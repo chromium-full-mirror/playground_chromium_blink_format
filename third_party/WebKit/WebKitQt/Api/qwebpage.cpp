@@ -123,9 +123,7 @@ QWebFrame* QWebPage::createFrame(QWebFrame* parentFrame,
 }
 
 void QWebPage::open(const QUrl& url) {
-  QWebNetworkRequest request;
-  request.setUrl(url);
-  open(request);
+  open(QWebNetworkRequest(url));
 }
 
 void QWebPage::open(const QWebNetworkRequest& req) {

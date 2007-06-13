@@ -126,6 +126,14 @@ void QWebNetworkRequestPrivate::setURL(const QUrl& u) {
 
 QWebNetworkRequest::QWebNetworkRequest() : d(new QWebNetworkRequestPrivate) {}
 
+QWebNetworkRequest::QWebNetworkRequest(const QUrl& url,
+                                       Method method,
+                                       const QByteArray& postData)
+    : d(new QWebNetworkRequestPrivate) {
+  d->init(method == Get ? "GET" : "POST", url);
+  d->postData = postData;
+}
+
 QWebNetworkRequest::QWebNetworkRequest(const QWebNetworkRequest& other)
     : d(new QWebNetworkRequestPrivate(*other.d)) {}
 
