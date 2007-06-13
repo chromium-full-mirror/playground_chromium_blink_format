@@ -41,12 +41,7 @@ class JavaClass : public Class {
   virtual const char* name() const { return _name; };
 
   virtual MethodList methodsNamed(const Identifier&, Instance* instance) const;
-
   virtual Field* fieldNamed(const Identifier&, Instance* instance) const;
-
-  virtual Constructor* constructorAt(int i) const { return &_constructors[i]; };
-
-  virtual int numConstructors() const { return _numConstructors; };
 
   bool isNumberClass() const;
   bool isBooleanClass() const;
@@ -58,8 +53,6 @@ class JavaClass : public Class {
   const char* _name;
   FieldMap _fields;
   MethodListMap _methods;
-  JavaConstructor* _constructors;
-  int _numConstructors;
 };
 
 }  // namespace Bindings

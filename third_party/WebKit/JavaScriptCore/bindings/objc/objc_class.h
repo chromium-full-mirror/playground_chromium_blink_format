@@ -48,9 +48,6 @@ class ObjcClass : public Class {
                                   Instance* instance,
                                   const Identifier& propertyName);
 
-  virtual Constructor* constructorAt(int) const { return 0; }
-  virtual int numConstructors() const { return 0; }
-
   ClassStructPtr isa() { return _isa; }
 
  private:
