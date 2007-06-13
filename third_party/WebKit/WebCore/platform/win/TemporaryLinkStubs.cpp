@@ -129,7 +129,6 @@ String FrameLoader::overrideMediaType() const {
 bool ResourceHandle::loadsBlocked() {
   return false;
 }
-void ResourceHandle::setDefersLoading(bool) {}
 
 // CRITFIXME: See if any of the following are actually implemented in OpenSource
 // and copy the impls to internal
