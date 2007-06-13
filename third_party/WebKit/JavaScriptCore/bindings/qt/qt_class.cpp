@@ -74,7 +74,7 @@ MethodList QtClass::methodsNamed(const Identifier& identifier,
     if (signature == name) {
       Method* method =
           new QtMethod(metaObject, i, signature, m.parameterTypes().size());
-      methodList.addMethod(method);
+      methodList.append(method);
       break;
     }
   }
