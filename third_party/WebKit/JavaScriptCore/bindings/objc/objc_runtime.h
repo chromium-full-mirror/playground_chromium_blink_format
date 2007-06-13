@@ -139,7 +139,7 @@ class ObjcArray : public Array {
   ObjectStructPtr _array;
 };
 
-class ObjcFallbackObjectImp : public JSObject, Noncopyable {
+class ObjcFallbackObjectImp : public JSObject {
  public:
   ObjcFallbackObjectImp(ObjcInstance* i, const Identifier propertyName);
 
