@@ -53,7 +53,6 @@ class ObjcField : public Field {
                                   JSValue* aValue) const;
 
   virtual const char* name() const;
-  virtual RuntimeType type() const;
 
  private:
   IvarStructPtr _ivar;

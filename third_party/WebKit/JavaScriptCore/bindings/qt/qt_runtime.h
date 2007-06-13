@@ -37,7 +37,6 @@ class QtField : public Field {
   virtual JSValue* valueFromInstance(ExecState*, const Instance*) const;
   virtual void setValueToInstance(ExecState*, const Instance*, JSValue*) const;
   virtual const char* name() const;
-  virtual RuntimeType type() const { return ""; }
 
  private:
   QMetaProperty property;
