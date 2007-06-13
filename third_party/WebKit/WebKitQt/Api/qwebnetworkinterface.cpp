@@ -27,6 +27,7 @@
 #include "qwebobjectpluginconnector.h"
 #include <qdebug.h>
 #include <qfile.h>
+#include <qurl.h>
 
 #include "ResourceHandle.h"
 #include "ResourceHandleClient.h"
@@ -183,7 +184,7 @@ void QWebNetworkJob::setResponse(const QHttpResponseHeader& response) {
   returns true if the job has been cancelled by the WebKit framework
 */
 bool QWebNetworkJob::cancelled() const {
-  return !d->resourceHandle;
+  return !d->resourceHandle && !d->connector;
 }
 
 /*!
@@ -263,6 +264,7 @@ void QWebNetworkManager::cancel(ResourceHandle* handle) {
   if (!job)
     return;
   job->d->resourceHandle = 0;
+  job->d->connector = 0;
   job->d->interface->cancelJob(job);
   handle->getInternal()->m_job = 0;
 }
@@ -281,7 +283,7 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
   DEBUG() << job->d->response.toString();
 
   QStringList cookies = job->d->response.allValues("Set-Cookie");
-  KURL url = job->d->resourceHandle->url();
+  KURL url(job->url().toString());
   foreach (QString c, cookies) { setCookies(url, url, c); }
   QString contentType = job->d->response.value("Content-Type");
   QString encoding;

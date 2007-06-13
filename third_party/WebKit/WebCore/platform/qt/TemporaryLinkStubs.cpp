@@ -82,10 +82,6 @@ int Font::offsetForPositionForComplexText(const TextRun&,
   return 0;
 }
 
-void WebCore::refreshPlugins(bool) {
-  notImplemented();
-}
-
 bool WebCore::historyContains(DeprecatedString const&) {
   return false;
 }
@@ -276,18 +272,6 @@ bool AXObjectCache::gAccessibilityEnabled = false;
 
 Vector<char> loadResourceIntoArray(const char*) {
   return Vector<char>();
-}
-
-PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
-  notImplemented();
-  return 0;
-}
-unsigned PlugInInfoStore::pluginCount() const {
-  notImplemented();
-  return 0;
-}
-bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
-  return false;
 }
 
 namespace WebCore {

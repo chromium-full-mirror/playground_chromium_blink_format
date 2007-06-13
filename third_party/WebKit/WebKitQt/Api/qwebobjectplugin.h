@@ -53,6 +53,9 @@ class QWEBKIT_EXPORT QWebObjectPlugin
   virtual ~QWebObjectPlugin();
 
   virtual QStringList keys() const = 0;
+
+  virtual QString descriptionForKey(const QString& key) const;
+  virtual QStringList mimetypesForKey(const QString& key) const;
   virtual QStringList extensionsForMimetype(const QString& mimeType) const;
   virtual QObject* create(QWebObjectPluginConnector* connector,
                           const QUrl& url,
