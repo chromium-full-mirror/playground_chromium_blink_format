@@ -45,7 +45,7 @@ class SVGPaintServerSolid : public SVGPaintServer {
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
-#if PLATFORM(CG) || PLATFORM(QT)
+#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(CAIRO)
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
                      SVGPaintTargetType,

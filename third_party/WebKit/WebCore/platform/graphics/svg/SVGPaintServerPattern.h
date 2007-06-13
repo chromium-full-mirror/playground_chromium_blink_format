@@ -70,7 +70,7 @@ class SVGPaintServerPattern : public SVGPaintServer {
                         bool isPaintingText) const;
 #endif
 
-#if PLATFORM(QT)
+#if PLATFORM(QT) || PLATFORM(CAIRO)
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
                      SVGPaintTargetType,
