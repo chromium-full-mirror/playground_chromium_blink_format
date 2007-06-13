@@ -76,12 +76,10 @@ QWebPagePrivate::~QWebPagePrivate() {
 
 QWebPage::NavigationRequestResponse QWebPagePrivate::navigationRequested(
     QWebFrame* frame,
-    const QUrl& url,
-    const QHttpRequestHeader& request,
-    const QByteArray& postData) {
+    const QWebNetworkRequest& request) {
   if (insideOpenCall && frame == mainFrame)
     return QWebPage::AcceptNavigationRequest;
-  return q->navigationRequested(frame, url, request, postData);
+  return q->navigationRequested(frame, request);
 }
 
 void QWebPagePrivate::createMainFrame() {
@@ -205,13 +203,8 @@ QWebPage* QWebPage::createWindow() {
 
 QWebPage::NavigationRequestResponse QWebPage::navigationRequested(
     QWebFrame* frame,
-    const QUrl& url,
-    const QHttpRequestHeader& request,
-    const QByteArray& postData) {
-  Q_UNUSED(frame)
-  Q_UNUSED(url)
+    const QWebNetworkRequest& request) {
   Q_UNUSED(request)
-  Q_UNUSED(postData)
   return AcceptNavigationRequest;
 }
 

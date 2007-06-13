@@ -686,12 +686,10 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
   Q_ASSERT(!m_policyFunction);
   m_policyFunction = function;
   if (m_webFrame) {
-    QWebNetworkRequestPrivate r;
-    r.init(request);
+    QWebNetworkRequest r(request);
     QWebPage* page = m_webFrame->page();
 
-    if (page->d->navigationRequested(m_webFrame, r.url, r.httpHeader,
-                                     r.postData) ==
+    if (page->d->navigationRequested(m_webFrame, r) ==
         QWebPage::IgnoreNavigationRequest) {
       slotCallPolicyFunction(PolicyIgnore);
       return;

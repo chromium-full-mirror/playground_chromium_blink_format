@@ -62,9 +62,7 @@ class QWebPagePrivate {
   bool insideOpenCall;
   QWebPage::NavigationRequestResponse navigationRequested(
       QWebFrame* frame,
-      const QUrl& url,
-      const QHttpRequestHeader& request,
-      const QByteArray& postData);
+      const QWebNetworkRequest& request);
 };
 
 #endif

@@ -135,8 +135,19 @@ QWebNetworkRequest& QWebNetworkRequest::operator=(
   return *this;
 }
 
+/*!
+  \internal
+*/
 QWebNetworkRequest::QWebNetworkRequest(QWebNetworkRequestPrivate* priv)
     : d(new QWebNetworkRequestPrivate(*priv)) {}
+
+/*!
+  \internal
+*/
+QWebNetworkRequest::QWebNetworkRequest(const WebCore::ResourceRequest& request)
+    : d(new QWebNetworkRequestPrivate) {
+  d->init(request);
+}
 
 QWebNetworkRequest::~QWebNetworkRequest() {
   delete d;

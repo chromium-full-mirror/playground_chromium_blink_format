@@ -34,6 +34,7 @@ class QWebFrame;
 class QUndoStack;
 class QUrl;
 class QHttpRequestHeader;
+class QWebNetworkRequest;
 
 class QWebPagePrivate;
 class QWebFrameData;
@@ -148,9 +149,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
   virtual NavigationRequestResponse navigationRequested(
       QWebFrame* frame,
-      const QUrl& url,
-      const QHttpRequestHeader& request,
-      const QByteArray& postData);
+      const QWebNetworkRequest& request);
 
  private:
   friend class QWebFrame;
