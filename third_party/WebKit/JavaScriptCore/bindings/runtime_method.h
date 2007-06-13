@@ -56,7 +56,7 @@ class RuntimeMethod : public InternalFunctionImp {
                                const Identifier&,
                                const PropertySlot&);
 
-  Bindings::MethodList _methodList;
+  OwnPtr<Bindings::MethodList> _methodList;
 };
 
 }  // namespace KJS
