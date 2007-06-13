@@ -38,7 +38,7 @@ class UIEvent;
 namespace KJS {
 
 class Window;
-class Clipboard;
+class JSClipboard;
 
 class JSAbstractEventListener : public WebCore::EventListener {
  public:
@@ -108,12 +108,15 @@ class DOMEvent : public DOMObject {
  public:
   DOMEvent(ExecState*, WebCore::Event*);
   virtual ~DOMEvent();
+
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   virtual void put(ExecState*, const Identifier&, JSValue*, int attr = None);
-  void putValueProperty(ExecState*, int token, JSValue*, int);
+  void putValueProperty(ExecState*, int token, JSValue*, int attr);
+
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+
   enum {
     Type,
     Target,
@@ -125,6 +128,7 @@ class DOMEvent : public DOMObject {
     StopPropagation,
     PreventDefault,
     InitEvent,
+
     // MS IE equivalents
     SrcElement,
     ReturnValue,
@@ -132,33 +136,34 @@ class DOMEvent : public DOMObject {
     ClipboardData,
     DataTransfer
   };
+
   WebCore::Event* impl() const { return m_impl.get(); }
-  virtual void mark();
 
  protected:
   RefPtr<WebCore::Event> m_impl;
-  mutable Clipboard* clipboard;
 };
 
 JSValue* toJS(ExecState*, WebCore::Event*);
-
 WebCore::Event* toEvent(
     JSValue*);  // returns 0 if value is not a DOMEvent object
 
 KJS_DEFINE_PROTOTYPE(DOMEventPrototype)
 
-class Clipboard : public DOMObject {
-  friend class ClipboardPrototypeFunction;
+class JSClipboard : public DOMObject {
+  friend class JSClipboardPrototypeFunction;
 
  public:
-  Clipboard(ExecState*, WebCore::Clipboard* ds);
+  JSClipboard(ExecState*, WebCore::Clipboard* ds);
+  virtual ~JSClipboard();
+
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   virtual void put(ExecState*, const Identifier&, JSValue*, int attr = None);
   void putValueProperty(ExecState*, int token, JSValue*, int attr);
-  virtual bool toBoolean(ExecState*) const { return true; }
+
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+
   enum {
     ClearData,
     GetData,
@@ -169,9 +174,14 @@ class Clipboard : public DOMObject {
     EffectAllowed
   };
 
+  WebCore::Clipboard* impl() const { return m_impl.get(); }
+
  private:
-  RefPtr<WebCore::Clipboard> clipboard;
+  RefPtr<WebCore::Clipboard> m_impl;
 };
+
+JSValue* toJS(ExecState*, WebCore::Clipboard*);
+WebCore::Clipboard* toClipboard(JSValue*);
 
 }  // namespace
 

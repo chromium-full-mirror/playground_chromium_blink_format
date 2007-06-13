@@ -77,6 +77,7 @@ class MouseEvent : public MouseRelatedEvent {
   unsigned short button() const { return m_button; }
   bool buttonDown() const { return m_buttonDown; }
   EventTargetNode* relatedTarget() const { return m_relatedTarget.get(); }
+
   Clipboard* clipboard() const { return m_clipboard.get(); }
 
   Node* toElement() const;
