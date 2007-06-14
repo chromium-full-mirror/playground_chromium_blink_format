@@ -36,6 +36,8 @@ class JSValue;
 
 namespace Bindings {
 
+class RootObject;
+
 typedef uint16_t NPUTF16;
 
 enum NP_ValueType {
@@ -56,7 +58,7 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
                         NPUTF16** UTF16Chars,
                         unsigned int* UTF16Length);
 void convertValueToNPVariant(ExecState*, JSValue*, NPVariant* result);
-JSValue* convertNPVariantToValue(ExecState*, const NPVariant*);
+JSValue* convertNPVariantToValue(ExecState*, const NPVariant*, RootObject*);
 Identifier identifierFromNPIdentifier(const NPUTF8* name);
 
 struct PrivateIdentifier {

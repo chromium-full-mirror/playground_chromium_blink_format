@@ -103,10 +103,10 @@ class Instance : Noncopyable {
 
   static Instance* createBindingForLanguageInstance(BindingLanguage,
                                                     void* nativeInstance,
-                                                    PassRefPtr<RootObject> = 0);
+                                                    PassRefPtr<RootObject>);
   static JSObject* createRuntimeObject(BindingLanguage,
                                        void* nativeInstance,
-                                       PassRefPtr<RootObject> = 0);
+                                       PassRefPtr<RootObject>);
 
   void ref() { _refCount++; }
   void deref() {

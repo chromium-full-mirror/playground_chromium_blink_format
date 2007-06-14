@@ -78,7 +78,8 @@ ObjcValue convertValueToObjcValue(ExecState* exec,
 JSValue* convertNSStringToString(NSString* nsstring);
 JSValue* convertObjcValueToValue(ExecState* exec,
                                  void* buffer,
-                                 ObjcValueType type);
+                                 ObjcValueType type,
+                                 RootObject*);
 ObjcValueType objcValueTypeForType(const char* type);
 
 bool convertJSMethodNameToObjc(const char* JSName,

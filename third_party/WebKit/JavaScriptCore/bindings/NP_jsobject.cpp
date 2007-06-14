@@ -38,10 +38,11 @@ using namespace KJS::Bindings;
 
 static List listFromVariantArgs(ExecState* exec,
                                 const NPVariant* args,
-                                unsigned argCount) {
+                                unsigned argCount,
+                                RootObject* rootObject) {
   List aList;
   for (unsigned i = 0; i < argCount; i++)
-    aList.append(convertNPVariantToValue(exec, &args[i]));
+    aList.append(convertNPVariantToValue(exec, &args[i], rootObject));
   return aList;
 }
 
@@ -128,7 +129,7 @@ bool _NPN_InvokeDefault(NPP,
     if (!funcImp->implementsCall())
       return false;
 
-    List argList = listFromVariantArgs(exec, args, argCount);
+    List argList = listFromVariantArgs(exec, args, argCount, rootObject);
     JSValue* resultV = funcImp->call(exec, funcImp, argList);
 
     // Convert and return the result of the function call.
@@ -187,7 +188,7 @@ bool _NPN_Invoke(NPP npp,
     // Call the function object.
     JSObject* funcImp = static_cast<JSObject*>(func);
     JSObject* thisObj = const_cast<JSObject*>(obj->imp);
-    List argList = listFromVariantArgs(exec, args, argCount);
+    List argList = listFromVariantArgs(exec, args, argCount, rootObject);
     JSValue* resultV = funcImp->call(exec, thisObj, argList);
 
     // Convert and return the result of the function call.
@@ -306,10 +307,10 @@ bool _NPN_SetProperty(NPP,
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
     if (i->isString)
       obj->imp->put(exec, identifierFromNPIdentifier(i->value.string),
-                    convertNPVariantToValue(exec, variant));
+                    convertNPVariantToValue(exec, variant, rootObject));
     else
       obj->imp->put(exec, i->value.number,
-                    convertNPVariantToValue(exec, variant));
+                    convertNPVariantToValue(exec, variant, rootObject));
     return true;
   }
 

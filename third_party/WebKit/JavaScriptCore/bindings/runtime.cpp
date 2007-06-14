@@ -45,12 +45,16 @@
 namespace KJS {
 namespace Bindings {
 
-Array::Array(PassRefPtr<RootObject> rootObject) : _rootObject(rootObject) {}
+Array::Array(PassRefPtr<RootObject> rootObject) : _rootObject(rootObject) {
+  ASSERT(_rootObject);
+}
 
 Array::~Array() {}
 
 Instance::Instance(PassRefPtr<RootObject> rootObject)
-    : _rootObject(rootObject), _refCount(0) {}
+    : _rootObject(rootObject), _refCount(0) {
+  ASSERT(_rootObject);
+}
 
 Instance::~Instance() {}
 
