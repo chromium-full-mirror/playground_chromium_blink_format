@@ -964,6 +964,8 @@ void HTMLSelectElement::typeAheadFind(KeyboardEvent* event) {
 
   const Vector<HTMLElement*>& items = listItems();
   int itemCount = items.size();
+  if (itemCount < 1)
+    return;
 
   int index =
       (optionToListIndex(selectedIndex()) + searchStartOffset) % itemCount;
