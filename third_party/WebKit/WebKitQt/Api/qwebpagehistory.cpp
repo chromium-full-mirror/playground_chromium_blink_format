@@ -29,6 +29,13 @@
 
 #include <QSharedData>
 
+QWebHistoryItem::QWebHistoryItem(const QWebHistoryItem& other) : d(other.d) {}
+
+QWebHistoryItem& QWebHistoryItem::operator=(const QWebHistoryItem& other) {
+  d = other.d;
+  return *this;
+}
+
 QWebHistoryItem::~QWebHistoryItem() {}
 
 QUrl QWebHistoryItem::originalUrl() const {
