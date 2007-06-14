@@ -62,6 +62,7 @@
 #include "IconLoader.h"
 #include "Logging.h"
 #include "MainResourceLoader.h"
+#include "MimeTypeRegistry.h"
 #include "Page.h"
 #include "PageCache.h"
 #include "ProgressTracker.h"
@@ -1510,7 +1511,9 @@ bool FrameLoader::requestObject(RenderPart* renderer,
   if (shouldUsePlugin(completedURL, mimeType, renderer->hasFallbackContent(),
                       useFallback)) {
     Settings* settings = m_frame->settings();
-    if (!settings || !settings->arePluginsEnabled())
+    if (!settings || !settings->arePluginsEnabled() ||
+        (!settings->isJavaEnabled() &&
+         MimeTypeRegistry::isJavaAppletMIMEType(mimeType)))
       return false;
     return loadPlugin(renderer, completedURL, mimeType, paramNames, paramValues,
                       useFallback);
