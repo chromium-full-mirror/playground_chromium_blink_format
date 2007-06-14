@@ -1079,6 +1079,16 @@ NPObject* Frame::windowScriptNPObject() {
   return d->m_windowScriptNPObject;
 }
 
+void Frame::cleanupScriptObjectsForPlugin(void* nativeHandle) {
+  RootObjectMap::iterator it = d->m_rootObjects.find(nativeHandle);
+
+  if (it == d->m_rootObjects.end())
+    return;
+
+  it->second->invalidate();
+  d->m_rootObjects.remove(it);
+}
+
 void Frame::cleanupScriptObjects() {
   cleanupPlatformScriptObjects();
   JSLock lock;
