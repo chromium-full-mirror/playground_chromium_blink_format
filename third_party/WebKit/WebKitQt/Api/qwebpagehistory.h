@@ -117,7 +117,6 @@ class QWEBKIT_EXPORT QWebHistoryItem {
   QWebHistoryItem& operator=(const QWebHistoryItem& other);
   ~QWebHistoryItem();
 
-  QWebHistoryItem* parent() const;
   QList<QWebHistoryItem*> children() const;
 
   QUrl originalUrl() const;
