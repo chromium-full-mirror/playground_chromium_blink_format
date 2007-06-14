@@ -32,14 +32,8 @@ const ClassInfo RuntimeArray::info = {"RuntimeArray", &ArrayInstance::info, 0,
                                       0};
 
 RuntimeArray::RuntimeArray(ExecState* exec, Bindings::Array* a)
-    : JSObject(exec->lexicalInterpreter()->builtinArrayPrototype()) {
-  // Always takes ownership of concrete array.
-  _array = a;
-}
-
-RuntimeArray::~RuntimeArray() {
-  delete _array;
-}
+    : JSObject(exec->lexicalInterpreter()->builtinArrayPrototype()),
+      _array(a) {}
 
 JSValue* RuntimeArray::lengthGetter(ExecState*,
                                     JSObject*,

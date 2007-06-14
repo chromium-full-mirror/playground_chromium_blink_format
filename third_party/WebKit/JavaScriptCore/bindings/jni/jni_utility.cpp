@@ -918,7 +918,8 @@ jvalue convertValueToJValue(ExecState* exec,
           RuntimeObjectImp* imp = static_cast<RuntimeObjectImp*>(value);
           JavaInstance* instance =
               static_cast<JavaInstance*>(imp->getInternalInstance());
-          result.l = instance->javaInstance();
+          if (instance)
+            result.l = instance->javaInstance();
         } else if (objectImp->classInfo() == &RuntimeArray::info) {
           // Input is a JavaScript Array that was originally created from a Java
           // Array

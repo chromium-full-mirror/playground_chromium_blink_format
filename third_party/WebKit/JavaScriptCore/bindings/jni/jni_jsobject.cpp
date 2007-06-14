@@ -392,6 +392,9 @@ jobject JavaJSObject::convertValueToJObject(JSValue* value) const {
         RuntimeObjectImp* runtimeImp = static_cast<RuntimeObjectImp*>(value);
         JavaInstance* runtimeInstance =
             static_cast<JavaInstance*>(runtimeImp->getInternalInstance());
+        if (!runtimeInstance)
+          return 0;
+
         return runtimeInstance->javaInstance();
       } else {
         nativeHandle = ptr_to_jlong(imp);

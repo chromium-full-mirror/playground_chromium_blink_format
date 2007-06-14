@@ -42,8 +42,6 @@ RuntimeMethod::RuntimeMethod(ExecState* exec,
           ident),
       _methodList(new MethodList(m)) {}
 
-RuntimeMethod::~RuntimeMethod() {}
-
 JSValue* RuntimeMethod::lengthGetter(ExecState*,
                                      JSObject*,
                                      const Identifier&,
@@ -92,6 +90,9 @@ JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
     return throwError(exec, TypeError);
 
   Instance* instance = imp->getInternalInstance();
+  if (!instance)
+    return RuntimeObjectImp::throwInvalidAccessError(exec);
+
   instance->begin();
   JSValue* aValue = instance->invokeMethod(exec, *_methodList, args);
   instance->end();

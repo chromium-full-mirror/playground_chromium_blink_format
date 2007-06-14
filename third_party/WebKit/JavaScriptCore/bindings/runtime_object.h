@@ -36,6 +36,7 @@ namespace KJS {
 class RuntimeObjectImp : public JSObject {
  public:
   RuntimeObjectImp(Bindings::Instance* i);
+  virtual ~RuntimeObjectImp();
 
   const ClassInfo* classInfo() const { return &info; }
 
@@ -53,7 +54,10 @@ class RuntimeObjectImp : public JSObject {
                                   const List& args);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
+  void invalidate();
   Bindings::Instance* getInternalInstance() const { return instance.get(); }
+
+  static JSObject* throwInvalidAccessError(ExecState*);
 
   static const ClassInfo info;
 

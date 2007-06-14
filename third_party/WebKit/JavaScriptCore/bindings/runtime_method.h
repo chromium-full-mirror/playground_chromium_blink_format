@@ -38,8 +38,6 @@ class RuntimeMethod : public InternalFunctionImp {
                 const Identifier& n,
                 Bindings::MethodList& methodList);
 
-  virtual ~RuntimeMethod();
-
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
   virtual JSValue* callAsFunction(ExecState* exec,
