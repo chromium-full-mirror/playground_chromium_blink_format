@@ -21,8 +21,13 @@
 #include "config.h"
 #include "FileChooser.h"
 
+#include "Document.h"
+#include "Frame.h"
+#include "FrameLoaderClientQt.h"
 #include "Icon.h"
-#include "NotImplemented.h"
+#include "Page.h"
+
+#include <QFontMetrics>
 
 namespace WebCore {
 
@@ -31,13 +36,25 @@ FileChooser::FileChooser(FileChooserClient* client, const String& filename)
 
 FileChooser::~FileChooser() {}
 
-void FileChooser::openFileChooser(Document*) {
-  notImplemented();
+void FileChooser::openFileChooser(Document* doc) {
+  Page* page = doc->page();
+  Frame* frame = doc->frame();
+  if (!page || !frame)
+    return;
+
+  FrameLoaderClientQt* fl =
+      static_cast<FrameLoaderClientQt*>(frame->loader()->client());
+  if (!fl)
+    return;
+
+  QString f = fl->chooseFile(m_filename);
+  if (!f.isEmpty())
+    chooseFile(f);
 }
 
-String FileChooser::basenameForWidth(const Font&, int width) const {
-  notImplemented();
-  return String();
+String FileChooser::basenameForWidth(const Font& f, int width) const {
+  QFontMetrics fm((QFont)f);
+  return fm.elidedText(m_filename, Qt::ElideLeft, width);
 }
 }
 

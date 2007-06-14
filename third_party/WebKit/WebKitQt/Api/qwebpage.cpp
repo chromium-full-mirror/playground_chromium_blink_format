@@ -49,14 +49,18 @@
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QFileDialog>
+#include <QHttpRequestHeader>
+#include <QInputDialog>
+#include <QMessageBox>
 #include <QUndoStack>
 #include <QUrl>
 #include <QVBoxLayout>
-#include <QHttpRequestHeader>
 
 using namespace WebCore;
 
 QWebPagePrivate::QWebPagePrivate(QWebPage* qq) : q(qq), modified(false) {
+  q->setFocusPolicy(Qt::ClickFocus);
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();
   editorClient = new EditorClientQt(q);
@@ -199,9 +203,27 @@ void QWebPage::javaScriptConsoleMessage(const QString& message,
                                         unsigned int lineNumber,
                                         const QString& sourceID) {}
 
-void QWebPage::statusTextChanged(const QString& text) {}
+void QWebPage::javaScriptAlert(QWebFrame* frame, const QString& msg) {
+  QMessageBox::information(frame, title(), msg, QMessageBox::Ok);
+}
 
-void QWebPage::runJavaScriptAlert(QWebFrame* frame, const QString& msg) {}
+bool QWebPage::javaScriptConfirm(QWebFrame* frame, const QString& msg) {
+  return 0 == QMessageBox::information(frame, title(), msg, QMessageBox::Yes,
+                                       QMessageBox::No);
+}
+
+bool QWebPage::javaScriptPrompt(QWebFrame* frame,
+                                const QString& msg,
+                                const QString& defaultValue,
+                                QString* result) {
+  bool ok = false;
+  QString x = QInputDialog::getText(frame, title(), msg, QLineEdit::Normal,
+                                    defaultValue, &ok);
+  if (ok && result) {
+    *result = x;
+  }
+  return ok;
+}
 
 QWebPage* QWebPage::createWindow() {
   return 0;
@@ -366,4 +388,8 @@ QWebSettings QWebPage::settings() const {
   settings.setUserStyleSheetLocation(wSettings->userStyleSheetLocation().url());
 
   return settings;
+}
+
+QString QWebPage::chooseFile(QWebFrame* parentFrame, const QString& oldFile) {
+  return QFileDialog::getOpenFileName(parentFrame, QString::null, oldFile);
 }

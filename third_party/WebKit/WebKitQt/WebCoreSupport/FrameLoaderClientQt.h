@@ -284,6 +284,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   virtual void windowObjectCleared() const;
 
+  QString chooseFile(const QString& oldFile);
+
  private:
   Frame* m_frame;
   QWebFrame* m_webFrame;
