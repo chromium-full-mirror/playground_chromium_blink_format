@@ -197,7 +197,7 @@ bool RuntimeObjectImp::canPut(ExecState* exec,
 
   instance->end();
 
-  return aField;
+  return !!aField;
 }
 
 bool RuntimeObjectImp::deleteProperty(ExecState*, const Identifier&) {
