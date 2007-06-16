@@ -30,13 +30,13 @@
 namespace WebCore {
 
 class CSSImageValue;
-class RectImpl;
+class Rect;
 
 class CSSBorderImageValue : public CSSValue {
  public:
   CSSBorderImageValue();
   CSSBorderImageValue(PassRefPtr<CSSImageValue>,
-                      PassRefPtr<RectImpl>,
+                      PassRefPtr<Rect>,
                       int horizontalRule,
                       int verticalRule);
 
@@ -49,7 +49,7 @@ class CSSBorderImageValue : public CSSValue {
   // These four values are used to make "cuts" in the image.  They can be
   // numbers
   // or percentages.
-  RefPtr<RectImpl> m_imageSliceRect;
+  RefPtr<Rect> m_imageSliceRect;
 
   // Values for how to handle the scaling/stretching/tiling of the image slices.
   int m_horizontalSizeRule;  // Rule for how to adjust the widths of the

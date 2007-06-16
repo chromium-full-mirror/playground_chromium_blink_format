@@ -31,7 +31,7 @@ namespace WebCore {
 class Counter;
 class DashboardRegion;
 class Pair;
-class RectImpl;
+class Rect;
 class RenderStyle;
 class StringImpl;
 
@@ -79,7 +79,7 @@ class CSSPrimitiveValue : public CSSValue {
   CSSPrimitiveValue(double, UnitTypes);
   CSSPrimitiveValue(const String&, UnitTypes);
   CSSPrimitiveValue(PassRefPtr<Counter>);
-  CSSPrimitiveValue(PassRefPtr<RectImpl>);
+  CSSPrimitiveValue(PassRefPtr<Rect>);
   CSSPrimitiveValue(unsigned color);  // RGB value
   CSSPrimitiveValue(PassRefPtr<Pair>);
   CSSPrimitiveValue(PassRefPtr<DashboardRegion>);  // FIXME: Why is dashboard
@@ -128,9 +128,7 @@ class CSSPrimitiveValue : public CSSValue {
   Counter* getCounterValue() const {
     return m_type != CSS_COUNTER ? 0 : m_value.counter;
   }
-  RectImpl* getRectValue() const {
-    return m_type != CSS_RECT ? 0 : m_value.rect;
-  }
+  Rect* getRectValue() const { return m_type != CSS_RECT ? 0 : m_value.rect; }
   unsigned getRGBColorValue() const {
     return m_type != CSS_RGBCOLOR ? 0 : m_value.rgbcolor;
   }
@@ -158,7 +156,7 @@ class CSSPrimitiveValue : public CSSValue {
     double num;
     StringImpl* string;
     Counter* counter;
-    RectImpl* rect;
+    Rect* rect;
     unsigned rgbcolor;
     Pair* pair;
     DashboardRegion* region;

@@ -39,85 +39,86 @@
 
 #include "kjs_css.lut.h"
 
-using namespace WebCore;
+namespace WebCore {
+
+using namespace KJS;
 using namespace HTMLNames;
 
-namespace KJS {
-
-const ClassInfo DOMStyleSheetList::info = {"StyleSheetList", 0,
-                                           &DOMStyleSheetListTable, 0};
+const ClassInfo JSStyleSheetList::info = {"StyleSheetList", 0,
+                                          &JSStyleSheetListTable, 0};
 
 /*
-@begin DOMStyleSheetListTable 2
-  length        DOMStyleSheetList::Length       DontDelete|ReadOnly
-  item          DOMStyleSheetList::Item         DontDelete|Function 1
+@begin JSStyleSheetListTable 2
+  length        WebCore::JSStyleSheetList::Length       DontDelete|ReadOnly
+  item          WebCore::JSStyleSheetList::Item         DontDelete|Function 1
 @end
 */
-KJS_IMPLEMENT_PROTOTYPE_FUNCTION(
-    DOMStyleSheetListFunc)  // not really a prototype, but doesn't matter
 
-DOMStyleSheetList::DOMStyleSheetList(ExecState* exec,
-                                     StyleSheetList* ssl,
-                                     Document* doc)
-    : m_impl(ssl), m_doc(doc) {
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(
+    JSStyleSheetListFunc)  // not really a prototype, but doesn't matter
+
+JSStyleSheetList::JSStyleSheetList(ExecState* exec,
+                                   StyleSheetList* styleSheetList,
+                                   Document* doc)
+    : m_impl(styleSheetList), m_doc(doc) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
 }
 
-DOMStyleSheetList::~DOMStyleSheetList() {
+JSStyleSheetList::~JSStyleSheetList() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-JSValue* DOMStyleSheetList::getValueProperty(ExecState* exec, int token) const {
+JSValue* JSStyleSheetList::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case Length:
       return jsNumber(m_impl->length());
     default:
-      ASSERT(0);
+      ASSERT_NOT_REACHED();
       return jsUndefined();
   }
 }
 
-JSValue* DOMStyleSheetList::indexGetter(ExecState* exec,
-                                        JSObject* originalObject,
-                                        const Identifier& propertyName,
-                                        const PropertySlot& slot) {
-  DOMStyleSheetList* thisObj = static_cast<DOMStyleSheetList*>(slot.slotBase());
-  return toJS(exec, thisObj->m_impl->item(slot.index()));
-}
-
-JSValue* DOMStyleSheetList::nameGetter(ExecState* exec,
+JSValue* JSStyleSheetList::indexGetter(ExecState* exec,
                                        JSObject* originalObject,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
-  DOMStyleSheetList* thisObj = static_cast<DOMStyleSheetList*>(slot.slotBase());
+  JSStyleSheetList* thisObj = static_cast<JSStyleSheetList*>(slot.slotBase());
+  return toJS(exec, thisObj->m_impl->item(slot.index()));
+}
+
+JSValue* JSStyleSheetList::nameGetter(ExecState* exec,
+                                      JSObject* originalObject,
+                                      const Identifier& propertyName,
+                                      const PropertySlot& slot) {
+  JSStyleSheetList* thisObj = static_cast<JSStyleSheetList*>(slot.slotBase());
   Element* element = thisObj->m_doc->getElementById(propertyName);
   return toJS(exec, static_cast<HTMLStyleElement*>(element)->sheet());
 }
 
-bool DOMStyleSheetList::getOwnPropertySlot(ExecState* exec,
-                                           const Identifier& propertyName,
-                                           PropertySlot& slot) {
+bool JSStyleSheetList::getOwnPropertySlot(ExecState* exec,
+                                          const Identifier& propertyName,
+                                          PropertySlot& slot) {
   const HashEntry* entry =
-      Lookup::findEntry(&DOMStyleSheetListTable, propertyName);
+      Lookup::findEntry(&JSStyleSheetListTable, propertyName);
 
   if (entry) {
     switch (entry->value) {
       case Length:
-        slot.setStaticEntry(this, entry, staticValueGetter<DOMStyleSheetList>);
+        slot.setStaticEntry(this, entry, staticValueGetter<JSStyleSheetList>);
         return true;
       case Item:
         slot.setStaticEntry(this, entry,
-                            staticFunctionGetter<DOMStyleSheetListFunc>);
+                            staticFunctionGetter<JSStyleSheetListFunc>);
         return true;
     }
   }
 
-  StyleSheetList& styleSheetList = *m_impl;
+  StyleSheetList* styleSheetList = m_impl.get();
 
   // Retrieve stylesheet by index
   bool ok;
   unsigned u = propertyName.toUInt32(&ok);
-  if (ok && u < styleSheetList.length()) {
+  if (ok && u < styleSheetList->length()) {
     slot.setCustomIndex(this, u, indexGetter);
     return true;
   }
@@ -138,61 +139,61 @@ bool DOMStyleSheetList::getOwnPropertySlot(ExecState* exec,
   return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-JSValue* toJS(ExecState* exec, StyleSheetList* ssl, Document* doc) {
+JSValue* toJS(ExecState* exec, StyleSheetList* styleSheetList, Document* doc) {
   // Can't use the cacheDOMObject macro because of the doc argument
-  DOMObject* ret;
-  if (!ssl)
+  if (!styleSheetList)
     return jsNull();
+
   ScriptInterpreter* interp =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
-  if ((ret = interp->getDOMObject(ssl)))
+  DOMObject* ret = interp->getDOMObject(styleSheetList);
+  if (ret)
     return ret;
-  else {
-    ret = new DOMStyleSheetList(exec, ssl, doc);
-    interp->putDOMObject(ssl, ret);
-    return ret;
-  }
+
+  ret = new JSStyleSheetList(exec, styleSheetList, doc);
+  interp->putDOMObject(styleSheetList, ret);
+  return ret;
 }
 
-JSValue* DOMStyleSheetListFunc::callAsFunction(ExecState* exec,
-                                               JSObject* thisObj,
-                                               const List& args) {
-  if (!thisObj->inherits(&KJS::DOMStyleSheetList::info))
+JSValue* JSStyleSheetListFunc::callAsFunction(ExecState* exec,
+                                              JSObject* thisObj,
+                                              const List& args) {
+  if (!thisObj->inherits(&JSStyleSheetList::info))
     return throwError(exec, TypeError);
-  StyleSheetList& styleSheetList =
-      *static_cast<DOMStyleSheetList*>(thisObj)->impl();
-  if (id == DOMStyleSheetList::Item)
-    return toJS(exec, styleSheetList.item(args[0]->toInt32(exec)));
+
+  StyleSheetList* styleSheetList =
+      static_cast<JSStyleSheetList*>(thisObj)->impl();
+  if (id == JSStyleSheetList::Item)
+    return toJS(exec, styleSheetList->item(args[0]->toInt32(exec)));
   return jsUndefined();
 }
 
 // -------------------------------------------------------------------------
 
-const ClassInfo DOMRGBColor::info = {"RGBColor", 0, &DOMRGBColorTable, 0};
+const ClassInfo JSRGBColor::info = {"RGBColor", 0, &JSRGBColorTable, 0};
 
 /*
-@begin DOMRGBColorTable 3
-  red   DOMRGBColor::Red        DontDelete|ReadOnly
-  green DOMRGBColor::Green      DontDelete|ReadOnly
-  blue  DOMRGBColor::Blue       DontDelete|ReadOnly
+@begin JSRGBColorTable 3
+  red   WebCore::JSRGBColor::Red        DontDelete|ReadOnly
+  green WebCore::JSRGBColor::Green      DontDelete|ReadOnly
+  blue  WebCore::JSRGBColor::Blue       DontDelete|ReadOnly
 @end
 */
-DOMRGBColor::DOMRGBColor(ExecState* exec, unsigned color) : m_color(color) {
+
+JSRGBColor::JSRGBColor(ExecState* exec, unsigned color) : m_color(color) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
 }
 
-DOMRGBColor::~DOMRGBColor() {
-  // rgbColors.remove(rgbColor.handle());
+JSRGBColor::~JSRGBColor() {}
+
+bool JSRGBColor::getOwnPropertySlot(ExecState* exec,
+                                    const Identifier& propertyName,
+                                    PropertySlot& slot) {
+  return getStaticValueSlot<JSRGBColor, DOMObject>(exec, &JSRGBColorTable, this,
+                                                   propertyName, slot);
 }
 
-bool DOMRGBColor::getOwnPropertySlot(ExecState* exec,
-                                     const Identifier& propertyName,
-                                     PropertySlot& slot) {
-  return getStaticValueSlot<DOMRGBColor, DOMObject>(exec, &DOMRGBColorTable,
-                                                    this, propertyName, slot);
-}
-
-JSValue* DOMRGBColor::getValueProperty(ExecState* exec, int token) const {
+JSValue* JSRGBColor::getValueProperty(ExecState* exec, int token) const {
   int color = m_color;
   switch (token) {
     case Red:
@@ -205,58 +206,13 @@ JSValue* DOMRGBColor::getValueProperty(ExecState* exec, int token) const {
       return toJS(exec, new CSSPrimitiveValue(color & 0xFF,
                                               CSSPrimitiveValue::CSS_NUMBER));
     default:
-      return NULL;
+      return 0;
   }
 }
 
-JSValue* getDOMRGBColor(ExecState* exec, unsigned c) {
-  // ### implement equals for RGBColor since they're not refcounted objects
-  return new DOMRGBColor(exec, c);
+JSValue* getJSRGBColor(ExecState* exec, unsigned color) {
+  // FIXME: implement equals for RGBColor since they're not refcounted objects
+  return new JSRGBColor(exec, color);
 }
 
-// -------------------------------------------------------------------------
-
-const ClassInfo DOMRect::info = {"Rect", 0, &DOMRectTable, 0};
-/*
-@begin DOMRectTable 4
-  top    DOMRect::Top     DontDelete|ReadOnly
-  right  DOMRect::Right   DontDelete|ReadOnly
-  bottom DOMRect::Bottom  DontDelete|ReadOnly
-  left   DOMRect::Left    DontDelete|ReadOnly
-@end
-*/
-DOMRect::DOMRect(ExecState* exec, RectImpl* r) : m_rect(r) {
-  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
-}
-
-DOMRect::~DOMRect() {
-  ScriptInterpreter::forgetDOMObject(m_rect.get());
-}
-
-bool DOMRect::getOwnPropertySlot(ExecState* exec,
-                                 const Identifier& propertyName,
-                                 PropertySlot& slot) {
-  return getStaticValueSlot<DOMRect, DOMObject>(exec, &DOMRectTable, this,
-                                                propertyName, slot);
-}
-
-JSValue* DOMRect::getValueProperty(ExecState* exec, int token) const {
-  RectImpl& rect = *m_rect;
-  switch (token) {
-    case Top:
-      return toJS(exec, rect.top());
-    case Right:
-      return toJS(exec, rect.right());
-    case Bottom:
-      return toJS(exec, rect.bottom());
-    case Left:
-      return toJS(exec, rect.left());
-    default:
-      return NULL;
-  }
-}
-
-JSValue* toJS(ExecState* exec, RectImpl* r) {
-  return cacheDOMObject<RectImpl, DOMRect>(exec, r);
-}
-}
+}  // namespace WebCore

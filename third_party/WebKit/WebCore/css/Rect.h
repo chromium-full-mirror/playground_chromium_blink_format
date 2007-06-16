@@ -1,8 +1,6 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
- * (C) 1999-2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 1999-2003 Lars Knoll (knoll@kde.org)
+ * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,19 +18,19 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef RectImpl_h
-#define RectImpl_h
+#ifndef Rect_h
+#define Rect_h
 
-#include "Shared.h"
 #include "CSSPrimitiveValue.h"
+#include "Shared.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
 
-class RectImpl : public Shared<RectImpl> {
+class Rect : public Shared<Rect> {
  public:
-  virtual ~RectImpl() {}
+  virtual ~Rect() {}
 
   CSSPrimitiveValue* top() const { return m_top.get(); }
   CSSPrimitiveValue* right() const { return m_right.get(); }
@@ -51,6 +49,6 @@ class RectImpl : public Shared<RectImpl> {
   RefPtr<CSSPrimitiveValue> m_left;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // Rect_h

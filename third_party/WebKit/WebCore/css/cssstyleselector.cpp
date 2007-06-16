@@ -54,7 +54,7 @@
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
 #include "Pair.h"
-#include "RectImpl.h"
+#include "Rect.h"
 #include "RenderTheme.h"
 #include "StyleSheetList.h"
 #include "UserAgentStyleSheets.h"
@@ -3455,7 +3455,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         return;
       } else if (primitiveValue->primitiveType() ==
                  CSSPrimitiveValue::CSS_RECT) {
-        RectImpl* rect = primitiveValue->getRectValue();
+        Rect* rect = primitiveValue->getRectValue();
         if (!rect)
           return;
         top = convertToLength(rect->top(), style);
@@ -3938,7 +3938,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
         // Set up a length box to represent our image slices.
         LengthBox& l = image.m_slices;
-        RectImpl* r = borderImage->m_imageSliceRect.get();
+        Rect* r = borderImage->m_imageSliceRect.get();
         if (r->top()->primitiveType() == CSSPrimitiveValue::CSS_PERCENTAGE)
           l.top = Length(r->top()->getFloatValue(), Percent);
         else
