@@ -110,7 +110,7 @@ class Image : Noncopyable {
   // Typically the CachedImage that owns us.
   ImageObserver* imageObserver() const { return m_imageObserver; }
 
-  enum TileRule { StretchTile, RepeatTile };
+  enum TileRule { StretchTile, RoundTile, RepeatTile };
 
 #if PLATFORM(MAC)
   // Accessors for native image formats.
