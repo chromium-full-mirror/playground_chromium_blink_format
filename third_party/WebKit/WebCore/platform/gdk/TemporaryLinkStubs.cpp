@@ -636,9 +636,6 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
                                          const KURL& url) {
   return String();
 }
-void systemBeep() {
-  notImplemented();
-}
 float userIdleTime() {
   notImplemented();
   return 0.0;
