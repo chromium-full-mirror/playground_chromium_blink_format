@@ -75,7 +75,7 @@ class SpinneretWebHost : public IWebFrameLoadDelegate {
 
   virtual HRESULT STDMETHODCALLTYPE didReceiveIcon(
       /* [in] */ IWebView* webView,
-      /* [in] */ IWebImage* image,
+      /* [in] */ OLE_HANDLE hBitmap,
       /* [in] */ IWebFrame* frame) {
     return S_OK;
   }
@@ -102,8 +102,8 @@ class SpinneretWebHost : public IWebFrameLoadDelegate {
   virtual HRESULT STDMETHODCALLTYPE willPerformClientRedirectToURL(
       /* [in] */ IWebView* webView,
       /* [in] */ BSTR url,
-      UINT delaySeconds,
-      /* [in] */ UINT fireDate,
+      /* [in] */ double delaySeconds,
+      /* [in] */ DATE fireDate,
       /* [in] */ IWebFrame* frame) {
     return S_OK;
   }
@@ -120,9 +120,10 @@ class SpinneretWebHost : public IWebFrameLoadDelegate {
     return S_OK;
   }
 
-  virtual HRESULT STDMETHODCALLTYPE windowScriptObjectAvailable(
+  virtual /* [local] */ HRESULT STDMETHODCALLTYPE windowScriptObjectAvailable(
       /* [in] */ IWebView* webView,
-      /* [in] */ IWebScriptObject* windowScriptObject) {
+      /* [in] */ JSContextRef context,
+      /* [in] */ JSObjectRef windowScriptObject) {
     return S_OK;
   }
 
