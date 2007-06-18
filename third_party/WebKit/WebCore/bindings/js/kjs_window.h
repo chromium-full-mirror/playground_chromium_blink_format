@@ -158,12 +158,6 @@ class Window : public DOMObject {
   Location* location() const;
   Selection* selection() const;
   bool find(const WebCore::String&, bool, bool, bool, bool, bool, bool) const;
-  BarInfo* locationbar(ExecState*) const;
-  BarInfo* menubar(ExecState*) const;
-  BarInfo* personalbar(ExecState*) const;
-  BarInfo* scrollbars(ExecState*) const;
-  BarInfo* statusbar(ExecState*) const;
-  BarInfo* toolbar(ExecState*) const;
 
   // Finds a wrapper of a JS EventListener, returns 0 if no existing one.
   JSEventListener* findJSEventListener(JSValue*, bool html = false);
@@ -217,11 +211,9 @@ class Window : public DOMObject {
     InnerWidth,
     Length,
     Location_,
-    Locationbar,
     Name,
     Navigator_,
     ClientInformation,
-    Menubar,
     OffscreenBuffering,
     Opener,
     OuterHeight,
@@ -229,10 +221,8 @@ class Window : public DOMObject {
     PageXOffset,
     PageYOffset,
     Parent,
-    Personalbar,
     ScreenX,
     ScreenY,
-    Scrollbars,
     Scroll,
     ScrollBy,
     ScreenTop,
@@ -294,8 +284,6 @@ class Window : public DOMObject {
     Onsubmit,
     Onunload,
     Onbeforeunload,
-    Statusbar,
-    Toolbar,
     FrameElement,
     ShowModalDialog,
     Find,
@@ -422,30 +410,6 @@ class Selection : public DOMObject {
   friend class Window;
   Selection(WebCore::Frame*);
   WebCore::Frame* m_frame;
-};
-
-class BarInfo : public DOMObject {
- public:
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  enum { Visible };
-  enum Type {
-    Locationbar,
-    Menubar,
-    Personalbar,
-    Scrollbars,
-    Statusbar,
-    Toolbar
-  };
-  WebCore::Frame* frame() const { return m_frame; }
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-
- private:
-  friend class Window;
-  BarInfo(ExecState*, WebCore::Frame*, Type);
-  WebCore::Frame* m_frame;
-  Type m_type;
 };
 
 }  // namespace
