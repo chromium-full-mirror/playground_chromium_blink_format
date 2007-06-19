@@ -36,8 +36,6 @@ class Node;
 
 namespace KJS {
 
-class BarInfo;
-class History;
 class JSEventListener;
 class JSLazyEventListener;
 class JSUnprotectedEventListener;
@@ -182,7 +180,6 @@ class Window : public DOMObject {
     Status,
     DOMException,
     Frames,
-    History_,
     Event_,
     InnerHeight,
     InnerWidth,

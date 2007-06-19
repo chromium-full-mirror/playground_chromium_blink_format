@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,26 +20,17 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#include "config.h"
-#include "History.h"
+module window {
 
-#include "DeprecatedString.h"
-#include "WebCoreHistory.h"
+    interface History {
+        readonly attribute unsigned long length;
 
-namespace WebCore {
+        void back();
+        void forward();
+        void go(in long distance);
+    };
 
-bool historyContains(const DeprecatedString& s) {
-  if (!WebCoreHistory::historyProvider())
-    return false;
-
-  // the other side of the bridge is careful not to throw exceptions here
-  if (s.hasFastLatin1())
-    return WebCoreHistory::historyProvider()->containsItemForURLLatin1(
-        s.latin1(), s.length());
-  return WebCoreHistory::historyProvider()->containsItemForURLUnicode(
-      (UChar*)s.unicode(), s.length());
-}
 }

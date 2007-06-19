@@ -38,6 +38,7 @@ class CSSStyleDeclaration;
 class Document;
 class Element;
 class Frame;
+class History;
 class Screen;
 class String;
 
@@ -51,6 +52,7 @@ class DOMWindow : public Shared<DOMWindow> {
 
   // DOM Level 0
   Screen* screen() const;
+  History* history() const;
   BarInfo* locationbar() const;
   BarInfo* menubar() const;
   BarInfo* personalbar() const;
@@ -75,6 +77,7 @@ class DOMWindow : public Shared<DOMWindow> {
  private:
   Frame* m_frame;
   mutable RefPtr<Screen> m_screen;
+  mutable RefPtr<History> m_history;
   mutable RefPtr<BarInfo> m_locationbar;
   mutable RefPtr<BarInfo> m_menubar;
   mutable RefPtr<BarInfo> m_personalbar;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,23 +20,49 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "config.h"
-#import "History.h"
+#include "config.h"
+#include "History.h"
 
-#import "DeprecatedString.h"
-#import "WebCoreHistory.h"
+#include "Frame.h"
+#include "FrameLoader.h"
 
 namespace WebCore {
 
-bool historyContains(const DeprecatedString& s)
-{
-    // the other side of the bridge is careful not to throw exceptions here
-    if (s.hasFastLatin1())
-        return [[WebCoreHistory historyProvider] containsItemForURLLatin1:s.latin1() length:s.length()];
-    return [[WebCoreHistory historyProvider] containsItemForURLUnicode:(UniChar *)s.unicode() length:s.length()];
+History::History(Frame* frame) : m_frame(frame) {}
+
+Frame* History::frame() const {
+  return m_frame;
 }
 
+void History::disconnectFrame() {
+  m_frame = 0;
 }
+
+unsigned History::length() const {
+  if (!m_frame)
+    return 0;
+  return m_frame->loader()->getHistoryLength();
+}
+
+void History::back() {
+  if (!m_frame)
+    return;
+  m_frame->loader()->scheduleHistoryNavigation(-1);
+}
+
+void History::forward() {
+  if (!m_frame)
+    return;
+  m_frame->loader()->scheduleHistoryNavigation(1);
+}
+
+void History::go(int distance) {
+  if (!m_frame)
+    return;
+  m_frame->loader()->scheduleHistoryNavigation(distance);
+}
+
+}  // namespace WebCore
