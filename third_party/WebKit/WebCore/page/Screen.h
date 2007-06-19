@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,40 +26,29 @@
 #ifndef Screen_h
 #define Screen_h
 
-#include "FloatRect.h"
-#include <wtf/Forward.h>
-#include <wtf/RefPtr.h>
-
-#if PLATFORM(MAC)
-#ifdef __OBJC__
-@class NSScreen;
-@class NSWindow;
-#else
-class NSScreen;
-class NSWindow;
-#endif
-#endif
+#include "Shared.h"
 
 namespace WebCore {
 
-class FloatRect;
-class Widget;
+class Frame;
 
-int screenDepth(Widget*);
-int screenDepthPerComponent(Widget*);
-bool screenIsMonochrome(Widget*);
+class Screen : public Shared<Screen> {
+ public:
+  Screen(Frame*);
+  void disconnectFrame();
 
-FloatRect screenRect(Widget*);
-FloatRect screenAvailableRect(Widget*);
+  unsigned height() const;
+  unsigned width() const;
+  unsigned colorDepth() const;
+  unsigned pixelDepth() const;
+  unsigned availLeft() const;
+  unsigned availTop() const;
+  unsigned availHeight() const;
+  unsigned availWidth() const;
 
-#if PLATFORM(MAC)
-NSScreen* screenForWindow(NSWindow*);
-
-FloatRect toUserSpace(const NSRect&, NSWindow* destination);
-NSRect toDeviceSpace(const FloatRect&, NSWindow* source);
-
-NSPoint flipScreenPoint(const NSPoint&, NSScreen*);
-#endif
+ private:
+  Frame* m_frame;
+};
 
 }  // namespace WebCore
 

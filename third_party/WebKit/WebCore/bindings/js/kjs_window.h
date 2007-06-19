@@ -71,29 +71,6 @@ class PausedTimeouts {
 
 class DOMWindowTimer;
 
-class Screen : public DOMObject {
- public:
-  enum {
-    Height,
-    Width,
-    ColorDepth,
-    PixelDepth,
-    AvailLeft,
-    AvailTop,
-    AvailHeight,
-    AvailWidth
-  };
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-
- private:
-  friend class Window;
-  Screen(ExecState*, WebCore::Frame*);
-  WebCore::Frame* m_frame;
-};
-
 class WindowPrivate;
 
 class Window : public DOMObject {
@@ -237,7 +214,6 @@ class Window : public DOMObject {
     Self,
     Window_,
     Top,
-    Screen_,
     Image,
     Option,
     Alert,

@@ -26,13 +26,13 @@
  */
 
 #include "config.h"
-#include "Screen.h"
-#include "Widget.h"
+#include "PlatformScreen.h"
 
 #include "NotImplemented.h"
-#include <wtf/Assertions.h>
+#include "Widget.h"
 #include <gdk/gdk.h>
 #include <stdio.h>
+#include <wtf/Assertions.h>
 
 namespace WebCore {
 
@@ -64,4 +64,5 @@ FloatRect screenAvailableRect(Widget*) {
   notImplemented();
   return FloatRect();
 }
-}
+
+}  // namespace WebCore
