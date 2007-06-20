@@ -199,7 +199,7 @@ void Image::drawTiled(GraphicsContext* ctxt,
   // stretch is not
   // set for a particular rule).
   float hPhase = scale.width() * srcRect.x();
-  float vPhase = scale.height() * (srcRect.height() - srcRect.y());
+  float vPhase = scale.height() * srcRect.y();
   if (hRule == Image::RepeatTile)
     hPhase -= fmodf(dstRect.width(), scale.width() * srcRect.width()) / 2.0f;
   if (vRule == Image::RepeatTile)

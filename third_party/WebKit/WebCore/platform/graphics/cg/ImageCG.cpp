@@ -178,9 +178,8 @@ void Image::drawPatternCallback(void* info, CGContextRef context) {
   CGImageRef image = data->nativeImageForCurrentFrame();
   float w = CGImageGetWidth(image);
   float h = CGImageGetHeight(image);
-  CGContextDrawImage(context,
-                     GraphicsContext(context).roundToDevicePixels(
-                         FloatRect(0, data->size().height() - h, w, h)),
+  CGContextDrawImage(context, GraphicsContext(context).roundToDevicePixels(
+                                  FloatRect(0, -h, w, h)),
                      image);
 }
 
@@ -192,10 +191,11 @@ void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatRect& destRect) {
   static const CGPatternCallbacks patternCallbacks = {0, drawPatternCallback,
                                                       NULL};
-  CGPatternRef pattern =
-      CGPatternCreate(this, tileRect, CGAffineTransform(patternTransform),
-                      tileRect.width(), tileRect.height(),
-                      kCGPatternTilingConstantSpacing, true, &patternCallbacks);
+  CGPatternRef pattern = CGPatternCreate(
+      this, FloatRect(tileRect.x(), -tileRect.y() - tileRect.height(),
+                      tileRect.width(), tileRect.height()),
+      CGAffineTransform(patternTransform), tileRect.width(), tileRect.height(),
+      kCGPatternTilingConstantSpacing, true, &patternCallbacks);
   if (!pattern)
     return;
 
