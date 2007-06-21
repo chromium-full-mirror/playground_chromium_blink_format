@@ -205,8 +205,9 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
         components->append(TextRunComponent(run.characters() + start, i - start,
                                             f, offset, f == &font.scFont()));
         offset += components->last().width + letterSpacing;
-        qDebug() << "   appending(2) " << components->last().string
-                 << components->last().width;
+        //                 qDebug() << "   appending(2) " <<
+        //                 components->last().string <<
+        //                 components->last().width;
       }
       if (smallCaps)
         f = (QChar::category(ch) == QChar::Letter_Lowercase ? &font.scFont()
@@ -279,7 +280,7 @@ int Font::width(const TextRun& run, const TextStyle& style) const {
   Vector<TextRunComponent, 1024> components;
   int w = generateComponents(&components, *this, run, style);
 
-  qDebug() << "     width=" << w;
+  //     qDebug() << "     width=" << w;
   return w;
 }
 
