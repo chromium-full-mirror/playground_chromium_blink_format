@@ -157,6 +157,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
       }
       offset += add + letterSpacing + font.spaceWidth();
       start = 1;
+      //         qDebug() << "space at 0" << offset;
     } else if (smallCaps) {
       f = (QChar::category(run[0]) == QChar::Letter_Lowercase ? &font.scFont()
                                                               : &font.font());
@@ -204,12 +205,12 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
         components->append(TextRunComponent(run.characters() + start, i - start,
                                             f, offset, f == &font.scFont()));
         offset += components->last().width + letterSpacing;
-        //                 qDebug() << "   appending(2) " <<
-        //                 components->last().string <<
-        //                 components->last().width;
+        qDebug() << "   appending(2) " << components->last().string
+                 << components->last().width;
       }
-      f = (QChar::category(ch) == QChar::Letter_Lowercase ? &font.scFont()
-                                                          : &font.font());
+      if (smallCaps)
+        f = (QChar::category(ch) == QChar::Letter_Lowercase ? &font.scFont()
+                                                            : &font.font());
       start = i;
     }
     if (run.length() - start > 0) {
@@ -220,7 +221,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
       //             qDebug() << "   appending(3) " << components->last().string
       //             << components->last().width;
     }
-  } else {  // if (padding || m_wordSpacing) {
+    offset += letterSpacing;
+  } else {
     int start = 0;
     for (int i = 0; i < run.length(); ++i) {
       if (Font::treatAsSpace(run[i])) {
@@ -277,7 +279,7 @@ int Font::width(const TextRun& run, const TextStyle& style) const {
   Vector<TextRunComponent, 1024> components;
   int w = generateComponents(&components, *this, run, style);
 
-  //     qDebug() << "     width=" << w;
+  qDebug() << "     width=" << w;
   return w;
 }
 
