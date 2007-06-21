@@ -384,6 +384,7 @@ static JSValue* replace(ExecState* exec,
       pushSourceRange(sourceRanges, sourceRangeCount, sourceRangeCapacity,
                       UString::Range(lastIndex, matchIndex - lastIndex));
 
+      UString substitutedReplacement;
       if (replacementFunction) {
         int completeMatchStart = ovector[0];
         List args;
@@ -400,14 +401,14 @@ static JSValue* replace(ExecState* exec,
         args.append(jsNumber(completeMatchStart));
         args.append(jsString(source));
 
-        replacementString =
+        substitutedReplacement =
             replacementFunction
                 ->call(exec, exec->dynamicInterpreter()->globalObject(), args)
                 ->toString(exec);
-      }
+      } else
+        substitutedReplacement =
+            substituteBackreferences(replacementString, source, ovector, reg);
 
-      UString substitutedReplacement =
-          substituteBackreferences(replacementString, source, ovector, reg);
       pushReplacement(replacements, replacementCount, replacementCapacity,
                       substitutedReplacement);
 
