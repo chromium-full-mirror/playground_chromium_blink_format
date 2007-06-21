@@ -89,6 +89,9 @@ void ContextMenuController::handleContextMenuEvent(Event* event) {
   PlatformMenuDescription customMenu =
       m_client->getCustomMenuFromDefaultItems(m_contextMenu.get());
   m_contextMenu->setPlatformDescription(customMenu);
+
+  // FIXME: We should be asking Settings whether to include the Inspect
+  // Element item, rather than our client.
   if (m_client->shouldIncludeInspectElementItem())
     m_contextMenu->addInspectElementItem();
   event->setDefaultHandled();
