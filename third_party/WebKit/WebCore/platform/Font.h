@@ -30,7 +30,7 @@
 #include <wtf/HashMap.h>
 
 #if PLATFORM(QT)
-class QFont;
+#include <QtGui/qfont.h>
 #endif
 
 namespace WebCore {
@@ -69,10 +69,12 @@ class Font {
  public:
   Font();
   Font(const FontDescription&, short letterSpacing, short wordSpacing);
+#if !PLATFORM(QT)
   Font(const FontPlatformData&, bool isPrinting);  // This constructor is only
                                                    // used if the platform wants
                                                    // to start with a native
                                                    // font.
+#endif
   ~Font();
 
   Font(const Font&);
@@ -137,7 +139,9 @@ class Font {
   unsigned weight() const { return m_fontDescription.weight(); }
   bool bold() const { return m_fontDescription.bold(); }
 
+#if !PLATFORM(QT)
   bool isPlatformFont() const { return m_isPlatformFont; }
+#endif
 
 #if PLATFORM(QT)
   operator QFont() const;
@@ -152,6 +156,7 @@ class Font {
   int spaceWidth() const;
   int tabWidth() const { return 8 * spaceWidth(); }
 
+#if !PLATFORM(QT)
   const FontData* primaryFont() const;
   const FontData* fontDataAt(unsigned) const;
   const GlyphData& glyphDataForCharacter(UChar32,
@@ -211,11 +216,12 @@ class Font {
                                         int h,
                                         int from,
                                         int to) const;
-
+#endif
   friend struct WidthIterator;
 
   // Useful for debugging the different font rendering code paths.
  public:
+#if !PLATFORM(QT)
   enum CodePath { Auto, Simple, Complex };
   static void setCodePath(CodePath);
   static CodePath codePath;
@@ -230,15 +236,19 @@ class Font {
   static bool isRoundingHackCharacter(UChar32 c) {
     return (((c & ~0xFF) == 0 && gRoundingHackCharacterTable[c]));
   }
-
+#endif
  private:
   FontDescription m_fontDescription;
+  short m_letterSpacing;
+  short m_wordSpacing;
+#if !PLATFORM(QT)
   mutable RefPtr<FontFallbackList> m_fontList;
   mutable HashMap<int, GlyphPageTreeNode*> m_pages;
   mutable GlyphPageTreeNode* m_pageZero;
-  short m_letterSpacing;
-  short m_wordSpacing;
   bool m_isPlatformFont;
+#else
+  QFont m_font;
+#endif
 };
 }
 
