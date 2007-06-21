@@ -242,12 +242,14 @@ class Font {
 
  private:
   FontDescription m_fontDescription;
-  short m_letterSpacing;
-  short m_wordSpacing;
 #if !PLATFORM(QT)
   mutable RefPtr<FontFallbackList> m_fontList;
   mutable HashMap<int, GlyphPageTreeNode*> m_pages;
   mutable GlyphPageTreeNode* m_pageZero;
+#endif
+  short m_letterSpacing;
+  short m_wordSpacing;
+#if !PLATFORM(QT)
   bool m_isPlatformFont;
 #else
   QFont m_font;
