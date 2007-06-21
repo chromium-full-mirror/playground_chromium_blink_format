@@ -145,7 +145,8 @@ class Font {
 #endif
 
 #if PLATFORM(QT)
-  operator QFont() const;
+  inline const QFont& font() const { return m_font; }
+  inline const QFont& scFont() const { return m_scFont; }
 #endif
 
   // Metrics that we query the FontFallbackList for.
@@ -250,7 +251,7 @@ class Font {
   bool m_isPlatformFont;
 #else
   QFont m_font;
-  QFontMetrics m_metrics;
+  QFont m_scFont;
   int m_spaceWidth;
 #endif
 };
