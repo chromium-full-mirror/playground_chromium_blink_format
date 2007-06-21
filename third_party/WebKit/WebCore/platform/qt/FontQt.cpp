@@ -105,7 +105,7 @@ void Font::drawText(GraphicsContext* ctx,
       if (treatAsSpace(run[i]))
         ++numSpaces;
   }
-  qDebug() << ">>>>>>> drawText" << padding << numSpaces;
+  //     qDebug() << ">>>>>>> drawText" << padding << numSpaces;
 
   if (m_letterSpacing) {
     // need to draw every letter on it's own
@@ -158,7 +158,7 @@ void Font::drawText(GraphicsContext* ctx,
       if (treatAsSpace(run[i])) {
         QString str(reinterpret_cast<const QChar*>(run.characters() + start),
                     i - start);
-        qDebug() << "drawing " << str << "at " << x;
+        //                 qDebug() << "drawing " << str << "at " << x;
         if (i >= from && i < to)
           p->drawText(QPointF(x, y), str);
         x += fm.width(str);
@@ -175,7 +175,7 @@ void Font::drawText(GraphicsContext* ctx,
     }
     QString str(reinterpret_cast<const QChar*>(run.characters() + start),
                 run.length() - start);
-    qDebug() << "last drawing " << str << "at " << x;
+    //         qDebug() << "last drawing " << str << "at " << x;
     p->drawText(QPointF(x, y), str);
     //     } else {
     //         p->drawText(point, QString(reinterpret_cast<const
@@ -228,25 +228,14 @@ int Font::width(const TextRun& run, const TextStyle& style) const {
                 run.length() - start);
     w += metrics.width(str);
   }
-  qDebug() << ">>>> width"
-           << QString::fromRawData(
-                  reinterpret_cast<const QChar*>(run.characters()),
-                  run.length())
-           << w << style.padding() << m_wordSpacing << m_letterSpacing << hex
-           << run[0];
+  //     qDebug() << ">>>> width" << QString::fromRawData(reinterpret_cast<const
+  //     QChar*>(run.characters()), run.length()) << w << style.padding() <<
+  //     m_wordSpacing << m_letterSpacing << hex << run[0];
   return w;
 }
 
 int Font::width(const TextRun& run) const {
-  QFontMetrics metrics(m_font);
-  int w = metrics.width(QString::fromRawData(
-      reinterpret_cast<const QChar*>(run.characters()), run.length()));
-  qDebug() << ">>>> width"
-           << QString::fromRawData(
-                  reinterpret_cast<const QChar*>(run.characters()),
-                  run.length())
-           << w;
-  return w;
+  return width(run, TextStyle());
 }
 
 float Font::floatWidth(const TextRun& run, const TextStyle& style) const {
