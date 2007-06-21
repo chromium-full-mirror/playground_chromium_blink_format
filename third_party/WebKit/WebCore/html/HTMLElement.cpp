@@ -906,3 +906,9 @@ HTMLFormElement* HTMLElement::virtualForm() const {
 }
 
 }  // namespace WebCore
+
+#ifndef NDEBUG
+void dumpInnerHTML(WebCore::HTMLElement* element) {
+  printf("%s\n", element->innerHTML().ascii().data());
+}
+#endif
