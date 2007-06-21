@@ -55,7 +55,7 @@ Font::Font(const FontDescription& description,
     familyName += family->family();
     family = family->next();
     if (family)
-      familyName += QLatin1Char(';');
+      familyName += QLatin1Char(',');
   }
 
   m_font.setFamily(familyName);
