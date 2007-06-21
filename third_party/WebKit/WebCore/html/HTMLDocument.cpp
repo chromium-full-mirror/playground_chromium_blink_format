@@ -67,7 +67,9 @@
 #include "HTMLElementFactory.h"
 #include "HTMLNames.h"
 #include "HTMLTokenizer.h"
+#include "InspectorController.h"
 #include "KURL.h"
+#include "Page.h"
 #include "cssstyleselector.h"
 
 #include "DocTypeStrings.cpp"
@@ -264,7 +266,12 @@ void HTMLDocument::captureEvents() {}
 void HTMLDocument::releaseEvents() {}
 
 Tokenizer* HTMLDocument::createTokenizer() {
-  return new HTMLTokenizer(this);
+  bool reportErrors = false;
+  if (Page* page = m_frame->page())
+    if (InspectorController* controller = page->inspectorController())
+      reportErrors = controller->windowVisible();
+
+  return new HTMLTokenizer(this, reportErrors);
 }
 
 // --------------------------------------------------------------------------

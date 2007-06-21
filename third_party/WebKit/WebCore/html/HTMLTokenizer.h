@@ -98,7 +98,7 @@ class Token {
 
 class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
  public:
-  HTMLTokenizer(HTMLDocument*);
+  HTMLTokenizer(HTMLDocument*, bool reportErrors);
   HTMLTokenizer(HTMLViewSourceDocument*);
   HTMLTokenizer(DocumentFragment*);
   virtual ~HTMLTokenizer();

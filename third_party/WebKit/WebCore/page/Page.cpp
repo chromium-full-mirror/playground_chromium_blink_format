@@ -33,6 +33,7 @@
 #include "FrameTree.h"
 #include "FrameView.h"
 #include "HistoryItem.h"
+#include "InspectorController.h"
 #include "ProgressTracker.h"
 #include "RenderWidget.h"
 #include "SelectionController.h"
@@ -66,7 +67,8 @@ Page::Page(ChromeClient* chromeClient,
       m_editorClient(editorClient),
       m_frameCount(0),
       m_tabKeyCyclesThroughElements(true),
-      m_defersLoading(false) {
+      m_defersLoading(false),
+      m_parentInspectorController(0) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
     setFocusRingColorChangeFunction(setNeedsReapplyStyles);
@@ -199,6 +201,10 @@ void Page::setDefersLoading(bool defers) {
 
 void Page::clearUndoRedoOperations() {
   m_editorClient->clearUndoRedoOperations();
+}
+
+void Page::setInspectorClient(InspectorClient* client) {
+  m_inspectorController.set(new InspectorController(this, client));
 }
 
 }  // namespace WebCore

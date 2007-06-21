@@ -25,6 +25,7 @@
 #include "ChromeClient.h"
 #include "FloatRect.h"
 #include "Frame.h"
+#include "InspectorController.h"
 #include "Page.h"
 #include "ResourceHandle.h"
 #include <wtf/PassRefPtr.h>
@@ -167,6 +168,10 @@ void Chrome::addMessageToConsole(MessageSource source,
                                  const String& sourceID) {
   if (source == JSMessageSource && level == ErrorMessageLevel)
     m_client->addMessageToConsole(message, lineNumber, sourceID);
+
+  if (InspectorController* inspector = m_page->inspectorController())
+    inspector->addMessageToConsole(source, level, message, lineNumber,
+                                   sourceID);
 }
 
 bool Chrome::canRunBeforeUnloadConfirmPanel() {

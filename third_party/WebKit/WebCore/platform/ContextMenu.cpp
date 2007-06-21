@@ -426,6 +426,26 @@ void ContextMenu::populate() {
   }
 }
 
+void ContextMenu::addInspectElementItem() {
+  Node* node = m_hitTestResult.innerNonSharedNode();
+  if (!node)
+    return;
+
+  Frame* frame = node->document()->frame();
+  if (!frame)
+    return;
+
+  if (!frame->page()->inspectorController())
+    return;
+
+  ContextMenuItem InspectElementItem(ActionType,
+                                     ContextMenuItemTagInspectElement,
+                                     contextMenuItemTagInspectElement());
+  // FIXME: Need to only add this if the developer tools preference is set
+  appendItem(*separatorItem());
+  appendItem(InspectElementItem);
+}
+
 static bool triStateToBool(Frame::TriState state) {
   return state == Frame::trueTriState;
 }
@@ -572,6 +592,7 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagWritingDirectionMenu:
     case ContextMenuItemTagPDFSinglePageScrolling:
     case ContextMenuItemTagPDFFacingPagesScrolling:
+    case ContextMenuItemTagInspectElement:
     case ContextMenuItemBaseApplicationTag:
       break;
   }

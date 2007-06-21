@@ -147,7 +147,7 @@ inline void Token::addAttribute(Document* doc,
 
 // ----------------------------------------------------------------------------
 
-HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc)
+HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
     : Tokenizer(),
       buffer(0),
       scriptCode(0),
@@ -158,7 +158,7 @@ HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc)
       m_requestingScript(false),
       m_timer(this, &HTMLTokenizer::timerFired),
       m_doc(doc),
-      parser(new HTMLParser(doc)),
+      parser(new HTMLParser(doc, reportErrors)),
       inWrite(false),
       m_fragment(false) {
   begin();

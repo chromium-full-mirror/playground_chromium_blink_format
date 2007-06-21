@@ -189,6 +189,10 @@ String WebCore::contextMenuItemTagShowSpellingPanel(bool show) {
       show ? LPCTSTR_UI_STRING("Show Spelling and Grammar", "menu item title")
            : LPCTSTR_UI_STRING("Hide Spelling and Grammar", "menu item title"));
 }
+String WebCore::contextMenuItemTagInspectElement() {
+  return String(LPCTSTR_UI_STRING("Inspect Element",
+                                  "Inspect Element context menu item"));
+}
 String WebCore::searchMenuNoRecentSearchesText() {
   return String(LPCTSTR_UI_STRING("No recent searches",
                                   "Label for only item in menu that appears "

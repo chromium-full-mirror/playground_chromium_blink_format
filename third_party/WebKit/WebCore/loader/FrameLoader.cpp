@@ -60,6 +60,7 @@
 #include "HTTPParsers.h"
 #include "IconDatabase.h"
 #include "IconLoader.h"
+#include "InspectorController.h"
 #include "Logging.h"
 #include "MainResourceLoader.h"
 #include "MimeTypeRegistry.h"
@@ -883,7 +884,7 @@ void FrameLoader::begin() {
 
 void FrameLoader::begin(const KURL& url) {
   clear();
-  partClearedInBegin();
+  dispatchWindowObjectAvailable();
 
   m_needsClear = true;
   m_isComplete = false;
@@ -2538,7 +2539,7 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
 
   m_committedFirstRealDocumentLoad = true;
 
-  m_client->dispatchDidCommitLoad();
+  dispatchDidCommitLoad();
 
   // If we have a title let the WebView know about it.
   if (!ptitle.isNull())
@@ -2898,7 +2899,7 @@ void FrameLoader::continueLoadAfterWillSubmitForm(PolicyAction) {
 
   unsigned long identifier =
       m_frame->page()->progress()->createUniqueIdentifier();
-  m_client->assignIdentifierToInitialRequest(
+  dispatchAssignIdentifierToInitialRequest(
       identifier, m_provisionalDocumentLoader.get(),
       m_provisionalDocumentLoader->originalRequest());
 
@@ -3059,6 +3060,12 @@ void FrameLoader::detachFromParent() {
   stopAllLoaders();
   saveScrollPositionAndViewStateToItem(currentHistoryItem());
   detachChildren();
+
+  if (m_frame->page()) {
+    if (InspectorController* inspector = m_frame->page()->inspectorController())
+      inspector->frameDetachedFromParent(m_frame);
+  }
+
   m_client->detachedFromParent2();
   setDocumentLoader(0);
   m_client->detachedFromParent3();
@@ -3220,7 +3227,7 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
 void FrameLoader::assignIdentifierToInitialRequest(
     unsigned long identifier,
     const ResourceRequest& clientRequest) {
-  return m_client->assignIdentifierToInitialRequest(
+  return dispatchAssignIdentifierToInitialRequest(
       identifier, activeDocumentLoader(), clientRequest);
 }
 
@@ -3228,9 +3235,8 @@ void FrameLoader::willSendRequest(ResourceLoader* loader,
                                   ResourceRequest& clientRequest,
                                   const ResourceResponse& redirectResponse) {
   applyUserAgent(clientRequest);
-  m_client->dispatchWillSendRequest(loader->documentLoader(),
-                                    loader->identifier(), clientRequest,
-                                    redirectResponse);
+  dispatchWillSendRequest(loader->documentLoader(), loader->identifier(),
+                          clientRequest, redirectResponse);
 }
 
 void FrameLoader::didReceiveResponse(ResourceLoader* loader,
@@ -3239,8 +3245,7 @@ void FrameLoader::didReceiveResponse(ResourceLoader* loader,
 
   if (m_frame->page())
     m_frame->page()->progress()->incrementProgress(loader->identifier(), r);
-  m_client->dispatchDidReceiveResponse(loader->documentLoader(),
-                                       loader->identifier(), r);
+  dispatchDidReceiveResponse(loader->documentLoader(), loader->identifier(), r);
 }
 
 void FrameLoader::didReceiveData(ResourceLoader* loader,
@@ -3250,8 +3255,8 @@ void FrameLoader::didReceiveData(ResourceLoader* loader,
   if (m_frame->page())
     m_frame->page()->progress()->incrementProgress(loader->identifier(), data,
                                                    length);
-  m_client->dispatchDidReceiveContentLength(
-      loader->documentLoader(), loader->identifier(), lengthReceived);
+  dispatchDidReceiveContentLength(loader->documentLoader(),
+                                  loader->identifier(), lengthReceived);
 }
 
 void FrameLoader::didFailToLoad(ResourceLoader* loader,
@@ -3620,15 +3625,13 @@ void FrameLoader::sendRemainingDelegateMessages(
     unsigned length,
     const ResourceError& error) {
   if (!response.isNull())
-    m_client->dispatchDidReceiveResponse(m_documentLoader.get(), identifier,
-                                         response);
+    dispatchDidReceiveResponse(m_documentLoader.get(), identifier, response);
 
   if (length > 0)
-    m_client->dispatchDidReceiveContentLength(m_documentLoader.get(),
-                                              identifier, length);
+    dispatchDidReceiveContentLength(m_documentLoader.get(), identifier, length);
 
   if (error.isNull())
-    m_client->dispatchDidFinishLoading(m_documentLoader.get(), identifier);
+    dispatchDidFinishLoading(m_documentLoader.get(), identifier);
   else
     m_client->dispatchDidFailLoading(m_documentLoader.get(), identifier, error);
 }
@@ -3639,12 +3642,12 @@ void FrameLoader::requestFromDelegate(ResourceRequest& request,
   ASSERT(!request.isNull());
 
   identifier = m_frame->page()->progress()->createUniqueIdentifier();
-  m_client->assignIdentifierToInitialRequest(identifier, m_documentLoader.get(),
-                                             request);
+  dispatchAssignIdentifierToInitialRequest(identifier, m_documentLoader.get(),
+                                           request);
 
   ResourceRequest newRequest(request);
-  m_client->dispatchWillSendRequest(m_documentLoader.get(), identifier,
-                                    newRequest, ResourceResponse());
+  dispatchWillSendRequest(m_documentLoader.get(), identifier, newRequest,
+                          ResourceResponse());
 
   if (newRequest.isNull())
     error = m_client->cancelledError(request);
@@ -3658,8 +3661,8 @@ void FrameLoader::loadedResourceFromMemoryCache(
     const ResourceRequest& request,
     const ResourceResponse& response,
     int length) {
-  if (m_client->dispatchDidLoadResourceFromMemoryCache(
-          m_documentLoader.get(), request, response, length))
+  if (dispatchDidLoadResourceFromMemoryCache(m_documentLoader.get(), request,
+                                             response, length))
     return;
 
   unsigned long identifier;
@@ -4430,8 +4433,7 @@ ResourceError FrameLoader::fileDoesNotExistError(
 void FrameLoader::didFinishLoad(ResourceLoader* loader) {
   if (m_frame->page())
     m_frame->page()->progress()->completeProgress(loader->identifier());
-  m_client->dispatchDidFinishLoading(loader->documentLoader(),
-                                     loader->identifier());
+  dispatchDidFinishLoading(loader->documentLoader(), loader->identifier());
 }
 
 void FrameLoader::didReceiveAuthenticationChallenge(
@@ -4544,10 +4546,15 @@ String FrameLoader::referrer() const {
   return documentLoader()->request().httpReferrer();
 }
 
-void FrameLoader::partClearedInBegin() {
+void FrameLoader::dispatchWindowObjectAvailable() {
   Settings* settings = m_frame->settings();
-  if (settings && settings->isJavaScriptEnabled())
+  if (settings && settings->isJavaScriptEnabled()) {
     m_client->windowObjectCleared();
+
+    if (InspectorController* inspector =
+            m_frame->page()->parentInspectorController())
+      inspector->windowScriptObjectAvailable();
+  }
 }
 
 Widget* FrameLoader::createJavaAppletWidget(
@@ -4635,6 +4642,76 @@ bool FrameLoader::shouldTreatURLAsLocal(const String& url) {
 
   String scheme = url.left(loc);
   return localSchemes().contains(scheme);
+}
+
+void FrameLoader::dispatchDidCommitLoad() {
+  m_client->dispatchDidCommitLoad();
+
+  if (InspectorController* inspector = m_frame->page()->inspectorController())
+    inspector->didCommitLoad(m_documentLoader.get());
+}
+
+void FrameLoader::dispatchAssignIdentifierToInitialRequest(
+    unsigned long identifier,
+    DocumentLoader* loader,
+    const ResourceRequest& request) {
+  m_client->assignIdentifierToInitialRequest(identifier, loader, request);
+
+  if (InspectorController* inspector = m_frame->page()->inspectorController())
+    inspector->identifierForInitialRequest(identifier, loader, request);
+}
+
+void FrameLoader::dispatchWillSendRequest(
+    DocumentLoader* loader,
+    unsigned long identifier,
+    ResourceRequest& request,
+    const ResourceResponse& redirectResponse) {
+  m_client->dispatchWillSendRequest(loader, identifier, request,
+                                    redirectResponse);
+
+  if (InspectorController* inspector = m_frame->page()->inspectorController())
+    inspector->willSendRequest(loader, identifier, request, redirectResponse);
+}
+
+void FrameLoader::dispatchDidReceiveResponse(DocumentLoader* loader,
+                                             unsigned long identifier,
+                                             const ResourceResponse& r) {
+  m_client->dispatchDidReceiveResponse(loader, identifier, r);
+
+  if (InspectorController* inspector = m_frame->page()->inspectorController())
+    inspector->didReceiveResponse(loader, identifier, r);
+}
+
+void FrameLoader::dispatchDidReceiveContentLength(DocumentLoader* loader,
+                                                  unsigned long identifier,
+                                                  int length) {
+  m_client->dispatchDidReceiveContentLength(loader, identifier, length);
+
+  if (InspectorController* inspector = m_frame->page()->inspectorController())
+    inspector->didReceiveContentLength(loader, identifier, length);
+}
+
+void FrameLoader::dispatchDidFinishLoading(DocumentLoader* loader,
+                                           unsigned long identifier) {
+  m_client->dispatchDidFinishLoading(loader, identifier);
+
+  if (InspectorController* inspector = m_frame->page()->inspectorController())
+    inspector->didFinishLoading(loader, identifier);
+}
+
+bool FrameLoader::dispatchDidLoadResourceFromMemoryCache(
+    DocumentLoader* loader,
+    const ResourceRequest& request,
+    const ResourceResponse& response,
+    int length) {
+  bool result = m_client->dispatchDidLoadResourceFromMemoryCache(
+      loader, request, response, length);
+
+  if (InspectorController* inspector = m_frame->page()->inspectorController())
+    inspector->didLoadResourceFromMemoryCache(loader, request, response,
+                                              length);
+
+  return result;
 }
 
 #if USE(LOW_BANDWIDTH_DISPLAY)

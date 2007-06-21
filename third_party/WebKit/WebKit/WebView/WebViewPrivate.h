@@ -421,6 +421,7 @@ backforward list.
 - (void)_setFormDelegate:(id<WebFormDelegate>)delegate;
 - (id<WebFormDelegate>)_formDelegate;
 
+- (BOOL)_isClosed;
 - (void)_close;
 
 /*!

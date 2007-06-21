@@ -417,7 +417,7 @@ class FrameLoader : Noncopyable
                                  Element*,
                                  const HashMap<String, String>& args);
 
-  void partClearedInBegin();
+  void dispatchWindowObjectAvailable();
   void restoreDocumentState();
 
   String overrideMediaType() const;
@@ -679,6 +679,26 @@ class FrameLoader : Noncopyable
   void removeAllLowBandwidthDisplayRequests();
   void switchOutLowBandwidthDisplayIfReady();
 #endif
+
+  void dispatchDidCommitLoad();
+  void dispatchAssignIdentifierToInitialRequest(unsigned long identifier,
+                                                DocumentLoader*,
+                                                const ResourceRequest&);
+  void dispatchWillSendRequest(DocumentLoader*,
+                               unsigned long identifier,
+                               ResourceRequest&,
+                               const ResourceResponse& redirectResponse);
+  void dispatchDidReceiveResponse(DocumentLoader*,
+                                  unsigned long identifier,
+                                  const ResourceResponse&);
+  void dispatchDidReceiveContentLength(DocumentLoader*,
+                                       unsigned long identifier,
+                                       int length);
+  void dispatchDidFinishLoading(DocumentLoader*, unsigned long identifier);
+  bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
+                                              const ResourceRequest&,
+                                              const ResourceResponse&,
+                                              int length);
 
   Frame* m_frame;
   FrameLoaderClient* m_client;

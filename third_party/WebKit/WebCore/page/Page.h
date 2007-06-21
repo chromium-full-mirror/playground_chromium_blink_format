@@ -44,6 +44,8 @@ class DragController;
 class EditorClient;
 class FocusController;
 class Frame;
+class InspectorClient;
+class InspectorController;
 class Node;
 class ProgressTracker;
 class Selection;
@@ -94,8 +96,20 @@ class Page : Noncopyable {
   ContextMenuController* contextMenuController() const {
     return m_contextMenuController.get();
   }
+  InspectorController* inspectorController() const {
+    return m_inspectorController.get();
+  }
   Settings* settings() const { return m_settings.get(); }
   ProgressTracker* progress() const { return m_progress.get(); }
+
+  void setInspectorClient(InspectorClient*);
+
+  void setParentInspectorController(InspectorController* controller) {
+    m_parentInspectorController = controller;
+  }
+  InspectorController* parentInspectorController() const {
+    return m_parentInspectorController;
+  }
 
   void setTabKeyCyclesThroughElements(bool b) {
     m_tabKeyCyclesThroughElements = b;
@@ -125,6 +139,7 @@ class Page : Noncopyable {
   OwnPtr<DragController> m_dragController;
   OwnPtr<FocusController> m_focusController;
   OwnPtr<ContextMenuController> m_contextMenuController;
+  OwnPtr<InspectorController> m_inspectorController;
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;
 
@@ -139,6 +154,8 @@ class Page : Noncopyable {
 
   bool m_tabKeyCyclesThroughElements;
   bool m_defersLoading;
+
+  InspectorController* m_parentInspectorController;
 
 #if PLATFORM(WIN)
   static HINSTANCE s_instanceHandle;

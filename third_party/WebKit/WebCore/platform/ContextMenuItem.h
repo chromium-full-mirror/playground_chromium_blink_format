@@ -121,6 +121,7 @@ enum ContextMenuAction {
   ContextMenuItemTagRightToLeft,
   ContextMenuItemTagPDFSinglePageScrolling,
   ContextMenuItemTagPDFFacingPagesScrolling,
+  ContextMenuItemTagInspectElement,
   ContextMenuItemBaseApplicationTag = 10000
 };
 

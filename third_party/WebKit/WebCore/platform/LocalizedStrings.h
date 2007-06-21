@@ -81,6 +81,7 @@ String contextMenuItemTagSpeechMenu();
 String contextMenuItemTagStartSpeaking();
 String contextMenuItemTagStopSpeaking();
 #endif
+String contextMenuItemTagInspectElement();
 
 String searchMenuNoRecentSearchesText();
 String searchMenuRecentSearchesText();

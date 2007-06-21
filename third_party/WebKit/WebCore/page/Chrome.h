@@ -47,10 +47,16 @@ enum MessageSource {
   HTMLMessageSource,
   XMLMessageSource,
   JSMessageSource,
-  CSSMessageSource
+  CSSMessageSource,
+  OtherMessageSource
 };
 
-enum MessageLevel { LogMessageLevel, WarningMessageLevel, ErrorMessageLevel };
+enum MessageLevel {
+  TipMessageLevel,
+  LogMessageLevel,
+  WarningMessageLevel,
+  ErrorMessageLevel
+};
 
 class Chrome {
  public:
