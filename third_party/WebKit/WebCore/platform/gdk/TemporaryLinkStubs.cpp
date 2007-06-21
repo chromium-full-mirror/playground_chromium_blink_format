@@ -386,6 +386,9 @@ String WebCore::contextMenuItemTagLeftToRight() {
 String WebCore::contextMenuItemTagRightToLeft() {
   return String();
 }
+String WebCore::contextMenuItemTagInspectElement() {
+  return String();
+}
 String WebCore::searchMenuNoRecentSearchesText() {
   return String("No recent searches");
 }

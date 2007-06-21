@@ -72,4 +72,9 @@ void ContextMenuClientGdk::speak(const String&) {
 void ContextMenuClientGdk::stopSpeaking() {
   notImplemented();
 }
+
+bool ContextMenuClientGdk::shouldIncludeInspectElementItem() {
+  notImplemented();
+  return false;
+}
 }
