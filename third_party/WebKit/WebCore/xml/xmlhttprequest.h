@@ -137,6 +137,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
   void processSyncLoadResults(const Vector<char>& data,
                               const ResourceResponse&);
 
+  String responseMIMEType() const;
   bool responseIsXML() const;
 
   String getRequestHeader(const String& name) const;
