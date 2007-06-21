@@ -83,6 +83,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   void setNetworkInterface(QWebNetworkInterface* interface);
   QWebNetworkInterface* networkInterface() const;
 
+  QPixmap icon() const;
+
  public slots:
   /**
    * Stops loading of the page, if loading.
@@ -129,6 +131,10 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
    * Signal is emitted when the statusbar text is changed by the page.
    */
   void statusBarTextChanged(const QString& text);
+  /**
+   * Signal is emitted when an icon ("favicon") is loaded from the site.
+   */
+  void iconLoaded();
 
  protected:
   virtual QWebFrame* createFrame(QWebFrame* parentFrame,
