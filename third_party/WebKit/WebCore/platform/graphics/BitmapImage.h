@@ -86,6 +86,9 @@ class BitmapImage : public Image {
   friend class GraphicsContext;
 
  public:
+#if PLATFORM(QT)
+  BitmapImage(const QPixmap& pixmap, ImageObserver* = 0);
+#endif
   BitmapImage(ImageObserver* = 0);
   ~BitmapImage();
 
@@ -210,6 +213,10 @@ class BitmapImage : public Image {
   bool m_sizeAvailable;    // Whether or not we can obtain the size of the first
                            // image frame yet from ImageIO.
   unsigned m_decodedSize;  // The current size of all decoded frames.
+
+#if PLATFORM(QT)
+  QPixmap* m_pixmap;
+#endif
 };
 }
 
