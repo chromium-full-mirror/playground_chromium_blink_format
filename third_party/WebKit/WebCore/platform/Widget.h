@@ -148,6 +148,8 @@ class Widget {
   QWidget* qwidget() const;
   QWidget* canvas() const;
   void setQWidget(QWidget*);
+  void setParent(ScrollView*);
+  ScrollView* parent() const;
 #endif
 
 #if PLATFORM(MAC)
