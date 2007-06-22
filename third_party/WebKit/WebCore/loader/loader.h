@@ -40,7 +40,8 @@ class Loader : private SubresourceLoaderClient {
   void load(DocLoader*,
             CachedResource*,
             bool incremental = true,
-            bool skipCanLoadCheck = false);
+            bool skipCanLoadCheck = false,
+            bool sendResourceLoadCallbacks = true);
 
   void cancelRequests(DocLoader*);
 

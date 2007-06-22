@@ -49,10 +49,12 @@ class SubresourceLoaderClient;
 
 class SubresourceLoader : public ResourceLoader {
  public:
-  static PassRefPtr<SubresourceLoader> create(Frame*,
-                                              SubresourceLoaderClient*,
-                                              const ResourceRequest&,
-                                              bool skipCanLoadCheck = false);
+  static PassRefPtr<SubresourceLoader> create(
+      Frame*,
+      SubresourceLoaderClient*,
+      const ResourceRequest&,
+      bool skipCanLoadCheck = false,
+      bool sendResourceLoadCallbacks = true);
 
   virtual ~SubresourceLoader();
 
@@ -69,7 +71,9 @@ class SubresourceLoader : public ResourceLoader {
   virtual void didFail(const ResourceError&);
 
  private:
-  SubresourceLoader(Frame*, SubresourceLoaderClient*);
+  SubresourceLoader(Frame*,
+                    SubresourceLoaderClient*,
+                    bool sendResourceLoadCallbacks);
 
   virtual void didCancel(const ResourceError&);
   SubresourceLoaderClient* m_client;

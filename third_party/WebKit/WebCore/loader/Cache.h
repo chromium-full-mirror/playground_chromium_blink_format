@@ -93,7 +93,8 @@ class Cache : Noncopyable {
                                   CachedResource::Type,
                                   const KURL& url,
                                   const String* charset = 0,
-                                  bool skipCanLoadCheck = false);
+                                  bool skipCanLoadCheck = false,
+                                  bool sendResourceLoadCallbacks = true);
 
   // Set/retreive the size of the cache. This will only hold approximately,
   // since the size some

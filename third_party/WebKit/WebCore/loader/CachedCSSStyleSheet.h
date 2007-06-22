@@ -43,7 +43,8 @@ class CachedCSSStyleSheet : public CachedResource {
   CachedCSSStyleSheet(DocLoader*,
                       const String& URL,
                       const String& charset,
-                      bool skipCanLoadCheck = false);
+                      bool skipCanLoadCheck = false,
+                      bool sendResourceLoadCallbacks = true);
   virtual ~CachedCSSStyleSheet();
 
   const String& sheet() const { return m_sheet; }

@@ -98,8 +98,9 @@ CachedCSSStyleSheet* DocLoader::requestCSSStyleSheet(const String& url,
   // what's in the cache already
   // is a load that failed because of the canLoad check. Probably not an issue
   // in practice.
-  return static_cast<CachedCSSStyleSheet*>(requestResource(
-      CachedResource::CSSStyleSheet, url, &charset, isUserStyleSheet));
+  return static_cast<CachedCSSStyleSheet*>(
+      requestResource(CachedResource::CSSStyleSheet, url, &charset,
+                      isUserStyleSheet, !isUserStyleSheet));
 }
 
 CachedCSSStyleSheet* DocLoader::requestUserCSSStyleSheet(
@@ -131,7 +132,8 @@ CachedXBLDocument* DocLoader::requestXBLDocument(const String& url) {
 CachedResource* DocLoader::requestResource(CachedResource::Type type,
                                            const String& url,
                                            const String* charset,
-                                           bool skipCanLoadCheck) {
+                                           bool skipCanLoadCheck,
+                                           bool sendResourceLoadCallbacks) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (m_frame && m_frame->loader()->isReloading())
@@ -140,7 +142,8 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
   checkForReload(fullURL);
 
   CachedResource* resource =
-      cache()->requestResource(this, type, fullURL, charset, skipCanLoadCheck);
+      cache()->requestResource(this, type, fullURL, charset, skipCanLoadCheck,
+                               sendResourceLoadCallbacks);
   if (resource) {
     m_docResources.set(resource->url(), resource);
     checkCacheObjectStatus(resource);
@@ -210,10 +213,12 @@ void DocLoader::checkCacheObjectStatus(CachedResource* resource) {
   const ResourceResponse& response = resource->response();
   SharedBuffer* data = resource->data();
 
-  // FIXME: If the WebKit client changes or cancels the request, WebCore does
-  // not respect this and continues the load.
-  m_frame->loader()->loadedResourceFromMemoryCache(request, response,
-                                                   data ? data->size() : 0);
+  if (resource->sendResourceLoadCallbacks()) {
+    // FIXME: If the WebKit client changes or cancels the request, WebCore does
+    // not respect this and continues the load.
+    m_frame->loader()->loadedResourceFromMemoryCache(request, response,
+                                                     data ? data->size() : 0);
+  }
   m_frame->loader()->didTellBridgeAboutLoad(resource->url());
 }
 

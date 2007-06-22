@@ -32,7 +32,11 @@ class DocLoader;
 
 class Request {
  public:
-  Request(DocLoader*, CachedResource*, bool incremental, bool skipCanLoadCheck);
+  Request(DocLoader*,
+          CachedResource*,
+          bool incremental,
+          bool skipCanLoadCheck,
+          bool sendResourceLoadCallbacks);
   ~Request();
 
   Vector<char>& buffer() { return m_buffer; }
@@ -46,6 +50,7 @@ class Request {
   void setIsMultipart(bool b = true) { m_multipart = b; }
 
   bool shouldSkipCanLoadCheck() const { return m_shouldSkipCanLoadCheck; }
+  bool sendResourceLoadCallbacks() const { return m_sendResourceLoadCallbacks; }
 
  private:
   Vector<char> m_buffer;
@@ -54,6 +59,7 @@ class Request {
   bool m_incremental;
   bool m_multipart;
   bool m_shouldSkipCanLoadCheck;
+  bool m_sendResourceLoadCallbacks;
 };
 
 }  // namespace WebCore

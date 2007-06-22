@@ -43,7 +43,7 @@
 namespace WebCore {
 
 MainResourceLoader::MainResourceLoader(Frame* frame)
-    : ResourceLoader(frame),
+    : ResourceLoader(frame, true),
       m_dataLoadTimer(this, &MainResourceLoader::handleDataLoadNow),
       m_loadingMultipartContent(false),
       m_waitingForContentPolicy(false) {}
