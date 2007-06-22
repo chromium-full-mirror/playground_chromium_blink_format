@@ -335,13 +335,13 @@ Length* StringImpl::toCoordsArray(int& len) const {
 }
 
 Length* StringImpl::toLengthArray(int& len) const {
-  if (!length()) {
-    len = 1;
-    return 0;
-  }
   DeprecatedString str(reinterpret_cast<const DeprecatedChar*>(m_data),
                        m_length);
   str = str.simplifyWhiteSpace();
+  if (!str.length()) {
+    len = 1;
+    return 0;
+  }
 
   len = str.contains(',') + 1;
   Length* r = new Length[len];
