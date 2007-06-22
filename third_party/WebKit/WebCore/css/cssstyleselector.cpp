@@ -5098,7 +5098,10 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
       (specifiedSize >= minLogicalSize || !isAbsoluteSize))
     zoomedSize = minLogicalSize;
 
-  return max(zoomedSize, 1.0f);
+  // Also clamp to a reasonable maximum to prevent insane font sizes from
+  // causing crashes on various
+  // platforms (I'm looking at you, Windows.)
+  return min(1000000.0f, max(zoomedSize, 1.0f));
 }
 
 const int fontSizeTableMax = 16;
