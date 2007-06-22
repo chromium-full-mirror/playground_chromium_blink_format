@@ -93,7 +93,6 @@ class PluginStreamWin : public Shared<PluginStreamWin>,
   void delayDeliveryTimerFired(Timer<PluginStreamWin>*);
 
   Vector<char>* m_deliveryData;
-  Vector<char>* m_completeDeliveryData;
 
   const NPPluginFuncs* m_pluginFuncs;
   NPP m_instance;

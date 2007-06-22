@@ -30,6 +30,7 @@
 #include "PluginDebug.h"
 #include "PluginPackageWin.h"
 #include "PluginViewWin.h"
+#include "SharedBuffer.h"
 #include "SubresourceLoader.h"
 
 #if USE(CFNETWORK)
@@ -69,7 +70,6 @@ PluginStreamWin::PluginStreamWin(PluginViewWin* pluginView,
       m_streamState(StreamBeforeStarted),
       m_delayDeliveryTimer(this, &PluginStreamWin::delayDeliveryTimerFired),
       m_deliveryData(0),
-      m_completeDeliveryData(0),
       m_pluginFuncs(pluginView->plugin()->pluginFuncs()),
       m_instance(pluginView->instance()) {
   ASSERT(m_pluginView);
@@ -89,7 +89,6 @@ PluginStreamWin::~PluginStreamWin() {
   ASSERT(!m_loader);
 
   delete m_deliveryData;
-  delete m_completeDeliveryData;
 
   free((char*)m_stream.url);
 
@@ -313,18 +312,6 @@ void PluginStreamWin::didReceiveData(SubresourceLoader* loader,
   m_deliveryData->resize(oldSize + length);
   memcpy(m_deliveryData->data() + oldSize, data, length);
 
-  if (m_transferMode == NP_ASFILE || m_transferMode == NP_ASFILEONLY) {
-    // FIXME: Since this is only used when all data has been received, it would
-    // be nice
-    // to be able to share it with the CFNetwork in-memory cache.
-    if (!m_completeDeliveryData)
-      m_completeDeliveryData = new Vector<char>;
-
-    oldSize = m_completeDeliveryData->size();
-    m_completeDeliveryData->resize(oldSize + length);
-    memcpy(m_completeDeliveryData->data() + oldSize, data, length);
-  }
-
   if (m_transferMode != NP_ASFILEONLY)
     deliverData();
 }
@@ -372,13 +359,13 @@ void PluginStreamWin::didFinishLoading(SubresourceLoader* loader) {
     }
 
     DWORD written;
-    size_t dataSize =
-        m_completeDeliveryData ? m_completeDeliveryData->size() : 0;
+    RefPtr<SharedBuffer> resourceData = loader->resourceData();
+    size_t dataSize = resourceData ? resourceData->size() : 0;
     bool retval = true;
 
     if (dataSize)
-      retval = WriteFile(tempFile, m_completeDeliveryData->data(),
-                         m_completeDeliveryData->size(), &written, 0);
+      retval = WriteFile(tempFile, resourceData->data(), resourceData->size(),
+                         &written, 0);
     CloseHandle(tempFile);
 
     if (!retval || written != dataSize) {
