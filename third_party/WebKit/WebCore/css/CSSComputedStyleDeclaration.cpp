@@ -1524,7 +1524,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return 0;
     case CSS_PROP_Z_INDEX:
       if (style->hasAutoZIndex())
-        return new CSSPrimitiveValue(CSS_VAL_NORMAL);
+        return new CSSPrimitiveValue(CSS_VAL_AUTO);
       return new CSSPrimitiveValue(style->zIndex(),
                                    CSSPrimitiveValue::CSS_NUMBER);
     case CSS_PROP__WEBKIT_BOX_SIZING:
