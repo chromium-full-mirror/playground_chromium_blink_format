@@ -55,6 +55,7 @@
 #include <QHttpRequestHeader>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QNetworkProxy>
 #include <QUndoStack>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -412,4 +413,12 @@ QWebSettings QWebPage::settings() const {
 
 QString QWebPage::chooseFile(QWebFrame* parentFrame, const QString& oldFile) {
   return QFileDialog::getOpenFileName(parentFrame, QString::null, oldFile);
+}
+
+void QWebPage::setNetworkProxy(const QNetworkProxy& proxy) {
+  d->networkProxy = proxy;
+}
+
+QNetworkProxy QWebPage::networkProxy() const {
+  return d->networkProxy;
 }

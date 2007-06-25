@@ -45,6 +45,7 @@
 #endif
 
 #if PLATFORM(QT)
+class QWebFrame;
 class QWebNetworkJob;
 #endif
 
@@ -104,7 +105,8 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if PLATFORM(QT)
         ,
-        m_job(0)
+        m_job(0),
+        m_frame(0)
 #endif
 #if PLATFORM(MAC)
         ,
@@ -159,6 +161,7 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if PLATFORM(QT)
   QWebNetworkJob* m_job;
+  QWebFrame* m_frame;
 #endif
 #if PLATFORM(MAC)
   NSURLAuthenticationChallenge* m_currentMacChallenge;

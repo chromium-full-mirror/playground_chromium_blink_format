@@ -23,6 +23,7 @@
 #ifndef QWEBPAGE_P_H
 #define QWEBPAGE_P_H
 
+#include <qnetworkproxy.h>
 #include <qpointer.h>
 
 #include "qwebpage.h"
@@ -63,6 +64,7 @@ class QWebPagePrivate {
   QWebPage::NavigationRequestResponse navigationRequested(
       QWebFrame* frame,
       const QWebNetworkRequest& request);
+  QNetworkProxy networkProxy;
 };
 
 #endif

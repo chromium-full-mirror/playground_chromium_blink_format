@@ -30,6 +30,7 @@
 
 #include <qwebkitglobal.h>
 
+class QWebFrame;
 class QWebNetworkJobPrivate;
 class QWebNetworkInterface;
 class QWebObjectPluginConnector;
@@ -96,6 +97,8 @@ class QWEBKIT_EXPORT QWebNetworkJob {
   bool deref();
 
   QWebNetworkInterface* networkInterface() const;
+
+  QWebFrame* frame() const;
 
  private:
   QWebNetworkJob();
