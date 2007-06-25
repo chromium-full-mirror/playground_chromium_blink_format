@@ -90,7 +90,7 @@ static PassRefPtr<DocumentFragment> documentFragmentFromDragData(
     DragData* dragData,
     RefPtr<Range> context,
     bool allowPlainText,
-    bool chosePlainText) {
+    bool& chosePlainText) {
   ASSERT(dragData);
   chosePlainText = false;
 
