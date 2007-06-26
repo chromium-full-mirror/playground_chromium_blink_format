@@ -581,8 +581,17 @@ void GraphicsContext::endTransparencyLayer() {
   m_data->layers.removeLast();
 }
 
-void GraphicsContext::clearRect(const FloatRect&) {
-  notImplemented();
+void GraphicsContext::clearRect(const FloatRect& rect) {
+  if (paintingDisabled())
+    return;
+
+  cairo_t* cr = m_data->context;
+
+  cairo_save(cr);
+  cairo_rectangle(cr, rect.x(), rect.y(), rect.width(), rect.height());
+  cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
+  cairo_fill(cr);
+  cairo_restore(cr);
 }
 
 void GraphicsContext::strokeRect(const FloatRect&, float) {
