@@ -122,6 +122,17 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 - (void)_setAutofilled:(BOOL)filled;
 @end
 
+// These changes are necessary to detect whether a form input was modified by a
+// user
+// or javascript
+@interface DOMHTMLInputElement (FormPromptAdditions)
+- (BOOL)_isEdited;
+@end
+
+@interface DOMHTMLTextAreaElement (FormPromptAdditions)
+- (BOOL)_isEdited;
+@end
+
 // All the methods in this category are used by Safari forms autofill and should
 // not be used for any other purpose.
 // They are stopgap measures until we finish transitioning form controls to not
