@@ -349,6 +349,7 @@ incremental searching), NO to begin search after the selected text.
 // whether or not they implement the protocol. For now we'll just deal with
 // HTML.
 // These methods are still in flux; don't rely on them yet.
+- (BOOL)canMarkAllTextMatches;
 - (WebNSUInteger)markAllMatchesForText:(NSString*)string
                          caseSensitive:(BOOL)caseFlag
                              highlight:(BOOL)highlight
