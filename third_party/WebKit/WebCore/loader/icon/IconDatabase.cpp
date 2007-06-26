@@ -209,6 +209,10 @@ bool IconDatabase::open(const String& databasePath) {
   return isOpen();
 }
 
+bool IconDatabase::isOpen() {
+  return m_mainDB.isOpen() && m_privateBrowsingDB.isOpen();
+}
+
 void IconDatabase::close() {
   // This will close all the SQL statements and transactions we have open,
   // syncing the DB at the appropriate point
@@ -395,6 +399,10 @@ void IconDatabase::setPrivateBrowsingEnabled(bool flag) {
     m_privateBrowsingDB.clearAllTables();
     m_currentDB = &m_mainDB;
   }
+}
+
+bool IconDatabase::isPrivateBrowsingEnabled() const {
+  return m_privateBrowsingEnabled;
 }
 
 Image* IconDatabase::iconForPageURL(const String& pageURL,
@@ -1013,6 +1021,10 @@ void IconDatabase::setEnabled(bool enabled) {
   if (!enabled && isOpen())
     close();
   m_isEnabled = enabled;
+}
+
+bool IconDatabase::enabled() const {
+  return m_isEnabled;
 }
 
 bool IconDatabase::imported() {
