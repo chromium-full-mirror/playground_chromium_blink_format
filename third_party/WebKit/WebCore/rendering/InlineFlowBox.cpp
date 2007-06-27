@@ -270,7 +270,7 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
       text->setXPos(x);
 
       int strokeOverflow =
-          static_cast<int>(ceilf(rt->style()->textStrokeWidth() / 2.0));
+          static_cast<int>(ceilf(rt->style()->textStrokeWidth() / 2.0f));
 
       // If letter-spacing is negative, we should factor that into right
       // overflow. (Even in RTL, letter-spacing is

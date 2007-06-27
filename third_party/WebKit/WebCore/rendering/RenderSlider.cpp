@@ -291,7 +291,7 @@ void RenderSlider::setValueForPosition(int position) {
 
   // Force integer value if not float.
   if (!equalIgnoringCase(precision, "float"))
-    val = lroundf(val);
+    val = lround(val);
 
   static_cast<HTMLInputElement*>(node())->setValueFromRenderer(
       String::number(val));
@@ -325,7 +325,7 @@ double RenderSlider::setPositionFromValue(bool inLayout) {
 
   // Force integer value if not float.
   if (!equalIgnoringCase(precision, "float"))
-    val = lroundf(val);
+    val = lround(val);
 
   // Calculate the new position based on the value
   double factor = (val - minVal) / (maxVal - minVal);

@@ -80,7 +80,7 @@ struct InspectorResource : public Shared<InspectorResource> {
   // Keep these in sync with WebInspector.Resource.Type
   enum Type { Doc, Stylesheet, Image, Script, Other };
 
-  InspectorResource(unsigned long identifier,
+  InspectorResource(long long identifier,
                     DocumentLoader* documentLoader,
                     Frame* frame)
       : identifier(identifier),
@@ -148,7 +148,7 @@ struct InspectorResource : public Shared<InspectorResource> {
       JSValueProtect(context, newScriptObject);
   }
 
-  unsigned long identifier;
+  long long identifier;
   RefPtr<DocumentLoader> loader;
   RefPtr<Frame> frame;
   ResourceRequest request;

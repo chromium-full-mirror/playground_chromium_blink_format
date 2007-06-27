@@ -113,7 +113,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                                opacity,
                                                FillOpacity,
                                                fillOpacity,
-                                               1.0)
+                                               1.0f)
   SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL_REFCOUNTED(
       SVGPaint,
       fill,
@@ -127,7 +127,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                                opacity,
                                                StrokeOpacity,
                                                strokeOpacity,
-                                               1.0)
+                                               1.0f)
   SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL_REFCOUNTED(
       SVGPaint,
       stroke,
@@ -146,7 +146,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                                miterLimit,
                                                StrokeMiterLimit,
                                                strokeMiterLimit,
-                                               4.0)
+                                               4.0f)
 
   SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL_REFCOUNTED(CSSValue,
                                                           stroke,
@@ -173,7 +173,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                                opacity,
                                                StopOpacity,
                                                stopOpacity,
-                                               1.0)
+                                               1.0f)
   SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(Color,
                                                stops,
                                                color,
@@ -223,7 +223,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                                floodOpacity,
                                                FloodOpacity,
                                                floodOpacity,
-                                               1.0)
+                                               1.0f)
   SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(Color,
                                                misc,
                                                floodColor,

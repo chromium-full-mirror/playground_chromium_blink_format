@@ -157,7 +157,7 @@ CGPatternRef CanvasPattern::createPattern(const CGAffineTransform& transform) {
   // occuring making the fill
   // pattern is not filled correctly.
   // So, just pick a really large number that works.
-  float yStep = m_repeatY ? rect.size.height : (100000000.0);
+  float yStep = m_repeatY ? rect.size.height : (100000000.0f);
 
   const CGPatternCallbacks patternCallbacks = {0, patternCallback,
                                                patternReleaseCallback};

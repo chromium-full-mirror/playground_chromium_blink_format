@@ -190,8 +190,8 @@ float ImageSource::frameDurationAtIndex(size_t index) {
   // that specify
   // a duration of <= 10 ms. See gfxImageFrame::GetTimeout in Gecko or Radar
   // 4051389 for more.
-  if (duration <= 0.010)
-    return 0.100;
+  if (duration <= 0.010f)
+    return 0.100f;
   return duration;
 }
 

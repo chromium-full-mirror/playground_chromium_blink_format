@@ -75,11 +75,11 @@ SVGTransformDistance::SVGTransformDistance(const SVGTransform& fromSVGTransform,
       float scaleX = fromSVGTransform.scale().width() != 0
                          ? toSVGTransform.scale().width() /
                                fromSVGTransform.scale().width()
-                         : toSVGTransform.scale().width() / 0.00001;
+                         : toSVGTransform.scale().width() / 0.00001f;
       float scaleY = fromSVGTransform.scale().height() != 0
                          ? toSVGTransform.scale().height() /
                                fromSVGTransform.scale().height()
-                         : toSVGTransform.scale().height() / 0.00001;
+                         : toSVGTransform.scale().height() / 0.00001f;
       m_transform.scale(scaleX, scaleY);
       return;
     }
@@ -262,12 +262,12 @@ bool SVGTransformDistance::isZero() const {
 float SVGTransformDistance::distance() const {
   switch (m_type) {
     case SVGTransform::SVG_TRANSFORM_UNKNOWN:
-      return 0;
+      return 0.0f;
     case SVGTransform::SVG_TRANSFORM_ROTATE:
       return sqrtf(m_angle * m_angle + m_cx * m_cx + m_cy * m_cy);
     case SVGTransform::SVG_TRANSFORM_MATRIX:
-      return 0;  // I'm not quite sure yet what distance between two matrices
-                 // means.
+      return 0.0f;  // I'm not quite sure yet what distance between two matrices
+                    // means.
     case SVGTransform::SVG_TRANSFORM_SCALE:
       return sqrtf(m_transform.a() * m_transform.a() +
                    m_transform.d() * m_transform.d());
@@ -279,7 +279,7 @@ float SVGTransformDistance::distance() const {
       return m_angle;
   }
   ASSERT_NOT_REACHED();
-  return 0;
+  return 0.0f;
 }
 }
 

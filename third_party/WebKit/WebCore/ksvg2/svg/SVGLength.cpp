@@ -112,7 +112,7 @@ inline SVGLengthType stringToLengthType(const String& string) {
 SVGLength::SVGLength(const SVGStyledElement* context,
                      SVGLengthMode mode,
                      const String& valueAsString)
-    : m_valueInSpecifiedUnits(0.0),
+    : m_valueInSpecifiedUnits(0.0f),
       m_unit(storeUnit(mode, LengthTypeNumber)),
       m_context(context) {
   setValueAsString(valueAsString);
@@ -125,13 +125,13 @@ SVGLengthType SVGLength::unitType() const {
 float SVGLength::value() const {
   SVGLengthType type = extractType(m_unit);
   if (type == LengthTypeUnknown)
-    return 0.0;
+    return 0.0f;
 
   switch (type) {
     case LengthTypeNumber:
       return m_valueInSpecifiedUnits;
     case LengthTypePercentage:
-      return SVGLength::PercentageOfViewport(m_valueInSpecifiedUnits / 100.0,
+      return SVGLength::PercentageOfViewport(m_valueInSpecifiedUnits / 100.0f,
                                              m_context, extractMode(m_unit));
     case LengthTypeEMS:
     case LengthTypeEXS: {
@@ -149,29 +149,29 @@ float SVGLength::value() const {
           // coords-units-03-b.svg
           // if this causes problems in real world cases maybe it would be best
           // to remove this
-          return m_valueInSpecifiedUnits * ceil(xHeight);
+          return m_valueInSpecifiedUnits * ceilf(xHeight);
         }
       }
-      return 0.0;
+      return 0.0f;
     }
     case LengthTypePX:
       return m_valueInSpecifiedUnits;
     case LengthTypeCM:
-      return m_valueInSpecifiedUnits / 2.54 * cssPixelsPerInch;
+      return m_valueInSpecifiedUnits / 2.54f * cssPixelsPerInch;
     case LengthTypeMM:
-      return m_valueInSpecifiedUnits / 25.4 * cssPixelsPerInch;
+      return m_valueInSpecifiedUnits / 25.4f * cssPixelsPerInch;
     case LengthTypeIN:
       return m_valueInSpecifiedUnits * cssPixelsPerInch;
     case LengthTypePT:
-      return m_valueInSpecifiedUnits / 72.0 * cssPixelsPerInch;
+      return m_valueInSpecifiedUnits / 72.0f * cssPixelsPerInch;
     case LengthTypePC:
-      return m_valueInSpecifiedUnits / 6.0 * cssPixelsPerInch;
+      return m_valueInSpecifiedUnits / 6.0f * cssPixelsPerInch;
     default:
       break;
   }
 
   ASSERT_NOT_REACHED();
-  return 0.0;
+  return 0.0f;
 }
 
 void SVGLength::setValue(float value) {
@@ -191,19 +191,19 @@ void SVGLength::setValue(float value) {
       m_valueInSpecifiedUnits = value;
       break;
     case LengthTypeCM:
-      m_valueInSpecifiedUnits = value * 2.54 / cssPixelsPerInch;
+      m_valueInSpecifiedUnits = value * 2.54f / cssPixelsPerInch;
       break;
     case LengthTypeMM:
-      m_valueInSpecifiedUnits = value * 25.4 / cssPixelsPerInch;
+      m_valueInSpecifiedUnits = value * 25.4f / cssPixelsPerInch;
       break;
     case LengthTypeIN:
       m_valueInSpecifiedUnits = value / cssPixelsPerInch;
       break;
     case LengthTypePT:
-      m_valueInSpecifiedUnits = value * 72.0 / cssPixelsPerInch;
+      m_valueInSpecifiedUnits = value * 72.0f / cssPixelsPerInch;
       break;
     case LengthTypePC:
-      m_valueInSpecifiedUnits = value / 6.0 * cssPixelsPerInch;
+      m_valueInSpecifiedUnits = value / 6.0f * cssPixelsPerInch;
       break;
     default:
       break;
@@ -222,7 +222,7 @@ float SVGLength::valueAsPercentage() const {
   // 100% = 100.0 instead of 1.0 for historical reasons, this could eventually
   // be changed
   if (extractType(m_unit) == LengthTypePercentage)
-    return valueInSpecifiedUnits() / 100.0;
+    return valueInSpecifiedUnits() / 100.0f;
 
   return valueInSpecifiedUnits();
 }
@@ -298,10 +298,9 @@ float SVGLength::PercentageOfViewport(float value,
   else if (mode == LengthModeHeight)
     return value * height;
   else if (mode == LengthModeOther)
-    return value * sqrt(pow(double(width), 2) + pow(double(height), 2)) /
-           sqrt(2.0);
+    return value * sqrtf(powf(width, 2) + powf(height, 2)) / sqrtf(2.0f);
 
-  return 0.0;
+  return 0.0f;
 }
 }
 

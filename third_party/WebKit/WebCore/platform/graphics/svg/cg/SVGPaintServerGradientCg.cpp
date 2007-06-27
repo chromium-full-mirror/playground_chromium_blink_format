@@ -73,14 +73,14 @@ static void cgGradientCallback(void* info,
     CGFloat percent =
         diffFromPrevious * stops[nextStopIndex].previousDeltaInverse;
 
-    outColor[0] =
-        ((1.0 - percent) * previousColorArray[0] + percent * nextColorArray[0]);
-    outColor[1] =
-        ((1.0 - percent) * previousColorArray[1] + percent * nextColorArray[1]);
-    outColor[2] =
-        ((1.0 - percent) * previousColorArray[2] + percent * nextColorArray[2]);
-    outColor[3] =
-        ((1.0 - percent) * previousColorArray[3] + percent * nextColorArray[3]);
+    outColor[0] = ((1.0f - percent) * previousColorArray[0] +
+                   percent * nextColorArray[0]);
+    outColor[1] = ((1.0f - percent) * previousColorArray[1] +
+                   percent * nextColorArray[1]);
+    outColor[2] = ((1.0f - percent) * previousColorArray[2] +
+                   percent * nextColorArray[2]);
+    outColor[3] = ((1.0f - percent) * previousColorArray[3] +
+                   percent * nextColorArray[3]);
   }
   // FIXME: have to handle the spreadMethod()s here SPREADMETHOD_REPEAT, etc.
 }
@@ -116,7 +116,7 @@ static CGShadingRef CGShadingRefForRadialGradient(
   // Spec: If (fx, fy) lies outside the circle defined by (cx, cy) and r, set
   // (fx, fy)
   // to the point of intersection of the line through (fx, fy) and the circle.
-  if (sqrtf(fdx * fdx + fdy * fdy) > radius) {
+  if (sqrt(fdx * fdx + fdy * fdy) > radius) {
     double angle = atan2(focus.y * 100.0, focus.x * 100.0);
     focus.x = cos(angle) * radius;
     focus.y = sin(angle) * radius;
@@ -148,7 +148,7 @@ void SVGPaintServerGradient::updateQuartzGradientStopsCache(
     CGFloat currOffset =
         min(max(stops[i].first, previousOffset), static_cast<CGFloat>(1.0));
     m_stopsCache[i].offset = currOffset;
-    m_stopsCache[i].previousDeltaInverse = 1.0 / (currOffset - previousOffset);
+    m_stopsCache[i].previousDeltaInverse = 1.0f / (currOffset - previousOffset);
     previousOffset = currOffset;
     CGFloat* ca = m_stopsCache[i].colorArray;
     stops[i].second.getRGBA(ca[0], ca[1], ca[2], ca[3]);
