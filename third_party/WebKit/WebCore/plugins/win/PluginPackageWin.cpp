@@ -85,7 +85,8 @@ PluginPackageWin::PluginPackageWin(const String& path,
     : m_path(path),
       m_module(0),
       m_lastModified(lastModified),
-      m_isLoaded(false) {
+      m_isLoaded(false),
+      m_loadCount(0) {
   int pos = m_path.deprecatedString().findRev('\\');
 
   m_fileName = m_path.right(m_path.length() - pos - 1);
@@ -144,8 +145,10 @@ bool PluginPackageWin::fetchInfo() {
 }
 
 bool PluginPackageWin::load() {
-  if (m_isLoaded)
+  if (m_isLoaded) {
+    m_loadCount++;
     return true;
+  }
 
   WCHAR currentPath[MAX_PATH];
 
@@ -244,6 +247,7 @@ bool PluginPackageWin::load() {
   if (npErr != NPERR_NO_ERROR)
     goto abort;
 
+  m_loadCount++;
   return true;
 abort:
   unloadWithoutShutdown();
@@ -252,6 +256,9 @@ abort:
 
 void PluginPackageWin::unload() {
   if (!m_isLoaded)
+    return;
+
+  if (--m_loadCount > 0)
     return;
 
   m_NPP_Shutdown();
@@ -263,6 +270,7 @@ void PluginPackageWin::unloadWithoutShutdown() {
   if (!m_isLoaded)
     return;
 
+  ASSERT(m_loadCount == 0);
   ASSERT(m_module);
 
   FreeLibrary(m_module);
