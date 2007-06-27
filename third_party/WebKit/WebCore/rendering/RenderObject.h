@@ -850,8 +850,6 @@ class RenderObject : public CachedResourceClient {
                   int adjbw1,
                   int adjbw2);
 
-  virtual void setTable(RenderTable*) {}
-
   // Repaint the entire object.  Called when, e.g., the color of a border
   // changes, or when a border
   // style changes.
