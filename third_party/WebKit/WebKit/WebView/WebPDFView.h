@@ -35,6 +35,7 @@
 @interface WebPDFView : NSView<WebDocumentView,
                                WebDocumentSearching,
                                WebDocumentIncrementalSearching,
+                               WebMultipleTextMatches,
                                WebDocumentSelection,
                                WebDocumentElement,
                                _WebDocumentViewState,
@@ -48,6 +49,8 @@
   BOOL _willUpdatePreferencesSoon;
   PDFView* PDFSubviewProxy;
   WebDataSource* dataSource;
+  NSArray* textMatches;
+  NSPoint lastScrollPosition;
 }
 
 + (NSArray*)supportedMIMETypes;
