@@ -97,8 +97,8 @@ FontPlatformData::FontPlatformData(const FontDescription& fontDescription,
   m_fontFace = cairo_ft_font_face_create_for_pattern(m_pattern);
   m_fontMatrix = (cairo_matrix_t*)malloc(sizeof(cairo_matrix_t));
   cairo_matrix_t ctm;
-  cairo_matrix_init_scale(m_fontMatrix, m_fontDescription.computedPixelSize(),
-                          m_fontDescription.computedPixelSize());
+  cairo_matrix_init_scale(m_fontMatrix, m_fontDescription.computedSize(),
+                          m_fontDescription.computedSize());
   cairo_matrix_init_identity(&ctm);
   m_options = cairo_font_options_create();
   m_scaledFont =
@@ -123,6 +123,7 @@ bool FontPlatformData::init() {
 FontPlatformData::~FontPlatformData() {
   if (m_pattern && ((FcPattern*)-1 != m_pattern))
     FcPatternDestroy(m_pattern);
+  free(m_fontMatrix);
   cairo_font_face_destroy(m_fontFace);
   cairo_scaled_font_destroy(m_scaledFont);
   cairo_font_options_destroy(m_options);
@@ -164,15 +165,6 @@ cairo_font_face_t** FontPlatformData::list(FontDescription& fontDescription,
   }
   result[fs->nfont] = NULL;
   return result;
-}
-
-Glyph FontPlatformData::index(unsigned ucs4) const {
-  ucs4 = (0xff & ucs4);
-  FT_Face face = cairo_ft_scaled_font_lock_face(m_scaledFont);
-  assert(face != 0);
-  int index = FcFreeTypeCharIndex(face, ucs4);
-  cairo_ft_scaled_font_unlock_face(m_scaledFont);
-  return index;
 }
 
 void FontPlatformData::setFont(cairo_t* cr) const {
