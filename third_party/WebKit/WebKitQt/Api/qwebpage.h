@@ -86,8 +86,10 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
   QPixmap icon() const;
 
+#ifndef QT_NO_NETWORKPROXY
   void setNetworkProxy(const QNetworkProxy& proxy);
   QNetworkProxy networkProxy() const;
+#endif
 
  public slots:
   /**

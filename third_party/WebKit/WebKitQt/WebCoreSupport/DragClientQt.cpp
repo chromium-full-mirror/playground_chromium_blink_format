@@ -56,12 +56,14 @@ void DragClientQt::startDrag(DragImageRef,
                              Clipboard* clipboard,
                              Frame*,
                              bool) {
+#ifndef QT_NO_DRAGANDDROP
   QMimeData* clipboardData =
       static_cast<ClipboardQt*>(clipboard)->clipboardData();
   static_cast<ClipboardQt*>(clipboard)->invalidateWritableData();
   QDrag drag(m_webPage);
   drag.setMimeData(clipboardData);
   drag.start();
+#endif
 }
 
 DragImageRef DragClientQt::createDragImageForLink(KURL&,
