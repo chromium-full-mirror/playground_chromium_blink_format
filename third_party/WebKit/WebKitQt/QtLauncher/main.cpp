@@ -218,9 +218,13 @@ class SearchEdit : public QLineEdit {
                                    geometry().top() - 2, geometry().right(),
                                    geometry().bottom()));
     clearButton->setVisible(true);
+#ifndef QT_NO_CURSOR
     clearButton->setCursor(Qt::ArrowCursor);
-    connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
+#endif
+#ifndef QT_NO_TOOLTIP
     clearButton->setToolTip("Clear");
+#endif
+    connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
   }
   ~SearchEdit() {}
 
@@ -288,8 +292,10 @@ class MainWindow : public QMainWindow {
   void showLinkHover(const QString& link, const QString& toolTip) {
     // statusBar()->showMessage(link);
     hoverLabel->setHoverLink(link);
+#ifndef QT_NO_TOOLTIP
     if (!toolTip.isEmpty())
       QToolTip::showText(QCursor::pos(), toolTip);
+#endif
   }
 
  protected:
