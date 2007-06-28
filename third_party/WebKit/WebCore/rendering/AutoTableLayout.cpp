@@ -67,8 +67,8 @@ void AutoTableLayout::recalcColumn(int effCol) {
         RenderTableCell* cell = current.cell;
 
         bool cellHasContent =
-            cell && (cell->firstChild() || cell->style()->hasBorder() ||
-                     cell->style()->hasPadding());
+            cell && (cell->firstChild() || m_table->cellPadding() ||
+                     cell->style()->hasBorder() || cell->style()->hasPadding());
         if (cellHasContent)
           l.emptyCellsOnly = false;
 
