@@ -106,7 +106,7 @@ void EditorClientQt::respondToChangedContents() {
 }
 
 void EditorClientQt::respondToChangedSelection() {
-  notImplemented();
+  emit m_page->selectionChanged();
 }
 
 void EditorClientQt::didEndEditing() {
