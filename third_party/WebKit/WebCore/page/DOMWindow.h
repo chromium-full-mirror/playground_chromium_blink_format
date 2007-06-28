@@ -35,6 +35,7 @@ namespace WebCore {
 class BarInfo;
 class CSSRuleList;
 class CSSStyleDeclaration;
+class DOMSelection;
 class Document;
 class Element;
 class Frame;
@@ -60,6 +61,8 @@ class DOMWindow : public Shared<DOMWindow> {
   BarInfo* statusbar() const;
   BarInfo* toolbar() const;
 
+  DOMSelection* getSelection();
+
   // DOM Level 2 AbstractView Interface
   Document* document() const;
 
@@ -77,6 +80,7 @@ class DOMWindow : public Shared<DOMWindow> {
  private:
   Frame* m_frame;
   mutable RefPtr<Screen> m_screen;
+  mutable RefPtr<DOMSelection> m_selection;
   mutable RefPtr<History> m_history;
   mutable RefPtr<BarInfo> m_locationbar;
   mutable RefPtr<BarInfo> m_menubar;
