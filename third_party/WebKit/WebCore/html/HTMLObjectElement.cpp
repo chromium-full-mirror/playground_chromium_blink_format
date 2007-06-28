@@ -276,10 +276,11 @@ bool HTMLObjectElement::isImageType() {
                                        // considered text/plain.
     }
   }
-  if (document()->frame())
-    return document()->frame()->loader()->client()->objectContentType(
-               KURL(m_url.deprecatedString()), m_serviceType) ==
-           ObjectContentImage;
+  if (Frame* frame = document()->frame()) {
+    KURL completedURL(frame->loader()->completeURL(m_url));
+    return frame->loader()->client()->objectContentType(
+               completedURL, m_serviceType) == ObjectContentImage;
+  }
 
   return Image::supportsType(m_serviceType);
 }
