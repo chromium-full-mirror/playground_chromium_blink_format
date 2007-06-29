@@ -330,16 +330,24 @@ void DeprecatedStringData::initialize(const char* a, unsigned l) {
   }
 }
 
-DeprecatedStringData::DeprecatedStringData(DeprecatedStringData& o)
-    : refCount(1),
-      _length(o._length),
-      _unicode(o._unicode),
-      _ascii(o._ascii),
-      _maxUnicode(o._maxUnicode),
-      _isUnicodeValid(o._isUnicodeValid),
-      _isHeapAllocated(0),
-      _maxAscii(o._maxAscii),
-      _isAsciiValid(o._isAsciiValid) {
+DeprecatedStringData* DeprecatedStringData::createAndAdopt(
+    DeprecatedStringData& o) {
+  DeprecatedStringData* data = new DeprecatedStringData();
+  data->adopt(o);
+  return data;
+}
+
+void DeprecatedStringData::adopt(DeprecatedStringData& o) {
+  ASSERT(refCount == 1);
+  _length = o._length;
+  _unicode = o._unicode;
+  _ascii = o._ascii;
+  _maxUnicode = o._maxUnicode;
+  _isUnicodeValid = o._isUnicodeValid;
+  _isHeapAllocated = 0;
+  _maxAscii = o._maxAscii;
+  _isAsciiValid = o._isAsciiValid;
+
   // Handle the case where either the Unicode or 8-bit pointer was
   // pointing to the internal buffer. We need to point at the
   // internal buffer in the new object, and copy the characters.
@@ -574,7 +582,8 @@ DeprecatedString DeprecatedString::number(double n) {
 inline void DeprecatedString::detachIfInternal() {
   DeprecatedStringData* oldData = *dataHandle;
   if (oldData->refCount > 1 && oldData == &internalData) {
-    DeprecatedStringData* newData = new DeprecatedStringData(*oldData);
+    DeprecatedStringData* newData =
+        DeprecatedStringData::createAndAdopt(*oldData);
     newData->_isHeapAllocated = 1;
     newData->refCount = oldData->refCount;
     oldData->refCount = 1;

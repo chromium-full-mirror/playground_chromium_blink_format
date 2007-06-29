@@ -186,7 +186,7 @@ struct DeprecatedStringData {
   void initialize(const char* u, unsigned l);
 
   // Move from destination to source.
-  DeprecatedStringData(DeprecatedStringData&);
+  static DeprecatedStringData* createAndAdopt(DeprecatedStringData&);
 
   ~DeprecatedStringData();
 
@@ -231,6 +231,8 @@ struct DeprecatedStringData {
                                                           // + 14) size
 
  private:
+  void adopt(DeprecatedStringData&);
+
   DeprecatedStringData(const DeprecatedStringData&);
   DeprecatedStringData& operator=(const DeprecatedStringData&);
 };
