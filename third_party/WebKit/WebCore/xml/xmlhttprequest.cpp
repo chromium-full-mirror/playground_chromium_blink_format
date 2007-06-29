@@ -486,7 +486,8 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
     }
 
     m_loader = 0;
-    if (error.isNull())
+
+    if (error.isNull() || request.url().isLocalFile())
       processSyncLoadResults(data, response);
     else
       ec = NETWORK_ERR;
