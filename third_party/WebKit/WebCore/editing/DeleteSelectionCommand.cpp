@@ -478,8 +478,9 @@ void DeleteSelectionCommand::handleGeneralDelete() {
         !m_upstreamStart.node()->isDescendantOf(m_downstreamEnd.node()) &&
         m_downstreamEnd.node()->inDocument() &&
         m_downstreamEnd.offset() >= m_downstreamEnd.node()->caretMinOffset()) {
-      if (m_downstreamEnd.offset() >= maxDeepOffset(m_downstreamEnd.node()) &&
-          !canHaveChildrenForEditing(m_downstreamEnd.node())) {
+      if (m_downstreamEnd.offset() >= maxDeepOffset(m_downstreamEnd.node())) {
+        // FIXME: Shouldn't remove m_downstreamEnd.node() if its offsets refer
+        // to children.
         // The node itself is fully selected, not just its contents.  Delete it.
         removeNode(m_downstreamEnd.node());
       } else {
