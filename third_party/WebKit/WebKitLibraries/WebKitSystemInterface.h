@@ -8,6 +8,8 @@
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
 
+@class QTMovie;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -186,6 +188,9 @@ void WKGetWheelEventDeltas(NSEvent*,
                            BOOL* continuous);
 
 BOOL WKAppVersionCheckLessThan(NSString*, int, double);
+
+int WKQTMovieDataRate(QTMovie* movie);
+float WKQTMovieMaxTimeLoaded(QTMovie* movie);
 
 #ifdef __cplusplus
 }
