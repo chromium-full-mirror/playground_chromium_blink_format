@@ -991,7 +991,7 @@ void RenderTextControl::hidePopup() {
 }
 
 void RenderTextControl::valueChanged(unsigned listIndex, bool fireEvents) {
-  ASSERT(listIndex < listSize());
+  ASSERT(static_cast<int>(listIndex) < listSize());
   HTMLInputElement* input = static_cast<HTMLInputElement*>(node());
   if (listIndex == (listSize() - 1)) {
     if (fireEvents) {
@@ -1012,7 +1012,7 @@ void RenderTextControl::valueChanged(unsigned listIndex, bool fireEvents) {
 }
 
 String RenderTextControl::itemText(unsigned listIndex) const {
-  unsigned size = listSize();
+  int size = listSize();
   if (size == 1) {
     ASSERT(!listIndex);
     return searchMenuNoRecentSearchesText();
@@ -1052,7 +1052,7 @@ int RenderTextControl::clientPaddingRight() const {
   return paddingRight() + m_cancelButton->renderer()->width();
 }
 
-unsigned RenderTextControl::listSize() const {
+int RenderTextControl::listSize() const {
   // If there are no recent searches, then our menu will have 1 "No recent
   // searches" item.
   if (!m_recentSearches.size())

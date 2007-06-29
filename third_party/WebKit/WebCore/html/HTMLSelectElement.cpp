@@ -638,7 +638,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
 #else
     int listIndex = optionToListIndex(selectedIndex());
     if (keyIdentifier == "Down" || keyIdentifier == "Right") {
-      size_t size = listItems().size();
+      int size = listItems().size();
       for (listIndex += 1; listIndex >= 0 && listIndex < size &&
                            (listItems()[listIndex]->disabled() ||
                             !listItems()[listIndex]->hasTagName(optionTag));
@@ -649,7 +649,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
         setSelectedIndex(listToOptionIndex(listIndex));
       handled = true;
     } else if (keyIdentifier == "Up" || keyIdentifier == "Left") {
-      size_t size = listItems().size();
+      int size = listItems().size();
       for (listIndex -= 1; listIndex >= 0 && listIndex < size &&
                            (listItems()[listIndex]->disabled() ||
                             !listItems()[listIndex]->hasTagName(optionTag));
