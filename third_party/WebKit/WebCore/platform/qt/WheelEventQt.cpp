@@ -33,13 +33,19 @@ namespace WebCore {
 PlatformWheelEvent::PlatformWheelEvent(QWheelEvent* e)
     : m_position(e->pos()),
       m_globalPosition(e->globalPos()),
-      m_deltaX(e->delta()),
-      m_deltaY(0),
       m_isAccepted(false),
       m_shiftKey(e->modifiers() & Qt::ShiftModifier),
       m_ctrlKey(e->modifiers() & Qt::ControlModifier),
       m_altKey(e->modifiers() & Qt::AltModifier),
       m_metaKey(e->modifiers() & Qt::MetaModifier),
-      m_isContinuous(false) {}
+      m_isContinuous(false) {
+  if (e->orientation() == Qt::Horizontal) {
+    m_deltaX = (e->delta() / 8);
+    m_deltaY = 0;
+  } else {
+    m_deltaX = 0;
+    m_deltaY = (e->delta() / 8);
+  }
+}
 
 }  // namespace WebCore
