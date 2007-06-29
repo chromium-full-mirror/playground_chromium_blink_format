@@ -89,8 +89,7 @@ void BackForwardList::goBack() {
 void BackForwardList::goForward() {
   ASSERT(m_current < m_entries.size() - 1);
   if (m_current < m_entries.size() - 1)
-    ;
-  m_current++;
+    m_current++;
 }
 
 void BackForwardList::goToItem(HistoryItem* item) {

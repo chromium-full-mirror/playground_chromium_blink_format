@@ -175,8 +175,7 @@ DragImageRef createDragImageFromImage(Image* img) {
 
 exit:
   if (workingDC)
-    ;
-  DeleteDC(workingDC);
+    DeleteDC(workingDC);
   ReleaseDC(0, dc);
   return hbmp;
 }
