@@ -229,8 +229,8 @@ PluginSet PluginDatabaseWin::getPluginsInPaths() const {
 static inline Vector<int> parseVersionString(const String& versionString) {
   Vector<int> version;
 
-  int startPos = 0;
-  int endPos;
+  unsigned startPos = 0;
+  unsigned endPos;
 
   while (startPos < versionString.length()) {
     for (endPos = startPos; endPos < versionString.length(); ++endPos)
