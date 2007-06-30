@@ -1144,6 +1144,26 @@ FloatRect Frame::selectionRect(bool clipToVisibleContent) const {
              : selectionRect;
 }
 
+void Frame::selectionTextRects(Vector<FloatRect>& rects,
+                               bool clipToVisibleContent) const {
+  RenderView* root = static_cast<RenderView*>(renderer());
+  if (!root)
+    return;
+
+  RefPtr<Range> selectedRange = selectionController()->toRange();
+
+  Vector<IntRect> intRects;
+  selectedRange->addLineBoxRects(intRects);
+
+  unsigned size = intRects.size();
+  FloatRect visibleContentRect = d->m_view->visibleContentRect();
+  for (unsigned i = 0; i < size; ++i)
+    if (clipToVisibleContent)
+      rects.append(intersection(intRects[i], visibleContentRect));
+    else
+      rects.append(intRects[i]);
+}
+
 bool Frame::isFrameSet() const {
   Document* document = d->m_doc.get();
   if (!document || !document->isHTMLDocument())

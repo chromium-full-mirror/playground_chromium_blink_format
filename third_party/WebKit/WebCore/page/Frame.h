@@ -346,6 +346,8 @@ class Frame : public Shared<Frame> {
   void clearTypingStyle();
 
   FloatRect selectionRect(bool clipToVisibleContent = true) const;
+  void selectionTextRects(Vector<FloatRect>&,
+                          bool clipToVisibleContent = true) const;
 
   HTMLFormElement* currentForm() const;
 
