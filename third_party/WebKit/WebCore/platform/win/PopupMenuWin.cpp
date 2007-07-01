@@ -354,7 +354,8 @@ void PopupMenu::invalidateItem(int index) {
     damageRect.setWidth(damageRect.width() -
                         m_scrollBar->frameGeometry().width());
 
-  ::InvalidateRect(m_popup, &RECT(damageRect), TRUE);
+  RECT r = damageRect;
+  ::InvalidateRect(m_popup, &r, TRUE);
 }
 
 IntRect PopupMenu::clientRect() const {
@@ -571,10 +572,13 @@ void PopupMenu::valueChanged(Scrollbar* scrollBar) {
   IntRect listRect = clientRect();
   if (m_scrollBar)
     listRect.setWidth(listRect.width() - m_scrollBar->frameGeometry().width());
-  ::ScrollWindowEx(m_popup, 0, scrolledLines * m_itemHeight, &RECT(listRect), 0,
-                   0, 0, flags);
-  if (m_scrollBar)
-    ::InvalidateRect(m_popup, &RECT(m_scrollBar->frameGeometry()), TRUE);
+  RECT r = listRect;
+  ::ScrollWindowEx(m_popup, 0, scrolledLines * m_itemHeight, &r, 0, 0, 0,
+                   flags);
+  if (m_scrollBar) {
+    r = m_scrollBar->frameGeometry();
+    ::InvalidateRect(m_popup, &r, TRUE);
+  }
   ::UpdateWindow(m_popup);
 }
 
@@ -799,7 +803,8 @@ static LRESULT CALLBACK PopupWndProc(HWND hWnd,
             popup->scrollBar()->handleMouseReleaseEvent(event);
             // FIXME: This is a hack to work around PlatformScrollbar not
             // invalidating correctly when it doesn't have a parent widget
-            ::InvalidateRect(popup->popupHandle(), &RECT(scrollBarRect), TRUE);
+            RECT r = scrollBarRect;
+            ::InvalidateRect(popup->popupHandle(), &r, TRUE);
             break;
           }
         }

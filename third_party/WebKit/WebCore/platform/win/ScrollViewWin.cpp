@@ -148,7 +148,8 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
       IntRect(0, 0, m_view->visibleWidth(), m_view->visibleHeight()));
   IntRect updateRect = clipRect;
   updateRect.intersect(scrollViewRect);
-  ::InvalidateRect(containingWindowHandle, &RECT(updateRect), false);
+  RECT r = updateRect;
+  ::InvalidateRect(containingWindowHandle, &r, false);
 
   if (!m_hasStaticBackground)  // The main frame can just blit the WebView
                                // window
