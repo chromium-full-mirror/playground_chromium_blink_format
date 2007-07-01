@@ -987,7 +987,7 @@ bool HTMLParser::isAffectedByResidualStyle(const AtomicString& tagName) {
 }
 
 void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
-  HTMLStackElem* maxElem;
+  HTMLStackElem* maxElem = 0;
   bool finished = false;
   while (!finished) {
     // Find the outermost element that crosses over to a higher level. If there
