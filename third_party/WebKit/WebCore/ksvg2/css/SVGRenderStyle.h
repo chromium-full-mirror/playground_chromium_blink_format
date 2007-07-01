@@ -318,6 +318,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
   SVGRenderStyle(const SVGRenderStyle*) {}
 
   void setBitDefaults() {
+    svg_inherited_flags._iflags = 0;
     svg_inherited_flags.f._clipRule = initialClipRule();
     svg_inherited_flags.f._colorRendering = initialColorRendering();
     svg_inherited_flags.f._fillRule = initialFillRule();
@@ -333,6 +334,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
     svg_inherited_flags.f._pointerEvents = initialPointerEvents();
     svg_inherited_flags.f._writingMode = initialWritingMode();
 
+    svg_noninherited_flags._niflags = 0;
     svg_noninherited_flags.f._alignmentBaseline = initialAlignmentBaseline();
     svg_noninherited_flags.f._dominantBaseline = initialDominantBaseline();
     svg_noninherited_flags.f._baselineShift = initialBaselineShift();
