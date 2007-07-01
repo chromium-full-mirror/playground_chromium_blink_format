@@ -58,7 +58,8 @@ Settings::Settings(Page* page)
       m_usesDashboardBackwardCompatibilityMode(false),
       m_needsAcrobatFrameReloadingQuirk(false),
       m_isDOMPasteAllowed(false),
-      m_shrinksStandaloneImagesToFit(true) {
+      m_shrinksStandaloneImagesToFit(true),
+      m_usesPageCache(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
