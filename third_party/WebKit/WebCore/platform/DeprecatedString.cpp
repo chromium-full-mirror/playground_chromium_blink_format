@@ -75,6 +75,7 @@ COMPILE_ASSERT(sizeof(DeprecatedChar) == 2, deprecated_char_is_2_bytes)
   (DeprecatedChar*)fastRealloc(P, sizeof(DeprecatedChar) * (N))
 #define DELETE_QCHAR(P) fastFree(P)
 
+#ifndef CHECK_FOR_HANDLE_LEAKS
 struct HandleNode;
 struct HandlePageNode;
 
@@ -88,17 +89,19 @@ static inline void initializeHandleNodes() {
   if (freeNodeAllocationPages == 0)
     freeNodeAllocationPages = allocatePageNode();
 }
+#endif
 
 static inline DeprecatedStringData** allocateHandle() {
 #ifdef CHECK_FOR_HANDLE_LEAKS
   return static_cast<DeprecatedStringData**>(
       fastMalloc(sizeof(DeprecatedStringData*)));
-#endif
+#else
 
   initializeHandleNodes();
 
   return reinterpret_cast<DeprecatedStringData**>(
       allocateNode(freeNodeAllocationPages));
+#endif
 }
 
 static void freeHandle(DeprecatedStringData**);
@@ -2388,6 +2391,8 @@ struct HandleNode {
   } type;
 };
 
+#ifndef CHECK_FOR_HANDLE_LEAKS
+
 static const size_t pageSize = 4096;
 static const uintptr_t pageMask = ~(pageSize - 1);
 static const size_t nodeBlockSize = pageSize / sizeof(HandleNode);
@@ -2466,11 +2471,13 @@ static HandleNode* allocateNode(HandlePageNode* pageNode) {
   return allocated;
 }
 
+#endif
+
 void freeHandle(DeprecatedStringData** _free) {
 #ifdef CHECK_FOR_HANDLE_LEAKS
   fastFree(_free);
   return;
-#endif
+#else
 
   HandleNode* free = (HandleNode*)_free;
   HandleNode* base = (HandleNode*)((uintptr_t)free & pageMask);
@@ -2502,6 +2509,7 @@ void freeHandle(DeprecatedStringData** _free) {
       freeNodeAllocationPages->next = pageNode;
     freeNodeAllocationPages = pageNode;
   }
+#endif
 }
 
 DeprecatedString DeprecatedString::fromUtf8(const char* chs) {

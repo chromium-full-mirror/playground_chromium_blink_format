@@ -378,8 +378,6 @@ bool RenderImage::isWidthSpecified() const {
     default:
       return false;
   }
-  ASSERT(false);
-  return false;
 }
 
 bool RenderImage::isHeightSpecified() const {
@@ -390,8 +388,6 @@ bool RenderImage::isHeightSpecified() const {
     default:
       return false;
   }
-  ASSERT(false);
-  return false;
 }
 
 int RenderImage::calcReplacedWidth() const {

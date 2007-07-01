@@ -462,8 +462,5 @@ bool HTMLAnchorElement::isLiveLink() const {
     case EditableLinkOnlyLiveWithShiftKey:
       return m_wasShiftKeyDownOnMouseDown;
   }
-  // not reached
-  ASSERT(0);
-  return false;
 }
 }
