@@ -50,7 +50,7 @@ class Counter : public Shared<Counter> {
   }
 
   int listStyleNumber() const {
-    return m_listStyle ? static_cast<int>(m_listStyle->getFloatValue()) : 0;
+    return m_listStyle ? m_listStyle->getIntValue() : 0;
   }
 
   void setIdentifier(PassRefPtr<CSSPrimitiveValue> identifier) {

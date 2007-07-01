@@ -143,12 +143,13 @@ double KSVGPainterFactory::cssPrimitiveToLength(const RenderObject* item,
     SVGStyledElement* element = static_cast<SVGStyledElement*>(item->element());
     SVGElement* viewportElement = (element ? element->viewportElement() : 0);
     if (viewportElement) {
-      double result = primitive->getFloatValue() / 100.0;
+      float result = primitive->getFloatValue() / 100.0f;
       return SVGLength::PercentageOfViewport(result, element, LengthModeOther);
     }
   }
 
-  return primitive->computeLengthFloat(const_cast<RenderStyle*>(item->style()));
+  return primitive->computeLengthDouble(
+      const_cast<RenderStyle*>(item->style()));
 }
 
 KCDashArray KSVGPainterFactory::dashArrayFromRenderingStyle(
@@ -164,8 +165,7 @@ KCDashArray KSVGPainterFactory::dashArrayFromRenderingStyle(
       if (!dash)
         continue;
 
-      array.append(
-          (float)dash->computeLengthFloat(const_cast<RenderStyle*>(style)));
+      array.append(dash->computeLengthFloat(const_cast<RenderStyle*>(style)));
     }
   }
 
