@@ -1475,7 +1475,7 @@ bool parseXMLDocumentFragment(const String& string,
   sax.initialized = XML_SAX2_MAGIC;
 
   int result = xmlParseBalancedChunkMemory(
-      0, &sax, &tokenizer, 0, (const xmlChar*)(const char*)(string.utf8()), 0);
+      0, &sax, &tokenizer, 0, (const xmlChar*)string.utf8().data(), 0);
   return result == 0;
 }
 

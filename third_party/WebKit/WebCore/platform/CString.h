@@ -29,6 +29,8 @@
 #include "Shared.h"
 #include <wtf/Vector.h>
 
+using std::min;
+
 namespace WebCore {
 
 class DeprecatedCString;
@@ -57,8 +59,6 @@ class CString {
   char* mutableData();
   unsigned length() const;
 
-  operator const char*() const { return data(); }
-
   bool isNull() const { return !m_buffer; }
 
   CString(const DeprecatedCString&);
@@ -69,6 +69,11 @@ class CString {
   void init(const char*, unsigned length);
   RefPtr<CStringBuffer> m_buffer;
 };
+
+bool operator==(const CString& a, const CString& b);
+inline bool operator!=(const CString& a, const CString& b) {
+  return !(a == b);
+}
 }
 
 #endif  // CString_h
