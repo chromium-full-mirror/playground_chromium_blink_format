@@ -1752,8 +1752,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
     // dirty lines.
     BidiIterator cleanLineStart;
     BidiStatus cleanLineBidiStatus;
-    BidiContext* cleanLineBidiContext;
-    int endLineYPos;
+    BidiContext* cleanLineBidiContext = 0;
+    int endLineYPos = 0;
     RootInlineBox* endLine =
         (fullLayout || !startLine) ? 0 : determineEndPosition(
                                              startLine, cleanLineStart,
