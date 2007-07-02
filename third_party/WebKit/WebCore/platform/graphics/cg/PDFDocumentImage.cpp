@@ -30,6 +30,7 @@
 #if PLATFORM(CG)
 
 #include "GraphicsContext.h"
+#include <wtf/MathExtras.h>
 
 using namespace std;
 
@@ -136,7 +137,8 @@ void PDFDocumentImage::setCurrentPage(int page) {
     m_cropBox = m_mediaBox;
 
   // get page rotation angle
-  m_rotation = CGPDFPageGetRotationAngle(cgPage) * M_PI / 180.0f;  // to radians
+  m_rotation =
+      CGPDFPageGetRotationAngle(cgPage) * piFloat / 180.0f;  // to radians
 }
 
 int PDFDocumentImage::pageCount() const {
