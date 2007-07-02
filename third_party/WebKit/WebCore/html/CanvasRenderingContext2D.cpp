@@ -669,9 +669,9 @@ void CanvasRenderingContext2D::setShadow(float width,
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if PLATFORM(CG)
   RGBA32 rgba = CSSParser::parseColor(color);
-  const CGFloat components[4] = {((rgba >> 16) & 0xFF) / 255.0,
-                                 ((rgba >> 8) & 0xFF) / 255.0,
-                                 (rgba & 0xFF) / 255.0, alpha};
+  const CGFloat components[4] = {((rgba >> 16) & 0xFF) / 255.0f,
+                                 ((rgba >> 8) & 0xFF) / 255.0f,
+                                 (rgba & 0xFF) / 255.0f, alpha};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGColorRef shadowColor = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
@@ -775,8 +775,8 @@ void CanvasRenderingContext2D::applyShadow() {
                     ? 0
                     : CSSParser::parseColor(state().m_shadowColor);
   const CGFloat components[4] = {
-      ((rgba >> 16) & 0xFF) / 255.0, ((rgba >> 8) & 0xFF) / 255.0,
-      (rgba & 0xFF) / 255.0, ((rgba >> 24) & 0xFF) / 255.0};
+      ((rgba >> 16) & 0xFF) / 255.0f, ((rgba >> 8) & 0xFF) / 255.0f,
+      (rgba & 0xFF) / 255.0f, ((rgba >> 24) & 0xFF) / 255.0f};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGColorRef color = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);

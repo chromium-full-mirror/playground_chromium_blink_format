@@ -27,16 +27,17 @@
 
 #include "CSSPropertyNames.h"
 #include "Document.h"
-#include "TimeScheduler.h"
+#include "FloatConversion.h"
+#include "ksvgcssproperties.h"
 #include "SVGParserUtilities.h"
 #include "SVGSVGElement.h"
 #include "SVGURIReference.h"
+#include "TimeScheduler.h"
 #include "XLinkNames.h"
-#include "ksvgcssproperties.h"
 #include <float.h>
 #include <math.h>
-#include <wtf/Vector.h>
 #include <wtf/MathExtras.h>
+#include <wtf/Vector.h>
 
 using namespace std;
 
@@ -109,7 +110,7 @@ double SVGAnimationElement::getSimpleDuration(ExceptionCode&) const {
 
 void SVGAnimationElement::parseKeyNumbers(Vector<float>& keyNumbers,
                                           const String& value) {
-  double number = 0.f;
+  double number = 0.0;
 
   const UChar* ptr = value.characters();
   const UChar* end = ptr + value.length();
@@ -117,7 +118,7 @@ void SVGAnimationElement::parseKeyNumbers(Vector<float>& keyNumbers,
   while (ptr < end) {
     if (!parseNumber(ptr, end, number, false))
       return;
-    keyNumbers.append(number);
+    keyNumbers.append(narrowPrecisionToFloat(number));
 
     if (!skipOptionalSpaces(ptr, end) || *ptr != ';')
       return;
@@ -153,7 +154,7 @@ static void parseValues(Vector<String>& values, const String& value) {
 
 static void parseKeySplines(Vector<SVGAnimationElement::KeySpline>& keySplines,
                             const String& value) {
-  double number = 0.f;
+  double number = 0.0;
   SVGAnimationElement::KeySpline keySpline;
 
   const UChar* ptr = value.characters();
@@ -162,16 +163,16 @@ static void parseKeySplines(Vector<SVGAnimationElement::KeySpline>& keySplines,
   while (ptr < end) {
     if (!(parseNumber(ptr, end, number, false) && skipOptionalSpaces(ptr, end)))
       return;
-    keySpline.control1.setX(number);
+    keySpline.control1.setX(narrowPrecisionToFloat(number));
     if (!(parseNumber(ptr, end, number, false) && skipOptionalSpaces(ptr, end)))
       return;
-    keySpline.control1.setY(number);
+    keySpline.control1.setY(narrowPrecisionToFloat(number));
     if (!(parseNumber(ptr, end, number, false) && skipOptionalSpaces(ptr, end)))
       return;
-    keySpline.control2.setX(number);
+    keySpline.control2.setX(narrowPrecisionToFloat(number));
     if (!parseNumber(ptr, end, number, false))
       return;
-    keySpline.control2.setY(number);
+    keySpline.control2.setY(narrowPrecisionToFloat(number));
     keySplines.append(keySpline);
 
     if (!skipOptionalSpaces(ptr, end) || *ptr != ';')
@@ -739,13 +740,13 @@ void SVGAnimationElement::handleTimerEvent(double elapsedSeconds,
 
   unsigned valueIndex = 0;
   float percentagePast = 0;
-  calculateValueIndexAndPercentagePast(timePercentage, valueIndex,
-                                       percentagePast);
+  calculateValueIndexAndPercentagePast(narrowPrecisionToFloat(timePercentage),
+                                       valueIndex, percentagePast);
 
   calculateFromAndToValues(animationMode, valueIndex);
 
-  updateAnimatedValue(animationMode, timePercentage, valueIndex,
-                      percentagePast);
+  updateAnimatedValue(animationMode, narrowPrecisionToFloat(timePercentage),
+                      valueIndex, percentagePast);
 
   if (timePercentage == 1.0) {
     if ((m_repeatCount > 0 && m_repetitions < m_repeatCount - 1) ||
@@ -775,8 +776,8 @@ bool SVGAnimationElement::updateAnimatedValueForElapsedSeconds(
       (isIndefinite(m_simpleDuration) && m_end <= 0.0))
     return false;  // Ignore dur="0" or dur="-neg"
 
-  float percentage = calculateTimePercentage(elapsedSeconds, m_begin, m_end,
-                                             m_simpleDuration, m_repetitions);
+  double percentage = calculateTimePercentage(elapsedSeconds, m_begin, m_end,
+                                              m_simpleDuration, m_repetitions);
 
   if (percentage <= 1.0 || connectedToTimer())
     handleTimerEvent(elapsedSeconds, percentage);

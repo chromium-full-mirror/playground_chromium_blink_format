@@ -25,10 +25,11 @@
 #if ENABLE(SVG)
 #include "SVGRadialGradientElement.h"
 
+#include "FloatConversion.h"
 #include "RadialGradientAttributes.h"
-#include "SVGPaintServerRadialGradient.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
+#include "SVGPaintServerRadialGradient.h"
 #include "SVGStopElement.h"
 #include "SVGTransform.h"
 #include "SVGTransformList.h"
@@ -131,7 +132,7 @@ void SVGRadialGradientElement::buildGradient() const {
       FloatPoint(attributes.cx(), attributes.cy()));
   radialGradient->setGradientFocal(
       FloatPoint(attributes.fx(), attributes.fy()));
-  radialGradient->setGradientRadius(attributes.r());
+  radialGradient->setGradientRadius(narrowPrecisionToFloat(attributes.r()));
 }
 
 RadialGradientAttributes SVGRadialGradientElement::collectGradientProperties()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,6 +28,7 @@
 
 #if PLATFORM(CG)
 
+#include "FloatConversion.h"
 #include "FloatRect.h"
 #include "IntRect.h"
 
@@ -45,7 +46,10 @@ AffineTransform::AffineTransform(double a,
                                  double d,
                                  double tx,
                                  double ty) {
-  m_transform = CGAffineTransformMake(a, b, c, d, tx, ty);
+  m_transform = CGAffineTransformMake(
+      narrowPrecisionToCGFloat(a), narrowPrecisionToCGFloat(b),
+      narrowPrecisionToCGFloat(c), narrowPrecisionToCGFloat(d),
+      narrowPrecisionToCGFloat(tx), narrowPrecisionToCGFloat(ty));
 }
 
 AffineTransform::AffineTransform(CGAffineTransform t) {
@@ -58,11 +62,16 @@ void AffineTransform::setMatrix(double a,
                                 double d,
                                 double tx,
                                 double ty) {
-  m_transform = CGAffineTransformMake(a, b, c, d, tx, ty);
+  m_transform = CGAffineTransformMake(
+      narrowPrecisionToCGFloat(a), narrowPrecisionToCGFloat(b),
+      narrowPrecisionToCGFloat(c), narrowPrecisionToCGFloat(d),
+      narrowPrecisionToCGFloat(tx), narrowPrecisionToCGFloat(ty));
 }
 
 void AffineTransform::map(double x, double y, double* x2, double* y2) const {
-  CGPoint result = CGPointApplyAffineTransform(CGPointMake(x, y), m_transform);
+  CGPoint result = CGPointApplyAffineTransform(
+      CGPointMake(narrowPrecisionToCGFloat(x), narrowPrecisionToCGFloat(y)),
+      m_transform);
   *x2 = result.x;
   *y2 = result.y;
 }
@@ -85,7 +94,7 @@ double AffineTransform::a() const {
 }
 
 void AffineTransform::setA(double a) {
-  m_transform.a = a;
+  m_transform.a = narrowPrecisionToCGFloat(a);
 }
 
 double AffineTransform::b() const {
@@ -93,7 +102,7 @@ double AffineTransform::b() const {
 }
 
 void AffineTransform::setB(double b) {
-  m_transform.b = b;
+  m_transform.b = narrowPrecisionToCGFloat(b);
 }
 
 double AffineTransform::c() const {
@@ -101,7 +110,7 @@ double AffineTransform::c() const {
 }
 
 void AffineTransform::setC(double c) {
-  m_transform.c = c;
+  m_transform.c = narrowPrecisionToCGFloat(c);
 }
 
 double AffineTransform::d() const {
@@ -109,7 +118,7 @@ double AffineTransform::d() const {
 }
 
 void AffineTransform::setD(double d) {
-  m_transform.d = d;
+  m_transform.d = narrowPrecisionToCGFloat(d);
 }
 
 double AffineTransform::e() const {
@@ -117,7 +126,7 @@ double AffineTransform::e() const {
 }
 
 void AffineTransform::setE(double e) {
-  m_transform.tx = e;
+  m_transform.tx = narrowPrecisionToCGFloat(e);
 }
 
 double AffineTransform::f() const {
@@ -125,7 +134,7 @@ double AffineTransform::f() const {
 }
 
 void AffineTransform::setF(double f) {
-  m_transform.ty = f;
+  m_transform.ty = narrowPrecisionToCGFloat(f);
 }
 
 void AffineTransform::reset() {
@@ -133,22 +142,27 @@ void AffineTransform::reset() {
 }
 
 AffineTransform& AffineTransform::scale(double sx, double sy) {
-  m_transform = CGAffineTransformScale(m_transform, sx, sy);
+  m_transform = CGAffineTransformScale(
+      m_transform, narrowPrecisionToCGFloat(sx), narrowPrecisionToCGFloat(sy));
   return *this;
 }
 
 AffineTransform& AffineTransform::rotate(double d) {
-  m_transform = CGAffineTransformRotate(m_transform, d * deg2rad);
+  m_transform = CGAffineTransformRotate(m_transform,
+                                        narrowPrecisionToCGFloat(d * deg2rad));
   return *this;
 }
 
 AffineTransform& AffineTransform::translate(double tx, double ty) {
-  m_transform = CGAffineTransformTranslate(m_transform, tx, ty);
+  m_transform = CGAffineTransformTranslate(
+      m_transform, narrowPrecisionToCGFloat(tx), narrowPrecisionToCGFloat(ty));
   return *this;
 }
 
 AffineTransform& AffineTransform::shear(double sx, double sy) {
-  CGAffineTransform shear = CGAffineTransformMake(1, sy, sx, 1, 0, 0);
+  CGAffineTransform shear =
+      CGAffineTransformMake(1.0f, narrowPrecisionToCGFloat(sy),
+                            narrowPrecisionToCGFloat(sx), 1.0f, 0.0f, 0.0f);
   m_transform = CGAffineTransformConcat(shear, m_transform);
   return *this;
 }
