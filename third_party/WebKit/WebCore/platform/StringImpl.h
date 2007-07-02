@@ -114,6 +114,7 @@ class StringImpl : public Shared<StringImpl> {
   int toInt(
       bool* ok = 0) const;  // ignores trailing garbage, unlike DeprecatedString
   double toDouble(bool* ok = 0) const;
+  float toFloat(bool* ok = 0) const;
 
   Length* toCoordsArray(int& len) const;
   Length* toLengthArray(int& len) const;

@@ -338,6 +338,7 @@ class DeprecatedString {
   int toInt(bool* ok = 0, int base = 10) const;
   unsigned toUInt(bool* ok = 0, int base = 10) const;
   double toDouble(bool* ok = 0) const;
+  float toFloat(bool* ok = 0) const;
 
   static DeprecatedString number(int);
   static DeprecatedString number(unsigned);
