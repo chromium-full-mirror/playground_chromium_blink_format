@@ -2747,19 +2747,7 @@ struct ShadowParseContext {
         allowColor(true),
         allowBreak(true) {}
 
-  ~ShadowParseContext() {
-    if (!allowBreak) {
-      delete values;
-      delete x;
-      delete y;
-      delete blur;
-      delete color;
-    }
-  }
-
   bool allowLength() { return allowX || allowY || allowBlur; }
-
-  bool failed() { return allowBreak = false; }
 
   void commitValue() {
     // Handle the ,, case gracefully by doing nothing.
@@ -2768,7 +2756,8 @@ struct ShadowParseContext {
         values = new CSSValueList();
 
       // Construct the current shadow value and add it to the list.
-      values->append(new ShadowValue(x, y, blur, color));
+      values->append(new ShadowValue(x.release(), y.release(), blur.release(),
+                                     color.release()));
     }
 
     // Now reset for the next shadow value.
@@ -2778,22 +2767,23 @@ struct ShadowParseContext {
   }
 
   void commitLength(Value* v) {
-    CSSPrimitiveValue* val =
+    RefPtr<CSSPrimitiveValue> val =
         new CSSPrimitiveValue(v->fValue, (CSSPrimitiveValue::UnitTypes)v->unit);
+
     if (allowX) {
-      x = val;
+      x = val.release();
       allowX = false;
       allowY = true;
       allowColor = false;
       allowBreak = false;
     } else if (allowY) {
-      y = val;
+      y = val.release();
       allowY = false;
       allowBlur = true;
       allowColor = true;
       allowBreak = true;
     } else if (allowBlur) {
-      blur = val;
+      blur = val.release();
       allowBlur = false;
     }
   }
@@ -2807,11 +2797,11 @@ struct ShadowParseContext {
       allowBlur = false;
   }
 
-  CSSValueList* values;
-  CSSPrimitiveValue* x;
-  CSSPrimitiveValue* y;
-  CSSPrimitiveValue* blur;
-  CSSPrimitiveValue* color;
+  RefPtr<CSSValueList> values;
+  RefPtr<CSSPrimitiveValue> x;
+  RefPtr<CSSPrimitiveValue> y;
+  RefPtr<CSSPrimitiveValue> blur;
+  RefPtr<CSSPrimitiveValue> color;
 
   bool allowX;
   bool allowY;
@@ -2830,7 +2820,7 @@ bool CSSParser::parseShadow(int propId, bool important) {
         // Other operators aren't legal or we aren't done with the current
         // shadow
         // value.  Treat as invalid.
-        return context.failed();
+        return false;
 
       // The value is good.  Commit it.
       context.commitValue();
@@ -2839,7 +2829,7 @@ bool CSSParser::parseShadow(int propId, bool important) {
     else if (validUnit(val, FLength, true)) {
       // We required a length and didn't get one. Invalid.
       if (!context.allowLength())
-        return context.failed();
+        return false;
 
       // A length is allowed here.  Construct the value and add it.
       context.commitLength(val);
@@ -2853,7 +2843,7 @@ bool CSSParser::parseShadow(int propId, bool important) {
             val->id <= CSS_VAL__WEBKIT_TEXT && !strict));
       if (isColor) {
         if (!context.allowColor)
-          return context.failed();
+          return false;
         parsedColor = new CSSPrimitiveValue(val->id);
       }
 
@@ -2862,8 +2852,7 @@ bool CSSParser::parseShadow(int propId, bool important) {
         parsedColor = parseColor(val);
 
       if (!parsedColor || !context.allowColor)
-        return context
-            .failed();  // This value is not a color or length and is invalid or
+        return false;  // This value is not a color or length and is invalid or
       // it is a color, but a color isn't allowed at this point.
 
       context.commitColor(parsedColor);
@@ -2875,13 +2864,13 @@ bool CSSParser::parseShadow(int propId, bool important) {
   if (context.allowBreak) {
     context.commitValue();
     if (context.values->length()) {
-      addProperty(propId, context.values, important);
+      addProperty(propId, context.values.release(), important);
       valueList->next();
       return true;
     }
   }
 
-  return context.failed();
+  return false;
 }
 
 struct BorderImageParseContext {
@@ -2903,21 +2892,6 @@ struct BorderImageParseContext {
         m_horizontalRule(0),
         m_verticalRule(0) {}
 
-  ~BorderImageParseContext() {
-    if (!m_allowBreak) {
-      delete m_image;
-      delete m_top;
-      delete m_right;
-      delete m_bottom;
-      delete m_left;
-      delete m_borderTop;
-      delete m_borderRight;
-      delete m_borderBottom;
-      delete m_borderLeft;
-    }
-  }
-
-  bool failed() { return m_allowBreak = false; }
   bool allowBreak() const { return m_allowBreak; }
   bool allowNumber() const { return m_allowNumber; }
   bool allowSlash() const { return m_allowSlash; }
@@ -2951,14 +2925,14 @@ struct BorderImageParseContext {
   }
   void commitWidth(Value* val) {
     if (!m_borderTop)
-      m_borderTop = val;
+      m_borderTop.set(val);
     else if (!m_borderRight)
-      m_borderRight = val;
+      m_borderRight.set(val);
     else if (!m_borderBottom)
-      m_borderBottom = val;
+      m_borderBottom.set(val);
     else {
       ASSERT(!m_borderLeft);
-      m_borderLeft = val;
+      m_borderLeft.set(val);
     }
 
     m_allowBreak = m_allowRule = true;
@@ -3041,17 +3015,17 @@ struct BorderImageParseContext {
   bool m_allowWidth;
   bool m_allowRule;
 
-  CSSImageValue* m_image;
+  RefPtr<CSSImageValue> m_image;
 
-  CSSPrimitiveValue* m_top;
-  CSSPrimitiveValue* m_right;
-  CSSPrimitiveValue* m_bottom;
-  CSSPrimitiveValue* m_left;
+  RefPtr<CSSPrimitiveValue> m_top;
+  RefPtr<CSSPrimitiveValue> m_right;
+  RefPtr<CSSPrimitiveValue> m_bottom;
+  RefPtr<CSSPrimitiveValue> m_left;
 
-  Value* m_borderTop;
-  Value* m_borderRight;
-  Value* m_borderBottom;
-  Value* m_borderLeft;
+  OwnPtr<Value> m_borderTop;
+  OwnPtr<Value> m_borderRight;
+  OwnPtr<Value> m_borderBottom;
+  OwnPtr<Value> m_borderLeft;
 
   int m_horizontalRule;
   int m_verticalRule;
@@ -3063,11 +3037,11 @@ bool CSSParser::parseBorderImage(int propId, bool important) {
   BorderImageParseContext context;
   Value* val = valueList->current();
   if (val->unit != CSSPrimitiveValue::CSS_URI)
-    return context.failed();
+    return false;
 
   String uri = parseURL(domString(val->string));
   if (uri.isEmpty())
-    return context.failed();
+    return false;
 
   context.commitImage(
       new CSSImageValue(String(KURL(styleElement->baseURL().deprecatedString(),
@@ -3091,7 +3065,7 @@ bool CSSParser::parseBorderImage(int propId, bool important) {
       context.commitRule(val->id);
     } else {
       // Something invalid was encountered.
-      return context.failed();
+      return false;
     }
   }
 
@@ -3101,7 +3075,7 @@ bool CSSParser::parseBorderImage(int propId, bool important) {
     return true;
   }
 
-  return context.failed();
+  return false;
 }
 
 bool CSSParser::parseCounter(int propId, int defaultValue, bool important) {
