@@ -306,7 +306,7 @@ class FrameLoader : Noncopyable
 
   void sendRemainingDelegateMessages(unsigned long identifier,
                                      const ResourceResponse&,
-                                     unsigned length,
+                                     int length,
                                      const ResourceError&);
   void requestFromDelegate(ResourceRequest&,
                            unsigned long& identifier,
