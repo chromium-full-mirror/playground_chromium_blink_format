@@ -25,6 +25,7 @@
 #include "SVGPaintServerGradient.h"
 
 #include "CgSupport.h"
+#include "FloatConversion.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
 #include "RenderPath.h"
@@ -118,8 +119,8 @@ static CGShadingRef CGShadingRefForRadialGradient(
   // to the point of intersection of the line through (fx, fy) and the circle.
   if (sqrt(fdx * fdx + fdy * fdy) > radius) {
     double angle = atan2(focus.y * 100.0, focus.x * 100.0);
-    focus.x = cos(angle) * radius;
-    focus.y = sin(angle) * radius;
+    focus.x = narrowPrecisionToCGFloat(cos(angle) * radius);
+    focus.y = narrowPrecisionToCGFloat(sin(angle) * radius);
   }
 
   CGFunctionCallbacks callbacks = {0, cgGradientCallback, NULL};
@@ -129,8 +130,9 @@ static CGShadingRef CGShadingRefForRadialGradient(
       (void*)server, 1, domainLimits, 4, rangeLimits, &callbacks);
 
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-  CGShadingRef shading = CGShadingCreateRadial(
-      colorSpace, focus, 0, center, radius, shadingFunction, true, true);
+  CGShadingRef shading = CGShadingCreateRadial(colorSpace, focus, 0, center,
+                                               narrowPrecisionToCGFloat(radius),
+                                               shadingFunction, true, true);
   CGColorSpaceRelease(colorSpace);
   CGFunctionRelease(shadingFunction);
   return shading;
@@ -143,7 +145,7 @@ void SVGPaintServerGradient::updateQuartzGradientStopsCache(
   m_stopsCount = stops.size();
   m_stopsCache = new SVGPaintServerGradient::QuartzGradientStop[m_stopsCount];
 
-  CGFloat previousOffset = 0.0;
+  CGFloat previousOffset = 0.0f;
   for (unsigned i = 0; i < stops.size(); ++i) {
     CGFloat currOffset =
         min(max(stops[i].first, previousOffset), static_cast<CGFloat>(1.0));
@@ -261,7 +263,7 @@ void SVGPaintServerGradient::handleBoundingBoxModeAndGradientTransformation(
 
   if (boundingBoxMode()) {
     // Choose default gradient bounding box
-    CGRect gradientBBox = CGRectMake(0.0, 0.0, 1.0, 1.0);
+    CGRect gradientBBox = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
 
     // Generate a transform to map between both bounding boxes
     CGAffineTransform gradientIntoObjectBBox =

@@ -1633,7 +1633,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::MoveBy:
       if (args.size() >= 2 && page) {
         FloatRect r = page->chrome()->windowRect();
-        r.move(args[0]->toNumber(exec), args[1]->toNumber(exec));
+        r.move(args[0]->toFloat(exec), args[1]->toFloat(exec));
         // Security check (the spec talks about UniversalBrowserWrite to disable
         // this check...)
         if (screenRect(page->mainFrame()->view()).contains(r))
@@ -1645,7 +1645,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         FloatRect r = page->chrome()->windowRect();
         FloatRect sr = screenRect(page->mainFrame()->view());
         r.setLocation(sr.location());
-        r.move(args[0]->toNumber(exec), args[1]->toNumber(exec));
+        r.move(args[0]->toFloat(exec), args[1]->toFloat(exec));
         // Security check (the spec talks about UniversalBrowserWrite to disable
         // this check...)
         if (sr.contains(r))
@@ -1655,8 +1655,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::ResizeBy:
       if (args.size() >= 2 && page) {
         FloatRect r = page->chrome()->windowRect();
-        FloatSize dest = r.size() + FloatSize(args[0]->toNumber(exec),
-                                              args[1]->toNumber(exec));
+        FloatSize dest = r.size() + FloatSize(args[0]->toFloat(exec),
+                                              args[1]->toFloat(exec));
         FloatRect sg = screenRect(page->mainFrame()->view());
         // Security check: within desktop limits and bigger than 100x100 (per
         // spec)
@@ -1670,7 +1670,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (args.size() >= 2 && page) {
         FloatRect r = page->chrome()->windowRect();
         FloatSize dest =
-            FloatSize(args[0]->toNumber(exec), args[1]->toNumber(exec));
+            FloatSize(args[0]->toFloat(exec), args[1]->toFloat(exec));
         FloatRect sg = screenRect(page->mainFrame()->view());
         // Security check: within desktop limits and bigger than 100x100 (per
         // spec)
