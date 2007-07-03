@@ -29,29 +29,29 @@
 
 namespace WebCore {
 
-SVGPathSegLinetoVerticalAbs::SVGPathSegLinetoVerticalAbs(double y)
+SVGPathSegLinetoVerticalAbs::SVGPathSegLinetoVerticalAbs(float y)
     : SVGPathSeg(), m_y(y) {}
 
 SVGPathSegLinetoVerticalAbs::~SVGPathSegLinetoVerticalAbs() {}
 
-void SVGPathSegLinetoVerticalAbs::setY(double y) {
+void SVGPathSegLinetoVerticalAbs::setY(float y) {
   m_y = y;
 }
 
-double SVGPathSegLinetoVerticalAbs::y() const {
+float SVGPathSegLinetoVerticalAbs::y() const {
   return m_y;
 }
 
-SVGPathSegLinetoVerticalRel::SVGPathSegLinetoVerticalRel(double y)
+SVGPathSegLinetoVerticalRel::SVGPathSegLinetoVerticalRel(float y)
     : SVGPathSeg(), m_y(y) {}
 
 SVGPathSegLinetoVerticalRel::~SVGPathSegLinetoVerticalRel() {}
 
-void SVGPathSegLinetoVerticalRel::setY(double y) {
+void SVGPathSegLinetoVerticalRel::setY(float y) {
   m_y = y;
 }
 
-double SVGPathSegLinetoVerticalRel::y() const {
+float SVGPathSegLinetoVerticalRel::y() const {
   return m_y;
 }
 }

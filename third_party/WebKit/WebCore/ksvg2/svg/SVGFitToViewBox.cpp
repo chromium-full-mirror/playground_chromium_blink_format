@@ -84,7 +84,7 @@ void SVGFitToViewBox::parseViewBox(const String& str) {
       doc->accessSVGExtensions()->reportWarning("Problem parsing viewBox=\"" +
                                                 str + "\"");
     else
-      setViewBoxBaseValue(FloatRect(x, y, w, h));
+      setViewBoxBaseValue(FloatRect::narrowPrecision(x, y, w, h));
   }
 }
 

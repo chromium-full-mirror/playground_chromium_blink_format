@@ -30,7 +30,7 @@
 namespace WebCore {
 class SVGPathSegLinetoAbs : public SVGPathSeg {
  public:
-  SVGPathSegLinetoAbs(double x, double y);
+  SVGPathSegLinetoAbs(float x, float y);
   virtual ~SVGPathSegLinetoAbs();
 
   virtual unsigned short pathSegType() const { return PATHSEG_LINETO_ABS; }
@@ -39,20 +39,20 @@ class SVGPathSegLinetoAbs : public SVGPathSeg {
     return String::format("L %.6lg %.6lg", m_x, m_y);
   }
 
-  void setX(double);
-  double x() const;
+  void setX(float);
+  float x() const;
 
-  void setY(double);
-  double y() const;
+  void setY(float);
+  float y() const;
 
  private:
-  double m_x;
-  double m_y;
+  float m_x;
+  float m_y;
 };
 
 class SVGPathSegLinetoRel : public SVGPathSeg {
  public:
-  SVGPathSegLinetoRel(double x, double y);
+  SVGPathSegLinetoRel(float x, float y);
   virtual ~SVGPathSegLinetoRel();
 
   virtual unsigned short pathSegType() const { return PATHSEG_LINETO_REL; }
@@ -61,15 +61,15 @@ class SVGPathSegLinetoRel : public SVGPathSeg {
     return String::format("l %.6lg %.6lg", m_x, m_y);
   }
 
-  void setX(double);
-  double x() const;
+  void setX(float);
+  float x() const;
 
-  void setY(double);
-  double y() const;
+  void setY(float);
+  float y() const;
 
  private:
-  double m_x;
-  double m_y;
+  float m_x;
+  float m_y;
 };
 
 }  // namespace WebCore

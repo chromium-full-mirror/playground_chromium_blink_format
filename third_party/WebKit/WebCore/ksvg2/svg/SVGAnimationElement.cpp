@@ -92,20 +92,20 @@ SVGElement* SVGAnimationElement::targetElement() const {
   return m_targetElement;
 }
 
-double SVGAnimationElement::getEndTime() const {
-  return m_end;
+float SVGAnimationElement::getEndTime() const {
+  return narrowPrecisionToFloat(m_end);
 }
 
-double SVGAnimationElement::getStartTime() const {
-  return m_begin;
+float SVGAnimationElement::getStartTime() const {
+  return narrowPrecisionToFloat(m_begin);
 }
 
-double SVGAnimationElement::getCurrentTime() const {
-  return m_currentTime;
+float SVGAnimationElement::getCurrentTime() const {
+  return narrowPrecisionToFloat(m_currentTime);
 }
 
-double SVGAnimationElement::getSimpleDuration(ExceptionCode&) const {
-  return m_simpleDuration;
+float SVGAnimationElement::getSimpleDuration(ExceptionCode&) const {
+  return narrowPrecisionToFloat(m_simpleDuration);
 }
 
 void SVGAnimationElement::parseKeyNumbers(Vector<float>& keyNumbers,

@@ -29,11 +29,11 @@
 
 namespace WebCore {
 
-SVGPathSegArcAbs::SVGPathSegArcAbs(double x,
-                                   double y,
-                                   double r1,
-                                   double r2,
-                                   double angle,
+SVGPathSegArcAbs::SVGPathSegArcAbs(float x,
+                                   float y,
+                                   float r1,
+                                   float r2,
+                                   float angle,
                                    bool largeArcFlag,
                                    bool sweepFlag)
     : SVGPathSeg(),
@@ -47,43 +47,43 @@ SVGPathSegArcAbs::SVGPathSegArcAbs(double x,
 
 SVGPathSegArcAbs::~SVGPathSegArcAbs() {}
 
-void SVGPathSegArcAbs::setX(double x) {
+void SVGPathSegArcAbs::setX(float x) {
   m_x = x;
 }
 
-double SVGPathSegArcAbs::x() const {
+float SVGPathSegArcAbs::x() const {
   return m_x;
 }
 
-void SVGPathSegArcAbs::setY(double y) {
+void SVGPathSegArcAbs::setY(float y) {
   m_y = y;
 }
 
-double SVGPathSegArcAbs::y() const {
+float SVGPathSegArcAbs::y() const {
   return m_y;
 }
 
-void SVGPathSegArcAbs::setR1(double r1) {
+void SVGPathSegArcAbs::setR1(float r1) {
   m_r1 = r1;
 }
 
-double SVGPathSegArcAbs::r1() const {
+float SVGPathSegArcAbs::r1() const {
   return m_r1;
 }
 
-void SVGPathSegArcAbs::setR2(double r2) {
+void SVGPathSegArcAbs::setR2(float r2) {
   m_r2 = r2;
 }
 
-double SVGPathSegArcAbs::r2() const {
+float SVGPathSegArcAbs::r2() const {
   return m_r2;
 }
 
-void SVGPathSegArcAbs::setAngle(double angle) {
+void SVGPathSegArcAbs::setAngle(float angle) {
   m_angle = angle;
 }
 
-double SVGPathSegArcAbs::angle() const {
+float SVGPathSegArcAbs::angle() const {
   return m_angle;
 }
 
@@ -103,11 +103,11 @@ bool SVGPathSegArcAbs::sweepFlag() const {
   return m_sweepFlag;
 }
 
-SVGPathSegArcRel::SVGPathSegArcRel(double x,
-                                   double y,
-                                   double r1,
-                                   double r2,
-                                   double angle,
+SVGPathSegArcRel::SVGPathSegArcRel(float x,
+                                   float y,
+                                   float r1,
+                                   float r2,
+                                   float angle,
                                    bool largeArcFlag,
                                    bool sweepFlag)
     : SVGPathSeg(),
@@ -121,43 +121,43 @@ SVGPathSegArcRel::SVGPathSegArcRel(double x,
 
 SVGPathSegArcRel::~SVGPathSegArcRel() {}
 
-void SVGPathSegArcRel::setX(double x) {
+void SVGPathSegArcRel::setX(float x) {
   m_x = x;
 }
 
-double SVGPathSegArcRel::x() const {
+float SVGPathSegArcRel::x() const {
   return m_x;
 }
 
-void SVGPathSegArcRel::setY(double y) {
+void SVGPathSegArcRel::setY(float y) {
   m_y = y;
 }
 
-double SVGPathSegArcRel::y() const {
+float SVGPathSegArcRel::y() const {
   return m_y;
 }
 
-void SVGPathSegArcRel::setR1(double r1) {
+void SVGPathSegArcRel::setR1(float r1) {
   m_r1 = r1;
 }
 
-double SVGPathSegArcRel::r1() const {
+float SVGPathSegArcRel::r1() const {
   return m_r1;
 }
 
-void SVGPathSegArcRel::setR2(double r2) {
+void SVGPathSegArcRel::setR2(float r2) {
   m_r2 = r2;
 }
 
-double SVGPathSegArcRel::r2() const {
+float SVGPathSegArcRel::r2() const {
   return m_r2;
 }
 
-void SVGPathSegArcRel::setAngle(double angle) {
+void SVGPathSegArcRel::setAngle(float angle) {
   m_angle = angle;
 }
 
-double SVGPathSegArcRel::angle() const {
+float SVGPathSegArcRel::angle() const {
   return m_angle;
 }
 

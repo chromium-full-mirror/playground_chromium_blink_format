@@ -47,12 +47,12 @@ SVGPathElement::SVGPathElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       SVGPathParser(),
-      m_pathLength(0.0) {}
+      m_pathLength(0.0f) {}
 
 SVGPathElement::~SVGPathElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGPathElement,
-                              double,
+                              float,
                               Number,
                               number,
                               PathLength,
@@ -60,20 +60,20 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGPathElement,
                               SVGNames::pathLengthAttr.localName(),
                               m_pathLength)
 
-double SVGPathElement::getTotalLength() {
+float SVGPathElement::getTotalLength() {
   // FIXME: this may wish to use the pathSegList instead of the pathdata if
   // that's cheaper to build (or cached)
   return toPathData().length();
 }
 
-FloatPoint SVGPathElement::getPointAtLength(double length) {
+FloatPoint SVGPathElement::getPointAtLength(float length) {
   // FIXME: this may wish to use the pathSegList instead of the pathdata if
   // that's cheaper to build (or cached)
   bool ok = false;
   return toPathData().pointAtLength(length, ok);
 }
 
-unsigned long SVGPathElement::getPathSegAtLength(double length) {
+unsigned long SVGPathElement::getPathSegAtLength(float length) {
   return pathSegList()->getPathSegAtLength(length);
 }
 
@@ -81,129 +81,129 @@ SVGPathSegClosePath* SVGPathElement::createSVGPathSegClosePath() {
   return new SVGPathSegClosePath();
 }
 
-SVGPathSegMovetoAbs* SVGPathElement::createSVGPathSegMovetoAbs(double x,
-                                                               double y) {
+SVGPathSegMovetoAbs* SVGPathElement::createSVGPathSegMovetoAbs(float x,
+                                                               float y) {
   return new SVGPathSegMovetoAbs(x, y);
 }
 
-SVGPathSegMovetoRel* SVGPathElement::createSVGPathSegMovetoRel(double x,
-                                                               double y) {
+SVGPathSegMovetoRel* SVGPathElement::createSVGPathSegMovetoRel(float x,
+                                                               float y) {
   return new SVGPathSegMovetoRel(x, y);
 }
 
-SVGPathSegLinetoAbs* SVGPathElement::createSVGPathSegLinetoAbs(double x,
-                                                               double y) {
+SVGPathSegLinetoAbs* SVGPathElement::createSVGPathSegLinetoAbs(float x,
+                                                               float y) {
   return new SVGPathSegLinetoAbs(x, y);
 }
 
-SVGPathSegLinetoRel* SVGPathElement::createSVGPathSegLinetoRel(double x,
-                                                               double y) {
+SVGPathSegLinetoRel* SVGPathElement::createSVGPathSegLinetoRel(float x,
+                                                               float y) {
   return new SVGPathSegLinetoRel(x, y);
 }
 
 SVGPathSegCurvetoCubicAbs* SVGPathElement::createSVGPathSegCurvetoCubicAbs(
-    double x,
-    double y,
-    double x1,
-    double y1,
-    double x2,
-    double y2) {
+    float x,
+    float y,
+    float x1,
+    float y1,
+    float x2,
+    float y2) {
   return new SVGPathSegCurvetoCubicAbs(x, y, x1, y1, x2, y2);
 }
 
 SVGPathSegCurvetoCubicRel* SVGPathElement::createSVGPathSegCurvetoCubicRel(
-    double x,
-    double y,
-    double x1,
-    double y1,
-    double x2,
-    double y2) {
+    float x,
+    float y,
+    float x1,
+    float y1,
+    float x2,
+    float y2) {
   return new SVGPathSegCurvetoCubicRel(x, y, x1, y1, x2, y2);
 }
 
 SVGPathSegCurvetoQuadraticAbs*
-SVGPathElement::createSVGPathSegCurvetoQuadraticAbs(double x,
-                                                    double y,
-                                                    double x1,
-                                                    double y1) {
+SVGPathElement::createSVGPathSegCurvetoQuadraticAbs(float x,
+                                                    float y,
+                                                    float x1,
+                                                    float y1) {
   return new SVGPathSegCurvetoQuadraticAbs(x, y, x1, y1);
 }
 
 SVGPathSegCurvetoQuadraticRel*
-SVGPathElement::createSVGPathSegCurvetoQuadraticRel(double x,
-                                                    double y,
-                                                    double x1,
-                                                    double y1) {
+SVGPathElement::createSVGPathSegCurvetoQuadraticRel(float x,
+                                                    float y,
+                                                    float x1,
+                                                    float y1) {
   return new SVGPathSegCurvetoQuadraticRel(x, y, x1, y1);
 }
 
-SVGPathSegArcAbs* SVGPathElement::createSVGPathSegArcAbs(double x,
-                                                         double y,
-                                                         double r1,
-                                                         double r2,
-                                                         double angle,
+SVGPathSegArcAbs* SVGPathElement::createSVGPathSegArcAbs(float x,
+                                                         float y,
+                                                         float r1,
+                                                         float r2,
+                                                         float angle,
                                                          bool largeArcFlag,
                                                          bool sweepFlag) {
   return new SVGPathSegArcAbs(x, y, r1, r2, angle, largeArcFlag, sweepFlag);
 }
 
-SVGPathSegArcRel* SVGPathElement::createSVGPathSegArcRel(double x,
-                                                         double y,
-                                                         double r1,
-                                                         double r2,
-                                                         double angle,
+SVGPathSegArcRel* SVGPathElement::createSVGPathSegArcRel(float x,
+                                                         float y,
+                                                         float r1,
+                                                         float r2,
+                                                         float angle,
                                                          bool largeArcFlag,
                                                          bool sweepFlag) {
   return new SVGPathSegArcRel(x, y, r1, r2, angle, largeArcFlag, sweepFlag);
 }
 
 SVGPathSegLinetoHorizontalAbs*
-SVGPathElement::createSVGPathSegLinetoHorizontalAbs(double x) {
+SVGPathElement::createSVGPathSegLinetoHorizontalAbs(float x) {
   return new SVGPathSegLinetoHorizontalAbs(x);
 }
 
 SVGPathSegLinetoHorizontalRel*
-SVGPathElement::createSVGPathSegLinetoHorizontalRel(double x) {
+SVGPathElement::createSVGPathSegLinetoHorizontalRel(float x) {
   return new SVGPathSegLinetoHorizontalRel(x);
 }
 
 SVGPathSegLinetoVerticalAbs* SVGPathElement::createSVGPathSegLinetoVerticalAbs(
-    double y) {
+    float y) {
   return new SVGPathSegLinetoVerticalAbs(y);
 }
 
 SVGPathSegLinetoVerticalRel* SVGPathElement::createSVGPathSegLinetoVerticalRel(
-    double y) {
+    float y) {
   return new SVGPathSegLinetoVerticalRel(y);
 }
 
 SVGPathSegCurvetoCubicSmoothAbs*
-SVGPathElement::createSVGPathSegCurvetoCubicSmoothAbs(double x,
-                                                      double y,
-                                                      double x2,
-                                                      double y2) {
+SVGPathElement::createSVGPathSegCurvetoCubicSmoothAbs(float x,
+                                                      float y,
+                                                      float x2,
+                                                      float y2) {
   return new SVGPathSegCurvetoCubicSmoothAbs(x, y, x2, y2);
 }
 
 SVGPathSegCurvetoCubicSmoothRel*
-SVGPathElement::createSVGPathSegCurvetoCubicSmoothRel(double x,
-                                                      double y,
-                                                      double x2,
-                                                      double y2) {
+SVGPathElement::createSVGPathSegCurvetoCubicSmoothRel(float x,
+                                                      float y,
+                                                      float x2,
+                                                      float y2) {
   return new SVGPathSegCurvetoCubicSmoothRel(x, y, x2, y2);
 }
 
 SVGPathSegCurvetoQuadraticSmoothAbs*
-SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothAbs(double x, double y) {
+SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothAbs(float x, float y) {
   return new SVGPathSegCurvetoQuadraticSmoothAbs(x, y);
 }
 
 SVGPathSegCurvetoQuadraticSmoothRel*
-SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothRel(double x, double y) {
+SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothRel(float x, float y) {
   return new SVGPathSegCurvetoQuadraticSmoothRel(x, y);
 }
 
-void SVGPathElement::svgMoveTo(double x1, double y1, bool, bool abs) {
+void SVGPathElement::svgMoveTo(float x1, float y1, bool, bool abs) {
   ExceptionCode ec = 0;
 
   if (abs)
@@ -212,7 +212,7 @@ void SVGPathElement::svgMoveTo(double x1, double y1, bool, bool abs) {
     pathSegList()->appendItem(createSVGPathSegMovetoRel(x1, y1), ec);
 }
 
-void SVGPathElement::svgLineTo(double x1, double y1, bool abs) {
+void SVGPathElement::svgLineTo(float x1, float y1, bool abs) {
   ExceptionCode ec = 0;
 
   if (abs)
@@ -221,7 +221,7 @@ void SVGPathElement::svgLineTo(double x1, double y1, bool abs) {
     pathSegList()->appendItem(createSVGPathSegLinetoRel(x1, y1), ec);
 }
 
-void SVGPathElement::svgLineToHorizontal(double x, bool abs) {
+void SVGPathElement::svgLineToHorizontal(float x, bool abs) {
   ExceptionCode ec = 0;
 
   if (abs)
@@ -230,7 +230,7 @@ void SVGPathElement::svgLineToHorizontal(double x, bool abs) {
     pathSegList()->appendItem(createSVGPathSegLinetoHorizontalRel(x), ec);
 }
 
-void SVGPathElement::svgLineToVertical(double y, bool abs) {
+void SVGPathElement::svgLineToVertical(float y, bool abs) {
   ExceptionCode ec = 0;
 
   if (abs)
@@ -239,12 +239,12 @@ void SVGPathElement::svgLineToVertical(double y, bool abs) {
     pathSegList()->appendItem(createSVGPathSegLinetoVerticalRel(y), ec);
 }
 
-void SVGPathElement::svgCurveToCubic(double x1,
-                                     double y1,
-                                     double x2,
-                                     double y2,
-                                     double x,
-                                     double y,
+void SVGPathElement::svgCurveToCubic(float x1,
+                                     float y1,
+                                     float x2,
+                                     float y2,
+                                     float x,
+                                     float y,
                                      bool abs) {
   ExceptionCode ec = 0;
 
@@ -256,10 +256,10 @@ void SVGPathElement::svgCurveToCubic(double x1,
         createSVGPathSegCurvetoCubicRel(x, y, x1, y1, x2, y2), ec);
 }
 
-void SVGPathElement::svgCurveToCubicSmooth(double x,
-                                           double y,
-                                           double x2,
-                                           double y2,
+void SVGPathElement::svgCurveToCubicSmooth(float x,
+                                           float y,
+                                           float x2,
+                                           float y2,
                                            bool abs) {
   ExceptionCode ec = 0;
 
@@ -271,10 +271,10 @@ void SVGPathElement::svgCurveToCubicSmooth(double x,
         createSVGPathSegCurvetoCubicSmoothRel(x2, y2, x, y), ec);
 }
 
-void SVGPathElement::svgCurveToQuadratic(double x,
-                                         double y,
-                                         double x1,
-                                         double y1,
+void SVGPathElement::svgCurveToQuadratic(float x,
+                                         float y,
+                                         float x1,
+                                         float y1,
                                          bool abs) {
   ExceptionCode ec = 0;
 
@@ -286,7 +286,7 @@ void SVGPathElement::svgCurveToQuadratic(double x,
                               ec);
 }
 
-void SVGPathElement::svgCurveToQuadraticSmooth(double x, double y, bool abs) {
+void SVGPathElement::svgCurveToQuadraticSmooth(float x, float y, bool abs) {
   ExceptionCode ec = 0;
 
   if (abs)
@@ -297,11 +297,11 @@ void SVGPathElement::svgCurveToQuadraticSmooth(double x, double y, bool abs) {
                               ec);
 }
 
-void SVGPathElement::svgArcTo(double x,
-                              double y,
-                              double r1,
-                              double r2,
-                              double angle,
+void SVGPathElement::svgArcTo(float x,
+                              float y,
+                              float r1,
+                              float r2,
+                              float angle,
                               bool largeArcFlag,
                               bool sweepFlag,
                               bool abs) {
@@ -330,8 +330,8 @@ void SVGPathElement::parseMappedAttribute(MappedAttribute* attr) {
       document()->accessSVGExtensions()->reportError("Problem parsing d=\"" +
                                                      attr->value() + "\"");
   } else if (attr->name() == SVGNames::pathLengthAttr) {
-    m_pathLength = attr->value().toDouble();
-    if (m_pathLength < 0.0)
+    m_pathLength = attr->value().toFloat();
+    if (m_pathLength < 0.0f)
       document()->accessSVGExtensions()->reportError(
           "A negative value for path attribute <pathLength> is not allowed");
   } else {

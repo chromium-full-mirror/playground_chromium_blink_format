@@ -32,12 +32,12 @@
 namespace WebCore {
 
 SVGStopElement::SVGStopElement(const QualifiedName& tagName, Document* doc)
-    : SVGStyledElement(tagName, doc), m_offset(0.0) {}
+    : SVGStyledElement(tagName, doc), m_offset(0.0f) {}
 
 SVGStopElement::~SVGStopElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGStopElement,
-                              double,
+                              float,
                               Number,
                               number,
                               Offset,
@@ -49,9 +49,9 @@ void SVGStopElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::offsetAttr) {
     const String& value = attr->value();
     if (value.endsWith("%"))
-      setOffsetBaseValue(value.left(value.length() - 1).toDouble() / 100.);
+      setOffsetBaseValue(value.left(value.length() - 1).toFloat() / 100.0f);
     else
-      setOffsetBaseValue(value.toDouble());
+      setOffsetBaseValue(value.toFloat());
   } else
     SVGStyledElement::parseMappedAttribute(attr);
 }

@@ -30,12 +30,12 @@
 namespace WebCore {
 class SVGPathSegCurvetoCubicAbs : public SVGPathSeg {
  public:
-  SVGPathSegCurvetoCubicAbs(double x,
-                            double y,
-                            double x1,
-                            double y1,
-                            double x2,
-                            double y2);
+  SVGPathSegCurvetoCubicAbs(float x,
+                            float y,
+                            float x1,
+                            float y1,
+                            float x2,
+                            float y2);
   virtual ~SVGPathSegCurvetoCubicAbs();
 
   virtual unsigned short pathSegType() const {
@@ -47,41 +47,41 @@ class SVGPathSegCurvetoCubicAbs : public SVGPathSeg {
                           m_x2, m_y2, m_x, m_y);
   }
 
-  void setX(double);
-  double x() const;
+  void setX(float);
+  float x() const;
 
-  void setY(double);
-  double y() const;
+  void setY(float);
+  float y() const;
 
-  void setX1(double);
-  double x1() const;
+  void setX1(float);
+  float x1() const;
 
-  void setY1(double);
-  double y1() const;
+  void setY1(float);
+  float y1() const;
 
-  void setX2(double);
-  double x2() const;
+  void setX2(float);
+  float x2() const;
 
-  void setY2(double);
-  double y2() const;
+  void setY2(float);
+  float y2() const;
 
  private:
-  double m_x;
-  double m_y;
-  double m_x1;
-  double m_y1;
-  double m_x2;
-  double m_y2;
+  float m_x;
+  float m_y;
+  float m_x1;
+  float m_y1;
+  float m_x2;
+  float m_y2;
 };
 
 class SVGPathSegCurvetoCubicRel : public SVGPathSeg {
  public:
-  SVGPathSegCurvetoCubicRel(double x,
-                            double y,
-                            double x1,
-                            double y1,
-                            double x2,
-                            double y2);
+  SVGPathSegCurvetoCubicRel(float x,
+                            float y,
+                            float x1,
+                            float y1,
+                            float x2,
+                            float y2);
   virtual ~SVGPathSegCurvetoCubicRel();
 
   virtual unsigned short pathSegType() const {
@@ -93,31 +93,31 @@ class SVGPathSegCurvetoCubicRel : public SVGPathSeg {
                           m_x2, m_y2, m_x, m_y);
   }
 
-  void setX(double);
-  double x() const;
+  void setX(float);
+  float x() const;
 
-  void setY(double);
-  double y() const;
+  void setY(float);
+  float y() const;
 
-  void setX1(double);
-  double x1() const;
+  void setX1(float);
+  float x1() const;
 
-  void setY1(double);
-  double y1() const;
+  void setY1(float);
+  float y1() const;
 
-  void setX2(double);
-  double x2() const;
+  void setX2(float);
+  float x2() const;
 
-  void setY2(double);
-  double y2() const;
+  void setY2(float);
+  float y2() const;
 
  private:
-  double m_x;
-  double m_y;
-  double m_x1;
-  double m_y1;
-  double m_x2;
-  double m_y2;
+  float m_x;
+  float m_y;
+  float m_x1;
+  float m_y1;
+  float m_x2;
+  float m_y2;
 };
 
 }  // namespace WebCore

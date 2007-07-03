@@ -28,13 +28,14 @@
 #include "SVGPathSeg.h"
 
 namespace WebCore {
+
 class SVGPathSegArcAbs : public SVGPathSeg {
  public:
-  SVGPathSegArcAbs(double x,
-                   double y,
-                   double r1,
-                   double r2,
-                   double angle,
+  SVGPathSegArcAbs(float x,
+                   float y,
+                   float r1,
+                   float r2,
+                   float angle,
                    bool largeArcFlag,
                    bool sweepFlag);
   virtual ~SVGPathSegArcAbs();
@@ -46,20 +47,20 @@ class SVGPathSegArcAbs : public SVGPathSeg {
                           m_angle, m_largeArcFlag, m_sweepFlag, m_x, m_y);
   }
 
-  void setX(double x);
-  double x() const;
+  void setX(float x);
+  float x() const;
 
-  void setY(double y);
-  double y() const;
+  void setY(float y);
+  float y() const;
 
-  void setR1(double r1);
-  double r1() const;
+  void setR1(float r1);
+  float r1() const;
 
-  void setR2(double r2);
-  double r2() const;
+  void setR2(float r2);
+  float r2() const;
 
-  void setAngle(double angle);
-  double angle() const;
+  void setAngle(float angle);
+  float angle() const;
 
   void setLargeArcFlag(bool largeArcFlag);
   bool largeArcFlag() const;
@@ -68,11 +69,11 @@ class SVGPathSegArcAbs : public SVGPathSeg {
   bool sweepFlag() const;
 
  private:
-  double m_x;
-  double m_y;
-  double m_r1;
-  double m_r2;
-  double m_angle;
+  float m_x;
+  float m_y;
+  float m_r1;
+  float m_r2;
+  float m_angle;
 
   bool m_largeArcFlag : 1;
   bool m_sweepFlag : 1;
@@ -80,11 +81,11 @@ class SVGPathSegArcAbs : public SVGPathSeg {
 
 class SVGPathSegArcRel : public SVGPathSeg {
  public:
-  SVGPathSegArcRel(double x,
-                   double y,
-                   double r1,
-                   double r2,
-                   double angle,
+  SVGPathSegArcRel(float x,
+                   float y,
+                   float r1,
+                   float r2,
+                   float angle,
                    bool largeArcFlag,
                    bool sweepFlag);
   virtual ~SVGPathSegArcRel();
@@ -96,20 +97,20 @@ class SVGPathSegArcRel : public SVGPathSeg {
                           m_angle, m_largeArcFlag, m_sweepFlag, m_x, m_y);
   }
 
-  void setX(double x);
-  double x() const;
+  void setX(float x);
+  float x() const;
 
-  void setY(double y);
-  double y() const;
+  void setY(float y);
+  float y() const;
 
-  void setR1(double r1);
-  double r1() const;
+  void setR1(float r1);
+  float r1() const;
 
-  void setR2(double r2);
-  double r2() const;
+  void setR2(float r2);
+  float r2() const;
 
-  void setAngle(double angle);
-  double angle() const;
+  void setAngle(float angle);
+  float angle() const;
 
   void setLargeArcFlag(bool largeArcFlag);
   bool largeArcFlag() const;
@@ -118,11 +119,11 @@ class SVGPathSegArcRel : public SVGPathSeg {
   bool sweepFlag() const;
 
  private:
-  double m_x;
-  double m_y;
-  double m_r1;
-  double m_r2;
-  double m_angle;
+  float m_x;
+  float m_y;
+  float m_r1;
+  float m_r2;
+  float m_angle;
 
   bool m_largeArcFlag : 1;
   bool m_sweepFlag : 1;
