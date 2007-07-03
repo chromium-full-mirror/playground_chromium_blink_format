@@ -94,3 +94,5 @@
 @interface WebHTMLView (
     WebDocumentInternalProtocols)<WebDocumentElement, WebMultipleTextMatches>
 @end
+
+#undef WebNSUInteger
