@@ -112,11 +112,6 @@ KJS::Bindings::Instance* Frame::createScriptInstanceForWidget(
 
 void Frame::cleanupPlatformScriptObjects() {}
 
-bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
-  // no smart replace
-  return true;
-}
-
 DragImageRef Frame::dragImageForSelection() {
   return 0;
 }
