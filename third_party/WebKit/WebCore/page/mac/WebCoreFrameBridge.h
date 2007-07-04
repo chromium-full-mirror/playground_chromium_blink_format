@@ -291,9 +291,6 @@ rangeByAlteringCurrentSelection:
 - (void)dragSourceEndedAt:(NSPoint)windowLoc
                 operation:(NSDragOperation)operation;
 
-- (BOOL)isCharacterSmartReplaceExempt:(unichar)c
-                  isPreviousCharacter:(BOOL)isPreviousCharacter;
-
 - (BOOL)getData:(NSData**)data
     andResponse:(NSURLResponse**)response
          forURL:(NSString*)URL;
