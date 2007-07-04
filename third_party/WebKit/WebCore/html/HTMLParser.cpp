@@ -522,6 +522,10 @@ bool HTMLParser::handleError(Node* n,
                isTableSection(h)) {
       if (n->hasTagName(tableTag)) {
         reportError(MisplacedTableError, &currentTagName);
+        if (m_isParsingFragment && !h->hasLocalName(tableTag))
+          // fragment may contain table parts without <table> ancestor, pop them
+          // one by one
+          popBlock(h->localName());
         popBlock(localName);  // end the table
         handled = true;       // ...and start a new one
       } else {
