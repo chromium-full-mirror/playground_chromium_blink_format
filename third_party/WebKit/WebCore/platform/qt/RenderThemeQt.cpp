@@ -299,11 +299,17 @@ bool RenderThemeQt::paintMenuList(RenderObject* o,
     return true;
 
   QStyleOptionComboBox opt;
+  EAppearance appearance = applyTheme(opt, o);
   opt.initFrom(widget);
-  opt.rect = r;
+  const QPoint topLeft = r.topLeft();
+  painter->translate(topLeft);
+  opt.rect.moveTo(QPoint(0, 0));
+  opt.rect.setSize(r.size());
+
   opt.frame = false;
 
   style->drawComplexControl(QStyle::CC_ComboBox, &opt, painter, widget);
+  painter->translate(-topLeft);
   return false;
 }
 
