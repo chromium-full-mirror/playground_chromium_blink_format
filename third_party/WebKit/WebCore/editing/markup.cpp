@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -63,13 +63,13 @@ using namespace HTMLNames;
 
 static inline bool shouldSelfClose(const Node* node);
 
-static DeprecatedString escapeTextForMarkup(const DeprecatedString& in,
+static DeprecatedString escapeTextForMarkup(const String& in,
                                             bool isAttributeValue) {
   DeprecatedString s = "";
 
   unsigned len = in.length();
   for (unsigned i = 0; i < len; ++i) {
-    switch (in[i].unicode()) {
+    switch (in[i]) {
       case '&':
         s += "&amp;";
         break;
@@ -86,7 +86,7 @@ static DeprecatedString escapeTextForMarkup(const DeprecatedString& in,
         }
       // fall through
       default:
-        s += in[i];
+        s += DeprecatedChar(in[i]);
     }
   }
 
@@ -105,9 +105,9 @@ static String stringValueForRange(const Node* node, const Range* range) {
   return str;
 }
 
-static DeprecatedString renderedText(const Node* node, const Range* range) {
+static String renderedText(const Node* node, const Range* range) {
   if (!node->isTextNode())
-    return DeprecatedString();
+    return String();
 
   ExceptionCode ec;
   const Text* textNode = static_cast<const Text*>(node);
@@ -203,7 +203,7 @@ static String addNamespace(
   if (foundNS != ns.impl()) {
     namespaces.set(pre, ns.impl());
     return " xmlns" + (!prefix.isEmpty() ? ":" + prefix : "") + "=\"" +
-           escapeTextForMarkup(ns.deprecatedString(), true) + "\"";
+           escapeTextForMarkup(ns, true) + "\"";
   }
 
   return "";
@@ -226,11 +226,10 @@ static DeprecatedString startMarkup(
       }
       bool useRenderedText =
           annotate && !enclosingNodeWithTag(const_cast<Node*>(node), selectTag);
-      DeprecatedString markup =
-          useRenderedText
-              ? escapeTextForMarkup(renderedText(node, range), false)
-              : escapeTextForMarkup(
-                    stringValueForRange(node, range).deprecatedString(), false);
+      DeprecatedString markup = escapeTextForMarkup(
+          useRenderedText ? renderedText(node, range)
+                          : stringValueForRange(node, range),
+          false);
       return annotate ? convertHTMLTextToInterchangeFormat(
                             markup, static_cast<const Text*>(node))
                       : markup;
@@ -273,15 +272,11 @@ static DeprecatedString startMarkup(
         if (attr->name() == styleAttr && el->isHTMLElement() &&
             (annotate || convertBlocksToInlines))
           continue;
-        String value = attr->value();
-        // FIXME: Handle case where value has illegal characters in it, like "
         if (documentIsHTML)
           markup += " " + attr->name().localName().deprecatedString();
         else
           markup += " " + attr->name().toString().deprecatedString();
-        markup +=
-            "=\"" + escapeTextForMarkup(value.deprecatedString(), true) + "\"";
-
+        markup += "=\"" + escapeTextForMarkup(attr->value(), true) + "\"";
         if (!documentIsHTML && namespaces &&
             shouldAddNamespaceAttr(attr, *namespaces))
           markup +=
@@ -301,8 +296,8 @@ static DeprecatedString startMarkup(
         if (convertBlocksToInlines)
           style->setProperty(CSS_PROP_DISPLAY, CSS_VAL_INLINE, true);
         if (style->length() > 0)
-          markup += " " + styleAttr.localName().deprecatedString() + "=\"" +
-                    style->cssText().deprecatedString() + "\"";
+          markup +=
+              " style=\"" + escapeTextForMarkup(style->cssText(), true) + "\"";
       }
 
       if (shouldSelfClose(el)) {
@@ -653,8 +648,8 @@ DeprecatedString createMarkup(const Range* range,
                                  "')");
 
         if (style->length()) {
-          markups.prepend("<div style='" + style->cssText().deprecatedString() +
-                          "'>");
+          markups.prepend("<div style=\"" +
+                          escapeTextForMarkup(style->cssText(), true) + "\">");
           markups.append("</div>");
         }
       } else {
@@ -686,11 +681,9 @@ DeprecatedString createMarkup(const Range* range,
     removeEnclosingMailBlockquoteStyle(style.get(), parentOfLastClosed);
 
     if (style->length() > 0) {
-      // FIXME: Handle case where style->cssText() has illegal characters in it,
-      // like "
-      DeprecatedString openTag = DeprecatedString("<span class=\"") +
-                                 AppleStyleSpanClass + "\" style=\"" +
-                                 style->cssText().deprecatedString() + "\">";
+      DeprecatedString openTag =
+          DeprecatedString("<span class=\"") + AppleStyleSpanClass +
+          "\" style=\"" + escapeTextForMarkup(style->cssText(), true) + "\">";
       markups.prepend(openTag);
       markups.append("</span>");
     }
