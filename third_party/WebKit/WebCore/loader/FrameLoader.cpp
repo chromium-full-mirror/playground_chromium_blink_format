@@ -268,14 +268,15 @@ void FrameLoader::init() {
           .get());
   setProvisionalDocumentLoader(m_policyDocumentLoader.get());
   setState(FrameStateProvisional);
-    m_provisionalDocumentLoader->setResponse(ResourceResponse(KURL(), "text/html", 0, String(), String());
-    m_provisionalDocumentLoader->finishedLoading();
-    begin();
-    write("<html><body>");
-    end();
-    m_frame->document()->cancelParsing();
-    m_creatingInitialEmptyDocument = false;
-    m_wasLoadEventEmitted = true;
+  m_provisionalDocumentLoader->setResponse(
+      ResourceResponse(KURL(), "text/html", 0, String(), String()));
+  m_provisionalDocumentLoader->finishedLoading();
+  begin();
+  write("<html><body>");
+  end();
+  m_frame->document()->cancelParsing();
+  m_creatingInitialEmptyDocument = false;
+  m_wasLoadEventEmitted = true;
 }
 
 void FrameLoader::setDefersLoading(bool defers) {
