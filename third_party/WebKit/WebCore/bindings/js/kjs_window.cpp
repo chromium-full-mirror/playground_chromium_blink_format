@@ -1546,6 +1546,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       return jsNull();
     }
     case Window::Open: {
+      String urlString = valueToStringWithUndefinedOrNullCheck(exec, args[0]);
       AtomicString frameName = args[1]->isUndefinedOrNull()
                                    ? "_blank"
                                    : AtomicString(args[1]->toString(exec));
@@ -1571,8 +1572,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (frameName == "_top" || frameName == "_parent") {
         String completedURL;
         Frame* activeFrame = Window::retrieveActive(exec)->m_frame;
-        if (!str.isEmpty() && activeFrame)
-          completedURL = activeFrame->document()->completeURL(str);
+        if (!urlString.isEmpty() && activeFrame)
+          completedURL = activeFrame->document()->completeURL(urlString);
 
         const Window* window = Window::retrieveWindow(frame);
         if (!completedURL.isEmpty() &&
@@ -1591,13 +1592,12 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       // In the case of a named frame or a new window, we'll use the
       // createWindow() helper
       WindowFeatures windowFeatures;
-      String features =
-          args[2]->isUndefinedOrNull() ? UString() : args[2]->toString(exec);
+      String features = valueToStringWithUndefinedOrNullCheck(exec, args[2]);
       parseWindowFeatures(features, windowFeatures);
       constrainToVisible(screenRect(page->mainFrame()->view()), windowFeatures);
 
-      frame =
-          createWindow(exec, frame, str, frameName, windowFeatures, 0, false);
+      frame = createWindow(exec, frame, urlString, frameName, windowFeatures, 0,
+                           false);
 
       if (!frame)
         return jsUndefined();
