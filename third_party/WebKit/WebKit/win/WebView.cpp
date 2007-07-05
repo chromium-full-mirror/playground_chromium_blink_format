@@ -1535,6 +1535,8 @@ HRESULT WebView::updateWebCoreSettingsFromPreferences(
 
   ResourceHandle::setCookieStorageAcceptPolicy(acceptPolicy);
 
+  settings->setShowsURLsInToolTips(false);
+
   m_mainFrame->invalidate();  // FIXME
 
   return S_OK;
