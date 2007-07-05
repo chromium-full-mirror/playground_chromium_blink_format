@@ -108,6 +108,8 @@ class ChromeClient {
 
   virtual void mouseDidMoveOverElement(const HitTestResult&,
                                        unsigned modifierFlags) = 0;
+
+  virtual void setToolTip(const String&) = 0;
 };
 }
 

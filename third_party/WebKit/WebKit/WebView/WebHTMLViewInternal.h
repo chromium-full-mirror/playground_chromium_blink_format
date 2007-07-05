@@ -46,7 +46,6 @@ struct WebHTMLViewInterpretKeyEventsParameters;
   BOOL closed;
   BOOL needsLayout;
   BOOL needsToApplyStyles;
-  BOOL showsURLsInToolTips;
   BOOL ignoringMouseDraggedEvents;
   BOOL printing;
 

@@ -109,6 +109,8 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void mouseDidMoveOverElement(const WebCore::HitTestResult&,
                                        unsigned modifierFlags);
 
+  virtual void setToolTip(const WebCore::String&);
+
  private:
   WebView* m_webView;
 };

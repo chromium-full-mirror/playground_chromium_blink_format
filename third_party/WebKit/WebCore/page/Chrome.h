@@ -131,6 +131,8 @@ class Chrome {
 
   void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
 
+  void setToolTip(const HitTestResult&);
+
 #if PLATFORM(MAC)
   void focusNSView(NSView*);
 #endif

@@ -97,6 +97,8 @@ class ChromeClientGdk : public ChromeClient {
 
   virtual void mouseDidMoveOverElement(const HitTestResult&,
                                        unsigned modifierFlags);
+
+  virtual void setToolTip(const String&);
 };
 }
 

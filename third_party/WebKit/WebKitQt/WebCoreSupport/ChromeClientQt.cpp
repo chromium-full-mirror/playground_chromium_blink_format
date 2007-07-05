@@ -244,4 +244,8 @@ void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult&,
                                              unsigned /*modifierFlags*/) {
   notImplemented();
 }
+
+void ChromeClientQt::setToolTip(const String&) {
+  notImplemented();
+}
 }
