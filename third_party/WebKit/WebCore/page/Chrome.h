@@ -37,6 +37,7 @@ class ChromeClient;
 class ContextMenu;
 class FloatRect;
 class Frame;
+class HitTestResult;
 class IntRect;
 class Page;
 class String;
@@ -127,6 +128,8 @@ class Chrome {
                           const IntRect& scrollViewRect,
                           const IntRect& clipRect);
   void updateBackingStore();
+
+  void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
 
 #if PLATFORM(MAC)
   void focusNSView(NSView*);

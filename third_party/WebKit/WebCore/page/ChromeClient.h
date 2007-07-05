@@ -27,6 +27,7 @@ namespace WebCore {
 
 class FloatRect;
 class Frame;
+class HitTestResult;
 class IntRect;
 class Page;
 class String;
@@ -104,6 +105,9 @@ class ChromeClient {
                                   const IntRect& scrollViewRect,
                                   const IntRect& clipRect) = 0;
   virtual void updateBackingStore() = 0;
+
+  virtual void mouseDidMoveOverElement(const HitTestResult&,
+                                       unsigned modifierFlags) = 0;
 };
 }
 

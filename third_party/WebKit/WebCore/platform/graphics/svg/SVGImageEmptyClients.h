@@ -125,6 +125,9 @@ class SVGEmptyChromeClient : public ChromeClient {
                                   const IntRect& scrollViewRect,
                                   const IntRect& clipRect) {}
   virtual void updateBackingStore() {}
+
+  virtual void mouseDidMoveOverElement(const HitTestResult&,
+                                       unsigned modifierFlags) {}
 };
 
 class SVGEmptyFrameLoaderClient : public FrameLoaderClient {

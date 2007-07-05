@@ -277,6 +277,11 @@ void Chrome::updateBackingStore() {
   m_client->updateBackingStore();
 }
 
+void Chrome::mouseDidMoveOverElement(const HitTestResult& result,
+                                     unsigned modifierFlags) {
+  m_client->mouseDidMoveOverElement(result, modifierFlags);
+}
+
 PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {
   if (const HashSet<Page*>* group = page->frameNamespace()) {
     HashSet<Page*>::const_iterator end = group->end();

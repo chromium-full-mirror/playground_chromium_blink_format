@@ -239,4 +239,9 @@ void ChromeClientQt::scrollBackingStore(int,
                                         const IntRect&) {}
 
 void ChromeClientQt::updateBackingStore() {}
+
+void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult&,
+                                             unsigned /*modifierFlags*/) {
+  notImplemented();
+}
 }

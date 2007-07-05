@@ -105,6 +105,9 @@ class ChromeClientQt : public ChromeClient {
   virtual void scrollBackingStore(int, int, const IntRect&, const IntRect&);
   virtual void updateBackingStore();
 
+  virtual void mouseDidMoveOverElement(const HitTestResult&,
+                                       unsigned modifierFlags);
+
   QWebPage* m_webPage;
 };
 }

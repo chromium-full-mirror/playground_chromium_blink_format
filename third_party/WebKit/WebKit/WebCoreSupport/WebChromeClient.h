@@ -106,6 +106,9 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void setStatusbarText(const WebCore::String&);
 
+  virtual void mouseDidMoveOverElement(const WebCore::HitTestResult&,
+                                       unsigned modifierFlags);
+
  private:
   WebView* m_webView;
 };
