@@ -257,7 +257,8 @@ class EventHandler : Noncopyable {
                                        Frame* subframe);
 
   bool passSubframeEventToSubframe(MouseEventWithHitTestResults&,
-                                   Frame* subframe);
+                                   Frame* subframe,
+                                   HitTestResult* hoveredNode = 0);
 
   bool passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
                                       PlatformScrollbar*);

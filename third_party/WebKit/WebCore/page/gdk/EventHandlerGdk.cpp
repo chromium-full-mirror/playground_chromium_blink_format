@@ -89,7 +89,8 @@ bool EventHandler::eventActivatedView(const PlatformMouseEvent& event) const {
 
 bool EventHandler::passSubframeEventToSubframe(
     MouseEventWithHitTestResults& event,
-    Frame* subframe) {
+    Frame* subframe,
+    HitTestResult*) {
   notImplemented();
   return false;
 }
