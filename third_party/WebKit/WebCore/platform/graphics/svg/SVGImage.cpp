@@ -33,6 +33,7 @@
 #include "FrameLoader.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
+#include "NotImplemented.h"
 #include "Page.h"
 #include "ResourceError.h"
 #include "SVGDocument.h"
@@ -115,6 +116,11 @@ NativeImagePtr SVGImage::nativeImageForCurrentFrame() {
   return m_frameCache->cgImage();
 #elif PLATFORM(QT)
   return m_frameCache->pixmap();
+#elif PLATFORM(CAIRO)
+  return m_frameCache->surface();
+#else
+  notImplemented();
+  return 0;
 #endif
 }
 
