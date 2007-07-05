@@ -667,11 +667,14 @@ class WebView : public IWebView,
 
   bool isPainting() const { return m_paintCount > 0; }
 
+  void setToolTip(const WebCore::String&);
+
  protected:
   static bool allowSiteSpecificHacks() { return s_allowSiteSpecificHacks; }
   void preflightSpellChecker();
   bool continuousCheckingAllowed();
   void initializeCacheSizesIfNecessary();
+  void initializeToolTipWindow();
 
   ULONG m_refCount;
   WebCore::String m_groupName;
@@ -712,6 +715,9 @@ class WebView : public IWebView,
   bool m_hasSpellCheckerDocumentTag;
   bool m_smartInsertDeleteEnabled;
   bool m_didClose;
+
+  HWND m_toolTipHwnd;
+  WebCore::String m_toolTip;
 
   static bool s_allowSiteSpecificHacks;
 };
