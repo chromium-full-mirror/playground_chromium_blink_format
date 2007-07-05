@@ -63,6 +63,10 @@ class DOMWindow : public Shared<DOMWindow> {
 
   DOMSelection* getSelection();
 
+  void focus();
+  void blur();
+  void close();
+
   // DOM Level 2 AbstractView Interface
   Document* document() const;
 

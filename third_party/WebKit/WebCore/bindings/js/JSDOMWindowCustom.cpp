@@ -30,18 +30,28 @@ bool JSDOMWindow::customGetOwnPropertySlot(KJS::ExecState* exec,
   // we don't want any properties other than "closed" on a closed window
   if (!frame()) {
     if (propertyName == "closed") {
-      slot.setStaticEntry(
-          this, KJS::Lookup::findEntry(KJS::Window::classInfo()->propHashTable,
-                                       "closed"),
-          KJS::staticValueGetter<KJS::Window>);
-      return true;
-    }
-    if (propertyName == "close") {
       const KJS::HashEntry* entry = KJS::Lookup::findEntry(
           KJS::Window::classInfo()->propHashTable, propertyName);
-      slot.setStaticEntry(this, entry,
-                          KJS::staticFunctionGetter<KJS::WindowFunc>);
-      return true;
+      ASSERT(entry);
+      if (entry) {
+        slot.setStaticEntry(this, entry, KJS::staticValueGetter<KJS::Window>);
+        return true;
+      }
+    }
+    if (propertyName == "close") {
+      KJS::JSValue* proto = prototype();
+      if (proto->isObject()) {
+        const KJS::HashEntry* entry = KJS::Lookup::findEntry(
+            static_cast<KJS::JSObject*>(proto)->classInfo()->propHashTable,
+            propertyName);
+        ASSERT(entry);
+        if (entry) {
+          slot.setStaticEntry(
+              this, entry,
+              KJS::staticFunctionGetter<JSDOMWindowPrototypeFunction>);
+          return true;
+        }
+      }
     }
 
     slot.setUndefined(this);
@@ -64,6 +74,29 @@ bool JSDOMWindow::customGetOwnPropertySlot(KJS::ExecState* exec,
     else
       slot.setValueSlot(this, val);
     return true;
+  }
+
+  // FIXME: We need this to work around the blanket isSafeScript check in
+  // KJS::Window.  Once we remove that, we
+  // can move this to JSDOMWindowPrototype.
+  KJS::JSValue* proto = prototype();
+  if (proto->isObject()) {
+    const KJS::HashEntry* entry = KJS::Lookup::findEntry(
+        static_cast<KJS::JSObject*>(proto)->classInfo()->propHashTable,
+        propertyName);
+    if (entry) {
+      if (entry->attr & KJS::Function) {
+        switch (entry->value) {
+          case FocusFuncNum:
+          case BlurFuncNum:
+          case CloseFuncNum:
+            slot.setStaticEntry(
+                this, entry,
+                KJS::staticFunctionGetter<JSDOMWindowPrototypeFunction>);
+            return true;
+        }
+      }
+    }
   }
 
   return false;
