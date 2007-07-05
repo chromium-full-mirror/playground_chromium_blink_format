@@ -112,8 +112,9 @@ bool EventHandler::passMousePressEventToSubframe(
 
 bool EventHandler::passMouseMoveEventToSubframe(
     MouseEventWithHitTestResults& mev,
-    Frame* subframe) {
-  return passSubframeEventToSubframe(mev, subframe);
+    Frame* subframe,
+    HitTestResult* hoveredNode) {
+  return passSubframeEventToSubframe(mev, subframe, hoveredNode);
 }
 
 bool EventHandler::passMouseReleaseEventToSubframe(
