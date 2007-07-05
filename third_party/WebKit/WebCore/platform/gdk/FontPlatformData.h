@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2006 Apple Computer, Inc.
  * Copyright (C) 2006 Michael Emmel mike.emmel@gmail.com
+ * Copyright (C) 2007 Holger Hans Peter Freyther
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -38,9 +39,19 @@ namespace WebCore {
 class FontPlatformData {
  public:
   class Deleted {};
-  FontPlatformData(Deleted) : m_pattern((FcPattern*)-1) {}
+  FontPlatformData(Deleted)
+      : m_pattern(reinterpret_cast<FcPattern*>(-1)),
+        m_fontMatrix(0),
+        m_fontFace(0),
+        m_options(0),
+        m_scaledFont(0) {}
 
-  FontPlatformData() : m_pattern(0) {}
+  FontPlatformData()
+      : m_pattern(0),
+        m_fontMatrix(0),
+        m_fontFace(0),
+        m_options(0),
+        m_scaledFont(0) {}
 
   FontPlatformData(const FontDescription&, const AtomicString& family);
   ~FontPlatformData();
@@ -56,8 +67,10 @@ class FontPlatformData {
   void setFont(cairo_t*) const;
 
   unsigned hash() const {
-    return StringImpl::computeHash((UChar*)&m_fontDescription,
-                                   sizeof(FontDescription) / sizeof(UChar));
+    uintptr_t hashCodes[2] = {reinterpret_cast<uintptr_t>(m_pattern),
+                              reinterpret_cast<uintptr_t>(m_fontMatrix)};
+    return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
+                                   sizeof(hashCodes) / sizeof(UChar));
   }
 
   bool operator==(const FontPlatformData&) const;
