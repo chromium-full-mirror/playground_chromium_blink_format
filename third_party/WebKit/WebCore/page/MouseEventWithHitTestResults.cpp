@@ -42,7 +42,7 @@ MouseEventWithHitTestResults::MouseEventWithHitTestResults(
     : m_event(event), m_hitTestResult(hitTestResult) {}
 
 Node* MouseEventWithHitTestResults::targetNode() const {
-  Node* node = m_hitTestResult.innerNonSharedNode();
+  Node* node = m_hitTestResult.innerNode();
   if (node && node->inDocument())
     return node;
 
