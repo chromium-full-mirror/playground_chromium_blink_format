@@ -920,7 +920,21 @@ bool EventHandler::handleMouseDoubleClickEvent(
   return swallowMouseUpEvent || swallowClickEvent || swallowMouseReleaseEvent;
 }
 
-bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
+bool EventHandler::mouseMoved(const PlatformMouseEvent& event) {
+  HitTestResult hoveredNode = HitTestResult(IntPoint());
+  bool result = handleMouseMoveEvent(event, &hoveredNode);
+
+  Page* page = m_frame->page();
+  if (!page)
+    return result;
+
+  hoveredNode.setToNonShadowAncestor();
+  page->chrome()->mouseDidMoveOverElement(hoveredNode, event.modifierFlags());
+  return result;
+}
+
+bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent,
+                                        HitTestResult* hoveredNode) {
   // in Radar 3703768 we saw frequent crashes apparently due to the
   // part being null here, which seems impossible, so check for nil
   // but also assert so that we can try to figure this out in debug
@@ -960,6 +974,8 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   HitTestRequest request(m_mousePressed && m_mouseDownMayStartSelect,
                          m_mousePressed, true);
   MouseEventWithHitTestResults mev = prepareMouseEvent(request, mouseEvent);
+  if (hoveredNode)
+    *hoveredNode = mev.hitTestResult();
 
   PlatformScrollbar* scrollbar = 0;
 
@@ -996,7 +1012,8 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   if (newSubframe) {
     // Update over/out state before passing the event to the subframe.
     updateMouseEventTargetNode(mev.targetNode(), mouseEvent, true);
-    swallowEvent |= passMouseMoveEventToSubframe(mev, newSubframe.get());
+    swallowEvent |=
+        passMouseMoveEventToSubframe(mev, newSubframe.get(), hoveredNode);
   } else {
     if (scrollbar && !m_mousePressed)
       scrollbar->handleMouseMoveEvent(mouseEvent);  // Handle hover effects on

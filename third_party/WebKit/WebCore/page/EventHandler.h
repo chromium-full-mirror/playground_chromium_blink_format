@@ -122,8 +122,11 @@ class EventHandler : Noncopyable {
 
   bool mouseDownMayStartSelect() const { return m_mouseDownMayStartSelect; }
 
+  bool mouseMoved(const PlatformMouseEvent&);
+
   bool handleMousePressEvent(const PlatformMouseEvent&);
-  bool handleMouseMoveEvent(const PlatformMouseEvent&);
+  bool handleMouseMoveEvent(const PlatformMouseEvent&,
+                            HitTestResult* hoveredNode = 0);
   bool handleMouseReleaseEvent(const PlatformMouseEvent&);
   bool handleWheelEvent(PlatformWheelEvent&);
 
@@ -248,7 +251,8 @@ class EventHandler : Noncopyable {
   bool passMousePressEventToSubframe(MouseEventWithHitTestResults&,
                                      Frame* subframe);
   bool passMouseMoveEventToSubframe(MouseEventWithHitTestResults&,
-                                    Frame* subframe);
+                                    Frame* subframe,
+                                    HitTestResult* hoveredNode = 0);
   bool passMouseReleaseEventToSubframe(MouseEventWithHitTestResults&,
                                        Frame* subframe);
 
