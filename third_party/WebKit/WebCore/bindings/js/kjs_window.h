@@ -100,9 +100,6 @@ class Window : public DOMObject {
   WebCore::Frame* frame() const { return m_frame; }
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  bool getOverridePropertySlot(ExecState*,
-                               const Identifier& propertyName,
-                               PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
@@ -294,6 +291,8 @@ class Window : public DOMObject {
   WebCore::Frame* m_frame;
   OwnPtr<WindowPrivate> d;
 };
+
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(WindowFunc)
 
 /**
  * An action (either function or string) to be executed after a specified
