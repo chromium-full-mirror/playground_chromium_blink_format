@@ -246,7 +246,6 @@ class FrameLoader : Noncopyable
   bool isStopping() const;
 
   void finishedLoading();
-  KURL URL() const;
 
   ResourceError cancelledError(const ResourceRequest&) const;
   ResourceError fileDoesNotExistError(const ResourceResponse&) const;
@@ -442,7 +441,9 @@ class FrameLoader : Noncopyable
 
   void frameDetached();
 
+  // FIXME: Which one of these URL methods is right?
   KURL url() const;
+  KURL URL() const;
 
   void updateBaseURLForEmptyDocument();
 
