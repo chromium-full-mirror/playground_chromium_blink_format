@@ -212,7 +212,7 @@ class HTMLInputElement : public HTMLGenericFormElement {
   String m_value;
   String m_originalValue;
   int xPos;
-  short m_maxLen;
+  int m_maxLen;
   short m_size;
   short yPos;
 
