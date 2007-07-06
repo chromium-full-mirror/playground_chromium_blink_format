@@ -161,15 +161,22 @@ struct HashTraits<P*> : GenericHashTraits<P*> {
 template <typename P>
 struct HashTraits<RefPtr<P>> : GenericHashTraits<RefPtr<P>> {
   typedef HashTraits<typename IntTypes<sizeof(P*)>::SignedType> StorageTraits;
+  typedef typename StorageTraits::TraitType StorageType;
   static const bool emptyValueIsZero = true;
   static const bool needsRef = true;
-  static void ref(const RefPtr<P>& p) {
-    if (p)
-      p->ref();
+
+  typedef union {
+    P* m_p;
+    StorageType m_s;
+  } UnionType;
+
+  static void ref(const StorageType& s) {
+    if (const P* p = reinterpret_cast<const UnionType*>(&s)->m_p)
+      const_cast<P*>(p)->ref();
   }
-  static void deref(const RefPtr<P>& p) {
-    if (p)
-      p->deref();
+  static void deref(const StorageType& s) {
+    if (const P* p = reinterpret_cast<const UnionType*>(&s)->m_p)
+      const_cast<P*>(p)->deref();
   }
 };
 

@@ -129,19 +129,29 @@ struct PairFirstExtractor {
 
 template <bool canReplaceDeletedKey,
           typename ValueType,
+          typename ValueTraits,
           typename ValueStorageTraits,
           typename HashFunctions>
 struct HashMapTranslator;
 
 template <typename ValueType,
+          typename ValueTraits,
           typename ValueStorageTraits,
           typename HashFunctions>
-struct HashMapTranslator<true, ValueType, ValueStorageTraits, HashFunctions> {
+struct HashMapTranslator<true,
+                         ValueType,
+                         ValueTraits,
+                         ValueStorageTraits,
+                         HashFunctions> {
   typedef typename ValueType::first_type KeyType;
   typedef typename ValueType::second_type MappedType;
   typedef typename ValueStorageTraits::TraitType ValueStorageType;
   typedef typename ValueStorageTraits::FirstTraits KeyStorageTraits;
   typedef typename KeyStorageTraits::TraitType KeyStorageType;
+  typedef typename ValueStorageTraits::SecondTraits MappedStorageTraits;
+  typedef typename MappedStorageTraits::TraitType MappedStorageType;
+  typedef typename ValueTraits::FirstTraits KeyTraits;
+  typedef typename ValueTraits::SecondTraits MappedTraits;
 
   static unsigned hash(const KeyType& key) { return HashFunctions::hash(key); }
   static bool equal(const KeyStorageType& a, const KeyType& b) {
@@ -151,20 +161,31 @@ struct HashMapTranslator<true, ValueType, ValueStorageTraits, HashFunctions> {
                         const KeyType& key,
                         const MappedType& mapped,
                         unsigned) {
-    *(KeyType*)&location.first = key;
-    *(MappedType*)&location.second = mapped;
+    Assigner<KeyTraits::needsRef, KeyType, KeyStorageType, KeyTraits>::assign(
+        key, location.first);
+    Assigner<MappedTraits::needsRef, MappedType, MappedStorageType,
+             MappedTraits>::assign(mapped, location.second);
   }
 };
 
 template <typename ValueType,
+          typename ValueTraits,
           typename ValueStorageTraits,
           typename HashFunctions>
-struct HashMapTranslator<false, ValueType, ValueStorageTraits, HashFunctions> {
+struct HashMapTranslator<false,
+                         ValueType,
+                         ValueTraits,
+                         ValueStorageTraits,
+                         HashFunctions> {
   typedef typename ValueType::first_type KeyType;
   typedef typename ValueType::second_type MappedType;
   typedef typename ValueStorageTraits::TraitType ValueStorageType;
   typedef typename ValueStorageTraits::FirstTraits KeyStorageTraits;
   typedef typename KeyStorageTraits::TraitType KeyStorageType;
+  typedef typename ValueStorageTraits::SecondTraits MappedStorageTraits;
+  typedef typename MappedStorageTraits::TraitType MappedStorageType;
+  typedef typename ValueTraits::FirstTraits KeyTraits;
+  typedef typename ValueTraits::SecondTraits MappedTraits;
 
   static unsigned hash(const KeyType& key) { return HashFunctions::hash(key); }
   static bool equal(const KeyStorageType& a, const KeyType& b) {
@@ -176,8 +197,10 @@ struct HashMapTranslator<false, ValueType, ValueStorageTraits, HashFunctions> {
                         unsigned) {
     if (location.first == KeyStorageTraits::deletedValue())
       location.first = KeyStorageTraits::emptyValue();
-    *(KeyType*)&location.first = key;
-    *(MappedType*)&location.second = mapped;
+    Assigner<KeyTraits::needsRef, KeyType, KeyStorageType, KeyTraits>::assign(
+        key, location.first);
+    Assigner<MappedTraits::needsRef, MappedType, MappedStorageType,
+             MappedTraits>::assign(mapped, location.second);
   }
 };
 
@@ -279,8 +302,8 @@ HashMap<T, U, V, W, X>::inlineAdd(const KeyType& key,
                                   const MappedType& mapped) {
   const bool canReplaceDeletedKey =
       !KeyTraits::needsDestruction || KeyStorageTraits::needsDestruction;
-  typedef HashMapTranslator<canReplaceDeletedKey, ValueType, ValueStorageTraits,
-                            HashFunctions>
+  typedef HashMapTranslator<canReplaceDeletedKey, ValueType, ValueTraits,
+                            ValueStorageTraits, HashFunctions>
       TranslatorType;
   return m_impl.template add<KeyType, MappedType, TranslatorType>(key, mapped);
 }

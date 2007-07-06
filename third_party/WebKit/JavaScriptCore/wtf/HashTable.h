@@ -1209,25 +1209,21 @@ struct NeedsRef<PairBaseHashTraits<FirstTraits, SecondTraits>,
   static const bool value = firstNeedsRef || secondNeedsRef;
 };
 
-template <bool needsRef, typename ValueTraits>
+template <bool needsRef, typename ValueTraits, typename ValueStorageTraits>
 struct RefCounterBase;
 
-template <typename ValueTraits>
-struct RefCounterBase<false, ValueTraits> {
-  typedef typename ValueTraits::TraitType ValueType;
-  static void ref(const ValueType&) {}
-  static void deref(const ValueType&) {}
+template <typename ValueTraits, typename ValueStorageTraits>
+struct RefCounterBase<false, ValueTraits, ValueStorageTraits> {
+  typedef typename ValueStorageTraits::TraitType ValueStorageType;
+  static void ref(const ValueStorageType&) {}
+  static void deref(const ValueStorageType&) {}
 };
 
-template <typename ValueTraits>
-struct RefCounterBase<true, ValueTraits> {
-  typedef typename ValueTraits::TraitType ValueType;
-  static void ref(const ValueType& v) {
-    ValueTraits::ref(*(const ValueType*)&v);
-  }
-  static void deref(const ValueType& v) {
-    ValueTraits::deref(*(const ValueType*)&v);
-  }
+template <typename ValueTraits, typename ValueStorageTraits>
+struct RefCounterBase<true, ValueTraits, ValueStorageTraits> {
+  typedef typename ValueStorageTraits::TraitType ValueStorageType;
+  static void ref(const ValueStorageType& v) { ValueTraits::ref(v); }
+  static void deref(const ValueStorageType& v) { ValueTraits::deref(v); }
 };
 
 template <typename ValueTraits, typename ValueStorageTraits>
@@ -1235,13 +1231,9 @@ struct RefCounter {
   typedef typename ValueTraits::TraitType ValueType;
   typedef typename ValueStorageTraits::TraitType ValueStorageType;
   static const bool needsRef = NeedsRef<ValueTraits, ValueStorageTraits>::value;
-  typedef RefCounterBase<needsRef, ValueTraits> Base;
-  static void ref(const ValueStorageType& v) {
-    Base::ref(*(const ValueType*)&v);
-  }
-  static void deref(const ValueStorageType& v) {
-    Base::deref(*(const ValueType*)&v);
-  }
+  typedef RefCounterBase<needsRef, ValueTraits, ValueStorageTraits> Base;
+  static void ref(const ValueStorageType& v) { Base::ref(v); }
+  static void deref(const ValueStorageType& v) { Base::deref(v); }
 };
 
 template <typename FirstTraits,
@@ -1258,15 +1250,17 @@ struct RefCounter<PairBaseHashTraits<FirstTraits, SecondTraits>,
       NeedsRef<FirstTraits, FirstStorageTraits>::value;
   static const bool secondNeedsRef =
       NeedsRef<SecondTraits, SecondStorageTraits>::value;
-  typedef RefCounterBase<firstNeedsRef, FirstTraits> FirstBase;
-  typedef RefCounterBase<secondNeedsRef, SecondTraits> SecondBase;
+  typedef RefCounterBase<firstNeedsRef, FirstTraits, FirstStorageTraits>
+      FirstBase;
+  typedef RefCounterBase<secondNeedsRef, SecondTraits, SecondStorageTraits>
+      SecondBase;
   static void ref(const ValueStorageType& v) {
-    FirstBase::ref(*(const FirstType*)&v.first);
-    SecondBase::ref(*(const SecondType*)&v.second);
+    FirstBase::ref(v.first);
+    SecondBase::ref(v.second);
   }
   static void deref(const ValueStorageType& v) {
-    FirstBase::deref(*(const FirstType*)&v.first);
-    SecondBase::deref(*(const SecondType*)&v.second);
+    FirstBase::deref(v.first);
+    SecondBase::deref(v.second);
   }
 };
 
@@ -1311,6 +1305,45 @@ struct HashTableRefCounter {
   typedef HashTableRefCounterBase<needsRef, HashTableType, ValueTraits> Base;
   static void refAll(HashTableType& table) { Base::refAll(table); }
   static void derefAll(HashTableType& table) { Base::derefAll(table); }
+};
+
+// helper template for HashMap and HashSet.
+template <bool needsRef,
+          typename FromType,
+          typename ToType,
+          typename FromTraits>
+struct Assigner;
+
+template <typename FromType, typename ToType, typename FromTraits>
+struct Assigner<false, FromType, ToType, FromTraits> {
+  typedef union {
+    FromType m_from;
+    ToType m_to;
+  } UnionType;
+
+  static void assign(const FromType& from, ToType& to) {
+    reinterpret_cast<UnionType*>(&to)->m_from = from;
+  }
+};
+
+template <typename FromType, typename ToType, typename FromTraits>
+struct Assigner<true, FromType, ToType, FromTraits> {
+  static void assign(const FromType& from, ToType& to) {
+    ToType oldTo = to;
+    memcpy(&to, &from, sizeof(FromType));
+    FromTraits::ref(to);
+    FromTraits::deref(oldTo);
+  }
+};
+
+template <typename FromType, typename FromTraits>
+struct Assigner<false, FromType, FromType, FromTraits> {
+  static void assign(const FromType& from, FromType& to) { to = from; }
+};
+
+template <typename FromType, typename FromTraits>
+struct Assigner<true, FromType, FromType, FromTraits> {
+  static void assign(const FromType& from, FromType& to) { to = from; }
 };
 
 }  // namespace WTF

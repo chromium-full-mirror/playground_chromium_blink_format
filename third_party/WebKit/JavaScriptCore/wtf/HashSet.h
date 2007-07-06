@@ -119,12 +119,20 @@ struct IdentityExtractor {
 
 template <bool canReplaceDeletedValue,
           typename ValueType,
+          typename ValueTraits,
           typename StorageTraits,
           typename HashFunctions>
 struct HashSetTranslator;
 
-template <typename ValueType, typename StorageTraits, typename HashFunctions>
-struct HashSetTranslator<true, ValueType, StorageTraits, HashFunctions> {
+template <typename ValueType,
+          typename ValueTraits,
+          typename StorageTraits,
+          typename HashFunctions>
+struct HashSetTranslator<true,
+                         ValueType,
+                         ValueTraits,
+                         StorageTraits,
+                         HashFunctions> {
   typedef typename StorageTraits::TraitType StorageType;
   static unsigned hash(const ValueType& key) {
     return HashFunctions::hash(key);
@@ -136,12 +144,20 @@ struct HashSetTranslator<true, ValueType, StorageTraits, HashFunctions> {
                         const ValueType& key,
                         const ValueType&,
                         unsigned) {
-    *(ValueType*)&location = key;
+    Assigner<ValueTraits::needsRef, ValueType, StorageType,
+             ValueTraits>::assign(key, location);
   }
 };
 
-template <typename ValueType, typename StorageTraits, typename HashFunctions>
-struct HashSetTranslator<false, ValueType, StorageTraits, HashFunctions> {
+template <typename ValueType,
+          typename ValueTraits,
+          typename StorageTraits,
+          typename HashFunctions>
+struct HashSetTranslator<false,
+                         ValueType,
+                         ValueTraits,
+                         StorageTraits,
+                         HashFunctions> {
   typedef typename StorageTraits::TraitType StorageType;
   static unsigned hash(const ValueType& key) {
     return HashFunctions::hash(key);
@@ -155,7 +171,8 @@ struct HashSetTranslator<false, ValueType, StorageTraits, HashFunctions> {
                         unsigned) {
     if (location == StorageTraits::deletedValue())
       location = StorageTraits::emptyValue();
-    *(ValueType*)&location = key;
+    Assigner<ValueTraits::needsRef, ValueType, StorageType,
+             ValueTraits>::assign(key, location);
   }
 };
 
@@ -301,8 +318,8 @@ pair<typename HashSet<T, U, V>::iterator, bool> HashSet<T, U, V>::add(
     const ValueType& value) {
   const bool canReplaceDeletedValue =
       !ValueTraits::needsDestruction || StorageTraits::needsDestruction;
-  typedef HashSetTranslator<canReplaceDeletedValue, ValueType, StorageTraits,
-                            HashFunctions>
+  typedef HashSetTranslator<canReplaceDeletedValue, ValueType, ValueTraits,
+                            StorageTraits, HashFunctions>
       Translator;
   return m_impl.template add<ValueType, ValueType, Translator>(value, value);
 }
