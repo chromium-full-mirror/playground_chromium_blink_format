@@ -1325,7 +1325,7 @@ HTMLHeadElement* Document::head() {
 
 void Document::close() {
   if (frame())
-    frame()->loader()->endIfNotLoading();
+    frame()->loader()->endIfNotLoadingMainResource();
   implicitClose();
 }
 

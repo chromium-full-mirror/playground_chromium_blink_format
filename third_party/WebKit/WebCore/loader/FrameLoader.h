@@ -206,7 +206,7 @@ class FrameLoader : Noncopyable
   void stopForUserCancel();
   void cancelPendingArchiveLoad(ResourceLoader*);
 
-  bool isLoadingMainResource() const;
+  bool isLoadingMainResource() const { return m_isLoadingMainResource; }
   bool isLoading() const;
   bool frameHasLoaded() const;
 
@@ -391,8 +391,7 @@ class FrameLoader : Noncopyable
   void write(const char* str, int len = -1, bool flush = false);
   void write(const String&);
   void end();
-
-  void endIfNotLoading();
+  void endIfNotLoadingMainResource();
 
   void setEncoding(const String& encoding, bool userChosen);
   String encoding() const;
