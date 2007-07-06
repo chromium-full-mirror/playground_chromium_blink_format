@@ -146,9 +146,9 @@ static void drawRectIntoContext(IntRect rect,
   view->paint(gc, rect);
 }
 
-HBITMAP imageFromSelection(Frame* frame, bool forceWhiteText) {
-  frame->setPaintRestriction(forceWhiteText
-                                 ? PaintRestrictionSelectionOnlyWhiteText
+HBITMAP imageFromSelection(Frame* frame, bool forceBlackText) {
+  frame->setPaintRestriction(forceBlackText
+                                 ? PaintRestrictionSelectionOnlyBlackText
                                  : PaintRestrictionSelectionOnly);
   FloatRect fr = frame->selectionRect();
   IntRect ir((int)fr.x(), (int)fr.y(), (int)fr.width(), (int)fr.height());
