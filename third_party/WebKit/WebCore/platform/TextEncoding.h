@@ -64,6 +64,8 @@ const TextEncoding& ASCIIEncoding();
 const TextEncoding& Latin1Encoding();
 const TextEncoding& UTF16BigEndianEncoding();
 const TextEncoding& UTF16LittleEndianEncoding();
+const TextEncoding& UTF32BigEndianEncoding();
+const TextEncoding& UTF32LittleEndianEncoding();
 const TextEncoding& UTF8Encoding();
 const TextEncoding& WindowsLatin1Encoding();
 

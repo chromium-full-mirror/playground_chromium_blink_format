@@ -339,8 +339,8 @@ static inline bool skipWhitespace(const char*& pos, const char* dataEnd) {
 }
 
 void TextResourceDecoder::checkForBOM(const char* data, size_t len) {
-  // Check for UTF-16 or UTF-8 BOM mark at the beginning, which is a sure sign
-  // of a Unicode encoding.
+  // Check for UTF-16/32 or UTF-8 BOM mark at the beginning, which is a sure
+  // sign of a Unicode encoding.
 
   if (m_source == UserChosenEncoding) {
     // FIXME: Maybe a BOM should override even a user-chosen encoding.
@@ -350,27 +350,33 @@ void TextResourceDecoder::checkForBOM(const char* data, size_t len) {
 
   // Check if we have enough data.
   size_t bufferLength = m_buffer.size();
-  if (bufferLength + len < 3)
+  if (bufferLength + len < 4)
     return;
 
   m_checkedForBOM = true;
 
-  // Extract the first three bytes.
+  // Extract the first four bytes.
   // Handle the case where some of bytes are already in the buffer.
   // The last byte is always guaranteed to not be in the buffer.
   const unsigned char* udata = reinterpret_cast<const unsigned char*>(data);
   unsigned char c1 = bufferLength >= 1 ? m_buffer[0] : *udata++;
   unsigned char c2 = bufferLength >= 2 ? m_buffer[1] : *udata++;
-  ASSERT(bufferLength < 3);
-  unsigned char c3 = *udata;
+  unsigned char c3 = bufferLength >= 3 ? m_buffer[2] : *udata++;
+  ASSERT(bufferLength < 4);
+  unsigned char c4 = *udata;
 
   // Check for the BOM.
-  if (c1 == 0xFE && c2 == 0xFF)
-    setEncoding(UTF16BigEndianEncoding(), AutoDetectedEncoding);
-  else if (c1 == 0xFF && c2 == 0xFE)
-    setEncoding(UTF16LittleEndianEncoding(), AutoDetectedEncoding);
-  else if (c1 == 0xEF && c2 == 0xBB && c3 == 0xBF)
+  if (c1 == 0xFF && c2 == 0xFE) {
+    if (c3 != 0 || c4 != 0)
+      setEncoding(UTF16LittleEndianEncoding(), AutoDetectedEncoding);
+    else
+      setEncoding(UTF32LittleEndianEncoding(), AutoDetectedEncoding);
+  } else if (c1 == 0xEF && c2 == 0xBB && c3 == 0xBF)
     setEncoding(UTF8Encoding(), AutoDetectedEncoding);
+  else if (c1 == 0xFE && c2 == 0xFF)
+    setEncoding(UTF16BigEndianEncoding(), AutoDetectedEncoding);
+  else if (c1 == 0 && c2 == 0 && c3 == 0xFE && c4 == 0xFF)
+    setEncoding(UTF32BigEndianEncoding(), AutoDetectedEncoding);
 }
 
 bool TextResourceDecoder::checkForCSSCharset(const char* data,
@@ -525,7 +531,15 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
       } else if (ptr[0] == 0 && ptr[1] == '?' && ptr[2] == 0 && ptr[3] == 'x' &&
                  ptr[4] == 0 && ptr[5] == 'm' && ptr[6] == 0 && ptr[7] == 'l') {
         // UTF-16 without BOM
-        setEncoding(((ptr - m_buffer.data()) % 2) ? "UTF-16LE" : "UTF-16BE",
+        setEncoding(((ptr - m_buffer.data()) % 2) ? UTF16LittleEndianEncoding()
+                                                  : UTF16BigEndianEncoding(),
+                    AutoDetectedEncoding);
+        return true;
+      } else if (ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 0 && ptr[3] == '?' &&
+                 ptr[4] == 0 && ptr[5] == 0 && ptr[6] == 0 && ptr[7] == 'x') {
+        // UTF-32 without BOM
+        setEncoding(((ptr - m_buffer.data()) % 4) ? UTF32LittleEndianEncoding()
+                                                  : UTF32BigEndianEncoding(),
                     AutoDetectedEncoding);
         return true;
       }
