@@ -37,7 +37,7 @@ class FrameLoaderClientQt;
 }
 class QWebFrameData;
 
-class QWEBKIT_EXPORT QWebFrame : public QAbstractScrollArea {
+class QWEBKIT_EXPORT QWebFrame : public QFrame {
   Q_OBJECT
  protected:
   QWebFrame(QWebPage* parent, QWebFrameData* frameData);
@@ -55,6 +55,8 @@ class QWEBKIT_EXPORT QWebFrame : public QAbstractScrollArea {
   QString title() const;
 
   QList<QWebFrame*> childFrames() const;
+
+  void suppressScrollbars(bool suppress);
 
  public Q_SLOTS:
   QString evaluateJavaScript(const QString& scriptSource);
@@ -75,9 +77,8 @@ class QWEBKIT_EXPORT QWebFrame : public QAbstractScrollArea {
   virtual void wheelEvent(QWheelEvent*);
   virtual void keyPressEvent(QKeyEvent*);
   virtual void keyReleaseEvent(QKeyEvent*);
-  virtual void scrollContentsBy(int dx, int dy);
-  virtual void focusInEvent(QFocusEvent* e);
-  virtual void focusOutEvent(QFocusEvent* e);
+  virtual void focusInEvent(QFocusEvent*);
+  virtual void focusOutEvent(QFocusEvent*);
   virtual bool focusNextPrevChild(bool next);
 
  private:
