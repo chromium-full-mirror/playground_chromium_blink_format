@@ -778,7 +778,7 @@ int RenderTable::calcBorderLeft() const {
       if (gb.style() == BHIDDEN)
         return 0;
       if (gb.style() > BHIDDEN)
-        borderWidth = max(borderWidth, gb.width);
+        borderWidth = max(borderWidth, static_cast<unsigned>(gb.width));
     }
 
     RenderTableSection* firstNonEmptySection =
@@ -792,7 +792,7 @@ int RenderTable::calcBorderLeft() const {
         return 0;
 
       if (sb.style() > BHIDDEN)
-        borderWidth = max(borderWidth, sb.width);
+        borderWidth = max(borderWidth, static_cast<unsigned>(sb.width));
 
       const RenderTableSection::CellStruct& cs =
           firstNonEmptySection->cellAt(0, leftmostColumn);
@@ -807,9 +807,9 @@ int RenderTable::calcBorderLeft() const {
           return 0;
 
         if (cb.style() > BHIDDEN)
-          borderWidth = max(borderWidth, cb.width);
+          borderWidth = max(borderWidth, static_cast<unsigned>(cb.width));
         if (rb.style() > BHIDDEN)
-          borderWidth = max(borderWidth, rb.width);
+          borderWidth = max(borderWidth, static_cast<unsigned>(rb.width));
       }
     }
     return borderWidth / 2;
@@ -839,7 +839,7 @@ int RenderTable::calcBorderRight() const {
       if (gb.style() == BHIDDEN)
         return 0;
       if (gb.style() > BHIDDEN)
-        borderWidth = max(borderWidth, gb.width);
+        borderWidth = max(borderWidth, static_cast<unsigned>(gb.width));
     }
 
     RenderTableSection* firstNonEmptySection =
@@ -853,7 +853,7 @@ int RenderTable::calcBorderRight() const {
         return 0;
 
       if (sb.style() > BHIDDEN)
-        borderWidth = max(borderWidth, sb.width);
+        borderWidth = max(borderWidth, static_cast<unsigned>(sb.width));
 
       const RenderTableSection::CellStruct& cs =
           firstNonEmptySection->cellAt(0, rightmostColumn);
@@ -868,9 +868,9 @@ int RenderTable::calcBorderRight() const {
           return 0;
 
         if (cb.style() > BHIDDEN)
-          borderWidth = max(borderWidth, cb.width);
+          borderWidth = max(borderWidth, static_cast<unsigned>(cb.width));
         if (rb.style() > BHIDDEN)
-          borderWidth = max(borderWidth, rb.width);
+          borderWidth = max(borderWidth, static_cast<unsigned>(rb.width));
       }
     }
     return (borderWidth + 1) / 2;
