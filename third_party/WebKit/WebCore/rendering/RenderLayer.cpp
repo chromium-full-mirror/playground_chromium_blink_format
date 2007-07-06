@@ -1551,9 +1551,9 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 
   bool selectionOnly =
       paintRestriction == PaintRestrictionSelectionOnly ||
-      paintRestriction == PaintRestrictionSelectionOnlyWhiteText;
-  bool forceWhiteText =
-      paintRestriction == PaintRestrictionSelectionOnlyWhiteText;
+      paintRestriction == PaintRestrictionSelectionOnlyBlackText;
+  bool forceBlackText =
+      paintRestriction == PaintRestrictionSelectionOnlyBlackText;
 
   if (isTransparent())
     haveTransparency = true;
@@ -1617,7 +1617,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     RenderObject::PaintInfo paintInfo(
         p, clipRectToApply,
         selectionOnly ? PaintPhaseSelection : PaintPhaseChildBlockBackgrounds,
-        forceWhiteText, paintingRootForRenderer, 0);
+        forceBlackText, paintingRootForRenderer, 0);
     renderer()->paint(paintInfo, tx, ty);
     if (!selectionOnly) {
       paintInfo.phase = PaintPhaseFloat;

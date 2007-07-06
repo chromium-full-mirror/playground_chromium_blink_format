@@ -88,7 +88,7 @@ enum PaintPhase {
 enum PaintRestriction {
   PaintRestrictionNone,
   PaintRestrictionSelectionOnly,
-  PaintRestrictionSelectionOnlyWhiteText
+  PaintRestrictionSelectionOnlyBlackText
 };
 
 enum HitTestFilter { HitTestAll, HitTestSelf, HitTestDescendants };
@@ -487,20 +487,20 @@ class RenderObject : public CachedResourceClient {
     PaintInfo(GraphicsContext* newContext,
               const IntRect& newRect,
               PaintPhase newPhase,
-              bool newForceWhiteText,
+              bool newForceBlackText,
               RenderObject* newPaintingRoot,
               RenderFlowSequencedSet* newOutlineObjects)
         : context(newContext),
           rect(newRect),
           phase(newPhase),
-          forceWhiteText(newForceWhiteText),
+          forceBlackText(newForceBlackText),
           paintingRoot(newPaintingRoot),
           outlineObjects(newOutlineObjects) {}
 
     GraphicsContext* context;
     IntRect rect;
     PaintPhase phase;
-    bool forceWhiteText;
+    bool forceBlackText;
     RenderObject*
         paintingRoot;  // used to draw just one element and its visual kids
     RenderFlowSequencedSet* outlineObjects;  // used to list outlines that
@@ -798,7 +798,8 @@ class RenderObject : public CachedResourceClient {
 
   virtual void addLineBoxRects(Vector<IntRect>&,
                                unsigned startOffset = 0,
-                               unsigned endOffset = UINT_MAX);
+                               unsigned endOffset = UINT_MAX,
+                               bool useSelectionHeight = false);
 
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   IntRect absoluteBoundingBoxRect();

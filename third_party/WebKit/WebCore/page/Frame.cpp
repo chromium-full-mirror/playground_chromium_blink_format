@@ -1160,7 +1160,7 @@ void Frame::selectionTextRects(Vector<FloatRect>& rects,
   RefPtr<Range> selectedRange = selectionController()->toRange();
 
   Vector<IntRect> intRects;
-  selectedRange->addLineBoxRects(intRects);
+  selectedRange->addLineBoxRects(intRects, true);
 
   unsigned size = intRects.size();
   FloatRect visibleContentRect = d->m_view->visibleContentRect();
@@ -1274,7 +1274,7 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
   else if (view() && view()->isTransparent())
     fillWithRed = false;  // Transparent, don't fill with red.
   else if (d->m_paintRestriction == PaintRestrictionSelectionOnly ||
-           d->m_paintRestriction == PaintRestrictionSelectionOnlyWhiteText)
+           d->m_paintRestriction == PaintRestrictionSelectionOnlyBlackText)
     fillWithRed = false;  // Selections are transparent, don't fill with red.
   else if (d->m_elementToDraw)
     fillWithRed =

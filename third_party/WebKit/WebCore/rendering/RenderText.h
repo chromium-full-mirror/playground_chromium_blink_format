@@ -73,7 +73,8 @@ class RenderText : public RenderObject {
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   virtual void addLineBoxRects(Vector<IntRect>&,
                                unsigned startOffset = 0,
-                               unsigned endOffset = UINT_MAX);
+                               unsigned endOffset = UINT_MAX,
+                               bool useSelectionHeight = false);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 

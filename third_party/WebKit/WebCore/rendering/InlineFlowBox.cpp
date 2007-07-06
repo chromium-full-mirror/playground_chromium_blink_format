@@ -870,7 +870,7 @@ void InlineFlowBox::paintTextDecorations(RenderObject::PaintInfo& paintInfo,
 
   // We don't want underlines or other decorations when we're trying to draw
   // nothing but the selection as white text.
-  if (paintInfo.phase == PaintPhaseSelection && paintInfo.forceWhiteText)
+  if (paintInfo.phase == PaintPhaseSelection && paintInfo.forceBlackText)
     return;
 
   GraphicsContext* context = paintInfo.context;

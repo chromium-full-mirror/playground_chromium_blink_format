@@ -1762,7 +1762,8 @@ void RenderObject::paintBoxShadow(GraphicsContext* context,
 
 void RenderObject::addLineBoxRects(Vector<IntRect>&,
                                    unsigned startOffset,
-                                   unsigned endOffset) {}
+                                   unsigned endOffset,
+                                   bool useSelectionHeight) {}
 
 void RenderObject::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
   // For blocks inside inlines, we go ahead and include margins so that we run
