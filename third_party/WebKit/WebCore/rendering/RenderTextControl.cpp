@@ -79,13 +79,24 @@ RenderTextControl::~RenderTextControl() {
 
 void RenderTextControl::setStyle(RenderStyle* style) {
   RenderBlock::setStyle(style);
-  if (m_innerBlock)
+  if (m_innerBlock) {
+    // We may have set the width and the height in the old style in layout().
+    // Reset them now to avoid
+    // getting a spurious layout hint.
+    m_innerBlock->renderer()->style()->setHeight(Length());
+    m_innerBlock->renderer()->style()->setWidth(Length());
     m_innerBlock->renderer()->setStyle(createInnerBlockStyle(style));
+  }
 
   if (m_innerText) {
     RenderBlock* textBlockRenderer =
         static_cast<RenderBlock*>(m_innerText->renderer());
     RenderStyle* textBlockStyle = createInnerTextStyle(style);
+    // We may have set the width and the height in the old style in layout().
+    // Reset them now to avoid
+    // getting a spurious layout hint.
+    textBlockRenderer->style()->setHeight(Length());
+    textBlockRenderer->style()->setWidth(Length());
     textBlockRenderer->setStyle(textBlockStyle);
     for (Node* n = m_innerText->firstChild(); n;
          n = n->traverseNextNode(m_innerText.get())) {
@@ -725,11 +736,17 @@ void RenderTextControl::layout() {
   int textBlockHeight =
       m_height - paddingTop() - paddingBottom() - borderTop() - borderBottom();
   int currentTextBlockHeight = m_innerText->renderer()->height();
-  if (m_multiLine || m_innerBlock || currentTextBlockHeight > m_height)
+  if (m_multiLine || m_innerBlock || currentTextBlockHeight > m_height) {
+    if (textBlockHeight != currentTextBlockHeight)
+      relayoutChildren = true;
     m_innerText->renderer()->style()->setHeight(Length(textBlockHeight, Fixed));
-  if (m_innerBlock)
+  }
+  if (m_innerBlock) {
+    if (textBlockHeight != m_innerBlock->renderer()->height())
+      relayoutChildren = true;
     m_innerBlock->renderer()->style()->setHeight(
         Length(textBlockHeight, Fixed));
+  }
 
   int oldWidth = m_width;
   calcWidth();
@@ -751,11 +768,16 @@ void RenderTextControl::layout() {
                        borderRight() - m_innerText->renderer()->paddingLeft() -
                        m_innerText->renderer()->paddingRight() -
                        searchExtrasWidth;
+  if (textBlockWidth != m_innerText->renderer()->width())
+    relayoutChildren = true;
   m_innerText->renderer()->style()->setWidth(Length(textBlockWidth, Fixed));
-  if (m_innerBlock)
-    m_innerBlock->renderer()->style()->setWidth(Length(
-        m_width - paddingLeft() - paddingRight() - borderLeft() - borderRight(),
-        Fixed));
+  if (m_innerBlock) {
+    int innerBlockWidth =
+        m_width - paddingLeft() - paddingRight() - borderLeft() - borderRight();
+    if (innerBlockWidth != m_innerBlock->renderer()->width())
+      relayoutChildren = true;
+    m_innerBlock->renderer()->style()->setWidth(Length(innerBlockWidth, Fixed));
+  }
 
   RenderBlock::layoutBlock(relayoutChildren);
 
