@@ -64,7 +64,7 @@ bool IconDatabase::open(const String& databasePath) {
   return false;
 }
 
-bool IconDatabase::isOpen() {
+bool IconDatabase::isOpen() const {
   return false;
 }
 
