@@ -4593,13 +4593,13 @@ void RenderBlock::updateFirstLetter() {
           RenderTextFragment(textObj->node(), oldText.get(), length,
                              oldText->length() - length);
       remainingText->setStyle(textObj->style());
-      remainingText->setFirstLetter(firstLetter);
       if (remainingText->element())
         remainingText->element()->setRenderer(remainingText);
 
       RenderObject* nextObj = textObj->nextSibling();
       firstLetterContainer->removeChild(textObj);
       firstLetterContainer->addChild(remainingText, nextObj);
+      remainingText->setFirstLetter(firstLetter);
 
       // construct text fragment for the first letter
       RenderTextFragment* letter = new (renderArena())

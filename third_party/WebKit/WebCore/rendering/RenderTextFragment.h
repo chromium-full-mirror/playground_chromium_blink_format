@@ -56,6 +56,7 @@ class RenderTextFragment : public RenderText {
 
  private:
   virtual void setTextInternal(PassRefPtr<StringImpl>);
+  virtual UChar previousCharacter();
 
   unsigned m_start;
   unsigned m_end;
