@@ -212,6 +212,7 @@ class Editor {
   void selectMarkedText();
   void unmarkText();
   void discardMarkedText();
+  void replaceMarkedText(const String&);
 
   bool ignoreMarkedTextSelectionChange() const {
     return m_ignoreMarkedTextSelectionChange;

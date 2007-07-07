@@ -198,7 +198,6 @@ typedef enum ObjectElementType {
              customAttributes:(NSArray*)attributes
                        ranges:(NSArray*)ranges;
 - (DOMRange*)markedTextDOMRange;
-- (void)replaceMarkedTextWithText:(NSString*)text;
 
 - (NSFont*)fontForSelection:(BOOL*)hasMultipleFonts;
 - (NSWritingDirection)baseWritingDirectionForSelectionStart;
