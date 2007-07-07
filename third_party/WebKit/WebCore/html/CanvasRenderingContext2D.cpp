@@ -420,6 +420,8 @@ void CanvasRenderingContext2D::fill() {
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
+  if (state().m_path.isEmpty())
+    return;
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if PLATFORM(CG)
   CGContextBeginPath(c->platformContext());
@@ -457,6 +459,8 @@ void CanvasRenderingContext2D::fill() {
 void CanvasRenderingContext2D::stroke() {
   GraphicsContext* c = drawingContext();
   if (!c)
+    return;
+  if (state().m_path.isEmpty())
     return;
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if PLATFORM(CG)
