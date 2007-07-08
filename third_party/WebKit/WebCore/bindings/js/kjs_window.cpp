@@ -881,6 +881,10 @@ void Window::put(ExecState* exec,
                  int attr) {
   const HashEntry* entry = Lookup::findEntry(&WindowTable, propertyName);
   if (entry) {
+    if (entry->attr & ReadOnly)
+      // readonly! Can't put!
+      return;
+
     switch (entry->value) {
       case Status:
         m_frame->setJSStatusBarText(value->toString(exec));
