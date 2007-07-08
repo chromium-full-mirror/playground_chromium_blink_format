@@ -160,6 +160,8 @@ class Element : public ContainerNode {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
 
+  virtual RenderStyle* computedStyle();
+
   virtual bool childTypeAllowed(NodeType);
 
   virtual Attribute* createAttribute(const QualifiedName& name,
