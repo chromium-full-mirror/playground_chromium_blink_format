@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2000-2001 Dawit Alemayehu <adawit@kde.org>
    Copyright (C) 2006 Alexey Proskuryakov <ap@webkit.org>
+   Copyright (C) 2007 Apple Inc. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License (LGPL)
@@ -50,9 +51,15 @@ static const char base64DecMap[128] = {
     0x31, 0x32, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 void base64Encode(const Vector<char>& in, Vector<char>& out, bool insertLFs) {
-  // clear out the output buffer
   out.clear();
   if (in.isEmpty())
+    return;
+
+  // If the input string is pathologically large, just return nothing.
+  // Note: Keep this in sync with the "out_len" computation below.
+  // Rather than being perfectly precise, this is a bit conservative.
+  const unsigned maxInputBufferSize = UINT_MAX / 77 * 76 / 4 * 3 - 2;
+  if (in.size() > maxInputBufferSize)
     return;
 
   unsigned sidx = 0;
@@ -62,9 +69,7 @@ void base64Encode(const Vector<char>& in, Vector<char>& out, bool insertLFs) {
 
   unsigned out_len = ((len + 2) / 3) * 4;
 
-  // Deal with the 76 characters or less per
-  // line limit specified in RFC 2045 on a
-  // pre request basis.
+  // Deal with the 76 character per line limit specified in RFC 2045.
   insertLFs = (insertLFs && out_len > 76);
   if (insertLFs)
     out_len += ((out_len - 1) / 76);
@@ -114,6 +119,10 @@ bool base64Decode(const Vector<char>& in, Vector<char>& out) {
   out.clear();
   if (in.isEmpty())
     return true;
+
+  // If the input string is pathologically large, just return nothing.
+  if (in.size() > UINT_MAX)
+    return false;
 
   unsigned len = in.size();
   const char* data = in.data();
