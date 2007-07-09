@@ -56,8 +56,7 @@ KJSProxy::~KJSProxy() {
 
 JSValue* KJSProxy::evaluate(const String& filename,
                             int baseLine,
-                            const String& str,
-                            Node* n) {
+                            const String& str) {
   // evaluate code. Returns the JS return value or 0
   // if there was none, an error occured or the type couldn't be converted.
 
@@ -72,8 +71,11 @@ JSValue* KJSProxy::evaluate(const String& filename,
 
   JSLock lock;
 
-  JSValue* thisNode =
-      n ? Window::retrieve(m_frame) : toJS(m_script->globalExec(), n);
+  // Evaluating the JavaScript could cause the frame to be deallocated
+  // so we start the keep alive timer here.
+  m_frame->keepAlive();
+
+  JSValue* thisNode = Window::retrieve(m_frame);
 
   m_script->startTimeoutCheck();
   Completion comp = m_script->evaluate(

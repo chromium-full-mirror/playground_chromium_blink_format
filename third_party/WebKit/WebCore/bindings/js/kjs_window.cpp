@@ -1761,7 +1761,7 @@ void ScheduledAction::execute(Window* window) {
       }
     }
   } else
-    frame->loader()->executeScript(0, m_code);
+    frame->loader()->executeScript(m_code);
 
   // Update our document's rendering following the execution of the timeout
   // callback.

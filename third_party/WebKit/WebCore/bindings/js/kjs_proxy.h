@@ -43,8 +43,7 @@ class KJSProxy {
 
   KJS::JSValue* evaluate(const String& filename,
                          int baseLine,
-                         const String& code,
-                         Node*);
+                         const String& code);
   void clear();
   EventListener* createHTMLEventHandler(const String& functionName,
                                         const String& code,

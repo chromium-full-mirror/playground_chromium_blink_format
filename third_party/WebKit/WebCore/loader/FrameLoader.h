@@ -401,10 +401,8 @@ class FrameLoader : Noncopyable
 
   KJS::JSValue* executeScript(const String& URL,
                               int baseLine,
-                              Node*,
                               const String& script);
-  KJS::JSValue* executeScript(Node*,
-                              const String& script,
+  KJS::JSValue* executeScript(const String& script,
                               bool forceUserGesture = false);
 
   bool gotoAnchor(const String& name);  // returns true if the anchor was found

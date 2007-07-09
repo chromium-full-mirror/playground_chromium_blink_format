@@ -539,7 +539,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const DeprecatedString& str,
 #endif
 
   m_state = state;
-  m_doc->frame()->loader()->executeScript(url, baseLine, 0, str);
+  m_doc->frame()->loader()->executeScript(url, baseLine, str);
   state = m_state;
 
   state.setAllowYield(true);
