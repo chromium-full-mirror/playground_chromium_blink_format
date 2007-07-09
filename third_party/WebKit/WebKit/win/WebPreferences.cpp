@@ -1168,3 +1168,13 @@ HRESULT WebPreferences::setAllowContinuousSpellChecking(BOOL enabled) {
   setBoolValue(CFSTR(AllowContinuousSpellCheckingPreferenceKey), enabled);
   return S_OK;
 }
+
+HRESULT WebPreferences::isDOMPasteAllowed(BOOL* enabled) {
+  *enabled = boolValueForKey(CFSTR(WebKitDOMPasteAllowedPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::setDOMPasteAllowed(BOOL enabled) {
+  setBoolValue(CFSTR(WebKitDOMPasteAllowedPreferenceKey), enabled);
+  return S_OK;
+}

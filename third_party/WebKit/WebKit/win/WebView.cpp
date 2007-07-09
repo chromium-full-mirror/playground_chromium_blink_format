@@ -1536,6 +1536,11 @@ HRESULT WebView::updateWebCoreSettingsFromPreferences(
     return hr;
   settings->setUsesPageCache(!!enabled);
 
+  hr = preferences->isDOMPasteAllowed(&enabled);
+  if (FAILED(hr))
+    return hr;
+  settings->setDOMPasteAllowed(!!enabled);
+
   ResourceHandle::setCookieStorageAcceptPolicy(acceptPolicy);
 
   settings->setShowsURLsInToolTips(false);

@@ -114,3 +114,6 @@
 
 #define AllowContinuousSpellCheckingPreferenceKey \
   "AllowContinuousSpellCheckingPreferenceKey"  // default: true
+
+#define WebKitDOMPasteAllowedPreferenceKey \
+  "WebKitDOMPasteAllowedPreferenceKey"  // default: false
