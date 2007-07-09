@@ -558,7 +558,7 @@ void QWebNetworkManager::cancelHttpJob(QWebNetworkJob* job) {
 
 void QWebNetworkManager::httpConnectionClosed(const WebCore::HostInfo& info) {
   WebCoreHttp* connection = m_hostMapping.take(info);
-  delete connection;
+  connection->deleteLater();
 }
 
 void QWebNetworkInterfacePrivate::sendFileData(QWebNetworkJob* job,
@@ -794,9 +794,8 @@ WebCoreHttp::WebCoreHttp(QObject* parent, const HostInfo& hi)
 }
 
 WebCoreHttp::~WebCoreHttp() {
-  // Crashes presently  FIXME
-  // delete connection[0].http;
-  // delete connection[1].http;
+  connection[0].http->deleteLater();
+  connection[1].http->deleteLater();
 }
 
 void WebCoreHttp::request(QWebNetworkJob* job) {
