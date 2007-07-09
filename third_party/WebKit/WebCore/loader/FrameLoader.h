@@ -331,6 +331,10 @@ class FrameLoader : Noncopyable
                       const String& referrer,
                       bool lockHistory = true,
                       bool userGesture = false);
+  void changeLocation(const KURL& URL,
+                      const String& referrer,
+                      bool lockHistory = true,
+                      bool userGesture = false);
   void urlSelected(const ResourceRequest&,
                    const String& target,
                    Event*,
