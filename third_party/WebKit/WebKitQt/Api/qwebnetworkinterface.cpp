@@ -1,6 +1,7 @@
 /*
   Copyright (C) 2006 Enrico Ros <enrico.ros@m31engineering.it>
   Copyright (C) 2007 Trolltech ASA
+  Copyright (C) 2007 Staikos Computing Services Inc.  <info@staikos.net>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -593,8 +594,7 @@ void QWebNetworkInterfacePrivate::parseDataUrl(QWebNetworkJob* job) {
 
   int index = data.indexOf(',');
   if (index != -1) {
-    header = data.mid(5, index - 5);
-    header = header.toLower();
+    header = data.mid(5, index - 5).toLower();
     // qDebug() << "header=" << header;
     data = data.mid(index + 1);
     // qDebug() << "data=" << data;
@@ -608,10 +608,9 @@ void QWebNetworkInterfacePrivate::parseDataUrl(QWebNetworkJob* job) {
   } else {
     data = QByteArray();
   }
+  data = QUrl::fromPercentEncoding(data).toLatin1();
   if (base64) {
     data = QByteArray::fromBase64(data);
-  } else {
-    data = QUrl::fromPercentEncoding(data).toLatin1();
   }
 
   if (header.isEmpty())
