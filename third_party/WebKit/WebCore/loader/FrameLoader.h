@@ -440,7 +440,7 @@ class FrameLoader : Noncopyable
 
   bool canCachePage();
 
-  void checkEmitLoadEvent();
+  void checkCallImplicitClose();
   bool didOpenURL(const KURL&);
 
   void frameDetached();
@@ -580,8 +580,6 @@ class FrameLoader : Noncopyable
 
   bool loadProvisionalItemFromCachedPage();
   void cachePageForHistoryItem(HistoryItem*);
-
-  void emitLoadEvent();
 
   void receivedFirstData();
 
@@ -739,7 +737,7 @@ class FrameLoader : Noncopyable
 
   String m_responseMIMEType;
 
-  bool m_wasLoadEventEmitted;
+  bool m_didCallImplicitClose;
   bool m_wasUnloadEventEmitted;
   bool m_isComplete;
   bool m_isLoadingMainResource;

@@ -224,7 +224,7 @@ FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
       m_cachePolicy(CachePolicyVerify),
       m_isExecutingJavaScriptFormAction(false),
       m_isRunningScript(false),
-      m_wasLoadEventEmitted(false),
+      m_didCallImplicitClose(false),
       m_wasUnloadEventEmitted(false),
       m_isComplete(false),
       m_isLoadingMainResource(false),
@@ -276,7 +276,7 @@ void FrameLoader::init() {
   end();
   m_frame->document()->cancelParsing();
   m_creatingInitialEmptyDocument = false;
-  m_wasLoadEventEmitted = true;
+  m_didCallImplicitClose = true;
 }
 
 void FrameLoader::setDefersLoading(bool defers) {
@@ -478,7 +478,7 @@ Frame* FrameLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
       allowsScrolling, marginWidth, marginHeight);
 
   if (!frame) {
-    checkEmitLoadEvent();
+    checkCallImplicitClose();
     return 0;
   }
 
@@ -488,7 +488,7 @@ Frame* FrameLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
     static_cast<RenderWidget*>(ownerElement->renderer())
         ->setWidget(frame->view());
 
-  checkEmitLoadEvent();
+  checkCallImplicitClose();
 
   // In these cases, the synchronous load would have finished
   // before we could connect the signals, so make sure to send the
@@ -603,7 +603,7 @@ void FrameLoader::stopLoading(bool sendUnload) {
 
   if (sendUnload) {
     if (m_frame->document()) {
-      if (m_wasLoadEventEmitted && !m_wasUnloadEventEmitted) {
+      if (m_didCallImplicitClose && !m_wasUnloadEventEmitted) {
         Node* currentFocusedNode = m_frame->document()->focusedNode();
         if (currentFocusedNode)
           currentFocusedNode->aboutToUnload();
@@ -620,7 +620,7 @@ void FrameLoader::stopLoading(bool sendUnload) {
   m_isComplete =
       true;  // to avoid calling completed() in finishedParsing() (David)
   m_isLoadingMainResource = false;
-  m_wasLoadEventEmitted = true;       // don't want that one either
+  m_didCallImplicitClose = true;      // don't want that one either
   m_cachePolicy = CachePolicyVerify;  // Why here?
 
   if (m_frame->document() && m_frame->document()->parsing()) {
@@ -727,7 +727,7 @@ bool FrameLoader::didOpenURL(const KURL& url) {
 
   m_isComplete = false;
   m_isLoadingMainResource = true;
-  m_wasLoadEventEmitted = false;
+  m_didCallImplicitClose = false;
 
   m_frame->setJSStatusBarText(String());
   m_frame->setJSDefaultStatusBarText(String());
@@ -745,7 +745,7 @@ bool FrameLoader::didOpenURL(const KURL& url) {
 
 void FrameLoader::didExplicitOpen() {
   m_isComplete = false;
-  m_wasLoadEventEmitted = false;
+  m_didCallImplicitClose = false;
 
   // Prevent window.open(url) -- eg window.open("about:blank") -- from blowing
   // away results
@@ -896,7 +896,7 @@ void FrameLoader::begin(const KURL& url) {
 
   m_needsClear = true;
   m_isComplete = false;
-  m_wasLoadEventEmitted = false;
+  m_didCallImplicitClose = false;
   m_isLoadingMainResource = true;
 
   KURL ref(url);
@@ -1227,7 +1227,7 @@ void FrameLoader::checkCompleted() {
   m_isComplete = true;
 
   RefPtr<Frame> protect(m_frame);
-  checkEmitLoadEvent();  // if we didn't do it before
+  checkCallImplicitClose();  // if we didn't do it before
 
   // Do not start a redirection timer for subframes here.
   // That is deferred until the parent is completed.
@@ -1248,8 +1248,8 @@ void FrameLoader::scheduleCheckCompleted() {
     m_checkCompletedTimer.startOneShot(0);
 }
 
-void FrameLoader::checkEmitLoadEvent() {
-  if (m_wasLoadEventEmitted || !m_frame->document() ||
+void FrameLoader::checkCallImplicitClose() {
+  if (m_didCallImplicitClose || !m_frame->document() ||
       m_frame->document()->parsing())
     return;
 
@@ -1270,7 +1270,7 @@ void FrameLoader::checkEmitLoadEvent() {
         child->document()->setDomain(domain);
   }
 
-  m_wasLoadEventEmitted = true;
+  m_didCallImplicitClose = true;
   m_wasUnloadEventEmitted = false;
   if (m_frame->document())
     m_frame->document()->implicitClose();
@@ -1579,7 +1579,7 @@ bool FrameLoader::loadPlugin(RenderPart* renderer,
     }
   }
 
-  checkEmitLoadEvent();
+  checkCallImplicitClose();
   return widget != 0;
 }
 
@@ -2628,7 +2628,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
   m_isComplete = false;
 
   // Don't re-emit the load event.
-  m_wasLoadEventEmitted = true;
+  m_didCallImplicitClose = true;
 
   // Delete old status bar messages (if it _was_ activated on last URL).
   Settings* settings = m_frame->settings();
@@ -2656,7 +2656,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
 
   m_needsClear = true;
   m_isComplete = false;
-  m_wasLoadEventEmitted = false;
+  m_didCallImplicitClose = false;
   m_outgoingReferrer = URL.url();
 
   FrameView* view = cachedPage.view();

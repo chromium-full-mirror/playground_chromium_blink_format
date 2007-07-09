@@ -1025,7 +1025,7 @@ bail_out:
 
   m_inStyleRecalc = false;
 
-  // If we wanted to emit the implicitClose() during recalcStyle, do so now that
+  // If we wanted to call implicitClose() during recalcStyle, do so now that
   // we're finished.
   if (m_closeAfterStyleRecalc) {
     m_closeAfterStyleRecalc = false;
@@ -1354,19 +1354,12 @@ void Document::implicitClose() {
   delete m_tokenizer;
   m_tokenizer = 0;
 
-  // Create a body element if we don't already have one.
-  // In the case of Radar 3758785, the window.onload was set in some javascript,
-  // but never fired because there was no body.
-  // This behavior now matches Firefox and IE.
-  HTMLElement* body = this->body();
-  if (!body && isHTMLDocument()) {
-    Node* de = documentElement();
-    if (de) {
-      body = new HTMLBodyElement(this);
+  // Create a body element if we don't already have one. See Radar 3758785.
+  if (!this->body() && isHTMLDocument()) {
+    if (Node* documentElement = this->documentElement()) {
       ExceptionCode ec = 0;
-      de->appendChild(body, ec);
-      if (ec != 0)
-        body = 0;
+      documentElement->appendChild(new HTMLBodyElement(this), ec);
+      ASSERT(!ec);
     }
   }
 
@@ -1399,7 +1392,7 @@ void Document::implicitClose() {
     return;
   }
 
-  frame()->loader()->checkEmitLoadEvent();
+  frame()->loader()->checkCallImplicitClose();
 
   // Now do our painting/layout, but only if we aren't in a subframe or if we're
   // in a subframe
