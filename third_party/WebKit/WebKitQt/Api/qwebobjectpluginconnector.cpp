@@ -40,7 +40,7 @@ QWebFrame* QWebObjectPluginConnector::frame() const {
 }
 
 QWidget* QWebObjectPluginConnector::pluginParentWidget() const {
-  return d->frame;
+  return d->frame->page();
 }
 
 QWebNetworkJob* QWebObjectPluginConnector::requestUrl(

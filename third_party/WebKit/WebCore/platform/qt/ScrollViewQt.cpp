@@ -46,6 +46,9 @@
 #include <QWidget>
 #include <QPainter>
 
+#include "qwebframe.h"
+#include "qwebpage.h"
+
 // #define DEBUG_SCROLLVIEW
 
 namespace WebCore {
@@ -59,8 +62,7 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
         m_inUpdateScrollbars(false),
         m_scrollbarsAvoidingResizer(0),
         m_vScrollbarMode(ScrollbarAuto),
-        m_hScrollbarMode(ScrollbarAuto),
-        m_area(0) {
+        m_hScrollbarMode(ScrollbarAuto) {
     setHasHorizontalScrollbar(true);
     setHasVerticalScrollbar(true);
   }
@@ -91,7 +93,6 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   RefPtr<PlatformScrollbar> m_hBar;
   QRegion m_dirtyRegion;
   HashSet<Widget*> m_children;
-  QWidget* m_area;
 };
 
 void ScrollView::ScrollViewPrivate::setHasHorizontalScrollbar(bool hasBar) {
@@ -147,11 +148,13 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
   // intersection
   // with the clip rect every time to keep it smooth.
   IntRect clipRect = m_view->windowClipRect();
-  QPoint origin = m_area->mapToParent(QPoint(0, 0));
-  IntRect scrollViewRect = IntRect(
-      origin.x(), origin.y(), m_view->visibleWidth(), m_view->visibleHeight());
+  IntRect scrollViewRect = m_view->convertToContainingWindow(
+      IntRect(0, 0, m_view->visibleWidth(), m_view->visibleHeight()));
+
   IntRect updateRect = clipRect;
   updateRect.intersect(scrollViewRect);
+
+  // FIXME update here?
 
   if (!m_hasStaticBackground)  // The main frame can just blit the WebView
                                // window
@@ -171,51 +174,17 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
   // Now update the window (which should do nothing but a blit of the backing
   // store's updateRect and so should
   // be very fast).
-  m_area->update();
+  m_view->containingWindow()->update();
 }
 
 IntRect ScrollView::ScrollViewPrivate::windowClipRect() const {
-  if (!m_view->parent())
-    return static_cast<const FrameView*>(m_view)->windowClipRect(false);
-
-  QRect clipRect = m_view->frameGeometry();
-
-  PlatformScrollbar* phBar = m_view->parent()->horizontalScrollBar();
-  PlatformScrollbar* pvBar = m_view->parent()->verticalScrollBar();
-
-  QRegion h;
-  if (phBar) {
-    QRect hrect = phBar->frameGeometry();
-    hrect.moveLeft(clipRect.left());  // anchor
-    hrect.setHeight(clipRect.height() - hrect.height());
-    h = QRegion(hrect);
-  }
-
-  QRegion v;
-  if (pvBar) {
-    QRect vrect = pvBar->frameGeometry();
-    vrect.moveTop(clipRect.top());  // anchor
-    vrect.setWidth(clipRect.width() - vrect.width());
-    v = QRegion(vrect);
-  }
-
-  QRegion clipRegion(clipRect);
-
-  clipRect = clipRegion.subtracted(h).subtracted(v).boundingRect();
-  clipRect.moveTopLeft(QPoint(0, 0));
-
-  return clipRect;
+  return static_cast<const FrameView*>(m_view)->windowClipRect(false);
 }
 
 ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {}
 
 ScrollView::~ScrollView() {
   delete m_data;
-}
-
-void ScrollView::setScrollArea(QWidget* area) {
-  m_data->m_area = area;
-  Widget::setQWidget(m_data->m_area);
 }
 
 PlatformScrollbar* ScrollView::horizontalScrollBar() const {
@@ -237,11 +206,14 @@ void ScrollView::updateContents(const IntRect& rect, bool now) {
   // Cache the dirty spot.
   addToDirtyRegion(containingWindowRect);
 
-  m_data->m_area->update(rect);
+  if (now)
+    containingWindow()->repaint(containingWindowRect);
+  else
+    containingWindow()->update(containingWindowRect);
 }
 
 void ScrollView::update() {
-  m_data->m_area->update();
+  containingWindow()->update();
 }
 
 int ScrollView::visibleWidth() const {
@@ -292,14 +264,6 @@ void ScrollView::setFrameGeometry(const IntRect& newGeometry) {
 }
 
 void ScrollView::geometryChanged() const {
-  Widget::geometryChanged();
-
-  if (parent()) {
-    // Set the mask so we don't receive mouse events for parent scrollbars
-    IntRect clipRect = m_data->windowClipRect();
-    m_data->m_area->setMask(QRegion(clipRect));
-  }
-
   HashSet<Widget*>::const_iterator end = m_data->m_children.end();
   for (HashSet<Widget*>::const_iterator current = m_data->m_children.begin();
        current != end; ++current)
@@ -323,13 +287,29 @@ int ScrollView::contentsHeight() const {
 }
 
 IntPoint ScrollView::windowToContents(const IntPoint& windowPoint) const {
-  //    qDebug() << "windowToContents" << windowPoint << endl;
-  return windowPoint + scrollOffset();
+  IntPoint viewPoint = convertFromContainingWindow(windowPoint);
+  return viewPoint + scrollOffset();
 }
 
 IntPoint ScrollView::contentsToWindow(const IntPoint& contentsPoint) const {
-  //    qDebug() << "contentsToWindow" << contentsPoint << endl;
-  return contentsPoint - scrollOffset();
+  IntPoint viewPoint = contentsPoint - scrollOffset();
+  return convertToContainingWindow(viewPoint);
+}
+
+IntPoint ScrollView::convertChildToSelf(const Widget* child,
+                                        const IntPoint& point) const {
+  IntPoint newPoint = point;
+  if (child != m_data->m_hBar && child != m_data->m_vBar)
+    newPoint = point - scrollOffset();
+  return Widget::convertChildToSelf(child, newPoint);
+}
+
+IntPoint ScrollView::convertSelfToChild(const Widget* child,
+                                        const IntPoint& point) const {
+  IntPoint newPoint = point;
+  if (child != m_data->m_hBar && child != m_data->m_vBar)
+    newPoint = point + scrollOffset();
+  return Widget::convertSelfToChild(child, newPoint);
 }
 
 IntSize ScrollView::scrollOffset() const {
@@ -571,32 +551,20 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
 
 PlatformScrollbar* ScrollView::scrollbarUnderMouse(
     const PlatformMouseEvent& mouseEvent) {
-  IntPoint viewPoint = mouseEvent.pos();
-
-  //     if (m_data->m_hBar && m_data->m_vBar) {
-  //       qDebug() << "ScrollView::scrollbarUnderMouse"
-  //               << "hbar" << m_data->m_hBar->frameGeometry()
-  //               << "vbar" << m_data->m_vBar->frameGeometry()
-  //               << "mouse" << viewPoint << endl;
-  //     }
-
-  if (m_data->m_hBar && m_data->m_hBar->frameGeometry().contains(viewPoint)) {
-    //         qDebug() << "got hbar!!" << endl;
+  IntPoint viewPoint = convertFromContainingWindow(mouseEvent.pos());
+  if (m_data->m_hBar && m_data->m_hBar->frameGeometry().contains(viewPoint))
     return m_data->m_hBar.get();
-  }
-  if (m_data->m_vBar && m_data->m_vBar->frameGeometry().contains(viewPoint)) {
-    //         qDebug() << "got vbar!!" << endl;
+  if (m_data->m_vBar && m_data->m_vBar->frameGeometry().contains(viewPoint))
     return m_data->m_vBar.get();
-  }
   return 0;
 }
 
 void ScrollView::addChild(Widget* child) {
   QWidget* w = child->qwidget();
   if (w) {
-    w->setParent(m_data->m_area);
     m_data->m_children.add(child);
   }
+
   child->setParent(this);
 }
 
@@ -618,38 +586,28 @@ void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {
   IntRect documentDirtyRect = rect;
 
   QPainter* p = context->platformContext();
-  bool ownCanvas = p->device() == m_data->m_area;
-
-  QRect canvasRect = frameGeometry();
 
   context->save();
 
-  if (ownCanvas) {
-    canvasRect.moveTopLeft(QPoint(0, 0));
-    documentDirtyRect.intersect(canvasRect);
-  } else {
-    canvasRect = originalGeometry();
-    documentDirtyRect.intersect(canvasRect);
-    context->translate(canvasRect.x(), canvasRect.y());
-    documentDirtyRect.move(-canvasRect.x(), -canvasRect.y());
-  }
+  QRect canvasRect = frameGeometry();
+  documentDirtyRect.intersect(canvasRect);
+  context->translate(canvasRect.x(), canvasRect.y());
+  documentDirtyRect.move(-canvasRect.x(), -canvasRect.y());
 
   context->translate(-contentsX(), -contentsY());
   documentDirtyRect.move(contentsX(), contentsY());
 
   IntRect clipRect = enclosingIntRect(visibleContentRect());
 
-  if (!(ownCanvas && parent()))
-    context->clip(clipRect);
+  context->clip(clipRect);
 
 #ifdef DEBUG_SCROLLVIEW
-  //    if (!(ownCanvas && parent()))
   qDebug() << "ScrollView::paint --> "
-           << "ownCanvas" << ownCanvas << "rect" << rect << "clipRect"
-           << clipRect << "visibleContentRect"
-           << enclosingIntRect(visibleContentRect()) << "frameGeometry"
-           << frameGeometry() << "canvasRect" << canvasRect
-           << "documentDirtyRect" << documentDirtyRect << endl;
+           << "isSubframe"
+           << (qwebframe() != qwebframe()->page()->mainFrame() ? "true"
+                                                               : "false")
+           << "rect" << rect << "canvasRect" << canvasRect << "clipRect"
+           << clipRect << "documentDirtyRect" << documentDirtyRect << endl;
 #endif
 
   static_cast<const FrameView*>(this)->frame()->paint(context,
@@ -664,10 +622,8 @@ void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {
     IntRect scrollViewDirtyRect = rect;
     scrollViewDirtyRect.intersect(canvasRect);
 
-    if (!ownCanvas) {
-      context->translate(canvasRect.x(), canvasRect.y());
-      scrollViewDirtyRect.move(-canvasRect.x(), -canvasRect.y());
-    }
+    context->translate(canvasRect.x(), canvasRect.y());
+    scrollViewDirtyRect.move(-canvasRect.x(), -canvasRect.y());
 
     if (m_data->m_hBar)
       m_data->m_hBar->paint(context, scrollViewDirtyRect);

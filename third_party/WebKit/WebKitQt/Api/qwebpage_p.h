@@ -36,7 +36,6 @@ class EditorClientQt;
 class Page;
 }
 
-class QVBoxLayout;
 class QUndoStack;
 
 class QWebPagePrivate {
@@ -51,7 +50,6 @@ class QWebPagePrivate {
   WebCore::Page* page;
 
   QPointer<QWebFrame> mainFrame;
-  QVBoxLayout* layout;
 
   QWebPage* q;
   QUndoStack* undoStack;

@@ -71,10 +71,6 @@ DumpRenderTree::DumpRenderTree() : m_stdin(0), m_notifier(), m_loading(false) {
   page->resize(maxViewWidth, maxViewHeight);
   frame = page->mainFrame();
   frame->suppressScrollbars(true);
-  frame->setFrameShape(QFrame::NoFrame);
-
-  // hack to force the right size on the frame
-  page->layout()->activate();
 
   m_controller = new LayoutTestController();
   QObject::connect(m_controller, SIGNAL(done()), this, SLOT(dump()),
