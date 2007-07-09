@@ -30,15 +30,18 @@
 #import <WebKit/npapi.h>
 
 namespace WebCore {
+class FrameLoader;
 class NetscapePlugInStreamLoader;
 }
 @class NSURLRequest;
 
 @interface WebNetscapePluginStream : WebBaseNetscapePluginStream {
+  WebCore::FrameLoader* _frameLoader;
   WebCore::NetscapePlugInStreamLoader* _loader;
   NSURLRequest* request;
 }
 
+- (id)initWithFrameLoader:(WebCore::FrameLoader*)frameLoader;
 - (id)initWithRequest:(NSURLRequest*)theRequest
                plugin:(NPP)thePlugin
            notifyData:(void*)theNotifyData

@@ -64,6 +64,7 @@ typedef struct {
   NPP npp;
   NPBool eventLogging;
   NPBool logDestroy;
+  NPBool returnErrorFromNewStream;
   NPObject* testObject;
   NPStream* stream;
   char* onStreamLoad;
