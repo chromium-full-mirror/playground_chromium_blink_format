@@ -36,10 +36,10 @@
 #include <wtf/RetainPtr.h>
 #elif PLATFORM(QT)
 #include <QMenu>
-typedef QMenu* PlatformMenuDescription;
 #endif
 
 namespace WebCore {
+class MenuEventProxy;
 
 class ContextMenuController;
 
@@ -74,6 +74,7 @@ class ContextMenu : Noncopyable {
   RetainPtr<NSMutableArray> m_platformDescription;
 #elif PLATFORM(QT)
   QMenu* m_menu;
+  MenuEventProxy* m_proxy;
 #else
   PlatformMenuDescription m_platformDescription;
 #endif

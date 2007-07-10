@@ -42,21 +42,13 @@ class NSMenuItem;
 typedef struct tagMENUITEMINFOW* LPMENUITEMINFO;
 #elif PLATFORM(GDK)
 typedef struct _GtkMenuItem GtkMenuItem;
+#elif PLATFORM(QT)
+#include <QAction>
 #endif
 
 namespace WebCore {
 
 class ContextMenu;
-
-#if PLATFORM(MAC)
-typedef NSMenuItem* PlatformMenuItemDescription;
-#elif PLATFORM(WIN)
-typedef LPMENUITEMINFO PlatformMenuItemDescription;
-#elif PLATFORM(QT)
-typedef void* PlatformMenuItemDescription;
-#elif PLATFORM(GDK)
-typedef GtkMenuItem* PlatformMenuItemDescription;
-#endif
 
 // This enum needs to be in sync with the WebMenuItemTag enum in WebUIDelegate.h
 // and the
@@ -126,6 +118,30 @@ enum ContextMenuAction {
 };
 
 enum ContextMenuItemType { ActionType, SeparatorType, SubmenuType };
+
+#if PLATFORM(MAC)
+typedef NSMenuItem* PlatformMenuItemDescription;
+#elif PLATFORM(WIN)
+typedef LPMENUITEMINFO PlatformMenuItemDescription;
+#elif PLATFORM(QT)
+struct PlatformMenuItemDescriptionType {
+  PlatformMenuItemDescriptionType()
+      : qaction(0),
+        menu(0),
+        action(ContextMenuItemTagNoAction),
+        type(ActionType),
+        subMenu(0) {}
+  QAction* qaction;
+  QMenu* menu;
+  ContextMenuAction action;
+  QString title;
+  ContextMenuItemType type;
+  PlatformMenuDescription subMenu;
+};
+typedef PlatformMenuItemDescriptionType* PlatformMenuItemDescription;
+#elif PLATFORM(GDK)
+typedef GtkMenuItem* PlatformMenuItemDescription;
+#endif
 
 class ContextMenuItem {
  public:
