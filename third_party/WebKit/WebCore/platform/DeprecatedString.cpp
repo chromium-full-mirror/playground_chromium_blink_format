@@ -1401,7 +1401,7 @@ int64_t DeprecatedString::toInt64(bool* ok, int base) const {
   const DeprecatedChar* p = unicode();
   int64_t val = 0;
   int l = dataHandle[0]->_length;
-  const int max_mult = int64_max / base;
+  const int64_t max_mult = int64_max / base;
   bool is_ok = false;
   int neg = 0;
 
@@ -1512,7 +1512,7 @@ uint64_t DeprecatedString::toUInt64(bool* ok, int base) const {
   uint64_t val = 0;
   int l = dataHandle[0]->_length;
 
-  const unsigned max_mult = uint64_max / base;
+  const uint64_t max_mult = uint64_max / base;
   bool is_ok = false;
 
   if (!p)
