@@ -71,9 +71,6 @@ class HTMLDocument : public Document, public CachedResourceClient {
 
   virtual bool childAllowed(Node*);
 
-  virtual PassRefPtr<Element> createElement(const String& tagName,
-                                            ExceptionCode&);
-
   virtual void determineParseMode(const String&);
 
   void addNamedItem(const String& name);
