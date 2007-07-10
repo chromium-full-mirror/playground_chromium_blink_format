@@ -1611,15 +1611,21 @@ int RenderBox::calcReplacedHeightUsing(Length height) const {
     case Fixed:
       return calcContentBoxHeight(height.value());
     case Percent: {
-      RenderBlock* cb = containingBlock();
+      RenderObject* cb = isPositioned() ? container() : containingBlock();
       if (cb->isPositioned() && cb->style()->height().isAuto() &&
           !(cb->style()->top().isAuto() || cb->style()->bottom().isAuto())) {
-        int oldHeight = cb->height();
-        cb->calcHeight();
-        int newHeight = cb->calcContentBoxHeight(cb->contentHeight());
-        cb->setHeight(oldHeight);
+        ASSERT(cb->isRenderBlock());
+        RenderBlock* block = static_cast<RenderBlock*>(cb);
+        int oldHeight = block->height();
+        block->calcHeight();
+        int newHeight = block->calcContentBoxHeight(block->contentHeight());
+        block->setHeight(oldHeight);
         return calcContentBoxHeight(height.calcValue(newHeight));
       }
+
+      int availableHeight = isPositioned()
+                                ? containingBlockHeightForPositioned(cb)
+                                : cb->availableHeight();
 
       // It is necessary to use the border-box to match WinIE's broken
       // box model.  This is essential for sizing inside
@@ -1627,10 +1633,10 @@ int RenderBox::calcReplacedHeightUsing(Length height) const {
       if (cb->isTableCell() &&
           (cb->style()->height().isAuto() || cb->style()->height().isPercent()))
         return height.calcValue(
-            cb->availableHeight() -
+            availableHeight -
             (borderTop() + borderBottom() + paddingTop() + paddingBottom()));
 
-      return calcContentBoxHeight(height.calcValue(cb->availableHeight()));
+      return calcContentBoxHeight(height.calcValue(availableHeight));
     }
     default:
       return intrinsicSize().height();
