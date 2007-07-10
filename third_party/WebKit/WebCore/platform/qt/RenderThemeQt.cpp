@@ -247,8 +247,12 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
     return true;
 
   QStyleOptionFrameV2 panel;
+
   panel.initFrom(widget);
   panel.rect = r;
+  panel.state |= QStyle::State_Sunken;
+  panel.features = QStyleOptionFrameV2::None;
+
   // Get the correct theme data for a button
   EAppearance appearance = applyTheme(panel, o);
   Q_ASSERT(appearance == TextFieldAppearance);
