@@ -59,8 +59,7 @@ Page::Page(ChromeClient* chromeClient,
       m_dragCaretController(new SelectionController(0, true)),
       m_dragController(new DragController(this, dragClient)),
       m_focusController(new FocusController(this)),
-      m_contextMenuController(
-          new ContextMenuController(this, contextMenuClient)),
+      m_contextMenuController(new ContextMenuController(contextMenuClient)),
       m_settings(new Settings(this)),
       m_progress(new ProgressTracker),
       m_backForwardList(new BackForwardList(this)),
@@ -86,6 +85,7 @@ Page::~Page() {
   for (Frame* frame = mainFrame(); frame; frame = frame->tree()->traverseNext())
     frame->pageDestroyed();
   m_editorClient->pageDestroyed();
+  m_inspectorController->pageDestroyed();
 
   m_backForwardList->close();
 

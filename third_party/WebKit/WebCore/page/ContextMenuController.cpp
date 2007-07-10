@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -58,9 +58,8 @@ namespace WebCore {
 
 using namespace EventNames;
 
-ContextMenuController::ContextMenuController(Page* page,
-                                             ContextMenuClient* client)
-    : m_page(page), m_client(client), m_contextMenu(0) {}
+ContextMenuController::ContextMenuController(ContextMenuClient* client)
+    : m_client(client), m_contextMenu(0) {}
 
 ContextMenuController::~ContextMenuController() {
   m_client->contextMenuDestroyed();
@@ -98,11 +97,11 @@ void ContextMenuController::handleContextMenuEvent(Event* event) {
 }
 
 static void openNewWindow(const KURL& urlToLoad, Frame* frame) {
-  Page* newPage = frame->page()->chrome()->createWindow(
-      frame, FrameLoadRequest(ResourceRequest(
-                 urlToLoad, frame->loader()->outgoingReferrer())));
-  if (newPage)
-    newPage->chrome()->show();
+  if (Page* oldPage = frame->page())
+    if (Page* newPage = oldPage->chrome()->createWindow(
+            frame, FrameLoadRequest(ResourceRequest(
+                       urlToLoad, frame->loader()->outgoingReferrer()))))
+      newPage->chrome()->show();
 }
 
 void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
@@ -117,7 +116,6 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
   Frame* frame = result.innerNonSharedNode()->document()->frame();
   if (!frame)
     return;
-  ASSERT(m_page == frame->page());
 
   switch (item->action()) {
     case ContextMenuItemTagOpenLinkInNewWindow:
@@ -196,7 +194,7 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
       // FIXME: Some day we may be able to do this from within WebCore.
       m_client->lookUpInDictionary(frame);
       break;
-    case ContextMenuItemTagOpenLink: {
+    case ContextMenuItemTagOpenLink:
       if (Frame* targetFrame = result.targetFrame())
         targetFrame->loader()->load(
             FrameLoadRequest(ResourceRequest(
@@ -205,7 +203,6 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
       else
         openNewWindow(result.absoluteLinkURL(), frame);
       break;
-    }
     case ContextMenuItemTagBold:
       frame->editor()->execCommand("ToggleBold");
       break;
@@ -275,8 +272,9 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
       break;
 #endif
     case ContextMenuItemTagInspectElement:
-      if (InspectorController* inspector = frame->page()->inspectorController())
-        inspector->inspect(result.innerNonSharedNode());
+      if (Page* page = frame->page())
+        if (InspectorController* inspector = page->inspectorController())
+          inspector->inspect(result.innerNonSharedNode());
       break;
     default:
       break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,18 +31,14 @@
 
 #include "Chrome.h"
 #include <JavaScriptCore/JSContextRef.h>
-#include <JavaScriptCore/JSStringRef.h>
 #include <wtf/HashMap.h>
-#include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
 
 class DocumentLoader;
-class Frame;
 class InspectorClient;
 class Node;
-class Page;
 class ResourceResponse;
 class ResourceError;
 
@@ -57,6 +53,8 @@ class InspectorController {
 
   InspectorController(Page*, InspectorClient*);
   ~InspectorController();
+
+  void pageDestroyed() { m_page = 0; }
 
   Page* inspectedPage() const { return m_inspectedPage; }
 
