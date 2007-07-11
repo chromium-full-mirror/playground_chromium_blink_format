@@ -30,11 +30,11 @@ bool JSDOMWindow::customGetOwnPropertySlot(KJS::ExecState* exec,
   // we don't want any properties other than "closed" on a closed window
   if (!frame()) {
     if (propertyName == "closed") {
-      const KJS::HashEntry* entry = KJS::Lookup::findEntry(
-          KJS::Window::classInfo()->propHashTable, propertyName);
+      const KJS::HashEntry* entry =
+          KJS::Lookup::findEntry(classInfo()->propHashTable, propertyName);
       ASSERT(entry);
       if (entry) {
-        slot.setStaticEntry(this, entry, KJS::staticValueGetter<KJS::Window>);
+        slot.setStaticEntry(this, entry, KJS::staticValueGetter<JSDOMWindow>);
         return true;
       }
     }

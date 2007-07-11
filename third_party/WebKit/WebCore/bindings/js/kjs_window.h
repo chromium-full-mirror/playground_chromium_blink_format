@@ -197,15 +197,10 @@ class Window : public DOMObject {
     Stop,
 
     // Attributes
-    Closed,
     Crypto,
-    DefaultStatus,
-    Status,
     Frames,
     Event_,
-    Length,
     Location_,
-    Name,
     Navigator_,
     ClientInformation,
     Opener,
