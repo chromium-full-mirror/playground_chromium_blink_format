@@ -3156,7 +3156,7 @@ int CSSParser::lex(void* yylvalWithoutType) {
     case URI:
     case STRING:
     case IDENT:
-    case HEX_OR_IDENT:
+    case HEX:
     case IDSEL:
     case DIMEN:
     case UNICODERANGE:
@@ -3227,7 +3227,7 @@ UChar* CSSParser::text(int* length) {
     case STRING:
       l--;
     /* nobreak */
-    case HEX_OR_IDENT:
+    case HEX:
     case IDSEL:
       start++;
       l--;
