@@ -478,6 +478,8 @@ bool SelectionController::modify(const String& alterString,
     granularity = ParagraphGranularity;
   else if (granularityStringLower == "lineboundary")
     granularity = LineBoundary;
+  else if (granularityStringLower == "sentenceboundary")
+    granularity = SentenceBoundary;
   else if (granularityStringLower == "paragraphboundary")
     granularity = ParagraphBoundary;
   else if (granularityStringLower == "documentboundary")
