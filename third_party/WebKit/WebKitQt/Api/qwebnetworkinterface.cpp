@@ -371,7 +371,8 @@ bool QWebNetworkManager::add(ResourceHandle* handle,
 
   job->d->request.init(handle->request());
 
-  if (handle->method() != "POST" && handle->method() != "GET") {
+  const QString method = handle->getInternal()->m_request.httpMethod();
+  if (method != "POST" && method != "GET") {
     // don't know what to do! (probably a request error!!)
     // but treat it like a 'GET' request
     qWarning("REQUEST: [%s]\n",
