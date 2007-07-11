@@ -1791,9 +1791,10 @@ void Editor::discardMarkedText() {
   setIgnoreMarkedTextSelectionChange(false);
 }
 
-#if !PLATFORM(MAC)
-void Editor::unmarkText() {}
-#endif
+void Editor::unmarkText() {
+  Vector<MarkedTextUnderline> underlines;
+  m_frame->setMarkedTextRange(0, underlines);
+}
 
 void Editor::replaceMarkedText(const String& text) {
   if (m_frame->selectionController()->isNone())
