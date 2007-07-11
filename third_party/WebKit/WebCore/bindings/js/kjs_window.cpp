@@ -812,10 +812,12 @@ void Window::put(ExecState* exec,
 
     switch (entry->value) {
       case Status:
-        m_frame->setJSStatusBarText(value->toString(exec));
+        if (isSafeScript(exec))
+          m_frame->setJSStatusBarText(value->toString(exec));
         return;
       case DefaultStatus:
-        m_frame->setJSDefaultStatusBarText(value->toString(exec));
+        if (isSafeScript(exec))
+          m_frame->setJSDefaultStatusBarText(value->toString(exec));
         return;
       case Location_: {
         Frame* p = Window::retrieveActive(exec)->m_frame;
