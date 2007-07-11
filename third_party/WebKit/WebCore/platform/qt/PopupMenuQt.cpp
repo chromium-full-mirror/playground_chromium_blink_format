@@ -98,7 +98,9 @@ void PopupMenu::hide() {
   m_popup->hidePopup();
 }
 
-void PopupMenu::updateFromElement() {}
+void PopupMenu::updateFromElement() {
+  client()->setTextFromItem(m_popupClient->selectedIndex());
+}
 
 bool PopupMenu::itemWritingDirectionIsNatural() {
   return false;
