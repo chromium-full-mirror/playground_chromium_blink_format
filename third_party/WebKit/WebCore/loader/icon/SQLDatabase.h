@@ -46,6 +46,7 @@ class SQLDatabase : public Noncopyable {
 
  public:
   SQLDatabase();
+  ~SQLDatabase() { close(); }
 
   bool open(const String& filename);
   bool isOpen() const { return m_db; }
