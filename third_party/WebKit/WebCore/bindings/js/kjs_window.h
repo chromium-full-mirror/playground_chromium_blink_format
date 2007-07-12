@@ -97,7 +97,6 @@ class Window : public DOMObject {
    * was called from.
    */
   static Window* retrieveActive(ExecState*);
-  WebCore::Frame* frame() const { return m_frame; }
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -105,7 +104,6 @@ class Window : public DOMObject {
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  virtual bool toBoolean(ExecState*) const;
 
   int installTimeout(const UString& handler, int t, bool singleShot);
   int installTimeout(JSValue* function,
@@ -119,8 +117,6 @@ class Window : public DOMObject {
   void timerFired(DOMWindowTimer*);
 
   KJS::ScriptInterpreter* interpreter() const;
-
-  void scheduleClose();
 
   bool isSafeScript(ExecState*) const;
   static bool isSafeScript(const ScriptInterpreter* origin,
@@ -275,7 +271,7 @@ class Window : public DOMObject {
   void clearAllTimeouts();
   int installTimeout(ScheduledAction*, int interval, bool singleShot);
 
-  WebCore::Frame* m_frame;
+  RefPtr<WebCore::DOMWindow> m_impl;
   OwnPtr<WindowPrivate> d;
 };
 

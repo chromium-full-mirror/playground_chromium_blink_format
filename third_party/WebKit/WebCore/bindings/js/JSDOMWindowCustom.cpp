@@ -21,6 +21,7 @@
 #include "JSDOMWindow.h"
 
 #include "kjs_window.h"
+#include "DOMWindow.h"
 
 namespace WebCore {
 
@@ -28,7 +29,7 @@ bool JSDOMWindow::customGetOwnPropertySlot(KJS::ExecState* exec,
                                            const KJS::Identifier& propertyName,
                                            KJS::PropertySlot& slot) {
   // we don't want any properties other than "closed" on a closed window
-  if (!frame()) {
+  if (!impl()->frame()) {
     if (propertyName == "closed") {
       const KJS::HashEntry* entry =
           KJS::Lookup::findEntry(classInfo()->propHashTable, propertyName);
@@ -106,7 +107,7 @@ bool JSDOMWindow::customPut(KJS::ExecState* exec,
                             const KJS::Identifier& propertyName,
                             KJS::JSValue* value,
                             int attr) {
-  if (!frame())
+  if (!impl()->frame())
     return true;
 
   // Called by an internal KJS call or if we have a local override (e.g. "var

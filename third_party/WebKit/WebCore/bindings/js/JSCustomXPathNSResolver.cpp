@@ -29,6 +29,7 @@
 #if ENABLE(XPATH)
 
 #include "CString.h"
+#include "DOMWindow.h"
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
@@ -55,7 +56,7 @@ PassRefPtr<JSCustomXPathNSResolver> JSCustomXPathNSResolver::create(
   }
 
   return new JSCustomXPathNSResolver(
-      resolverObject, KJS::Window::retrieveActive(exec)->frame());
+      resolverObject, KJS::Window::retrieveActive(exec)->impl()->frame());
 }
 
 JSCustomXPathNSResolver::JSCustomXPathNSResolver(JSObject* customResolver,
