@@ -3237,6 +3237,14 @@ void Document::applyXSLTransform(ProcessingInstruction* pi) {
                                       this, frame());
 }
 
+void Document::setTransformSource(void* doc) {
+  if (doc == m_transformSource)
+    return;
+
+  xmlFreeDoc((xmlDocPtr)m_transformSource);
+  m_transformSource = doc;
+}
+
 #endif
 
 void Document::setDesignMode(InheritedBool value) {
