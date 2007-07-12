@@ -121,8 +121,6 @@ void BitmapImage::draw(GraphicsContext* ctxt,
   }
 
   IntSize selfSize = size();
-  FloatRect srcRect(src);
-  FloatRect dstRect(dst);
 
   ctxt->save();
 
