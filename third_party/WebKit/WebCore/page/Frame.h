@@ -288,6 +288,7 @@ class Frame : public Shared<Frame> {
   void removeEditingStyleFromElement(Element*) const;
 
   Range* markedTextRange() const;
+  IntRect firstRectForRange(Range*) const;
 
 #if PLATFORM(MAC)
   void issuePasteCommand();
