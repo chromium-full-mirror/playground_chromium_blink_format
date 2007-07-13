@@ -51,7 +51,10 @@ class RenderSVGText : public RenderSVGBlock {
                            int tx,
                            int ty,
                            HitTestAction);
-  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
+  virtual void absoluteRects(Vector<IntRect>&,
+                             int tx,
+                             int ty,
+                             bool topLevel = true);
   virtual IntRect absoluteClippedOverflowRect();
   virtual bool requiresLayer();
   virtual void layout();

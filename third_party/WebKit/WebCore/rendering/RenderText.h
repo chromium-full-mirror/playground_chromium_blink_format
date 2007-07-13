@@ -70,7 +70,10 @@ class RenderText : public RenderObject {
     return false;
   }
 
-  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
+  virtual void absoluteRects(Vector<IntRect>&,
+                             int tx,
+                             int ty,
+                             bool topLevel = true);
   virtual void addLineBoxRects(Vector<IntRect>&,
                                unsigned startOffset = 0,
                                unsigned endOffset = UINT_MAX,

@@ -37,7 +37,10 @@ namespace WebCore {
 
 RenderSVGTSpan::RenderSVGTSpan(Node* n) : RenderSVGInline(n) {}
 
-void RenderSVGTSpan::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
+void RenderSVGTSpan::absoluteRects(Vector<IntRect>& rects,
+                                   int tx,
+                                   int ty,
+                                   bool) {
   InlineFlowBox* initFlow = firstLineBox();
   FloatRect bounds(tx + initFlow->xPos(), ty + initFlow->yPos(), width(),
                    height());

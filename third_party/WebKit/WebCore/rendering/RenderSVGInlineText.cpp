@@ -39,7 +39,8 @@ RenderSVGInlineText::RenderSVGInlineText(Node* n, StringImpl* str)
 
 void RenderSVGInlineText::absoluteRects(Vector<IntRect>& rects,
                                         int tx,
-                                        int ty) {
+                                        int ty,
+                                        bool) {
   FloatRect absoluteRect =
       absoluteTransform().mapRect(FloatRect(tx, ty, width(), height()));
   rects.append(enclosingIntRect(absoluteRect));

@@ -348,7 +348,7 @@ IntRect RenderSVGContainer::absoluteClippedOverflowRect() {
   return repaintRect;
 }
 
-void RenderSVGContainer::absoluteRects(Vector<IntRect>& rects, int, int) {
+void RenderSVGContainer::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
   rects.append(absoluteClippedOverflowRect());
 }
 

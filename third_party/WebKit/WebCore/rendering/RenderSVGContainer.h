@@ -67,7 +67,10 @@ class RenderSVGContainer : public RenderContainer {
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual IntRect absoluteClippedOverflowRect();
-  virtual void absoluteRects(Vector<IntRect>& rects, int tx, int ty);
+  virtual void absoluteRects(Vector<IntRect>& rects,
+                             int tx,
+                             int ty,
+                             bool topLevel = true);
 
   virtual AffineTransform absoluteTransform() const;
 

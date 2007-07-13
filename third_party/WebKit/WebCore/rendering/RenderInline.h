@@ -82,7 +82,7 @@ class RenderInline : public RenderFlow {
   virtual int offsetLeft() const;
   virtual int offsetTop() const;
 
-  void absoluteRects(Vector<IntRect>&, int tx, int ty);
+  void absoluteRects(Vector<IntRect>&, int tx, int ty, bool topLevel = true);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 

@@ -121,7 +121,7 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
   return false;
 }
 
-void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int) {
+void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
   rects.append(absoluteClippedOverflowRect());
 }
 

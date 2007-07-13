@@ -276,7 +276,7 @@ IntRect RenderSVGImage::absoluteClippedOverflowRect() {
   return enclosingIntRect(repaintRect);
 }
 
-void RenderSVGImage::absoluteRects(Vector<IntRect>& rects, int, int) {
+void RenderSVGImage::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
   rects.append(absoluteClippedOverflowRect());
 }
 
