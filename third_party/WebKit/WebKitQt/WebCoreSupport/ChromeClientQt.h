@@ -110,6 +110,8 @@ class ChromeClientQt : public ChromeClient {
 
   virtual void setToolTip(const String&);
 
+  virtual void print();
+
   QWebPage* m_webPage;
 };
 }

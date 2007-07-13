@@ -250,4 +250,8 @@ void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult&,
 void ChromeClientQt::setToolTip(const String&) {
   notImplemented();
 }
+
+void ChromeClientQt::print() {
+  notImplemented();
+}
 }

@@ -130,6 +130,8 @@ class SVGEmptyChromeClient : public ChromeClient {
                                        unsigned modifierFlags) {}
 
   virtual void setToolTip(const String&) {}
+
+  virtual void print() {}
 };
 
 class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
