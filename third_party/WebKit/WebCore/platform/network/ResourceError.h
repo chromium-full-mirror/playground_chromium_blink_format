@@ -29,7 +29,7 @@
 
 #include "PlatformString.h"
 
-#if PLATFORM(MAC)
+#if PLATFORM(CF)
 #include <wtf/RetainPtr.h>
 #endif
 
@@ -49,7 +49,7 @@ class ResourceError {
  public:
   ResourceError()
       : m_errorCode(0)
-#if PLATFORM(MAC)
+#if PLATFORM(CF)
         ,
         m_dataIsUpToDate(true)
 #endif
@@ -65,7 +65,7 @@ class ResourceError {
         m_errorCode(errorCode),
         m_failingURL(failingURL),
         m_localizedDescription(localizedDescription)
-#if PLATFORM(MAC)
+#if PLATFORM(CF)
         ,
         m_dataIsUpToDate(true)
 #endif
@@ -73,12 +73,15 @@ class ResourceError {
         m_isNull(false) {
   }
 
+#if PLATFORM(CF)
 #if PLATFORM(MAC)
   ResourceError(NSError* error)
-      : m_dataIsUpToDate(false), m_platformError(error), m_isNull(!error) {}
-#elif PLATFORM(CF)
-  ResourceError(CFStreamError);
-  ResourceError(CFErrorRef);
+#else
+  ResourceError(CFStreamError error);
+  ResourceError(CFErrorRef error)
+#endif
+      : m_dataIsUpToDate(false), m_platformError(error), m_isNull(!error) {
+  }
 #endif
 
 #if 0
@@ -108,21 +111,24 @@ class ResourceError {
     return m_localizedDescription;
   }
 
+#if PLATFORM(CF)
 #if PLATFORM(MAC)
   operator NSError*() const;
-#elif USE(CFNETWORK)
+#else
+  operator CFErrorRef() const;
   operator CFStreamError() const;
+#endif
 #endif
 
  private:
   void unpackPlatformErrorIfNeeded() const {
-#if PLATFORM(MAC)
+#if PLATFORM(CF)
     if (!m_dataIsUpToDate)
       const_cast<ResourceError*>(this)->unpackPlatformError();
 #endif
   }
 
-#if PLATFORM(MAC)
+#if PLATFORM(CF)
   void unpackPlatformError();
 #endif
 
@@ -131,9 +137,13 @@ class ResourceError {
   String m_failingURL;
   String m_localizedDescription;
 
-#if PLATFORM(MAC)
+#if PLATFORM(CF)
   bool m_dataIsUpToDate;
+#endif
+#if PLATFORM(MAC)
   mutable RetainPtr<NSError> m_platformError;
+#elif PLATFORM(CF)
+  mutable RetainPtr<CFErrorRef> m_platformError;
 #endif
   bool m_isNull;
 };
@@ -151,9 +161,14 @@ inline bool operator==(const ResourceError& a, const ResourceError& b) {
     return false;
   if (a.localizedDescription() != b.localizedDescription())
     return false;
+#if PLATFORM(CF)
 #if PLATFORM(MAC)
   if ((NSError*)a != (NSError*)b)
     return false;
+#else
+  if ((CFErrorRef)a != (CFErrorRef)b)
+    return false;
+#endif
 #endif
   return true;
 }
