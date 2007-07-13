@@ -166,6 +166,7 @@ class RenderBlock : public RenderFlow {
                       int& endYPos,
                       int& repaintBottom,
                       int& repaintTop);
+  bool generatesLineBoxesForInlineChild(RenderObject*);
   int skipWhitespace(BidiIterator&, BidiState&);
   BidiIterator findNextLineBreak(BidiIterator& start, BidiState& info);
   RootInlineBox* constructLine(const BidiIterator& start,
