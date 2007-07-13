@@ -260,6 +260,7 @@ void RenderPartObject::layout() {
 
   calcWidth();
   calcHeight();
+  adjustOverflowForBoxShadow();
 
   RenderPart::layout();
 

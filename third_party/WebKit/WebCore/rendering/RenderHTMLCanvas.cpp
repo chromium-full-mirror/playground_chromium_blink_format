@@ -91,6 +91,7 @@ void RenderHTMLCanvas::layout() {
   }
   calcWidth();
   calcHeight();
+  adjustOverflowForBoxShadow();
   if (checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
 

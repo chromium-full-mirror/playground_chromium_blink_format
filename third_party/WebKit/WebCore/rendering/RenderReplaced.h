@@ -30,6 +30,7 @@ class RenderReplaced : public RenderBox {
  public:
   RenderReplaced(Node*);
   RenderReplaced(Node*, const IntSize& intrinsicSize);
+  virtual ~RenderReplaced();
 
   virtual const char* renderName() const { return "RenderReplaced"; }
 
@@ -42,6 +43,12 @@ class RenderReplaced : public RenderBox {
   virtual void paint(PaintInfo&, int tx, int ty) = 0;
 
   virtual IntSize intrinsicSize() const;
+
+  virtual int overflowHeight(bool includeInterior = true) const;
+  virtual int overflowWidth(bool includeInterior = true) const;
+  virtual int overflowLeft(bool includeInterior = true) const;
+  virtual int overflowTop(bool includeInterior = true) const;
+  virtual IntRect overflowRect(bool includeInterior = true) const;
 
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;
@@ -61,11 +68,13 @@ class RenderReplaced : public RenderBox {
   void setIntrinsicSize(const IntSize&);
 
   bool shouldPaint(PaintInfo&, int& tx, int& ty);
+  void adjustOverflowForBoxShadow();
 
  private:
   IntSize m_intrinsicSize;
 
   unsigned m_selectionState : 3;  // SelectionState
+  bool m_hasOverflow : 1;
 };
 }
 
