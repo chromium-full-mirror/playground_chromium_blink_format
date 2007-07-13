@@ -76,9 +76,6 @@
 
 using namespace WebCore;
 
-void Frame::print() {
-  notImplemented();
-}
 void Frame::issueTransposeCommand() {
   notImplemented();
 }

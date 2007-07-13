@@ -110,6 +110,8 @@ class ChromeClient {
                                        unsigned modifierFlags) = 0;
 
   virtual void setToolTip(const String&) = 0;
+
+  virtual void print() = 0;
 };
 }
 

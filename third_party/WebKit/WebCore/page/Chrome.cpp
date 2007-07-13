@@ -321,6 +321,10 @@ void Chrome::setToolTip(const HitTestResult& result) {
   m_client->setToolTip(toolTip);
 }
 
+void Chrome::print() {
+  m_client->print();
+}
+
 PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {
   if (const HashSet<Page*>* group = page->frameNamespace()) {
     HashSet<Page*>::const_iterator end = group->end();

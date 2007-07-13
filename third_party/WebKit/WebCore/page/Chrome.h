@@ -133,6 +133,8 @@ class Chrome {
 
   void setToolTip(const HitTestResult&);
 
+  void print();
+
 #if PLATFORM(MAC)
   void focusNSView(NSView*);
 #endif
