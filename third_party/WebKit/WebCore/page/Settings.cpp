@@ -60,7 +60,8 @@ Settings::Settings(Page* page)
       m_isDOMPasteAllowed(false),
       m_shrinksStandaloneImagesToFit(true),
       m_usesPageCache(false),
-      m_showsURLsInToolTips(false) {
+      m_showsURLsInToolTips(false),
+      m_forceFTPDirectoryListings(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -240,6 +241,14 @@ void Settings::setShrinksStandaloneImagesToFit(
 
 void Settings::setShowsURLsInToolTips(bool showsURLsInToolTips) {
   m_showsURLsInToolTips = showsURLsInToolTips;
+}
+
+void Settings::setFTPDirectoryTemplatePath(const String& path) {
+  m_ftpDirectoryTemplatePath = path;
+}
+
+void Settings::setForceFTPDirectoryListings(bool force) {
+  m_forceFTPDirectoryListings = force;
 }
 
 }  // namespace WebCore

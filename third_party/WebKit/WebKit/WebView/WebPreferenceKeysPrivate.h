@@ -75,6 +75,8 @@
 #define WebGrammarCheckingEnabled @"WebGrammarCheckingEnabled"
 #define WebKitDOMPasteAllowedPreferenceKey @"WebKitDOMPasteAllowedPreferenceKey"
 #define WebKitUsesPageCachePreferenceKey @"WebKitUsesPageCachePreferenceKey"
+#define WebKitFTPDirectoryTemplatePath @"WebKitFTPDirectoryTemplatePath"
+#define WebKitForceFTPDirectoryListings @"WebKitForceFTPDirectoryListings"
 
 // These are private both because callers should be using the cover methods and
 // because the

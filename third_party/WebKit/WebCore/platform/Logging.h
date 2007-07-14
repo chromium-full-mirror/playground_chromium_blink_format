@@ -49,6 +49,7 @@ extern WTFLogChannel LogHistory;
 extern WTFLogChannel LogPageCache;
 extern WTFLogChannel LogPlatformLeaks;
 extern WTFLogChannel LogNetwork;
+extern WTFLogChannel LogFTP;
 
 void InitializeLoggingChannelsIfNecessary();
 }

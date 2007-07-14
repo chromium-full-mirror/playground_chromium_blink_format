@@ -80,5 +80,11 @@ inline unsigned SharedBuffer::platformDataSize() const {
 
   return 0;
 }
+
+PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(
+    const String& filePath) {
+  return 0;
+}
+
 #endif
 }
