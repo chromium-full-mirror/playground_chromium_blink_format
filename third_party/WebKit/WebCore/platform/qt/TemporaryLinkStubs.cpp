@@ -86,6 +86,10 @@ FTPDirectoryDocument::FTPDirectoryDocument(WebCore::DOMImplementation* i,
     : HTMLDocument(i, f) {
   notImplemented();
 }
+Tokenizer* FTPDirectoryDocument::createTokenizer() {
+  notImplemented();
+  return 0;
+}
 
 namespace WebCore {
 
