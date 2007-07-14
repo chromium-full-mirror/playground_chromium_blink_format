@@ -81,8 +81,9 @@ void FrameView::updateBorder() {
 
 bool AXObjectCache::gAccessibilityEnabled = false;
 
-FTPDirectoryDocument::FTPDirectoryDocument(WebCore::DOMImplementation*,
-                                           WebCore::Frame*) {
+FTPDirectoryDocument::FTPDirectoryDocument(WebCore::DOMImplementation* i,
+                                           WebCore::Frame* f)
+    : HTMLDocument(i, f) {
   notImplemented();
 }
 
