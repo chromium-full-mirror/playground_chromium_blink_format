@@ -38,6 +38,7 @@
 #include "Font.h"
 #include "Frame.h"
 #include "FrameLoader.h"
+#include "FTPDirectoryDocument.h"
 #include "IntPoint.h"
 #include "Widget.h"
 #include "GraphicsContext.h"
@@ -79,6 +80,11 @@ void FrameView::updateBorder() {
 }
 
 bool AXObjectCache::gAccessibilityEnabled = false;
+
+FTPDirectoryDocument::FTPDirectoryDocument(WebCore::DOMImplementation*,
+                                           WebCore::Frame*) {
+  notImplemented();
+}
 
 namespace WebCore {
 
