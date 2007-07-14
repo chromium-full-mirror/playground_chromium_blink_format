@@ -1689,13 +1689,13 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
   invalidateClick();
 
   DragOperation srcOp = DragOperationNone;
+
+  freeClipboard();  // would only happen if we missed a dragEnd.  Do it anyway,
+                    // just
+                    // to make sure it gets numbified
+  dragState().m_dragClipboard = createDraggingClipboard();
+
   if (dragState().m_dragSrcMayBeDHTML) {
-    freeClipboard();  // would only happen if we missed a dragEnd.  Do it
-                      // anyway, just
-                      // to make sure it gets numbified
-
-    dragState().m_dragClipboard = createDraggingClipboard();
-
     // Check to see if the is a DOM based drag, if it is get the DOM specified
     // drag
     // image and offset
