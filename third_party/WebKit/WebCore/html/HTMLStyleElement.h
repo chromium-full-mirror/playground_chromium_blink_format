@@ -50,14 +50,19 @@ class HTMLStyleElement : public HTMLElement, public StyleElement {
   bool disabled() const;
   void setDisabled(bool);
 
-  const AtomicString& media() const;
+  virtual const AtomicString& media() const;
   void setMedia(const AtomicString&);
 
-  const AtomicString& type() const;
+  virtual const AtomicString& type() const;
   void setType(const AtomicString&);
+
+  StyleSheet* sheet();
+
+  virtual void setLoading(bool loading) { m_loading = loading; }
 
  protected:
   String m_media;
+  bool m_loading;
 };
 
 }  // namespace
