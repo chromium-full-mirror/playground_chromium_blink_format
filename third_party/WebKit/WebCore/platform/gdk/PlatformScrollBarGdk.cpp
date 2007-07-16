@@ -27,9 +27,12 @@
 
 #include "config.h"
 #include "PlatformScrollBar.h"
+#include "IntRect.h"
+#include "GraphicsContext.h"
 
 #include "NotImplemented.h"
 #include <gtk/gtk.h>
+#include <cairo/cairo.h>
 #include <stdio.h>
 
 using namespace WebCore;
@@ -41,13 +44,26 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
   GtkScrollbar* scrollBar = orientation == HorizontalScrollbar
                                 ? GTK_SCROLLBAR(::gtk_hscrollbar_new(NULL))
                                 : GTK_SCROLLBAR(::gtk_vscrollbar_new(NULL));
+  gtk_widget_show(GTK_WIDGET(scrollBar));
   setGtkWidget(GTK_WIDGET(scrollBar));
+
+  /*
+   * assign a sane default width and height to the ScrollBar, otherwise
+   * we will end up with a 0 width scrollbar.
+   */
+  resize(PlatformScrollbar::horizontalScrollbarHeight(),
+         PlatformScrollbar::verticalScrollbarWidth());
+
+  g_object_ref(G_OBJECT(scrollBar));
+  gtk_object_sink(GTK_OBJECT(scrollBar));
 }
+
 PlatformScrollbar::~PlatformScrollbar() {
   /*
    * the Widget does not take over ownership.
    */
-  gtk_object_unref(GTK_OBJECT(gtkWidget()));
+  gtk_widget_destroy(gtkWidget());
+  g_object_unref(G_OBJECT(gtkWidget()));
 }
 
 int PlatformScrollbar::width() const {
@@ -62,8 +78,9 @@ void PlatformScrollbar::setEnabled(bool enabled) {
   Widget::setEnabled(enabled);
 }
 
-void PlatformScrollbar::paint(GraphicsContext*, const IntRect&) {
-  notImplemented();
+void PlatformScrollbar::paint(GraphicsContext* graphicsContext,
+                              const IntRect& damageRect) {
+  Widget::paint(graphicsContext, damageRect);
 }
 
 void PlatformScrollbar::updateThumbPosition() {

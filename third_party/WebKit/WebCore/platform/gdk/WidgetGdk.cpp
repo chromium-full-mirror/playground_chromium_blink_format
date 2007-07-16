@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  * Copyright (C) 2006 Michael Emmel mike.emmel@gmail.com
+ * Copyright (C) 2007 Holger Hans Peter Freyther
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +60,11 @@ Widget::Widget(GtkWidget* widget) : data(new WidgetPrivate) {
   setGtkWidget(widget);
 }
 
-GdkDrawable* Widget::drawable() const {
+GdkDrawable* Widget::gdkDrawable() const {
+  if (!data->drawable && data->widget)
+    data->drawable = GTK_IS_LAYOUT(data->widget)
+                         ? GTK_LAYOUT(data->widget)->bin_window
+                         : data->widget->window;
   return data->drawable;
 }
 
@@ -68,8 +73,7 @@ GtkWidget* Widget::gtkWidget() const {
 }
 
 void Widget::setGtkWidget(GtkWidget* widget) {
-  data->drawable =
-      GTK_IS_LAYOUT(widget) ? GTK_LAYOUT(widget)->bin_window : widget->window;
+  data->drawable = 0;
   data->widget = widget;
 }
 
@@ -101,7 +105,7 @@ void Widget::setCursor(const Cursor& cursor) {
   if (!pcur)
     return;
 
-  GdkDrawable* drawable = data->drawable;
+  GdkDrawable* drawable = gdkDrawable();
   if (!drawable || !GDK_IS_WINDOW(drawable))
     return;
   GdkWindow* window = GDK_WINDOW(drawable);
@@ -109,7 +113,7 @@ void Widget::setCursor(const Cursor& cursor) {
 }
 
 void Widget::show() {
-  GdkDrawable* drawable = data->drawable;
+  GdkDrawable* drawable = gdkDrawable();
   if (!drawable || !GDK_IS_WINDOW(drawable))
     return;
   GdkWindow* window = GDK_WINDOW(drawable);
@@ -117,7 +121,7 @@ void Widget::show() {
 }
 
 void Widget::hide() {
-  GdkDrawable* drawable = data->drawable;
+  GdkDrawable* drawable = gdkDrawable();
   if (!drawable || !GDK_IS_WINDOW(drawable))
     return;
   GdkWindow* window = GDK_WINDOW(drawable);

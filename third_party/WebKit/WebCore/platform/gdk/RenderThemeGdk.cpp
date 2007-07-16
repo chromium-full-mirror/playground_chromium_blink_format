@@ -184,12 +184,9 @@ bool RenderThemeGdk::paintCheckbox(RenderObject* o,
                                    const IntRect& rect) {
   // FIXME: is it the right thing to do?
   GtkWidget* checkbox = gtkCheckbox();
-  GdkPixmap* pixmap = gdk_pixmap_new(GDK_DRAWABLE(checkbox->window),
-                                     rect.width(), rect.height(), -1);
-  gtk_paint_box(checkbox->style, GDK_DRAWABLE(pixmap), GTK_STATE_NORMAL,
-                GTK_SHADOW_OUT, NULL, checkbox, "checkbutton", 0, 0,
-                rect.width(), rect.height());
-  copyToContext(pixmap, i.context->platformContext(), rect);
+  gtk_paint_box(checkbox->style, i.context->gdkDrawable(), GTK_STATE_NORMAL,
+                GTK_SHADOW_OUT, NULL, checkbox, "checkbutton", rect.x(),
+                rect.y(), rect.width(), rect.height());
 
   return false;
 }
@@ -220,12 +217,9 @@ bool RenderThemeGdk::paintRadio(RenderObject* o,
                                 const IntRect& rect) {
   // FIXME: is it the right thing to do?
   GtkWidget* radio = gtkRadioButton();
-  GdkPixmap* pixmap = gdk_pixmap_new(GDK_DRAWABLE(radio->window), rect.width(),
-                                     rect.height(), -1);
-  gtk_paint_box(radio->style, GDK_DRAWABLE(pixmap), GTK_STATE_NORMAL,
-                GTK_SHADOW_OUT, NULL, radio, "radiobutton", 0, 0, rect.width(),
-                rect.height());
-  copyToContext(pixmap, i.context->platformContext(), rect);
+  gtk_paint_box(radio->style, i.context->gdkDrawable(), GTK_STATE_NORMAL,
+                GTK_SHADOW_OUT, NULL, radio, "radiobutton", rect.x(), rect.y(),
+                rect.width(), rect.height());
 
   return false;
 }
@@ -235,12 +229,9 @@ bool RenderThemeGdk::paintButton(RenderObject*,
                                  const IntRect& rect) {
   // FIXME: should use theme-aware drawing. This should honor the state as well
   GtkWidget* button = gtkButton();
-  GdkPixmap* pixmap = gdk_pixmap_new(GDK_DRAWABLE(button->window), rect.width(),
-                                     rect.height(), -1);
-  gtk_paint_box(button->style, GDK_DRAWABLE(pixmap), GTK_STATE_NORMAL,
-                GTK_SHADOW_OUT, NULL, button, "button", 0, 0, rect.width(),
-                rect.height());
-  copyToContext(pixmap, i.context->platformContext(), rect);
+  gtk_paint_box(button->style, i.context->gdkDrawable(), GTK_STATE_NORMAL,
+                GTK_SHADOW_OUT, NULL, button, "button", rect.x(), rect.y(),
+                rect.width(), rect.height());
   return false;
 }
 
@@ -270,20 +261,6 @@ void RenderThemeGdk::adjustButtonStyle(CSSStyleSelector* selector,
 }
 
 void RenderThemeGdk::systemFont(int propId, FontDescription&) const {}
-
-/*
- * copy the src surface to the current context at position (rect.x,rect.y) and
- * invalidate
- * GdkPixmap
- */
-void RenderThemeGdk::copyToContext(GdkPixmap* src,
-                                   cairo_t* cr,
-                                   const IntRect& rect) {
-  gdk_cairo_set_source_pixmap(cr, src, rect.x(), rect.y());
-  cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-  cairo_paint(cr);
-  g_object_unref(src);
-}
 
 GtkWidget* RenderThemeGdk::gtkButton() const {
   if (!m_gtkButton) {

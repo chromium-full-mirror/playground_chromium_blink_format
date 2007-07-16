@@ -45,6 +45,10 @@
 #include <cairo-win32.h>
 #endif
 
+#if PLATFORM(GDK)
+#include <gdk/gdk.h>
+#endif
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -58,6 +62,10 @@ class GraphicsContextPlatformPrivate {
 
   cairo_t* cr;
   Vector<float> layers;
+
+#if PLATFORM(GDK)
+  GdkDrawable* drawable;
+#endif
 };
 
 static inline void setColor(cairo_t* cr, const Color& col) {
@@ -76,7 +84,14 @@ static inline void fillRectSourceOver(cairo_t* cr,
   cairo_fill(cr);
 }
 
-GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate() : cr(0) {}
+GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate()
+    : cr(0)
+#if PLATFORM(GDK)
+      ,
+      drawable(0)
+#endif
+{
+}
 
 GraphicsContextPlatformPrivate::~GraphicsContextPlatformPrivate() {
   cairo_destroy(cr);
@@ -761,6 +776,16 @@ void GraphicsContext::fillRoundedRect(const IntRect&,
                                       const Color&) {
   notImplemented();
 }
+
+#if PLATFORM(GDK)
+void GraphicsContext::setGdkDrawable(GdkDrawable* drawable) {
+  m_data->drawable = drawable;
+}
+
+GdkDrawable* GraphicsContext::gdkDrawable() const {
+  return m_data->drawable;
+}
+#endif
 
 }  // namespace WebCore
 

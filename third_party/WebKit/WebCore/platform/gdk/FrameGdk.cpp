@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  * Copyright (C) 2006 Michael Emmel mike.emmel@gmail.com
+ * Copyright (C) 2007 Holger Hans Peter Freyther
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -69,6 +70,17 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
   return resource;
 }
 
+struct FrameGdkExposeData {
+  GtkContainer* container;
+  GdkEventExpose* expose;
+};
+
+static void frame_gdk_expose_child(GtkWidget* widget, gpointer _data) {
+  FrameGdkExposeData* data = (FrameGdkExposeData*)_data;
+  int width, height;
+  gtk_container_propagate_expose(data->container, widget, data->expose);
+}
+
 namespace WebCore {
 
 FrameGdk::FrameGdk(Page* page,
@@ -134,6 +146,7 @@ void FrameGdk::handleGdkEvent(GdkEvent* event) {
       gdk_window_begin_paint_region(event->any.window, event->expose.region);
       cairo_t* cr = gdk_cairo_create(event->any.window);
       GraphicsContext ctx(cr);
+      ctx.setGdkDrawable(event->any.window);
       if (renderer()) {
         if (view()->needsLayout())
           view()->layout();
@@ -141,7 +154,16 @@ void FrameGdk::handleGdkEvent(GdkEvent* event) {
         paint(&ctx, rect);
       }
       cairo_destroy(cr);
+
+      /*
+       * Make sure children of the view get redrawn
+       */
+      FrameGdkExposeData data = {GTK_CONTAINER(view()->gtkWidget()),
+                                 &event->expose};
+      gtk_container_forall(GTK_CONTAINER(view()->gtkWidget()),
+                           frame_gdk_expose_child, &data);
       gdk_window_end_paint(event->any.window);
+
       break;
     }
 
@@ -184,7 +206,7 @@ void FrameGdk::handleGdkEvent(GdkEvent* event) {
       break;
     }
     case GDK_MOTION_NOTIFY:
-      eventHandler()->handleMouseMoveEvent(PlatformMouseEvent(event));
+      eventHandler()->mouseMoved(PlatformMouseEvent(event));
       break;
     case GDK_BUTTON_PRESS:
     case GDK_2BUTTON_PRESS:

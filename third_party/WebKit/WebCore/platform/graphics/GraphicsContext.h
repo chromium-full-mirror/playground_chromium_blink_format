@@ -45,6 +45,10 @@ typedef QPainter PlatformGraphicsContext;
 typedef void PlatformGraphicsContext;
 #endif
 
+#if PLATFORM(GDK)
+typedef struct _GdkDrawable GdkDrawable;
+#endif
+
 #if PLATFORM(WIN)
 typedef struct HDC__* HDC;
 #endif
@@ -248,6 +252,11 @@ class GraphicsContext : Noncopyable {
 #if PLATFORM(QT)
   void setFillRule(WindRule);
   PlatformPath* currentPath();
+#endif
+
+#if PLATFORM(GDK)
+  void setGdkDrawable(GdkDrawable*);
+  GdkDrawable* gdkDrawable() const;
 #endif
 
  private:
