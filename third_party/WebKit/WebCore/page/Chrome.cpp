@@ -321,8 +321,8 @@ void Chrome::setToolTip(const HitTestResult& result) {
   m_client->setToolTip(toolTip);
 }
 
-void Chrome::print() {
-  m_client->print();
+void Chrome::print(Frame* frame) {
+  m_client->print(frame);
 }
 
 PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {

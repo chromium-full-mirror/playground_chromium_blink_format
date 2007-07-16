@@ -259,7 +259,7 @@ void ChromeClientGdk::setToolTip(const String&) {
   notImplemented();
 }
 
-void ChromeClientGdk::print() {
+void ChromeClientGdk::print(Frame*) {
   notImplemented();
 }
 

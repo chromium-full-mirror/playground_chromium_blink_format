@@ -131,7 +131,7 @@ class SVGEmptyChromeClient : public ChromeClient {
 
   virtual void setToolTip(const String&) {}
 
-  virtual void print() {}
+  virtual void print(Frame*) {}
 };
 
 class SVGEmptyFrameLoaderClient : public FrameLoaderClient {

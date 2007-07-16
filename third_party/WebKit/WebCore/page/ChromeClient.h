@@ -111,7 +111,7 @@ class ChromeClient {
 
   virtual void setToolTip(const String&) = 0;
 
-  virtual void print() = 0;
+  virtual void print(Frame*) = 0;
 };
 }
 

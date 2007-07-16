@@ -258,7 +258,6 @@ class Frame : public Shared<Frame> {
  public:
   void focusWindow();
   void unfocusWindow();
-  void print();
   bool shouldClose();
   void scheduleClose();
 
