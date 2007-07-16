@@ -86,9 +86,14 @@ const FontData* FontCache::getFontDataForCharacters(const Font& font,
     HFONT result;
     if (langFontLink->MapFont(hdc, actualCodePages, characters[0], &result) ==
         S_OK) {
-      fontData = new FontData(FontPlatformData(
+      // MLang has an internal cache, which means it really will hand back the
+      // same HFONT pointer if it can.  We can
+      // therefore safely use our hash on HFONT pointers (FontPlatformData ->
+      // FontData) and actually expect it to work.
+      FontPlatformData platformData(
           result, font.fontDescription().computedPixelSize(),
-          font.fontDescription().bold(), font.fontDescription().italic()));
+          font.fontDescription().bold(), font.fontDescription().italic());
+      fontData = getCachedFontData(&platformData);
       fontData->setIsMLangFont();
     }
   }
