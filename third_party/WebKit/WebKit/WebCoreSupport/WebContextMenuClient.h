@@ -48,7 +48,6 @@ class WebContextMenuClient : public WebCore::ContextMenuClient {
   virtual void speak(const WebCore::String&);
   virtual void stopSpeaking();
   virtual void searchWithSpotlight();
-  virtual bool shouldIncludeInspectElementItem();
 
   WebView* webView() { return m_webView; }
 
