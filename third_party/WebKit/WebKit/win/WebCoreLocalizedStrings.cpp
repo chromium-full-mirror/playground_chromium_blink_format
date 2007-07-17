@@ -230,3 +230,7 @@ String WebCore::AXHeadingText() {
   return String(LPCTSTR_UI_STRING(
       "heading", "accessibility role description for headings"));
 }
+String WebCore::unknownFileSizeText() {
+  return String(LPCTSTR_UI_STRING(
+      "Unknown", "Unknown filesize FTP directory listing item"));
+}

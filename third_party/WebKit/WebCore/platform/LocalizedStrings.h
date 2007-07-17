@@ -92,6 +92,8 @@ String AXLinkText();
 String AXListMarkerText();
 String AXImageMapText();
 String AXHeadingText();
+
+String unknownFileSizeText();
 }
 
 #endif

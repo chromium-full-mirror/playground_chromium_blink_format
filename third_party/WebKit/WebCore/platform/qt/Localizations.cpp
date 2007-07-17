@@ -187,5 +187,8 @@ String AXImageMapText() {
 String AXHeadingText() {
   return String();
 }
+String unknownFileSizeText() {
+  return "Unknown";
+}
 }
 // vim: ts=4 sw=4 et

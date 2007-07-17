@@ -411,6 +411,9 @@ String WebCore::searchMenuRecentSearchesText() {
 String WebCore::searchMenuClearRecentSearchesText() {
   return String("Clear recent searches");
 }
+String WebCore::unknownFileSizeText() {
+  return "Unknown";
+}
 
 PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
   notImplemented();
