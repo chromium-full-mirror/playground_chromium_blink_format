@@ -47,7 +47,8 @@ typedef enum {
   WebFrameLoadTypeReload,
   WebFrameLoadTypeReloadAllowingStaleData,
   WebFrameLoadTypeSame,  // user loads same URL again (but not reload button)
-  WebFrameLoadTypeInternal,
+  WebFrameLoadTypeInternal,  // maps to
+                             // WebCore::FrameLoadTypeRedirectWithLockedHistory
   WebFrameLoadTypeReplace
 } WebFrameLoadType;
 
