@@ -121,8 +121,8 @@ class Window : public DOMObject {
   bool isSafeScript(ExecState*) const;
   static bool isSafeScript(const ScriptInterpreter* origin,
                            const ScriptInterpreter* target);
+
   Location* location() const;
-  bool find(const WebCore::String&, bool, bool, bool, bool, bool, bool) const;
 
   // Finds a wrapper of a JS EventListener, returns 0 if no existing one.
   WebCore::JSEventListener* findJSEventListener(JSValue*, bool html = false);
@@ -168,11 +168,7 @@ class Window : public DOMObject {
     // Functions
     AToB,
     BToA,
-    Alert,
-    Confirm,
-    Prompt,
     Open,
-    Print,
     SetTimeout,
     ClearTimeout,
     SetInterval,
@@ -189,8 +185,6 @@ class Window : public DOMObject {
     ResizeBy,
     ResizeTo,
     ShowModalDialog,
-    Find,
-    Stop,
 
     // Attributes
     Crypto,
