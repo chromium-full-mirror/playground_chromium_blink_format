@@ -235,6 +235,7 @@ class FrameLoaderClient {
   virtual bool canCachePage() const = 0;
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,
+                        const ResourceRequest&,
                         const ResourceResponse&) = 0;
 
   virtual Frame* createFrame(const KURL& url,

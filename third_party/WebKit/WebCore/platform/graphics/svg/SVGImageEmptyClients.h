@@ -173,6 +173,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,
+                        const ResourceRequest&,
                         const ResourceResponse&) {}
 
   virtual void assignIdentifierToInitialRequest(unsigned long identifier,
