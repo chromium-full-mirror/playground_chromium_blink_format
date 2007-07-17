@@ -63,6 +63,8 @@ class DOMWindow : public Shared<DOMWindow> {
 
   DOMSelection* getSelection();
 
+  Element* frameElement() const;
+
   void focus();
   void blur();
   void close();

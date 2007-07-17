@@ -198,7 +198,6 @@ class Window : public DOMObject {
     Self,
     Window_,
     Top,
-    FrameElement,
 
     // Event Listeners
     Onabort,

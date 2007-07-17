@@ -181,7 +181,6 @@ Window::get
   self                  Window::Self                DontDelete|ReadOnly
   window                Window::Window_             DontDelete|ReadOnly
   top                   Window::Top                 DontDelete|ReadOnly
-  frameElement          Window::FrameElement        DontDelete|ReadOnly
 # -- Event Listeners --
   onabort               Window::Onabort             DontDelete
   onblur                Window::Onblur              DontDelete
@@ -611,14 +610,6 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
     case XSLTProcessor_:
       return jsUndefined();
 #endif
-    case FrameElement:
-      if (!isSafeScript(exec))
-        return jsUndefined();
-      if (Document* doc = impl()->frame()->document())
-        if (Element* fe = doc->ownerElement())
-          if (checkNodeSecurity(exec, fe))
-            return toJS(exec, fe);
-      return jsUndefined();
   }
 
   if (!isSafeScript(exec))
