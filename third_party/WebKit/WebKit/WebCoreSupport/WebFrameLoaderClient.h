@@ -78,6 +78,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,
+                        const WebCore::ResourceRequest&,
                         const WebCore::ResourceResponse&);
 
   virtual void assignIdentifierToInitialRequest(
