@@ -553,7 +553,7 @@ class FrameLoader : Noncopyable
   void updateHistoryForBackForwardNavigation();
   void updateHistoryForReload();
   void updateHistoryForStandardLoad();
-  void updateHistoryForInternalLoad();
+  void updateHistoryForRedirectWithLockedHistory();
   void updateHistoryForClientRedirect();
   void updateHistoryForCommit();
 
