@@ -226,6 +226,7 @@ class FrameLoaderClientGdk : public FrameLoaderClient {
   virtual bool canCachePage() const;
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,
+                        const ResourceRequest&,
                         const ResourceResponse&);
 
  private:

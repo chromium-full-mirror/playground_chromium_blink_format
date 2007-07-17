@@ -442,6 +442,7 @@ void FrameLoaderClientGdk::dispatchDidFailLoad(const ResourceError&) {
 }
 void FrameLoaderClientGdk::download(ResourceHandle*,
                                     const ResourceRequest&,
+                                    const ResourceRequest&,
                                     const ResourceResponse&) {
   notImplemented();
 }
