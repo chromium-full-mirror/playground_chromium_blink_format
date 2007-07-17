@@ -783,7 +783,12 @@ bool Window::getOwnPropertySlot(ExecState* exec,
 
   // allow shortcuts like 'Image1' instead of document.images.Image1
   Document* doc = impl()->frame()->document();
-  if (isSafeScript(exec) && doc && doc->isHTMLDocument()) {
+  if (doc && doc->isHTMLDocument()) {
+    if (!isSafeScript(exec)) {
+      slot.setUndefined(this);
+      return true;
+    }
+
     AtomicString atomicPropertyName = propertyName;
     if (static_cast<HTMLDocument*>(doc)->hasNamedItem(atomicPropertyName) ||
         doc->getElementById(atomicPropertyName)) {
