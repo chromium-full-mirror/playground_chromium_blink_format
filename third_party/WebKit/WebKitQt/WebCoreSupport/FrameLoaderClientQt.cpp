@@ -572,6 +572,7 @@ FrameLoaderClientQt::createDocumentLoader(
 
 void FrameLoaderClientQt::download(WebCore::ResourceHandle*,
                                    const WebCore::ResourceRequest&,
+                                   const WebCore::ResourceRequest&,
                                    const WebCore::ResourceResponse&) {
   notImplemented();
 }
