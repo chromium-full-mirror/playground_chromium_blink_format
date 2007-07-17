@@ -58,8 +58,12 @@ namespace WebCore {
 
 using namespace EventNames;
 
-ContextMenuController::ContextMenuController(ContextMenuClient* client)
-    : m_client(client), m_contextMenu(0) {}
+ContextMenuController::ContextMenuController(Page* page,
+                                             ContextMenuClient* client)
+    : m_page(page), m_client(client), m_contextMenu(0) {
+  ASSERT_ARG(page, page);
+  ASSERT_ARG(client, client);
+}
 
 ContextMenuController::~ContextMenuController() {
   m_client->contextMenuDestroyed();

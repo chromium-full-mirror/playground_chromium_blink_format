@@ -39,7 +39,7 @@ class Page;
 
 class ContextMenuController : Noncopyable {
  public:
-  ContextMenuController(ContextMenuClient*);
+  ContextMenuController(Page*, ContextMenuClient*);
   ~ContextMenuController();
 
   ContextMenuClient* client() { return m_client; }
