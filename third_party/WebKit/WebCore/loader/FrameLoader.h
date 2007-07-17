@@ -153,6 +153,7 @@ class FrameLoader : Noncopyable
   void finalSetupForReplace(DocumentLoader*);
   void load(const KURL&, Event*);
   void load(const FrameLoadRequest&,
+            bool lockHistory,
             bool userGesture,
             Event*,
             HTMLFormElement*,
@@ -340,7 +341,10 @@ class FrameLoader : Noncopyable
                    Event*,
                    bool lockHistory,
                    bool userGesture);
-  void urlSelected(const FrameLoadRequest&, Event*, bool userGesture);
+  void urlSelected(const FrameLoadRequest&,
+                   Event*,
+                   bool lockHistory,
+                   bool userGesture);
 
   bool requestFrame(HTMLFrameOwnerElement*,
                     const String& URL,
@@ -373,15 +377,13 @@ class FrameLoader : Noncopyable
   String baseTarget() const;
   KURL dataURLBaseFromRequest(const ResourceRequest& request) const;
 
-  void scheduleRedirection(double delay, const String& URL);
-
+  bool isScheduledLocationChangePending() const;
+  void scheduleHTTPRedirection(double delay, const String& URL);
   void scheduleLocationChange(const String& URL,
                               const String& referrer,
                               bool lockHistory = true,
                               bool userGesture = false);
   void scheduleRefresh(bool userGesture = false);
-  bool isScheduledLocationChangePending() const;
-
   void scheduleHistoryNavigation(int steps);
 
   bool canGoBackOrForward(int distance) const;

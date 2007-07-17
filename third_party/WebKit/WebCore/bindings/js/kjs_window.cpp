@@ -804,8 +804,7 @@ void Window::put(ExecState* exec,
             // We want a new history item if this JS was called via a user
             // gesture
             impl()->frame()->loader()->scheduleLocationChange(
-                dstUrl, p->loader()->outgoingReferrer(), !userGesture,
-                userGesture);
+                dstUrl, p->loader()->outgoingReferrer(), false, userGesture);
           }
         }
         return;
@@ -1406,8 +1405,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
               static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                   ->wasRunByUserGesture();
           frame->loader()->scheduleLocationChange(
-              completedURL, activeFrame->loader()->outgoingReferrer(),
-              false /*don't lock history*/, userGesture);
+              completedURL, activeFrame->loader()->outgoingReferrer(), false,
+              userGesture);
         }
         return Window::retrieve(frame);
       }
@@ -1919,9 +1918,8 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
     bool userGesture =
         static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
             ->wasRunByUserGesture();
-    // We want a new history item if this JS was called via a user gesture
     m_frame->loader()->scheduleLocationChange(
-        url.url(), activeFrame->loader()->outgoingReferrer(), !userGesture,
+        url.url(), activeFrame->loader()->outgoingReferrer(), false,
         userGesture);
   }
 }
@@ -1951,8 +1949,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
                     ->wasRunByUserGesture();
             frame->loader()->scheduleLocationChange(
                 p->loader()->completeURL(str).url(),
-                p->loader()->outgoingReferrer(), true /*lock history*/,
-                userGesture);
+                p->loader()->outgoingReferrer(), true, userGesture);
           }
         }
         break;
@@ -1984,8 +1981,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
             // We want a new history item if this JS was called via a user
             // gesture
             frame->loader()->scheduleLocationChange(
-                dstUrl, p->loader()->outgoingReferrer(), !userGesture,
-                userGesture);
+                dstUrl, p->loader()->outgoingReferrer(), false, userGesture);
           }
         }
         break;

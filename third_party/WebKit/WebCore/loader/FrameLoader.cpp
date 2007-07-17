@@ -298,7 +298,8 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
   if (!request.frameName().isEmpty() && request.frameName() != "_blank")
     if (Frame* frame = m_frame->tree()->find(request.frameName())) {
       if (!request.resourceRequest().url().isEmpty())
-        frame->loader()->load(request, true, 0, 0, HashMap<String, String>());
+        frame->loader()->load(request, false, true, 0, 0,
+                              HashMap<String, String>());
       if (Page* page = frame->page())
         page->chrome()->focus();
       created = false;
@@ -417,7 +418,7 @@ void FrameLoader::urlSelected(const ResourceRequest& request,
   if (frameRequest.resourceRequest().httpReferrer().isEmpty())
     frameRequest.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
 
-  urlSelected(frameRequest, triggeringEvent, userGesture);
+  urlSelected(frameRequest, triggeringEvent, lockHistory, userGesture);
 }
 
 bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
@@ -442,8 +443,8 @@ bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
 
   Frame* frame = m_frame->tree()->child(frameName);
   if (frame)
-    frame->loader()->scheduleLocationChange(url.url(), m_outgoingReferrer,
-                                            false, userGestureHint());
+    frame->loader()->scheduleLocationChange(url.url(), m_outgoingReferrer, true,
+                                            userGestureHint());
   else
     frame = loadSubframe(ownerElement, url, frameName, m_outgoingReferrer);
 
@@ -878,7 +879,7 @@ void FrameLoader::receivedFirstData() {
   else
     URL = m_frame->document()->completeURL(URL);
 
-  scheduleRedirection(delay, URL);
+  scheduleHTTPRedirection(delay, URL);
 }
 
 const String& FrameLoader::responseMIMEType() const {
@@ -1295,17 +1296,14 @@ KURL FrameLoader::completeURL(const String& url) {
   return m_frame->document()->completeURL(url).deprecatedString();
 }
 
-void FrameLoader::scheduleRedirection(double delay, const String& url) {
+void FrameLoader::scheduleHTTPRedirection(double delay, const String& url) {
   if (delay < 0 || delay > INT_MAX / 1000)
     return;
 
-  // We want a new history item if the refresh timeout > 1 second.  We
-  // accomplish this
-  // by pretending a slow redirect is a user gesture and passing false for
-  // lockHistory
+  // We want a new history item if the refresh timeout is > 1 second.
   if (!m_scheduledRedirection || delay <= m_scheduledRedirection->delay)
     scheduleRedirection(
-        new ScheduledRedirection(delay, url, delay <= 1, delay > 1));
+        new ScheduledRedirection(delay, url, delay <= 1, false));
 }
 
 void FrameLoader::scheduleLocationChange(const String& url,
@@ -1837,10 +1835,11 @@ void FrameLoader::finalSetupForReplace(DocumentLoader* loader) {
 }
 
 void FrameLoader::load(const KURL& URL, Event* event) {
-  load(ResourceRequest(URL), true, event, 0, HashMap<String, String>());
+  load(ResourceRequest(URL), false, true, event, 0, HashMap<String, String>());
 }
 
 void FrameLoader::load(const FrameLoadRequest& request,
+                       bool lockHistory,
                        bool userGesture,
                        Event* event,
                        HTMLFormElement* submitForm,
@@ -1871,7 +1870,7 @@ void FrameLoader::load(const FrameLoadRequest& request,
     FrameLoadType loadType;
     if (request.resourceRequest().cachePolicy() == ReloadIgnoringCacheData)
       loadType = FrameLoadTypeReload;
-    else if (!userGesture)
+    else if (lockHistory)
       loadType = FrameLoadTypeInternal;
     else
       loadType = FrameLoadTypeStandard;
@@ -3038,8 +3037,9 @@ void FrameLoader::submitForm(const FrameLoadRequest& request, Event* event) {
     m_submittedFormURL = request.resourceRequest().url();
   }
 
-  // FIXME: Why do we always pass true for userGesture?
-  load(request, true, event, m_formAboutToBeSubmitted.get(),
+  // FIXME: We should probably call userGestureHint() to tell whether this form
+  // submission was the result of a user gesture.
+  load(request, false, true, event, m_formAboutToBeSubmitted.get(),
        m_formValuesAboutToBeSubmitted);
 
   clearRecordedFormValues();
@@ -3047,12 +3047,13 @@ void FrameLoader::submitForm(const FrameLoadRequest& request, Event* event) {
 
 void FrameLoader::urlSelected(const FrameLoadRequest& request,
                               Event* event,
+                              bool lockHistory,
                               bool userGesture) {
   FrameLoadRequest copy = request;
   if (copy.resourceRequest().httpReferrer().isEmpty())
     copy.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
 
-  load(copy, userGesture, event, 0, HashMap<String, String>());
+  load(copy, lockHistory, userGesture, event, 0, HashMap<String, String>());
 }
 
 String FrameLoader::userAgent(const KURL& url) const {
