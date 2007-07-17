@@ -46,22 +46,22 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-bool isTableCell(Node* node) {
+static bool isTableCell(Node* node) {
   return node && (node->hasTagName(tdTag) || node->hasTagName(thTag));
 }
 
-bool isTableRow(Node* node) {
+static bool isTableRow(Node* node) {
   return node && node->hasTagName(trTag);
 }
 
-bool isTableCellEmpty(Node* cell) {
+static bool isTableCellEmpty(Node* cell) {
   ASSERT(isTableCell(cell));
   VisiblePosition firstInCell(Position(cell, 0));
   VisiblePosition lastInCell(Position(cell, maxDeepOffset(cell)));
   return firstInCell == lastInCell;
 }
 
-bool isTableRowEmpty(Node* row) {
+static bool isTableRowEmpty(Node* row) {
   if (!isTableRow(row))
     return false;
 
