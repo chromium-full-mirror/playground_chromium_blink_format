@@ -317,6 +317,7 @@ class WebFrame : public IWebFrame,
                               const WebCore::KURL& originalURL) const;
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,
+                        const WebCore::ResourceRequest&,
                         const WebCore::ResourceResponse&);
 
   virtual void assignIdentifierToInitialRequest(
