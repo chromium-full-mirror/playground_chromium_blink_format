@@ -1584,6 +1584,10 @@ HRESULT WebView::updateWebCoreSettingsFromPreferences(
 
   settings->setForceFTPDirectoryListings(true);
 
+  // FIXME: make this read a preference like the Mac's WebKitDeveloperExtras
+  // or when Safari's IncludeDebugMenu is set
+  settings->setDeveloperExtrasEnabled(true);
+
   m_mainFrame->invalidate();  // FIXME
 
   return S_OK;

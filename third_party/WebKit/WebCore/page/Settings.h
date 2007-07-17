@@ -151,6 +151,9 @@ class Settings {
   void setForceFTPDirectoryListings(bool);
   bool forceFTPDirectoryListings() const { return m_forceFTPDirectoryListings; }
 
+  void setDeveloperExtrasEnabled(bool);
+  bool developerExtrasEnabled() const { return m_developerExtrasEnabled; }
+
  private:
   Page* m_page;
 
@@ -183,6 +186,7 @@ class Settings {
   bool m_usesPageCache : 1;
   bool m_showsURLsInToolTips : 1;
   bool m_forceFTPDirectoryListings : 1;
+  bool m_developerExtrasEnabled : 1;
 };
 
 }  // namespace WebCore

@@ -61,7 +61,8 @@ Settings::Settings(Page* page)
       m_shrinksStandaloneImagesToFit(true),
       m_usesPageCache(false),
       m_showsURLsInToolTips(false),
-      m_forceFTPDirectoryListings(false) {
+      m_forceFTPDirectoryListings(false),
+      m_developerExtrasEnabled(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -249,6 +250,10 @@ void Settings::setFTPDirectoryTemplatePath(const String& path) {
 
 void Settings::setForceFTPDirectoryListings(bool force) {
   m_forceFTPDirectoryListings = force;
+}
+
+void Settings::setDeveloperExtrasEnabled(bool developerExtrasEnabled) {
+  m_developerExtrasEnabled = developerExtrasEnabled;
 }
 
 }  // namespace WebCore
