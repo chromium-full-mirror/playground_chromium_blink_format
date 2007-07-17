@@ -75,6 +75,7 @@ class HTMLTableElement : public HTMLElement {
   HTMLTableSectionElement* tFoot() const { return m_foot; }
   Node* setTFoot(HTMLTableSectionElement*);
 
+  HTMLTableSectionElement* firstTBody() const { return m_firstBody; }
   Node* setTBody(HTMLTableSectionElement*);
 
   HTMLElement* createTHead();
