@@ -215,8 +215,6 @@ class IconDatabase : Noncopyable {
   Timer<IconDatabase> m_updateTimer;
 
   bool m_initialPruningComplete;
-  SQLTransaction* m_initialPruningTransaction;
-  SQLStatement* m_preparedPageRetainInsertStatement;
 
   bool m_imported;
   mutable bool m_isImportedSet;
