@@ -63,7 +63,7 @@ using namespace HTMLNames;
 static const DOMTimeStamp typeAheadTimeout = 1000;
 
 HTMLSelectElement::HTMLSelectElement(Document* doc, HTMLFormElement* f)
-    : HTMLGenericFormElement(selectTag, doc, f),
+    : HTMLFormControlElementWithState(selectTag, doc, f),
       m_minwidth(0),
       m_size(0),
       m_multiple(false),
@@ -73,14 +73,12 @@ HTMLSelectElement::HTMLSelectElement(Document* doc, HTMLFormElement* f)
       m_activeSelectionEndIndex(-1),
       m_activeSelectionState(false),
       m_repeatingChar(0),
-      m_lastCharTime(0) {
-  document()->registerFormElementWithState(this);
-}
+      m_lastCharTime(0) {}
 
 HTMLSelectElement::HTMLSelectElement(const QualifiedName& tagName,
                                      Document* doc,
                                      HTMLFormElement* f)
-    : HTMLGenericFormElement(tagName, doc, f),
+    : HTMLFormControlElementWithState(tagName, doc, f),
       m_minwidth(0),
       m_size(0),
       m_multiple(false),
@@ -90,13 +88,7 @@ HTMLSelectElement::HTMLSelectElement(const QualifiedName& tagName,
       m_activeSelectionEndIndex(-1),
       m_activeSelectionState(false),
       m_repeatingChar(0),
-      m_lastCharTime(0) {
-  document()->registerFormElementWithState(this);
-}
-
-HTMLSelectElement::~HTMLSelectElement() {
-  document()->unregisterFormElementWithState(this);
-}
+      m_lastCharTime(0) {}
 
 bool HTMLSelectElement::checkDTD(const Node* newChild) {
   // Make sure to keep <optgroup> in sync with this.
@@ -113,7 +105,7 @@ void HTMLSelectElement::recalcStyle(StyleChange ch) {
       static_cast<RenderListBox*>(renderer())->setOptionsChanged(true);
   }
 
-  HTMLGenericFormElement::recalcStyle(ch);
+  HTMLFormControlElementWithState::recalcStyle(ch);
 }
 
 const AtomicString& HTMLSelectElement::type() const {
@@ -271,7 +263,7 @@ void HTMLSelectElement::setValue(const String& value) {
     }
 }
 
-String HTMLSelectElement::stateValue() const {
+bool HTMLSelectElement::saveState(String& value) const {
   const Vector<HTMLElement*>& items = listItems();
   int l = items.size();
   Vector<char, 1024> characters(l);
@@ -281,7 +273,8 @@ String HTMLSelectElement::stateValue() const {
                     static_cast<HTMLOptionElement*>(e)->selected();
     characters[i] = selected ? 'X' : '.';
   }
-  return String(characters, l);
+  value = String(characters, l);
+  return true;
 }
 
 void HTMLSelectElement::restoreState(const String& state) {
@@ -300,7 +293,8 @@ void HTMLSelectElement::restoreState(const String& state) {
 bool HTMLSelectElement::insertBefore(PassRefPtr<Node> newChild,
                                      Node* refChild,
                                      ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::insertBefore(newChild, refChild, ec);
+  bool result =
+      HTMLFormControlElementWithState::insertBefore(newChild, refChild, ec);
   if (result)
     setRecalcListItems();
   return result;
@@ -309,14 +303,15 @@ bool HTMLSelectElement::insertBefore(PassRefPtr<Node> newChild,
 bool HTMLSelectElement::replaceChild(PassRefPtr<Node> newChild,
                                      Node* oldChild,
                                      ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::replaceChild(newChild, oldChild, ec);
+  bool result =
+      HTMLFormControlElementWithState::replaceChild(newChild, oldChild, ec);
   if (result)
     setRecalcListItems();
   return result;
 }
 
 bool HTMLSelectElement::removeChild(Node* oldChild, ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::removeChild(oldChild, ec);
+  bool result = HTMLFormControlElementWithState::removeChild(oldChild, ec);
   if (result)
     setRecalcListItems();
   return result;
@@ -324,14 +319,14 @@ bool HTMLSelectElement::removeChild(Node* oldChild, ExceptionCode& ec) {
 
 bool HTMLSelectElement::appendChild(PassRefPtr<Node> newChild,
                                     ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::appendChild(newChild, ec);
+  bool result = HTMLFormControlElementWithState::appendChild(newChild, ec);
   if (result)
     setRecalcListItems();
   return result;
 }
 
 ContainerNode* HTMLSelectElement::addChild(PassRefPtr<Node> newChild) {
-  ContainerNode* result = HTMLGenericFormElement::addChild(newChild);
+  ContainerNode* result = HTMLFormControlElementWithState::addChild(newChild);
   if (result)
     setRecalcListItems();
   return result;
@@ -376,19 +371,19 @@ void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == onchangeAttr) {
     setHTMLEventListener(changeEvent, attr);
   } else
-    HTMLGenericFormElement::parseMappedAttribute(attr);
+    HTMLFormControlElementWithState::parseMappedAttribute(attr);
 }
 
 bool HTMLSelectElement::isKeyboardFocusable(KeyboardEvent* event) const {
   if (renderer())
     return isFocusable();
-  return HTMLGenericFormElement::isKeyboardFocusable(event);
+  return HTMLFormControlElementWithState::isKeyboardFocusable(event);
 }
 
 bool HTMLSelectElement::isMouseFocusable() const {
   if (renderer())
     return isFocusable();
-  return HTMLGenericFormElement::isMouseFocusable();
+  return HTMLFormControlElementWithState::isMouseFocusable();
 }
 
 bool HTMLSelectElement::canSelectAll() const {
@@ -527,7 +522,7 @@ void HTMLSelectElement::recalcListItems() const {
 void HTMLSelectElement::childrenChanged() {
   setRecalcListItems();
 
-  HTMLGenericFormElement::childrenChanged();
+  HTMLFormControlElementWithState::childrenChanged();
 }
 
 void HTMLSelectElement::setRecalcListItems() {
@@ -571,7 +566,7 @@ void HTMLSelectElement::dispatchFocusEvent() {
     // Save the selection so it can be compared to the new selection when we
     // call onChange during dispatchBlurEvent.
     saveLastSelection();
-  HTMLGenericFormElement::dispatchFocusEvent();
+  HTMLFormControlElementWithState::dispatchFocusEvent();
 }
 
 void HTMLSelectElement::dispatchBlurEvent() {
@@ -580,7 +575,7 @@ void HTMLSelectElement::dispatchBlurEvent() {
   // This matches other browsers' behavior.
   if (usesMenuList())
     menuListOnChange();
-  HTMLGenericFormElement::dispatchBlurEvent();
+  HTMLFormControlElementWithState::dispatchBlurEvent();
 }
 
 void HTMLSelectElement::defaultEventHandler(Event* evt) {
@@ -604,7 +599,7 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
     }
   }
 
-  HTMLGenericFormElement::defaultEventHandler(evt);
+  HTMLFormControlElementWithState::defaultEventHandler(evt);
 }
 
 void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
@@ -1060,7 +1055,7 @@ void HTMLSelectElement::setLength(unsigned newLen, ExceptionCode& ec) {
 
   if (diff < 0) {  // add dummy elements
     do {
-      RefPtr<Element> option = ownerDocument()->createElement("option", ec);
+      RefPtr<Element> option = document()->createElement("option", ec);
       if (!option)
         break;
       add(static_cast<HTMLElement*>(option.get()), 0, ec);

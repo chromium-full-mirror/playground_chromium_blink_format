@@ -97,14 +97,14 @@ static int numCharactersInGraphemeClusters(const StringImpl* s,
 }
 
 HTMLInputElement::HTMLInputElement(Document* doc, HTMLFormElement* f)
-    : HTMLGenericFormElement(inputTag, doc, f) {
+    : HTMLFormControlElementWithState(inputTag, doc, f) {
   init();
 }
 
 HTMLInputElement::HTMLInputElement(const QualifiedName& tagName,
                                    Document* doc,
                                    HTMLFormElement* f)
-    : HTMLGenericFormElement(tagName, doc, f) {
+    : HTMLFormControlElementWithState(tagName, doc, f) {
   init();
 }
 
@@ -134,13 +134,11 @@ void HTMLInputElement::init() {
 
   if (form())
     m_autocomplete = form()->autoComplete();
-
-  document()->registerFormElementWithState(this);
 }
 
 HTMLInputElement::~HTMLInputElement() {
-  ownerDocument()->unregisterFormElementWithState(this);
-  ownerDocument()->unregisterForDidRestoreFromCacheCallback(this);
+  if (inputType() == PASSWORD)
+    document()->unregisterForDidRestoreFromCacheCallback(this);
   delete m_imageLoader;
 }
 
@@ -152,10 +150,10 @@ bool HTMLInputElement::isKeyboardFocusable(KeyboardEvent* event) const {
   // If text fields can be focused, then they should always be keyboard
   // focusable
   if (isTextField())
-    return HTMLGenericFormElement::isFocusable();
+    return HTMLFormControlElementWithState::isFocusable();
 
   // If the base class says we can't be focused, then we can stop now.
-  if (!HTMLGenericFormElement::isKeyboardFocusable(event))
+  if (!HTMLFormControlElementWithState::isKeyboardFocusable(event))
     return false;
 
   if (inputType() == RADIO) {
@@ -185,8 +183,8 @@ bool HTMLInputElement::isKeyboardFocusable(KeyboardEvent* event) const {
 
 bool HTMLInputElement::isMouseFocusable() const {
   if (isTextField())
-    return HTMLGenericFormElement::isFocusable();
-  return HTMLGenericFormElement::isMouseFocusable();
+    return HTMLFormControlElementWithState::isFocusable();
+  return HTMLFormControlElementWithState::isMouseFocusable();
 }
 
 void HTMLInputElement::focus(bool restorePreviousSelection) {
@@ -207,7 +205,7 @@ void HTMLInputElement::focus(bool restorePreviousSelection) {
     updateFocusAppearance(restorePreviousSelection);
     return;
   }
-  HTMLGenericFormElement::focus(restorePreviousSelection);
+  HTMLFormControlElementWithState::focus(restorePreviousSelection);
 }
 
 void HTMLInputElement::updateFocusAppearance(bool restorePreviousSelection) {
@@ -221,7 +219,7 @@ void HTMLInputElement::updateFocusAppearance(bool restorePreviousSelection) {
     if (document() && document()->frame())
       document()->frame()->revealSelection();
   } else
-    HTMLGenericFormElement::updateFocusAppearance();
+    HTMLFormControlElementWithState::updateFocusAppearance();
 }
 
 void HTMLInputElement::aboutToUnload() {
@@ -235,7 +233,7 @@ void HTMLInputElement::dispatchFocusEvent() {
     if (inputType() == PASSWORD && document()->frame())
       document()->setUseSecureKeyboardEntryWhenActive(true);
   }
-  HTMLGenericFormElement::dispatchFocusEvent();
+  HTMLFormControlElementWithState::dispatchFocusEvent();
 }
 
 void HTMLInputElement::dispatchBlurEvent() {
@@ -244,7 +242,7 @@ void HTMLInputElement::dispatchBlurEvent() {
       document()->setUseSecureKeyboardEntryWhenActive(false);
     document()->frame()->textFieldDidEndEditing(this);
   }
-  HTMLGenericFormElement::dispatchBlurEvent();
+  HTMLFormControlElementWithState::dispatchBlurEvent();
 }
 
 void HTMLInputElement::setType(const String& t) {
@@ -321,13 +319,10 @@ void HTMLInputElement::setInputType(const String& t) {
       else
         recheckValue();
 
-      if (wasPasswordField && !isPasswordField) {
-        ownerDocument()->registerFormElementWithState(this);
-        ownerDocument()->unregisterForDidRestoreFromCacheCallback(this);
-      } else if (!wasPasswordField && isPasswordField) {
-        ownerDocument()->unregisterFormElementWithState(this);
-        ownerDocument()->registerForDidRestoreFromCacheCallback(this);
-      }
+      if (wasPasswordField && !isPasswordField)
+        document()->unregisterForDidRestoreFromCacheCallback(this);
+      else if (!wasPasswordField && isPasswordField)
+        document()->registerForDidRestoreFromCacheCallback(this);
 
       if (didRespectHeightAndWidth != willRespectHeightAndWidth) {
         NamedMappedAttrMap* map = mappedAttributes();
@@ -414,8 +409,7 @@ const AtomicString& HTMLInputElement::type() const {
   return emptyAtom;
 }
 
-String HTMLInputElement::stateValue() const {
-  ASSERT(inputType() != PASSWORD);  // should never save/restore password fields
+bool HTMLInputElement::saveState(String& result) const {
   switch (inputType()) {
     case BUTTON:
     case FILE:
@@ -427,14 +421,17 @@ String HTMLInputElement::stateValue() const {
     case SEARCH:
     case SUBMIT:
     case TEXT:
-      return value();
+      result = value();
+      return true;
     case CHECKBOX:
     case RADIO:
-      return checked() ? "on" : "off";
+      result = checked() ? "on" : "off";
+      return true;
     case PASSWORD:
-      break;
+      return false;
   }
-  return String();
+  ASSERT_NOT_REACHED();
+  return false;
 }
 
 void HTMLInputElement::restoreState(const String& state) {
@@ -666,7 +663,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
              attr->name() == maxAttr || attr->name() == precisionAttr) {
     setChanged();
   } else
-    HTMLGenericFormElement::parseMappedAttribute(attr);
+    HTMLFormControlElementWithState::parseMappedAttribute(attr);
 }
 
 bool HTMLInputElement::rendererIsNeeded(RenderStyle* style) {
@@ -683,7 +680,7 @@ bool HTMLInputElement::rendererIsNeeded(RenderStyle* style) {
     case SEARCH:
     case SUBMIT:
     case TEXT:
-      return HTMLGenericFormElement::rendererIsNeeded(style);
+      return HTMLFormControlElementWithState::rendererIsNeeded(style);
     case HIDDEN:
       return false;
   }
@@ -726,7 +723,7 @@ void HTMLInputElement::attach() {
     m_inited = true;
   }
 
-  HTMLGenericFormElement::attach();
+  HTMLFormControlElementWithState::attach();
 
   if (inputType() == IMAGE) {
     if (!m_imageLoader)
@@ -745,7 +742,7 @@ void HTMLInputElement::attach() {
 }
 
 void HTMLInputElement::detach() {
-  HTMLGenericFormElement::detach();
+  HTMLFormControlElementWithState::detach();
   setValueMatchesRenderer(false);
 }
 
@@ -895,7 +892,7 @@ void HTMLInputElement::copyNonAttributeProperties(const Element* source) {
   m_checked = sourceElem->m_checked;
   m_indeterminate = sourceElem->m_indeterminate;
 
-  HTMLGenericFormElement::copyNonAttributeProperties(source);
+  HTMLFormControlElementWithState::copyNonAttributeProperties(source);
 }
 
 String HTMLInputElement::value() const {
@@ -1133,7 +1130,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
   // Let the key handling done in EventTargetNode take precedence over the event
   // handling here for editable text fields
   if (!clickDefaultFormButton) {
-    HTMLGenericFormElement::defaultEventHandler(evt);
+    HTMLFormControlElementWithState::defaultEventHandler(evt);
     if (evt->defaultHandled())
       return;
   }
@@ -1468,20 +1465,16 @@ void HTMLInputElement::didRestoreFromCache() {
 
 void HTMLInputElement::willMoveToNewOwnerDocument() {
   if (inputType() == PASSWORD)
-    ownerDocument()->unregisterForDidRestoreFromCacheCallback(this);
-  else
-    ownerDocument()->unregisterFormElementWithState(this);
+    document()->unregisterForDidRestoreFromCacheCallback(this);
 
-  HTMLGenericFormElement::willMoveToNewOwnerDocument();
+  HTMLFormControlElementWithState::willMoveToNewOwnerDocument();
 }
 
 void HTMLInputElement::didMoveToNewOwnerDocument() {
   if (inputType() == PASSWORD)
     document()->registerForDidRestoreFromCacheCallback(this);
-  else
-    document()->registerFormElementWithState(this);
 
-  HTMLGenericFormElement::didMoveToNewOwnerDocument();
+  HTMLFormControlElementWithState::didMoveToNewOwnerDocument();
 }
 
 }  // namespace

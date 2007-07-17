@@ -36,7 +36,7 @@ class HTMLGenericFormElement : public HTMLElement {
  public:
   HTMLGenericFormElement(const QualifiedName& tagName,
                          Document*,
-                         HTMLFormElement* = 0);
+                         HTMLFormElement*);
   virtual ~HTMLGenericFormElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -53,7 +53,6 @@ class HTMLGenericFormElement : public HTMLElement {
   virtual void attach();
   virtual void insertedIntoTree(bool deep);
   virtual void removedFromTree(bool deep);
-  virtual void closeRenderer();
 
   virtual void reset() {}
 
@@ -90,9 +89,6 @@ class HTMLGenericFormElement : public HTMLElement {
    */
   virtual bool appendFormData(FormDataList&, bool) { return false; }
 
-  virtual String stateValue() const;
-  virtual void restoreState(const String& value);
-
   virtual bool isSuccessfulSubmitButton() const { return false; }
   virtual bool isActivatedSubmit() const { return false; }
   virtual void setActivatedSubmit(bool flag) {}
@@ -108,6 +104,25 @@ class HTMLGenericFormElement : public HTMLElement {
   bool m_disabled;
   bool m_readOnly;
   mutable bool m_valueMatchesRenderer;
+};
+
+class HTMLFormControlElementWithState : public HTMLGenericFormElement {
+ public:
+  HTMLFormControlElementWithState(const QualifiedName& tagName,
+                                  Document*,
+                                  HTMLFormElement*);
+  virtual ~HTMLFormControlElementWithState();
+
+  virtual void closeRenderer();
+
+  virtual bool saveState(String& value) const = 0;
+
+ protected:
+  virtual void willMoveToNewOwnerDocument();
+  virtual void didMoveToNewOwnerDocument();
+
+ private:
+  virtual void restoreState(const String& value) = 0;
 };
 
 }  // namespace

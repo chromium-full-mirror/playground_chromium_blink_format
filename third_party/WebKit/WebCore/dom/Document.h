@@ -3,7 +3,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
  *           (C) 2006 Alexey Proskuryakov (ap@webkit.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -61,8 +61,8 @@ class Frame;
 class FrameView;
 class HTMLDocument;
 class HTMLElement;
+class HTMLFormControlElementWithState;
 class HTMLFormElement;
-class HTMLGenericFormElement;
 class HTMLHeadElement;
 class HTMLImageLoader;
 class HTMLInputElement;
@@ -321,14 +321,11 @@ class Document : public ContainerNode {
 
   // Machinery for saving and restoring state when you leave and then go back to
   // a page.
-  void registerFormElementWithState(HTMLGenericFormElement* e) {
+  void registerFormElementWithState(HTMLFormControlElementWithState* e) {
     m_formElementsWithState.add(e);
   }
-  void unregisterFormElementWithState(HTMLGenericFormElement* e) {
+  void unregisterFormElementWithState(HTMLFormControlElementWithState* e) {
     m_formElementsWithState.remove(e);
-  }
-  bool isFormElementRegistered(HTMLGenericFormElement* e) {
-    return m_formElementsWithState.contains(e);
   }
   Vector<String> formElementsState() const;
   void setStateForNewFormElements(const Vector<String>&);
@@ -826,7 +823,7 @@ class Document : public ContainerNode {
                   FormElementKeyHash,
                   FormElementKeyHashTraits>
       FormElementStateMap;
-  ListHashSet<HTMLGenericFormElement*> m_formElementsWithState;
+  ListHashSet<HTMLFormControlElementWithState*> m_formElementsWithState;
   FormElementStateMap m_stateForNewFormElements;
 
   HashSet<Element*> m_didRestorePageCallbackSet;
