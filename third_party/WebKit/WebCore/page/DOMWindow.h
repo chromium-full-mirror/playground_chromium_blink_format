@@ -114,6 +114,15 @@ class DOMWindow : public Shared<DOMWindow> {
   String defaultstatus() const { return defaultStatus(); }
   void setDefaultstatus(const String& string) { setDefaultStatus(string); }
 
+  // Self referential attributes
+  DOMWindow* self() const;
+  DOMWindow* window() const { return self(); }
+  DOMWindow* frames() const { return self(); }
+
+  DOMWindow* opener() const;
+  DOMWindow* parent() const;
+  DOMWindow* top() const;
+
   // DOM Level 2 AbstractView Interface
   Document* document() const;
 

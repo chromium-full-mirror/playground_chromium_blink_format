@@ -188,16 +188,10 @@ class Window : public DOMObject {
 
     // Attributes
     Crypto,
-    Frames,
     Event_,
     Location_,
     Navigator_,
     ClientInformation,
-    Opener,
-    Parent,
-    Self,
-    Window_,
-    Top,
 
     // Event Listeners
     Onabort,
