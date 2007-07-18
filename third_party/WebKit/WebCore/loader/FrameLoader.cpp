@@ -3094,8 +3094,7 @@ void FrameLoader::detachFromParent() {
   detachChildren();
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->frameDetachedFromParent(m_frame);
+    page->inspectorController()->frameDetachedFromParent(m_frame);
 
   m_client->detachedFromParent2();
   setDocumentLoader(0);
@@ -4675,8 +4674,7 @@ void FrameLoader::dispatchDidCommitLoad() {
   m_client->dispatchDidCommitLoad();
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->didCommitLoad(m_documentLoader.get());
+    page->inspectorController()->didCommitLoad(m_documentLoader.get());
 }
 
 void FrameLoader::dispatchAssignIdentifierToInitialRequest(
@@ -4686,8 +4684,8 @@ void FrameLoader::dispatchAssignIdentifierToInitialRequest(
   m_client->assignIdentifierToInitialRequest(identifier, loader, request);
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->identifierForInitialRequest(identifier, loader, request);
+    page->inspectorController()->identifierForInitialRequest(identifier, loader,
+                                                             request);
 }
 
 void FrameLoader::dispatchWillSendRequest(
@@ -4699,8 +4697,8 @@ void FrameLoader::dispatchWillSendRequest(
                                     redirectResponse);
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->willSendRequest(loader, identifier, request, redirectResponse);
+    page->inspectorController()->willSendRequest(loader, identifier, request,
+                                                 redirectResponse);
 }
 
 void FrameLoader::dispatchDidReceiveResponse(DocumentLoader* loader,
@@ -4709,8 +4707,7 @@ void FrameLoader::dispatchDidReceiveResponse(DocumentLoader* loader,
   m_client->dispatchDidReceiveResponse(loader, identifier, r);
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->didReceiveResponse(loader, identifier, r);
+    page->inspectorController()->didReceiveResponse(loader, identifier, r);
 }
 
 void FrameLoader::dispatchDidReceiveContentLength(DocumentLoader* loader,
@@ -4719,8 +4716,8 @@ void FrameLoader::dispatchDidReceiveContentLength(DocumentLoader* loader,
   m_client->dispatchDidReceiveContentLength(loader, identifier, length);
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->didReceiveContentLength(loader, identifier, length);
+    page->inspectorController()->didReceiveContentLength(loader, identifier,
+                                                         length);
 }
 
 void FrameLoader::dispatchDidFinishLoading(DocumentLoader* loader,
@@ -4728,8 +4725,7 @@ void FrameLoader::dispatchDidFinishLoading(DocumentLoader* loader,
   m_client->dispatchDidFinishLoading(loader, identifier);
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->didFinishLoading(loader, identifier);
+    page->inspectorController()->didFinishLoading(loader, identifier);
 }
 
 bool FrameLoader::dispatchDidLoadResourceFromMemoryCache(
@@ -4741,9 +4737,8 @@ bool FrameLoader::dispatchDidLoadResourceFromMemoryCache(
       loader, request, response, length);
 
   if (Page* page = m_frame->page())
-    if (InspectorController* inspector = page->inspectorController())
-      inspector->didLoadResourceFromMemoryCache(loader, request, response,
-                                                length);
+    page->inspectorController()->didLoadResourceFromMemoryCache(
+        loader, request, response, length);
 
   return result;
 }
