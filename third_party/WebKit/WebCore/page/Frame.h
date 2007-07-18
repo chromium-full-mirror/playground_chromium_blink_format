@@ -245,6 +245,9 @@ class Frame : public Shared<Frame> {
 
   void dashboardRegionsChanged();
 
+  void clearScriptProxy();
+  void clearDOMWindow();
+
   void cleanupScriptObjects();
   void cleanupScriptObjectsForPlugin(void*);
 

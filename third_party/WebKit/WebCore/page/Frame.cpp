@@ -1167,6 +1167,16 @@ NPObject* Frame::windowScriptNPObject() {
   return d->m_windowScriptNPObject;
 }
 
+void Frame::clearScriptProxy() {
+  if (d->m_jscript)
+    d->m_jscript->clear();
+}
+
+void Frame::clearDOMWindow() {
+  if (d->m_domWindow)
+    d->m_domWindow->clear();
+}
+
 void Frame::cleanupScriptObjectsForPlugin(void* nativeHandle) {
   RootObjectMap::iterator it = d->m_rootObjects.find(nativeHandle);
 
