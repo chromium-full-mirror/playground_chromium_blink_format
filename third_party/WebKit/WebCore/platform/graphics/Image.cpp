@@ -30,7 +30,7 @@
 #include "AffineTransform.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
-#include "MimeTypeRegistry.h"
+#include "MIMETypeRegistry.h"
 
 #include <math.h>
 
@@ -45,7 +45,7 @@ Image::Image(ImageObserver* observer) : m_imageObserver(observer) {}
 Image::~Image() {}
 
 bool Image::supportsType(const String& type) {
-  return MimeTypeRegistry::isSupportedImageResourceMIMEType(type);
+  return MIMETypeRegistry::isSupportedImageResourceMIMEType(type);
 }
 
 bool Image::isNull() const {

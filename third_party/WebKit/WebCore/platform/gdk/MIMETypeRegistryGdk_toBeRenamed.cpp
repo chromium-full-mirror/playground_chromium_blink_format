@@ -26,7 +26,7 @@
  */
 
 #include "config.h"
-#include "MimeTypeRegistry.h"
+#include "MIMETypeRegistry.h"
 
 namespace WebCore {
 
@@ -54,7 +54,7 @@ static const ExtensionMap extensionMap[] = {{"bmp", "image/bmp"},
                                             {"xhtml", "application/xhtml+xml"},
                                             {0, 0}};
 
-String MimeTypeRegistry::getMIMETypeForExtension(const String& ext) {
+String MIMETypeRegistry::getMIMETypeForExtension(const String& ext) {
   String s = ext.lower();
   const ExtensionMap* e = extensionMap;
   while (e->extension) {
