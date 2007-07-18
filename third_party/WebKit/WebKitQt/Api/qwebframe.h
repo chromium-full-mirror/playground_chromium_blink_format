@@ -63,7 +63,10 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
   QList<QWebFrame*> childFrames() const;
 
-  void suppressScrollbars(bool suppress);
+  Qt::ScrollBarPolicy verticalScrollBarPolicy() const;
+  void setVerticalScrollBarPolicy(Qt::ScrollBarPolicy);
+  Qt::ScrollBarPolicy horizontalScrollBarPolicy() const;
+  void setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy);
 
   void render(QPainter* painter, const QRect& source);
 

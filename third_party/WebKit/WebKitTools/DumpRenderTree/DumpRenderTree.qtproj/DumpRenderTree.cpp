@@ -70,7 +70,8 @@ DumpRenderTree::DumpRenderTree() : m_stdin(0), m_notifier(), m_loading(false) {
   page = new WebPage(0);
   page->resize(maxViewWidth, maxViewHeight);
   frame = page->mainFrame();
-  frame->suppressScrollbars(true);
+  frame->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  frame->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   m_controller = new LayoutTestController();
   QObject::connect(m_controller, SIGNAL(done()), this, SLOT(dump()),
