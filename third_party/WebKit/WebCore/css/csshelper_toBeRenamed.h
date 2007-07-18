@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef csshelper_h
-#define csshelper_h
+#ifndef CSSHelper_h
+#define CSSHelper_h
 
 namespace WebCore {
 
@@ -39,6 +39,7 @@ String parseURL(const String& url);
 // "absolute" CSS length units like inch and pt is always fixed and never
 // changes.
 const float cssPixelsPerInch = 96.0f;
+
 }  // namespace WebCore
 
-#endif  // csshelper_h
+#endif  // CSSHelper_h

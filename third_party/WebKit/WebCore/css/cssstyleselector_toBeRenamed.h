@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef cssstyleselector_h
-#define cssstyleselector_h
+#ifndef CSSStyleSelector_h
+#define CSSStyleSelector_h
 
 #include "DeprecatedString.h"
 #include "RenderStyle.h"
@@ -302,6 +302,7 @@ class CSSRuleDataList {
   CSSRuleData* m_first;
   CSSRuleData* m_last;
 };
-}
 
-#endif
+}  // WebCore
+
+#endif  // CSSStyleSelector_h
