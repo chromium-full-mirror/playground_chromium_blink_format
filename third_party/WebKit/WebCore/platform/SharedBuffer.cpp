@@ -61,6 +61,7 @@ void SharedBuffer::clear() {
 }
 
 #if !PLATFORM(MAC)
+
 inline void SharedBuffer::clearPlatformData() {}
 
 inline void SharedBuffer::maybeTransferPlatformData() {}
@@ -80,6 +81,10 @@ inline unsigned SharedBuffer::platformDataSize() const {
 
   return 0;
 }
+
+#endif
+
+#if !PLATFORM(MAC) && !PLATFORM(WIN)
 
 PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(
     const String& filePath) {
