@@ -32,6 +32,7 @@
 #import <wtf/HashMap.h>
 #import <wtf/RetainPtr.h>
 
+@class WebDownload;
 @class WebFrame;
 @class WebFramePolicyListener;
 @class WebHistoryItem;
@@ -264,6 +265,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   bool canUseArchivedResource(NSURLRequest*) const;
   bool canUseArchivedResource(NSURLResponse*) const;
   void deliverArchivedResources(WebCore::Timer<WebFrameLoaderClient>*);
+
+  void setOriginalURLForDownload(WebDownload*,
+                                 const WebCore::ResourceRequest&) const;
 
   RetainPtr<WebFramePolicyListener> setUpPolicyListener(
       WebCore::FramePolicyFunction);
