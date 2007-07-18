@@ -39,7 +39,7 @@
 #include "ResourceHandle.h"
 #include "ResourceHandleClient.h"
 #include "ResourceHandleInternal.h"
-#include "MimeTypeRegistry.h"
+#include "MIMETypeRegistry.h"
 #include "CookieJar.h"
 
 #define notImplemented() \
@@ -431,7 +431,7 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
     int index = extension.lastIndexOf(QLatin1Char('.'));
     if (index > 0) {
       extension = extension.mid(index + 1);
-      contentType = MimeTypeRegistry::getMIMETypeForExtension(extension);
+      contentType = MIMETypeRegistry::getMIMETypeForExtension(extension);
     }
   }
   //     qDebug() << "Content-Type=" << contentType;

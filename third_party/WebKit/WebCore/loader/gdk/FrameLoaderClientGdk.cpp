@@ -34,7 +34,7 @@
 #include "DocumentLoader.h"
 #include "FrameGdk.h"
 #include "FrameLoader.h"
-#include "MimeTypeRegistry.h"
+#include "MIMETypeRegistry.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
 #include "ResourceRequest.h"
@@ -211,7 +211,7 @@ ObjectContentType FrameLoaderClientGdk::objectContentType(
     return ObjectContentType();
 
   // TODO: use more than just the extension to determine the content type?
-  String rtype = MimeTypeRegistry::getMIMETypeForPath(url.path());
+  String rtype = MIMETypeRegistry::getMIMETypeForPath(url.path());
   if (!rtype.isEmpty())
     return ObjectContentFrame;
   return ObjectContentType();
