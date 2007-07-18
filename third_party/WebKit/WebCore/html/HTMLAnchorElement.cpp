@@ -184,10 +184,6 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
 
     String url = parseURL(getAttribute(hrefAttr));
 
-    String target = getAttribute(targetAttr);
-    if (e && e->button() == MiddleButton)
-      target = "_blank";
-
     ASSERT(evt->target());
     ASSERT(evt->target()->toNode());
     if (evt->target()->toNode()->hasTagName(imgTag)) {
@@ -214,7 +210,8 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
 
     if (!evt->defaultPrevented() && document()->frame())
       document()->frame()->loader()->urlSelected(document()->completeURL(url),
-                                                 target, evt, false, true);
+                                                 getAttribute(targetAttr), evt,
+                                                 false, true);
 
     evt->setDefaultHandled();
   } else if (m_isLink && isContentEditable()) {
