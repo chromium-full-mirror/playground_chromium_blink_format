@@ -181,7 +181,8 @@ void ResourceRequestBase::addHTTPHeaderFields(
     addHTTPHeaderField(it->first, it->second);
 }
 
-bool operator==(const ResourceRequestBase& a, const ResourceRequestBase& b) {
+bool equalIgnoringHeaderFields(const ResourceRequestBase& a,
+                               const ResourceRequestBase& b) {
   if (a.url() != b.url())
     return false;
 
@@ -200,9 +201,6 @@ bool operator==(const ResourceRequestBase& a, const ResourceRequestBase& b) {
   if (a.allowHTTPCookies() != b.allowHTTPCookies())
     return false;
 
-  if (a.httpHeaderFields() != b.httpHeaderFields())
-    return false;
-
   FormData* formDataA = a.httpBody();
   FormData* formDataB = b.httpBody();
 
@@ -212,6 +210,16 @@ bool operator==(const ResourceRequestBase& a, const ResourceRequestBase& b) {
     return !formDataA;
 
   if (*formDataA != *formDataB)
+    return false;
+
+  return true;
+}
+
+bool operator==(const ResourceRequestBase& a, const ResourceRequestBase& b) {
+  if (!equalIgnoringHeaderFields(a, b))
+    return false;
+
+  if (a.httpHeaderFields() != b.httpHeaderFields())
     return false;
 
   return true;
