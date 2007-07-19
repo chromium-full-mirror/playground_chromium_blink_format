@@ -372,7 +372,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
 
   RenderObject* child = prev ? prev : next;
   if (canDeleteAnonymousBlocks && child && !child->previousSibling() &&
-      !child->nextSibling()) {
+      !child->nextSibling() && !isFlexibleBox()) {
     // The removal has knocked us down to containing only a single anonymous
     // box.  We can go ahead and pull the content right back up into our
     // box.
