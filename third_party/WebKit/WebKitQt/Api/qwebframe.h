@@ -69,6 +69,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy);
 
   void render(QPainter* painter, const QRect& source);
+  void layout();
 
   QPoint pos() const;
   QRect geometry() const;
