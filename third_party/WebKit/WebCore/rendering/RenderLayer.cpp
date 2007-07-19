@@ -1570,8 +1570,8 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     paintingRootForRenderer = paintingRoot;
 
   // We want to paint our layer, but only if we intersect the damage rect.
-  bool shouldPaint = intersectsDamageRect(layerBounds, damageRect) &&
-                     renderer()->style()->visibility() == VISIBLE;
+  bool shouldPaint =
+      intersectsDamageRect(layerBounds, damageRect) && m_hasVisibleContent;
   if (shouldPaint && !selectionOnly && !damageRect.isEmpty()) {
     // Begin transparency layers lazily now that we know we have to paint
     // something.
