@@ -48,6 +48,7 @@ struct WebHTMLViewInterpretKeyEventsParameters;
   BOOL needsToApplyStyles;
   BOOL ignoringMouseDraggedEvents;
   BOOL printing;
+  BOOL avoidingPrintOrphan;
 
   id savedSubviews;
   BOOL subviewsSetAside;
