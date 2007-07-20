@@ -40,6 +40,7 @@ struct TextRunComponent {
   TextRunComponent() : font(0) {}
   TextRunComponent(const UChar* start,
                    int length,
+                   bool rtl,
                    const QFont* font,
                    int offset,
                    bool sc = false);
@@ -51,6 +52,7 @@ struct TextRunComponent {
 
 TextRunComponent::TextRunComponent(const UChar* start,
                                    int length,
+                                   bool rtl,
                                    const QFont* f,
                                    int o,
                                    bool sc)
@@ -59,6 +61,7 @@ TextRunComponent::TextRunComponent(const UChar* start,
       offset(o) {
   if (sc)
     string = string.toUpper();
+  string.prepend(rtl ? QChar(0x202e) : QChar(0x202d));
   width = QFontMetrics(*font).width(string);
 }
 
@@ -174,7 +177,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
         //                 qDebug() << "    treatAsSpace:" << i << start;
         if (i - start > 0) {
           components->append(TextRunComponent(run.characters() + start,
-                                              i - start, f, offset,
+                                              i - start, style.rtl(), f, offset,
                                               f == &font.scFont()));
           offset += components->last().width + letterSpacing;
           //                     qDebug() << "   appending(1) " <<
@@ -203,7 +206,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
       }
       if (i - start > 0) {
         components->append(TextRunComponent(run.characters() + start, i - start,
-                                            f, offset, f == &font.scFont()));
+                                            style.rtl(), f, offset,
+                                            f == &font.scFont()));
         offset += components->last().width + letterSpacing;
         //                 qDebug() << "   appending(2) " <<
         //                 components->last().string <<
@@ -216,8 +220,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
     }
     if (run.length() - start > 0) {
       components->append(TextRunComponent(run.characters() + start,
-                                          run.length() - start, f, offset,
-                                          f == &font.scFont()));
+                                          run.length() - start, style.rtl(), f,
+                                          offset, f == &font.scFont()));
       offset += components->last().width;
       //             qDebug() << "   appending(3) " << components->last().string
       //             << components->last().width;
@@ -228,8 +232,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
     for (int i = 0; i < run.length(); ++i) {
       if (Font::treatAsSpace(run[i])) {
         if (i - start > 0) {
-          components->append(
-              TextRunComponent(run.characters() + start, i - start, f, offset));
+          components->append(TextRunComponent(
+              run.characters() + start, i - start, style.rtl(), f, offset));
           offset += components->last().width;
         }
         int add = 0;
@@ -246,7 +250,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
     }
     if (run.length() - start > 0) {
       components->append(TextRunComponent(run.characters() + start,
-                                          run.length() - start, f, offset));
+                                          run.length() - start, style.rtl(), f,
+                                          offset));
       offset += components->last().width;
     }
   }
@@ -267,12 +272,22 @@ void Font::drawText(GraphicsContext* ctx,
   p->setPen(QColor(color));
 
   Vector<TextRunComponent, 1024> components;
-  generateComponents(&components, *this, run, style);
+  int w = generateComponents(&components, *this, run, style);
 
-  for (int i = 0; i < components.size(); ++i) {
-    p->setFont(*components.at(i).font);
-    QPointF pt(point.x() + components.at(i).offset, point.y());
-    p->drawText(pt, components.at(i).string);
+  if (style.rtl()) {
+    for (int i = 0; i < components.size(); ++i) {
+      p->setFont(*components.at(i).font);
+      QPointF pt(
+          point.x() + w - components.at(i).offset - components.at(i).width,
+          point.y());
+      p->drawText(pt, components.at(i).string);
+    }
+  } else {
+    for (int i = 0; i < components.size(); ++i) {
+      p->setFont(*components.at(i).font);
+      QPointF pt(point.x() + components.at(i).offset, point.y());
+      p->drawText(pt, components.at(i).string);
+    }
   }
 }
 
