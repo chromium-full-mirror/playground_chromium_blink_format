@@ -63,6 +63,7 @@ class PlatformKeyboardEvent {
   bool isAutoRepeat() const { return m_autoRepeat; }
   void setIsAutoRepeat(bool in) { m_autoRepeat = in; }
   int WindowsKeyCode() const { return m_WindowsKeyCode; }
+  void setWindowsKeyCode(int code) { m_WindowsKeyCode = code; }
   bool isKeypad() const { return m_isKeypad; }
   bool shiftKey() const { return m_shiftKey; }
   bool ctrlKey() const { return m_ctrlKey; }
