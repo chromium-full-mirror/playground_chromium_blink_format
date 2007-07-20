@@ -323,12 +323,11 @@ void ScrollView::scrollBy(int dx, int dy) {
 void ScrollView::scrollRectIntoViewRecursively(const IntRect& r) {
   IntPoint p(max(0, r.x()), max(0, r.y()));
   ScrollView* view = this;
-  ScrollView* oldView = view;
   while (view) {
     view->setContentsPos(p.x(), p.y());
     p.move(view->x() - view->scrollOffset().width(),
            view->y() - view->scrollOffset().height());
-    view = static_cast<ScrollView*>(parent());
+    view = static_cast<ScrollView*>(view->parent());
   }
 }
 
