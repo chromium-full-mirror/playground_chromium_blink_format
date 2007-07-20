@@ -1058,6 +1058,10 @@ RenderStyle* RenderTextControl::itemStyle(unsigned listIndex) const {
   return style();
 }
 
+Color RenderTextControl::itemBackgroundColor(unsigned listIndex) const {
+  return style()->backgroundColor();
+}
+
 RenderStyle* RenderTextControl::clientStyle() const {
   return style();
 }

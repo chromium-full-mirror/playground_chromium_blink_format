@@ -94,6 +94,7 @@ class Color {
   Color light() const;
   Color dark() const;
 
+  Color blend(const Color&) const;
   Color blendWithWhite() const;
 
 #if PLATFORM(QT)
