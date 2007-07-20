@@ -94,6 +94,8 @@ class PluginStreamWin : public Shared<PluginStreamWin>,
 
   Vector<char>* m_deliveryData;
 
+  HANDLE m_tempFileHandle;
+
   const NPPluginFuncs* m_pluginFuncs;
   NPP m_instance;
   uint16 m_transferMode;

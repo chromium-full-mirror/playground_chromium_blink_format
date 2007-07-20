@@ -131,6 +131,10 @@ class ResourceLoader : public Shared<ResourceLoader>,
   ResourceHandle* handle() const { return m_handle.get(); }
   bool sendResourceLoadCallbacks() const { return m_sendResourceLoadCallbacks; }
 
+  void setShouldBufferData(bool shouldBufferData) {
+    m_shouldBufferData = shouldBufferData;
+  }
+
  protected:
   ResourceLoader(Frame*, bool sendResourceLoadCallbacks);
 
@@ -153,6 +157,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   bool m_calledDidFinishLoad;
 
   bool m_sendResourceLoadCallbacks;
+  bool m_shouldBufferData;
 
  protected:
   // FIXME: Once everything is made cross platform, these can be private instead
