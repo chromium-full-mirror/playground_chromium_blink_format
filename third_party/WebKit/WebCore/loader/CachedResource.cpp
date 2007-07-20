@@ -25,6 +25,7 @@
 #include "CachedResource.h"
 
 #include "Cache.h"
+#include "DocLoader.h"
 #include "FrameLoader.h"
 #include "Request.h"
 #include <KURL.h>
@@ -37,7 +38,8 @@ CachedResource::CachedResource(const String& URL,
                                bool forCache,
                                bool sendResourceLoadCallbacks)
     : m_sendResourceLoadCallbacks(sendResourceLoadCallbacks),
-      m_inCache(forCache) {
+      m_inCache(forCache),
+      m_docLoader(0) {
   m_url = URL;
   m_type = type;
   m_status = Pending;
@@ -67,6 +69,9 @@ CachedResource::~CachedResource() {
 #ifndef NDEBUG
   m_deleted = true;
 #endif
+
+  if (m_docLoader)
+    m_docLoader->removeCachedResource(this);
 }
 
 void CachedResource::finish() {
