@@ -661,6 +661,7 @@ class WebView : public IWebView,
   bool onIMESetContext(WPARAM, LPARAM);
   void selectionChanged();
   void resetIME(WebCore::Frame*);
+  bool inIMEKeyDown() const { return m_inIMEKeyDown; }
 
   HRESULT registerDragDrop();
   HRESULT revokeDragDrop();
@@ -736,6 +737,7 @@ class WebView : public IWebView,
   bool m_smartInsertDeleteEnabled;
   bool m_didClose;
   unsigned m_inIMEComposition;
+  bool m_inIMEKeyDown;
   HWND m_toolTipHwnd;
   WebCore::String m_toolTip;
 
