@@ -34,6 +34,7 @@
 #include "WebFrame.h"
 
 #include <WebCore/IntRect.h>
+#include <WebCore/Timer.h>
 #include <wtf/OwnPtr.h>
 
 class WebFrame;
@@ -645,6 +646,7 @@ class WebView : public IWebView,
   void deleteBackingStore();
   void frameRect(RECT* rect);
   void closeWindow();
+  void closeWindowSoon();
   void close();
   bool didClose() const { return m_didClose; }
   void setProhibitsMainFrameScrolling(bool = true);
@@ -688,10 +690,12 @@ class WebView : public IWebView,
   bool continuousCheckingAllowed();
   void initializeCacheSizesIfNecessary();
   void initializeToolTipWindow();
+  void closeWindowTimerFired(WebCore::Timer<WebView>*);
   void prepareCandidateWindow(WebCore::Frame*, HIMC);
   void updateSelectionForIME();
   bool onIMERequestCharPosition(WebCore::Frame*, IMECHARPOSITION*, LRESULT*);
   bool onIMERequestReconvertString(WebCore::Frame*, RECONVERTSTRING*, LRESULT*);
+
   ULONG m_refCount;
   WebCore::String m_groupName;
   HWND m_hostWindow;
@@ -736,6 +740,8 @@ class WebView : public IWebView,
   WebCore::String m_toolTip;
 
   static bool s_allowSiteSpecificHacks;
+
+  WebCore::Timer<WebView> m_closeWindowTimer;
 };
 
 #endif

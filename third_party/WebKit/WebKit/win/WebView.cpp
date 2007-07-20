@@ -141,7 +141,8 @@ WebView::WebView()
       m_smartInsertDeleteEnabled(false),
       m_didClose(false),
       m_inIMEComposition(0),
-      m_toolTipHwnd(0) {
+      m_toolTipHwnd(0),
+      m_closeWindowTimer(this, &WebView::closeWindowTimerFired) {
   KJS::Collector::registerAsMainThread();
 
   m_backingStoreSize.cx = m_backingStoreSize.cy = 0;
@@ -561,6 +562,16 @@ void WebView::paintIntoWindow(HDC bitmapDC, HDC windowDC, LPRECT dirtyRect) {
 
 void WebView::frameRect(RECT* rect) {
   ::GetWindowRect(m_viewWindow, rect);
+}
+
+void WebView::closeWindowSoon() {
+  m_closeWindowTimer.startOneShot(0);
+  AddRef();
+}
+
+void WebView::closeWindowTimerFired(WebCore::Timer<WebView>*) {
+  closeWindow();
+  Release();
 }
 
 void WebView::closeWindow() {
