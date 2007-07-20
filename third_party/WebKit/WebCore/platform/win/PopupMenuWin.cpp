@@ -21,6 +21,7 @@
 #include "config.h"
 #include "PopupMenu.h"
 
+#include "BidiReorderCharacters.h"
 #include "Document.h"
 #include "FloatRect.h"
 #include "FontData.h"
@@ -494,7 +495,7 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
     unsigned length = itemText.length();
     const UChar* string = itemText.characters();
     TextStyle textStyle(0, 0, 0, false, true);
-    RenderBlock::CharacterBuffer characterBuffer;
+    CharacterBuffer characterBuffer;
 
     if (clientStyle->direction() == RTL &&
         clientStyle->unicodeBidi() == Override)
@@ -505,8 +506,9 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
       // If necessary, reorder characters by running the string through the bidi
       // algorithm
       characterBuffer.append(string, length);
-      RenderBlock::bidiReorderCharacters(client()->clientDocument(),
-                                         clientStyle, characterBuffer);
+      bidiReorderCharacters(characterBuffer, clientStyle->direction() == RTL,
+                            clientStyle->unicodeBidi() == Override,
+                            clientStyle->visuallyOrdered());
       string = characterBuffer.data();
     }
     TextRun textRun(string, length);

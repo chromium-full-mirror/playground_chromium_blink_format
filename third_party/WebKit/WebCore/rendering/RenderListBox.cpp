@@ -31,6 +31,7 @@
 #include "config.h"
 #include "RenderListBox.h"
 
+#include "BidiReorderCharacters.h"
 #include "Document.h"
 #include "EventHandler.h"
 #include "EventNames.h"
@@ -331,7 +332,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
   unsigned length = itemText.length();
   const UChar* string = itemText.characters();
   TextStyle textStyle(0, 0, 0, false, true);
-  RenderBlock::CharacterBuffer characterBuffer;
+  CharacterBuffer characterBuffer;
 
   if (itemStyle->direction() == RTL && itemStyle->unicodeBidi() == Override)
     textStyle.setRTL(true);
@@ -341,7 +342,9 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
     // If necessary, reorder characters by running the string through the bidi
     // algorithm
     characterBuffer.append(string, length);
-    RenderBlock::bidiReorderCharacters(document(), itemStyle, characterBuffer);
+    bidiReorderCharacters(characterBuffer, itemStyle->direction() == RTL,
+                          itemStyle->unicodeBidi() == Override,
+                          itemStyle->visuallyOrdered());
     string = characterBuffer.data();
   }
   TextRun textRun(string, length);

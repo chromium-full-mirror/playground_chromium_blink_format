@@ -24,82 +24,26 @@
 #ifndef bidi_h
 #define bidi_h
 
-#include <wtf/unicode/Unicode.h>
+#include "BidiResolver.h"
 
 namespace WebCore {
 
+class BidiIterator;
 class RenderArena;
 class RenderBlock;
 class RenderObject;
 class InlineBox;
 
-struct BidiStatus {
-  BidiStatus()
-      : eor(WTF::Unicode::OtherNeutral),
-        lastStrong(WTF::Unicode::OtherNeutral),
-        last(WTF::Unicode::OtherNeutral) {}
-
-  WTF::Unicode::Direction eor;
-  WTF::Unicode::Direction lastStrong;
-  WTF::Unicode::Direction last;
-};
-
-class BidiContext {
- public:
-  BidiContext(unsigned char level,
-              WTF::Unicode::Direction embedding,
-              BidiContext* parent = 0,
-              bool override = false);
-  ~BidiContext();
-
-  void ref() const;
-  void deref() const;
-
-  WTF::Unicode::Direction dir() const {
-    return static_cast<WTF::Unicode::Direction>(m_dir);
-  }
-
-  unsigned char level;
-  bool override : 1;
-  unsigned m_dir : 5;  // WTF::Unicode::Direction
-
-  BidiContext* parent;
-
-  // refcounting....
-  mutable int count;
-};
-
-struct BidiRun {
-  BidiRun(int start_,
-          int stop_,
+struct BidiRun : BidiCharacterRun {
+  BidiRun(int start,
+          int stop,
           RenderObject* o,
           BidiContext* context,
           WTF::Unicode::Direction dir)
-      : start(start_),
-        stop(stop_),
+      : BidiCharacterRun(start, stop, context, dir),
         obj(o),
         box(0),
-        override(context->override),
-        nextRun(0) {
-    if (dir == WTF::Unicode::OtherNeutral)
-      dir = context->dir();
-
-    level = context->level;
-
-    // add level of run (cases I1 & I2)
-    if (level % 2) {
-      if (dir == WTF::Unicode::LeftToRight ||
-          dir == WTF::Unicode::ArabicNumber ||
-          dir == WTF::Unicode::EuropeanNumber)
-        level++;
-    } else {
-      if (dir == WTF::Unicode::RightToLeft)
-        level++;
-      else if (dir == WTF::Unicode::ArabicNumber ||
-               dir == WTF::Unicode::EuropeanNumber)
-        level += 2;
-    }
-  }
+        compact(false) {}
 
   void destroy(RenderArena*);
 
@@ -109,30 +53,17 @@ struct BidiRun {
   // Overridden to prevent the normal delete from being called.
   void operator delete(void*, size_t);
 
+  BidiRun* next() { return static_cast<BidiRun*>(m_next); }
+
  private:
   // The normal operator new is disallowed.
   void* operator new(size_t) throw();
 
  public:
-  int start;
-  int stop;
-
   RenderObject* obj;
   InlineBox* box;
-
-  // explicit + implicit levels here
-  unsigned char level;
-  bool override : 1;
-  bool compact : 1;
-
-  BidiRun* nextRun;
-
-  bool reversed(bool visuallyOrdered) { return level % 2 && !visuallyOrdered; }
-  bool dirOverride(bool visuallyOrdered) { return override || visuallyOrdered; }
+  bool compact;
 };
-
-struct BidiIterator;
-struct BidiState;
 
 }  // namespace WebCore
 
