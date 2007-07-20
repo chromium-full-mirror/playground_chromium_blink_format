@@ -44,10 +44,15 @@ struct TextRunComponent {
                    const QFont* font,
                    int offset,
                    bool sc = false);
+  TextRunComponent(int spaces, bool rtl, const QFont* font, int offset);
+
+  inline bool isSpace() const { return spaces != 0; }
+
   QString string;
   const QFont* font;
   int width;
   int offset;
+  int spaces;
 };
 
 TextRunComponent::TextRunComponent(const UChar* start,
@@ -58,11 +63,18 @@ TextRunComponent::TextRunComponent(const UChar* start,
                                    bool sc)
     : string(reinterpret_cast<const QChar*>(start), length),
       font(f),
-      offset(o) {
+      offset(o),
+      spaces(0) {
   if (sc)
     string = string.toUpper();
   string.prepend(rtl ? QChar(0x202e) : QChar(0x202d));
   width = QFontMetrics(*font).width(string);
+}
+
+TextRunComponent::TextRunComponent(int s, bool rtl, const QFont* f, int o)
+    : string(s, QLatin1Char(' ')), font(f), offset(o), spaces(s) {
+  string.prepend(rtl ? QChar(0x202e) : QChar(0x202d));
+  width = spaces * QFontMetrics(*font).width(QLatin1Char(' '));
 }
 
 Font::Font() : m_letterSpacing(0), m_wordSpacing(0), m_font(), m_scFont() {
@@ -158,7 +170,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
         padding -= add;
         --numSpaces;
       }
-      offset += add + letterSpacing + font.spaceWidth();
+      components->append(TextRunComponent(1, style.rtl(), f, offset));
+      offset += add + letterSpacing + components->last().width;
       start = 1;
       //         qDebug() << "space at 0" << offset;
     } else if (smallCaps) {
@@ -189,7 +202,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
           padding -= add;
           --numSpaces;
         }
-        offset += wordSpacing + add + font.spaceWidth() + letterSpacing;
+        components->append(TextRunComponent(1, style.rtl(), f, offset));
+        offset += wordSpacing + add + components->last().width + letterSpacing;
         start = i + 1;
         continue;
       } else if (!letterSpacing) {
@@ -242,7 +256,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
           padding -= add;
           --numSpaces;
         }
-        offset += add + font.spaceWidth();
+        components->append(TextRunComponent(1, style.rtl(), f, offset));
+        offset += add + components->last().width;
         if (i)
           offset += wordSpacing;
         start = i + 1;
@@ -284,17 +299,21 @@ void Font::drawText(GraphicsContext* ctx,
 
   if (style.rtl()) {
     for (int i = 0; i < components.size(); ++i) {
-      p->setFont(*components.at(i).font);
-      QPointF pt(
-          point.x() + w - components.at(i).offset - components.at(i).width,
-          point.y());
-      p->drawText(pt, components.at(i).string);
+      if (!components.at(i).isSpace()) {
+        p->setFont(*components.at(i).font);
+        QPointF pt(
+            point.x() + w - components.at(i).offset - components.at(i).width,
+            point.y());
+        p->drawText(pt, components.at(i).string);
+      }
     }
   } else {
     for (int i = 0; i < components.size(); ++i) {
-      p->setFont(*components.at(i).font);
-      QPointF pt(point.x() + components.at(i).offset, point.y());
-      p->drawText(pt, components.at(i).string);
+      if (!components.at(i).isSpace()) {
+        p->setFont(*components.at(i).font);
+        QPointF pt(point.x() + components.at(i).offset, point.y());
+        p->drawText(pt, components.at(i).string);
+      }
     }
   }
   if (from > 0 || to < run.length())
@@ -338,7 +357,7 @@ int Font::offsetForPosition(const TextRun& run,
         layout.beginLayout();
         QTextLine l = layout.createLine();
         if (!l.isValid())
-          return 0;
+          return offset;
 
         l.setLineWidth(INT_MAX / 256);
         layout.endLayout();
@@ -353,7 +372,6 @@ int Font::offsetForPosition(const TextRun& run,
         offset += components.at(i).string.length() - 1;
       }
     }
-    return 0;
   } else {
     for (int i = 0; i < components.size(); ++i) {
       int xs = components.at(i).offset;
@@ -363,7 +381,7 @@ int Font::offsetForPosition(const TextRun& run,
         layout.beginLayout();
         QTextLine l = layout.createLine();
         if (!l.isValid())
-          return 0;
+          return offset;
 
         l.setLineWidth(INT_MAX / 256);
         layout.endLayout();
@@ -378,8 +396,8 @@ int Font::offsetForPosition(const TextRun& run,
         offset += components.at(i).string.length() - 1;
       }
     }
-    return run.length();
   }
+  return run.length();
 }
 
 static float cursorToX(const Vector<TextRunComponent, 1024>& components,
@@ -426,10 +444,6 @@ FloatRect Font::selectionRectForText(const TextRun& run,
   if (x2 < x1)
     qSwap(x1, x2);
 
-  //     qDebug() << ">>>>>>>>>>> selectionRectForText: string=" <<
-  //     QString((QChar *)run.characters(), run.length())
-  //              << "from/to=" << from << to
-  //              << "x1/x2=" << x1 << x2;
   return FloatRect(pt.x() + x1, pt.y(), x2 - x1, h);
 }
 
