@@ -100,9 +100,6 @@ class CachedResource {
   unsigned accessCount() const { return m_accessCount; }
   void increaseAccessCount() { m_accessCount++; }
 
-  unsigned liveAccessCount() const { return m_liveAccessCount; }
-  void resetLiveAccessCount() { m_liveAccessCount = 0; }
-  void increaseLiveAccessCount() { m_liveAccessCount++; }
   void liveResourceAccessed();
 
   // Computes the status of an object after loading.
@@ -159,7 +156,7 @@ class CachedResource {
  private:
   unsigned m_encodedSize;
   unsigned m_accessCount;
-  unsigned m_liveAccessCount;
+  unsigned m_isInLiveResourcesList;
 
   bool m_sendResourceLoadCallbacks;
 
@@ -170,7 +167,6 @@ class CachedResource {
 #ifndef NDEBUG
   bool m_deleted;
   unsigned m_lruIndex;
-  unsigned m_liveLRUIndex;
 #endif
 
  private:
