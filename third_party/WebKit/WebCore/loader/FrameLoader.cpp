@@ -862,7 +862,15 @@ void FrameLoader::clear(bool clearWindowProperties) {
 }
 
 void FrameLoader::receivedFirstData() {
-  begin(m_workingURL);
+  begin(m_workingURL, false);
+
+  dispatchDidCommitLoad();
+  dispatchWindowObjectAvailable();
+
+  String ptitle = m_documentLoader->title();
+  // If we have a title let the WebView know about it.
+  if (!ptitle.isNull())
+    m_client->dispatchDidReceiveTitle(ptitle);
 
   m_frame->document()->docLoader()->setCachePolicy(m_cachePolicy);
   m_workingURL = KURL();
@@ -895,9 +903,10 @@ void FrameLoader::begin() {
   begin(KURL());
 }
 
-void FrameLoader::begin(const KURL& url) {
+void FrameLoader::begin(const KURL& url, bool dispatch) {
   clear();
-  dispatchWindowObjectAvailable();
+  if (dispatch)
+    dispatchWindowObjectAvailable();
 
   m_needsClear = true;
   m_shouldClearWindowProperties = true;
@@ -2498,7 +2507,6 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
 
   // Handle adding the URL to the back/forward list.
   DocumentLoader* dl = m_documentLoader.get();
-  String ptitle = dl->title();
 
   switch (m_loadType) {
     case FrameLoadTypeForward:
@@ -2556,12 +2564,6 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
     return;
 
   m_committedFirstRealDocumentLoad = true;
-
-  dispatchDidCommitLoad();
-
-  // If we have a title let the WebView know about it.
-  if (!ptitle.isNull())
-    m_client->dispatchDidReceiveTitle(ptitle);
 }
 
 bool FrameLoader::privateBrowsingEnabled() const {

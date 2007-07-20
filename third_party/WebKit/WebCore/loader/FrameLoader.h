@@ -392,7 +392,8 @@ class FrameLoader : Noncopyable
   KURL historyURL(int distance);
 
   void begin();
-  void begin(const KURL&);
+  void begin(const KURL&, bool dispatchWindowObjectAvailable = true);
+
   void write(const char* str, int len = -1, bool flush = false);
   void write(const String&);
   void end();
