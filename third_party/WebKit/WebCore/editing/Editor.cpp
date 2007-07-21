@@ -762,10 +762,6 @@ void Editor::applyParagraphStyleToSelection(CSSStyleDeclaration* style,
     applyParagraphStyle(style, editingAction);
 }
 
-bool Editor::selectWordBeforeMenuEvent() const {
-  return client() && client()->selectWordBeforeMenuEvent();
-}
-
 bool Editor::clientIsEditable() const {
   return client() && client()->isEditable();
 }

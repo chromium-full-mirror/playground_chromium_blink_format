@@ -693,10 +693,6 @@ void WebEditorClient::handleInputMethodKeypress(KeyboardEvent* evt) {
     evt->setDefaultHandled();
 }
 
-bool WebEditorClient::selectWordBeforeMenuEvent() {
-  return false;
-}
-
 bool WebEditorClient::isEditable() {
   return false;
 }
