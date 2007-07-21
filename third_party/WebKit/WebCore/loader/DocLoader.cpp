@@ -98,9 +98,18 @@ CachedCSSStyleSheet* DocLoader::requestCSSStyleSheet(const String& url,
   // what's in the cache already
   // is a load that failed because of the canLoad check. Probably not an issue
   // in practice.
-  return static_cast<CachedCSSStyleSheet*>(
+  CachedCSSStyleSheet* sheet = static_cast<CachedCSSStyleSheet*>(
       requestResource(CachedResource::CSSStyleSheet, url, &charset,
                       isUserStyleSheet, !isUserStyleSheet));
+
+  // A user style sheet can outlive its DocLoader so don't store any pointers to
+  // it
+  if (sheet && isUserStyleSheet) {
+    sheet->setDocLoader(0);
+    m_docResources.remove(sheet->url());
+  }
+
+  return sheet;
 }
 
 CachedCSSStyleSheet* DocLoader::requestUserCSSStyleSheet(
