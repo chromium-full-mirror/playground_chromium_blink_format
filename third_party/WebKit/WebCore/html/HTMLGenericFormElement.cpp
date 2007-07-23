@@ -102,9 +102,8 @@ void HTMLGenericFormElement::insertedIntoTree(bool deep) {
     m_form = findFormAncestor();
     if (m_form)
       m_form->registerFormElement(this);
-    else if (isRadioButton() && !name().isEmpty() && isChecked())
-      document()->radioButtonChecked(static_cast<HTMLInputElement*>(this),
-                                     m_form);
+    else
+      document()->checkedRadioButtons().addButton(this);
   }
 
   HTMLElement::insertedIntoTree(deep);
