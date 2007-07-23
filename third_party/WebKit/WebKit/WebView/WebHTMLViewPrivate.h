@@ -55,10 +55,6 @@
                   entireLine:(BOOL)line;
 @end
 
-@interface WebHTMLView (WebNSTextInputSupport)<NSTextInput>
-- (void)_updateSelectionForInputManager;
-@end
-
 @interface WebHTMLView (WebPrivate)
 
 + (NSArray*)supportedMIMETypes;
