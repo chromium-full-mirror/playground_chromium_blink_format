@@ -635,11 +635,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
           // Add ourselves to the containing block of the entire continuation so
           // that it can
           // paint us atomically.
-          RenderBlock* block = object()
-                                   ->element()
-                                   ->renderer()
-                                   ->continuation()
-                                   ->containingBlock();
+          RenderBlock* block = object()->containingBlock()->containingBlock();
           block->addContinuationWithOutline(
               static_cast<RenderFlow*>(object()->element()->renderer()));
         } else if (!object()->isInlineContinuation())
