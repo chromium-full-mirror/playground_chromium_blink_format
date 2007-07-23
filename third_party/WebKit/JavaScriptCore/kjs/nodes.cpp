@@ -1650,17 +1650,14 @@ JSValue* VarDeclNode::handleSlowCase(ExecState* exec,
 
 // ECMA 12.2
 JSValue* VarDeclNode::evaluate(ExecState* exec) {
-  JSValue* val;
+  const ScopeChain& chain = exec->context()->scopeChain();
+  JSObject* variableObject = exec->context()->variableObject();
+
+  ASSERT(!chain.isEmpty());
+
   if (init) {
-    val = init->evaluate(exec);
+    JSValue* val = init->evaluate(exec);
     KJS_CHECKEXCEPTIONVALUE
-
-    const ScopeChain& chain = exec->context()->scopeChain();
-    JSObject* variableObject = exec->context()->variableObject();
-
-    ASSERT(!chain.isEmpty());
-    ASSERT(variableObject->getDirect(ident) ||
-           ident == exec->propertyNames().arguments);
 
     // if the variable object is the top of the scope chain, then that must
     // be where this variable is declared, processVarDecls would have put
@@ -1674,7 +1671,28 @@ JSValue* VarDeclNode::evaluate(ExecState* exec) {
     if (varType == VarDeclNode::Constant)
       flags |= ReadOnly;
 
-    variableObject->put(exec, ident, val, flags);
+    if (++chain.begin() == chain.end()) {
+      int flags = Internal;
+      if (exec->context()->codeType() != EvalCode)
+        flags |= DontDelete;
+      if (varType == VarDeclNode::Constant)
+        flags |= ReadOnly;
+      variableObject->putDirect(ident, val, flags);
+    } else {
+      ASSERT(variableObject->getDirect(ident) ||
+             ident == exec->propertyNames().arguments);
+      variableObject->put(exec, ident, val, flags);
+    }
+  } else {
+    if (++chain.begin() == chain.end()) {
+      int flags = Internal;
+      if (exec->context()->codeType() != EvalCode)
+        flags |= DontDelete;
+      if (varType == VarDeclNode::Constant)
+        flags |= ReadOnly;
+      variableObject->putDirect(ident, jsUndefined(), flags);
+    } else {
+    }
   }
 
   // no caller of this function actually uses the return value.
