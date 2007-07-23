@@ -33,18 +33,19 @@
 
 #include "ResourceResponse.h"
 
+typedef struct _WebKitGtkFrame WebKitGtkFrame;
+
 namespace WebCore {
 
 class FrameGdk;
 
 class FrameLoaderClientGdk : public FrameLoaderClient {
  public:
-  FrameLoaderClientGdk();
+  FrameLoaderClientGdk(WebKitGtkFrame*);
   virtual ~FrameLoaderClientGdk() {}
   virtual void frameLoaderDestroyed();
 
-  void setFrame(FrameGdk* frame) { m_frame = frame; }
-  Frame* frame();
+  WebKitGtkFrame* webFrame() const { return m_frame; }
 
   virtual bool hasWebView() const;
   virtual bool hasFrameView() const;
@@ -230,7 +231,7 @@ class FrameLoaderClientGdk : public FrameLoaderClient {
                         const ResourceResponse&);
 
  private:
-  FrameGdk* m_frame;
+  WebKitGtkFrame* m_frame;
   ResourceResponse m_response;
   bool m_firstData;
 };

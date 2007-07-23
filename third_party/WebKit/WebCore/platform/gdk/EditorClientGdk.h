@@ -34,13 +34,15 @@
 
 #include <wtf/Forward.h>
 
+typedef struct _WebKitGtkPage WebKitGtkPage;
+
 namespace WebCore {
 
 class Page;
 
 class EditorClientGdk : public EditorClient {
  public:
-  EditorClientGdk();
+  EditorClientGdk(WebKitGtkPage*);
 
   // from EditorClient
   virtual void pageDestroyed();
@@ -113,11 +115,8 @@ class EditorClientGdk : public EditorClient {
   virtual bool spellingUIIsShowing();
   virtual void getGuessesForWord(const String&, Vector<String>& guesses);
 
-  // EditorClientGdk only
-  void setPage(Page*);
-
  private:
-  Page* m_page;
+  WebKitGtkPage* m_page;
 };
 }
 

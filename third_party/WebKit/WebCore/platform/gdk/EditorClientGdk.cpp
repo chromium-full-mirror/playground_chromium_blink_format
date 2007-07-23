@@ -39,8 +39,11 @@
 #include "NotImplemented.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
+#include "webkitgtkprivate.h"
 
 #include <stdio.h>
+
+using namespace WebKitGtk;
 
 namespace WebCore {
 
@@ -181,12 +184,10 @@ void EditorClientGdk::toggleContinuousSpellChecking() {
   notImplemented();
 }
 
-void EditorClientGdk::toggleGrammarChecking() {
-  EditorClientGdk();
-}
+void EditorClientGdk::toggleGrammarChecking() {}
 
 void EditorClientGdk::handleKeypress(KeyboardEvent* event) {
-  Frame* frame = m_page->focusController()->focusedOrMainFrame();
+  Frame* frame = core(m_page)->focusController()->focusedOrMainFrame();
   if (!frame)
     return;
 
@@ -227,11 +228,7 @@ void EditorClientGdk::handleInputMethodKeypress(KeyboardEvent*) {
   notImplemented();
 }
 
-EditorClientGdk::EditorClientGdk() {}
-
-void EditorClientGdk::setPage(Page* page) {
-  m_page = page;
-}
+EditorClientGdk::EditorClientGdk(WebKitGtkPage* page) : m_page(page) {}
 
 void EditorClientGdk::textFieldDidBeginEditing(Element*) {
   notImplemented();
