@@ -36,6 +36,12 @@
 #define KJS_FAST_CALL
 #endif
 
+#if COMPILER(GCC)
+#define KJS_NO_INLINE __attribute__((noinline))
+#else
+#define KJS_NO_INLINE
+#endif
+
 namespace KJS {
 
 class ProgramNode;
@@ -958,6 +964,9 @@ class VarDeclNode : public Node {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
+  JSValue* handleSlowCase(ExecState*,
+                          const ScopeChain&,
+                          JSValue*) KJS_FAST_CALL KJS_NO_INLINE;
   Type varType;
   Identifier ident;
   RefPtr<AssignExprNode> init;
