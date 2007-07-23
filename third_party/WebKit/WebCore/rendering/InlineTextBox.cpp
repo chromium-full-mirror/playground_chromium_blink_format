@@ -682,11 +682,15 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
                                                  RenderStyle* style,
                                                  const Font* f,
                                                  bool grammar) {
-  tx += m_x;
-  ty += m_y;
+  // Never print spelling/grammar markers (5327887)
+  if (textObject()->document()->printing())
+    return;
 
   if (m_truncation == cFullTruncation)
     return;
+
+  tx += m_x;
+  ty += m_y;
 
   int start = 0;        // start of line to draw, relative to tx
   int width = m_width;  // how much line to draw
