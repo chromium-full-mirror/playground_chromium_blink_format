@@ -802,10 +802,10 @@ class DOMHTMLElement : public DOMElement, public IDOMHTMLElement {
     return DOMElement::getAttribute(name, result);
   }
 
-  virtual HRESULT STDMETHODCALLTYPE setResult(
+  virtual HRESULT STDMETHODCALLTYPE setAttribute(
       /* [in] */ BSTR name,
       /* [in] */ BSTR value) {
-    return DOMElement::setResult(name, value);
+    return DOMElement::setAttribute(name, value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeAttribute(
@@ -1171,10 +1171,10 @@ class DOMHTMLFormElement : public DOMHTMLElement, public IDOMHTMLFormElement {
     return DOMHTMLElement::getAttribute(name, result);
   }
 
-  virtual HRESULT STDMETHODCALLTYPE setResult(
+  virtual HRESULT STDMETHODCALLTYPE setAttribute(
       /* [in] */ BSTR name,
       /* [in] */ BSTR value) {
-    return DOMHTMLElement::setResult(name, value);
+    return DOMHTMLElement::setAttribute(name, value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeAttribute(
@@ -1622,10 +1622,10 @@ class DOMHTMLSelectElement : public DOMHTMLElement,
     return DOMHTMLElement::getAttribute(name, result);
   }
 
-  virtual HRESULT STDMETHODCALLTYPE setResult(
+  virtual HRESULT STDMETHODCALLTYPE setAttribute(
       /* [in] */ BSTR name,
       /* [in] */ BSTR value) {
-    return DOMHTMLElement::setResult(name, value);
+    return DOMHTMLElement::setAttribute(name, value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeAttribute(
@@ -2091,10 +2091,10 @@ class DOMHTMLOptionElement : public DOMHTMLElement,
     return DOMHTMLElement::getAttribute(name, result);
   }
 
-  virtual HRESULT STDMETHODCALLTYPE setResult(
+  virtual HRESULT STDMETHODCALLTYPE setAttribute(
       /* [in] */ BSTR name,
       /* [in] */ BSTR value) {
-    return DOMHTMLElement::setResult(name, value);
+    return DOMHTMLElement::setAttribute(name, value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeAttribute(
@@ -2535,10 +2535,10 @@ class DOMHTMLInputElement : public DOMHTMLElement,
     return DOMHTMLElement::getAttribute(name, result);
   }
 
-  virtual HRESULT STDMETHODCALLTYPE setResult(
+  virtual HRESULT STDMETHODCALLTYPE setAttribute(
       /* [in] */ BSTR name,
       /* [in] */ BSTR value) {
-    return DOMHTMLElement::setResult(name, value);
+    return DOMHTMLElement::setAttribute(name, value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeAttribute(
@@ -3080,10 +3080,10 @@ class DOMHTMLTextAreaElement : public DOMHTMLElement,
     return DOMHTMLElement::getAttribute(name, result);
   }
 
-  virtual HRESULT STDMETHODCALLTYPE setResult(
+  virtual HRESULT STDMETHODCALLTYPE setAttribute(
       /* [in] */ BSTR name,
       /* [in] */ BSTR value) {
-    return DOMHTMLElement::setResult(name, value);
+    return DOMHTMLElement::setAttribute(name, value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeAttribute(

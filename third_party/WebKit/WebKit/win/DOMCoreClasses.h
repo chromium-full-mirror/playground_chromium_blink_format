@@ -914,7 +914,7 @@ class DOMElement : public DOMNode,
       /* [in] */ BSTR name,
       /* [retval][out] */ BSTR* result);
 
-  virtual HRESULT STDMETHODCALLTYPE setResult(
+  virtual HRESULT STDMETHODCALLTYPE setAttribute(
       /* [in] */ BSTR name,
       /* [in] */ BSTR value);
 
