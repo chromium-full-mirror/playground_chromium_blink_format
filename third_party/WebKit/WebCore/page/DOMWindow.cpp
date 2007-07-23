@@ -50,10 +50,6 @@ DOMWindow::DOMWindow(Frame* frame) : m_frame(frame) {}
 
 DOMWindow::~DOMWindow() {}
 
-Frame* DOMWindow::frame() {
-  return m_frame;
-}
-
 void DOMWindow::disconnectFrame() {
   m_frame = 0;
   clear();

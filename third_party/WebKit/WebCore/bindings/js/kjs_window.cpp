@@ -237,10 +237,6 @@ Window::~Window() {
     i1->second->clearWindowObj();
 }
 
-DOMWindow* Window::impl() const {
-  return m_impl.get();
-}
-
 ScriptInterpreter* Window::interpreter() const {
   Frame* frame = impl()->frame();
   if (!frame)

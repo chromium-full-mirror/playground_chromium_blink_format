@@ -79,7 +79,7 @@ class Window : public DOMObject {
 
  public:
   ~Window();
-  WebCore::DOMWindow* impl() const;
+  WebCore::DOMWindow* impl() const { return m_impl.get(); }
   void disconnectFrame();
   /**
    * Returns and registers a window object. In case there's already a Window

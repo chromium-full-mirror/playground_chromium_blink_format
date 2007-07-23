@@ -48,7 +48,7 @@ class DOMWindow : public Shared<DOMWindow> {
   DOMWindow(Frame*);
   virtual ~DOMWindow();
 
-  Frame* frame();
+  Frame* frame() { return m_frame; }
   void disconnectFrame();
 
   void clear();
