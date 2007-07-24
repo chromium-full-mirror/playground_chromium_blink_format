@@ -408,6 +408,7 @@ class FrameLoader : Noncopyable
   KJS::JSValue* executeScript(const String& script,
                               bool forceUserGesture = false);
 
+  void gotoAnchor();
   bool gotoAnchor(const String& name);  // returns true if the anchor was found
   void scrollToAnchor(const KURL&);
 
@@ -583,8 +584,6 @@ class FrameLoader : Noncopyable
   void cachePageForHistoryItem(HistoryItem*);
 
   void receivedFirstData();
-
-  void gotoAnchor();
 
   void updatePolicyBaseURL();
   void setPolicyBaseURL(const String&);

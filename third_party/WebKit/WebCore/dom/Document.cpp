@@ -328,6 +328,7 @@ Document::Document(DOMImplementation* impl, Frame* frame)
   m_usesSiblingRules = false;
   m_usesFirstLineRules = false;
   m_usesFirstLetterRules = false;
+  m_gotoAnchorNeededAfterStylesheetsLoad = false;
 
   m_styleSelector = new CSSStyleSelector(this, m_usersheet, m_styleSheets.get(),
                                          !inCompatMode());
@@ -1938,6 +1939,9 @@ void Document::stylesheetLoaded() {
 #endif
 
   updateStyleSelector();
+
+  if (!m_pendingStylesheets && m_gotoAnchorNeededAfterStylesheetsLoad)
+    m_frame->loader()->gotoAnchor();
 }
 
 void Document::updateStyleSelector() {

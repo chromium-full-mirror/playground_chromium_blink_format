@@ -1467,6 +1467,13 @@ String FrameLoader::encoding() const {
 bool FrameLoader::gotoAnchor(const String& name) {
   ASSERT(m_frame->document());
 
+  if (!m_frame->document()->haveStylesheetsLoaded()) {
+    m_frame->document()->setGotoAnchorNeededAfterStylesheetsLoad(true);
+    return false;
+  }
+
+  m_frame->document()->setGotoAnchorNeededAfterStylesheetsLoad(false);
+
   Node* anchorNode = m_frame->document()->getElementById(AtomicString(name));
   if (!anchorNode)
     anchorNode = m_frame->document()->anchors()->namedItem(
