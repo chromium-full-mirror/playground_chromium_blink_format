@@ -75,6 +75,11 @@ class RenderThemeMac : public RenderTheme {
 
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
+  virtual int popupInternalPaddingLeft(RenderStyle*) const;
+  virtual int popupInternalPaddingRight(RenderStyle*) const;
+  virtual int popupInternalPaddingTop(RenderStyle*) const;
+  virtual int popupInternalPaddingBottom(RenderStyle*) const;
+
  protected:
   // Methods for each appearance value.
   virtual bool paintCheckbox(RenderObject*,
@@ -206,7 +211,6 @@ class RenderThemeMac : public RenderTheme {
   const int* buttonMargins() const;
   void setButtonCellState(const RenderObject*, const IntRect&);
 
-  void setPopupPaddingFromControlSize(RenderStyle*, NSControlSize) const;
   void setPopupButtonCellState(const RenderObject*, const IntRect&);
   const IntSize* popupButtonSizes() const;
   const int* popupButtonMargins() const;

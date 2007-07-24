@@ -162,6 +162,11 @@ class RenderTheme {
   bool isHovered(const RenderObject*) const;
   bool isReadOnlyControl(const RenderObject*) const;
 
+  virtual int popupInternalPaddingLeft(RenderStyle*) const { return 0; }
+  virtual int popupInternalPaddingRight(RenderStyle*) const { return 0; }
+  virtual int popupInternalPaddingTop(RenderStyle*) const { return 0; }
+  virtual int popupInternalPaddingBottom(RenderStyle*) const { return 0; }
+
  protected:
   // Methods for each appearance value.
   virtual void adjustCheckboxStyle(CSSStyleSelector*,

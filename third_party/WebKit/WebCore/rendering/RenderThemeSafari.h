@@ -79,6 +79,11 @@ class RenderThemeSafari : public RenderTheme {
                                       RenderStyle*,
                                       Element*) const;
 
+  virtual int popupInternalPaddingLeft(RenderStyle*) const;
+  virtual int popupInternalPaddingRight(RenderStyle*) const;
+  virtual int popupInternalPaddingTop(RenderStyle*) const;
+  virtual int popupInternalPaddingBottom(RenderStyle*) const;
+
  protected:
   // Methods for each appearance value.
   virtual bool paintCheckbox(RenderObject*,
@@ -196,7 +201,6 @@ class RenderThemeSafari : public RenderTheme {
   const IntSize* buttonSizes() const;
   const int* buttonMargins(NSControlSize) const;
 
-  void setPopupPaddingFromControlSize(RenderStyle*, NSControlSize) const;
   const IntSize* popupButtonSizes() const;
   const int* popupButtonMargins(NSControlSize) const;
   const int* popupButtonPadding(NSControlSize) const;
