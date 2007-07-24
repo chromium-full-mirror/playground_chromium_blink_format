@@ -3507,9 +3507,10 @@ void RenderBlock::calcColumnWidth() {
 
   int availWidth = desiredColumnWidth;
   int colGap = columnGap();
+  int colWidth = max(1, static_cast<int>(style()->columnWidth()));
+  int colCount = max(1, static_cast<int>(style()->columnCount()));
 
   if (style()->hasAutoColumnWidth()) {
-    int colCount = style()->columnCount();
     if ((colCount - 1) * colGap < availWidth) {
       desiredColumnCount = colCount;
       desiredColumnWidth =
@@ -3520,7 +3521,6 @@ void RenderBlock::calcColumnWidth() {
           (availWidth - (desiredColumnCount - 1) * colGap) / desiredColumnCount;
     }
   } else if (style()->hasAutoColumnCount()) {
-    int colWidth = static_cast<int>(style()->columnWidth());
     if (colWidth < availWidth) {
       desiredColumnCount = (availWidth + colGap) / (colWidth + colGap);
       desiredColumnWidth =
@@ -3528,9 +3528,6 @@ void RenderBlock::calcColumnWidth() {
     }
   } else {
     // Both are set.
-    int colWidth = static_cast<int>(style()->columnWidth());
-    int colCount = style()->columnCount();
-
     if (colCount * colWidth + (colCount - 1) * colGap <= availWidth) {
       desiredColumnCount = colCount;
       desiredColumnWidth = colWidth;
