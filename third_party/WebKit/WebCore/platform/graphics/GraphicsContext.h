@@ -180,6 +180,7 @@ class GraphicsContext : Noncopyable {
                 const TextStyle&,
                 int from = 0,
                 int to = -1);
+  void drawBidiText(const TextRun&, const IntPoint&, const TextStyle&);
   void drawHighlightForText(const TextRun&,
                             const IntPoint&,
                             int h,
