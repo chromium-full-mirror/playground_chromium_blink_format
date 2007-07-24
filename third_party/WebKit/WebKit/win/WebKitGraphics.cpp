@@ -41,7 +41,7 @@
 #include <CoreGraphics/CoreGraphics.h>
 #pragma warning(pop)
 
-#include <windows.h>
+#include <WebKitSystemInterface/WebKitSystemInterface.h>
 
 using namespace WebCore;
 
@@ -83,6 +83,25 @@ void DrawTextAtPoint(CGContextRef cgContext,
     drawString = drawString.impl()->secure(WebCore::bullet);
   WebCoreDrawTextAtPoint(context, drawString, point, makeFont(description),
                          textColor, underlinedIndex);
+}
+
+void WebDrawText(WebTextRenderInfo* info) {
+  if (!info || info->structSize != sizeof(WebTextRenderInfo) ||
+      !info->cgContext || !info->description)
+    return;
+
+  int oldFontSmoothingLevel = -1;
+  if (info->overrideSmoothingLevel >= 0) {
+    oldFontSmoothingLevel = wkGetFontSmoothingLevel();
+    wkSetFontSmoothingLevel(info->overrideSmoothingLevel);
+  }
+
+  DrawTextAtPoint(info->cgContext, info->text, info->length, info->pt,
+                  *(info->description), info->color, info->underlinedIndex,
+                  info->drawAsPassword);
+
+  if (info->overrideSmoothingLevel >= 0)
+    wkSetFontSmoothingLevel(oldFontSmoothingLevel);
 }
 
 float TextFloatWidth(LPCTSTR text,
