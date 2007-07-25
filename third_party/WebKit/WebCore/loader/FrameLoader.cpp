@@ -1871,8 +1871,10 @@ void FrameLoader::load(const FrameLoadRequest& request,
     referrer = m_outgoingReferrer;
 
   ASSERT(frame()->document());
-  if (!canLoad(url, frame()->document()) && !canLoad(url, referrer)) {
-    FrameLoader::reportLocalLoadFailed(m_frame->page(), url.url());
+
+  const String& urlString = url.url().lower();
+  if (urlString.startsWith("file:")) {
+    FrameLoader::reportLocalLoadFailed(m_frame->page(), urlString);
     return;
   }
 
