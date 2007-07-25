@@ -69,7 +69,8 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
       handle->request().url().url().ascii());
 
   ResourceRequest request(cfRequest);
-  handle->client()->willSendRequest(handle, request, cfRedirectResponse);
+  if (handle->client())
+    handle->client()->willSendRequest(handle, request, cfRedirectResponse);
 
   cfRequest = request.cfURLRequest();
 
@@ -85,7 +86,8 @@ void didReceiveResponse(CFURLConnectionRef conn,
   LOG(Network, "CFNet - didReceiveResponse(conn=%p, handle=%p) (%s)", conn,
       handle, handle->request().url().url().ascii());
 
-  handle->client()->didReceiveResponse(handle, cfResponse);
+  if (handle->client())
+    handle->client()->didReceiveResponse(handle, cfResponse);
 }
 
 void didReceiveData(CFURLConnectionRef conn,
@@ -99,8 +101,9 @@ void didReceiveData(CFURLConnectionRef conn,
   LOG(Network, "CFNet - didReceiveData(conn=%p, handle=%p, bytes=%d) (%s)",
       conn, handle, length, handle->request().url().url().ascii());
 
-  handle->client()->didReceiveData(handle, (const char*)bytes, length,
-                                   originalLength);
+  if (handle->client())
+    handle->client()->didReceiveData(handle, (const char*)bytes, length,
+                                     originalLength);
 }
 
 void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
@@ -109,7 +112,8 @@ void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
   LOG(Network, "CFNet - didFinishLoading(conn=%p, handle=%p) (%s)", conn,
       handle, handle->request().url().url().ascii());
 
-  handle->client()->didFinishLoading(handle);
+  if (handle->client())
+    handle->client()->didFinishLoading(handle);
 }
 
 void didFail(CFURLConnectionRef conn,
@@ -120,7 +124,8 @@ void didFail(CFURLConnectionRef conn,
   LOG(Network, "CFNet - didFail(conn=%p, handle=%p, error = %p) (%s)", conn,
       handle, error, handle->request().url().url().ascii());
 
-  handle->client()->didFail(handle, ResourceError(error));
+  if (handle->client())
+    handle->client()->didFail(handle, ResourceError(error));
 }
 
 CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
@@ -131,7 +136,8 @@ CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
   CacheStoragePolicy policy = static_cast<CacheStoragePolicy>(
       CFCachedURLResponseGetStoragePolicy(cachedResponse));
 
-  handle->client()->willCacheResponse(handle, policy);
+  if (handle->client())
+    handle->client()->willCacheResponse(handle, policy);
 
   if (static_cast<CFURLCacheStoragePolicy>(policy) !=
       CFCachedURLResponseGetStoragePolicy(cachedResponse))
@@ -324,7 +330,8 @@ void ResourceHandle::didReceiveAuthenticationChallenge(
   d->m_currentWebChallenge =
       AuthenticationChallenge(d->m_currentCFChallenge, this);
 
-  client()->didReceiveAuthenticationChallenge(this, d->m_currentWebChallenge);
+  if (client())
+    client()->didReceiveAuthenticationChallenge(this, d->m_currentWebChallenge);
 }
 
 void ResourceHandle::receivedCredential(
@@ -364,7 +371,8 @@ void ResourceHandle::receivedCancellation(
   if (challenge != d->m_currentWebChallenge)
     return;
 
-  client()->receivedCancellation(this, challenge);
+  if (client())
+    client()->receivedCancellation(this, challenge);
 }
 
 CFURLConnectionRef ResourceHandle::connection() const {
