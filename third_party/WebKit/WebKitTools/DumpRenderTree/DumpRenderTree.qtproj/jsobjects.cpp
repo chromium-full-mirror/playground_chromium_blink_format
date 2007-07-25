@@ -35,6 +35,13 @@ class HackWebFrame : public QWebFrame {
  public:
   void mousePressEvent(QMouseEvent* e) { QWebFrame::mousePressEvent(e); }
   void mouseReleaseEvent(QMouseEvent* e) { QWebFrame::mouseReleaseEvent(e); }
+
+ protected:
+  HackWebFrame(QWebPage* parent, QWebFrameData* frameData)
+      : QWebFrame(parent, frameData) {}
+  HackWebFrame(QWebFrame* parent, QWebFrameData* frameData)
+      : QWebFrame(parent, frameData) {}
+  ~HackWebFrame() {}
 };
 
 LayoutTestController::LayoutTestController() : QObject() {
