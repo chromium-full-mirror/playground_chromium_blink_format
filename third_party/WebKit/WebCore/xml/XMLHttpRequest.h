@@ -29,6 +29,7 @@
 #include "ResourceResponse.h"
 #include "StringHash.h"
 #include "SubresourceLoaderClient.h"
+#include <kjs/ustring.h>
 
 #include <wtf/HashMap.h>
 #include <wtf/Vector.h>
@@ -99,7 +100,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
   void overrideMIMEType(const String& override);
   String getAllResponseHeaders() const;
   String getResponseHeader(const String& name) const;
-  String getResponseText() const;
+  KJS::UString getResponseText() const;
   Document* getResponseXML() const;
 
   void setOnReadyStateChangeListener(EventListener*);
@@ -150,6 +151,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
 
   void changeState(XMLHttpRequestState newState);
   void callReadyStateChangeListener();
+  void dropProtection();
 
   Document* m_doc;
 
@@ -170,7 +172,19 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
   String m_encoding;
 
   RefPtr<TextResourceDecoder> m_decoder;
-  String m_responseText;
+
+  // Unlike most strings in the DOM, we keep this as a KJS::UString, not a
+  // WebCore::String.
+  // That's because these strings can easily get huge (they are filled from the
+  // network with
+  // no parsing) and because JS can easily observe many intermediate states, so
+  // it's very useful
+  // to be able to share the buffer with JavaScript versions of the whole or
+  // partial string.
+  // In contrast, this string doesn't interact much with the rest of the engine
+  // so it's not that
+  // big a cost that it isn't a String.
+  KJS::UString m_responseText;
   mutable bool m_createdDocument;
   mutable RefPtr<Document> m_responseXML;
 

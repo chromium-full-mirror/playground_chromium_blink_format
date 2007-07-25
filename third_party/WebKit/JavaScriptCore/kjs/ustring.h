@@ -25,6 +25,7 @@
 #define _KJS_USTRING_H_
 
 #include "JSLock.h"
+#include "collector.h"
 #include <stdint.h>
 #include <wtf/Assertions.h>
 #include <wtf/FastMalloc.h>
@@ -197,9 +198,9 @@ class UString {
 
     void destroy();
 
+    bool baseIsSelf() const { return baseString == this; }
     UChar* data() const {
-      return baseString ? (baseString->buf + baseString->preCapacity + offset)
-                        : (buf + preCapacity + offset);
+      return baseString->buf + baseString->preCapacity + offset;
     }
     int size() const { return len; }
 
@@ -464,6 +465,8 @@ class UString {
 
   void copyForWriting();
 
+  size_t cost() const;
+
  private:
   int expandedSize(int size, int otherSize) const;
   int usedCapacity() const;
@@ -521,6 +524,26 @@ inline unsigned UString::toArrayIndex(bool* ok) const {
   if (ok && i >= 0xFFFFFFFFU)
     *ok = false;
   return i;
+}
+
+inline size_t UString::cost() const {
+  // If this string is sharing with a base, then don't count any cost. We will
+  // never share
+  // with a base that wasn't already big enough to register extra cost, so a
+  // string holding that
+  // buffer has already paid extra cost at some point; and if we just
+  // enlarged it by a huge amount, it must have been by appending a string
+  // that itself paid extra cost, or a huge number of small strings. Either way,
+  // GC will come
+  // relatively soon.
+
+  // If we didn't do this, the shared substring optimization would result
+  // in constantly garbage collecting when sharing with one big string.
+
+  if (!m_rep->baseIsSelf())
+    return 0;
+
+  return (m_rep->capacity + m_rep->preCapacity) * sizeof(UChar);
 }
 
 }  // namespace
