@@ -421,6 +421,11 @@ static PassRefPtr<CSSValue> getBorderRadiusCornerValue(IntSize radius) {
   return list.release();
 }
 
+static IntRect sizingBox(RenderObject* renderer) {
+  return renderer->style()->boxSizing() == CONTENT_BOX ? renderer->contentBox()
+                                                       : renderer->borderBox();
+}
+
 CSSComputedStyleDeclaration::CSSComputedStyleDeclaration(PassRefPtr<Node> n)
     : m_node(n) {}
 
@@ -1034,7 +1039,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return new CSSPrimitiveValue(CSS_VAL_NORMAL);
     case CSS_PROP_HEIGHT:
       if (renderer)
-        return new CSSPrimitiveValue(renderer->contentHeight(),
+        return new CSSPrimitiveValue(sizingBox(renderer).height(),
                                      CSSPrimitiveValue::CSS_PX);
       return valueForLength(style->height());
     case CSS_PROP__WEBKIT_HIGHLIGHT:
@@ -1503,7 +1508,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
                                    CSSPrimitiveValue::CSS_NUMBER);
     case CSS_PROP_WIDTH:
       if (renderer)
-        return new CSSPrimitiveValue(renderer->contentWidth(),
+        return new CSSPrimitiveValue(sizingBox(renderer).width(),
                                      CSSPrimitiveValue::CSS_PX);
       return valueForLength(style->width());
     case CSS_PROP_WORD_BREAK:
