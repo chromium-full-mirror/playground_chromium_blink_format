@@ -269,10 +269,8 @@ rangeByAlteringCurrentSelection:
 - (void)setSelectionToDragCaret;
 - (void)moveSelectionToDragCaret:(DOMDocumentFragment*)selectionFragment
                        smartMove:(BOOL)smartMove;
-- (void)moveDragCaretToPoint:(NSPoint)point;
 - (DOMRange*)dragCaretDOMRange;
 - (BOOL)isDragCaretRichlyEditable;
-- (DOMRange*)editableDOMRangeForPoint:(NSPoint)point;
 - (DOMRange*)characterRangeAtPoint:(NSPoint)point;
 
 - (void)deleteKeyPressedWithSmartDelete:(BOOL)smartDelete

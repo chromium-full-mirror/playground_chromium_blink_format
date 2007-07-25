@@ -131,38 +131,14 @@ bool DragController::dragIsMove(SelectionController* selectionController,
          selectionController->isContentEditable() && !isCopyKeyDown();
 }
 
-static VisiblePosition visiblePositionForPoint(Frame* frame,
-                                               IntPoint outerPoint) {
-  ASSERT(frame);
-  HitTestResult result =
-      frame->eventHandler()->hitTestResultAtPoint(outerPoint, true);
-  Node* node = result.innerNode();
-  if (!node)
-    return VisiblePosition();
-  RenderObject* renderer = node->renderer();
-  if (!renderer)
-    return VisiblePosition();
-  VisiblePosition visiblePos = renderer->positionForCoordinates(
-      result.localPoint().x(), result.localPoint().y());
-  if (visiblePos.isNull())
-    visiblePos = VisiblePosition(Position(node, 0));
-  return visiblePos;
-}
-
 void DragController::cancelDrag() {
   m_page->dragCaretController()->clear();
 }
 
-static Document* documentAtPoint(Frame* frame, const IntPoint& point) {
-  if (!frame || !frame->view())
-    return 0;
-
-  IntPoint pt = frame->view()->windowToContents(point);
-  HitTestResult result = HitTestResult(pt);
-
-  if (frame->renderer())
-    result = frame->eventHandler()->hitTestResultAtPoint(pt, false);
-  return result.innerNode() ? result.innerNode()->document() : 0;
+void DragController::dragEnded() {
+  m_dragInitiator = 0;
+  m_didInitiateDrag = false;
+  m_page->dragCaretController()->clear();
 }
 
 DragOperation DragController::dragEntered(DragData* dragData) {
@@ -196,7 +172,7 @@ DragOperation DragController::dragUpdated(DragData* dragData) {
 bool DragController::performDrag(DragData* dragData) {
   ASSERT(dragData);
   ASSERT(m_document ==
-         documentAtPoint(m_page->mainFrame(), dragData->clientPosition()));
+         m_page->mainFrame()->documentAtPoint(dragData->clientPosition()));
   if (m_isHandlingDrag) {
     ASSERT(m_dragDestinationAction & DragDestinationActionDHTML);
     m_client->willPerformDragDestinationAction(DragDestinationActionDHTML,
@@ -234,7 +210,10 @@ bool DragController::performDrag(DragData* dragData) {
 DragOperation DragController::dragEnteredOrUpdated(DragData* dragData) {
   ASSERT(dragData);
   IntPoint windowPoint = dragData->clientPosition();
-  Document* newDraggingDoc = documentAtPoint(m_page->mainFrame(), windowPoint);
+
+  Document* newDraggingDoc = 0;
+  if (Frame* frame = m_page->mainFrame())
+    newDraggingDoc = frame->documentAtPoint(windowPoint);
   if (m_document != newDraggingDoc) {
     if (m_document)
       cancelDrag();
@@ -307,7 +286,9 @@ DragOperation DragController::tryDocumentDrag(
     Frame* innerFrame = element->document()->frame();
     ASSERT(innerFrame);
     if (!asFileInput(element)) {
-      Selection dragCaret(visiblePositionForPoint(m_document->frame(), point));
+      Selection dragCaret;
+      if (Frame* frame = m_document->frame())
+        dragCaret = frame->visiblePositionForPoint(point);
       m_page->dragCaretController()->setSelection(dragCaret);
     }
 
@@ -328,8 +309,8 @@ DragSourceAction DragController::delegateDragSourceAction(
 
 DragOperation DragController::operationForLoad(DragData* dragData) {
   ASSERT(dragData);
-  Document* doc =
-      documentAtPoint(m_page->mainFrame(), dragData->clientPosition());
+  Document* doc = 0;
+  doc = m_page->mainFrame()->documentAtPoint(dragData->clientPosition());
   if (doc && (m_didInitiateDrag || doc->isPluginDocument() ||
               (doc->frame() && doc->frame()->editor()->clientIsEditable())))
     return DragOperationNone;
@@ -342,7 +323,7 @@ static bool setSelectionToDragCaret(Frame* frame,
                                     const IntPoint& point) {
   frame->selectionController()->setSelection(dragCaret);
   if (frame->selectionController()->isNone()) {
-    dragCaret = visiblePositionForPoint(frame, point);
+    dragCaret = frame->visiblePositionForPoint(point);
     frame->selectionController()->setSelection(dragCaret);
     range = dragCaret.toRange();
   }
@@ -417,6 +398,11 @@ bool DragController::concludeDrag(DragData* dragData,
   Selection dragCaret(m_page->dragCaretController()->selection());
   m_page->dragCaretController()->clear();
   RefPtr<Range> range = dragCaret.toRange();
+
+  // For range to be null a WebKit client must have done something bad while
+  // manually controlling drag behaviour
+  if (!range)
+    return false;
   DocLoader* loader = range->ownerDocument()->docLoader();
   loader->setAllowStaleResources(true);
   if (dragIsMove(innerFrame->selectionController(), dragData) ||
@@ -831,5 +817,26 @@ void DragController::doSystemDrag(DragImageRef image,
   // drag termination event.  As dragEnded just resets drag variables, we just
   // call it anyway to be on the safe side
   dragEnded();
+}
+
+// Manual drag caret manipulation
+void DragController::placeDragCaret(const IntPoint& windowPoint) {
+  Frame* mainFrame = m_page->mainFrame();
+  Document* newDraggingDoc = mainFrame->documentAtPoint(windowPoint);
+  if (m_document != newDraggingDoc) {
+    if (m_document)
+      cancelDrag();
+    m_document = newDraggingDoc;
+  }
+  if (!m_document)
+    return;
+  Frame* frame = m_document->frame();
+  ASSERT(frame);
+  FrameView* frameView = frame->view();
+  if (!frameView)
+    return;
+  IntPoint framePoint = frameView->windowToContents(windowPoint);
+  Selection dragCaret(frame->visiblePositionForPoint(framePoint));
+  m_page->dragCaretController()->setSelection(dragCaret);
 }
 }
