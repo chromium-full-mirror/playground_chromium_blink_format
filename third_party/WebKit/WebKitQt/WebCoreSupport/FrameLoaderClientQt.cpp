@@ -447,8 +447,8 @@ void FrameLoaderClientQt::setDocumentViewFromCachedPage(CachedPage*) {
 }
 
 void FrameLoaderClientQt::updateGlobalHistoryForStandardLoad(
-    const WebCore::KURL&) {
-  notImplemented();
+    const WebCore::KURL& url) {
+  emit m_webFrame->page()->addToHistory(QUrl(url.prettyURL()));
 }
 
 void FrameLoaderClientQt::updateGlobalHistoryForReload(const WebCore::KURL&) {

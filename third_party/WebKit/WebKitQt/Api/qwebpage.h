@@ -166,6 +166,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
    */
   void initialLayoutComplete();
 
+  void addToHistory(const QUrl&);
+
  protected:
   virtual QWebFrame* createFrame(QWebFrame* parentFrame,
                                  QWebFrameData* frameData);
