@@ -553,6 +553,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const DeprecatedString& str,
   m_executingScript--;
 
   if (!m_executingScript && !state.loadingExtScript()) {
+    pendingSrc.prepend(prependingSrc);
     src.append(pendingSrc);
     pendingSrc.clear();
   } else if (!prependingSrc.isEmpty()) {
