@@ -60,6 +60,9 @@ void PageCache::setCapacity(int capacity) {
 
 void PageCache::add(PassRefPtr<HistoryItem> prpItem,
                     PassRefPtr<CachedPage> cachedPage) {
+  ASSERT(prpItem);
+  ASSERT(cachedPage);
+
   HistoryItem* item = prpItem.releaseRef();  // Balanced in remove().
 
   // Remove stale cache entry if necessary.
@@ -75,7 +78,7 @@ void PageCache::add(PassRefPtr<HistoryItem> prpItem,
 
 void PageCache::remove(HistoryItem* item) {
   // Safely ignore attempts to remove items not in the cache.
-  if (!item->m_cachedPage)
+  if (!item || !item->m_cachedPage)
     return;
 
   autorelease(item->m_cachedPage.release());

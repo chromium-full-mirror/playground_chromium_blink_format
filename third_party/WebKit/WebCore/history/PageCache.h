@@ -47,7 +47,9 @@ class PageCache : Noncopyable {
   void add(PassRefPtr<HistoryItem>,
            PassRefPtr<CachedPage>);  // Prunes if capacity() is exceeded.
   void remove(HistoryItem*);
-  CachedPage* get(HistoryItem* item) { return item->m_cachedPage.get(); }
+  CachedPage* get(HistoryItem* item) {
+    return item ? item->m_cachedPage.get() : 0;
+  }
 
   void releaseAutoreleasedPagesNow();
 
