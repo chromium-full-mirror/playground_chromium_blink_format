@@ -26,10 +26,9 @@
 #ifndef PageCache_h
 #define PageCache_h
 
+#include "HistoryItem.h"
 #include "Timer.h"
 #include <wtf/Forward.h>
-#include <wtf/HashMap.h>
-#include <wtf/ListHashSet.h>
 #include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
 
@@ -46,19 +45,21 @@ class PageCache : Noncopyable {
   int capacity() { return m_capacity; }
 
   void add(PassRefPtr<HistoryItem>,
-           PassRefPtr<CachedPage>);  // prunes if capacity() is exceeded
+           PassRefPtr<CachedPage>);  // Prunes if capacity() is exceeded.
   void remove(HistoryItem*);
-  CachedPage* get(HistoryItem*);
+  CachedPage* get(HistoryItem* item) { return item->m_cachedPage.get(); }
 
   void releaseAutoreleasedPagesNow();
 
  private:
   typedef HashSet<RefPtr<CachedPage>> CachedPageSet;
-  typedef HashMap<RefPtr<HistoryItem>, RefPtr<CachedPage>> CachedPageMap;
 
-  PageCache();
+  PageCache();   // Use pageCache() instead.
   ~PageCache();  // Not implemented to make sure nobody accidentally calls
                  // delete -- WebCore does not delete singletons.
+
+  void addToLRUList(HistoryItem*);  // Adds to the head of the list.
+  void removeFromLRUList(HistoryItem*);
 
   void prune();
 
@@ -66,12 +67,11 @@ class PageCache : Noncopyable {
   void releaseAutoreleasedPagesNowOrReschedule(Timer<PageCache>*);
 
   int m_capacity;
+  int m_size;
 
-  // FIXME: A ListHashSet is slight overkill here - we only need a simple linked
-  // list.
-  ListHashSet<HistoryItem*>
-      m_LRUList;  // m_cachedPages retains these HistoryItems for us
-  CachedPageMap m_cachedPages;
+  // LRU List
+  HistoryItem* m_head;
+  HistoryItem* m_tail;
 
   Timer<PageCache> m_autoreleaseTimer;
   CachedPageSet m_autoreleaseSet;
