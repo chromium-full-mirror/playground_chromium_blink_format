@@ -837,6 +837,7 @@ UString& UString::operator=(const char* c) {
       m_rep->offset == 0 && m_rep->preCapacity == 0) {
     d = m_rep->buf;
     m_rep->_hash = 0;
+    m_rep->len = l;
   } else {
     d = static_cast<UChar*>(fastMalloc(sizeof(UChar) * l));
     m_rep = Rep::create(d, l);

@@ -137,7 +137,7 @@ XMLHttpRequestState XMLHttpRequest::getReadyState() const {
   return m_state;
 }
 
-KJS::UString XMLHttpRequest::getResponseText() const {
+const KJS::UString& XMLHttpRequest::getResponseText() const {
   return m_responseText;
 }
 
@@ -317,7 +317,10 @@ void XMLHttpRequest::open(const String& method,
   // clear stuff from possible previous load
   m_requestHeaders.clear();
   m_response = ResourceResponse();
-  m_responseText = "";
+  {
+    KJS::JSLock lock;
+    m_responseText = "";
+  }
   m_createdDocument = false;
   m_responseXML = 0;
 
@@ -649,8 +652,11 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
   if (m_state < Sent)
     changeState(Sent);
 
-  if (m_decoder)
-    m_responseText += m_decoder->flush();
+  {
+    KJS::JSLock lock;
+    if (m_decoder)
+      m_responseText += m_decoder->flush();
+  }
 
   bool hadLoader = m_loader;
   m_loader = 0;
@@ -703,7 +709,10 @@ void XMLHttpRequest::didReceiveData(SubresourceLoader*,
 
   String decoded = m_decoder->decode(data, len);
 
-  m_responseText += decoded;
+  {
+    KJS::JSLock lock;
+    m_responseText += decoded;
+  }
 
   if (!m_aborted) {
     if (m_state != Receiving)
