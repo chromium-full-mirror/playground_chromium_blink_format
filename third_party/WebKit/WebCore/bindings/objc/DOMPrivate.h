@@ -126,11 +126,11 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 // user
 // or javascript
 @interface DOMHTMLInputElement (FormPromptAdditions)
-- (BOOL)_isEdited;
+- (BOOL)_isUserEdited;
 @end
 
 @interface DOMHTMLTextAreaElement (FormPromptAdditions)
-- (BOOL)_isEdited;
+- (BOOL)_isUserEdited;
 @end
 
 // All the methods in this category are used by Safari forms autofill and should
