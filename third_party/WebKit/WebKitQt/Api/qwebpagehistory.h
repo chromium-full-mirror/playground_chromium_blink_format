@@ -139,6 +139,7 @@ class QWebPageHistoryPrivate;
 class QWEBKIT_EXPORT QWebPageHistory {
  public:
   QWebPageHistory(const QWebPageHistory& other);
+  QWebPageHistory& operator=(const QWebPageHistory& other);
   ~QWebPageHistory();
 
   QList<QWebHistoryItem> items() const;

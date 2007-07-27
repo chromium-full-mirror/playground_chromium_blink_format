@@ -66,6 +66,7 @@ class QWEBKIT_EXPORT QWebSettings {
   ~QWebSettings();
 
   QWebSettings(const QWebSettings&);
+  QWebSettings& operator=(const QWebSettings&);
 
   void setFontFamily(FontType type, const QString& family);
   QString fontFamily(FontType type) const;

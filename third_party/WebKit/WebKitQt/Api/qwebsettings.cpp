@@ -144,6 +144,11 @@ QWebSettings::QWebSettings(const QWebSettings& other) {
   d = other.d;
 }
 
+QWebSettings& QWebSettings::operator=(const QWebSettings& other) {
+  d = other.d;
+  return *this;
+}
+
 void QWebSettings::setGlobal(const QWebSettings& settings) {
   globalSettings = settings;
 }
