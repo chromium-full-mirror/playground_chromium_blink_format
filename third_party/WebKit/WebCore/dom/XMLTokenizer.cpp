@@ -1616,10 +1616,10 @@ static void attributesStartElementNsHandler(AttributeParseState* state,
 
   for (int i = 0; i < attrs.count(); i++) {
     const QXmlStreamAttribute& attr = attrs[i];
-    String attrLocalName = attr.name().toString();
-    String attrValue = attr.value().toString();
-    String attrURI = attr.namespaceUri().toString();
-    String attrQName = attr.qualifiedName().toString();
+    String attrLocalName = attr.name();
+    String attrValue = attr.value();
+    String attrURI = attr.namespaceUri();
+    String attrQName = attr.qualifiedName();
     state->attributes.set(attrQName, attrValue);
   }
 }
@@ -1664,16 +1664,17 @@ static inline String prefixFromQName(const QString& qName) {
   else
     return qName.left(offset);
 }
+
 static inline void handleElementNamespaces(
     Element* newElement,
     const QXmlStreamNamespaceDeclarations& ns,
     ExceptionCode& ec) {
   for (int i = 0; i < ns.count(); ++i) {
     const QXmlStreamNamespaceDeclaration& decl = ns[i];
-    String namespaceQName = "xmlns";
-    String namespaceURI = decl.namespaceUri().toString();
-    if (!decl.prefix().isEmpty())
-      namespaceQName = QLatin1String("xmlns:") + decl.prefix().toString();
+    String namespaceURI = decl.namespaceUri();
+    String namespaceQName = decl.prefix().isEmpty()
+                                ? String("xmlns")
+                                : String("xmlns:") + decl.prefix();
     newElement->setAttributeNS("http://www.w3.org/2000/xmlns/", namespaceQName,
                                namespaceURI, ec);
     if (ec)  // exception setting attributes
@@ -1686,12 +1687,11 @@ static inline void handleElementAttributes(Element* newElement,
                                            ExceptionCode& ec) {
   for (int i = 0; i < attrs.count(); ++i) {
     const QXmlStreamAttribute& attr = attrs[i];
-    String attrLocalName = attr.name().toString();
-    String attrValue = attr.value().toString();
-    String attrURI = attr.namespaceUri().isEmpty()
-                         ? String()
-                         : String(attr.namespaceUri().toString());
-    String attrQName = attr.qualifiedName().toString();
+    String attrLocalName = attr.name();
+    String attrValue = attr.value();
+    String attrURI =
+        attr.namespaceUri().isEmpty() ? String() : String(attr.namespaceUri());
+    String attrQName = attr.qualifiedName();
     newElement->setAttributeNS(attrURI, attrQName, attrValue, ec);
     if (ec)  // exception setting attributes
       return;
@@ -1773,8 +1773,8 @@ void XMLTokenizer::parseStartElement() {
 
   exitText();
 
-  String localName = m_stream.name().toString();
-  String uri = m_stream.namespaceUri().toString();
+  String localName = m_stream.name();
+  String uri = m_stream.namespaceUri();
   String prefix = prefixFromQName(m_stream.qualifiedName().toString());
 
   if (m_parsingFragment && uri.isNull()) {
@@ -1785,8 +1785,6 @@ void XMLTokenizer::parseStartElement() {
   }
 
   ExceptionCode ec = 0;
-  qDebug() << prefix << prefix.isNull() << localName << localName.isNull()
-           << uri;
   QualifiedName qName(prefix, localName, uri);
   RefPtr<Element> newElement = m_doc->createElement(qName, true, ec);
   if (!newElement) {
@@ -1890,8 +1888,7 @@ void XMLTokenizer::parseEndElement() {
 void XMLTokenizer::parseCharacters() {
   if (m_currentNode->isTextNode() || enterText()) {
     ExceptionCode ec = 0;
-    static_cast<Text*>(m_currentNode)
-        ->appendData(m_stream.text().toString(), ec);
+    static_cast<Text*>(m_currentNode)->appendData(m_stream.text(), ec);
   }
 }
 
@@ -1901,8 +1898,8 @@ void XMLTokenizer::parseProcessingInstruction() {
   // ### handle exceptions
   int exception = 0;
   RefPtr<ProcessingInstruction> pi = m_doc->createProcessingInstruction(
-      m_stream.processingInstructionTarget().toString(),
-      m_stream.processingInstructionData().toString(), exception);
+      m_stream.processingInstructionTarget(),
+      m_stream.processingInstructionData(), exception);
   if (exception)
     return;
 
@@ -1922,7 +1919,7 @@ void XMLTokenizer::parseProcessingInstruction() {
 void XMLTokenizer::parseCdata() {
   exitText();
 
-  RefPtr<Node> newNode = new CDATASection(m_doc, m_stream.text().toString());
+  RefPtr<Node> newNode = new CDATASection(m_doc, m_stream.text());
   if (!m_currentNode->addChild(newNode.get()))
     return;
   if (m_view && !newNode->attached())
@@ -1932,7 +1929,7 @@ void XMLTokenizer::parseCdata() {
 void XMLTokenizer::parseComment() {
   exitText();
 
-  RefPtr<Node> newNode = new Comment(m_doc, m_stream.text().toString());
+  RefPtr<Node> newNode = new Comment(m_doc, m_stream.text());
   m_currentNode->addChild(newNode.get());
   if (m_view && !newNode->attached())
     newNode->attach();
