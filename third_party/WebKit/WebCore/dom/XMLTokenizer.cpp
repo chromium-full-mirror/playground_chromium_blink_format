@@ -1444,6 +1444,10 @@ void XMLTokenizer::resumeParsing() {
     if (m_parserPaused)
       return;
   }
+#else
+  parse();
+  if (m_parserPaused)
+    return;
 #endif
 
   // Then, write any pending data
@@ -1666,7 +1670,6 @@ static inline void handleElementAttributes(Element* newElement,
     String attrValue = attr.value().toString();
     String attrURI = attr.namespaceUri().toString();
     String attrQName = attr.qualifiedName().toString();
-
     newElement->setAttributeNS(attrURI, attrQName, attrValue, ec);
     if (ec)  // exception setting attributes
       return;
@@ -1701,10 +1704,11 @@ void WebCore::XMLTokenizer::parse() {
         parseComment();
       } break;
       case QXmlStreamReader::DTD: {
-        // qDebug()<<"DTD";
+        // qDebug()<<"------------- DTD";
+        parseDtd();
       } break;
       case QXmlStreamReader::EntityReference: {
-        // qDebug()<<"Entity";
+        // qDebug()<<"---------------- Entity";
       } break;
       case QXmlStreamReader::ProcessingInstruction: {
         parseProcessingInstruction();
@@ -1882,7 +1886,7 @@ void XMLTokenizer::parseProcessingInstruction() {
 void XMLTokenizer::parseCdata() {
   exitText();
 
-  // qDebug()<<"CDATA with "<<m_stream.text().toString();
+  qDebug() << "CDATA with " << m_stream.text().toString();
   RefPtr<Node> newNode = new CDATASection(m_doc, m_stream.text().toString());
   if (!m_currentNode->addChild(newNode.get()))
     return;
@@ -1903,6 +1907,25 @@ void XMLTokenizer::endDocument() {}
 
 bool XMLTokenizer::hasError() const {
   return m_stream.hasError();
+}
+
+void XMLTokenizer::parseDtd() {
+  const QXmlStreamNotationDeclarations& decls = m_stream.notationDeclarations();
+
+  for (int i = 0; i < decls.count(); ++i) {
+    const QXmlStreamNotationDeclaration& decl = decls[i];
+    QStringRef extId = decl.publicId();
+    if ((extId == "-//W3C//DTD XHTML 1.0 Transitional//EN") ||
+        (extId == "-//W3C//DTD XHTML 1.1//EN") ||
+        (extId == "-//W3C//DTD XHTML 1.0 Strict//EN") ||
+        (extId == "-//W3C//DTD XHTML 1.0 Frameset//EN") ||
+        (extId == "-//W3C//DTD XHTML Basic 1.0//EN") ||
+        (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN") ||
+        (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN") ||
+        (extId == "-//WAPFORUM//DTD XHTML Mobile 1.0//EN")) {
+      setIsXHTMLDocument(true);  // controls if we replace entities or not.
+    }
+  }
 }
 #endif
 }

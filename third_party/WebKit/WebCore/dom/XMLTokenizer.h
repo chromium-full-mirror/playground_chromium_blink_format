@@ -116,6 +116,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   void parseCdata();
   void parseComment();
   void endDocument();
+  void parseDtd();
   bool hasError() const;
 #endif
 
