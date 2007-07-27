@@ -5,6 +5,7 @@
  * Copyright (C) 2005, 2006 Apple Computer, Inc.
  * Copyright (C) 2006 Alexey Proskuryakov (ap@webkit.org)
  * Copyright (C) 2007 Samuel Weinig (sam@webkit.org)
+ * Copyright (C) 2007 Trolltech ASA
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -798,36 +799,6 @@ void XMLTokenizer::characters(const xmlChar* s, int len) {
   }
 }
 
-void XMLTokenizer::handleError(ErrorType type,
-                               const char* m,
-                               int lineNumber,
-                               int columnNumber) {
-  if (type == fatal ||
-      (m_errorCount < maxErrors && m_lastErrorLine != lineNumber &&
-       m_lastErrorColumn != columnNumber)) {
-    switch (type) {
-      case warning:
-        m_errorMessages += String::format("warning on line %d at column %d: %s",
-                                          lineNumber, columnNumber, m);
-        break;
-      case fatal:
-      case nonFatal:
-        m_errorMessages += String::format("error on line %d at column %d: %s",
-                                          lineNumber, columnNumber, m);
-    }
-
-    m_lastErrorLine = lineNumber;
-    m_lastErrorColumn = columnNumber;
-    ++m_errorCount;
-  }
-
-  if (type != warning)
-    m_sawError = true;
-
-  if (type == fatal)
-    stopParsing();
-}
-
 void XMLTokenizer::error(ErrorType type, const char* message, va_list args) {
   if (m_parserStopped)
     return;
@@ -1148,6 +1119,36 @@ static void ignorableWhitespaceHandler(void* ctx, const xmlChar* ch, int len) {
 }
 #endif
 
+void XMLTokenizer::handleError(ErrorType type,
+                               const char* m,
+                               int lineNumber,
+                               int columnNumber) {
+  if (type == fatal ||
+      (m_errorCount < maxErrors && m_lastErrorLine != lineNumber &&
+       m_lastErrorColumn != columnNumber)) {
+    switch (type) {
+      case warning:
+        m_errorMessages += String::format("warning on line %d at column %d: %s",
+                                          lineNumber, columnNumber, m);
+        break;
+      case fatal:
+      case nonFatal:
+        m_errorMessages += String::format("error on line %d at column %d: %s",
+                                          lineNumber, columnNumber, m);
+    }
+
+    m_lastErrorLine = lineNumber;
+    m_lastErrorColumn = columnNumber;
+    ++m_errorCount;
+  }
+
+  if (type != warning)
+    m_sawError = true;
+
+  if (type == fatal)
+    stopParsing();
+}
+
 bool XMLTokenizer::enterText() {
   RefPtr<Node> newNode = new Text(m_doc, "");
   if (!m_currentNode->addChild(newNode.get()))
@@ -1226,6 +1227,11 @@ void XMLTokenizer::end() {
       xmlFreeDoc(m_context->myDoc);
     xmlFreeParserCtxt(m_context);
     m_context = 0;
+  }
+#else
+  if (m_stream.error() == QXmlStreamReader::PrematureEndOfDocumentError) {
+    handleError(warning, qPrintable(m_stream.errorString()), lineNumber(),
+                columnNumber());
   }
 #endif
 
@@ -1703,9 +1709,16 @@ void WebCore::XMLTokenizer::parse() {
       case QXmlStreamReader::ProcessingInstruction: {
         parseProcessingInstruction();
       } break;
-      default:
-        // qDebug()<<"Invalid state = "<<m_stream.tokenType();;
-        break;
+      default: {
+        if (m_stream.error() != QXmlStreamReader::PrematureEndOfDocumentError) {
+          ErrorType type =
+              (m_stream.error() == QXmlStreamReader::NotWellFormedError)
+                  ? fatal
+                  : warning;
+          handleError(type, qPrintable(m_stream.errorString()), lineNumber(),
+                      columnNumber());
+        }
+      } break;
     }
   }
 }
