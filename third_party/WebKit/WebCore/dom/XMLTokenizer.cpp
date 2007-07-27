@@ -1701,6 +1701,7 @@ static inline void handleElementAttributes(Element* newElement,
 void XMLTokenizer::parse() {
   while (!m_parserStopped && !m_parserPaused && !m_stream.atEnd()) {
     m_stream.readNext();
+    qDebug() << m_stream.tokenType() << m_stream.text().toString();
     switch (m_stream.tokenType()) {
       case QXmlStreamReader::StartDocument: {
         startDocument();
@@ -1774,6 +1775,8 @@ void XMLTokenizer::parseStartElement() {
   }
 
   ExceptionCode ec = 0;
+  qDebug() << prefix << prefix.isNull() << localName << localName.isNull()
+           << uri;
   QualifiedName qName(prefix, localName, uri);
   RefPtr<Element> newElement = m_doc->createElement(qName, true, ec);
   if (!newElement) {
