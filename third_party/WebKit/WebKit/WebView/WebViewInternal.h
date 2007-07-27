@@ -106,7 +106,7 @@ WebViewGetFrameLoadDelegateImplementations(WebView* webView);
 + (BOOL)_representationExistsForURLScheme:(NSString*)URLScheme;
 - (BOOL)_isPerformingProgrammaticFocus;
 - (void)_mouseDidMoveOverElement:(NSDictionary*)dictionary
-                   modifierFlags:(WebNSUInteger)modifierFlags;
+                   modifierFlags:(NSUInteger)modifierFlags;
 - (WebView*)_openNewWindowWithRequest:(NSURLRequest*)request;
 - (void)_writeImageForElement:(NSDictionary*)element
           withPasteboardTypes:(NSArray*)types
