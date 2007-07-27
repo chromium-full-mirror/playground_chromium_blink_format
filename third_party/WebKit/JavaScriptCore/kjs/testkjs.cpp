@@ -45,6 +45,10 @@
 #include <crtdbg.h>
 #endif
 
+#if PLATFORM(QT)
+#include <QDateTime>
+#endif
+
 using namespace KJS;
 using namespace WTF;
 
@@ -58,7 +62,10 @@ class StopWatch {
   long getElapsedMS();  // call stop() first
 
  private:
-#if PLATFORM(WIN_OS)
+#if PLATFORM(QT)
+  uint m_startTime;
+  uint m_stopTime;
+#elif PLATFORM(WIN_OS)
   DWORD m_startTime;
   DWORD m_stopTime;
 #else
@@ -69,7 +76,10 @@ class StopWatch {
 };
 
 void StopWatch::start() {
-#if PLATFORM(WIN_OS)
+#if PLATFORM(QT)
+  QDateTime t = QDateTime::currentDateTime();
+  m_startTime = t.toTime_t() * 1000 + t.time().msec();
+#elif PLATFORM(WIN_OS)
   m_startTime = timeGetTime();
 #else
   gettimeofday(&m_startTime, 0);
@@ -77,7 +87,10 @@ void StopWatch::start() {
 }
 
 void StopWatch::stop() {
-#if PLATFORM(WIN_OS)
+#if PLATFORM(QT)
+  QDateTime t = QDateTime::currentDateTime();
+  m_stopTime = t.toTime_t() * 1000 + t.time().msec();
+#elif PLATFORM(WIN_OS)
   m_stopTime = timeGetTime();
 #else
   gettimeofday(&m_stopTime, 0);
@@ -85,7 +98,7 @@ void StopWatch::stop() {
 }
 
 long StopWatch::getElapsedMS() {
-#if PLATFORM(WIN_OS)
+#if PLATFORM(WIN_OS) || PLATFORM(QT)
   return m_stopTime - m_startTime;
 #else
   timeval elapsedTime;
