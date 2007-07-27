@@ -46,8 +46,10 @@
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
+#ifndef USE_QXMLSTREAM
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
+#endif
 #include <wtf/Platform.h>
 #include <wtf/Vector.h>
 
@@ -69,6 +71,7 @@ using namespace HTMLNames;
 
 const int maxErrors = 25;
 
+#ifndef USE_QXMLSTREAM
 class PendingCallbacks {
  public:
   PendingCallbacks() { m_callbacks.setAutoDelete(true); }
@@ -306,7 +309,7 @@ class PendingCallbacks {
  public:
   DeprecatedPtrList<PendingCallback> m_callbacks;
 };
-
+#endif
 // --------------------------------
 
 static int globalDescriptor = 0;
@@ -336,6 +339,7 @@ class OffsetBuffer {
   unsigned m_currentOffset;
 };
 
+#ifndef USE_QXMLSTREAM
 static bool shouldAllowExternalLoad(const char* inURI) {
   if (strstr(inURI, "/etc/xml/catalog") ||
       strstr(inURI, "http://www.w3.org/Graphics/SVG") == inURI ||
@@ -343,7 +347,6 @@ static bool shouldAllowExternalLoad(const char* inURI) {
     return false;
   return true;
 }
-
 static void* openFunc(const char* uri) {
   if (!globalDocLoader || !shouldAllowExternalLoad(uri))
     return &globalDescriptor;
@@ -409,13 +412,18 @@ static xmlParserCtxtPtr createStringParser(xmlSAXHandlerPtr handlers,
                                                 : XML_CHAR_ENCODING_UTF16BE);
   return parser;
 }
+#endif
 
 // --------------------------------
 
 XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
     : m_doc(_doc),
-      m_view(_view),
-      m_context(0),
+      m_view(_view)
+#ifndef USE_QXMLSTREAM
+      ,
+      m_context(0)
+#endif
+      ,
       m_currentNode(_doc),
       m_currentNodeIsReferenced(false),
       m_sawError(false),
@@ -430,13 +438,22 @@ XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
       m_lastErrorColumn(0),
       m_pendingScript(0),
       m_scriptStartLine(0),
-      m_parsingFragment(false),
-      m_pendingCallbacks(new PendingCallbacks) {}
+      m_parsingFragment(false)
+#ifndef USE_QXMLSTREAM
+      ,
+      m_pendingCallbacks(new PendingCallbacks)
+#endif
+{
+}
 
 XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
     : m_doc(fragment->document()),
-      m_view(0),
-      m_context(0),
+      m_view(0)
+#ifndef USE_QXMLSTREAM
+      ,
+      m_context(0)
+#endif
+      ,
       m_currentNode(fragment),
       m_currentNodeIsReferenced(fragment),
       m_sawError(false),
@@ -451,8 +468,12 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
       m_lastErrorColumn(0),
       m_pendingScript(0),
       m_scriptStartLine(0),
-      m_parsingFragment(true),
-      m_pendingCallbacks(new PendingCallbacks) {
+      m_parsingFragment(true)
+#ifndef USE_QXMLSTREAM
+      ,
+      m_pendingCallbacks(new PendingCallbacks)
+#endif
+{
   if (fragment)
     fragment->ref();
   if (m_doc)
@@ -518,6 +539,7 @@ bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
     return false;
   }
 
+#ifndef USE_QXMLSTREAM
   if (!m_context)
     initializeParserContext();
 
@@ -539,10 +561,11 @@ bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
                   reinterpret_cast<const char*>(parseString.characters()),
                   sizeof(UChar) * parseString.length(), 0);
   }
+#endif
 
   return false;
 }
-
+#ifndef USE_QXMLSTREAM
 inline String toString(const xmlChar* str, unsigned len) {
   return UTF8Encoding().decode(reinterpret_cast<const char*>(str), len);
 }
@@ -768,30 +791,6 @@ void XMLTokenizer::characters(const xmlChar* s, int len) {
     ExceptionCode ec = 0;
     static_cast<Text*>(m_currentNode)->appendData(toString(s, len), ec);
   }
-}
-
-bool XMLTokenizer::enterText() {
-  RefPtr<Node> newNode = new Text(m_doc, "");
-  if (!m_currentNode->addChild(newNode.get()))
-    return false;
-  setCurrentNode(newNode.get());
-  return true;
-}
-
-void XMLTokenizer::exitText() {
-  if (m_parserStopped)
-    return;
-
-  if (!m_currentNode || !m_currentNode->isTextNode())
-    return;
-
-  if (m_view && m_currentNode && !m_currentNode->attached())
-    m_currentNode->attach();
-
-  // FIXME: What's the right thing to do if the parent is really 0?
-  // Just leaving the current node set to the text node doesn't make much sense.
-  if (Node* par = m_currentNode->parentNode())
-    setCurrentNode(par);
 }
 
 void XMLTokenizer::handleError(ErrorType type,
@@ -1142,8 +1141,34 @@ static void ignorableWhitespaceHandler(void* ctx, const xmlChar* ch, int len) {
   // http://bugzilla.gnome.org/show_bug.cgi?id=172255
   // http://bugs.webkit.org/show_bug.cgi?id=5792
 }
+#endif
+
+bool XMLTokenizer::enterText() {
+  RefPtr<Node> newNode = new Text(m_doc, "");
+  if (!m_currentNode->addChild(newNode.get()))
+    return false;
+  setCurrentNode(newNode.get());
+  return true;
+}
+
+void XMLTokenizer::exitText() {
+  if (m_parserStopped)
+    return;
+
+  if (!m_currentNode || !m_currentNode->isTextNode())
+    return;
+
+  if (m_view && m_currentNode && !m_currentNode->attached())
+    m_currentNode->attach();
+
+  // FIXME: What's the right thing to do if the parent is really 0?
+  // Just leaving the current node set to the text node doesn't make much sense.
+  if (Node* par = m_currentNode->parentNode())
+    setCurrentNode(par);
+}
 
 void XMLTokenizer::initializeParserContext() {
+#ifndef USE_QXMLSTREAM
   xmlSAXHandler sax;
   memset(&sax, 0, sizeof(sax));
   sax.error = normalErrorHandler;
@@ -1162,12 +1187,15 @@ void XMLTokenizer::initializeParserContext() {
   sax.ignorableWhitespace = ignorableWhitespaceHandler;
   sax.entityDecl = xmlSAX2EntityDecl;
   sax.initialized = XML_SAX2_MAGIC;
-
+#endif
   m_parserStopped = false;
   m_sawError = false;
   m_sawXSLTransform = false;
   m_sawFirstElement = false;
+
+#ifndef USE_QXMLSTREAM
   m_context = createStringParser(&sax, this);
+#endif
 }
 
 void XMLTokenizer::end() {
@@ -1184,6 +1212,7 @@ void XMLTokenizer::end() {
   }
 #endif
 
+#ifndef USE_QXMLSTREAM
   if (m_context) {
     // Tell libxml we're done.
     xmlParseChunk(m_context, 0, 0, 1);
@@ -1193,6 +1222,7 @@ void XMLTokenizer::end() {
     xmlFreeParserCtxt(m_context);
     m_context = 0;
   }
+#endif
 
   if (m_sawError)
     insertErrorMessageBlock();
@@ -1360,16 +1390,26 @@ void* xmlDocPtrForString(DocLoader* docLoader,
 #endif
 
 int XMLTokenizer::lineNumber() const {
+#ifndef USE_QXMLSTREAM
   return m_context->input->line;
+#else
+  return m_stream.lineNumber();
+#endif
 }
 
 int XMLTokenizer::columnNumber() const {
+#ifndef USE_QXMLSTREAM
   return m_context->input->col;
+#else
+  return m_stream.columnNumber();
+#endif
 }
 
 void XMLTokenizer::stopParsing() {
   Tokenizer::stopParsing();
+#ifndef USE_QXMLSTREAM
   xmlStopParser(m_context);
+#endif
 }
 
 void XMLTokenizer::pauseParsing() {
@@ -1384,7 +1424,8 @@ void XMLTokenizer::resumeParsing() {
 
   m_parserPaused = false;
 
-  // First, execute any pending callbacks
+// First, execute any pending callbacks
+#ifndef USE_QXMLSTREAM
   while (!m_pendingCallbacks->isEmpty()) {
     m_pendingCallbacks->callAndRemoveFirstCallback(this);
 
@@ -1392,6 +1433,7 @@ void XMLTokenizer::resumeParsing() {
     if (m_parserPaused)
       return;
   }
+#endif
 
   // Then, write any pending data
   SegmentedString rest = m_pendingSrc;
@@ -1400,10 +1442,16 @@ void XMLTokenizer::resumeParsing() {
 
   // Finally, if finish() has been called and write() didn't result
   // in any further callbacks being queued, call end()
-  if (m_finishCalled && m_pendingCallbacks->isEmpty())
+  if (m_finishCalled
+#ifndef USE_QXMLSTREAM
+      && m_pendingCallbacks->isEmpty())
+#else
+      )
+#endif
     end();
 }
 
+#ifndef USE_QXMLSTREAM
 static void balancedStartElementNsHandler(void* closure,
                                           const xmlChar* localname,
                                           const xmlChar* prefix,
@@ -1454,12 +1502,13 @@ static void balancedWarningHandler(void* closure, const char* message, ...) {
                                              args);
   va_end(args);
 }
-
+#endif
 bool parseXMLDocumentFragment(const String& string,
                               DocumentFragment* fragment,
                               Element* parent) {
   XMLTokenizer tokenizer(fragment, parent);
 
+#ifndef USE_QXMLSTREAM
   xmlSAXHandler sax;
   memset(&sax, 0, sizeof(sax));
 
@@ -1476,6 +1525,8 @@ bool parseXMLDocumentFragment(const String& string,
   int result = xmlParseBalancedChunkMemory(
       0, &sax, &tokenizer, 0, (const xmlChar*)string.utf8().data(), 0);
   return result == 0;
+#endif
+  return false;
 }
 
 // --------------------------------
@@ -1485,6 +1536,7 @@ struct AttributeParseState {
   bool gotAttributes;
 };
 
+#ifndef USE_QXMLSTREAM
 static void attributesStartElementNsHandler(void* closure,
                                             const xmlChar* xmlLocalName,
                                             const xmlChar* xmlPrefix,
@@ -1516,11 +1568,13 @@ static void attributesStartElementNsHandler(void* closure,
     state->attributes.set(attrQName, attrValue);
   }
 }
+#endif
 
 HashMap<String, String> parseAttributes(const String& string, bool& attrsOK) {
   AttributeParseState state;
   state.gotAttributes = false;
 
+#ifndef USE_QXMLSTREAM
   xmlSAXHandler sax;
   memset(&sax, 0, sizeof(sax));
   sax.startElementNs = attributesStartElementNsHandler;
@@ -1532,7 +1586,7 @@ HashMap<String, String> parseAttributes(const String& string, bool& attrsOK) {
   if (parser->myDoc)
     xmlFreeDoc(parser->myDoc);
   xmlFreeParserCtxt(parser);
-
+#endif
   attrsOK = state.gotAttributes;
   return state.attributes;
 }

@@ -25,14 +25,27 @@
 #ifndef XMLTokenizer_h
 #define XMLTokenizer_h
 
+#include "config.h"
+
 #include "CachedResourceClient.h"
 #include "SegmentedString.h"
 #include "StringHash.h"
 #include "Tokenizer.h"
-#include <libxml/tree.h>
-#include <libxml/xmlstring.h>
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
+
+#if PLATFORM(QT)
+#if !ENABLE(XSLT)
+#define USE_QXMLSTREAM
+#endif
+#endif
+
+#ifndef USE_QXMLSTREAM
+#include <libxml/tree.h>
+#include <libxml/xmlstring.h>
+#else
+#include <QtXml/qxmlstream.h>
+#endif
 
 namespace WebCore {
 
@@ -70,6 +83,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   // from CachedResourceClient
   virtual void notifyFinished(CachedResource* finishedObj);
 
+#ifndef USE_QXMLSTREAM
   // callbacks from parser SAX
   void error(ErrorType, const char* message, va_list args);
   void startElementNs(const xmlChar* xmlLocalName,
@@ -91,6 +105,8 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   void internalSubset(const xmlChar* name,
                       const xmlChar* externalID,
                       const xmlChar* systemID);
+#else
+#endif
 
   void handleError(ErrorType type,
                    const char* m,
@@ -116,7 +132,11 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
 
   String m_originalSourceForTransform;
 
+#ifdef USE_QXMLSTREAM
+  QXmlStreamReader m_stream;
+#else
   xmlParserCtxtPtr m_context;
+#endif
   Node* m_currentNode;
   bool m_currentNodeIsReferenced;
 
@@ -143,8 +163,9 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
 
   typedef HashMap<String, String> PrefixForNamespaceMap;
   PrefixForNamespaceMap m_prefixToNamespaceMap;
-
+#ifndef USE_QXMLSTREAM
   OwnPtr<PendingCallbacks> m_pendingCallbacks;
+#endif
   SegmentedString m_pendingSrc;
 };
 
