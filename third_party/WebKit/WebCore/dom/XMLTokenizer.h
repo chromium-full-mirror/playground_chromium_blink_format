@@ -106,6 +106,16 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
                       const xmlChar* externalID,
                       const xmlChar* systemID);
 #else
+  void parse();
+  void startDocument();
+  void parseStartElement();
+  void parseEndElement();
+  void parseCharacters();
+  void parseProcessingInstruction();
+  void parseCdata();
+  void parseComment();
+  void endDocument();
+  bool hasError() const;
 #endif
 
   void handleError(ErrorType type,
