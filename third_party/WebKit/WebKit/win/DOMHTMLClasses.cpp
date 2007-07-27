@@ -42,6 +42,7 @@
 #include <WebCore/HTMLTextAreaElement.h>
 #include <WebCore/IntRect.h>
 #include <WebCore/RenderObject.h>
+#include <WebCore/RenderTextControl.h>
 #pragma warning(pop)
 
 using namespace WebCore;
@@ -778,6 +779,8 @@ DOMHTMLInputElement::QueryInterface(REFIID riid, void** ppvObject) {
     *ppvObject = static_cast<IDOMHTMLInputElement*>(this);
   else if (IsEqualGUID(riid, IID_IFormsAutoFillTransition))
     *ppvObject = static_cast<IFormsAutoFillTransition*>(this);
+  else if (IsEqualGUID(riid, IID_IFormPromptAdditions))
+    *ppvObject = static_cast<IFormPromptAdditions*>(this);
   else
     return DOMHTMLElement::QueryInterface(riid, ppvObject);
 
@@ -1117,6 +1120,26 @@ HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::setAutofilled(
   return S_OK;
 }
 
+// DOMHTMLInputElement -- IFormPromptAdditions
+// ------------------------------------
+
+HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::isUserEdited(
+    /* [retval][out] */ BOOL* result) {
+  if (!result)
+    return E_POINTER;
+
+  *result = FALSE;
+  ASSERT(m_element);
+  BOOL textField = FALSE;
+  if (FAILED(isTextField(&textField)) || !textField)
+    return S_OK;
+  RenderObject* renderer = m_element->renderer();
+  if (renderer &&
+      static_cast<WebCore::RenderTextControl*>(renderer)->isUserEdited())
+    *result = TRUE;
+  return S_OK;
+}
+
 // DOMHTMLTextAreaElement - IUnknown
 // ----------------------------------------------
 
@@ -1125,6 +1148,8 @@ DOMHTMLTextAreaElement::QueryInterface(REFIID riid, void** ppvObject) {
   *ppvObject = 0;
   if (IsEqualGUID(riid, IID_IDOMHTMLTextAreaElement))
     *ppvObject = static_cast<IDOMHTMLTextAreaElement*>(this);
+  else if (IsEqualGUID(riid, IID_IFormPromptAdditions))
+    *ppvObject = static_cast<IFormPromptAdditions*>(this);
   else
     return DOMHTMLElement::QueryInterface(riid, ppvObject);
 
@@ -1277,5 +1302,22 @@ HRESULT STDMETHODCALLTYPE DOMHTMLTextAreaElement::select(void) {
   HTMLTextAreaElement* textareaElement =
       static_cast<HTMLTextAreaElement*>(m_element);
   textareaElement->select();
+  return S_OK;
+}
+
+// DOMHTMLTextAreaElement -- IFormPromptAdditions
+// ------------------------------------
+
+HRESULT STDMETHODCALLTYPE DOMHTMLTextAreaElement::isUserEdited(
+    /* [retval][out] */ BOOL* result) {
+  if (!result)
+    return E_POINTER;
+
+  *result = FALSE;
+  ASSERT(m_element);
+  RenderObject* renderer = m_element->renderer();
+  if (renderer &&
+      static_cast<WebCore::RenderTextControl*>(renderer)->isUserEdited())
+    *result = TRUE;
   return S_OK;
 }
