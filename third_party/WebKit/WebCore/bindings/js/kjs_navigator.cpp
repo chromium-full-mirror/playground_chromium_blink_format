@@ -71,7 +71,7 @@ class PluginBase : public DOMObject {
   PluginBase(ExecState* exec);
   virtual ~PluginBase();
 
-  void refresh(bool reload);
+  static void refresh(bool reload);
 
  protected:
   static void cachePluginDataIfNecessary();
@@ -573,7 +573,7 @@ bool MimeType::getOwnPropertySlot(ExecState* exec,
 JSValue* PluginsFunc::callAsFunction(ExecState* exec,
                                      JSObject*,
                                      const List& args) {
-  PluginBase(exec).refresh(args[0]->toBoolean(exec));
+  PluginBase::refresh(args[0]->toBoolean(exec));
   return jsUndefined();
 }
 
