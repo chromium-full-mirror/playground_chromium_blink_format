@@ -152,7 +152,7 @@ class Widget {
 
   QWebFrame* qwebframe() const;
   void setQWebFrame(QWebFrame* webFrame);
-  void setParent(ScrollView*);
+  virtual void setParent(ScrollView*);
   ScrollView* parent() const;
   virtual void geometryChanged() const;
 
