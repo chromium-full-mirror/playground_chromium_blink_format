@@ -135,6 +135,10 @@ GtkStateType RenderThemeGdk::determineState(RenderObject* o) {
   return result;
 }
 
+GtkShadowType RenderThemeGdk::determineShadow(RenderObject* o) {
+  return isChecked(o) ? GTK_SHADOW_IN : GTK_SHADOW_OUT;
+}
+
 ThemeData RenderThemeGdk::getThemeData(RenderObject* o) {
   ThemeData result;
   switch (o->style()->appearance()) {
@@ -173,9 +177,8 @@ bool RenderThemeGdk::paintCheckbox(RenderObject* o,
   // FIXME: is it the right thing to do?
   GtkWidget* checkbox = gtkCheckbox();
   gtk_paint_check(checkbox->style, i.context->gdkDrawable(), determineState(o),
-                  isChecked(o) ? GTK_SHADOW_IN : GTK_SHADOW_OUT, NULL, checkbox,
-                  "checkbutton", rect.x(), rect.y(), rect.width(),
-                  rect.height());
+                  determineShadow(o), NULL, checkbox, "checkbutton", rect.x(),
+                  rect.y(), rect.width(), rect.height());
 
   return false;
 }
@@ -207,9 +210,8 @@ bool RenderThemeGdk::paintRadio(RenderObject* o,
   // FIXME: is it the right thing to do?
   GtkWidget* radio = gtkRadioButton();
   gtk_paint_option(radio->style, i.context->gdkDrawable(), determineState(o),
-                   isChecked(o) ? GTK_SHADOW_IN : GTK_SHADOW_OUT, NULL, radio,
-                   "radiobutton", rect.x(), rect.y(), rect.width(),
-                   rect.height());
+                   determineShadow(o), NULL, radio, "radiobutton", rect.x(),
+                   rect.y(), rect.width(), rect.height());
 
   return false;
 }
@@ -220,8 +222,8 @@ bool RenderThemeGdk::paintButton(RenderObject* o,
   // FIXME: should use theme-aware drawing. This should honor the state as well
   GtkWidget* button = gtkButton();
   gtk_paint_box(button->style, i.context->gdkDrawable(), determineState(o),
-                isChecked(o) ? GTK_SHADOW_IN : GTK_SHADOW_OUT, NULL, button,
-                "button", rect.x(), rect.y(), rect.width(), rect.height());
+                determineShadow(o), NULL, button, "button", rect.x(), rect.y(),
+                rect.width(), rect.height());
   return false;
 }
 
@@ -285,7 +287,13 @@ GtkWidget* RenderThemeGdk::gtkRadioButton() const {
 GtkWidget* RenderThemeGdk::gtkWindowContainer() const {
   if (!m_container) {
     m_unmappedWindow = gtk_window_new(GTK_WINDOW_POPUP);
-    m_container = gtk_fixed_new();
+    // Some GTK themes (i.e. Clearlooks) draw the buttons differently
+    // (in particular, call gtk_style_apply_default_background) if they
+    // are unallocated and are children of a GtkFixed widget, which is
+    // apparently what some "make Firefox buttons look like GTK" code
+    // does.  To avoid this ugly look, we use a GtkHBox as a parent,
+    // rather than a GtkFixed.
+    m_container = gtk_hbox_new(false, 0);
     gtk_container_add(GTK_CONTAINER(m_unmappedWindow), m_container);
     gtk_widget_realize(m_unmappedWindow);
   }
