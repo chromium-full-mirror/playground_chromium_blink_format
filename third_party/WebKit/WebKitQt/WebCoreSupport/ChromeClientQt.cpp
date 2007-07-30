@@ -231,14 +231,14 @@ IntRect ChromeClientQt::windowResizerRect() const {
   return IntRect();
 }
 
-void ChromeClientQt::addToDirtyRegion(const IntRect& r) {
-  m_webPage->update(r);
-}
+void ChromeClientQt::addToDirtyRegion(const IntRect& r) {}
 
-void ChromeClientQt::scrollBackingStore(int,
-                                        int,
-                                        const IntRect&,
-                                        const IntRect&) {}
+void ChromeClientQt::scrollBackingStore(int dx,
+                                        int dy,
+                                        const IntRect& scrollViewRect,
+                                        const IntRect& clipRect) {
+  m_webPage->scroll(dx, dy, scrollViewRect);
+}
 
 void ChromeClientQt::updateBackingStore() {}
 
