@@ -39,5 +39,5 @@
     didSetSelectionTypesForPasteboard:(NSPasteboard*)pasteboard;
 - (BOOL)webView:(WebView*)webView
     shouldMoveRangeAfterDelete:(DOMRange*)range
-                replacingRange:(DOMRange*)range;
+                replacingRange:(DOMRange*)rangeToBeReplaced;
 @end
