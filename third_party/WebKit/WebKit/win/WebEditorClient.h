@@ -72,6 +72,7 @@ class WebEditorClient : public WebCore::EditorClient {
                         WebCore::Range* replacingRange,
                         WebCore::EditorInsertAction);
   bool shouldApplyStyle(WebCore::CSSStyleDeclaration*, WebCore::Range*);
+  bool shouldMoveRangeAfterDelete(WebCore::Range*, WebCore::Range*);
   bool shouldChangeTypingStyle(WebCore::CSSStyleDeclaration* currentStyle,
                                WebCore::CSSStyleDeclaration* toProposedStyle);
 

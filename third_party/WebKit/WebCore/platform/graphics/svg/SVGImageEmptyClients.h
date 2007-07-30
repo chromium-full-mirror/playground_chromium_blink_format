@@ -423,6 +423,7 @@ class SVGEmptyEditorClient : public EditorClient {
   }
 
   virtual bool shouldApplyStyle(CSSStyleDeclaration*, Range*) { return false; }
+  virtual bool shouldMoveRangeAfterDelete(Range*, Range*) { return false; }
   //  virtual bool shouldChangeTypingStyle(CSSStyleDeclaration* fromStyle,
   //  CSSStyleDeclaration* toStyle) { return false; }
   //  virtual bool doCommandBySelector(SEL selector) { return false; }

@@ -268,6 +268,12 @@ bool WebEditorClient::shouldApplyStyle(CSSStyleDeclaration* /*style*/,
   return true;
 }
 
+bool WebEditorClient::shouldMoveRangeAfterDelete(Range* /*range*/,
+                                                 Range* /*rangeToBeReplaced*/) {
+  notImplemented();
+  return true;
+}
+
 bool WebEditorClient::shouldChangeTypingStyle(
     CSSStyleDeclaration* /*currentStyle*/,
     CSSStyleDeclaration* /*toProposedStyle*/) {

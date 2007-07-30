@@ -68,6 +68,9 @@ class WebEditorClient : public WebCore::EditorClient {
 
   virtual bool shouldApplyStyle(WebCore::CSSStyleDeclaration*, WebCore::Range*);
 
+  virtual bool shouldMoveRangeAfterDelete(WebCore::Range* range,
+                                          WebCore::Range* rangeToBeReplaced);
+
   virtual void didBeginEditing();
   virtual void didEndEditing();
   virtual void didWriteSelectionToPasteboard();
