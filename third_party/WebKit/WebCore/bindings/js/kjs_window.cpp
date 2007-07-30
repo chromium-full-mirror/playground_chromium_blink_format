@@ -408,7 +408,7 @@ static Frame* createWindow(ExecState* exec,
           KURL(completedURL.deprecatedString()),
           activeFrame->loader()->outgoingReferrer(), false, userGesture);
       if (Document* oldDoc = openerFrame->document()) {
-        newFrame->document()->setDomain(oldDoc->domain(), true);
+        newFrame->document()->setDomainInternal(oldDoc->domain());
         newFrame->document()->setBaseURL(oldDoc->baseURL());
       }
     } else if (!url.isEmpty())
@@ -963,27 +963,34 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
 
 bool Window::isSafeScript(ExecState* exec) const {
   Frame* frame = impl()->frame();
-  if (!frame)  // frame deleted ? can't grant access
+  if (!frame)
     return false;
   Frame* activeFrame =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())->frame();
   if (!activeFrame)
     return false;
-  if (activeFrame == frame)  // Not calling from another frame, no problem.
+  if (activeFrame == frame)
     return true;
+
+  WebCore::Document* thisDocument = frame->document();
 
   // JS may be attempting to access the "window" object, which should be valid,
   // even if the document hasn't been constructed yet.  If the document doesn't
   // exist yet allow JS to access the window object.
-  if (!frame->document())
+  if (!thisDocument)
     return true;
 
-  WebCore::Document* thisDocument = frame->document();
   WebCore::Document* actDocument = activeFrame->document();
 
+  if (actDocument) {
+    if (thisDocument->domainWasSetInDOM() && actDocument->domainWasSetInDOM()) {
+      if (thisDocument->domain() == actDocument->domain())
+        return true;
+    }
+  }
+
   KURL actURL = activeFrame->loader()->url();
-  WebCore::String actDomain =
-      actDocument ? actDocument->domain() : actURL.host();
+  WebCore::String actDomain = actURL.host();
 
   // FIXME: this really should be explicitly checking for the "file:" protocol
   // instead
@@ -992,7 +999,6 @@ bool Window::isSafeScript(ExecState* exec) const {
     return true;
 
   KURL thisURL = frame->loader()->url();
-  WebCore::String thisDomain = thisDocument->domain();
 
   // If this document is being initially loaded as empty by its parent
   // or opener, allow access from any document in the same domain as
@@ -1004,10 +1010,11 @@ bool Window::isSafeScript(ExecState* exec) const {
            shouldLoadAsEmptyDocument(ancestorFrame->loader()->url()))
       ancestorFrame = ancestorFrame->tree()->parent();
     if (ancestorFrame) {
-      thisDomain = ancestorFrame->document()->domain();
       thisURL = ancestorFrame->loader()->url();
     }
   }
+
+  WebCore::String thisDomain = thisURL.host();
 
   if (actDomain == thisDomain && actURL.protocol() == thisURL.protocol() &&
       actURL.port() == thisURL.port())

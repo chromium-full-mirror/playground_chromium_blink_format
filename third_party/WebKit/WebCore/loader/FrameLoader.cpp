@@ -1282,7 +1282,7 @@ void FrameLoader::checkCallImplicitClose() {
     for (Frame* child = m_frame->tree()->firstChild(); child;
          child = child->tree()->nextSibling())
       if (child->document())
-        child->document()->setDomain(domain);
+        child->document()->setDomainInternal(domain);
   }
 
   m_didCallImplicitClose = true;
