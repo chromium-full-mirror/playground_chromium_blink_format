@@ -213,7 +213,7 @@ static void webkit_gtk_page_class_init(WebKitGtkPageClass* page_class) {
    */
   webkit_gtk_page_signals[LOAD_STARTED] = g_signal_new(
       "load_started", G_TYPE_FROM_CLASS(page_class),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL, NULL, NULL,
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_GTK_TYPE_FRAME);
 
   /**
@@ -223,41 +223,40 @@ static void webkit_gtk_page_class_init(WebKitGtkPageClass* page_class) {
    */
   webkit_gtk_page_signals[LOAD_PROGRESS_CHANGED] = g_signal_new(
       "load_progress_changed", G_TYPE_FROM_CLASS(page_class),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL, NULL, NULL,
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
 
-  webkit_gtk_page_signals[LOAD_FINISHED] =
-      g_signal_new("load_finished", G_TYPE_FROM_CLASS(page_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, webkit_gtk_marshal_VOID__OBJECT_BOOLEAN,
-                   G_TYPE_NONE, 2, WEBKIT_GTK_TYPE_FRAME, G_TYPE_BOOLEAN);
+  webkit_gtk_page_signals[LOAD_FINISHED] = g_signal_new(
+      "load_finished", G_TYPE_FROM_CLASS(page_class),
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_GTK_TYPE_FRAME);
 
   webkit_gtk_page_signals[TITLE_CHANGED] =
       g_signal_new("title_changed", G_TYPE_FROM_CLASS(page_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, webkit_gtk_marshal_VOID__STRING_STRING,
-                   G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, webkit_gtk_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
+                   G_TYPE_STRING, G_TYPE_STRING);
 
   webkit_gtk_page_signals[HOVERING_OVER_LINK] =
       g_signal_new("hovering_over_link", G_TYPE_FROM_CLASS(page_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, webkit_gtk_marshal_VOID__STRING_STRING,
-                   G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, webkit_gtk_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
+                   G_TYPE_STRING, G_TYPE_STRING);
 
   webkit_gtk_page_signals[STATUS_BAR_TEXT_CHANGED] = g_signal_new(
       "status_bar_text_changed", G_TYPE_FROM_CLASS(page_class),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL, NULL, NULL,
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
 
   webkit_gtk_page_signals[ICOND_LOADED] =
       g_signal_new("icon_loaded", G_TYPE_FROM_CLASS(page_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   webkit_gtk_page_signals[SELECTION_CHANGED] =
       g_signal_new("selection_changed", G_TYPE_FROM_CLASS(page_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   /*
    * implementations of virtual methods

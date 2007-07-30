@@ -68,25 +68,25 @@ static void webkit_gtk_frame_class_init(WebKitGtkFrameClass* frame_class) {
    */
   webkit_gtk_frame_signals[CLEARED] =
       g_signal_new("cleared", G_TYPE_FROM_CLASS(frame_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   webkit_gtk_frame_signals[LOAD_DONE] = g_signal_new(
       "load_done", G_TYPE_FROM_CLASS(frame_class),
-      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL, NULL, NULL,
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
 
   webkit_gtk_frame_signals[TITLE_CHANGED] =
       g_signal_new("title_changed", G_TYPE_FROM_CLASS(frame_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, webkit_gtk_marshal_VOID__STRING_STRING,
-                   G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, webkit_gtk_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
+                   G_TYPE_STRING, G_TYPE_STRING);
 
   webkit_gtk_frame_signals[HOVERING_OVER_LINK] =
       g_signal_new("hovering_over_link", G_TYPE_FROM_CLASS(frame_class),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), NULL,
-                   NULL, NULL, webkit_gtk_marshal_VOID__STRING_STRING,
-                   G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, webkit_gtk_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
+                   G_TYPE_STRING, G_TYPE_STRING);
 
   /*
    * implementations of virtual methods
