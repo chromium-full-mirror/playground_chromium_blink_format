@@ -266,7 +266,7 @@ void MainResourceLoader::callContinueAfterContentPolicy(void* argument,
 void MainResourceLoader::continueAfterContentPolicy(PolicyAction policy) {
   ASSERT(m_waitingForContentPolicy);
   m_waitingForContentPolicy = false;
-  if (!frameLoader()->isStopping())
+  if (frameLoader() && !frameLoader()->isStopping())
     continueAfterContentPolicy(policy, m_response);
   deref();  // balances ref in didReceiveResponse
 }
