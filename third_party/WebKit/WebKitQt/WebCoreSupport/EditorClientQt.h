@@ -68,6 +68,8 @@ class EditorClientQt : public EditorClient {
 
   virtual bool shouldApplyStyle(CSSStyleDeclaration*, Range*);
 
+  virtual bool shouldMoveRangeAfterDelete(Range*, Range*);
+
   virtual void didBeginEditing();
   virtual void respondToChangedContents();
   virtual void respondToChangedSelection();
