@@ -204,7 +204,7 @@ class FrameLoader : Noncopyable
 
   // Also not cool.
   void stopAllLoaders();
-  void stopForUserCancel();
+  void stopForUserCancel(bool deferCheckLoadComplete = false);
   void cancelPendingArchiveLoad(ResourceLoader*);
 
   bool isLoadingMainResource() const { return m_isLoadingMainResource; }
@@ -462,6 +462,7 @@ class FrameLoader : Noncopyable
   void finishedParsing();
   void checkCompleted();
   void scheduleCheckCompleted();
+  void scheduleCheckLoadComplete();
 
   void clearRecordedFormValues();
   void recordFormValue(const String& name,
@@ -561,6 +562,7 @@ class FrameLoader : Noncopyable
 
   void redirectionTimerFired(Timer<FrameLoader>*);
   void checkCompletedTimerFired(Timer<FrameLoader>*);
+  void checkLoadCompleteTimerFired(Timer<FrameLoader>*);
 
   void cancelRedirection(bool newLoadInProgress = false);
 
@@ -771,6 +773,7 @@ class FrameLoader : Noncopyable
 
   Timer<FrameLoader> m_redirectionTimer;
   Timer<FrameLoader> m_checkCompletedTimer;
+  Timer<FrameLoader> m_checkLoadCompleteTimer;
 
   Frame* m_opener;
   HashSet<Frame*> m_openedFrames;
