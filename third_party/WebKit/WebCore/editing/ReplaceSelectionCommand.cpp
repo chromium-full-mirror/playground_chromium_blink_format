@@ -30,6 +30,7 @@
 #include "BeforeTextInsertedEvent.h"
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSPropertyNames.h"
+#include "CSSValueKeywords.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "EditingText.h"
@@ -281,6 +282,7 @@ ReplaceSelectionCommand::ReplaceSelectionCommand(
     bool smartReplace,
     bool matchStyle,
     bool preventNesting,
+    bool movingParagraph,
     EditAction editAction)
     : CompositeEditCommand(document),
       m_selectReplacement(selectReplacement),
@@ -288,6 +290,7 @@ ReplaceSelectionCommand::ReplaceSelectionCommand(
       m_matchStyle(matchStyle),
       m_documentFragment(fragment),
       m_preventNesting(preventNesting),
+      m_movingParagraph(movingParagraph),
       m_editAction(editAction) {}
 
 bool ReplaceSelectionCommand::shouldMergeStart(
@@ -353,6 +356,29 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& from,
          // would
          // be a no-op and cause infinite recursion.
          !isBlock(fromNode) && !isBlock(toNode);
+}
+
+// Style rules that match just inserted elements could change their appearance,
+// like
+// a div inserted into a document with div { display:inline; }.
+void ReplaceSelectionCommand::negateStyleRulesThatAffectAppearance() {
+  for (RefPtr<Node> node = m_firstNodeInserted.get(); node;
+       node = node->traverseNextNode()) {
+    // FIXME: <rdar://problem/5371536> Style rules that match pasted content can
+    // change it's appearance
+    if (isStyleSpan(node.get())) {
+      HTMLElement* e = static_cast<HTMLElement*>(node.get());
+      // There are other styles that style rules can give to style spans,
+      // but these are the two important ones because they'll prevent
+      // inserted content from appearing in the right paragraph.
+      if (isBlock(e))
+        e->getInlineStyleDecl()->setProperty(CSS_PROP_DISPLAY, CSS_VAL_INLINE);
+      if (e->renderer() && e->renderer()->style()->floating() != FNONE)
+        e->getInlineStyleDecl()->setProperty(CSS_PROP_FLOAT, CSS_VAL_NONE);
+    }
+    if (node == m_lastLeafInserted)
+      break;
+  }
 }
 
 void ReplaceSelectionCommand::removeRedundantStyles(
@@ -629,6 +655,8 @@ void ReplaceSelectionCommand::doApply() {
     node = next;
   }
 
+  negateStyleRulesThatAffectAppearance();
+
   removeRedundantStyles(mailBlockquoteEnclosingSelectionStart);
 
   endOfInsertedContent = positionAtEndOfInsertedContent();
@@ -653,6 +681,11 @@ void ReplaceSelectionCommand::doApply() {
 
   if (shouldMergeStart(selectionStartWasStartOfParagraph,
                        fragment.hasInterchangeNewlineAtStart())) {
+    // Bail to avoid infinite recursion.
+    if (m_movingParagraph) {
+      ASSERT_NOT_REACHED();
+      return;
+    }
     VisiblePosition destination = startOfInsertedContent.previous();
     VisiblePosition startOfParagraphToMove = startOfInsertedContent;
 
@@ -703,6 +736,11 @@ void ReplaceSelectionCommand::doApply() {
           createBreakElement(document()).get(), m_lastLeafInserted.get());
 
   } else if (shouldMergeEnd(selectionEndWasEndOfParagraph)) {
+    // Bail to avoid infinite recursion.
+    if (m_movingParagraph) {
+      ASSERT_NOT_REACHED();
+      return;
+    }
     // Merging two paragraphs will destroy the moved one's block styles.  Always
     // move forward to preserve
     // the block style of the paragraph already in the document, unless the

@@ -848,7 +848,7 @@ void CompositeEditCommand::moveParagraphs(
 
   setEndingSelection(destination);
   applyCommandToComposite(new ReplaceSelectionCommand(
-      document(), fragment.get(), true, false, !preserveStyle, false));
+      document(), fragment.get(), true, false, !preserveStyle, false, true));
 
   if (preserveSelection && startIndex != -1) {
     // Fragment creation (using createMarkup) incorrectly uses regular

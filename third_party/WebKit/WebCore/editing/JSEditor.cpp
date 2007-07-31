@@ -283,9 +283,9 @@ bool execInsertHorizontalRule(Frame* frame,
   if (ec)
     return false;
 
-  applyCommand(new ReplaceSelectionCommand(frame->document(),
-                                           fragment.release(), false, false,
-                                           false, true, EditActionUnspecified));
+  applyCommand(new ReplaceSelectionCommand(
+      frame->document(), fragment.release(), false, false, false, true, false,
+      EditActionUnspecified));
   return true;
 }
 
