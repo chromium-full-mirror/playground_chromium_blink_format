@@ -124,9 +124,9 @@ class Settings {
     return m_usesDashboardBackwardCompatibilityMode;
   }
 
-  void setNeedsAcrobatFrameReloadingQuirk(bool);
+  void setNeedsAdobeFrameReloadingQuirk(bool);
   bool needsAcrobatFrameReloadingQuirk() const {
-    return m_needsAcrobatFrameReloadingQuirk;
+    return m_needsAdobeFrameReloadingQuirk;
   }
 
   void setDOMPasteAllowed(bool);
@@ -180,7 +180,7 @@ class Settings {
   bool m_shouldPrintBackgrounds : 1;
   bool m_textAreasAreResizable : 1;
   bool m_usesDashboardBackwardCompatibilityMode : 1;
-  bool m_needsAcrobatFrameReloadingQuirk : 1;
+  bool m_needsAdobeFrameReloadingQuirk : 1;
   bool m_isDOMPasteAllowed : 1;
   bool m_shrinksStandaloneImagesToFit : 1;
   bool m_usesPageCache : 1;
