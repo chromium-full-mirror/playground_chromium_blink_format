@@ -983,7 +983,7 @@ class Document : public ContainerNode {
 
   HTMLCollection::CollectionInfo
       m_collectionInfo[HTMLCollection::UnnamedCollectionTypes];
-  HashMap<AtomicStringImpl*, HTMLCollection::CollectionInfo>
+  HashMap<AtomicStringImpl*, HTMLCollection::CollectionInfo*>
       m_nameCollectionInfo[HTMLCollection::CollectionTypes -
                            HTMLCollection::UnnamedCollectionTypes];
 
