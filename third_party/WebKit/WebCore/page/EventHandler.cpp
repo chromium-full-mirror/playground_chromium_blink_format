@@ -1132,6 +1132,9 @@ bool EventHandler::updateDragAndDrop(const PlatformMouseEvent& event,
   if (!m_frame->document())
     return false;
 
+  if (!m_frame->view())
+    return false;
+
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(HitTestRequest(true, false), event);
 
