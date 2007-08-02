@@ -468,7 +468,7 @@ class UString {
   size_t cost() const;
 
  private:
-  int expandedSize(int size, int otherSize) const;
+  size_t expandedSize(size_t size, size_t otherSize) const;
   int usedCapacity() const;
   int usedPreCapacity() const;
   void expandCapacity(int requiredLength);

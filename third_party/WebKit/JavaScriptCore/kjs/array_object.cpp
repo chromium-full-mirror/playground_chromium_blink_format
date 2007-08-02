@@ -570,6 +570,11 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
       for (unsigned int k = 0; k < length; k++) {
         if (k >= 1)
           str += separator;
+        if (str.isNull()) {
+          JSObject* error = Error::create(exec, GeneralError, "Out of memory");
+          exec->setException(error);
+          break;
+        }
 
         JSValue* element = thisObj->get(exec, k);
         if (element->isUndefinedOrNull())
@@ -592,6 +597,11 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
 
         if (id == ToString || id == Join || fallback)
           str += element->toString(exec);
+
+        if (str.isNull()) {
+          JSObject* error = Error::create(exec, GeneralError, "Out of memory");
+          exec->setException(error);
+        }
 
         if (exec->hadException())
           break;
