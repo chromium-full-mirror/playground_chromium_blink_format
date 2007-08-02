@@ -83,6 +83,8 @@ KJS::Bindings::Instance* Frame::createScriptInstanceForWidget(Widget* widget) {
 
 Vector<IntRect> computePageRectsForFrame(Frame* frame,
                                          const IntRect& printRect,
+                                         float headerHeight,
+                                         float footerHeight,
                                          float userScaleFactor) {
   ASSERT(frame);
 
@@ -107,6 +109,7 @@ Vector<IntRect> computePageRectsForFrame(Frame* frame,
 
   float pageWidth = (float)root->docWidth();
   float pageHeight = pageWidth * ratio;
+  pageHeight -= (headerHeight + footerHeight);
 
   if (pageHeight <= 0) {
     LOG_ERROR("pageHeight has bad value %.2f", pageHeight);

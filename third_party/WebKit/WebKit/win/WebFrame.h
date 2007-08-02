@@ -445,6 +445,7 @@ class WebFrame : public IWebFrame,
                    float minPageWidth,
                    float maxPageWidth,
                    bool adjustViewSize);
+  void headerAndFooterHeights(float*, float*);
 
  protected:
   ULONG m_refCount;
