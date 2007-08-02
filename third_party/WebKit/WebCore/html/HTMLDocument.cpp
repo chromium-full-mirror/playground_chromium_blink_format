@@ -278,7 +278,7 @@ Tokenizer* HTMLDocument::createTokenizer() {
 // --------------------------------------------------------------------------
 
 bool HTMLDocument::childAllowed(Node* newChild) {
-  return newChild->hasTagName(htmlTag);
+  return newChild->hasTagName(htmlTag) || newChild->isCommentNode();
 }
 
 static void addItemToMap(HTMLDocument::NameCountMap& map, const String& name) {
