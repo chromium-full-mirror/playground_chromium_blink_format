@@ -187,6 +187,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   virtual void javaScriptConsoleMessage(const QString& message,
                                         unsigned int lineNumber,
                                         const QString& sourceID);
+  virtual QString userAgentStringForUrl(const QUrl& forUrl) const;
 
   virtual void resizeEvent(QResizeEvent*);
   virtual void paintEvent(QPaintEvent*);
