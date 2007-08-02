@@ -63,6 +63,7 @@ class DeleteButtonController {
  private:
   Frame* m_frame;
   RefPtr<HTMLElement> m_target;
+  RefPtr<HTMLElement> m_containerElement;
   RefPtr<HTMLElement> m_outlineElement;
   RefPtr<DeleteButton> m_buttonElement;
   bool m_wasStaticPositioned;
