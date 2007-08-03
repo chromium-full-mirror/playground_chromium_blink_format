@@ -75,7 +75,7 @@ class FontData : Noncopyable {
   const GlyphData& missingGlyphData() const { return m_missingGlyphData; }
 
 #if PLATFORM(MAC)
-  NSFont* getNSFont() const { return m_font.font; }
+  NSFont* getNSFont() const { return m_font.font(); }
   void checkShapesArabic() const;
   bool shapesArabic() const {
     if (!m_checkedShapesArabic)
