@@ -150,10 +150,12 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (cache()->disabled()) {
-    if (CachedResource* resource = m_docResources.get(fullURL.url())) {
-      if (type != resource->type())
-        return 0;
-      return resource;
+    HashMap<String, CachedResource*>::iterator it =
+        m_docResources.find(fullURL.url());
+
+    if (it != m_docResources.end()) {
+      it->second->setDocLoader(0);
+      m_docResources.remove(it);
     }
   }
 
@@ -166,7 +168,6 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
       cache()->requestResource(this, type, fullURL, charset, skipCanLoadCheck,
                                sendResourceLoadCallbacks);
   if (resource) {
-    ASSERT(!cache()->disabled() || !m_docResources.contains(resource->url()));
     m_docResources.set(resource->url(), resource);
     checkCacheObjectStatus(resource);
   }
