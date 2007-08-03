@@ -91,6 +91,9 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
                                        const String* charset,
                                        bool skipCanLoadCheck,
                                        bool sendResourceLoadCallbacks) {
+  if (!url.isValid())
+    return 0;
+
   // Look up the resource in our map.
   CachedResource* resource = m_resources.get(url.url());
 

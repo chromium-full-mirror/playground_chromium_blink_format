@@ -150,8 +150,11 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (cache()->disabled()) {
-    if (CachedResource* resource = m_docResources.get(fullURL.url()))
+    if (CachedResource* resource = m_docResources.get(fullURL.url())) {
+      if (type != resource->type())
+        return 0;
       return resource;
+    }
   }
 
   if (m_frame && m_frame->loader()->isReloading())
