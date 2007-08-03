@@ -62,7 +62,7 @@ class RenderTextControlInnerBlock : public RenderBlock {
                            int x,
                            int y,
                            int tx,
-                           int tx,
+                           int ty,
                            HitTestAction);
 };
 
