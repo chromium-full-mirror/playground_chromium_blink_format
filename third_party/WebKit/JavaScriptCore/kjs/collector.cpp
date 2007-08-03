@@ -46,6 +46,8 @@
 #include <mach/thread_act.h>
 #include <mach/vm_map.h>
 
+#include "CollectorHeapIntrospector.h"
+
 #elif PLATFORM(WIN_OS)
 
 #include <windows.h>
@@ -410,6 +412,11 @@ void Collector::registerThread() {
   if (!pthread_getspecific(registeredThreadKey)) {
     if (!onMainThread())
       WTF::fastMallocSetIsMultiThreaded();
+#if PLATFORM(DARWIN)
+    else
+      CollectorHeapIntrospector::init(&heap);
+#endif
+
     Collector::Thread* thread =
         new Collector::Thread(pthread_self(), getCurrentPlatformThread());
 
