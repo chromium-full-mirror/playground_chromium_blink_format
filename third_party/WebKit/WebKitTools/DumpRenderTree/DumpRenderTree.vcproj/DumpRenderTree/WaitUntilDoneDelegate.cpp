@@ -191,7 +191,7 @@ HRESULT STDMETHODCALLTYPE
 WaitUntilDoneDelegate::runJavaScriptAlertPanelWithMessage(
     /* [in] */ IWebView* /*sender*/,
     /* [in] */ BSTR message) {
-  wprintf(L"ALERT: %s\n", message);
+  wprintf(L"ALERT: %s\n", message ? message : L"");
 
   return S_OK;
 }
