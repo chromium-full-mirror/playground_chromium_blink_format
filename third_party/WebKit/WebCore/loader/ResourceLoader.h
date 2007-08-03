@@ -89,7 +89,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
 
   void didReceiveAuthenticationChallenge(const AuthenticationChallenge&);
   void didCancelAuthenticationChallenge(const AuthenticationChallenge&);
-  void receivedCancellation(const AuthenticationChallenge&);
+  virtual void receivedCancellation(const AuthenticationChallenge&);
 
   // ResourceHandleClient
   virtual void willSendRequest(ResourceHandle*,

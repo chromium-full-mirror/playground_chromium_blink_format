@@ -245,4 +245,16 @@ void SubresourceLoader::didCancel(const ResourceError& error) {
   m_documentLoader->removeSubresourceLoader(this);
   ResourceLoader::didCancel(error);
 }
+
+void SubresourceLoader::receivedCancellation(
+    const AuthenticationChallenge& challenge) {
+  ASSERT(!reachedTerminalState());
+
+  RefPtr<SubresourceLoader> protect(this);
+
+  if (m_client)
+    m_client->receivedCancellation(this, challenge);
+
+  ResourceLoader::receivedCancellation(challenge);
+}
 }
