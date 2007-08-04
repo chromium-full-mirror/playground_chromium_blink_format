@@ -55,9 +55,16 @@ class MIMETypeRegistry {
   // Check to see if a mime type is a valid Java applet mime type
   static bool isJavaAppletMIMEType(const String& mimeType);
 
-  static const HashSet<String>& getSupportedImageMIMETypes();
-  static const HashSet<String>& getSupportedImageResourceMIMETypes();
-  static const HashSet<String>& getSupportedNonImageMIMETypes();
+  // Check to see if a mime type should be treated as text
+  // application/javascript is one that should be even though it doesn't start
+  // with text/
+  // text/html is one that *shouldn't* be by default even though it *does* start
+  // with text/
+  static bool shouldTreatAsText(const String& mimeType);
+
+  static HashSet<String>& getSupportedImageMIMETypes();
+  static HashSet<String>& getSupportedImageResourceMIMETypes();
+  static HashSet<String>& getSupportedNonImageMIMETypes();
 };
 
 }  // namespace WebCore
