@@ -234,6 +234,16 @@ static JSValueRef dumpChildFrameScrollPositionsCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef dumpChildFramesAsTextCallback(JSContextRef context,
+                                                JSObjectRef function,
+                                                JSObjectRef thisObject,
+                                                size_t argumentCount,
+                                                const JSValueRef arguments[],
+                                                JSValueRef* exception) {
+  shouldDumpChildFramesAsText = true;
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef dumpBackForwardListCallback(JSContextRef context,
                                               JSObjectRef function,
                                               JSObjectRef thisObject,
@@ -400,6 +410,8 @@ static JSStaticFunction staticFunctions[] = {
     {"dumpTitleChanges", dumpTitleChangesCallback,
      kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
     {"dumpChildFrameScrollPositions", dumpChildFrameScrollPositionsCallback,
+     kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+    {"dumpChildFramesAsText", dumpChildFramesAsTextCallback,
      kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
     {"dumpBackForwardList", dumpBackForwardListCallback,
      kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
