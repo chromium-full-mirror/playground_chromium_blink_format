@@ -347,9 +347,10 @@ static inline int localeCompare(const UString& a, const UString& b) {
 }
 
 static JSValue* replace(ExecState* exec,
-                        const UString& source,
+                        StringImp* sourceVal,
                         JSValue* pattern,
                         JSValue* replacement) {
+  UString source = sourceVal->value();
   JSObject* replacementFunction = 0;
   UString replacementString;
 
@@ -404,7 +405,7 @@ static JSValue* replace(ExecState* exec,
         }
 
         args.append(jsNumber(completeMatchStart));
-        args.append(jsString(source));
+        args.append(sourceVal);
 
         substitutedReplacement =
             replacementFunction
@@ -433,12 +434,16 @@ static JSValue* replace(ExecState* exec,
                       UString::Range(lastIndex, source.size() - lastIndex));
 
     UString result;
+
     if (sourceRanges)
       result = source.spliceSubstringsWithSeparators(
           sourceRanges, sourceRangeCount, replacements, replacementCount);
 
     delete[] sourceRanges;
     delete[] replacements;
+
+    if (result == source)
+      return sourceVal;
 
     return jsString(result);
   }
@@ -449,14 +454,14 @@ static JSValue* replace(ExecState* exec,
   int matchLen = patternString.size();
   // Do the replacement
   if (matchPos == -1)
-    return jsString(source);
+    return sourceVal;
 
   if (replacementFunction) {
     List args;
 
     args.append(jsString(source.substr(matchPos, matchLen)));
     args.append(jsNumber(matchPos));
-    args.append(jsString(source));
+    args.append(sourceVal);
 
     replacementString =
         replacementFunction
@@ -618,7 +623,12 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
       break;
     }
     case Replace:
-      result = replace(exec, s, a0, a1);
+      StringImp* sVal =
+          thisObj->inherits(&StringInstance::info)
+              ? static_cast<StringInstance*>(thisObj)->internalValue()
+              : static_cast<StringImp*>(jsString(s));
+
+      result = replace(exec, sVal, a0, a1);
       break;
     case Slice: {
       // The arg processing is very much like ArrayProtoFunc::Slice

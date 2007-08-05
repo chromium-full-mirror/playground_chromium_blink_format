@@ -46,6 +46,10 @@ class StringInstance : public JSWrapperObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
+  StringImp* internalValue() const {
+    return static_cast<StringImp*>(JSWrapperObject::internalValue());
+  }
+
  private:
   static JSValue* lengthGetter(ExecState* exec,
                                JSObject*,
