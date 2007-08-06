@@ -46,7 +46,8 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
   ExecState* exec = toJS(ctx);
   JSObject* jsThisObject = toJS(thisObject);
   UString::Rep* scriptRep = toJS(script);
-  UString::Rep* sourceURLRep = toJS(sourceURL);
+  UString::Rep* sourceURLRep =
+      sourceURL ? toJS(sourceURL) : &UString::Rep::null;
   // Interpreter::evaluate sets "this" to the global object if it is NULL
   Completion completion = exec->dynamicInterpreter()->evaluate(
       UString(sourceURLRep), startingLineNumber, UString(scriptRep),
@@ -74,7 +75,8 @@ bool JSCheckScriptSyntax(JSContextRef ctx,
 
   ExecState* exec = toJS(ctx);
   UString::Rep* scriptRep = toJS(script);
-  UString::Rep* sourceURLRep = toJS(sourceURL);
+  UString::Rep* sourceURLRep =
+      sourceURL ? toJS(sourceURL) : &UString::Rep::null;
   Completion completion = exec->dynamicInterpreter()->checkSyntax(
       UString(sourceURLRep), startingLineNumber, UString(scriptRep));
   if (completion.complType() == Throw) {
