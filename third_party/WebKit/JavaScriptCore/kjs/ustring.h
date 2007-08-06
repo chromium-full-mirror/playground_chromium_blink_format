@@ -461,7 +461,7 @@ class UString {
 #endif
 
   Rep* rep() const { return m_rep.get(); }
-  UString(PassRefPtr<Rep> r) : m_rep(r) {}
+  UString(PassRefPtr<Rep> r) : m_rep(r) { ASSERT(m_rep); }
 
   void copyForWriting();
 
