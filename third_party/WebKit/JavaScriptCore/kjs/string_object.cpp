@@ -622,7 +622,7 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
       delete tmpReg;
       break;
     }
-    case Replace:
+    case Replace: {
       StringImp* sVal =
           thisObj->inherits(&StringInstance::info)
               ? static_cast<StringInstance*>(thisObj)->internalValue()
@@ -630,6 +630,7 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
 
       result = replace(exec, sVal, a0, a1);
       break;
+    }
     case Slice: {
       // The arg processing is very much like ArrayProtoFunc::Slice
       double start = a0->toInteger(exec);
