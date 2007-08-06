@@ -229,6 +229,10 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
                              RenderFlow* oldCont) {
   RenderBlock* pre = 0;
   RenderBlock* block = containingBlock();
+
+  // Delete our line boxes before we do the inline split into continuations.
+  block->deleteLineBoxTree();
+
   bool madeNewBeforeBlock = false;
   if (block->isAnonymousBlock() &&
       (!block->parent() || !block->parent()->createsAnonymousWrapper())) {
