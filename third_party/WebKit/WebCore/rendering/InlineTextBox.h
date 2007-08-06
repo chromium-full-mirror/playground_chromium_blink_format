@@ -61,8 +61,6 @@ class InlineTextBox : public InlineRunBox {
 
   void offsetRun(int d) { m_start += d; }
 
-  void destroy(RenderArena*);
-
   virtual int selectionTop();
   virtual int selectionHeight();
 
@@ -94,18 +92,6 @@ class InlineTextBox : public InlineRunBox {
 
   virtual bool isLineBreak() const;
 
-  // Overloaded new operator.  Derived classes must override operator new
-  // in order to allocate out of the RenderArena.
-  void* operator new(size_t, RenderArena*) throw();
-
-  // Overridden to prevent the normal delete from being called.
-  void operator delete(void*, size_t);
-
- private:
-  // The normal operator new is disallowed.
-  void* operator new(size_t) throw();
-
- public:
   void setSpaceAdd(int add) {
     m_width -= m_toAdd;
     m_toAdd = add;

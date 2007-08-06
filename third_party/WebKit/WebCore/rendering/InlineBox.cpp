@@ -1,7 +1,5 @@
-/**
-* This file is part of the html renderer for KDE.
- *
- * Copyright (C) 2003, 2006 Apple Computer, Inc.
+/*
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,8 +20,8 @@
 #include "config.h"
 #include "InlineBox.h"
 
-#include "InlineFlowBox.h"
 #include "HitTestResult.h"
+#include "InlineFlowBox.h"
 #include "RenderArena.h"
 #include "RootInlineBox.h"
 
@@ -33,6 +31,15 @@ namespace WebCore {
 
 #ifndef NDEBUG
 static bool inInlineBoxDetach;
+#endif
+
+#ifndef NDEBUG
+
+InlineBox::~InlineBox() {
+  if (!m_hasBadParent && m_parent)
+    m_parent->setHasBadChildList();
+}
+
 #endif
 
 void InlineBox::remove() {
@@ -152,17 +159,6 @@ bool InlineBox::nodeAtPoint(const HitTestRequest& request,
   // elements in the CSS2.1
   // specification.)
   return object()->hitTest(request, result, x, y, tx, ty);
-}
-
-bool InlineBox::isChildOfParent() {
-  if (!m_parent)
-    return true;
-
-  for (InlineBox* box = m_parent->firstChild(); box; box = box->nextOnLine())
-    if (box == this)
-      return true;
-
-  return false;
 }
 
 RootInlineBox* InlineBox::root() {

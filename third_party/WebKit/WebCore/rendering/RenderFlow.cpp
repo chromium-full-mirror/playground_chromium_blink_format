@@ -1,9 +1,7 @@
-/**
- * This file is part of the html renderer for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -38,6 +36,15 @@ using namespace std;
 namespace WebCore {
 
 using namespace HTMLNames;
+
+#ifndef NDEBUG
+
+RenderFlow::~RenderFlow() {
+  ASSERT(!m_firstLineBox);
+  ASSERT(!m_lastLineBox);
+}
+
+#endif
 
 RenderFlow* RenderFlow::createAnonymousFlow(Document* doc, RenderStyle* style) {
   RenderFlow* result;
@@ -114,6 +121,8 @@ void RenderFlow::addChild(RenderObject* newChild, RenderObject* beforeChild) {
 }
 
 void RenderFlow::extractLineBox(InlineFlowBox* box) {
+  checkConsistency();
+
   m_lastLineBox = box->prevFlowBox();
   if (box == m_firstLineBox)
     m_firstLineBox = 0;
@@ -122,9 +131,13 @@ void RenderFlow::extractLineBox(InlineFlowBox* box) {
   box->setPreviousLineBox(0);
   for (InlineRunBox* curr = box; curr; curr = curr->nextLineBox())
     curr->setExtracted();
+
+  checkConsistency();
 }
 
 void RenderFlow::attachLineBox(InlineFlowBox* box) {
+  checkConsistency();
+
   if (m_lastLineBox) {
     m_lastLineBox->setNextLineBox(box);
     box->setPreviousLineBox(m_lastLineBox);
@@ -136,9 +149,13 @@ void RenderFlow::attachLineBox(InlineFlowBox* box) {
     last = curr;
   }
   m_lastLineBox = last;
+
+  checkConsistency();
 }
 
 void RenderFlow::removeLineBox(InlineFlowBox* box) {
+  checkConsistency();
+
   if (box == m_firstLineBox)
     m_firstLineBox = box->nextFlowBox();
   if (box == m_lastLineBox)
@@ -147,16 +164,17 @@ void RenderFlow::removeLineBox(InlineFlowBox* box) {
     box->nextLineBox()->setPreviousLineBox(box->prevLineBox());
   if (box->prevLineBox())
     box->prevLineBox()->setNextLineBox(box->nextLineBox());
+
+  checkConsistency();
 }
 
 void RenderFlow::deleteLineBoxes() {
   if (m_firstLineBox) {
     RenderArena* arena = renderArena();
-    InlineRunBox *curr = m_firstLineBox, *next = 0;
-    while (curr) {
+    InlineRunBox* next;
+    for (InlineRunBox* curr = m_firstLineBox; curr; curr = next) {
       next = curr->nextLineBox();
       curr->destroy(arena);
-      curr = next;
     }
     m_firstLineBox = 0;
     m_lastLineBox = 0;
@@ -197,12 +215,11 @@ void RenderFlow::destroy() {
       // If we are an anonymous block, then our line boxes might have children
       // that will outlast this block. In the non-anonymous block case those
       // children will be destroyed by the time we return from this function.
-      if (isAnonymousBlock()) {
+      if (isAnonymousBlock() && !selfNeedsLayout()) {
         for (InlineFlowBox* box = m_firstLineBox; box;
              box = box->nextFlowBox()) {
-          while (InlineBox* childBox = box->firstChild()) {
+          while (InlineBox* childBox = box->firstChild())
             childBox->remove();
-          }
         }
       }
     } else if (isInline() && parent())
@@ -323,6 +340,8 @@ void RenderFlow::dirtyLineBoxes(bool fullLayout, bool isRootLineBox) {
 InlineBox* RenderFlow::createInlineBox(bool makePlaceHolderBox,
                                        bool isRootLineBox,
                                        bool isOnlyRun) {
+  checkConsistency();
+
   if (!isRootLineBox &&
       (isReplaced() || makePlaceHolderBox))  // Inline tables and inline blocks
     return RenderContainer::createInlineBox(
@@ -341,6 +360,8 @@ InlineBox* RenderFlow::createInlineBox(bool makePlaceHolderBox,
     flowBox->setPreviousLineBox(m_lastLineBox);
     m_lastLineBox = flowBox;
   }
+
+  checkConsistency();
 
   return flowBox;
 }
@@ -896,5 +917,20 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* graphicsContext,
         r + ow, b + ow, BSBottom, oc, style()->color(), os,
         (!nextline.isEmpty() && l - ow < tx + nextline.right()) ? -ow : ow, ow);
 }
+
+#ifndef NDEBUG
+
+void RenderFlow::checkConsistency() const {
+  const InlineFlowBox* prev = 0;
+  for (const InlineFlowBox* child = m_firstLineBox; child != 0;
+       child = child->nextFlowBox()) {
+    ASSERT(child->object() == this);
+    ASSERT(child->prevFlowBox() == prev);
+    prev = child;
+  }
+  ASSERT(prev == m_lastLineBox);
+}
+
+#endif
 
 }  // namespace WebCore
