@@ -223,7 +223,7 @@ class RenderText : public RenderObject {
 };
 
 #ifdef NDEBUG
-inline void RenderText::checkConsistency() {}
+inline void RenderText::checkConsistency() const {}
 #endif
 
 }  // namespace WebCore
