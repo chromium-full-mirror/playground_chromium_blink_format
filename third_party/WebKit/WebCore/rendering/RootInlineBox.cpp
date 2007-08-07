@@ -64,6 +64,7 @@ void RootInlineBox::destroy(RenderArena* arena) {
 void RootInlineBox::detachEllipsisBox(RenderArena* arena) {
   if (m_hasEllipsisBox) {
     EllipsisBoxMap::iterator it = gEllipsisBoxMap->find(this);
+    it->second->setParent(0);
     it->second->destroy(arena);
     gEllipsisBoxMap->remove(it);
     m_hasEllipsisBox = false;
