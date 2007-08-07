@@ -152,7 +152,7 @@ void PlatformScrollbar::paint(GraphicsContext* graphicsContext,
   m_opt.pageStep = m_visibleSize;
   m_opt.singleStep = m_lineStep;
   m_opt.minimum = 0;
-  m_opt.maximum = m_totalSize - m_visibleSize;
+  m_opt.maximum = qMax(0, m_totalSize - m_visibleSize);
   if (m_pressedPart != QStyle::SC_None) {
     m_opt.activeSubControls = m_pressedPart;
   } else {
