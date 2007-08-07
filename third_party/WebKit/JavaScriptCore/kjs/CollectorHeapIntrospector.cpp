@@ -102,13 +102,4 @@ kern_return_t CollectorHeapIntrospector::enumerate(
   return 0;
 }
 
-void CollectorHeapIntrospector::forceLock(malloc_zone_t*) {
-  JSLock::lock();
-}
-
-void CollectorHeapIntrospector::forceUnlock(malloc_zone_t*) {
-  ASSERT(JSLock::currentThreadIsHoldingLock());
-  JSLock::unlock();
-}
-
 }  // namespace KJS
