@@ -1068,6 +1068,8 @@ class RenderObject : public CachedResourceClient {
 
   void invalidateVerticalPosition() { m_verticalPosition = PositionUndefined; }
 
+  virtual void removeLeftoverAnonymousBlock(RenderBlock* child);
+
  protected:
   virtual void printBoxDecorations(GraphicsContext*,
                                    int /*x*/,
@@ -1080,8 +1082,6 @@ class RenderObject : public CachedResourceClient {
   virtual IntRect viewRect() const;
 
   short getVerticalPosition(bool firstLine) const;
-
-  virtual void removeLeftoverAnonymousBoxes();
 
   void adjustRectForOutlineAndShadow(IntRect&) const;
 

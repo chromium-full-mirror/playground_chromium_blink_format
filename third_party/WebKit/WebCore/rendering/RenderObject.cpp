@@ -2348,8 +2348,13 @@ void RenderObject::handleDynamicFloatPositionChange() {
         RenderObject* beforeChild = nextSibling();
         parent()->removeChildNode(this);
         parentInline->splitFlow(beforeChild, newBox, this, oldContinuation);
-      } else if (parent()->isRenderBlock())
-        static_cast<RenderBlock*>(parent())->makeChildrenNonInline();
+      } else if (parent()->isRenderBlock()) {
+        RenderBlock* o = static_cast<RenderBlock*>(parent());
+        o->makeChildrenNonInline();
+        if (o->isAnonymousBlock() && o->parent())
+          o->parent()->removeLeftoverAnonymousBlock(o);
+        // o may be dead here
+      }
     } else {
       // An anonymous block must be made to wrap this inline.
       RenderBlock* box = createAnonymousBlock();
@@ -2993,7 +2998,7 @@ void RenderObject::scheduleRelayout() {
   }
 }
 
-void RenderObject::removeLeftoverAnonymousBoxes() {}
+void RenderObject::removeLeftoverAnonymousBlock(RenderBlock*) {}
 
 InlineBox* RenderObject::createInlineBox(bool, bool isRootLineBox, bool) {
   ASSERT(!isRootLineBox);
