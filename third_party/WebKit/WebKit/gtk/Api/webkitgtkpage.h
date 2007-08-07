@@ -148,6 +148,8 @@ WEBKIT_GTK_API void webkit_gtk_page_stop_loading(WebKitGtkPage* page);
 
 WEBKIT_GTK_API void webkit_gtk_page_open(WebKitGtkPage* page, const gchar* url);
 
+WEBKIT_GTK_API void webkit_gtk_page_reload(WebKitGtkPage* page);
+
 WEBKIT_GTK_API void webkit_gtk_page_load_string(WebKitGtkPage* page,
                                                 const gchar* content,
                                                 const gchar* content_mime_type,
