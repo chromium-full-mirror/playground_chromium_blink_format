@@ -767,10 +767,6 @@ class Document : public ContainerNode {
   }
 #endif
 
-  void addNodeList() { m_numNodeLists++; }
-  void removeNodeList() { m_numNodeLists--; }
-  bool hasNodeLists() const { return m_numNodeLists != 0; }
-
  protected:
   CSSStyleSelector* m_styleSelector;
   bool m_didCalculateStyleSelector;
@@ -1012,7 +1008,6 @@ class Document : public ContainerNode {
 
   bool m_useSecureKeyboardEntryWhenActive;
 
-  unsigned m_numNodeLists;
 #if USE(LOW_BANDWIDTH_DISPLAY)
   bool m_inLowBandwidthDisplay;
 #endif

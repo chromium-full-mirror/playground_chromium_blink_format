@@ -566,8 +566,6 @@ ContainerNode* ContainerNode::addChild(PassRefPtr<Node> newChild) {
 
   if (inDocument())
     newChild->insertedIntoDocument();
-  if (document()->hasNodeLists())
-    notifyNodeListsChildrenChanged();
   childrenChanged();
 
   if (newChild->isElementNode())
