@@ -236,7 +236,7 @@ inline UChar32 toUpper(UChar32 ch) {
 
 inline int toUpper(UChar* result,
                    int resultLength,
-                   UChar* src,
+                   const UChar* src,
                    int srcLength,
                    bool* error) {
   const UChar* e = src + srcLength;
