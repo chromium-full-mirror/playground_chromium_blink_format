@@ -110,7 +110,6 @@ static gboolean webkit_gtk_page_rendering_area_handle_gdk_event(
       gtk_container_forall(GTK_CONTAINER(frame->view()->gtkWidget()),
                            frame_gdk_expose_child, &data);
       gdk_window_end_paint(event->any.window);
-
       break;
     }
 
@@ -181,15 +180,15 @@ static void webkit_gtk_page_rendering_area_resize_callback(
     GtkWidget*,
     GtkAllocation* allocation,
     WebKitGtkPage* page) {
-  WebKitGtkPagePrivate* page_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  WebKitGtkFramePrivate* frame_data =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(page_data->main_frame);
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  WebKitGtkFramePrivate* frameData =
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
 
-  frame_data->frame->view()->updateGeometry(allocation->width,
-                                            allocation->height);
-  frame_data->frame->forceLayout();
-  frame_data->frame->view()->adjustViewSize();
-  frame_data->frame->sendResizeEvent();
+  frameData->frame->view()->updateGeometry(allocation->width,
+                                           allocation->height);
+  frameData->frame->forceLayout();
+  frameData->frame->view()->adjustViewSize();
+  frameData->frame->sendResizeEvent();
 }
 
 static void webkit_gtk_page_register_rendering_area_events(
@@ -253,9 +252,9 @@ static gchar* webkit_gtk_page_real_java_script_prompt(
     WebKitGtkPage*,
     WebKitGtkFrame*,
     const gchar*,
-    const gchar* default_value) {
+    const gchar* defaultValue) {
   notImplemented();
-  return g_strdup(default_value);
+  return g_strdup(defaultValue);
 }
 
 static void webkit_gtk_page_real_java_script_console_message(WebKitGtkPage*,
@@ -268,17 +267,17 @@ static void webkit_gtk_page_real_java_script_console_message(WebKitGtkPage*,
 static void webkit_gtk_page_finalize(GObject* object) {
   webkit_gtk_page_stop_loading(WEBKIT_GTK_PAGE(object));
 
-  WebKitGtkPagePrivate* private_data =
+  WebKitGtkPagePrivate* pageData =
       WEBKIT_GTK_PAGE_GET_PRIVATE(WEBKIT_GTK_PAGE(object));
-  // delete private_data->page; - we don't have a DragClient yet, so it is
-  // crashing here
-  delete private_data->settings;
-  g_object_unref(private_data->main_frame);
-  delete private_data->user_agent;
+  // delete pageData->page; - we don't have a DragClient yet, so it is crashing
+  // here
+  delete pageData->settings;
+  g_object_unref(pageData->mainFrame);
+  delete pageData->userAgent;
 }
 
-static void webkit_gtk_page_class_init(WebKitGtkPageClass* page_class) {
-  g_type_class_add_private(page_class, sizeof(WebKitGtkPagePrivate));
+static void webkit_gtk_page_class_init(WebKitGtkPageClass* pageClass) {
+  g_type_class_add_private(pageClass, sizeof(WebKitGtkPagePrivate));
 
   /*
    * signals
@@ -291,7 +290,7 @@ static void webkit_gtk_page_class_init(WebKitGtkPageClass* page_class) {
    * When a WebKitGtkFrame begins to load this signal is emitted.
    */
   webkit_gtk_page_signals[LOAD_STARTED] = g_signal_new(
-      "load_started", G_TYPE_FROM_CLASS(page_class),
+      "load_started", G_TYPE_FROM_CLASS(pageClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_GTK_TYPE_FRAME);
 
@@ -301,64 +300,64 @@ static void webkit_gtk_page_class_init(WebKitGtkPageClass* page_class) {
    * @progress: Global progress
    */
   webkit_gtk_page_signals[LOAD_PROGRESS_CHANGED] = g_signal_new(
-      "load_progress_changed", G_TYPE_FROM_CLASS(page_class),
+      "load_progress_changed", G_TYPE_FROM_CLASS(pageClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
 
   webkit_gtk_page_signals[LOAD_FINISHED] = g_signal_new(
-      "load_finished", G_TYPE_FROM_CLASS(page_class),
+      "load_finished", G_TYPE_FROM_CLASS(pageClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_GTK_TYPE_FRAME);
 
   webkit_gtk_page_signals[TITLE_CHANGED] =
-      g_signal_new("title_changed", G_TYPE_FROM_CLASS(page_class),
+      g_signal_new("title_changed", G_TYPE_FROM_CLASS(pageClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, webkit_gtk_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
                    G_TYPE_STRING, G_TYPE_STRING);
 
   webkit_gtk_page_signals[HOVERING_OVER_LINK] =
-      g_signal_new("hovering_over_link", G_TYPE_FROM_CLASS(page_class),
+      g_signal_new("hovering_over_link", G_TYPE_FROM_CLASS(pageClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, webkit_gtk_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
                    G_TYPE_STRING, G_TYPE_STRING);
 
   webkit_gtk_page_signals[STATUS_BAR_TEXT_CHANGED] = g_signal_new(
-      "status_bar_text_changed", G_TYPE_FROM_CLASS(page_class),
+      "status_bar_text_changed", G_TYPE_FROM_CLASS(pageClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
 
   webkit_gtk_page_signals[ICOND_LOADED] =
-      g_signal_new("icon_loaded", G_TYPE_FROM_CLASS(page_class),
+      g_signal_new("icon_loaded", G_TYPE_FROM_CLASS(pageClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   webkit_gtk_page_signals[SELECTION_CHANGED] =
-      g_signal_new("selection_changed", G_TYPE_FROM_CLASS(page_class),
+      g_signal_new("selection_changed", G_TYPE_FROM_CLASS(pageClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   /*
    * implementations of virtual methods
    */
-  page_class->create_frame = webkit_gtk_page_real_create_frame;
-  page_class->create_page = webkit_gtk_page_real_create_page;
-  page_class->navigation_requested = webkit_gtk_page_real_navigation_requested;
-  page_class->choose_file = webkit_gtk_page_real_choose_file;
-  page_class->java_script_alert = webkit_gtk_page_real_java_script_alert;
-  page_class->java_script_confirm = webkit_gtk_page_real_java_script_confirm;
-  page_class->java_script_prompt = webkit_gtk_page_real_java_script_prompt;
-  page_class->java_script_console_message =
+  pageClass->create_frame = webkit_gtk_page_real_create_frame;
+  pageClass->create_page = webkit_gtk_page_real_create_page;
+  pageClass->navigation_requested = webkit_gtk_page_real_navigation_requested;
+  pageClass->choose_file = webkit_gtk_page_real_choose_file;
+  pageClass->java_script_alert = webkit_gtk_page_real_java_script_alert;
+  pageClass->java_script_confirm = webkit_gtk_page_real_java_script_confirm;
+  pageClass->java_script_prompt = webkit_gtk_page_real_java_script_prompt;
+  pageClass->java_script_console_message =
       webkit_gtk_page_real_java_script_console_message;
 
-  G_OBJECT_CLASS(page_class)->finalize = webkit_gtk_page_finalize;
-  GTK_WIDGET_CLASS(page_class)
+  G_OBJECT_CLASS(pageClass)->finalize = webkit_gtk_page_finalize;
+  GTK_WIDGET_CLASS(pageClass)
       ->event = webkit_gtk_page_rendering_area_handle_gdk_event;
 }
 
 static void webkit_gtk_page_init(WebKitGtkPage* page) {
-  WebKitGtkPagePrivate* private_data =
+  WebKitGtkPagePrivate* pageData =
       WEBKIT_GTK_PAGE_GET_PRIVATE(WEBKIT_GTK_PAGE(page));
-  private_data->page =
+  pageData->page =
       new Page(new ChromeClientGdk(page), new ContextMenuClientGdk,
                new EditorClientGdk(page), 0, new InspectorClientGdk);
 
@@ -371,7 +370,7 @@ static void webkit_gtk_page_init(WebKitGtkPage* page) {
       G_OBJECT(page), "size-allocate",
       G_CALLBACK(webkit_gtk_page_rendering_area_resize_callback), page);
 
-  private_data->main_frame = WEBKIT_GTK_FRAME(webkit_gtk_frame_new(page));
+  pageData->mainFrame = WEBKIT_GTK_FRAME(webkit_gtk_frame_new(page));
 }
 
 GtkWidget* webkit_gtk_page_new(void) {
@@ -392,85 +391,85 @@ WebKitGtkSettings* webkit_gtk_page_get_settings(WebKitGtkPage* page) {
 }
 
 void webkit_gtk_page_go_backward(WebKitGtkPage* page) {
-  WebKitGtkPagePrivate* page_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  WebKitGtkFramePrivate* frame_data =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(page_data->main_frame);
-  frame_data->frame->loader()->goBackOrForward(-1);
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  WebKitGtkFramePrivate* frameData =
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
+  frameData->frame->loader()->goBackOrForward(-1);
 }
 
 void webkit_gtk_page_go_forward(WebKitGtkPage* page) {
-  WebKitGtkPagePrivate* page_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  WebKitGtkFramePrivate* frame_data =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(page_data->main_frame);
-  frame_data->frame->loader()->goBackOrForward(1);
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  WebKitGtkFramePrivate* frameData =
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
+  frameData->frame->loader()->goBackOrForward(1);
 }
 
 gboolean webkit_gtk_page_can_go_backward(WebKitGtkPage* page) {
   WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
   WebKitGtkFramePrivate* frameData =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->main_frame);
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
   return frameData->frame->loader()->canGoBackOrForward(-1);
 }
 
 gboolean webkit_gtk_page_can_go_forward(WebKitGtkPage* page) {
   WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
   WebKitGtkFramePrivate* frameData =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->main_frame);
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
   return frameData->frame->loader()->canGoBackOrForward(1);
 }
 
 void webkit_gtk_page_open(WebKitGtkPage* page, const gchar* url) {
-  WebKitGtkPagePrivate* page_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  WebKitGtkFramePrivate* frame_data =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(page_data->main_frame);
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  WebKitGtkFramePrivate* frameData =
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
 
   DeprecatedString string = DeprecatedString::fromUtf8(url);
-  frame_data->frame->loader()->load(ResourceRequest(KURL(string)));
+  frameData->frame->loader()->load(ResourceRequest(KURL(string)));
 }
 
 void webkit_gtk_page_reload(WebKitGtkPage* page) {
-  WebKitGtkPagePrivate* page_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  WebKitGtkFramePrivate* frame_data =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(page_data->main_frame);
-  frame_data->frame->loader()->reload();
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  WebKitGtkFramePrivate* frameData =
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
+  frameData->frame->loader()->reload();
 }
 
 void webkit_gtk_page_load_string(WebKitGtkPage* page,
                                  const gchar* content,
-                                 const gchar* content_mime_type,
-                                 const gchar* content_encoding,
-                                 const gchar* base_url) {
-  WebKitGtkPagePrivate* page_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  WebKitGtkFramePrivate* frame_data =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(page_data->main_frame);
+                                 const gchar* contentMimeType,
+                                 const gchar* contentEncoding,
+                                 const gchar* baseUrl) {
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  WebKitGtkFramePrivate* frameData =
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
 
-  KURL url(DeprecatedString::fromUtf8(base_url));
+  KURL url(DeprecatedString::fromUtf8(baseUrl));
   RefPtr<SharedBuffer> sharedBuffer =
       new SharedBuffer(strdup(content), strlen(content));
-  SubstituteData substituteData(
-      sharedBuffer.release(), String(content_mime_type),
-      String(content_encoding), KURL("about:blank"), url);
+  SubstituteData substituteData(sharedBuffer.release(), String(contentMimeType),
+                                String(contentEncoding), KURL("about:blank"),
+                                url);
 
-  frame_data->frame->loader()->load(ResourceRequest(url), substituteData);
+  frameData->frame->loader()->load(ResourceRequest(url), substituteData);
 }
 
 void webkit_gtk_page_load_html_string(WebKitGtkPage* page,
                                       const gchar* content,
-                                      const gchar* base_url) {
-  webkit_gtk_page_load_string(page, content, "text/html", "UTF-8", base_url);
+                                      const gchar* baseUrl) {
+  webkit_gtk_page_load_string(page, content, "text/html", "UTF-8", baseUrl);
 }
 
 void webkit_gtk_page_stop_loading(WebKitGtkPage* page) {
-  WebKitGtkPagePrivate* page_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  WebKitGtkFramePrivate* frame_data =
-      WEBKIT_GTK_FRAME_GET_PRIVATE(page_data->main_frame);
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  WebKitGtkFramePrivate* frameData =
+      WEBKIT_GTK_FRAME_GET_PRIVATE(pageData->mainFrame);
 
-  if (FrameLoader* loader = frame_data->frame->loader())
+  if (FrameLoader* loader = frameData->frame->loader())
     loader->stopAllLoaders();
 }
 
 WebKitGtkFrame* webkit_gtk_page_get_main_frame(WebKitGtkPage* page) {
-  WebKitGtkPagePrivate* private_data = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
-  return private_data->main_frame;
+  WebKitGtkPagePrivate* pageData = WEBKIT_GTK_PAGE_GET_PRIVATE(page);
+  return pageData->mainFrame;
 }
 }

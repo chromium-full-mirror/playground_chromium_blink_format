@@ -67,9 +67,9 @@ struct _WebKitGtkPagePrivate {
   WebCore::Page* page;
   WebCore::Settings* settings;
 
-  WebKitGtkFrame* main_frame;
-  WebCore::String application_name_for_user_agent;
-  WebCore::String* user_agent;
+  WebKitGtkFrame* mainFrame;
+  WebCore::String applicationNameForUserAgent;
+  WebCore::String* userAgent;
 };
 
 #define WEBKIT_GTK_FRAME_GET_PRIVATE(obj)                    \
