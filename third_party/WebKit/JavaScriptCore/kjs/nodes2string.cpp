@@ -358,11 +358,11 @@ void PrefixErrorNode::streamTo(SourceStream& s) const {
 }
 
 void UnaryPlusNode::streamTo(SourceStream& s) const {
-  s << "+" << expr;
+  s << "+ " << expr;
 }
 
 void NegateNode::streamTo(SourceStream& s) const {
-  s << "-" << expr;
+  s << "- " << expr;
 }
 
 void BitwiseNotNode::streamTo(SourceStream& s) const {
@@ -374,11 +374,11 @@ void LogicalNotNode::streamTo(SourceStream& s) const {
 }
 
 void MultNode::streamTo(SourceStream& s) const {
-  s << term1 << oper << term2;
+  s << term1 << " " << oper << " " << term2;
 }
 
 void AddNode::streamTo(SourceStream& s) const {
-  s << term1 << oper << term2;
+  s << term1 << " " << oper << " " << term2;
 }
 
 void ShiftNode::streamTo(SourceStream& s) const {
