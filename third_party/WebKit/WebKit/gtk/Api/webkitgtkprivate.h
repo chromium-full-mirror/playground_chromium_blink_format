@@ -43,7 +43,7 @@
 
 #include "Settings.h"
 #include "Page.h"
-#include "FrameGdk.h"
+#include "Frame.h"
 #include "FrameLoaderClientGdk.h"
 
 namespace WebKitGtk {
@@ -77,7 +77,7 @@ struct _WebKitGtkPagePrivate {
                                WebKitGtkFramePrivate))
 typedef struct _WebKitGtkFramePrivate WebKitGtkFramePrivate;
 struct _WebKitGtkFramePrivate {
-  WebCore::FrameGdk* frame;
+  WebCore::Frame* frame;
   WebCore::FrameLoaderClientGdk* client;
   WebKitGtkPage* page;
 };
