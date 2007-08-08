@@ -3644,8 +3644,7 @@ void Document::initSecurityPolicyURL() {
 
   // javascript: URLs create document using the "about" protocol
   if (!m_securityPolicyURL.isEmpty() &&
-      m_securityPolicyURL.protocol() != "about" &&
-      m_securityPolicyURL.protocol() != "data")
+      m_securityPolicyURL.protocol() != "about")
     return;
 
   Frame* openerFrame = 0;
