@@ -68,7 +68,6 @@ class CachedImage : public CachedResource, public ImageObserver {
 
   virtual unsigned decodedSize() const;
 
-  virtual void decodedSizeWillChange(const Image* image, int delta);
   virtual void decodedSizeChanged(const Image* image, int delta);
 
   virtual bool shouldPauseAnimation(const Image* image);
