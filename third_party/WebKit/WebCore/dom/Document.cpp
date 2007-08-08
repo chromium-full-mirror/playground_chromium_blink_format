@@ -258,7 +258,7 @@ static bool acceptsEditingFocus(Node* node) {
 DeprecatedPtrList<Document>* Document::changedDocuments = 0;
 
 // FrameView might be 0
-Document::Document(DOMImplementation* impl, Frame* frame)
+Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
     : ContainerNode(0),
       m_implementation(impl),
       m_domtree_version(0),
@@ -299,7 +299,8 @@ Document::Document(DOMImplementation* impl, Frame* frame)
       ,
       m_inLowBandwidthDisplay(false)
 #endif
-{
+      ,
+      m_isXHTML(isXHTML) {
   m_document.resetSkippingRef(this);
 
   m_printing = false;
@@ -483,13 +484,16 @@ Element* Document::documentElement() const {
 
 PassRefPtr<Element> Document::createElement(const String& name,
                                             ExceptionCode& ec) {
-  String lowerName(name.lower());
-  if (!isValidName(lowerName)) {
-    ec = INVALID_CHARACTER_ERR;
-    return 0;
-  }
-  return HTMLElementFactory::createHTMLElement(AtomicString(lowerName), this, 0,
-                                               false);
+  if (m_isXHTML) {
+    if (!isValidName(name)) {
+      ec = INVALID_CHARACTER_ERR;
+      return 0;
+    }
+
+    return HTMLElementFactory::createHTMLElement(AtomicString(name), this, 0,
+                                                 false);
+  } else
+    return createElementNS(nullAtom, name, ec);
 }
 
 PassRefPtr<DocumentFragment> Document::createDocumentFragment() {

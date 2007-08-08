@@ -33,6 +33,7 @@
 #include "Frame.h"
 #include "FTPDirectoryDocument.h"
 #include "HTMLDocument.h"
+#include "HTMLNames.h"
 #include "HTMLViewSourceDocument.h"
 #include "Image.h"
 #include "ImageDocument.h"
@@ -278,6 +279,9 @@ PassRefPtr<Document> DOMImplementation::createDocument(
     doc = new SVGDocument(this, 0);
   else
 #endif
+      if (namespaceURI == HTMLNames::xhtmlNamespaceURI)
+    doc = new Document(this, 0, true);
+  else
     doc = new Document(this, 0);
 
   // now get the interesting parts of the doctype
@@ -364,7 +368,7 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   if (type == "text/html")
     return new HTMLDocument(this, frame);
   if (type == "application/xhtml+xml")
-    return new Document(this, frame);
+    return new Document(this, frame, true);
 
 #if ENABLE(FTPDIR)
   // Plugins cannot take FTP from us either
