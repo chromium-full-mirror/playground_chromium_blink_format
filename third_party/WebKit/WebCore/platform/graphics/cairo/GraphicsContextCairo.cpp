@@ -64,7 +64,7 @@ class GraphicsContextPlatformPrivate {
   Vector<float> layers;
 
 #if PLATFORM(GDK)
-  GdkDrawable* drawable;
+  GdkEventExpose* expose;
 #endif
 };
 
@@ -88,7 +88,7 @@ GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate()
     : cr(0)
 #if PLATFORM(GDK)
       ,
-      drawable(0)
+      expose(0)
 #endif
 {
 }
@@ -778,12 +778,26 @@ void GraphicsContext::fillRoundedRect(const IntRect&,
 }
 
 #if PLATFORM(GDK)
-void GraphicsContext::setGdkDrawable(GdkDrawable* drawable) {
-  m_data->drawable = drawable;
+void GraphicsContext::setGdkExposeEvent(GdkEventExpose* expose) {
+  m_data->expose = expose;
+}
+
+GdkEventExpose* GraphicsContext::gdkExposeEvent() const {
+  return m_data->expose;
 }
 
 GdkDrawable* GraphicsContext::gdkDrawable() const {
-  return m_data->drawable;
+  return GDK_DRAWABLE(m_data->expose->window);
+}
+
+IntPoint GraphicsContext::translatePoint(const IntPoint& point) const {
+  cairo_matrix_t tm;
+  cairo_get_matrix(m_data->cr, &tm);
+  double x = point.x();
+  double y = point.y();
+
+  cairo_matrix_transform_point(&tm, &x, &y);
+  return IntPoint(x, y);
 }
 #endif
 

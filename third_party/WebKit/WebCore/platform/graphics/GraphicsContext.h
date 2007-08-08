@@ -47,6 +47,7 @@ typedef void PlatformGraphicsContext;
 
 #if PLATFORM(GDK)
 typedef struct _GdkDrawable GdkDrawable;
+typedef struct _GdkEventExpose GdkEventExpose;
 #endif
 
 #if PLATFORM(WIN)
@@ -256,8 +257,10 @@ class GraphicsContext : Noncopyable {
 #endif
 
 #if PLATFORM(GDK)
-  void setGdkDrawable(GdkDrawable*);
+  void setGdkExposeEvent(GdkEventExpose*);
   GdkDrawable* gdkDrawable() const;
+  GdkEventExpose* gdkExposeEvent() const;
+  IntPoint translatePoint(const IntPoint&) const;
 #endif
 
  private:
