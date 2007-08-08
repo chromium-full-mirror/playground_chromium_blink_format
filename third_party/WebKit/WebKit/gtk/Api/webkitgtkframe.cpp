@@ -59,6 +59,8 @@ static void webkit_gtk_frame_finalize(GObject* object) {
       WEBKIT_GTK_FRAME_GET_PRIVATE(WEBKIT_GTK_FRAME(object));
   privateData->frame->loader()->cancelAndClear();
   delete privateData->frame;
+
+  G_OBJECT_CLASS(webkit_gtk_frame_parent_class)->finalize(object);
 }
 
 static void webkit_gtk_frame_class_init(WebKitGtkFrameClass* frameClass) {
