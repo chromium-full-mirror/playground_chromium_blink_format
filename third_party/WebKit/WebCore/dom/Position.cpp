@@ -619,9 +619,12 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
   return true;
 }
 
+// This is only called from DeleteSelectionCommand and assumes that it starts in
+// editable content.
 Position Position::leadingWhitespacePosition(
     EAffinity affinity,
     bool considerNonCollapsibleWhitespace) const {
+  ASSERT(isEditablePosition(*this));
   if (isNull())
     return Position();
 
@@ -636,15 +639,19 @@ Position Position::leadingWhitespacePosition(
     if (considerNonCollapsibleWhitespace
             ? (DeprecatedChar(c).isSpace() || c == noBreakSpace)
             : isCollapsibleWhitespace(c))
-      return prev;
+      if (isEditablePosition(prev))
+        return prev;
   }
 
   return Position();
 }
 
+// This is only called from DeleteSelectionCommand and assumes that it starts in
+// editable content.
 Position Position::trailingWhitespacePosition(
     EAffinity affinity,
     bool considerNonCollapsibleWhitespace) const {
+  ASSERT(isEditablePosition(*this));
   if (isNull())
     return Position();
 
@@ -656,7 +663,8 @@ Position Position::trailingWhitespacePosition(
       if (considerNonCollapsibleWhitespace
               ? (DeprecatedChar(c).isSpace() || c == noBreakSpace)
               : isCollapsibleWhitespace(c))
-        return *this;
+        if (isEditablePosition(*this))
+          return *this;
       return Position();
     }
   }
@@ -672,7 +680,8 @@ Position Position::trailingWhitespacePosition(
     if (considerNonCollapsibleWhitespace
             ? (DeprecatedChar(c).isSpace() || c == noBreakSpace)
             : isCollapsibleWhitespace(c))
-      return next;
+      if (isEditablePosition(*this))
+        return next;
   }
 
   return Position();
