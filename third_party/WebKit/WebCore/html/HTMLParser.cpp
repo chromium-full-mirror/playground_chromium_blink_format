@@ -541,7 +541,7 @@ bool HTMLParser::handleError(Node* n,
         Node* grandparent = parent->parentNode();
 
         if (n->isTextNode() ||
-            (h->hasLocalName(trTag) && isTableSection(parent) &&
+            (h->hasLocalName(trTag) && isTableSection(parent) && grandparent &&
              grandparent->hasTagName(tableTag)) ||
             ((!n->hasTagName(tdTag) && !n->hasTagName(thTag) &&
               !n->hasTagName(formTag) && !n->hasTagName(scriptTag)) &&
@@ -549,6 +549,9 @@ bool HTMLParser::handleError(Node* n,
           node = (node->hasTagName(tableTag))
                      ? node
                      : ((node->hasTagName(trTag)) ? grandparent : parent);
+          // This can happen with fragments
+          if (!node)
+            return false;
           Node* parent = node->parentNode();
           if (!parent)
             return false;
