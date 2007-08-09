@@ -165,6 +165,7 @@ class CachedResource {
   unsigned m_encodedSize;
   unsigned m_accessCount;
   unsigned m_inLiveDecodedResourcesList;
+  double m_lastLiveAccessTime;  // Used as a "thrash guard" in the cache
 
   bool m_sendResourceLoadCallbacks;
 

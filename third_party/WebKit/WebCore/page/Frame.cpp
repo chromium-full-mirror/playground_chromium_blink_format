@@ -63,6 +63,7 @@
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "Settings.h"
+#include "SystemTime.h"
 #include "TextIterator.h"
 #include "TextResourceDecoder.h"
 #include "XMLNames.h"
@@ -88,7 +89,9 @@ namespace WebCore {
 using namespace EventNames;
 using namespace HTMLNames;
 
-const double caretBlinkFrequency = 0.5;
+static const double caretBlinkFrequency = 0.5;
+
+double Frame::s_currentPaintTimeStamp = 0;
 
 class UserStyleSheetLoader : public CachedResourceClient {
  public:
@@ -1371,6 +1374,10 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     p->fillRect(rect, Color(0xFF, 0, 0));
 #endif
 
+  bool isTopLevelPainter = !s_currentPaintTimeStamp;
+  if (isTopLevelPainter)
+    s_currentPaintTimeStamp = currentTime();
+
   if (renderer()) {
     ASSERT(d->m_view && !d->m_view->needsLayout());
     ASSERT(!d->m_isPainting);
@@ -1392,6 +1399,9 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
       renderer()->view()->frameView()->updateDashboardRegions();
   } else
     LOG_ERROR("called Frame::paint with nil renderer");
+
+  if (isTopLevelPainter)
+    s_currentPaintTimeStamp = 0;
 }
 
 void Frame::setPaintRestriction(PaintRestriction pr) {
