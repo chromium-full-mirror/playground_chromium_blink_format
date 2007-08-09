@@ -85,7 +85,7 @@ class EventHandler : Noncopyable {
 
   void clear();
 
-  void updateSelectionForMouseDragOverPosition(const VisiblePosition&);
+  void updateSelectionForMouseDrag();
 
   Node* mousePressNode() const;
   void setMousePressNode(PassRefPtr<Node>);
@@ -289,6 +289,9 @@ class EventHandler : Noncopyable {
 #endif
 
   bool invertSenseOfTabsToLinks(KeyboardEvent*) const;
+
+  void updateSelectionForMouseDrag(Node* targetNode,
+                                   const IntPoint& localPoint);
 
   Frame* m_frame;
 
