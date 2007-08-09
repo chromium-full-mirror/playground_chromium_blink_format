@@ -26,6 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef __LP64__
 #import <WebBaseNetscapePluginView.h>
 
 @class NSURLRequest;
@@ -65,3 +66,4 @@
 - (NPError)setVariable:(NPPVariable)variable value:(void*)value;
 
 @end
+#endif
