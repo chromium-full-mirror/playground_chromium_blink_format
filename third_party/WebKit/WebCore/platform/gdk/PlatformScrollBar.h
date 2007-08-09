@@ -55,6 +55,7 @@ class PlatformScrollbar : public Widget, public Scrollbar {
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
+  virtual void geometryChanged();
 
  private:
   static void gtkValueChanged(GtkAdjustment*, PlatformScrollbar*);
