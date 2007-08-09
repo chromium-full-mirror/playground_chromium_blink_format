@@ -989,7 +989,8 @@ bool Window::isSafeScript(ExecState* exec) const {
   const KURL& thisURL = thisDocument->securityPolicyURL();
 
   // data: URL's are not allowed access to anything other than themselves.
-  if (thisURL.protocol() == "data" || actURL.protocol() == "data")
+  if (equalIgnoringCase(thisURL.protocol(), "data") ||
+      equalIgnoringCase(actURL.protocol(), "data"))
     return false;
 
   if (thisDocument->domainWasSetInDOM() && actDocument->domainWasSetInDOM()) {
@@ -997,8 +998,8 @@ bool Window::isSafeScript(ExecState* exec) const {
       return true;
   }
 
-  if (actURL.host() == thisURL.host() &&
-      actURL.protocol() == thisURL.protocol() &&
+  if (equalIgnoringCase(actURL.host(), thisURL.host()) &&
+      equalIgnoringCase(actURL.protocol(), thisURL.protocol()) &&
       actURL.port() == thisURL.port())
     return true;
 
