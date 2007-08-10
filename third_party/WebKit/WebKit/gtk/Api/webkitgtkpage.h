@@ -65,11 +65,11 @@ typedef struct _WebKitGtkPageClass WebKitGtkPageClass;
  * the  size of the viewport and we won't be able to use gdk_window_move.
  */
 struct _WebKitGtkPage {
-  GtkLayout parent;
+  GtkContainer parent;
 };
 
 struct _WebKitGtkPageClass {
-  GtkLayoutClass parent;
+  GtkContainerClass parent;
 
   /*
    * default handler/virtual methods
@@ -109,6 +109,13 @@ struct _WebKitGtkPageClass {
                                       const gchar* message,
                                       unsigned int line_number,
                                       const gchar* source_id);
+
+  /*
+   * internal
+   */
+  void (*set_scroll_adjustments)(WebKitGtkPage*,
+                                 GtkAdjustment*,
+                                 GtkAdjustment*);
 };
 
 WEBKIT_GTK_API GType webkit_gtk_page_get_type(void);

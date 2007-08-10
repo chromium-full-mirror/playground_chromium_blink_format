@@ -69,6 +69,8 @@ struct _WebKitGtkPagePrivate {
   WebKitGtkFrame* mainFrame;
   WebCore::String applicationNameForUserAgent;
   WebCore::String* userAgent;
+
+  HashSet<GtkWidget*> children;
 };
 
 #define WEBKIT_GTK_FRAME_GET_PRIVATE(obj)                    \
