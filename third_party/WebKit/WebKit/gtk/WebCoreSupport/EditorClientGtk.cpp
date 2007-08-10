@@ -49,7 +49,7 @@ namespace WebKit {
 
 bool EditorClient::shouldDeleteRange(Range*) {
   notImplemented();
-  return false;
+  return true;
 }
 
 bool EditorClient::shouldShowDeleteInterface(HTMLElement*) {
@@ -73,12 +73,12 @@ int EditorClient::spellCheckerDocumentTag() {
 
 bool EditorClient::shouldBeginEditing(WebCore::Range*) {
   notImplemented();
-  return false;
+  return true;
 }
 
 bool EditorClient::shouldEndEditing(WebCore::Range*) {
   notImplemented();
-  return false;
+  return true;
 }
 
 bool EditorClient::shouldInsertText(String, Range*, EditorInsertAction) {
@@ -86,10 +86,7 @@ bool EditorClient::shouldInsertText(String, Range*, EditorInsertAction) {
   return true;
 }
 
-bool EditorClient::shouldChangeSelectedRange(Range* fromRange,
-                                             Range* toRange,
-                                             EAffinity,
-                                             bool stillSelecting) {
+bool EditorClient::shouldChangeSelectedRange(Range*, Range*, EAffinity, bool) {
   notImplemented();
   return true;
 }
@@ -97,7 +94,7 @@ bool EditorClient::shouldChangeSelectedRange(Range* fromRange,
 bool EditorClient::shouldApplyStyle(WebCore::CSSStyleDeclaration*,
                                     WebCore::Range*) {
   notImplemented();
-  return false;
+  return true;
 }
 
 bool EditorClient::shouldMoveRangeAfterDelete(WebCore::Range*,
@@ -128,11 +125,6 @@ void EditorClient::didWriteSelectionToPasteboard() {
 
 void EditorClient::didSetSelectionTypesForPasteboard() {
   notImplemented();
-}
-
-bool EditorClient::selectWordBeforeMenuEvent() {
-  notImplemented();
-  return false;
 }
 
 bool EditorClient::isEditable() {
@@ -174,11 +166,11 @@ void EditorClient::redo() {
 
 bool EditorClient::shouldInsertNode(Node*, Range*, EditorInsertAction) {
   notImplemented();
-  return false;
+  return true;
 }
 
 void EditorClient::pageDestroyed() {
-  notImplemented();
+  delete this;
 }
 
 bool EditorClient::smartInsertDeleteEnabled() {

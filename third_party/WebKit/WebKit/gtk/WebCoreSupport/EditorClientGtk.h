@@ -58,7 +58,6 @@ class EditorClient : public WebCore::EditorClient {
   virtual void toggleGrammarChecking();
   virtual int spellCheckerDocumentTag();
 
-  virtual bool selectWordBeforeMenuEvent();
   virtual bool isEditable();
 
   virtual bool shouldBeginEditing(WebCore::Range*);
