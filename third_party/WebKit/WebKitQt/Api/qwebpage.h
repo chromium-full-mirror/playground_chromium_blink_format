@@ -172,8 +172,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   virtual QWebFrame* createFrame(QWebFrame* parentFrame,
                                  QWebFrameData* frameData);
   virtual QWebPage* createWindow();
-  virtual QObject* createPlugin(const QUrl& url,
-                                const QString& mimeType,
+  virtual QObject* createPlugin(const QString& classid,
+                                const QUrl& url,
                                 const QStringList& paramNames,
                                 const QStringList& paramValues);
 

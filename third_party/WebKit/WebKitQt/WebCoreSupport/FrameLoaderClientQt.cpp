@@ -741,8 +741,12 @@ Frame* FrameLoaderClientQt::createFrame(const KURL& url,
 ObjectContentType FrameLoaderClientQt::objectContentType(
     const KURL& url,
     const String& _mimeType) {
-  // qDebug()<<" ++++++++++++++++ url is "<<url.prettyURL()<<", mime =
-  // "<<mimeType;
+  qDebug() << " ++++++++++++++++ url is " << url.prettyURL()
+           << ", mime = " << _mimeType;
+  if (_mimeType == "application/x-qt-plugin" ||
+      _mimeType == "application/x-qt-styled-widget")
+    return ObjectContentPlugin;
+
   if (!url.isValid())
     return ObjectContentNone;
 
@@ -757,10 +761,6 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
 
   if (MIMETypeRegistry::isSupportedImageMIMEType(mimeType))
     return ObjectContentImage;
-
-  if (_mimeType == "application/x-qt-plugin" ||
-      _mimeType == "application/x-qt-styled-widget")
-    return ObjectContentPlugin;
 
   if (QWebFactoryLoader::self()->supportsMimeType(mimeType))
     return ObjectContentPlugin;
@@ -829,9 +829,9 @@ Widget* FrameLoaderClientQt::createPlugin(Element* element,
                                           const Vector<String>& paramValues,
                                           const String& mimeType,
                                           bool loadManually) {
-  // qDebug()<<"------ Creating plugin in FrameLoaderClientQt::createPlugin for
-  // "<<mimeType;
-  // qDebug()<<"------\t url = "<<url.prettyURL();
+  //     qDebug()<<"------ Creating plugin in FrameLoaderClientQt::createPlugin
+  //     for "<<mimeType;
+  //     qDebug()<<"------\t url = "<<url.prettyURL();
   QStringList params;
   QStringList values;
   for (int i = 0; i < paramNames.size(); ++i)
@@ -845,8 +845,29 @@ Widget* FrameLoaderClientQt::createPlugin(Element* element,
   QObject* object = 0;
 
   if (mimeType == "application/x-qt-plugin" ||
-      mimeType == "application/x-qt-styled-widget")
-    object = m_webFrame->page()->createPlugin(qurl, mimeType, params, values);
+      mimeType == "application/x-qt-styled-widget") {
+    object = m_webFrame->page()->createPlugin(element->getAttribute("classid"),
+                                              qurl, params, values);
+    QWidget* widget = qobject_cast<QWidget*>(object);
+    if (widget && mimeType == "application/x-qt-styled-widget") {
+      CSSComputedStyleDeclaration cssDecl(element);
+
+      QString styleSheet = element->getAttribute("style");
+      if (!styleSheet.isEmpty())
+        styleSheet += QLatin1Char(';');
+
+      for (int i = 0; i < numqStyleSheetProperties; ++i) {
+        CSSPropertyID property = qstyleSheetProperties[i];
+
+        styleSheet += ::getPropertyName(property);
+        styleSheet += QLatin1Char(':');
+        styleSheet += cssDecl.getPropertyValue(property);
+        styleSheet += QLatin1Char(';');
+      }
+
+      widget->setStyleSheet(styleSheet);
+    }
+  }
 
   if (!object)
     object = QWebFactoryLoader::self()->create(m_webFrame, qurl, mimeType,
@@ -856,24 +877,6 @@ Widget* FrameLoaderClientQt::createPlugin(Element* element,
     QWidget* widget = qobject_cast<QWidget*>(object);
     if (widget) {
       widget->setParent(m_webFrame->page());
-      if (mimeType == "application/x-qt-styled-widget") {
-        CSSComputedStyleDeclaration cssDecl(element);
-
-        QString styleSheet = element->getAttribute("style");
-        if (!styleSheet.isEmpty())
-          styleSheet += QLatin1Char(';');
-
-        for (int i = 0; i < numqStyleSheetProperties; ++i) {
-          CSSPropertyID property = qstyleSheetProperties[i];
-
-          styleSheet += ::getPropertyName(property);
-          styleSheet += QLatin1Char(':');
-          styleSheet += cssDecl.getPropertyValue(property);
-          styleSheet += QLatin1Char(';');
-        }
-
-        widget->setStyleSheet(styleSheet);
-      }
       Widget* w = new Widget();
       w->setQWidget(widget);
       return w;
