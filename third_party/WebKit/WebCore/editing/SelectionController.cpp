@@ -1141,8 +1141,8 @@ bool SelectionController::contains(const IntPoint& point) {
   Position start(m_sel.visibleStart().deepEquivalent());
   Position end(m_sel.visibleEnd().deepEquivalent());
   Position p(visiblePos.deepEquivalent());
-  // A selection doesn't contain its endpoints.
-  return comparePositions(start, p) < 0 && comparePositions(p, end) < 0;
+
+  return comparePositions(start, p) <= 0 && comparePositions(p, end) <= 0;
 }
 
 // Workaround for the fact that it's hard to delete a frame.
