@@ -22,6 +22,7 @@
 #ifndef BidiContext_h
 #define BidiContext_h
 
+#include <wtf/Assertions.h>
 #include <wtf/RefPtr.h>
 #include <wtf/unicode/Unicode.h>
 
@@ -38,7 +39,10 @@ class BidiContext {
         m_direction(direction),
         m_override(override),
         m_parent(parent),
-        m_refCount(0) {}
+        m_refCount(0) {
+    ASSERT(direction == WTF::Unicode::LeftToRight ||
+           direction == WTF::Unicode::RightToLeft);
+  }
 
   void ref() const { m_refCount++; }
   void deref() const {
