@@ -1108,9 +1108,10 @@ void Document::updateLayoutIgnorePendingStylesheets() {
     // really want to do is
     // suspend JS instead of doing a layout with inaccurate information.
     if (body() && !body()->renderer() &&
-        m_pendingSheetLayout == NoLayoutWithPendingSheets)
+        m_pendingSheetLayout == NoLayoutWithPendingSheets) {
       m_pendingSheetLayout = DidLayoutWithPendingSheets;
-    updateStyleSelector();
+      updateStyleSelector();
+    }
   }
 
   updateLayout();
