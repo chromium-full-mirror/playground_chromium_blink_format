@@ -30,15 +30,14 @@
 #define WEBKIT_GTK_PRIVATE_H
 
 /*
- * Internal class. This class knows the shared secret of WebKitGtkFrameData,
- * WebKitGtkNetworkRequest. These private members point to WebCore resources
- * we don't want to expose to the outer world.
+ * Internal class. This class knows the shared secret of WebKitGtkFrame,
+ * WebKitGtkNetworkRequest and WebKitGtkPage.
+ * They are using WebCore which musn't be exposed to the outer world.
  */
 
 #include "webkitgtksettings.h"
 #include "webkitgtkpage.h"
 #include "webkitgtkframe.h"
-#include "webkitgtkframedata.h"
 #include "webkitgtknetworkrequest.h"
 
 #include "Settings.h"
@@ -81,6 +80,9 @@ struct _WebKitGtkFramePrivate {
   WebCore::FrameLoaderClientGdk* client;
   WebKitGtkPage* page;
 };
+
+GObject* webkit_gtk_frame_init_with_page(WebKitGtkPage*,
+                                         WebCore::HTMLFrameOwnerElement*);
 }
 
 #endif
