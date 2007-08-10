@@ -29,13 +29,14 @@
 #include "config.h"
 
 #include "webkitgtkprivate.h"
-#include "NotImplemented.h"
-#include "FrameLoader.h"
 #include "ChromeClientGtk.h"
+#include "FrameLoader.h"
+#include "FrameLoaderClientGtk.h"
+#include "NotImplemented.h"
 
 using namespace WebCore;
 
-namespace WebKitGtk {
+namespace WebKit {
 void apply(WebKitGtkSettings*, WebCore::Settings*) {
   notImplemented();
 }
@@ -59,8 +60,8 @@ WebCore::Frame* core(WebKitGtkFrame* frame) {
 }
 
 WebKitGtkFrame* kit(WebCore::Frame* coreFrame) {
-  FrameLoaderClientGtk* client =
-      static_cast<FrameLoaderClientGtk*>(coreFrame->loader()->client());
+  WebKit::FrameLoaderClient* client =
+      static_cast<WebKit::FrameLoaderClient*>(coreFrame->loader()->client());
   return client->webFrame();
 }
 
@@ -70,8 +71,8 @@ WebCore::Page* core(WebKitGtkPage* page) {
 }
 
 WebKitGtkPage* kit(WebCore::Page* page) {
-  ChromeClientGtk* client =
-      static_cast<ChromeClientGtk*>(page->chrome()->client());
+  WebKit::ChromeClient* client =
+      static_cast<WebKit::ChromeClient*>(page->chrome()->client());
   return client->webPage();
 }
 }

@@ -33,11 +33,11 @@
 
 typedef struct _WebKitGtkPage WebKitGtkPage;
 
-namespace WebKitGtk {
+namespace WebKit {
 
-class ChromeClientGtk : public WebCore::ChromeClient {
+class ChromeClient : public WebCore::ChromeClient {
  public:
-  ChromeClientGtk(WebKitGtkPage*);
+  ChromeClient(WebKitGtkPage*);
   WebKitGtkPage* webPage() const { return m_webPage; }
 
   virtual void chromeDestroyed();
@@ -118,4 +118,4 @@ class ChromeClientGtk : public WebCore::ChromeClient {
 };
 }
 
-#endif  // ChromeClientGtk_h
+#endif  // ChromeClient_h

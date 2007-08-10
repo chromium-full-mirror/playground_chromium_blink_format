@@ -32,44 +32,46 @@
 
 #include <stdio.h>
 
-namespace WebCore {
+using namespace WebCore;
 
-void ContextMenuClientGtk::contextMenuDestroyed() {
+namespace WebKit {
+
+void ContextMenuClient::contextMenuDestroyed() {
   notImplemented();
 }
 
-PlatformMenuDescription ContextMenuClientGtk::getCustomMenuFromDefaultItems(
+PlatformMenuDescription ContextMenuClient::getCustomMenuFromDefaultItems(
     ContextMenu*) {
   notImplemented();
   return PlatformMenuDescription();
 }
 
-void ContextMenuClientGtk::contextMenuItemSelected(ContextMenuItem*,
-                                                   const ContextMenu*) {
+void ContextMenuClient::contextMenuItemSelected(ContextMenuItem*,
+                                                const ContextMenu*) {
   notImplemented();
 }
 
-void ContextMenuClientGtk::downloadURL(const KURL& url) {
+void ContextMenuClient::downloadURL(const KURL& url) {
   notImplemented();
 }
 
-void ContextMenuClientGtk::copyImageToClipboard(const HitTestResult&) {
+void ContextMenuClient::copyImageToClipboard(const HitTestResult&) {
   notImplemented();
 }
 
-void ContextMenuClientGtk::searchWithGoogle(const Frame*) {
+void ContextMenuClient::searchWithGoogle(const Frame*) {
   notImplemented();
 }
 
-void ContextMenuClientGtk::lookUpInDictionary(Frame*) {
+void ContextMenuClient::lookUpInDictionary(Frame*) {
   notImplemented();
 }
 
-void ContextMenuClientGtk::speak(const String&) {
+void ContextMenuClient::speak(const String&) {
   notImplemented();
 }
 
-void ContextMenuClientGtk::stopSpeaking() {
+void ContextMenuClient::stopSpeaking() {
   notImplemented();
 }
 }
