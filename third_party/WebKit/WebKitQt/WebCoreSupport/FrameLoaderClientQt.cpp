@@ -756,6 +756,9 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
   if (MIMETypeRegistry::isSupportedImageMIMEType(mimeType))
     return ObjectContentImage;
 
+  if (_mimeType == "application/x-qt-plugin")
+    return ObjectContentPlugin;
+
   if (QWebFactoryLoader::self()->supportsMimeType(mimeType))
     return ObjectContentPlugin;
 
@@ -781,13 +784,22 @@ Widget* FrameLoaderClientQt::createPlugin(Element* element,
   for (int i = 0; i < paramValues.size(); ++i)
     values.append(paramValues[i]);
 
-  QUrl qurl = QString(url.url());
+  QString urlStr(url.url());
+  QUrl qurl = urlStr;
 
-  QObject* object = QWebFactoryLoader::self()->create(m_webFrame, qurl,
-                                                      mimeType, params, values);
+  QObject* object = 0;
+
+  if (mimeType == "application/x-qt-plugin")
+    object = m_webFrame->page()->createPlugin(qurl, mimeType, params, values);
+
+  if (!object)
+    object = QWebFactoryLoader::self()->create(m_webFrame, qurl, mimeType,
+                                               params, values);
+
   if (object) {
     QWidget* widget = qobject_cast<QWidget*>(object);
     if (widget) {
+      widget->setParent(m_webFrame->page());
       Widget* w = new Widget();
       w->setQWidget(widget);
       return w;
