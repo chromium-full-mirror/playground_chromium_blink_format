@@ -215,7 +215,10 @@ class Frame : public Shared<Frame> {
 #if PLATFORM(MAC)
   WebScriptObject* windowScriptObject();
 #endif
+
+#if USE(NPOBJECT)
   NPObject* windowScriptNPObject();
+#endif
 
   void setDocument(PassRefPtr<Document>);
 

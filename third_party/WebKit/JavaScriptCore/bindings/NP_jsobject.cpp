@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#if !PLATFORM(DARWIN) || !defined(__LP64__)
+
 #include "NP_jsobject.h"
 
 #include "c_utility.h"
@@ -462,3 +465,5 @@ bool _NPN_Enumerate(NPP,
 
   return false;
 }
+
+#endif

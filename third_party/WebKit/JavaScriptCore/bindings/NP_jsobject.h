@@ -26,6 +26,8 @@
 #ifndef NP_JSOBJECT_H
 #define NP_JSOBJECT_H
 
+#if !PLATFORM(DARWIN) || !defined(__LP64__)
+
 #include "npruntime.h"
 #include <wtf/Forward.h>
 
@@ -52,4 +54,5 @@ NPObject* _NPN_CreateScriptObject(
     PassRefPtr<KJS::Bindings::RootObject> rootObject);
 NPObject* _NPN_CreateNoScriptObject(void);
 
+#endif
 #endif

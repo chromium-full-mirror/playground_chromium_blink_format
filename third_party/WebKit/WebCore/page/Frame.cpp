@@ -1141,6 +1141,7 @@ PassRefPtr<KJS::Bindings::RootObject> Frame::createRootObject(
   return rootObject.release();
 }
 
+#if USE(NPOBJECT)
 NPObject* Frame::windowScriptNPObject() {
   if (!d->m_windowScriptNPObject) {
     Settings* settings = this->settings();
@@ -1163,6 +1164,7 @@ NPObject* Frame::windowScriptNPObject() {
 
   return d->m_windowScriptNPObject;
 }
+#endif
 
 void Frame::clearScriptProxy() {
   if (d->m_jscript)
@@ -1200,6 +1202,7 @@ void Frame::cleanupScriptObjects() {
     d->m_bindingRootObject = 0;
   }
 
+#if USE(NPOBJECT)
   if (d->m_windowScriptNPObject) {
     // Call _NPN_DeallocateObject() instead of _NPN_ReleaseObject() so that we
     // don't leak if a plugin fails to release the window
@@ -1209,6 +1212,7 @@ void Frame::cleanupScriptObjects() {
     _NPN_DeallocateObject(d->m_windowScriptNPObject);
     d->m_windowScriptNPObject = 0;
   }
+#endif
 }
 
 RenderObject* Frame::renderer() const {

@@ -25,6 +25,9 @@
  */
 
 #include "config.h"
+
+#if !PLATFORM(DARWIN) || !defined(__LP64__)
+
 #include "c_utility.h"
 
 #include "NP_jsobject.h"
@@ -206,3 +209,5 @@ Identifier identifierFromNPIdentifier(const NPUTF8* name) {
 }
 }
 }
+
+#endif

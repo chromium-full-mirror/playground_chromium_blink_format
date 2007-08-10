@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#if !PLATFORM(DARWIN) || !defined(__LP64__)
+
 #include "c_instance.h"
 
 #include "c_class.h"
@@ -193,3 +196,5 @@ void CInstance::getPropertyNames(ExecState*, PropertyNameArray& nameArray) {
 }
 }
 }
+
+#endif

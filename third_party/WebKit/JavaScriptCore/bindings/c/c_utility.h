@@ -26,6 +26,8 @@
 #ifndef C_UTILITY_H_
 #define C_UTILITY_H_
 
+#if !PLATFORM(DARWIN) || !defined(__LP64__)
+
 #include "npruntime.h"
 
 namespace KJS {
@@ -71,4 +73,5 @@ struct PrivateIdentifier {
 }
 }
 
+#endif
 #endif
