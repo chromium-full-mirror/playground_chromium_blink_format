@@ -300,7 +300,8 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
       m_inLowBandwidthDisplay(false)
 #endif
       ,
-      m_isXHTML(isXHTML) {
+      m_isXHTML(isXHTML),
+      m_numNodeLists(0) {
   m_document.resetSkippingRef(this);
 
   m_printing = false;
