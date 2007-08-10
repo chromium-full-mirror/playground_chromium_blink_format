@@ -30,6 +30,7 @@
 #if PLATFORM(CG)
 
 #include "GraphicsContext.h"
+#include "ImageObserver.h"
 #include <wtf/MathExtras.h>
 
 using namespace std;
@@ -180,6 +181,9 @@ void PDFDocumentImage::draw(GraphicsContext* context,
                            m_document, m_currentPage + 1);
 
   context->restore();
+
+  if (imageObserver())
+    imageObserver()->didDraw(this);
 }
 }
 

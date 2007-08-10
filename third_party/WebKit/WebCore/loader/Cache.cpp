@@ -191,7 +191,7 @@ void Cache::pruneLiveResources() {
     ASSERT(current->referenced());
     if (current->isLoaded()) {
       // Check to see if the remaining resources are too new to prune.
-      double elapsedTime = currentTime - current->m_lastLiveAccessTime;
+      double elapsedTime = currentTime - current->m_lastDecodedAccessTime;
       if (elapsedTime < cMinDelayBeforeLiveDecodedPrune)
         return;
 
@@ -209,7 +209,7 @@ void Cache::pruneLiveResources() {
   }
 }
 
-void Cache::pruneAllResources() {
+void Cache::pruneDeadResources() {
   // No need to prune if all of our objects fit.
   if (m_currentSize <= m_maximumSize)
     return;
@@ -281,7 +281,7 @@ void Cache::pruneAllResources() {
 
 void Cache::setMaximumSize(unsigned bytes) {
   m_maximumSize = bytes;
-  pruneAllResources();
+  pruneDeadResources();
 }
 
 void Cache::remove(CachedResource* resource) {

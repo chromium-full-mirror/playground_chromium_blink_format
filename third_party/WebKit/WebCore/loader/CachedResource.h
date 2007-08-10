@@ -101,8 +101,6 @@ class CachedResource {
   unsigned accessCount() const { return m_accessCount; }
   void increaseAccessCount() { m_accessCount++; }
 
-  void liveResourceAccessed();
-
   // Computes the status of an object after loading.
   // Updates the expire date on the cache entry file
   void finish();
@@ -146,6 +144,7 @@ class CachedResource {
 
  protected:
   void setEncodedSize(unsigned);
+  void didAccessDecodedData(double timeStamp);
 
   HashCountedSet<CachedResourceClient*> m_clients;
 
@@ -165,7 +164,7 @@ class CachedResource {
   unsigned m_encodedSize;
   unsigned m_accessCount;
   unsigned m_inLiveDecodedResourcesList;
-  double m_lastLiveAccessTime;  // Used as a "thrash guard" in the cache
+  double m_lastDecodedAccessTime;  // Used as a "thrash guard" in the cache
 
   bool m_sendResourceLoadCallbacks;
 

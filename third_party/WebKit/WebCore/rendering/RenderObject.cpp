@@ -1303,9 +1303,6 @@ bool RenderObject::paintBorderImage(GraphicsContext* graphicsContext,
   if (clipped)
     graphicsContext->restore();
 
-  if (!graphicsContext->paintingDisabled())
-    borderImage->liveResourceAccessed();
-
   return true;
 }
 

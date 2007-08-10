@@ -40,13 +40,8 @@
 
 namespace WebCore {
 
-class CachedCSSStyleSheet;
-class CachedImage;
 class CachedResource;
-class CachedScript;
-class CachedXSLStyleSheet;
 class DocLoader;
-class Image;
 class KURL;
 
 // This cache holds subresources used by Web pages: images, scripts,
@@ -112,11 +107,10 @@ class Cache : Noncopyable {
   // list.
   void remove(CachedResource*);
 
-  // Flush the cache.  Any resources still referenced by Web pages will not be
-  // removed by this call.
-  void pruneAllResources();
+  // Flush dead resources (resources not referenced by Web pages).
+  void pruneDeadResources();
 
-  // Flush live resources only.
+  // Flush live resources.
   void pruneLiveResources();
 
   void addDocLoader(DocLoader*);

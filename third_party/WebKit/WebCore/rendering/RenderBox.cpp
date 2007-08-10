@@ -774,12 +774,9 @@ void RenderBox::paintBackgroundExtended(GraphicsContext* context,
 
     calculateBackgroundImageGeometry(bgLayer, tx, ty, w, h, destRect, phase,
                                      tileSize);
-    if (!destRect.isEmpty()) {
+    if (!destRect.isEmpty())
       context->drawTiledImage(bg->image(), destRect, phase, tileSize,
                               bgLayer->backgroundComposite());
-      if (!context->paintingDisabled())
-        bg->liveResourceAccessed();
-    }
   }
 
   if (bgLayer->backgroundClip() != BGBORDER)
