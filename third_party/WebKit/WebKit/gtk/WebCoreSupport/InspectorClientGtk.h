@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef InspectorClientGdk_h
-#define InspectorClientGdk_h
+#ifndef InspectorClientGtk_h
+#define InspectorClientGtk_h
 
 #include "InspectorClient.h"
 
@@ -36,7 +36,7 @@ class Node;
 class Page;
 class String;
 
-class InspectorClientGdk : public InspectorClient {
+class InspectorClientGtk : public InspectorClient {
  public:
   virtual void inspectorDestroyed();
 

@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ChromeClientGdk_h
-#define ChromeClientGdk_h
+#ifndef ChromeClientGtk_h
+#define ChromeClientGtk_h
 
 #include "ChromeClient.h"
 
@@ -35,9 +35,9 @@ typedef struct _WebKitGtkPage WebKitGtkPage;
 
 namespace WebKitGtk {
 
-class ChromeClientGdk : public WebCore::ChromeClient {
+class ChromeClientGtk : public WebCore::ChromeClient {
  public:
-  ChromeClientGdk(WebKitGtkPage*);
+  ChromeClientGtk(WebKitGtkPage*);
   WebKitGtkPage* webPage() const { return m_webPage; }
 
   virtual void chromeDestroyed();
@@ -118,4 +118,4 @@ class ChromeClientGdk : public WebCore::ChromeClient {
 };
 }
 
-#endif  // ChromeClientGdk_h
+#endif  // ChromeClientGtk_h

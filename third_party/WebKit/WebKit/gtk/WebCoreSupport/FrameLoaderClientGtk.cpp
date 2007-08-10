@@ -31,7 +31,7 @@
  */
 
 #include "config.h"
-#include "FrameLoaderClientGdk.h"
+#include "FrameLoaderClientGtk.h"
 #include "DocumentLoader.h"
 #include "FrameLoader.h"
 #include "FrameView.h"
@@ -55,25 +55,25 @@ using namespace WebKitGtk;
 
 namespace WebCore {
 
-FrameLoaderClientGdk::FrameLoaderClientGdk(WebKitGtkFrame* frame)
+FrameLoaderClientGtk::FrameLoaderClientGtk(WebKitGtkFrame* frame)
     : m_frame(frame), m_firstData(false) {
   ASSERT(m_frame);
 }
 
-String FrameLoaderClientGdk::userAgent(const KURL&) {
+String FrameLoaderClientGtk::userAgent(const KURL&) {
   return "Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/420+ (KHTML, "
          "like Gecko)";
 }
 
 WTF::PassRefPtr<WebCore::DocumentLoader>
-FrameLoaderClientGdk::createDocumentLoader(
+FrameLoaderClientGtk::createDocumentLoader(
     const WebCore::ResourceRequest& request,
     const SubstituteData& substituteData) {
   RefPtr<DocumentLoader> loader = new DocumentLoader(request, substituteData);
   return loader.release();
 }
 
-void FrameLoaderClientGdk::dispatchWillSubmitForm(
+void FrameLoaderClientGtk::dispatchWillSubmitForm(
     FramePolicyFunction policyFunction,
     PassRefPtr<FormState>) {
   // FIXME: This is surely too simple
@@ -83,7 +83,7 @@ void FrameLoaderClientGdk::dispatchWillSubmitForm(
   (core(m_frame)->loader()->*policyFunction)(PolicyUse);
 }
 
-void FrameLoaderClientGdk::committedLoad(DocumentLoader* loader,
+void FrameLoaderClientGtk::committedLoad(DocumentLoader* loader,
                                          const char* data,
                                          int length) {
   FrameLoader* fl = loader->frameLoader();
@@ -91,40 +91,40 @@ void FrameLoaderClientGdk::committedLoad(DocumentLoader* loader,
   fl->addData(data, length);
 }
 
-void FrameLoaderClientGdk::dispatchDidReceiveAuthenticationChallenge(
+void FrameLoaderClientGtk::dispatchDidReceiveAuthenticationChallenge(
     DocumentLoader*,
     unsigned long identifier,
     const AuthenticationChallenge&) {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::dispatchDidCancelAuthenticationChallenge(
+void FrameLoaderClientGtk::dispatchDidCancelAuthenticationChallenge(
     DocumentLoader*,
     unsigned long identifier,
     const AuthenticationChallenge&) {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::dispatchWillSendRequest(DocumentLoader*,
+void FrameLoaderClientGtk::dispatchWillSendRequest(DocumentLoader*,
                                                    unsigned long,
                                                    ResourceRequest&,
                                                    const ResourceResponse&) {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::assignIdentifierToInitialRequest(
+void FrameLoaderClientGtk::assignIdentifierToInitialRequest(
     unsigned long identifier,
     DocumentLoader*,
     const ResourceRequest&) {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::postProgressStartedNotification() {
+void FrameLoaderClientGtk::postProgressStartedNotification() {
   WebKitGtkPage* page = getPageFromFrame(m_frame);
   g_signal_emit_by_name(page, "load_started", m_frame);
 }
 
-void FrameLoaderClientGdk::postProgressEstimateChangedNotification() {
+void FrameLoaderClientGtk::postProgressEstimateChangedNotification() {
   WebKitGtkPage* kitPage = getPageFromFrame(m_frame);
   Page* corePage = core(kitPage);
 
@@ -133,18 +133,18 @@ void FrameLoaderClientGdk::postProgressEstimateChangedNotification() {
       lround(corePage->progress()->estimatedProgress() * 100));
 }
 
-void FrameLoaderClientGdk::postProgressFinishedNotification() {
+void FrameLoaderClientGtk::postProgressFinishedNotification() {
   WebKitGtkPage* page = getPageFromFrame(m_frame);
 
   g_signal_emit_by_name(page, "load_finished", m_frame);
 }
 
-void FrameLoaderClientGdk::frameLoaderDestroyed() {
+void FrameLoaderClientGtk::frameLoaderDestroyed() {
   m_frame = 0;
   delete this;
 }
 
-void FrameLoaderClientGdk::dispatchDidReceiveResponse(
+void FrameLoaderClientGtk::dispatchDidReceiveResponse(
     DocumentLoader*,
     unsigned long,
     const ResourceResponse& response) {
@@ -152,7 +152,7 @@ void FrameLoaderClientGdk::dispatchDidReceiveResponse(
   m_firstData = true;
 }
 
-void FrameLoaderClientGdk::dispatchDecidePolicyForMIMEType(
+void FrameLoaderClientGtk::dispatchDecidePolicyForMIMEType(
     FramePolicyFunction policyFunction,
     const String&,
     const ResourceRequest&) {
@@ -163,7 +163,7 @@ void FrameLoaderClientGdk::dispatchDecidePolicyForMIMEType(
   (core(m_frame)->loader()->*policyFunction)(PolicyUse);
 }
 
-void FrameLoaderClientGdk::dispatchDecidePolicyForNewWindowAction(
+void FrameLoaderClientGtk::dispatchDecidePolicyForNewWindowAction(
     FramePolicyFunction policyFunction,
     const NavigationAction&,
     const ResourceRequest&,
@@ -176,7 +176,7 @@ void FrameLoaderClientGdk::dispatchDecidePolicyForNewWindowAction(
   (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
 }
 
-void FrameLoaderClientGdk::dispatchDecidePolicyForNavigationAction(
+void FrameLoaderClientGtk::dispatchDecidePolicyForNavigationAction(
     FramePolicyFunction policyFunction,
     const NavigationAction&,
     const ResourceRequest&) {
@@ -186,7 +186,7 @@ void FrameLoaderClientGdk::dispatchDecidePolicyForNavigationAction(
   (core(m_frame)->loader()->*policyFunction)(PolicyUse);
 }
 
-Widget* FrameLoaderClientGdk::createPlugin(Element*,
+Widget* FrameLoaderClientGtk::createPlugin(Element*,
                                            const KURL&,
                                            const Vector<String>&,
                                            const Vector<String>&,
@@ -196,7 +196,7 @@ Widget* FrameLoaderClientGdk::createPlugin(Element*,
   return 0;
 }
 
-Frame* FrameLoaderClientGdk::createFrame(const KURL& url,
+Frame* FrameLoaderClientGtk::createFrame(const KURL& url,
                                          const String& name,
                                          HTMLFrameOwnerElement* ownerElement,
                                          const String& referrer,
@@ -241,12 +241,12 @@ Frame* FrameLoaderClientGdk::createFrame(const KURL& url,
   return childFrame;
 }
 
-void FrameLoaderClientGdk::redirectDataToPlugin(Widget* pluginWidget) {
+void FrameLoaderClientGtk::redirectDataToPlugin(Widget* pluginWidget) {
   notImplemented();
   return;
 }
 
-Widget* FrameLoaderClientGdk::createJavaAppletWidget(
+Widget* FrameLoaderClientGtk::createJavaAppletWidget(
     const IntSize&,
     Element*,
     const KURL& baseURL,
@@ -256,7 +256,7 @@ Widget* FrameLoaderClientGdk::createJavaAppletWidget(
   return 0;
 }
 
-ObjectContentType FrameLoaderClientGdk::objectContentType(
+ObjectContentType FrameLoaderClientGtk::objectContentType(
     const KURL& url,
     const String& mimeType) {
   if (!url.isValid())
@@ -269,201 +269,201 @@ ObjectContentType FrameLoaderClientGdk::objectContentType(
   return ObjectContentType();
 }
 
-String FrameLoaderClientGdk::overrideMediaType() const {
+String FrameLoaderClientGtk::overrideMediaType() const {
   notImplemented();
   return String();
 }
 
-void FrameLoaderClientGdk::windowObjectCleared() const {
+void FrameLoaderClientGtk::windowObjectCleared() const {
   g_signal_emit_by_name(m_frame, "cleared");
 }
 
-void FrameLoaderClientGdk::setMainFrameDocumentReady(bool) {
+void FrameLoaderClientGtk::setMainFrameDocumentReady(bool) {
   // this is only interesting once we provide an external API for the DOM
 }
 
-bool FrameLoaderClientGdk::hasWebView() const {
+bool FrameLoaderClientGtk::hasWebView() const {
   notImplemented();
   return true;
 }
 
-bool FrameLoaderClientGdk::hasFrameView() const {
+bool FrameLoaderClientGtk::hasFrameView() const {
   notImplemented();
   return true;
 }
 
-void FrameLoaderClientGdk::dispatchDidFinishLoad() {
+void FrameLoaderClientGtk::dispatchDidFinishLoad() {
   g_signal_emit_by_name(m_frame, "load_done", true);
 }
 
-void FrameLoaderClientGdk::frameLoadCompleted() {
+void FrameLoaderClientGtk::frameLoadCompleted() {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::saveViewStateToItem(HistoryItem*) {
+void FrameLoaderClientGtk::saveViewStateToItem(HistoryItem*) {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::restoreViewState() {
+void FrameLoaderClientGtk::restoreViewState() {
   notImplemented();
 }
 
-bool FrameLoaderClientGdk::shouldGoToHistoryItem(HistoryItem* item) const {
+bool FrameLoaderClientGtk::shouldGoToHistoryItem(HistoryItem* item) const {
   // FIXME: This is a very simple implementation. More sophisticated
   // implementation would delegate the decision to a PolicyDelegate.
   // See mac implementation for example.
   return item != 0;
 }
 
-bool FrameLoaderClientGdk::privateBrowsingEnabled() const {
+bool FrameLoaderClientGtk::privateBrowsingEnabled() const {
   notImplemented();
   return false;
 }
-void FrameLoaderClientGdk::makeDocumentView() {
+void FrameLoaderClientGtk::makeDocumentView() {
   notImplemented();
 }
-void FrameLoaderClientGdk::makeRepresentation(DocumentLoader*) {
+void FrameLoaderClientGtk::makeRepresentation(DocumentLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::forceLayout() {
+void FrameLoaderClientGtk::forceLayout() {
   notImplemented();
 }
-void FrameLoaderClientGdk::forceLayoutForNonHTML() {
+void FrameLoaderClientGtk::forceLayoutForNonHTML() {
   notImplemented();
 }
-void FrameLoaderClientGdk::setCopiesOnScroll() {
+void FrameLoaderClientGtk::setCopiesOnScroll() {
   notImplemented();
 }
-void FrameLoaderClientGdk::detachedFromParent1() {
+void FrameLoaderClientGtk::detachedFromParent1() {
   notImplemented();
 }
-void FrameLoaderClientGdk::detachedFromParent2() {
+void FrameLoaderClientGtk::detachedFromParent2() {
   notImplemented();
 }
-void FrameLoaderClientGdk::detachedFromParent3() {
+void FrameLoaderClientGtk::detachedFromParent3() {
   notImplemented();
 }
-void FrameLoaderClientGdk::detachedFromParent4() {
+void FrameLoaderClientGtk::detachedFromParent4() {
   notImplemented();
 }
-void FrameLoaderClientGdk::loadedFromCachedPage() {
+void FrameLoaderClientGtk::loadedFromCachedPage() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidHandleOnloadEvents() {
+void FrameLoaderClientGtk::dispatchDidHandleOnloadEvents() {
   notImplemented();
 }
-void FrameLoaderClientGdk::
+void FrameLoaderClientGtk::
     dispatchDidReceiveServerRedirectForProvisionalLoad() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidCancelClientRedirect() {
+void FrameLoaderClientGtk::dispatchDidCancelClientRedirect() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchWillPerformClientRedirect(const KURL&,
+void FrameLoaderClientGtk::dispatchWillPerformClientRedirect(const KURL&,
                                                              double,
                                                              double) {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidChangeLocationWithinPage() {
+void FrameLoaderClientGtk::dispatchDidChangeLocationWithinPage() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchWillClose() {
+void FrameLoaderClientGtk::dispatchWillClose() {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::dispatchDidReceiveIcon() {
+void FrameLoaderClientGtk::dispatchDidReceiveIcon() {
   WebKitGtkPage* page = getPageFromFrame(m_frame);
 
   g_signal_emit_by_name(page, "icon_loaded", m_frame);
 }
 
-void FrameLoaderClientGdk::dispatchDidStartProvisionalLoad() {}
+void FrameLoaderClientGtk::dispatchDidStartProvisionalLoad() {}
 
-void FrameLoaderClientGdk::dispatchDidReceiveTitle(const String& title) {
+void FrameLoaderClientGtk::dispatchDidReceiveTitle(const String& title) {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::dispatchDidCommitLoad() {
+void FrameLoaderClientGtk::dispatchDidCommitLoad() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidFinishDocumentLoad() {
+void FrameLoaderClientGtk::dispatchDidFinishDocumentLoad() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidFirstLayout() {
+void FrameLoaderClientGtk::dispatchDidFirstLayout() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchShow() {
+void FrameLoaderClientGtk::dispatchShow() {
   notImplemented();
 }
-void FrameLoaderClientGdk::cancelPolicyCheck() {
+void FrameLoaderClientGtk::cancelPolicyCheck() {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidLoadMainResource(DocumentLoader*) {
+void FrameLoaderClientGtk::dispatchDidLoadMainResource(DocumentLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::revertToProvisionalState(DocumentLoader*) {
+void FrameLoaderClientGtk::revertToProvisionalState(DocumentLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::clearUnarchivingState(DocumentLoader*) {
+void FrameLoaderClientGtk::clearUnarchivingState(DocumentLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::willChangeTitle(DocumentLoader*) {
+void FrameLoaderClientGtk::willChangeTitle(DocumentLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::didChangeTitle(DocumentLoader* l) {
+void FrameLoaderClientGtk::didChangeTitle(DocumentLoader* l) {
   setTitle(l->title(), l->URL());
 }
-void FrameLoaderClientGdk::finishedLoading(DocumentLoader*) {
+void FrameLoaderClientGtk::finishedLoading(DocumentLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::finalSetupForReplace(DocumentLoader*) {
+void FrameLoaderClientGtk::finalSetupForReplace(DocumentLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::setDefersLoading(bool) {
+void FrameLoaderClientGtk::setDefersLoading(bool) {
   notImplemented();
 }
-bool FrameLoaderClientGdk::isArchiveLoadPending(ResourceLoader*) const {
+bool FrameLoaderClientGtk::isArchiveLoadPending(ResourceLoader*) const {
   notImplemented();
   return false;
 }
-void FrameLoaderClientGdk::cancelPendingArchiveLoad(ResourceLoader*) {
+void FrameLoaderClientGtk::cancelPendingArchiveLoad(ResourceLoader*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::clearArchivedResources() {
+void FrameLoaderClientGtk::clearArchivedResources() {
   notImplemented();
 }
-bool FrameLoaderClientGdk::canHandleRequest(const ResourceRequest&) const {
-  notImplemented();
-  return true;
-}
-bool FrameLoaderClientGdk::canShowMIMEType(const String&) const {
+bool FrameLoaderClientGtk::canHandleRequest(const ResourceRequest&) const {
   notImplemented();
   return true;
 }
-bool FrameLoaderClientGdk::representationExistsForURLScheme(
+bool FrameLoaderClientGtk::canShowMIMEType(const String&) const {
+  notImplemented();
+  return true;
+}
+bool FrameLoaderClientGtk::representationExistsForURLScheme(
     const String&) const {
   notImplemented();
   return false;
 }
-String FrameLoaderClientGdk::generatedMIMETypeForURLScheme(
+String FrameLoaderClientGtk::generatedMIMETypeForURLScheme(
     const String&) const {
   notImplemented();
   return String();
 }
 
-void FrameLoaderClientGdk::provisionalLoadStarted() {
+void FrameLoaderClientGtk::provisionalLoadStarted() {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::didFinishLoad() {
+void FrameLoaderClientGtk::didFinishLoad() {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::prepareForDataSourceReplacement() {
+void FrameLoaderClientGtk::prepareForDataSourceReplacement() {
   notImplemented();
 }
 
-void FrameLoaderClientGdk::setTitle(const String& title, const KURL& url) {
+void FrameLoaderClientGtk::setTitle(const String& title, const KURL& url) {
   WebKitGtkPage* page = getPageFromFrame(m_frame);
 
   CString titleString = title.utf8();
@@ -476,25 +476,25 @@ void FrameLoaderClientGdk::setTitle(const String& title, const KURL& url) {
                           urlString.data());
 }
 
-void FrameLoaderClientGdk::setDocumentViewFromCachedPage(WebCore::CachedPage*) {
+void FrameLoaderClientGtk::setDocumentViewFromCachedPage(WebCore::CachedPage*) {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidReceiveContentLength(
+void FrameLoaderClientGtk::dispatchDidReceiveContentLength(
     DocumentLoader*,
     unsigned long identifier,
     int lengthReceived) {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidFinishLoading(DocumentLoader*,
+void FrameLoaderClientGtk::dispatchDidFinishLoading(DocumentLoader*,
                                                     unsigned long identifier) {
   notImplemented();
 }
-void FrameLoaderClientGdk::dispatchDidFailLoading(DocumentLoader*,
+void FrameLoaderClientGtk::dispatchDidFailLoading(DocumentLoader*,
                                                   unsigned long identifier,
                                                   const ResourceError&) {
   notImplemented();
 }
-bool FrameLoaderClientGdk::dispatchDidLoadResourceFromMemoryCache(
+bool FrameLoaderClientGtk::dispatchDidLoadResourceFromMemoryCache(
     DocumentLoader*,
     const ResourceRequest&,
     const ResourceResponse&,
@@ -503,84 +503,84 @@ bool FrameLoaderClientGdk::dispatchDidLoadResourceFromMemoryCache(
   return false;
 }
 
-void FrameLoaderClientGdk::dispatchDidFailProvisionalLoad(
+void FrameLoaderClientGtk::dispatchDidFailProvisionalLoad(
     const ResourceError&) {
   g_signal_emit_by_name(m_frame, "load_done", false);
 }
 
-void FrameLoaderClientGdk::dispatchDidFailLoad(const ResourceError&) {
+void FrameLoaderClientGtk::dispatchDidFailLoad(const ResourceError&) {
   g_signal_emit_by_name(m_frame, "load_done", false);
 }
 
-void FrameLoaderClientGdk::download(ResourceHandle*,
+void FrameLoaderClientGtk::download(ResourceHandle*,
                                     const ResourceRequest&,
                                     const ResourceRequest&,
                                     const ResourceResponse&) {
   notImplemented();
 }
-ResourceError FrameLoaderClientGdk::cancelledError(const ResourceRequest&) {
+ResourceError FrameLoaderClientGtk::cancelledError(const ResourceRequest&) {
   notImplemented();
   return ResourceError();
 }
-ResourceError FrameLoaderClientGdk::blockedError(const ResourceRequest&) {
+ResourceError FrameLoaderClientGtk::blockedError(const ResourceRequest&) {
   notImplemented();
   return ResourceError();
 }
-ResourceError FrameLoaderClientGdk::cannotShowURLError(const ResourceRequest&) {
+ResourceError FrameLoaderClientGtk::cannotShowURLError(const ResourceRequest&) {
   notImplemented();
   return ResourceError();
 }
-ResourceError FrameLoaderClientGdk::interruptForPolicyChangeError(
+ResourceError FrameLoaderClientGtk::interruptForPolicyChangeError(
     const ResourceRequest&) {
   notImplemented();
   return ResourceError();
 }
-ResourceError FrameLoaderClientGdk::cannotShowMIMETypeError(
+ResourceError FrameLoaderClientGtk::cannotShowMIMETypeError(
     const ResourceResponse&) {
   notImplemented();
   return ResourceError();
 }
-ResourceError FrameLoaderClientGdk::fileDoesNotExistError(
+ResourceError FrameLoaderClientGtk::fileDoesNotExistError(
     const ResourceResponse&) {
   notImplemented();
   return ResourceError();
 }
-bool FrameLoaderClientGdk::shouldFallBack(const ResourceError&) {
+bool FrameLoaderClientGtk::shouldFallBack(const ResourceError&) {
   notImplemented();
   return false;
 }
-bool FrameLoaderClientGdk::willUseArchive(ResourceLoader*,
+bool FrameLoaderClientGtk::willUseArchive(ResourceLoader*,
                                           const ResourceRequest&,
                                           const KURL& originalURL) const {
   notImplemented();
   return false;
 }
-void FrameLoaderClientGdk::saveDocumentViewToCachedPage(CachedPage*) {
+void FrameLoaderClientGtk::saveDocumentViewToCachedPage(CachedPage*) {
   notImplemented();
 }
-bool FrameLoaderClientGdk::canCachePage() const {
+bool FrameLoaderClientGtk::canCachePage() const {
   notImplemented();
   return false;
 }
-Frame* FrameLoaderClientGdk::dispatchCreatePage() {
+Frame* FrameLoaderClientGtk::dispatchCreatePage() {
   notImplemented();
   return 0;
 }
-void FrameLoaderClientGdk::dispatchUnableToImplementPolicy(
+void FrameLoaderClientGtk::dispatchUnableToImplementPolicy(
     const ResourceError&) {
   notImplemented();
 }
-void FrameLoaderClientGdk::setMainDocumentError(DocumentLoader*,
+void FrameLoaderClientGtk::setMainDocumentError(DocumentLoader*,
                                                 const ResourceError&) {
   notImplemented();
 }
-void FrameLoaderClientGdk::startDownload(const ResourceRequest&) {
+void FrameLoaderClientGtk::startDownload(const ResourceRequest&) {
   notImplemented();
 }
-void FrameLoaderClientGdk::updateGlobalHistoryForStandardLoad(const KURL&) {
+void FrameLoaderClientGtk::updateGlobalHistoryForStandardLoad(const KURL&) {
   notImplemented();
 }
-void FrameLoaderClientGdk::updateGlobalHistoryForReload(const KURL&) {
+void FrameLoaderClientGtk::updateGlobalHistoryForReload(const KURL&) {
   notImplemented();
 }
 }

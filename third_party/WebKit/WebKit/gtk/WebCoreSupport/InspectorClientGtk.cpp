@@ -27,46 +27,46 @@
  */
 
 #include "config.h"
-#include "InspectorClientGdk.h"
+#include "InspectorClientGtk.h"
 
 #include "NotImplemented.h"
 
 namespace WebCore {
 
-void InspectorClientGdk::inspectorDestroyed() {
+void InspectorClientGtk::inspectorDestroyed() {
   notImplemented();
 }
 
-Page* InspectorClientGdk::createPage() {
+Page* InspectorClientGtk::createPage() {
   notImplemented();
   return 0;
 }
 
-void InspectorClientGdk::showWindow() {
+void InspectorClientGtk::showWindow() {
   notImplemented();
 }
 
-void InspectorClientGdk::closeWindow() {
+void InspectorClientGtk::closeWindow() {
   notImplemented();
 }
 
-void InspectorClientGdk::attachWindow() {
+void InspectorClientGtk::attachWindow() {
   notImplemented();
 }
 
-void InspectorClientGdk::detachWindow() {
+void InspectorClientGtk::detachWindow() {
   notImplemented();
 }
 
-void InspectorClientGdk::highlight(Node* node) {
+void InspectorClientGtk::highlight(Node* node) {
   notImplemented();
 }
 
-void InspectorClientGdk::hideHighlight() {
+void InspectorClientGtk::hideHighlight() {
   notImplemented();
 }
 
-void InspectorClientGdk::inspectedURLChanged(const String&) {
+void InspectorClientGtk::inspectedURLChanged(const String&) {
   notImplemented();
 }
 }
