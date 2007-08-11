@@ -35,6 +35,7 @@
 #include "NotImplemented.h"
 #include "ChromeClientGtk.h"
 #include "ContextMenuClientGtk.h"
+#include "DragClientGtk.h"
 #include "EditorClientGtk.h"
 #include "EventHandler.h"
 #include "HitTestRequest.h"
@@ -278,8 +279,7 @@ static void webkit_gtk_page_finalize(GObject* object) {
 
   WebKitGtkPagePrivate* pageData =
       WEBKIT_GTK_PAGE_GET_PRIVATE(WEBKIT_GTK_PAGE(object));
-  // delete pageData->page; - we don't have a DragClient yet, so it is crashing
-  // here
+  delete pageData->page;
   delete pageData->settings;
   g_object_unref(pageData->mainFrame);
   delete pageData->userAgent;
@@ -396,7 +396,8 @@ static void webkit_gtk_page_init(WebKitGtkPage* page) {
       WEBKIT_GTK_PAGE_GET_PRIVATE(WEBKIT_GTK_PAGE(page));
   pageData->page =
       new Page(new WebKit::ChromeClient(page), new WebKit::ContextMenuClient,
-               new WebKit::EditorClient(page), 0, new WebKit::InspectorClient);
+               new WebKit::EditorClient(page), new WebKit::DragClient,
+               new WebKit::InspectorClient);
 
   Settings* settings = pageData->page->settings();
   settings->setLoadsImagesAutomatically(true);
