@@ -43,16 +43,8 @@ namespace WebCore {
 
 using namespace EventNames;
 
-static bool isKeyboardOptionTab(KeyboardEvent* event) {
-  return event &&
-         (event->type() == keydownEvent || event->type() == keypressEvent) &&
-         event->altKey() && event->keyIdentifier() == "U+0009";
-}
-
 bool EventHandler::tabsToAllControls(KeyboardEvent* event) const {
-  bool handlingOptionTab = isKeyboardOptionTab(event);
-
-  return handlingOptionTab;
+  return true;
 }
 
 void EventHandler::focusDocumentView() {
@@ -82,17 +74,8 @@ bool EventHandler::passMouseDownEventToWidget(Widget* widget) {
   return false;
 }
 
-bool EventHandler::eventActivatedView(const PlatformMouseEvent& event) const {
+bool EventHandler::eventActivatedView(const PlatformMouseEvent&) const {
   notImplemented();
-  return false;
-}
-
-bool EventHandler::passSubframeEventToSubframe(
-    MouseEventWithHitTestResults& event,
-    Frame* subframe,
-    HitTestResult*) {
-  notImplemented();
-  return false;
 }
 
 bool EventHandler::passWheelEventToWidget(PlatformWheelEvent&, Widget* widget) {
@@ -108,20 +91,23 @@ Clipboard* EventHandler::createDraggingClipboard() const {
 bool EventHandler::passMousePressEventToSubframe(
     MouseEventWithHitTestResults& mev,
     Frame* subframe) {
-  return passSubframeEventToSubframe(mev, subframe);
+  subframe->eventHandler()->handleMousePressEvent(mev.event());
+  return true;
 }
 
 bool EventHandler::passMouseMoveEventToSubframe(
     MouseEventWithHitTestResults& mev,
     Frame* subframe,
     HitTestResult* hoveredNode) {
-  return passSubframeEventToSubframe(mev, subframe, hoveredNode);
+  subframe->eventHandler()->handleMouseMoveEvent(mev.event(), hoveredNode);
+  return true;
 }
 
 bool EventHandler::passMouseReleaseEventToSubframe(
     MouseEventWithHitTestResults& mev,
     Frame* subframe) {
-  return passSubframeEventToSubframe(mev, subframe);
+  subframe->eventHandler()->handleMouseReleaseEvent(mev.event());
+  return true;
 }
 
 bool EventHandler::passMousePressEventToScrollbar(
