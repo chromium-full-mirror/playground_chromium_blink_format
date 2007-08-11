@@ -29,6 +29,8 @@
 #ifndef __HIWebView__
 #define __HIWebView__
 
+#ifndef __LP64__
+
 #include <Carbon/Carbon.h>
 
 #include <AvailabilityMacros.h>
@@ -60,7 +62,7 @@ extern "C" {
  *    An operating system status code.
  *
  *  Availability:
- *    Mac OS X:         in version 10.2.7 and later
+ *    Mac OS X:         in version 10.2.7 and later [32-bit only]
  *    CarbonLib:        not available
  *    Non-Carbon CFM:   not available
  */
@@ -86,7 +88,7 @@ extern OSStatus HIWebViewCreate(HIViewRef* outControl);
  *    An operating system status code.
  *
  *  Availability:
- *    Mac OS X:         in version 10.4 and later
+ *    Mac OS X:         in version 10.4 and later [32-bit only]
  *    CarbonLib:        not available
  *    Non-Carbon CFM:   not available
  */
@@ -107,7 +109,7 @@ extern OSStatus HIWebViewCreateWithClass(Class aClass, HIViewRef* outControl);
  *    A pointer to a web view object, or NULL.
  *
  *  Availability:
- *    Mac OS X:         in version 10.2.7 and later
+ *    Mac OS X:         in version 10.2.7 and later [32-bit only]
  *    CarbonLib:        not available
  *    Non-Carbon CFM:   not available
  */
@@ -119,4 +121,5 @@ extern WebView* HIWebViewGetWebView(HIViewRef inView);
 }
 #endif
 
+#endif
 #endif /* __HIWebView__ */
