@@ -1192,7 +1192,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
   LONG_PTR longPtr = GetWindowLongPtr(hWnd, 0);
   WebView* webView = reinterpret_cast<WebView*>(longPtr);
   WebFrame* mainFrameImpl = webView ? webView->topLevelFrame() : 0;
-  if (!mainFrameImpl)
+  if (!mainFrameImpl || webView->isBeingDestroyed())
     return DefWindowProc(hWnd, message, wParam, lParam);
 
   ASSERT(webView);
