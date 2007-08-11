@@ -183,10 +183,12 @@ class ScrollView : public Widget {
                           const IntRect& clipRect);
   void updateBackingStore();
 
+ protected:
+  HashSet<Widget*>* children() const;
+
  private:
   IntSize maximumScroll() const;
   void updateScrollbars(const IntSize& desiredOffset);
-  HashSet<Widget*>* children();
 
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
