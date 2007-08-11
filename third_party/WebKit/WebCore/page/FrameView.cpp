@@ -914,7 +914,7 @@ void FrameView::setWasScrolledByUser(bool wasScrolledByUser) {
   d->m_wasScrolledByUser = wasScrolledByUser;
 }
 
-#ifdef PLATFORM(GDK)
+#if PLATFORM(GDK)
 void FrameView::layoutIfNeededRecursive() {
   // We have to crawl our entire tree looking for any FrameViews that need
   // layout and make sure they are up to date.
