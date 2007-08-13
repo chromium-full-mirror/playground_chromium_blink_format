@@ -68,8 +68,6 @@ class CachedImage : public CachedResource, public ImageObserver {
 
   void clear();
 
-  virtual unsigned decodedSize() const;
-
   bool stillNeedsLoad() const {
     return !m_errorOccurred && m_status == Unknown && m_loading == false;
   }
