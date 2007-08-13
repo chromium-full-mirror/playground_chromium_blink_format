@@ -2203,38 +2203,6 @@ void RenderObject::showTreeForThis() const {
 
 #endif  // NDEBUG
 
-static Node* selectStartNode(const RenderObject* object) {
-  Node* node = 0;
-  bool forcedOn = false;
-
-  for (const RenderObject* curr = object; curr; curr = curr->parent()) {
-    if (curr->style()->userSelect() == SELECT_TEXT)
-      forcedOn = true;
-    if (!forcedOn && curr->style()->userSelect() == SELECT_NONE)
-      return 0;
-
-    if (!node)
-      node = curr->element();
-  }
-
-  // somewhere up the render tree there must be an element!
-  ASSERT(node);
-
-  return node;
-}
-
-bool RenderObject::canSelect() const {
-  return selectStartNode(this) != 0;
-}
-
-bool RenderObject::shouldSelect() const {
-  if (Node* node = selectStartNode(this))
-    return EventTargetNodeCast(node)->dispatchHTMLEvent(selectstartEvent, true,
-                                                        true);
-
-  return false;
-}
-
 Color RenderObject::selectionBackgroundColor() const {
   Color color;
   if (style()->userSelect() != SELECT_NONE) {
@@ -2287,7 +2255,7 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
         dhtmlWillDrag = false;
         return curr->node();
       }
-      if (curr->shouldSelect())
+      if (curr->style()->userSelect() != SELECT_IGNORE)
         // In this case we have a click in the unselected portion of text.  If
         // this text is
         // selectable, we want to start the selection process instead of looking
