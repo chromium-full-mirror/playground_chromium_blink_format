@@ -1827,13 +1827,25 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
 
   DeprecatedString str = v->toString(exec);
   KURL url = m_frame->loader()->url();
+  const Window* window = Window::retrieveWindow(m_frame);
+  bool sameDomainAccess = window && window->isSafeScript(exec);
+
   const HashEntry* entry = Lookup::findEntry(&LocationTable, p);
-  if (entry)
+
+  if (entry) {
+    // cross-domain access to the location is allowed when assigning the whole
+    // location,
+    // but not when assigning the individual pieces, since that might
+    // inadvertently
+    // disclose other parts of the original location.
+    if (entry->value != Href && !sameDomainAccess)
+      return;
+
     switch (entry->value) {
       case Href: {
-        Frame* p = Window::retrieveActive(exec)->impl()->frame();
-        if (p)
-          url = p->loader()->completeURL(str).url();
+        Frame* frame = Window::retrieveActive(exec)->impl()->frame();
+        if (frame)
+          url = frame->loader()->completeURL(str).url();
         else
           url = str;
         break;
@@ -1873,15 +1885,14 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
         // <http://bugs.webkit.org/show_bug.cgi?id=12720>
         return;
     }
-  else {
-    JSObject::put(exec, p, v, attr);
+  } else {
+    if (sameDomainAccess)
+      JSObject::put(exec, p, v, attr);
     return;
   }
 
-  const Window* window = Window::retrieveWindow(m_frame);
   Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
-  if (!url.url().startsWith("javascript:", false) ||
-      (window && window->isSafeScript(exec))) {
+  if (!url.url().startsWith("javascript:", false) || sameDomainAccess) {
     bool userGesture =
         static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
             ->wasRunByUserGesture();
