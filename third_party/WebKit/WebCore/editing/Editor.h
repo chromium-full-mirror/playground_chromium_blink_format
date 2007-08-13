@@ -216,9 +216,7 @@ class Editor {
   bool ignoreMarkedTextSelectionChange() const {
     return m_ignoreMarkedTextSelectionChange;
   }
-  void setIgnoreMarkedTextSelectionChange(bool ignore) {
-    m_ignoreMarkedTextSelectionChange = ignore;
-  }
+  void setIgnoreMarkedTextSelectionChange(bool ignore);
 
 #if PLATFORM(MAC)
   NSString* userVisibleString(NSURL*);
@@ -253,6 +251,7 @@ class Editor {
                                 bool selectReplacement,
                                 bool smartReplace);
   void writeSelectionToPasteboard(Pasteboard*);
+  void revealSelectionAfterEditingOperation();
 
 #if PLATFORM(MAC)
   void addToKillRing(Range*, bool prepend);
