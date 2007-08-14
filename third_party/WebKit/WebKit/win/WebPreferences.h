@@ -295,9 +295,11 @@ class WebPreferences : public IWebPreferences {
   void setIntegerValue(CFStringRef key, int value);
   void setBoolValue(CFStringRef key, BOOL value);
   static WebPreferences* getInstanceForIdentifier(BSTR identifier);
-  static void initialize();
-  static void save();
-  static void load();
+  static void initializeDefaultSettings();
+  void save();
+  void load();
+  void migrateDefaultSettingsFromSafari3Beta();
+  void removeValuesMatchingDefaultSettings();
   static HRESULT preferencesPath(LPTSTR path, size_t cchPath);
   static HRESULT safeCreateFileWithData(LPCTSTR path,
                                         void* data,
