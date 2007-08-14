@@ -4007,14 +4007,6 @@ void FrameLoader::saveDocumentState() {
   if (m_creatingInitialEmptyDocument)
     return;
 
-  // Do not save doc state if the page has a form that would be submitted via
-  // https.
-  Document* document = m_frame->document();
-  ASSERT(document);
-
-  if (document->hasSecureForm())
-    return;
-
   // For a standard page load, we will have a previous item set, which will be
   // used to
   // store the form state.  However, in some cases we will have no previous
@@ -4038,6 +4030,9 @@ void FrameLoader::saveDocumentState() {
                                             : m_currentHistoryItem.get();
   if (!item)
     return;
+
+  Document* document = m_frame->document();
+  ASSERT(document);
 
   if (document && item->isCurrentDocument(document)) {
     LOG(Loading, "WebCoreLoading %s: saving form state to %p",
