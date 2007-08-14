@@ -188,11 +188,11 @@ void HTMLObjectElement::attach() {
   }
 }
 
-void HTMLObjectElement::closeRenderer() {
+void HTMLObjectElement::finishedParsing() {
   // The parser just reached </object>.
   setComplete(true);
 
-  HTMLPlugInElement::closeRenderer();
+  HTMLPlugInElement::finishedParsing();
 }
 
 void HTMLObjectElement::setComplete(bool complete) {

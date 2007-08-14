@@ -225,7 +225,7 @@ class Node : public TreeShared<Node> {
   // Also used for script elements and some SVG elements for similar purposes,
   // but making parsing a special case in this respect should be avoided if
   // possible.
-  virtual void closeRenderer() {}
+  virtual void finishedParsing() {}
 
   // Called by the frame right before dispatching an unloadEvent. [Radar
   // 4532113]

@@ -411,9 +411,9 @@ double SVGAnimationElement::parseClockValue(const String& data) {
   return result;
 }
 
-void SVGAnimationElement::closeRenderer() {
+void SVGAnimationElement::finishedParsing() {
   ownerSVGElement()->timeScheduler()->addTimer(this, lround(getStartTime()));
-  SVGElement::closeRenderer();
+  SVGElement::finishedParsing();
 }
 
 String SVGAnimationElement::targetAttributeAnimatedValue() const {

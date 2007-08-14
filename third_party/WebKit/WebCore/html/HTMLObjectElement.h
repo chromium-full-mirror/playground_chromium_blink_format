@@ -45,7 +45,7 @@ class HTMLObjectElement : public HTMLPlugInElement {
   virtual void attach();
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual void closeRenderer();
+  virtual void finishedParsing();
   virtual void detach();
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
