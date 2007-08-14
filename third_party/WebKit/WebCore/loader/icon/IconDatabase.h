@@ -89,6 +89,13 @@ class IconDatabase : Noncopyable {
 
   static const String& defaultDatabaseFilename();
 
+  // For clients to tell the IconDatabase that when it does open it should run
+  // the integrity check.
+  // The flag is reset to false after the integrity check is run
+  static void checkIntegrityBeforeOpening();
+
+  bool checkIntegrity();
+
  private:
   IconDatabase();
   ~IconDatabase();

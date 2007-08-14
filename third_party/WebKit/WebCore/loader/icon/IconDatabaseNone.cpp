@@ -139,4 +139,10 @@ IconDatabase::~IconDatabase() {
   ASSERT_NOT_REACHED();
 }
 
+bool IconDatabase::checkIntegrity() {
+  return true;
+}
+
+void IconDatabase::checkIntegrityBeforeOpening() {}
+
 }  // namespace WebCore

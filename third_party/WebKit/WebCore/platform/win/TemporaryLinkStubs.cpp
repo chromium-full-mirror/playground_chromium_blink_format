@@ -36,6 +36,7 @@
 #include "Editor.h"
 #include "EventHandler.h"
 #include "FileChooser.h"
+#include "FileSystem.h"
 #include "Font.h"
 #include "FormState.h"
 #include "FrameLoader.h"
@@ -94,6 +95,15 @@ namespace WebCore {
 
 void FrameView::updateBorder() {
   notImplemented();
+}
+
+bool fileExists(const String& path) {
+  notImplemented();
+  return false;
+}
+bool deleteFile(const String& path) {
+  notImplemented();
+  return false;
 }
 }
 
