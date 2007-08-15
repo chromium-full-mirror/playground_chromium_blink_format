@@ -401,7 +401,6 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
       m_content(0),
       m_counterDirectives(0),
       userDrag(RenderStyle::initialUserDrag()),
-      userSelect(RenderStyle::initialUserSelect()),
       textOverflow(RenderStyle::initialTextOverflow()),
       marginTopCollapse(MCOLLAPSE),
       marginBottomCollapse(MCOLLAPSE),
@@ -428,7 +427,6 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       m_content(0),
       m_counterDirectives(0),
       userDrag(o.userDrag),
-      userSelect(o.userSelect),
       textOverflow(o.textOverflow),
       marginTopCollapse(o.marginTopCollapse),
       marginBottomCollapse(o.marginBottomCollapse),
@@ -472,8 +470,7 @@ bool StyleRareNonInheritedData::operator==(
          flexibleBox == o.flexibleBox && marquee == o.marquee &&
          m_multiCol == o.m_multiCol && m_content == o.m_content &&
          m_counterDirectives == o.m_counterDirectives &&
-         userDrag == o.userDrag && userSelect == o.userSelect &&
-         textOverflow == o.textOverflow &&
+         userDrag == o.userDrag && textOverflow == o.textOverflow &&
          marginTopCollapse == o.marginTopCollapse &&
          marginBottomCollapse == o.marginBottomCollapse &&
          matchNearestMailBlockquoteColor == o.matchNearestMailBlockquoteColor &&
@@ -504,7 +501,8 @@ StyleRareInheritedData::StyleRareInheritedData()
       nbspMode(NBNORMAL),
       khtmlLineBreak(LBNORMAL),
       textSizeAdjust(RenderStyle::initialTextSizeAdjust()),
-      resize(RenderStyle::initialResize()) {}
+      resize(RenderStyle::initialResize()),
+      userSelect(RenderStyle::initialUserSelect()) {}
 
 StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
     : Shared<StyleRareInheritedData>(),
@@ -520,7 +518,8 @@ StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
       nbspMode(o.nbspMode),
       khtmlLineBreak(o.khtmlLineBreak),
       textSizeAdjust(o.textSizeAdjust),
-      resize(o.resize) {}
+      resize(o.resize),
+      userSelect(o.userSelect) {}
 
 StyleRareInheritedData::~StyleRareInheritedData() {
   delete textShadow;
@@ -534,7 +533,7 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const {
          userModify == o.userModify && wordBreak == o.wordBreak &&
          wordWrap == o.wordWrap && nbspMode == o.nbspMode &&
          khtmlLineBreak == o.khtmlLineBreak &&
-         textSizeAdjust == o.textSizeAdjust;
+         textSizeAdjust == o.textSizeAdjust && userSelect == o.userSelect;
 }
 
 bool StyleRareInheritedData::shadowDataEquivalent(
@@ -1047,8 +1046,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       *background.get() != *other->background.get() ||
       visual->textDecoration != other->visual->textDecoration ||
       rareInheritedData->userModify != other->rareInheritedData->userModify ||
-      rareNonInheritedData->userSelect !=
-          other->rareNonInheritedData->userSelect ||
+      rareInheritedData->userSelect != other->rareInheritedData->userSelect ||
       rareNonInheritedData->userDrag != other->rareNonInheritedData->userDrag ||
       rareNonInheritedData->m_borderFit !=
           other->rareNonInheritedData->m_borderFit ||

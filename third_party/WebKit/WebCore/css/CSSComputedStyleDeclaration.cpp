@@ -1568,8 +1568,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       break;
     case CSS_PROP__WEBKIT_USER_SELECT:
       switch (style->userSelect()) {
-        case SELECT_AUTO:
-          return new CSSPrimitiveValue(CSS_VAL_AUTO);
         case SELECT_NONE:
           return new CSSPrimitiveValue(CSS_VAL_NONE);
         case SELECT_TEXT:
