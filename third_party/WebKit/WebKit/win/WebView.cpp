@@ -70,6 +70,7 @@
 #include <WebCore/HitTestResult.h>
 #include <WebCore/IntRect.h>
 #include <WebCore/KeyboardEvent.h>
+#include <WebCore/Language.h>
 #include <WebCore/MIMETypeRegistry.h>
 #include <WebCore/NotImplemented.h>
 #include <WebCore/Page.h>
@@ -1627,15 +1628,6 @@ static String osVersion() {
   return osVersion;
 }
 
-static String language() {
-  TCHAR languageName[256];
-  if (!GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, languageName,
-                     ARRAYSIZE(languageName)))
-    return "en";
-  else
-    return String(languageName, (unsigned int)_tcslen(languageName));
-}
-
 static String webKitVersion() {
   String versionStr = "420+";
   void* data = 0;
@@ -1722,7 +1714,7 @@ const String& WebView::userAgentForKURL(const KURL& url) {
     m_userAgentStandard = String::format(
         "Mozilla/5.0 (Windows; U; %s; %s) AppleWebKit/%s (KHTML, like "
         "Gecko)%s%s",
-        osVersion().latin1().data(), language().latin1().data(),
+        osVersion().latin1().data(), defaultLanguage().latin1().data(),
         webKitVersion().latin1().data(),
         (m_applicationName.length() ? " " : ""),
         m_applicationName.latin1().data());
