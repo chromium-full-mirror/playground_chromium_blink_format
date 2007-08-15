@@ -26,6 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef BUILDING_ON_TIGER
+
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #import <HIToolbox/CarbonEvents.h>
@@ -72,3 +74,5 @@
 - (void)relinquishFocus;
 
 @end
+
+#endif
