@@ -188,7 +188,7 @@ bool ProcessingInstruction::isLoading() const {
 
 bool ProcessingInstruction::sheetLoaded() {
   if (!isLoading()) {
-    document()->removePendingSheet();
+    document()->stylesheetLoaded();
     return true;
   }
   return false;

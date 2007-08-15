@@ -328,7 +328,7 @@ bool HTMLParser::insertNode(Node* n, bool flat) {
   } else {
     if (parentAttached && !n->attached() && !m_isParsingFragment)
       n->attach();
-    n->finishedParsing();
+    n->closeRenderer();
   }
 
   return true;
@@ -1369,7 +1369,7 @@ inline HTMLStackElem* HTMLParser::popOneBlockCommon() {
   // Also, a few elements (<applet>, <object>) need to know when all child
   // elements (<param>s) are available.
   if (current && elem->node != current)
-    current->finishedParsing();
+    current->closeRenderer();
 
   blockStack = elem->next;
   current = elem->node;

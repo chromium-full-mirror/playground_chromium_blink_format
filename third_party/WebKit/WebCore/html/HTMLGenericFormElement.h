@@ -113,7 +113,7 @@ class HTMLFormControlElementWithState : public HTMLGenericFormElement {
                                   HTMLFormElement*);
   virtual ~HTMLFormControlElementWithState();
 
-  virtual void finishedParsing();
+  virtual void closeRenderer();
 
   virtual bool saveState(String& value) const = 0;
 
