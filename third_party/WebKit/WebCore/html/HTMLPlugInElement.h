@@ -46,7 +46,7 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  virtual void detach();
+  virtual void willRemove();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual bool checkDTD(const Node* newChild);
