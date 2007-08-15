@@ -96,7 +96,8 @@ JSValue* CInstance::invokeMethod(ExecState* exec,
 
   {
     JSLock::DropAllLocks dropAllLocks;
-    _object->_class->invoke(_object, ident, cArgs, count, &resultVariant);
+    _object->_class->invoke(_object, ident, cArgs.data(), count,
+                            &resultVariant);
   }
 
   for (i = 0; i < count; i++)
@@ -124,7 +125,8 @@ JSValue* CInstance::invokeDefaultMethod(ExecState* exec, const List& args) {
   VOID_TO_NPVARIANT(resultVariant);
   {
     JSLock::DropAllLocks dropAllLocks;
-    _object->_class->invokeDefault(_object, cArgs, count, &resultVariant);
+    _object->_class->invokeDefault(_object, cArgs.data(), count,
+                                   &resultVariant);
   }
 
   for (i = 0; i < count; i++)

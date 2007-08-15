@@ -258,7 +258,8 @@ JSObject* JSCallbackObject::construct(ExecState* exec, const List& args) {
       for (int i = 0; i < argumentCount; i++)
         arguments[i] = toRef(args[i]);
       JSLock::DropAllLocks dropAllLocks;
-      return toJS(callAsConstructor(execRef, thisRef, argumentCount, arguments,
+      return toJS(callAsConstructor(execRef, thisRef, argumentCount,
+                                    arguments.data(),
                                     toRef(exec->exceptionSlot())));
     }
   }
@@ -314,7 +315,8 @@ JSValue* JSCallbackObject::callAsFunction(ExecState* exec,
         arguments[i] = toRef(args[i]);
       JSLock::DropAllLocks dropAllLocks;
       return toJS(callAsFunction(execRef, thisRef, thisObjRef, argumentCount,
-                                 arguments, toRef(exec->exceptionSlot())));
+                                 arguments.data(),
+                                 toRef(exec->exceptionSlot())));
     }
   }
 

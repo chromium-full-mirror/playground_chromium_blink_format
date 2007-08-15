@@ -69,7 +69,7 @@ JSObject* JSCallbackConstructor::construct(ExecState* exec, const List& args) {
       arguments[i] = toRef(args[i]);
 
     JSLock::DropAllLocks dropAllLocks;
-    return toJS(m_callback(ctx, thisRef, argumentCount, arguments,
+    return toJS(m_callback(ctx, thisRef, argumentCount, arguments.data(),
                            toRef(exec->exceptionSlot())));
   }
 

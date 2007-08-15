@@ -273,7 +273,7 @@ bool HTMLSelectElement::saveState(String& value) const {
                     static_cast<HTMLOptionElement*>(e)->selected();
     characters[i] = selected ? 'X' : '.';
   }
-  value = String(characters, l);
+  value = String(characters.data(), l);
   return true;
 }
 
