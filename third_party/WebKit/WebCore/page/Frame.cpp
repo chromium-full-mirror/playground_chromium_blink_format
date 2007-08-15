@@ -104,7 +104,7 @@ class UserStyleSheetLoader : public CachedResourceClient {
   }
   ~UserStyleSheetLoader() {
     if (!m_cachedSheet->isLoaded())
-      m_document->stylesheetLoaded();
+      m_document->removePendingSheet();
     m_cachedSheet->deref(this);
   }
 
@@ -112,7 +112,7 @@ class UserStyleSheetLoader : public CachedResourceClient {
   virtual void setCSSStyleSheet(const String& /*URL*/,
                                 const String& /*charset*/,
                                 const String& sheet) {
-    m_document->stylesheetLoaded();
+    m_document->removePendingSheet();
     if (Frame* frame = m_document->frame())
       frame->setUserStyleSheet(sheet);
   }

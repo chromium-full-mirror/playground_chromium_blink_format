@@ -36,7 +36,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 SVGStyleElement::SVGStyleElement(const QualifiedName& tagName, Document* doc)
-    : SVGElement(tagName, doc) {}
+    : SVGElement(tagName, doc), m_createdByParser(false) {}
 
 const AtomicString& SVGStyleElement::xmlspace() const {
   return getAttribute(XMLNames::spaceAttr);
@@ -81,9 +81,16 @@ void SVGStyleElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGElement::parseMappedAttribute(attr);
 }
 
+void SVGStyleElement::finishedParsing() {
+  StyleElement::process(this);
+  SVGElement::finishedParsing();
+}
+
 void SVGStyleElement::insertedIntoDocument() {
   SVGElement::insertedIntoDocument();
-  StyleElement::insertedIntoDocument(document());
+
+  if (!m_createdByParser)
+    StyleElement::insertedIntoDocument(document(), this);
 }
 
 void SVGStyleElement::removedFromDocument() {
@@ -92,7 +99,7 @@ void SVGStyleElement::removedFromDocument() {
 }
 
 void SVGStyleElement::childrenChanged() {
-  StyleElement::childrenChanged(this);
+  StyleElement::process(this);
 }
 
 StyleSheet* SVGStyleElement::sheet() {
@@ -100,7 +107,7 @@ StyleSheet* SVGStyleElement::sheet() {
 }
 
 bool SVGStyleElement::sheetLoaded() {
-  document()->stylesheetLoaded();
+  document()->removePendingSheet();
   return true;
 }
 }

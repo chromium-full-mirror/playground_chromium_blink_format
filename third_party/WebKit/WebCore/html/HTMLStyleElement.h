@@ -44,6 +44,11 @@ class HTMLStyleElement : public HTMLElement, public StyleElement {
   virtual void removedFromDocument();
   virtual void childrenChanged();
 
+  void setCreatedByParser(bool createdByParser) {
+    m_createdByParser = createdByParser;
+  }
+  virtual void finishedParsing();
+
   virtual bool isLoading() const;
   virtual bool sheetLoaded();
 
@@ -63,6 +68,7 @@ class HTMLStyleElement : public HTMLElement, public StyleElement {
  protected:
   String m_media;
   bool m_loading;
+  bool m_createdByParser;
 };
 
 }  // namespace

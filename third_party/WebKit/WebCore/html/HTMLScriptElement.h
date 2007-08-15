@@ -52,7 +52,7 @@ class HTMLScriptElement : public HTMLElement, public CachedResourceClient {
   void setCreatedByParser(bool createdByParser) {
     m_createdByParser = createdByParser;
   }
-  virtual void closeRenderer();
+  virtual void finishedParsing();
 
   bool shouldExecuteAsJavaScript();
   void evaluateScript(const String& URL, const String& script);
