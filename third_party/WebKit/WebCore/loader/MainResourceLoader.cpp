@@ -65,7 +65,8 @@ void MainResourceLoader::receivedError(const ResourceError& error) {
     frameLoader()->didFailToLoad(this, error);
   }
 
-  frameLoader()->receivedMainResourceError(error, true);
+  if (frameLoader())
+    frameLoader()->receivedMainResourceError(error, true);
 
   if (!cancelled()) {
     releaseResources();
