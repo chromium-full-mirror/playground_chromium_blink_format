@@ -54,6 +54,7 @@ class ElementRareData {
 
   IntSize m_minimumSizeForResizing;
   RenderStyle* m_computedStyle;
+  bool m_needsFocusAppearanceUpdateSoonAfterAttach;
 };
 
 typedef HashMap<const Element*, ElementRareData*> ElementRareDataMap;
@@ -73,7 +74,8 @@ static inline IntSize defaultMinimumSizeForResizing() {
 
 inline ElementRareData::ElementRareData(Element* element)
     : m_minimumSizeForResizing(defaultMinimumSizeForResizing()),
-      m_computedStyle(0) {}
+      m_computedStyle(0),
+      m_needsFocusAppearanceUpdateSoonAfterAttach(false) {}
 
 void ElementRareData::resetComputedStyle(Element* element) {
   if (!m_computedStyle)
@@ -83,11 +85,7 @@ void ElementRareData::resetComputedStyle(Element* element) {
 }
 
 Element::Element(const QualifiedName& qName, Document* doc)
-    : ContainerNode(doc),
-      m_updateFocusAppearanceTimer(this,
-                                   &Element::updateFocusAppearanceTimerFired),
-      m_needsFocusAppearanceUpdate(false),
-      m_tagName(qName) {}
+    : ContainerNode(doc), m_tagName(qName) {}
 
 Element::~Element() {
   if (namedAttrMap)
@@ -626,18 +624,19 @@ void Element::removedFromDocument() {
 }
 
 void Element::attach() {
-#if !defined(SPEED_DEBUG) || SPEED_DEBUG < 1
   createRendererIfNeeded();
-#endif
   ContainerNode::attach();
-  if (needsFocusAppearanceUpdate() &&
-      !m_updateFocusAppearanceTimer.isActive() &&
-      document()->focusedNode() == this)
-    m_updateFocusAppearanceTimer.startOneShot(0);
+  if (ElementRareData* rd = rareData()) {
+    if (rd->m_needsFocusAppearanceUpdateSoonAfterAttach) {
+      if (isFocusable() && document()->focusedNode() == this)
+        document()->updateFocusAppearanceSoon();
+      rd->m_needsFocusAppearanceUpdateSoonAfterAttach = false;
+    }
+  }
 }
 
 void Element::detach() {
-  stopUpdateFocusAppearanceTimer();
+  cancelFocusAppearanceUpdate();
   if (ElementRareData* rd = rareData())
     rd->resetComputedStyle(this);
   ContainerNode::detach();
@@ -947,6 +946,9 @@ CSSStyleDeclaration* Element::style() {
 
 void Element::focus(bool restorePreviousSelection) {
   Document* doc = document();
+  if (doc->focusedNode() == this)
+    return;
+
   doc->updateLayout();
 
   if (!supportsFocus())
@@ -956,10 +958,11 @@ void Element::focus(bool restorePreviousSelection) {
     page->focusController()->setFocusedNode(this, doc->frame());
 
   if (!isFocusable()) {
-    setNeedsFocusAppearanceUpdate(true);
+    createRareData()->m_needsFocusAppearanceUpdateSoonAfterAttach = true;
     return;
   }
 
+  cancelFocusAppearanceUpdate();
   updateFocusAppearance(restorePreviousSelection);
 }
 
@@ -982,29 +985,14 @@ void Element::updateFocusAppearance(bool restorePreviousSelection) {
     renderer()->enclosingLayer()->scrollRectToVisible(getRect());
 }
 
-void Element::updateFocusAppearanceTimerFired(Timer<Element>*) {
-  stopUpdateFocusAppearanceTimer();
-  Document* doc = document();
-  doc->updateLayout();
-  if (isFocusable())
-    updateFocusAppearance();
-}
-
 void Element::blur() {
-  stopUpdateFocusAppearanceTimer();
+  cancelFocusAppearanceUpdate();
   Document* doc = document();
   if (doc->focusedNode() == this) {
     if (doc->frame())
       doc->frame()->page()->focusController()->setFocusedNode(0, doc->frame());
     else
       doc->setFocusedNode(0);
-  }
-}
-
-void Element::stopUpdateFocusAppearanceTimer() {
-  if (m_updateFocusAppearanceTimer.isActive()) {
-    m_updateFocusAppearanceTimer.stop();
-    setNeedsFocusAppearanceUpdate(false);
   }
 }
 
@@ -1059,5 +1047,12 @@ RenderStyle* Element::computedStyle() {
     rd->m_computedStyle = document()->styleSelector()->styleForElement(
         this, parent() ? parent()->computedStyle() : 0);
   return rd->m_computedStyle;
+}
+
+void Element::cancelFocusAppearanceUpdate() {
+  if (ElementRareData* rd = rareData())
+    rd->m_needsFocusAppearanceUpdateSoonAfterAttach = false;
+  if (document()->focusedNode() == this)
+    document()->cancelFocusAppearanceUpdate();
 }
 }

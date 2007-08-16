@@ -344,10 +344,10 @@ class Document : public ContainerNode {
                                AtomicStringImpl* type,
                                String& state);
 
-  FrameView* view() const;     // can be NULL
-  Frame* frame() const;        // can be NULL
-  Page* page() const;          // can be NULL
-  Settings* settings() const;  // can be NULL
+  FrameView* view() const;                  // can be NULL
+  Frame* frame() const { return m_frame; }  // can be NULL
+  Page* page() const;                       // can be NULL
+  Settings* settings() const;               // can be NULL
 
   PassRefPtr<Range> createRange();
 
@@ -773,7 +773,10 @@ class Document : public ContainerNode {
   void removeNodeList() { m_numNodeLists--; }
   bool hasNodeLists() const { return m_numNodeLists != 0; }
 
- protected:
+  void updateFocusAppearanceSoon();
+  void cancelFocusAppearanceUpdate();
+
+ private:
   CSSStyleSelector* m_styleSelector;
   bool m_didCalculateStyleSelector;
 
@@ -879,6 +882,8 @@ class Document : public ContainerNode {
   DeprecatedPtrList<HTMLImageLoader> m_imageLoadEventDispatchingList;
   Timer<Document> m_imageLoadEventTimer;
 
+  Timer<Document> m_updateFocusAppearanceTimer;
+
   Node* m_cssTarget;
 
   bool m_processingLoadEvent;
@@ -956,12 +961,16 @@ class Document : public ContainerNode {
   void initSecurityPolicyURL();
   const KURL& securityPolicyURL() const { return m_securityPolicyURL; }
 
+ protected:
+  void clearXMLVersion() { m_xmlVersion = String(); }
+
  private:
   bool shouldBeAllowedToLoadLocalResources() const;
 
   void updateTitle();
   void removeAllDisconnectedNodeEventListeners();
   void imageLoadEventTimerFired(Timer<Document>*);
+  void updateFocusAppearanceTimerFired(Timer<Document>*);
 
   JSEditor* jsEditor();
   JSEditor* m_jsEditor;

@@ -198,27 +198,6 @@ bool HTMLInputElement::isMouseFocusable() const {
   return HTMLFormControlElementWithState::isMouseFocusable();
 }
 
-void HTMLInputElement::focus(bool restorePreviousSelection) {
-  if (isTextField()) {
-    Document* doc = document();
-    if (doc->focusedNode() == this)
-      return;
-    doc->updateLayout();
-    if (!supportsFocus())
-      return;
-    if (Page* page = doc->page())
-      page->focusController()->setFocusedNode(this, doc->frame());
-    // FIXME: Should isFocusable do the updateLayout?
-    if (!isFocusable()) {
-      setNeedsFocusAppearanceUpdate(true);
-      return;
-    }
-    updateFocusAppearance(restorePreviousSelection);
-    return;
-  }
-  HTMLFormControlElementWithState::focus(restorePreviousSelection);
-}
-
 void HTMLInputElement::updateFocusAppearance(bool restorePreviousSelection) {
   if (isTextField()) {
     if (!restorePreviousSelection || cachedSelStart == -1)
@@ -230,7 +209,8 @@ void HTMLInputElement::updateFocusAppearance(bool restorePreviousSelection) {
     if (document() && document()->frame())
       document()->frame()->revealSelection();
   } else
-    HTMLFormControlElementWithState::updateFocusAppearance();
+    HTMLFormControlElementWithState::updateFocusAppearance(
+        restorePreviousSelection);
 }
 
 void HTMLInputElement::aboutToUnload() {
