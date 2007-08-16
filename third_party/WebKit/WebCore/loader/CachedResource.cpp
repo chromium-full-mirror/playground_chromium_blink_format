@@ -112,7 +112,7 @@ void CachedResource::deref(CachedResourceClient* c) {
     cache()->removeFromLiveResourcesSize(this);
     cache()->removeFromLiveDecodedResourcesList(this);
     allReferencesRemoved();
-    cache()->pruneDeadResources();
+    cache()->prune();
   }
 }
 
@@ -143,7 +143,7 @@ void CachedResource::setDecodedSize(unsigned size) {
       cache()->removeFromLiveDecodedResourcesList(this);
 
     // Update the cache's size totals.
-    cache()->adjustSize(referenced(), delta, delta);
+    cache()->adjustSize(referenced(), delta);
   }
 }
 
@@ -172,7 +172,7 @@ void CachedResource::setEncodedSize(unsigned size) {
     cache()->insertInLRUList(this);
 
     // Update the cache's size totals.
-    cache()->adjustSize(referenced(), delta, 0);
+    cache()->adjustSize(referenced(), delta);
   }
 }
 
@@ -184,7 +184,7 @@ void CachedResource::didAccessDecodedData(double timeStamp) {
       cache()->removeFromLiveDecodedResourcesList(this);
       cache()->insertInLiveDecodedResourcesList(this);
     }
-    cache()->pruneLiveResources();
+    cache()->prune();
   }
 }
 }
