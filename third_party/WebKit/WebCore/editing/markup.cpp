@@ -465,12 +465,45 @@ static bool propertyMissingOrEqualToNone(CSSMutableStyleDeclaration* style,
          CSS_VAL_NONE;
 }
 
-bool elementHasTextDecorationProperty(Node* node) {
+static bool elementHasTextDecorationProperty(Node* node) {
   RefPtr<CSSMutableStyleDeclaration> style =
       styleFromMatchedRulesAndInlineDecl(node);
   if (!style)
     return false;
   return !propertyMissingOrEqualToNone(style.get(), CSS_PROP_TEXT_DECORATION);
+}
+
+static PassRefPtr<Range> moveEndpointsBeforeNode(const Range* range,
+                                                 Node* node) {
+  if (!range || range->isDetached())
+    return 0;
+
+  Document* document = range->ownerDocument();
+
+  ExceptionCode ec = 0;
+  Node* startContainer = range->startContainer(ec);
+  ASSERT(ec == 0);
+  int startOffset = range->startOffset(ec);
+  ASSERT(ec == 0);
+  Node* endContainer = range->endContainer(ec);
+  ASSERT(ec == 0);
+  int endOffset = range->endOffset(ec);
+  ASSERT(ec == 0);
+
+  ASSERT(startContainer);
+  ASSERT(endContainer);
+
+  if (startContainer == node || startContainer->isDescendantOf(node)) {
+    startContainer = node->parent();
+    startOffset = node->nodeIndex();
+  }
+  if (endContainer == node || endContainer->isDescendantOf(node)) {
+    endContainer = node->parent();
+    endOffset = node->nodeIndex();
+  }
+
+  return new Range(document, startContainer, startOffset, endContainer,
+                   endOffset);
 }
 
 // FIXME: Shouldn't we omit style info when annotate ==
@@ -481,36 +514,52 @@ DeprecatedString createMarkup(const Range* range,
                               Vector<Node*>* nodes,
                               EAnnotateForInterchange annotate,
                               bool convertBlocksToInlines) {
-  if (!range || range->isDetached())
-    return DeprecatedString();
-
   static const DeprecatedString interchangeNewlineString =
       DeprecatedString("<br class=\"") + AppleInterchangeNewline + "\">";
 
-  ExceptionCode ec = 0;
-  if (range->collapsed(ec))
+  if (!range || range->isDetached())
     return "";
-  ASSERT(ec == 0);
-  Node* commonAncestor = range->commonAncestorContainer(ec);
-  ASSERT(ec == 0);
 
-  Document* doc = commonAncestor->document();
-  // disable the delete button so it's elements are not serialized into the
-  // markup
-  doc->frame()->editor()->deleteButtonController()->disable();
-  doc->updateLayoutIgnorePendingStylesheets();
+  Document* document = range->ownerDocument();
+  if (!document)
+    return "";
+
+  // Disable the delete button so it's elements are not serialized into the
+  // markup,
+  // but make sure neither endpoint is inside the delete user interface.
+  Frame* frame = document->frame();
+  DeleteButtonController* deleteButton =
+      frame ? frame->editor()->deleteButtonController() : 0;
+  RefPtr<Range> updatedRange = moveEndpointsBeforeNode(
+      range, deleteButton ? deleteButton->containerElement() : 0);
+  if (deleteButton)
+    deleteButton->disable();
+
+  ExceptionCode ec = 0;
+  bool collapsed = updatedRange->collapsed(ec);
+  ASSERT(ec == 0);
+  if (collapsed)
+    return "";
+  Node* commonAncestor = updatedRange->commonAncestorContainer(ec);
+  ASSERT(ec == 0);
+  if (!commonAncestor)
+    return "";
+
+  document->updateLayoutIgnorePendingStylesheets();
 
   DeprecatedStringList markups;
-  Node* pastEnd = range->pastEndNode();
+  Node* pastEnd = updatedRange->pastEndNode();
   Node* lastClosed = 0;
   Vector<Node*> ancestorsToClose;
 
-  Node* startNode = range->startNode();
-  VisiblePosition visibleStart(range->startPosition(), VP_DEFAULT_AFFINITY);
-  VisiblePosition visibleEnd(range->endPosition(), VP_DEFAULT_AFFINITY);
+  Node* startNode = updatedRange->startNode();
+  VisiblePosition visibleStart(updatedRange->startPosition(),
+                               VP_DEFAULT_AFFINITY);
+  VisiblePosition visibleEnd(updatedRange->endPosition(), VP_DEFAULT_AFFINITY);
   if (annotate && needInterchangeNewlineAfter(visibleStart)) {
     if (visibleStart == visibleEnd.previous()) {
-      doc->frame()->editor()->deleteButtonController()->enable();
+      if (deleteButton)
+        deleteButton->enable();
       return interchangeNewlineString;
     }
 
@@ -539,7 +588,7 @@ DeprecatedString createMarkup(const Range* range,
 
     // Add the node to the markup.
     if (addMarkupForNode) {
-      markups.append(startMarkup(n, range, annotate));
+      markups.append(startMarkup(n, updatedRange.get(), annotate));
       if (nodes)
         nodes->append(n);
     }
@@ -584,7 +633,7 @@ DeprecatedString createMarkup(const Range* range,
             // or b) ancestors that we never encountered during a pre-order
             // traversal starting at startNode:
             ASSERT(startNode->isDescendantOf(parent));
-            markups.prepend(startMarkup(parent, range, annotate));
+            markups.prepend(startMarkup(parent, updatedRange.get(), annotate));
             markups.append(endMarkup(parent));
             if (nodes)
               nodes->append(parent);
@@ -646,7 +695,9 @@ DeprecatedString createMarkup(const Range* range,
   // preserve the appearance of the copied markup.
   // FIXME: Do this for all fully selected blocks, not just the body.
   Node* fullySelectedRoot =
-      body && *Selection::selectionFromContentsOfNode(body).toRange() == *range
+      body &&
+              *Selection::selectionFromContentsOfNode(body).toRange() ==
+                  *updatedRange
           ? body
           : 0;
   if (annotate && fullySelectedRoot)
@@ -679,8 +730,8 @@ DeprecatedString createMarkup(const Range* range,
           markups.append("</div>");
         }
       } else {
-        markups.prepend(
-            startMarkup(ancestor, range, annotate, convertBlocksToInlines));
+        markups.prepend(startMarkup(ancestor, updatedRange.get(), annotate,
+                                    convertBlocksToInlines));
         markups.append(endMarkup(ancestor));
       }
       if (nodes)
@@ -727,13 +778,15 @@ DeprecatedString createMarkup(const Range* range,
     for (Node* ancestor = lastClosed->parentNode(); ancestor;
          ancestor = ancestor->parentNode()) {
       if (isMailBlockquote(ancestor)) {
-        markups.prepend(startMarkup(ancestor, range, annotate));
+        markups.prepend(startMarkup(ancestor, updatedRange.get(), annotate));
         markups.append(endMarkup(ancestor));
       }
     }
   }
 
-  doc->frame()->editor()->deleteButtonController()->enable();
+  if (deleteButton)
+    deleteButton->enable();
+
   return markups.join("");
 }
 
@@ -759,15 +812,30 @@ DeprecatedString createMarkup(const Node* node,
   ASSERT(annotate == DoNotAnnotateForInterchange);  // annotation not yet
                                                     // implemented for this code
                                                     // path
+
+  if (!node)
+    return "";
+
+  Document* document = node->document();
+  Frame* frame = document->frame();
+  DeleteButtonController* deleteButton =
+      frame ? frame->editor()->deleteButtonController() : 0;
+
   // disable the delete button so it's elements are not serialized into the
   // markup
-  if (node->document()->frame())
-    node->document()->frame()->editor()->deleteButtonController()->disable();
-  node->document()->updateLayoutIgnorePendingStylesheets();
+  if (deleteButton) {
+    if (node->isDescendantOf(deleteButton->containerElement()))
+      return "";
+    deleteButton->disable();
+  }
+
+  document->updateLayoutIgnorePendingStylesheets();
   DeprecatedString result(
       markup(const_cast<Node*>(node), includeChildren, nodes));
-  if (node->document()->frame())
-    node->document()->frame()->editor()->deleteButtonController()->enable();
+
+  if (deleteButton)
+    deleteButton->enable();
+
   return result;
 }
 
