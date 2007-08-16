@@ -58,6 +58,8 @@ class TimerBase : Noncopyable {
     m_repeatInterval += delta;
   }
 
+  static void fireTimersInNestedEventLoop();
+
  private:
   virtual void fired() = 0;
 
