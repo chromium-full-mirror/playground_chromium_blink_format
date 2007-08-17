@@ -36,7 +36,7 @@ class RenderPartObject : public RenderPart {
   virtual const char* renderName() const { return "RenderPartObject"; }
 
   virtual void layout();
-  virtual void updateWidget();
+  void updateWidget(bool onlyCreateNonPlugins);
 
   virtual void viewCleared();
 };

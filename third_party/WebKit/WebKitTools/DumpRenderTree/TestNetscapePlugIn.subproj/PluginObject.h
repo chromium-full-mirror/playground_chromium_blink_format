@@ -63,6 +63,7 @@ typedef struct {
   NPObject header;
   NPP npp;
   NPBool eventLogging;
+  NPBool logSetWindow;
   NPBool logDestroy;
   NPBool returnErrorFromNewStream;
   NPObject* testObject;

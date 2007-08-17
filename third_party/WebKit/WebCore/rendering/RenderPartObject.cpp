@@ -29,6 +29,7 @@
 #include "EventHandler.h"
 #include "Frame.h"
 #include "FrameLoader.h"
+#include "FrameLoaderClient.h"
 #include "FrameTree.h"
 #include "FrameView.h"
 #include "HTMLEmbedElement.h"
@@ -98,14 +99,12 @@ static inline void mapClassIdToServiceType(const String& classId,
   // TODO: add more plugins here
 }
 
-void RenderPartObject::updateWidget() {
+void RenderPartObject::updateWidget(bool onlyCreateNonPlugins) {
   String url;
   String serviceType;
   Vector<String> paramNames;
   Vector<String> paramValues;
   Frame* frame = m_view->frame();
-
-  setNeedsLayoutAndPrefWidthsRecalc();
 
   if (element()->hasTagName(objectTag)) {
     HTMLObjectElement* o = static_cast<HTMLObjectElement*>(element());
@@ -226,6 +225,17 @@ void RenderPartObject::updateWidget() {
            !static_cast<Text*>(child)->containsOnlyWhitespace()))
         m_hasFallbackContent = true;
     }
+
+    if (onlyCreateNonPlugins) {
+      KURL completedURL;
+      if (!url.isEmpty())
+        completedURL = frame->loader()->completeURL(url);
+
+      if (frame->loader()->client()->objectContentType(
+              completedURL, serviceType) == ObjectContentPlugin)
+        return;
+    }
+
     bool success =
         frame->loader()->requestObject(this, url, AtomicString(o->name()),
                                        serviceType, paramNames, paramValues);
@@ -250,6 +260,17 @@ void RenderPartObject::updateWidget() {
         paramValues.append(it->value().domString());
       }
     }
+
+    if (onlyCreateNonPlugins) {
+      KURL completedURL;
+      if (!url.isEmpty())
+        completedURL = frame->loader()->completeURL(url);
+
+      if (frame->loader()->client()->objectContentType(
+              completedURL, serviceType) == ObjectContentPlugin)
+        return;
+    }
+
     frame->loader()->requestObject(this, url, o->getAttribute(nameAttr),
                                    serviceType, paramNames, paramValues);
   }
@@ -263,6 +284,9 @@ void RenderPartObject::layout() {
   adjustOverflowForBoxShadow();
 
   RenderPart::layout();
+
+  if (!m_widget)
+    updateWidget(false);
 
   setNeedsLayout(false);
 }

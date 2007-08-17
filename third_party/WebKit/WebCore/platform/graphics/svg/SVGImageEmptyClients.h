@@ -353,7 +353,8 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
                              int marginHeight) {
     return 0;
   }
-  virtual Widget* createPlugin(Element*,
+  virtual Widget* createPlugin(const IntSize&,
+                               Element*,
                                const KURL&,
                                const Vector<String>&,
                                const Vector<String>&,

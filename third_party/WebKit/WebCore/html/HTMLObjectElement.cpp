@@ -77,6 +77,7 @@ KJS::Bindings::Instance* HTMLObjectElement::getInstance() const {
   if (m_instance)
     return m_instance.get();
 
+  document()->updateLayoutIgnorePendingStylesheets();
   RenderObject* r = renderer();
   if (r && r->isWidget()) {
     if (Widget* widget = static_cast<RenderWidget*>(r)->widget())
@@ -179,7 +180,7 @@ void HTMLObjectElement::attach() {
         // this method or recalcStyle (which also calls updateWidget) to be
         // called.
         m_needWidgetUpdate = false;
-        static_cast<RenderPartObject*>(renderer())->updateWidget();
+        static_cast<RenderPartObject*>(renderer())->updateWidget(true);
       } else {
         m_needWidgetUpdate = true;
         setChanged();
