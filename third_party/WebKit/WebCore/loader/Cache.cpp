@@ -198,9 +198,9 @@ void Cache::pruneLiveResources() {
   if (m_liveSize <= capacity)
     return;
 
-  unsigned targetSize =
-      capacity * cTargetPrunePercentage;  // Cut by a percentage to avoid
-                                          // immediately pruning again.
+  unsigned targetSize = static_cast<unsigned>(
+      capacity * cTargetPrunePercentage);  // Cut by a percentage to avoid
+                                           // immediately pruning again.
   double currentTime = Frame::currentPaintTimeStamp();
   if (!currentTime)  // In case prune is called directly, outside of a Frame
                      // paint.
@@ -239,9 +239,9 @@ void Cache::pruneDeadResources() {
   if (m_deadSize <= capacity)
     return;
 
-  unsigned targetSize =
-      capacity * cTargetPrunePercentage;  // Cut by a percentage to avoid
-                                          // immediately pruning again.
+  unsigned targetSize = static_cast<unsigned>(
+      capacity * cTargetPrunePercentage);  // Cut by a percentage to avoid
+                                           // immediately pruning again.
   int size = m_allResources.size();
   bool canShrinkLRULists = true;
   for (int i = size - 1; i >= 0; i--) {
