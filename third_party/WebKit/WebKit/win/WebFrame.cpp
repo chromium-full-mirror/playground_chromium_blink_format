@@ -2254,7 +2254,8 @@ Frame* WebFrame::createFrame(const KURL& url,
   return result;
 }
 
-Widget* WebFrame::createPlugin(Element* element,
+Widget* WebFrame::createPlugin(const IntSize&,
+                               Element* element,
                                const KURL& url,
                                const Vector<String>& paramNames,
                                const Vector<String>& paramValues,
