@@ -97,6 +97,10 @@ struct WebHTMLViewInterpretKeyEventsParameters;
   CFRunLoopTimerRef updateMouseoverTimer;
 
   SEL selectorForDoCommandBySelector;
+
+#ifndef NDEBUG
+  BOOL enumeratingSubviews;
+#endif
 }
 - (void)clear;
 @end
