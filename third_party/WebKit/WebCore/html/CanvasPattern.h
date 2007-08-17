@@ -30,6 +30,7 @@
 #include "Shared.h"
 
 #if PLATFORM(CG)
+#include <wtf/RetainPtr.h>
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -54,7 +55,7 @@ class CanvasPattern : public Shared<CanvasPattern>, CachedResourceClient {
   ~CanvasPattern();
 
 #if PLATFORM(CG)
-  CGImageRef platformImage() const { return m_platformImage; }
+  CGImageRef platformImage() const { return m_platformImage.get(); }
 #endif
   CachedImage* cachedImage() const { return m_cachedImage; }
 
@@ -64,7 +65,7 @@ class CanvasPattern : public Shared<CanvasPattern>, CachedResourceClient {
 
  private:
 #if PLATFORM(CG)
-  const CGImageRef m_platformImage;
+  const RetainPtr<CGImageRef> m_platformImage;
 #endif
   CachedImage* const m_cachedImage;
   const bool m_repeatX;
