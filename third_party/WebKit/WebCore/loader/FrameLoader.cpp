@@ -2578,6 +2578,8 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
 
     case FrameLoadTypeStandard:
       updateHistoryForStandardLoad();
+      if (m_frame->view())
+        m_frame->view()->suppressScrollbars(true);
       m_client->makeDocumentView();
       break;
 
