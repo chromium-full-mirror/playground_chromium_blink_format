@@ -122,3 +122,6 @@
 // default values from the user's preferences <rdar://problem/5214504>
 #define WebKitDidMigrateDefaultSettingsFromSafari3BetaPreferenceKey \
   "WebKitDidMigrateDefaultSettingsFromSafari3BetaPreferenceKey"
+
+#define WebKitDeveloperExtrasEnabledPreferenceKey "WebKitDeveloperExtras"
+#define DisableWebKitDeveloperExtrasPreferenceKey "DisableWebKitDeveloperExtras"
