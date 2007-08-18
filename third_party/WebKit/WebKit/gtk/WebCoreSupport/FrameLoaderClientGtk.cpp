@@ -185,7 +185,8 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
   (core(m_frame)->loader()->*policyFunction)(PolicyUse);
 }
 
-Widget* FrameLoaderClient::createPlugin(Element*,
+Widget* FrameLoaderClient::createPlugin(IntSize&,
+                                        Element*,
                                         const KURL&,
                                         const Vector<String>&,
                                         const Vector<String>&,

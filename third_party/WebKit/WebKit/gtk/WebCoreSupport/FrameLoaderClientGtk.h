@@ -157,7 +157,8 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
       bool allowsScrolling,
       int marginWidth,
       int marginHeight);
-  virtual WebCore::Widget* createPlugin(WebCore::Element*,
+  virtual WebCore::Widget* createPlugin(const WebCore::IntSize&,
+                                        WebCore::Element*,
                                         const WebCore::KURL&,
                                         const WTF::Vector<WebCore::String>&,
                                         const WTF::Vector<WebCore::String>&,
