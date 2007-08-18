@@ -277,6 +277,7 @@ class WebPreferences : public IWebPreferences {
   static BSTR webPreferencesChangedNotification();
   static void setInstance(WebPreferences* instance, BSTR identifier);
   static void removeReferenceForIdentifier(BSTR identifier);
+  static WebPreferences* sharedStandardPreferences();
 
   // From WebHistory.h
   HRESULT historyItemLimit(int* limit);
