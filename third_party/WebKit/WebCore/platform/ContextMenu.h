@@ -66,6 +66,8 @@ class ContextMenu : Noncopyable {
   PlatformMenuDescription platformDescription() const;
   void setPlatformDescription(PlatformMenuDescription);
 
+  PlatformMenuDescription releasePlatformDescription();
+
  private:
   HitTestResult m_hitTestResult;
 

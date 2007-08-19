@@ -439,6 +439,10 @@ void ContextMenu::setPlatformDescription(PlatformMenuDescription menu) {
 PlatformMenuDescription ContextMenu::platformDescription() const {
   return m_platformDescription;
 }
+PlatformMenuDescription ContextMenu::releasePlatformDescription() const {
+  notImplemented();
+  return 0;
+}
 
 ContextMenuItem::ContextMenuItem(PlatformMenuItemDescription) {
   notImplemented();
