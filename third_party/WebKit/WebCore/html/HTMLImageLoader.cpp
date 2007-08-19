@@ -63,8 +63,9 @@ void HTMLImageLoader::setImage(CachedImage* newImage) {
       oldImage->deref(this);
   }
 
-  if (RenderImage* renderer = static_cast<RenderImage*>(element()->renderer()))
-    renderer->resetAnimation();
+  if (RenderObject* renderer = element()->renderer())
+    if (renderer->isImage())
+      static_cast<RenderImage*>(renderer)->resetAnimation();
 }
 
 void HTMLImageLoader::setLoadingImage(CachedImage* loadingImage) {
@@ -113,8 +114,9 @@ void HTMLImageLoader::updateFromElement() {
       oldImage->deref(this);
   }
 
-  if (RenderImage* renderer = static_cast<RenderImage*>(elem->renderer()))
-    renderer->resetAnimation();
+  if (RenderObject* renderer = elem->renderer())
+    if (renderer->isImage())
+      static_cast<RenderImage*>(renderer)->resetAnimation();
 }
 
 void HTMLImageLoader::dispatchLoadEvent() {
@@ -134,7 +136,8 @@ void HTMLImageLoader::notifyFinished(CachedResource* image) {
   if (!doc->ownerElement())
     printf("Image loaded at %d\n", doc->elapsedTime());
 #endif
-  if (RenderImage* renderer = static_cast<RenderImage*>(elem->renderer()))
-    renderer->setCachedImage(m_image);
+  if (RenderObject* renderer = elem->renderer())
+    if (renderer->isImage())
+      static_cast<RenderImage*>(renderer)->setCachedImage(m_image);
 }
 }
