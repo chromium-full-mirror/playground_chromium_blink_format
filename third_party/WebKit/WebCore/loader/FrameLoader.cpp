@@ -273,8 +273,7 @@ void FrameLoader::init() {
   m_provisionalDocumentLoader->setResponse(
       ResourceResponse(KURL(), "text/html", 0, String(), String()));
   m_provisionalDocumentLoader->finishedLoading();
-  begin();
-  write("<html><body>");
+  begin(KURL(), false);
   end();
   m_frame->document()->cancelParsing();
   m_creatingInitialEmptyDocument = false;
@@ -4630,7 +4629,8 @@ String FrameLoader::referrer() const {
 
 void FrameLoader::dispatchWindowObjectAvailable() {
   if (Settings* settings = m_frame->settings())
-    if (settings->isJavaScriptEnabled()) {
+    if (settings->isJavaScriptEnabled() &&
+        m_frame->scriptProxy()->haveInterpreter()) {
       m_client->windowObjectCleared();
       if (Page* page = m_frame->page())
         if (InspectorController* inspector = page->parentInspectorController())
