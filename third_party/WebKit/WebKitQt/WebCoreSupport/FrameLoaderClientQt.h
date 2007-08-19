@@ -257,7 +257,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
                              bool allowsScrolling,
                              int marginWidth,
                              int marginHeight);
-  virtual Widget* createPlugin(Element*,
+  virtual Widget* createPlugin(const IntSize&,
+                               Element*,
                                const KURL&,
                                const Vector<String>&,
                                const Vector<String>&,
