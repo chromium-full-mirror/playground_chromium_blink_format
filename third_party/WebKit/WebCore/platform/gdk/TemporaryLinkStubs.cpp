@@ -439,7 +439,7 @@ void ContextMenu::setPlatformDescription(PlatformMenuDescription menu) {
 PlatformMenuDescription ContextMenu::platformDescription() const {
   return m_platformDescription;
 }
-PlatformMenuDescription ContextMenu::releasePlatformDescription() const {
+PlatformMenuDescription ContextMenu::releasePlatformDescription() {
   notImplemented();
   return 0;
 }
