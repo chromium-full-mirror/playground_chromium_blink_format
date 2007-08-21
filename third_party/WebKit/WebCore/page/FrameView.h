@@ -132,7 +132,13 @@ class FrameView : public ScrollView {
   bool wasScrolledByUser() const;
   void setWasScrolledByUser(bool);
 
+// FIXME: This method should be used by all platforms, but currently depends on
+// ScrollView::children,
+// which not all methods have. Once FrameView and ScrollView are merged, this
+// #if should be removed.
+#if PLATFORM(WIN) || PLATFORM(GDK)
   void layoutIfNeededRecursive();
+#endif
 
  private:
   void init();
