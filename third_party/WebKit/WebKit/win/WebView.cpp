@@ -1973,7 +1973,7 @@ void WebView::initializeToolTipWindow() {
   ::SendMessage(m_toolTipHwnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&info));
   ::SendMessage(m_toolTipHwnd, TTM_SETMAXTIPWIDTH, 0, maxToolTipWidth);
 
-  ::SetWindowPos(m_toolTipHwnd, HWND_TOPMOST, 0, 0, 0, 0,
+  ::SetWindowPos(m_toolTipHwnd, HWND_TOP, 0, 0, 0, 0,
                  SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
