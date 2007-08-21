@@ -258,8 +258,9 @@ void AutoTableLayout::calcPrefWidths(int& minWidth, int& maxWidth) {
   int spanMaxWidth = calcEffectiveWidth();
   minWidth = 0;
   maxWidth = 0;
-  int maxPercent = 0;
-  int maxNonPercent = 0;
+  float maxPercent = 0;
+  float maxNonPercent = 0;
+  bool scaleColumns = shouldScaleColumns(m_table);
 
   // We substitute 0 percent by (epsilon / percentScaleFactor) percent in two
   // places below to avoid division by zero.
@@ -270,23 +271,25 @@ void AutoTableLayout::calcPrefWidths(int& minWidth, int& maxWidth) {
   for (unsigned int i = 0; i < m_layoutStruct.size(); i++) {
     minWidth += m_layoutStruct[i].effMinWidth;
     maxWidth += m_layoutStruct[i].effMaxWidth;
-    if (m_layoutStruct[i].effWidth.isPercent()) {
-      int percent =
-          min(m_layoutStruct[i].effWidth.rawValue(), remainingPercent);
-      int pw = (m_layoutStruct[i].effMaxWidth * 100 * percentScaleFactor) /
-               max(percent, epsilon);
-      remainingPercent -= percent;
-      maxPercent = max(pw, maxPercent);
-    } else {
-      maxNonPercent += m_layoutStruct[i].effMaxWidth;
+    if (scaleColumns) {
+      if (m_layoutStruct[i].effWidth.isPercent()) {
+        int percent =
+            min(m_layoutStruct[i].effWidth.rawValue(), remainingPercent);
+        float pw = static_cast<float>(m_layoutStruct[i].effMaxWidth) * 100 *
+                   percentScaleFactor / max(percent, epsilon);
+        maxPercent = max(pw, maxPercent);
+        remainingPercent -= percent;
+      } else
+        maxNonPercent += m_layoutStruct[i].effMaxWidth;
     }
   }
 
-  if (shouldScaleColumns(m_table)) {
+  if (scaleColumns) {
     maxNonPercent = maxNonPercent * 100 * percentScaleFactor /
                     max(remainingPercent, epsilon);
-    maxWidth = max(maxNonPercent, maxWidth);
-    maxWidth = max(maxWidth, maxPercent);
+    maxWidth =
+        max(maxWidth, static_cast<int>(min(maxNonPercent, INT_MAX / 2.0f)));
+    maxWidth = max(maxWidth, static_cast<int>(min(maxPercent, INT_MAX / 2.0f)));
   }
 
   maxWidth = max(maxWidth, spanMaxWidth);
@@ -308,7 +311,7 @@ void AutoTableLayout::calcPrefWidths(int& minWidth, int& maxWidth) {
   they get modified.
  */
 int AutoTableLayout::calcEffectiveWidth() {
-  int tMaxWidth = 0;
+  float tMaxWidth = 0;
 
   unsigned int nEffCols = m_layoutStruct.size();
   int hspacing = m_table->hBorderSpacing();
@@ -334,10 +337,10 @@ int AutoTableLayout::calcEffectiveWidth() {
     int col = m_table->colToEffCol(cell->col());
     unsigned int lastCol = col;
     int cMinWidth = cell->minPrefWidth() + hspacing;
-    int cMaxWidth = cell->maxPrefWidth() + hspacing;
+    float cMaxWidth = cell->maxPrefWidth() + hspacing;
     int totalPercent = 0;
     int minWidth = 0;
-    int maxWidth = 0;
+    float maxWidth = 0;
     bool allColsArePercent = true;
     bool allColsAreFixed = true;
     bool haveAuto = false;
@@ -395,14 +398,14 @@ int AutoTableLayout::calcEffectiveWidth() {
         // can't satify this condition, treat as variable
         w = Length();
       } else {
-        int spanMax = max(maxWidth, cMaxWidth);
+        float spanMax = max(maxWidth, cMaxWidth);
         tMaxWidth =
             max(tMaxWidth, spanMax * 100 * percentScaleFactor / w.rawValue());
 
         // all non percent columns in the span get percent vlaues to sum up
         // correctly.
         int percentMissing = w.rawValue() - totalPercent;
-        int totalWidth = 0;
+        float totalWidth = 0;
         for (unsigned int pos = col; pos < lastCol; pos++) {
           if (!(m_layoutStruct[pos].effWidth.isPercent()))
             totalWidth += m_layoutStruct[pos].effMaxWidth;
@@ -410,8 +413,9 @@ int AutoTableLayout::calcEffectiveWidth() {
 
         for (unsigned int pos = col; pos < lastCol && totalWidth > 0; pos++) {
           if (!(m_layoutStruct[pos].effWidth.isPercent())) {
-            int percent =
-                percentMissing * m_layoutStruct[pos].effMaxWidth / totalWidth;
+            int percent = percentMissing *
+                          static_cast<float>(m_layoutStruct[pos].effMaxWidth) /
+                          totalWidth;
             totalWidth -= m_layoutStruct[pos].effMaxWidth;
             percentMissing -= percent;
             if (percent > 0)
@@ -436,7 +440,7 @@ int AutoTableLayout::calcEffectiveWidth() {
         }
 
       } else {
-        int maxw = maxWidth;
+        float maxw = maxWidth;
         int minw = minWidth;
 
         // Give min to variable first, to fixed second, and to others third.
@@ -459,8 +463,12 @@ int AutoTableLayout::calcEffectiveWidth() {
                 fixedWidth <= cMinWidth)) {
             int w =
                 max(m_layoutStruct[pos].effMinWidth,
-                    maxw ? (cMinWidth * m_layoutStruct[pos].effMaxWidth / maxw)
-                         : cMinWidth);
+                    static_cast<int>(
+                        maxw
+                            ? cMinWidth * static_cast<float>(
+                                              m_layoutStruct[pos].effMaxWidth) /
+                                  maxw
+                            : cMinWidth));
             w = min(m_layoutStruct[pos].effMinWidth + (cMinWidth - minw), w);
 
             maxw -= m_layoutStruct[pos].effMaxWidth;
@@ -474,11 +482,14 @@ int AutoTableLayout::calcEffectiveWidth() {
     if (!(w.isPercent())) {
       if (cMaxWidth > maxWidth) {
         for (unsigned int pos = col; maxWidth >= 0 && pos < lastCol; pos++) {
-          int w =
-              max(m_layoutStruct[pos].effMaxWidth,
-                  maxWidth
-                      ? (cMaxWidth * m_layoutStruct[pos].effMaxWidth / maxWidth)
-                      : cMaxWidth);
+          int w = max(
+              m_layoutStruct[pos].effMaxWidth,
+              static_cast<int>(maxWidth
+                                   ? cMaxWidth *
+                                         static_cast<float>(
+                                             m_layoutStruct[pos].effMaxWidth) /
+                                         maxWidth
+                                   : cMaxWidth));
           maxWidth -= m_layoutStruct[pos].effMaxWidth;
           cMaxWidth -= w;
           m_layoutStruct[pos].effMaxWidth = w;
@@ -496,7 +507,7 @@ int AutoTableLayout::calcEffectiveWidth() {
   }
   m_effWidthDirty = false;
 
-  return tMaxWidth;
+  return static_cast<int>(min(tMaxWidth, INT_MAX / 2.0f));
 }
 
 /* gets all cells that originate in a column and have a cellspan > 1
@@ -560,8 +571,8 @@ void AutoTableLayout::layout() {
   int totalRelative = 0;
   int numAuto = 0;
   int numFixed = 0;
-  int totalAuto = 0;
-  int totalFixed = 0;
+  float totalAuto = 0;
+  float totalFixed = 0;
   int totalPercent = 0;
   int allocAuto = 0;
   int numAutoEmptyCellsOnly = 0;
@@ -668,8 +679,11 @@ void AutoTableLayout::layout() {
       Length& width = m_layoutStruct[i].effWidth;
       if (width.isAuto() && totalAuto != 0 &&
           !m_layoutStruct[i].emptyCellsOnly) {
-        int w = max(int(m_layoutStruct[i].calcWidth),
-                    available* m_layoutStruct[i].effMaxWidth / totalAuto);
+        int w = max(
+            m_layoutStruct[i].calcWidth,
+            static_cast<int>(available *
+                             static_cast<float>(m_layoutStruct[i].effMaxWidth) /
+                             totalAuto));
         available -= w;
         totalAuto -= m_layoutStruct[i].effMaxWidth;
         m_layoutStruct[i].calcWidth = w;
@@ -686,7 +700,8 @@ void AutoTableLayout::layout() {
     for (int i = 0; i < nEffCols; i++) {
       Length& width = m_layoutStruct[i].effWidth;
       if (width.isFixed()) {
-        int w = available * m_layoutStruct[i].effMaxWidth / totalFixed;
+        int w = available * static_cast<float>(m_layoutStruct[i].effMaxWidth) /
+                totalFixed;
         available -= w;
         totalFixed -= m_layoutStruct[i].effMaxWidth;
         m_layoutStruct[i].calcWidth += w;
