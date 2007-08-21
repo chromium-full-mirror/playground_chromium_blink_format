@@ -361,7 +361,9 @@ void WebView::updateBackingStore(FrameView* frameView,
       (m_backingStoreDirtyRegion || backingStoreCompletelyDirty)) {
     // Do a layout first so that everything we render to the backing store is
     // always current.
-    m_mainFrame->layoutIfNeededRecursive(0);
+    if (Frame* coreFrame = core(m_mainFrame))
+      if (FrameView* view = coreFrame->view())
+        view->layoutIfNeededRecursive();
 
     // This emulates the Mac smarts for painting rects intelligently.  This is
     // very important for us, since we double buffer based off dirty rects.

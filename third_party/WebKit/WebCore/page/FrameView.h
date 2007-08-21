@@ -132,9 +132,7 @@ class FrameView : public ScrollView {
   bool wasScrolledByUser() const;
   void setWasScrolledByUser(bool);
 
-#if PLATFORM(GDK)
   void layoutIfNeededRecursive();
-#endif
 
  private:
   void init();
