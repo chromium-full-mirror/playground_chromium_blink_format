@@ -173,6 +173,7 @@ HBITMAP imageFromSelection(Frame* frame, bool forceBlackText) {
 
   GraphicsContext gc(context);
 
+  frame->document()->updateLayout();
   drawRectIntoContext(ir, frame->view(), &gc);
 
   CGContextRelease(context);
