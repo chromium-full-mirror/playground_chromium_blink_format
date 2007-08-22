@@ -43,6 +43,10 @@
 extern "C" {
 #endif
 
+#ifdef __OBJC__
+@class WebView;
+#endif
+
 /*
  *  HIWebViewCreate()
  *
@@ -65,8 +69,6 @@ extern "C" {
 extern OSStatus HIWebViewCreate(HIViewRef* outControl);
 
 #ifdef __OBJC__
-
-@class WebView;
 
 /*
  *  HIWebViewCreateWithClass(HIViewRef * outControl, Class aClass)
@@ -120,5 +122,4 @@ extern WebView* HIWebViewGetWebView(HIViewRef inView);
 #endif
 
 #endif
-
 #endif /* __HIWebView__ */
