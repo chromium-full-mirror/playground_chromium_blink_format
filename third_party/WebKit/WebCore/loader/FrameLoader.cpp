@@ -1610,7 +1610,6 @@ bool FrameLoader::loadPlugin(RenderPart* renderer,
     }
   }
 
-  checkCallImplicitClose();
   return widget != 0;
 }
 
