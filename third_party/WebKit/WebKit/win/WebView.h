@@ -526,6 +526,11 @@ class WebView : public IWebView,
       /* [in] */ IWebNotification* notification);
 
   // IWebViewPrivate
+  virtual HRESULT STDMETHODCALLTYPE setCustomDropTarget(
+      /* [in] */ IDropTarget* dt);
+
+  virtual HRESULT STDMETHODCALLTYPE removeCustomDropTarget();
+
   virtual HRESULT STDMETHODCALLTYPE setInViewSourceMode(
       /* [in] */ BOOL flag);
 
@@ -737,6 +742,7 @@ class WebView : public IWebView,
   bool m_hasSpellCheckerDocumentTag;
   bool m_smartInsertDeleteEnabled;
   bool m_didClose;
+  bool m_hasCustomDropTarget;
   unsigned m_inIMEComposition;
   bool m_inIMEKeyDown;
   HWND m_toolTipHwnd;
