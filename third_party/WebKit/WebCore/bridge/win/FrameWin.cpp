@@ -81,28 +81,29 @@ KJS::Bindings::Instance* Frame::createScriptInstanceForWidget(Widget* widget) {
   return static_cast<PluginViewWin*>(widget)->bindingInstance();
 }
 
-Vector<IntRect> computePageRectsForFrame(Frame* frame,
-                                         const IntRect& printRect,
-                                         float headerHeight,
-                                         float footerHeight,
-                                         float userScaleFactor) {
+void computePageRectsForFrame(Frame* frame,
+                              const IntRect& printRect,
+                              float headerHeight,
+                              float footerHeight,
+                              float userScaleFactor,
+                              Vector<IntRect>& pages) {
   ASSERT(frame);
 
-  Vector<IntRect> pages;
+  pages.clear();
 
   if (!frame->document() || !frame->view() || !frame->document()->renderer())
-    return pages;
+    return;
 
   RenderView* root = static_cast<RenderView*>(frame->document()->renderer());
 
   if (!root) {
     LOG_ERROR("document to be printed has no renderer");
-    return pages;
+    return;
   }
 
   if (userScaleFactor <= 0) {
     LOG_ERROR("userScaleFactor has bad value %.2f", userScaleFactor);
-    return pages;
+    return;
   }
 
   float ratio = (float)printRect.height() / (float)printRect.width();
@@ -113,7 +114,7 @@ Vector<IntRect> computePageRectsForFrame(Frame* frame,
 
   if (pageHeight <= 0) {
     LOG_ERROR("pageHeight has bad value %.2f", pageHeight);
-    return pages;
+    return;
   }
 
   float currPageHeight = pageHeight / userScaleFactor;
@@ -121,20 +122,18 @@ Vector<IntRect> computePageRectsForFrame(Frame* frame,
   float docWidth = root->layer()->width();
   float currPageWidth = pageWidth / userScaleFactor;
 
-  for (float i = 0; i < docHeight; i += currPageHeight) {
-    float proposedBottom = min(docHeight, i + pageHeight);
-    frame->adjustPageHeight(&proposedBottom, i, proposedBottom, i);
-    currPageHeight = max(1.0f, proposedBottom - i);
+  // always return at least one page, since empty files should print a blank
+  // page
+  float printedPagesHeight = 0.0;
+  do {
+    float proposedBottom = min(docHeight, printedPagesHeight + pageHeight);
+    frame->adjustPageHeight(&proposedBottom, printedPagesHeight, proposedBottom,
+                            printedPagesHeight);
+    currPageHeight = max(1.0f, proposedBottom - printedPagesHeight);
 
-    int x = 0;
-    int y = i;
-    int wide = currPageWidth;
-    int high = currPageHeight;
-    IntRect pageRect(x, y, wide, high);
-    pages.append(pageRect);
-  }
-
-  return pages;
+    pages.append(IntRect(0, printedPagesHeight, currPageWidth, currPageHeight));
+    printedPagesHeight += currPageHeight;
+  } while (printedPagesHeight < docHeight);
 }
 
 static void drawRectIntoContext(IntRect rect,
