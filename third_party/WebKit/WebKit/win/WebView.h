@@ -282,7 +282,7 @@ class WebView : public IWebView,
       /* [retval][out] */ BSTR* urlString);
 
   virtual HRESULT STDMETHODCALLTYPE mainFrameDocument(
-      /* [retval][out] */ IDOMDocument** document);
+      /* [retval][out] */ IDeprecatedDOMDocument** document);
 
   virtual HRESULT STDMETHODCALLTYPE mainFrameTitle(
       /* [retval][out] */ BSTR* title);
@@ -348,22 +348,22 @@ class WebView : public IWebView,
   // IWebViewCSS
 
   virtual HRESULT STDMETHODCALLTYPE computedStyleForElement(
-      /* [in] */ IDOMElement* element,
+      /* [in] */ IDeprecatedDOMElement* element,
       /* [in] */ BSTR pseudoElement,
-      /* [retval][out] */ IDOMCSSStyleDeclaration** style);
+      /* [retval][out] */ IDeprecatedDOMCSSStyleDeclaration** style);
 
   // IWebViewEditing
 
   virtual HRESULT STDMETHODCALLTYPE editableDOMRangeForPoint(
       /* [in] */ LPPOINT point,
-      /* [retval][out] */ IDOMRange** range);
+      /* [retval][out] */ IDeprecatedDOMRange** range);
 
   virtual HRESULT STDMETHODCALLTYPE setSelectedDOMRange(
-      /* [in] */ IDOMRange* range,
+      /* [in] */ IDeprecatedDOMRange* range,
       /* [in] */ WebSelectionAffinity affinity);
 
   virtual HRESULT STDMETHODCALLTYPE selectedDOMRange(
-      /* [retval][out] */ IDOMRange** range);
+      /* [retval][out] */ IDeprecatedDOMRange** range);
 
   virtual HRESULT STDMETHODCALLTYPE selectionAffinity(
       /* [retval][out][retval][out] */ WebSelectionAffinity* affinity);
@@ -375,10 +375,10 @@ class WebView : public IWebView,
       /* [retval][out] */ BOOL* isEditable);
 
   virtual HRESULT STDMETHODCALLTYPE setTypingStyle(
-      /* [in] */ IDOMCSSStyleDeclaration* style);
+      /* [in] */ IDeprecatedDOMCSSStyleDeclaration* style);
 
   virtual HRESULT STDMETHODCALLTYPE typingStyle(
-      /* [retval][out] */ IDOMCSSStyleDeclaration** style);
+      /* [retval][out] */ IDeprecatedDOMCSSStyleDeclaration** style);
 
   virtual HRESULT STDMETHODCALLTYPE setSmartInsertDeleteEnabled(
       /* [in] */ BOOL flag);
@@ -406,7 +406,7 @@ class WebView : public IWebView,
 
   virtual HRESULT STDMETHODCALLTYPE styleDeclarationWithText(
       /* [in] */ BSTR text,
-      /* [retval][out] */ IDOMCSSStyleDeclaration** style);
+      /* [retval][out] */ IDeprecatedDOMCSSStyleDeclaration** style);
 
   virtual HRESULT STDMETHODCALLTYPE hasSelectedRange(
       /* [retval][out] */ BOOL* hasSelectedRange);
@@ -434,7 +434,7 @@ class WebView : public IWebView,
   // IWebViewUndoableEditing
 
   virtual HRESULT STDMETHODCALLTYPE replaceSelectionWithNode(
-      /* [in] */ IDOMNode* node);
+      /* [in] */ IDeprecatedDOMNode* node);
 
   virtual HRESULT STDMETHODCALLTYPE replaceSelectionWithText(
       /* [in] */ BSTR text);
@@ -450,7 +450,7 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE clearSelection(void);
 
   virtual HRESULT STDMETHODCALLTYPE applyStyle(
-      /* [in] */ IDOMCSSStyleDeclaration* style);
+      /* [in] */ IDeprecatedDOMCSSStyleDeclaration* style);
 
   // IWebViewEditingActions
 

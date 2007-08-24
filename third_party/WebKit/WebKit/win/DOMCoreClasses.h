@@ -34,7 +34,7 @@
 #include "WebScriptObject.h"
 
 // {79A193A5-D783-4c73-9AD9-D10678B943DE}
-DEFINE_GUID(IID_DOMNode,
+DEFINE_GUID(IID_DeprecatedDOMNode,
             0x79a193a5,
             0xd783,
             0x4c73,
@@ -54,7 +54,8 @@ class Node;
 class NodeList;
 }
 
-class DOMObject : public WebScriptObject, public IDOMObject {
+class DeprecatedDOMObject : public WebScriptObject,
+                            public IDeprecatedDOMObject {
  public:
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
@@ -115,26 +116,32 @@ class DOMObject : public WebScriptObject, public IDOMObject {
   }
 };
 
-class DOMNode : public DOMObject, public IDOMNode, public IDOMEventTarget {
+class DeprecatedDOMNode : public DeprecatedDOMObject,
+                          public IDeprecatedDOMNode,
+                          public IDeprecatedDOMEventTarget {
  protected:
-  DOMNode(WebCore::Node* n);
-  ~DOMNode();
+  DeprecatedDOMNode(WebCore::Node* n);
+  ~DeprecatedDOMNode();
 
  public:
-  static IDOMNode* createInstance(WebCore::Node* n);
+  static IDeprecatedDOMNode* createInstance(WebCore::Node* n);
 
  public:
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);
-  virtual ULONG STDMETHODCALLTYPE AddRef(void) { return DOMObject::AddRef(); }
-  virtual ULONG STDMETHODCALLTYPE Release(void) { return DOMObject::Release(); }
+  virtual ULONG STDMETHODCALLTYPE AddRef(void) {
+    return DeprecatedDOMObject::AddRef();
+  }
+  virtual ULONG STDMETHODCALLTYPE Release(void) {
+    return DeprecatedDOMObject::Release();
+  }
 
   // IWebScriptObject
   virtual HRESULT STDMETHODCALLTYPE throwException(
       /* [in] */ BSTR exceptionMessage,
       /* [retval][out] */ BOOL* result) {
-    return DOMObject::throwException(exceptionMessage, result);
+    return DeprecatedDOMObject::throwException(exceptionMessage, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE callWebScriptMethod(
@@ -142,43 +149,43 @@ class DOMNode : public DOMObject, public IDOMNode, public IDOMEventTarget {
       /* [size_is][in] */ const VARIANT args[],
       /* [in] */ int cArgs,
       /* [retval][out] */ VARIANT* result) {
-    return DOMObject::callWebScriptMethod(name, args, cArgs, result);
+    return DeprecatedDOMObject::callWebScriptMethod(name, args, cArgs, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE evaluateWebScript(
       /* [in] */ BSTR script,
       /* [retval][out] */ VARIANT* result) {
-    return DOMObject::evaluateWebScript(script, result);
+    return DeprecatedDOMObject::evaluateWebScript(script, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeWebScriptKey(
       /* [in] */ BSTR name) {
-    return DOMObject::removeWebScriptKey(name);
+    return DeprecatedDOMObject::removeWebScriptKey(name);
   }
 
   virtual HRESULT STDMETHODCALLTYPE stringRepresentation(
       /* [retval][out] */ BSTR* stringRepresentation) {
-    return DOMObject::stringRepresentation(stringRepresentation);
+    return DeprecatedDOMObject::stringRepresentation(stringRepresentation);
   }
 
   virtual HRESULT STDMETHODCALLTYPE webScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [retval][out] */ VARIANT* result) {
-    return DOMObject::webScriptValueAtIndex(index, result);
+    return DeprecatedDOMObject::webScriptValueAtIndex(index, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setWebScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [in] */ VARIANT val) {
-    return DOMObject::setWebScriptValueAtIndex(index, val);
+    return DeprecatedDOMObject::setWebScriptValueAtIndex(index, val);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setException(
       /* [in] */ BSTR description) {
-    return DOMObject::setException(description);
+    return DeprecatedDOMObject::setException(description);
   }
 
-  // IDOMNode
+  // IDeprecatedDOMNode
   virtual HRESULT STDMETHODCALLTYPE nodeName(
       /* [retval][out] */ BSTR* result);
 
@@ -192,53 +199,53 @@ class DOMNode : public DOMObject, public IDOMNode, public IDOMEventTarget {
       /* [retval][out] */ unsigned short* result);
 
   virtual HRESULT STDMETHODCALLTYPE parentNode(
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE childNodes(
-      /* [retval][out] */ IDOMNodeList** result);
+      /* [retval][out] */ IDeprecatedDOMNodeList** result);
 
   virtual HRESULT STDMETHODCALLTYPE firstChild(
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE lastChild(
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE previousSibling(
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE nextSibling(
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE attributes(
-      /* [retval][out] */ IDOMNamedNodeMap** result);
+      /* [retval][out] */ IDeprecatedDOMNamedNodeMap** result);
 
   virtual HRESULT STDMETHODCALLTYPE ownerDocument(
-      /* [retval][out] */ IDOMDocument** result);
+      /* [retval][out] */ IDeprecatedDOMDocument** result);
 
   virtual HRESULT STDMETHODCALLTYPE insertBefore(
-      /* [in] */ IDOMNode* newChild,
-      /* [in] */ IDOMNode* refChild,
-      /* [retval][out] */ IDOMNode** result);
+      /* [in] */ IDeprecatedDOMNode* newChild,
+      /* [in] */ IDeprecatedDOMNode* refChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE replaceChild(
-      /* [in] */ IDOMNode* newChild,
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result);
+      /* [in] */ IDeprecatedDOMNode* newChild,
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE removeChild(
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result);
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE appendChild(
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result);
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE hasChildNodes(
       /* [retval][out] */ BOOL* result);
 
   virtual HRESULT STDMETHODCALLTYPE cloneNode(
       /* [in] */ BOOL deep,
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE normalize(void);
 
@@ -263,11 +270,11 @@ class DOMNode : public DOMObject, public IDOMNode, public IDOMEventTarget {
       /* [retval][out] */ BOOL* result);
 
   virtual HRESULT STDMETHODCALLTYPE isSameNode(
-      /* [in] */ IDOMNode* other,
+      /* [in] */ IDeprecatedDOMNode* other,
       /* [retval][out] */ BOOL* result);
 
   virtual HRESULT STDMETHODCALLTYPE isEqualNode(
-      /* [in] */ IDOMNode* other,
+      /* [in] */ IDeprecatedDOMNode* other,
       /* [retval][out] */ BOOL* result);
 
   virtual HRESULT STDMETHODCALLTYPE textContent(
@@ -276,48 +283,53 @@ class DOMNode : public DOMObject, public IDOMNode, public IDOMEventTarget {
   virtual HRESULT STDMETHODCALLTYPE setTextContent(
       /* [in] */ BSTR text);
 
-  // IDOMEventTarget
+  // IDeprecatedDOMEventTarget
   virtual HRESULT STDMETHODCALLTYPE addEventListener(
       /* [in] */ BSTR type,
-      /* [in] */ IDOMEventListener* listener,
+      /* [in] */ IDeprecatedDOMEventListener* listener,
       /* [in] */ BOOL useCapture);
 
   virtual HRESULT STDMETHODCALLTYPE removeEventListener(
       /* [in] */ BSTR type,
-      /* [in] */ IDOMEventListener* listener,
+      /* [in] */ IDeprecatedDOMEventListener* listener,
       /* [in] */ BOOL useCapture);
 
   virtual HRESULT STDMETHODCALLTYPE dispatchEvent(
-      /* [in] */ IDOMEvent* evt,
+      /* [in] */ IDeprecatedDOMEvent* evt,
       /* [retval][out] */ BOOL* result);
 
-  // DOMNode
+  // DeprecatedDOMNode
   WebCore::Node* node() const { return m_node; }
 
  protected:
   WebCore::Node* m_node;
 };
 
-class DOMNodeList : public DOMObject, public IDOMNodeList {
+class DeprecatedDOMNodeList : public DeprecatedDOMObject,
+                              public IDeprecatedDOMNodeList {
  protected:
-  DOMNodeList(WebCore::NodeList* l);
-  ~DOMNodeList();
+  DeprecatedDOMNodeList(WebCore::NodeList* l);
+  ~DeprecatedDOMNodeList();
 
  public:
-  static IDOMNodeList* createInstance(WebCore::NodeList* l);
+  static IDeprecatedDOMNodeList* createInstance(WebCore::NodeList* l);
 
  public:
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);
-  virtual ULONG STDMETHODCALLTYPE AddRef(void) { return DOMObject::AddRef(); }
-  virtual ULONG STDMETHODCALLTYPE Release(void) { return DOMObject::Release(); }
+  virtual ULONG STDMETHODCALLTYPE AddRef(void) {
+    return DeprecatedDOMObject::AddRef();
+  }
+  virtual ULONG STDMETHODCALLTYPE Release(void) {
+    return DeprecatedDOMObject::Release();
+  }
 
   // IWebScriptObject
   virtual HRESULT STDMETHODCALLTYPE throwException(
       /* [in] */ BSTR exceptionMessage,
       /* [retval][out] */ BOOL* result) {
-    return DOMObject::throwException(exceptionMessage, result);
+    return DeprecatedDOMObject::throwException(exceptionMessage, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE callWebScriptMethod(
@@ -325,46 +337,46 @@ class DOMNodeList : public DOMObject, public IDOMNodeList {
       /* [size_is][in] */ const VARIANT args[],
       /* [in] */ int cArgs,
       /* [retval][out] */ VARIANT* result) {
-    return DOMObject::callWebScriptMethod(name, args, cArgs, result);
+    return DeprecatedDOMObject::callWebScriptMethod(name, args, cArgs, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE evaluateWebScript(
       /* [in] */ BSTR script,
       /* [retval][out] */ VARIANT* result) {
-    return DOMObject::evaluateWebScript(script, result);
+    return DeprecatedDOMObject::evaluateWebScript(script, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeWebScriptKey(
       /* [in] */ BSTR name) {
-    return DOMObject::removeWebScriptKey(name);
+    return DeprecatedDOMObject::removeWebScriptKey(name);
   }
 
   virtual HRESULT STDMETHODCALLTYPE stringRepresentation(
       /* [retval][out] */ BSTR* stringRepresentation) {
-    return DOMObject::stringRepresentation(stringRepresentation);
+    return DeprecatedDOMObject::stringRepresentation(stringRepresentation);
   }
 
   virtual HRESULT STDMETHODCALLTYPE webScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [retval][out] */ VARIANT* result) {
-    return DOMObject::webScriptValueAtIndex(index, result);
+    return DeprecatedDOMObject::webScriptValueAtIndex(index, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setWebScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [in] */ VARIANT val) {
-    return DOMObject::setWebScriptValueAtIndex(index, val);
+    return DeprecatedDOMObject::setWebScriptValueAtIndex(index, val);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setException(
       /* [in] */ BSTR description) {
-    return DOMObject::setException(description);
+    return DeprecatedDOMObject::setException(description);
   }
 
-  // IDOMNodeList
+  // IDeprecatedDOMNodeList
   virtual HRESULT STDMETHODCALLTYPE item(
       /* [in] */ UINT index,
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE length(
       /* [retval][out] */ UINT* result);
@@ -373,29 +385,33 @@ class DOMNodeList : public DOMObject, public IDOMNodeList {
   WebCore::NodeList* m_nodeList;
 };
 
-class DOMDocument : public DOMNode,
-                    public IDOMDocument,
-                    public IDOMViewCSS,
-                    public IDOMDocumentEvent {
+class DeprecatedDOMDocument : public DeprecatedDOMNode,
+                              public IDeprecatedDOMDocument,
+                              public IDeprecatedDOMViewCSS,
+                              public IDeprecatedDOMDocumentEvent {
  protected:
-  DOMDocument(WebCore::Document* d);
-  ~DOMDocument();
+  DeprecatedDOMDocument(WebCore::Document* d);
+  ~DeprecatedDOMDocument();
 
  public:
-  static IDOMDocument* createInstance(WebCore::Document* d);
+  static IDeprecatedDOMDocument* createInstance(WebCore::Document* d);
 
  public:
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);
-  virtual ULONG STDMETHODCALLTYPE AddRef(void) { return DOMNode::AddRef(); }
-  virtual ULONG STDMETHODCALLTYPE Release(void) { return DOMNode::Release(); }
+  virtual ULONG STDMETHODCALLTYPE AddRef(void) {
+    return DeprecatedDOMNode::AddRef();
+  }
+  virtual ULONG STDMETHODCALLTYPE Release(void) {
+    return DeprecatedDOMNode::Release();
+  }
 
   // IWebScriptObject
   virtual HRESULT STDMETHODCALLTYPE throwException(
       /* [in] */ BSTR exceptionMessage,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::throwException(exceptionMessage, result);
+    return DeprecatedDOMNode::throwException(exceptionMessage, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE callWebScriptMethod(
@@ -403,310 +419,314 @@ class DOMDocument : public DOMNode,
       /* [size_is][in] */ const VARIANT args[],
       /* [in] */ int cArgs,
       /* [retval][out] */ VARIANT* result) {
-    return DOMNode::callWebScriptMethod(name, args, cArgs, result);
+    return DeprecatedDOMNode::callWebScriptMethod(name, args, cArgs, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE evaluateWebScript(
       /* [in] */ BSTR script,
       /* [retval][out] */ VARIANT* result) {
-    return DOMNode::evaluateWebScript(script, result);
+    return DeprecatedDOMNode::evaluateWebScript(script, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeWebScriptKey(
       /* [in] */ BSTR name) {
-    return DOMNode::removeWebScriptKey(name);
+    return DeprecatedDOMNode::removeWebScriptKey(name);
   }
 
   virtual HRESULT STDMETHODCALLTYPE stringRepresentation(
       /* [retval][out] */ BSTR* stringRepresentation) {
-    return DOMNode::stringRepresentation(stringRepresentation);
+    return DeprecatedDOMNode::stringRepresentation(stringRepresentation);
   }
 
   virtual HRESULT STDMETHODCALLTYPE webScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [retval][out] */ VARIANT* result) {
-    return DOMNode::webScriptValueAtIndex(index, result);
+    return DeprecatedDOMNode::webScriptValueAtIndex(index, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setWebScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [in] */ VARIANT val) {
-    return DOMNode::setWebScriptValueAtIndex(index, val);
+    return DeprecatedDOMNode::setWebScriptValueAtIndex(index, val);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setException(
       /* [in] */ BSTR description) {
-    return DOMNode::setException(description);
+    return DeprecatedDOMNode::setException(description);
   }
 
-  // IDOMNode
+  // IDeprecatedDOMNode
   virtual HRESULT STDMETHODCALLTYPE nodeName(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::nodeName(result);
+    return DeprecatedDOMNode::nodeName(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE nodeValue(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::nodeValue(result);
+    return DeprecatedDOMNode::nodeValue(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setNodeValue(
       /* [in] */ BSTR value) {
-    return DOMNode::setNodeValue(value);
+    return DeprecatedDOMNode::setNodeValue(value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE nodeType(
       /* [retval][out] */ unsigned short* result) {
-    return DOMNode::nodeType(result);
+    return DeprecatedDOMNode::nodeType(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE parentNode(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::parentNode(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::parentNode(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE childNodes(
-      /* [retval][out] */ IDOMNodeList** result) {
-    return DOMNode::childNodes(result);
+      /* [retval][out] */ IDeprecatedDOMNodeList** result) {
+    return DeprecatedDOMNode::childNodes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE firstChild(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::firstChild(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::firstChild(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE lastChild(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::lastChild(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::lastChild(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE previousSibling(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::previousSibling(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::previousSibling(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE nextSibling(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::nextSibling(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::nextSibling(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE attributes(
-      /* [retval][out] */ IDOMNamedNodeMap** result) {
-    return DOMNode::attributes(result);
+      /* [retval][out] */ IDeprecatedDOMNamedNodeMap** result) {
+    return DeprecatedDOMNode::attributes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE ownerDocument(
-      /* [retval][out] */ IDOMDocument** result) {
-    return DOMNode::ownerDocument(result);
+      /* [retval][out] */ IDeprecatedDOMDocument** result) {
+    return DeprecatedDOMNode::ownerDocument(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE insertBefore(
-      /* [in] */ IDOMNode* newChild,
-      /* [in] */ IDOMNode* refChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::insertBefore(newChild, refChild, result);
+      /* [in] */ IDeprecatedDOMNode* newChild,
+      /* [in] */ IDeprecatedDOMNode* refChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::insertBefore(newChild, refChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE replaceChild(
-      /* [in] */ IDOMNode* newChild,
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::replaceChild(newChild, oldChild, result);
+      /* [in] */ IDeprecatedDOMNode* newChild,
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::replaceChild(newChild, oldChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeChild(
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::removeChild(oldChild, result);
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::removeChild(oldChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE appendChild(
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::appendChild(oldChild, result);
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::appendChild(oldChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE hasChildNodes(
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::hasChildNodes(result);
+    return DeprecatedDOMNode::hasChildNodes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE cloneNode(
       /* [in] */ BOOL deep,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::cloneNode(deep, result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::cloneNode(deep, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE normalize(void) {
-    return DOMNode::normalize();
+    return DeprecatedDOMNode::normalize();
   }
 
   virtual HRESULT STDMETHODCALLTYPE isSupported(
       /* [in] */ BSTR feature,
       /* [in] */ BSTR version,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::isSupported(feature, version, result);
+    return DeprecatedDOMNode::isSupported(feature, version, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE namespaceURI(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::namespaceURI(result);
+    return DeprecatedDOMNode::namespaceURI(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE prefix(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::prefix(result);
+    return DeprecatedDOMNode::prefix(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setPrefix(
       /* [in] */ BSTR prefix) {
-    return DOMNode::setPrefix(prefix);
+    return DeprecatedDOMNode::setPrefix(prefix);
   }
 
   virtual HRESULT STDMETHODCALLTYPE localName(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::localName(result);
+    return DeprecatedDOMNode::localName(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE hasAttributes(
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::hasAttributes(result);
+    return DeprecatedDOMNode::hasAttributes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE isSameNode(
-      /* [in] */ IDOMNode* other,
+      /* [in] */ IDeprecatedDOMNode* other,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::isSameNode(other, result);
+    return DeprecatedDOMNode::isSameNode(other, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE isEqualNode(
-      /* [in] */ IDOMNode* other,
+      /* [in] */ IDeprecatedDOMNode* other,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::isEqualNode(other, result);
+    return DeprecatedDOMNode::isEqualNode(other, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE textContent(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::textContent(result);
+    return DeprecatedDOMNode::textContent(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setTextContent(
       /* [in] */ BSTR text) {
-    return DOMNode::setTextContent(text);
+    return DeprecatedDOMNode::setTextContent(text);
   }
 
-  // IDOMDocument
+  // IDeprecatedDOMDocument
   virtual HRESULT STDMETHODCALLTYPE doctype(
-      /* [retval][out] */ IDOMDocumentType** result);
+      /* [retval][out] */ IDeprecatedDOMDocumentType** result);
 
   virtual HRESULT STDMETHODCALLTYPE implementation(
-      /* [retval][out] */ IDOMImplementation** result);
+      /* [retval][out] */ IDeprecatedDOMImplementation** result);
 
   virtual HRESULT STDMETHODCALLTYPE documentElement(
-      /* [retval][out] */ IDOMElement** result);
+      /* [retval][out] */ IDeprecatedDOMElement** result);
 
   virtual HRESULT STDMETHODCALLTYPE createElement(
       /* [in] */ BSTR tagName,
-      /* [retval][out] */ IDOMElement** result);
+      /* [retval][out] */ IDeprecatedDOMElement** result);
 
   virtual HRESULT STDMETHODCALLTYPE createDocumentFragment(
-      /* [retval][out] */ IDOMDocumentFragment** result);
+      /* [retval][out] */ IDeprecatedDOMDocumentFragment** result);
 
   virtual HRESULT STDMETHODCALLTYPE createTextNode(
       /* [in] */ BSTR data,
-      /* [retval][out] */ IDOMText** result);
+      /* [retval][out] */ IDeprecatedDOMText** result);
 
   virtual HRESULT STDMETHODCALLTYPE createComment(
       /* [in] */ BSTR data,
-      /* [retval][out] */ IDOMComment** result);
+      /* [retval][out] */ IDeprecatedDOMComment** result);
 
   virtual HRESULT STDMETHODCALLTYPE createCDATASection(
       /* [in] */ BSTR data,
-      /* [retval][out] */ IDOMCDATASection** result);
+      /* [retval][out] */ IDeprecatedDOMCDATASection** result);
 
   virtual HRESULT STDMETHODCALLTYPE createProcessingInstruction(
       /* [in] */ BSTR target,
       /* [in] */ BSTR data,
-      /* [retval][out] */ IDOMProcessingInstruction** result);
+      /* [retval][out] */ IDeprecatedDOMProcessingInstruction** result);
 
   virtual HRESULT STDMETHODCALLTYPE createAttribute(
       /* [in] */ BSTR name,
-      /* [retval][out] */ IDOMAttr** result);
+      /* [retval][out] */ IDeprecatedDOMAttr** result);
 
   virtual HRESULT STDMETHODCALLTYPE createEntityReference(
       /* [in] */ BSTR name,
-      /* [retval][out] */ IDOMEntityReference** result);
+      /* [retval][out] */ IDeprecatedDOMEntityReference** result);
 
   virtual HRESULT STDMETHODCALLTYPE getElementsByTagName(
       /* [in] */ BSTR tagName,
-      /* [retval][out] */ IDOMNodeList** result);
+      /* [retval][out] */ IDeprecatedDOMNodeList** result);
 
   virtual HRESULT STDMETHODCALLTYPE importNode(
-      /* [in] */ IDOMNode* importedNode,
+      /* [in] */ IDeprecatedDOMNode* importedNode,
       /* [in] */ BOOL deep,
-      /* [retval][out] */ IDOMNode** result);
+      /* [retval][out] */ IDeprecatedDOMNode** result);
 
   virtual HRESULT STDMETHODCALLTYPE createElementNS(
       /* [in] */ BSTR namespaceURI,
       /* [in] */ BSTR qualifiedName,
-      /* [retval][out] */ IDOMElement** result);
+      /* [retval][out] */ IDeprecatedDOMElement** result);
 
   virtual HRESULT STDMETHODCALLTYPE createAttributeNS(
       /* [in] */ BSTR namespaceURI,
       /* [in] */ BSTR qualifiedName,
-      /* [retval][out] */ IDOMAttr** result);
+      /* [retval][out] */ IDeprecatedDOMAttr** result);
 
   virtual HRESULT STDMETHODCALLTYPE getElementsByTagNameNS(
       /* [in] */ BSTR namespaceURI,
       /* [in] */ BSTR localName,
-      /* [retval][out] */ IDOMNodeList** result);
+      /* [retval][out] */ IDeprecatedDOMNodeList** result);
 
   virtual HRESULT STDMETHODCALLTYPE getElementById(
       /* [in] */ BSTR elementId,
-      /* [retval][out] */ IDOMElement** result);
+      /* [retval][out] */ IDeprecatedDOMElement** result);
 
-  // IDOMViewCSS
+  // IDeprecatedDOMViewCSS
   virtual HRESULT STDMETHODCALLTYPE getComputedStyle(
-      /* [in] */ IDOMElement* elt,
+      /* [in] */ IDeprecatedDOMElement* elt,
       /* [in] */ BSTR pseudoElt,
-      /* [retval][out] */ IDOMCSSStyleDeclaration** result);
+      /* [retval][out] */ IDeprecatedDOMCSSStyleDeclaration** result);
 
-  // IDOMDocumentEvent
+  // IDeprecatedDOMDocumentEvent
   virtual HRESULT STDMETHODCALLTYPE createEvent(
       /* [in] */ BSTR eventType,
-      /* [retval][out] */ IDOMEvent** result);
+      /* [retval][out] */ IDeprecatedDOMEvent** result);
 
-  // DOMDocument
+  // DeprecatedDOMDocument
   WebCore::Document* document() { return m_document; }
 
  protected:
   WebCore::Document* m_document;
 };
 
-class DOMElement : public DOMNode,
-                   public IDOMElement,
-                   public IDOMElementPrivate,
-                   public IDOMNodeExtensions,
-                   public IDOMElementCSSInlineStyle,
-                   public IDOMElementExtensions {
+class DeprecatedDOMElement : public DeprecatedDOMNode,
+                             public IDeprecatedDOMElement,
+                             public IDeprecatedDOMElementPrivate,
+                             public IDeprecatedDOMNodeExtensions,
+                             public IDeprecatedDOMElementCSSInlineStyle,
+                             public IDeprecatedDOMElementExtensions {
  protected:
-  DOMElement(WebCore::Element* e);
-  ~DOMElement();
+  DeprecatedDOMElement(WebCore::Element* e);
+  ~DeprecatedDOMElement();
 
  public:
-  static IDOMElement* createInstance(WebCore::Element* e);
+  static IDeprecatedDOMElement* createInstance(WebCore::Element* e);
 
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);
-  virtual ULONG STDMETHODCALLTYPE AddRef(void) { return DOMNode::AddRef(); }
-  virtual ULONG STDMETHODCALLTYPE Release(void) { return DOMNode::Release(); }
+  virtual ULONG STDMETHODCALLTYPE AddRef(void) {
+    return DeprecatedDOMNode::AddRef();
+  }
+  virtual ULONG STDMETHODCALLTYPE Release(void) {
+    return DeprecatedDOMNode::Release();
+  }
 
   // IWebScriptObject
   virtual HRESULT STDMETHODCALLTYPE throwException(
       /* [in] */ BSTR exceptionMessage,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::throwException(exceptionMessage, result);
+    return DeprecatedDOMNode::throwException(exceptionMessage, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE callWebScriptMethod(
@@ -714,199 +734,199 @@ class DOMElement : public DOMNode,
       /* [size_is][in] */ const VARIANT args[],
       /* [in] */ int cArgs,
       /* [retval][out] */ VARIANT* result) {
-    return DOMNode::callWebScriptMethod(name, args, cArgs, result);
+    return DeprecatedDOMNode::callWebScriptMethod(name, args, cArgs, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE evaluateWebScript(
       /* [in] */ BSTR script,
       /* [retval][out] */ VARIANT* result) {
-    return DOMNode::evaluateWebScript(script, result);
+    return DeprecatedDOMNode::evaluateWebScript(script, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeWebScriptKey(
       /* [in] */ BSTR name) {
-    return DOMNode::removeWebScriptKey(name);
+    return DeprecatedDOMNode::removeWebScriptKey(name);
   }
 
   virtual HRESULT STDMETHODCALLTYPE stringRepresentation(
       /* [retval][out] */ BSTR* stringRepresentation) {
-    return DOMNode::stringRepresentation(stringRepresentation);
+    return DeprecatedDOMNode::stringRepresentation(stringRepresentation);
   }
 
   virtual HRESULT STDMETHODCALLTYPE webScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [retval][out] */ VARIANT* result) {
-    return DOMNode::webScriptValueAtIndex(index, result);
+    return DeprecatedDOMNode::webScriptValueAtIndex(index, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setWebScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [in] */ VARIANT val) {
-    return DOMNode::setWebScriptValueAtIndex(index, val);
+    return DeprecatedDOMNode::setWebScriptValueAtIndex(index, val);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setException(
       /* [in] */ BSTR description) {
-    return DOMNode::setException(description);
+    return DeprecatedDOMNode::setException(description);
   }
 
-  // IDOMNode
+  // IDeprecatedDOMNode
   virtual HRESULT STDMETHODCALLTYPE nodeName(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::nodeName(result);
+    return DeprecatedDOMNode::nodeName(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE nodeValue(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::nodeValue(result);
+    return DeprecatedDOMNode::nodeValue(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setNodeValue(
       /* [in] */ BSTR value) {
-    return DOMNode::setNodeValue(value);
+    return DeprecatedDOMNode::setNodeValue(value);
   }
 
   virtual HRESULT STDMETHODCALLTYPE nodeType(
       /* [retval][out] */ unsigned short* result) {
-    return DOMNode::nodeType(result);
+    return DeprecatedDOMNode::nodeType(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE parentNode(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::parentNode(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::parentNode(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE childNodes(
-      /* [retval][out] */ IDOMNodeList** result) {
-    return DOMNode::childNodes(result);
+      /* [retval][out] */ IDeprecatedDOMNodeList** result) {
+    return DeprecatedDOMNode::childNodes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE firstChild(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::firstChild(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::firstChild(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE lastChild(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::lastChild(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::lastChild(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE previousSibling(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::previousSibling(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::previousSibling(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE nextSibling(
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::nextSibling(result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::nextSibling(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE attributes(
-      /* [retval][out] */ IDOMNamedNodeMap** result) {
-    return DOMNode::attributes(result);
+      /* [retval][out] */ IDeprecatedDOMNamedNodeMap** result) {
+    return DeprecatedDOMNode::attributes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE ownerDocument(
-      /* [retval][out] */ IDOMDocument** result) {
-    return DOMNode::ownerDocument(result);
+      /* [retval][out] */ IDeprecatedDOMDocument** result) {
+    return DeprecatedDOMNode::ownerDocument(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE insertBefore(
-      /* [in] */ IDOMNode* newChild,
-      /* [in] */ IDOMNode* refChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::insertBefore(newChild, refChild, result);
+      /* [in] */ IDeprecatedDOMNode* newChild,
+      /* [in] */ IDeprecatedDOMNode* refChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::insertBefore(newChild, refChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE replaceChild(
-      /* [in] */ IDOMNode* newChild,
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::replaceChild(newChild, oldChild, result);
+      /* [in] */ IDeprecatedDOMNode* newChild,
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::replaceChild(newChild, oldChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeChild(
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::removeChild(oldChild, result);
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::removeChild(oldChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE appendChild(
-      /* [in] */ IDOMNode* oldChild,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::appendChild(oldChild, result);
+      /* [in] */ IDeprecatedDOMNode* oldChild,
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::appendChild(oldChild, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE hasChildNodes(
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::hasChildNodes(result);
+    return DeprecatedDOMNode::hasChildNodes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE cloneNode(
       /* [in] */ BOOL deep,
-      /* [retval][out] */ IDOMNode** result) {
-    return DOMNode::cloneNode(deep, result);
+      /* [retval][out] */ IDeprecatedDOMNode** result) {
+    return DeprecatedDOMNode::cloneNode(deep, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE normalize(void) {
-    return DOMNode::normalize();
+    return DeprecatedDOMNode::normalize();
   }
 
   virtual HRESULT STDMETHODCALLTYPE isSupported(
       /* [in] */ BSTR feature,
       /* [in] */ BSTR version,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::isSupported(feature, version, result);
+    return DeprecatedDOMNode::isSupported(feature, version, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE namespaceURI(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::namespaceURI(result);
+    return DeprecatedDOMNode::namespaceURI(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE prefix(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::prefix(result);
+    return DeprecatedDOMNode::prefix(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setPrefix(
       /* [in] */ BSTR prefix) {
-    return DOMNode::setPrefix(prefix);
+    return DeprecatedDOMNode::setPrefix(prefix);
   }
 
   virtual HRESULT STDMETHODCALLTYPE localName(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::localName(result);
+    return DeprecatedDOMNode::localName(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE hasAttributes(
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::hasAttributes(result);
+    return DeprecatedDOMNode::hasAttributes(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE isSameNode(
-      /* [in] */ IDOMNode* other,
+      /* [in] */ IDeprecatedDOMNode* other,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::isSameNode(other, result);
+    return DeprecatedDOMNode::isSameNode(other, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE isEqualNode(
-      /* [in] */ IDOMNode* other,
+      /* [in] */ IDeprecatedDOMNode* other,
       /* [retval][out] */ BOOL* result) {
-    return DOMNode::isEqualNode(other, result);
+    return DeprecatedDOMNode::isEqualNode(other, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE textContent(
       /* [retval][out] */ BSTR* result) {
-    return DOMNode::textContent(result);
+    return DeprecatedDOMNode::textContent(result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setTextContent(
       /* [in] */ BSTR text) {
-    return DOMNode::setTextContent(text);
+    return DeprecatedDOMNode::setTextContent(text);
   }
 
-  // IDOMElement
+  // IDeprecatedDOMElement
   virtual HRESULT STDMETHODCALLTYPE tagName(
       /* [retval][out] */ BSTR* result);
 
@@ -923,19 +943,19 @@ class DOMElement : public DOMNode,
 
   virtual HRESULT STDMETHODCALLTYPE getAttributeNode(
       /* [in] */ BSTR name,
-      /* [retval][out] */ IDOMAttr** result);
+      /* [retval][out] */ IDeprecatedDOMAttr** result);
 
   virtual HRESULT STDMETHODCALLTYPE setAttributeNode(
-      /* [in] */ IDOMAttr* newAttr,
-      /* [retval][out] */ IDOMAttr** result);
+      /* [in] */ IDeprecatedDOMAttr* newAttr,
+      /* [retval][out] */ IDeprecatedDOMAttr** result);
 
   virtual HRESULT STDMETHODCALLTYPE removeAttributeNode(
-      /* [in] */ IDOMAttr* oldAttr,
-      /* [retval][out] */ IDOMAttr** result);
+      /* [in] */ IDeprecatedDOMAttr* oldAttr,
+      /* [retval][out] */ IDeprecatedDOMAttr** result);
 
   virtual HRESULT STDMETHODCALLTYPE getElementsByTagName(
       /* [in] */ BSTR name,
-      /* [retval][out] */ IDOMNodeList** result);
+      /* [retval][out] */ IDeprecatedDOMNodeList** result);
 
   virtual HRESULT STDMETHODCALLTYPE getAttributeNS(
       /* [in] */ BSTR namespaceURI,
@@ -954,16 +974,16 @@ class DOMElement : public DOMNode,
   virtual HRESULT STDMETHODCALLTYPE getAttributeNodeNS(
       /* [in] */ BSTR namespaceURI,
       /* [in] */ BSTR localName,
-      /* [retval][out] */ IDOMAttr** result);
+      /* [retval][out] */ IDeprecatedDOMAttr** result);
 
   virtual HRESULT STDMETHODCALLTYPE setAttributeNodeNS(
-      /* [in] */ IDOMAttr* newAttr,
-      /* [retval][out] */ IDOMAttr** result);
+      /* [in] */ IDeprecatedDOMAttr* newAttr,
+      /* [retval][out] */ IDeprecatedDOMAttr** result);
 
   virtual HRESULT STDMETHODCALLTYPE getElementsByTagNameNS(
       /* [in] */ BSTR namespaceURI,
       /* [in] */ BSTR localName,
-      /* [retval][out] */ IDOMNodeList** result);
+      /* [retval][out] */ IDeprecatedDOMNodeList** result);
 
   virtual HRESULT STDMETHODCALLTYPE hasAttribute(
       /* [in] */ BSTR name,
@@ -978,7 +998,7 @@ class DOMElement : public DOMNode,
 
   virtual HRESULT STDMETHODCALLTYPE blur(void);
 
-  // IDOMNodeExtensions
+  // IDeprecatedDOMNodeExtensions
   virtual HRESULT STDMETHODCALLTYPE boundingBox(
       /* [retval][out] */ LPRECT rect);
 
@@ -986,11 +1006,11 @@ class DOMElement : public DOMNode,
       /* [size_is][in] */ RECT* rects,
       /* [in] */ int cRects);
 
-  // IDOMElementPrivate
+  // IDeprecatedDOMElementPrivate
   virtual HRESULT STDMETHODCALLTYPE coreElement(void** element);
 
   virtual HRESULT STDMETHODCALLTYPE isEqual(
-      /* [in] */ IDOMElement* other,
+      /* [in] */ IDeprecatedDOMElement* other,
       /* [retval][out] */ BOOL* result);
 
   virtual HRESULT STDMETHODCALLTYPE isFocused(
@@ -999,11 +1019,11 @@ class DOMElement : public DOMNode,
   virtual HRESULT STDMETHODCALLTYPE innerText(
       /* [retval][out] */ BSTR* result);
 
-  // IDOMElementCSSInlineStyle
+  // IDeprecatedDOMElementCSSInlineStyle
   virtual HRESULT STDMETHODCALLTYPE style(
-      /* [retval][out] */ IDOMCSSStyleDeclaration** result);
+      /* [retval][out] */ IDeprecatedDOMCSSStyleDeclaration** result);
 
-  // IDOMElementExtensions
+  // IDeprecatedDOMElementExtensions
   virtual HRESULT STDMETHODCALLTYPE offsetLeft(
       /* [retval][out] */ int* result);
 
@@ -1017,7 +1037,7 @@ class DOMElement : public DOMNode,
       /* [retval][out] */ int* result);
 
   virtual HRESULT STDMETHODCALLTYPE offsetParent(
-      /* [retval][out] */ IDOMElement** result);
+      /* [retval][out] */ IDeprecatedDOMElement** result);
 
   virtual HRESULT STDMETHODCALLTYPE clientWidth(
       /* [retval][out] */ int* result);
@@ -1049,7 +1069,7 @@ class DOMElement : public DOMNode,
   virtual HRESULT STDMETHODCALLTYPE scrollIntoViewIfNeeded(
       /* [in] */ BOOL centerIfNeeded);
 
-  // DOMElement
+  // DeprecatedDOMElement
   WebCore::Element* element() { return m_element; }
 
  protected:

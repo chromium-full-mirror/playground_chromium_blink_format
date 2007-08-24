@@ -98,10 +98,10 @@ class WebFrame : public IWebFrame,
       /* [retval][out] */ IWebFrameView** view);
 
   virtual HRESULT STDMETHODCALLTYPE DOMDocument(
-      /* [retval][out] */ IDOMDocument** document);
+      /* [retval][out] */ IDeprecatedDOMDocument** document);
 
   virtual HRESULT STDMETHODCALLTYPE frameElement(
-      /* [retval][out] */ IDOMHTMLElement** frameElement);
+      /* [retval][out] */ IDeprecatedDOMHTMLElement** frameElement);
 
   virtual HRESULT STDMETHODCALLTYPE loadRequest(
       /* [in] */ IWebURLRequest* request);
@@ -145,7 +145,7 @@ class WebFrame : public IWebFrame,
       /* [retval][out] */ IEnumVARIANT** enumFrames);
 
   virtual HRESULT STDMETHODCALLTYPE currentForm(
-      /* [retval][out] */ IDOMElement** formElement);
+      /* [retval][out] */ IDeprecatedDOMElement** formElement);
 
   // IWebFramePrivate
   virtual HRESULT STDMETHODCALLTYPE renderTreeAsExternalRepresentation(
@@ -408,20 +408,23 @@ class WebFrame : public IWebFrame,
   void setTextSizeMultiplier(float multiplier);
   HRESULT inViewSourceMode(BOOL* flag);
   HRESULT setInViewSourceMode(BOOL flag);
-  HRESULT elementWithName(BSTR name, IDOMElement* form, IDOMElement** element);
-  HRESULT formForElement(IDOMElement* element, IDOMElement** form);
-  HRESULT elementDoesAutoComplete(IDOMElement* element, bool* result);
-  HRESULT controlsInForm(IDOMElement* form,
-                         IDOMElement** controls,
+  HRESULT elementWithName(BSTR name,
+                          IDeprecatedDOMElement* form,
+                          IDeprecatedDOMElement** element);
+  HRESULT formForElement(IDeprecatedDOMElement* element,
+                         IDeprecatedDOMElement** form);
+  HRESULT elementDoesAutoComplete(IDeprecatedDOMElement* element, bool* result);
+  HRESULT controlsInForm(IDeprecatedDOMElement* form,
+                         IDeprecatedDOMElement** controls,
                          int* cControls);
-  HRESULT elementIsPassword(IDOMElement* element, bool* result);
+  HRESULT elementIsPassword(IDeprecatedDOMElement* element, bool* result);
   HRESULT searchForLabelsBeforeElement(const BSTR* labels,
                                        int cLabels,
-                                       IDOMElement* beforeElement,
+                                       IDeprecatedDOMElement* beforeElement,
                                        BSTR* result);
   HRESULT matchLabelsAgainstElement(const BSTR* labels,
                                     int cLabels,
-                                    IDOMElement* againstElement,
+                                    IDeprecatedDOMElement* againstElement,
                                     BSTR* result);
   HRESULT canProvideDocumentSource(bool* result);
   WebHistory* webHistory();
