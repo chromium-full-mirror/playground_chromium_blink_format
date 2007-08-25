@@ -37,6 +37,7 @@
 }
 
 + (WebPluginDatabase*)sharedDatabase;
++ (void)closeSharedDatabase;  // avoids creating the database just to close it
 
 // Plug-ins are returned in this order: New plug-in (WBPL), Mach-O Netscape, CFM
 // Netscape
