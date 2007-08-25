@@ -27,10 +27,12 @@
 #include "JSEventTargetNode.h"
 
 #include "AtomicString.h"
+#include "Document.h"
 #include "Event.h"
 #include "EventListener.h"
 #include "EventNames.h"
 #include "EventTargetNode.h"
+#include "Frame.h"
 #include "JSEvent.h"
 #include "Node.h"
 #include "kjs_events.h"
@@ -326,9 +328,12 @@ void JSEventTargetNode::putValueProperty(ExecState* exec,
 void JSEventTargetNode::setListener(ExecState* exec,
                                     const AtomicString& eventType,
                                     JSValue* func) const {
-  EventTargetNodeCast(impl())->setHTMLEventListener(
-      eventType, KJS::Window::retrieveActive(exec)->findOrCreateJSEventListener(
-                     func, true));
+  Frame* frame = impl()->document()->frame();
+  if (frame)
+    EventTargetNodeCast(impl())->setHTMLEventListener(
+        eventType,
+        KJS::Window::retrieveWindow(frame)->findOrCreateJSEventListener(func,
+                                                                        true));
 }
 
 JSValue* JSEventTargetNode::getListener(const AtomicString& eventType) const {
@@ -370,16 +375,23 @@ JSValue* JSEventTargetNodePrototypeFunction::callAsFunction(ExecState* exec,
   EventTargetNode* node = static_cast<EventTargetNode*>(jsNode->impl());
   switch (id) {
     case JSEventTargetNode::AddEventListener: {
+      Frame* frame = node->document()->frame();
+      if (!frame)
+        return jsUndefined();
       JSEventListener* listener =
-          Window::retrieveActive(exec)->findOrCreateJSEventListener(args[1]);
+          KJS::Window::retrieveWindow(frame)->findOrCreateJSEventListener(
+              args[1]);
       if (listener)
         node->addEventListener(args[0]->toString(exec), listener,
                                args[2]->toBoolean(exec));
       return jsUndefined();
     }
     case JSEventTargetNode::RemoveEventListener: {
+      Frame* frame = node->document()->frame();
+      if (!frame)
+        return jsUndefined();
       JSEventListener* listener =
-          Window::retrieveActive(exec)->findJSEventListener(args[1]);
+          KJS::Window::retrieveWindow(frame)->findJSEventListener(args[1]);
       if (listener)
         node->removeEventListener(args[0]->toString(exec), listener,
                                   args[2]->toBoolean(exec));

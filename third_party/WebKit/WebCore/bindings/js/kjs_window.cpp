@@ -1517,8 +1517,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!window->isSafeScript(exec))
         return jsUndefined();
       if (JSEventListener* listener =
-              Window::retrieveActive(exec)->findOrCreateJSEventListener(
-                  args[1]))
+              window->findOrCreateJSEventListener(args[1]))
         if (Document* doc = frame->document())
           doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
                                       listener, args[2]->toBoolean(exec));
@@ -1526,8 +1525,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::RemoveEventListener:
       if (!window->isSafeScript(exec))
         return jsUndefined();
-      if (JSEventListener* listener =
-              Window::retrieveActive(exec)->findJSEventListener(args[1]))
+      if (JSEventListener* listener = window->findJSEventListener(args[1]))
         if (Document* doc = frame->document())
           doc->removeWindowEventListener(AtomicString(args[0]->toString(exec)),
                                          listener, args[2]->toBoolean(exec));
