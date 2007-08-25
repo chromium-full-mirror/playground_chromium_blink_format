@@ -101,8 +101,13 @@ GraphicsContextPlatformPrivate::~GraphicsContextPlatformPrivate() {
 GraphicsContext::GraphicsContext(HDC dc)
     : m_common(createGraphicsContextPrivate()),
       m_data(new GraphicsContextPlatformPrivate) {
-  cairo_surface_t* surface = cairo_win32_surface_create(dc);
-  m_data->cr = cairo_create(surface);
+  if (dc) {
+    cairo_surface_t* surface = cairo_win32_surface_create(dc);
+    m_data->cr = cairo_create(surface);
+  } else {
+    setPaintingDisabled(true);
+    m_data->cr = 0;
+  }
 }
 #endif
 
@@ -110,6 +115,7 @@ GraphicsContext::GraphicsContext(PlatformGraphicsContext* cr)
     : m_common(createGraphicsContextPrivate()),
       m_data(new GraphicsContextPlatformPrivate) {
   m_data->cr = cairo_reference(cr);
+  setPaintingDisabled(!cr);
 }
 
 GraphicsContext::~GraphicsContext() {
