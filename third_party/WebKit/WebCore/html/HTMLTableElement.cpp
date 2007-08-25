@@ -348,6 +348,29 @@ bool HTMLTableElement::mapToEntry(const QualifiedName& attrName,
   return HTMLElement::mapToEntry(attrName, result);
 }
 
+static inline bool isTableCellAncestor(Node* n) {
+  return n->hasTagName(theadTag) || n->hasTagName(tbodyTag) ||
+         n->hasTagName(tfootTag) || n->hasTagName(trTag) ||
+         n->hasTagName(thTag);
+}
+
+static bool setTableCellsChanged(Node* n) {
+  ASSERT(n);
+  bool cellChanged = false;
+
+  if (n->hasTagName(tdTag))
+    cellChanged = true;
+  else if (isTableCellAncestor(n)) {
+    for (Node* child = n->firstChild(); child; child = child->nextSibling())
+      cellChanged |= setTableCellsChanged(child);
+  }
+
+  if (cellChanged)
+    n->setChanged();
+
+  return cellChanged;
+}
+
 void HTMLTableElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == widthAttr)
     addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
@@ -441,6 +464,7 @@ void HTMLTableElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == rulesAttr) {
     // Cache the value of "rules" so that the pieces of the table can examine it
     // later.
+    TableRules oldRules = m_rulesAttr;
     m_rulesAttr = UnsetRules;
     if (equalIgnoringCase(attr->value(), "none"))
       m_rulesAttr = NoneRules;
@@ -457,6 +481,9 @@ void HTMLTableElement::parseMappedAttribute(MappedAttribute* attr) {
     // enabled.
     if (m_rulesAttr != UnsetRules)
       addCSSProperty(attr, CSS_PROP_BORDER_COLLAPSE, CSS_VAL_COLLAPSE);
+    if (oldRules != m_rulesAttr && m_firstBody)
+      if (setTableCellsChanged(m_firstBody))
+        setChanged();
   } else if (attr->name() == cellspacingAttr) {
     if (!attr->value().isEmpty())
       addCSSLength(attr, CSS_PROP_BORDER_SPACING, attr->value());
