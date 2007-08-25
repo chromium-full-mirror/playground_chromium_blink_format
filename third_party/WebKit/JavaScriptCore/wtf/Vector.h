@@ -367,8 +367,6 @@ class Vector {
 
   T* data() { return m_impl.buffer(); }
   const T* data() const { return m_impl.buffer(); }
-  operator T*() { return data(); }
-  operator const T*() const { return data(); }
 
   iterator begin() { return data(); }
   iterator end() { return begin() + m_size; }
