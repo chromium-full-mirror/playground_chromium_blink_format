@@ -108,6 +108,8 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
 
   void stopSearchEventTimer();
 
+  bool placeholderIsVisible() const { return m_placeholderVisible; }
+
  private:
   // PopupMenuClient methods
   virtual void valueChanged(unsigned listIndex, bool fireEvents = true);
