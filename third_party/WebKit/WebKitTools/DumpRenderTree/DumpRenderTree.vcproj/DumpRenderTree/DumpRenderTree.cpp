@@ -244,11 +244,11 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
   if (!frame)
     return L"";
 
-  COMPtr<IDeprecatedDOMDocument> document;
+  COMPtr<IDOMDocument> document;
   if (FAILED(frame->DOMDocument(&document)))
     return L"";
 
-  COMPtr<IDeprecatedDOMElement> documentElement;
+  COMPtr<IDOMElement> documentElement;
   if (FAILED(document->documentElement(&documentElement)))
     return L"";
 
@@ -271,7 +271,7 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
   }
 
   BSTR innerText = 0;
-  COMPtr<IDeprecatedDOMElementPrivate> docPrivate;
+  COMPtr<IDOMElementPrivate> docPrivate;
   if (SUCCEEDED(documentElement->QueryInterface(&docPrivate)))
     docPrivate->innerText(&innerText);
 
@@ -516,7 +516,7 @@ void dump() {
     if (!resultString)
       printf("ERROR: nil result from %s",
              dumpAsText
-                 ? "IDeprecatedDOMElement::innerText"
+                 ? "IDOMElement::innerText"
                  : "IFrameViewPrivate::renderTreeAsExternalRepresentation");
     else {
       unsigned stringLength = SysStringLen(resultString);

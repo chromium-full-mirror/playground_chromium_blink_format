@@ -31,33 +31,28 @@
 
 #include <WebCore/CSSStyleDeclaration.h>
 
-class DeprecatedDOMCSSStyleDeclaration
-    : public DeprecatedDOMObject,
-      public IDeprecatedDOMCSSStyleDeclaration {
+class DOMCSSStyleDeclaration : public DOMObject,
+                               public IDOMCSSStyleDeclaration {
  protected:
-  DeprecatedDOMCSSStyleDeclaration(WebCore::CSSStyleDeclaration* d);
-  ~DeprecatedDOMCSSStyleDeclaration();
+  DOMCSSStyleDeclaration(WebCore::CSSStyleDeclaration* d);
+  ~DOMCSSStyleDeclaration();
 
  public:
-  static IDeprecatedDOMCSSStyleDeclaration* createInstance(
+  static IDOMCSSStyleDeclaration* createInstance(
       WebCore::CSSStyleDeclaration* d);
 
  public:
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);
-  virtual ULONG STDMETHODCALLTYPE AddRef(void) {
-    return DeprecatedDOMObject::AddRef();
-  }
-  virtual ULONG STDMETHODCALLTYPE Release(void) {
-    return DeprecatedDOMObject::Release();
-  }
+  virtual ULONG STDMETHODCALLTYPE AddRef(void) { return DOMObject::AddRef(); }
+  virtual ULONG STDMETHODCALLTYPE Release(void) { return DOMObject::Release(); }
 
   // IWebScriptObject
   virtual HRESULT STDMETHODCALLTYPE throwException(
       /* [in] */ BSTR exceptionMessage,
       /* [retval][out] */ BOOL* result) {
-    return DeprecatedDOMObject::throwException(exceptionMessage, result);
+    return DOMObject::throwException(exceptionMessage, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE callWebScriptMethod(
@@ -65,43 +60,43 @@ class DeprecatedDOMCSSStyleDeclaration
       /* [size_is][in] */ const VARIANT args[],
       /* [in] */ int cArgs,
       /* [retval][out] */ VARIANT* result) {
-    return DeprecatedDOMObject::callWebScriptMethod(name, args, cArgs, result);
+    return DOMObject::callWebScriptMethod(name, args, cArgs, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE evaluateWebScript(
       /* [in] */ BSTR script,
       /* [retval][out] */ VARIANT* result) {
-    return DeprecatedDOMObject::evaluateWebScript(script, result);
+    return DOMObject::evaluateWebScript(script, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE removeWebScriptKey(
       /* [in] */ BSTR name) {
-    return DeprecatedDOMObject::removeWebScriptKey(name);
+    return DOMObject::removeWebScriptKey(name);
   }
 
   virtual HRESULT STDMETHODCALLTYPE stringRepresentation(
       /* [retval][out] */ BSTR* stringRepresentation) {
-    return DeprecatedDOMObject::stringRepresentation(stringRepresentation);
+    return DOMObject::stringRepresentation(stringRepresentation);
   }
 
   virtual HRESULT STDMETHODCALLTYPE webScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [retval][out] */ VARIANT* result) {
-    return DeprecatedDOMObject::webScriptValueAtIndex(index, result);
+    return DOMObject::webScriptValueAtIndex(index, result);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setWebScriptValueAtIndex(
       /* [in] */ unsigned int index,
       /* [in] */ VARIANT val) {
-    return DeprecatedDOMObject::setWebScriptValueAtIndex(index, val);
+    return DOMObject::setWebScriptValueAtIndex(index, val);
   }
 
   virtual HRESULT STDMETHODCALLTYPE setException(
       /* [in] */ BSTR description) {
-    return DeprecatedDOMObject::setException(description);
+    return DOMObject::setException(description);
   }
 
-  // IDeprecatedDOMCSSStyleDeclaration
+  // IDOMCSSStyleDeclaration
   virtual HRESULT STDMETHODCALLTYPE cssText(
       /* [retval][out] */ BSTR* result);
 
@@ -114,7 +109,7 @@ class DeprecatedDOMCSSStyleDeclaration
 
   virtual HRESULT STDMETHODCALLTYPE getPropertyCSSValue(
       /* [in] */ BSTR propertyName,
-      /* [retval][out] */ IDeprecatedDOMCSSValue** result);
+      /* [retval][out] */ IDOMCSSValue** result);
 
   virtual HRESULT STDMETHODCALLTYPE removeProperty(
       /* [in] */ BSTR propertyName,
@@ -137,7 +132,7 @@ class DeprecatedDOMCSSStyleDeclaration
       /* [retval][out] */ BSTR* result);
 
   virtual HRESULT STDMETHODCALLTYPE parentRule(
-      /* [retval][out] */ IDeprecatedDOMCSSRule** result);
+      /* [retval][out] */ IDOMCSSRule** result);
 
  protected:
   ULONG m_refCount;
