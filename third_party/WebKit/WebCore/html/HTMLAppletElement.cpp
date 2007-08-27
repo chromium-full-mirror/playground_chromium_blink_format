@@ -127,7 +127,7 @@ RenderObject* HTMLAppletElement::createRenderer(RenderArena* arena,
     return new (document()->renderArena()) RenderApplet(this, args);
   }
 
-  return new (document()->renderArena()) RenderInline(this);
+  return RenderObject::createObject(this, style);
 }
 
 #if USE(JAVASCRIPTCORE_BINDINGS)
