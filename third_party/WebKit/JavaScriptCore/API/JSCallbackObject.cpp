@@ -44,7 +44,7 @@ JSCallbackObject::JSCallbackObject(ExecState* exec,
                                    JSClassRef jsClass,
                                    JSValue* prototype,
                                    void* data)
-    : JSObject(prototype), m_isInitialized(false) {
+    : JSObject(prototype), m_class(0), m_isInitialized(false) {
   init(exec, jsClass, data);
 }
 
