@@ -110,6 +110,28 @@ static DeprecatedString escapeTextForMarkup(const String& in,
   return s;
 }
 
+static String urlAttributeToQuotedString(String urlString) {
+  UChar quoteChar = '"';
+  if (urlString.stripWhiteSpace().startsWith("javascript:", false)) {
+    // minimal escaping for javascript urls
+    if (urlString.contains('"')) {
+      if (urlString.contains('\''))
+        urlString.replace('"', "&quot;");
+      else
+        quoteChar = '\'';
+    }
+  } else
+    // FIXME this does not fully match other browsers. Firefox escapes spaces
+    // and other special characters.
+    urlString = escapeTextForMarkup(urlString.deprecatedString(), true);
+
+  String res;
+  res.append(quoteChar);
+  res.append(urlString);
+  res.append(quoteChar);
+  return res;
+}
+
 static String stringValueForRange(const Node* node, const Range* range) {
   String str = node->nodeValue().copy();
   if (range) {
@@ -293,7 +315,12 @@ static DeprecatedString startMarkup(
           markup += " " + attr->name().localName().deprecatedString();
         else
           markup += " " + attr->name().toString().deprecatedString();
-        markup += "=\"" + escapeTextForMarkup(attr->value(), true) + "\"";
+        if (el->isURLAttribute(attr))
+          markup +=
+              "=" +
+              urlAttributeToQuotedString(attr->value()).deprecatedString();
+        else
+          markup += "=\"" + escapeTextForMarkup(attr->value(), true) + "\"";
         if (!documentIsHTML && namespaces &&
             shouldAddNamespaceAttr(attr, *namespaces))
           markup +=
