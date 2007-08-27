@@ -26,6 +26,7 @@
 #define RenderObject_h
 
 #include "CachedResourceClient.h"
+#include "Document.h"
 #include "RenderStyle.h"
 #include "ScrollTypes.h"
 #include "VisiblePosition.h"
@@ -262,7 +263,7 @@ class RenderObject : public CachedResourceClient {
   void* operator new(size_t) throw();
 
  public:
-  RenderArena* renderArena() const;
+  RenderArena* renderArena() const { return document()->renderArena(); }
 
   virtual bool isRenderBlock() const { return false; }
   virtual bool isRenderInline() const { return false; }
@@ -291,7 +292,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isListBox() const { return false; }
   virtual bool isSlider() const { return false; }
 
-  bool isRoot() const;
+  bool isRoot() const { return document()->documentElement() == node(); }
   bool isBody() const;
   bool isHR() const;
 
