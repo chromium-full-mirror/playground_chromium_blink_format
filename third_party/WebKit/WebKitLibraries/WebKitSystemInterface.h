@@ -49,11 +49,13 @@ void WKSetNSURLConnectionDefersCallbacks(NSURLConnection* connection,
 float WKSecondsSinceLastInputEvent(void);
 
 void WKShowKeyAndMain(void);
+#ifndef __LP64__
 OSStatus WKSyncWindowWithCGAfterMove(WindowRef);
 unsigned WKCarbonWindowMask(void);
 void* WKGetNativeWindowFromWindowRef(WindowRef);
 OSType WKCarbonWindowPropertyCreator(void);
 OSType WKCarbonWindowPropertyTag(void);
+#endif
 
 typedef id WKNSURLConnectionDelegateProxyPtr;
 
@@ -62,6 +64,8 @@ WKNSURLConnectionDelegateProxyPtr WKCreateNSURLConnectionDelegateProxy(void);
 void WKDisableCGDeferredUpdates(void);
 
 Class WKNSURLProtocolClassForReqest(NSURLRequest* request);
+void WKSetNSURLRequestShouldContentSniff(NSMutableURLRequest* request,
+                                         BOOL shouldContentSniff);
 
 unsigned WKGetNSAutoreleasePoolCount(void);
 
@@ -126,10 +130,12 @@ void WKPopupMenu(NSMenu*,
                  NSFont*);
 
 void WKSendUserChangeNotifications(void);
+#ifndef __LP64__
 BOOL WKConvertNSEventToCarbonEvent(EventRecord* carbonEvent,
                                    NSEvent* cocoaEvent);
 void WKSendKeyEventToTSM(NSEvent* theEvent);
 void WKCallDrawingNotification(CGrafPtr port, Rect* bounds);
+#endif
 
 BOOL WKGetGlyphTransformedAdvances(NSFont* font,
                                    CGAffineTransform* m,
@@ -168,11 +174,13 @@ ATSLayoutRecord* WKGetGlyphVectorFirstRecord(WKGlyphVectorRef glyphVector);
 size_t WKGetGlyphVectorRecordSize(WKGlyphVectorRef glyphVector);
 ATSGlyphRef WKGetDefaultGlyphForChar(NSFont* font, UniChar c);
 
+#ifndef __LP64__
 NSEvent* WKCreateNSEventWithCarbonEvent(EventRef eventRef);
 NSEvent* WKCreateNSEventWithCarbonMouseMoveEvent(EventRef inEvent,
                                                  NSWindow* window);
 NSEvent* WKCreateNSEventWithCarbonClickEvent(EventRef inEvent,
                                              WindowRef windowRef);
+#endif
 
 CGContextRef WKNSWindowOverrideCGContext(NSWindow*, CGContextRef);
 void WKNSWindowRestoreCGContext(NSWindow*, CGContextRef);
