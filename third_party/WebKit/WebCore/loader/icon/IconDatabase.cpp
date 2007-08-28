@@ -898,6 +898,9 @@ void IconDatabase::syncDatabase() {
   double timestamp = currentTime();
 #endif
 
+  SQLTransaction syncTransaction(*m_currentDB);
+  syncTransaction.begin();
+
   // First we'll do the pending additions
   // Starting with the IconDataCaches that need updating/insertion
   for (HashSet<IconDataCache *>::iterator
@@ -946,6 +949,7 @@ void IconDatabase::syncDatabase() {
     LOG(IconDatabase, "Deleted icon %s", (*i).ascii().data());
   }
   m_iconURLsPendingDeletion.clear();
+  syncTransaction.commit();
 
   // If the timer was running to cause this update, we can kill the timer as its
   // firing would be redundant
