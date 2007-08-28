@@ -2481,9 +2481,6 @@ const Vector<WebCore::IntRect>& WebFrame::computePageRects(HDC printDC) {
   ASSERT(coreFrame);
   ASSERT(coreFrame->document());
 
-  if (m_pageRects.size())
-    return m_pageRects;
-
   if (!printDC)
     return m_pageRects;
 
