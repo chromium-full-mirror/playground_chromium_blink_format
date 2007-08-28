@@ -67,6 +67,8 @@ class VisiblePosition {
   // next() and previous() will increment/decrement by a character cluster.
   VisiblePosition next(bool stayInEditableContent = false) const;
   VisiblePosition previous(bool stayInEditableContent = false) const;
+  VisiblePosition lastEditablePositionAtOrBefore(const VisiblePosition&) const;
+  VisiblePosition firstEditablePositionAtOrAfter(const VisiblePosition&) const;
 
   UChar characterAfter() const;
   UChar characterBefore() const { return previous().characterAfter(); }
