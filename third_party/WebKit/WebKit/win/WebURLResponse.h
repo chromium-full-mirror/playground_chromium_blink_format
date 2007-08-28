@@ -28,6 +28,7 @@
 
 #include "IWebURLResponse.h"
 #include "IWebHTTPURLResponse.h"
+#include "IWebURLResponsePrivate.h"
 
 #pragma warning(push, 0)
 #include <WebCore/ResourceResponse.h>
@@ -47,7 +48,7 @@ DEFINE_GUID(IID_WebURLResponse,
             0x55,
             0x5);
 
-class WebURLResponse : public IWebHTTPURLResponse {
+class WebURLResponse : public IWebHTTPURLResponse, IWebURLResponsePrivate {
  public:
   static WebURLResponse* createInstance();
   static WebURLResponse* createInstance(
@@ -97,14 +98,25 @@ class WebURLResponse : public IWebHTTPURLResponse {
   virtual HRESULT STDMETHODCALLTYPE statusCode(
       /* [retval][out] */ int* statusCode);
 
+  // IWebURLResponsePrivate
+  virtual HRESULT STDMETHODCALLTYPE sslPeerCertificate(
+      /* [retval][out] */ OLE_HANDLE* result);
+
   const WebCore::ResourceResponse& resourceResponse() const;
 
  protected:
   HRESULT suggestedFileExtension(BSTR* result);
+  CFDictionaryRef certificateDictionary() const;
 
  protected:
   ULONG m_refCount;
   WebCore::ResourceResponse m_response;
+  mutable RetainPtr<CFDictionaryRef> m_SSLCertificateInfo;  // this ensures
+                                                            // certificate
+                                                            // contexts are
+                                                            // valid for the
+                                                            // lifetime of this
+                                                            // WebURLResponse.
 };
 
 #endif
