@@ -136,7 +136,9 @@ class ResourceLoader : public Shared<ResourceLoader>,
   }
 
  protected:
-  ResourceLoader(Frame*, bool sendResourceLoadCallbacks);
+  ResourceLoader(Frame*,
+                 bool sendResourceLoadCallbacks,
+                 bool shouldContentSniff);
 
   virtual void didCancel(const ResourceError&);
   void didFinishLoadingOnePart();
@@ -157,6 +159,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   bool m_calledDidFinishLoad;
 
   bool m_sendResourceLoadCallbacks;
+  bool m_shouldContentSniff;
   bool m_shouldBufferData;
 
  protected:

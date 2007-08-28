@@ -54,7 +54,8 @@ class SubresourceLoader : public ResourceLoader {
       SubresourceLoaderClient*,
       const ResourceRequest&,
       bool skipCanLoadCheck = false,
-      bool sendResourceLoadCallbacks = true);
+      bool sendResourceLoadCallbacks = true,
+      bool shouldContentSniff = true);
 
   virtual ~SubresourceLoader();
 
@@ -74,7 +75,8 @@ class SubresourceLoader : public ResourceLoader {
  private:
   SubresourceLoader(Frame*,
                     SubresourceLoaderClient*,
-                    bool sendResourceLoadCallbacks);
+                    bool sendResourceLoadCallbacks,
+                    bool shouldContentSniff);
 
   virtual void didCancel(const ResourceError&);
   SubresourceLoaderClient* m_client;

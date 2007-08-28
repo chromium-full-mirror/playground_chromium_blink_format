@@ -88,6 +88,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
   ResourceHandle(const ResourceRequest&,
                  ResourceHandleClient*,
                  bool defersLoading,
+                 bool shouldContentSniff,
                  bool mightDownloadFromHandle);
 
  public:
@@ -97,6 +98,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
       ResourceHandleClient*,
       Frame*,
       bool defersLoading,
+      bool shouldContentSniff,
       bool mightDownloadFromHandle = false);
 
   static void loadResourceSynchronously(const ResourceRequest&,

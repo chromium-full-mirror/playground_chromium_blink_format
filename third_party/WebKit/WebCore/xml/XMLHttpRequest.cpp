@@ -471,7 +471,8 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
   // page.
   // this is true while running onunload handlers
   // FIXME: Maybe create can return false for other reasons too?
-  m_loader = SubresourceLoader::create(m_doc->frame(), this, request);
+  m_loader = SubresourceLoader::create(m_doc->frame(), this, request, false,
+                                       true, false);
 }
 
 void XMLHttpRequest::abort() {

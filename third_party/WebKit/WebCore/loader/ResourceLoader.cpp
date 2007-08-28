@@ -51,11 +51,14 @@ PassRefPtr<SharedBuffer> ResourceLoader::resourceData() {
   return 0;
 }
 
-ResourceLoader::ResourceLoader(Frame* frame, bool sendResourceLoadCallbacks)
+ResourceLoader::ResourceLoader(Frame* frame,
+                               bool sendResourceLoadCallbacks,
+                               bool shouldContentSniff)
     : m_reachedTerminalState(false),
       m_cancelled(false),
       m_calledDidFinishLoad(false),
       m_sendResourceLoadCallbacks(sendResourceLoadCallbacks),
+      m_shouldContentSniff(shouldContentSniff),
       m_shouldBufferData(true),
       m_frame(frame),
       m_documentLoader(frame->loader()->activeDocumentLoader()),
@@ -118,8 +121,9 @@ bool ResourceLoader::load(const ResourceRequest& r) {
     return true;
   }
 
-  m_handle = ResourceHandle::create(clientRequest, this, m_frame.get(),
-                                    m_defersLoading);
+  m_handle =
+      ResourceHandle::create(clientRequest, this, m_frame.get(),
+                             m_defersLoading, m_shouldContentSniff, true);
 
   return true;
 }

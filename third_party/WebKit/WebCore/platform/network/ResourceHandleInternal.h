@@ -70,11 +70,13 @@ class ResourceHandleInternal : Noncopyable {
                          const ResourceRequest& request,
                          ResourceHandleClient* c,
                          bool defersLoading,
+                         bool shouldContentSniff,
                          bool mightDownloadFromHandle)
       : m_client(c),
         m_request(request),
         status(0),
         m_defersLoading(defersLoading),
+        m_shouldContentSniff(shouldContentSniff),
         m_mightDownloadFromHandle(mightDownloadFromHandle)
 #if USE(CFNETWORK)
         ,
@@ -127,6 +129,7 @@ class ResourceHandleInternal : Noncopyable {
   int status;
 
   bool m_defersLoading;
+  bool m_shouldContentSniff;
   bool m_mightDownloadFromHandle;
 #if USE(CFNETWORK)
   RetainPtr<CFURLConnectionRef> m_connection;

@@ -37,11 +37,13 @@ namespace WebCore {
 ResourceHandle::ResourceHandle(const ResourceRequest& request,
                                ResourceHandleClient* client,
                                bool defersLoading,
+                               bool shouldContentSniff,
                                bool mightDownloadFromHandle)
     : d(new ResourceHandleInternal(this,
                                    request,
                                    client,
                                    defersLoading,
+                                   shouldContentSniff,
                                    mightDownloadFromHandle)) {}
 
 PassRefPtr<ResourceHandle> ResourceHandle::create(
@@ -49,9 +51,11 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
     ResourceHandleClient* client,
     Frame* frame,
     bool defersLoading,
+    bool shouldContentSniff,
     bool mightDownloadFromHandle) {
-  RefPtr<ResourceHandle> newHandle(new ResourceHandle(
-      request, client, defersLoading, mightDownloadFromHandle));
+  RefPtr<ResourceHandle> newHandle(
+      new ResourceHandle(request, client, defersLoading, shouldContentSniff,
+                         mightDownloadFromHandle));
 
   if (!portAllowed(request)) {
     newHandle->scheduleBlockedFailure();

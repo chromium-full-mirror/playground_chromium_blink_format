@@ -59,8 +59,9 @@ static SubresourceLoaderCounter subresourceLoaderCounter;
 
 SubresourceLoader::SubresourceLoader(Frame* frame,
                                      SubresourceLoaderClient* client,
-                                     bool sendResourceLoadCallbacks)
-    : ResourceLoader(frame, sendResourceLoadCallbacks),
+                                     bool sendResourceLoadCallbacks,
+                                     bool shouldContentSniff)
+    : ResourceLoader(frame, sendResourceLoadCallbacks, shouldContentSniff),
       m_client(client),
       m_loadingMultipartContent(false) {
 #ifndef NDEBUG
@@ -86,7 +87,8 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
     SubresourceLoaderClient* client,
     const ResourceRequest& request,
     bool skipCanLoadCheck,
-    bool sendResourceLoadCallbacks) {
+    bool sendResourceLoadCallbacks,
+    bool shouldContentSniff) {
   if (!frame)
     return 0;
 
@@ -120,8 +122,8 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
 
   fl->addExtraFieldsToRequest(newRequest, false, false);
 
-  RefPtr<SubresourceLoader> subloader(
-      new SubresourceLoader(frame, client, sendResourceLoadCallbacks));
+  RefPtr<SubresourceLoader> subloader(new SubresourceLoader(
+      frame, client, sendResourceLoadCallbacks, shouldContentSniff));
   if (!subloader->load(newRequest))
     return 0;
 
