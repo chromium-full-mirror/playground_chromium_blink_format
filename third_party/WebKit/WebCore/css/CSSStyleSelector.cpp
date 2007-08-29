@@ -826,6 +826,7 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
       styleNotYetAvailable->font().update();
     }
     styleNotYetAvailable->ref();
+    e->document()->setHasNodesWithPlaceholderStyle();
     return styleNotYetAvailable;
   }
 

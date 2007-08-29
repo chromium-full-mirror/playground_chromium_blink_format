@@ -751,6 +751,10 @@ class Document : public ContainerNode {
     return m_pendingSheetLayout == DidLayoutWithPendingSheets;
   }
 
+  void setHasNodesWithPlaceholderStyle() {
+    m_hasNodesWithPlaceholderStyle = true;
+  }
+
   String iconURL();
   void setIconURL(const String& iconURL, const String& type);
 
@@ -810,6 +814,8 @@ class Document : public ContainerNode {
   // stylesheets
   // do eventually load.
   PendingSheetLayout m_pendingSheetLayout;
+
+  bool m_hasNodesWithPlaceholderStyle;
 
   RefPtr<CSSStyleSheet> m_elemSheet;
 
