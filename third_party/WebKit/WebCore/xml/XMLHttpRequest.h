@@ -124,6 +124,8 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
                              bool tempEvent = false);
   EventListenersMap& eventListeners() { return m_eventListeners; }
 
+  Document* document() const { return m_doc; }
+
   using Shared<XMLHttpRequest>::ref;
   using Shared<XMLHttpRequest>::deref;
 
