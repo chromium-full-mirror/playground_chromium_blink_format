@@ -1579,7 +1579,9 @@ bool FrameLoader::shouldUsePlugin(const KURL& url,
   // If an object's content can't be handled and it has no fallback, let
   // it be handled as a plugin to show the broken plugin icon.
   useFallback = objectType == ObjectContentNone && hasFallback;
-  return objectType == ObjectContentNone || objectType == ObjectContentPlugin;
+  return objectType == ObjectContentNone ||
+         objectType == ObjectContentNetscapePlugin ||
+         objectType == ObjectContentOtherPlugin;
 }
 
 bool FrameLoader::loadPlugin(RenderPart* renderer,

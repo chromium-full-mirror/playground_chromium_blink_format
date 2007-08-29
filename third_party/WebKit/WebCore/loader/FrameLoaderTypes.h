@@ -70,7 +70,8 @@ enum ObjectContentType {
   ObjectContentNone,
   ObjectContentImage,
   ObjectContentFrame,
-  ObjectContentPlugin
+  ObjectContentNetscapePlugin,
+  ObjectContentOtherPlugin
 };
 }
 

@@ -99,7 +99,7 @@ static inline void mapClassIdToServiceType(const String& classId,
   // TODO: add more plugins here
 }
 
-void RenderPartObject::updateWidget(bool onlyCreateNonPlugins) {
+void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
   String url;
   String serviceType;
   Vector<String> paramNames;
@@ -220,13 +220,13 @@ void RenderPartObject::updateWidget(bool onlyCreateNonPlugins) {
         m_hasFallbackContent = true;
     }
 
-    if (onlyCreateNonPlugins) {
+    if (onlyCreateNonNetscapePlugins) {
       KURL completedURL;
       if (!url.isEmpty())
         completedURL = frame->loader()->completeURL(url);
 
       if (frame->loader()->client()->objectContentType(
-              completedURL, serviceType) == ObjectContentPlugin)
+              completedURL, serviceType) == ObjectContentNetscapePlugin)
         return;
     }
 
@@ -255,13 +255,13 @@ void RenderPartObject::updateWidget(bool onlyCreateNonPlugins) {
       }
     }
 
-    if (onlyCreateNonPlugins) {
+    if (onlyCreateNonNetscapePlugins) {
       KURL completedURL;
       if (!url.isEmpty())
         completedURL = frame->loader()->completeURL(url);
 
       if (frame->loader()->client()->objectContentType(
-              completedURL, serviceType) == ObjectContentPlugin)
+              completedURL, serviceType) == ObjectContentNetscapePlugin)
         return;
     }
 

@@ -27,6 +27,7 @@
 #import <JavaVM/jni.h>
 #import <WebCore/WebCoreKeyboardUIMode.h>
 #import <WebCore/EditAction.h>
+#import <WebCore/FrameLoaderTypes.h>
 #import <WebCore/SelectionController.h>
 #import <WebCore/TextAffinity.h>
 #import <WebCore/TextGranularity.h>
@@ -68,13 +69,6 @@ enum WebScrollGranularity {
   WebScrollPage,
   WebScrollDocument,
   WebScrollWheel
-};
-
-typedef enum ObjectElementType {
-  ObjectElementNone,
-  ObjectElementImage,
-  ObjectElementFrame,
-  ObjectElementPlugin
 };
 
 @protocol WebCoreOpenPanelResultListener<NSObject>
@@ -346,8 +340,8 @@ rangeByAlteringCurrentSelection:
                            DOMElement:(DOMElement*)element;
 - (void)redirectDataToPlugin:(NSView*)pluginView;
 
-- (ObjectElementType)determineObjectFromMIMEType:(NSString*)MIMEType
-                                             URL:(NSURL*)URL;
+- (WebCore::ObjectContentType)determineObjectFromMIMEType:(NSString*)MIMEType
+                                                      URL:(NSURL*)URL;
 
 - (jobject)getAppletInView:(NSView*)view;
 
