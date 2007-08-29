@@ -745,7 +745,7 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
            << ", mime = " << _mimeType;
   if (_mimeType == "application/x-qt-plugin" ||
       _mimeType == "application/x-qt-styled-widget")
-    return ObjectContentPlugin;
+    return ObjectContentOtherPlugin;
 
   if (!url.isValid())
     return ObjectContentNone;
@@ -763,7 +763,7 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
     return ObjectContentImage;
 
   if (QWebFactoryLoader::self()->supportsMimeType(mimeType))
-    return ObjectContentPlugin;
+    return ObjectContentNetscapePlugin;
 
   if (MIMETypeRegistry::isSupportedNonImageMIMEType(mimeType))
     return ObjectContentFrame;
