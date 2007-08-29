@@ -2472,7 +2472,10 @@ PassRefPtr<Range> Editor::rangeForPoint(const IntPoint& windowPoint) {
     return 0;
   IntPoint framePoint = frameView->windowToContents(windowPoint);
   Selection selection(frame->visiblePositionForPoint(framePoint));
-  return selection.toRange();
+  return avoidIntersectionWithNode(
+      selection.toRange().get(),
+      deleteButtonController() ? deleteButtonController()->containerElement()
+                               : 0);
 }
 
 void Editor::revealSelectionAfterEditingOperation() {
