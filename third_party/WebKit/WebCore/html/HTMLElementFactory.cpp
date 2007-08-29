@@ -138,8 +138,10 @@ static PassRefPtr<HTMLElement> metaConstructor(const AtomicString&,
 static PassRefPtr<HTMLElement> styleConstructor(const AtomicString&,
                                                 Document* doc,
                                                 HTMLFormElement*,
-                                                bool) {
-  return new HTMLStyleElement(doc);
+                                                bool createdByParser) {
+  RefPtr<HTMLStyleElement> style = new HTMLStyleElement(doc);
+  style->setCreatedByParser(createdByParser);
+  return style.release();
 }
 
 static PassRefPtr<HTMLElement> titleConstructor(const AtomicString&,
