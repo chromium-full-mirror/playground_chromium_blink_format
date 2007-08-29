@@ -446,6 +446,7 @@ class WebFrame : public IWebFrame,
                    float maxPageWidth,
                    bool adjustViewSize);
   void headerAndFooterHeights(float*, float*);
+  WebCore::IntRect printerMarginRect(HDC);
 
  protected:
   ULONG m_refCount;
