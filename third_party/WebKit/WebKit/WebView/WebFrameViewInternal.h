@@ -28,6 +28,7 @@
 
 #import <WebKit/WebFrameView.h>
 
+@class WebDynamicScrollBarsView;
 @class WebView;
 
 @interface WebFrameView (WebInternal)
@@ -46,6 +47,6 @@
     (BOOL)allowImageTypeOmission;
 + (Class)_viewClassForMIMEType:(NSString*)MIMEType;
 + (BOOL)_canShowMIMETypeAsHTML:(NSString*)MIMEType;
-- (NSScrollView*)_scrollView;
+- (WebDynamicScrollBarsView*)_scrollView;
 
 @end
