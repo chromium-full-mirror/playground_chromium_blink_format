@@ -1036,6 +1036,7 @@ void InlineFlowBox::clearTruncation() {
 #ifndef NDEBUG
 
 void InlineFlowBox::checkConsistency() const {
+#ifdef CHECK_CONSISTENCY
   ASSERT(!m_hasBadChildList);
   const InlineBox* prev = 0;
   for (const InlineBox* child = m_firstChild; child;
@@ -1045,6 +1046,7 @@ void InlineFlowBox::checkConsistency() const {
     prev = child;
   }
   ASSERT(prev == m_lastChild);
+#endif
 }
 
 #endif

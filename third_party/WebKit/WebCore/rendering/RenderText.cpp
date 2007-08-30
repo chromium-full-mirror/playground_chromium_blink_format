@@ -1217,6 +1217,7 @@ InlineBox* RenderText::inlineBox(int offset, EAffinity affinity) {
 #ifndef NDEBUG
 
 void RenderText::checkConsistency() const {
+#ifdef CHECK_CONSISTENCY
   const InlineTextBox* prev = 0;
   for (const InlineTextBox* child = m_firstTextBox; child != 0;
        child = child->nextTextBox()) {
@@ -1225,6 +1226,7 @@ void RenderText::checkConsistency() const {
     prev = child;
   }
   ASSERT(prev == m_lastTextBox);
+#endif
 }
 
 #endif

@@ -921,6 +921,7 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* graphicsContext,
 #ifndef NDEBUG
 
 void RenderFlow::checkConsistency() const {
+#ifdef CHECK_CONSISTENCY
   const InlineFlowBox* prev = 0;
   for (const InlineFlowBox* child = m_firstLineBox; child != 0;
        child = child->nextFlowBox()) {
@@ -929,6 +930,7 @@ void RenderFlow::checkConsistency() const {
     prev = child;
   }
   ASSERT(prev == m_lastLineBox);
+#endif
 }
 
 #endif
