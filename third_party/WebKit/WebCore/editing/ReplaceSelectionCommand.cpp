@@ -191,7 +191,10 @@ PassRefPtr<Node> ReplacementFragment::insertFragmentForTestRendering(
 
   ExceptionCode ec = 0;
 
-  // Copy the whitespace style from the context onto this element.
+  // Copy the whitespace and user-select style from the context onto this
+  // element.
+  // FIXME: We should examine other style properties to see if they would be
+  // appropriate to consider during the test rendering.
   Node* n = context;
   while (n && !n->isElementNode())
     n = n->parentNode();
@@ -202,6 +205,11 @@ PassRefPtr<Node> ReplacementFragment::insertFragmentForTestRendering(
     style->setProperty(CSS_PROP_WHITE_SPACE,
                        contextStyle->getPropertyValue(CSS_PROP_WHITE_SPACE),
                        false, ec);
+    ASSERT(ec == 0);
+    style->setProperty(
+        CSS_PROP__WEBKIT_USER_SELECT,
+        contextStyle->getPropertyValue(CSS_PROP__WEBKIT_USER_SELECT), false,
+        ec);
     ASSERT(ec == 0);
   }
 
