@@ -72,7 +72,7 @@ class CompositeEditCommand : public EditCommand {
   void insertNodeAfter(Node* insertChild, Node* refChild);
   void insertNodeAt(Node* insertChild, const Position&);
   void insertNodeBefore(Node* insertChild, Node* refChild);
-  void insertParagraphSeparator();
+  void insertParagraphSeparator(bool useDefaultParagraphElement = false);
   void insertTextIntoNode(Text* node, int offset, const String& text);
   void joinTextNodes(Text*, Text*);
   void rebalanceWhitespace();

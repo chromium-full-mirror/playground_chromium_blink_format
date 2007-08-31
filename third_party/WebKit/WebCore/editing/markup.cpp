@@ -461,8 +461,12 @@ static void completeURLs(Node* node, const String& baseURL) {
 
 static bool needInterchangeNewlineAfter(const VisiblePosition& v) {
   VisiblePosition next = v.next();
+  Node* upstreamNode = next.deepEquivalent().upstream().node();
+  Node* downstreamNode = v.deepEquivalent().downstream().node();
+  // Add an interchange newline if a paragraph break is selected and a br won't
+  // already be added to the markup to represent it.
   return isEndOfParagraph(v) && isStartOfParagraph(next) &&
-         !next.deepEquivalent().upstream().node()->hasTagName(brTag);
+         !(upstreamNode->hasTagName(brTag) && upstreamNode == downstreamNode);
 }
 
 static PassRefPtr<CSSMutableStyleDeclaration>
@@ -760,6 +764,8 @@ DeprecatedString createMarkup(const Range* range,
     }
   }
 
+  // FIXME: The interchange newline should be placed in the block that it's in,
+  // not after all of the content, unconditionally.
   if (annotate && needInterchangeNewlineAfter(visibleEnd.previous()))
     markups.append(interchangeNewlineString);
 
