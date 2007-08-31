@@ -113,7 +113,11 @@ void EditCommand::unapply() {
 
   Frame* frame = m_document->frame();
 
+  DeleteButtonController* deleteButtonController =
+      frame->editor()->deleteButtonController();
+  deleteButtonController->disable();
   doUnapply();
+  deleteButtonController->enable();
 
   if (!m_parent) {
     updateLayout();
@@ -127,7 +131,11 @@ void EditCommand::reapply() {
 
   Frame* frame = m_document->frame();
 
+  DeleteButtonController* deleteButtonController =
+      frame->editor()->deleteButtonController();
+  deleteButtonController->disable();
   doReapply();
+  deleteButtonController->enable();
 
   if (!m_parent) {
     updateLayout();
