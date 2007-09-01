@@ -401,6 +401,8 @@ void EditorClientQt::getGuessesForWord(const String&, Vector<String>&) {
 bool EditorClientQt::isEditing() const {
   return m_editing;
 }
+
+void EditorClientQt::setInputMethodState(bool) {}
 }
 
 // vim: ts=4 sw=4 et

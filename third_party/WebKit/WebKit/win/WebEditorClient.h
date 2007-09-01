@@ -126,6 +126,8 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual void getGuessesForWord(const WebCore::String&,
                                  Vector<WebCore::String>& guesses);
 
+  virtual void setInputMethodState(bool);
+
  private:
   WebView* m_webView;
   WebEditorUndoTarget* m_undoTarget;

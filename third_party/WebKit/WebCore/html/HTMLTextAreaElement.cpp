@@ -307,4 +307,8 @@ Selection HTMLTextAreaElement::selection() const {
       ->selection(cachedSelStart, cachedSelEnd);
 }
 
+bool HTMLTextAreaElement::shouldUseInputMethod() const {
+  return true;
+}
+
 }  // namespace

@@ -92,6 +92,8 @@ class HTMLTextAreaElement : public HTMLFormControlElementWithState {
   };
   Selection selection() const;
 
+  virtual bool shouldUseInputMethod() const;
+
  private:
   void updateValue() const;
 

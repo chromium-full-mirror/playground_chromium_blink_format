@@ -491,6 +491,7 @@ class SVGEmptyEditorClient : public EditorClient {
   virtual void showSpellingUI(bool show) {}
   virtual bool spellingUIIsShowing() { return false; }
   virtual void getGuessesForWord(const String&, Vector<String>& guesses) {}
+  virtual void setInputMethodState(bool enabled) {}
 };
 
 class SVGEmptyContextMenuClient : public ContextMenuClient {

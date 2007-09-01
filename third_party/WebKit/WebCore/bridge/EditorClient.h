@@ -152,6 +152,7 @@ class EditorClient {
   virtual void showSpellingUI(bool show) = 0;
   virtual bool spellingUIIsShowing() = 0;
   virtual void getGuessesForWord(const String&, Vector<String>& guesses) = 0;
+  virtual void setInputMethodState(bool enabled) = 0;
 };
 }
 

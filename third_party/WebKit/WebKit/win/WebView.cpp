@@ -3703,6 +3703,7 @@ class IMMDict {
   typedef BOOL(CALLBACK* setCandidateWindowPtr)(HIMC, LPCANDIDATEFORM);
   typedef BOOL(CALLBACK* setOpenStatusPtr)(HIMC, BOOL);
   typedef BOOL(CALLBACK* notifyIMEPtr)(HIMC, DWORD, DWORD, DWORD);
+  typedef BOOL(CALLBACK* associateContextExPtr)(HWND, HIMC, DWORD);
 
  public:
   getContextPtr getContext;
@@ -3711,6 +3712,8 @@ class IMMDict {
   setCandidateWindowPtr setCandidateWindow;
   setOpenStatusPtr setOpenStatus;
   notifyIMEPtr notifyIME;
+  associateContextExPtr associateContextEx;
+
   static const IMMDict& dict();
 
  private:
@@ -3743,6 +3746,9 @@ IMMDict::IMMDict() {
   notifyIME = reinterpret_cast<notifyIMEPtr>(
       ::GetProcAddress(m_instance, "ImmNotifyIME"));
   ASSERT(notifyIME);
+  associateContextEx = reinterpret_cast<associateContextExPtr>(
+      ::GetProcAddress(m_instance, "ImmAssociateContextEx"));
+  ASSERT(associateContextEx);
 }
 
 HIMC WebView::getIMMContext() {
@@ -3835,6 +3841,11 @@ void WebView::updateSelectionForIME() {
       !markedTextContainsSelection(targetFrame->markedTextRange(),
                                    selectionRange.get()))
     resetIME(targetFrame);
+}
+
+void WebView::setInputMethodState(bool enabled) {
+  IMMDict::dict().associateContextEx(m_viewWindow, 0,
+                                     enabled ? IACE_DEFAULT : 0);
 }
 
 void WebView::selectionChanged() {

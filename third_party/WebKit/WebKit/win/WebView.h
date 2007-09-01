@@ -667,6 +667,7 @@ class WebView : public IWebView,
   void selectionChanged();
   void resetIME(WebCore::Frame*);
   bool inIMEKeyDown() const { return m_inIMEKeyDown; }
+  void setInputMethodState(bool);
 
   HRESULT registerDragDrop();
   HRESULT revokeDragDrop();

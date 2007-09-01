@@ -294,6 +294,8 @@ bool EditorClient::spellingUIIsShowing() {
 void EditorClient::getGuessesForWord(const String&, Vector<String>&) {
   notImplemented();
 }
+
+void EditorClient::setInputMethodState(bool) {}
 }
 
 // vim: ts=4 sw=4 et
