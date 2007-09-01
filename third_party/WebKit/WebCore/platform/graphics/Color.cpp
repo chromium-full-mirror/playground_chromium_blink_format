@@ -52,7 +52,7 @@ RGBA32 makeRGBA(int r, int g, int b, int a) {
          max(0, min(g, 255)) << 8 | max(0, min(b, 255));
 }
 
-double calcHue(double temp1, double temp2, double hueVal) {
+static double calcHue(double temp1, double temp2, double hueVal) {
   if (hueVal < 0.0)
     hueVal++;
   else if (hueVal > 1.0)

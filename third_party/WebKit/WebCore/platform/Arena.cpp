@@ -84,7 +84,7 @@ static int freelist_count = 0;
   if ((j_) >> 1)                        \
     (_log2) += 1;
 
-int CeilingLog2(unsigned int i) {
+static int CeilingLog2(unsigned int i) {
   int log2;
   CEILING_LOG2(log2, i);
   return log2;
@@ -279,16 +279,5 @@ void FreeArenaPool(ArenaPool* pool) {
 
 void FinishArenaPool(ArenaPool* pool) {
   FreeArenaList(pool, &pool->first, true);
-}
-
-void ArenaFinish(void) {
-  Arena *a, *next;
-
-  for (a = arena_freelist; a; a = next) {
-    next = a->next;
-    fastFree(a);
-    a = 0;
-  }
-  arena_freelist = NULL;
 }
 }
