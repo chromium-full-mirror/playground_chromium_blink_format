@@ -96,6 +96,12 @@ class IconDatabase : Noncopyable {
 
   bool checkIntegrity();
 
+  // Support for WebCoreStatistics in WebKit
+  size_t pageURLMappingCount() const;
+  size_t retainedPageURLCount() const;
+  size_t iconRecordCount() const;
+  size_t iconRecordCountWithData() const;
+
  private:
   IconDatabase();
   ~IconDatabase();
