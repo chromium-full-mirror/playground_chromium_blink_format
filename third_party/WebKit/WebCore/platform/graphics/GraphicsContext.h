@@ -128,7 +128,8 @@ class GraphicsContext : Noncopyable {
                  CompositeOperator = CompositeSourceOver);
   void drawImage(Image*,
                  const IntRect&,
-                 CompositeOperator = CompositeSourceOver);
+                 CompositeOperator = CompositeSourceOver,
+                 bool useLowQualityScale = false);
   void drawImage(Image*,
                  const IntPoint& destPoint,
                  const IntRect& srcRect,
@@ -136,11 +137,13 @@ class GraphicsContext : Noncopyable {
   void drawImage(Image*,
                  const IntRect& destRect,
                  const IntRect& srcRect,
-                 CompositeOperator = CompositeSourceOver);
+                 CompositeOperator = CompositeSourceOver,
+                 bool useLowQualityScale = false);
   void drawImage(Image*,
                  const FloatRect& destRect,
                  const FloatRect& srcRect = FloatRect(0, 0, -1, -1),
-                 CompositeOperator = CompositeSourceOver);
+                 CompositeOperator = CompositeSourceOver,
+                 bool useLowQualityScale = false);
   void drawTiledImage(Image*,
                       const IntRect& destRect,
                       const IntPoint& srcPoint,
@@ -152,6 +155,13 @@ class GraphicsContext : Noncopyable {
                       Image::TileRule hRule = Image::StretchTile,
                       Image::TileRule vRule = Image::StretchTile,
                       CompositeOperator = CompositeSourceOver);
+#if PLATFORM(CG)
+  void setUseLowQualityImageInterpolation(bool = true);
+  bool useLowQualityImageInterpolation() const;
+#else
+  void setUseLowQualityImageInterpolation(bool = true) {}
+  bool useLowQualityImageInterpolation() const { return false; }
+#endif
 
   void clip(const IntRect&);
   void addRoundedRectClip(const IntRect&,

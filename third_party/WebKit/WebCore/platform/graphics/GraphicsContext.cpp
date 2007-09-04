@@ -204,8 +204,9 @@ void GraphicsContext::drawImage(Image* image,
 
 void GraphicsContext::drawImage(Image* image,
                                 const IntRect& r,
-                                CompositeOperator op) {
-  drawImage(image, r, IntRect(0, 0, -1, -1), op);
+                                CompositeOperator op,
+                                bool useLowQualityScale) {
+  drawImage(image, r, IntRect(0, 0, -1, -1), op, useLowQualityScale);
 }
 
 void GraphicsContext::drawImage(Image* image,
@@ -218,8 +219,9 @@ void GraphicsContext::drawImage(Image* image,
 void GraphicsContext::drawImage(Image* image,
                                 const IntRect& dest,
                                 const IntRect& srcRect,
-                                CompositeOperator op) {
-  drawImage(image, FloatRect(dest), srcRect, op);
+                                CompositeOperator op,
+                                bool useLowQualityScale) {
+  drawImage(image, FloatRect(dest), srcRect, op, useLowQualityScale);
 }
 
 void GraphicsContext::drawText(const TextRun& run,
@@ -339,10 +341,13 @@ const Vector<IntRect>& GraphicsContext::focusRingRects() const {
   return m_common->m_focusRingRects;
 }
 
+static const int cInterpolationCutoff = 800 * 800;
+
 void GraphicsContext::drawImage(Image* image,
                                 const FloatRect& dest,
                                 const FloatRect& src,
-                                CompositeOperator op) {
+                                CompositeOperator op,
+                                bool useLowQualityScale) {
   if (paintingDisabled())
     return;
 
@@ -361,8 +366,17 @@ void GraphicsContext::drawImage(Image* image,
   if (th == -1)
     th = image->height();
 
+  bool shouldUseLowQualityInterpolation = useLowQualityScale &&
+                                          (tsw != tw || tsh != th) &&
+                                          tsw * tsh > cInterpolationCutoff;
+  if (shouldUseLowQualityInterpolation) {
+    save();
+    setUseLowQualityImageInterpolation(true);
+  }
   image->draw(this, FloatRect(dest.location(), FloatSize(tw, th)),
               FloatRect(src.location(), FloatSize(tsw, tsh)), op);
+  if (shouldUseLowQualityInterpolation)
+    restore();
 }
 
 void GraphicsContext::drawTiledImage(Image* image,

@@ -36,6 +36,7 @@
 #include "HTMLMapElement.h"
 #include "HTMLNames.h"
 #include "HitTestResult.h"
+#include "Page.h"
 #include "RenderView.h"
 #include "TextStyle.h"
 
@@ -292,7 +293,9 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
                                      : 0;
     CompositeOperator compositeOperator =
         imageElt ? imageElt->compositeOperator() : CompositeSourceOver;
-    context->drawImage(image(), rect, compositeOperator);
+    context->drawImage(
+        image(), rect, compositeOperator,
+        document()->page()->inLowQualityImageInterpolationMode());
   }
 
   // draw the selection tint even if the image itself is not available
