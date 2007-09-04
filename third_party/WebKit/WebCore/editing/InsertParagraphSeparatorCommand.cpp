@@ -174,7 +174,6 @@ void InsertParagraphSeparatorCommand::doApply() {
   // similar case where previous position is in another, presumeably nested,
   // block.
   if (isFirstInBlock || !inSameBlock(visiblePos, visiblePos.previous())) {
-    pos = pos.downstream();
     Node* refNode;
     if (isFirstInBlock && !nestNewBlock)
       refNode = startBlock;
@@ -183,6 +182,9 @@ void InsertParagraphSeparatorCommand::doApply() {
       ASSERT(refNode);  // must be true or we'd be in the end of block case
     } else
       refNode = pos.node();
+
+    // find ending selection position easily before inserting the paragraph
+    pos = pos.downstream();
 
     insertNodeBefore(blockToInsert.get(), refNode);
     appendBlockPlaceholder(blockToInsert.get());
