@@ -42,6 +42,10 @@
 #include "MIMETypeRegistry.h"
 #include "RenderTextControl.h"
 
+#if PLATFORM(QT)
+#include <QtCore/QFileInfo>
+#endif
+
 #if PLATFORM(WIN_OS)
 #include <shlwapi.h>
 #endif
@@ -211,7 +215,9 @@ static int randomNumber() {
 // (see basename(3) specification for examples).
 // Consider this if it ever needs to become a general purpose method.
 static String pathGetFilename(String path) {
-#if PLATFORM(WIN_OS)
+#if PLATFORM(QT)
+  return QFileInfo(path).fileName();
+#elif PLATFORM(WIN_OS)
   return String(PathFindFileName(path.charactersWithNullTermination()));
 #else
   return path.substring(path.reverseFind('/') + 1);
