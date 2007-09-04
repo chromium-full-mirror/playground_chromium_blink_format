@@ -30,11 +30,7 @@
 
 namespace WebCore {
 
-SQLTransaction::SQLTransaction(SQLDatabase& db, bool start)
-    : m_db(db), m_began(false) {
-  if (start)
-    begin();
-}
+SQLTransaction::SQLTransaction(SQLDatabase& db) : m_db(db), m_began(false) {}
 
 SQLTransaction::~SQLTransaction() {
   if (m_began)
@@ -42,20 +38,31 @@ SQLTransaction::~SQLTransaction() {
 }
 
 void SQLTransaction::begin() {
-  if (!m_began)
+  if (!m_began) {
+    ASSERT(!m_db.m_transactionInProgress);
     m_began = m_db.executeCommand("BEGIN;");
+    m_db.m_transactionInProgress = true;
+  }
 }
 
 void SQLTransaction::commit() {
   if (m_began) {
-    if (m_db.executeCommand("COMMIT;"))
+    ASSERT(m_db.m_transactionInProgress);
+    if (m_db.executeCommand("COMMIT;")) {
       m_began = false;
+      m_db.m_transactionInProgress = false;
+    }
   }
 }
 
 void SQLTransaction::rollback() {
-  if (m_began)
-    m_db.executeCommand("ROLLBACK;");
+  if (m_began) {
+    ASSERT(m_db.m_transactionInProgress);
+    if (m_db.executeCommand("ROLLBACK;")) {
+      m_began = false;
+      m_db.m_transactionInProgress = false;
+    }
+  }
 }
 
 }  // namespace WebCore

@@ -35,6 +35,7 @@ typedef struct sqlite3 sqlite3;
 namespace WebCore {
 
 class SQLStatement;
+class SQLTransaction;
 
 extern const int SQLResultError;
 extern const int SQLResultDone;
@@ -42,7 +43,7 @@ extern const int SQLResultOk;
 extern const int SQLResultRow;
 
 class SQLDatabase : public Noncopyable {
-  friend class SQLStatement;
+  friend class SQLTransaction;
 
  public:
   SQLDatabase();
@@ -59,6 +60,8 @@ class SQLDatabase : public Noncopyable {
   bool tableExists(const String&);
   void clearAllTables();
   void runVacuumCommand();
+
+  bool transactionInProgress() const { return m_transactionInProgress; }
 
   int64_t lastInsertRowID();
   int lastChanges();
@@ -81,10 +84,21 @@ class SQLDatabase : public Noncopyable {
   int lastError();
   const char* lastErrorMsg();
 
+  sqlite3* sqlite3Handle() const {
+    ASSERT(pthread_equal(m_openingThread, pthread_self()));
+    return m_db;
+  }
+
  private:
   String m_path;
   sqlite3* m_db;
   int m_lastError;
+
+  bool m_transactionInProgress;
+
+#ifndef NDEBUG
+  pthread_t m_openingThread;
+#endif
 
 };  // class SQLDatabase
 
