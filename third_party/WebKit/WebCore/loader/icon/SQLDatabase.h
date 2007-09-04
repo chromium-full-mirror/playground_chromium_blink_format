@@ -30,6 +30,10 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/Vector.h>
 
+#ifndef NDEBUG
+#include <pthread.h>
+#endif
+
 typedef struct sqlite3 sqlite3;
 
 namespace WebCore {
