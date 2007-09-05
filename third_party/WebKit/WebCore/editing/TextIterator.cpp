@@ -509,10 +509,6 @@ static bool shouldEmitExtraNewlineForNode(Node* node) {
 }
 
 bool TextIterator::shouldRepresentNodeOffsetZero() {
-  // Can't represent the position without m_lastTextNode
-  if (!m_lastTextNode)
-    return false;
-
   // Leave element positioned flush with start of a paragraph
   // (e.g. do not insert tab before a table cell at the start of a paragraph)
   if (m_lastCharacter == '\n')
@@ -524,8 +520,7 @@ bool TextIterator::shouldRepresentNodeOffsetZero() {
 
   // We've not emitted anything yet. Generally, there is no need for any
   // positioning then.
-  // The only exception is when the element is visually not in the same position
-  // as
+  // The only exception is when the element is visually not in the same line as
   // the start of the range (e.g. the range starts at the end of the previous
   // paragraph).
   // NOTE: Creating VisiblePositions and comparing them is relatively expensive,
@@ -545,7 +540,7 @@ bool TextIterator::shouldRepresentNodeOffsetZero() {
   VisiblePosition startPos =
       VisiblePosition(m_startContainer, m_startOffset, DOWNSTREAM);
   VisiblePosition currPos = VisiblePosition(m_node, 0, DOWNSTREAM);
-  return startPos != currPos;
+  return !inSameLine(startPos, currPos);
 }
 
 void TextIterator::representNodeOffsetZero() {
