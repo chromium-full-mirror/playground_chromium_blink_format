@@ -30,7 +30,6 @@
 #include <setjmp.h>
 #include <stdlib.h>
 #include <wtf/FastMalloc.h>
-#include <wtf/FastMallocInternal.h>
 #include <wtf/HashCountedSet.h>
 #include <wtf/UnusedParam.h>
 
@@ -411,10 +410,8 @@ void Collector::registerThread() {
   pthread_once(&registeredThreadKeyOnce, initializeRegisteredThreadKey);
 
   if (!pthread_getspecific(registeredThreadKey)) {
-    if (!onMainThread())
-      WTF::fastMallocSetIsMultiThreaded();
 #if PLATFORM(DARWIN)
-    else
+    if (onMainThread())
       CollectorHeapIntrospector::init(&heap);
 #endif
 
