@@ -83,7 +83,7 @@ GIFImageDecoder::~GIFImageDecoder() {
 }
 
 // Take the data and store it.
-void GIFImageDecoder::setData(const Vector<char>& data, bool allDataReceived) {
+void GIFImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
   if (m_failed)
     return;
 
@@ -130,7 +130,7 @@ int GIFImageDecoder::frameCount() {
     // worse than what
     // ImageIO does on Mac right now (it also crawls all the data again).
     GIFImageDecoderPrivate reader;
-    reader.decode(m_data, GIFFrameCountQuery);
+    reader.decode(m_data->buffer(), GIFFrameCountQuery);
     m_frameCountValid = true;
     m_frameBufferCache.resize(reader.frameCount());
   }
@@ -164,7 +164,7 @@ void GIFImageDecoder::decode(GIFQuery query, unsigned haltAtFrame) const {
   if (m_failed)
     return;
 
-  m_failed = !m_reader->decode(m_data, query, haltAtFrame);
+  m_failed = !m_reader->decode(m_data->buffer(), query, haltAtFrame);
 
   if (m_failed) {
     delete m_reader;
@@ -179,7 +179,7 @@ void GIFImageDecoder::sizeNowAvailable(unsigned width, unsigned height) {
 }
 
 void GIFImageDecoder::decodingHalted(unsigned bytesLeft) {
-  m_reader->setReadOffset(m_data.size() - bytesLeft);
+  m_reader->setReadOffset(m_data->size() - bytesLeft);
 }
 
 void GIFImageDecoder::initFrameBuffer(RGBA32Buffer& buffer,
@@ -250,7 +250,6 @@ void GIFImageDecoder::initFrameBuffer(RGBA32Buffer& buffer,
         bool sawAlpha = buffer.hasAlpha();
         IntRect prevRect = previousBuffer->rect();
         unsigned end = prevRect.y() + prevRect.height();
-        unsigned* src;
 
         // Given that we allocate buffers to be the same size as previous
         // buffers,

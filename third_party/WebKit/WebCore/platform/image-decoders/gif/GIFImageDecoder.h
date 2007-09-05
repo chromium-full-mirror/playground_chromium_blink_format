@@ -39,7 +39,7 @@ class GIFImageDecoder : public ImageDecoder {
   ~GIFImageDecoder();
 
   // Take the data and store it.
-  virtual void setData(const Vector<char>& data, bool allDataReceived);
+  virtual void setData(SharedBuffer* data, bool allDataReceived);
 
   // Whether or not the size information has been decoded yet.
   virtual bool isSizeAvailable() const;
