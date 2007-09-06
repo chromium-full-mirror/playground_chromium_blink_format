@@ -100,6 +100,7 @@ class PluginStreamWin : public Shared<PluginStreamWin>,
   NPP m_instance;
   uint16 m_transferMode;
   int32 m_offset;
+  CString m_headers;
   CString m_path;
   NPReason m_reason;
   NPStream m_stream;
