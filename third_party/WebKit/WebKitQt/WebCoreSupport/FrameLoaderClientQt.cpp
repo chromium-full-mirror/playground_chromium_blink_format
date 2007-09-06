@@ -658,9 +658,9 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
     const WebCore::NavigationAction&,
     const WebCore::ResourceRequest&,
     const WebCore::String&) {
-  notImplemented();
   Q_ASSERT(!m_policyFunction);
-  callPolicyFunction(function, PolicyIgnore);
+  m_policyFunction = function;
+  slotCallPolicyFunction(PolicyUse);
 }
 
 void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
