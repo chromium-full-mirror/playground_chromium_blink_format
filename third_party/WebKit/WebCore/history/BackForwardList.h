@@ -70,7 +70,6 @@ class BackForwardList : public Shared<BackForwardList> {
   void close();
   bool closed();
 
-  void clearPageCache();
   void removeItem(HistoryItem*);
   HistoryItemVector& entries();
 
