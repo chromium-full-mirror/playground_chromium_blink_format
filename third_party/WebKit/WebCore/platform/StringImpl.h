@@ -156,6 +156,8 @@ class StringImpl : public Shared<StringImpl> {
 
   Vector<char> ascii() const;
 
+  WTF::Unicode::Direction defaultWritingDirection() const;
+
 #if PLATFORM(CF)
   StringImpl(CFStringRef);
   CFStringRef createCFString() const;
