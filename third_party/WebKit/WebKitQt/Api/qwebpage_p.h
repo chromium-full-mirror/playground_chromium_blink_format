@@ -59,6 +59,9 @@ class QWebPagePrivate {
   bool modified;
 
   bool insideOpenCall;
+  quint64 m_totalBytes;
+  quint64 m_bytesReceived;
+
   QWebPage::NavigationRequestResponse navigationRequested(
       QWebFrame* frame,
       const QWebNetworkRequest& request,
