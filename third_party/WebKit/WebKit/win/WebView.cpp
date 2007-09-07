@@ -796,11 +796,17 @@ bool WebView::onUninitMenuPopup(WPARAM wParam, LPARAM /*lParam*/) {
   return true;
 }
 
-void WebView::performContextMenuAction(WPARAM wParam, LPARAM /*lParam*/) {
+void WebView::performContextMenuAction(WPARAM wParam,
+                                       LPARAM lParam,
+                                       bool byPosition) {
   ContextMenu* menu = m_page->contextMenuController()->contextMenu();
   ASSERT(menu);
 
-  ContextMenuItem* item = menu->itemWithAction((ContextMenuAction)wParam);
+  ContextMenuItem* item =
+      byPosition ? menu->itemAtIndex((unsigned)wParam, (HMENU)lParam)
+                 : menu->itemWithAction((ContextMenuAction)wParam);
+  if (!item)
+    return;
   m_page->contextMenuController()->contextMenuItemSelected(item);
   delete item;
 }
@@ -1387,7 +1393,10 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       if (HIWORD(wParam))
         handled = webView->execCommand(wParam, lParam);
       else  // If the high word of wParam is 0, the message is from a menu
-        webView->performContextMenuAction(wParam, lParam);
+        webView->performContextMenuAction(wParam, lParam, false);
+      break;
+    case WM_MENUCOMMAND:
+      webView->performContextMenuAction(wParam, lParam, true);
       break;
     case WM_CONTEXTMENU:
       handled = webView->handleContextMenuEvent(wParam, lParam);

@@ -57,6 +57,7 @@ class ContextMenu : Noncopyable {
   void appendItem(ContextMenuItem&);
 
   ContextMenuItem* itemWithAction(unsigned);
+  ContextMenuItem* itemAtIndex(unsigned, const PlatformMenuDescription);
 
   unsigned itemCount() const;
 
