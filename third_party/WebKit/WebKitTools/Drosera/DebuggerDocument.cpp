@@ -199,7 +199,7 @@ JSValueRef DebuggerDocument::breakpointEditorHTML(JSContextRef context) {
       AdoptCF, CFStringCreateWithBytes(0, charBuffer.data(), charBuffer.size(),
                                        kCFStringEncodingUTF8, true));
   JSRetainPtr<JSStringRef> fileContentsJS(
-      KJS::Adopt, JSStringCreateWithCFString(fileContents.get()));
+      Adopt, JSStringCreateWithCFString(fileContents.get()));
   JSValueRef ret = JSValueMakeString(context, fileContentsJS.get());
 
   return ret;
@@ -240,7 +240,7 @@ JSValueRef DebuggerDocument::evaluateScript(JSContextRef context,
   ASSERT(!*exception);
 
   JSRetainPtr<JSStringRef> script(
-      KJS::Adopt, JSValueToStringCopy(context, arguments[0], exception));
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
   ASSERT(!*exception);
 
   JSValueRef ret =
@@ -289,7 +289,7 @@ JSValueRef DebuggerDocument::valueForScopeVariableNamed(
     return JSValueMakeUndefined(context);
 
   JSRetainPtr<JSStringRef> key(
-      KJS::Adopt, JSValueToStringCopy(context, arguments[0], exception));
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
   ASSERT(!*exception);
 
   if (!JSValueIsNumber(context, arguments[1]))
@@ -312,7 +312,7 @@ JSValueRef DebuggerDocument::log(JSContextRef context,
     return JSValueMakeUndefined(context);
 
   JSRetainPtr<JSStringRef> msg(
-      KJS::Adopt, JSValueToStringCopy(context, arguments[0], exception));
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
   ASSERT(!*exception);
 
   DebuggerDocument::platformLog(context, msg.get());
@@ -448,7 +448,7 @@ void DebuggerDocument::windowScriptObjectAvailable(JSContextRef context,
                                                    JSObjectRef windowObject,
                                                    JSValueRef* exception) {
   JSRetainPtr<JSStringRef> droseraStr(
-      KJS::Adopt, JSStringCreateWithUTF8CString("DebuggerDocument"));
+      Adopt, JSStringCreateWithUTF8CString("DebuggerDocument"));
   JSValueRef droseraObject = JSObjectMake(context, getDroseraJSClass(), this);
 
   JSObjectSetProperty(
@@ -461,7 +461,7 @@ JSValueRef DebuggerDocument::toJSArray(JSContextRef context,
                                        JSValueRef* exception) {
   JSObjectRef globalObject = JSContextGetGlobalObject(context);
   JSRetainPtr<JSStringRef> constructorString(
-      KJS::Adopt, JSStringCreateWithUTF8CString("Array"));
+      Adopt, JSStringCreateWithUTF8CString("Array"));
   JSValueRef constructorProperty = JSObjectGetProperty(
       context, globalObject, constructorString.get(), exception);
   ASSERT(!*exception);
@@ -474,7 +474,7 @@ JSValueRef DebuggerDocument::toJSArray(JSContextRef context,
       JSObjectCallAsConstructor(context, arrayConstructor, 0, 0, exception);
   ASSERT(!*exception);
 
-  JSRetainPtr<JSStringRef> pushString(KJS::Adopt,
+  JSRetainPtr<JSStringRef> pushString(Adopt,
                                       JSStringCreateWithUTF8CString("push"));
   JSValueRef pushValue =
       JSObjectGetProperty(context, array, pushString.get(), exception);
@@ -509,7 +509,7 @@ JSValueRef DebuggerDocument::callFunctionOnObject(JSContextRef context,
                                                   int argumentCount,
                                                   JSValueRef arguments[],
                                                   JSValueRef* exception) {
-  JSRetainPtr<JSStringRef> string(KJS::Adopt,
+  JSRetainPtr<JSStringRef> string(Adopt,
                                   JSStringCreateWithUTF8CString(functionName));
   JSValueRef objectProperty =
       JSObjectGetProperty(context, object, string.get(), exception);
@@ -570,7 +570,7 @@ void DebuggerDocument::logException(JSContextRef context,
   if (!exception)
     return;
 
-  JSRetainPtr<JSStringRef> msg(KJS::Adopt,
+  JSRetainPtr<JSStringRef> msg(Adopt,
                                JSValueToStringCopy(context, exception, 0));
   DebuggerDocument::platformLog(context, msg.get());
 }

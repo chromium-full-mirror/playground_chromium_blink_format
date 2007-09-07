@@ -32,8 +32,6 @@
 #include <JavaScriptCore/JSStringRef.h>
 #include <algorithm>
 
-namespace KJS {
-
 inline void JSRetain(JSStringRef string) {
   JSStringRetain(string);
 }
@@ -198,8 +196,4 @@ inline bool operator!=(T* a, const JSRetainPtr<U>& b) {
   return a != b.get();
 }
 
-}  // namespace KJS
-
-using KJS::JSRetainPtr;
-
-#endif  // KJS_JSRetainPtr_h
+#endif  // JSRetainPtr_h
