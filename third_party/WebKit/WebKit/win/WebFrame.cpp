@@ -2350,12 +2350,9 @@ Widget* WebFrame::createJavaAppletWidget(const IntSize&,
 ObjectContentType WebFrame::objectContentType(const KURL& url,
                                               const String& mimeTypeIn) {
   String mimeType = mimeTypeIn;
-  if (mimeType.isEmpty()) {
+  if (mimeType.isEmpty())
     mimeType = MIMETypeRegistry::getMIMETypeForExtension(
         url.path().mid(url.path().findRev('.') + 1));
-    if (mimeType.isEmpty())
-      return WebCore::ObjectContentNone;
-  }
 
   if (mimeType.isEmpty())
     return ObjectContentFrame;  // Go ahead and hope that we can display the
@@ -2370,7 +2367,7 @@ ObjectContentType WebFrame::objectContentType(const KURL& url,
   if (MIMETypeRegistry::isSupportedNonImageMIMEType(mimeType))
     return WebCore::ObjectContentFrame;
 
-  return (ObjectContentType)0;
+  return WebCore::ObjectContentNone;
 }
 
 String WebFrame::overrideMediaType() const {
