@@ -45,9 +45,15 @@ class HTMLFrameOwnerElement : public HTMLElement {
     return m_contentFrame;
   }
 
+  bool createdByParser() const { return m_createdByParser; }
+  void setCreatedByParser(bool createdByParser) {
+    m_createdByParser = createdByParser;
+  }
+
  private:
   friend class Frame;
   Frame* m_contentFrame;
+  bool m_createdByParser;
 };
 
 }  // namespace WebCore

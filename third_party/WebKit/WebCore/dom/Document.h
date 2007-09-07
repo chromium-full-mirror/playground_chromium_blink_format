@@ -967,6 +967,8 @@ class Document : public ContainerNode {
   void initSecurityPolicyURL();
   const KURL& securityPolicyURL() const { return m_securityPolicyURL; }
 
+  bool processingLoadEvent() const { return m_processingLoadEvent; }
+
  protected:
   void clearXMLVersion() { m_xmlVersion = String(); }
 
