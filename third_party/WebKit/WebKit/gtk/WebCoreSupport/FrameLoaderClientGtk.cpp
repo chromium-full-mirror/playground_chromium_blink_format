@@ -279,6 +279,10 @@ void FrameLoaderClient::windowObjectCleared() const {
 
 void FrameLoaderClient::didPerformFirstNavigation() const {}
 
+void FrameLoaderClient::registerForIconNotification(bool) const {
+  notImplemented();
+}
+
 void FrameLoaderClient::setMainFrameDocumentReady(bool) {
   // this is only interesting once we provide an external API for the DOM
 }
