@@ -278,7 +278,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void windowObjectCleared() const;
   virtual void didPerformFirstNavigation() const;
 
-  virtual void registerForIconNotification(bool) const;
+  virtual void registerForIconNotification(bool);
 
   QString chooseFile(const QString& oldFile);
 
