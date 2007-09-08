@@ -279,7 +279,7 @@ void FrameLoaderClient::windowObjectCleared() const {
 
 void FrameLoaderClient::didPerformFirstNavigation() const {}
 
-void FrameLoaderClient::registerForIconNotification(bool) const {
+void FrameLoaderClient::registerForIconNotification(bool) {
   notImplemented();
 }
 

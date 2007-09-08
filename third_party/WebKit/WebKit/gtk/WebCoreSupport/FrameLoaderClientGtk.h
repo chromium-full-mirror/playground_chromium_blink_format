@@ -175,7 +175,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void windowObjectCleared() const;
   virtual void didPerformFirstNavigation() const;
 
-  virtual void registerForIconNotification(bool) const;
+  virtual void registerForIconNotification(bool);
 
   virtual WebCore::ObjectContentType objectContentType(
       const WebCore::KURL& url,
