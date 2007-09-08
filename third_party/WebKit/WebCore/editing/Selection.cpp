@@ -232,7 +232,7 @@ void Selection::validate() {
       // from the the end of the
       // last word to the line break (also RightWordIfOnBoundary);
       VisiblePosition start = VisiblePosition(m_start, m_affinity);
-      VisiblePosition originalEnd(m_end, m_affinity);
+      VisiblePosition end = VisiblePosition(m_end, m_affinity);
       EWordSide side = RightWordIfOnBoundary;
       if (isEndOfDocument(start) ||
           (isEndOfLine(start) && !isStartOfLine(start) &&
@@ -240,35 +240,10 @@ void Selection::validate() {
         side = LeftWordIfOnBoundary;
       m_start = startOfWord(start, side).deepEquivalent();
       side = RightWordIfOnBoundary;
-      if (isEndOfDocument(originalEnd) ||
-          (isEndOfLine(originalEnd) && !isStartOfLine(originalEnd) &&
-           !isEndOfParagraph(originalEnd)))
+      if (isEndOfDocument(end) ||
+          (isEndOfLine(end) && !isStartOfLine(end) && !isEndOfParagraph(end)))
         side = LeftWordIfOnBoundary;
-
-      VisiblePosition wordEnd(endOfWord(originalEnd, side));
-      VisiblePosition end(wordEnd);
-
-      if (isEndOfParagraph(originalEnd)) {
-        // Select the paragraph break (the space from the end of a paragraph to
-        // the start of
-        // the next one) to match TextEdit.
-        end = wordEnd.next(true);
-
-        if (Node* table = isFirstPositionAfterTable(end)) {
-          // The paragraph break after the last paragraph in the last cell of a
-          // block table ends
-          // at the start of the paragraph after the table.
-          if (isBlock(table))
-            end = end.next(true);
-          else
-            end = wordEnd;
-        }
-
-        if (end.isNull())
-          end = wordEnd;
-      }
-
-      m_end = end.deepEquivalent();
+      m_end = endOfWord(end, side).deepEquivalent();
       break;
     }
     case SentenceGranularity: {
@@ -315,29 +290,6 @@ void Selection::validate() {
                 m_end.node()))
           m_end = visibleParagraphEnd.deepEquivalent();
       }
-
-      // Include the "paragraph break" (the space from the end of this paragraph
-      // to the start
-      // of the next one) in the selection.
-      VisiblePosition end(visibleParagraphEnd.next(true));
-
-      if (Node* table = isFirstPositionAfterTable(end)) {
-        // The paragraph break after the last paragraph in the last cell of a
-        // block table ends
-        // at the start of the paragraph after the table, not at the position
-        // just after the table.
-        if (isBlock(table))
-          end = end.next(true);
-        // There is no parargraph break after the last paragraph in the last
-        // cell of an inline table.
-        else
-          end = visibleParagraphEnd;
-      }
-
-      if (end.isNull())
-        end = visibleParagraphEnd;
-
-      m_end = end.deepEquivalent();
       break;
     }
     case DocumentBoundary:
