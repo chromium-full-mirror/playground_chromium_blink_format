@@ -277,6 +277,8 @@ void FrameLoaderClient::windowObjectCleared() const {
   g_signal_emit_by_name(m_frame, "cleared");
 }
 
+void FrameLoaderClient::didPerformFirstNavigation() const {}
+
 void FrameLoaderClient::setMainFrameDocumentReady(bool) {
   // this is only interesting once we provide an external API for the DOM
 }

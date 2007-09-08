@@ -173,6 +173,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
       const WTF::Vector<WebCore::String>& paramValues);
   virtual WebCore::String overrideMediaType() const;
   virtual void windowObjectCleared() const;
+  virtual void didPerformFirstNavigation() const;
 
   virtual WebCore::ObjectContentType objectContentType(
       const WebCore::KURL& url,

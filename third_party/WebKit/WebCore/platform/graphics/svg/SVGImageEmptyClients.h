@@ -378,6 +378,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
   virtual void redirectDataToPlugin(WebCore::Widget*) {}
   virtual void windowObjectCleared() const {}
+  virtual void didPerformFirstNavigation() const {}
 
 #if PLATFORM(MAC)
   virtual NSCachedURLResponse* willCacheResponse(
