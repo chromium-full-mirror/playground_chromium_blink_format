@@ -40,4 +40,10 @@ class Image;
 }
 @end
 
+@interface WebIconDatabase (WebInternal)
+- (void)_sendNotificationForURL:(NSString*)URL;
+- (void)_sendDidRemoveAllIconsNotification;
+@end
+
+extern bool importToWebCoreFormat();
 NSImage* webGetNSImage(WebCore::Image*, NSSize);

@@ -380,6 +380,8 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void windowObjectCleared() const {}
   virtual void didPerformFirstNavigation() const {}
 
+  virtual void registerForIconNotification(bool listen) {}
+
 #if PLATFORM(MAC)
   virtual NSCachedURLResponse* willCacheResponse(
       DocumentLoader*,

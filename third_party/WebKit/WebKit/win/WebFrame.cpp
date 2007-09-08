@@ -2396,7 +2396,9 @@ void WebFrame::windowObjectCleared() const {
   }
 }
 
-void FrameLoaderClient::didPerformFirstNavigation() const {}
+void WebFrame::didPerformFirstNavigation() const {}
+
+void WebFrame::registerForIconNotification(bool /*listen*/) {}
 
 static IntRect printerRect(HDC printDC) {
   return IntRect(0, 0, GetDeviceCaps(printDC, PHYSICALWIDTH) -

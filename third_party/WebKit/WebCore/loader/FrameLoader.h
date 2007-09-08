@@ -545,6 +545,8 @@ class FrameLoader : Noncopyable
     return !m_creatingInitialEmptyDocument && !m_committedFirstRealDocumentLoad;
   }
 
+  void iconLoadDecisionAvailable();
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
@@ -760,6 +762,7 @@ class FrameLoader : Noncopyable
   KURL m_workingURL;
 
   OwnPtr<IconLoader> m_iconLoader;
+  bool m_mayLoadIconLater;
 
   bool m_cancellingWithLoadInProgress;
 

@@ -29,6 +29,7 @@
 #ifndef DocumentLoader_h
 #define DocumentLoader_h
 
+#include "IconDatabase.h"
 #include "NavigationAction.h"
 #include "Shared.h"
 #include "PlatformString.h"
@@ -137,6 +138,8 @@ class DocumentLoader : public Shared<DocumentLoader> {
 
   bool startLoadingMainResource(unsigned long identifier);
   void cancelMainResourceLoad(const ResourceError&);
+
+  void iconLoadDecisionAvailable();
 
   bool isLoadingMainResource() const;
   bool isLoadingSubresources() const;

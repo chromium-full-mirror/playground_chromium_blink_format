@@ -656,4 +656,9 @@ void DocumentLoader::subresourceLoaderFinishedLoadingOnePart(
   if (Frame* frame = m_frame)
     frame->loader()->checkLoadComplete();
 }
+
+void DocumentLoader::iconLoadDecisionAvailable() {
+  if (m_frame)
+    m_frame->loader()->iconLoadDecisionAvailable();
+}
 }

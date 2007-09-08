@@ -71,6 +71,7 @@
 #include "SSLKeyGenerator.h"
 #include "SubresourceLoader.h"
 #include "SystemTime.h"
+#include "Threading.h"
 #include "loader.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -160,4 +161,8 @@ String WebCore::signedPublicKeyAndChallengeString(unsigned,
                                                   const KURL&) {
   notImplemented();
   return String();
+}
+
+void WebCore::callOnMainThread(void (*)()) {
+  notImplemented();
 }

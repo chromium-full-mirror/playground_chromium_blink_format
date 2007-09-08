@@ -274,6 +274,8 @@ class FrameLoaderClient {
                                                        // in the back/forward
                                                        // list.
 
+  virtual void registerForIconNotification(bool listen = true) = 0;
+
 #if PLATFORM(MAC)
   virtual NSCachedURLResponse* willCacheResponse(
       DocumentLoader*,
