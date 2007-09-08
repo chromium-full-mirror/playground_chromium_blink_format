@@ -966,8 +966,10 @@ void* IconDatabase::iconDatabaseSyncThread() {
   // automatically qualifies
   // us to do an integrity check
   String journalFilename = m_completeDatabasePath + "-journal";
-  if (!checkIntegrityOnOpen)
+  if (!checkIntegrityOnOpen) {
+    AutodrainedPool pool;
     checkIntegrityOnOpen = fileExists(journalFilename);
+  }
 
   {
     MutexLocker locker(m_syncLock);
