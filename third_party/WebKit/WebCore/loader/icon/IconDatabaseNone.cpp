@@ -124,18 +124,8 @@ bool IconDatabase::isEnabled() const {
   return false;
 }
 
-bool IconDatabase::imported() {
-  return false;
-}
-
-void IconDatabase::setImported(bool import) {}
-
 IconDatabase::~IconDatabase() {
   ASSERT_NOT_REACHED();
-}
-
-bool IconDatabase::checkIntegrity() {
-  return true;
 }
 
 void IconDatabase::checkIntegrityBeforeOpening() {}
