@@ -530,4 +530,7 @@ bool deleteFile(const String& path) {
   notImplemented();
   return false;
 }
+void callOnMainThread(void (*)()) {
+  notImplemented();
+}
 }
