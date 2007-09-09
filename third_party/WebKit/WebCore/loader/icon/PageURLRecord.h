@@ -56,7 +56,7 @@ class PageURLRecord : Noncopyable {
   inline String url() const { return m_pageURL; }
 
   void setIconRecord(PassRefPtr<IconRecord>);
-  IconRecord* PageURLRecord::iconRecord() { return m_iconRecord.get(); }
+  IconRecord* iconRecord() { return m_iconRecord.get(); }
 
   PageURLSnapshot snapshot(bool forDeletion = false) const;
 
