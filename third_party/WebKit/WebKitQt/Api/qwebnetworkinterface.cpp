@@ -79,7 +79,7 @@ void QWebNetworkRequestPrivate::init(
     const QUrl& url,
     const WebCore::ResourceRequest* resourceRequest) {
   httpHeader = QHttpRequestHeader(
-      method, url.toEncoded(QUrl::RemoveScheme | QUrl::RemoveAuthority));
+      method, url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority));
   httpHeader.setValue(QLatin1String("User-Agent"),
                       QLatin1String("Mozilla/5.0 (PC; U; Intel; Linux; en) "
                                     "AppleWebKit/420+ (KHTML, like Gecko)"));
@@ -459,7 +459,7 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
 
       job->d->request.httpHeader.setRequest(
           job->d->request.httpHeader.method(),
-          newUrl.toEncoded(QUrl::RemoveScheme | QUrl::RemoveAuthority));
+          newUrl.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority));
       job->d->request.setURL(newUrl);
       job->d->redirected = true;
       return;
