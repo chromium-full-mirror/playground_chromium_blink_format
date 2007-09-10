@@ -786,7 +786,7 @@ IconDatabase::IconDatabase()
       m_client(defaultClient()),
       m_imported(false),
       m_isImportedSet(false) {
-#if PLATFORM(MAC)
+#if PLATFORM(DARWIN)
   ASSERT(pthread_main_np());
 #endif
 }
