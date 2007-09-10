@@ -759,7 +759,7 @@ enum EUserDrag { DRAG_AUTO, DRAG_NONE, DRAG_ELEMENT };
 
 // CSS3 User Select Values
 
-enum EUserSelect { SELECT_NONE, SELECT_TEXT, SELECT_IGNORE };
+enum EUserSelect { SELECT_AUTO, SELECT_NONE, SELECT_TEXT, SELECT_IGNORE };
 
 // Word Break Values. Matches WinIE, rather than CSS3
 
@@ -928,9 +928,10 @@ class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
   ContentData* m_content;
   CounterDirectiveMap* m_counterDirectives;
 
-  unsigned userDrag : 2;  // EUserDrag
-  bool textOverflow : 1;  // Whether or not lines that spill out should be
-                          // truncated with "..."
+  unsigned userDrag : 2;    // EUserDrag
+  unsigned userSelect : 2;  // EUserSelect
+  bool textOverflow : 1;    // Whether or not lines that spill out should be
+                            // truncated with "..."
   unsigned marginTopCollapse : 2;     // EMarginCollapse
   unsigned marginBottomCollapse : 2;  // EMarginCollapse
   unsigned
@@ -980,7 +981,6 @@ class StyleRareInheritedData : public Shared<StyleRareInheritedData> {
   unsigned khtmlLineBreak : 1;  // EKHTMLLineBreak
   bool textSizeAdjust : 1;      // An Apple extension.
   unsigned resize : 2;          // EResize
-  unsigned userSelect : 2;      // EUserSelect
 };
 
 //------------------------------------------------
@@ -1757,7 +1757,7 @@ class RenderStyle {
     return static_cast<EUserDrag>(rareNonInheritedData->userDrag);
   }
   EUserSelect userSelect() const {
-    return static_cast<EUserSelect>(rareInheritedData->userSelect);
+    return static_cast<EUserSelect>(rareNonInheritedData->userSelect);
   }
   bool textOverflow() const { return rareNonInheritedData->textOverflow; }
   EMarginCollapse marginTopCollapse() const {
@@ -2195,7 +2195,7 @@ class RenderStyle {
   }
   void setUserDrag(EUserDrag d) { SET_VAR(rareNonInheritedData, userDrag, d); }
   void setUserSelect(EUserSelect s) {
-    SET_VAR(rareInheritedData, userSelect, s);
+    SET_VAR(rareNonInheritedData, userSelect, s);
   }
   void setTextOverflow(bool b) {
     SET_VAR(rareNonInheritedData, textOverflow, b);
@@ -2407,7 +2407,7 @@ class RenderStyle {
   static EMarqueeDirection initialMarqueeDirection() { return MAUTO; }
   static EUserModify initialUserModify() { return READ_ONLY; }
   static EUserDrag initialUserDrag() { return DRAG_AUTO; }
-  static EUserSelect initialUserSelect() { return SELECT_TEXT; }
+  static EUserSelect initialUserSelect() { return SELECT_AUTO; }
   static bool initialTextOverflow() { return false; }
   static EMarginCollapse initialMarginTopCollapse() { return MCOLLAPSE; }
   static EMarginCollapse initialMarginBottomCollapse() { return MCOLLAPSE; }

@@ -152,7 +152,8 @@ void EventHandler::selectClosestWordFromMouseEvent(
   Node* innerNode = result.targetNode();
   Selection newSelection;
 
-  if (innerNode && innerNode->renderer() && m_mouseDownMayStartSelect) {
+  if (innerNode && innerNode->renderer() && m_mouseDownMayStartSelect &&
+      innerNode->renderer()->shouldSelect()) {
     VisiblePosition pos(
         innerNode->renderer()->positionForPoint(result.localPoint()));
     if (pos.isNotNull()) {
@@ -194,7 +195,8 @@ bool EventHandler::handleMousePressEventTripleClick(
     return false;
 
   Node* innerNode = event.targetNode();
-  if (!(innerNode && innerNode->renderer() && m_mouseDownMayStartSelect))
+  if (!(innerNode && innerNode->renderer() && m_mouseDownMayStartSelect &&
+        innerNode->renderer()->shouldSelect()))
     return false;
 
   Selection newSelection;
@@ -221,7 +223,8 @@ bool EventHandler::handleMousePressEventSingleClick(
     return false;
 
   Node* innerNode = event.targetNode();
-  if (!(innerNode && innerNode->renderer() && m_mouseDownMayStartSelect))
+  if (!(innerNode && innerNode->renderer() && m_mouseDownMayStartSelect &&
+        innerNode->renderer()->shouldSelect()))
     return false;
 
   // Extend the selection if the Shift key is down, unless the click is in a
@@ -423,7 +426,7 @@ void EventHandler::updateSelectionForMouseDrag(Node* targetNode,
   if (!targetRenderer)
     return;
 
-  if (!canMouseDragExtendSelect(targetNode))
+  if (!targetRenderer->shouldSelect())
     return;
 
   VisiblePosition targetPosition(targetRenderer->positionForPoint(localPoint));
@@ -747,8 +750,8 @@ Cursor EventHandler::selectCursor(const MouseEventWithHitTestResults& event,
           layer->isPointInResizeControl(
               m_frame->view()->windowToContents(event.event().pos())))
         inResizer = true;
-      if ((editable || (renderer && renderer->isText() &&
-                        renderer->style()->userSelect() != SELECT_IGNORE)) &&
+      if ((editable ||
+           (renderer && renderer->isText() && renderer->canSelect())) &&
           !inResizer && !scrollbar)
         return iBeamCursor();
       return pointerCursor();
@@ -1471,32 +1474,18 @@ void EventHandler::scheduleHoverStateUpdate() {
     m_hoverTimer.startOneShot(0);
 }
 
-// Whether or not a mouse down can begin the creation of a selection.  Fires the
-// selectStart event.
 bool EventHandler::canMouseDownStartSelect(Node* node) {
   if (!node || !node->renderer())
     return true;
 
-  // Some controls and images can't start a select on a mouse down.
-  if (node->renderer()->style()->userSelect() == SELECT_IGNORE)
+  // Check to see if -webkit-user-select has been set to none
+  if (!node->renderer()->canSelect())
     return false;
 
+  // Some controls and images can't start a select on a mouse down.
   for (RenderObject* curr = node->renderer(); curr; curr = curr->parent())
-    if (Node* node = curr->element())
-      return EventTargetNodeCast(node)->dispatchHTMLEvent(selectstartEvent,
-                                                          true, true);
-
-  return true;
-}
-
-bool EventHandler::canMouseDragExtendSelect(Node* node) {
-  if (!node || !node->renderer())
-    return true;
-
-  for (RenderObject* curr = node->renderer(); curr; curr = curr->parent())
-    if (Node* node = curr->element())
-      return EventTargetNodeCast(node)->dispatchHTMLEvent(selectstartEvent,
-                                                          true, true);
+    if (curr->style()->userSelect() == SELECT_IGNORE)
+      return false;
 
   return true;
 }

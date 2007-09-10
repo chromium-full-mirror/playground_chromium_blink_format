@@ -1205,7 +1205,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
                             e->document()->frame()->isContentEditable()) ||
                            style->userModify() == READ_WRITE ||
                            style->userModify() == READ_WRITE_PLAINTEXT_ONLY))
-    style->setUserSelect(SELECT_TEXT);
+    style->setUserSelect(SELECT_AUTO);
 
   // Cull out any useless layers and also repeat patterns into additional
   // layers.
@@ -4504,7 +4504,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         return;
       switch (primitiveValue->getIdent()) {
         case CSS_VAL_AUTO:
-          style->setUserSelect(SELECT_TEXT);
+          style->setUserSelect(SELECT_AUTO);
           break;
         case CSS_VAL_NONE:
           style->setUserSelect(SELECT_NONE);
