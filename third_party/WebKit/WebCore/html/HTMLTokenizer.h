@@ -120,6 +120,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
     return src.excludeLineNumbers();
   }
 
+  virtual void executeScriptsWaitingForStylesheets();
+
  private:
   class State;
 
@@ -361,6 +363,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   RefPtr<Node> scriptNode;
 
   bool m_requestingScript;
+  bool m_hasScriptsWaitingForStylesheets;
 
   // if we found one broken comment, there are most likely others as well
   // store a flag to get rid of the O(n^2) behaviour in such a case.

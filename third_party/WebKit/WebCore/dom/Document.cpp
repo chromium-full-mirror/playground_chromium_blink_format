@@ -1970,6 +1970,9 @@ void Document::removePendingSheet() {
 
   updateStyleSelector();
 
+  if (!m_pendingStylesheets && m_tokenizer)
+    m_tokenizer->executeScriptsWaitingForStylesheets();
+
   if (!m_pendingStylesheets && m_gotoAnchorNeededAfterStylesheetsLoad &&
       m_frame)
     m_frame->loader()->gotoAnchor();

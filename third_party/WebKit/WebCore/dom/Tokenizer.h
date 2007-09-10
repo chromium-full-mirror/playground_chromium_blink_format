@@ -58,6 +58,8 @@ class Tokenizer {
   virtual int lineNumber() const { return -1; }
   virtual int columnNumber() const { return -1; }
 
+  virtual void executeScriptsWaitingForStylesheets() {}
+
  protected:
   // The tokenizer has buffers, so parsing may continue even after
   // it stops receiving data. We use m_parserStopped to stop the tokenizer
