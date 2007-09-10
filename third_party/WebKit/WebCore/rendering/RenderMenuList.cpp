@@ -215,10 +215,9 @@ IntRect RenderMenuList::controlClipRect(int tx, int ty) const {
                    ty + borderTop() + paddingTop(), contentWidth(),
                    contentHeight());
 
-  IntRect innerBox(
-      tx + borderLeft() + paddingLeft() + m_innerBlock->paddingLeft(),
-      ty + borderTop() + paddingTop() + m_innerBlock->paddingTop(),
-      m_innerBlock->contentWidth(), m_innerBlock->contentHeight());
+  IntRect innerBox(tx + m_innerBlock->xPos() + m_innerBlock->paddingLeft(),
+                   ty + m_innerBlock->yPos() + m_innerBlock->paddingTop(),
+                   m_innerBlock->contentWidth(), m_innerBlock->contentHeight());
 
   return intersection(outerBox, innerBox);
 }
