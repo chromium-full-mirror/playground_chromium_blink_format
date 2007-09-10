@@ -35,14 +35,13 @@
 #pragma warning(pop)
 
 #include <JavaScriptCore/Vector.h>
+#include <wtf/OwnPtr.h>
 
 // Forward Declarations
 #if PLATFORM(MAC)
-@class DebuggerClientMac;
-typedef DebuggerClientMac* DebuggerClient;
+@class DebuggerClient;
 #else if PLATFORM(WIN)
-class DebuggerClientWin;
-typedef DebuggerClientWin* DebuggerClient;
+class DebuggerClient;
 #endif
 
 typedef struct OpaqueJSString* JSStringRef;
@@ -50,8 +49,7 @@ typedef struct OpaqueJSValue* JSObjectRef;
 
 class DebuggerDocument {
  public:
-  DebuggerDocument(DebuggerClient debugger)
-      : m_paused(false), m_debuggerClient(debugger) {}
+  DebuggerDocument(DebuggerClient*);
 
   // These are all calls out of the JS
   static JSValueRef breakpointEditorHTMLCallback(
@@ -222,7 +220,7 @@ class DebuggerDocument {
 
   static void logException(JSContextRef, JSValueRef exception);
 
-  DebuggerClient m_debuggerClient;
+  OwnPtr<DebuggerClient> m_debuggerClient;
   bool m_paused;
 };
 
