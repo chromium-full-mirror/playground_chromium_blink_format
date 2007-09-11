@@ -830,6 +830,9 @@ void SelectionController::removeAllRanges() {
 
 // Adds r to the currently selected range.
 void SelectionController::addRange(const Range* r) {
+  if (!r)
+    return;
+
   if (isNone()) {
     setSelection(Selection(r));
     return;
@@ -1229,6 +1232,11 @@ void SelectionController::setSelectedRange(Range* range,
                                            bool closeTyping,
                                            ExceptionCode& ec) {
   ec = 0;
+
+  if (!range) {
+    ec = INVALID_STATE_ERR;
+    return;
+  }
 
   Node* startContainer = range->startContainer(ec);
   if (ec)
