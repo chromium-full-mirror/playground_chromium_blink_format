@@ -132,7 +132,7 @@ WEBKIT_GTK_API gboolean webkit_gtk_page_can_cut(WebKitGtkPage* page);
 
 WEBKIT_GTK_API gboolean webkit_gtk_page_can_copy(WebKitGtkPage* page);
 
-WEBKIT_GTK_API gboolean webkit_gtk_page_can_copy(WebKitGtkPage* page);
+WEBKIT_GTK_API gboolean webkit_gtk_page_can_paste(WebKitGtkPage* page);
 
 WEBKIT_GTK_API void webkit_gtk_page_cut(WebKitGtkPage* page);
 
