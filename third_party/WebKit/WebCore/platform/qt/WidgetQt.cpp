@@ -213,16 +213,20 @@ void Widget::geometryChanged() const {}
 IntPoint Widget::convertToContainingWindow(const IntPoint& point) const {
   IntPoint windowPoint = point;
   for (const Widget *parentWidget = parent(), *childWidget = this; parentWidget;
-       childWidget = parentWidget, parentWidget = parentWidget->parent())
-    windowPoint = parentWidget->convertChildToSelf(childWidget, windowPoint);
+       childWidget = parentWidget, parentWidget = parentWidget->parent()) {
+    IntPoint oldPoint = windowPoint;
+    windowPoint = parentWidget->convertChildToSelf(childWidget, oldPoint);
+  }
   return windowPoint;
 }
 
 IntPoint Widget::convertFromContainingWindow(const IntPoint& point) const {
   IntPoint widgetPoint = point;
   for (const Widget *parentWidget = parent(), *childWidget = this; parentWidget;
-       childWidget = parentWidget, parentWidget = parentWidget->parent())
-    widgetPoint = parentWidget->convertSelfToChild(childWidget, widgetPoint);
+       childWidget = parentWidget, parentWidget = parentWidget->parent()) {
+    IntPoint oldPoint = widgetPoint;
+    widgetPoint = parentWidget->convertSelfToChild(childWidget, oldPoint);
+  }
   return widgetPoint;
 }
 
