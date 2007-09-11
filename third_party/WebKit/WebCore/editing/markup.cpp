@@ -652,7 +652,8 @@ DeprecatedString createMarkup(const Range* range,
   Node* commonAncestorBlock =
       commonAncestor ? enclosingBlock(commonAncestor) : 0;
   if (annotate && commonAncestorBlock) {
-    if (commonAncestorBlock->hasTagName(tbodyTag)) {
+    if (commonAncestorBlock->hasTagName(tbodyTag) ||
+        commonAncestorBlock->hasTagName(trTag)) {
       Node* table = commonAncestorBlock->parentNode();
       while (table && !table->hasTagName(tableTag))
         table = table->parentNode();
