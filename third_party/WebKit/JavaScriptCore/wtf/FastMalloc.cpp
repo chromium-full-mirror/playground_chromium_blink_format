@@ -2689,35 +2689,22 @@ kern_return_t FastMallocZone::enumerate(task_t task,
   return 0;
 }
 
-size_t FastMallocZone::size(malloc_zone_t* zone, const void* ptr) {
-  if (!ptr || !pageheap)
-    return 0;
-
-  const PageID p = reinterpret_cast<uintptr_t>(ptr) >> kPageShift;
-  Span* span = pageheap->GetDescriptorEnsureSafe(p);
-  if (!span)
-    return 0;
-
-  if (span->sizeclass == 0)
-    return span->length * kPageSize;
-
-  return ByteSizeForClass(span->sizeclass);
+size_t FastMallocZone::size(malloc_zone_t*, const void*) {
+  return 0;
 }
 
-void* FastMallocZone::zoneMalloc(malloc_zone_t* zone, size_t size) {
-  return fastMalloc(size);
+void* FastMallocZone::zoneMalloc(malloc_zone_t*, size_t) {
+  return 0;
 }
 
-void* FastMallocZone::zoneCalloc(malloc_zone_t*, size_t numItems, size_t size) {
-  return fastCalloc(numItems, size);
+void* FastMallocZone::zoneCalloc(malloc_zone_t*, size_t, size_t) {
+  return 0;
 }
 
-void FastMallocZone::zoneFree(malloc_zone_t*, void* ptr) {
-  return fastFree(ptr);
-}
+void FastMallocZone::zoneFree(malloc_zone_t*, void*) {}
 
-void* FastMallocZone::zoneRealloc(malloc_zone_t*, void* ptr, size_t size) {
-  return fastRealloc(ptr, size);
+void* FastMallocZone::zoneRealloc(malloc_zone_t*, void*, size_t) {
+  return 0;
 }
 
 #undef malloc
