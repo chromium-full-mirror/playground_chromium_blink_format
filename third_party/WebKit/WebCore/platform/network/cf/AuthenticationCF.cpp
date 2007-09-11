@@ -137,6 +137,12 @@ CFURLProtectionSpaceRef createCF(const ProtectionSpace& coreSpace) {
     case ProtectionSpaceAuthenticationSchemeHTMLForm:
       scheme = kCFURLProtectionSpaceAuthenticationSchemeHTMLForm;
       break;
+    case ProtectionSpaceAuthenticationSchemeNTLM:
+      scheme = kCFURLProtectionSpaceAuthenticationSchemeNTLM;
+      break;
+    case ProtectionSpaceAuthenticationSchemeNegotiate:
+      scheme = kCFURLProtectionSpaceAuthenticationSchemeNegotiate;
+      break;
     default:
       ASSERT_NOT_REACHED();
   }
@@ -216,6 +222,12 @@ ProtectionSpace core(CFURLProtectionSpaceRef cfSpace) {
       break;
     case kCFURLProtectionSpaceAuthenticationSchemeHTMLForm:
       scheme = ProtectionSpaceAuthenticationSchemeHTMLForm;
+      break;
+    case kCFURLProtectionSpaceAuthenticationSchemeNTLM:
+      scheme = ProtectionSpaceAuthenticationSchemeNTLM;
+      break;
+    case kCFURLProtectionSpaceAuthenticationSchemeNegotiate:
+      scheme = ProtectionSpaceAuthenticationSchemeNegotiate;
       break;
     default:
       ASSERT_NOT_REACHED();
