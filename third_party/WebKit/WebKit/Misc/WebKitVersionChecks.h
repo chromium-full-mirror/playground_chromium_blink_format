@@ -52,6 +52,9 @@
   0x020A0C00                                                  // 522.12.0
 #define WEBKIT_FIRST_VERSION_WITH_CACHE_MODEL_API 0x020B0500  // 523.5.0
 
+#define WEBKIT_FIRST_CFNETWORK_VERSION_WITH_LARGE_DISK_CACHE_FIX \
+  0x00D30000  // 211
+
 #ifdef __cplusplus
 extern "C" {
 #endif
