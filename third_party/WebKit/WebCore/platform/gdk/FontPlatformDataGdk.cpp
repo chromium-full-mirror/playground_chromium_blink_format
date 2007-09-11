@@ -41,12 +41,7 @@ namespace WebCore {
 
 FontPlatformData::FontPlatformData(const FontDescription& fontDescription,
                                    const AtomicString& familyName)
-    : m_pattern(0),
-      m_fontDescription(fontDescription),
-      m_fontMatrix(0),
-      m_fontFace(0),
-      m_options(0),
-      m_scaledFont(0) {
+    : m_pattern(0), m_fontDescription(fontDescription), m_scaledFont(0) {
   FontPlatformData::init();
 
   CString familyNameString = familyName.domString().utf8();
@@ -62,6 +57,9 @@ FontPlatformData::FontPlatformData(const FontDescription& fontDescription,
   int type = fontDescription.genericFamily();
 
   FcPattern* pattern = FcPatternCreate();
+  cairo_font_face_t* fontFace;
+  cairo_font_options_t* options;
+  cairo_matrix_t* fontMatrix;
 
   if (!FcPatternAddString(pattern, FC_FAMILY,
                           reinterpret_cast<const FcChar8*>(fcfamily)))
@@ -101,16 +99,18 @@ FontPlatformData::FontPlatformData(const FontDescription& fontDescription,
   // FIXME: should we set some default font?
   if (!m_pattern)
     goto freePattern;
-  m_fontFace = cairo_ft_font_face_create_for_pattern(m_pattern);
-  m_fontMatrix =
+  fontFace = cairo_ft_font_face_create_for_pattern(m_pattern);
+  fontMatrix =
       reinterpret_cast<cairo_matrix_t*>(malloc(sizeof(cairo_matrix_t)));
   cairo_matrix_t ctm;
-  cairo_matrix_init_scale(m_fontMatrix, m_fontDescription.computedSize(),
+  cairo_matrix_init_scale(fontMatrix, m_fontDescription.computedSize(),
                           m_fontDescription.computedSize());
   cairo_matrix_init_identity(&ctm);
-  m_options = cairo_font_options_create();
-  m_scaledFont =
-      cairo_scaled_font_create(m_fontFace, m_fontMatrix, &ctm, m_options);
+  options = cairo_font_options_create();
+  m_scaledFont = cairo_scaled_font_create(fontFace, fontMatrix, &ctm, options);
+  cairo_font_face_destroy(fontFace);
+  cairo_font_options_destroy(options);
+  free(fontMatrix);
 
 freePattern:
   FcPatternDestroy(pattern);
@@ -169,13 +169,9 @@ cairo_font_face_t** FontPlatformData::list(FontDescription& fontDescription,
 }
 
 void FontPlatformData::setFont(cairo_t* cr) const {
-  ASSERT(m_fontFace);
-  ASSERT(m_fontMatrix);
-  ASSERT(m_options);
+  ASSERT(m_scaledFont);
 
-  cairo_set_font_face(cr, m_fontFace);
-  cairo_set_font_matrix(cr, m_fontMatrix);
-  cairo_set_font_options(cr, m_options);
+  cairo_set_scaled_font(cr, m_scaledFont);
 }
 
 bool FontPlatformData::operator==(const FontPlatformData& other) const {
