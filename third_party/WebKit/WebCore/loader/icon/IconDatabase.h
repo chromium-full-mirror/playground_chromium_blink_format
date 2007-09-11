@@ -142,9 +142,6 @@ class IconDatabase : Noncopyable {
   // Holding m_syncLock is required when accessing m_completeDatabasePath
   String m_completeDatabasePath;
 
-  Mutex m_removeLock;
-  ThreadCondition m_removeCondition;
-
   bool m_threadTerminationRequested;
   bool m_removeIconsRequested;
   bool m_iconURLImportComplete;
