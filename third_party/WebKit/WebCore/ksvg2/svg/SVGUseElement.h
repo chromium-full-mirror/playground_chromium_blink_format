@@ -107,7 +107,9 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void alterShadowTreeForSVGTag(SVGElement* target);
 
   void buildShadowTree(SVGElement* target, SVGElementInstance* targetInstance);
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
   void expandUseElementsInShadowTree(Node* element);
+#endif
   void attachShadowTree();
 
   // "Tree connector"

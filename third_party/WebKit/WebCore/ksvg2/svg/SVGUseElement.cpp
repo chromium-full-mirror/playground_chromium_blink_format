@@ -329,9 +329,11 @@ void SVGUseElement::buildPendingResource() {
   // This also handles the special cases: <use> on <symbol>, <use> on <svg>.
   buildShadowTree(target, m_targetElementInstance.get());
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
   // Expand all <use> elements in the shadow tree.
   // Expand means: replace the actual <use> element by what it references.
   expandUseElementsInShadowTree(m_shadowTreeRootElement.get());
+#endif
 
   // Now that the shadow tree is completly expanded, we can associate
   // shadow tree elements <-> instances in the instance tree.
@@ -554,6 +556,7 @@ void SVGUseElement::buildShadowTree(SVGElement* target,
     alterShadowTreeForSVGTag(newChildPtr);
 }
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 void SVGUseElement::expandUseElementsInShadowTree(Node* element) {
   // Why expand the <use> elements in the shadow tree here, and not just
   // do this directly in buildShadowTree, if we encounter a <use> element?
@@ -638,6 +641,7 @@ void SVGUseElement::expandUseElementsInShadowTree(Node* element) {
        child = child->nextSibling())
     expandUseElementsInShadowTree(child.get());
 }
+#endif
 
 void SVGUseElement::attachShadowTree() {
   if (!m_shadowTreeRootElement || m_shadowTreeRootElement->attached() ||
@@ -685,8 +689,13 @@ void SVGUseElement::associateInstancesWithShadowTreeElements(
   SVGElement* originalElement = targetInstance->correspondingElement();
 
   if (originalElement->hasTagName(SVGNames::useTag)) {
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
     // <use> gets replaced by <g>
     ASSERT(target->nodeName() == SVGNames::gTag);
+#else
+    ASSERT(target->nodeName() == SVGNames::gTag ||
+           target->nodeName() == SVGNames::useTag);
+#endif
   } else if (originalElement->hasTagName(SVGNames::symbolTag)) {
     // <symbol> gets replaced by <svg>
     ASSERT(target->nodeName() == SVGNames::svgTag);
