@@ -26,135 +26,165 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "config.h"
-#include "DebuggerDocumentWin.h"
+#include "DebuggerClient.h"
 
+#include "DebuggerApplication.h"
 #include "DebuggerDocument.h"
 
-static DebuggerDocument callbacks;
+#include <JavaScriptCore/JSContextRef.h>
+#include <JavaScriptCore/JSRetainPtr.h>
+#include <JavaScriptCore/JSStringRef.h>
+#include <JavaScriptCore/JSStringRefCF.h>
+#include <JavaScriptCore/RetainPtr.h>
 
-static JSValueRef breakpointEditorHTMLCallback(JSContextRef context,
-                                               JSObjectRef /*function*/,
-                                               JSObjectRef /*thisObject*/,
-                                               size_t /*argumentCount*/,
-                                               const JSValueRef /*arguments*/[],
-                                               JSValueRef* /*exception*/) {
-  return DebuggerDocument::breakpointEditorHTML(context);
+void DebuggerClient::pause() {
+  // if ([[(NSDistantObject *)server connectionForProxy] isValid])
+  //    [server pause];
+  //[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
-static JSValueRef currentFunctionStackCallback(JSContextRef /*context*/,
-                                               JSObjectRef /*function*/,
-                                               JSObjectRef /*thisObject*/,
-                                               size_t /*argumentCount*/,
-                                               const JSValueRef /*arguments*/[],
-                                               JSValueRef* /*exception*/) {
-  callbacks.currentFunctionStack();
-  return 0;  // FIXME: the return value will need to change when the above
-             // function is finished
+void DebuggerClient::resume() {
+  // if ([[(NSDistantObject *)server connectionForProxy] isValid])
+  //    [server resume];
 }
 
-static JSValueRef evaluateScript_inCallFrame_Callback(
-    JSContextRef context,
-    JSObjectRef /*function*/,
-    JSObjectRef /*thisObject*/,
-    size_t /*argumentCount*/,
-    const JSValueRef /*arguments*/[],
-    JSValueRef* /*exception*/) {
-  return callbacks.evaluateScript(context, 0);  // FIXME: the input values will
-                                                // change when this function is
-                                                // completed
+void DebuggerClient::stepInto() {
+  // if ([[(NSDistantObject *)server connectionForProxy] isValid])
+  //    [server step];
 }
 
-static JSValueRef isPausedCallback(JSContextRef context,
-                                   JSObjectRef /*function*/,
-                                   JSObjectRef /*thisObject*/,
-                                   size_t /*argumentCount*/,
-                                   const JSValueRef /*arguments*/[],
-                                   JSValueRef* /*exception*/) {
-  return JSValueMakeBoolean(context, callbacks.isPaused());
+// DebuggerDocument platform specific implementations
+
+void DebuggerDocument::platformPause(JSContextRef /*context*/) {
+  m_debuggerClient->pause();
 }
 
-static JSValueRef localScopeVariableNamesForCallFrame_Callback(
-    JSContextRef context,
-    JSObjectRef /*function*/,
-    JSObjectRef /*thisObject*/,
-    size_t /*argumentCount*/,
-    const JSValueRef /*arguments*/[],
-    JSValueRef* /*exception*/) {
-  callbacks.localScopeVariableNamesForCallFrame(context);
-  return 0;  // FIXME: the return value will need to change when the above
-             // function is finished
+void DebuggerDocument::platformResume(JSContextRef /*context*/) {
+  m_debuggerClient->resume();
 }
 
-static JSValueRef pauseCallback(JSContextRef /*context*/,
-                                JSObjectRef /*function*/,
-                                JSObjectRef /*thisObject*/,
-                                size_t /*argumentCount*/,
-                                const JSValueRef /*arguments*/[],
-                                JSValueRef* /*exception*/) {
-  callbacks.pause();
-  return 0;  // FIXME: the return value will need to change when the above
-             // function is finished
+void DebuggerDocument::platformStepInto(JSContextRef /*context*/) {
+  m_debuggerClient->stepInto();
 }
 
-static JSValueRef resumeCallback(JSContextRef /*context*/,
-                                 JSObjectRef /*function*/,
-                                 JSObjectRef /*thisObject*/,
-                                 size_t /*argumentCount*/,
-                                 const JSValueRef /*arguments*/[],
-                                 JSValueRef* /*exception*/) {
-  callbacks.resume();
-  return 0;  // FIXME: the return value will need to change when the above
-             // function is finished
+JSValueRef DebuggerDocument::platformEvaluateScript(JSContextRef context,
+                                                    JSStringRef /*script*/,
+                                                    int /*callFrame*/) {
+  //    WebScriptCallFrame *cframe = [m_debuggerClient currentFrame];
+  //    for (unsigned count = 0; count < callFrame; count++)
+  //        cframe = [cframe caller];
+  //
+  //    if (!cframe)
+  return JSValueMakeUndefined(context);
+  //
+  //    RetainPtr<CFStringRef> scriptCF(AdoptCF,
+  //    JSStringCopyCFString(kCFAllocatorDefault, script));
+  //    id value = [cframe evaluateWebScript:(NSString *)scriptCF.get()];
+  //
+  //    NSString *resultString = [NSString
+  //    stringOrNilFromWebScriptResult:value];
+  //    JSRetainPtr<JSStringRef> resultJS(KJS::Adopt,
+  //    JSStringCreateWithCFString((CFStringRef)resultString));
+  //    JSValueRef returnValue = JSValueMakeString(context, resultJS.get());
+  //
+  //    return returnValue;
 }
 
-static JSValueRef stepIntoCallback(JSContextRef /*context*/,
-                                   JSObjectRef /*function*/,
-                                   JSObjectRef /*thisObject*/,
-                                   size_t /*argumentCount*/,
-                                   const JSValueRef /*arguments*/[],
-                                   JSValueRef* /*exception*/) {
-  callbacks.stepInto();
-  return 0;  // FIXME: the return value will need to change when the above
-             // function is finished
-}
-
-static JSValueRef valueForScopeVariableNamed_inCallFrame_Callback(
+void DebuggerDocument::getPlatformCurrentFunctionStack(
     JSContextRef /*context*/,
-    JSObjectRef /*function*/,
-    JSObjectRef /*thisObject*/,
-    size_t /*argumentCount*/,
-    const JSValueRef /*arguments*/[],
-    JSValueRef* /*exception*/) {
-  callbacks.valueForScopeVariableNamed(0, 0);  // FIXME: the input values will
-                                               // change when this function is
-                                               // completed
-  return 0;  // FIXME: the return value will need to change when the above
-             // function is finished
+    Vector<JSValueRef>& /*currentStack*/) {
+  //    for (WebScriptCallFrame *frame = [m_debuggerClient currentFrame];
+  //    frame;) {
+  //        CFStringRef function;
+  //        if ([frame functionName])
+  //            function = (CFStringRef)[frame functionName];
+  //        else if ([frame caller])
+  //            function = CFSTR("(anonymous function)");
+  //        else
+  //            function = CFSTR("(global scope)");
+  //        frame = [frame caller];
+  //
+  //        JSRetainPtr<JSStringRef> stackString(KJS::Adopt,
+  //        JSStringCreateWithCFString(function));
+  //        JSValueRef stackValue = JSValueMakeString(context,
+  //        stackString.get());
+  //        currentStack.append(stackValue);
+  //    }
 }
 
-JSStaticFunction* staticFunctions() {
-  static JSStaticFunction staticFunctions[] = {
-      {"breakpointEditorHTML", breakpointEditorHTMLCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"currentFunctionStack", currentFunctionStackCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"evaluateScript_inCallFrame_", evaluateScript_inCallFrame_Callback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"isPaused", isPausedCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"localScopeVariableNamesForCallFrame_",
-       localScopeVariableNamesForCallFrame_Callback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"pause", pauseCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"resume", resumeCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"stepInto", stepIntoCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"valueForScopeVariableNamed_inCallFrame_",
-       valueForScopeVariableNamed_inCallFrame_Callback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {0, 0, 0}};
+void DebuggerDocument::getPlatformLocalScopeVariableNamesForCallFrame(
+    JSContextRef /*context*/,
+    int /*callFrame*/,
+    Vector<JSValueRef>& /*variableNames*/) {
+  //    WebScriptCallFrame *cframe = [m_debuggerClient currentFrame];
+  //    for (unsigned count = 0; count < callFrame; count++)
+  //        cframe = [cframe caller];
+  //
+  //    if (!cframe)
+  //        return;
+  //    if (![[cframe scopeChain] count])
+  //        return;
+  //
+  //    WebScriptObject *scope = [[cframe scopeChain] objectAtIndex:0]; // local
+  //    is always first
+  //    NSArray *localScopeVariableNames = [m_debuggerClient
+  //    webScriptAttributeKeysForScriptObject:scope];
+  //
+  //    for (int i = 0; i < [localScopeVariableNames count]; ++i) {
+  //        JSRetainPtr<JSStringRef> variableName(KJS::Adopt,
+  //        JSStringCreateWithCFString((CFStringRef)[localScopeVariableNames
+  //        objectAtIndex:i]));
+  //        JSValueRef variableNameValue = JSValueMakeString(context,
+  //        variableName.get());
+  //        variableNames.append(variableNameValue);
+  //    }
+}
 
-  return staticFunctions;
+JSValueRef DebuggerDocument::platformValueForScopeVariableNamed(
+    JSContextRef context,
+    JSStringRef /*key*/,
+    int /*callFrame*/) {
+  //    WebScriptCallFrame *cframe = [m_debuggerClient currentFrame];
+  //    for (unsigned count = 0; count < callFrame; count++)
+  //        cframe = [cframe caller];
+  //
+  //    if (!cframe)
+  //        return JSValueMakeUndefined(context);
+  //
+  //    unsigned scopeCount = [[cframe scopeChain] count];
+  //
+  //    if (!scopeCount)
+  //        return JSValueMakeUndefined(context);
+  //
+  //    NSString *resultString = nil;
+  //
+  //    for (unsigned i = 0; i < scopeCount && resultString == nil; i++) {
+  //        WebScriptObject *scope = [[cframe scopeChain] objectAtIndex:i];
+  //
+  //        RetainPtr<CFStringRef> keyCF(AdoptCF,
+  //        JSStringCopyCFString(kCFAllocatorDefault, key));
+  //
+  //        id value = nil;
+  //        @try {
+  //            value = [scope valueForKey:(NSString *)keyCF.get()];
+  //        } @catch(NSException* localException) { // The value wasn't found.
+  //        }
+  //
+  //        resultString = [NSString stringOrNilFromWebScriptResult:value];
+  //    }
+  //
+  //    if (!resultString)
+  return JSValueMakeUndefined(context);
+  //
+  //    JSRetainPtr<JSStringRef> resultJS(KJS::Adopt,
+  //    JSStringCreateWithCFString((CFStringRef)resultString));
+  //    JSValueRef retVal = JSValueMakeString(context, resultJS.get());
+  //    return retVal;
+}
+
+void DebuggerDocument::platformLog(JSContextRef /*context*/,
+                                   JSStringRef /*msg*/) {
+  //    RetainPtr<CFStringRef> msgCF(AdoptCF,
+  //    JSStringCopyCFString(kCFAllocatorDefault, msg));
+  //    [DebuggerClientMac log:(NSString *)msgCF.get()];
 }

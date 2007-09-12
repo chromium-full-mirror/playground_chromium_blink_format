@@ -279,8 +279,8 @@ JSValueRef DebuggerDocument::localScopeVariableNamesForCallFrame(
 
   // Get the variable names
   Vector<JSValueRef> localVariableNames;
-  getPlatformLocalScopeVariableNamesForCallFrame(context, callFrame,
-                                                 localVariableNames);
+  getPlatformLocalScopeVariableNamesForCallFrame(
+      context, static_cast<int>(callFrame), localVariableNames);
   return DebuggerDocument::toJSArray(context, localVariableNames, exception);
 }
 
