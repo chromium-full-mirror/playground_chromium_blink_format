@@ -980,7 +980,7 @@ bool RenderThemeSafari::paintSliderThumb(
     state |= SafariTheme::PressedState;
 
   paintThemePart(SliderThumbPart, paintInfo.context->platformContext(), r,
-                 (NSControlSize)0, state);
+                 NSSmallControlSize, state);
   return false;
 }
 
