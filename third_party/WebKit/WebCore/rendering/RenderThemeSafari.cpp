@@ -556,7 +556,7 @@ bool RenderThemeSafari::paintTextField(RenderObject* o,
                                        const RenderObject::PaintInfo& paintInfo,
                                        const IntRect& r) {
   paintThemePart(TextFieldPart, paintInfo.context->platformContext(), r,
-                 (NSControlSize)0, determineState(o));
+                 (NSControlSize)0, determineState(o) & ~FocusedState);
   return false;
 }
 
@@ -568,7 +568,7 @@ bool RenderThemeSafari::paintTextArea(RenderObject* o,
                                       const RenderObject::PaintInfo& paintInfo,
                                       const IntRect& r) {
   paintThemePart(TextAreaPart, paintInfo.context->platformContext(), r,
-                 (NSControlSize)0, determineState(o));
+                 (NSControlSize)0, determineState(o) & ~FocusedState);
   return false;
 }
 
