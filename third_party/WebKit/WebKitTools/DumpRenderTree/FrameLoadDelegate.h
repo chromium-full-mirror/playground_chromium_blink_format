@@ -29,7 +29,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface FrameLoadDelegate : NSObject {
-}
+class LayoutTestController;
 
+@interface FrameLoadDelegate : NSObject {
+  LayoutTestController* layoutTestContoller;
+}
 @end
