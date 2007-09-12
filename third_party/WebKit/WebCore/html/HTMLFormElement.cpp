@@ -66,8 +66,7 @@ HTMLFormElement::HTMLFormElement(Document* doc)
       m_insubmit(false),
       m_doingsubmit(false),
       m_inreset(false),
-      m_malformed(false),
-      m_preserveAcrossRemove(false) {}
+      m_malformed(false) {}
 
 HTMLFormElement::~HTMLFormElement() {
   delete m_elementAliases;

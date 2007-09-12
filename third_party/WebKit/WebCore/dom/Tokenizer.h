@@ -60,6 +60,8 @@ class Tokenizer {
 
   virtual void executeScriptsWaitingForStylesheets() {}
 
+  virtual bool isHTMLTokenizer() const { return false; }
+
  protected:
   // The tokenizer has buffers, so parsing may continue even after
   // it stops receiving data. We use m_parserStopped to stop the tokenizer

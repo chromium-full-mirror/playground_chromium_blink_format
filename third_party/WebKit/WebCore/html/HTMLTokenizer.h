@@ -122,6 +122,9 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
 
   virtual void executeScriptsWaitingForStylesheets();
 
+  virtual bool isHTMLTokenizer() const { return true; }
+  HTMLParser* htmlParser() const { return parser; }
+
  private:
   class State;
 

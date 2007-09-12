@@ -122,6 +122,7 @@ HTMLParser::HTMLParser(HTMLDocument* doc, bool reportErrors)
       haveFrameSet(false),
       m_isParsingFragment(false),
       m_reportErrors(reportErrors),
+      m_handlingResidualStyleAcrossBlocks(false),
       inStrayTableContent(0) {}
 
 HTMLParser::HTMLParser(DocumentFragment* frag)
@@ -135,6 +136,7 @@ HTMLParser::HTMLParser(DocumentFragment* frag)
       haveFrameSet(false),
       m_isParsingFragment(true),
       m_reportErrors(false),
+      m_handlingResidualStyleAcrossBlocks(false),
       inStrayTableContent(0) {
   if (frag)
     frag->ref();
@@ -997,6 +999,7 @@ bool HTMLParser::isAffectedByResidualStyle(const AtomicString& tagName) {
 void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   HTMLStackElem* maxElem = 0;
   bool finished = false;
+  m_handlingResidualStyleAcrossBlocks = true;
   while (!finished) {
     // Find the outermost element that crosses over to a higher level. If there
     // exists another higher-level
@@ -1124,8 +1127,6 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
     //
     // Step 1: Remove |blockElem| from its parent, doing a batch detach of all
     // the kids.
-    if (m_currentFormElement)
-      m_currentFormElement->setPreserveAcrossRemove(true);
     if (isBlockStillInTree)
       blockElem->parentNode()->removeChild(blockElem, ec);
 
@@ -1229,8 +1230,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
                           0);  // FIXME: Deal with stray table content some day
                                // if it becomes necessary to do so.
 
-  if (m_currentFormElement)
-    m_currentFormElement->setPreserveAcrossRemove(false);
+  m_handlingResidualStyleAcrossBlocks = false;
 }
 
 void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,

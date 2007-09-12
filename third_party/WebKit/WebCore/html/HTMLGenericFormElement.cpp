@@ -32,7 +32,10 @@
 #include "HTMLFormElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
+#include "HTMLParser.h"
+#include "HTMLTokenizer.h"
 #include "RenderTheme.h"
+#include "Tokenizer.h"
 
 namespace WebCore {
 
@@ -121,11 +124,17 @@ void HTMLGenericFormElement::removedFromTree(bool deep) {
   // to the form.
   // Otherwise, null out our form and remove ourselves from the form's list of
   // elements.
-  if (m_form && !m_form->preserveAcrossRemove() &&
+  HTMLParser* parser = 0;
+  if (Tokenizer* tokenizer = document()->tokenizer())
+    if (tokenizer->isHTMLTokenizer())
+      parser = static_cast<HTMLTokenizer*>(tokenizer)->htmlParser();
+
+  if (m_form && !(parser && parser->isHandlingResidualStyleAcrossBlocks()) &&
       findRoot(this) != findRoot(m_form)) {
     m_form->removeFormElement(this);
     m_form = 0;
   }
+
   HTMLElement::removedFromTree(deep);
 }
 
