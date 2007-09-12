@@ -48,7 +48,11 @@ Cursor::Cursor(const Cursor& other) : m_impl(other.m_impl) {}
 Cursor::~Cursor() {}
 
 Cursor::Cursor(Image* image, const IntPoint& hotspot)
-    : m_impl(*(image->getPixmap()), hotspot.x(), hotspot.y()) {}
+#ifndef QT_NO_CURSOR
+    : m_impl(*(image->getPixmap()), hotspot.x(), hotspot.y())
+#endif
+{
+}
 
 Cursor& Cursor::operator=(const Cursor& other) {
   m_impl = other.m_impl;
