@@ -863,8 +863,10 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
           newExec.setException(exec->exception());
         ctx.setExecState(&newExec);
 
-        if (switchGlobal)
+        if (switchGlobal) {
           ctx.pushScope(thisObj);
+          ctx.setVariableObject(thisObj);
+        }
 
         // execute the code
         progNode->processVarDecls(&newExec);
