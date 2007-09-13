@@ -114,7 +114,7 @@ JSValue* MathObjectImp::getValueProperty(ExecState*, int token) const {
 
 // ------------------------------ MathObjectImp --------------------------------
 
-static bool randomSeeded = false;
+static bool didInitRandom;
 
 MathFuncImp::MathFuncImp(ExecState* exec, int i, int l, const Identifier& name)
     : InternalFunctionImp(
@@ -205,11 +205,11 @@ JSValue* MathFuncImp::callAsFunction(ExecState* exec,
         result = ::pow(arg, arg2);
       break;
     case MathObjectImp::Random:
-      if (!randomSeeded) {
-        srand(static_cast<unsigned>(time(0)));
-        randomSeeded = true;
+      if (!didInitRandom) {
+        wtf_random_init();
+        didInitRandom = true;
       }
-      result = (double)rand() / RAND_MAX;
+      result = wtf_random();
       break;
     case MathObjectImp::Round:
       if (signbit(arg) && arg >= -0.5)
