@@ -55,11 +55,13 @@ class TypingCommand : public CompositeEditCommand {
                                       TextGranularity = CharacterGranularity);
   static void insertText(Document*,
                          const String&,
-                         bool selectInsertedText = false);
+                         bool selectInsertedText = false,
+                         bool insertedTextIsComposition = false);
   static void insertText(Document*,
                          const String&,
                          const Selection&,
-                         bool selectInsertedText = false);
+                         bool selectInsertedText = false,
+                         bool insertedTextIsComposition = false);
   static void insertLineBreak(Document*);
   static void insertParagraphSeparator(Document*);
   static void insertParagraphSeparatorInQuotedContent(Document*);

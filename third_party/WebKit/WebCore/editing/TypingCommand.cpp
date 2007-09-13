@@ -103,20 +103,22 @@ void TypingCommand::forwardDeleteKeyPressed(Document* document,
 
 void TypingCommand::insertText(Document* document,
                                const String& text,
-                               bool selectInsertedText) {
+                               bool selectInsertedText,
+                               bool insertedTextIsComposition) {
   ASSERT(document);
 
   Frame* frame = document->frame();
   ASSERT(frame);
 
   insertText(document, text, frame->selectionController()->selection(),
-             selectInsertedText);
+             selectInsertedText, insertedTextIsComposition);
 }
 
 void TypingCommand::insertText(Document* document,
                                const String& text,
                                const Selection& selectionForInsertion,
-                               bool selectInsertedText) {
+                               bool selectInsertedText,
+                               bool insertedTextIsComposition) {
   ASSERT(document);
 
   RefPtr<Frame> frame = document->frame();
@@ -128,7 +130,8 @@ void TypingCommand::insertText(Document* document,
   String newText = text;
   Node* startNode = selectionForInsertion.start().node();
 
-  if (startNode && startNode->rootEditableElement()) {
+  if (startNode && startNode->rootEditableElement() &&
+      !insertedTextIsComposition) {
     // Send BeforeTextInsertedEvent. The event handler will update text if
     // necessary.
     ExceptionCode ec = 0;

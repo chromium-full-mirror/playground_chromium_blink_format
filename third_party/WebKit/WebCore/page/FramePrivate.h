@@ -114,8 +114,6 @@ class FramePrivate {
   RefPtr<Node> m_elementToDraw;
   PaintRestriction m_paintRestriction;
 
-  bool m_markedTextUsesUnderlines;
-  Vector<MarkedTextUnderline> m_markedTextUnderlines;
   bool m_highlightTextMatches;
   bool m_windowHasFocus;
 
@@ -124,8 +122,6 @@ class FramePrivate {
   unsigned frameCount;
 
   bool m_prohibitsScrolling;
-
-  RefPtr<Range> m_markedTextRange;
 
   // The root object used for objects bound outside the context of a plugin.
   RefPtr<KJS::Bindings::RootObject> m_bindingRootObject;

@@ -141,6 +141,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   const AtomicString& autosaveName() const;
   void startSearchEventTimer();
   void searchEventTimerFired(Timer<RenderTextControl>*);
+  String finishText(Vector<UChar>&) const;
 
   RefPtr<HTMLTextFieldInnerElement> m_innerBlock;
   RefPtr<HTMLTextFieldInnerTextElement> m_innerText;
