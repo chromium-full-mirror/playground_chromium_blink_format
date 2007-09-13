@@ -39,7 +39,7 @@
 #include <JavaScriptCore/Vector.h>
 
 DebuggerDocument::DebuggerDocument(DebuggerClient* debugger)
-    : m_paused(false), m_debuggerClient(debugger) {
+    : m_debuggerClient(debugger) {
   ASSERT(m_debuggerClient);
 }
 
@@ -100,17 +100,6 @@ JSValueRef DebuggerDocument::breakpointEditorHTMLCallback(
   return ret;
 }
 
-JSValueRef DebuggerDocument::isPausedCallback(JSContextRef context,
-                                              JSObjectRef /*function*/,
-                                              JSObjectRef thisObject,
-                                              size_t /*argumentCount*/,
-                                              const JSValueRef /*arguments*/[],
-                                              JSValueRef* /*exception*/) {
-  DebuggerDocument* debuggerDocument =
-      reinterpret_cast<DebuggerDocument*>(JSObjectGetPrivate(thisObject));
-  return JSValueMakeBoolean(context, debuggerDocument->m_paused);
-}
-
 JSValueRef DebuggerDocument::pauseCallback(JSContextRef context,
                                            JSObjectRef /*function*/,
                                            JSObjectRef thisObject,
@@ -120,7 +109,6 @@ JSValueRef DebuggerDocument::pauseCallback(JSContextRef context,
   DebuggerDocument* debuggerDocument =
       reinterpret_cast<DebuggerDocument*>(JSObjectGetPrivate(thisObject));
 
-  debuggerDocument->m_paused = true;
   debuggerDocument->platformPause();
   return JSValueMakeUndefined(context);
 }
@@ -133,7 +121,6 @@ JSValueRef DebuggerDocument::resumeCallback(JSContextRef context,
                                             JSValueRef* /*exception*/) {
   DebuggerDocument* debuggerDocument =
       reinterpret_cast<DebuggerDocument*>(JSObjectGetPrivate(thisObject));
-  debuggerDocument->m_paused = false;
   debuggerDocument->platformResume();
   return JSValueMakeUndefined(context);
 }
@@ -269,6 +256,15 @@ JSValueRef DebuggerDocument::logCallback(JSContextRef context,
 }
 
 //-- These are the calls into the JS. --//
+
+bool DebuggerDocument::isPaused(JSContextRef context) const {
+  JSObjectRef globalObject = JSContextGetGlobalObject(context);
+  JSRetainPtr<JSStringRef> string(Adopt,
+                                  JSStringCreateWithUTF8CString("isPaused"));
+  JSValueRef objectProperty =
+      JSObjectGetProperty(context, globalObject, string.get(), 0);
+  return JSValueToBoolean(context, objectProperty);
+}
 
 void DebuggerDocument::updateFileSource(JSContextRef context,
                                         JSStringRef documentSource,
@@ -468,8 +464,6 @@ JSStaticFunction* DebuggerDocument::staticFunctions() {
       {"currentFunctionStack", DebuggerDocument::currentFunctionStackCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"evaluateScript", DebuggerDocument::evaluateScriptCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"isPaused", DebuggerDocument::isPausedCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"localScopeVariableNamesForCallFrame",
        DebuggerDocument::localScopeVariableNamesForCallFrameCallback,

@@ -50,7 +50,7 @@ class DebuggerDocument {
  public:
   DebuggerDocument(DebuggerClient*);
 
-  // These are all calls out of the JS
+  // These are all calls from the JS
   static JSValueRef breakpointEditorHTMLCallback(
       JSContextRef context,
       JSObjectRef /*function*/,
@@ -58,12 +58,6 @@ class DebuggerDocument {
       size_t /*argumentCount*/,
       const JSValueRef /*arguments*/[],
       JSValueRef* /*exception*/);
-  static JSValueRef isPausedCallback(JSContextRef context,
-                                     JSObjectRef /*function*/,
-                                     JSObjectRef /*thisObject*/,
-                                     size_t /*argumentCount*/,
-                                     const JSValueRef /*arguments*/[],
-                                     JSValueRef* /*exception*/);
   static JSValueRef pauseCallback(JSContextRef context,
                                   JSObjectRef /*function*/,
                                   JSObjectRef /*thisObject*/,
@@ -116,7 +110,7 @@ class DebuggerDocument {
                                 const JSValueRef /*arguments*/[],
                                 JSValueRef* /*exception*/);
 
-  // Cross-platform functions
+  // Non Cross-platform functions
   void platformPause();
   void platformResume();
   void platformStepInto();
@@ -135,6 +129,7 @@ class DebuggerDocument {
   static void platformLog(JSStringRef msg);
 
   // These are the calls into the JS.
+  bool isPaused(JSContextRef) const;
   static void updateFileSource(JSContextRef,
                                JSStringRef documentSource,
                                JSStringRef url);
@@ -179,8 +174,6 @@ class DebuggerDocument {
       JSValueRef arguments[],
       JSValueRef* exception = 0);  // Implementation for calls into JS
 
-  bool getPaused() const { return m_paused; }
-
  private:
   static JSValueRef callFunctionOnObject(
       JSContextRef,
@@ -196,8 +189,6 @@ class DebuggerDocument {
 
   DebuggerClient* m_debuggerClient;  // DebuggerClient owns the DebuggerDocument
                                      // so don't delete it.  It will delete you!
-
-  bool m_paused;
 };
 
 #endif  // DebuggerDocument_H
