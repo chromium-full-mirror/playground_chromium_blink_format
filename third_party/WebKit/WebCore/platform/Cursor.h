@@ -32,7 +32,7 @@
 typedef struct HICON__* HICON;
 typedef HICON HCURSOR;
 #include <Shared.h>
-#include <RefPtr.h>
+#include <wtf/RefPtr.h>
 #elif PLATFORM(GDK)
 #include <gdk/gdk.h>
 #elif PLATFORM(QT)
@@ -57,7 +57,7 @@ class SharedCursor : public Shared<SharedCursor> {
  public:
   SharedCursor(HCURSOR nativeCursor) : m_nativeCursor(nativeCursor) {}
   ~SharedCursor() { DestroyIcon(m_nativeCursor); }
-  HCURSOR nativeCursor() { return m_nativeCursor; }
+  HCURSOR nativeCursor() const { return m_nativeCursor; }
 
  private:
   HCURSOR m_nativeCursor;

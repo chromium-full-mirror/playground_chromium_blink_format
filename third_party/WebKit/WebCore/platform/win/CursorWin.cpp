@@ -29,6 +29,9 @@
 
 #include "Image.h"
 #include "IntPoint.h"
+
+#include <wtf/OwnPtr.h>
+
 #include <windows.h>
 
 #define ALPHA_CURSORS
@@ -143,11 +146,10 @@ Cursor::Cursor(PlatformCursor c) : m_impl(c) {}
 static Cursor loadCursorByName(char* name, int x, int y) {
   IntPoint hotSpot(x, y);
   Cursor c;
-  Image* cursorImage = Image::loadPlatformResource(name);
-  if (cursorImage && !cursorImage->isNull()) {
-    c = Cursor(cursorImage, hotSpot);
-    delete cursorImage;
-  } else
+  OwnPtr<Image> cursorImage(Image::loadPlatformResource(name));
+  if (cursorImage && !cursorImage->isNull())
+    c = Cursor(cursorImage.get(), hotSpot);
+  else
     c = pointerCursor();
   return c;
 }
