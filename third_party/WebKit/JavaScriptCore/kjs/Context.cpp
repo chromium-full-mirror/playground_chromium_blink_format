@@ -36,6 +36,7 @@ Context::Context(JSObject* glob,
                  FunctionImp* func,
                  const List* args)
     : m_interpreter(interpreter),
+      m_savedContext(interpreter->context()),
       m_currentBody(currentBody),
       m_function(func),
       m_arguments(args),
@@ -86,7 +87,7 @@ Context::Context(JSObject* glob,
 }
 
 Context::~Context() {
-  m_interpreter->setContext(m_callingContext);
+  m_interpreter->setContext(m_savedContext);
 
   // The arguments list is only needed to potentially create the  arguments
   // object,

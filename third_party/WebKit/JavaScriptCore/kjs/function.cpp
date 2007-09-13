@@ -796,7 +796,7 @@ static double parseFloat(const UString& s) {
 }
 
 JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
-                                       JSObject* /*thisObj*/,
+                                       JSObject* thisObj,
                                        const List& args) {
   JSValue* res = jsUndefined();
 
@@ -844,20 +844,34 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
         if (!progNode)
           return throwError(exec, SyntaxError, errMsg, errLine, sid, NULL);
 
+        bool switchGlobal =
+            exec->dynamicInterpreter()->isGlobalObject(thisObj) &&
+            thisObj != exec->dynamicInterpreter()->globalObject();
+
         // enter a new execution context
+        Interpreter* interpreter =
+            switchGlobal
+                ? exec->dynamicInterpreter()->interpreterForGlobalObject(
+                      thisObj)
+                : exec->dynamicInterpreter();
         JSObject* thisVal =
             static_cast<JSObject*>(exec->context()->thisValue());
-        Context ctx(exec->dynamicInterpreter()->globalObject(),
-                    exec->dynamicInterpreter(), thisVal, progNode.get(),
-                    EvalCode, exec->context());
-        ExecState newExec(exec->dynamicInterpreter(), &ctx);
+        Context ctx(interpreter->globalObject(), interpreter, thisVal,
+                    progNode.get(), EvalCode, exec->context());
+        ExecState newExec(interpreter, &ctx);
         if (exec->hadException())
           newExec.setException(exec->exception());
         ctx.setExecState(&newExec);
 
+        if (switchGlobal)
+          ctx.pushScope(thisObj);
+
         // execute the code
         progNode->processVarDecls(&newExec);
         Completion c = progNode->execute(&newExec);
+
+        if (switchGlobal)
+          ctx.popScope();
 
         // if an exception occured, propogate it back to the previous execution
         // object
