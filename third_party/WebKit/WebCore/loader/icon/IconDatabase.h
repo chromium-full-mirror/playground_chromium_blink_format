@@ -112,7 +112,7 @@ class IconDatabase : Noncopyable {
 
   void wakeSyncThread();
   void scheduleOrDeferSyncTimer();
-  Timer<IconDatabase> m_syncTimer;
+  OwnPtr<Timer<IconDatabase>> m_syncTimer;
   void syncTimerFired(Timer<IconDatabase>*);
 
   pthread_t m_syncThread;
@@ -139,6 +139,7 @@ class IconDatabase : Noncopyable {
 
   mutable Mutex m_syncLock;
   ThreadCondition m_syncCondition;
+  String m_databaseDirectory;
   // Holding m_syncLock is required when accessing m_completeDatabasePath
   String m_completeDatabasePath;
 

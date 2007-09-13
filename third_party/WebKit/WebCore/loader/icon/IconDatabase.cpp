@@ -167,24 +167,22 @@ bool IconDatabase::open(const String& databasePath) {
     return false;
   }
 
-  // Need to create the database path if it doesn't already exist
-  makeAllDirectories(databasePath);
+  m_databaseDirectory = databasePath.copy();
 
-  // First we'll formulate the full path for the database file
-  String dbFilename;
+// Formulate the full path for the database file
 #if PLATFORM(WIN_OS)
-  if (databasePath[databasePath.length()] == '\\')
-    dbFilename = databasePath + defaultDatabaseFilename();
+  if (m_databaseDirectory[m_databaseDirectory.length()] == '\\')
+    m_completeDatabasePath = m_databaseDirectory + defaultDatabaseFilename();
   else
-    dbFilename = databasePath + "\\" + defaultDatabaseFilename();
+    m_completeDatabasePath =
+        m_databaseDirectory + "\\" + defaultDatabaseFilename();
 #else
-  if (databasePath[databasePath.length()] == '/')
-    dbFilename = databasePath + defaultDatabaseFilename();
+  if (m_databaseDirectory[m_databaseDirectory.length()] == '/')
+    m_completeDatabasePath = m_databaseDirectory + defaultDatabaseFilename();
   else
-    dbFilename = databasePath + "/" + defaultDatabaseFilename();
+    m_completeDatabasePath =
+        m_databaseDirectory + "/" + defaultDatabaseFilename();
 #endif
-
-  m_completeDatabasePath = dbFilename.copy();
 
   // Lock here as well as first thing in the thread so the tread doesn't
   // actually commence until the pthread_create() call
@@ -899,8 +897,7 @@ size_t IconDatabase::iconRecordCountWithData() {
 }
 
 IconDatabase::IconDatabase()
-    : m_syncTimer(this, &IconDatabase::syncTimerFired),
-      m_syncThreadRunning(false),
+    : m_syncThreadRunning(false),
       m_defaultIconRecord(0),
       m_isEnabled(false),
       m_privateBrowsingEnabled(false),
@@ -953,8 +950,11 @@ void IconDatabase::wakeSyncThread() {
 
 void IconDatabase::scheduleOrDeferSyncTimer() {
   ASSERT_NOT_SYNC_THREAD();
+  if (!m_syncTimer)
+    m_syncTimer.set(
+        new Timer<IconDatabase>(this, &IconDatabase::syncTimerFired));
 
-  m_syncTimer.startOneShot(updateTimerDelay);
+  m_syncTimer->startOneShot(updateTimerDelay);
 }
 
 void IconDatabase::syncTimerFired(Timer<IconDatabase>*) {
@@ -1088,6 +1088,9 @@ void* IconDatabase::iconDatabaseSyncThread() {
 #ifndef NDEBUG
   double startTime = currentTime();
 #endif
+
+  // Need to create the database path if it doesn't already exist
+  makeAllDirectories(m_databaseDirectory);
 
   // Existence of a journal file is evidence of a previous crash/force quit and
   // automatically qualifies
@@ -1986,6 +1989,7 @@ void* IconDatabase::cleanupSyncThread() {
   // Close the database
   MutexLocker locker(m_syncLock);
 
+  m_databaseDirectory = String();
   m_completeDatabasePath = String();
   deleteAllPreparedStatements();
   m_syncDB.close();
