@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef DumpRenderTree_h
+#define DumpRenderTree_h
+
 @class DumpRenderTreeDraggingInfo;
 @class EditingDelegate;
 @class FrameLoadDelegate;
@@ -34,41 +37,44 @@
 @class ResourceLoadDelegate;
 @class UIDelegate;
 @class WebFrame;
-@class WebScriptObject;
 @class WebView;
 
-extern BOOL dumpAsText;
-extern BOOL dumpDOMAsWebArchive;
-extern BOOL dumpSourceAsWebArchive;
-extern BOOL dumpSelectionRect;
-extern BOOL dumpTitleChanges;
-extern BOOL dumpBackForwardList;
-extern BOOL dumpChildFrameScrollPositions;
-extern BOOL dumpChildFramesAsText;
-extern BOOL testRepaint;
-extern BOOL repaintSweepHorizontally;
-extern BOOL windowIsKey;
-extern BOOL shouldDumpEditingCallbacks;
-extern BOOL shouldDumpResourceLoadCallbacks;
-extern BOOL shouldDumpFrameLoadCallbacks;
-extern BOOL shouldDumpResourceLoadCallbacks;
-extern BOOL shouldDumpFrameLoadCallbacks;
-extern BOOL waitToDump;
-extern BOOL canOpenWindows;
-extern BOOL closeWebViews;
-extern BOOL closeRemainingWindowsWhenComplete;
-extern BOOL addFileToPasteboardOnDrag;
+extern volatile bool done;
 
-extern volatile BOOL done;
+extern bool dumpAsText;
+extern bool dumpSelectionRect;
+extern bool dumpTitleChanges;
+extern bool dumpBackForwardList;
+extern bool dumpChildFrameScrollPositions;
+extern bool dumpChildFramesAsText;
+extern bool dumpDOMAsWebArchive;
+extern bool dumpSourceAsWebArchive;
+extern bool shouldDumpEditingCallbacks;
+extern bool shouldDumpResourceLoadCallbacks;
+extern bool shouldDumpFrameLoadCallbacks;
+extern bool shouldDumpResourceLoadCallbacks;
+extern bool shouldDumpFrameLoadCallbacks;
+extern bool addFileToPasteboardOnDrag;
+extern bool canOpenWindows;
+extern bool closeRemainingWindowsWhenComplete;
+extern bool closeWebViews;
+extern bool repaintSweepHorizontally;
+extern bool testRepaint;
+extern bool waitToDump;
+extern bool windowIsKey;
+
+extern CFMutableArrayRef allWindowsRef;
+extern CFMutableSetRef disallowedURLs;
+extern CFRunLoopTimerRef waitToDumpWatchdog;
+extern CFTimeInterval waitToDumpWatchdogInterval;
 
 extern WebFrame* mainFrame;
-extern DumpRenderTreeDraggingInfo* draggingInfo;
 extern WebFrame* topLoadingFrame;
+
+extern DumpRenderTreeDraggingInfo* draggingInfo;
+
+// Global Controllers
 extern NavigationController* navigationController;
-extern NSTimer* waitToDumpWatchdog;
-extern NSTimeInterval waitToDumpWatchdogInterval;
-extern CFMutableArrayRef allWindowsRef;
-extern NSMutableSet* disallowedURLs;
 
 // Delegates
 extern FrameLoadDelegate* frameLoadDelegate;
@@ -80,3 +86,5 @@ extern PolicyDelegate* policyDelegate;
 WebView* createWebView();
 void displayWebView();
 void dump(void);
+
+#endif DumpRenderTree_h

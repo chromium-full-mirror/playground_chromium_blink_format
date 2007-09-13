@@ -82,7 +82,7 @@ class LayoutTestController {
   int windowCount();
 
  private:
-  static JSClassRef getLayoutTestControllerJSClass();
+  static JSClassRef getJSClass();
   static JSStaticFunction* staticFunctions();
 };
 
