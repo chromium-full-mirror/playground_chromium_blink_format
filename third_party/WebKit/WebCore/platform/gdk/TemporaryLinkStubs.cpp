@@ -40,7 +40,6 @@
 #include "DocumentLoader.h"
 #include "EditCommand.h"
 #include "Editor.h"
-#include "FileChooser.h"
 #include "FileSystem.h"
 #include "Font.h"
 #include "FrameLoadRequest.h"
@@ -156,20 +155,6 @@ SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {
 bool SearchPopupMenu::enabled() {
   notImplemented();
   return true;
-}
-
-FileChooser::FileChooser(FileChooserClient*, const String&) {
-  notImplemented();
-}
-FileChooser::~FileChooser() {
-  notImplemented();
-}
-void FileChooser::openFileChooser(Document*) {
-  notImplemented();
-}
-String FileChooser::basenameForWidth(const Font&, int width) const {
-  notImplemented();
-  return String();
 }
 
 Color WebCore::focusRingColor() {
