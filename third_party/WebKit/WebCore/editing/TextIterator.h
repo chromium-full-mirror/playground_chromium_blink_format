@@ -86,6 +86,7 @@ class TextIterator {
  private:
   void exitNode();
   bool shouldRepresentNodeOffsetZero();
+  bool shouldEmitSpaceBeforeAndAfterNode(Node*);
   void representNodeOffsetZero();
   bool handleTextNode();
   bool handleReplacedElement();
@@ -144,8 +145,10 @@ class TextIterator {
   // any other content
   bool m_haveEmitted;
 
-  // Used by selection preservation code.
-  bool m_emitForReplacedElements;
+  // Used by selection preservation code.  There should be one character emitted
+  // between every VisiblePosition
+  // in the Range used to create the TextIterator.
+  bool m_emitForSelectionPreservation;
 };
 
 // Iterates through the DOM range, returning all the text, and 0-length
