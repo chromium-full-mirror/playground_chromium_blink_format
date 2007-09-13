@@ -514,6 +514,7 @@ PluginPackageWin* PluginDatabaseWin::findPlugin(const KURL& url,
 
 PluginViewWin* PluginDatabaseWin::createPluginView(
     Frame* parentFrame,
+    const IntSize& size,
     Element* element,
     const KURL& url,
     const Vector<String>& paramNames,
@@ -525,7 +526,7 @@ PluginViewWin* PluginDatabaseWin::createPluginView(
   if (!plugin && refresh())
     plugin = findPlugin(url, mimeType);
 
-  return new PluginViewWin(parentFrame, plugin, element, url, paramNames,
+  return new PluginViewWin(parentFrame, size, plugin, element, url, paramNames,
                            paramValues, mimeType);
 }
 }

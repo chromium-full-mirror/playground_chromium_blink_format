@@ -80,6 +80,7 @@ class PluginViewWin : public Widget {
 
  public:
   PluginViewWin(Frame* parentFrame,
+                const IntSize&,
                 PluginPackageWin* plugin,
                 Element*,
                 const KURL&,
