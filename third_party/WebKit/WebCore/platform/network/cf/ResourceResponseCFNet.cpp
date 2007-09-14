@@ -53,31 +53,6 @@ static inline bool filenameHasSaneExtension(const String& filename) {
   return dot > 0 && dot < length - 1;
 }
 
-static inline String suggestedFilenameForResponse(
-    const ResourceResponse& response,
-    const HTTPHeaderMap& headers) {
-  // FIXME: When <rdar://problem/5053780> is fixed we can get rid of this
-  // function.
-  CFURLResponseRef cfURLResponse = response.cfURLResponse();
-  ASSERT(cfURLResponse);
-
-  String filename;
-
-  // First, try the Content-Disposition header.
-  String contentDisposition = headers.get("Content-Disposition");
-  if (!contentDisposition.isNull())
-    filename = filenameFromHTTPContentDisposition(contentDisposition);
-
-  if (filename.isNull()) {
-    RetainPtr<CFStringRef> suggestedFilename(
-        AdoptCF, CFURLResponseCopySuggestedFilename(cfURLResponse));
-
-    filename = suggestedFilename.get();
-  }
-
-  return filename;
-}
-
 void ResourceResponse::doUpdateResourceResponse() {
   if (!m_cfResponse.get())
     return;
@@ -100,6 +75,10 @@ void ResourceResponse::doUpdateResourceResponse() {
       CFURLResponseGetLastModifiedDate(m_cfResponse.get());
   m_lastModifiedDate = min(
       (time_t)(lastModified + kCFAbsoluteTimeIntervalSince1970), MAX_TIME_T);
+
+  RetainPtr<CFStringRef> suggestedFilename(
+      AdoptCF, CFURLResponseCopySuggestedFilename(m_cfResponse.get()));
+  m_suggestedFilename = suggestedFilename.get();
 
   CFHTTPMessageRef httpResponse =
       CFURLResponseGetHTTPResponse(m_cfResponse.get());
@@ -124,8 +103,5 @@ void ResourceResponse::doUpdateResourceResponse() {
       m_httpHeaderFields.set((CFStringRef)keys[i], (CFStringRef)values[i]);
   } else
     m_httpStatusCode = 0;
-
-  m_suggestedFilename =
-      suggestedFilenameForResponse(m_cfResponse.get(), m_httpHeaderFields);
 }
 }
