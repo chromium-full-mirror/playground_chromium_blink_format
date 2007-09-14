@@ -163,10 +163,6 @@ class DebuggerDocument {
                               Vector<JSValueRef>&,
                               JSValueRef* exception);
 
-  // Converting string types
-  static NSString* NSStringCreateWithJSStringRef(JSStringRef);
-  static JSValueRef JSValueRefCreateWithNSString(JSContextRef, NSString*);
-
   static JSValueRef callGlobalFunction(
       JSContextRef,
       const char* functionName,
