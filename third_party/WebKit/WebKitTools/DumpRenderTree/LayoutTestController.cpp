@@ -33,7 +33,28 @@
 #include <JavaScriptCore/JSObjectRef.h>
 #include <JavaScriptCore/JSRetainPtr.h>
 
-LayoutTestController::LayoutTestController() {}
+LayoutTestController::LayoutTestController(
+    bool testRepaintDefault,
+    bool testRepaintSweepHorizontallyDefault)
+    : m_dumpAsText(false),
+      m_dumpBackForwardList(false),
+      m_dumpChildFrameScrollPositions(false),
+      m_dumpChildFramesAsText(false),
+      m_dumpDOMAsWebArchive(false),
+      m_dumpSelectionRect(false),
+      m_dumpSourceAsWebArchive(false),
+      m_dumpTitleChanges(false),
+      m_dumpEditingCallbacks(false),
+      m_dumpResourceLoadCallbacks(false),
+      m_dumpFrameLoadCallbacks(false),
+      m_addFileToPasteboardOnDrag(false),
+      m_callCloseOnWebViews(true),
+      m_canOpenWindows(false),
+      m_closeRemainingWindowsWhenComplete(true),
+      m_testRepaint(testRepaintDefault),
+      m_testRepaintSweepHorizontally(testRepaintSweepHorizontallyDefault),
+      m_waitToDump(false),
+      m_windowIsKey(true) {}
 
 LayoutTestController::~LayoutTestController() {}
 
@@ -48,7 +69,7 @@ static JSValueRef dumpAsTextCallback(JSContextRef context,
                                      JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpAsText();
+  controller->setDumpAsText(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -60,7 +81,7 @@ static JSValueRef dumpBackForwardListCallback(JSContextRef context,
                                               JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpBackForwardList();
+  controller->setDumpBackForwardList(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -72,7 +93,7 @@ static JSValueRef dumpChildFramesAsTextCallback(JSContextRef context,
                                                 JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpChildFramesAsText();
+  controller->setDumpChildFramesAsText(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -85,7 +106,7 @@ static JSValueRef dumpChildFrameScrollPositionsCallback(
     JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpChildFrameScrollPositions();
+  controller->setDumpChildFrameScrollPositions(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -97,7 +118,7 @@ static JSValueRef dumpDOMAsWebArchiveCallback(JSContextRef context,
                                               JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpDOMAsWebArchive();
+  controller->setDumpDOMAsWebArchive(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -109,7 +130,7 @@ static JSValueRef dumpEditingCallbacksCallback(JSContextRef context,
                                                JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpEditingCallbacks();
+  controller->setDumpEditingCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -121,7 +142,7 @@ static JSValueRef dumpFrameLoadCallbacksCallback(JSContextRef context,
                                                  JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpFrameLoadCallbacks();
+  controller->setDumpFrameLoadCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -134,7 +155,7 @@ static JSValueRef dumpResourceLoadCallbacksCallback(
     JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpResourceLoadCallbacks();
+  controller->setDumpResourceLoadCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -146,7 +167,7 @@ static JSValueRef dumpSelectionRectCallback(JSContextRef context,
                                             JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpSelectionRect();
+  controller->setDumpSelectionRect(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -158,7 +179,7 @@ static JSValueRef dumpSourceAsWebArchiveCallback(JSContextRef context,
                                                  JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpSourceAsWebArchive();
+  controller->setDumpSourceAsWebArchive(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -170,7 +191,7 @@ static JSValueRef dumpTitleChangesCallback(JSContextRef context,
                                            JSValueRef* exception) {
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->dumpTitleChanges();
+  controller->setDumpTitleChanges(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -180,7 +201,9 @@ static JSValueRef repaintSweepHorizontallyCallback(JSContextRef context,
                                                    size_t argumentCount,
                                                    const JSValueRef arguments[],
                                                    JSValueRef* exception) {
-  repaintSweepHorizontally = true;
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setTestRepaintSweepHorizontally(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -193,7 +216,9 @@ static JSValueRef setCallCloseOnWebViewsCallback(JSContextRef context,
   if (argumentCount < 1)
     return JSValueMakeUndefined(context);
 
-  closeWebViews = JSValueToBoolean(context, arguments[0]);
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setCallCloseOnWebViews(JSValueToBoolean(context, arguments[0]));
   return JSValueMakeUndefined(context);
 }
 
@@ -203,7 +228,9 @@ static JSValueRef setCanOpenWindowsCallback(JSContextRef context,
                                             size_t argumentCount,
                                             const JSValueRef arguments[],
                                             JSValueRef* exception) {
-  canOpenWindows = true;
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setCanOpenWindows(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -217,7 +244,10 @@ static JSValueRef setCloseRemainingWindowsWhenCompleteCallback(
   if (argumentCount < 1)
     return JSValueMakeUndefined(context);
 
-  closeRemainingWindowsWhenComplete = JSValueToBoolean(context, arguments[0]);
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setCloseRemainingWindowsWhenComplete(
+      JSValueToBoolean(context, arguments[0]));
   return JSValueMakeUndefined(context);
 }
 
@@ -227,7 +257,9 @@ static JSValueRef testRepaintCallback(JSContextRef context,
                                       size_t argumentCount,
                                       const JSValueRef arguments[],
                                       JSValueRef* exception) {
-  testRepaint = true;
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setTestRepaint(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -238,7 +270,9 @@ static JSValueRef addFileToPasteboardOnDragCallback(
     size_t argumentCount,
     const JSValueRef arguments[],
     JSValueRef* exception) {
-  addFileToPasteboardOnDrag = YES;
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setAddFileToPasteboardOnDrag(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -628,7 +662,7 @@ static JSValueRef waitUntilDoneCallback(JSContextRef context,
   // Has mac & windows implementation
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->waitUntilDone();
+  controller->setWaitToDump(true);
 
   return JSValueMakeUndefined(context);
 }
