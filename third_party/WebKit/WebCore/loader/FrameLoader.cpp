@@ -443,7 +443,7 @@ bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
   } else
     url = completeURL(urlString);
 
-  Frame* frame = m_frame->tree()->child(frameName);
+  Frame* frame = ownerElement->contentFrame();
   if (frame)
     frame->loader()->scheduleLocationChange(url.url(), m_outgoingReferrer, true,
                                             userGestureHint());
