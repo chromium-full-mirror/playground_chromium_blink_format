@@ -378,4 +378,7 @@ bool deleteFile(const String& path) {
 void callOnMainThread(void (*)()) {
   notImplemented();
 }
+void initializeThreading() {
+  notImplemented();
+}
 }

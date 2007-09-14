@@ -78,10 +78,6 @@ class ThreadCondition : Noncopyable {
 void initializeThreading();
 void callOnMainThread(void (*)());
 
-#if !PLATFORM(WIN)
-void initializeThreading() {}
-#endif
-
 }  // namespace WebCore
 
 #endif  // Threading_h
