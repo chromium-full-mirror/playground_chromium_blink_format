@@ -1120,8 +1120,7 @@ void FrameLoader::startIconLoader() {
       // of the icon from the database to make sure someone
       // has done it.  This is after registering for the notification so the
       // WebView can call the appropriate delegate method.
-      // Otherwise if the icon data *is* available, and this icon load was
-      // previously deferred, we need to notifiy the delegate
+      // Otherwise if the icon data *is* available, notify the delegate
       if (!iconDatabase()->iconDataKnownForIconURL(urlString)) {
         LOG(IconDatabase,
             "Told not to load icon %s but icon data is not yet available - "
@@ -1131,7 +1130,7 @@ void FrameLoader::startIconLoader() {
         iconDatabase()->iconForPageURL(m_URL.url(), IntSize(0, 0));
         iconDatabase()->iconForPageURL(originalRequestURL().url(),
                                        IntSize(0, 0));
-      } else if (m_mayLoadIconLater)
+      } else
         m_client->dispatchDidReceiveIcon();
 
       return;
