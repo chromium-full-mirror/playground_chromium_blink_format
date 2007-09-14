@@ -713,10 +713,6 @@ class FrameLoader : Noncopyable
                                               const ResourceResponse&,
                                               int length);
 
-  void setShouldClearWindowProperties(bool shouldClearWindowProperties) {
-    m_shouldClearWindowProperties = shouldClearWindowProperties;
-  }
-
   Frame* m_frame;
   FrameLoaderClient* m_client;
 
@@ -769,7 +765,6 @@ class FrameLoader : Noncopyable
   OwnPtr<ScheduledRedirection> m_scheduledRedirection;
 
   bool m_needsClear;
-  bool m_shouldClearWindowProperties;
   bool m_receivedData;
 
   bool m_encodingWasChosenByUser;
