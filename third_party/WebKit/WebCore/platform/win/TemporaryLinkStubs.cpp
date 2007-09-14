@@ -162,7 +162,3 @@ String WebCore::signedPublicKeyAndChallengeString(unsigned,
   notImplemented();
   return String();
 }
-
-void WebCore::callOnMainThread(void (*)()) {
-  notImplemented();
-}
