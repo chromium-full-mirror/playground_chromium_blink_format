@@ -375,6 +375,10 @@ bool deleteFile(const String& path) {
   notImplemented();
   return false;
 }
+bool fileSize(const String& path, long long& result) {
+  notImplemented();
+  return false;
+}
 void callOnMainThread(void (*)()) {
   notImplemented();
 }
