@@ -81,7 +81,8 @@ const int cMaxTimerNestingLevel = 5;
 const double cMinimumTimerInterval = 0.010;
 
 struct WindowPrivate {
-  WindowPrivate() : loc(0), m_evt(0), m_returnValueSlot(0) {}
+  WindowPrivate()
+      : loc(0), m_evt(0), m_dialogArguments(0), m_returnValueSlot(0) {}
 
   Window::ListenersMap jsEventListeners;
   Window::ListenersMap jsHTMLEventListeners;
