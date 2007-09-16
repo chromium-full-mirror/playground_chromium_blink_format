@@ -49,10 +49,6 @@ class FontPlatformData {
 
   static bool init();
 
-  static cairo_font_face_t** list(FontDescription&,
-                                  const AtomicString& familyName,
-                                  int* length);
-
   bool isFixedPitch();
 
   void setFont(cairo_t*) const;
