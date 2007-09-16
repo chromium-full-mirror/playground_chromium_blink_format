@@ -225,6 +225,9 @@ class String {
   CString latin1() const;
   CString utf8() const;
 
+  static String fromUTF8(const char*, size_t);
+  static String fromUTF8(const char*);
+
   // Determines the writing direction using the Unicode Bidi Algorithm rules P2
   // and P3.
   WTF::Unicode::Direction defaultWritingDirection() const {

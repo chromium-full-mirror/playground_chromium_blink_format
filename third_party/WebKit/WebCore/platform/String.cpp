@@ -430,6 +430,14 @@ CString String::utf8() const {
   return UTF8Encoding().encode(characters(), length());
 }
 
+String String::fromUTF8(const char* string, size_t size) {
+  return UTF8Encoding().decode(string, size);
+}
+
+String String::fromUTF8(const char* string) {
+  return UTF8Encoding().decode(string, strlen(string));
+}
+
 bool operator==(const String& a, const DeprecatedString& b) {
   unsigned l = a.length();
   if (l != b.length())
