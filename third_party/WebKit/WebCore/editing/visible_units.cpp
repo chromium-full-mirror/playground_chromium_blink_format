@@ -238,7 +238,7 @@ static unsigned previousWordPositionBoundary(const UChar* characters,
 
 VisiblePosition previousWordPosition(const VisiblePosition& c) {
   VisiblePosition prev = previousBoundary(c, previousWordPositionBoundary);
-  return c.firstEditablePositionAtOrAfter(prev);
+  return c.honorEditableBoundaryAtOrAfter(prev);
 }
 
 static unsigned nextWordPositionBoundary(const UChar* characters,
@@ -248,7 +248,7 @@ static unsigned nextWordPositionBoundary(const UChar* characters,
 
 VisiblePosition nextWordPosition(const VisiblePosition& c) {
   VisiblePosition next = nextBoundary(c, nextWordPositionBoundary);
-  return c.lastEditablePositionAtOrBefore(next);
+  return c.honorEditableBoundaryAtOrBefore(next);
 }
 
 // ---------
@@ -270,6 +270,16 @@ static RootInlineBox* rootBoxForLine(const VisiblePosition& c) {
   return box->root();
 }
 
+static VisiblePosition positionAvoidingFirstPositionInTable(
+    const VisiblePosition& c) {
+  // return table offset 0 instead of the first VisiblePosition inside the table
+  VisiblePosition previous = c.previous();
+  if (isLastPositionBeforeTable(previous))
+    return previous;
+
+  return c;
+}
+
 static VisiblePosition startPositionForLine(const VisiblePosition& c) {
   if (c.isNull())
     return VisiblePosition();
@@ -281,7 +291,8 @@ static VisiblePosition startPositionForLine(const VisiblePosition& c) {
     Position p = c.deepEquivalent();
     if (p.node()->renderer() && p.node()->renderer()->isRenderBlock() &&
         p.offset() == 0)
-      return c;
+      return positionAvoidingFirstPositionInTable(c);
+
     return VisiblePosition();
   }
 
@@ -312,13 +323,7 @@ static VisiblePosition startPositionForLine(const VisiblePosition& c) {
   }
 
   VisiblePosition visPos = VisiblePosition(startNode, startOffset, DOWNSTREAM);
-
-  // return table offset 0 instead of the first VisiblePosition inside the table
-  VisiblePosition visPrevious = visPos.previous();
-  if (isLastPositionBeforeTable(visPrevious))
-    visPos = visPrevious;
-
-  return visPos;
+  return positionAvoidingFirstPositionInTable(visPos);
 }
 
 VisiblePosition startOfLine(const VisiblePosition& c) {
@@ -345,7 +350,7 @@ VisiblePosition startOfLine(const VisiblePosition& c) {
     }
   }
 
-  return c.firstEditablePositionAtOrAfter(visPos);
+  return c.honorEditableBoundaryAtOrAfter(visPos);
 }
 
 static VisiblePosition endPositionForLine(const VisiblePosition& c) {
@@ -416,7 +421,7 @@ VisiblePosition endOfLine(const VisiblePosition& c) {
     visPos = endPositionForLine(visPos);
   }
 
-  return c.lastEditablePositionAtOrBefore(visPos);
+  return c.honorEditableBoundaryAtOrBefore(visPos);
 }
 
 bool inSameLine(const VisiblePosition& a, const VisiblePosition& b) {
@@ -615,7 +620,7 @@ static unsigned previousSentencePositionBoundary(const UChar* characters,
 
 VisiblePosition previousSentencePosition(const VisiblePosition& c) {
   VisiblePosition prev = previousBoundary(c, previousSentencePositionBoundary);
-  return c.firstEditablePositionAtOrAfter(prev);
+  return c.honorEditableBoundaryAtOrAfter(prev);
 }
 
 static unsigned nextSentencePositionBoundary(const UChar* characters,
@@ -629,7 +634,7 @@ static unsigned nextSentencePositionBoundary(const UChar* characters,
 
 VisiblePosition nextSentencePosition(const VisiblePosition& c) {
   VisiblePosition next = nextBoundary(c, nextSentencePositionBoundary);
-  return c.lastEditablePositionAtOrBefore(next);
+  return c.honorEditableBoundaryAtOrBefore(next);
 }
 
 // FIXME: Broken for positions before/after images that aren't inline (5027702)
