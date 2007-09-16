@@ -40,7 +40,6 @@
 #include "DocumentLoader.h"
 #include "EditCommand.h"
 #include "Editor.h"
-#include "FileSystem.h"
 #include "Font.h"
 #include "FrameLoadRequest.h"
 #include "FrameLoader.h"
@@ -366,14 +365,6 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
 float userIdleTime() {
   notImplemented();
   return 0.0;
-}
-bool fileExists(const String& path) {
-  notImplemented();
-  return false;
-}
-bool deleteFile(const String& path) {
-  notImplemented();
-  return false;
 }
 bool fileSize(const String& path, long long& result) {
   notImplemented();
