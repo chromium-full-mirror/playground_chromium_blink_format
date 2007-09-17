@@ -81,6 +81,9 @@ struct _WebKitGtkFramePrivate {
   WebCore::Frame* frame;
   WebCore::FrameLoaderClient* client;
   WebKitGtkPage* page;
+
+  gchar* title;
+  gchar* location;
 };
 
 GObject* webkit_gtk_frame_init_with_page(WebKitGtkPage*,

@@ -59,6 +59,8 @@ struct _WebKitGtkFrame {
 struct _WebKitGtkFrameClass {
   GObjectClass parent;
 
+  void (*title_changed)(WebKitGtkFrame* frame, gchar* title, gchar* location);
+
   /*
    * protected virtual methods
    */
@@ -84,6 +86,8 @@ WEBKIT_GTK_API gchar* webkit_gtk_frame_get_inner_text(WebKitGtkFrame* frame);
 WEBKIT_GTK_API gchar* webkit_gtk_frame_get_selected_text(WebKitGtkFrame* frame);
 
 WEBKIT_GTK_API gchar* webkit_gtk_frame_get_title(WebKitGtkFrame* frame);
+
+WEBKIT_GTK_API gchar* webkit_gtk_frame_get_location(WebKitGtkFrame* frame);
 
 WEBKIT_GTK_API GSList* webkit_gtk_frame_get_child_frames(WebKitGtkFrame* frame);
 
