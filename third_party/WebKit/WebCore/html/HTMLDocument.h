@@ -44,8 +44,8 @@ class HTMLDocument : public Document, public CachedResourceClient {
 
   void setBody(HTMLElement*, ExceptionCode&);
 
-  int width() const;
-  int height() const;
+  int width();
+  int height();
 
   String dir();
   void setDir(const String&);
