@@ -2225,14 +2225,13 @@ void IconDatabase::removeIconFromSQLDatabase(const String& iconURL) {
   // In practice the only caller of this method is always wrapped in a
   // transaction itself so placing another here is unnecessary
 
+  // It's possible this icon is not in the database because of certain rapid
+  // browsing patterns (such as a stress test) where the
+  // icon is marked to be added then marked for removal before it is ever
+  // written to disk.  No big deal, early return
   int64_t iconID = getIconIDForIconURLFromSQLDatabase(iconURL);
-  ASSERT(iconID);
-  if (!iconID) {
-    LOG_ERROR(
-        "Unable to get iconID for icon URL %s to delete it from the database",
-        urlForLogging(iconURL).utf8().data());
+  if (!iconID)
     return;
-  }
 
   readySQLStatement(m_deletePageURLsForIconURLStatement, m_syncDB,
                     "DELETE FROM PageURL WHERE PageURL.iconID = (?);");
