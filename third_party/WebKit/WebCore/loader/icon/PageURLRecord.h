@@ -52,6 +52,7 @@ class PageURLSnapshot {
 class PageURLRecord : Noncopyable {
  public:
   PageURLRecord(const String& pageURL);
+  ~PageURLRecord();
 
   inline String url() const { return m_pageURL; }
 

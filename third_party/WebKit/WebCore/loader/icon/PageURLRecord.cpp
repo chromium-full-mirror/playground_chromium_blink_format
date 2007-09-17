@@ -36,6 +36,10 @@ namespace WebCore {
 PageURLRecord::PageURLRecord(const String& pageURL)
     : m_pageURL(pageURL), m_retainCount(0) {}
 
+PageURLRecord::~PageURLRecord() {
+  setIconRecord(0);
+}
+
 void PageURLRecord::setIconRecord(PassRefPtr<IconRecord> icon) {
   if (m_iconRecord)
     m_iconRecord->m_retainingPageURLs.remove(m_pageURL);
