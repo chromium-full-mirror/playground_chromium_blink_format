@@ -1152,7 +1152,8 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
       return true;
   }
 
-  frame->view()->scroll(direction, granularity);
+  if (!frame->eventHandler()->scrollOverflow(direction, granularity))
+    frame->view()->scroll(direction, granularity);
 
   return true;
 }
