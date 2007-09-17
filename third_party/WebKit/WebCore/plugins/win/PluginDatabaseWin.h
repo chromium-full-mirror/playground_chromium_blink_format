@@ -52,7 +52,8 @@ class PluginDatabaseWin {
                                   const KURL& url,
                                   const Vector<String>& paramNames,
                                   const Vector<String>& paramValues,
-                                  const String& mimeType);
+                                  const String& mimeType,
+                                  bool loadManually);
 
   bool refresh();
   Vector<PluginPackageWin*> plugins() const;

@@ -62,6 +62,8 @@ class PluginStreamWin : public Shared<PluginStreamWin>,
 
   void startStream();
 
+  void setLoadManually(bool loadManually) { m_loadManually = loadManually; }
+
   // SubresourceLoaderClient
   virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&);
   virtual void didReceiveData(SubresourceLoader*, const char*, int);
@@ -88,6 +90,7 @@ class PluginStreamWin : public Shared<PluginStreamWin>,
   void* m_notifyData;
   bool m_sendNotification;
   PluginStreamState m_streamState;
+  bool m_loadManually;
 
   Timer<PluginStreamWin> m_delayDeliveryTimer;
   void delayDeliveryTimerFired(Timer<PluginStreamWin>*);
