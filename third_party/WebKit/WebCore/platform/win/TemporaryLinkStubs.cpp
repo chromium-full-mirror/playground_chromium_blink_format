@@ -104,14 +104,6 @@ bool ScrollView::inWindow() const {
   return true;
 }
 
-Color WebCore::focusRingColor() {
-  notImplemented();
-  return 0xFF7DADD9;
-}
-void WebCore::setFocusRingColorChangeFunction(void (*)()) {
-  notImplemented();
-}
-
 void Frame::setNeedsReapplyStyles() {
   notImplemented();
 }
