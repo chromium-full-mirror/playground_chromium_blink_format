@@ -26,6 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "DumpRenderTree.h"
 #include "GCController.h"
 
 #include <JavaScriptCore/JSObjectRef.h>
@@ -35,8 +36,7 @@ GCController::GCController() {}
 
 GCController::~GCController() {}
 
-#pragma mark -
-#pragma mark Static Functions
+// Static Functions
 
 static JSValueRef collectCallback(JSContextRef context,
                                   JSObjectRef function,
@@ -80,8 +80,7 @@ static JSValueRef getJSObjectCountCallback(JSContextRef context,
   return JSValueMakeNumber(context, jsObjectCount);
 }
 
-#pragma mark -
-#pragma mark Object Creation
+// Object Creation
 
 void GCController::makeWindowObject(JSContextRef context,
                                     JSObjectRef windowObject,
