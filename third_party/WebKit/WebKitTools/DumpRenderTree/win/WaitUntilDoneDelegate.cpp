@@ -35,14 +35,12 @@
 #include "LayoutTestController.h"
 #include "WorkQueueItem.h"
 #include "WorkQueue.h"
-
 #include <WebCore/COMPtr.h>
 #include <wtf/Platform.h>
 #include <JavaScriptCore/Assertions.h>
 #include <JavaScriptCore/JavaScriptCore.h>
 #include <WebKit/IWebFramePrivate.h>
 #include <WebKit/IWebViewPrivate.h>
-
 #include <stdio.h>
 
 static FrameLoadDelegate* g_delegateWaitingOnTimer;
@@ -100,7 +98,7 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didReceiveTitle(
     /* [in] */ IWebView* webView,
     /* [in] */ BSTR title,
     /* [in] */ IWebFrame* frame) {
-  if (shouldDumpTitleChanges)
+  if (::layoutTestController->dumpTitleChanges() && !done)
     printf("TITLE CHANGED: %S\n", title ? title : L"");
   return S_OK;
 }
@@ -115,7 +113,7 @@ void FrameLoadDelegate::processWork() {
 
   // if we didn't start a new load, then we finished all the commands, so we're
   // ready to dump state
-  if (!topLoadingFrame && !waitToDump)
+  if (!topLoadingFrame && !::layoutTestController->waitToDump())
     dump();
 }
 
@@ -133,7 +131,7 @@ void FrameLoadDelegate::locationChangeDone(IWebError*, IWebFrame* frame) {
   topLoadingFrame = 0;
   WorkQueue::shared()->setFrozen(true);
 
-  if (waitToDump)
+  if (::layoutTestController->waitToDump())
     return;
 
   if (WorkQueue::shared()->count()) {
@@ -165,13 +163,9 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::windowScriptObjectAvailable(
     /* [in] */ IWebView* sender,
     /* [in] */ JSContextRef context,
     /* [in] */ JSObjectRef windowObject) {
-  JSStringRef layoutTestControllerStr =
-      JSStringCreateWithUTF8CString("layoutTestController");
-  JSValueRef layoutTestController = makeLayoutTestController(context);
-  JSObjectSetProperty(
-      context, windowObject, layoutTestControllerStr, layoutTestController,
-      kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, 0);
-  JSStringRelease(layoutTestControllerStr);
+  JSValueRef exception = 0;
+  layoutTestController->makeWindowObject(context, windowObject, &exception);
+  ASSERT(!exception);
 
   JSStringRef eventSenderStr = JSStringCreateWithUTF8CString("eventSender");
   JSValueRef eventSender = makeEventSender(context);

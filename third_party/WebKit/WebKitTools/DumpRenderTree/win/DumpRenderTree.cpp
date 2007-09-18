@@ -28,8 +28,13 @@
 
 #include "DumpRenderTree.h"
 
+#include "EditingDelegate.h"
+#include "LayoutTestController.h"
+#include "UIDelegate.h"
+#include "WaitUntilDoneDelegate.h"
+#include "WorkQueueItem.h"
+#include "WorkQueue.h"
 #include <wtf/Vector.h>
-
 #include <WebCore/COMPtr.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <JavaScriptCore/JavaScriptCore.h>
@@ -44,13 +49,9 @@
 #include <WebKit/IWebURLResponse.h>
 #include <WebKit/IWebViewPrivate.h>
 #include <WebKit/WebKit.h>
+#include <wingdi.h>
 #include <windows.h>
-
-#include "EditingDelegate.h"
-#include "UIDelegate.h"
-#include "WaitUntilDoneDelegate.h"
-#include "WorkQueueItem.h"
-#include "WorkQueue.h"
+#include <stdio.h>
 
 using std::wstring;
 
@@ -72,7 +73,7 @@ static bool threaded = false;
 
 static const char* currentTest;
 
-bool done;
+volatile bool done;
 // This is the topmost frame that is loading, during a given load, or nil when
 // no load is
 // in progress.  Usually this is the same as the main frame, but not always.  In
@@ -84,19 +85,12 @@ IWebFrame* topLoadingFrame;  // !nil iff a load is in progress
 static COMPtr<IWebHistoryItem>
     prevTestBFItem;  // current b/f item at the end of the previous test
 
-bool dumpAsText = false;
-bool waitToDump = false;
-bool shouldDumpEditingCallbacks = false;
-bool shouldDumpTitleChanges = false;
-bool shouldDumpChildFrameScrollPositions = false;
-bool shouldDumpChildFramesAsText = false;
-bool shouldDumpBackForwardList = false;
-bool testRepaint = false;
-bool repaintSweepHorizontally = false;
-
 IWebFrame* frame;
 HWND webViewWindow;
 static HWND hostWindow;
+
+LayoutTestController* layoutTestController = 0;
+CFRunLoopTimerRef waitToDumpWatchdog = 0;
 
 static const unsigned timeoutValue = 60000;
 static const unsigned timeoutId = 10;
@@ -204,7 +198,10 @@ static wstring initialize(HMODULE hModule) {
   return exePath;
 }
 
-#include <stdio.h>
+void displayWebView() {
+  ::InvalidateRect(webViewWindow, 0, TRUE);
+  ::UpdateWindow(webViewWindow);
+}
 
 void dumpFrameScrollPosition(IWebFrame* frame) {
   if (!frame)
@@ -234,7 +231,7 @@ void dumpFrameScrollPosition(IWebFrame* frame) {
            (double)scrollPosition.cy);
   }
 
-  if (shouldDumpChildFrameScrollPositions) {
+  if (::layoutTestController->dumpChildFrameScrollPositions()) {
     COMPtr<IEnumVARIANT> enumKids;
     if (FAILED(frame->childFrames(&enumKids)))
       return;
@@ -290,7 +287,7 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
 
   SysFreeString(innerText);
 
-  if (shouldDumpChildFramesAsText) {
+  if (::layoutTestController->dumpChildFramesAsText()) {
     COMPtr<IEnumVARIANT> enumKids;
     if (FAILED(frame->childFrames(&enumKids)))
       return L"";
@@ -488,7 +485,9 @@ void dump() {
     if (SUCCEEDED(dataSource->response(&response)) && response) {
       BSTR mimeType;
       if (SUCCEEDED(response->MIMEType(&mimeType)))
-        dumpAsText |= !_tcscmp(mimeType, TEXT("text/plain"));
+        ::layoutTestController->setDumpAsText(
+            ::layoutTestController->dumpAsText() |
+            !_tcscmp(mimeType, TEXT("text/plain")));
       SysFreeString(mimeType);
     }
   }
@@ -496,7 +495,7 @@ void dump() {
   BSTR resultString = 0;
 
   if (dumpTree) {
-    if (dumpAsText) {
+    if (::layoutTestController->dumpAsText()) {
       ::InvalidateRect(webViewWindow, 0, TRUE);
       ::SendMessage(webViewWindow, WM_PAINT, 0, 0);
       wstring result = dumpFramesAsText(frame);
@@ -525,7 +524,7 @@ void dump() {
 
     if (!resultString)
       printf("ERROR: nil result from %s",
-             dumpAsText
+             ::layoutTestController->dumpAsText()
                  ? "IDOMElement::innerText"
                  : "IFrameViewPrivate::renderTreeAsExternalRepresentation");
     else {
@@ -538,10 +537,10 @@ void dump() {
       buffer[bufferSize] = '\0';
       printf("%s", buffer);
       free(buffer);
-      if (!dumpAsText)
+      if (!::layoutTestController->dumpAsText())
         dumpFrameScrollPosition(frame);
     }
-    if (shouldDumpBackForwardList)
+    if (::layoutTestController->dumpBackForwardList())
       dumpBackForwardList(frame);
   }
 
@@ -582,17 +581,9 @@ static void runTest(const char* pathOrURL) {
 
   currentTest = pathOrURL;
 
+  ::layoutTestController = new LayoutTestController(false, false);
   done = false;
   topLoadingFrame = 0;
-  waitToDump = false;
-  dumpAsText = false;
-  shouldDumpEditingCallbacks = false;
-  shouldDumpTitleChanges = false;
-  shouldDumpChildFrameScrollPositions = false;
-  shouldDumpChildFramesAsText = false;
-  shouldDumpBackForwardList = false;
-  testRepaint = false;
-  repaintSweepHorizontally = false;
   timedOut = false;
 
   prevTestBFItem = 0;
