@@ -34,16 +34,30 @@
 #endif
 
 namespace WebCore {
+#ifndef __OBJC__
+class NetscapePlugInStreamLoader;
+
+class NetscapePlugInStreamLoaderClient {
+ public:
+  virtual void didReceiveResponse(NetscapePlugInStreamLoader*,
+                                  const ResourceResponse&) = 0;
+  virtual void didReceiveData(NetscapePlugInStreamLoader*,
+                              const char*,
+                              int) = 0;
+  virtual void didFail(NetscapePlugInStreamLoader*, const ResourceError&) = 0;
+  virtual void didFinishLoading(NetscapePlugInStreamLoader*) {}
+};
+#endif
+
+#ifdef __OBJC__
+typedef id<WebPlugInStreamLoaderDelegate> PlugInStreamLoaderDelegate;
+#else
+class NetscapePlugInStreamLoaderClient;
+typedef NetscapePlugInStreamLoaderClient* PlugInStreamLoaderDelegate;
+#endif
 
 class NetscapePlugInStreamLoader : public ResourceLoader {
  public:
-#ifdef __OBJC__
-  typedef id<WebPlugInStreamLoaderDelegate> PlugInStreamLoaderDelegate;
-#else
-  class PlugInStreamLoaderClient;
-  typedef PlugInStreamLoaderClient* PlugInStreamLoaderDelegate;
-#endif
-
   static PassRefPtr<NetscapePlugInStreamLoader> create(
       Frame*,
       PlugInStreamLoaderDelegate);
@@ -51,7 +65,7 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
 
   bool isDone() const;
 
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) || USE(CFNETWORK)
   virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char*,
                               int,
@@ -66,10 +80,14 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
  private:
   NetscapePlugInStreamLoader(Frame*, PlugInStreamLoaderDelegate);
 
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) || USE(CFNETWORK)
   virtual void didCancel(const ResourceError& error);
+#endif
 
+#if PLATFORM(MAC)
   RetainPtr<PlugInStreamLoaderDelegate> m_stream;
+#elif USE(CFNETWORK)
+  NetscapePlugInStreamLoaderClient* m_client;
 #endif
 };
 }

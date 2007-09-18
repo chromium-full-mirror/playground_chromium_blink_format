@@ -94,9 +94,11 @@ PluginStreamWin::~PluginStreamWin() {
 void PluginStreamWin::start() {
   ASSERT(!m_loadManually);
 
-  m_loader = SubresourceLoader::create(m_frame, this, m_resourceRequest);
-  if (m_loader)
-    m_loader->setShouldBufferData(false);
+  m_loader = NetscapePlugInStreamLoader::create(m_frame, this);
+
+  m_loader->setShouldBufferData(false);
+  m_loader->documentLoader()->addPlugInStreamLoader(m_loader.get());
+  m_loader->load(m_resourceRequest);
 }
 
 void PluginStreamWin::stop() {
@@ -362,7 +364,7 @@ void PluginStreamWin::sendJavaScriptStream(const KURL& requestURL,
   didFinishLoading(0);
 }
 
-void PluginStreamWin::didReceiveResponse(SubresourceLoader* loader,
+void PluginStreamWin::didReceiveResponse(NetscapePlugInStreamLoader* loader,
                                          const ResourceResponse& response) {
   ASSERT(loader == m_loader);
   ASSERT(m_streamState == StreamBeforeStarted);
@@ -372,7 +374,7 @@ void PluginStreamWin::didReceiveResponse(SubresourceLoader* loader,
   startStream();
 }
 
-void PluginStreamWin::didReceiveData(SubresourceLoader* loader,
+void PluginStreamWin::didReceiveData(NetscapePlugInStreamLoader* loader,
                                      const char* data,
                                      int length) {
   ASSERT(loader == m_loader);
@@ -405,7 +407,8 @@ void PluginStreamWin::didReceiveData(SubresourceLoader* loader,
   }
 }
 
-void PluginStreamWin::didFail(SubresourceLoader* loader, const ResourceError&) {
+void PluginStreamWin::didFail(NetscapePlugInStreamLoader* loader,
+                              const ResourceError&) {
   ASSERT(loader == m_loader);
 
   m_loader = 0;
@@ -414,7 +417,7 @@ void PluginStreamWin::didFail(SubresourceLoader* loader, const ResourceError&) {
   destroyStream(NPRES_NETWORK_ERR);
 }
 
-void PluginStreamWin::didFinishLoading(SubresourceLoader* loader) {
+void PluginStreamWin::didFinishLoading(NetscapePlugInStreamLoader* loader) {
   ASSERT(loader == m_loader);
   ASSERT(m_streamState == StreamStarted);
 

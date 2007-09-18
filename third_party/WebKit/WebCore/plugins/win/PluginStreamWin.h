@@ -33,9 +33,9 @@
 #include "CString.h"
 #include "KURL.h"
 #include "npfunctions.h"
+#include "NetscapePlugInStreamLoader.h"
 #include "PlatformString.h"
 #include "Shared.h"
-#include "SubresourceLoaderClient.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "StringHash.h"
@@ -48,7 +48,7 @@ class PluginViewWin;
 enum PluginStreamState { StreamBeforeStarted, StreamStarted, StreamStopped };
 
 class PluginStreamWin : public Shared<PluginStreamWin>,
-                        private SubresourceLoaderClient {
+                        private NetscapePlugInStreamLoaderClient {
  public:
   PluginStreamWin(PluginViewWin*,
                   Frame*,
@@ -64,11 +64,12 @@ class PluginStreamWin : public Shared<PluginStreamWin>,
 
   void setLoadManually(bool loadManually) { m_loadManually = loadManually; }
 
-  // SubresourceLoaderClient
-  virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&);
-  virtual void didReceiveData(SubresourceLoader*, const char*, int);
-  virtual void didFail(SubresourceLoader*, const ResourceError&);
-  virtual void didFinishLoading(SubresourceLoader*);
+  // NetscapePlugInStreamLoaderClient
+  virtual void didReceiveResponse(NetscapePlugInStreamLoader*,
+                                  const ResourceResponse&);
+  virtual void didReceiveData(NetscapePlugInStreamLoader*, const char*, int);
+  virtual void didFail(NetscapePlugInStreamLoader*, const ResourceError&);
+  virtual void didFinishLoading(NetscapePlugInStreamLoader*);
 
   void sendJavaScriptStream(const KURL& requestURL,
                             const CString& resultString);
@@ -85,7 +86,7 @@ class PluginStreamWin : public Shared<PluginStreamWin>,
   ResourceResponse m_resourceResponse;
 
   Frame* m_frame;
-  RefPtr<SubresourceLoader> m_loader;
+  RefPtr<NetscapePlugInStreamLoader> m_loader;
   PluginViewWin* m_pluginView;
   void* m_notifyData;
   bool m_sendNotification;
