@@ -268,11 +268,6 @@ bool UniscribeController::shapeAndPlaceItem(const UChar* cp,
     return true;
 
   // We now have a collection of glyphs.
-  // FIXME: Use the cluster and visual attr information to do letter-spacing,
-  // word-spacing
-  // and justification.
-  // FIXME: Support rounding hacks.
-  // FIXME: Support smallcaps (re-itemize and re-shape to do this?).
   Vector<GOFFSET> offsets;
   Vector<int> advances;
   offsets.resize(glyphs.size());
