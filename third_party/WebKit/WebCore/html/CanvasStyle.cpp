@@ -87,7 +87,9 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
           ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f,
           ((color >> 24) & 0xFF) / 255.0f);
 #elif PLATFORM(QT)
-      p->setPen(QPen(QColor(QRgb(color))));
+      QPen currentPen = p->pen();
+      currentPen.setColor((QColor(QRgb(color))));
+      p->setPen(currentPen);
 #endif
       break;
     }
@@ -99,9 +101,11 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
           context->platformContext(), ((color >> 16) & 0xFF) / 255.0f,
           ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, m_alpha);
 #elif PLATFORM(QT)
+      QPen currentPen = p->pen();
       QColor clr = QColor(QRgb(color));
       clr.setAlphaF(m_alpha);
-      p->setPen(clr);
+      currentPen.setColor(clr);
+      p->setPen(currentPen);
 #endif
       break;
     }
@@ -112,8 +116,10 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
                                   m_alpha);
 #elif PLATFORM(QT)
       QColor clr;
+      QPen currentPen = p->pen();
       clr.setRgbF(m_grayLevel, m_grayLevel, m_grayLevel, m_alpha);
-      p->setPen(clr);
+      currentPen.setColor(clr);
+      p->setPen(currentPen);
 #endif
       break;
     }
