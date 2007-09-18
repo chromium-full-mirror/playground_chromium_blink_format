@@ -94,6 +94,8 @@ enum {
 - (void)webView:(WebView*)sender didDrawRect:(NSRect)rect;
 - (void)webView:(WebView*)sender
     didScrollDocumentInFrameView:(WebFrameView*)frameView;
+// FIXME: If we ever make this method public, it should include a WebFrame
+// parameter.
 - (BOOL)webViewShouldInterruptJavaScript:(WebView*)sender;
 - (void)webView:(WebView*)sender willPopupMenu:(NSMenu*)menu;
 - (void)webView:(WebView*)sender
