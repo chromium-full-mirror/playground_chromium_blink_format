@@ -103,7 +103,7 @@ const FontData* FontCache::getFontDataForCharacters(const Font& font,
         FontPlatformData* result =
             getCachedFontPlatformData(font.fontDescription(), familyName);
         if (result)
-          return getCachedFontData(result);
+          fontData = getCachedFontData(result);
       }
     }
   }
