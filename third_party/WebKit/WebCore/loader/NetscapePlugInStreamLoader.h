@@ -34,7 +34,7 @@
 #endif
 
 namespace WebCore {
-#ifndef __OBJC__
+#if USE(CFNETWORK)
 class NetscapePlugInStreamLoader;
 
 class NetscapePlugInStreamLoaderClient {
@@ -49,11 +49,13 @@ class NetscapePlugInStreamLoaderClient {
 };
 #endif
 
+#if PLATFORM(MAC)
 #ifdef __OBJC__
 typedef id<WebPlugInStreamLoaderDelegate> PlugInStreamLoaderDelegate;
 #else
 class NetscapePlugInStreamLoaderClient;
 typedef NetscapePlugInStreamLoaderClient* PlugInStreamLoaderDelegate;
+#endif
 #endif
 
 class NetscapePlugInStreamLoader : public ResourceLoader {
