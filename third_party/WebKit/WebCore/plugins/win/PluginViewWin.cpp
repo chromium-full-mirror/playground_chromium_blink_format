@@ -262,8 +262,13 @@ static LRESULT CALLBACK PluginViewWndProc(HWND hWnd,
 
 LRESULT
 PluginViewWin::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+  if (message == m_lastMessage &&
+      (m_quirks & PluginQuirkDontCallWndProcForSameMessageRecursively) &&
+      m_isCallingPluginWndProc)
+    return 1;
+
   if (message == WM_USER + 1 &&
-      m_quirks & PluginQuirkThrottleWMUserPlusOneMessages) {
+      (m_quirks & PluginQuirkThrottleWMUserPlusOneMessages)) {
     if (!m_messageThrottler)
       m_messageThrottler.set(new PluginMessageThrottlerWin(this));
 
@@ -271,8 +276,16 @@ PluginViewWin::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     return 0;
   }
 
+  m_lastMessage = message;
+  m_isCallingPluginWndProc = true;
+
   // Call the plug-in's window proc.
-  return ::CallWindowProc(m_pluginWndProc, hWnd, message, wParam, lParam);
+  LRESULT result =
+      ::CallWindowProc(m_pluginWndProc, hWnd, message, wParam, lParam);
+
+  m_isCallingPluginWndProc = false;
+
+  return result;
 }
 
 void PluginViewWin::updateWindow() const {
@@ -1394,6 +1407,11 @@ void PluginViewWin::determineQuirks(const String& mimeType) {
   // See <rdar://problem/5487742>.
   if (mimeType == "application/x-silverlight")
     m_quirks |= PluginQuirkDontUnloadPlugin;
+
+  // Prevent the Real plugin from calling the Window Proc recursively, causing
+  // the stack to overflow.
+  if (mimeType == "audio/x-pn-realaudio-plugin")
+    m_quirks |= PluginQuirkDontCallWndProcForSameMessageRecursively;
 }
 
 void PluginViewWin::setParameters(const Vector<String>& paramNames,
@@ -1448,6 +1466,8 @@ PluginViewWin::PluginViewWin(Frame* parentFrame,
       m_isTransparent(false),
       m_isVisible(false),
       m_haveInitialized(false),
+      m_lastMessage(0),
+      m_isCallingPluginWndProc(false),
       m_loadManually(loadManually),
       m_manualStream(0) {
   if (!m_plugin) {
