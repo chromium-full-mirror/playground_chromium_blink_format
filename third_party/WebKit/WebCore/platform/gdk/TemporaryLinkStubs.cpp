@@ -122,16 +122,6 @@ PassRefPtr<Clipboard> Editor::newGeneralClipboard(ClipboardAccessPolicy) {
   return 0;
 }
 
-FTPDirectoryDocument::FTPDirectoryDocument(WebCore::DOMImplementation* i,
-                                           WebCore::Frame* f)
-    : HTMLDocument(i, f) {
-  notImplemented();
-}
-Tokenizer* FTPDirectoryDocument::createTokenizer() {
-  notImplemented();
-  return 0;
-}
-
 namespace WebCore {
 Vector<String> supportedKeySizes() {
   notImplemented();
