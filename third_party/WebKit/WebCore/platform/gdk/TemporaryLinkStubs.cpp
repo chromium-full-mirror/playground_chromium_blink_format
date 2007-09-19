@@ -161,21 +161,6 @@ Color WebCore::focusRingColor() {
 }
 void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
-bool ResourceHandle::willLoadFromCache(ResourceRequest&) {
-  notImplemented();
-  return false;
-}
-bool ResourceHandle::loadsBlocked() {
-  notImplemented();
-  return false;
-}
-void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
-                                               ResourceError& error,
-                                               ResourceResponse& response,
-                                               Vector<char>& data) {
-  notImplemented();
-}
-
 Icon::Icon() {
   notImplemented();
 }

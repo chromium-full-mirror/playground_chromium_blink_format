@@ -656,21 +656,6 @@ bool SearchPopupMenu::enabled() {
   return true;
 }
 
-bool ResourceHandle::willLoadFromCache(ResourceRequest&) {
-  notImplemented();
-  return false;
-}
-bool ResourceHandle::loadsBlocked() {
-  notImplemented();
-  return false;
-}
-void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
-                                               ResourceError& e,
-                                               ResourceResponse& r,
-                                               Vector<char>& data) {
-  notImplemented();
-}
-
 // bool SharedBuffer::hasPlatformData() const { notImplemented(); return false;
 // }
 // const char* SharedBuffer::platformData() const { notImplemented(); return
