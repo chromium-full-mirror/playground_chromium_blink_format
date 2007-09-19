@@ -98,6 +98,7 @@ class HTMLElement : public StyledElement {
 
   void setHTMLEventListener(const AtomicString& eventType, Attribute*);
 
+  virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   HTMLFormElement* form() const { return virtualForm(); }

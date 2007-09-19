@@ -38,6 +38,7 @@
 #include "HTMLNames.h"
 #include "HTMLTokenizer.h"
 #include "RenderWordBreak.h"
+#include "Settings.h"
 #include "Text.h"
 #include "TextIterator.h"
 #include "XMLTokenizer.h"
@@ -116,7 +117,7 @@ bool HTMLElement::mapToEntry(const QualifiedName& attrName,
     return false;
   }
   if (attrName == dirAttr) {
-    result = hasTagName(bdoTag) ? eBDO : eUniversal;
+    result = hasLocalName(bdoTag) ? eBDO : eUniversal;
     return false;
   }
 
@@ -148,8 +149,9 @@ void HTMLElement::parseMappedAttribute(MappedAttribute* attr) {
     // FIXME: Implement
   } else if (attr->name() == dirAttr) {
     addCSSProperty(attr, CSS_PROP_DIRECTION, attr->value());
-    addCSSProperty(attr, CSS_PROP_UNICODE_BIDI,
-                   hasTagName(bdoTag) ? CSS_VAL_BIDI_OVERRIDE : CSS_VAL_EMBED);
+    addCSSProperty(attr, CSS_PROP_UNICODE_BIDI, hasLocalName(bdoTag)
+                                                    ? CSS_VAL_BIDI_OVERRIDE
+                                                    : CSS_VAL_EMBED);
   }
   // standard events
   else if (attr->name() == onclickAttr) {
@@ -873,7 +875,7 @@ bool HTMLElement::inBlockTagList(const Node* newChild) {
 }
 
 bool HTMLElement::checkDTD(const Node* newChild) {
-  if (hasTagName(addressTag) && newChild->hasTagName(pTag))
+  if (hasLocalName(addressTag) && newChild->hasTagName(pTag))
     return true;
   return inEitherTagList(newChild);
 }
@@ -885,9 +887,18 @@ void HTMLElement::setHTMLEventListener(const AtomicString& eventType,
                      attr->localName().domString(), attr->value(), this));
 }
 
+bool HTMLElement::rendererIsNeeded(RenderStyle* style) {
+  if (hasLocalName(noscriptTag)) {
+    Settings* settings = document()->settings();
+    if (settings && settings->isJavaScriptEnabled())
+      return false;
+  }
+  return (document()->documentElement() == this) || (style->display() != NONE);
+}
+
 RenderObject* HTMLElement::createRenderer(RenderArena* arena,
                                           RenderStyle* style) {
-  if (hasTagName(wbrTag))
+  if (hasLocalName(wbrTag))
     return new (arena) RenderWordBreak(this);
   return RenderObject::createObject(this, style);
 }
