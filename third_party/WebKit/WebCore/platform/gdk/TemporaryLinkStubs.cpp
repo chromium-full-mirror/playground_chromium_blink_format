@@ -63,7 +63,6 @@
 #include "ResourceLoader.h"
 #include "Screen.h"
 #include "ScrollBar.h"
-#include "SearchPopupMenu.h"
 #include "TextBoundaries.h"
 #include "TextBreakIteratorInternalICU.h"
 #include "loader.h"
@@ -136,22 +135,6 @@ bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
 }
 void WebCore::refreshPlugins(bool) {
   notImplemented();
-}
-
-void SearchPopupMenu::saveRecentSearches(const AtomicString& name,
-                                         const Vector<String>& searchItems) {
-  notImplemented();
-}
-void SearchPopupMenu::loadRecentSearches(const AtomicString& name,
-                                         Vector<String>& searchItems) {
-  notImplemented();
-}
-SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {
-  notImplemented();
-}
-bool SearchPopupMenu::enabled() {
-  notImplemented();
-  return true;
 }
 
 Color WebCore::focusRingColor() {
