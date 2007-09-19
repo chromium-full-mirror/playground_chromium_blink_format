@@ -700,6 +700,14 @@ HRESULT STDMETHODCALLTYPE WebFrame::provisionalDataSource(
   return *source ? S_OK : E_FAIL;
 }
 
+KURL WebFrame::url() const {
+  Frame* coreFrame = core(this);
+  if (!coreFrame)
+    return KURL();
+
+  return coreFrame->loader()->URL();
+}
+
 HRESULT STDMETHODCALLTYPE WebFrame::stopLoading(void) {
   if (Frame* coreFrame = core(this))
     coreFrame->loader()->stopAllLoaders();
@@ -1478,10 +1486,7 @@ void WebFrame::dispatchWillClose() {
 }
 
 void WebFrame::dispatchDidReceiveIcon() {
-  COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(d->webView->frameLoadDelegate(&frameLoadDelegate)))
-    // FIXME: Pass in the right HBITMAP.
-    frameLoadDelegate->didReceiveIcon(d->webView, 0, this);
+  d->webView->dispatchDidReceiveIconFromWebFrame(this);
 }
 
 void WebFrame::dispatchDidStartProvisionalLoad() {
@@ -2422,7 +2427,9 @@ void WebFrame::windowObjectCleared() const {
 
 void WebFrame::didPerformFirstNavigation() const {}
 
-void WebFrame::registerForIconNotification(bool /*listen*/) {}
+void WebFrame::registerForIconNotification(bool listen) {
+  d->webView->registerForIconNotification(listen);
+}
 
 static IntRect printerRect(HDC printDC) {
   return IntRect(0, 0, GetDeviceCaps(printDC, PHYSICALWIDTH) -

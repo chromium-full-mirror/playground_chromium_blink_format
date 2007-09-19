@@ -433,6 +433,8 @@ class WebFrame : public IWebFrame,
       WebCore::FramePolicyFunction function);
   void receivedPolicyDecision(WebCore::PolicyAction);
 
+  WebCore::KURL url() const;
+
  protected:
   void loadHTMLString(BSTR string, BSTR baseURL, BSTR unreachableURL);
   void loadData(PassRefPtr<WebCore::SharedBuffer>,
