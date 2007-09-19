@@ -252,8 +252,7 @@ static void clearSelectionIfNeeded(Frame* oldFocusedFrame,
     return;
 
   if (Node* mousePressNode = newFocusedFrame->eventHandler()->mousePressNode())
-    if (mousePressNode->renderer() &&
-        mousePressNode->renderer()->style()->userSelect() == SELECT_IGNORE)
+    if (mousePressNode->renderer() && !mousePressNode->canStartSelection())
       if (Node* root = s->rootEditableElement())
         if (Node* shadowAncestorNode = root->shadowAncestorNode())
           // Don't do this for textareas and text fields, when they lose focus

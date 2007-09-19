@@ -105,6 +105,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
   virtual bool saveState(String& value) const;
   virtual void restoreState(const String&);
 
+  virtual bool canStartSelection() const;
+
   bool canHaveSelection() const;
   int selectionStart() const;
   int selectionEnd() const;

@@ -52,6 +52,8 @@ class HTMLImageElement : public HTMLElement {
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
+  virtual bool canStartSelection() const { return false; }
+
   int width(bool ignorePendingStylesheets = false) const;
   int height(bool ignorePendingStylesheets = false) const;
 

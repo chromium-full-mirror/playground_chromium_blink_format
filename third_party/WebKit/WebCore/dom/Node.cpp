@@ -1060,6 +1060,12 @@ int Node::nextOffset(int current) const {
   return renderer() ? renderer()->nextOffset(current) : current + 1;
 }
 
+bool Node::canStartSelection() const {
+  if (isContentEditable())
+    return true;
+  return parent() ? parent()->canStartSelection() : true;
+}
+
 Node* Node::shadowAncestorNode() {
 #if ENABLE(SVG)
   // SVG elements living in a shadow tree only occour when <use> created them.

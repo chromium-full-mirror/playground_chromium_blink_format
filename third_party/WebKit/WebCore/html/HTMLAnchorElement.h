@@ -49,6 +49,8 @@ class HTMLAnchorElement : public HTMLElement {
   virtual void accessKeyAction(bool fullAction);
   virtual bool isURLAttribute(Attribute*) const;
 
+  virtual bool canStartSelection() const;
+
   String accessKey() const;
   void setAccessKey(const String&);
 
