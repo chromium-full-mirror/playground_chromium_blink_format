@@ -48,10 +48,6 @@ G_BEGIN_DECLS
 #define WEBKIT_GTK_FRAME_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS((obj), WEBKIT_GTK_TYPE_FRAME, WebKitGtkFrameClass))
 
-typedef struct _WebKitGtkPage WebKitGtkPage;
-typedef struct _WebKitGtkFrame WebKitGtkFrame;
-typedef struct _WebKitGtkFrameClass WebKitGtkFrameClass;
-
 struct _WebKitGtkFrame {
   GObject parent;
 };
