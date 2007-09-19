@@ -351,10 +351,6 @@ float userIdleTime() {
   notImplemented();
   return 0.0;
 }
-bool fileSize(const String& path, long long& result) {
-  notImplemented();
-  return false;
-}
 void callOnMainThread(void (*)()) {
   notImplemented();
 }
