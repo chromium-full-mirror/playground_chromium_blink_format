@@ -141,20 +141,6 @@ Color WebCore::focusRingColor() {
 }
 void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
-Icon::Icon() {
-  notImplemented();
-}
-Icon::~Icon() {
-  notImplemented();
-}
-PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
-  notImplemented();
-  return PassRefPtr<Icon>(new Icon());
-}
-void Icon::paint(GraphicsContext*, const IntRect&) {
-  notImplemented();
-}
-
 void CachedPage::close() {
   notImplemented();
 }
