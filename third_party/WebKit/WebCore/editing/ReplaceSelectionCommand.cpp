@@ -449,6 +449,13 @@ void ReplaceSelectionCommand::removeRedundantStyles(
           computedStyle(node)->copyInheritableProperties();
       parentStyle->diff(style.get());
 
+      // Remove any inherited block properties that are now in the span's style.
+      // This cuts out meaningless properties
+      // and prevents properties from magically affecting blocks later if the
+      // style is cloned for a new block element
+      // during a future editing operation.
+      style->removeBlockProperties();
+
       styles.append(style.release());
     }
     if (node == m_lastLeafInserted)

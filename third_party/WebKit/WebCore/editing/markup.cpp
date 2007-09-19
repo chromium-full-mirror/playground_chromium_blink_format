@@ -749,12 +749,22 @@ DeprecatedString createMarkup(const Range* range,
   if (parentOfLastClosed && parentOfLastClosed->renderer()) {
     RefPtr<CSSMutableStyleDeclaration> style =
         computedStyle(parentOfLastClosed)->copyInheritableProperties();
+
     // Styles that Mail blockquotes contribute should only be placed on the Mail
     // blockquote, to help
     // us differentiate those styles from ones that the user has applied.  This
     // helps us
     // get the color of content pasted into blockquotes right.
     removeEnclosingMailBlockquoteStyle(style.get(), parentOfLastClosed);
+
+    // Since we are converting blocks to inlines, remove any inherited block
+    // properties that are in the style.
+    // This cuts out meaningless properties and prevents properties from
+    // magically affecting blocks later
+    // if the style is cloned for a new block element during a future editing
+    // operation.
+    if (convertBlocksToInlines)
+      style->removeBlockProperties();
 
     if (style->length() > 0) {
       DeprecatedString openTag =
