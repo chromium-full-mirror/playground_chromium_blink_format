@@ -32,6 +32,8 @@
 
 #if PLATFORM(CG)
 typedef struct CGShading* CGShadingRef;
+#elif PLATFORM(QT)
+class QGradient;
 #endif
 
 namespace WebCore {
@@ -53,6 +55,8 @@ class CanvasGradient : public Shared<CanvasGradient> {
 
 #if PLATFORM(CG)
   CGShadingRef platformShading();
+#elif PLATFORM(QT)
+  QGradient* platformShading();
 #endif
 
   struct ColorStop {
@@ -79,6 +83,8 @@ class CanvasGradient : public Shared<CanvasGradient> {
 
 #if PLATFORM(CG)
   CGShadingRef m_shading;
+#elif PLATFORM(QT)
+  QGradient* m_shading;
 #endif
 };
 

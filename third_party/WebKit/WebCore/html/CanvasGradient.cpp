@@ -30,6 +30,8 @@
 
 #if PLATFORM(CG)
 #include <ApplicationServices/ApplicationServices.h>
+#elif PLATFORM(QT)
+#include <QGradient>
 #endif
 
 namespace WebCore {
@@ -41,6 +43,9 @@ CanvasGradient::CanvasGradient(const FloatPoint& p0, const FloatPoint& p1)
       m_stopsSorted(false),
       m_lastStop(0)
 #if PLATFORM(CG)
+      ,
+      m_shading(0)
+#elif PLATFORM(QT)
       ,
       m_shading(0)
 #endif
@@ -61,6 +66,9 @@ CanvasGradient::CanvasGradient(const FloatPoint& p0,
 #if PLATFORM(CG)
       ,
       m_shading(0)
+#elif PLATFORM(QT)
+      ,
+      m_shading(0)
 #endif
 {
 }
@@ -68,6 +76,8 @@ CanvasGradient::CanvasGradient(const FloatPoint& p0,
 CanvasGradient::~CanvasGradient() {
 #if PLATFORM(CG)
   CGShadingRelease(m_shading);
+#elif PLATFORM(QT)
+  delete m_shading;
 #endif
 }
 
@@ -81,6 +91,9 @@ void CanvasGradient::addColorStop(float value, const String& color) {
 
 #if PLATFORM(CG)
   CGShadingRelease(m_shading);
+  m_shading = 0;
+#elif PLATFORM(QT)
+  delete m_shading;
   m_shading = 0;
 #endif
 }
@@ -117,6 +130,31 @@ CGShadingRef CanvasGradient::platformShading() {
 
   CGColorSpaceRelease(colorSpace);
   CGFunctionRelease(colorFunction);
+
+  return m_shading;
+}
+
+#elif PLATFORM(QT)
+
+QGradient* CanvasGradient::platformShading() {
+  if (m_shading)
+    return m_shading;
+
+  if (m_radial)
+    m_shading =
+        new QRadialGradient(m_p0.x(), m_p0.y(), m_r0, m_p1.x(), m_p1.y());
+  else
+    m_shading = new QLinearGradient(m_p0.x(), m_p0.y(), m_p1.x(), m_p1.y());
+
+  QColor stopColor;
+  Vector<ColorStop>::iterator stopIterator = m_stops.begin();
+  ;
+  while (stopIterator != m_stops.end()) {
+    stopColor.setRgbF(stopIterator->red, stopIterator->green,
+                      stopIterator->blue, stopIterator->alpha);
+    m_shading->setColorAt(stopIterator->stop, stopColor);
+    ++stopIterator;
+  }
 
   return m_shading;
 }
