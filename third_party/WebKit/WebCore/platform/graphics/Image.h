@@ -128,6 +128,7 @@ class Image : Noncopyable {
 
 #if PLATFORM(WIN)
   virtual bool getHBITMAP(HBITMAP) { return false; }
+  virtual bool getHBITMAPOfSize(HBITMAP, LPSIZE) { return false; }
 #endif
 
  protected:
@@ -137,6 +138,12 @@ class Image : Noncopyable {
                                  CompositeOperator op);
 
  private:
+#if PLATFORM(WIN)
+  virtual void drawFrameMatchingSourceSize(GraphicsContext*,
+                                           const FloatRect& dstRect,
+                                           const IntSize& srcSize,
+                                           CompositeOperator) {}
+#endif
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,

@@ -124,6 +124,7 @@ class BitmapImage : public Image {
 
 #if PLATFORM(WIN)
   virtual bool getHBITMAP(HBITMAP);
+  virtual bool getHBITMAPOfSize(HBITMAP, LPSIZE);
 #endif
 
   virtual NativeImagePtr nativeImageForCurrentFrame() {
@@ -131,6 +132,12 @@ class BitmapImage : public Image {
   }
 
  private:
+#if PLATFORM(WIN)
+  virtual void drawFrameMatchingSourceSize(GraphicsContext*,
+                                           const FloatRect& dstRect,
+                                           const IntSize& srcSize,
+                                           CompositeOperator);
+#endif
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
