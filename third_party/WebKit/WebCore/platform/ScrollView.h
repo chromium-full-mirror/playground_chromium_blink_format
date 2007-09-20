@@ -155,6 +155,9 @@ class ScrollView : public Widget {
                           const IntRect& clipRect);
   void updateBackingStore();
 
+  void setAllowsScrolling(bool);
+  bool allowsScrolling() const;
+
   HashSet<Widget*>* children();
 
  private:

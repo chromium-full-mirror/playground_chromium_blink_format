@@ -198,6 +198,12 @@ class WebFrame : public IWebFrame,
       /* [in] */ IWebFrame* ancestor,
       /* [retval][out] */ BOOL* result);
 
+  virtual HRESULT STDMETHODCALLTYPE setAllowsScrolling(
+      /* [in] */ BOOL flag);
+
+  virtual HRESULT STDMETHODCALLTYPE allowsScrolling(
+      /* [retval][out] */ BOOL* flag);
+
   // FrameWinClient
   virtual void ref();
   virtual void deref();

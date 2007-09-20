@@ -76,6 +76,9 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
 
   void scrollBackingStore(const IntSize& scrollDelta);
 
+  void setAllowsScrolling(bool);
+  bool allowsScrolling() const;
+
   ScrollView* m_view;
   IntSize m_scrollOffset;
   IntSize m_contentsSize;
@@ -171,6 +174,26 @@ void ScrollView::ScrollViewPrivate::scrollBackingStore(
   // store's updateRect and so should
   // be very fast).
   ::UpdateWindow(containingWindowHandle);
+}
+
+void ScrollView::ScrollViewPrivate::setAllowsScrolling(bool flag) {
+  if (flag && m_vScrollbarMode == ScrollbarAlwaysOff)
+    m_vScrollbarMode = ScrollbarAuto;
+  else if (!flag)
+    m_vScrollbarMode = ScrollbarAlwaysOff;
+
+  if (flag && m_hScrollbarMode == ScrollbarAlwaysOff)
+    m_hScrollbarMode = ScrollbarAuto;
+  else if (!flag)
+    m_hScrollbarMode = ScrollbarAlwaysOff;
+
+  m_view->updateScrollbars(m_scrollOffset);
+}
+
+bool ScrollView::ScrollViewPrivate::allowsScrolling() const {
+  // Return YES if either horizontal or vertical scrolling is allowed.
+  return m_hScrollbarMode != ScrollbarAlwaysOff ||
+         m_vScrollbarMode != ScrollbarAlwaysOff;
 }
 
 IntRect ScrollView::ScrollViewPrivate::windowClipRect() const {
@@ -720,6 +743,14 @@ void ScrollView::updateBackingStore() {
   if (!page)
     return;
   page->chrome()->updateBackingStore();
+}
+
+void ScrollView::setAllowsScrolling(bool flag) {
+  m_data->setAllowsScrolling(flag);
+}
+
+bool ScrollView::allowsScrolling() const {
+  return m_data->allowsScrolling();
 }
 
 }  // namespace WebCore

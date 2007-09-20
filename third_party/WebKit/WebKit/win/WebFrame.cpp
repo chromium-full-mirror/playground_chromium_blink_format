@@ -448,6 +448,25 @@ WebFrame* WebFrame::createInstance() {
   return instance;
 }
 
+HRESULT STDMETHODCALLTYPE WebFrame::setAllowsScrolling(
+    /* [in] */ BOOL flag) {
+  if (Frame* frame = core(this))
+    if (FrameView* view = frame->view())
+      view->setAllowsScrolling(!!flag);
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebFrame::allowsScrolling(
+    /* [retval][out] */ BOOL* flag) {
+  if (flag)
+    if (Frame* frame = core(this))
+      if (FrameView* view = frame->view())
+        *flag = view->allowsScrolling();
+
+  return S_OK;
+}
+
 // IUnknown -------------------------------------------------------------------
 
 HRESULT STDMETHODCALLTYPE WebFrame::QueryInterface(REFIID riid,
