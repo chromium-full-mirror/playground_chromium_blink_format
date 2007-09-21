@@ -60,6 +60,11 @@ void NetscapePlugInStreamLoader::didReceiveResponse(
   RefPtr<NetscapePlugInStreamLoader> protect(this);
 
   m_client->didReceiveResponse(this, response);
+
+  // Don't continue if the stream is cancelled
+  if (!m_client)
+    return;
+
   ResourceLoader::didReceiveResponse(response);
 }
 
