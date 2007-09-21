@@ -769,16 +769,13 @@ void PluginViewWin::performRequest(PluginRequestWin* request) {
   RefPtr<Frame> parentFrame = m_parentFrame;
   JSValue* result =
       m_parentFrame->loader()->executeScript(jsString.deprecatedString(), true);
-  String resultString;
 
-  if (!getString(parentFrame->scriptProxy(), result, resultString))
-    return;
+  if (request->frameLoadRequest().frameName().isNull()) {
+    String resultString;
 
-  if (!request->frameLoadRequest().frameName().isNull()) {
-    parentFrame->loader()->begin();
-    parentFrame->loader()->write(resultString);
-    parentFrame->loader()->end();
-  } else {
+    if (!getString(parentFrame->scriptProxy(), result, resultString))
+      return;
+
     CString cstr = resultString.utf8();
     RefPtr<PluginStreamWin> stream = new PluginStreamWin(
         this, parentFrame.get(), request->frameLoadRequest().resourceRequest(),
