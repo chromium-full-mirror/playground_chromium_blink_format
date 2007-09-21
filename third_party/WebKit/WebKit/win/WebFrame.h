@@ -467,6 +467,7 @@ class WebFrame : public IWebFrame,
   WebCore::KURL m_originalRequestURL;
   bool m_inPrintingMode;
   Vector<WebCore::IntRect> m_pageRects;
+  int m_pageHeight;  // height of the page adjusted by margins
 };
 
 #endif

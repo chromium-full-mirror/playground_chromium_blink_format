@@ -39,7 +39,8 @@ void computePageRectsForFrame(Frame*,
                               float headerHeight,
                               float footerHeight,
                               float userScaleFactor,
-                              Vector<IntRect>& pages);
+                              Vector<IntRect>& pages,
+                              int& pageHeight);
 }
 
 #endif

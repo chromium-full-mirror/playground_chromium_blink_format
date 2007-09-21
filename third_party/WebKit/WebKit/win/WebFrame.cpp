@@ -431,7 +431,8 @@ WebFrame::WebFrame()
     : m_refCount(0),
       d(new WebFrame::WebFramePrivate),
       m_quickRedirectComing(false),
-      m_inPrintingMode(false) {
+      m_inPrintingMode(false),
+      m_pageHeight(0) {
   WebFrameCount++;
   gClassCount++;
 }
@@ -2569,7 +2570,7 @@ const Vector<WebCore::IntRect>& WebFrame::computePageRects(HDC printDC) {
               pageRect.height() - marginRect.y() - marginRect.bottom());
 
   computePageRectsForFrame(coreFrame, adjustedRect, headerHeight, footerHeight,
-                           1.0, m_pageRects);
+                           1.0, m_pageRects, m_pageHeight);
 
   return m_pageRects;
 }
@@ -2683,7 +2684,8 @@ HRESULT STDMETHODCALLTYPE WebFrame::spoolPages(
       }
 
       if (footerHeight) {
-        y = (int)headerHeight + pageRect.height();
+        y = max((int)headerHeight + pageRect.height(),
+                m_pageHeight - (int)footerHeight);
         RECT footerRect = {x, y, x + pageRect.width(), y + (int)footerHeight};
         ui2->drawFooterInRect(d->webView, &footerRect, (OLE_HANDLE)(LONG64)pctx,
                               ii + 1, pageCount);
