@@ -34,6 +34,9 @@ id createJSWrapper(KJS::JSObject*,
 - (void)_setImp:(KJS::JSObject*)imp
     originRootObject:(PassRefPtr<KJS::Bindings::RootObject>)originRootObject
           rootObject:(PassRefPtr<KJS::Bindings::RootObject>)rootObject;
+- (void)_setOriginRootObject:
+            (PassRefPtr<KJS::Bindings::RootObject>)originRootObject
+               andRootObject:(PassRefPtr<KJS::Bindings::RootObject>)rootObject;
 - (void)_initializeScriptDOMNodeImp;
 - (KJS::JSObject*)_imp;
 - (BOOL)_hasImp;

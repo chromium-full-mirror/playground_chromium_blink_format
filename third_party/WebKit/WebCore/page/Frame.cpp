@@ -1094,6 +1094,7 @@ NPObject* Frame::windowScriptNPObject() {
       // JavaScript is enabled, so there is a JavaScript window object.  Return
       // an NPObject bound to the window
       // object.
+      KJS::JSLock lock;
       KJS::JSObject* win = KJS::Window::retrieveWindow(this);
       ASSERT(win);
       KJS::Bindings::RootObject* root = bindingRootObject();
@@ -1131,8 +1132,7 @@ void Frame::cleanupScriptObjectsForPlugin(void* nativeHandle) {
   d->m_rootObjects.remove(it);
 }
 
-void Frame::cleanupScriptObjects() {
-  cleanupPlatformScriptObjects();
+void Frame::clearScriptObjects() {
   JSLock lock;
 
   RootObjectMap::const_iterator end = d->m_rootObjects.end();
@@ -1158,6 +1158,8 @@ void Frame::cleanupScriptObjects() {
     d->m_windowScriptNPObject = 0;
   }
 #endif
+
+  clearPlatformScriptObjects();
 }
 
 RenderObject* Frame::renderer() const {
