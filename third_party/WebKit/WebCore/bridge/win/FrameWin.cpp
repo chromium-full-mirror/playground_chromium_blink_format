@@ -70,7 +70,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-void Frame::cleanupPlatformScriptObjects() {}
+void Frame::clearPlatformScriptObjects() {}
 
 KJS::Bindings::Instance* Frame::createScriptInstanceForWidget(Widget* widget) {
   // FIXME: Ideally we'd have an isPluginView() here but we can't add that to

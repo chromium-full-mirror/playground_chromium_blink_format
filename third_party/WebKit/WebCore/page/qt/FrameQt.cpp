@@ -109,7 +109,7 @@ KJS::Bindings::Instance* Frame::createScriptInstanceForWidget(
       bindingRootObject());
 }
 
-void Frame::cleanupPlatformScriptObjects() {}
+void Frame::clearPlatformScriptObjects() {}
 
 DragImageRef Frame::dragImageForSelection() {
   return 0;

@@ -132,7 +132,7 @@ int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
 void Frame::print() {
   notImplemented();
 }
-void Frame::cleanupPlatformScriptObjects() {
+void Frame::clearPlatformScriptObjects() {
   notImplemented();
 }
 bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
