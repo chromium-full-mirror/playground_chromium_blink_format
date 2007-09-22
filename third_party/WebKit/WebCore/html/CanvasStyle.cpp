@@ -129,9 +129,11 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       CGContextSetRGBStrokeColor(context->platformContext(), m_red, m_green,
                                  m_blue, m_alpha);
 #elif PLATFORM(QT)
+      QPen currentPen = p->pen();
       QColor clr;
       clr.setRgbF(m_red, m_green, m_blue, m_alpha);
-      p->setPen(clr);
+      currentPen.setColor(clr);
+      p->setPen(currentPen);
 #endif
       break;
     }
@@ -141,9 +143,11 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       CGContextSetCMYKStrokeColor(context->platformContext(), m_cyan, m_magenta,
                                   m_yellow, m_black, m_alpha);
 #elif PLATFORM(QT)
+      QPen currentPen = p->pen();
       QColor clr;
       clr.setCmykF(m_cyan, m_magenta, m_yellow, m_black, m_alpha);
-      p->setPen(clr);
+      currentPen.setColor(clr);
+      p->setPen(currentPen);
 #endif
       break;
     }
@@ -169,7 +173,11 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
           ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f,
           ((color >> 24) & 0xFF) / 255.0f);
 #elif PLATFORM(QT)
-      p->setBrush(QColor(QRgb(color)));
+      QBrush currentBrush = p->brush();
+      QColor clr;
+      clr.setRgb(QRgb(color));
+      currentBrush.setColor(clr);
+      p->setBrush(currentBrush);
 #endif
       break;
     }
@@ -181,9 +189,12 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
           context->platformContext(), ((color >> 16) & 0xFF) / 255.0f,
           ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, m_alpha);
 #elif PLATFORM(QT)
-      QColor clr = QColor(QRgb(color));
+      QBrush currentBrush = p->brush();
+      QColor clr;
+      clr.setRgb(QRgb(color));
       clr.setAlphaF(m_alpha);
-      p->setBrush(clr);
+      currentBrush.setColor(clr);
+      p->setBrush(currentBrush);
 #endif
       break;
     }
@@ -193,9 +204,11 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
       CGContextSetGrayFillColor(context->platformContext(), m_grayLevel,
                                 m_alpha);
 #elif PLATFORM(QT)
+      QBrush currentBrush = p->brush();
       QColor clr;
       clr.setRgbF(m_grayLevel, m_grayLevel, m_grayLevel, m_alpha);
-      p->setBrush(clr);
+      currentBrush.setColor(clr);
+      p->setBrush(currentBrush);
 #endif
       break;
     }
@@ -205,9 +218,11 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
       CGContextSetRGBFillColor(context->platformContext(), m_red, m_green,
                                m_blue, m_alpha);
 #elif PLATFORM(QT)
+      QBrush currentBrush = p->brush();
       QColor clr;
       clr.setRgbF(m_red, m_green, m_blue, m_alpha);
-      p->setBrush(clr);
+      currentBrush.setColor(clr);
+      p->setBrush(currentBrush);
 #endif
       break;
     }
@@ -217,9 +232,11 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
       CGContextSetCMYKFillColor(context->platformContext(), m_cyan, m_magenta,
                                 m_yellow, m_black, m_alpha);
 #elif PLATFORM(QT)
+      QBrush currentBrush = p->brush();
       QColor clr;
       clr.setCmykF(m_cyan, m_magenta, m_yellow, m_black, m_alpha);
-      p->setBrush(clr);
+      currentBrush.setColor(clr);
+      p->setBrush(currentBrush);
 #endif
       break;
     }
