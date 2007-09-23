@@ -45,7 +45,7 @@ typedef QPainter PlatformGraphicsContext;
 typedef void PlatformGraphicsContext;
 #endif
 
-#if PLATFORM(GDK)
+#if PLATFORM(GTK)
 typedef struct _GdkDrawable GdkDrawable;
 typedef struct _GdkEventExpose GdkEventExpose;
 #endif
@@ -266,7 +266,7 @@ class GraphicsContext : Noncopyable {
   PlatformPath* currentPath();
 #endif
 
-#if PLATFORM(GDK)
+#if PLATFORM(GTK)
   void setGdkExposeEvent(GdkEventExpose*);
   GdkDrawable* gdkDrawable() const;
   GdkEventExpose* gdkExposeEvent() const;

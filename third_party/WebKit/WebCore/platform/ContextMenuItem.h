@@ -40,7 +40,7 @@ class NSMenuItem;
 #endif
 #elif PLATFORM(WIN)
 typedef struct tagMENUITEMINFOW* LPMENUITEMINFO;
-#elif PLATFORM(GDK)
+#elif PLATFORM(GTK)
 typedef struct _GtkMenuItem GtkMenuItem;
 #elif PLATFORM(QT)
 #include <QAction>
@@ -139,7 +139,7 @@ struct PlatformMenuItemDescriptionType {
   PlatformMenuDescription subMenu;
 };
 typedef PlatformMenuItemDescriptionType* PlatformMenuItemDescription;
-#elif PLATFORM(GDK)
+#elif PLATFORM(GTK)
 typedef GtkMenuItem* PlatformMenuItemDescription;
 #endif
 

@@ -25,7 +25,7 @@
  */
 
 #include "config.h"
-#include "RenderThemeGdk.h"
+#include "RenderThemeGtk.h"
 
 #include "NotImplemented.h"
 #include "RenderObject.h"
@@ -70,11 +70,11 @@
 namespace WebCore {
 
 RenderTheme* theme() {
-  static RenderThemeGdk gdkTheme;
+  static RenderThemeGtk gdkTheme;
   return &gdkTheme;
 }
 
-RenderThemeGdk::RenderThemeGdk()
+RenderThemeGtk::RenderThemeGtk()
     : m_gtkButton(0),
       m_gtkCheckbox(0),
       m_gtkRadioButton(0),
@@ -83,9 +83,9 @@ RenderThemeGdk::RenderThemeGdk()
       m_unmappedWindow(0),
       m_container(0) {}
 
-void RenderThemeGdk::close() {}
+void RenderThemeGtk::close() {}
 
-void RenderThemeGdk::addIntrinsicMargins(RenderStyle* style) const {
+void RenderThemeGtk::addIntrinsicMargins(RenderStyle* style) const {
   // Cut out the intrinsic margins completely if we end up using a small font
   // size
   if (style->fontSize() < 11)
@@ -111,7 +111,7 @@ void RenderThemeGdk::addIntrinsicMargins(RenderStyle* style) const {
   }
 }
 
-bool RenderThemeGdk::supportsFocus(EAppearance appearance) {
+bool RenderThemeGtk::supportsFocus(EAppearance appearance) {
   switch (appearance) {
     case PushButtonAppearance:
     case ButtonAppearance:
@@ -124,7 +124,7 @@ bool RenderThemeGdk::supportsFocus(EAppearance appearance) {
   return false;
 }
 
-GtkStateType RenderThemeGdk::determineState(RenderObject* o) {
+GtkStateType RenderThemeGtk::determineState(RenderObject* o) {
   GtkStateType result = GTK_STATE_NORMAL;
   if (!isEnabled(o))
     result = GTK_STATE_INSENSITIVE;
@@ -135,11 +135,11 @@ GtkStateType RenderThemeGdk::determineState(RenderObject* o) {
   return result;
 }
 
-GtkShadowType RenderThemeGdk::determineShadow(RenderObject* o) {
+GtkShadowType RenderThemeGtk::determineShadow(RenderObject* o) {
   return isChecked(o) ? GTK_SHADOW_IN : GTK_SHADOW_OUT;
 }
 
-ThemeData RenderThemeGdk::getThemeData(RenderObject* o) {
+ThemeData RenderThemeGtk::getThemeData(RenderObject* o) {
   ThemeData result;
   switch (o->style()->appearance()) {
     case PushButtonAppearance:
@@ -167,11 +167,11 @@ ThemeData RenderThemeGdk::getThemeData(RenderObject* o) {
   return result;
 }
 
-void RenderThemeGdk::setCheckboxSize(RenderStyle* style) const {
+void RenderThemeGtk::setCheckboxSize(RenderStyle* style) const {
   setRadioSize(style);
 }
 
-bool RenderThemeGdk::paintCheckbox(RenderObject* o,
+bool RenderThemeGtk::paintCheckbox(RenderObject* o,
                                    const RenderObject::PaintInfo& i,
                                    const IntRect& rect) {
   // FIXME: is it the right thing to do?
@@ -184,7 +184,7 @@ bool RenderThemeGdk::paintCheckbox(RenderObject* o,
   return false;
 }
 
-void RenderThemeGdk::setRadioSize(RenderStyle* style) const {
+void RenderThemeGtk::setRadioSize(RenderStyle* style) const {
   notImplemented();
   // If the width and height are both specified, then we have nothing to do.
   if (!style->width().isIntrinsicOrAuto() && !style->height().isAuto())
@@ -205,7 +205,7 @@ void RenderThemeGdk::setRadioSize(RenderStyle* style) const {
     style->setHeight(Length(ff, Fixed));
 }
 
-bool RenderThemeGdk::paintRadio(RenderObject* o,
+bool RenderThemeGtk::paintRadio(RenderObject* o,
                                 const RenderObject::PaintInfo& i,
                                 const IntRect& rect) {
   // FIXME: is it the right thing to do?
@@ -218,7 +218,7 @@ bool RenderThemeGdk::paintRadio(RenderObject* o,
   return false;
 }
 
-bool RenderThemeGdk::paintButton(RenderObject* o,
+bool RenderThemeGtk::paintButton(RenderObject* o,
                                  const RenderObject::PaintInfo& i,
                                  const IntRect& rect) {
   // FIXME: should use theme-aware drawing. This should honor the state as well
@@ -230,34 +230,34 @@ bool RenderThemeGdk::paintButton(RenderObject* o,
   return false;
 }
 
-void RenderThemeGdk::adjustTextFieldStyle(CSSStyleSelector*,
+void RenderThemeGtk::adjustTextFieldStyle(CSSStyleSelector*,
                                           RenderStyle*,
                                           Element* e) const {
   notImplemented();
 }
 
-bool RenderThemeGdk::paintTextField(RenderObject* o,
+bool RenderThemeGtk::paintTextField(RenderObject* o,
                                     const RenderObject::PaintInfo& i,
                                     const IntRect& r) {
   // FIXME: should use theme-aware drawing
   return true;
 }
 
-bool RenderThemeGdk::paintTextArea(RenderObject* o,
+bool RenderThemeGtk::paintTextArea(RenderObject* o,
                                    const RenderObject::PaintInfo& i,
                                    const IntRect& r) {
   return paintTextField(o, i, r);
 }
 
-void RenderThemeGdk::adjustButtonStyle(CSSStyleSelector* selector,
+void RenderThemeGtk::adjustButtonStyle(CSSStyleSelector* selector,
                                        RenderStyle* style,
                                        WebCore::Element* e) const {
   addIntrinsicMargins(style);
 }
 
-void RenderThemeGdk::systemFont(int propId, FontDescription&) const {}
+void RenderThemeGtk::systemFont(int propId, FontDescription&) const {}
 
-GtkWidget* RenderThemeGdk::gtkButton() const {
+GtkWidget* RenderThemeGtk::gtkButton() const {
   if (!m_gtkButton) {
     m_gtkButton = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(gtkWindowContainer()), m_gtkButton);
@@ -267,7 +267,7 @@ GtkWidget* RenderThemeGdk::gtkButton() const {
   return m_gtkButton;
 }
 
-GtkWidget* RenderThemeGdk::gtkCheckbox() const {
+GtkWidget* RenderThemeGtk::gtkCheckbox() const {
   if (!m_gtkCheckbox) {
     m_gtkCheckbox = gtk_check_button_new();
     gtk_container_add(GTK_CONTAINER(gtkWindowContainer()), m_gtkCheckbox);
@@ -277,7 +277,7 @@ GtkWidget* RenderThemeGdk::gtkCheckbox() const {
   return m_gtkCheckbox;
 }
 
-GtkWidget* RenderThemeGdk::gtkRadioButton() const {
+GtkWidget* RenderThemeGtk::gtkRadioButton() const {
   if (!m_gtkRadioButton) {
     m_gtkRadioButton = gtk_radio_button_new(NULL);
     gtk_container_add(GTK_CONTAINER(gtkWindowContainer()), m_gtkRadioButton);
@@ -287,7 +287,7 @@ GtkWidget* RenderThemeGdk::gtkRadioButton() const {
   return m_gtkRadioButton;
 }
 
-GtkWidget* RenderThemeGdk::gtkWindowContainer() const {
+GtkWidget* RenderThemeGtk::gtkWindowContainer() const {
   if (!m_container) {
     m_unmappedWindow = gtk_window_new(GTK_WINDOW_POPUP);
     // Some GTK themes (i.e. Clearlooks) draw the buttons differently

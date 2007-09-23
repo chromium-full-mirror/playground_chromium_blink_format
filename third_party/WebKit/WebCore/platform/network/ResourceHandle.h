@@ -159,7 +159,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
                                                  LPARAM);
 #endif
 
-#if PLATFORM(GDK) || PLATFORM(QT)
+#if PLATFORM(GTK) || PLATFORM(QT)
   ResourceHandleInternal* getInternal() { return d.get(); }
 #endif
 

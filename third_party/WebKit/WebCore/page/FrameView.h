@@ -136,7 +136,7 @@ class FrameView : public ScrollView {
 // ScrollView::children,
 // which not all methods have. Once FrameView and ScrollView are merged, this
 // #if should be removed.
-#if PLATFORM(WIN) || PLATFORM(GDK)
+#if PLATFORM(WIN) || PLATFORM(GTK)
   void layoutIfNeededRecursive();
 #endif
 

@@ -45,7 +45,7 @@
 #include <cairo-win32.h>
 #endif
 
-#if PLATFORM(GDK)
+#if PLATFORM(GTK)
 #include <gdk/gdk.h>
 #endif
 
@@ -63,7 +63,7 @@ class GraphicsContextPlatformPrivate {
   cairo_t* cr;
   Vector<float> layers;
 
-#if PLATFORM(GDK)
+#if PLATFORM(GTK)
   GdkEventExpose* expose;
 #endif
 };
@@ -86,7 +86,7 @@ static inline void fillRectSourceOver(cairo_t* cr,
 
 GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate()
     : cr(0)
-#if PLATFORM(GDK)
+#if PLATFORM(GTK)
       ,
       expose(0)
 #endif
@@ -556,7 +556,7 @@ void GraphicsContext::setPlatformFont(const Font& font) {
   if (paintingDisabled())
     return;
 
-#if PLATFORM(GDK)
+#if PLATFORM(GTK)
   // FIXME: is it the right thing to do? Also, doesn't work on Win because
   // there FontData doesn't have ::setFont()
   const FontData* fontData = font.primaryFont();
@@ -783,7 +783,7 @@ void GraphicsContext::fillRoundedRect(const IntRect&,
   notImplemented();
 }
 
-#if PLATFORM(GDK)
+#if PLATFORM(GTK)
 void GraphicsContext::setGdkExposeEvent(GdkEventExpose* expose) {
   m_data->expose = expose;
 }
