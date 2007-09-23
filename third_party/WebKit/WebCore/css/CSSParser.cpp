@@ -1879,19 +1879,22 @@ CSSValue* CSSParser::parseBackgroundColor() {
   return parseColor();
 }
 
-CSSValue* CSSParser::parseBackgroundImage() {
-  if (valueList->current()->id == CSS_VAL_NONE)
-    return new CSSImageValue();
+bool CSSParser::parseBackgroundImage(CSSValue*& value) {
+  if (valueList->current()->id == CSS_VAL_NONE) {
+    value = new CSSImageValue();
+    return true;
+  }
   if (valueList->current()->unit == CSSPrimitiveValue::CSS_URI) {
     String uri = parseURL(domString(valueList->current()->string));
     if (!uri.isEmpty())
-      return new CSSImageValue(
+      value = new CSSImageValue(
           String(KURL(styleElement->baseURL().deprecatedString(),
                       uri.deprecatedString())
                      .url()),
           styleElement);
+    return true;
   }
-  return 0;
+  return false;
 }
 
 CSSValue* CSSParser::parseBackgroundPositionXY(bool& xFound, bool& yFound) {
@@ -2049,8 +2052,7 @@ bool CSSParser::parseBackgroundProperty(int propId,
             valueList->next();
           break;
         case CSS_PROP_BACKGROUND_IMAGE:
-          currValue = parseBackgroundImage();
-          if (currValue)
+          if (parseBackgroundImage(currValue))
             valueList->next();
           break;
         case CSS_PROP__WEBKIT_BACKGROUND_CLIP:
@@ -2099,7 +2101,6 @@ bool CSSParser::parseBackgroundProperty(int propId,
             valueList->next();
           break;
       }
-
       if (!currValue)
         goto failed;
 
