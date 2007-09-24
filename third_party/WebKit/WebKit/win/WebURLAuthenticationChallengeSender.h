@@ -28,28 +28,15 @@
 
 #include "IWebURLAuthenticationChallenge.h"
 
-#include <wtf/PassRefPtr.h>
+#include <wtf/Forward.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
 class ResourceHandle;
-};
+}
 
-// {5CACD637-F82F-491f-947A-5DCA38AA0FEA}
-DEFINE_GUID(IID_WebURLAuthenticationChallengeSender,
-            0x5cacd637,
-            0xf82f,
-            0x491f,
-            0x94,
-            0x7a,
-            0x5d,
-            0xca,
-            0x38,
-            0xaa,
-            0xf,
-            0xea);
-
-class WebURLAuthenticationChallengeSender
+class __declspec(uuid("5CACD637-F82F-491F-947A-5DCA38AA0FEA"))
+    WebURLAuthenticationChallengeSender
     : public IWebURLAuthenticationChallengeSender {
  public:
   static WebURLAuthenticationChallengeSender* createInstance(
@@ -80,7 +67,7 @@ class WebURLAuthenticationChallengeSender
 
   WebCore::ResourceHandle* resourceHandle() const;
 
- protected:
+ private:
   ULONG m_refCount;
 
   RefPtr<WebCore::ResourceHandle> m_handle;

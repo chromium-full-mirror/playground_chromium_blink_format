@@ -48,8 +48,11 @@ using namespace WebCore;
 // ----------------------------------------------------------------
 
 WebURLAuthenticationChallenge::WebURLAuthenticationChallenge(
-    const AuthenticationChallenge& authenticationChallenge)
-    : m_refCount(0), m_authenticationChallenge(authenticationChallenge) {
+    const AuthenticationChallenge& authenticationChallenge,
+    IWebURLAuthenticationChallengeSender* sender)
+    : m_refCount(0),
+      m_authenticationChallenge(authenticationChallenge),
+      m_sender(sender) {
   gClassCount++;
 }
 
@@ -57,17 +60,19 @@ WebURLAuthenticationChallenge::~WebURLAuthenticationChallenge() {
   gClassCount--;
 }
 
-WebURLAuthenticationChallenge* WebURLAuthenticationChallenge::createInstance() {
+WebURLAuthenticationChallenge* WebURLAuthenticationChallenge::createInstance(
+    const AuthenticationChallenge& authenticationChallenge) {
   WebURLAuthenticationChallenge* instance =
-      new WebURLAuthenticationChallenge(AuthenticationChallenge());
+      new WebURLAuthenticationChallenge(authenticationChallenge, 0);
   instance->AddRef();
   return instance;
 }
 
 WebURLAuthenticationChallenge* WebURLAuthenticationChallenge::createInstance(
-    const AuthenticationChallenge& authenticationChallenge) {
+    const AuthenticationChallenge& authenticationChallenge,
+    IWebURLAuthenticationChallengeSender* sender) {
   WebURLAuthenticationChallenge* instance =
-      new WebURLAuthenticationChallenge(authenticationChallenge);
+      new WebURLAuthenticationChallenge(authenticationChallenge, sender);
   instance->AddRef();
   return instance;
 }
@@ -79,7 +84,7 @@ WebURLAuthenticationChallenge::QueryInterface(REFIID riid, void** ppvObject) {
   *ppvObject = 0;
   if (IsEqualGUID(riid, IID_IUnknown))
     *ppvObject = static_cast<IUnknown*>(this);
-  else if (IsEqualGUID(riid, IID_WebURLAuthenticationChallenge))
+  else if (IsEqualGUID(riid, __uuidof(WebURLAuthenticationChallenge)))
     *ppvObject = static_cast<WebURLAuthenticationChallenge*>(this);
   else if (IsEqualGUID(riid, IID_IWebURLAuthenticationChallenge))
     *ppvObject = static_cast<IWebURLAuthenticationChallenge*>(this);
@@ -126,11 +131,9 @@ WebURLAuthenticationChallenge::initWithProtectionSpace(
   if (FAILED(hr))
     return hr;
 
-  COMPtr<WebURLCredential> webCredential;
-  hr = proposedCredential->QueryInterface(CLSID_WebURLCredential,
-                                          (void**)&webCredential);
-  if (FAILED(hr))
-    return hr;
+  COMPtr<WebURLCredential> webCredential(Query, proposedCredential);
+  if (!webCredential)
+    return E_NOINTERFACE;
 
   COMPtr<WebURLResponse> webResponse;
   hr =
@@ -143,11 +146,9 @@ WebURLAuthenticationChallenge::initWithProtectionSpace(
   if (FAILED(hr))
     return hr;
 
-  COMPtr<WebURLAuthenticationChallengeSender> webSender;
-  hr = sender->QueryInterface(IID_WebURLAuthenticationChallengeSender,
-                              (void**)&webSender);
-  if (FAILED(hr))
-    return hr;
+  COMPtr<WebURLAuthenticationChallengeSender> webSender(Query, sender);
+  if (!webSender)
+    return E_NOINTERFACE;
 
   // FIXME: After we change AuthenticationChallenge to use "ResourceHandle" as
   // the abstract "Sender" or "Source of this Auth Challenge", then we'll
@@ -168,19 +169,13 @@ WebURLAuthenticationChallenge::initWithAuthenticationChallenge(
   if (!challenge || !sender)
     return E_POINTER;
 
-  HRESULT hr = S_OK;
+  COMPtr<WebURLAuthenticationChallenge> webChallenge(Query, challenge);
+  if (!webChallenge)
+    return E_NOINTERFACE;
 
-  COMPtr<WebURLAuthenticationChallenge> webChallenge;
-  hr = challenge->QueryInterface(IID_WebURLAuthenticationChallenge,
-                                 (void**)&webChallenge);
-  if (FAILED(hr))
-    return hr;
-
-  COMPtr<WebURLAuthenticationChallengeSender> webSender;
-  hr = sender->QueryInterface(IID_WebURLAuthenticationChallengeSender,
-                              (void**)&webSender);
-  if (FAILED(hr))
-    return hr;
+  COMPtr<WebURLAuthenticationChallengeSender> webSender(Query, sender);
+  if (!webSender)
+    return E_NOINTERFACE;
 
   m_authenticationChallenge = AuthenticationChallenge(
       webChallenge->authenticationChallenge().cfURLAuthChallengeRef(),
@@ -224,10 +219,13 @@ HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallenge::protectionSpace(
 
 HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallenge::sender(
     /* [out, retval] */ IWebURLAuthenticationChallengeSender** sender) {
-  ResourceHandle* handle = m_authenticationChallenge.sourceHandle();
-  *sender = WebURLAuthenticationChallengeSender::createInstance(handle);
+  if (!m_sender) {
+    ResourceHandle* handle = m_authenticationChallenge.sourceHandle();
+    m_sender.adoptRef(
+        WebURLAuthenticationChallengeSender::createInstance(handle));
+  }
 
-  return S_OK;
+  return m_sender.copyRefTo(sender);
 }
 
 // WebURLAuthenticationChallenge
