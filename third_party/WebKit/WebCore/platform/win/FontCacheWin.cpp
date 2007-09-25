@@ -27,16 +27,14 @@
  */
 
 #include "config.h"
-#include "FontCache.h"
-
 #include <winsock2.h>
+#include "FontCache.h"
 #include "FontData.h"
 #include "Font.h"
 #include <windows.h>
 #include <mlang.h>
 #include <ApplicationServices/ApplicationServices.h>
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
-#include "COMPtr.h"
 
 using std::min;
 
@@ -47,16 +45,20 @@ void FontCache::platformInit() {
 }
 
 IMLangFontLink2* FontCache::getFontLinkInterface() {
-  static COMPtr<IMLangFontLink2> langFontLink;
-  if (!langFontLink) {
-    COMPtr<IMultiLanguage> multiLanguage;
+  static IMultiLanguage* multiLanguage;
+  if (!multiLanguage) {
     if (CoCreateInstance(CLSID_CMultiLanguage, 0, CLSCTX_ALL,
                          IID_IMultiLanguage, (void**)&multiLanguage) != S_OK)
       return 0;
-    langFontLink.query(multiLanguage);
   }
 
-  return langFontLink.get();
+  static IMLangFontLink2* langFontLink;
+  if (!langFontLink) {
+    if (multiLanguage->QueryInterface(&langFontLink) != S_OK)
+      return 0;
+  }
+
+  return langFontLink;
 }
 
 const FontData* FontCache::getFontDataForCharacters(const Font& font,
