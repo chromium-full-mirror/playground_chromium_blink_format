@@ -104,6 +104,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
   void negateStyleRulesThatAffectAppearance();
   void removeRedundantStyles(Node*);
+  void removeUnrenderedNodes();
 
   void handlePasteAsQuotationNode();
 
