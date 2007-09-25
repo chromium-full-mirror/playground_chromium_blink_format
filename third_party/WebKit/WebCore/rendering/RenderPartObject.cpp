@@ -40,6 +40,7 @@
 #include "KURL.h"
 #include "MIMETypeRegistry.h"
 #include "Page.h"
+#include "RenderView.h"
 #include "Text.h"
 
 namespace WebCore {
@@ -51,6 +52,11 @@ RenderPartObject::RenderPartObject(HTMLFrameOwnerElement* element)
   // init RenderObject attributes
   setInline(true);
   m_hasFallbackContent = false;
+}
+
+RenderPartObject::~RenderPartObject() {
+  if (m_view)
+    m_view->removeWidgetToUpdate(this);
 }
 
 static bool isURLAllowed(Document* doc, const String& url) {
@@ -279,8 +285,8 @@ void RenderPartObject::layout() {
 
   RenderPart::layout();
 
-  if (!m_widget)
-    updateWidget(false);
+  if (!m_widget && m_view)
+    m_view->addWidgetToUpdate(this);
 
   setNeedsLayout(false);
 }

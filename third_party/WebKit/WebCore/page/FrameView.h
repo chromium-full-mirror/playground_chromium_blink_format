@@ -28,6 +28,7 @@
 #include "ScrollView.h"
 #include "IntSize.h"
 #include <wtf/Forward.h>
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
@@ -41,6 +42,7 @@ class PlatformMouseEvent;
 class Node;
 class RenderLayer;
 class RenderObject;
+class RenderPartObject;
 class String;
 
 template <typename T>
@@ -132,6 +134,9 @@ class FrameView : public ScrollView {
   bool wasScrolledByUser() const;
   void setWasScrolledByUser(bool);
 
+  void addWidgetToUpdate(RenderPartObject*);
+  void removeWidgetToUpdate(RenderPartObject*);
+
 // FIXME: This method should be used by all platforms, but currently depends on
 // ScrollView::children,
 // which not all methods have. Once FrameView and ScrollView are merged, this
@@ -162,6 +167,7 @@ class FrameView : public ScrollView {
   unsigned m_refCount;
   IntSize m_size;
   IntSize m_margins;
+  OwnPtr<HashSet<RenderPartObject*>> m_widgetUpdateSet;
   RefPtr<Frame> m_frame;
   FrameViewPrivate* d;
 };
