@@ -507,7 +507,8 @@ void PluginViewWin::handleMouseEvent(MouseEvent* event) {
   if (event->shiftKey())
     npEvent.wParam |= MK_SHIFT;
 
-  if (event->type() == mousemoveEvent) {
+  if (event->type() == mousemoveEvent || event->type() == mouseoutEvent ||
+      event->type() == mouseoverEvent) {
     npEvent.event = WM_MOUSEMOVE;
     if (event->buttonDown())
       switch (event->button()) {
