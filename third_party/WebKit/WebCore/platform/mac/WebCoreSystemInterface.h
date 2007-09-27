@@ -104,12 +104,13 @@ extern CGFontRef (*wkGetCGFontFromNSFont)(NSFont*);
 extern ATSGlyphRef (*wkGetDefaultGlyphForChar)(NSFont*, UniChar);
 extern NSFont* (*wkGetFontInLanguageForRange)(NSFont*, NSString*, NSRange);
 extern NSFont* (*wkGetFontInLanguageForCharacter)(NSFont*, UniChar);
-extern void (*wkGetFontMetrics)(NSFont*,
+extern void (*wkGetFontMetrics)(CGFontRef,
                                 int* ascent,
                                 int* descent,
                                 int* lineGap,
                                 unsigned* unitsPerEm);
-extern BOOL (*wkGetGlyphTransformedAdvances)(NSFont*,
+extern BOOL (*wkGetGlyphTransformedAdvances)(CGFontRef,
+                                             NSFont*,
                                              CGAffineTransform*,
                                              ATSGlyphRef*,
                                              CGSize* advance);
