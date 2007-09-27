@@ -368,9 +368,8 @@ static bool writeURL(WCDataObject* data,
                      bool withPlainText,
                      bool withHTML) {
   ASSERT(data);
-  ASSERT(!url.isEmpty());
 
-  if (!url.isValid())
+  if (url.isEmpty())
     return false;
 
   if (title.isEmpty()) {
@@ -465,13 +464,11 @@ bool ClipboardWin::setData(const String& type, const String& data) {
 
   ClipboardDataType winType = clipboardTypeFromMIMEType(type);
 
-  if (winType == ClipboardDataTypeURL) {
-    KURL url = data.deprecatedString();
-    if (!url.isValid())
-      return false;
-    return WebCore::writeURL(m_writableDataObject.get(), url, String(), false,
-                             true);
-  } else if (winType == ClipboardDataTypeText) {
+  if (winType == ClipboardDataTypeURL)
+    return WebCore::writeURL(m_writableDataObject.get(),
+                             data.deprecatedString(), String(), false, true);
+
+  if (winType == ClipboardDataTypeText) {
     STGMEDIUM medium = {0};
     medium.tymed = TYMED_HGLOBAL;
     medium.hGlobal = createGlobalData(data);
@@ -485,6 +482,7 @@ bool ClipboardWin::setData(const String& type, const String& data) {
     }
     return true;
   }
+
   return false;
 }
 

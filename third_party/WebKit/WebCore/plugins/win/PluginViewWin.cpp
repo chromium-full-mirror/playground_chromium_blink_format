@@ -651,7 +651,7 @@ bool PluginViewWin::start() {
 
   m_isStarted = true;
 
-  if (m_url.isValid() && !m_loadManually) {
+  if (!m_url.isEmpty() && !m_loadManually) {
     FrameLoadRequest frameLoadRequest;
     frameLoadRequest.resourceRequest().setHTTPMethod("GET");
     frameLoadRequest.resourceRequest().setURL(m_url);
@@ -814,7 +814,7 @@ NPError PluginViewWin::load(const FrameLoadRequest& frameLoadRequest,
 
   KURL url = frameLoadRequest.resourceRequest().url();
 
-  if (!url.isValid())
+  if (url.isEmpty())
     return NPERR_INVALID_URL;
 
   String target = frameLoadRequest.frameName();
