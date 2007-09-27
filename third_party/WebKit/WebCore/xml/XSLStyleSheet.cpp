@@ -33,6 +33,29 @@
 #include "XMLTokenizer.h"
 #include <libxml/uri.h>
 #include <libxslt/xsltutils.h>
+#if PLATFORM(DARWIN)
+#include "SoftLinking.h"
+#endif
+
+#if PLATFORM(DARWIN)
+SOFT_LINK_LIBRARY(libxslt)
+SOFT_LINK(libxslt, xsltIsBlank, int, (xmlChar * str), (str))
+SOFT_LINK(libxslt,
+          xsltGetNsProp,
+          xmlChar*,
+          (xmlNodePtr node, const xmlChar* name, const xmlChar* nameSpace),
+          (node, name, nameSpace))
+SOFT_LINK(libxslt,
+          xsltParseStylesheetDoc,
+          xsltStylesheetPtr,
+          (xmlDocPtr doc),
+          (doc))
+SOFT_LINK(libxslt,
+          xsltLoadStylesheetPI,
+          xsltStylesheetPtr,
+          (xmlDocPtr doc),
+          (doc))
+#endif
 
 namespace WebCore {
 
