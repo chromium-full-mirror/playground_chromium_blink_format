@@ -101,9 +101,6 @@ struct InspectorResource : public Shared<InspectorResource> {
   ~InspectorResource() { setScriptObject(0, 0); }
 
   Type type() const {
-    if (!requestURL.isValid())
-      return Other;
-
     if (requestURL == loader->requestURL())
       return Doc;
 

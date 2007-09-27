@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.  All rights
- * reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -69,8 +68,6 @@ class KURL {
   KURL(CFURLRef);
 #endif
   bool isEmpty() const { return urlString.isEmpty(); }
-  bool isMalformed() const { return !m_isValid; }
-  bool isValid() const { return m_isValid; }
   bool hasPath() const;
 
   DeprecatedString url() const { return urlString; }

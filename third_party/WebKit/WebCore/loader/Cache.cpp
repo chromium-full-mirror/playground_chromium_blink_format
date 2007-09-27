@@ -97,7 +97,9 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
                                        const String* charset,
                                        bool skipCanLoadCheck,
                                        bool sendResourceLoadCallbacks) {
-  if (!url.isValid())
+  // FIXME: Do we really need to special-case an empty URL?
+  // Would it be better to just go on with the cache code and let it fail later?
+  if (url.isEmpty())
     return 0;
 
   // Look up the resource in our map.
