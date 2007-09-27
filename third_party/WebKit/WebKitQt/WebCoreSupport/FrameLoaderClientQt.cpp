@@ -754,7 +754,7 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
       _mimeType == "application/x-qt-styled-widget")
     return ObjectContentOtherPlugin;
 
-  if (!url.isValid())
+  if (url.isEmpty())
     return ObjectContentNone;
 
   String mimeType = _mimeType;
