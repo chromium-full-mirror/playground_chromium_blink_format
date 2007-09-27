@@ -134,12 +134,13 @@ void WKSendKeyEventToTSM(NSEvent* theEvent);
 void WKCallDrawingNotification(CGrafPtr port, Rect* bounds);
 #endif
 
-BOOL WKGetGlyphTransformedAdvances(NSFont* font,
+BOOL WKGetGlyphTransformedAdvances(CGFontRef,
+                                   NSFont*,
                                    CGAffineTransform* m,
                                    ATSGlyphRef* glyph,
                                    CGSize* advance);
 CGFontRef WKGetCGFontFromNSFont(NSFont* font);
-void WKGetFontMetrics(NSFont* font,
+void WKGetFontMetrics(CGFontRef font,
                       int* ascent,
                       int* descent,
                       int* lineGap,
@@ -154,8 +155,6 @@ void WKReleaseStyleGroup(void* group);
 BOOL WKCGContextGetShouldSmoothFonts(CGContextRef cgContext);
 
 void WKSetPatternPhaseInUserSpace(CGContextRef, CGPoint);
-
-#define WKGlyphVectorSize (50 * 32)
 
 typedef void* WKGlyphVectorRef;
 OSStatus WKConvertCharToGlyphs(void* styleGroup,
