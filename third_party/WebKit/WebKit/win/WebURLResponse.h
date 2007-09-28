@@ -98,6 +98,9 @@ class WebURLResponse : public IWebHTTPURLResponse, IWebURLResponsePrivate {
   virtual HRESULT STDMETHODCALLTYPE statusCode(
       /* [retval][out] */ int* statusCode);
 
+  virtual HRESULT STDMETHODCALLTYPE isAttachment(
+      /* [retval][out] */ BOOL* attachment);
+
   // IWebURLResponsePrivate
   virtual HRESULT STDMETHODCALLTYPE sslPeerCertificate(
       /* [retval][out] */ OLE_HANDLE* result);

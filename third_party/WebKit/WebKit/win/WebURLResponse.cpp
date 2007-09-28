@@ -28,6 +28,7 @@
 #include <initguid.h>
 #include "WebURLResponse.h"
 
+#include "HTTPHeaderPropertyBag.h"
 #include "MarshallingHelpers.h"
 #include "WebLocalizableStrings.h"
 
@@ -370,9 +371,8 @@ HRESULT STDMETHODCALLTYPE WebURLResponse::URL(
 HRESULT STDMETHODCALLTYPE WebURLResponse::allHeaderFields(
     /* [retval][out] */ IPropertyBag** headerFields) {
   ASSERT(m_response.isHTTP());
-  if (headerFields)
-    *headerFields = 0;
-  return E_NOTIMPL;
+  *headerFields = HTTPHeaderPropertyBag::createInstance(this);
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE WebURLResponse::localizedStringForStatusCode(
@@ -395,6 +395,12 @@ HRESULT STDMETHODCALLTYPE WebURLResponse::statusCode(
   ASSERT(m_response.isHTTP());
   if (statusCode)
     *statusCode = m_response.httpStatusCode();
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebURLResponse::isAttachment(
+    /* [retval][out] */ BOOL* attachment) {
+  *attachment = m_response.isAttachment();
   return S_OK;
 }
 
