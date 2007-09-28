@@ -33,28 +33,28 @@ class Shared : Noncopyable {
       : m_refCount(0)
 #ifndef NDEBUG
         ,
-        m_inDestructor(0)
+        m_hasDeleted(false)
 #endif
   {
   }
 
   void ref() {
-    ASSERT(!m_inDestructor);
+    ASSERT(!m_hasDeleted);
     ++m_refCount;
   }
 
   void deref() {
-    ASSERT(!m_inDestructor);
+    ASSERT(!m_hasDeleted);
     if (--m_refCount <= 0) {
 #ifndef NDEBUG
-      m_inDestructor = true;
+      m_hasDeleted = true;
 #endif
       delete static_cast<T*>(this);
     }
   }
 
   bool hasOneRef() {
-    ASSERT(!m_inDestructor);
+    ASSERT(!m_hasDeleted);
     return m_refCount == 1;
   }
 
@@ -63,25 +63,55 @@ class Shared : Noncopyable {
  private:
   int m_refCount;
 #ifndef NDEBUG
-  bool m_inDestructor;
+  bool m_hasDeleted;
 #endif
 };
 
 template <class T>
-class TreeShared {
+class TreeShared : Noncopyable {
  public:
-  TreeShared() : m_refCount(0), m_parent(0) {}
-  TreeShared(T* parent) : m_refCount(0), m_parent(parent) {}
+  TreeShared()
+      : m_refCount(0),
+        m_parent(0)
+#ifndef NDEBUG
+        ,
+        m_hasRemovedLastRef(false)
+#endif
+  {
+  }
+  TreeShared(T* parent)
+      : m_refCount(0),
+        m_parent(parent)
+#ifndef NDEBUG
+        ,
+        m_hasRemovedLastRef(false)
+#endif
+  {
+  }
   virtual ~TreeShared() {}
 
   virtual void removedLastRef() { delete static_cast<T*>(this); }
 
-  void ref() { ++m_refCount; }
-  void deref() {
-    if (--m_refCount <= 0 && !m_parent)
-      removedLastRef();
+  void ref() {
+    ASSERT(!m_hasRemovedLastRef);
+    ++m_refCount;
   }
-  bool hasOneRef() { return m_refCount == 1; }
+
+  void deref() {
+    ASSERT(!m_hasRemovedLastRef);
+    if (--m_refCount <= 0 && !m_parent) {
+#ifndef NDEBUG
+      m_hasRemovedLastRef = true;
+#endif
+      removedLastRef();
+    }
+  }
+
+  bool hasOneRef() const {
+    ASSERT(!m_hasRemovedLastRef);
+    return m_refCount == 1;
+  }
+
   int refCount() const { return m_refCount; }
 
   void setParent(T* parent) { m_parent = parent; }
@@ -90,9 +120,9 @@ class TreeShared {
  private:
   int m_refCount;
   T* m_parent;
-
-  TreeShared(const TreeShared&);
-  TreeShared& operator=(const TreeShared&);
+#ifndef NDEBUG
+  bool m_hasRemovedLastRef;
+#endif
 };
 }
 

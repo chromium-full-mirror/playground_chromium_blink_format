@@ -35,7 +35,7 @@ class DocPtr {
   }
   DocPtr(const DocPtr& o) : m_ptr(o.m_ptr) {
     if (T* ptr = m_ptr)
-      ptr->selfOnlyRefRef();
+      ptr->selfOnlyRef();
   }
   ~DocPtr() {
     if (T* ptr = m_ptr)
