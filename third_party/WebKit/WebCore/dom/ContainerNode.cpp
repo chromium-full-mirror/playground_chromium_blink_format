@@ -67,14 +67,18 @@ void ContainerNode::removeAllChildren() {
   // We have to tell all children that their parent has died.
   Node* n;
   Node* next;
-
   for (n = m_firstChild; n != 0; n = next) {
+    ASSERT(!n->m_deletionHasBegun);
+
     next = n->nextSibling();
     n->setPreviousSibling(0);
     n->setNextSibling(0);
     n->setParent(0);
 
     if (!n->refCount()) {
+#ifndef NDEBUG
+      n->m_deletionHasBegun = true;
+#endif
       // Add the node to the list of nodes to be deleted.
       // Reuse the nextSibling pointer for this purpose.
       if (tail)
@@ -89,6 +93,8 @@ void ContainerNode::removeAllChildren() {
   // Only for the top level call, do the actual deleting.
   if (topLevel) {
     while ((n = head) != 0) {
+      ASSERT(n->m_deletionHasBegun);
+
       next = n->nextSibling();
       n->setNextSibling(0);
 
