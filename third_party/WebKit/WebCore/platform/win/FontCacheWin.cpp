@@ -73,6 +73,7 @@ const FontData* FontCache::getFontDataForCharacters(const Font& font,
   HDC hdc = GetDC(0);
   HFONT primaryFont = font.primaryFont()->m_font.hfont();
   HGDIOBJ oldFont = SelectObject(hdc, primaryFont);
+  HFONT hfont = 0;
 
   DWORD acpCodePages;
   langFontLink->CodePageToCodePages(CP_ACP, &acpCodePages);
@@ -91,7 +92,7 @@ const FontData* FontCache::getFontDataForCharacters(const Font& font,
       GetObject(result, sizeof(LOGFONT), &lf);
       langFontLink->ReleaseFont(result);
 
-      HFONT hfont = CreateFontIndirect(&lf);
+      hfont = CreateFontIndirect(&lf);
       SelectObject(hdc, hfont);
 
       WCHAR name[LF_FACESIZE];
@@ -108,6 +109,8 @@ const FontData* FontCache::getFontDataForCharacters(const Font& font,
   }
 
   SelectObject(hdc, oldFont);
+  if (hfont)
+    DeleteObject(hfont);
   ReleaseDC(0, hdc);
   return fontData;
 }
