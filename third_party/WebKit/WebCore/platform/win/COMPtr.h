@@ -57,7 +57,7 @@ class COMPtr {
   inline COMPtr(QueryTag, IUnknown* ptr) : m_ptr(copyQueryInterfaceRef(ptr)) {}
   template <typename U>
   inline COMPtr(QueryTag, const COMPtr<U>& ptr)
-      : m_ptr(copyQueryInterfaceRef(ptr)) {}
+      : m_ptr(copyQueryInterfaceRef(ptr.get())) {}
 
   ~COMPtr() {
     if (m_ptr)

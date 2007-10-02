@@ -1,6 +1,6 @@
 // -*- mode: c++; c-basic-offset: 4 -*-
 /*
- *  Copyright (C) 2006 Apple Computer, Inc.
+ *  Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -26,36 +26,79 @@
 #include <wtf/Assertions.h>
 #include <wtf/Noncopyable.h>
 
+#if PLATFORM(WIN)
+
+typedef struct HBITMAP__* HBITMAP;
+typedef struct HBRUSH__* HBRUSH;
+typedef struct HFONT__* HFONT;
+typedef struct HPALETTE__* HPALETTE;
+typedef struct HPEN__* HPEN;
+typedef struct HRGN__* HRGN;
+
+#endif
+
 namespace WTF {
+
+// Unlike most of our smart pointers, OwnPtr can take either the pointer type or
+// the pointed-to type.
+
+// FIXME: Share a single RemovePointer class template with RetainPtr.
+template <typename T>
+struct OwnPtrRemovePointer {
+  typedef T type;
+};
+template <typename T>
+struct OwnPtrRemovePointer<T*> {
+  typedef T type;
+};
+
+template <typename T>
+inline void deleteOwnedPtr(T* ptr) {
+  typedef char known[sizeof(T) ? 1 : -1];
+  if (sizeof(known))
+    delete ptr;
+}
+
+#if PLATFORM(WIN)
+void deleteOwnedPtr(HBITMAP);
+void deleteOwnedPtr(HBRUSH);
+void deleteOwnedPtr(HFONT);
+void deleteOwnedPtr(HPALETTE);
+void deleteOwnedPtr(HPEN);
+void deleteOwnedPtr(HRGN);
+#endif
 
 template <typename T>
 class OwnPtr : Noncopyable {
  public:
-  explicit OwnPtr(T* ptr = 0) : m_ptr(ptr) {}
-  ~OwnPtr() { safeDelete(); }
+  typedef typename OwnPtrRemovePointer<T>::type ValueType;
+  typedef ValueType* PtrType;
 
-  T* get() const { return m_ptr; }
-  T* release() {
-    T* ptr = m_ptr;
+  explicit OwnPtr(PtrType ptr = 0) : m_ptr(ptr) {}
+  ~OwnPtr() { deleteOwnedPtr(m_ptr); }
+
+  PtrType get() const { return m_ptr; }
+  PtrType release() {
+    PtrType ptr = m_ptr;
     m_ptr = 0;
     return ptr;
   }
 
-  void set(T* ptr) {
+  void set(PtrType ptr) {
     ASSERT(!ptr || m_ptr != ptr);
-    safeDelete();
+    deleteOwnedPtr(m_ptr);
     m_ptr = ptr;
   }
   void clear() {
-    safeDelete();
+    deleteOwnedPtr(m_ptr);
     m_ptr = 0;
   }
 
-  T& operator*() const {
+  ValueType& operator*() const {
     ASSERT(m_ptr);
     return *m_ptr;
   }
-  T* operator->() const {
+  PtrType operator->() const {
     ASSERT(m_ptr);
     return m_ptr;
   }
@@ -64,19 +107,13 @@ class OwnPtr : Noncopyable {
 
   // This conversion operator allows implicit conversion to bool but not to
   // other integer types.
-  typedef T* (OwnPtr::*UnspecifiedBoolType)() const;
+  typedef PtrType (OwnPtr::*UnspecifiedBoolType)() const;
   operator UnspecifiedBoolType() const { return m_ptr ? &OwnPtr::get : 0; }
 
   void swap(OwnPtr& o) { std::swap(m_ptr, o.m_ptr); }
 
  private:
-  void safeDelete() {
-    typedef char known[sizeof(T) ? 1 : -1];
-    if (sizeof(known))
-      delete m_ptr;
-  }
-
-  T* m_ptr;
+  PtrType m_ptr;
 };
 
 template <typename T>
@@ -85,7 +122,7 @@ inline void swap(OwnPtr<T>& a, OwnPtr<T>& b) {
 }
 
 template <typename T>
-inline T* getPtr(const OwnPtr<T>& p) {
+inline typename OwnPtr<T>::PtrType getPtr(const OwnPtr<T>& p) {
   return p.get();
 }
 
