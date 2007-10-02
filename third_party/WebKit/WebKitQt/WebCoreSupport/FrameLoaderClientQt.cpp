@@ -775,6 +775,9 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
   if (MIMETypeRegistry::isSupportedNonImageMIMEType(mimeType))
     return ObjectContentFrame;
 
+  if (url.protocol() == "about")
+    return ObjectContentFrame;
+
   return ObjectContentNone;
 }
 
@@ -793,7 +796,7 @@ Widget* FrameLoaderClientQt::createPlugin(const IntSize&,
                                           const String& mimeType,
                                           bool loadManually) {
   //     qDebug()<<"------ Creating plugin in FrameLoaderClientQt::createPlugin
-  //     for "<<mimeType;
+  //     for "<<url.prettyURL() << mimeType;
   //     qDebug()<<"------\t url = "<<url.prettyURL();
   QStringList params;
   QStringList values;
