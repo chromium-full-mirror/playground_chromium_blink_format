@@ -60,6 +60,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QString renderTreeDump() const;
   QString selectedText() const;
   QString title() const;
+  QString name() const;
 
   QList<QWebFrame*> childFrames() const;
 

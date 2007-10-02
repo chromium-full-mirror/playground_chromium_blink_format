@@ -71,6 +71,7 @@ class DumpRenderTree : public QObject {
   void quit();
 
  private:
+  QString dumpFramesAsText(QWebFrame* frame);
   LayoutTestController* m_controller;
 
   QWebPage* m_page;
