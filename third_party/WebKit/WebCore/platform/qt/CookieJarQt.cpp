@@ -44,7 +44,11 @@ void setCookies(const KURL& url, const KURL& policyURL, const String& value) {
 
 String cookies(const KURL& url) {
   QUrl u((QString)url.url());
-  return (String)QCookieJar::cookieJar()->cookies(u);
+  QString cookies = QCookieJar::cookieJar()->cookies(u);
+  int idx = cookies.indexOf(QLatin1Char(';'));
+  if (idx > 0)
+    cookies = cookies.left(idx);
+  return cookies;
 }
 
 bool cookiesEnabled() {
