@@ -98,12 +98,19 @@ Page* ChromeClientQt::createWindow(Frame*, const FrameLoadRequest& request) {
   QWebPage* newPage = m_webPage->createWindow();
   if (!newPage)
     return 0;
+  KURL url = request.resourceRequest().url();
+  newPage->open(QUrl(url.prettyURL()));
   return newPage->d->page;
 }
 
-Page* ChromeClientQt::createModalDialog(Frame*, const FrameLoadRequest&) {
-  notImplemented();
-  return 0;
+Page* ChromeClientQt::createModalDialog(Frame*,
+                                        const FrameLoadRequest& request) {
+  QWebPage* newPage = m_webPage->createModalDialog();
+  if (!newPage)
+    return 0;
+  KURL url = request.resourceRequest().url();
+  newPage->open(QUrl(url.prettyURL()));
+  return newPage->d->page;
 }
 
 void ChromeClientQt::show() {

@@ -250,6 +250,10 @@ QWebPage* QWebPage::createWindow() {
   return 0;
 }
 
+QWebPage* QWebPage::createModalDialog() {
+  return 0;
+}
+
 QObject* QWebPage::createPlugin(const QString& classid,
                                 const QUrl& url,
                                 const QStringList& paramNames,
