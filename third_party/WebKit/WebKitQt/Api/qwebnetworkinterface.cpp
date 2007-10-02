@@ -569,6 +569,7 @@ void QWebNetworkInterfacePrivate::sendFileData(QWebNetworkJob* job,
   if (!job->cancelled()) {
     QHttpResponseHeader response;
     response.setStatusLine(statusCode);
+    response.setContentLength(data.length());
     job->setResponse(response);
     emit q->started(job);
     if (!data.isEmpty())
@@ -620,7 +621,11 @@ void QWebNetworkInterfacePrivate::parseDataUrl(QWebNetworkJob* job) {
   response.setContentLength(data.size());
   job->setResponse(response);
 
-  sendFileData(job, statusCode, data);
+  int error = statusCode >= 400 ? 1 : 0;
+  emit q->started(job);
+  if (!data.isEmpty())
+    emit q->data(job, data);
+  emit q->finished(job, error);
 }
 
 /*!
