@@ -201,7 +201,7 @@ inline int toLower(UChar* result,
     const QUnicodeTables::Properties* prop = QUnicodeTables::properties(c);
     if (prop->lowerCaseSpecial) {
       QString qstring;
-      if (c > 0x10000) {
+      if (c < 0x10000) {
         qstring += QChar(c);
       } else {
         qstring += QChar(*(s - 1));
@@ -256,7 +256,7 @@ inline int toUpper(UChar* result,
     const QUnicodeTables::Properties* prop = QUnicodeTables::properties(c);
     if (prop->upperCaseSpecial) {
       QString qstring;
-      if (c > 0x10000) {
+      if (c < 0x10000) {
         qstring += QChar(c);
       } else {
         qstring += QChar(*(s - 1));
