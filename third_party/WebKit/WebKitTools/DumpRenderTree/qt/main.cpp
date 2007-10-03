@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
   char currentPath[PATH_MAX + 1];
   getcwd(currentPath, PATH_MAX);
   QByteArray configFile = currentPath;
-  configFile += "/WebKitTools/DumpRenderTree/DumpRenderTree.qtproj/fonts.conf";
+  configFile += "/WebKitTools/DumpRenderTree/qt/fonts.conf";
   if (!FcConfigParseAndLoad(config, (FcChar8*)configFile.data(), true))
     qFatal("Couldn't load font configuration file");
   if (!FcConfigAppFontAddDir(config, (FcChar8*)fontDir.data()))
