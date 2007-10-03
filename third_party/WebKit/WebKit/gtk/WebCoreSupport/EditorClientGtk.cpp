@@ -226,7 +226,7 @@ void EditorClient::handleInputMethodKeypress(KeyboardEvent*) {
   notImplemented();
 }
 
-EditorClient::EditorClient(WebKitGtkPage* page) : m_page(page) {}
+EditorClient::EditorClient(WebKitPage* page) : m_page(page) {}
 
 void EditorClient::textFieldDidBeginEditing(Element*) {
   notImplemented();

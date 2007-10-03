@@ -34,7 +34,7 @@
 
 #include <wtf/Forward.h>
 
-typedef struct _WebKitGtkPage WebKitGtkPage;
+typedef struct _WebKitPage WebKitPage;
 
 namespace WebCore {
 class Page;
@@ -44,7 +44,7 @@ namespace WebKit {
 
 class EditorClient : public WebCore::EditorClient {
  public:
-  EditorClient(WebKitGtkPage*);
+  EditorClient(WebKitPage*);
 
   // from EditorClient
   virtual void pageDestroyed();
@@ -126,7 +126,7 @@ class EditorClient : public WebCore::EditorClient {
   virtual void setInputMethodState(bool enabled);
 
  private:
-  WebKitGtkPage* m_page;
+  WebKitPage* m_page;
 };
 }
 

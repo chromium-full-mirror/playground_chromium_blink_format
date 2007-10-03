@@ -55,7 +55,7 @@ using namespace WebCore;
 
 namespace WebKit {
 
-FrameLoaderClient::FrameLoaderClient(WebKitGtkFrame* frame)
+FrameLoaderClient::FrameLoaderClient(WebKitFrame* frame)
     : m_frame(frame), m_firstData(false) {
   ASSERT(m_frame);
 }
@@ -119,12 +119,12 @@ void FrameLoaderClient::assignIdentifierToInitialRequest(
 }
 
 void FrameLoaderClient::postProgressStartedNotification() {
-  WebKitGtkPage* page = getPageFromFrame(m_frame);
+  WebKitPage* page = getPageFromFrame(m_frame);
   g_signal_emit_by_name(page, "load_started", m_frame);
 }
 
 void FrameLoaderClient::postProgressEstimateChangedNotification() {
-  WebKitGtkPage* kitPage = getPageFromFrame(m_frame);
+  WebKitPage* kitPage = getPageFromFrame(m_frame);
   Page* corePage = core(kitPage);
 
   g_signal_emit_by_name(
@@ -133,7 +133,7 @@ void FrameLoaderClient::postProgressEstimateChangedNotification() {
 }
 
 void FrameLoaderClient::postProgressFinishedNotification() {
-  WebKitGtkPage* page = getPageFromFrame(m_frame);
+  WebKitPage* page = getPageFromFrame(m_frame);
 
   g_signal_emit_by_name(page, "load_finished", m_frame);
 }
@@ -206,8 +206,8 @@ Frame* FrameLoaderClient::createFrame(const KURL& url,
   Frame* coreFrame = core(webFrame());
 
   ASSERT(core(getPageFromFrame(webFrame())) == coreFrame->page());
-  WebKitGtkFrame* gtkFrame = WEBKIT_GTK_FRAME(webkit_gtk_frame_init_with_page(
-      getPageFromFrame(webFrame()), ownerElement));
+  WebKitFrame* gtkFrame = WEBKIT_FRAME(
+      webkit_frame_init_with_page(getPageFromFrame(webFrame()), ownerElement));
   Frame* childFrame = core(gtkFrame);
 
   coreFrame->tree()->appendChild(childFrame);
@@ -376,7 +376,7 @@ void FrameLoaderClient::dispatchWillClose() {
 }
 
 void FrameLoaderClient::dispatchDidReceiveIcon() {
-  WebKitGtkPage* page = getPageFromFrame(m_frame);
+  WebKitPage* page = getPageFromFrame(m_frame);
 
   g_signal_emit_by_name(page, "icon_loaded", m_frame);
 }
@@ -466,14 +466,14 @@ void FrameLoaderClient::prepareForDataSourceReplacement() {
 }
 
 void FrameLoaderClient::setTitle(const String& title, const KURL& url) {
-  WebKitGtkPage* page = getPageFromFrame(m_frame);
+  WebKitPage* page = getPageFromFrame(m_frame);
 
   CString titleString = title.utf8();
   DeprecatedCString urlString = url.prettyURL().utf8();
   g_signal_emit_by_name(m_frame, "title_changed", titleString.data(),
                         urlString.data());
 
-  if (m_frame == webkit_gtk_page_get_main_frame(page))
+  if (m_frame == webkit_page_get_main_frame(page))
     g_signal_emit_by_name(page, "title_changed", titleString.data(),
                           urlString.data());
 }

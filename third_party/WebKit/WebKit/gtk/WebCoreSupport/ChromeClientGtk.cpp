@@ -41,7 +41,7 @@
 using namespace WebCore;
 
 namespace WebKit {
-ChromeClient::ChromeClient(WebKitGtkPage* page)
+ChromeClient::ChromeClient(WebKitPage* page)
     : m_webPage(page), m_didSendLinkSignal(false) {}
 
 void ChromeClient::chromeDestroyed() {
@@ -77,13 +77,11 @@ void ChromeClient::unfocus() {
 
 Page* ChromeClient::createWindow(Frame*, const FrameLoadRequest&) {
   /* TODO: FrameLoadRequest is not used */
-  WebKitGtkPage* page =
-      WEBKIT_GTK_PAGE_GET_CLASS(m_webPage)->create_page(m_webPage);
+  WebKitPage* page = WEBKIT_PAGE_GET_CLASS(m_webPage)->create_page(m_webPage);
   if (!page)
     return 0;
 
-  WebKitGtkPagePrivate* privateData =
-      WEBKIT_GTK_PAGE_GET_PRIVATE(WEBKIT_GTK_PAGE(page));
+  WebKitPagePrivate* privateData = WEBKIT_PAGE_GET_PRIVATE(WEBKIT_PAGE(page));
   return privateData->page;
 }
 
@@ -175,20 +173,20 @@ void ChromeClient::addMessageToConsole(const WebCore::String& message,
   CString messageString = message.utf8();
   CString sourceIdString = sourceId.utf8();
 
-  WEBKIT_GTK_PAGE_GET_CLASS(m_webPage)
+  WEBKIT_PAGE_GET_CLASS(m_webPage)
       ->java_script_console_message(m_webPage, messageString.data(), lineNumber,
                                     sourceIdString.data());
 }
 
 void ChromeClient::runJavaScriptAlert(Frame* frame, const String& message) {
   CString messageString = message.utf8();
-  WEBKIT_GTK_PAGE_GET_CLASS(m_webPage)
+  WEBKIT_PAGE_GET_CLASS(m_webPage)
       ->java_script_alert(m_webPage, kit(frame), messageString.data());
 }
 
 bool ChromeClient::runJavaScriptConfirm(Frame* frame, const String& message) {
   CString messageString = message.utf8();
-  return WEBKIT_GTK_PAGE_GET_CLASS(m_webPage)->java_script_confirm(
+  return WEBKIT_PAGE_GET_CLASS(m_webPage)->java_script_confirm(
       m_webPage, kit(frame), messageString.data());
 }
 
@@ -199,7 +197,7 @@ bool ChromeClient::runJavaScriptPrompt(Frame* frame,
   CString messageString = message.utf8();
   CString defaultValueString = defaultValue.utf8();
 
-  gchar* cresult = WEBKIT_GTK_PAGE_GET_CLASS(m_webPage)->java_script_prompt(
+  gchar* cresult = WEBKIT_PAGE_GET_CLASS(m_webPage)->java_script_prompt(
       m_webPage, kit(frame), messageString.data(), defaultValueString.data());
   if (!cresult)
     return false;

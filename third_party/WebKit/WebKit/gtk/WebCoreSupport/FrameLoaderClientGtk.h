@@ -32,17 +32,17 @@
 #include "FrameLoaderClient.h"
 #include "ResourceResponse.h"
 
-typedef struct _WebKitGtkFrame WebKitGtkFrame;
+typedef struct _WebKitFrame WebKitFrame;
 
 namespace WebKit {
 
 class FrameLoaderClient : public WebCore::FrameLoaderClient {
  public:
-  FrameLoaderClient(WebKitGtkFrame*);
+  FrameLoaderClient(WebKitFrame*);
   virtual ~FrameLoaderClient() {}
   virtual void frameLoaderDestroyed();
 
-  WebKitGtkFrame* webFrame() const { return m_frame; }
+  WebKitFrame* webFrame() const { return m_frame; }
 
   virtual bool hasWebView() const;
   virtual bool hasFrameView() const;
@@ -248,7 +248,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
                         const WebCore::ResourceResponse&);
 
  private:
-  WebKitGtkFrame* m_frame;
+  WebKitFrame* m_frame;
   WebCore::ResourceResponse m_response;
   bool m_firstData;
 };
