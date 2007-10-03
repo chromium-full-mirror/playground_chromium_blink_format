@@ -115,6 +115,7 @@ class ChromeClient : public WebCore::ChromeClient {
 
  private:
   WebKitGtkPage* m_webPage;
+  bool m_didSendLinkSignal;
 };
 }
 
