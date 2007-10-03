@@ -157,6 +157,8 @@ WEBKIT_GTK_API void webkit_gtk_page_load_html_string(WebKitGtkPage* page,
 WEBKIT_GTK_API WebKitGtkFrame* webkit_gtk_page_get_main_frame(
     WebKitGtkPage* page);
 
+WEBKIT_GTK_API void webkit_gtk_page_execute_script(WebKitGtkPage* page,
+                                                   const gchar* script);
 G_END_DECLS
 
 #endif
