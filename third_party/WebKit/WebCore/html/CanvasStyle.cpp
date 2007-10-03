@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  * Copyright (C) 2007 Trolltech ASA
+ * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,6 +39,8 @@
 #include <QBrush>
 #include <QPen>
 #include <QColor>
+#elif PLATFORM(CAIRO)
+#include <cairo.h>
 #endif
 
 namespace WebCore {
@@ -76,6 +79,8 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
     return;
 #if PLATFORM(QT)
   QPainter* p = static_cast<QPainter*>(context->platformContext());
+#elif PLATFORM(CAIRO)
+  cairo_t* cr = context->platformContext();
 #endif
   switch (m_type) {
     case ColorString: {
@@ -90,6 +95,11 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       QPen currentPen = p->pen();
       currentPen.setColor((QColor(QRgb(color))));
       p->setPen(currentPen);
+#elif PLATFORM(CAIRO)
+      // FIXME: fill and stroke color should be dealt with separately
+      cairo_set_source_rgba(
+          cr, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f,
+          (color & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
 #endif
       break;
     }
@@ -106,6 +116,11 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       clr.setAlphaF(m_alpha);
       currentPen.setColor(clr);
       p->setPen(currentPen);
+#elif PLATFORM(CAIRO)
+      // FIXME: fill and stroke color should be dealt with separately
+      cairo_set_source_rgba(
+          cr, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f,
+          (color & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
 #endif
       break;
     }
@@ -120,6 +135,8 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       clr.setRgbF(m_grayLevel, m_grayLevel, m_grayLevel, m_alpha);
       currentPen.setColor(clr);
       p->setPen(currentPen);
+#elif PLATFORM(CAIRO)
+      cairo_set_source_rgba(cr, m_grayLevel, m_grayLevel, m_grayLevel, m_alpha);
 #endif
       break;
     }
@@ -134,6 +151,9 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       clr.setRgbF(m_red, m_green, m_blue, m_alpha);
       currentPen.setColor(clr);
       p->setPen(currentPen);
+#elif PLATFORM(CAIRO)
+      // FIXME: fill and stroke color should be dealt with separately
+      cairo_set_source_rgba(cr, m_red, m_green, m_blue, m_alpha);
 #endif
       break;
     }
