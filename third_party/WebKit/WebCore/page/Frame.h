@@ -42,7 +42,6 @@ struct NPObject;
 
 namespace KJS {
 class Interpreter;
-
 namespace Bindings {
 class Instance;
 class RootObject;
@@ -110,10 +109,6 @@ class Timer;
 
 class Frame : public Shared<Frame> {
  public:
-  static double currentPaintTimeStamp() {
-    return s_currentPaintTimeStamp;
-  }  // returns 0 if not painting
-
   Frame(Page*, HTMLFrameOwnerElement*, FrameLoaderClient*);
   virtual void setView(FrameView*);
   virtual ~Frame();
@@ -142,6 +137,7 @@ class Frame : public Shared<Frame> {
   SelectionController* selectionController() const;
   FrameTree* tree() const;
 
+  // FIXME: Rename to contentRenderer and change type to RenderView.
   RenderObject* renderer()
       const;  // root renderer for the document contained in this frame
   RenderPart*
@@ -149,15 +145,10 @@ class Frame : public Shared<Frame> {
 
   friend class FramePrivate;
 
-  DragImageRef dragImageForSelection();
-
  private:
-  static double s_currentPaintTimeStamp;  // used for detecting decoded resource
-                                          // thrash in the cache
-
   FramePrivate* d;
 
-  // === undecided, may or may not belong here
+  // === undecided, would like to consider moving to another class
 
  public:
   static Frame* frameForWidget(const Widget*);
@@ -165,16 +156,8 @@ class Frame : public Shared<Frame> {
   Settings* settings() const;  // can be NULL
   void reparseConfiguration();
 
-  // should move to FrameView
-  void paint(GraphicsContext*, const IntRect&);
-  void setPaintRestriction(PaintRestriction);
-  bool isPainting() const;
-
   void setUserStyleSheetLocation(const KURL&);
   void setUserStyleSheet(const String& styleSheetData);
-
-  void setZoomFactor(int percent);
-  int zoomFactor() const;
 
   void setPrinting(bool printing,
                    float minPageWidth,
@@ -183,11 +166,6 @@ class Frame : public Shared<Frame> {
 
   bool inViewSourceMode() const;
   void setInViewSourceMode(bool = true) const;
-
-  void setJSStatusBarText(const String&);
-  void setJSDefaultStatusBarText(const String&);
-  String jsStatusBarText() const;
-  String jsDefaultStatusBarText() const;
 
   void keepAlive();  // Used to keep the frame alive when running a script that
                      // might destroy it.
@@ -214,36 +192,17 @@ class Frame : public Shared<Frame> {
 
   KJSProxy* scriptProxy();
 
-  bool isFrameSet() const;
-
-  void adjustPageHeight(float* newBottom,
-                        float oldTop,
-                        float oldBottom,
-                        float bottomLimit);
-
-  void forceLayout(bool allowSubtree = false);
-  void forceLayoutWithPageWidthRange(float minPageWidth,
-                                     float maxPageWidth,
-                                     bool adjustViewSize);
-
-  void sendResizeEvent();
-  void sendScrollEvent();
-
   void clearTimers();
   static void clearTimers(FrameView*);
 
   bool isActive() const;
   void setIsActive(bool flag);
-  void setWindowHasFocus(bool flag);
 
   // Convenience, to avoid repeating the code to dig down to get this.
   UChar backslashAsCurrencySymbol() const;
 
   void setNeedsReapplyStyles();
   String documentTypeString() const;
-
-  bool prohibitsScrolling() const;
-  void setProhibitsScrolling(const bool);
 
   void dashboardRegionsChanged();
 
@@ -258,6 +217,51 @@ class Frame : public Shared<Frame> {
 
   void lifeSupportTimerFired(Timer<Frame>*);
 
+  // === to be moved into Document
+
+ public:
+  bool isFrameSet() const;
+
+  // === to be moved into EventHandler
+
+ public:
+  void sendResizeEvent();
+  void sendScrollEvent();
+
+  void setWindowHasFocus(bool flag);
+
+  // === to be moved into FrameView
+
+ public:
+  void paint(GraphicsContext*, const IntRect&);
+  void setPaintRestriction(PaintRestriction);
+  bool isPainting() const;
+
+  static double currentPaintTimeStamp() {
+    return s_currentPaintTimeStamp;
+  }  // returns 0 if not painting
+
+  void forceLayout(bool allowSubtree = false);
+  void forceLayoutWithPageWidthRange(float minPageWidth,
+                                     float maxPageWidth,
+                                     bool adjustViewSize);
+
+  void adjustPageHeight(float* newBottom,
+                        float oldTop,
+                        float oldBottom,
+                        float bottomLimit);
+
+  void setZoomFactor(int percent);
+  int zoomFactor() const;  // FIXME: This is a multiplier for text size only;
+                           // needs a better name.
+
+  bool prohibitsScrolling() const;
+  void setProhibitsScrolling(const bool);
+
+ private:
+  static double s_currentPaintTimeStamp;  // used for detecting decoded resource
+                                          // thrash in the cache
+
   // === to be moved into Chrome
 
  public:
@@ -265,6 +269,11 @@ class Frame : public Shared<Frame> {
   void unfocusWindow();
   bool shouldClose();
   void scheduleClose();
+
+  void setJSStatusBarText(const String&);
+  void setJSDefaultStatusBarText(const String&);
+  String jsStatusBarText() const;
+  String jsDefaultStatusBarText() const;
 
   // === to be moved into Editor
 
@@ -293,9 +302,6 @@ class Frame : public Shared<Frame> {
 
   IntRect firstRectForRange(Range*) const;
 
-#if PLATFORM(MAC)
-  void issuePasteCommand();
-#endif
   void issueTransposeCommand();
   void respondToChangedSelection(const Selection& oldSelection,
                                  bool closeTyping);
@@ -319,6 +325,8 @@ class Frame : public Shared<Frame> {
   bool doTextFieldCommandFromEvent(Element*, KeyboardEvent*);
   void textWillBeDeletedInTextField(Element* input);
   void textDidChangeInTextArea(Element*);
+
+  DragImageRef dragImageForSelection();
 
   // === to be moved into SelectionController
 
@@ -372,9 +380,10 @@ class Frame : public Shared<Frame> {
 
   VisiblePosition visiblePositionForPoint(const IntPoint& framePoint);
   Document* documentAtPoint(const IntPoint& windowPoint);
+
 #if PLATFORM(MAC)
 
-  // === undecided, may or may not belong here
+  // === undecided, would like to consider moving to another class
 
  public:
   NSString* searchForNSLabelsAboveCell(RegularExpression*,
@@ -412,6 +421,7 @@ class Frame : public Shared<Frame> {
  public:
   NSDictionary* fontAttributesForSelectionStart() const;
   NSWritingDirection baseWritingDirectionForSelectionStart() const;
+  void issuePasteCommand();
 
 #endif
 };
