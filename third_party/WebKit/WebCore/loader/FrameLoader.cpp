@@ -3456,7 +3456,7 @@ void FrameLoader::receivedMainResourceError(const ResourceError& error,
       handleFallbackContent();
   }
 
-  if (m_state == FrameStateProvisional) {
+  if (m_state == FrameStateProvisional && m_provisionalDocumentLoader) {
     KURL failedURL = m_provisionalDocumentLoader->originalRequestCopy().url();
     didNotOpenURL(failedURL);
 
