@@ -929,8 +929,12 @@ void FrameView::updateControlTints() {
   // theme and platform
   // to define when controls get the tint and to call this function when that
   // changes.
-  if (!m_frame)
+
+  // Optimize the common case where we bring a window to the front while it's
+  // still empty.
+  if (!m_frame || m_frame->loader()->url().isEmpty())
     return;
+
   Document* doc = m_frame->document();
   if (doc && theme()->supportsControlTints() && m_frame->renderer()) {
     doc->updateLayout();  // Ensure layout is up to date.
