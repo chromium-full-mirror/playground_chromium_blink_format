@@ -45,6 +45,7 @@ class LayoutTestController : public QObject {
   bool shouldDumpAsText() const { return m_textDump; }
   bool shouldDumpChildrenAsText() const { return m_dumpChildrenAsText; }
   bool shouldWaitUntilDone() const { return m_waitForDone; }
+  bool canOpenWindows() const { return m_canOpenWindows; }
 
   void reset();
 
@@ -58,6 +59,7 @@ class LayoutTestController : public QObject {
   void maybeDump(bool ok);
   void dumpAsText() { m_textDump = true; }
   void dumpChildFramesAsText() { m_dumpChildrenAsText = true; }
+  void setCanOpenWindows() { m_canOpenWindows = true; }
   void waitUntilDone();
   void notifyDone();
   void dumpEditingCallbacks();
@@ -68,6 +70,7 @@ class LayoutTestController : public QObject {
   bool m_isLoading;
   bool m_textDump;
   bool m_dumpChildrenAsText;
+  bool m_canOpenWindows;
   bool m_waitForDone;
   int m_timeoutTimer;
   QWebFrame* m_topLoadingFrame;

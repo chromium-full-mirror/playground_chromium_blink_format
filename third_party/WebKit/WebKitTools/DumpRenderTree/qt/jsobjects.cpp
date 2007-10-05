@@ -46,18 +46,15 @@ class HackWebFrame : public QWebFrame {
 };
 
 LayoutTestController::LayoutTestController() : QObject() {
-  m_isLoading = true;
-  m_textDump = false;
-  m_dumpChildrenAsText = false;
-  m_waitForDone = false;
   m_timeoutTimer = 0;
-  m_topLoadingFrame = 0;
+  reset();
 }
 
 void LayoutTestController::reset() {
   m_isLoading = true;
   m_textDump = false;
   m_dumpChildrenAsText = false;
+  m_canOpenWindows = false;
   m_waitForDone = false;
   if (m_timeoutTimer) {
     killTimer(m_timeoutTimer);

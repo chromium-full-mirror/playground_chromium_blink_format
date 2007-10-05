@@ -62,6 +62,7 @@ class DumpRenderTree : public QObject {
   LayoutTestController* layoutTestController() const { return m_controller; }
   EventSender* eventSender() const { return m_eventSender; }
 
+  QWebPage* createWindow();
  public Q_SLOTS:
   void initJSObjects();
   void readStdin(int);
@@ -80,6 +81,8 @@ class DumpRenderTree : public QObject {
 
   QFile* m_stdin;
   QSocketNotifier* m_notifier;
+
+  QList<QWidget*> windows;
 };
 }
 
