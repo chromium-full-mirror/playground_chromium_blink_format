@@ -64,7 +64,7 @@ int WordBreakIteratorQt::first() {
 }
 
 int WordBreakIteratorQt::next() {
-  if (currentPos == length) {
+  if (currentPos >= length) {
     currentPos = -1;
     return currentPos;
   }
@@ -79,7 +79,7 @@ int WordBreakIteratorQt::next() {
   return currentPos;
 }
 int WordBreakIteratorQt::previous() {
-  if (currentPos == 0) {
+  if (currentPos <= 0) {
     currentPos = -1;
     return currentPos;
   }
@@ -100,13 +100,13 @@ int CharBreakIteratorQt::first() {
 }
 
 int CharBreakIteratorQt::next() {
-  if (currentPos == length)
+  if (currentPos >= length)
     return -1;
   currentPos = layout.nextCursorPosition(currentPos);
   return currentPos;
 }
 int CharBreakIteratorQt::previous() {
-  if (currentPos == 0)
+  if (currentPos <= 0)
     return -1;
   currentPos = layout.previousCursorPosition(currentPos);
   return currentPos;
