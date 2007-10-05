@@ -33,11 +33,13 @@
 #include <qpoint.h>
 
 class QWebFrame;
-
+namespace WebCore {
+class DumpRenderTree;
+}
 class LayoutTestController : public QObject {
   Q_OBJECT
  public:
-  LayoutTestController();
+  LayoutTestController(WebCore::DumpRenderTree* drt);
 
   bool isLoading() const { return m_isLoading; }
   void setLoading(bool loading) { m_isLoading = loading; }
@@ -65,6 +67,8 @@ class LayoutTestController : public QObject {
   void dumpEditingCallbacks();
   void queueReload();
   void provisionalLoad();
+  void setCloseRemainingWindowsWhenComplete(bool) {}
+  int windowCount();
 
  private:
   bool m_isLoading;
@@ -74,6 +78,7 @@ class LayoutTestController : public QObject {
   bool m_waitForDone;
   int m_timeoutTimer;
   QWebFrame* m_topLoadingFrame;
+  WebCore::DumpRenderTree* m_drt;
 };
 
 class QWebPage;

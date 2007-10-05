@@ -31,6 +31,8 @@
 #include <qevent.h>
 #include <qapplication.h>
 
+#include "DumpRenderTree.h"
+
 class HackWebFrame : public QWebFrame {
  public:
   void mousePressEvent(QMouseEvent* e) { QWebFrame::mousePressEvent(e); }
@@ -45,7 +47,8 @@ class HackWebFrame : public QWebFrame {
   ~HackWebFrame() {}
 };
 
-LayoutTestController::LayoutTestController() : QObject() {
+LayoutTestController::LayoutTestController(WebCore::DumpRenderTree* drt)
+    : QObject(), m_drt(drt) {
   m_timeoutTimer = 0;
   reset();
 }
@@ -70,7 +73,7 @@ void LayoutTestController::maybeDump(bool ok) {
 
   m_topLoadingFrame = 0;
 
-  if (!ok || !shouldWaitUntilDone()) {
+  if (!shouldWaitUntilDone()) {
     emit done();
     m_isLoading = false;
   }
@@ -90,6 +93,10 @@ void LayoutTestController::notifyDone() {
   m_timeoutTimer = 0;
   emit done();
   m_isLoading = false;
+}
+
+int LayoutTestController::windowCount() {
+  return m_drt->windowCount();
 }
 
 void LayoutTestController::dumpEditingCallbacks() {

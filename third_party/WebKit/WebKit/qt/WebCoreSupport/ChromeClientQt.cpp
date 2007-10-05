@@ -37,6 +37,7 @@
 
 #include "qwebpage.h"
 #include "qwebpage_p.h"
+#include "qwebframe_p.h"
 
 namespace WebCore {
 
@@ -190,7 +191,8 @@ bool ChromeClientQt::runBeforeUnloadConfirmPanel(const String& message,
 }
 
 void ChromeClientQt::closeWindowSoon() {
-  notImplemented();
+  m_webPage->mainFrame()->d->frame->loader()->stopAllLoaders();
+  m_webPage->deleteLater();
 }
 
 void ChromeClientQt::runJavaScriptAlert(Frame* f, const String& msg) {
