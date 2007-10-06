@@ -62,7 +62,7 @@ class KJSProxy {
 
   bool haveInterpreter() const { return m_script; }
 
-  void updateDocumentWrapper();
+  void clearDocumentWrapper();
 
  private:
   RefPtr<KJS::ScriptInterpreter> m_script;
