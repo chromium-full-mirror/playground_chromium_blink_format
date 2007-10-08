@@ -1430,7 +1430,7 @@ void* xmlDocPtrForString(DocLoader* docLoader,
 
 int XMLTokenizer::lineNumber() const {
 #ifndef USE_QXMLSTREAM
-  return m_context->input->line;
+  return m_context ? m_context->input->line : 1;
 #else
   return m_stream.lineNumber();
 #endif
@@ -1438,7 +1438,7 @@ int XMLTokenizer::lineNumber() const {
 
 int XMLTokenizer::columnNumber() const {
 #ifndef USE_QXMLSTREAM
-  return m_context->input->col;
+  return m_context ? m_context->input->col : 1;
 #else
   return m_stream.columnNumber();
 #endif
