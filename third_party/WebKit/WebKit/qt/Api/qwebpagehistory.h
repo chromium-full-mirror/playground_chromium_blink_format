@@ -142,6 +142,8 @@ class QWEBKIT_EXPORT QWebPageHistory {
   QWebPageHistory& operator=(const QWebPageHistory& other);
   ~QWebPageHistory();
 
+  void clear();
+
   QList<QWebHistoryItem> items() const;
   QList<QWebHistoryItem> backItems(int maxItems) const;
   QList<QWebHistoryItem> forwardItems(int maxItems) const;
