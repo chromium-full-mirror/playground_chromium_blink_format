@@ -236,7 +236,8 @@ void FrameLoaderClientQt::dispatchDidStartProvisionalLoad() {
 }
 
 void FrameLoaderClientQt::dispatchDidReceiveTitle(const String& title) {
-  setTitle(title);
+  QString t = title;
+  emit titleChanged(t);
 }
 
 void FrameLoaderClientQt::dispatchDidCommitLoad() {
@@ -319,8 +320,8 @@ void FrameLoaderClientQt::willChangeTitle(DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::didChangeTitle(DocumentLoader* l) {
-  setTitle(l->title());
+void FrameLoaderClientQt::didChangeTitle(DocumentLoader*) {
+  // no need for, dispatchDidReceiveTitle is the right callback
 }
 
 void FrameLoaderClientQt::finishedLoading(DocumentLoader* loader) {
@@ -408,14 +409,8 @@ void FrameLoaderClientQt::prepareForDataSourceReplacement() {
   m_frame->loader()->detachChildren();
 }
 
-void FrameLoaderClientQt::setTitle(const String& title) {
-  QString t = title;
-  emit titleChanged(t);
-}
-
-void FrameLoaderClientQt::setTitle(const String& title, const KURL& url) {
-  Q_UNUSED(url)
-  setTitle(title);
+void FrameLoaderClientQt::setTitle(const String&, const KURL&) {
+  // no need for, dispatchDidReceiveTitle is the right callback
 }
 
 String FrameLoaderClientQt::userAgent(const KURL& url) {
