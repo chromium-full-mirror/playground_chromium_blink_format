@@ -64,6 +64,8 @@ class DumpRenderTree : public QObject {
   QWebPage* createWindow();
   int windowCount() const;
 
+  QWebPage* webPage() const { return m_page; }
+
  public Q_SLOTS:
   void initJSObjects();
   void readStdin(int);

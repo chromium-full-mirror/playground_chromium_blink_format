@@ -69,6 +69,8 @@ class LayoutTestController : public QObject {
   void provisionalLoad();
   void setCloseRemainingWindowsWhenComplete(bool) {}
   int windowCount();
+  void display() {}
+  void clearBackForwardList();
 
  private:
   bool m_isLoading;
