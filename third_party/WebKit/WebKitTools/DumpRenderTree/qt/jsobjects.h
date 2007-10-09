@@ -73,6 +73,8 @@ class LayoutTestController : public QObject {
   void display() {}
   void clearBackForwardList();
   void dumpTitleChanges() { m_dumpTitleChanges = true; }
+  QString encodeHostName(const QString& host);
+  QString decodeHostName(const QString& host);
 
  private:
   bool m_isLoading;
