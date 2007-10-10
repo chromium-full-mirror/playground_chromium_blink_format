@@ -104,6 +104,9 @@ FTPEntryType parseOneFTPLine(const char* line,
     }
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#if PLATFORM(QT) && defined(Q_WS_WIN32)
+#define gmtime_r(x, y) gmtime_s(y, x)
+#endif
 
 #if defined(SUPPORT_EPLF)
     /* EPLF handling must come somewhere before /bin/dls handling. */
