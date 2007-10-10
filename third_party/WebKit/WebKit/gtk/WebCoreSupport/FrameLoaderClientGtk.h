@@ -149,7 +149,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void postProgressEstimateChangedNotification();
   virtual void postProgressFinishedNotification();
 
-  virtual WebCore::Frame* createFrame(
+  virtual PassRefPtr<WebCore::Frame> createFrame(
       const WebCore::KURL& url,
       const WebCore::String& name,
       WebCore::HTMLFrameOwnerElement* ownerElement,

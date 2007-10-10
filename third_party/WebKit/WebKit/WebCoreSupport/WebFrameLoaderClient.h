@@ -233,13 +233,14 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void setTitle(const WebCore::String& title, const WebCore::KURL&);
 
-  virtual WebCore::Frame* createFrame(const WebCore::KURL& url,
-                                      const WebCore::String& name,
-                                      WebCore::HTMLFrameOwnerElement*,
-                                      const WebCore::String& referrer,
-                                      bool allowsScrolling,
-                                      int marginWidth,
-                                      int marginHeight);
+  virtual PassRefPtr<WebCore::Frame> createFrame(
+      const WebCore::KURL& url,
+      const WebCore::String& name,
+      WebCore::HTMLFrameOwnerElement*,
+      const WebCore::String& referrer,
+      bool allowsScrolling,
+      int marginWidth,
+      int marginHeight);
   virtual WebCore::Widget* createPlugin(const WebCore::IntSize&,
                                         WebCore::Element*,
                                         const WebCore::KURL&,

@@ -240,13 +240,13 @@ class FrameLoaderClient {
                         const ResourceRequest&,
                         const ResourceResponse&) = 0;
 
-  virtual Frame* createFrame(const KURL& url,
-                             const String& name,
-                             HTMLFrameOwnerElement* ownerElement,
-                             const String& referrer,
-                             bool allowsScrolling,
-                             int marginWidth,
-                             int marginHeight) = 0;
+  virtual PassRefPtr<Frame> createFrame(const KURL& url,
+                                        const String& name,
+                                        HTMLFrameOwnerElement* ownerElement,
+                                        const String& referrer,
+                                        bool allowsScrolling,
+                                        int marginWidth,
+                                        int marginHeight) = 0;
   virtual Widget* createPlugin(const IntSize&,
                                Element*,
                                const KURL&,

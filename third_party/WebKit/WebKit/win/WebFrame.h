@@ -208,10 +208,11 @@ class WebFrame : public IWebFrame,
   virtual void ref();
   virtual void deref();
 
-  virtual WebCore::Frame* createFrame(const WebCore::KURL&,
-                                      const WebCore::String& name,
-                                      WebCore::HTMLFrameOwnerElement*,
-                                      const WebCore::String& referrer);
+  virtual PassRefPtr<WebCore::Frame> createFrame(
+      const WebCore::KURL&,
+      const WebCore::String& name,
+      WebCore::HTMLFrameOwnerElement*,
+      const WebCore::String& referrer);
   virtual void openURL(const WebCore::String& URL,
                        const WebCore::Event* triggeringEvent,
                        bool newWindow,
@@ -368,7 +369,7 @@ class WebFrame : public IWebFrame,
   virtual void postProgressEstimateChangedNotification();
   virtual void postProgressFinishedNotification();
 
-  virtual WebCore::Frame* createFrame(
+  virtual PassRefPtr<WebCore::Frame> createFrame(
       const WebCore::KURL& url,
       const WebCore::String& name,
       WebCore::HTMLFrameOwnerElement* ownerElement,

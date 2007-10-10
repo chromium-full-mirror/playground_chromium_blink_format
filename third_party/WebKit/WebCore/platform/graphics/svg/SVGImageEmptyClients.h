@@ -344,13 +344,13 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void saveDocumentViewToCachedPage(CachedPage*) {}
   virtual bool canCachePage() const { return false; }
 
-  virtual Frame* createFrame(const KURL& url,
-                             const String& name,
-                             HTMLFrameOwnerElement* ownerElement,
-                             const String& referrer,
-                             bool allowsScrolling,
-                             int marginWidth,
-                             int marginHeight) {
+  virtual PassRefPtr<Frame> createFrame(const KURL& url,
+                                        const String& name,
+                                        HTMLFrameOwnerElement* ownerElement,
+                                        const String& referrer,
+                                        bool allowsScrolling,
+                                        int marginWidth,
+                                        int marginHeight) {
     return 0;
   }
   virtual Widget* createPlugin(const IntSize&,
