@@ -580,10 +580,12 @@ bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
         String version = attrs.get("version");
         String encoding = attrs.get("encoding");
         ExceptionCode ec = 0;
-        if (!version.isEmpty())
-          m_doc->setXMLVersion(version, ec);
-        if (!encoding.isEmpty())
-          m_doc->setXMLEncoding(encoding);
+        if (!m_parsingFragment) {
+          if (!version.isEmpty())
+            m_doc->setXMLVersion(version, ec);
+          if (!encoding.isEmpty())
+            m_doc->setXMLEncoding(encoding);
+        }
       }
     }
     m_stream.addData(data);
@@ -1271,7 +1273,8 @@ void XMLTokenizer::end() {
   }
 
   setCurrentNode(0);
-  m_doc->finishedParsing();
+  if (!m_parsingFragment)
+    m_doc->finishedParsing();
 }
 
 void XMLTokenizer::finish() {
@@ -1773,7 +1776,8 @@ void XMLTokenizer::startDocument() {
   initializeParserContext();
   ExceptionCode ec = 0;
 
-  m_doc->setXMLStandalone(m_stream.isStandaloneDocument(), ec);
+  if (!m_parsingFragment)
+    m_doc->setXMLStandalone(m_stream.isStandaloneDocument(), ec);
 }
 
 void XMLTokenizer::parseStartElement() {
@@ -2030,7 +2034,8 @@ void XMLTokenizer::parseDtd() {
       (publicId == "-//WAPFORUM//DTD XHTML Mobile 1.0//EN")) {
     setIsXHTMLDocument(true);  // controls if we replace entities or not.
   }
-  m_doc->setDocType(new DocumentType(m_doc, name, publicId, systemId));
+  if (!m_parsingFragment)
+    m_doc->setDocType(new DocumentType(m_doc, name, publicId, systemId));
 }
 #endif
 }
