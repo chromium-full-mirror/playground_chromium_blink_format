@@ -126,12 +126,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
   CFURLConnectionRef connection() const;
   CFURLConnectionRef releaseConnectionForDownload();
 
-  static CFHTTPCookieStorageAcceptPolicy cookieStorageAcceptPolicy();
-  static void setCookieStorageAcceptPolicy(CFHTTPCookieStorageAcceptPolicy);
-
-  static CFHTTPCookieStorageRef cookieStorage();
-  static void setCookieStorage(CFHTTPCookieStorageRef);
-
   static void setHostAllowsAnyHTTPSCertificate(const String&);
 #endif
   PassRefPtr<SharedBuffer> bufferedData();

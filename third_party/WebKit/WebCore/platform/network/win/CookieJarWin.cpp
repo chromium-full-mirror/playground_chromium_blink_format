@@ -32,6 +32,7 @@
 #if USE(CFNETWORK)
 #include <CoreFoundation/CoreFoundation.h>
 #include <CFNetwork/CFHTTPCookiesPriv.h>
+#include <WebKitSystemInterface/WebKitSystemInterface.h>
 #else
 #include <Wininet.h>
 #endif
@@ -45,7 +46,8 @@ static const CFStringRef s_cookieCF = CFSTR("Cookie");
 
 void setCookies(const KURL& url, const KURL& policyURL, const String& value) {
 #if USE(CFNETWORK)
-  if (!ResourceHandle::cookieStorage())
+  CFHTTPCookieStorageRef defaultCookieStorage = wkGetDefaultHTTPCookieStorage();
+  if (!defaultCookieStorage)
     return;
 
   RetainPtr<CFURLRef> urlCF(AdoptCF, url.createCFURL());
@@ -67,9 +69,8 @@ void setCookies(const KURL& url, const KURL& policyURL, const String& value) {
       AdoptCF, CFHTTPCookieCreateWithResponseHeaderFields(
                    kCFAllocatorDefault, headerFieldsCF.get(), urlCF.get()));
 
-  CFHTTPCookieStorageSetCookies(ResourceHandle::cookieStorage(),
-                                cookiesCF.get(), urlCF.get(),
-                                policyURLCF.get());
+  CFHTTPCookieStorageSetCookies(defaultCookieStorage, cookiesCF.get(),
+                                urlCF.get(), policyURLCF.get());
 #else
   // FIXME: Deal with the policy URL.
   DeprecatedString str = url.url();
@@ -82,7 +83,8 @@ void setCookies(const KURL& url, const KURL& policyURL, const String& value) {
 
 String cookies(const KURL& url) {
 #if USE(CFNETWORK)
-  if (!ResourceHandle::cookieStorage())
+  CFHTTPCookieStorageRef defaultCookieStorage = wkGetDefaultHTTPCookieStorage();
+  if (!defaultCookieStorage)
     return String();
 
   String cookieString;
@@ -91,8 +93,8 @@ String cookies(const KURL& url) {
   bool secure = equalIgnoringCase(url.protocol(), "https");
 
   RetainPtr<CFArrayRef> cookiesCF(
-      AdoptCF, CFHTTPCookieStorageCopyCookiesForURL(
-                   ResourceHandle::cookieStorage(), urlCF.get(), secure));
+      AdoptCF, CFHTTPCookieStorageCopyCookiesForURL(defaultCookieStorage,
+                                                    urlCF.get(), secure));
   RetainPtr<CFDictionaryRef> headerCF(
       AdoptCF, CFHTTPCookieCopyRequestHeaderFields(kCFAllocatorDefault,
                                                    cookiesCF.get()));
@@ -116,9 +118,12 @@ String cookies(const KURL& url) {
 }
 
 bool cookiesEnabled() {
-  return ResourceHandle::cookieStorageAcceptPolicy() ==
-             CFHTTPCookieStorageAcceptPolicyOnlyFromMainDocumentDomain ||
-         ResourceHandle::cookieStorageAcceptPolicy() ==
-             CFHTTPCookieStorageAcceptPolicyAlways;
+  CFHTTPCookieStorageAcceptPolicy policy =
+      CFHTTPCookieStorageAcceptPolicyOnlyFromMainDocumentDomain;
+  if (CFHTTPCookieStorageRef defaultCookieStorage =
+          wkGetDefaultHTTPCookieStorage())
+    policy = CFHTTPCookieStorageGetCookieAcceptPolicy(defaultCookieStorage);
+  return policy == CFHTTPCookieStorageAcceptPolicyOnlyFromMainDocumentDomain ||
+         policy == CFHTTPCookieStorageAcceptPolicyAlways;
 }
 }
