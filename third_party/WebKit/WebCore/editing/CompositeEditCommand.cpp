@@ -424,7 +424,7 @@ void CompositeEditCommand::prepareWhitespaceAtPositionForSplit(
   position = upstreamPos.downstream();
 
   VisiblePosition visiblePos(position);
-  VisiblePosition previousVisiblePos(visiblePos.next());
+  VisiblePosition previousVisiblePos(visiblePos.previous());
   Position previous(previousVisiblePos.deepEquivalent());
 
   if (isCollapsibleWhitespace(previousVisiblePos.characterAfter()) &&
