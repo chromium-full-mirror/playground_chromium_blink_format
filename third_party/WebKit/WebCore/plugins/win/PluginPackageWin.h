@@ -30,6 +30,7 @@
 #include <windows.h>
 
 #include "Shared.h"
+#include "Timer.h"
 #include "StringHash.h"
 #include "PlatformString.h"
 #include "npfunctions.h"
@@ -86,6 +87,10 @@ class PluginPackageWin : public Shared<PluginPackageWin> {
   NPP_ShutdownProcPtr m_NPP_Shutdown;
   NPPluginFuncs m_pluginFuncs;
   NPNetscapeFuncs m_browserFuncs;
+
+  void freeLibrarySoon();
+  void freeLibraryTimerFired(Timer<PluginPackageWin>*);
+  Timer<PluginPackageWin> m_freeLibraryTimer;
 };
 
 struct PluginPackageWinHash {
