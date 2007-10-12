@@ -23,6 +23,7 @@
  */
 
 #include "config.h"
+#include "RenderSVGInlineText.h"
 
 #if ENABLE(SVG)
 #include "SVGRootInlineBox.h"
@@ -32,6 +33,7 @@
 #include "GraphicsContext.h"
 #include "InlineTextBox.h"
 #include "Range.h"
+#include "RenderSVGRoot.h"
 #include "SVGInlineFlowBox.h"
 #include "SVGPaintServer.h"
 #include "SVGRenderSupport.h"
@@ -98,6 +100,17 @@ inline void closeTextChunk(SVGTextChunkLayoutInfo& info,
   ASSERT(info.chunk.end >= info.chunk.start);
 
   textChunks.append(info.chunk);
+}
+
+RenderSVGRoot* findSVGRootObject(RenderObject* start) {
+  // Find associated root inline box
+  while (start && !start->isSVGRoot())
+    start = start->parent();
+
+  ASSERT(start);
+  ASSERT(start->isSVGRoot());
+
+  return static_cast<RenderSVGRoot*>(start);
 }
 
 inline FloatPoint topLeftPositionOfCharacterRange(Vector<SVGChar>& chars) {
@@ -635,7 +648,6 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
 
   for (unsigned i = 0; i < length; ++i) {
     SVGChar svgChar;
-    svgChar.selected = false;
     svgChar.drawnSeperated = false;
     svgChar.newTextChunk = false;
 
@@ -1012,8 +1024,6 @@ void SVGRootInlineBox::paintSelectionForTextBox(InlineTextBox* textBox,
                                                 const UChar* chars,
                                                 int length,
                                                 GraphicsContext* p,
-                                                int tx,
-                                                int ty,
                                                 RenderStyle* style,
                                                 const Font* f) {
   if (textBox->selectionState() == RenderObject::SelectionNone)
@@ -1050,9 +1060,8 @@ void SVGRootInlineBox::paintSelectionForTextBox(InlineTextBox* textBox,
   if (!firstChar.transform.isIdentity())
     p->concatCTM(firstChar.transform);
 
-  const Font& font = textBox->textObject()->style()->font();
-  FloatRect selectionRect(firstChar.x, firstChar.y - font.ascent(), width,
-                          font.ascent() + font.descent());
+  FloatRect selectionRect(firstChar.x, firstChar.y - f->ascent(), width,
+                          f->ascent() + f->descent());
   p->fillRect(selectionRect, color);
 
   p->restore();
@@ -1251,7 +1260,7 @@ void SVGRootInlineBox::paintCharacterRangeForTextBox(
       int boxStartOffset = chars - text->characters() - textBox->start();
       paintSelectionForTextBox(textBox, boxStartOffset,
                                const_cast<SVGChar*>(&svgChar), chars, length,
-                               paintInfo.context, tx, ty, styleToUse, font);
+                               paintInfo.context, styleToUse, font);
     }
   }
 

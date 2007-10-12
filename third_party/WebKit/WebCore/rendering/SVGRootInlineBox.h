@@ -32,6 +32,7 @@
 namespace WebCore {
 
 class InlineTextBox;
+class RenderSVGRoot;
 
 class SVGRootInlineBox : public RootInlineBox {
  public:
@@ -78,8 +79,6 @@ class SVGRootInlineBox : public RootInlineBox {
                                 const UChar*,
                                 int length,
                                 GraphicsContext*,
-                                int tx,
-                                int ty,
                                 RenderStyle*,
                                 const Font*);
 
@@ -118,6 +117,8 @@ float cummulatedWidthOfInlineBoxCharacterRange(
     SVGInlineBoxCharacterRange& range);
 float cummulatedHeightOfInlineBoxCharacterRange(
     SVGInlineBoxCharacterRange& range);
+
+RenderSVGRoot* findSVGRootObject(RenderObject* start);
 
 }  // namespace WebCore
 

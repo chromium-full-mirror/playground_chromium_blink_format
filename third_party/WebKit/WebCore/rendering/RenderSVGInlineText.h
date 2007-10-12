@@ -46,6 +46,9 @@ class RenderSVGInlineText : public RenderText {
                             EAffinity,
                             int* extraWidthToEndOfLine = 0);
   virtual VisiblePosition positionForCoordinates(int x, int y);
+
+ private:
+  IntRect computeAbsoluteRectForRange(int startPos, int endPos);
 };
 }
 

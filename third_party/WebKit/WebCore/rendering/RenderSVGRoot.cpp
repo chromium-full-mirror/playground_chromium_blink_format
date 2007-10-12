@@ -259,7 +259,9 @@ void RenderSVGRoot::addFocusRingRects(GraphicsContext* graphicsContext,
 }
 
 void RenderSVGRoot::absoluteRects(Vector<IntRect>& rects, int, int) {
-  rects.append(absoluteClippedOverflowRect());
+  for (RenderObject* current = firstChild(); current != 0;
+       current = current->nextSibling())
+    current->absoluteRects(rects, 0, 0);
 }
 
 AffineTransform RenderSVGRoot::absoluteTransform() const {
@@ -323,10 +325,14 @@ bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
                                 int _ty,
                                 HitTestAction hitTestAction) {
   AffineTransform ctm = RenderContainer::absoluteTransform();
+
+  int sx = (_tx - ctm.e());  // scroll offset
+  int sy = (_ty - ctm.f());  // scroll offset
+
   if (!viewport().isEmpty() && style()->overflowX() == OHIDDEN &&
       style()->overflowY() == OHIDDEN) {
-    int tx = m_x - _tx;
-    int ty = m_y - _ty;
+    int tx = m_x - _tx + sx;
+    int ty = m_y - _ty + sy;
 
     // Check if we need to do anything at all.
     IntRect overflowBox = overflowRect(false);
@@ -338,8 +344,6 @@ bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
       return false;
   }
 
-  int sx = (_tx - ctm.e());  // scroll offset
-  int sy = (_ty - ctm.f());  // scroll offset
   for (RenderObject* child = lastChild(); child;
        child = child->previousSibling()) {
     if (child->nodeAtPoint(request, result, _x - sx, _y - sy, 0, 0,
