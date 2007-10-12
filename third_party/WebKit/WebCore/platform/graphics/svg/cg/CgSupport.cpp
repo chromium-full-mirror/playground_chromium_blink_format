@@ -31,8 +31,8 @@
 
 #include "FloatConversion.h"
 #include "GraphicsContext.h"
-#include "KCanvasRenderingStyle.h"
 #include "RenderStyle.h"
+#include "SVGPaintServer.h"
 #include "SVGRenderStyle.h"
 #include <wtf/Assertions.h>
 
@@ -58,10 +58,9 @@ void applyStrokeStyleToContext(CGContextRef context,
                                RenderStyle* style,
                                const RenderObject* object) {
   /* Shouldn't all these be in the stroke painter? */
-  CGContextSetLineWidth(
-      context,
-      narrowPrecisionToCGFloat(KSVGPainterFactory::cssPrimitiveToLength(
-          object, style->svgStyle()->strokeWidth(), 1.0)));
+  CGContextSetLineWidth(context,
+                        SVGRenderStyle::cssPrimitiveToLength(
+                            object, style->svgStyle()->strokeWidth(), 1.0));
 
   CGContextSetLineCap(context, CGLineCapFromKC(style->svgStyle()->capStyle()));
   CGContextSetLineJoin(context,
@@ -69,9 +68,8 @@ void applyStrokeStyleToContext(CGContextRef context,
 
   CGContextSetMiterLimit(context, style->svgStyle()->strokeMiterLimit());
 
-  const KCDashArray& dashes =
-      KSVGPainterFactory::dashArrayFromRenderingStyle(style);
-  double dashOffset = KSVGPainterFactory::cssPrimitiveToLength(
+  const DashArray& dashes = dashArrayFromRenderingStyle(style);
+  double dashOffset = SVGRenderStyle::cssPrimitiveToLength(
       object, style->svgStyle()->strokeDashOffset(), 0.0);
 
   CGContextSetLineDash(context, narrowPrecisionToCGFloat(dashOffset),

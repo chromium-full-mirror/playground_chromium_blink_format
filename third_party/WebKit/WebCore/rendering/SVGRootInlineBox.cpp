@@ -31,7 +31,6 @@
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "InlineTextBox.h"
-#include "KCanvasRenderingStyle.h"
 #include "Range.h"
 #include "SVGInlineFlowBox.h"
 #include "SVGPaintServer.h"
@@ -145,7 +144,7 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   }
 
   SVGPaintServer* fillPaintServer =
-      KSVGPainterFactory::fillPaintServer(object()->style(), object());
+      SVGPaintServer::fillPaintServer(object()->style(), object());
   if (fillPaintServer) {
     if (fillPaintServer->setup(pi.context, object(), ApplyToFillTargetType,
                                true)) {
@@ -159,7 +158,7 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   }
 
   SVGPaintServer* strokePaintServer =
-      KSVGPainterFactory::strokePaintServer(object()->style(), object());
+      SVGPaintServer::strokePaintServer(object()->style(), object());
   if (strokePaintServer) {
     if (strokePaintServer->setup(pi.context, object(), ApplyToStrokeTargetType,
                                  true)) {
@@ -1131,7 +1130,7 @@ void SVGRootInlineBox::paintInlineBoxes(RenderObject::PaintInfo& paintInfo,
       Vector<SVGChar>::iterator savedIt = it;
 
       SVGPaintServer* fillPaintServer =
-          KSVGPainterFactory::fillPaintServer(object->style(), object);
+          SVGPaintServer::fillPaintServer(object->style(), object);
       if (fillPaintServer) {
         if (fillPaintServer->setup(pi.context, object, ApplyToFillTargetType,
                                    true)) {
@@ -1144,7 +1143,7 @@ void SVGRootInlineBox::paintInlineBoxes(RenderObject::PaintInfo& paintInfo,
       }
 
       SVGPaintServer* strokePaintServer =
-          KSVGPainterFactory::strokePaintServer(object->style(), object);
+          SVGPaintServer::strokePaintServer(object->style(), object);
       if (strokePaintServer) {
         if (strokePaintServer->setup(pi.context, object,
                                      ApplyToStrokeTargetType, true)) {

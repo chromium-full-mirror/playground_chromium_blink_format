@@ -66,7 +66,7 @@ void RenderSVGContainer::setLocalTransform(const AffineTransform& matrix) {
 bool RenderSVGContainer::requiresLayer() {
   // Only allow an <svg> element to generate a layer when it's positioned in a
   // non-SVG context
-  return (isPositioned() || isRelPositioned()) && isOutermostSVG();
+  return false;
 }
 
 short RenderSVGContainer::lineHeight(bool b, bool isRootLineBox) const {
@@ -75,12 +75,6 @@ short RenderSVGContainer::lineHeight(bool b, bool isRootLineBox) const {
 
 short RenderSVGContainer::baselinePosition(bool b, bool isRootLineBox) const {
   return height() + marginTop() + marginBottom();
-}
-
-// This method should be temporary until a RenderSVGRoot class can be made
-// http://bugs.webkit.org/show_bug.cgi?id=12207
-bool RenderSVGContainer::isOutermostSVG() const {
-  return parent() && !parent()->isSVGContainer();
 }
 
 void RenderSVGContainer::layout() {
@@ -116,11 +110,6 @@ void RenderSVGContainer::layout() {
   calcHeight();
 
   m_absoluteBounds = absoluteClippedOverflowRect();
-  if (isOutermostSVG()) {
-    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
-    m_width = m_width * svg->currentScale();
-    m_height = m_height * svg->currentScale();
-  }
 
   if (selfNeedsLayout() && checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
@@ -132,33 +121,14 @@ void RenderSVGContainer::layout() {
 void RenderSVGContainer::applyContentTransforms(PaintInfo& paintInfo,
                                                 int& parentX,
                                                 int& parentY) {
-  if (isOutermostSVG()) {
-    // Translate from parent offsets (html renderers) to a relative transform
-    // (svg renderers)
-    IntPoint origin;
-    origin.move(parentX, parentY);
-    origin.move(m_x, m_y);
-    origin.move(borderLeft(), borderTop());
-    origin.move(paddingLeft(), paddingTop());
-    if (origin.x() || origin.y()) {
-      paintInfo.context->concatCTM(
-          AffineTransform().translate(origin.x(), origin.y()));
-      paintInfo.rect.move(-origin.x(), -origin.y());
-    }
-    parentX = parentY = 0;
-    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
-    paintInfo.context->concatCTM(AffineTransform().scale(svg->currentScale()));
-  } else {
-    // Only the root <svg> element should need any translations using the
-    // HTML/CSS system
-    // parentX, parentY are also non-zero for first-level kids of these
-    // CSS-transformed <svg> root-elements (due to RenderBox::paint) for any
-    // other element
-    // they should be 0.   m_x, m_y should always be 0 for non-root svg
-    // containers
-    ASSERT(m_x == 0);
-    ASSERT(m_y == 0);
-  }
+  // Only the root <svg> element should need any translations using the HTML/CSS
+  // system
+  // parentX, parentY are also non-zero for first-level kids of these
+  // CSS-transformed <svg> root-elements (due to RenderBox::paint) for any other
+  // element
+  // they should be 0.   m_x, m_y should always be 0 for non-root svg containers
+  ASSERT(m_x == 0);
+  ASSERT(m_y == 0);
 
   if (!viewport().isEmpty()) {
     if (style()->overflowX() != OVISIBLE)
@@ -173,22 +143,11 @@ void RenderSVGContainer::applyContentTransforms(PaintInfo& paintInfo,
   }
   if (!localTransform().isIdentity())
     paintInfo.context->concatCTM(localTransform());
-  if (isOutermostSVG()) {
-    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
-    paintInfo.context->concatCTM(AffineTransform().translate(
-        svg->currentTranslate().x(), svg->currentTranslate().y()));
-  }
 }
 
 void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (paintInfo.context->paintingDisabled() || !drawsContents())
     return;
-
-  // This should only exist for <svg> renderers
-  if (isOutermostSVG() && hasBoxDecorations() &&
-      (paintInfo.phase == PaintPhaseForeground ||
-       paintInfo.phase == PaintPhaseSelection))
-    paintBoxDecorations(paintInfo, m_x + parentX, m_y + parentY);
 
   if (!firstChild()) {
 #if ENABLE(SVG_EXPERIMENTAL_FEATURES)
@@ -288,13 +247,15 @@ FloatRect RenderSVGContainer::viewBox() const {
   return m_viewBox;
 }
 
-void RenderSVGContainer::setAlign(KCAlign align) {
+void RenderSVGContainer::setAlign(
+    SVGPreserveAspectRatio::SVGPreserveAspectRatioType align) {
   m_align = align;
   if (style())
     setNeedsLayout(true);
 }
 
-KCAlign RenderSVGContainer::align() const {
+SVGPreserveAspectRatio::SVGPreserveAspectRatioType RenderSVGContainer::align()
+    const {
   return m_align;
 }
 
@@ -302,14 +263,8 @@ AffineTransform RenderSVGContainer::viewportTransform() const {
   // FIXME: The method name is confusing, since it does not
   // do viewport translating anymore. Look into this while
   //  fixing bug 12207.
-  if (!viewBox().isEmpty()) {
-    FloatRect viewportRect = viewport();
-    if (isOutermostSVG())
-      viewportRect =
-          FloatRect(viewport().x(), viewport().y(), width(), height());
-
-    return getAspectRatio(viewBox(), viewportRect);
-  }
+  if (!viewBox().isEmpty())
+    return getAspectRatio(viewBox(), viewport());
 
   return AffineTransform();
 }
@@ -345,11 +300,6 @@ void RenderSVGContainer::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
 
 AffineTransform RenderSVGContainer::absoluteTransform() const {
   AffineTransform ctm = RenderContainer::absoluteTransform();
-  if (isOutermostSVG()) {
-    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
-    ctm.scale(svg->currentScale());
-    ctm.translate(svg->currentTranslate().x(), svg->currentTranslate().y());
-  }
   ctm.translate(viewport().x(), viewport().y());
   return viewportTransform() * ctm;
 }
@@ -419,17 +369,22 @@ AffineTransform RenderSVGContainer::getAspectRatio(
   float vpar = logicWidth / logicHeight;
   float svgar = physWidth / physHeight;
 
-  if (align() == ALIGN_NONE) {
+  if (align() == SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_NONE) {
     temp.scale(physWidth / logicWidth, physHeight / logicHeight);
     temp.translate(-logicX, -logicY);
   } else if ((vpar < svgar && !slice()) || (vpar >= svgar && slice())) {
     temp.scale(physHeight / logicHeight, physHeight / logicHeight);
 
-    if (align() == ALIGN_XMINYMIN || align() == ALIGN_XMINYMID ||
-        align() == ALIGN_XMINYMAX)
+    if (align() == SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMINYMIN ||
+        align() == SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMINYMID ||
+        align() == SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMINYMAX)
       temp.translate(-logicX, -logicY);
-    else if (align() == ALIGN_XMIDYMIN || align() == ALIGN_XMIDYMID ||
-             align() == ALIGN_XMIDYMAX)
+    else if (align() ==
+                 SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMIDYMIN ||
+             align() ==
+                 SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMIDYMID ||
+             align() ==
+                 SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMIDYMAX)
       temp.translate(
           -logicX - (logicWidth - physWidth * logicHeight / physHeight) / 2,
           -logicY);
@@ -440,11 +395,16 @@ AffineTransform RenderSVGContainer::getAspectRatio(
   } else {
     temp.scale(physWidth / logicWidth, physWidth / logicWidth);
 
-    if (align() == ALIGN_XMINYMIN || align() == ALIGN_XMIDYMIN ||
-        align() == ALIGN_XMAXYMIN)
+    if (align() == SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMINYMIN ||
+        align() == SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMIDYMIN ||
+        align() == SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMAXYMIN)
       temp.translate(-logicX, -logicY);
-    else if (align() == ALIGN_XMINYMID || align() == ALIGN_XMIDYMID ||
-             align() == ALIGN_XMAXYMID)
+    else if (align() ==
+                 SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMINYMID ||
+             align() ==
+                 SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMIDYMID ||
+             align() ==
+                 SVGPreserveAspectRatio::SVG_PRESERVEASPECTRATIO_XMAXYMID)
       temp.translate(
           -logicX,
           -logicY - (logicHeight - physHeight * logicWidth / physWidth) / 2);

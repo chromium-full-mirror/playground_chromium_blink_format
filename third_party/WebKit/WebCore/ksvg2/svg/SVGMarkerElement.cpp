@@ -180,7 +180,8 @@ RenderObject* SVGMarkerElement::createRenderer(RenderArena* arena,
                                                RenderStyle* style) {
   RenderSVGContainer* markerContainer = new (arena) RenderSVGContainer(this);
   markerContainer->setViewBox(viewBox());
-  markerContainer->setAlign(KCAlign(preserveAspectRatio()->align() - 1));
+  markerContainer->setAlign(SVGPreserveAspectRatio::SVGPreserveAspectRatioType(
+      preserveAspectRatio()->align()));
   markerContainer->setSlice(preserveAspectRatio()->meetOrSlice() ==
                             SVGPreserveAspectRatio::SVG_MEETORSLICE_SLICE);
   markerContainer->setDrawsContents(
@@ -199,7 +200,9 @@ void SVGMarkerElement::notifyAttributeChange() const {
   // reduce the number of updates needed.
   if (markerContainer) {
     markerContainer->setViewBox(viewBox());
-    markerContainer->setAlign(KCAlign(preserveAspectRatio()->align() - 1));
+    markerContainer->setAlign(
+        SVGPreserveAspectRatio::SVGPreserveAspectRatioType(
+            preserveAspectRatio()->align()));
     markerContainer->setSlice(preserveAspectRatio()->meetOrSlice() ==
                               SVGPreserveAspectRatio::SVG_MEETORSLICE_SLICE);
   }

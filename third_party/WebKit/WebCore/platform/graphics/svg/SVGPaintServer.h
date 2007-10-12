@@ -38,6 +38,12 @@
 class QPen;
 #endif
 
+#if PLATFORM(CG)
+typedef Vector<CGFloat> DashArray;
+#else
+typedef Vector<float> DashArray;
+#endif
+
 namespace WebCore {
 
 enum SVGPaintServerType {
@@ -86,6 +92,11 @@ class SVGPaintServer : public SVGResource {
                      SVGPaintTargetType,
                      bool isPaintingText = false) const = 0;
 
+  static SVGPaintServer* strokePaintServer(const RenderStyle*,
+                                           const RenderObject*);
+  static SVGPaintServer* fillPaintServer(const RenderStyle*,
+                                         const RenderObject*);
+
  protected:
 #if PLATFORM(CG)
   void strokePath(CGContextRef, const RenderPath*) const;
@@ -103,6 +114,7 @@ TextStream& operator<<(TextStream&, const SVGPaintServer&);
 
 SVGPaintServer* getPaintServerById(Document*, const AtomicString&);
 
+DashArray dashArrayFromRenderingStyle(const RenderStyle* style);
 }  // namespace WebCore
 
 #endif

@@ -27,21 +27,9 @@
 
 #include "RenderContainer.h"
 #include "RenderPath.h"
+#include "SVGPreserveAspectRatio.h"
 
 namespace WebCore {
-
-enum KCAlign {
-  ALIGN_NONE = 0,
-  ALIGN_XMINYMIN = 1,
-  ALIGN_XMIDYMIN = 2,
-  ALIGN_XMAXYMIN = 3,
-  ALIGN_XMINYMID = 4,
-  ALIGN_XMIDYMID = 5,
-  ALIGN_XMAXYMID = 6,
-  ALIGN_XMINYMAX = 7,
-  ALIGN_XMIDYMAX = 8,
-  ALIGN_XMAXYMAX = 9
-};
 
 class SVGElement;
 
@@ -87,8 +75,8 @@ class RenderSVGContainer : public RenderContainer {
   void setViewBox(const FloatRect&);
   FloatRect viewBox() const;
 
-  void setAlign(KCAlign);
-  KCAlign align() const;
+  void setAlign(SVGPreserveAspectRatio::SVGPreserveAspectRatioType);
+  SVGPreserveAspectRatio::SVGPreserveAspectRatioType align() const;
 
   void setSlice(bool);
   bool slice() const;
@@ -103,8 +91,6 @@ class RenderSVGContainer : public RenderContainer {
                            int ty,
                            HitTestAction);
 
-  bool isOutermostSVG() const;
-
  private:
   void calcViewport();
   AffineTransform getAspectRatio(const FloatRect& logical,
@@ -117,7 +103,7 @@ class RenderSVGContainer : public RenderContainer {
 
   FloatRect m_viewport;
   FloatRect m_viewBox;
-  KCAlign m_align;
+  SVGPreserveAspectRatio::SVGPreserveAspectRatioType m_align;
   IntRect m_absoluteBounds;
 };
 
