@@ -94,6 +94,17 @@
 @property(readonly, retain) DOMElement* documentElement;
 @property(readonly, retain) DOMAbstractView* defaultView;
 @property(readonly, retain) DOMStyleSheetList* styleSheets;
+@property(readonly, retain) DOMHTMLCollection* images;
+@property(readonly, retain) DOMHTMLCollection* applets;
+@property(readonly, retain) DOMHTMLCollection* links;
+@property(readonly, retain) DOMHTMLCollection* forms;
+@property(readonly, retain) DOMHTMLCollection* anchors;
+@property(copy) NSString* title;
+@property(readonly, copy) NSString* referrer;
+@property(readonly, copy) NSString* domain;
+@property(readonly, copy) NSString* URL;
+@property(retain) DOMHTMLElement* body;
+@property(copy) NSString* cookie;
 - (DOMElement*)createElement:(NSString*)tagName;
 - (DOMDocumentFragment*)createDocumentFragment;
 - (DOMText*)createTextNode:(NSString*)data;
@@ -136,6 +147,7 @@
 - (DOMCSSRuleList*)getMatchedCSSRules:(DOMElement*)element
                         pseudoElement:(NSString*)pseudoElement
                            authorOnly:(BOOL)authorOnly;
+- (DOMNodeList*)getElementsByName:(NSString*)elementName;
 #ifdef ENABLE_XPATH
 - (DOMXPathExpression*)createExpression:(NSString*)
                              expression:(id<DOMXPathNSResolver>)resolver;
@@ -395,23 +407,11 @@
 @end
 
 @interface DOMHTMLDocument : DOMDocument
-@property(copy) NSString* title;
-@property(readonly, copy) NSString* referrer;
-@property(readonly, copy) NSString* domain;
-@property(readonly, copy) NSString* URL;
-@property(retain) DOMHTMLElement* body;
-@property(readonly, retain) DOMHTMLCollection* images;
-@property(readonly, retain) DOMHTMLCollection* applets;
-@property(readonly, retain) DOMHTMLCollection* links;
-@property(readonly, retain) DOMHTMLCollection* forms;
-@property(readonly, retain) DOMHTMLCollection* anchors;
-@property(copy) NSString* cookie;
 - (void)open;
 - (void)close;
 - (void)write:(NSString*)text;
 - (void)writeln:(NSString*)text;
 - (DOMElement*)getElementById:(NSString*)elementId;
-- (DOMNodeList*)getElementsByName:(NSString*)elementName;
 @end
 
 @interface DOMHTMLElement : DOMElement

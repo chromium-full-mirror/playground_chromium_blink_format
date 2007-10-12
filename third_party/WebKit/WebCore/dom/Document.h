@@ -231,12 +231,6 @@ class Document : public ContainerNode {
 
   PassRefPtr<NameNodeList> getElementsByName(const String& elementName);
 
-  // Actually part of JSHTMLDocument, but used for giving XML documents a window
-  // title as well
-  String title() const { return m_title; }
-  void setTitle(const String&, Element* titleElement = 0);
-  void removeTitle(Element* titleElement);
-
   PassRefPtr<HTMLCollection> images();
   PassRefPtr<HTMLCollection> embeds();
   PassRefPtr<HTMLCollection>
@@ -623,11 +617,20 @@ class Document : public ContainerNode {
   // Returns 0 if this is the top level document.
   Element* ownerElement() const;
 
+  String title() const { return m_title; }
+  void setTitle(const String&, Element* titleElement = 0);
+  void removeTitle(Element* titleElement);
+
+  String cookie() const;
+  void setCookie(const String&);
+
   String referrer() const;
 
   String domain() const;
   void setDomain(const String& newDomain);
   void setDomainInternal(const String& newDomain);
+
+  String lastModified() const;
 
   String policyBaseURL() const { return m_policyBaseURL; }
   void setPolicyBaseURL(const String& s) { m_policyBaseURL = s; }
@@ -654,6 +657,8 @@ class Document : public ContainerNode {
   HTMLMapElement* getImageMap(const String& URL) const;
 
   HTMLElement* body();
+  void setBody(PassRefPtr<HTMLElement>, ExceptionCode&);
+
   HTMLHeadElement* head();
 
   String toString() const;
