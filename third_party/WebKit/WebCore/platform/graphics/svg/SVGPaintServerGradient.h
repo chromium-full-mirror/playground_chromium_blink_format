@@ -87,7 +87,7 @@ class SVGPaintServerGradient : public SVGPaintServer {
                         SVGPaintTargetType,
                         bool isPaintingText) const;
   virtual void renderPath(GraphicsContext*&,
-                          const RenderPath*,
+                          const RenderObject*,
                           SVGPaintTargetType) const;
 
   virtual void invalidate();

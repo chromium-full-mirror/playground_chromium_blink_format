@@ -84,7 +84,6 @@ class SVGPaintServerPattern : public SVGPaintServer {
   const SVGPatternElement* m_ownerElement;
   AffineTransform m_patternTransform;
   FloatRect m_patternBoundaries;
-  bool m_boundingBoxMode;
 
 #if PLATFORM(CG)
   mutable CGColorSpaceRef m_patternSpace;

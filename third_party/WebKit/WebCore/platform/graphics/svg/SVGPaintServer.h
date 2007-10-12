@@ -62,7 +62,6 @@ enum SVGPaintTargetType {
 
 class GraphicsContext;
 class RenderObject;
-class RenderPath;
 class RenderStyle;
 
 class SVGPaintServer : public SVGResource {
@@ -77,14 +76,14 @@ class SVGPaintServer : public SVGResource {
 
   // To be implemented in platform specific code.
   virtual void draw(GraphicsContext*&,
-                    const RenderPath*,
+                    const RenderObject*,
                     SVGPaintTargetType) const;
   virtual void teardown(GraphicsContext*&,
                         const RenderObject*,
                         SVGPaintTargetType,
                         bool isPaintingText = false) const;
   virtual void renderPath(GraphicsContext*&,
-                          const RenderPath*,
+                          const RenderObject*,
                           SVGPaintTargetType) const;
 
   virtual bool setup(GraphicsContext*&,
@@ -99,10 +98,10 @@ class SVGPaintServer : public SVGResource {
 
  protected:
 #if PLATFORM(CG)
-  void strokePath(CGContextRef, const RenderPath*) const;
-  void clipToStrokePath(CGContextRef, const RenderPath*) const;
-  void fillPath(CGContextRef, const RenderPath*) const;
-  void clipToFillPath(CGContextRef, const RenderPath*) const;
+  void strokePath(CGContextRef, const RenderObject*) const;
+  void clipToStrokePath(CGContextRef, const RenderObject*) const;
+  void fillPath(CGContextRef, const RenderObject*) const;
+  void clipToFillPath(CGContextRef, const RenderObject*) const;
 #endif
 
 #if PLATFORM(QT)

@@ -30,12 +30,6 @@
 
 namespace WebCore {
 
-static inline Color colorFromFloatComponents(CGFloat* colorComponents) {
-  return Color(
-      float(colorComponents[0]) * 255.0f, float(colorComponents[1]) * 255.0f,
-      float(colorComponents[2]) * 255.0f, float(colorComponents[3]) * 255.0f);
-}
-
 bool SVGPaintServerSolid::setup(GraphicsContext*& context,
                                 const RenderObject* object,
                                 SVGPaintTargetType type,
@@ -56,13 +50,12 @@ bool SVGPaintServerSolid::setup(GraphicsContext*& context,
     colorComponents[3] =
         style->svgStyle()
             ->fillOpacity();  // SVG/CSS colors are not specified w/o alpha
+
     CGContextSetFillColorSpace(contextRef, deviceRGBColorSpace);
     CGContextSetFillColor(contextRef, colorComponents);
-    if (isPaintingText) {
-      const_cast<RenderObject*>(object)->style()->setColor(
-          colorFromFloatComponents(colorComponents));
+
+    if (isPaintingText)
       context->setTextDrawingMode(cTextFill);
-    }
   }
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
@@ -73,14 +66,14 @@ bool SVGPaintServerSolid::setup(GraphicsContext*& context,
     colorComponents[3] =
         style->svgStyle()
             ->strokeOpacity();  // SVG/CSS colors are not specified w/o alpha
+
     CGContextSetStrokeColorSpace(contextRef, deviceRGBColorSpace);
     CGContextSetStrokeColor(contextRef, colorComponents);
+
     applyStrokeStyleToContext(contextRef, style, object);
-    if (isPaintingText) {
-      const_cast<RenderObject*>(object)->style()->setColor(
-          colorFromFloatComponents(colorComponents));
+
+    if (isPaintingText)
       context->setTextDrawingMode(cTextStroke);
-    }
   }
 
   return true;

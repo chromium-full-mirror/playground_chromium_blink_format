@@ -26,7 +26,7 @@
 
 #include "GraphicsContext.h"
 #include "KCanvasRenderingStyle.h"
-#include "RenderPath.h"
+#include "RenderObject.h"
 
 #include <QPainter>
 #include <QVector>
@@ -71,7 +71,7 @@ void SVGPaintServer::setPenProperties(const RenderObject* object,
 }
 
 void SVGPaintServer::draw(GraphicsContext*& context,
-                          const RenderPath* path,
+                          const RenderObject* path,
                           SVGPaintTargetType type) const {
   if (!setup(context, path, type))
     return;
@@ -88,7 +88,7 @@ void SVGPaintServer::teardown(GraphicsContext*&,
 }
 
 void SVGPaintServer::renderPath(GraphicsContext*& context,
-                                const RenderPath* path,
+                                const RenderObject* path,
                                 SVGPaintTargetType type) const {
   RenderStyle* renderStyle = path->style();
 

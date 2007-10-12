@@ -41,7 +41,8 @@ namespace WebCore {
 void prepareToRenderSVGContent(RenderObject* object,
                                RenderObject::PaintInfo& paintInfo,
                                const FloatRect& boundingBox,
-                               SVGResourceFilter*& filter) {
+                               SVGResourceFilter*& filter,
+                               SVGResourceFilter* rootFilter) {
   SVGElement* svgElement = static_cast<SVGElement*>(object->element());
   ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
   ASSERT(object);
@@ -68,8 +69,17 @@ void prepareToRenderSVGContent(RenderObject* object,
   AtomicString maskerId(SVGURIReference::getTarget(svgStyle->maskElement()));
 
   Document* document = object->document();
+
 #if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  filter = getFilterById(document, filterId);
+  SVGResourceFilter* newFilter = getFilterById(document, filterId);
+  if (newFilter == rootFilter) {
+    // Catch <text filter="url(#foo)">Test<tspan
+    // filter="url(#foo)">123</tspan></text>.
+    // The filter is NOT meant to be applied twice in that case!
+    filter = 0;
+    filterId = String();
+  } else
+    filter = newFilter;
 #endif
 
   SVGResourceClipper* clipper = getClipperById(document, clipperId);

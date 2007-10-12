@@ -25,12 +25,12 @@
 #include "SVGPaintServer.h"
 
 #include "GraphicsContext.h"
-#include "RenderPath.h"
+#include "RenderObject.h"
 
 namespace WebCore {
 
 void SVGPaintServer::draw(GraphicsContext*& context,
-                          const RenderPath* path,
+                          const RenderObject* path,
                           SVGPaintTargetType type) const {
   if (!setup(context, path, type))
     return;
@@ -47,7 +47,7 @@ void SVGPaintServer::teardown(GraphicsContext*&,
 }
 
 void SVGPaintServer::renderPath(GraphicsContext*& context,
-                                const RenderPath* path,
+                                const RenderObject* path,
                                 SVGPaintTargetType type) const {
   RenderStyle* style = path->style();
   CGContextRef contextRef = context->platformContext();
@@ -59,18 +59,19 @@ void SVGPaintServer::renderPath(GraphicsContext*& context,
     strokePath(contextRef, path);
 }
 
-void SVGPaintServer::strokePath(CGContextRef context, const RenderPath*) const {
+void SVGPaintServer::strokePath(CGContextRef context,
+                                const RenderObject*) const {
   CGContextStrokePath(context);
 }
 
 void SVGPaintServer::clipToStrokePath(CGContextRef context,
-                                      const RenderPath*) const {
+                                      const RenderObject*) const {
   CGContextReplacePathWithStrokedPath(context);
   CGContextClip(context);
 }
 
 void SVGPaintServer::fillPath(CGContextRef context,
-                              const RenderPath* path) const {
+                              const RenderObject* path) const {
   if (path->style()->svgStyle()->fillRule() == RULE_EVENODD)
     CGContextEOFillPath(context);
   else
@@ -78,7 +79,7 @@ void SVGPaintServer::fillPath(CGContextRef context,
 }
 
 void SVGPaintServer::clipToFillPath(CGContextRef context,
-                                    const RenderPath* path) const {
+                                    const RenderObject* path) const {
   if (path->style()->svgStyle()->fillRule() == RULE_EVENODD)
     CGContextEOClip(context);
   else
