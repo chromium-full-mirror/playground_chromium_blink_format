@@ -51,10 +51,10 @@ class SVGInlineTextBox : public InlineTextBox {
                            int ty);
   virtual IntRect selectionRect(int absx, int absy, int startPos, int endPos);
 
+  SVGRootInlineBox* svgRootInlineBox() const;
+
  protected:
   friend class RenderSVGInlineText;
-
-  SVGRootInlineBox* svgRootInlineBox() const;
   bool svgCharacterHitsPosition(int x, int y, int& offset) const;
 
  private:

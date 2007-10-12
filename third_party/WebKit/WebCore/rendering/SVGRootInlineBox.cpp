@@ -136,10 +136,12 @@ inline void closeTextChunk(SVGTextChunkLayoutInfo& info,
   textChunks.append(info.chunk);
 }
 
-inline IntPoint rootBoxTopLeftPosition(Vector<SVGChar>& chars) {
-  Vector<SVGChar>::iterator it = chars.begin();
-  Vector<SVGChar>::iterator end = chars.end();
+inline FloatPoint topLeftPositionOfCharacterRange(Vector<SVGChar>& chars) {
+  return topLeftPositionOfCharacterRange(chars.begin(), chars.end());
+}
 
+FloatPoint topLeftPositionOfCharacterRange(Vector<SVGChar>::iterator it,
+                                           Vector<SVGChar>::iterator end) {
   float lowX = FLT_MAX, lowY = FLT_MAX;
   for (; it != end; ++it) {
     float x = (*it).x;
@@ -152,7 +154,7 @@ inline IntPoint rootBoxTopLeftPosition(Vector<SVGChar>& chars) {
       lowY = y;
   }
 
-  return IntPoint((int)floorf(lowX), (int)floorf(lowY));
+  return FloatPoint(lowX, lowY);
 }
 
 void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
@@ -263,7 +265,7 @@ float SVGRootInlineBox::cummulatedWidthOfSelectionRange(InlineTextBox* textBox,
       TextStyle(0, 0));
 }
 
-static float cummulatedWidthOfInlineBoxCharacterRange(
+float cummulatedWidthOfInlineBoxCharacterRange(
     SVGInlineBoxCharacterRange& range) {
   ASSERT(!range.isOpen());
   ASSERT(range.isClosed());
@@ -278,7 +280,7 @@ static float cummulatedWidthOfInlineBoxCharacterRange(
                          TextStyle(0, 0));
 }
 
-static float cummulatedHeightOfInlineBoxCharacterRange(
+float cummulatedHeightOfInlineBoxCharacterRange(
     SVGInlineBoxCharacterRange& range) {
   ASSERT(!range.isOpen());
   ASSERT(range.isClosed());
@@ -407,8 +409,8 @@ void SVGRootInlineBox::computePerCharacterLayoutInformation() {
 
   // Finally the top left position of our box is known.
   // Propogate this knownledge to our RenderSVGText parent.
-  IntPoint topLeft = rootBoxTopLeftPosition(m_svgChars);
-  object()->setPos(topLeft.x(), topLeft.y());
+  FloatPoint topLeft = topLeftPositionOfCharacterRange(m_svgChars);
+  object()->setPos((int)floorf(topLeft.x()), (int)floorf(topLeft.y()));
 
   // Layout all InlineText/Flow boxes
   // BEWARE: This requires the root top/left position to be set correctly

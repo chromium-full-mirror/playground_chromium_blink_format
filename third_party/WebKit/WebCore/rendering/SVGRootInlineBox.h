@@ -101,6 +101,14 @@ class SVGRootInlineBox : public RootInlineBox {
   Vector<SVGTextChunk> m_svgTextChunks;
 };
 
+// Shared with SVGRenderTreeAsText
+FloatPoint topLeftPositionOfCharacterRange(Vector<SVGChar>::iterator start,
+                                           Vector<SVGChar>::iterator end);
+float cummulatedWidthOfInlineBoxCharacterRange(
+    SVGInlineBoxCharacterRange& range);
+float cummulatedHeightOfInlineBoxCharacterRange(
+    SVGInlineBoxCharacterRange& range);
+
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)

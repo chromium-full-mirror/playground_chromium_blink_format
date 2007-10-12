@@ -35,6 +35,9 @@ class RenderObject;
 DeprecatedString externalRepresentation(RenderObject*);
 void write(TextStream&, const RenderObject&, int indent = 0);
 
+// Helper function shared with SVGRenderTreeAsText
+String quoteAndEscapeNonPrintables(const String&);
+
 }  // namespace WebCore
 
 #endif  // RenderTreeAsText_h
