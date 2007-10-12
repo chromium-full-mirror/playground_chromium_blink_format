@@ -53,7 +53,11 @@ class SVGInlineTextBox : public InlineTextBox {
 
   SVGRootInlineBox* svgRootInlineBox() const;
 
- protected:
+  // Helper functions shared with SVGRootInlineBox
+  float calculateGlyphWidth(RenderStyle*, int offset) const;
+  float calculateGlyphHeight(RenderStyle*, int offset) const;
+
+ private:
   friend class RenderSVGInlineText;
   bool svgCharacterHitsPosition(int x, int y, int& offset) const;
 
