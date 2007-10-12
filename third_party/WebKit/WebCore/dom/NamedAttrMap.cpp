@@ -4,6 +4,7 @@
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
  * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ *           (C) 2007 Eric Seidel (eric@webkit.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -33,8 +34,8 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-static inline bool inHTMLDocument(const Element* e) {
-  return e && e->document()->isHTMLDocument();
+static inline bool shouldIgnoreAttributeCase(const Element* e) {
+  return e && e->document()->isHTMLDocument() && e->isHTMLElement();
 }
 
 NamedAttrMap::NamedAttrMap(Element* e) : element(e), attrs(0), len(0) {}
@@ -49,7 +50,7 @@ bool NamedAttrMap::isMappedAttributeMap() const {
 }
 
 PassRefPtr<Node> NamedAttrMap::getNamedItem(const String& name) const {
-  String localName = inHTMLDocument(element) ? name.lower() : name;
+  String localName = shouldIgnoreAttributeCase(element) ? name.lower() : name;
   Attribute* a = getAttributeItem(localName);
   if (!a)
     return 0;
@@ -64,7 +65,7 @@ PassRefPtr<Node> NamedAttrMap::getNamedItemNS(const String& namespaceURI,
 
 PassRefPtr<Node> NamedAttrMap::removeNamedItem(const String& name,
                                                ExceptionCode& ec) {
-  String localName = inHTMLDocument(element) ? name.lower() : name;
+  String localName = shouldIgnoreAttributeCase(element) ? name.lower() : name;
   Attribute* a = getAttributeItem(localName);
   if (!a) {
     ec = NOT_FOUND_ERR;

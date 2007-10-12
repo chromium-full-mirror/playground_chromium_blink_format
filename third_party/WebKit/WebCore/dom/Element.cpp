@@ -4,6 +4,7 @@
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
  * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ *           (C) 2007 Eric Seidel (eric@webkit.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -374,12 +375,12 @@ int Element::scrollHeight() {
   return 0;
 }
 
-static inline bool inHTMLDocument(const Element* e) {
-  return e && e->document()->isHTMLDocument();
+static inline bool shouldIgnoreAttributeCase(const Element* e) {
+  return e && e->document()->isHTMLDocument() && e->isHTMLElement();
 }
 
 const AtomicString& Element::getAttribute(const String& name) const {
-  String localName = inHTMLDocument(this) ? name.lower() : name;
+  String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
   if (localName == styleAttr.localName())
     updateStyleAttributeIfNeeded();
 
@@ -403,7 +404,7 @@ void Element::setAttribute(const String& name,
     return;
   }
 
-  String localName = inHTMLDocument(this) ? name.lower() : name;
+  String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
 
   // allocate attributemap if necessary
   Attribute* old = attributes(false)->getAttributeItem(localName);
@@ -891,7 +892,7 @@ void Element::setAttributeNS(const String& namespaceURI,
 }
 
 void Element::removeAttribute(const String& name, ExceptionCode& ec) {
-  String localName = inHTMLDocument(this) ? name.lower() : name;
+  String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
 
   if (namedAttrMap) {
     namedAttrMap->removeNamedItem(localName, ec);
@@ -910,7 +911,7 @@ PassRefPtr<Attr> Element::getAttributeNode(const String& name) {
   NamedAttrMap* attrs = attributes(true);
   if (!attrs)
     return 0;
-  String localName = inHTMLDocument(this) ? name.lower() : name;
+  String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
   return static_pointer_cast<Attr>(attrs->getNamedItem(localName));
 }
 
@@ -927,7 +928,7 @@ bool Element::hasAttribute(const String& name) const {
   NamedAttrMap* attrs = attributes(true);
   if (!attrs)
     return false;
-  String localName = inHTMLDocument(this) ? name.lower() : name;
+  String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
   return attrs->getAttributeItem(localName);
 }
 
