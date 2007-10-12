@@ -169,7 +169,7 @@ JSValue* JSSVGPointList::removeItem(ExecState* exec, const List& args) {
 
   RefPtr<SVGPODListItem<FloatPoint>> listItem(listImp->removeItem(index, ec));
   JSSVGPODTypeWrapper<FloatPoint>* obj =
-      new JSSVGPODTypeWrapper<FloatPoint>((FloatPoint&)*listItem.get());
+      new JSSVGPODTypeWrapperCreatorReadOnly<FloatPoint>(*listItem.get());
 
   KJS::JSValue* result = toJS(exec, obj);
   setDOMException(exec, ec);

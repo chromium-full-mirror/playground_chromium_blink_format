@@ -33,42 +33,49 @@
 #include "SVGElement.h"
 
 #include <wtf/Assertions.h>
+#include <wtf/HashMap.h>
 
 namespace WebCore {
 
 template <typename PODType>
 class JSSVGPODTypeWrapper : public Shared<JSSVGPODTypeWrapper<PODType>> {
  public:
-  JSSVGPODTypeWrapper(const PODType& type) : m_podType(type) {}
-
   virtual ~JSSVGPODTypeWrapper() {}
 
-  operator PODType&() { return m_podType; }
+  // Getter wrapper
+  virtual operator PODType() = 0;
 
-  // Implemented by JSSVGPODTypeWrapperCreator
-  virtual void commitChange(KJS::ExecState*) {}
-
- private:
-  PODType m_podType;
+  // Setter wrapper
+  virtual void commitChange(KJS::ExecState*, PODType) = 0;
 };
 
 template <typename PODType, typename PODTypeCreator>
-class JSSVGPODTypeWrapperCreator : public JSSVGPODTypeWrapper<PODType> {
+class JSSVGPODTypeWrapperCreatorReadWrite
+    : public JSSVGPODTypeWrapper<PODType> {
  public:
   typedef PODType (PODTypeCreator::*GetterMethod)() const;
   typedef void (PODTypeCreator::*SetterMethod)(PODType);
 
-  JSSVGPODTypeWrapperCreator(PODTypeCreator* creator,
-                             GetterMethod getter,
-                             SetterMethod setter)
-      : JSSVGPODTypeWrapper<PODType>((creator->*getter)()),
-        m_creator(creator),
-        m_setter(setter) {}
+  JSSVGPODTypeWrapperCreatorReadWrite(PODTypeCreator* creator,
+                                      GetterMethod getter,
+                                      SetterMethod setter)
+      : m_creator(creator), m_getter(getter), m_setter(setter) {
+    ASSERT(creator);
+    ASSERT(getter);
+    ASSERT(setter);
+  }
 
-  virtual ~JSSVGPODTypeWrapperCreator() {}
+  virtual ~JSSVGPODTypeWrapperCreatorReadWrite() {}
 
-  virtual void commitChange(KJS::ExecState* exec) {
-    (m_creator->*m_setter)((PODType&)(*this));
+  // Getter wrapper
+  virtual operator PODType() { return (m_creator.get()->*m_getter)(); }
+
+  // Setter wrapper
+  virtual void commitChange(KJS::ExecState* exec, PODType type) {
+    if (!m_setter)
+      return;
+
+    (m_creator.get()->*m_setter)(type);
 
     ASSERT(exec && exec->dynamicInterpreter());
     Frame* activeFrame =
@@ -82,9 +89,9 @@ class JSSVGPODTypeWrapperCreator : public JSSVGPODTypeWrapper<PODType> {
              ? activeFrame->document()->accessSVGExtensions()
              : 0);
     if (extensions &&
-        extensions->hasGenericContext<PODTypeCreator>(m_creator)) {
+        extensions->hasGenericContext<PODTypeCreator>(m_creator.get())) {
       const SVGElement* context =
-          extensions->genericContext<PODTypeCreator>(m_creator);
+          extensions->genericContext<PODTypeCreator>(m_creator.get());
       ASSERT(context);
 
       context->notifyAttributeChange();
@@ -93,8 +100,26 @@ class JSSVGPODTypeWrapperCreator : public JSSVGPODTypeWrapper<PODType> {
 
  private:
   // Update callbacks
-  PODTypeCreator* m_creator;
+  RefPtr<PODTypeCreator> m_creator;
+  GetterMethod m_getter;
   SetterMethod m_setter;
+};
+
+template <typename PODType>
+class JSSVGPODTypeWrapperCreatorReadOnly : public JSSVGPODTypeWrapper<PODType> {
+ public:
+  JSSVGPODTypeWrapperCreatorReadOnly(PODType type) : m_podType(type) {}
+
+  virtual ~JSSVGPODTypeWrapperCreatorReadOnly() {}
+
+  // Getter wrapper
+  virtual operator PODType() { return m_podType; }
+
+  // Setter wrapper
+  virtual void commitChange(KJS::ExecState*, PODType type) { m_podType = type; }
+
+ private:
+  PODType m_podType;
 };
 
 template <typename PODType>
@@ -102,11 +127,12 @@ class SVGPODListItem;
 
 template <typename PODType, typename ListType>
 class JSSVGPODTypeWrapperCreatorForList
-    : public JSSVGPODTypeWrapperCreator<PODType, SVGPODListItem<PODType>> {
+    : public JSSVGPODTypeWrapperCreatorReadWrite<PODType,
+                                                 SVGPODListItem<PODType>> {
  public:
   JSSVGPODTypeWrapperCreatorForList(SVGPODListItem<PODType>* creator,
                                     const ListType* list)
-      : JSSVGPODTypeWrapperCreator<PODType, SVGPODListItem<PODType>>(
+      : JSSVGPODTypeWrapperCreatorReadWrite<PODType, SVGPODListItem<PODType>>(
             creator,
             &SVGPODListItem<PODType>::value,
             &SVGPODListItem<PODType>::setValue),
@@ -114,10 +140,10 @@ class JSSVGPODTypeWrapperCreatorForList
 
   virtual ~JSSVGPODTypeWrapperCreatorForList() {}
 
-  virtual void commitChange(KJS::ExecState* exec) {
+  virtual void commitChange(KJS::ExecState* exec, PODType type) {
     // Update POD item within SVGList
-    JSSVGPODTypeWrapperCreator<PODType, SVGPODListItem<PODType>>::commitChange(
-        exec);
+    JSSVGPODTypeWrapperCreatorReadWrite<
+        PODType, SVGPODListItem<PODType>>::commitChange(exec, type);
 
     // Notify owner of the list, that it's content changed
     const SVGElement* context = m_list->context();
@@ -128,6 +154,127 @@ class JSSVGPODTypeWrapperCreatorForList
 
  private:
   const ListType* m_list;
+};
+
+// Caching facilities
+template <typename PODType, typename PODTypeCreator>
+struct PODTypeReadWriteHashInfo {
+  typedef PODType (PODTypeCreator::*GetterMethod)() const;
+  typedef void (PODTypeCreator::*SetterMethod)(PODType);
+
+  // Empty value
+  PODTypeReadWriteHashInfo() : creator(0), getter(0), setter(0) {}
+
+  // Deleted value
+  explicit PODTypeReadWriteHashInfo(bool)
+      : creator(reinterpret_cast<PODTypeCreator*>(-1)), getter(0), setter(0) {}
+
+  PODTypeReadWriteHashInfo(PODTypeCreator* _creator,
+                           GetterMethod _getter,
+                           SetterMethod _setter)
+      : creator(_creator), getter(_getter), setter(_setter) {
+    ASSERT(creator);
+    ASSERT(getter);
+  }
+
+  bool operator==(const PODTypeReadWriteHashInfo& other) const {
+    return creator == other.creator && getter == other.getter &&
+           setter == other.setter;
+  }
+
+  PODTypeCreator* creator;
+  GetterMethod getter;
+  SetterMethod setter;
+};
+
+template <typename PODType, typename PODTypeCreator>
+struct PODTypeReadWriteHashInfoHash {
+  static unsigned hash(
+      const PODTypeReadWriteHashInfo<PODType, PODTypeCreator>& info) {
+    return StringImpl::computeHash(
+        (UChar*)&info,
+        sizeof(PODTypeReadWriteHashInfo<PODType, PODTypeCreator>) /
+            sizeof(UChar));
+  }
+
+  static bool equal(
+      const PODTypeReadWriteHashInfo<PODType, PODTypeCreator>& a,
+      const PODTypeReadWriteHashInfo<PODType, PODTypeCreator>& b) {
+    return a == b;
+  }
+};
+
+template <typename PODType, typename PODTypeCreator>
+struct PODTypeReadWriteHashInfoTraits
+    : WTF::GenericHashTraits<
+          PODTypeReadWriteHashInfo<PODType, PODTypeCreator>> {
+  static const bool emptyValueIsZero = true;
+  static const bool needsDestruction = false;
+
+  static const PODTypeReadWriteHashInfo<PODType, PODTypeCreator>&
+  deletedValue() {
+    static PODTypeReadWriteHashInfo<PODType, PODTypeCreator> key(true);
+    return key;
+  }
+
+  static const PODTypeReadWriteHashInfo<PODType, PODTypeCreator>& emptyValue() {
+    static PODTypeReadWriteHashInfo<PODType, PODTypeCreator> key;
+    return key;
+  }
+};
+
+template <typename PODType, typename PODTypeCreator>
+class JSSVGPODTypeWrapperCache {
+ public:
+  typedef PODType (PODTypeCreator::*GetterMethod)() const;
+  typedef void (PODTypeCreator::*SetterMethod)(PODType);
+
+  typedef HashMap<PODTypeReadWriteHashInfo<PODType, PODTypeCreator>,
+                  JSSVGPODTypeWrapperCreatorReadWrite<PODType, PODTypeCreator>*,
+                  PODTypeReadWriteHashInfoHash<PODType, PODTypeCreator>,
+                  PODTypeReadWriteHashInfoTraits<PODType, PODTypeCreator>>
+      ReadWriteHashMap;
+  typedef typename ReadWriteHashMap::const_iterator ReadWriteHashMapIterator;
+
+  static ReadWriteHashMap& readWriteHashMap() {
+    static ReadWriteHashMap _readWriteHashMap;
+    return _readWriteHashMap;
+  }
+
+  // Used for readwrite attributes only
+  static JSSVGPODTypeWrapper<PODType>* lookupOrCreateWrapper(
+      PODTypeCreator* creator,
+      GetterMethod getter,
+      SetterMethod setter) {
+    ReadWriteHashMap& map(readWriteHashMap());
+    PODTypeReadWriteHashInfo<PODType, PODTypeCreator> info(creator, getter,
+                                                           setter);
+
+    if (map.contains(info))
+      return map.get(info);
+
+    JSSVGPODTypeWrapperCreatorReadWrite<PODType, PODTypeCreator>* wrapper =
+        new JSSVGPODTypeWrapperCreatorReadWrite<PODType, PODTypeCreator>(
+            creator, getter, setter);
+    map.set(info, wrapper);
+    return wrapper;
+  }
+
+  static void forgetWrapper(JSSVGPODTypeWrapper<PODType>* wrapper) {
+    ReadWriteHashMap& map(readWriteHashMap());
+
+    ReadWriteHashMapIterator it = map.begin();
+    ReadWriteHashMapIterator end = map.end();
+
+    for (; it != end; ++it) {
+      if (it->second != wrapper)
+        continue;
+
+      // It's guaruanteed that there's just one object we need to take care of.
+      map.remove(it->first);
+      break;
+    }
+  }
 };
 };
 
