@@ -61,6 +61,7 @@ class FontPlatformData {
   CGFontRef cgFont() const { return m_cgFont; }
 
   int size() const { return m_size; }
+  void setSize(int size) { m_size = size; }
   bool syntheticBold() const { return m_syntheticBold; }
   bool syntheticOblique() const { return m_syntheticOblique; }
 
