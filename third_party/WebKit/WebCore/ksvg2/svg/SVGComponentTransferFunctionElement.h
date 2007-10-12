@@ -53,28 +53,28 @@ class SVGComponentTransferFunctionElement : public SVGElement {
                                  TableValues,
                                  tableValues)
   ANIMATED_PROPERTY_DECLARATIONS(SVGComponentTransferFunctionElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Slope,
                                  slope)
   ANIMATED_PROPERTY_DECLARATIONS(SVGComponentTransferFunctionElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Intercept,
                                  intercept)
   ANIMATED_PROPERTY_DECLARATIONS(SVGComponentTransferFunctionElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Amplitude,
                                  amplitude)
   ANIMATED_PROPERTY_DECLARATIONS(SVGComponentTransferFunctionElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Exponent,
                                  exponent)
   ANIMATED_PROPERTY_DECLARATIONS(SVGComponentTransferFunctionElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Offset,
                                  offset)
 };

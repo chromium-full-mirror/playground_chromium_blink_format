@@ -48,28 +48,28 @@ class SVGFESpecularLightingElement
                                  In1,
                                  in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  SpecularConstant,
                                  specularConstant)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  SpecularExponent,
                                  specularExponent)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  SurfaceScale,
                                  surfaceScale)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  KernelUnitLengthX,
                                  kernelUnitLengthX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
 

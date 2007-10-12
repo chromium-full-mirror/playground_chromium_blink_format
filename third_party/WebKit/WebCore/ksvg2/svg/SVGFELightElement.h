@@ -39,41 +39,41 @@ class SVGFELightElement : public SVGElement {
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Azimuth,
                                  azimuth)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Elevation,
                                  elevation)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, double, double, X, x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, double, double, Y, y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, double, double, Z, z)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, float, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, float, Y, y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, float, Z, z)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  PointsAtX,
                                  pointsAtX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  PointsAtY,
                                  pointsAtY)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  PointsAtZ,
                                  pointsAtZ)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  SpecularExponent,
                                  specularExponent)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  LimitingConeAngle,
                                  limitingConeAngle)
 };

@@ -47,13 +47,13 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  BaseFrequencyX,
                                  baseFrequencyX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  BaseFrequencyY,
                                  baseFrequencyY)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,
@@ -62,8 +62,8 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
                                  NumOctaves,
                                  numOctaves)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Seed,
                                  seed)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,

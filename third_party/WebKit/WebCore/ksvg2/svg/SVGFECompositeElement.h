@@ -56,10 +56,10 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
                                  int,
                                  _operator,
                                  _operator)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, double, double, K1, k1)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, double, double, K2, k2)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, double, double, K3, k3)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, double, double, K4, k4)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, float, float, K1, k1)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, float, float, K2, k2)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, float, float, K3, k3)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, float, float, K4, k4)
 
   mutable SVGFEComposite* m_filterEffect;
 };

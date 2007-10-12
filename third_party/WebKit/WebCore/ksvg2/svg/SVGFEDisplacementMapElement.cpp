@@ -72,7 +72,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEDisplacementMapElement,
                               SVGNames::yChannelSelectorAttr.localName(),
                               m_yChannelSelector)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDisplacementMapElement,
-                              double,
+                              float,
                               Number,
                               number,
                               Scale,

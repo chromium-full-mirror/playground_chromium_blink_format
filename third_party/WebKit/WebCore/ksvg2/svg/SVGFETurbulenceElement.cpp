@@ -46,7 +46,7 @@ SVGFETurbulenceElement::~SVGFETurbulenceElement() {
 }
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
-                              double,
+                              float,
                               Number,
                               number,
                               BaseFrequencyX,
@@ -54,7 +54,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               "baseFrequencyX",
                               m_baseFrequencyX)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
-                              double,
+                              float,
                               Number,
                               number,
                               BaseFrequencyY,
@@ -62,7 +62,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               "baseFrequencyY",
                               m_baseFrequencyY)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
-                              double,
+                              float,
                               Number,
                               number,
                               Seed,

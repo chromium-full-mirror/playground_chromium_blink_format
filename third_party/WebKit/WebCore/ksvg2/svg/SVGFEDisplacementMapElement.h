@@ -62,8 +62,8 @@ class SVGFEDisplacementMapElement
                                  YChannelSelector,
                                  yChannelSelector)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  Scale,
                                  scale)
 

@@ -48,23 +48,23 @@ class SVGFEDiffuseLightingElement
                                  In1,
                                  in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  DiffuseConstant,
                                  diffuseConstant)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  SurfaceScale,
                                  surfaceScale)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  KernelUnitLengthX,
                                  kernelUnitLengthX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
-                                 double,
-                                 double,
+                                 float,
+                                 float,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
 
