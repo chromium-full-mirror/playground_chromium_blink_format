@@ -62,11 +62,10 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     return false;
 
   CGSize cellSize = CGSize(tile()->size());
-  CGFloat alpha = 1;  // canvasStyle->opacity(); //which?
 
   context->save();
 
-  // Repesct local pattern transformations
+  // Respect local pattern transformation
   CGContextConcatCTM(contextRef, patternTransform());
 
   // Pattern space seems to start in the lower-left, so we flip the Y here.
@@ -74,8 +73,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
   CGContextSetPatternPhase(contextRef, phase);
 
   RenderStyle* style = object->style();
-  CGContextSetAlpha(contextRef,
-                    style->opacity());  // or do I set the alpha above?
+  CGContextSetAlpha(contextRef, style->opacity());
 
   ASSERT(!m_pattern);
   CGPatternCallbacks callbacks = {0, patternCallback, NULL};
@@ -91,6 +89,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     m_patternSpace = CGColorSpaceCreatePattern(0);
 
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
+    CGFloat alpha = style->svgStyle()->fillOpacity();
     CGContextSetFillColorSpace(contextRef, m_patternSpace);
     CGContextSetFillPattern(contextRef, m_pattern, &alpha);
 
@@ -99,6 +98,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
   }
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
+    CGFloat alpha = style->svgStyle()->strokeOpacity();
     CGContextSetStrokeColorSpace(contextRef, m_patternSpace);
     CGContextSetStrokePattern(contextRef, m_pattern, &alpha);
     applyStrokeStyleToContext(contextRef, style, object);

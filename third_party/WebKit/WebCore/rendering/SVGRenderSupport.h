@@ -28,18 +28,16 @@
 
 namespace WebCore {
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
 class SVGResourceFilter;
 void prepareToRenderSVGContent(RenderObject*,
-                               RenderObject::PaintInfo& paintInfo,
+                               RenderObject::PaintInfo&,
                                const FloatRect& boundingBox,
                                SVGResourceFilter*&);
-#else
-void prepareToRenderSVGContent(RenderObject*,
-                               RenderObject::PaintInfo& paintInfo,
-                               const FloatRect& boundingBox,
-                               void*);
-#endif
+void finishRenderSVGContent(RenderObject*,
+                            RenderObject::PaintInfo&,
+                            const FloatRect& boundingBox,
+                            SVGResourceFilter*&,
+                            GraphicsContext* savedContext);
 }
 
 #endif

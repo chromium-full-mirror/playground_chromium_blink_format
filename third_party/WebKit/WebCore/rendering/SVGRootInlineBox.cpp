@@ -52,31 +52,23 @@
 
 namespace WebCore {
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
 static void prepareTextRendering(RenderObject::PaintInfo& paintInfo,
                                  int tx,
                                  int ty,
                                  InlineFlowBox* flowBox,
                                  FloatRect& boundingBox,
-                                 SVGResourceFilter*& filter)
-#else
-static void prepareTextRendering(RenderObject::PaintInfo& paintInfo,
-                                 int tx,
-                                 int ty,
-                                 InlineFlowBox* flowBox,
-                                 FloatRect& boundingBox,
-                                 void* filter)
-#endif
-{
+                                 SVGResourceFilter*& filter) {
   ASSERT(paintInfo.phase == PaintPhaseForeground);
+  ASSERT(flowBox);
+
   RenderObject* object = flowBox->object();
+  ASSERT(object);
 
   paintInfo.context->save();
   paintInfo.context->concatCTM(object->localTransform());
 
   boundingBox = FloatRect(tx + flowBox->xPos(), ty + flowBox->yPos(),
                           flowBox->width(), flowBox->height());
-
   prepareToRenderSVGContent(object, paintInfo, boundingBox, filter);
 }
 
@@ -144,22 +136,12 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
     return;
 
   FloatRect boundingBox;
-
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   SVGResourceFilter* filter = 0;
-#else
-  void* filter = 0;
-#endif
+
+  RenderObject::PaintInfo savedInfo(paintInfo);
   prepareTextRendering(paintInfo, tx, ty, this, boundingBox, filter);
 
   RenderObject::PaintInfo pi(paintInfo);
-
-  float opacity = object()->style()->opacity();
-  if (opacity < 1.0f) {
-    paintInfo.context->clip(enclosingIntRect(boundingBox));
-    paintInfo.context->beginTransparencyLayer(opacity);
-  }
-
   SVGPaintServer* fillPaintServer =
       SVGPaintServer::fillPaintServer(object()->style(), object());
   if (fillPaintServer) {
@@ -188,14 +170,8 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
     }
   }
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  if (filter)
-    filter->applyFilter(paintInfo.context, boundingBox);
-#endif
-
-  if (opacity < 1.0f)
-    paintInfo.context->endTransparencyLayer();
-
+  finishRenderSVGContent(object(), paintInfo, boundingBox, filter,
+                         savedInfo.context);
   paintInfo.context->restore();
 }
 
@@ -1123,12 +1099,9 @@ void SVGRootInlineBox::paintChildInlineFlowBox(
     InlineFlowBox* flowBox,
     Vector<SVGChar>::iterator& it) {
   FloatRect boundingBox;
-
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   SVGResourceFilter* filter = 0;
-#else
-  void* filter = 0;
-#endif
+
+  RenderObject::PaintInfo savedInfo(paintInfo);
   prepareTextRendering(paintInfo, tx, ty, flowBox, boundingBox, filter);
 
   RenderObject* object = flowBox->object();
@@ -1136,12 +1109,6 @@ void SVGRootInlineBox::paintChildInlineFlowBox(
 
   if (!flowBox->isRootInlineBox())
     pi.rect = (object->localTransform()).inverse().mapRect(pi.rect);
-
-  float opacity = object->style()->opacity();
-  if (opacity < 1.0f) {
-    paintInfo.context->clip(enclosingIntRect(boundingBox));
-    paintInfo.context->beginTransparencyLayer(opacity);
-  }
 
   bool painted = false;
   Vector<SVGChar>::iterator savedIt = it;
@@ -1173,14 +1140,8 @@ void SVGRootInlineBox::paintChildInlineFlowBox(
     }
   }
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  if (filter)
-    filter->applyFilter(paintInfo.context, boundingBox);
-#endif
-
-  if (opacity < 1.0f)
-    paintInfo.context->endTransparencyLayer();
-
+  finishRenderSVGContent(object, paintInfo, boundingBox, filter,
+                         savedInfo.context);
   paintInfo.context->restore();
 }
 

@@ -290,9 +290,9 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
   ASSERT(contextRef);
 
   context->save();
-  CGContextSetAlpha(contextRef, style->opacity());
 
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
+    CGContextSetAlpha(contextRef, style->svgStyle()->fillOpacity());
     context->save();
 
     if (isPaintingText)
@@ -300,6 +300,7 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
   }
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
+    CGContextSetAlpha(contextRef, style->svgStyle()->strokeOpacity());
     context->save();
     applyStrokeStyleToContext(contextRef, style, object);
 
