@@ -241,15 +241,17 @@ bool CSSParser::parseValue(CSSMutableStyleDeclaration* declaration,
   return ok;
 }
 
-RGBA32 CSSParser::parseColor(const String& string, bool strict) {
-  RGBA32 color = 0;
-  RefPtr<CSSMutableStyleDeclaration> dummyStyleDeclaration =
-      new CSSMutableStyleDeclaration;
-
+// color will only be changed when string contains a valid css color, making it
+// possible to set up a default color.
+bool CSSParser::parseColor(RGBA32& color, const String& string, bool strict) {
+  color = 0;
   CSSParser parser(true);
 
   // First try creating a color specified by name or the "#" syntax.
   if (!parser.parseColor(string, color, strict)) {
+    RefPtr<CSSMutableStyleDeclaration> dummyStyleDeclaration =
+        new CSSMutableStyleDeclaration;
+
     // Now try to create a color from the rgb() or rgba() syntax.
     if (parser.parseColor(dummyStyleDeclaration.get(), string)) {
       CSSValue* value = parser.parsedProperties[0]->value();
@@ -258,10 +260,11 @@ RGBA32 CSSParser::parseColor(const String& string, bool strict) {
             static_cast<CSSPrimitiveValue*>(value);
         color = primitiveValue->getRGBColorValue();
       }
-    }
+    } else
+      return false;
   }
 
-  return color;
+  return true;
 }
 
 bool CSSParser::parseColor(CSSMutableStyleDeclaration* declaration,

@@ -84,7 +84,8 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
 #endif
   switch (m_type) {
     case ColorString: {
-      RGBA32 color = CSSParser::parseColor(m_color);
+      RGBA32 color = 0;  // default is transparant black
+      CSSParser::parseColor(color, m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if PLATFORM(CG)
       CGContextSetRGBStrokeColor(
@@ -104,7 +105,8 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       break;
     }
     case ColorStringWithAlpha: {
-      RGBA32 color = CSSParser::parseColor(m_color);
+      RGBA32 color = 0;  // default is transparant black
+      CSSParser::parseColor(color, m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if PLATFORM(CG)
       CGContextSetRGBStrokeColor(
@@ -185,7 +187,8 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
 #endif
   switch (m_type) {
     case ColorString: {
-      RGBA32 color = CSSParser::parseColor(m_color);
+      RGBA32 color = 0;  // default is transparant black
+      CSSParser::parseColor(color, m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if PLATFORM(CG)
       CGContextSetRGBFillColor(
@@ -202,7 +205,8 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
       break;
     }
     case ColorStringWithAlpha: {
-      RGBA32 color = CSSParser::parseColor(m_color);
+      RGBA32 color = 0;  // default is transparant black
+      CSSParser::parseColor(color, m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if PLATFORM(CG)
       CGContextSetRGBFillColor(
