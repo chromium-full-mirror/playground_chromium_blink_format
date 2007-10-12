@@ -51,14 +51,22 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource();
 
- protected:
-  std::auto_ptr<ImageBuffer> drawMaskerContent();
+  std::auto_ptr<ImageBuffer> drawMaskerContent(const FloatRect& targetRect,
+                                               FloatRect& maskRect) const;
 
+ protected:
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
+
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement, int, int, MaskUnits, maskUnits)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
+                                 int,
+                                 int,
+                                 MaskContentUnits,
+                                 maskContentUnits)
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement, SVGLength, SVGLength, X, x)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement, SVGLength, SVGLength, Y, y)
@@ -77,7 +85,6 @@ class SVGMaskElement : public SVGStyledLocatableElement,
 
  private:
   RefPtr<SVGResourceMasker> m_masker;
-  mutable bool m_dirty;
 };
 
 }  // namespace WebCore
