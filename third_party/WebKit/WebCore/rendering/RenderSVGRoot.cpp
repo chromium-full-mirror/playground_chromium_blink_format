@@ -28,6 +28,7 @@
 
 #include "GraphicsContext.h"
 #include "RenderPath.h"
+#include "RenderSVGContainer.h"
 #include "RenderView.h"
 #include "SVGLength.h"
 #include "SVGRenderSupport.h"
@@ -307,6 +308,11 @@ FloatRect RenderSVGRoot::relativeBBox(bool includeStroke) const {
   for (; current != 0; current = current->nextSibling()) {
     FloatRect childBBox = current->relativeBBox(includeStroke);
     FloatRect mappedBBox = current->localTransform().mapRect(childBBox);
+    // <svg> can have a viewBox contributing to the bbox
+    if (current->isSVGContainer())
+      mappedBBox = static_cast<RenderSVGContainer*>(current)
+                       ->viewportTransform()
+                       .mapRect(mappedBBox);
     rect.unite(mappedBBox);
   }
 
