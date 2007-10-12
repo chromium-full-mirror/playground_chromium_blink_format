@@ -117,6 +117,8 @@ class RenderSVGContainer : public RenderObject {
   int m_width;
   int m_height;
 
+  bool selfWillPaint() const;
+
   bool m_drawsContents : 1;
 
   IntRect m_absoluteBounds;

@@ -66,10 +66,7 @@ class SVGStyledElement : public SVGElement {
   RenderStyle* resolveStyle(RenderStyle* parentStyle);
 
  protected:
-  friend class RenderPath;
-  void rebuildRenderer() const;
-
-  virtual bool hasRelativeValues() const { return false; }
+  virtual bool hasRelativeValues() const { return true; }
 
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
 

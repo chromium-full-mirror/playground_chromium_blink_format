@@ -286,18 +286,6 @@ PassRefPtr<CSSValue> SVGStyledElement::getPresentationAttribute(
     return 0;
   return cssSVGAttr->style()->getPropertyCSSValue(name);
 }
-
-void SVGStyledElement::rebuildRenderer() const {
-  if (!renderer() || !renderer()->isRenderPath())
-    return;
-
-  RenderPath* renderPath = static_cast<RenderPath*>(renderer());
-  SVGElement* parentElement = svg_dynamic_cast(parentNode());
-  if (parentElement && parentElement->renderer() && parentElement->isStyled() &&
-      parentElement->childShouldCreateRenderer(
-          const_cast<SVGStyledElement*>(this)))
-    renderPath->setNeedsLayout(true);
-}
 }
 
 #endif  // ENABLE(SVG)

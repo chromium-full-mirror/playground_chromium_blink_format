@@ -88,8 +88,6 @@ class RenderPath : public RenderObject {
                                 const Path&) const;
   virtual FloatRect strokeBBox() const;
 
-  bool hasRelativeValues() const;
-
  private:
   FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
 

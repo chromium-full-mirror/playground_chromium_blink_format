@@ -46,7 +46,7 @@ class SVGTransform {
   };
 
   SVGTransform();
-  SVGTransform(SVGTransformType type);
+  SVGTransform(SVGTransformType);
   explicit SVGTransform(const AffineTransform&);
   virtual ~SVGTransform();
 

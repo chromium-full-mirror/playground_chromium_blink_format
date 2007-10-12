@@ -26,6 +26,7 @@
 #include "SVGCircleElement.h"
 
 #include "FloatPoint.h"
+#include "RenderPath.h"
 #include "SVGNames.h"
 
 namespace WebCore {
@@ -88,8 +89,8 @@ void SVGCircleElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void SVGCircleElement::notifyAttributeChange() const {
-  if (!document()->parsing())
-    rebuildRenderer();
+  if (!document()->parsing() && renderer())
+    renderer()->setNeedsLayout(true);
 
   SVGStyledTransformableElement::notifyAttributeChange();
 }
