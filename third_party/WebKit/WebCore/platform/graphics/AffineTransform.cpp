@@ -29,11 +29,9 @@
 #include "FloatRect.h"
 #include "IntRect.h"
 
-#include <math.h>
+#include <wtf/MathExtras.h>
 
 namespace WebCore {
-
-const double deg2rad = 0.017453292519943295769;  // pi/180
 
 bool AffineTransform::isInvertible() const {
   return det() != 0.0;
@@ -52,7 +50,7 @@ AffineTransform& AffineTransform::scaleNonUniform(double sx, double sy) {
 }
 
 AffineTransform& AffineTransform::rotateFromVector(double x, double y) {
-  return rotate(atan2(y, x) / deg2rad);
+  return rotate(rad2deg(atan2(y, x)));
 }
 
 AffineTransform& AffineTransform::flipX() {
@@ -64,10 +62,10 @@ AffineTransform& AffineTransform::flipY() {
 }
 
 AffineTransform& AffineTransform::skewX(double angle) {
-  return shear(tan(angle * deg2rad), 0.0f);
+  return shear(tan(deg2rad(angle)), 0.0f);
 }
 
 AffineTransform& AffineTransform::skewY(double angle) {
-  return shear(0.0f, tan(angle * deg2rad));
+  return shear(0.0f, tan(deg2rad(angle)));
 }
 }

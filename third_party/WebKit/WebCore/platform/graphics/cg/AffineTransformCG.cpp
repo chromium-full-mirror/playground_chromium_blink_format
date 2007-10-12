@@ -32,9 +32,9 @@
 #include "FloatRect.h"
 #include "IntRect.h"
 
-namespace WebCore {
+#include <wtf/MathExtras.h>
 
-static const double deg2rad = 0.017453292519943295769;  // pi/180
+namespace WebCore {
 
 AffineTransform::AffineTransform() {
   m_transform = CGAffineTransformIdentity;
@@ -149,7 +149,7 @@ AffineTransform& AffineTransform::scale(double sx, double sy) {
 
 AffineTransform& AffineTransform::rotate(double d) {
   m_transform = CGAffineTransformRotate(m_transform,
-                                        narrowPrecisionToCGFloat(d * deg2rad));
+                                        narrowPrecisionToCGFloat(deg2rad(d)));
   return *this;
 }
 
