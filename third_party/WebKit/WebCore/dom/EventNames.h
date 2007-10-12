@@ -43,11 +43,12 @@ namespace EventNames {
                                                                                  \
                           macro(DOMActivate) macro(DOMAttrModified) macro(       \
                               DOMCharacterDataModified) macro(DOMFocusIn)        \
-                              macro(DOMFocusOut) macro(DOMNodeInserted)          \
-                                  macro(DOMNodeInsertedIntoDocument) macro(      \
-                                      DOMNodeRemoved)                            \
-                                      macro(DOMNodeRemovedFromDocument) macro(   \
-                                          DOMSubtreeModified)                    \
+                              macro(DOMFocusOut) macro(DOMNodeInserted) macro(   \
+                                  DOMNodeInsertedIntoDocument)                   \
+                                  macro(DOMNodeRemoved) macro(                   \
+                                      DOMNodeRemovedFromDocument)                \
+                                      macro(DOMSubtreeModified) macro(           \
+                                          DOMContentLoaded)                      \
                                                                                  \
                                           macro(webkitBeforeTextInserted)        \
                                               macro(                             \

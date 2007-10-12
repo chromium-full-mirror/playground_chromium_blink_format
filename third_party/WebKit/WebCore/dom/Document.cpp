@@ -3483,6 +3483,10 @@ PassRefPtr<NameNodeList> Document::getElementsByName(
 
 void Document::finishedParsing() {
   setParsing(false);
+
+  ExceptionCode ec = 0;
+  dispatchEvent(new Event(DOMContentLoadedEvent, true, false), ec);
+
   if (Frame* f = frame())
     f->loader()->finishedParsing();
 }
