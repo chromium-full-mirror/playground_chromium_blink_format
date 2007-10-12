@@ -140,8 +140,7 @@ void SVGSVGElement::setContentStyleType(const AtomicString& type) {
 FloatRect SVGSVGElement::viewport() const {
   double _x = 0.0;
   double _y = 0.0;
-  if (renderer() && renderer()->parent() &&
-      !renderer()->parent()->isSVGContainer()) {
+  if (!isOutermostSVG()) {
     _x = x().value();
     _y = y().value();
   }
@@ -354,8 +353,7 @@ SVGTransform SVGSVGElement::createSVGTransformFromMatrix(
 
 AffineTransform SVGSVGElement::getCTM() const {
   AffineTransform mat;
-  if (renderer() && renderer()->parent() &&
-      !renderer()->parent()->isSVGContainer())
+  if (!isOutermostSVG())
     mat.translate(x().value(), y().value());
 
   if (attributes()->getNamedItem(SVGNames::viewBoxAttr)) {
@@ -368,20 +366,17 @@ AffineTransform SVGSVGElement::getCTM() const {
 }
 
 AffineTransform SVGSVGElement::getScreenCTM() const {
-  // FIXME: This assumes that any <svg> element not immediately descending from
-  // another SVGElement
-  // has *no* svg ancestors
   document()->updateLayoutIgnorePendingStylesheets();
   float rootX = 0.0f;
   float rootY = 0.0f;
 
   if (RenderObject* renderer = this->renderer()) {
     renderer = renderer->parent();
-    if (renderer &&
-        !(renderer->element() && renderer->element()->isSVGElement())) {
+    if (isOutermostSVG()) {
       int tx = 0;
       int ty = 0;
-      renderer->absolutePosition(tx, ty, true);
+      if (renderer)
+        renderer->absolutePosition(tx, ty, true);
       rootX += tx;
       rootY += ty;
     } else {
@@ -403,8 +398,7 @@ AffineTransform SVGSVGElement::getScreenCTM() const {
 }
 
 RenderObject* SVGSVGElement::createRenderer(RenderArena* arena, RenderStyle*) {
-  // FIXME: All this setup should be done after attributesChanged, not here.
-  if (!parentNode()->isSVGElement())
+  if (isOutermostSVG())
     return new (arena) RenderSVGRoot(this);
   else
     return new (arena) RenderSVGViewportContainer(this);
@@ -445,6 +439,12 @@ void SVGSVGElement::setCurrentTime(float /* seconds */) {
 bool SVGSVGElement::hasRelativeValues() const {
   return (x().isRelative() || width().isRelative() || y().isRelative() ||
           height().isRelative());
+}
+
+bool SVGSVGElement::isOutermostSVG() const {
+  // This is true whenever this is the outermost SVG, even if there are HTML
+  // elements outside it
+  return !parentNode()->isSVGElement();
 }
 
 void SVGSVGElement::attributeChanged(Attribute* attr, bool preserveDecls) {
