@@ -78,6 +78,7 @@
 #include "JSSVGSwitchElement.h"
 #include "JSSVGSymbolElement.h"
 #include "JSSVGTextElement.h"
+#include "JSSVGTextPathElement.h"
 #include "JSSVGTitleElement.h"
 #include "JSSVGTRefElement.h"
 #include "JSSVGTSpanElement.h"
@@ -141,6 +142,7 @@
 #include "SVGSwitchElement.h"
 #include "SVGSymbolElement.h"
 #include "SVGTextElement.h"
+#include "SVGTextPathElement.h"
 #include "SVGTitleElement.h"
 #include "SVGTRefElement.h"
 #include "SVGTSpanElement.h"
@@ -206,13 +208,18 @@ typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
                                           radialGradient,                       \
                                           RadialGradient) macro(rect, Rect)     \
                                           macro(script, Script) macro(          \
-                                              set, Set) macro(stop, Stop)       \
-                                              macro(style, Style) macro(        \
-                                                  svg, SVG) macro(switch,       \
-                                                                  Switch)       \
-                                                  macro(symbol, Symbol) macro(  \
-                                                      text, Text) macro(title,  \
-                                                                        Title)  \
+                                              set,                              \
+                                              Set) macro(stop,                  \
+                                                         Stop) macro(style,     \
+                                                                     Style)     \
+                                              macro(svg, SVG) macro(            \
+                                                  switch,                       \
+                                                  Switch) macro(symbol,         \
+                                                                Symbol)         \
+                                                  macro(text, Text) macro(      \
+                                                      textPath,                 \
+                                                      TextPath) macro(title,    \
+                                                                      Title)    \
                                                       macro(tref, TRef) macro(  \
                                                           tspan,                \
                                                           TSpan) macro(use,     \
@@ -234,12 +241,12 @@ typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
               macro(polyline, Polyline) macro(polygon, Polygon)               \
                   macro(radialGradient, RadialGradient) macro(rect, Rect)     \
                       macro(script, Script) macro(set, Set) macro(stop, Stop) \
-                          macro(style, Style) macro(svg, SVG)                 \
-                              macro(switch, Switch) macro(symbol, Symbol)     \
-                                  macro(text, Text) macro(title, Title)       \
-                                      macro(tref, TRef) macro(tspan, TSpan)   \
-                                          macro(use, Use) macro(              \
-                                              view, View)  // end of macro
+                          macro(style, Style) macro(svg, SVG) macro(          \
+                              switch, Switch) macro(symbol, Symbol)           \
+                              macro(text, Text) macro(textPath, TextPath)     \
+                                  macro(title, Title) macro(tref, TRef)       \
+                                      macro(tspan, TSpan) macro(use, Use)     \
+                                          macro(view, View)  // end of macro
 
 #endif
 
