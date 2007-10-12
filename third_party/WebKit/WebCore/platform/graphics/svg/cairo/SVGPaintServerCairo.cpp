@@ -29,7 +29,7 @@
 #include "SVGPaintServer.h"
 
 #include "GraphicsContext.h"
-#include "KCanvasRenderingStyle.h"
+#include "SVGPaintServer.h"
 #include "RenderPath.h"
 
 #include <cairo.h>
@@ -37,7 +37,7 @@
 namespace WebCore {
 
 void SVGPaintServer::draw(GraphicsContext*& context,
-                          const RenderPath* path,
+                          const RenderObject* path,
                           SVGPaintTargetType type) const {
   if (!setup(context, path, type))
     return;
@@ -54,7 +54,7 @@ void SVGPaintServer::teardown(GraphicsContext*&,
 }
 
 void SVGPaintServer::renderPath(GraphicsContext*& context,
-                                const RenderPath* path,
+                                const RenderObject* path,
                                 SVGPaintTargetType type) const {
   cairo_t* cr = context->platformContext();
   const SVGRenderStyle* style = path->style()->svgStyle();
