@@ -809,7 +809,6 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
     svgChar.drawnSeperated = false;
     svgChar.newTextChunk = false;
 
-    float angle = 0.0;
     float glyphWidth = 0.0;
     float glyphHeight = 0.0;
 
@@ -858,17 +857,15 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
         newOffset = info.cury;
 
       svgChar.visible = info.nextPathLayoutPointAndAngle(
-          info.curx, info.cury, angle, glyphAdvance, newOffset);
+          info.curx, info.cury, info.angle, glyphAdvance, newOffset);
+      svgChar.drawnSeperated = true;
     }
-
-    float dx = 0.0;
-    float dy = 0.0;
 
     // Apply x-axis shift
     if (info.dxValueAvailable()) {
-      dx = info.dxValueNext();
       svgChar.drawnSeperated = true;
 
+      float dx = info.dxValueNext();
       info.dx += dx;
 
       if (!info.inPathLayout())
@@ -877,9 +874,9 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
 
     // Apply y-axis shift
     if (info.dyValueAvailable()) {
-      dy = info.dyValueNext();
       svgChar.drawnSeperated = true;
 
+      float dy = info.dyValueNext();
       info.dy += dy;
 
       if (!info.inPathLayout())
@@ -887,50 +884,40 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
     }
 
     // Apply rotation
-    if (info.angleValueAvailable()) {
-      svgChar.drawnSeperated = true;
-      angle = info.angleValueNext();
-    }
+    if (info.angleValueAvailable())
+      info.angle = info.angleValueNext();
 
     // Apply baseline-shift
     if (info.baselineShiftValueAvailable()) {
       svgChar.drawnSeperated = true;
       float shift = info.baselineShiftValueNext();
 
-      if (isVerticalText) {
+      if (isVerticalText)
         info.shiftx += shift;
-        info.curx += shift;
-      } else {
+      else
         info.shifty -= shift;
-        info.cury -= shift;
-      }
     }
 
     svgChar.x = info.curx;
     svgChar.y = info.cury;
 
-    float pathXShift = 0.0;
-    float pathYShift = 0.0;
+    // For text paths any shift (dx/dy/baseline-shift) has to be applied after
+    // the rotation
+    if (!info.inPathLayout()) {
+      svgChar.x += info.shiftx;
+      svgChar.y += info.shifty;
 
-    // Correct character position for text on path layout
-    // All placed characters on a path use absolute positioning (internally).
-    // So we still have to apply baseline-shift/dx/dy corrections manually.
-    if (info.inPathLayout()) {
-      svgChar.drawnSeperated = true;
+      svgChar.pathXShift = 0.0;
+      svgChar.pathYShift = 0.0;
+    } else {
+      svgChar.pathXShift = info.dx + info.shiftx;
+      svgChar.pathYShift = info.dy + info.shifty;
 
       // Translate to glyph midpoint
       if (isVerticalText)
-        pathYShift = glyphHeight / 2.0;
+        svgChar.pathYShift -= glyphHeight / 2.0;
       else
-        pathXShift = glyphWidth / 2.0;
-
-      // Respect accumulated dx/dy values
-      pathXShift -= info.dx;
-      pathYShift -= info.dy;
-
-      // Alter character position
-      svgChar.x -= pathXShift;
-      svgChar.y -= pathYShift;
+        svgChar.pathXShift -= glyphWidth / 2.0;
     }
 
     // Correct character position for vertical text layout
@@ -940,17 +927,10 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
       svgChar.y += glyphHeight;
     }
 
-    // Setup affine transform for single glyph
-    if (angle != 0.0) {
-      AffineTransform rotationMatrix;
-
-      rotationMatrix.translate(svgChar.x + pathXShift, svgChar.y + pathYShift);
-      rotationMatrix.rotate(angle);
-      rotationMatrix.translate(-svgChar.x - pathXShift,
-                               -svgChar.y - pathYShift);
-
-      svgChar.transform = rotationMatrix;
-    }
+    // Record angle if specified
+    svgChar.angle = info.angle;
+    if (svgChar.angle != 0.0)
+      svgChar.drawnSeperated = true;
 
     // Advance current position
     if (!isVerticalText)

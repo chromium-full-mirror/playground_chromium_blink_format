@@ -106,8 +106,9 @@ FloatRect SVGInlineTextBox::calculateGlyphBoundaries(
   FloatRect glyphRect(x1, y1, x2 - x1, y2 - y1);
 
   // Take per-character transformations into account
-  if (!svgChar.transform.isIdentity())
-    glyphRect = svgChar.transform.mapRect(glyphRect);
+  AffineTransform ctm = svgChar.characterTransform();
+  if (!ctm.isIdentity())
+    glyphRect = ctm.mapRect(glyphRect);
 
   return glyphRect;
 }
@@ -351,8 +352,9 @@ void SVGInlineTextBox::paintCharacters(RenderObject::PaintInfo& paintInfo,
   if (*font != paintInfo.context->font())
     paintInfo.context->setFont(*font);
 
-  if (!svgChar.transform.isIdentity())
-    paintInfo.context->concatCTM(svgChar.transform);
+  AffineTransform ctm = svgChar.characterTransform();
+  if (!ctm.isIdentity())
+    paintInfo.context->concatCTM(ctm);
 
   // 1. Paint backgrounds behind text if needed.  Examples of such backgrounds
   // include selection
@@ -434,8 +436,8 @@ void SVGInlineTextBox::paintCharacters(RenderObject::PaintInfo& paintInfo,
   if (setShadow)
     paintInfo.context->clearShadow();
 
-  if (!svgChar.transform.isIdentity())
-    paintInfo.context->concatCTM(svgChar.transform.inverse());
+  if (!ctm.isIdentity())
+    paintInfo.context->concatCTM(ctm.inverse());
 }
 
 void SVGInlineTextBox::paintSelection(int boxStartOffset,
@@ -545,8 +547,9 @@ void SVGInlineTextBox::paintDecoration(ETextDecoration decoration,
   context->save();
   context->beginPath();
 
-  if (!svgChar.transform.isIdentity())
-    context->concatCTM(svgChar.transform);
+  AffineTransform ctm = svgChar.characterTransform();
+  if (!ctm.isIdentity())
+    context->concatCTM(ctm);
 
   if (isFilled) {
     if (RenderObject* fillObject = info.fillServerMap.get(decoration)) {
