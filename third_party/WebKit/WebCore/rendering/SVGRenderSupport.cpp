@@ -86,9 +86,10 @@ void prepareToRenderSVGContent(RenderObject* object,
   SVGResourceMasker* masker = getMaskerById(document, maskerId);
 
 #if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  if (filter)
+  if (filter) {
+    filter->addClient(styledElement);
     filter->prepareFilter(paintInfo.context, boundingBox);
-  else if (!filterId.isEmpty())
+  } else if (!filterId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
         filterId, styledElement);
 #endif
