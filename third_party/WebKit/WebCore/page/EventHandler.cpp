@@ -1090,6 +1090,8 @@ bool EventHandler::handleMouseReleaseEvent(
 #if ENABLE(SVG)
   if (m_svgPan) {
     m_svgPan = false;
+    static_cast<SVGDocument*>(m_frame->document())
+        ->updatePan(m_currentMousePosition);
     return true;
   }
 #endif
