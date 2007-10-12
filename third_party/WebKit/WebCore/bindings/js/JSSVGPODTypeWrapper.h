@@ -155,9 +155,9 @@ struct PODTypeReadWriteHashInfoHash {
   static unsigned hash(
       const PODTypeReadWriteHashInfo<PODType, PODTypeCreator>& info) {
     return StringImpl::computeHash(
-        (UChar*)&info,
+        (::UChar*)&info,
         sizeof(PODTypeReadWriteHashInfo<PODType, PODTypeCreator>) /
-            sizeof(UChar));
+            sizeof(::UChar));
   }
 
   static bool equal(
