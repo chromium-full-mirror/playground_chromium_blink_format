@@ -153,22 +153,28 @@ auto_ptr<ImageBuffer> SVGMaskElement::drawMaskerContent(
     const FloatRect& targetRect,
     FloatRect& maskDestRect) const {
   // Determine specified mask size
-  float xValue = x().valueAsPercentage();
-  float yValue = y().valueAsPercentage();
-  float widthValue = width().valueAsPercentage();
-  float heightValue = height().valueAsPercentage();
+  float xValue;
+  float yValue;
+  float widthValue;
+  float heightValue;
 
   if (maskUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX) {
-    xValue *= targetRect.width();
-    yValue *= targetRect.height();
-    widthValue *= targetRect.width();
-    heightValue *= targetRect.height();
+    xValue = x().valueAsPercentage() * targetRect.width();
+    yValue = y().valueAsPercentage() * targetRect.height();
+    widthValue = width().valueAsPercentage() * targetRect.width();
+    heightValue = height().valueAsPercentage() * targetRect.height();
+  } else {
+    xValue = x().value();
+    yValue = y().value();
+    widthValue = width().value();
+    heightValue = height().value();
   }
 
   auto_ptr<ImageBuffer> maskImage = ImageBuffer::create(
       IntSize(lroundf(widthValue), lroundf(heightValue)), false);
   if (!maskImage.get())
     return maskImage;
+
   maskDestRect = FloatRect(xValue, yValue, widthValue, heightValue);
   if (maskUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX)
     maskDestRect.move(targetRect.x(), targetRect.y());
@@ -202,7 +208,6 @@ auto_ptr<ImageBuffer> SVGMaskElement::drawMaskerContent(
     maskImageContext->restore();
 
   maskImageContext->restore();
-
   return maskImage;
 }
 
