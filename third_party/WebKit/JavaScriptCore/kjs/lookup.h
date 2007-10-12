@@ -371,17 +371,18 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
         : KJS::JSObject(ClassPrototypePrototype::self(exec)) {}       \
   };
 
-#define KJS_IMPLEMENT_PROTOTYPE(ClassName, ClassPrototype, ClassFunction)     \
-  const ClassInfo ClassPrototype::info = {ClassName "Prototype", 0,           \
-                                          &ClassPrototype##Table, 0};         \
-  JSObject* ClassPrototype::self(ExecState* exec) {                           \
-    static Identifier prototypeIdentifier("[[" ClassName ".prototype]]");     \
-    return KJS::cacheGlobalObject<ClassPrototype>(exec, prototypeIdentifier); \
-  }                                                                           \
-  bool ClassPrototype::getOwnPropertySlot(                                    \
-      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) {  \
-    return getStaticFunctionSlot<ClassFunction, JSObject>(                    \
-        exec, &ClassPrototype##Table, this, propertyName, slot);              \
+#define KJS_IMPLEMENT_PROTOTYPE(ClassName, ClassPrototype, ClassFunction)      \
+  const ClassInfo ClassPrototype::info = {ClassName "Prototype", 0,            \
+                                          &ClassPrototype##Table, 0};          \
+  JSObject* ClassPrototype::self(ExecState* exec) {                            \
+    static Identifier* prototypeIdentifier =                                   \
+        new Identifier("[[" ClassName ".prototype]]");                         \
+    return KJS::cacheGlobalObject<ClassPrototype>(exec, *prototypeIdentifier); \
+  }                                                                            \
+  bool ClassPrototype::getOwnPropertySlot(                                     \
+      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) {   \
+    return getStaticFunctionSlot<ClassFunction, JSObject>(                     \
+        exec, &ClassPrototype##Table, this, propertyName, slot);               \
   }
 
 #define KJS_IMPLEMENT_PROTOTYPE_FUNCTION(ClassFunction)                    \
