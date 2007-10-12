@@ -229,7 +229,7 @@ void RenderPath::addFocusRingRects(GraphicsContext* graphicsContext,
                                             boundingBox.height()));
 }
 
-void RenderPath::absoluteRects(Vector<IntRect>& rects, int _tx, int _ty, bool) {
+void RenderPath::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
   rects.append(absoluteClippedOverflowRect());
 }
 
@@ -237,14 +237,14 @@ bool RenderPath::nodeAtPoint(const HitTestRequest& request,
                              HitTestResult& result,
                              int _x,
                              int _y,
-                             int _tx,
-                             int _ty,
+                             int,
+                             int,
                              HitTestAction hitTestAction) {
   // We only draw in the forground phase, so we only hit-test then.
   if (hitTestAction != HitTestForeground)
     return false;
 
-  IntPoint absolutePoint(_x - _tx, _y - _ty);
+  IntPoint absolutePoint(_x, _y);
 
   PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_PATH_HITTESTING,
                                  style()->svgStyle()->pointerEvents());
