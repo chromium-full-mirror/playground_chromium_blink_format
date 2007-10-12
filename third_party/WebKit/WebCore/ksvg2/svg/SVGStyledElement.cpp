@@ -35,6 +35,7 @@
 #include "SVGElementInstance.h"
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
+#include "SVGResource.h"
 #include "SVGSVGElement.h"
 #include <wtf/Assertions.h>
 
@@ -290,6 +291,11 @@ PassRefPtr<CSSValue> SVGStyledElement::getPresentationAttribute(
   if (!cssSVGAttr || !cssSVGAttr->style())
     return 0;
   return cssSVGAttr->style()->getPropertyCSSValue(name);
+}
+
+void SVGStyledElement::detach() {
+  SVGResource::removeClient(this);
+  SVGElement::detach();
 }
 }
 

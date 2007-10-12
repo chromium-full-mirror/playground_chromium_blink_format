@@ -66,6 +66,8 @@ class SVGStyledElement : public SVGElement {
   // now.
   RenderStyle* resolveStyle(RenderStyle* parentStyle);
 
+  virtual void detach();
+
  protected:
   virtual bool hasRelativeValues() const { return true; }
 

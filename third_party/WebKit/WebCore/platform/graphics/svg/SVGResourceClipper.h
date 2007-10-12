@@ -70,7 +70,7 @@ class SVGResourceClipper : public SVGResource {
 
   const ClipDataList& clipData() const;
 
-  virtual bool isClipper() const { return true; }
+  virtual SVGResourceType resourceType() const { return ClipperResourceType; }
   virtual TextStream& externalRepresentation(TextStream&) const;
 
   // To be implemented by the specific rendering devices

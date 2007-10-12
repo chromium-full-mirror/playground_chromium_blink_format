@@ -69,7 +69,9 @@ class SVGPaintServer : public SVGResource {
   SVGPaintServer();
   virtual ~SVGPaintServer();
 
-  virtual bool isPaintServer() const { return true; }
+  virtual SVGResourceType resourceType() const {
+    return PaintServerResourceType;
+  }
 
   virtual SVGPaintServerType type() const = 0;
   virtual TextStream& externalRepresentation(TextStream&) const = 0;
