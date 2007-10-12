@@ -45,7 +45,7 @@ class SVGDocument : public Document {
   void dispatchZoomEvent(float prevScale, float newScale);
   void dispatchScrollEvent();
 
-  virtual bool zoomAndPanEnabled() const;
+  bool zoomAndPanEnabled() const;
 
   void startPan(const FloatPoint& start);
   void updatePan(const FloatPoint& pos) const;

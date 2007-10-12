@@ -179,11 +179,6 @@ SVGResource* SVGMarkerElement::canvasResource() {
 RenderObject* SVGMarkerElement::createRenderer(RenderArena* arena,
                                                RenderStyle* style) {
   RenderSVGContainer* markerContainer = new (arena) RenderSVGContainer(this);
-  markerContainer->setViewBox(viewBox());
-  markerContainer->setAlign(SVGPreserveAspectRatio::SVGPreserveAspectRatioType(
-      preserveAspectRatio()->align()));
-  markerContainer->setSlice(preserveAspectRatio()->meetOrSlice() ==
-                            SVGPreserveAspectRatio::SVG_MEETORSLICE_SLICE);
   markerContainer->setDrawsContents(
       false);  // Marker contents will be explicitly drawn.
   return markerContainer;
@@ -198,14 +193,8 @@ void SVGMarkerElement::notifyAttributeChange() const {
 
   // NOTE: This is a typical case, where proper "attributeChanged" usage would
   // reduce the number of updates needed.
-  if (markerContainer) {
-    markerContainer->setViewBox(viewBox());
-    markerContainer->setAlign(
-        SVGPreserveAspectRatio::SVGPreserveAspectRatioType(
-            preserveAspectRatio()->align()));
-    markerContainer->setSlice(preserveAspectRatio()->meetOrSlice() ==
-                              SVGPreserveAspectRatio::SVG_MEETORSLICE_SLICE);
-  }
+  if (markerContainer)
+    markerContainer->setNeedsLayout(true);
 
   m_marker->invalidate();
   m_marker->repaintClients();

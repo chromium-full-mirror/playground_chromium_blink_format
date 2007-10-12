@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -99,15 +99,6 @@ class RenderSVGContainer : public RenderObject {
 
   FloatRect viewport() const;
 
-  void setViewBox(const FloatRect&);
-  FloatRect viewBox() const;
-
-  void setAlign(SVGPreserveAspectRatio::SVGPreserveAspectRatioType);
-  SVGPreserveAspectRatio::SVGPreserveAspectRatioType align() const;
-
-  void setSlice(bool);
-  bool slice() const;
-
   AffineTransform viewportTransform() const;
 
   virtual bool nodeAtPoint(const HitTestRequest&,
@@ -123,8 +114,6 @@ class RenderSVGContainer : public RenderObject {
   int calcReplacedWidth() const;
   int calcReplacedHeight() const;
 
-  AffineTransform getAspectRatio(const FloatRect& logical,
-                                 const FloatRect& physical) const;
   void applyContentTransforms(PaintInfo&);
 
   RenderObject* m_firstChild;
@@ -134,13 +123,10 @@ class RenderSVGContainer : public RenderObject {
   int m_height;
 
   bool m_drawsContents : 1;
-  bool m_slice : 1;
 
   AffineTransform m_matrix;
 
   FloatRect m_viewport;
-  FloatRect m_viewBox;
-  SVGPreserveAspectRatio::SVGPreserveAspectRatioType m_align;
   IntRect m_absoluteBounds;
 };
 

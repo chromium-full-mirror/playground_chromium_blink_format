@@ -36,7 +36,8 @@ namespace WebCore {
 class SVGAngle;
 class SVGLength;
 class SVGTransform;
-class SVGLength;
+class SVGViewSpec;
+class SVGViewElement;
 class TimeScheduler;
 class SVGSVGElement : public SVGStyledLocatableElement,
                       public SVGTests,
@@ -69,7 +70,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   bool useCurrentView() const;
   void setUseCurrentView(bool currentView);
 
-  // SVGViewSpec* currentView() const;
+  SVGViewSpec* currentView() const;
 
   float currentScale() const;
   void setCurrentScale(float scale);
@@ -122,6 +123,11 @@ class SVGSVGElement : public SVGStyledLocatableElement,
 
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
+  virtual AffineTransform viewBoxToViewTransform(float viewWidth,
+                                                 float viewHeight) const;
+
+  void inheritViewAttributes(SVGViewElement*);
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
@@ -162,6 +168,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   bool m_useCurrentView;
   TimeScheduler* m_timeScheduler;
   FloatPoint m_translation;
+  mutable SVGViewSpec* m_viewSpec;
 };
 
 }  // namespace WebCore

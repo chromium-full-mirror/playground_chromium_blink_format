@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -36,9 +36,15 @@ class SVGFitToViewBox {
   virtual ~SVGFitToViewBox();
 
   // 'SVGFitToViewBox' functions
-  void parseViewBox(const String&);
-  AffineTransform viewBoxToViewTransform(float viewWidth,
-                                         float viewHeight) const;
+  bool parseViewBox(const UChar*& start,
+                    const UChar* end,
+                    double& x,
+                    double& y,
+                    double& w,
+                    double& h,
+                    bool validate = true);
+  virtual AffineTransform viewBoxToViewTransform(float viewWidth,
+                                                 float viewHeight) const;
 
   bool parseMappedAttribute(MappedAttribute*);
 
