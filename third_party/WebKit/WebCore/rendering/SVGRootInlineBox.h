@@ -87,7 +87,17 @@ class SVGRootInlineBox : public RootInlineBox {
                         int tx,
                         int ty,
                         InlineFlowBox* start,
-                        Vector<SVGChar>::iterator& it);
+                        Vector<SVGChar>::iterator&);
+  void paintChildInlineTextBox(RenderObject::PaintInfo&,
+                               int tx,
+                               int ty,
+                               InlineTextBox*,
+                               Vector<SVGChar>::iterator&);
+  void paintChildInlineFlowBox(RenderObject::PaintInfo&,
+                               int tx,
+                               int ty,
+                               InlineFlowBox*,
+                               Vector<SVGChar>::iterator&);
   void paintCharacterRangeForTextBox(RenderObject::PaintInfo& paintInfo,
                                      int tx,
                                      int ty,
