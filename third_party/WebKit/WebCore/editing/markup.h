@@ -48,16 +48,13 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(Document*,
 PassRefPtr<DocumentFragment> createFragmentFromNodes(Document*,
                                                      const Vector<Node*>&);
 
-DeprecatedString createMarkup(
-    const Range*,
-    Vector<Node*>* = 0,
-    EAnnotateForInterchange = DoNotAnnotateForInterchange,
-    bool convertBlocksToInlines = false);
-DeprecatedString createMarkup(
-    const Node*,
-    EChildrenOnly = IncludeNode,
-    Vector<Node*>* = 0,
-    EAnnotateForInterchange = DoNotAnnotateForInterchange);
+String createMarkup(const Range*,
+                    Vector<Node*>* = 0,
+                    EAnnotateForInterchange = DoNotAnnotateForInterchange,
+                    bool convertBlocksToInlines = false);
+String createMarkup(const Node*,
+                    EChildrenOnly = IncludeNode,
+                    Vector<Node*>* = 0);
 }
 
 #endif  // markup_h
