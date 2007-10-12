@@ -38,10 +38,7 @@ namespace WebCore {
 
 RenderSVGTSpan::RenderSVGTSpan(Node* n) : RenderSVGInline(n) {}
 
-void RenderSVGTSpan::absoluteRects(Vector<IntRect>& rects,
-                                   int tx,
-                                   int ty,
-                                   bool) {
+void RenderSVGTSpan::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
   InlineRunBox* firstBox = firstLineBox();
 
   SVGRootInlineBox* rootBox =
