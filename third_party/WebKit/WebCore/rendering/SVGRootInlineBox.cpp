@@ -274,7 +274,7 @@ struct SVGRootInlineBoxPaintWalker {
 
     int textDecorations = styleToUse->textDecorationsInEffect();
 
-    int textWidth = 0.0f;
+    int textWidth = 0;
     IntPoint decorationOrigin;
     SVGTextDecorationInfo info;
 
@@ -446,7 +446,8 @@ TextStyle svgTextStyleForInlineTextBox(RenderStyle* style,
   ASSERT(textBox);
   ASSERT(style);
 
-  return TextStyle(false, xPos, textBox->toAdd(), textBox->m_reversed,
+  return TextStyle(false, static_cast<int>(xPos), textBox->toAdd(),
+                   textBox->m_reversed,
                    textBox->m_dirOverride || style->visuallyOrdered());
 }
 
@@ -573,9 +574,9 @@ static void applyTextAnchorToTextChunk(SVGTextChunk& chunk) {
 
     // Move target box
     if (chunk.isVerticalText)
-      curBox->setYPos(curBox->yPos() + shift);
+      curBox->setYPos(curBox->yPos() + static_cast<int>(shift));
     else
-      curBox->setXPos(curBox->xPos() + shift);
+      curBox->setXPos(curBox->xPos() + static_cast<int>(shift));
   }
 }
 
