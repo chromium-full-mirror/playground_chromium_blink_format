@@ -135,12 +135,14 @@ SVGFESpecularLighting* SVGFESpecularLightingElement::filterEffect(
   SVGFESpecularLightingElement* nonConstThis =
       const_cast<SVGFESpecularLightingElement*>(this);
 
-  RenderStyle* parentStyle = 0;
-  if (!renderer())
-    parentStyle = nonConstThis->styleForRenderer(parent()->renderer());
-
+  RenderStyle* parentStyle =
+      nonConstThis->styleForRenderer(parent()->renderer());
   RenderStyle* filterStyle = nonConstThis->resolveStyle(parentStyle);
+
   m_filterEffect->setLightingColor(filterStyle->svgStyle()->lightingColor());
+
+  parentStyle->deref(document()->renderArena());
+  filterStyle->deref(document()->renderArena());
 
   setStandardAttributes(m_filterEffect);
 

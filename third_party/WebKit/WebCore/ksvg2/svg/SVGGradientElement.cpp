@@ -150,8 +150,7 @@ Vector<SVGGradientStop> SVGGradientElement::buildStops() const {
       stops.append(makeGradientStop(
           stopOffset,
           makeRGBA(c.red(), c.green(), c.blue(), int(opacity * 255.))));
-      if (!stop->renderer())
-        stopStyle->deref(document()->renderArena());
+      stopStyle->deref(document()->renderArena());
     }
   }
 
