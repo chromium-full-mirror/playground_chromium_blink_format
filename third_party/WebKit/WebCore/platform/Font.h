@@ -4,7 +4,7 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2006 Apple Computer, Inc.
+ * Copyright (C) 2003, 2006, 2007 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -41,6 +41,7 @@ class FloatRect;
 class FontData;
 class FontFallbackList;
 class FontPlatformData;
+class FontSelector;
 class GlyphBuffer;
 class GlyphPageTreeNode;
 class GraphicsContext;
@@ -81,16 +82,7 @@ class Font {
   Font(const Font&);
   Font& operator=(const Font&);
 
-  bool operator==(const Font& other) const {
-    // Our FontData doesn't have to be checked, since checking the font
-    // description will be fine.
-    // FIXME: This does not work if the font was made with the FontPlatformData
-    // constructor.
-    return m_fontDescription == other.m_fontDescription &&
-           m_letterSpacing == other.m_letterSpacing &&
-           m_wordSpacing == other.m_wordSpacing;
-  }
-
+  bool operator==(const Font& other) const;
   bool operator!=(const Font& other) const { return !(*this == other); }
 
   const FontDescription& fontDescription() const { return m_fontDescription; }
@@ -98,7 +90,7 @@ class Font {
   int pixelSize() const { return fontDescription().computedPixelSize(); }
   float size() const { return fontDescription().computedSize(); }
 
-  void update() const;
+  void update(PassRefPtr<FontSelector>) const;
 
   void drawText(GraphicsContext*,
                 const TextRun&,

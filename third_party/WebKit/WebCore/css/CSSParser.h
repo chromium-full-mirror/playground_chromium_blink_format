@@ -172,6 +172,8 @@ class CSSParser {
 
   static bool parseColor(const String&, RGBA32& rgb, bool strict);
 
+  bool parseFontFaceSrc();
+
 #if ENABLE(SVG)
   bool parseSVGValue(int propId, bool important);
   CSSValue* parseSVGPaint();
@@ -202,6 +204,7 @@ class CSSParser {
   CSSRule* createMediaRule(MediaList*, CSSRuleList*);
   CSSRuleList* createRuleList();
   CSSRule* createStyleRule(CSSSelector*);
+  CSSRule* createFontFaceRule();
 
   MediaQueryExp* createFloatingMediaQueryExp(const AtomicString&, ValueList*);
   MediaQueryExp* sinkFloatingMediaQueryExp(MediaQueryExp*);

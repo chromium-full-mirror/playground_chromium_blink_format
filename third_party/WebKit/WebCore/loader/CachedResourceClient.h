@@ -36,6 +36,7 @@ class XBLDocument;
 
 namespace WebCore {
 
+class CachedFont;
 class CachedResource;
 class CachedImage;
 class String;
@@ -72,6 +73,8 @@ class CachedResourceClient {
                                 const String& /*sheet*/) {}
   virtual void setXSLStyleSheet(const String& /*URL*/,
                                 const String& /*sheet*/) {}
+
+  virtual void fontLoaded(CachedFont*){};
 
 #if ENABLE(XBL)
   virtual void setXBLDocument(const String& /*URL*/, XBL::XBLDocument*) {}

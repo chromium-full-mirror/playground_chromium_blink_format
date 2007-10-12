@@ -22,11 +22,13 @@
 #include "RenderTextControl.h"
 
 #include "CharacterNames.h"
+#include "CSSStyleSelector.h"
 #include "Document.h"
 #include "Editor.h"
 #include "EditorClient.h"
 #include "Event.h"
 #include "EventNames.h"
+#include "FontSelector.h"
 #include "Frame.h"
 #include "HTMLBRElement.h"
 #include "HTMLInputElement.h"
@@ -1267,6 +1269,10 @@ bool RenderTextControl::isScrollable() const {
   if (m_innerText && m_innerText->renderer()->isScrollable())
     return true;
   return RenderObject::isScrollable();
+}
+
+FontSelector* RenderTextControl::fontSelector() const {
+  return document()->styleSelector()->fontSelector();
 }
 
 }  // namespace WebCore

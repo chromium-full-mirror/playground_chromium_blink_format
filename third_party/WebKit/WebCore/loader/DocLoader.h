@@ -35,6 +35,7 @@
 namespace WebCore {
 
 class CachedCSSStyleSheet;
+class CachedFont;
 class CachedImage;
 class CachedScript;
 class CachedXSLStyleSheet;
@@ -60,6 +61,7 @@ class DocLoader {
   CachedCSSStyleSheet* requestUserCSSStyleSheet(const String& url,
                                                 const String& charset);
   CachedScript* requestScript(const String& url, const String& charset);
+  CachedFont* requestFont(const String& url);
 
 #if ENABLE(XSLT)
   CachedXSLStyleSheet* requestXSLStyleSheet(const String& url);

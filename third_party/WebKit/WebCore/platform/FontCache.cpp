@@ -32,6 +32,7 @@
 #include "Font.h"
 #include "FontFallbackList.h"
 #include "FontPlatformData.h"
+#include "FontSelector.h"
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 
@@ -218,7 +219,9 @@ FontData* FontCache::getCachedFontData(const FontPlatformData* platformData) {
   return result;
 }
 
-const FontData* FontCache::getFontData(const Font& font, int& familyIndex) {
+const FontData* FontCache::getFontData(const Font& font,
+                                       int& familyIndex,
+                                       FontSelector* fontSelector) {
   FontPlatformData* result = 0;
 
   int startIndex = familyIndex;
@@ -228,9 +231,16 @@ const FontData* FontCache::getFontData(const Font& font, int& familyIndex) {
   const FontFamily* currFamily = startFamily;
   while (currFamily && !result) {
     familyIndex++;
-    if (currFamily->family().length())
+    if (currFamily->family().length()) {
+      if (fontSelector) {
+        FontData* data = fontSelector->getFontData(font.fontDescription(),
+                                                   currFamily->family());
+        if (data)
+          return data;
+      }
       result = getCachedFontPlatformData(font.fontDescription(),
                                          currFamily->family());
+    }
     currFamily = currFamily->next();
   }
 
@@ -250,7 +260,7 @@ const FontData* FontCache::getFontData(const Font& font, int& familyIndex) {
     // We only do the last resort fallback
     // when trying to find the primary font.  Otherwise our fallback will rely
     // on the actual characters used.
-    result = getLastResortFallbackFont(font);
+    result = getLastResortFallbackFont(font.fontDescription());
 
   // Now that we have a result, we need to go from FontPlatformData -> FontData.
   return getCachedFontData(result);

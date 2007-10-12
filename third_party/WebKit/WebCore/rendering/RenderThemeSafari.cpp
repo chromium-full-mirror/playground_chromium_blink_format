@@ -340,7 +340,7 @@ void RenderThemeSafari::setFontFromControlSize(
   style->setLineHeight(RenderStyle::initialLineHeight());
 
   if (style->setFontDescription(fontDescription))
-    style->font().update();
+    style->font().update(selector->fontSelector());
 }
 
 NSControlSize RenderThemeSafari::controlSizeForSystemFont(

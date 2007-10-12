@@ -27,6 +27,9 @@
 
 #include "CSSBorderImageValue.h"
 #include "CSSCursorImageValue.h"
+#include "CSSFontFace.h"
+#include "CSSFontFaceSource.h"
+#include "CSSFontFaceRule.h"
 #include "CSSImageValue.h"
 #include "CSSImportRule.h"
 #include "CSSMediaRule.h"
@@ -184,7 +187,9 @@ class CSSRuleSet {
 
   typedef HashMap<AtomicStringImpl*, CSSRuleDataList*> AtomRuleMap;
 
-  void addRulesFromSheet(CSSStyleSheet* sheet, MediaQueryEvaluator* medium);
+  void addRulesFromSheet(CSSStyleSheet*,
+                         MediaQueryEvaluator*,
+                         CSSStyleSelector* = 0);
 
   void addRule(CSSStyleRule* rule, CSSSelector* sel);
   void addToRuleSet(AtomicStringImpl* key,
@@ -208,7 +213,6 @@ class CSSRuleSet {
   AtomRuleMap m_classRules;
   AtomRuleMap m_tagRules;
   CSSRuleDataList* m_universalRules;
-
   unsigned m_ruleCount;
 };
 
@@ -275,7 +279,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
     m_userSheet->parseString(userStyleSheet, strictParsing);
 
     m_userStyle = new CSSRuleSet();
-    m_userStyle->addRulesFromSheet(m_userSheet.get(), m_medium);
+    m_userStyle->addRulesFromSheet(m_userSheet.get(), m_medium, this);
   }
 
   // add stylesheets from document
@@ -285,33 +289,12 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
   for (; it.current(); ++it)
     if (it.current()->isCSSStyleSheet() && !it.current()->disabled())
       m_authorStyle->addRulesFromSheet(
-          static_cast<CSSStyleSheet*>(it.current()), m_medium);
-}
+          static_cast<CSSStyleSheet*>(it.current()), m_medium, this);
 
-CSSStyleSelector::CSSStyleSelector(CSSStyleSheet* sheet) {
-  init();
-
-  if (!defaultStyle)
-    loadDefaultStyle();
-  FrameView* view = sheet->doc()->view();
-
-  if (view)
-    m_medium = new MediaQueryEvaluator(view->mediaType());
-  else
-    m_medium = new MediaQueryEvaluator("all");
-
-  Element* root = sheet->doc()->documentElement();
-  if (root)
-    m_rootDefaultStyle = styleForElement(root, 0, false, true);
-
-  if (m_rootDefaultStyle && view) {
-    delete m_medium;
-    m_medium = new MediaQueryEvaluator(view->mediaType(), view->frame()->page(),
-                                       m_rootDefaultStyle);
-  }
-
-  m_authorStyle = new CSSRuleSet();
-  m_authorStyle->addRulesFromSheet(sheet, m_medium);
+  // Just delete our font selector if we end up with nothing but invalid
+  // @font-face rules.
+  if (m_fontSelector && m_fontSelector->isEmpty())
+    m_fontSelector = 0;
 }
 
 void CSSStyleSelector::init() {
@@ -823,7 +806,7 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
       styleNotYetAvailable = ::new RenderStyle;
       styleNotYetAvailable->ref();
       styleNotYetAvailable->setDisplay(NONE);
-      styleNotYetAvailable->font().update();
+      styleNotYetAvailable->font().update(m_fontSelector);
     }
     styleNotYetAvailable->ref();
     e->document()->setHasNodesWithPlaceholderStyle();
@@ -1248,7 +1231,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
 void CSSStyleSelector::updateFont() {
   checkForTextSizeAdjust();
   checkForGenericFamilyChange(style, parentStyle);
-  style->font().update();
+  style->font().update(m_fontSelector);
   fontDirty = false;
 }
 
@@ -1785,7 +1768,8 @@ void CSSRuleSet::addRule(CSSStyleRule* rule, CSSSelector* sel) {
 }
 
 void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
-                                   MediaQueryEvaluator* medium) {
+                                   MediaQueryEvaluator* medium,
+                                   CSSStyleSelector* styleSelector) {
   if (!sheet || !sheet->isCSSStyleSheet())
     return;
 
@@ -1805,7 +1789,7 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
     } else if (item->isImportRule()) {
       CSSImportRule* import = static_cast<CSSImportRule*>(item);
       if (!import->media() || medium->eval(import->media()))
-        addRulesFromSheet(import->styleSheet(), medium);
+        addRulesFromSheet(import->styleSheet(), medium, styleSelector);
     } else if (item->isMediaRule()) {
       CSSMediaRule* r = static_cast<CSSMediaRule*>(item);
       CSSRuleList* rules = r->cssRules();
@@ -1819,9 +1803,18 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
             CSSStyleRule* rule = static_cast<CSSStyleRule*>(childItem);
             for (CSSSelector* s = rule->selector(); s; s = s->next())
               addRule(rule, s);
+          } else if (item->isFontFaceRule() && styleSelector) {
+            // Add this font face to our set.
+            const CSSFontFaceRule* fontFaceRule =
+                static_cast<CSSFontFaceRule*>(item);
+            styleSelector->ensureFontSelector()->addFontFaceRule(fontFaceRule);
           }
         }  // for rules
       }    // if rules
+    } else if (item->isFontFaceRule() && styleSelector) {
+      // Add this font face to our set.
+      const CSSFontFaceRule* fontFaceRule = static_cast<CSSFontFaceRule*>(item);
+      styleSelector->ensureFontSelector()->addFontFaceRule(fontFaceRule);
     }
   }
 }
@@ -3615,24 +3608,29 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
               face = settings->standardFontFamily();
               break;
             case CSS_VAL_SERIF:
-              face = settings->serifFontFamily();
+              face = m_fontSelector ? "-webkit-serif"
+                                    : settings->serifFontFamily();
               fontDescription.setGenericFamily(FontDescription::SerifFamily);
               break;
             case CSS_VAL_SANS_SERIF:
-              face = settings->sansSerifFontFamily();
+              face = m_fontSelector ? "-webkit-sans-serif"
+                                    : settings->sansSerifFontFamily();
               fontDescription.setGenericFamily(
                   FontDescription::SansSerifFamily);
               break;
             case CSS_VAL_CURSIVE:
-              face = settings->cursiveFontFamily();
+              face = m_fontSelector ? "-webkit-cursive"
+                                    : settings->cursiveFontFamily();
               fontDescription.setGenericFamily(FontDescription::CursiveFamily);
               break;
             case CSS_VAL_FANTASY:
-              face = settings->fantasyFontFamily();
+              face = m_fontSelector ? "-webkit-fantasy"
+                                    : settings->fantasyFontFamily();
               fontDescription.setGenericFamily(FontDescription::FantasyFamily);
               break;
             case CSS_VAL_MONOSPACE:
-              face = settings->fixedFontFamily();
+              face = m_fontSelector ? "-webkit-monospace"
+                                    : settings->fixedFontFamily();
               fontDescription.setGenericFamily(
                   FontDescription::MonospaceFamily);
               break;
@@ -3854,6 +3852,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         applyProperty(CSS_PROP_FONT_SIZE, font->size.get());
 
         m_lineHeightValue = font->lineHeight.get();
+
         applyProperty(CSS_PROP_FONT_FAMILY, font->family.get());
       }
       return;
@@ -4151,6 +4150,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         default:
           return;
       }
+      return;
+    case CSS_PROP_SRC:  // Only used in @font-face rules.
       return;
     case CSS_PROP__WEBKIT_BOX_DIRECTION:
       HANDLE_INHERIT_AND_INITIAL(boxDirection, BoxDirection)
@@ -5271,6 +5272,12 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
 
 bool CSSStyleSelector::hasSelectorForAttribute(const AtomicString& attrname) {
   return m_selectorAttrs.contains(attrname.impl());
+}
+
+CSSFontSelector* CSSStyleSelector::ensureFontSelector() {
+  if (!m_fontSelector.get())
+    m_fontSelector = new CSSFontSelector(m_document);
+  return m_fontSelector.get();
 }
 
 }  // namespace WebCore

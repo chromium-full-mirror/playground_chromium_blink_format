@@ -32,9 +32,17 @@ CSSFontFaceRule::CSSFontFaceRule(StyleBase* parent) : CSSRule(parent) {}
 
 CSSFontFaceRule::~CSSFontFaceRule() {}
 
+void CSSFontFaceRule::setDeclaration(
+    PassRefPtr<CSSMutableStyleDeclaration> style) {
+  m_style = style;
+}
+
 String CSSFontFaceRule::cssText() const {
-  // FIXME: Implement!
-  return String();
+  String result("@font-face");
+  result += " { ";
+  result += m_style->cssText();
+  result += "}";
+  return result;
 }
 
 }  // namespace WebCore

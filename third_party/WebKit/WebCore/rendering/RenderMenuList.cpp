@@ -23,7 +23,9 @@
 #include "config.h"
 #include "RenderMenuList.h"
 
+#include "CSSStyleSelector.h"
 #include "Document.h"
+#include "FontSelector.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "HTMLNames.h"
@@ -386,5 +388,9 @@ bool RenderMenuList::itemIsSelected(unsigned listIndex) const {
 void RenderMenuList::setTextFromItem(unsigned listIndex) {
   HTMLSelectElement* select = static_cast<HTMLSelectElement*>(node());
   setTextFromOption(select->listToOptionIndex(listIndex));
+}
+
+FontSelector* RenderMenuList::fontSelector() const {
+  return document()->styleSelector()->fontSelector();
 }
 }

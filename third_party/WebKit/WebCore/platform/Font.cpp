@@ -373,6 +373,24 @@ Font& Font::operator=(const Font& other) {
 
 Font::~Font() {}
 
+bool Font::operator==(const Font& other) const {
+  // Our FontData don't have to be checked, since checking the font description
+  // will be fine.
+  // FIXME: This does not work if the font was made with the FontPlatformData
+  // constructor.
+  if ((m_fontList && m_fontList->loadingCustomFonts()) ||
+      (other.m_fontList && other.m_fontList->loadingCustomFonts()))
+    return false;
+
+  FontSelector* first = m_fontList ? m_fontList->fontSelector() : 0;
+  FontSelector* second =
+      other.m_fontList ? other.m_fontList->fontSelector() : 0;
+
+  return first == second && m_fontDescription == other.m_fontDescription &&
+         m_letterSpacing == other.m_letterSpacing &&
+         m_wordSpacing == other.m_wordSpacing;
+}
+
 // FIXME: It is unfortunate that this function needs to be passed the original
 // cluster.
 // It is only required for the platform's FontCache::getFontDataForCharacters(),
@@ -521,7 +539,7 @@ const FontData* Font::fontDataForCharacters(const UChar* characters,
   return m_fontList->fontDataForCharacters(this, characters, length);
 }
 
-void Font::update() const {
+void Font::update(PassRefPtr<FontSelector> fontSelector) const {
   // FIXME: It is pretty crazy that we are willing to just poke into a RefPtr,
   // but it ends up
   // being reasonably safe (because inherited fonts in the render tree pick up
@@ -532,8 +550,8 @@ void Font::update() const {
   // pretty disgusting,
   // and could eventually be rectified by using RefPtrs for Fonts themselves.
   if (!m_fontList)
-    m_fontList = new FontFallbackList;
-  m_fontList->invalidate();
+    m_fontList = new FontFallbackList();
+  m_fontList->invalidate(fontSelector);
   m_pageZero = 0;
   m_pages.clear();
 }
@@ -721,6 +739,11 @@ void Font::drawText(GraphicsContext* context,
                     const FloatPoint& point,
                     int from,
                     int to) const {
+  // Don't draw anything while we are using custom fonts that are in the process
+  // of loading.
+  if (m_fontList && m_fontList->loadingCustomFonts())
+    return;
+
   to = (to == -1 ? run.length() : to);
   if (canUseGlyphCache(run))
     drawSimpleText(context, run, style, point, from, to);

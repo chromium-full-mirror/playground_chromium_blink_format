@@ -1611,6 +1611,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSS_PROP_SCROLLBAR_HIGHLIGHT_COLOR:
     case CSS_PROP_SCROLLBAR_SHADOW_COLOR:
     case CSS_PROP_SCROLLBAR_TRACK_COLOR:
+    case CSS_PROP_SRC:  // Only used in @font-face rules.
     case CSS_PROP_SIZE:
     case CSS_PROP_TEXT_LINE_THROUGH:
     case CSS_PROP_TEXT_LINE_THROUGH_COLOR:
