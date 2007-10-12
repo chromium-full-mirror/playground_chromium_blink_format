@@ -229,10 +229,10 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
         ts << s << *strokePaintServer;
 
       double dashOffset = SVGRenderStyle::cssPrimitiveToLength(
-          &path, svgStyle->strokeDashOffset(), 0.0);
+          &path, svgStyle->strokeDashOffset(), 0.0f);
       const DashArray& dashArray = dashArrayFromRenderingStyle(style);
       double strokeWidth = SVGRenderStyle::cssPrimitiveToLength(
-          &path, svgStyle->strokeWidth(), 1.0);
+          &path, svgStyle->strokeWidth(), 1.0f);
 
       if (svgStyle->strokeOpacity() != 1.0f)
         ts << s << "[opacity=" << svgStyle->strokeOpacity() << "]";

@@ -55,8 +55,8 @@ JSValue* JSSVGMatrix::inverse(ExecState* exec, const List&) {
 JSValue* JSSVGMatrix::translate(ExecState* exec, const List& args) {
   AffineTransform imp(*impl());
 
-  float x = args[0]->toNumber(exec);
-  float y = args[1]->toNumber(exec);
+  float x = args[0]->toFloat(exec);
+  float y = args[1]->toFloat(exec);
 
   return toJS(exec, new JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>(
                         imp.translate(x, y)),
@@ -66,7 +66,7 @@ JSValue* JSSVGMatrix::translate(ExecState* exec, const List& args) {
 JSValue* JSSVGMatrix::scale(ExecState* exec, const List& args) {
   AffineTransform imp(*impl());
 
-  float scaleFactor = args[0]->toNumber(exec);
+  float scaleFactor = args[0]->toFloat(exec);
   return toJS(exec, new JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>(
                         imp.scale(scaleFactor)),
               m_context.get());
@@ -75,8 +75,8 @@ JSValue* JSSVGMatrix::scale(ExecState* exec, const List& args) {
 JSValue* JSSVGMatrix::scaleNonUniform(ExecState* exec, const List& args) {
   AffineTransform imp(*impl());
 
-  float scaleFactorX = args[0]->toNumber(exec);
-  float scaleFactorY = args[1]->toNumber(exec);
+  float scaleFactorX = args[0]->toFloat(exec);
+  float scaleFactorY = args[1]->toFloat(exec);
 
   return toJS(exec, new JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>(
                         imp.scaleNonUniform(scaleFactorX, scaleFactorY)),
@@ -86,7 +86,7 @@ JSValue* JSSVGMatrix::scaleNonUniform(ExecState* exec, const List& args) {
 JSValue* JSSVGMatrix::rotate(ExecState* exec, const List& args) {
   AffineTransform imp(*impl());
 
-  float angle = args[0]->toNumber(exec);
+  float angle = args[0]->toFloat(exec);
   return toJS(exec, new JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>(
                         imp.rotate(angle)),
               m_context.get());
@@ -126,7 +126,7 @@ JSValue* JSSVGMatrix::flipY(ExecState* exec, const List&) {
 JSValue* JSSVGMatrix::skewX(ExecState* exec, const List& args) {
   AffineTransform imp(*impl());
 
-  float angle = args[0]->toNumber(exec);
+  float angle = args[0]->toFloat(exec);
   return toJS(exec, new JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>(
                         imp.skewX(angle)),
               m_context.get());
@@ -135,7 +135,7 @@ JSValue* JSSVGMatrix::skewX(ExecState* exec, const List& args) {
 JSValue* JSSVGMatrix::skewY(ExecState* exec, const List& args) {
   AffineTransform imp(*impl());
 
-  float angle = args[0]->toNumber(exec);
+  float angle = args[0]->toFloat(exec);
   return toJS(exec, new JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>(
                         imp.skewY(angle)),
               m_context.get());

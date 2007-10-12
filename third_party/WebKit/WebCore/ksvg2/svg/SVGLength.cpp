@@ -232,7 +232,7 @@ bool SVGLength::setValueAsString(const String& s) {
   if (s.isEmpty())
     return false;
 
-  double convertedNumber = 0;
+  float convertedNumber = 0.0f;
   const UChar* ptr = s.characters();
   const UChar* end = ptr + s.length();
 
@@ -240,7 +240,7 @@ bool SVGLength::setValueAsString(const String& s) {
     return false;
 
   m_unit = storeUnit(extractMode(m_unit), stringToLengthType(s));
-  m_valueInSpecifiedUnits = narrowPrecisionToFloat(convertedNumber);
+  m_valueInSpecifiedUnits = convertedNumber;
   return true;
 }
 
@@ -269,7 +269,7 @@ float SVGLength::PercentageOfViewport(float value,
                                       SVGLengthMode mode) {
   ASSERT(context);
 
-  float width = 0, height = 0;
+  float width = 0.0f, height = 0.0f;
   SVGElement* viewportElement = context->viewportElement();
 
   Document* doc = context->document();

@@ -29,14 +29,14 @@
 
 namespace WebCore {
 
-SVGNumberList::SVGNumberList() : SVGList<double>() {}
+SVGNumberList::SVGNumberList() : SVGList<float>() {}
 
 SVGNumberList::~SVGNumberList() {}
 
 void SVGNumberList::parse(const String& value) {
   ExceptionCode ec = 0;
 
-  double number = 0;
+  float number = 0.0f;
 
   const UChar* ptr = value.characters();
   const UChar* end = ptr + value.length();

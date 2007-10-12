@@ -38,10 +38,10 @@ class SVGFitToViewBox {
   // 'SVGFitToViewBox' functions
   bool parseViewBox(const UChar*& start,
                     const UChar* end,
-                    double& x,
-                    double& y,
-                    double& w,
-                    double& h,
+                    float& x,
+                    float& y,
+                    float& w,
+                    float& h,
                     bool validate = true);
   virtual AffineTransform viewBoxToViewTransform(float viewWidth,
                                                  float viewHeight) const;

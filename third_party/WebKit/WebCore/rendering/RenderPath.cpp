@@ -431,7 +431,7 @@ FloatRect RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
     return FloatRect();
 
   double strokeWidth =
-      SVGRenderStyle::cssPrimitiveToLength(this, svgStyle->strokeWidth(), 1.0);
+      SVGRenderStyle::cssPrimitiveToLength(this, svgStyle->strokeWidth(), 1.0f);
   DrawMarkersData data(context, startMarker, midMarker, strokeWidth);
 
   path.apply(&data, drawStartAndMidMarkers);

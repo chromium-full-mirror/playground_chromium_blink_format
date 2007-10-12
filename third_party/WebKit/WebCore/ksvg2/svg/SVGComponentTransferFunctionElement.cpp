@@ -37,11 +37,11 @@ SVGComponentTransferFunctionElement::SVGComponentTransferFunctionElement(
     : SVGElement(tagName, doc),
       m_type(SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN),
       m_tableValues(new SVGNumberList),
-      m_slope(1.0),
-      m_intercept(0.0),
-      m_amplitude(1.0),
-      m_exponent(1.0),
-      m_offset(0.0) {}
+      m_slope(1.0f),
+      m_intercept(0.0f),
+      m_amplitude(1.0f),
+      m_exponent(1.0f),
+      m_offset(0.0f) {}
 
 SVGComponentTransferFunctionElement::~SVGComponentTransferFunctionElement() {}
 
@@ -119,15 +119,15 @@ void SVGComponentTransferFunctionElement::parseMappedAttribute(
   } else if (attr->name() == SVGNames::tableValuesAttr)
     tableValuesBaseValue()->parse(value);
   else if (attr->name() == SVGNames::slopeAttr)
-    setSlopeBaseValue(value.toDouble());
+    setSlopeBaseValue(value.toFloat());
   else if (attr->name() == SVGNames::interceptAttr)
-    setInterceptBaseValue(value.toDouble());
+    setInterceptBaseValue(value.toFloat());
   else if (attr->name() == SVGNames::amplitudeAttr)
-    setAmplitudeBaseValue(value.toDouble());
+    setAmplitudeBaseValue(value.toFloat());
   else if (attr->name() == SVGNames::exponentAttr)
-    setExponentBaseValue(value.toDouble());
+    setExponentBaseValue(value.toFloat());
   else if (attr->name() == SVGNames::offsetAttr)
-    setOffsetBaseValue(value.toDouble());
+    setOffsetBaseValue(value.toFloat());
   else
     SVGElement::parseMappedAttribute(attr);
 }

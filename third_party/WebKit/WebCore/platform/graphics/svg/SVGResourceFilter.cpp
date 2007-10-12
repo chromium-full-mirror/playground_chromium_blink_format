@@ -49,8 +49,8 @@ FloatRect SVGResourceFilter::filterBBoxForItemBBox(
     const FloatRect& itemBBox) const {
   FloatRect filterBBox = filterRect();
 
-  float xOffset = 0.0;
-  float yOffset = 0.0;
+  float xOffset = 0.0f;
+  float yOffset = 0.0f;
 
   if (!effectBoundingBoxMode()) {
     xOffset = itemBBox.x();

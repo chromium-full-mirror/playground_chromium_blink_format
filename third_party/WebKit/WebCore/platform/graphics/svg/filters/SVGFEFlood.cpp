@@ -30,7 +30,7 @@
 namespace WebCore {
 
 SVGFEFlood::SVGFEFlood(SVGResourceFilter* filter)
-    : SVGFilterEffect(filter), m_floodColor(), m_floodOpacity(0.0) {}
+    : SVGFilterEffect(filter), m_floodColor(), m_floodOpacity(0.0f) {}
 
 Color SVGFEFlood::floodColor() const {
   return m_floodColor;

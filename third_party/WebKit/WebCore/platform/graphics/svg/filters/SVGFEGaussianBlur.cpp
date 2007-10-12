@@ -30,7 +30,7 @@
 namespace WebCore {
 
 SVGFEGaussianBlur::SVGFEGaussianBlur(SVGResourceFilter* filter)
-    : SVGFilterEffect(filter), m_x(0.0), m_y(0.0) {}
+    : SVGFilterEffect(filter), m_x(0.0f), m_y(0.0f) {}
 
 float SVGFEGaussianBlur::stdDeviationX() const {
   return m_x;

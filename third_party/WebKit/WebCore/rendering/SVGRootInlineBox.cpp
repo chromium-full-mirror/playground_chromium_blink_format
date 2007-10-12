@@ -274,7 +274,7 @@ struct SVGRootInlineBoxPaintWalker {
 
     int textDecorations = styleToUse->textDecorationsInEffect();
 
-    int textWidth = 0.0;
+    int textWidth = 0.0f;
     IntPoint decorationOrigin;
     SVGTextDecorationInfo info;
 
@@ -309,12 +309,12 @@ struct SVGRootInlineBoxPaintWalker {
         info = m_rootBox->retrievePaintServersForTextDecoration(text);
       }
 
-      if (textDecorations & UNDERLINE && textWidth != 0.0)
+      if (textDecorations & UNDERLINE && textWidth != 0.0f)
         textBox->paintDecoration(UNDERLINE, m_paintInfo.context,
                                  decorationOrigin.x(), decorationOrigin.y(),
                                  textWidth, *it, info);
 
-      if (textDecorations & OVERLINE && textWidth != 0.0)
+      if (textDecorations & OVERLINE && textWidth != 0.0f)
         textBox->paintDecoration(OVERLINE, m_paintInfo.context,
                                  decorationOrigin.x(), decorationOrigin.y(),
                                  textWidth, *it, info);
@@ -324,7 +324,7 @@ struct SVGRootInlineBoxPaintWalker {
                                stringLength);
 
       // Paint decorations, that have to be drawn afterwards
-      if (textDecorations & LINE_THROUGH && textWidth != 0.0)
+      if (textDecorations & LINE_THROUGH && textWidth != 0.0f)
         textBox->paintDecoration(LINE_THROUGH, m_paintInfo.context,
                                  decorationOrigin.x(), decorationOrigin.y(),
                                  textWidth, *it, info);
@@ -452,7 +452,7 @@ TextStyle svgTextStyleForInlineTextBox(RenderStyle* style,
 
 static float cummulatedWidthOrHeightOfTextChunk(SVGTextChunk& chunk,
                                                 bool calcWidthOnly) {
-  float length = 0.0;
+  float length = 0.0f;
   Vector<SVGChar>::iterator charIt = chunk.start;
 
   Vector<SVGInlineBoxCharacterRange>::iterator it = chunk.boxes.begin();
@@ -536,7 +536,7 @@ static void applyTextAnchorToTextChunk(SVGTextChunk& chunk) {
   if (chunk.anchor == TA_START)
     return;
 
-  float shift = 0.0;
+  float shift = 0.0f;
 
   if (chunk.isVerticalText)
     shift = cummulatedHeightOfTextChunk(chunk);
@@ -544,9 +544,9 @@ static void applyTextAnchorToTextChunk(SVGTextChunk& chunk) {
     shift = cummulatedWidthOfTextChunk(chunk);
 
   if (chunk.anchor == TA_MIDDLE)
-    shift *= -0.5;
+    shift *= -0.5f;
   else
-    shift *= -1.0;
+    shift *= -1.0f;
 
   // Apply correction to chunk
   Vector<SVGChar>::iterator chunkIt = chunk.start;
@@ -732,7 +732,7 @@ void SVGRootInlineBox::buildLayoutInformation(InlineFlowBox* start,
       } else if (!isAnchor) {
         info.setInPathLayout(true);
 
-        float textAnchorStartOffset = 0.0;
+        float textAnchorStartOffset = 0.0f;
         bool isVerticalText =
             isVerticalWritingMode(flowBox->object()->style()->svgStyle());
 
@@ -742,13 +742,13 @@ void SVGRootInlineBox::buildLayoutInformation(InlineFlowBox* start,
         switch (anchor) {
           case TA_END:
           case TA_MIDDLE: {
-            float totalAdvance = 0.0;
+            float totalAdvance = 0.0f;
             totalAdvanceOfInlineBox(flowBox, isVerticalText, totalAdvance);
 
             if (anchor == TA_END)
               textAnchorStartOffset -= totalAdvance;
             else
-              textAnchorStartOffset -= totalAdvance / 2.0;
+              textAnchorStartOffset -= totalAdvance / 2.0f;
           }
           case TA_START:
             break;
@@ -901,8 +901,8 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
     svgChar.drawnSeperated = false;
     svgChar.newTextChunk = false;
 
-    float glyphWidth = 0.0;
-    float glyphHeight = 0.0;
+    float glyphWidth = 0.0f;
+    float glyphHeight = 0.0f;
 
     if (!textBox->m_reversed) {
       glyphWidth = svgTextBox->calculateGlyphWidth(style, textBox->start() + i);
@@ -936,8 +936,8 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
       info.cury = info.yValueNext();
     }
 
-    float dx = 0.0;
-    float dy = 0.0;
+    float dx = 0.0f;
+    float dy = 0.0f;
 
     // Apply x-axis shift
     if (info.dxValueAvailable()) {
@@ -1005,32 +1005,32 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
       svgChar.x += info.shiftx;
       svgChar.y += info.shifty;
 
-      svgChar.pathXShift = 0.0;
-      svgChar.pathYShift = 0.0;
+      svgChar.pathXShift = 0.0f;
+      svgChar.pathYShift = 0.0f;
     } else {
       svgChar.pathXShift = info.shiftx;
       svgChar.pathYShift = info.shifty;
 
       // Translate to glyph midpoint
       if (isVerticalText) {
-        svgChar.pathYShift -= glyphHeight / 2.0;
+        svgChar.pathYShift -= glyphHeight / 2.0f;
         svgChar.pathXShift += info.dx;
       } else {
         svgChar.pathYShift += info.dy;
-        svgChar.pathXShift -= glyphWidth / 2.0;
+        svgChar.pathXShift -= glyphWidth / 2.0f;
       }
     }
 
     // Correct character position for vertical text layout
     if (isVerticalText) {
       svgChar.drawnSeperated = true;
-      svgChar.x -= glyphWidth / 2.0;
+      svgChar.x -= glyphWidth / 2.0f;
       svgChar.y += glyphHeight;
     }
 
     // Record angle if specified
     svgChar.angle = info.angle;
-    if (svgChar.angle != 0.0)
+    if (svgChar.angle != 0.0f)
       svgChar.drawnSeperated = true;
 
     // Advance current position

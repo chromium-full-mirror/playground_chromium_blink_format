@@ -59,10 +59,10 @@ ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(
 
 bool SVGFitToViewBox::parseViewBox(const UChar*& c,
                                    const UChar* end,
-                                   double& x,
-                                   double& y,
-                                   double& w,
-                                   double& h,
+                                   float& x,
+                                   float& y,
+                                   float& w,
+                                   float& h,
                                    bool validate) {
   Document* doc = contextElement()->document();
   String str(c, end - c);
@@ -113,7 +113,7 @@ AffineTransform SVGFitToViewBox::viewBoxToViewTransform(
 
 bool SVGFitToViewBox::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::viewBoxAttr) {
-    double x = 0, y = 0, w = 0, h = 0;
+    float x = 0.0f, y = 0.0f, w = 0.0f, h = 0.0f;
     const UChar* c = attr->value().characters();
     const UChar* end = c + attr->value().length();
     if (parseViewBox(c, end, x, y, w, h))

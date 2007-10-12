@@ -31,9 +31,9 @@ class SVGPathSegList;
 
 bool parseNumber(const UChar*& ptr,
                  const UChar* end,
-                 double& number,
+                 float& number,
                  bool skip = true);
-bool parseNumberOptionalNumber(const String& s, double& h, double& v);
+bool parseNumberOptionalNumber(const String& s, float& h, float& v);
 
 // SVG allows several different whitespace characters:
 // http://www.w3.org/TR/SVG/paths.html#PathDataBNF

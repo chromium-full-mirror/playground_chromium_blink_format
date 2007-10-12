@@ -48,18 +48,25 @@
 
 namespace WebCore {
 
-bool parseNumber(const UChar*& ptr,
-                 const UChar* end,
-                 double& number,
-                 bool skip) {
+/* We use this generic _parseNumber function to allow the Path parsing code to
+ * work
+ * at a higher precision internally, without any unnecessary runtime cost or
+ * code
+ * complexity
+ */
+template <typename FloatType>
+static bool _parseNumber(const UChar*& ptr,
+                         const UChar* end,
+                         FloatType& number,
+                         bool skip) {
   int integer, exponent;
-  double decimal, frac;
+  FloatType decimal, frac;
   int sign, expsign;
   const UChar* start = ptr;
 
   exponent = 0;
   integer = 0;
-  frac = 1.0;
+  frac = 1;
   decimal = 0;
   sign = 1;
   expsign = 1;
@@ -88,7 +95,7 @@ bool parseNumber(const UChar*& ptr,
       return false;
 
     while (ptr < end && *ptr >= '0' && *ptr <= '9')
-      decimal += (*(ptr++) - '0') * (frac *= 0.1);
+      decimal += (*(ptr++) - '0') * (frac *= static_cast<FloatType>(0.1));
   }
 
   // read the exponent part
@@ -116,7 +123,7 @@ bool parseNumber(const UChar*& ptr,
   }
 
   number = integer + decimal;
-  number *= sign * pow(10.0, expsign * exponent);
+  number *= sign * static_cast<FloatType>(pow(10.0, expsign * exponent));
 
   if (start == ptr)
     return false;
@@ -127,7 +134,22 @@ bool parseNumber(const UChar*& ptr,
   return true;
 }
 
-bool parseNumberOptionalNumber(const String& s, double& x, double& y) {
+bool parseNumber(const UChar*& ptr,
+                 const UChar* end,
+                 float& number,
+                 bool skip) {
+  return _parseNumber(ptr, end, number, skip);
+}
+
+// Only used for parsing Paths
+static bool parseNumber(const UChar*& ptr,
+                        const UChar* end,
+                        double& number,
+                        bool skip = true) {
+  return _parseNumber(ptr, end, number, skip);
+}
+
+bool parseNumberOptionalNumber(const String& s, float& x, float& y) {
   if (s.isEmpty())
     return false;
   const UChar* cur = s.characters();
@@ -155,11 +177,11 @@ bool pointsListFromSVGData(SVGPointList* pointsList, const String& points) {
   bool delimParsed = false;
   while (cur < end) {
     delimParsed = false;
-    double xPos = 0;
+    float xPos = 0.0f;
     if (!parseNumber(cur, end, xPos))
       return false;
 
-    double yPos = 0;
+    float yPos = 0.0f;
     if (!parseNumber(cur, end, yPos, false))
       return false;
 
@@ -719,15 +741,15 @@ class PathBuilder : public SVGPathParser {
 
  private:
   virtual void svgMoveTo(double x1, double y1, bool closed, bool abs = true) {
-    current.setX(abs ? x1 : current.x() + x1);
-    current.setY(abs ? y1 : current.y() + y1);
+    current.setX(narrowPrecisionToFloat(abs ? x1 : current.x() + x1));
+    current.setY(narrowPrecisionToFloat(abs ? y1 : current.y() + y1));
     if (closed)
       m_path->closeSubpath();
     m_path->moveTo(current);
   }
   virtual void svgLineTo(double x1, double y1, bool abs = true) {
-    current.setX(abs ? x1 : current.x() + x1);
-    current.setY(abs ? y1 : current.y() + y1);
+    current.setX(narrowPrecisionToFloat(abs ? x1 : current.x() + x1));
+    current.setY(narrowPrecisionToFloat(abs ? y1 : current.y() + y1));
     m_path->addLineTo(current);
   }
   virtual void svgCurveToCubic(double x1,
@@ -743,9 +765,10 @@ class PathBuilder : public SVGPathParser {
       x2 += current.x();
       y2 += current.y();
     }
-    current.setX(abs ? x : current.x() + x);
-    current.setY(abs ? y : current.y() + y);
-    m_path->addBezierCurveTo(FloatPoint(x1, y1), FloatPoint(x2, y2), current);
+    current.setX(narrowPrecisionToFloat(abs ? x : current.x() + x));
+    current.setY(narrowPrecisionToFloat(abs ? y : current.y() + y));
+    m_path->addBezierCurveTo(FloatPoint::narrowPrecision(x1, y1),
+                             FloatPoint::narrowPrecision(x2, y2), current);
   }
   virtual void svgClosePath() { m_path->closeSubpath(); }
   Path* m_path;
@@ -770,40 +793,56 @@ class SVGPathSegListBuilder : public SVGPathParser {
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegMovetoAbs(x1, y1), ec);
+          SVGPathElement::createSVGPathSegMovetoAbs(narrowPrecisionToFloat(x1),
+                                                    narrowPrecisionToFloat(y1)),
+          ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegMovetoRel(x1, y1), ec);
+          SVGPathElement::createSVGPathSegMovetoRel(narrowPrecisionToFloat(x1),
+                                                    narrowPrecisionToFloat(y1)),
+          ec);
   }
   virtual void svgLineTo(double x1, double y1, bool abs = true) {
     ExceptionCode ec = 0;
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegLinetoAbs(x1, y1), ec);
+          SVGPathElement::createSVGPathSegLinetoAbs(narrowPrecisionToFloat(x1),
+                                                    narrowPrecisionToFloat(y1)),
+          ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegLinetoRel(x1, y1), ec);
+          SVGPathElement::createSVGPathSegLinetoRel(narrowPrecisionToFloat(x1),
+                                                    narrowPrecisionToFloat(y1)),
+          ec);
   }
   virtual void svgLineToHorizontal(double x, bool abs) {
     ExceptionCode ec = 0;
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegLinetoHorizontalAbs(x), ec);
+          SVGPathElement::createSVGPathSegLinetoHorizontalAbs(
+              narrowPrecisionToFloat(x)),
+          ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegLinetoHorizontalRel(x), ec);
+          SVGPathElement::createSVGPathSegLinetoHorizontalRel(
+              narrowPrecisionToFloat(x)),
+          ec);
   }
   virtual void svgLineToVertical(double y, bool abs) {
     ExceptionCode ec = 0;
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegLinetoVerticalAbs(y), ec);
+          SVGPathElement::createSVGPathSegLinetoVerticalAbs(
+              narrowPrecisionToFloat(y)),
+          ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegLinetoVerticalRel(y), ec);
+          SVGPathElement::createSVGPathSegLinetoVerticalRel(
+              narrowPrecisionToFloat(y)),
+          ec);
   }
   virtual void svgCurveToCubic(double x1,
                                double y1,
@@ -816,11 +855,17 @@ class SVGPathSegListBuilder : public SVGPathParser {
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoCubicAbs(x, y, x1, y1, x2, y2),
+          SVGPathElement::createSVGPathSegCurvetoCubicAbs(
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y),
+              narrowPrecisionToFloat(x1), narrowPrecisionToFloat(y1),
+              narrowPrecisionToFloat(x2), narrowPrecisionToFloat(y2)),
           ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoCubicRel(x, y, x1, y1, x2, y2),
+          SVGPathElement::createSVGPathSegCurvetoCubicRel(
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y),
+              narrowPrecisionToFloat(x1), narrowPrecisionToFloat(y1),
+              narrowPrecisionToFloat(x2), narrowPrecisionToFloat(y2)),
           ec);
   }
   virtual void svgCurveToCubicSmooth(double x,
@@ -832,11 +877,15 @@ class SVGPathSegListBuilder : public SVGPathParser {
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoCubicSmoothAbs(x2, y2, x, y),
+          SVGPathElement::createSVGPathSegCurvetoCubicSmoothAbs(
+              narrowPrecisionToFloat(x2), narrowPrecisionToFloat(y2),
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y)),
           ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoCubicSmoothRel(x2, y2, x, y),
+          SVGPathElement::createSVGPathSegCurvetoCubicSmoothRel(
+              narrowPrecisionToFloat(x2), narrowPrecisionToFloat(y2),
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y)),
           ec);
   }
   virtual void svgCurveToQuadratic(double x,
@@ -848,11 +897,15 @@ class SVGPathSegListBuilder : public SVGPathParser {
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoQuadraticAbs(x1, y1, x, y),
+          SVGPathElement::createSVGPathSegCurvetoQuadraticAbs(
+              narrowPrecisionToFloat(x1), narrowPrecisionToFloat(y1),
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y)),
           ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoQuadraticRel(x1, y1, x, y),
+          SVGPathElement::createSVGPathSegCurvetoQuadraticRel(
+              narrowPrecisionToFloat(x1), narrowPrecisionToFloat(y1),
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y)),
           ec);
   }
   virtual void svgCurveToQuadraticSmooth(double x, double y, bool abs) {
@@ -860,10 +913,14 @@ class SVGPathSegListBuilder : public SVGPathParser {
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothAbs(x, y), ec);
+          SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothAbs(
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y)),
+          ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothRel(x, y), ec);
+          SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothRel(
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y)),
+          ec);
   }
   virtual void svgArcTo(double x,
                         double y,
@@ -877,13 +934,17 @@ class SVGPathSegListBuilder : public SVGPathParser {
 
     if (abs)
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegArcAbs(x, y, r1, r2, angle,
-                                                 largeArcFlag, sweepFlag),
+          SVGPathElement::createSVGPathSegArcAbs(
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y),
+              narrowPrecisionToFloat(r1), narrowPrecisionToFloat(r2),
+              narrowPrecisionToFloat(angle), largeArcFlag, sweepFlag),
           ec);
     else
       m_pathSegList->appendItem(
-          SVGPathElement::createSVGPathSegArcRel(x, y, r1, r2, angle,
-                                                 largeArcFlag, sweepFlag),
+          SVGPathElement::createSVGPathSegArcRel(
+              narrowPrecisionToFloat(x), narrowPrecisionToFloat(y),
+              narrowPrecisionToFloat(r1), narrowPrecisionToFloat(r2),
+              narrowPrecisionToFloat(angle), largeArcFlag, sweepFlag),
           ec);
   }
   virtual void svgClosePath() {

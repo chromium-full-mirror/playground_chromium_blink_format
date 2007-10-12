@@ -60,7 +60,7 @@ void applyStrokeStyleToContext(CGContextRef context,
   /* Shouldn't all these be in the stroke painter? */
   CGContextSetLineWidth(context,
                         SVGRenderStyle::cssPrimitiveToLength(
-                            object, style->svgStyle()->strokeWidth(), 1.0));
+                            object, style->svgStyle()->strokeWidth(), 1.0f));
 
   CGContextSetLineCap(context, CGLineCapFromKC(style->svgStyle()->capStyle()));
   CGContextSetLineJoin(context,
@@ -70,7 +70,7 @@ void applyStrokeStyleToContext(CGContextRef context,
 
   const DashArray& dashes = dashArrayFromRenderingStyle(style);
   double dashOffset = SVGRenderStyle::cssPrimitiveToLength(
-      object, style->svgStyle()->strokeDashOffset(), 0.0);
+      object, style->svgStyle()->strokeDashOffset(), 0.0f);
 
   CGContextSetLineDash(context, narrowPrecisionToCGFloat(dashOffset),
                        dashes.data(), dashes.size());

@@ -90,7 +90,7 @@ FloatRect SVGInlineTextBox::calculateGlyphBoundaries(
   const Font& font = style->font();
 
   // Take RTL text into account and pick right glyph width/height.
-  float glyphWidth = 0.0;
+  float glyphWidth = 0.0f;
 
   if (!m_reversed)
     glyphWidth = calculateGlyphWidth(style, offset);
@@ -140,10 +140,10 @@ struct SVGInlineTextBoxClosestCharacterToPositionWalker {
 
       // Calculate distances relative to the glyph mid-point. I hope this is
       // accurate enough.
-      float xDistance = glyphRect.x() + glyphRect.width() / 2.0 - m_x;
-      float yDistance = glyphRect.y() - glyphRect.height() / 2.0 - m_y;
+      float xDistance = glyphRect.x() + glyphRect.width() / 2.0f - m_x;
+      float yDistance = glyphRect.y() - glyphRect.height() / 2.0f - m_y;
 
-      float newDistance = sqrt(xDistance * xDistance + yDistance * yDistance);
+      float newDistance = sqrtf(xDistance * xDistance + yDistance * yDistance);
       if (newDistance <= m_distance) {
         m_distance = newDistance;
         closestOffset = newOffset;
@@ -507,19 +507,20 @@ static inline Path pathForDecoration(ETextDecoration decoration,
                                      float y,
                                      float width) {
   float thickness = SVGRenderStyle::cssPrimitiveToLength(
-      object, object->style()->svgStyle()->strokeWidth(), 1.0);
+      object, object->style()->svgStyle()->strokeWidth(), 1.0f);
 
   const Font& font = object->style()->font();
-  thickness = max(thickness * powf(font.size(), 2.0) / font.unitsPerEm(), 1.0f);
+  thickness =
+      max(thickness * powf(font.size(), 2.0f) / font.unitsPerEm(), 1.0f);
 
   if (decoration == UNDERLINE)
-    y += thickness * 1.5;  // For compatibility with Batik/Opera
+    y += thickness * 1.5f;  // For compatibility with Batik/Opera
   else if (decoration == OVERLINE)
     y += thickness;
 
-  float halfThickness = thickness / 2.0;
+  float halfThickness = thickness / 2.0f;
   return Path::createRectangle(
-      FloatRect(x + halfThickness, y, width - 2.0 * halfThickness, thickness));
+      FloatRect(x + halfThickness, y, width - 2.0f * halfThickness, thickness));
 }
 
 void SVGInlineTextBox::paintDecoration(ETextDecoration decoration,

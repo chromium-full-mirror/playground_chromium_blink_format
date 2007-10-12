@@ -170,7 +170,8 @@ void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
     InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
     for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine()) {
       FloatRect boxRect(box->xPos(), box->yPos(), box->width(), box->height());
-      boxRect.move(x - htmlParentCtm.e(), y - htmlParentCtm.f());
+      boxRect.move(narrowPrecisionToFloat(x - htmlParentCtm.e()),
+                   narrowPrecisionToFloat(y - htmlParentCtm.f()));
       rects.append(enclosingIntRect(absoluteTransform().mapRect(boxRect)));
     }
   }
@@ -198,7 +199,7 @@ FloatRect RenderSVGText::relativeBBox(bool includeStroke) const {
   // SVG needs to include the strokeWidth(), not the textStrokeWidth().
   if (includeStroke && style()->svgStyle()->hasStroke())
     repaintRect.inflate(SVGRenderStyle::cssPrimitiveToLength(
-        this, style()->svgStyle()->strokeWidth(), 0.0));
+        this, style()->svgStyle()->strokeWidth(), 0.0f));
 
   repaintRect.move(xPos(), yPos());
   return repaintRect;

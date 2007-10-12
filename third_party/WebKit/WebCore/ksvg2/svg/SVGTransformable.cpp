@@ -52,7 +52,7 @@ AffineTransform SVGTransformable::getScreenCTM(
 
 int parseTransformParamList(const UChar*& ptr,
                             const UChar* end,
-                            double* values,
+                            float* values,
                             int required,
                             int optional) {
   int optionalParams = 0, requiredParams = 0;
@@ -119,7 +119,7 @@ bool SVGTransformable::parseTransformValue(unsigned type,
     return false;
 
   int valueCount = 0;
-  double values[] = {0, 0, 0, 0, 0, 0};
+  float values[] = {0, 0, 0, 0, 0, 0};
   if ((valueCount = parseTransformParamList(ptr, end, values,
                                             requiredValuesForType[type],
                                             optionalValuesForType[type])) < 0)
