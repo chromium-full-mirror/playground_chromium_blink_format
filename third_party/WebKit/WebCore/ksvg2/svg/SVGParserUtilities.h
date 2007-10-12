@@ -58,7 +58,7 @@ static inline bool skipOptionalSpacesOrDelimiter(const UChar*& ptr,
 }
 
 static inline bool skipString(const UChar*& ptr,
-                              const UChar*& end,
+                              const UChar* end,
                               const UChar* name,
                               int length) {
   if (end - ptr < length)
@@ -70,7 +70,7 @@ static inline bool skipString(const UChar*& ptr,
 }
 
 static inline bool skipString(const UChar*& ptr,
-                              const UChar*& end,
+                              const UChar* end,
                               const char* str) {
   int length = strlen(str);
   if (end - ptr < length)

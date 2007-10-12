@@ -25,11 +25,13 @@
 #if ENABLE(SVG)
 
 #include "SVGLocatable.h"
+#include <PlatformString.h>
 
 namespace WebCore {
 
 class AtomicString;
 class AffineTransform;
+class SVGTransform;
 class SVGTransformList;
 
 class SVGTransformable : virtual public SVGLocatable {
@@ -44,6 +46,10 @@ class SVGTransformable : virtual public SVGLocatable {
 
   static bool parseTransformAttribute(SVGTransformList*,
                                       const AtomicString& transform);
+  static bool parseTransformValue(unsigned type,
+                                  const UChar*& ptr,
+                                  const UChar* end,
+                                  SVGTransform&);
   AffineTransform getCTM(const SVGElement*) const;
   AffineTransform getScreenCTM(const SVGElement*) const;
 };
