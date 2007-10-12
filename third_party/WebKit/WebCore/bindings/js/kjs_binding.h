@@ -42,6 +42,10 @@ class String;
 class JSNode;
 
 typedef int ExceptionCode;
+
+#if ENABLE(SVG)
+class SVGElement;
+#endif
 }
 
 namespace KJS {
@@ -137,6 +141,26 @@ inline JSValue* cacheDOMObject(ExecState* exec, DOMObj* domObj) {
   interp->putDOMObject(domObj, ret);
   return ret;
 }
+
+#if ENABLE(SVG)
+/**
+ * Retrieve from cache, or create, a KJS object around a SVG DOM object
+ */
+template <class DOMObj, class KJSDOMObj>
+inline JSValue* cacheSVGDOMObject(ExecState* exec,
+                                  DOMObj* domObj,
+                                  WebCore::SVGElement* context) {
+  if (!domObj)
+    return jsNull();
+  ScriptInterpreter* interp =
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
+  if (DOMObject* ret = interp->getDOMObject(domObj))
+    return ret;
+  DOMObject* ret = new KJSDOMObj(exec, domObj, context);
+  interp->putDOMObject(domObj, ret);
+  return ret;
+}
+#endif
 
 // Convert a DOM implementation exception code into a JavaScript exception in
 // the execution state.

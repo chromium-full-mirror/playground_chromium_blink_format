@@ -55,7 +55,7 @@ class SVGPreserveAspectRatio : public Shared<SVGPreserveAspectRatio> {
     SVG_MEETORSLICE_SLICE = 2
   };
 
-  SVGPreserveAspectRatio(const SVGStyledElement* context);
+  SVGPreserveAspectRatio();
   virtual ~SVGPreserveAspectRatio();
 
   void setAlign(unsigned short);
@@ -79,8 +79,6 @@ class SVGPreserveAspectRatio : public Shared<SVGPreserveAspectRatio> {
  protected:
   unsigned short m_align;
   unsigned short m_meetOrSlice;
-
-  const SVGStyledElement* m_context;
 };
 
 }  // namespace WebCore

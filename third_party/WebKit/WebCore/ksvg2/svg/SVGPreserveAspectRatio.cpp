@@ -29,11 +29,10 @@
 
 namespace WebCore {
 
-SVGPreserveAspectRatio::SVGPreserveAspectRatio(const SVGStyledElement* context)
+SVGPreserveAspectRatio::SVGPreserveAspectRatio()
     : Shared<SVGPreserveAspectRatio>(),
       m_align(SVG_PRESERVEASPECTRATIO_XMIDYMID),
-      m_meetOrSlice(SVG_MEETORSLICE_MEET),
-      m_context(context) {
+      m_meetOrSlice(SVG_MEETORSLICE_MEET) {
   // FIXME: Should the two values default to UNKNOWN instead?
 }
 
@@ -41,7 +40,6 @@ SVGPreserveAspectRatio::~SVGPreserveAspectRatio() {}
 
 void SVGPreserveAspectRatio::setAlign(unsigned short align) {
   m_align = align;
-  // FIXME: Do we need a call to notifyAttributeChange here?
 }
 
 unsigned short SVGPreserveAspectRatio::align() const {
@@ -50,7 +48,6 @@ unsigned short SVGPreserveAspectRatio::align() const {
 
 void SVGPreserveAspectRatio::setMeetOrSlice(unsigned short meetOrSlice) {
   m_meetOrSlice = meetOrSlice;
-  // FIXME: Do we need a call to notifyAttributeChange here?
 }
 
 unsigned short SVGPreserveAspectRatio::meetOrSlice() const {
@@ -156,8 +153,6 @@ void SVGPreserveAspectRatio::parsePreserveAspectRatio(const String& string) {
 
   m_align = align;
   m_meetOrSlice = meetOrSlice;
-  if (m_context)
-    m_context->notifyAttributeChange();
 }
 
 AffineTransform SVGPreserveAspectRatio::getCTM(float logicX,

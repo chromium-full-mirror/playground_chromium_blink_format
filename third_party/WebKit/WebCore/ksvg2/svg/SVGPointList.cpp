@@ -28,14 +28,9 @@
 
 using namespace WebCore;
 
-SVGPointList::SVGPointList(const SVGElement* context)
-    : SVGPODList<FloatPoint>(), m_context(context) {}
+SVGPointList::SVGPointList() : SVGPODList<FloatPoint>() {}
 
 SVGPointList::~SVGPointList() {}
-
-const SVGElement* SVGPointList::context() const {
-  return m_context;
-}
 
 #endif  // ENABLE(SVG)
 

@@ -86,13 +86,6 @@ class SVGDocumentExtensions {
     return s_baseValueMap;
   }
 
-  template <typename KeyType>
-  static HashMap<const KeyType*, const SVGElement*>* genericContextMap() {
-    static HashMap<const KeyType*, const SVGElement*>* s_genericContextMap =
-        new HashMap<const KeyType*, const SVGElement*>();
-    return s_genericContextMap;
-  }
-
  public:
   // This HashMap contains a list of pending resources. Pending resources, are
   // such
@@ -158,33 +151,6 @@ class SVGDocumentExtensions {
       return propertyMap->contains(propertyName.impl());
 
     return false;
-  }
-
-  // Used by several JS wrappers
-  template <typename KeyType>
-  const SVGElement* genericContext(const KeyType* obj) const {
-    return genericContextMap<KeyType>()->get(obj);
-  }
-
-  template <typename KeyType>
-  void setGenericContext(const KeyType* obj, const SVGElement* context) {
-    genericContextMap<KeyType>()->set(obj, context);
-  }
-
-  template <typename KeyType>
-  void removeGenericContext(const KeyType* obj) {
-    genericContextMap<KeyType>()->remove(obj);
-  }
-
-  template <typename KeyType>
-  bool hasGenericContext(const KeyType* obj) {
-    return genericContextMap<KeyType>()->contains(obj);
-  }
-
-  // Used by the generated JS wrappers only
-  template <typename KeyType>
-  static void forgetGenericContext(const KeyType* obj) {
-    genericContextMap<KeyType>()->remove(obj);
   }
 };
 

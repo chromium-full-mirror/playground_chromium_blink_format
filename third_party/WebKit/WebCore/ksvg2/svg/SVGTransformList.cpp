@@ -32,8 +32,7 @@
 
 using namespace WebCore;
 
-SVGTransformList::SVGTransformList(const SVGElement* context)
-    : SVGPODList<SVGTransform>(), m_context(context) {}
+SVGTransformList::SVGTransformList() : SVGPODList<SVGTransform>() {}
 
 SVGTransformList::~SVGTransformList() {}
 
@@ -75,10 +74,6 @@ SVGTransform SVGTransformList::concatenateForType(
   }
 
   return totalTransform.addToSVGTransform(SVGTransform());
-}
-
-const SVGElement* SVGTransformList::context() const {
-  return m_context;
 }
 
 #endif  // ENABLE(SVG)
