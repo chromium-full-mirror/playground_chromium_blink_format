@@ -27,10 +27,10 @@
 namespace WebCore {
 struct PatternAttributes {
   PatternAttributes()
-      : m_x(0.0),
-        m_y(0.0),
-        m_width(0.0),
-        m_height(0.0),
+      : m_x(),
+        m_y(),
+        m_width(),
+        m_height(),
         m_boundingBoxMode(true),
         m_boundingBoxModeContent(false),
         m_patternContentElement(0),
@@ -43,10 +43,10 @@ struct PatternAttributes {
         m_patternTransformSet(false),
         m_patternContentElementSet(false) {}
 
-  double x() const { return m_x; }
-  double y() const { return m_y; }
-  double width() const { return m_width; }
-  double height() const { return m_height; }
+  SVGLength x() const { return m_x; }
+  SVGLength y() const { return m_y; }
+  SVGLength width() const { return m_width; }
+  SVGLength height() const { return m_height; }
   bool boundingBoxMode() const { return m_boundingBoxMode; }
   bool boundingBoxModeContent() const { return m_boundingBoxModeContent; }
   AffineTransform patternTransform() const { return m_patternTransform; }
@@ -54,19 +54,19 @@ struct PatternAttributes {
     return m_patternContentElement;
   }
 
-  void setX(double value) {
+  void setX(const SVGLength& value) {
     m_x = value;
     m_xSet = true;
   }
-  void setY(double value) {
+  void setY(const SVGLength& value) {
     m_y = value;
     m_ySet = true;
   }
-  void setWidth(double value) {
+  void setWidth(const SVGLength& value) {
     m_width = value;
     m_widthSet = true;
   }
-  void setHeight(double value) {
+  void setHeight(const SVGLength& value) {
     m_height = value;
     m_heightSet = true;
   }
@@ -98,10 +98,10 @@ struct PatternAttributes {
 
  private:
   // Properties
-  double m_x;
-  double m_y;
-  double m_width;
-  double m_height;
+  SVGLength m_x;
+  SVGLength m_y;
+  SVGLength m_width;
+  SVGLength m_height;
   bool m_boundingBoxMode;
   bool m_boundingBoxModeContent;
   AffineTransform m_patternTransform;

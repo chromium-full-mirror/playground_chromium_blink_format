@@ -311,7 +311,11 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
 
     auto_ptr<ImageBuffer> maskImage = ImageBuffer::create(
         IntSize(maskRect.width(), maskRect.height()), false);
-    // FIXME: maskImage could be NULL
+
+    if (!maskImage.get()) {
+      context->restore();
+      return false;
+    }
 
     GraphicsContext* maskImageContext = maskImage->context();
     maskImageContext->save();
