@@ -41,7 +41,7 @@ SVGStyledTransformableElement::SVGStyledTransformableElement(
     Document* doc)
     : SVGStyledLocatableElement(tagName, doc),
       SVGTransformable(),
-      m_transform(new SVGTransformList) {}
+      m_transform(new SVGTransformList(this)) {}
 
 SVGStyledTransformableElement::~SVGStyledTransformableElement() {}
 
@@ -114,7 +114,18 @@ void SVGStyledTransformableElement::attach() {
   if (renderer() && !m_localMatrix.isIdentity())
     renderer()->setLocalTransform(m_localMatrix);
 }
+
+void SVGStyledTransformableElement::notifyAttributeChange() const {
+  // FIXME: We should cache this, and only update if needed. The whole nAC()
+  // concept, should be
+  // switched to something similar like attributeChanged(), but specific to SVG
+  // DOM. (Niko)
+  const_cast<SVGStyledTransformableElement*>(this)->updateLocalTransform(
+      transform());
+  SVGStyledLocatableElement::notifyAttributeChange();
+}
 }
 
-// vim:ts=4:noet
 #endif  // ENABLE(SVG)
+
+// vim:ts=4:noet

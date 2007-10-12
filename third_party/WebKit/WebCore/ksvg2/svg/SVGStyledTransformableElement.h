@@ -59,6 +59,7 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
   void updateLocalTransform(SVGTransformList* localTransforms);
 
   virtual void attach();
+  virtual void notifyAttributeChange() const;
 
  protected:
   mutable AffineTransform m_localMatrix;
