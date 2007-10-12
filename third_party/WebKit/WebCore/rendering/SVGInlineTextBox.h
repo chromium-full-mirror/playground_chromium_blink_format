@@ -57,6 +57,10 @@ class SVGInlineTextBox : public InlineTextBox {
   float calculateGlyphWidth(RenderStyle*, int offset) const;
   float calculateGlyphHeight(RenderStyle*, int offset) const;
 
+  FloatRect calculateGlyphBoundaries(RenderStyle*,
+                                     int offset,
+                                     const SVGChar&) const;
+
  private:
   friend class RenderSVGInlineText;
   bool svgCharacterHitsPosition(int x, int y, int& offset) const;

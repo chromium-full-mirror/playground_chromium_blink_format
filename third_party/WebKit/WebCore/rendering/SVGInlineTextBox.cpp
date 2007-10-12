@@ -75,6 +75,35 @@ float SVGInlineTextBox::calculateGlyphHeight(RenderStyle* style,
   return style->font().ascent() + style->font().descent();
 }
 
+FloatRect SVGInlineTextBox::calculateGlyphBoundaries(
+    RenderStyle* style,
+    int offset,
+    const SVGChar& svgChar) const {
+  const Font& font = style->font();
+
+  // Take RTL text into account and pick right glyph width/height.
+  float glyphWidth = 0.0;
+
+  if (!m_reversed)
+    glyphWidth = calculateGlyphWidth(style, offset);
+  else
+    glyphWidth = calculateGlyphWidth(style, start() + end() - offset);
+
+  float x1 = svgChar.x;
+  float x2 = svgChar.x + glyphWidth;
+
+  float y1 = svgChar.y - font.ascent();
+  float y2 = svgChar.y + font.descent();
+
+  FloatRect glyphRect(x1, y1, x2 - x1, y2 - y1);
+
+  // Take per-character transformations into account
+  if (!svgChar.transform.isIdentity())
+    glyphRect = svgChar.transform.mapRect(glyphRect);
+
+  return glyphRect;
+}
+
 SVGChar* SVGInlineTextBox::closestCharacterToPosition(int x,
                                                       int y,
                                                       int& offset) const {
@@ -133,18 +162,11 @@ SVGChar* SVGInlineTextBox::closestCharacterToPosition(int x,
                                  firstRangeInFirstChunkStartOffset;
 
         // Take RTL text into account and pick right glyph width/height.
-        float glyphWidth = 0.0;
-        float glyphHeight = 0.0;
-
-        if (!m_reversed) {
-          glyphWidth = calculateGlyphWidth(style, newOffset);
-          glyphHeight = calculateGlyphHeight(style, newOffset);
-        } else {
-          glyphWidth = calculateGlyphWidth(style, start() + end() - newOffset);
-          glyphHeight =
-              calculateGlyphHeight(style, start() + end() - newOffset);
+        if (m_reversed)
           newOffset = start() + end() - newOffset;
-        }
+
+        float glyphWidth = calculateGlyphWidth(style, newOffset);
+        float glyphHeight = calculateGlyphHeight(style, newOffset);
 
         // Calculate distances relative to the glyph mid-point. I hope this is
         // accurate enough.
@@ -244,9 +266,7 @@ bool SVGInlineTextBox::nodeAtPoint(const HitTestRequest& request,
                                    int ty) {
   ASSERT(!isLineBreak());
 
-  RenderStyle* style = textObject()->style(m_firstLine);
-  IntRect rect = selectionRect(0, -style->font().ascent(), 0, len());
-
+  IntRect rect = selectionRect(0, 0, 0, len());
   if (object()->style()->visibility() == VISIBLE && rect.contains(x, y)) {
     object()->updateHitTestResult(result, IntPoint(x - tx, y - ty));
     return true;
@@ -255,10 +275,7 @@ bool SVGInlineTextBox::nodeAtPoint(const HitTestRequest& request,
   return false;
 }
 
-IntRect SVGInlineTextBox::selectionRect(int tx,
-                                        int ty,
-                                        int startPos,
-                                        int endPos) {
+IntRect SVGInlineTextBox::selectionRect(int, int, int startPos, int endPos) {
   if (startPos >= endPos)
     return IntRect();
 
@@ -273,8 +290,6 @@ IntRect SVGInlineTextBox::selectionRect(int tx,
       const_cast<Vector<SVGTextChunk>&>(rootBox->svgTextChunks());
 
   RenderStyle* style = textObject()->style();
-  const Font& font = style->font();
-
   FloatRect selectionRect;
 
   Vector<SVGTextChunk>::iterator it = chunks.begin();
@@ -314,32 +329,8 @@ IntRect SVGInlineTextBox::selectionRect(int tx,
         unsigned int newOffset = start() + (itChar - itCharBegin) +
                                  firstRangeInFirstChunkStartOffset;
 
-        // Take RTL text into account and pick right glyph width/height.
-        float glyphWidth = 0.0;
-        float glyphHeight = 0.0;
-
-        if (!m_reversed) {
-          glyphWidth = calculateGlyphWidth(style, newOffset);
-          glyphHeight = calculateGlyphHeight(style, newOffset);
-        } else {
-          glyphWidth = calculateGlyphWidth(style, start() + end() - newOffset);
-          glyphHeight =
-              calculateGlyphHeight(style, start() + end() - newOffset);
-        }
-
-        float x1 = (*itChar).x;
-        float x2 = (*itChar).x + glyphWidth;
-
-        float y1 = (*itChar).y - font.ascent();
-        float y2 = (*itChar).y + font.descent();
-
-        FloatRect glyphRect(x1, y1, x2 - x1, y2 - y1);
-
-        // Take per-character transformations into account
-        if (!(*itChar).transform.isIdentity())
-          glyphRect = (*itChar).transform.mapRect(glyphRect);
-
-        selectionRect.unite(glyphRect);
+        int offset = m_reversed ? start() + end() - newOffset : newOffset;
+        selectionRect.unite(calculateGlyphBoundaries(style, offset, *itChar));
       }
 
       chunkOffset += range.endOffset - range.startOffset;
