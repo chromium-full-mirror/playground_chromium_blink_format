@@ -71,17 +71,20 @@ CIFilter* getNormalMap(CIImage* bumpMap, float scale);
   cropRect.intersect(filterRect);                                    \
   cropRect.move(-filterRect.x(), -filterRect.y());
 
-#define FE_QUARTZ_MAP_TO_SUBREGION_APPLY(cropRect)                            \
-  {                                                                           \
-    CIFilter* crop = [CIFilter filterWithName:@"CICrop"];                     \
-    [crop setDefaults];                                                       \
-    [crop setValue:[filter valueForKey:@"outputImage"] forKey:@"inputImage"]; \
-    [crop setValue:[CIVector vectorWithX:cropRect.x()                         \
-                                       Y:cropRect.y()                         \
-                                       Z:cropRect.width()                     \
-                                       W:cropRect.height()]                   \
-            forKey:@"inputRectangle"];                                        \
-    filter = crop;                                                            \
+#define FE_QUARTZ_MAP_TO_SUBREGION_APPLY(cropRect)                   \
+  {                                                                  \
+    CIFilter* crop = [CIFilter filterWithName:@"CICrop"];            \
+    [crop setDefaults];                                              \
+    if (CIImage* currentFilterOutputImage =                          \
+            [filter valueForKey:@"outputImage"]) {                   \
+      [crop setValue:currentFilterOutputImage forKey:@"inputImage"]; \
+      [crop setValue:[CIVector vectorWithX:cropRect.x()              \
+                                         Y:cropRect.y()              \
+                                         Z:cropRect.width()          \
+                                         W:cropRect.height()]        \
+              forKey:@"inputRectangle"];                             \
+      filter = crop;                                                 \
+    }                                                                \
   }
 
 #define FE_QUARTZ_MAP_TO_SUBREGION(bbox)    \
