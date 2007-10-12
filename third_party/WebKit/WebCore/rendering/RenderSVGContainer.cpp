@@ -30,6 +30,7 @@
 #include "RenderView.h"
 #include "SVGLength.h"
 #include "SVGMarkerElement.h"
+#include "SVGRenderSupport.h"
 #include "SVGResourceClipper.h"
 #include "SVGResourceFilter.h"
 #include "SVGResourceMasker.h"
@@ -65,8 +66,7 @@ void RenderSVGContainer::setLocalTransform(const AffineTransform& matrix) {
 bool RenderSVGContainer::requiresLayer() {
   // Only allow an <svg> element to generate a layer when it's positioned in a
   // non-SVG context
-  return (isPositioned() || isRelPositioned()) &&
-         (element()->parent() && !element()->parent()->isSVGElement());
+  return (isPositioned() || isRelPositioned()) && isOutermostSVG();
 }
 
 short RenderSVGContainer::lineHeight(bool b, bool isRootLineBox) const {
@@ -75,6 +75,12 @@ short RenderSVGContainer::lineHeight(bool b, bool isRootLineBox) const {
 
 short RenderSVGContainer::baselinePosition(bool b, bool isRootLineBox) const {
   return height() + marginTop() + marginBottom();
+}
+
+// This method should be temporary until a RenderSVGRoot class can be made
+// http://bugs.webkit.org/show_bug.cgi?id=12207
+bool RenderSVGContainer::isOutermostSVG() const {
+  return parent() && !parent()->isSVGContainer();
 }
 
 void RenderSVGContainer::layout() {
@@ -95,6 +101,8 @@ void RenderSVGContainer::layout() {
 
   RenderObject* child = firstChild();
   while (child) {
+    // FIXME: This check is bogus, see
+    // http://bugs.webkit.org/show_bug.cgi?id=14003
     if (!child->isRenderPath() ||
         static_cast<RenderPath*>(child)->hasRelativeValues())
       child->setNeedsLayout(true);
@@ -108,7 +116,7 @@ void RenderSVGContainer::layout() {
   calcHeight();
 
   m_absoluteBounds = absoluteClippedOverflowRect();
-  if (!parent()->isSVGContainer()) {
+  if (isOutermostSVG()) {
     SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
     m_width = m_width * svg->currentScale();
     m_height = m_height * svg->currentScale();
@@ -121,41 +129,10 @@ void RenderSVGContainer::layout() {
   setNeedsLayout(false);
 }
 
-void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
-  if (paintInfo.context->paintingDisabled())
-    return;
-
-  // This should only exist for <svg> renderers
-  if (hasBoxDecorations() && (paintInfo.phase == PaintPhaseForeground ||
-                              paintInfo.phase == PaintPhaseSelection))
-    paintBoxDecorations(paintInfo, m_x + parentX, m_y + parentY);
-
-  if ((paintInfo.phase == PaintPhaseOutline ||
-       paintInfo.phase == PaintPhaseSelfOutline) &&
-      style()->outlineWidth() && style()->visibility() == VISIBLE)
-    paintOutline(paintInfo.context, parentX, parentY, width(), height(),
-                 style());
-
-  if (paintInfo.phase != PaintPhaseForeground || !drawsContents())
-    return;
-
-  const SVGRenderStyle* svgStyle = style()->svgStyle();
-  AtomicString filterId(SVGURIReference::getTarget(svgStyle->filter()));
-
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  SVGResourceFilter* filter = getFilterById(document(), filterId);
-#endif
-
-  if (!firstChild()
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-      && !filter
-#endif
-      )
-    return;  // Spec: groups w/o children still may render filter content.
-
-  paintInfo.context->save();
-
-  if (!parent()->isSVGContainer()) {
+void RenderSVGContainer::applyContentTransforms(PaintInfo& paintInfo,
+                                                int& parentX,
+                                                int& parentY) {
+  if (isOutermostSVG()) {
     // Translate from parent offsets (html renderers) to a relative transform
     // (svg renderers)
     IntPoint origin;
@@ -196,52 +173,60 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   }
   if (!localTransform().isIdentity())
     paintInfo.context->concatCTM(localTransform());
-  if (!parent()->isSVGContainer()) {
+  if (isOutermostSVG()) {
     SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
     paintInfo.context->concatCTM(AffineTransform().translate(
         svg->currentTranslate().x(), svg->currentTranslate().y()));
   }
+}
 
-  FloatRect strokeBBox = relativeBBox(true);
+void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
+  if (paintInfo.context->paintingDisabled())
+    return;
 
-  SVGElement* svgElement = static_cast<SVGElement*>(element());
-  ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
+  // This should only exist for <svg> renderers
+  if (isOutermostSVG() && hasBoxDecorations() &&
+      (paintInfo.phase == PaintPhaseForeground ||
+       paintInfo.phase == PaintPhaseSelection))
+    paintBoxDecorations(paintInfo, m_x + parentX, m_y + parentY);
 
-  SVGStyledElement* styledElement = static_cast<SVGStyledElement*>(svgElement);
+  if ((paintInfo.phase == PaintPhaseOutline ||
+       paintInfo.phase == PaintPhaseSelfOutline) &&
+      style()->outlineWidth() && style()->visibility() == VISIBLE)
+    paintOutline(paintInfo.context, parentX, parentY, width(), height(),
+                 style());
 
-  AtomicString clipperId(SVGURIReference::getTarget(svgStyle->clipPath()));
-  AtomicString maskerId(SVGURIReference::getTarget(svgStyle->maskElement()));
+  if (paintInfo.phase != PaintPhaseForeground || !drawsContents())
+    return;
 
-  SVGResourceClipper* clipper = getClipperById(document(), clipperId);
-  SVGResourceMasker* masker = getMaskerById(document(), maskerId);
+  if (!firstChild()) {
+#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+    // Spec: groups w/o children still may render filter content.
+    const SVGRenderStyle* svgStyle = style()->svgStyle();
+    AtomicString filterId(SVGURIReference::getTarget(svgStyle->filter()));
+    SVGResourceFilter* filter = getFilterById(document(), filterId);
+    if (!filter)
+#endif
+      return;
+  }
 
-  if (clipper) {
-    clipper->addClient(styledElement);
-    clipper->applyClip(paintInfo.context, strokeBBox);
-  } else if (!clipperId.isEmpty())
-    svgElement->document()->accessSVGExtensions()->addPendingResource(
-        clipperId, styledElement);
+  paintInfo.context->save();
 
-  if (masker) {
-    masker->addClient(styledElement);
-    masker->applyMask(paintInfo.context, strokeBBox);
-  } else if (!maskerId.isEmpty())
-    svgElement->document()->accessSVGExtensions()->addPendingResource(
-        maskerId, styledElement);
+  applyContentTransforms(paintInfo, parentX, parentY);
+
+#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+  SVGResourceFilter* filter = 0;
+#else
+  void* filter = 0;
+#endif
+  FloatRect boundingBox = relativeBBox(true);
+  prepareToRenderSVGContent(this, paintInfo, boundingBox, filter);
 
   float opacity = style()->opacity();
   if (opacity < 1.0f) {
-    paintInfo.context->clip(enclosingIntRect(strokeBBox));
+    paintInfo.context->clip(enclosingIntRect(boundingBox));
     paintInfo.context->beginTransparencyLayer(opacity);
   }
-
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  if (filter)
-    filter->prepareFilter(paintInfo.context, strokeBBox);
-  else if (!filterId.isEmpty())
-    svgElement->document()->accessSVGExtensions()->addPendingResource(
-        filterId, styledElement);
-#endif
 
   if (!viewBox().isEmpty())
     paintInfo.context->concatCTM(viewportTransform());
@@ -250,7 +235,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
 #if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   if (filter)
-    filter->applyFilter(paintInfo.context, strokeBBox);
+    filter->applyFilter(paintInfo.context, boundingBox);
 #endif
 
   if (opacity < 1.0f)
@@ -318,7 +303,7 @@ AffineTransform RenderSVGContainer::viewportTransform() const {
   //  fixing bug 12207.
   if (!viewBox().isEmpty()) {
     FloatRect viewportRect = viewport();
-    if (!parent()->isSVGContainer())
+    if (isOutermostSVG())
       viewportRect =
           FloatRect(viewport().x(), viewport().y(), width(), height());
 
@@ -353,7 +338,7 @@ void RenderSVGContainer::absoluteRects(Vector<IntRect>& rects, int, int, bool) {
 
 AffineTransform RenderSVGContainer::absoluteTransform() const {
   AffineTransform ctm = RenderContainer::absoluteTransform();
-  if (!parent()->isSVGContainer()) {
+  if (isOutermostSVG()) {
     SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
     ctm.scale(svg->currentScale());
     ctm.translate(svg->currentTranslate().x(), svg->currentTranslate().y());

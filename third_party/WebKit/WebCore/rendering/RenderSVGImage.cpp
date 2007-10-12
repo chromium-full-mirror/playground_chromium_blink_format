@@ -31,9 +31,9 @@
 #include "GraphicsContext.h"
 #include "PointerEventsHitRules.h"
 #include "SVGImageElement.h"
-#include "SVGImageElement.h"
 #include "SVGLength.h"
 #include "SVGPreserveAspectRatio.h"
+#include "SVGRenderSupport.h"
 #include "SVGResourceClipper.h"
 #include "SVGResourceFilter.h"
 #include "SVGResourceMasker.h"
@@ -136,45 +136,13 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   paintInfo.context->concatCTM(localTransform());
   paintInfo.context->concatCTM(translationForAttributes());
 
+#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+  SVGResourceFilter* filter = 0;
+#else
+  void* filter = 0;
+#endif
   FloatRect boundingBox = FloatRect(0, 0, width(), height());
-
-  SVGElement* svgElement = static_cast<SVGElement*>(element());
-  ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
-
-  SVGStyledElement* styledElement = static_cast<SVGStyledElement*>(svgElement);
-  const SVGRenderStyle* svgStyle = style()->svgStyle();
-
-  AtomicString filterId(SVGURIReference::getTarget(svgStyle->filter()));
-  AtomicString clipperId(SVGURIReference::getTarget(svgStyle->clipPath()));
-  AtomicString maskerId(SVGURIReference::getTarget(svgStyle->maskElement()));
-
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  SVGResourceFilter* filter = getFilterById(document(), filterId);
-#endif
-  SVGResourceClipper* clipper = getClipperById(document(), clipperId);
-  SVGResourceMasker* masker = getMaskerById(document(), maskerId);
-
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
-  if (filter)
-    filter->prepareFilter(paintInfo.context, boundingBox);
-  else if (!filterId.isEmpty())
-    svgElement->document()->accessSVGExtensions()->addPendingResource(
-        filterId, styledElement);
-#endif
-
-  if (clipper) {
-    clipper->addClient(styledElement);
-    clipper->applyClip(paintInfo.context, boundingBox);
-  } else if (!clipperId.isEmpty())
-    svgElement->document()->accessSVGExtensions()->addPendingResource(
-        clipperId, styledElement);
-
-  if (masker) {
-    masker->addClient(styledElement);
-    masker->applyMask(paintInfo.context, boundingBox);
-  } else if (!maskerId.isEmpty())
-    svgElement->document()->accessSVGExtensions()->addPendingResource(
-        maskerId, styledElement);
+  prepareToRenderSVGContent(this, paintInfo, boundingBox, filter);
 
   float opacity = style()->opacity();
   if (opacity < 1.0f) {
