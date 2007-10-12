@@ -32,6 +32,7 @@
 
 #include "AffineTransform.h"
 #include "SVGRenderStyle.h"
+#include "SVGTextContentElement.h"
 
 namespace WebCore {
 
@@ -98,6 +99,7 @@ struct SVGCharacterLayoutInfo {
                                    float& y,
                                    float& angle,
                                    float glyphAdvance,
+                                   float extraAdvance,
                                    float newOffset);
 
   // Used for text-on-path.
@@ -205,18 +207,33 @@ struct SVGInlineBoxCharacterRange {
   InlineBox* box;
 };
 
+// Convenience typedef
+typedef SVGTextContentElement::SVGLengthAdjustType ELengthAdjust;
+
 struct SVGTextChunk {
   SVGTextChunk()
       : anchor(TA_START),
+        textLength(0.0),
+        lengthAdjust(SVGTextContentElement::LENGTHADJUST_SPACING),
+        ctm(),
         isVerticalText(false),
         isTextPath(false),
         start(0),
         end(0) {}
 
+  // text-anchor support
   ETextAnchor anchor;
+
+  // textLength & lengthAdjust support
+  float textLength;
+  ELengthAdjust lengthAdjust;
+  AffineTransform ctm;
+
+  // status flags
   bool isVerticalText : 1;
   bool isTextPath : 1;
 
+  // main chunk data
   Vector<SVGChar>::iterator start;
   Vector<SVGChar>::iterator end;
 
@@ -228,6 +245,7 @@ struct SVGTextChunkWalkerBase {
 
   virtual void operator()(SVGInlineTextBox* textBox,
                           int startOffset,
+                          const AffineTransform& chunkCtm,
                           const Vector<SVGChar>::iterator& start,
                           const Vector<SVGChar>::iterator& end) = 0;
 
@@ -245,6 +263,7 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
   typedef void (CallbackClass::*SVGTextChunkWalkerCallback)(
       SVGInlineTextBox* textBox,
       int startOffset,
+      const AffineTransform& chunkCtm,
       const Vector<SVGChar>::iterator& start,
       const Vector<SVGChar>::iterator& end);
 
@@ -274,9 +293,10 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
 
   virtual void operator()(SVGInlineTextBox* textBox,
                           int startOffset,
+                          const AffineTransform& chunkCtm,
                           const Vector<SVGChar>::iterator& start,
                           const Vector<SVGChar>::iterator& end) {
-    (*m_object.*m_walkerCallback)(textBox, startOffset, start, end);
+    (*m_object.*m_walkerCallback)(textBox, startOffset, chunkCtm, start, end);
   }
 
   // Followings methods are only used for painting text chunks

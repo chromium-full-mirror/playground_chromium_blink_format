@@ -261,6 +261,7 @@ struct SVGRootInlineBoxPaintWalker {
 
   void chunkPortionCallback(SVGInlineTextBox* textBox,
                             int startOffset,
+                            const AffineTransform& chunkCtm,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
     RenderText* text = textBox->textObject();
@@ -276,6 +277,9 @@ struct SVGRootInlineBoxPaintWalker {
     int textWidth = 0.0;
     IntPoint decorationOrigin;
     SVGTextDecorationInfo info;
+
+    if (!chunkCtm.isIdentity())
+      m_paintInfo.context->concatCTM(chunkCtm);
 
     for (Vector<SVGChar>::iterator it = start; it != end; ++it) {
       if (!(*it).visible)
@@ -328,6 +332,9 @@ struct SVGRootInlineBoxPaintWalker {
       // Skip processed characters
       it = itSearch - 1;
     }
+
+    if (!chunkCtm.isIdentity())
+      m_paintInfo.context->concatCTM(chunkCtm.inverse());
   }
 
  private:
@@ -443,53 +450,90 @@ TextStyle svgTextStyleForInlineTextBox(RenderStyle* style,
                    textBox->m_dirOverride || style->visuallyOrdered());
 }
 
-static float cummulatedWidthOfTextChunk(SVGTextChunk& chunk) {
-  float width = 0.0;
+static float cummulatedWidthOrHeightOfTextChunk(SVGTextChunk& chunk,
+                                                bool calcWidthOnly) {
+  float length = 0.0;
+  Vector<SVGChar>::iterator charIt = chunk.start;
 
   Vector<SVGInlineBoxCharacterRange>::iterator it = chunk.boxes.begin();
   Vector<SVGInlineBoxCharacterRange>::iterator end = chunk.boxes.end();
 
-  for (; it != end; ++it)
-    width += cummulatedWidthOfInlineBoxCharacterRange(*it);
+  for (; it != end; ++it) {
+    SVGInlineBoxCharacterRange& range = *it;
 
-  return width;
+    SVGInlineTextBox* box = static_cast<SVGInlineTextBox*>(range.box);
+    RenderStyle* style = box->object()->style();
+
+    for (int i = range.startOffset; i < range.endOffset; ++i) {
+      ASSERT(charIt <= chunk.end);
+
+      // Determine how many characters - starting from the current - can be
+      // measured at once.
+      // Important for non-absolute positioned non-latin1 text (ie. Arabic)
+      // where ie. the width
+      // of a string is not the sum of the boundaries of all contained glyphs.
+      Vector<SVGChar>::iterator itSearch = charIt + 1;
+      Vector<SVGChar>::iterator endSearch = charIt + range.endOffset - i;
+      while (itSearch != endSearch) {
+        if ((*itSearch).drawnSeperated)
+          break;
+
+        itSearch++;
+      }
+
+      unsigned int positionOffset = itSearch - charIt;
+
+      // Calculate width/height of subrange
+      SVGInlineBoxCharacterRange subRange;
+      subRange.box = range.box;
+      subRange.startOffset = i;
+      subRange.endOffset = i + positionOffset;
+
+      if (calcWidthOnly)
+        length += cummulatedWidthOfInlineBoxCharacterRange(subRange);
+      else
+        length += cummulatedHeightOfInlineBoxCharacterRange(subRange);
+
+      // Calculate gap between the previous & current range
+      // <text x="10 50 70">ABCD</text> - we need to take the gaps between A & B
+      // into account
+      // so add "40" as width, and analogous for B & C, add "20" as width.
+      if (itSearch > chunk.start && itSearch < chunk.end) {
+        SVGChar& lastCharacter = *(itSearch - 1);
+        SVGChar& currentCharacter = *itSearch;
+
+        int offset = box->m_reversed ? box->end() - i - positionOffset + 1
+                                     : box->start() + i + positionOffset - 1;
+
+        if (calcWidthOnly) {
+          float lastGlyphWidth = box->calculateGlyphWidth(style, offset);
+          length += currentCharacter.x - lastCharacter.x - lastGlyphWidth;
+        } else {
+          float lastGlyphHeight = box->calculateGlyphHeight(style, offset);
+          length += currentCharacter.y - lastCharacter.y - lastGlyphHeight;
+        }
+      }
+
+      // Advance processed characters
+      i += positionOffset - 1;
+      charIt = itSearch;
+    }
+  }
+
+  ASSERT(charIt == chunk.end);
+  return length;
+}
+
+static float cummulatedWidthOfTextChunk(SVGTextChunk& chunk) {
+  return cummulatedWidthOrHeightOfTextChunk(chunk, true);
 }
 
 static float cummulatedHeightOfTextChunk(SVGTextChunk& chunk) {
-  float height = 0.0;
-
-  Vector<SVGInlineBoxCharacterRange>::iterator it = chunk.boxes.begin();
-  Vector<SVGInlineBoxCharacterRange>::iterator end = chunk.boxes.end();
-
-  for (; it != end; ++it)
-    height += cummulatedHeightOfInlineBoxCharacterRange(*it);
-
-  return height;
+  return cummulatedWidthOrHeightOfTextChunk(chunk, false);
 }
 
 static void applyTextAnchorToTextChunk(SVGTextChunk& chunk) {
-#if DEBUG_CHUNK_BUILDING > 0
-  {
-    fprintf(stderr,
-            "Handle TEXT CHUNK! anchor=%i, isVerticalText=%i, isTextPath=%i "
-            "start=%p, end=%p -> dist: %i\n",
-            (int)chunk.anchor, (int)chunk.isVerticalText, (int)chunk.isTextPath,
-            chunk.start, chunk.end, (unsigned int)(chunk.end - chunk.start));
-
-    Vector<SVGInlineBoxCharacterRange>::iterator boxIt = chunk.boxes.begin();
-    Vector<SVGInlineBoxCharacterRange>::iterator boxEnd = chunk.boxes.end();
-
-    unsigned int i = 0;
-    for (; boxIt != boxEnd; ++boxIt) {
-      SVGInlineBoxCharacterRange& range = *boxIt;
-      i++;
-      fprintf(stderr, "RANGE %i STARTOFFSET: %i, ENDOFFSET: %i, BOX: %p\n", i,
-              range.startOffset, range.endOffset, range.box);
-    }
-  }
-#endif
-
-  if (chunk.anchor == TA_START || chunk.isTextPath)
+  if (chunk.anchor == TA_START)
     return;
 
   float shift = 0.0;
@@ -532,6 +576,54 @@ static void applyTextAnchorToTextChunk(SVGTextChunk& chunk) {
       curBox->setYPos(curBox->yPos() + shift);
     else
       curBox->setXPos(curBox->xPos() + shift);
+  }
+}
+
+static void applyTextLengthCorrectionToTextChunk(SVGTextChunk& chunk) {
+  if (chunk.textLength <= FLT_EPSILON)  // Not sure, why <= 0.0 doesn't work
+                                        // here (some fltpoint issue)
+    return;
+
+  float computedWidth = cummulatedWidthOfTextChunk(chunk);
+  float computedHeight = cummulatedHeightOfTextChunk(chunk);
+
+  if ((computedWidth <= 0.0 && !chunk.isVerticalText) ||
+      (computedHeight <= 0.0 && chunk.isVerticalText))
+    return;
+
+  float computedLength;
+
+  if (chunk.isVerticalText)
+    computedLength = computedHeight;
+  else
+    computedLength = computedWidth;
+
+  if (chunk.lengthAdjust ==
+      SVGTextContentElement::LENGTHADJUST_SPACINGANDGLYPHS) {
+    SVGChar& firstChar = *(chunk.start);
+    chunk.ctm.translate(firstChar.x, firstChar.y);
+
+    if (chunk.isVerticalText)
+      chunk.ctm.scale(1.0, chunk.textLength / computedLength);
+    else
+      chunk.ctm.scale(chunk.textLength / computedLength, 1.0);
+
+    chunk.ctm.translate(-firstChar.x, -firstChar.y);
+  } else {
+    float spacingToApply =
+        (chunk.textLength - computedLength) / float(chunk.end - chunk.start);
+
+    // Apply correction to chunk
+    Vector<SVGChar>::iterator chunkIt = chunk.start;
+    for (; chunkIt != chunk.end; ++chunkIt) {
+      SVGChar& curChar = *chunkIt;
+      curChar.drawnSeperated = true;
+
+      if (chunk.isVerticalText)
+        curChar.y += (chunkIt - chunk.start) * spacingToApply;
+      else
+        curChar.x += (chunkIt - chunk.start) * spacingToApply;
+    }
   }
 }
 
@@ -844,28 +936,14 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
       info.cury = info.yValueNext();
     }
 
-    // Calculate absolute x/y values, if needed
-    if (!info.inPathLayout())
-      svgChar.visible = true;
-    else {
-      float glyphAdvance = isVerticalText ? glyphHeight : glyphWidth;
-      float newOffset = FLT_MIN;
-
-      if (assignedX && !isVerticalText)
-        newOffset = info.curx;
-      else if (assignedY && isVerticalText)
-        newOffset = info.cury;
-
-      svgChar.visible = info.nextPathLayoutPointAndAngle(
-          info.curx, info.cury, info.angle, glyphAdvance, newOffset);
-      svgChar.drawnSeperated = true;
-    }
+    float dx = 0.0;
+    float dy = 0.0;
 
     // Apply x-axis shift
     if (info.dxValueAvailable()) {
       svgChar.drawnSeperated = true;
 
-      float dx = info.dxValueNext();
+      dx = info.dxValueNext();
       info.dx += dx;
 
       if (!info.inPathLayout())
@@ -876,11 +954,31 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
     if (info.dyValueAvailable()) {
       svgChar.drawnSeperated = true;
 
-      float dy = info.dyValueNext();
+      dy = info.dyValueNext();
       info.dy += dy;
 
       if (!info.inPathLayout())
         info.cury += dy;
+    }
+
+    // Calculate absolute x/y values, if needed
+    if (!info.inPathLayout())
+      svgChar.visible = true;
+    else {
+      float glyphAdvance = isVerticalText ? glyphHeight : glyphWidth;
+      float extraAdvance = isVerticalText ? dy : dx;
+
+      float newOffset = FLT_MIN;
+
+      if (assignedX && !isVerticalText)
+        newOffset = info.curx;
+      else if (assignedY && isVerticalText)
+        newOffset = info.cury;
+
+      svgChar.visible = info.nextPathLayoutPointAndAngle(
+          info.curx, info.cury, info.angle, glyphAdvance, extraAdvance,
+          newOffset);
+      svgChar.drawnSeperated = true;
     }
 
     // Apply rotation
@@ -910,14 +1008,17 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
       svgChar.pathXShift = 0.0;
       svgChar.pathYShift = 0.0;
     } else {
-      svgChar.pathXShift = info.dx + info.shiftx;
-      svgChar.pathYShift = info.dy + info.shifty;
+      svgChar.pathXShift = info.shiftx;
+      svgChar.pathYShift = info.shifty;
 
       // Translate to glyph midpoint
-      if (isVerticalText)
+      if (isVerticalText) {
         svgChar.pathYShift -= glyphHeight / 2.0;
-      else
+        svgChar.pathXShift += info.dx;
+      } else {
+        svgChar.pathYShift += info.dy;
         svgChar.pathXShift -= glyphWidth / 2.0;
+      }
     }
 
     // Correct character position for vertical text layout
@@ -978,6 +1079,13 @@ void SVGRootInlineBox::buildTextChunks(InlineFlowBox* start,
       RenderText* text = textBox->textObject();
       ASSERT(text);
 
+      SVGElement* textElement = svg_dynamic_cast(text->element()->parent());
+      ASSERT(text->element());
+
+      SVGTextContentElement* textContent =
+          static_cast<SVGTextContentElement*>(textElement);
+      ASSERT(textContent);
+
       // Start new character range for the first chunk
       bool isFirstCharacter = m_svgTextChunks.isEmpty() &&
                               info.chunk.start == info.it &&
@@ -1012,6 +1120,8 @@ void SVGRootInlineBox::buildTextChunks(InlineFlowBox* start,
               isVerticalWritingMode(text->style()->svgStyle());
           info.chunk.isTextPath = info.handlingTextPath;
           info.chunk.anchor = text->style()->svgStyle()->textAnchor();
+          info.chunk.textLength = textContent->textLength().value();
+          info.chunk.lengthAdjust = (ELengthAdjust)textContent->lengthAdjust();
 
 #if DEBUG_CHUNK_BUILDING > 1
           fprintf(
@@ -1051,6 +1161,9 @@ void SVGRootInlineBox::buildTextChunks(InlineFlowBox* start,
                 isVerticalWritingMode(text->style()->svgStyle());
             info.chunk.isTextPath = info.handlingTextPath;
             info.chunk.anchor = text->style()->svgStyle()->textAnchor();
+            info.chunk.textLength = textContent->textLength().value();
+            info.chunk.lengthAdjust =
+                (ELengthAdjust)textContent->lengthAdjust();
 
             range.box = curr;
             range.startOffset = i;
@@ -1155,8 +1268,39 @@ void SVGRootInlineBox::layoutTextChunks() {
   Vector<SVGTextChunk>::iterator it = m_svgTextChunks.begin();
   Vector<SVGTextChunk>::iterator end = m_svgTextChunks.end();
 
-  for (; it != end; ++it)
-    applyTextAnchorToTextChunk(*it);
+  for (; it != end; ++it) {
+    SVGTextChunk& chunk = *it;
+
+#if DEBUG_CHUNK_BUILDING > 0
+    {
+      fprintf(stderr,
+              "Handle TEXT CHUNK! anchor=%i, textLength=%f, lengthAdjust=%i, "
+              "isVerticalText=%i, isTextPath=%i start=%p, end=%p -> dist: %i\n",
+              (int)chunk.anchor, chunk.textLength, (int)chunk.lengthAdjust,
+              (int)chunk.isVerticalText, (int)chunk.isTextPath, chunk.start,
+              chunk.end, (unsigned int)(chunk.end - chunk.start));
+
+      Vector<SVGInlineBoxCharacterRange>::iterator boxIt = chunk.boxes.begin();
+      Vector<SVGInlineBoxCharacterRange>::iterator boxEnd = chunk.boxes.end();
+
+      unsigned int i = 0;
+      for (; boxIt != boxEnd; ++boxIt) {
+        SVGInlineBoxCharacterRange& range = *boxIt;
+        i++;
+        fprintf(stderr,
+                " -> RANGE %i STARTOFFSET: %i, ENDOFFSET: %i, BOX: %p\n", i,
+                range.startOffset, range.endOffset, range.box);
+      }
+    }
+#endif
+
+    // text-path & text-anchor/textLength need special treatment.
+    if (chunk.isTextPath)
+      continue;
+
+    applyTextLengthCorrectionToTextChunk(chunk);
+    applyTextAnchorToTextChunk(chunk);
+  }
 }
 
 static inline void addPaintServerToTextDecorationInfo(
@@ -1268,13 +1412,16 @@ void SVGRootInlineBox::walkTextChunks(SVGTextChunkWalkerBase* walker,
 
       // Process this chunk portion
       if (textBox)
-        (*walker)(rangeTextBox, range.startOffset, itCharBegin, itCharEnd);
+        (*walker)(rangeTextBox, range.startOffset, curChunk.ctm, itCharBegin,
+                  itCharEnd);
       else {
         if (walker->setupFill(range.box))
-          (*walker)(rangeTextBox, range.startOffset, itCharBegin, itCharEnd);
+          (*walker)(rangeTextBox, range.startOffset, curChunk.ctm, itCharBegin,
+                    itCharEnd);
 
         if (walker->setupStroke(range.box))
-          (*walker)(rangeTextBox, range.startOffset, itCharBegin, itCharEnd);
+          (*walker)(rangeTextBox, range.startOffset, curChunk.ctm, itCharBegin,
+                    itCharEnd);
       }
 
       chunkOffset += length;
