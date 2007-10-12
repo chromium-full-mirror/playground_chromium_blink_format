@@ -80,7 +80,7 @@ class SVGLength {
   float valueAsPercentage() const;
 
   String valueAsString() const;
-  void setValueAsString(const String&);
+  bool setValueAsString(const String&);
 
   void newValueSpecifiedUnits(unsigned short, float valueInSpecifiedUnits);
   void convertToSpecifiedUnits(unsigned short);
