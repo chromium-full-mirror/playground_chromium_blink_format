@@ -88,18 +88,12 @@ class RenderSVGContainer : public RenderObject {
                              bool topLevel = true);
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
-  virtual AffineTransform absoluteTransform() const;
-
-  bool fillContains(const FloatPoint&) const;
-  bool strokeContains(const FloatPoint&) const;
   FloatRect relativeBBox(bool includeStroke = true) const;
 
   virtual AffineTransform localTransform() const;
   void setLocalTransform(const AffineTransform&);
 
-  FloatRect viewport() const;
-
-  AffineTransform viewportTransform() const;
+  virtual AffineTransform viewportTransform() const;
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -109,12 +103,13 @@ class RenderSVGContainer : public RenderObject {
                            int ty,
                            HitTestAction);
 
+ protected:
+  virtual void applyContentTransforms(PaintInfo&);
+  virtual void applyAdditionalTransforms(PaintInfo&);
+
  private:
-  void calcViewport();
   int calcReplacedWidth() const;
   int calcReplacedHeight() const;
-
-  void applyContentTransforms(PaintInfo&);
 
   RenderObject* m_firstChild;
   RenderObject* m_lastChild;
@@ -124,10 +119,9 @@ class RenderSVGContainer : public RenderObject {
 
   bool m_drawsContents : 1;
 
-  AffineTransform m_matrix;
-
-  FloatRect m_viewport;
   IntRect m_absoluteBounds;
+
+  AffineTransform m_matrix;
 };
 
 }  // namespace WebCore
