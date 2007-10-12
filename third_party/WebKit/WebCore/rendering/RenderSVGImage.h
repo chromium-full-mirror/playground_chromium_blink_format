@@ -69,10 +69,15 @@ class RenderSVGImage : public RenderImage {
                            int _ty,
                            HitTestAction);
 
+  virtual void calcWidth();
+  virtual void calcHeight();
+
  private:
   AffineTransform translationForAttributes();
   AffineTransform m_transform;
   IntRect m_absoluteBounds;
+  float m_imageWidth;
+  float m_imageHeight;
 };
 
 }  // namespace WebCore
