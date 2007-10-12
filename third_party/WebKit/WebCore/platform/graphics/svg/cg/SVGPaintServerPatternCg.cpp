@@ -54,7 +54,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
         const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
     targetRect = object->absoluteTransform().inverse().mapRect(textBoundary);
   } else
-    targetRect = CGContextGetPathBoundingBox(contextRef);
+    targetRect = object->relativeBBox(false);
 
   m_ownerElement->buildPattern(targetRect);
 
