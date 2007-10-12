@@ -43,6 +43,7 @@
 #include <wtf/Vector.h>
 
 #if ENABLE(SVG)
+#include "RenderSVGRoot.h"
 #include "RenderSVGContainer.h"
 #include "RenderSVGInlineText.h"
 #include "RenderSVGText.h"
@@ -334,6 +335,10 @@ void write(TextStream& ts, const RenderObject& o, int indent) {
   }
   if (o.isSVGContainer()) {
     write(ts, static_cast<const RenderSVGContainer&>(o), indent);
+    return;
+  }
+  if (o.isSVGRoot()) {
+    write(ts, static_cast<const RenderSVGRoot&>(o), indent);
     return;
   }
   if (o.isSVGText()) {

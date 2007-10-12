@@ -25,9 +25,8 @@
 
 #if ENABLE(SVG)
 #include "RenderSVGInline.h"
+
 #include "SVGInlineFlowBox.h"
-#include "SVGTextPositioningElement.h"
-#include "SVGLengthList.h"
 
 namespace WebCore {
 

@@ -132,7 +132,6 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int, int) {
 
   paintInfo.context->save();
   paintInfo.context->concatCTM(localTransform());
-  paintInfo.context->concatCTM(translationForAttributes());
 
   if (paintInfo.phase == PaintPhaseForeground) {
 #if ENABLE(SVG_EXPERIMENTAL_FEATURES)
@@ -140,7 +139,10 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int, int) {
 #else
     void* filter = 0;
 #endif
-    FloatRect boundingBox = FloatRect(0, 0, m_imageWidth, m_imageHeight);
+    AffineTransform imageCtm(translationForAttributes());
+
+    FloatRect boundingBox =
+        FloatRect(imageCtm.e(), imageCtm.f(), m_imageWidth, m_imageHeight);
     prepareToRenderSVGContent(this, paintInfo, boundingBox, filter);
 
     float opacity = style()->opacity();
@@ -162,6 +164,7 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int, int) {
       adjustRectsForAspectRatio(destRect, srcRect,
                                 imageElt->preserveAspectRatio());
 
+    paintInfo.context->concatCTM(imageCtm);
     paintInfo.context->drawImage(image(), destRect, srcRect);
 
 #if ENABLE(SVG_EXPERIMENTAL_FEATURES)

@@ -25,7 +25,6 @@
 
 #if ENABLE(SVG)
 
-#include "RenderContainer.h"
 #include "RenderPath.h"
 #include "SVGPreserveAspectRatio.h"
 
@@ -33,10 +32,38 @@ namespace WebCore {
 
 class SVGElement;
 
-class RenderSVGContainer : public RenderContainer {
+class RenderSVGContainer : public RenderObject {
  public:
   RenderSVGContainer(SVGStyledElement*);
   ~RenderSVGContainer();
+
+  virtual RenderObject* firstChild() const { return m_firstChild; }
+  virtual RenderObject* lastChild() const { return m_lastChild; }
+
+  virtual int width() const { return m_width; }
+  virtual int height() const { return m_height; }
+
+  virtual bool canHaveChildren() const;
+  virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
+  virtual void removeChild(RenderObject*);
+
+  virtual void destroy();
+  void destroyLeftoverChildren();
+
+  virtual RenderObject* removeChildNode(RenderObject*, bool fullRemove = true);
+  virtual void appendChildNode(RenderObject*, bool fullAppend = true);
+  virtual void insertChildNode(RenderObject* child,
+                               RenderObject* before,
+                               bool fullInsert = true);
+
+  // Designed for speed.  Don't waste time doing a bunch of work like layer
+  // updating and repainting when we know that our
+  // change in parentage is not going to affect anything.
+  virtual void moveChildNode(RenderObject* child) {
+    appendChildNode(child->parent()->removeChildNode(child, false), false);
+  }
+
+  virtual void calcPrefWidths() { setPrefWidthsDirty(false); }
 
   // Some containers do not want it's children
   // to be drawn, because they may be 'referenced'
@@ -93,12 +120,22 @@ class RenderSVGContainer : public RenderContainer {
 
  private:
   void calcViewport();
+  int calcReplacedWidth() const;
+  int calcReplacedHeight() const;
+
   AffineTransform getAspectRatio(const FloatRect& logical,
                                  const FloatRect& physical) const;
-  void applyContentTransforms(PaintInfo&, int& parentX, int& parentY);
+  void applyContentTransforms(PaintInfo&);
+
+  RenderObject* m_firstChild;
+  RenderObject* m_lastChild;
+
+  int m_width;
+  int m_height;
 
   bool m_drawsContents : 1;
   bool m_slice : 1;
+
   AffineTransform m_matrix;
 
   FloatRect m_viewport;

@@ -24,7 +24,6 @@
 #define RenderSVGRoot_h
 
 #if ENABLE(SVG)
-
 #include "RenderContainer.h"
 #include "RenderPath.h"
 #include "SVGPreserveAspectRatio.h"
@@ -38,10 +37,9 @@ class RenderSVGRoot : public RenderContainer {
   RenderSVGRoot(SVGStyledElement*);
   ~RenderSVGRoot();
 
-  virtual bool isSVGContainer() const { return true; }
-  virtual const char* renderName() const { return "RenderSVGContainer"; }
+  virtual bool isSVGRoot() const { return true; }
+  virtual const char* renderName() const { return "RenderSVGRoot"; }
 
-  virtual bool requiresLayer();
   virtual short lineHeight(bool b, bool isRootLineBox = false) const;
   virtual short baselinePosition(bool b, bool isRootLineBox = false) const;
 
@@ -86,7 +84,7 @@ class RenderSVGRoot : public RenderContainer {
   void calcViewport();
   AffineTransform getAspectRatio(const FloatRect& logical,
                                  const FloatRect& physical) const;
-  void applyContentTransforms(PaintInfo&, int& parentX, int& parentY);
+  void applyContentTransforms(PaintInfo&, int parentX, int parentY);
 
   bool m_slice : 1;
   AffineTransform m_matrix;
