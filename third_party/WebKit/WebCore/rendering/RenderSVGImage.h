@@ -39,10 +39,7 @@ class RenderSVGImage : public RenderImage {
   RenderSVGImage(SVGImageElement*);
   virtual ~RenderSVGImage();
 
-  virtual AffineTransform localTransform() const { return m_transform; }
-  virtual void setLocalTransform(const AffineTransform& transform) {
-    m_transform = transform;
-  }
+  virtual AffineTransform localTransform() const { return m_localTransform; }
 
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
   virtual IntRect absoluteClippedOverflowRect();
@@ -57,6 +54,8 @@ class RenderSVGImage : public RenderImage {
   void adjustRectsForAspectRatio(FloatRect& destRect,
                                  FloatRect& srcRect,
                                  SVGPreserveAspectRatio*);
+
+  virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
   bool requiresLayer();
@@ -71,11 +70,11 @@ class RenderSVGImage : public RenderImage {
 
   virtual void calcWidth();
   virtual void calcHeight();
+  bool calculateLocalTransform();
 
  private:
   AffineTransform translationForAttributes();
-  AffineTransform m_transform;
-  IntRect m_absoluteBounds;
+  AffineTransform m_localTransform;
   float m_imageWidth;
   float m_imageHeight;
 };

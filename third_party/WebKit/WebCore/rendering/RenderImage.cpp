@@ -315,9 +315,7 @@ void RenderImage::layout() {
   }
 
   // minimum height
-  m_height = m_cachedImage && m_cachedImage->errorOccurred()
-                 ? intrinsicSize().height()
-                 : 0;
+  m_height = errorOccurred() ? intrinsicSize().height() : 0;
 
   calcWidth();
   calcHeight();

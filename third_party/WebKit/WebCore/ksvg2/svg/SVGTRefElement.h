@@ -34,7 +34,6 @@ class SVGTRefElement : public SVGTextPositioningElement,
   SVGTRefElement(const QualifiedName&, Document*);
   virtual ~SVGTRefElement();
 
-  virtual void attributeChanged(Attribute* attr, bool preserveDecls);
   virtual void parseMappedAttribute(MappedAttribute*);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

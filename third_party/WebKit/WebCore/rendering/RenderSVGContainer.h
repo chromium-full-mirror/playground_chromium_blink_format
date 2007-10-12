@@ -90,9 +90,8 @@ class RenderSVGContainer : public RenderObject {
 
   FloatRect relativeBBox(bool includeStroke = true) const;
 
+  virtual bool calculateLocalTransform();
   virtual AffineTransform localTransform() const;
-  void setLocalTransform(const AffineTransform&);
-
   virtual AffineTransform viewportTransform() const;
 
   virtual bool nodeAtPoint(const HitTestRequest&,
@@ -121,9 +120,9 @@ class RenderSVGContainer : public RenderObject {
 
   bool m_drawsContents : 1;
 
+ protected:
   IntRect m_absoluteBounds;
-
-  AffineTransform m_matrix;
+  AffineTransform m_localTransform;
 };
 
 }  // namespace WebCore

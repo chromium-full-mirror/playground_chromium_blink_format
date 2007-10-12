@@ -39,10 +39,11 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual const char* renderName() const { return "RenderSVGText"; }
 
-  virtual AffineTransform localTransform() const { return m_transform; }
-  virtual void setLocalTransform(const AffineTransform& transform) {
-    m_transform = transform;
-  }
+  virtual bool isSVGText() const { return true; }
+
+  bool calculateLocalTransform();
+  virtual AffineTransform localTransform() const { return m_localTransform; }
+
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -51,21 +52,23 @@ class RenderSVGText : public RenderSVGBlock {
                            int tx,
                            int ty,
                            HitTestAction);
+
+  virtual bool requiresLayer();
+  virtual void layout();
+
   virtual void absoluteRects(Vector<IntRect>&,
                              int tx,
                              int ty,
                              bool topLevel = true);
   virtual IntRect absoluteClippedOverflowRect();
-  virtual bool requiresLayer();
-  virtual void layout();
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
+
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
                                      bool isOnlyRun = false);
-  virtual bool isSVGText() const { return true; }
 
  private:
-  AffineTransform m_transform;
+  AffineTransform m_localTransform;
   IntRect m_absoluteBounds;
 };
 }

@@ -37,11 +37,11 @@ namespace WebCore {
 class FloatPoint;
 class Path;
 class RenderSVGContainer;
-class SVGStyledElement;
+class SVGStyledTransformableElement;
 
 class RenderPath : public RenderObject {
  public:
-  RenderPath(RenderStyle* style, SVGStyledElement* node);
+  RenderPath(RenderStyle*, SVGStyledTransformableElement*);
   virtual ~RenderPath();
 
   // Hit-detection seperated for the fill and the stroke
@@ -59,8 +59,8 @@ class RenderPath : public RenderObject {
   virtual bool isRenderPath() const { return true; }
   virtual const char* renderName() const { return "RenderPath"; }
 
+  bool calculateLocalTransform();
   virtual AffineTransform localTransform() const;
-  virtual void setLocalTransform(const AffineTransform& matrix);
 
   virtual void layout();
   virtual IntRect absoluteClippedOverflowRect();
@@ -95,7 +95,7 @@ class RenderPath : public RenderObject {
   mutable FloatRect m_fillBBox;
   mutable FloatRect m_strokeBbox;
   FloatRect m_markerBounds;
-  AffineTransform m_matrix;
+  AffineTransform m_localTransform;
   IntRect m_absoluteBounds;
 };
 }

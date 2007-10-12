@@ -59,8 +59,6 @@ class SVGTextPathElement : public SVGTextContentElement,
   virtual void insertedIntoDocument();
   virtual void buildPendingResource();
 
-  virtual void attach();
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);

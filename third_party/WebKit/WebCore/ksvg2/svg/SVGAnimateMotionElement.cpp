@@ -24,6 +24,7 @@
 #if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGAnimateMotionElement.h"
 
+#include "RenderObject.h"
 #include "SVGMPathElement.h"
 #include "SVGParserUtilities.h"
 #include "SVGPathElement.h"
@@ -219,7 +220,10 @@ void SVGAnimateMotionElement::applyAnimatedValueToElement() {
                       m_animatedTranslation.height());
   if (!transform.isIdentity()) {
     transformList->appendItem(SVGTransform(transform), ec);
-    transformableElement->updateLocalTransform(transformList.get());
+    transformableElement->setTransform(transformList.get());
+    if (transformableElement->renderer())
+      transformableElement->renderer()->setNeedsLayout(
+          true);  // should be part of setTransform
   }
 }
 }

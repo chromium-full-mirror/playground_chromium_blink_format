@@ -29,6 +29,7 @@
 #include "RenderView.h"
 #include "SVGForeignObjectElement.h"
 #include "SVGLength.h"
+#include "SVGTransformList.h"
 
 namespace WebCore {
 
@@ -81,6 +82,13 @@ bool RenderForeignObject::requiresLayer() {
   return false;
 }
 
+bool RenderForeignObject::calculateLocalTransform() {
+  AffineTransform oldTransform = m_localTransform;
+  m_localTransform = static_cast<SVGForeignObjectElement*>(element())
+                         ->animatedLocalTransform();
+  return (oldTransform != m_localTransform);
+}
+
 void RenderForeignObject::layout() {
   ASSERT(needsLayout());
 
@@ -94,6 +102,8 @@ void RenderForeignObject::layout() {
     oldBounds = m_absoluteBounds;
     oldOutlineBox = absoluteOutlineBox();
   }
+
+  calculateLocalTransform();
 
   RenderBlock::layout();
 

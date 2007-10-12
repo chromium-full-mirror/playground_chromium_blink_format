@@ -30,7 +30,7 @@
 
 #include "AffineTransform.h"
 #include "GraphicsContext.h"
-#include "RenderSVGContainer.h"
+#include "RenderSVGViewportContainer.h"
 #include "TextStream.h"
 
 namespace WebCore {
@@ -46,7 +46,7 @@ SVGResourceMarker::SVGResourceMarker()
 
 SVGResourceMarker::~SVGResourceMarker() {}
 
-void SVGResourceMarker::setMarker(RenderSVGContainer* marker) {
+void SVGResourceMarker::setMarker(RenderSVGViewportContainer* marker) {
   m_marker = marker;
 }
 

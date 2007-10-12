@@ -131,7 +131,6 @@ class SVGSVGElement : public SVGStyledLocatableElement,
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
-  friend class RenderSVGContainer;
   friend class RenderSVGRoot;
   friend class RenderSVGViewportContainer;
 

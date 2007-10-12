@@ -24,7 +24,7 @@
 #if ENABLE(SVG)
 #include "SVGSwitchElement.h"
 
-#include "RenderSVGContainer.h"
+#include "RenderSVGTransformableContainer.h"
 #include "SVGNames.h"
 
 namespace WebCore {
@@ -50,7 +50,7 @@ bool SVGSwitchElement::childShouldCreateRenderer(Node* child) const {
 
 RenderObject* SVGSwitchElement::createRenderer(RenderArena* arena,
                                                RenderStyle*) {
-  return new (arena) RenderSVGContainer(this);
+  return new (arena) RenderSVGTransformableContainer(this);
 }
 }
 
