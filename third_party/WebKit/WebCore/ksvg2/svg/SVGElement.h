@@ -197,7 +197,9 @@
       ClassName::LowerProperty##Animated() const {                             \
     const SVGElement* context = contextElement();                              \
     ASSERT(context);                                                           \
-    return new ClassName::SVGAnimatedTemplate##UpperProperty(context);         \
+    return lookupOrCreateWrapper<                                              \
+        ClassName::SVGAnimatedTemplate##UpperProperty, SVGElement>(context,    \
+                                                                   AttrName);  \
   }
 
 #define ANIMATED_PROPERTY_DEFINITIONS(ClassName, BareType, UpperClassName,    \
@@ -208,7 +210,9 @@
       UpperProperty, LowerProperty, AttrName, StorageGetter, this)            \
   PassRefPtr<ClassName::SVGAnimatedTemplate##UpperProperty>                   \
       ClassName::LowerProperty##Animated() const {                            \
-    return new ClassName::SVGAnimatedTemplate##UpperProperty(this);           \
+    return lookupOrCreateWrapper<                                             \
+        ClassName::SVGAnimatedTemplate##UpperProperty, ClassName>(this,       \
+                                                                  AttrName);  \
   }
 
 namespace WebCore {
