@@ -1684,7 +1684,7 @@ bool RenderLayer::hitTest(const HitTestRequest& request,
     // itself
     if (node->isLink() && !result.URLElement() && !node->hasTagName(imgTag))
       result.setURLElement(static_cast<Element*>(node));
-    node = node->parentNode();
+    node = node->eventParentNode();
   }
 
   // Next set up the correct :hover/:active state along the new chain.
