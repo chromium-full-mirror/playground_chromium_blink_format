@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,8 +22,8 @@
 
 #ifndef SVGFECompositeElement_h
 #define SVGFECompositeElement_h
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGFEComposite.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
@@ -34,11 +34,8 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFECompositeElement(const QualifiedName&, Document*);
   virtual ~SVGFECompositeElement();
 
-  // 'SVGFECompositeElement' functions
-  // Derived from: 'Element'
-  virtual void parseMappedAttribute(MappedAttribute* attr);
-
-  virtual SVGFEComposite* filterEffect() const;
+  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual SVGFEComposite* filterEffect(SVGResourceFilter*) const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -63,6 +60,7 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, double, double, K2, k2)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, double, double, K3, k3)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, double, double, K4, k4)
+
   mutable SVGFEComposite* m_filterEffect;
 };
 

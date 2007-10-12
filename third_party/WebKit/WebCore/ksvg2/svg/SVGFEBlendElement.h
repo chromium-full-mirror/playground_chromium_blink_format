@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,8 +22,8 @@
 
 #ifndef SVGFEBlendElement_h
 #define SVGFEBlendElement_h
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGFEBlend.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
@@ -33,11 +33,8 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFEBlendElement(const QualifiedName&, Document*);
   virtual ~SVGFEBlendElement();
 
-  // 'SVGFEBlendElement' functions
-  // Derived from: 'Element'
-  virtual void parseMappedAttribute(MappedAttribute* attr);
-
-  virtual SVGFEBlend* filterEffect() const;
+  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual SVGFEBlend* filterEffect(SVGResourceFilter*) const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -46,6 +43,7 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement, String, String, In1, in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement, String, String, In2, in2)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement, int, int, Mode, mode)
+
   mutable SVGFEBlend* m_filterEffect;
 };
 
@@ -53,3 +51,5 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
 
 #endif  // ENABLE(SVG)
 #endif
+
+// vim:ts=4:noet

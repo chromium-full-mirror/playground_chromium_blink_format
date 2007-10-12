@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,9 +22,9 @@
 
 #ifndef SVGFEMergeNodeElement_h
 #define SVGFEMergeNodeElement_h
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
-#include <SVGElement.h>
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#include "SVGElement.h"
 
 namespace WebCore {
 class SVGFEMergeNodeElement : public SVGElement {
@@ -32,10 +32,7 @@ class SVGFEMergeNodeElement : public SVGElement {
   SVGFEMergeNodeElement(const QualifiedName&, Document*);
   virtual ~SVGFEMergeNodeElement();
 
-  // Derived from: 'Element'
-  virtual void parseMappedAttribute(MappedAttribute* attr);
-
-  // 'SVGFEMergeNodeElement' functions
+  virtual void parseMappedAttribute(MappedAttribute*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

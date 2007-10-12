@@ -31,7 +31,8 @@ SVGResourceFilter::SVGResourceFilter() {}
 SVGResourceFilter::~SVGResourceFilter() {}
 
 SVGFilterEffect* SVGResourceFilter::createFilterEffect(
-    const SVGFilterEffectType&) {
+    const SVGFilterEffectType&,
+    SVGResourceFilter*) {
   // FIXME: implement me :-)
   return 0;
 }

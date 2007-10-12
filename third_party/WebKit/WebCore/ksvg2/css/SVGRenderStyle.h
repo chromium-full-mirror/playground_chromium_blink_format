@@ -233,6 +233,12 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                                FloodColor,
                                                floodColor,
                                                Color(0, 0, 0))
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(Color,
+                                               misc,
+                                               lightingColor,
+                                               LightingColor,
+                                               lightingColor,
+                                               Color(255, 255, 255))
   SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL_REFCOUNTED(CSSValue,
                                                           misc,
                                                           baselineShiftValue,

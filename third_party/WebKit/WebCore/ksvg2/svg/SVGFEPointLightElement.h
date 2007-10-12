@@ -19,8 +19,8 @@
 
 #ifndef SVGFEPointLightElement_h
 #define SVGFEPointLightElement_h
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGFELightElement.h"
 
 namespace WebCore {
@@ -28,6 +28,7 @@ class SVGFEPointLightElement : public SVGFELightElement {
  public:
   SVGFEPointLightElement(const QualifiedName&, Document*);
   virtual ~SVGFEPointLightElement();
+
   virtual SVGLightSource* lightSource() const;
 };
 

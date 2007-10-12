@@ -35,4 +35,5 @@ SVGLightSource* SVGFEDistantLightElement::lightSource() const {
   return new SVGDistantLightSource(azimuth(), elevation());
 }
 }
+
 #endif  // ENABLE(SVG)

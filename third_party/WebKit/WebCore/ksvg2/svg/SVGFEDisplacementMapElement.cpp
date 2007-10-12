@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2006 Oliver Hunt <ojh16@student.canterbury.ac.nz>
+ Copyright (C) 2006 Oliver Hunt <oliver@nerget.com>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -30,8 +30,8 @@ SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
     const QualifiedName& tagName,
     Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_xChannelSelector(0),
-      m_yChannelSelector(0),
+      m_xChannelSelector(SVG_CHANNEL_A),
+      m_yChannelSelector(SVG_CHANNEL_A),
       m_scale(0.0),
       m_filterEffect(0) {}
 
@@ -110,12 +110,14 @@ void SVGFEDisplacementMapElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect() const {
+SVGFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect(
+    SVGResourceFilter* filter) const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEDisplacementMap*>(
-        SVGResourceFilter::createFilterEffect(FE_DISPLACEMENT_MAP));
+        SVGResourceFilter::createFilterEffect(FE_DISPLACEMENT_MAP, filter));
   if (!m_filterEffect)
     return 0;
+
   m_filterEffect->setXChannelSelector(
       (SVGChannelSelectorType)xChannelSelector());
   m_filterEffect->setYChannelSelector(
@@ -123,6 +125,7 @@ SVGFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect() const {
   m_filterEffect->setIn(in1());
   m_filterEffect->setIn2(in2());
   m_filterEffect->setScale(scale());
+
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;
 }

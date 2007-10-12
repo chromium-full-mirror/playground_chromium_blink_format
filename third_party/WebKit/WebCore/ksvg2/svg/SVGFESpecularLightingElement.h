@@ -1,7 +1,7 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
-                  2005 Oliver Hunt <ojh16@student.canterbury.ac.nz>
+                  2005 Oliver Hunt <oliver@nerget.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,8 +21,8 @@
 
 #ifndef SVGFESpecularLightingElement_h
 #define SVGFESpecularLightingElement_h
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGFESpecularLighting.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
@@ -35,11 +35,8 @@ class SVGFESpecularLightingElement
   SVGFESpecularLightingElement(const QualifiedName&, Document*);
   virtual ~SVGFESpecularLightingElement();
 
-  // 'SVGFEDiffuseLightingElement' functions
-  // Derived from: 'Element'
-  virtual void parseMappedAttribute(MappedAttribute* attr);
-
-  virtual SVGFESpecularLighting* filterEffect() const;
+  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual SVGFESpecularLighting* filterEffect(SVGResourceFilter*) const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -66,11 +63,6 @@ class SVGFESpecularLightingElement
                                  SurfaceScale,
                                  surfaceScale)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 SVGColor*,
-                                 RefPtr<SVGColor>,
-                                 LightingColor,
-                                 lightingColor)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
                                  double,
                                  double,
                                  KernelUnitLengthX,
@@ -80,10 +72,9 @@ class SVGFESpecularLightingElement
                                  double,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
-  // need other properties here...
+
   mutable SVGFESpecularLighting* m_filterEffect;
 
-  // light management
   void updateLights() const;
 };
 

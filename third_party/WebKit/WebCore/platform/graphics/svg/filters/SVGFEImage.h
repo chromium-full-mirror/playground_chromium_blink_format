@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                   2005 Eric Seidel <eric.seidel@kdemail.net>
 
@@ -33,11 +33,10 @@ namespace WebCore {
 
 class SVGFEImage : public SVGFilterEffect, public CachedResourceClient {
  public:
-  SVGFEImage();
+  SVGFEImage(SVGResourceFilter*);
   virtual ~SVGFEImage();
 
-  // FIXME: Eventually we need to support <svg> (RenderObject*) as well as image
-  // data.
+  // FIXME: We need to support <svg> (RenderObject*) as well as image data.
 
   CachedImage* cachedImage() const;
   void setCachedImage(CachedImage*);
@@ -45,7 +44,7 @@ class SVGFEImage : public SVGFilterEffect, public CachedResourceClient {
   virtual TextStream& externalRepresentation(TextStream&) const;
 
 #if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(SVGResourceFilter*) const;
+  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
 #endif
 
  private:

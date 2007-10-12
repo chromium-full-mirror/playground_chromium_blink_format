@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -63,10 +63,11 @@ void SVGFEComponentTransferElement::parseMappedAttribute(
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFEComponentTransfer* SVGFEComponentTransferElement::filterEffect() const {
+SVGFEComponentTransfer* SVGFEComponentTransferElement::filterEffect(
+    SVGResourceFilter* filter) const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEComponentTransfer*>(
-        SVGResourceFilter::createFilterEffect(FE_COMPONENT_TRANSFER));
+        SVGResourceFilter::createFilterEffect(FE_COMPONENT_TRANSFER, filter));
   if (!m_filterEffect)
     return 0;
 

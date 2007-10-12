@@ -23,6 +23,7 @@
 #include "SVGFEDiffuseLightingElement.h"
 
 #include "Attr.h"
+#include "RenderObject.h"
 #include "SVGColor.h"
 #include "SVGFELightElement.h"
 #include "SVGNames.h"
@@ -37,9 +38,8 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
     const QualifiedName& tagName,
     Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_diffuseConstant(0.0),
-      m_surfaceScale(0.0),
-      m_lightingColor(new SVGColor()),
+      m_diffuseConstant(1.0),
+      m_surfaceScale(1.0),
       m_kernelUnitLengthX(0.0),
       m_kernelUnitLengthY(0.0),
       m_filterEffect(0) {}
@@ -88,14 +88,6 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
                               kernelUnitLengthY,
                               "kernelUnitLengthY",
                               m_kernelUnitLengthY)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
-                              SVGColor*,
-                              Color,
-                              color,
-                              LightingColor,
-                              lightingColor,
-                              SVGNames::lighting_colorAttr.localName(),
-                              m_lightingColor.get())
 
 void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
@@ -111,26 +103,36 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
       setKernelUnitLengthXBaseValue(x);
       setKernelUnitLengthYBaseValue(y);
     }
-  } else if (attr->name() == SVGNames::lighting_colorAttr)
-    setLightingColorBaseValue(new SVGColor(value));
-  else
+  } else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect() const {
+SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect(
+    SVGResourceFilter* filter) const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEDiffuseLighting*>(
-        SVGResourceFilter::createFilterEffect(FE_DIFFUSE_LIGHTING));
+        SVGResourceFilter::createFilterEffect(FE_DIFFUSE_LIGHTING, filter));
   if (!m_filterEffect)
     return 0;
 
   m_filterEffect->setIn(in1());
-  setStandardAttributes(m_filterEffect);
   m_filterEffect->setDiffuseConstant(diffuseConstant());
   m_filterEffect->setSurfaceScale(surfaceScale());
   m_filterEffect->setKernelUnitLengthX(kernelUnitLengthX());
   m_filterEffect->setKernelUnitLengthY(kernelUnitLengthY());
-  m_filterEffect->setLightingColor(lightingColor()->color());
+
+  SVGFEDiffuseLightingElement* nonConstThis =
+      const_cast<SVGFEDiffuseLightingElement*>(this);
+
+  RenderStyle* parentStyle = 0;
+  if (!renderer())
+    parentStyle = nonConstThis->styleForRenderer(parent()->renderer());
+
+  RenderStyle* filterStyle = nonConstThis->resolveStyle(parentStyle);
+  m_filterEffect->setLightingColor(filterStyle->svgStyle()->lightingColor());
+
+  setStandardAttributes(m_filterEffect);
+
   updateLights();
   return m_filterEffect;
 }

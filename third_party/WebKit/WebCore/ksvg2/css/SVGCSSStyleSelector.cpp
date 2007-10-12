@@ -658,7 +658,24 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
         col = style->color();
       else
         col = c->color();
+
       svgstyle->setStopColor(col);
+      break;
+    }
+    case SVGCSS_PROP_LIGHTING_COLOR: {
+      HANDLE_INHERIT_AND_INITIAL(lightingColor, LightingColor);
+
+      SVGColor* c = static_cast<SVGColor*>(value);
+      if (!c)
+        return CSSStyleSelector::applyProperty(id, value);
+
+      Color col;
+      if (c->colorType() == SVGColor::SVG_COLORTYPE_CURRENTCOLOR)
+        col = style->color();
+      else
+        col = c->color();
+
+      svgstyle->setLightingColor(col);
       break;
     }
     case SVGCSS_PROP_FLOOD_OPACITY: {
@@ -681,7 +698,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
     case SVGCSS_PROP_FLOOD_COLOR: {
       Color col;
       if (isInitial)
-        col = SVGRenderStyle::initialStopColor();
+        col = SVGRenderStyle::initialFloodColor();
       else {
         SVGColor* c = static_cast<SVGColor*>(value);
         if (!c)

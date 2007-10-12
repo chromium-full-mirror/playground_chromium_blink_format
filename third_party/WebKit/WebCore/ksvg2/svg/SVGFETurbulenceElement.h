@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,8 +22,8 @@
 
 #ifndef SVGFETurbulenceElement_h
 #define SVGFETurbulenceElement_h
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGFETurbulence.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
@@ -39,11 +39,8 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFETurbulenceElement(const QualifiedName&, Document*);
   virtual ~SVGFETurbulenceElement();
 
-  // 'SVGFETurbulenceElement' functions
-  // Derived from: 'Element'
-  virtual void parseMappedAttribute(MappedAttribute* attr);
-
-  virtual SVGFETurbulence* filterEffect() const;
+  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual SVGFETurbulence* filterEffect(SVGResourceFilter*) const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -75,6 +72,7 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
                                  StitchTiles,
                                  stitchTiles)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement, int, int, Type, type)
+
   mutable SVGFETurbulence* m_filterEffect;
 };
 
