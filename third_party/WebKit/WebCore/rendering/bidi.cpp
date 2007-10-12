@@ -1029,6 +1029,11 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
             // Now position our text runs vertically.
             computeVerticalPositionsForLine(lineBox);
 
+#if ENABLE(SVG)
+            // Special SVG text layout code
+            lineBox->computePerCharacterLayoutInformation();
+#endif
+
 #if PLATFORM(MAC)
             // Highlight acts as an overflow inflation.
             if (style()->highlight() != nullAtom)

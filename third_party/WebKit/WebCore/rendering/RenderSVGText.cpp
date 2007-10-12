@@ -61,7 +61,7 @@ void RenderSVGText::layout() {
     oldOutlineBox = absoluteOutlineBox();
   }
 
-  // FIXME: need to allow floating point positions
+  // Best guess for a relative starting point
   SVGTextElement* text = static_cast<SVGTextElement*>(element());
   int xOffset = (int)(text->x()->getFirst().value());
   int yOffset = (int)(text->y()->getFirst().value());
@@ -118,6 +118,7 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
                                       _tx, _ty, hitTestAction);
     }
   }
+
   return false;
 }
 

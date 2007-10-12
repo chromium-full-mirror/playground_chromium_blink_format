@@ -243,6 +243,8 @@ class InlineBox {
 
   void setHasBadParent();
 
+  int toAdd() { return m_toAdd; }
+
  public:
   RenderObject* m_object;
 
