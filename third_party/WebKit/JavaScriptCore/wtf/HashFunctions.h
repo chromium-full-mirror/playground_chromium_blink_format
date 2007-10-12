@@ -88,6 +88,15 @@ struct IntHash {
   static bool equal(T a, T b) { return a == b; }
 };
 
+template <typename T>
+struct FloatHash {
+  static unsigned hash(T key) {
+    return intHash(
+        *reinterpret_cast<typename IntTypes<sizeof(T)>::UnsignedType*>(&key));
+  }
+  static bool equal(T a, T b) { return a == b; }
+};
+
 // pointer identity hash function
 
 template <typename T>
@@ -143,6 +152,15 @@ struct DefaultHash<long long> {
 template <>
 struct DefaultHash<unsigned long long> {
   typedef IntHash<unsigned long long> Hash;
+};
+
+template <>
+struct DefaultHash<float> {
+  typedef FloatHash<float> Hash;
+};
+template <>
+struct DefaultHash<double> {
+  typedef FloatHash<double> Hash;
 };
 
 // make PtrHash the default hash function for pointer types that don't
