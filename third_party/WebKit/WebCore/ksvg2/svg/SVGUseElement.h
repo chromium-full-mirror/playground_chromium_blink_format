@@ -105,10 +105,12 @@ class SVGUseElement : public SVGStyledTransformableElement,
       SVGElement* target,
       SVGElementInstance* targetInstance);
   void alterShadowTreeForSVGTag(SVGElement* target);
+  void removeDisallowedElementsFromSubtree(Node* element);
 
   void buildShadowTree(SVGElement* target, SVGElementInstance* targetInstance);
 #if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
   void expandUseElementsInShadowTree(Node* element);
+  void expandSymbolElementsInShadowTree(Node* element);
 #endif
   void attachShadowTree();
 
