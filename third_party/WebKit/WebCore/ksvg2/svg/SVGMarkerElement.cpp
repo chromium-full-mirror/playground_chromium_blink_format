@@ -186,7 +186,7 @@ RenderObject* SVGMarkerElement::createRenderer(RenderArena* arena,
 }
 
 void SVGMarkerElement::notifyAttributeChange() const {
-  if (!m_marker || !attached() || ownerDocument()->parsing())
+  if (!m_marker || !attached() || document()->parsing())
     return;
 
   RenderSVGContainer* markerContainer =

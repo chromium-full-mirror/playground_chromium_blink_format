@@ -132,7 +132,7 @@ void SVGImageElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void SVGImageElement::notifyAttributeChange() const {
-  if (!ownerDocument()->parsing())
+  if (!document()->parsing())
     rebuildRenderer();
 
   SVGStyledTransformableElement::notifyAttributeChange();

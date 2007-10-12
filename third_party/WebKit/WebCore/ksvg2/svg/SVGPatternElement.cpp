@@ -297,7 +297,7 @@ void SVGPatternElement::buildPattern(const FloatRect& targetRect) const {
 }
 
 void SVGPatternElement::notifyAttributeChange() const {
-  if (!m_resource || !attached() || ownerDocument()->parsing())
+  if (!m_resource || !attached() || document()->parsing())
     return;
 
   m_resource->invalidate();

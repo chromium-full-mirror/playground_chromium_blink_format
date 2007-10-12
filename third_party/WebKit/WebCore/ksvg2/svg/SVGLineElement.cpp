@@ -97,7 +97,7 @@ void SVGLineElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void SVGLineElement::notifyAttributeChange() const {
-  if (!ownerDocument()->parsing())
+  if (!document()->parsing())
     rebuildRenderer();
 
   SVGStyledTransformableElement::notifyAttributeChange();
