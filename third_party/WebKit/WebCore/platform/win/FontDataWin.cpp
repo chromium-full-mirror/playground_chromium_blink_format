@@ -83,6 +83,8 @@ void FontData::platformInit() {
       !_tcscmp(faceName.data(), _T("Courier")))
     fAscent += floorf(((fAscent + fDescent) * 0.15f) + 0.5f);
 
+  m_unitsPerEm = 1;  // FIXME!
+
   m_ascent = lroundf(fAscent);
   m_descent = lroundf(fDescent);
   m_lineGap = lroundf(fLineGap);

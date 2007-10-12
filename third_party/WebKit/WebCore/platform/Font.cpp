@@ -562,6 +562,10 @@ float Font::xHeight() const {
   return primaryFont()->xHeight();
 }
 
+unsigned Font::unitsPerEm() const {
+  return primaryFont()->unitsPerEm();
+}
+
 int Font::spaceWidth() const {
   return (int)ceilf(primaryFont()->m_adjustedSpaceWidth + m_letterSpacing);
 }
