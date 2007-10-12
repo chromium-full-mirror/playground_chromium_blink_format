@@ -275,12 +275,12 @@ Value FunId::evaluate() const {
     while (startPos < length && isWhitespace(idList[startPos]))
       ++startPos;
 
+    if (startPos == length)
+      break;
+
     size_t endPos = startPos;
     while (endPos < length && !isWhitespace(idList[endPos]))
       ++endPos;
-
-    if (endPos == length)
-      break;
 
     // If there are several nodes with the same id, id() should return the first
     // one.
