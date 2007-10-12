@@ -681,6 +681,12 @@ void RenderObject::setChildNeedsLayout(bool b, bool markParents) {
   }
 }
 
+static inline bool objectIsRelayoutBoundary(const RenderObject* obj) {
+  // FIXME: In future it may be possible to broaden this condition in order to
+  // improve performance
+  return obj->isTextField() || obj->isTextArea() || obj->isSVGRoot();
+}
+
 void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout) {
   RenderObject* o = container();
   RenderObject* last = this;
@@ -700,7 +706,7 @@ void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout) {
     }
 
     last = o;
-    if (scheduleRelayout && (last->isTextField() || last->isTextArea()))
+    if (scheduleRelayout && objectIsRelayoutBoundary(last))
       break;
     o = o->container();
   }
