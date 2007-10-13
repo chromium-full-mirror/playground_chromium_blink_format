@@ -70,10 +70,13 @@ bool InsertListCommand::modifyRange() {
   // if the start of the selection is inside that table, the last paragraph
   // that we'll want modify is the last one inside the table, not the table
   // itself.
-  // Adjust startOfLastParagraph here to avoid infinite recursion.
+  // Adjust startOfLastParagraph and visibleEnd here to avoid infinite
+  // recursion.
   if (Node* table = isFirstPositionAfterTable(visibleEnd))
-    if (visibleStart.deepEquivalent().node()->isDescendantOf(table))
-      startOfLastParagraph = startOfParagraph(visibleEnd.previous(true));
+    if (visibleStart.deepEquivalent().node()->isDescendantOf(table)) {
+      visibleEnd = visibleEnd.previous(true);
+      startOfLastParagraph = startOfParagraph(visibleEnd);
+    }
 
   if (startOfParagraph(visibleStart) == startOfLastParagraph)
     return false;
@@ -204,11 +207,16 @@ void InsertListCommand::doApply() {
     Node* nextList =
         outermostEnclosingList(nextPosition.deepEquivalent().node());
     Node* startNode = start.deepEquivalent().node();
+    Node* previousCell = enclosingTableCell(previousPosition.deepEquivalent());
+    Node* nextCell = enclosingTableCell(nextPosition.deepEquivalent());
+    Node* currentCell = enclosingTableCell(start.deepEquivalent());
     if (previousList && (!previousList->hasTagName(listTag) ||
-                         startNode->isDescendantOf(previousList)))
+                         startNode->isDescendantOf(previousList) ||
+                         previousCell != currentCell))
       previousList = 0;
     if (nextList &&
-        (!nextList->hasTagName(listTag) || startNode->isDescendantOf(nextList)))
+        (!nextList->hasTagName(listTag) ||
+         startNode->isDescendantOf(nextList) || nextCell != currentCell))
       nextList = 0;
     // Place list item into adjoining lists.
     if (previousList)
