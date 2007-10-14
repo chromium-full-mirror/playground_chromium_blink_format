@@ -23,7 +23,6 @@
  */
 
 #if ENABLE(SVG)
-
 #include "RenderObject.h"
 
 namespace WebCore {
@@ -39,6 +38,11 @@ void finishRenderSVGContent(RenderObject*,
                             const FloatRect& boundingBox,
                             SVGResourceFilter*&,
                             GraphicsContext* savedContext);
+
+// This offers a way to render parts of a WebKit rendering tree into a
+// ImageBuffer.
+class ImageBuffer;
+void renderSubtreeToImage(ImageBuffer*, RenderObject*);
 }
 
 #endif

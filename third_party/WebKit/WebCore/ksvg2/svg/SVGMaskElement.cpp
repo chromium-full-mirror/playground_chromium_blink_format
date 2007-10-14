@@ -32,6 +32,7 @@
 #include "RenderSVGContainer.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
+#include "SVGRenderSupport.h"
 #include "SVGUnitTypes.h"
 #include <math.h>
 #include <wtf/MathExtras.h>
@@ -201,7 +202,7 @@ auto_ptr<ImageBuffer> SVGMaskElement::drawMaskerContent(
     if (!item)
       continue;
 
-    ImageBuffer::renderSubtreeToImage(maskImage.get(), item);
+    renderSubtreeToImage(maskImage.get(), item);
   }
 
   if (maskContentUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX)
