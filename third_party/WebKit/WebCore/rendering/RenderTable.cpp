@@ -185,7 +185,8 @@ void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
     // If the next renderer is actually wrapped in an anonymous table section,
     // we need to go up and find that.
     while (beforeChild && !beforeChild->isTableSection() &&
-           !beforeChild->isTableCol())
+           !beforeChild->isTableCol() &&
+           beforeChild->style()->display() != TABLE_CAPTION)
       beforeChild = beforeChild->parent();
 
     RenderContainer::addChild(child, beforeChild);
@@ -206,12 +207,13 @@ void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
     nextToLastBox = lastBox;
     lastBox = lastBox->parent();
   }
-  if (lastBox && lastBox->isAnonymous()) {
+  if (lastBox && lastBox->isAnonymous() && !isAfterContent(lastBox)) {
     lastBox->addChild(child, nextToLastBox);
     return;
   }
 
-  if (beforeChild && !beforeChild->isTableSection())
+  if (beforeChild && !beforeChild->isTableSection() &&
+      beforeChild->style()->display() != TABLE_CAPTION)
     beforeChild = 0;
   RenderTableSection* section =
       new (renderArena()) RenderTableSection(document() /* anonymous */);
