@@ -813,19 +813,18 @@ void RenderFlow::paintOutline(GraphicsContext* graphicsContext,
   if (style()->outlineStyleIsAuto() || style()->outlineStyle() <= BHIDDEN)
     return;
 
-  Vector<IntRect*> rects;
+  Vector<IntRect> rects;
 
-  rects.append(new IntRect);
+  rects.append(IntRect());
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
     rects.append(
-        new IntRect(curr->xPos(), curr->yPos(), curr->width(), curr->height()));
+        IntRect(curr->xPos(), curr->yPos(), curr->width(), curr->height()));
 
-  rects.append(new IntRect);
+  rects.append(IntRect());
 
   for (unsigned i = 1; i < rects.size() - 1; i++)
-    paintOutlineForLine(graphicsContext, tx, ty, *rects.at(i - 1), *rects.at(i),
-                        *rects.at(i + 1));
-  deleteAllValues(rects);
+    paintOutlineForLine(graphicsContext, tx, ty, rects.at(i - 1), rects.at(i),
+                        rects.at(i + 1));
 }
 
 void RenderFlow::paintOutlineForLine(GraphicsContext* graphicsContext,
