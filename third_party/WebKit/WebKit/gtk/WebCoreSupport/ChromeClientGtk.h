@@ -30,6 +30,7 @@
 #define ChromeClientGtk_h
 
 #include "ChromeClient.h"
+#include "KURL.h"
 
 typedef struct _WebKitPage WebKitPage;
 
@@ -115,7 +116,7 @@ class ChromeClient : public WebCore::ChromeClient {
 
  private:
   WebKitPage* m_webPage;
-  bool m_didSendLinkSignal;
+  WebCore::KURL m_hoveredLinkURL;
 };
 }
 
