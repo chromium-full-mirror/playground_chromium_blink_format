@@ -135,7 +135,7 @@ void BooleanNode::streamTo(SourceStream& s) const {
 }
 
 void NumberNode::streamTo(SourceStream& s) const {
-  s << value;
+  s << val;
 }
 
 void StringNode::streamTo(SourceStream& s) const {
