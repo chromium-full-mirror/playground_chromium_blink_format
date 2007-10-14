@@ -27,7 +27,7 @@
 #include "GraphicsContext.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
-#include "RenderText.h"
+#include "RenderTextFragment.h"
 
 namespace WebCore {
 
@@ -92,7 +92,8 @@ void RenderButton::setText(const String& str) {
     if (m_buttonText)
       m_buttonText->setText(str.impl());
     else {
-      m_buttonText = new (renderArena()) RenderText(document(), str.impl());
+      m_buttonText =
+          new (renderArena()) RenderTextFragment(document(), str.impl());
       m_buttonText->setStyle(style());
       addChild(m_buttonText);
     }
