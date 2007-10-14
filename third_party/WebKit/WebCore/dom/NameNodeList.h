@@ -43,7 +43,6 @@ class NameNodeList : public NodeList {
   virtual Node* item(unsigned index) const;
 
   // Other methods (not part of DOM)
-  virtual void rootNodeChildrenChanged() {}
   virtual void rootNodeAttributeChanged() {
     NodeList::rootNodeChildrenChanged();
   }
