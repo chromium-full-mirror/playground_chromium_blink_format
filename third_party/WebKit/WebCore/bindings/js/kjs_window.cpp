@@ -82,8 +82,7 @@ const int cMaxTimerNestingLevel = 5;
 const double cMinimumTimerInterval = 0.010;
 
 struct WindowPrivate {
-  WindowPrivate()
-      : loc(0), m_evt(0), m_dialogArguments(0), m_returnValueSlot(0) {}
+  WindowPrivate() : loc(0), m_evt(0), m_returnValueSlot(0) {}
 
   Window::ListenersMap jsEventListeners;
   Window::ListenersMap jsHTMLEventListeners;
@@ -91,7 +90,6 @@ struct WindowPrivate {
   Window::UnprotectedListenersMap jsUnprotectedHTMLEventListeners;
   mutable Location* loc;
   WebCore::Event* m_evt;
-  JSValue* m_dialogArguments;
   JSValue** m_returnValueSlot;
   typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
   TimeoutsMap m_timeouts;
@@ -364,7 +362,8 @@ static Frame* createWindow(ExecState* exec,
                            Frame* openerFrame,
                            const String& url,
                            const String& frameName,
-                           const WindowFeatures& windowFeatures) {
+                           const WindowFeatures& windowFeatures,
+                           JSValue* dialogArgs) {
   Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
 
   ResourceRequest request;
@@ -394,6 +393,9 @@ static Frame* createWindow(ExecState* exec,
   newFrame->loader()->setOpenedByDOM();
 
   Window* newWindow = Window::retrieveWindow(newFrame);
+
+  if (dialogArgs)
+    newWindow->putDirect("dialogArguments", dialogArgs);
 
   if (!url.startsWith("javascript:", false) || newWindow->isSafeScript(exec)) {
     String completedURL =
@@ -501,20 +503,18 @@ static JSValue* showModalDialog(ExecState* exec,
 
   Frame* dialogFrame = createWindow(
       exec, frame, valueToStringWithUndefinedOrNullCheck(exec, args[0]), "",
-      wargs);
+      wargs, args[1]);
   if (!dialogFrame)
     return jsUndefined();
 
   Window* dialogWindow = Window::retrieveWindow(dialogFrame);
 
-  dialogWindow->putDirect("dialogArguments", args[1]);
-
   // Get the return value either just before clearing the dialog window's
   // properties (in Window::clear), or when on return from runModal.
   JSValue* returnValue = 0;
-  dialogWindow->setDialogArgumentsAndReturnValueSlot(args[1], &returnValue);
+  dialogWindow->setReturnValueSlot(&returnValue);
   dialogFrame->page()->chrome()->runModal();
-  dialogWindow->setDialogArgumentsAndReturnValueSlot(0, 0);
+  dialogWindow->setReturnValueSlot(0);
 
   // If we don't have a return value, get it now.
   // Either Window::clear was not called yet, or there was no return value,
@@ -1127,9 +1127,6 @@ void Window::clear() {
   if (Frame* frame = impl()->frame())
     frame->scriptProxy()->interpreter()->initGlobalObject();
 
-  if (d->m_dialogArguments)
-    putDirect("dialogArguments", d->m_dialogArguments);
-
   // there's likely to be lots of garbage now
   gcController().garbageCollectSoon();
 }
@@ -1400,7 +1397,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       windowFeatures.height = windowRect.height();
       windowFeatures.width = windowRect.width();
 
-      frame = createWindow(exec, frame, urlString, frameName, windowFeatures);
+      frame =
+          createWindow(exec, frame, urlString, frameName, windowFeatures, 0);
 
       if (!frame)
         return jsUndefined();
@@ -1549,10 +1547,8 @@ void Window::updateLayout() const {
     docimpl->updateLayoutIgnorePendingStylesheets();
 }
 
-void Window::setDialogArgumentsAndReturnValueSlot(JSValue* dialogArgs,
-                                                  JSValue** returnValueSlot) {
-  d->m_dialogArguments = dialogArgs;
-  d->m_returnValueSlot = returnValueSlot;
+void Window::setReturnValueSlot(JSValue** slot) {
+  d->m_returnValueSlot = slot;
 }
 
 ////////////////////// ScheduledAction ////////////////////////

@@ -151,8 +151,7 @@ class Window : public DOMObject {
   void setCurrentEvent(WebCore::Event*);
 
   // Set a place to put a dialog return value when the window is cleared.
-  void setDialogArgumentsAndReturnValueSlot(JSValue* arguments,
-                                            JSValue** returnValueSlot);
+  void setReturnValueSlot(JSValue** slot);
 
   typedef HashMap<JSObject*, WebCore::JSEventListener*> ListenersMap;
   typedef HashMap<JSObject*, WebCore::JSUnprotectedEventListener*>
