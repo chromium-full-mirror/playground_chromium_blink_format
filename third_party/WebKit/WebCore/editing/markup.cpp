@@ -128,7 +128,7 @@ static DeprecatedString escapeContentText(const String& in) {
 
   for (unsigned i = 0; i < len; ++i) {
     UChar c = uchars[i];
-    if (c == '&' | c == '<') {
+    if ((c == '&') | (c == '<')) {
       s.append(dchars + lastCopiedFrom, i - lastCopiedFrom);
       if (c == '&')
         s += "&amp;";
@@ -154,7 +154,7 @@ static void appendEscapedContent(Vector<UChar>& result,
 
   for (unsigned i = 0; i < len; ++i) {
     UChar c = uchars[i];
-    if (c == '&' | c == '<') {
+    if ((c == '&') | (c == '<')) {
       result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
       if (c == '&')
         appendString(result, ampEntity);
