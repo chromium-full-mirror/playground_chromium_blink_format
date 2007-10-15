@@ -185,6 +185,13 @@ class CSSParser {
   bool parseShadow(int propId, bool important);
   bool parseBorderImage(int propId, bool important);
 
+  CSSValue* parseTransform();
+  bool parseTransformOrigin(int propId,
+                            int& propId1,
+                            int& propId2,
+                            CSSValue*&,
+                            CSSValue*&);
+
   int yyparse();
 
   CSSSelector* createFloatingSelector();
@@ -292,6 +299,8 @@ class CSSParser {
   }
 
   static bool validUnit(Value*, Units, bool strict);
+
+  friend class TransformOperationInfo;
 };
 
 }  // namespace WebCore
