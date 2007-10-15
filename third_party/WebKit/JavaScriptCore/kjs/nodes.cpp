@@ -361,7 +361,7 @@ JSValue* BooleanNode::evaluate(ExecState*) {
 // ------------------------------ NumberNode -----------------------------------
 
 JSValue* NumberNode::evaluate(ExecState*) {
-  return jsNumber(val);
+  return jsNumber(value);
 }
 
 // ------------------------------ StringNode -----------------------------------
