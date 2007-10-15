@@ -23,7 +23,8 @@
 
 #include "config.h"
 #include "RenderPath.h"
-#include "KCanvasRenderingStyle.h"
+#include "SVGRenderStyle.h"
+#include "SVGPaintServer.h"
 
 #include <QDebug>
 #include <QPainterPathStroker>
@@ -35,7 +36,7 @@ bool RenderPath::strokeContains(const FloatPoint& point,
   if (path().isEmpty())
     return false;
 
-  if (requiresStroke && !KSVGPainterFactory::strokePaintServer(style(), this))
+  if (requiresStroke && !SVGPaintServer::strokePaintServer(style(), this))
     return false;
 
   return false;
@@ -45,7 +46,7 @@ static QPainterPath getPathStroke(const QPainterPath& path,
                                   const RenderObject* object,
                                   const RenderStyle* style) {
   QPainterPathStroker s;
-  s.setWidth(KSVGPainterFactory::cssPrimitiveToLength(
+  s.setWidth(SVGRenderStyle::cssPrimitiveToLength(
       object, style->svgStyle()->strokeWidth(), 1.0));
 
   if (style->svgStyle()->capStyle() == ButtCap)
@@ -59,9 +60,8 @@ static QPainterPath getPathStroke(const QPainterPath& path,
   } else if (style->svgStyle()->joinStyle() == RoundJoin)
     s.setJoinStyle(Qt::RoundJoin);
 
-  const KCDashArray& dashes =
-      KSVGPainterFactory::dashArrayFromRenderingStyle(style);
-  double dashOffset = KSVGPainterFactory::cssPrimitiveToLength(
+  const DashArray& dashes = WebCore::dashArrayFromRenderingStyle(style);
+  double dashOffset = SVGRenderStyle::cssPrimitiveToLength(
       object, style->svgStyle()->strokeDashOffset(), 0.0);
 
   unsigned int dashLength = !dashes.isEmpty() ? dashes.size() : 0;
