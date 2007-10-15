@@ -29,6 +29,7 @@
 
 #include "CFDictionaryPropertyBag.h"
 #include "COMPtr.h"
+#include "DefaultPolicyDelegate.h"
 #include "DOMCoreClasses.h"
 #include "IWebError.h"
 #include "IWebErrorPrivate.h"
@@ -1981,20 +1982,19 @@ void WebFrame::dispatchDecidePolicyForNavigationAction(
   ASSERT(coreFrame);
 
   COMPtr<IWebPolicyDelegate> policyDelegate;
-  if (SUCCEEDED(d->webView->policyDelegate(&policyDelegate))) {
-    COMPtr<IWebURLRequest> urlRequest;
-    urlRequest.adoptRef(WebMutableURLRequest::createInstance(request));
-    COMPtr<WebActionPropertyBag> actionInformation;
-    actionInformation.adoptRef(
-        WebActionPropertyBag::createInstance(action, coreFrame));
+  if (FAILED(d->webView->policyDelegate(&policyDelegate)))
+    policyDelegate = DefaultPolicyDelegate::sharedInstance();
 
-    if (SUCCEEDED(policyDelegate->decidePolicyForNavigationAction(
-            d->webView, actionInformation.get(), urlRequest.get(), this,
-            setUpPolicyListener(function).get())))
-      return;
-  }
+  COMPtr<IWebURLRequest> urlRequest(
+      AdoptCOM, WebMutableURLRequest::createInstance(request));
+  COMPtr<WebActionPropertyBag> actionInformation(
+      AdoptCOM, WebActionPropertyBag::createInstance(action, coreFrame));
 
-  // FIXME: Add a sane default implementation
+  if (SUCCEEDED(policyDelegate->decidePolicyForNavigationAction(
+          d->webView, actionInformation.get(), urlRequest.get(), this,
+          setUpPolicyListener(function).get())))
+    return;
+
   (coreFrame->loader()->*function)(PolicyUse);
 }
 

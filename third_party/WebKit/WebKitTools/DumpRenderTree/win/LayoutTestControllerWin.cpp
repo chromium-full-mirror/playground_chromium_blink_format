@@ -30,6 +30,7 @@
 #include "LayoutTestController.h"
 
 #include "EditingDelegate.h"
+#include "PolicyDelegate.h"
 #include "WorkQueue.h"
 #include "WorkQueueItem.h"
 #include <WebCore/COMPtr.h>
@@ -176,7 +177,14 @@ void LayoutTestController::setAcceptsEditing(bool acceptsEditing) {
 }
 
 void LayoutTestController::setCustomPolicyDelegate(bool setDelegate) {
-  // FIXME: Implement!
+  COMPtr<IWebView> webView;
+  if (FAILED(frame->webView(&webView)))
+    return;
+
+  if (setDelegate)
+    webView->setPolicyDelegate(policyDelegate);
+  else
+    webView->setPolicyDelegate(NULL);
 }
 
 void LayoutTestController::setMainFrameIsFirstResponder(bool flag) {

@@ -31,6 +31,7 @@
 #include "EditingDelegate.h"
 #include "FrameLoaderDelegate.h"
 #include "LayoutTestController.h"
+#include "PolicyDelegate.h"
 #include "UIDelegate.h"
 #include "WorkQueueItem.h"
 #include "WorkQueue.h"
@@ -84,6 +85,7 @@ volatile bool done;
 IWebFrame* topLoadingFrame;  // !nil iff a load is in progress
 static COMPtr<IWebHistoryItem>
     prevTestBFItem;  // current b/f item at the end of the previous test
+IWebPolicyDelegate* policyDelegate;
 
 IWebFrame* frame;
 HWND webViewWindow;
@@ -588,6 +590,8 @@ static void runTest(const char* pathOrURL) {
     if (SUCCEEDED(webView->backForwardList(&bfList)))
       bfList->currentItem(&prevTestBFItem);
 
+    webView->setPolicyDelegate(NULL);
+
     COMPtr<IWebIBActions> webIBActions;
     if (SUCCEEDED(
             webView->QueryInterface(IID_IWebIBActions, (void**)&webIBActions)))
@@ -821,6 +825,8 @@ int main(int argc, char* argv[]) {
   if (FAILED(webView->setFrameLoadDelegate(frameLoadDelegate.get())))
     return -1;
 
+  policyDelegate = new PolicyDelegate();
+
   COMPtr<UIDelegate> uiDelegate;
   uiDelegate.adoptRef(new UIDelegate);
   if (FAILED(webView->setUIDelegate(uiDelegate.get())))
@@ -891,6 +897,7 @@ int main(int argc, char* argv[]) {
   if (threaded)
     stopJavaScriptThreads();
 
+  delete policyDelegate;
   frame->Release();
 
   if (leakChecking) {
