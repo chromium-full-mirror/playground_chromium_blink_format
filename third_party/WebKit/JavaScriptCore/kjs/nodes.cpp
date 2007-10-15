@@ -1827,6 +1827,7 @@ Completion DoWhileNode::execute(ExecState* exec) {
 
   JSValue* bv;
   Completion c;
+  JSValue* value = 0;
 
   do {
     // bail out on error
@@ -1839,9 +1840,12 @@ Completion DoWhileNode::execute(ExecState* exec) {
     if (exec->dynamicInterpreter()->timedOut())
       return Completion(Interrupted);
 
+    if (c.isValueCompletion())
+      value = c.value();
+
     if (!((c.complType() == Continue) && ls.contains(c.target()))) {
       if ((c.complType() == Break) && ls.contains(c.target()))
-        return Completion(Normal, 0);
+        return Completion(Normal, value);
       if (c.complType() != Normal)
         return c;
     }
@@ -1849,7 +1853,7 @@ Completion DoWhileNode::execute(ExecState* exec) {
     KJS_CHECKEXCEPTION
   } while (bv->toBoolean(exec));
 
-  return Completion(Normal, 0);
+  return Completion(Normal, value);
 }
 
 void DoWhileNode::processVarDecls(ExecState* exec) {
@@ -2558,23 +2562,22 @@ SourceElementsNode::SourceElementsNode(SourceElementsNode* s1,
 // ECMA 14
 Completion SourceElementsNode::execute(ExecState* exec) {
   KJS_CHECKEXCEPTION
+  JSValue* v = 0;
+  SourceElementsNode* n = this;
+  while (1) {
+    Completion c = n->node->execute(exec);
 
-  Completion c1 = node->execute(exec);
-  KJS_CHECKEXCEPTION;
-  if (c1.complType() != Normal)
-    return c1;
+    if (JSValue* v2 = c.value())
+      v = v2;
+    c.setValue(v);
 
-  for (SourceElementsNode* n = next.get(); n; n = n->next.get()) {
-    Completion c2 = n->node->execute(exec);
-    if (c2.complType() != Normal)
-      return c2;
-    // The spec says to return c2 here, but it seems that mozilla returns c1 if
-    // c2 doesn't have a value
-    if (c2.value())
-      c1 = c2;
+    if (c.complType() != Normal)
+      return c;
+
+    n = n->next.get();
+    if (!n)
+      return c;
   }
-
-  return c1;
 }
 
 // ECMA 14

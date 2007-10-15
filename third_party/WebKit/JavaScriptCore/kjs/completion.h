@@ -54,6 +54,7 @@ class Completion {
 
   ComplType complType() const { return comp; }
   JSValue* value() const { return val; }
+  void setValue(JSValue* v) { val = v; }
   Identifier target() const { return tar; }
   bool isValueCompletion() const { return !!val; }
 
