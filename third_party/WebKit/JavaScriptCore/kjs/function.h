@@ -34,7 +34,11 @@ class ActivationImp;
 class FunctionBodyNode;
 class FunctionPrototype;
 
-enum CodeType { GlobalCode, EvalCode, FunctionCode, AnonymousCode };
+enum CodeType {
+  GlobalCode,
+  EvalCode,
+  FunctionCode,
+};
 
 class InternalFunctionImp : public JSObject {
  public:
