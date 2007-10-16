@@ -36,6 +36,7 @@
 #include "npruntime_impl.h"
 #include "PropertyNameArray.h"
 #include "runtime_root.h"
+#include <wtf/Assertions.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Vector.h>
 
@@ -75,7 +76,7 @@ JSValue* CInstance::invokeMethod(ExecState* exec,
                                  const List& args) {
   // Overloading methods are not allowed by NPObjects.  Should only be one
   // name match for a particular method.
-  assert(methodList.size() == 1);
+  ASSERT(methodList.size() == 1);
 
   CMethod* method = static_cast<CMethod*>(methodList[0]);
 

@@ -54,6 +54,7 @@
 #include "DateMath.h"
 
 #include <wtf/ASCIICType.h>
+#include <wtf/Assertions.h>
 #include <wtf/MathExtras.h>
 #include <wtf/StringExtras.h>
 
@@ -162,7 +163,7 @@ static UString formatLocaleDate(ExecState* exec,
   UChar buffer[200];
   const size_t bufferLength = sizeof(buffer) / sizeof(buffer[0]);
   size_t length = CFStringGetLength(string);
-  assert(length <= bufferLength);
+  ASSERT(length <= bufferLength);
   if (length > bufferLength)
     length = bufferLength;
   CFStringGetCharacters(string, CFRangeMake(0, length),
@@ -801,7 +802,7 @@ inline static void skipSpacesAndComments(const char*& s) {
 
 // returns 0-11 (Jan-Dec); -1 on failure
 static int findMonth(const char* monthStr) {
-  assert(monthStr);
+  ASSERT(monthStr);
   char needle[4];
   for (int i = 0; i < 3; ++i) {
     if (!*monthStr)

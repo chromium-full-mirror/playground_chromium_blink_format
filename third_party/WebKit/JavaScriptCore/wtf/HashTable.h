@@ -25,7 +25,7 @@
 
 #include "FastMalloc.h"
 #include "HashTraits.h"
-#include <assert.h>
+#include <wtf/Assertions.h>
 
 namespace WTF {
 
@@ -223,7 +223,7 @@ class HashTableConstIterator {
 
   const_iterator& operator++() {
     checkValidity();
-    assert(m_position != m_endPosition);
+    ASSERT(m_position != m_endPosition);
     ++m_position;
     skipEmptyBuckets();
     return *this;
@@ -244,15 +244,15 @@ class HashTableConstIterator {
  private:
   void checkValidity() const {
 #if CHECK_HASHTABLE_ITERATORS
-    assert(m_table);
+    ASSERT(m_table);
 #endif
   }
 
 #if CHECK_HASHTABLE_ITERATORS
   void checkValidity(const const_iterator& other) const {
-    assert(m_table);
-    assert(other.m_table);
-    assert(m_table == other.m_table);
+    ASSERT(m_table);
+    ASSERT(other.m_table);
+    ASSERT(m_table == other.m_table);
   }
 #else
   void checkValidity(const const_iterator&) const {}
@@ -583,7 +583,7 @@ inline typename HashTable<Key,
                           KeyTraits>::FullLookupType
 HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::lookup(
     const T& key) {
-  assert(m_table);
+  ASSERT(m_table);
 
   unsigned h = HashTranslator::hash(key);
   int sizeMask = m_tableSizeMask;
@@ -677,9 +677,9 @@ template <typename Key,
 inline void
 HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::reinsert(
     ValueType& entry) {
-  assert(m_table);
-  assert(!lookup(Extractor::extract(entry)).second);
-  assert(!isDeletedBucket(*(lookup(Extractor::extract(entry)).first)));
+  ASSERT(m_table);
+  ASSERT(!lookup(Extractor::extract(entry)).second);
+  ASSERT(!isDeletedBucket(*(lookup(Extractor::extract(entry)).first)));
 #if DUMP_HASHTABLE_STATS
   ++HashTableStats::numReinserts;
 #endif
@@ -983,8 +983,8 @@ template <typename Key,
 void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     checkTableConsistency() const {
   checkTableConsistencyExceptSize();
-  assert(!shouldExpand());
-  assert(!shouldShrink());
+  ASSERT(!shouldExpand());
+  ASSERT(!shouldShrink());
 }
 
 template <typename Key,
@@ -1011,15 +1011,15 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     }
 
     const_iterator it = find(Extractor::extract(*entry));
-    assert(entry == it.m_position);
+    ASSERT(entry == it.m_position);
     ++count;
   }
 
-  assert(count == m_keyCount);
-  assert(deletedCount == m_deletedCount);
-  assert(m_tableSize >= m_minTableSize);
-  assert(m_tableSizeMask);
-  assert(m_tableSize == m_tableSizeMask + 1);
+  ASSERT(count == m_keyCount);
+  ASSERT(deletedCount == m_deletedCount);
+  ASSERT(m_tableSize >= m_minTableSize);
+  ASSERT(m_tableSizeMask);
+  ASSERT(m_tableSize == m_tableSizeMask + 1);
 }
 
 #endif  // CHECK_HASHTABLE_CONSISTENCY
@@ -1066,11 +1066,11 @@ void addIterator(
   if (!table) {
     it->m_next = 0;
   } else {
-    assert(table->m_iterators != it);
+    ASSERT(table->m_iterators != it);
     it->m_next = table->m_iterators;
     table->m_iterators = it;
     if (it->m_next) {
-      assert(!it->m_next->m_previous);
+      ASSERT(!it->m_next->m_previous);
       it->m_next->m_previous = it;
     }
   }
@@ -1096,19 +1096,19 @@ void removeIterator(HashTableConstIterator<Key,
 
   // Delete iterator from doubly-linked list of iterators.
   if (!it->m_table) {
-    assert(!it->m_next);
-    assert(!it->m_previous);
+    ASSERT(!it->m_next);
+    ASSERT(!it->m_previous);
   } else {
     if (it->m_next) {
-      assert(it->m_next->m_previous == it);
+      ASSERT(it->m_next->m_previous == it);
       it->m_next->m_previous = it->m_previous;
     }
     if (it->m_previous) {
-      assert(it->m_table->m_iterators != it);
-      assert(it->m_previous->m_next == it);
+      ASSERT(it->m_table->m_iterators != it);
+      ASSERT(it->m_previous->m_next == it);
       it->m_previous->m_next = it->m_next;
     } else {
-      assert(it->m_table->m_iterators == it);
+      ASSERT(it->m_table->m_iterators == it);
       it->m_table->m_iterators = it->m_next;
     }
   }

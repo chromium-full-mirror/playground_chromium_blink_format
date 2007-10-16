@@ -13,7 +13,6 @@
 
 #include "config.h"
 
-#include <assert.h>
 #include <ctype.h>
 #include <float.h>
 #include <locale.h>

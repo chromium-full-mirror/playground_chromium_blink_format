@@ -32,6 +32,7 @@
 #include "operations.h"
 #include "PropertyNameArray.h"
 #include <math.h>
+#include <wtf/Assertions.h>
 
 // maximum global call stack size. Protects against accidental or
 // malicious infinite recursions. Define to -1 if you want no limit.
@@ -61,7 +62,7 @@ namespace KJS {
 // ------------------------------ Object ---------------------------------------
 
 JSValue* JSObject::call(ExecState* exec, JSObject* thisObj, const List& args) {
-  assert(implementsCall());
+  ASSERT(implementsCall());
 
 #if KJS_MAX_STACK > 0
   static int depth = 0;  // sum of all concurrent interpreters
@@ -198,7 +199,7 @@ void JSObject::put(ExecState* exec,
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr) {
-  assert(value);
+  ASSERT(value);
 
   // non-standard netscape extension
   if (propertyName == exec->propertyNames().underscoreProto) {
@@ -428,7 +429,7 @@ bool JSObject::implementsConstruct() const {
 }
 
 JSObject* JSObject::construct(ExecState*, const List& /*args*/) {
-  assert(false);
+  ASSERT(false);
   return NULL;
 }
 
@@ -447,7 +448,7 @@ bool JSObject::implementsCall() const {
 JSValue* JSObject::callAsFunction(ExecState* /*exec*/,
                                   JSObject* /*thisObj*/,
                                   const List& /*args*/) {
-  assert(false);
+  ASSERT(false);
   return NULL;
 }
 

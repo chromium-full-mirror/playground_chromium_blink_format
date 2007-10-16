@@ -25,13 +25,13 @@
 #include "config.h"
 #include "lexer.h"
 
-#include <ctype.h>
-#include <limits.h>
-#include <string.h>
-
 #include "function.h"
 #include "interpreter.h"
 #include "nodes.h"
+#include <ctype.h>
+#include <limits.h>
+#include <string.h>
+#include <wtf/Assertions.h>
 #include <wtf/unicode/Unicode.h>
 
 using namespace WTF;
@@ -450,7 +450,7 @@ int Lexer::lex() {
         }
         break;
       default:
-        assert(!"Unhandled state in switch statement");
+        ASSERT(!"Unhandled state in switch statement");
     }
 
     // move on to the next character
@@ -582,7 +582,7 @@ int Lexer::lex() {
       error = true;
       return -1;
     default:
-      assert(!"unhandled numeration value in switch");
+      ASSERT(!"unhandled numeration value in switch");
       error = true;
       return -1;
   }

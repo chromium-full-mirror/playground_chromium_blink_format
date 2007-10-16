@@ -25,22 +25,20 @@
 #include "config.h"
 #include "function.h"
 
+#include "context.h"
+#include "debugger.h"
 #include "dtoa.h"
-#include "internal.h"
 #include "function_object.h"
+#include "internal.h"
 #include "lexer.h"
 #include "nodes.h"
 #include "operations.h"
-#include "debugger.h"
-#include "context.h"
-
-#include <stdio.h>
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
-
 #include <wtf/ASCIICType.h>
+#include <wtf/Assertions.h>
 #include <wtf/unicode/Unicode.h>
 
 using namespace WTF;
@@ -382,7 +380,7 @@ void IndexToNameMap::unMap(const Identifier& index) {
   bool indexIsNumber;
   int indexAsNumber = index.toUInt32(&indexIsNumber);
 
-  assert(indexIsNumber && indexAsNumber < size);
+  ASSERT(indexIsNumber && indexAsNumber < size);
 
   _map[indexAsNumber] = CommonIdentifiers::shared()->nullIdentifier;
 }
@@ -395,7 +393,7 @@ Identifier& IndexToNameMap::operator[](const Identifier& index) {
   bool indexIsNumber;
   int indexAsNumber = index.toUInt32(&indexIsNumber);
 
-  assert(indexIsNumber && indexAsNumber < size);
+  ASSERT(indexIsNumber && indexAsNumber < size);
 
   return (*this)[indexAsNumber];
 }
@@ -531,8 +529,8 @@ void ActivationImp::put(ExecState*,
                         int attr) {
   // There's no way that an activation object can have a prototype or
   // getter/setter properties
-  assert(!_prop.hasGetterSetterProperties());
-  assert(prototype() == jsNull());
+  ASSERT(!_prop.hasGetterSetterProperties());
+  ASSERT(prototype() == jsNull());
 
   _prop.put(propertyName, value, attr, (attr == None || attr == DontDelete));
 }

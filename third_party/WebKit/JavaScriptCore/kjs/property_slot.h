@@ -25,7 +25,7 @@
 
 #include "identifier.h"
 #include "value.h"
-#include <assert.h>
+#include <wtf/Assertions.h>
 
 namespace KJS {
 
@@ -68,14 +68,14 @@ class PropertySlot {
   void setStaticEntry(JSObject* slotBase,
                       const HashEntry* staticEntry,
                       GetValueFunc getValue) {
-    assert(getValue);
+    ASSERT(getValue);
     m_slotBase = slotBase;
     m_data.staticEntry = staticEntry;
     m_getValue = getValue;
   }
 
   void setCustom(JSObject* slotBase, GetValueFunc getValue) {
-    assert(getValue);
+    ASSERT(getValue);
     m_slotBase = slotBase;
     m_getValue = getValue;
   }
@@ -83,7 +83,7 @@ class PropertySlot {
   void setCustomIndex(JSObject* slotBase,
                       unsigned index,
                       GetValueFunc getValue) {
-    assert(getValue);
+    ASSERT(getValue);
     m_slotBase = slotBase;
     m_data.index = index;
     m_getValue = getValue;

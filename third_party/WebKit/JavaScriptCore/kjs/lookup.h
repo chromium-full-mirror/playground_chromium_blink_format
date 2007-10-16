@@ -24,11 +24,12 @@
 #ifndef _KJSLOOKUP_H_
 #define _KJSLOOKUP_H_
 
-#include "interpreter.h"
-#include "identifier.h"
-#include "object.h"
 #include "context.h"
+#include "identifier.h"
+#include "interpreter.h"
+#include "object.h"
 #include <stdio.h>
+#include <wtf/Assertions.h>
 
 namespace KJS {
 
@@ -213,7 +214,7 @@ inline bool getStaticFunctionSlot(ExecState* exec,
     return static_cast<ParentImp*>(thisObj)->ParentImp::getOwnPropertySlot(
         exec, propertyName, slot);
 
-  assert(entry->attr & Function);
+  ASSERT(entry->attr & Function);
 
   slot.setStaticEntry(thisObj, entry, staticFunctionGetter<FuncImp>);
   return true;
@@ -236,7 +237,7 @@ inline bool getStaticValueSlot(ExecState* exec,
   if (!entry)  // not found, forward to parent
     return thisObj->ParentImp::getOwnPropertySlot(exec, propertyName, slot);
 
-  assert(!(entry->attr & Function));
+  ASSERT(!(entry->attr & Function));
 
   slot.setStaticEntry(thisObj, entry, staticValueGetter<ThisImp>);
   return true;
@@ -308,7 +309,7 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
       static_cast<JSObject*>(exec->lexicalInterpreter()->globalObject());
   JSValue* obj = globalObject->getDirect(propertyName);
   if (obj) {
-    assert(obj->isObject());
+    ASSERT(obj->isObject());
     return static_cast<JSObject*>(obj);
   }
   JSObject* newObject = new ClassCtor(exec);
