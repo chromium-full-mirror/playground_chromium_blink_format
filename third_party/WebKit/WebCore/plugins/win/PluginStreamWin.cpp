@@ -84,8 +84,6 @@ PluginStreamWin::~PluginStreamWin() {
   ASSERT(m_streamState != StreamStarted);
   ASSERT(!m_loader);
 
-  delete m_deliveryData;
-
   free((char*)m_stream.url);
 
   streams().remove(&m_stream);
@@ -338,8 +336,8 @@ void PluginStreamWin::deliverData() {
   if (totalBytesDelivered > 0) {
     if (totalBytesDelivered < totalBytes) {
       int remainingBytes = totalBytes - totalBytesDelivered;
-      memmove(m_deliveryData, m_deliveryData + totalBytesDelivered,
-              remainingBytes);
+      memmove(m_deliveryData->data(),
+              m_deliveryData->data() + totalBytesDelivered, remainingBytes);
       m_deliveryData->resize(remainingBytes);
     } else {
       m_deliveryData->resize(0);
@@ -382,7 +380,7 @@ void PluginStreamWin::didReceiveData(NetscapePlugInStreamLoader* loader,
   ASSERT(m_streamState == StreamStarted);
 
   if (!m_deliveryData)
-    m_deliveryData = new Vector<char>;
+    m_deliveryData.set(new Vector<char>);
 
   int oldSize = m_deliveryData->size();
   m_deliveryData->resize(oldSize + length);
