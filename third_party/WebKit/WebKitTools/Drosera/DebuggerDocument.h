@@ -38,7 +38,7 @@
 
 // Forward Declarations
 #if PLATFORM(MAC)
-@class DebuggerClient;
+@class ServerConnection;
 #else if PLATFORM(WIN)
 class DebuggerClient;
 #endif
@@ -48,7 +48,7 @@ typedef struct OpaqueJSValue* JSObjectRef;
 
 class DebuggerDocument {
  public:
-  DebuggerDocument(DebuggerClient*);
+  DebuggerDocument(ServerConnection*);
 
   // These are all calls from the JS
   static JSValueRef breakpointEditorHTMLCallback(
@@ -183,8 +183,7 @@ class DebuggerDocument {
 
   static void logException(JSContextRef, JSValueRef exception);
 
-  DebuggerClient* m_debuggerClient;  // DebuggerClient owns the DebuggerDocument
-                                     // so don't delete it.  It will delete you!
+  ServerConnection* m_server;
 };
 
 #endif  // DebuggerDocument_H

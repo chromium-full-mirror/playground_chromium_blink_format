@@ -29,18 +29,16 @@
 #include "config.h"
 #include "DebuggerDocument.h"
 
-#include "DebuggerClient.h"
+#include "ServerConnection.h"
 
 #include <JavaScriptCore/JSContextRef.h>
 #include <JavaScriptCore/JSRetainPtr.h>
-#include <JavaScriptCore/JSStringRef.h>
 #include <JavaScriptCore/JSStringRefCF.h>
 #include <JavaScriptCore/RetainPtr.h>
-#include <JavaScriptCore/Vector.h>
 
-DebuggerDocument::DebuggerDocument(DebuggerClient* debugger)
-    : m_debuggerClient(debugger) {
-  ASSERT(m_debuggerClient);
+DebuggerDocument::DebuggerDocument(ServerConnection* serverConn)
+    : m_server(serverConn) {
+  ASSERT(m_server);
 }
 
 //-- Callbacks

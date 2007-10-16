@@ -1,18 +1,19 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Vladimir Olexa (vladimir.olexa@gmail.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  *
  * 1.  Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer. 
+ *     notice, this list of conditions and the following disclaimer.
  * 2.  Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution. 
+ *     documentation and/or other materials provided with the distribution.
  * 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
  *     its contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission. 
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY APPLE AND ITS CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -26,11 +27,27 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef __OBJC__
+@class DebuggerClient;
+@class NSString;
+@class WebScriptCallFrame;
+@class WebScriptDebugServer;
 
-#import <Cocoa/Cocoa.h>
-#import <WebKit/WebKit.h>
-#import <WebKit/WebScriptDebugDelegate.h>
-#import <WebKit/WebScriptDebugServer.h>
+@interface ServerConnection : NSObject<WebScriptDebugListener> {
+  NSString* currentServerName;
+  WebScriptCallFrame* currentFrame;
+  id<WebScriptDebugServer> server;
+  JSGlobalContextRef globalContext;
+}
 
-#endif
+- (id)initWithServerName:(NSString*)serverName;
+- (void)setGlobalContext:(JSGlobalContextRef)globalContextRef;
+- (void)pause;
+- (void)resume;
+- (void)stepInto;
+- (void)switchToServerNamed:(NSString*)name;
+- (void)applicationTerminating:(NSNotification*)notifiction;
+- (WebScriptCallFrame*)currentFrame;
+- (NSArray*)webScriptAttributeKeysForScriptObject:(WebScriptObject*)object;
+- (NSDictionary*)knownServers;
+
+@end

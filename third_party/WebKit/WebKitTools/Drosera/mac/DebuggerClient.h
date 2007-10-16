@@ -27,19 +27,21 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+@class WebView;
+@class ServerConnection;
+
 class DebuggerDocument;
 
-@interface DebuggerClient : NSWindowController<WebScriptDebugListener> {
+@interface DebuggerClient : NSWindowController {
   IBOutlet WebView* webView;
-  id<WebScriptDebugServer> server;
-  WebScriptCallFrame* currentFrame;
-  NSString* currentServerName;
   BOOL webViewLoaded;
   DebuggerDocument* debuggerDocument;
+  ServerConnection* server;
 }
-- (id)initWithServerName:(NSString*)serverName;
-- (void)switchToServerNamed:(NSString*)name;
 
++ (void)log:(NSString*)msg;
+
+- (id)initWithServerConnection:(ServerConnection*)serverConn;
 - (IBAction)pause:(id)sender;
 - (IBAction)resume:(id)sender;
 - (IBAction)stepInto:(id)sender;
@@ -47,4 +49,5 @@ class DebuggerDocument;
 - (IBAction)stepOut:(id)sender;
 - (IBAction)showConsole:(id)sender;
 - (IBAction)closeCurrentFile:(id)sender;
+
 @end
