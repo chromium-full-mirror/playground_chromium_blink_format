@@ -1010,6 +1010,9 @@ PageURLRecord* IconDatabase::getOrCreatePageURLRecord(const String& pageURL) {
   // m_urlAndIconLock before calling this method
   ASSERT(m_urlAndIconLock.tryLock() == EBUSY);
 
+  if (pageURL.isEmpty())
+    return 0;
+
   PageURLRecord* pageRecord = m_pageURLToRecordMap.get(pageURL);
 
   MutexLocker locker(m_pendingReadingLock);
@@ -1403,7 +1406,7 @@ void IconDatabase::performURLImport() {
       // If database cleanup *is* allowed, we don't want to bother pulling in a
       // page url from disk that noone is actually interested
       // in - we'll prune it later instead!
-      if (!pageRecord && databaseCleanupCounter) {
+      if (!pageRecord && databaseCleanupCounter && !pageURL.isEmpty()) {
         pageRecord = new PageURLRecord(pageURL);
         m_pageURLToRecordMap.set(pageURL, pageRecord);
       }
