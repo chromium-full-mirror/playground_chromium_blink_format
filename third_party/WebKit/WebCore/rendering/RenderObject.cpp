@@ -3161,7 +3161,7 @@ bool RenderObject::shrinkToAvoidFloats() const {
   // involves doing a relayout during findNextLineBreak and somehow overriding
   // the containingBlockWidth method to return the
   // current remaining width on a line.
-  if (isInline() || !avoidsFloats())
+  if (isInline() && !isHTMLMarquee() || !avoidsFloats())
     return false;
 
   // All auto-width objects that avoid floats should always use lineWidth.
