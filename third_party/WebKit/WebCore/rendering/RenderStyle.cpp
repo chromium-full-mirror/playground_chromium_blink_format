@@ -395,6 +395,17 @@ bool StyleMultiColData::operator==(const StyleMultiColData& o) const {
          m_breakInside == o.m_breakInside;
 }
 
+StyleTransformData::StyleTransformData()
+    : m_x(RenderStyle::initialTransformOriginX()),
+      m_y(RenderStyle::initialTransformOriginY()) {}
+
+StyleTransformData::StyleTransformData(const StyleTransformData& o)
+    : Shared<StyleTransformData>(), m_x(o.m_x), m_y(o.m_y) {}
+
+bool StyleTransformData::operator==(const StyleTransformData& o) const {
+  return m_x == o.m_x && m_y == o.m_y;
+}
+
 StyleRareNonInheritedData::StyleRareNonInheritedData()
     : lineClamp(RenderStyle::initialLineClamp()),
       opacity(RenderStyle::initialOpacity()),
@@ -424,6 +435,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       flexibleBox(o.flexibleBox),
       marquee(o.marquee),
       m_multiCol(o.m_multiCol),
+      m_transform(o.m_transform),
       m_content(0),
       m_counterDirectives(0),
       userDrag(o.userDrag),
@@ -468,7 +480,8 @@ bool StyleRareNonInheritedData::operator==(
   return lineClamp == o.lineClamp &&
          m_dashboardRegions == o.m_dashboardRegions && opacity == o.opacity &&
          flexibleBox == o.flexibleBox && marquee == o.marquee &&
-         m_multiCol == o.m_multiCol && m_content == o.m_content &&
+         m_multiCol == o.m_multiCol && m_transform == o.m_transform &&
+         m_content == o.m_content &&
          m_counterDirectives == o.m_counterDirectives &&
          userDrag == o.userDrag && textOverflow == o.textOverflow &&
          marginTopCollapse == o.marginTopCollapse &&
@@ -683,6 +696,7 @@ RenderStyle::RenderStyle(bool)
   rareNonInheritedData.access()->flexibleBox.init();
   rareNonInheritedData.access()->marquee.init();
   rareNonInheritedData.access()->m_multiCol.init();
+  rareNonInheritedData.access()->m_transform.init();
   rareInheritedData.init();
   inherited.init();
 
@@ -897,6 +911,12 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
             other->rareNonInheritedData->m_multiCol.get() &&
         *rareNonInheritedData->m_multiCol.get() !=
             *other->rareNonInheritedData->m_multiCol.get())
+      return Layout;
+
+    if (rareNonInheritedData->m_transform.get() !=
+            other->rareNonInheritedData->m_transform.get() &&
+        *rareNonInheritedData->m_transform.get() !=
+            *other->rareNonInheritedData->m_transform.get())
       return Layout;
 
     // If regions change trigger a relayout to re-calc regions.

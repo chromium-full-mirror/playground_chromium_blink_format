@@ -680,6 +680,22 @@ class StyleMultiColData : public Shared<StyleMultiColData> {
   unsigned m_breakInside : 2;  // EPageBreak
 };
 
+// CSS Transforms (may become part of CSS3)
+
+class StyleTransformData : public Shared<StyleTransformData> {
+ public:
+  StyleTransformData();
+  StyleTransformData(const StyleTransformData& o);
+
+  bool operator==(const StyleTransformData& o) const;
+  bool operator!=(const StyleTransformData& o) const { return !(*this == o); }
+
+  // This will eventually hold the parsed transform operations as well.
+  // In this first landing, we're just mapping in the transform origin.
+  Length m_x;
+  Length m_y;
+};
+
 //------------------------------------------------
 // CSS3 Flexible Box Properties
 
@@ -924,6 +940,8 @@ class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
   DataRef<StyleFlexibleBoxData> flexibleBox;  // Flexible box properties
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
   DataRef<StyleMultiColData> m_multiCol;      //  CSS3 multicol properties
+  DataRef<StyleTransformData>
+      m_transform;  // Transform properties (rotate, scale, skew, etc.)
 
   ContentData* m_content;
   CounterDirectiveMap* m_counterDirectives;
@@ -1831,6 +1849,12 @@ class RenderStyle {
     return static_cast<EPageBreak>(
         rareNonInheritedData->m_multiCol->m_breakAfter);
   }
+  Length transformOriginX() const {
+    return rareNonInheritedData->m_transform->m_x;
+  }
+  Length transformOriginY() const {
+    return rareNonInheritedData->m_transform->m_y;
+  }
   // End CSS3 Getters
 
   // Apple-specific property getter methods
@@ -2267,6 +2291,12 @@ class RenderStyle {
   void setColumnBreakAfter(EPageBreak p) {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_breakAfter, p);
   }
+  void setTransformOriginX(Length l) {
+    SET_VAR(rareNonInheritedData.access()->m_transform, m_x, l);
+  }
+  void setTransformOriginY(Length l) {
+    SET_VAR(rareNonInheritedData.access()->m_transform, m_y, l);
+  }
   // End CSS3 Setters
 
   // Apple-specific property setters
@@ -2426,6 +2456,8 @@ class RenderStyle {
   static bool initialVisuallyOrdered() { return false; }
   static float initialTextStrokeWidth() { return 0; }
   static unsigned short initialColumnCount() { return 1; }
+  static Length initialTransformOriginX() { return Length(50.0, Percent); }
+  static Length initialTransformOriginY() { return Length(50.0, Percent); }
 
   // Keep these at the end.
   static int initialLineClamp() { return -1; }
