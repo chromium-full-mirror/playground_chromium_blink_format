@@ -67,6 +67,8 @@
 
 #endif
 
+#include <wtf/DisallowCType.h>
+
 #if !COMPILER(MSVC)  // can't get this to compile on Visual C++ yet
 #define AVOID_STATIC_CONSTRUCTORS 1
 #endif

@@ -1,7 +1,6 @@
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2004 Apple Computer, Inc.
+ *  Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -41,7 +40,6 @@
 #include <sys/timeb.h>
 #endif
 
-#include <ctype.h>
 #include <float.h>
 #include <limits.h>
 #include <locale.h>
@@ -55,12 +53,15 @@
 #include "operations.h"
 #include "DateMath.h"
 
+#include <wtf/ASCIICType.h>
 #include <wtf/MathExtras.h>
 #include <wtf/StringExtras.h>
 
 #if PLATFORM(MAC)
 #include <CoreFoundation/CoreFoundation.h>
 #endif
+
+using namespace WTF;
 
 namespace KJS {
 
@@ -786,7 +787,7 @@ inline static void skipSpacesAndComments(const char*& s) {
   int nesting = 0;
   char ch;
   while ((ch = *s)) {
-    if (!isspace(ch)) {
+    if (!isASCIISpace(ch)) {
       if (ch == '(')
         nesting++;
       else if (ch == ')' && nesting > 0)
@@ -805,7 +806,7 @@ static int findMonth(const char* monthStr) {
   for (int i = 0; i < 3; ++i) {
     if (!*monthStr)
       return -1;
-    needle[i] = static_cast<char>(tolower(*monthStr++));
+    needle[i] = static_cast<char>(toASCIILower(*monthStr++));
   }
   needle[3] = '\0';
   const char* haystack = "janfebmaraprmayjunjulaugsepoctnovdec";
@@ -842,8 +843,8 @@ static double parseDate(const UString& date) {
   long month = -1;
   const char* wordStart = dateString;
   // Check contents of first words if not number
-  while (*dateString && !isdigit(*dateString)) {
-    if (isspace(*dateString) || *dateString == '(') {
+  while (*dateString && !isASCIIDigit(*dateString)) {
+    if (isASCIISpace(*dateString) || *dateString == '(') {
       if (dateString - wordStart >= 3)
         month = findMonth(wordStart);
       skipSpacesAndComments(dateString);
@@ -994,7 +995,7 @@ static double parseDate(const UString& date) {
         return NaN;
 
       // ':40 GMT'
-      if (*dateString && *dateString != ':' && !isspace(*dateString))
+      if (*dateString && *dateString != ':' && !isASCIISpace(*dateString))
         return NaN;
 
       // seconds are optional in rfc822 + rfc2822

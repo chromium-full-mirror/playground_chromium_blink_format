@@ -1,6 +1,5 @@
 // -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *  Copyright (C) 2007 Cameron Zwarich (cwzwarich@uwaterloo.ca)
@@ -47,8 +46,8 @@
 #include <strings.h>
 #endif
 
-using std::max;
-using std::min;
+using namespace WTF;
+using namespace std;
 
 namespace KJS {
 
@@ -951,7 +950,7 @@ double UString::toDouble(bool tolerateTrailingJunk,
   const char* c = ascii();
 
   // skip leading white space
-  while (isspace(*c))
+  while (isASCIISpace(*c))
     c++;
 
   // empty string ?
@@ -1006,7 +1005,7 @@ double UString::toDouble(bool tolerateTrailingJunk,
   }
 
   // allow trailing white space
-  while (isspace(*c))
+  while (isASCIISpace(*c))
     c++;
   // don't allow anything after - unless tolerant=true
   if (!tolerateTrailingJunk && *c != '\0')

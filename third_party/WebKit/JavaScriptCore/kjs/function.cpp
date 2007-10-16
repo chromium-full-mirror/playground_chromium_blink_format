@@ -1,9 +1,8 @@
 // -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2002 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *  Copyright (C) 2007 Cameron Zwarich (cwzwarich@uwaterloo.ca)
  *
  *  This library is free software; you can redistribute it and/or
@@ -40,8 +39,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include <ctype.h>
 
+#include <wtf/ASCIICType.h>
 #include <wtf/unicode/Unicode.h>
 
 using namespace WTF;
@@ -602,7 +601,8 @@ static JSValue* decode(ExecState* exec,
     UChar c = *p;
     if (c == '%') {
       int charLen = 0;
-      if (k <= len - 3 && isxdigit(p[1].uc) && isxdigit(p[2].uc)) {
+      if (k <= len - 3 && isASCIIHexDigit(p[1].uc) &&
+          isASCIIHexDigit(p[2].uc)) {
         const char b0 = Lexer::convertHex(p[1].uc, p[2].uc);
         const int sequenceLen = UTF8SequenceLength(b0);
         if (sequenceLen != 0 && k <= len - sequenceLen * 3) {
@@ -611,7 +611,8 @@ static JSValue* decode(ExecState* exec,
           sequence[0] = b0;
           for (int i = 1; i < sequenceLen; ++i) {
             const UChar* q = p + i * 3;
-            if (q[0] == '%' && isxdigit(q[1].uc) && isxdigit(q[2].uc))
+            if (q[0] == '%' && isASCIIHexDigit(q[1].uc) &&
+                isASCIIHexDigit(q[2].uc))
               sequence[i] = Lexer::convertHex(q[1].uc, q[2].uc);
             else {
               charLen = 0;
@@ -642,8 +643,9 @@ static JSValue* decode(ExecState* exec,
         // function.
         // For that, it's good to support the wonky "%u" syntax for
         // compatibility with WinIE.
-        if (k <= len - 6 && p[1] == 'u' && isxdigit(p[2].uc) &&
-            isxdigit(p[3].uc) && isxdigit(p[4].uc) && isxdigit(p[5].uc)) {
+        if (k <= len - 6 && p[1] == 'u' && isASCIIHexDigit(p[2].uc) &&
+            isASCIIHexDigit(p[3].uc) && isASCIIHexDigit(p[4].uc) &&
+            isASCIIHexDigit(p[5].uc)) {
           charLen = 6;
           u = Lexer::convertUnicode(p[2].uc, p[3].uc, p[4].uc, p[5].uc);
         }
