@@ -353,6 +353,7 @@ void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
         attached()) {
       detach();
       attach();
+      setRecalcListItems();
     }
   } else if (attr->name() == widthAttr) {
     m_minwidth = max(attr->value().toInt(), 0);
