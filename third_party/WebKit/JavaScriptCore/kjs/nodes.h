@@ -1281,13 +1281,6 @@ class ParameterNode : public Node {
   ListRefPtr<ParameterNode> next;
 };
 
-class Parameter {
- public:
-  Parameter() KJS_FAST_CALL {}
-  Parameter(const Identifier& n) KJS_FAST_CALL : name(n) {}
-  Identifier name;
-};
-
 // inherited by ProgramNode
 class FunctionBodyNode : public BlockNode {
  public:
@@ -1298,16 +1291,16 @@ class FunctionBodyNode : public BlockNode {
   void addParam(const Identifier& ident) KJS_FAST_CALL;
   size_t numParams() const KJS_FAST_CALL { return m_parameters.size(); }
   Identifier paramName(size_t pos) const KJS_FAST_CALL {
-    return m_parameters[pos].name;
+    return m_parameters[pos];
   }
   UString paramString() const KJS_FAST_CALL;
-  Vector<Parameter>& parameters() KJS_FAST_CALL { return m_parameters; }
+  Vector<Identifier>& parameters() KJS_FAST_CALL { return m_parameters; }
   void processDeclarations(ExecState*) KJS_FAST_CALL;
 
  private:
   UString m_sourceURL;
   int m_sourceId;
-  Vector<Parameter> m_parameters;
+  Vector<Identifier> m_parameters;
 };
 
 class FuncExprNode : public Node {
