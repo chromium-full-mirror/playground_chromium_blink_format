@@ -107,6 +107,7 @@ class Editor {
 
   void indent();
   void outdent();
+  void transpose();
 
   bool shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
                             PassRefPtr<Range> replacingDOMRange,

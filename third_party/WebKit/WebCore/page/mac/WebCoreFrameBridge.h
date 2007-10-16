@@ -210,7 +210,6 @@ enum WebScrollGranularity {
 
 - (id)accessibilityTree;
 
-- (DOMRange*)rangeOfCharactersAroundCaret;
 - (DOMRange*)
 rangeByAlteringCurrentSelection:
     (WebCore::SelectionController::EAlteration)alteration
