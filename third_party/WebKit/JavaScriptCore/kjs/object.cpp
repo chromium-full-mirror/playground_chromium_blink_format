@@ -220,9 +220,6 @@ void JSObject::put(ExecState* exec,
   // Assume that a C++ implementation knows what it is doing
   // and let it override the canPut() check.
   if ((attr == None || attr == DontDelete) && !canPut(exec, propertyName)) {
-#ifdef KJS_VERBOSE
-    fprintf(stderr, "WARNING: canPut %s said NO\n", propertyName.ascii());
-#endif
     return;
   }
 
