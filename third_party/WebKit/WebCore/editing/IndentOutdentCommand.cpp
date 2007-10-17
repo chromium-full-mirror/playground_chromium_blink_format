@@ -134,8 +134,9 @@ static int indexForVisiblePosition(VisiblePosition& visiblePosition) {
     return 0;
   Position p(visiblePosition.deepEquivalent());
   RefPtr<Range> range =
-      new Range(p.node()->document(), Position(p.node()->document(), 0), p);
-  return TextIterator::rangeLength(range.get());
+      new Range(p.node()->document(), Position(p.node()->document(), 0),
+                rangeCompliantEquivalent(p));
+  return TextIterator::rangeLength(range.get(), true);
 }
 
 void IndentOutdentCommand::indentRegion() {
@@ -221,12 +222,12 @@ void IndentOutdentCommand::indentRegion() {
   }
 
   RefPtr<Range> startRange = TextIterator::rangeFromLocationAndLength(
-      document()->documentElement(), 0, startIndex);
+      document()->documentElement(), startIndex, 0, true);
   RefPtr<Range> endRange = TextIterator::rangeFromLocationAndLength(
-      document()->documentElement(), 0, endIndex);
+      document()->documentElement(), endIndex, 0, true);
   if (startRange && endRange)
-    setEndingSelection(Selection(startRange->endPosition(),
-                                 endRange->endPosition(), DOWNSTREAM));
+    setEndingSelection(Selection(startRange->startPosition(),
+                                 endRange->startPosition(), DOWNSTREAM));
 }
 
 void IndentOutdentCommand::outdentParagraph() {

@@ -63,7 +63,8 @@ PassRefPtr<Range> findPlainText(const Range*,
 class TextIterator {
  public:
   TextIterator();
-  explicit TextIterator(const Range*, bool emitForReplacedElements = false);
+  explicit TextIterator(const Range*,
+                        bool emitCharactersBetweenAllVisiblePositions = false);
 
   bool atEnd() const { return !m_positionNode; }
   void advance();
@@ -148,7 +149,7 @@ class TextIterator {
   // Used by selection preservation code.  There should be one character emitted
   // between every VisiblePosition
   // in the Range used to create the TextIterator.
-  bool m_emitForSelectionPreservation;
+  bool m_emitCharactersBetweenAllVisiblePositions;
 };
 
 // Iterates through the DOM range, returning all the text, and 0-length
@@ -215,8 +216,9 @@ class SimplifiedBackwardsTextIterator {
 class CharacterIterator {
  public:
   CharacterIterator();
-  explicit CharacterIterator(const Range* r,
-                             bool emitForReplacedElements = false);
+  explicit CharacterIterator(
+      const Range* r,
+      bool emitCharactersBetweenAllVisiblePositions = false);
 
   void advance(int numCharacters);
 

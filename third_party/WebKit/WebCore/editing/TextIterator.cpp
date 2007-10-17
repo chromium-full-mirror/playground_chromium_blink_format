@@ -84,13 +84,15 @@ TextIterator::TextIterator()
       m_positionNode(0),
       m_lastCharacter(0) {}
 
-TextIterator::TextIterator(const Range* r, bool emitForSelectionPreservation)
+TextIterator::TextIterator(const Range* r,
+                           bool emitCharactersBetweenAllVisiblePositions)
     : m_startContainer(0),
       m_startOffset(0),
       m_endContainer(0),
       m_endOffset(0),
       m_positionNode(0),
-      m_emitForSelectionPreservation(emitForSelectionPreservation) {
+      m_emitCharactersBetweenAllVisiblePositions(
+          emitCharactersBetweenAllVisiblePositions) {
   if (!r)
     return;
 
@@ -374,7 +376,7 @@ bool TextIterator::handleReplacedElement() {
 
   m_haveEmitted = true;
 
-  if (m_emitForSelectionPreservation) {
+  if (m_emitCharactersBetweenAllVisiblePositions) {
     // We want replaced elements to behave like punctuation for boundary
     // finding, and to simply take up space for the selection preservation
     // code in moveParagraphs, so we use a comma.
@@ -503,7 +505,7 @@ static bool shouldEmitExtraNewlineForNode(Node* node) {
 }
 
 bool TextIterator::shouldRepresentNodeOffsetZero() {
-  if (m_emitForSelectionPreservation && m_node->renderer() &&
+  if (m_emitCharactersBetweenAllVisiblePositions && m_node->renderer() &&
       m_node->renderer()->isTable())
     return true;
 
@@ -564,7 +566,8 @@ bool TextIterator::shouldRepresentNodeOffsetZero() {
 
 bool TextIterator::shouldEmitSpaceBeforeAndAfterNode(Node* node) {
   return node->renderer() && node->renderer()->isTable() &&
-         (node->renderer()->isInline() || m_emitForSelectionPreservation);
+         (node->renderer()->isInline() ||
+          m_emitCharactersBetweenAllVisiblePositions);
 }
 
 void TextIterator::representNodeOffsetZero() {
@@ -583,7 +586,7 @@ void TextIterator::representNodeOffsetZero() {
 bool TextIterator::handleNonTextNode() {
   if (shouldEmitNewlineForNode(m_node))
     emitCharacter('\n', m_node->parentNode(), m_node, 0, 1);
-  else if (m_emitForSelectionPreservation && m_node->renderer() &&
+  else if (m_emitCharactersBetweenAllVisiblePositions && m_node->renderer() &&
            m_node->renderer()->isHR())
     emitCharacter(' ', m_node->parentNode(), m_node, 0, 1);
   else
@@ -921,12 +924,13 @@ PassRefPtr<Range> SimplifiedBackwardsTextIterator::range() const {
 CharacterIterator::CharacterIterator()
     : m_offset(0), m_runOffset(0), m_atBreak(true) {}
 
-CharacterIterator::CharacterIterator(const Range* r,
-                                     bool emitSpaceForReplacedElements)
+CharacterIterator::CharacterIterator(
+    const Range* r,
+    bool emitCharactersBetweenAllVisiblePositions)
     : m_offset(0),
       m_runOffset(0),
       m_atBreak(true),
-      m_textIterator(r, emitSpaceForReplacedElements) {
+      m_textIterator(r, emitCharactersBetweenAllVisiblePositions) {
   while (!atEnd() && m_textIterator.length() == 0)
     m_textIterator.advance();
 }
@@ -1175,9 +1179,9 @@ unsigned CircularSearchBuffer::length() const {
 
 // --------
 
-int TextIterator::rangeLength(const Range* r, bool spacesForReplacedElements) {
+int TextIterator::rangeLength(const Range* r, bool forSelectionPreservation) {
   int length = 0;
-  for (TextIterator it(r, spacesForReplacedElements); !it.atEnd(); it.advance())
+  for (TextIterator it(r, forSelectionPreservation); !it.atEnd(); it.advance())
     length += it.length();
 
   return length;
@@ -1207,7 +1211,7 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(
     Element* scope,
     int rangeLocation,
     int rangeLength,
-    bool spacesForReplacedElements) {
+    bool forSelectionPreservation) {
   RefPtr<Range> resultRange = scope->document()->createRange();
 
   int docTextPosition = 0;
@@ -1216,7 +1220,7 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(
 
   RefPtr<Range> textRunRange;
 
-  TextIterator it(rangeOfContents(scope).get(), spacesForReplacedElements);
+  TextIterator it(rangeOfContents(scope).get(), forSelectionPreservation);
 
   // FIXME: the atEnd() check shouldn't be necessary, workaround for
   // <http://bugs.webkit.org/show_bug.cgi?id=6289>.
