@@ -65,7 +65,9 @@ class RenderTableRow : public RenderContainer {
                            HitTestAction);
 
   // The only time rows get a layer is when they have transparency.
-  virtual bool requiresLayer() { return isTransparent() || hasOverflowClip(); }
+  virtual bool requiresLayer() {
+    return isTransparent() || hasOverflowClip() || hasTransform();
+  }
 
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void imageChanged(CachedImage*);

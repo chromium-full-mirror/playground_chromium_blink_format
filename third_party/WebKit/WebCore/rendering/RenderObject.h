@@ -392,6 +392,8 @@ class RenderObject : public CachedResourceClient {
   virtual int verticalScrollbarWidth() const;
   virtual int horizontalScrollbarHeight() const;
 
+  bool hasTransform() const { return m_hasTransform; }
+
  private:
   bool includeVerticalScrollbarSize() const {
     return hasOverflowClip() &&
@@ -451,6 +453,7 @@ class RenderObject : public CachedResourceClient {
   void setReplaced(bool b = true) { m_replaced = b; }
   void setHasOverflowClip(bool b = true) { m_hasOverflowClip = b; }
   void setHasLayer(bool b = true) { m_hasLayer = b; }
+  void setHasTransform(bool b = true) { m_hasTransform = b; }
 
   void scheduleRelayout();
 
@@ -1112,6 +1115,7 @@ class RenderObject : public CachedResourceClient {
 
   bool m_hasLayer : 1;
   bool m_hasOverflowClip : 1;
+  bool m_hasTransform : 1;
 
   bool m_hasOverrideSize : 1;
 

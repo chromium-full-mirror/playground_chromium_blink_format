@@ -254,7 +254,8 @@ void RenderTableCell::setStyle(RenderStyle* newStyle) {
 }
 
 bool RenderTableCell::requiresLayer() {
-  return isPositioned() || isTransparent() || hasOverflowClip();
+  return isPositioned() || isTransparent() || hasOverflowClip() ||
+         hasTransform();
 }
 
 // The following rules apply for resolving conflicts and figuring out which
