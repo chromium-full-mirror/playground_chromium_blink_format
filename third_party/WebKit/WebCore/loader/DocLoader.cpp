@@ -197,11 +197,8 @@ void DocLoader::setAutoLoadImages(bool enable) {
       CachedImage* image =
           const_cast<CachedImage*>(static_cast<const CachedImage*>(resource));
 
-      CachedResource::Status status = image->status();
-      if (status != CachedResource::Unknown)
-        continue;
-
-      cache()->loader()->load(this, image, true);
+      if (image->stillNeedsLoad())
+        cache()->loader()->load(this, image, true);
     }
   }
 }
