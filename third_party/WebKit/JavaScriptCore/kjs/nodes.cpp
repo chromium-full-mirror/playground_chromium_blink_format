@@ -2492,7 +2492,7 @@ void FuncDeclNode::processDeclaration(ExecState* exec) {
 
   // TODO: let this be an object with [[Class]] property "Function"
   FunctionImp* func =
-      new DeclaredFunctionImp(exec, ident, body.get(), context->scopeChain());
+      new FunctionImp(exec, ident, body.get(), context->scopeChain());
 
   JSObject* proto = exec->lexicalInterpreter()->builtinObject()->construct(
       exec, List::empty());
@@ -2536,7 +2536,7 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
   }
 
   FunctionImp* func =
-      new DeclaredFunctionImp(exec, ident, body.get(), context->scopeChain());
+      new FunctionImp(exec, ident, body.get(), context->scopeChain());
   JSObject* proto = exec->lexicalInterpreter()->builtinObject()->construct(
       exec, List::empty());
   proto->put(exec, exec->propertyNames().constructor, func,

@@ -44,8 +44,6 @@ class RuntimeMethod : public InternalFunctionImp {
                                   JSObject* thisObj,
                                   const List& args);
 
-  virtual CodeType codeType() const;
-
   virtual Completion execute(ExecState* exec);
 
  private:
