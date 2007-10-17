@@ -86,6 +86,7 @@ circumstance. */
 
 /* Win32 uses DLL by default; it needs special stuff for exported functions. */
 
+#if 0
 #ifdef _WIN32
 #ifdef PCRE_DEFINITION
 #ifdef DLL_EXPORT
@@ -94,6 +95,7 @@ circumstance. */
 #else
 #ifndef PCRE_STATIC
 #define PCRE_DATA_SCOPE extern __declspec(dllimport)
+#endif
 #endif
 #endif
 #endif
