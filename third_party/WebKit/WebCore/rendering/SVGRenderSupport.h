@@ -43,6 +43,8 @@ void finishRenderSVGContent(RenderObject*,
 // ImageBuffer.
 class ImageBuffer;
 void renderSubtreeToImage(ImageBuffer*, RenderObject*);
+
+void clampImageBufferSizeToViewport(RenderObject*, IntSize&);
 }
 
 #endif
