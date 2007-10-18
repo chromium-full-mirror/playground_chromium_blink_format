@@ -47,8 +47,6 @@ int waitForThreadCompletion(ThreadIdentifier, void**);
 void detachThread(ThreadIdentifier);
 
 class Mutex : Noncopyable {
-  friend class ThreadCondition;
-
  public:
   Mutex();
   ~Mutex();
@@ -57,8 +55,11 @@ class Mutex : Noncopyable {
   bool tryLock();
   void unlock();
 
- private:
 #if USE(PTHREADS)
+ public:
+  pthread_mutex_t& impl() { return m_mutex; }
+
+ private:
   pthread_mutex_t m_mutex;
 #endif
 };
@@ -143,9 +144,9 @@ class ThreadSafeShared : Noncopyable {
 
 void callOnMainThread(void (*)());
 
-#if PLATFORM(WIN)
 void initializeThreading();
-#else
+
+#if !PLATFORM(WIN)
 inline void initializeThreading() {}
 #endif
 

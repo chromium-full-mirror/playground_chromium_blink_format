@@ -35,19 +35,28 @@
 
 namespace WebCore {
 
+typedef Vector<void (*)()> FunctionQueue;
+
 static HWND threadingWindowHandle = 0;
 static UINT threadingFiredMessage = 0;
 const LPCWSTR kThreadingWindowClassName = L"ThreadingWindowClass";
 static bool processingCustomThreadingMessage = false;
 
-Mutex functionQueueMutex;
-Vector<void (*)()> functionQueue;
+static Mutex& functionQueueMutex() {
+  static Mutex staticFunctionQueueMutex;
+  return staticFunctionQueueMutex;
+}
+
+static FunctionQueue& functionQueue() {
+  static FunctionQueue staticFunctionQueue;
+  return staticFunctionQueue;
+}
 
 static void callFunctionsOnMainThread() {
-  Vector<void (*)()> queueCopy;
+  FunctionQueue queueCopy;
   {
-    MutexLocker locker(functionQueueMutex);
-    queueCopy.swap(functionQueue);
+    MutexLocker locker(functionQueueMutex());
+    queueCopy.swap(functionQueue());
   }
 
   LOG(Threading, "Calling %u functions on the main thread", queueCopy.size());
@@ -97,8 +106,8 @@ void callOnMainThread(void (*function)()) {
         "PostMessage()s");
 
   {
-    MutexLocker locker(functionQueueMutex);
-    functionQueue.append(function);
+    MutexLocker locker(functionQueueMutex());
+    functionQueue().append(function);
   }
 
   PostMessage(threadingWindowHandle, threadingFiredMessage, 0, 0);
