@@ -3725,7 +3725,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       // Clamp opacity to the range 0-1
       style->setOpacity(min(1.0f, max(0.0f, primitiveValue->getFloatValue())));
       return;
-    case CSS_PROP__WEBKIT_BOX_ALIGN:
+    case CSS_PROP__WEBKIT_BOX_ALIGN: {
       HANDLE_INHERIT_AND_INITIAL(boxAlign, BoxAlign)
       if (!primitiveValue)
         return;
@@ -3733,6 +3733,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       if (boxAlignment != BJUSTIFY)
         style->setBoxAlign(boxAlignment);
       return;
+    }
     case CSS_PROP_SRC:  // Only used in @font-face rules.
       return;
     case CSS_PROP__WEBKIT_BOX_DIRECTION:
@@ -3750,7 +3751,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       if (primitiveValue)
         style->setBoxOrient(*primitiveValue);
       return;
-    case CSS_PROP__WEBKIT_BOX_PACK:
+    case CSS_PROP__WEBKIT_BOX_PACK: {
       HANDLE_INHERIT_AND_INITIAL(boxPack, BoxPack)
       if (!primitiveValue)
         return;
@@ -3758,6 +3759,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       if (boxPack != BSTRETCH && boxPack != BBASELINE)
         style->setBoxPack(boxPack);
       return;
+    }
     case CSS_PROP__WEBKIT_BOX_FLEX:
       HANDLE_INHERIT_AND_INITIAL(boxFlex, BoxFlex)
       if (!primitiveValue ||
