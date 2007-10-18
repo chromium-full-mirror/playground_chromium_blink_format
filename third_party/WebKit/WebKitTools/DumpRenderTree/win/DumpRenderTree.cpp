@@ -117,7 +117,18 @@ static LRESULT CALLBACK DumpRenderTreeWndProc(HWND hWnd,
 
 extern "C" BOOL InitializeCoreGraphics();
 
+#ifdef DEBUG_WEBKIT_HAS_SUFFIX
+#define WEBKITDLL TEXT("WebKit_debug.dll")
+#else
+#define WEBKITDLL TEXT("WebKit.dll")
+#endif
+
 static wstring initialize(HMODULE hModule) {
+  if (HMODULE webKitModule = LoadLibrary(WEBKITDLL))
+    if (FARPROC dllRegisterServer =
+            GetProcAddress(webKitModule, "DllRegisterServer"))
+      dllRegisterServer();
+
   static LPCTSTR fontsToInstall[] = {
       TEXT("AHEM____.ttf"),
       TEXT("Apple Chancery.ttf"),
