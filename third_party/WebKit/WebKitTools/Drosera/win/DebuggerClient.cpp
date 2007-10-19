@@ -28,27 +28,115 @@
 #include "config.h"
 #include "DebuggerClient.h"
 
-#include "DebuggerApplication.h"
 #include "DebuggerDocument.h"
+#include "ServerConnection.h"
 
+#include <WebKit/IWebView.h>
 #include <JavaScriptCore/JSContextRef.h>
-#include <JavaScriptCore/JSRetainPtr.h>
-#include <JavaScriptCore/JSStringRef.h>
-#include <JavaScriptCore/JSStringRefCF.h>
-#include <JavaScriptCore/RetainPtr.h>
 
-void DebuggerClient::pause() {
-  // if ([[(NSDistantObject *)server connectionForProxy] isValid])
-  //    [server pause];
-  //[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+DebuggerClient::DebuggerClient() : m_webViewLoaded(false) {}
+
+DebuggerClient::DebuggerClient(const std::wstring& serverName)
+    : m_webViewLoaded(false) {
+  initWithServerName(serverName);
 }
 
-void DebuggerClient::resume() {
-  // if ([[(NSDistantObject *)server connectionForProxy] isValid])
-  //    [server resume];
+void DebuggerClient::initWithServerName(const std::wstring& serverName) {
+  m_server.set(ServerConnection::initWithServerName(serverName));
+  m_debuggerDocument.set(new DebuggerDocument(m_server.get()));
 }
 
-void DebuggerClient::stepInto() {
-  // if ([[(NSDistantObject *)server connectionForProxy] isValid])
-  //    [server step];
+// IUnknown ------------------------------
+HRESULT STDMETHODCALLTYPE DebuggerClient::QueryInterface(REFIID riid,
+                                                         void** ppvObject) {
+  *ppvObject = 0;
+  if (IsEqualGUID(riid, IID_IUnknown))
+    *ppvObject = this;
+  else if (IsEqualGUID(riid, IID_IWebFrameLoadDelegate))
+    *ppvObject = static_cast<IWebFrameLoadDelegate*>(this);
+  else if (IsEqualGUID(riid, IID_IWebUIDelegate))
+    *ppvObject = static_cast<IWebUIDelegate*>(this);
+  else
+    return E_NOINTERFACE;
+
+  AddRef();
+  return S_OK;
+}
+
+ULONG STDMETHODCALLTYPE DebuggerClient::AddRef(
+    void) {  // COM ref-counting isn't useful to us because we're in charge of
+             // the lifetime of the WebView.
+  return 2;
+}
+
+ULONG STDMETHODCALLTYPE DebuggerClient::Release(
+    void) {  // COM ref-counting isn't useful to us because we're in charge of
+             // the lifetime of the WebView.
+  return 2;
+}
+
+// IWebFrameLoadDelegate ------------------------------
+HRESULT STDMETHODCALLTYPE DebuggerClient::didFinishLoadForFrame(
+    /* [in] */ IWebView*,
+    /* [in] */ IWebFrame* frame) {
+  // FIXME: Check the IWebView passed in vs the m_webView which should be used?
+  // note: this is Drosera's own WebView, not the one in the app that we are
+  // attached to.
+  m_webViewLoaded = true;
+
+  COMPtr<IWebFrame> mainFrame;
+  HRESULT hr = m_webView->mainFrame(&mainFrame);
+  if (FAILED(hr))
+    return hr;
+
+  if (mainFrame != frame)
+    return S_OK;
+
+  // FIXME: This cannot be implemented until IWebFrame has a globalContext
+  //    if (m_server)
+  //        m_server->setGlobalContext(mainFrame->globalContext());
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE DebuggerClient::windowScriptObjectAvailable(
+    /* [in] */ IWebView*,
+    /* [in] */ JSContextRef context,
+    /* [in] */ JSObjectRef windowObject) {
+  JSValueRef exception = 0;
+  if (m_debuggerDocument)
+    m_debuggerDocument->windowScriptObjectAvailable(context, windowObject,
+                                                    &exception);
+
+  if (exception)
+    return E_FAIL;
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE DebuggerClient::didReceiveTitle(
+    /* [in] */ IWebView*,
+    /* [in] */ BSTR,
+    /* [in] */ IWebFrame*) {
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE DebuggerClient::createWebViewWithRequest(
+    /* [in] */ IWebView*,
+    /* [in] */ IWebURLRequest*,
+    /* [retval][out] */ IWebView**) {
+  return S_OK;
+}
+
+// IWebUIDelegate ------------------------------
+HRESULT STDMETHODCALLTYPE
+DebuggerClient::runJavaScriptAlertPanelWithMessage(  // For debugging purposes
+    /* [in] */ IWebView*,
+    /* [in] */ BSTR message) {
+#ifndef NDEBUG
+  fwprintf(stderr, L"%s\n", message ? message : L"");
+#else
+  (void)message;
+#endif
+  return S_OK;
 }
