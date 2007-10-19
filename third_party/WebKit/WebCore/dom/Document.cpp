@@ -32,6 +32,7 @@
 #include "CSSValueKeywords.h"
 #include "Comment.h"
 #include "CookieJar.h"
+#include "DatabaseThread.h"
 #include "DOMImplementation.h"
 #include "DocLoader.h"
 #include "DocumentFragment.h"
@@ -305,6 +306,7 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
       ,
       m_isXHTML(isXHTML),
       m_numNodeLists(0) {
+  printf("Document %p being constructed\n", this);
   m_document.resetSkippingRef(this);
 
   m_printing = false;
@@ -401,6 +403,7 @@ void Document::removedLastRef() {
 }
 
 Document::~Document() {
+  printf("Document %p is being destroyed\n", this);
   ASSERT(!renderer());
   ASSERT(!m_inPageCache);
   ASSERT(!m_savedRenderer);
@@ -454,6 +457,12 @@ Document::~Document() {
       sizeof(m_nameCollectionInfo) / sizeof(m_nameCollectionInfo[0]);
   for (unsigned i = 0; i < count; i++)
     deleteAllValues(m_nameCollectionInfo[i]);
+
+  if (m_databaseThread) {
+    printf("Destroying document %p which has a database thread\n", this);
+    m_databaseThread->documentGoingAway();
+    m_databaseThread = 0;
+  }
 
   if (m_styleSheets)
     m_styleSheets->documentDestroyed();
@@ -3736,6 +3745,16 @@ void Document::updateFocusAppearanceTimerFired(Timer<Document>*) {
   Element* element = static_cast<Element*>(node);
   if (element->isFocusable())
     element->updateFocusAppearance(false);
+}
+
+DatabaseThread* Document::databaseThread() {
+  if (!m_databaseThread) {
+    m_databaseThread = new DatabaseThread(this);
+    if (!m_databaseThread->start())
+      m_databaseThread = 0;
+  }
+
+  return m_databaseThread.get();
 }
 
 }  // namespace WebCore

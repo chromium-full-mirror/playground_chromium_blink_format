@@ -32,10 +32,12 @@
 #include "Chrome.h"
 #include <JavaScriptCore/JSContextRef.h>
 #include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
 
+class Database;
 class DocumentLoader;
 class InspectorClient;
 class Node;
@@ -43,6 +45,7 @@ class ResourceResponse;
 class ResourceError;
 
 struct ConsoleMessage;
+struct InspectorDatabaseResource;
 struct InspectorResource;
 struct ResourceRequest;
 
@@ -50,6 +53,7 @@ class InspectorController {
  public:
   typedef HashMap<long long, RefPtr<InspectorResource>> ResourcesMap;
   typedef HashMap<RefPtr<Frame>, ResourcesMap*> FrameResourcesMap;
+  typedef HashSet<RefPtr<InspectorDatabaseResource>> DatabaseResourcesSet;
 
   InspectorController(Page*, InspectorClient*);
   ~InspectorController();
@@ -113,6 +117,11 @@ class InspectorController {
                       unsigned long identifier,
                       const ResourceError&);
 
+  void didOpenDatabase(Database*,
+                       const String& domain,
+                       const String& name,
+                       const String& version);
+
   const ResourcesMap& resources() const { return m_resources; }
 
  private:
@@ -122,6 +131,7 @@ class InspectorController {
   void clearScriptConsoleMessages();
 
   void clearNetworkTimeline();
+  void clearDatabaseScriptResources();
 
   void addResource(InspectorResource*);
   void removeResource(InspectorResource*);
@@ -144,6 +154,9 @@ class InspectorController {
   void pruneResources(ResourcesMap*, DocumentLoader* loaderToKeep = 0);
   void removeAllResources(ResourcesMap* map) { pruneResources(map); }
 
+  JSObjectRef addDatabaseScriptResource(InspectorDatabaseResource*);
+  void removeDatabaseScriptResource(InspectorDatabaseResource*);
+
   Page* m_inspectedPage;
   InspectorClient* m_client;
   Page* m_page;
@@ -152,6 +165,7 @@ class InspectorController {
   ResourcesMap m_resources;
   FrameResourcesMap m_frameResources;
   Vector<ConsoleMessage*> m_consoleMessages;
+  DatabaseResourcesSet m_databaseResources;
   JSObjectRef m_scriptObject;
   JSObjectRef m_controllerScriptObject;
   JSContextRef m_scriptContext;

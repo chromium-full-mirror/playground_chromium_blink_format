@@ -49,6 +49,7 @@ class CSSStyleDeclaration;
 class CSSStyleSelector;
 class CSSStyleSheet;
 class Comment;
+class DatabaseThread;
 class DOMImplementation;
 class DOMWindow;
 class DocLoader;
@@ -981,6 +982,8 @@ class Document : public ContainerNode {
 
   bool processingLoadEvent() const { return m_processingLoadEvent; }
 
+  DatabaseThread* databaseThread();
+
  protected:
   void clearXMLVersion() { m_xmlVersion = String(); }
 
@@ -1052,6 +1055,8 @@ class Document : public ContainerNode {
   bool m_isXHTML;
 
   unsigned m_numNodeLists;
+
+  RefPtr<DatabaseThread> m_databaseThread;
 #if USE(LOW_BANDWIDTH_DISPLAY)
   bool m_inLowBandwidthDisplay;
 #endif

@@ -130,4 +130,8 @@ bool SecurityOrigin::isSecureTransitionTo(const KURL& url) const {
          m_port == url.port();
 }
 
+String SecurityOrigin::toString() const {
+  return m_protocol + ":" + m_host + ":" + String::number(m_port);
+}
+
 }  // namespace WebCore

@@ -60,4 +60,5 @@ WTFLogChannel LogPlatformLeaks = {0x00010000, "WebCoreLogLevel",
 WTFLogChannel LogNetwork = {0x00100000, "WebCoreLogLevel", WTFLogChannelOff};
 WTFLogChannel LogFTP = {0x00200000, "WebCoreLogLevel", WTFLogChannelOff};
 WTFLogChannel LogThreading = {0x00400000, "WebCoreLogLevel", WTFLogChannelOff};
+WTFLogChannel LogStorageAPI = {0x00800000, "WebCoreLogLevel", WTFLogChannelOff};
 }

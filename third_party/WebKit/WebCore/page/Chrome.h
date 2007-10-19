@@ -135,6 +135,8 @@ class Chrome {
 
   void print(Frame*);
 
+  bool runDatabaseSizeLimitPrompt(Frame*, const String& origin);
+
 #if PLATFORM(MAC)
   void focusNSView(NSView*);
 #endif

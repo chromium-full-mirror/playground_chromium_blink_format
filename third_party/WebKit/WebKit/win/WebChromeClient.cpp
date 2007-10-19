@@ -454,3 +454,8 @@ void WebChromeClient::print(Frame* frame) {
                                              (void**)&uiDelegate2)))
       uiDelegate2->printFrame(m_webView, kit(frame));
 }
+
+bool WebChromeClient::runDatabaseSizeLimitPrompt(Frame*, const String&) {
+  notImplemented();
+  return false;
+}
