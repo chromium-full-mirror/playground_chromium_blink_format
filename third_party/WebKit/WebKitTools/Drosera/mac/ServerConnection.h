@@ -48,6 +48,6 @@
 - (void)applicationTerminating:(NSNotification*)notifiction;
 - (WebScriptCallFrame*)currentFrame;
 - (NSArray*)webScriptAttributeKeysForScriptObject:(WebScriptObject*)object;
-- (NSDictionary*)knownServers;
+- (NSString*)currentServerName;
 
 @end
