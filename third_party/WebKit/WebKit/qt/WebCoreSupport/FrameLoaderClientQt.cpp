@@ -891,3 +891,5 @@ QString FrameLoaderClientQt::chooseFile(const QString& oldFile) {
   return webFrame()->page()->chooseFile(webFrame(), oldFile);
 }
 }
+
+#include "moc_FrameLoaderClientQt.cpp"
