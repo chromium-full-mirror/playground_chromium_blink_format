@@ -685,8 +685,6 @@ class FrameLoader : Noncopyable
 
   void startIconLoader();
 
-  bool isSecureTransition(const KURL& fromURL, const KURL& toURL);
-
 #if USE(LOW_BANDWIDTH_DISPLAY)
   // implementation of CachedResourceClient
   virtual void notifyFinished(CachedResource*);

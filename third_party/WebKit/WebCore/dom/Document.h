@@ -33,6 +33,7 @@
 #include "HTMLCollection.h"
 #include "HTMLFormElement.h"
 #include "KURL.h"
+#include "SecurityOrigin.h"
 #include "StringHash.h"
 #include "Timer.h"
 #include <wtf/HashCountedSet.h>
@@ -975,10 +976,8 @@ class Document : public ContainerNode {
   SVGDocumentExtensions* accessSVGExtensions();
 #endif
 
-  bool domainWasSetInDOM() const { return m_domainWasSetInDOM; }
-
-  void initSecurityPolicyURL();
-  const KURL& securityPolicyURL() const { return m_securityPolicyURL; }
+  void initSecurityOrigin();
+  const SecurityOrigin& securityOrigin() const { return m_securityOrigin; }
 
   bool processingLoadEvent() const { return m_processingLoadEvent; }
 
@@ -997,9 +996,8 @@ class Document : public ContainerNode {
   JSEditor* m_jsEditor;
 
   mutable String m_domain;
-  bool m_domainWasSetInDOM;
 
-  KURL m_securityPolicyURL;
+  SecurityOrigin m_securityOrigin;
 
   RenderObject* m_savedRenderer;
   int m_secureForms;
