@@ -13,10 +13,6 @@ static gchar* gTitle;
 static gint gProgress;
 static guint gStatusbarContextId;
 
-static bool stringIsEqual(const char* str1, const char* str2) {
-  return 0 == strcmp(str1, str2);
-}
-
 static gchar* autocorrectURL(const gchar* url) {
   if (strncmp("http://", url, 7) != 0 && strncmp("https://", url, 8) != 0 &&
       strncmp("file://", url, 7) != 0 && strncmp("ftp://", url, 6) != 0) {
@@ -99,33 +95,7 @@ static void menuMainQuitCallback(gpointer) {
   gtk_main_quit();
 }
 
-int main(int argc, char* argv[]) {
-  gtk_init(&argc, &argv);
-  webkit_init();
-
-  gchar* url = "http://www.google.com";
-  bool exitAfterLoading = false;
-  bool dumpRenderTree = false;
-  for (int argPos = 1; argPos < argc; ++argPos) {
-    char* currArg = argv[argPos];
-    if (stringIsEqual(currArg, "-exit-after-loading"))
-      exitAfterLoading = true;
-    else if (stringIsEqual(currArg, "-exitafterloading"))
-      exitAfterLoading = true;
-    else if (stringIsEqual(currArg, "-exitafterload"))
-      exitAfterLoading = true;
-    else if (stringIsEqual(currArg, "-exit-after-load"))
-      exitAfterLoading = true;
-    else if (stringIsEqual(currArg, "-drt"))
-      dumpRenderTree = true;
-    else if (stringIsEqual(currArg, "-dump-render-tree"))
-      dumpRenderTree = true;
-    else if (stringIsEqual(currArg, "-dumprendertree"))
-      dumpRenderTree = true;
-    else
-      url = autocorrectURL(currArg);
-  }
-
+static GtkWidget* setupMainMenu() {
   GtkWidget* menuMain = gtk_menu_new();
   GtkWidget* menuMainBack = gtk_menu_item_new_with_label("Back");
   gtk_menu_shell_append(GTK_MENU_SHELL(menuMain), menuMainBack);
@@ -148,6 +118,12 @@ int main(int argc, char* argv[]) {
   GtkWidget* menuMainRoot = gtk_menu_item_new_with_label("Main");
   gtk_widget_show(menuMainRoot);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuMainRoot), menuMain);
+
+  return menuMainRoot;
+}
+
+static void setupMainWindowUI() {
+  GtkWidget* menuMainRoot = setupMainMenu();
 
   GtkWidget* menuBar = gtk_menu_bar_new();
   gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), menuMainRoot);
@@ -178,6 +154,7 @@ int main(int argc, char* argv[]) {
   GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWindow),
                                  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
   gPage = WEBKIT_PAGE(webkit_page_new());
   gtk_container_add(GTK_CONTAINER(scrolledWindow), GTK_WIDGET(gPage));
   gtk_box_pack_start(GTK_BOX(vbox), scrolledWindow, TRUE, TRUE, 0);
@@ -191,9 +168,20 @@ int main(int argc, char* argv[]) {
                    gPage);
   g_signal_connect(gPage, "hovering-over-link", G_CALLBACK(hoveringOverLink),
                    gPage);
+}
+
+int main(int argc, char* argv[]) {
+  gtk_init(&argc, &argv);
+  webkit_init();
+
+  gchar* url = autocorrectURL((argc > 1) ? argv[1] : "http://www.google.com");
+
+  setupMainWindowUI();
+
   webkit_page_open(gPage, url);
 
   gtk_widget_show_all(gTopLevelWindow);
+  g_free(url);
   gtk_main();
   return 0;
 }
