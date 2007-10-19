@@ -1191,7 +1191,7 @@ class TCMalloc_ThreadCache {
   static void InitTSD();
   static TCMalloc_ThreadCache* GetCache();
   static TCMalloc_ThreadCache* GetCacheIfPresent();
-  static void* CreateCacheIfNecessary();
+  static TCMalloc_ThreadCache* CreateCacheIfNecessary();
   static void DeleteCache(void* ptr);
   static void RecomputeThreadCacheSize();
 
@@ -1300,6 +1300,26 @@ static inline TCMalloc_PageHeap* getPageHeap() {
 // Until then, we use a slow path to get the heap object.
 static bool tsd_inited = false;
 static pthread_key_t heap_key;
+#if COMPILER(MSVC)
+__declspec(thread) TCMalloc_ThreadCache* threadHeap;
+#endif
+
+static ALWAYS_INLINE TCMalloc_ThreadCache* getThreadHeap() {
+#if COMPILER(MSVC)
+  return threadHeap;
+#else
+  return static_cast<TCMalloc_ThreadCache*>(pthread_getspecific(heap_key));
+#endif
+}
+
+static ALWAYS_INLINE void setThreadHeap(TCMalloc_ThreadCache* heap) {
+  // still do pthread_setspecific when using MSVC fast TLS to
+  // benefit from the delete callback.
+  pthread_setspecific(heap_key, heap);
+#if COMPILER(MSVC)
+  threadHeap = heap;
+#endif
+}
 
 // Allocator for thread heaps
 static PageHeapAllocator<TCMalloc_ThreadCache> threadheap_allocator;
@@ -1574,15 +1594,15 @@ inline void TCMalloc_ThreadCache::Scavenge() {
 }
 
 ALWAYS_INLINE TCMalloc_ThreadCache* TCMalloc_ThreadCache::GetCache() {
-  void* ptr = NULL;
+  TCMalloc_ThreadCache* ptr = NULL;
   if (!tsd_inited) {
     InitModule();
   } else {
-    ptr = pthread_getspecific(heap_key);
+    ptr = getThreadHeap();
   }
   if (ptr == NULL)
     ptr = CreateCacheIfNecessary();
-  return static_cast<TCMalloc_ThreadCache*>(ptr);
+  return ptr;
 }
 
 // In deletion paths, we do not try to create a thread-cache.  This is
@@ -1591,7 +1611,7 @@ ALWAYS_INLINE TCMalloc_ThreadCache* TCMalloc_ThreadCache::GetCache() {
 inline TCMalloc_ThreadCache* TCMalloc_ThreadCache::GetCacheIfPresent() {
   if (!tsd_inited)
     return NULL;
-  return static_cast<TCMalloc_ThreadCache*>(pthread_getspecific(heap_key));
+  return getThreadHeap();
 }
 
 void TCMalloc_ThreadCache::PickNextSample() {
@@ -1656,7 +1676,7 @@ void TCMalloc_ThreadCache::InitTSD() {
   }
 }
 
-void* TCMalloc_ThreadCache::CreateCacheIfNecessary() {
+TCMalloc_ThreadCache* TCMalloc_ThreadCache::CreateCacheIfNecessary() {
   // Initialize per-thread data if necessary
   TCMalloc_ThreadCache* heap = NULL;
   {
@@ -1700,7 +1720,7 @@ void* TCMalloc_ThreadCache::CreateCacheIfNecessary() {
   // linked list of heaps.
   if (!heap->setspecific_ && tsd_inited) {
     heap->setspecific_ = true;
-    pthread_setspecific(heap_key, heap);
+    setThreadHeap(heap);
   }
   return heap;
 }
