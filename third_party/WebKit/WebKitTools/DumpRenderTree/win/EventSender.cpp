@@ -303,7 +303,7 @@ static JSValueRef keyDownCallback(JSContextRef context,
         else if (JSStringIsEqualToUTF8CString(string, "shiftKey"))
           newKeyState[VK_SHIFT] = 0x80;
         else if (JSStringIsEqualToUTF8CString(string, "altKey"))
-          newKeyState[VK_CONTROL] = 0x80;
+          newKeyState[VK_MENU] = 0x80;
         else if (JSStringIsEqualToUTF8CString(string, "metaKey"))
           newKeyState[VK_MENU] = 0x80;
 
