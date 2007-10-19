@@ -88,4 +88,7 @@
 #include <wtf/FastMalloc.h>
 #endif
 
+#if !PLATFORM(QT)  // this breaks compilation of <QFontDatabase>, at least, so
+                   // turn it off for now
 #include <wtf/DisallowCType.h>
+#endif
