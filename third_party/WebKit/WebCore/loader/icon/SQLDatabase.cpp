@@ -239,7 +239,7 @@ int SQLDatabase::authorizerFunction(void* userData,
       return auth->allowAlterTable(parameter1, parameter2);
     case SQLITE_REINDEX:
       return auth->allowReindex(parameter1);
-#if SQLITE_VERSION_NUMBER > 3004000
+#if SQLITE_VERSION_NUMBER > 3003013
     case SQLITE_ANALYZE:
       return auth->allowAnalyze(parameter1);
     case SQLITE_CREATE_VTABLE:
