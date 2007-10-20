@@ -34,11 +34,8 @@
 #include "FrameView.h"
 #include "FTPDirectoryDocument.h"
 #include "GlobalHistory.h"
-#include "Language.h"
 #include "NotImplemented.h"
 #include "PlugInInfoStore.h"
-#include "TextBoundaries.h"
-#include "TextBreakIteratorInternalICU.h"
 
 using namespace WebCore;
 
@@ -54,29 +51,8 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
   return resource;
 }
 
-namespace WebCore {
-class Page;
-}
-
 void FrameView::updateBorder() {
   notImplemented();
-}
-
-int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
-  notImplemented();
-  return 0;
-}
-void WebCore::findWordBoundary(UChar const* str,
-                               int len,
-                               int position,
-                               int* start,
-                               int* end) {
-  *start = position;
-  *end = position;
-}
-const char* WebCore::currentTextBreakLocaleID() {
-  notImplemented();
-  return "en_us";
 }
 
 /********************************************************/
@@ -86,10 +62,6 @@ bool AXObjectCache::gAccessibilityEnabled = false;
 
 bool WebCore::historyContains(DeprecatedString const&) {
   return false;
-}
-
-String WebCore::defaultLanguage() {
-  return "en";
 }
 
 PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
