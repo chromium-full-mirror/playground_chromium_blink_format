@@ -48,6 +48,12 @@ class RenderThemeGtk : public RenderTheme {
   // hovered.
   virtual bool supportsHover(const RenderStyle* style) const { return true; }
 
+  // The platform selection color.
+  virtual Color platformActiveSelectionBackgroundColor() const;
+  virtual Color platformInactiveSelectionBackgroundColor() const;
+  virtual Color platformActiveSelectionForegroundColor() const;
+  virtual Color platformInactiveSelectionForegroundColor() const;
+
   // System fonts.
   virtual void systemFont(int propId, FontDescription&) const;
 
@@ -89,6 +95,8 @@ class RenderThemeGtk : public RenderTheme {
   bool supportsFocus(EAppearance);
 
   ThemeData getThemeData(RenderObject*);
+
+  static void gtkStyleSet(GtkWidget*, GtkStyle*, RenderTheme*);
 
   /*
    * hold the state
