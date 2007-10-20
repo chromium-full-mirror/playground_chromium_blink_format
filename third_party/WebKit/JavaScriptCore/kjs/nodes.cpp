@@ -2476,6 +2476,11 @@ UString FunctionBodyNode::paramString() const {
   return s;
 }
 
+Completion FunctionBodyNode::execute(ExecState* exec) {
+  processDeclarations(exec);
+  return BlockNode::execute(exec);
+}
+
 // ------------------------------ FuncDeclNode ---------------------------------
 
 void FuncDeclNode::addParams() {

@@ -131,7 +131,6 @@ class FunctionImp : public InternalFunctionImp {
                                const PropertySlot&);
 
   void passInParameters(ExecState*, const List&);
-  void processVarDecls(ExecState*);
 };
 
 class IndexToNameMap {

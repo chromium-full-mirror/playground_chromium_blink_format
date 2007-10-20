@@ -81,7 +81,6 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
   ctx.setExecState(&newExec);
 
   passInParameters(&newExec, args);
-  processVarDecls(&newExec);
 
   Debugger* dbg = exec->dynamicInterpreter()->debugger();
   int sid = -1;
@@ -281,10 +280,6 @@ Completion FunctionImp::execute(ExecState* exec) {
   if (result.complType() == Throw || result.complType() == ReturnValue)
     return result;
   return Completion(Normal, jsUndefined());  // TODO: or ReturnValue ?
-}
-
-void FunctionImp::processVarDecls(ExecState* exec) {
-  body->processDeclarations(exec);
 }
 
 // ------------------------------ IndexToNameMap
@@ -819,8 +814,6 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
           ctx.setVariableObject(thisObj);
         }
 
-        // execute the code
-        progNode->processDeclarations(&newExec);
         Completion c = progNode->execute(&newExec);
 
         if (switchGlobal)

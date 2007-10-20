@@ -983,7 +983,7 @@ class VarDeclNode : public Node {
   VarDeclNode(const Identifier& id, AssignExprNode* in, Type t) KJS_FAST_CALL;
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  void ALWAYS_INLINE processDeclaration(ExecState*) KJS_FAST_CALL;
+  ALWAYS_INLINE void processDeclaration(ExecState*) KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
@@ -1288,6 +1288,8 @@ class FunctionBodyNode : public BlockNode {
   int sourceId() KJS_FAST_CALL { return m_sourceId; }
   const UString& sourceURL() KJS_FAST_CALL { return m_sourceURL; }
 
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
+
   void addParam(const Identifier& ident) KJS_FAST_CALL;
   size_t numParams() const KJS_FAST_CALL { return m_parameters.size(); }
   Identifier paramName(size_t pos) const KJS_FAST_CALL {
@@ -1295,7 +1297,7 @@ class FunctionBodyNode : public BlockNode {
   }
   UString paramString() const KJS_FAST_CALL;
   Vector<Identifier>& parameters() KJS_FAST_CALL { return m_parameters; }
-  void processDeclarations(ExecState*) KJS_FAST_CALL;
+  ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
 
  private:
   UString m_sourceURL;
@@ -1348,7 +1350,7 @@ class FuncDeclNode : public StatementNode {
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
-  void ALWAYS_INLINE processDeclaration(ExecState*) KJS_FAST_CALL;
+  ALWAYS_INLINE void processDeclaration(ExecState*) KJS_FAST_CALL;
 
  private:
   void addParams() KJS_FAST_CALL;
