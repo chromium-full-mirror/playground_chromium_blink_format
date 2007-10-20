@@ -136,7 +136,4 @@ float userIdleTime() {
   notImplemented();
   return 0.0;
 }
-void callOnMainThread(void (*)()) {
-  notImplemented();
-}
 }
