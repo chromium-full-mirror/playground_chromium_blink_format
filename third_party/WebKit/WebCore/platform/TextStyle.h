@@ -38,7 +38,8 @@ class TextStyle {
         m_rtl(rtl),
         m_directionalOverride(directionalOverride),
         m_applyRunRounding(applyRunRounding),
-        m_applyWordRounding(applyWordRounding) {}
+        m_applyWordRounding(applyWordRounding),
+        m_disableSpacing(false) {}
 
   bool allowTabs() const { return m_allowTabs; }
   int xPos() const { return m_xpos; }
@@ -48,7 +49,9 @@ class TextStyle {
   bool directionalOverride() const { return m_directionalOverride; }
   bool applyRunRounding() const { return m_applyRunRounding; }
   bool applyWordRounding() const { return m_applyWordRounding; }
+  bool spacingDisabled() const { return m_disableSpacing; }
 
+  void disableSpacing() { m_disableSpacing = true; }
   void disableRoundingHacks() {
     m_applyRunRounding = m_applyWordRounding = false;
   }
@@ -65,6 +68,7 @@ class TextStyle {
   bool m_directionalOverride;
   bool m_applyRunRounding;
   bool m_applyWordRounding;
+  bool m_disableSpacing;
 };
 }
 

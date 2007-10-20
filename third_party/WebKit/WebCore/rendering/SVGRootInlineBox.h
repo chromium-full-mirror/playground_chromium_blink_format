@@ -70,8 +70,12 @@ class SVGRootInlineBox : public RootInlineBox {
   void buildLayoutInformationForTextBox(SVGCharacterLayoutInfo&,
                                         InlineTextBox*);
 
-  void buildTextChunks();
-  void buildTextChunks(InlineFlowBox* start, SVGTextChunkLayoutInfo&);
+  void buildTextChunks(Vector<SVGChar>&,
+                       Vector<SVGTextChunk>&,
+                       InlineFlowBox* start);
+  void buildTextChunks(Vector<SVGChar>&,
+                       InlineFlowBox* start,
+                       SVGTextChunkLayoutInfo&);
   void layoutTextChunks();
 
   SVGTextDecorationInfo retrievePaintServersForTextDecoration(

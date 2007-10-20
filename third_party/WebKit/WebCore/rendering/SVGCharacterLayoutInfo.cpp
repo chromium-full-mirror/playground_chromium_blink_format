@@ -69,7 +69,7 @@ static float calculateBaselineShift(RenderObject* item) {
   return baselineShift;
 }
 
-SVGCharacterLayoutInfo::SVGCharacterLayoutInfo()
+SVGCharacterLayoutInfo::SVGCharacterLayoutInfo(Vector<SVGChar>& chars)
     : curx(0.0f),
       cury(0.0f),
       angle(0.0f),
@@ -77,6 +77,11 @@ SVGCharacterLayoutInfo::SVGCharacterLayoutInfo()
       dy(0.0f),
       shiftx(0.0f),
       shifty(0.0f),
+      pathExtraAdvance(0.0f),
+      pathTextLength(0.0f),
+      pathChunkLength(0.0f),
+      svgChars(chars),
+      nextDrawnSeperated(false),
       xStackChanged(false),
       yStackChanged(false),
       dxStackChanged(false),
@@ -207,10 +212,7 @@ void SVGCharacterLayoutInfo::processedChunk(float savedShiftX,
   }
 }
 
-bool SVGCharacterLayoutInfo::nextPathLayoutPointAndAngle(float& x,
-                                                         float& y,
-                                                         float& angle,
-                                                         float glyphAdvance,
+bool SVGCharacterLayoutInfo::nextPathLayoutPointAndAngle(float glyphAdvance,
                                                          float extraAdvance,
                                                          float newOffset) {
   if (layoutPathLength <= 0.0f)
@@ -223,7 +225,7 @@ bool SVGCharacterLayoutInfo::nextPathLayoutPointAndAngle(float& x,
   currentOffset += extraAdvance;
 
   float offset = currentOffset + glyphAdvance / 2.0f;
-  currentOffset += glyphAdvance;
+  currentOffset += glyphAdvance + pathExtraAdvance;
 
   if (offset < 0.0f || offset > layoutPathLength)
     return false;
@@ -232,8 +234,8 @@ bool SVGCharacterLayoutInfo::nextPathLayoutPointAndAngle(float& x,
   FloatPoint point = layoutPath.pointAtLength(offset, ok);
   ASSERT(ok);
 
-  x = point.x();
-  y = point.y();
+  curx = point.x();
+  cury = point.y();
 
   angle = layoutPath.normalAngleAtLength(offset, ok);
   ASSERT(ok);
@@ -249,6 +251,10 @@ bool SVGCharacterLayoutInfo::inPathLayout() const {
 
 void SVGCharacterLayoutInfo::setInPathLayout(bool value) {
   pathLayout = value;
+
+  pathExtraAdvance = 0.0f;
+  pathTextLength = 0.0f;
+  pathChunkLength = 0.0f;
 }
 
 void SVGCharacterLayoutInfo::addLayoutInformation(InlineFlowBox* flowBox,
@@ -261,6 +267,7 @@ void SVGCharacterLayoutInfo::addLayoutInformation(InlineFlowBox* flowBox,
   RenderSVGTextPath* textPath =
       static_cast<RenderSVGTextPath*>(flowBox->object());
   Path path = textPath->layoutPath();
+
   float baselineShift = calculateBaselineShift(textPath);
 
   layoutPath = path;
@@ -488,13 +495,15 @@ void SVGCharacterLayoutInfo::baselineShiftStackWalk() {
 AffineTransform SVGChar::characterTransform() const {
   AffineTransform ctm;
 
-  // Rotate character around angle
+  // Rotate character around angle, and possibly scale.
+  // Only happens in textPath layouts.
   ctm.translate(x, y);
   ctm.rotate(angle);
+  ctm.scale(pathXScale, pathYScale);
   ctm.translate(-x, -y);
 
-  // Apply transformations which have to be applied after
-  // the rotation - only happens with textPath.
+  // Apply transformations which have to be applied orthogonal to the path
+  // Only happens in textPath layouts.
   ctm.translate(pathXShift, pathYShift);
 
   return ctm;
