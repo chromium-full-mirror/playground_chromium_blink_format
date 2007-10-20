@@ -263,4 +263,9 @@ void ChromeClientQt::setToolTip(const String&) {
 void ChromeClientQt::print(Frame*) {
   notImplemented();
 }
+
+bool ChromeClientQt::runDatabaseSizeLimitPrompt(Frame*, const String& origin) {
+  notImplemented();
+  return false;
+}
 }

@@ -112,6 +112,8 @@ class ChromeClientQt : public ChromeClient {
 
   virtual void print(Frame*);
 
+  virtual bool runDatabaseSizeLimitPrompt(Frame*, const String&);
+
   QWebPage* m_webPage;
 };
 }

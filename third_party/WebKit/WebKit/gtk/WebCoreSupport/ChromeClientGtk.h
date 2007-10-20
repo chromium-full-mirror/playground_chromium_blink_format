@@ -114,6 +114,9 @@ class ChromeClient : public WebCore::ChromeClient {
 
   virtual void print(WebCore::Frame*);
 
+  virtual bool runDatabaseSizeLimitPrompt(WebCore::Frame*,
+                                          const WebCore::String&);
+
  private:
   WebKitPage* m_webPage;
   WebCore::KURL m_hoveredLinkURL;

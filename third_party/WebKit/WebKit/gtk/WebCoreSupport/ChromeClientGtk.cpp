@@ -269,4 +269,9 @@ void ChromeClient::setToolTip(const String&) {
 void ChromeClient::print(Frame*) {
   notImplemented();
 }
+
+bool ChromeClient::runDatabaseSizeLimitPrompt(Frame*, const String& origin) {
+  notImplemented();
+  return false;
+}
 }
