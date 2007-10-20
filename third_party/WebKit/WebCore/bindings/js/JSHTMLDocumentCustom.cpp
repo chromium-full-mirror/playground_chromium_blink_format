@@ -69,7 +69,7 @@ JSValue* JSHTMLDocument::nameGetter(ExecState* exec,
     Frame* frame;
     if (node->hasTagName(iframeTag) &&
         (frame = static_cast<HTMLIFrameElement*>(node)->contentFrame()))
-      return Window::retrieve(frame);
+      return KJS::Window::retrieve(frame);
 
     return toJS(exec, node);
   }
@@ -100,7 +100,7 @@ JSValue* JSHTMLDocument::open(ExecState* exec, const List& args) {
   if (args.size() > 2) {
     Frame* frame = static_cast<HTMLDocument*>(impl())->frame();
     if (frame) {
-      Window* window = Window::retrieveWindow(frame);
+      KJS::Window* window = KJS::Window::retrieveWindow(frame);
       if (window) {
         JSObject* functionObject = window->get(exec, "open")->getObject();
         if (!functionObject || !functionObject->implementsCall())
