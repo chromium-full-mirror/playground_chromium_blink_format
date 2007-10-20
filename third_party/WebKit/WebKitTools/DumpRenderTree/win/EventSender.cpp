@@ -279,7 +279,7 @@ static JSValueRef keyDownCallback(JSContextRef context,
   JSStringRef character = JSValueToStringCopy(context, arguments[0], exception);
   ASSERT(!*exception);
   int virtualKeyCode;
-  if (JSStringIsEqualToUTF8CString(string, "rightArrow")) {
+  if (JSStringIsEqualToUTF8CString(character, "rightArrow")) {
     virtualKeyCode = VK_RIGHT;
   } else {
     int charCode = JSStringGetCharactersPtr(character)[0];
