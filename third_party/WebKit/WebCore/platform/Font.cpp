@@ -510,9 +510,10 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c, bool mirror) const {
     // Got the fallback glyph and font.
     GlyphPage* fallbackPage =
         GlyphPageTreeNode::getRootChild(characterFontData, pageNumber)->page();
-    const GlyphData& data = fallbackPage
-                                ? fallbackPage->glyphDataForCharacter(c)
-                                : characterFontData->missingGlyphData();
+    const GlyphData& data =
+        fallbackPage && fallbackPage->glyphDataForCharacter(c).fontData
+            ? fallbackPage->glyphDataForCharacter(c)
+            : characterFontData->missingGlyphData();
     // Cache it so we don't have to do system fallback again next time.
     if (!useSmallCapsFont)
       page->setGlyphDataForCharacter(c, data.glyph, data.fontData);
