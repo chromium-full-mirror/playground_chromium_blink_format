@@ -65,7 +65,7 @@ class ArrayInstance : public JSObject {
                                const Identifier&,
                                const PropertySlot&);
 
-  void setLength(unsigned newLength, ExecState* exec);
+  void setLength(unsigned newLength);
 
   unsigned compactForSorting();
 
