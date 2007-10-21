@@ -47,9 +47,11 @@
 #include "RenderObject.h"
 #include "ScrollBar.h"
 #include "Timer.h"
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
+class AffineTransform;
 class CachedResource;
 class HitTestResult;
 class PlatformScrollbar;
@@ -218,7 +220,9 @@ class RenderLayer : public ScrollbarClient {
 
   bool isTransparent() const;
   RenderLayer* transparentAncestor();
-  void beginTransparencyLayers(GraphicsContext*, const IntRect&);
+  void beginTransparencyLayers(GraphicsContext*,
+                               const IntRect&,
+                               const RenderLayer* rootLayer);
 
   const RenderLayer* root() const {
     const RenderLayer* curr = this;
@@ -303,6 +307,8 @@ class RenderLayer : public ScrollbarClient {
   void updateLayerPositions(bool doFullRepaint = false,
                             bool checkForRepaint = true);
 
+  void updateTransform();
+
   void relativePositionOffset(int& relX, int& relY) {
     relX += m_relX;
     relY += m_relY;
@@ -371,10 +377,11 @@ class RenderLayer : public ScrollbarClient {
                                  // layer in the document's coordinate space.
 
   bool intersectsDamageRect(const IntRect& layerBounds,
-                            const IntRect& damageRect) const;
+                            const IntRect& damageRect,
+                            const RenderLayer* rootLayer) const;
 
   // Returns a bounding box for this layer only.
-  IntRect absoluteBoundingBox() const;
+  IntRect boundingBox(const RenderLayer* rootLayer) const;
 
   void updateHoverActiveState(const HitTestRequest&, HitTestResult&);
 
@@ -517,6 +524,8 @@ class RenderLayer : public ScrollbarClient {
   // left/top values.
   int m_staticX;
   int m_staticY;
+
+  OwnPtr<AffineTransform> m_transform;
 };
 
 }  // namespace WebCore

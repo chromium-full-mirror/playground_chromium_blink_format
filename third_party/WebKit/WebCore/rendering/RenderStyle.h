@@ -693,18 +693,18 @@ class TransformOperation : public Shared<TransformOperation> {
 
   virtual void apply(AffineTransform&, const IntSize& borderBoxSize) = 0;
 
-  bool isScaleOperation() const { return false; }
-  bool isRotateOperation() const { return false; }
-  bool isSkewOperation() const { return false; }
-  bool isTranslateOperation() const { return false; }
-  bool isMatrixOperation() const { return false; }
+  virtual bool isScaleOperation() const { return false; }
+  virtual bool isRotateOperation() const { return false; }
+  virtual bool isSkewOperation() const { return false; }
+  virtual bool isTranslateOperation() const { return false; }
+  virtual bool isMatrixOperation() const { return false; }
 };
 
 class ScaleTransformOperation : public TransformOperation {
  public:
   ScaleTransformOperation(double sx, double sy) : m_x(sx), m_y(sy) {}
 
-  bool isScaleOperation() const { return true; }
+  virtual bool isScaleOperation() const { return true; }
 
   virtual bool operator==(const TransformOperation& o) const {
     if (o.isScaleOperation()) {
@@ -728,7 +728,7 @@ class RotateTransformOperation : public TransformOperation {
  public:
   RotateTransformOperation(double angle) : m_angle(angle) {}
 
-  bool isRotateOperation() const { return true; }
+  virtual bool isRotateOperation() const { return true; }
 
   virtual bool operator==(const TransformOperation& o) const {
     if (o.isRotateOperation()) {
@@ -752,7 +752,7 @@ class SkewTransformOperation : public TransformOperation {
   SkewTransformOperation(double angleX, double angleY)
       : m_angleX(angleX), m_angleY(angleY) {}
 
-  bool isSkewOperation() const { return true; }
+  virtual bool isSkewOperation() const { return true; }
 
   virtual bool operator==(const TransformOperation& o) const {
     if (o.isSkewOperation()) {
@@ -777,7 +777,7 @@ class TranslateTransformOperation : public TransformOperation {
   TranslateTransformOperation(const Length& tx, const Length& ty)
       : m_x(tx), m_y(ty) {}
 
-  bool isTranslateOperation() const { return true; }
+  virtual bool isTranslateOperation() const { return true; }
 
   virtual bool operator==(const TransformOperation& o) const {
     if (o.isTranslateOperation()) {
@@ -808,7 +808,7 @@ class MatrixTransformOperation : public TransformOperation {
                            const Length& f)
       : m_a(a), m_b(b), m_c(c), m_d(d), m_e(e), m_f(f) {}
 
-  bool isMatrixOperation() const { return true; }
+  virtual bool isMatrixOperation() const { return true; }
 
   virtual bool operator==(const TransformOperation& o) const {
     if (o.isMatrixOperation()) {
