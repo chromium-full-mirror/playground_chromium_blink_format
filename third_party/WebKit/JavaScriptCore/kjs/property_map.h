@@ -83,7 +83,6 @@ class PropertyMap {
 
   void mark() const;
   void getEnumerablePropertyNames(PropertyNameArray&) const;
-  void getSparseArrayPropertyNames(PropertyNameArray&) const;
 
   void save(SavedProperties&) const;
   void restore(const SavedProperties& p);

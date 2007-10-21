@@ -35,7 +35,13 @@
 #include <wtf/Assertions.h>
 #include <wtf/HashSet.h>
 
-using namespace KJS;
+namespace KJS {
+
+typedef HashMap<unsigned, JSValue*> OverflowMap;
+
+static inline OverflowMap* overflowMap(JSValue** storage) {
+  return storage ? reinterpret_cast<OverflowMap*>(storage[-2]) : 0;
+}
 
 // ------------------------------ ArrayInstance -----------------------------
 
@@ -47,10 +53,10 @@ static inline JSValue** allocateStorage(size_t capacity) {
   if (capacity == 0)
     return 0;
 
-  // store capacity in extra space before the beginning of the storage array to
-  // save space
+  // store capacity and overflow map in extra space before the beginning of the
+  // storage array to save space
   JSValue** storage =
-      static_cast<JSValue**>(fastCalloc(capacity + 1, sizeof(JSValue*))) + 1;
+      static_cast<JSValue**>(fastCalloc(capacity + 2, sizeof(JSValue*))) + 2;
   storage[-1] = reinterpret_cast<JSValue*>(capacity);
   return storage;
 }
@@ -61,17 +67,16 @@ static inline void reallocateStorage(JSValue**& storage, size_t newCapacity) {
     return;
   }
 
-  // store capacity in extra space before the beginning of the storage array to
-  // save space
+  // store capacity and overflow map in extra space before the beginning of the
+  // storage array to save space
   storage = static_cast<JSValue**>(fastRealloc(
-                storage - 1, (newCapacity + 1) * sizeof(JSValue*))) +
-            1;
+                storage - 2, (newCapacity + 2) * sizeof(JSValue*))) +
+            2;
   storage[-1] = reinterpret_cast<JSValue*>(newCapacity);
 }
 
 static inline void freeStorage(JSValue** storage) {
-  if (storage)
-    fastFree(storage - 1);
+  fastFree(storage - 2);
 }
 
 ArrayInstance::ArrayInstance(JSObject* proto, unsigned initialLength)
@@ -89,26 +94,32 @@ ArrayInstance::ArrayInstance(JSObject* proto, const List& list)
       storage(allocateStorage(storageLength)) {
   ListIterator it = list.begin();
   unsigned l = length;
-  for (unsigned i = 0; i < l; ++i) {
+  for (unsigned i = 0; i < l; ++i)
     storage[i] = it++;
-  }
-  // When the array is created non-empty its cells are filled so it's really no
+  // When the array is created non-empty, its cells are filled so it's really no
   // worse than
   // a property map. Therefore don't report extra memory cost.
 }
 
 ArrayInstance::~ArrayInstance() {
-  freeStorage(storage);
+  if (storage) {
+    delete reinterpret_cast<OverflowMap*>(storage[-2]);
+    freeStorage(storage);
+  }
 }
 
 JSValue* ArrayInstance::getItem(unsigned i) const {
-  if (i >= length)
+  if (i < storageLength) {
+    JSValue* value = storage[i];
+    return value ? value : jsUndefined();
+  }
+
+  const OverflowMap* overflow = overflowMap(storage);
+  if (!overflow)
     return jsUndefined();
 
-  JSValue* val =
-      (i < storageLength) ? storage[i] : getDirect(Identifier::from(i));
-
-  return val ? val : jsUndefined();
+  JSValue* value = overflow->get(i);
+  return value ? value : jsUndefined();
 }
 
 JSValue* ArrayInstance::lengthGetter(ExecState*,
@@ -128,29 +139,9 @@ bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
 
   bool ok;
   unsigned index = propertyName.toArrayIndex(&ok);
-  if (ok) {
-    if (index >= length)
-      return false;
-    if (index < storageLength) {
-      JSValue* v = storage[index];
-      if (!v)
-        return false;
-      slot.setValueSlot(this, &storage[index]);
-      return true;
-    }
-  }
+  if (!ok)
+    return JSObject::getOwnPropertySlot(exec, propertyName, slot);
 
-  return JSObject::getOwnPropertySlot(exec, propertyName, slot);
-}
-
-bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
-                                       unsigned index,
-                                       PropertySlot& slot) {
-  if (index > MAX_ARRAY_INDEX)
-    return getOwnPropertySlot(exec, Identifier::from(index), slot);
-
-  if (index >= length)
-    return false;
   if (index < storageLength) {
     JSValue* v = storage[index];
     if (!v)
@@ -158,8 +149,38 @@ bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
     slot.setValueSlot(this, &storage[index]);
     return true;
   }
+  if (index > MAX_ARRAY_INDEX)
+    return JSObject::getOwnPropertySlot(exec, propertyName, slot);
+  OverflowMap* overflow = overflowMap(storage);
+  if (!overflow)
+    return false;
+  OverflowMap::iterator it = overflow->find(index);
+  if (it == overflow->end())
+    return false;
+  slot.setValueSlot(this, &it->second);
+  return true;
+}
 
-  return JSObject::getOwnPropertySlot(exec, index, slot);
+bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
+                                       unsigned index,
+                                       PropertySlot& slot) {
+  if (index < storageLength) {
+    JSValue* v = storage[index];
+    if (!v)
+      return false;
+    slot.setValueSlot(this, &storage[index]);
+    return true;
+  }
+  if (index > MAX_ARRAY_INDEX)
+    return getOwnPropertySlot(exec, Identifier::from(index), slot);
+  OverflowMap* overflow = overflowMap(storage);
+  if (!overflow)
+    return false;
+  OverflowMap::iterator it = overflow->find(index);
+  if (it == overflow->end())
+    return false;
+  slot.setValueSlot(this, &it->second);
+  return true;
 }
 
 // Special implementation of [[Put]] - see ECMA 15.4.5.1
@@ -191,29 +212,32 @@ void ArrayInstance::put(ExecState* exec,
                         unsigned index,
                         JSValue* value,
                         int attr) {
-  // 0xFFFF FFFF is a bit weird --- it should be treated as a non-array index,
-  // even when
-  // it's a string
+  // 0xFFFFFFFF is a bit weird --- it should be treated as a non-array index,
+  // even when it's a string
   if (index > MAX_ARRAY_INDEX) {
     put(exec, Identifier::from(index), value, attr);
     return;
   }
 
-  if (index < sparseArrayCutoff && index >= storageLength) {
+  if (index < sparseArrayCutoff && index >= storageLength)
     resizeStorage(index + 1);
-  }
 
-  if (index >= length) {
+  if (index >= length)
     length = index + 1;
-  }
 
   if (index < storageLength) {
     storage[index] = value;
     return;
   }
 
-  ASSERT(index >= sparseArrayCutoff);
-  JSObject::put(exec, Identifier::from(index), value, attr);
+  OverflowMap* overflow = overflowMap(storage);
+  if (!overflow) {
+    overflow = new OverflowMap;
+    if (!storage)
+      allocateStorage(1);
+    storage[-2] = reinterpret_cast<JSValue*>(overflow);
+  }
+  overflow->add(index, value);
 }
 
 bool ArrayInstance::deleteProperty(ExecState* exec,
@@ -230,6 +254,14 @@ bool ArrayInstance::deleteProperty(ExecState* exec,
       storage[index] = 0;
       return true;
     }
+    if (OverflowMap* overflow = overflowMap(storage)) {
+      OverflowMap::iterator it = overflow->find(index);
+      if (it == overflow->end())
+        return false;
+      overflow->remove(it);
+      return true;
+    }
+    return false;
   }
 
   return JSObject::deleteProperty(exec, propertyName);
@@ -245,8 +277,14 @@ bool ArrayInstance::deleteProperty(ExecState* exec, unsigned index) {
     storage[index] = 0;
     return true;
   }
-
-  return JSObject::deleteProperty(exec, Identifier::from(index));
+  OverflowMap* overflow = overflowMap(storage);
+  if (!overflow)
+    return false;
+  OverflowMap::iterator it = overflow->find(index);
+  if (it == overflow->end())
+    return false;
+  overflow->remove(it);
+  return true;
 }
 
 void ArrayInstance::getPropertyNames(ExecState* exec,
@@ -258,6 +296,16 @@ void ArrayInstance::getPropertyNames(ExecState* exec,
     JSValue* value = storage[i];
     if (value && value != undefined)
       propertyNames.add(Identifier::from(i));
+  }
+
+  OverflowMap* overflow = overflowMap(storage);
+  if (overflow) {
+    OverflowMap::iterator end = overflow->end();
+    for (OverflowMap::iterator it = overflow->begin(); it != end; ++it) {
+      JSValue* value = it->second;
+      if (value && value != undefined)
+        propertyNames.add(Identifier::from(it->first));
+    }
   }
 
   JSObject::getPropertyNames(exec, propertyNames);
@@ -287,24 +335,17 @@ void ArrayInstance::resizeStorage(unsigned newLength) {
 }
 
 void ArrayInstance::setLength(unsigned newLength, ExecState* exec) {
-  if (newLength <= storageLength) {
+  if (newLength <= storageLength)
     resizeStorage(newLength);
-  }
 
   if (newLength < length) {
-    PropertyNameArray sparseProperties;
-
-    _prop.getSparseArrayPropertyNames(sparseProperties);
-
-    PropertyNameArrayIterator end = sparseProperties.end();
-
-    for (PropertyNameArrayIterator it = sparseProperties.begin(); it != end;
-         ++it) {
-      Identifier name = *it;
-      bool ok;
-      unsigned index = name.toArrayIndex(&ok);
-      if (ok && index > newLength)
-        deleteProperty(exec, name);
+    if (OverflowMap* overflow = overflowMap(storage)) {
+      OverflowMap copy = *overflow;
+      OverflowMap::iterator end = copy.end();
+      for (OverflowMap::iterator it = copy.begin(); it != end; ++it) {
+        if (it->first >= newLength)
+          overflow->remove(it->first);
+      }
     }
   }
 
@@ -319,6 +360,14 @@ void ArrayInstance::mark() {
     if (imp && !imp->marked())
       imp->mark();
   }
+  if (OverflowMap* overflow = overflowMap(storage)) {
+    OverflowMap::iterator end = overflow->end();
+    for (OverflowMap::iterator it = overflow->begin(); it != end; ++it) {
+      JSValue* value = it->second;
+      if (value && !value->marked())
+        value->mark();
+    }
+  }
 }
 
 static ExecState* execForCompareByStringForQSort = 0;
@@ -327,12 +376,8 @@ static int compareByStringForQSort(const void* a, const void* b) {
   ExecState* exec = execForCompareByStringForQSort;
   JSValue* va = *(JSValue**)a;
   JSValue* vb = *(JSValue**)b;
-  if (va->isUndefined()) {
-    return vb->isUndefined() ? 0 : 1;
-  }
-  if (vb->isUndefined()) {
-    return -1;
-  }
+  ASSERT(!va->isUndefined());
+  ASSERT(!vb->isUndefined());
   return compare(va->toString(exec), vb->toString(exec));
 }
 
@@ -393,12 +438,8 @@ static int compareWithCompareFunctionForQSort(const void* a, const void* b) {
 
   JSValue* va = *(JSValue**)a;
   JSValue* vb = *(JSValue**)b;
-  if (va->isUndefined()) {
-    return vb->isUndefined() ? 0 : 1;
-  }
-  if (vb->isUndefined()) {
-    return -1;
-  }
+  ASSERT(!va->isUndefined());
+  ASSERT(!vb->isUndefined());
 
   args->arguments.clear();
   args->arguments.append(va);
@@ -456,20 +497,25 @@ unsigned ArrayInstance::compactForSorting() {
     }
   }
 
-  PropertyNameArray sparseProperties;
-  _prop.getSparseArrayPropertyNames(sparseProperties);
-  unsigned newLength = o + sparseProperties.size();
+  unsigned newLength = o;
 
-  if (newLength > storageLength)
-    resizeStorage(newLength);
+  if (OverflowMap* overflow = overflowMap(storage)) {
+    OverflowMap::iterator end = overflow->end();
+    for (OverflowMap::iterator it = overflow->begin(); it != end; ++it)
+      newLength += it->second != undefined;
 
-  PropertyNameArrayIterator end = sparseProperties.end();
-  for (PropertyNameArrayIterator it = sparseProperties.begin(); it != end;
-       ++it) {
-    Identifier name = *it;
-    storage[o] = getDirect(name);
-    _prop.remove(name);
-    o++;
+    if (newLength > storageLength)
+      resizeStorage(newLength);
+
+    for (OverflowMap::iterator it = overflow->begin(); it != end; ++it) {
+      JSValue* v = it->second;
+      if (v != undefined) {
+        storage[o] = v;
+        o++;
+      }
+    }
+    delete overflow;
+    storage[-2] = 0;
   }
 
   if (newLength != storageLength)
@@ -1098,4 +1144,5 @@ JSValue* ArrayObjectImp::callAsFunction(ExecState* exec,
                                         const List& args) {
   // equivalent to 'new Array(....)'
   return construct(exec, args);
+}
 }
