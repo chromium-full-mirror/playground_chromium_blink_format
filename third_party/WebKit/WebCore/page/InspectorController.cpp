@@ -80,7 +80,7 @@ struct ConsoleMessage {
 
 struct InspectorResource : public Shared<InspectorResource> {
   // Keep these in sync with WebInspector.Resource.Type
-  enum Type { Doc, Stylesheet, Image, Script, Other };
+  enum Type { Doc, Stylesheet, Image, Font, Script, Other };
 
   InspectorResource(long long identifier,
                     DocumentLoader* documentLoader,
@@ -125,6 +125,8 @@ struct InspectorResource : public Shared<InspectorResource> {
     switch (cachedResource->type()) {
       case CachedResource::ImageResource:
         return Image;
+      case CachedResource::FontResource:
+        return Font;
       case CachedResource::CSSStyleSheet:
 #if ENABLE(XSLT)
       case CachedResource::XSLStyleSheet:
