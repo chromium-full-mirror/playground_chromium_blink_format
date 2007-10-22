@@ -456,10 +456,12 @@ Document::~Document() {
   for (unsigned i = 0; i < count; i++)
     deleteAllValues(m_nameCollectionInfo[i]);
 
+#if ENABLE(DATABASE)
   if (m_databaseThread) {
     m_databaseThread->documentGoingAway();
     m_databaseThread = 0;
   }
+#endif
 
   if (m_styleSheets)
     m_styleSheets->documentDestroyed();
@@ -3744,6 +3746,7 @@ void Document::updateFocusAppearanceTimerFired(Timer<Document>*) {
     element->updateFocusAppearance(false);
 }
 
+#if ENABLE(DATABASE)
 DatabaseThread* Document::databaseThread() {
   if (!m_databaseThread) {
     m_databaseThread = new DatabaseThread(this);
@@ -3753,5 +3756,6 @@ DatabaseThread* Document::databaseThread() {
 
   return m_databaseThread.get();
 }
+#endif
 
 }  // namespace WebCore

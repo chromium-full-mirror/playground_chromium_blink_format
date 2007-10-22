@@ -142,10 +142,12 @@ class DOMWindow : public Shared<DOMWindow> {
                                              bool authorOnly = true) const;
   double devicePixelRatio() const;
 
+#if ENABLE(DATABASE)
   // HTML 5 client-side database
   PassRefPtr<Database> openDatabase(const String& name,
                                     const String& version,
                                     ExceptionCode&);
+#endif
 
  private:
   Frame* m_frame;

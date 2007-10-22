@@ -520,6 +520,7 @@ static JSValueRef search(JSContextRef ctx,
   return array;
 }
 
+#if ENABLE(DATABASE)
 static JSValueRef databaseTableNames(JSContextRef ctx,
                                      JSObjectRef /*function*/,
                                      JSObjectRef thisObject,
@@ -567,6 +568,7 @@ static JSValueRef databaseTableNames(JSContextRef ctx,
 
   return result;
 }
+#endif
 
 static JSValueRef inspectedWindow(JSContextRef ctx,
                                   JSObjectRef /*function*/,
@@ -754,20 +756,23 @@ void InspectorController::windowScriptObjectAvailable() {
   ASSERT(global);
 
   static JSStaticFunction staticFunctions[] = {
-      {"addSourceToFrame", addSourceToFrame, kJSPropertyAttributeNone},
-      {"getResourceDocumentNode", getResourceDocumentNode,
-       kJSPropertyAttributeNone},
-      {"highlightDOMNode", highlightDOMNode, kJSPropertyAttributeNone},
-      {"hideDOMNodeHighlight", hideDOMNodeHighlight, kJSPropertyAttributeNone},
-      {"loaded", loaded, kJSPropertyAttributeNone},
-      {"windowUnloading", unloading, kJSPropertyAttributeNone},
-      {"attach", attach, kJSPropertyAttributeNone},
-      {"detach", detach, kJSPropertyAttributeNone},
-      {"log", log, kJSPropertyAttributeNone},
-      {"search", search, kJSPropertyAttributeNone},
-      {"databaseTableNames", databaseTableNames, kJSPropertyAttributeNone},
-      {"inspectedWindow", inspectedWindow, kJSPropertyAttributeNone},
-      {0, 0, 0}};
+    {"addSourceToFrame", addSourceToFrame, kJSPropertyAttributeNone},
+    {"getResourceDocumentNode", getResourceDocumentNode,
+     kJSPropertyAttributeNone},
+    {"highlightDOMNode", highlightDOMNode, kJSPropertyAttributeNone},
+    {"hideDOMNodeHighlight", hideDOMNodeHighlight, kJSPropertyAttributeNone},
+    {"loaded", loaded, kJSPropertyAttributeNone},
+    {"windowUnloading", unloading, kJSPropertyAttributeNone},
+    {"attach", attach, kJSPropertyAttributeNone},
+    {"detach", detach, kJSPropertyAttributeNone},
+    {"log", log, kJSPropertyAttributeNone},
+    {"search", search, kJSPropertyAttributeNone},
+#if ENABLE(DATABASE)
+    {"databaseTableNames", databaseTableNames, kJSPropertyAttributeNone},
+#endif
+    {"inspectedWindow", inspectedWindow, kJSPropertyAttributeNone},
+    {0, 0, 0}
+  };
 
   JSClassDefinition inspectorControllerDefinition = {0,
                                                      kJSClassAttributeNone,
@@ -1225,12 +1230,15 @@ void InspectorController::populateScriptResources() {
   for (unsigned i = 0; i < messageCount; ++i)
     addScriptConsoleMessage(m_consoleMessages[i]);
 
+#if ENABLE(DATABASE)
   DatabaseResourcesSet::iterator databasesEnd = m_databaseResources.end();
   for (DatabaseResourcesSet::iterator it = m_databaseResources.begin();
        it != databasesEnd; ++it)
     addDatabaseScriptResource((*it).get());
+#endif
 }
 
+#if ENABLE(DATABASE)
 JSObjectRef InspectorController::addDatabaseScriptResource(
     InspectorDatabaseResource* resource) {
   ASSERT_ARG(resource, resource);
@@ -1316,6 +1324,7 @@ void InspectorController::removeDatabaseScriptResource(
 
   resource->setScriptObject(0, 0);
 }
+#endif
 
 void InspectorController::addScriptConsoleMessage(
     const ConsoleMessage* message) {
@@ -1387,6 +1396,7 @@ void InspectorController::clearScriptResources() {
 }
 
 void InspectorController::clearDatabaseScriptResources() {
+#if ENABLE(DATABASE)
   if (!m_scriptContext || !m_scriptObject)
     return;
 
@@ -1398,6 +1408,7 @@ void InspectorController::clearDatabaseScriptResources() {
   }
 
   callClearFunction(m_scriptContext, m_scriptObject, "clearDatabaseResources");
+#endif
 }
 
 void InspectorController::clearScriptConsoleMessages() {
@@ -1447,11 +1458,15 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     deleteAllValues(m_consoleMessages);
     m_consoleMessages.clear();
 
+#if ENABLE(DATABASE)
     m_databaseResources.clear();
+#endif
 
     if (windowVisible()) {
       clearScriptConsoleMessages();
+#if ENABLE(DATABASE)
       clearDatabaseScriptResources();
+#endif
       clearNetworkTimeline();
 
       // We don't add the main resource until its load is committed. This
@@ -1674,6 +1689,7 @@ void InspectorController::didFailLoading(DocumentLoader* loader,
   }
 }
 
+#if ENABLE(DATABASE)
 void InspectorController::didOpenDatabase(Database* database,
                                           const String& domain,
                                           const String& name,
@@ -1689,5 +1705,6 @@ void InspectorController::didOpenDatabase(Database* database,
   if (windowVisible())
     addDatabaseScriptResource(resource);
 }
+#endif
 
 }  // namespace WebCore

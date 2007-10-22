@@ -982,8 +982,9 @@ class Document : public ContainerNode {
 
   bool processingLoadEvent() const { return m_processingLoadEvent; }
 
+#if ENABLE(DATABASE)
   DatabaseThread* databaseThread();
-
+#endif
  protected:
   void clearXMLVersion() { m_xmlVersion = String(); }
 
@@ -1056,7 +1057,9 @@ class Document : public ContainerNode {
 
   unsigned m_numNodeLists;
 
+#if ENABLE(DATABASE)
   RefPtr<DatabaseThread> m_databaseThread;
+#endif
 #if USE(LOW_BANDWIDTH_DISPLAY)
   bool m_inLowBandwidthDisplay;
 #endif
