@@ -65,8 +65,6 @@ class Drosera {
 
   COMPtr<IWebView> m_webView;
   COMPtr<IWebViewPrivate> m_webViewPrivate;
-  COMPtr<IWebFrameLoadDelegate> m_webFrameLoadDelegate;
-  COMPtr<IWebUIDelegate> m_webUIDelegate;
 
   OwnPtr<DebuggerClient> m_debuggerClient;
   OwnPtr<ServerDictionary> m_knownServerNames;

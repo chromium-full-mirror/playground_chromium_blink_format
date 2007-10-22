@@ -94,7 +94,6 @@ class DebuggerClient : public BaseDelegate {
 
   COMPtr<IWebView> m_webView;
   OwnPtr<DebuggerDocument> m_debuggerDocument;
-  OwnPtr<ServerConnection> m_server;
 };
 
 #endif  // DebuggerClient_H
