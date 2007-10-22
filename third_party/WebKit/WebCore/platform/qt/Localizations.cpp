@@ -38,7 +38,7 @@ String submitButtonDefaultLabel() {
   return "Submit";
 }
 String inputElementAltText() {
-  return String();
+  return "Submit";
 }
 String resetButtonDefaultLabel() {
   return "Reset";
@@ -98,7 +98,7 @@ String contextMenuItemTagPaste() {
   return "Paste";
 }
 String contextMenuItemTagNoGuessesFound() {
-  return String();
+  return "No Guesses Found";
 }
 String contextMenuItemTagIgnoreSpelling() {
   return "Ignore";
@@ -122,16 +122,16 @@ String contextMenuItemTagSpellingMenu() {
   return "Spelling";
 }
 String contextMenuItemTagShowSpellingPanel(bool show) {
-  return String();
+  return show ? "Show Spelling and Grammar" : "Hide Spelling and Grammar";
 }
 String contextMenuItemTagCheckSpelling() {
   return "Check Spelling";
 }
 String contextMenuItemTagCheckSpellingWhileTyping() {
-  return String();
+  return "Check Spelling While Typing";
 }
 String contextMenuItemTagCheckGrammarWithSpelling() {
-  return String();
+  return "Check Grammar With Spelling";
 }
 String contextMenuItemTagFontMenu() {
   return "Fonts";
@@ -164,13 +164,13 @@ String contextMenuItemTagInspectElement() {
   return "Inspect";
 }
 String searchMenuNoRecentSearchesText() {
-  return String();
+  return "No recent searches";
 }
 String searchMenuRecentSearchesText() {
-  return String();
+  return "Recent searches";
 }
 String searchMenuClearRecentSearchesText() {
-  return String();
+  return "Clear recent searches";
 }
 String AXWebAreaText() {
   return String();
