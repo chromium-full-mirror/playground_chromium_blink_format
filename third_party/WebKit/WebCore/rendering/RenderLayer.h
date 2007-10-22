@@ -220,9 +220,7 @@ class RenderLayer : public ScrollbarClient {
 
   bool isTransparent() const;
   RenderLayer* transparentAncestor();
-  void beginTransparencyLayers(GraphicsContext*,
-                               const IntRect&,
-                               const RenderLayer* rootLayer);
+  void beginTransparencyLayers(GraphicsContext*, const RenderLayer* rootLayer);
 
   const RenderLayer* root() const {
     const RenderLayer* curr = this;
@@ -392,6 +390,8 @@ class RenderLayer : public ScrollbarClient {
   int staticY() const { return m_staticY; }
   void setStaticX(int staticX) { m_staticX = staticX; }
   void setStaticY(int staticY) { m_staticY = staticY; }
+
+  AffineTransform* transform() const { return m_transform.get(); }
 
   void destroy(RenderArena*);
 
