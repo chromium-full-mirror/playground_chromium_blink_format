@@ -97,8 +97,10 @@ static IconDatabaseClient* defaultClient() {
 }
 
 IconDatabase* iconDatabase() {
-  if (!sharedIconDatabase)
+  if (!sharedIconDatabase) {
+    initializeThreading();
     sharedIconDatabase = new IconDatabase;
+  }
   return sharedIconDatabase;
 }
 
@@ -137,8 +139,6 @@ bool IconDatabase::open(const String& databasePath) {
   // Formulate the full path for the database file
   m_completeDatabasePath =
       pathByAppendingComponent(m_databaseDirectory, defaultDatabaseFilename());
-
-  initializeThreading();
 
   // Lock here as well as first thing in the thread so the tread doesn't
   // actually commence until the pthread_create() call

@@ -127,6 +127,8 @@ Database::Database(Document* document,
   if (m_name.isNull())
     m_name = "";
 
+  initializeThreading();
+
   m_guid = guidForOriginAndName(m_securityOrigin.toString(), name);
 
   {

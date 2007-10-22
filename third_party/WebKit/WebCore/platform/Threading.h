@@ -36,6 +36,11 @@
 #include <pthread.h>
 #endif
 
+#if PLATFORM(GTK)
+typedef struct _GMutex GMutex;
+typedef struct _GCond GCond;
+#endif
+
 #include <stdint.h>
 
 namespace WebCore {
@@ -48,6 +53,17 @@ ThreadIdentifier createThread(ThreadFunction, void*);
 int waitForThreadCompletion(ThreadIdentifier, void**);
 void detachThread(ThreadIdentifier);
 
+#if USE(PTHREADS)
+typedef pthread_mutex_t PlatformMutex;
+typedef pthread_cond_t PlatformCondition;
+#elif PLATFORM(GTK)
+typedef GMutex* PlatformMutex;
+typedef GCond* PlatformCondition;
+#else
+typedef void* PlatformMutex;
+typedef void* PlatformCondition;
+#endif
+
 class Mutex : Noncopyable {
  public:
   Mutex();
@@ -57,13 +73,11 @@ class Mutex : Noncopyable {
   bool tryLock();
   void unlock();
 
-#if USE(PTHREADS)
  public:
-  pthread_mutex_t& impl() { return m_mutex; }
+  PlatformMutex& impl() { return m_mutex; }
 
  private:
-  pthread_mutex_t m_mutex;
-#endif
+  PlatformMutex m_mutex;
 };
 
 class MutexLocker : Noncopyable {
@@ -85,9 +99,7 @@ class ThreadCondition : Noncopyable {
   void broadcast();
 
  private:
-#if USE(PTHREADS)
-  pthread_cond_t m_condition;
-#endif
+  PlatformCondition m_condition;
 };
 
 template <class T>
@@ -148,7 +160,7 @@ void callOnMainThread(void (*)());
 
 void initializeThreading();
 
-#if !PLATFORM(WIN)
+#if !PLATFORM(WIN) && !PLATFORM(GTK)
 inline void initializeThreading() {}
 #endif
 
