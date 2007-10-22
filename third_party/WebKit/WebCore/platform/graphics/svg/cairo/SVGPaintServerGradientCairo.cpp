@@ -74,8 +74,8 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
     pattern = cairo_pattern_create_linear(x0, y0, x1, y1);
 
   } else if (this->type() == RadialGradientPaintServer) {
-    const SVGPaintServerRadialGradient* radial =
-        static_cast<const SVGPaintServerRadialGradient*>(this);
+    // const SVGPaintServerRadialGradient* radial = static_cast<const
+    // SVGPaintServerRadialGradient*>(this);
     // TODO: pattern = cairo_pattern_create_radial();
     return false;
   } else {
