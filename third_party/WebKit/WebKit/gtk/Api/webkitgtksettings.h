@@ -96,8 +96,8 @@ void webkit_web_settings_set_font_family(WebKitSettings*,
                                          WebKitFontFamily family,
                                          gchar* family_name);
 
-gchar* webkit_web_settings_get_font_family(WebKitSettings*,
-                                           WebKitFontFamily family);
+const gchar* webkit_web_settings_get_font_family(WebKitSettings*,
+                                                 WebKitFontFamily family);
 
 void webkit_web_settings_set_user_style_sheet_location(WebKitSettings*, gchar*);
 

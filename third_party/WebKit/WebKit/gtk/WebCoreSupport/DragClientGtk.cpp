@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2007 Apple Inc.  All rights reserved.
  * Copyright (C) 2007 Holger Hans Peter Freyther
+ * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -48,10 +49,12 @@ void DragClient::willPerformDragSourceAction(DragSourceAction,
 
 DragDestinationAction DragClient::actionMaskForDrag(DragData*) {
   notImplemented();
+  return DragDestinationActionAny;
 }
 
 DragSourceAction DragClient::dragSourceActionMaskForPoint(const IntPoint&) {
   notImplemented();
+  return DragSourceActionAny;
 }
 
 void DragClient::startDrag(DragImageRef,
@@ -67,6 +70,7 @@ DragImageRef DragClient::createDragImageForLink(KURL&,
                                                 const String& label,
                                                 Frame*) {
   notImplemented();
+  return 0;
 }
 
 void DragClient::dragControllerDestroyed() {

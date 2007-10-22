@@ -37,7 +37,9 @@ WebKitSettings* webkit_web_settings_copy(WebKitSettings* setting) {}
 
 void webkit_web_settings_free(WebKitSettings* setting) {}
 
-WebKitSettings* webkit_web_settings_get_global(void) {}
+WebKitSettings* webkit_web_settings_get_global(void) {
+  return 0;
+}
 
 void webkit_web_settings_set_global(WebKitSettings* setting) {}
 
@@ -45,8 +47,10 @@ void webkit_web_settings_set_font_family(WebKitSettings*,
                                          WebKitFontFamily family,
                                          gchar* family_name) {}
 
-gchar* webkit_web_settings_get_font_family(WebKitSettings*,
-                                           WebKitFontFamily family) {}
+const gchar* webkit_web_settings_get_font_family(WebKitSettings*,
+                                                 WebKitFontFamily family) {
+  return 0;
+}
 
 void webkit_web_settings_set_user_style_sheet_location(WebKitSettings*,
                                                        gchar*) {}
