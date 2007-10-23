@@ -76,8 +76,9 @@ class JSValue : Noncopyable {
   const JSObject* getObject() const;  // NULL if not an object
 
   // Extracting integer values.
-  bool getInt32(int32_t&) const;
   bool getUInt32(uint32_t&) const;
+  bool getTruncatedInt32(int32_t&) const;
+  bool getTruncatedUInt32(uint32_t&) const;
 
   // Basic conversions.
   JSValue* toPrimitive(ExecState* exec,
@@ -143,8 +144,9 @@ class JSCell : public JSValue {
   const JSObject* getObject() const;  // NULL if not an object
 
   // Extracting integer values.
-  virtual bool getInt32(int32_t&) const;
   virtual bool getUInt32(uint32_t&) const;
+  virtual bool getTruncatedInt32(int32_t&) const;
+  virtual bool getTruncatedUInt32(uint32_t&) const;
 
   // Basic conversions.
   virtual JSValue* toPrimitive(
@@ -304,14 +306,21 @@ inline const JSObject* JSValue::getObject() const {
   return JSImmediate::isImmediate(this) ? 0 : asCell()->getObject();
 }
 
-inline bool JSValue::getInt32(int32_t& v) const {
-  return JSImmediate::isImmediate(this) ? JSImmediate::getInt32(this, v)
-                                        : asCell()->getInt32(v);
-}
-
 inline bool JSValue::getUInt32(uint32_t& v) const {
   return JSImmediate::isImmediate(this) ? JSImmediate::getUInt32(this, v)
                                         : asCell()->getUInt32(v);
+}
+
+inline bool JSValue::getTruncatedInt32(int32_t& v) const {
+  return JSImmediate::isImmediate(this)
+             ? JSImmediate::getTruncatedInt32(this, v)
+             : asCell()->getTruncatedInt32(v);
+}
+
+inline bool JSValue::getTruncatedUInt32(uint32_t& v) const {
+  return JSImmediate::isImmediate(this)
+             ? JSImmediate::getTruncatedUInt32(this, v)
+             : asCell()->getTruncatedUInt32(v);
 }
 
 inline void JSValue::mark() {
@@ -358,7 +367,7 @@ inline JSObject* JSValue::toObject(ExecState* exec) const {
 
 ALWAYS_INLINE int32_t JSValue::toInt32(ExecState* exec) const {
   int32_t i;
-  if (JSImmediate::isImmediate(this) && JSImmediate::getInt32(this, i))
+  if (JSImmediate::isImmediate(this) && JSImmediate::getTruncatedInt32(this, i))
     return i;
   bool ok;
   return toInt32SlowCase(exec, ok);
@@ -366,7 +375,8 @@ ALWAYS_INLINE int32_t JSValue::toInt32(ExecState* exec) const {
 
 inline uint32_t JSValue::toUInt32(ExecState* exec) const {
   uint32_t i;
-  if (JSImmediate::isImmediate(this) && JSImmediate::getUInt32(this, i))
+  if (JSImmediate::isImmediate(this) &&
+      JSImmediate::getTruncatedUInt32(this, i))
     return i;
   bool ok;
   return toUInt32SlowCase(exec, ok);
@@ -374,7 +384,8 @@ inline uint32_t JSValue::toUInt32(ExecState* exec) const {
 
 inline int32_t JSValue::toInt32(ExecState* exec, bool& ok) const {
   int32_t i;
-  if (JSImmediate::isImmediate(this) && JSImmediate::getInt32(this, i)) {
+  if (JSImmediate::isImmediate(this) &&
+      JSImmediate::getTruncatedInt32(this, i)) {
     ok = true;
     return i;
   }
@@ -383,7 +394,8 @@ inline int32_t JSValue::toInt32(ExecState* exec, bool& ok) const {
 
 inline uint32_t JSValue::toUInt32(ExecState* exec, bool& ok) const {
   uint32_t i;
-  if (JSImmediate::isImmediate(this) && JSImmediate::getUInt32(this, i)) {
+  if (JSImmediate::isImmediate(this) &&
+      JSImmediate::getTruncatedUInt32(this, i)) {
     ok = true;
     return i;
   }

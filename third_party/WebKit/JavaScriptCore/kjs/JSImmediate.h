@@ -86,8 +86,9 @@ class JSImmediate {
   static UString toString(const JSValue*);
   static JSType type(const JSValue*);
 
-  static bool getInt32(const JSValue*, int32_t&);
   static bool getUInt32(const JSValue*, uint32_t&);
+  static bool getTruncatedInt32(const JSValue*, int32_t&);
+  static bool getTruncatedUInt32(const JSValue*, uint32_t&);
 
   // It would nice just to use fromDouble() to create these values, but that
   // would prevent them from
@@ -163,7 +164,7 @@ struct JSImmediate::FPBitValues<true, false> {
     return tag(floatUnion.asBits, NumberType);
   }
 
-  static double toDouble(const JSValue* v) {
+  static float toFloat(const JSValue* v) {
     ASSERT(isImmediate(v));
 
     FloatUnion floatUnion;
@@ -171,24 +172,22 @@ struct JSImmediate::FPBitValues<true, false> {
     return floatUnion.asFloat;
   }
 
-  static bool getInt32(const JSValue* v, int32_t& i) {
-    ASSERT(isImmediate(v));
+  static double toDouble(const JSValue* v) { return toFloat(v); }
 
-    FloatUnion floatUnion;
-    floatUnion.asBits = static_cast<uint32_t>(unTag(v));
-    float f = floatUnion.asFloat;
+  static bool getTruncatedInt32(const JSValue* v, int32_t& i) {
+    float f = toFloat(v);
+    if (!(f >= -2147483648.0F && f < 2147483648.0F))
+      return false;
     i = static_cast<int32_t>(f);
-    return isNumber(v) && i == f;
+    return isNumber(v);
   }
 
-  static bool getUInt32(const JSValue* v, uint32_t& i) {
-    ASSERT(isImmediate(v));
-
-    FloatUnion floatUnion;
-    floatUnion.asBits = static_cast<uint32_t>(unTag(v));
-    float f = floatUnion.asFloat;
+  static bool getTruncatedUInt32(const JSValue* v, uint32_t& i) {
+    float f = toFloat(v);
+    if (!(f >= 0.0F && f < 4294967296.0F))
+      return false;
     i = static_cast<uint32_t>(f);
-    return isNumber(v) && i == f;
+    return isNumber(v);
   }
 };
 
@@ -217,16 +216,20 @@ struct JSImmediate::FPBitValues<false, true> {
     return doubleUnion.asDouble;
   }
 
-  static bool getInt32(const JSValue* v, int32_t& i) {
+  static bool getTruncatedInt32(const JSValue* v, int32_t& i) {
     double d = toDouble(v);
+    if (!(d >= -2147483648.0 && d < 2147483648.0))
+      return false;
     i = static_cast<int32_t>(d);
-    return isNumber(v) && i == d;
+    return isNumber(v);
   }
 
-  static bool getUInt32(const JSValue* v, uint32_t& i) {
+  static bool getTruncatedUInt32(const JSValue* v, uint32_t& i) {
     double d = toDouble(v);
+    if (!(d >= 0.0 && d < 4294967296.0))
+      return false;
     i = static_cast<uint32_t>(d);
-    return isNumber(v) && i == d;
+    return isNumber(v);
   }
 };
 
@@ -264,12 +267,18 @@ inline double JSImmediate::toDouble(const JSValue* v) {
   return FPBitValues<is32bit, is64bit>::toDouble(v);
 }
 
-inline bool JSImmediate::getInt32(const JSValue* v, int32_t& i) {
-  return FPBitValues<is32bit, is64bit>::getInt32(v, i);
+inline bool JSImmediate::getUInt32(const JSValue* v, uint32_t& i) {
+  double d = toDouble(v);
+  i = static_cast<uint32_t>(d);
+  return isNumber(v) && i == d;
 }
 
-inline bool JSImmediate::getUInt32(const JSValue* v, uint32_t& i) {
-  return FPBitValues<is32bit, is64bit>::getUInt32(v, i);
+inline bool JSImmediate::getTruncatedInt32(const JSValue* v, int32_t& i) {
+  return FPBitValues<is32bit, is64bit>::getTruncatedInt32(v, i);
+}
+
+inline bool JSImmediate::getTruncatedUInt32(const JSValue* v, uint32_t& i) {
+  return FPBitValues<is32bit, is64bit>::getTruncatedUInt32(v, i);
 }
 
 }  // namespace KJS

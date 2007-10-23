@@ -85,8 +85,9 @@ class NumberImp : public JSCell {
  private:
   NumberImp(double v) : val(v) {}
 
-  virtual bool getInt32(int32_t&) const;
   virtual bool getUInt32(uint32_t&) const;
+  virtual bool getTruncatedInt32(int32_t&) const;
+  virtual bool getTruncatedUInt32(uint32_t&) const;
 
   double val;
 };
