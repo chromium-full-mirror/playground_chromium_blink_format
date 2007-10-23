@@ -634,6 +634,8 @@ class WebView : public IWebView,
   bool keyDown(WPARAM, LPARAM, bool systemKeyDown = false);
   bool keyUp(WPARAM, LPARAM);
   HRESULT updateWebCoreSettingsFromPreferences(IWebPreferences* preferences);
+  static HRESULT updateGlobalSettingsFromPreferences(IWebPreferences*);
+  HRESULT updateSettingsFromPreferences(IWebPreferences*);
   bool inResizer(LPARAM lParam);
   void paint(HDC, LPARAM);
   void paintIntoBackingStore(WebCore::FrameView*,

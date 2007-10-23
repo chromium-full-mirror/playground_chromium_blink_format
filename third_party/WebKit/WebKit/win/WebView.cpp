@@ -1637,11 +1637,6 @@ HRESULT WebView::updateWebCoreSettingsFromPreferences(
     return hr;
   settings->setEditableLinkBehavior((EditableLinkBehavior)behavior);
 
-  WebKitCookieStorageAcceptPolicy acceptPolicy;
-  hr = preferences->cookieStorageAcceptPolicy(&acceptPolicy);
-  if (FAILED(hr))
-    return hr;
-
   hr = preferences->usesPageCache(&enabled);
   if (FAILED(hr))
     return hr;
@@ -1651,12 +1646,6 @@ HRESULT WebView::updateWebCoreSettingsFromPreferences(
   if (FAILED(hr))
     return hr;
   settings->setDOMPasteAllowed(!!enabled);
-
-  // set cookie storage accept policy
-  if (CFHTTPCookieStorageRef defaultCookieStorage =
-          wkGetDefaultHTTPCookieStorage())
-    CFHTTPCookieStorageSetCookieAcceptPolicy(defaultCookieStorage,
-                                             acceptPolicy);
 
   settings->setShowsURLsInToolTips(false);
 
@@ -1669,11 +1658,38 @@ HRESULT WebView::updateWebCoreSettingsFromPreferences(
   return S_OK;
 }
 
+HRESULT WebView::updateGlobalSettingsFromPreferences(
+    IWebPreferences* preferences) {
+  WebKitCookieStorageAcceptPolicy acceptPolicy;
+  HRESULT hr = preferences->cookieStorageAcceptPolicy(&acceptPolicy);
+  if (FAILED(hr))
+    return hr;
+
+  // set cookie storage accept policy
+  if (CFHTTPCookieStorageRef defaultCookieStorage =
+          wkGetDefaultHTTPCookieStorage())
+    CFHTTPCookieStorageSetCookieAcceptPolicy(defaultCookieStorage,
+                                             acceptPolicy);
+
+  return S_OK;
+}
+
+HRESULT WebView::updateSettingsFromPreferences(IWebPreferences* preferences) {
+  HRESULT hr = updateWebCoreSettingsFromPreferences(preferences);
+  if (FAILED(hr))
+    return hr;
+
+  COMPtr<WebPreferences> webPreferences(Query, preferences);
+  if (webPreferences &&
+      webPreferences == WebPreferences::sharedStandardPreferences())
+    hr = updateGlobalSettingsFromPreferences(preferences);
+
+  return hr;
+}
+
 bool WebView::developerExtrasEnabled() const {
-  COMPtr<WebPreferences> webPrefs;
-  if (SUCCEEDED(m_preferences->QueryInterface(IID_WebPreferences,
-                                              (void**)&webPrefs)) &&
-      webPrefs->developerExtrasDisabledByOverride())
+  COMPtr<WebPreferences> webPrefs(Query, m_preferences);
+  if (webPrefs && webPrefs->developerExtrasDisabledByOverride())
     return false;
 
 #ifdef NDEBUG
@@ -1949,7 +1965,7 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
   COMPtr<IWebPreferences> prefs;
   if (FAILED(preferences(&prefs)))
     return hr;
-  hr = updateWebCoreSettingsFromPreferences(prefs.get());
+  hr = updateSettingsFromPreferences(prefs.get());
   if (FAILED(hr))
     return hr;
 
@@ -3469,7 +3485,7 @@ HRESULT STDMETHODCALLTYPE WebView::onNotify(
   if (FAILED(hr))
     return hr;
 
-  hr = updateWebCoreSettingsFromPreferences(preferences.get());
+  hr = updateSettingsFromPreferences(preferences.get());
 
   return hr;
 }
