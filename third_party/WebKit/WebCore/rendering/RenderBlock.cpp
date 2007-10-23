@@ -3205,7 +3205,8 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
               scrolledX + o->left + o->node->marginLeft() - o->node->xPos();
           int yoffset =
               scrolledY + o->startY + o->node->marginTop() - o->node->yPos();
-          if (o->node->hitTest(request, result, _x, _y, xoffset, yoffset)) {
+          if (o->node->hitTest(request, result, IntPoint(_x, _y), xoffset,
+                               yoffset)) {
             updateHitTestResult(result, IntPoint(_x - xoffset, _y - yoffset));
             return true;
           }

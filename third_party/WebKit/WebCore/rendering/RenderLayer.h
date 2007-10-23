@@ -424,7 +424,8 @@ class RenderLayer : public ScrollbarClient {
   RenderLayer* hitTestLayer(RenderLayer* rootLayer,
                             const HitTestRequest&,
                             HitTestResult&,
-                            const IntRect& hitTestRect);
+                            const IntRect& hitTestRect,
+                            const IntPoint& hitTestPoint);
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);
 
   bool shouldBeOverflowOnly() const;

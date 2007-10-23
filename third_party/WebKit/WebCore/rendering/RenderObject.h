@@ -612,8 +612,7 @@ class RenderObject : public CachedResourceClient {
 
   bool hitTest(const HitTestRequest&,
                HitTestResult&,
-               int x,
-               int y,
+               const IntPoint&,
                int tx,
                int ty,
                HitTestFilter = HitTestAll);

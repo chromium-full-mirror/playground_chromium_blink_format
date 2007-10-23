@@ -1615,7 +1615,6 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     p->concatCTM(transform);
 
     // Now do a paint with the root layer shifted to be us.
-    rootLayer = this;
     paintLayer(this, p, transform.inverse().mapRect(paintDirtyRect),
                haveTransparency, paintRestriction, paintingRoot);
 
@@ -1766,7 +1765,8 @@ bool RenderLayer::hitTest(const HitTestRequest& request,
   IntRect boundsRect(m_x, m_y, width(), height());
   boundsRect.intersect(frameVisibleRect(renderer()));
 
-  RenderLayer* insideLayer = hitTestLayer(this, request, result, boundsRect);
+  RenderLayer* insideLayer =
+      hitTestLayer(this, request, result, boundsRect, result.point());
 
   // Now determine if the result is inside an anchor; make sure an image map
   // wins if
@@ -1801,7 +1801,41 @@ Node* RenderLayer::enclosingElement() const {
 RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
                                        const HitTestRequest& request,
                                        HitTestResult& result,
-                                       const IntRect& hitTestRect) {
+                                       const IntRect& hitTestRect,
+                                       const IntPoint& hitTestPoint) {
+  // Apply a transform if we have one.
+  if (m_transform && rootLayer != this) {
+    // If the transform can't be inverted, then don't hit test this layer at
+    // all.
+    if (!m_transform->isInvertible())
+      return 0;
+
+    // Make sure the parent's clip rects have been calculated.
+    parent()->calculateClipRects(rootLayer);
+
+    // Go ahead and test the enclosing clip now.
+    IntRect clipRect = parent()->clipRects()->overflowClipRect();
+    if (!clipRect.contains(hitTestPoint))
+      return 0;
+
+    // Adjust the transform such that the renderer's upper left corner is at
+    // (0,0) in user space.
+    // This involves subtracting out the position of the layer in our current
+    // coordinate space.
+    int x = 0;
+    int y = 0;
+    convertToLayerCoords(rootLayer, x, y);
+    AffineTransform transform;
+    transform.translate(x, y);
+    transform = *m_transform * transform;
+
+    // Map the hit test point into the transformed space and then do a hit test
+    // with the root layer shifted to be us.
+    return hitTestLayer(this, request, result,
+                        transform.inverse().mapRect(hitTestRect),
+                        transform.inverse().mapPoint(hitTestPoint));
+  }
+
   // Calculate the clip rects we should use.
   IntRect layerBounds;
   IntRect bgRect;
@@ -1824,8 +1858,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // z-index.
   if (m_posZOrderList) {
     for (int i = m_posZOrderList->size() - 1; i >= 0; --i) {
-      insideLayer = m_posZOrderList->at(i)->hitTestLayer(rootLayer, request,
-                                                         result, hitTestRect);
+      insideLayer = m_posZOrderList->at(i)->hitTestLayer(
+          rootLayer, request, result, hitTestRect, hitTestPoint);
       if (insideLayer)
         return insideLayer;
     }
@@ -1834,8 +1868,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Now check our overflow objects.
   if (m_overflowList) {
     for (int i = m_overflowList->size() - 1; i >= 0; --i) {
-      insideLayer = m_overflowList->at(i)->hitTestLayer(rootLayer, request,
-                                                        result, hitTestRect);
+      insideLayer = m_overflowList->at(i)->hitTestLayer(
+          rootLayer, request, result, hitTestRect, hitTestPoint);
       if (insideLayer)
         return insideLayer;
     }
@@ -1843,10 +1877,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
 
   // Next we want to see if the mouse pos is inside the child RenderObjects of
   // the layer.
-  if (fgRect.contains(result.point()) &&
+  if (fgRect.contains(hitTestPoint) &&
       renderer()->hitTest(
-          request, result, result.point().x(), result.point().y(),
-          layerBounds.x() - renderer()->xPos(),
+          request, result, hitTestPoint, layerBounds.x() - renderer()->xPos(),
           layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestDescendants)) {
     // For positioned generated content, we might still not have a
@@ -1867,8 +1900,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Now check our negative z-index children.
   if (m_negZOrderList) {
     for (int i = m_negZOrderList->size() - 1; i >= 0; --i) {
-      insideLayer = m_negZOrderList->at(i)->hitTestLayer(rootLayer, request,
-                                                         result, hitTestRect);
+      insideLayer = m_negZOrderList->at(i)->hitTestLayer(
+          rootLayer, request, result, hitTestRect, hitTestPoint);
       if (insideLayer)
         return insideLayer;
     }
@@ -1876,10 +1909,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
 
   // Next we want to see if the mouse is inside this layer but not any of its
   // children.
-  if (bgRect.contains(result.point()) &&
+  if (bgRect.contains(hitTestPoint) &&
       renderer()->hitTest(
-          request, result, result.point().x(), result.point().y(),
-          layerBounds.x() - renderer()->xPos(),
+          request, result, hitTestPoint, layerBounds.x() - renderer()->xPos(),
           layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestSelf)) {
     if (!result.innerNode() || !result.innerNonSharedNode()) {
@@ -1900,7 +1932,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // exited the WebView, and so hit testing over a scrollbar hits the content
   // document.
   if ((request.active || request.mouseUp) && renderer()->isRenderView()) {
-    renderer()->updateHitTestResult(result, result.point());
+    renderer()->updateHitTestResult(result, hitTestPoint);
     return this;
   }
 
