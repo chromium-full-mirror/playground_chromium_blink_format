@@ -237,6 +237,7 @@ static PseudoState pseudoState;
 CSSStyleSelector::CSSStyleSelector(Document* doc,
                                    const String& userStyleSheet,
                                    StyleSheetList* styleSheets,
+                                   CSSStyleSheet* mappedElementSheet,
                                    bool _strictParsing) {
   init();
 
@@ -285,6 +286,10 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
 
   // add stylesheets from document
   m_authorStyle = new CSSRuleSet();
+
+  // Add rules from elments like SVG's <font-face>
+  if (mappedElementSheet)
+    m_authorStyle->addRulesFromSheet(mappedElementSheet, m_medium, this);
 
   DeprecatedPtrListIterator<StyleSheet> it(styleSheets->styleSheets);
   for (; it.current(); ++it)

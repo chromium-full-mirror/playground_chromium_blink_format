@@ -84,6 +84,7 @@ class CSSStyleSelector : public StyleSelector {
   CSSStyleSelector(Document*,
                    const String& userStyleSheet,
                    StyleSheetList* styleSheets,
+                   CSSStyleSheet* mappedElementsSheet,
                    bool strictParsing);
   ~CSSStyleSelector();
 
