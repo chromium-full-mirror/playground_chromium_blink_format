@@ -40,7 +40,6 @@
 #include <WebKit/IWebMutableURLRequest.h>
 #include <WebKit/IWebView.h>
 #include <WebKit/WebKit.h>
-#include <windowsx.h>
 
 const unsigned MAX_LOADSTRING = 100;
 
@@ -58,10 +57,6 @@ LRESULT CALLBACK droseraWndProc(HWND hWnd,
                                 UINT message,
                                 WPARAM wParam,
                                 LPARAM lParam);
-INT_PTR CALLBACK attachWndProc(HWND hDlg,
-                               UINT message,
-                               WPARAM wParam,
-                               LPARAM lParam);
 INT_PTR CALLBACK aboutWndProc(HWND hDlg,
                               UINT message,
                               WPARAM wParam,
@@ -87,7 +82,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
   Drosera drosera;
 
-  HRESULT ret = drosera.initUI(hInstance, nCmdShow);
+  HRESULT ret = drosera.init(hInstance, nCmdShow);
   if (FAILED(ret))
     return ret;
 
@@ -148,10 +143,6 @@ LRESULT CALLBACK droseraWndProc(HWND hWnd,
           DialogBox(Drosera::getInst(), MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd,
                     ::aboutWndProc);
           break;
-        case ID_FILE_ATTACH:
-          DialogBox(Drosera::getInst(), MAKEINTRESOURCE(IDD_ATTACH), hWnd,
-                    ::attachWndProc);
-          break;
         case ID_FILE_EXIT:
           DestroyWindow(hWnd);
           break;
@@ -197,32 +188,19 @@ INT_PTR CALLBACK aboutWndProc(HWND hDlg,
   return (INT_PTR)FALSE;
 }
 
-// Message handler for Attach box.
-INT_PTR CALLBACK attachWndProc(HWND hDlg,
-                               UINT message,
-                               WPARAM wParam,
-                               LPARAM lParam) {
-  UNREFERENCED_PARAMETER(lParam);
-  switch (message) {
-    case WM_INITDIALOG:
-      return (INT_PTR)TRUE;
-
-    case WM_COMMAND:
-      if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
-        EndDialog(hDlg, LOWORD(wParam));
-        return (INT_PTR)TRUE;
-      }
-      break;
-  }
-  return (INT_PTR)FALSE;
-}
-
 ////////////////// End Setup Windows Specific Interface //////////////////
 
-Drosera::Drosera()
-    : m_hWnd(0),
-      m_debuggerClient(new DebuggerClient()),
-      m_knownServerNames(new ServerDictionary()) {}
+Drosera::Drosera() : m_hWnd(0), m_debuggerClient(new DebuggerClient()) {
+  OleInitialize(0);
+}
+
+HRESULT Drosera::init(HINSTANCE hInstance, int nCmdShow) {
+  HRESULT ret = initUI(hInstance, nCmdShow);
+  if (FAILED(ret))
+    return ret;
+
+  return ret;
+}
 
 HRESULT Drosera::initUI(HINSTANCE hInstance, int nCmdShow) {
   // Initialize global strings
@@ -241,10 +219,6 @@ HRESULT Drosera::initUI(HINSTANCE hInstance, int nCmdShow) {
   SetLastError(0);
   SetWindowLongPtr(m_hWnd, 0, reinterpret_cast<LONG_PTR>(this));
   HRESULT ret = HRESULT_FROM_WIN32(GetLastError());
-  if (FAILED(ret))
-    return ret;
-
-  ret = OleInitialize(0);
   if (FAILED(ret))
     return ret;
 
@@ -286,7 +260,7 @@ HRESULT Drosera::initUI(HINSTANCE hInstance, int nCmdShow) {
   ShowWindow(m_hWnd, nCmdShow);
   UpdateWindow(m_hWnd);
 
-  return 0;
+  return ret;
 }
 
 LRESULT Drosera::onSize(WPARAM, LPARAM) {
@@ -312,24 +286,11 @@ bool Drosera::webViewLoaded() const {
   return m_debuggerClient->webViewLoaded();
 }
 
-// FIXME: The below functionality cannot be implemented until the Notification
-// and WebScriptDebugServer is implmented on Windows
-
-void Drosera::applicationDidFinishLaunching() {
-  // Adding functions to be associated with notifications
-}
-
 // Server Detection Callbacks
 
-void Drosera::serverLoaded() {}
-
-void Drosera::serverUnloaded() {}
-
-HRESULT Drosera::attach(int sender) {
+HRESULT Drosera::attach(const std::wstring& serverName) {
   // Get selected server
-  unsigned int row = sender;
-  std::wstring key = m_knownServerNames->get(row);
-  m_debuggerClient->initWithServerName(key);
+  m_debuggerClient->initWithServerName(serverName);
 
   HRESULT ret = m_webView->setFrameLoadDelegate(m_debuggerClient.get());
   if (FAILED(ret))
