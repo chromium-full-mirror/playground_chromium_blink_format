@@ -75,6 +75,7 @@ class LayoutTestController : public QObject {
   void dumpTitleChanges() { m_dumpTitleChanges = true; }
   QString encodeHostName(const QString& host);
   QString decodeHostName(const QString& host);
+  void dumpSelectionRect() const {}
 
  private:
   bool m_isLoading;
