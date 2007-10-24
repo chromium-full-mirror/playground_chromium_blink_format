@@ -198,7 +198,7 @@ redo:
   return 0;
 }
 
-TextInputController::TextInputController(QWebPage* parent) {}
+TextInputController::TextInputController(QWebPage* parent) : QObject(parent) {}
 
 void TextInputController::doCommand(const QString& command) {
   Qt::KeyboardModifiers modifiers = Qt::NoModifier;
@@ -275,6 +275,11 @@ void TextInputController::doCommand(const QString& command) {
     keycode = Qt::Key_PageDown;
   } else if (command == "pageUp:") {
     keycode = Qt::Key_PageUp;
+  } else if (command == "deleteWordBackward:") {
+    modifiers |= Qt::ControlModifier;
+    keycode = Qt::Key_Backspace;
+  } else if (command == "deleteBackward:") {
+    keycode = Qt::Key_Backspace;
   }
   QKeyEvent event(QEvent::KeyPress, keycode, modifiers);
   QApplication::sendEvent(parent(), &event);
