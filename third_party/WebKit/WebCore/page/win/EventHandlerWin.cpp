@@ -55,6 +55,8 @@ bool EventHandler::passMouseMoveEventToSubframe(
     MouseEventWithHitTestResults& mev,
     Frame* subframe,
     HitTestResult* hoveredNode) {
+  if (m_mouseDownMayStartDrag && !m_mouseDownWasInSubframe)
+    return false;
   subframe->eventHandler()->handleMouseMoveEvent(mev.event(), hoveredNode);
   return true;
 }
