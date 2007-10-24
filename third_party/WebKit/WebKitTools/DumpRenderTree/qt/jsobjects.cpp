@@ -32,6 +32,7 @@
 #include <qapplication.h>
 
 #include "DumpRenderTree.h"
+extern void qt_dump_editing_callbacks(bool b);
 
 class HackWebFrame : public QWebFrame {
  public:
@@ -65,6 +66,7 @@ void LayoutTestController::reset() {
     m_timeoutTimer = 0;
   }
   m_topLoadingFrame = 0;
+  qt_dump_editing_callbacks(false);
 }
 
 void LayoutTestController::maybeDump(bool ok) {
@@ -105,7 +107,8 @@ void LayoutTestController::clearBackForwardList() {
 }
 
 void LayoutTestController::dumpEditingCallbacks() {
-  // qDebug() << ">>>dumpEditingCallbacks";
+  qDebug() << ">>>dumpEditingCallbacks";
+  qt_dump_editing_callbacks(true);
 }
 
 void LayoutTestController::queueReload() {
