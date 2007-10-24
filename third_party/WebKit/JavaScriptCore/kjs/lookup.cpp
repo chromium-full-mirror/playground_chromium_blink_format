@@ -1,8 +1,7 @@
 // -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,18 +21,17 @@
  */
 
 #include "config.h"
-#include <stdio.h>
-#include <string.h>
-
 #include "lookup.h"
+
 #include <wtf/Assertions.h>
 
 namespace KJS {
 
 static inline bool keysMatch(const UChar* c, unsigned len, const char* s) {
+  // FIXME: This can run off the end of |s| if |c| has a U+0000 character in it.
   const char* end = s + len;
   for (; s != end; c++, s++)
-    if (c->uc != (unsigned char)*s)
+    if (c->uc != *s)
       return false;
   return *s == 0;
 }
@@ -42,19 +40,10 @@ static inline const HashEntry* findEntry(const struct HashTable* table,
                                          unsigned int hash,
                                          const UChar* c,
                                          unsigned int len) {
-#ifndef NDEBUG
-  if (table->type != 2) {
-    fprintf(stderr, "KJS: Unknown hash table version.\n");
-    return 0;
-  }
-#endif
-  ASSERT(table->hashSize != 0);
+  ASSERT(table->type == 3);
 
-  hash %= table->hashSize;
+  const HashEntry* e = &table->entries[hash & table->hashSizeMask];
 
-  const HashEntry* e = &table->entries[hash];
-
-  // empty bucket ?
   if (!e->s)
     return 0;
 
@@ -71,9 +60,7 @@ static inline const HashEntry* findEntry(const struct HashTable* table,
 
 const HashEntry* Lookup::findEntry(const struct HashTable* table,
                                    const Identifier& s) {
-  const HashEntry* entry =
-      KJS::findEntry(table, s.ustring().rep()->hash(), s.data(), s.size());
-  return entry;
+  return KJS::findEntry(table, s.ustring().rep()->_hash, s.data(), s.size());
 }
 
 int Lookup::find(const struct HashTable* table,
@@ -88,7 +75,7 @@ int Lookup::find(const struct HashTable* table,
 
 int Lookup::find(const struct HashTable* table, const Identifier& s) {
   const HashEntry* entry =
-      KJS::findEntry(table, s.ustring().rep()->hash(), s.data(), s.size());
+      KJS::findEntry(table, s.ustring().rep()->_hash, s.data(), s.size());
   if (entry)
     return entry->value;
   return -1;

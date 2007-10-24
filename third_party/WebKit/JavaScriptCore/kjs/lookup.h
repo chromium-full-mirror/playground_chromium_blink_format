@@ -1,8 +1,7 @@
 // -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,8 +32,6 @@
 
 namespace KJS {
 
-class FunctionPrototype;
-
 /**
  * An entry in a hash table.
  */
@@ -51,7 +48,7 @@ struct HashEntry {
   /**
    * attr is a set for flags (e.g. the property flags, see object.h)
    */
-  short int attr;
+  unsigned char attr;
   /**
    * params is another number. For property hashtables, it is used to
    * denote the number of argument of the function
@@ -94,9 +91,9 @@ struct HashTable {
    */
   const HashEntry* entries;
   /**
-   * the maximum value for the hash. Always smaller than size.
+   * the maximum value for the hash minus 1. Always smaller than size.
    */
-  int hashSize;
+  int hashSizeMask;
 };
 
 /**
