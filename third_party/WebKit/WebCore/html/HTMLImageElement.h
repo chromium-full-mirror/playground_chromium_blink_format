@@ -119,6 +119,8 @@ class HTMLImageElement : public HTMLElement {
 
   bool complete() const;
 
+  bool haveFiredLoadEvent() const { return m_imageLoader.haveFiredLoadEvent(); }
+
  protected:
   HTMLImageLoader m_imageLoader;
   String usemap;

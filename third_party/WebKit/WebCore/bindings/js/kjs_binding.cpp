@@ -33,6 +33,8 @@
 #include "Event.h"
 #include "EventNames.h"
 #include "Frame.h"
+#include "HTMLImageElement.h"
+#include "HTMLNames.h"
 #include "JSNode.h"
 #include "Page.h"
 #include "PlatformString.h"
@@ -54,6 +56,7 @@
 
 using namespace WebCore;
 using namespace EventNames;
+using namespace HTMLNames;
 
 namespace KJS {
 
@@ -202,12 +205,19 @@ void ScriptInterpreter::markDOMNodesForDocument(Document* doc) {
     NodeMap::iterator nodeEnd = nodeDict->end();
     for (NodeMap::iterator nodeIt = nodeDict->begin(); nodeIt != nodeEnd;
          ++nodeIt) {
-      JSNode* node = nodeIt->second;
+      JSNode* jsNode = nodeIt->second;
+      Node* node = jsNode->impl();
+
       // don't mark wrappers for nodes that are no longer in the
       // document - they should not be saved if the node is not
       // otherwise reachable from JS.
-      if (node->impl()->inDocument() && !node->marked())
-        node->mark();
+      // However, image elements that aren't in the document are also
+      // marked, if they are not done loading yet.
+      if (!jsNode->marked() &&
+          (node->inDocument() ||
+           (node->hasTagName(imgTag) &&
+            !static_cast<HTMLImageElement*>(node)->haveFiredLoadEvent())))
+        jsNode->mark();
     }
   }
 }
