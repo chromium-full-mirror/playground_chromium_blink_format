@@ -102,6 +102,7 @@ class EventSender : public QObject {
   void mouseMoveTo(int x, int y);
   void leapForward(int ms);
   void keyDown(const QString& string, const QStringList& modifiers);
+  void clearKillRing() {}
 
  private:
   QPoint m_mousePos;
