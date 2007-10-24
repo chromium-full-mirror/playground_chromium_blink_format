@@ -308,7 +308,7 @@ void RenderView::setSelection(RenderObject* start,
         os->selectionState() != SelectionNone) {
       // Blocks are responsible for painting line gaps and margin gaps.  They
       // must be examined as well.
-      oldSelectedObjects.set(os, new SelectionInfo(os, false));
+      oldSelectedObjects.set(os, new SelectionInfo(os, true));
       RenderBlock* cb = os->containingBlock();
       while (cb && !cb->isRenderView()) {
         BlockSelectionInfo* blockInfo = oldSelectedBlocks.get(cb);
@@ -361,7 +361,7 @@ void RenderView::setSelection(RenderObject* start,
   while (o && o != stop) {
     if ((o->canBeSelectionLeaf() || o == start || o == end) &&
         o->selectionState() != SelectionNone) {
-      newSelectedObjects.set(o, new SelectionInfo(o, false));
+      newSelectedObjects.set(o, new SelectionInfo(o, true));
       RenderBlock* cb = o->containingBlock();
       while (cb && !cb->isRenderView()) {
         BlockSelectionInfo* blockInfo = newSelectedBlocks.get(cb);

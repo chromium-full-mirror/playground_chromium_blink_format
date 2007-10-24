@@ -1959,7 +1959,8 @@ bool RenderBlock::isSelectionRoot() const {
     return false;
 
   if (isBody() || isRoot() || hasOverflowClip() || isRelPositioned() ||
-      isFloatingOrPositioned() || isTableCell() || isInlineBlockOrInlineTable())
+      isFloatingOrPositioned() || isTableCell() ||
+      isInlineBlockOrInlineTable() || hasTransform())
     return true;
 
   if (view() && view()->selectionStart()) {
@@ -2017,8 +2018,9 @@ GapRects RenderBlock::fillSelectionGaps(RenderBlock* rootBlock,
                        // someday.
     return result;
 
-  if (m_hasColumns) {
-    // FIXME: We should learn how to gap fill multiple columns eventually.
+  if (m_hasColumns || hasTransform()) {
+    // FIXME: We should learn how to gap fill multiple columns and transforms
+    // eventually.
     lastTop = (ty - blockY) + height();
     lastLeft = leftSelectionOffset(rootBlock, height());
     lastRight = rightSelectionOffset(rootBlock, height());
