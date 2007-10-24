@@ -291,11 +291,6 @@ void RenderPartObject::layout() {
   setNeedsLayout(false);
 }
 
-void RenderPartObject::updateWidgetSoon() {
-  if (m_view)
-    m_view->addWidgetToUpdate(this);
-}
-
 void RenderPartObject::viewCleared() {
   if (element() && m_widget && m_widget->isFrameView()) {
     FrameView* view = static_cast<FrameView*>(m_widget);

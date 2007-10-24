@@ -38,7 +38,6 @@ class RenderPartObject : public RenderPart {
 
   virtual void layout();
   void updateWidget(bool onlyCreateNonPlugins);
-  void updateWidgetSoon();
 
   virtual void viewCleared();
 };

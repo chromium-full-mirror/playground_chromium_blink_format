@@ -185,7 +185,7 @@ void HTMLObjectElement::attach() {
         // this method or recalcStyle (which also calls updateWidget) to be
         // called.
         m_needWidgetUpdate = false;
-        static_cast<RenderPartObject*>(renderer())->updateWidgetSoon();
+        static_cast<RenderPartObject*>(renderer())->updateWidget(true);
       } else {
         m_needWidgetUpdate = true;
         setChanged();
