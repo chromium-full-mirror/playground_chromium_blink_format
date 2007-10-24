@@ -82,7 +82,7 @@ class Identifier {
 
   static PassRefPtr<UString::Rep> add(const char*);
   static PassRefPtr<UString::Rep> add(const UChar*, int length);
-  static PassRefPtr<UString::Rep> Identifier::add(UString::Rep* r) {
+  static PassRefPtr<UString::Rep> add(UString::Rep* r) {
     if (r->isIdentifier)
       return r;
     return addSlowCase(r);
