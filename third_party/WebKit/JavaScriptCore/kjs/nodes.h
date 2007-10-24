@@ -114,6 +114,7 @@ class Node {
   virtual Node* nodeInsideAllParens() KJS_FAST_CALL;
 
   virtual bool isNumber() const KJS_FAST_CALL { return false; }
+  virtual bool isImmediateValue() const KJS_FAST_CALL { return false; }
   virtual bool isLocation() const KJS_FAST_CALL { return false; }
   virtual bool isResolveNode() const KJS_FAST_CALL { return false; }
   virtual bool isBracketAccessorNode() const KJS_FAST_CALL { return false; }
@@ -227,6 +228,23 @@ class NumberNode : public Node {
 
  private:
   double val;
+};
+
+class ImmediateNumberNode : public Node {
+ public:
+  ImmediateNumberNode(JSValue* v) KJS_FAST_CALL : m_value(v) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+
+  virtual bool isImmediateValue() const KJS_FAST_CALL { return true; }
+  double value() const KJS_FAST_CALL { return JSImmediate::toDouble(m_value); }
+  void setValue(double v) KJS_FAST_CALL {
+    m_value = JSImmediate::fromDouble(v);
+    ASSERT(m_value == v);
+  }
+
+ private:
+  JSValue* m_value;
 };
 
 class StringNode : public Node {
