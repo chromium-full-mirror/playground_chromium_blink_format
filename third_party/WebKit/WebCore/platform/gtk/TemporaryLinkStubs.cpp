@@ -29,7 +29,6 @@
 
 #include "AXObjectCache.h"
 #include "CachedPage.h"
-#include "Clipboard.h"
 #include "Editor.h"
 #include "FrameView.h"
 #include "FTPDirectoryDocument.h"
@@ -87,11 +86,6 @@ void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
 void CachedPage::close() {
   notImplemented();
-}
-
-PassRefPtr<Clipboard> Editor::newGeneralClipboard(ClipboardAccessPolicy) {
-  notImplemented();
-  return 0;
 }
 
 namespace WebCore {
