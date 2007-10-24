@@ -240,7 +240,7 @@ class ImmediateNumberNode : public Node {
   double value() const KJS_FAST_CALL { return JSImmediate::toDouble(m_value); }
   void setValue(double v) KJS_FAST_CALL {
     m_value = JSImmediate::fromDouble(v);
-    ASSERT(m_value == v);
+    ASSERT(m_value);
   }
 
  private:
