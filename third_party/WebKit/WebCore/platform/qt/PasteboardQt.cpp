@@ -40,9 +40,7 @@
 
 namespace WebCore {
 
-Pasteboard::Pasteboard() {
-  notImplemented();
-}
+Pasteboard::Pasteboard() {}
 
 Pasteboard* Pasteboard::generalPasteboard() {
   static Pasteboard* pasteboard = 0;
@@ -107,6 +105,6 @@ void Pasteboard::writeImage(Node*, const KURL&, const String&) {
 }
 
 void Pasteboard::clear() {
-  notImplemented();
+  QApplication::clipboard()->clear();
 }
 }
