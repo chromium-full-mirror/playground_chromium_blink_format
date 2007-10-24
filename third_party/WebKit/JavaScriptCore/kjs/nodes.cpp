@@ -1342,16 +1342,33 @@ JSValue* UnsignedRightShiftNode::evaluate(ExecState* exec) {
 // ------------------------------ Relational Nodes
 // -------------------------------
 
+static inline JSValue* lessThan(ExecState* exec, JSValue* v1, JSValue* v2) {
+  JSValue* p1 = v1->toPrimitive(exec, NumberType);
+  JSValue* p2 = v2->toPrimitive(exec, NumberType);
+
+  if (p1->isString() && p2->isString())
+    return jsBoolean(p1->toString(exec) < p2->toString(exec));
+
+  return jsBoolean(p1->toNumber(exec) < p2->toNumber(exec));
+}
+
+static inline JSValue* lessThanEq(ExecState* exec, JSValue* v1, JSValue* v2) {
+  JSValue* p1 = v1->toPrimitive(exec, NumberType);
+  JSValue* p2 = v2->toPrimitive(exec, NumberType);
+
+  if (p1->isString() && p2->isString())
+    return jsBoolean(!(p2->toString(exec) < p1->toString(exec)));
+
+  return jsBoolean(p1->toNumber(exec) <= p2->toNumber(exec));
+}
+
 // ECMA 11.8.1
 JSValue* LessNode::evaluate(ExecState* exec) {
   JSValue* v1 = expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  int r = relation(exec, v1, v2);
-  if (r < 0)
-    return jsBoolean(false);
-  return jsBoolean(r == 1);
+  return lessThan(exec, v1, v2);
 }
 
 // ECMA 11.8.2
@@ -1360,10 +1377,7 @@ JSValue* GreaterNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  int r = relation(exec, v2, v1);
-  if (r < 0)
-    return jsBoolean(false);
-  return jsBoolean(r == 1);
+  return lessThan(exec, v2, v1);
 }
 
 // ECMA 11.8.3
@@ -1372,10 +1386,7 @@ JSValue* LessEqNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  int r = relation(exec, v2, v1);
-  if (r < 0)
-    return jsBoolean(false);
-  return jsBoolean(r == 0);
+  return lessThanEq(exec, v1, v2);
 }
 
 // ECMA 11.8.4
@@ -1384,10 +1395,7 @@ JSValue* GreaterEqNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  int r = relation(exec, v1, v2);
-  if (r < 0)
-    return jsBoolean(false);
-  return jsBoolean(r == 0);
+  return lessThanEq(exec, v2, v1);
 }
 
 // ECMA 11.8.6
