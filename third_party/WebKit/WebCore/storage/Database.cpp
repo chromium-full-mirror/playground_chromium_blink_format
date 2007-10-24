@@ -163,7 +163,6 @@ Database::~Database() {
   if (hashSet->isEmpty()) {
     guidToDatabaseMap().remove(m_guid);
     delete hashSet;
-    ASSERT(guidToVersionMap().contains(m_guid));
     guidToVersionMap().remove(m_guid);
   }
 }

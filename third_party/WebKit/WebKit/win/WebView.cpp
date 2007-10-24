@@ -30,6 +30,7 @@
 #include "CFDictionaryPropertyBag.h"
 #include "DOMCoreClasses.h"
 #include "IWebNotification.h"
+#include "WebDatabaseManager.h"
 #include "WebDebugProgram.h"
 #include "WebDocumentLoader.h"
 #include "WebEditorClient.h"
@@ -1909,6 +1910,8 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
     return hr;
 
   m_groupName = String(groupName, SysStringLen(groupName));
+
+  WebKitSetWebDatabasesPathIfNecessary();
 
   m_page = new Page(new WebChromeClient(this), new WebContextMenuClient(this),
                     new WebEditorClient(this), new WebDragClient(this),

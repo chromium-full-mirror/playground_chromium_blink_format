@@ -35,26 +35,29 @@
 
 namespace WebCore {
 
-String DatabaseTracker::s_databasePath;
-
-void DatabaseTracker::setDatabasePath(const String& path) {
-  s_databasePath = path;
-}
-
-const String& DatabaseTracker::databasePath() {
-  return s_databasePath;
-}
-
 DatabaseTracker& DatabaseTracker::tracker() {
   static DatabaseTracker tracker;
 
   return tracker;
 }
 
-DatabaseTracker::DatabaseTracker() {
-  String databasePath = DatabaseTracker::databasePath();
-  makeAllDirectories(databasePath);
-  databasePath = pathByAppendingComponent(databasePath, "Databases.db");
+DatabaseTracker::DatabaseTracker() {}
+
+void DatabaseTracker::setDatabasePath(const String& path) {
+  m_databasePath = path;
+  openTrackerDatabase();
+}
+
+const String& DatabaseTracker::databasePath() {
+  return m_databasePath;
+}
+
+void DatabaseTracker::openTrackerDatabase() {
+  ASSERT(!m_database.isOpen());
+
+  makeAllDirectories(m_databasePath);
+  String databasePath =
+      pathByAppendingComponent(m_databasePath, "Databases.db");
 
   if (!m_database.open(databasePath)) {
     // FIXME: What do do here?
@@ -81,7 +84,6 @@ DatabaseTracker::DatabaseTracker() {
 
 String DatabaseTracker::fullPathForDatabase(const String& origin,
                                             const String& name) {
-  String databasePath = DatabaseTracker::databasePath();
   SQLStatement statement(
       m_database, "SELECT path FROM Databases WHERE origin=? AND name=?;");
 
@@ -94,7 +96,8 @@ String DatabaseTracker::fullPathForDatabase(const String& origin,
   int result = statement.step();
 
   if (result == SQLResultRow)
-    return pathByAppendingComponent(databasePath, statement.getColumnText16(0));
+    return pathByAppendingComponent(m_databasePath,
+                                    statement.getColumnText16(0));
   if (result != SQLResultDone) {
     LOG_ERROR(
         "Failed to retrieve filename from Database Tracker for origin %s, name "
@@ -124,7 +127,7 @@ String DatabaseTracker::fullPathForDatabase(const String& origin,
   String filename;
   do {
     ++seq;
-    filename = pathByAppendingComponent(databasePath,
+    filename = pathByAppendingComponent(m_databasePath,
                                         String::format("%016llx.db", seq));
   } while (fileExists(filename));
 

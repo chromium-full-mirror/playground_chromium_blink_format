@@ -39,8 +39,8 @@ namespace WebCore {
 
 class DatabaseTracker {
  public:
-  static void setDatabasePath(const String&);
-  static const String& databasePath();
+  void setDatabasePath(const String&);
+  const String& databasePath();
 
   String fullPathForDatabase(const String& origin, const String& name);
 
@@ -56,6 +56,8 @@ class DatabaseTracker {
  private:
   DatabaseTracker();
 
+  void openTrackerDatabase();
+
   bool addDatabase(const String& origin,
                    const String& name,
                    const String& path);
@@ -64,7 +66,7 @@ class DatabaseTracker {
   SQLDatabase m_database;
   mutable OwnPtr<HashSet<String>> m_origins;
 
-  static String s_databasePath;
+  String m_databasePath;
 };
 
 }  // namespace WebCore
