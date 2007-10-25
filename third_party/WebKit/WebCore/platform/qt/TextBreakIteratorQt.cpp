@@ -43,6 +43,8 @@ TextBreakIterator* wordBreakIterator(const UChar* string, int length) {
   static QTextBoundaryFinder* iterator = 0;
   static const UChar* cachedString = 0;
   static int cachedLength = 0;
+  if (!string)
+    return 0;
   if (string != cachedString || length != cachedLength) {
     if (!iterator)
       iterator = new QTextBoundaryFinder;
@@ -62,6 +64,8 @@ TextBreakIterator* characterBreakIterator(const UChar* string, int length) {
   static QTextBoundaryFinder* iterator = 0;
   static const UChar* cachedString = 0;
   static int cachedLength = 0;
+  if (!string)
+    return 0;
   if (string != cachedString || length != cachedLength) {
     if (!iterator)
       iterator = new QTextBoundaryFinder;
@@ -81,6 +85,8 @@ TextBreakIterator* lineBreakIterator(const UChar* string, int length) {
   static QTextBoundaryFinder* iterator = 0;
   static const UChar* cachedString = 0;
   static int cachedLength = 0;
+  if (!string)
+    return 0;
   if (string != cachedString || length != cachedLength) {
     if (!iterator)
       iterator = new QTextBoundaryFinder;
@@ -100,6 +106,8 @@ TextBreakIterator* sentenceBreakIterator(const UChar* string, int length) {
   static QTextBoundaryFinder* iterator = 0;
   static const UChar* cachedString = 0;
   static int cachedLength = 0;
+  if (!string)
+    return 0;
   if (string != cachedString || length != cachedLength) {
     if (!iterator)
       iterator = new QTextBoundaryFinder;
