@@ -57,7 +57,8 @@ class QWebNetworkJobPrivate {
         resourceHandle(0),
         redirected(false),
         interface(0),
-        connector(0) {}
+        connector(0),
+        jobStatus(QWebNetworkJob::JobCreated) {}
   int ref;
 
   QWebNetworkRequestPrivate request;
@@ -68,6 +69,7 @@ class QWebNetworkJobPrivate {
 
   QWebNetworkInterface* interface;
   QWebObjectPluginConnector* connector;
+  QWebNetworkJob::JobStatus jobStatus;
 };
 
 class QWebNetworkManager : public QObject {
