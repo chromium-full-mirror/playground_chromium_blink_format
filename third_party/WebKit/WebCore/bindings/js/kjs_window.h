@@ -70,7 +70,7 @@ class DOMWindowTimer;
 
 class WindowPrivate;
 
-// This is the only WebCore JS binding which does not inherit from DOMNode
+// This is the only WebCore JS binding which does not inherit from DOMObject
 class Window : public JSGlobalObject {
   friend class Location;
   friend class WindowFunc;
