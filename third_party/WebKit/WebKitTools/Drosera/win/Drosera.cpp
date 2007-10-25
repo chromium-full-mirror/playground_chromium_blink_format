@@ -50,8 +50,6 @@ static const LRESULT kNotHandledResult = -1;
 static LPCTSTR kDroseraPointerProp = TEXT("DroseraPointer");
 static HINSTANCE hInst;
 
-extern "C" BOOL InitializeCoreGraphics();
-
 ATOM registerDroseraClass(HINSTANCE hInstance);
 LRESULT CALLBACK droseraWndProc(HWND hWnd,
                                 UINT message,
@@ -77,8 +75,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
   UNREFERENCED_PARAMETER(lpCmdLine);
 
   MSG msg;
-
-  InitializeCoreGraphics();
 
   Drosera drosera;
 
