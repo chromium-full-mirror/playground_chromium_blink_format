@@ -411,19 +411,23 @@ static inline void addAdobeAcrobatPluginPath(Vector<String>& paths) {
 
 static inline String safariPluginsPath() {
   WCHAR moduleFileNameStr[_MAX_PATH];
+  static String pluginsPath;
+  static bool cachedPluginPath = false;
 
-  int moduleFileNameLen = GetModuleFileName(0, moduleFileNameStr, _MAX_PATH);
+  if (!cachedPluginPath) {
+    cachedPluginPath = true;
 
-  if (!moduleFileNameLen)
-    return String();
+    int moduleFileNameLen = GetModuleFileName(0, moduleFileNameStr, _MAX_PATH);
 
-  String moduleFileName = String(moduleFileNameStr, moduleFileNameLen);
-  int i = moduleFileName.reverseFind('\\');
-  if (i == -1)
-    return String();
+    if (!moduleFileNameLen || moduleFileNameLen == _MAX_PATH)
+      goto exit;
 
-  String pluginsPath = moduleFileName.left(i);
-  pluginsPath.append("\\Plugins");
+    if (!PathRemoveFileSpec(moduleFileNameStr))
+      goto exit;
+
+    pluginsPath = String(moduleFileNameStr) + "\\Plugins";
+  }
+exit:
   return pluginsPath;
 }
 
@@ -469,7 +473,7 @@ PluginPackageWin* PluginDatabaseWin::pluginForMIMEType(const String& mimeType) {
     if ((*it)->mimeToDescriptions().contains(key)) {
       plugin = (*it).get();
       // prefer plugins in our own plugins directory
-      if (plugin->path() == ourPath)
+      if (plugin->parentDirectory() == ourPath)
         break;
     }
   }
@@ -496,7 +500,7 @@ PluginPackageWin* PluginDatabaseWin::pluginForExtension(
         if (extensions[i] == extension) {
           plugin = (*it).get();
           // prefer plugins in our own plugins directory
-          if (plugin->path() == ourPath)
+          if (plugin->parentDirectory() == ourPath)
             break;
         }
       }

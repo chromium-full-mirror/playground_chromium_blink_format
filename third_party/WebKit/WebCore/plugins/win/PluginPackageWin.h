@@ -49,7 +49,7 @@ class PluginPackageWin : public Shared<PluginPackageWin> {
   String name() const { return m_name; }
   String description() const { return m_description; }
   String fileName() const { return m_fileName; }
-  String path() const { return m_path; }
+  String parentDirectory() const { return m_parentDirectory; }
 
   const MIMEToDescriptionsMap& mimeToDescriptions() const {
     return m_mimeToDescriptions;
@@ -78,6 +78,7 @@ class PluginPackageWin : public Shared<PluginPackageWin> {
   String m_path;
   String m_fileName;
   String m_name;
+  String m_parentDirectory;
 
   MIMEToDescriptionsMap m_mimeToDescriptions;
   MIMEToExtensionsMap m_mimeToExtensions;
