@@ -302,11 +302,11 @@ void Image::drawPattern(GraphicsContext* ctxt,
 
     CGColorRelease(color);
 
-    ctxt->restore();
-
 #ifndef BUILDING_ON_TIGER
   }
 #endif
+
+  ctxt->restore();
 
   if (imageObserver())
     imageObserver()->didDraw(this);
