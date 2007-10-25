@@ -31,7 +31,7 @@
 #include "Database.h"
 #include "FileSystem.h"
 #include "NotImplemented.h"
-#include "SQLStatement.h"
+#include "SQLiteStatement.h"
 
 namespace WebCore {
 
@@ -84,7 +84,7 @@ void DatabaseTracker::openTrackerDatabase() {
 
 String DatabaseTracker::fullPathForDatabase(const String& origin,
                                             const String& name) {
-  SQLStatement statement(
+  SQLiteStatement statement(
       m_database, "SELECT path FROM Databases WHERE origin=? AND name=?;");
 
   if (statement.prepare() != SQLResultOk)
@@ -106,7 +106,7 @@ String DatabaseTracker::fullPathForDatabase(const String& origin,
     return "";
   }
 
-  SQLStatement sequenceStatement(
+  SQLiteStatement sequenceStatement(
       m_database, "SELECT seq FROM sqlite_sequence WHERE name='Databases';");
 
   // FIXME: More informative error handling here, even though these steps should
@@ -148,7 +148,8 @@ void DatabaseTracker::populateOrigins() {
   if (!m_database.isOpen())
     return;
 
-  SQLStatement statement(m_database, "SELECT DISTINCT origin FROM Databases;");
+  SQLiteStatement statement(m_database,
+                            "SELECT DISTINCT origin FROM Databases;");
 
   if (statement.prepare() != SQLResultOk)
     return;
@@ -175,8 +176,8 @@ bool DatabaseTracker::databaseNamesForOrigin(const String& origin,
   if (!m_database.isOpen())
     return false;
 
-  SQLStatement statement(m_database,
-                         "SELECT name FROM Databases where origin=?;");
+  SQLiteStatement statement(m_database,
+                            "SELECT name FROM Databases where origin=?;");
 
   if (statement.prepare() != SQLResultOk)
     return false;
@@ -202,7 +203,7 @@ bool DatabaseTracker::addDatabase(const String& origin,
   if (!m_database.isOpen())
     return false;
 
-  SQLStatement statement(
+  SQLiteStatement statement(
       m_database,
       "INSERT INTO Databases (origin, name, path) VALUES (?, ?, ?);");
 

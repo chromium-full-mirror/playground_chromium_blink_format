@@ -24,11 +24,11 @@
  */
 
 #include "config.h"
-#include "SQLDatabase.h"
+#include "SQLiteDatabase.h"
 
 #include "Logging.h"
-#include "SQLAuthorizer.h"
-#include "SQLStatement.h"
+#include "SQLiteAuthorizer.h"
+#include "SQLiteStatement.h"
 
 #include <sqlite3.h>
 
@@ -40,17 +40,17 @@ const int SQLResultOk = SQLITE_OK;
 const int SQLResultRow = SQLITE_ROW;
 const int SQLResultSchema = SQLITE_SCHEMA;
 
-SQLDatabase::SQLDatabase() : m_db(0), m_transactionInProgress(false) {
+SQLiteDatabase::SQLiteDatabase() : m_db(0), m_transactionInProgress(false) {
 #ifndef NDEBUG
   memset(&m_openingThread, 0, sizeof(pthread_t));
 #endif
 }
 
-SQLDatabase::~SQLDatabase() {
+SQLiteDatabase::~SQLiteDatabase() {
   close();
 }
 
-bool SQLDatabase::open(const String& filename) {
+bool SQLiteDatabase::open(const String& filename) {
   close();
 
   // SQLite expects a null terminator on its UTF16 strings
@@ -70,13 +70,13 @@ bool SQLDatabase::open(const String& filename) {
     m_openingThread = pthread_self();
 #endif
 
-  if (!SQLStatement(*this, "PRAGMA temp_store = MEMORY;").executeCommand())
+  if (!SQLiteStatement(*this, "PRAGMA temp_store = MEMORY;").executeCommand())
     LOG_ERROR("SQLite database could not set temp_store to memory");
 
   return isOpen();
 }
 
-void SQLDatabase::close() {
+void SQLiteDatabase::close() {
   if (m_db) {
     sqlite3_close(m_db);
     m_path.truncate(0);
@@ -87,40 +87,40 @@ void SQLDatabase::close() {
 #endif
 }
 
-void SQLDatabase::setFullsync(bool fsync) {
+void SQLiteDatabase::setFullsync(bool fsync) {
   if (fsync)
     executeCommand("PRAGMA fullfsync = 1;");
   else
     executeCommand("PRAGMA fullfsync = 0;");
 }
 
-void SQLDatabase::setSynchronous(SynchronousPragma sync) {
+void SQLiteDatabase::setSynchronous(SynchronousPragma sync) {
   executeCommand(String::format("PRAGMA synchronous = %i", sync));
 }
 
-void SQLDatabase::setBusyTimeout(int ms) {
+void SQLiteDatabase::setBusyTimeout(int ms) {
   if (m_db)
     sqlite3_busy_timeout(m_db, ms);
   else
     LOG(SQLDatabase, "BusyTimeout set on non-open database");
 }
 
-void SQLDatabase::setBusyHandler(int (*handler)(void*, int)) {
+void SQLiteDatabase::setBusyHandler(int (*handler)(void*, int)) {
   if (m_db)
     sqlite3_busy_handler(m_db, handler, NULL);
   else
     LOG(SQLDatabase, "Busy handler set on non-open database");
 }
 
-bool SQLDatabase::executeCommand(const String& sql) {
-  return SQLStatement(*this, sql).executeCommand();
+bool SQLiteDatabase::executeCommand(const String& sql) {
+  return SQLiteStatement(*this, sql).executeCommand();
 }
 
-bool SQLDatabase::returnsAtLeastOneResult(const String& sql) {
-  return SQLStatement(*this, sql).returnsAtLeastOneResult();
+bool SQLiteDatabase::returnsAtLeastOneResult(const String& sql) {
+  return SQLiteStatement(*this, sql).returnsAtLeastOneResult();
 }
 
-bool SQLDatabase::tableExists(const String& tablename) {
+bool SQLiteDatabase::tableExists(const String& tablename) {
   if (!isOpen())
     return false;
 
@@ -128,15 +128,15 @@ bool SQLDatabase::tableExists(const String& tablename) {
       "SELECT name FROM sqlite_master WHERE type = 'table' AND name = '" +
       tablename + "';";
 
-  SQLStatement sql(*this, statement);
+  SQLiteStatement sql(*this, statement);
   sql.prepare();
   return sql.step() == SQLITE_ROW;
 }
 
-void SQLDatabase::clearAllTables() {
+void SQLiteDatabase::clearAllTables() {
   String query = "SELECT name FROM sqlite_master WHERE type='table';";
   Vector<String> tables;
-  if (!SQLStatement(*this, query).returnTextResults16(0, tables)) {
+  if (!SQLiteStatement(*this, query).returnTextResults16(0, tables)) {
     LOG(SQLDatabase, "Unable to retrieve list of tables from database");
     return;
   }
@@ -150,38 +150,38 @@ void SQLDatabase::clearAllTables() {
   }
 }
 
-void SQLDatabase::runVacuumCommand() {
+void SQLiteDatabase::runVacuumCommand() {
   if (!executeCommand("VACUUM;"))
     LOG(SQLDatabase, "Unable to vacuum database - %s", lastErrorMsg());
 }
 
-int64_t SQLDatabase::lastInsertRowID() {
+int64_t SQLiteDatabase::lastInsertRowID() {
   if (!m_db)
     return 0;
   return sqlite3_last_insert_rowid(m_db);
 }
 
-int SQLDatabase::lastChanges() {
+int SQLiteDatabase::lastChanges() {
   if (!m_db)
     return 0;
   return sqlite3_changes(m_db);
 }
 
-int SQLDatabase::lastError() {
+int SQLiteDatabase::lastError() {
   return m_db ? sqlite3_errcode(m_db) : SQLITE_ERROR;
 }
 
-const char* SQLDatabase::lastErrorMsg() {
+const char* SQLiteDatabase::lastErrorMsg() {
   return sqlite3_errmsg(m_db);
 }
 
-int SQLDatabase::authorizerFunction(void* userData,
-                                    int actionCode,
-                                    const char* parameter1,
-                                    const char* parameter2,
-                                    const char* /*databaseName*/,
-                                    const char* /*trigger_or_view*/) {
-  SQLAuthorizer* auth = static_cast<SQLAuthorizer*>(userData);
+int SQLiteDatabase::authorizerFunction(void* userData,
+                                       int actionCode,
+                                       const char* parameter1,
+                                       const char* parameter2,
+                                       const char* /*databaseName*/,
+                                       const char* /*trigger_or_view*/) {
+  SQLiteAuthorizer* auth = static_cast<SQLiteAuthorizer*>(userData);
   ASSERT(auth);
 
   switch (actionCode) {
@@ -255,7 +255,7 @@ int SQLDatabase::authorizerFunction(void* userData,
   }
 }
 
-void SQLDatabase::setAuthorizer(PassRefPtr<SQLAuthorizer> auth) {
+void SQLiteDatabase::setAuthorizer(PassRefPtr<SQLiteAuthorizer> auth) {
   if (!m_db) {
     LOG_ERROR("Attempt to set an authorizer on a non-open SQL database");
     ASSERT_NOT_REACHED();
@@ -266,17 +266,17 @@ void SQLDatabase::setAuthorizer(PassRefPtr<SQLAuthorizer> auth) {
 
   m_authorizer = auth;
   if (m_authorizer)
-    sqlite3_set_authorizer(m_db, SQLDatabase::authorizerFunction,
+    sqlite3_set_authorizer(m_db, SQLiteDatabase::authorizerFunction,
                            m_authorizer.get());
   else
     sqlite3_set_authorizer(m_db, NULL, 0);
 }
 
-void SQLDatabase::lock() {
+void SQLiteDatabase::lock() {
   m_lockingMutex.lock();
 }
 
-void SQLDatabase::unlock() {
+void SQLiteDatabase::unlock() {
   m_lockingMutex.unlock();
 }
 

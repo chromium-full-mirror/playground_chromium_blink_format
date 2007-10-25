@@ -31,7 +31,7 @@
 
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
-#include "SQLDatabase.h"
+#include "SQLiteDatabase.h"
 #include "StringHash.h"
 #include "Threading.h"
 #include "Timer.h"
@@ -133,8 +133,8 @@ class Database : public ThreadSafeShared<Database> {
   String m_expectedVersion;
   String m_filename;
 
-  SQLDatabase m_mainSQLDatabase;
-  SQLDatabase m_threadSQLDatabase;
+  SQLiteDatabase m_mainSQLDatabase;
+  SQLiteDatabase m_threadSQLDatabase;
   RefPtr<DatabaseAuthorizer> m_databaseAuthorizer;
 
   Mutex m_databaseThreadMutex;

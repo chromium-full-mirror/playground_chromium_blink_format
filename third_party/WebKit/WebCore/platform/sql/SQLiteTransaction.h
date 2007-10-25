@@ -23,29 +23,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SQLTransaction_h
-#define SQLTransaction_h
+#ifndef SQLiteTransaction_h
+#define SQLiteTransaction_h
 
 #include <wtf/Noncopyable.h>
 
 namespace WebCore {
 
-class SQLDatabase;
+class SQLiteDatabase;
 
-class SQLTransaction : public Noncopyable {
+class SQLiteTransaction : public Noncopyable {
  public:
-  SQLTransaction(SQLDatabase& db);
-  ~SQLTransaction();
+  SQLiteTransaction(SQLiteDatabase& db);
+  ~SQLiteTransaction();
 
   void begin();
   void commit();
   void rollback();
 
  private:
-  SQLDatabase& m_db;
+  SQLiteDatabase& m_db;
   bool m_began;
 };
 
 }  // namespace WebCore
 
-#endif  // SQLTransation_H
+#endif  // SQLiteTransation_H

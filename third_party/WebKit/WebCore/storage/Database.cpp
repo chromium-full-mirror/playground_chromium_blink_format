@@ -44,9 +44,9 @@
 #include "NotImplemented.h"
 #include "Page.h"
 #include "SQLCallback.h"
-#include "SQLDatabase.h"
+#include "SQLiteDatabase.h"
+#include "SQLiteStatement.h"
 #include "SQLResultSet.h"
-#include "SQLStatement.h"
 #include "VersionChangeCallback.h"
 
 namespace WebCore {
@@ -190,10 +190,10 @@ bool Database::openAndVerifyVersion(ExceptionCode& e) {
   return task->openSuccessful();
 }
 
-static bool retrieveTextResultFromDatabase(SQLDatabase& db,
+static bool retrieveTextResultFromDatabase(SQLiteDatabase& db,
                                            const String& query,
                                            String& resultString) {
-  SQLStatement statement(db, query);
+  SQLiteStatement statement(db, query);
   int result = statement.prepare();
 
   if (result != SQLResultOk) {
@@ -235,10 +235,10 @@ bool Database::getVersionFromDatabase(String& version) {
   return result;
 }
 
-static bool setTextValueInDatabase(SQLDatabase& db,
+static bool setTextValueInDatabase(SQLiteDatabase& db,
                                    const String& query,
                                    const String& value) {
-  SQLStatement statement(db, query);
+  SQLiteStatement statement(db, query);
   int result = statement.prepare();
 
   if (result != SQLResultOk) {
@@ -492,7 +492,7 @@ void Database::performExecuteSql(const String& sqlStatement,
 
   m_databaseAuthorizer->reset();
 
-  SQLStatement statement(m_threadSQLDatabase, sqlStatement);
+  SQLiteStatement statement(m_threadSQLDatabase, sqlStatement);
   int result = statement.prepare();
   if (result != SQLResultOk) {
     LOG(StorageAPI, "Failed to prepare sql query '%s' - error was: %s",
@@ -571,8 +571,9 @@ void Database::performCloseTransaction() {
 Vector<String> Database::performGetTableNames() {
   disableAuthorizer();
 
-  SQLStatement statement(m_threadSQLDatabase,
-                         "SELECT name FROM sqlite_master WHERE type='table';");
+  SQLiteStatement statement(
+      m_threadSQLDatabase,
+      "SELECT name FROM sqlite_master WHERE type='table';");
   if (statement.prepare() != SQLResultOk) {
     LOG_ERROR("Unable to retrieve list of tables for database %s",
               databaseDebugName().ascii().data());
@@ -618,7 +619,7 @@ void Database::executeSql(const String& sqlStatement,
                           ExceptionCode& e) {
   // 4.11.3 Step 1 - Statement and argument validation
   // FIXME: Currently the best way we have to validate the statement is to
-  // create an actual SQLStatement and prepare it.  We can't prepare on
+  // create an actual SQLiteStatement and prepare it.  We can't prepare on
   // the main thread and run on the worker thread, because the worker thread
   // might be in the middle of database activity.  So we have two options
   // 1 - Break up the executeSql task into two steps.  Step 1 is prepare the
@@ -655,7 +656,7 @@ void Database::executeSql(const String& sqlStatement,
   //     For now, I'm going with solution #2, as it is easiest to implement and
   //     the true badness of its "con" is dubious.
 
-  SQLStatement statement(m_mainSQLDatabase, sqlStatement);
+  SQLiteStatement statement(m_mainSQLDatabase, sqlStatement);
   int result = statement.prepare();
 
   // Workaround for <rdar://problem/5537019> - a prepare on 1 connection

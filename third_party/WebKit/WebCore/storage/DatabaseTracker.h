@@ -29,7 +29,7 @@
 #define DatabaseTracker_h
 
 #include "PlatformString.h"
-#include "SQLDatabase.h"
+#include "SQLiteDatabase.h"
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
@@ -63,7 +63,7 @@ class DatabaseTracker {
                    const String& path);
   void populateOrigins();
 
-  SQLDatabase m_database;
+  SQLiteDatabase m_database;
   mutable OwnPtr<HashSet<String>> m_origins;
 
   String m_databasePath;

@@ -24,20 +24,21 @@
  */
 
 #include "config.h"
-#include "SQLTransaction.h"
+#include "SQLiteTransaction.h"
 
-#include "SQLDatabase.h"
+#include "SQLiteDatabase.h"
 
 namespace WebCore {
 
-SQLTransaction::SQLTransaction(SQLDatabase& db) : m_db(db), m_began(false) {}
+SQLiteTransaction::SQLiteTransaction(SQLiteDatabase& db)
+    : m_db(db), m_began(false) {}
 
-SQLTransaction::~SQLTransaction() {
+SQLiteTransaction::~SQLiteTransaction() {
   if (m_began)
     rollback();
 }
 
-void SQLTransaction::begin() {
+void SQLiteTransaction::begin() {
   if (!m_began) {
     ASSERT(!m_db.m_transactionInProgress);
     m_began = m_db.executeCommand("BEGIN;");
@@ -45,7 +46,7 @@ void SQLTransaction::begin() {
   }
 }
 
-void SQLTransaction::commit() {
+void SQLiteTransaction::commit() {
   if (m_began) {
     ASSERT(m_db.m_transactionInProgress);
     if (m_db.executeCommand("COMMIT;")) {
@@ -55,7 +56,7 @@ void SQLTransaction::commit() {
   }
 }
 
-void SQLTransaction::rollback() {
+void SQLiteTransaction::rollback() {
   if (m_began) {
     ASSERT(m_db.m_transactionInProgress);
     if (m_db.executeCommand("ROLLBACK;")) {
