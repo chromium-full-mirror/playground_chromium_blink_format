@@ -93,7 +93,7 @@ Context::~Context() {
   // collected
   ActivationImp* activation = static_cast<ActivationImp*>(m_activation);
   if (activation)
-    activation->releaseArguments();
+    activation->resetArguments();
 }
 
 void Context::mark() {
