@@ -611,7 +611,7 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
       RefPtr<Element> newElement = createElementNS(
           oldElement->namespaceURI(), oldElement->tagQName().toString(), ec);
 
-      if (ec != 0)
+      if (ec)
         return 0;
 
       NamedAttrMap* attrs = oldElement->attributes(true);
@@ -620,7 +620,7 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
         for (unsigned i = 0; i < length; i++) {
           Attribute* attr = attrs->attributeItem(i);
           newElement->setAttribute(attr->name(), attr->value().impl(), ec);
-          if (ec != 0)
+          if (ec)
             return 0;
         }
       }
@@ -631,22 +631,48 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
         for (Node* oldChild = oldElement->firstChild(); oldChild;
              oldChild = oldChild->nextSibling()) {
           RefPtr<Node> newChild = importNode(oldChild, true, ec);
-          if (ec != 0)
+          if (ec)
             return 0;
           newElement->appendChild(newChild.release(), ec);
-          if (ec != 0)
+          if (ec)
             return 0;
         }
       }
 
       return newElement.release();
     }
-    case ATTRIBUTE_NODE:
+    case ATTRIBUTE_NODE: {
+      RefPtr<Attr> newAttr =
+          new Attr(0, this, static_cast<Attr*>(importedNode)->attr()->clone());
+      newAttr->createTextChild();
+      return newAttr.release();
+    }
+    case DOCUMENT_FRAGMENT_NODE: {
+      DocumentFragment* oldFragment =
+          static_cast<DocumentFragment*>(importedNode);
+      RefPtr<DocumentFragment> newFragment = createDocumentFragment();
+      if (deep) {
+        for (Node* oldChild = oldFragment->firstChild(); oldChild;
+             oldChild = oldChild->nextSibling()) {
+          RefPtr<Node> newChild = importNode(oldChild, true, ec);
+          if (ec)
+            return 0;
+          newFragment->appendChild(newChild.release(), ec);
+          if (ec)
+            return 0;
+        }
+      }
+
+      return newFragment.release();
+    }
     case ENTITY_NODE:
+    case NOTATION_NODE:
+    // FIXME: It should be possible to import these node types, however in DOM3
+    // the DocumentType is readonly, so there isn't much sense in doing that.
+    // Ability to add these imported nodes to a DocumentType will be considered
+    // for addition to a future release of the DOM.
     case DOCUMENT_NODE:
     case DOCUMENT_TYPE_NODE:
-    case DOCUMENT_FRAGMENT_NODE:
-    case NOTATION_NODE:
     case XPATH_NAMESPACE_NODE:
       break;
   }
