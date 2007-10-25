@@ -27,7 +27,6 @@
 #include "WebKitDLL.h"
 #include "WebScriptDebugServer.h"
 
-#include "WebKitStatistics.h"
 #include "WebView.h"
 #include <wtf/Vector.h>
 
@@ -166,26 +165,29 @@ void WebScriptDebugServer::viewRemoved(IWebView* view) {
 // IWebScriptDebugServer
 // -----------------------------------------------------------
 
-HRESULT STDMETHODCALLTYPE WebScriptDebugServer::attach(void) {
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::addListener(
+    /* [in] */ const IWebScriptDebugListener*) {
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebScriptDebugServer::detach(void) {
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::removeListener(
+    /* [in] */ const IWebScriptDebugListener*) {
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebScriptDebugServer::statistics(
-    /* [retval][out] */ IWebKitStatistics** statistics) {
-  if (!statistics)
-    return E_POINTER;
-  *statistics = WebKitStatistics::createInstance();
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::step() {
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebScriptDebugServer::webViews(
-    /* [retval][out] */ IEnumVARIANT** enumViews) {
-  if (!enumViews)
-    return E_POINTER;
-  *enumViews = new EnumViews;
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::pause() {
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::resume() {
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::isPaused(
+    /* [out, retval] */ BOOL*) {
   return S_OK;
 }
