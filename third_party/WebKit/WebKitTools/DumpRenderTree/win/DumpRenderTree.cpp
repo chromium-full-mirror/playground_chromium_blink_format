@@ -115,8 +115,6 @@ static LRESULT CALLBACK DumpRenderTreeWndProc(HWND hWnd,
   }
 }
 
-extern "C" BOOL InitializeCoreGraphics();
-
 #ifdef DEBUG_WEBKIT_HAS_SUFFIX
 #define WEBKITDLL TEXT("WebKit_debug.dll")
 #else
@@ -173,9 +171,6 @@ static wstring initialize(HMODULE hModule) {
     for (int i = 0; i < ARRAYSIZE(fontsToInstall); ++i)
       textRenderer->registerPrivateFont(
           wstring(resourcesPath + fontsToInstall[i]).c_str());
-
-  // Initialize CG
-  InitializeCoreGraphics();
 
   // Register a host window
   WNDCLASSEX wcex;
