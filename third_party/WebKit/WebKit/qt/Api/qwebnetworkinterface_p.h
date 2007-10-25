@@ -70,6 +70,7 @@ class QWebNetworkJobPrivate {
   QWebNetworkInterface* interface;
   QWebObjectPluginConnector* connector;
   QWebNetworkJob::JobStatus jobStatus;
+  QString errorString;
 };
 
 class QWebNetworkManager : public QObject {
