@@ -42,7 +42,7 @@ void webkit_init(void) {
   // default location
   gchar* databaseDirectory =
       g_build_filename(g_get_user_data_dir(), "webkit", "databases", NULL);
-  WebCore::DatabaseTracker::setDatabasePath(databaseDirectory);
+  WebCore::DatabaseTracker::tracker().setDatabasePath(databaseDirectory);
   g_free(databaseDirectory);
 }
 }
