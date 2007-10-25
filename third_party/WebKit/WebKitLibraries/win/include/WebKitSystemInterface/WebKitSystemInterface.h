@@ -29,6 +29,8 @@
 struct CGAffineTransform;
 struct CGSize;
 
+typedef const struct __CFData* CFDataRef;
+typedef const struct __CFString* CFStringRef;
 typedef struct CGColor* CGColorRef;
 typedef struct CGContext* CGContextRef;
 typedef unsigned short CGFontIndex;
@@ -50,6 +52,10 @@ void wkGetGlyphAdvances(CGFontRef,
                         CGSize& advance);
 void wkGetGlyphs(CGFontRef, const UChar[], CGGlyph[], size_t count);
 void wkSetUpFontCache(size_t s);
+void wkAddFontsInDirectory(CFStringRef);
+void wkAddFontsAtPath(CFStringRef);
+void wkAddFontsFromPlistRepresentation(CFDataRef);
+CFDataRef wkCreateFontsPlistRepresentation();
 
 void wkDrawFocusRing(CGContextRef, CGColorRef, float radius);
 
