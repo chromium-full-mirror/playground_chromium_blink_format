@@ -58,6 +58,27 @@ TypingCommand::TypingCommand(Document* document,
       m_granularity(granularity),
       m_openedByBackwardDelete(false) {}
 
+void TypingCommand::deleteSelection(Document* document, bool smartDelete) {
+  ASSERT(document);
+
+  Frame* frame = document->frame();
+  ASSERT(frame);
+
+  if (!frame->selectionController()->isRange())
+    return;
+
+  EditCommand* lastEditCommand = frame->editor()->lastEditCommand();
+  if (isOpenForMoreTypingCommand(lastEditCommand)) {
+    static_cast<TypingCommand*>(lastEditCommand)->deleteSelection(smartDelete);
+    return;
+  }
+
+  RefPtr<TypingCommand> typingCommand =
+      new TypingCommand(document, DeleteSelection, "", false);
+  typingCommand->setSmartDelete(smartDelete);
+  typingCommand->apply();
+}
+
 void TypingCommand::deleteKeyPressed(Document* document,
                                      bool smartDelete,
                                      TextGranularity granularity) {
@@ -245,6 +266,9 @@ void TypingCommand::doApply() {
       m_openedByBackwardDelete = true;
 
   switch (m_commandType) {
+    case DeleteSelection:
+      deleteSelection(m_smartDelete);
+      return;
     case DeleteKey:
       deleteKeyPressed(m_granularity);
       return;
@@ -441,7 +465,7 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
     // originally should be selected.
     if (m_openedByBackwardDelete)
       setStartingSelection(selectionAfterUndo);
-    deleteSelection(selectionToDelete, m_smartDelete);
+    CompositeEditCommand::deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();
   }
@@ -528,14 +552,19 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
       document()->frame()->shouldDeleteSelection(selectionToDelete)) {
     // make undo select what was deleted
     setStartingSelection(selectionAfterUndo);
-    deleteSelection(selectionToDelete, m_smartDelete);
+    CompositeEditCommand::deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();
   }
 }
 
+void TypingCommand::deleteSelection(bool smartDelete) {
+  CompositeEditCommand::deleteSelection(smartDelete);
+}
+
 bool TypingCommand::preservesTypingStyle() const {
   switch (m_commandType) {
+    case DeleteSelection:
     case DeleteKey:
     case ForwardDeleteKey:
     case InsertParagraphSeparator:

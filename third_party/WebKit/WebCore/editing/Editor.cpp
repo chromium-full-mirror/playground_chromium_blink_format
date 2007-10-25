@@ -1803,6 +1803,11 @@ void Editor::confirmComposition(const String& text, bool preserveSelection) {
     return;
   }
 
+  // If there is a composition to replace, remove it with a deletion that will
+  // be part of the
+  // same Undo step as the next and previous insertions.
+  TypingCommand::deleteSelection(m_frame->document(), false);
+
   m_compositionNode = 0;
   m_customCompositionUnderlines.clear();
 
@@ -1826,6 +1831,11 @@ void Editor::setComposition(const String& text,
     setIgnoreCompositionSelectionChange(false);
     return;
   }
+
+  // If there is a composition to replace, remove it with a deletion that will
+  // be part of the
+  // same Undo step as the next and previous insertions.
+  TypingCommand::deleteSelection(m_frame->document(), false);
 
   m_compositionNode = 0;
   m_customCompositionUnderlines.clear();
