@@ -25,7 +25,7 @@
 
 #include "config.h"
 #include "WebKitDLL.h"
-#include "WebDebugProgram.h"
+#include "WebScriptDebugServer.h"
 
 #include "WebKitStatistics.h"
 #include "WebView.h"
@@ -103,31 +103,32 @@ class EnumViews : public IEnumVARIANT {
   Vector<IWebView*>::iterator m_current;
 };
 
-// WebDebugProgram ------------------------------------------------------------
+// WebScriptDebugServer
+// ------------------------------------------------------------
 
-WebDebugProgram::WebDebugProgram() : m_refCount(0) {
+WebScriptDebugServer::WebScriptDebugServer() : m_refCount(0) {
   gClassCount++;
 }
 
-WebDebugProgram::~WebDebugProgram() {
+WebScriptDebugServer::~WebScriptDebugServer() {
   gClassCount--;
 }
 
-WebDebugProgram* WebDebugProgram::createInstance() {
-  WebDebugProgram* instance = new WebDebugProgram;
+WebScriptDebugServer* WebScriptDebugServer::createInstance() {
+  WebScriptDebugServer* instance = new WebScriptDebugServer;
   instance->AddRef();
   return instance;
 }
 
 // IUnknown -------------------------------------------------------------------
 
-HRESULT STDMETHODCALLTYPE WebDebugProgram::QueryInterface(REFIID riid,
-                                                          void** ppvObject) {
+HRESULT STDMETHODCALLTYPE
+WebScriptDebugServer::QueryInterface(REFIID riid, void** ppvObject) {
   *ppvObject = 0;
   if (IsEqualGUID(riid, IID_IUnknown))
-    *ppvObject = static_cast<WebDebugProgram*>(this);
-  else if (IsEqualGUID(riid, IID_IWebDebugProgram))
-    *ppvObject = static_cast<WebDebugProgram*>(this);
+    *ppvObject = static_cast<WebScriptDebugServer*>(this);
+  else if (IsEqualGUID(riid, IID_IWebScriptDebugServer))
+    *ppvObject = static_cast<WebScriptDebugServer*>(this);
   else
     return E_NOINTERFACE;
 
@@ -135,11 +136,11 @@ HRESULT STDMETHODCALLTYPE WebDebugProgram::QueryInterface(REFIID riid,
   return S_OK;
 }
 
-ULONG STDMETHODCALLTYPE WebDebugProgram::AddRef(void) {
+ULONG STDMETHODCALLTYPE WebScriptDebugServer::AddRef(void) {
   return ++m_refCount;
 }
 
-ULONG STDMETHODCALLTYPE WebDebugProgram::Release(void) {
+ULONG STDMETHODCALLTYPE WebScriptDebugServer::Release(void) {
   ULONG newRef = --m_refCount;
   if (!newRef)
     delete (this);
@@ -147,11 +148,11 @@ ULONG STDMETHODCALLTYPE WebDebugProgram::Release(void) {
   return newRef;
 }
 
-void WebDebugProgram::viewAdded(IWebView* view) {
+void WebScriptDebugServer::viewAdded(IWebView* view) {
   sViews.append(view);
 }
 
-void WebDebugProgram::viewRemoved(IWebView* view) {
+void WebScriptDebugServer::viewRemoved(IWebView* view) {
   Vector<IWebView*>::iterator end = sViews.end();
   int i = 0;
   for (Vector<IWebView *>::iterator it = sViews.begin(); it != end; ++it, ++i) {
@@ -162,17 +163,18 @@ void WebDebugProgram::viewRemoved(IWebView* view) {
   }
 }
 
-// IWebDebugProgram -----------------------------------------------------------
+// IWebScriptDebugServer
+// -----------------------------------------------------------
 
-HRESULT STDMETHODCALLTYPE WebDebugProgram::attach(void) {
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::attach(void) {
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebDebugProgram::detach(void) {
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::detach(void) {
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebDebugProgram::statistics(
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::statistics(
     /* [retval][out] */ IWebKitStatistics** statistics) {
   if (!statistics)
     return E_POINTER;
@@ -180,7 +182,7 @@ HRESULT STDMETHODCALLTYPE WebDebugProgram::statistics(
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebDebugProgram::webViews(
+HRESULT STDMETHODCALLTYPE WebScriptDebugServer::webViews(
     /* [retval][out] */ IEnumVARIANT** enumViews) {
   if (!enumViews)
     return E_POINTER;
