@@ -32,6 +32,7 @@
 
 #include "NP_jsobject.h"
 #include "c_instance.h"
+#include "JSGlobalObject.h"
 #include "npruntime_impl.h"
 #include "npruntime_priv.h"
 #include "runtime_object.h"
@@ -142,9 +143,8 @@ void convertValueToNPVariant(ExecState* exec,
       RootObject* originRootObject = findRootObject(originInterpreter);
 
       Interpreter* interpreter = 0;
-      if (originInterpreter->isGlobalObject(value)) {
-        interpreter = originInterpreter->interpreterForGlobalObject(value);
-      }
+      if (object->isGlobalObject())
+        interpreter = static_cast<JSGlobalObject*>(object)->interpreter();
 
       if (!interpreter)
         interpreter = originInterpreter;

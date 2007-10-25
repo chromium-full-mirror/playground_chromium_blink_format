@@ -50,7 +50,7 @@ class ExecState;
  */
 class Context {
  public:
-  Context(JSObject* global,
+  Context(JSGlobalObject*,
           Interpreter*,
           JSObject* thisV,
           FunctionBodyNode* currentBody,

@@ -32,13 +32,11 @@ Interpreter* ExecState::lexicalInterpreter() const {
   if (!m_context)
     return dynamicInterpreter();
 
-  Interpreter* result = Interpreter::interpreterWithGlobalObject(
-      m_context->scopeChain().bottom());
+  JSObject* object = m_context->scopeChain().bottom();
+  if (object && object->isGlobalObject())
+    return static_cast<JSGlobalObject*>(object)->interpreter();
 
-  if (!result)
-    return dynamicInterpreter();
-
-  return result;
+  return dynamicInterpreter();
 }
 
 }  // namespace KJS

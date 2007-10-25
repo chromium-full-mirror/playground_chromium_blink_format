@@ -79,13 +79,13 @@ static inline InterpreterMap& interpreterMap() {
   return *map;
 }
 
-Interpreter::Interpreter(JSObject* globalObject)
+Interpreter::Interpreter(JSGlobalObject* globalObject)
     : m_globalExec(this, 0), m_globalObject(globalObject) {
   init();
 }
 
 Interpreter::Interpreter()
-    : m_globalExec(this, 0), m_globalObject(new JSObject()) {
+    : m_globalExec(this, 0), m_globalObject(new JSGlobalObject()) {
   init();
 }
 
@@ -112,7 +112,6 @@ void Interpreter::init() {
     // This is the first interpreter
     s_hook = next = prev = this;
   }
-  interpreterMap().set(m_globalObject, this);
 
   initGlobalObject();
 }
@@ -130,14 +129,15 @@ Interpreter::~Interpreter() {
     // This was the last interpreter
     s_hook = 0;
   }
-  interpreterMap().remove(m_globalObject);
 }
 
-JSObject* Interpreter::globalObject() const {
+JSGlobalObject* Interpreter::globalObject() const {
   return m_globalObject;
 }
 
 void Interpreter::initGlobalObject() {
+  m_globalObject->setInterpreter(this);
+
   // Clear before inititalizing, to avoid marking uninitialized (dangerous) or
   // stale (wasteful) pointers during initialization.
 
@@ -453,7 +453,7 @@ Completion Interpreter::evaluate(const UString& sourceURL,
 
   m_recursion++;
 
-  JSObject* globalObj = m_globalObject;
+  JSGlobalObject* globalObj = m_globalObject;
   JSObject* thisObj = globalObj;
 
   // "this" must be an object... use same rules as Function.prototype.apply()
@@ -684,10 +684,6 @@ void Interpreter::mark() {
     m_TypeErrorPrototype->mark();
   if (m_UriErrorPrototype && !m_UriErrorPrototype->marked())
     m_UriErrorPrototype->mark();
-}
-
-Interpreter* Interpreter::interpreterWithGlobalObject(JSObject* globalObject) {
-  return interpreterMap().get(globalObject);
 }
 
 #ifdef KJS_DEBUG_MEM

@@ -51,7 +51,7 @@ class SVGElement;
 namespace KJS {
 
 /**
- * Base class for all objects in this binding.
+ * Base class for all objects in this binding EXCEPT Window
  */
 class DOMObject : public JSObject {
  protected:
@@ -72,7 +72,7 @@ class DOMObject : public JSObject {
  */
 class ScriptInterpreter : public Interpreter {
  public:
-  ScriptInterpreter(JSObject* global, WebCore::Frame*);
+  ScriptInterpreter(JSGlobalObject*, WebCore::Frame*);
 
   static DOMObject* getDOMObject(void* objectHandle);
   static void putDOMObject(void* objectHandle, DOMObject*);

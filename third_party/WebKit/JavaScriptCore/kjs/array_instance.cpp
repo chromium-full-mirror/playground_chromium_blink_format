@@ -502,7 +502,7 @@ struct CompareWithCompareFunctionArguments {
   ExecState* exec;
   JSObject* compareFunction;
   List arguments;
-  JSObject* globalObject;
+  JSGlobalObject* globalObject;
 };
 
 static CompareWithCompareFunctionArguments*

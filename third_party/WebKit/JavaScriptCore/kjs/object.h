@@ -483,6 +483,7 @@ class JSObject : public JSCell {
   void restoreProperties(const SavedProperties& p) { _prop.restore(p); }
 
   virtual bool isActivation() { return false; }
+  virtual bool isGlobalObject() const { return false; }
 
  protected:
   PropertyMap _prop;
