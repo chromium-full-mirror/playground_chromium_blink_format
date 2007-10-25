@@ -146,6 +146,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
 
 #ifdef USE_QXMLSTREAM
   QXmlStreamReader m_stream;
+  bool m_wroteText;
 #else
   xmlParserCtxtPtr m_context;
 #endif

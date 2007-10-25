@@ -425,7 +425,10 @@ static xmlParserCtxtPtr createStringParser(xmlSAXHandlerPtr handlers,
 XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
     : m_doc(_doc),
       m_view(_view)
-#ifndef USE_QXMLSTREAM
+#ifdef USE_QXMLSTREAM
+      ,
+      m_wroteText(false)
+#else
       ,
       m_context(0)
 #endif
@@ -568,6 +571,7 @@ bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
                   sizeof(UChar) * parseString.length(), 0);
   }
 #else
+  m_wroteText = true;
   QString data(parseString);
   if (!data.isEmpty()) {
     if (!m_sawFirstElement) {
@@ -1260,7 +1264,8 @@ void XMLTokenizer::end() {
     m_context = 0;
   }
 #else
-  if (m_stream.error() == QXmlStreamReader::PrematureEndOfDocumentError) {
+  if (m_stream.error() == QXmlStreamReader::PrematureEndOfDocumentError ||
+      (m_wroteText && !m_sawFirstElement)) {
     handleError(fatal, qPrintable(m_stream.errorString()), lineNumber(),
                 columnNumber());
   }
