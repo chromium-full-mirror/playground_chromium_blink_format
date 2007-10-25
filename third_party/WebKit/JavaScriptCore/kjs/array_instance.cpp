@@ -24,6 +24,7 @@
 #include "config.h"
 #include "array_instance.h"
 
+#include "JSGlobalObject.h"
 #include "PropertyNameArray.h"
 #include <wtf/Assertions.h>
 
