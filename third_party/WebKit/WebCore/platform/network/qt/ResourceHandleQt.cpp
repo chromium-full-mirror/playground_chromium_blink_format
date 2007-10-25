@@ -172,7 +172,8 @@ void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
   }
 
   QWebNetworkManager::self()->add(&handle,
-                                  QWebNetworkInterface::defaultInterface());
+                                  QWebNetworkInterface::defaultInterface(),
+                                  QWebNetworkManager::SynchronousJob);
   syncLoader.waitForCompletion();
   error = syncLoader.resourceError();
   data = syncLoader.data();

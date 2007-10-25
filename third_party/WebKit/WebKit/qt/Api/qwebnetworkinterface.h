@@ -127,10 +127,12 @@ class QWEBKIT_EXPORT QWebNetworkInterface : public QObject {
   virtual void addJob(QWebNetworkJob* job);
   virtual void cancelJob(QWebNetworkJob* job);
 
- signals:
+ protected:
   void started(QWebNetworkJob*);
   void data(QWebNetworkJob*, const QByteArray& data);
   void finished(QWebNetworkJob*, int errorCode);
+
+ signals:
   /**
    * Signal is emitted when an SSL error occurs.
    */
