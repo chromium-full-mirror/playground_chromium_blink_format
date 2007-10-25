@@ -38,6 +38,8 @@ extern "C" {
 void webkit_init(void) {
   WebCore::InitializeLoggingChannelsIfNecessary();
 
+  WebCore::initializeThreading();
+
 #if ENABLE(DATABASE)
   // FIXME: It should be possible for client applications to override this
   // default location
