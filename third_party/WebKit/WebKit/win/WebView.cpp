@@ -1040,7 +1040,9 @@ bool WebView::handleEditingKeyboardEvent(KeyboardEvent* evt) {
     if (frame->editor()->execCommand(command, evt))
       return true;
 
-  if (!evt->keyEvent())
+  if (!evt->keyEvent() || evt->altKey())  // do not treat this as text input if
+                                          // it's a system key event (alt key is
+                                          // down)
     return false;
 
   if (evt->keyEvent()->text().length() == 1) {
@@ -1074,7 +1076,10 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
   // the message parameters to get the character code to construct the
   // PlatformKeyboardEvent.
   if (systemKeyDown) {
-    if (::PeekMessage(&msg, m_viewWindow, WM_SYSCHAR, WM_SYSCHAR, PM_REMOVE))
+    if (::PeekMessage(&msg, m_viewWindow, WM_SYSCHAR, WM_SYSCHAR,
+                      PM_NOREMOVE))  // don't remove sys key message from the
+                                     // windows message queue until we know we
+                                     // can handle it
       m_currentCharacterCode = (UChar)msg.wParam;
   } else if (::PeekMessage(&msg, m_viewWindow, WM_CHAR, WM_CHAR, PM_REMOVE))
     m_currentCharacterCode = (UChar)msg.wParam;
@@ -1092,7 +1097,7 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
   bool handled = frame->eventHandler()->keyEvent(keyEvent);
   m_inIMEKeyDown = false;
   if (handled)
-    return true;
+    goto exit;
 
   // We need to handle back/forward using either Backspace(+Shift) or
   // Ctrl+Left/Right Arrow keys.
@@ -1146,13 +1151,19 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
       direction = ScrollDown;
       break;
     default:
-      // We return true here so the WM_CHAR handler won't pick up unhandled
-      // messages.
-      return true;
+      // We want to let Windows handle the WM_SYSCHAR event if we can't handle
+      // it
+      // We do want to return true for regular key down case so the WM_CHAR
+      // handler won't pick up unhandled messages
+      return !systemKeyDown;
   }
 
   if (!frame->eventHandler()->scrollOverflow(direction, granularity))
     frame->view()->scroll(direction, granularity);
+
+exit:
+  if (systemKeyDown)  // remove sys key message if we have handled it
+    ::PeekMessage(&msg, m_viewWindow, WM_SYSCHAR, WM_SYSCHAR, PM_REMOVE);
 
   return true;
 }
