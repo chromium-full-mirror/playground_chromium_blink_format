@@ -26,6 +26,7 @@
 #include "config.h"
 #include "WebKitDLL.h"
 
+#include "ForEachCoClass.h"
 #include "IWebURLResponse.h"
 #include "ProgIDMacros.h"
 #include "WebKit.h"
@@ -46,20 +47,9 @@ ULONG gLockCount;
 ULONG gClassCount;
 HINSTANCE gInstance;
 
-#define FOR_EACH_CLASS(macro)                                                  \
-  macro(CFDictionaryPropertyBag) macro(WebCache) macro(WebDebugProgram)        \
-      macro(WebDownload) macro(WebError) macro(WebHistory)                     \
-          macro(WebHistoryItem) macro(WebIconDatabase)                         \
-              macro(WebJavaScriptCollector) macro(WebKitStatistics)            \
-                  macro(WebMutableURLRequest) macro(WebNotificationCenter)     \
-                      macro(WebPreferences) macro(WebScrollBar)                \
-                          macro(WebURLCredential) macro(WebURLProtectionSpace) \
-                              macro(WebURLRequest) macro(WebURLResponse)       \
-                                  macro(WebView)
-
 #define CLSID_FOR_CLASS(cls) CLSID_##cls,
-
-static CLSID gRegCLSIDs[] = {FOR_EACH_CLASS(CLSID_FOR_CLASS)};
+static CLSID gRegCLSIDs[] = {FOR_EACH_COCLASS(CLSID_FOR_CLASS)};
+#undef CLSID_FOR_CLASS
 
 void shutDownWebKit() {
   WebCore::iconDatabase()->close();
@@ -157,7 +147,8 @@ STDAPI DllCanUnloadNow(void) {
        TEXT("{########-####-####-####-############}")},  // end of macro
 
 static const int gSlotsPerEntry = 12;
-static LPCTSTR gRegTable[][3] = {FOR_EACH_CLASS(KEYS_FOR_CLASS)};
+static LPCTSTR gRegTable[][3] = {FOR_EACH_COCLASS(KEYS_FOR_CLASS)};
+#undef KEYS_FOR_CLASS
 
 static void substituteGUID(LPTSTR str, const UUID* guid) {
   if (!guid || !str)
