@@ -129,8 +129,6 @@ class FunctionImp : public InternalFunctionImp {
                                JSObject*,
                                const Identifier&,
                                const PropertySlot&);
-
-  void passInParameters(ExecState*, const List&);
 };
 
 class IndexToNameMap {
