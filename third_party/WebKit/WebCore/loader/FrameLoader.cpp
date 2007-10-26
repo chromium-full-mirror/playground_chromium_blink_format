@@ -1667,12 +1667,8 @@ bool FrameLoader::requestObject(RenderPart* renderer,
   HTMLPlugInElement* element =
       static_cast<HTMLPlugInElement*>(renderer->node());
 
-  AtomicString uniqueFrameName = m_frame->tree()->uniqueChildName(frameName);
-  element->setFrameName(uniqueFrameName);
-
   // FIXME: OK to always make a new frame? When does the old frame get removed?
-  return loadSubframe(element, completedURL, uniqueFrameName,
-                      m_outgoingReferrer);
+  return loadSubframe(element, completedURL, frameName, m_outgoingReferrer);
 }
 
 bool FrameLoader::shouldUsePlugin(const KURL& url,

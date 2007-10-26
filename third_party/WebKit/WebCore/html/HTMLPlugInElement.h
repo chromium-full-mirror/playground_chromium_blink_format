@@ -46,8 +46,6 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  virtual void willRemove();
-
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual bool checkDTD(const Node* newChild);
 
@@ -70,8 +68,6 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
   virtual NPObject* getNPObject();
 #endif
 
-  void setFrameName(const AtomicString& frameName) { m_frameName = frameName; }
-
   virtual void defaultEventHandler(Event*);
 
  private:
@@ -87,9 +83,6 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
 #if USE(NPOBJECT)
   NPObject* m_NPObject;
 #endif
-
- private:
-  AtomicString m_frameName;
 };
 
 }  // namespace WebCore
