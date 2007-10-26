@@ -55,8 +55,8 @@ class StringImp : public JSCell {
 
   JSType type() const { return StringType; }
 
-  JSValue* toPrimitive(ExecState* exec,
-                       JSType preferred = UnspecifiedType) const;
+  JSValue* toPrimitive(ExecState*, JSType preferred = UnspecifiedType) const;
+  bool getPrimitiveNumber(ExecState*, double& number) const;
   bool toBoolean(ExecState* exec) const;
   double toNumber(ExecState* exec) const;
   UString toString(ExecState* exec) const;
@@ -75,8 +75,8 @@ class NumberImp : public JSCell {
 
   JSType type() const { return NumberType; }
 
-  JSValue* toPrimitive(ExecState* exec,
-                       JSType preferred = UnspecifiedType) const;
+  JSValue* toPrimitive(ExecState*, JSType preferred = UnspecifiedType) const;
+  bool getPrimitiveNumber(ExecState*, double& number) const;
   bool toBoolean(ExecState* exec) const;
   double toNumber(ExecState* exec) const;
   UString toString(ExecState* exec) const;

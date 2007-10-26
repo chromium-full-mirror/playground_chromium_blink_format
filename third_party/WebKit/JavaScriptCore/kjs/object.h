@@ -85,8 +85,9 @@ class GetterSetterImp : public JSCell {
 
   GetterSetterImp() : getter(0), setter(0) {}
 
-  virtual JSValue* toPrimitive(ExecState* exec,
+  virtual JSValue* toPrimitive(ExecState*,
                                JSType preferred = UnspecifiedType) const;
+  virtual bool getPrimitiveNumber(ExecState*, double& number) const;
   virtual bool toBoolean(ExecState* exec) const;
   virtual double toNumber(ExecState* exec) const;
   virtual UString toString(ExecState* exec) const;
@@ -432,8 +433,9 @@ class JSObject : public JSCell {
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
-  virtual JSValue* toPrimitive(ExecState* exec,
+  virtual JSValue* toPrimitive(ExecState*,
                                JSType preferredType = UnspecifiedType) const;
+  virtual bool getPrimitiveNumber(ExecState*, double& number) const;
   virtual bool toBoolean(ExecState* exec) const;
   virtual double toNumber(ExecState* exec) const;
   virtual UString toString(ExecState* exec) const;
