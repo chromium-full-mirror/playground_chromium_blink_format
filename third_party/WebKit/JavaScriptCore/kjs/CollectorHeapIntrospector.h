@@ -38,7 +38,7 @@ struct CollectorHeap;
 
 class CollectorHeapIntrospector {
  public:
-  static void init(CollectorHeap*);
+  static void init(CollectorHeap*, CollectorHeap*);
   static kern_return_t enumerate(task_t,
                                  void* context,
                                  unsigned typeMask,
@@ -54,7 +54,7 @@ class CollectorHeapIntrospector {
   static void statistics(malloc_zone_t*, malloc_statistics_t*) {}
 
  private:
-  CollectorHeapIntrospector(CollectorHeap*);
+  CollectorHeapIntrospector(CollectorHeap*, CollectorHeap*);
   static size_t size(malloc_zone_t*, const void*) { return 0; }
   static void* zoneMalloc(malloc_zone_t*, size_t) {
     LOG_ERROR("malloc is not supported");
@@ -78,7 +78,8 @@ class CollectorHeapIntrospector {
   static void zoneDestroy(malloc_zone_t*) {}
 
   malloc_zone_t m_zone;
-  CollectorHeap* m_heap;
+  CollectorHeap* m_primaryHeap;
+  CollectorHeap* m_numberHeap;
 };
 }
 

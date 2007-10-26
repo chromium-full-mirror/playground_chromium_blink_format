@@ -82,6 +82,8 @@ class NumberImp : public JSCell {
   UString toString(ExecState* exec) const;
   JSObject* toObject(ExecState* exec) const;
 
+  void* operator new(size_t size) { return Collector::allocateNumber(size); }
+
  private:
   NumberImp(double v) : val(v) {}
 

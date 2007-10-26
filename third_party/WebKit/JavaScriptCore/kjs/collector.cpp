@@ -96,7 +96,8 @@ struct CollectorHeap {
   OperationInProgress operationInProgress;
 };
 
-static CollectorHeap heap = {0, 0, 0, 0, 0, 0, 0, NoOperation};
+static CollectorHeap primaryHeap = {0, 0, 0, 0, 0, 0, 0, NoOperation};
+static CollectorHeap numberHeap = {0, 0, 0, 0, 0, 0, 0, NoOperation};
 
 // FIXME: I don't think this needs to be a static data member of the Collector
 // class.
@@ -180,11 +181,15 @@ void Collector::recordExtraCost(size_t cost) {
   // if a large value survives one garbage collection, there is not much point
   // to
   // collecting more frequently as long as it stays alive.
+  // NOTE: we target the primaryHeap unconditionally as JSNumber doesn't modify
+  // cost
 
-  heap.extraCost += cost;
+  primaryHeap.extraCost += cost;
 }
 
-void* Collector::allocate(size_t s) {
+template <Collector::HeapType heapType>
+void* Collector::heapAllocate(size_t s) {
+  CollectorHeap& heap = heapType == PrimaryHeap ? primaryHeap : numberHeap;
   ASSERT(JSLock::lockCount() > 0);
   ASSERT(JSLock::currentThreadIsHoldingLock());
   ASSERT(s <= CELL_SIZE);
@@ -200,7 +205,8 @@ void* Collector::allocate(size_t s) {
   size_t numLiveObjects = heap.numLiveObjects;
   size_t numLiveObjectsAtLastCollect = heap.numLiveObjectsAtLastCollect;
   size_t numNewObjects = numLiveObjects - numLiveObjectsAtLastCollect;
-  size_t newCost = numNewObjects + heap.extraCost;
+  const size_t newCost =
+      heapType == PrimaryHeap ? numNewObjects + heap.extraCost : numNewObjects;
 
   if (newCost >= ALLOCATIONS_PER_COLLECTION &&
       newCost >= numLiveObjectsAtLastCollect) {
@@ -271,6 +277,14 @@ void* Collector::allocate(size_t s) {
 #endif
 
   return newCell;
+}
+
+void* Collector::allocate(size_t s) {
+  return heapAllocate<PrimaryHeap>(s);
+}
+
+void* Collector::allocateNumber(size_t s) {
+  return heapAllocate<NumberHeap>(s);
 }
 
 static inline void* currentThreadStackBase() {
@@ -417,7 +431,7 @@ void Collector::registerThread() {
   if (!pthread_getspecific(registeredThreadKey)) {
 #if PLATFORM(DARWIN)
     if (onMainThread())
-      CollectorHeapIntrospector::init(&heap);
+      CollectorHeapIntrospector::init(&primaryHeap, &numberHeap);
 #endif
 
     Collector::Thread* thread =
@@ -450,8 +464,10 @@ void Collector::markStackObjectsConservatively(void* start, void* end) {
   char** p = (char**)start;
   char** e = (char**)end;
 
-  size_t usedBlocks = heap.usedBlocks;
-  CollectorBlock** blocks = heap.blocks;
+  size_t usedPrimaryBlocks = primaryHeap.usedBlocks;
+  size_t usedNumberBlocks = numberHeap.usedBlocks;
+  CollectorBlock** primaryBlocks = primaryHeap.blocks;
+  CollectorBlock** numberBlocks = numberHeap.blocks;
 
   const size_t lastCellOffset = sizeof(CollectorCell) * (CELLS_PER_BLOCK - 1);
 
@@ -460,8 +476,21 @@ void Collector::markStackObjectsConservatively(void* start, void* end) {
     if (IS_CELL_ALIGNED(x) && x) {
       uintptr_t offset = reinterpret_cast<uintptr_t>(x) & BLOCK_OFFSET_MASK;
       CollectorBlock* blockAddr = reinterpret_cast<CollectorBlock*>(x - offset);
-      for (size_t block = 0; block < usedBlocks; block++) {
-        if ((blocks[block] == blockAddr) & (offset <= lastCellOffset)) {
+      // Mark the the number heap, we can mark these Cells directly to avoid the
+      // virtual call cost
+      for (size_t block = 0; block < usedNumberBlocks; block++) {
+        if ((numberBlocks[block] == blockAddr) & (offset <= lastCellOffset)) {
+          if (((CollectorCell*)x)->u.freeCell.zeroIfFree != 0)
+            // Don't check whether we need to mark as we're only setting a bit
+            // in this case
+            Collector::markCell(reinterpret_cast<JSCell*>(x));
+          goto endMarkLoop;
+        }
+      }
+
+      // Mark the primary heap
+      for (size_t block = 0; block < usedPrimaryBlocks; block++) {
+        if ((primaryBlocks[block] == blockAddr) & (offset <= lastCellOffset)) {
           if (((CollectorCell*)x)->u.freeCell.zeroIfFree != 0) {
             JSCell* imp = reinterpret_cast<JSCell*>(x);
             if (!imp->marked())
@@ -470,6 +499,7 @@ void Collector::markStackObjectsConservatively(void* start, void* end) {
           break;
         }
       }
+    endMarkLoop:;
     }
   }
 }
@@ -738,10 +768,12 @@ void Collector::markMainThreadOnlyObjects() {
 
   size_t count = 0;
 
-  for (size_t block = 0; block < heap.usedBlocks; block++) {
+  // We don't look at the numberHeap as primitive values can never be marked as
+  // main thread only
+  for (size_t block = 0; block < primaryHeap.usedBlocks; block++) {
     ASSERT(count < mainThreadOnlyObjectCount);
 
-    CollectorBlock* curBlock = heap.blocks[block];
+    CollectorBlock* curBlock = primaryHeap.blocks[block];
     size_t minimumCellsToProcess = curBlock->usedCells;
     for (size_t i = 0; (i < minimumCellsToProcess) & (i < CELLS_PER_BLOCK);
          i++) {
@@ -762,50 +794,12 @@ void Collector::markMainThreadOnlyObjects() {
   }
 }
 
-bool Collector::collect() {
-  ASSERT(JSLock::lockCount() > 0);
-  ASSERT(JSLock::currentThreadIsHoldingLock());
-
-  ASSERT(heap.operationInProgress == NoOperation);
-  if (heap.operationInProgress != NoOperation)
-    abort();
-
-  heap.operationInProgress = Collection;
-
-  bool currentThreadIsMainThread = onMainThread();
-
-// MARK: first mark all referenced objects recursively starting out from the set
-// of root objects
-
-#ifndef NDEBUG
-  // Forbid malloc during the mark phase. Marking a thread suspends it, so
-  // a malloc inside mark() would risk a deadlock with a thread that had been
-  // suspended while holding the malloc lock.
-  fastMallocForbid();
-#endif
-
-  if (Interpreter::s_hook) {
-    Interpreter* scr = Interpreter::s_hook;
-    do {
-      scr->mark();
-      scr = scr->next;
-    } while (scr != Interpreter::s_hook);
-  }
-
-  markStackObjectsConservatively();
-  markProtectedObjects();
-  List::markProtectedLists();
-#if USE(MULTIPLE_THREADS)
-  if (!currentThreadIsMainThread)
-    markMainThreadOnlyObjects();
-#endif
-
-#ifndef NDEBUG
-  fastMallocAllow();
-#endif
-
+template <Collector::HeapType heapType>
+size_t Collector::sweep(bool currentThreadIsMainThread) {
   // SWEEP: delete everything with a zero refcount (garbage) and unmark
   // everything else
+  CollectorHeap& heap =
+      heapType == Collector::PrimaryHeap ? primaryHeap : numberHeap;
 
   size_t emptyBlocks = 0;
   size_t numLiveObjects = heap.numLiveObjects;
@@ -830,14 +824,16 @@ bool Collector::collect() {
             continue;
 
           JSCell* imp = reinterpret_cast<JSCell*>(cell);
-
-          ASSERT(currentThreadIsMainThread ||
-                 !curBlock->collectOnMainThreadOnly.get(i));
-          if (curBlock->collectOnMainThreadOnly.get(i)) {
-            curBlock->collectOnMainThreadOnly.clear(i);
-            --mainThreadOnlyObjectCount;
+          if (heapType != Collector::NumberHeap) {
+            ASSERT(currentThreadIsMainThread ||
+                   !curBlock->collectOnMainThreadOnly.get(i));
+            if (curBlock->collectOnMainThreadOnly.get(i)) {
+              curBlock->collectOnMainThreadOnly.clear(i);
+              --Collector::mainThreadOnlyObjectCount;
+            }
+            imp->~JSCell();
           }
-          imp->~JSCell();
+
           --usedCells;
           --numLiveObjects;
 
@@ -858,13 +854,15 @@ bool Collector::collect() {
         } else {
           if (!curBlock->marked.get(i)) {
             JSCell* imp = reinterpret_cast<JSCell*>(cell);
-            ASSERT(currentThreadIsMainThread ||
-                   !curBlock->collectOnMainThreadOnly.get(i));
-            if (curBlock->collectOnMainThreadOnly.get(i)) {
-              curBlock->collectOnMainThreadOnly.clear(i);
-              --mainThreadOnlyObjectCount;
+            if (heapType != Collector::NumberHeap) {
+              ASSERT(currentThreadIsMainThread ||
+                     !curBlock->collectOnMainThreadOnly.get(i));
+              if (curBlock->collectOnMainThreadOnly.get(i)) {
+                curBlock->collectOnMainThreadOnly.clear(i);
+                --Collector::mainThreadOnlyObjectCount;
+              }
+              imp->~JSCell();
             }
-            imp->~JSCell();
             --usedCells;
             --numLiveObjects;
 
@@ -906,24 +904,75 @@ bool Collector::collect() {
   if (heap.numLiveObjects != numLiveObjects)
     heap.firstBlockWithPossibleSpace = 0;
 
-  bool deleted = heap.numLiveObjects != numLiveObjects;
-
   heap.numLiveObjects = numLiveObjects;
   heap.numLiveObjectsAtLastCollect = numLiveObjects;
   heap.extraCost = 0;
+  return numLiveObjects;
+}
 
-  heap.operationInProgress = NoOperation;
+bool Collector::collect() {
+  ASSERT(JSLock::lockCount() > 0);
+  ASSERT(JSLock::currentThreadIsHoldingLock());
+
+  ASSERT(primaryHeap.operationInProgress == NoOperation |
+         numberHeap.operationInProgress == NoOperation);
+  if (primaryHeap.operationInProgress != NoOperation |
+      numberHeap.operationInProgress != NoOperation)
+    abort();
+
+  primaryHeap.operationInProgress = Collection;
+  numberHeap.operationInProgress = Collection;
+
+  bool currentThreadIsMainThread = onMainThread();
+
+// MARK: first mark all referenced objects recursively starting out from the set
+// of root objects
+
+#ifndef NDEBUG
+  // Forbid malloc during the mark phase. Marking a thread suspends it, so
+  // a malloc inside mark() would risk a deadlock with a thread that had been
+  // suspended while holding the malloc lock.
+  fastMallocForbid();
+#endif
+
+  if (Interpreter::s_hook) {
+    Interpreter* scr = Interpreter::s_hook;
+    do {
+      scr->mark();
+      scr = scr->next;
+    } while (scr != Interpreter::s_hook);
+  }
+
+  markStackObjectsConservatively();
+  markProtectedObjects();
+  List::markProtectedLists();
+#if USE(MULTIPLE_THREADS)
+  if (!currentThreadIsMainThread)
+    markMainThreadOnlyObjects();
+#endif
+
+#ifndef NDEBUG
+  fastMallocAllow();
+#endif
+
+  size_t originalLiveObjects =
+      primaryHeap.numLiveObjects + numberHeap.numLiveObjects;
+  size_t numLiveObjects = sweep<PrimaryHeap>(currentThreadIsMainThread);
+  numLiveObjects += sweep<NumberHeap>(currentThreadIsMainThread);
+
+  primaryHeap.operationInProgress = NoOperation;
+  numberHeap.operationInProgress = NoOperation;
 
   bool newMemoryFull = (numLiveObjects >= KJS_MEM_LIMIT);
   if (newMemoryFull && newMemoryFull != memoryFull)
     reportOutOfMemoryToAllInterpreters();
   memoryFull = newMemoryFull;
 
-  return deleted;
+  return originalLiveObjects < numLiveObjects;
 }
 
 size_t Collector::size() {
-  return heap.numLiveObjects;
+  return primaryHeap.numLiveObjects + numberHeap.numLiveObjects;
 }
 
 size_t Collector::numInterpreters() {
@@ -986,7 +1035,8 @@ HashCountedSet<const char*>* Collector::rootObjectTypeCounts() {
 }
 
 bool Collector::isBusy() {
-  return heap.operationInProgress != NoOperation;
+  return primaryHeap.operationInProgress != NoOperation |
+         numberHeap.operationInProgress != NoOperation;
 }
 
 void Collector::reportOutOfMemoryToAllInterpreters() {
