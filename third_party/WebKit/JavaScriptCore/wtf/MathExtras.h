@@ -81,6 +81,9 @@ inline float roundf(float num) {
 inline bool signbit(double num) {
   return _copysign(1.0, num) < 0;
 }
+inline double trunc(double num) {
+  return num > 0 ? floor(num) : ceil(num);
+}
 
 inline double nextafter(double x, double y) {
   return _nextafter(x, y);

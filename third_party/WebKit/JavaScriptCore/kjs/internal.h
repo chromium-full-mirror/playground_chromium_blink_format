@@ -142,9 +142,6 @@ class DebuggerImp {
   bool isAborted;
 };
 
-// helper function for toInteger, toInt32, toUInt32 and toUInt16
-double roundValue(ExecState*, JSValue*);
-
 #ifndef NDEBUG
 void printInfo(ExecState* exec, const char* s, JSValue*, int lineno = -1);
 #endif
