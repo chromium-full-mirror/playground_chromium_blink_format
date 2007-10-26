@@ -1468,6 +1468,8 @@ class FunctionBodyNode : public BlockNode {
 
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
+  SymbolTable& symbolTable() { return m_symbolTable; }
+
   void addParam(const Identifier& ident) KJS_FAST_CALL;
   size_t numParams() const KJS_FAST_CALL { return m_parameters.size(); }
   Identifier paramName(size_t pos) const KJS_FAST_CALL {
@@ -1476,8 +1478,8 @@ class FunctionBodyNode : public BlockNode {
   UString paramString() const KJS_FAST_CALL;
   Vector<Identifier>& parameters() KJS_FAST_CALL { return m_parameters; }
   ALWAYS_INLINE void processDeclarations(ExecState*);
-  ALWAYS_INLINE void processDeclarationsFunctionCode(ExecState*);
-  ALWAYS_INLINE void processDeclarationsProgramCode(ExecState*);
+  ALWAYS_INLINE void processDeclarationsForFunctionCode(ExecState*);
+  ALWAYS_INLINE void processDeclarationsForProgramCode(ExecState*);
 
  private:
   UString m_sourceURL;
@@ -1486,11 +1488,18 @@ class FunctionBodyNode : public BlockNode {
   void initializeDeclarationStacks(ExecState*);
   bool m_initializedDeclarationStacks;
 
-  // Properties that will go into the ActivationImp's symbol table. (Used for
+  void initializesymbolTable();
+  bool m_initializedSymbolTable;
+
+  // Properties that will go into the ActivationImp's local storage. (Used for
   // initializing the ActivationImp.)
   DeclarationStacks::VarStack m_varStack;
   DeclarationStacks::FunctionStack m_functionStack;
   Vector<Identifier> m_parameters;
+
+  // Mapping from property name -> local storage index. (Used once to transform
+  // the AST, and subsequently for residual slow case lookups.)
+  SymbolTable m_symbolTable;
 };
 
 class FuncExprNode : public Node {

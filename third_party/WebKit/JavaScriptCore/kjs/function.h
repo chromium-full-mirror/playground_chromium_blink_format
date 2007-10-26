@@ -24,6 +24,7 @@
 #ifndef KJS_FUNCTION_H
 #define KJS_FUNCTION_H
 
+#include "SymbolTable.h"
 #include "object.h"
 #include <wtf/OwnPtr.h>
 #include <wtf/Vector.h>
@@ -169,7 +170,33 @@ class Arguments : public JSObject {
 
 class ActivationImp : public JSObject {
  public:
-  ActivationImp(FunctionImp* function, const List& arguments);
+  struct LocalStorageEntry {
+    LocalStorageEntry() {}
+
+    LocalStorageEntry(JSValue* v, int a) : value(v), attributes(a) {}
+
+    JSValue* value;
+    int attributes;
+  };
+
+  typedef Vector<LocalStorageEntry, 32> LocalStorage;
+
+ private:
+  struct ActivationImpPrivate {
+    ActivationImpPrivate(FunctionImp* f, const List& a)
+        : function(f), arguments(a), argumentsObject(0) {
+      ASSERT(f);
+    }
+
+    FunctionImp* function;
+    LocalStorage localStorage;
+
+    List arguments;
+    Arguments* argumentsObject;
+  };
+
+ public:
+  ActivationImp::ActivationImp(FunctionImp* function, const List& arguments);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*,
@@ -185,7 +212,9 @@ class ActivationImp : public JSObject {
 
   bool isActivation() { return true; }
 
-  void releaseArguments() { _arguments.reset(); }
+  void releaseArguments() { d->arguments.reset(); }
+
+  LocalStorage& localStorage() { return d->localStorage; };
 
  private:
   static PropertySlot::GetValueFunc getArgumentsGetter();
@@ -195,9 +224,8 @@ class ActivationImp : public JSObject {
                                   const PropertySlot& slot);
   void createArgumentsObject(ExecState*);
 
-  FunctionImp* _function;
-  List _arguments;
-  mutable Arguments* _argumentsObject;
+  OwnPtr<ActivationImpPrivate> d;
+  SymbolTable* symbolTable;
 };
 
 class GlobalFuncImp : public InternalFunctionImp {
