@@ -56,8 +56,6 @@ LayoutTestController::LayoutTestController(
       m_waitToDump(false),
       m_windowIsKey(true) {}
 
-LayoutTestController::~LayoutTestController() {}
-
 // Static Functions
 
 static JSValueRef dumpAsTextCallback(JSContextRef context,
