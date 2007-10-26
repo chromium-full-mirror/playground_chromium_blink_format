@@ -24,7 +24,7 @@
 #include "config.h"
 #include "collector.h"
 
-#include "context.h"
+#include "ExecState.h"
 #include "internal.h"
 #include "list.h"
 #include "value.h"
