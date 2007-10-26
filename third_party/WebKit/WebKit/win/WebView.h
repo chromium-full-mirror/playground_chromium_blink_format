@@ -32,6 +32,7 @@
 #include "IWebView.h"
 #include "IWebViewPrivate.h"
 #include "WebFrame.h"
+#include "WebPreferences.h"
 
 #include <WebCore/IntRect.h>
 #include <WebCore/Timer.h>
@@ -633,9 +634,6 @@ class WebView : public IWebView,
   bool execCommand(WPARAM wParam, LPARAM lParam);
   bool keyDown(WPARAM, LPARAM, bool systemKeyDown = false);
   bool keyUp(WPARAM, LPARAM);
-  HRESULT updateWebCoreSettingsFromPreferences(IWebPreferences* preferences);
-  static HRESULT updateGlobalSettingsFromPreferences(IWebPreferences*);
-  HRESULT updateSettingsFromPreferences(IWebPreferences*);
   bool inResizer(LPARAM lParam);
   void paint(HDC, LPARAM);
   void paintIntoBackingStore(WebCore::FrameView*,
@@ -695,8 +693,15 @@ class WebView : public IWebView,
   void setToolTip(const WebCore::String&);
 
   void registerForIconNotification(bool listen);
-  HRESULT notifyDidAddIcon(IWebNotification*);
   void dispatchDidReceiveIconFromWebFrame(WebFrame*);
+
+  HRESULT notifyDidAddIcon(IWebNotification*);
+  HRESULT notifyPreferencesChanged(IWebNotification*);
+
+  static void setCacheModel(WebCacheModel);
+  static WebCacheModel cacheModel();
+  static bool didSetCacheModel();
+  static WebCacheModel maxCacheModelInAnyInstance();
 
  protected:
   HIMC getIMMContext();
@@ -704,7 +709,6 @@ class WebView : public IWebView,
   static bool allowSiteSpecificHacks() { return s_allowSiteSpecificHacks; }
   void preflightSpellChecker();
   bool continuousCheckingAllowed();
-  void initializeCacheSizesIfNecessary();
   void initializeToolTipWindow();
   void closeWindowTimerFired(WebCore::Timer<WebView>*);
   void prepareCandidateWindow(WebCore::Frame*, HIMC);
@@ -712,6 +716,10 @@ class WebView : public IWebView,
   bool onIMERequestCharPosition(WebCore::Frame*, IMECHARPOSITION*, LRESULT*);
   bool onIMERequestReconvertString(WebCore::Frame*, RECONVERTSTRING*, LRESULT*);
   bool developerExtrasEnabled() const;
+
+  // AllWebViewSet functions
+  void addToAllWebViewsSet();
+  void removeFromAllWebViewsSet();
 
   ULONG m_refCount;
   WebCore::String m_groupName;
@@ -731,9 +739,9 @@ class WebView : public IWebView,
   COMPtr<IWebUIDelegatePrivate> m_uiDelegatePrivate;
   COMPtr<IWebFormDelegate> m_formDelegate;
   COMPtr<IWebPolicyDelegate> m_policyDelegate;
-  COMPtr<IWebPreferences> m_preferences;
   COMPtr<IWebResourceLoadDelegate> m_resourceLoadDelegate;
   COMPtr<IWebDownloadDelegate> m_downloadDelegate;
+  COMPtr<WebPreferences> m_preferences;
   bool m_userAgentOverridden;
   bool m_useBackForwardList;
   WebCore::String m_userAgentCustom;

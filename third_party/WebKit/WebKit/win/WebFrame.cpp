@@ -2452,7 +2452,27 @@ void WebFrame::windowObjectCleared() const {
   }
 }
 
-void WebFrame::didPerformFirstNavigation() const {}
+void WebFrame::didPerformFirstNavigation() const {
+  COMPtr<IWebPreferences> preferences;
+  if (FAILED(d->webView->preferences(&preferences)))
+    return;
+
+  COMPtr<IWebPreferencesPrivate> preferencesPrivate(Query, preferences);
+  if (!preferencesPrivate)
+    return;
+  BOOL automaticallyDetectsCacheModel;
+  if (FAILED(preferencesPrivate->automaticallyDetectsCacheModel(
+          &automaticallyDetectsCacheModel)))
+    return;
+
+  WebCacheModel cacheModel;
+  if (FAILED(preferences->cacheModel(&cacheModel)))
+    return;
+
+  if (automaticallyDetectsCacheModel &&
+      cacheModel < WebCacheModelDocumentBrowser)
+    preferences->setCacheModel(WebCacheModelDocumentBrowser);
+}
 
 void WebFrame::registerForIconNotification(bool listen) {
   d->webView->registerForIconNotification(listen);

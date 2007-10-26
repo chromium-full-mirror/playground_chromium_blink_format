@@ -27,6 +27,7 @@
 #include "WebKit.h"
 #include "WebKitDLL.h"
 #include "WebPreferences.h"
+#include "WebKit.h"
 
 #include "WebNotificationCenter.h"
 #include "WebPreferenceKeysPrivate.h"
@@ -52,14 +53,6 @@
 
 using namespace WebCore;
 
-static unsigned long long WebSystemMainMemory() {
-  MEMORYSTATUSEX statex;
-
-  statex.dwLength = sizeof(statex);
-  GlobalMemoryStatusEx(&statex);
-  return statex.ullTotalPhys;
-}
-
 static String preferencesPath() {
   static String path = pathByAppendingComponent(
       roamingUserSpecificStorageDirectory(), "WebKitPreferences.plist");
@@ -79,13 +72,16 @@ WebPreferences* WebPreferences::sharedStandardPreferences() {
     standardPreferences = WebPreferences::createInstance();
     standardPreferences->load();
     standardPreferences->setAutosaves(TRUE);
-    standardPreferences->postPreferencesChangesNotification();
   }
 
   return standardPreferences;
 }
 
-WebPreferences::WebPreferences() : m_refCount(0), m_autoSaves(0) {
+WebPreferences::WebPreferences()
+    : m_refCount(0),
+      m_autoSaves(0),
+      m_automaticallyDetectsCacheModel(true),
+      m_numWebViews(0) {
   gClassCount++;
 }
 
@@ -141,38 +137,6 @@ void WebPreferences::initializeDefaultSettings() {
   CFMutableDictionaryRef defaults = CFDictionaryCreateMutable(
       0, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
-  // As a fudge factor, use 1000 instead of 1024, in case the reported memory
-  // doesn't align exactly to a megabyte boundary.
-  unsigned long long memSize = WebSystemMainMemory() / 1024 / 1000;
-
-  // Page cache size (in pages)
-  int pageCacheSize;
-  if (memSize >= 1024)
-    pageCacheSize = 10;
-  else if (memSize >= 512)
-    pageCacheSize = 5;
-  else if (memSize >= 384)
-    pageCacheSize = 4;
-  else if (memSize >= 256)
-    pageCacheSize = 3;
-  else if (memSize >= 128)
-    pageCacheSize = 2;
-  else if (memSize >= 64)
-    pageCacheSize = 1;
-  else
-    pageCacheSize = 0;
-
-  // Object cache size (in bytes)
-  int objectCacheSize;
-  if (memSize >= 2048)
-    objectCacheSize = 128 * 1024 * 1024;
-  else if (memSize >= 1024)
-    objectCacheSize = 64 * 1024 * 1024;
-  else if (memSize >= 512)
-    objectCacheSize = 32 * 1024 * 1024;
-  else
-    objectCacheSize = 24 * 1024 * 1024;
-
   CFDictionaryAddValue(defaults, CFSTR(WebKitStandardFontPreferenceKey),
                        CFSTR("Times New Roman"));
   CFDictionaryAddValue(defaults, CFSTR(WebKitFixedFontPreferenceKey),
@@ -198,16 +162,6 @@ void WebPreferences::initializeDefaultSettings() {
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitDefaultTextEncodingNamePreferenceKey),
                        defaultDefaultEncoding.createCFString());
-
-  RetainPtr<CFStringRef> pageCacheSizeString(
-      AdoptCF, CFStringCreateWithFormat(0, 0, CFSTR("%d"), pageCacheSize));
-  CFDictionaryAddValue(defaults, CFSTR(WebKitPageCacheSizePreferenceKey),
-                       pageCacheSizeString.get());
-
-  RetainPtr<CFStringRef> objectCacheSizeString(
-      AdoptCF, CFStringCreateWithFormat(0, 0, CFSTR("%d"), objectCacheSize));
-  CFDictionaryAddValue(defaults, CFSTR(WebKitObjectCacheSizePreferenceKey),
-                       objectCacheSizeString.get());
 
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitUserStyleSheetEnabledPreferenceKey),
@@ -282,6 +236,12 @@ void WebPreferences::initializeDefaultSettings() {
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitUsesPageCachePreferenceKey),
                        kCFBooleanTrue);
+
+  RetainPtr<CFStringRef> cacheModelRef(
+      AdoptCF,
+      CFStringCreateWithFormat(0, 0, CFSTR("%d"), WebCacheModelDocumentViewer));
+  CFDictionaryAddValue(defaults, CFSTR(WebKitCacheModelPreferenceKey),
+                       cacheModelRef.get());
 
   s_defaultSettings = defaults;
 }
@@ -380,12 +340,6 @@ void WebPreferences::setStringValue(CFStringRef key, LPCTSTR value) {
   postPreferencesChangesNotification();
 }
 
-BSTR WebPreferences::webPreferencesChangedNotification() {
-  static BSTR webPreferencesChangedNotification =
-      SysAllocString(WebPreferencesChangedNotification);
-  return webPreferencesChangedNotification;
-}
-
 void WebPreferences::setIntegerValue(CFStringRef key, int value) {
   if (integerValueForKey(key) == value)
     return;
@@ -411,6 +365,17 @@ void WebPreferences::setBoolValue(CFStringRef key, BOOL value) {
   postPreferencesChangesNotification();
 }
 
+BSTR WebPreferences::webPreferencesChangedNotification() {
+  static BSTR webPreferencesChangedNotification =
+      SysAllocString(WebPreferencesChangedNotification);
+  return webPreferencesChangedNotification;
+}
+
+BSTR WebPreferences::webPreferencesRemovedNotification() {
+  static BSTR webPreferencesRemovedNotification =
+      SysAllocString(WebPreferencesRemovedNotification);
+  return webPreferencesRemovedNotification;
+}
 void WebPreferences::save() {
   RetainPtr<CFWriteStreamRef> stream(
       AdoptCF, CFWriteStreamCreateWithAllocatedBuffers(kCFAllocatorDefault,
@@ -584,6 +549,8 @@ HRESULT STDMETHODCALLTYPE WebPreferences::initWithIdentifier(
     m_identifier = anIdentifier;
     setInstance(this, m_identifier);
   }
+
+  this->postPreferencesChangesNotification();
 
   return S_OK;
 }
@@ -935,14 +902,14 @@ HRESULT WebPreferences::setHistoryAgeInDaysLimit(int limit) {
   return S_OK;
 }
 
-HRESULT WebPreferences::pageCacheSize(unsigned int* limit) {
-  *limit = integerValueForKey(CFSTR(WebKitPageCacheSizePreferenceKey));
-  return S_OK;
+HRESULT WebPreferences::unused1() {
+  ASSERT_NOT_REACHED();
+  return E_FAIL;
 }
 
-HRESULT WebPreferences::objectCacheSize(unsigned int* limit) {
-  *limit = integerValueForKey(CFSTR(WebKitObjectCacheSizePreferenceKey));
-  return S_OK;
+HRESULT WebPreferences::unused2() {
+  ASSERT_NOT_REACHED();
+  return E_FAIL;
 }
 
 HRESULT WebPreferences::iconDatabaseLocation(
@@ -1067,6 +1034,20 @@ HRESULT WebPreferences::setDOMPasteAllowed(BOOL enabled) {
   return S_OK;
 }
 
+HRESULT WebPreferences::cacheModel(WebCacheModel* cacheModel) {
+  if (!cacheModel)
+    return E_POINTER;
+
+  *cacheModel =
+      (WebCacheModel)integerValueForKey(CFSTR(WebKitCacheModelPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::setCacheModel(WebCacheModel cacheModel) {
+  setIntegerValue(CFSTR(WebKitCacheModelPreferenceKey), cacheModel);
+  return S_OK;
+}
+
 HRESULT WebPreferences::setDeveloperExtrasEnabled(BOOL enabled) {
   setBoolValue(CFSTR(WebKitDeveloperExtrasEnabledPreferenceKey), enabled);
   return S_OK;
@@ -1082,4 +1063,32 @@ HRESULT WebPreferences::developerExtrasEnabled(BOOL* enabled) {
 
 bool WebPreferences::developerExtrasDisabledByOverride() {
   return !!boolValueForKey(CFSTR(DisableWebKitDeveloperExtrasPreferenceKey));
+}
+
+HRESULT WebPreferences::setAutomaticallyDetectsCacheModel(
+    BOOL automaticallyDetectsCacheModel) {
+  m_automaticallyDetectsCacheModel = !!automaticallyDetectsCacheModel;
+  return S_OK;
+}
+
+HRESULT WebPreferences::automaticallyDetectsCacheModel(
+    BOOL* automaticallyDetectsCacheModel) {
+  if (!automaticallyDetectsCacheModel)
+    return E_POINTER;
+
+  *automaticallyDetectsCacheModel = m_automaticallyDetectsCacheModel;
+  return S_OK;
+}
+
+void WebPreferences::willAddToWebView() {
+  ++m_numWebViews;
+}
+
+void WebPreferences::didRemoveFromWebView() {
+  ASSERT(m_numWebViews);
+  if (--m_numWebViews == 0) {
+    IWebNotificationCenter* nc = WebNotificationCenter::defaultCenterInternal();
+    nc->postNotificationName(webPreferencesRemovedNotification(),
+                             static_cast<IWebPreferences*>(this), 0);
+  }
 }
