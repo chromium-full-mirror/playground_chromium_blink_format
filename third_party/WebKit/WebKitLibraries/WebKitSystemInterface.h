@@ -105,6 +105,8 @@ CFReadStreamRef WKCreateCustomCFReadStream(
     void (*formUnschedule)(CFReadStreamRef, CFRunLoopRef, CFStringRef, void*),
     void* context);
 
+void WKDrawCapsLockIndicator(CGContextRef, CGRect);
+
 void WKDrawFocusRing(CGContextRef context,
                      CGRect clipRect,
                      CGColorRef color,
