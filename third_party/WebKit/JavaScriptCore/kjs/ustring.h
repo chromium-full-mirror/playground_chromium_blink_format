@@ -154,6 +154,11 @@ class UString {
         _hash = computeHash(data(), len);
       return _hash;
     }
+    unsigned computedHash() const {
+      ASSERT(_hash);
+      return _hash;
+    }  // fast path for Identifiers
+
     static unsigned computeHash(const UChar*, int length);
     static unsigned computeHash(const char*);
 
