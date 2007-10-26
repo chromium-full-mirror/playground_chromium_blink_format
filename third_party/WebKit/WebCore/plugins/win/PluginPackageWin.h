@@ -50,6 +50,7 @@ class PluginPackageWin : public Shared<PluginPackageWin> {
   String description() const { return m_description; }
   String fileName() const { return m_fileName; }
   String parentDirectory() const { return m_parentDirectory; }
+  void getFileVersion(DWORD& mostSignificant, DWORD& leastSignificant) const;
 
   const MIMEToDescriptionsMap& mimeToDescriptions() const {
     return m_mimeToDescriptions;
@@ -70,9 +71,13 @@ class PluginPackageWin : public Shared<PluginPackageWin> {
  private:
   PluginPackageWin(const String& path, const FILETIME& lastModified);
   bool fetchInfo();
+  void storeFileVersion(LPVOID versionInfoData);
 
   bool m_isLoaded;
   int m_loadCount;
+
+  DWORD m_fileVersionMS;
+  DWORD m_fileVersionLS;
 
   String m_description;
   String m_path;
