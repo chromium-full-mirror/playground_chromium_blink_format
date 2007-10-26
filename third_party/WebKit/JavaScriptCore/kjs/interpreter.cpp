@@ -81,12 +81,16 @@ static inline InterpreterMap& interpreterMap() {
 }
 
 Interpreter::Interpreter(JSGlobalObject* globalObject)
-    : m_globalExec(this, 0), m_globalObject(globalObject) {
+    : m_currentExec(0),
+      m_globalObject(globalObject),
+      m_globalExec(this, globalObject, globalObject, 0) {
   init();
 }
 
 Interpreter::Interpreter()
-    : m_globalExec(this, 0), m_globalObject(new JSGlobalObject()) {
+    : m_currentExec(0),
+      m_globalObject(new JSGlobalObject()),
+      m_globalExec(this, m_globalObject, m_globalObject, 0) {
   init();
 }
 
@@ -97,7 +101,6 @@ void Interpreter::init() {
   m_timeoutTime = 0;
   m_recursion = 0;
   m_debugger = 0;
-  m_context = 0;
 
   resetTimeoutCheck();
   m_timeoutCheckCount = 0;
@@ -468,9 +471,7 @@ Completion Interpreter::evaluate(const UString& sourceURL,
     res = Completion(Throw, m_globalExec.exception());
   else {
     // execute the code
-    Context ctx(globalObj, this, thisObj, progNode.get());
-    ExecState newExec(this, &ctx);
-    ctx.setExecState(&newExec);
+    ExecState newExec(this, globalObj, thisObj, progNode.get());
     res = progNode->execute(&newExec);
   }
 
@@ -613,8 +614,8 @@ JSObject* Interpreter::builtinURIErrorPrototype() const {
 }
 
 void Interpreter::mark() {
-  if (m_context)
-    m_context->mark();
+  if (m_currentExec)
+    m_currentExec->mark();
 
   if (m_globalExec.exception() && !m_globalExec.exception()->marked())
     m_globalExec.exception()->mark();
