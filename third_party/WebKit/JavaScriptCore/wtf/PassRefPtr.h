@@ -23,6 +23,8 @@
 #ifndef WTF_PassRefPtr_h
 #define WTF_PassRefPtr_h
 
+#include "AlwaysInline.h"
+
 namespace WTF {
 
 template <typename T>
@@ -49,7 +51,7 @@ class PassRefPtr {
   template <typename U>
   PassRefPtr(const PassRefPtr<U>& o) : m_ptr(o.releaseRef()) {}
 
-  ~PassRefPtr() {
+  ALWAYS_INLINE ~PassRefPtr() {
     if (T* ptr = m_ptr)
       ptr->deref();
   }

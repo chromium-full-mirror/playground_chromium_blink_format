@@ -24,6 +24,7 @@
 #define WTF_RefPtr_h
 
 #include <algorithm>
+#include "AlwaysInline.h"
 
 namespace WTF {
 
@@ -66,7 +67,7 @@ class RefPtr {
   }
 
   T& operator*() const { return *m_ptr; }
-  T* operator->() const { return m_ptr; }
+  ALWAYS_INLINE T* operator->() const { return m_ptr; }
 
   bool operator!() const { return !m_ptr; }
 
