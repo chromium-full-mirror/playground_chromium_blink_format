@@ -55,8 +55,6 @@ LayoutTestController::LayoutTestController(WebCore::DumpRenderTree* drt)
   reset();
 }
 
-LayoutTestController::~LayoutTestController() {}
-
 void LayoutTestController::reset() {
   m_isLoading = true;
   m_textDump = false;
