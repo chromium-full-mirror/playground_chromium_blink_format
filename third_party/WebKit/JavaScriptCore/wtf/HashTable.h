@@ -596,13 +596,19 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::lookup(
 #endif
 
   ValueType* table = m_table;
-  ValueType* entry;
   ValueType* deletedEntry = 0;
-  while (!isEmptyBucket(*(entry = table + i))) {
+
+  while (1) {
+    ValueType* entry = table + i;
+
+    if (isEmptyBucket(*entry))
+      return makeLookupResult(deletedEntry ? deletedEntry : entry, false, h);
+
     if (isDeletedBucket(*entry))
       deletedEntry = entry;
     else if (HashTranslator::equal(Extractor::extract(*entry), key))
       return makeLookupResult(entry, true, h);
+
 #if DUMP_HASHTABLE_STATS
     ++probeCount;
     HashTableStats::recordCollisionAtCount(probeCount);
@@ -611,8 +617,6 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::lookup(
       k = 1 | (h % sizeMask);
     i = (i + k) & sizeMask;
   }
-
-  return makeLookupResult(deletedEntry ? deletedEntry : entry, false, h);
 }
 
 template <typename Key,
