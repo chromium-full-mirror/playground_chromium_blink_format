@@ -1558,6 +1558,9 @@ static void balancedWarningHandler(void* closure, const char* message, ...) {
 bool parseXMLDocumentFragment(const String& string,
                               DocumentFragment* fragment,
                               Element* parent) {
+  if (!string.length())
+    return true;
+
   XMLTokenizer tokenizer(fragment, parent);
 
 #ifndef USE_QXMLSTREAM
