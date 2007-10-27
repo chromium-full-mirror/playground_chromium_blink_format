@@ -50,10 +50,12 @@ LayoutState::LayoutState(LayoutState* prev,
     m_offset = prev->m_offset + offset;
 
   if (renderer->isRelPositioned()) {
-    int relX = 0;
-    int relY = 0;
-    renderer->layer()->relativePositionOffset(relX, relY);
-    m_offset += IntSize(relX, relY);
+    if (renderer->hasLayer()) {
+      int relX = 0;
+      int relY = 0;
+      renderer->layer()->relativePositionOffset(relX, relY);
+      m_offset += IntSize(relX, relY);
+    }
   } else if (renderer->isPositioned() && !fixed) {
     if (RenderObject* container = renderer->container())
       m_offset += renderer->offsetForPositionedInContainer(container);
