@@ -194,6 +194,8 @@ void RenderLayer::updateLayerPositions(bool doFullRepaint,
 
   updateVisibilityStatus();
 
+  updateTransform();
+
   if (m_hasVisibleContent) {
     RenderView* view = m_object->view();
     ASSERT(view);
@@ -229,8 +231,6 @@ void RenderLayer::updateLayerPositions(bool doFullRepaint,
   // With all our children positioned, now update our marquee if we need to.
   if (m_marquee)
     m_marquee->updateMarqueePosition();
-
-  updateTransform();
 }
 
 void RenderLayer::updateTransform() {
