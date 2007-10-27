@@ -61,9 +61,6 @@ class SVGResourceFilter : public SVGResource {
   SVGResourceFilter();
   virtual ~SVGResourceFilter();
 
-  static SVGFilterEffect* createFilterEffect(const SVGFilterEffectType&,
-                                             SVGResourceFilter*);
-
   virtual SVGResourceType resourceType() const { return FilterResourceType; }
 
   bool filterBoundingBoxMode() const { return m_filterBBoxMode; }
@@ -101,6 +98,8 @@ class SVGResourceFilter : public SVGResource {
 #endif
 
  private:
+// FIXME: This should be pulled out of this header and into platform-specific
+// static methods and private data
 #if PLATFORM(CI)
   NSArray* getCIFilterStack(CIImage* inputImage, const FloatRect& bbox);
 

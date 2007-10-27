@@ -43,12 +43,6 @@ void SVGResourceFilter::prepareFilter(GraphicsContext*&, const FloatRect&) {
 void SVGResourceFilter::applyFilter(GraphicsContext*&, const FloatRect&) {
   notImplemented();
 }
-
-SVGFilterEffect* SVGResourceFilter::createFilterEffect(
-    const SVGFilterEffectType&,
-    SVGResourceFilter*) {
-  return NULL;
-}
 }
 
 #endif  // ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)

@@ -80,10 +80,7 @@ void SVGFEOffsetElement::parseMappedAttribute(MappedAttribute* attr) {
 
 SVGFEOffset* SVGFEOffsetElement::filterEffect(SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = static_cast<SVGFEOffset*>(
-        SVGResourceFilter::createFilterEffect(FE_OFFSET, filter));
-  if (!m_filterEffect)
-    return 0;
+    m_filterEffect = new SVGFEOffset(filter);
 
   m_filterEffect->setIn(in1());
   m_filterEffect->setDx(dx());

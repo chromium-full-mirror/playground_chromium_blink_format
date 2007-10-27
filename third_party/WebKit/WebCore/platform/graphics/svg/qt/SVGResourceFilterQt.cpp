@@ -30,13 +30,6 @@ SVGResourceFilter::SVGResourceFilter() {}
 
 SVGResourceFilter::~SVGResourceFilter() {}
 
-SVGFilterEffect* SVGResourceFilter::createFilterEffect(
-    const SVGFilterEffectType&,
-    SVGResourceFilter*) {
-  // FIXME: implement me :-)
-  return 0;
-}
-
 void SVGResourceFilter::prepareFilter(GraphicsContext*&, const FloatRect&) {
   // FIXME: implement me :-)
 }
