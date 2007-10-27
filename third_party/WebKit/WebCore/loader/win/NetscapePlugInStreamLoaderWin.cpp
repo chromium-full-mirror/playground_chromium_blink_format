@@ -72,7 +72,8 @@ void NetscapePlugInStreamLoader::didReceiveResponse(
   if (!m_client)
     return;
 
-  if (response.httpStatusCode() < 100 || response.httpStatusCode() >= 400)
+  if (response.isHTTP() &&
+      (response.httpStatusCode() < 100 || response.httpStatusCode() >= 400))
     didCancel(frameLoader()->fileDoesNotExistError(response));
 }
 
