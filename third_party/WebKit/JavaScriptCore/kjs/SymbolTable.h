@@ -61,4 +61,4 @@ class SymbolTable : private PropertyMap {
 
 }  // namespace KJS
 
-#endif SymbolTable_h
+#endif  // SymbolTable_h
