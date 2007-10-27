@@ -33,7 +33,8 @@
 #include "JSStringRef.h"
 
 JSStringRef JSStringCreateWithBSTR(BSTR string) {
-  return JSStringCreateWithCharacters(string, SysStringLen(string));
+  return JSStringCreateWithCharacters(string ? string : L"",
+                                      string ? SysStringLen(string) : 0);
 }
 
 BSTR JSStringCopyBSTR(const JSStringRef string) {
