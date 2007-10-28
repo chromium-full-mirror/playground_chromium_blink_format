@@ -231,6 +231,14 @@ class ScrollView : public Widget {
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
 #endif
+#if PLATFORM(WX)
+  ScrollView();
+  ~ScrollView();
+
+ private:
+  class ScrollViewPrivate;
+  ScrollViewPrivate* m_data;
+#endif
 };
 
 }  // namespace WebCore

@@ -38,6 +38,8 @@ typedef struct HMENU__* HMENU;
 class QMenu;
 #elif PLATFORM(GTK)
 typedef struct _GtkMenu GtkMenu;
+#elif PLATFORM(WX)
+class wxMenu;
 #endif
 
 namespace WebCore {
@@ -50,6 +52,8 @@ typedef HMENU PlatformMenuDescription;
 typedef QMenu* PlatformMenuDescription;
 #elif PLATFORM(GTK)
 typedef GtkMenu* PlatformMenuDescription;
+#elif PLATFORM(WX)
+typedef wxMenu* PlatformMenuDescription;
 #endif
 
 }  // namespace

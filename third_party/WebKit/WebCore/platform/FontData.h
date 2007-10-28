@@ -101,6 +101,10 @@ class FontData : Noncopyable {
   void setFont(cairo_t*) const;
 #endif
 
+#if PLATFORM(WX)
+  wxFont* getWxFont() const { return m_font.font(); }
+#endif
+
  private:
   void platformInit();
   void platformDestroy();

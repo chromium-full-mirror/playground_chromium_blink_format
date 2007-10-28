@@ -57,6 +57,10 @@ typedef struct _GdkEventMotion GdkEventMotion;
 class QMouseEvent;
 #endif
 
+#if PLATFORM(WX)
+class wxMouseEvent;
+#endif
+
 namespace WebCore {
 
 // These button numbers match the ones used in the DOM API, 0 through 2, except
@@ -136,6 +140,10 @@ class PlatformMouseEvent {
 #endif
 #if PLATFORM(QT)
   PlatformMouseEvent(QMouseEvent*, int clickCount);
+#endif
+
+#if PLATFORM(WX)
+  PlatformMouseEvent(const wxMouseEvent&, const wxPoint& globalPoint);
 #endif
 
  private:

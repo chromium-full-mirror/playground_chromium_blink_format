@@ -44,6 +44,8 @@ typedef struct tagMENUITEMINFOW* LPMENUITEMINFO;
 typedef struct _GtkMenuItem GtkMenuItem;
 #elif PLATFORM(QT)
 #include <QAction>
+#elif PLATFORM(WX)
+class wxMenuItem;
 #endif
 
 namespace WebCore {
@@ -141,6 +143,8 @@ struct PlatformMenuItemDescriptionType {
 typedef PlatformMenuItemDescriptionType* PlatformMenuItemDescription;
 #elif PLATFORM(GTK)
 typedef GtkMenuItem* PlatformMenuItemDescription;
+#elif PLATFORM(WX)
+typedef wxMenuItem* PlatformMenuItemDescription;
 #endif
 
 class ContextMenuItem {

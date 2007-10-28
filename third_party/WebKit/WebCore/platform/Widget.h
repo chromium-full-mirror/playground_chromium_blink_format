@@ -51,6 +51,10 @@ class QWidget;
 class QWebFrame;
 #endif
 
+#if PLATFORM(WX)
+class wxScrolledWindow;
+#endif
+
 namespace WebCore {
 
 class Cursor;
@@ -196,6 +200,12 @@ class Widget {
   void addToSuperview(NSView* superview);
   void removeFromSuperview();
   IntPoint convertToScreenCoordinate(NSView*, const IntPoint&);
+#endif
+
+#if PLATFORM(WX)
+  Widget(wxScrolledWindow*);
+  wxScrolledWindow* nativeWindow() const;
+  void setNativeWindow(wxScrolledWindow*);
 #endif
 
  private:
