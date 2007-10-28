@@ -146,6 +146,8 @@ class RenderTheme {
 
   void platformColorsDidChange();
 
+  virtual double caretBlinkFrequency() const { return 0.5; }
+
   // System fonts.
   virtual void systemFont(int propId, FontDescription&) const = 0;
 
