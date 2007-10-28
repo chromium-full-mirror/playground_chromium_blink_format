@@ -82,10 +82,13 @@ struct QNameHash {
                                  name->m_namespace.impl()};
     return hashComponents(c);
   }
+
   static bool equal(const QualifiedName::QualifiedNameImpl* a,
                     const QualifiedName::QualifiedNameImpl* b) {
     return a == b;
   }
+
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 typedef HashSet<QualifiedName::QualifiedNameImpl*, QNameHash> QNameSet;

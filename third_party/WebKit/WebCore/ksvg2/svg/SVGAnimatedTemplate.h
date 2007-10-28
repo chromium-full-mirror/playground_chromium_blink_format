@@ -72,6 +72,8 @@ struct SVGAnimatedTypeWrapperKeyHash {
                     const SVGAnimatedTypeWrapperKey& b) {
     return a == b;
   }
+
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
 struct SVGAnimatedTypeWrapperKeyHashTraits

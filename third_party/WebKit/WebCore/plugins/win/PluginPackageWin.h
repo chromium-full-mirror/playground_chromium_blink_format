@@ -116,6 +116,7 @@ struct PluginPackageWinHash {
                     const RefPtr<PluginPackageWin>& b) {
     return PluginPackageWin::equal(*a.get(), *b.get());
   }
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 }  // namespace WebCore

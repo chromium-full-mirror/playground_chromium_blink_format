@@ -64,6 +64,7 @@ struct MappedAttributeHash {
   static bool equal(const MappedAttributeKey& a, const MappedAttributeKey& b) {
     return a == b;
   }
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
 typedef HashMap<MappedAttributeKey,

@@ -61,6 +61,7 @@ struct StrHash<WebCore::StringImpl*> {
 
     return true;
   }
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <>
@@ -76,6 +77,7 @@ struct StrHash<RefPtr<WebCore::StringImpl>> {
                     const RefPtr<WebCore::StringImpl>& b) {
     return StrHash<WebCore::StringImpl*>::equal(a.get(), b.get());
   }
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <>
@@ -86,6 +88,7 @@ struct StrHash<WebCore::String> {
   static bool equal(const WebCore::String& a, const WebCore::String& b) {
     return StrHash<WebCore::StringImpl*>::equal(a.impl(), b.impl());
   }
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <typename T>
@@ -200,6 +203,8 @@ class CaseInsensitiveHash<WebCore::StringImpl*> {
     return WTF::Unicode::umemcasecmp(a->characters(), b->characters(),
                                      length) == 0;
   }
+
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <>
@@ -216,6 +221,8 @@ struct CaseInsensitiveHash<RefPtr<WebCore::StringImpl>> {
                     const RefPtr<WebCore::StringImpl>& b) {
     return CaseInsensitiveHash<WebCore::StringImpl*>::equal(a.get(), b.get());
   }
+
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <>
@@ -226,6 +233,8 @@ struct CaseInsensitiveHash<WebCore::String> {
   static bool equal(const WebCore::String& a, const WebCore::String& b) {
     return CaseInsensitiveHash<WebCore::StringImpl*>::equal(a.impl(), b.impl());
   }
+
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 // store WebCore::String as StringImpl*

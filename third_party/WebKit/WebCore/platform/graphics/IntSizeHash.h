@@ -34,6 +34,8 @@ struct IntHash<IntSize> {
     return intHash((static_cast<uint64_t>(key.width()) << 32 | key.height()));
   }
   static bool equal(const IntSize& a, const IntSize& b) { return a == b; }
+
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 template <>
 struct DefaultHash<IntSize> {

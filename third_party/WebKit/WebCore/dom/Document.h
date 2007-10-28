@@ -134,6 +134,7 @@ struct FormElementKeyHash {
   static bool equal(const FormElementKey& a, const FormElementKey& b) {
     return a == b;
   }
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
 struct FormElementKeyHashTraits : WTF::GenericHashTraits<FormElementKey> {

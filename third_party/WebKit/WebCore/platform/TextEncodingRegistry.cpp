@@ -96,6 +96,8 @@ struct TextEncodingNameHash {
       h ^= (h >> 6);
     }
   }
+
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 struct TextCodecFactory {
