@@ -29,7 +29,6 @@
 #ifndef FontPlatformData_H
 #define FontPlatformData_H
 
-#include "config.h"
 #include "FontDescription.h"
 #include "AtomicString.h"
 #include "StringImpl.h"
