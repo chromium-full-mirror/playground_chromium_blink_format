@@ -180,7 +180,7 @@ void Chrome::addMessageToConsole(MessageSource source,
                                  const String& message,
                                  unsigned lineNumber,
                                  const String& sourceID) {
-  if (source == JSMessageSource && level == ErrorMessageLevel)
+  if (source == JSMessageSource)
     m_client->addMessageToConsole(message, lineNumber, sourceID);
 
   if (InspectorController* inspector = m_page->inspectorController())

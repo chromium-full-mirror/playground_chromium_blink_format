@@ -36,6 +36,7 @@ namespace WebCore {
 class BarInfo;
 class CSSRuleList;
 class CSSStyleDeclaration;
+class Console;
 class Database;
 class DOMSelection;
 class Document;
@@ -149,6 +150,8 @@ class DOMWindow : public Shared<DOMWindow> {
                                     ExceptionCode&);
 #endif
 
+  Console* console() const;
+
  private:
   Frame* m_frame;
   mutable RefPtr<Screen> m_screen;
@@ -160,6 +163,7 @@ class DOMWindow : public Shared<DOMWindow> {
   mutable RefPtr<BarInfo> m_scrollbars;
   mutable RefPtr<BarInfo> m_statusbar;
   mutable RefPtr<BarInfo> m_toolbar;
+  mutable RefPtr<Console> m_console;
 };
 
 }  // namespace WebCore
