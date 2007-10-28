@@ -480,7 +480,10 @@ bool PluginDatabaseWin::isPluginBlacklisted(PluginPackageWin* plugin) {
         (fileVersionMS == silverlightPluginMinRequiredVersionMSDWORD &&
          fileVersionLS < silverlightPluginMinRequiredVersionLSDWORD))
       return true;
-  }
+  } else if (plugin->fileName() == "npmozax.dll")
+    // Bug 15217: Mozilla ActiveX control complains about missing xpcom_core.dll
+    return true;
+
   return false;
 }
 
