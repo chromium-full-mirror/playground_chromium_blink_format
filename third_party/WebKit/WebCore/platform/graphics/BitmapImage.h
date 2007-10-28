@@ -127,6 +127,10 @@ class BitmapImage : public Image {
   virtual bool getHBITMAPOfSize(HBITMAP, LPSIZE);
 #endif
 
+#if PLATFORM(WX)
+  virtual wxBitmap* getWxBitmap() const;
+#endif
+
   virtual NativeImagePtr nativeImageForCurrentFrame() {
     return frameAtIndex(currentFrame());
   }
@@ -142,7 +146,7 @@ class BitmapImage : public Image {
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
                     CompositeOperator);
-#if PLATFORM(QT)
+#if PLATFORM(QT) || PLATFORM(WX)
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
                            const AffineTransform& patternTransform,

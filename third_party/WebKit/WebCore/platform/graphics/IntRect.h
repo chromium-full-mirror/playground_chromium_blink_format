@@ -50,6 +50,10 @@ class QRect;
 class TRect;
 #endif
 
+#if PLATFORM(WX)
+class wxRect;
+#endif
+
 namespace WebCore {
 
 class FloatRect;
@@ -126,6 +130,11 @@ class IntRect {
     inflateY(d);
   }
   void scale(float s);
+
+#if PLATFORM(WX)
+  IntRect(const wxRect&);
+  operator wxRect() const;
+#endif
 
 #if PLATFORM(WIN)
   IntRect(const RECT&);
