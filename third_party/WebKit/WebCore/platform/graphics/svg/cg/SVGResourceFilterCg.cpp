@@ -32,9 +32,9 @@
 
 namespace WebCore {
 
-SVGResourceFilter::SVGResourceFilter() {}
-
-SVGResourceFilter::~SVGResourceFilter() {}
+SVGResourceFilterPlatformData* SVGResourceFilter::createPlatformData() {
+  return 0;
+}
 
 void SVGResourceFilter::prepareFilter(GraphicsContext*&, const FloatRect&) {
   notImplemented();
