@@ -232,6 +232,7 @@ struct ListHashSetNodeHashFunctions {
   static bool equal(Node* const& a, Node* const& b) {
     return HashArg::equal(a->m_value, b->m_value);
   }
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <typename ValueArg, typename HashArg>
@@ -359,8 +360,7 @@ struct ListHashSetTranslator {
   }
   static void translate(Node*& location,
                         const ValueType& key,
-                        NodeAllocator* allocator,
-                        unsigned) {
+                        NodeAllocator* allocator) {
     location = new (allocator) Node(key);
   }
 };

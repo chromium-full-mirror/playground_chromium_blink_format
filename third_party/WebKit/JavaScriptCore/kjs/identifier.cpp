@@ -43,6 +43,7 @@ struct StrHash<KJS::UString::Rep*> {
   static bool equal(const KJS::UString::Rep* a, const KJS::UString::Rep* b) {
     return KJS::Identifier::equal(a, b);
   }
+  static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <>

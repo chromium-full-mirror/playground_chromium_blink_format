@@ -160,8 +160,7 @@ struct HashMapTranslator<true,
   }
   static void translate(ValueStorageType& location,
                         const KeyType& key,
-                        const MappedType& mapped,
-                        unsigned) {
+                        const MappedType& mapped) {
     Assigner<KeyTraits::needsRef, KeyType, KeyStorageType, KeyTraits>::assign(
         key, location.first);
     Assigner<MappedTraits::needsRef, MappedType, MappedStorageType,
@@ -194,8 +193,7 @@ struct HashMapTranslator<false,
   }
   static void translate(ValueStorageType& location,
                         const KeyType& key,
-                        const MappedType& mapped,
-                        unsigned) {
+                        const MappedType& mapped) {
     if (location.first == KeyStorageTraits::deletedValue())
       location.first = KeyStorageTraits::emptyValue();
     Assigner<KeyTraits::needsRef, KeyType, KeyStorageType, KeyTraits>::assign(
@@ -326,12 +324,15 @@ HashMap<T, U, V, W, X>::add(const KeyType& key, const MappedType& mapped) {
 }
 
 template <typename T, typename U, typename V, typename W, typename MappedTraits>
-inline typename HashMap<T, U, V, W, MappedTraits>::MappedType
+typename HashMap<T, U, V, W, MappedTraits>::MappedType
 HashMap<T, U, V, W, MappedTraits>::get(const KeyType& key) const {
-  const_iterator it = find(key);
-  if (it == end())
+  if (m_impl.isEmpty())
     return MappedTraits::emptyValue();
-  return it->second;
+  ValueStorageType* entry =
+      const_cast<HashTableType&>(m_impl).lookup(*(const KeyStorageType*)&key);
+  if (!entry)
+    return MappedTraits::emptyValue();
+  return ((ValueType*)entry)->second;
 }
 
 template <typename T, typename U, typename V, typename W, typename X>

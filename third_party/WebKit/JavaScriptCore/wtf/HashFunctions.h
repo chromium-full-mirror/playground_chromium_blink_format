@@ -86,6 +86,7 @@ struct IntHash {
         static_cast<typename IntTypes<sizeof(T)>::UnsignedType>(key));
   }
   static bool equal(T a, T b) { return a == b; }
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
 template <typename T>
@@ -95,6 +96,7 @@ struct FloatHash {
         *reinterpret_cast<typename IntTypes<sizeof(T)>::UnsignedType*>(&key));
   }
   static bool equal(T a, T b) { return a == b; }
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
 // pointer identity hash function
@@ -113,6 +115,7 @@ struct PtrHash {
 #endif
   }
   static bool equal(T a, T b) { return a == b; }
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 template <typename P>
 struct PtrHash<RefPtr<P>> {
@@ -120,6 +123,7 @@ struct PtrHash<RefPtr<P>> {
     return PtrHash<P*>::hash(key.get());
   }
   static bool equal(const RefPtr<P>& a, const RefPtr<P>& b) { return a == b; }
+  static const bool safeToCompareToEmptyOrDeleted = true;
 };
 
 // default hash function for each type

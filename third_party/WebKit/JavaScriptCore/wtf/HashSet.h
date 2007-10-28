@@ -143,8 +143,7 @@ struct HashSetTranslator<true,
   }
   static void translate(StorageType& location,
                         const ValueType& key,
-                        const ValueType&,
-                        unsigned) {
+                        const ValueType&) {
     Assigner<ValueTraits::needsRef, ValueType, StorageType,
              ValueTraits>::assign(key, location);
   }
@@ -168,8 +167,7 @@ struct HashSetTranslator<false,
   }
   static void translate(StorageType& location,
                         const ValueType& key,
-                        const ValueType&,
-                        unsigned) {
+                        const ValueType&) {
     if (location == StorageTraits::deletedValue())
       location = StorageTraits::emptyValue();
     Assigner<ValueTraits::needsRef, ValueType, StorageType,
@@ -334,7 +332,7 @@ HashSet<Value, HashFunctions, Traits>::add(const T& value) {
   typedef HashSetTranslatorAdapter<canReplaceDeletedValue, ValueType,
                                    StorageTraits, T, Translator>
       Adapter;
-  return m_impl.template add<T, T, Adapter>(value, value);
+  return m_impl.template addPassingHashCode<T, T, Adapter>(value, value);
 }
 
 template <typename T, typename U, typename V>
