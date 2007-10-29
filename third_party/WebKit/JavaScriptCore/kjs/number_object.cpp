@@ -177,7 +177,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
         // unless someone finds a precise rule.
         char s[2048 + 3];
         double x = v->toNumber(exec);
-        if (isNaN(x) || isInf(x))
+        if (isnan(x) || isinf(x))
           return jsString(UString::from(x));
 
         // apply algorithm on absolute value. add sign later.
@@ -229,7 +229,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
       int f = (int)df;
 
       double x = v->toNumber(exec);
-      if (isNaN(x))
+      if (isnan(x))
         return jsString("NaN");
 
       UString s = "";
@@ -264,7 +264,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
     case ToExponential: {
       double x = v->toNumber(exec);
 
-      if (isNaN(x) || isInf(x))
+      if (isnan(x) || isinf(x))
         return jsString(UString::from(x));
 
       JSValue* fractionDigits = args[0];
@@ -293,7 +293,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
       int decimalPoint;
       int sign;
 
-      if (isNaN(x))
+      if (isnan(x))
         return jsString("NaN");
 
       char* result = kjs_dtoa(x, 0, 0, &decimalPoint, &sign, NULL);
@@ -357,7 +357,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
 
       double dp = args[0]->toIntegerPreserveNaN(exec);
       double x = v->toNumber(exec);
-      if (isNaN(dp) || isNaN(x) || isInf(x))
+      if (isnan(dp) || isnan(x) || isinf(x))
         return jsString(v->toString(exec));
 
       UString s = "";

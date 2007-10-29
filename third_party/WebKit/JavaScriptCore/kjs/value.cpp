@@ -25,7 +25,6 @@
 
 #include "error_object.h"
 #include "nodes.h"
-#include "operations.h"
 #include <stdio.h>
 #include <string.h>
 #include <wtf/MathExtras.h>
@@ -57,7 +56,7 @@ double JSValue::toInteger(ExecState* exec) const {
   if (getTruncatedInt32(i))
     return i;
   double d = toNumber(exec);
-  return isNaN(d) ? 0.0 : trunc(d);
+  return isnan(d) ? 0.0 : trunc(d);
 }
 
 double JSValue::toIntegerPreserveNaN(ExecState* exec) const {
@@ -74,7 +73,7 @@ int32_t JSValue::toInt32SlowCase(ExecState* exec, bool& ok) const {
   if (d >= -D32 / 2 && d < D32 / 2)
     return static_cast<int32_t>(d);
 
-  if (isNaN(d) || isInf(d)) {
+  if (isnan(d) || isinf(d)) {
     ok = false;
     return 0;
   }
@@ -94,7 +93,7 @@ uint32_t JSValue::toUInt32SlowCase(ExecState* exec, bool& ok) const {
   if (d >= 0.0 && d < D32)
     return static_cast<uint32_t>(d);
 
-  if (isNaN(d) || isInf(d)) {
+  if (isnan(d) || isinf(d)) {
     ok = false;
     return 0;
   }
