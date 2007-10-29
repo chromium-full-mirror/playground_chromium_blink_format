@@ -413,7 +413,7 @@ void ResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
                                          DeclarationStacks::NodeStack&) {
   size_t index = functionBody->symbolTable().get(ident.ustring().rep());
   if (index != missingSymbolMarker())
-    new (this) LocalVarAccessNode(this, index);
+    new (this) LocalVarAccessNode(index);
 }
 
 JSValue* LocalVarAccessNode::evaluate(ExecState* exec) {
