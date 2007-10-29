@@ -424,6 +424,116 @@ bool StyleTransformData::transformDataEquivalent(
   return true;
 }
 
+Transition::Transition()
+    : m_duration(RenderStyle::initialTransitionDuration()),
+      m_repeatCount(RenderStyle::initialTransitionRepeatCount()),
+      m_timingFunction(RenderStyle::initialTransitionTimingFunction()),
+      m_property(RenderStyle::initialTransitionProperty()),
+      m_durationSet(false),
+      m_repeatCountSet(false),
+      m_timingFunctionSet(false),
+      m_propertySet(false),
+      m_next(0) {}
+
+Transition::Transition(const Transition& o)
+    : m_duration(o.m_duration),
+      m_repeatCount(o.m_repeatCount),
+      m_timingFunction(o.m_timingFunction),
+      m_property(o.m_property),
+      m_durationSet(o.m_durationSet),
+      m_repeatCountSet(o.m_repeatCountSet),
+      m_timingFunctionSet(o.m_timingFunctionSet),
+      m_propertySet(o.m_propertySet),
+      m_next(o.m_next ? new Transition(*o.m_next) : 0) {}
+
+Transition::~Transition() {
+  delete m_next;
+}
+
+Transition& Transition::operator=(const Transition& o) {
+  if (m_next != o.m_next) {
+    delete m_next;
+    m_next = o.m_next ? new Transition(*o.m_next) : 0;
+  }
+
+  m_duration = o.m_duration;
+  m_repeatCount = o.m_repeatCount;
+  m_timingFunction = o.m_timingFunction;
+  m_property = o.m_property;
+
+  m_durationSet = o.m_durationSet;
+  m_repeatCountSet = o.m_repeatCountSet;
+  m_timingFunctionSet = o.m_timingFunctionSet;
+  m_propertySet = o.m_propertySet;
+
+  return *this;
+}
+
+bool Transition::operator==(const Transition& o) const {
+  return m_duration == o.m_duration && m_repeatCount == o.m_repeatCount &&
+         m_timingFunction == o.m_timingFunction && m_property == o.m_property &&
+         m_durationSet == o.m_durationSet &&
+         m_repeatCountSet == o.m_repeatCountSet &&
+         m_timingFunctionSet == o.m_timingFunctionSet &&
+         m_propertySet == o.m_propertySet &&
+         ((m_next && o.m_next) ? *m_next == *o.m_next : m_next == o.m_next);
+}
+
+void Transition::fillUnsetProperties() {
+  Transition* curr;
+  for (curr = this; curr && curr->isTransitionDurationSet();
+       curr = curr->next())
+    ;
+  if (curr && curr != this) {
+    // We need to fill in the remaining values with the pattern specified.
+    for (Transition* pattern = this; curr; curr = curr->next()) {
+      curr->m_duration = pattern->m_duration;
+      pattern = pattern->next();
+      if (pattern == curr || !pattern)
+        pattern = this;
+    }
+  }
+
+  for (curr = this; curr && curr->isTransitionRepeatCountSet();
+       curr = curr->next())
+    ;
+  if (curr && curr != this) {
+    // We need to fill in the remaining values with the pattern specified.
+    for (Transition* pattern = this; curr; curr = curr->next()) {
+      curr->m_repeatCount = pattern->m_repeatCount;
+      pattern = pattern->next();
+      if (pattern == curr || !pattern)
+        pattern = this;
+    }
+  }
+
+  for (curr = this; curr && curr->isTransitionTimingFunctionSet();
+       curr = curr->next())
+    ;
+  if (curr && curr != this) {
+    // We need to fill in the remaining values with the pattern specified.
+    for (Transition* pattern = this; curr; curr = curr->next()) {
+      curr->m_timingFunction = pattern->m_timingFunction;
+      pattern = pattern->next();
+      if (pattern == curr || !pattern)
+        pattern = this;
+    }
+  }
+
+  for (curr = this; curr && curr->isTransitionPropertySet();
+       curr = curr->next())
+    ;
+  if (curr && curr != this) {
+    // We need to fill in the remaining values with the pattern specified.
+    for (Transition* pattern = this; curr; curr = curr->next()) {
+      curr->m_property = pattern->m_property;
+      pattern = pattern->next();
+      if (pattern == curr || !pattern)
+        pattern = this;
+    }
+  }
+}
+
 StyleRareNonInheritedData::StyleRareNonInheritedData()
     : lineClamp(RenderStyle::initialLineClamp()),
       opacity(RenderStyle::initialOpacity()),
@@ -437,7 +547,8 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
           RenderStyle::initialMatchNearestMailBlockquoteColor()),
       m_appearance(RenderStyle::initialAppearance()),
       m_borderFit(RenderStyle::initialBorderFit()),
-      m_boxShadow(0)
+      m_boxShadow(0),
+      m_transition(0)
 #if ENABLE(XBL)
       ,
       bindingURI(0)
@@ -463,7 +574,8 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       matchNearestMailBlockquoteColor(o.matchNearestMailBlockquoteColor),
       m_appearance(o.m_appearance),
       m_borderFit(o.m_borderFit),
-      m_boxShadow(o.m_boxShadow ? new ShadowData(*o.m_boxShadow) : 0)
+      m_boxShadow(o.m_boxShadow ? new ShadowData(*o.m_boxShadow) : 0),
+      m_transition(o.m_transition ? new Transition(*o.m_transition) : 0)
 #if ENABLE(XBL)
       ,
       bindingURI(o.bindingURI ? o.bindingURI->copy() : 0)
@@ -475,6 +587,7 @@ StyleRareNonInheritedData::~StyleRareNonInheritedData() {
   delete m_content;
   delete m_counterDirectives;
   delete m_boxShadow;
+  delete m_transition;
 #if ENABLE(XBL)
   delete bindingURI;
 #endif
@@ -506,7 +619,7 @@ bool StyleRareNonInheritedData::operator==(
          marginBottomCollapse == o.marginBottomCollapse &&
          matchNearestMailBlockquoteColor == o.matchNearestMailBlockquoteColor &&
          m_appearance == o.m_appearance && m_borderFit == o.m_borderFit &&
-         shadowDataEquivalent(o)
+         shadowDataEquivalent(o) && transitionDataEquivalent(o)
 #if ENABLE(XBL)
          && bindingsEquivalent(o)
 #endif
@@ -518,6 +631,15 @@ bool StyleRareNonInheritedData::shadowDataEquivalent(
   if (!m_boxShadow && o.m_boxShadow || m_boxShadow && !o.m_boxShadow)
     return false;
   if (m_boxShadow && o.m_boxShadow && (*m_boxShadow != *o.m_boxShadow))
+    return false;
+  return true;
+}
+
+bool StyleRareNonInheritedData::transitionDataEquivalent(
+    const StyleRareNonInheritedData& o) const {
+  if (!m_transition && o.m_transition || m_transition && !o.m_transition)
+    return false;
+  if (m_transition && o.m_transition && (*m_transition != *o.m_transition))
     return false;
   return true;
 }
@@ -937,7 +1059,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
             *other->rareNonInheritedData->m_transform.get())
       return Layout;
 
-    // If regions change trigger a relayout to re-calc regions.
+    // If regions change, trigger a relayout to re-calc regions.
     if (rareNonInheritedData->m_dashboardRegions !=
         other->rareNonInheritedData->m_dashboardRegions)
       return Layout;
@@ -1098,6 +1220,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   // to mouse events,
   // so they don't need to cause any repaint or layout.
 
+  // Transitions don't need to be checked either.  We always set the new style
+  // on the RenderObject, so we will get a chance to fire off
+  // the resulting transition properly.
   return Equal;
 }
 
@@ -1470,5 +1595,33 @@ const Vector<StyleDashboardRegion>& RenderStyle::noneDashboardRegions() {
     noneListInitialized = true;
   }
   return noneList;
+}
+
+void RenderStyle::adjustTransitions() {
+  if (transitions()) {
+    if (transitions()->isEmpty()) {
+      clearTransitions();
+      return;
+    }
+
+    Transition* next;
+    for (Transition* p = accessTransitions(); p; p = next) {
+      next = p->m_next;
+      if (next && next->isEmpty())
+        delete next;
+      p->m_next = 0;
+      break;
+    }
+  }
+
+  // Repeat patterns into layers that don't have some properties set.
+  accessTransitions()->fillUnsetProperties();
+}
+
+Transition* RenderStyle::accessTransitions() {
+  Transition* layer = rareNonInheritedData.access()->m_transition;
+  if (!layer)
+    rareNonInheritedData.access()->m_transition = new Transition();
+  return rareNonInheritedData->m_transition;
 }
 }

@@ -35,6 +35,7 @@
 namespace WebCore {
 
 class AffineTransform;
+class AnimationController;
 class Color;
 class Document;
 class Element;
@@ -1066,6 +1067,8 @@ class RenderObject : public CachedResourceClient {
   void invalidateVerticalPosition() { m_verticalPosition = PositionUndefined; }
 
   virtual void removeLeftoverAnonymousBlock(RenderBlock* child);
+
+  AnimationController* animationController() const;
 
  protected:
   virtual void printBoxDecorations(GraphicsContext*,

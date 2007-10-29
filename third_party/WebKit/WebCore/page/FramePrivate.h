@@ -26,6 +26,7 @@
 #ifndef FramePrivate_h
 #define FramePrivate_h
 
+#include "AnimationController.h"
 #include "Editor.h"
 #include "EventHandler.h"
 #include "FrameTree.h"
@@ -93,6 +94,7 @@ class FramePrivate {
   Timer<Frame> m_caretBlinkTimer;
   Editor m_editor;
   EventHandler m_eventHandler;
+  AnimationController m_animationController;
 
   bool m_caretVisible : 1;
   bool m_caretPaint : 1;

@@ -230,6 +230,11 @@ class CSSStyleSelector : public StyleSelector {
   void mapBackgroundXPosition(BackgroundLayer* layer, CSSValue* value);
   void mapBackgroundYPosition(BackgroundLayer* layer, CSSValue* value);
 
+  void mapTransitionDuration(Transition*, CSSValue*);
+  void mapTransitionRepeatCount(Transition*, CSSValue*);
+  void mapTransitionTimingFunction(Transition*, CSSValue*);
+  void mapTransitionProperty(Transition*, CSSValue*);
+
   // We collect the set of decls that match in |m_matchedDecls|.  We then walk
   // the
   // set of matched decls four times, once for those properties that others

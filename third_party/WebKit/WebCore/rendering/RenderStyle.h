@@ -44,6 +44,7 @@
 #include "CSSTransformValue.h"
 #include "DataRef.h"
 #include "Font.h"
+#include "FloatPoint.h"
 #include "GraphicsTypes.h"
 #include "IntRect.h"
 #include "Length.h"
@@ -486,7 +487,7 @@ struct BackgroundLayer {
   }
   LengthSize backgroundSize() const { return m_backgroundSize; }
 
-  BackgroundLayer* next() const { return m_next; }
+  const BackgroundLayer* next() const { return m_next; }
   BackgroundLayer* next() { return m_next; }
 
   bool isBackgroundImageSet() const { return m_imageSet; }
@@ -1066,6 +1067,103 @@ struct ContentData : Noncopyable {
 
 enum EBorderFit { BorderFitBorder, BorderFitLines };
 
+enum ETimingFunctionType { LinearTimingFunction, CubicBezierTimingFunction };
+
+struct TimingFunction {
+  TimingFunction()
+      : m_type(CubicBezierTimingFunction),
+        m_firstPoint(.25f, .1f),
+        m_secondPoint(.25f, 1.0f) {}
+
+  TimingFunction(ETimingFunctionType timingFunction,
+                 const FloatPoint& p1 = FloatPoint(),
+                 const FloatPoint& p2 = FloatPoint())
+      : m_type(timingFunction), m_firstPoint(p1), m_secondPoint(p2) {}
+
+  bool operator==(const TimingFunction& o) const {
+    return m_type == o.m_type && m_firstPoint == o.m_firstPoint &&
+           m_secondPoint == o.m_secondPoint;
+  }
+
+  ETimingFunctionType m_type;
+  FloatPoint m_firstPoint;
+  FloatPoint m_secondPoint;
+};
+
+struct Transition {
+ public:
+  Transition();
+  ~Transition();
+
+  Transition* next() const { return m_next; }
+  Transition* next() { return m_next; }
+
+  bool isTransitionDurationSet() const { return m_durationSet; }
+  bool isTransitionRepeatCountSet() const { return m_repeatCountSet; }
+  bool isTransitionTimingFunctionSet() const { return m_timingFunctionSet; }
+  bool isTransitionPropertySet() const { return m_propertySet; }
+
+  bool isEmpty() const {
+    return !m_durationSet && !m_repeatCountSet && !m_timingFunctionSet &&
+           !m_propertySet;
+  }
+  void clearTransitionDuration() { m_durationSet = false; }
+  void clearTransitionRepeatCount() { m_repeatCountSet = false; }
+  void clearTransitionTimingFunction() { m_timingFunctionSet = false; }
+  void clearTransitionProperty() { m_propertySet = false; }
+
+  int transitionDuration() const { return m_duration; }
+  int transitionRepeatCount() const { return m_repeatCount; }
+  const TimingFunction& transitionTimingFunction() const {
+    return m_timingFunction;
+  }
+  const AtomicString& transitionProperty() const { return m_property; }
+
+  void setTransitionDuration(int d) {
+    m_duration = d;
+    m_durationSet = true;
+  }
+  void setTransitionRepeatCount(int c) {
+    m_repeatCount = c;
+    m_repeatCountSet = true;
+  }
+  void setTransitionTimingFunction(const TimingFunction& f) {
+    m_timingFunction = f;
+    m_timingFunctionSet = true;
+  }
+  void setTransitionProperty(const AtomicString& t) {
+    m_property = t;
+    m_propertySet = true;
+  }
+
+  void setNext(Transition* n) {
+    if (m_next != n) {
+      delete m_next;
+      m_next = n;
+    }
+  }
+
+  Transition& operator=(const Transition& o);
+  Transition(const Transition& o);
+
+  bool operator==(const Transition& o) const;
+  bool operator!=(const Transition& o) const { return !(*this == o); }
+
+  void fillUnsetProperties();
+
+  int m_duration;
+  int m_repeatCount;
+  TimingFunction m_timingFunction;
+  AtomicString m_property;
+
+  bool m_durationSet;
+  bool m_repeatCountSet;
+  bool m_timingFunctionSet;
+  bool m_propertySet;
+
+  Transition* m_next;
+};
+
 // This struct is for rarely used non-inherited CSS3, CSS2, and WebKit-specific
 // properties.
 // By grouping them together, we save space, and only allocate this object when
@@ -1087,6 +1185,7 @@ class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
   }
 
   bool shadowDataEquivalent(const StyleRareNonInheritedData& o) const;
+  bool transitionDataEquivalent(const StyleRareNonInheritedData&) const;
 
   int lineClamp;  // An Apple extension.
   Vector<StyleDashboardRegion> m_dashboardRegions;
@@ -1114,6 +1213,8 @@ class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
   unsigned m_appearance : 6;                // EAppearance
   unsigned m_borderFit : 1;                 // EBorderFit
   ShadowData* m_boxShadow;                  // For box-shadow decorations.
+
+  Transition* m_transition;
 
 #if ENABLE(XBL)
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -2020,6 +2121,10 @@ class RenderStyle {
   // End CSS3 Getters
 
   // Apple-specific property getter methods
+  Transition* accessTransitions();
+  const Transition* transitions() const {
+    return rareNonInheritedData->m_transition;
+  }
   int lineClamp() const { return rareNonInheritedData->lineClamp; }
   bool textSizeAdjust() const { return rareInheritedData->textSizeAdjust; }
   ETextSecurity textSecurity() const {
@@ -2465,6 +2570,16 @@ class RenderStyle {
   // End CSS3 Setters
 
   // Apple-specific property setters
+  void clearTransitions() {
+    delete rareNonInheritedData.access()->m_transition;
+    rareNonInheritedData.access()->m_transition = 0;
+  }
+  void inheritTransitions(const Transition* parent) {
+    clearTransitions();
+    if (parent)
+      rareNonInheritedData.access()->m_transition = new Transition(*parent);
+  }
+  void adjustTransitions();
   void setLineClamp(int c) { SET_VAR(rareNonInheritedData, lineClamp, c); }
   void setTextSizeAdjust(bool b) {
     SET_VAR(rareInheritedData, textSizeAdjust, b);
@@ -2629,6 +2744,12 @@ class RenderStyle {
   static Length initialTransformOriginY() { return Length(50.0, Percent); }
 
   // Keep these at the end.
+  static int initialTransitionDuration() { return 250; }
+  static int initialTransitionRepeatCount() { return 1; }
+  static TimingFunction initialTransitionTimingFunction() {
+    return TimingFunction();
+  }
+  static const AtomicString& initialTransitionProperty() { return nullAtom; }
   static int initialLineClamp() { return -1; }
   static bool initialTextSizeAdjust() { return true; }
   static ETextSecurity initialTextSecurity() { return TSNONE; }
