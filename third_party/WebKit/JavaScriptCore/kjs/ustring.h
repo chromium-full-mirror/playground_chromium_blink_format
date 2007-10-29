@@ -51,7 +51,8 @@ class KJScript;
 
 namespace KJS {
 
-enum PlacementNewAdoptType { PlacementNewAdopt };
+using WTF::PlacementNewAdoptType;
+using WTF::PlacementNewAdopt;
 
 class UString;
 
@@ -241,7 +242,7 @@ class UString {
   ~UString() {}
 
   // Special constructor for cases where we overwrite an object in place.
-  UString(PlacementNewAdoptType) {}
+  UString(PlacementNewAdoptType) : m_rep(PlacementNewAdopt) {}
 
   /**
    * Constructs a string from an int.
