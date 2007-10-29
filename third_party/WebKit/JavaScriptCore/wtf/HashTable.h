@@ -607,7 +607,7 @@ inline Value*
 HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::lookup(
     const T& key) {
   ASSERT(m_table);
-#if !ASSERT_DISABLED && false
+#if !ASSERT_DISABLED && 0
   if (HashFunctions::safeToCompareToEmptyOrDeleted) {
     ASSERT(!HashTranslator::equal(KeyTraits::emptyValue(), key));
     ASSERT(!HashTranslator::equal(KeyTraits::deletedValue(), key));
@@ -669,7 +669,7 @@ inline typename HashTable<Key,
 HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     lookupForWriting(const T& key) {
   ASSERT(m_table);
-#if !ASSERT_DISABLED && false
+#if !ASSERT_DISABLED && 0
   if (HashFunctions::safeToCompareToEmptyOrDeleted) {
     ASSERT(!HashTranslator::equal(KeyTraits::emptyValue(), key));
     ASSERT(!HashTranslator::equal(KeyTraits::deletedValue(), key));
@@ -737,7 +737,7 @@ inline typename HashTable<Key,
 HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     fullLookupForWriting(const T& key) {
   ASSERT(m_table);
-#if !ASSERT_DISABLED && false
+#if !ASSERT_DISABLED && 0
   if (HashFunctions::safeToCompareToEmptyOrDeleted) {
     ASSERT(!HashTranslator::equal(KeyTraits::emptyValue(), key));
     ASSERT(!HashTranslator::equal(KeyTraits::deletedValue(), key));
@@ -806,7 +806,7 @@ inline pair<typename HashTable<Key,
 HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
     const T& key,
     const Extra& extra) {
-#if !ASSERT_DISABLED && false
+#if !ASSERT_DISABLED && 0
   if (HashFunctions::safeToCompareToEmptyOrDeleted) {
     ASSERT(!HashTranslator::equal(KeyTraits::emptyValue(), key));
     ASSERT(!HashTranslator::equal(KeyTraits::deletedValue(), key));
