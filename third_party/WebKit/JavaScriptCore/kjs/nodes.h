@@ -89,11 +89,6 @@ enum Precedence {
   PrecExpression
 };
 
-// Specifies that a Node should adopt the memory layout it was initialized into.
-// We use this to swap a pre-existing base class node with a more optimized
-// subclass node.
-enum PlacementNewAdoptTag { PlacementNewAdopt };
-
 struct DeclarationStacks {
   typedef Vector<Node*, 16> NodeStack;
   typedef Vector<VarDeclNode*, 16> VarStack;
@@ -111,7 +106,7 @@ struct DeclarationStacks {
 class Node {
  public:
   Node() KJS_FAST_CALL;
-  Node(PlacementNewAdoptTag) KJS_FAST_CALL {}
+  Node(PlacementNewAdoptType) KJS_FAST_CALL {}
   virtual ~Node();
 
   virtual JSValue* evaluate(ExecState* exec) KJS_FAST_CALL = 0;
@@ -308,8 +303,9 @@ class ResolveNode : public Node {
  public:
   ResolveNode(const Identifier& s) KJS_FAST_CALL : ident(s) {}
 
-  ResolveNode(PlacementNewAdoptTag) KJS_FAST_CALL : Node(PlacementNewAdopt),
-                                                    ident(ident) {}
+  // Special constructor for cases where we overwrite an object in place.
+  ResolveNode(PlacementNewAdoptType) KJS_FAST_CALL : Node(PlacementNewAdopt),
+                                                     ident(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -330,6 +326,7 @@ class ResolveNode : public Node {
 
 class LocalVarAccessNode : public ResolveNode {
  public:
+  // Overwrites a ResolveNode in place.
   LocalVarAccessNode(size_t i) : ResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     index = i;
