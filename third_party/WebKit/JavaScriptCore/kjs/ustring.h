@@ -169,7 +169,7 @@ class UString {
       ++rc;
       return this;
     }
-    void deref() {
+    ALWAYS_INLINE void deref() {
       ASSERT(JSLock::lockCount() > 0);
       if (--rc == 0)
         destroy();
