@@ -60,7 +60,7 @@ class CollectorHeapIntrospector {
     LOG_ERROR("malloc is not supported");
     return 0;
   }
-  static void* zoneCalloc(malloc_zone_t*, size_t numItems, size_t size) {
+  static void* zoneCalloc(malloc_zone_t*, size_t, size_t) {
     LOG_ERROR("calloc is not supported");
     return 0;
   }
