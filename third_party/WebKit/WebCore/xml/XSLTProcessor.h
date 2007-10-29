@@ -1,7 +1,7 @@
 /*
  * This file is part of the XSL implementation.
  *
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2007 Apple, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -44,15 +44,14 @@ class XSLTProcessor : public Shared<XSLTProcessor> {
     m_stylesheet = styleSheet;
   }
   bool transformToString(Node* source,
-                         DeprecatedString& resultMIMEType,
-                         DeprecatedString& resultString,
-                         DeprecatedString& resultEncoding);
-  RefPtr<Document> createDocumentFromSource(
-      const DeprecatedString& source,
-      const DeprecatedString& sourceEncoding,
-      const DeprecatedString& sourceMIMEType,
-      Node* sourceNode,
-      Frame* frame);
+                         String& resultMIMEType,
+                         String& resultString,
+                         String& resultEncoding);
+  RefPtr<Document> createDocumentFromSource(const String& source,
+                                            const String& sourceEncoding,
+                                            const String& sourceMIMEType,
+                                            Node* sourceNode,
+                                            Frame* frame);
 
   // DOM methods
   void importStylesheet(Node* style) { m_stylesheetRootNode = style; }
@@ -73,6 +72,8 @@ class XSLTProcessor : public Shared<XSLTProcessor> {
     m_stylesheetRootNode = NULL;
     m_parameters.clear();
   }
+
+  static void parseErrorFunc(void* userData, xmlError*);
 
  public:
   // Only for libXSLT callbacks
