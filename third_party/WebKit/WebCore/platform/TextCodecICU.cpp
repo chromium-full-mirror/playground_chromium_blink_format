@@ -275,7 +275,7 @@ static void gbkCallbackEscape(const void* context,
                               UChar32 codePoint,
                               UConverterCallbackReason reason,
                               UErrorCode* err) {
-  if (gbkEscapes().contains(codePoint)) {
+  if (codePoint && gbkEscapes().contains(codePoint)) {
     UChar outChar = gbkEscapes().get(codePoint);
     const UChar* source = &outChar;
     *err = U_ZERO_ERROR;

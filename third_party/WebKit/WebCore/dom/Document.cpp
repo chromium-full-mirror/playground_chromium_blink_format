@@ -2780,9 +2780,13 @@ bool Document::parseQualifiedName(const String& qualifiedName,
 }
 
 void Document::addImageMap(HTMLMapElement* imageMap) {
+  const AtomicString& name = imageMap->getName();
+  if (!name.impl())
+    return;
+
   // Add the image map, unless there's already another with that name.
   // "First map wins" is the rule other browsers seem to implement.
-  m_imageMapsByName.add(imageMap->getName().impl(), imageMap);
+  m_imageMapsByName.add(name.impl(), imageMap);
 }
 
 void Document::removeImageMap(HTMLMapElement* imageMap) {
@@ -2793,6 +2797,9 @@ void Document::removeImageMap(HTMLMapElement* imageMap) {
   // map
   // once a map has been removed.
   const AtomicString& name = imageMap->getName();
+  if (!name.impl())
+    return;
+
   ImageMapsByName::iterator it = m_imageMapsByName.find(name.impl());
   if (it != m_imageMapsByName.end() && it->second == imageMap)
     m_imageMapsByName.remove(it);
