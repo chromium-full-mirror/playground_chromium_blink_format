@@ -60,23 +60,23 @@ StringInstance::StringInstance(JSObject* proto, const UString& string)
   setInternalValue(jsString(string));
 }
 
-JSValue* StringInstance::lengthGetter(ExecState* exec,
+JSValue* StringInstance::lengthGetter(ExecState*,
                                       JSObject*,
                                       const Identifier&,
                                       const PropertySlot& slot) {
   return jsNumber(static_cast<StringInstance*>(slot.slotBase())
                       ->internalValue()
-                      ->toString(exec)
+                      ->value()
                       .size());
 }
 
-JSValue* StringInstance::indexGetter(ExecState* exec,
+JSValue* StringInstance::indexGetter(ExecState*,
                                      JSObject*,
                                      const Identifier&,
                                      const PropertySlot& slot) {
   const UChar c = static_cast<StringInstance*>(slot.slotBase())
                       ->internalValue()
-                      ->toString(exec)[slot.index()];
+                      ->value()[slot.index()];
   return jsString(UString(&c, 1));
 }
 
@@ -88,18 +88,28 @@ bool StringInstance::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  bool ok;
-  const unsigned index = propertyName.toArrayIndex(&ok);
-  if (ok) {
-    const UString s = internalValue()->toString(exec);
-    const unsigned length = s.size();
-    if (index < length) {
-      slot.setCustomIndex(this, index, indexGetter);
-      return true;
-    }
+  bool isStrictUInt32;
+  unsigned i = propertyName.toStrictUInt32(&isStrictUInt32);
+  unsigned length = internalValue()->value().size();
+  if (isStrictUInt32 && i < length) {
+    slot.setCustomIndex(this, i, indexGetter);
+    return true;
   }
 
   return JSObject::getOwnPropertySlot(exec, propertyName, slot);
+}
+
+bool StringInstance::getOwnPropertySlot(ExecState* exec,
+                                        unsigned propertyName,
+                                        PropertySlot& slot) {
+  unsigned length = internalValue()->value().size();
+  if (propertyName < length) {
+    slot.setCustomIndex(this, propertyName, indexGetter);
+    return true;
+  }
+
+  return JSObject::getOwnPropertySlot(exec, Identifier::from(propertyName),
+                                      slot);
 }
 
 void StringInstance::put(ExecState* exec,

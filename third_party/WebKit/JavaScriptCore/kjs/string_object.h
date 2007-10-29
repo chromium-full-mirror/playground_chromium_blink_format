@@ -32,13 +32,17 @@ namespace KJS {
 class StringInstance : public JSWrapperObject {
  public:
   StringInstance(JSObject* proto);
-  StringInstance(JSObject* proto, StringImp* string);
-  StringInstance(JSObject* proto, const UString& string);
+  StringInstance(JSObject* proto, StringImp*);
+  StringInstance(JSObject* proto, const UString&);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  unsigned propertyName,
+                                  PropertySlot&);
+
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValue*,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
@@ -51,14 +55,16 @@ class StringInstance : public JSWrapperObject {
   }
 
  private:
-  static JSValue* lengthGetter(ExecState* exec,
+  bool inlineGetOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
+
+  static JSValue* lengthGetter(ExecState*,
                                JSObject*,
                                const Identifier&,
-                               const PropertySlot& slot);
-  static JSValue* indexGetter(ExecState* exec,
+                               const PropertySlot&);
+  static JSValue* indexGetter(ExecState*,
                               JSObject*,
                               const Identifier&,
-                              const PropertySlot& slot);
+                              const PropertySlot&);
 };
 
 // WebCore uses this to make style.filter undetectable
