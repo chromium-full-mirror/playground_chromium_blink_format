@@ -56,7 +56,6 @@ class HTMLOptionElement : public HTMLGenericFormElement {
   void setText(const String&, ExceptionCode&);
 
   int index() const;
-  void setIndex(int, ExceptionCode&);
   virtual void parseMappedAttribute(MappedAttribute*);
 
   String value() const;
