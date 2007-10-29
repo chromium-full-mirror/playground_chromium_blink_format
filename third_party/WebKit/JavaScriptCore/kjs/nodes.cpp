@@ -1233,6 +1233,21 @@ static JSValue* typeStringForValue(JSValue* v) {
   }
 }
 
+void TypeOfResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
+                                               DeclarationStacks::NodeStack&) {
+  size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
+  if (index != missingSymbolMarker())
+    new (this) LocalTypeOfAccessNode(index);
+}
+
+JSValue* LocalTypeOfAccessNode::evaluate(ExecState* exec) {
+  ActivationImp* variableObject =
+      static_cast<ActivationImp*>(exec->variableObject());
+  ASSERT(variableObject->isActivation());
+  ASSERT(variableObject == exec->scopeChain().top());
+  return typeStringForValue(variableObject->localStorage()[m_index].value);
+}
+
 JSValue* TypeOfResolveNode::evaluate(ExecState* exec) {
   const ScopeChain& chain = exec->scopeChain();
   ScopeChainIterator iter = chain.begin();
@@ -1270,6 +1285,28 @@ JSValue* TypeOfValueNode::evaluate(ExecState* exec) {
 
 // ------------------------------ PrefixResolveNode
 // ----------------------------------
+
+void PrefixResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
+                                               DeclarationStacks::NodeStack&) {
+  size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
+  if (index != missingSymbolMarker())
+    new (this) PrefixLocalAccessNode(index);
+}
+
+JSValue* PrefixLocalAccessNode::evaluate(ExecState* exec) {
+  ActivationImp* variableObject =
+      static_cast<ActivationImp*>(exec->variableObject());
+  ASSERT(variableObject->isActivation());
+  ASSERT(variableObject == exec->scopeChain().top());
+  JSValue* v = variableObject->localStorage()[m_index].value;
+
+  double n = v->toNumber(exec);
+
+  double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
+  JSValue* n2 = jsNumber(newValue);
+  variableObject->localStorage()[m_index].value = n2;
+  return n2;
+}
 
 JSValue* PrefixResolveNode::evaluate(ExecState* exec) {
   const ScopeChain& chain = exec->scopeChain();
@@ -2038,9 +2075,34 @@ static ALWAYS_INLINE JSValue* valueForReadModifyAssignment(ExecState* exec,
 // -----------------------------------
 
 void AssignResolveNode::optimizeVariableAccess(
-    FunctionBodyNode*,
+    FunctionBodyNode* functionBody,
     DeclarationStacks::NodeStack& nodeStack) {
   nodeStack.append(m_right.get());
+  size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
+  if (index != missingSymbolMarker())
+    new (this) AssignLocalAccessNode(index);
+}
+
+JSValue* AssignLocalAccessNode::evaluate(ExecState* exec) {
+  ActivationImp* variableObject =
+      static_cast<ActivationImp*>(exec->variableObject());
+  ASSERT(variableObject->isActivation());
+  ASSERT(variableObject == exec->scopeChain().top());
+  JSValue* v;
+
+  if (m_oper == OpEqual)
+    v = m_right->evaluate(exec);
+  else {
+    JSValue* v1 = variableObject->localStorage()[m_index].value;
+    KJS_CHECKEXCEPTIONVALUE
+    JSValue* v2 = m_right->evaluate(exec);
+    v = valueForReadModifyAssignment(exec, v1, v2, m_oper);
+  }
+
+  KJS_CHECKEXCEPTIONVALUE
+
+  variableObject->localStorage()[m_index].value = v;
+  return v;
 }
 
 JSValue* AssignResolveNode::evaluate(ExecState* exec) {
