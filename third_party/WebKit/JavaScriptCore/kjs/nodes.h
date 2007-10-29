@@ -143,8 +143,6 @@ class Node {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL {}
 
-  virtual void breakCycle() KJS_FAST_CALL {}
-
  protected:
   Completion createErrorCompletion(ExecState*,
                                    ErrorType,
@@ -338,12 +336,8 @@ class LocalVarAccessNode : public ResolveNode {
 
 class ElementNode : public Node {
  public:
-  // list pointer is tail of a circular list, cracked in the ArrayNode ctor
-  ElementNode(int e, Node* n) KJS_FAST_CALL : next(this), elision(e), node(n) {
-    Parser::noteNodeCycle(this);
-  }
-  ElementNode(ElementNode* l, int e, Node* n) KJS_FAST_CALL : next(l->next),
-                                                              elision(e),
+  ElementNode(int e, Node* n) KJS_FAST_CALL : elision(e), node(n) {}
+  ElementNode(ElementNode* l, int e, Node* n) KJS_FAST_CALL : elision(e),
                                                               node(n) {
     l->next = this;
   }
@@ -353,7 +347,6 @@ class ElementNode : public Node {
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   PassRefPtr<ElementNode> releaseNext() KJS_FAST_CALL { return next.release(); }
-  virtual void breakCycle() KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -369,17 +362,12 @@ class ElementNode : public Node {
 class ArrayNode : public Node {
  public:
   ArrayNode(int e) KJS_FAST_CALL : elision(e), opt(true) {}
-  ArrayNode(ElementNode* ele) KJS_FAST_CALL : element(ele->next.release()),
+  ArrayNode(ElementNode* ele) KJS_FAST_CALL : element(ele),
                                               elision(0),
-                                              opt(false) {
-    Parser::removeNodeCycle(element.get());
-  }
-  ArrayNode(int eli, ElementNode* ele) KJS_FAST_CALL
-      : element(ele->next.release()),
-        elision(eli),
-        opt(true) {
-    Parser::removeNodeCycle(element.get());
-  }
+                                              opt(false) {}
+  ArrayNode(int eli, ElementNode* ele) KJS_FAST_CALL : element(ele),
+                                                       elision(eli),
+                                                       opt(true) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -419,14 +407,9 @@ class PropertyNode : public Node {
 
 class PropertyListNode : public Node {
  public:
-  // list pointer is tail of a circular list, cracked in the ObjectLiteralNode
-  // ctor
-  PropertyListNode(PropertyNode* n) KJS_FAST_CALL : node(n), next(this) {
-    Parser::noteNodeCycle(this);
-  }
+  PropertyListNode(PropertyNode* n) KJS_FAST_CALL : node(n) {}
   PropertyListNode(PropertyNode* n, PropertyListNode* l) KJS_FAST_CALL
-      : node(n),
-        next(l->next) {
+      : node(n) {
     l->next = this;
   }
   virtual void optimizeVariableAccess(FunctionBodyNode*,
@@ -437,7 +420,6 @@ class PropertyListNode : public Node {
   PassRefPtr<PropertyListNode> releaseNext() KJS_FAST_CALL {
     return next.release();
   }
-  virtual void breakCycle() KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -452,10 +434,7 @@ class PropertyListNode : public Node {
 class ObjectLiteralNode : public Node {
  public:
   ObjectLiteralNode() KJS_FAST_CALL {}
-  ObjectLiteralNode(PropertyListNode* l) KJS_FAST_CALL
-      : list(l->next.release()) {
-    Parser::removeNodeCycle(list.get());
-  }
+  ObjectLiteralNode(PropertyListNode* l) KJS_FAST_CALL : list(l) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -511,12 +490,8 @@ class DotAccessorNode : public Node {
 
 class ArgumentListNode : public Node {
  public:
-  // list pointer is tail of a circular list, cracked in the ArgumentsNode ctor
-  ArgumentListNode(Node* e) KJS_FAST_CALL : next(this), expr(e) {
-    Parser::noteNodeCycle(this);
-  }
-  ArgumentListNode(ArgumentListNode* l, Node* e) KJS_FAST_CALL : next(l->next),
-                                                                 expr(e) {
+  ArgumentListNode(Node* e) KJS_FAST_CALL : expr(e) {}
+  ArgumentListNode(ArgumentListNode* l, Node* e) KJS_FAST_CALL : expr(e) {
     l->next = this;
   }
   virtual void optimizeVariableAccess(FunctionBodyNode*,
@@ -528,7 +503,6 @@ class ArgumentListNode : public Node {
   PassRefPtr<ArgumentListNode> releaseNext() KJS_FAST_CALL {
     return next.release();
   }
-  virtual void breakCycle() KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -543,9 +517,7 @@ class ArgumentListNode : public Node {
 class ArgumentsNode : public Node {
  public:
   ArgumentsNode() KJS_FAST_CALL {}
-  ArgumentsNode(ArgumentListNode* l) KJS_FAST_CALL : list(l->next.release()) {
-    Parser::removeNodeCycle(list.get());
-  }
+  ArgumentsNode(ArgumentListNode* l) KJS_FAST_CALL : list(l) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1490,15 +1462,10 @@ class VarDeclNode : public Node {
 
 class VarDeclListNode : public Node {
  public:
-  // list pointer is tail of a circular list, cracked in the
-  // ForNode/VarStatementNode ctor
-  VarDeclListNode(VarDeclNode* v) KJS_FAST_CALL : next(this), var(v) {
-    Parser::noteNodeCycle(this);
+  VarDeclListNode(VarDeclNode* v) KJS_FAST_CALL : var(v) {
     m_mayHaveDeclarations = true;
   }
-  VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) KJS_FAST_CALL
-      : next(l->next),
-        var(v) {
+  VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) KJS_FAST_CALL : var(v) {
     l->next = this;
     m_mayHaveDeclarations = true;
   }
@@ -1510,7 +1477,6 @@ class VarDeclListNode : public Node {
   PassRefPtr<VarDeclListNode> releaseNext() KJS_FAST_CALL {
     return next.release();
   }
-  virtual void breakCycle() KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -1526,8 +1492,7 @@ class VarDeclListNode : public Node {
 
 class VarStatementNode : public StatementNode {
  public:
-  VarStatementNode(VarDeclListNode* l) KJS_FAST_CALL : next(l->next.release()) {
-    Parser::removeNodeCycle(next.get());
+  VarStatementNode(VarDeclListNode* l) KJS_FAST_CALL : next(l) {
     m_mayHaveDeclarations = true;
   }
   virtual void optimizeVariableAccess(FunctionBodyNode*,
@@ -1638,14 +1603,6 @@ class ForNode : public StatementNode {
         expr2(e2),
         expr3(e3),
         statement(s) {
-    m_mayHaveDeclarations = true;
-  }
-  ForNode(VarDeclListNode* e1, Node* e2, Node* e3, StatementNode* s)
-      KJS_FAST_CALL : expr1(e1->next.release()),
-                      expr2(e2),
-                      expr3(e3),
-                      statement(s) {
-    Parser::removeNodeCycle(expr1.get());
     m_mayHaveDeclarations = true;
   }
   virtual void optimizeVariableAccess(FunctionBodyNode*,
@@ -1794,15 +1751,9 @@ class TryNode : public StatementNode {
 
 class ParameterNode : public Node {
  public:
-  // list pointer is tail of a circular list, cracked in the
-  // FuncDeclNode/FuncExprNode ctor
-  ParameterNode(const Identifier& i) KJS_FAST_CALL : id(i), next(this) {
-    Parser::noteNodeCycle(this);
-  }
-  ParameterNode(ParameterNode* next, const Identifier& i) KJS_FAST_CALL
-      : id(i),
-        next(next->next) {
-    next->next = this;
+  ParameterNode(const Identifier& i) KJS_FAST_CALL : id(i) {}
+  ParameterNode(ParameterNode* l, const Identifier& i) KJS_FAST_CALL : id(i) {
+    l->next = this;
   }
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   Identifier ident() KJS_FAST_CALL { return id; }
@@ -1811,7 +1762,6 @@ class ParameterNode : public Node {
   PassRefPtr<ParameterNode> releaseNext() KJS_FAST_CALL {
     return next.release();
   }
-  virtual void breakCycle() KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -1874,13 +1824,9 @@ class FuncExprNode : public Node {
  public:
   FuncExprNode(const Identifier& i,
                FunctionBodyNode* b,
-               ParameterNode* p = 0) KJS_FAST_CALL
-      : ident(i),
-        param(p ? p->next.release() : 0),
-        body(b) {
-    if (p) {
-      Parser::removeNodeCycle(param.get());
-    }
+               ParameterNode* p = 0) KJS_FAST_CALL : ident(i),
+                                                     param(p),
+                                                     body(b) {
     addParams();
   }
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
@@ -1907,9 +1853,8 @@ class FuncDeclNode : public StatementNode {
   FuncDeclNode(const Identifier& i,
                ParameterNode* p,
                FunctionBodyNode* b) KJS_FAST_CALL : ident(i),
-                                                    param(p->next.release()),
+                                                    param(p),
                                                     body(b) {
-    Parser::removeNodeCycle(param.get());
     addParams();
     m_mayHaveDeclarations = true;
   }
@@ -1929,10 +1874,8 @@ class FuncDeclNode : public StatementNode {
 class SourceElementsNode : public StatementNode {
  public:
   static int count;
-  // list pointer is tail of a circular list, cracked in the BlockNode (or
-  // subclass) ctor
   SourceElementsNode(StatementNode*) KJS_FAST_CALL;
-  SourceElementsNode(SourceElementsNode* s1, StatementNode* s2) KJS_FAST_CALL;
+  SourceElementsNode(SourceElementsNode*, StatementNode*) KJS_FAST_CALL;
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1942,7 +1885,6 @@ class SourceElementsNode : public StatementNode {
   PassRefPtr<SourceElementsNode> releaseNext() KJS_FAST_CALL {
     return next.release();
   }
-  virtual void breakCycle() KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
@@ -1957,10 +1899,8 @@ class CaseClauseNode : public Node {
   CaseClauseNode(Node* e) KJS_FAST_CALL : expr(e) {
     m_mayHaveDeclarations = true;
   }
-  CaseClauseNode(Node* e, SourceElementsNode* s) KJS_FAST_CALL
-      : expr(e),
-        source(s->next.release()) {
-    Parser::removeNodeCycle(source.get());
+  CaseClauseNode(Node* e, SourceElementsNode* s) KJS_FAST_CALL : expr(e),
+                                                                 source(s) {
     m_mayHaveDeclarations = true;
   }
   virtual void optimizeVariableAccess(FunctionBodyNode*,
@@ -1982,14 +1922,11 @@ class CaseClauseNode : public Node {
 
 class ClauseListNode : public Node {
  public:
-  // list pointer is tail of a circular list, cracked in the CaseBlockNode ctor
-  ClauseListNode(CaseClauseNode* c) KJS_FAST_CALL : clause(c), next(this) {
-    Parser::noteNodeCycle(this);
+  ClauseListNode(CaseClauseNode* c) KJS_FAST_CALL : clause(c) {
     m_mayHaveDeclarations = true;
   }
   ClauseListNode(ClauseListNode* n, CaseClauseNode* c) KJS_FAST_CALL
-      : clause(c),
-        next(n->next) {
+      : clause(c) {
     n->next = this;
     m_mayHaveDeclarations = true;
   }
@@ -2003,7 +1940,6 @@ class ClauseListNode : public Node {
   PassRefPtr<ClauseListNode> releaseNext() KJS_FAST_CALL {
     return next.release();
   }
-  virtual void breakCycle() KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
