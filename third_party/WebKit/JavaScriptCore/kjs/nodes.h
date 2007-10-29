@@ -834,9 +834,9 @@ class TypeOfResolveNode : public Node {
   size_t m_index;  // Used by LocalTypeOfNode.
 };
 
-class LocalTypeOfAccessNode : public TypeOfResolveNode {
+class LocalVarTypeOfNode : public TypeOfResolveNode {
  public:
-  LocalTypeOfAccessNode(size_t i) KJS_FAST_CALL
+  LocalVarTypeOfNode(size_t i) KJS_FAST_CALL
       : TypeOfResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
@@ -867,8 +867,7 @@ class PrefixResolveNode : public Node {
 
   PrefixResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : Node(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt),
-        m_oper(m_oper) {}
+        m_ident(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -881,12 +880,12 @@ class PrefixResolveNode : public Node {
  protected:
   Identifier m_ident;
   Operator m_oper;
-  size_t m_index;
+  size_t m_index;  // Used by LocalVarPrefixNode.
 };
 
-class PrefixLocalAccessNode : public PrefixResolveNode {
+class LocalVarPrefixNode : public PrefixResolveNode {
  public:
-  PrefixLocalAccessNode(size_t i) KJS_FAST_CALL
+  LocalVarPrefixNode(size_t i) KJS_FAST_CALL
       : PrefixResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
@@ -1382,7 +1381,6 @@ class AssignResolveNode : public Node {
   AssignResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : Node(PlacementNewAdopt),
         m_ident(PlacementNewAdopt),
-        m_oper(m_oper),
         m_right(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
@@ -1396,12 +1394,12 @@ class AssignResolveNode : public Node {
   Identifier m_ident;
   Operator m_oper;
   RefPtr<Node> m_right;
-  size_t m_index;
+  size_t m_index;  // Used by LocalVarAssignNode.
 };
 
-class AssignLocalAccessNode : public AssignResolveNode {
+class LocalVarAssignNode : public AssignResolveNode {
  public:
-  AssignLocalAccessNode(size_t i) KJS_FAST_CALL
+  LocalVarAssignNode(size_t i) KJS_FAST_CALL
       : AssignResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
