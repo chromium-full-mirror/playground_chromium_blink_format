@@ -335,7 +335,7 @@ class LocalVarAccessNode : public ResolveNode {
     ASSERT(n == this);
     ASSERT(sizeof(n) == sizeof(this));
 
-    ASSERT(i != missingSymbolMarker);
+    ASSERT(i != missingSymbolMarker());
     index = i;
   }
 
