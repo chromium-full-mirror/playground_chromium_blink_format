@@ -80,6 +80,10 @@ class RenderThemeMac : public RenderTheme {
   virtual int popupInternalPaddingTop(RenderStyle*) const;
   virtual int popupInternalPaddingBottom(RenderStyle*) const;
 
+  virtual bool paintCapsLockIndicator(RenderObject*,
+                                      const RenderObject::PaintInfo&,
+                                      const IntRect&);
+
  protected:
   // Methods for each appearance value.
   virtual bool paintCheckbox(RenderObject*,

@@ -156,4 +156,8 @@ PlatformKeyboardEvent::PlatformKeyboardEvent(HWND,
       m_ctrlKey(GetKeyState(VK_CONTROL) & HIGH_BIT_MASK_SHORT),
       m_altKey(GetKeyState(VK_MENU) & HIGH_BIT_MASK_SHORT),
       m_metaKey(m_altKey) {}
+
+bool PlatformKeyboardEvent::currentCapsLockState() {
+  return GetKeyState(VK_CAPITAL) & 1;
+}
 }

@@ -1075,6 +1075,8 @@ class RenderObject : public CachedResourceClient {
 
   virtual void removeLeftoverAnonymousBlock(RenderBlock* child);
 
+  virtual void capsLockStateMayHaveChanged() {}
+
   AnimationController* animationController() const;
 
  protected:

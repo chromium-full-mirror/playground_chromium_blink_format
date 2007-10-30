@@ -1901,4 +1901,11 @@ void EventHandler::defaultTabEventHandler(Event* event, bool isBackTab) {
   if (handled)
     event->setDefaultHandled();
 }
+
+void EventHandler::capsLockStateMayHaveChanged() {
+  if (Document* d = m_frame->document())
+    if (Node* node = d->focusedNode())
+      if (RenderObject* r = node->renderer())
+        r->capsLockStateMayHaveChanged();
+}
 }

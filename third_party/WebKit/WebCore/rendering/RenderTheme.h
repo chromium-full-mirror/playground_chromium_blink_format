@@ -169,6 +169,13 @@ class RenderTheme {
   virtual int popupInternalPaddingTop(RenderStyle*) const { return 0; }
   virtual int popupInternalPaddingBottom(RenderStyle*) const { return 0; }
 
+  // Method for painting the caps lock indicator
+  virtual bool paintCapsLockIndicator(RenderObject*,
+                                      const RenderObject::PaintInfo&,
+                                      const IntRect&) {
+    return 0;
+  };
+
  protected:
   // Methods for each appearance value.
   virtual void adjustCheckboxStyle(CSSStyleSelector*,

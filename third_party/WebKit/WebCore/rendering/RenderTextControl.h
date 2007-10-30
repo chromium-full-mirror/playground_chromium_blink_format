@@ -60,6 +60,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
                            HitTestAction);
   virtual void layout();
   virtual bool avoidsFloats() const { return true; }
+  virtual void paint(PaintInfo&, int tx, int ty);
 
   virtual bool isEdited() const { return m_dirty; }
   virtual void setEdited(bool isEdited) { m_dirty = isEdited; }
@@ -111,6 +112,8 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
 
   bool placeholderIsVisible() const { return m_placeholderVisible; }
 
+  virtual void capsLockStateMayHaveChanged();
+
  private:
   // PopupMenuClient methods
   virtual void valueChanged(unsigned listIndex, bool fireEvents = true);
@@ -154,6 +157,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   bool m_multiLine;
   bool m_placeholderVisible;
   bool m_userEdited;
+  bool m_shouldDrawCapsLockIndicator;
 
   RefPtr<SearchPopupMenu> m_searchPopup;
   bool m_searchPopupIsVisible;

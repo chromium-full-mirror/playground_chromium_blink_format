@@ -152,6 +152,8 @@ class EventHandler : Noncopyable {
 
   void focusDocumentView();
 
+  void capsLockStateMayHaveChanged();
+
 #if PLATFORM(MAC)
   PassRefPtr<KeyboardEvent> currentKeyboardEvent() const;
 
