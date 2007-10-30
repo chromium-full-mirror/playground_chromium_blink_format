@@ -55,6 +55,12 @@ class InspectorController {
   typedef HashMap<RefPtr<Frame>, ResourcesMap*> FrameResourcesMap;
   typedef HashSet<RefPtr<InspectorDatabaseResource>> DatabaseResourcesSet;
 
+  typedef enum {
+    FocusedNodeDocumentPanel,
+    ConsolePanel,
+    TimelinePanel
+  } SpecialPanels;
+
   InspectorController(Page*, InspectorClient*);
   ~InspectorController();
 
@@ -67,6 +73,11 @@ class InspectorController {
   void inspect(Node*);
   void highlight(Node*);
   void hideHighlight();
+
+  void show();
+  void showConsole();
+  void showTimeline();
+  void close();
 
   bool windowVisible();
   void setWindowVisible(bool visible = true);
@@ -86,7 +97,6 @@ class InspectorController {
   void windowScriptObjectAvailable();
 
   void scriptObjectReady();
-  void windowUnloading();
 
   void populateScriptResources();
   void clearScriptResources();
@@ -176,6 +186,7 @@ class InspectorController {
   JSObjectRef m_controllerScriptObject;
   JSContextRef m_scriptContext;
   bool m_windowVisible;
+  SpecialPanels m_showAfterVisible;
   long long m_nextIdentifier;
 };
 

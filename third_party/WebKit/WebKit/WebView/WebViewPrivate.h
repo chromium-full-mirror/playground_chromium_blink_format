@@ -39,6 +39,7 @@
 
 @class NSError;
 @class WebFrame;
+@class WebInspector;
 @class WebPreferences;
 
 @protocol WebFormDelegate;
@@ -175,6 +176,8 @@ incremental searching), NO to begin search after the selected text.
 
 + (BOOL)_developerExtrasEnabled;
 + (BOOL)_scriptDebuggerEnabled;
+
+- (WebInspector*)inspector;
 
 /*!
     @method setBackgroundColor:
