@@ -31,7 +31,6 @@
 
 #include "DebuggerClient.h"
 #include "DebuggerDocument.h"
-#include "HelperFunctions.h"
 #include "resource.h"
 #include "ServerConnection.h"
 
@@ -40,6 +39,7 @@
 #include <WebKit/IWebMutableURLRequest.h>
 #include <WebKit/IWebView.h>
 #include <WebKit/WebKit.h>
+#include <wtf/RetainPtr.h>
 
 const unsigned MAX_LOADSTRING = 100;
 
@@ -49,6 +49,8 @@ TCHAR szWindowClass[MAX_LOADSTRING];  // the main window class name
 static const LRESULT kNotHandledResult = -1;
 static LPCTSTR kDroseraPointerProp = TEXT("DroseraPointer");
 static HINSTANCE hInst;
+
+BSTR cfStringToBSTR(CFStringRef cfstr);
 
 ATOM registerDroseraClass(HINSTANCE hInstance);
 LRESULT CALLBACK droseraWndProc(HWND hWnd,
@@ -325,4 +327,20 @@ HRESULT Drosera::attach() {
     return ret;
 
   return ret;
+}
+
+BSTR cfStringToBSTR(CFStringRef cfstr) {
+  if (!cfstr)
+    return 0;
+
+  const UniChar* uniChars = CFStringGetCharactersPtr(cfstr);
+  if (uniChars)
+    return SysAllocStringLen((LPCTSTR)uniChars, CFStringGetLength(cfstr));
+
+  CFIndex length = CFStringGetLength(cfstr);
+  BSTR bstr = SysAllocStringLen(0, length);
+  CFStringGetCharacters(cfstr, CFRangeMake(0, length), (UniChar*)bstr);
+  bstr[length] = 0;
+
+  return bstr;
 }

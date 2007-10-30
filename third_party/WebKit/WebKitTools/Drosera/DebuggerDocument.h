@@ -174,6 +174,8 @@ class DebuggerDocument {
                                    JSObjectRef windowObject,
                                    JSValueRef* exception = 0);
 
+  ServerConnection* server() const { return m_server.get(); }
+
  private:
   static JSValueRef callFunctionOnObject(
       JSContextRef,
