@@ -305,7 +305,7 @@ void DebuggerDocument::willExecuteStatement(JSContextRef context,
 
   DebuggerDocument::callGlobalFunction(context, "willExecuteStatement",
                                        argumentsSize, arguments, exception);
-  if (*exception)
+  if (exception && *exception)
     logException(context, *exception);
 }
 
@@ -318,7 +318,7 @@ void DebuggerDocument::didEnterCallFrame(JSContextRef context,
 
   DebuggerDocument::callGlobalFunction(context, "didEnterCallFrame",
                                        argumentsSize, arguments, exception);
-  if (*exception)
+  if (exception && *exception)
     logException(context, *exception);
 }
 
@@ -331,7 +331,7 @@ void DebuggerDocument::willLeaveCallFrame(JSContextRef context,
 
   DebuggerDocument::callGlobalFunction(context, "willLeaveCallFrame",
                                        argumentsSize, arguments, exception);
-  if (*exception)
+  if (exception && *exception)
     logException(context, *exception);
 }
 
@@ -356,7 +356,7 @@ void DebuggerDocument::windowScriptObjectAvailable(JSContextRef context,
   JSObjectSetProperty(
       context, windowObject, droseraStr.get(), droseraObject,
       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, exception);
-  if (*exception)
+  if (exception && *exception)
     logException(context, *exception);
 }
 
@@ -423,7 +423,7 @@ JSValueRef DebuggerDocument::callFunctionOnObject(JSContextRef context,
 
   JSValueRef returnValue = JSObjectCallAsFunction(
       context, function, 0, argumentCount, arguments, exception);
-  if (*exception)
+  if (exception && *exception)
     logException(context, *exception);
 
   return returnValue;
