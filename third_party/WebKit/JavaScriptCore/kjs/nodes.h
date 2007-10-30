@@ -641,13 +641,11 @@ class FunctionCallDotNode : public Node {
   RefPtr<ArgumentsNode> args;
 };
 
-class PostfixResolveNode : public Node {
+class PostIncResolveNode : public Node {
  public:
-  PostfixResolveNode(const Identifier& i, Operator o) KJS_FAST_CALL
-      : m_ident(i),
-        m_oper(o) {}
+  PostIncResolveNode(const Identifier& i) KJS_FAST_CALL : m_ident(i) {}
 
-  PostfixResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+  PostIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : Node(PlacementNewAdopt),
         m_ident(PlacementNewAdopt) {}
 
@@ -660,14 +658,44 @@ class PostfixResolveNode : public Node {
 
  protected:
   Identifier m_ident;
-  Operator m_oper;
   size_t index;  // Used by LocalVarPostfixNode.
 };
 
-class LocalVarPostfixNode : public PostfixResolveNode {
+class PostIncLocalVarNode : public PostIncResolveNode {
  public:
-  LocalVarPostfixNode(size_t i) KJS_FAST_CALL
-      : PostfixResolveNode(PlacementNewAdopt) {
+  PostIncLocalVarNode(size_t i) KJS_FAST_CALL
+      : PostIncResolveNode(PlacementNewAdopt) {
+    ASSERT(i != missingSymbolMarker());
+    index = i;
+  }
+
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+};
+
+class PostDecResolveNode : public Node {
+ public:
+  PostDecResolveNode(const Identifier& i) KJS_FAST_CALL : m_ident(i) {}
+
+  PostDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+      : Node(PlacementNewAdopt),
+        m_ident(PlacementNewAdopt) {}
+
+  virtual void optimizeVariableAccess(FunctionBodyNode*,
+                                      DeclarationStacks::NodeStack&)
+      KJS_FAST_CALL;
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual Precedence precedence() const { return PrecPostfix; }
+
+ protected:
+  Identifier m_ident;
+  size_t index;  // Used by LocalVarPostfixNode.
+};
+
+class PostDecLocalVarNode : public PostDecResolveNode {
+ public:
+  PostDecLocalVarNode(size_t i) KJS_FAST_CALL
+      : PostDecResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     index = i;
   }
@@ -677,40 +705,74 @@ class LocalVarPostfixNode : public PostfixResolveNode {
 
 class PostfixBracketNode : public Node {
  public:
-  PostfixBracketNode(Node* b, Node* s, Operator o) KJS_FAST_CALL
-      : m_base(b),
-        m_subscript(s),
-        m_oper(o) {}
+  PostfixBracketNode(Node* b, Node* s) KJS_FAST_CALL : m_base(b),
+                                                       m_subscript(s) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
 
- private:
+ protected:
+  virtual bool isIncrement() const = 0;
   RefPtr<Node> m_base;
   RefPtr<Node> m_subscript;
-  Operator m_oper;
+};
+
+class PostIncBracketNode : public PostfixBracketNode {
+ public:
+  PostIncBracketNode(Node* b, Node* s) KJS_FAST_CALL
+      : PostfixBracketNode(b, s) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  virtual bool isIncrement() const { return true; }
+};
+
+class PostDecBracketNode : public PostfixBracketNode {
+ public:
+  PostDecBracketNode(Node* b, Node* s) KJS_FAST_CALL
+      : PostfixBracketNode(b, s) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  virtual bool isIncrement() const { return false; }
 };
 
 class PostfixDotNode : public Node {
  public:
-  PostfixDotNode(Node* b, const Identifier& i, Operator o) KJS_FAST_CALL
-      : m_base(b),
-        m_ident(i),
-        m_oper(o) {}
+  PostfixDotNode(Node* b, const Identifier& i) KJS_FAST_CALL : m_base(b),
+                                                               m_ident(i) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
 
- private:
+ protected:
+  virtual bool isIncrement() const = 0;
   RefPtr<Node> m_base;
   Identifier m_ident;
-  Operator m_oper;
+};
+
+class PostIncDotNode : public PostfixDotNode {
+ public:
+  PostIncDotNode(Node* b, const Identifier& i) KJS_FAST_CALL
+      : PostfixDotNode(b, i) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  virtual bool isIncrement() const { return true; }
+};
+
+class PostDecDotNode : public PostfixDotNode {
+ public:
+  PostDecDotNode(Node* b, const Identifier& i) KJS_FAST_CALL
+      : PostfixDotNode(b, i) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  virtual bool isIncrement() const { return false; }
 };
 
 class PostfixErrorNode : public Node {
@@ -859,13 +921,11 @@ class TypeOfValueNode : public Node {
   RefPtr<Node> m_expr;
 };
 
-class PrefixResolveNode : public Node {
+class PreIncResolveNode : public Node {
  public:
-  PrefixResolveNode(const Identifier& s, Operator o) KJS_FAST_CALL : m_ident(s),
-                                                                     m_oper(o) {
-  }
+  PreIncResolveNode(const Identifier& s) KJS_FAST_CALL : m_ident(s) {}
 
-  PrefixResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+  PreIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : Node(PlacementNewAdopt),
         m_ident(PlacementNewAdopt) {}
 
@@ -879,14 +939,45 @@ class PrefixResolveNode : public Node {
 
  protected:
   Identifier m_ident;
-  Operator m_oper;
   size_t m_index;  // Used by LocalVarPrefixNode.
 };
 
-class LocalVarPrefixNode : public PrefixResolveNode {
+class PreIncLocalVarNode : public PreIncResolveNode {
  public:
-  LocalVarPrefixNode(size_t i) KJS_FAST_CALL
-      : PrefixResolveNode(PlacementNewAdopt) {
+  PreIncLocalVarNode(size_t i) KJS_FAST_CALL
+      : PreIncResolveNode(PlacementNewAdopt) {
+    ASSERT(i != missingSymbolMarker());
+    m_index = i;
+  }
+
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+};
+
+class PreDecResolveNode : public Node {
+ public:
+  PreDecResolveNode(const Identifier& s) KJS_FAST_CALL : m_ident(s) {}
+
+  PreDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+      : Node(PlacementNewAdopt),
+        m_ident(PlacementNewAdopt) {}
+
+  virtual void optimizeVariableAccess(FunctionBodyNode*,
+                                      DeclarationStacks::NodeStack&)
+      KJS_FAST_CALL;
+
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual Precedence precedence() const { return PrecUnary; }
+
+ protected:
+  Identifier m_ident;
+  size_t m_index;  // Used by LocalVarPrefixNode.
+};
+
+class PreDecLocalVarNode : public PreDecResolveNode {
+ public:
+  PreDecLocalVarNode(size_t i) KJS_FAST_CALL
+      : PreDecResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
@@ -896,40 +987,73 @@ class LocalVarPrefixNode : public PrefixResolveNode {
 
 class PrefixBracketNode : public Node {
  public:
-  PrefixBracketNode(Node* b, Node* s, Operator o) KJS_FAST_CALL
-      : m_base(b),
-        m_subscript(s),
-        m_oper(o) {}
+  PrefixBracketNode(Node* b, Node* s) KJS_FAST_CALL : m_base(b),
+                                                      m_subscript(s) {}
+
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
- private:
+ protected:
+  virtual bool isIncrement() const = 0;
   RefPtr<Node> m_base;
   RefPtr<Node> m_subscript;
-  Operator m_oper;
+};
+
+class PreIncBracketNode : public PrefixBracketNode {
+ public:
+  PreIncBracketNode(Node* b, Node* s) KJS_FAST_CALL : PrefixBracketNode(b, s) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  bool isIncrement() const { return true; }
+};
+
+class PreDecBracketNode : public PrefixBracketNode {
+ public:
+  PreDecBracketNode(Node* b, Node* s) KJS_FAST_CALL : PrefixBracketNode(b, s) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  bool isIncrement() const { return false; }
 };
 
 class PrefixDotNode : public Node {
  public:
-  PrefixDotNode(Node* b, const Identifier& i, Operator o) KJS_FAST_CALL
-      : m_base(b),
-        m_ident(i),
-        m_oper(o) {}
+  PrefixDotNode(Node* b, const Identifier& i) KJS_FAST_CALL : m_base(b),
+                                                              m_ident(i) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual Precedence precedence() const { return PrecUnary; }
+  virtual Precedence precedence() const { return PrecPostfix; }
 
- private:
+ protected:
+  virtual bool isIncrement() const = 0;
   RefPtr<Node> m_base;
   Identifier m_ident;
-  Operator m_oper;
+};
+
+class PreIncDotNode : public PrefixDotNode {
+ public:
+  PreIncDotNode(Node* b, const Identifier& i) KJS_FAST_CALL
+      : PrefixDotNode(b, i) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  virtual bool isIncrement() const { return true; }
+};
+
+class PreDecDotNode : public PrefixDotNode {
+ public:
+  PreDecDotNode(Node* b, const Identifier& i) KJS_FAST_CALL
+      : PrefixDotNode(b, i) {}
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+ protected:
+  virtual bool isIncrement() const { return false; }
 };
 
 class PrefixErrorNode : public Node {
@@ -1370,15 +1494,15 @@ class ConditionalNode : public Node {
   RefPtr<Node> expr2;
 };
 
-class AssignResolveNode : public Node {
+class ReadModifyResolveNode : public Node {
  public:
-  AssignResolveNode(const Identifier& ident,
-                    Operator oper,
-                    Node* right) KJS_FAST_CALL : m_ident(ident),
-                                                 m_oper(oper),
-                                                 m_right(right) {}
+  ReadModifyResolveNode(const Identifier& ident,
+                        Operator oper,
+                        Node* right) KJS_FAST_CALL : m_ident(ident),
+                                                     m_oper(oper),
+                                                     m_right(right) {}
 
-  AssignResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+  ReadModifyResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : Node(PlacementNewAdopt),
         m_ident(PlacementNewAdopt),
         m_right(PlacementNewAdopt) {}
@@ -1394,12 +1518,47 @@ class AssignResolveNode : public Node {
   Identifier m_ident;
   Operator m_oper;
   RefPtr<Node> m_right;
-  size_t m_index;  // Used by LocalVarAssignNode.
+  size_t m_index;  // Used by ReadModifyLocalVarNode.
 };
 
-class LocalVarAssignNode : public AssignResolveNode {
+class ReadModifyLocalVarNode : public ReadModifyResolveNode {
  public:
-  LocalVarAssignNode(size_t i) KJS_FAST_CALL
+  ReadModifyLocalVarNode(size_t i) KJS_FAST_CALL
+      : ReadModifyResolveNode(PlacementNewAdopt) {
+    ASSERT(i != missingSymbolMarker());
+    m_index = i;
+  }
+
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+};
+
+class AssignResolveNode : public Node {
+ public:
+  AssignResolveNode(const Identifier& ident, Node* right) KJS_FAST_CALL
+      : m_ident(ident),
+        m_right(right) {}
+
+  AssignResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+      : Node(PlacementNewAdopt),
+        m_ident(PlacementNewAdopt),
+        m_right(PlacementNewAdopt) {}
+
+  virtual void optimizeVariableAccess(FunctionBodyNode*,
+                                      DeclarationStacks::NodeStack&)
+      KJS_FAST_CALL;
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual Precedence precedence() const { return PrecAssignment; }
+
+ protected:
+  Identifier m_ident;
+  RefPtr<Node> m_right;
+  size_t m_index;  // Used by ReadModifyLocalVarNode.
+};
+
+class AssignLocalVarNode : public AssignResolveNode {
+ public:
+  AssignLocalVarNode(size_t i) KJS_FAST_CALL
       : AssignResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;

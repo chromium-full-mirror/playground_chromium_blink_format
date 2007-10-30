@@ -939,14 +939,15 @@ JSValue* FunctionCallDotNode::evaluate(ExecState* exec) {
 // ------------------------------ PostfixResolveNode
 // ----------------------------------
 
-void PostfixResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
+// Increment
+void PostIncResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
                                                 DeclarationStacks::NodeStack&) {
   size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
   if (index != missingSymbolMarker())
-    new (this) LocalVarPostfixNode(index);
+    new (this) PostIncLocalVarNode(index);
 }
 
-JSValue* PostfixResolveNode::evaluate(ExecState* exec) {
+JSValue* PostIncResolveNode::evaluate(ExecState* exec) {
   // Check for missed optimization opportunity.
   ASSERT(!canSkipLookup(exec, m_ident));
 
@@ -965,10 +966,7 @@ JSValue* PostfixResolveNode::evaluate(ExecState* exec) {
       JSValue* v = slot.getValue(exec, base, m_ident);
 
       double n = v->toNumber(exec);
-
-      double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-      base->put(exec, m_ident, jsNumber(newValue));
-
+      base->put(exec, m_ident, jsNumber(n + 1));
       return jsNumber(n);
     }
 
@@ -978,7 +976,7 @@ JSValue* PostfixResolveNode::evaluate(ExecState* exec) {
   return throwUndefinedVariableError(exec, m_ident);
 }
 
-JSValue* LocalVarPostfixNode::evaluate(ExecState* exec) {
+JSValue* PostIncLocalVarNode::evaluate(ExecState* exec) {
   ActivationImp* variableObject =
       static_cast<ActivationImp*>(exec->variableObject());
   ASSERT(variableObject->isActivation());
@@ -986,8 +984,56 @@ JSValue* LocalVarPostfixNode::evaluate(ExecState* exec) {
 
   JSValue** slot = &variableObject->localStorage()[index].value;
   double n = (*slot)->toNumber(exec);
-  double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-  *slot = jsNumber(newValue);
+  *slot = jsNumber(n + 1);
+  return jsNumber(n);
+}
+
+// Decrement
+void PostDecResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
+                                                DeclarationStacks::NodeStack&) {
+  size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
+  if (index != missingSymbolMarker())
+    new (this) PostDecLocalVarNode(index);
+}
+
+JSValue* PostDecResolveNode::evaluate(ExecState* exec) {
+  // Check for missed optimization opportunity.
+  ASSERT(!canSkipLookup(exec, m_ident));
+
+  const ScopeChain& chain = exec->scopeChain();
+  ScopeChainIterator iter = chain.begin();
+  ScopeChainIterator end = chain.end();
+
+  // we must always have something in the scope chain
+  ASSERT(iter != end);
+
+  PropertySlot slot;
+  JSObject* base;
+  do {
+    base = *iter;
+    if (base->getPropertySlot(exec, m_ident, slot)) {
+      JSValue* v = slot.getValue(exec, base, m_ident);
+
+      double n = v->toNumber(exec);
+      base->put(exec, m_ident, jsNumber(n - 1));
+      return jsNumber(n);
+    }
+
+    ++iter;
+  } while (iter != end);
+
+  return throwUndefinedVariableError(exec, m_ident);
+}
+
+JSValue* PostDecLocalVarNode::evaluate(ExecState* exec) {
+  ActivationImp* variableObject =
+      static_cast<ActivationImp*>(exec->variableObject());
+  ASSERT(variableObject->isActivation());
+  ASSERT(variableObject == exec->scopeChain().top());
+
+  JSValue** slot = &variableObject->localStorage()[index].value;
+  double n = (*slot)->toNumber(exec);
+  *slot = jsNumber(n - 1);
   return jsNumber(n);
 }
 
@@ -1001,7 +1047,7 @@ void PostfixBracketNode::optimizeVariableAccess(
   nodeStack.append(m_base.get());
 }
 
-JSValue* PostfixBracketNode::evaluate(ExecState* exec) {
+JSValue* PostIncBracketNode::evaluate(ExecState* exec) {
   JSValue* baseValue = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   JSValue* subscript = m_subscript->evaluate(exec);
@@ -1019,8 +1065,7 @@ JSValue* PostfixBracketNode::evaluate(ExecState* exec) {
 
     double n = v->toNumber(exec);
 
-    double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-    base->put(exec, propertyIndex, jsNumber(newValue));
+    base->put(exec, propertyIndex, jsNumber(n + 1));
 
     return jsNumber(n);
   }
@@ -1034,8 +1079,44 @@ JSValue* PostfixBracketNode::evaluate(ExecState* exec) {
 
   double n = v->toNumber(exec);
 
-  double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-  base->put(exec, propertyName, jsNumber(newValue));
+  base->put(exec, propertyName, jsNumber(n + 1));
+
+  return jsNumber(n);
+}
+
+JSValue* PostDecBracketNode::evaluate(ExecState* exec) {
+  JSValue* baseValue = m_base->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+  JSValue* subscript = m_subscript->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSObject* base = baseValue->toObject(exec);
+
+  uint32_t propertyIndex;
+  if (subscript->getUInt32(propertyIndex)) {
+    PropertySlot slot;
+    JSValue* v = base->getPropertySlot(exec, propertyIndex, slot)
+                     ? slot.getValue(exec, base, propertyIndex)
+                     : jsUndefined();
+    KJS_CHECKEXCEPTIONVALUE
+
+    double n = v->toNumber(exec);
+
+    base->put(exec, propertyIndex, jsNumber(n - 1));
+
+    return jsNumber(n);
+  }
+
+  Identifier propertyName(subscript->toString(exec));
+  PropertySlot slot;
+  JSValue* v = base->getPropertySlot(exec, propertyName, slot)
+                   ? slot.getValue(exec, base, propertyName)
+                   : jsUndefined();
+  KJS_CHECKEXCEPTIONVALUE
+
+  double n = v->toNumber(exec);
+
+  base->put(exec, propertyName, jsNumber(n - 1));
 
   return jsNumber(n);
 }
@@ -1049,7 +1130,7 @@ void PostfixDotNode::optimizeVariableAccess(
   nodeStack.append(m_base.get());
 }
 
-JSValue* PostfixDotNode::evaluate(ExecState* exec) {
+JSValue* PostIncDotNode::evaluate(ExecState* exec) {
   JSValue* baseValue = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   JSObject* base = baseValue->toObject(exec);
@@ -1062,8 +1143,25 @@ JSValue* PostfixDotNode::evaluate(ExecState* exec) {
 
   double n = v->toNumber(exec);
 
-  double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-  base->put(exec, m_ident, jsNumber(newValue));
+  base->put(exec, m_ident, jsNumber(n + 1));
+
+  return jsNumber(n);
+}
+
+JSValue* PostDecDotNode::evaluate(ExecState* exec) {
+  JSValue* baseValue = m_base->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+  JSObject* base = baseValue->toObject(exec);
+
+  PropertySlot slot;
+  JSValue* v = base->getPropertySlot(exec, m_ident, slot)
+                   ? slot.getValue(exec, base, m_ident)
+                   : jsUndefined();
+  KJS_CHECKEXCEPTIONVALUE
+
+  double n = v->toNumber(exec);
+
+  base->put(exec, m_ident, jsNumber(n - 1));
 
   return jsNumber(n);
 }
@@ -1286,14 +1384,14 @@ JSValue* TypeOfValueNode::evaluate(ExecState* exec) {
 // ------------------------------ PrefixResolveNode
 // ----------------------------------
 
-void PrefixResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
+void PreIncResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
                                                DeclarationStacks::NodeStack&) {
   size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
   if (index != missingSymbolMarker())
-    new (this) LocalVarPrefixNode(index);
+    new (this) PreIncLocalVarNode(index);
 }
 
-JSValue* LocalVarPrefixNode::evaluate(ExecState* exec) {
+JSValue* PreIncLocalVarNode::evaluate(ExecState* exec) {
   ActivationImp* variableObject =
       static_cast<ActivationImp*>(exec->variableObject());
   ASSERT(variableObject->isActivation());
@@ -1301,14 +1399,12 @@ JSValue* LocalVarPrefixNode::evaluate(ExecState* exec) {
   JSValue* v = variableObject->localStorage()[m_index].value;
 
   double n = v->toNumber(exec);
-
-  double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-  JSValue* n2 = jsNumber(newValue);
+  JSValue* n2 = jsNumber(n + 1);
   variableObject->localStorage()[m_index].value = n2;
   return n2;
 }
 
-JSValue* PrefixResolveNode::evaluate(ExecState* exec) {
+JSValue* PreIncResolveNode::evaluate(ExecState* exec) {
   const ScopeChain& chain = exec->scopeChain();
   ScopeChainIterator iter = chain.begin();
   ScopeChainIterator end = chain.end();
@@ -1324,9 +1420,55 @@ JSValue* PrefixResolveNode::evaluate(ExecState* exec) {
       JSValue* v = slot.getValue(exec, base, m_ident);
 
       double n = v->toNumber(exec);
+      JSValue* n2 = jsNumber(n + 1);
+      base->put(exec, m_ident, n2);
 
-      double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-      JSValue* n2 = jsNumber(newValue);
+      return n2;
+    }
+
+    ++iter;
+  } while (iter != end);
+
+  return throwUndefinedVariableError(exec, m_ident);
+}
+
+void PreDecResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
+                                               DeclarationStacks::NodeStack&) {
+  size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
+  if (index != missingSymbolMarker())
+    new (this) PreDecLocalVarNode(index);
+}
+
+JSValue* PreDecLocalVarNode::evaluate(ExecState* exec) {
+  ActivationImp* variableObject =
+      static_cast<ActivationImp*>(exec->variableObject());
+  ASSERT(variableObject->isActivation());
+  ASSERT(variableObject == exec->scopeChain().top());
+  JSValue* v = variableObject->localStorage()[m_index].value;
+
+  double n = v->toNumber(exec);
+  JSValue* n2 = jsNumber(n - 1);
+  variableObject->localStorage()[m_index].value = n2;
+  return n2;
+}
+
+JSValue* PreDecResolveNode::evaluate(ExecState* exec) {
+  const ScopeChain& chain = exec->scopeChain();
+  ScopeChainIterator iter = chain.begin();
+  ScopeChainIterator end = chain.end();
+
+  // we must always have something in the scope chain
+  ASSERT(iter != end);
+
+  PropertySlot slot;
+  JSObject* base;
+  do {
+    base = *iter;
+    if (base->getPropertySlot(exec, m_ident, slot)) {
+      JSValue* v = slot.getValue(exec, base, m_ident);
+
+      double n = v->toNumber(exec);
+      JSValue* n2 = jsNumber(n - 1);
       base->put(exec, m_ident, n2);
 
       return n2;
@@ -1348,7 +1490,7 @@ void PrefixBracketNode::optimizeVariableAccess(
   nodeStack.append(m_base.get());
 }
 
-JSValue* PrefixBracketNode::evaluate(ExecState* exec) {
+JSValue* PreIncBracketNode::evaluate(ExecState* exec) {
   JSValue* baseValue = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   JSValue* subscript = m_subscript->evaluate(exec);
@@ -1364,10 +1506,7 @@ JSValue* PrefixBracketNode::evaluate(ExecState* exec) {
                      : jsUndefined();
     KJS_CHECKEXCEPTIONVALUE
 
-    double n = v->toNumber(exec);
-
-    double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-    JSValue* n2 = jsNumber(newValue);
+    JSValue* n2 = jsNumber(v->toNumber(exec) + 1);
     base->put(exec, propertyIndex, n2);
 
     return n2;
@@ -1380,10 +1519,42 @@ JSValue* PrefixBracketNode::evaluate(ExecState* exec) {
                    : jsUndefined();
   KJS_CHECKEXCEPTIONVALUE
 
-  double n = v->toNumber(exec);
+  JSValue* n2 = jsNumber(v->toNumber(exec) + 1);
+  base->put(exec, propertyName, n2);
 
-  double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-  JSValue* n2 = jsNumber(newValue);
+  return n2;
+}
+
+JSValue* PreDecBracketNode::evaluate(ExecState* exec) {
+  JSValue* baseValue = m_base->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+  JSValue* subscript = m_subscript->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSObject* base = baseValue->toObject(exec);
+
+  uint32_t propertyIndex;
+  if (subscript->getUInt32(propertyIndex)) {
+    PropertySlot slot;
+    JSValue* v = base->getPropertySlot(exec, propertyIndex, slot)
+                     ? slot.getValue(exec, base, propertyIndex)
+                     : jsUndefined();
+    KJS_CHECKEXCEPTIONVALUE
+
+    JSValue* n2 = jsNumber(v->toNumber(exec) - 1);
+    base->put(exec, propertyIndex, n2);
+
+    return n2;
+  }
+
+  Identifier propertyName(subscript->toString(exec));
+  PropertySlot slot;
+  JSValue* v = base->getPropertySlot(exec, propertyName, slot)
+                   ? slot.getValue(exec, base, propertyName)
+                   : jsUndefined();
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSValue* n2 = jsNumber(v->toNumber(exec) - 1);
   base->put(exec, propertyName, n2);
 
   return n2;
@@ -1398,7 +1569,7 @@ void PrefixDotNode::optimizeVariableAccess(
   nodeStack.append(m_base.get());
 }
 
-JSValue* PrefixDotNode::evaluate(ExecState* exec) {
+JSValue* PreIncDotNode::evaluate(ExecState* exec) {
   JSValue* baseValue = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   JSObject* base = baseValue->toObject(exec);
@@ -1410,9 +1581,25 @@ JSValue* PrefixDotNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
 
   double n = v->toNumber(exec);
+  JSValue* n2 = jsNumber(n + 1);
+  base->put(exec, m_ident, n2);
 
-  double newValue = (m_oper == OpPlusPlus) ? n + 1 : n - 1;
-  JSValue* n2 = jsNumber(newValue);
+  return n2;
+}
+
+JSValue* PreDecDotNode::evaluate(ExecState* exec) {
+  JSValue* baseValue = m_base->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+  JSObject* base = baseValue->toObject(exec);
+
+  PropertySlot slot;
+  JSValue* v = base->getPropertySlot(exec, m_ident, slot)
+                   ? slot.getValue(exec, base, m_ident)
+                   : jsUndefined();
+  KJS_CHECKEXCEPTIONVALUE
+
+  double n = v->toNumber(exec);
+  JSValue* n2 = jsNumber(n - 1);
   base->put(exec, m_ident, n2);
 
   return n2;
@@ -2071,8 +2258,17 @@ static ALWAYS_INLINE JSValue* valueForReadModifyAssignment(ExecState* exec,
   return v;
 }
 
-// ------------------------------ AssignResolveNode
+// ------------------------------ ReadModifyResolveNode
 // -----------------------------------
+
+void ReadModifyResolveNode::optimizeVariableAccess(
+    FunctionBodyNode* functionBody,
+    DeclarationStacks::NodeStack& nodeStack) {
+  nodeStack.append(m_right.get());
+  size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
+  if (index != missingSymbolMarker())
+    new (this) ReadModifyLocalVarNode(index);
+}
 
 void AssignResolveNode::optimizeVariableAccess(
     FunctionBodyNode* functionBody,
@@ -2080,10 +2276,10 @@ void AssignResolveNode::optimizeVariableAccess(
   nodeStack.append(m_right.get());
   size_t index = functionBody->symbolTable().get(m_ident.ustring().rep());
   if (index != missingSymbolMarker())
-    new (this) LocalVarAssignNode(index);
+    new (this) AssignLocalVarNode(index);
 }
 
-JSValue* LocalVarAssignNode::evaluate(ExecState* exec) {
+JSValue* ReadModifyLocalVarNode::evaluate(ExecState* exec) {
   ActivationImp* variableObject =
       static_cast<ActivationImp*>(exec->variableObject());
   ASSERT(variableObject->isActivation());
@@ -2104,7 +2300,21 @@ JSValue* LocalVarAssignNode::evaluate(ExecState* exec) {
   return v;
 }
 
-JSValue* AssignResolveNode::evaluate(ExecState* exec) {
+JSValue* AssignLocalVarNode::evaluate(ExecState* exec) {
+  ActivationImp* variableObject =
+      static_cast<ActivationImp*>(exec->variableObject());
+  ASSERT(variableObject->isActivation());
+  ASSERT(variableObject == exec->scopeChain().top());
+  JSValue* v = m_right->evaluate(exec);
+
+  KJS_CHECKEXCEPTIONVALUE
+
+  variableObject->localStorage()[m_index].value = v;
+
+  return v;
+}
+
+JSValue* ReadModifyResolveNode::evaluate(ExecState* exec) {
   const ScopeChain& chain = exec->scopeChain();
   ScopeChainIterator iter = chain.begin();
   ScopeChainIterator end = chain.end();
@@ -2136,6 +2346,33 @@ found:
     JSValue* v2 = m_right->evaluate(exec);
     v = valueForReadModifyAssignment(exec, v1, v2, m_oper);
   }
+
+  KJS_CHECKEXCEPTIONVALUE
+
+  base->put(exec, m_ident, v);
+  return v;
+}
+
+JSValue* AssignResolveNode::evaluate(ExecState* exec) {
+  const ScopeChain& chain = exec->scopeChain();
+  ScopeChainIterator iter = chain.begin();
+  ScopeChainIterator end = chain.end();
+
+  // we must always have something in the scope chain
+  ASSERT(iter != end);
+
+  PropertySlot slot;
+  JSObject* base;
+  do {
+    base = *iter;
+    if (base->getPropertySlot(exec, m_ident, slot))
+      goto found;
+
+    ++iter;
+  } while (iter != end);
+
+found:
+  JSValue* v = m_right->evaluate(exec);
 
   KJS_CHECKEXCEPTIONVALUE
 
