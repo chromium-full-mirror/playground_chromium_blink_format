@@ -54,7 +54,8 @@ LayoutTestController::LayoutTestController(
       m_testRepaint(testRepaintDefault),
       m_testRepaintSweepHorizontally(testRepaintSweepHorizontallyDefault),
       m_waitToDump(false),
-      m_windowIsKey(true) {}
+      m_windowIsKey(true),
+      m_globalFlag(false) {}
 
 // Static Functions
 
@@ -677,6 +678,28 @@ static JSValueRef windowCountCallback(JSContextRef context,
   return JSValueMakeNumber(context, windows);
 }
 
+// Static Values
+
+static JSValueRef getGlobalFlagCallback(JSContextRef context,
+                                        JSObjectRef thisObject,
+                                        JSStringRef propertyName,
+                                        JSValueRef* exception) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeBoolean(context, controller->globalFlag());
+}
+
+static bool setGlobalFlagCallback(JSContextRef context,
+                                  JSObjectRef thisObject,
+                                  JSStringRef propertyName,
+                                  JSValueRef value,
+                                  JSValueRef* exception) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setGlobalFlag(JSValueToBoolean(context, value));
+  return true;
+}
+
 // Object Creation
 
 void LayoutTestController::makeWindowObject(JSContextRef context,
@@ -693,15 +716,16 @@ void LayoutTestController::makeWindowObject(JSContextRef context,
 }
 
 JSClassRef LayoutTestController::getJSClass() {
-  static JSClassRef layoutTestControllerClass = 0;
+  static JSClassRef layoutTestControllerClass;
 
   if (!layoutTestControllerClass) {
+    JSStaticValue* staticValues = LayoutTestController::staticValues();
     JSStaticFunction* staticFunctions = LayoutTestController::staticFunctions();
     JSClassDefinition classDefinition = {0,
                                          kJSClassAttributeNone,
                                          "LayoutTestController",
                                          0,
-                                         0,
+                                         staticValues,
                                          staticFunctions,
                                          0,
                                          0,
@@ -719,6 +743,14 @@ JSClassRef LayoutTestController::getJSClass() {
   }
 
   return layoutTestControllerClass;
+}
+
+JSStaticValue* LayoutTestController::staticValues() {
+  static JSStaticValue staticValues[] = {
+      {"globalFlag", getGlobalFlagCallback, setGlobalFlagCallback,
+       kJSPropertyAttributeNone},
+      {0, 0, 0, 0}};
+  return staticValues;
 }
 
 JSStaticFunction* LayoutTestController::staticFunctions() {

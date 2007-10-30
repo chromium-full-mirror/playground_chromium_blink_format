@@ -157,6 +157,9 @@ class LayoutTestController {
   bool windowIsKey() const { return m_windowIsKey; }
   void setWindowIsKey(bool windowIsKey);
 
+  bool globalFlag() const { return m_globalFlag; }
+  void setGlobalFlag(bool globalFlag) { m_globalFlag = globalFlag; }
+
  private:
   bool m_dumpAsText;
   bool m_dumpBackForwardList;
@@ -179,7 +182,10 @@ class LayoutTestController {
                       // notifyDone() has not yet been called.
   bool m_windowIsKey;
 
+  bool m_globalFlag;
+
   static JSClassRef getJSClass();
+  static JSStaticValue* staticValues();
   static JSStaticFunction* staticFunctions();
 };
 
