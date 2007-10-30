@@ -4561,39 +4561,40 @@ void CSSStyleSelector::mapBackgroundYPosition(BackgroundLayer* layer,
   layer->setBackgroundYPosition(l);
 }
 
-void CSSStyleSelector::mapTransitionDuration(Transition* layer,
+void CSSStyleSelector::mapTransitionDuration(Transition* transition,
                                              CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    layer->setTransitionDuration(RenderStyle::initialTransitionDuration());
+    transition->setTransitionDuration(RenderStyle::initialTransitionDuration());
     return;
   }
 
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
   if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_S)
-    layer->setTransitionDuration(int(1000 * primitiveValue->getFloatValue()));
+    transition->setTransitionDuration(
+        int(1000 * primitiveValue->getFloatValue()));
   else if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_MS)
-    layer->setTransitionDuration(int(primitiveValue->getFloatValue()));
+    transition->setTransitionDuration(int(primitiveValue->getFloatValue()));
 }
 
-void CSSStyleSelector::mapTransitionRepeatCount(Transition* layer,
+void CSSStyleSelector::mapTransitionRepeatCount(Transition* transition,
                                                 CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    layer->setTransitionRepeatCount(
+    transition->setTransitionRepeatCount(
         RenderStyle::initialTransitionRepeatCount());
     return;
   }
 
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
   if (primitiveValue->getIdent() == CSS_VAL_INFINITE)
-    layer->setTransitionRepeatCount(-1);
+    transition->setTransitionRepeatCount(-1);
   else
-    layer->setTransitionRepeatCount(int(primitiveValue->getFloatValue()));
+    transition->setTransitionRepeatCount(int(primitiveValue->getFloatValue()));
 }
 
-void CSSStyleSelector::mapTransitionTimingFunction(Transition* layer,
+void CSSStyleSelector::mapTransitionTimingFunction(Transition* transition,
                                                    CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    layer->setTransitionTimingFunction(
+    transition->setTransitionTimingFunction(
         RenderStyle::initialTransitionTimingFunction());
     return;
   }
@@ -4602,26 +4603,23 @@ void CSSStyleSelector::mapTransitionTimingFunction(Transition* layer,
     CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
     switch (primitiveValue->getIdent()) {
       case CSS_VAL_LINEAR:
-        layer->setTransitionTimingFunction(
+        transition->setTransitionTimingFunction(
             TimingFunction(LinearTimingFunction));
         break;
       case CSS_VAL_AUTO:
-        layer->setTransitionTimingFunction(TimingFunction());
+        transition->setTransitionTimingFunction(TimingFunction());
         break;
       case CSS_VAL_EASE_IN:
-        layer->setTransitionTimingFunction(
-            TimingFunction(CubicBezierTimingFunction, FloatPoint(.42f, .0f),
-                           FloatPoint(1.0f, 1.0f)));
+        transition->setTransitionTimingFunction(
+            TimingFunction(CubicBezierTimingFunction, .42, .0, 1.0, 1.0));
         break;
       case CSS_VAL_EASE_OUT:
-        layer->setTransitionTimingFunction(
-            TimingFunction(CubicBezierTimingFunction, FloatPoint(.0f, .0f),
-                           FloatPoint(.58f, 1.0f)));
+        transition->setTransitionTimingFunction(
+            TimingFunction(CubicBezierTimingFunction, .0, .0, .58, 1.0));
         break;
       case CSS_VAL_EASE_IN_OUT:
-        layer->setTransitionTimingFunction(
-            TimingFunction(CubicBezierTimingFunction, FloatPoint(.42f, .0f),
-                           FloatPoint(.58f, 1.0f)));
+        transition->setTransitionTimingFunction(
+            TimingFunction(CubicBezierTimingFunction, .42, .0, .58, 1.0));
         break;
     }
     return;
@@ -4629,20 +4627,20 @@ void CSSStyleSelector::mapTransitionTimingFunction(Transition* layer,
 
   CSSTimingFunctionValue* timingFunction =
       static_cast<CSSTimingFunctionValue*>(value);
-  layer->setTransitionTimingFunction(
-      TimingFunction(CubicBezierTimingFunction, timingFunction->firstPoint(),
-                     timingFunction->secondPoint()));
+  transition->setTransitionTimingFunction(TimingFunction(
+      CubicBezierTimingFunction, timingFunction->x1(), timingFunction->y1(),
+      timingFunction->x2(), timingFunction->y2()));
 }
 
-void CSSStyleSelector::mapTransitionProperty(Transition* layer,
+void CSSStyleSelector::mapTransitionProperty(Transition* transition,
                                              CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    layer->setTransitionProperty(RenderStyle::initialTransitionProperty());
+    transition->setTransitionProperty(RenderStyle::initialTransitionProperty());
     return;
   }
 
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
-  layer->setTransitionProperty(primitiveValue->getStringValue());
+  transition->setTransitionProperty(primitiveValue->getIdent());
 }
 
 void CSSStyleSelector::checkForTextSizeAdjust() {

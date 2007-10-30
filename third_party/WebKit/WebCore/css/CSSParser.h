@@ -159,7 +159,7 @@ class CSSParser {
   CSSValue* parseTransitionDuration();
   CSSValue* parseTransitionRepeatCount();
   CSSValue* parseTransitionTimingFunction();
-  bool parseTimingFunctionValue(ValueList*& args, float& result);
+  bool parseTimingFunctionValue(ValueList*& args, double& result);
   CSSValue* parseTransitionProperty();
   bool parseTransitionProperty(int propId, CSSValue*&);
   bool parseTransitionShorthand(bool important);

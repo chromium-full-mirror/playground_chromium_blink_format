@@ -27,7 +27,6 @@
 #include "config.h"
 #include "RenderBox.h"
 
-#include "AnimationController.h"
 #include "CachedImage.h"
 #include "Document.h"
 #include "FrameView.h"
@@ -152,10 +151,6 @@ void RenderBox::setStyle(RenderStyle* newStyle) {
     static_cast<RenderView*>(document()->renderer())
         ->setMaximalOutlineSize(style()->outlineSize());
 
-  // Notify the animation controller of the updated style so it can compare
-  // against its current animations and update as needed.
-  animationController()->updateTransitions(this, oldStyle, newStyle);
-
   if (oldStyle)
     oldStyle->deref(renderArena());
 }
@@ -163,7 +158,7 @@ void RenderBox::setStyle(RenderStyle* newStyle) {
 RenderBox::~RenderBox() {}
 
 void RenderBox::destroy() {
-  // A lot of the code in this funtion is just pasted into
+  // A lot of the code in this function is just pasted into
   // RenderWidget::destroy. If anything in this function changes,
   // be sure to fix RenderWidget::destroy() as well.
   if (hasOverrideSize())

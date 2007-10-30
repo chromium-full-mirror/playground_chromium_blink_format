@@ -590,7 +590,7 @@ RenderObject* Element::createRenderer(RenderArena* arena, RenderStyle* style) {
     // case.
     RenderBlock* result = new (arena) RenderBlock(this);
     if (result)
-      result->setStyle(style);
+      result->setAnimatableStyle(style);
     return result;
   }
   return RenderObject::createObject(this, style);
