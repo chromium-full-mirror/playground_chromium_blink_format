@@ -36,6 +36,10 @@ typedef struct CGColor* CGColorRef;
 class QColor;
 #endif
 
+#if PLATFORM(GTK)
+typedef struct _GdkColor GdkColor;
+#endif
+
 #if PLATFORM(WX)
 class wxColour;
 #endif
@@ -96,6 +100,11 @@ class Color {
 #if PLATFORM(QT)
   Color(const QColor&);
   operator QColor() const;
+#endif
+
+#if PLATFORM(GTK)
+  Color(const GdkColor&);
+// We can't sensibly go back to GdkColor without losing the alpha value
 #endif
 
 #if PLATFORM(WX)
