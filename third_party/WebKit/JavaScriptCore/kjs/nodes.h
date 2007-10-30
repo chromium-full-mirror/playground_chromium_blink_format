@@ -1567,9 +1567,9 @@ class AssignLocalVarNode : public AssignResolveNode {
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 };
 
-class AssignBracketNode : public Node {
+class ReadModifyBracketNode : public Node {
  public:
-  AssignBracketNode(Node* base, Node* subscript, Operator oper, Node* right)
+  ReadModifyBracketNode(Node* base, Node* subscript, Operator oper, Node* right)
       KJS_FAST_CALL : m_base(base),
                       m_subscript(subscript),
                       m_oper(oper),
@@ -1588,13 +1588,53 @@ class AssignBracketNode : public Node {
   RefPtr<Node> m_right;
 };
 
+class AssignBracketNode : public Node {
+ public:
+  AssignBracketNode(Node* base, Node* subscript, Node* right) KJS_FAST_CALL
+      : m_base(base),
+        m_subscript(subscript),
+        m_right(right) {}
+  virtual void optimizeVariableAccess(FunctionBodyNode*,
+                                      DeclarationStacks::NodeStack&)
+      KJS_FAST_CALL;
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual Precedence precedence() const { return PrecAssignment; }
+
+ protected:
+  RefPtr<Node> m_base;
+  RefPtr<Node> m_subscript;
+  RefPtr<Node> m_right;
+};
+
 class AssignDotNode : public Node {
  public:
-  AssignDotNode(Node* base, const Identifier& ident, Operator oper, Node* right)
-      KJS_FAST_CALL : m_base(base),
-                      m_ident(ident),
-                      m_oper(oper),
-                      m_right(right) {}
+  AssignDotNode(Node* base, const Identifier& ident, Node* right) KJS_FAST_CALL
+      : m_base(base),
+        m_ident(ident),
+        m_right(right) {}
+  virtual void optimizeVariableAccess(FunctionBodyNode*,
+                                      DeclarationStacks::NodeStack&)
+      KJS_FAST_CALL;
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual Precedence precedence() const { return PrecAssignment; }
+
+ protected:
+  RefPtr<Node> m_base;
+  Identifier m_ident;
+  RefPtr<Node> m_right;
+};
+
+class ReadModifyDotNode : public Node {
+ public:
+  ReadModifyDotNode(Node* base,
+                    const Identifier& ident,
+                    Operator oper,
+                    Node* right) KJS_FAST_CALL : m_base(base),
+                                                 m_ident(ident),
+                                                 m_oper(oper),
+                                                 m_right(right) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
