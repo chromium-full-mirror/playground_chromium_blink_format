@@ -505,6 +505,8 @@ static void cacluateBackgroundSize(const BackgroundLayer* bgLayer,
         scaledHeight = bg->imageSize().height();
       }
     }
+    scaledWidth = max(1, scaledWidth);
+    scaledHeight = max(1, scaledHeight);
   } else {
     scaledWidth = bg->imageSize().width();
     scaledHeight = bg->imageSize().height();

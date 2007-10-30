@@ -195,6 +195,11 @@ void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatPoint& phase,
                         CompositeOperator op,
                         const FloatRect& destRect) {
+  ASSERT(patternTransform.isInvertible());
+  if (!patternTransform.isInvertible())
+    // Avoid a hang under CGContextDrawTiledImage on release builds.
+    return;
+
   CGContextRef context = ctxt->platformContext();
   ctxt->save();
   CGContextClipToRect(context, destRect);
