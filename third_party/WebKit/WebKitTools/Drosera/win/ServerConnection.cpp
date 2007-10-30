@@ -36,6 +36,8 @@
 #include <JavaScriptCore/JSRetainPtr.h>
 #include <JavaScriptCore/JSStringRefBSTR.h>
 #include <JavaScriptCore/RetainPtr.h>
+#include <WebKit/IWebScriptCallFrame.h>
+#include <WebKit/IWebScriptDebugServer.h>
 #include <WebKit/WebKit.h>
 
 ServerConnection::ServerConnection() : m_globalContext(0) {
@@ -57,6 +59,8 @@ ServerConnection::~ServerConnection() {
 void ServerConnection::setGlobalContext(JSGlobalContextRef globalContextRef) {
   m_globalContext = JSGlobalContextRetain(globalContextRef);
 }
+
+// Pause & Step
 
 void ServerConnection::pause() {
   if (m_server)
@@ -83,25 +87,6 @@ void ServerConnection::applicationTerminating() {
 void ServerConnection::serverConnectionDidDie() {
   if (m_server)
     m_server->removeListener(this);
-}
-
-// Stack & Variables
-
-IWebScriptCallFrame* ServerConnection::currentFrame() const {
-  return m_currentFrame;
-}
-
-IWebScriptCallFrame* ServerConnection::getCallerFrame(int callFrame) const {
-  COMPtr<IWebScriptCallFrame> cframe = currentFrame();
-  COMPtr<IWebScriptCallFrame> callerFrame;
-  for (int count = 0; count < callFrame; count++) {
-    if (FAILED(cframe->caller(&callerFrame)))
-      return 0;
-
-    cframe = callerFrame;
-  }
-
-  return cframe.get();
 }
 
 // IUnknown --------------------------------------------------
@@ -263,8 +248,6 @@ HRESULT STDMETHODCALLTYPE ServerConnection::didEnterCallFrame(
   if (!m_globalContext)
     return ret;
 
-  // FIXME: This won't be relevant until IWebScriptCallFrame is implemented on
-  // Windows
   m_currentFrame = frame;
 
   JSValueRef sidJS = JSValueMakeNumber(m_globalContext, sourceID);
@@ -307,8 +290,6 @@ HRESULT STDMETHODCALLTYPE ServerConnection::willLeaveCallFrame(
 
   DebuggerDocument::willLeaveCallFrame(m_globalContext, sidJS, linenoJS);
 
-  // FIXME: This won't be relevant until IWebScriptCallFrame is implemented on
-  // Windows
   m_currentFrame = frame;
 
   return S_OK;
@@ -330,4 +311,23 @@ HRESULT STDMETHODCALLTYPE ServerConnection::exceptionWasRaised(
   DebuggerDocument::exceptionWasRaised(m_globalContext, sidJS, linenoJS);
 
   return ret;
+}
+
+// Stack & Variables
+
+IWebScriptCallFrame* ServerConnection::currentFrame() const {
+  return m_currentFrame.get();
+}
+
+IWebScriptCallFrame* ServerConnection::getCallerFrame(int callFrame) const {
+  COMPtr<IWebScriptCallFrame> cframe = currentFrame();
+  COMPtr<IWebScriptCallFrame> callerFrame;
+  for (int count = 0; count < callFrame; count++) {
+    if (FAILED(cframe->caller(&callerFrame)))
+      return 0;
+
+    cframe = callerFrame;
+  }
+
+  return cframe.get();
 }
