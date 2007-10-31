@@ -26,8 +26,10 @@
  */
 
 #include "config.h"
-#include "KeyboardCodes.h"
 #include "PlatformKeyboardEvent.h"
+
+#include "KeyboardCodes.h"
+#include "NotImplemented.h"
 
 #include <QKeyEvent>
 
@@ -456,6 +458,11 @@ PlatformKeyboardEvent::PlatformKeyboardEvent(QKeyEvent* event) {
   m_shiftKey =
       (state & Qt::ShiftModifier) != 0 ||
       event->key() == Qt::Key_Backtab;  // Simulate Shift+Tab with Key_Backtab
+}
+
+bool PlatformKeyboardEvent::currentCapsLockState() {
+  notImplemented();
+  return false;
 }
 }
 
