@@ -315,7 +315,6 @@ class PendingCallbacks {
  public:
   DeprecatedPtrList<PendingCallback> m_callbacks;
 };
-#endif
 // --------------------------------
 
 static int globalDescriptor = 0;
@@ -345,7 +344,6 @@ class OffsetBuffer {
   unsigned m_currentOffset;
 };
 
-#ifndef USE_QXMLSTREAM
 static bool shouldAllowExternalLoad(const char* inURI) {
   if (strstr(inURI, "/etc/xml/catalog") ||
       strstr(inURI, "http://www.w3.org/Graphics/SVG") == inURI ||
@@ -420,6 +418,17 @@ static xmlParserCtxtPtr createStringParser(xmlSAXHandlerPtr handlers,
 }
 #endif
 
+#ifdef USE_QXMLSTREAM
+class EntityResolver : public QXmlStreamEntityResolver {
+  virtual QString resolveUndeclaredEntity(const QString& name);
+};
+
+QString EntityResolver::resolveUndeclaredEntity(const QString& name) {
+  UChar c = decodeNamedEntity(name.toUtf8().constData());
+  return QString(c);
+}
+#endif
+
 // --------------------------------
 
 XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
@@ -453,6 +462,9 @@ XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
       m_pendingCallbacks(new PendingCallbacks)
 #endif
 {
+#if defined(USE_QXMLSTREAM) && QT_VERSION >= 0x040400
+  m_stream.setEntityResolver(new EntityResolver);
+#endif
 }
 
 XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
@@ -535,6 +547,7 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
   }
 #if QT_VERSION >= 0x040400
   m_stream.addExtraNamespaceDeclarations(namespaces);
+  m_stream.setEntityResolver(new EntityResolver);
 #endif
 #endif
 }
@@ -545,6 +558,9 @@ XMLTokenizer::~XMLTokenizer() {
     m_doc->deref();
   if (m_pendingScript)
     m_pendingScript->deref(this);
+#if defined(USE_QXMLSTREAM) && QT_VERSION >= 0x040400
+  delete m_stream.entityResolver();
+#endif
 }
 
 void XMLTokenizer::setCurrentNode(Node* n) {
