@@ -694,6 +694,10 @@ class TransformOperation : public Shared<TransformOperation> {
 
   virtual void apply(AffineTransform&, const IntSize& borderBoxSize) = 0;
 
+  virtual TransformOperation* blend(const TransformOperation* from,
+                                    double progress,
+                                    bool blendToIdentity = false) = 0;
+
   virtual bool isScaleOperation() const { return false; }
   virtual bool isRotateOperation() const { return false; }
   virtual bool isSkewOperation() const { return false; }
@@ -720,6 +724,10 @@ class ScaleTransformOperation : public TransformOperation {
     transform.scale(m_x, m_y);
   }
 
+  virtual TransformOperation* blend(const TransformOperation* from,
+                                    double progress,
+                                    bool blendToIdentity = false);
+
  private:
   double m_x;
   double m_y;
@@ -744,6 +752,10 @@ class RotateTransformOperation : public TransformOperation {
     transform.rotate(m_angle);
   }
 
+  virtual TransformOperation* blend(const TransformOperation* from,
+                                    double progress,
+                                    bool blendToIdentity = false);
+
  private:
   double m_angle;
 };
@@ -767,6 +779,10 @@ class SkewTransformOperation : public TransformOperation {
   virtual void apply(AffineTransform& transform, const IntSize& borderBoxSize) {
     transform.skew(m_angleX, m_angleY);
   }
+
+  virtual TransformOperation* blend(const TransformOperation* from,
+                                    double progress,
+                                    bool blendToIdentity = false);
 
  private:
   double m_angleX;
@@ -793,6 +809,10 @@ class TranslateTransformOperation : public TransformOperation {
     transform.translate(m_x.calcValue(borderBoxSize.width()),
                         m_y.calcValue(borderBoxSize.height()));
   }
+
+  virtual TransformOperation* blend(const TransformOperation* from,
+                                    double progress,
+                                    bool blendToIdentity = false);
 
  private:
   Length m_x;
@@ -828,6 +848,10 @@ class MatrixTransformOperation : public TransformOperation {
     transform.multiply(matrix);
   }
 
+  virtual TransformOperation* blend(const TransformOperation* from,
+                                    double progress,
+                                    bool blendToIdentity = false);
+
  private:
   Length m_a;
   Length m_b;
@@ -835,6 +859,25 @@ class MatrixTransformOperation : public TransformOperation {
   Length m_d;
   Length m_e;
   Length m_f;
+};
+
+class TransformOperations {
+ public:
+  bool operator==(const TransformOperations&) const;
+  bool operator!=(const TransformOperations& o) const { return !(*this == o); }
+
+  bool isEmpty() const { return m_operations.isEmpty(); }
+  unsigned size() const { return m_operations.size(); }
+  const RefPtr<TransformOperation>& operator[](size_t i) const {
+    return m_operations.at(i);
+  }
+
+  void append(const RefPtr<TransformOperation>& op) {
+    return m_operations.append(op);
+  }
+
+ private:
+  Vector<RefPtr<TransformOperation>> m_operations;
 };
 
 class StyleTransformData : public Shared<StyleTransformData> {
@@ -845,9 +888,7 @@ class StyleTransformData : public Shared<StyleTransformData> {
   bool operator==(const StyleTransformData&) const;
   bool operator!=(const StyleTransformData& o) const { return !(*this == o); }
 
-  bool transformDataEquivalent(const StyleTransformData&) const;
-
-  Vector<RefPtr<TransformOperation>> m_operations;
+  TransformOperations m_operations;
   Length m_x;
   Length m_y;
 };
@@ -2122,7 +2163,7 @@ class RenderStyle {
     return static_cast<EPageBreak>(
         rareNonInheritedData->m_multiCol->m_breakAfter);
   }
-  const Vector<RefPtr<TransformOperation>>& transform() const {
+  const TransformOperations& transform() const {
     return rareNonInheritedData->m_transform->m_operations;
   }
   Length transformOriginX() const {
@@ -2575,7 +2616,7 @@ class RenderStyle {
   void setColumnBreakAfter(EPageBreak p) {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_breakAfter, p);
   }
-  void setTransform(const Vector<RefPtr<TransformOperation>>& ops) {
+  void setTransform(const TransformOperations& ops) {
     SET_VAR(rareNonInheritedData.access()->m_transform, m_operations, ops);
   }
   void setTransformOriginX(Length l) {
@@ -2753,8 +2794,8 @@ class RenderStyle {
   static bool initialVisuallyOrdered() { return false; }
   static float initialTextStrokeWidth() { return 0; }
   static unsigned short initialColumnCount() { return 1; }
-  static const Vector<RefPtr<TransformOperation>>& initialTransform() {
-    static Vector<RefPtr<TransformOperation>> ops;
+  static const TransformOperations& initialTransform() {
+    static TransformOperations ops;
     return ops;
   }
   static Length initialTransformOriginX() { return Length(50.0, Percent); }

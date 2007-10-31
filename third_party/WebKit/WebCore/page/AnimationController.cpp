@@ -275,13 +275,7 @@ static inline Color blendFunc(const Color& from,
 static inline Length blendFunc(const Length& from,
                                const Length& to,
                                double progress) {
-  if (from.type() != to.type())
-    return to;
-  return from.type() == Percent
-             ? Length(blendFunc(from.percent(), to.percent(), progress),
-                      Percent)
-             : Length(blendFunc(from.value(), to.value(), progress),
-                      from.type());
+  return to.blend(from, progress);
 }
 
 static inline ShadowData* blendFunc(const ShadowData* from,
@@ -292,6 +286,25 @@ static inline ShadowData* blendFunc(const ShadowData* from,
                         blendFunc(from->y, to->y, progress),
                         blendFunc(from->blur, to->blur, progress),
                         blendFunc(from->color, to->color, progress));
+}
+
+static inline TransformOperations blendFunc(const TransformOperations& from,
+                                            const TransformOperations& to,
+                                            double progress) {
+  // Blend any operations whose types actually match up.  Otherwise don't
+  // bother.
+  unsigned fromSize = from.size();
+  unsigned toSize = to.size();
+  unsigned size = max(fromSize, toSize);
+  TransformOperations result;
+  for (unsigned i = 0; i < size; i++) {
+    TransformOperation* fromOp = i < fromSize ? from[i].get() : 0;
+    TransformOperation* toOp = i < toSize ? to[i].get() : 0;
+    TransformOperation* blendedOp =
+        toOp ? toOp->blend(fromOp, progress) : fromOp->blend(0, progress, true);
+    result.append(blendedOp);
+  }
+  return result;
 }
 
 #define BLEND(prop, getter, setter)                                           \
@@ -398,6 +411,11 @@ void ImplicitAnimation::animate(CompositeImplicitAnimation* animation,
   BLEND(CSS_PROP_WORD_SPACING, wordSpacing, setWordSpacing);
   BLEND_SHADOW(CSS_PROP__WEBKIT_BOX_SHADOW, boxShadow, setBoxShadow);
   BLEND_SHADOW(CSS_PROP_TEXT_SHADOW, textShadow, setTextShadow);
+  BLEND(CSS_PROP__WEBKIT_TRANSFORM, transform, setTransform);
+  BLEND(CSS_PROP__WEBKIT_TRANSFORM_ORIGIN_X, transformOriginX,
+        setTransformOriginX);
+  BLEND(CSS_PROP__WEBKIT_TRANSFORM_ORIGIN_Y, transformOriginY,
+        setTransformOriginY);
 }
 
 RenderStyle* CompositeImplicitAnimation::animate(RenderObject* renderer,
