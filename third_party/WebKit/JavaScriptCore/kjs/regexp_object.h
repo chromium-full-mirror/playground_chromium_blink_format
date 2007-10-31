@@ -49,7 +49,7 @@ class RegExpProtoFunc : public InternalFunctionImp {
                                   JSObject* thisObj,
                                   const List& args);
 
-  enum { Exec, Test, ToString };
+  enum { Compile, Exec, Test, ToString };
 
  private:
   int id;
