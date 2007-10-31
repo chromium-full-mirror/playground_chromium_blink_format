@@ -85,7 +85,6 @@
 #include "JSHTMLAnchorElement.h"
 #include "JSHTMLAppletElement.h"
 #include "JSHTMLAreaElement.h"
-#include "JSHTMLAudioElement.h"
 #include "JSHTMLBRElement.h"
 #include "JSHTMLBaseElement.h"
 #include "JSHTMLBaseFontElement.h"
@@ -129,7 +128,6 @@
 #include "JSHTMLQuoteElement.h"
 #include "JSHTMLScriptElement.h"
 #include "JSHTMLSelectElement.h"
-#include "JSHTMLSourceElement.h"
 #include "JSHTMLStyleElement.h"
 #include "JSHTMLTableCaptionElement.h"
 #include "JSHTMLTableCellElement.h"
@@ -140,7 +138,12 @@
 #include "JSHTMLTextAreaElement.h"
 #include "JSHTMLTitleElement.h"
 #include "JSHTMLUListElement.h"
+
+#if ENABLE(VIDEO)
+#include "JSHTMLAudioElement.h"
+#include "JSHTMLSourceElement.h"
 #include "JSHTMLVideoElement.h"
+#endif
 
 #include "kjs_html.h"
 
