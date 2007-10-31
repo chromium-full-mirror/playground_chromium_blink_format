@@ -94,6 +94,10 @@ class EventTargetNode : public Node, public EventTarget {
   void dispatchSimulatedClick(PassRefPtr<Event> underlyingEvent,
                               bool sendMouseEvents = false,
                               bool showPressedLook = true);
+  bool dispatchProgressEvent(const AtomicString& eventType,
+                             bool lengthComputableArg,
+                             unsigned loadedArg,
+                             unsigned totalArg);
 
   virtual void handleLocalEvents(Event*, bool useCapture);
 

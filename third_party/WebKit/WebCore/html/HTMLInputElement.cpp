@@ -138,7 +138,7 @@ void HTMLInputElement::init() {
 
 HTMLInputElement::~HTMLInputElement() {
   if (inputType() == PASSWORD)
-    document()->unregisterForDidRestoreFromCacheCallback(this);
+    document()->unregisterForCacheCallbacks(this);
 
   document()->checkedRadioButtons().removeButton(this);
 
@@ -312,9 +312,9 @@ void HTMLInputElement::setInputType(const String& t) {
         recheckValue();
 
       if (wasPasswordField && !isPasswordField)
-        document()->unregisterForDidRestoreFromCacheCallback(this);
+        document()->unregisterForCacheCallbacks(this);
       else if (!wasPasswordField && isPasswordField)
-        document()->registerForDidRestoreFromCacheCallback(this);
+        document()->registerForCacheCallbacks(this);
 
       if (didRespectHeightAndWidth != willRespectHeightAndWidth) {
         NamedMappedAttrMap* map = mappedAttributes();
@@ -1463,7 +1463,7 @@ void HTMLInputElement::didRestoreFromCache() {
 
 void HTMLInputElement::willMoveToNewOwnerDocument() {
   if (inputType() == PASSWORD)
-    document()->unregisterForDidRestoreFromCacheCallback(this);
+    document()->unregisterForCacheCallbacks(this);
 
   document()->checkedRadioButtons().removeButton(this);
 
@@ -1472,7 +1472,7 @@ void HTMLInputElement::willMoveToNewOwnerDocument() {
 
 void HTMLInputElement::didMoveToNewOwnerDocument() {
   if (inputType() == PASSWORD)
-    document()->registerForDidRestoreFromCacheCallback(this);
+    document()->registerForCacheCallbacks(this);
 
   HTMLFormControlElementWithState::didMoveToNewOwnerDocument();
 }

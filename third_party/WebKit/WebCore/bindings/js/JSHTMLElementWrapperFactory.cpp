@@ -23,6 +23,7 @@
 #include "HTMLAnchorElement.h"
 #include "HTMLAppletElement.h"
 #include "HTMLAreaElement.h"
+#include "HTMLAudioElement.h"
 #include "HTMLBRElement.h"
 #include "HTMLBaseElement.h"
 #include "HTMLBaseFontElement.h"
@@ -66,6 +67,7 @@
 #include "HTMLQuoteElement.h"
 #include "HTMLScriptElement.h"
 #include "HTMLSelectElement.h"
+#include "HTMLSourceElement.h"
 #include "HTMLStyleElement.h"
 #include "HTMLTableCaptionElement.h"
 #include "HTMLTableCellElement.h"
@@ -76,12 +78,14 @@
 #include "HTMLTextAreaElement.h"
 #include "HTMLTitleElement.h"
 #include "HTMLUListElement.h"
+#include "HTMLVideoElement.h"
 
 #include "HTMLNames.h"
 
 #include "JSHTMLAnchorElement.h"
 #include "JSHTMLAppletElement.h"
 #include "JSHTMLAreaElement.h"
+#include "JSHTMLAudioElement.h"
 #include "JSHTMLBRElement.h"
 #include "JSHTMLBaseElement.h"
 #include "JSHTMLBaseFontElement.h"
@@ -125,6 +129,7 @@
 #include "JSHTMLQuoteElement.h"
 #include "JSHTMLScriptElement.h"
 #include "JSHTMLSelectElement.h"
+#include "JSHTMLSourceElement.h"
 #include "JSHTMLStyleElement.h"
 #include "JSHTMLTableCaptionElement.h"
 #include "JSHTMLTableCellElement.h"
@@ -135,6 +140,7 @@
 #include "JSHTMLTextAreaElement.h"
 #include "JSHTMLTitleElement.h"
 #include "JSHTMLUListElement.h"
+#include "JSHTMLVideoElement.h"
 
 #include "kjs_html.h"
 
@@ -180,6 +186,9 @@ typedef JSNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
                                                       ul,                      \
                                                       UList)  // end of macro
 
+#define FOR_EACH_VIDEO_TAG(macro) \
+  macro(audio, Audio) macro(source, Source) macro(video, Video)  // end of macro
+
 #define CREATE_WRAPPER_FUNCTION(tag, name)                                \
   static JSNode* create##name##Wrapper(ExecState* exec,                   \
                                        PassRefPtr<HTMLElement> element) { \
@@ -187,6 +196,9 @@ typedef JSNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
         exec, static_cast<HTML##name##Element*>(element.get()));          \
   }
 FOR_EACH_TAG(CREATE_WRAPPER_FUNCTION)
+#if ENABLE(VIDEO)
+FOR_EACH_VIDEO_TAG(CREATE_WRAPPER_FUNCTION)
+#endif
 #undef CREATE_WRAPPER_FUNCTION
 
 JSNode* createJSHTMLWrapper(ExecState* exec, PassRefPtr<HTMLElement> element) {
@@ -195,6 +207,9 @@ JSNode* createJSHTMLWrapper(ExecState* exec, PassRefPtr<HTMLElement> element) {
 #define ADD_TO_HASH_MAP(tag, name) \
   map.set(tag##Tag.localName().impl(), create##name##Wrapper);
     FOR_EACH_TAG(ADD_TO_HASH_MAP)
+#if ENABLE(VIDEO)
+    FOR_EACH_VIDEO_TAG(ADD_TO_HASH_MAP)
+#endif
 #undef ADD_TO_HASH_MAP
     map.set(colgroupTag.localName().impl(), createTableColWrapper);
     map.set(h2Tag.localName().impl(), createHeadingWrapper);

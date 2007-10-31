@@ -45,6 +45,7 @@
 #include "JSDOMExceptionConstructor.h"
 #include "JSDOMWindow.h"
 #include "JSEvent.h"
+#include "JSHTMLAudioElementConstructor.h"
 #include "JSHTMLCollection.h"
 #include "JSHTMLOptionElementConstructor.h"
 #include "JSMutationEvent.h"
@@ -205,6 +206,7 @@ Window::get
   onunload              Window::Onunload            DontDelete
   onbeforeunload        Window::Onbeforeunload      DontDelete
 # -- Constructors --
+  Audio                 Window::Audio               DontDelete
   DOMException          Window::DOMException        DontDelete
   Image                 Window::Image               DontDelete
   Option                Window::Option              DontDelete
@@ -583,6 +585,13 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
         return jsUndefined();
       return new JSXMLHttpRequestConstructorImp(exec,
                                                 impl()->frame()->document());
+    case Audio:
+#if ENABLE(VIDEO)
+      return new JSHTMLAudioElementConstructor(exec,
+                                               impl()->frame()->document());
+#else
+      return jsUndefined();
+#endif
 #if ENABLE(XSLT)
     case XSLTProcessor_:
       if (!isSafeScript(exec))

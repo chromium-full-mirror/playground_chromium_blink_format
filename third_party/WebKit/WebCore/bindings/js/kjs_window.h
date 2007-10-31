@@ -224,6 +224,7 @@ class Window : public JSGlobalObject {
 
     // Constructors
     DOMException,
+    Audio,
     Image,
     Option,
     XMLHttpRequest,

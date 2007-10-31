@@ -27,33 +27,48 @@
 namespace WebCore {
 namespace EventNames {
 
-#define DOM_EVENT_NAMES_FOR_EACH(macro)                                          \
-                                                                                 \
-  macro(abort) macro(beforecopy) macro(beforecut) macro(beforepaste) macro(      \
-      beforeunload) macro(blur) macro(change) macro(click) macro(contextmenu)    \
-      macro(copy) macro(cut) macro(dblclick) macro(drag) macro(dragend) macro(   \
-          dragenter) macro(dragleave) macro(dragover) macro(dragstart)           \
-          macro(drop) macro(error) macro(focus) macro(input) macro(keydown)      \
-              macro(keypress) macro(keyup) macro(load) macro(mousedown) macro(   \
-                  mousemove) macro(mouseout) macro(mouseover) macro(mouseup)     \
-                  macro(mousewheel) macro(overflowchanged) macro(paste) macro(   \
-                      readystatechange) macro(reset) macro(resize) macro(scroll) \
-                      macro(search) macro(select) macro(selectstart) macro(      \
-                          submit) macro(textInput) macro(unload) macro(zoom)     \
-                                                                                 \
-                          macro(DOMActivate) macro(DOMAttrModified) macro(       \
-                              DOMCharacterDataModified) macro(DOMFocusIn)        \
-                              macro(DOMFocusOut) macro(DOMNodeInserted) macro(   \
-                                  DOMNodeInsertedIntoDocument)                   \
-                                  macro(DOMNodeRemoved) macro(                   \
-                                      DOMNodeRemovedFromDocument)                \
-                                      macro(DOMSubtreeModified) macro(           \
-                                          DOMContentLoaded)                      \
-                                                                                 \
-                                          macro(webkitBeforeTextInserted)        \
-                                              macro(                             \
-                                                  webkitEditableContentChanged)  \
-                                                                                 \
+#define DOM_EVENT_NAMES_FOR_EACH(macro)                                                  \
+                                                                                         \
+  macro(abort) macro(beforecopy) macro(beforecut) macro(beforepaste) macro(              \
+      beforeunload) macro(blur) macro(change) macro(click) macro(contextmenu)            \
+      macro(copy) macro(cut) macro(dblclick) macro(drag) macro(dragend) macro(           \
+          dragenter) macro(dragleave) macro(dragover) macro(dragstart)                   \
+          macro(drop) macro(error) macro(focus) macro(input) macro(keydown)              \
+              macro(keypress) macro(keyup) macro(load) macro(mousedown) macro(           \
+                  mousemove) macro(mouseout) macro(mouseover) macro(mouseup)             \
+                  macro(mousewheel) macro(overflowchanged) macro(paste) macro(           \
+                      readystatechange) macro(reset) macro(resize) macro(scroll)         \
+                      macro(search) macro(select) macro(selectstart) macro(              \
+                          submit) macro(textInput) macro(unload) macro(zoom)             \
+                                                                                         \
+                          macro(DOMActivate) macro(DOMAttrModified) macro(               \
+                              DOMCharacterDataModified) macro(DOMFocusIn)                \
+                              macro(DOMFocusOut) macro(DOMNodeInserted) macro(           \
+                                  DOMNodeInsertedIntoDocument) macro(DOMNodeRemoved)     \
+                                  macro(DOMNodeRemovedFromDocument) macro(               \
+                                      DOMSubtreeModified) macro(DOMContentLoaded)        \
+                                                                                         \
+                                      macro(webkitBeforeTextInserted) macro(             \
+                                          webkitEditableContentChanged)                  \
+                                                                                         \
+                                          macro(canshowcurrentframe) macro(              \
+                                              canplay) macro(canplaythrough)             \
+                                              macro(dataunavailable) macro(              \
+                                                  durationchange) macro(emptied)         \
+                                                  macro(ended) macro(                    \
+                                                      loadedfirstframe)                  \
+                                                      macro(loadedmetadata) macro(       \
+                                                          pause) macro(play)             \
+                                                          macro(ratechange) macro(       \
+                                                              timeupdate)                \
+                                                              macro(volumechange) macro( \
+                                                                  waiting)               \
+                                                                                         \
+                                                                  macro(begin) macro(    \
+                                                                      progress)          \
+                                                                      macro(             \
+                                                                          stalled)       \
+                                                                                         \
       // end of DOM_EVENT_NAMES_FOR_EACH
 
 #ifndef DOM_EVENT_NAMES_HIDE_GLOBALS
