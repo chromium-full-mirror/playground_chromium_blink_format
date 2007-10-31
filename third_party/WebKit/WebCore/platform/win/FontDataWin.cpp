@@ -95,10 +95,9 @@ void FontData::platformInit() {
   // rather than getting it from the font.
   // Unfortunately, NSFont will round this for us so we don't quite get the
   // right value.
-  Glyph xGlyph = GlyphPageTreeNode::getRootChild(this, 0)
-                     ->page()
-                     ->glyphDataForCharacter('x')
-                     .glyph;
+  GlyphPage* glyphPageZero = GlyphPageTreeNode::getRootChild(this, 0)->page();
+  Glyph xGlyph =
+      glyphPageZero ? glyphPageZero->glyphDataForCharacter('x').glyph : 0;
   if (xGlyph) {
     CGRect xBox;
     CGFontGetGlyphBBoxes(font, &xGlyph, 1, &xBox);
