@@ -174,7 +174,6 @@ incremental searching), NO to begin search after the selected text.
 
 @interface WebView (WebPrivate)
 
-+ (BOOL)_developerExtrasEnabled;
 + (BOOL)_scriptDebuggerEnabled;
 
 - (WebInspector*)inspector;
