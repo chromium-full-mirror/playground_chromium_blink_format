@@ -147,6 +147,9 @@ class WebFrame : public IWebFrame,
   virtual HRESULT STDMETHODCALLTYPE currentForm(
       /* [retval][out] */ IDOMElement** formElement);
 
+  virtual HRESULT STDMETHODCALLTYPE globalContext(
+      /* [retval][out] */ JSGlobalContextRef* context);
+
   // IWebFramePrivate
   virtual HRESULT STDMETHODCALLTYPE renderTreeAsExternalRepresentation(
       /* [retval][out] */ BSTR* result);
