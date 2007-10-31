@@ -596,6 +596,15 @@ inline HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
 {
 }
 
+static inline unsigned doubleHash(unsigned key) {
+  key = ~key + (key >> 23);
+  key ^= (key << 12);
+  key ^= (key >> 7);
+  key ^= (key << 2);
+  key ^= (key >> 20);
+  return key;
+}
+
 template <typename Key,
           typename Value,
           typename Extractor,
@@ -648,7 +657,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::lookup(
     HashTableStats::recordCollisionAtCount(probeCount);
 #endif
     if (k == 0)
-      k = 1 | (h % sizeMask);
+      k = 1 | doubleHash(h);
     i = (i + k) & sizeMask;
   }
 }
@@ -716,7 +725,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     HashTableStats::recordCollisionAtCount(probeCount);
 #endif
     if (k == 0)
-      k = 1 | (h % sizeMask);
+      k = 1 | doubleHash(h);
     i = (i + k) & sizeMask;
   }
 }
@@ -784,7 +793,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     HashTableStats::recordCollisionAtCount(probeCount);
 #endif
     if (k == 0)
-      k = 1 | (h % sizeMask);
+      k = 1 | doubleHash(h);
     i = (i + k) & sizeMask;
   }
 }
@@ -862,7 +871,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
     HashTableStats::recordCollisionAtCount(probeCount);
 #endif
     if (k == 0)
-      k = 1 | (h % sizeMask);
+      k = 1 | doubleHash(h);
     i = (i + k) & sizeMask;
   }
 
