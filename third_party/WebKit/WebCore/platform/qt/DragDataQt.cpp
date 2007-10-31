@@ -96,7 +96,7 @@ Color DragData::asColor() const {
 }
 
 Clipboard* DragData::createClipboard(ClipboardAccessPolicy policy) const {
-  return new ClipboardQt(policy, m_platformDragData, true);
+  return new ClipboardQt(policy, m_platformDragData);
 }
 
 bool DragData::containsCompatibleContent() const {
@@ -113,6 +113,8 @@ bool DragData::containsURL() const {
 }
 
 String DragData::asURL(String* title) const {
+  if (!m_platformDragData)
+    return String();
   QList<QUrl> urls = m_platformDragData->urls();
   return urls.first().toString();
 }
