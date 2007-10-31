@@ -62,7 +62,7 @@ DeleteButtonController::DeleteButtonController(Frame* frame)
       m_wasAutoZIndex(false),
       m_disableStack(0) {}
 
-static bool isDeletableElement(Node* node) {
+static bool isDeletableElement(const Node* node) {
   if (!node || !node->isHTMLElement() || !node->inDocument() ||
       !node->isContentEditable())
     return false;

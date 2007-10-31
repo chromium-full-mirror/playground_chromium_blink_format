@@ -53,7 +53,7 @@ VisiblePosition lastEditablePositionBeforePositionInRoot(const Position&,
                                                          Node*);
 int comparePositions(const Position&, const Position&);
 Node* lowestEditableAncestor(Node*);
-bool isContentEditable(Node*);
+bool isContentEditable(const Node*);
 Position nextCandidate(const Position&);
 Position nextVisuallyDistinctCandidate(const Position&);
 Position previousCandidate(const Position&);
@@ -61,7 +61,7 @@ Position previousVisuallyDistinctCandidate(const Position&);
 bool isEditablePosition(const Position&);
 bool isRichlyEditablePosition(const Position&);
 Element* editableRootForPosition(const Position&);
-bool isBlock(Node*);
+bool isBlock(const Node*);
 Node* enclosingBlock(Node*);
 
 String stringWithRebalancedWhitespace(const String&, bool, bool);
@@ -118,7 +118,7 @@ Node* isLastPositionBeforeTable(const VisiblePosition&);
 Node* isFirstPositionAfterTable(const VisiblePosition&);
 
 Node* enclosingNodeWithTag(Node*, const QualifiedName&);
-Node* enclosingNodeOfType(Node*, bool (*nodeIsOfType)(Node*));
+Node* enclosingNodeOfType(Node*, bool (*nodeIsOfType)(const Node*));
 Node* enclosingTableCell(const Position&);
 Node* enclosingEmptyListItem(const VisiblePosition&);
 Node* enclosingAnchorElement(const Position&);

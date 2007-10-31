@@ -603,11 +603,11 @@ static bool needInterchangeNewlineAfter(const VisiblePosition& v) {
 }
 
 static PassRefPtr<CSSMutableStyleDeclaration>
-styleFromMatchedRulesAndInlineDecl(Node* node) {
+styleFromMatchedRulesAndInlineDecl(const Node* node) {
   if (!node->isHTMLElement())
     return 0;
 
-  HTMLElement* element = static_cast<HTMLElement*>(node);
+  HTMLElement* element = static_cast<const HTMLElement*>(node);
   RefPtr<CSSMutableStyleDeclaration> style =
       styleFromMatchedRulesForElement(element);
   RefPtr<CSSMutableStyleDeclaration> inlineStyleDecl =
@@ -629,7 +629,7 @@ static bool propertyMissingOrEqualToNone(CSSMutableStyleDeclaration* style,
          CSS_VAL_NONE;
 }
 
-static bool elementHasTextDecorationProperty(Node* node) {
+static bool elementHasTextDecorationProperty(const Node* node) {
   RefPtr<CSSMutableStyleDeclaration> style =
       styleFromMatchedRulesAndInlineDecl(node);
   if (!style)

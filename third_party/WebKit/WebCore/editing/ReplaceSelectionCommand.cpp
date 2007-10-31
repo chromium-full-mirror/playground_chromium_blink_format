@@ -329,9 +329,9 @@ bool ReplaceSelectionCommand::shouldMergeEnd(
          shouldMerge(endOfInsertedContent, next);
 }
 
-static bool isMailPasteAsQuotationNode(Node* node) {
+static bool isMailPasteAsQuotationNode(const Node* node) {
   return node && node->hasTagName(blockquoteTag) && node->isElementNode() &&
-         static_cast<Element*>(node)->getAttribute(classAttr) ==
+         static_cast<const Element*>(node)->getAttribute(classAttr) ==
              ApplePasteAsQuotation;
 }
 
