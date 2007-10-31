@@ -607,7 +607,11 @@ styleFromMatchedRulesAndInlineDecl(const Node* node) {
   if (!node->isHTMLElement())
     return 0;
 
-  HTMLElement* element = static_cast<const HTMLElement*>(node);
+  // FIXME: Having to const_cast here is ugly, but it is quite a bit of work to
+  // untangle
+  // the non-const-ness of styleFromMatchedRulesForElement.
+  HTMLElement* element =
+      const_cast<HTMLElement*>(static_cast<const HTMLElement*>(node));
   RefPtr<CSSMutableStyleDeclaration> style =
       styleFromMatchedRulesForElement(element);
   RefPtr<CSSMutableStyleDeclaration> inlineStyleDecl =
