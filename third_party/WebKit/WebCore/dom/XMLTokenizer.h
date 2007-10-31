@@ -173,8 +173,8 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   String m_defaultNamespaceURI;
 
   typedef HashMap<String, String> PrefixForNamespaceMap;
-#ifndef USE_QXMLSTREAM
   PrefixForNamespaceMap m_prefixToNamespaceMap;
+#ifndef USE_QXMLSTREAM
   OwnPtr<PendingCallbacks> m_pendingCallbacks;
 #endif
   SegmentedString m_pendingSrc;
