@@ -1718,10 +1718,10 @@ void RenderStyle::adjustTransitions() {
       p->m_next = 0;
       break;
     }
-  }
 
-  // Repeat patterns into layers that don't have some properties set.
-  accessTransitions()->fillUnsetProperties();
+    // Repeat patterns into layers that don't have some properties set.
+    accessTransitions()->fillUnsetProperties();
+  }
 }
 
 Transition* RenderStyle::accessTransitions() {

@@ -310,7 +310,7 @@ static inline TransformOperations blendFunc(const TransformOperations& from,
   if (m_property == prop && m_toStyle->getter() != targetStyle->getter())     \
     reset(renderer, currentStyle, targetStyle);                               \
                                                                               \
-  if ((m_property == RenderStyle::initialTransitionProperty() &&              \
+  if ((m_property == cAnimateAll &&                                           \
        !animation->hasAnimationForProperty(prop)) ||                          \
       m_property == prop) {                                                   \
     if (m_fromStyle->getter() != m_toStyle->getter()) {                       \
@@ -330,7 +330,7 @@ static inline TransformOperations blendFunc(const TransformOperations& from,
                              *m_toStyle->getter() != *targetStyle->getter()))  \
     reset(renderer, currentStyle, targetStyle);                                \
                                                                                \
-  if ((m_property == RenderStyle::initialTransitionProperty() &&               \
+  if ((m_property == cAnimateAll &&                                            \
        !animation->hasAnimationForProperty(prop)) ||                           \
       m_property == prop) {                                                    \
     if (m_fromStyle->getter() && m_toStyle->getter() &&                        \
@@ -351,13 +351,12 @@ void ImplicitAnimation::animate(CompositeImplicitAnimation* animation,
                                 RenderStyle* currentStyle,
                                 RenderStyle* targetStyle,
                                 RenderStyle*& animatedStyle) {
-  // FIXME: If we have no trigger property, then the only way to tell if our
+  // FIXME: If we have no transition-property, then the only way to tell if our
   // goal state changed is to check
   // every single animatable property.  For now we'll just diff the styles to
   // ask that question,
   // but we should really exclude non-animatable properties.
-  if (!m_toStyle || (m_property == RenderStyle::initialTransitionProperty() &&
-                     targetStyle->diff(m_toStyle)))
+  if (!m_toStyle || (m_property == cAnimateAll && targetStyle->diff(m_toStyle)))
     reset(renderer, currentStyle, targetStyle);
 
   // FIXME: Blow up shorthands so that they can be honored.
