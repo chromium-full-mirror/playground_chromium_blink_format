@@ -118,4 +118,9 @@ Interpreter* ExecState::lexicalInterpreter() const {
   return dynamicInterpreter();
 }
 
+void ExecState::updateLocalStorage() {
+  m_localStorageBuffer =
+      static_cast<ActivationImp*>(m_activation)->localStorage().data();
+}
+
 }  // namespace KJS

@@ -44,6 +44,7 @@ class Interpreter;
 class FunctionImp;
 class GlobalFuncImp;
 class FunctionBodyNode;
+class LocalStorageEntry;
 
 /**
  * Represents the current state of script execution. This is
@@ -106,6 +107,9 @@ class ExecState {
   // binaries
   const CommonIdentifiers& propertyNames() const { return *m_propertyNames; }
 
+  LocalStorageEntry* localStorage() { return m_localStorageBuffer; }
+  void updateLocalStorage();
+
  private:
   ExecState(Interpreter* interp,
             JSGlobalObject* glob,
@@ -131,6 +135,7 @@ class ExecState {
   FunctionImp* m_function;
   const List* m_arguments;
   JSObject* m_activation;
+  LocalStorageEntry* m_localStorageBuffer;
 
   ScopeChain scope;
   JSObject* m_variable;

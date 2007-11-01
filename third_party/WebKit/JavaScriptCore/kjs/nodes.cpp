@@ -440,11 +440,10 @@ void ResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
 }
 
 JSValue* LocalVarAccessNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
-  return variableObject->localStorage()[index].value;
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
+  return exec->localStorage()[index].value;
 }
 
 // ------------------------------ ElementNode ----------------------------------
@@ -799,12 +798,11 @@ JSValue* FunctionCallResolveNode::evaluate(ExecState* exec) {
 }
 
 JSValue* LocalVarFunctionCallNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
 
-  JSValue* v = variableObject->localStorage()[index].value;
+  JSValue* v = exec->localStorage()[index].value;
 
   if (!v->isObject())
     return throwError(exec, TypeError,
@@ -977,12 +975,11 @@ JSValue* PostIncResolveNode::evaluate(ExecState* exec) {
 }
 
 JSValue* PostIncLocalVarNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
 
-  JSValue** slot = &variableObject->localStorage()[index].value;
+  JSValue** slot = &exec->localStorage()[index].value;
   double n = (*slot)->toNumber(exec);
   *slot = jsNumber(n + 1);
   return jsNumber(n);
@@ -1026,12 +1023,11 @@ JSValue* PostDecResolveNode::evaluate(ExecState* exec) {
 }
 
 JSValue* PostDecLocalVarNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
 
-  JSValue** slot = &variableObject->localStorage()[index].value;
+  JSValue** slot = &exec->localStorage()[index].value;
   double n = (*slot)->toNumber(exec);
   *slot = jsNumber(n - 1);
   return jsNumber(n);
@@ -1339,11 +1335,11 @@ void TypeOfResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
 }
 
 JSValue* LocalVarTypeOfNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
-  return typeStringForValue(variableObject->localStorage()[m_index].value);
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
+
+  return typeStringForValue(exec->localStorage()[m_index].value);
 }
 
 JSValue* TypeOfResolveNode::evaluate(ExecState* exec) {
@@ -1392,15 +1388,14 @@ void PreIncResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
 }
 
 JSValue* PreIncLocalVarNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
-  JSValue* v = variableObject->localStorage()[m_index].value;
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
+  JSValue** slot = &exec->localStorage()[m_index].value;
 
-  double n = v->toNumber(exec);
+  double n = (*slot)->toNumber(exec);
   JSValue* n2 = jsNumber(n + 1);
-  variableObject->localStorage()[m_index].value = n2;
+  *slot = n2;
   return n2;
 }
 
@@ -1440,15 +1435,14 @@ void PreDecResolveNode::optimizeVariableAccess(FunctionBodyNode* functionBody,
 }
 
 JSValue* PreDecLocalVarNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
-  JSValue* v = variableObject->localStorage()[m_index].value;
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
+  JSValue** slot = &exec->localStorage()[m_index].value;
 
-  double n = v->toNumber(exec);
+  double n = (*slot)->toNumber(exec);
   JSValue* n2 = jsNumber(n - 1);
-  variableObject->localStorage()[m_index].value = n2;
+  *slot = n2;
   return n2;
 }
 
@@ -2280,16 +2274,14 @@ void AssignResolveNode::optimizeVariableAccess(
 }
 
 JSValue* ReadModifyLocalVarNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
-  JSValue* v;
-  JSValue** slot = &variableObject->localStorage()[m_index].value;
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
+  JSValue** slot = &exec->localStorage()[m_index].value;
 
   ASSERT(m_oper != OpEqual);
   JSValue* v2 = m_right->evaluate(exec);
-  v = valueForReadModifyAssignment(exec, *slot, v2, m_oper);
+  JSValue* v = valueForReadModifyAssignment(exec, *slot, v2, m_oper);
 
   KJS_CHECKEXCEPTIONVALUE
 
@@ -2298,15 +2290,14 @@ JSValue* ReadModifyLocalVarNode::evaluate(ExecState* exec) {
 }
 
 JSValue* AssignLocalVarNode::evaluate(ExecState* exec) {
-  ActivationImp* variableObject =
-      static_cast<ActivationImp*>(exec->variableObject());
-  ASSERT(variableObject->isActivation());
-  ASSERT(variableObject == exec->scopeChain().top());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject())->isActivation());
+  ASSERT(static_cast<ActivationImp*>(exec->variableObject()) ==
+         exec->scopeChain().top());
   JSValue* v = m_right->evaluate(exec);
 
   KJS_CHECKEXCEPTIONVALUE
 
-  variableObject->localStorage()[m_index].value = v;
+  exec->localStorage()[m_index].value = v;
 
   return v;
 }
@@ -3651,6 +3642,8 @@ void FunctionBodyNode::processDeclarationsForFunctionCode(ExecState* exec) {
     localStorage.append(
         LocalStorageEntry(node->makeFunction(exec), minAttributes));
   }
+
+  exec->updateLocalStorage();
 }
 
 void FunctionBodyNode::processDeclarationsForProgramCode(ExecState* exec) {
