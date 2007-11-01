@@ -44,7 +44,7 @@ class Interpreter;
 class FunctionImp;
 class GlobalFuncImp;
 class FunctionBodyNode;
-class LocalStorageEntry;
+struct LocalStorageEntry;
 
 /**
  * Represents the current state of script execution. This is
