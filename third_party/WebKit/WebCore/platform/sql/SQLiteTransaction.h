@@ -41,9 +41,11 @@ class SQLiteTransaction : public Noncopyable {
   void commit();
   void rollback();
 
+  bool inProgress() const { return m_inProgress; }
+
  private:
   SQLiteDatabase& m_db;
-  bool m_began;
+  bool m_inProgress;
 };
 
 }  // namespace WebCore
