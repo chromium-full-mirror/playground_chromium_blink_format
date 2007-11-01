@@ -172,10 +172,12 @@ class Arguments : public JSObject {
 class ActivationImp : public JSObject {
  private:
   struct ActivationImpPrivate {
-    ActivationImpPrivate(ExecState* e) : exec(e), argumentsObject(0) {}
+    ActivationImpPrivate(ExecState* e)
+        : exec(e), function(e->function()), argumentsObject(0) {}
 
     LocalStorage localStorage;
     ExecState* exec;
+    FunctionImp* function;
     Arguments* argumentsObject;
   };
 

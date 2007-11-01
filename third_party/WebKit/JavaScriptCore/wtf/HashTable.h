@@ -34,8 +34,10 @@ namespace WTF {
 
 #ifdef NDEBUG
 #define CHECK_HASHTABLE_ITERATORS 0
+#define CHECK_HASHTABLE_USE_AFTER_DESTRUCTION 0
 #else
 #define CHECK_HASHTABLE_ITERATORS 1
+#define CHECK_HASHTABLE_USE_AFTER_DESTRUCTION 1
 #endif
 
 #if DUMP_HASHTABLE_STATS
@@ -420,6 +422,9 @@ class HashTable {
   ~HashTable() {
     invalidateIterators();
     deallocateTable(m_table, m_tableSize);
+#if CHECK_HASHTABLE_USE_AFTER_DESTRUCTION
+    m_table = (ValueType*)(uintptr_t)0xbbadbeef;
+#endif
   }
 
   HashTable(const HashTable&);
