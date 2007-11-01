@@ -306,6 +306,22 @@ static inline TransformOperations blendFunc(const TransformOperations& from,
   return result;
 }
 
+static inline EVisibility blendFunc(EVisibility from,
+                                    EVisibility to,
+                                    double progress) {
+  if (from == to || from != VISIBLE && to != VISIBLE)
+    return to;
+
+  // Any non-zero result means we consider the object to be visible.  Only at 0
+  // do we consider the object to be
+  // invisible.   The invisible value we use (HIDDEN vs. COLLAPSE) depends on
+  // the specified from/to values.
+  double fromVal = from == VISIBLE ? 1. : 0.;
+  double toVal = to == VISIBLE ? 1. : 0.;
+  double result = blendFunc(fromVal, toVal, progress);
+  return result > 0. ? VISIBLE : (to != VISIBLE ? to : from);
+}
+
 #define BLEND(prop, getter, setter)                                           \
   if (m_property == prop && m_toStyle->getter() != targetStyle->getter())     \
     reset(renderer, currentStyle, targetStyle);                               \
@@ -414,6 +430,7 @@ void ImplicitAnimation::animate(CompositeImplicitAnimation* animation,
         setTransformOriginX);
   BLEND(CSS_PROP__WEBKIT_TRANSFORM_ORIGIN_Y, transformOriginY,
         setTransformOriginY);
+  BLEND(CSS_PROP_VISIBILITY, visibility, setVisibility);
 }
 
 RenderStyle* CompositeImplicitAnimation::animate(RenderObject* renderer,
