@@ -297,7 +297,8 @@ void GIFImageDecoder::haveDecodedRow(
   if (buffer.status() == RGBA32Buffer::FrameEmpty)
     initFrameBuffer(buffer, previousBuffer, compositeWithPreviousFrame);
 
-  if (rowBuffer == 0)
+  // Do nothing for bogus data.
+  if (rowBuffer == 0 || static_cast<int>(rowNumber) >= m_size.height())
     return;
 
   unsigned colorMapSize;
