@@ -554,8 +554,6 @@ void ReplaceSelectionCommand::doApply() {
     return;
 
   bool selectionIsPlainText = !selection.isContentRichlyEditable();
-  if (selectionIsPlainText)
-    m_matchStyle = true;
 
   Element* currentRoot = selection.rootEditableElement();
   ReplacementFragment fragment(document(), m_documentFragment.get(),

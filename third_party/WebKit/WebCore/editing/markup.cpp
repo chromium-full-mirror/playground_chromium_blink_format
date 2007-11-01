@@ -1074,6 +1074,8 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
   if (!context)
     return 0;
 
+  Node* block = enclosingBlock(context->startNode());
+
   Node* styleNode = context->startNode();
   if (!styleNode) {
     styleNode = context->startPosition().node();
@@ -1128,7 +1130,7 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
       ASSERT(ec == 0);
       element->setAttribute(classAttr, AppleInterchangeNewline);
     } else {
-      element = createDefaultParagraphElement(document);
+      element = static_cast<Element*>(block->cloneNode(false).get());
       fillContainerFromString(element.get(), s);
     }
     fragment->appendChild(element.release(), ec);
