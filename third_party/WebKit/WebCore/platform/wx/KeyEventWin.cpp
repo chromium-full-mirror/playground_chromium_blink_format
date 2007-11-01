@@ -152,7 +152,8 @@ PlatformKeyboardEvent::PlatformKeyboardEvent(HWND hWnd,
       m_ctrlKey(GetAsyncKeyState(VK_CONTROL) & HIGH_BIT_MASK_SHORT),
       m_altKey(lParam & ALT_KEY_DOWN_MASK),
       m_metaKey(lParam & ALT_KEY_DOWN_MASK)  // FIXME: Is this right?
-{
+      ,
+      m_isModifierKeyPress(false) {
   if (!m_shiftKey)
     m_text = String(singleCharacterString(tolower(wParam)));
 }
