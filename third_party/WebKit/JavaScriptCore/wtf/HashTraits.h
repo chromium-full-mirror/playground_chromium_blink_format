@@ -276,7 +276,7 @@ struct DeletedValueAssigner<HashTraits<pair<First, Second>>> {
   }
 };
 
-// hassh functions and traits that are equivalent (for code sharing)
+// hash functions and traits that are equivalent (for code sharing)
 
 template <typename HashArg, typename TraitsArg>
 struct HashKeyStorageTraits {
