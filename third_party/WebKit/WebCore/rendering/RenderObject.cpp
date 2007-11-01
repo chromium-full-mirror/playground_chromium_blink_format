@@ -686,7 +686,9 @@ void RenderObject::setChildNeedsLayout(bool b, bool markParents) {
 static inline bool objectIsRelayoutBoundary(const RenderObject* obj) {
   // FIXME: In future it may be possible to broaden this condition in order to
   // improve performance
-  return obj->isTextField() || obj->isTextArea()
+  return obj->isTextField() || obj->isTextArea() ||
+         obj->hasOverflowClip() && !obj->style()->width().isIntrinsicOrAuto() &&
+             !obj->style()->height().isIntrinsicOrAuto()
 #if ENABLE(SVG)
          || obj->isSVGRoot()
 #endif
