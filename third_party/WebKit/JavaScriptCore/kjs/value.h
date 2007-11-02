@@ -255,7 +255,7 @@ inline bool JSValue::isBoolean() const {
 
 inline bool JSValue::isNumber() const {
   return JSImmediate::isNumber(this) ||
-         !JSImmediate::isImmediate(this) && asCell()->isNumber();
+         (!JSImmediate::isImmediate(this) && asCell()->isNumber());
 }
 
 inline bool JSValue::isString() const {
