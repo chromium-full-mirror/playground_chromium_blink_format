@@ -1636,7 +1636,7 @@ bool FrameLoader::requestObject(RenderPart* renderer,
                                 const Vector<String>& paramNames,
                                 const Vector<String>& paramValues) {
   if (url.isEmpty() && mimeType.isEmpty())
-    return true;
+    return false;
 
 #if USE(LOW_BANDWIDTH_DISPLAY)
   // don't care object during low bandwidth display
