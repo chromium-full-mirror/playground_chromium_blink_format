@@ -362,7 +362,7 @@ void ArgumentListNode::streamTo(SourceStream& s) const {
 }
 
 void ArgumentsNode::streamTo(SourceStream& s) const {
-  s << '(' << list << ')';
+  s << '(' << listNode << ')';
 }
 
 void NewExprNode::streamTo(SourceStream& s) const {

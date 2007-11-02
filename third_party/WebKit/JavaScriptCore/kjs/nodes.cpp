@@ -57,7 +57,7 @@ namespace KJS {
 #define KJS_CHECKEXCEPTIONLIST \
   if (exec->hadException()) {  \
     handleException(exec);     \
-    return List();             \
+    return;                    \
   }
 
 #if !ASSERT_DISABLED
@@ -629,16 +629,12 @@ JSValue* ArgumentListNode::evaluate(ExecState*) {
 }
 
 // ECMA 11.2.4
-List ArgumentListNode::evaluateList(ExecState* exec) {
-  List l;
-
+void ArgumentListNode::evaluateList(ExecState* exec, List& list) {
   for (ArgumentListNode* n = this; n; n = n->next.get()) {
     JSValue* v = n->expr->evaluate(exec);
     KJS_CHECKEXCEPTIONLIST
-    l.append(v);
+    list.append(v);
   }
-
-  return l;
 }
 
 // ------------------------------ ArgumentsNode --------------------------------
@@ -646,8 +642,8 @@ List ArgumentListNode::evaluateList(ExecState* exec) {
 void ArgumentsNode::optimizeVariableAccess(
     FunctionBodyNode*,
     DeclarationStacks::NodeStack& nodeStack) {
-  if (list)
-    nodeStack.append(list.get());
+  if (listNode)
+    nodeStack.append(listNode.get());
 }
 
 JSValue* ArgumentsNode::evaluate(ExecState*) {
@@ -673,7 +669,7 @@ JSValue* NewExprNode::evaluate(ExecState* exec) {
 
   List argList;
   if (args) {
-    argList = args->evaluateList(exec);
+    args->evaluateList(exec, argList);
     KJS_CHECKEXCEPTIONVALUE
   }
 
@@ -722,7 +718,8 @@ JSValue* FunctionCallValueNode::evaluate(ExecState* exec) {
         expr.get());
   }
 
-  List argList = args->evaluateList(exec);
+  List argList;
+  args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   JSObject* thisObj = exec->dynamicInterpreter()->globalObject();
@@ -775,7 +772,8 @@ JSValue* FunctionCallResolveNode::evaluate(ExecState* exec) {
             ident);
       }
 
-      List argList = args->evaluateList(exec);
+      List argList;
+      args->evaluateList(exec, argList);
       KJS_CHECKEXCEPTIONVALUE
 
       JSObject* thisObj = base;
@@ -815,7 +813,8 @@ JSValue* LocalVarFunctionCallNode::evaluate(ExecState* exec) {
         exec, TypeError,
         "Object %s (result of expression %s) does not allow calls.", v, ident);
 
-  List argList = args->evaluateList(exec);
+  List argList;
+  args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   return func->call(exec, exec->dynamicInterpreter()->globalObject(), argList);
@@ -871,7 +870,8 @@ JSValue* FunctionCallBracketNode::evaluate(ExecState* exec) {
         funcVal, base.get(), subscript.get());
   }
 
-  List argList = args->evaluateList(exec);
+  List argList;
+  args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   JSObject* thisObj = baseObj;
@@ -921,7 +921,8 @@ JSValue* FunctionCallDotNode::evaluate(ExecState* exec) {
     return throwError(exec, TypeError, dotExprDoesNotAllowCallsString(),
                       funcVal, base.get(), ident);
 
-  List argList = args->evaluateList(exec);
+  List argList;
+  args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   JSObject* thisObj = baseObj;

@@ -88,7 +88,7 @@ class JavaJSObject {
 
   jobject convertValueToJObject(JSValue*) const;
   JSValue* convertJObjectToValue(jobject) const;
-  List listFromJArray(jobjectArray) const;
+  void getListFromJArray(jobjectArray, List&) const;
 
   RootObject* rootObject() const;
 
