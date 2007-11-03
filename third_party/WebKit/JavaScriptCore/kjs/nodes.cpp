@@ -60,6 +60,12 @@ namespace KJS {
     return;                    \
   }
 
+#define KJS_CHECKEXCEPTIONVOID \
+  if (exec->hadException()) {  \
+    handleException(exec);     \
+    return;                    \
+  }
+
 #if !ASSERT_DISABLED
 static inline bool canSkipLookup(ExecState* exec, const Identifier& ident) {
   // Static lookup in EvalCode is impossible because variables aren't
@@ -2557,11 +2563,18 @@ VarDeclNode::VarDeclNode(const Identifier& id, AssignExprNode* in, Type t)
 void VarDeclNode::optimizeVariableAccess(
     FunctionBodyNode*,
     DeclarationStacks::NodeStack& nodeStack) {
+  if (next)
+    nodeStack.append(next.get());
   if (init)
     nodeStack.append(init.get());
 }
 
 void VarDeclNode::getDeclarations(DeclarationStacks& stacks) {
+  if (next) {
+    ASSERT(next->mayHaveDeclarations());
+    stacks.nodeStack.append(next.get());
+  }
+
   // The normal check to avoid overwriting pre-existing values with variable
   // declarations doesn't work for the "arguments" property because we
   // instantiate it lazily. So we need to check here instead.
@@ -2571,9 +2584,9 @@ void VarDeclNode::getDeclarations(DeclarationStacks& stacks) {
   stacks.varStack.append(this);
 }
 
-JSValue* VarDeclNode::handleSlowCase(ExecState* exec,
-                                     const ScopeChain& chain,
-                                     JSValue* val) {
+void VarDeclNode::handleSlowCase(ExecState* exec,
+                                 const ScopeChain& chain,
+                                 JSValue* val) {
   ScopeChainIterator iter = chain.begin();
   ScopeChainIterator end = chain.end();
 
@@ -2597,11 +2610,10 @@ JSValue* VarDeclNode::handleSlowCase(ExecState* exec,
     flags |= ReadOnly;
 
   base->put(exec, ident, val, flags);
-  return 0;
 }
 
 // ECMA 12.2
-JSValue* VarDeclNode::evaluate(ExecState* exec) {
+inline void VarDeclNode::evaluateSingle(ExecState* exec) {
   const ScopeChain& chain = exec->scopeChain();
   JSObject* variableObject = exec->variableObject();
 
@@ -2619,7 +2631,7 @@ JSValue* VarDeclNode::evaluate(ExecState* exec) {
     variableObject->putDirect(ident, val, flags);
   } else if (init) {
     JSValue* val = init->evaluate(exec);
-    KJS_CHECKEXCEPTIONVALUE
+    KJS_CHECKEXCEPTIONVOID
 
     // if the variable object is the top of the scope chain, then that must
     // be where this variable is declared, processVarDecls would have put
@@ -2636,39 +2648,19 @@ JSValue* VarDeclNode::evaluate(ExecState* exec) {
     ASSERT(variableObject->hasProperty(exec, ident));
     variableObject->put(exec, ident, val, flags);
   }
-
-  // no caller of this function actually uses the return value.
-  // FIXME: It would be better to change the inheritence hierarchy so this
-  // node doesn't even have an evaluate method, but instead a differently named
-  // one with a void return.
-  return 0;
 }
 
-// ------------------------------ VarDeclListNode ------------------------------
+JSValue* VarDeclNode::evaluate(ExecState* exec) {
+  evaluateSingle(exec);
 
-void VarDeclListNode::optimizeVariableAccess(
-    FunctionBodyNode*,
-    DeclarationStacks::NodeStack& nodeStack) {
-  if (next)
-    nodeStack.append(next.get());
-  nodeStack.append(var.get());
-}
-
-// ECMA 12.2
-JSValue* VarDeclListNode::evaluate(ExecState* exec) {
-  for (VarDeclListNode* n = this; n; n = n->next.get()) {
-    n->var->evaluate(exec);
-    KJS_CHECKEXCEPTIONVALUE
+  if (VarDeclNode* n = next.get()) {
+    do {
+      n->evaluateSingle(exec);
+      KJS_CHECKEXCEPTIONVALUE
+      n = n->next.get();
+    } while (n);
   }
   return jsUndefined();
-}
-
-void VarDeclListNode::getDeclarations(DeclarationStacks& stacks) {
-  if (next) {
-    ASSERT(next->mayHaveDeclarations());
-    stacks.nodeStack.append(next.get());
-  }
-  stacks.nodeStack.append(var.get());
 }
 
 // ------------------------------ VarStatementNode -----------------------------
@@ -2684,7 +2676,7 @@ void VarStatementNode::optimizeVariableAccess(
 Completion VarStatementNode::execute(ExecState* exec) {
   KJS_BREAKPOINT;
 
-  (void)next->evaluate(exec);
+  next->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   return Completion(Normal);
