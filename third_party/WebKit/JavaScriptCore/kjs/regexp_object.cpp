@@ -230,12 +230,9 @@ JSValue* RegExpProtoFunc::callAsFunction(ExecState* exec,
 
 const ClassInfo RegExpImp::info = {"RegExp", 0, 0, 0};
 
-RegExpImp::RegExpImp(RegExpPrototype* regexpProto)
-    : JSObject(regexpProto), reg(0L) {}
+RegExpImp::RegExpImp(RegExpPrototype* regexpProto) : JSObject(regexpProto) {}
 
-RegExpImp::~RegExpImp() {
-  delete reg;
-}
+RegExpImp::~RegExpImp() {}
 
 // ------------------------------ RegExpObjectImp ------------------------------
 
