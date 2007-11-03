@@ -48,9 +48,8 @@ class PlatformScrollbar : public Widget, public Scrollbar {
   virtual void setEnabled(bool);
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
-  // FIXME: Implement.
-  static int horizontalScrollbarHeight() { return 15; }
-  static int verticalScrollbarWidth() { return 15; }
+  static int horizontalScrollbarHeight();
+  static int verticalScrollbarWidth();
 
  protected:
   virtual void updateThumbPosition();
