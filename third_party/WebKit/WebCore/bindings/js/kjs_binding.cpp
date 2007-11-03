@@ -1,5 +1,4 @@
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
  *  Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *  Copyright (C) 2007 Samuel Weinig <sam@webkit.org>
@@ -68,17 +67,19 @@ typedef HashMap<Document*, NodeMap*> NodePerDocMap;
 // all are unregistered before they are destroyed. This has helped us fix at
 // least one bug.
 
+static void addWrapper(DOMObject* wrapper);
+static void removeWrapper(DOMObject* wrapper);
+static void removeWrappers(const NodeMap& wrappers);
+
 #ifdef NDEBUG
 
-#define ADD_WRAPPER(wrapper)
-#define REMOVE_WRAPPER(wrapper)
-#define REMOVE_WRAPPERS(wrappers)
+static inline void addWrapper(DOMObject*) {}
+
+static inline void removeWrapper(DOMObject*) {}
+
+static inline void removeWrappers(const NodeMap&) {}
 
 #else
-
-#define ADD_WRAPPER(wrapper) addWrapper(wrapper)
-#define REMOVE_WRAPPER(wrapper) removeWrapper(wrapper)
-#define REMOVE_WRAPPERS(wrappers) removeWrappers(wrappers)
 
 static HashSet<DOMObject*>& wrapperSet() {
   static HashSet<DOMObject*> staticWrapperSet;
@@ -141,13 +142,12 @@ DOMObject* ScriptInterpreter::getDOMObject(void* objectHandle) {
 }
 
 void ScriptInterpreter::putDOMObject(void* objectHandle, DOMObject* wrapper) {
-  ADD_WRAPPER(wrapper);
+  addWrapper(wrapper);
   domObjects().set(objectHandle, wrapper);
 }
 
 void ScriptInterpreter::forgetDOMObject(void* objectHandle) {
-  REMOVE_WRAPPER(domObjects().get(objectHandle));
-  domObjects().remove(objectHandle);
+  removeWrapper(domObjects().take(objectHandle));
 }
 
 JSNode* ScriptInterpreter::getDOMNodeForDocument(Document* document,
@@ -162,20 +162,19 @@ JSNode* ScriptInterpreter::getDOMNodeForDocument(Document* document,
 
 void ScriptInterpreter::forgetDOMNodeForDocument(Document* document,
                                                  Node* node) {
-  REMOVE_WRAPPER(getDOMNodeForDocument(document, node));
   if (!document) {
-    domObjects().remove(node);
+    removeWrapper(domObjects().take(node));
     return;
   }
   NodeMap* documentDict = domNodesPerDocument().get(document);
   if (documentDict)
-    documentDict->remove(node);
+    removeWrapper(documentDict->take(node));
 }
 
 void ScriptInterpreter::putDOMNodeForDocument(Document* document,
                                               Node* node,
                                               JSNode* wrapper) {
-  ADD_WRAPPER(wrapper);
+  addWrapper(wrapper);
   if (!document) {
     domObjects().set(node, wrapper);
     return;
@@ -190,12 +189,11 @@ void ScriptInterpreter::putDOMNodeForDocument(Document* document,
 
 void ScriptInterpreter::forgetAllDOMNodesForDocument(Document* document) {
   ASSERT(document);
-  NodePerDocMap::iterator it = domNodesPerDocument().find(document);
-  if (it != domNodesPerDocument().end()) {
-    REMOVE_WRAPPERS(*it->second);
-    delete it->second;
-    domNodesPerDocument().remove(it);
-  }
+  NodeMap* map = domNodesPerDocument().take(document);
+  if (!map)
+    return;
+  removeWrappers(*map);
+  delete map;
 }
 
 void ScriptInterpreter::markDOMNodesForDocument(Document* doc) {
@@ -235,10 +233,10 @@ void ScriptInterpreter::updateDOMNodeDocument(Node* node,
   ASSERT(oldDoc != newDoc);
   JSNode* wrapper = getDOMNodeForDocument(oldDoc, node);
   if (wrapper) {
-    REMOVE_WRAPPER(wrapper);
+    removeWrapper(wrapper);
     putDOMNodeForDocument(newDoc, node, wrapper);
     forgetDOMNodeForDocument(oldDoc, node);
-    ADD_WRAPPER(wrapper);
+    addWrapper(wrapper);
   }
 }
 
