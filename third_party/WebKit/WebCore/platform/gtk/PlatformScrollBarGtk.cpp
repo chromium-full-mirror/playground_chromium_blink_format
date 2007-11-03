@@ -38,6 +38,13 @@
 
 using namespace WebCore;
 
+static gboolean gtkScrollEventCallback(GtkWidget* widget,
+                                       GdkEventScroll* event,
+                                       PlatformScrollbar*) {
+  return gtk_widget_event(gtk_widget_get_parent(widget),
+                          reinterpret_cast<GdkEvent*>(event));
+}
+
 PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
                                      ScrollbarOrientation orientation,
                                      ScrollbarControlSize controlSize)
@@ -52,6 +59,8 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
   g_object_ref(G_OBJECT(scrollBar));
   g_signal_connect(G_OBJECT(scrollBar), "value-changed",
                    G_CALLBACK(PlatformScrollbar::gtkValueChanged), this);
+  g_signal_connect(G_OBJECT(scrollBar), "scroll-event",
+                   G_CALLBACK(gtkScrollEventCallback), this);
 
   setGtkWidget(GTK_WIDGET(scrollBar));
 
@@ -68,7 +77,10 @@ PlatformScrollbar::~PlatformScrollbar() {
    * the Widget does not take over ownership.
    */
   g_signal_handlers_disconnect_by_func(
-      G_OBJECT(gtkWidget()), (gpointer)PlatformScrollbar::gtkValueChanged,
+      G_OBJECT(gtkWidget()),
+      reinterpret_cast<void*>(PlatformScrollbar::gtkValueChanged), this);
+  g_signal_handlers_disconnect_by_func(
+      G_OBJECT(gtkWidget()), reinterpret_cast<void*>(gtkScrollEventCallback),
       this);
   g_object_unref(G_OBJECT(gtkWidget()));
 }
