@@ -1,7 +1,6 @@
 // -*- mode: c++; c-basic-offset: 4 -*-
 /*
- *  This file is part of the KDE libraries
- *  Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ *  Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -28,17 +27,14 @@
 
 namespace KJS {
 
-class PropertyNameArray;
 class JSObject;
 class JSValue;
+class PropertyNameArray;
 
-class SavedProperty;
-
+struct PropertyMapEntry;
 struct PropertyMapHashTable;
+struct SavedProperty;
 
-/**
-* Saved Properties
-*/
 class SavedProperties {
   friend class PropertyMap;
 
@@ -47,45 +43,31 @@ class SavedProperties {
   ~SavedProperties();
 
  private:
-  int _count;
-  OwnArrayPtr<SavedProperty> _properties;
+  unsigned m_count;
+  OwnArrayPtr<SavedProperty> m_properties;
 };
 
-/**
-* A hashtable entry for the @ref PropertyMap.
-*/
-struct PropertyMapHashTableEntry {
-  PropertyMapHashTableEntry() : key(0) {}
-  UString::Rep* key;
-  JSValue* value;
-  int attributes;
-  int index;
-};
-
-/**
-* Javascript Property Map.
-*/
-class PropertyMap {
+class PropertyMap : Noncopyable {
  public:
   PropertyMap();
   ~PropertyMap();
 
   void clear();
 
-  void put(const Identifier& name,
-           JSValue* value,
-           int attributes,
-           bool roCheck = false);
-  void remove(const Identifier& name);
-  JSValue* get(const Identifier& name) const;
-  JSValue* get(const Identifier& name, unsigned& attributes) const;
+  void put(const Identifier&,
+           JSValue*,
+           unsigned attributes,
+           bool checkReadOnly = false);
+  void remove(const Identifier&);
+  JSValue* get(const Identifier&) const;
+  JSValue* get(const Identifier&, unsigned& attributes) const;
   JSValue** getLocation(const Identifier& name);
 
   void mark() const;
   void getEnumerablePropertyNames(PropertyNameArray&) const;
 
   void save(SavedProperties&) const;
-  void restore(const SavedProperties& p);
+  void restore(const SavedProperties&);
 
   bool hasGetterSetterProperties() const { return m_getterSetterFlag; }
   void setHasGetterSetterProperties(bool f) { m_getterSetterFlag = f; }
@@ -93,18 +75,18 @@ class PropertyMap {
   bool containsGettersOrSetters() const;
 
  private:
+  typedef PropertyMapEntry Entry;
+  typedef PropertyMapHashTable Table;
+
   static bool keysMatch(const UString::Rep*, const UString::Rep*);
   void expand();
   void rehash();
-  void rehash(int newTableSize);
+  void rehash(unsigned newTableSize);
   void createTable();
 
-  void insert(UString::Rep*, JSValue* value, int attributes, int index);
+  void insert(const Entry&);
 
   void checkConsistency();
-
-  typedef PropertyMapHashTableEntry Entry;
-  typedef PropertyMapHashTable Table;
 
   UString::Rep* m_singleEntryKey;
   union {
