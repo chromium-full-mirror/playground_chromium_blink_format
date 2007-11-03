@@ -521,10 +521,6 @@ JSObject* Interpreter::builtinDate() const {
   return m_Date;
 }
 
-JSObject* Interpreter::builtinRegExp() const {
-  return m_RegExp;
-}
-
 JSObject* Interpreter::builtinError() const {
   return m_Error;
 }
