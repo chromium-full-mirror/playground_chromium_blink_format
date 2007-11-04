@@ -96,9 +96,9 @@ JSValue* JSHTMLInputElementBaseFunction::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-const ClassInfo JSHTMLInputElementBase::info = {
-    "JSHTMLInputElementBase", &JSHTMLElement::info,
-    &JSHTMLInputElementBaseTable, 0};
+const ClassInfo JSHTMLInputElementBase::info = {"JSHTMLInputElementBase",
+                                                &JSHTMLElement::info,
+                                                &JSHTMLInputElementBaseTable};
 
 JSHTMLInputElementBase::JSHTMLInputElementBase(ExecState* exec,
                                                PassRefPtr<HTMLInputElement> e)

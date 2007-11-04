@@ -44,7 +44,7 @@ namespace KJS {
 
 // ------------------------------ StringInstance ----------------------------
 
-const ClassInfo StringInstance::info = {"String", 0, 0, 0};
+const ClassInfo StringInstance::info = {"String", 0, 0};
 
 StringInstance::StringInstance(JSObject* proto) : JSWrapperObject(proto) {
   setInternalValue(jsString(""));
@@ -138,7 +138,7 @@ void StringInstance::getPropertyNames(ExecState* exec,
 
 // ------------------------------ StringPrototype ---------------------------
 const ClassInfo StringPrototype::info = {"String", &StringInstance::info,
-                                         &stringTable, 0};
+                                         &stringTable};
 /* Source for string_object.lut.h
 @begin stringTable 26
   toString              StringProtoFunc::ToString       DontEnum|Function 0

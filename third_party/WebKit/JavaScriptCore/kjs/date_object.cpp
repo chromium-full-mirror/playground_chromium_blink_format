@@ -337,7 +337,7 @@ static void fillStructuresUsingDateArgs(ExecState* exec,
 
 // ------------------------------ DateInstance ------------------------------
 
-const ClassInfo DateInstance::info = {"Date", 0, 0, 0};
+const ClassInfo DateInstance::info = {"Date", 0, 0};
 
 DateInstance::DateInstance(JSObject* proto) : JSWrapperObject(proto) {}
 
@@ -386,8 +386,7 @@ static inline bool isTime_tSigned() {
 
 // ------------------------------ DatePrototype -----------------------------
 
-const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, &dateTable,
-                                       0};
+const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, &dateTable};
 
 /* Source for date_object.lut.h
    We use a negative ID to denote the "UTC" variant.

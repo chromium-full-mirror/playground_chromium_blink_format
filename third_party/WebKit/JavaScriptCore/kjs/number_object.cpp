@@ -35,7 +35,7 @@ using namespace KJS;
 
 // ------------------------------ NumberInstance ----------------------------
 
-const ClassInfo NumberInstance::info = {"Number", 0, 0, 0};
+const ClassInfo NumberInstance::info = {"Number", 0, 0};
 
 NumberInstance::NumberInstance(JSObject* proto) : JSWrapperObject(proto) {}
 // ------------------------------ NumberPrototype ---------------------------
@@ -423,7 +423,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
 // ------------------------------ NumberObjectImp ------------------------------
 
 const ClassInfo NumberObjectImp::info = {"Function", &InternalFunctionImp::info,
-                                         &numberTable, 0};
+                                         &numberTable};
 
 /* Source for number_object.lut.h
 @begin numberTable 5

@@ -84,7 +84,7 @@ JSObject* JSXMLHttpRequestConstructorImp::construct(ExecState* exec,
 }
 
 const ClassInfo JSXMLHttpRequest::info = {"JSXMLHttpRequest", 0,
-                                          &JSXMLHttpRequestTable, 0};
+                                          &JSXMLHttpRequestTable};
 
 /* Source for JSXMLHttpRequestTable.
 @begin JSXMLHttpRequestTable 7

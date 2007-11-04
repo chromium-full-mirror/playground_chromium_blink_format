@@ -363,7 +363,7 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
 
 #define KJS_IMPLEMENT_PROTOTYPE(ClassName, ClassPrototype, ClassFunction)      \
   const ClassInfo ClassPrototype::info = {ClassName "Prototype", 0,            \
-                                          &ClassPrototype##Table, 0};          \
+                                          &ClassPrototype##Table};             \
   JSObject* ClassPrototype::self(ExecState* exec) {                            \
     static Identifier* prototypeIdentifier =                                   \
         new Identifier("[[" ClassName ".prototype]]");                         \

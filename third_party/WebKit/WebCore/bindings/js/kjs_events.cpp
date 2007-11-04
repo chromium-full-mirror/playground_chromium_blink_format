@@ -345,7 +345,7 @@ JSValue* getNodeEventListener(EventTargetNode* n,
 
 // -------------------------------------------------------------------------
 
-const ClassInfo JSClipboard::info = {"Clipboard", 0, &JSClipboardTable, 0};
+const ClassInfo JSClipboard::info = {"Clipboard", 0, &JSClipboardTable};
 
 /* Source for JSClipboardTable. Use "make hashtables" to regenerate.
 @begin JSClipboardTable 3

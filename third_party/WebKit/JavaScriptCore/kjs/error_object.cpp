@@ -34,7 +34,7 @@ using namespace KJS;
 
 // ------------------------------ ErrorInstance ----------------------------
 
-const ClassInfo ErrorInstance::info = {"Error", 0, 0, 0};
+const ClassInfo ErrorInstance::info = {"Error", 0, 0};
 
 ErrorInstance::ErrorInstance(JSObject* proto) : JSObject(proto) {}
 
@@ -139,7 +139,7 @@ NativeErrorPrototype::NativeErrorPrototype(ExecState* exec,
 // ------------------------------ NativeErrorImp -------------------------------
 
 const ClassInfo NativeErrorImp::info = {"Function", &InternalFunctionImp::info,
-                                        0, 0};
+                                        0};
 
 NativeErrorImp::NativeErrorImp(ExecState* exec,
                                FunctionPrototype* funcProto,
