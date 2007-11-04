@@ -40,12 +40,12 @@
 #include <WebKit/IWebScriptDebugServer.h>
 #include <WebKit/WebKit.h>
 
-ServerConnection::ServerConnection() : m_globalContext(0) {
-  HRESULT serverCreated =
-      CoCreateInstance(CLSID_WebScriptDebugServer, 0, CLSCTX_LOCAL_SERVER,
-                       IID_IWebScriptDebugServer, (void**)&m_server);
-  if (!FAILED(serverCreated))
-    m_server->addListener(this);
+#include <iostream>
+
+ServerConnection::ServerConnection()
+    : m_globalContext(0), m_serverConnected(false) {
+  OleInitialize(0);
+  attemptToCreateServerConnection();
 }
 
 ServerConnection::~ServerConnection() {
@@ -54,6 +54,19 @@ ServerConnection::~ServerConnection() {
 
   if (m_globalContext)
     JSGlobalContextRelease(m_globalContext);
+}
+
+void ServerConnection::attemptToCreateServerConnection(
+    JSGlobalContextRef globalContextRef) {
+  HRESULT serverCreated =
+      CoCreateInstance(CLSID_WebScriptDebugServer, 0, CLSCTX_LOCAL_SERVER,
+                       IID_IWebScriptDebugServer, (void**)&m_server);
+  if (!FAILED(serverCreated)) {
+    m_server->addListener(this);
+    m_serverConnected = true;
+    if (globalContextRef)
+      m_globalContext = JSGlobalContextRetain(globalContextRef);
+  }
 }
 
 void ServerConnection::setGlobalContext(JSGlobalContextRef globalContextRef) {

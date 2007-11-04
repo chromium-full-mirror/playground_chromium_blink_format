@@ -50,6 +50,10 @@ class Drosera {
 
   bool webViewLoaded() const;
 
+  // Server connection functions
+  bool serverConnected() const;
+  void attemptToCreateServerConnection();
+
  private:
   HRESULT initUI(HINSTANCE hInstance, int nCmdShow);
   HRESULT attach();

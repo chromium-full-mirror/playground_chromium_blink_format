@@ -36,7 +36,13 @@
 
 DebuggerClient::DebuggerClient()
     : m_webViewLoaded(false),
-      m_debuggerDocument(new DebuggerDocument(new ServerConnection())) {}
+      m_debuggerDocument(new DebuggerDocument(new ServerConnection())),
+      m_globalContext(0) {}
+
+DebuggerClient::~DebuggerClient() {
+  if (m_globalContext)
+    JSGlobalContextRelease(m_globalContext);
+}
 
 // IUnknown ------------------------------
 HRESULT STDMETHODCALLTYPE DebuggerClient::QueryInterface(REFIID riid,
@@ -73,6 +79,8 @@ HRESULT STDMETHODCALLTYPE DebuggerClient::didFinishLoadForFrame(
     /* [in] */ IWebFrame*) {
   HRESULT ret = S_OK;
 
+  m_webViewLoaded = true;
+
   COMPtr<IWebFrame> mainFrame;
   ret = webView->mainFrame(&mainFrame);
   if (FAILED(ret))
@@ -83,9 +91,11 @@ HRESULT STDMETHODCALLTYPE DebuggerClient::didFinishLoadForFrame(
   if (FAILED(ret))
     return ret;
 
-  m_debuggerDocument->server()->setGlobalContext(context);
+  if (!m_globalContext)
+    m_globalContext = JSGlobalContextRetain(context);
 
-  m_webViewLoaded = true;
+  if (serverConnected())
+    m_debuggerDocument->server()->setGlobalContext(m_globalContext);
 
   return ret;
 }
@@ -132,4 +142,13 @@ DebuggerClient::runJavaScriptAlertPanelWithMessage(  // For debugging purposes
   (void)message;
 #endif
   return S_OK;
+}
+
+bool DebuggerClient::serverConnected() const {
+  return m_debuggerDocument->server()->serverConnected();
+}
+
+void DebuggerClient::attemptToCreateServerConnection() {
+  m_debuggerDocument->server()->attemptToCreateServerConnection(
+      m_globalContext);
 }
