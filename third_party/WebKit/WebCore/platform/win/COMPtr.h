@@ -98,7 +98,8 @@ class COMPtr {
     query(ptr.get());
   }
 
-  HRESULT copyRefTo(T**);
+  template <typename U>
+  HRESULT copyRefTo(U**);
   void adoptRef(T*);
 
  private:
@@ -118,7 +119,8 @@ inline T* COMPtr<T>::copyQueryInterfaceRef(IUnknown* ptr) {
 }
 
 template <typename T>
-inline HRESULT COMPtr<T>::copyRefTo(T** ptr) {
+template <typename U>
+inline HRESULT COMPtr<T>::copyRefTo(U** ptr) {
   if (!ptr)
     return E_POINTER;
   *ptr = m_ptr;

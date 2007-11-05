@@ -40,6 +40,7 @@
 
 class WebFrame;
 class WebBackForwardList;
+class WebInspector;
 class WebInspectorClient;
 
 WebCore::Page* core(IWebView*);
@@ -620,6 +621,9 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE loadBackForwardListFromOtherView(
       /* [in] */ IWebView* otherView);
 
+  virtual HRESULT STDMETHODCALLTYPE inspector(
+      /* [retval][out] */ IWebInspector**);
+
   // WebView
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
@@ -742,6 +746,8 @@ class WebView : public IWebView,
   COMPtr<IWebResourceLoadDelegate> m_resourceLoadDelegate;
   COMPtr<IWebDownloadDelegate> m_downloadDelegate;
   COMPtr<WebPreferences> m_preferences;
+  COMPtr<WebInspector> m_webInspector;
+
   bool m_userAgentOverridden;
   bool m_useBackForwardList;
   WebCore::String m_userAgentCustom;
