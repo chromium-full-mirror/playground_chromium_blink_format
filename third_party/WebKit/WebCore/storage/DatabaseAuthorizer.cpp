@@ -134,6 +134,10 @@ int DatabaseAuthorizer::allowUpdate(const String& tableName,
   return denyBasedOnTableName(tableName);
 }
 
+int DatabaseAuthorizer::allowTransaction() {
+  return m_securityEnabled ? SQLAuthDeny : SQLAuthAllow;
+}
+
 int DatabaseAuthorizer::allowRead(const String& tableName,
                                   const String& columnName) {
   return denyBasedOnTableName(tableName);
