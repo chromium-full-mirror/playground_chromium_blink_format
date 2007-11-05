@@ -1498,7 +1498,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         int i = args[1]->toInt32(exec);
 
         List argsTail;
-        args.slice(2, argsTail);
+        args.getSlice(2, argsTail);
 
         int r = (const_cast<Window*>(window))
                     ->installTimeout(func, argsTail, i, true /*single shot*/);
@@ -1518,7 +1518,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         int i = args[1]->toInt32(exec);
 
         List argsTail;
-        args.slice(2, argsTail);
+        args.getSlice(2, argsTail);
 
         int r = (const_cast<Window*>(window))
                     ->installTimeout(func, argsTail, i, false);
@@ -1672,9 +1672,8 @@ int Window::installTimeout(ScheduledAction* a, int t, bool singleShot) {
 
 ScheduledAction::ScheduledAction(JSValue* func, const List& args)
     : m_func(func) {
-  ListIterator it = args.begin();
-  ListIterator end = args.end();
-  while (it != end)
+  List::const_iterator end = args.end();
+  for (List::const_iterator it = args.begin(); it != end; ++it)
     m_args.append(*it);
 }
 

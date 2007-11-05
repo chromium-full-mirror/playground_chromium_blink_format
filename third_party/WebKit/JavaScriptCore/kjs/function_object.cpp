@@ -155,7 +155,7 @@ JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
         callThis = thisArg->toObject(exec);
 
       List argsTail;
-      args.slice(1, argsTail);
+      args.getSlice(1, argsTail);
       result = func->call(exec, callThis, argsTail);
     } break;
   }

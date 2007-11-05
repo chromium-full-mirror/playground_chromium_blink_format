@@ -396,6 +396,8 @@ class Vector {
   void append(const U*, size_t);
   template <typename U>
   void append(const U&);
+  template <typename U>
+  void uncheckedAppend(const U& val);
   template <typename U, size_t c>
   void append(const Vector<U, c>&);
 
@@ -602,6 +604,18 @@ inline void Vector<T, inlineCapacity>::append(const U& val) {
   const U* ptr = &val;
   if (size() == capacity())
     ptr = expandCapacity(size() + 1, ptr);
+  new (end()) T(*ptr);
+  ++m_size;
+}
+
+// This version of append saves a branch in the case where you know that the
+// vector's capacity is large enough for the append to succeed.
+
+template <typename T, size_t inlineCapacity>
+template <typename U>
+inline void Vector<T, inlineCapacity>::uncheckedAppend(const U& val) {
+  ASSERT(size() < capacity());
+  const U* ptr = &val;
   new (end()) T(*ptr);
   ++m_size;
 }
