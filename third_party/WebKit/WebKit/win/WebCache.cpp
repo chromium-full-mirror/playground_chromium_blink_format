@@ -148,3 +148,11 @@ HRESULT STDMETHODCALLTYPE WebCache::setDisabled(
   WebCore::cache()->setDisabled(!!disabled);
   return S_OK;
 }
+
+HRESULT STDMETHODCALLTYPE WebCache::disabled(
+    /* [out][retval] */ BOOL* disabled) {
+  if (!disabled)
+    return E_POINTER;
+  *disabled = WebCore::cache()->disabled();
+  return S_OK;
+}

@@ -53,6 +53,9 @@ class WebCache : public IWebCache {
   virtual HRESULT STDMETHODCALLTYPE setDisabled(
       /* [in] */ BOOL disabled);
 
+  virtual HRESULT STDMETHODCALLTYPE disabled(
+      /* [out][retval] */ BOOL*);
+
  protected:
   ULONG m_refCount;
 };
