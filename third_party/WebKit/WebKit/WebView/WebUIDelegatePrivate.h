@@ -118,4 +118,8 @@ enum {
     runDatabaseSizeLimitPromptForOrigin:(NSString*)origin
                        initiatedByFrame:(WebFrame*)frame;
 
+- (WebView*)webView:(WebView*)sender
+    createWebViewWithRequest:(NSURLRequest*)request
+              windowFeatures:(NSDictionary*)features;
+
 @end

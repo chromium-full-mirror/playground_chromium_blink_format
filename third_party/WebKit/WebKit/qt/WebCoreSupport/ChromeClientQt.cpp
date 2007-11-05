@@ -34,6 +34,7 @@
 #include "FrameLoaderClientQt.h"
 #include "FrameView.h"
 #include "NotImplemented.h"
+#include "WindowFeatures.h"
 
 #include "qwebpage.h"
 #include "qwebpage_p.h"
@@ -95,18 +96,11 @@ void ChromeClientQt::takeFocus(FocusDirection) {
   m_webPage->clearFocus();
 }
 
-Page* ChromeClientQt::createWindow(Frame*, const FrameLoadRequest& request) {
-  QWebPage* newPage = m_webPage->createWindow();
-  if (!newPage)
-    return 0;
-  KURL url = request.resourceRequest().url();
-  newPage->open(QUrl(url.prettyURL()));
-  return newPage->d->page;
-}
-
-Page* ChromeClientQt::createModalDialog(Frame*,
-                                        const FrameLoadRequest& request) {
-  QWebPage* newPage = m_webPage->createModalDialog();
+Page* ChromeClientQt::createWindow(Frame*,
+                                   const FrameLoadRequest& request,
+                                   const WindowFeatures& features) {
+  QWebPage* newPage = features.dialog ? m_webPage->createModalDialog()
+                                      : m_webPage->createWindow();
   if (!newPage)
     return 0;
   KURL url = request.resourceRequest().url();

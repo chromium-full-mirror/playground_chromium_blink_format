@@ -57,9 +57,8 @@ class ChromeClient : public WebCore::ChromeClient {
   virtual void takeFocus(WebCore::FocusDirection);
 
   virtual WebCore::Page* createWindow(WebCore::Frame*,
-                                      const WebCore::FrameLoadRequest&);
-  virtual WebCore::Page* createModalDialog(WebCore::Frame*,
-                                           const WebCore::FrameLoadRequest&);
+                                      const WebCore::FrameLoadRequest&,
+                                      const WebCore::WindowFeatures&);
   virtual void show();
 
   virtual bool canRunModal();
