@@ -55,8 +55,7 @@ using namespace WebCore;
 
 namespace WebKit {
 
-FrameLoaderClient::FrameLoaderClient(WebKitFrame* frame)
-    : m_frame(frame), m_firstData(false) {
+FrameLoaderClient::FrameLoaderClient(WebKitFrame* frame) : m_frame(frame) {
   ASSERT(m_frame);
 }
 
@@ -148,7 +147,6 @@ void FrameLoaderClient::dispatchDidReceiveResponse(
     unsigned long,
     const ResourceResponse& response) {
   m_response = response;
-  m_firstData = true;
 }
 
 void FrameLoaderClient::dispatchDecidePolicyForMIMEType(

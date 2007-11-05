@@ -250,7 +250,6 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
  private:
   WebKitFrame* m_frame;
   WebCore::ResourceResponse m_response;
-  bool m_firstData;
 };
 }
 
