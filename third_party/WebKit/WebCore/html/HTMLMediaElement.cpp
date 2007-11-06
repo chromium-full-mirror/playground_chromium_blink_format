@@ -92,6 +92,18 @@ bool HTMLMediaElement::checkDTD(const Node* newChild) {
   return newChild->hasTagName(sourceTag) || HTMLElement::checkDTD(newChild);
 }
 
+void HTMLMediaElement::attributeChanged(Attribute* attr, bool preserveDecls) {
+  HTMLElement::attributeChanged(attr, preserveDecls);
+
+  const QualifiedName& attrName = attr->name();
+  if (attrName == srcAttr) {
+    // 3.14.9.2.
+    // change to src attribute triggers load()
+    if (inDocument() && m_networkState == EMPTY)
+      scheduleLoad();
+  }
+}
+
 void HTMLMediaElement::insertedIntoDocument() {
   HTMLElement::insertedIntoDocument();
   if (!src().isEmpty())
