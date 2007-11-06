@@ -1773,10 +1773,11 @@ static JSValue* addSlowCase(ExecState* exec, JSValue* v1, JSValue* v2) {
 static inline JSValue* add(ExecState* exec, JSValue* v1, JSValue* v2) {
   JSType t1 = v1->type();
   JSType t2 = v2->type();
+  const unsigned bothTypes = (t1 << 16) | t2;
 
-  if (t1 == NumberType && t2 == NumberType)
+  if (bothTypes == ((NumberType << 16) | NumberType))
     return jsNumber(v1->toNumber(exec) + v2->toNumber(exec));
-  else if (t1 == StringType && t2 == StringType) {
+  else if (bothTypes == ((StringType << 16) | StringType)) {
     UString value = static_cast<StringImp*>(v1)->value() +
                     static_cast<StringImp*>(v2)->value();
     if (value.isNull())
