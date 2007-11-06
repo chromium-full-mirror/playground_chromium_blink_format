@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2007 Apple, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,13 +44,7 @@ namespace WebCore {
 using namespace EventNames;
 
 EditCommand::EditCommand(Document* document)
-    : m_document(document),
-      m_startingSelection(
-          document->frame()->selectionController()->selection()),
-      m_endingSelection(m_startingSelection),
-      m_startingRootEditableElement(m_startingSelection.rootEditableElement()),
-      m_endingRootEditableElement(m_startingRootEditableElement),
-      m_parent(0) {
+    : m_document(document), m_parent(0) {
   ASSERT(m_document);
   ASSERT(m_document->frame());
   DeleteButtonController* deleteButton =
@@ -153,7 +147,7 @@ EditAction EditCommand::editingAction() const {
 
 void EditCommand::setStartingSelection(const Selection& s) {
   Element* root = s.rootEditableElement();
-  for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent) {
+  for (EditCommand* cmd = this;; cmd = cmd->m_parent) {
     cmd->m_startingSelection = s;
     cmd->m_startingRootEditableElement = root;
     if (!cmd->m_parent || cmd->m_parent->isFirstCommand(cmd))

@@ -263,12 +263,6 @@ rangeByAlteringCurrentSelection:
 - (BOOL)isDragCaretRichlyEditable;
 - (DOMRange*)characterRangeAtPoint:(NSPoint)point;
 
-- (void)deleteKeyPressedWithSmartDelete:(BOOL)smartDelete
-                            granularity:(WebCore::TextGranularity)granularity;
-- (void)forwardDeleteKeyPressedWithSmartDelete:(BOOL)smartDelete
-                                   granularity:
-                                       (WebCore::TextGranularity)granularity;
-
 - (DOMCSSStyleDeclaration*)typingStyle;
 - (void)setTypingStyle:(DOMCSSStyleDeclaration*)style
         withUndoAction:(WebCore::EditAction)undoAction;
