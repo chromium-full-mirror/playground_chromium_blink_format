@@ -54,6 +54,7 @@ class HTMLObjectElement : public HTMLPlugInElement {
   virtual void childrenChanged();
 
   virtual bool isURLAttribute(Attribute*) const;
+  virtual const QualifiedName& imageSourceAttributeName() const;
 
   bool isImageType();
 

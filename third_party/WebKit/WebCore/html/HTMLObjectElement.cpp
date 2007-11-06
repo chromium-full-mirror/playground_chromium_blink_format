@@ -267,6 +267,10 @@ bool HTMLObjectElement::isURLAttribute(Attribute* attr) const {
           (attr->name() == usemapAttr && attr->value().domString()[0] != '#'));
 }
 
+const QualifiedName& HTMLObjectElement::imageSourceAttributeName() const {
+  return dataAttr;
+}
+
 bool HTMLObjectElement::isImageType() {
   if (m_serviceType.isEmpty() && m_url.startsWith("data:")) {
     // Extract the MIME type from the data URL.

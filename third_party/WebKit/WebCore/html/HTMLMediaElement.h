@@ -50,8 +50,7 @@ class HTMLMediaElement : public HTMLElement, public MovieClient {
 
   bool checkDTD(const Node* newChild);
 
-  virtual bool rendererIsNeeded(RenderStyle*);
-  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 

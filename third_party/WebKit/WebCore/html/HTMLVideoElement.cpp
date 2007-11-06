@@ -30,18 +30,67 @@
 
 #include "CSSHelper.h"
 #include "CSSPropertyNames.h"
+#include "Document.h"
+#include "HTMLImageLoader.h"
 #include "HTMLNames.h"
+#include "RenderImage.h"
+#include "RenderVideo.h"
 
 namespace WebCore {
 
 using namespace HTMLNames;
 
 HTMLVideoElement::HTMLVideoElement(Document* doc)
-    : HTMLMediaElement(HTMLNames::videoTag, doc) {}
+    : HTMLMediaElement(HTMLNames::videoTag, doc),
+      m_imageLoader(0),
+      m_shouldShowPosterImage(false) {}
+
+bool HTMLVideoElement::rendererIsNeeded(RenderStyle* style) {
+  return HTMLElement::rendererIsNeeded(style);
+}
+
+RenderObject* HTMLVideoElement::createRenderer(RenderArena* arena,
+                                               RenderStyle*) {
+  if (m_shouldShowPosterImage)
+    return new (arena) RenderImage(this);
+  return new (arena) RenderVideo(this);
+}
+
+void HTMLVideoElement::attach() {
+  HTMLMediaElement::attach();
+
+  if (m_shouldShowPosterImage) {
+    if (!m_imageLoader)
+      m_imageLoader = new HTMLImageLoader(this);
+    m_imageLoader->updateFromElement();
+    if (renderer() && renderer()->isImage()) {
+      RenderImage* imageRenderer = static_cast<RenderImage*>(renderer());
+      imageRenderer->setCachedImage(m_imageLoader->image());
+    }
+  }
+}
+
+void HTMLVideoElement::detach() {
+  HTMLMediaElement::detach();
+
+  if (!m_shouldShowPosterImage)
+    if (m_imageLoader) {
+      delete m_imageLoader;
+      m_imageLoader = 0;
+    }
+}
 
 void HTMLVideoElement::parseMappedAttribute(MappedAttribute* attr) {
   const QualifiedName& attrName = attr->name();
-  if (attrName == widthAttr)
+
+  if (attrName == posterAttr) {
+    updatePosterImage();
+    if (m_shouldShowPosterImage) {
+      if (!m_imageLoader)
+        m_imageLoader = new HTMLImageLoader(this);
+      m_imageLoader->updateFromElement();
+    }
+  } else if (attrName == widthAttr)
     addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
   else if (attrName == heightAttr)
     addCSSLength(attr, CSS_PROP_HEIGHT, attr->value());
@@ -79,6 +128,32 @@ int HTMLVideoElement::height() const {
 
 void HTMLVideoElement::setHeight(int value) {
   setAttribute(heightAttr, String::number(value));
+}
+
+String HTMLVideoElement::poster() const {
+  return document()->completeURL(getAttribute(posterAttr));
+}
+
+void HTMLVideoElement::setPoster(const String& value) {
+  setAttribute(posterAttr, value);
+}
+
+bool HTMLVideoElement::isURLAttribute(Attribute* attr) const {
+  return attr->name() == posterAttr;
+}
+
+const QualifiedName& HTMLVideoElement::imageSourceAttributeName() const {
+  return posterAttr;
+}
+
+void HTMLVideoElement::updatePosterImage() {
+  bool oldShouldShowPosterImage = m_shouldShowPosterImage;
+  m_shouldShowPosterImage =
+      !poster().isEmpty() && m_networkState < LOADED_FIRST_FRAME;
+  if (attached() && oldShouldShowPosterImage != m_shouldShowPosterImage) {
+    detach();
+    attach();
+  }
 }
 }
 #endif
