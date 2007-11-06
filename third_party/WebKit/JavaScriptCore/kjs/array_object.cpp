@@ -223,7 +223,7 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
       break;
     }
     case Push: {
-      for (int n = 0; n < args.size(); n++)
+      for (unsigned int n = 0; n < args.size(); n++)
         thisObj->put(exec, length + n, args[n]);
       length += args.size();
       thisObj->put(exec, exec->propertyNames().length, jsNumber(length),
