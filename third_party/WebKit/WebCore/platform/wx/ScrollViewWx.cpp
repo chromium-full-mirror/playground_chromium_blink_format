@@ -26,12 +26,12 @@
 #include "config.h"
 #include "ScrollView.h"
 
-#include <algorithm>
 #include "FloatRect.h"
 #include "IntRect.h"
-
-#include <stdio.h>
 #include "NotImplemented.h"
+
+#include <algorithm>
+#include <stdio.h>
 
 #include <wx/defs.h>
 #include <wx/scrolwin.h>
@@ -103,9 +103,13 @@ FloatRect ScrollView::visibleContentRect() const {
 }
 
 void ScrollView::setContentsPos(int newX, int newY) {
-  int dx = newX - contentsX();
-  int dy = newY - contentsY();
-  scrollBy(dx, dy);
+  wxScrolledWindow* win = nativeWindow();
+  if (win) {
+    int sUnitX = 1;
+    int sUnitY = 1;
+    win->GetScrollPixelsPerUnit(&sUnitX, &sUnitY);
+    win->Scroll(newX / sUnitX, newY / sUnitY);
+  }
 }
 
 void ScrollView::resizeContents(int w, int h) {
@@ -166,15 +170,14 @@ IntSize ScrollView::scrollOffset() const {
   return IntSize(contentsX(), contentsY());
 }
 
-IntSize ScrollView::maximumScroll() const {
-  notImplemented();
-  return IntSize(0, 0);
-}
-
 void ScrollView::scrollBy(int dx, int dy) {
   wxScrolledWindow* win = nativeWindow();
-  if (win)
-    win->Scroll(dx, dy);
+  if (win) {
+    int sUnitX = 1;
+    int sUnitY = 1;
+    win->GetScrollPixelsPerUnit(&sUnitX, &sUnitY);
+    win->Scroll(contentsX() + (dx / sUnitX), contentsY() + (dy / sUnitY));
+  }
 }
 
 WebCore::ScrollbarMode ScrollView::hScrollbarMode() const {
@@ -191,13 +194,6 @@ void ScrollView::setHScrollbarMode(ScrollbarMode newMode) {
 
 void ScrollView::setVScrollbarMode(ScrollbarMode newMode) {
   notImplemented();
-}
-
-void ScrollView::updateScrollBars() {
-  wxScrolledWindow* win = nativeWindow();
-  if (win) {
-    // if (m_data->vScrollbarMode != ScrollBarMode::ScrollbarAlwaysOff)
-  }
 }
 
 void ScrollView::setStaticBackground(bool flag) {

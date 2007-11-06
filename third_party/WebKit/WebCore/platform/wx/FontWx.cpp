@@ -28,15 +28,14 @@
 
 #include "FontData.h"
 #include "FontFallbackList.h"
+#include "GlyphBuffer.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
-#include "GlyphBuffer.h"
-#include "fontprops.h"
+#include "NotImplemented.h"
 
+#include "fontprops.h"
 #include <wx/defs.h>
 #include <wx/dcclient.h>
-
-#include "NotImplemented.h"
 
 namespace WebCore {
 
@@ -50,9 +49,11 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
   Color color = graphicsContext->fillColor();
 
 #if USE(WXGC)
-  wxGraphicsContext* dc =
-      (wxGraphicsContext*)graphicsContext->platformContext();
-  dc->SetFont(*font->getWxFont(), color);
+  wxGCDC* dc = (wxGCDC*)graphicsContext->platformContext();
+  wxFont wxfont = *font->getWxFont();
+  if (wxfont.IsOk())
+    dc->SetFont(wxfont);
+  dc->SetTextForeground(color);
 #else
   wxDC* dc = graphicsContext->platformContext();
   dc->SetTextBackground(color);
