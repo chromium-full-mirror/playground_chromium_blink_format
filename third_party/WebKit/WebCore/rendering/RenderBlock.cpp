@@ -307,9 +307,11 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
 
   m_childrenInline = false;
 
-  deleteLineBoxTree();
-
   RenderObject* child = firstChild();
+  if (!child)
+    return;
+
+  deleteLineBoxTree();
 
   while (child) {
     RenderObject *inlineRunStart, *inlineRunEnd;
@@ -335,6 +337,8 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
   for (RenderObject* c = firstChild(); c; c = c->nextSibling())
     ASSERT(!c->isInline());
 #endif
+
+  repaint();
 }
 
 void RenderBlock::removeChild(RenderObject* oldChild) {
