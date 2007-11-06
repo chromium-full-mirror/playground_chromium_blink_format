@@ -48,7 +48,7 @@ class List : Noncopyable {
       markSet().remove(this);
   }
 
-  int size() const { return m_vector.size(); }
+  size_t size() const { return m_vector.size(); }
   bool isEmpty() const { return m_vector.isEmpty(); }
 
   JSValue* at(size_t i) const {
