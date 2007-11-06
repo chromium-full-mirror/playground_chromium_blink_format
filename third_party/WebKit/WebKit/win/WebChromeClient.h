@@ -24,10 +24,15 @@
  */
 
 #include <WebCore/ChromeClient.h>
+#include <WebCore/COMPtr.h>
 #include <WebCore/FocusDirection.h>
 #include <wtf/Forward.h>
 
 class WebView;
+
+interface IWebUIDelegate;
+interface IWebUIDelegate2;
+interface IWebUIDelegate3;
 
 class WebChromeClient : public WebCore::ChromeClient {
  public:
@@ -109,5 +114,9 @@ class WebChromeClient : public WebCore::ChromeClient {
                                           const WebCore::String& origin);
 
  private:
+  COMPtr<IWebUIDelegate> uiDelegate();
+  COMPtr<IWebUIDelegate2> uiDelegate2();
+  COMPtr<IWebUIDelegate3> uiDelegate3();
+
   WebView* m_webView;
 };
