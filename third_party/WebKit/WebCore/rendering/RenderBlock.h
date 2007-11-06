@@ -132,7 +132,7 @@ class RenderBlock : public RenderFlow {
 
   virtual void layout();
   virtual void layoutBlock(bool relayoutChildren);
-  void layoutBlockChildren(bool relayoutChildren);
+  void layoutBlockChildren(bool relayoutChildren, int& maxFloatBottom);
   void layoutInlineChildren(bool relayoutChildren,
                             int& repaintTop,
                             int& repaintBottom);
@@ -215,7 +215,7 @@ class RenderBlock : public RenderFlow {
     return !hasColumns() && floatBottom() > m_height;
   }
   void addIntrudingFloats(RenderBlock* prev, int xoffset, int yoffset);
-  void addOverhangingFloats(RenderBlock* child, int xoffset, int yoffset);
+  int addOverhangingFloats(RenderBlock* child, int xoffset, int yoffset);
 
   int nearestFloatBottom(int height) const;
   int floatBottom() const;
