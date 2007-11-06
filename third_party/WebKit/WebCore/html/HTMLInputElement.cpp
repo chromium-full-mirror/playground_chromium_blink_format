@@ -109,7 +109,6 @@ HTMLInputElement::HTMLInputElement(const QualifiedName& tagName,
 }
 
 void HTMLInputElement::init() {
-  m_imageLoader = 0;
   m_type = TEXT;
   m_maxLen = cMaxLen;
   m_size = 20;
@@ -141,8 +140,6 @@ HTMLInputElement::~HTMLInputElement() {
     document()->unregisterForCacheCallbacks(this);
 
   document()->checkedRadioButtons().removeButton(this);
-
-  delete m_imageLoader;
 
   // Need to remove this from the form while it is still an HTMLInputElement,
   // so can't wait for the base class's destructor to do it.
@@ -338,10 +335,8 @@ void HTMLInputElement::setInputType(const String& t) {
   }
   m_haveType = true;
 
-  if (inputType() != IMAGE && m_imageLoader) {
-    delete m_imageLoader;
-    m_imageLoader = 0;
-  }
+  if (inputType() != IMAGE && m_imageLoader)
+    m_imageLoader.clear();
 }
 
 const AtomicString& HTMLInputElement::type() const {
@@ -596,7 +591,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == srcAttr) {
     if (renderer() && inputType() == IMAGE) {
       if (!m_imageLoader)
-        m_imageLoader = new HTMLImageLoader(this);
+        m_imageLoader.set(new HTMLImageLoader(this));
       m_imageLoader->updateFromElement();
     }
   } else if (attr->name() == usemapAttr || attr->name() == accesskeyAttr) {
@@ -714,7 +709,7 @@ void HTMLInputElement::attach() {
 
   if (inputType() == IMAGE) {
     if (!m_imageLoader)
-      m_imageLoader = new HTMLImageLoader(this);
+      m_imageLoader.set(new HTMLImageLoader(this));
     m_imageLoader->updateFromElement();
     if (renderer()) {
       RenderImage* imageObj = static_cast<RenderImage*>(renderer());
