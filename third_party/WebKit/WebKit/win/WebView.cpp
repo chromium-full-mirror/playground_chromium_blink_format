@@ -1297,9 +1297,9 @@ bool WebView::execCommand(WPARAM wParam, LPARAM /*lParam*/) {
   return handled;
 }
 
-bool WebView::keyUp(WPARAM virtualKeyCode, LPARAM keyData) {
+bool WebView::keyUp(WPARAM virtualKeyCode, LPARAM keyData, bool systemKeyDown) {
   PlatformKeyboardEvent keyEvent(m_viewWindow, virtualKeyCode, keyData,
-                                 m_currentCharacterCode);
+                                 m_currentCharacterCode, systemKeyDown);
 
   // Don't send key events for alt+space and alt+f4.
   if (keyEvent.altKey() &&
@@ -1415,9 +1415,10 @@ bool WebView::handleEditingKeyboardEvent(KeyboardEvent* evt) {
     if (frame->editor()->execCommand(command, evt))
       return true;
 
-  if (!evt->keyEvent() || evt->altKey())  // do not treat this as text input if
-                                          // it's a system key event (alt key is
-                                          // down)
+  if (!evt->keyEvent() || evt->keyEvent()->isSystemKey())  // do not treat this
+                                                           // as text input if
+                                                           // it's a system key
+                                                           // event
     return false;
 
   if (evt->keyEvent()->text().length() == 1) {
@@ -1465,7 +1466,7 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
     virtualKeyCode = MapVirtualKey(LOBYTE(HIWORD(keyData)), 1);
 
   PlatformKeyboardEvent keyEvent(m_viewWindow, virtualKeyCode, keyData,
-                                 m_currentCharacterCode);
+                                 m_currentCharacterCode, systemKeyDown);
   bool handled = frame->eventHandler()->keyEvent(keyEvent);
   m_inIMEKeyDown = false;
   if (handled)
@@ -1652,6 +1653,8 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       handled = webView->keyDown(wParam, lParam);
       break;
     case WM_SYSKEYUP:
+      handled = webView->keyUp(wParam, lParam, true);
+      break;
     case WM_KEYUP:
       handled = webView->keyUp(wParam, lParam);
       break;

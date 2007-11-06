@@ -152,7 +152,8 @@ static inline String singleCharacterString(UChar c) {
 PlatformKeyboardEvent::PlatformKeyboardEvent(HWND,
                                              WPARAM virtualKeyCode,
                                              LPARAM keyData,
-                                             UChar characterCode)
+                                             UChar characterCode,
+                                             bool systemKey)
     : m_text(singleCharacterString(characterCode)),
       m_unmodifiedText(singleCharacterString(characterCode)),
       m_keyIdentifier(keyIdentifierForWindowsKeyCode(virtualKeyCode)),
@@ -168,7 +169,8 @@ PlatformKeyboardEvent::PlatformKeyboardEvent(HWND,
       m_isModifierKeyPress(virtualKeyCode == VK_SHIFT ||
                            virtualKeyCode == VK_CONTROL ||
                            virtualKeyCode == VK_MENU ||
-                           virtualKeyCode == VK_CAPITAL) {}
+                           virtualKeyCode == VK_CAPITAL),
+      m_isSystemKey(systemKey) {}
 
 bool PlatformKeyboardEvent::currentCapsLockState() {
   return GetKeyState(VK_CAPITAL) & 1;
