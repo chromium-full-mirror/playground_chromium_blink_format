@@ -148,7 +148,7 @@ QWebPage::QWebPage(QWidget* parent)
   setPalette(pal);
   setAcceptDrops(true);
   connect(this, SIGNAL(loadProgressChanged(int)), this,
-          SLOT(onLoadProgressChanged(int)));
+          SLOT(_q_onLoadProgressChanged(int)));
 }
 
 QWebPage::~QWebPage() {
@@ -791,9 +791,9 @@ QString QWebPage::userAgentStringForUrl(const QUrl& forUrl) const {
       "(KHTML, like Gecko) Safari/419.3 Qt");
 }
 
-void QWebPage::onLoadProgressChanged(int) {
-  d->m_totalBytes = d->page->progress()->totalPageAndResourceBytesToLoad();
-  d->m_bytesReceived = d->page->progress()->totalBytesReceived();
+void QWebPagePrivate::_q_onLoadProgressChanged(int) {
+  m_totalBytes = page->progress()->totalPageAndResourceBytesToLoad();
+  m_bytesReceived = page->progress()->totalBytesReceived();
 }
 
 quint64 QWebPage::totalBytes() const {
@@ -803,3 +803,5 @@ quint64 QWebPage::totalBytes() const {
 quint64 QWebPage::bytesReceived() const {
   return d->m_totalBytes;
 }
+
+#include "moc_qwebpage.cpp"
