@@ -86,6 +86,7 @@ class QWebPagePrivate {
   void _q_webActionTriggered(bool checked);
   void updateAction(QWebPage::WebAction action);
   void updateNavigationActions();
+  void updateEditorActions();
 
   WebCore::ChromeClientQt* chromeClient;
   WebCore::ContextMenuClientQt* contextMenuClient;
