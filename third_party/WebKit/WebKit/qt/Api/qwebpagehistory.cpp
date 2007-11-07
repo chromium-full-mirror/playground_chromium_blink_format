@@ -64,20 +64,11 @@ QWebHistoryItem::QWebHistoryItem(QWebHistoryItemPrivate* priv) {
   d = priv;
 }
 
-QWebPageHistory::QWebPageHistory(QWebPageHistoryPrivate* priv) {
-  d = priv;
-}
+QWebPageHistory::QWebPageHistory() : d(0) {}
 
-QWebPageHistory::QWebPageHistory(const QWebPageHistory& other) {
-  d = other.d;
+QWebPageHistory::~QWebPageHistory() {
+  delete d;
 }
-
-QWebPageHistory& QWebPageHistory::operator=(const QWebPageHistory& other) {
-  d = other.d;
-  return *this;
-}
-
-QWebPageHistory::~QWebPageHistory() {}
 
 void QWebPageHistory::clear() {
   RefPtr<WebCore::HistoryItem> current = d->lst->currentItem();

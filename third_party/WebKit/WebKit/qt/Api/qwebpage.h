@@ -75,8 +75,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
   QWebFrame* mainFrame() const;
 
-  // ### should return a pointer
-  QWebPageHistory history() const;
+  QWebPageHistory* history() const;
 
   // ### owned by webpage, returns a pointer, no setter!
   void setSettings(const QWebSettings& settings);
