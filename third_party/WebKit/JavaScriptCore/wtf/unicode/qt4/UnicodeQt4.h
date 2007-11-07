@@ -363,10 +363,10 @@ inline DecompositionType decompositionType(UChar32 c) {
 inline int umemcasecmp(const UChar* a, const UChar* b, int len) {
   // handle surrogates correctly
   for (int i = 0; i < len; ++i) {
-    QChar c1 = QChar(a[i]).toCaseFolded();
-    QChar c2 = QChar(b[i]).toCaseFolded();
+    uint c1 = QChar::toCaseFolded(a[i]);
+    uint c2 = QChar::toCaseFolded(b[i]);
     if (c1 != c2)
-      return c1 < c2;
+      return c1 - c2;
   }
   return 0;
 }
@@ -504,7 +504,7 @@ inline int umemcasecmp(const UChar* a, const UChar* b, int len) {
     QChar c1 = QChar(a[i]).toLower();
     QChar c2 = QChar(b[i]).toLower();
     if (c1 != c2)
-      return c1 < c2;
+      return c1.unicode() - c2.unicode();
   }
   return 0;
 }
