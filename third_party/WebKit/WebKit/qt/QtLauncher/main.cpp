@@ -248,11 +248,18 @@ class SearchEdit : public QLineEdit {
   QPushButton* clearButton;
 };
 
+class WebPage : public QWebPage {
+ public:
+  inline WebPage(QWidget* parent) : QWebPage(parent) {}
+
+  virtual QWebPage* createWindow();
+};
+
 class MainWindow : public QMainWindow {
   Q_OBJECT
  public:
-  MainWindow(const QUrl& url) {
-    page = new QWebPage(this);
+  MainWindow(const QUrl& url = QUrl()) {
+    page = new WebPage(this);
     InfoWidget* info = new InfoWidget(page);
     info->setGeometry(20, 20, info->sizeHint().width(),
                       info->sizeHint().height());
@@ -292,10 +299,12 @@ class MainWindow : public QMainWindow {
     hoverLabel = new HoverLabel(this);
     hoverLabel->hide();
 
-    page->open(url);
+    if (url.isValid())
+      page->open(url);
 
     info->raise();
   }
+  inline QWebPage* webPage() const { return page; }
  protected slots:
   void changeLocation() {
     QUrl url(urlEdit->text());
@@ -323,6 +332,11 @@ class MainWindow : public QMainWindow {
   QLineEdit* urlEdit;
   HoverLabel* hoverLabel;
 };
+
+QWebPage* WebPage::createWindow() {
+  MainWindow* mw = new MainWindow;
+  return mw->webPage();
+}
 
 #include "main.moc"
 
