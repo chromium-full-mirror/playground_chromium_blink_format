@@ -32,17 +32,20 @@
 namespace WebCore {
 class ChromeClientQt;
 class ContextMenuClientQt;
+class ContextMenuItem;
 class EditorClientQt;
 class Page;
 }
 
 class QUndoStack;
+class QMenu;
 
 class QWebPagePrivate {
  public:
   QWebPagePrivate(QWebPage*);
   ~QWebPagePrivate();
   void createMainFrame();
+  QMenu* createContextMenu(QList<WebCore::ContextMenuItem>* items);
 
   QWebFrame* frameAt(const QPoint& pos) const;
 
