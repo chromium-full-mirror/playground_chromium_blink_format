@@ -29,7 +29,7 @@
 namespace WebCore {
 
 struct WindowFeatures {
-  inline WindowFeatures()
+  WindowFeatures()
       : xSet(false),
         ySet(false),
         widthSet(false),
