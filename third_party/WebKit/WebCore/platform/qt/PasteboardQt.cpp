@@ -52,9 +52,7 @@ Pasteboard* Pasteboard::generalPasteboard() {
   return pasteboard;
 }
 
-void Pasteboard::writeSelection(Range* selectedRange,
-                                bool canSmartCopyOrDelete,
-                                Frame* frame) {
+void Pasteboard::writeSelection(Range* selectedRange, bool, Frame* frame) {
   QMimeData* md = new QMimeData;
   md->setText(frame->selectedText());
   md->setHtml(createMarkup(selectedRange, 0, AnnotateForInterchange));
@@ -65,7 +63,7 @@ bool Pasteboard::canSmartReplace() {
   return false;
 }
 
-String Pasteboard::plainText(Frame* frame) {
+String Pasteboard::plainText(Frame*) {
   return QApplication::clipboard()->text();
 }
 
