@@ -86,7 +86,6 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq) : q(qq), modified(false) {
 
   // ### should be configurable
   page->settings()->setDefaultTextEncodingName("iso-8859-1");
-  page->settings()->setDOMPasteAllowed(true);
 
   settings = new QWebSettings(page->settings());
 

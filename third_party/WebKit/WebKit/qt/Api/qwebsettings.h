@@ -53,7 +53,8 @@ class QWEBKIT_EXPORT QWebSettings {
     JavaEnabled,
     PluginsEnabled,
     PrivateBrowsingEnabled,
-    JavascriptCanOpenWindows
+    JavascriptCanOpenWindows,
+    JavascriptCanAccessClipboard
   };
   enum WebGraphic {
     MissingImageGraphic,
