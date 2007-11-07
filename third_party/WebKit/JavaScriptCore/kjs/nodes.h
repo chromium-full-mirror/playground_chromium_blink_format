@@ -143,6 +143,10 @@ class Node {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL {}
 
+  // Used to optimize those nodes that do extra work when returning a result,
+  // even if the result has no semantic relevance
+  virtual void optimizeForUnnecessaryResult() {}
+
  protected:
   Completion createErrorCompletion(ExecState*,
                                    ErrorType,
@@ -642,13 +646,26 @@ class FunctionCallDotNode : public Node {
   RefPtr<ArgumentsNode> args;
 };
 
-class PostIncResolveNode : public Node {
+class PrePostResolveNode : public Node {
  public:
-  PostIncResolveNode(const Identifier& i) KJS_FAST_CALL : m_ident(i) {}
+  PrePostResolveNode(const Identifier& i) KJS_FAST_CALL : m_ident(i) {}
 
-  PostIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+  PrePostResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : Node(PlacementNewAdopt),
         m_ident(PlacementNewAdopt) {}
+
+ protected:
+  Identifier m_ident;
+  size_t m_index;  // Used by LocalVarPostfixNode.
+};
+
+class PostIncResolveNode : public PrePostResolveNode {
+ public:
+  PostIncResolveNode(const Identifier& i) KJS_FAST_CALL
+      : PrePostResolveNode(i) {}
+
+  PostIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
+      : PrePostResolveNode(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -656,10 +673,7 @@ class PostIncResolveNode : public Node {
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
-
- protected:
-  Identifier m_ident;
-  size_t index;  // Used by LocalVarPostfixNode.
+  virtual void optimizeForUnnecessaryResult();
 };
 
 class PostIncLocalVarNode : public PostIncResolveNode {
@@ -667,19 +681,20 @@ class PostIncLocalVarNode : public PostIncResolveNode {
   PostIncLocalVarNode(size_t i) KJS_FAST_CALL
       : PostIncResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
-    index = i;
+    m_index = i;
   }
 
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void optimizeForUnnecessaryResult();
 };
 
-class PostDecResolveNode : public Node {
+class PostDecResolveNode : public PrePostResolveNode {
  public:
-  PostDecResolveNode(const Identifier& i) KJS_FAST_CALL : m_ident(i) {}
+  PostDecResolveNode(const Identifier& i) KJS_FAST_CALL
+      : PrePostResolveNode(i) {}
 
   PostDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : Node(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {}
+      : PrePostResolveNode(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -687,10 +702,7 @@ class PostDecResolveNode : public Node {
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
-
- protected:
-  Identifier m_ident;
-  size_t index;  // Used by LocalVarPostfixNode.
+  virtual void optimizeForUnnecessaryResult();
 };
 
 class PostDecLocalVarNode : public PostDecResolveNode {
@@ -698,10 +710,11 @@ class PostDecLocalVarNode : public PostDecResolveNode {
   PostDecLocalVarNode(size_t i) KJS_FAST_CALL
       : PostDecResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
-    index = i;
+    m_index = i;
   }
 
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual void optimizeForUnnecessaryResult();
 };
 
 class PostfixBracketNode : public Node {
@@ -922,13 +935,13 @@ class TypeOfValueNode : public Node {
   RefPtr<Node> m_expr;
 };
 
-class PreIncResolveNode : public Node {
+class PreIncResolveNode : public PrePostResolveNode {
  public:
-  PreIncResolveNode(const Identifier& s) KJS_FAST_CALL : m_ident(s) {}
+  PreIncResolveNode(const Identifier& s) KJS_FAST_CALL : PrePostResolveNode(s) {
+  }
 
   PreIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : Node(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {}
+      : PrePostResolveNode(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -937,10 +950,6 @@ class PreIncResolveNode : public Node {
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
-
- protected:
-  Identifier m_ident;
-  size_t m_index;  // Used by LocalVarPrefixNode.
 };
 
 class PreIncLocalVarNode : public PreIncResolveNode {
@@ -954,13 +963,13 @@ class PreIncLocalVarNode : public PreIncResolveNode {
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 };
 
-class PreDecResolveNode : public Node {
+class PreDecResolveNode : public PrePostResolveNode {
  public:
-  PreDecResolveNode(const Identifier& s) KJS_FAST_CALL : m_ident(s) {}
+  PreDecResolveNode(const Identifier& s) KJS_FAST_CALL : PrePostResolveNode(s) {
+  }
 
   PreDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : Node(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {}
+      : PrePostResolveNode(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -969,10 +978,6 @@ class PreDecResolveNode : public Node {
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
-
- protected:
-  Identifier m_ident;
-  size_t m_index;  // Used by LocalVarPrefixNode.
 };
 
 class PreDecLocalVarNode : public PreDecResolveNode {
@@ -1842,7 +1847,10 @@ class ForNode : public StatementNode {
         expr3(e3),
         statement(s) {
     m_mayHaveDeclarations = true;
+    if (expr3)
+      expr3->optimizeForUnnecessaryResult();
   }
+
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
