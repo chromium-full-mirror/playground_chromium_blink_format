@@ -175,8 +175,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   void onLoadProgressChanged(int);
 
  protected:
-  virtual QWebFrame* createFrame(QWebFrame* parentFrame,
-                                 QWebFrameData* frameData);
   virtual QWebPage* createWindow();
   virtual QWebPage* createModalDialog();
   virtual QObject* createPlugin(const QString& classid,
