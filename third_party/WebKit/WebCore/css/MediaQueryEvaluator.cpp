@@ -146,7 +146,7 @@ bool MediaQueryEvaluator::eval(const MediaList* mediaList) const {
   return result;
 }
 
-static bool parseAspectRatio(CSSValue* value, int& a, int& b) {
+static bool parseAspectRatio(CSSValue* value, int& h, int& v) {
   if (value->isValueList()) {
     CSSValueList* valueList = static_cast<CSSValueList*>(value);
     if (valueList->length() == 3) {
@@ -165,9 +165,9 @@ static bool parseAspectRatio(CSSValue* value, int& a, int& b) {
         String str = static_cast<CSSPrimitiveValue*>(i1)->getStringValue();
         if (!str.isNull() && str.length() == 1 &&
             str[0] == DeprecatedChar('/')) {
-          a = static_cast<CSSPrimitiveValue*>(i0)->getIntValue(
+          h = static_cast<CSSPrimitiveValue*>(i0)->getIntValue(
               CSSPrimitiveValue::CSS_NUMBER);
-          b = static_cast<CSSPrimitiveValue*>(i2)->getIntValue(
+          v = static_cast<CSSPrimitiveValue*>(i2)->getIntValue(
               CSSPrimitiveValue::CSS_NUMBER);
           return true;
         }
@@ -241,10 +241,10 @@ static bool device_aspect_ratioMediaFeatureEval(CSSValue* value,
                                                 MediaFeaturePrefix op) {
   if (value) {
     FloatRect sg = screenRect(page->mainFrame()->view());
-    int a = 0;
-    int b = 0;
-    if (parseAspectRatio(value, a, b))
-      return b != 0 && cmpvalue(a * (int)sg.height(), b * (int)sg.width(), op);
+    int h = 0;
+    int v = 0;
+    if (parseAspectRatio(value, h, v))
+      return v != 0 && cmpvalue((int)sg.width() * v, (int)sg.height() * h, op);
     return false;
   }
 
