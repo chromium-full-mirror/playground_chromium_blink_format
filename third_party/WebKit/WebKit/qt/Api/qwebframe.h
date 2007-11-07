@@ -86,14 +86,6 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void titleChanged(const QString& title);
   void hoveringOverLink(const QString& link, const QString& title);
 
- protected:
-  // for dumprendertree
-  virtual void mouseMoveEvent(QMouseEvent*);
-  virtual void mousePressEvent(QMouseEvent*);
-  virtual void mouseDoubleClickEvent(QMouseEvent*);
-  virtual void mouseReleaseEvent(QMouseEvent*);
-  virtual void wheelEvent(QWheelEvent*);
-
  private:
   friend class QWebPage;
   friend class QWebPagePrivate;

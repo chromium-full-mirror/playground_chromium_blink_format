@@ -71,6 +71,8 @@ class QWebFramePrivate {
   WebCore::PlatformScrollbar* horizontalScrollBar() const;
   WebCore::PlatformScrollbar* verticalScrollBar() const;
 
+  inline QPoint pos() const { return frameView->frameGeometry().topLeft(); }
+
   QWebFrame* q;
   WebCore::FrameLoaderClientQt* frameLoaderClient;
   WTF::RefPtr<WebCore::Frame> frame;
