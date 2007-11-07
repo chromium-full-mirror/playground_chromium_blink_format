@@ -233,8 +233,7 @@ QSize QWebPage::sizeHint() const {
 }
 
 void QWebPage::stop() {
-  FrameLoader* f = mainFrame()->d->frame->loader();
-  f->stopForUserCancel();
+  webActionTriggered(Stop);
 }
 
 QWebPageHistory* QWebPage::history() const {
@@ -242,11 +241,11 @@ QWebPageHistory* QWebPage::history() const {
 }
 
 void QWebPage::goBack() {
-  d->page->goBack();
+  webActionTriggered(GoBack);
 }
 
 void QWebPage::goForward() {
-  d->page->goForward();
+  webActionTriggered(GoForward);
 }
 
 void QWebPage::goToHistoryItem(const QWebHistoryItem& item) {
@@ -303,6 +302,43 @@ QObject* QWebPage::createPlugin(const QString& classid,
   return 0;
 }
 
+void QWebPage::webActionTriggered(WebAction action, bool checked) {
+  switch (action) {
+    // ### these need a context...
+    case OpenLinkInNewWindow:
+    case OpenFrameInNewWindow:
+    case DownloadLinkToDisk:
+    case CopyLinkToClipboard:
+    case OpenImageInNewWindow:
+    case DownloadImageToDisk:
+    case CopyImageToClipboard:
+      break;
+    case GoBack:
+      d->page->goBack();
+      break;
+    case GoForward:
+      d->page->goForward();
+      break;
+    case Stop:
+      mainFrame()->d->frame->loader()->stopForUserCancel();
+      break;
+    case Reload:
+      mainFrame()->d->frame->loader()->reload();
+      break;
+    case Cut:
+      d->page->focusController()->focusedOrMainFrame()->editor()->cut();
+      break;
+    case Copy:
+      d->page->focusController()->focusedOrMainFrame()->editor()->copy();
+      break;
+    case Paste:
+      d->page->focusController()->focusedOrMainFrame()->editor()->paste();
+      break;
+    default:
+      break;
+  }
+}
+
 QWebPage::NavigationRequestResponse QWebPage::navigationRequested(
     QWebFrame* frame,
     const QWebNetworkRequest& request,
@@ -328,15 +364,15 @@ bool QWebPage::canPaste() const {
 }
 
 void QWebPage::cut() {
-  d->page->focusController()->focusedOrMainFrame()->editor()->cut();
+  webActionTriggered(Cut);
 }
 
 void QWebPage::copy() {
-  d->page->focusController()->focusedOrMainFrame()->editor()->copy();
+  webActionTriggered(Copy);
 }
 
 void QWebPage::paste() {
-  d->page->focusController()->focusedOrMainFrame()->editor()->paste();
+  webActionTriggered(Paste);
 }
 
 /*!

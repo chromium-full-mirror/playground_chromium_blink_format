@@ -67,6 +67,31 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
     NavigationTypeOther
   };
 
+  enum WebAction {
+    NoWebAction = -1,
+
+    OpenLinkInNewWindow,
+    OpenFrameInNewWindow,
+
+    DownloadLinkToDisk,
+    CopyLinkToClipboard,
+
+    OpenImageInNewWindow,
+    DownloadImageToDisk,
+    CopyImageToClipboard,
+
+    GoBack,
+    GoForward,
+    Stop,
+    Reload,
+
+    Cut,
+    Copy,
+    Paste,
+
+    NumWebActions = Paste
+  };
+
   QWebPage(QWidget* parent);
   ~QWebPage();
 
@@ -185,6 +210,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
                                 const QUrl& url,
                                 const QStringList& paramNames,
                                 const QStringList& paramValues);
+
+  virtual void webActionTriggered(WebAction action, bool checked = false);
 
   virtual NavigationRequestResponse navigationRequested(
       QWebFrame* frame,
