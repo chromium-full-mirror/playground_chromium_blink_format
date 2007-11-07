@@ -43,6 +43,7 @@
 #include "Settings.h"
 #include "Page.h"
 #include "FrameLoader.h"
+#include "FrameLoadRequest.h"
 #include "KURL.h"
 #include "Image.h"
 #include "IconDatabase.h"
@@ -53,6 +54,8 @@
 #include "PlatformKeyboardEvent.h"
 #include "PlatformWheelEvent.h"
 #include "ProgressTracker.h"
+#include "RefPtr.h"
+#include "HashMap.h"
 #include "HitTestResult.h"
 #include "LocalizedStrings.h"
 
@@ -127,6 +130,8 @@ void QWebPagePrivate::createMainFrame() {
 static QWebPage::WebAction webActionForContextMenuAction(
     WebCore::ContextMenuAction action) {
   switch (action) {
+    case WebCore::ContextMenuItemTagOpenLink:
+      return QWebPage::OpenLink;
     case WebCore::ContextMenuItemTagOpenLinkInNewWindow:
       return QWebPage::OpenLinkInNewWindow;
     case WebCore::ContextMenuItemTagDownloadLinkToDisk:
@@ -418,15 +423,34 @@ void QWebPage::webActionTriggered(WebAction action, bool checked) {
   const char* command = 0;
 
   switch (action) {
+    case OpenLink:
+      if (QWebFrame* targetFrame = d->currentContext.targetFrame()) {
+        WTF::RefPtr<WebCore::Frame> wcFrame = targetFrame->d->frame;
+        WebCore::ResourceRequest rr(
+            WebCore::KURL(d->currentContext.linkUrl().toString()),
+            wcFrame->loader()->outgoingReferrer());
+        targetFrame->d->frame->loader()->load(WebCore::FrameLoadRequest(rr),
+                                              /*lockHistory*/ false,
+                                              /*userGesture*/ true,
+                                              /*event*/ 0,
+                                              /*HTMLFormElement*/ 0,
+                                              /*formValues*/
+                                              WTF::HashMap<String, String>());
+        break;
+      } else {
+      }
+    // fall through
     case OpenLinkInNewWindow:
       break;
     case OpenFrameInNewWindow:
+      break;
     case DownloadLinkToDisk:
     case CopyLinkToClipboard:
       editor->copyURL(WebCore::KURL(d->currentContext.linkUrl().toString()),
                       d->currentContext.text());
       break;
     case OpenImageInNewWindow:
+      break;
     case DownloadImageToDisk:
     case CopyImageToClipboard:
       break;
@@ -591,6 +615,9 @@ QAction* QWebPage::webAction(WebAction action) const {
   QString text;
 
   switch (action) {
+    case OpenLink:
+      text = contextMenuItemTagOpenLink();
+      break;
     case OpenLinkInNewWindow:
       text = contextMenuItemTagOpenLinkInNewWindow();
       break;
