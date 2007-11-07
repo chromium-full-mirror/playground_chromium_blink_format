@@ -46,6 +46,7 @@ class FrameLoaderClientQt;
 class FrameLoadRequest;
 class EditorClientQt;
 class ResourceHandle;
+class HitTestResult;
 }
 
 class QWEBKIT_EXPORT QWebPage : public QWidget {
@@ -181,6 +182,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   void paste();
   // ### should we have execCommand() or something similar?
 
+  QAction* webAction(WebAction action) const;
+
  signals:
   /**
    * Signal is emitted when load is started on one of the child
@@ -283,6 +286,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
  private:
   Q_PRIVATE_SLOT(d, void _q_onLoadProgressChanged(int))
+  Q_PRIVATE_SLOT(d, void _q_webActionTriggered(bool checked));
   friend class QWebFrame;
   friend class QWebPagePrivate;
   friend class WebCore::ChromeClientQt;

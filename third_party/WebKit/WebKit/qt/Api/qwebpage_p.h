@@ -40,6 +40,39 @@ class Page;
 class QUndoStack;
 class QMenu;
 
+class QWebPageContextPrivate {
+ public:
+  QPoint pos;
+  QString text;
+  QUrl linkUrl;
+  QUrl imageUrl;
+  QPixmap image;
+  QPointer<QWebFrame> targetFrame;
+};
+
+class QWebPageContext {
+ public:
+  QWebPageContext();
+  QWebPageContext(const QWebPageContext& other);
+  QWebPageContext& operator=(const QWebPageContext& other);
+  ~QWebPageContext();
+
+  QPoint pos() const;
+  QString text() const;
+  QUrl linkUrl() const;
+  QUrl imageUrl() const;
+  // ### we have a pixmap internally, should this be called pixmap() instead?
+  QPixmap image() const;
+
+  QWebFrame* targetFrame() const;
+
+ private:
+  QWebPageContext(const WebCore::HitTestResult& hitTest);
+  QWebPageContextPrivate* d;
+
+  friend class QWebPage;
+};
+
 class QWebPagePrivate {
  public:
   QWebPagePrivate(QWebPage*);
@@ -50,6 +83,7 @@ class QWebPagePrivate {
   QWebFrame* frameAt(const QPoint& pos) const;
 
   void _q_onLoadProgressChanged(int);
+  void _q_webActionTriggered(bool checked);
 
   WebCore::ChromeClientQt* chromeClient;
   WebCore::ContextMenuClientQt* contextMenuClient;
@@ -84,6 +118,9 @@ class QWebPagePrivate {
 #endif
 
   QWebPageHistory history;
+  QWebPageContext currentContext;
+
+  QAction* actions[QWebPage::NumWebActions];
 };
 
 #endif
