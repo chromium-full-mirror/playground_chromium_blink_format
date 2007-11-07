@@ -658,7 +658,7 @@ void Element::detach() {
 
 void Element::recalcStyle(StyleChange change) {
   // ### should go away and be done in renderobject
-  RenderStyle* _style = renderStyle();
+  RenderStyle* currentStyle = renderStyle();
   bool hasParentStyle = parentNode() ? parentNode()->renderStyle() : false;
 
 #if ENABLE(SVG)
@@ -672,7 +672,7 @@ void Element::recalcStyle(StyleChange change) {
   }
   if (hasParentStyle && (change >= Inherit || changed())) {
     RenderStyle* newStyle = document()->styleSelector()->styleForElement(this);
-    StyleChange ch = diff(_style, newStyle);
+    StyleChange ch = diff(currentStyle, newStyle);
     if (ch == Detach) {
       if (attached())
         detach();
@@ -683,7 +683,20 @@ void Element::recalcStyle(StyleChange change) {
       setHasChangedChild(false);
       newStyle->deref(document()->renderArena());
       return;
-    } else if (ch != NoChange) {
+    }
+
+    if (newStyle && change != Force && styleChangeType() != FullStyleChange &&
+        document()->usesDescendantRules()) {
+      // Preserve "affected by" bits that were propagated to us from descendants
+      if (currentStyle->affectedByHoverRules())
+        newStyle->setAffectedByHoverRules(true);
+      if (currentStyle->affectedByActiveRules())
+        newStyle->setAffectedByActiveRules(true);
+      if (currentStyle->affectedByDragRules())
+        newStyle->setAffectedByDragRules(true);
+    }
+
+    if (ch != NoChange) {
       if (newStyle)
         setRenderStyle(newStyle);
     } else if (changed() && newStyle && (document()->usesSiblingRules() ||
