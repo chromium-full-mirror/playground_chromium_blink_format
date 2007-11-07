@@ -89,7 +89,36 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
     Copy,
     Paste,
 
-    NumWebActions = Paste
+    Undo,
+    Redo,
+    MoveToNextChar,
+    MoveToPreviousChar,
+    MoveToNextWord,
+    MoveToPreviousWord,
+    MoveToNextLine,
+    MoveToPreviousLine,
+    MoveToStartOfLine,
+    MoveToEndOfLine,
+    MoveToStartOfBlock,
+    MoveToEndOfBlock,
+    MoveToStartOfDocument,
+    MoveToEndOfDocument,
+    SelectNextChar,
+    SelectPreviousChar,
+    SelectNextWord,
+    SelectPreviousWord,
+    SelectNextLine,
+    SelectPreviousLine,
+    SelectStartOfLine,
+    SelectEndOfLine,
+    SelectStartOfBlock,
+    SelectEndOfBlock,
+    SelectStartOfDocument,
+    SelectEndOfDocument,
+    DeleteStartOfWord,
+    DeleteEndOfWord,
+
+    NumWebActions = DeleteEndOfWord
   };
 
   QWebPage(QWidget* parent);
