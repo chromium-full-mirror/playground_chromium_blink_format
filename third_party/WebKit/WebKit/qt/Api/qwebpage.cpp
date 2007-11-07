@@ -182,7 +182,7 @@ QMenu* QWebPagePrivate::createContextMenu(
       case WebCore::ActionType: {
         QWebPage::WebAction action =
             webActionForContextMenuAction(item.action());
-        QAction* a = q->webAction(action);
+        QAction* a = q->action(action);
         if (a)
           menu->addAction(a);
         break;
@@ -594,7 +594,7 @@ QString QWebPage::selectedText() const {
   return d->page->focusController()->focusedOrMainFrame()->selectedText();
 }
 
-QAction* QWebPage::webAction(WebAction action) const {
+QAction* QWebPage::action(WebAction action) const {
   if (action == QWebPage::NoWebAction)
     return 0;
   if (d->actions[action])

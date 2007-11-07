@@ -160,7 +160,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
   QString selectedText() const;
 
-  QAction* webAction(WebAction action) const;
+  QAction* action(WebAction action) const;
 
  public slots:
   /**
