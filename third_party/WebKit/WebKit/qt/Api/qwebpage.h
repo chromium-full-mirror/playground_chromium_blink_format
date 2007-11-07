@@ -53,6 +53,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   Q_OBJECT
 
   Q_PROPERTY(bool modified READ isModified)
+  Q_PROPERTY(QString selectedText READ selectedText)
  public:
   enum NavigationRequestResponse {
     AcceptNavigationRequest,
@@ -163,6 +164,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   quint64 totalBytes() const;
   quint64 bytesReceived() const;
 
+  QString selectedText() const;
+
   QAction* webAction(WebAction action) const;
 
  public slots:
@@ -223,7 +226,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
    */
   void iconLoaded();
 
-  // #### doesn't give you anything without a way to actually get the selection
   void selectionChanged();
 
   /**
