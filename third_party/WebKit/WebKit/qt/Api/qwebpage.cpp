@@ -235,6 +235,9 @@ void QWebPagePrivate::updateAction(QWebPage::WebAction action) {
     case QWebPage::Stop:
       enabled = loader->isLoading();
       break;
+    case QWebPage::Reload:
+      enabled = !loader->isLoading();
+      break;
     case QWebPage::Cut:
       enabled = editor->canCut();
       break;
@@ -259,6 +262,7 @@ void QWebPagePrivate::updateNavigationActions() {
   updateAction(QWebPage::GoBack);
   updateAction(QWebPage::GoForward);
   updateAction(QWebPage::Stop);
+  updateAction(QWebPage::Reload);
 }
 
 void QWebPagePrivate::updateEditorActions() {
