@@ -165,6 +165,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   quint64 totalBytes() const;
   quint64 bytesReceived() const;
 
+  QAction* webAction(WebAction action) const;
+
  public slots:
   /**
    * Stops loading of the page, if loading.
@@ -183,8 +185,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   void copy();
   void paste();
   // ### should we have execCommand() or something similar?
-
-  QAction* webAction(WebAction action) const;
 
  signals:
   /**
