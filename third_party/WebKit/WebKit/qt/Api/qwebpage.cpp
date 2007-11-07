@@ -410,10 +410,7 @@ void QWebPage::mousePressEvent(QMouseEvent* ev) {
   if (!frame->eventHandler)
     return;
 
-  if (ev->button() == Qt::RightButton)
-    frame->eventHandler->sendContextMenuEvent(PlatformMouseEvent(ev, 1));
-  else
-    frame->eventHandler->handleMousePressEvent(PlatformMouseEvent(ev, 1));
+  frame->eventHandler->handleMousePressEvent(PlatformMouseEvent(ev, 1));
 
   // FIXME need to keep track of subframe focus for key events!
   frame->page->setFocus();
@@ -439,6 +436,12 @@ void QWebPage::mouseReleaseEvent(QMouseEvent* ev) {
     frame->page->setFocus();
   }
   d->frameUnderMouse = 0;
+}
+
+void QWebPage::contextMenuEvent(QContextMenuEvent* ev) {
+  QWebFramePrivate* frame = d->currentFrame(ev->pos())->d;
+  if (frame->eventHandler)
+    frame->eventHandler->sendContextMenuEvent(PlatformMouseEvent(ev, 1));
 }
 
 void QWebPage::wheelEvent(QWheelEvent* ev) {

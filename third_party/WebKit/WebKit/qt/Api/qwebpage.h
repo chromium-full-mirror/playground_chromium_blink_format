@@ -212,6 +212,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   virtual void mousePressEvent(QMouseEvent*);
   virtual void mouseDoubleClickEvent(QMouseEvent*);
   virtual void mouseReleaseEvent(QMouseEvent*);
+  virtual void contextMenuEvent(QContextMenuEvent*);
   virtual void wheelEvent(QWheelEvent*);
   virtual void keyPressEvent(QKeyEvent*);
   virtual void keyReleaseEvent(QKeyEvent*);
