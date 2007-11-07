@@ -30,14 +30,14 @@
 #include <QPixmap>
 #include <QSharedDataPointer>
 
+namespace WebCore {
+class Settings;
+};
+
 class QWebPage;
 class QWebSettingsPrivate;
 
 class QWEBKIT_EXPORT QWebSettings {
- public:
-  static void setGlobal(const QWebSettings& settings);
-  static QWebSettings global();
-
  public:
   enum FontType {
     StandardFont,
@@ -62,11 +62,7 @@ class QWEBKIT_EXPORT QWebSettings {
     TextAreaResizeCornerGraphic
   };
 
-  QWebSettings();
-  ~QWebSettings();
-
-  QWebSettings(const QWebSettings&);
-  QWebSettings& operator=(const QWebSettings&);
+  static QWebSettings* defaultSettings();
 
   void setFontFamily(FontType type, const QString& family);
   QString fontFamily(FontType type) const;
@@ -97,7 +93,15 @@ class QWEBKIT_EXPORT QWebSettings {
   static QPixmap webGraphic(WebGraphic type);
 
  private:
-  QSharedDataPointer<QWebSettingsPrivate> d;
+  friend class QWebPagePrivate;
+
+  Q_DISABLE_COPY(QWebSettings)
+
+  QWebSettings();
+  QWebSettings(WebCore::Settings* settings);
+  ~QWebSettings();
+
+  QWebSettingsPrivate* d;
 };
 
 #endif

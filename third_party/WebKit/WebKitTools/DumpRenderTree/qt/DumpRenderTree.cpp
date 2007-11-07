@@ -76,9 +76,7 @@ class WebPage : public QWebPage {
 
 WebPage::WebPage(QWidget* parent, DumpRenderTree* drt)
     : QWebPage(parent), m_drt(drt) {
-  QWebSettings s = settings();
-  s.setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-  setSettings(s);
+  settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
 }
 
 QWebPage* WebPage::createWindow() {
