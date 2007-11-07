@@ -1758,7 +1758,8 @@ int RenderBox::containingBlockWidthForPositioned(
   }
 
   return containingBlock->width() - containingBlock->borderLeft() -
-         containingBlock->borderRight();
+         containingBlock->borderRight() -
+         containingBlock->verticalScrollbarWidth();
 }
 
 int RenderBox::containingBlockHeightForPositioned(
