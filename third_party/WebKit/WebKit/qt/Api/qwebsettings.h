@@ -72,9 +72,11 @@ class QWEBKIT_EXPORT QWebSettings {
 
   void setFontFamily(FontType type, const QString& family);
   QString fontFamily(FontType type) const;
+  void resetFontFamily(FontType type);
 
   void setFontSize(FontSize type, int size);
   int fontSize(FontSize type) const;
+  void resetFontSize(FontSize type);
 
   void setAttribute(WebAttribute attr, bool on = true);
   bool testAttribute(WebAttribute attr) const;
