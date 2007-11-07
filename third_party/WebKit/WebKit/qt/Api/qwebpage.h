@@ -247,8 +247,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
                                         unsigned int lineNumber,
                                         const QString& sourceID);
 
-  // ### should the be here?
-  virtual QString userAgentStringForUrl(const QUrl& forUrl) const;
+  virtual QString userAgentFor(const QUrl& url) const;
 
   virtual void resizeEvent(QResizeEvent*);
   virtual void paintEvent(QPaintEvent*);
