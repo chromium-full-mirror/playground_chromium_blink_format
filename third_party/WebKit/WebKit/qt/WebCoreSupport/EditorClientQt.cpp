@@ -35,6 +35,7 @@
 
 #include "Document.h"
 #include "EditCommandQt.h"
+#include "Page.h"
 #include "Editor.h"
 #include "FocusController.h"
 #include "Frame.h"
@@ -202,6 +203,10 @@ void EditorClientQt::respondToChangedSelection() {
     printf(
         "EDITING DELEGATE: "
         "webViewDidChangeSelection:WebViewDidChangeSelectionNotification\n");
+  //     const Selection &selection = m_page->d->page->selection();
+  //     char buffer[1024];
+  //     selection.formatForDebugger(buffer, sizeof(buffer));
+  //     printf("%s\n", buffer);
 
   emit m_page->selectionChanged();
 }
@@ -214,13 +219,9 @@ void EditorClientQt::didEndEditing() {
   m_editing = false;
 }
 
-void EditorClientQt::didWriteSelectionToPasteboard() {
-  notImplemented();
-}
+void EditorClientQt::didWriteSelectionToPasteboard() {}
 
-void EditorClientQt::didSetSelectionTypesForPasteboard() {
-  notImplemented();
-}
+void EditorClientQt::didSetSelectionTypesForPasteboard() {}
 
 bool EditorClientQt::selectWordBeforeMenuEvent() {
   notImplemented();
