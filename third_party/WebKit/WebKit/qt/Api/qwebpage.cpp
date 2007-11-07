@@ -57,6 +57,7 @@
 #include "RefPtr.h"
 #include "HashMap.h"
 #include "HitTestResult.h"
+#include "WindowFeatures.h"
 #include "LocalizedStrings.h"
 
 #include <QDebug>
@@ -418,10 +419,12 @@ static WebCore::FrameLoadRequest frameLoadRequest(const QUrl& url,
 }
 
 static void openNewWindow(const QUrl& url, WebCore::Frame* frame) {
-  if (Page* oldPage = frame->page())
+  if (Page* oldPage = frame->page()) {
+    WindowFeatures features;
     if (Page* newPage = oldPage->chrome()->createWindow(
-            frame, frameLoadRequest(url, frame)))
+            frame, frameLoadRequest(url, frame), features))
       newPage->chrome()->show();
+  }
 }
 
 void QWebPage::triggerAction(WebAction action, bool checked) {
