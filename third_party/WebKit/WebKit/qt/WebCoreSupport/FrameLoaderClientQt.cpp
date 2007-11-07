@@ -737,6 +737,7 @@ PassRefPtr<Frame> FrameLoaderClientQt::createFrame(
   frameData.marginHeight = marginHeight;
 
   QWebFrame* webFrame = new QWebFrame(m_webFrame, &frameData);
+  emit m_webFrame->page()->frameCreated(webFrame);
 
   RefPtr<Frame> childFrame = webFrame->d->frame;
 

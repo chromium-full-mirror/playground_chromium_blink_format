@@ -114,6 +114,8 @@ void QWebPagePrivate::createMainFrame() {
         SIGNAL(hoveringOverLink(const QString&, const QString&)));
 
     mainFrame->d->frameView->setFrameGeometry(q->geometry());
+
+    emit q->frameCreated(mainFrame);
   }
 }
 
