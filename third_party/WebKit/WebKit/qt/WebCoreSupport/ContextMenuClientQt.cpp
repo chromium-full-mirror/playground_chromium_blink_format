@@ -26,6 +26,7 @@
 #include "config.h"
 #include "ContextMenuClientQt.h"
 
+#include "ContextMenu.h"
 #include "HitTestResult.h"
 #include "KURL.h"
 #include "Shared.h"
@@ -40,9 +41,9 @@ void ContextMenuClientQt::contextMenuDestroyed() {
 }
 
 PlatformMenuDescription ContextMenuClientQt::getCustomMenuFromDefaultItems(
-    ContextMenu*) {
-  notImplemented();
-  return PlatformMenuDescription();
+    ContextMenu* menu) {
+  // warning: this transfers the ownership to the caller
+  return menu->releasePlatformDescription();
 }
 
 void ContextMenuClientQt::contextMenuItemSelected(ContextMenuItem*,
