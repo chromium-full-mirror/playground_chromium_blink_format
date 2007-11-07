@@ -161,6 +161,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   QString selectedText() const;
 
   QAction* action(WebAction action) const;
+  virtual void triggerAction(WebAction action, bool checked = false);
 
  public slots:
   /**
@@ -228,8 +229,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
                                 const QUrl& url,
                                 const QStringList& paramNames,
                                 const QStringList& paramValues);
-
-  virtual void webActionTriggered(WebAction action, bool checked = false);
 
   virtual NavigationRequestResponse navigationRequested(
       QWebFrame* frame,
