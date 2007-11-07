@@ -241,16 +241,23 @@ void FrameLoaderClientQt::dispatchDidReceiveTitle(const String& title) {
 }
 
 void FrameLoaderClientQt::dispatchDidCommitLoad() {
-  notImplemented();
+  if (m_frame->tree()->parent())
+    return;
+  m_webFrame->page()->d->updateNavigationActions();
 }
 
 void FrameLoaderClientQt::dispatchDidFinishDocumentLoad() {
-  notImplemented();
+  if (m_frame->tree()->parent())
+    return;
+  m_webFrame->page()->d->updateNavigationActions();
 }
 
 void FrameLoaderClientQt::dispatchDidFinishLoad() {
   if (m_webFrame)
     emit m_webFrame->loadDone(true);
+  if (m_frame->tree()->parent())
+    return;
+  m_webFrame->page()->d->updateNavigationActions();
 }
 
 void FrameLoaderClientQt::dispatchDidFirstLayout() {
@@ -299,6 +306,9 @@ void FrameLoaderClientQt::clearUnarchivingState(DocumentLoader*) {
 void FrameLoaderClientQt::postProgressStartedNotification() {
   if (m_webFrame && m_frame->page())
     emit loadStarted(m_webFrame);
+  if (m_frame->tree()->parent())
+    return;
+  m_webFrame->page()->d->updateNavigationActions();
 }
 
 void FrameLoaderClientQt::postProgressEstimateChangedNotification() {
@@ -442,7 +452,11 @@ void FrameLoaderClientQt::windowObjectCleared() const {
     emit m_webFrame->cleared();
 }
 
-void FrameLoaderClientQt::didPerformFirstNavigation() const {}
+void FrameLoaderClientQt::didPerformFirstNavigation() const {
+  if (m_frame->tree()->parent())
+    return;
+  m_webFrame->page()->d->updateNavigationActions();
+}
 
 void FrameLoaderClientQt::registerForIconNotification(bool) {
   notImplemented();
