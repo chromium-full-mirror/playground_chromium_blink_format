@@ -130,8 +130,8 @@ void QWebPageHistory::goForward() {
   d->lst->goBack();
 }
 
-void QWebPageHistory::goToItem(QWebHistoryItem* item) {
-  d->lst->goToItem(item->d->item);
+void QWebPageHistory::goToItem(const QWebHistoryItem& item) {
+  d->lst->goToItem(item.d->item);
 }
 
 QWebHistoryItem QWebPageHistory::backItem() const {
