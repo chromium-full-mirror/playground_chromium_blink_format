@@ -244,6 +244,10 @@ void QWebPagePrivate::updateAction(QWebPage::WebAction action) {
     case QWebPage::Paste:
       enabled = editor->canPaste();
       break;
+    case QWebPage::Undo:
+    case QWebPage::Redo:
+      // those two are handled by QUndoStack
+      break;
     default:
       break;
   }
@@ -630,12 +634,16 @@ QAction* QWebPage::webAction(WebAction action) const {
       text = contextMenuItemTagPaste();
       break;
 
-    case Undo:
-      text = tr("Undo");
-      break;
-    case Redo:
-      text = tr("Redo");
-      break;
+    case Undo: {
+      QAction* a = undoStack()->createUndoAction(d->q);
+      d->actions[action] = a;
+      return a;
+    }
+    case Redo: {
+      QAction* a = undoStack()->createRedoAction(d->q);
+      d->actions[action] = a;
+      return a;
+    }
     case MoveToNextChar:
     case MoveToPreviousChar:
     case MoveToNextWord:
@@ -689,9 +697,9 @@ bool QWebPage::isModified() const {
   return d->modified;
 }
 
-QUndoStack* QWebPage::undoStack() {
+QUndoStack* QWebPage::undoStack() const {
   if (!d->undoStack)
-    d->undoStack = new QUndoStack(this);
+    d->undoStack = new QUndoStack(const_cast<QWebPage*>(this));
 
   return d->undoStack;
 }
