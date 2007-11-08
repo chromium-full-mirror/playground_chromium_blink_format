@@ -42,6 +42,7 @@
 
 #include <WTF/RefPtr.h>
 #include <WTF/HashMap.h>
+#include <WTF/OwnPtr.h>
 
 namespace WebCore {
 class AuthenticationChallenge;
@@ -61,6 +62,7 @@ typedef struct OpaqueJSValue* JSObjectRef;
 class WebFrame;
 class WebFramePolicyListener;
 class WebHistory;
+class WebScriptDebugger;
 class WebView;
 
 interface IWebHistoryItemPrivate;
@@ -148,8 +150,7 @@ class WebFrame : public IWebFrame,
   virtual HRESULT STDMETHODCALLTYPE currentForm(
       /* [retval][out] */ IDOMElement** formElement);
 
-  virtual HRESULT STDMETHODCALLTYPE globalContext(
-      /* [retval][out] */ JSGlobalContextRef* context);
+  virtual /* [local] */ JSGlobalContextRef STDMETHODCALLTYPE globalContext();
 
   // IWebFramePrivate
   virtual HRESULT STDMETHODCALLTYPE renderTreeAsExternalRepresentation(
@@ -413,7 +414,7 @@ class WebFrame : public IWebFrame,
       const WebCore::String& mimeType);
   virtual WebCore::String overrideMediaType() const;
 
-  virtual void windowObjectCleared() const;
+  virtual void windowObjectCleared();
   virtual void didPerformFirstNavigation() const;
 
   virtual void registerForIconNotification(bool listen);
@@ -457,6 +458,9 @@ class WebFrame : public IWebFrame,
 
   WebCore::KURL url() const;
 
+  virtual void attachScriptDebugger();
+  virtual void detachScriptDebugger();
+
  protected:
   void loadHTMLString(BSTR string, BSTR baseURL, BSTR unreachableURL);
   void loadData(PassRefPtr<WebCore::SharedBuffer>,
@@ -484,6 +488,9 @@ class WebFrame : public IWebFrame,
   bool m_inPrintingMode;
   Vector<WebCore::IntRect> m_pageRects;
   int m_pageHeight;  // height of the page adjusted by margins
+
+ private:
+  OwnPtr<WebScriptDebugger> m_scriptDebugger;
 };
 
 #endif

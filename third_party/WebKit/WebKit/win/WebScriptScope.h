@@ -31,11 +31,17 @@
 
 #include "IWebScriptScope.h"
 
+#include <kjs/object.h>
+
 class WebScriptScope : public IWebScriptScope {
  public:
-  WebScriptScope();
+  static WebScriptScope* createInstance(KJS::JSObject* scope);
+
+ private:
+  WebScriptScope(KJS::JSObject* scope);
   virtual ~WebScriptScope();
 
+ public:
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);
@@ -52,6 +58,7 @@ class WebScriptScope : public IWebScriptScope {
 
  protected:
   ULONG m_refCount;
+  KJS::JSObject* m_scope;
 };
 
 #endif

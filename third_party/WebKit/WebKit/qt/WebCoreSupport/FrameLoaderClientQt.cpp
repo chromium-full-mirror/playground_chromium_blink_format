@@ -447,7 +447,7 @@ bool FrameLoaderClientQt::canHandleRequest(
   return true;
 }
 
-void FrameLoaderClientQt::windowObjectCleared() const {
+void FrameLoaderClientQt::windowObjectCleared() {
   if (m_webFrame)
     emit m_webFrame->cleared();
 }

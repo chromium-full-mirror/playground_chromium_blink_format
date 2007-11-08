@@ -113,6 +113,8 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual bool runDatabaseSizeLimitPrompt(WebCore::Frame*,
                                           const WebCore::String& origin);
 
+  virtual WebView* webView() const { return m_webView; }
+
  private:
   COMPtr<IWebUIDelegate> uiDelegate();
   COMPtr<IWebUIDelegate2> uiDelegate2();

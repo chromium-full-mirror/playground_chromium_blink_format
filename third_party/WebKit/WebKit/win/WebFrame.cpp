@@ -40,6 +40,7 @@
 #include "IWebUIDelegatePrivate.h"
 #include "MarshallingHelpers.h"
 #include "WebActionPropertyBag.h"
+#include "WebChromeClient.h"
 #include "WebDocumentLoader.h"
 #include "WebDownload.h"
 #include "WebError.h"
@@ -53,6 +54,8 @@
 #include "WebView.h"
 #include "WebDataSource.h"
 #include "WebHistoryItem.h"
+#include "WebScriptDebugger.h"
+#include "WebScriptDebugServer.h"
 #include "WebURLAuthenticationChallenge.h"
 #include "WebURLResponse.h"
 #pragma warning(push, 0)
@@ -157,6 +160,13 @@ Frame* core(const WebFrame* webFrame) {
   if (!webFrame)
     return 0;
   return const_cast<WebFrame*>(webFrame)->impl();
+}
+
+WebView* kit(Page* page) {
+  return page
+             ? static_cast<WebChromeClient*>(page->chrome()->client())
+                   ->webView()
+             : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -433,7 +443,8 @@ WebFrame::WebFrame()
       d(new WebFrame::WebFramePrivate),
       m_quickRedirectComing(false),
       m_inPrintingMode(false),
-      m_pageHeight(0) {
+      m_pageHeight(0),
+      m_scriptDebugger(0) {
   WebFrameCount++;
   gClassCount++;
 }
@@ -576,19 +587,12 @@ HRESULT STDMETHODCALLTYPE WebFrame::currentForm(
   return *currentForm ? S_OK : E_FAIL;
 }
 
-HRESULT STDMETHODCALLTYPE WebFrame::globalContext(
-    /* [retval][out] */ JSGlobalContextRef* context) {
-  if (!context)
-    return E_POINTER;
-
-  *context = 0;
-
+JSGlobalContextRef STDMETHODCALLTYPE WebFrame::globalContext() {
   Frame* coreFrame = core(this);
   if (!coreFrame)
-    return E_FAIL;
+    return 0;
 
-  *context = toGlobalRef(coreFrame->scriptProxy()->interpreter()->globalExec());
-  return S_OK;
+  return toGlobalRef(coreFrame->scriptProxy()->interpreter()->globalExec());
 }
 
 HRESULT STDMETHODCALLTYPE WebFrame::loadRequest(
@@ -648,9 +652,10 @@ HRESULT STDMETHODCALLTYPE WebFrame::loadData(
       // FIXME: this does a needless copy, would be better to read right into
       // the SharedBuffer
       // or adopt the Vector or something.
-      if (SUCCEEDED(
-              data->Read(dataBuffer.data(), (ULONG)dataBuffer.size(), &read)))
-        sharedBuffer->append(dataBuffer.data(), (int)dataBuffer.size());
+      if (SUCCEEDED(data->Read(dataBuffer.data(),
+                               static_cast<ULONG>(dataBuffer.size()), &read)))
+        sharedBuffer->append(dataBuffer.data(),
+                             static_cast<int>(dataBuffer.size()));
     }
   }
 
@@ -744,6 +749,15 @@ KURL WebFrame::url() const {
     return KURL();
 
   return coreFrame->loader()->URL();
+}
+
+void WebFrame::attachScriptDebugger() {
+  if (!m_scriptDebugger && core(this)->scriptProxy()->haveInterpreter())
+    m_scriptDebugger.set(new WebScriptDebugger(this));
+}
+
+void WebFrame::detachScriptDebugger() {
+  m_scriptDebugger.clear();
 }
 
 HRESULT STDMETHODCALLTYPE WebFrame::stopLoading(void) {
@@ -1643,8 +1657,17 @@ void WebFrame::dispatchWillSubmitForm(FramePolicyFunction function,
   (coreFrame->loader()->*function)(PolicyUse);
 }
 
-void WebFrame::dispatchDidLoadMainResource(DocumentLoader*) {
-  notImplemented();
+void WebFrame::dispatchDidLoadMainResource(DocumentLoader* loader) {
+  if (WebScriptDebugServer::listenerCount() > 0) {
+    Frame* coreFrame = core(this);
+    if (!coreFrame)
+      return;
+
+    WebScriptDebugServer::sharedWebScriptDebugServer()
+        ->didLoadMainResourceForDataSource(
+            kit(coreFrame->page()),
+            loader ? static_cast<WebDocumentLoader*>(loader)->dataSource() : 0);
+  }
 }
 
 void WebFrame::revertToProvisionalState(DocumentLoader*) {
@@ -2479,7 +2502,7 @@ String WebFrame::overrideMediaType() const {
   return String();
 }
 
-void WebFrame::windowObjectCleared() const {
+void WebFrame::windowObjectCleared() {
   Frame* coreFrame = core(this);
   ASSERT(coreFrame);
 
@@ -2497,6 +2520,11 @@ void WebFrame::windowObjectCleared() const {
 
     frameLoadDelegate->windowScriptObjectAvailable(d->webView, context,
                                                    windowObject);
+  }
+
+  if (WebScriptDebugServer::listenerCount() > 0) {
+    detachScriptDebugger();
+    attachScriptDebugger();
   }
 }
 
