@@ -57,7 +57,6 @@ void FrameView::updateBorder() {
 /********************************************************/
 /* Completely empty stubs (mostly to allow DRT to run): */
 /********************************************************/
-bool AXObjectCache::gAccessibilityEnabled = false;
 
 bool WebCore::historyContains(DeprecatedString const&) {
   return false;

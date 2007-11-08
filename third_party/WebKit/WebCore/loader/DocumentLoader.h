@@ -90,10 +90,6 @@ class DocumentLoader : public Shared<DocumentLoader> {
   KURL responseURL() const;
   String responseMIMEType() const;
 
-  // FIXME: After we have a ResourceResponse in the mix, this method can go away
-  // and we can use it directly
-  bool getResponseModifiedHeader(String& modified) const;
-
   void replaceRequestURLForAnchorScroll(const KURL&);
   bool isStopping() const;
   void stopLoading();

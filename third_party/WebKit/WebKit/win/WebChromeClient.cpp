@@ -36,7 +36,6 @@
 #include <WebCore/FloatRect.h>
 #include <WebCore/FrameLoadRequest.h>
 #include <WebCore/FrameView.h>
-#include <WebCore/NotImplemented.h>
 #include <WebCore/WindowFeatures.h>
 #pragma warning(pop)
 
@@ -236,21 +235,19 @@ bool WebChromeClient::scrollbarsVisible() {
   return !!b;
 }
 
-void WebChromeClient::setMenubarVisible(bool) {
-  IWebUIDelegate* uiDelegate = 0;
-  if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
-    notImplemented();
-    uiDelegate->Release();
-  }
+void WebChromeClient::setMenubarVisible(bool visible) {
+  COMPtr<IWebUIDelegate3> delegate = uiDelegate3();
+  if (!delegate)
+    return;
+  delegate->setMenuBarVisible(m_webView, visible);
 }
 
 bool WebChromeClient::menubarVisible() {
-  bool result = false;
-  IWebUIDelegate* uiDelegate = 0;
-  if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
-    notImplemented();
-    uiDelegate->Release();
-  }
+  COMPtr<IWebUIDelegate3> delegate = uiDelegate3();
+  if (!delegate)
+    return true;
+  BOOL result = true;
+  delegate->isMenuBarVisible(m_webView, &result);
   return result;
 }
 
@@ -454,9 +451,15 @@ void WebChromeClient::print(Frame* frame) {
       uiDelegate2->printFrame(m_webView, kit(frame));
 }
 
-bool WebChromeClient::runDatabaseSizeLimitPrompt(Frame*, const String&) {
-  notImplemented();
-  return false;
+bool WebChromeClient::runDatabaseSizeLimitPrompt(Frame* frame,
+                                                 const String& prompt) {
+  COMPtr<IWebUIDelegate3> delegate = uiDelegate3();
+  if (!delegate)
+    return false;
+  BOOL result = FALSE;
+  delegate->runDatabaseSizeLimitPrompt(m_webView, BString(prompt), kit(frame),
+                                       &result);
+  return result;
 }
 
 COMPtr<IWebUIDelegate> WebChromeClient::uiDelegate() {

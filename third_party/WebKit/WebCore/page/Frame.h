@@ -288,8 +288,6 @@ class Frame : public Shared<Frame> {
   const Selection& mark() const;  // Mark, to be used as emacs uses it.
   void setMark(const Selection&);
 
-  void transpose();
-
   void computeAndSetTypingStyle(CSSStyleDeclaration*,
                                 EditAction = EditActionUnspecified);
   enum TriState { falseTriState, trueTriState, mixedTriState };
@@ -302,7 +300,6 @@ class Frame : public Shared<Frame> {
 
   IntRect firstRectForRange(Range*) const;
 
-  void issueTransposeCommand();
   void respondToChangedSelection(const Selection& oldSelection,
                                  bool closeTyping);
   bool shouldChangeSelection(const Selection& oldSelection,

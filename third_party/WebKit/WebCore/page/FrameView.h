@@ -158,8 +158,6 @@ class FrameView : public ScrollView {
                                ScrollbarMode& hMode,
                                ScrollbarMode& vMode);
 
-  void updateBorder();
-
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 
   void dispatchScheduledEvents();

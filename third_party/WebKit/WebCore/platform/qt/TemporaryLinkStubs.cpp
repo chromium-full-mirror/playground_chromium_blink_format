@@ -72,8 +72,6 @@ void FrameView::updateBorder() {
   notImplemented();
 }
 
-bool AXObjectCache::gAccessibilityEnabled = false;
-
 namespace WebCore {
 
 Vector<String> supportedKeySizes() {

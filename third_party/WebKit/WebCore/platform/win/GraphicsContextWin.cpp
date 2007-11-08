@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -189,6 +189,10 @@ void GraphicsContextPlatformPrivate::clip(const IntRect& clipRect) {
     return;
   IntersectClipRect(m_hdc, clipRect.x(), clipRect.y(), clipRect.right(),
                     clipRect.bottom());
+}
+
+void GraphicsContextPlatformPrivate::clip(const Path&) {
+  notImplemented();
 }
 
 void GraphicsContextPlatformPrivate::scale(const FloatSize& size) {

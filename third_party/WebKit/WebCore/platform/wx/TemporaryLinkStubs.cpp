@@ -110,9 +110,6 @@ void Frame::clearPlatformScriptObjects() {
   notImplemented();
 }
 
-void Frame::issueTransposeCommand() {
-  notImplemented();
-}
 void Frame::dashboardRegionsChanged() {
   notImplemented();
 }
@@ -148,8 +145,6 @@ static WebCore::Cursor localCursor;
 const WebCore::Cursor& WebCore::moveCursor() {
   return localCursor;
 }
-
-bool AXObjectCache::gAccessibilityEnabled = false;
 
 namespace WebCore {
 bool historyContains(DeprecatedString const&) {
@@ -399,11 +394,6 @@ void Editor::showStylesPanel() {
   notImplemented();
 }
 
-String FrameLoader::overrideMediaType() const {
-  notImplemented();
-  return String();
-}
-
 bool EventHandler::tabsToAllControls(KeyboardEvent* event) const {
   notImplemented();
   return false;
@@ -436,11 +426,6 @@ SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {
 }
 bool SearchPopupMenu::enabled() {
   return true;
-}
-
-bool DocumentLoader::getResponseModifiedHeader(WebCore::String&) const {
-  notImplemented();
-  return false;
 }
 
 namespace WebCore {
