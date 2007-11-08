@@ -424,11 +424,10 @@ bool QWebNetworkManager::add(ResourceHandle* handle,
   job->d->request.init(handle->request());
 
   const QString method = handle->getInternal()->m_request.httpMethod();
-  if (method != "POST" && method != "GET") {
-    // don't know what to do! (probably a request error!!)
-    // but treat it like a 'GET' request
+  if (method != "POST" && method != "GET" && method != "HEAD") {
     qWarning("REQUEST: [%s]\n",
              qPrintable(job->d->request.httpHeader.toString()));
+    return false;
   }
 
   DEBUG() << "QWebNetworkManager::add:"

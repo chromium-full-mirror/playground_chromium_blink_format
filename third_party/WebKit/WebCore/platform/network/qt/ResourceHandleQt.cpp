@@ -119,13 +119,6 @@ bool ResourceHandle::start(Frame* frame) {
   if (!page)
     return false;
 
-  // check for (probably) broken requests
-  if (d->m_request.httpMethod() != "GET" &&
-      d->m_request.httpMethod() != "POST") {
-    notImplemented();
-    return false;
-  }
-
   getInternal()->m_frame =
       static_cast<FrameLoaderClientQt*>(frame->loader()->client())->webFrame();
   return QWebNetworkManager::self()->add(
@@ -163,18 +156,14 @@ void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
   WebCoreSynchronousLoader syncLoader;
   ResourceHandle handle(request, &syncLoader, true, false, true);
 
-  // check for (probably) broken requests
-  if (handle.d->m_request.httpMethod() != "GET" &&
-      handle.d->m_request.httpMethod() != "POST" &&
-      handle.d->m_request.httpMethod() != "HEAD") {
+  if (!QWebNetworkManager::self()->add(&handle,
+                                       QWebNetworkInterface::defaultInterface(),
+                                       QWebNetworkManager::SynchronousJob)) {
     // FIXME Create a sane ResourceError
     error = ResourceError(String(), -1, String(), String());
     return;
   }
 
-  QWebNetworkManager::self()->add(&handle,
-                                  QWebNetworkInterface::defaultInterface(),
-                                  QWebNetworkManager::SynchronousJob);
   syncLoader.waitForCompletion();
   error = syncLoader.resourceError();
   data = syncLoader.data();
