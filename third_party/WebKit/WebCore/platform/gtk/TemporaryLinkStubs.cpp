@@ -50,10 +50,6 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
   return resource;
 }
 
-void FrameView::updateBorder() {
-  notImplemented();
-}
-
 /********************************************************/
 /* Completely empty stubs (mostly to allow DRT to run): */
 /********************************************************/

@@ -84,11 +84,6 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
   return resource;
 }
 
-// FrameView functions
-void FrameView::updateBorder() {
-  notImplemented();
-}
-
 void Widget::removeFromParent() {
   notImplemented();
 }
