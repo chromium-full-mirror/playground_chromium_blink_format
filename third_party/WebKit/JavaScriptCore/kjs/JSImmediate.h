@@ -237,7 +237,7 @@ ALWAYS_INLINE JSValue* JSImmediate::nullImmediate() {
 ALWAYS_INLINE bool JSImmediate::toBoolean(const JSValue* v) {
   ASSERT(isImmediate(v));
   uintptr_t bits = unTag(v);
-  return bits != 0 & (JSImmediate::getTag(v) != UndefinedType);
+  return (bits != 0) & (JSImmediate::getTag(v) != UndefinedType);
 }
 
 ALWAYS_INLINE JSValue* JSImmediate::fromDouble(double d) {
