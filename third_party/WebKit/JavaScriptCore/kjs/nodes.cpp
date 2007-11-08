@@ -2242,7 +2242,7 @@ JSValue* BitAndNode::evaluate(ExecState* exec) {
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  return jsNumber(v1->toInt32(exec) & v2->toInt32(exec));
+  return jsNumberFromAnd(exec, v1, v2);
 }
 
 void BitXOrNode::optimizeVariableAccess(
