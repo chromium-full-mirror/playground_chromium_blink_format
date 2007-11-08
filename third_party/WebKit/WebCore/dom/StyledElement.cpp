@@ -333,8 +333,14 @@ void StyledElement::addCSSLength(MappedAttribute* attr,
 
     for (; l < v->length(); l++) {
       UChar cc = (*v)[l];
-      if (cc > '9' || (cc < '0' && cc != '*' && cc != '%' && cc != '.'))
+      if (cc > '9')
         break;
+      if (cc < '0') {
+        if (cc == '%' || cc == '*')
+          l++;
+        if (cc != '.')
+          break;
+      }
     }
 
     if (l != v->length()) {
