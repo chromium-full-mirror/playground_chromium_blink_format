@@ -70,7 +70,7 @@ int Lookup::find(const struct HashTable* table,
   const HashEntry* entry =
       KJS::findEntry(table, UString::Rep::computeHash(c, len), c, len);
   if (entry)
-    return entry->value;
+    return entry->value.intValue;
   return -1;
 }
 
@@ -78,7 +78,7 @@ int Lookup::find(const struct HashTable* table, const Identifier& s) {
   const HashEntry* entry = KJS::findEntry(
       table, s.ustring().rep()->computedHash(), s.data(), s.size());
   if (entry)
-    return entry->value;
+    return entry->value.intValue;
   return -1;
 }
 }

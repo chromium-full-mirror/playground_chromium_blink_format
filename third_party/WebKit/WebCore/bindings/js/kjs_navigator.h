@@ -50,14 +50,16 @@ class Navigator : public DOMObject {
     ProductSub,
     Vendor,
     VendorSub,
-    CookieEnabled,
-    JavaEnabled
+    CookieEnabled
   };
   WebCore::Frame* frame() const { return m_frame; }
 
  private:
   WebCore::Frame* m_frame;
 };
+
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION_WITH_CREATE(NavigatorProtoFuncJavaEnabled)
+
 }  // namespace
 
 #endif

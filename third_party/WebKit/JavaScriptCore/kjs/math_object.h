@@ -24,57 +24,37 @@
 #define MATH_OBJECT_H_
 
 #include "function_object.h"
+#include "lookup.h"
 
 namespace KJS {
 
 class MathObjectImp : public JSObject {
  public:
-  MathObjectImp(ExecState* exec, ObjectPrototype* objProto);
+  MathObjectImp(ExecState*, ObjectPrototype*);
+
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
+  JSValue* getValueProperty(ExecState*, int token) const;
+
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-  enum {
-    Euler,
-    Ln2,
-    Ln10,
-    Log2E,
-    Log10E,
-    Pi,
-    Sqrt1_2,
-    Sqrt2,
-    Abs,
-    ACos,
-    ASin,
-    ATan,
-    ATan2,
-    Ceil,
-    Cos,
-    Pow,
-    Exp,
-    Floor,
-    Log,
-    Max,
-    Min,
-    Random,
-    Round,
-    Sin,
-    Sqrt,
-    Tan
-  };
+
+  enum { Euler, Ln2, Ln10, Log2E, Log10E, Pi, Sqrt1_2, Sqrt2 };
 };
 
-class MathFuncImp : public InternalFunctionImp {
- public:
-  MathFuncImp(ExecState* exec, int i, int l, const Identifier&);
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const List& args);
+#define FOR_EACH_CLASS(macro)                                                  \
+  macro(MathProtoFuncAbs) macro(MathProtoFuncACos) macro(MathProtoFuncASin)    \
+      macro(MathProtoFuncATan) macro(MathProtoFuncATan2)                       \
+          macro(MathProtoFuncCeil) macro(MathProtoFuncCos)                     \
+              macro(MathProtoFuncExp) macro(MathProtoFuncFloor)                \
+                  macro(MathProtoFuncLog) macro(MathProtoFuncMax)              \
+                      macro(MathProtoFuncMin) macro(MathProtoFuncPow)          \
+                          macro(MathProtoFuncRandom) macro(MathProtoFuncRound) \
+                              macro(MathProtoFuncSin) macro(MathProtoFuncSqrt) \
+                                  macro(MathProtoFuncTan)
 
- private:
-  int id;
-};
+FOR_EACH_CLASS(KJS_IMPLEMENT_PROTOTYPE_FUNCTION_WITH_CREATE)
+#undef FOR_EACH_CLASS
 
-}  // namespace
+}  // namespace KJS
 
-#endif
+#endif  // MATH_OBJECT_H_

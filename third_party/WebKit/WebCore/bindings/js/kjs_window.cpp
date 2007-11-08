@@ -154,25 +154,35 @@ const ClassInfo Window::info = {"Window", 0, &WindowTable};
 # Warning, when adding a function to this object you need to add a case in
 Window::get
 # -- Functions --
-  atob                  Window::AToB                DontDelete|Function 1
-  btoa                  Window::BToA                DontDelete|Function 1
-  scroll                Window::Scroll              DontDelete|Function 2
-  scrollBy              Window::ScrollBy            DontDelete|Function 2
-  scrollTo              Window::ScrollTo            DontDelete|Function 2
-  moveBy                Window::MoveBy              DontDelete|Function 2
-  moveTo                Window::MoveTo              DontDelete|Function 2
-  resizeBy              Window::ResizeBy            DontDelete|Function 2
-  resizeTo              Window::ResizeTo            DontDelete|Function 2
-  open                  Window::Open                DontDelete|Function 3
-  setTimeout            Window::SetTimeout          DontDelete|Function 2
-  clearTimeout          Window::ClearTimeout        DontDelete|Function 1
-  setInterval           Window::SetInterval         DontDelete|Function 2
-  clearInterval         Window::ClearInterval       DontDelete|Function 1
-  captureEvents         Window::CaptureEvents       DontDelete|Function 0
-  releaseEvents         Window::ReleaseEvents       DontDelete|Function 0
-  addEventListener      Window::AddEventListener    DontDelete|Function 3
-  removeEventListener   Window::RemoveEventListener DontDelete|Function 3
-  showModalDialog       Window::ShowModalDialog     DontDelete|Function 1
+  atob                  &WindowProtoFuncAToB::create DontDelete|Function 1
+  btoa                  &WindowProtoFuncBToA::create DontDelete|Function 1
+  scroll                &WindowProtoFuncScrollTo::create DontDelete|Function 2
+  scrollBy              &WindowProtoFuncScrollBy::create DontDelete|Function 2
+  scrollTo              &WindowProtoFuncScrollTo::create DontDelete|Function 2
+  moveBy                &WindowProtoFuncMoveBy::create DontDelete|Function 2
+  moveTo                &WindowProtoFuncMoveTo::create DontDelete|Function 2
+  resizeBy              &WindowProtoFuncResizeBy::create DontDelete|Function 2
+  resizeTo              &WindowProtoFuncResizeTo::create DontDelete|Function 2
+  open                  &WindowProtoFuncOpen::create DontDelete|Function 3
+  setTimeout            &WindowProtoFuncSetTimeout::create DontDelete|Function 2
+  clearTimeout          &WindowProtoFuncClearTimeout::create
+DontDelete|Function 1
+  setInterval           &WindowProtoFuncSetInterval::create
+DontDelete|Function 2
+  clearInterval         &WindowProtoFuncClearTimeout::create
+DontDelete|Function 1
+  addEventListener      &WindowProtoFuncAddEventListener::create
+DontDelete|Function 3
+  removeEventListener   &WindowProtoFuncRemoveEventListener::create
+DontDelete|Function 3
+  showModalDialog       &WindowProtoFuncShowModalDialog::create
+DontDelete|Function 1
+# Not implemented
+  captureEvents         &WindowProtoFuncNotImplemented::create
+DontDelete|Function 0
+  releaseEvents         &WindowProtoFuncNotImplemented::create
+DontDelete|Function 0
+
 # -- Attributes --
   crypto                Window::Crypto              DontDelete|ReadOnly
   event                 Window::Event_              DontDelete
@@ -715,17 +725,15 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   const HashEntry* entry = Lookup::findEntry(&WindowTable, propertyName);
   if (entry) {
     if (entry->attr & Function) {
-      switch (entry->value) {
-        case ShowModalDialog:
-          if (!canShowModalDialog(this))
-            return false;
-        // fall through
-        default:
-          if (isSafeScript(exec))
-            slot.setStaticEntry(this, entry, staticFunctionGetter<WindowFunc>);
-          else
-            slot.setUndefined(this);
+      if (entry->value.functionValue ==
+          &WindowProtoFuncShowModalDialog::create) {
+        if (!canShowModalDialog(this))
+          return false;
       }
+      if (isSafeScript(exec))
+        slot.setStaticEntry(this, entry, staticFunctionGetter);
+      else
+        slot.setUndefined(this);
     } else
       slot.setStaticEntry(this, entry, staticValueGetter<Window>);
     return true;
@@ -780,7 +788,7 @@ void Window::put(ExecState* exec,
     if (entry->attr & ReadOnly)
       return;
 
-    switch (entry->value) {
+    switch (entry->value.intValue) {
       case Location_: {
         Frame* p = Window::retrieveActive(exec)->impl()->frame();
         if (p) {
@@ -1318,9 +1326,152 @@ static void adjustWindowRect(const FloatRect& screen,
   window.setY(window.y() + screen.y());
 }
 
-JSValue* WindowFunc::callAsFunction(ExecState* exec,
-                                    JSObject* thisObj,
-                                    const List& args) {
+JSValue* WindowProtoFuncAToB::callAsFunction(ExecState* exec,
+                                             JSObject* thisObj,
+                                             const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  JSValue* v = args[0];
+  UString s = v->toString(exec);
+
+  if (args.size() < 1)
+    return throwError(exec, SyntaxError, "Not enough arguments");
+  if (v->isNull())
+    return jsString();
+  if (!s.is8Bit()) {
+    setDOMException(exec, INVALID_CHARACTER_ERR);
+    return jsUndefined();
+  }
+
+  Vector<char> in(s.size());
+  for (int i = 0; i < s.size(); ++i)
+    in[i] = static_cast<char>(s.data()[i].unicode());
+  Vector<char> out;
+
+  if (!base64Decode(in, out))
+    return throwError(exec, GeneralError, "Cannot decode base64");
+
+  return jsString(String(out.data(), out.size()));
+}
+
+JSValue* WindowProtoFuncBToA::callAsFunction(ExecState* exec,
+                                             JSObject* thisObj,
+                                             const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  JSValue* v = args[0];
+  UString s = v->toString(exec);
+
+  if (args.size() < 1)
+    return throwError(exec, SyntaxError, "Not enough arguments");
+  if (v->isNull())
+    return jsString();
+  if (!s.is8Bit()) {
+    setDOMException(exec, INVALID_CHARACTER_ERR);
+    return jsUndefined();
+  }
+
+  Vector<char> in(s.size());
+  for (int i = 0; i < s.size(); ++i)
+    in[i] = static_cast<char>(s.data()[i].unicode());
+  Vector<char> out;
+
+  base64Encode(in, out);
+
+  return jsString(String(out.data(), out.size()));
+}
+
+JSValue* WindowProtoFuncOpen::callAsFunction(ExecState* exec,
+                                             JSObject* thisObj,
+                                             const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  Page* page = frame->page();
+
+  String urlString = valueToStringWithUndefinedOrNullCheck(exec, args[0]);
+  AtomicString frameName = args[1]->isUndefinedOrNull()
+                               ? "_blank"
+                               : AtomicString(args[1]->toString(exec));
+
+  // Because FrameTree::find() returns true for empty strings, we must check for
+  // empty framenames.
+  // Otherwise, illegitimate window.open() calls with no name will pass right
+  // through the popup blocker.
+  if (!allowPopUp(exec, window) &&
+      (frameName.isEmpty() || !frame->tree()->find(frameName)))
+    return jsUndefined();
+
+  // Get the target frame for the special cases of _top and _parent
+  if (frameName == "_top")
+    while (frame->tree()->parent())
+      frame = frame->tree()->parent();
+  else if (frameName == "_parent")
+    if (frame->tree()->parent())
+      frame = frame->tree()->parent();
+
+  // In those cases, we can schedule a location change right now and return
+  // early
+  if (frameName == "_top" || frameName == "_parent") {
+    String completedURL;
+    Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
+    if (!urlString.isEmpty() && activeFrame)
+      completedURL = activeFrame->document()->completeURL(urlString);
+
+    const Window* window = Window::retrieveWindow(frame);
+    if (!completedURL.isEmpty() &&
+        (!completedURL.startsWith("javascript:", false) ||
+         (window && window->isSafeScript(exec)))) {
+      bool userGesture =
+          static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
+              ->wasRunByUserGesture();
+      frame->loader()->scheduleLocationChange(
+          completedURL, activeFrame->loader()->outgoingReferrer(), false,
+          userGesture);
+    }
+    return Window::retrieve(frame);
+  }
+
+  // In the case of a named frame or a new window, we'll use the createWindow()
+  // helper
+  WindowFeatures windowFeatures;
+  String features = valueToStringWithUndefinedOrNullCheck(exec, args[2]);
+  parseWindowFeatures(features, windowFeatures);
+  FloatRect windowRect(windowFeatures.x, windowFeatures.y, windowFeatures.width,
+                       windowFeatures.height);
+  adjustWindowRect(screenAvailableRect(page->mainFrame()->view()), windowRect,
+                   windowRect);
+
+  windowFeatures.x = windowRect.x();
+  windowFeatures.y = windowRect.y();
+  windowFeatures.height = windowRect.height();
+  windowFeatures.width = windowRect.width();
+
+  frame = createWindow(exec, frame, urlString, frameName, windowFeatures, 0);
+
+  if (!frame)
+    return jsUndefined();
+
+  return Window::retrieve(frame);  // global object
+}
+
+JSValue* WindowProtoFuncScrollBy::callAsFunction(ExecState* exec,
+                                                 JSObject* thisObj,
+                                                 const List& args) {
   if (!thisObj->inherits(&Window::info))
     return throwError(exec, TypeError);
   Window* window = static_cast<Window*>(thisObj);
@@ -1329,237 +1480,284 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     return jsUndefined();
 
   FrameView* widget = frame->view();
+
+  window->updateLayout();
+  if (args.size() >= 2 && widget)
+    widget->scrollBy(args[0]->toInt32(exec), args[1]->toInt32(exec));
+  return jsUndefined();
+}
+
+JSValue* WindowProtoFuncScrollTo::callAsFunction(ExecState* exec,
+                                                 JSObject* thisObj,
+                                                 const List& args) {
+  // Also the implementation for window.scroll()
+
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  FrameView* widget = frame->view();
+
+  window->updateLayout();
+  if (args.size() >= 2 && widget)
+    widget->setContentsPos(args[0]->toInt32(exec), args[1]->toInt32(exec));
+  return jsUndefined();
+}
+
+JSValue* WindowProtoFuncMoveBy::callAsFunction(ExecState* exec,
+                                               JSObject* thisObj,
+                                               const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
   Page* page = frame->page();
+
+  if (args.size() >= 2 && page) {
+    FloatRect fr = page->chrome()->windowRect();
+    FloatRect update = fr;
+    update.move(args[0]->toFloat(exec), args[1]->toFloat(exec));
+    // Security check (the spec talks about UniversalBrowserWrite to disable
+    // this check...)
+    adjustWindowRect(screenAvailableRect(page->mainFrame()->view()), fr,
+                     update);
+    page->chrome()->setWindowRect(fr);
+  }
+  return jsUndefined();
+}
+
+JSValue* WindowProtoFuncMoveTo::callAsFunction(ExecState* exec,
+                                               JSObject* thisObj,
+                                               const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  Page* page = frame->page();
+
+  if (args.size() >= 2 && page) {
+    FloatRect fr = page->chrome()->windowRect();
+    FloatRect sr = screenAvailableRect(page->mainFrame()->view());
+    fr.setLocation(sr.location());
+    FloatRect update = fr;
+    update.move(args[0]->toFloat(exec), args[1]->toFloat(exec));
+    // Security check (the spec talks about UniversalBrowserWrite to disable
+    // this check...)
+    adjustWindowRect(sr, fr, update);
+    page->chrome()->setWindowRect(fr);
+  }
+  return jsUndefined();
+}
+
+JSValue* WindowProtoFuncResizeBy::callAsFunction(ExecState* exec,
+                                                 JSObject* thisObj,
+                                                 const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  Page* page = frame->page();
+
+  if (args.size() >= 2 && page) {
+    FloatRect fr = page->chrome()->windowRect();
+    FloatSize dest =
+        fr.size() + FloatSize(args[0]->toFloat(exec), args[1]->toFloat(exec));
+    FloatRect update(fr.location(), dest);
+    adjustWindowRect(screenAvailableRect(page->mainFrame()->view()), fr,
+                     update);
+    page->chrome()->setWindowRect(fr);
+  }
+  return jsUndefined();
+}
+
+JSValue* WindowProtoFuncResizeTo::callAsFunction(ExecState* exec,
+                                                 JSObject* thisObj,
+                                                 const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  Page* page = frame->page();
+
+  if (args.size() >= 2 && page) {
+    FloatRect fr = page->chrome()->windowRect();
+    FloatSize dest = FloatSize(args[0]->toFloat(exec), args[1]->toFloat(exec));
+    FloatRect update(fr.location(), dest);
+    adjustWindowRect(screenAvailableRect(page->mainFrame()->view()), fr,
+                     update);
+    page->chrome()->setWindowRect(fr);
+  }
+  return jsUndefined();
+}
+
+JSValue* WindowProtoFuncSetTimeout::callAsFunction(ExecState* exec,
+                                                   JSObject* thisObj,
+                                                   const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
   JSValue* v = args[0];
   UString s = v->toString(exec);
-  String str = s;
-  String str2;
 
-  switch (id) {
-    case Window::AToB:
-    case Window::BToA: {
-      if (args.size() < 1)
-        return throwError(exec, SyntaxError, "Not enough arguments");
-      if (v->isNull())
-        return jsString();
-      if (!s.is8Bit()) {
-        setDOMException(exec, INVALID_CHARACTER_ERR);
-        return jsUndefined();
-      }
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+  if (v->isString()) {
+    int i = args[1]->toInt32(exec);
+    int r = (const_cast<Window*>(window))
+                ->installTimeout(s, i, true /*single shot*/);
+    return jsNumber(r);
+  } else if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
+    JSValue* func = args[0];
+    int i = args[1]->toInt32(exec);
 
-      Vector<char> in(s.size());
-      for (int i = 0; i < s.size(); ++i)
-        in[i] = static_cast<char>(s.data()[i].unicode());
-      Vector<char> out;
+    List argsTail;
+    args.getSlice(2, argsTail);
 
-      if (id == Window::AToB) {
-        if (!base64Decode(in, out))
-          return throwError(exec, GeneralError, "Cannot decode base64");
-      } else
-        base64Encode(in, out);
+    int r = (const_cast<Window*>(window))
+                ->installTimeout(func, argsTail, i, true /*single shot*/);
+    return jsNumber(r);
+  } else
+    return jsUndefined();
+}
 
-      return jsString(String(out.data(), out.size()));
-    }
-    case Window::Open: {
-      String urlString = valueToStringWithUndefinedOrNullCheck(exec, args[0]);
-      AtomicString frameName = args[1]->isUndefinedOrNull()
-                                   ? "_blank"
-                                   : AtomicString(args[1]->toString(exec));
+JSValue* WindowProtoFuncClearTimeout::callAsFunction(ExecState* exec,
+                                                     JSObject* thisObj,
+                                                     const List& args) {
+  // Also the implementation for window.clearInterval()
 
-      // Because FrameTree::find() returns true for empty strings, we must check
-      // for empty framenames.
-      // Otherwise, illegitimate window.open() calls with no name will pass
-      // right through the popup blocker.
-      if (!allowPopUp(exec, window) &&
-          (frameName.isEmpty() || !frame->tree()->find(frameName)))
-        return jsUndefined();
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
 
-      // Get the target frame for the special cases of _top and _parent
-      if (frameName == "_top")
-        while (frame->tree()->parent())
-          frame = frame->tree()->parent();
-      else if (frameName == "_parent")
-        if (frame->tree()->parent())
-          frame = frame->tree()->parent();
+  JSValue* v = args[0];
 
-      // In those cases, we can schedule a location change right now and return
-      // early
-      if (frameName == "_top" || frameName == "_parent") {
-        String completedURL;
-        Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
-        if (!urlString.isEmpty() && activeFrame)
-          completedURL = activeFrame->document()->completeURL(urlString);
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+  (const_cast<Window*>(window))->clearTimeout(v->toInt32(exec));
+  return jsUndefined();
+}
 
-        const Window* window = Window::retrieveWindow(frame);
-        if (!completedURL.isEmpty() &&
-            (!completedURL.startsWith("javascript:", false) ||
-             (window && window->isSafeScript(exec)))) {
-          bool userGesture =
-              static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
-                  ->wasRunByUserGesture();
-          frame->loader()->scheduleLocationChange(
-              completedURL, activeFrame->loader()->outgoingReferrer(), false,
-              userGesture);
-        }
-        return Window::retrieve(frame);
-      }
+JSValue* WindowProtoFuncSetInterval::callAsFunction(ExecState* exec,
+                                                    JSObject* thisObj,
+                                                    const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
 
-      // In the case of a named frame or a new window, we'll use the
-      // createWindow() helper
-      WindowFeatures windowFeatures;
-      String features = valueToStringWithUndefinedOrNullCheck(exec, args[2]);
-      parseWindowFeatures(features, windowFeatures);
-      FloatRect windowRect(windowFeatures.x, windowFeatures.y,
-                           windowFeatures.width, windowFeatures.height);
-      adjustWindowRect(screenAvailableRect(page->mainFrame()->view()),
-                       windowRect, windowRect);
+  JSValue* v = args[0];
+  UString s = v->toString(exec);
 
-      windowFeatures.x = windowRect.x();
-      windowFeatures.y = windowRect.y();
-      windowFeatures.height = windowRect.height();
-      windowFeatures.width = windowRect.width();
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+  if (args.size() >= 2 && v->isString()) {
+    int i = args[1]->toInt32(exec);
+    int r = (const_cast<Window*>(window))->installTimeout(s, i, false);
+    return jsNumber(r);
+  } else if (args.size() >= 2 && v->isObject() &&
+             static_cast<JSObject*>(v)->implementsCall()) {
+    JSValue* func = args[0];
+    int i = args[1]->toInt32(exec);
 
-      frame =
-          createWindow(exec, frame, urlString, frameName, windowFeatures, 0);
+    List argsTail;
+    args.getSlice(2, argsTail);
 
-      if (!frame)
-        return jsUndefined();
+    int r =
+        (const_cast<Window*>(window))->installTimeout(func, argsTail, i, false);
+    return jsNumber(r);
+  } else
+    return jsUndefined();
+}
 
-      return Window::retrieve(frame);  // global object
-    }
-    case Window::ScrollBy:
-      window->updateLayout();
-      if (args.size() >= 2 && widget)
-        widget->scrollBy(args[0]->toInt32(exec), args[1]->toInt32(exec));
-      return jsUndefined();
-    case Window::Scroll:
-    case Window::ScrollTo:
-      window->updateLayout();
-      if (args.size() >= 2 && widget)
-        widget->setContentsPos(args[0]->toInt32(exec), args[1]->toInt32(exec));
-      return jsUndefined();
-    case Window::MoveBy:
-      if (args.size() >= 2 && page) {
-        FloatRect fr = page->chrome()->windowRect();
-        FloatRect update = fr;
-        update.move(args[0]->toFloat(exec), args[1]->toFloat(exec));
-        // Security check (the spec talks about UniversalBrowserWrite to disable
-        // this check...)
-        adjustWindowRect(screenAvailableRect(page->mainFrame()->view()), fr,
-                         update);
-        page->chrome()->setWindowRect(fr);
-      }
-      return jsUndefined();
-    case Window::MoveTo:
-      if (args.size() >= 2 && page) {
-        FloatRect fr = page->chrome()->windowRect();
-        FloatRect sr = screenAvailableRect(page->mainFrame()->view());
-        fr.setLocation(sr.location());
-        FloatRect update = fr;
-        update.move(args[0]->toFloat(exec), args[1]->toFloat(exec));
-        // Security check (the spec talks about UniversalBrowserWrite to disable
-        // this check...)
-        adjustWindowRect(sr, fr, update);
-        page->chrome()->setWindowRect(fr);
-      }
-      return jsUndefined();
-    case Window::ResizeBy:
-      if (args.size() >= 2 && page) {
-        FloatRect fr = page->chrome()->windowRect();
-        FloatSize dest = fr.size() + FloatSize(args[0]->toFloat(exec),
-                                               args[1]->toFloat(exec));
-        FloatRect update(fr.location(), dest);
-        adjustWindowRect(screenAvailableRect(page->mainFrame()->view()), fr,
-                         update);
-        page->chrome()->setWindowRect(fr);
-      }
-      return jsUndefined();
-    case Window::ResizeTo:
-      if (args.size() >= 2 && page) {
-        FloatRect fr = page->chrome()->windowRect();
-        FloatSize dest =
-            FloatSize(args[0]->toFloat(exec), args[1]->toFloat(exec));
-        FloatRect update(fr.location(), dest);
-        adjustWindowRect(screenAvailableRect(page->mainFrame()->view()), fr,
-                         update);
-        page->chrome()->setWindowRect(fr);
-      }
-      return jsUndefined();
-    case Window::SetTimeout:
-      if (!window->isSafeScript(exec))
-        return jsUndefined();
-      if (v->isString()) {
-        int i = args[1]->toInt32(exec);
-        int r = (const_cast<Window*>(window))
-                    ->installTimeout(s, i, true /*single shot*/);
-        return jsNumber(r);
-      } else if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
-        JSValue* func = args[0];
-        int i = args[1]->toInt32(exec);
+JSValue* WindowProtoFuncAddEventListener::callAsFunction(ExecState* exec,
+                                                         JSObject* thisObj,
+                                                         const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
 
-        List argsTail;
-        args.getSlice(2, argsTail);
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+  if (JSEventListener* listener = window->findOrCreateJSEventListener(args[1]))
+    if (Document* doc = frame->document())
+      doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
+                                  listener, args[2]->toBoolean(exec));
+  return jsUndefined();
+}
 
-        int r = (const_cast<Window*>(window))
-                    ->installTimeout(func, argsTail, i, true /*single shot*/);
-        return jsNumber(r);
-      } else
-        return jsUndefined();
-    case Window::SetInterval:
-      if (!window->isSafeScript(exec))
-        return jsUndefined();
-      if (args.size() >= 2 && v->isString()) {
-        int i = args[1]->toInt32(exec);
-        int r = (const_cast<Window*>(window))->installTimeout(s, i, false);
-        return jsNumber(r);
-      } else if (args.size() >= 2 && v->isObject() &&
-                 static_cast<JSObject*>(v)->implementsCall()) {
-        JSValue* func = args[0];
-        int i = args[1]->toInt32(exec);
+JSValue* WindowProtoFuncRemoveEventListener::callAsFunction(ExecState* exec,
+                                                            JSObject* thisObj,
+                                                            const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
 
-        List argsTail;
-        args.getSlice(2, argsTail);
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+  if (JSEventListener* listener = window->findJSEventListener(args[1]))
+    if (Document* doc = frame->document())
+      doc->removeWindowEventListener(AtomicString(args[0]->toString(exec)),
+                                     listener, args[2]->toBoolean(exec));
+  return jsUndefined();
+}
 
-        int r = (const_cast<Window*>(window))
-                    ->installTimeout(func, argsTail, i, false);
-        return jsNumber(r);
-      } else
-        return jsUndefined();
-    case Window::ClearTimeout:
-    case Window::ClearInterval:
-      if (!window->isSafeScript(exec))
-        return jsUndefined();
-      (const_cast<Window*>(window))->clearTimeout(v->toInt32(exec));
-      return jsUndefined();
-    case Window::CaptureEvents:
-    case Window::ReleaseEvents:
-      // If anyone implements these, they need the safe script security check.
-      if (!window->isSafeScript(exec))
-        return jsUndefined();
-      // Not implemented.
-      return jsUndefined();
-    case Window::AddEventListener:
-      if (!window->isSafeScript(exec))
-        return jsUndefined();
-      if (JSEventListener* listener =
-              window->findOrCreateJSEventListener(args[1]))
-        if (Document* doc = frame->document())
-          doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
-                                      listener, args[2]->toBoolean(exec));
-      return jsUndefined();
-    case Window::RemoveEventListener:
-      if (!window->isSafeScript(exec))
-        return jsUndefined();
-      if (JSEventListener* listener = window->findJSEventListener(args[1]))
-        if (Document* doc = frame->document())
-          doc->removeWindowEventListener(AtomicString(args[0]->toString(exec)),
-                                         listener, args[2]->toBoolean(exec));
-      return jsUndefined();
-    case Window::ShowModalDialog: {
-      JSValue* result = showModalDialog(exec, window, args);
-      return result;
-    }
-  }
+JSValue* WindowProtoFuncShowModalDialog::callAsFunction(ExecState* exec,
+                                                        JSObject* thisObj,
+                                                        const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  return showModalDialog(exec, window, args);
+}
+
+JSValue* WindowProtoFuncNotImplemented::callAsFunction(ExecState* exec,
+                                                       JSObject* thisObj,
+                                                       const List& args) {
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
+  Window* window = static_cast<Window*>(thisObj);
+  Frame* frame = window->impl()->frame();
+  if (!frame)
+    return jsUndefined();
+
+  // If anyone implements these, they need the safe script security check.
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+  // Not implemented.
   return jsUndefined();
 }
 
@@ -1792,21 +1990,22 @@ Window::UnprotectedListenersMap& Window::jsUnprotectedHTMLEventListeners() {
 const ClassInfo Location::info = {"Location", 0, &LocationTable};
 /*
 @begin LocationTable 12
-  assign        Location::Assign        DontDelete|Function 1
-  hash          Location::Hash          DontDelete
-  host          Location::Host          DontDelete
-  hostname      Location::Hostname      DontDelete
-  href          Location::Href          DontDelete
-  pathname      Location::Pathname      DontDelete
-  port          Location::Port          DontDelete
-  protocol      Location::Protocol      DontDelete
-  search        Location::Search        DontDelete
-  toString      Location::ToString      DontEnum|DontDelete|Function 0
-  replace       Location::Replace       DontDelete|Function 1
-  reload        Location::Reload        DontDelete|Function 0
+  assign        &LocationProtoFuncAssign::create        DontDelete|Function 1
+  hash          Location::Hash                          DontDelete
+  host          Location::Host                          DontDelete
+  hostname      Location::Hostname                      DontDelete
+  href          Location::Href                          DontDelete
+  pathname      Location::Pathname                      DontDelete
+  port          Location::Port                          DontDelete
+  protocol      Location::Protocol                      DontDelete
+  search        Location::Search                        DontDelete
+  toString      &LocationProtoFuncToString::create
+DontEnum|DontDelete|Function 0
+  replace       &LocationProtoFuncReplace::create       DontDelete|Function 1
+  reload        &LocationProtoFuncReload::create        DontDelete|Function 0
 @end
 */
-KJS_IMPLEMENT_PROTOTYPE_FUNCTION(LocationFunc)
+
 Location::Location(Frame* p) : m_frame(p) {}
 
 JSValue* Location::getValueProperty(ExecState* exec, int token) const {
@@ -1853,15 +2052,18 @@ bool Location::getOwnPropertySlot(ExecState* exec,
   const Window* window = Window::retrieveWindow(m_frame);
 
   const HashEntry* entry = Lookup::findEntry(&LocationTable, propertyName);
-  if (!entry || (entry->value != Replace && entry->value != Reload &&
-                 entry->value != Assign))
+  if (!entry || !(entry->attr & KJS::Function) ||
+      (entry->value.functionValue != &LocationProtoFuncReplace::create &&
+       entry->value.functionValue != &LocationProtoFuncReload::create &&
+       entry->value.functionValue != &LocationProtoFuncAssign::create)) {
     if (!window || !window->isSafeScript(exec)) {
       slot.setUndefined(this);
       return true;
     }
+  }
 
-  return getStaticPropertySlot<LocationFunc, Location, JSObject>(
-      exec, &LocationTable, this, propertyName, slot);
+  return getStaticPropertySlot<Location, JSObject>(exec, &LocationTable, this,
+                                                   propertyName, slot);
 }
 
 void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
@@ -1881,10 +2083,10 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
     // but not when assigning the individual pieces, since that might
     // inadvertently
     // disclose other parts of the original location.
-    if (entry->value != Href && !sameDomainAccess)
+    if (entry->value.intValue != Href && !sameDomainAccess)
       return;
 
-    switch (entry->value) {
+    switch (entry->value.intValue) {
       case Href: {
         Frame* frame = Window::retrieveActive(exec)->impl()->frame();
         if (frame)
@@ -1945,78 +2147,113 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
   }
 }
 
-JSValue* LocationFunc::callAsFunction(ExecState* exec,
-                                      JSObject* thisObj,
-                                      const List& args) {
+JSValue* LocationProtoFuncReplace::callAsFunction(ExecState* exec,
+                                                  JSObject* thisObj,
+                                                  const List& args) {
   if (!thisObj->inherits(&Location::info))
     return throwError(exec, TypeError);
   Location* location = static_cast<Location*>(thisObj);
   Frame* frame = location->frame();
-  if (frame) {
-    Window* window = Window::retrieveWindow(frame);
-    if (id != Location::Replace && !window->isSafeScript(exec))
-      return jsUndefined();
+  if (!frame)
+    return jsUndefined();
 
-    switch (id) {
-      case Location::Replace: {
-        DeprecatedString str = args[0]->toString(exec);
-        Frame* p = Window::retrieveActive(exec)->impl()->frame();
-        if (p) {
-          const Window* window = Window::retrieveWindow(frame);
-          if (!str.startsWith("javascript:", false) ||
-              (window && window->isSafeScript(exec))) {
-            bool userGesture =
-                static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
-                    ->wasRunByUserGesture();
-            frame->loader()->scheduleLocationChange(
-                p->loader()->completeURL(str).url(),
-                p->loader()->outgoingReferrer(), true, userGesture);
-          }
-        }
-        break;
-      }
-      case Location::Reload: {
-        const Window* window = Window::retrieveWindow(frame);
-        if (!frame->loader()->url().url().startsWith("javascript:", false) ||
-            (window && window->isSafeScript(exec))) {
-          bool userGesture =
-              static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
-                  ->wasRunByUserGesture();
-          frame->loader()->scheduleRefresh(userGesture);
-        }
-        break;
-      }
-      case Location::Assign: {
-        Frame* p = Window::retrieveActive(exec)->impl()->frame();
-        if (p) {
-          const Window* window = Window::retrieveWindow(frame);
-          DeprecatedString dstUrl =
-              p->loader()
-                  ->completeURL(DeprecatedString(args[0]->toString(exec)))
-                  .url();
-          if (!dstUrl.startsWith("javascript:", false) ||
-              (window && window->isSafeScript(exec))) {
-            bool userGesture =
-                static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
-                    ->wasRunByUserGesture();
-            // We want a new history item if this JS was called via a user
-            // gesture
-            frame->loader()->scheduleLocationChange(
-                dstUrl, p->loader()->outgoingReferrer(), false, userGesture);
-          }
-        }
-        break;
-      }
-      case Location::ToString:
-        if (!frame || !Window::retrieveWindow(frame)->isSafeScript(exec))
-          return jsString();
-
-        if (!frame->loader()->url().hasPath())
-          return jsString(frame->loader()->url().prettyURL() + "/");
-        return jsString(frame->loader()->url().prettyURL());
+  DeprecatedString str = args[0]->toString(exec);
+  Frame* p = Window::retrieveActive(exec)->impl()->frame();
+  if (p) {
+    const Window* window = Window::retrieveWindow(frame);
+    if (!str.startsWith("javascript:", false) ||
+        (window && window->isSafeScript(exec))) {
+      bool userGesture =
+          static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
+              ->wasRunByUserGesture();
+      frame->loader()->scheduleLocationChange(
+          p->loader()->completeURL(str).url(), p->loader()->outgoingReferrer(),
+          true, userGesture);
     }
   }
+
   return jsUndefined();
+}
+
+JSValue* LocationProtoFuncReload::callAsFunction(ExecState* exec,
+                                                 JSObject* thisObj,
+                                                 const List& args) {
+  if (!thisObj->inherits(&Location::info))
+    return throwError(exec, TypeError);
+  Location* location = static_cast<Location*>(thisObj);
+  Frame* frame = location->frame();
+  if (!frame)
+    return jsUndefined();
+
+  Window* window = Window::retrieveWindow(frame);
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+
+  if (!frame->loader()->url().url().startsWith("javascript:", false) ||
+      (window && window->isSafeScript(exec))) {
+    bool userGesture =
+        static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
+            ->wasRunByUserGesture();
+    frame->loader()->scheduleRefresh(userGesture);
+  }
+  return jsUndefined();
+}
+
+JSValue* LocationProtoFuncAssign::callAsFunction(ExecState* exec,
+                                                 JSObject* thisObj,
+                                                 const List& args) {
+  if (!thisObj->inherits(&Location::info))
+    return throwError(exec, TypeError);
+  Location* location = static_cast<Location*>(thisObj);
+  Frame* frame = location->frame();
+  if (!frame)
+    return jsUndefined();
+
+  Window* window = Window::retrieveWindow(frame);
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+
+  Frame* p = Window::retrieveActive(exec)->impl()->frame();
+  if (p) {
+    const Window* window = Window::retrieveWindow(frame);
+    DeprecatedString dstUrl =
+        p->loader()
+            ->completeURL(DeprecatedString(args[0]->toString(exec)))
+            .url();
+    if (!dstUrl.startsWith("javascript:", false) ||
+        (window && window->isSafeScript(exec))) {
+      bool userGesture =
+          static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
+              ->wasRunByUserGesture();
+      // We want a new history item if this JS was called via a user gesture
+      frame->loader()->scheduleLocationChange(
+          dstUrl, p->loader()->outgoingReferrer(), false, userGesture);
+    }
+  }
+
+  return jsUndefined();
+}
+
+JSValue* LocationProtoFuncToString::callAsFunction(ExecState* exec,
+                                                   JSObject* thisObj,
+                                                   const List& args) {
+  if (!thisObj->inherits(&Location::info))
+    return throwError(exec, TypeError);
+  Location* location = static_cast<Location*>(thisObj);
+  Frame* frame = location->frame();
+  if (!frame)
+    return jsUndefined();
+
+  Window* window = Window::retrieveWindow(frame);
+  if (!window->isSafeScript(exec))
+    return jsUndefined();
+
+  if (!frame || !Window::retrieveWindow(frame)->isSafeScript(exec))
+    return jsString();
+
+  if (!frame->loader()->url().hasPath())
+    return jsString(frame->loader()->url().prettyURL() + "/");
+  return jsString(frame->loader()->url().prettyURL());
 }
 
 /////////////////////////////////////////////////////////////////////////////
