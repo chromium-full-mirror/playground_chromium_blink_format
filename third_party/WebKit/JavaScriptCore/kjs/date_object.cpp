@@ -57,6 +57,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/MathExtras.h>
 #include <wtf/StringExtras.h>
+#include <wtf/UnusedParam.h>
 
 #if PLATFORM(MAC)
 #include <CoreFoundation/CoreFoundation.h>
@@ -1084,6 +1085,8 @@ JSValue* DateProtoFuncToLocaleString::callAsFunction(ExecState* exec,
   double secs = floor(milli / msPerSecond);
   return jsString(formatLocaleDate(exec, secs, true, true, args));
 #else
+  UNUSED_PARAM(args);
+
   const bool utc = false;
 
   GregorianDateTime t;
@@ -1108,6 +1111,8 @@ JSValue* DateProtoFuncToLocaleDateString::callAsFunction(ExecState* exec,
   double secs = floor(milli / msPerSecond);
   return jsString(formatLocaleDate(exec, secs, true, false, args));
 #else
+  UNUSED_PARAM(args);
+
   const bool utc = false;
 
   GregorianDateTime t;
@@ -1132,6 +1137,8 @@ JSValue* DateProtoFuncToLocaleTimeString::callAsFunction(ExecState* exec,
   double secs = floor(milli / msPerSecond);
   return jsString(formatLocaleDate(exec, secs, false, true, args));
 #else
+  UNUSED_PARAM(args);
+
   const bool utc = false;
 
   GregorianDateTime t;
