@@ -1091,6 +1091,7 @@ void RenderLayer::destroyScrollbar(ScrollbarOrientation orientation) {
   if (scrollbar) {
     if (scrollbar->isWidget())
       static_cast<PlatformScrollbar*>(scrollbar.get())->removeFromParent();
+    scrollbar->setClient(0);
 
     // FIXME: Destroy the engine scrollbar.
     scrollbar = 0;

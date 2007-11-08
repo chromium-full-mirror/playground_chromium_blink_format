@@ -59,6 +59,8 @@ class Scrollbar : public Shared<Scrollbar> {
  public:
   virtual ~Scrollbar() {}
 
+  void setClient(ScrollbarClient* client) { m_client = client; }
+
   virtual bool isWidget() const = 0;
 
   ScrollbarOrientation orientation() const { return m_orientation; }
