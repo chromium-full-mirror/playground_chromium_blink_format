@@ -112,27 +112,27 @@ class QWebNetworkManager : public QObject {
   QWebNetworkManager();
   QHash<WebCore::HostInfo, WebCore::WebCoreHttp*> m_hostMapping;
 
-  struct JobData {
-    JobData(QWebNetworkJob* _job, const QByteArray& _data)
-        : job(_job), data(_data) {}
+  struct JobWork {
+    enum WorkType { JobStarted, JobData, JobFinished };
 
-    QWebNetworkJob* job;
-    QByteArray data;
-  };
+    explicit JobWork(QWebNetworkJob* _job)
+        : workType(JobStarted), errorCode(-1), job(_job) {}
 
-  struct JobFinished {
-    JobFinished(QWebNetworkJob* _job, int _errorCode)
-        : job(_job), errorCode(_errorCode) {}
+    explicit JobWork(QWebNetworkJob* _job, int _errorCode)
+        : workType(JobFinished), errorCode(_errorCode), job(_job) {}
 
-    QWebNetworkJob* job;
+    explicit JobWork(QWebNetworkJob* _job, const QByteArray& _data)
+        : workType(JobData), errorCode(-1), job(_job), data(_data) {}
+
+    const WorkType workType;
     int errorCode;
+    QByteArray data;
+    QWebNetworkJob* job;
   };
 
   QMutex m_queueMutex;
   bool m_scheduledWork;
-  QList<QWebNetworkJob*> m_startedJobs;
-  QList<JobData*> m_receivedData;
-  QList<JobFinished*> m_finishedJobs;
+  QList<JobWork*> m_pendingWork;
   QHash<QWebNetworkJob*, int> m_synchronousJobs;
 };
 
