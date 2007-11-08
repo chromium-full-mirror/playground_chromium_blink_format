@@ -482,6 +482,8 @@ HRESULT STDMETHODCALLTYPE WebFrame::QueryInterface(REFIID riid,
     *ppvObject = static_cast<IWebFrame*>(this);
   else if (IsEqualGUID(riid, IID_IWebFramePrivate))
     *ppvObject = static_cast<IWebFramePrivate*>(this);
+  else if (IsEqualGUID(riid, IID_IWebDocumentText))
+    *ppvObject = static_cast<IWebDocumentText*>(this);
   else
     return E_NOINTERFACE;
 
@@ -884,7 +886,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::childFrames(
   return S_OK;
 }
 
-// IWebFramePrivaete ------------------------------------------------------
+// IWebFramePrivate ------------------------------------------------------
 
 HRESULT STDMETHODCALLTYPE WebFrame::renderTreeAsExternalRepresentation(
     /* [retval][out] */ BSTR* result) {
@@ -972,6 +974,37 @@ HRESULT STDMETHODCALLTYPE WebFrame::loadType(
 
   *type = (WebFrameLoadType)coreFrame->loader()->loadType();
   return S_OK;
+}
+
+// IWebDocumentText -----------------------------------------------------------
+
+HRESULT STDMETHODCALLTYPE WebFrame::supportsTextEncoding(
+    /* [retval][out] */ BOOL* result) {
+  *result = FALSE;
+  return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE WebFrame::selectedString(
+    /* [retval][out] */ BSTR* result) {
+  *result = 0;
+
+  Frame* coreFrame = core(this);
+  if (!coreFrame)
+    return E_FAIL;
+
+  String text = coreFrame->selectedText();
+  text.replace('\\', coreFrame->backslashAsCurrencySymbol());
+
+  *result = BString(text).release();
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebFrame::selectAll() {
+  return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE WebFrame::deselectAll() {
+  return E_NOTIMPL;
 }
 
 // WebFrame ---------------------------------------------------------------
