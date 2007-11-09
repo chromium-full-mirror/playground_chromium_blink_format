@@ -124,7 +124,7 @@ class QWebPagePrivate {
   QWebPageContext currentContext;
   QWebSettings* settings;
 
-  QAction* actions[QWebPage::NumWebActions];
+  QAction* actions[QWebPage::WebActionCount];
 };
 
 #endif

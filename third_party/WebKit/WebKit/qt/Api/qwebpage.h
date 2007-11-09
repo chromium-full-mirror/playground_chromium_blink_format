@@ -122,7 +122,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
     DeleteStartOfWord,
     DeleteEndOfWord,
 
-    NumWebActions = DeleteEndOfWord
+    WebActionCount
   };
 
   QWebPage(QWidget* parent);
