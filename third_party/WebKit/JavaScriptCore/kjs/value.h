@@ -227,12 +227,12 @@ ALWAYS_INLINE JSValue* jsNumber(unsigned long i) {
 
 ALWAYS_INLINE JSValue* jsNumber(long long i) {
   JSValue* v = JSImmediate::from(i);
-  return v ? v : jsNumberCell(i);
+  return v ? v : jsNumberCell(static_cast<double>(i));
 }
 
 ALWAYS_INLINE JSValue* jsNumber(unsigned long long i) {
   JSValue* v = JSImmediate::from(i);
-  return v ? v : jsNumberCell(i);
+  return v ? v : jsNumberCell(static_cast<double>(i));
 }
 
 ALWAYS_INLINE JSValue* jsNumberFromAnd(ExecState* exec,
