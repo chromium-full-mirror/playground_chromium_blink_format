@@ -298,7 +298,8 @@ void GIFImageDecoder::haveDecodedRow(
     initFrameBuffer(buffer, previousBuffer, compositeWithPreviousFrame);
 
   // Do nothing for bogus data.
-  if (rowBuffer == 0 || static_cast<int>(rowNumber) >= m_size.height())
+  if (rowBuffer == 0 ||
+      static_cast<int>(m_reader->frameYOffset() + rowNumber) >= m_size.height())
     return;
 
   unsigned colorMapSize;
