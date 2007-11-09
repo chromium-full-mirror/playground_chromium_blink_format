@@ -29,6 +29,8 @@
 #ifndef Database_h
 #define Database_h
 
+#if ENABLE(DATABASE)
+
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
 #include "SQLiteDatabase.h"
@@ -161,5 +163,7 @@ class Database : public ThreadSafeShared<Database> {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // Database_h
