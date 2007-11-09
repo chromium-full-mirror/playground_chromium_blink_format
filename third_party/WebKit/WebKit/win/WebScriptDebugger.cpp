@@ -34,41 +34,48 @@
 #include "WebFrame.h"
 #include "WebScriptDebugServer.h"
 
+#pragma warning(push, 0)
 #include <WebCore/BString.h>
 #include <WebCore/kjs_binding.h>
 #include <WebCore/kjs_proxy.h>
 #include <WebCore/PlatformString.h>
-
-#include <WebCore/COMPtr.h>
+#pragma warning(pop)
 
 using namespace WebCore;
+using namespace KJS;
 
 WebScriptDebugger::WebScriptDebugger(WebFrame* frame) : m_frame(frame) {
   ASSERT(m_frame);
-  if (KJSProxy* proxy = core(m_frame)->scriptProxy())
-    attach(static_cast<KJS::Interpreter*>(proxy->interpreter()));
+
+  KJSProxy* proxy = core(m_frame)->scriptProxy();
+  if (!proxy)
+    return;
+
+  Interpreter* interp(proxy->interpreter());
+  attach(interp);
+
+  m_frame->webView(&m_webView);
+  ASSERT(m_webView);
+
+  callEvent(interp->globalExec(), -1, -1, 0, List());
 }
 
-bool WebScriptDebugger::sourceParsed(KJS::ExecState*,
+bool WebScriptDebugger::sourceParsed(ExecState*,
                                      int sourceId,
-                                     const KJS::UString& sourceURL,
-                                     const KJS::UString& source,
+                                     const UString& sourceURL,
+                                     const UString& source,
                                      int startingLineNumber,
                                      int errorLine,
-                                     const KJS::UString& /*errorMsg*/) {
+                                     const UString& /*errorMsg*/) {
   if (WebScriptDebugServer::listenerCount() <= 0)
     return true;
-
-  COMPtr<IWebView> webView;
-  if (FAILED(m_frame->webView(&webView)))
-    return false;
 
   BString bSource = String(source);
   BString bSourceURL = String(sourceURL);
 
   if (errorLine == -1) {
     WebScriptDebugServer::sharedWebScriptDebugServer()->didParseSource(
-        webView.get(), bSource, startingLineNumber, bSourceURL, sourceId,
+        m_webView.get(), bSource, startingLineNumber, bSourceURL, sourceId,
         m_frame);
   } else {
     // FIXME: the error var should be made with the information in the errorMsg.
@@ -77,8 +84,67 @@ bool WebScriptDebugger::sourceParsed(KJS::ExecState*,
     // fully understand yet.
     BString error(L"An Error Occurred.");
     WebScriptDebugServer::sharedWebScriptDebugServer()->failedToParseSource(
-        webView.get(), bSource, startingLineNumber, bSourceURL, error, m_frame);
+        m_webView.get(), bSource, startingLineNumber, bSourceURL, error,
+        m_frame);
   }
 
   return true;
+}
+
+bool WebScriptDebugger::callEvent(ExecState* state,
+                                  int sourceId,
+                                  int lineno,
+                                  JSObject* /*function*/,
+                                  const List& /*args*/) {
+  enterFrame(state);
+  WebScriptDebugServer::sharedWebScriptDebugServer()->didEnterCallFrame(
+      m_webView.get(), m_topStackFrame.get(), sourceId, lineno, m_frame);
+
+  return true;
+}
+
+bool WebScriptDebugger::atStatement(ExecState*,
+                                    int sourceId,
+                                    int firstLine,
+                                    int /*lastLine*/) {
+  WebScriptDebugServer::sharedWebScriptDebugServer()->willExecuteStatement(
+      m_webView.get(), m_topStackFrame.get(), sourceId, firstLine, m_frame);
+
+  return true;
+}
+
+bool WebScriptDebugger::returnEvent(ExecState*,
+                                    int sourceId,
+                                    int lineno,
+                                    JSObject* /*function*/) {
+  WebScriptDebugServer::sharedWebScriptDebugServer()->willLeaveCallFrame(
+      m_webView.get(), m_topStackFrame.get(), sourceId, lineno, m_frame);
+  leaveFrame();
+  return true;
+}
+
+bool WebScriptDebugger::exception(ExecState*,
+                                  int sourceId,
+                                  int lineno,
+                                  JSValue* /*exception */) {
+  WebScriptDebugServer::sharedWebScriptDebugServer()->exceptionWasRaised(
+      m_webView.get(), m_topStackFrame.get(), sourceId, lineno, m_frame);
+
+  return true;
+}
+
+void WebScriptDebugger::enterFrame(ExecState*) {
+  // FIXME: the implementation of this is dependent on finishing the
+  // implementation of WebScriptScope.
+}
+
+void WebScriptDebugger::leaveFrame() {
+  if (!m_topStackFrame)
+    return;
+
+  COMPtr<IWebScriptCallFrame> caller;
+  if (FAILED(m_topStackFrame->caller(&caller)))
+    return;
+
+  m_topStackFrame = caller;
 }
