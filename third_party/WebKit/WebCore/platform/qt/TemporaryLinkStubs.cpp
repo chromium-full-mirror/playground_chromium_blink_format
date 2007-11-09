@@ -80,10 +80,13 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
   return String();
 }
 
+#if !defined(Q_OS_WIN)
+// defined in win/SystemTimeWin.cpp, which is compiled for the Qt/Windows port
 float userIdleTime() {
   notImplemented();
   return 0.0;
 }
+#endif
 }
 
 // vim: ts=4 sw=4 et
