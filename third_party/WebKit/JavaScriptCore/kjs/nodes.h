@@ -384,9 +384,9 @@ class ElementNode : public ExpressionNode {
 class ArrayNode : public ExpressionNode {
  public:
   ArrayNode(int e) KJS_FAST_CALL : elision(e), opt(true) {}
-  ArrayNode(ElementNode*) KJS_FAST_CALL : element(ele),
-                                          elision(0),
-                                          opt(false) {}
+  ArrayNode(ElementNode* ele) KJS_FAST_CALL : element(ele),
+                                              elision(0),
+                                              opt(false) {}
   ArrayNode(int eli, ElementNode* ele) KJS_FAST_CALL : element(ele),
                                                        elision(eli),
                                                        opt(true) {}
