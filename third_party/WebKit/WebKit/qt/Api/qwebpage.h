@@ -122,6 +122,10 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
     DeleteStartOfWord,
     DeleteEndOfWord,
 
+    SetTextDirectionDefault,
+    SetTextDirectionLeftToRight,
+    SetTextDirectionRightToLeft,
+
     WebActionCount
   };
 
