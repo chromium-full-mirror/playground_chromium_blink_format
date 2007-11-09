@@ -1,7 +1,6 @@
 // -*- c-basic-offset: 4 -*-
 /*
- *  This file is part of the KDE libraries
- *  Copyright (C) 2005 Apple Computer, Inc.
+ *  Copyright (C) 2005, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -34,59 +33,75 @@ class JSObject;
 
 struct HashEntry;
 
-#define VALUE_SLOT_MARKER ((GetValueFunc)1)
+#define KJS_VALUE_SLOT_MARKER 0
+#define KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER reinterpret_cast<GetValueFunc>(1)
+
 class PropertySlot {
  public:
   typedef JSValue* (*GetValueFunc)(ExecState*,
                                    JSObject* originalObject,
                                    const Identifier&,
                                    const PropertySlot&);
+  typedef JSValue* (*GetValueNumericFunc)(ExecState*,
+                                          JSObject* originalObject,
+                                          unsigned index,
+                                          const PropertySlot&);
 
   JSValue* getValue(ExecState* exec,
                     JSObject* originalObject,
                     const Identifier& propertyName) const {
-    if (m_getValue == VALUE_SLOT_MARKER)
+    if (m_getValue == KJS_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
+    ASSERT(m_getValue != KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER);
     return m_getValue(exec, originalObject, propertyName, *this);
   }
 
   JSValue* getValue(ExecState* exec,
                     JSObject* originalObject,
                     unsigned propertyName) const {
-    if (m_getValue == VALUE_SLOT_MARKER)
+    if (m_getValue == KJS_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
+    if (m_getValue == KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER)
+      return m_data.numericFunc(exec, originalObject, propertyName, *this);
     return m_getValue(exec, originalObject, Identifier::from(propertyName),
                       *this);
   }
 
   void setValueSlot(JSObject* slotBase, JSValue** valueSlot) {
+    m_getValue = KJS_VALUE_SLOT_MARKER;
     m_slotBase = slotBase;
     m_data.valueSlot = valueSlot;
-    m_getValue = VALUE_SLOT_MARKER;
   }
 
   void setStaticEntry(JSObject* slotBase,
                       const HashEntry* staticEntry,
                       GetValueFunc getValue) {
     ASSERT(getValue);
+    m_getValue = getValue;
     m_slotBase = slotBase;
     m_data.staticEntry = staticEntry;
-    m_getValue = getValue;
   }
 
   void setCustom(JSObject* slotBase, GetValueFunc getValue) {
     ASSERT(getValue);
-    m_slotBase = slotBase;
     m_getValue = getValue;
+    m_slotBase = slotBase;
   }
 
   void setCustomIndex(JSObject* slotBase,
                       unsigned index,
                       GetValueFunc getValue) {
     ASSERT(getValue);
+    m_getValue = getValue;
     m_slotBase = slotBase;
     m_data.index = index;
-    m_getValue = getValue;
+  }
+
+  void setCustomNumeric(JSObject* slotBase, GetValueNumericFunc getValue) {
+    ASSERT(getValue);
+    m_slotBase = slotBase;
+    m_getValue = KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER;
+    m_data.numericFunc = getValue;
   }
 
   void setGetterSlot(JSObject* slotBase, JSObject* getterFunc) {
@@ -123,6 +138,7 @@ class PropertySlot {
     JSValue** valueSlot;
     const HashEntry* staticEntry;
     unsigned index;
+    GetValueNumericFunc numericFunc;
   } m_data;
 };
 }
