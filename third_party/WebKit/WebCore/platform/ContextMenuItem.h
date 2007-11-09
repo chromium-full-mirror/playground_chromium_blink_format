@@ -130,14 +130,13 @@ struct PlatformMenuItemDescription {
   PlatformMenuItemDescription()
       : type(ActionType),
         action(ContextMenuItemTagNoAction),
-        subMenu(0),
         checked(false),
         enabled(true) {}
 
   ContextMenuItemType type;
   ContextMenuAction action;
   String title;
-  ContextMenu* subMenu;
+  QList<ContextMenuItem> subMenuItems;
   bool checked;
   bool enabled;
 };

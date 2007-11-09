@@ -78,7 +78,7 @@ class QWebPagePrivate {
   QWebPagePrivate(QWebPage*);
   ~QWebPagePrivate();
   void createMainFrame();
-  QMenu* createContextMenu(QList<WebCore::ContextMenuItem>* items);
+  QMenu* createContextMenu(const QList<WebCore::ContextMenuItem>* items);
 
   QWebFrame* frameAt(const QPoint& pos) const;
 
