@@ -180,6 +180,7 @@ static QWebPage::WebAction webActionForContextMenuAction(
 }
 
 QMenu* QWebPagePrivate::createContextMenu(
+    const WebCore::ContextMenu* webcoreMenu,
     const QList<WebCore::ContextMenuItem>* items) {
   QMenu* menu = new QMenu;
   for (int i = 0; i < items->count(); ++i) {
@@ -189,15 +190,22 @@ QMenu* QWebPagePrivate::createContextMenu(
         QWebPage::WebAction action =
             webActionForContextMenuAction(item.action());
         QAction* a = q->action(action);
-        if (a)
+        if (a) {
+          ContextMenuItem it(item);
+          webcoreMenu->checkOrEnableIfNeeded(it);
+          PlatformMenuItemDescription desc = it.releasePlatformDescription();
+          a->setEnabled(desc.enabled);
+          a->setChecked(desc.checked);
+
           menu->addAction(a);
+        }
         break;
       }
       case WebCore::SeparatorType:
         menu->addSeparator();
         break;
       case WebCore::SubmenuType: {
-        QMenu* subMenu = createContextMenu(item.platformSubMenu());
+        QMenu* subMenu = createContextMenu(webcoreMenu, item.platformSubMenu());
         subMenu->setTitle(item.title());
         menu->addAction(subMenu->menuAction());
         break;
@@ -872,7 +880,7 @@ void QWebPage::contextMenuEvent(QContextMenuEvent* ev) {
   d->currentContext = QWebPageContext(menu->hitTestResult());
 
   const QList<ContextMenuItem>* items = menu->platformDescription();
-  QMenu* qmenu = d->createContextMenu(items);
+  QMenu* qmenu = d->createContextMenu(menu, items);
   if (qmenu) {
     qmenu->exec(ev->globalPos());
     delete qmenu;
