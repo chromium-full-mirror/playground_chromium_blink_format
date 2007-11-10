@@ -680,7 +680,22 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
       }
     } else if (m_startContainer->nodeType() ==
                Node::PROCESSING_INSTRUCTION_NODE) {
-      // ### operate just on data ?
+      if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
+        RefPtr<ProcessingInstruction> c =
+            static_pointer_cast<ProcessingInstruction>(
+                m_startContainer->cloneNode(true));
+        c->setData(
+            c->data().substring(m_startOffset, m_endOffset - m_startOffset),
+            ec);
+        fragment->appendChild(c.release(), ec);
+      }
+      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS) {
+        ProcessingInstruction* pi =
+            static_cast<ProcessingInstruction*>(m_startContainer.get());
+        String data(pi->data());
+        data.remove(m_startOffset, m_endOffset - m_startOffset);
+        pi->setData(data, ec);
+      }
     } else {
       Node* n = m_startContainer->firstChild();
       unsigned i;
@@ -744,8 +759,19 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
       }
     } else if (m_startContainer->nodeType() ==
                Node::PROCESSING_INSTRUCTION_NODE) {
-      // ### operate just on data ?
-      // leftContents = ...
+      if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
+        RefPtr<ProcessingInstruction> c =
+            static_pointer_cast<ProcessingInstruction>(
+                m_startContainer->cloneNode(true));
+        c->setData(c->data().substring(m_startOffset), ec);
+        leftContents = c.release();
+      }
+      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS) {
+        ProcessingInstruction* pi =
+            static_cast<ProcessingInstruction*>(m_startContainer.get());
+        String data(pi->data());
+        pi->setData(data.left(m_startOffset), ec);
+      }
     } else {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
         leftContents = m_startContainer->cloneNode(false);
@@ -811,10 +837,20 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
             ->deleteData(0, m_endOffset, ec);
         m_startContainer->document()->updateLayout();
       }
-    } else if (m_startContainer->nodeType() ==
+    } else if (m_endContainer->nodeType() ==
                Node::PROCESSING_INSTRUCTION_NODE) {
-      // ### operate just on data ?
-      // rightContents = ...
+      if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
+        RefPtr<ProcessingInstruction> c =
+            static_pointer_cast<ProcessingInstruction>(
+                m_endContainer->cloneNode(true));
+        c->setData(c->data().left(m_endOffset), ec);
+        rightContents = c.release();
+      }
+      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS) {
+        ProcessingInstruction* pi =
+            static_cast<ProcessingInstruction*>(m_endContainer.get());
+        pi->setData(pi->data().substring(m_endOffset), ec);
+      }
     } else {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
         rightContents = m_endContainer->cloneNode(false);
@@ -1136,9 +1172,9 @@ bool Range::isDetached() const {
 }
 
 void Range::checkNodeWOffset(Node* n, int offset, ExceptionCode& ec) const {
-  if (offset < 0) {
+  if (offset < 0)
     ec = INDEX_SIZE_ERR;
-  }
+  // no return here
 
   switch (n->nodeType()) {
     case Node::ENTITY_NODE:
@@ -1153,7 +1189,6 @@ void Range::checkNodeWOffset(Node* n, int offset, ExceptionCode& ec) const {
         ec = INDEX_SIZE_ERR;
       break;
     case Node::PROCESSING_INSTRUCTION_NODE:
-      // ### are we supposed to check with just data or the whole contents?
       if ((unsigned)offset >
           static_cast<ProcessingInstruction*>(n)->data().length())
         ec = INDEX_SIZE_ERR;
