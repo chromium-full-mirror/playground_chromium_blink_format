@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
@@ -106,7 +105,7 @@ struct DeclarationStacks {
   FunctionStack& functionStack;
 };
 
-class Node {
+class Node : Noncopyable {
  public:
   Node() KJS_FAST_CALL;
   Node(PlacementNewAdoptType) KJS_FAST_CALL {}
@@ -135,10 +134,6 @@ class Node {
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL {}
-
-  // Used to optimize those nodes that do extra work when returning a result,
-  // even if the result has no semantic relevance
-  virtual void optimizeForUnnecessaryResult() {}
 
  protected:
   Completion createErrorCompletion(ExecState*,
@@ -184,16 +179,11 @@ class Node {
 
   int m_line : 31;
   bool m_mayHaveDeclarations : 1;
-
- private:
-  // disallow assignment
-  Node& operator=(const Node&) KJS_FAST_CALL;
-  Node(const Node& other) KJS_FAST_CALL;
 };
 
 class ExpressionNode : public Node {
  public:
-  ExpressionNode() KJS_FAST_CALL : Node() {}
+  ExpressionNode() KJS_FAST_CALL {}
 
   // Special constructor for cases where we overwrite an object in place.
   ExpressionNode(PlacementNewAdoptType) KJS_FAST_CALL
@@ -207,6 +197,11 @@ class ExpressionNode : public Node {
 
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL = 0;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+
+  // Used to optimize those nodes that do extra work when returning a result,
+  // even if the result has no semantic relevance
+  virtual void optimizeForUnnecessaryResult() {}
 };
 
 class StatementNode : public Node {
@@ -238,15 +233,22 @@ class NullNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecPrimary; }
 };
 
-class BooleanNode : public ExpressionNode {
+class FalseNode : public ExpressionNode {
  public:
-  BooleanNode(bool v) KJS_FAST_CALL : value(v) {}
+  FalseNode() KJS_FAST_CALL {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL { return false; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
+};
 
- private:
-  bool value;
+class TrueNode : public ExpressionNode {
+ public:
+  TrueNode() KJS_FAST_CALL {}
+  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL { return true; }
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual Precedence precedence() const { return PrecPrimary; }
 };
 
 class NumberNode : public ExpressionNode {
@@ -254,6 +256,7 @@ class NumberNode : public ExpressionNode {
   NumberNode(double v) KJS_FAST_CALL : m_double(v) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -288,6 +291,7 @@ class StringNode : public ExpressionNode {
   StringNode(const UString* v) KJS_FAST_CALL { value = *v; }
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -350,12 +354,13 @@ class LocalVarAccessNode : public ResolveNode {
   }
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
 
  private:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
 };
 
-class ElementNode : public ExpressionNode {
+class ElementNode : public Node {
  public:
   ElementNode(int e, ExpressionNode* n) KJS_FAST_CALL : elision(e), node(n) {}
   ElementNode(ElementNode* l, int e, ExpressionNode* n) KJS_FAST_CALL
@@ -363,16 +368,18 @@ class ElementNode : public ExpressionNode {
         node(n) {
     l->next = this;
   }
-  virtual void optimizeVariableAccess(FunctionBodyNode*,
-                                      DeclarationStacks::NodeStack&)
-      KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  PassRefPtr<ElementNode> releaseNext() KJS_FAST_CALL { return next.release(); }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
   }
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(FunctionBodyNode*,
+                                      DeclarationStacks::NodeStack&)
+      KJS_FAST_CALL;
+
+  PassRefPtr<ElementNode> releaseNext() KJS_FAST_CALL { return next.release(); }
+
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 
  private:
   friend class ArrayNode;
@@ -403,7 +410,7 @@ class ArrayNode : public ExpressionNode {
   bool opt;
 };
 
-class PropertyNode : public ExpressionNode {
+class PropertyNode : public Node {
  public:
   enum Type { Constant, Getter, Setter };
   PropertyNode(const Identifier& n, ExpressionNode* a, Type t) KJS_FAST_CALL
@@ -413,22 +420,23 @@ class PropertyNode : public ExpressionNode {
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  friend class PropertyListNode;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
   }
+
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   const Identifier& name() const { return m_name; }
 
  private:
+  friend class PropertyListNode;
   Identifier m_name;
   RefPtr<ExpressionNode> assign;
   Type type;
 };
 
-class PropertyListNode : public ExpressionNode {
+class PropertyListNode : public Node {
  public:
   PropertyListNode(PropertyNode* n) KJS_FAST_CALL : node(n) {}
   PropertyListNode(PropertyNode* n, PropertyListNode* l) KJS_FAST_CALL
@@ -438,14 +446,15 @@ class PropertyListNode : public ExpressionNode {
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  PassRefPtr<PropertyListNode> releaseNext() KJS_FAST_CALL {
-    return next.release();
-  }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
+  }
+
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  PassRefPtr<PropertyListNode> releaseNext() KJS_FAST_CALL {
+    return next.release();
   }
 
  private:
@@ -479,6 +488,7 @@ class BracketAccessorNode : public ExpressionNode {
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
 
@@ -515,7 +525,7 @@ class DotAccessorNode : public ExpressionNode {
   Identifier ident;
 };
 
-class ArgumentListNode : public ExpressionNode {
+class ArgumentListNode : public Node {
  public:
   ArgumentListNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
   ArgumentListNode(ArgumentListNode* l, ExpressionNode* e) KJS_FAST_CALL
@@ -525,15 +535,15 @@ class ArgumentListNode : public ExpressionNode {
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  void evaluateList(ExecState*, List&) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  PassRefPtr<ArgumentListNode> releaseNext() KJS_FAST_CALL {
-    return next.release();
-  }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
+  }
+
+  void evaluateList(ExecState*, List&) KJS_FAST_CALL;
+  PassRefPtr<ArgumentListNode> releaseNext() KJS_FAST_CALL {
+    return next.release();
   }
 
  private:
@@ -542,22 +552,22 @@ class ArgumentListNode : public ExpressionNode {
   RefPtr<ExpressionNode> expr;
 };
 
-class ArgumentsNode : public ExpressionNode {
+class ArgumentsNode : public Node {
  public:
   ArgumentsNode() KJS_FAST_CALL {}
   ArgumentsNode(ArgumentListNode* l) KJS_FAST_CALL : listNode(l) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  void evaluateList(ExecState* exec, List& list) KJS_FAST_CALL {
-    if (listNode)
-      listNode->evaluateList(exec, list);
-  }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
+  }
+
+  void evaluateList(ExecState* exec, List& list) KJS_FAST_CALL {
+    if (listNode)
+      listNode->evaluateList(exec, list);
   }
 
  private:
@@ -1161,6 +1171,7 @@ class LogicalNotNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1316,6 +1327,7 @@ class LessNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1333,6 +1345,7 @@ class GreaterNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1350,6 +1363,7 @@ class LessEqNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1367,6 +1381,7 @@ class GreaterEqNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1384,6 +1399,7 @@ class InstanceOfNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1400,6 +1416,7 @@ class InNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1416,6 +1433,7 @@ class EqualNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
@@ -1433,6 +1451,7 @@ class NotEqualNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
@@ -1450,6 +1469,7 @@ class StrictEqualNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
@@ -1467,6 +1487,7 @@ class NotStrictEqualNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
@@ -1537,6 +1558,7 @@ class LogicalAndNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecLogicalAnd; }
 
@@ -1554,6 +1576,7 @@ class LogicalOrNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecLogicalOr; }
 
@@ -1576,6 +1599,7 @@ class ConditionalNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecConditional; }
 
@@ -1766,7 +1790,9 @@ class AssignErrorNode : public ExpressionNode {
 class CommaNode : public ExpressionNode {
  public:
   CommaNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                    expr2(e2) {}
+                                                                    expr2(e2) {
+    e1->optimizeForUnnecessaryResult();
+  }
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1865,7 +1891,9 @@ class EmptyStatementNode : public StatementNode {
 
 class ExprStatementNode : public StatementNode {
  public:
-  ExprStatementNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  ExprStatementNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {
+    e->optimizeForUnnecessaryResult();
+  }
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1944,6 +1972,8 @@ class ForNode : public StatementNode {
                                             expr3(e3),
                                             statement(s) {
     m_mayHaveDeclarations = true;
+    if (expr1)
+      expr1->optimizeForUnnecessaryResult();
     if (expr3)
       expr3->optimizeForUnnecessaryResult();
   }
@@ -2097,13 +2127,12 @@ class TryNode : public StatementNode {
   RefPtr<StatementNode> finallyBlock;
 };
 
-class ParameterNode : public ExpressionNode {
+class ParameterNode : public Node {
  public:
   ParameterNode(const Identifier& i) KJS_FAST_CALL : id(i) {}
   ParameterNode(ParameterNode* l, const Identifier& i) KJS_FAST_CALL : id(i) {
     l->next = this;
   }
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   Identifier ident() KJS_FAST_CALL { return id; }
   ParameterNode* nextParam() KJS_FAST_CALL { return next.get(); }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -2218,7 +2247,7 @@ class FuncDeclNode : public StatementNode {
   RefPtr<FunctionBodyNode> body;
 };
 
-class CaseClauseNode : public ExpressionNode {
+class CaseClauseNode : public Node {
  public:
   CaseClauseNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {
     m_mayHaveDeclarations = true;
@@ -2231,8 +2260,6 @@ class CaseClauseNode : public ExpressionNode {
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  Completion evalStatements(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   virtual Precedence precedence() const {
@@ -2240,12 +2267,15 @@ class CaseClauseNode : public ExpressionNode {
     return PrecExpression;
   }
 
+  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  Completion evalStatements(ExecState*) KJS_FAST_CALL;
+
  private:
   RefPtr<ExpressionNode> expr;
   OwnPtr<SourceElements> m_children;
 };
 
-class ClauseListNode : public ExpressionNode {
+class ClauseListNode : public Node {
  public:
   ClauseListNode(CaseClauseNode* c) KJS_FAST_CALL : clause(c) {
     m_mayHaveDeclarations = true;
@@ -2258,7 +2288,6 @@ class ClauseListNode : public ExpressionNode {
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   CaseClauseNode* getClause() const KJS_FAST_CALL { return clause.get(); }
   ClauseListNode* getNext() const KJS_FAST_CALL { return next.get(); }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -2277,7 +2306,7 @@ class ClauseListNode : public ExpressionNode {
   ListRefPtr<ClauseListNode> next;
 };
 
-class CaseBlockNode : public ExpressionNode {
+class CaseBlockNode : public Node {
  public:
   CaseBlockNode(ClauseListNode* l1,
                 CaseClauseNode* d,
@@ -2285,7 +2314,6 @@ class CaseBlockNode : public ExpressionNode {
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   Completion evalBlock(ExecState* exec, JSValue* input) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;

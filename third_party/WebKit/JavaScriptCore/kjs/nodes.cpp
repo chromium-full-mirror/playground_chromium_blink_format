@@ -208,6 +208,15 @@ double ExpressionNode::evaluateToNumber(ExecState* exec) {
   return value->toNumber(exec);
 }
 
+bool ExpressionNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* value = evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  return value->toBoolean(exec);
+}
+
 static void substitute(UString& string, const UString& substring) KJS_FAST_CALL;
 static void substitute(UString& string, const UString& substring) {
   int position = string.find("%s");
@@ -385,10 +394,16 @@ JSValue* NullNode::evaluate(ExecState*) {
   return jsNull();
 }
 
-// ------------------------------ BooleanNode ----------------------------------
+// ------------------------------ FalseNode ----------------------------------
 
-JSValue* BooleanNode::evaluate(ExecState*) {
-  return jsBoolean(value);
+JSValue* FalseNode::evaluate(ExecState*) {
+  return jsBoolean(false);
+}
+
+// ------------------------------ TrueNode ----------------------------------
+
+JSValue* TrueNode::evaluate(ExecState*) {
+  return jsBoolean(true);
 }
 
 // ------------------------------ NumberNode -----------------------------------
@@ -403,6 +418,13 @@ double NumberNode::evaluateToNumber(ExecState*) {
   return m_double;
 }
 
+bool NumberNode::evaluateToBoolean(ExecState*) {
+  return m_double < 0.0 || m_double > 0.0;  // false for NaN as well as 0
+}
+
+// ------------------------------ ImmediateNumberNode
+// -----------------------------------
+
 JSValue* ImmediateNumberNode::evaluate(ExecState*) {
   return m_value;
 }
@@ -415,6 +437,10 @@ JSValue* StringNode::evaluate(ExecState*) {
 
 double StringNode::evaluateToNumber(ExecState*) {
   return value.toDouble();
+}
+
+bool StringNode::evaluateToBoolean(ExecState*) {
+  return !value.isEmpty();
 }
 
 // ------------------------------ RegExpNode -----------------------------------
@@ -482,6 +508,10 @@ JSValue* LocalVarAccessNode::evaluate(ExecState* exec) {
 
 double LocalVarAccessNode::evaluateToNumber(ExecState* exec) {
   return inlineEvaluate(exec)->toNumber(exec);
+}
+
+bool LocalVarAccessNode::evaluateToBoolean(ExecState* exec) {
+  return inlineEvaluate(exec)->toBoolean(exec);
 }
 
 // ------------------------------ ElementNode ----------------------------------
@@ -642,6 +672,10 @@ double BracketAccessorNode::evaluateToNumber(ExecState* exec) {
   return inlineEvaluate(exec)->toNumber(exec);
 }
 
+bool BracketAccessorNode::evaluateToBoolean(ExecState* exec) {
+  return inlineEvaluate(exec)->toBoolean(exec);
+}
+
 // ------------------------------ DotAccessorNode
 // --------------------------------
 
@@ -669,11 +703,6 @@ void ArgumentListNode::optimizeVariableAccess(
   nodeStack.append(expr.get());
 }
 
-JSValue* ArgumentListNode::evaluate(ExecState*) {
-  ASSERT(0);
-  return 0;  // dummy, see evaluateList()
-}
-
 // ECMA 11.2.4
 void ArgumentListNode::evaluateList(ExecState* exec, List& list) {
   for (ArgumentListNode* n = this; n; n = n->next.get()) {
@@ -690,11 +719,6 @@ void ArgumentsNode::optimizeVariableAccess(
     DeclarationStacks::NodeStack& nodeStack) {
   if (listNode)
     nodeStack.append(listNode.get());
-}
-
-JSValue* ArgumentsNode::evaluate(ExecState*) {
-  ASSERT(0);
-  return 0;  // dummy, see evaluateList()
 }
 
 // ------------------------------ NewExprNode ----------------------------------
@@ -1719,9 +1743,11 @@ void LogicalNotNode::optimizeVariableAccess(
 
 // ECMA 11.4.9
 JSValue* LogicalNotNode::evaluate(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
-  KJS_CHECKEXCEPTIONVALUE
-  return jsBoolean(!v->toBoolean(exec));
+  return jsBoolean(!expr->evaluateToBoolean(exec));
+}
+
+bool LogicalNotNode::evaluateToBoolean(ExecState* exec) {
+  return !expr->evaluateToBoolean(exec);
 }
 
 // ------------------------------ Multiplicative Nodes
@@ -2011,28 +2037,28 @@ JSValue* UnsignedRightShiftNode::evaluate(ExecState* exec) {
 // ------------------------------ Relational Nodes
 // -------------------------------
 
-static inline JSValue* lessThan(ExecState* exec, JSValue* v1, JSValue* v2) {
+static inline bool lessThan(ExecState* exec, JSValue* v1, JSValue* v2) {
   double n1;
   double n2;
   bool wasNotString1 = v1->getPrimitiveNumber(exec, n1);
   bool wasNotString2 = v2->getPrimitiveNumber(exec, n2);
 
   if (wasNotString1 | wasNotString2)
-    return jsBoolean(n1 < n2);
+    return n1 < n2;
 
-  return jsBoolean(v1->toString(exec) < v2->toString(exec));
+  return v1->toString(exec) < v2->toString(exec);
 }
 
-static inline JSValue* lessThanEq(ExecState* exec, JSValue* v1, JSValue* v2) {
+static inline bool lessThanEq(ExecState* exec, JSValue* v1, JSValue* v2) {
   double n1;
   double n2;
   bool wasNotString1 = v1->getPrimitiveNumber(exec, n1);
   bool wasNotString2 = v2->getPrimitiveNumber(exec, n2);
 
   if (wasNotString1 | wasNotString2)
-    return jsBoolean(n1 <= n2);
+    return n1 <= n2;
 
-  return jsBoolean(!(v2->toString(exec) < v1->toString(exec)));
+  return !(v2->toString(exec) < v1->toString(exec));
 }
 
 void LessNode::optimizeVariableAccess(FunctionBodyNode*,
@@ -2047,6 +2073,20 @@ JSValue* LessNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
+  return jsBoolean(lessThan(exec, v1, v2));
+}
+
+bool LessNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
   return lessThan(exec, v1, v2);
 }
 
@@ -2063,6 +2103,20 @@ JSValue* GreaterNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
+  return jsBoolean(lessThan(exec, v2, v1));
+}
+
+bool GreaterNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
   return lessThan(exec, v2, v1);
 }
 
@@ -2079,6 +2133,20 @@ JSValue* LessEqNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
+  return jsBoolean(lessThanEq(exec, v1, v2));
+}
+
+bool LessEqNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
   return lessThanEq(exec, v1, v2);
 }
 
@@ -2095,6 +2163,20 @@ JSValue* GreaterEqNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
+  return jsBoolean(lessThanEq(exec, v2, v1));
+}
+
+bool GreaterEqNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
   return lessThanEq(exec, v2, v1);
 }
 
@@ -2118,17 +2200,54 @@ JSValue* InstanceOfNode::evaluate(ExecState* exec) {
                       "Cannot be used with instanceof operator.",
                       v2, expr2.get());
 
-  JSObject* o2(static_cast<JSObject*>(v2));
+  JSObject* o2 = static_cast<JSObject*>(v2);
+
+  // According to the spec, only some types of objects "implement" the
+  // [[HasInstance]] property.
+  // But we are supposed to throw an exception where the object does not "have"
+  // the [[HasInstance]]
+  // property. It seems that all objects have the property, but not all
+  // implement it, so in this
+  // case we return false (consistent with Mozilla).
   if (!o2->implementsHasInstance())
-    // According to the spec, only some types of objects "implement" the
-    // [[HasInstance]] property.
-    // But we are supposed to throw an exception where the object does not
-    // "have" the [[HasInstance]]
-    // property. It seems that all object have the property, but not all
-    // implement it, so in this
-    // case we return false (consistent with mozilla)
     return jsBoolean(false);
+
   return jsBoolean(o2->hasInstance(exec, v1));
+}
+
+bool InstanceOfNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+
+  if (!v2->isObject()) {
+    throwError(exec, TypeError,
+               "Value %s (result of expression %s) is not an object. Cannot be "
+               "used with 'instanceof' operator.",
+               v2, expr2.get());
+    return false;
+  }
+
+  JSObject* o2 = static_cast<JSObject*>(v2);
+
+  // According to the spec, only some types of objects "implement" the
+  // [[HasInstance]] property.
+  // But we are supposed to throw an exception where the object does not "have"
+  // the [[HasInstance]]
+  // property. It seems that all objects have the property, but not all
+  // implement it, so in this
+  // case we return false (consistent with Mozilla).
+  if (!o2->implementsHasInstance())
+    return false;
+
+  return o2->hasInstance(exec, v1);
 }
 
 void InNode::optimizeVariableAccess(FunctionBodyNode*,
@@ -2144,14 +2263,36 @@ JSValue* InNode::evaluate(ExecState* exec) {
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  // Is all of this OK for host objects?
   if (!v2->isObject())
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s) is not an object. "
-                      "Cannot be used with IN expression.",
+                      "Cannot be used with 'in' operator.",
                       v2, expr2.get());
-  JSObject* o2(static_cast<JSObject*>(v2));
-  return jsBoolean(o2->hasProperty(exec, Identifier(v1->toString(exec))));
+
+  return jsBoolean(static_cast<JSObject*>(v2)->hasProperty(
+      exec, Identifier(v1->toString(exec))));
+}
+
+bool InNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+
+  if (!v2->isObject())
+    return throwError(exec, TypeError,
+                      "Value %s (result of expression %s) is not an object. "
+                      "Cannot be used with 'in' operator.",
+                      v2, expr2.get());
+
+  return static_cast<JSObject*>(v2)->hasProperty(
+      exec, Identifier(v1->toString(exec)));
 }
 
 // ------------------------------ Equality Nodes
@@ -2174,6 +2315,21 @@ JSValue* EqualNode::evaluate(ExecState* exec) {
   return jsBoolean(equal(exec, v1, v2));
 }
 
+bool EqualNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+
+  return equal(exec, v1, v2);
+}
+
 void NotEqualNode::optimizeVariableAccess(
     FunctionBodyNode*,
     DeclarationStacks::NodeStack& nodeStack) {
@@ -2189,6 +2345,21 @@ JSValue* NotEqualNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
 
   return jsBoolean(!equal(exec, v1, v2));
+}
+
+bool NotEqualNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+
+  return !equal(exec, v1, v2);
 }
 
 void StrictEqualNode::optimizeVariableAccess(
@@ -2208,6 +2379,21 @@ JSValue* StrictEqualNode::evaluate(ExecState* exec) {
   return jsBoolean(strictEqual(exec, v1, v2));
 }
 
+bool StrictEqualNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+
+  return strictEqual(exec, v1, v2);
+}
+
 void NotStrictEqualNode::optimizeVariableAccess(
     FunctionBodyNode*,
     DeclarationStacks::NodeStack& nodeStack) {
@@ -2223,6 +2409,21 @@ JSValue* NotStrictEqualNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
 
   return jsBoolean(!strictEqual(exec, v1, v2));
+}
+
+bool NotStrictEqualNode::evaluateToBoolean(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  JSValue* v2 = expr2->evaluate(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+
+  return !strictEqual(exec, v1, v2);
 }
 
 // ------------------------------ Bit Operation Nodes
@@ -2292,13 +2493,21 @@ JSValue* LogicalAndNode::evaluate(ExecState* exec) {
   JSValue* v1 = expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   bool b1 = v1->toBoolean(exec);
+  KJS_CHECKEXCEPTIONVALUE
   if (!b1)
     return v1;
-
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-
   return v2;
+}
+
+bool LogicalAndNode::evaluateToBoolean(ExecState* exec) {
+  bool b = expr1->evaluateToBoolean(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  return b && expr2->evaluateToBoolean(exec);
 }
 
 void LogicalOrNode::optimizeVariableAccess(
@@ -2311,14 +2520,18 @@ void LogicalOrNode::optimizeVariableAccess(
 JSValue* LogicalOrNode::evaluate(ExecState* exec) {
   JSValue* v1 = expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  bool b1 = v1->toBoolean(exec);
-  if (b1)
+  if (v1->toBoolean(exec))
     return v1;
+  return expr2->evaluate(exec);
+}
 
-  JSValue* v2 = expr2->evaluate(exec);
-  KJS_CHECKEXCEPTIONVALUE
-
-  return v2;
+bool LogicalOrNode::evaluateToBoolean(ExecState* exec) {
+  bool b = expr1->evaluateToBoolean(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  return b || expr2->evaluateToBoolean(exec);
 }
 
 // ------------------------------ ConditionalNode ------------------------------
@@ -2333,17 +2546,18 @@ void ConditionalNode::optimizeVariableAccess(
 
 // ECMA 11.12
 JSValue* ConditionalNode::evaluate(ExecState* exec) {
-  JSValue* v = logical->evaluate(exec);
+  bool b = logical->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONVALUE
-  bool b = v->toBoolean(exec);
+  return b ? expr1->evaluate(exec) : expr2->evaluate(exec);
+}
 
-  if (b)
-    v = expr1->evaluate(exec);
-  else
-    v = expr2->evaluate(exec);
-  KJS_CHECKEXCEPTIONVALUE
-
-  return v;
+bool ConditionalNode::evaluateToBoolean(ExecState* exec) {
+  bool b = logical->evaluateToBoolean(exec);
+  if (exec->hadException()) {
+    handleException(exec);
+    return false;
+  }
+  return b ? expr1->evaluateToBoolean(exec) : expr2->evaluateToBoolean(exec);
 }
 
 // ECMA 11.13
@@ -2688,10 +2902,7 @@ void CommaNode::optimizeVariableAccess(
 JSValue* CommaNode::evaluate(ExecState* exec) {
   expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  JSValue* v = expr2->evaluate(exec);
-  KJS_CHECKEXCEPTIONVALUE
-
-  return v;
+  return expr2->evaluate(exec);
 }
 
 // ------------------------------ AssignExprNode -------------------------------
@@ -2973,9 +3184,8 @@ void IfNode::optimizeVariableAccess(FunctionBodyNode*,
 Completion IfNode::execute(ExecState* exec) {
   KJS_BREAKPOINT;
 
-  JSValue* v = expr->evaluate(exec);
+  bool b = expr->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTION
-  bool b = v->toBoolean(exec);
 
   // if ... then
   if (b)
@@ -3009,13 +3219,11 @@ void DoWhileNode::optimizeVariableAccess(
 Completion DoWhileNode::execute(ExecState* exec) {
   KJS_BREAKPOINT;
 
-  JSValue* bv;
-  Completion c;
   JSValue* value = 0;
 
-  do {
+  while (1) {
     exec->pushIteration();
-    c = statement->execute(exec);
+    Completion c = statement->execute(exec);
     exec->popIteration();
 
     if (exec->dynamicInterpreter()->timedOut())
@@ -3030,11 +3238,14 @@ Completion DoWhileNode::execute(ExecState* exec) {
       if (c.complType() != Normal)
         return c;
     }
-    bv = expr->evaluate(exec);
-    KJS_CHECKEXCEPTION
-  } while (bv->toBoolean(exec));
 
-  return Completion(Normal, value);
+    bool b = expr->evaluateToBoolean(exec);
+    KJS_CHECKEXCEPTION
+    if (!b)
+      return Completion(Normal, value);
+  }
+
+  return Completion();  // work around gcc 4.0 bug
 }
 
 void DoWhileNode::getDeclarations(DeclarationStacks& stacks) {
@@ -3055,21 +3266,16 @@ void WhileNode::optimizeVariableAccess(
 Completion WhileNode::execute(ExecState* exec) {
   KJS_BREAKPOINT;
 
-  JSValue* bv;
-  Completion c;
-  bool b(false);
   JSValue* value = 0;
 
   while (1) {
-    bv = expr->evaluate(exec);
+    bool b = expr->evaluateToBoolean(exec);
     KJS_CHECKEXCEPTION
-    b = bv->toBoolean(exec);
-
     if (!b)
       return Completion(Normal, value);
 
     exec->pushIteration();
-    c = statement->execute(exec);
+    Completion c = statement->execute(exec);
     exec->popIteration();
 
     if (exec->dynamicInterpreter()->timedOut())
@@ -3109,17 +3315,18 @@ void ForNode::optimizeVariableAccess(FunctionBodyNode*,
 
 // ECMA 12.6.3
 Completion ForNode::execute(ExecState* exec) {
-  JSValue *v, *cval = 0;
+  JSValue* cval = 0;
 
   if (expr1) {
-    v = expr1->evaluate(exec);
+    expr1->evaluate(exec);
     KJS_CHECKEXCEPTION
   }
+
   while (1) {
     if (expr2) {
-      v = expr2->evaluate(exec);
+      bool b = expr2->evaluateToBoolean(exec);
       KJS_CHECKEXCEPTION
-      if (!v->toBoolean(exec))
+      if (!b)
         return Completion(Normal, cval);
     }
 
@@ -3139,7 +3346,7 @@ Completion ForNode::execute(ExecState* exec) {
       return Completion(Interrupted);
 
     if (expr3) {
-      v = expr3->evaluate(exec);
+      expr3->evaluate(exec);
       KJS_CHECKEXCEPTION
     }
   }
@@ -3427,12 +3634,6 @@ void ClauseListNode::getDeclarations(DeclarationStacks& stacks) {
     stacks.nodeStack.append(clause.get());
 }
 
-JSValue* ClauseListNode::evaluate(ExecState*) {
-  // should never be called
-  ASSERT(false);
-  return 0;
-}
-
 // ------------------------------ CaseBlockNode --------------------------------
 
 CaseBlockNode::CaseBlockNode(ClauseListNode* l1,
@@ -3460,12 +3661,6 @@ void CaseBlockNode::getDeclarations(DeclarationStacks& stacks) {
     stacks.nodeStack.append(def.get());
   if (list1 && list1->mayHaveDeclarations())
     stacks.nodeStack.append(list1.get());
-}
-
-JSValue* CaseBlockNode::evaluate(ExecState*) {
-  // should never be called
-  ASSERT(false);
-  return 0;
 }
 
 // ECMA 12.11
@@ -3650,13 +3845,6 @@ Completion TryNode::execute(ExecState* exec) {
   }
 
   return c;
-}
-
-// ------------------------------ ParameterNode --------------------------------
-
-// ECMA 13
-JSValue* ParameterNode::evaluate(ExecState*) {
-  return jsUndefined();
 }
 
 // ------------------------------ FunctionBodyNode -----------------------------
