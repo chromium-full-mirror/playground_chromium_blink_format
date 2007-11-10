@@ -112,7 +112,7 @@ const unsigned char cRangeTertiaryTable = 145;  // leave room for 16 subtable
 // indices (cRangeTableBase + 1 ..
 // cRangeTableBase + 16)
 
-unsigned int unicodeRangeForCharacter(UChar32 ch);
+unsigned int findCharUnicodeRange(UChar32 ch);
 const char* langGroupFromUnicodeRange(unsigned char unicodeRange);
 }
 
