@@ -126,6 +126,10 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
     SetTextDirectionLeftToRight,
     SetTextDirectionRightToLeft,
 
+    ToggleBold,
+    ToggleItalic,
+    ToggleUnderline,
+
     WebActionCount
   };
 
