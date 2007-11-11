@@ -183,6 +183,7 @@ struct SVGCharOnPath : Shared<SVGCharOnPath> {
         yScale(1.0f),
         xShift(0.0f),
         yShift(0.0f),
+        orientationAngle(0.0f),
         visible(true) {}
 
   float xScale;
@@ -190,6 +191,8 @@ struct SVGCharOnPath : Shared<SVGCharOnPath> {
 
   float xShift;
   float yShift;
+
+  float orientationAngle;
 
   // Determines wheter this char is visible (ie. false for chars "off" the text
   // layout path)
@@ -201,6 +204,8 @@ struct SVGChar {
       : x(0.0f),
         y(0.0f),
         angle(0.0f),
+        orientationShiftX(0.0f),
+        orientationShiftY(0.0f),
         pathData(),
         drawnSeperated(false),
         newTextChunk(false) {}
@@ -210,6 +215,9 @@ struct SVGChar {
   float x;
   float y;
   float angle;
+
+  float orientationShiftX;
+  float orientationShiftY;
 
   RefPtr<SVGCharOnPath> pathData;
 
