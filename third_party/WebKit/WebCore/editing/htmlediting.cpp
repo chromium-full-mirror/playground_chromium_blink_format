@@ -61,8 +61,6 @@ bool editingIgnoresContent(const Node* node) {
   return !canHaveChildrenForEditing(node) && !node->isTextNode();
 }
 
-// Some nodes, like brs, will technically accept children, but we don't want
-// that to happen while editing.
 bool canHaveChildrenForEditing(const Node* node) {
   return !node->hasTagName(hrTag) && !node->hasTagName(brTag) &&
          !node->hasTagName(imgTag) && !node->hasTagName(buttonTag) &&
@@ -304,14 +302,13 @@ Position rangeCompliantEquivalent(const Position& pos) {
 
   if (pos.offset() <= 0) {
     if (node->parentNode() &&
-            (node->hasTagName(brTag) || editingIgnoresContent(node)) ||
-        isTableElement(node))
+        (editingIgnoresContent(node) || isTableElement(node)))
       return positionBeforeNode(node);
     return Position(node, 0);
   }
 
   if (node->offsetInCharacters())
-    return Position(node, min(node->maxOffset(), pos.offset()));
+    return Position(node, min(node->maxCharacterOffset(), pos.offset()));
 
   int maxCompliantOffset = node->childNodeCount();
   if (pos.offset() > maxCompliantOffset) {
@@ -353,13 +350,13 @@ int maxDeepOffset(const Node* node) {
   if (!node)
     return 0;
   if (node->offsetInCharacters())
-    return node->maxOffset();
+    return node->maxCharacterOffset();
 
   if (node->hasChildNodes())
     return node->childNodeCount();
 
   // NOTE: This should preempt the childNodeCount for, e.g., select nodes
-  if (node->hasTagName(brTag) || editingIgnoresContent(node))
+  if (editingIgnoresContent(node))
     return 1;
 
   return 0;
@@ -851,6 +848,29 @@ bool isMailBlockquote(const Node* node) {
     return false;
 
   return static_cast<const Element*>(node)->getAttribute("type") == "cite";
+}
+
+int caretMinOffset(const Node* n) {
+  RenderObject* r = n->renderer();
+  ASSERT(!n->isCharacterDataNode() || !r ||
+         r->isText());  // FIXME: This was a runtime check that seemingly
+                        // couldn't fail; changed it to an assertion for now.
+  return r ? r->caretMinOffset() : 0;
+}
+
+int caretMaxOffset(const Node* n) {
+  RenderObject* r = n->renderer();
+  ASSERT(!n->isCharacterDataNode() || !r ||
+         r->isText());  // FIXME: This was a runtime check that seemingly
+                        // couldn't fail; changed it to an assertion for now.
+  if (r)
+    return r->caretMaxOffset();
+
+  if (n->isCharacterDataNode()) {
+    const CharacterData* c = static_cast<const CharacterData*>(n);
+    return static_cast<int>(c->length());
+  }
+  return 1;
 }
 
 bool lineBreakExistsAtPosition(const VisiblePosition& visiblePosition) {

@@ -3361,7 +3361,14 @@ Position RenderBlock::positionForRenderer(RenderObject* renderer,
   if (!node)
     return Position();
 
-  int offset = start ? node->caretMinOffset() : node->caretMaxOffset();
+  ASSERT(renderer == node->renderer());
+
+  int offset = start ? renderer->caretMinOffset() : renderer->caretMaxOffset();
+
+  // FIXME: This was a runtime check that seemingly couldn't fail; changed it to
+  // an assertion for now.
+  ASSERT(!node->isCharacterDataNode() || renderer->isText());
+
   return Position(node, offset);
 }
 

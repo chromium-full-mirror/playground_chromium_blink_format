@@ -51,6 +51,7 @@ class ProcessingInstruction : public ContainerNode,
   virtual PassRefPtr<Node> cloneNode(bool deep);
   virtual bool childTypeAllowed(NodeType);
   virtual bool offsetInCharacters() const;
+  virtual int maxCharacterOffset() const;
 
   // Other methods (not part of DOM)
   String localHref() const { return m_localHref; }

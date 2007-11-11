@@ -1371,7 +1371,7 @@ void Range::selectNodeContents(Node* refNode, ExceptionCode& ec) {
   m_startContainer = refNode;
   m_startOffset = 0;
   m_endContainer = refNode;
-  m_endOffset = refNode->offsetInCharacters() ? refNode->maxOffset()
+  m_endOffset = refNode->offsetInCharacters() ? refNode->maxCharacterOffset()
                                               : refNode->childNodeCount();
 }
 

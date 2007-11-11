@@ -30,6 +30,9 @@
 
 namespace WebCore {
 
+// A Position iterator with constant-time
+// increment, decrement, and several predicates on the Position it is at.
+// Conversion to/from Position is O(n) in the offset.
 class PositionIterator {
  public:
   PositionIterator() : m_parent(0), m_child(0), m_offset(0) {}

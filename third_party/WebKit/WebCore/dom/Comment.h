@@ -44,7 +44,6 @@ class Comment : public CharacterData {
   // Other methods (not part of DOM)
   virtual bool isCommentNode() const { return true; }
   virtual bool childTypeAllowed(NodeType);
-  virtual bool offsetInCharacters() const;
 
   virtual String toString() const;
 };

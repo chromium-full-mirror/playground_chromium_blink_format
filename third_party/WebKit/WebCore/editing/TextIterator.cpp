@@ -740,8 +740,8 @@ SimplifiedBackwardsTextIterator::SimplifiedBackwardsTextIterator(
     if (endOffset > 0 &&
         endOffset <= static_cast<int>(endNode->childNodeCount())) {
       endNode = endNode->childNode(endOffset - 1);
-      endOffset = endNode->hasChildNodes() ? endNode->childNodeCount()
-                                           : endNode->maxOffset();
+      endOffset = endNode->offsetInCharacters() ? endNode->maxCharacterOffset()
+                                                : endNode->childNodeCount();
     }
   }
 
@@ -830,7 +830,7 @@ void SimplifiedBackwardsTextIterator::advance() {
     }
 
     m_node = next;
-    m_offset = m_node ? m_node->caretMaxOffset() : 0;
+    m_offset = m_node ? caretMaxOffset(m_node) : 0;
     m_handledNode = false;
     m_handledChildren = false;
 

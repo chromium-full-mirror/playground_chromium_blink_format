@@ -389,8 +389,6 @@ class Document : public ContainerNode {
   // to get visually ordered hebrew and arabic pages right
   void setVisuallyOrdered();
 
-  void updateSelection();
-
   void open();
   void implicitOpen();
   void close();
