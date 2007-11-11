@@ -340,10 +340,6 @@ inline bool isLower(UChar32 c) {
   return QChar::category(c) == QChar::Letter_Lowercase;
 }
 
-inline bool isUpper(UChar32 c) {
-  return QChar::category(c) == QChar::Letter_Uppercase;
-}
-
 inline int digitValue(UChar32 c) {
   return QChar::digitValue(c);
 }
@@ -468,11 +464,6 @@ inline bool isDigit(UChar32 c) {
 inline bool isLower(UChar32 c) {
   return (c & 0xffff0000) == 0 &&
          QChar((unsigned short)c).category() == QChar::Letter_Lowercase;
-}
-
-inline bool isUpper(UChar32 c) {
-  return (c & 0xffff0000) == 0 &&
-         QChar((unsigned short)c).category() == QChar::Letter_Uppercase;
 }
 
 inline int digitValue(UChar32 c) {

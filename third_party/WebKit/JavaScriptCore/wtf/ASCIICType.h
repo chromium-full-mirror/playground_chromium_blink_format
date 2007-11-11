@@ -70,16 +70,19 @@ inline bool isASCIIAlphanumeric(wchar_t c) {
 #endif
 
 inline bool isASCIIDigit(char c) {
-  return c >= '0' && c <= '9';
+  return (c >= '0') & (c <= '9');
 }
 inline bool isASCIIDigit(unsigned short c) {
-  return c >= '0' && c <= '9';
+  return (c >= '0') & (c <= '9');
 }
 #if !COMPILER(MSVC) || defined(_NATIVE_WCHAR_T_DEFINED)
 inline bool isASCIIDigit(wchar_t c) {
-  return c >= '0' && c <= '9';
+  return (c >= '0') & (c <= '9');
 }
 #endif
+inline bool isASCIIDigit(int c) {
+  return (c >= '0') & (c <= '9');
+}
 
 inline bool isASCIIHexDigit(char c) {
   return c >= '0' && c <= '9' || (c | 0x20) >= 'a' && (c | 0x20) <= 'f';

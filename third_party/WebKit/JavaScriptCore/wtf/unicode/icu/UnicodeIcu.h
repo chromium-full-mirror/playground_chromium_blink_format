@@ -206,10 +206,6 @@ inline bool isLower(UChar32 c) {
   return !!u_islower(c);
 }
 
-inline bool isUpper(UChar32 c) {
-  return !!u_isUUppercase(c);
-}
-
 inline int digitValue(UChar32 c) {
   return u_charDigitValue(c);
 }

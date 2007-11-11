@@ -1,12 +1,12 @@
-/*************************************************
-*      Perl-Compatible Regular Expressions       *
-*************************************************/
+/* This is JavaScriptCore's variant of the PCRE library. While this library
+started out as a copy of PCRE, many of the features of PCRE have been
+removed. This library now supports only the regular expression features
+required by the JavaScript language specification, and has only the functions
+needed by JavaScriptCore and the rest of WebKit.
 
-/* PCRE is a library of functions to support regular expressions whose syntax
-and semantics are as close as possible to those of the Perl 5 language.
-
-                       Written by Philip Hazel
+                 Originally written by Philip Hazel
            Copyright (c) 1997-2006 University of Cambridge
+    Copyright (C) 2002, 2004, 2006, 2007 Apple Inc. All rights reserved.
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-
 /*************************************************
 *           Create PCRE character tables         *
 *************************************************/
@@ -52,63 +51,63 @@ Arguments:   none
 Returns:     pointer to the contiguous block of data
 */
 
-static const unsigned char *
-pcre_maketables(void)
-{
-unsigned char *yield, *p;
-int i;
+static const unsigned char* pcre_maketables(void) {
+  unsigned char *yield, *p;
+  int i;
 
-#ifndef DFTABLES
-yield = (unsigned char*)(pcre_malloc)(tables_length);
-#else
-yield = (unsigned char*)malloc(tables_length);
-#endif
+  yield = (unsigned char*)malloc(tables_length);
 
-if (yield == NULL) return NULL;
-p = yield;
+  if (yield == NULL)
+    return NULL;
+  p = yield;
 
-/* First comes the lower casing table */
+  /* First comes the lower casing table */
 
-for (i = 0; i < 256; i++) *p++ = tolower(i);
+  for (i = 0; i < 256; i++)
+    *p++ = tolower(i);
 
-/* Next the case-flipping table */
+  /* Next the case-flipping table */
 
-for (i = 0; i < 256; i++) *p++ = islower(i)? toupper(i) : tolower(i);
+  for (i = 0; i < 256; i++)
+    *p++ = islower(i) ? toupper(i) : tolower(i);
 
-/* Then the character class tables. Don't try to be clever and save effort on
-exclusive ones - in some locales things may be different. Note that the table
-for "space" includes everything "isspace" gives, including VT in the default
-locale. This makes it work for the POSIX class [:space:]. Note also that it is
-possible for a character to be alnum or alpha without being lower or upper,
-such as "male and female ordinals" (\xAA and \xBA) in the fr_FR locale (at
-least under Debian Linux's locales as of 12/2005). So we must test for alnum
-specially. */
+  /* Then the character class tables. Don't try to be clever and save effort on
+  exclusive ones - in some locales things may be different. Note that the table
+  for "space" includes everything "isspace" gives, including VT in the default
+  locale. This makes it work for the POSIX class [:space:]. Note also that it is
+  possible for a character to be alnum or alpha without being lower or upper,
+  such as "male and female ordinals" (\xAA and \xBA) in the fr_FR locale (at
+  least under Debian Linux's locales as of 12/2005). So we must test for alnum
+  specially. */
 
-memset(p, 0, cbit_length);
-for (i = 0; i < 128; i++)
-  {
-  if (isdigit(i)) p[cbit_digit  + i/8] |= 1 << (i&7);
-  if (isalnum(i)) p[cbit_word   + i/8] |= 1 << (i&7);
-  if (i == '_')   p[cbit_word   + i/8] |= 1 << (i&7);
-  if (isspace(i)) p[cbit_space  + i/8] |= 1 << (i&7);
+  memset(p, 0, cbit_length);
+  for (i = '0'; i <= '9'; i++)
+    p[cbit_digit + i / 8] |= 1 << (i & 7);
+  p[cbit_word + '_' / 8] |= 1 << ('_' & 7);
+  for (i = 0; i < 128; i++) {
+    if (isalnum(i))
+      p[cbit_word + i / 8] |= 1 << (i & 7);
+    if (isspace(i))
+      p[cbit_space + i / 8] |= 1 << (i & 7);
   }
-p += cbit_length;
+  p += cbit_length;
 
-/* Finally, the character type table. In this, we exclude VT from the white
-space chars, because Perl doesn't recognize it as such for \s and for comments
-within regexes. */
+  /* Finally, the character type table. In this, we exclude VT from the white
+  space chars, because Perl doesn't recognize it as such for \s and for comments
+  within regexes. */
 
-for (i = 0; i < 128; i++)
-  {
-  int x = 0;
-  if (isspace(i)) x += ctype_space;
-  if (isdigit(i)) x += ctype_digit;
-  if (isxdigit(i)) x += ctype_xdigit;
-  if (isalnum(i) || i == '_') x += ctype_word;
-  *p++ = x;
+  for (i = 0; i < 128; i++) {
+    int x = 0;
+    if (isspace(i))
+      x += ctype_space;
+    if (isxdigit(i))
+      x += ctype_xdigit;
+    if (isalnum(i) || i == '_')
+      x += ctype_word;
+    *p++ = x;
   }
 
-return yield;
+  return yield;
 }
 
 /* End of pcre_maketables.c */

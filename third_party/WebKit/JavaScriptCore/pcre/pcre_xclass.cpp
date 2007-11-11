@@ -1,12 +1,12 @@
-/*************************************************
-*      Perl-Compatible Regular Expressions       *
-*************************************************/
+/* This is JavaScriptCore's variant of the PCRE library. While this library
+started out as a copy of PCRE, many of the features of PCRE have been
+removed. This library now supports only the regular expression features
+required by the JavaScript language specification, and has only the functions
+needed by JavaScriptCore and the rest of WebKit.
 
-/* PCRE is a library of functions to support regular expressions whose syntax
-and semantics are as close as possible to those of the Perl 5 language.
-
-                       Written by Philip Hazel
+                 Originally written by Philip Hazel
            Copyright (c) 1997-2006 University of Cambridge
+    Copyright (C) 2002, 2004, 2006, 2007 Apple Inc. All rights reserved.
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -37,14 +37,10 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-
 /* This module contains an internal function that is used to match an extended
-class (one that contains characters whose values are > 255). It is used by both
-pcre_exec() and pcre_def_exec(). */
-
+class (one that contains characters whose values are > 255). */
 
 #include "pcre_internal.h"
-
 
 /*************************************************
 *       Match character against an XCLASS        *
@@ -60,45 +56,40 @@ Arguments:
 Returns:      TRUE if character matches, else FALSE
 */
 
-BOOL
-_pcre_xclass(int c, const uschar *data)
-{
-int t;
-BOOL negated = (*data & XCL_NOT) != 0;
+BOOL _pcre_xclass(int c, const uschar* data) {
+  int t;
+  BOOL negated = (*data & XCL_NOT) != 0;
 
-/* Character values < 256 are matched against a bitmap, if one is present. If
-not, we still carry on, because there may be ranges that start below 256 in the
-additional data. */
+  /* Character values < 256 are matched against a bitmap, if one is present. If
+  not, we still carry on, because there may be ranges that start below 256 in
+  the
+  additional data. */
 
-if (c < 256)
-  {
-  if ((*data & XCL_MAP) != 0 && (data[1 + c/8] & (1 << (c&7))) != 0)
-    return !negated;   /* char found */
+  if (c < 256) {
+    if ((*data & XCL_MAP) != 0 && (data[1 + c / 8] & (1 << (c & 7))) != 0)
+      return !negated; /* char found */
   }
 
-/* First skip the bit map if present. Then match against the list of Unicode
-properties or large chars or ranges that end with a large char. We won't ever
-encounter XCL_PROP or XCL_NOTPROP when UCP support is not compiled. */
+  /* First skip the bit map if present. Then match against the list of Unicode
+  properties or large chars or ranges that end with a large char. We won't ever
+  encounter XCL_PROP or XCL_NOTPROP when UCP support is not compiled. */
 
-if ((*data++ & XCL_MAP) != 0) data += 32;
+  if ((*data++ & XCL_MAP) != 0)
+    data += 32;
 
-while ((t = *data++) != XCL_END)
-  {
-  int x, y;
-  if (t == XCL_SINGLE)
-    {
-    GETUTF8CHARINC(x, data);
-    if (c == x) return !negated;
-    }
-  else if (t == XCL_RANGE)
-    {
-    GETUTF8CHARINC(x, data);
-    GETUTF8CHARINC(y, data);
-    if (c >= x && c <= y) return !negated;
+  while ((t = *data++) != XCL_END) {
+    int x, y;
+    if (t == XCL_SINGLE) {
+      GETUTF8CHARINC(x, data);
+      if (c == x)
+        return !negated;
+    } else if (t == XCL_RANGE) {
+      GETUTF8CHARINC(x, data);
+      GETUTF8CHARINC(y, data);
+      if (c >= x && c <= y)
+        return !negated;
     }
   }
 
-return negated;   /* char did not match */
+  return negated; /* char did not match */
 }
-
-/* End of pcre_xclass.c */

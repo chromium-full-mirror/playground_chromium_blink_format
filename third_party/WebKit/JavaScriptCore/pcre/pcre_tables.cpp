@@ -1,12 +1,12 @@
-/*************************************************
-*      Perl-Compatible Regular Expressions       *
-*************************************************/
+/* This is JavaScriptCore's variant of the PCRE library. While this library
+started out as a copy of PCRE, many of the features of PCRE have been
+removed. This library now supports only the regular expression features
+required by the JavaScript language specification, and has only the functions
+needed by JavaScriptCore and the rest of WebKit.
 
-/* PCRE is a library of functions to support regular expressions whose syntax
-and semantics are as close as possible to those of the Perl 5 language.
-
-                       Written by Philip Hazel
+                 Originally written by Philip Hazel
            Copyright (c) 1997-2006 University of Cambridge
+    Copyright (C) 2002, 2004, 2006, 2007 Apple Inc. All rights reserved.
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -37,42 +37,36 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-
-/* This file contains a private PCRE function that converts an ordinal
-character value into a UTF8 string. */
-
+/* This module contains some fixed tables that are used by more than one of the
+PCRE code modules. */
 
 #include "pcre_internal.h"
 
-
 /*************************************************
-*       Convert character value to UTF-8         *
+*           Tables for UTF-8 support             *
 *************************************************/
 
-/* This function takes an integer value in the range 0 - 0x7fffffff
-and encodes it as a UTF-8 character in 0 to 6 bytes.
+/* These are the breakpoints for different numbers of bytes in a UTF-8
+character. */
 
-Arguments:
-  cvalue     the character value
-  buffer     pointer to buffer for result - at least 6 bytes long
+const int _pcre_utf8_table1[] = {0x7f,     0x7ff,     0xffff,
+                                 0x1fffff, 0x3ffffff, 0x7fffffff};
 
-Returns:     number of characters placed in the buffer
-*/
+const int _pcre_utf8_table1_size = sizeof(_pcre_utf8_table1) / sizeof(int);
 
-int
-_pcre_ord2utf8(int cvalue, uschar *buffer)
-{
-register int i, j;
-for (i = 0; i < _pcre_utf8_table1_size; i++)
-  if (cvalue <= _pcre_utf8_table1[i]) break;
-buffer += i;
-for (j = i; j > 0; j--)
- {
- *buffer-- = 0x80 | (cvalue & 0x3f);
- cvalue >>= 6;
- }
-*buffer = _pcre_utf8_table2[i] | cvalue;
-return i + 1;
-}
+/* These are the indicator bits and the mask for the data bits to set in the
+first byte of a character, indexed by the number of additional bytes. */
 
-/* End of pcre_ord2utf8.c */
+const int _pcre_utf8_table2[] = {0, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
+const int _pcre_utf8_table3[] = {0xff, 0x1f, 0x0f, 0x07, 0x03, 0x01};
+
+/* Table of the number of extra characters, indexed by the first character
+masked with 0x3f. The highest number for a valid UTF-8 character is in fact
+0x3d. */
+
+const uschar _pcre_utf8_table4[] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+
+#include "chartables.c"

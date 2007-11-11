@@ -37,12 +37,10 @@ RegExp::RegExp(const UString& pattern)
       m_flags(0),
       m_constructionError(0),
       m_numSubpatterns(0) {
-  const char* errorMessage;
-  m_regExp =
-      jsRegExpCompile(reinterpret_cast<const JSRegExpChar*>(m_pattern.data()),
-                      m_pattern.size(), 0, &m_numSubpatterns, &errorMessage);
-  if (!m_regExp)
-    m_constructionError = strdup(errorMessage);
+  m_regExp = jsRegExpCompile(reinterpret_cast<const ::UChar*>(m_pattern.data()),
+                             m_pattern.size(), JSRegExpDoNotIgnoreCase,
+                             JSRegExpSingleLine, &m_numSubpatterns,
+                             &m_constructionError);
 }
 
 RegExp::RegExp(const UString& pattern, const UString& flags)
@@ -57,29 +55,27 @@ RegExp::RegExp(const UString& pattern, const UString& flags)
     m_flags |= Global;
 
   // FIXME: Eliminate duplication by adding a way ask a JSRegExp what its flags
-  // are.
-  int options = 0;
+  // are?
+  JSRegExpIgnoreCaseOption ignoreCaseOption = JSRegExpDoNotIgnoreCase;
   if (flags.find('i') != -1) {
     m_flags |= IgnoreCase;
-    options |= JS_REGEXP_CASELESS;
+    ignoreCaseOption = JSRegExpIgnoreCase;
   }
 
+  JSRegExpMultilineOption multilineOption = JSRegExpSingleLine;
   if (flags.find('m') != -1) {
     m_flags |= Multiline;
-    options |= JS_REGEXP_MULTILINE;
+    multilineOption = JSRegExpMultiline;
   }
 
-  const char* errorMessage;
-  m_regExp = jsRegExpCompile(
-      reinterpret_cast<const JSRegExpChar*>(m_pattern.data()), m_pattern.size(),
-      options, &m_numSubpatterns, &errorMessage);
-  if (!m_regExp)
-    m_constructionError = strdup(errorMessage);
+  m_regExp =
+      jsRegExpCompile(reinterpret_cast<const ::UChar*>(m_pattern.data()),
+                      m_pattern.size(), ignoreCaseOption, multilineOption,
+                      &m_numSubpatterns, &m_constructionError);
 }
 
 RegExp::~RegExp() {
   jsRegExpFree(m_regExp);
-  free(m_constructionError);
 }
 
 int RegExp::match(const UString& s, int i, OwnArrayPtr<int>* ovector) {
@@ -109,12 +105,12 @@ int RegExp::match(const UString& s, int i, OwnArrayPtr<int>* ovector) {
   }
 
   int numMatches =
-      jsRegExpExecute(m_regExp, reinterpret_cast<const JSRegExpChar*>(s.data()),
+      jsRegExpExecute(m_regExp, reinterpret_cast<const ::UChar*>(s.data()),
                       s.size(), i, offsetVector, offsetVectorSize);
 
   if (numMatches < 0) {
 #ifndef NDEBUG
-    if (numMatches != JS_REGEXP_ERROR_NOMATCH)
+    if (numMatches != JSRegExpErrorNoMatch)
       fprintf(stderr, "KJS: pcre_exec() failed with result %d\n", numMatches);
 #endif
     if (ovector)
