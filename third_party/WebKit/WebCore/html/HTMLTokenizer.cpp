@@ -243,7 +243,7 @@ void HTMLTokenizer::begin() {
   noMoreData = false;
   brokenComments = false;
   brokenServer = false;
-  lineno = 0;
+  m_lineNumber = 0;
   scriptStartLineno = 0;
   tagStartLineno = 0;
   m_state.setForceSynchronous(false);
@@ -261,7 +261,7 @@ HTMLTokenizer::State HTMLTokenizer::processListing(SegmentedString list,
     if (state.skipLF()) {
       state.setSkipLF(false);
       if (*list == '\n') {
-        list.advance(0);
+        list.advance();
         continue;
       }
     }
@@ -279,11 +279,11 @@ HTMLTokenizer::State HTMLTokenizer::processListing(SegmentedString list,
       if (*list == '\r')
         state.setSkipLF(true);
 
-      list.advance(0);
+      list.advance();
     } else {
       state.setDiscardLF(false);
       *dest++ = *list;
-      list.advance(0);
+      list.advance();
     }
   }
 
@@ -298,7 +298,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
              state.inStyle() + state.inScript() ==
          1);
   if (state.inScript())
-    scriptStartLineno = lineno;
+    scriptStartLineno = m_lineNumber;
 
   if (state.inComment())
     state = parseComment(src, state);
@@ -317,7 +317,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
       continue;
     }
     if (scriptCodeResync && !tquote && ch == '>') {
-      src.advance(lineNumberPtr());
+      src.advance(m_lineNumber);
       scriptCodeSize = scriptCodeResync - 1;
       scriptCodeResync = 0;
       scriptCode[scriptCodeSize] = scriptCode[scriptCodeSize + 1] = 0;
@@ -377,13 +377,13 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
     if (!scriptCodeResync && (state.inTextArea() || state.inTitle()) &&
         !src.escaped() && ch == '&') {
       UChar* scriptCodeDest = scriptCode + scriptCodeSize;
-      src.advance(lineNumberPtr());
+      src.advance(m_lineNumber);
       state =
           parseEntity(src, scriptCodeDest, state, m_cBufferPos, true, false);
       scriptCodeSize = scriptCodeDest - scriptCode;
     } else {
       scriptCode[scriptCodeSize++] = *src;
-      src.advance(lineNumberPtr());
+      src.advance(m_lineNumber);
     }
   }
 
@@ -608,7 +608,7 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
         endCharsCount = 4;
       }
       if (handleBrokenComments || endCharsCount > 1) {
-        src.advance(lineNumberPtr());
+        src.advance(m_lineNumber);
         if (!(state.inTitle() || state.inScript() || state.inXmp() ||
               state.inTextArea() || state.inStyle())) {
           checkScriptBuffer();
@@ -629,7 +629,7 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
         return state;  // Finished parsing comment
       }
     }
-    src.advance(lineNumberPtr());
+    src.advance(m_lineNumber);
   }
 
   return state;
@@ -642,12 +642,12 @@ HTMLTokenizer::State HTMLTokenizer::parseServer(SegmentedString& src,
     scriptCode[scriptCodeSize++] = *src;
     if (*src == '>' && scriptCodeSize > 1 &&
         scriptCode[scriptCodeSize - 2] == '%') {
-      src.advance(lineNumberPtr());
+      src.advance(m_lineNumber);
       state.setInServer(false);
       scriptCodeSize = 0;
       return state;  // Finished parsing server include
     }
-    src.advance(lineNumberPtr());
+    src.advance(m_lineNumber);
   }
   return state;
 }
@@ -668,11 +668,11 @@ HTMLTokenizer::State HTMLTokenizer::parseProcessingInstruction(
     else if (chbegin == '>' && (!tquote || oldchar == '?')) {
       // We got a '?>' sequence
       state.setInProcessingInstruction(false);
-      src.advance(lineNumberPtr());
+      src.advance(m_lineNumber);
       state.setDiscardLF(true);
       return state;  // Finished parsing comment!
     }
-    src.advance(lineNumberPtr());
+    src.advance(m_lineNumber);
     oldchar = chbegin;
   }
 
@@ -687,7 +687,7 @@ HTMLTokenizer::State HTMLTokenizer::parseText(SegmentedString& src,
     if (state.skipLF()) {
       state.setSkipLF(false);
       if (cc == '\n') {
-        src.advance(lineNumberPtr());
+        src.advance(m_lineNumber);
         continue;
       }
     }
@@ -700,7 +700,7 @@ HTMLTokenizer::State HTMLTokenizer::parseText(SegmentedString& src,
       *dest++ = '\n';
     } else
       *dest++ = cc;
-    src.advance(lineNumberPtr());
+    src.advance(m_lineNumber);
   }
 
   return state;
@@ -728,7 +728,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
       case SearchEntity:
         if (cc == '#') {
           cBuffer[cBufferPos++] = cc;
-          src.advance(lineNumberPtr());
+          src.advance(m_lineNumber);
           state.setEntityState(NumericSearch);
         } else
           state.setEntityState(EntityName);
@@ -738,7 +738,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
       case NumericSearch:
         if (cc == 'x' || cc == 'X') {
           cBuffer[cBufferPos++] = cc;
-          src.advance(lineNumberPtr());
+          src.advance(m_lineNumber);
           state.setEntityState(Hexadecimal);
         } else if (cc >= '0' && cc <= '9')
           state.setEntityState(Decimal);
@@ -763,7 +763,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
                     0xF;  // handle both upper and lower case without a branch
           EntityUnicodeValue = EntityUnicodeValue * 16 + digit;
           cBuffer[cBufferPos++] = cc;
-          src.advance(lineNumberPtr());
+          src.advance(m_lineNumber);
         }
         if (cBufferPos == 10)
           state.setEntityState(SearchSemicolon);
@@ -781,7 +781,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
 
           EntityUnicodeValue = EntityUnicodeValue * 10 + (cc - '0');
           cBuffer[cBufferPos++] = cc;
-          src.advance(lineNumberPtr());
+          src.advance(m_lineNumber);
         }
         if (cBufferPos == 9)
           state.setEntityState(SearchSemicolon);
@@ -799,7 +799,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
           }
 
           cBuffer[cBufferPos++] = cc;
-          src.advance(lineNumberPtr());
+          src.advance(m_lineNumber);
         }
         if (cBufferPos == 9)
           state.setEntityState(SearchSemicolon);
@@ -821,7 +821,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
         if (EntityUnicodeValue > 0 && EntityUnicodeValue <= 0x10FFFF) {
           if (!inViewSourceMode()) {
             if (*src == ';')
-              src.advance(lineNumberPtr());
+              src.advance(m_lineNumber);
             if (EntityUnicodeValue <= 0xFFFF) {
               checkBuffer();
               src.push(fixUpChar(EntityUnicodeValue));
@@ -841,7 +841,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
             dest += cBufferPos;
             if (*src == ';') {
               *dest++ = ';';
-              src.advance(lineNumberPtr());
+              src.advance(m_lineNumber);
             }
           }
         } else {
@@ -867,7 +867,6 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
 
   unsigned cBufferPos = m_cBufferPos;
 
-  int* lineNoPtr = lineNumberPtr();
   bool lastIsSlash = false;
 
   while (!src.isEmpty()) {
@@ -889,7 +888,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               kdDebug(6036) << "Found comment" << endl;
 #endif
               // Found '<!--' sequence
-              src.advance(lineNoPtr);
+              src.advance(m_lineNumber);
               dest = buffer;  // ignore the previous part of this tag
               state.setInComment(true);
               state.setTagState(NoTag);
@@ -899,7 +898,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               // can handle this case.  Only do this in quirks mode. -dwh
               if (!src.isEmpty() && *src == '>' && m_doc->inCompatMode()) {
                 state.setInComment(false);
-                src.advance(lineNoPtr);
+                src.advance(m_lineNumber);
                 if (!src.isEmpty())
                   // cuts off high bits, which is okay
                   cBuffer[cBufferPos++] = *src;
@@ -911,7 +910,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
             }
             // cuts off high bits, which is okay
             cBuffer[cBufferPos++] = *src;
-            src.advance(lineNoPtr);
+            src.advance(m_lineNumber);
             break;
           } else
             searchCount = 0;  // Stop looking for '<!--' sequence
@@ -931,7 +930,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
             cBuffer[cBufferPos++] = curchar + ('a' - 'A');
           else
             cBuffer[cBufferPos++] = curchar;
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
 
         // Disadvantage: we add the possible rest of the tag
@@ -988,7 +987,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           }
           if (inViewSourceMode())
             currToken.addViewSourceChar(curchar);
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
         break;
       case AttributeName: {
@@ -1020,7 +1019,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           else
             cBuffer[cBufferPos++] = curchar;
 
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
         if (cBufferPos == CBUFLEN) {
           cBuffer[cBufferPos] = '\0';
@@ -1060,7 +1059,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               state.setTagState(SearchValue);
               if (inViewSourceMode())
                 currToken.addViewSourceChar(curchar);
-              src.advance(lineNoPtr);
+              src.advance(m_lineNumber);
             } else {
               currToken.addAttribute(m_doc, attrName, emptyAtom,
                                      inViewSourceMode());
@@ -1075,7 +1074,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
 
           lastIsSlash = curchar == '/';
 
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
         break;
       case SearchValue:
@@ -1087,7 +1086,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               state.setTagState(QuotedValue);
               if (inViewSourceMode())
                 currToken.addViewSourceChar(curchar);
-              src.advance(lineNoPtr);
+              src.advance(m_lineNumber);
             } else
               state.setTagState(Value);
 
@@ -1095,7 +1094,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           }
           if (inViewSourceMode())
             currToken.addViewSourceChar(curchar);
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
         break;
       case QuotedValue:
@@ -1133,7 +1132,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
             // ### attributes like '&{blaa....};' are supposed to be treated as
             // jscript.
             if (curchar == '&') {
-              src.advance(lineNoPtr);
+              src.advance(m_lineNumber);
               state = parseEntity(src, dest, state, cBufferPos, true, true);
               break;
             } else if ((tquote == SingleQuote && curchar == '\'') ||
@@ -1156,12 +1155,12 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               tquote = NoQuote;
               if (inViewSourceMode())
                 currToken.addViewSourceChar(curchar);
-              src.advance(lineNoPtr);
+              src.advance(m_lineNumber);
               break;
             }
           }
           *dest++ = *src;
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
         break;
       case Value:
@@ -1174,7 +1173,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           if (curchar <= '>' && !src.escaped()) {
             // parse Entities
             if (curchar == '&') {
-              src.advance(lineNoPtr);
+              src.advance(m_lineNumber);
               state = parseEntity(src, dest, state, cBufferPos, true, true);
               break;
             }
@@ -1192,7 +1191,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           }
 
           *dest++ = *src;
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
         break;
       case SearchEnd: {
@@ -1208,7 +1207,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
 
           if (inViewSourceMode())
             currToken.addViewSourceChar(*src);
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
         }
         if (src.isEmpty())
           break;
@@ -1218,7 +1217,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
         tquote = NoQuote;
 
         if (*src != '<')
-          src.advance(lineNoPtr);
+          src.advance(m_lineNumber);
 
         if (currToken.tagName == nullAtom) {  // stop if tag is unknown
           m_cBufferPos = cBufferPos;
@@ -1295,7 +1294,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               searchStopperLen = 7;
               State savedState = state;
               SegmentedString savedSrc = src;
-              long savedLineno = lineno;
+              long savedLineno = m_lineNumber;
               state.setInTitle(true);
               state = parseSpecial(src, state);
               if (state.inTitle() && src.isEmpty()) {
@@ -1312,7 +1311,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
                 // than a local variable.
                 state = savedState;
                 src = savedSrc;
-                lineno = savedLineno;
+                m_lineNumber = savedLineno;
                 scriptCodeSize = 0;
               }
             }
@@ -1420,8 +1419,6 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
 
   State state = m_state;
 
-  int* lineNoPtr = lineNumberPtr();
-
   while (!src.isEmpty() &&
          (!frame || !frame->loader()->isScheduledLocationChangePending())) {
     if (!continueProcessing(processedCount, startTime, state))
@@ -1437,7 +1434,7 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
       state.setSkipLF(false);
 
     if (wasSkipLF && (cc == '\n'))
-      src.advance(0);
+      src.advance();
     else if (state.needsSpecialWriteHandling()) {
       // it's important to keep needsSpecialWriteHandling with the flags this
       // block tests
@@ -1506,12 +1503,12 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
         state = parseTag(src, state);
       }
     } else if (cc == '&' && !src.escaped()) {
-      src.advance(lineNoPtr);
+      src.advance(m_lineNumber);
       state = parseEntity(src, dest, state, m_cBufferPos, true,
                           state.hasTagState());
     } else if (cc == '<' && !src.escaped()) {
-      tagStartLineno = lineno;
-      src.advance(lineNoPtr);
+      tagStartLineno = m_lineNumber;
+      src.advance(m_lineNumber);
       state.setStartTag(true);
     } else if (cc == '\n' || cc == '\r') {
       if (state.discardLF())
@@ -1521,17 +1518,17 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
         // Process this LF
         *dest++ = '\n';
         if (cc == '\r' && !src.excludeLineNumbers())
-          lineno++;
+          m_lineNumber++;
       }
 
       /* Check for MS-DOS CRLF sequence */
       if (cc == '\r')
         state.setSkipLF(true);
-      src.advance(lineNoPtr);
+      src.advance(m_lineNumber);
     } else {
       state.setDiscardLF(false);
       *dest++ = cc;
-      src.advance(lineNoPtr);
+      src.advance(m_lineNumber);
     }
   }
 
@@ -1681,7 +1678,7 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
   } else if (currToken.tagName == nullAtom) {
     currToken.reset();
     if (jsProxy)
-      jsProxy->setEventHandlerLineno(lineno);
+      jsProxy->setEventHandlerLineno(m_lineNumber);
     return 0;
   }
 

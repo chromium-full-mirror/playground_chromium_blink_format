@@ -3,7 +3,7 @@
               (C) 1997 Torben Weis (weis@kde.org)
               (C) 1998 Waldo Bastian (bastian@kde.org)
               (C) 2001 Dirk Mueller (mueller@kde.org)
-    Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+    Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -111,10 +111,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   virtual bool processingData() const;
   virtual int executingScript() const { return m_executingScript; }
 
-  virtual int lineNumber() const { return lineno; }
+  virtual int lineNumber() const { return m_lineNumber; }
   virtual int columnNumber() const { return 1; }
-
-  int* lineNumberPtr() { return &lineno; }
 
   bool processingContentWrittenByScript() const {
     return src.excludeLineNumbers();
@@ -372,7 +370,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   // store a flag to get rid of the O(n^2) behaviour in such a case.
   bool brokenComments;
   // current line number
-  int lineno;
+  int m_lineNumber;
   // line number at which the current <script> started
   int scriptStartLineno;
   int tagStartLineno;
