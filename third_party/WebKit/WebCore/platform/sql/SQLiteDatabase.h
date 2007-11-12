@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,10 +31,6 @@
 #include "Threading.h"
 #include <wtf/Noncopyable.h>
 #include <wtf/Vector.h>
-
-#ifndef NDEBUG
-#include <pthread.h>
-#endif
 
 #if COMPILER(MSVC)
 #pragma warning(disable : 4800)
@@ -96,7 +93,7 @@ class SQLiteDatabase : public Noncopyable {
   const char* lastErrorMsg();
 
   sqlite3* sqlite3Handle() const {
-    ASSERT(pthread_equal(m_openingThread, pthread_self()));
+    ASSERT(currentThread() == m_openingThread);
     return m_db;
   }
 
@@ -124,9 +121,7 @@ class SQLiteDatabase : public Noncopyable {
   RefPtr<SQLiteAuthorizer> m_authorizer;
 
   Mutex m_lockingMutex;
-#ifndef NDEBUG
-  pthread_t m_openingThread;
-#endif
+  ThreadIdentifier m_openingThread;
 
 };  // class SQLiteDatabase
 

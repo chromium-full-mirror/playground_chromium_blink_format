@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -117,7 +118,7 @@ class IconDatabase : Noncopyable {
   OwnPtr<Timer<IconDatabase>> m_syncTimer;
   void syncTimerFired(Timer<IconDatabase>*);
 
-  pthread_t m_syncThread;
+  ThreadIdentifier m_syncThread;
   bool m_syncThreadRunning;
 
   HashSet<RefPtr<DocumentLoader>> m_loadersPendingDecision;
