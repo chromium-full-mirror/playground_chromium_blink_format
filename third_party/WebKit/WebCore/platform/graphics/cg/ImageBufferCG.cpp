@@ -36,7 +36,7 @@ using namespace std;
 namespace WebCore {
 
 auto_ptr<ImageBuffer> ImageBuffer::create(const IntSize& size, bool grayScale) {
-  if (size.width() <= 0 || size.height() <= 0)
+  if (size.width() < 0 || size.height() < 0)
     return auto_ptr<ImageBuffer>();
   unsigned int bytesPerRow = size.width();
   if (!grayScale) {
