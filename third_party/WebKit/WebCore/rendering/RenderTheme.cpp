@@ -493,4 +493,8 @@ void RenderTheme::platformColorsDidChange() {
   m_inactiveSelectionColor = Color();
 }
 
+Color RenderTheme::platformTextSearchHighlightColor() const {
+  return Color(255, 255, 0);
+}
+
 }  // namespace WebCore

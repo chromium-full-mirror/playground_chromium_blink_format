@@ -132,6 +132,8 @@ class RenderTheme {
   Color activeSelectionBackgroundColor() const;
   Color inactiveSelectionBackgroundColor() const;
 
+  virtual Color platformTextSearchHighlightColor() const;
+
   // The platform selection color.
   virtual Color platformActiveSelectionBackgroundColor() const;
   virtual Color platformInactiveSelectionBackgroundColor() const;

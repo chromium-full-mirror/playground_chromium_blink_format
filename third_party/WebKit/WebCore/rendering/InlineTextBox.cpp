@@ -30,6 +30,7 @@
 #include "HitTestResult.h"
 #include "RenderArena.h"
 #include "RenderBlock.h"
+#include "RenderTheme.h"
 #include "Text.h"
 #include "TextStyle.h"
 #include "break_lines.h"
@@ -769,11 +770,11 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
 
   // Optionally highlight the text
   if (object()->document()->frame()->markedTextMatchesAreHighlighted()) {
-    Color yellow = Color(255, 255, 0);
+    Color color = theme()->platformTextSearchHighlightColor();
     pt->save();
-    updateGraphicsContext(pt, yellow, yellow, 0);  // Don't draw text at all!
+    updateGraphicsContext(pt, color, color, 0);  // Don't draw text at all!
     pt->clip(IntRect(tx + m_x, ty + y, m_width, h));
-    pt->drawHighlightForText(run, startPoint, h, renderStyle, yellow, sPos,
+    pt->drawHighlightForText(run, startPoint, h, renderStyle, color, sPos,
                              ePos);
     pt->restore();
   }
