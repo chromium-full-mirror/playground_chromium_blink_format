@@ -475,6 +475,7 @@ class HashTable {
 
   void remove(const KeyType&);
   void remove(iterator);
+  void removeWithoutEntryConsistencyCheck(iterator);
   void clear();
 
   static bool isEmptyBucket(const ValueType& value) {
@@ -490,6 +491,12 @@ class HashTable {
   ValueType* lookup(const Key& key) {
     return lookup<Key, IdentityTranslatorType>(key);
   }
+
+#if CHECK_HASHTABLE_CONSISTENCY
+  void checkTableConsistency() const;
+#else
+  static void checkTableConsistency() {}
+#endif
 
  private:
   static ValueType* allocateTable(int size);
@@ -508,6 +515,8 @@ class HashTable {
   template <typename T, typename HashTranslator>
   LookupType lookupForWriting(const T&);
 
+  void removeAndInvalidateWithoutEntryConsistencyCheck(ValueType*);
+  void removeAndInvalidate(ValueType*);
   void remove(ValueType*);
 
   bool shouldExpand() const {
@@ -552,10 +561,8 @@ class HashTable {
   }
 
 #if CHECK_HASHTABLE_CONSISTENCY
-  void checkTableConsistency() const;
   void checkTableConsistencyExceptSize() const;
 #else
-  static void checkTableConsistency() {}
   static void checkTableConsistencyExceptSize() {}
 #endif
 
@@ -1039,11 +1046,33 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
-    ValueType* pos) {
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    removeAndInvalidateWithoutEntryConsistencyCheck(ValueType* pos) {
+  invalidateIterators();
+  remove(pos);
+}
+
+template <typename Key,
+          typename Value,
+          typename Extractor,
+          typename HashFunctions,
+          typename Traits,
+          typename KeyTraits>
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    removeAndInvalidate(ValueType* pos) {
   invalidateIterators();
   checkTableConsistency();
+  remove(pos);
+}
 
+template <typename Key,
+          typename Value,
+          typename Extractor,
+          typename HashFunctions,
+          typename Traits,
+          typename KeyTraits>
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
+    ValueType* pos) {
 #if DUMP_HASHTABLE_STATS
   ++HashTableStats::numRemoves;
 #endif
@@ -1070,7 +1099,22 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
   if (it == end())
     return;
 
-  remove(const_cast<ValueType*>(it.m_iterator.m_position));
+  removeAndInvalidate(const_cast<ValueType*>(it.m_iterator.m_position));
+}
+
+template <typename Key,
+          typename Value,
+          typename Extractor,
+          typename HashFunctions,
+          typename Traits,
+          typename KeyTraits>
+inline void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    removeWithoutEntryConsistencyCheck(iterator it) {
+  if (it == end())
+    return;
+
+  removeAndInvalidateWithoutEntryConsistencyCheck(
+      const_cast<ValueType*>(it.m_iterator.m_position));
 }
 
 template <typename Key,
