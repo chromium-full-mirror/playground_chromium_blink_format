@@ -136,6 +136,7 @@ class Node : Noncopyable {
       KJS_FAST_CALL {}
 
  protected:
+  Node(JSType) KJS_FAST_CALL;  // used by ExpressionNode
   Completion createErrorCompletion(ExecState*,
                                    ErrorType,
                                    const char* msg) KJS_FAST_CALL;
@@ -177,13 +178,15 @@ class Node : Noncopyable {
 
   Completion rethrowException(ExecState*) KJS_FAST_CALL;
 
-  int m_line : 31;
+  int m_line : 28;
   bool m_mayHaveDeclarations : 1;
+  unsigned m_expectedReturnType : 3;  // JSType
 };
 
 class ExpressionNode : public Node {
  public:
-  ExpressionNode() KJS_FAST_CALL {}
+  ExpressionNode() KJS_FAST_CALL : Node() {}
+  ExpressionNode(JSType expectedReturn) KJS_FAST_CALL : Node(expectedReturn) {}
 
   // Special constructor for cases where we overwrite an object in place.
   ExpressionNode(PlacementNewAdoptType) KJS_FAST_CALL
@@ -194,6 +197,10 @@ class ExpressionNode : public Node {
   virtual bool isResolveNode() const KJS_FAST_CALL { return false; }
   virtual bool isBracketAccessorNode() const KJS_FAST_CALL { return false; }
   virtual bool isDotAccessorNode() const KJS_FAST_CALL { return false; }
+
+  JSType expectedReturnType() const KJS_FAST_CALL {
+    return static_cast<JSType>(m_expectedReturnType);
+  }
 
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL = 0;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
@@ -227,7 +234,7 @@ class StatementNode : public Node {
 
 class NullNode : public ExpressionNode {
  public:
-  NullNode() KJS_FAST_CALL {}
+  NullNode() KJS_FAST_CALL : ExpressionNode(NullType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
@@ -235,7 +242,7 @@ class NullNode : public ExpressionNode {
 
 class FalseNode : public ExpressionNode {
  public:
-  FalseNode() KJS_FAST_CALL {}
+  FalseNode() KJS_FAST_CALL : ExpressionNode(BooleanType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL { return false; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -244,7 +251,7 @@ class FalseNode : public ExpressionNode {
 
 class TrueNode : public ExpressionNode {
  public:
-  TrueNode() KJS_FAST_CALL {}
+  TrueNode() KJS_FAST_CALL : ExpressionNode(BooleanType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL { return true; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -253,7 +260,8 @@ class TrueNode : public ExpressionNode {
 
 class NumberNode : public ExpressionNode {
  public:
-  NumberNode(double v) KJS_FAST_CALL : m_double(v) {}
+  NumberNode(double v) KJS_FAST_CALL : ExpressionNode(NumberType),
+                                       m_double(v) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
@@ -283,12 +291,14 @@ class ImmediateNumberNode : public NumberNode {
   }
 
  private:
-  JSValue* m_value;
+  JSValue* m_value;  // This is never a JSCell, only JSImmediate, thus no
+                     // ProtectedPtr
 };
 
 class StringNode : public ExpressionNode {
  public:
-  StringNode(const UString* v) KJS_FAST_CALL { value = *v; }
+  StringNode(const UString* v) KJS_FAST_CALL : ExpressionNode(StringType),
+                                               m_value(*v) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
@@ -296,19 +306,21 @@ class StringNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecPrimary; }
 
  private:
-  UString value;
+  UString m_value;
 };
 
 class RegExpNode : public ExpressionNode {
  public:
-  RegExpNode(const UString& p, const UString& f) KJS_FAST_CALL : pattern(p),
-                                                                 flags(f) {}
+  RegExpNode(const UString& pattern, const UString& flags) KJS_FAST_CALL
+      : m_pattern(pattern),
+        m_flags(flags) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
  private:
-  UString pattern, flags;
+  UString m_pattern;
+  UString m_flags;
 };
 
 class ThisNode : public ExpressionNode {
@@ -685,7 +697,9 @@ class FunctionCallDotNode : public ExpressionNode {
 
 class PrePostResolveNode : public ExpressionNode {
  public:
-  PrePostResolveNode(const Identifier& i) KJS_FAST_CALL : m_ident(i) {}
+  PrePostResolveNode(const Identifier& i) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        m_ident(i) {}
 
   PrePostResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
@@ -931,11 +945,15 @@ class VoidNode : public ExpressionNode {
 
 class TypeOfResolveNode : public ExpressionNode {
  public:
-  TypeOfResolveNode(const Identifier& s) KJS_FAST_CALL : m_ident(s) {}
+  TypeOfResolveNode(const Identifier& s) KJS_FAST_CALL
+      : ExpressionNode(StringType),
+        m_ident(s) {}
 
   TypeOfResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {}
+        m_ident(PlacementNewAdopt) {
+    m_expectedReturnType = StringType;
+  }
 
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -956,6 +974,7 @@ class LocalVarTypeOfNode : public TypeOfResolveNode {
  public:
   LocalVarTypeOfNode(size_t i) KJS_FAST_CALL
       : TypeOfResolveNode(PlacementNewAdopt) {
+    m_expectedReturnType = StringType;
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
@@ -965,7 +984,8 @@ class LocalVarTypeOfNode : public TypeOfResolveNode {
 
 class TypeOfValueNode : public ExpressionNode {
  public:
-  TypeOfValueNode(ExpressionNode* e) KJS_FAST_CALL : m_expr(e) {}
+  TypeOfValueNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(StringType),
+                                                     m_expr(e) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1123,7 +1143,8 @@ class PrefixErrorNode : public ExpressionNode {
 
 class UnaryPlusNode : public ExpressionNode {
  public:
-  UnaryPlusNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  UnaryPlusNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(NumberType),
+                                                   m_expr(e) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1132,12 +1153,13 @@ class UnaryPlusNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecUnary; }
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class NegateNode : public ExpressionNode {
  public:
-  NegateNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  NegateNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(NumberType),
+                                                expr(e) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1152,7 +1174,8 @@ class NegateNode : public ExpressionNode {
 
 class BitwiseNotNode : public ExpressionNode {
  public:
-  BitwiseNotNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  BitwiseNotNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(NumberType),
+                                                    expr(e) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1166,7 +1189,8 @@ class BitwiseNotNode : public ExpressionNode {
 
 class LogicalNotNode : public ExpressionNode {
  public:
-  LogicalNotNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  LogicalNotNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(BooleanType),
+                                                    expr(e) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1181,8 +1205,10 @@ class LogicalNotNode : public ExpressionNode {
 
 class MultNode : public ExpressionNode {
  public:
-  MultNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL : term1(t1),
-                                                                   term2(t2) {}
+  MultNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        term1(t1),
+        term2(t2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1199,8 +1225,10 @@ class MultNode : public ExpressionNode {
 
 class DivNode : public ExpressionNode {
  public:
-  DivNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL : term1(t1),
-                                                                  term2(t2) {}
+  DivNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        term1(t1),
+        term2(t2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1217,8 +1245,10 @@ class DivNode : public ExpressionNode {
 
 class ModNode : public ExpressionNode {
  public:
-  ModNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL : term1(t1),
-                                                                  term2(t2) {}
+  ModNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        term1(t1),
+        term2(t2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1245,15 +1275,54 @@ class AddNode : public ExpressionNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAdditive; }
 
- private:
+ protected:
+  AddNode(ExpressionNode* t1,
+          ExpressionNode* t2,
+          JSType expectedReturn) KJS_FAST_CALL : ExpressionNode(expectedReturn),
+                                                 term1(t1),
+                                                 term2(t2) {}
   RefPtr<ExpressionNode> term1;
   RefPtr<ExpressionNode> term2;
 };
 
+class AddNumbersNode : public AddNode {
+ public:
+  AddNumbersNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : AddNode(t1, t2, NumberType) {}
+  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+
+ private:
+  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*) KJS_FAST_CALL;
+};
+
+class AddStringLeftNode : public AddNode {
+ public:
+  AddStringLeftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : AddNode(t1, t2, StringType) {}
+  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+};
+
+class AddStringRightNode : public AddNode {
+ public:
+  AddStringRightNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : AddNode(t1, t2, StringType) {}
+  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+};
+
+class AddStringsNode : public AddNode {
+ public:
+  AddStringsNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : AddNode(t1, t2, StringType) {}
+  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+};
+
 class SubNode : public ExpressionNode {
  public:
-  SubNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL : term1(t1),
-                                                                  term2(t2) {}
+  SubNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        term1(t1),
+        term2(t2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1271,7 +1340,8 @@ class SubNode : public ExpressionNode {
 class LeftShiftNode : public ExpressionNode {
  public:
   LeftShiftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
-      : term1(t1),
+      : ExpressionNode(NumberType),
+        term1(t1),
         term2(t2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1288,7 +1358,8 @@ class LeftShiftNode : public ExpressionNode {
 class RightShiftNode : public ExpressionNode {
  public:
   RightShiftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
-      : term1(t1),
+      : ExpressionNode(NumberType),
+        term1(t1),
         term2(t2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1305,7 +1376,8 @@ class RightShiftNode : public ExpressionNode {
 class UnsignedRightShiftNode : public ExpressionNode {
  public:
   UnsignedRightShiftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
-      : term1(t1),
+      : ExpressionNode(NumberType),
+        term1(t1),
         term2(t2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1321,8 +1393,10 @@ class UnsignedRightShiftNode : public ExpressionNode {
 
 class LessNode : public ExpressionNode {
  public:
-  LessNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                   expr2(e2) {}
+  LessNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+      : ExpressionNode(BooleanType),
+        expr1(e1),
+        expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1331,9 +1405,23 @@ class LessNode : public ExpressionNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
- private:
+ protected:
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
+};
+
+class LessNumbersNode : public LessNode {
+ public:
+  LessNumbersNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+      : LessNode(e1, e2) {}
+  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+};
+
+class LessStringsNode : public LessNode {
+ public:
+  LessStringsNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+      : LessNode(e1, e2) {}
+  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 };
 
 class GreaterNode : public ExpressionNode {
@@ -1393,7 +1481,8 @@ class GreaterEqNode : public ExpressionNode {
 class InstanceOfNode : public ExpressionNode {
  public:
   InstanceOfNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
+      : ExpressionNode(BooleanType),
+        expr1(e1),
         expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1427,8 +1516,10 @@ class InNode : public ExpressionNode {
 
 class EqualNode : public ExpressionNode {
  public:
-  EqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                    expr2(e2) {}
+  EqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+      : ExpressionNode(BooleanType),
+        expr1(e1),
+        expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1445,7 +1536,8 @@ class EqualNode : public ExpressionNode {
 class NotEqualNode : public ExpressionNode {
  public:
   NotEqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
+      : ExpressionNode(BooleanType),
+        expr1(e1),
         expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1463,7 +1555,8 @@ class NotEqualNode : public ExpressionNode {
 class StrictEqualNode : public ExpressionNode {
  public:
   StrictEqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
+      : ExpressionNode(BooleanType),
+        expr1(e1),
         expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1481,7 +1574,8 @@ class StrictEqualNode : public ExpressionNode {
 class NotStrictEqualNode : public ExpressionNode {
  public:
   NotStrictEqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
+      : ExpressionNode(BooleanType),
+        expr1(e1),
         expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1498,9 +1592,10 @@ class NotStrictEqualNode : public ExpressionNode {
 
 class BitAndNode : public ExpressionNode {
  public:
-  BitAndNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                     expr2(e2) {
-  }
+  BitAndNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        expr1(e1),
+        expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1515,8 +1610,10 @@ class BitAndNode : public ExpressionNode {
 
 class BitOrNode : public ExpressionNode {
  public:
-  BitOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                    expr2(e2) {}
+  BitOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        expr1(e1),
+        expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1531,9 +1628,10 @@ class BitOrNode : public ExpressionNode {
 
 class BitXOrNode : public ExpressionNode {
  public:
-  BitXOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                     expr2(e2) {
-  }
+  BitXOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        expr1(e1),
+        expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -1552,7 +1650,8 @@ class BitXOrNode : public ExpressionNode {
 class LogicalAndNode : public ExpressionNode {
  public:
   LogicalAndNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
+      : ExpressionNode(BooleanType),
+        expr1(e1),
         expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)
@@ -1570,7 +1669,8 @@ class LogicalAndNode : public ExpressionNode {
 class LogicalOrNode : public ExpressionNode {
  public:
   LogicalOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
+      : ExpressionNode(BooleanType),
+        expr1(e1),
         expr2(e2) {}
   virtual void optimizeVariableAccess(FunctionBodyNode*,
                                       DeclarationStacks::NodeStack&)

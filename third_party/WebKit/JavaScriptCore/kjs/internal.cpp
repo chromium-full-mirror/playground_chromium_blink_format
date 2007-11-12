@@ -55,7 +55,10 @@ JSValue* StringImp::toPrimitive(ExecState*, JSType) const {
   return const_cast<StringImp*>(this);
 }
 
-bool StringImp::getPrimitiveNumber(ExecState*, double& number) const {
+bool StringImp::getPrimitiveNumber(ExecState*,
+                                   double& number,
+                                   JSValue*& value) {
+  value = this;
   number = val.toDouble();
   return false;
 }
@@ -84,8 +87,11 @@ JSValue* NumberImp::toPrimitive(ExecState*, JSType) const {
   return const_cast<NumberImp*>(this);
 }
 
-bool NumberImp::getPrimitiveNumber(ExecState*, double& number) const {
+bool NumberImp::getPrimitiveNumber(ExecState*,
+                                   double& number,
+                                   JSValue*& value) {
   number = val;
+  value = this;
   return true;
 }
 
@@ -144,9 +150,12 @@ JSValue* GetterSetterImp::toPrimitive(ExecState*, JSType) const {
   return jsNull();
 }
 
-bool GetterSetterImp::getPrimitiveNumber(ExecState*, double& number) const {
-  ASSERT(false);
+bool GetterSetterImp::getPrimitiveNumber(ExecState*,
+                                         double& number,
+                                         JSValue*& value) {
+  ASSERT_NOT_REACHED();
   number = 0;
+  value = 0;
   return true;
 }
 

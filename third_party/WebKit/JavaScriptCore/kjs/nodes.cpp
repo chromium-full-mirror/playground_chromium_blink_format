@@ -129,7 +129,18 @@ static NodeCounter nodeCounter;
 static HashSet<Node*>* newNodes;
 static HashCountedSet<Node*>* nodeExtraRefCounts;
 
-Node::Node() : m_mayHaveDeclarations(false) {
+Node::Node() : m_mayHaveDeclarations(false), m_expectedReturnType(ObjectType) {
+#ifndef NDEBUG
+  ++NodeCounter::count;
+#endif
+  m_line = Lexer::curr()->lineNo();
+  if (!newNodes)
+    newNodes = new HashSet<Node*>;
+  newNodes->add(this);
+}
+
+Node::Node(JSType expectedReturn)
+    : m_mayHaveDeclarations(false), m_expectedReturnType(expectedReturn) {
 #ifndef NDEBUG
   ++NodeCounter::count;
 #endif
@@ -435,23 +446,23 @@ JSValue* ImmediateNumberNode::evaluate(ExecState*) {
 // ------------------------------ StringNode -----------------------------------
 
 JSValue* StringNode::evaluate(ExecState*) {
-  return jsOwnedString(value);
+  return jsOwnedString(m_value);
 }
 
 double StringNode::evaluateToNumber(ExecState*) {
-  return value.toDouble();
+  return m_value.toDouble();
 }
 
 bool StringNode::evaluateToBoolean(ExecState*) {
-  return !value.isEmpty();
+  return !m_value.isEmpty();
 }
 
 // ------------------------------ RegExpNode -----------------------------------
 
 JSValue* RegExpNode::evaluate(ExecState* exec) {
   List list;
-  list.append(jsOwnedString(pattern));
-  list.append(jsOwnedString(flags));
+  list.append(jsOwnedString(m_pattern));
+  list.append(jsOwnedString(m_flags));
 
   JSObject* reg = exec->lexicalInterpreter()->builtinRegExp();
   return reg->construct(exec, list);
@@ -1690,12 +1701,12 @@ JSValue* PrefixErrorNode::evaluate(ExecState* exec) {
 void UnaryPlusNode::optimizeVariableAccess(
     FunctionBodyNode*,
     DeclarationStacks::NodeStack& nodeStack) {
-  nodeStack.append(expr.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.4.6
 JSValue* UnaryPlusNode::evaluate(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   return v->toJSNumber(exec);
@@ -1766,10 +1777,7 @@ void MultNode::optimizeVariableAccess(FunctionBodyNode*,
 double MultNode::inlineEvaluateToNumber(ExecState* exec) {
   double n1 = term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-
   double n2 = term2->evaluateToNumber(exec);
-  KJS_CHECKEXCEPTIONNUMBER
-
   return n1 * n2;
 }
 
@@ -1791,10 +1799,7 @@ void DivNode::optimizeVariableAccess(FunctionBodyNode*,
 double DivNode::inlineEvaluateToNumber(ExecState* exec) {
   double n1 = term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-
   double n2 = term2->evaluateToNumber(exec);
-  KJS_CHECKEXCEPTIONNUMBER
-
   return n1 / n2;
 }
 
@@ -1816,10 +1821,7 @@ void ModNode::optimizeVariableAccess(FunctionBodyNode*,
 double ModNode::inlineEvaluateToNumber(ExecState* exec) {
   double n1 = term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-
   double n2 = term2->evaluateToNumber(exec);
-  KJS_CHECKEXCEPTIONNUMBER
-
   return fmod(n1, n2);
 }
 
@@ -1952,6 +1954,54 @@ double AddNode::evaluateToNumber(ExecState* exec) {
   return addToNumber(exec, v1, v2);
 }
 
+double AddNumbersNode::inlineEvaluateToNumber(ExecState* exec) {
+  double n1 = term1->evaluateToNumber(exec);
+  KJS_CHECKEXCEPTIONNUMBER
+  double n2 = term2->evaluateToNumber(exec);
+  return n1 + n2;
+}
+
+JSValue* AddNumbersNode::evaluate(ExecState* exec) {
+  return jsNumber(inlineEvaluateToNumber(exec));
+}
+
+double AddNumbersNode::evaluateToNumber(ExecState* exec) {
+  return inlineEvaluateToNumber(exec);
+}
+
+JSValue* AddStringsNode::evaluate(ExecState* exec) {
+  JSValue* v1 = term1->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSValue* v2 = term2->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  return jsString(static_cast<StringImp*>(v1)->value() +
+                  static_cast<StringImp*>(v2)->value());
+}
+
+JSValue* AddStringLeftNode::evaluate(ExecState* exec) {
+  JSValue* v1 = term1->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSValue* v2 = term2->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSValue* p2 = v2->toPrimitive(exec, UnspecifiedType);
+  return jsString(static_cast<StringImp*>(v1)->value() + p2->toString(exec));
+}
+
+JSValue* AddStringRightNode::evaluate(ExecState* exec) {
+  JSValue* v1 = term1->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSValue* v2 = term2->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+
+  JSValue* p1 = v1->toPrimitive(exec, UnspecifiedType);
+  return jsString(p1->toString(exec) + static_cast<StringImp*>(v2)->value());
+}
+
 void SubNode::optimizeVariableAccess(FunctionBodyNode*,
                                      DeclarationStacks::NodeStack& nodeStack) {
   nodeStack.append(term1.get());
@@ -1962,10 +2012,7 @@ void SubNode::optimizeVariableAccess(FunctionBodyNode*,
 double SubNode::inlineEvaluateToNumber(ExecState* exec) {
   double n1 = term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-
   double n2 = term2->evaluateToNumber(exec);
-  KJS_CHECKEXCEPTIONNUMBER
-
   return n1 - n2;
 }
 
@@ -2043,25 +2090,31 @@ JSValue* UnsignedRightShiftNode::evaluate(ExecState* exec) {
 static inline bool lessThan(ExecState* exec, JSValue* v1, JSValue* v2) {
   double n1;
   double n2;
-  bool wasNotString1 = v1->getPrimitiveNumber(exec, n1);
-  bool wasNotString2 = v2->getPrimitiveNumber(exec, n2);
+  JSValue* p1;
+  JSValue* p2;
+  bool wasNotString1 = v1->getPrimitiveNumber(exec, n1, p1);
+  bool wasNotString2 = v2->getPrimitiveNumber(exec, n2, p2);
 
   if (wasNotString1 | wasNotString2)
     return n1 < n2;
 
-  return v1->toString(exec) < v2->toString(exec);
+  return static_cast<const StringImp*>(p1)->value() <
+         static_cast<const StringImp*>(p2)->value();
 }
 
 static inline bool lessThanEq(ExecState* exec, JSValue* v1, JSValue* v2) {
   double n1;
   double n2;
-  bool wasNotString1 = v1->getPrimitiveNumber(exec, n1);
-  bool wasNotString2 = v2->getPrimitiveNumber(exec, n2);
+  JSValue* p1;
+  JSValue* p2;
+  bool wasNotString1 = v1->getPrimitiveNumber(exec, n1, p1);
+  bool wasNotString2 = v2->getPrimitiveNumber(exec, n2, p2);
 
   if (wasNotString1 | wasNotString2)
     return n1 <= n2;
 
-  return !(v2->toString(exec) < v1->toString(exec));
+  return !(static_cast<const StringImp*>(p2)->value() <
+           static_cast<const StringImp*>(p1)->value());
 }
 
 void LessNode::optimizeVariableAccess(FunctionBodyNode*,
@@ -2085,6 +2138,21 @@ bool LessNode::evaluateToBoolean(ExecState* exec) {
   JSValue* v2 = expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
   return lessThan(exec, v1, v2);
+}
+
+JSValue* LessNumbersNode::evaluate(ExecState* exec) {
+  double n1 = expr1->evaluateToNumber(exec);
+  KJS_CHECKEXCEPTIONVALUE
+  double n2 = expr2->evaluateToNumber(exec);
+  return jsBoolean(n1 < n2);
+}
+
+JSValue* LessStringsNode::evaluate(ExecState* exec) {
+  JSValue* v1 = expr1->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
+  JSValue* v2 = expr2->evaluate(exec);
+  return jsBoolean(static_cast<StringImp*>(v1)->value() <
+                   static_cast<StringImp*>(v2)->value());
 }
 
 void GreaterNode::optimizeVariableAccess(
