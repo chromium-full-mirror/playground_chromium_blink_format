@@ -500,8 +500,8 @@ void PropertyMap::createTable() {
   JSValue* oldSingleEntryValue = m_u.singleEntryValue;
 #endif
 
-  m_u.table =
-      static_cast<Table*>(fastCalloc(1, Table::allocationSize(newTableSize)));
+  m_u.table = static_cast<Table*>(
+      fastZeroedMalloc(Table::allocationSize(newTableSize)));
   m_u.table->size = newTableSize;
   m_u.table->sizeMask = newTableSize - 1;
   m_usingTable = true;
@@ -526,8 +526,8 @@ void PropertyMap::rehash(unsigned newTableSize) {
 
   Table* oldTable = m_u.table;
 
-  m_u.table =
-      static_cast<Table*>(fastCalloc(1, Table::allocationSize(newTableSize)));
+  m_u.table = static_cast<Table*>(
+      fastZeroedMalloc(Table::allocationSize(newTableSize)));
   m_u.table->size = newTableSize;
   m_u.table->sizeMask = newTableSize - 1;
 

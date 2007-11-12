@@ -1141,7 +1141,7 @@ Value* HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
   // but
   // gcc doesn't appear to support that
   if (Traits::emptyValueIsZero)
-    return static_cast<ValueType*>(fastCalloc(size, sizeof(ValueType)));
+    return static_cast<ValueType*>(fastZeroedMalloc(size * sizeof(ValueType)));
   ValueType* result =
       static_cast<ValueType*>(fastMalloc(size * sizeof(ValueType)));
   for (int i = 0; i < size; i++)
