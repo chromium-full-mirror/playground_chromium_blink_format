@@ -103,7 +103,7 @@ TextIterator::TextIterator(const Range* r,
   int startOffset = r->startOffset(ec);
   Node* endContainer = r->endContainer(ec);
   int endOffset = r->endOffset(ec);
-  if (ec != 0)
+  if (ec)
     return;
 
   // Callers should be handing us well-formed ranges. If we discover that this

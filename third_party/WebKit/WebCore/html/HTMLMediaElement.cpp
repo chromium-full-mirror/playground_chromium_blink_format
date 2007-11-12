@@ -573,6 +573,7 @@ void HTMLMediaElement::setAutoplay(bool b) {
 void HTMLMediaElement::play(ExceptionCode& ec) {
   // 3.14.9.7. Playing the media resource
   if (!m_movie || networkState() == EMPTY) {
+    ec = 0;
     load(ec);
     if (ec)
       return;
@@ -595,6 +596,7 @@ void HTMLMediaElement::play(ExceptionCode& ec) {
 void HTMLMediaElement::pause(ExceptionCode& ec) {
   // 3.14.9.7. Playing the media resource
   if (!m_movie || networkState() == EMPTY) {
+    ec = 0;
     load(ec);
     if (ec)
       return;

@@ -218,6 +218,7 @@ void HTMLSelectElement::add(HTMLElement* element,
       !(element->hasLocalName(optionTag) || element->hasLocalName(hrTag)))
     return;
 
+  ec = 0;
   insertBefore(element, before, ec);
   if (!ec)
     setRecalcListItems();
@@ -1044,7 +1045,7 @@ void HTMLSelectElement::setOption(unsigned index,
     remove(index);
   }
   // finally add the new element
-  if (ec == 0) {
+  if (!ec) {
     add(option, before, ec);
     if (diff >= 0 && option->selected())
       setSelectedIndex(index, !m_multiple);
