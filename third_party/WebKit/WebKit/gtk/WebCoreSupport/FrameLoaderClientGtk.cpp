@@ -60,18 +60,19 @@ using namespace WebCore;
 
 namespace WebKit {
 
-FrameLoaderClient::FrameLoaderClient(WebKitFrame* frame) : m_frame(frame) {
+FrameLoaderClient::FrameLoaderClient(WebKitFrame* frame)
+    : m_frame(frame), m_userAgent("") {
   ASSERT(m_frame);
 }
 
 static String agentPlatform() {
 #ifdef GDK_WINDOWING_X11
   return "X11";
-#elif defined(GTK_WINDOWING_WIN32)
+#elif defined(GDK_WINDOWING_WIN32)
   return "Windows";
-#elif defined(GTK_WINDOWING_QUARTZ)
+#elif defined(GDK_WINDOWING_QUARTZ)
   return "Macintosh";
-#elif defined(GTK_WINDOWING_DIRECTFB)
+#elif defined(GDK_WINDOWING_DIRECTFB)
   return "DirectFB";
 #else
   notImplemented();
