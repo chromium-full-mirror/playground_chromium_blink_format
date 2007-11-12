@@ -278,7 +278,7 @@ void StringNode::streamTo(SourceStream& s) const {
 }
 
 void RegExpNode::streamTo(SourceStream& s) const {
-  s << '/' << m_pattern << '/' << m_flags;
+  s << '/' << m_regExp->pattern() << '/' << m_regExp->flags();
 }
 
 void ThisNode::streamTo(SourceStream& s) const {

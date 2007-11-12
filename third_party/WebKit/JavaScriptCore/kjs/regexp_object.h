@@ -105,6 +105,7 @@ class RegExpObjectImp : public InternalFunctionImp {
 
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState*, const List&);
+  JSObject* createRegExpImp(ExecState*, PassRefPtr<RegExp>);
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
   virtual void put(ExecState*,
                    const Identifier&,
