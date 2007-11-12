@@ -380,7 +380,9 @@ class FrameLoader : Noncopyable
   String baseTarget() const;
   KURL dataURLBaseFromRequest(const ResourceRequest& request) const;
 
-  bool isScheduledLocationChangePending() const;
+  bool isScheduledLocationChangePending() const {
+    return m_scheduledRedirection && isLocationChange(*m_scheduledRedirection);
+  }
   void scheduleHTTPRedirection(double delay, const String& URL);
   void scheduleLocationChange(const String& URL,
                               const String& referrer,
@@ -710,6 +712,8 @@ class FrameLoader : Noncopyable
                                               const ResourceRequest&,
                                               const ResourceResponse&,
                                               int length);
+
+  static bool isLocationChange(const ScheduledRedirection&);
 
   Frame* m_frame;
   FrameLoaderClient* m_client;
