@@ -43,6 +43,7 @@ void fastMallocAllow();
 }  // namespace WTF
 
 using WTF::fastMalloc;
+using WTF::fastZeroedMalloc;
 using WTF::fastCalloc;
 using WTF::fastRealloc;
 using WTF::fastFree;
