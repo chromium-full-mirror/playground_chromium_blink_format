@@ -635,6 +635,10 @@ static void runTest(const char* pathOrURL) {
     if (SUCCEEDED(
             webView->QueryInterface(IID_IWebIBActions, (void**)&webIBActions)))
       webIBActions->makeTextStandardSize(0);
+
+    COMPtr<IWebPreferences> preferences;
+    if (SUCCEEDED(webView->preferences(&preferences)))
+      preferences->setPrivateBrowsingEnabled(FALSE);
   }
 
   WorkQueue::shared()->clear();
