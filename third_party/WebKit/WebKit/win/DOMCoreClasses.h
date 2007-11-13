@@ -999,6 +999,9 @@ class DOMElement : public DOMNode,
   virtual HRESULT STDMETHODCALLTYPE innerText(
       /* [retval][out] */ BSTR* result);
 
+  virtual HRESULT STDMETHODCALLTYPE
+  font(WebFontDescription* webFontDescription);
+
   // IDOMElementCSSInlineStyle
   virtual HRESULT STDMETHODCALLTYPE style(
       /* [retval][out] */ IDOMCSSStyleDeclaration** result);
