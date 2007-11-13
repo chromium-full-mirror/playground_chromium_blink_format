@@ -183,7 +183,7 @@ static int check_escape(const pcre_uchar** ptrptr,
                         int bracount,
                         BOOL isclass) {
   const pcre_uchar* ptr = *ptrptr + 1;
-  int c, i;
+  int i;
 
   /* If backslash is at the end of the pattern, it's an error. */
   if (ptr == patternEnd) {
@@ -192,7 +192,7 @@ static int check_escape(const pcre_uchar** ptrptr,
     return 0;
   }
 
-  c = *ptr;
+  int c = *ptr;
 
   /* Non-alphamerics are literals. For digits or letters, do an initial lookup
   in
@@ -207,23 +207,11 @@ static int check_escape(const pcre_uchar** ptrptr,
   /* Escapes that need further processing, or are illegal. */
 
   else {
-    const pcre_uchar* oldptr;
     switch (c) {
-      /* A number of Perl escapes are not handled by PCRE. We give an explicit
-      error. */
-
-      /* The handling of escape sequences consisting of a string of digits
-      starting with one that is not zero is not straightforward. By experiment,
-      the way Perl works seems to be as follows:
-
-      Outside a character class, the digits are read as a decimal number. If the
-      number is less than 10, or if there are that many previous extracting
-      left brackets, then it is a back reference. Otherwise, up to three octal
-      digits are read to form an escaped byte. Thus \123 is likely to be octal
-      123 (cf \0123, which is octal 012 followed by the literal 3). If the octal
-      value is greater than 377, the least significant 8 bits are taken. Inside
-      a
-      character class, \ followed by a digit is always an octal number. */
+      /* Escape sequences starting with a non-zero digit are backreferences,
+      unless there are insufficient brackets, in which case they are octal
+      escape sequences. Those sequences end on the first non-octal character
+      or when we overflow 0-255, whichever comes first. */
 
       case '1':
       case '2':
@@ -236,11 +224,11 @@ static int check_escape(const pcre_uchar** ptrptr,
       case '9':
 
         if (!isclass) {
-          oldptr = ptr;
+          const pcre_uchar* oldptr = ptr;
           c -= '0';
-          while (ptr + 1 < patternEnd && isASCIIDigit(ptr[1]))
+          while (ptr + 1 < patternEnd && isASCIIDigit(ptr[1]) && c <= bracount)
             c = c * 10 + *(++ptr) - '0';
-          if (c < 10 || c <= bracount) {
+          if (c <= bracount) {
             c = -(ESC_REF + c);
             break;
           }
@@ -248,16 +236,10 @@ static int check_escape(const pcre_uchar** ptrptr,
         }
 
         /* Handle an octal number following \. If the first digit is 8 or 9,
-        Perl
-        generates a binary zero byte and treats the digit as a following
-        literal.
-        Thus we have to pull back the pointer by one. */
+        this is not octal. */
 
-        if ((c = *ptr) >= '8') {
-          ptr--;
-          c = 0;
+        if ((c = *ptr) >= '8')
           break;
-        }
 
       /* \0 always starts an octal number, but we may drop through to here with
       a
@@ -265,85 +247,48 @@ static int check_escape(const pcre_uchar** ptrptr,
 
       case '0':
         c -= '0';
-        while (i++ < 2 && ptr + 1 < patternEnd && ptr[1] >= '0' &&
-               ptr[1] <= '7')
-          c = c * 8 + *(++ptr) - '0';
-        c &= 255; /* Take least significant 8 bits */
+        for (i = 1; i <= 2; ++i) {
+          if (ptr + i >= patternEnd || ptr[i] < '0' || ptr[i] > '7')
+            break;
+          int cc = c * 8 + ptr[i] - '0';
+          if (cc > 255)
+            break;
+          c = cc;
+        }
+        ptr += i - 1;
         break;
 
-      /* \x is complicated. \x{ddd} is a character number which can be greater
-      than 0xff in utf8 mode, but only if the ddd are hex digits. If not, { is
-      treated as a data character. */
-
       case 'x':
-        if (ptr + 1 < patternEnd && ptr[1] == '{') {
-          const pcre_uchar* pt = ptr + 2;
-          int count = 0;
-
-          c = 0;
-          while (pt < patternEnd && isASCIIHexDigit(*pt)) {
-            register int cc = *pt++;
-            if (c == 0 && cc == '0')
-              continue; /* Leading zeroes */
-            count++;
-
-            if (cc >= 'a')
-              cc -= 32; /* Convert to upper case */
-            c = (c << 4) + cc - ((cc < 'A') ? '0' : ('A' - 10));
-          }
-
-          if (pt < patternEnd && *pt == '}') {
-            if (c < 0 || count > 8)
-              *errorcodeptr = ERR3;
-            else if (c >= 0xD800 && c <= 0xDFFF)
-              *errorcodeptr = ERR3;  // half of surrogate pair
-            else if (c >= 0xFDD0 && c <= 0xFDEF)
-              *errorcodeptr = ERR3;  // ?
-            else if (c == 0xFFFE)
-              *errorcodeptr = ERR3;  // not a character
-            else if (c == 0xFFFF)
-              *errorcodeptr = ERR3;  // not a character
-            else if (c > 0x10FFFF)
-              *errorcodeptr = ERR3;  // out of Unicode character range
-            ptr = pt;
+        c = 0;
+        for (i = 1; i <= 2; ++i) {
+          if (ptr + i >= patternEnd || !isASCIIHexDigit(ptr[i])) {
+            c = 'x';
+            i = 1;
             break;
           }
-
-          /* If the sequence of hex digits does not end with '}', then we don't
-          recognize this construct; fall through to the normal \x handling. */
-        }
-
-        /* Read just a single-byte hex-defined char */
-
-        c = 0;
-        while (i++ < 2 && ptr + 1 < patternEnd && isASCIIHexDigit(ptr[1])) {
-          int cc;        /* Some compilers don't like ++ */
-          cc = *(++ptr); /* in initializers */
+          int cc = ptr[i];
           if (cc >= 'a')
             cc -= 32; /* Convert to upper case */
           c = c * 16 + cc - ((cc < 'A') ? '0' : ('A' - 10));
         }
+        ptr += i - 1;
         break;
 
-      case 'u': {
-        const pcre_uchar* pt = ptr;
+      case 'u':
         c = 0;
-        while (i++ < 4) {
-          if (pt + 1 >= patternEnd || !isASCIIHexDigit(pt[1])) {
-            pt = ptr;
+        for (i = 1; i <= 4; ++i) {
+          if (ptr + i >= patternEnd || !isASCIIHexDigit(ptr[i])) {
             c = 'u';
+            i = 1;
             break;
-          } else {
-            int cc;       /* Some compilers don't like ++ */
-            cc = *(++pt); /* in initializers */
-            if (cc >= 'a')
-              cc -= 32; /* Convert to upper case */
-            c = c * 16 + cc - ((cc < 'A') ? '0' : ('A' - 10));
           }
+          int cc = ptr[i];
+          if (cc >= 'a')
+            cc -= 32; /* Convert to upper case */
+          c = c * 16 + cc - ((cc < 'A') ? '0' : ('A' - 10));
         }
-        ptr = pt;
+        ptr += i - 1;
         break;
-      }
 
       /* Other special escapes not starting with a digit are straightforward */
 
@@ -967,7 +912,6 @@ static BOOL compile_branch(int options,
     BOOL should_flip_negation; /* If a negative special such as \S is used, we
                                   should negate the whole class to properly
                                   support Unicode. */
-    BOOL possessive_quantifier;
     BOOL is_quantifier;
     int class_charcount;
     int class_lastchar;
@@ -1060,9 +1004,9 @@ static BOOL compile_branch(int options,
 
         /* If the first character is '^', set the negation flag and skip it. */
 
-        if ((c = *(++ptr)) == '^') {
+        if (ptr[1] == '^') {
           negate_class = true;
-          c = *(++ptr);
+          ++ptr;
         } else {
           negate_class = false;
         }
@@ -1087,14 +1031,13 @@ static BOOL compile_branch(int options,
 
         memset(classbits, 0, 32 * sizeof(uschar));
 
-        /* Process characters until ] is reached. By writing this as a "do" it
-        means that an initial ] is taken as a data character. The first pass
+        /* Process characters until ] is reached. The first pass
         through the regex checked the overall syntax, so we don't need to be
         very
         strict here. At the start of the loop, c contains the first byte of the
         character. */
 
-        do {
+        while ((c = *(++ptr)) != ']') {
           if (c > 127) {             /* Braces are required because the */
             GETCHARLEN(c, ptr, ptr); /* macro generates multiple statements */
           }
@@ -1313,12 +1256,6 @@ static BOOL compile_branch(int options,
           }
         }
 
-        /* Loop until ']' reached; the check for end of string happens inside
-        the
-        loop. This "while" is the end of the "do" above. */
-
-        while ((c = *(++ptr)) != ']');
-
         /* If class_charcount is 1, we saw precisely one character whose value
         is
         less than 256. In non-UTF-8 mode we can always optimize. In UTF-8 mode,
@@ -1463,8 +1400,7 @@ static BOOL compile_branch(int options,
 
         reqvary = (repeat_min == repeat_max) ? 0 : REQ_VARY;
 
-        op_type = 0;                   /* Default single-char op codes */
-        possessive_quantifier = false; /* Default not possessive quantifier */
+        op_type = 0; /* Default single-char op codes */
 
         /* Save start of previous item, in case we have to move it up to make
         space
@@ -1478,11 +1414,7 @@ static BOOL compile_branch(int options,
         but if PCRE_UNGREEDY is set, it works the other way round. We change the
         repeat type to the non-default. */
 
-        if (ptr + 1 < patternEnd && ptr[1] == '+') {
-          repeat_type = 0; /* Force greedy */
-          possessive_quantifier = true;
-          ptr++;
-        } else if (ptr + 1 < patternEnd && ptr[1] == '?') {
+        if (ptr + 1 < patternEnd && ptr[1] == '?') {
           repeat_type = 1;
           ptr++;
         } else
@@ -1861,25 +1793,6 @@ static BOOL compile_branch(int options,
         else {
           *errorcodeptr = ERR11;
           goto FAILED;
-        }
-
-        /* If the character following a repeat is '+', we wrap the entire
-        repeated
-        item inside OP_ONCE brackets. This is just syntactic sugar, taken from
-        Sun's Java package. The repeated item starts at tempcode, not at
-        previous,
-        which might be the first part of a string whose (former) last char we
-        repeated. However, we don't support '+' after a greediness '?'. */
-
-        if (possessive_quantifier) {
-          int len = code - tempcode;
-          memmove(tempcode + 1 + LINK_SIZE, tempcode, len);
-          code += 1 + LINK_SIZE;
-          len += 1 + LINK_SIZE;
-          tempcode[0] = OP_ONCE;
-          *code++ = OP_KET;
-          PUTINC(code, 0, len);
-          PUT(tempcode, 1, len);
         }
 
       /* In all case we no longer have a previous item. We also set the
@@ -2762,169 +2675,158 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
 
         class_utf8 = false;
 
-        /* Written as a "do" so that an initial ']' is taken as data */
+        for (; ptr < patternEnd && *ptr != ']'; ++ptr) {
+          /* Check for escapes */
 
-        if (*ptr != 0)
-          do {
-            /* Outside \Q...\E, check for escapes */
+          if (*ptr == '\\') {
+            c = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
+            if (errorcode != 0)
+              goto PCRE_ERROR_RETURN;
 
-            if (*ptr == '\\') {
-              c = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
-              if (errorcode != 0)
-                goto PCRE_ERROR_RETURN;
+            /* \b is backspace inside a class; \X is literal */
 
-              /* \b is backspace inside a class; \X is literal */
+            if (-c == ESC_b)
+              c = '\b';
 
-              if (-c == ESC_b)
-                c = '\b';
+            /* Handle escapes that turn into characters */
 
-              /* Handle escapes that turn into characters */
+            if (c >= 0)
+              goto NON_SPECIAL_CHARACTER;
 
-              if (c >= 0)
-                goto NON_SPECIAL_CHARACTER;
-
-              /* Escapes that are meta-things. The normal ones just affect the
-              bit map, but Unicode properties require an XCLASS extended item.
-              */
-
-              else {
-                class_optcount = 10; /* \d, \s etc; make sure > 1 */
-              }
-            }
-
-            /* Anything else increments the possible optimization count. We have
-            to
-            detect ranges here so that we can compute the number of extra ranges
-            for
-            caseless wide characters when UCP support is available. If there are
-            wide
-            characters, we are going to have to use an XCLASS, even for single
-            characters. */
+            /* Escapes that are meta-things. The normal ones just affect the
+            bit map, but Unicode properties require an XCLASS extended item. */
 
             else {
-              int d;
+              class_optcount = 10; /* \d, \s etc; make sure > 1 */
+            }
+          }
 
-              {
-                int extra = 0;
-                GETCHARLENEND(c, ptr, patternEnd, extra);
-                ptr += extra;
-              }
+          /* Anything else increments the possible optimization count. We have
+          to
+          detect ranges here so that we can compute the number of extra ranges
+          for
+          caseless wide characters when UCP support is available. If there are
+          wide
+          characters, we are going to have to use an XCLASS, even for single
+          characters. */
 
-            /* Come here from handling \ above when it escapes to a char value
-             */
+          else {
+            int d;
 
-            NON_SPECIAL_CHARACTER:
-              class_optcount++;
+            {
+              int extra = 0;
+              GETCHARLENEND(c, ptr, patternEnd, extra);
+              ptr += extra;
+            }
 
-              d = -1;
-              if (ptr + 1 < patternEnd && ptr[1] == '-') {
-                pcre_uchar const* hyptr = ptr++;
-                if (ptr + 1 < patternEnd && ptr[1] == '\\') {
-                  ptr++;
-                  d = check_escape(&ptr, patternEnd, &errorcode, bracount,
-                                   true);
-                  if (errorcode != 0)
-                    goto PCRE_ERROR_RETURN;
-                  if (-d == ESC_b)
-                    d = '\b'; /* backspace */
-                } else if (ptr + 1 < patternEnd && ptr[1] != ']') {
-                  ptr++;
-                  {
-                    int extra = 0;
-                    GETCHARLENEND(d, ptr, patternEnd, extra);
-                    ptr += extra;
-                  }
-                }
-                if (d < 0)
-                  ptr = hyptr; /* go back to hyphen as data */
-              }
+          /* Come here from handling \ above when it escapes to a char value */
 
-              /* If d >= 0 we have a range. In UTF-8 mode, if the end is > 255,
-              or >
-              127 for caseless matching, we will need to use an XCLASS. */
+          NON_SPECIAL_CHARACTER:
+            class_optcount++;
 
-              if (d >= 0) {
-                class_optcount = 10; /* Ensure > 1 */
-                if (d < c) {
-                  errorcode = ERR8;
+            d = -1;
+            if (ptr + 1 < patternEnd && ptr[1] == '-') {
+              pcre_uchar const* hyptr = ptr++;
+              if (ptr + 1 < patternEnd && ptr[1] == '\\') {
+                ptr++;
+                d = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
+                if (errorcode != 0)
                   goto PCRE_ERROR_RETURN;
+                if (-d == ESC_b)
+                  d = '\b'; /* backspace */
+              } else if (ptr + 1 < patternEnd && ptr[1] != ']') {
+                ptr++;
+                {
+                  int extra = 0;
+                  GETCHARLENEND(d, ptr, patternEnd, extra);
+                  ptr += extra;
                 }
+              }
+              if (d < 0)
+                ptr = hyptr; /* go back to hyphen as data */
+            }
 
-                if ((d > 255 || (ignoreCase && d > 127))) {
-                  uschar buffer[6];
-                  if (!class_utf8) /* Allow for XCLASS overhead */
-                  {
-                    class_utf8 = true;
-                    length += LINK_SIZE + 2;
-                  }
+            /* If d >= 0 we have a range. In UTF-8 mode, if the end is > 255, or
+            >
+            127 for caseless matching, we will need to use an XCLASS. */
 
-                  /* If we have UCP support, find out how many extra ranges are
-                  needed to map the other case of characters within this range.
-                  We
-                  have to mimic the range optimization here, because extending
-                  the
-                  range upwards might push d over a boundary that makes is use
-                  another byte in the UTF-8 representation. */
-
-                  if (ignoreCase) {
-                    int occ, ocd;
-                    int cc = c;
-                    int origd = d;
-                    while (get_othercase_range(&cc, origd, &occ, &ocd)) {
-                      if (occ >= c && ocd <= d)
-                        continue; /* Skip embedded */
-
-                      if (occ < c && ocd >= c - 1) /* Extend the basic range */
-                      {                            /* if there is overlap,   */
-                        c = occ;                   /* noting that if occ < c */
-                        continue;                  /* we can't have ocd > d  */
-                      }                            /* because a subrange is  */
-                      if (ocd > d && occ <= d + 1) /* always shorter than    */
-                      {                            /* the basic range.       */
-                        d = ocd;
-                        continue;
-                      }
-
-                      /* An extra item is needed */
-
-                      length +=
-                          1 + _pcre_ord2utf8(occ, buffer) +
-                          ((occ == ocd) ? 0 : _pcre_ord2utf8(ocd, buffer));
-                    }
-                  }
-
-                  /* The length of the (possibly extended) range */
-
-                  length +=
-                      1 + _pcre_ord2utf8(c, buffer) + _pcre_ord2utf8(d, buffer);
-                }
-
+            if (d >= 0) {
+              class_optcount = 10; /* Ensure > 1 */
+              if (d < c) {
+                errorcode = ERR8;
+                goto PCRE_ERROR_RETURN;
               }
 
-              /* We have a single character. There is nothing to be done unless
-              we
-              are in UTF-8 mode. If the char is > 255, or 127 when caseless, we
-              must
-              allow for an XCL_SINGLE item, doubled for caselessness if there is
-              UCP
-              support. */
-
-              else {
-                if ((c > 255 || (ignoreCase && c > 127))) {
-                  uschar buffer[6];
-                  class_optcount = 10; /* Ensure > 1 */
-                  if (!class_utf8)     /* Allow for XCLASS overhead */
-                  {
-                    class_utf8 = true;
-                    length += LINK_SIZE + 2;
-                  }
-                  length +=
-                      (ignoreCase ? 2 : 1) * (1 + _pcre_ord2utf8(c, buffer));
+              if ((d > 255 || (ignoreCase && d > 127))) {
+                uschar buffer[6];
+                if (!class_utf8) /* Allow for XCLASS overhead */
+                {
+                  class_utf8 = true;
+                  length += LINK_SIZE + 2;
                 }
+
+                /* If we have UCP support, find out how many extra ranges are
+                needed to map the other case of characters within this range. We
+                have to mimic the range optimization here, because extending the
+                range upwards might push d over a boundary that makes is use
+                another byte in the UTF-8 representation. */
+
+                if (ignoreCase) {
+                  int occ, ocd;
+                  int cc = c;
+                  int origd = d;
+                  while (get_othercase_range(&cc, origd, &occ, &ocd)) {
+                    if (occ >= c && ocd <= d)
+                      continue; /* Skip embedded */
+
+                    if (occ < c && ocd >= c - 1) /* Extend the basic range */
+                    {                            /* if there is overlap,   */
+                      c = occ;                   /* noting that if occ < c */
+                      continue;                  /* we can't have ocd > d  */
+                    }                            /* because a subrange is  */
+                    if (ocd > d && occ <= d + 1) /* always shorter than    */
+                    {                            /* the basic range.       */
+                      d = ocd;
+                      continue;
+                    }
+
+                    /* An extra item is needed */
+
+                    length += 1 + _pcre_ord2utf8(occ, buffer) +
+                              ((occ == ocd) ? 0 : _pcre_ord2utf8(ocd, buffer));
+                  }
+                }
+
+                /* The length of the (possibly extended) range */
+
+                length +=
+                    1 + _pcre_ord2utf8(c, buffer) + _pcre_ord2utf8(d, buffer);
+              }
+
+            }
+
+            /* We have a single character. There is nothing to be done unless we
+            are in UTF-8 mode. If the char is > 255, or 127 when caseless, we
+            must
+            allow for an XCL_SINGLE item, doubled for caselessness if there is
+            UCP
+            support. */
+
+            else {
+              if ((c > 255 || (ignoreCase && c > 127))) {
+                uschar buffer[6];
+                class_optcount = 10; /* Ensure > 1 */
+                if (!class_utf8)     /* Allow for XCLASS overhead */
+                {
+                  class_utf8 = true;
+                  length += LINK_SIZE + 2;
+                }
+                length +=
+                    (ignoreCase ? 2 : 1) * (1 + _pcre_ord2utf8(c, buffer));
               }
             }
-          } while (++ptr < patternEnd &&
-                   *ptr != ']'); /* Concludes "do" above */
+          }
+        }
 
         if (ptr >= patternEnd) /* Missing terminating ']' */
         {

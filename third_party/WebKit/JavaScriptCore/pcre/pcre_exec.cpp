@@ -620,156 +620,139 @@ RECURSE:
       current high water mark for use by positive assertions. Do this also
       for the "once" (not-backup up) groups. */
 
-      BEGIN_OPCODE(KET) : BEGIN_OPCODE(KETRMIN) : BEGIN_OPCODE(KETRMAX) : {
-        frame->prev = frame->ecode - GET(frame->ecode, 1);
-        frame->saved_eptr = frame->eptrb->epb_saved_eptr;
+      BEGIN_OPCODE(KET)
+          : BEGIN_OPCODE(KETRMIN)
+          : BEGIN_OPCODE(KETRMAX)
+          : frame->prev = frame->ecode - GET(frame->ecode, 1);
+      frame->saved_eptr = frame->eptrb->epb_saved_eptr;
 
-        /* Back up the stack of bracket start pointers. */
+      /* Back up the stack of bracket start pointers. */
 
-        frame->eptrb = frame->eptrb->epb_prev;
+      frame->eptrb = frame->eptrb->epb_prev;
 
-        if (*frame->prev == OP_ASSERT || *frame->prev == OP_ASSERT_NOT ||
-            *frame->prev == OP_ONCE) {
-          md->end_match_ptr = frame->eptr; /* For ONCE */
-          md->end_offset_top = frame->offset_top;
-          is_match = true;
-          RRETURN;
-        }
+      if (*frame->prev == OP_ASSERT || *frame->prev == OP_ASSERT_NOT ||
+          *frame->prev == OP_ONCE) {
+        md->end_match_ptr = frame->eptr; /* For ONCE */
+        md->end_offset_top = frame->offset_top;
+        is_match = true;
+        RRETURN;
+      }
 
-        /* In all other cases except a conditional group we have to check the
-        group number back at the start and if necessary complete handling an
-        extraction by setting the offsets and bumping the high water mark. */
+      /* In all other cases except a conditional group we have to check the
+      group number back at the start and if necessary complete handling an
+      extraction by setting the offsets and bumping the high water mark. */
 
-        frame->number = *frame->prev - OP_BRA;
+      frame->number = *frame->prev - OP_BRA;
 
-        /* For extended extraction brackets (large number), we have to fish out
-        the number from a dummy opcode at the start. */
+      /* For extended extraction brackets (large number), we have to fish out
+      the number from a dummy opcode at the start. */
 
-        if (frame->number > EXTRACT_BASIC_MAX)
-          frame->number = GET2(frame->prev, 2 + LINK_SIZE);
-        frame->offset = frame->number << 1;
+      if (frame->number > EXTRACT_BASIC_MAX)
+        frame->number = GET2(frame->prev, 2 + LINK_SIZE);
+      frame->offset = frame->number << 1;
 
 #ifdef DEBUG
-        printf("end bracket %d", frame->number);
-        printf("\n");
+      printf("end bracket %d", frame->number);
+      printf("\n");
 #endif
 
-        /* Test for a numbered group. This includes groups called as a result
-        of recursion. Note that whole-pattern recursion is coded as a recurse
-        into group 0, so it won't be picked up here. Instead, we catch it when
-        the OP_END is reached. */
+      /* Test for a numbered group. This includes groups called as a result
+      of recursion. Note that whole-pattern recursion is coded as a recurse
+      into group 0, so it won't be picked up here. Instead, we catch it when
+      the OP_END is reached. */
 
-        if (frame->number > 0) {
-          if (frame->offset >= md->offset_max)
-            md->offset_overflow = true;
-          else {
-            md->offset_vector[frame->offset] =
-                md->offset_vector[md->offset_end - frame->number];
-            md->offset_vector[frame->offset + 1] =
-                frame->eptr - md->start_subject;
-            if (frame->offset_top <= frame->offset)
-              frame->offset_top = frame->offset + 2;
-          }
+      if (frame->number > 0) {
+        if (frame->offset >= md->offset_max)
+          md->offset_overflow = true;
+        else {
+          md->offset_vector[frame->offset] =
+              md->offset_vector[md->offset_end - frame->number];
+          md->offset_vector[frame->offset + 1] =
+              frame->eptr - md->start_subject;
+          if (frame->offset_top <= frame->offset)
+            frame->offset_top = frame->offset + 2;
         }
+      }
 
-        /* For a non-repeating ket, just continue at this level. This also
-        happens for a repeating ket if no characters were matched in the group.
-        This is the forcible breaking of infinite loops as implemented in Perl
-        5.005. If there is an options reset, it will get obeyed in the normal
-        course of events. */
+      /* For a non-repeating ket, just continue at this level. This also
+      happens for a repeating ket if no characters were matched in the group.
+      This is the forcible breaking of infinite loops as implemented in Perl
+      5.005. If there is an options reset, it will get obeyed in the normal
+      course of events. */
 
-        if (*frame->ecode == OP_KET || frame->eptr == frame->saved_eptr) {
-          frame->ecode += 1 + LINK_SIZE;
-          NEXT_OPCODE;
-        }
+      if (*frame->ecode == OP_KET || frame->eptr == frame->saved_eptr) {
+        frame->ecode += 1 + LINK_SIZE;
+        NEXT_OPCODE;
+      }
 
-        /* The repeating kets try the rest of the pattern or restart from the
-        preceding bracket, in the appropriate order. */
+      /* The repeating kets try the rest of the pattern or restart from the
+      preceding bracket, in the appropriate order. */
 
-        if (*frame->ecode == OP_KETRMIN) {
-          RMATCH(16, frame->ecode + 1 + LINK_SIZE, frame->eptrb, 0);
-          if (is_match)
-            RRETURN;
-          RMATCH(17, frame->prev, frame->eptrb, match_isgroup);
-          if (is_match)
-            RRETURN;
-        } else /* OP_KETRMAX */
-        {
-          RMATCH(18, frame->prev, frame->eptrb, match_isgroup);
-          if (is_match)
-            RRETURN;
-          RMATCH(19, frame->ecode + 1 + LINK_SIZE, frame->eptrb, 0);
-          if (is_match)
-            RRETURN;
-        }
+      if (*frame->ecode == OP_KETRMIN) {
+        RMATCH(16, frame->ecode + 1 + LINK_SIZE, frame->eptrb, 0);
+        if (is_match)
+          RRETURN;
+        RMATCH(17, frame->prev, frame->eptrb, match_isgroup);
+        if (is_match)
+          RRETURN;
+      } else /* OP_KETRMAX */
+      {
+        RMATCH(18, frame->prev, frame->eptrb, match_isgroup);
+        if (is_match)
+          RRETURN;
+        RMATCH(19, frame->ecode + 1 + LINK_SIZE, frame->eptrb, 0);
+        if (is_match)
+          RRETURN;
       }
       RRETURN;
 
-      /* Start of subject unless notbol, or after internal newline if multiline
-       */
+      /* Start of subject, or after internal newline if multiline. */
 
-      BEGIN_OPCODE(CIRC) : if (md->multiline) {
-        if (frame->eptr != md->start_subject && !IS_NEWLINE(frame->eptr[-1]))
-          RRETURN_NO_MATCH;
-        frame->ecode++;
-        NEXT_OPCODE;
-      }
-      if (frame->eptr != md->start_subject)
-        RRETURN_NO_MATCH;
+      BEGIN_OPCODE(CIRC)
+          : if (frame->eptr != md->start_subject &&
+                (!md->multiline || !IS_NEWLINE(frame->eptr[-1])))
+                RRETURN_NO_MATCH;
       frame->ecode++;
       NEXT_OPCODE;
 
-      /* Assert before internal newline if multiline, or before a terminating
-      newline unless endonly is set, else end of subject unless noteol is set.
-      */
+      /* End of subject, or before internal newline if multiline. */
 
-      BEGIN_OPCODE(DOLL) : if (md->multiline) {
-        if (frame->eptr < md->end_subject) {
-          if (!IS_NEWLINE(*frame->eptr))
-            RRETURN_NO_MATCH;
-        }
-        frame->ecode++;
-      }
-      else {
-        if (frame->eptr < md->end_subject - 1 ||
-            (frame->eptr == md->end_subject - 1 && !IS_NEWLINE(*frame->eptr)))
-          RRETURN_NO_MATCH;
-        frame->ecode++;
-      }
+      BEGIN_OPCODE(DOLL)
+          : if (frame->eptr < md->end_subject &&
+                (!md->multiline || !IS_NEWLINE(*frame->eptr))) RRETURN_NO_MATCH;
+      frame->ecode++;
       NEXT_OPCODE;
 
       /* Word boundary assertions */
 
-      BEGIN_OPCODE(NOT_WORD_BOUNDARY) : BEGIN_OPCODE(WORD_BOUNDARY) : {
-        /* Find out if the previous and current characters are "word"
-        characters.
-        It takes a bit more work in UTF-8 mode. Characters > 128 are assumed to
-        be "non-word" characters. */
+      BEGIN_OPCODE(NOT_WORD_BOUNDARY)
+          : BEGIN_OPCODE(WORD_BOUNDARY)
+          : /* Find out if the previous and current characters are "word"
+            characters.
+            It takes a bit more work in UTF-8 mode. Characters > 128 are assumed
+            to
+            be "non-word" characters. */
 
-        {
-          if (frame->eptr == md->start_subject)
-            prev_is_word = false;
-          else {
-            const pcre_uchar* lastptr = frame->eptr - 1;
-            while (ISMIDCHAR(*lastptr))
-              lastptr--;
-            GETCHAR(c, lastptr);
-            prev_is_word = c < 128 && (md->ctypes[c] & ctype_word) != 0;
-          }
-          if (frame->eptr >= md->end_subject)
-            cur_is_word = false;
-          else {
-            GETCHAR(c, frame->eptr);
-            cur_is_word = c < 128 && (md->ctypes[c] & ctype_word) != 0;
-          }
-        }
-
-        /* Now see if the situation is what we want */
-
-        if ((*frame->ecode++ == OP_WORD_BOUNDARY) ? cur_is_word == prev_is_word
-                                                  : cur_is_word != prev_is_word)
-          RRETURN_NO_MATCH;
+            if (frame->eptr == md->start_subject) prev_is_word = false;
+      else {
+        const pcre_uchar* lastptr = frame->eptr - 1;
+        while (ISMIDCHAR(*lastptr))
+          lastptr--;
+        GETCHAR(c, lastptr);
+        prev_is_word = c < 128 && (md->ctypes[c] & ctype_word) != 0;
       }
+      if (frame->eptr >= md->end_subject)
+        cur_is_word = false;
+      else {
+        GETCHAR(c, frame->eptr);
+        cur_is_word = c < 128 && (md->ctypes[c] & ctype_word) != 0;
+      }
+
+      /* Now see if the situation is what we want */
+
+      if ((*frame->ecode++ == OP_WORD_BOUNDARY) ? cur_is_word == prev_is_word
+                                                : cur_is_word != prev_is_word)
+        RRETURN_NO_MATCH;
       NEXT_OPCODE;
 
       /* Match a single character type; inline for speed */
