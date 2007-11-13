@@ -1535,6 +1535,7 @@ class GreaterNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1553,6 +1554,7 @@ class LessEqNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1571,6 +1573,7 @@ class GreaterEqNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1626,6 +1629,7 @@ class EqualNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1645,6 +1649,7 @@ class NotEqualNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1664,6 +1669,7 @@ class StrictEqualNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1683,6 +1689,7 @@ class NotStrictEqualNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1774,7 +1781,7 @@ class LogicalAndNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecLogicalAnd; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1794,7 +1801,7 @@ class LogicalOrNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecLogicalOr; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
