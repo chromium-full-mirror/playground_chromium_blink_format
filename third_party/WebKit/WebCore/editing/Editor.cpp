@@ -240,21 +240,17 @@ void Editor::deleteRange(Range* range,
   if (killRing)
     addToKillRing(range, prepend);
 
-  ExceptionCode ec = 0;
-
   SelectionController* selectionController = m_frame->selectionController();
   bool smartDelete = smartDeleteOK && canSmartCopyOrDelete();
   switch (deletionAction) {
     case deleteSelectionAction:
-      selectionController->setSelectedRange(range, DOWNSTREAM, true, ec);
-      if (ec)
+      if (!selectionController->setSelectedRange(range, DOWNSTREAM, true))
         return;
       deleteSelectionWithSmartDelete(smartDelete);
       break;
     case deleteKeyAction:
-      selectionController->setSelectedRange(
-          range, DOWNSTREAM, (granularity != CharacterGranularity), ec);
-      if (ec)
+      if (!selectionController->setSelectedRange(
+              range, DOWNSTREAM, (granularity != CharacterGranularity)))
         return;
       if (m_frame->document()) {
         TypingCommand::deleteKeyPressed(m_frame->document(), smartDelete,
@@ -263,9 +259,8 @@ void Editor::deleteRange(Range* range,
       }
       break;
     case forwardDeleteKeyAction:
-      selectionController->setSelectedRange(
-          range, DOWNSTREAM, (granularity != CharacterGranularity), ec);
-      if (ec)
+      if (!selectionController->setSelectedRange(
+              range, DOWNSTREAM, (granularity != CharacterGranularity)))
         return;
       if (m_frame->document()) {
         TypingCommand::forwardDeleteKeyPressed(m_frame->document(), smartDelete,
@@ -651,7 +646,8 @@ void Editor::removeFormattingAndStyle() {
 
   // Make a plain text string from the selection to remove formatting like
   // tables and lists.
-  String string = m_frame->selectionController()->toString();
+  String string =
+      plainText(m_frame->selectionController()->selection().toRange().get());
 
   // Get the default style for this editable root, it's the style that we'll
   // give the
@@ -1764,9 +1760,8 @@ void Editor::selectComposition() {
   RefPtr<Range> range = compositionRange();
   if (!range)
     return;
-  ExceptionCode ec = 0;
   m_frame->selectionController()->setSelectedRange(range.get(), DOWNSTREAM,
-                                                   false, ec);
+                                                   false);
 }
 
 void Editor::confirmComposition() {
@@ -1843,9 +1838,9 @@ void Editor::setComposition(const String& text,
   if (!text.isEmpty()) {
     TypingCommand::insertText(m_frame->document(), text, true, true);
 
-    Node* baseNode = m_frame->selectionController()->baseNode();
+    Node* baseNode = m_frame->selectionController()->base().node();
     unsigned baseOffset = m_frame->selectionController()->base().offset();
-    Node* extentNode = m_frame->selectionController()->extentNode();
+    Node* extentNode = m_frame->selectionController()->extent().node();
     unsigned extentOffset = m_frame->selectionController()->extent().offset();
 
     if (baseNode && baseNode == extentNode && baseNode->isTextNode() &&
@@ -1866,9 +1861,8 @@ void Editor::setComposition(const String& text,
       unsigned end = min(max(start, baseOffset + selectionEnd), extentOffset);
       RefPtr<Range> selectedRange =
           new Range(baseNode->document(), baseNode, start, baseNode, end);
-      ExceptionCode ec = 0;
       m_frame->selectionController()->setSelectedRange(selectedRange.get(),
-                                                       DOWNSTREAM, false, ec);
+                                                       DOWNSTREAM, false);
     }
   }
 
