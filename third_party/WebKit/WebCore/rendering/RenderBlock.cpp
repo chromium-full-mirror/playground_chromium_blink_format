@@ -710,7 +710,9 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   bool didFullRepaint = false;
   if (checkForRepaint)
     didFullRepaint = repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
-  if (!didFullRepaint && repaintTop != repaintBottom) {
+  if (!didFullRepaint && repaintTop != repaintBottom &&
+      (style()->visibility() == VISIBLE ||
+       enclosingLayer()->hasVisibleContent())) {
     IntRect repaintRect(m_overflowLeft, repaintTop,
                         m_overflowWidth - m_overflowLeft,
                         repaintBottom - repaintTop);

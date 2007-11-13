@@ -1038,6 +1038,10 @@ void RenderBox::deleteLineBoxWrapper() {
 }
 
 IntRect RenderBox::absoluteClippedOverflowRect() {
+  if (style()->visibility() != VISIBLE &&
+      !enclosingLayer()->hasVisibleContent())
+    return IntRect();
+
   IntRect r = overflowRect(false);
 
   if (RenderView* v = view())
