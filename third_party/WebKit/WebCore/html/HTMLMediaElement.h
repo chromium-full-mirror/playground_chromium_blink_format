@@ -163,6 +163,7 @@ class HTMLMediaElement : public HTMLElement, public MovieClient {
   void checkIfSeekNeeded();
 
   String pickMedia();
+  void updatePlayState();
   float effectiveStart() const;
   float effectiveEnd() const;
   float effectiveLoopStart() const;
@@ -193,6 +194,7 @@ class HTMLMediaElement : public HTMLElement, public MovieClient {
   float m_volume;
   bool m_muted;
 
+  bool m_paused;
   bool m_seeking;
 
   unsigned m_previousProgress;
