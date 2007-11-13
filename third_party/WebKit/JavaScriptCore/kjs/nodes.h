@@ -205,6 +205,8 @@ class ExpressionNode : public Node {
 
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL = 0;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
 
   // Used to optimize those nodes that do extra work when returning a result,
@@ -266,6 +268,8 @@ class NumberNode : public ExpressionNode {
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -284,6 +288,8 @@ class ImmediateNumberNode : public NumberNode {
     ASSERT(v == JSImmediate::from(d));
   }
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
 
   virtual void setValue(double d) KJS_FAST_CALL {
     m_double = d;
@@ -344,6 +350,10 @@ class ResolveNode : public ExpressionNode {
       KJS_FAST_CALL;
 
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -352,6 +362,7 @@ class ResolveNode : public ExpressionNode {
   const Identifier& identifier() const KJS_FAST_CALL { return ident; }
 
  protected:
+  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
   Identifier ident;
   size_t index;  // Used by LocalVarAccessNode.
 };
@@ -366,6 +377,8 @@ class LocalVarAccessNode : public ResolveNode {
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
 
  private:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
@@ -500,6 +513,8 @@ class BracketAccessorNode : public ExpressionNode {
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
 
@@ -523,6 +538,10 @@ class DotAccessorNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
 
@@ -532,6 +551,7 @@ class DotAccessorNode : public ExpressionNode {
   const Identifier& identifier() const KJS_FAST_CALL { return ident; }
 
  private:
+  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
   RefPtr<ExpressionNode> expr;
   Identifier ident;
 };
@@ -594,10 +614,15 @@ class NewExprNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecLeftHandSide; }
 
  private:
+  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
   RefPtr<ExpressionNode> expr;
   RefPtr<ArgumentsNode> args;
 };
@@ -634,10 +659,15 @@ class FunctionCallResolveNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
 
  protected:
+  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
   Identifier ident;
   RefPtr<ArgumentsNode> args;
   size_t index;  // Used by LocalVarFunctionCallNode.
@@ -652,6 +682,13 @@ class LocalVarFunctionCallNode : public FunctionCallResolveNode {
   }
 
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+
+ private:
+  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
 };
 
 class FunctionCallBracketNode : public ExpressionNode {
@@ -685,10 +722,15 @@ class FunctionCallDotNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
 
- protected:
+ private:
+  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
   RefPtr<ExpressionNode> base;
   Identifier ident;
   RefPtr<ArgumentsNode> args;
@@ -764,7 +806,14 @@ class PostDecLocalVarNode : public PostDecResolveNode {
   }
 
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void optimizeForUnnecessaryResult();
+
+ private:
+  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
 };
 
 class PostfixBracketNode : public ExpressionNode {
@@ -1148,6 +1197,10 @@ class UnaryPlusNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1179,10 +1232,15 @@ class BitwiseNotNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> expr;
 };
 
@@ -1213,6 +1271,9 @@ class MultNode : public ExpressionNode {
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMultiplicitave; }
 
@@ -1233,6 +1294,8 @@ class DivNode : public ExpressionNode {
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMultiplicitave; }
 
@@ -1253,6 +1316,9 @@ class ModNode : public ExpressionNode {
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMultiplicitave; }
 
@@ -1271,6 +1337,8 @@ class AddNode : public ExpressionNode {
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAdditive; }
 
@@ -1282,6 +1350,9 @@ class AddNode : public ExpressionNode {
                                                  term2(t2) {}
   RefPtr<ExpressionNode> term1;
   RefPtr<ExpressionNode> term2;
+
+ private:
+  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
 };
 
 class AddNumbersNode : public AddNode {
@@ -1290,6 +1361,8 @@ class AddNumbersNode : public AddNode {
       : AddNode(t1, t2, NumberType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
 
  private:
   ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*) KJS_FAST_CALL;
@@ -1327,6 +1400,8 @@ class SubNode : public ExpressionNode {
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAdditive; }
 
@@ -1346,10 +1421,14 @@ class LeftShiftNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecShift; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> term1;
   RefPtr<ExpressionNode> term2;
 };
@@ -1364,10 +1443,14 @@ class RightShiftNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecShift; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> term1;
   RefPtr<ExpressionNode> term2;
 };
@@ -1382,10 +1465,14 @@ class UnsignedRightShiftNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecShift; }
 
  private:
+  ALWAYS_INLINE uint32_t inlineEvaluateToUInt32(ExecState*);
   RefPtr<ExpressionNode> term1;
   RefPtr<ExpressionNode> term2;
 };
@@ -1404,6 +1491,9 @@ class LessNode : public ExpressionNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
+ private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+
  protected:
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
@@ -1414,6 +1504,10 @@ class LessNumbersNode : public LessNode {
   LessNumbersNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
       : LessNode(e1, e2) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+
+ private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
 };
 
 class LessStringsNode : public LessNode {
@@ -1421,6 +1515,10 @@ class LessStringsNode : public LessNode {
   LessStringsNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
       : LessNode(e1, e2) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+
+ private:
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
 };
 
 class GreaterNode : public ExpressionNode {
@@ -1599,10 +1697,15 @@ class BitAndNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecBitwiseAnd; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1617,10 +1720,15 @@ class BitOrNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecBitwiseOr; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1635,10 +1743,15 @@ class BitXOrNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecBitwiseXor; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1661,6 +1774,7 @@ class LogicalAndNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecLogicalAnd; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1680,6 +1794,7 @@ class LogicalOrNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecLogicalOr; }
 
  private:
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
   RefPtr<ExpressionNode> expr1;
   RefPtr<ExpressionNode> expr2;
 };
@@ -1699,6 +1814,9 @@ class ConditionalNode : public ExpressionNode {
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecConditional; }
 
@@ -1911,6 +2029,10 @@ class AssignExprNode : public ExpressionNode {
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
