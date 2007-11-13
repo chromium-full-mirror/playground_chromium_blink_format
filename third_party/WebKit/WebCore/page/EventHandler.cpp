@@ -1256,7 +1256,7 @@ void EventHandler::cancelDragAndDrop(const PlatformMouseEvent& event,
     else
       dispatchDragEvent(dragleaveEvent, m_dragTarget.get(), event, clipboard);
   }
-  m_dragTarget = 0;
+  clearDragState();
 }
 
 bool EventHandler::performDragAndDrop(const PlatformMouseEvent& event,
@@ -1274,8 +1274,16 @@ bool EventHandler::performDragAndDrop(const PlatformMouseEvent& event,
       accept =
           dispatchDragEvent(dropEvent, m_dragTarget.get(), event, clipboard);
   }
-  m_dragTarget = 0;
+  clearDragState();
   return accept;
+}
+
+void EventHandler::clearDragState() {
+  m_dragTarget = 0;
+  m_capturingMouseEventsNode = 0;
+#if PLATFORM(MAC)
+  m_sendingEventToSubview = false;
+#endif
 }
 
 Node* EventHandler::nodeUnderMouse() const {

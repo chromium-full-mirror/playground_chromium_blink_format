@@ -246,6 +246,7 @@ class EventHandler : Noncopyable {
 
   bool handleDrag(const MouseEventWithHitTestResults&);
   bool handleMouseUp(const MouseEventWithHitTestResults&);
+  void clearDragState();
 
   bool dispatchDragSrcEvent(const AtomicString& eventType,
                             const PlatformMouseEvent&);
