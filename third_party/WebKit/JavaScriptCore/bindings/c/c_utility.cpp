@@ -77,7 +77,7 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
   ConversionResult result = ConvertUTF8ToUTF16(&sourcestart, sourceend,
                                                &targetstart, targetend, true);
 
-  *UTF16Length = targetstart - *UTF16Chars;
+  *UTF16Length = targetstart - reinterpret_cast<::UChar*>(*UTF16Chars);
 
   // Check to see if the conversion was successful
   // Some plugins return invalid UTF-8 in NPVariantType_String, see
