@@ -47,6 +47,10 @@ class Drosera {
 
   HRESULT init(HINSTANCE hInstance, int nCmdShow);
   LRESULT onSize(WPARAM, LPARAM);
+  LRESULT CALLBACK handleCommand(HWND hWnd,
+                                 UINT message,
+                                 WPARAM wParam,
+                                 LPARAM lParam);
 
   bool webViewLoaded() const;
 

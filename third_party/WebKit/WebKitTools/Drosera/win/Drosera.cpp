@@ -154,7 +154,6 @@ LRESULT CALLBACK droseraWndProc(HWND hWnd,
                                 UINT message,
                                 WPARAM wParam,
                                 LPARAM lParam) {
-  int wmId, wmEvent;
   PAINTSTRUCT ps;
   HDC hdc;
 
@@ -163,19 +162,7 @@ LRESULT CALLBACK droseraWndProc(HWND hWnd,
 
   switch (message) {
     case WM_COMMAND:
-      wmId = LOWORD(wParam);
-      wmEvent = HIWORD(wParam);
-      switch (wmId) {
-        case ID_HELP_ABOUT:
-          DialogBox(Drosera::getInst(), MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd,
-                    ::aboutWndProc);
-          break;
-        case ID_FILE_EXIT:
-          DestroyWindow(hWnd);
-          break;
-        default:
-          return DefWindowProc(hWnd, message, wParam, lParam);
-      }
+      return drosera->handleCommand(hWnd, message, wParam, lParam);
       break;
     case WM_SIZE:
       if (!drosera)
@@ -192,6 +179,44 @@ LRESULT CALLBACK droseraWndProc(HWND hWnd,
     default:
       return DefWindowProc(hWnd, message, wParam, lParam);
   }
+
+  return 0;
+}
+
+LRESULT CALLBACK Drosera::handleCommand(HWND hWnd,
+                                        UINT message,
+                                        WPARAM wParam,
+                                        LPARAM lParam) {
+  int wmId = LOWORD(wParam);
+  switch (wmId) {
+    case ID_DEBUG_CONTINUE:
+      m_debuggerClient->resume();
+      break;
+    case ID_DEBUG_PAUSE:
+      m_debuggerClient->pause();
+      break;
+    case ID_DEBUG_STEPINTO:
+      m_debuggerClient->stepInto();
+      break;
+    case ID_DEBUG_STEPOVER:
+      m_debuggerClient->stepOver();
+      break;
+    case ID_DEBUG_STEPOUT:
+      m_debuggerClient->stepOut();
+      break;
+    case ID_DEBUG_SHOWCONSOLE:
+      m_debuggerClient->showConsole();
+    case ID_HELP_ABOUT:
+      DialogBox(Drosera::getInst(), MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd,
+                ::aboutWndProc);
+      break;
+    case ID_FILE_EXIT:
+      DestroyWindow(hWnd);
+      break;
+    default:
+      return DefWindowProc(hWnd, message, wParam, lParam);
+  }
+
   return 0;
 }
 
