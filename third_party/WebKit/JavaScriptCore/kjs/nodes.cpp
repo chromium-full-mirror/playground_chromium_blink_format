@@ -3536,28 +3536,43 @@ void VarStatementNode::getDeclarations(DeclarationStacks& stacks) {
 
 static inline void statementListPushFIFO(SourceElements& statements,
                                          DeclarationStacks::NodeStack& stack) {
-  for (SourceElements::iterator ptr = statements.end() - 1;
-       ptr >= statements.begin(); --ptr)
-    stack.append((*ptr).get());
+  SourceElements::iterator it = statements.end();
+  SourceElements::iterator begin = statements.begin();
+  while (it != begin) {
+    --it;
+    stack.append((*it).get());
+  }
 }
 
 static inline void statementListGetDeclarations(SourceElements& statements,
                                                 DeclarationStacks& stacks) {
-  for (SourceElements::iterator ptr = statements.end() - 1;
-       ptr >= statements.begin(); --ptr)
-    if ((*ptr)->mayHaveDeclarations())
-      stacks.nodeStack.append((*ptr).get());
+  SourceElements::iterator it = statements.end();
+  SourceElements::iterator begin = statements.begin();
+  while (it != begin) {
+    --it;
+    if ((*it)->mayHaveDeclarations())
+      stacks.nodeStack.append((*it).get());
+  }
 }
 
-static inline Node* statementListInitializeDeclarationStacks(
+static inline Node* statementListInitializeDeclarationStack(
     SourceElements& statements,
     DeclarationStacks::NodeStack& stack) {
-  for (SourceElements::iterator ptr = statements.end() - 1;
-       ptr >= statements.begin(); --ptr)
-    if ((*ptr)->mayHaveDeclarations())
-      stack.append((*ptr).get());
+  ASSERT(!stack.size());  // Otherwise, the removeLast() call might remove
+                          // someone else's node.
+
+  SourceElements::iterator it = statements.end();
+  SourceElements::iterator begin = statements.begin();
+
+  while (it != begin) {
+    --it;
+    if ((*it)->mayHaveDeclarations())
+      stack.append((*it).get());
+  }
+
   if (!stack.size())
     return 0;
+
   Node* n = stack.last();
   stack.removeLast();
   return n;
@@ -3566,10 +3581,19 @@ static inline Node* statementListInitializeDeclarationStacks(
 static inline Node* statementListInitializeVariableAccessStack(
     SourceElements& statements,
     DeclarationStacks::NodeStack& stack) {
-  for (SourceElements::iterator ptr = statements.end() - 1;
-       ptr != statements.begin(); --ptr)
-    stack.append((*ptr).get());
-  return statements[0].get();
+  if (!statements.size())
+    return 0;
+
+  SourceElements::iterator it = statements.end();
+  SourceElements::iterator begin = statements.begin();
+  SourceElements::iterator beginPlusOne = begin + 1;
+
+  while (it != beginPlusOne) {
+    --it;
+    stack.append((*it).get());
+  }
+
+  return (*begin).get();
 }
 
 static inline Completion statementListExecute(SourceElements& statements,
@@ -3592,32 +3616,24 @@ static inline Completion statementListExecute(SourceElements& statements,
 
 // ------------------------------ BlockNode ------------------------------------
 
+BlockNode::BlockNode(SourceElements* children) {
+  ASSERT(children);
+  m_mayHaveDeclarations = true;
+  m_children.set(children);
+}
+
 void BlockNode::optimizeVariableAccess(
     FunctionBodyNode*,
     DeclarationStacks::NodeStack& nodeStack) {
-  if (m_children)
-    statementListPushFIFO(*m_children, nodeStack);
-}
-
-BlockNode::BlockNode(SourceElements* children) {
-  if (children) {
-    m_mayHaveDeclarations = true;
-    m_children.set(children);
-    setLoc(children->at(0)->firstLine(),
-           children->at(children->size() - 1)->lastLine());
-  }
+  statementListPushFIFO(*m_children, nodeStack);
 }
 
 void BlockNode::getDeclarations(DeclarationStacks& stacks) {
-  ASSERT(m_children);
   statementListGetDeclarations(*m_children, stacks);
 }
 
 // ECMA 12.1
 Completion BlockNode::execute(ExecState* exec) {
-  if (!m_children)
-    return Completion(Normal);
-
   return statementListExecute(*m_children, exec);
 }
 
@@ -4339,12 +4355,9 @@ FunctionBodyNode::FunctionBodyNode(SourceElements* children)
 }
 
 void FunctionBodyNode::initializeDeclarationStacks(ExecState* exec) {
-  if (!m_children)
-    return;
-
   DeclarationStacks::NodeStack nodeStack;
   DeclarationStacks stacks(exec, nodeStack, m_varStack, m_functionStack);
-  Node* node = statementListInitializeDeclarationStacks(*m_children, nodeStack);
+  Node* node = statementListInitializeDeclarationStack(*m_children, nodeStack);
   if (!node)
     return;
 
@@ -4383,9 +4396,6 @@ void FunctionBodyNode::initializeSymbolTable() {
 }
 
 void FunctionBodyNode::optimizeVariableAccess() {
-  if (!m_children)
-    return;
-
   DeclarationStacks::NodeStack nodeStack;
   Node* node =
       statementListInitializeVariableAccessStack(*m_children, nodeStack);
