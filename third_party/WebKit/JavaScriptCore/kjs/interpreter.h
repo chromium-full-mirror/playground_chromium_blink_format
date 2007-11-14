@@ -26,8 +26,9 @@
 
 #include "ExecState.h"
 #include "protect.h"
-#include "value.h"
 #include "types.h"
+#include "value.h"
+#include <wtf/Shared.h>
 
 namespace KJS {
 
@@ -75,7 +76,7 @@ class UriErrorPrototype;
  * evaluation, and also provides access to built-in properties such as
  * " Object" and "Number".
  */
-class Interpreter {
+class Interpreter : public Shared<Interpreter> {
   friend class Collector;
 
  public:
@@ -101,6 +102,8 @@ class Interpreter {
    * initialized with the standard global properties.
    */
   Interpreter();
+
+  virtual ~Interpreter();  // only deref should delete us
 
   /**
    * Resets the global object's default properties and adds the default object
@@ -343,15 +346,7 @@ class Interpreter {
 
   bool timedOut();
 
-  void ref() { ++m_refCount; }
-  void deref() {
-    if (--m_refCount <= 0)
-      delete this;
-  }
-  int refCount() const { return m_refCount; }
-
  protected:
-  virtual ~Interpreter();  // only deref should delete us
   virtual bool shouldInterruptScript() const { return true; }
 
   unsigned m_timeoutTime;
@@ -365,8 +360,6 @@ class Interpreter {
   // Uncopyable
   Interpreter(const Interpreter&);
   Interpreter operator=(const Interpreter&);
-
-  int m_refCount;
 
   ExecState* m_currentExec;
   JSGlobalObject* m_globalObject;

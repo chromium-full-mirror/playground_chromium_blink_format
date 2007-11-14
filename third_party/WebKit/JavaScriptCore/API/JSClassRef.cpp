@@ -39,10 +39,8 @@ const JSClassDefinition kJSClassDefinitionEmpty = {0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
                              OpaqueJSClass* protoClass)
-    : refCount(0)
-      // FIXME: <rdar://problem/4949018>
-      ,
-      className(definition->className),
+    // FIXME: <rdar://problem/4949018>
+    : className(definition->className),
       parentClass(definition->parentClass),
       prototypeClass(0),
       staticValues(0),

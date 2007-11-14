@@ -56,7 +56,7 @@ struct StaticFunctionEntry {
   JSPropertyAttributes attributes;
 };
 
-struct OpaqueJSClass {
+struct OpaqueJSClass : public Shared<OpaqueJSClass> {
   static OpaqueJSClass* create(const JSClassDefinition*);
   static OpaqueJSClass* createNoAutomaticPrototype(const JSClassDefinition*);
   ~OpaqueJSClass();
@@ -67,8 +67,6 @@ struct OpaqueJSClass {
       StaticValuesTable;
   typedef HashMap<RefPtr<KJS::UString::Rep>, StaticFunctionEntry*>
       StaticFunctionsTable;
-
-  unsigned refCount;
 
   KJS::UString className;
   OpaqueJSClass* parentClass;

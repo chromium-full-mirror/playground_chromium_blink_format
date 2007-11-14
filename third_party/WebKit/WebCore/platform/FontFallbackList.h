@@ -28,7 +28,7 @@
 // files.
 
 #include "FontData.h"
-#include "Shared.h"
+#include <wtf/Shared.h>
 #include "FontSelector.h"
 #include <wtf/Vector.h>
 

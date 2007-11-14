@@ -33,8 +33,7 @@
 namespace KJS {
 
 RegExp::RegExp(const UString& pattern)
-    : m_refCount(0),
-      m_pattern(pattern),
+    : m_pattern(pattern),
       m_flagBits(0),
       m_constructionError(0),
       m_numSubpatterns(0) {
@@ -45,8 +44,7 @@ RegExp::RegExp(const UString& pattern)
 }
 
 RegExp::RegExp(const UString& pattern, const UString& flags)
-    : m_refCount(0),
-      m_pattern(pattern),
+    : m_pattern(pattern),
       m_flags(flags),
       m_flagBits(0),
       m_constructionError(0),
