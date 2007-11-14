@@ -40,6 +40,13 @@
 #include <WebKit/IWebViewPrivate.h>
 #include <stdio.h>
 
+UIDelegate::UIDelegate() : m_refCount(1) {
+  m_frame.bottom = 0;
+  m_frame.top = 0;
+  m_frame.left = 0;
+  m_frame.right = 0;
+}
+
 HRESULT STDMETHODCALLTYPE UIDelegate::QueryInterface(REFIID riid,
                                                      void** ppvObject) {
   *ppvObject = 0;
@@ -78,14 +85,14 @@ HRESULT STDMETHODCALLTYPE UIDelegate::hasCustomMenuImplementation(
 HRESULT STDMETHODCALLTYPE UIDelegate::setFrame(
     /* [in] */ IWebView* /*sender*/,
     /* [in] */ RECT* frame) {
-  m_frame = frame;
+  m_frame = *frame;
   return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE UIDelegate::webViewFrame(
     /* [in] */ IWebView* /*sender*/,
     /* [retval][out] */ RECT* frame) {
-  frame = m_frame;
+  *frame = m_frame;
   return S_OK;
 }
 
