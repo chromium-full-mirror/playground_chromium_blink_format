@@ -25,49 +25,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef ChangeVersionWrapper_h
+#define ChangeVersionWrapper_h
 
-#ifndef DatabaseCallback_h
-#define DatabaseCallback_h
-
-#include "Threading.h"
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefPtr.h>
+#include "PlatformString.h"
+#include "SQLTransaction.h"
 
 namespace WebCore {
 
-class SQLCallback;
-class SQLResultSet;
-class VersionChangeCallback;
-
-class DatabaseCallback : public ThreadSafeShared<DatabaseCallback> {
+class ChangeVersionWrapper : public SQLTransactionWrapper {
  public:
-  virtual ~DatabaseCallback() {}
-  virtual void performCallback() = 0;
-};
+  ChangeVersionWrapper(const String& oldVersion, const String& newVersion);
 
-class DatabaseChangeVersionCallback : public DatabaseCallback {
- public:
-  DatabaseChangeVersionCallback(PassRefPtr<VersionChangeCallback>,
-                                bool versionChanged);
-  virtual ~DatabaseChangeVersionCallback() {}
-  virtual void performCallback();
+  virtual bool performPreflight(SQLTransaction*);
+  virtual bool performPostflight(SQLTransaction*);
+
+  virtual SQLError* sqlError() const { return m_sqlError.get(); }
 
  private:
-  RefPtr<VersionChangeCallback> m_callback;
-  bool m_versionChanged;
-};
-
-class DatabaseExecuteSqlCallback : public DatabaseCallback {
- public:
-  DatabaseExecuteSqlCallback(PassRefPtr<SQLCallback>, PassRefPtr<SQLResultSet>);
-  virtual ~DatabaseExecuteSqlCallback() {}
-  virtual void performCallback();
-
- private:
-  RefPtr<SQLCallback> m_callback;
-  RefPtr<SQLResultSet> m_resultSet;
+  String m_oldVersion;
+  String m_newVersion;
+  RefPtr<SQLError> m_sqlError;
 };
 
 }  // namespace WebCore
 
-#endif  // DatabaseCallback_h
+#endif  // ChangeVersionWrapper_h

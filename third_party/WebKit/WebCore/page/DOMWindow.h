@@ -147,6 +147,8 @@ class DOMWindow : public Shared<DOMWindow> {
   // HTML 5 client-side database
   PassRefPtr<Database> openDatabase(const String& name,
                                     const String& version,
+                                    const String& displayName,
+                                    unsigned long estimatedSize,
                                     ExceptionCode&);
 #endif
 

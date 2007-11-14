@@ -31,11 +31,10 @@
 #include "Database.h"
 #include "Logging.h"
 #include "SQLValue.h"
-#include "SQLCallback.h"
 
 namespace WebCore {
 
-DatabaseTask::DatabaseTask() : m_complete(false), m_synchronous(false) {}
+DatabaseTask::DatabaseTask() : m_complete(false) {}
 
 DatabaseTask::~DatabaseTask() {}
 
@@ -46,8 +45,8 @@ void DatabaseTask::performTask(Database* db) {
 
   LOG(StorageAPI, "Performing DatabaseTask %p\n", this);
 
-  if (m_synchronous)
-    m_synchronousMutex.lock();
+  if (m_synchronousMutex)
+    m_synchronousMutex->lock();
 
   db->resetAuthorizer();
   doPerformTask(db);
@@ -55,24 +54,25 @@ void DatabaseTask::performTask(Database* db) {
 
   m_complete = true;
 
-  if (m_synchronous) {
-    m_synchronousCondition.signal();
-    m_synchronousMutex.unlock();
+  if (m_synchronousMutex) {
+    ASSERT(m_synchronousCondition);
+    m_synchronousCondition->signal();
+    m_synchronousMutex->unlock();
   }
 }
 
 void DatabaseTask::lockForSynchronousScheduling() {
-  m_synchronousMutex.lock();
-  m_synchronous = true;
+  ASSERT(!m_synchronousMutex);
+  m_synchronousMutex.set(new Mutex);
+  m_synchronousMutex->lock();
 }
 
 void DatabaseTask::waitForSynchronousCompletion() {
   // Caller of this method must lock this object beforehand
-  ASSERT(m_synchronousMutex.tryLock() == false);
-
-  m_synchronousCondition.wait(m_synchronousMutex);
-  m_synchronous = false;
-  m_synchronousMutex.unlock();
+  ASSERT(m_synchronousMutex && m_synchronousMutex->tryLock() == false);
+  m_synchronousCondition.set(new ThreadCondition);
+  m_synchronousCondition->wait(*m_synchronousMutex.get());
+  m_synchronousMutex->unlock();
 }
 
 // *** DatabaseOpenTask ***
@@ -89,37 +89,10 @@ void DatabaseOpenTask::doPerformTask(Database* db) {
 // Runs the passed in sql query along with the arguments, and calls the callback
 // with the results
 
-DatabaseExecuteSqlTask::DatabaseExecuteSqlTask(
-    const String& query,
-    const Vector<SQLValue>& arguments,
-    PassRefPtr<SQLCallback> callback)
-    : DatabaseTask(),
-      m_query(query.copy()),
-      m_arguments(arguments),
-      m_callback(callback) {
-  ASSERT(callback->isThreadSafe());
-}
+DatabaseTransactionTask::DatabaseTransactionTask() : DatabaseTask() {}
 
-void DatabaseExecuteSqlTask::doPerformTask(Database* db) {
-  db->performExecuteSql(m_query, m_arguments, m_callback);
-}
-
-// *** DatabaseChangeVersionTask ***
-// Atomically verifies the current version is the same as the passed in "old
-// version", and changes it to the new version
-
-DatabaseChangeVersionTask::DatabaseChangeVersionTask(
-    const String& oldVersion,
-    const String& newVersion,
-    PassRefPtr<VersionChangeCallback> callback)
-    : m_oldVersion(oldVersion.copy()),
-      m_newVersion(newVersion.copy()),
-      m_callback(callback) {
-  ASSERT(callback->isThreadSafe());
-}
-
-void DatabaseChangeVersionTask::doPerformTask(Database* db) {
-  db->performChangeVersion(m_oldVersion, m_newVersion, m_callback);
+void DatabaseTransactionTask::doPerformTask(Database* db) {
+  db->performTransactionStep();
 }
 
 // *** DatabaseTableNamesTask ***

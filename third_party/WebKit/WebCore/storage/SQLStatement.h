@@ -25,30 +25,54 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef SQLStatment_h
+#define SQLStatment_h
 
-#include "VersionChangeCallback.h"
+#include "PlatformString.h"
+#include "Threading.h"
 
-#include <kjs/object.h>
-#include <kjs/protect.h>
-#include <wtf/Forward.h>
+#include "SQLError.h"
+#include "SQLResultSet.h"
+#include "SQLStatementCallback.h"
+#include "SQLStatementErrorCallback.h"
+#include "SQLValue.h"
 
-namespace KJS {
-class JSObject;
-}
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefPtr.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
-class Frame;
-class SQLResultSet;
+class Database;
+class SQLTransaction;
+class String;
 
-class JSCustomVersionChangeCallback : public VersionChangeCallback {
+class SQLStatement : public ThreadSafeShared<SQLStatement> {
  public:
-  JSCustomVersionChangeCallback(KJS::JSObject* callback, Frame*);
+  SQLStatement(const String& statement,
+               const Vector<SQLValue>& arguments,
+               PassRefPtr<SQLStatementCallback> callback,
+               PassRefPtr<SQLStatementErrorCallback> errorCallback);
 
-  virtual void handleEvent(bool versionChanges);
+  bool execute(Database*);
+  bool hasStatementCallback() const { return m_statementCallback; }
+  bool hasStatementErrorCallback() const { return m_statementErrorCallback; }
+  void setVersionMismatchedError();
+
+  bool performCallback(SQLTransaction*);
+
+  SQLError* sqlError() const { return m_error.get(); }
 
  private:
-  KJS::ProtectedPtr<KJS::JSObject> m_callback;
-  RefPtr<Frame> m_frame;
+  String m_statement;
+  Vector<SQLValue> m_arguments;
+  RefPtr<SQLStatementCallback> m_statementCallback;
+  RefPtr<SQLStatementErrorCallback> m_statementErrorCallback;
+
+  RefPtr<SQLError> m_error;
+  RefPtr<SQLResultSet> m_resultSet;
 };
-}
+
+}  // namespace WebCore
+
+#endif  // SQLStatment_h

@@ -528,7 +528,9 @@ double DOMWindow::devicePixelRatio() const {
 #if ENABLE(DATABASE)
 PassRefPtr<Database> DOMWindow::openDatabase(const String& name,
                                              const String& version,
-                                             ExceptionCode& e) {
+                                             const String& displayName,
+                                             unsigned long estimatedSize,
+                                             ExceptionCode& ec) {
   if (!m_frame)
     return 0;
 
@@ -537,7 +539,8 @@ PassRefPtr<Database> DOMWindow::openDatabase(const String& name,
   if (!doc)
     return 0;
 
-  return Database::openDatabase(doc, name, version, e);
+  return Database::openDatabase(doc, name, version, displayName, estimatedSize,
+                                ec);
 }
 #endif
 
