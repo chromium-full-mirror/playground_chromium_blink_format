@@ -54,7 +54,7 @@ class FileChooserClient {
   virtual void valueChanged() = 0;
 };
 
-class FileChooser : public Shared<FileChooser> {
+class FileChooser : public RefCounted<FileChooser> {
  public:
   static PassRefPtr<FileChooser> create(FileChooserClient*,
                                         const String& initialFilename);

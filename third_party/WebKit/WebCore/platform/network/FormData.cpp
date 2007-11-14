@@ -35,7 +35,7 @@ FormData::FormData(const CString& s) {
 }
 
 FormData::FormData(const FormData& data)
-    : Shared<FormData>(), m_elements(data.m_elements) {}
+    : RefCounted<FormData>(), m_elements(data.m_elements) {}
 
 PassRefPtr<FormData> FormData::copy() const {
   return new FormData(*this);

@@ -31,7 +31,7 @@
 
 namespace KJS {
 
-class RegExp : public Shared<RegExp> {
+class RegExp : public RefCounted<RegExp> {
  private:
   enum { Global = 1, IgnoreCase = 2, Multiline = 4 };
 

@@ -29,7 +29,7 @@
 #if ENABLE(SVG)
 
 #include "PlatformString.h"
-#include <wtf/Shared.h>
+#include <wtf/RefCounted.h>
 #include "StringHash.h"
 
 #include <wtf/HashMap.h>
@@ -67,7 +67,7 @@ enum SVGResourceType {
 //
 // SVG creates/uses these resources.
 
-class SVGResource : public Shared<SVGResource> {
+class SVGResource : public RefCounted<SVGResource> {
  public:
   SVGResource();
   virtual ~SVGResource();

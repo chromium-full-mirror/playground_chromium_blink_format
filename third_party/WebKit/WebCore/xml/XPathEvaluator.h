@@ -29,7 +29,7 @@
 
 #if ENABLE(XPATH)
 
-#include <wtf/Shared.h>
+#include <wtf/RefCounted.h>
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -50,7 +50,7 @@ enum XPathExceptionCode {
   TYPE_ERR
 };
 
-class XPathEvaluator : public Shared<XPathEvaluator> {
+class XPathEvaluator : public RefCounted<XPathEvaluator> {
  public:
   PassRefPtr<XPathExpression> createExpression(const String& expression,
                                                XPathNSResolver*,

@@ -29,7 +29,9 @@
 namespace WebCore {
 
 FontFamily::FontFamily(const FontFamily& other)
-    : Shared<FontFamily>(), m_family(other.m_family), m_next(other.m_next) {}
+    : RefCounted<FontFamily>(),
+      m_family(other.m_family),
+      m_next(other.m_next) {}
 
 FontFamily& FontFamily::operator=(const FontFamily& other) {
   m_family = other.m_family;

@@ -28,7 +28,7 @@
 
 #include "AtomicString.h"
 #include "EventTarget.h"
-#include <wtf/Shared.h>
+#include <wtf/RefCounted.h>
 
 namespace WebCore {
 
@@ -42,7 +42,7 @@ const int EventExceptionOffset = 100;
 const int EventExceptionMax = 199;
 enum EventExceptionCode { UNSPECIFIED_EVENT_TYPE_ERR = EventExceptionOffset };
 
-class Event : public Shared<Event> {
+class Event : public RefCounted<Event> {
  public:
   enum PhaseType { CAPTURING_PHASE = 1, AT_TARGET = 2, BUBBLING_PHASE = 3 };
 

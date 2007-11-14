@@ -70,7 +70,7 @@ SVGRenderStyle::SVGRenderStyle(bool) {
 }
 
 SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other)
-    : Shared<SVGRenderStyle>() {
+    : RefCounted<SVGRenderStyle>() {
   fill = other.fill;
   stroke = other.stroke;
   text = other.text;

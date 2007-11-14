@@ -27,7 +27,7 @@
 
 #include <wtf/Vector.h>
 
-#include <wtf/Shared.h>
+#include <wtf/RefCounted.h>
 #include "SVGListTraits.h"
 #include "ExceptionCode.h"
 
@@ -41,7 +41,7 @@ struct SVGListTypeOperations {
 };
 
 template <typename Item>
-class SVGList : public Shared<SVGList<Item>> {
+class SVGList : public RefCounted<SVGList<Item>> {
  private:
   typedef SVGListTypeOperations<Item> TypeOperations;
 
@@ -121,7 +121,7 @@ class SVGList : public Shared<SVGList<Item>> {
 };
 
 template <typename Item>
-class SVGPODListItem : public Shared<SVGPODListItem<Item>> {
+class SVGPODListItem : public RefCounted<SVGPODListItem<Item>> {
  public:
   SVGPODListItem() : m_item() {}
   SVGPODListItem(const Item& item) : m_item(item) {}

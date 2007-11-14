@@ -32,7 +32,7 @@ static RenderStyle* defaultStyle;
 StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Auto) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
-    : Shared<StyleSurroundData>(),
+    : RefCounted<StyleSurroundData>(),
       offset(o.offset),
       margin(o.margin),
       padding(o.padding),
@@ -51,7 +51,7 @@ StyleBoxData::StyleBoxData()
 }
 
 StyleBoxData::StyleBoxData(const StyleBoxData& o)
-    : Shared<StyleBoxData>(),
+    : RefCounted<StyleBoxData>(),
       width(o.width),
       height(o.height),
       min_width(o.min_width),
@@ -78,7 +78,7 @@ StyleVisualData::StyleVisualData()
 StyleVisualData::~StyleVisualData() {}
 
 StyleVisualData::StyleVisualData(const StyleVisualData& o)
-    : Shared<StyleVisualData>(),
+    : RefCounted<StyleVisualData>(),
       clip(o.clip),
       hasClip(o.hasClip),
       textDecoration(o.textDecoration),
@@ -309,7 +309,7 @@ void BackgroundLayer::cullEmptyLayers() {
 StyleBackgroundData::StyleBackgroundData() {}
 
 StyleBackgroundData::StyleBackgroundData(const StyleBackgroundData& o)
-    : Shared<StyleBackgroundData>(),
+    : RefCounted<StyleBackgroundData>(),
       m_background(o.m_background),
       m_outline(o.m_outline) {}
 
@@ -326,7 +326,7 @@ StyleMarqueeData::StyleMarqueeData()
       direction(RenderStyle::initialMarqueeDirection()) {}
 
 StyleMarqueeData::StyleMarqueeData(const StyleMarqueeData& o)
-    : Shared<StyleMarqueeData>(),
+    : RefCounted<StyleMarqueeData>(),
       increment(o.increment),
       speed(o.speed),
       loops(o.loops),
@@ -348,7 +348,7 @@ StyleFlexibleBoxData::StyleFlexibleBoxData()
       lines(RenderStyle::initialBoxLines()) {}
 
 StyleFlexibleBoxData::StyleFlexibleBoxData(const StyleFlexibleBoxData& o)
-    : Shared<StyleFlexibleBoxData>(),
+    : RefCounted<StyleFlexibleBoxData>(),
       flex(o.flex),
       flex_group(o.flex_group),
       ordinal_group(o.ordinal_group),
@@ -375,7 +375,7 @@ StyleMultiColData::StyleMultiColData()
       m_breakInside(RenderStyle::initialPageBreak()) {}
 
 StyleMultiColData::StyleMultiColData(const StyleMultiColData& o)
-    : Shared<StyleMultiColData>(),
+    : RefCounted<StyleMultiColData>(),
       m_width(o.m_width),
       m_count(o.m_count),
       m_gap(o.m_gap),
@@ -401,7 +401,7 @@ StyleTransformData::StyleTransformData()
       m_y(RenderStyle::initialTransformOriginY()) {}
 
 StyleTransformData::StyleTransformData(const StyleTransformData& o)
-    : Shared<StyleTransformData>(),
+    : RefCounted<StyleTransformData>(),
       m_operations(o.m_operations),
       m_x(o.m_x),
       m_y(o.m_y) {}
@@ -664,7 +664,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
 
 StyleRareNonInheritedData::StyleRareNonInheritedData(
     const StyleRareNonInheritedData& o)
-    : Shared<StyleRareNonInheritedData>(),
+    : RefCounted<StyleRareNonInheritedData>(),
       lineClamp(o.lineClamp),
       opacity(o.opacity),
       flexibleBox(o.flexibleBox),
@@ -764,7 +764,7 @@ StyleRareInheritedData::StyleRareInheritedData()
       userSelect(RenderStyle::initialUserSelect()) {}
 
 StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
-    : Shared<StyleRareInheritedData>(),
+    : RefCounted<StyleRareInheritedData>(),
       textStrokeColor(o.textStrokeColor),
       textStrokeWidth(o.textStrokeWidth),
       textFillColor(o.textFillColor),
@@ -818,7 +818,7 @@ StyleInheritedData::StyleInheritedData()
 StyleInheritedData::~StyleInheritedData() {}
 
 StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
-    : Shared<StyleInheritedData>(),
+    : RefCounted<StyleInheritedData>(),
       indent(o.indent),
       line_height(o.line_height),
       style_image(o.style_image),

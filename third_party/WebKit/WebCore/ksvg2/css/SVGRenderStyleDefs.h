@@ -33,7 +33,7 @@
 #include "Color.h"
 #include "Path.h"
 #include "PlatformString.h"
-#include <wtf/Shared.h>
+#include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 
 // Helper macros for 'SVGRenderStyle'
@@ -148,7 +148,7 @@ class CSSValueList;
 class SVGPaint;
 
 // Inherited/Non-Inherited Style Datastructures
-class StyleFillData : public Shared<StyleFillData> {
+class StyleFillData : public RefCounted<StyleFillData> {
  public:
   StyleFillData();
   StyleFillData(const StyleFillData& other);
@@ -165,7 +165,7 @@ class StyleFillData : public Shared<StyleFillData> {
   StyleFillData& operator=(const StyleFillData&);
 };
 
-class StyleStrokeData : public Shared<StyleStrokeData> {
+class StyleStrokeData : public RefCounted<StyleStrokeData> {
  public:
   StyleStrokeData();
   StyleStrokeData(const StyleStrokeData&);
@@ -188,7 +188,7 @@ class StyleStrokeData : public Shared<StyleStrokeData> {
   StyleStrokeData& operator=(const StyleStrokeData&);
 };
 
-class StyleStopData : public Shared<StyleStopData> {
+class StyleStopData : public RefCounted<StyleStopData> {
  public:
   StyleStopData();
   StyleStopData(const StyleStopData& other);
@@ -205,7 +205,7 @@ class StyleStopData : public Shared<StyleStopData> {
   StyleStopData& operator=(const StyleStopData&);
 };
 
-class StyleTextData : public Shared<StyleTextData> {
+class StyleTextData : public RefCounted<StyleTextData> {
  public:
   StyleTextData();
   StyleTextData(const StyleTextData& other);
@@ -221,7 +221,7 @@ class StyleTextData : public Shared<StyleTextData> {
   StyleTextData& operator=(const StyleTextData&);
 };
 
-class StyleClipData : public Shared<StyleClipData> {
+class StyleClipData : public RefCounted<StyleClipData> {
  public:
   StyleClipData();
   StyleClipData(const StyleClipData& other);
@@ -237,7 +237,7 @@ class StyleClipData : public Shared<StyleClipData> {
   StyleClipData& operator=(const StyleClipData&);
 };
 
-class StyleMaskData : public Shared<StyleMaskData> {
+class StyleMaskData : public RefCounted<StyleMaskData> {
  public:
   StyleMaskData();
   StyleMaskData(const StyleMaskData& other);
@@ -253,7 +253,7 @@ class StyleMaskData : public Shared<StyleMaskData> {
   StyleMaskData& operator=(const StyleMaskData&);
 };
 
-class StyleMarkerData : public Shared<StyleMarkerData> {
+class StyleMarkerData : public RefCounted<StyleMarkerData> {
  public:
   StyleMarkerData();
   StyleMarkerData(const StyleMarkerData& other);
@@ -272,7 +272,7 @@ class StyleMarkerData : public Shared<StyleMarkerData> {
 };
 
 // Note : the rule for this class is, *no inheritance* of these props
-class StyleMiscData : public Shared<StyleMiscData> {
+class StyleMiscData : public RefCounted<StyleMiscData> {
  public:
   StyleMiscData();
   StyleMiscData(const StyleMiscData& other);

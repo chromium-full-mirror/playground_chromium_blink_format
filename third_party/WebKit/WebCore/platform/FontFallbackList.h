@@ -28,7 +28,7 @@
 // files.
 
 #include "FontData.h"
-#include <wtf/Shared.h>
+#include <wtf/RefCounted.h>
 #include "FontSelector.h"
 #include <wtf/Vector.h>
 
@@ -43,7 +43,7 @@ class FontSelector;
 
 const int cAllFamiliesScanned = -1;
 
-class FontFallbackList : public Shared<FontFallbackList> {
+class FontFallbackList : public RefCounted<FontFallbackList> {
  public:
   FontFallbackList();
 

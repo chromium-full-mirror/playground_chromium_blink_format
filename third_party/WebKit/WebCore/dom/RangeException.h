@@ -27,7 +27,7 @@
 #ifndef RangeException_h
 #define RangeException_h
 
-#include <wtf/Shared.h>
+#include <wtf/RefCounted.h>
 
 namespace WebCore {
 
@@ -38,7 +38,7 @@ enum RangeExceptionCode {
   INVALID_NODE_TYPE_ERR
 };
 
-class RangeException : public Shared<RangeException> {
+class RangeException : public RefCounted<RangeException> {
  public:
   static const unsigned short BAD_BOUNDARYPOINTS_ERR = 1;
   static const unsigned short INVALID_NODE_TYPE_ERR = 2;

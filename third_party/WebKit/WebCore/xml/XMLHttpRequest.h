@@ -66,7 +66,7 @@ enum XMLHttpRequestState {
   Loaded = 4      // The data transfer has been completed.
 };
 
-class XMLHttpRequest : public Shared<XMLHttpRequest>,
+class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
                        public EventTarget,
                        private SubresourceLoaderClient {
  public:
@@ -127,8 +127,8 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
 
   Document* document() const { return m_doc; }
 
-  using Shared<XMLHttpRequest>::ref;
-  using Shared<XMLHttpRequest>::deref;
+  using RefCounted<XMLHttpRequest>::ref;
+  using RefCounted<XMLHttpRequest>::deref;
 
  private:
   virtual void refEventTarget() { ref(); }
