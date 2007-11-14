@@ -32,6 +32,9 @@
 #include "Color.h"
 #include "SVGPaintServer.h"
 
+#include <wtf/RefCounted.h>
+#include <wtf/RefPtr.h>
+
 #if PLATFORM(QT)
 class QGradient;
 #endif
@@ -124,8 +127,11 @@ class SVGPaintServerGradient : public SVGPaintServer {
     CGFloat previousDeltaInverse;
   } QuartzGradientStop;
 
-  QuartzGradientStop* m_stopsCache;
-  int m_stopsCount;
+  struct SharedStopCache : public RefCounted<SharedStopCache> {
+    Vector<QuartzGradientStop> m_stops;
+  };
+
+  RefPtr<SharedStopCache> m_stopsCache;
 
   CGShadingRef m_shadingCache;
   mutable GraphicsContext* m_savedContext;
