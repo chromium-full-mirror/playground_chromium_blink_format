@@ -36,7 +36,7 @@
 #include "npfunctions.h"
 #include "NetscapePlugInStreamLoader.h"
 #include "PlatformString.h"
-#include "Shared.h"
+#include "RefCounted.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "StringHash.h"
@@ -48,7 +48,7 @@ class PluginViewWin;
 
 enum PluginStreamState { StreamBeforeStarted, StreamStarted, StreamStopped };
 
-class PluginStreamWin : public Shared<PluginStreamWin>,
+class PluginStreamWin : public RefCounted<PluginStreamWin>,
                         private NetscapePlugInStreamLoaderClient {
  public:
   PluginStreamWin(PluginViewWin*,
