@@ -2130,7 +2130,7 @@ static BOOL compile_regex(int options,
 
   /* Loop for each alternative branch */
 
-  for (;;) {
+  while (true) {
     /* Now compile the branch */
 
     if (!compile_branch(options, brackets, &code, &ptr, patternEnd,
@@ -2140,7 +2140,7 @@ static BOOL compile_regex(int options,
     }
 
     /* If this is the first branch, the firstbyte and reqbyte values for the
-    branch become the values for the regex. */
+     branch become the values for the regex. */
 
     if (*last_branch != OP_ALT) {
       firstbyte = branchfirstbyte;
@@ -2148,15 +2148,16 @@ static BOOL compile_regex(int options,
     }
 
     /* If this is not the first branch, the first char and reqbyte have to
-    match the values from all the previous branches, except that if the previous
-    value for reqbyte didn't have REQ_VARY set, it can still match, and we set
-    REQ_VARY for the regex. */
+     match the values from all the previous branches, except that if the
+     previous
+     value for reqbyte didn't have REQ_VARY set, it can still match, and we set
+     REQ_VARY for the regex. */
 
     else {
       /* If we previously had a firstbyte, but it doesn't match the new branch,
-      we have to abandon the firstbyte for the regex, but if there was
-      previously
-      no reqbyte, it takes on the value of the old firstbyte. */
+       we have to abandon the firstbyte for the regex, but if there was
+       previously
+       no reqbyte, it takes on the value of the old firstbyte. */
 
       if (firstbyte >= 0 && firstbyte != branchfirstbyte) {
         if (reqbyte < 0)
@@ -2165,7 +2166,7 @@ static BOOL compile_regex(int options,
       }
 
       /* If we (now or from before) have no firstbyte, a firstbyte from the
-      branch becomes a reqbyte if there isn't a branch reqbyte. */
+       branch becomes a reqbyte if there isn't a branch reqbyte. */
 
       if (firstbyte < 0 && branchfirstbyte >= 0 && branchreqbyte < 0)
         branchreqbyte = branchfirstbyte;
@@ -2179,13 +2180,15 @@ static BOOL compile_regex(int options,
     }
 
     /* Reached end of expression, either ')' or end of pattern. Go back through
-    the alternative branches and reverse the chain of offsets, with the field in
-    the BRA item now becoming an offset to the first alternative. If there are
-    no alternatives, it points to the end of the group. The length in the
-    terminating ket is always the length of the whole bracketed item. If any of
-    the ims options were changed inside the group, compile a resetting op-code
-    following, except at the very end of the pattern. Return leaving the pointer
-    at the terminating char. */
+     the alternative branches and reverse the chain of offsets, with the field
+     in
+     the BRA item now becoming an offset to the first alternative. If there are
+     no alternatives, it points to the end of the group. The length in the
+     terminating ket is always the length of the whole bracketed item. If any of
+     the ims options were changed inside the group, compile a resetting op-code
+     following, except at the very end of the pattern. Return leaving the
+     pointer
+     at the terminating char. */
 
     if (ptr >= patternEnd || *ptr != '|') {
       int length = code - last_branch;
@@ -2212,9 +2215,9 @@ static BOOL compile_regex(int options,
     }
 
     /* Another branch follows; insert an "or" node. Its length field points back
-    to the previous branch while the bracket remains open. At the end the chain
-    is reversed. It's done like this so that the start of the bracket has a
-    zero offset until it is closed, making it possible to detect recursion. */
+     to the previous branch while the bracket remains open. At the end the chain
+     is reversed. It's done like this so that the start of the bracket has a
+     zero offset until it is closed, making it possible to detect recursion. */
 
     *code = OP_ALT;
     PUT(code, 1, code - last_branch);
@@ -2222,7 +2225,7 @@ static BOOL compile_regex(int options,
     code += 1 + LINK_SIZE;
     ptr++;
   }
-  /* Control never reaches here */
+  ASSERT_NOT_REACHED();
 }
 
 /*************************************************
