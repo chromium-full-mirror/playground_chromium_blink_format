@@ -1266,7 +1266,7 @@ CString UString::UTF8String(bool strict) const {
   char* p = buffer.data();
   const ::UChar* d = reinterpret_cast<const ::UChar*>(&data()->uc);
   ConversionResult result =
-      ConvertUTF16ToUTF8(&d, d + length, &p, p + buffer.size(), strict);
+      convertUTF16ToUTF8(&d, d + length, &p, p + buffer.size(), strict);
   if (result != conversionOK)
     return CString();
 

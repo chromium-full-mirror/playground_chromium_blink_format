@@ -47,18 +47,10 @@ namespace KJS {
 namespace Bindings {
 
 // Requires free() of returned UTF16Chars.
-void convertNPStringToUTF16(const NPString* string,
-                            NPUTF16** UTF16Chars,
-                            unsigned int* UTF16Length) {
-  convertUTF8ToUTF16(string->UTF8Characters, string->UTF8Length, UTF16Chars,
-                     UTF16Length);
-}
-
-// Requires free() of returned UTF16Chars.
-void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
-                        int UTF8Length,
-                        NPUTF16** UTF16Chars,
-                        unsigned int* UTF16Length) {
+static void convertUTF8ToUTF16WithLatin1Fallback(const NPUTF8* UTF8Chars,
+                                                 int UTF8Length,
+                                                 NPUTF16** UTF16Chars,
+                                                 unsigned int* UTF16Length) {
   ASSERT(UTF8Chars || UTF8Length == 0);
   ASSERT(UTF16Chars);
 
@@ -74,8 +66,8 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
   ::UChar* targetstart = reinterpret_cast<::UChar*>(*UTF16Chars);
   ::UChar* targetend = targetstart + UTF8Length;
 
-  ConversionResult result = ConvertUTF8ToUTF16(&sourcestart, sourceend,
-                                               &targetstart, targetend, true);
+  ConversionResult result =
+      convertUTF8ToUTF16(&sourcestart, sourceend, &targetstart, targetend);
 
   *UTF16Length = targetstart - reinterpret_cast<::UChar*>(*UTF16Chars);
 
@@ -191,11 +183,20 @@ JSValue* convertNPVariantToValue(ExecState*,
   return jsUndefined();
 }
 
+// Requires free() of returned UTF16Chars.
+void convertNPStringToUTF16(const NPString* string,
+                            NPUTF16** UTF16Chars,
+                            unsigned int* UTF16Length) {
+  convertUTF8ToUTF16WithLatin1Fallback(
+      string->UTF8Characters, string->UTF8Length, UTF16Chars, UTF16Length);
+}
+
 Identifier identifierFromNPIdentifier(const NPUTF8* name) {
   NPUTF16* methodName;
   unsigned UTF16Length;
-  convertUTF8ToUTF16(name, -1, &methodName,
-                     &UTF16Length);  // requires free() of returned memory.
+  convertUTF8ToUTF16WithLatin1Fallback(
+      name, -1, &methodName,
+      &UTF16Length);  // requires free() of returned memory.
   Identifier identifier((const KJS::UChar*)methodName, UTF16Length);
   free(methodName);
   return identifier;
