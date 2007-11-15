@@ -91,7 +91,7 @@ String DatabaseTracker::fullPathForDatabase(const SecurityOriginData& origin,
   if (statement.prepare() != SQLResultOk)
     return "";
 
-  statement.bindText(1, origin);
+  statement.bindText(1, origin.stringIdentifier());
   statement.bindText(2, name);
 
   int result = statement.step();
@@ -184,7 +184,7 @@ bool DatabaseTracker::databaseNamesForOrigin(const SecurityOriginData& origin,
   if (statement.prepare() != SQLResultOk)
     return false;
 
-  statement.bindText(1, origin);
+  statement.bindText(1, origin.stringIdentifier());
 
   int result;
   while ((result = statement.step()) == SQLResultRow)
