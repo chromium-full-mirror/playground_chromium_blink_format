@@ -113,35 +113,18 @@ bool SQLiteStatement::returnsAtLeastOneResult() {
   return true;
 }
 
-int SQLiteStatement::bindBlob(int index,
-                              const void* blob,
-                              int size,
-                              bool copy) {
+int SQLiteStatement::bindBlob(int index, const void* blob, int size) {
   ASSERT(blob);
   ASSERT(size > -1);
-  if (copy)
-    sqlite3_bind_blob(m_statement, index, blob, size, SQLITE_TRANSIENT);
-  else
-    sqlite3_bind_blob(m_statement, index, blob, size, SQLITE_STATIC);
+
+  sqlite3_bind_blob(m_statement, index, blob, size, SQLITE_TRANSIENT);
+
   return lastError();
 }
 
-int SQLiteStatement::bindText(int index, const char* text, bool copy) {
-  ASSERT(text);
-  if (copy)
-    sqlite3_bind_text(m_statement, index, text, strlen(text), SQLITE_TRANSIENT);
-  else
-    sqlite3_bind_text(m_statement, index, text, strlen(text), SQLITE_STATIC);
-  return lastError();
-}
-
-int SQLiteStatement::bindText16(int index, const String& text, bool copy) {
-  if (copy)
-    sqlite3_bind_text16(m_statement, index, text.characters(),
-                        sizeof(UChar) * text.length(), SQLITE_TRANSIENT);
-  else
-    sqlite3_bind_text16(m_statement, index, text.characters(),
-                        sizeof(UChar) * text.length(), SQLITE_STATIC);
+int SQLiteStatement::bindText(int index, const String& text) {
+  sqlite3_bind_text16(m_statement, index, text.characters(),
+                      sizeof(UChar) * text.length(), SQLITE_TRANSIENT);
   return lastError();
 }
 
@@ -160,7 +143,7 @@ int SQLiteStatement::bindNull(int index) {
 int SQLiteStatement::bindValue(int index, const SQLValue& value) {
   switch (value.type()) {
     case SQLValue::StringValue:
-      return bindText16(index, value.string());
+      return bindText(index, value.string());
     case SQLValue::NumberValue:
       return bindDouble(index, value.number());
     case SQLValue::NullValue:

@@ -44,9 +44,8 @@ class SQLiteStatement : public Noncopyable {
 
   int prepare();
   bool isPrepared() const { return m_statement; }
-  int bindBlob(int index, const void* blob, int size, bool copy = true);
-  int bindText(int index, const char* text, bool copy = true);
-  int bindText16(int index, const String& text, bool copy = true);
+  int bindBlob(int index, const void* blob, int size);
+  int bindText(int index, const String& text);
   int bindInt64(int index, int64_t integer);
   int bindDouble(int index, double number);
   int bindNull(int index);

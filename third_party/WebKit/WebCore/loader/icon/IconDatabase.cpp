@@ -2069,7 +2069,7 @@ void IconDatabase::setIconIDForPageURLInSQLDatabase(int64_t iconID,
 
   readySQLiteStatement(m_setIconIDForPageURLStatement, m_syncDB,
                        "INSERT INTO PageURL (url, iconID) VALUES ((?), ?);");
-  m_setIconIDForPageURLStatement->bindText16(1, pageURL, false);
+  m_setIconIDForPageURLStatement->bindText(1, pageURL);
   m_setIconIDForPageURLStatement->bindInt64(2, iconID);
 
   int result = m_setIconIDForPageURLStatement->step();
@@ -2087,7 +2087,7 @@ void IconDatabase::removePageURLFromSQLDatabase(const String& pageURL) {
 
   readySQLiteStatement(m_removePageURLStatement, m_syncDB,
                        "DELETE FROM PageURL WHERE url = (?);");
-  m_removePageURLStatement->bindText16(1, pageURL, false);
+  m_removePageURLStatement->bindText(1, pageURL);
 
   if (m_removePageURLStatement->step() != SQLResultDone)
     LOG_ERROR("removePageURLFromSQLDatabase failed for url %s",
@@ -2103,7 +2103,7 @@ int64_t IconDatabase::getIconIDForIconURLFromSQLDatabase(
   readySQLiteStatement(
       m_getIconIDForIconURLStatement, m_syncDB,
       "SELECT IconInfo.iconID FROM IconInfo WHERE IconInfo.url = (?);");
-  m_getIconIDForIconURLStatement->bindText16(1, iconURL, false);
+  m_getIconIDForIconURLStatement->bindText(1, iconURL);
 
   int64_t result = m_getIconIDForIconURLStatement->step();
   if (result == SQLResultRow)
@@ -2129,7 +2129,7 @@ int64_t IconDatabase::addIconURLToSQLDatabase(const String& iconURL) {
 
   readySQLiteStatement(m_addIconToIconInfoStatement, m_syncDB,
                        "INSERT INTO IconInfo (url, stamp) VALUES (?, 0);");
-  m_addIconToIconInfoStatement->bindText16(1, iconURL);
+  m_addIconToIconInfoStatement->bindText(1, iconURL);
 
   int result = m_addIconToIconInfoStatement->step();
   m_addIconToIconInfoStatement->reset();
@@ -2165,7 +2165,7 @@ PassRefPtr<SharedBuffer> IconDatabase::getImageDataForIconURLFromSQLDatabase(
                        "SELECT IconData.data FROM IconData WHERE "
                        "IconData.iconID IN (SELECT iconID FROM IconInfo WHERE "
                        "IconInfo.url = (?));");
-  m_getImageDataForIconURLStatement->bindText16(1, iconURL, false);
+  m_getImageDataForIconURLStatement->bindText(1, iconURL);
 
   int result = m_getImageDataForIconURLStatement->step();
   if (result == SQLResultRow) {
@@ -2259,7 +2259,7 @@ void IconDatabase::writeIconSnapshotToSQLDatabase(
         m_updateIconInfoStatement, m_syncDB,
         "UPDATE IconInfo SET stamp = ?, url = ? WHERE iconID = ?;");
     m_updateIconInfoStatement->bindInt64(1, snapshot.timestamp);
-    m_updateIconInfoStatement->bindText16(2, snapshot.iconURL);
+    m_updateIconInfoStatement->bindText(2, snapshot.iconURL);
     m_updateIconInfoStatement->bindInt64(3, iconID);
 
     if (m_updateIconInfoStatement->step() != SQLResultDone)
@@ -2289,7 +2289,7 @@ void IconDatabase::writeIconSnapshotToSQLDatabase(
   } else {
     readySQLiteStatement(m_setIconInfoStatement, m_syncDB,
                          "INSERT INTO IconInfo (url,stamp) VALUES (?, ?);");
-    m_setIconInfoStatement->bindText16(1, snapshot.iconURL);
+    m_setIconInfoStatement->bindText(1, snapshot.iconURL);
     m_setIconInfoStatement->bindInt64(2, snapshot.timestamp);
 
     if (m_setIconInfoStatement->step() != SQLResultDone)

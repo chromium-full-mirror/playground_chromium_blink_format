@@ -230,7 +230,7 @@ static bool setTextValueInDatabase(SQLiteDatabase& db,
     return false;
   }
 
-  statement.bindText16(1, value);
+  statement.bindText(1, value);
 
   result = statement.step();
   if (result != SQLResultDone) {
