@@ -3078,10 +3078,7 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
    pointer. */
   if (!errorptr)
     return 0;
-
   *errorptr = NULL;
-
-  /* Set up pointers to the individual character tables */
 
   compile_data compile_block;
 
@@ -3093,8 +3090,6 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
 
   if (length > MAX_PATTERN_SIZE)
     return returnError(ERR16, errorptr);
-
-  /* Compute the size of data block needed and get it. */
 
   size_t size = length + sizeof(real_pcre);
   real_pcre* re = reinterpret_cast<real_pcre*>(new char[size]);

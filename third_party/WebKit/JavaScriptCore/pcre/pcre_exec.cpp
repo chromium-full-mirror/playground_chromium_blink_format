@@ -710,7 +710,7 @@ RECURSE:
 
       BEGIN_OPCODE(CIRC)
           : if (frame->eptr != md->start_subject &&
-                (!md->multiline || !IS_NEWLINE(frame->eptr[-1])))
+                (!md->multiline || !isNewline(frame->eptr[-1])))
                 RRETURN_NO_MATCH;
       frame->ecode++;
       NEXT_OPCODE;
@@ -719,7 +719,7 @@ RECURSE:
 
       BEGIN_OPCODE(DOLL)
           : if (frame->eptr < md->end_subject &&
-                (!md->multiline || !IS_NEWLINE(*frame->eptr))) RRETURN_NO_MATCH;
+                (!md->multiline || !isNewline(*frame->eptr))) RRETURN_NO_MATCH;
       frame->ecode++;
       NEXT_OPCODE;
 
@@ -758,7 +758,7 @@ RECURSE:
       /* Match a single character type; inline for speed */
 
       BEGIN_OPCODE(ANY)
-          : if (frame->eptr < md->end_subject && IS_NEWLINE(*frame->eptr))
+          : if (frame->eptr < md->end_subject && isNewline(*frame->eptr))
                 RRETURN_NO_MATCH;
       if (frame->eptr++ >= md->end_subject)
         RRETURN_NO_MATCH;
@@ -1596,7 +1596,7 @@ RECURSE:
         switch (frame->ctype) {
           case OP_ANY:
             for (i = 1; i <= min; i++) {
-              if (frame->eptr >= md->end_subject || IS_NEWLINE(*frame->eptr))
+              if (frame->eptr >= md->end_subject || isNewline(*frame->eptr))
                 RRETURN_NO_MATCH;
               ++frame->eptr;
               while (frame->eptr < md->end_subject && ISMIDCHAR(*frame->eptr))
@@ -1689,7 +1689,7 @@ RECURSE:
             GETCHARINC(c, frame->eptr);
             switch (frame->ctype) {
               case OP_ANY:
-                if (IS_NEWLINE(c))
+                if (isNewline(c))
                   RRETURN;
                 break;
 
@@ -1749,8 +1749,7 @@ RECURSE:
             if (frame->max < INT_MAX) {
               {
                 for (i = min; i < frame->max; i++) {
-                  if (frame->eptr >= md->end_subject ||
-                      IS_NEWLINE(*frame->eptr))
+                  if (frame->eptr >= md->end_subject || isNewline(*frame->eptr))
                     break;
                   frame->eptr++;
                   while (frame->eptr < md->end_subject &&
@@ -1765,8 +1764,7 @@ RECURSE:
             else {
               {
                 for (i = min; i < frame->max; i++) {
-                  if (frame->eptr >= md->end_subject ||
-                      IS_NEWLINE(*frame->eptr))
+                  if (frame->eptr >= md->end_subject || isNewline(*frame->eptr))
                     break;
                   frame->eptr++;
                 }
@@ -2229,7 +2227,7 @@ int jsRegExpExecute(const pcre* argument_re,
 
     else if (startline) {
       if (start_match > match_block.start_subject + start_offset) {
-        while (start_match < end_subject && !IS_NEWLINE(start_match[-1]))
+        while (start_match < end_subject && !isNewline(start_match[-1]))
           start_match++;
       }
     }
