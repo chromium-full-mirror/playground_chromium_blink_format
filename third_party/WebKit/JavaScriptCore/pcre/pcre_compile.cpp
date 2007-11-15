@@ -2438,98 +2438,35 @@ static int find_firstassertedchar(const uschar* code,
   return c;
 }
 
-/*************************************************
-*        Compile a Regular Expression            *
-*************************************************/
+static int calculateCompiledPatternLengthAndFlags(
+    const pcre_char* pattern,
+    int patternLength,
+    JSRegExpIgnoreCaseOption ignoreCase,
+    compile_data& compile_block,
+    ErrorCode errorcode) {
+  /* Make a pass over the pattern to compute the
+   amount of store required to hold the compiled code. This does not have to be
+   perfect as long as errors are overestimates. At the same time we can detect
+   any
+   flag settings right at the start, and extract them. Make an attempt to
+   correct
+   for any counted white space if an "extended" flag setting appears late in the
+   pattern. We can't be so clever for #-comments. */
 
-/* This function takes a string and returns a pointer to a block of store
-holding a compiled version of the expression. The original API for this
-function had no error code return variable; it is retained for backwards
-compatibility. The new function is given a new name.
-
-Arguments:
-  pattern       the regular expression
-  options       various option bits
-  errorcodeptr  pointer to error code variable (pcre_compile2() only)
-                  can be NULL if you don't want a code value
-  errorptr      pointer to pointer to error text
-  erroroffset   ptr offset in pattern where error was detected
-  tables        pointer to character tables or NULL
-
-Returns:        pointer to compiled data block, or NULL on error,
-                with errorptr and erroroffset set
-*/
-
-pcre* jsRegExpCompile(const pcre_char* pattern,
-                      int patternLength,
-                      JSRegExpIgnoreCaseOption ignoreCase,
-                      JSRegExpMultilineOption multiline,
-                      unsigned* numSubpatterns,
-                      const char** errorptr) {
-  real_pcre* re;
   int length = 1 + LINK_SIZE; /* For initial BRA plus length */
-  int c, firstbyte, reqbyte;
-  int bracount = 0;
   int branch_extra = 0;
   int branch_newextra;
-  int item_count = -1;
-  int name_count = 0;
-  int max_name_size = 0;
   int lastitemlength = 0;
-  ErrorCode errorcode = ERR0;
   BOOL class_utf8;
   BOOL capturing;
   unsigned int brastackptr = 0;
-  size_t size;
-  uschar* code;
-  const uschar* codestart;
-  const pcre_uchar* ptr;
-  const pcre_uchar* patternEnd;
-  compile_data compile_block;
   int brastack[BRASTACK_SIZE];
   uschar bralenstack[BRASTACK_SIZE];
+  int item_count = -1;
+  int bracount = 0;
 
-  /* We can't pass back an error message if errorptr is NULL; I guess the best
-  we
-  can do is just return NULL, but we can set a code value if there is a code
-  pointer. */
-
-  if (errorptr == NULL) {
-    return NULL;
-  }
-
-  *errorptr = NULL;
-
-  /* Set up pointers to the individual character tables */
-
-  compile_block.lcc = _pcre_default_tables + lcc_offset;
-  compile_block.fcc = _pcre_default_tables + fcc_offset;
-  compile_block.cbits = _pcre_default_tables + cbits_offset;
-  compile_block.ctypes = _pcre_default_tables + ctypes_offset;
-
-  /* Maximum back reference and backref bitmap. This is updated for numeric
-  references during the first pass, but for named references during the actual
-  compile pass. The bitmap records up to 31 back references to help in deciding
-  whether (.*) can be treated as anchored or not. */
-
-  compile_block.top_backref = 0;
-  compile_block.backref_map = 0;
-
-  /* Reflect pattern for debugging output */
-
-  DPRINTF(
-      ("------------------------------------------------------------------\n"));
-
-  /* The first thing to do is to make a pass over the pattern to compute the
-  amount of store required to hold the compiled code. This does not have to be
-  perfect as long as errors are overestimates. At the same time we can detect
-  any
-  flag settings right at the start, and extract them. Make an attempt to correct
-  for any counted white space if an "extended" flag setting appears late in the
-  pattern. We can't be so clever for #-comments. */
-
-  ptr = (const pcre_uchar*)(pattern - 1);
-  patternEnd = (const pcre_uchar*)(pattern + patternLength);
+  const pcre_uchar* ptr = (const pcre_uchar*)(pattern - 1);
+  const pcre_uchar* patternEnd = (const pcre_uchar*)(pattern + patternLength);
 
   while (++ptr < patternEnd) {
     int min = 0, max = 0;
@@ -2537,18 +2474,19 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
     int bracket_length;
     int duplength;
 
-    c = *ptr;
+    int c = *ptr;
 
     item_count++; /* Is zero for the first non-comment item */
 
     switch (c) {
       /* A backslashed item may be an escaped data character or it may be a
-      character type. */
+       character type. */
 
       case '\\':
         c = check_escape(&ptr, patternEnd, &errorcode, bracount, false);
         if (errorcode != 0)
-          goto PCRE_ERROR_RETURN;
+          return -1;
+        ;
 
         lastitemlength = 1; /* Default length of last item for repeats */
 
@@ -2573,8 +2511,8 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         length++;
 
         /* A back reference needs an additional 2 bytes, plus either one or 5
-        bytes for a repeat. We also need to keep the value of the highest
-        back reference. */
+         bytes for a repeat. We also need to keep the value of the highest
+         back reference. */
 
         if (c <= -ESC_REF) {
           int refnum = -c - ESC_REF;
@@ -2585,7 +2523,8 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
           if (ptr[1] == '{' && is_counted_repeat(ptr + 2, patternEnd)) {
             ptr = read_repeat_counts(ptr + 2, &min, &max, &errorcode);
             if (errorcode != 0)
-              goto PCRE_ERROR_RETURN;
+              return -1;
+            ;
             if ((min == 0 && (max == 1 || max == -1)) ||
                 (min == 1 && max == -1))
               length++;
@@ -2612,14 +2551,15 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         goto POSESSIVE; /* A few lines below */
 
       /* This covers the cases of braced repeats after a single char, metachar,
-      class, or back reference. */
+       class, or back reference. */
 
       case '{':
         if (!is_counted_repeat(ptr + 1, patternEnd))
           goto NORMAL_CHAR;
         ptr = read_repeat_counts(ptr + 1, &min, &max, &errorcode);
         if (errorcode != 0)
-          goto PCRE_ERROR_RETURN;
+          return -1;
+        ;
 
         /* These special cases just insert one extra opcode */
 
@@ -2650,21 +2590,21 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         continue;
 
       /* An alternation contains an offset to the next branch or ket. If any ims
-      options changed in the previous branch(es), and/or if we are in a
-      lookbehind assertion, extra space will be needed at the start of the
-      branch. This is handled by branch_extra. */
+       options changed in the previous branch(es), and/or if we are in a
+       lookbehind assertion, extra space will be needed at the start of the
+       branch. This is handled by branch_extra. */
 
       case '|':
         length += 1 + LINK_SIZE + branch_extra;
         continue;
 
       /* A character class uses 33 characters provided that all the character
-      values are less than 256. Otherwise, it uses a bit map for low valued
-      characters, and individual items for others. Don't worry about character
-      types that aren't allowed in classes - they'll get picked up during the
-      compile. A character class that contains only one single-byte character
-      uses 2 or 3 bytes, depending on whether it is negated or not. Notice this
-      where we can. (In UTF-8 mode we can do this only for chars < 128.) */
+       values are less than 256. Otherwise, it uses a bit map for low valued
+       characters, and individual items for others. Don't worry about character
+       types that aren't allowed in classes - they'll get picked up during the
+       compile. A character class that contains only one single-byte character
+       uses 2 or 3 bytes, depending on whether it is negated or not. Notice this
+       where we can. (In UTF-8 mode we can do this only for chars < 128.) */
 
       case '[':
         if (*(++ptr) == '^') {
@@ -2681,7 +2621,8 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
           if (*ptr == '\\') {
             c = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
             if (errorcode != 0)
-              goto PCRE_ERROR_RETURN;
+              return -1;
+            ;
 
             /* \b is backspace inside a class; \X is literal */
 
@@ -2694,7 +2635,7 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
               goto NON_SPECIAL_CHARACTER;
 
             /* Escapes that are meta-things. The normal ones just affect the
-            bit map, but Unicode properties require an XCLASS extended item. */
+             bit map, but Unicode properties require an XCLASS extended item. */
 
             else {
               class_optcount = 10; /* \d, \s etc; make sure > 1 */
@@ -2702,13 +2643,13 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
           }
 
           /* Anything else increments the possible optimization count. We have
-          to
-          detect ranges here so that we can compute the number of extra ranges
-          for
-          caseless wide characters when UCP support is available. If there are
-          wide
-          characters, we are going to have to use an XCLASS, even for single
-          characters. */
+           to
+           detect ranges here so that we can compute the number of extra ranges
+           for
+           caseless wide characters when UCP support is available. If there are
+           wide
+           characters, we are going to have to use an XCLASS, even for single
+           characters. */
 
           else {
             int d;
@@ -2731,7 +2672,8 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
                 ptr++;
                 d = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
                 if (errorcode != 0)
-                  goto PCRE_ERROR_RETURN;
+                  return -1;
+                ;
                 if (-d == ESC_b)
                   d = '\b'; /* backspace */
               } else if (ptr + 1 < patternEnd && ptr[1] != ']') {
@@ -2747,14 +2689,15 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
             }
 
             /* If d >= 0 we have a range. In UTF-8 mode, if the end is > 255, or
-            >
-            127 for caseless matching, we will need to use an XCLASS. */
+             >
+             127 for caseless matching, we will need to use an XCLASS. */
 
             if (d >= 0) {
               class_optcount = 10; /* Ensure > 1 */
               if (d < c) {
                 errorcode = ERR8;
-                goto PCRE_ERROR_RETURN;
+                return -1;
+                ;
               }
 
               if ((d > 255 || (ignoreCase && d > 127))) {
@@ -2766,10 +2709,12 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
                 }
 
                 /* If we have UCP support, find out how many extra ranges are
-                needed to map the other case of characters within this range. We
-                have to mimic the range optimization here, because extending the
-                range upwards might push d over a boundary that makes is use
-                another byte in the UTF-8 representation. */
+                 needed to map the other case of characters within this range.
+                 We
+                 have to mimic the range optimization here, because extending
+                 the
+                 range upwards might push d over a boundary that makes is use
+                 another byte in the UTF-8 representation. */
 
                 if (ignoreCase) {
                   int occ, ocd;
@@ -2806,11 +2751,11 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
             }
 
             /* We have a single character. There is nothing to be done unless we
-            are in UTF-8 mode. If the char is > 255, or 127 when caseless, we
-            must
-            allow for an XCL_SINGLE item, doubled for caselessness if there is
-            UCP
-            support. */
+             are in UTF-8 mode. If the char is > 255, or 127 when caseless, we
+             must
+             allow for an XCL_SINGLE item, doubled for caselessness if there is
+             UCP
+             support. */
 
             else {
               if ((c > 255 || (ignoreCase && c > 127))) {
@@ -2831,14 +2776,15 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         if (ptr >= patternEnd) /* Missing terminating ']' */
         {
           errorcode = ERR6;
-          goto PCRE_ERROR_RETURN;
+          return -1;
+          ;
         }
 
         /* We can optimize when there was only one optimizable character.
-        Repeats
-        for positive and negated single one-byte chars are handled by the
-        general
-        code. Here, we handle repeats for the class opcodes. */
+         Repeats
+         for positive and negated single one-byte chars are handled by the
+         general
+         code. Here, we handle repeats for the class opcodes. */
 
         if (class_optcount == 1)
           length += 3;
@@ -2846,14 +2792,15 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
           length += 33;
 
           /* A repeat needs either 1 or 5 bytes. If it is a possessive
-          quantifier,
-          we also need extra for wrapping the whole thing in a sub-pattern. */
+           quantifier,
+           we also need extra for wrapping the whole thing in a sub-pattern. */
 
           if (ptr + 1 < patternEnd && ptr[1] == '{' &&
               is_counted_repeat(ptr + 2, patternEnd)) {
             ptr = read_repeat_counts(ptr + 2, &min, &max, &errorcode);
             if (errorcode != 0)
-              goto PCRE_ERROR_RETURN;
+              return -1;
+            ;
             if ((min == 0 && (max == 1 || max == -1)) ||
                 (min == 1 && max == -1))
               length++;
@@ -2880,11 +2827,12 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         if (ptr + 1 < patternEnd && ptr[1] == '?') {
           switch (c = (ptr + 2 < patternEnd ? ptr[2] : 0)) {
             /* Non-referencing groups and lookaheads just move the pointer on,
-            and
-            then behave like a non-special bracket, except that they don't
-            increment
-            the count of extracting brackets. Ditto for the "once only" bracket,
-            which is in Perl from version 5.005. */
+             and
+             then behave like a non-special bracket, except that they don't
+             increment
+             the count of extracting brackets. Ditto for the "once only"
+             bracket,
+             which is in Perl from version 5.005. */
 
             case ':':
             case '=':
@@ -2893,16 +2841,17 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
               break;
 
             /* Else loop checking valid options until ) is met. Anything else is
-            an
-            error. If we are without any brackets, i.e. at top level, the
-            settings
-            act as if specified in the options, so massage the options
-            immediately.
-            This is for backward compatibility with Perl 5.004. */
+             an
+             error. If we are without any brackets, i.e. at top level, the
+             settings
+             act as if specified in the options, so massage the options
+             immediately.
+             This is for backward compatibility with Perl 5.004. */
 
             default:
               errorcode = ERR12;
-              goto PCRE_ERROR_RETURN;
+              return -1;
+              ;
           }
         }
 
@@ -2910,9 +2859,9 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
           capturing = 1;
 
         /* Capturing brackets must be counted so we can process escapes in a
-        Perlish way. If the number exceeds EXTRACT_BASIC_MAX we are going to
-        need
-        an additional 3 bytes of memory per capturing bracket. */
+         Perlish way. If the number exceeds EXTRACT_BASIC_MAX we are going to
+         need
+         an additional 3 bytes of memory per capturing bracket. */
 
         if (capturing) {
           bracount++;
@@ -2921,16 +2870,17 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         }
 
         /* Save length for computing whole length at end if there's a repeat
-        that
-        requires duplication of the group. Also save the current value of
-        branch_extra, and start the new group with the new value. If non-zero,
-        this
-        will either be 2 for a (?imsx: group, or 3 for a lookbehind assertion.
-        */
+         that
+         requires duplication of the group. Also save the current value of
+         branch_extra, and start the new group with the new value. If non-zero,
+         this
+         will either be 2 for a (?imsx: group, or 3 for a lookbehind assertion.
+         */
 
         if (brastackptr >= sizeof(brastack) / sizeof(int)) {
           errorcode = ERR17;
-          goto PCRE_ERROR_RETURN;
+          return -1;
+          ;
         }
 
         bralenstack[brastackptr] = branch_extra;
@@ -2941,10 +2891,11 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         continue;
 
       /* Handle ket. Look for subsequent max/min; for certain sets of values we
-      have to replicate this bracket up to that many times. If brastackptr is
-      0 this is an unmatched bracket which will generate an error, but take care
-      not to try to access brastack[-1] when computing the length and restoring
-      the branch_extra value. */
+       have to replicate this bracket up to that many times. If brastackptr is
+       0 this is an unmatched bracket which will generate an error, but take
+       care
+       not to try to access brastack[-1] when computing the length and restoring
+       the branch_extra value. */
 
       case ')':
         length += 1 + LINK_SIZE;
@@ -2955,13 +2906,14 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
           duplength = 0;
 
         /* Leave ptr at the final char; for read_repeat_counts this happens
-        automatically; for the others we need an increment. */
+         automatically; for the others we need an increment. */
 
         if (ptr + 1 < patternEnd && (c = ptr[1]) == '{' &&
             is_counted_repeat(ptr + 2, patternEnd)) {
           ptr = read_repeat_counts(ptr + 2, &min, &max, &errorcode);
           if (errorcode != 0)
-            goto PCRE_ERROR_RETURN;
+            return -1;
+          ;
         } else if (c == '*') {
           min = 0;
           max = -1;
@@ -2980,9 +2932,9 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         }
 
         /* If the minimum is zero, we have to allow for an OP_BRAZERO before the
-        group, and if the maximum is greater than zero, we have to replicate
-        maxval-1 times; each replication acquires an OP_BRAZERO plus a nesting
-        bracket set. */
+         group, and if the maximum is greater than zero, we have to replicate
+         maxval-1 times; each replication acquires an OP_BRAZERO plus a nesting
+         bracket set. */
 
         if (min == 0) {
           length++;
@@ -2991,11 +2943,12 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         }
 
         /* When the minimum is greater than zero, we have to replicate up to
-        minval-1 times, with no additions required in the copies. Then, if there
-        is a limited maximum we have to replicate up to maxval-1 times allowing
-        for a BRAZERO item before each optional copy and nesting brackets for
-        all
-        but one of the optional copies. */
+         minval-1 times, with no additions required in the copies. Then, if
+         there
+         is a limited maximum we have to replicate up to maxval-1 times allowing
+         for a BRAZERO item before each optional copy and nesting brackets for
+         all
+         but one of the optional copies. */
 
         else {
           length += (min - 1) * duplength;
@@ -3013,9 +2966,10 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
         continue;
 
       /* Non-special character. It won't be space or # in extended mode, so it
-      is
-      always a genuine character. If we are in a \Q...\E sequence, check for the
-      end; if not, we have a literal. */
+       is
+       always a genuine character. If we are in a \Q...\E sequence, check for
+       the
+       end; if not, we have a literal. */
 
       default:
       NORMAL_CHAR:
@@ -3046,52 +3000,140 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
   }
 
   length += 2 + LINK_SIZE; /* For final KET and END */
+  return length;
+}
 
-  if (length > MAX_PATTERN_SIZE) {
-    errorcode = ERR16;
-    goto PCRE_ERROR_RETURN;
+#ifdef DEBUG
+static void printCompiledRegExp(real_pcre* re, int length) {
+  printf("Length = %d top_bracket = %d top_backref = %d\n", length,
+         re->top_bracket, re->top_backref);
+
+  if (re->options) {
+    printf("%s%s%s\n", ((re->options & PCRE_ANCHORED) != 0) ? "anchored " : "",
+           ((re->options & PCRE_CASELESS) != 0) ? "caseless " : "",
+           ((re->options & PCRE_MULTILINE) != 0) ? "multiline " : "");
   }
+
+  if (re->options & PCRE_FIRSTSET) {
+    char ch = re->first_byte & 255;
+    const char* caseless =
+        ((re->first_byte & REQ_CASELESS) == 0) ? "" : " (caseless)";
+    if (isASCIIAlphanumeric(ch))
+      printf("First char = %c%s\n", ch, caseless);
+    else
+      printf("First char = \\x%02x%s\n", ch, caseless);
+  }
+
+  if (re->options & PCRE_REQCHSET) {
+    char ch = re->req_byte & 255;
+    const char* caseless =
+        ((re->req_byte & REQ_CASELESS) == 0) ? "" : " (caseless)";
+    if (isASCIIAlphanumeric(ch))
+      printf("Req char = %c%s\n", ch, caseless);
+    else
+      printf("Req char = \\x%02x%s\n", ch, caseless);
+  }
+
+  // This debugging function has been removed from JavaScriptCore's PCRE
+  // pcre_printint(re, stdout);
+}
+#endif
+
+/*************************************************
+*        Compile a Regular Expression            *
+*************************************************/
+
+/* This function takes a string and returns a pointer to a block of store
+holding a compiled version of the expression. The original API for this
+function had no error code return variable; it is retained for backwards
+compatibility. The new function is given a new name.
+
+Arguments:
+  pattern       the regular expression
+  options       various option bits
+  errorcodeptr  pointer to error code variable (pcre_compile2() only)
+                  can be NULL if you don't want a code value
+  errorptr      pointer to pointer to error text
+  erroroffset   ptr offset in pattern where error was detected
+  tables        pointer to character tables or NULL
+
+Returns:        pointer to compiled data block, or NULL on error,
+                with errorptr and erroroffset set
+*/
+
+static pcre* returnError(ErrorCode errorcode, const char** errorptr) {
+  *errorptr = error_text(errorcode);
+  return 0;
+}
+
+pcre* jsRegExpCompile(const pcre_char* pattern,
+                      int patternLength,
+                      JSRegExpIgnoreCaseOption ignoreCase,
+                      JSRegExpMultilineOption multiline,
+                      unsigned* numSubpatterns,
+                      const char** errorptr) {
+  /* We can't pass back an error message if errorptr is NULL; I guess the best
+   we
+   can do is just return NULL, but we can set a code value if there is a code
+   pointer. */
+  if (!errorptr)
+    return 0;
+
+  *errorptr = NULL;
+
+  /* Set up pointers to the individual character tables */
+
+  compile_data compile_block;
+
+  ErrorCode errorcode = ERR0;
+  int length = calculateCompiledPatternLengthAndFlags(
+      pattern, patternLength, ignoreCase, compile_block, errorcode);
+  if (errorcode)
+    return returnError(errorcode, errorptr);
+
+  if (length > MAX_PATTERN_SIZE)
+    return returnError(ERR16, errorptr);
 
   /* Compute the size of data block needed and get it. */
 
-  size = length + sizeof(real_pcre) + name_count * (max_name_size + 3);
-  re = reinterpret_cast<real_pcre*>(new char[size]);
+  size_t size = length + sizeof(real_pcre);
+  real_pcre* re = reinterpret_cast<real_pcre*>(new char[size]);
 
-  if (re == NULL) {
-    errorcode = ERR13;
-    goto PCRE_ERROR_RETURN;
-  }
+  if (!re)
+    return returnError(ERR13, errorptr);
 
   /* Put in the magic number, and save the sizes, options, and character table
-  pointer. NULL is used for the default character tables. The nullpad field is
-  at
-  the end; it's there to help in the case when a regex compiled on a system with
-  4-byte pointers is run on another with 8-byte pointers. */
+   pointer. NULL is used for the default character tables. The nullpad field is
+   at
+   the end; it's there to help in the case when a regex compiled on a system
+   with
+   4-byte pointers is run on another with 8-byte pointers. */
 
   re->size = (pcre_uint32)size;
   re->options =
       (ignoreCase ? PCRE_CASELESS : 0) | (multiline ? PCRE_MULTILINE : 0);
 
   /* The starting points of the name/number translation table and of the code
-  are
-  passed around in the compile data block. */
+   are
+   passed around in the compile data block. */
 
-  codestart = (const uschar*)(re + 1);
+  const uschar* codestart = (const uschar*)(re + 1);
   compile_block.start_code = codestart;
   compile_block.start_pattern = (const pcre_uchar*)pattern;
-  compile_block.req_varyopt = 0;
 
   /* Set up a starting, non-extracting bracket, then compile the expression. On
-  error, errorcode will be set non-zero, so we don't need to look at the result
-  of the function here. */
+   error, errorcode will be set non-zero, so we don't need to look at the result
+   of the function here. */
 
-  ptr = (const pcre_uchar*)pattern;
-  code = (uschar*)codestart;
+  const pcre_uchar* ptr = (const pcre_uchar*)pattern;
+  const pcre_uchar* patternEnd = pattern + patternLength;
+  uschar* code = (uschar*)codestart;
   *code = OP_BRA;
-  bracount = 0;
-  (void)compile_regex(re->options, &bracount, &code, &ptr, patternEnd,
+  int firstbyte, reqbyte;
+  int bracketCount = 0;
+  (void)compile_regex(re->options, &bracketCount, &code, &ptr, patternEnd,
                       &errorcode, 0, &firstbyte, &reqbyte, &compile_block);
-  re->top_bracket = bracount;
+  re->top_bracket = bracketCount;
   re->top_backref = compile_block.top_backref;
 
   /* If not reached end of pattern on success, there's an excess bracket. */
@@ -3100,7 +3142,7 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
     errorcode = ERR10;
 
   /* Fill in the terminating state and check for disastrous overflow, but
-  if debugging, leave the test till after things are printed out. */
+   if debugging, leave the test till after things are printed out. */
 
   *code++ = OP_END;
 
@@ -3110,7 +3152,7 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
 #endif
 
   /* Give an error if there's back reference to a non-existent capturing
-  subpattern. */
+   subpattern. */
 
   if (re->top_backref > re->top_bracket)
     errorcode = ERR15;
@@ -3119,52 +3161,50 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
 
   if (errorcode != ERR0) {
     delete[] reinterpret_cast<char*>(re);
-  PCRE_ERROR_RETURN:
-    *errorptr = error_text(errorcode);
-    return NULL;
+    return returnError(errorcode, errorptr);
   }
 
   /* If the anchored option was not passed, set the flag if we can determine
-  that
-  the pattern is anchored by virtue of ^ characters or \A or anything else (such
-  as starting with .* when DOTALL is set).
+   that
+   the pattern is anchored by virtue of ^ characters or \A or anything else
+   (such
+   as starting with .* when DOTALL is set).
 
-  Otherwise, if we know what the first character has to be, save it, because
-  that
-  speeds up unanchored matches no end. If not, see if we can set the
-  PCRE_STARTLINE flag. This is helpful for multiline matches when all branches
-  start with ^. and also when all branches start with .* for non-DOTALL matches.
-  */
+   Otherwise, if we know what the first character has to be, save it, because
+   that
+   speeds up unanchored matches no end. If not, see if we can set the
+   PCRE_STARTLINE flag. This is helpful for multiline matches when all branches
+   start with ^. and also when all branches start with .* for non-DOTALL
+   matches.
+   */
 
-  {
-    if (is_anchored(codestart, re->options, 0, compile_block.backref_map))
-      re->options |= PCRE_ANCHORED;
-    else {
-      if (firstbyte < 0)
-        firstbyte = find_firstassertedchar(codestart, re->options, false);
-      if (firstbyte >= 0) /* Remove caseless flag for non-caseable chars */
-      {
-        int ch = firstbyte & 255;
-        if (ch < 127) { /* Strange indentation to aid in merging. */
-          re->first_byte =
-              ((firstbyte & REQ_CASELESS) != 0 && compile_block.fcc[ch] == ch)
-                  ? ch
-                  : firstbyte;
-          re->options |= PCRE_FIRSTSET;
-        }
-      } else if (is_startline(codestart, 0, compile_block.backref_map))
-        re->options |= PCRE_STARTLINE;
-    }
+  if (is_anchored(codestart, re->options, 0, compile_block.backref_map))
+    re->options |= PCRE_ANCHORED;
+  else {
+    if (firstbyte < 0)
+      firstbyte = find_firstassertedchar(codestart, re->options, false);
+    if (firstbyte >= 0) /* Remove caseless flag for non-caseable chars */
+    {
+      int ch = firstbyte & 255;
+      if (ch < 127) {
+        re->first_byte =
+            ((firstbyte & REQ_CASELESS) != 0 && compile_block.fcc[ch] == ch)
+                ? ch
+                : firstbyte;
+        re->options |= PCRE_FIRSTSET;
+      }
+    } else if (is_startline(codestart, 0, compile_block.backref_map))
+      re->options |= PCRE_STARTLINE;
   }
 
   /* For an anchored pattern, we use the "required byte" only if it follows a
-  variable length item in the regex. Remove the caseless flag for non-caseable
-  bytes. */
+   variable length item in the regex. Remove the caseless flag for non-caseable
+   bytes. */
 
   if (reqbyte >= 0 &&
-      ((re->options & PCRE_ANCHORED) == 0 || (reqbyte & REQ_VARY) != 0)) {
+      (!(re->options & PCRE_ANCHORED) || (reqbyte & REQ_VARY))) {
     int ch = reqbyte & 255;
-    if (ch < 127) { /* Strange indentation to aid in merging. */
+    if (ch < 127) {
       re->req_byte =
           ((reqbyte & REQ_CASELESS) != 0 && compile_block.fcc[ch] == ch)
               ? (reqbyte & ~REQ_CASELESS)
@@ -3173,45 +3213,11 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
     }
   }
 
-/* Print out the compiled data if debugging is enabled. This is never the
-case when building a production library. */
-
 #ifdef DEBUG
-
-  printf("Length = %d top_bracket = %d top_backref = %d\n", length,
-         re->top_bracket, re->top_backref);
-
-  if (re->options != 0) {
-    printf("%s%s%s\n", ((re->options & PCRE_ANCHORED) != 0) ? "anchored " : "",
-           ((re->options & PCRE_CASELESS) != 0) ? "caseless " : "",
-           ((re->options & PCRE_MULTILINE) != 0) ? "multiline " : "");
-  }
-
-  if ((re->options & PCRE_FIRSTSET) != 0) {
-    int ch = re->first_byte & 255;
-    const char* caseless =
-        ((re->first_byte & REQ_CASELESS) == 0) ? "" : " (caseless)";
-    if (isprint(ch))
-      printf("First char = %c%s\n", ch, caseless);
-    else
-      printf("First char = \\x%02x%s\n", ch, caseless);
-  }
-
-  if ((re->options & PCRE_REQCHSET) != 0) {
-    int ch = re->req_byte & 255;
-    const char* caseless =
-        ((re->req_byte & REQ_CASELESS) == 0) ? "" : " (caseless)";
-    if (isprint(ch))
-      printf("Req char = %c%s\n", ch, caseless);
-    else
-      printf("Req char = \\x%02x%s\n", ch, caseless);
-  }
-
-  pcre_printint(re, stdout);
+  printCompiledRegExp(re);
 
   /* This check is done here in the debugging case so that the code that
-  was compiled can be seen. */
-
+   was compiled can be seen. */
   if (code - codestart > length) {
     (pcre_free)(re);
     *errorptr = error_text(ERR7);
