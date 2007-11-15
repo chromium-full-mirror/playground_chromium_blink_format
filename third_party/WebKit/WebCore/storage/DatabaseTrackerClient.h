@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,18 +25,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef DatabaseTrackerClient_h
+#define DatabaseTrackerClient_h
 
-extern const NSString* WebDatabaseDirectoryDefaultsKey;
-extern const NSString* WebDatabaseNameKey;
-extern const NSString* WebDatabaseSizeKey;
+namespace WebCore {
 
-@interface WebDatabaseManager : NSObject {
-}
+class SecurityOriginData;
+class String;
 
-+ (NSArray*)origins;
-+ (NSArray*)databasesWithOrigin:(NSString*)origin;
-+ (void)deleteAllDatabases;
-+ (void)deleteAllDatabasesWithOrigin:(NSString*)origin;
-+ (void)deleteDatabaseWithOrigin:(NSString*)origin named:(NSString*)name;
+class DatabaseTrackerClient {
+ public:
+  virtual ~DatabaseTrackerClient() {}
+  virtual void dispatchDidModifyOrigin(const SecurityOriginData&) = 0;
+  virtual void dispatchDidModifyDatabase(const SecurityOriginData&,
+                                         const String& databaseName) = 0;
+};
 
-@end
+}  // namespace WebCore
+
+#endif  // DatabaseTrackerClient_h

@@ -35,6 +35,7 @@ namespace WebCore {
 
 class Frame;
 class KURL;
+class SecurityOriginData;
 
 class SecurityOrigin {
  public:
@@ -47,6 +48,8 @@ class SecurityOrigin {
   bool isSecureTransitionTo(const KURL&) const;
 
   String toString() const;
+
+  SecurityOriginData securityOriginData() const;
 
  private:
   void clear();
