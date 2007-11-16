@@ -22,8 +22,8 @@
 
 #ifndef SVGTextContentElement_h
 #define SVGTextContentElement_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledElement.h"
@@ -52,18 +52,15 @@ class SVGTextContentElement : public SVGStyledElement,
   // 'SVGTextContentElement' functions
   long getNumberOfChars() const;
   float getComputedTextLength() const;
-  float getSubStringLength(unsigned long charnum,
+  float getSubStringLength(long charnum,
                            unsigned long nchars,
                            ExceptionCode&) const;
-  FloatPoint getStartPositionOfChar(unsigned long charnum,
-                                    ExceptionCode&) const;
-  FloatPoint getEndPositionOfChar(unsigned long charnum, ExceptionCode&) const;
-  FloatRect getExtentOfChar(unsigned long charnum, ExceptionCode&) const;
-  float getRotationOfChar(unsigned long charnum, ExceptionCode&) const;
+  FloatPoint getStartPositionOfChar(long charnum, ExceptionCode&) const;
+  FloatPoint getEndPositionOfChar(long charnum, ExceptionCode&) const;
+  FloatRect getExtentOfChar(long charnum, ExceptionCode&) const;
+  float getRotationOfChar(long charnum, ExceptionCode&) const;
   long getCharNumAtPosition(const FloatPoint&) const;
-  void selectSubString(unsigned long charnum,
-                       unsigned long nchars,
-                       ExceptionCode&) const;
+  void selectSubString(long charnum, long nchars, ExceptionCode&) const;
 
   virtual void parseMappedAttribute(MappedAttribute*);
 
