@@ -158,7 +158,7 @@ void Step::nodesInAxis(Node* context, NodeSet& nodes) const {
         }
       }
       return;
-    case PrecedingAxis:
+    case PrecedingAxis: {
       if (context->isAttributeNode())
         context = static_cast<Attr*>(context)->ownerElement();
 
@@ -172,6 +172,7 @@ void Step::nodesInAxis(Node* context, NodeSet& nodes) const {
       }
       nodes.markSorted(false);
       return;
+    }
     case AttributeAxis: {
       if (context->nodeType() != Node::ELEMENT_NODE)
         return;
