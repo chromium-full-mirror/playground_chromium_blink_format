@@ -83,10 +83,12 @@ LocationPath::~LocationPath() {
 }
 
 Value LocationPath::evaluate() const {
+  EvaluationContext& evaluationContext = Expression::evaluationContext();
+  EvaluationContext backupContext = evaluationContext;
   /* For absolute location paths, the context node is ignored - the
    * document's root node is used instead.
    */
-  Node* context = Expression::evaluationContext().node.get();
+  Node* context = evaluationContext.node.get();
   if (m_absolute && context->nodeType() != Node::DOCUMENT_NODE)
     context = context->ownerDocument();
 
@@ -94,6 +96,7 @@ Value LocationPath::evaluate() const {
   nodes.append(context);
   evaluate(nodes);
 
+  evaluationContext = backupContext;
   return Value(nodes, Value::adopt);
 }
 
