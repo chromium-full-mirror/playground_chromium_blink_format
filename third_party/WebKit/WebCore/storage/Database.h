@@ -38,6 +38,7 @@
 #include "StringHash.h"
 #include "Threading.h"
 #include "Timer.h"
+#include "VoidCallback.h"
 
 #include <wtf/Forward.h>
 #include <wtf/HashSet.h>
@@ -75,9 +76,11 @@ class Database : public ThreadSafeShared<Database> {
   void changeVersion(const String& oldVersion,
                      const String& newVersion,
                      PassRefPtr<SQLTransactionCallback> callback,
-                     PassRefPtr<SQLTransactionErrorCallback> errorCallback);
+                     PassRefPtr<SQLTransactionErrorCallback> errorCallback,
+                     PassRefPtr<VoidCallback> successCallback);
   void transaction(PassRefPtr<SQLTransactionCallback> callback,
-                   PassRefPtr<SQLTransactionErrorCallback> errorCallback);
+                   PassRefPtr<SQLTransactionErrorCallback> errorCallback,
+                   PassRefPtr<VoidCallback> successCallback);
 
   // Internal engine support
   void databaseThreadGoingAway();

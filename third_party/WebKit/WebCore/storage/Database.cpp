@@ -446,7 +446,8 @@ void Database::changeVersion(
     const String& oldVersion,
     const String& newVersion,
     PassRefPtr<SQLTransactionCallback> callback,
-    PassRefPtr<SQLTransactionErrorCallback> errorCallback) {
+    PassRefPtr<SQLTransactionErrorCallback> errorCallback,
+    PassRefPtr<VoidCallback> successCallback) {
   scheduleTransaction(
       new SQLTransaction(this, callback, errorCallback,
                          new ChangeVersionWrapper(oldVersion, newVersion)));
@@ -454,7 +455,8 @@ void Database::changeVersion(
 
 void Database::transaction(
     PassRefPtr<SQLTransactionCallback> callback,
-    PassRefPtr<SQLTransactionErrorCallback> errorCallback) {
+    PassRefPtr<SQLTransactionErrorCallback> errorCallback,
+    PassRefPtr<VoidCallback> successCallback) {
   scheduleTransaction(new SQLTransaction(this, callback, errorCallback, 0));
 }
 
