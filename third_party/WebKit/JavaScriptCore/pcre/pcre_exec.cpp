@@ -974,7 +974,7 @@ RECURSE:
             RRETURN;
           stack.currentFrame->eptr += stack.currentFrame->length;
         }
-        ASSERT_NOT_REACHED();
+        /* Control never reaches here */
       }
 
       /* If maximizing, find the longest string and work backwards */
@@ -995,7 +995,7 @@ RECURSE:
         }
         RRETURN_NO_MATCH;
       }
-      ASSERT_NOT_REACHED();
+      /* Control never reaches here */
 
       /* Match a bit-mapped character class, possibly repeatedly. This op code
        is
@@ -1088,7 +1088,7 @@ RECURSE:
             }
           }
         }
-        ASSERT_NOT_REACHED();
+        /* Control never reaches here */
       }
       /* If maximizing, find the longest possible run, then work backwards. */
       else {
@@ -1119,7 +1119,7 @@ RECURSE:
 
         RRETURN;
       }
-      ASSERT_NOT_REACHED();
+      /* Control never reaches here */
 
       /* Match an extended character class. This opcode is encountered only
        in UTF-8 mode, because that's the only time it is compiled. */
@@ -1190,7 +1190,7 @@ RECURSE:
           if (!_pcre_xclass(c, stack.currentFrame->data))
             RRETURN;
         }
-        ASSERT_NOT_REACHED();
+        /* Control never reaches here */
       }
 
       /* If maximizing, find the longest possible run, then work backwards. */
@@ -1217,7 +1217,7 @@ RECURSE:
         RRETURN;
       }
 
-      ASSERT_NOT_REACHED();
+      /* Control never reaches here */
 
       /* Match a single character, casefully */
 
@@ -1363,7 +1363,7 @@ RECURSE:
               RRETURN;
             ++stack.currentFrame->eptr;
           }
-          ASSERT_NOT_REACHED();
+          /* Control never reaches here */
         } else {
           stack.currentFrame->pp = stack.currentFrame->eptr;
           for (i = min; i < stack.currentFrame->max; i++) {
@@ -1382,7 +1382,7 @@ RECURSE:
           }
           RRETURN_NO_MATCH;
         }
-        ASSERT_NOT_REACHED();
+        /* Control never reaches here */
       } else {
         /* No case on surrogate pairs, so no need to bother with "othercase". */
 
@@ -1411,7 +1411,7 @@ RECURSE:
               RRETURN;
             stack.currentFrame->eptr += 2;
           }
-          ASSERT_NOT_REACHED();
+          /* Control never reaches here */
         } else {
           stack.currentFrame->pp = stack.currentFrame->eptr;
           for (i = min; i < stack.currentFrame->max; i++) {
@@ -1431,9 +1431,9 @@ RECURSE:
           }
           RRETURN_NO_MATCH;
         }
-        ASSERT_NOT_REACHED();
+        /* Control never reaches here */
       }
-      ASSERT_NOT_REACHED();
+      /* Control never reaches here */
 
       /* Match a negated single one-byte character. The character we are
        checking can be multibyte. */
@@ -1539,7 +1539,7 @@ RECURSE:
                 stack.currentFrame->fc == d)
               RRETURN;
           }
-          ASSERT_NOT_REACHED();
+          /* Control never reaches here */
         }
 
         /* Maximize case */
@@ -1573,7 +1573,7 @@ RECURSE:
 
           RRETURN;
         }
-        ASSERT_NOT_REACHED();
+        /* Control never reaches here */
       }
 
       /* Caseful comparisons */
@@ -1603,7 +1603,7 @@ RECURSE:
                 stack.currentFrame->fc == d)
               RRETURN;
           }
-          ASSERT_NOT_REACHED();
+          /* Control never reaches here */
         }
 
         /* Maximize case */
@@ -1636,7 +1636,7 @@ RECURSE:
           RRETURN;
         }
       }
-      ASSERT_NOT_REACHED();
+      /* Control never reaches here */
 
       /* Match a single character type repeatedly; several different opcodes
        share code. This is very similar to the code for single characters, but
@@ -1830,7 +1830,7 @@ RECURSE:
               return matchError(JSRegExpErrorInternal, stack);
           }
         }
-        ASSERT_NOT_REACHED();
+        /* Control never reaches here */
       }
 
       /* If maximizing it is worth using inline code for speed, doing the type
@@ -1965,7 +1965,7 @@ RECURSE:
 
         RRETURN;
       }
-      ASSERT_NOT_REACHED();
+      /* Control never reaches here */
 
       BEGIN_OPCODE(CRMINPLUS)
           : BEGIN_OPCODE(CRMINQUERY)
