@@ -30,6 +30,7 @@
 #include <wtf/FastMalloc.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
+#include <wtf/Vector.h>
 
 /* On some ARM platforms GCC won't pack structures by default so sizeof(UChar)
    will end up being != 2 which causes crashes since the code depends on that.
@@ -219,6 +220,9 @@ class UString {
    * Copy constructor. Makes a shallow copy only.
    */
   UString(const UString& s) : m_rep(s.m_rep) {}
+
+  UString(const Vector<UChar>& buffer);
+
   /**
    * Convenience declaration only ! You'll be on your own to write the
    * implementation for a construction from DOM::DOMString.

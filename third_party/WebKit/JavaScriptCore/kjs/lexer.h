@@ -25,6 +25,7 @@
 #define Lexer_h
 
 #include "ustring.h"
+#include <wtf/Vector.h>
 
 namespace KJS {
 
@@ -92,15 +93,12 @@ class Lexer : Noncopyable {
  private:
   friend Lexer& lexer();
   Lexer();
-  ~Lexer();
 
   int yylineno;
   UString m_sourceURL;
   bool done;
-  char* buffer8;    // FIXME: This buffer is never deallocated.
-  UChar* buffer16;  // FIXME: This buffer is never deallocated.
-  unsigned int size8, size16;
-  unsigned int pos8, pos16;
+  Vector<char> m_buffer8;
+  Vector<UChar> m_buffer16;
   bool terminator;
   bool restrKeyword;
   // encountered delimiter like "'" and "}" on last run
@@ -130,8 +128,8 @@ class Lexer : Noncopyable {
   void record16(int);
   void record16(UChar);
 
-  KJS::Identifier* makeIdentifier(UChar* buffer, unsigned int pos);
-  UString* makeUString(UChar* buffer, unsigned int pos);
+  KJS::Identifier* makeIdentifier(const Vector<UChar>& buffer);
+  UString* makeUString(const Vector<UChar>& buffer);
 
   const UChar* code;
   unsigned int length;
@@ -145,13 +143,8 @@ class Lexer : Noncopyable {
   // end-of-file marker)
   int current, next1, next2, next3;
 
-  UString** strings;
-  unsigned int numStrings;
-  unsigned int stringsCapacity;
-
-  KJS::Identifier** identifiers;
-  unsigned int numIdentifiers;
-  unsigned int identifiersCapacity;
+  Vector<UString*> m_strings;
+  Vector<KJS::Identifier*> m_identifiers;
 
   UString m_pattern;
   UString m_flags;

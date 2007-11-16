@@ -447,6 +447,13 @@ UString::UString(UChar* c, int length, bool copy) {
     m_rep = Rep::create(c, length);
 }
 
+UString::UString(const Vector<UChar>& buffer) {
+  if (!buffer.size())
+    m_rep = &Rep::empty;
+  else
+    m_rep = Rep::createCopying(buffer.data(), buffer.size());
+}
+
 UString::UString(const UString& a, const UString& b) {
   int aSize = a.size();
   int aOffset = a.m_rep->offset;
