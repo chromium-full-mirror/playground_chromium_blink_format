@@ -403,7 +403,7 @@ Completion Interpreter::checkSyntax(const UString& sourceURL,
 
   int errLine;
   UString errMsg;
-  RefPtr<ProgramNode> progNode = Parser::parse(
+  RefPtr<ProgramNode> progNode = parser().parseProgram(
       sourceURL, startingLineNumber, code, codeLength, 0, &errLine, &errMsg);
   if (!progNode)
     return Completion(Throw, Error::create(&m_globalExec, SyntaxError, errMsg,
@@ -432,15 +432,16 @@ Completion Interpreter::evaluate(const UString& sourceURL,
                                            "Recursion too deep"));
 
   // parse the source code
-  int sid;
+  int sourceId;
   int errLine;
   UString errMsg;
-  RefPtr<ProgramNode> progNode = Parser::parse(
-      sourceURL, startingLineNumber, code, codeLength, &sid, &errLine, &errMsg);
+  RefPtr<ProgramNode> progNode =
+      parser().parseProgram(sourceURL, startingLineNumber, code, codeLength,
+                            &sourceId, &errLine, &errMsg);
 
   // notify debugger that source has been parsed
   if (m_debugger) {
-    bool cont = m_debugger->sourceParsed(&m_globalExec, sid, sourceURL,
+    bool cont = m_debugger->sourceParsed(&m_globalExec, sourceId, sourceURL,
                                          UString(code, codeLength),
                                          startingLineNumber, errLine, errMsg);
     if (!cont)
@@ -450,7 +451,7 @@ Completion Interpreter::evaluate(const UString& sourceURL,
   // no program node means a syntax error occurred
   if (!progNode)
     return Completion(Throw, Error::create(&m_globalExec, SyntaxError, errMsg,
-                                           errLine, sid, sourceURL));
+                                           errLine, sourceId, sourceURL));
 
   m_globalExec.clearException();
 
@@ -682,19 +683,6 @@ void Interpreter::mark() {
   if (m_UriErrorPrototype && !m_UriErrorPrototype->marked())
     m_UriErrorPrototype->mark();
 }
-
-#ifdef KJS_DEBUG_MEM
-#include "lexer.h"
-void Interpreter::finalCheck() {
-  fprintf(stderr, "Interpreter::finalCheck()\n");
-  Collector::collect();
-
-  Node::finalCheck();
-  Collector::finalCheck();
-  Lexer::globalClear();
-  UString::globalClear();
-}
-#endif
 
 static bool printExceptions = false;
 

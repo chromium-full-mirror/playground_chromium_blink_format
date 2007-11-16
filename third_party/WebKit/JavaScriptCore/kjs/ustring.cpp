@@ -173,7 +173,7 @@ UString::Rep UString::Rep::empty = {
     0, 0, 1, 0, 0, &UString::Rep::empty, reinterpret_cast<UChar*>(&almostUChar),
     0, 0, 0, 0};
 const int normalStatBufferSize = 4096;
-static char* statBuffer = 0;
+static char* statBuffer = 0;  // FIXME: This buffer is never deallocated.
 static int statBufferSize = 0;
 
 PassRefPtr<UString::Rep> UString::Rep::createCopying(const UChar* d, int l) {
@@ -884,14 +884,6 @@ char* UString::ascii() const {
 
   return statBuffer;
 }
-
-#ifdef KJS_DEBUG_MEM
-void UString::globalClear() {
-  delete[] statBuffer;
-  statBuffer = 0;
-  statBufferSize = 0;
-}
-#endif
 
 UString& UString::operator=(const char* c) {
   if (!c) {
