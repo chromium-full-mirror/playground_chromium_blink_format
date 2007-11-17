@@ -113,6 +113,7 @@ class MoviePrivate : Noncopyable {
 
  private:
   void updateStates();
+  void doSeek();
   void cancelSeek();
   void seekTimerFired(Timer<MoviePrivate>*);
   void cuePointTimerFired(Timer<MoviePrivate>*);
@@ -129,11 +130,9 @@ class MoviePrivate : Noncopyable {
   Timer<MoviePrivate> m_seekTimer;
   Timer<MoviePrivate> m_cuePointTimer;
   float m_previousTimeCueTimerFired;
-  float m_rateBeforeSeek;
   Movie::NetworkState m_networkState;
   Movie::ReadyState m_readyState;
   bool m_startedPlaying;
-  bool m_blockStateUpdate;
   bool m_isStreaming;
 };
 }

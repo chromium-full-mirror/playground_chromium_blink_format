@@ -48,7 +48,7 @@ class MovieClient {
   virtual void movieNetworkStateChanged(Movie*) {}
   virtual void movieReadyStateChanged(Movie*) {}
   virtual void movieVolumeChanged(Movie*) {}
-  virtual void movieDidEnd(Movie*) {}
+  virtual void movieTimeChanged(Movie*) {}
   virtual void movieCuePointReached(Movie*, float cueTime) {}
 };
 
@@ -130,7 +130,7 @@ class Movie : Noncopyable {
   void networkStateChanged();
   void readyStateChanged();
   void volumeChanged();
-  void didEnd();
+  void timeChanged();
   void cuePointReached(float cueTime);
 
  private:
