@@ -231,52 +231,6 @@ bool Editor::canSmartCopyOrDelete() {
          m_frame->selectionGranularity() == WordGranularity;
 }
 
-void Editor::deleteRange(Range* range,
-                         bool killRing,
-                         bool prepend,
-                         bool smartDeleteOK,
-                         EditorDeleteAction deletionAction,
-                         TextGranularity granularity) {
-  if (killRing)
-    addToKillRing(range, prepend);
-
-  SelectionController* selectionController = m_frame->selectionController();
-  bool smartDelete = smartDeleteOK && canSmartCopyOrDelete();
-  switch (deletionAction) {
-    case deleteSelectionAction:
-      if (!selectionController->setSelectedRange(range, DOWNSTREAM, true))
-        return;
-      deleteSelectionWithSmartDelete(smartDelete);
-      break;
-    case deleteKeyAction:
-      if (!selectionController->setSelectedRange(
-              range, DOWNSTREAM, (granularity != CharacterGranularity)))
-        return;
-      if (m_frame->document()) {
-        TypingCommand::deleteKeyPressed(m_frame->document(), smartDelete,
-                                        granularity);
-        revealSelectionAfterEditingOperation();
-      }
-      break;
-    case forwardDeleteKeyAction:
-      if (!selectionController->setSelectedRange(
-              range, DOWNSTREAM, (granularity != CharacterGranularity)))
-        return;
-      if (m_frame->document()) {
-        TypingCommand::forwardDeleteKeyPressed(m_frame->document(), smartDelete,
-                                               granularity);
-        revealSelectionAfterEditingOperation();
-      }
-      break;
-  }
-
-  // clear the "start new kill ring sequence" setting, because it was set to
-  // true
-  // when the selection was updated by deleting the range
-  if (killRing)
-    setStartNewKillRingSequence(false);
-}
-
 bool Editor::deleteWithDirection(SelectionController::EDirection direction,
                                  TextGranularity granularity,
                                  bool killRing,
@@ -287,49 +241,61 @@ bool Editor::deleteWithDirection(SelectionController::EDirection direction,
   if (!canEdit())
     return false;
 
-  RefPtr<Range> range;
-  EditorDeleteAction deletionAction = deleteSelectionAction;
-
-  bool smartDeleteOK = false;
-
   if (m_frame->selectionController()->isRange()) {
-    range = selectedRange();
-    smartDeleteOK = true;
-    if (isTypingAction)
-      deletionAction = deleteKeyAction;
+    if (killRing)
+      addToKillRing(selectedRange().get(), false);
+    if (isTypingAction) {
+      if (m_frame->document()) {
+        TypingCommand::deleteKeyPressed(m_frame->document(), true, granularity);
+        revealSelectionAfterEditingOperation();
+      }
+    } else {
+      deleteSelectionWithSmartDelete(canSmartCopyOrDelete());
+      // Implicitly calls revealSelectionAfterEditingOperation().
+    }
   } else {
-    SelectionController selectionController;
-    selectionController.setSelection(
-        m_frame->selectionController()->selection());
-    selectionController.modify(SelectionController::EXTEND, direction,
-                               granularity);
-    if (killRing && selectionController.isCaret() &&
+    SelectionController selectionToDelete;
+    selectionToDelete.setSelection(m_frame->selectionController()->selection());
+    selectionToDelete.modify(SelectionController::EXTEND, direction,
+                             granularity);
+    if (killRing && selectionToDelete.isCaret() &&
         granularity != CharacterGranularity)
-      selectionController.modify(SelectionController::EXTEND, direction,
-                                 CharacterGranularity);
+      selectionToDelete.modify(SelectionController::EXTEND, direction,
+                               CharacterGranularity);
 
-    range = selectionController.toRange();
+    RefPtr<Range> range = selectionToDelete.toRange();
+
+    if (killRing)
+      addToKillRing(range.get(), false);
+
+    if (!m_frame->selectionController()->setSelectedRange(
+            range.get(), DOWNSTREAM, (granularity != CharacterGranularity)))
+      return true;
 
     switch (direction) {
       case SelectionController::FORWARD:
       case SelectionController::RIGHT:
-        deletionAction = forwardDeleteKeyAction;
+        if (m_frame->document())
+          TypingCommand::forwardDeleteKeyPressed(m_frame->document(), false,
+                                                 granularity);
         break;
       case SelectionController::BACKWARD:
       case SelectionController::LEFT:
-        deletionAction = deleteKeyAction;
+        if (m_frame->document())
+          TypingCommand::deleteKeyPressed(m_frame->document(), false,
+                                          granularity);
         break;
     }
+    revealSelectionAfterEditingOperation();
   }
 
-  deleteRange(range.get(), killRing, false, smartDeleteOK, deletionAction,
-              granularity);
+  // clear the "start new kill ring sequence" setting, because it was set to
+  // true
+  // when the selection was updated by deleting the range
+  if (killRing)
+    setStartNewKillRingSequence(false);
 
   return true;
-}
-
-void Editor::deleteSelectionWithSmartDelete() {
-  deleteSelectionWithSmartDelete(canSmartCopyOrDelete());
 }
 
 void Editor::deleteSelectionWithSmartDelete(bool smartDelete) {
@@ -1588,7 +1554,7 @@ void Editor::cut() {
     Pasteboard::generalPasteboard()->writeSelection(
         selection.get(), canSmartCopyOrDelete(), m_frame);
     didWriteSelectionToPasteboard();
-    deleteSelectionWithSmartDelete();
+    deleteSelectionWithSmartDelete(canSmartCopyOrDelete());
   }
 }
 
@@ -1645,8 +1611,14 @@ void Editor::performDelete() {
     systemBeep();
     return;
   }
-  deleteRange(selectedRange().get(), true, false, true, deleteSelectionAction,
-              CharacterGranularity);
+
+  addToKillRing(selectedRange().get(), false);
+  deleteSelectionWithSmartDelete(canSmartCopyOrDelete());
+
+  // clear the "start new kill ring sequence" setting, because it was set to
+  // true
+  // when the selection was updated by deleting the range
+  setStartNewKillRingSequence(false);
 }
 
 void Editor::copyURL(const KURL& url, const String& title) {

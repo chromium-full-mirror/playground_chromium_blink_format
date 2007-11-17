@@ -57,7 +57,6 @@ class CompositeEditCommand : public EditCommand {
                   EditAction = EditActionChangeAttributes);
   void applyStyledElement(Element*);
   void removeStyledElement(Element*);
-  void deleteKeyPressed();
   void deleteSelection(bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true,
                        bool replace = false,
