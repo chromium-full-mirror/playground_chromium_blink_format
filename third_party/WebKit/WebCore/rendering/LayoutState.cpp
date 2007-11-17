@@ -69,6 +69,7 @@ LayoutState::LayoutState(LayoutState* prev,
     int y = m_offset.height();
     RenderLayer* layer = renderer->layer();
     IntRect clipRect(x, y, layer->width(), layer->height());
+    clipRect.move(renderer->view()->layoutDelta());
     if (m_clipped)
       m_clipRect.intersect(clipRect);
     else {
