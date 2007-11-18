@@ -458,26 +458,6 @@ static JSValueRef detach(JSContextRef ctx,
   return JSValueMakeUndefined(ctx);
 }
 
-static JSValueRef log(JSContextRef ctx,
-                      JSObjectRef /*function*/,
-                      JSObjectRef /*thisObject*/,
-                      size_t argumentCount,
-                      const JSValueRef arguments[],
-                      JSValueRef* /*exception*/) {
-  if (argumentCount < 1 || !JSValueIsString(ctx, arguments[0]))
-    return JSValueMakeUndefined(ctx);
-
-#ifndef NDEBUG
-  JSStringRef string = JSValueToStringCopy(ctx, arguments[0], 0);
-  String message(JSStringGetCharactersPtr(string), JSStringGetLength(string));
-  JSStringRelease(string);
-
-  fprintf(stderr, "%s\n", message.latin1().data());
-#endif
-
-  return JSValueMakeUndefined(ctx);
-}
-
 static JSValueRef search(JSContextRef ctx,
                          JSObjectRef /*function*/,
                          JSObjectRef thisObject,
@@ -813,7 +793,6 @@ void InspectorController::windowScriptObjectAvailable() {
     {"windowUnloading", unloading, kJSPropertyAttributeNone},
     {"attach", attach, kJSPropertyAttributeNone},
     {"detach", detach, kJSPropertyAttributeNone},
-    {"log", log, kJSPropertyAttributeNone},
     {"search", search, kJSPropertyAttributeNone},
 #if ENABLE(DATABASE)
     {"databaseTableNames", databaseTableNames, kJSPropertyAttributeNone},
