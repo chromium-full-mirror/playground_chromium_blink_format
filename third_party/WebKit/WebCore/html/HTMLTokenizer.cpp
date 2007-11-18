@@ -353,7 +353,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
     }
     // possible end of tagname, lets check.
     if (!scriptCodeResync && !state.escaped() && !src.escaped() &&
-        (ch == '>' || ch == '/' || ch <= ' ') && ch &&
+        (ch == '>' || ch == '/' || isASCIISpace(ch)) &&
         scriptCodeSize >= searchStopperLen &&
         tagMatch(searchStopper, scriptCode + scriptCodeSize - searchStopperLen,
                  searchStopperLen)) {
@@ -920,7 +920,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
         unsigned int ll = min(src.length(), CBUFLEN - cBufferPos);
         while (ll--) {
           UChar curchar = *src;
-          if (curchar <= ' ' || curchar == '>' || curchar == '<') {
+          if (isASCIISpace(curchar) || curchar == '>' || curchar == '<') {
             finish = true;
             break;
           }
@@ -976,7 +976,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           UChar curchar = *src;
           // In this mode just ignore any quotes we encounter and treat them
           // like spaces.
-          if (curchar > ' ' && curchar != '\'' && curchar != '"') {
+          if (!isASCIISpace(curchar) && curchar != '\'' && curchar != '"') {
             if (curchar == '<' || curchar == '>')
               state.setTagState(SearchEnd);
             else
@@ -1002,7 +1002,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           // cases like <input type=checkbox checked/> to work (and accommodates
           // XML-style syntax as per HTML5).
           if (curchar <= '>' &&
-              (curchar >= '<' || curchar <= ' ' || curchar == '/')) {
+              (curchar >= '<' || isASCIISpace(curchar) || curchar == '/')) {
             cBuffer[cBufferPos] = '\0';
             attrName = AtomicString(cBuffer);
             dest = buffer;
@@ -1050,7 +1050,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
 
           // In this mode just ignore any quotes or slashes we encounter and
           // treat them like spaces.
-          if (curchar > ' ' && curchar != '\'' && curchar != '"' &&
+          if (!isASCIISpace(curchar) && curchar != '\'' && curchar != '"' &&
               curchar != '/') {
             if (curchar == '=') {
 #ifdef TOKEN_DEBUG
@@ -1080,8 +1080,8 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
       case SearchValue:
         while (!src.isEmpty()) {
           UChar curchar = *src;
-          if (curchar > ' ') {
-            if ((curchar == '\'' || curchar == '\"')) {
+          if (!isASCIISpace(curchar)) {
+            if (curchar == '\'' || curchar == '\"') {
               tquote = curchar == '\"' ? DoubleQuote : SingleQuote;
               state.setTagState(QuotedValue);
               if (inViewSourceMode())
@@ -1179,7 +1179,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
             }
             // no quotes. Every space means end of value
             // '/' does not delimit in IE!
-            if (curchar <= ' ' || curchar == '>') {
+            if (isASCIISpace(curchar) || curchar == '>') {
               AtomicString v(buffer + 1, dest - buffer - 1);
               currToken.addAttribute(m_doc, attrName, v, inViewSourceMode());
               if (inViewSourceMode())
