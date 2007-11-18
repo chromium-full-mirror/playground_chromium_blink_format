@@ -40,6 +40,8 @@ class InspectorClient {
 
   virtual Page* createPage() = 0;
 
+  virtual String localizedStringsURL() = 0;
+
   virtual void showWindow() = 0;
   virtual void closeWindow() = 0;
 

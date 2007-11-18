@@ -374,7 +374,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   }
   virtual String overrideMediaType() const { return String(); }
 
-  virtual void redirectDataToPlugin(WebCore::Widget*) {}
+  virtual void redirectDataToPlugin(Widget*) {}
   virtual void windowObjectCleared() {}
   virtual void didPerformFirstNavigation() const {}
 
@@ -551,7 +551,9 @@ class SVGEmptyInspectorClient : public InspectorClient {
 
   virtual void inspectorDestroyed(){};
 
-  virtual WebCore::Page* createPage() { return 0; };
+  virtual Page* createPage() { return 0; };
+
+  virtual String localizedStringsURL() { return String(); };
 
   virtual void showWindow(){};
   virtual void closeWindow(){};
@@ -559,9 +561,9 @@ class SVGEmptyInspectorClient : public InspectorClient {
   virtual void attachWindow(){};
   virtual void detachWindow(){};
 
-  virtual void highlight(WebCore::Node*){};
+  virtual void highlight(Node*){};
   virtual void hideHighlight(){};
-  virtual void inspectedURLChanged(const WebCore::String& newURL){};
+  virtual void inspectedURLChanged(const String& newURL){};
 };
 }
 

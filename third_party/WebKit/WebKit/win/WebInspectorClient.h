@@ -46,6 +46,9 @@ class WebInspectorClient : public WebCore::InspectorClient {
   virtual void inspectorDestroyed();
 
   virtual WebCore::Page* createPage();
+
+  virtual WebCore::String localizedStringsURL();
+
   virtual void showWindow();
   virtual void closeWindow();
   virtual bool windowVisible();

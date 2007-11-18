@@ -48,6 +48,11 @@ Page* InspectorClientWx::createPage() {
   return 0;
 }
 
+String InspectorClientWx::localizedStringsURL() {
+  notImplemented();
+  return String();
+}
+
 void InspectorClientWx::showWindow() {
   notImplemented();
 }

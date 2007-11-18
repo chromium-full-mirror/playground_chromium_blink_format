@@ -42,6 +42,8 @@ class InspectorClientQt : public InspectorClient {
 
   virtual Page* createPage();
 
+  virtual String localizedStringsURL();
+
   virtual void showWindow();
   virtual void closeWindow();
 

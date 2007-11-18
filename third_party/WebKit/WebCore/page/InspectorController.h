@@ -70,6 +70,8 @@ class InspectorController {
 
   Page* inspectedPage() const { return m_inspectedPage; }
 
+  String localizedStringsURL();
+
   void inspect(Node*);
   void highlight(Node*);
   void hideHighlight();
