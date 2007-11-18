@@ -1135,7 +1135,7 @@ void Window::clear() {
   // only if we haven't been
   // disconnected yet
   if (Frame* frame = impl()->frame())
-    frame->scriptProxy()->interpreter()->initGlobalObject();
+    frame->scriptProxy()->interpreter()->resetGlobalObjectProperties();
 
   // there's likely to be lots of garbage now
   gcController().garbageCollectSoon();

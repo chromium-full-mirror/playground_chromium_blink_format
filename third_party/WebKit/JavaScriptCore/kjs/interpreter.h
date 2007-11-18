@@ -81,9 +81,19 @@ class Interpreter : public RefCounted<Interpreter> {
 
  public:
   /**
-   * Creates a new interpreter. The supplied object will be used as the global
+   * Creates a new interpreter. The global object must be set via
+   * setGlobalObject
+   * before code is executed with this interpreter.
+   */
+  Interpreter();
+
+  virtual ~Interpreter();  // only deref should delete us
+
+  /**
+   * Set the interpreter's global object. The supplied object will be used as
+   * the global
    * object for all scripts executed with this interpreter. During
-   * constuction, all the standard properties such as "Object" and "Number"
+   * construction, all the standard properties such as "Object" and "Number"
    * will be added to the global object.
    *
    * Note: You should not use the same global object for multiple
@@ -94,22 +104,15 @@ class Interpreter : public RefCounted<Interpreter> {
    * interpreter (e.g. a script modifying String.prototype), the changes will
    * be overridden.
    *
-   * @param global The object to use as the global object for this interpreter
+   * @param The object to use as the global object for this interpreter
    */
-  Interpreter(JSGlobalObject*);
-  /**
-   * Creates a new interpreter. A global object will be created and
-   * initialized with the standard global properties.
-   */
-  Interpreter();
-
-  virtual ~Interpreter();  // only deref should delete us
+  void setGlobalObject(JSGlobalObject*);
 
   /**
    * Resets the global object's default properties and adds the default object
    * prototype to its prototype chain.
    */
-  void initGlobalObject();
+  void resetGlobalObjectProperties();
 
   /**
    * Returns the object that is used as the global object during all script
@@ -346,6 +349,9 @@ class Interpreter : public RefCounted<Interpreter> {
 
  private:
   void init();
+
+  void createObjectsForGlobalObjectProperties();
+  void setGlobalObjectProperties();
 
   void resetTimeoutCheck();
   bool checkTimeout();
