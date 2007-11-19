@@ -234,7 +234,7 @@ void GIFImageDecoder::initFrameBuffer(unsigned frameIndex) {
         buffer->bytes() = prevBuffer->bytes();
         for (int y = prevRect.y(); y < prevRect.bottom(); ++y) {
           unsigned* const currentRow =
-              buffer.bytes().data() + (y * m_size.width());
+              buffer->bytes().data() + (y * m_size.width());
           for (int x = prevRect.x(); x < prevRect.right(); ++x)
             buffer->setRGBA(currentRow + x, 0, 0, 0, 0);
         }
