@@ -36,5 +36,6 @@ typedef WebCore::SecurityOriginData WebCoreSecurityOriginData;
 
 - (id)_initWithWebCoreSecurityOriginData:
     (WebCoreSecurityOriginData*)securityOriginData;
+- (WebCoreSecurityOriginData)_core;
 
 @end
