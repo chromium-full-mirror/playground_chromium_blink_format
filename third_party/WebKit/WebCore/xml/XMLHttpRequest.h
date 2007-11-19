@@ -101,8 +101,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void overrideMIMEType(const String& override);
   String getAllResponseHeaders(ExceptionCode&) const;
   String getResponseHeader(const String& name, ExceptionCode&) const;
-  const KJS::UString& getResponseText() const;
-  Document* getResponseXML() const;
+  const KJS::UString& getResponseText(ExceptionCode&) const;
+  Document* getResponseXML(ExceptionCode&) const;
 
   void setOnReadyStateChangeListener(EventListener*);
   EventListener* onReadyStateChangeListener() const;
