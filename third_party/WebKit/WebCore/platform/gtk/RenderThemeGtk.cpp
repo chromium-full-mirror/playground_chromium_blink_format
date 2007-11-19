@@ -105,6 +105,14 @@ static bool paintMozWidget(RenderTheme* theme,
                            RenderObject* o,
                            const RenderObject::PaintInfo& i,
                            const IntRect& rect) {
+  // No GdkWindow to render to, so return true to fall back
+  if (!i.context->gdkDrawable())
+    return true;
+
+  // Painting is disabled so just claim to have succeeded
+  if (i.context->paintingDisabled())
+    return false;
+
   GtkWidgetState mozState;
   setMozState(theme, &mozState, o);
 
