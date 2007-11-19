@@ -38,8 +38,9 @@ namespace WebCore {
 
 struct SecurityOriginDataHash {
   static unsigned hash(const SecurityOriginData& data) {
-    unsigned hashCodes[3] = {data.protocol().impl()->hash(),
-                             data.host().impl()->hash(), data.port()};
+    unsigned hashCodes[3] = {
+        data.protocol().impl() ? data.protocol().impl()->hash() : 0,
+        data.host().impl() ? data.host().impl()->hash() : 0, data.port()};
     return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
                                    3 * sizeof(unsigned) / sizeof(UChar));
   }
