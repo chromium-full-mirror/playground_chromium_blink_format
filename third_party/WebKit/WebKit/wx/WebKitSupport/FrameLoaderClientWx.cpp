@@ -80,11 +80,11 @@ void FrameLoaderClientWx::detachFrameLoader() {
 }
 
 void FrameLoaderClientWx::ref() {
-  Shared<FrameLoaderClientWx>::ref();
+  RefCounted<FrameLoaderClientWx>::ref();
 }
 
 void FrameLoaderClientWx::deref() {
-  Shared<FrameLoaderClientWx>::deref();
+  RefCounted<FrameLoaderClientWx>::deref();
 }
 
 bool FrameLoaderClientWx::hasWebView() const {

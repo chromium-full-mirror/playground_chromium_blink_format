@@ -132,29 +132,30 @@ wxWebFrame::wxWebFrame(const wxString& title)
 
   // ... and attach this menu bar to the frame
   SetMenuBar(menuBar);
-  /*
-      wxToolBar* toolbar = CreateToolBar();
-      toolbar->SetToolBitmapSize(wxSize(32, 32));
 
-      wxBitmap back = wxArtProvider::GetBitmap(wxART_GO_BACK, wxART_TOOLBAR,
-     wxSize(32,32));
-      toolbar->AddTool(ID_BACK, back, wxT("Back"));
+  wxToolBar* toolbar = CreateToolBar();
+  toolbar->SetToolBitmapSize(wxSize(32, 32));
 
-      wxBitmap forward = wxArtProvider::GetBitmap(wxART_GO_FORWARD,
-     wxART_TOOLBAR, wxSize(32,32));
-      toolbar->AddTool(ID_FORWARD, forward, wxT("Next"));
+  wxBitmap back =
+      wxArtProvider::GetBitmap(wxART_GO_BACK, wxART_TOOLBAR, wxSize(32, 32));
+  toolbar->AddTool(ID_BACK, back, wxT("Back"));
 
-      addressBar = new wxTextCtrl(toolbar, ID_TEXTCTRL, _T(""),
-     wxDefaultPosition, wxSize(400, -1), wxTE_PROCESS_ENTER);
-      toolbar->AddControl(addressBar);
+  wxBitmap forward =
+      wxArtProvider::GetBitmap(wxART_GO_FORWARD, wxART_TOOLBAR, wxSize(32, 32));
+  toolbar->AddTool(ID_FORWARD, forward, wxT("Next"));
 
-      searchCtrl = new wxSearchCtrl(toolbar, ID_SEARCHCTRL, _("Search"),
-     wxDefaultPosition, wxSize(200, -1), wxTE_PROCESS_ENTER);
-      toolbar->AddControl(searchCtrl);
-      toolbar->Realize();
+  addressBar = new wxTextCtrl(toolbar, ID_TEXTCTRL, _T(""), wxDefaultPosition,
+                              wxSize(400, -1), wxTE_PROCESS_ENTER);
+  toolbar->AddControl(addressBar);
 
-      SetToolBar(toolbar);
-  */
+  searchCtrl =
+      new wxSearchCtrl(toolbar, ID_SEARCHCTRL, _("Search"), wxDefaultPosition,
+                       wxSize(200, -1), wxTE_PROCESS_ENTER);
+  toolbar->AddControl(searchCtrl);
+  toolbar->Realize();
+
+  SetToolBar(toolbar);
+
   // Create the wxWebView Window
   webview =
       new wxWebView((wxWindow*)this, 1001, wxDefaultPosition, wxSize(200, 200));
