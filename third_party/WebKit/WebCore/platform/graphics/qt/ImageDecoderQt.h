@@ -89,6 +89,7 @@ class ImageDecoderQt : public ImageDecoder {
   typedef QList<ImageData> ImageList;
   ImageList m_imageList;
   mutable QHash<int, QPixmap> m_pixmapCache;
+  int m_loopCount;
 };
 }
 
