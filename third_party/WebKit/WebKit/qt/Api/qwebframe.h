@@ -83,7 +83,9 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void loadDone(bool ok);
   void provisionalLoad();
   void titleChanged(const QString& title);
-  void hoveringOverLink(const QString& link, const QString& title);
+  void hoveringOverLink(const QString& link,
+                        const QString& title,
+                        const QString& textContent);
 
  private:
   friend class QWebPage;
