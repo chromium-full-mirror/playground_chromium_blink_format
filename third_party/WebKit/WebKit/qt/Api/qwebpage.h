@@ -208,7 +208,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
    */
   void hoveringOverLink(const QString& link,
                         const QString& title,
-                        const QString& textContent);
+                        const QString& textContent = QString());
   /**
    * Signal is emitted when the statusbar text is changed by the page.
    */
