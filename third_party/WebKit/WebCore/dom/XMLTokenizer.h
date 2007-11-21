@@ -104,6 +104,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   void internalSubset(const xmlChar* name,
                       const xmlChar* externalID,
                       const xmlChar* systemID);
+  void endDocument();
 #else
   void parse();
   void startDocument();
@@ -176,6 +177,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   PrefixForNamespaceMap m_prefixToNamespaceMap;
 #ifndef USE_QXMLSTREAM
   OwnPtr<PendingCallbacks> m_pendingCallbacks;
+  Vector<xmlChar> m_bufferedText;
 #endif
   SegmentedString m_pendingSrc;
 };
