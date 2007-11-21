@@ -46,6 +46,7 @@ class CachedScript : public CachedResource {
   virtual void ref(CachedResourceClient*);
 
   virtual void setEncoding(const String&);
+  virtual String encoding() const;
   virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);
   virtual void error();
 

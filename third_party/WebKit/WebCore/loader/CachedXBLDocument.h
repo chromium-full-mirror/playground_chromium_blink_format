@@ -50,6 +50,7 @@ class CachedXBLDocument : public CachedResource {
   virtual void ref(CachedResourceClient*);
 
   virtual void setEncoding(const String&);
+  virtual String encoding() const;
   virtual void data(Vector<char>&, bool allDataReceived);
   virtual void error();
 

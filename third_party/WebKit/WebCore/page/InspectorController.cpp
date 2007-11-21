@@ -175,7 +175,6 @@ struct InspectorResource : public RefCounted<InspectorResource> {
   HTTPHeaderMap responseHeaderFields;
   String mimeType;
   String suggestedFilename;
-  String textEncodingName;
   JSContextRef scriptContext;
   JSObjectRef scriptObject;
   long long expectedContentLength;
@@ -251,9 +250,11 @@ static JSValueRef addSourceToFrame(JSContextRef ctx,
     return undefined;
 
   RefPtr<SharedBuffer> buffer;
-  if (resource->requestURL == resource->loader->requestURL())
+  String textEncodingName;
+  if (resource->requestURL == resource->loader->requestURL()) {
     buffer = resource->loader->mainResourceData();
-  else {
+    textEncodingName = resource->loader->frame()->document()->inputEncoding();
+  } else {
     FrameLoader* frameLoader = resource->loader->frameLoader();
     if (!frameLoader)
       return undefined;
@@ -268,14 +269,11 @@ static JSValueRef addSourceToFrame(JSContextRef ctx,
       return undefined;
 
     buffer = cachedResource->data();
+    textEncodingName = cachedResource->encoding();
   }
 
   if (!buffer)
     return undefined;
-
-  String textEncodingName = resource->loader->overrideEncoding();
-  if (!textEncodingName)
-    textEncodingName = resource->textEncodingName;
 
   TextEncoding encoding(textEncodingName);
   if (!encoding.isValid())
@@ -1094,7 +1092,6 @@ static void updateResourceResponse(InspectorResource* resource,
   resource->responseHeaderFields = response.httpHeaderFields();
   resource->responseStatusCode = response.httpStatusCode();
   resource->suggestedFilename = response.suggestedFilename();
-  resource->textEncodingName = response.textEncodingName();
 }
 
 void InspectorController::updateScriptResourceRequest(
