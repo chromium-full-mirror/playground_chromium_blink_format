@@ -1204,7 +1204,7 @@ void RenderBox::calcWidth() {
   // If layout is limited to a subtree, the subtree root's width does not
   // change.
   if (node() && view()->frameView() &&
-      view()->frameView()->layoutRoot() == node())
+      view()->frameView()->layoutRoot() == this)
     return;
 
   // The parent box is flexing us, so it has increased or decreased our
