@@ -2925,8 +2925,8 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
         if (dval(d) > 0.5 + dval(eps))
           goto bump_up;
         else if (dval(d) < 0.5 - dval(eps)) {
-          while (*--s == '0')
-            ;
+          while (*--s == '0') {
+          }
           s++;
           goto ret1;
         }
@@ -3248,8 +3248,8 @@ roundoff:
 #ifdef Honor_FLT_ROUNDS
 trimzeros:
 #endif
-  while (*--s == '0')
-    ;
+  while (*--s == '0') {
+  }
   s++;
 }
 ret : Bfree(S);

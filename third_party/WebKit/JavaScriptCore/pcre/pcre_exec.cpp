@@ -1728,8 +1728,8 @@ RECURSE:
                    (md->ctypes[*stack.currentFrame->eptr] & ctype_space) != 0))
                 RRETURN_NO_MATCH;
               while (++stack.currentFrame->eptr < md->end_subject &&
-                     ISMIDCHAR(*stack.currentFrame->eptr))
-                ;
+                     ISMIDCHAR(*stack.currentFrame->eptr)) {
+              }
             }
             break;
 
@@ -1750,8 +1750,8 @@ RECURSE:
                    (md->ctypes[*stack.currentFrame->eptr] & ctype_word) != 0))
                 RRETURN_NO_MATCH;
               while (++stack.currentFrame->eptr < md->end_subject &&
-                     ISMIDCHAR(*stack.currentFrame->eptr))
-                ;
+                     ISMIDCHAR(*stack.currentFrame->eptr)) {
+              }
             }
             break;
 
