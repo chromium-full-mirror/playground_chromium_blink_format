@@ -769,16 +769,16 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
     unsigned count = 0;
     Node* n;
     for (n = element->previousSibling(); n && !n->isElementNode();
-         n = n->previousSibling())
-      ;
+         n = n->previousSibling()) {
+    }
     while (n) {
       if (canShareStyleWithElement(n))
         return n->renderStyle();
       if (count++ == cStyleSearchThreshold)
         return 0;
       for (n = n->previousSibling(); n && !n->isElementNode();
-           n = n->previousSibling())
-        ;
+           n = n->previousSibling()) {
+      }
     }
     if (!n)
       n = locateCousinList(static_cast<Element*>(element->parentNode()));
@@ -788,8 +788,8 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
       if (count++ == cStyleSearchThreshold)
         return 0;
       for (n = n->previousSibling(); n && !n->isElementNode();
-           n = n->previousSibling())
-        ;
+           n = n->previousSibling()) {
+      }
     }
   }
   return 0;

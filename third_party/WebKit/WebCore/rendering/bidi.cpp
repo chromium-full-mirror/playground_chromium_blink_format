@@ -1157,8 +1157,8 @@ RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
     }
   } else {
     for (curr = firstRootBox(); curr && !curr->isDirty();
-         curr = curr->nextRootBox())
-      ;
+         curr = curr->nextRootBox()) {
+    }
     if (curr) {
       // We have a dirty line.
       if (RootInlineBox* prevRootBox = curr->prevRootBox()) {
