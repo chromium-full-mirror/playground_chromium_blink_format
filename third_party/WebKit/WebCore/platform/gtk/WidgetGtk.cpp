@@ -160,6 +160,9 @@ void Widget::paint(GraphicsContext* context, const IntRect&) {
   if (!gtkWidget())
     return;
 
+  if (!context->gdkExposeEvent())
+    return;
+
   GtkWidget* widget = gtkWidget();
   ASSERT(GTK_WIDGET_NO_WINDOW(widget));
 
