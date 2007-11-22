@@ -67,12 +67,12 @@
 using namespace WebCore;
 
 void QWebFramePrivate::init(QWebFrame* qframe,
-                            WebCore::Page* page,
+                            WebCore::Page* webcorePage,
                             QWebFrameData* frameData) {
   q = qframe;
 
   frameLoaderClient = new FrameLoaderClientQt();
-  frame = new Frame(page, frameData->ownerElement, frameLoaderClient);
+  frame = new Frame(webcorePage, frameData->ownerElement, frameLoaderClient);
   frameLoaderClient->setFrame(qframe, frame.get());
 
   frameView = new FrameView(frame.get());
