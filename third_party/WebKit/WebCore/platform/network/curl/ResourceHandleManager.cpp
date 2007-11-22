@@ -190,7 +190,11 @@ void ResourceHandleManager::downloadTimerCallback(
   timeout.tv_sec = 0;
   timeout.tv_usec = selectTimeoutMS * 1000;  // select waits microseconds
 
+  // Temporarily disable timers since signals may interrupt select(), raising
+  // EINTR errors on some platforms
+  setDeferringTimers(true);
   int rc = ::select(maxfd + 1, &fdread, &fdwrite, &fdexcep, &timeout);
+  setDeferringTimers(false);
 
   if (-1 == rc) {
 #ifndef NDEBUG
@@ -200,9 +204,8 @@ void ResourceHandleManager::downloadTimerCallback(
   }
 
   int runningHandles = 0;
-  CURLMcode curlCode = CURLM_CALL_MULTI_PERFORM;
-  while (CURLM_CALL_MULTI_PERFORM == curlCode) {
-    curlCode = curl_multi_perform(m_curlMultiHandle, &runningHandles);
+  while (curl_multi_perform(m_curlMultiHandle, &runningHandles) ==
+         CURLM_CALL_MULTI_PERFORM) {
   }
 
   // check the curl messages indicating completed transfers
