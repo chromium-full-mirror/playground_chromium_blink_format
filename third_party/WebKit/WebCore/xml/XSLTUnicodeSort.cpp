@@ -295,6 +295,8 @@ void xsltUnicodeSortFunction(xsltTransformContextPtr ctxt,
                 (const char*)results[j + incr]->stringval, -1, &status);
             tst = ucol_strcoll(coll, target, u_strlen(target), target2,
                                u_strlen(target2));
+            xmlFree(target);
+            xmlFree(target2);
             /* End ICU change */
           }
           if (descending)
@@ -357,6 +359,8 @@ void xsltUnicodeSortFunction(xsltTransformContextPtr ctxt,
                     (const char*)res[j + incr]->stringval, -1, &status);
                 tst = ucol_strcoll(coll, target, u_strlen(target), target2,
                                    u_strlen(target2));
+                xmlFree(target);
+                xmlFree(target2);
                 /* End ICU change */
               }
               if (desc)
