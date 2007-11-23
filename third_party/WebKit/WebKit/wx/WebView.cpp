@@ -23,11 +23,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "wx/wxprec.h"
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
-
 #include "config.h"
 #include "DeprecatedString.h"
 #include "Document.h"
@@ -58,6 +53,11 @@
 #include "kjs_binding.h"
 #include <kjs/value.h>
 #include <kjs/ustring.h>
+
+#include "wx/wxprec.h"
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
 
 #include "WebView.h"
 #include "WebViewPrivate.h"
