@@ -44,6 +44,7 @@
 #include "TextResourceDecoder.h"
 #include "XMLTokenizer.h"
 #include "XSLTExtensions.h"
+#include "XSLTUnicodeSort.h"
 #include "loader.h"
 #include "markup.h"
 #include <libxslt/imports.h>
@@ -84,6 +85,11 @@ SOFT_LINK(libxslt,
           int,
           (xsltTransformContextPtr ctxt, const char** params),
           (ctxt, params))
+SOFT_LINK(libxslt,
+          xsltSetCtxtSortFunc,
+          void,
+          (xsltTransformContextPtr ctxt, xsltSortFunc handler),
+          (ctxt, handler))
 SOFT_LINK(libxslt, xsltSetLoaderFunc, void, (xsltDocLoaderFunc f), (f))
 SOFT_LINK(libxslt,
           xsltSaveResultTo,
@@ -412,6 +418,12 @@ bool XSLTProcessor::transformToString(Node* sourceNode,
     xsltTransformContextPtr transformContext =
         xsltNewTransformContext(sheet, sourceDoc);
     registerXSLTExtensions(transformContext);
+#if USE(ICU_UNICODE)
+    // <http://bugs.webkit.org/show_bug.cgi?id=16077>: XSLT processor <xsl:sort>
+    // algorithm only compares by code point
+    // Only implemented for ICU yet.
+    xsltSetCtxtSortFunc(transformContext, xsltUnicodeSortFunction);
+#endif
 
     // This is a workaround for a bug in libxslt.
     // The bug has been fixed in version 1.1.13, so once we ship that this can
