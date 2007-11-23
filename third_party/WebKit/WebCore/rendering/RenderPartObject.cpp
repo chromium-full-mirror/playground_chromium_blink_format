@@ -115,6 +115,7 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
   if (element()->hasTagName(objectTag)) {
     HTMLObjectElement* o = static_cast<HTMLObjectElement*>(element());
 
+    o->setNeedWidgetUpdate(false);
     if (!o->isComplete())
       return;
     // Check for a child EMBED tag.
@@ -240,6 +241,7 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
       o->renderFallbackContent();
   } else if (element()->hasTagName(embedTag)) {
     HTMLEmbedElement* o = static_cast<HTMLEmbedElement*>(element());
+    o->setNeedWidgetUpdate(false);
     url = o->url;
     serviceType = o->m_serviceType;
 

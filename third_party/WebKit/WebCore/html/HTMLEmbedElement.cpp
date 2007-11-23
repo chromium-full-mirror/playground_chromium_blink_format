@@ -44,7 +44,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLEmbedElement::HTMLEmbedElement(Document* doc)
-    : HTMLPlugInElement(embedTag, doc) {}
+    : HTMLPlugInElement(embedTag, doc), m_needWidgetUpdate(false) {}
 
 HTMLEmbedElement::~HTMLEmbedElement() {
 #if USE(JAVASCRIPTCORE_BINDINGS)
@@ -147,10 +147,9 @@ RenderObject* HTMLEmbedElement::createRenderer(RenderArena* arena,
 }
 
 void HTMLEmbedElement::attach() {
+  m_needWidgetUpdate = true;
+  queuePostAttachCallback(&HTMLPlugInElement::updateWidgetCallback, this);
   HTMLPlugInElement::attach();
-
-  if (renderer())
-    static_cast<RenderPartObject*>(renderer())->updateWidget(true);
 }
 
 void HTMLEmbedElement::detach() {
@@ -158,6 +157,11 @@ void HTMLEmbedElement::detach() {
   m_instance = 0;
 #endif
   HTMLPlugInElement::detach();
+}
+
+void HTMLEmbedElement::updateWidget() {
+  if (m_needWidgetUpdate && renderer())
+    static_cast<RenderPartObject*>(renderer())->updateWidget(true);
 }
 
 void HTMLEmbedElement::insertedIntoDocument() {

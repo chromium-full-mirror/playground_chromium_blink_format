@@ -1064,6 +1064,7 @@ void Document::recalcStyle(StyleChange change) {
     return;  // Guard against re-entrancy. -dwh
 
   m_inStyleRecalc = true;
+  suspendPostAttachCallbacks();
 
   ASSERT(!renderer() || renderArena());
   if (!renderer() || !renderArena())
@@ -1126,6 +1127,7 @@ bail_out:
   setHasChangedChild(false);
   setDocumentChanged(false);
 
+  resumePostAttachCallbacks();
   m_inStyleRecalc = false;
 
   // If we wanted to call implicitClose() during recalcStyle, do so now that

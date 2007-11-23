@@ -49,6 +49,8 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual bool checkDTD(const Node* newChild);
 
+  virtual void updateWidget() {}
+
   String align() const;
   void setAlign(const String&);
 
@@ -76,6 +78,8 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
 #endif
 
  protected:
+  static void updateWidgetCallback(Node*);
+
   String oldNameAttr;
 #if USE(JAVASCRIPTCORE_BINDINGS)
   mutable RefPtr<KJS::Bindings::Instance> m_instance;
