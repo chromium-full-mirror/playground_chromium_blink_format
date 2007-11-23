@@ -4265,14 +4265,10 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                   static_cast<CSSPrimitiveValue*>(values->item(4));
               CSSPrimitiveValue* sixthValue =
                   static_cast<CSSPrimitiveValue*>(values->item(5));
-              bool ok;
               MatrixTransformOperation* matrix = new MatrixTransformOperation(
-                  convertToLength(firstValue, style, &ok),
-                  convertToLength(secondValue, style, &ok),
-                  convertToLength(thirdValue, style, &ok),
-                  convertToLength(fourthValue, style, &ok),
-                  convertToLength(fifthValue, style, &ok),
-                  convertToLength(sixthValue, style, &ok));
+                  firstValue->getDoubleValue(), secondValue->getDoubleValue(),
+                  thirdValue->getDoubleValue(), fourthValue->getDoubleValue(),
+                  fifthValue->getDoubleValue(), sixthValue->getDoubleValue());
               operations.append(matrix);
               break;
             }
