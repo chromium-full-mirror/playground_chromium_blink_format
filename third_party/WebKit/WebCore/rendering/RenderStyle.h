@@ -844,7 +844,7 @@ class MatrixTransformOperation : public TransformOperation {
 
   virtual void apply(AffineTransform& transform, const IntSize& borderBoxSize) {
     AffineTransform matrix(m_a, m_b, m_c, m_d, m_e, m_f);
-    transform.multiply(matrix);
+    transform = matrix * transform;
   }
 
   virtual TransformOperation* blend(const TransformOperation* from,
