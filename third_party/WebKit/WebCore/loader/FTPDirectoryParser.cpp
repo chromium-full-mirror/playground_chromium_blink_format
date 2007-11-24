@@ -25,6 +25,11 @@
 #if ENABLE(FTPDIR)
 #include "FTPDirectoryParser.h"
 
+// On Win, the threadsafe *_r functions need to be gotten from pthreads.
+#if COMPILER(MSVC) && USE(PTHREADS)
+#include <pthread.h>
+#endif
+
 #include <wtf/ASCIICType.h>
 
 using namespace WTF;
