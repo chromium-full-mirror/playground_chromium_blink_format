@@ -43,6 +43,6 @@
 - (void)cancelLoadAndDestroyStreamWithError:(NSError*)error;
 
 - (void)receivedData:(NSData*)data;
-- (void)finishedLoadingWithData:(NSData*)data;
+- (void)finishedLoading;
 
 @end
