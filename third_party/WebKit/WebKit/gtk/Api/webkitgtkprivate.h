@@ -70,6 +70,7 @@ struct _WebKitPagePrivate {
   WebCore::String* userAgent;
 
   HashSet<GtkWidget*> children;
+  bool editable;
 };
 
 #define WEBKIT_FRAME_GET_PRIVATE(obj) \
@@ -80,6 +81,7 @@ struct _WebKitFramePrivate {
   WebCore::FrameLoaderClient* client;
   WebKitPage* page;
 
+  gchar* name;
   gchar* title;
   gchar* location;
 };
@@ -92,8 +94,8 @@ struct _WebKitNetworkRequestPrivate {
   gchar* url;
 };
 
-GObject* webkit_frame_init_with_page(WebKitPage*,
-                                     WebCore::HTMLFrameOwnerElement*);
+WebKitFrame* webkit_frame_init_with_page(WebKitPage*,
+                                         WebCore::HTMLFrameOwnerElement*);
 }
 
 #endif
