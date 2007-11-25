@@ -2446,7 +2446,7 @@ static int calculateCompiledPatternLengthAndFlags(
     int patternLength,
     JSRegExpIgnoreCaseOption ignoreCase,
     compile_data& compile_block,
-    ErrorCode errorcode) {
+    ErrorCode& errorcode) {
   /* Make a pass over the pattern to compute the
    amount of store required to hold the compiled code. This does not have to be
    perfect as long as errors are overestimates. At the same time we can detect
