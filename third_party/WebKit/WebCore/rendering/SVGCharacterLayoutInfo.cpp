@@ -492,6 +492,10 @@ void SVGCharacterLayoutInfo::baselineShiftStackWalk() {
   }
 }
 
+bool SVGChar::isHidden() const {
+  return pathData && pathData->hidden;
+}
+
 AffineTransform SVGChar::characterTransform() const {
   AffineTransform ctm;
 

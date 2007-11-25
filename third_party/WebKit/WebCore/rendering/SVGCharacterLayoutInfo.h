@@ -184,7 +184,7 @@ struct SVGCharOnPath : RefCounted<SVGCharOnPath> {
         xShift(0.0f),
         yShift(0.0f),
         orientationAngle(0.0f),
-        visible(true) {}
+        hidden(false) {}
 
   float xScale;
   float yScale;
@@ -194,9 +194,7 @@ struct SVGCharOnPath : RefCounted<SVGCharOnPath> {
 
   float orientationAngle;
 
-  // Determines wheter this char is visible (ie. false for chars "off" the text
-  // layout path)
-  bool visible : 1;
+  bool hidden : 1;
 };
 
 struct SVGChar {
@@ -227,7 +225,8 @@ struct SVGChar {
   // Determines wheter this char starts a new chunk
   bool newTextChunk : 1;
 
-  // Helper method
+  // Helper methods
+  bool isHidden() const;
   AffineTransform characterTransform() const;
 };
 
