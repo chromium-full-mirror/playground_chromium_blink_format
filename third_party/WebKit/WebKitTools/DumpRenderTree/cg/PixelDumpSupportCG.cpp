@@ -89,7 +89,7 @@ static void getMD5HashStringForBitmap(CGContextRef bitmap, char string[33]) {
     snprintf(string, 33, "%s%02x", string, hash[i]);
 }
 
-void drawSelectionRectIntoContext(CGContextRef context, CGRect rect) {
+void drawSelectionRect(CGContextRef context, const CGRect& rect) {
   const CGFloat redColor[4] = {1.0, 0.0, 0.0, 0.0};
 
   CGContextSaveGState(context);
@@ -104,15 +104,14 @@ void dumpWebViewAsPixelsAndCompareWithExpected(
   RetainPtr<CGContextRef> context = getBitmapContextFromWebView();
 
 #if PLATFORM(MAC)
-  if (!layoutTestController->testRepaint())
-    drawWebViewIntoContext(context.get());
-  else if (!layoutTestController->testRepaintSweepHorizontally())
-    repaintWithVerticalSweep(context.get());
+  if (layoutTestController->testRepaint())
+    repaintWebView(context.get(),
+                   layoutTestController->testRepaintSweepHorizontally());
   else
-    repaintWithHorizontalSweep(context.get());
+    paintWebView(context.get());
 
   if (layoutTestController->dumpSelectionRect())
-    drawSelectionRectIntoContext(context.get(), getSelectionRect());
+    drawSelectionRect(context.get(), getSelectionRect());
 #endif
 
   // Compute the actual hash to compare to the expected image's hash.
