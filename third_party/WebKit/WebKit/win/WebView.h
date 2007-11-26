@@ -642,8 +642,10 @@ class WebView : public IWebView,
   void paint(HDC, LPARAM);
   void paintIntoBackingStore(WebCore::FrameView*,
                              HDC bitmapDC,
-                             LPRECT dirtyRect);
-  void paintIntoWindow(HDC bitmapDC, HDC windowDC, LPRECT dirtyRect);
+                             const WebCore::IntRect& dirtyRect);
+  void paintIntoWindow(HDC bitmapDC,
+                       HDC windowDC,
+                       const WebCore::IntRect& dirtyRect);
   bool ensureBackingStore();
   void addToDirtyRegion(const WebCore::IntRect&);
   void addToDirtyRegion(HRGN);
