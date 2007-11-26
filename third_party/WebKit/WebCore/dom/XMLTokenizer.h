@@ -84,7 +84,8 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
 
 #ifndef USE_QXMLSTREAM
   // callbacks from parser SAX
-  void error(ErrorType, const char* message, va_list args);
+  void error(ErrorType, const char* message, va_list args)
+      WTF_ATTRIBUTE_PRINTF(3, 0);
   void startElementNs(const xmlChar* xmlLocalName,
                       const xmlChar* xmlPrefix,
                       const xmlChar* xmlURI,

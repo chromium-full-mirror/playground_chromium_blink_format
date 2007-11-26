@@ -161,11 +161,7 @@ class String {
   static String number(unsigned long long);
   static String number(double);
 
-  static String format(const char*, ...)
-#if __GNUC__
-      __attribute__((format(printf, 1, 2)))
-#endif
-      ;
+  static String format(const char*, ...) WTF_ATTRIBUTE_PRINTF(1, 2);
 
   Vector<String> split(const String& separator,
                        bool allowEmptyEntries = false) const;

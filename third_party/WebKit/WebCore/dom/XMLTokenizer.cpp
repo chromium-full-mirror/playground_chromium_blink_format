@@ -1078,6 +1078,7 @@ static void commentHandler(void* closure, const xmlChar* comment) {
   getTokenizer(closure)->comment(comment);
 }
 
+WTF_ATTRIBUTE_PRINTF(2, 3)
 static void warningHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
@@ -1085,6 +1086,7 @@ static void warningHandler(void* closure, const char* message, ...) {
   va_end(args);
 }
 
+WTF_ATTRIBUTE_PRINTF(2, 3)
 static void fatalErrorHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
@@ -1092,6 +1094,7 @@ static void fatalErrorHandler(void* closure, const char* message, ...) {
   va_end(args);
 }
 
+WTF_ATTRIBUTE_PRINTF(2, 3)
 static void normalErrorHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
@@ -1605,6 +1608,7 @@ static void balancedCommentHandler(void* closure, const xmlChar* comment) {
   static_cast<XMLTokenizer*>(closure)->comment(comment);
 }
 
+WTF_ATTRIBUTE_PRINTF(2, 3)
 static void balancedWarningHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
