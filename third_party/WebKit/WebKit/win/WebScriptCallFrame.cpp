@@ -30,7 +30,6 @@
 #include "WebKitDLL.h"
 #include "WebScriptCallFrame.h"
 
-#include "Identifier.h"
 #include "IWebScriptScope.h"
 #include "Function.h"
 #include "WebScriptScope.h"
@@ -118,14 +117,14 @@ HRESULT STDMETHODCALLTYPE EnumScopes::Next(ULONG celt,
     return S_FALSE;
 
   // Create a WebScriptScope from the m_current then put it in an IUnknown.
-  COMPtr<IWebScriptScope> scope = WebScriptScope::createInstance(*m_current);
-  COMPtr<IUnknown> unknown = static_cast<IUnknown*>(scope.get());
+  COMPtr<IWebScriptScope> scope(AdoptCOM,
+                                WebScriptScope::createInstance(*m_current));
   ++m_current;
-  if (!unknown)
+  if (!scope)
     return E_FAIL;
 
   V_VT(rgVar) = VT_UNKNOWN;
-  V_UNKNOWN(rgVar) = unknown.get();
+  V_UNKNOWN(rgVar) = scope.releaseRef();
 
   if (pCeltFetched)
     *pCeltFetched = 1;
@@ -255,6 +254,21 @@ WebScriptCallFrame::stringByEvaluatingJavaScriptFromString(
 
   JSLock lock;
 
+  JSValue* scriptExecutionResult =
+      valueByEvaluatingJavaScriptFromString(script);
+
+  if (scriptExecutionResult && scriptExecutionResult->isString())
+    *result =
+        WebCore::BString(WebCore::String(scriptExecutionResult->getString()))
+            .release();
+  else
+    return E_FAIL;
+
+  return S_OK;
+}
+
+JSValue* WebScriptCallFrame::valueByEvaluatingJavaScriptFromString(
+    BSTR script) {
   ExecState* state = m_state;
   Interpreter* interp = state->dynamicInterpreter();
   JSObject* globObj = interp->globalObject();
@@ -293,13 +307,5 @@ WebScriptCallFrame::stringByEvaluatingJavaScriptFromString(
                                                  // on which eval path was used)
   state->setException(savedException);
 
-  if (!scriptExecutionResult)
-    return E_FAIL;
-
-  scriptExecutionResult->isString();
-  *result =
-      WebCore::BString(WebCore::String(scriptExecutionResult->getString()))
-          .release();
-
-  return S_OK;
+  return scriptExecutionResult;
 }

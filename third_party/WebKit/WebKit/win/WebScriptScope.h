@@ -43,16 +43,21 @@ class WebScriptScope : public IWebScriptScope {
 
  public:
   // IUnknown
-  virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
-                                                   void** ppvObject);
-  virtual ULONG STDMETHODCALLTYPE AddRef(void);
-  virtual ULONG STDMETHODCALLTYPE Release(void);
+  virtual HRESULT STDMETHODCALLTYPE QueryInterface(
+      /* [in] */ REFIID,
+      /* [retval][out] */ void** ppvObject);
+
+  virtual ULONG STDMETHODCALLTYPE AddRef();
+
+  virtual ULONG STDMETHODCALLTYPE Release();
 
   // IWebScriptScope
   virtual HRESULT STDMETHODCALLTYPE variableNames(
-      /* [out, retval] */ IEnumVARIANT**);
+      /* [in] */ IWebScriptCallFrame*,
+      /* [retval][out] */ IEnumVARIANT**);
 
   virtual HRESULT STDMETHODCALLTYPE valueForVariable(
+      /* [in] */ IWebScriptCallFrame*,
       /* [in] */ BSTR key,
       /* [out, retval] */ BSTR* value);
 
