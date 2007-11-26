@@ -30,15 +30,17 @@
 #define ForEachCoClass_h
 
 #define FOR_EACH_COCLASS(macro)                                              \
-  macro(CFDictionaryPropertyBag) macro(WebCache) macro(WebDownload)          \
-      macro(WebError) macro(WebHistory) macro(WebHistoryItem)                \
-          macro(WebIconDatabase) macro(WebJavaScriptCollector)               \
-              macro(WebKitStatistics) macro(WebMutableURLRequest)            \
-                  macro(WebNotificationCenter) macro(WebPreferences)         \
-                      macro(WebScrollBar) macro(WebScriptDebugServer)        \
-                          macro(WebTextRenderer) macro(WebURLCredential)     \
-                              macro(WebURLProtectionSpace)                   \
-                                  macro(WebURLRequest) macro(WebURLResponse) \
-                                      macro(WebView)  // end of macro
+  macro(CFDictionaryPropertyBag) macro(WebCache) macro(WebDatabaseManager)   \
+      macro(WebDownload) macro(WebError) macro(WebHistory)                   \
+          macro(WebHistoryItem) macro(WebIconDatabase)                       \
+              macro(WebJavaScriptCollector) macro(WebKitStatistics)          \
+                  macro(WebMutableURLRequest) macro(WebNotificationCenter)   \
+                      macro(WebPreferences) macro(WebScrollBar)              \
+                          macro(WebScriptDebugServer) macro(WebTextRenderer) \
+                              macro(WebURLCredential)                        \
+                                  macro(WebURLProtectionSpace)               \
+                                      macro(WebURLRequest)                   \
+                                          macro(WebURLResponse)              \
+                                              macro(WebView)  // end of macro
 
 #endif  // !defined(ForEachCoClass_h)
