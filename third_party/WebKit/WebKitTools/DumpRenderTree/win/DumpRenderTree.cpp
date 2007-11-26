@@ -50,6 +50,8 @@
 #include <WebKit/IWebURLResponse.h>
 #include <WebKit/IWebViewPrivate.h>
 #include <WebKit/WebKit.h>
+#include <fcntl.h>
+#include <io.h>
 #include <windows.h>
 #include <stdio.h>
 
@@ -820,6 +822,8 @@ static void stopJavaScriptThreads(void) {
 
 int main(int argc, char* argv[]) {
   leakChecking = false;
+
+  _setmode(1, _O_BINARY);
 
   initialize(GetModuleHandle(0));
 
