@@ -1341,15 +1341,6 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
     // will we have to potentially relayout.
     int yPosEstimate = estimateVerticalPosition(child, marginInfo);
 
-    // If an element might be affected by the presence of floats, then always
-    // mark it for
-    // layout.
-    if (!child->avoidsFloats() || child->shrinkToAvoidFloats()) {
-      int fb = max(previousFloatBottom, floatBottom());
-      if (fb > m_height || fb > yPosEstimate)
-        child->setChildNeedsLayout(true, false);
-    }
-
     // Cache our old rect so that we can dirty the proper repaint rects if the
     // child moves.
     IntRect oldRect(child->xPos(), child->yPos(), child->width(),
@@ -1359,8 +1350,21 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren,
     // top.
     view()->addLayoutDelta(IntSize(0, child->yPos() - yPosEstimate));
     child->setPos(child->xPos(), yPosEstimate);
+
+    bool markDescendantsWithFloats = false;
     if (yPosEstimate != oldRect.y() && !child->avoidsFloats() &&
         child->containsFloats())
+      markDescendantsWithFloats = true;
+    else if (!child->avoidsFloats() || child->shrinkToAvoidFloats()) {
+      // If an element might be affected by the presence of floats, then always
+      // mark it for
+      // layout.
+      int fb = max(previousFloatBottom, floatBottom());
+      if (fb > m_height || fb > yPosEstimate)
+        markDescendantsWithFloats = true;
+    }
+
+    if (markDescendantsWithFloats)
       child->markAllDescendantsWithFloatsForLayout();
 
     if (child->isRenderBlock())
