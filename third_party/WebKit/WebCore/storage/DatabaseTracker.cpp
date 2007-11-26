@@ -114,20 +114,28 @@ void DatabaseTracker::openTrackerDatabase() {
 
 String DatabaseTracker::fullPathForDatabase(const SecurityOriginData& origin,
                                             const String& name) {
+  String originIdentifier = origin.stringIdentifier();
+  String originPath =
+      pathByAppendingComponent(m_databasePath, originIdentifier);
+
+  // Make sure the path for this SecurityOrigin exists
+  if (!makeAllDirectories(originPath))
+    return "";
+
+  // See if we have a path for this database yet
   SQLiteStatement statement(
       m_database, "SELECT path FROM Databases WHERE origin=? AND name=?;");
 
   if (statement.prepare() != SQLResultOk)
     return "";
 
-  statement.bindText(1, origin.stringIdentifier());
+  statement.bindText(1, originIdentifier);
   statement.bindText(2, name);
 
   int result = statement.step();
 
   if (result == SQLResultRow)
-    return pathByAppendingComponent(m_databasePath,
-                                    statement.getColumnText16(0));
+    return pathByAppendingComponent(originPath, statement.getColumnText16(0));
   if (result != SQLResultDone) {
     LOG_ERROR(
         "Failed to retrieve filename from Database Tracker for origin %s, name "
@@ -135,6 +143,7 @@ String DatabaseTracker::fullPathForDatabase(const SecurityOriginData& origin,
         origin.stringIdentifier().ascii().data(), name.ascii().data());
     return "";
   }
+  statement.finalize();
 
   SQLiteStatement sequenceStatement(
       m_database, "SELECT seq FROM sqlite_sequence WHERE name='Databases';");
@@ -153,15 +162,14 @@ String DatabaseTracker::fullPathForDatabase(const SecurityOriginData& origin,
     seq = sequenceStatement.getColumnInt64(0);
   } else if (result != SQLResultDone)
     return "";
+  sequenceStatement.finalize();
 
   String filename;
   do {
     ++seq;
-    filename = pathByAppendingComponent(m_databasePath,
-                                        String::format("%016llx.db", seq));
+    filename =
+        pathByAppendingComponent(originPath, String::format("%016llx.db", seq));
   } while (fileExists(filename));
-
-  sequenceStatement.finalize();
 
   if (!addDatabase(origin, name, String::format("%016llx.db", seq)))
     return "";
