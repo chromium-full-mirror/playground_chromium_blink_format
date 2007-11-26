@@ -58,7 +58,7 @@ Arguments:
 Returns:      the other case or -1 if none
 */
 
-int _pcre_ucp_othercase(const int c) {
+int _pcre_ucp_othercase(const unsigned int c) {
   int bot = 0;
   int top = sizeof(ucp_table) / sizeof(cnode);
   int mid, offset;
