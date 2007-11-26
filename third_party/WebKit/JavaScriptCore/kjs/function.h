@@ -190,6 +190,7 @@ class ActivationImp : public JSObject {
                    JSValue* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
+  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
