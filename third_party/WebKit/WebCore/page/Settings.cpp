@@ -259,6 +259,9 @@ void Settings::setDeveloperExtrasEnabled(bool developerExtrasEnabled) {
 }
 
 void Settings::setAuthorAndUserStylesEnabled(bool authorAndUserStylesEnabled) {
+  if (m_authorAndUserStylesEnabled == authorAndUserStylesEnabled)
+    return;
+
   m_authorAndUserStylesEnabled = authorAndUserStylesEnabled;
   setNeedsReapplyStylesInAllFrames(m_page);
 }
