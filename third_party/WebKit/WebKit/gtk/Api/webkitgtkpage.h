@@ -79,6 +79,10 @@ struct _WebKitPageClass {
       WebKitFrame* frame,
       WebKitNetworkRequest* request);
 
+  void (*window_object_cleared)(WebKitPage* page,
+                                WebKitFrame* frame,
+                                JSGlobalContextRef context,
+                                JSObjectRef window_object);
   gchar* (*choose_file)(WebKitPage* page,
                         WebKitFrame* frame,
                         const gchar* old_file);
