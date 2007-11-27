@@ -521,6 +521,25 @@ static JSValueRef setAcceptsEditingCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setAuthorAndUserStylesEnabledCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has mac & windows implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setAuthorAndUserStylesEnabled(
+      JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setCustomPolicyDelegateCallback(JSContextRef context,
                                                   JSObjectRef function,
                                                   JSObjectRef thisObject,
@@ -825,6 +844,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"repaintSweepHorizontally", repaintSweepHorizontallyCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setAcceptsEditing", setAcceptsEditingCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setAuthorAndUserStylesEnabled", setAuthorAndUserStylesEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setCallCloseOnWebViews", setCallCloseOnWebViewsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

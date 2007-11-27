@@ -85,7 +85,8 @@ class CSSStyleSelector : public StyleSelector {
                    const String& userStyleSheet,
                    StyleSheetList* styleSheets,
                    CSSStyleSheet* mappedElementsSheet,
-                   bool strictParsing);
+                   bool strictParsing,
+                   bool matchAuthorAndUserStyles);
   ~CSSStyleSelector();
 
   static void loadDefaultStyle();
@@ -267,6 +268,7 @@ class CSSStyleSelector : public StyleSelector {
   CSSValue* m_lineHeightValue;
   bool fontDirty;
   bool isXMLDoc;
+  bool m_matchAuthorAndUserStyles;
 
   RefPtr<CSSFontSelector> m_fontSelector;
 

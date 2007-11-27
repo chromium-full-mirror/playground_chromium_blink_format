@@ -338,9 +338,13 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
   m_usesFirstLetterRules = false;
   m_gotoAnchorNeededAfterStylesheetsLoad = false;
 
-  m_styleSelector =
-      new CSSStyleSelector(this, m_usersheet, m_styleSheets.get(),
-                           m_mappedElementSheet.get(), !inCompatMode());
+  bool matchAuthorAndUserStyles = true;
+  if (Settings* settings = this->settings())
+    matchAuthorAndUserStyles = settings->authorAndUserStylesEnabled();
+  m_styleSelector = new CSSStyleSelector(
+      this, m_usersheet, m_styleSheets.get(), m_mappedElementSheet.get(),
+      !inCompatMode(), matchAuthorAndUserStyles);
+
   m_didCalculateStyleSelector = false;
   m_pendingStylesheets = 0;
   m_ignorePendingStylesheets = false;
@@ -2076,8 +2080,13 @@ void Document::recalcStyleSelector() {
 
   DeprecatedPtrList<StyleSheet> oldStyleSheets = m_styleSheets->styleSheets;
   m_styleSheets->styleSheets.clear();
-  Node* n;
-  for (n = this; n; n = n->traverseNextNode()) {
+
+  bool matchAuthorAndUserStyles = true;
+  if (Settings* settings = this->settings())
+    matchAuthorAndUserStyles = settings->authorAndUserStylesEnabled();
+
+  Node* n = matchAuthorAndUserStyles ? this : 0;
+  for (; n; n = n->traverseNextNode()) {
     StyleSheet* sheet = 0;
 
     if (n->nodeType() == PROCESSING_INSTRUCTION_NODE) {
@@ -2103,8 +2112,7 @@ void Document::recalcStyleSelector() {
         Element* elem = getElementById(pi->localHref().impl());
         if (elem) {
           String sheetText("");
-          Node* c;
-          for (c = elem->firstChild(); c; c = c->nextSibling()) {
+          for (Node* c = elem->firstChild(); c; c = c->nextSibling()) {
             if (c->nodeType() == TEXT_NODE ||
                 c->nodeType() == CDATA_SECTION_NODE)
               sheetText += c->nodeValue();
@@ -2116,7 +2124,6 @@ void Document::recalcStyleSelector() {
           sheet = cssSheet;
         }
       }
-
     } else if (n->isHTMLElement() &&
                    (n->hasTagName(linkTag) || n->hasTagName(styleTag))
 #if ENABLE(SVG)
@@ -2209,9 +2216,9 @@ void Document::recalcStyleSelector() {
   String usersheet = m_usersheet;
   if (view() && view()->mediaType() == "print")
     usersheet += m_printSheet;
-  m_styleSelector =
-      new CSSStyleSelector(this, usersheet, m_styleSheets.get(),
-                           m_mappedElementSheet.get(), !inCompatMode());
+  m_styleSelector = new CSSStyleSelector(
+      this, usersheet, m_styleSheets.get(), m_mappedElementSheet.get(),
+      !inCompatMode(), matchAuthorAndUserStyles);
   m_styleSelector->setEncodedURL(m_url);
   m_didCalculateStyleSelector = true;
 }

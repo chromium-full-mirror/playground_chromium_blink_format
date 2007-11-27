@@ -63,7 +63,8 @@ Settings::Settings(Page* page)
       m_usesPageCache(false),
       m_showsURLsInToolTips(false),
       m_forceFTPDirectoryListings(false),
-      m_developerExtrasEnabled(false) {
+      m_developerExtrasEnabled(false),
+      m_authorAndUserStylesEnabled(true) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -255,6 +256,11 @@ void Settings::setForceFTPDirectoryListings(bool force) {
 
 void Settings::setDeveloperExtrasEnabled(bool developerExtrasEnabled) {
   m_developerExtrasEnabled = developerExtrasEnabled;
+}
+
+void Settings::setAuthorAndUserStylesEnabled(bool authorAndUserStylesEnabled) {
+  m_authorAndUserStylesEnabled = authorAndUserStylesEnabled;
+  setNeedsReapplyStylesInAllFrames(m_page);
 }
 
 void Settings::setDefaultDatabaseOriginQuota(unsigned long long quota) {

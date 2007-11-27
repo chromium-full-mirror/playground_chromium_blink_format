@@ -154,6 +154,11 @@ class Settings {
   void setDeveloperExtrasEnabled(bool);
   bool developerExtrasEnabled() const { return m_developerExtrasEnabled; }
 
+  void setAuthorAndUserStylesEnabled(bool);
+  bool authorAndUserStylesEnabled() const {
+    return m_authorAndUserStylesEnabled;
+  }
+
   void setDefaultDatabaseOriginQuota(unsigned long long);
   unsigned long long defaultDatabaseOriginQuota() const;
 
@@ -190,6 +195,7 @@ class Settings {
   bool m_showsURLsInToolTips : 1;
   bool m_forceFTPDirectoryListings : 1;
   bool m_developerExtrasEnabled : 1;
+  bool m_authorAndUserStylesEnabled : 1;
 };
 
 }  // namespace WebCore
