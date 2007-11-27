@@ -547,6 +547,8 @@ class FrameLoader : Noncopyable
 
   void iconLoadDecisionAvailable();
 
+  bool shouldAllowNavigation(Frame* targetFrame) const;
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
@@ -676,8 +678,6 @@ class FrameLoader : Noncopyable
   void handleUnimplementablePolicy(const ResourceError&);
 
   void applyUserAgent(ResourceRequest& request);
-
-  bool canTarget(Frame*) const;
 
   void scheduleRedirection(ScheduledRedirection*);
   void startRedirectionTimer();

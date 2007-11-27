@@ -792,6 +792,8 @@ void Window::put(ExecState* exec,
       case Location_: {
         Frame* p = Window::retrieveActive(exec)->impl()->frame();
         if (p) {
+          if (!p->loader()->shouldAllowNavigation(impl()->frame()))
+            return;
           DeprecatedString dstUrl =
               p->loader()
                   ->completeURL(DeprecatedString(value->toString(exec)))
@@ -2092,10 +2094,11 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
     switch (entry->value.intValue) {
       case Href: {
         Frame* frame = Window::retrieveActive(exec)->impl()->frame();
-        if (frame)
-          url = frame->loader()->completeURL(str).url();
-        else
-          url = str;
+        if (!frame)
+          return;
+        if (!frame->loader()->shouldAllowNavigation(m_frame))
+          return;
+        url = frame->loader()->completeURL(str).url();
         break;
       }
       case Hash: {
@@ -2160,9 +2163,11 @@ JSValue* LocationProtoFuncReplace::callAsFunction(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  DeprecatedString str = args[0]->toString(exec);
   Frame* p = Window::retrieveActive(exec)->impl()->frame();
   if (p) {
+    if (!p->loader()->shouldAllowNavigation(frame))
+      return jsUndefined();
+    DeprecatedString str = args[0]->toString(exec);
     const Window* window = Window::retrieveWindow(frame);
     if (!str.startsWith("javascript:", false) ||
         (window && window->isSafeScript(exec))) {
@@ -2212,12 +2217,10 @@ JSValue* LocationProtoFuncAssign::callAsFunction(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  Window* window = Window::retrieveWindow(frame);
-  if (!window->isSafeScript(exec))
-    return jsUndefined();
-
   Frame* p = Window::retrieveActive(exec)->impl()->frame();
   if (p) {
+    if (!p->loader()->shouldAllowNavigation(frame))
+      return jsUndefined();
     const Window* window = Window::retrieveWindow(frame);
     DeprecatedString dstUrl =
         p->loader()
