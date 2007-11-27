@@ -60,7 +60,8 @@ class RenderSlider : public RenderBlock {
   bool inDragMode() const;
 
  private:
-  RenderStyle* createThumbStyle(RenderStyle* parentStyle);
+  RenderStyle* createThumbStyle(RenderStyle* parentStyle,
+                                RenderStyle* oldStyle = 0);
   int trackSize();
 
   RefPtr<HTMLSliderThumbElement> m_thumb;
