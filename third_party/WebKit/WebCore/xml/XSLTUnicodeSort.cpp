@@ -68,7 +68,8 @@ static void (*softLink_xsltTransformError)(xsltTransformContextPtr ctxt,
                                            xsltStylesheetPtr style,
                                            xmlNodePtr node,
                                            const char*,
-                                           ...) = init_xsltTransformError;
+                                           ...)
+    WTF_ATTRIBUTE_PRINTF(4, 5) = init_xsltTransformError;
 
 static void init_xsltTransformError(xsltTransformContextPtr ctxt,
                                     xsltStylesheetPtr style,
