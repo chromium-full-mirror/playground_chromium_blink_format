@@ -340,6 +340,8 @@ class Vector {
   typedef VectorTypeOperations<T> TypeOperations;
 
  public:
+  typedef T ValueType;
+
   typedef T* iterator;
   typedef const T* const_iterator;
 
