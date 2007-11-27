@@ -2535,7 +2535,6 @@ static int calculateCompiledPatternLengthAndFlags(
               length += 5;
             if (ptr[1] == '?')
               ptr++;
-            ptr++;
           }
         }
         continue;
