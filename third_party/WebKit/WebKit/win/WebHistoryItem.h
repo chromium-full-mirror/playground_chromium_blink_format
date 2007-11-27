@@ -31,7 +31,7 @@
 #include "IWebIconDatabase.h"
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <WebCore/BString.h>
+#include <WebCore/PlatformString.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
@@ -111,7 +111,7 @@ class WebHistoryItem : public IWebHistoryItem, IWebHistoryItemPrivate {
   ULONG m_refCount;
 
   RefPtr<WebCore::HistoryItem> m_historyItem;
-  WebCore::BString m_alternateTitle;
+  WebCore::String m_alternateTitle;
 };
 
 #endif
