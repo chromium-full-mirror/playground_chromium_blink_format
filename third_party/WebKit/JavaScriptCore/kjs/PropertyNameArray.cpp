@@ -31,4 +31,9 @@ void PropertyNameArray::add(const Identifier& ident) {
   m_vector.append(ident);
 }
 
+void PropertyNameArray::swap(PropertyNameArray& other) {
+  m_vector.swap(other.m_vector);
+  m_set.swap(other.m_set);
+}
+
 }  // namespace KJS
