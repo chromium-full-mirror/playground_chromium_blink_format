@@ -45,7 +45,7 @@ extern "C" {
 @result           A JSString containing string. Ownership follows the Create
 Rule.
 */
-JSStringRef JSStringCreateWithCFString(CFStringRef string);
+JS_EXPORT JSStringRef JSStringCreateWithCFString(CFStringRef string);
 /*!
 @function
 @abstract         Creates a CFString from a JavaScript string.
@@ -54,7 +54,8 @@ JSStringRef JSStringCreateWithCFString(CFStringRef string);
 @result           A CFString containing string. Ownership follows the Create
 Rule.
 */
-CFStringRef JSStringCopyCFString(CFAllocatorRef alloc, JSStringRef string);
+JS_EXPORT CFStringRef JSStringCopyCFString(CFAllocatorRef alloc,
+                                           JSStringRef string);
 
 #ifdef __cplusplus
 }
