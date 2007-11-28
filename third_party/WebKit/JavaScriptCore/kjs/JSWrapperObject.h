@@ -56,14 +56,14 @@ class JSWrapperObject : public JSObject {
    */
   void setInternalValue(JSValue* v);
 
-  virtual void markChildren(MarkStack& stack);
+  virtual void mark();
 
  private:
   JSValue* m_internalValue;
 };
 
 inline JSWrapperObject::JSWrapperObject(JSValue* proto)
-    : JSObject(proto), m_internalValue(jsNull()) {}
+    : JSObject(proto), m_internalValue(0) {}
 
 inline JSValue* JSWrapperObject::internalValue() const {
   return m_internalValue;

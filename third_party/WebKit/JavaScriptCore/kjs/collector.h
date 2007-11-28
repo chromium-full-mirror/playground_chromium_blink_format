@@ -32,10 +32,9 @@
 
 namespace KJS {
 
-class CollectorBlock;
 class JSCell;
 class JSValue;
-class MarkStack;
+class CollectorBlock;
 
 class Collector {
  public:
@@ -67,7 +66,6 @@ class Collector {
 
   static bool isCellMarked(const JSCell*);
   static void markCell(JSCell*);
-  static bool cellMayHaveRefs(const JSCell*);
 
   enum HeapType { PrimaryHeap, NumberHeap };
 
@@ -83,14 +81,12 @@ class Collector {
   Collector();
 
   static void recordExtraCost(size_t);
-  static void markProtectedObjects(MarkStack&);
-  static void markMainThreadOnlyObjects(MarkStack&);
-  static void markCurrentThreadConservatively(MarkStack&);
-  static void markOtherThreadConservatively(MarkStack&, Thread*);
-  static void markStackObjectsConservatively(MarkStack&);
-  static void markStackObjectsConservatively(MarkStack&,
-                                             void* start,
-                                             void* end);
+  static void markProtectedObjects();
+  static void markMainThreadOnlyObjects();
+  static void markCurrentThreadConservatively();
+  static void markOtherThreadConservatively(Thread*);
+  static void markStackObjectsConservatively();
+  static void markStackObjectsConservatively(void* start, void* end);
 
   static size_t mainThreadOnlyObjectCount;
   static bool memoryFull;
@@ -125,8 +121,7 @@ const size_t SMALL_CELL_SIZE = CELL_SIZE / 2;
 const size_t CELL_MASK = CELL_SIZE - 1;
 const size_t CELL_ALIGN_MASK = ~CELL_MASK;
 const size_t CELLS_PER_BLOCK =
-    (BLOCK_SIZE * 8 - sizeof(uint32_t) * 8 - sizeof(uint32_t) * 8 -
-     sizeof(void*) * 8 -
+    (BLOCK_SIZE * 8 - sizeof(uint32_t) * 8 - sizeof(void*) * 8 -
      2 * (7 + 3 * 8)) /
     (CELL_SIZE * 8 + 2);
 const size_t SMALL_CELLS_PER_BLOCK = 2 * CELLS_PER_BLOCK;
@@ -166,7 +161,6 @@ class CollectorBlock {
   CollectorCell cells[CELLS_PER_BLOCK];
   uint32_t usedCells;
   CollectorCell* freeList;
-  uint32_t mayHaveRefs;
   CollectorBitmap marked;
   CollectorBitmap collectOnMainThreadOnly;
 };
@@ -176,7 +170,6 @@ class SmallCellCollectorBlock {
   SmallCollectorCell cells[SMALL_CELLS_PER_BLOCK];
   uint32_t usedCells;
   SmallCollectorCell* freeList;
-  uint32_t mayHaveRefs;
   CollectorBitmap marked;
   CollectorBitmap collectOnMainThreadOnly;
 };
@@ -201,10 +194,6 @@ inline bool Collector::isCellMarked(const JSCell* cell) {
 
 inline void Collector::markCell(JSCell* cell) {
   cellBlock(cell)->marked.set(cellOffset(cell));
-}
-
-inline bool Collector::cellMayHaveRefs(const JSCell* cell) {
-  return cellBlock(cell)->mayHaveRefs;
 }
 
 inline void Collector::reportExtraMemoryCost(size_t cost) {

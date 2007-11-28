@@ -37,10 +37,9 @@ namespace WebCore {
 
 using namespace KJS;
 
-void JSDocument::markChildren(MarkStack& stack) {
-  DOMObject::markChildren(stack);
-  ScriptInterpreter::markDOMNodesForDocument(stack,
-                                             static_cast<Document*>(impl()));
+void JSDocument::mark() {
+  DOMObject::mark();
+  ScriptInterpreter::markDOMNodesForDocument(static_cast<Document*>(impl()));
 }
 
 JSValue* JSDocument::location(ExecState* exec) const {

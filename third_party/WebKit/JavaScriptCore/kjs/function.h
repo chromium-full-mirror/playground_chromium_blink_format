@@ -108,7 +108,7 @@ class FunctionImp : public InternalFunctionImp {
   void setScope(const ScopeChain& s) { _scope = s; }
   const ScopeChain& scope() const { return _scope; }
 
-  virtual void markChildren(MarkStack&);
+  virtual void mark();
 
  private:
   ScopeChain _scope;
@@ -149,7 +149,7 @@ class Arguments : public JSObject {
             FunctionImp* func,
             const List& args,
             ActivationImp* act);
-  virtual void markChildren(MarkStack&);
+  virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
@@ -195,7 +195,7 @@ class ActivationImp : public JSObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
-  virtual void markChildren(MarkStack&);
+  virtual void mark();
 
   bool isActivation() { return true; }
 

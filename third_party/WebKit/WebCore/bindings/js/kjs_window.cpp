@@ -293,10 +293,10 @@ Location* Window::location() const {
 }
 
 // reference our special objects during garbage collection
-void Window::markChildren(KJS::MarkStack& stack) {
-  JSObject::markChildren(stack);
-  if (d->loc)
-    stack.push(d->loc);
+void Window::mark() {
+  JSObject::mark();
+  if (d->loc && !d->loc->marked())
+    d->loc->mark();
 }
 
 static bool allowPopUp(ExecState* exec, Window* window) {

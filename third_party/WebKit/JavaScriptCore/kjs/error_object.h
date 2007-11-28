@@ -86,6 +86,8 @@ class NativeErrorImp : public InternalFunctionImp {
                                   JSObject* thisObj,
                                   const List& args);
 
+  virtual void mark();
+
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 

@@ -33,7 +33,6 @@ class BooleanInstance : public JSWrapperObject {
   BooleanInstance(JSObject* proto);
 
   virtual const ClassInfo* classInfo() const { return &info; }
-  virtual void markChildren(MarkStack& stack);
   static const ClassInfo info;
 };
 

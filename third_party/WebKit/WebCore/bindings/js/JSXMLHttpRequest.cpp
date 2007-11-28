@@ -200,8 +200,8 @@ void JSXMLHttpRequest::putValueProperty(ExecState* exec,
   }
 }
 
-void JSXMLHttpRequest::markChildren(KJS::MarkStack& stack) {
-  DOMObject::markChildren(stack);
+void JSXMLHttpRequest::mark() {
+  DOMObject::mark();
 
   JSUnprotectedEventListener* onReadyStateChangeListener =
       static_cast<JSUnprotectedEventListener*>(
@@ -210,10 +210,10 @@ void JSXMLHttpRequest::markChildren(KJS::MarkStack& stack) {
       static_cast<JSUnprotectedEventListener*>(m_impl->onLoadListener());
 
   if (onReadyStateChangeListener)
-    onReadyStateChangeListener->markChildren(stack);
+    onReadyStateChangeListener->mark();
 
   if (onLoadListener)
-    onLoadListener->markChildren(stack);
+    onLoadListener->mark();
 
   typedef XMLHttpRequest::EventListenersMap EventListenersMap;
   typedef XMLHttpRequest::ListenerVector ListenerVector;
@@ -224,7 +224,7 @@ void JSXMLHttpRequest::markChildren(KJS::MarkStack& stack) {
          vecIter != mapIter->second.end(); ++vecIter) {
       JSUnprotectedEventListener* listener =
           static_cast<JSUnprotectedEventListener*>(vecIter->get());
-      listener->markChildren(stack);
+      listener->mark();
     }
   }
 }

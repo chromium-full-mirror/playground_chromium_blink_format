@@ -183,9 +183,9 @@ void JSUnprotectedEventListener::clearWindowObj() {
   m_win = 0;
 }
 
-void JSUnprotectedEventListener::markChildren(KJS::MarkStack& stack) {
-  if (m_listener)
-    stack.push(m_listener);
+void JSUnprotectedEventListener::mark() {
+  if (m_listener && !m_listener->marked())
+    m_listener->mark();
 }
 
 #ifndef NDEBUG

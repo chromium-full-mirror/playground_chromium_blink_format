@@ -196,8 +196,7 @@ void ScriptInterpreter::forgetAllDOMNodesForDocument(Document* document) {
   delete map;
 }
 
-void ScriptInterpreter::markDOMNodesForDocument(MarkStack& stack,
-                                                Document* doc) {
+void ScriptInterpreter::markDOMNodesForDocument(Document* doc) {
   NodePerDocMap::iterator dictIt = domNodesPerDocument().find(doc);
   if (dictIt != domNodesPerDocument().end()) {
     NodeMap* nodeDict = dictIt->second;
@@ -212,10 +211,11 @@ void ScriptInterpreter::markDOMNodesForDocument(MarkStack& stack,
       // otherwise reachable from JS.
       // However, image elements that aren't in the document are also
       // marked, if they are not done loading yet.
-      if (node->inDocument() ||
-          (node->hasTagName(imgTag) &&
-           !static_cast<HTMLImageElement*>(node)->haveFiredLoadEvent()))
-        stack.push(jsNode);
+      if (!jsNode->marked() &&
+          (node->inDocument() ||
+           (node->hasTagName(imgTag) &&
+            !static_cast<HTMLImageElement*>(node)->haveFiredLoadEvent())))
+        jsNode->mark();
     }
   }
 }

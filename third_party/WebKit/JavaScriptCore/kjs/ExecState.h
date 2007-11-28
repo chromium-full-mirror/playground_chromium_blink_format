@@ -101,7 +101,7 @@ class ExecState {
 
   void setGlobalObject(JSGlobalObject*);
 
-  void markChildren(MarkStack&);
+  void mark();
 
   // This is a workaround to avoid accessing the global variables for these
   // identifiers in

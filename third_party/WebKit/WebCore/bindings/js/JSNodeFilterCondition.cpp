@@ -33,8 +33,8 @@ namespace WebCore {
 JSNodeFilterCondition::JSNodeFilterCondition(KJS::JSObject* filter)
     : m_filter(filter) {}
 
-void JSNodeFilterCondition::markChildren(KJS::MarkStack& stack) {
-  stack.push(m_filter);
+void JSNodeFilterCondition::mark() {
+  m_filter->mark();
 }
 
 short JSNodeFilterCondition::acceptNode(Node* filterNode) const {
