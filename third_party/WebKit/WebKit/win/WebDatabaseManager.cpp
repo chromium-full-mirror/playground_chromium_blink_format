@@ -29,7 +29,10 @@
 #include "WebDatabaseManager.h"
 #include "WebKitDLL.h"
 
+#include "CFDictionaryPropertyBag.h"
 #include "COMEnumVariant.h"
+#include "MarshallingHelpers.h"
+#include "WebNotificationCenter.h"
 #include "WebSecurityOrigin.h"
 
 #include <WebCore/BString.h>
@@ -196,8 +199,10 @@ struct COMVariantSetter<SecurityOriginData>
 // -------------------------------------------------------------
 HRESULT STDMETHODCALLTYPE WebDatabaseManager::sharedWebDatabaseManager(
     /* [retval][out] */ IWebDatabaseManager** result) {
-  if (!s_sharedWebDatabaseManager)
+  if (!s_sharedWebDatabaseManager) {
     s_sharedWebDatabaseManager.adoptRef(WebDatabaseManager::createInstance());
+    DatabaseTracker::tracker().setClient(s_sharedWebDatabaseManager.get());
+  }
 
   return s_sharedWebDatabaseManager.copyRefTo(result);
 }
@@ -322,6 +327,47 @@ HRESULT STDMETHODCALLTYPE WebDatabaseManager::deleteDatabaseWithOrigin(
       String(databaseName, SysStringLen(databaseName)));
 
   return S_OK;
+}
+
+void WebDatabaseManager::dispatchDidModifyOrigin(
+    const SecurityOriginData& origin) {
+  static BSTR databaseDidModifyOriginName =
+      SysAllocString(WebDatabaseDidModifyOriginNotification);
+  IWebNotificationCenter* notifyCenter =
+      WebNotificationCenter::defaultCenterInternal();
+
+  COMPtr<WebSecurityOrigin> securityOrigin(
+      AdoptCOM, WebSecurityOrigin::createInstance(origin));
+  notifyCenter->postNotificationName(databaseDidModifyOriginName,
+                                     securityOrigin.get(), 0);
+}
+
+void WebDatabaseManager::dispatchDidModifyDatabase(
+    const SecurityOriginData& origin,
+    const String& databaseName) {
+  static BSTR databaseDidModifyOriginName =
+      SysAllocString(WebDatabaseDidModifyDatabaseNotification);
+  IWebNotificationCenter* notifyCenter =
+      WebNotificationCenter::defaultCenterInternal();
+
+  COMPtr<WebSecurityOrigin> securityOrigin(
+      AdoptCOM, WebSecurityOrigin::createInstance(origin));
+
+  RetainPtr<CFMutableDictionaryRef> userInfo(
+      AdoptCF, CFDictionaryCreateMutable(0, 0, &kCFTypeDictionaryKeyCallBacks,
+                                         &kCFTypeDictionaryValueCallBacks));
+
+  static CFStringRef databaseNameKey =
+      MarshallingHelpers::LPCOLESTRToCFStringRef(WebDatabaseNameKey);
+  RetainPtr<CFStringRef> str(AdoptCF, databaseName.createCFString());
+  CFDictionarySetValue(userInfo.get(), databaseNameKey, str.get());
+
+  COMPtr<CFDictionaryPropertyBag> userInfoBag(
+      AdoptCOM, CFDictionaryPropertyBag::createInstance());
+  userInfoBag->setDictionary(userInfo.get());
+
+  notifyCenter->postNotificationName(databaseDidModifyOriginName,
+                                     securityOrigin.get(), userInfoBag.get());
 }
 
 void WebKitSetWebDatabasesPathIfNecessary() {

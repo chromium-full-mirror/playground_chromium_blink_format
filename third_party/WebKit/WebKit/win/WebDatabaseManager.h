@@ -28,9 +28,12 @@
 #ifndef WebDatabaseManager_h
 #define WebDatabaseManager_h
 
+#include <WebCore/DatabaseTrackerClient.h>
+
 #include "IWebDatabaseManager.h"
 
-class WebDatabaseManager : public IWebDatabaseManager {
+class WebDatabaseManager : public IWebDatabaseManager,
+                           private WebCore::DatabaseTrackerClient {
  public:
   static WebDatabaseManager* createInstance();
 
@@ -67,6 +70,11 @@ class WebDatabaseManager : public IWebDatabaseManager {
   virtual HRESULT STDMETHODCALLTYPE deleteDatabaseWithOrigin(
       /* [in] */ BSTR databaseName,
       /* [in] */ IWebSecurityOrigin* origin);
+
+  // DatabaseTrackerClient
+  virtual void dispatchDidModifyOrigin(const WebCore::SecurityOriginData&);
+  virtual void dispatchDidModifyDatabase(const WebCore::SecurityOriginData&,
+                                         const WebCore::String& databaseName);
 
  private:
   WebDatabaseManager();
