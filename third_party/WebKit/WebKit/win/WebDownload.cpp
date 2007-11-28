@@ -271,8 +271,7 @@ HRESULT STDMETHODCALLTYPE WebDownload::initWithRequest(
     /* [in] */ IWebURLRequest* request,
     /* [in] */ IWebDownloadDelegate* delegate) {
   COMPtr<WebMutableURLRequest> webRequest;
-  if (!request || FAILED(request->QueryInterface(CLSID_WebMutableURLRequest,
-                                                 (void**)&webRequest))) {
+  if (!request || FAILED(request->QueryInterface(&webRequest))) {
     LOG(Download,
         "WebDownload - initWithRequest failed - not a WebMutableURLRequest");
     return E_FAIL;

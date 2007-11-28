@@ -70,7 +70,7 @@ WebURLAuthenticationChallengeSender::QueryInterface(REFIID riid,
   *ppvObject = 0;
   if (IsEqualGUID(riid, IID_IUnknown))
     *ppvObject = static_cast<IUnknown*>(this);
-  else if (IsEqualGUID(riid, __uuidof(WebURLAuthenticationChallengeSender)))
+  else if (IsEqualGUID(riid, __uuidof(this)))
     *ppvObject = static_cast<WebURLAuthenticationChallengeSender*>(this);
   else if (IsEqualGUID(riid, IID_IWebURLAuthenticationChallengeSender))
     *ppvObject = static_cast<IWebURLAuthenticationChallengeSender*>(this);

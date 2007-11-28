@@ -2190,8 +2190,7 @@ HRESULT WebView::notifyDidAddIcon(IWebNotification* notification) {
     return E_FAIL;
 
   COMPtr<CFDictionaryPropertyBag> dictionaryPropertyBag;
-  hr = propertyBag->QueryInterface(IID_CFDictionaryPropertyBag,
-                                   (void**)&dictionaryPropertyBag);
+  hr = propertyBag->QueryInterface(&dictionaryPropertyBag);
   if (FAILED(hr))
     return hr;
 
@@ -2380,8 +2379,7 @@ HRESULT STDMETHODCALLTYPE WebView::goToBackForwardItem(
   *succeeded = FALSE;
 
   COMPtr<WebHistoryItem> webHistoryItem;
-  HRESULT hr =
-      item->QueryInterface(CLSID_WebHistoryItem, (void**)&webHistoryItem);
+  HRESULT hr = item->QueryInterface(&webHistoryItem);
   if (FAILED(hr))
     return hr;
 
@@ -4023,8 +4021,7 @@ HRESULT STDMETHODCALLTYPE WebView::canHandleRequest(IWebURLRequest* request,
                                                     BOOL* result) {
   COMPtr<WebMutableURLRequest> requestImpl;
 
-  HRESULT hr =
-      request->QueryInterface(CLSID_WebMutableURLRequest, (void**)&requestImpl);
+  HRESULT hr = request->QueryInterface(&requestImpl);
   if (FAILED(hr))
     return hr;
 
@@ -4095,7 +4092,7 @@ HRESULT STDMETHODCALLTYPE WebView::loadBackForwardListFromOtherView(
   ASSERT(!backForwardList->currentItem());  // destination list should be empty
 
   COMPtr<WebView> otherWebView;
-  if (FAILED(otherView->QueryInterface(CLSID_WebView, (void**)&otherWebView)))
+  if (FAILED(otherView->QueryInterface(&otherWebView)))
     return E_FAIL;
   BackForwardList* otherBackForwardList =
       otherWebView->m_page->backForwardList();
@@ -4520,12 +4517,9 @@ HRESULT createMatchEnumerator(Vector<IntRect>* rects,
 Page* core(IWebView* iWebView) {
   Page* page = 0;
 
-  WebView* webView = 0;
-  if (SUCCEEDED(iWebView->QueryInterface(CLSID_WebView, (void**)&webView)) &&
-      webView) {
+  COMPtr<WebView> webView;
+  if (SUCCEEDED(iWebView->QueryInterface(&webView)) && webView)
     page = webView->page();
-    webView->Release();
-  }
 
   return page;
 }
