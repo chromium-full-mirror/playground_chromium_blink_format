@@ -233,6 +233,8 @@ static bool registerPluginView() {
   if (haveRegisteredWindowClass)
     return true;
 
+  haveRegisteredWindowClass = true;
+
   ASSERT(Page::instanceHandle());
 
   WNDCLASSEX wcex;
@@ -251,7 +253,7 @@ static bool registerPluginView() {
   wcex.lpszClassName = kWebPluginViewWindowClassName;
   wcex.hIconSm = 0;
 
-  return RegisterClassEx(&wcex);
+  return !!RegisterClassEx(&wcex);
 }
 
 static LRESULT CALLBACK PluginViewWndProc(HWND hWnd,
