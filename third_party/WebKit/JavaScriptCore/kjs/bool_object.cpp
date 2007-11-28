@@ -36,6 +36,11 @@ const ClassInfo BooleanInstance::info = {"Boolean", 0, 0};
 
 BooleanInstance::BooleanInstance(JSObject* proto) : JSWrapperObject(proto) {}
 
+void BooleanInstance::markChildren(MarkStack& stack) {
+  JSObject::markChildren(stack);
+  ASSERT(JSImmediate::isImmediate(internalValue()));
+}
+
 // ------------------------------ BooleanPrototype --------------------------
 
 // ECMA 15.6.4

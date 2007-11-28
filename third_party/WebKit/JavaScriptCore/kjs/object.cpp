@@ -110,9 +110,7 @@ JSValue* JSObject::call(ExecState* exec, JSObject* thisObj, const List& args) {
 
 // ------------------------------ JSObject ------------------------------------
 
-void JSObject::mark() {
-  JSCell::mark();
-
+void JSObject::markChildren(MarkStack& stack) {
 #if JAVASCRIPT_MARK_TRACING
   static int markStackDepth = 0;
   markStackDepth++;
@@ -122,11 +120,8 @@ void JSObject::mark() {
   printf("%s (%p)\n", className().UTF8String().c_str(), this);
 #endif
 
-  JSValue* proto = _proto;
-  if (!proto->marked())
-    proto->mark();
-
-  _prop.mark();
+  stack.push(_proto);
+  _prop.markChildren(stack);
 
 #if JAVASCRIPT_MARK_TRACING
   markStackDepth--;

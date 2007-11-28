@@ -65,9 +65,9 @@ FunctionImp::FunctionImp(ExecState* exec,
       body(b),
       _scope(sc) {}
 
-void FunctionImp::mark() {
-  InternalFunctionImp::mark();
-  _scope.mark();
+void FunctionImp::markChildren(MarkStack& stack) {
+  InternalFunctionImp::markChildren(stack);
+  _scope.markChildren(stack);
 }
 
 JSValue* FunctionImp::callAsFunction(ExecState* exec,
@@ -359,10 +359,9 @@ Arguments::Arguments(ExecState* exec,
   }
 }
 
-void Arguments::mark() {
-  JSObject::mark();
-  if (_activationObject && !_activationObject->marked())
-    _activationObject->mark();
+void Arguments::markChildren(MarkStack& stack) {
+  JSObject::markChildren(stack);
+  stack.push(_activationObject);
 }
 
 JSValue* Arguments::mappedIndexGetter(ExecState* exec,
@@ -505,22 +504,16 @@ void ActivationImp::put(ExecState*,
   _prop.put(propertyName, value, attr, (attr == None || attr == DontDelete));
 }
 
-void ActivationImp::mark() {
-  JSObject::mark();
+void ActivationImp::markChildren(MarkStack& stack) {
+  JSObject::markChildren(stack);
 
   size_t size = d->localStorage.size();
-  for (size_t i = 0; i < size; ++i) {
-    JSValue* value = d->localStorage[i].value;
-    if (!value->marked())
-      value->mark();
-  }
+  for (size_t i = 0; i < size; ++i)
+    stack.push(d->localStorage[i].value);
 
-  ASSERT(d->function);
-  if (!d->function->marked())
-    d->function->mark();
-
-  if (d->argumentsObject && !d->argumentsObject->marked())
-    d->argumentsObject->mark();
+  stack.push(d->function);
+  if (d->argumentsObject)
+    stack.push(d->argumentsObject);
 }
 
 void ActivationImp::createArgumentsObject(ExecState* exec) {

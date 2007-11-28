@@ -53,7 +53,7 @@ class ArrayInstance : public JSObject {
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
-  virtual void mark();
+  virtual void markChildren(MarkStack&);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

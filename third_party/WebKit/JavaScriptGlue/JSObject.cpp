@@ -108,9 +108,9 @@ UInt8 JSUserObject::Equal(JSBase* other) {
   return result;
 }
 
-void JSUserObject::Mark() {
+void JSUserObject::Mark(KJS::MarkStack& stack) {
   if (fMarkProc) {
-    fMarkProc(fData);
+    fMarkProc(stack, fData);
   }
 }
 

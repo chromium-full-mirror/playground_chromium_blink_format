@@ -55,7 +55,7 @@ class JSValueWrapper {
                                           JSObjectRef thisObj,
                                           CFArrayRef args);
   static CFTypeRef JSObjectCopyCFValue(void* data);
-  static void JSObjectMark(void* data);
+  static void JSObjectMark(KJS::MarkStack&, void* data);
 };
 
 #endif

@@ -30,6 +30,10 @@
 #include "NodeFilterCondition.h"
 #include <wtf/RefPtr.h>
 
+namespace KJS {
+class MarkStack;
+}
+
 namespace WebCore {
 
 class NodeFilter : public RefCounted<NodeFilter> {
@@ -64,7 +68,9 @@ class NodeFilter : public RefCounted<NodeFilter> {
 
   NodeFilter(NodeFilterCondition*);
   short acceptNode(Node*) const;
-  void mark() { m_condition->mark(); };
+  void markChildren(KJS::MarkStack& stack) {
+    m_condition->markChildren(stack);
+  };
 
  private:
   RefPtr<NodeFilterCondition> m_condition;

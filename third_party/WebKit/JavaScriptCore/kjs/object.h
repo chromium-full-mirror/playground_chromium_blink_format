@@ -27,6 +27,7 @@
 
 #include "JSType.h"
 #include "CommonIdentifiers.h"
+#include "MarkStack.h"
 #include "interpreter.h"
 #include "property_map.h"
 #include "property_slot.h"
@@ -87,7 +88,7 @@ class GetterSetterImp : public JSCell {
   virtual UString toString(ExecState* exec) const;
   virtual JSObject* toObject(ExecState* exec) const;
 
-  virtual void mark();
+  virtual void markChildren(MarkStack&);
 
   JSObject* getGetter() { return getter; }
   void setGetter(JSObject* g) { getter = g; }
@@ -114,7 +115,7 @@ class JSObject : public JSCell {
    */
   JSObject();
 
-  virtual void mark();
+  virtual void markChildren(MarkStack&);
   virtual JSType type() const;
 
   /**
@@ -623,11 +624,10 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
 // scope_chain_mark.h -- can't put it in scope_chain.h since it depends on
 // JSObject.
 
-inline void ScopeChain::mark() {
+inline void ScopeChain::markChildren(MarkStack& stack) {
   for (ScopeChainNode* n = _node; n; n = n->next) {
     JSObject* o = n->object;
-    if (!o->marked())
-      o->mark();
+    stack.push(o);
   }
 }
 

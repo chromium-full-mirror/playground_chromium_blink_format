@@ -98,7 +98,7 @@ class Window : public JSGlobalObject {
    * was called from.
    */
   static Window* retrieveActive(ExecState*);
-  virtual void mark();
+  virtual void markChildren(MarkStack&);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,

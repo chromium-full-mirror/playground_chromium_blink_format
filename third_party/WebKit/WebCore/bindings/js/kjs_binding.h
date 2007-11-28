@@ -88,7 +88,7 @@ class ScriptInterpreter : public Interpreter {
   static void updateDOMNodeDocument(WebCore::Node*,
                                     WebCore::Document* oldDoc,
                                     WebCore::Document* newDoc);
-  static void markDOMNodesForDocument(WebCore::Document*);
+  static void markDOMNodesForDocument(MarkStack&, WebCore::Document*);
 
   WebCore::Frame* frame() const { return m_frame; }
 

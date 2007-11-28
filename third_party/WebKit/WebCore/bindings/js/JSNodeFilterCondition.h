@@ -32,7 +32,7 @@ class JSNodeFilterCondition : public NodeFilterCondition {
  public:
   JSNodeFilterCondition(KJS::JSObject* filter);
   virtual short acceptNode(Node*) const;
-  virtual void mark();
+  virtual void markChildren(KJS::MarkStack&);
 
  protected:
   KJS::JSObject* m_filter;

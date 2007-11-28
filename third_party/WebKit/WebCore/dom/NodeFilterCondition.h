@@ -29,6 +29,10 @@
 
 #include <wtf/RefCounted.h>
 
+namespace KJS {
+class MarkStack;
+}
+
 namespace WebCore {
 
 class Node;
@@ -37,7 +41,7 @@ class NodeFilterCondition : public RefCounted<NodeFilterCondition> {
  public:
   virtual ~NodeFilterCondition() {}
   virtual short acceptNode(Node*) const;
-  virtual void mark() {}
+  virtual void markChildren(KJS::MarkStack&) {}
 };
 
 }  // namespace WebCore

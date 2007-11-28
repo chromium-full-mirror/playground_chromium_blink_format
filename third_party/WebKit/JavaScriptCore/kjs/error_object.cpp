@@ -169,9 +169,3 @@ JSValue* NativeErrorImp::callAsFunction(ExecState* exec,
                                         const List& args) {
   return construct(exec, args);
 }
-
-void NativeErrorImp::mark() {
-  JSObject::mark();
-  if (proto && !proto->marked())
-    proto->mark();
-}

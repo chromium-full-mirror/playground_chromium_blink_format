@@ -94,7 +94,7 @@ class ScopeChain {
   void push(const ScopeChain&);
   void pop();
 
-  void mark();
+  void markChildren(MarkStack&);
 
 #ifndef NDEBUG
   void print();

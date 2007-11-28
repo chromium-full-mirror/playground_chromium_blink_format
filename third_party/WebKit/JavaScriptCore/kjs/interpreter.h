@@ -305,7 +305,7 @@ class Interpreter : public RefCounted<Interpreter> {
    * Called during the mark phase of the garbage collector. Subclasses
    * implementing custom mark methods must make sure to chain to this one.
    */
-  virtual void mark();
+  virtual void markRoots(MarkStack&);
 
   static bool shouldPrintExceptions();
   static void setShouldPrintExceptions(bool);

@@ -146,6 +146,11 @@ void StringInstance::getPropertyNames(ExecState* exec,
   return JSObject::getPropertyNames(exec, propertyNames);
 }
 
+void StringInstance::markChildren(MarkStack& stack) {
+  JSObject::markChildren(stack);
+  stack.pushAtom(internalValue());
+}
+
 // ------------------------------ StringPrototype ---------------------------
 const ClassInfo StringPrototype::info = {"String", &StringInstance::info,
                                          &stringTable};
