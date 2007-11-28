@@ -251,7 +251,7 @@ HRESULT STDMETHODCALLTYPE WebDatabaseManager::detailsForDatabaseWithOrigin(
     /* [in] */ BSTR databaseName,
     /* [in] */ IWebSecurityOrigin* origin,
     /* [retval][out] */ IPropertyBag** result) {
-  if (!databaseName || !origin || !result)
+  if (!origin || !result)
     return E_POINTER;
 
   *result = 0;
@@ -304,8 +304,11 @@ HRESULT STDMETHODCALLTYPE WebDatabaseManager::deleteDatabasesWithOrigin(
 HRESULT STDMETHODCALLTYPE WebDatabaseManager::deleteDatabaseWithOrigin(
     /* [in] */ BSTR databaseName,
     /* [in] */ IWebSecurityOrigin* origin) {
-  if (!databaseName || !origin)
+  if (!origin)
     return E_POINTER;
+
+  if (!databaseName)
+    return E_INVALIDARG;
 
   if (this != s_sharedWebDatabaseManager)
     return E_FAIL;
