@@ -437,29 +437,27 @@ Arguments:
 Returns:       pointer to the first significant opcode
 */
 
-static const uschar* first_significant_code(const uschar* code,
-                                            bool skipassert) {
-  for (;;) {
+static const uschar* firstSignificantOpCode(const uschar* code) {
+  while (*code == OP_BRANUMBER)
+    code += OP_lengths[*code];
+  return code;
+}
+
+static const uschar* firstSignificantOpCodeSkippingAssertions(
+    const uschar* code) {
+  while (true) {
     switch (*code) {
       case OP_ASSERT_NOT:
-        if (!skipassert)
-          return code;
-        do
+        do {
           code += GET(code, 1);
-        while (*code == OP_ALT);
+        } while (*code == OP_ALT);
         code += OP_lengths[*code];
         break;
-
       case OP_WORD_BOUNDARY:
       case OP_NOT_WORD_BOUNDARY:
-        if (!skipassert)
-          return code;
-      /* Fall through */
-
       case OP_BRANUMBER:
         code += OP_lengths[*code];
         break;
-
       default:
         return code;
     }
@@ -2178,7 +2176,7 @@ static bool is_anchored(const uschar* code,
                         unsigned int bracket_map,
                         unsigned int backref_map) {
   do {
-    const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, false);
+    const uschar* scode = firstSignificantOpCode(code + 1 + LINK_SIZE);
     int op = *scode;
 
     /* Capturing brackets */
@@ -2228,7 +2226,7 @@ static bool canApplyFirstCharOptimization(const uschar* code,
                                           unsigned int bracket_map,
                                           unsigned int backref_map) {
   do {
-    const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, false);
+    const uschar* scode = firstSignificantOpCode(code + 1 + LINK_SIZE);
     int op = *scode;
 
     /* Capturing brackets */
@@ -2287,7 +2285,8 @@ static int find_firstassertedchar(const uschar* code,
                                   bool inassert) {
   int c = -1;
   do {
-    const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, true);
+    const uschar* scode =
+        firstSignificantOpCodeSkippingAssertions(code + 1 + LINK_SIZE);
     int op = *scode;
 
     if (op >= OP_BRA)
