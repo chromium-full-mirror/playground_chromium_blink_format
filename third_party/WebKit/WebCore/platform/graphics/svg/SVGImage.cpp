@@ -43,6 +43,7 @@
 #include "SVGLength.h"
 #include "SVGRenderSupport.h"
 #include "SVGSVGElement.h"
+#include "Settings.h"
 
 #include "SVGImageEmptyClients.h"
 
@@ -154,6 +155,8 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     m_page.set(new Page(dummyChromeClient, dummyContextMenuClient,
                         dummyEditorClient, dummyDragClient,
                         dummyInspectorClient));
+    m_page->settings()->setJavaScriptEnabled(false);
+
     m_frame = new Frame(m_page.get(), 0, dummyFrameLoaderClient);
     m_frame->init();
     m_frameView = new FrameView(m_frame.get());
