@@ -1039,7 +1039,7 @@ RECURSE:
         }
         RRETURN_NO_MATCH;
       }
-      ASSERT_NOT_REACHED();
+      /* Control never reaches here */
 
       /* Match a bit-mapped character class, possibly repeatedly. This op code
        is

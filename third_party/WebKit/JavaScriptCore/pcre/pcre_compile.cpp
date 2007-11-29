@@ -1971,11 +1971,9 @@ static bool compile_branch(int options,
     }
   } /* end of big loop */
 
-  /* Control never reaches here by falling through, only by a goto for all the
-   error states. Pass back the position in the pattern so that it can be
-   displayed
-   to the user for diagnosing the error. */
-  ASSERT_NOT_REACHED();
+/* Control never reaches here by falling through, only by a goto for all the
+ error states. Pass back the position in the pattern so that it can be displayed
+ to the user for diagnosing the error. */
 
 FAILED:
   *ptrptr = ptr;
