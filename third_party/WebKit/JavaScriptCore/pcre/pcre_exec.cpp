@@ -125,8 +125,6 @@ struct MatchData {
   int* offset_vector;                 /* Offset vector */
   int offset_end;                     /* One past the end */
   int offset_max;                     /* The maximum usable for return data */
-  const uschar* lowerCaseChars;       /* Points to lower casing table */
-  const uschar* ctypes;               /* Points to table of type maps */
   bool offset_overflow;               /* Set if too many extractions */
   UChar* start_subject;               /* Start of the subject string */
   UChar* end_subject;                 /* End of the subject string */
@@ -849,13 +847,13 @@ RECURSE:
         while (isTrailingSurrogate(*lastptr))
           lastptr--;
         getChar(c, lastptr);
-        prev_is_word = c < 128 && (md.ctypes[c] & ctype_word) != 0;
+        prev_is_word = isWordChar(c);
       }
       if (stack.currentFrame->args.eptr >= md.end_subject)
         cur_is_word = false;
       else {
         getChar(c, stack.currentFrame->args.eptr);
-        cur_is_word = c < 128 && (md.ctypes[c] & ctype_word) != 0;
+        cur_is_word = isWordChar(c);
       }
 
       /* Now see if the situation is what we want */
@@ -901,7 +899,7 @@ RECURSE:
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
       GETCHARINCTEST(c, stack.currentFrame->args.eptr);
-      if (c < 128 && (md.ctypes[c] & ctype_space))
+      if (isSpaceChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
       NEXT_OPCODE;
@@ -910,7 +908,7 @@ RECURSE:
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
       GETCHARINCTEST(c, stack.currentFrame->args.eptr);
-      if (c >= 128 || !(md.ctypes[c] & ctype_space))
+      if (!isSpaceChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
       NEXT_OPCODE;
@@ -919,7 +917,7 @@ RECURSE:
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
       GETCHARINCTEST(c, stack.currentFrame->args.eptr);
-      if (c < 128 && (md.ctypes[c] & ctype_word))
+      if (isWordChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
       NEXT_OPCODE;
@@ -928,7 +926,7 @@ RECURSE:
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
       GETCHARINCTEST(c, stack.currentFrame->args.eptr);
-      if (c >= 128 || !(md.ctypes[c] & ctype_word))
+      if (!isWordChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
       NEXT_OPCODE;
@@ -970,7 +968,7 @@ RECURSE:
         case OP_CRQUERY:
         case OP_CRMINQUERY:
           c = *stack.currentFrame->args.ecode++ - OP_CRSTAR;
-          minimize = (c & 1) != 0;
+          minimize = (c & 1);
           min = rep_min[c]; /* Pick up values from tables; */
           stack.currentFrame->locals.max =
               rep_max[c]; /* zero for max => infinity */
@@ -1088,7 +1086,7 @@ RECURSE:
         case OP_CRQUERY:
         case OP_CRMINQUERY:
           c = *stack.currentFrame->args.ecode++ - OP_CRSTAR;
-          minimize = (c & 1) != 0;
+          minimize = (c & 1);
           min = rep_min[c]; /* Pick up values from tables; */
           stack.currentFrame->locals.max =
               rep_max[c]; /* zero for max => infinity */
@@ -1206,7 +1204,7 @@ RECURSE:
         case OP_CRQUERY:
         case OP_CRMINQUERY:
           c = *stack.currentFrame->args.ecode++ - OP_CRSTAR;
-          minimize = (c & 1) != 0;
+          minimize = (c & 1);
           min = rep_min[c]; /* Pick up values from tables; */
           stack.currentFrame->locals.max =
               rep_max[c]; /* zero for max => infinity */
@@ -1394,7 +1392,7 @@ RECURSE:
           : BEGIN_OPCODE(QUERY)
           : BEGIN_OPCODE(MINQUERY)
           : c = *stack.currentFrame->args.ecode++ - OP_STAR;
-      minimize = (c & 1) != 0;
+      minimize = (c & 1);
       min = rep_min[c]; /* Pick up values from tables; */
       stack.currentFrame->locals.max =
           rep_max[c]; /* zero for max => infinity */
@@ -1540,8 +1538,8 @@ RECURSE:
       GETCHARINCTEST(c, stack.currentFrame->args.eptr);
       if (md.ignoreCase) {
         if (c < 128)
-          c = md.lowerCaseChars[c];
-        if (md.lowerCaseChars[*stack.currentFrame->args.ecode++] == c)
+          c = toLowerCase(c);
+        if (toLowerCase(*stack.currentFrame->args.ecode++) == c)
           RRETURN_NO_MATCH;
       } else {
         if (*stack.currentFrame->args.ecode++ == c)
@@ -1577,7 +1575,7 @@ RECURSE:
           : BEGIN_OPCODE(NOTQUERY)
           : BEGIN_OPCODE(NOTMINQUERY)
           : c = *stack.currentFrame->args.ecode++ - OP_NOTSTAR;
-      minimize = (c & 1) != 0;
+      minimize = (c & 1);
       min = rep_min[c]; /* Pick up values from tables; */
       stack.currentFrame->locals.max =
           rep_max[c]; /* zero for max => infinity */
@@ -1608,14 +1606,14 @@ RECURSE:
       if (md.ignoreCase) {
         if (stack.currentFrame->locals.fc < 128)
           stack.currentFrame->locals.fc =
-              md.lowerCaseChars[stack.currentFrame->locals.fc];
+              toLowerCase(stack.currentFrame->locals.fc);
 
         {
           int d;
           for (i = 1; i <= min; i++) {
             GETCHARINC(d, stack.currentFrame->args.eptr);
             if (d < 128)
-              d = md.lowerCaseChars[d];
+              d = toLowerCase(d);
             if (stack.currentFrame->locals.fc == d)
               RRETURN_NO_MATCH;
           }
@@ -1634,7 +1632,7 @@ RECURSE:
               RRETURN;
             GETCHARINC(d, stack.currentFrame->args.eptr);
             if (d < 128)
-              d = md.lowerCaseChars[d];
+              d = toLowerCase(d);
             if (stack.currentFrame->locals.fi >=
                     stack.currentFrame->locals.max ||
                 stack.currentFrame->args.eptr >= md.end_subject ||
@@ -1657,7 +1655,7 @@ RECURSE:
                 break;
               GETCHARLEN(d, stack.currentFrame->args.eptr, len);
               if (d < 128)
-                d = md.lowerCaseChars[d];
+                d = toLowerCase(d);
               if (stack.currentFrame->locals.fc == d)
                 break;
               stack.currentFrame->args.eptr += len;
@@ -1770,7 +1768,7 @@ RECURSE:
           : BEGIN_OPCODE(TYPEQUERY)
           : BEGIN_OPCODE(TYPEMINQUERY)
           : c = *stack.currentFrame->args.ecode++ - OP_TYPESTAR;
-      minimize = (c & 1) != 0;
+      minimize = (c & 1);
       min = rep_min[c]; /* Pick up values from tables; */
       stack.currentFrame->locals.max =
           rep_max[c]; /* zero for max => infinity */
@@ -1833,9 +1831,7 @@ RECURSE:
           case OP_NOT_WHITESPACE:
             for (i = 1; i <= min; i++) {
               if (stack.currentFrame->args.eptr >= md.end_subject ||
-                  (*stack.currentFrame->args.eptr < 128 &&
-                   (md.ctypes[*stack.currentFrame->args.eptr] & ctype_space) !=
-                       0))
+                  isSpaceChar(*stack.currentFrame->args.eptr))
                 RRETURN_NO_MATCH;
               while (++stack.currentFrame->args.eptr < md.end_subject &&
                      isTrailingSurrogate(*stack.currentFrame->args.eptr)) {
@@ -1846,9 +1842,7 @@ RECURSE:
           case OP_WHITESPACE:
             for (i = 1; i <= min; i++) {
               if (stack.currentFrame->args.eptr >= md.end_subject ||
-                  *stack.currentFrame->args.eptr >= 128 ||
-                  (md.ctypes[*stack.currentFrame->args.eptr++] & ctype_space) ==
-                      0)
+                  !isSpaceChar(*stack.currentFrame->args.eptr++))
                 RRETURN_NO_MATCH;
               /* No need to skip more bytes - we know it's a 1-byte character */
             }
@@ -1857,9 +1851,7 @@ RECURSE:
           case OP_NOT_WORDCHAR:
             for (i = 1; i <= min; i++) {
               if (stack.currentFrame->args.eptr >= md.end_subject ||
-                  (*stack.currentFrame->args.eptr < 128 &&
-                   (md.ctypes[*stack.currentFrame->args.eptr] & ctype_word) !=
-                       0))
+                  isWordChar(*stack.currentFrame->args.eptr))
                 RRETURN_NO_MATCH;
               while (++stack.currentFrame->args.eptr < md.end_subject &&
                      isTrailingSurrogate(*stack.currentFrame->args.eptr)) {
@@ -1870,9 +1862,7 @@ RECURSE:
           case OP_WORDCHAR:
             for (i = 1; i <= min; i++) {
               if (stack.currentFrame->args.eptr >= md.end_subject ||
-                  *stack.currentFrame->args.eptr >= 128 ||
-                  (md.ctypes[*stack.currentFrame->args.eptr++] & ctype_word) ==
-                      0)
+                  !isWordChar(*stack.currentFrame->args.eptr++))
                 RRETURN_NO_MATCH;
               /* No need to skip more bytes - we know it's a 1-byte character */
             }
@@ -1921,22 +1911,22 @@ RECURSE:
               break;
 
             case OP_NOT_WHITESPACE:
-              if (c < 128 && (md.ctypes[c] & ctype_space))
+              if (isSpaceChar(c))
                 RRETURN;
               break;
 
             case OP_WHITESPACE:
-              if (c >= 128 || !(md.ctypes[c] & ctype_space))
+              if (!isSpaceChar(c))
                 RRETURN;
               break;
 
             case OP_NOT_WORDCHAR:
-              if (c < 128 && (md.ctypes[c] & ctype_word))
+              if (isWordChar(c))
                 RRETURN;
               break;
 
             case OP_WORDCHAR:
-              if (c >= 128 || !(md.ctypes[c] & ctype_word))
+              if (!isWordChar(c))
                 RRETURN;
               break;
 
@@ -2018,7 +2008,7 @@ RECURSE:
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
               GETCHARLEN(c, stack.currentFrame->args.eptr, len);
-              if (c < 128 && (md.ctypes[c] & ctype_space))
+              if (isSpaceChar(c))
                 break;
               stack.currentFrame->args.eptr += len;
             }
@@ -2030,7 +2020,7 @@ RECURSE:
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
               GETCHARLEN(c, stack.currentFrame->args.eptr, len);
-              if (c >= 128 || !(md.ctypes[c] & ctype_space))
+              if (!isSpaceChar(c))
                 break;
               stack.currentFrame->args.eptr += len;
             }
@@ -2042,7 +2032,7 @@ RECURSE:
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
               GETCHARLEN(c, stack.currentFrame->args.eptr, len);
-              if (c < 128 && (md.ctypes[c] & ctype_word))
+              if (isWordChar(c))
                 break;
               stack.currentFrame->args.eptr += len;
             }
@@ -2054,7 +2044,7 @@ RECURSE:
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
               GETCHARLEN(c, stack.currentFrame->args.eptr, len);
-              if (c >= 128 || !(md.ctypes[c] & ctype_word))
+              if (!isWordChar(c))
                 break;
               stack.currentFrame->args.eptr += len;
             }
@@ -2306,9 +2296,6 @@ int jsRegExpExecute(const JSRegExp* re,
   match_block.end_subject = match_block.start_subject + length;
   UChar* end_subject = match_block.end_subject;
 
-  match_block.lowerCaseChars = _pcre_default_tables + lcc_offset;
-  match_block.ctypes = _pcre_default_tables + ctypes_offset;
-
   match_block.multiline = (re->options & PCRE_MULTILINE);
   match_block.ignoreCase = (re->options & OptionIgnoreCase);
 
@@ -2370,7 +2357,7 @@ int jsRegExpExecute(const JSRegExp* re,
   if (re->options & PCRE_FIRSTSET) {
     first_byte = re->first_byte & 255;
     if ((first_byte_caseless = (re->first_byte & REQ_IGNORE_CASE)))
-      first_byte = match_block.lowerCaseChars[first_byte];
+      first_byte = toLowerCase(first_byte);
   }
 
   /* For anchored or unanchored matches, there may be a "last known required
@@ -2382,8 +2369,7 @@ int jsRegExpExecute(const JSRegExp* re,
   if (re->options & PCRE_REQCHSET) {
     req_byte = re->req_byte & 255;
     req_byte_caseless = (re->req_byte & REQ_IGNORE_CASE);
-    req_byte2 =
-        (_pcre_default_tables + fcc_offset)[req_byte]; /* case flipped */
+    req_byte2 = flipCase(req_byte);
   }
 
   /* Loop for handling unanchored repeated matching attempts; for anchored
@@ -2424,7 +2410,7 @@ int jsRegExpExecute(const JSRegExp* re,
           int sm = *start_match;
           if (sm > 127)
             break;
-          if (match_block.lowerCaseChars[sm] == first_char)
+          if (toLowerCase(sm) == first_char)
             break;
           start_match++;
         }
