@@ -153,7 +153,7 @@ static bool compile_regex(int,
                           int,
                           int*,
                           int*,
-                          CompileData*);
+                          CompileData&);
 
 /*************************************************
 *            Handle escapes                      *
@@ -782,8 +782,8 @@ Returns:             nothing
 
 static void complete_callout(uschar* previous_callout,
                              const UChar* ptr,
-                             CompileData* cd) {
-  int length = ptr - cd->start_pattern - GET(previous_callout, 2);
+                             const CompileData& cd) {
+  int length = ptr - cd.start_pattern - GET(previous_callout, 2);
   PUT(previous_callout, 2 + LINK_SIZE, length);
 }
 
@@ -890,7 +890,7 @@ static bool compile_branch(int options,
                            ErrorCode* errorcodeptr,
                            int* firstbyteptr,
                            int* reqbyteptr,
-                           CompileData* cd) {
+                           CompileData& cd) {
   int repeat_type, op_type;
   int repeat_min = 0, repeat_max = 0; /* To please picky compilers */
   int bravalue = 0;
@@ -1089,7 +1089,7 @@ static bool compile_branch(int options,
               c = '\b'; /* \b is backslash in a class */
 
             if (c < 0) {
-              const uschar* cbits = cd->cbits;
+              const uschar* cbits = cd.cbits;
               class_charcount += 2; /* Greater than 1 is what matters */
               switch (-c) {
                 case ESC_d:
@@ -1244,7 +1244,7 @@ static bool compile_branch(int options,
             for (; c <= d; c++) {
               classbits[c / 8] |= (1 << (c & 7));
               if (options & PCRE_CASELESS) {
-                int uc = cd->fcc[c]; /* flip case */
+                int uc = cd.fcc[c]; /* flip case */
                 classbits[uc / 8] |= (1 << (uc & 7));
               }
               class_charcount++; /* in case a one-char range */
@@ -1281,7 +1281,7 @@ static bool compile_branch(int options,
           {
             classbits[c / 8] |= (1 << (c & 7));
             if (options & PCRE_CASELESS) {
-              c = cd->fcc[c]; /* flip case */
+              c = cd.fcc[c]; /* flip case */
               classbits[c / 8] |= (1 << (c & 7));
             }
             class_charcount++;
@@ -1383,12 +1383,11 @@ static bool compile_branch(int options,
          setting must remain unchanged after any kind of repeat. */
 
         *code++ = (negate_class == should_flip_negation) ? OP_CLASS : OP_NCLASS;
-        if (negate_class) {
+        if (negate_class)
           for (c = 0; c < 32; c++)
             code[c] = ~classbits[c];
-        } else {
+        else
           memcpy(code, classbits, 32);
-        }
         code += 32;
         break;
 
@@ -1400,7 +1399,7 @@ static bool compile_branch(int options,
           goto NORMAL_CHAR;
         ptr =
             read_repeat_counts(ptr + 1, &repeat_min, &repeat_max, errorcodeptr);
-        if (*errorcodeptr != 0)
+        if (*errorcodeptr)
           goto FAILED;
         goto REPEAT;
 
@@ -1479,7 +1478,7 @@ static bool compile_branch(int options,
           } else {
             c = code[-1];
             if (repeat_min > 1)
-              reqbyte = c | req_caseopt | cd->req_varyopt;
+              reqbyte = c | req_caseopt | cd.req_varyopt;
           }
 
           goto OUTPUT_SINGLE_REPEAT; /* Code shared with single character types
@@ -1490,7 +1489,7 @@ static bool compile_branch(int options,
                  *previous == OP_ASCII_LETTER_NC) {
           c = previous[1];
           if (repeat_min > 1)
-            reqbyte = c | req_caseopt | cd->req_varyopt;
+            reqbyte = c | req_caseopt | cd.req_varyopt;
           goto OUTPUT_SINGLE_REPEAT;
         }
 
@@ -1835,7 +1834,7 @@ static bool compile_branch(int options,
 
       END_REPEAT:
         previous = NULL;
-        cd->req_varyopt |= reqvary;
+        cd.req_varyopt |= reqvary;
         break;
 
       /* Start of nested bracket sub-expression, or comment or lookahead or
@@ -1901,7 +1900,7 @@ static bool compile_branch(int options,
         previous = (bravalue >= OP_ONCE) ? code : NULL;
         *code = bravalue;
         tempcode = code;
-        tempreqvary = cd->req_varyopt; /* Save value before bracket */
+        tempreqvary = cd.req_varyopt; /* Save value before bracket */
 
         if (!compile_regex(options, brackets, /* Extracting bracket count */
                            &tempcode,         /* Where to put code (updated) */
@@ -2087,7 +2086,7 @@ static bool compile_branch(int options,
           if (mclength == 1 || req_caseopt == 0) {
             firstbyte = mcbuffer[0] | req_caseopt;
             if (mclength != 1)
-              reqbyte = code[-1] | cd->req_varyopt;
+              reqbyte = code[-1] | cd.req_varyopt;
           } else
             firstbyte = reqbyte = REQ_NONE;
         }
@@ -2099,7 +2098,7 @@ static bool compile_branch(int options,
           zerofirstbyte = firstbyte;
           zeroreqbyte = reqbyte;
           if (mclength == 1 || req_caseopt == 0)
-            reqbyte = code[-1] | req_caseopt | cd->req_varyopt;
+            reqbyte = code[-1] | req_caseopt | cd.req_varyopt;
         }
 
         break; /* End of literal character handling */
@@ -2150,7 +2149,7 @@ static bool compile_regex(int options,
                           int skipbytes,
                           int* firstbyteptr,
                           int* reqbyteptr,
-                          CompileData* cd) {
+                          CompileData& cd) {
   const UChar* ptr = *ptrptr;
   uschar* code = *codeptr;
   uschar* last_branch = code;
@@ -3161,7 +3160,7 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
   int firstbyte, reqbyte;
   int bracketCount = 0;
   (void)compile_regex(re->options, &bracketCount, &code, &ptr, patternEnd,
-                      &errorcode, 0, &firstbyte, &reqbyte, &compile_block);
+                      &errorcode, 0, &firstbyte, &reqbyte, compile_block);
   re->top_bracket = bracketCount;
   re->top_backref = compile_block.top_backref;
 
