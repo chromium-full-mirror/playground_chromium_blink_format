@@ -379,7 +379,7 @@ static const UChar* read_repeat_counts(const UChar* p,
   int max = -1;
 
   /* Read the minimum value and do a paranoid check: a negative value indicates
-  an integer overflow. */
+   an integer overflow. */
 
   while (isASCIIDigit(*p))
     min = min * 10 + *p++ - '0';
@@ -389,8 +389,8 @@ static const UChar* read_repeat_counts(const UChar* p,
   }
 
   /* Read the maximum value if there is one, and again do a paranoid on its
-  size.
-  Also, max must not be less than min. */
+   size.
+   Also, max must not be less than min. */
 
   if (*p == '}')
     max = min;
@@ -411,8 +411,8 @@ static const UChar* read_repeat_counts(const UChar* p,
   }
 
   /* Fill in the required variables, and pass back the pointer to the
-  terminating
-  '}'. */
+   terminating
+   '}'. */
 
   *minp = min;
   *maxp = max;
