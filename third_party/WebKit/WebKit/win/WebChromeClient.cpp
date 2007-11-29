@@ -451,7 +451,7 @@ void WebChromeClient::print(Frame* frame) {
       uiDelegate2->printFrame(m_webView, kit(frame));
 }
 
-unsigned long long ChromeClient::requestQuotaIncreaseForNewDatabase(
+unsigned long long WebChromeClient::requestQuotaIncreaseForNewDatabase(
     Frame*,
     const SecurityOriginData&,
     const String&,
@@ -459,7 +459,7 @@ unsigned long long ChromeClient::requestQuotaIncreaseForNewDatabase(
   return 0;
 }
 
-unsigned long long ChromeClient::requestQuotaIncreaseForDatabaseOperation(
+unsigned long long WebChromeClient::requestQuotaIncreaseForDatabaseOperation(
     Frame*,
     const SecurityOriginData&,
     const String&,
