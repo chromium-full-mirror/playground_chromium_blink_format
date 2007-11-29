@@ -806,7 +806,7 @@ Yield:        true when range returned; false when no more
 */
 
 static bool get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
-  int c, othercase = 0, next;
+  int c, othercase = 0;
 
   for (c = *cptr; c <= d; c++) {
     if ((othercase = _pcre_ucp_othercase(c)) >= 0)
@@ -817,7 +817,7 @@ static bool get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
     return false;
 
   *ocptr = othercase;
-  next = othercase + 1;
+  int next = othercase + 1;
 
   for (++c; c <= d; c++) {
     if (_pcre_ucp_othercase(c) != next)
@@ -2430,7 +2430,6 @@ static int find_firstassertedchar(const uschar* code,
                                   bool inassert) {
   int c = -1;
   do {
-    int d;
     const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, true);
     int op = *scode;
 
@@ -2443,7 +2442,8 @@ static int find_firstassertedchar(const uschar* code,
 
       case OP_BRA:
       case OP_ASSERT:
-      case OP_ONCE:
+      case OP_ONCE: {
+        int d;
         if ((d = find_firstassertedchar(scode, options, op == OP_ASSERT)) < 0)
           return -1;
         if (c < 0)
@@ -2451,7 +2451,7 @@ static int find_firstassertedchar(const uschar* code,
         else if (c != d)
           return -1;
         break;
-
+      }
       case OP_EXACT: /* Fall through */
         scode += 2;
 
@@ -2465,7 +2465,7 @@ static int find_firstassertedchar(const uschar* code,
           return -1;
         if (c < 0) {
           c = scode[1];
-          if ((options & PCRE_CASELESS) != 0)
+          if (options & PCRE_CASELESS)
             c |= REQ_CASELESS;
         } else if (c != scode[1])
           return -1;
@@ -2746,7 +2746,7 @@ static int calculateCompiledPatternLengthAndFlags(
                  We
                  have to mimic the range optimization here, because extending
                  the
-                 range upwards might push d over a boundary that makes is use
+                 range upwards might push d over a boundary that makes it use
                  another byte in the UTF-8 representation. */
 
                 if (ignoreCase) {
