@@ -82,7 +82,7 @@ static const short escapes[] = {
 /* Error code numbers. They are given names so that they can more easily be
 tracked. */
 
-typedef enum {
+enum ErrorCode {
   ERR0,
   ERR1,
   ERR2,
@@ -101,7 +101,7 @@ typedef enum {
   ERR15,
   ERR16,
   ERR17
-} ErrorCode;
+};
 
 /* Table of sizes for the fixed-length opcodes. It's defined in a macro so that
 the definition is next to the definition of the opcodes in pcre_internal.h. */
