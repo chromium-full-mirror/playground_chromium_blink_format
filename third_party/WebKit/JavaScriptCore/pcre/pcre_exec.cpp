@@ -415,8 +415,6 @@ static int match(UChar* subjectPtr,
                  int offset_top,
                  MatchData& md) {
   int is_match = false;
-  bool cur_is_word;
-  bool prev_is_word;
   int min;
   bool minimize =
       false; /* Initialization not really needed, but some compilers think so.
@@ -816,41 +814,43 @@ RECURSE:
 
       /* Word boundary assertions */
 
-      BEGIN_OPCODE(NOT_WORD_BOUNDARY)
-          : BEGIN_OPCODE(WORD_BOUNDARY)
-          : /* Find out if the previous and current characters are "word"
-             characters.
-             It takes a bit more work in UTF-8 mode. Characters > 128 are
-             assumed to
-             be "non-word" characters. */
+      BEGIN_OPCODE(NOT_WORD_BOUNDARY) : BEGIN_OPCODE(WORD_BOUNDARY) : {
+        /* Find out if the previous and current characters are "word"
+         characters.
+         It takes a bit more work in UTF-8 mode. Characters > 128 are assumed to
+         be "non-word" characters. */
 
-            if (stack.currentFrame->args.subjectPtr == md.start_subject)
-                prev_is_word = false;
-      else {
-        const UChar* lastptr = stack.currentFrame->args.subjectPtr - 1;
-        while (isTrailingSurrogate(*lastptr))
-          lastptr--;
-        int c = getChar(lastptr);
-        prev_is_word = isWordChar(c);
+        bool cur_is_word;
+        bool prev_is_word;
+
+        if (stack.currentFrame->args.subjectPtr == md.start_subject)
+          prev_is_word = false;
+        else {
+          const UChar* lastptr = stack.currentFrame->args.subjectPtr - 1;
+          while (isTrailingSurrogate(*lastptr))
+            lastptr--;
+          int c = getChar(lastptr);
+          prev_is_word = isWordChar(c);
+        }
+        if (stack.currentFrame->args.subjectPtr >= md.end_subject)
+          cur_is_word = false;
+        else {
+          int c = getChar(stack.currentFrame->args.subjectPtr);
+          cur_is_word = isWordChar(c);
+        }
+
+        /* Now see if the situation is what we want */
+
+        if ((*stack.currentFrame->args.instructionPtr++ == OP_WORD_BOUNDARY)
+                ? cur_is_word == prev_is_word
+                : cur_is_word != prev_is_word)
+          RRETURN_NO_MATCH;
+        NEXT_OPCODE;
       }
-      if (stack.currentFrame->args.subjectPtr >= md.end_subject)
-        cur_is_word = false;
-      else {
-        int c = getChar(stack.currentFrame->args.subjectPtr);
-        cur_is_word = isWordChar(c);
-      }
-
-      /* Now see if the situation is what we want */
-
-      if ((*stack.currentFrame->args.instructionPtr++ == OP_WORD_BOUNDARY)
-              ? cur_is_word == prev_is_word
-              : cur_is_word != prev_is_word)
-        RRETURN_NO_MATCH;
-      NEXT_OPCODE;
 
       /* Match a single character type; inline for speed */
 
-      BEGIN_OPCODE(ANY)
+      BEGIN_OPCODE(ANY_CHAR)
           : if (stack.currentFrame->args.subjectPtr < md.end_subject &&
                 isNewline(*stack.currentFrame->args.subjectPtr))
                 RRETURN_NO_MATCH;
@@ -1787,7 +1787,7 @@ RECURSE:
         RRETURN_NO_MATCH;
       if (min > 0) {
         switch (stack.currentFrame->locals.ctype) {
-          case OP_ANY:
+          case OP_ANY_CHAR:
             for (int i = 1; i <= min; i++) {
               if (stack.currentFrame->args.subjectPtr >= md.end_subject ||
                   isNewline(*stack.currentFrame->args.subjectPtr))
@@ -1887,7 +1887,7 @@ RECURSE:
 
           int c = getCharAndAdvance(stack.currentFrame->args.subjectPtr);
           switch (stack.currentFrame->locals.ctype) {
-            case OP_ANY:
+            case OP_ANY_CHAR:
               if (isNewline(c))
                 RRETURN;
               break;
@@ -1938,7 +1938,7 @@ RECURSE:
             stack.currentFrame->args.subjectPtr; /* Remember where we started */
 
         switch (stack.currentFrame->locals.ctype) {
-          case OP_ANY:
+          case OP_ANY_CHAR:
 
             /* Special code is required for UTF8, but when the maximum is
              unlimited
