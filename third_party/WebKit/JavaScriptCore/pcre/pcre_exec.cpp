@@ -121,15 +121,15 @@ struct MatchFrame {
 doing traditional NFA matching, so that they are thread-safe. */
 
 struct MatchData {
-  unsigned long int match_call_count; /* As it says */
-  int* offset_vector;                 /* Offset vector */
-  int offset_end;                     /* One past the end */
-  int offset_max;                     /* The maximum usable for return data */
-  bool offset_overflow;               /* Set if too many extractions */
-  UChar* start_subject;               /* Start of the subject string */
-  UChar* end_subject;                 /* End of the subject string */
-  UChar* end_match_ptr;               /* Subject position at end match */
-  int end_offset_top;                 /* Highwater mark at end of match */
+  unsigned long int match_call_count;
+  int* offset_vector;   /* Offset vector */
+  int offset_end;       /* One past the end */
+  int offset_max;       /* The maximum usable for return data */
+  bool offset_overflow; /* Set if too many extractions */
+  UChar* start_subject; /* Start of the subject string */
+  UChar* end_subject;   /* End of the subject string */
+  UChar* end_match_ptr; /* Subject position at end match */
+  int end_offset_top;   /* Highwater mark at end of match */
   bool multiline;
   bool ignoreCase;
 };
@@ -513,7 +513,7 @@ RECURSE:
         if (is_match)
           RRETURN;
         stack.currentFrame->args.ecode +=
-            GET(stack.currentFrame->args.ecode, 1);
+            getOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       } while (*stack.currentFrame->args.ecode == OP_ALT);
       DPRINTF(("bracket 0 failed\n"));
       RRETURN;
@@ -547,7 +547,7 @@ RECURSE:
         if (is_match)
           break;
         stack.currentFrame->args.ecode +=
-            GET(stack.currentFrame->args.ecode, 1);
+            getOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       }
       while (*stack.currentFrame->args.ecode == OP_ALT)
         ;
@@ -557,10 +557,7 @@ RECURSE:
       /* Continue from after the assertion, updating the offsets high water
        mark, since extracts may have been taken during the assertion. */
 
-      do
-        stack.currentFrame->args.ecode +=
-            GET(stack.currentFrame->args.ecode, 1);
-      while (*stack.currentFrame->args.ecode == OP_ALT);
+      moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->args.ecode);
       stack.currentFrame->args.ecode += 1 + LINK_SIZE;
       stack.currentFrame->args.offset_top = md.end_offset_top;
       NEXT_OPCODE;
@@ -573,7 +570,7 @@ RECURSE:
         if (is_match)
           RRETURN_NO_MATCH;
         stack.currentFrame->args.ecode +=
-            GET(stack.currentFrame->args.ecode, 1);
+            getOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       }
       while (*stack.currentFrame->args.ecode == OP_ALT)
         ;
@@ -599,7 +596,7 @@ RECURSE:
         if (is_match)
           break;
         stack.currentFrame->args.ecode +=
-            GET(stack.currentFrame->args.ecode, 1);
+            getOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       } while (*stack.currentFrame->args.ecode == OP_ALT);
 
       /* If hit the end of the group (which could be repeated), fail */
@@ -611,10 +608,7 @@ RECURSE:
       /* Continue as from after the assertion, updating the offsets high water
        mark, since extracts may have been taken. */
 
-      do {
-        stack.currentFrame->args.ecode +=
-            GET(stack.currentFrame->args.ecode, 1);
-      } while (*stack.currentFrame->args.ecode == OP_ALT);
+      moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->args.ecode);
 
       stack.currentFrame->args.offset_top = md.end_offset_top;
       stack.currentFrame->args.eptr = md.end_match_ptr;
@@ -663,10 +657,8 @@ RECURSE:
        bracketed group and go to there. */
 
       BEGIN_OPCODE(ALT)
-          : do stack.currentFrame->args.ecode +=
-          GET(stack.currentFrame->args.ecode, 1);
-      while (*stack.currentFrame->args.ecode == OP_ALT)
-        ;
+          : moveOpcodePtrPastAnyAlternateBranches(
+                stack.currentFrame->args.ecode);
       NEXT_OPCODE;
 
       /* BRAZERO and BRAMINZERO occur just before a bracket group, indicating
@@ -681,10 +673,7 @@ RECURSE:
                stack.currentFrame->args.eptrb, match_isgroup);
         if (is_match)
           RRETURN;
-        do {
-          stack.currentFrame->locals.next +=
-              GET(stack.currentFrame->locals.next, 1);
-        } while (*stack.currentFrame->locals.next == OP_ALT);
+        moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->locals.next);
         stack.currentFrame->args.ecode =
             stack.currentFrame->locals.next + 1 + LINK_SIZE;
       }
@@ -692,10 +681,7 @@ RECURSE:
 
       BEGIN_OPCODE(BRAMINZERO) : {
         stack.currentFrame->locals.next = stack.currentFrame->args.ecode + 1;
-        do {
-          stack.currentFrame->locals.next +=
-              GET(stack.currentFrame->locals.next, 1);
-        } while (*stack.currentFrame->locals.next == OP_ALT);
+        moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->locals.next);
         RMATCH(15, stack.currentFrame->locals.next + 1 + LINK_SIZE,
                stack.currentFrame->args.eptrb, match_isgroup);
         if (is_match)
@@ -715,7 +701,7 @@ RECURSE:
           : BEGIN_OPCODE(KETRMAX)
           : stack.currentFrame->locals.prev =
           stack.currentFrame->args.ecode -
-          GET(stack.currentFrame->args.ecode, 1);
+          getOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       stack.currentFrame->locals.saved_eptr =
           stack.currentFrame->args.eptrb->epb_saved_eptr;
 
@@ -743,8 +729,8 @@ RECURSE:
        the number from a dummy opcode at the start. */
 
       if (stack.currentFrame->locals.number > EXTRACT_BASIC_MAX)
-        stack.currentFrame->locals.number =
-            GET2(stack.currentFrame->locals.prev, 2 + LINK_SIZE);
+        stack.currentFrame->locals.number = get2ByteOpcodeValueAtOffset(
+            stack.currentFrame->locals.prev, 2 + LINK_SIZE);
       stack.currentFrame->locals.offset = stack.currentFrame->locals.number
                                           << 1;
 
@@ -941,8 +927,9 @@ RECURSE:
 
       BEGIN_OPCODE(REF)
           : stack.currentFrame->locals.offset =
-          GET2(stack.currentFrame->args.ecode, 1) << 1; /* Doubled ref number */
-      stack.currentFrame->args.ecode += 3;              /* Advance past item */
+          get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1)
+          << 1;                            /* Doubled ref number */
+      stack.currentFrame->args.ecode += 3; /* Advance past item */
 
       /* If the reference is unset, set the length to be longer than the amount
        of subject left; this ensures that every attempt at a match fails. We
@@ -979,9 +966,9 @@ RECURSE:
         case OP_CRRANGE:
         case OP_CRMINRANGE:
           minimize = (*stack.currentFrame->args.ecode == OP_CRMINRANGE);
-          min = GET2(stack.currentFrame->args.ecode, 1);
+          min = get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
           stack.currentFrame->locals.max =
-              GET2(stack.currentFrame->args.ecode, 3);
+              get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 3);
           if (stack.currentFrame->locals.max == 0)
             stack.currentFrame->locals.max = INT_MAX;
           stack.currentFrame->args.ecode += 5;
@@ -1097,9 +1084,9 @@ RECURSE:
         case OP_CRRANGE:
         case OP_CRMINRANGE:
           minimize = (*stack.currentFrame->args.ecode == OP_CRMINRANGE);
-          min = GET2(stack.currentFrame->args.ecode, 1);
+          min = get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
           stack.currentFrame->locals.max =
-              GET2(stack.currentFrame->args.ecode, 3);
+              get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 3);
           if (stack.currentFrame->locals.max == 0)
             stack.currentFrame->locals.max = INT_MAX;
           stack.currentFrame->args.ecode += 5;
@@ -1193,8 +1180,8 @@ RECURSE:
           : stack.currentFrame->locals.data = stack.currentFrame->args.ecode +
                                               1 +
                                               LINK_SIZE; /* Save for matching */
-      stack.currentFrame->args.ecode +=
-          GET(stack.currentFrame->args.ecode, 1); /* Advance past the item */
+      stack.currentFrame->args.ecode += getOpcodeValueAtOffset(
+          stack.currentFrame->args.ecode, 1); /* Advance past the item */
 
       switch (*stack.currentFrame->args.ecode) {
         case OP_CRSTAR:
@@ -1215,9 +1202,9 @@ RECURSE:
         case OP_CRRANGE:
         case OP_CRMINRANGE:
           minimize = (*stack.currentFrame->args.ecode == OP_CRMINRANGE);
-          min = GET2(stack.currentFrame->args.ecode, 1);
+          min = get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
           stack.currentFrame->locals.max =
-              GET2(stack.currentFrame->args.ecode, 3);
+              get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 3);
           if (stack.currentFrame->locals.max == 0)
             stack.currentFrame->locals.max = INT_MAX;
           stack.currentFrame->args.ecode += 5;
@@ -1374,13 +1361,14 @@ RECURSE:
 
       BEGIN_OPCODE(EXACT)
           : min = stack.currentFrame->locals.max =
-                GET2(stack.currentFrame->args.ecode, 1);
+                get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       minimize = false;
       stack.currentFrame->args.ecode += 3;
       goto REPEATCHAR;
 
       BEGIN_OPCODE(UPTO) : BEGIN_OPCODE(MINUPTO) : min = 0;
-      stack.currentFrame->locals.max = GET2(stack.currentFrame->args.ecode, 1);
+      stack.currentFrame->locals.max =
+          get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       minimize = *stack.currentFrame->args.ecode == OP_MINUPTO;
       stack.currentFrame->args.ecode += 3;
       goto REPEATCHAR;
@@ -1557,13 +1545,14 @@ RECURSE:
 
       BEGIN_OPCODE(NOTEXACT)
           : min = stack.currentFrame->locals.max =
-                GET2(stack.currentFrame->args.ecode, 1);
+                get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       minimize = false;
       stack.currentFrame->args.ecode += 3;
       goto REPEATNOTCHAR;
 
       BEGIN_OPCODE(NOTUPTO) : BEGIN_OPCODE(NOTMINUPTO) : min = 0;
-      stack.currentFrame->locals.max = GET2(stack.currentFrame->args.ecode, 1);
+      stack.currentFrame->locals.max =
+          get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       minimize = *stack.currentFrame->args.ecode == OP_NOTMINUPTO;
       stack.currentFrame->args.ecode += 3;
       goto REPEATNOTCHAR;
@@ -1750,13 +1739,14 @@ RECURSE:
 
       BEGIN_OPCODE(TYPEEXACT)
           : min = stack.currentFrame->locals.max =
-                GET2(stack.currentFrame->args.ecode, 1);
+                get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       minimize = true;
       stack.currentFrame->args.ecode += 3;
       goto REPEATTYPE;
 
       BEGIN_OPCODE(TYPEUPTO) : BEGIN_OPCODE(TYPEMINUPTO) : min = 0;
-      stack.currentFrame->locals.max = GET2(stack.currentFrame->args.ecode, 1);
+      stack.currentFrame->locals.max =
+          get2ByteOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
       minimize = *stack.currentFrame->args.ecode == OP_TYPEMINUPTO;
       stack.currentFrame->args.ecode += 3;
       goto REPEATTYPE;
@@ -2118,8 +2108,8 @@ RECURSE:
        number from a dummy opcode at the start. */
 
       if (stack.currentFrame->locals.number > EXTRACT_BASIC_MAX)
-        stack.currentFrame->locals.number =
-            GET2(stack.currentFrame->args.ecode, 2 + LINK_SIZE);
+        stack.currentFrame->locals.number = get2ByteOpcodeValueAtOffset(
+            stack.currentFrame->args.ecode, 2 + LINK_SIZE);
       stack.currentFrame->locals.offset = stack.currentFrame->locals.number
                                           << 1;
 
@@ -2149,7 +2139,7 @@ RECURSE:
           if (is_match)
             RRETURN;
           stack.currentFrame->args.ecode +=
-              GET(stack.currentFrame->args.ecode, 1);
+              getOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
         } while (*stack.currentFrame->args.ecode == OP_ALT);
 
         DPRINTF(("bracket %d failed\n", stack.currentFrame->locals.number));
