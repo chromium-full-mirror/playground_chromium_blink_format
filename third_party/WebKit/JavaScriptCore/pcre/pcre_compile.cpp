@@ -153,7 +153,7 @@ static bool compile_regex(int,
                           int,
                           int*,
                           int*,
-                          compile_data*);
+                          CompileData*);
 
 /*************************************************
 *            Handle escapes                      *
@@ -782,7 +782,7 @@ Returns:             nothing
 
 static void complete_callout(uschar* previous_callout,
                              const UChar* ptr,
-                             compile_data* cd) {
+                             CompileData* cd) {
   int length = ptr - cd->start_pattern - GET(previous_callout, 2);
   PUT(previous_callout, 2 + LINK_SIZE, length);
 }
@@ -832,6 +832,35 @@ static bool get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
 }
 
 /*************************************************
+ *       Convert character value to UTF-8         *
+ *************************************************/
+
+/* This function takes an integer value in the range 0 - 0x7fffffff
+ and encodes it as a UTF-8 character in 0 to 6 bytes.
+
+ Arguments:
+ cvalue     the character value
+ buffer     pointer to buffer for result - at least 6 bytes long
+
+ Returns:     number of characters placed in the buffer
+ */
+
+// FIXME: This should be removed as soon as all UTF8 uses are removed from PCRE
+int _pcre_ord2utf8(int cvalue, uschar* buffer) {
+  int i;
+  for (i = 0; i < _pcre_utf8_table1_size; i++)
+    if (cvalue <= _pcre_utf8_table1[i])
+      break;
+  buffer += i;
+  for (int j = i; j > 0; j--) {
+    *buffer-- = 0x80 | (cvalue & 0x3f);
+    cvalue >>= 6;
+  }
+  *buffer = _pcre_utf8_table2[i] | cvalue;
+  return i + 1;
+}
+
+/*************************************************
 *           Compile one branch                   *
 *************************************************/
 
@@ -861,7 +890,7 @@ static bool compile_branch(int options,
                            ErrorCode* errorcodeptr,
                            int* firstbyteptr,
                            int* reqbyteptr,
-                           compile_data* cd) {
+                           CompileData* cd) {
   int repeat_type, op_type;
   int repeat_min = 0, repeat_max = 0; /* To please picky compilers */
   int bravalue = 0;
@@ -2121,7 +2150,7 @@ static bool compile_regex(int options,
                           int skipbytes,
                           int* firstbyteptr,
                           int* reqbyteptr,
-                          compile_data* cd) {
+                          CompileData* cd) {
   const UChar* ptr = *ptrptr;
   uschar* code = *codeptr;
   uschar* last_branch = code;
@@ -2453,7 +2482,7 @@ static int calculateCompiledPatternLengthAndFlags(
     const UChar* pattern,
     int patternLength,
     JSRegExpIgnoreCaseOption ignoreCase,
-    compile_data& compile_block,
+    CompileData& compile_block,
     ErrorCode& errorcode) {
   /* Make a pass over the pattern to compute the
    amount of store required to hold the compiled code. This does not have to be
@@ -2501,8 +2530,7 @@ static int calculateCompiledPatternLengthAndFlags(
 
         lastitemlength = 1; /* Default length of last item for repeats */
 
-        if (c >= 0) /* Data character */
-        {
+        if (c >= 0) {  /* Data character */
           length += 2; /* For a one-byte character */
 
           if (c > 127) {
@@ -2533,9 +2561,8 @@ static int calculateCompiledPatternLengthAndFlags(
           length += 2; /* For single back reference */
           if (ptr[1] == '{' && is_counted_repeat(ptr + 2, patternEnd)) {
             ptr = read_repeat_counts(ptr + 2, &min, &max, &errorcode);
-            if (errorcode != 0)
+            if (errorcode)
               return -1;
-            ;
             if ((min == 0 && (max == 1 || max == -1)) ||
                 (min == 1 && max == -1))
               length++;
@@ -2647,9 +2674,8 @@ static int calculateCompiledPatternLengthAndFlags(
             /* Escapes that are meta-things. The normal ones just affect the
              bit map, but Unicode properties require an XCLASS extended item. */
 
-            else {
+            else
               class_optcount = 10; /* \d, \s etc; make sure > 1 */
-            }
           }
 
           /* Anything else increments the possible optimization count. We have
@@ -3088,7 +3114,7 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
     return 0;
   *errorptr = NULL;
 
-  compile_data compile_block;
+  CompileData compile_block;
 
   ErrorCode errorcode = ERR0;
   int length = calculateCompiledPatternLengthAndFlags(
