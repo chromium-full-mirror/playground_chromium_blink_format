@@ -3006,7 +3006,7 @@ static int calculateCompiledPatternLengthAndFlags(
 }
 
 #ifdef DEBUG
-static void printCompiledRegExp(real_pcre* re, int length) {
+static void printCompiledRegExp(JSRegExp* re, int length) {
   printf("Length = %d top_bracket = %d top_backref = %d\n", length,
          re->top_bracket, re->top_backref);
 
@@ -3063,17 +3063,17 @@ Returns:        pointer to compiled data block, or NULL on error,
                 with errorptr and erroroffset set
 */
 
-static pcre* returnError(ErrorCode errorcode, const char** errorptr) {
+static JSRegExp* returnError(ErrorCode errorcode, const char** errorptr) {
   *errorptr = error_text(errorcode);
   return 0;
 }
 
-pcre* jsRegExpCompile(const pcre_char* pattern,
-                      int patternLength,
-                      JSRegExpIgnoreCaseOption ignoreCase,
-                      JSRegExpMultilineOption multiline,
-                      unsigned* numSubpatterns,
-                      const char** errorptr) {
+JSRegExp* jsRegExpCompile(const pcre_char* pattern,
+                          int patternLength,
+                          JSRegExpIgnoreCaseOption ignoreCase,
+                          JSRegExpMultilineOption multiline,
+                          unsigned* numSubpatterns,
+                          const char** errorptr) {
   /* We can't pass back an error message if errorptr is NULL; I guess the best
    we
    can do is just return NULL, but we can set a code value if there is a code
@@ -3093,8 +3093,8 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
   if (length > MAX_PATTERN_SIZE)
     return returnError(ERR16, errorptr);
 
-  size_t size = length + sizeof(real_pcre);
-  real_pcre* re = reinterpret_cast<real_pcre*>(new char[size]);
+  size_t size = length + sizeof(JSRegExp);
+  JSRegExp* re = reinterpret_cast<JSRegExp*>(new char[size]);
 
   if (!re)
     return returnError(ERR13, errorptr);
@@ -3225,7 +3225,7 @@ pcre* jsRegExpCompile(const pcre_char* pattern,
 
   if (numSubpatterns)
     *numSubpatterns = re->top_bracket;
-  return (pcre*)re;
+  return static_cast<JSRegExp*>(re);
 }
 
 void jsRegExpFree(JSRegExp* re) {
