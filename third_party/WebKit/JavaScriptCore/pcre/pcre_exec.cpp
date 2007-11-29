@@ -59,19 +59,6 @@ using namespace WTF;
 #undef min
 #undef max
 
-/* Structure for building a chain of data that actually lives on the
-stack, for holding the values of the subject pointer at the start of each
-subpattern, so as to detect when an empty string has been matched by a
-subpattern - to break infinite loops. When NO_RECURSE is set, these blocks
-are on the heap, not on the stack. */
-
-struct eptrblock {
-  struct eptrblock* epb_prev;
-  const UChar* epb_saved_eptr;
-};
-
-/* Structure for remembering the local variables in a private frame */
-
 #ifndef USE_COMPUTED_GOTO_FOR_MATCH_RECURSION
 typedef int ReturnLocation;
 #else
@@ -87,7 +74,7 @@ struct MatchFrame {
     const UChar* eptr;
     const uschar* ecode;
     int offset_top;
-    eptrblock* eptrb;
+    const UChar* subpatternStart;
   } args;
 
   /* PCRE uses "fake" recursion built off of gotos, thus
@@ -113,7 +100,7 @@ struct MatchFrame {
     int save_offset2;
     int save_offset3;
 
-    eptrblock newptrb;
+    const UChar* subpatternStart;
   } locals;
 };
 
@@ -345,7 +332,7 @@ struct MatchStack {
   }
 
   inline void pushNewFrame(const uschar* ecode,
-                           eptrblock* eptrb,
+                           const UChar* subpatternStart,
                            ReturnLocation returnLocation) {
     MatchFrame* newframe = allocateNextFrame();
     newframe->previousFrame = currentFrame;
@@ -353,7 +340,7 @@ struct MatchStack {
     newframe->args.eptr = currentFrame->args.eptr;
     newframe->args.offset_top = currentFrame->args.offset_top;
     newframe->args.ecode = ecode;
-    newframe->args.eptrb = eptrb;
+    newframe->args.subpatternStart = subpatternStart;
     newframe->returnLocation = returnLocation;
     size++;
 
@@ -444,7 +431,7 @@ static int match(UChar* eptr,
   stack.currentFrame->args.eptr = eptr;
   stack.currentFrame->args.ecode = ecode;
   stack.currentFrame->args.offset_top = offset_top;
-  stack.currentFrame->args.eptrb = NULL;
+  stack.currentFrame->args.subpatternStart = 0;
 
 /* This is where control jumps back to to effect "recursion" */
 
@@ -464,13 +451,9 @@ RECURSE:
    to
    this stack. */
 
-  if (is_group_start) {
-    stack.currentFrame->locals.newptrb.epb_prev =
-        stack.currentFrame->args.eptrb;
-    stack.currentFrame->locals.newptrb.epb_saved_eptr =
-        stack.currentFrame->args.eptr;
-    stack.currentFrame->args.eptrb = &stack.currentFrame->locals.newptrb;
-  }
+  if (is_group_start)
+    stack.currentFrame->locals.subpatternStart =
+        stack.currentFrame->args.subpatternStart;
 
 /* Now start processing the operations. */
 
@@ -499,7 +482,7 @@ RECURSE:
           : NON_CAPTURING_BRACKET : DPRINTF(("start bracket 0\n"));
       do {
         RMATCH(2, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           RRETURN;
         stack.currentFrame->args.ecode +=
@@ -582,7 +565,7 @@ RECURSE:
 
       do {
         RMATCH(9, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           break;
         stack.currentFrame->args.ecode +=
@@ -623,20 +606,20 @@ RECURSE:
 
       if (*stack.currentFrame->args.ecode == OP_KETRMIN) {
         RMATCH(10, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.eptrb, 0);
+               stack.currentFrame->args.subpatternStart, 0);
         if (is_match)
           RRETURN;
         RMATCH(11, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           RRETURN;
       } else { /* OP_KETRMAX */
         RMATCH(12, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           RRETURN;
         RMATCH(13, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.eptrb, 0);
+               stack.currentFrame->args.subpatternStart, 0);
         if (is_match)
           RRETURN;
       }
@@ -660,7 +643,7 @@ RECURSE:
       BEGIN_OPCODE(BRAZERO) : {
         stack.currentFrame->locals.next = stack.currentFrame->args.ecode + 1;
         RMATCH(14, stack.currentFrame->locals.next,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           RRETURN;
         moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->locals.next);
@@ -673,7 +656,7 @@ RECURSE:
         stack.currentFrame->locals.next = stack.currentFrame->args.ecode + 1;
         moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->locals.next);
         RMATCH(15, stack.currentFrame->locals.next + 1 + LINK_SIZE,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           RRETURN;
         stack.currentFrame->args.ecode++;
@@ -692,12 +675,10 @@ RECURSE:
           : stack.currentFrame->locals.prev =
           stack.currentFrame->args.ecode -
           getOpcodeValueAtOffset(stack.currentFrame->args.ecode, 1);
-      stack.currentFrame->locals.saved_eptr =
-          stack.currentFrame->args.eptrb->epb_saved_eptr;
-
-      /* Back up the stack of bracket start pointers. */
-
-      stack.currentFrame->args.eptrb = stack.currentFrame->args.eptrb->epb_prev;
+      stack.currentFrame->args.subpatternStart =
+          stack.currentFrame->locals.subpatternStart;
+      stack.currentFrame->locals.subpatternStart =
+          stack.currentFrame->previousFrame->args.subpatternStart;
 
       if (*stack.currentFrame->locals.prev == OP_ASSERT ||
           *stack.currentFrame->locals.prev == OP_ASSERT_NOT ||
@@ -768,20 +749,20 @@ RECURSE:
 
       if (*stack.currentFrame->args.ecode == OP_KETRMIN) {
         RMATCH(16, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.eptrb, 0);
+               stack.currentFrame->args.subpatternStart, 0);
         if (is_match)
           RRETURN;
         RMATCH(17, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           RRETURN;
       } else { /* OP_KETRMAX */
         RMATCH(18, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.eptrb, match_isgroup);
+               stack.currentFrame->args.subpatternStart, match_isgroup);
         if (is_match)
           RRETURN;
         RMATCH(19, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.eptrb, 0);
+               stack.currentFrame->args.subpatternStart, 0);
         if (is_match)
           RRETURN;
       }
@@ -1001,7 +982,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RMATCH(20, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1027,7 +1008,7 @@ RECURSE:
         }
         while (stack.currentFrame->args.eptr >= stack.currentFrame->locals.pp) {
           RMATCH(21, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           stack.currentFrame->args.eptr -= stack.currentFrame->locals.length;
@@ -1114,7 +1095,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RMATCH(22, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1151,7 +1132,7 @@ RECURSE:
         }
         for (;;) {
           RMATCH(24, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->args.eptr-- == stack.currentFrame->locals.pp)
@@ -1227,7 +1208,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RMATCH(26, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1255,7 +1236,7 @@ RECURSE:
         }
         for (;;) {
           RMATCH(27, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->args.eptr-- == stack.currentFrame->locals.pp)
@@ -1412,7 +1393,7 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             RMATCH(28, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.eptrb, 0);
+                   stack.currentFrame->args.subpatternStart, 0);
             if (is_match)
               RRETURN;
             if (stack.currentFrame->locals.fi >=
@@ -1441,7 +1422,7 @@ RECURSE:
           while (stack.currentFrame->args.eptr >=
                  stack.currentFrame->locals.pp) {
             RMATCH(29, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.eptrb, 0);
+                   stack.currentFrame->args.subpatternStart, 0);
             if (is_match)
               RRETURN;
             --stack.currentFrame->args.eptr;
@@ -1468,7 +1449,7 @@ RECURSE:
                stack.currentFrame->locals.fi++) {
             int nc;
             RMATCH(30, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.eptrb, 0);
+                   stack.currentFrame->args.subpatternStart, 0);
             if (is_match)
               RRETURN;
             if (stack.currentFrame->locals.fi >=
@@ -1495,7 +1476,7 @@ RECURSE:
           while (stack.currentFrame->args.eptr >=
                  stack.currentFrame->locals.pp) {
             RMATCH(31, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.eptrb, 0);
+                   stack.currentFrame->args.subpatternStart, 0);
             if (is_match)
               RRETURN;
             stack.currentFrame->args.eptr -= 2;
@@ -1606,7 +1587,7 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             RMATCH(38, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.eptrb, 0);
+                   stack.currentFrame->args.subpatternStart, 0);
             if (is_match)
               RRETURN;
             getCharAndAdvance(d, stack.currentFrame->args.eptr);
@@ -1641,7 +1622,7 @@ RECURSE:
             }
             for (;;) {
               RMATCH(40, stack.currentFrame->args.ecode,
-                     stack.currentFrame->args.eptrb, 0);
+                     stack.currentFrame->args.subpatternStart, 0);
               if (is_match)
                 RRETURN;
               if (stack.currentFrame->args.eptr-- ==
@@ -1676,7 +1657,7 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             RMATCH(42, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.eptrb, 0);
+                   stack.currentFrame->args.subpatternStart, 0);
             if (is_match)
               RRETURN;
             getCharAndAdvance(d, stack.currentFrame->args.eptr);
@@ -1707,7 +1688,7 @@ RECURSE:
             }
             for (;;) {
               RMATCH(44, stack.currentFrame->args.ecode,
-                     stack.currentFrame->args.eptrb, 0);
+                     stack.currentFrame->args.subpatternStart, 0);
               if (is_match)
                 RRETURN;
               if (stack.currentFrame->args.eptr-- ==
@@ -1866,7 +1847,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RMATCH(48, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -2040,7 +2021,7 @@ RECURSE:
 
         for (;;) {
           RMATCH(52, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.eptrb, 0);
+                 stack.currentFrame->args.subpatternStart, 0);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->args.eptr-- == stack.currentFrame->locals.pp)
@@ -2125,7 +2106,7 @@ RECURSE:
 
         do {
           RMATCH(1, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-                 stack.currentFrame->args.eptrb, match_isgroup);
+                 stack.currentFrame->args.subpatternStart, match_isgroup);
           if (is_match)
             RRETURN;
           stack.currentFrame->args.ecode +=
