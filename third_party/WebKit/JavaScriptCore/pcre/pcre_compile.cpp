@@ -929,12 +929,13 @@ static bool compile_branch(int options,
   int zerofirstbyte = REQ_UNSET;
 
   /* The variable req_caseopt contains either the REQ_CASELESS value or zero,
-   according to the current setting of the caseless flag. REQ_CASELESS is a bit
+   according to the current setting of the ignores-case flag. REQ_CASELESS is a
+   bit
    value > 255. It is added into the firstbyte or reqbyte variables to record
    the
    case status of the value. This is used only for ASCII characters. */
 
-  int req_caseopt = ((options & PCRE_CASELESS) != 0) ? REQ_CASELESS : 0;
+  int req_caseopt = (options & PCRE_CASELESS) ? REQ_CASELESS : 0;
 
   /* Switch on next character until the end of the branch */
 
@@ -2054,7 +2055,7 @@ static bool compile_branch(int options,
           mclength = 1;
           mcbuffer[0] = c;
 
-          if (options & PCRE_CASELESS && (c | 0x20) >= 'a' &&
+          if ((options & PCRE_CASELESS) && (c | 0x20) >= 'a' &&
               (c | 0x20) <= 'z') {
             *code++ = OP_ASCII_LETTER_NC;
             *code++ = c | 0x20;
@@ -2359,43 +2360,35 @@ Arguments:
 Returns:         true or false
 */
 
-static bool is_startline(const uschar* code,
-                         unsigned int bracket_map,
-                         unsigned int backref_map) {
+static bool canApplyFirstCharOptimization(const uschar* code,
+                                          unsigned int bracket_map,
+                                          unsigned int backref_map) {
   do {
     const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, false);
     int op = *scode;
 
     /* Capturing brackets */
-
     if (op > OP_BRA) {
-      int new_map;
       op -= OP_BRA;
       if (op > EXTRACT_BASIC_MAX)
         op = GET2(scode, 2 + LINK_SIZE);
-      new_map = bracket_map | ((op < 32) ? (1 << op) : 1);
-      if (!is_startline(scode, new_map, backref_map))
+      int new_map = bracket_map | ((op < 32) ? (1 << op) : 1);
+      if (!canApplyFirstCharOptimization(scode, new_map, backref_map))
         return false;
     }
 
     /* Other brackets */
-
     else if (op == OP_BRA || op == OP_ASSERT || op == OP_ONCE) {
-      if (!is_startline(scode, bracket_map, backref_map))
+      if (!canApplyFirstCharOptimization(scode, bracket_map, backref_map))
         return false;
-    }
 
-    /* .* means "start at start or after \n" if it isn't in brackets that
-    may be referenced. */
+      /* .* means "start at start or after \n" if it isn't in brackets that
+       may be referenced. */
 
-    else if (op == OP_TYPESTAR || op == OP_TYPEMINSTAR) {
-      if (scode[1] != OP_ANY || (bracket_map & backref_map) != 0)
+    } else if (op == OP_TYPESTAR || op == OP_TYPEMINSTAR) {
+      if (scode[1] != OP_ANY || (bracket_map & backref_map))
         return false;
-    }
-
-    /* Check for explicit circumflex */
-
-    else if (op != OP_CIRC)
+    } else if (op != OP_CIRC) /* Check for explicit circumflex */
       return false;
 
     /* Move on to the next alternative */
@@ -3043,14 +3036,14 @@ static void printCompiledRegExp(JSRegExp* re, int length) {
 
   if (re->options) {
     printf("%s%s%s\n", ((re->options & PCRE_ANCHORED) != 0) ? "anchored " : "",
-           ((re->options & PCRE_CASELESS) != 0) ? "caseless " : "",
+           ((re->options & PCRE_CASELESS) != 0) ? "ignores case " : "",
            ((re->options & PCRE_MULTILINE) != 0) ? "multiline " : "");
   }
 
   if (re->options & PCRE_FIRSTSET) {
     char ch = re->first_byte & 255;
     const char* caseless =
-        ((re->first_byte & REQ_CASELESS) == 0) ? "" : " (caseless)";
+        (re->first_byte & REQ_CASELESS) ? " (ignores case)" : "";
     if (isASCIIAlphanumeric(ch))
       printf("First char = %c%s\n", ch, caseless);
     else
@@ -3201,7 +3194,8 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    Otherwise, if we know what the first character has to be, save it, because
    that
    speeds up unanchored matches no end. If not, see if we can set the
-   PCRE_STARTLINE flag. This is helpful for multiline matches when all branches
+   OptionUseMultiLineFirstCharOptimization flag. This is helpful for multiline
+   matches when all branches
    start with ^. and also when all branches start with .* for non-DOTALL
    matches.
    */
@@ -3221,8 +3215,9 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
                 : firstbyte;
         re->options |= PCRE_FIRSTSET;
       }
-    } else if (is_startline(codestart, 0, compile_block.backref_map))
-      re->options |= PCRE_STARTLINE;
+    } else if (canApplyFirstCharOptimization(codestart, 0,
+                                             compile_block.backref_map))
+      re->options |= OptionUseMultiLineFirstCharOptimization;
   }
 
   /* For an anchored pattern, we use the "required byte" only if it follows a

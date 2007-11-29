@@ -115,7 +115,7 @@ struct MatchFrame {
 /* Structure for passing "static" information around between the functions
 doing traditional NFA matching, so that they are thread-safe. */
 
-typedef struct match_data {
+struct MatchData {
   unsigned long int match_call_count; /* As it says */
   int* offset_vector;                 /* Offset vector */
   int offset_end;                     /* One past the end */
@@ -129,7 +129,7 @@ typedef struct match_data {
   int end_offset_top;                 /* Highwater mark at end of match */
   bool multiline;
   bool caseless;
-} match_data;
+};
 
 #define match_isgroup true /* Set if start of bracketed group */
 
@@ -161,20 +161,18 @@ Arguments:
 Returns:     nothing
 */
 
-static void pchars(const UChar* p,
-                   int length,
-                   bool is_subject,
-                   match_data* md) {
-  int c;
+static void pchars(const UChar* p, int length, bool is_subject, MatchData* md) {
   if (is_subject && length > md->end_subject - p)
     length = md->end_subject - p;
-  while (length-- > 0)
+  while (length-- > 0) {
+    int c;
     if (isprint(c = *(p++)))
       printf("%c", c);
     else if (c < 256)
       printf("\\x%02x", c);
     else
       printf("\\x{%x}", c);
+  }
 }
 #endif
 
@@ -194,7 +192,7 @@ Arguments:
 Returns:      true if matched
 */
 
-static bool match_ref(int offset, UChar* eptr, int length, match_data* md) {
+static bool match_ref(int offset, UChar* eptr, int length, MatchData* md) {
   UChar* p = md->start_subject + md->offset_vector[offset];
 
 #ifdef DEBUG
@@ -398,7 +396,7 @@ static inline void getUTF8CharAndIncrementLength(int& c,
 static int match(UChar* eptr,
                  const uschar* ecode,
                  int offset_top,
-                 match_data* md) {
+                 MatchData* md) {
   int is_match = false;
   int i;
   int c;
@@ -2200,7 +2198,7 @@ int jsRegExpExecute(const JSRegExp* re,
   ASSERT(offsetcount >= 0);
   ASSERT(offsets || offsetcount == 0);
 
-  match_data match_block;
+  MatchData match_block;
   match_block.start_subject = (UChar*)subject;
   match_block.end_subject = match_block.start_subject + length;
   UChar* end_subject = match_block.end_subject;
@@ -2208,8 +2206,8 @@ int jsRegExpExecute(const JSRegExp* re,
   match_block.lcc = _pcre_default_tables + lcc_offset;
   match_block.ctypes = _pcre_default_tables + ctypes_offset;
 
-  match_block.multiline = (re->options & PCRE_MULTILINE) != 0;
-  match_block.caseless = (re->options & PCRE_CASELESS) != 0;
+  match_block.multiline = (re->options & PCRE_MULTILINE);
+  match_block.caseless = (re->options & PCRE_CASELESS);
 
   /* If the expression has got more back references than the offsets supplied
    can
@@ -2291,7 +2289,8 @@ int jsRegExpExecute(const JSRegExp* re,
 
   UChar* start_match = (UChar*)subject + start_offset;
   UChar* req_byte_ptr = start_match - 1;
-  bool startline = re->options & PCRE_STARTLINE;
+  bool useMultiLineFirstCharOptimization =
+      re->options & OptionUseMultiLineFirstCharOptimization;
 
   do {
     UChar* save_end_subject = end_subject;
@@ -2332,8 +2331,7 @@ int jsRegExpExecute(const JSRegExp* re,
     }
 
     /* Or to just after \n for a multiline match if possible */
-
-    else if (startline) {
+    else if (useMultiLineFirstCharOptimization) {
       if (start_match > match_block.start_subject + start_offset) {
         while (start_match < end_subject && !isNewline(start_match[-1]))
           start_match++;

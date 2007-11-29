@@ -279,11 +279,13 @@ static inline void getChar(int& c, const UChar* eptr) {
   while (isTrailingSurrogate(*eptr)) \
     eptr--;
 
+// FIXME: These are really more of a "regexp state" than "regexp options"
 enum PCREOptions {
-  PCRE_FIRSTSET = 0x40000000,  /* first_byte is set */
-  PCRE_REQCHSET = 0x20000000,  /* req_byte is set */
-  PCRE_STARTLINE = 0x10000000, /* start after \n for multiline */
-  PCRE_ANCHORED = 0x02000000,  /* can't use partial with this regex */
+  PCRE_FIRSTSET = 0x40000000, /* first_byte is set */
+  PCRE_REQCHSET = 0x20000000, /* req_byte is set */
+  OptionUseMultiLineFirstCharOptimization =
+      0x10000000,             /* start after \n for multiline */
+  PCRE_ANCHORED = 0x02000000, /* can't use partial with this regex */
   PCRE_CASELESS = 0x00000001,
   PCRE_MULTILINE = 0x00000002
 };
