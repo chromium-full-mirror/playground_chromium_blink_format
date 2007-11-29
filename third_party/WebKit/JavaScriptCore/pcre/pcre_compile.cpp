@@ -2172,8 +2172,8 @@ Returns:     true or false
 
 static bool is_anchored(const uschar* code,
                         int options,
-                        unsigned int bracket_map,
-                        unsigned int backref_map) {
+                        unsigned bracket_map,
+                        unsigned backref_map) {
   do {
     const uschar* scode = firstSignificantOpCode(code + 1 + LINK_SIZE);
     int op = *scode;
@@ -2222,8 +2222,8 @@ Arguments:
 */
 
 static bool canApplyFirstCharOptimization(const uschar* code,
-                                          unsigned int bracket_map,
-                                          unsigned int backref_map) {
+                                          unsigned bracket_map,
+                                          unsigned backref_map) {
   do {
     const uschar* scode = firstSignificantOpCode(code + 1 + LINK_SIZE);
     int op = *scode;
@@ -2349,11 +2349,8 @@ static int calculateCompiledPatternLengthAndFlags(
 
   int length = 1 + LINK_SIZE; /* For initial BRA plus length */
   int branch_extra = 0;
-  int branch_newextra;
   int lastitemlength = 0;
-  bool class_utf8;
-  bool capturing;
-  unsigned int brastackptr = 0;
+  unsigned brastackptr = 0;
   int brastack[BRASTACK_SIZE];
   uschar bralenstack[BRASTACK_SIZE];
   int item_count = -1;
@@ -2363,11 +2360,7 @@ static int calculateCompiledPatternLengthAndFlags(
   const UChar* patternEnd = (const UChar*)(pattern + patternLength);
 
   while (++ptr < patternEnd) {
-    int min = 0, max = 0;
-    int class_optcount;
-    int bracket_length;
-    int duplength;
-
+    int minRepeats = 0, maxRepeats = 0;
     int c = *ptr;
 
     item_count++; /* Is zero for the first non-comment item */
@@ -2380,7 +2373,6 @@ static int calculateCompiledPatternLengthAndFlags(
         c = check_escape(&ptr, patternEnd, &errorcode, bracount, false);
         if (errorcode != 0)
           return -1;
-        ;
 
         lastitemlength = 1; /* Default length of last item for repeats */
 
@@ -2414,11 +2406,12 @@ static int calculateCompiledPatternLengthAndFlags(
             compile_block.top_backref = refnum;
           length += 2; /* For single back reference */
           if (ptr[1] == '{' && is_counted_repeat(ptr + 2, patternEnd)) {
-            ptr = read_repeat_counts(ptr + 2, &min, &max, &errorcode);
+            ptr = read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats,
+                                     &errorcode);
             if (errorcode)
               return -1;
-            if ((min == 0 && (max == 1 || max == -1)) ||
-                (min == 1 && max == -1))
+            if ((minRepeats == 0 && (maxRepeats == 1 || maxRepeats == -1)) ||
+                (minRepeats == 1 && maxRepeats == -1))
               length++;
             else
               length += 5;
@@ -2447,27 +2440,27 @@ static int calculateCompiledPatternLengthAndFlags(
       case '{':
         if (!is_counted_repeat(ptr + 1, patternEnd))
           goto NORMAL_CHAR;
-        ptr = read_repeat_counts(ptr + 1, &min, &max, &errorcode);
+        ptr = read_repeat_counts(ptr + 1, &minRepeats, &maxRepeats, &errorcode);
         if (errorcode != 0)
           return -1;
-        ;
 
         /* These special cases just insert one extra opcode */
 
-        if ((min == 0 && (max == 1 || max == -1)) || (min == 1 && max == -1))
+        if ((minRepeats == 0 && (maxRepeats == 1 || maxRepeats == -1)) ||
+            (minRepeats == 1 && maxRepeats == -1))
           length++;
 
         /* These cases might insert additional copies of a preceding character.
          */
 
         else {
-          if (min != 1) {
+          if (minRepeats != 1) {
             length -=
                 lastitemlength; /* Uncount the original char or metachar */
-            if (min > 0)
+            if (minRepeats > 0)
               length += 3 + lastitemlength;
           }
-          length += lastitemlength + ((max > 0) ? 3 : 1);
+          length += lastitemlength + ((maxRepeats > 0) ? 3 : 1);
         }
 
         if (ptr[1] == '?')
@@ -2497,14 +2490,15 @@ static int calculateCompiledPatternLengthAndFlags(
        uses 2 or 3 bytes, depending on whether it is negated or not. Notice this
        where we can. (In UTF-8 mode we can do this only for chars < 128.) */
 
-      case '[':
+      case '[': {
+        int class_optcount;
         if (*(++ptr) == '^') {
           class_optcount = 10; /* Greater than one */
           ptr++;
         } else
           class_optcount = 0;
 
-        class_utf8 = false;
+        bool class_utf8 = false;
 
         for (; ptr < patternEnd && *ptr != ']'; ++ptr) {
           /* Check for escapes */
@@ -2513,7 +2507,6 @@ static int calculateCompiledPatternLengthAndFlags(
             c = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
             if (errorcode != 0)
               return -1;
-            ;
 
             /* \b is backspace inside a class; \X is literal */
 
@@ -2557,7 +2550,6 @@ static int calculateCompiledPatternLengthAndFlags(
                 d = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
                 if (errorcode != 0)
                   return -1;
-                ;
                 if (-d == ESC_b)
                   d = '\b'; /* backspace */
               } else if (ptr + 1 < patternEnd && ptr[1] != ']') {
@@ -2577,7 +2569,6 @@ static int calculateCompiledPatternLengthAndFlags(
               if (d < c) {
                 errorcode = ERR8;
                 return -1;
-                ;
               }
 
               if ((d > 255 || (ignoreCase && d > 127))) {
@@ -2653,11 +2644,9 @@ static int calculateCompiledPatternLengthAndFlags(
           }
         }
 
-        if (ptr >= patternEnd) /* Missing terminating ']' */
-        {
+        if (ptr >= patternEnd) { /* Missing terminating ']' */
           errorcode = ERR6;
           return -1;
-          ;
         }
 
         /* We can optimize when there was only one optimizable character.
@@ -2677,12 +2666,12 @@ static int calculateCompiledPatternLengthAndFlags(
 
           if (ptr + 1 < patternEnd && ptr[1] == '{' &&
               is_counted_repeat(ptr + 2, patternEnd)) {
-            ptr = read_repeat_counts(ptr + 2, &min, &max, &errorcode);
+            ptr = read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats,
+                                     &errorcode);
             if (errorcode != 0)
               return -1;
-            ;
-            if ((min == 0 && (max == 1 || max == -1)) ||
-                (min == 1 && max == -1))
+            if ((minRepeats == 0 && (maxRepeats == 1 || maxRepeats == -1)) ||
+                (minRepeats == 1 && maxRepeats == -1))
               length++;
             else
               length += 5;
@@ -2694,13 +2683,13 @@ static int calculateCompiledPatternLengthAndFlags(
           }
         }
         continue;
-
+      }
       /* Brackets may be genuine groups or special things */
 
-      case '(':
-        branch_newextra = 0;
-        bracket_length = 1 + LINK_SIZE;
-        capturing = false;
+      case '(': {
+        int branch_newextra = 0;
+        int bracket_length = 1 + LINK_SIZE;
+        bool capturing = false;
 
         /* Handle special forms of bracket, which all start (? */
 
@@ -2731,11 +2720,8 @@ static int calculateCompiledPatternLengthAndFlags(
             default:
               errorcode = ERR12;
               return -1;
-              ;
           }
-        }
-
-        else
+        } else
           capturing = 1;
 
         /* Capturing brackets must be counted so we can process escapes in a
@@ -2760,7 +2746,6 @@ static int calculateCompiledPatternLengthAndFlags(
         if (brastackptr >= sizeof(brastack) / sizeof(int)) {
           errorcode = ERR17;
           return -1;
-          ;
         }
 
         bralenstack[brastackptr] = branch_extra;
@@ -2769,15 +2754,16 @@ static int calculateCompiledPatternLengthAndFlags(
         brastack[brastackptr++] = length;
         length += bracket_length;
         continue;
-
-      /* Handle ket. Look for subsequent max/min; for certain sets of values we
+      }
+      /* Handle ket. Look for subsequent maxRepeats/minRepeats; for certain sets
+       of values we
        have to replicate this bracket up to that many times. If brastackptr is
        0 this is an unmatched bracket which will generate an error, but take
        care
        not to try to access brastack[-1] when computing the length and restoring
        the branch_extra value. */
-
-      case ')':
+      case ')': {
+        int duplength;
         length += 1 + LINK_SIZE;
         if (brastackptr > 0) {
           duplength = length - brastack[--brastackptr];
@@ -2790,25 +2776,25 @@ static int calculateCompiledPatternLengthAndFlags(
 
         if (ptr + 1 < patternEnd && (c = ptr[1]) == '{' &&
             is_counted_repeat(ptr + 2, patternEnd)) {
-          ptr = read_repeat_counts(ptr + 2, &min, &max, &errorcode);
-          if (errorcode != 0)
+          ptr =
+              read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats, &errorcode);
+          if (errorcode)
             return -1;
-          ;
         } else if (c == '*') {
-          min = 0;
-          max = -1;
+          minRepeats = 0;
+          maxRepeats = -1;
           ptr++;
         } else if (c == '+') {
-          min = 1;
-          max = -1;
+          minRepeats = 1;
+          maxRepeats = -1;
           ptr++;
         } else if (c == '?') {
-          min = 0;
-          max = 1;
+          minRepeats = 0;
+          maxRepeats = 1;
           ptr++;
         } else {
-          min = 1;
-          max = 1;
+          minRepeats = 1;
+          maxRepeats = 1;
         }
 
         /* If the minimum is zero, we have to allow for an OP_BRAZERO before the
@@ -2816,10 +2802,10 @@ static int calculateCompiledPatternLengthAndFlags(
          maxval-1 times; each replication acquires an OP_BRAZERO plus a nesting
          bracket set. */
 
-        if (min == 0) {
+        if (minRepeats == 0) {
           length++;
-          if (max > 0)
-            length += (max - 1) * (duplength + 3 + 2 * LINK_SIZE);
+          if (maxRepeats > 0)
+            length += (maxRepeats - 1) * (duplength + 3 + 2 * LINK_SIZE);
         }
 
         /* When the minimum is greater than zero, we have to replicate up to
@@ -2831,10 +2817,12 @@ static int calculateCompiledPatternLengthAndFlags(
          but one of the optional copies. */
 
         else {
-          length += (min - 1) * duplength;
-          if (max > min) /* Need this test as max=-1 means no limit */
-            length += (max - min) * (duplength + 3 + 2 * LINK_SIZE) -
-                      (2 + 2 * LINK_SIZE);
+          length += (minRepeats - 1) * duplength;
+          if (maxRepeats >
+              minRepeats) /* Need this test as maxRepeats=-1 means no limit */
+            length +=
+                (maxRepeats - minRepeats) * (duplength + 3 + 2 * LINK_SIZE) -
+                (2 + 2 * LINK_SIZE);
         }
 
         /* Allow space for once brackets for "possessive quantifier" */
@@ -2844,7 +2832,7 @@ static int calculateCompiledPatternLengthAndFlags(
           length += 2 + 2 * LINK_SIZE;
         }
         continue;
-
+      }
       /* Non-special character. It won't be space or # in extended mode, so it
        is
        always a genuine character. If we are in a \Q...\E sequence, check for
@@ -2860,11 +2848,7 @@ static int calculateCompiledPatternLengthAndFlags(
         /* In UTF-8 mode, check for additional bytes. */
 
         if (c > 127) {
-          if (isLeadingSurrogate(c)) {
-            c = decodeSurrogatePair(c, ptr < patternEnd ? *ptr : 0);
-            ++ptr;
-          }
-
+          c = getCharAndAdvanceIfSurrogate(ptr, patternEnd);
           {
             int i;
             for (i = 0; i < _pcre_utf8_table1_size; i++)
