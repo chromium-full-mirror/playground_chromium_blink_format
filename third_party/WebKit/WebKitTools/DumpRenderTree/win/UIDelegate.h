@@ -254,9 +254,7 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate {
   virtual HRESULT STDMETHODCALLTYPE trackCustomPopupMenu(
       /* [in] */ IWebView* sender,
       /* [in] */ OLE_HANDLE menu,
-      /* [in] */ LPPOINT point) {
-    return E_NOTIMPL;
-  }
+      /* [in] */ LPPOINT point);
 
   virtual HRESULT STDMETHODCALLTYPE measureCustomMenuItem(
       /* [in] */ IWebView* sender,
