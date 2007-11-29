@@ -804,7 +804,7 @@ static bool compile_branch(int options,
    the
    case status of the value. This is used only for ASCII characters. */
 
-  int req_caseopt = (options & OptionIgnoreCase) ? REQ_IGNORE_CASE : 0;
+  int req_caseopt = (options & IgnoreCaseOption) ? REQ_IGNORE_CASE : 0;
 
   /* Switch on next character until the end of the branch */
 
@@ -855,7 +855,7 @@ static bool compile_branch(int options,
        the setting of any following char as a first character. */
 
       case '^':
-        if (options & OptionMatchAcrossMultipleLines) {
+        if (options & MatchAcrossMultipleLinesOption) {
           if (firstbyte == REQ_UNSET)
             firstbyte = REQ_NONE;
         }
@@ -1048,7 +1048,7 @@ static bool compile_branch(int options,
              matching for characters > 127 is available only if UCP support is
              available. */
 
-            if ((d > 255 || ((options & OptionIgnoreCase) && d > 127))) {
+            if ((d > 255 || ((options & IgnoreCaseOption) && d > 127))) {
               class_utf8 = true;
 
               /* With UCP support, we can find the other case equivalents of
@@ -1056,7 +1056,7 @@ static bool compile_branch(int options,
                how
                they fit with the basic range. */
 
-              if (options & OptionIgnoreCase) {
+              if (options & IgnoreCaseOption) {
                 int occ, ocd;
                 int cc = c;
                 int origd = d;
@@ -1108,7 +1108,7 @@ static bool compile_branch(int options,
 
             for (; c <= d; c++) {
               classbits[c / 8] |= (1 << (c & 7));
-              if (options & OptionIgnoreCase) {
+              if (options & IgnoreCaseOption) {
                 int uc = flipCase(c);
                 classbits[uc / 8] |= (1 << (uc & 7));
               }
@@ -1128,12 +1128,12 @@ static bool compile_branch(int options,
 
           /* Handle a character that cannot go in the bit map */
 
-          if ((c > 255 || ((options & OptionIgnoreCase) && c > 127))) {
+          if ((c > 255 || ((options & IgnoreCaseOption) && c > 127))) {
             class_utf8 = true;
             *class_utf8data++ = XCL_SINGLE;
             class_utf8data += _pcre_ord2utf8(c, class_utf8data);
 
-            if (options & OptionIgnoreCase) {
+            if (options & IgnoreCaseOption) {
               int othercase;
               if ((othercase = _pcre_ucp_othercase(c)) >= 0) {
                 *class_utf8data++ = XCL_SINGLE;
@@ -1145,7 +1145,7 @@ static bool compile_branch(int options,
           /* Handle a single-byte character */
           {
             classbits[c / 8] |= (1 << (c & 7));
-            if (options & OptionIgnoreCase) {
+            if (options & IgnoreCaseOption) {
               c = flipCase(c);
               classbits[c / 8] |= (1 << (c & 7));
             }
@@ -1919,7 +1919,7 @@ static bool compile_branch(int options,
           mclength = 1;
           mcbuffer[0] = c;
 
-          if ((options & OptionIgnoreCase) && (c | 0x20) >= 'a' &&
+          if ((options & IgnoreCaseOption) && (c | 0x20) >= 'a' &&
               (c | 0x20) <= 'z') {
             *code++ = OP_ASCII_LETTER_IGNORING_CASE;
             *code++ = c | 0x20;
@@ -1931,7 +1931,7 @@ static bool compile_branch(int options,
           mclength = _pcre_ord2utf8(c, mcbuffer);
 
           *code++ =
-              (options & OptionIgnoreCase) ? OP_CHAR_IGNORING_CASE : OP_CHAR;
+              (options & IgnoreCaseOption) ? OP_CHAR_IGNORING_CASE : OP_CHAR;
           for (c = 0; c < mclength; c++)
             *code++ = mcbuffer[c];
         }
@@ -2195,7 +2195,7 @@ static bool is_anchored(const uschar* code,
 
       /* Check for explicit anchoring */
 
-      else if ((options & OptionMatchAcrossMultipleLines) || op != OP_CIRC)
+      else if ((options & MatchAcrossMultipleLinesOption) || op != OP_CIRC)
         return false;
     code += getOpcodeValueAtOffset(code, 1);
   } while (*code == OP_ALT); /* Loop for each alternative */
@@ -2320,7 +2320,7 @@ static int find_firstassertedchar(const uschar* code,
           return -1;
         if (c < 0) {
           c = scode[1];
-          if (options & OptionIgnoreCase)
+          if (options & IgnoreCaseOption)
             c |= REQ_IGNORE_CASE;
         } else if (c != scode[1])
           return -1;
@@ -2889,13 +2889,14 @@ static void printCompiledRegExp(JSRegExp* re, int length) {
          re->top_bracket, re->top_backref);
 
   if (re->options) {
-    printf("%s%s%s\n", ((re->options & PCRE_ANCHORED) != 0) ? "anchored " : "",
-           ((re->options & OptionIgnoreCase) != 0) ? "ignores case " : "",
-           ((re->options & OptionMatchAcrossMultipleLines) != 0) ? "multiline "
+    printf("%s%s%s\n",
+           ((re->options & IsAnchoredOption) != 0) ? "anchored " : "",
+           ((re->options & IgnoreCaseOption) != 0) ? "ignores case " : "",
+           ((re->options & MatchAcrossMultipleLinesOption) != 0) ? "multiline "
                                                                  : "");
   }
 
-  if (re->options & PCRE_FIRSTSET) {
+  if (re->options & UseFirstByteOptimizationOption) {
     char ch = re->first_byte & 255;
     const char* caseless =
         (re->first_byte & REQ_IGNORE_CASE) ? " (ignores case)" : "";
@@ -2905,7 +2906,7 @@ static void printCompiledRegExp(JSRegExp* re, int length) {
       printf("First char = \\x%02x%s\n", ch, caseless);
   }
 
-  if (re->options & PCRE_REQCHSET) {
+  if (re->options & UseRequiredByteOptimizationOption) {
     char ch = re->req_byte & 255;
     const char* caseless =
         (re->req_byte & REQ_IGNORE_CASE) ? " (ignores case)" : "";
@@ -2986,8 +2987,8 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    4-byte pointers is run on another with 8-byte pointers. */
 
   re->size = (pcre_uint32)size;
-  re->options = (ignoreCase ? OptionIgnoreCase : 0) |
-                (multiline ? OptionMatchAcrossMultipleLines : 0);
+  re->options = (ignoreCase ? IgnoreCaseOption : 0) |
+                (multiline ? MatchAcrossMultipleLinesOption : 0);
 
   /* The starting points of the name/number translation table and of the code
    are
@@ -3049,14 +3050,14 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    Otherwise, if we know what the first character has to be, save it, because
    that
    speeds up unanchored matches no end. If not, see if we can set the
-   OptionUseMultiLineFirstCharOptimization flag. This is helpful for multiline
+   UseMultiLineFirstByteOptimizationOption flag. This is helpful for multiline
    matches when all branches
    start with ^. and also when all branches start with .* for non-DOTALL
    matches.
    */
 
   if (is_anchored(codestart, re->options, 0, compile_block.backref_map))
-    re->options |= PCRE_ANCHORED;
+    re->options |= IsAnchoredOption;
   else {
     if (firstbyte < 0)
       firstbyte = find_firstassertedchar(codestart, re->options, false);
@@ -3067,11 +3068,11 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
         re->first_byte = ((firstbyte & REQ_IGNORE_CASE) && flipCase(ch) == ch)
                              ? ch
                              : firstbyte;
-        re->options |= PCRE_FIRSTSET;
+        re->options |= UseFirstByteOptimizationOption;
       }
     } else if (canApplyFirstCharOptimization(codestart, 0,
                                              compile_block.backref_map))
-      re->options |= OptionUseMultiLineFirstCharOptimization;
+      re->options |= UseMultiLineFirstByteOptimizationOption;
   }
 
   /* For an anchored pattern, we use the "required byte" only if it follows a
@@ -3079,13 +3080,13 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    bytes. */
 
   if (reqbyte >= 0 &&
-      (!(re->options & PCRE_ANCHORED) || (reqbyte & REQ_VARY))) {
+      (!(re->options & IsAnchoredOption) || (reqbyte & REQ_VARY))) {
     int ch = reqbyte & 255;
     if (ch < 127) {
       re->req_byte = ((reqbyte & REQ_IGNORE_CASE) && flipCase(ch) == ch)
                          ? (reqbyte & ~REQ_IGNORE_CASE)
                          : reqbyte;
-      re->options |= PCRE_REQCHSET;
+      re->options |= UseRequiredByteOptimizationOption;
     }
   }
 
