@@ -183,7 +183,6 @@ static int check_escape(const UChar** ptrptr,
                         int bracount,
                         bool isclass) {
   const UChar* ptr = *ptrptr + 1;
-  int i;
 
   /* If backslash is at the end of the pattern, it's an error. */
   if (ptr == patternEnd) {
@@ -195,24 +194,18 @@ static int check_escape(const UChar** ptrptr,
   int c = *ptr;
 
   /* Non-alphamerics are literals. For digits or letters, do an initial lookup
-  in
-  a table. A non-zero result is something that can be returned immediately.
-  Otherwise further processing may be required. */
+   in
+   a table. A non-zero result is something that can be returned immediately.
+   Otherwise further processing may be required. */
 
-  if (c < '0' || c > 'z') {
-  } /* Not alphameric */
-  else if ((i = escapes[c - '0']) != 0)
-    c = i;
+  if (c < '0' || c > 'z') { /* Not alphameric */
+  } else if (int escapeValue = escapes[c - '0'])
+    c = escapeValue;
 
   /* Escapes that need further processing, or are illegal. */
 
   else {
     switch (c) {
-      /* Escape sequences starting with a non-zero digit are backreferences,
-      unless there are insufficient brackets, in which case they are octal
-      escape sequences. Those sequences end on the first non-octal character
-      or when we overflow 0-255, whichever comes first. */
-
       case '1':
       case '2':
       case '3':
@@ -222,6 +215,10 @@ static int check_escape(const UChar** ptrptr,
       case '7':
       case '8':
       case '9':
+        /* Escape sequences starting with a non-zero digit are backreferences,
+         unless there are insufficient brackets, in which case they are octal
+         escape sequences. Those sequences end on the first non-octal character
+         or when we overflow 0-255, whichever comes first. */
 
         if (!isclass) {
           const UChar* oldptr = ptr;
@@ -236,17 +233,18 @@ static int check_escape(const UChar** ptrptr,
         }
 
         /* Handle an octal number following \. If the first digit is 8 or 9,
-        this is not octal. */
+         this is not octal. */
 
         if ((c = *ptr) >= '8')
           break;
 
       /* \0 always starts an octal number, but we may drop through to here with
-      a
-      larger first octal digit. */
+       a
+       larger first octal digit. */
 
-      case '0':
+      case '0': {
         c -= '0';
+        int i;
         for (i = 1; i <= 2; ++i) {
           if (ptr + i >= patternEnd || ptr[i] < '0' || ptr[i] > '7')
             break;
@@ -257,9 +255,10 @@ static int check_escape(const UChar** ptrptr,
         }
         ptr += i - 1;
         break;
-
-      case 'x':
+      }
+      case 'x': {
         c = 0;
+        int i;
         for (i = 1; i <= 2; ++i) {
           if (ptr + i >= patternEnd || !isASCIIHexDigit(ptr[i])) {
             c = 'x';
@@ -273,9 +272,10 @@ static int check_escape(const UChar** ptrptr,
         }
         ptr += i - 1;
         break;
-
-      case 'u':
+      }
+      case 'u': {
         c = 0;
+        int i;
         for (i = 1; i <= 4; ++i) {
           if (ptr + i >= patternEnd || !isASCIIHexDigit(ptr[i])) {
             c = 'u';
@@ -290,8 +290,9 @@ static int check_escape(const UChar** ptrptr,
         ptr += i - 1;
         break;
 
-      /* Other special escapes not starting with a digit are straightforward */
-
+        /* Other special escapes not starting with a digit are straightforward
+         */
+      }
       case 'c':
         if (++ptr == patternEnd) {
           *errorcodeptr = ERR2;
@@ -300,8 +301,8 @@ static int check_escape(const UChar** ptrptr,
         c = *ptr;
 
         /* A letter is upper-cased; then the 0x40 bit is flipped. This coding
-        is ASCII-specific, but then the whole concept of \cx is ASCII-specific.
-        */
+         is ASCII-specific, but then the whole concept of \cx is ASCII-specific.
+         */
 
         if (c >= 'a' && c <= 'z')
           c -= 32;
