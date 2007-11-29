@@ -92,6 +92,16 @@ PassRefPtr<Database> Database::openDatabase(Document* document,
                                             const String& displayName,
                                             unsigned long estimatedSize,
                                             ExceptionCode& e) {
+  if (!DatabaseTracker::tracker().canEstablishDatabase(
+          document, name, displayName, estimatedSize)) {
+    // There should be an exception raised here in addition to returning a null
+    // Database object.  The question has been raised with the WHATWG
+    LOG(StorageAPI, "Database %s for origin %s not allowed to be established",
+        name.ascii().data(),
+        document->securityOrigin().toString().ascii().data());
+    return 0;
+  }
+
   RefPtr<Database> database = new Database(document, name, expectedVersion);
 
   if (!database->openAndVerifyVersion(e)) {
@@ -101,6 +111,10 @@ PassRefPtr<Database> Database::openDatabase(Document* document,
         database->databaseDebugName().ascii().data());
     return 0;
   }
+
+  DatabaseTracker::tracker().setDatabaseDetails(
+      document->securityOrigin().securityOriginData(), name, displayName,
+      estimatedSize);
 
   if (Page* page = document->frame()->page())
     page->inspectorController()->didOpenDatabase(

@@ -38,7 +38,9 @@
 namespace WebCore {
 
 class DatabaseTrackerClient;
+class Document;
 class SecurityOriginData;
+
 struct SecurityOriginDataHash;
 struct SecurityOriginDataTraits;
 
@@ -47,8 +49,17 @@ class DatabaseTracker {
   void setDatabasePath(const String&);
   const String& databasePath();
 
+  bool canEstablishDatabase(Document* document,
+                            const String& name,
+                            const String& displayName,
+                            unsigned long estimatedSize);
+  void setDatabaseDetails(const SecurityOriginData& origin,
+                          const String& name,
+                          const String& displayName,
+                          unsigned long estimatedSize);
   String fullPathForDatabase(const SecurityOriginData& origin,
-                             const String& name);
+                             const String& name,
+                             bool createIfNotExists = true);
 
   void origins(Vector<SecurityOriginData>& result);
   bool databaseNamesForOrigin(const SecurityOriginData& origin,
@@ -57,6 +68,7 @@ class DatabaseTracker {
   DatabaseDetails detailsForNameAndOrigin(const String&,
                                           const SecurityOriginData&);
 
+  unsigned long long usageForDatabase(const String&, const SecurityOriginData&);
   unsigned long long usageForOrigin(const SecurityOriginData&);
   unsigned long long quotaForOrigin(const SecurityOriginData&);
   void setQuota(const SecurityOriginData&, unsigned long long);
@@ -77,16 +89,22 @@ class DatabaseTracker {
 
   void openTrackerDatabase();
 
+  bool hasEntryForOrigin(const SecurityOriginData&);
+  void establishEntryForOrigin(const SecurityOriginData&);
+
   bool addDatabase(const SecurityOriginData& origin,
                    const String& name,
                    const String& path);
   void populateOrigins();
 
+  bool deleteDatabaseFile(const SecurityOriginData& origin, const String& name);
+
   SQLiteDatabase m_database;
-  mutable OwnPtr<HashSet<SecurityOriginData,
+  mutable OwnPtr<HashMap<SecurityOriginData,
+                         unsigned long long,
                          SecurityOriginDataHash,
                          SecurityOriginDataTraits>>
-      m_origins;
+      m_originQuotaMap;
 
   String m_databasePath;
 

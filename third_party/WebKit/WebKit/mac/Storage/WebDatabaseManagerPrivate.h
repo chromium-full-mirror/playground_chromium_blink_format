@@ -43,7 +43,7 @@ extern const NSString* WebDatabaseDidModifyOriginNotification;
 // The notification userInfo will have a WebDatabaseNameKey whose value is the
 // database name.
 extern const NSString* WebDatabaseDidModifyDatabaseNotification;
-extern const NSString* WebDatabaseNameKey;
+extern const NSString* WebDatabaseIdentifierKey;
 
 @class WebSecurityOrigin;
 
@@ -61,12 +61,12 @@ extern const NSString* WebDatabaseNameKey;
 
 // Will return the dictionary describing everything about the database for the
 // passed origin and name
-- (NSDictionary*)detailsForDatabase:(NSString*)databaseName
+- (NSDictionary*)detailsForDatabase:(NSString*)databaseIdentifier
                          withOrigin:(WebSecurityOrigin*)origin;
 
 - (void)deleteAllDatabases;
 - (void)deleteDatabasesWithOrigin:(WebSecurityOrigin*)origin;
-- (void)deleteDatabase:(NSString*)databaseName
+- (void)deleteDatabase:(NSString*)databaseIdentifier
             withOrigin:(WebSecurityOrigin*)origin;
 
 @end

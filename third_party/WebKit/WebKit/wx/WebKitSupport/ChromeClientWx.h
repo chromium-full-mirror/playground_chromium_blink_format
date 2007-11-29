@@ -111,7 +111,16 @@ class ChromeClientWx : public ChromeClient {
 
   virtual void print(Frame*);
 
-  virtual bool runDatabaseSizeLimitPrompt(Frame*, const String& origin);
+  virtual unsigned long long requestQuotaIncreaseForNewDatabase(
+      Frame*,
+      const SecurityOriginData&,
+      const String&,
+      unsigned long long);
+  virtual unsigned long long requestQuotaIncreaseForDatabaseOperation(
+      Frame*,
+      const SecurityOriginData&,
+      const String&,
+      unsigned long long);
 };
 }
 #endif  // ChromeClientWx_H

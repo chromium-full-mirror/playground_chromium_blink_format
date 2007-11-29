@@ -137,8 +137,19 @@ class SVGEmptyChromeClient : public ChromeClient {
 
   virtual void print(Frame*) {}
 
-  virtual bool runDatabaseSizeLimitPrompt(Frame*, const String&) {
-    return false;
+  virtual unsigned long long requestQuotaIncreaseForNewDatabase(
+      Frame*,
+      const SecurityOriginData&,
+      const String&,
+      unsigned long long) {
+    return 0;
+  }
+  virtual unsigned long long requestQuotaIncreaseForDatabaseOperation(
+      Frame*,
+      const SecurityOriginData&,
+      const String&,
+      unsigned long long) {
+    return 0;
   }
 };
 
