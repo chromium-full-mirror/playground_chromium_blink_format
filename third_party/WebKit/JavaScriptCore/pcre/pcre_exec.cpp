@@ -78,10 +78,10 @@ typedef int ReturnLocation;
 typedef void* ReturnLocation;
 #endif
 
-typedef struct matchframe {
+struct MatchFrame {
   ReturnLocation returnLocation;
 
-  struct matchframe* prevframe;
+  struct MatchFrame* previousFrame;
 
   /* Function arguments that may change */
 
@@ -110,7 +110,7 @@ typedef struct matchframe {
   int save_offset1, save_offset2, save_offset3;
 
   eptrblock newptrb;
-} matchframe;
+};
 
 /* Structure for passing "static" information around between the functions
 doing traditional NFA matching, so that they are thread-safe. */
@@ -194,10 +194,7 @@ Arguments:
 Returns:      true if matched
 */
 
-static BOOL match_ref(int offset,
-                      register USPTR eptr,
-                      int length,
-                      match_data* md) {
+static BOOL match_ref(int offset, USPTR eptr, int length, match_data* md) {
   USPTR p = md->start_subject + md->offset_vector[offset];
 
 #ifdef DEBUG
@@ -325,25 +322,25 @@ struct MatchStack {
    require
    any calls to pcre_stack_malloc, yet the amount of stack used for the array is
    modest enough that we don't run out of stack. */
-  matchframe frames[16];
-  matchframe* framesEnd;
-  matchframe* currentFrame;
+  MatchFrame frames[16];
+  MatchFrame* framesEnd;
+  MatchFrame* currentFrame;
 
   inline bool canUseStackBufferForNextFrame() {
     return (currentFrame >= frames && currentFrame + 1 < framesEnd);
   }
 
-  inline matchframe* allocateNextFrame() {
+  inline MatchFrame* allocateNextFrame() {
     if (canUseStackBufferForNextFrame())
       return currentFrame + 1;
-    return new matchframe;
+    return new MatchFrame;
   }
 
   inline void pushNewFrame(const uschar* ecode,
                            eptrblock* eptrb,
                            ReturnLocation returnLocation) {
-    matchframe* newframe = allocateNextFrame();
-    newframe->prevframe = currentFrame;
+    MatchFrame* newframe = allocateNextFrame();
+    newframe->previousFrame = currentFrame;
 
     newframe->eptr = currentFrame->eptr;
     newframe->offset_top = currentFrame->offset_top;
@@ -354,21 +351,21 @@ struct MatchStack {
     currentFrame = newframe;
   }
 
-  inline bool frameIsStackAllocated(matchframe* frame) {
+  inline bool frameIsStackAllocated(MatchFrame* frame) {
     return (frame >= frames && frame < framesEnd);
   }
 
   inline void popCurrentFrame() {
-    matchframe* oldFrame = currentFrame;
-    currentFrame = currentFrame->prevframe;
+    MatchFrame* oldFrame = currentFrame;
+    currentFrame = currentFrame->previousFrame;
     if (!frameIsStackAllocated(oldFrame))
       delete oldFrame;
   }
 
   void unrollAnyHeapAllocatedFrames() {
     while (!frameIsStackAllocated(currentFrame)) {
-      matchframe* oldFrame = currentFrame;
-      currentFrame = currentFrame->prevframe;
+      MatchFrame* oldFrame = currentFrame;
+      currentFrame = currentFrame->previousFrame;
       delete oldFrame;
     }
   }
@@ -379,13 +376,32 @@ static int matchError(int errorCode, MatchStack& stack) {
   return errorCode;
 }
 
+/* Get the next UTF-8 character, not advancing the pointer, incrementing length
+ if there are extra bytes. This is called when we know we are in UTF-8 mode. */
+
+static inline void getUTF8CharAndIncrementLength(int& c,
+                                                 const uschar* eptr,
+                                                 int& len) {
+  c = *eptr;
+  if ((c & 0xc0) == 0xc0) {
+    int gcaa = _pcre_utf8_table4[c & 0x3f]; /* Number of additional bytes */
+    int gcss = 6 * gcaa;
+    c = (c & _pcre_utf8_table3[gcaa]) << gcss;
+    for (int gcii = 1; gcii <= gcaa; gcii++) {
+      gcss -= 6;
+      c |= (eptr[gcii] & 0x3f) << gcss;
+    }
+    len += gcaa;
+  }
+}
+
 static int match(USPTR eptr,
                  const uschar* ecode,
                  int offset_top,
                  match_data* md) {
-  register int is_match = false;
-  register int i;
-  register int c;
+  int is_match = false;
+  int i;
+  int c;
 
   unsigned rdepth = 0;
 
@@ -798,15 +814,15 @@ RECURSE:
                 false;
       else {
         const pcre_uchar* lastptr = stack.currentFrame->eptr - 1;
-        while (ISMIDCHAR(*lastptr))
+        while (isTrailingSurrogate(*lastptr))
           lastptr--;
-        GETCHAR(c, lastptr);
+        getChar(c, lastptr);
         prev_is_word = c < 128 && (md->ctypes[c] & ctype_word) != 0;
       }
       if (stack.currentFrame->eptr >= md->end_subject)
         cur_is_word = false;
       else {
-        GETCHAR(c, stack.currentFrame->eptr);
+        getChar(c, stack.currentFrame->eptr);
         cur_is_word = c < 128 && (md->ctypes[c] & ctype_word) != 0;
       }
 
@@ -826,7 +842,7 @@ RECURSE:
       if (stack.currentFrame->eptr++ >= md->end_subject)
         RRETURN_NO_MATCH;
       while (stack.currentFrame->eptr < md->end_subject &&
-             ISMIDCHAR(*stack.currentFrame->eptr))
+             isTrailingSurrogate(*stack.currentFrame->eptr))
         stack.currentFrame->eptr++;
       stack.currentFrame->ecode++;
       NEXT_OPCODE;
@@ -1223,8 +1239,9 @@ RECURSE:
 
       BEGIN_OPCODE(CHAR) : stack.currentFrame->length = 1;
       stack.currentFrame->ecode++;
-      GETUTF8CHARLEN(stack.currentFrame->fc, stack.currentFrame->ecode,
-                     stack.currentFrame->length);
+      getUTF8CharAndIncrementLength(stack.currentFrame->fc,
+                                    stack.currentFrame->ecode,
+                                    stack.currentFrame->length);
       {
         int dc;
         stack.currentFrame->ecode += stack.currentFrame->length;
@@ -1233,7 +1250,7 @@ RECURSE:
             RRETURN_NO_MATCH;
           case 1:
             dc = *stack.currentFrame->eptr++;
-            if (IS_LEADING_SURROGATE(dc))
+            if (isLeadingSurrogate(dc))
               RRETURN_NO_MATCH;
             break;
           default:
@@ -1248,8 +1265,9 @@ RECURSE:
 
       BEGIN_OPCODE(CHARNC) : stack.currentFrame->length = 1;
       stack.currentFrame->ecode++;
-      GETUTF8CHARLEN(stack.currentFrame->fc, stack.currentFrame->ecode,
-                     stack.currentFrame->length);
+      getUTF8CharAndIncrementLength(stack.currentFrame->fc,
+                                    stack.currentFrame->ecode,
+                                    stack.currentFrame->length);
 
       if (md->end_subject - stack.currentFrame->eptr == 0)
         RRETURN_NO_MATCH;
@@ -1258,7 +1276,7 @@ RECURSE:
         int dc;
         if (md->end_subject - stack.currentFrame->eptr == 1) {
           dc = *stack.currentFrame->eptr++;
-          if (IS_LEADING_SURROGATE(dc))
+          if (isLeadingSurrogate(dc))
             RRETURN_NO_MATCH;
         } else
           GETCHARINC(dc, stack.currentFrame->eptr);
@@ -1327,8 +1345,9 @@ RECURSE:
     REPEATCHAR:
 
       stack.currentFrame->length = 1;
-      GETUTF8CHARLEN(stack.currentFrame->fc, stack.currentFrame->ecode,
-                     stack.currentFrame->length);
+      getUTF8CharAndIncrementLength(stack.currentFrame->fc,
+                                    stack.currentFrame->ecode,
+                                    stack.currentFrame->length);
       if (min * (stack.currentFrame->fc > 0xFFFF ? 2 : 1) >
           md->end_subject - stack.currentFrame->eptr)
         RRETURN_NO_MATCH;
@@ -1388,7 +1407,7 @@ RECURSE:
 
         for (i = 1; i <= min; i++) {
           int nc;
-          GETCHAR(nc, stack.currentFrame->eptr);
+          getChar(nc, stack.currentFrame->eptr);
           if (nc != stack.currentFrame->fc)
             RRETURN_NO_MATCH;
           stack.currentFrame->eptr += 2;
@@ -1406,7 +1425,7 @@ RECURSE:
             if (stack.currentFrame->fi >= stack.currentFrame->max ||
                 stack.currentFrame->eptr >= md->end_subject)
               RRETURN;
-            GETCHAR(nc, stack.currentFrame->eptr);
+            getChar(nc, stack.currentFrame->eptr);
             if (*stack.currentFrame->eptr != stack.currentFrame->fc)
               RRETURN;
             stack.currentFrame->eptr += 2;
@@ -1418,7 +1437,7 @@ RECURSE:
             int nc;
             if (stack.currentFrame->eptr > md->end_subject - 2)
               break;
-            GETCHAR(nc, stack.currentFrame->eptr);
+            getChar(nc, stack.currentFrame->eptr);
             if (*stack.currentFrame->eptr != stack.currentFrame->fc)
               break;
             stack.currentFrame->eptr += 2;
@@ -1512,7 +1531,7 @@ RECURSE:
           stack.currentFrame->fc = md->lcc[stack.currentFrame->fc];
 
         {
-          register int d;
+          int d;
           for (i = 1; i <= min; i++) {
             GETCHARINC(d, stack.currentFrame->eptr);
             if (d < 128)
@@ -1526,7 +1545,7 @@ RECURSE:
           NEXT_OPCODE;
 
         if (minimize) {
-          register int d;
+          int d;
           for (stack.currentFrame->fi = min;; stack.currentFrame->fi++) {
             RMATCH(38, stack.currentFrame->ecode, stack.currentFrame->eptrb, 0);
             if (is_match)
@@ -1548,7 +1567,7 @@ RECURSE:
           stack.currentFrame->pp = stack.currentFrame->eptr;
 
           {
-            register int d;
+            int d;
             for (i = min; i < stack.currentFrame->max; i++) {
               int len = 1;
               if (stack.currentFrame->eptr >= md->end_subject)
@@ -1580,7 +1599,7 @@ RECURSE:
 
       else {
         {
-          register int d;
+          int d;
           for (i = 1; i <= min; i++) {
             GETCHARINC(d, stack.currentFrame->eptr);
             if (stack.currentFrame->fc == d)
@@ -1592,7 +1611,7 @@ RECURSE:
           NEXT_OPCODE;
 
         if (minimize) {
-          register int d;
+          int d;
           for (stack.currentFrame->fi = min;; stack.currentFrame->fi++) {
             RMATCH(42, stack.currentFrame->ecode, stack.currentFrame->eptrb, 0);
             if (is_match)
@@ -1612,7 +1631,7 @@ RECURSE:
           stack.currentFrame->pp = stack.currentFrame->eptr;
 
           {
-            register int d;
+            int d;
             for (i = min; i < stack.currentFrame->max; i++) {
               int len = 1;
               if (stack.currentFrame->eptr >= md->end_subject)
@@ -1697,7 +1716,7 @@ RECURSE:
                 RRETURN_NO_MATCH;
               ++stack.currentFrame->eptr;
               while (stack.currentFrame->eptr < md->end_subject &&
-                     ISMIDCHAR(*stack.currentFrame->eptr))
+                     isTrailingSurrogate(*stack.currentFrame->eptr))
                 stack.currentFrame->eptr++;
             }
             break;
@@ -1728,7 +1747,7 @@ RECURSE:
                    (md->ctypes[*stack.currentFrame->eptr] & ctype_space) != 0))
                 RRETURN_NO_MATCH;
               while (++stack.currentFrame->eptr < md->end_subject &&
-                     ISMIDCHAR(*stack.currentFrame->eptr)) {
+                     isTrailingSurrogate(*stack.currentFrame->eptr)) {
               }
             }
             break;
@@ -1750,7 +1769,7 @@ RECURSE:
                    (md->ctypes[*stack.currentFrame->eptr] & ctype_word) != 0))
                 RRETURN_NO_MATCH;
               while (++stack.currentFrame->eptr < md->end_subject &&
-                     ISMIDCHAR(*stack.currentFrame->eptr)) {
+                     isTrailingSurrogate(*stack.currentFrame->eptr)) {
               }
             }
             break;
@@ -2272,13 +2291,14 @@ int jsRegExpExecute(const JSRegExp* re,
 
   USPTR start_match = (USPTR)subject + start_offset;
   USPTR req_byte_ptr = start_match - 1;
+  bool startline = re->options & PCRE_STARTLINE;
 
   do {
     USPTR save_end_subject = end_subject;
 
     /* Reset the maximum number of extractions we might see. */
 
-    if (match_block.offset_vector != NULL) {
+    if (match_block.offset_vector) {
       int* iptr = match_block.offset_vector;
       int* iend = iptr + resetcount;
       while (iptr < iend)
@@ -2313,7 +2333,7 @@ int jsRegExpExecute(const JSRegExp* re,
 
     /* Or to just after \n for a multiline match if possible */
 
-    else if (re->options & PCRE_STARTLINE) {
+    else if (startline) {
       if (start_match > match_block.start_subject + start_offset) {
         while (start_match < end_subject && !isNewline(start_match[-1]))
           start_match++;
@@ -2411,7 +2431,7 @@ int jsRegExpExecute(const JSRegExp* re,
 
     if (returnCode == MATCH_NOMATCH) {
       start_match++;
-      while (start_match < end_subject && ISMIDCHAR(*start_match))
+      while (start_match < end_subject && isTrailingSurrogate(*start_match))
         start_match++;
       continue;
     }

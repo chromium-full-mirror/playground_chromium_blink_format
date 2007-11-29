@@ -486,15 +486,15 @@ Returns:   the fixed length, or -1 if there is no fixed length,
 static int find_fixedlength(uschar* code, int options) {
   int length = -1;
 
-  register int branchlength = 0;
-  register uschar* cc = code + 1 + LINK_SIZE;
+  int branchlength = 0;
+  uschar* cc = code + 1 + LINK_SIZE;
 
   /* Scan along the opcodes for this branch. If we get to the end of the
   branch, check the length against that of the other branches. */
 
   for (;;) {
     int d;
-    register int op = *cc;
+    int op = *cc;
     if (op >= OP_BRA)
       op = OP_BRA;
 
@@ -652,7 +652,7 @@ Returns:      true if what is matched could be empty
 */
 
 static BOOL could_be_empty_branch(const uschar* code, const uschar* endcode) {
-  register int c;
+  int c;
   for (code = first_significant_code(code + 1 + LINK_SIZE, true);
        code < endcode;
        code = first_significant_code(code + OP_lengths[c], true)) {
@@ -870,8 +870,8 @@ static BOOL compile_branch(int options,
   int zeroreqbyte, zerofirstbyte;
   int req_caseopt, reqvary, tempreqvary;
   int after_manual_callout = 0;
-  register int c;
-  register uschar* code = *codeptr;
+  int c;
+  uschar* code = *codeptr;
   uschar* tempcode;
   BOOL groupsetfirstbyte = false;
   const pcre_uchar* ptr = *ptrptr;
@@ -1057,7 +1057,7 @@ static BOOL compile_branch(int options,
               c = '\b'; /* \b is backslash in a class */
 
             if (c < 0) {
-              register const uschar* cbits = cd->cbits;
+              const uschar* cbits = cd->cbits;
               class_charcount += 2; /* Greater than 1 is what matters */
               switch (-c) {
                 case ESC_d:
@@ -1631,7 +1631,7 @@ static BOOL compile_branch(int options,
         cases. */
 
         else if (*previous >= OP_BRA || *previous == OP_ONCE) {
-          register int i;
+          int i;
           int ketoffset = 0;
           int len = code - previous;
           uschar* bralink = NULL;
@@ -1646,7 +1646,7 @@ static BOOL compile_branch(int options,
           pointer. */
 
           if (repeat_max == -1) {
-            register uschar* ket = previous;
+            uschar* ket = previous;
             do
               ket += GET(ket, 1);
             while (*ket != OP_KET);
@@ -1857,8 +1857,7 @@ static BOOL compile_branch(int options,
 
         /* Process nested bracketed re. Assertions may not be repeated, but
         other
-        kinds can be. We copy code into a non-register variable in order to be
-        able
+        kinds can be. We copy code into a non-variable in order to be able
         to pass its address because some compilers complain otherwise. Pass in a
         new setting for the ims options if they have changed. */
 
@@ -2266,13 +2265,13 @@ Arguments:
 Returns:     true or false
 */
 
-static BOOL is_anchored(register const uschar* code,
+static BOOL is_anchored(const uschar* code,
                         int options,
                         unsigned int bracket_map,
                         unsigned int backref_map) {
   do {
     const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, false);
-    register int op = *scode;
+    int op = *scode;
 
     /* Capturing brackets */
 
@@ -2328,7 +2327,7 @@ static BOOL is_startline(const uschar* code,
                          unsigned int backref_map) {
   do {
     const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, false);
-    register int op = *scode;
+    int op = *scode;
 
     /* Capturing brackets */
 
@@ -2392,11 +2391,11 @@ Returns:     -1 or the fixed first char
 static int find_firstassertedchar(const uschar* code,
                                   int options,
                                   BOOL inassert) {
-  register int c = -1;
+  int c = -1;
   do {
     int d;
     const uschar* scode = first_significant_code(code + 1 + LINK_SIZE, true);
-    register int op = *scode;
+    int op = *scode;
 
     if (op >= OP_BRA)
       op = OP_BRA;
@@ -2982,8 +2981,8 @@ static int calculateCompiledPatternLengthAndFlags(
         /* In UTF-8 mode, check for additional bytes. */
 
         if (c > 127) {
-          if (IS_LEADING_SURROGATE(c)) {
-            c = DECODE_SURROGATE_PAIR(c, ptr < patternEnd ? *ptr : 0);
+          if (isLeadingSurrogate(c)) {
+            c = decodeSurrogatePair(c, ptr < patternEnd ? *ptr : 0);
             ++ptr;
           }
 
@@ -3225,7 +3224,7 @@ JSRegExp* jsRegExpCompile(const pcre_char* pattern,
 
   if (numSubpatterns)
     *numSubpatterns = re->top_bracket;
-  return static_cast<JSRegExp*>(re);
+  return re;
 }
 
 void jsRegExpFree(JSRegExp* re) {

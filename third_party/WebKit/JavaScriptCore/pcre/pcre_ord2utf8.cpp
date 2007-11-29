@@ -57,12 +57,12 @@ Returns:     number of characters placed in the buffer
 */
 
 int _pcre_ord2utf8(int cvalue, uschar* buffer) {
-  register int i, j;
+  int i;
   for (i = 0; i < _pcre_utf8_table1_size; i++)
     if (cvalue <= _pcre_utf8_table1[i])
       break;
   buffer += i;
-  for (j = i; j > 0; j--) {
+  for (int j = i; j > 0; j--) {
     *buffer-- = 0x80 | (cvalue & 0x3f);
     cvalue >>= 6;
   }
