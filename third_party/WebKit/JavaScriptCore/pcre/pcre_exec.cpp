@@ -7,6 +7,7 @@ needed by JavaScriptCore and the rest of WebKit.
                  Originally written by Philip Hazel
            Copyright (c) 1997-2006 University of Cambridge
     Copyright (C) 2002, 2004, 2006, 2007 Apple Inc. All rights reserved.
+    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -120,8 +121,6 @@ struct MatchData {
   bool ignoreCase;
 };
 
-#define match_isgroup true /* Set if start of bracketed group */
-
 /* Non-error returns from the match() function. Error returns are externally
 defined PCRE_ERROR_xxx codes, which are all negative. */
 
@@ -146,8 +145,6 @@ Arguments:
   length      number to print
   is_subject  true if printing from within md.start_subject
   md          pointer to matching data block, if is_subject is true
-
-Returns:     nothing
 */
 
 static void pchars(const UChar* p,
@@ -226,20 +223,6 @@ static bool match_ref(int offset,
   return true;
 }
 
-/***************************************************************************
-****************************************************************************
-                   RECURSION IN THE match() FUNCTION
-
-The original match() function was highly recursive. The current version
-still has the remnants of the original in that recursive processing of the
-regular expression is triggered by invoking a macro named RMATCH. This is
-no longer really much like a recursive call to match() itself.
-****************************************************************************
-***************************************************************************/
-
-/* These versions of the macros use the stack, as normal. There are debugging
-versions and production versions. */
-
 #ifndef USE_COMPUTED_GOTO_FOR_MATCH_RECURSION
 
 /* Use numbered labels and switch statement at the bottom of the match function.
@@ -262,16 +245,28 @@ a bit more code and notice if we use conflicting numbers.*/
 
 #endif
 
-#define RMATCH(num, ra, rb, rc)                              \
-  {                                                          \
-    stack.pushNewFrame((ra), (rb), RMATCH_WHERE(num));       \
-    is_group_start = (rc);                                   \
-    if (stack.size >= MATCH_LIMIT_RECURSION)                 \
-      return matchError(JSRegExpErrorRecursionLimit, stack); \
-    DPRINTF(("restarting from line %d\n", __LINE__));        \
-    goto RECURSE;                                            \
-    RRETURN_##num : stack.popCurrentFrame();                 \
-    DPRINTF(("did a goto back to line %d\n", __LINE__));     \
+#define CHECK_RECURSION_LIMIT              \
+  if (stack.size >= MATCH_LIMIT_RECURSION) \
+    return matchError(JSRegExpErrorRecursionLimit, stack);
+
+#define RECURSE_WITH_RETURN_NUMBER(num) \
+  CHECK_RECURSION_LIMIT                 \
+  goto RECURSE;                         \
+  RRETURN_##num:
+
+#define RECURSIVE_MATCH(num, ra, rb)                   \
+  {                                                    \
+    stack.pushNewFrame((ra), (rb), RMATCH_WHERE(num)); \
+    RECURSE_WITH_RETURN_NUMBER(num)                    \
+    stack.popCurrentFrame();                           \
+  }
+
+#define RECURSIVE_MATCH_STARTNG_NEW_GROUP(num, ra, rb) \
+  {                                                    \
+    stack.pushNewFrame((ra), (rb), RMATCH_WHERE(num)); \
+    startNewGroup(stack.currentFrame);                 \
+    RECURSE_WITH_RETURN_NUMBER(num)                    \
+    stack.popCurrentFrame();                           \
   }
 
 #define RRETURN goto RRETURN_LABEL
@@ -389,6 +384,16 @@ static inline void getUTF8CharAndIncrementLength(int& c,
   }
 }
 
+static inline void startNewGroup(MatchFrame* currentFrame) {
+  /* At the start of a bracketed group, add the current subject pointer to the
+   stack of such pointers, to be re-instated at the end of the group when we hit
+   the closing ket. When match() is called in other circumstances, we don't add
+   to
+   this stack. */
+
+  currentFrame->locals.subpatternStart = currentFrame->args.subpatternStart;
+}
+
 static int match(UChar* eptr,
                  const uschar* ecode,
                  int offset_top,
@@ -399,7 +404,6 @@ static int match(UChar* eptr,
 
   bool cur_is_word;
   bool prev_is_word;
-  bool is_group_start = true;
   int min;
   bool minimize =
       false; /* Initialization not really needed, but some compilers think so.
@@ -432,28 +436,11 @@ static int match(UChar* eptr,
   stack.currentFrame->args.ecode = ecode;
   stack.currentFrame->args.offset_top = offset_top;
   stack.currentFrame->args.subpatternStart = 0;
+  startNewGroup(stack.currentFrame);
 
 /* This is where control jumps back to to effect "recursion" */
 
 RECURSE:
-
-  /* OK, now we can get on with the real code of the function. Recursive calls
-   are specified by the macro RMATCH and RRETURN is used to return. When
-   NO_RECURSE is *not* defined, these just turn into a recursive call to match()
-   and a "return", respectively (possibly with some debugging if DEBUG is
-   defined). However, RMATCH isn't like a function call because it's quite a
-   complicated macro. It has to be used in one particular way. This shouldn't,
-   however, impact performance when true recursion is being used. */
-
-  /* At the start of a bracketed group, add the current subject pointer to the
-   stack of such pointers, to be re-instated at the end of the group when we hit
-   the closing ket. When match() is called in other circumstances, we don't add
-   to
-   this stack. */
-
-  if (is_group_start)
-    stack.currentFrame->locals.subpatternStart =
-        stack.currentFrame->args.subpatternStart;
 
 /* Now start processing the operations. */
 
@@ -473,7 +460,7 @@ RECURSE:
 #ifdef USE_COMPUTED_GOTO_FOR_MATCH_OPCODE_LOOP
     NEXT_OPCODE;
 #else
-    switch (*stack.currentFrame->args.ecode)
+  switch (*stack.currentFrame->args.ecode)
 #endif
     {
       /* Non-capturing bracket: optimized */
@@ -481,8 +468,9 @@ RECURSE:
       BEGIN_OPCODE(BRA)
           : NON_CAPTURING_BRACKET : DPRINTF(("start bracket 0\n"));
       do {
-        RMATCH(2, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            2, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
         stack.currentFrame->args.ecode +=
@@ -515,8 +503,8 @@ RECURSE:
        this level is identical to the lookahead case. */
 
       BEGIN_OPCODE(ASSERT) : do {
-        RMATCH(6, stack.currentFrame->args.ecode + 1 + LINK_SIZE, NULL,
-               match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            6, stack.currentFrame->args.ecode + 1 + LINK_SIZE, NULL);
         if (is_match)
           break;
         stack.currentFrame->args.ecode +=
@@ -538,8 +526,8 @@ RECURSE:
       /* Negative assertion: all branches must fail to match */
 
       BEGIN_OPCODE(ASSERT_NOT) : do {
-        RMATCH(7, stack.currentFrame->args.ecode + 1 + LINK_SIZE, NULL,
-               match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            7, stack.currentFrame->args.ecode + 1 + LINK_SIZE, NULL);
         if (is_match)
           RRETURN_NO_MATCH;
         stack.currentFrame->args.ecode +=
@@ -564,8 +552,9 @@ RECURSE:
       stack.currentFrame->locals.saved_eptr = stack.currentFrame->args.eptr;
 
       do {
-        RMATCH(9, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            9, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           break;
         stack.currentFrame->args.ecode +=
@@ -605,21 +594,23 @@ RECURSE:
        opcode. */
 
       if (*stack.currentFrame->args.ecode == OP_KETRMIN) {
-        RMATCH(10, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.subpatternStart, 0);
+        RECURSIVE_MATCH(10, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
+                        stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
-        RMATCH(11, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            11, stack.currentFrame->locals.prev,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
       } else { /* OP_KETRMAX */
-        RMATCH(12, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            12, stack.currentFrame->locals.prev,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
-        RMATCH(13, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.subpatternStart, 0);
+        RECURSIVE_MATCH(13, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
+                        stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
       }
@@ -642,8 +633,9 @@ RECURSE:
 
       BEGIN_OPCODE(BRAZERO) : {
         stack.currentFrame->locals.next = stack.currentFrame->args.ecode + 1;
-        RMATCH(14, stack.currentFrame->locals.next,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            14, stack.currentFrame->locals.next,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
         moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->locals.next);
@@ -655,8 +647,9 @@ RECURSE:
       BEGIN_OPCODE(BRAMINZERO) : {
         stack.currentFrame->locals.next = stack.currentFrame->args.ecode + 1;
         moveOpcodePtrPastAnyAlternateBranches(stack.currentFrame->locals.next);
-        RMATCH(15, stack.currentFrame->locals.next + 1 + LINK_SIZE,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            15, stack.currentFrame->locals.next + 1 + LINK_SIZE,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
         stack.currentFrame->args.ecode++;
@@ -748,21 +741,23 @@ RECURSE:
        preceding bracket, in the appropriate order. */
 
       if (*stack.currentFrame->args.ecode == OP_KETRMIN) {
-        RMATCH(16, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.subpatternStart, 0);
+        RECURSIVE_MATCH(16, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
+                        stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
-        RMATCH(17, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            17, stack.currentFrame->locals.prev,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
       } else { /* OP_KETRMAX */
-        RMATCH(18, stack.currentFrame->locals.prev,
-               stack.currentFrame->args.subpatternStart, match_isgroup);
+        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+            18, stack.currentFrame->locals.prev,
+            stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
-        RMATCH(19, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-               stack.currentFrame->args.subpatternStart, 0);
+        RECURSIVE_MATCH(19, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
+                        stack.currentFrame->args.subpatternStart);
         if (is_match)
           RRETURN;
       }
@@ -981,8 +976,8 @@ RECURSE:
       if (minimize) {
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
-          RMATCH(20, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(20, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1007,8 +1002,8 @@ RECURSE:
           stack.currentFrame->args.eptr += stack.currentFrame->locals.length;
         }
         while (stack.currentFrame->args.eptr >= stack.currentFrame->locals.pp) {
-          RMATCH(21, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(21, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           stack.currentFrame->args.eptr -= stack.currentFrame->locals.length;
@@ -1094,8 +1089,8 @@ RECURSE:
       if (minimize) {
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
-          RMATCH(22, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(22, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1131,8 +1126,8 @@ RECURSE:
           stack.currentFrame->args.eptr += length;
         }
         for (;;) {
-          RMATCH(24, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(24, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->args.eptr-- == stack.currentFrame->locals.pp)
@@ -1207,8 +1202,8 @@ RECURSE:
       if (minimize) {
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
-          RMATCH(26, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(26, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1235,8 +1230,8 @@ RECURSE:
           stack.currentFrame->args.eptr += length;
         }
         for (;;) {
-          RMATCH(27, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(27, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->args.eptr-- == stack.currentFrame->locals.pp)
@@ -1392,8 +1387,8 @@ RECURSE:
           stack.currentFrame->locals.repeat_othercase = othercase;
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
-            RMATCH(28, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.subpatternStart, 0);
+            RECURSIVE_MATCH(28, stack.currentFrame->args.ecode,
+                            stack.currentFrame->args.subpatternStart);
             if (is_match)
               RRETURN;
             if (stack.currentFrame->locals.fi >=
@@ -1421,8 +1416,8 @@ RECURSE:
           }
           while (stack.currentFrame->args.eptr >=
                  stack.currentFrame->locals.pp) {
-            RMATCH(29, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.subpatternStart, 0);
+            RECURSIVE_MATCH(29, stack.currentFrame->args.ecode,
+                            stack.currentFrame->args.subpatternStart);
             if (is_match)
               RRETURN;
             --stack.currentFrame->args.eptr;
@@ -1448,8 +1443,8 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             int nc;
-            RMATCH(30, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.subpatternStart, 0);
+            RECURSIVE_MATCH(30, stack.currentFrame->args.ecode,
+                            stack.currentFrame->args.subpatternStart);
             if (is_match)
               RRETURN;
             if (stack.currentFrame->locals.fi >=
@@ -1475,8 +1470,8 @@ RECURSE:
           }
           while (stack.currentFrame->args.eptr >=
                  stack.currentFrame->locals.pp) {
-            RMATCH(31, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.subpatternStart, 0);
+            RECURSIVE_MATCH(31, stack.currentFrame->args.ecode,
+                            stack.currentFrame->args.subpatternStart);
             if (is_match)
               RRETURN;
             stack.currentFrame->args.eptr -= 2;
@@ -1586,8 +1581,8 @@ RECURSE:
           int d;
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
-            RMATCH(38, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.subpatternStart, 0);
+            RECURSIVE_MATCH(38, stack.currentFrame->args.ecode,
+                            stack.currentFrame->args.subpatternStart);
             if (is_match)
               RRETURN;
             getCharAndAdvance(d, stack.currentFrame->args.eptr);
@@ -1621,8 +1616,8 @@ RECURSE:
               stack.currentFrame->args.eptr += length;
             }
             for (;;) {
-              RMATCH(40, stack.currentFrame->args.ecode,
-                     stack.currentFrame->args.subpatternStart, 0);
+              RECURSIVE_MATCH(40, stack.currentFrame->args.ecode,
+                              stack.currentFrame->args.subpatternStart);
               if (is_match)
                 RRETURN;
               if (stack.currentFrame->args.eptr-- ==
@@ -1656,8 +1651,8 @@ RECURSE:
           int d;
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
-            RMATCH(42, stack.currentFrame->args.ecode,
-                   stack.currentFrame->args.subpatternStart, 0);
+            RECURSIVE_MATCH(42, stack.currentFrame->args.ecode,
+                            stack.currentFrame->args.subpatternStart);
             if (is_match)
               RRETURN;
             getCharAndAdvance(d, stack.currentFrame->args.eptr);
@@ -1687,8 +1682,8 @@ RECURSE:
               stack.currentFrame->args.eptr += length;
             }
             for (;;) {
-              RMATCH(44, stack.currentFrame->args.ecode,
-                     stack.currentFrame->args.subpatternStart, 0);
+              RECURSIVE_MATCH(44, stack.currentFrame->args.ecode,
+                              stack.currentFrame->args.subpatternStart);
               if (is_match)
                 RRETURN;
               if (stack.currentFrame->args.eptr-- ==
@@ -1846,8 +1841,8 @@ RECURSE:
       if (minimize) {
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
-          RMATCH(48, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(48, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -2020,8 +2015,8 @@ RECURSE:
          */
 
         for (;;) {
-          RMATCH(52, stack.currentFrame->args.ecode,
-                 stack.currentFrame->args.subpatternStart, 0);
+          RECURSIVE_MATCH(52, stack.currentFrame->args.ecode,
+                          stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           if (stack.currentFrame->args.eptr-- == stack.currentFrame->locals.pp)
@@ -2047,7 +2042,7 @@ RECURSE:
 #ifdef USE_COMPUTED_GOTO_FOR_MATCH_OPCODE_LOOP
     CAPTURING_BRACKET:
 #else
-      default:
+    default:
 #endif
       /* Opening capturing bracket. If there is space in the offset vector, save
        the current subject position in the working slot at the top of the
@@ -2105,8 +2100,9 @@ RECURSE:
             stack.currentFrame->args.eptr - md.start_subject;
 
         do {
-          RMATCH(1, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
-                 stack.currentFrame->args.subpatternStart, match_isgroup);
+          RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+              1, stack.currentFrame->args.ecode + 1 + LINK_SIZE,
+              stack.currentFrame->args.subpatternStart);
           if (is_match)
             RRETURN;
           stack.currentFrame->args.ecode +=
