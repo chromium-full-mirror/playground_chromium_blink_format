@@ -284,11 +284,11 @@ a bit more code and notice if we use conflicting numbers.*/
 
 /* On entry instructionPtr points to the first opcode, and subjectPtr to the
 first character
-in the subject string, while subjectPtrb holds the value of subjectPtr at the
+in the subject string, while substringStart holds the value of subjectPtr at the
 start of the
 last bracketed group - used for breaking infinite loops matching zero-length
 strings. This function is called recursively in many circumstances. Whenever it
-returns a negative (error) response, the outer incarnation must also return the
+returns a negative (error) response, the outer match() call must also return the
 same response.
 
 Arguments:
@@ -315,10 +315,6 @@ struct MatchStack {
     ASSERT((sizeof(frames) / sizeof(frames[0])) == FRAMES_ON_STACK);
   }
 
-  /* The value 16 here is large enough that most regular expressions don't
-   require
-   any calls to pcre_stack_malloc, yet the amount of stack used for the array is
-   modest enough that we don't run out of stack. */
   MatchFrame frames[FRAMES_ON_STACK];
   MatchFrame* framesEnd;
   MatchFrame* currentFrame;
@@ -429,11 +425,13 @@ static int match(UChar* subjectPtr,
 #endif
 
 #ifdef USE_COMPUTED_GOTO_FOR_MATCH_RECURSION
+  // Shark shows this as a hot line
+  // Using a static const here makes this line disappear, but makes later access
+  // hotter (not sure why)
   stack.currentFrame->returnLocation = &&RETURN;
 #else
   stack.currentFrame->returnLocation = 0;
 #endif
-
   stack.currentFrame->args.subjectPtr = subjectPtr;
   stack.currentFrame->args.instructionPtr = instructionPtr;
   stack.currentFrame->args.offset_top = offset_top;
