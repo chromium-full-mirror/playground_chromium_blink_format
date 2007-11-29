@@ -865,9 +865,7 @@ static BOOL compile_branch(int options,
   int repeat_type, op_type;
   int repeat_min = 0, repeat_max = 0; /* To please picky compilers */
   int bravalue = 0;
-  int firstbyte, reqbyte;
-  int zeroreqbyte, zerofirstbyte;
-  int req_caseopt, reqvary, tempreqvary;
+  int reqvary, tempreqvary;
   int after_manual_callout = 0;
   int c;
   uschar* code = *codeptr;
@@ -884,25 +882,30 @@ static BOOL compile_branch(int options,
   uschar utf8_char[6];
 
   /* Initialize no first byte, no required byte. REQ_UNSET means "no char
-  matching encountered yet". It gets changed to REQ_NONE if we hit something
-  that
-  matches a non-fixed char first char; reqbyte just remains unset if we never
-  find one.
+   matching encountered yet". It gets changed to REQ_NONE if we hit something
+   that
+   matches a non-fixed char first char; reqbyte just remains unset if we never
+   find one.
 
-  When we hit a repeat whose minimum is zero, we may have to adjust these values
-  to take the zero repeat into account. This is implemented by setting them to
-  zerofirstbyte and zeroreqbyte when such a repeat is encountered. The
-  individual
-  item types that can be repeated set these backoff variables appropriately. */
+   When we hit a repeat whose minimum is zero, we may have to adjust these
+   values
+   to take the zero repeat into account. This is implemented by setting them to
+   zerofirstbyte and zeroreqbyte when such a repeat is encountered. The
+   individual
+   item types that can be repeated set these backoff variables appropriately. */
 
-  firstbyte = reqbyte = zerofirstbyte = zeroreqbyte = REQ_UNSET;
+  int firstbyte = REQ_UNSET;
+  int reqbyte = REQ_UNSET;
+  int zeroreqbyte = REQ_UNSET;
+  int zerofirstbyte = REQ_UNSET;
 
   /* The variable req_caseopt contains either the REQ_CASELESS value or zero,
-  according to the current setting of the caseless flag. REQ_CASELESS is a bit
-  value > 255. It is added into the firstbyte or reqbyte variables to record the
-  case status of the value. This is used only for ASCII characters. */
+   according to the current setting of the caseless flag. REQ_CASELESS is a bit
+   value > 255. It is added into the firstbyte or reqbyte variables to record
+   the
+   case status of the value. This is used only for ASCII characters. */
 
-  req_caseopt = ((options & PCRE_CASELESS) != 0) ? REQ_CASELESS : 0;
+  int req_caseopt = ((options & PCRE_CASELESS) != 0) ? REQ_CASELESS : 0;
 
   /* Switch on next character until the end of the branch */
 
@@ -925,13 +928,12 @@ static BOOL compile_branch(int options,
     c = ptr < patternEnd ? *ptr : 0;
 
     /* Fill in length of a previous callout, except when the next thing is
-    a quantifier. */
+     a quantifier. */
 
     is_quantifier = c == '*' || c == '+' || c == '?' ||
                     (c == '{' && is_counted_repeat(ptr + 1, patternEnd));
 
-    if (!is_quantifier && previous_callout != NULL &&
-        after_manual_callout-- <= 0) {
+    if (!is_quantifier && previous_callout && after_manual_callout-- <= 0) {
       complete_callout(previous_callout, ptr, cd);
       previous_callout = NULL;
     }
@@ -952,7 +954,7 @@ static BOOL compile_branch(int options,
         return true;
 
       /* Handle single-character metacharacters. In multiline mode, ^ disables
-      the setting of any following char as a first character. */
+       the setting of any following char as a first character. */
 
       case '^':
         if ((options & PCRE_MULTILINE) != 0) {
@@ -969,7 +971,7 @@ static BOOL compile_branch(int options,
         break;
 
       /* There can never be a first char if '.' is first, whatever happens about
-      repeats. The value of reqbyte doesn't change either. */
+       repeats. The value of reqbyte doesn't change either. */
 
       case '.':
         if (firstbyte == REQ_UNSET)
@@ -981,40 +983,41 @@ static BOOL compile_branch(int options,
         break;
 
       /* Character classes. If the included characters are all < 256, we build a
-      32-byte bitmap of the permitted characters, except in the special case
-      where there is only one such character. For negated classes, we build the
-      map as usual, then invert it at the end. However, we use a different
-      opcode
-      so that data characters > 255 can be handled correctly.
+       32-byte bitmap of the permitted characters, except in the special case
+       where there is only one such character. For negated classes, we build the
+       map as usual, then invert it at the end. However, we use a different
+       opcode
+       so that data characters > 255 can be handled correctly.
 
-      If the class contains characters outside the 0-255 range, a different
-      opcode is compiled. It may optionally have a bit map for characters < 256,
-      but those above are are explicitly listed afterwards. A flag byte tells
-      whether the bitmap is present, and whether this is a negated class or not.
-      */
+       If the class contains characters outside the 0-255 range, a different
+       opcode is compiled. It may optionally have a bit map for characters <
+       256,
+       but those above are are explicitly listed afterwards. A flag byte tells
+       whether the bitmap is present, and whether this is a negated class or
+       not.
+       */
 
       case '[':
         previous = code;
         should_flip_negation = false;
 
         /* PCRE supports POSIX class stuff inside a class. Perl gives an error
-        if
-        they are encountered at the top level, so we'll do that too. */
+         if
+         they are encountered at the top level, so we'll do that too. */
 
         /* If the first character is '^', set the negation flag and skip it. */
 
         if (ptr[1] == '^') {
           negate_class = true;
           ++ptr;
-        } else {
+        } else
           negate_class = false;
-        }
 
         /* Keep a count of chars with values < 256 so that we can optimize the
-        case
-        of just a single character (as long as it's < 256). For higher valued
-        UTF-8
-        characters, we don't yet do any optimization. */
+         case
+         of just a single character (as long as it's < 256). For higher valued
+         UTF-8
+         characters, we don't yet do any optimization. */
 
         class_charcount = 0;
         class_lastchar = -1;
@@ -1023,18 +1026,18 @@ static BOOL compile_branch(int options,
         class_utf8data = code + LINK_SIZE + 34; /* For UTF-8 items */
 
         /* Initialize the 32-char bit map to all zeros. We have to build the
-        map in a temporary bit of store, in case the class contains only 1
-        character (< 256), because in that case the compiled code doesn't use
-        the
-        bit map. */
+         map in a temporary bit of store, in case the class contains only 1
+         character (< 256), because in that case the compiled code doesn't use
+         the
+         bit map. */
 
         memset(classbits, 0, 32 * sizeof(uschar));
 
         /* Process characters until ] is reached. The first pass
-        through the regex checked the overall syntax, so we don't need to be
-        very
-        strict here. At the start of the loop, c contains the first byte of the
-        character. */
+         through the regex checked the overall syntax, so we don't need to be
+         very
+         strict here. At the start of the loop, c contains the first byte of the
+         character. */
 
         while ((c = *(++ptr)) != ']') {
           if (c > 127) {             /* Braces are required because the */
@@ -1042,12 +1045,13 @@ static BOOL compile_branch(int options,
           }
 
           /* Backslash may introduce a single character, or it may introduce one
-          of the specials, which just set a flag. Escaped items are checked for
-          validity in the pre-compiling pass. The sequence \b is a special case.
-          Inside a class (and only there) it is treated as backspace. Elsewhere
-          it marks a word boundary. Other escapes have preset maps ready to
-          or into the one we are building. We assume they have more than one
-          character in them, so set class_charcount bigger than one. */
+           of the specials, which just set a flag. Escaped items are checked for
+           validity in the pre-compiling pass. The sequence \b is a special
+           case.
+           Inside a class (and only there) it is treated as backspace. Elsewhere
+           it marks a word boundary. Other escapes have preset maps ready to
+           or into the one we are building. We assume they have more than one
+           character in them, so set class_charcount bigger than one. */
 
           if (c == '\\') {
             c = check_escape(&ptr, patternEnd, errorcodeptr, *brackets, true);
@@ -1093,8 +1097,8 @@ static BOOL compile_branch(int options,
                   continue;
 
                 /* Unrecognized escapes are faulted if PCRE is running in its
-                strict mode. By default, for compatibility with Perl, they are
-                treated as literals. */
+                 strict mode. By default, for compatibility with Perl, they are
+                 treated as literals. */
 
                 default:
                   c = *ptr;             /* The final character */
@@ -1103,13 +1107,13 @@ static BOOL compile_branch(int options,
             }
 
             /* Fall through if we have a single character (c >= 0). This may be
-            > 256 in UTF-8 mode. */
+             > 256 in UTF-8 mode. */
 
           } /* End of backslash handling */
 
           /* A single character may be followed by '-' to form a range. However,
-          Perl does not permit ']' to be the end of the range. A '-' character
-          here is treated as a literal. */
+           Perl does not permit ']' to be the end of the range. A '-' character
+           here is treated as a literal. */
 
           if (ptr[1] == '-' && ptr[2] != ']') {
             int d;
@@ -1118,16 +1122,16 @@ static BOOL compile_branch(int options,
             GETCHARLEN(d, ptr, ptr);
 
             /* The second part of a range can be a single-character escape, but
-            not any of the other escapes. Perl 5.6 treats a hyphen as a literal
-            in such circumstances. */
+             not any of the other escapes. Perl 5.6 treats a hyphen as a literal
+             in such circumstances. */
 
             if (d == '\\') {
               const UChar* oldptr = ptr;
               d = check_escape(&ptr, patternEnd, errorcodeptr, *brackets, true);
 
               /* \b is backslash; \X is literal X; any other special means the
-              '-'
-              was literal */
+               '-'
+               was literal */
 
               if (d < 0) {
                 if (d == -ESC_b)
@@ -1140,24 +1144,25 @@ static BOOL compile_branch(int options,
             }
 
             /* The check that the two values are in the correct order happens in
-            the pre-pass. Optimize one-character ranges */
+             the pre-pass. Optimize one-character ranges */
 
             if (d == c)
               goto LONE_SINGLE_CHARACTER; /* A few lines below */
 
             /* In UTF-8 mode, if the upper limit is > 255, or > 127 for caseless
-            matching, we have to use an XCLASS with extra data items. Caseless
-            matching for characters > 127 is available only if UCP support is
-            available. */
+             matching, we have to use an XCLASS with extra data items. Caseless
+             matching for characters > 127 is available only if UCP support is
+             available. */
 
-            if ((d > 255 || ((options & PCRE_CASELESS) != 0 && d > 127))) {
+            if ((d > 255 || ((options & PCRE_CASELESS) && d > 127))) {
               class_utf8 = true;
 
               /* With UCP support, we can find the other case equivalents of
-              the relevant characters. There may be several ranges. Optimize how
-              they fit with the basic range. */
+               the relevant characters. There may be several ranges. Optimize
+               how
+               they fit with the basic range. */
 
-              if ((options & PCRE_CASELESS) != 0) {
+              if (options & PCRE_CASELESS) {
                 int occ, ocd;
                 int cc = c;
                 int origd = d;
@@ -1176,9 +1181,9 @@ static BOOL compile_branch(int options,
                     continue;
                   }
 
-                  if (occ == ocd) {
+                  if (occ == ocd)
                     *class_utf8data++ = XCL_SINGLE;
-                  } else {
+                  else {
                     *class_utf8data++ = XCL_RANGE;
                     class_utf8data += _pcre_ord2utf8(occ, class_utf8data);
                   }
@@ -1187,29 +1192,29 @@ static BOOL compile_branch(int options,
               }
 
               /* Now record the original range, possibly modified for UCP
-              caseless
-              overlapping ranges. */
+               caseless
+               overlapping ranges. */
 
               *class_utf8data++ = XCL_RANGE;
               class_utf8data += _pcre_ord2utf8(c, class_utf8data);
               class_utf8data += _pcre_ord2utf8(d, class_utf8data);
 
               /* With UCP support, we are done. Without UCP support, there is no
-              caseless matching for UTF-8 characters > 127; we can use the bit
-              map
-              for the smaller ones. */
+               caseless matching for UTF-8 characters > 127; we can use the bit
+               map
+               for the smaller ones. */
 
               continue; /* With next character in the class */
             }
 
             /* We use the bit map for all cases when not in UTF-8 mode; else
-            ranges that lie entirely within 0-127 when there is UCP support;
-            else
-            for partial ranges without UCP support. */
+             ranges that lie entirely within 0-127 when there is UCP support;
+             else
+             for partial ranges without UCP support. */
 
             for (; c <= d; c++) {
               classbits[c / 8] |= (1 << (c & 7));
-              if ((options & PCRE_CASELESS) != 0) {
+              if (options & PCRE_CASELESS) {
                 int uc = cd->fcc[c]; /* flip case */
                 classbits[uc / 8] |= (1 << (uc & 7));
               }
@@ -1221,32 +1226,32 @@ static BOOL compile_branch(int options,
           }
 
         /* Handle a lone single character - we can get here for a normal
-        non-escape char, or after \ that introduces a single character or for an
-        apparent range that isn't. */
+         non-escape char, or after \ that introduces a single character or for
+         an
+         apparent range that isn't. */
 
         LONE_SINGLE_CHARACTER:
 
           /* Handle a character that cannot go in the bit map */
 
-          if ((c > 255 || ((options & PCRE_CASELESS) != 0 && c > 127))) {
+          if ((c > 255 || ((options & PCRE_CASELESS) && c > 127))) {
             class_utf8 = true;
             *class_utf8data++ = XCL_SINGLE;
             class_utf8data += _pcre_ord2utf8(c, class_utf8data);
 
-            if ((options & PCRE_CASELESS) != 0) {
+            if (options & PCRE_CASELESS) {
               int othercase;
               if ((othercase = _pcre_ucp_othercase(c)) >= 0) {
                 *class_utf8data++ = XCL_SINGLE;
                 class_utf8data += _pcre_ord2utf8(othercase, class_utf8data);
               }
             }
-
           } else
 
           /* Handle a single-byte character */
           {
             classbits[c / 8] |= (1 << (c & 7));
-            if ((options & PCRE_CASELESS) != 0) {
+            if (options & PCRE_CASELESS) {
               c = cd->fcc[c]; /* flip case */
               classbits[c / 8] |= (1 << (c & 7));
             }
@@ -1256,22 +1261,22 @@ static BOOL compile_branch(int options,
         }
 
         /* If class_charcount is 1, we saw precisely one character whose value
-        is
-        less than 256. In non-UTF-8 mode we can always optimize. In UTF-8 mode,
-        we
-        can optimize the negative case only if there were no characters >= 128
-        because OP_NOT and the related opcodes like OP_NOTSTAR operate on
-        single-bytes only. This is an historical hangover. Maybe one day we can
-        tidy these opcodes to handle multi-byte characters.
+         is
+         less than 256. In non-UTF-8 mode we can always optimize. In UTF-8 mode,
+         we
+         can optimize the negative case only if there were no characters >= 128
+         because OP_NOT and the related opcodes like OP_NOTSTAR operate on
+         single-bytes only. This is an historical hangover. Maybe one day we can
+         tidy these opcodes to handle multi-byte characters.
 
-        The optimization throws away the bit map. We turn the item into a
-        1-character OP_CHAR[NC] if it's positive, or OP_NOT if it's negative.
-        Note
-        that OP_NOT does not support multibyte characters. In the positive case,
-        it
-        can cause firstbyte to be set. Otherwise, there can be no first char if
-        this item is first, whatever repeat count may follow. In the case of
-        reqbyte, save the previous value for reinstating. */
+         The optimization throws away the bit map. We turn the item into a
+         1-character OP_CHAR[NC] if it's positive, or OP_NOT if it's negative.
+         Note
+         that OP_NOT does not support multibyte characters. In the positive
+         case, it
+         can cause firstbyte to be set. Otherwise, there can be no first char if
+         this item is first, whatever repeat count may follow. In the case of
+         reqbyte, save the previous value for reinstating. */
 
         if (class_charcount == 1 &&
             (!class_utf8 && (!negate_class || class_lastchar < 128))) {
@@ -1289,18 +1294,18 @@ static BOOL compile_branch(int options,
           }
 
           /* For a single, positive character, get the value into c, and
-          then we can handle this with the normal one-character code. */
+           then we can handle this with the normal one-character code. */
 
           c = class_lastchar;
           goto NORMAL_CHAR;
         } /* End of 1-char optimization */
 
         /* The general case - not the one-char optimization. If this is the
-        first
-        thing in the branch, there can be no first char setting, whatever the
-        repeat count. Any reqbyte setting must remain unchanged after any kind
-        of
-        repeat. */
+         first
+         thing in the branch, there can be no first char setting, whatever the
+         repeat count. Any reqbyte setting must remain unchanged after any kind
+         of
+         repeat. */
 
         if (firstbyte == REQ_UNSET)
           firstbyte = REQ_NONE;
@@ -1308,8 +1313,8 @@ static BOOL compile_branch(int options,
         zeroreqbyte = reqbyte;
 
         /* If there are characters with values > 255, we have to compile an
-        extended class, with its own opcode. If there are no characters < 256,
-        we can omit the bitmap. */
+         extended class, with its own opcode. If there are no characters < 256,
+         we can omit the bitmap. */
 
         if (class_utf8 && !should_flip_negation) {
           *class_utf8data++ = XCL_END; /* Marks the end of extra data */
@@ -1318,7 +1323,7 @@ static BOOL compile_branch(int options,
           *code = negate_class ? XCL_NOT : 0;
 
           /* If the map is required, install it, and move on to the end of
-          the extra data */
+           the extra data */
 
           if (class_charcount > 0) {
             *code++ |= XCL_MAP;
@@ -1341,12 +1346,12 @@ static BOOL compile_branch(int options,
         }
 
         /* If there are no characters > 255, negate the 32-byte map if
-        necessary,
-        and copy it into the code vector. If this is the first thing in the
-        branch,
-        there can be no first char setting, whatever the repeat count. Any
-        reqbyte
-        setting must remain unchanged after any kind of repeat. */
+         necessary,
+         and copy it into the code vector. If this is the first thing in the
+         branch,
+         there can be no first char setting, whatever the repeat count. Any
+         reqbyte
+         setting must remain unchanged after any kind of repeat. */
 
         *code++ = (negate_class == should_flip_negation) ? OP_CLASS : OP_NCLASS;
         if (negate_class) {
@@ -1359,7 +1364,7 @@ static BOOL compile_branch(int options,
         break;
 
       /* Various kinds of repeat; '{' is not necessarily a quantifier, but this
-      has been tested above. */
+       has been tested above. */
 
       case '{':
         if (!is_quantifier)
@@ -1385,7 +1390,7 @@ static BOOL compile_branch(int options,
         repeat_max = 1;
 
       REPEAT:
-        if (previous == NULL) {
+        if (!previous) {
           *errorcodeptr = ERR9;
           goto FAILED;
         }
@@ -1402,16 +1407,17 @@ static BOOL compile_branch(int options,
         op_type = 0; /* Default single-char op codes */
 
         /* Save start of previous item, in case we have to move it up to make
-        space
-        for an inserted OP_ONCE for the additional '+' extension. */
+         space
+         for an inserted OP_ONCE for the additional '+' extension. */
 
         tempcode = previous;
 
         /* If the next character is '+', we have a possessive quantifier. This
-        implies greediness, whatever the setting of the PCRE_UNGREEDY option.
-        If the next character is '?' this is a minimizing repeat, by default,
-        but if PCRE_UNGREEDY is set, it works the other way round. We change the
-        repeat type to the non-default. */
+         implies greediness, whatever the setting of the PCRE_UNGREEDY option.
+         If the next character is '?' this is a minimizing repeat, by default,
+         but if PCRE_UNGREEDY is set, it works the other way round. We change
+         the
+         repeat type to the non-default. */
 
         if (ptr + 1 < patternEnd && ptr[1] == '?') {
           repeat_type = 1;
@@ -1420,19 +1426,19 @@ static BOOL compile_branch(int options,
           repeat_type = 0;
 
         /* If previous was a character match, abolish the item and generate a
-        repeat item instead. If a char item has a minumum of more than one,
-        ensure
-        that it is set in reqbyte - it might not be if a sequence such as x{3}
-        is
-        the first thing in a branch because the x will have gone into firstbyte
-        instead.  */
+         repeat item instead. If a char item has a minumum of more than one,
+         ensure
+         that it is set in reqbyte - it might not be if a sequence such as x{3}
+         is
+         the first thing in a branch because the x will have gone into firstbyte
+         instead.  */
 
         if (*previous == OP_CHAR || *previous == OP_CHARNC) {
           /* Deal with UTF-8 characters that take up more than one byte. It's
-          easier to write this out separately than try to macrify it. Use c to
-          hold the length of the character in bytes, plus 0x80 to flag that it's
-          a
-          length rather than a small character. */
+           easier to write this out separately than try to macrify it. Use c to
+           hold the length of the character in bytes, plus 0x80 to flag that
+           it's a
+           length rather than a small character. */
 
           if ((code[-1] & 0x80) != 0) {
             uschar* lastchar = code - 1;
@@ -1460,10 +1466,10 @@ static BOOL compile_branch(int options,
         }
 
         /* If previous was a single negated character ([^a] or similar), we use
-        one of the special opcodes, replacing it. The code is shared with
-        single-
-        character repeats by setting opt_type to add a suitable offset into
-        repeat_type. OP_NOT is currently used only for single-byte chars. */
+         one of the special opcodes, replacing it. The code is shared with
+         single-
+         character repeats by setting opt_type to add a suitable offset into
+         repeat_type. OP_NOT is currently used only for single-byte chars. */
 
         else if (*previous == OP_NOT) {
           op_type = OP_NOTSTAR - OP_STAR; /* Use "not" opcodes */
@@ -1472,9 +1478,10 @@ static BOOL compile_branch(int options,
         }
 
         /* If previous was a character type match (\d or similar), abolish it
-        and
-        create a suitable repeat item. The code is shared with single-character
-        repeats by setting op_type to add a suitable offset into repeat_type. */
+         and
+         create a suitable repeat item. The code is shared with single-character
+         repeats by setting op_type to add a suitable offset into repeat_type.
+         */
 
         else if (*previous <= OP_ANY) {
           uschar* oldcode;
@@ -1489,8 +1496,8 @@ static BOOL compile_branch(int options,
           code = previous; /* Usually overwrite previous item */
 
           /* If the maximum is zero then the minimum must also be zero; Perl
-          allows
-          this case, so we do too - by simply omitting the item altogether. */
+           allows
+           this case, so we do too - by simply omitting the item altogether. */
 
           if (repeat_max == 0)
             goto END_REPEAT;
@@ -1500,8 +1507,8 @@ static BOOL compile_branch(int options,
           repeat_type += op_type;
 
           /* A minimum of zero is handled either as the special case * or ?, or
-          as
-          an UPTO, with the maximum given. */
+           as
+           an UPTO, with the maximum given. */
 
           if (repeat_min == 0) {
             if (repeat_max == -1)
@@ -1515,10 +1522,10 @@ static BOOL compile_branch(int options,
           }
 
           /* A repeat minimum of 1 is optimized into some special cases. If the
-          maximum is unlimited, we use OP_PLUS. Otherwise, the original item it
-          left in place and, if the maximum is greater than 1, we use OP_UPTO
-          with
-          one less than the maximum. */
+           maximum is unlimited, we use OP_PLUS. Otherwise, the original item it
+           left in place and, if the maximum is greater than 1, we use OP_UPTO
+           with
+           one less than the maximum. */
 
           else if (repeat_min == 1) {
             if (repeat_max == -1)
@@ -1533,7 +1540,7 @@ static BOOL compile_branch(int options,
           }
 
           /* The case {n,n} is just an EXACT, while the general case {n,m} is
-          handled as an EXACT followed by an UPTO. */
+           handled as an EXACT followed by an UPTO. */
 
           else {
             *code++ =
@@ -1541,12 +1548,12 @@ static BOOL compile_branch(int options,
             PUT2INC(code, 0, repeat_min);
 
             /* If the maximum is unlimited, insert an OP_STAR. Before doing so,
-            we have to insert the character for the previous code. For a
-            repeated
-            Unicode property match, there are two extra bytes that define the
-            required property. In UTF-8 mode, long characters have their length
-            in
-            c, with the 0x80 bit as a flag. */
+             we have to insert the character for the previous code. For a
+             repeated
+             Unicode property match, there are two extra bytes that define the
+             required property. In UTF-8 mode, long characters have their length
+             in
+             c, with the 0x80 bit as a flag. */
 
             if (repeat_max < 0) {
               if (c >= 128) {
@@ -1563,7 +1570,7 @@ static BOOL compile_branch(int options,
             }
 
             /* Else insert an UPTO if the max is greater than the min, again
-            preceded by the character, for the previously inserted code. */
+             preceded by the character, for the previously inserted code. */
 
             else if (repeat_max != repeat_min) {
               if (c >= 128) {
@@ -1590,8 +1597,8 @@ static BOOL compile_branch(int options,
             *code++ = c;
 
           /* For a repeated Unicode property match, there are two extra bytes
-          that
-          define the required property. */
+           that
+           define the required property. */
 
           if (prop_type >= 0) {
             *code++ = prop_type;
@@ -1600,8 +1607,8 @@ static BOOL compile_branch(int options,
         }
 
         /* If previous was a character class or a back reference, we put the
-        repeat
-        stuff after it, but just skip the item if the repeat was {0,0}. */
+         repeat
+         stuff after it, but just skip the item if the repeat was {0,0}. */
 
         else if (*previous == OP_CLASS || *previous == OP_NCLASS ||
                  *previous == OP_XCLASS || *previous == OP_REF) {
@@ -1626,23 +1633,22 @@ static BOOL compile_branch(int options,
         }
 
         /* If previous was a bracket group, we may have to replicate it in
-        certain
-        cases. */
+         certain
+         cases. */
 
         else if (*previous >= OP_BRA || *previous == OP_ONCE) {
-          int i;
           int ketoffset = 0;
           int len = code - previous;
           uschar* bralink = NULL;
 
           /* If the maximum repeat count is unlimited, find the end of the
-          bracket
-          by scanning through from the start, and compute the offset back to it
-          from the current code pointer. There may be an OP_OPT setting
-          following
-          the final KET, so we can't find the end just by going back from the
-          code
-          pointer. */
+           bracket
+           by scanning through from the start, and compute the offset back to it
+           from the current code pointer. There may be an OP_OPT setting
+           following
+           the final KET, so we can't find the end just by going back from the
+           code
+           pointer. */
 
           if (repeat_max == -1) {
             uschar* ket = previous;
@@ -1653,19 +1659,19 @@ static BOOL compile_branch(int options,
           }
 
           /* The case of a zero minimum is special because of the need to stick
-          OP_BRAZERO in front of it, and because the group appears once in the
-          data, whereas in other cases it appears the minimum number of times.
-          For
-          this reason, it is simplest to treat this case separately, as
-          otherwise
-          the code gets far too messy. There are several special subcases when
-          the
-          minimum is zero. */
+           OP_BRAZERO in front of it, and because the group appears once in the
+           data, whereas in other cases it appears the minimum number of times.
+           For
+           this reason, it is simplest to treat this case separately, as
+           otherwise
+           the code gets far too messy. There are several special subcases when
+           the
+           minimum is zero. */
 
           if (repeat_min == 0) {
             /* If the maximum is also zero, we just omit the group from the
-            output
-            altogether. */
+             output
+             altogether. */
 
             if (repeat_max == 0) {
               code = previous;
@@ -1673,12 +1679,12 @@ static BOOL compile_branch(int options,
             }
 
             /* If the maximum is 1 or unlimited, we just have to stick in the
-            BRAZERO and do no more at this point. However, we do need to adjust
-            any OP_RECURSE calls inside the group that refer to the group itself
-            or
-            any internal group, because the offset is from the start of the
-            whole
-            regex. Temporarily terminate the pattern while doing this. */
+             BRAZERO and do no more at this point. However, we do need to adjust
+             any OP_RECURSE calls inside the group that refer to the group
+             itself or
+             any internal group, because the offset is from the start of the
+             whole
+             regex. Temporarily terminate the pattern while doing this. */
 
             if (repeat_max <= 1) {
               *code = OP_END;
@@ -1688,19 +1694,19 @@ static BOOL compile_branch(int options,
             }
 
             /* If the maximum is greater than 1 and limited, we have to
-            replicate
-            in a nested fashion, sticking OP_BRAZERO before each set of
-            brackets.
-            The first one has to be handled carefully because it's the original
-            copy, which has to be moved up. The remainder can be handled by code
-            that is common with the non-zero minimum case below. We have to
-            adjust the value or repeat_max, since one less copy is required.
-            Once
-            again, we may have to adjust any OP_RECURSE calls inside the group.
-            */
+             replicate
+             in a nested fashion, sticking OP_BRAZERO before each set of
+             brackets.
+             The first one has to be handled carefully because it's the original
+             copy, which has to be moved up. The remainder can be handled by
+             code
+             that is common with the non-zero minimum case below. We have to
+             adjust the value or repeat_max, since one less copy is required.
+             Once
+             again, we may have to adjust any OP_RECURSE calls inside the group.
+             */
 
             else {
-              int offset;
               *code = OP_END;
               memmove(previous + 2 + LINK_SIZE, previous, len);
               code += 2 + LINK_SIZE;
@@ -1708,9 +1714,9 @@ static BOOL compile_branch(int options,
               *previous++ = OP_BRA;
 
               /* We chain together the bracket offset fields that have to be
-              filled in later when the ends of the brackets are reached. */
+               filled in later when the ends of the brackets are reached. */
 
-              offset = (bralink == NULL) ? 0 : previous - bralink;
+              int offset = (bralink == NULL) ? 0 : previous - bralink;
               bralink = previous;
               PUTINC(previous, 0, offset);
             }
@@ -1719,15 +1725,17 @@ static BOOL compile_branch(int options,
           }
 
           /* If the minimum is greater than zero, replicate the group as many
-          times as necessary, and adjust the maximum to the number of subsequent
-          copies that we need. If we set a first char from the group, and didn't
-          set a required char, copy the latter from the former. */
+           times as necessary, and adjust the maximum to the number of
+           subsequent
+           copies that we need. If we set a first char from the group, and
+           didn't
+           set a required char, copy the latter from the former. */
 
           else {
             if (repeat_min > 1) {
               if (groupsetfirstbyte && reqbyte < 0)
                 reqbyte = firstbyte;
-              for (i = 1; i < repeat_min; i++) {
+              for (int i = 1; i < repeat_min; i++) {
                 memcpy(code, previous, len);
                 code += len;
               }
@@ -1737,24 +1745,23 @@ static BOOL compile_branch(int options,
           }
 
           /* This code is common to both the zero and non-zero minimum cases. If
-          the maximum is limited, it replicates the group in a nested fashion,
-          remembering the bracket starts on a stack. In the case of a zero
-          minimum,
-          the first one was set up above. In all cases the repeat_max now
-          specifies
-          the number of additional copies needed. */
+           the maximum is limited, it replicates the group in a nested fashion,
+           remembering the bracket starts on a stack. In the case of a zero
+           minimum,
+           the first one was set up above. In all cases the repeat_max now
+           specifies
+           the number of additional copies needed. */
 
           if (repeat_max >= 0) {
-            for (i = repeat_max - 1; i >= 0; i--) {
+            for (int i = repeat_max - 1; i >= 0; i--) {
               *code++ = OP_BRAZERO + repeat_type;
 
               /* All but the final copy start a new nesting, maintaining the
-              chain of brackets outstanding. */
+               chain of brackets outstanding. */
 
               if (i != 0) {
-                int offset;
                 *code++ = OP_BRA;
-                offset = (bralink == NULL) ? 0 : code - bralink;
+                int offset = (!bralink) ? 0 : code - bralink;
                 bralink = code;
                 PUTINC(code, 0, offset);
               }
@@ -1764,13 +1771,12 @@ static BOOL compile_branch(int options,
             }
 
             /* Now chain through the pending brackets, and fill in their length
-            fields (which are holding the chain links pro tem). */
+             fields (which are holding the chain links pro tem). */
 
-            while (bralink != NULL) {
-              int oldlinkoffset;
+            while (bralink) {
               int offset = code - bralink + 1;
               uschar* bra = code - offset;
-              oldlinkoffset = GET(bra, 1);
+              int oldlinkoffset = GET(bra, 1);
               bralink = (oldlinkoffset == 0) ? NULL : bralink - oldlinkoffset;
               *code++ = OP_KET;
               PUTINC(code, 0, offset);
@@ -1779,9 +1785,9 @@ static BOOL compile_branch(int options,
           }
 
           /* If the maximum is unlimited, set a repeater in the final copy. We
-          can't just offset backwards from the current code point, because we
-          don't know if there's been an options resetting after the ket. The
-          correct offset was computed above. */
+           can't just offset backwards from the current code point, because we
+           don't know if there's been an options resetting after the ket. The
+           correct offset was computed above. */
 
           else
             code[-ketoffset] = OP_KETRMAX + repeat_type;
@@ -1795,8 +1801,8 @@ static BOOL compile_branch(int options,
         }
 
       /* In all case we no longer have a previous item. We also set the
-      "follows varying string" flag for subsequently encountered reqbytes if
-      it isn't already set and we have just passed a varying length item. */
+       "follows varying string" flag for subsequently encountered reqbytes if
+       it isn't already set and we have just passed a varying length item. */
 
       END_REPEAT:
         previous = NULL;
@@ -1804,12 +1810,13 @@ static BOOL compile_branch(int options,
         break;
 
       /* Start of nested bracket sub-expression, or comment or lookahead or
-      lookbehind or option setting or condition. First deal with special things
-      that can come after a bracket; all are introduced by ?, and the appearance
-      of any of them means that this is not a referencing group. They were
-      checked for validity in the first pass over the string, so we don't have
-      to
-      check for syntax errors here.  */
+       lookbehind or option setting or condition. First deal with special things
+       that can come after a bracket; all are introduced by ?, and the
+       appearance
+       of any of them means that this is not a referencing group. They were
+       checked for validity in the first pass over the string, so we don't have
+       to
+       check for syntax errors here.  */
 
       case '(':
         skipbytes = 0;
@@ -1840,9 +1847,10 @@ static BOOL compile_branch(int options,
         }
 
         /* Else we have a referencing group; adjust the opcode. If the bracket
-        number is greater than EXTRACT_BASIC_MAX, we set the opcode one higher,
-        and
-        arrange for the true number to follow later, in an OP_BRANUMBER item. */
+         number is greater than EXTRACT_BASIC_MAX, we set the opcode one higher,
+         and
+         arrange for the true number to follow later, in an OP_BRANUMBER item.
+         */
 
         else {
           if (++(*brackets) > EXTRACT_BASIC_MAX) {
@@ -1855,10 +1863,11 @@ static BOOL compile_branch(int options,
         }
 
         /* Process nested bracketed re. Assertions may not be repeated, but
-        other
-        kinds can be. We copy code into a non-variable in order to be able
-        to pass its address because some compilers complain otherwise. Pass in a
-        new setting for the ims options if they have changed. */
+         other
+         kinds can be. We copy code into a non-variable in order to be able
+         to pass its address because some compilers complain otherwise. Pass in
+         a
+         new setting for the ims options if they have changed. */
 
         previous = (bravalue >= OP_ONCE) ? code : NULL;
         *code = bravalue;
@@ -1877,19 +1886,19 @@ static BOOL compile_branch(int options,
           goto FAILED;
 
         /* At the end of compiling, code is still pointing to the start of the
-        group, while tempcode has been updated to point past the end of the
-        group
-        and any option resetting that may follow it. The pattern pointer (ptr)
-        is on the bracket. */
+         group, while tempcode has been updated to point past the end of the
+         group
+         and any option resetting that may follow it. The pattern pointer (ptr)
+         is on the bracket. */
 
         /* Handle updating of the required and first characters. Update for
-        normal
-        brackets of all kinds, and conditions with two branches (see code
-        above).
-        If the bracket is followed by a quantifier with zero repeat, we have to
-        back off. Hence the definition of zeroreqbyte and zerofirstbyte outside
-        the
-        main loop so that they can be accessed for the back off. */
+         normal
+         brackets of all kinds, and conditions with two branches (see code
+         above).
+         If the bracket is followed by a quantifier with zero repeat, we have to
+         back off. Hence the definition of zeroreqbyte and zerofirstbyte outside
+         the
+         main loop so that they can be accessed for the back off. */
 
         zeroreqbyte = reqbyte;
         zerofirstbyte = firstbyte;
@@ -1897,11 +1906,11 @@ static BOOL compile_branch(int options,
 
         if (bravalue >= OP_BRA || bravalue == OP_ONCE) {
           /* If we have not yet set a firstbyte in this branch, take it from the
-          subpattern, remembering that it was set here so that a repeat of more
-          than one can replicate it as reqbyte if necessary. If the subpattern
-          has
-          no firstbyte, set "none" for the whole branch. In both cases, a zero
-          repeat forces firstbyte to "none". */
+           subpattern, remembering that it was set here so that a repeat of more
+           than one can replicate it as reqbyte if necessary. If the subpattern
+           has
+           no firstbyte, set "none" for the whole branch. In both cases, a zero
+           repeat forces firstbyte to "none". */
 
           if (firstbyte == REQ_UNSET) {
             if (subfirstbyte >= 0) {
@@ -1913,30 +1922,31 @@ static BOOL compile_branch(int options,
           }
 
           /* If firstbyte was previously set, convert the subpattern's firstbyte
-          into reqbyte if there wasn't one, using the vary flag that was in
-          existence beforehand. */
+           into reqbyte if there wasn't one, using the vary flag that was in
+           existence beforehand. */
 
           else if (subfirstbyte >= 0 && subreqbyte < 0)
             subreqbyte = subfirstbyte | tempreqvary;
 
           /* If the subpattern set a required byte (or set a first byte that
-          isn't
-          really the first byte - see above), set it. */
+           isn't
+           really the first byte - see above), set it. */
 
           if (subreqbyte >= 0)
             reqbyte = subreqbyte;
         }
 
         /* For a forward assertion, we take the reqbyte, if set. This can be
-        helpful if the pattern that follows the assertion doesn't set a
-        different
-        char. For example, it's useful for /(?=abcde).+/. We can't set firstbyte
-        for an assertion, however because it leads to incorrect effect for
-        patterns
-        such as /(?=a)a.+/ when the "real" "a" would then become a reqbyte
-        instead
-        of a firstbyte. This is overcome by a scan at the end if there's no
-        firstbyte, looking for an asserted first char. */
+         helpful if the pattern that follows the assertion doesn't set a
+         different
+         char. For example, it's useful for /(?=abcde).+/. We can't set
+         firstbyte
+         for an assertion, however because it leads to incorrect effect for
+         patterns
+         such as /(?=a)a.+/ when the "real" "a" would then become a reqbyte
+         instead
+         of a firstbyte. This is overcome by a scan at the end if there's no
+         firstbyte, looking for an asserted first char. */
 
         else if (bravalue == OP_ASSERT && subreqbyte >= 0)
           reqbyte = subreqbyte;
@@ -1954,25 +1964,25 @@ static BOOL compile_branch(int options,
         break;
 
       /* Check \ for being a real metacharacter; if not, fall through and handle
-      it as a data character at the start of a string. Escape items are checked
-      for validity in the pre-compiling pass. */
+       it as a data character at the start of a string. Escape items are checked
+       for validity in the pre-compiling pass. */
 
       case '\\':
         tempptr = ptr;
         c = check_escape(&ptr, patternEnd, errorcodeptr, *brackets, false);
 
         /* Handle metacharacters introduced by \. For ones like \d, the ESC_
-        values
-        are arranged to be the negation of the corresponding OP_values. For the
-        back references, the values are ESC_REF plus the reference number. Only
-        back references and those types that consume a character may be
-        repeated.
-        We can test for values between ESC_b and ESC_w for the latter; this may
-        have to change if any new ones are ever created. */
+         values
+         are arranged to be the negation of the corresponding OP_values. For the
+         back references, the values are ESC_REF plus the reference number. Only
+         back references and those types that consume a character may be
+         repeated.
+         We can test for values between ESC_b and ESC_w for the latter; this may
+         have to change if any new ones are ever created. */
 
         if (c < 0) {
           /* For metasequences that actually match a character, we disable the
-          setting of a first character if it hasn't already been set. */
+           setting of a first character if it hasn't already been set. */
 
           if (firstbyte == REQ_UNSET && -c > ESC_b && -c <= ESC_w)
             firstbyte = REQ_NONE;
@@ -1992,7 +2002,7 @@ static BOOL compile_branch(int options,
           }
 
           /* For the rest, we can obtain the OP value by negating the escape
-          value */
+           value */
 
           else {
             previous = (-c > ESC_b && -c <= ESC_w) ? code : NULL;
@@ -2004,8 +2014,8 @@ static BOOL compile_branch(int options,
       /* Fall through. */
 
       /* Handle a literal character. It is guaranteed not to be whitespace or #
-      when the extended flag is set. If we are in UTF-8 mode, it may be a
-      multi-byte literal character. */
+       when the extended flag is set. If we are in UTF-8 mode, it may be a
+       multi-byte literal character. */
 
       default:
       NORMAL_CHAR:
@@ -2033,17 +2043,17 @@ static BOOL compile_branch(int options,
         }
 
         /* Set the first and required bytes appropriately. If no previous first
-        byte, set it from this character, but revert to none on a zero repeat.
-        Otherwise, leave the firstbyte value alone, and don't change it on a
-        zero
-        repeat. */
+         byte, set it from this character, but revert to none on a zero repeat.
+         Otherwise, leave the firstbyte value alone, and don't change it on a
+         zero
+         repeat. */
 
         if (firstbyte == REQ_UNSET) {
           zerofirstbyte = REQ_NONE;
           zeroreqbyte = reqbyte;
 
           /* If the character is more than one byte long, we can set firstbyte
-          only if it is not to be matched caselessly. */
+           only if it is not to be matched caselessly. */
 
           if (mclength == 1 || req_caseopt == 0) {
             firstbyte = mcbuffer[0] | req_caseopt;
@@ -2054,7 +2064,7 @@ static BOOL compile_branch(int options,
         }
 
         /* firstbyte was previously set; we can set reqbyte only the length is
-        1 or the matching is caseful. */
+         1 or the matching is caseful. */
 
         else {
           zerofirstbyte = firstbyte;
@@ -2068,8 +2078,8 @@ static BOOL compile_branch(int options,
   } /* end of big loop */
 
 /* Control never reaches here by falling through, only by a goto for all the
-error states. Pass back the position in the pattern so that it can be displayed
-to the user for diagnosing the error. */
+ error states. Pass back the position in the pattern so that it can be displayed
+ to the user for diagnosing the error. */
 
 FAILED:
   *ptrptr = ptr;
