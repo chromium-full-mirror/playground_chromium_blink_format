@@ -383,8 +383,8 @@ must also be updated to match. */
                                                                                          \
           macro(ANY)                                                                     \
                                                                                          \
-              macro(CIRC) macro(DOLL) macro(CHAR) macro(CHARNC) macro(                   \
-                  ASCII_CHAR) macro(ASCII_LETTER_NC) macro(NOT)                          \
+              macro(CIRC) macro(DOLL) macro(CHAR) macro(CHAR_IGNORING_CASE) macro(       \
+                  ASCII_CHAR) macro(ASCII_LETTER_IGNORING_CASE) macro(NOT)               \
                                                                                          \
                   macro(STAR) macro(MINSTAR) macro(PLUS) macro(MINPLUS) macro(           \
                       QUERY) macro(MINQUERY) macro(UPTO) macro(MINUPTO) macro(EXACT)     \
