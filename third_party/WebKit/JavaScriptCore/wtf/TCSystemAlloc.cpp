@@ -101,8 +101,14 @@ static const int32_t FLAGS_malloc_devmem_limit = 0;
 
 #if HAVE(SBRK)
 
-static void* TrySbrk(size_t size, size_t alignment) {
+static void* TrySbrk(size_t size, size_t* actual_size, size_t alignment) {
   size = ((size + alignment - 1) / alignment) * alignment;
+
+  // could theoretically return the "extra" bytes here, but this
+  // is simple and correct.
+  if (actual_size)
+    *actual_size = size;
+
   void* result = sbrk(size);
   if (result == reinterpret_cast<void*>(-1)) {
     sbrk_failure = true;
@@ -140,13 +146,18 @@ static void* TrySbrk(size_t size, size_t alignment) {
 
 #if HAVE(MMAP)
 
-static void* TryMmap(size_t size, size_t alignment) {
+static void* TryMmap(size_t size, size_t* actual_size, size_t alignment) {
   // Enforce page alignment
   if (pagesize == 0)
     pagesize = getpagesize();
   if (alignment < pagesize)
     alignment = pagesize;
   size = ((size + alignment - 1) / alignment) * alignment;
+
+  // could theoretically return the "extra" bytes here, but this
+  // is simple and correct.
+  if (actual_size)
+    *actual_size = size;
 
   // Ask for extra memory if alignment > pagesize
   size_t extra = 0;
@@ -183,16 +194,24 @@ static void* TryMmap(size_t size, size_t alignment) {
 
 #if HAVE(VIRTUALALLOC)
 
-static void* TryVirtualAlloc(size_t size, size_t alignment) {
+static void* TryVirtualAlloc(size_t size,
+                             size_t* actual_size,
+                             size_t alignment) {
   // Enforce page alignment
   if (pagesize == 0) {
     SYSTEM_INFO system_info;
     GetSystemInfo(&system_info);
     pagesize = system_info.dwPageSize;
   }
+
   if (alignment < pagesize)
     alignment = pagesize;
   size = ((size + alignment - 1) / alignment) * alignment;
+
+  // could theoretically return the "extra" bytes here, but this
+  // is simple and correct.
+  if (actual_size)
+    *actual_size = size;
 
   // Ask for extra memory if alignment > pagesize
   size_t extra = 0;
@@ -233,7 +252,7 @@ static void* TryVirtualAlloc(size_t size, size_t alignment) {
 #endif /* HAVE(MMAP) */
 
 #ifndef WTF_CHANGES
-static void* TryDevMem(size_t size, size_t alignment) {
+static void* TryDevMem(size_t size, size_t* actual_size, size_t alignment) {
   static bool initialized = false;
   static off_t physmem_base;   // next physical memory address to allocate
   static off_t physmem_limit;  // maximum physical address allowed
@@ -266,6 +285,11 @@ static void* TryDevMem(size_t size, size_t alignment) {
   if (alignment < pagesize)
     alignment = pagesize;
   size = ((size + alignment - 1) / alignment) * alignment;
+
+  // could theoretically return the "extra" bytes here, but this
+  // is simple and correct.
+  if (actual_size)
+    *actual_size = size;
 
   // Ask for extra memory if alignment > pagesize
   size_t extra = 0;
@@ -307,12 +331,11 @@ static void* TryDevMem(size_t size, size_t alignment) {
 }
 #endif
 
-void* TCMalloc_SystemAlloc(size_t size, size_t alignment) {
-#ifndef WTF_CHANGES
-  if (TCMallocDebug::level >= TCMallocDebug::kVerbose) {
-    MESSAGE("TCMalloc_SystemAlloc(%" PRIuS ", %" PRIuS ")\n", size, alignment);
-  }
-#endif
+void* TCMalloc_SystemAlloc(size_t size, size_t* actual_size, size_t alignment) {
+  // Discard requests that overflow
+  if (size + alignment < size)
+    return NULL;
+
   SpinLockHolder lock_holder(&spinlock);
 
   // Enforce minimum alignment
@@ -324,7 +347,7 @@ void* TCMalloc_SystemAlloc(size_t size, size_t alignment) {
   for (int i = 0; i < 2; i++) {
 #ifndef WTF_CHANGES
     if (use_devmem && !devmem_failure) {
-      void* result = TryDevMem(size, alignment);
+      void* result = TryDevMem(size, actual_size, alignment);
       if (result != NULL)
         return result;
     }
@@ -332,7 +355,7 @@ void* TCMalloc_SystemAlloc(size_t size, size_t alignment) {
 
 #if HAVE(SBRK)
     if (use_sbrk && !sbrk_failure) {
-      void* result = TrySbrk(size, alignment);
+      void* result = TrySbrk(size, actual_size, alignment);
       if (result != NULL)
         return result;
     }
@@ -340,7 +363,7 @@ void* TCMalloc_SystemAlloc(size_t size, size_t alignment) {
 
 #if HAVE(MMAP)
     if (use_mmap && !mmap_failure) {
-      void* result = TryMmap(size, alignment);
+      void* result = TryMmap(size, actual_size, alignment);
       if (result != NULL)
         return result;
     }
@@ -348,7 +371,7 @@ void* TCMalloc_SystemAlloc(size_t size, size_t alignment) {
 
 #if HAVE(VIRTUALALLOC)
     if (use_VirtualAlloc && !VirtualAlloc_failure) {
-      void* result = TryVirtualAlloc(size, alignment);
+      void* result = TryVirtualAlloc(size, actual_size, alignment);
       if (result != NULL)
         return result;
     }
