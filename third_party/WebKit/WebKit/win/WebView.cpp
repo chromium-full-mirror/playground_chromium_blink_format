@@ -1059,7 +1059,7 @@ bool WebView::handleContextMenuEvent(WPARAM wParam, LPARAM lParam) {
           IntPoint(coords.x, coords.y), false);
   Frame* targetFrame = result.innerNonSharedNode()
                            ? result.innerNonSharedNode()->document()->frame()
-                           : m_page->focusedOrMainFrame();
+                           : m_page->focusController()->focusedOrMainFrame();
 
   targetFrame->view()->setCursor(pointerCursor());
   PlatformMouseEvent mouseEvent(m_viewWindow, WM_RBUTTONUP, wParam, lParam);
