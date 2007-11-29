@@ -489,9 +489,9 @@ static int find_fixedlength(uschar* code, int options) {
   uschar* cc = code + 1 + LINK_SIZE;
 
   /* Scan along the opcodes for this branch. If we get to the end of the
-  branch, check the length against that of the other branches. */
+   branch, check the length against that of the other branches. */
 
-  for (;;) {
+  while (true) {
     int d;
     int op = *cc;
     if (op >= OP_BRA)
@@ -511,9 +511,9 @@ static int find_fixedlength(uschar* code, int options) {
         break;
 
       /* Reached end of a branch; if it's a ket it is the end of a nested
-      call. If it's ALT it is an alternation in a nested call. If it is
-      END it's the end of the outer call. All can be handled by the same code.
-      */
+       call. If it's ALT it is an alternation in a nested call. If it is
+       END it's the end of the outer call. All can be handled by the same code.
+       */
 
       case OP_ALT:
       case OP_KET:
@@ -567,7 +567,7 @@ static int find_fixedlength(uschar* code, int options) {
         break;
 
       /* Handle exact repetitions. The count is already in characters, but we
-      need to skip over a multibyte character in UTF8 mode.  */
+       need to skip over a multibyte character in UTF8 mode.  */
 
       case OP_EXACT:
         branchlength += GET2(cc, 1);
