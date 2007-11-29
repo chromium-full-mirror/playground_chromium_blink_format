@@ -2181,28 +2181,24 @@ static bool is_anchored(const uschar* code,
     int op = *scode;
 
     /* Capturing brackets */
-
     if (op > OP_BRA) {
-      int new_map;
       op -= OP_BRA;
       if (op > EXTRACT_BASIC_MAX)
         op = GET2(scode, 2 + LINK_SIZE);
-      new_map = bracket_map | ((op < 32) ? (1 << op) : 1);
+      int new_map = bracket_map | ((op < 32) ? (1 << op) : 1);
       if (!is_anchored(scode, options, new_map, backref_map))
         return false;
     }
 
     /* Other brackets */
-
-    else if (op == OP_BRA || op == OP_ASSERT || op == OP_ONCE) {
+    else if (op == OP_BRA || op == OP_ASSERT || op == OP_ONCE)
       if (!is_anchored(scode, options, bracket_map, backref_map))
         return false;
-    }
 
-    /* Check for explicit anchoring */
+      /* Check for explicit anchoring */
 
-    else if (((options & PCRE_MULTILINE) != 0 || op != OP_CIRC))
-      return false;
+      else if ((options & PCRE_MULTILINE) || op != OP_CIRC)
+        return false;
     code += GET(code, 1);
   } while (*code == OP_ALT); /* Loop for each alternative */
   return true;
