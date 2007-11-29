@@ -813,7 +813,6 @@ static bool compile_branch(int options,
     bool should_flip_negation; /* If a negative special such as \S is used, we
                                   should negate the whole class to properly
                                   support Unicode. */
-    bool is_quantifier;
     int class_charcount;
     int class_lastchar;
     int skipbytes;
@@ -829,8 +828,8 @@ static bool compile_branch(int options,
     /* Fill in length of a previous callout, except when the next thing is
      a quantifier. */
 
-    is_quantifier = c == '*' || c == '+' || c == '?' ||
-                    (c == '{' && is_counted_repeat(ptr + 1, patternEnd));
+    bool is_quantifier = c == '*' || c == '+' || c == '?' ||
+                         (c == '{' && is_counted_repeat(ptr + 1, patternEnd));
 
     if (!is_quantifier && previous_callout && after_manual_callout-- <= 0) {
       complete_callout(previous_callout, ptr, cd);

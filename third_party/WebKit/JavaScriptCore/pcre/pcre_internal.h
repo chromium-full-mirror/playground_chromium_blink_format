@@ -262,22 +262,24 @@ static inline int decodeSurrogatePair(int leadingSurrogate,
   return ((leadingSurrogate << 10) + trailingSurrogate + SURROGATE_OFFSET);
 }
 
-static inline void getChar(int& c, const UChar* eptr) {
-  c = eptr[0];
+static inline void getChar(int& c, const UChar* subjectPtr) {
+  c = subjectPtr[0];
   if (isLeadingSurrogate(c))
-    c = decodeSurrogatePair(c, eptr[1]);
+    c = decodeSurrogatePair(c, subjectPtr[1]);
 }
 
-static inline void getCharAndAdvance(int& c, const UChar*& eptr) {
-  c = *eptr++;
+static inline void getCharAndAdvance(int& c, const UChar*& subjectPtr) {
+  c = *subjectPtr++;
   if (isLeadingSurrogate(c))
-    c = decodeSurrogatePair(c, *eptr++);
+    c = decodeSurrogatePair(c, *subjectPtr++);
 }
 
-static inline void getCharAndLength(int& c, const UChar*& eptr, int& length) {
-  c = eptr[0];
+static inline void getCharAndLength(int& c,
+                                    const UChar*& subjectPtr,
+                                    int& length) {
+  c = subjectPtr[0];
   if (isLeadingSurrogate(c)) {
-    c = decodeSurrogatePair(c, eptr[1]);
+    c = decodeSurrogatePair(c, subjectPtr[1]);
     length = 2;
   } else
     length = 1;
@@ -285,11 +287,12 @@ static inline void getCharAndLength(int& c, const UChar*& eptr, int& length) {
 
 // FIXME: All (2) calls to this funtion should be removed and replaced with
 // calls to getCharAndAdvance
-static inline void getCharAndAdvanceIfSurrogate(int& c, const UChar*& eptr) {
-  c = eptr[0];
+static inline void getCharAndAdvanceIfSurrogate(int& c,
+                                                const UChar*& subjectPtr) {
+  c = subjectPtr[0];
   if (isLeadingSurrogate(c)) {
-    c = decodeSurrogatePair(c, eptr[1]);
-    eptr++;
+    c = decodeSurrogatePair(c, subjectPtr[1]);
+    subjectPtr++;
   }
 }
 
@@ -297,21 +300,21 @@ static inline void getCharAndAdvanceIfSurrogate(int& c, const UChar*& eptr) {
 // FIXME: This could also be removed and an end-aware getCharAndAdvance added
 // instead.
 static inline void getCharAndAdvanceIfSurrogate(int& c,
-                                                const UChar*& eptr,
+                                                const UChar*& subjectPtr,
                                                 const UChar* end) {
-  c = eptr[0];
+  c = subjectPtr[0];
   if (isLeadingSurrogate(c)) {
-    if (eptr + 1 < end)
-      c = decodeSurrogatePair(c, eptr[1]);
+    if (subjectPtr + 1 < end)
+      c = decodeSurrogatePair(c, subjectPtr[1]);
     else
       c = decodeSurrogatePair(c, 0);
-    eptr++;
+    subjectPtr++;
   }
 }
 
-#define BACKCHAR(eptr)               \
-  while (isTrailingSurrogate(*eptr)) \
-    eptr--;
+#define BACKCHAR(subjectPtr)               \
+  while (isTrailingSurrogate(*subjectPtr)) \
+    subjectPtr--;
 
 // FIXME: These are really more of a "regexp state" than "regexp options"
 enum PCREOptions {
