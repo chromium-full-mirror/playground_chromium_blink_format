@@ -293,6 +293,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isMenuList() const { return false; }
   virtual bool isListBox() const { return false; }
   virtual bool isSlider() const { return false; }
+  virtual bool isMedia() const { return false; }
 
   bool isRoot() const { return document()->documentElement() == node(); }
   bool isBody() const;

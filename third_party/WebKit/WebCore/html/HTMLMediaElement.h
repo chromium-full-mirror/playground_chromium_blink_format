@@ -62,6 +62,8 @@ class HTMLMediaElement : public HTMLElement, public MovieClient {
 
   void scheduleLoad();
 
+  virtual void defaultEventHandler(Event*);
+
   // DOM API
   // error state
   PassRefPtr<MediaError> error() const;

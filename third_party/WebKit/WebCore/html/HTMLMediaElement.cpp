@@ -31,6 +31,7 @@
 #include "CSSHelper.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
+#include "Event.h"
 #include "EventNames.h"
 #include "ExceptionCode.h"
 #include "HTMLDocument.h"
@@ -105,6 +106,10 @@ void HTMLMediaElement::attributeChanged(Attribute* attr, bool preserveDecls) {
     // change to src attribute triggers load()
     if (inDocument() && m_networkState == EMPTY)
       scheduleLoad();
+  }
+  if (attrName == controlsAttr) {
+    if (renderer())
+      renderer()->updateFromElement();
   }
 }
 
@@ -928,6 +933,9 @@ void HTMLMediaElement::updateMovie() {
     m_movie->play();
   else if (!shouldBePlaying && !m_movie->paused())
     m_movie->pause();
+
+  if (renderer())
+    renderer()->updateFromElement();
 }
 
 void HTMLMediaElement::willSaveToCache() {
@@ -959,6 +967,12 @@ void HTMLMediaElement::didRestoreFromCache() {
     play(ec);
   if (renderer())
     renderer()->updateFromElement();
+}
+
+void HTMLMediaElement::defaultEventHandler(Event* event) {
+  if (renderer() && renderer()->isMedia())
+    static_cast<RenderMedia*>(renderer())->forwardEvent(event);
+  HTMLElement::defaultEventHandler(event);
 }
 }
 
