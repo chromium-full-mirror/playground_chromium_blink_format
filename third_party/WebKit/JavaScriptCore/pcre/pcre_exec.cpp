@@ -67,7 +67,7 @@ are on the heap, not on the stack. */
 
 struct eptrblock {
   struct eptrblock* epb_prev;
-  UChar* epb_saved_eptr;
+  const UChar* epb_saved_eptr;
 };
 
 /* Structure for remembering the local variables in a private frame */
@@ -84,7 +84,7 @@ struct MatchFrame {
 
   /* Function arguments that may change */
   struct {
-    UChar* eptr;
+    const UChar* eptr;
     const uschar* ecode;
     int offset_top;
     eptrblock* eptrb;
@@ -122,14 +122,14 @@ doing traditional NFA matching, so that they are thread-safe. */
 
 struct MatchData {
   unsigned long int match_call_count;
-  int* offset_vector;   /* Offset vector */
-  int offset_end;       /* One past the end */
-  int offset_max;       /* The maximum usable for return data */
-  bool offset_overflow; /* Set if too many extractions */
-  UChar* start_subject; /* Start of the subject string */
-  UChar* end_subject;   /* End of the subject string */
-  UChar* end_match_ptr; /* Subject position at end match */
-  int end_offset_top;   /* Highwater mark at end of match */
+  int* offset_vector;         /* Offset vector */
+  int offset_end;             /* One past the end */
+  int offset_max;             /* The maximum usable for return data */
+  bool offset_overflow;       /* Set if too many extractions */
+  UChar* start_subject;       /* Start of the subject string */
+  UChar* end_subject;         /* End of the subject string */
+  const UChar* end_match_ptr; /* Subject position at end match */
+  int end_offset_top;         /* Highwater mark at end of match */
   bool multiline;
   bool ignoreCase;
 };
@@ -199,7 +199,7 @@ Returns:      true if matched
 */
 
 static bool match_ref(int offset,
-                      UChar* eptr,
+                      const UChar* eptr,
                       int length,
                       const MatchData& md) {
   UChar* p = md.start_subject + md.offset_vector[offset];
@@ -866,7 +866,7 @@ RECURSE:
       BEGIN_OPCODE(NOT_DIGIT)
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
-      GETCHARINCTEST(c, stack.currentFrame->args.eptr);
+      getCharAndAdvance(c, stack.currentFrame->args.eptr);
       if (isASCIIDigit(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
@@ -875,7 +875,7 @@ RECURSE:
       BEGIN_OPCODE(DIGIT)
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
-      GETCHARINCTEST(c, stack.currentFrame->args.eptr);
+      getCharAndAdvance(c, stack.currentFrame->args.eptr);
       if (!isASCIIDigit(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
@@ -884,7 +884,7 @@ RECURSE:
       BEGIN_OPCODE(NOT_WHITESPACE)
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
-      GETCHARINCTEST(c, stack.currentFrame->args.eptr);
+      getCharAndAdvance(c, stack.currentFrame->args.eptr);
       if (isSpaceChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
@@ -893,7 +893,7 @@ RECURSE:
       BEGIN_OPCODE(WHITESPACE)
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
-      GETCHARINCTEST(c, stack.currentFrame->args.eptr);
+      getCharAndAdvance(c, stack.currentFrame->args.eptr);
       if (!isSpaceChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
@@ -902,7 +902,7 @@ RECURSE:
       BEGIN_OPCODE(NOT_WORDCHAR)
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
-      GETCHARINCTEST(c, stack.currentFrame->args.eptr);
+      getCharAndAdvance(c, stack.currentFrame->args.eptr);
       if (isWordChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
@@ -911,7 +911,7 @@ RECURSE:
       BEGIN_OPCODE(WORDCHAR)
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
-      GETCHARINCTEST(c, stack.currentFrame->args.eptr);
+      getCharAndAdvance(c, stack.currentFrame->args.eptr);
       if (!isWordChar(c))
         RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
@@ -1044,7 +1044,7 @@ RECURSE:
         }
         RRETURN_NO_MATCH;
       }
-      /* Control never reaches here */
+      ASSERT_NOT_REACHED();
 
       /* Match a bit-mapped character class, possibly repeatedly. This op code
        is
@@ -1102,12 +1102,12 @@ RECURSE:
       for (i = 1; i <= min; i++) {
         if (stack.currentFrame->args.eptr >= md.end_subject)
           RRETURN_NO_MATCH;
-        GETCHARINC(c, stack.currentFrame->args.eptr);
+        getCharAndAdvance(c, stack.currentFrame->args.eptr);
         if (c > 255) {
           if (stack.currentFrame->locals.data[-1] == OP_CLASS)
             RRETURN_NO_MATCH;
         } else {
-          if ((stack.currentFrame->locals.data[c / 8] & (1 << (c & 7))) == 0)
+          if (!(stack.currentFrame->locals.data[c / 8] & (1 << (c & 7))))
             RRETURN_NO_MATCH;
         }
       }
@@ -1130,7 +1130,7 @@ RECURSE:
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
               stack.currentFrame->args.eptr >= md.end_subject)
             RRETURN;
-          GETCHARINC(c, stack.currentFrame->args.eptr);
+          getCharAndAdvance(c, stack.currentFrame->args.eptr);
           if (c > 255) {
             if (stack.currentFrame->locals.data[-1] == OP_CLASS)
               RRETURN;
@@ -1146,18 +1146,18 @@ RECURSE:
         stack.currentFrame->locals.pp = stack.currentFrame->args.eptr;
 
         for (i = min; i < stack.currentFrame->locals.max; i++) {
-          int len = 1;
           if (stack.currentFrame->args.eptr >= md.end_subject)
             break;
-          GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+          int length;
+          getCharAndLength(c, stack.currentFrame->args.eptr, length);
           if (c > 255) {
             if (stack.currentFrame->locals.data[-1] == OP_CLASS)
               break;
           } else {
-            if ((stack.currentFrame->locals.data[c / 8] & (1 << (c & 7))) == 0)
+            if (!(stack.currentFrame->locals.data[c / 8] & (1 << (c & 7))))
               break;
           }
-          stack.currentFrame->args.eptr += len;
+          stack.currentFrame->args.eptr += length;
         }
         for (;;) {
           RMATCH(24, stack.currentFrame->args.ecode,
@@ -1219,7 +1219,7 @@ RECURSE:
       for (i = 1; i <= min; i++) {
         if (stack.currentFrame->args.eptr >= md.end_subject)
           RRETURN_NO_MATCH;
-        GETCHARINC(c, stack.currentFrame->args.eptr);
+        getCharAndAdvance(c, stack.currentFrame->args.eptr);
         if (!_pcre_xclass(c, stack.currentFrame->locals.data))
           RRETURN_NO_MATCH;
       }
@@ -1243,7 +1243,7 @@ RECURSE:
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
               stack.currentFrame->args.eptr >= md.end_subject)
             RRETURN;
-          GETCHARINC(c, stack.currentFrame->args.eptr);
+          getCharAndAdvance(c, stack.currentFrame->args.eptr);
           if (!_pcre_xclass(c, stack.currentFrame->locals.data))
             RRETURN;
         }
@@ -1255,13 +1255,13 @@ RECURSE:
       else {
         stack.currentFrame->locals.pp = stack.currentFrame->args.eptr;
         for (i = min; i < stack.currentFrame->locals.max; i++) {
-          int len = 1;
           if (stack.currentFrame->args.eptr >= md.end_subject)
             break;
-          GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+          int length;
+          getCharAndLength(c, stack.currentFrame->args.eptr, length);
           if (!_pcre_xclass(c, stack.currentFrame->locals.data))
             break;
-          stack.currentFrame->args.eptr += len;
+          stack.currentFrame->args.eptr += length;
         }
         for (;;) {
           RMATCH(27, stack.currentFrame->args.ecode,
@@ -1296,7 +1296,7 @@ RECURSE:
               RRETURN_NO_MATCH;
             break;
           default:
-            GETCHARINC(dc, stack.currentFrame->args.eptr);
+            getCharAndAdvance(dc, stack.currentFrame->args.eptr);
         }
         if (stack.currentFrame->locals.fc != dc)
           RRETURN_NO_MATCH;
@@ -1321,7 +1321,7 @@ RECURSE:
           if (isLeadingSurrogate(dc))
             RRETURN_NO_MATCH;
         } else
-          GETCHARINC(dc, stack.currentFrame->args.eptr);
+          getCharAndAdvance(dc, stack.currentFrame->args.eptr);
         stack.currentFrame->args.ecode += stack.currentFrame->locals.length;
 
         /* If we have Unicode property support, we can use it to test the other
@@ -1523,7 +1523,7 @@ RECURSE:
           : if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
       stack.currentFrame->args.ecode++;
-      GETCHARINCTEST(c, stack.currentFrame->args.eptr);
+      getCharAndAdvance(c, stack.currentFrame->args.eptr);
       if (md.ignoreCase) {
         if (c < 128)
           c = toLowerCase(c);
@@ -1600,7 +1600,7 @@ RECURSE:
         {
           int d;
           for (i = 1; i <= min; i++) {
-            GETCHARINC(d, stack.currentFrame->args.eptr);
+            getCharAndAdvance(d, stack.currentFrame->args.eptr);
             if (d < 128)
               d = toLowerCase(d);
             if (stack.currentFrame->locals.fc == d)
@@ -1619,7 +1619,7 @@ RECURSE:
                    stack.currentFrame->args.eptrb, 0);
             if (is_match)
               RRETURN;
-            GETCHARINC(d, stack.currentFrame->args.eptr);
+            getCharAndAdvance(d, stack.currentFrame->args.eptr);
             if (d < 128)
               d = toLowerCase(d);
             if (stack.currentFrame->locals.fi >=
@@ -1639,15 +1639,15 @@ RECURSE:
           {
             int d;
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(d, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(d, stack.currentFrame->args.eptr, length);
               if (d < 128)
                 d = toLowerCase(d);
               if (stack.currentFrame->locals.fc == d)
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             for (;;) {
               RMATCH(40, stack.currentFrame->args.ecode,
@@ -1672,7 +1672,7 @@ RECURSE:
         {
           int d;
           for (i = 1; i <= min; i++) {
-            GETCHARINC(d, stack.currentFrame->args.eptr);
+            getCharAndAdvance(d, stack.currentFrame->args.eptr);
             if (stack.currentFrame->locals.fc == d)
               RRETURN_NO_MATCH;
           }
@@ -1689,7 +1689,7 @@ RECURSE:
                    stack.currentFrame->args.eptrb, 0);
             if (is_match)
               RRETURN;
-            GETCHARINC(d, stack.currentFrame->args.eptr);
+            getCharAndAdvance(d, stack.currentFrame->args.eptr);
             if (stack.currentFrame->locals.fi >=
                     stack.currentFrame->locals.max ||
                 stack.currentFrame->args.eptr >= md.end_subject ||
@@ -1707,13 +1707,13 @@ RECURSE:
           {
             int d;
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(d, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(d, stack.currentFrame->args.eptr, length);
               if (stack.currentFrame->locals.fc == d)
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             for (;;) {
               RMATCH(44, stack.currentFrame->args.ecode,
@@ -1803,7 +1803,7 @@ RECURSE:
             for (i = 1; i <= min; i++) {
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 RRETURN_NO_MATCH;
-              GETCHARINC(c, stack.currentFrame->args.eptr);
+              getCharAndAdvance(c, stack.currentFrame->args.eptr);
               if (isASCIIDigit(c))
                 RRETURN_NO_MATCH;
             }
@@ -1883,7 +1883,7 @@ RECURSE:
               stack.currentFrame->args.eptr >= md.end_subject)
             RRETURN;
 
-          GETCHARINC(c, stack.currentFrame->args.eptr);
+          getCharAndAdvance(c, stack.currentFrame->args.eptr);
           switch (stack.currentFrame->locals.ctype) {
             case OP_ANY:
               if (isNewline(c))
@@ -1970,73 +1970,73 @@ RECURSE:
 
           case OP_NOT_DIGIT:
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(c, stack.currentFrame->args.eptr, length);
               if (isASCIIDigit(c))
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             break;
 
           case OP_DIGIT:
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(c, stack.currentFrame->args.eptr, length);
               if (!isASCIIDigit(c))
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             break;
 
           case OP_NOT_WHITESPACE:
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(c, stack.currentFrame->args.eptr, length);
               if (isSpaceChar(c))
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             break;
 
           case OP_WHITESPACE:
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(c, stack.currentFrame->args.eptr, length);
               if (!isSpaceChar(c))
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             break;
 
           case OP_NOT_WORDCHAR:
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(c, stack.currentFrame->args.eptr, length);
               if (isWordChar(c))
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             break;
 
           case OP_WORDCHAR:
             for (i = min; i < stack.currentFrame->locals.max; i++) {
-              int len = 1;
               if (stack.currentFrame->args.eptr >= md.end_subject)
                 break;
-              GETCHARLEN(c, stack.currentFrame->args.eptr, len);
+              int length;
+              getCharAndLength(c, stack.currentFrame->args.eptr, length);
               if (!isWordChar(c))
                 break;
-              stack.currentFrame->args.eptr += len;
+              stack.currentFrame->args.eptr += length;
             }
             break;
 

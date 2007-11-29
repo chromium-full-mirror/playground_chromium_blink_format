@@ -855,7 +855,7 @@ static bool compile_branch(int options,
        the setting of any following char as a first character. */
 
       case '^':
-        if ((options & PCRE_MULTILINE) != 0) {
+        if (options & PCRE_MULTILINE) {
           if (firstbyte == REQ_UNSET)
             firstbyte = REQ_NONE;
         }
@@ -938,9 +938,8 @@ static bool compile_branch(int options,
          character. */
 
         while ((c = *(++ptr)) != ']') {
-          if (c > 127) {             /* Braces are required because the */
-            GETCHARLEN(c, ptr, ptr); /* macro generates multiple statements */
-          }
+          if (c > 127)
+            getCharAndAdvanceIfSurrogate(c, ptr);
 
           /* Backslash may introduce a single character, or it may introduce one
            of the specials, which just set a flag. Escaped items are checked for
@@ -1013,10 +1012,10 @@ static bool compile_branch(int options,
            here is treated as a literal. */
 
           if (ptr[1] == '-' && ptr[2] != ']') {
-            int d;
             ptr += 2;
 
-            GETCHARLEN(d, ptr, ptr);
+            int d;
+            getCharAndAdvanceIfSurrogate(d, ptr);
 
             /* The second part of a range can be a single-character escape, but
              not any of the other escapes. Perl 5.6 treats a hyphen as a literal
@@ -2543,20 +2542,14 @@ static int calculateCompiledPatternLengthAndFlags(
            characters. */
 
           else {
-            int d;
-
-            {
-              int extra = 0;
-              GETCHARLENEND(c, ptr, patternEnd, extra);
-              ptr += extra;
-            }
+            getCharAndAdvanceIfSurrogate(c, ptr, patternEnd);
 
           /* Come here from handling \ above when it escapes to a char value */
 
           NON_SPECIAL_CHARACTER:
             class_optcount++;
 
-            d = -1;
+            int d = -1;
             if (ptr + 1 < patternEnd && ptr[1] == '-') {
               UChar const* hyptr = ptr++;
               if (ptr + 1 < patternEnd && ptr[1] == '\\') {
@@ -2569,9 +2562,7 @@ static int calculateCompiledPatternLengthAndFlags(
                   d = '\b'; /* backspace */
               } else if (ptr + 1 < patternEnd && ptr[1] != ']') {
                 ptr++;
-                int extra = 0;
-                GETCHARLENEND(d, ptr, patternEnd, extra);
-                ptr += extra;
+                getCharAndAdvanceIfSurrogate(d, ptr, patternEnd);
               }
               if (d < 0)
                 ptr = hyptr; /* go back to hyphen as data */
