@@ -806,7 +806,7 @@ Arguments:
 Yield:        true when range returned; false when no more
 */
 
-static BOOL get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
+static bool get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
   int c, othercase = 0, next;
 
   for (c = *cptr; c <= d; c++) {
