@@ -224,7 +224,8 @@ static int check_escape(const UChar** ptrptr,
         if (!isclass) {
           const UChar* oldptr = ptr;
           c -= '0';
-          while (ptr + 1 < patternEnd && isASCIIDigit(ptr[1]) && c <= bracount)
+          while ((ptr + 1 < patternEnd) && isASCIIDigit(ptr[1]) &&
+                 c <= bracount)
             c = c * 10 + *(++ptr) - '0';
           if (c <= bracount) {
             c = -(ESC_REF + c);
@@ -751,6 +752,12 @@ Returns:         true on success
                  false, with *errorcodeptr set non-zero on error
 */
 
+static inline bool safelyCheckNextChar(const UChar* ptr,
+                                       const UChar* patternEnd,
+                                       UChar expected) {
+  return ((ptr + 1 < patternEnd) && ptr[1] == expected);
+}
+
 static bool compile_branch(int options,
                            int* brackets,
                            uschar** codeptr,
@@ -905,6 +912,9 @@ static bool compile_branch(int options,
 
         /* If the first character is '^', set the negation flag and skip it. */
 
+        if (ptr + 1 >= patternEnd)
+          return -1;
+
         if (ptr[1] == '^') {
           negate_class = true;
           ++ptr;
@@ -936,7 +946,8 @@ static bool compile_branch(int options,
          very
          strict here. At the start of the loop, c contains the first byte of the
          character. */
-        while ((c = *(++ptr)) != ']') {
+
+        while ((++ptr < patternEnd) && (c = *ptr) != ']') {
           /* Backslash may introduce a single character, or it may introduce one
            of the specials, which just set a flag. Escaped items are checked for
            validity in the pre-compiling pass. The sequence \b is a special
@@ -1007,7 +1018,7 @@ static bool compile_branch(int options,
            Perl does not permit ']' to be the end of the range. A '-' character
            here is treated as a literal. */
 
-          if (ptr[1] == '-' && ptr[2] != ']') {
+          if ((ptr + 2 < patternEnd) && ptr[1] == '-' && ptr[2] != ']') {
             ptr += 2;
 
             int d = *ptr;
@@ -1137,10 +1148,8 @@ static bool compile_branch(int options,
                 class_utf8data += _pcre_ord2utf8(othercase, class_utf8data);
               }
             }
-          } else
-
-          /* Handle a single-byte character */
-          {
+          } else {
+            /* Handle a single-byte character */
             classbits[c / 8] |= (1 << (c & 7));
             if (options & IgnoreCaseOption) {
               c = flipCase(c);
@@ -1310,7 +1319,7 @@ static bool compile_branch(int options,
          the
          repeat type to the non-default. */
 
-        if (ptr + 1 < patternEnd && ptr[1] == '?') {
+        if (safelyCheckNextChar(ptr, patternEnd, '?')) {
           repeat_type = 1;
           ptr++;
         } else
@@ -2402,7 +2411,8 @@ static int calculateCompiledPatternLengthAndFlags(
           if (refnum > compile_block.top_backref)
             compile_block.top_backref = refnum;
           length += 2; /* For single back reference */
-          if (ptr[1] == '{' && is_counted_repeat(ptr + 2, patternEnd)) {
+          if (safelyCheckNextChar(ptr, patternEnd, '{') &&
+              is_counted_repeat(ptr + 2, patternEnd)) {
             ptr = read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats,
                                      &errorcode);
             if (errorcode)
@@ -2412,7 +2422,7 @@ static int calculateCompiledPatternLengthAndFlags(
               length++;
             else
               length += 5;
-            if (ptr[1] == '?')
+            if (safelyCheckNextChar(ptr, patternEnd, '?'))
               ptr++;
           }
         }
@@ -2460,11 +2470,11 @@ static int calculateCompiledPatternLengthAndFlags(
           length += lastitemlength + ((maxRepeats > 0) ? 3 : 1);
         }
 
-        if (ptr[1] == '?')
+        if (safelyCheckNextChar(ptr, patternEnd, '?'))
           ptr++; /* Needs no extra length */
 
       POSSESSIVE: /* Test for possessive quantifier */
-        if (ptr[1] == '+') {
+        if (safelyCheckNextChar(ptr, patternEnd, '+')) {
           ptr++;
           length += 2 + 2 * LINK_SIZE; /* Allow for atomic brackets */
         }
@@ -2540,16 +2550,16 @@ static int calculateCompiledPatternLengthAndFlags(
             class_optcount++;
 
             int d = -1;
-            if (ptr + 1 < patternEnd && ptr[1] == '-') {
+            if (safelyCheckNextChar(ptr, patternEnd, '-')) {
               UChar const* hyptr = ptr++;
-              if (ptr + 1 < patternEnd && ptr[1] == '\\') {
+              if (safelyCheckNextChar(ptr, patternEnd, '\\')) {
                 ptr++;
                 d = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
                 if (errorcode != 0)
                   return -1;
                 if (-d == ESC_b)
                   d = '\b'; /* backspace */
-              } else if (ptr + 1 < patternEnd && ptr[1] != ']')
+              } else if ((ptr + 1 < patternEnd) && ptr[1] != ']')
                 d = *++ptr;
               if (d < 0)
                 ptr = hyptr; /* go back to hyphen as data */
@@ -2659,7 +2669,7 @@ static int calculateCompiledPatternLengthAndFlags(
            quantifier,
            we also need extra for wrapping the whole thing in a sub-pattern. */
 
-          if (ptr + 1 < patternEnd && ptr[1] == '{' &&
+          if (safelyCheckNextChar(ptr, patternEnd, '{') &&
               is_counted_repeat(ptr + 2, patternEnd)) {
             ptr = read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats,
                                      &errorcode);
@@ -2670,10 +2680,10 @@ static int calculateCompiledPatternLengthAndFlags(
               length++;
             else
               length += 5;
-            if (ptr + 1 < patternEnd && ptr[1] == '+') {
+            if (safelyCheckNextChar(ptr, patternEnd, '+')) {
               ptr++;
               length += 2 + 2 * LINK_SIZE;
-            } else if (ptr + 1 < patternEnd && ptr[1] == '?')
+            } else if (safelyCheckNextChar(ptr, patternEnd, '?'))
               ptr++;
           }
         }
@@ -2689,7 +2699,7 @@ static int calculateCompiledPatternLengthAndFlags(
 
         /* Handle special forms of bracket, which all start (? */
 
-        if (ptr + 1 < patternEnd && ptr[1] == '?') {
+        if (safelyCheckNextChar(ptr, patternEnd, '?')) {
           switch (c = (ptr + 2 < patternEnd ? ptr[2] : 0)) {
             /* Non-referencing groups and lookaheads just move the pointer on,
              and
@@ -2772,7 +2782,7 @@ static int calculateCompiledPatternLengthAndFlags(
         /* Leave ptr at the final char; for read_repeat_counts this happens
          automatically; for the others we need an increment. */
 
-        if (ptr + 1 < patternEnd && (c = ptr[1]) == '{' &&
+        if ((ptr + 1 < patternEnd) && (c = ptr[1]) == '{' &&
             is_counted_repeat(ptr + 2, patternEnd)) {
           ptr =
               read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats, &errorcode);
@@ -2825,7 +2835,7 @@ static int calculateCompiledPatternLengthAndFlags(
 
         /* Allow space for once brackets for "possessive quantifier" */
 
-        if (ptr + 1 < patternEnd && ptr[1] == '+') {
+        if (safelyCheckNextChar(ptr, patternEnd, '+')) {
           ptr++;
           length += 2 + 2 * LINK_SIZE;
         }
