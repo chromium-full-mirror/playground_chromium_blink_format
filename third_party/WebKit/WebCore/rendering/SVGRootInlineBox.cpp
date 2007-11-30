@@ -692,13 +692,13 @@ FontStyle svgFontStyleForInlineTextBox(RenderStyle* style,
   ASSERT(textBox);
   ASSERT(style);
 
-  FontStyle FontStyle(false, static_cast<int>(xPos), textBox->toAdd(),
+  FontStyle fontStyle(false, static_cast<int>(xPos), textBox->toAdd(),
                       textBox->m_reversed,
                       textBox->m_dirOverride || style->visuallyOrdered());
 
   // We handle letter & word spacing ourselves
-  FontStyle.disableSpacing();
-  return FontStyle;
+  fontStyle.disableSpacing();
+  return fontStyle;
 }
 
 static float cummulatedWidthOrHeightOfTextChunk(SVGTextChunk& chunk,

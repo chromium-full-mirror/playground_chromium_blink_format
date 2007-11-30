@@ -97,7 +97,7 @@ void RenderListBox::updateFromElement() {
     int size = numItems();
 
     float width = 0;
-    FontStyle FontStyle(0, 0, 0, false, false, false, false);
+    FontStyle fontStyle(0, 0, 0, false, false, false, false);
     for (int i = 0; i < size; ++i) {
       HTMLElement* element = listItems[i];
       String text;
@@ -113,7 +113,7 @@ void RenderListBox::updateFromElement() {
       }
 
       if (!text.isEmpty()) {
-        float textWidth = itemFont.floatWidth(TextRun(text.impl()), FontStyle);
+        float textWidth = itemFont.floatWidth(TextRun(text.impl()), fontStyle);
         width = max(width, textWidth);
       }
     }
@@ -338,13 +338,13 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
 
   unsigned length = itemText.length();
   const UChar* string = itemText.characters();
-  FontStyle FontStyle(0, 0, 0, itemStyle->direction() == RTL,
+  FontStyle fontStyle(0, 0, 0, itemStyle->direction() == RTL,
                       itemStyle->unicodeBidi() == Override, false, false);
   TextRun textRun(string, length);
 
   // Draw the item text
   if (itemStyle->visibility() != HIDDEN)
-    paintInfo.context->drawBidiText(textRun, r.location(), FontStyle);
+    paintInfo.context->drawBidiText(textRun, r.location(), fontStyle);
 }
 
 void RenderListBox::paintItemBackground(PaintInfo& paintInfo,

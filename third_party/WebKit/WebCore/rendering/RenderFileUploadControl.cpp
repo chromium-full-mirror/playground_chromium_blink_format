@@ -176,7 +176,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
         m_fileChooser->basenameForWidth(style()->font(), maxFilenameWidth());
     unsigned length = displayedFilename.length();
     const UChar* string = displayedFilename.characters();
-    FontStyle FontStyle(0, 0, 0, style()->direction() == RTL,
+    FontStyle fontStyle(0, 0, 0, style()->direction() == RTL,
                         style()->unicodeBidi() == Override);
     TextRun textRun(string, length);
 
@@ -203,7 +203,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
     paintInfo.context->setFillColor(style()->color());
 
     // Draw the filename
-    paintInfo.context->drawBidiText(textRun, IntPoint(textX, textY), FontStyle);
+    paintInfo.context->drawBidiText(textRun, IntPoint(textX, textY), fontStyle);
 
     if (m_fileChooser->icon()) {
       // Determine where the icon should be placed
