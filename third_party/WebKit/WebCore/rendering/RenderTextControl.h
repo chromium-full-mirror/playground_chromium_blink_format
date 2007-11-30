@@ -123,6 +123,8 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   virtual RenderStyle* itemStyle(unsigned listIndex) const;
   virtual RenderStyle* clientStyle() const;
   virtual Document* clientDocument() const;
+  virtual int clientInsetLeft() const;
+  virtual int clientInsetRight() const;
   virtual int clientPaddingLeft() const;
   virtual int clientPaddingRight() const;
   virtual int listSize() const;
