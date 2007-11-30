@@ -589,7 +589,7 @@ static int find_fixedlength(uschar* code, int options) {
       case OP_WHITESPACE:
       case OP_NOT_WORDCHAR:
       case OP_WORDCHAR:
-      case OP_ANY_CHAR:
+      case OP_NOT_NEWLINE:
         branchlength++;
         cc++;
         break;
@@ -877,7 +877,7 @@ static bool compile_branch(int options,
         zerofirstbyte = firstbyte;
         zeroreqbyte = reqbyte;
         previous = code;
-        *code++ = OP_ANY_CHAR;
+        *code++ = OP_NOT_NEWLINE;
         break;
 
       /* Character classes. If the included characters are all < 256, we build a
@@ -937,9 +937,6 @@ static bool compile_branch(int options,
          strict here. At the start of the loop, c contains the first byte of the
          character. */
         while ((c = *(++ptr)) != ']') {
-          if (c > 127)
-            c = getCharAndAdvanceIfSurrogate(ptr);
-
           /* Backslash may introduce a single character, or it may introduce one
            of the specials, which just set a flag. Escaped items are checked for
            validity in the pre-compiling pass. The sequence \b is a special
@@ -1013,7 +1010,7 @@ static bool compile_branch(int options,
           if (ptr[1] == '-' && ptr[2] != ']') {
             ptr += 2;
 
-            int d = getCharAndAdvanceIfSurrogate(ptr);
+            int d = *ptr;
 
             /* The second part of a range can be a single-character escape, but
              not any of the other escapes. Perl 5.6 treats a hyphen as a literal
@@ -1255,11 +1252,11 @@ static bool compile_branch(int options,
           memcpy(code, classbits, 32);
         code += 32;
         break;
-
-        /* Various kinds of repeat; '{' is not necessarily a quantifier, but
-         this
-         has been tested above. */
       }
+
+      /* Various kinds of repeat; '{' is not necessarily a quantifier, but this
+       has been tested above. */
+
       case '{':
         if (!is_quantifier)
           goto NORMAL_CHAR;
@@ -1377,7 +1374,7 @@ static bool compile_branch(int options,
          repeats by setting op_type to add a suitable offset into repeat_type.
          */
 
-        else if (*previous <= OP_ANY_CHAR) {
+        else if (*previous <= OP_NOT_NEWLINE) {
           op_type = OP_TYPESTAR - OP_STAR; /* Use type opcodes */
           c = *previous;
 
@@ -2245,7 +2242,7 @@ static bool canApplyFirstCharOptimization(const uschar* code,
        may be referenced. */
 
     } else if (op == OP_TYPESTAR || op == OP_TYPEMINSTAR) {
-      if (scode[1] != OP_ANY_CHAR || (bracket_map & backref_map))
+      if (scode[1] != OP_NOT_NEWLINE || (bracket_map & backref_map))
         return false;
     } else if (op != OP_CIRC) /* Check for explicit circumflex */
       return false;
@@ -2305,8 +2302,10 @@ static int find_firstassertedchar(const uschar* code,
           return -1;
         break;
       }
-      case OP_EXACT: /* Fall through */
+
+      case OP_EXACT:
         scode += 2;
+      /* Fall through */
 
       case OP_CHAR:
       case OP_CHAR_IGNORING_CASE:
@@ -2430,7 +2429,7 @@ static int calculateCompiledPatternLengthAndFlags(
       case '+': /* those are handled separately */
       case '?':
         length++;
-        goto POSESSIVE; /* A few lines below */
+        goto POSSESSIVE;
 
       /* This covers the cases of braced repeats after a single char, metachar,
        class, or back reference. */
@@ -2464,7 +2463,7 @@ static int calculateCompiledPatternLengthAndFlags(
         if (ptr[1] == '?')
           ptr++; /* Needs no extra length */
 
-      POSESSIVE: /* Test for possessive quantifier */
+      POSSESSIVE: /* Test for possessive quantifier */
         if (ptr[1] == '+') {
           ptr++;
           length += 2 + 2 * LINK_SIZE; /* Allow for atomic brackets */
@@ -2533,7 +2532,7 @@ static int calculateCompiledPatternLengthAndFlags(
            characters. */
 
           else {
-            c = getCharAndAdvanceIfSurrogate(ptr, patternEnd);
+            c = *ptr;
 
           /* Come here from handling \ above when it escapes to a char value */
 
@@ -2550,10 +2549,8 @@ static int calculateCompiledPatternLengthAndFlags(
                   return -1;
                 if (-d == ESC_b)
                   d = '\b'; /* backspace */
-              } else if (ptr + 1 < patternEnd && ptr[1] != ']') {
-                ptr++;
-                d = getCharAndAdvanceIfSurrogate(ptr, patternEnd);
-              }
+              } else if (ptr + 1 < patternEnd && ptr[1] != ']')
+                d = *++ptr;
               if (d < 0)
                 ptr = hyptr; /* go back to hyphen as data */
             }
@@ -2682,6 +2679,7 @@ static int calculateCompiledPatternLengthAndFlags(
         }
         continue;
       }
+
       /* Brackets may be genuine groups or special things */
 
       case '(': {
@@ -2753,6 +2751,7 @@ static int calculateCompiledPatternLengthAndFlags(
         length += bracket_length;
         continue;
       }
+
       /* Handle ket. Look for subsequent maxRepeats/minRepeats; for certain sets
        of values we
        have to replicate this bracket up to that many times. If brastackptr is
@@ -2760,6 +2759,7 @@ static int calculateCompiledPatternLengthAndFlags(
        care
        not to try to access brastack[-1] when computing the length and restoring
        the branch_extra value. */
+
       case ')': {
         int duplength;
         length += 1 + LINK_SIZE;
@@ -2831,6 +2831,7 @@ static int calculateCompiledPatternLengthAndFlags(
         }
         continue;
       }
+
       /* Non-special character. It won't be space or # in extended mode, so it
        is
        always a genuine character. If we are in a \Q...\E sequence, check for
@@ -2839,22 +2840,16 @@ static int calculateCompiledPatternLengthAndFlags(
 
       default:
       NORMAL_CHAR:
-
         length += 2;        /* For a one-byte character */
         lastitemlength = 1; /* Default length of last item for repeats */
 
-        /* In UTF-8 mode, check for additional bytes. */
-
         if (c > 127) {
-          c = getCharAndAdvanceIfSurrogate(ptr, patternEnd);
-          {
-            int i;
-            for (i = 0; i < _pcre_utf8_table1_size; i++)
-              if (c <= _pcre_utf8_table1[i])
-                break;
-            length += i;
-            lastitemlength += i;
-          }
+          int i;
+          for (i = 0; i < _pcre_utf8_table1_size; i++)
+            if (c <= _pcre_utf8_table1[i])
+              break;
+          length += i;
+          lastitemlength += i;
         }
 
         continue;
