@@ -267,11 +267,17 @@ void Settings::setAuthorAndUserStylesEnabled(bool authorAndUserStylesEnabled) {
 }
 
 void Settings::setDefaultDatabaseOriginQuota(unsigned long long quota) {
+#if ENABLE(DATABASE)
   DatabaseTracker::tracker().setDefaultOriginQuota(quota);
+#endif
 }
 
 unsigned long long Settings::defaultDatabaseOriginQuota() const {
+#if ENABLE(DATABASE)
   return DatabaseTracker::tracker().defaultOriginQuota();
+#else
+  return 0;
+#endif
 }
 
 }  // namespace WebCore
