@@ -39,9 +39,47 @@
 #include <JavaScriptCore/JavaScriptCore.h>
 #include <WebKit/IWebFramePrivate.h>
 #include <WebKit/IWebViewPrivate.h>
+#include <wtf/Vector.h>
 #include <stdio.h>
+#include <string>
+
+using std::string;
 
 static FrameLoadDelegate* g_delegateWaitingOnTimer;
+
+string BSTRtoString(BSTR bstr) {
+  int result =
+      WideCharToMultiByte(CP_UTF8, 0, bstr, SysStringLen(bstr) + 1, 0, 0, 0, 0);
+  Vector<char> utf8Vector(result);
+  result = WideCharToMultiByte(CP_UTF8, 0, bstr, SysStringLen(bstr) + 1,
+                               utf8Vector.data(), result, 0, 0);
+  if (!result)
+    return string();
+
+  return string(utf8Vector.data(), utf8Vector.size() - 1);
+}
+
+string descriptionSuitableForTestResult(IWebFrame* webFrame) {
+  COMPtr<IWebView> webView;
+  if (FAILED(webFrame->webView(&webView)))
+    return string();
+
+  COMPtr<IWebFrame> mainFrame;
+  if (FAILED(webView->mainFrame(&mainFrame)))
+    return string();
+
+  if (webFrame == mainFrame)
+    return "main frame";
+
+  BSTR frameNameBSTR;
+  if (FAILED(webFrame->name(&frameNameBSTR)))
+    return string();
+
+  string frameName = "frame \"" + BSTRtoString(frameNameBSTR) + "\"";
+  SysFreeString(frameNameBSTR);
+
+  return frameName;
+}
 
 FrameLoadDelegate::FrameLoadDelegate()
     : m_refCount(1), m_gcController(new GCController) {}
@@ -55,6 +93,10 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::QueryInterface(REFIID riid,
     *ppvObject = static_cast<IWebFrameLoadDelegate*>(this);
   else if (IsEqualGUID(riid, IID_IWebFrameLoadDelegate))
     *ppvObject = static_cast<IWebFrameLoadDelegate*>(this);
+  else if (IsEqualGUID(riid, IID_IWebFrameLoadDelegate2))
+    *ppvObject = static_cast<IWebFrameLoadDelegate*>(this);
+  else if (IsEqualGUID(riid, IID_IWebFrameLoadDelegatePrivate))
+    *ppvObject = static_cast<IWebFrameLoadDelegatePrivate*>(this);
   else
     return E_NOINTERFACE;
 
@@ -77,11 +119,26 @@ ULONG STDMETHODCALLTYPE FrameLoadDelegate::Release(void) {
 HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didStartProvisionalLoadForFrame(
     /* [in] */ IWebView* webView,
     /* [in] */ IWebFrame* frame) {
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didStartProvisionalLoadForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
   // Make sure we only set this once per test.  If it gets cleared, and then set
   // again, we might
   // end up doing two dumps for one test.
   if (!topLoadingFrame && !done)
     topLoadingFrame = frame;
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFailProvisionalLoadWithError(
+    /* [in] */ IWebView* webView,
+    /* [in] */ IWebError* error,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didFailProvisionalLoadWithError\n",
+           descriptionSuitableForTestResult(frame).c_str());
 
   return S_OK;
 }
@@ -94,6 +151,11 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didCommitLoadForFrame(
   if (FAILED(hr))
     return hr;
   webViewPrivate->updateActiveState();
+
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didCommitLoadForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
   return S_OK;
 }
 
@@ -150,6 +212,10 @@ void FrameLoadDelegate::locationChangeDone(IWebError*, IWebFrame* frame) {
 HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFinishLoadForFrame(
     /* [in] */ IWebView* webView,
     /* [in] */ IWebFrame* frame) {
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didFinishLoadForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
   locationChangeDone(0, frame);
   return S_OK;
 }
@@ -162,10 +228,25 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFailLoadWithError(
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FrameLoadDelegate::windowScriptObjectAvailable(
-    /* [in] */ IWebView* sender,
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::willCloseFrame(
+    /* [in] */ IWebView* webView,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - willCloseFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didClearWindowObject(
+    /* [in] */ IWebView* webView,
     /* [in] */ JSContextRef context,
-    /* [in] */ JSObjectRef windowObject) {
+    /* [in] */ JSObjectRef windowObject,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didClearWindowObjectForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
   JSValueRef exception = 0;
 
   ::layoutTestController->makeWindowObject(context, windowObject, &exception);
@@ -180,6 +261,26 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::windowScriptObjectAvailable(
       context, windowObject, eventSenderStr, eventSender,
       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, 0);
   JSStringRelease(eventSenderStr);
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFinishDocumentLoadForFrame(
+    /* [in] */ IWebView* sender,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didFinishDocumentLoadForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didHandleOnloadEventsForFrame(
+    /* [in] */ IWebView* sender,
+    /* [in] */ IWebFrame* frame) {
+  if (!done && layoutTestController->dumpFrameLoadCallbacks())
+    printf("%s - didHandleOnloadEventsForFrame\n",
+           descriptionSuitableForTestResult(frame).c_str());
 
   return S_OK;
 }
