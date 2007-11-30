@@ -18,14 +18,14 @@
  *
  */
 
-#ifndef TextStyle_h
-#define TextStyle_h
+#ifndef FontStyle_h
+#define FontStyle_h
 
 namespace WebCore {
 
-class TextStyle {
+class FontStyle {
  public:
-  TextStyle(bool allowTabs = false,
+  FontStyle(bool allowTabs = false,
             int xpos = 0,
             int padding = 0,
             bool rtl = false,

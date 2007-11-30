@@ -32,7 +32,7 @@
 #include "GraphicsContext.h"
 #include "IntRect.h"
 #include "NotImplemented.h"
-#include "TextStyle.h"
+#include "FontStyle.h"
 #include "UniscribeController.h"
 #include <ApplicationServices/ApplicationServices.h>
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
@@ -111,7 +111,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun& run,
-                                            const TextStyle& style,
+                                            const FontStyle& style,
                                             const IntPoint& point,
                                             int h,
                                             int from,
@@ -138,7 +138,7 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
 
 void Font::drawComplexText(GraphicsContext* context,
                            const TextRun& run,
-                           const TextStyle& style,
+                           const FontStyle& style,
                            const FloatPoint& point,
                            int from,
                            int to) const {
@@ -169,14 +169,14 @@ void Font::drawComplexText(GraphicsContext* context,
 }
 
 float Font::floatWidthForComplexText(const TextRun& run,
-                                     const TextStyle& style) const {
+                                     const FontStyle& style) const {
   UniscribeController controller(this, run, style);
   controller.advance(run.length());
   return controller.runWidthSoFar();
 }
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
-                                          const TextStyle& style,
+                                          const FontStyle& style,
                                           int x,
                                           bool includePartialGlyphs) const {
   UniscribeController controller(this, run, style);

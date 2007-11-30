@@ -31,7 +31,7 @@
 #include "RenderText.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
-#include "TextStyle.h"
+#include "FontStyle.h"
 #include <math.h>
 
 using namespace std;
@@ -176,7 +176,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
         m_fileChooser->basenameForWidth(style()->font(), maxFilenameWidth());
     unsigned length = displayedFilename.length();
     const UChar* string = displayedFilename.characters();
-    TextStyle textStyle(0, 0, 0, style()->direction() == RTL,
+    FontStyle FontStyle(0, 0, 0, style()->direction() == RTL,
                         style()->unicodeBidi() == Override);
     TextRun textRun(string, length);
 
@@ -203,7 +203,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
     paintInfo.context->setFillColor(style()->color());
 
     // Draw the filename
-    paintInfo.context->drawBidiText(textRun, IntPoint(textX, textY), textStyle);
+    paintInfo.context->drawBidiText(textRun, IntPoint(textX, textY), FontStyle);
 
     if (m_fileChooser->icon()) {
       // Determine where the icon should be placed
@@ -247,7 +247,7 @@ void RenderFileUploadControl::calcPrefWidths() {
     // (using "0" as the nominal character).
     const UChar ch = '0';
     float charWidth = style()->font().floatWidth(
-        TextRun(&ch, 1), TextStyle(0, 0, 0, false, false, false));
+        TextRun(&ch, 1), FontStyle(0, 0, 0, false, false, false));
     m_maxPrefWidth = (int)ceilf(charWidth * defaultWidthNumChars);
   }
 

@@ -32,7 +32,7 @@
 #include "FontFallbackList.h"
 #include "IntPoint.h"
 #include "GlyphBuffer.h"
-#include "TextStyle.h"
+#include "FontStyle.h"
 #include <wtf/unicode/Unicode.h>
 #include <wtf/MathExtras.h>
 
@@ -91,7 +91,7 @@ const uint8_t Font::gRoundingHackCharacterTable[256] = {
 Font::CodePath Font::codePath = Auto;
 
 struct WidthIterator {
-  WidthIterator(const Font* font, const TextRun& run, const TextStyle& style);
+  WidthIterator(const Font* font, const TextRun& run, const FontStyle& style);
 
   void advance(int to, GlyphBuffer* glyphBuffer = 0);
   bool advanceOneCharacter(float& width, GlyphBuffer* glyphBuffer = 0);
@@ -101,7 +101,7 @@ struct WidthIterator {
   const TextRun& m_run;
   int m_end;
 
-  const TextStyle& m_style;
+  const FontStyle& m_style;
 
   unsigned m_currentCharacter;
   float m_runWidthSoFar;
@@ -115,7 +115,7 @@ struct WidthIterator {
 
 WidthIterator::WidthIterator(const Font* font,
                              const TextRun& run,
-                             const TextStyle& style)
+                             const FontStyle& style)
     : m_font(font),
       m_run(run),
       m_end(run.length()),
@@ -563,10 +563,10 @@ void Font::update(PassRefPtr<FontSelector> fontSelector) const {
 }
 
 int Font::width(const TextRun& run) const {
-  return width(run, TextStyle());
+  return width(run, FontStyle());
 }
 
-int Font::width(const TextRun& run, const TextStyle& style) const {
+int Font::width(const TextRun& run, const FontStyle& style) const {
   return lroundf(floatWidth(run, style));
 }
 
@@ -671,7 +671,7 @@ bool Font::canUseGlyphCache(const TextRun& run) const {
 
 void Font::drawSimpleText(GraphicsContext* context,
                           const TextRun& run,
-                          const TextStyle& style,
+                          const FontStyle& style,
                           const FloatPoint& point,
                           int from,
                           int to) const {
@@ -712,7 +712,7 @@ void Font::drawSimpleText(GraphicsContext* context,
 void Font::drawGlyphBuffer(GraphicsContext* context,
                            const GlyphBuffer& glyphBuffer,
                            const TextRun& run,
-                           const TextStyle& style,
+                           const FontStyle& style,
                            const FloatPoint& point) const {
   // Draw each contiguous run of glyphs that use the same font data.
   const FontData* fontData = glyphBuffer.fontDataAt(0);
@@ -741,7 +741,7 @@ void Font::drawGlyphBuffer(GraphicsContext* context,
 
 void Font::drawText(GraphicsContext* context,
                     const TextRun& run,
-                    const TextStyle& style,
+                    const FontStyle& style,
                     const FloatPoint& point,
                     int from,
                     int to) const {
@@ -757,14 +757,14 @@ void Font::drawText(GraphicsContext* context,
     drawComplexText(context, run, style, point, from, to);
 }
 
-float Font::floatWidth(const TextRun& run, const TextStyle& style) const {
+float Font::floatWidth(const TextRun& run, const FontStyle& style) const {
   if (canUseGlyphCache(run))
     return floatWidthForSimpleText(run, style, 0);
   return floatWidthForComplexText(run, style);
 }
 
 float Font::floatWidthForSimpleText(const TextRun& run,
-                                    const TextStyle& style,
+                                    const FontStyle& style,
                                     GlyphBuffer* glyphBuffer) const {
   WidthIterator it(this, run, style);
   it.advance(run.length(), glyphBuffer);
@@ -772,7 +772,7 @@ float Font::floatWidthForSimpleText(const TextRun& run,
 }
 
 FloatRect Font::selectionRectForText(const TextRun& run,
-                                     const TextStyle& style,
+                                     const FontStyle& style,
                                      const IntPoint& point,
                                      int h,
                                      int from,
@@ -784,7 +784,7 @@ FloatRect Font::selectionRectForText(const TextRun& run,
 }
 
 FloatRect Font::selectionRectForSimpleText(const TextRun& run,
-                                           const TextStyle& style,
+                                           const FontStyle& style,
                                            const IntPoint& point,
                                            int h,
                                            int from,
@@ -810,7 +810,7 @@ FloatRect Font::selectionRectForSimpleText(const TextRun& run,
 }
 
 int Font::offsetForPosition(const TextRun& run,
-                            const TextStyle& style,
+                            const FontStyle& style,
                             int x,
                             bool includePartialGlyphs) const {
   if (canUseGlyphCache(run))
@@ -819,7 +819,7 @@ int Font::offsetForPosition(const TextRun& run,
 }
 
 int Font::offsetForPositionForSimpleText(const TextRun& run,
-                                         const TextStyle& style,
+                                         const FontStyle& style,
                                          int x,
                                          bool includePartialGlyphs) const {
   float delta = (float)x;

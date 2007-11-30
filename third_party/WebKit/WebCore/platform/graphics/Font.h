@@ -46,7 +46,7 @@ class GlyphBuffer;
 class GlyphPageTreeNode;
 class GraphicsContext;
 class IntPoint;
-class TextStyle;
+class FontStyle;
 
 struct GlyphData;
 
@@ -94,22 +94,22 @@ class Font {
 
   void drawText(GraphicsContext*,
                 const TextRun&,
-                const TextStyle&,
+                const FontStyle&,
                 const FloatPoint&,
                 int from = 0,
                 int to = -1) const;
 
-  int width(const TextRun&, const TextStyle&) const;
+  int width(const TextRun&, const FontStyle&) const;
   int width(const TextRun&) const;
-  float floatWidth(const TextRun&, const TextStyle&) const;
+  float floatWidth(const TextRun&, const FontStyle&) const;
   float floatWidth(const TextRun&) const;
 
   int offsetForPosition(const TextRun&,
-                        const TextStyle&,
+                        const FontStyle&,
                         int position,
                         bool includePartialGlyphs) const;
   FloatRect selectionRectForText(const TextRun&,
-                                 const TextStyle&,
+                                 const FontStyle&,
                                  const IntPoint&,
                                  int h,
                                  int from = 0,
@@ -162,7 +162,7 @@ class Font {
   bool canUseGlyphCache(const TextRun&) const;
   void drawSimpleText(GraphicsContext*,
                       const TextRun&,
-                      const TextStyle&,
+                      const FontStyle&,
                       const FloatPoint&,
                       int from,
                       int to) const;
@@ -175,34 +175,34 @@ class Font {
   void drawGlyphBuffer(GraphicsContext*,
                        const GlyphBuffer&,
                        const TextRun&,
-                       const TextStyle&,
+                       const FontStyle&,
                        const FloatPoint&) const;
   void drawComplexText(GraphicsContext*,
                        const TextRun&,
-                       const TextStyle&,
+                       const FontStyle&,
                        const FloatPoint&,
                        int from,
                        int to) const;
   float floatWidthForSimpleText(const TextRun&,
-                                const TextStyle&,
+                                const FontStyle&,
                                 GlyphBuffer*) const;
-  float floatWidthForComplexText(const TextRun&, const TextStyle&) const;
+  float floatWidthForComplexText(const TextRun&, const FontStyle&) const;
   int offsetForPositionForSimpleText(const TextRun&,
-                                     const TextStyle&,
+                                     const FontStyle&,
                                      int position,
                                      bool includePartialGlyphs) const;
   int offsetForPositionForComplexText(const TextRun&,
-                                      const TextStyle&,
+                                      const FontStyle&,
                                       int position,
                                       bool includePartialGlyphs) const;
   FloatRect selectionRectForSimpleText(const TextRun&,
-                                       const TextStyle&,
+                                       const FontStyle&,
                                        const IntPoint&,
                                        int h,
                                        int from,
                                        int to) const;
   FloatRect selectionRectForComplexText(const TextRun&,
-                                        const TextStyle&,
+                                        const FontStyle&,
                                         const IntPoint&,
                                         int h,
                                         int from,

@@ -79,7 +79,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun& run,
-                                            const TextStyle& style,
+                                            const FontStyle& style,
                                             const IntPoint& point,
                                             int h,
                                             int from,
@@ -90,7 +90,7 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
 
 void Font::drawComplexText(GraphicsContext* graphicsContext,
                            const TextRun& run,
-                           const TextStyle& style,
+                           const FontStyle& style,
                            const FloatPoint& point,
                            int from,
                            int to) const {
@@ -98,13 +98,13 @@ void Font::drawComplexText(GraphicsContext* graphicsContext,
 }
 
 float Font::floatWidthForComplexText(const TextRun& run,
-                                     const TextStyle& style) const {
+                                     const FontStyle& style) const {
   notImplemented();
   return 0;
 }
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
-                                          const TextStyle& style,
+                                          const FontStyle& style,
                                           int x,
                                           bool includePartialGlyphs) const {
   notImplemented();

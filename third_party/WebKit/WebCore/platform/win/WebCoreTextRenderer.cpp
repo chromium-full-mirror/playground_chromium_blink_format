@@ -29,7 +29,7 @@
 #include "FontDescription.h"
 #include "GraphicsContext.h"
 #include "StringTruncator.h"
-#include "TextStyle.h"
+#include "FontStyle.h"
 #include <wtf/unicode/Unicode.h>
 
 namespace WebCore {
@@ -51,7 +51,7 @@ static void doDrawTextAtPoint(GraphicsContext& context,
                               const Color& color,
                               int underlinedIndex) {
   TextRun run(text.characters(), text.length());
-  TextStyle style;
+  FontStyle style;
 
   context.setFillColor(color);
   if (isOneLeftToRightRun(run))

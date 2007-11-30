@@ -67,20 +67,20 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 
 void Font::drawComplexText(GraphicsContext*,
                            const TextRun&,
-                           const TextStyle&,
+                           const FontStyle&,
                            const FloatPoint&,
                            int from,
                            int to) const {
   notImplemented();
 }
 
-float Font::floatWidthForComplexText(const TextRun&, const TextStyle&) const {
+float Font::floatWidthForComplexText(const TextRun&, const FontStyle&) const {
   notImplemented();
   return 0.0f;
 }
 
 int Font::offsetForPositionForComplexText(const TextRun&,
-                                          const TextStyle&,
+                                          const FontStyle&,
                                           int,
                                           bool) const {
   notImplemented();
@@ -88,7 +88,7 @@ int Font::offsetForPositionForComplexText(const TextRun&,
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun&,
-                                            const TextStyle&,
+                                            const FontStyle&,
                                             const IntPoint&,
                                             int,
                                             int,

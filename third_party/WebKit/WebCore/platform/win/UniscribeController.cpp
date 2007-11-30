@@ -30,7 +30,7 @@
 #include "UniscribeController.h"
 #include "Font.h"
 #include "FontData.h"
-#include "TextStyle.h"
+#include "FontStyle.h"
 #include <wtf/MathExtras.h>
 
 namespace WebCore {
@@ -44,7 +44,7 @@ namespace WebCore {
 // measuring.
 UniscribeController::UniscribeController(const Font* font,
                                          const TextRun& run,
-                                         const TextStyle& style)
+                                         const FontStyle& style)
     : m_font(*font),
       m_run(run),
       m_style(style),

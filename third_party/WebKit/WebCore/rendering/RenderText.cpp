@@ -33,7 +33,7 @@
 #include "RenderLayer.h"
 #include "Text.h"
 #include "TextBreakIterator.h"
-#include "TextStyle.h"
+#include "FontStyle.h"
 #include "break_lines.h"
 #include <wtf/AlwaysInline.h>
 
@@ -428,7 +428,7 @@ ALWAYS_INLINE int RenderText::widthFromCache(const Font& f,
   }
 
   return f.width(TextRun(text()->characters() + start, len),
-                 TextStyle(allowTabs(), xPos));
+                 FontStyle(allowTabs(), xPos));
 }
 
 void RenderText::trimmedPrefWidths(int leadWidth,
@@ -708,7 +708,7 @@ void RenderText::calcPrefWidths(int leadWidth) {
       } else {
         currMaxWidth +=
             f.width(TextRun(txt + i, 1),
-                    TextStyle(allowTabs(), leadWidth + currMaxWidth));
+                    FontStyle(allowTabs(), leadWidth + currMaxWidth));
         needsWordSpacing = isSpace && !previousCharacterIsSpace && i == len - 1;
       }
       ASSERT(lastWordBoundary == i);
@@ -1071,7 +1071,7 @@ unsigned int RenderText::width(unsigned int from,
       w = widthFromCache(f, from, len, xPos);
   } else
     w = f.width(TextRun(text()->characters() + from, len),
-                TextStyle(allowTabs(), xPos));
+                FontStyle(allowTabs(), xPos));
 
   return w;
 }

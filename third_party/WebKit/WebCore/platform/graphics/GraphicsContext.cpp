@@ -29,7 +29,7 @@
 
 #include "BidiResolver.h"
 #include "Font.h"
-#include "TextStyle.h"
+#include "FontStyle.h"
 
 using namespace std;
 
@@ -228,12 +228,12 @@ void GraphicsContext::drawText(const TextRun& run,
                                const IntPoint& point,
                                int from,
                                int to) {
-  drawText(run, point, TextStyle(), from, to);
+  drawText(run, point, FontStyle(), from, to);
 }
 
 void GraphicsContext::drawText(const TextRun& run,
                                const IntPoint& point,
-                               const TextStyle& style,
+                               const FontStyle& style,
                                int from,
                                int to) {
   if (paintingDisabled())
@@ -244,7 +244,7 @@ void GraphicsContext::drawText(const TextRun& run,
 
 void GraphicsContext::drawBidiText(const TextRun& run,
                                    const IntPoint& point,
-                                   const TextStyle& style) {
+                                   const FontStyle& style) {
   if (paintingDisabled())
     return;
 
@@ -266,7 +266,7 @@ void GraphicsContext::drawBidiText(const TextRun& run,
   FloatPoint currPoint = point;
   BidiCharacterRun* bidiRun = bidiResolver.firstRun();
   while (bidiRun) {
-    TextStyle subrunStyle(style);
+    FontStyle subrunStyle(style);
     subrunStyle.setRTL(bidiRun->level() % 2);
     subrunStyle.setDirectionalOverride(bidiRun->dirOverride(false));
 
@@ -288,7 +288,7 @@ void GraphicsContext::drawBidiText(const TextRun& run,
 void GraphicsContext::drawHighlightForText(const TextRun& run,
                                            const IntPoint& point,
                                            int h,
-                                           const TextStyle& style,
+                                           const FontStyle& style,
                                            const Color& backgroundColor,
                                            int from,
                                            int to) {

@@ -39,8 +39,6 @@ int findNextWordFromIndex(const UChar* chars,
                           bool forward) {
   UBreakIterator* it = wordBreakIterator(chars, len);
 
-  int newPosition = position;
-
   if (forward) {
     position = ubrk_following(it, position);
     while (position != UBRK_DONE) {

@@ -199,16 +199,16 @@ PassRefPtr<Node> ReplacementFragment::insertFragmentForTestRendering(
   while (n && !n->isElementNode())
     n = n->parentNode();
   if (n) {
-    RefPtr<CSSComputedStyleDeclaration> contextStyle =
+    RefPtr<CSSComputedStyleDeclaration> conFontStyle =
         new CSSComputedStyleDeclaration(static_cast<Element*>(n));
     CSSStyleDeclaration* style = holder->style();
     style->setProperty(CSS_PROP_WHITE_SPACE,
-                       contextStyle->getPropertyValue(CSS_PROP_WHITE_SPACE),
+                       conFontStyle->getPropertyValue(CSS_PROP_WHITE_SPACE),
                        false, ec);
     ASSERT(ec == 0);
     style->setProperty(
         CSS_PROP__WEBKIT_USER_SELECT,
-        contextStyle->getPropertyValue(CSS_PROP__WEBKIT_USER_SELECT), false,
+        conFontStyle->getPropertyValue(CSS_PROP__WEBKIT_USER_SELECT), false,
         ec);
     ASSERT(ec == 0);
   }
