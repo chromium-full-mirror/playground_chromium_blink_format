@@ -42,12 +42,12 @@ static LPCTSTR kConsoleClassName = _T("DroseraConsoleWindowClass");
 
 static LRESULT CALLBACK consoleWndProc(HWND, UINT, WPARAM, LPARAM);
 
-ATOM registerConsoleClass(HINSTANCE hInstance) {
+void registerConsoleClass(HINSTANCE hInstance) {
   static bool haveRegisteredWindowClass = false;
 
   if (haveRegisteredWindowClass) {
     haveRegisteredWindowClass = true;
-    return true;
+    return;
   }
 
   WNDCLASSEX wcex;
@@ -66,7 +66,7 @@ ATOM registerConsoleClass(HINSTANCE hInstance) {
   wcex.lpszClassName = kConsoleClassName;
   wcex.hIconSm = 0;
 
-  return RegisterClassEx(&wcex);
+  RegisterClassEx(&wcex);
 }
 
 static LRESULT CALLBACK consoleWndProc(HWND hWnd,
@@ -190,14 +190,6 @@ HRESULT STDMETHODCALLTYPE DebuggerClient::windowScriptObjectAvailable(
   if (exception)
     return E_FAIL;
 
-  return S_OK;
-}
-
-HRESULT STDMETHODCALLTYPE DebuggerClient::didReceiveTitle(
-    /* [in] */ IWebView*,
-    /* [in] */ BSTR /* title */,
-    /* [in] */ IWebFrame*) {
-  // FIXME: Set the title of Drosera's window to "[server name] - [title]"
   return S_OK;
 }
 

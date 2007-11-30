@@ -69,11 +69,6 @@ class DebuggerClient : public BaseDelegate {
       /* [in] */ JSContextRef,
       /* [in] */ JSObjectRef);
 
-  HRESULT STDMETHODCALLTYPE didReceiveTitle(
-      /* [in] */ IWebView*,
-      /* [in] */ BSTR,
-      /* [in] */ IWebFrame*);
-
   // IWebUIDelegate
   HRESULT STDMETHODCALLTYPE runJavaScriptAlertPanelWithMessage(
       /* [in] */ IWebView*,
@@ -83,10 +78,6 @@ class DebuggerClient : public BaseDelegate {
       /* [in] */ IWebView*,
       /* [in] */ IWebURLRequest*,
       /* [retval][out] */ IWebView**);
-
-  // IWebNotificationObserver
-  HRESULT STDMETHODCALLTYPE onNotify(
-      /* [in] */ IWebNotification*);
 
   bool webViewLoaded() const { return m_webViewLoaded; }
 
