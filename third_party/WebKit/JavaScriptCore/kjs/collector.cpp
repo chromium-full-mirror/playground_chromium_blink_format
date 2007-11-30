@@ -425,11 +425,12 @@ static inline PlatformThread getCurrentPlatformThread() {
 
 class Collector::Thread {
  public:
-  Thread(pthread_t pthread, const PlatformThread& platThread)
-      : posixThread(pthread), platformThread(platThread) {}
+  Thread(pthread_t pthread, const PlatformThread& platThread, void* base)
+      : posixThread(pthread), platformThread(platThread), stackBase(base) {}
   Thread* next;
   pthread_t posixThread;
   PlatformThread platformThread;
+  void* stackBase;
 };
 
 pthread_key_t registeredThreadKey;
@@ -480,8 +481,8 @@ void Collector::registerThread() {
       CollectorHeapIntrospector::init(&primaryHeap, &numberHeap);
 #endif
 
-    Collector::Thread* thread =
-        new Collector::Thread(pthread_self(), getCurrentPlatformThread());
+    Collector::Thread* thread = new Collector::Thread(
+        pthread_self(), getCurrentPlatformThread(), currentThreadStackBase());
 
     thread->next = registeredThreads;
     registeredThreads = thread;
@@ -694,25 +695,6 @@ static inline void* otherThreadStackPointer(
 #endif
 }
 
-static inline void* otherThreadStackBase(const PlatformThreadRegisters& regs,
-                                         Collector::Thread* thread) {
-#if PLATFORM(DARWIN)
-  (void)regs;
-  return pthread_get_stackaddr_np(thread->posixThread);
-// end PLATFORM(DARWIN);
-#elif PLATFORM(X86) && PLATFORM(WIN_OS)
-  LDT_ENTRY desc;
-  NT_TIB* tib;
-  GetThreadSelectorEntry(thread->platformThread.handle, regs.SegFs, &desc);
-  tib = (NT_TIB*)(uintptr_t)(desc.BaseLow | desc.HighWord.Bytes.BaseMid << 16 |
-                             desc.HighWord.Bytes.BaseHi << 24);
-  ASSERT(tib == tib->Self);
-  return tib->StackBase;
-#else
-#error Need a way to get the stack pointer for another thread on this platform
-#endif
-}
-
 void Collector::markOtherThreadConservatively(Thread* thread) {
   suspendThread(thread->platformThread);
 
@@ -723,8 +705,7 @@ void Collector::markOtherThreadConservatively(Thread* thread) {
   markStackObjectsConservatively((void*)&regs, (void*)((char*)&regs + regSize));
 
   void* stackPointer = otherThreadStackPointer(regs);
-  void* stackBase = otherThreadStackBase(regs, thread);
-  markStackObjectsConservatively(stackPointer, stackBase);
+  markStackObjectsConservatively(stackPointer, thread->stackBase);
 
   resumeThread(thread->platformThread);
 }
