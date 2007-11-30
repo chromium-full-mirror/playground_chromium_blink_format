@@ -1218,8 +1218,8 @@ void RenderBox::calcWidth() {
   bool inVerticalBox =
       parent()->isFlexibleBox() && (parent()->style()->boxOrient() == VERTICAL);
   bool stretching = (parent()->style()->boxAlign() == BSTRETCH);
-  bool treatAsReplaced = isReplaced() && !isInlineBlockOrInlineTable() &&
-                         (!inVerticalBox || !stretching);
+  bool treatAsReplaced =
+      shouldCalculateSizeAsReplaced() && (!inVerticalBox || !stretching);
 
   Length width =
       (treatAsReplaced) ? Length(calcReplacedWidth(), Fixed) : style()->width();
@@ -1410,8 +1410,8 @@ void RenderBox::calcHeight() {
     bool inHorizontalBox = parent()->isFlexibleBox() &&
                            parent()->style()->boxOrient() == HORIZONTAL;
     bool stretching = parent()->style()->boxAlign() == BSTRETCH;
-    bool treatAsReplaced = isReplaced() && !isInlineBlockOrInlineTable() &&
-                           (!inHorizontalBox || !stretching);
+    bool treatAsReplaced =
+        shouldCalculateSizeAsReplaced() && (!inHorizontalBox || !stretching);
     bool checkMinMaxHeight = false;
 
     // The parent box is flexing us, so it has increased or decreased our

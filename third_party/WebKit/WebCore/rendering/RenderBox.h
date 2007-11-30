@@ -208,6 +208,10 @@ class RenderBox : public RenderObject {
 
   void calcAbsoluteHorizontal();
 
+  virtual bool shouldCalculateSizeAsReplaced() const {
+    return isReplaced() && !isInlineBlockOrInlineTable();
+  }
+
  private:
   void paintRootBoxDecorations(PaintInfo&, int tx, int ty);
 
