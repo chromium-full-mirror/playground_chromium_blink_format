@@ -91,7 +91,7 @@ struct _WebKitFramePrivate {
                                WebKitNetworkRequestPrivate))
 typedef struct _WebKitNetworkRequestPrivate WebKitNetworkRequestPrivate;
 struct _WebKitNetworkRequestPrivate {
-  gchar* url;
+  gchar* uri;
 };
 
 WebKitFrame* webkit_frame_init_with_page(WebKitPage*,
