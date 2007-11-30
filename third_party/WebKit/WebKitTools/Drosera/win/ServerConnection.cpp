@@ -65,8 +65,10 @@ void ServerConnection::attemptToCreateServerConnection(
     if (FAILED(tempServer->sharedWebScriptDebugServer(&m_server)))
       return;
 
-    if (FAILED(m_server->addListener(this)))
+    if (FAILED(m_server->addListener(this))) {
+      m_server = 0;
       return;
+    }
 
     m_serverConnected = true;
 
@@ -322,6 +324,13 @@ HRESULT STDMETHODCALLTYPE ServerConnection::exceptionWasRaised(
   DebuggerDocument::exceptionWasRaised(m_globalContext, sidJS, linenoJS);
 
   return ret;
+}
+
+HRESULT STDMETHODCALLTYPE ServerConnection::serverDidDie() {
+  m_server = 0;
+  m_currentFrame = 0;
+  m_serverConnected = false;
+  return S_OK;
 }
 
 // Stack & Variables
