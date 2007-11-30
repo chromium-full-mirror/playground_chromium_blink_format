@@ -172,7 +172,7 @@ void ChromeClientQt::addMessageToConsole(const String& message,
 }
 
 void ChromeClientQt::chromeDestroyed() {
-  notImplemented();
+  delete this;
 }
 
 bool ChromeClientQt::canRunBeforeUnloadConfirmPanel() {

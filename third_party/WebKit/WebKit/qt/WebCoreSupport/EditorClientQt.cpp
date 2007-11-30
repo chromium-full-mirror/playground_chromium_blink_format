@@ -291,7 +291,7 @@ bool EditorClientQt::shouldInsertNode(Node* node,
 }
 
 void EditorClientQt::pageDestroyed() {
-  notImplemented();
+  delete this;
 }
 
 bool EditorClientQt::smartInsertDeleteEnabled() {
