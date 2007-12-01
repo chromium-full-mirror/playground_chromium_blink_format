@@ -40,7 +40,6 @@
 #include "SVGTextPositioningElement.h"
 #include "SVGURIReference.h"
 #include "Text.h"
-#include "FontStyle.h"
 #include "UnicodeRange.h"
 
 #include <float.h>
@@ -550,8 +549,8 @@ struct SVGRootInlineBoxPaintWalker {
       // Paint decorations, that have to be drawn before the text gets drawn
       if (textDecorations != TDNONE &&
           m_paintInfo.phase != PaintPhaseSelection) {
-        textWidth = styleToUse->font().width(TextRun(stringStart, stringLength),
-                                             styleToUse);
+        textWidth = styleToUse->font().width(svgTextRunForInlineTextBox(
+            stringStart, stringLength, styleToUse, textBox, (*it).x));
         decorationOrigin =
             IntPoint((int)(*it).x, (int)(*it).y - styleToUse->font().ascent());
         info = m_rootBox->retrievePaintServersForTextDecoration(text);
@@ -666,10 +665,9 @@ float cummulatedWidthOfInlineBoxCharacterRange(
   RenderText* text = textBox->textObject();
   RenderStyle* style = text->style();
 
-  return style->font().floatWidth(
-      TextRun(text->characters() + textBox->start() + range.startOffset,
-              range.endOffset - range.startOffset),
-      svgFontStyleForInlineTextBox(style, textBox, 0));
+  return style->font().floatWidth(svgTextRunForInlineTextBox(
+      text->characters() + textBox->start() + range.startOffset,
+      range.endOffset - range.startOffset, style, textBox, 0));
 }
 
 float cummulatedHeightOfInlineBoxCharacterRange(
@@ -686,19 +684,21 @@ float cummulatedHeightOfInlineBoxCharacterRange(
          (font.ascent() + font.descent());
 }
 
-FontStyle svgFontStyleForInlineTextBox(RenderStyle* style,
-                                       const InlineTextBox* textBox,
-                                       float xPos) {
+TextRun svgTextRunForInlineTextBox(const UChar* c,
+                                   int len,
+                                   RenderStyle* style,
+                                   const InlineTextBox* textBox,
+                                   float xPos) {
   ASSERT(textBox);
   ASSERT(style);
 
-  FontStyle fontStyle(false, static_cast<int>(xPos), textBox->toAdd(),
-                      textBox->m_reversed,
-                      textBox->m_dirOverride || style->visuallyOrdered());
+  TextRun run(c, len, false, static_cast<int>(xPos), textBox->toAdd(),
+              textBox->m_reversed,
+              textBox->m_dirOverride || style->visuallyOrdered());
 
   // We handle letter & word spacing ourselves
-  fontStyle.disableSpacing();
-  return fontStyle;
+  run.disableSpacing();
+  return run;
 }
 
 static float cummulatedWidthOrHeightOfTextChunk(SVGTextChunk& chunk,

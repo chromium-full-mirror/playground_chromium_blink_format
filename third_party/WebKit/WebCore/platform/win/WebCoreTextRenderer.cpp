@@ -29,7 +29,6 @@
 #include "FontDescription.h"
 #include "GraphicsContext.h"
 #include "StringTruncator.h"
-#include "FontStyle.h"
 #include <wtf/unicode/Unicode.h>
 
 namespace WebCore {
@@ -51,14 +50,13 @@ static void doDrawTextAtPoint(GraphicsContext& context,
                               const Color& color,
                               int underlinedIndex) {
   TextRun run(text.characters(), text.length());
-  FontStyle style;
 
   context.setFillColor(color);
   if (isOneLeftToRightRun(run))
-    font.drawText(&context, run, style, point);
+    font.drawText(&context, run, point);
   else {
     context.setFont(font);
-    context.drawBidiText(run, point, style);
+    context.drawBidiText(run, point);
   }
 
   if (underlinedIndex >= 0) {
@@ -67,12 +65,12 @@ static void doDrawTextAtPoint(GraphicsContext& context,
     int beforeWidth;
     if (underlinedIndex > 0) {
       TextRun beforeRun(text.characters(), underlinedIndex);
-      beforeWidth = font.width(beforeRun, style);
+      beforeWidth = font.width(beforeRun);
     } else
       beforeWidth = 0;
 
     TextRun underlinedRun(text.characters() + underlinedIndex, 1);
-    int underlinedWidth = font.width(underlinedRun, style);
+    int underlinedWidth = font.width(underlinedRun);
 
     IntPoint underlinePoint(point);
     underlinePoint.move(beforeWidth, 1);

@@ -24,7 +24,6 @@
 #include "Font.h"
 #include "FontDescription.h"
 #include "FontSelector.h"
-#include "FontStyle.h"
 
 #include "GraphicsContext.h"
 #include <QTextLayout>
@@ -151,14 +150,13 @@ void Font::update(PassRefPtr<FontSelector>) const {
 
 static int generateComponents(Vector<TextRunComponent, 1024>* components,
                               const Font& font,
-                              const TextRun& run,
-                              const FontStyle& style) {
+                              const TextRun& run) {
   //     qDebug() << "generateComponents" << QString((const QChar
   //     *)run.characters(), run.length());
   int letterSpacing = font.letterSpacing();
   int wordSpacing = font.wordSpacing();
   bool smallCaps = font.fontDescription().smallCaps();
-  int padding = style.padding();
+  int padding = run.padding();
   int numSpaces = 0;
   if (padding) {
     for (int i = 0; i < run.length(); i++)
@@ -178,8 +176,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
         padding -= add;
         --numSpaces;
       }
-      components->append(
-          TextRunComponent(1, style.rtl(), &font.font(), offset));
+      components->append(TextRunComponent(1, run.rtl(), &font.font(), offset));
       offset += add + letterSpacing + components->last().width;
       start = 1;
       //         qDebug() << "space at 0" << offset;
@@ -199,7 +196,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
         //                 qDebug() << "    treatAsSpace:" << i << start;
         if (i - start > 0) {
           components->append(TextRunComponent(run.characters() + start,
-                                              i - start, style.rtl(), f, offset,
+                                              i - start, run.rtl(), f, offset,
                                               f == &font.scFont()));
           offset += components->last().width + letterSpacing;
           //                     qDebug() << "   appending(1) " <<
@@ -212,7 +209,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
           --numSpaces;
         }
         components->append(
-            TextRunComponent(1, style.rtl(), &font.font(), offset));
+            TextRunComponent(1, run.rtl(), &font.font(), offset));
         offset += wordSpacing + add + components->last().width + letterSpacing;
         start = i + 1;
         continue;
@@ -230,7 +227,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
       }
       if (i - start > 0) {
         components->append(TextRunComponent(run.characters() + start, i - start,
-                                            style.rtl(), f, offset,
+                                            run.rtl(), f, offset,
                                             f == &font.scFont()));
         offset += components->last().width + letterSpacing;
         //                 qDebug() << "   appending(2) " <<
@@ -244,7 +241,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
     }
     if (run.length() - start > 0) {
       components->append(TextRunComponent(run.characters() + start,
-                                          run.length() - start, style.rtl(), f,
+                                          run.length() - start, run.rtl(), f,
                                           offset, f == &font.scFont()));
       offset += components->last().width;
       //             qDebug() << "   appending(3) " << components->last().string
@@ -256,8 +253,8 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
     for (int i = 0; i < run.length(); ++i) {
       if (Font::treatAsSpace(run[i])) {
         if (i - start > 0) {
-          components->append(TextRunComponent(
-              run.characters() + start, i - start, style.rtl(), f, offset));
+          components->append(TextRunComponent(run.characters() + start,
+                                              i - start, run.rtl(), f, offset));
           offset += components->last().width;
         }
         int add = 0;
@@ -267,7 +264,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
           --numSpaces;
         }
         components->append(
-            TextRunComponent(1, style.rtl(), &font.font(), offset));
+            TextRunComponent(1, run.rtl(), &font.font(), offset));
         offset += add + components->last().width;
         if (i)
           offset += wordSpacing;
@@ -276,7 +273,7 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
     }
     if (run.length() - start > 0) {
       components->append(TextRunComponent(run.characters() + start,
-                                          run.length() - start, style.rtl(), f,
+                                          run.length() - start, run.rtl(), f,
                                           offset));
       offset += components->last().width;
     }
@@ -286,7 +283,6 @@ static int generateComponents(Vector<TextRunComponent, 1024>* components,
 
 void Font::drawText(GraphicsContext* ctx,
                     const TextRun& run,
-                    const FontStyle& style,
                     const FloatPoint& point,
                     int from,
                     int to) const {
@@ -297,18 +293,18 @@ void Font::drawText(GraphicsContext* ctx,
   p->setPen(QColor(color));
 
   Vector<TextRunComponent, 1024> components;
-  int w = generateComponents(&components, *this, run, style);
+  int w = generateComponents(&components, *this, run);
 
   if (from > 0 || to < run.length()) {
     FloatRect clip = selectionRectForText(
-        run, style, IntPoint(qRound(point.x()), qRound(point.y())),
+        run, IntPoint(qRound(point.x()), qRound(point.y())),
         QFontMetrics(m_font).height(), from, to);
     QRectF rect(clip.x(), clip.y() - ascent(), clip.width(), clip.height());
     p->save();
     p->setClipRect(rect.toRect());
   }
 
-  if (style.rtl()) {
+  if (run.rtl()) {
     for (int i = 0; i < components.size(); ++i) {
       if (!components.at(i).isSpace()) {
         p->setFont(*components.at(i).font);
@@ -331,20 +327,12 @@ void Font::drawText(GraphicsContext* ctx,
     p->restore();
 }
 
-int Font::width(const TextRun& run, const FontStyle& style) const {
+int Font::width(const TextRun& run) const {
   Vector<TextRunComponent, 1024> components;
-  int w = generateComponents(&components, *this, run, style);
+  int w = generateComponents(&components, *this, run);
 
   //     qDebug() << "     width=" << w;
   return w;
-}
-
-int Font::width(const TextRun& run) const {
-  return width(run, FontStyle());
-}
-
-float Font::floatWidth(const TextRun& run, const FontStyle& style) const {
-  return width(run, style);
 }
 
 float Font::floatWidth(const TextRun& run) const {
@@ -352,14 +340,13 @@ float Font::floatWidth(const TextRun& run) const {
 }
 
 int Font::offsetForPosition(const TextRun& run,
-                            const FontStyle& style,
                             int position,
                             bool includePartialGlyphs) const {
   Vector<TextRunComponent, 1024> components;
-  int w = generateComponents(&components, *this, run, style);
+  int w = generateComponents(&components, *this, run);
 
   int offset = 0;
-  if (style.rtl()) {
+  if (run.rtl()) {
     for (int i = 0; i < components.size(); ++i) {
       int xe = w - components.at(i).offset;
       int xs = xe - components.at(i).width;
@@ -413,7 +400,7 @@ int Font::offsetForPosition(const TextRun& run,
 
 static float cursorToX(const Vector<TextRunComponent, 1024>& components,
                        int width,
-                       const FontStyle& style,
+                       bool rtl,
                        int cursor) {
   int start = 0;
   for (int i = 0; i < components.size(); ++i) {
@@ -422,7 +409,7 @@ static float cursorToX(const Vector<TextRunComponent, 1024>& components,
       continue;
     }
     int xs = components.at(i).offset;
-    if (style.rtl())
+    if (rtl)
       xs = width - xs - components.at(i).width;
     QTextLayout layout(components.at(i).string, *components.at(i).font);
     layout.beginLayout();
@@ -439,19 +426,18 @@ static float cursorToX(const Vector<TextRunComponent, 1024>& components,
 }
 
 FloatRect Font::selectionRectForText(const TextRun& run,
-                                     const FontStyle& style,
                                      const IntPoint& pt,
                                      int h,
                                      int from,
                                      int to) const {
   Vector<TextRunComponent, 1024> components;
-  int w = generateComponents(&components, *this, run, style);
+  int w = generateComponents(&components, *this, run);
 
   if (from == 0 && to == run.length())
     return FloatRect(pt.x(), pt.y(), w, h);
 
-  float x1 = cursorToX(components, w, style, from);
-  float x2 = cursorToX(components, w, style, to);
+  float x1 = cursorToX(components, w, run.rtl(), from);
+  float x2 = cursorToX(components, w, run.rtl(), to);
   if (x2 < x1)
     qSwap(x1, x2);
 

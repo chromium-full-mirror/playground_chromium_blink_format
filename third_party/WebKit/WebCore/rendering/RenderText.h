@@ -169,7 +169,7 @@ class RenderText : public RenderObject {
 
   InlineTextBox* findNextInlineTextBox(int offset, int& pos) const;
 
-  int allowTabs() const { return !style()->collapseWhiteSpace(); }
+  bool allowTabs() const { return !style()->collapseWhiteSpace(); }
 
   void checkConsistency() const;
 

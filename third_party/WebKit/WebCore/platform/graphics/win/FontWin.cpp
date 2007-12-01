@@ -32,7 +32,6 @@
 #include "GraphicsContext.h"
 #include "IntRect.h"
 #include "NotImplemented.h"
-#include "FontStyle.h"
 #include "UniscribeController.h"
 #include <ApplicationServices/ApplicationServices.h>
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
@@ -111,12 +110,11 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun& run,
-                                            const FontStyle& style,
                                             const IntPoint& point,
                                             int h,
                                             int from,
                                             int to) const {
-  UniscribeController it(this, run, style);
+  UniscribeController it(this, run);
   it.advance(from);
   float beforeWidth = it.runWidthSoFar();
   it.advance(to);
@@ -124,7 +122,7 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
 
   // Using roundf() rather than ceilf() for the right edge as a compromise to
   // ensure correct caret positioning
-  if (style.rtl()) {
+  if (run.rtl()) {
     it.advance(run.length());
     float totalWidth = it.runWidthSoFar();
     return FloatRect(
@@ -138,7 +136,6 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
 
 void Font::drawComplexText(GraphicsContext* context,
                            const TextRun& run,
-                           const FontStyle& style,
                            const FloatPoint& point,
                            int from,
                            int to) const {
@@ -146,7 +143,7 @@ void Font::drawComplexText(GraphicsContext* context,
   GlyphBuffer glyphBuffer;
 
   float startX = point.x();
-  UniscribeController controller(this, run, style);
+  UniscribeController controller(this, run);
   controller.advance(from);
   float beforeWidth = controller.runWidthSoFar();
   controller.advance(to, &glyphBuffer);
@@ -157,7 +154,7 @@ void Font::drawComplexText(GraphicsContext* context,
 
   float afterWidth = controller.runWidthSoFar();
 
-  if (style.rtl()) {
+  if (run.rtl()) {
     controller.advance(run.length());
     startX += controller.runWidthSoFar() - afterWidth;
   } else
@@ -165,21 +162,19 @@ void Font::drawComplexText(GraphicsContext* context,
 
   // Draw the glyph buffer now at the starting point returned in startX.
   FloatPoint startPoint(startX, point.y());
-  drawGlyphBuffer(context, glyphBuffer, run, style, startPoint);
+  drawGlyphBuffer(context, glyphBuffer, run, startPoint);
 }
 
-float Font::floatWidthForComplexText(const TextRun& run,
-                                     const FontStyle& style) const {
-  UniscribeController controller(this, run, style);
+float Font::floatWidthForComplexText(const TextRun& run) const {
+  UniscribeController controller(this, run);
   controller.advance(run.length());
   return controller.runWidthSoFar();
 }
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
-                                          const FontStyle& style,
                                           int x,
                                           bool includePartialGlyphs) const {
-  UniscribeController controller(this, run, style);
+  UniscribeController controller(this, run);
   return controller.offsetForPosition(x, includePartialGlyphs);
 }
 }

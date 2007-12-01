@@ -33,7 +33,6 @@
 #include "Font.h"
 #include "FontPlatformData.h"
 #include "TextBreakIterator.h"
-#include "FontStyle.h"
 #include <wtf/Assertions.h>
 #include <wtf/Vector.h>
 
@@ -107,10 +106,9 @@ static float stringWidth(const Font& renderer,
                          unsigned length,
                          bool disableRoundingHacks) {
   TextRun run(characters, length);
-  FontStyle style;
   if (disableRoundingHacks)
-    style.disableRoundingHacks();
-  return renderer.floatWidth(run, style);
+    run.disableRoundingHacks();
+  return renderer.floatWidth(run);
 }
 
 static String truncateString(const String& string,
