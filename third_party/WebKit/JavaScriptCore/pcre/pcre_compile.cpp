@@ -912,8 +912,10 @@ static bool compile_branch(int options,
 
         /* If the first character is '^', set the negation flag and skip it. */
 
-        if (ptr + 1 >= patternEnd)
-          return -1;
+        if (ptr + 1 >= patternEnd) {
+          *errorcodeptr = ERR6;
+          return false;
+        }
 
         if (ptr[1] == '^') {
           negate_class = true;
