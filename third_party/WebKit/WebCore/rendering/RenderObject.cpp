@@ -200,7 +200,7 @@ RenderObject::RenderObject(Node* node)
 }
 
 RenderObject::~RenderObject() {
-  ASSERT(!node() || !document()->frame()->view() ||
+  ASSERT(!node() || documentBeingDestroyed() || !document()->frame()->view() ||
          document()->frame()->view()->layoutRoot() != this);
 #ifndef NDEBUG
   --RenderObjectCounter::count;
@@ -697,7 +697,10 @@ static inline bool objectIsRelayoutBoundary(const RenderObject* obj) {
       ;
 }
 
-void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout) {
+void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout,
+                                                 RenderObject* newRoot) {
+  ASSERT(!scheduleRelayout || !newRoot);
+
   RenderObject* o = container();
   RenderObject* last = this;
 
@@ -714,6 +717,9 @@ void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout) {
         return;
       o->m_normalChildNeedsLayout = true;
     }
+
+    if (o == newRoot)
+      return;
 
     last = o;
     if (scheduleRelayout && objectIsRelayoutBoundary(last))

@@ -80,7 +80,7 @@ class FrameView : public ScrollView {
   void unscheduleRelayout();
   bool layoutPending() const;
 
-  RenderObject* layoutRoot() const;
+  RenderObject* layoutRoot(bool onlyDuringLayout = false) const;
   int layoutCount() const;
 
   // These two helper functions just pass through to the RenderView.

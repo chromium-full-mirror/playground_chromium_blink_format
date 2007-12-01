@@ -434,7 +434,8 @@ class RenderObject : public CachedResourceClient {
 
   virtual void markAllDescendantsWithFloatsForLayout(
       RenderObject* floatToRemove = 0);
-  void markContainingBlocksForLayout(bool scheduleRelayout = true);
+  void markContainingBlocksForLayout(bool scheduleRelayout = true,
+                                     RenderObject* newRoot = 0);
   void setNeedsLayout(bool b, bool markParents = true);
   void setChildNeedsLayout(bool b, bool markParents = true);
 
