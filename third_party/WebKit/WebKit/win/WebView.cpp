@@ -4130,6 +4130,12 @@ HRESULT STDMETHODCALLTYPE WebView::loadBackForwardListFromOtherView(
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE WebView::clearUndoRedoOperations() {
+  if (Frame* frame = m_page->focusController()->focusedOrMainFrame())
+    frame->editor()->clearUndoRedoOperations();
+  return S_OK;
+}
+
 HRESULT WebView::registerDragDrop() {
   ASSERT(::IsWindow(m_viewWindow));
   return ::RegisterDragDrop(m_viewWindow, this);

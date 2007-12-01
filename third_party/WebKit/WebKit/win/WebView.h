@@ -624,6 +624,8 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE inspector(
       /* [retval][out] */ IWebInspector**);
 
+  virtual HRESULT STDMETHODCALLTYPE clearUndoRedoOperations(void);
+
   // WebView
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
