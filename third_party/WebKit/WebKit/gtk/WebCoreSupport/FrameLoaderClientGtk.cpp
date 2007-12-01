@@ -51,9 +51,9 @@
 #include "kjs_binding.h"
 #include "kjs_proxy.h"
 #include "kjs_window.h"
-#include "webkitgtkpage.h"
-#include "webkitgtkframe.h"
-#include "webkitgtkprivate.h"
+#include "webkitwebview.h"
+#include "webkitwebframe.h"
+#include "webkitprivate.h"
 
 #include <JavaScriptCore/APICast.h>
 #include <stdio.h>
@@ -65,7 +65,7 @@ using namespace WebCore;
 
 namespace WebKit {
 
-FrameLoaderClient::FrameLoaderClient(WebKitFrame* frame)
+FrameLoaderClient::FrameLoaderClient(WebKitWebFrame* frame)
     : m_frame(frame), m_userAgent("") {
   ASSERT(m_frame);
 }
@@ -205,12 +205,12 @@ void FrameLoaderClient::assignIdentifierToInitialRequest(
 }
 
 void FrameLoaderClient::postProgressStartedNotification() {
-  WebKitPage* page = getPageFromFrame(m_frame);
+  WebKitWebView* page = getViewFromFrame(m_frame);
   g_signal_emit_by_name(page, "load_started", m_frame);
 }
 
 void FrameLoaderClient::postProgressEstimateChangedNotification() {
-  WebKitPage* kitPage = getPageFromFrame(m_frame);
+  WebKitWebView* kitPage = getViewFromFrame(m_frame);
   Page* corePage = core(kitPage);
 
   g_signal_emit_by_name(
@@ -219,7 +219,7 @@ void FrameLoaderClient::postProgressEstimateChangedNotification() {
 }
 
 void FrameLoaderClient::postProgressFinishedNotification() {
-  WebKitPage* page = getPageFromFrame(m_frame);
+  WebKitWebView* page = getViewFromFrame(m_frame);
 
   g_signal_emit_by_name(page, "load_finished", m_frame);
 }
@@ -268,7 +268,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
   if (!policyFunction)
     return;
 
-  WebKitPage* page = getPageFromFrame(m_frame);
+  WebKitWebView* page = getViewFromFrame(m_frame);
   WebKitNetworkRequest* request =
       webkit_network_request_new(resourceRequest.url().url().utf8().data());
   WebKitNavigationResponse response;
@@ -307,9 +307,10 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
     int marginHeight) {
   Frame* coreFrame = core(webFrame());
 
-  ASSERT(core(getPageFromFrame(webFrame())) == coreFrame->page());
-  WebKitFrame* gtkFrame = WEBKIT_FRAME(
-      webkit_frame_init_with_page(getPageFromFrame(webFrame()), ownerElement));
+  ASSERT(core(getViewFromFrame(webFrame())) == coreFrame->page());
+  WebKitWebFrame* gtkFrame =
+      WEBKIT_WEB_FRAME(webkit_web_frame_init_with_web_view(
+          getViewFromFrame(webFrame()), ownerElement));
   RefPtr<Frame> childFrame(adoptRef(core(gtkFrame)));
 
   coreFrame->tree()->appendChild(childFrame);
@@ -398,7 +399,7 @@ void FrameLoaderClient::windowObjectCleared() {
       toRef(KJS::Window::retrieve(coreFrame)->getObject());
   ASSERT(windowObject);
 
-  WebKitPage* page = getPageFromFrame(m_frame);
+  WebKitWebView* page = getViewFromFrame(m_frame);
   g_signal_emit_by_name(page, "window_object_cleared", m_frame, context,
                         windowObject);
 
@@ -505,7 +506,7 @@ void FrameLoaderClient::dispatchWillClose() {
 }
 
 void FrameLoaderClient::dispatchDidReceiveIcon() {
-  WebKitPage* page = getPageFromFrame(m_frame);
+  WebKitWebView* page = getViewFromFrame(m_frame);
 
   g_signal_emit_by_name(page, "icon_loaded", m_frame);
 }
@@ -605,14 +606,14 @@ void FrameLoaderClient::prepareForDataSourceReplacement() {
 }
 
 void FrameLoaderClient::setTitle(const String& title, const KURL& url) {
-  WebKitPage* page = getPageFromFrame(m_frame);
+  WebKitWebView* page = getViewFromFrame(m_frame);
 
   CString titleString = title.utf8();
   DeprecatedCString urlString = url.prettyURL().utf8();
   g_signal_emit_by_name(m_frame, "title_changed", titleString.data(),
                         urlString.data());
 
-  if (m_frame == webkit_page_get_main_frame(page))
+  if (m_frame == webkit_web_view_get_main_frame(page))
     g_signal_emit_by_name(page, "title_changed", titleString.data(),
                           urlString.data());
 }

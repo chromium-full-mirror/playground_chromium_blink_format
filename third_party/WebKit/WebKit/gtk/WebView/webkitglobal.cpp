@@ -27,7 +27,7 @@
  */
 
 #include "config.h"
-#include "webkitgtkglobal.h"
+#include "webkitglobal.h"
 
 #include "Logging.h"
 #include "DatabaseTracker.h"

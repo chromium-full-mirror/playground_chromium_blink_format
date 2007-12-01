@@ -40,7 +40,7 @@
 #include "NotImplemented.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
-#include "webkitgtkprivate.h"
+#include "webkitprivate.h"
 
 #include <stdio.h>
 
@@ -129,7 +129,7 @@ void EditorClient::didSetSelectionTypesForPasteboard() {
 }
 
 bool EditorClient::isEditable() {
-  return webkit_page_get_editable(m_page);
+  return webkit_web_view_get_editable(m_page);
 }
 
 void EditorClient::registerCommandForUndo(
@@ -342,7 +342,7 @@ void EditorClient::handleInputMethodKeypress(KeyboardEvent*) {
   notImplemented();
 }
 
-EditorClient::EditorClient(WebKitPage* page) : m_page(page) {}
+EditorClient::EditorClient(WebKitWebView* page) : m_page(page) {}
 
 void EditorClient::textFieldDidBeginEditing(Element*) {
   notImplemented();

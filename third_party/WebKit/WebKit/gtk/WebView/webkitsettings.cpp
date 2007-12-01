@@ -26,48 +26,38 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WEBKIT_NETWORK_REQUEST_H
-#define WEBKIT_NETWORK_REQUEST_H
+#include "config.h"
 
-#include <glib-object.h>
+#include "webkitsettings.h"
 
-#include "webkitgtkdefines.h"
+extern "C" {
+GType webkit_web_settings_get_type(void) {
+  return GType();
+}
 
-G_BEGIN_DECLS
+WebKitSettings* webkit_web_settings_copy(WebKitSettings* setting) {
+  return 0;
+}
 
-#define WEBKIT_TYPE_NETWORK_REQUEST (webkit_network_request_get_type())
-#define WEBKIT_NETWORK_REQUEST(obj)                               \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), WEBKIT_TYPE_NETWORK_REQUEST, \
-                              WebKitNetworkRequest))
-#define WEBKIT_NETWORK_REQUEST_CLASS(klass)                      \
-  (G_TYPE_CHECK_CLASS_CAST((klass), WEBKIT_TYPE_NETWORK_REQUEST, \
-                           WebKitNetworkRequestClass))
-#define WEBKIT_IS_NETWORK_REQUEST(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), WEBKIT_TYPE_NETWORK_REQUEST))
-#define WEBKIT_IS_NETWORK_REQUEST_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass), WEBKIT_TYPE_NETWORK_REQUEST))
-#define WEBKIT_NETWORK_REQUEST_GET_CLASS(obj)                    \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), WEBKIT_TYPE_NETWORK_REQUEST, \
-                             WebKitNetworkRequestClass))
+void webkit_web_settings_free(WebKitSettings* setting) {}
 
-struct _WebKitNetworkRequest {
-  GObject parent;
-};
+WebKitSettings* webkit_web_settings_get_global(void) {
+  return 0;
+}
 
-struct _WebKitNetworkRequestClass {
-  GObjectClass parent;
-};
+void webkit_web_settings_set_global(WebKitSettings* setting) {}
 
-WEBKIT_API GType webkit_network_request_get_type(void);
+void webkit_web_settings_set_font_family(WebKitSettings*,
+                                         WebKitFontFamily family,
+                                         gchar* family_name) {}
 
-WEBKIT_API WebKitNetworkRequest* webkit_network_request_new(const gchar* uri);
+const gchar* webkit_web_settings_get_font_family(WebKitSettings*,
+                                                 WebKitFontFamily family) {
+  return 0;
+}
 
-WEBKIT_API void webkit_network_request_set_uri(WebKitNetworkRequest* request,
-                                               const gchar* uri);
+void webkit_web_settings_set_user_style_sheet_location(WebKitSettings*,
+                                                       gchar*) {}
 
-WEBKIT_API const gchar* webkit_network_request_get_uri(
-    WebKitNetworkRequest* request);
-
-G_END_DECLS
-
-#endif
+void webkit_set_ftp_directory_template_path(WebKitSettings*, gchar*) {}
+}

@@ -26,15 +26,37 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WEBKIT_GLOBAL_H
-#define WEBKIT_GLOBAL_H
+#ifndef WEBKIT_DEFINES_H
+#define WEBKIT_DEFINES_H
 
-#include "webkitgtkdefines.h"
+#include <glib.h>
 
-G_BEGIN_DECLS
+typedef struct _WebKitWebFrame WebKitWebFrame;
+typedef struct _WebKitWebFrameClass WebKitWebFrameClass;
 
-WEBKIT_API void webkit_init(void);
+typedef struct _WebKitWebFrameData WebKitWebFrameData;
 
-G_END_DECLS
+typedef struct _WebKitWebView WebKitWebView;
+typedef struct _WebKitWebViewClass WebKitWebViewClass;
+
+typedef struct _WebKitNetworkRequest WebKitNetworkRequest;
+typedef struct _WebKitNetworkRequestClass WebKitNetworkRequestClass;
+
+typedef struct OpaqueJSContext* JSGlobalContextRef;
+typedef struct OpaqueJSValue* JSObjectRef;
+
+#ifdef G_OS_WIN32
+#ifdef BUILDING_WEBKIT
+#define WEBKIT_API __declspec(dllexport)
+#else
+#define WEBKIT_API __declspec(dllimport)
+#endif
+#else
+#define WEBKIT_API __attribute__((visibility("default")))
+#endif
+
+#ifndef WEBKIT_API
+#define WEBKIT_API
+#endif
 
 #endif

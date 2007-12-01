@@ -26,38 +26,15 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
+#ifndef WEBKIT_GLOBAL_H
+#define WEBKIT_GLOBAL_H
 
-#include "webkitgtksettings.h"
+#include "webkitdefines.h"
 
-extern "C" {
-GType webkit_web_settings_get_type(void) {
-  return GType();
-}
+G_BEGIN_DECLS
 
-WebKitSettings* webkit_web_settings_copy(WebKitSettings* setting) {
-  return 0;
-}
+WEBKIT_API void webkit_init(void);
 
-void webkit_web_settings_free(WebKitSettings* setting) {}
+G_END_DECLS
 
-WebKitSettings* webkit_web_settings_get_global(void) {
-  return 0;
-}
-
-void webkit_web_settings_set_global(WebKitSettings* setting) {}
-
-void webkit_web_settings_set_font_family(WebKitSettings*,
-                                         WebKitFontFamily family,
-                                         gchar* family_name) {}
-
-const gchar* webkit_web_settings_get_font_family(WebKitSettings*,
-                                                 WebKitFontFamily family) {
-  return 0;
-}
-
-void webkit_web_settings_set_user_style_sheet_location(WebKitSettings*,
-                                                       gchar*) {}
-
-void webkit_set_ftp_directory_template_path(WebKitSettings*, gchar*) {}
-}
+#endif

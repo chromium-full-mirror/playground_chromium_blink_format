@@ -30,15 +30,15 @@
 #define WEBKIT_PRIVATE_H
 
 /*
- * Internal class. This class knows the shared secret of WebKitFrame,
- * WebKitNetworkRequest and WebKitPage.
+ * Internal class. This class knows the shared secret of WebKitWebFrame,
+ * WebKitNetworkRequest and WebKitWebView.
  * They are using WebCore which musn't be exposed to the outer world.
  */
 
-#include "webkitgtksettings.h"
-#include "webkitgtkpage.h"
-#include "webkitgtkframe.h"
-#include "webkitgtknetworkrequest.h"
+#include "webkitsettings.h"
+#include "webkitwebview.h"
+#include "webkitwebframe.h"
+#include "webkitnetworkrequest.h"
 
 #include "Settings.h"
 #include "Page.h"
@@ -48,24 +48,25 @@
 namespace WebKit {
 void apply(WebKitSettings*, WebCore::Settings*);
 WebKitSettings* create(WebCore::Settings*);
-WebKitFrame* getFrameFromPage(WebKitPage*);
-WebKitPage* getPageFromFrame(WebKitFrame*);
+WebKitWebFrame* getFrameFromView(WebKitWebView*);
+WebKitWebView* getViewFromFrame(WebKitWebFrame*);
 
-WebCore::Frame* core(WebKitFrame*);
-WebKitFrame* kit(WebCore::Frame*);
-WebCore::Page* core(WebKitPage*);
-WebKitPage* kit(WebCore::Page*);
+WebCore::Frame* core(WebKitWebFrame*);
+WebKitWebFrame* kit(WebCore::Frame*);
+WebCore::Page* core(WebKitWebView*);
+WebKitWebView* kit(WebCore::Page*);
 }
 
 extern "C" {
-#define WEBKIT_PAGE_GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE((obj), WEBKIT_TYPE_PAGE, WebKitPagePrivate))
-typedef struct _WebKitPagePrivate WebKitPagePrivate;
-struct _WebKitPagePrivate {
-  WebCore::Page* page;
+#define WEBKIT_WEB_VIEW_GET_PRIVATE(obj)                    \
+  (G_TYPE_INSTANCE_GET_PRIVATE((obj), WEBKIT_TYPE_WEB_VIEW, \
+                               WebKitWebViewPrivate))
+typedef struct _WebKitWebViewPrivate WebKitWebViewPrivate;
+struct _WebKitWebViewPrivate {
+  WebCore::Page* corePage;
   WebCore::Settings* settings;
 
-  WebKitFrame* mainFrame;
+  WebKitWebFrame* mainFrame;
   WebCore::String applicationNameForUserAgent;
   WebCore::String* userAgent;
 
@@ -73,13 +74,14 @@ struct _WebKitPagePrivate {
   bool editable;
 };
 
-#define WEBKIT_FRAME_GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE((obj), WEBKIT_TYPE_FRAME, WebKitFramePrivate))
-typedef struct _WebKitFramePrivate WebKitFramePrivate;
-struct _WebKitFramePrivate {
+#define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \
+  (G_TYPE_INSTANCE_GET_PRIVATE((obj), WEBKIT_TYPE_WEB_FRAME, \
+                               WebKitWebFramePrivate))
+typedef struct _WebKitWebFramePrivate WebKitWebFramePrivate;
+struct _WebKitWebFramePrivate {
   WebCore::Frame* frame;
   WebCore::FrameLoaderClient* client;
-  WebKitPage* page;
+  WebKitWebView* webView;
 
   gchar* name;
   gchar* title;
@@ -94,8 +96,9 @@ struct _WebKitNetworkRequestPrivate {
   gchar* uri;
 };
 
-WebKitFrame* webkit_frame_init_with_page(WebKitPage*,
-                                         WebCore::HTMLFrameOwnerElement*);
+WebKitWebFrame* webkit_web_frame_init_with_web_view(
+    WebKitWebView*,
+    WebCore::HTMLFrameOwnerElement*);
 }
 
 #endif
