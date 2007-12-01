@@ -273,11 +273,6 @@ bool ScriptInterpreter::isSafeScript(const Interpreter* target) {
                               static_cast<const ScriptInterpreter*>(target));
 }
 
-Interpreter* ScriptInterpreter::interpreterForGlobalObject(const JSValue* imp) {
-  const Window* win = static_cast<const Window*>(imp);
-  return win->interpreter();
-}
-
 bool ScriptInterpreter::shouldInterruptScript() const {
   Page* page = m_frame->page();
 

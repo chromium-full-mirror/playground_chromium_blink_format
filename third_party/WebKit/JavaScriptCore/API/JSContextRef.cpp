@@ -62,14 +62,14 @@ JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass) {
 JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef ctx) {
   JSLock lock;
   ExecState* exec = toJS(ctx);
-  exec->dynamicInterpreter()->ref();
+  gcProtect(exec->dynamicInterpreter()->globalObject());
   return ctx;
 }
 
 void JSGlobalContextRelease(JSGlobalContextRef ctx) {
   JSLock lock;
   ExecState* exec = toJS(ctx);
-  exec->dynamicInterpreter()->deref();
+  gcUnprotect(exec->dynamicInterpreter()->globalObject());
 }
 
 JSObjectRef JSContextGetGlobalObject(JSContextRef ctx) {

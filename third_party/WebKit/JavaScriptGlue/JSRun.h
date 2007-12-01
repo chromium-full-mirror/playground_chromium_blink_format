@@ -65,7 +65,6 @@ class JSRun : public JSBase {
  private:
   UString fSource;
   ProtectedPtr<JSGlobalObject> fGlobalObject;
-  RefPtr<JSInterpreter> fInterpreter;
   JSFlags fFlags;
 };
 

@@ -219,10 +219,11 @@ int main(int argc, char** argv) {
   return res;
 }
 
-static PassRefPtr<Interpreter> setupInterpreter() {
-  GlobalImp* global = new GlobalImp();
-  RefPtr<Interpreter> interp = new Interpreter();
-  interp->setGlobalObject(global);
+static GlobalImp* createGlobalObject() {
+  GlobalImp* global = new GlobalImp;
+  Interpreter* interp = new Interpreter;
+  interp->setGlobalObject(global);  // global now owns interp.
+
   // add debug() function
   global->put(interp->globalExec(), "debug",
               new TestFunctionImp(TestFunctionImp::Debug, 1));
@@ -244,7 +245,7 @@ static PassRefPtr<Interpreter> setupInterpreter() {
               new TestFunctionImp(TestFunctionImp::Load, 1));
 
   Interpreter::setShouldPrintExceptions(true);
-  return interp.release();
+  return global;
 }
 
 static bool prettyPrintScript(const UString& fileName,
@@ -266,7 +267,7 @@ static bool prettyPrintScript(const UString& fileName,
 }
 
 static bool runWithScripts(const Vector<UString>& fileNames, bool prettyPrint) {
-  RefPtr<Interpreter> interp = setupInterpreter();
+  GlobalImp* globalObject = createGlobalObject();
   Vector<char> script;
 
   bool success = true;
@@ -280,7 +281,8 @@ static bool runWithScripts(const Vector<UString>& fileNames, bool prettyPrint) {
     if (prettyPrint)
       prettyPrintScript(fileName, script);
     else {
-      Completion completion = interp->evaluate(fileName, 0, script.data());
+      Completion completion =
+          globalObject->interpreter()->evaluate(fileName, 0, script.data());
       success = success && completion.complType() != Throw;
     }
   }

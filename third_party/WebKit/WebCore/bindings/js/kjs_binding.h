@@ -111,7 +111,6 @@ class ScriptInterpreter : public Interpreter {
   WebCore::Event* getCurrentEvent() const { return m_currentEvent; }
 
   virtual bool isGlobalObject(JSValue*);
-  virtual Interpreter* interpreterForGlobalObject(const JSValue*);
   virtual bool isSafeScript(const Interpreter* target);
 
   virtual bool shouldInterruptScript() const;

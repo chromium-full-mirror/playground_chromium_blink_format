@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "JSValueWrapper.h"
+#include "JSRun.h"
 #include <JavaScriptCore/PropertyNameArray.h>
 #include <pthread.h>
 
@@ -55,33 +56,37 @@ JSValue* JSValueWrapper::GetValue() {
  * need to supply the global scope.
  */
 
-pthread_key_t interpreterKey;
-pthread_once_t interpreterKeyOnce = PTHREAD_ONCE_INIT;
+pthread_key_t globalObjectKey;
+pthread_once_t globalObjectKeyOnce = PTHREAD_ONCE_INIT;
 
-static void derefInterpreter(void* data) {
-  static_cast<Interpreter*>(data)->deref();
+static void unprotectGlobalObject(void* data) {
+  gcUnprotect(static_cast<JSGlobalObject*>(data));
 }
 
-static void initializeInterpreterKey() {
-  pthread_key_create(&interpreterKey, derefInterpreter);
+static void initializeGlobalObjectKey() {
+  pthread_key_create(&globalObjectKey, unprotectGlobalObject);
 }
 
 static ExecState* getThreadGlobalExecState() {
-  pthread_once(&interpreterKeyOnce, initializeInterpreterKey);
-  Interpreter* interpreter =
-      static_cast<Interpreter*>(pthread_getspecific(interpreterKey));
-  if (!interpreter) {
-    interpreter = new Interpreter();
-    interpreter->setGlobalObject(new JSGlobalObject());
-    interpreter->ref();
-    pthread_setspecific(interpreterKey, interpreter);
+  pthread_once(&globalObjectKeyOnce, initializeGlobalObjectKey);
+  JSGlobalObject* globalObject =
+      static_cast<JSGlobalObject*>(pthread_getspecific(globalObjectKey));
+  if (!globalObject) {
+    globalObject = new JSGlobalObject;
+    Interpreter* interpreter = new JSInterpreter;
+    interpreter->setGlobalObject(
+        globalObject);  // globalObject now owns interpreter
+
+    gcProtect(globalObject);
+    pthread_setspecific(globalObjectKey, globalObject);
   }
+
+  ExecState* exec = globalObject->interpreter()->globalExec();
 
   // Discard exceptions -- otherwise an exception would forestall JS
   // evaluation throughout the thread
-  interpreter->globalExec()->clearException();
-
-  return interpreter->globalExec();
+  exec->clearException();
+  return exec;
 }
 
 void JSValueWrapper::GetJSObectCallBacks(JSObjectCallBacks& callBacks) {
