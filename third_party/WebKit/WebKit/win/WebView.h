@@ -580,7 +580,7 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE generateSelectionImage(BOOL forceWhiteText,
                                                            OLE_HANDLE* hBitmap);
 
-  virtual HRESULT STDMETHODCALLTYPE selectionImageRect(RECT* rc);
+  virtual HRESULT STDMETHODCALLTYPE selectionRect(RECT* rc);
 
   virtual HRESULT STDMETHODCALLTYPE DragEnter(IDataObject* pDataObject,
                                               DWORD grfKeyState,
