@@ -510,7 +510,7 @@ For example, to create a class definition with only a finalize method:
 JSClassDefinition definition = kJSClassDefinitionEmpty;
 definition.finalize = Finalize;
 */
-extern const JSClassDefinition kJSClassDefinitionEmpty;
+JS_EXPORT extern const JSClassDefinition kJSClassDefinitionEmpty;
 
 /*!
 @function
