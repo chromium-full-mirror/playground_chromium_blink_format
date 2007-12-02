@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FrameLoaderDelegate_h
-#define FrameLoaderDelegate_h
+#ifndef FrameLoadDelegate_h
+#define FrameLoadDelegate_h
 
 #include <WebKit/IWebFrameLoadDelegate.h>
 #include <WebKit/IWebFrameLoadDelegatePrivate.h>
@@ -152,4 +152,4 @@ class FrameLoadDelegate : public IWebFrameLoadDelegate2,
   OwnPtr<GCController> m_gcController;
 };
 
-#endif  // FrameLoaderDelegate_h
+#endif  // FrameLoadDelegate_h
