@@ -288,7 +288,7 @@ void SQLTransaction::postflightAndCommit() {
   // The commit was successful, notify the delegates if the transaction modified
   // this database
   if (m_modifiedDatabase)
-    DatabaseTracker::tracker().notifyDatabaseChanged(
+    DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
         m_database->m_securityOrigin.securityOriginData(), m_database->m_name);
 
   // Transaction Step 10 - End transaction steps
@@ -351,7 +351,7 @@ void SQLTransaction::cleanupAfterTransactionErrorCallback() {
     } else if (m_modifiedDatabase) {
       // But if the commit was successful, notify the delegates if the
       // transaction modified this database
-      DatabaseTracker::tracker().notifyDatabaseChanged(
+      DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
           m_database->m_securityOrigin.securityOriginData(),
           m_database->m_name);
     }

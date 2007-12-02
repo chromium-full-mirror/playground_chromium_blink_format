@@ -82,8 +82,9 @@ class DatabaseTracker {
   void setDefaultOriginQuota(unsigned long long);
   unsigned long long defaultOriginQuota() const;
 
-  void notifyDatabaseChanged(const SecurityOriginData& origin,
-                             const String& name);
+  // From a secondary thread, must be thread safe with its data
+  void scheduleNotifyDatabaseChanged(const SecurityOriginData&,
+                                     const String& name);
 
   static DatabaseTracker& tracker();
 
@@ -113,6 +114,9 @@ class DatabaseTracker {
 
   unsigned long long m_defaultQuota;
   DatabaseTrackerClient* m_client;
+
+  static void scheduleForNotification();
+  static void notifyDatabasesChanged();
 };
 
 }  // namespace WebCore

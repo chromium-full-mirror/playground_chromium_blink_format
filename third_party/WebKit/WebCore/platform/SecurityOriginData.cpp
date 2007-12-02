@@ -73,6 +73,10 @@ SecurityOriginData::SecurityOriginData(const String& stringIdentifier)
   m_port = port;
 }
 
+SecurityOriginData SecurityOriginData::copy() const {
+  return SecurityOriginData(m_protocol.copy(), m_host.copy(), m_port);
+}
+
 String SecurityOriginData::stringIdentifier() const {
   static String separatorString = String(&SeparatorCharacter, 1);
   return m_protocol + separatorString + m_host + separatorString +

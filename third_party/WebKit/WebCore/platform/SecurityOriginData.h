@@ -45,6 +45,10 @@ class SecurityOriginData {
   const String& host() const { return m_host; }
   unsigned short port() const { return m_port; }
 
+  // Needed to make a deep copy of the object for thread safety when crossing a
+  // thread boundary
+  SecurityOriginData copy() const;
+
   String stringIdentifier() const;
 
  private:
