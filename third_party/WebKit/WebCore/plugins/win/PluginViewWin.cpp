@@ -1350,7 +1350,7 @@ KJS::Bindings::Instance* PluginViewWin::bindingInstance() {
     return 0;
 
   RefPtr<KJS::Bindings::RootObject> root = m_parentFrame->createRootObject(
-      this, m_parentFrame->scriptProxy()->interpreter());
+      this, m_parentFrame->scriptProxy()->interpreter()->globalObject());
   KJS::Bindings::Instance* instance =
       KJS::Bindings::Instance::createBindingForLanguageInstance(
           KJS::Bindings::Instance::CLanguage, object, root.release());
