@@ -166,9 +166,9 @@ typedef struct _WebFrameLoadDelegateImplementationCache {
   IMP didFinishDocumentLoadForFrameFunc;
 } WebFrameLoadDelegateImplementationCache;
 
-WebResourceDelegateImplementationCache
+WebResourceDelegateImplementationCache*
 WebViewGetResourceLoadDelegateImplementations(WebView* webView);
-WebFrameLoadDelegateImplementationCache
+WebFrameLoadDelegateImplementationCache*
 WebViewGetFrameLoadDelegateImplementations(WebView* webView);
 
 #ifdef __cplusplus
