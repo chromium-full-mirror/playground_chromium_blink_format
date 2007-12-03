@@ -48,6 +48,7 @@
 #include "Image.h"
 #include "IconDatabase.h"
 #include "InspectorClientQt.h"
+#include "InspectorController.h"
 #include "FocusController.h"
 #include "Editor.h"
 #include "PlatformScrollBar.h"
@@ -175,6 +176,8 @@ static QWebPage::WebAction webActionForContextMenuAction(
       return QWebPage::ToggleItalic;
     case WebCore::ContextMenuItemTagUnderline:
       return QWebPage::ToggleUnderline;
+    case WebCore::ContextMenuItemTagInspectElement:
+      return QWebPage::InspectElement;
     default:
       break;
   }
@@ -610,6 +613,10 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
       break;
     case ToggleUnderline:
       editor->toggleUnderline();
+
+    case InspectElement:
+      d->page->inspectorController()->inspect(
+          d->currentContext.d->innerNonSharedNode.get());
       break;
 
     default:
@@ -753,6 +760,10 @@ QAction* QWebPage::action(WebAction action) const {
     case ToggleUnderline:
       text = contextMenuItemTagUnderline();
       checkable = true;
+      break;
+
+    case InspectElement:
+      text = contextMenuItemTagInspectElement();
       break;
 
     case NoWebAction:
@@ -1258,6 +1269,7 @@ QWebPageContext::QWebPageContext(const WebCore::HitTestResult& hitTest)
   d->text = hitTest.textContent();
   d->linkUrl = hitTest.absoluteLinkURL().url();
   d->imageUrl = hitTest.absoluteImageURL().url();
+  d->innerNonSharedNode = hitTest.innerNonSharedNode();
   WebCore::Image* img = hitTest.image();
   if (img) {
     QPixmap* pix = img->getPixmap();

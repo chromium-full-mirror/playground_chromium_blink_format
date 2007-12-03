@@ -130,6 +130,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
     ToggleItalic,
     ToggleUnderline,
 
+    InspectElement,
+
     WebActionCount
   };
 
