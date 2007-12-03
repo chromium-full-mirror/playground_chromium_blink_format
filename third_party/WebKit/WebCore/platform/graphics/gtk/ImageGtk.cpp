@@ -24,11 +24,10 @@
  */
 
 #include "config.h"
-#include "Image.h"
 
 #include "BitmapImage.h"
+#include "Image.h"
 #include "NotImplemented.h"
-#include <cairo.h>
 
 // This function loads resources from WebKit
 Vector<char> loadResourceIntoArray(const char*);
