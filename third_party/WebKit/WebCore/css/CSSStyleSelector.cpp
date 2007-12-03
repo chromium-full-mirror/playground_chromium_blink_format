@@ -1358,6 +1358,14 @@ CSSStyleSelector::SelectorMatch CSSStyleSelector::checkSelector(
     Element* e,
     bool isAncestor,
     bool isSubSelector) {
+#if ENABLE(SVG)
+  // Spec: CSS2 selectors cannot be applied to the (conceptually) cloned DOM
+  // tree
+  // because its contents are not part of the formal document structure.
+  if (e->isSVGElement() && e->isShadowNode())
+    return SelectorFailsCompletely;
+#endif
+
   // first selector has to match
   if (!checkOneSelector(sel, e, isAncestor, isSubSelector))
     return SelectorFailsLocally;
