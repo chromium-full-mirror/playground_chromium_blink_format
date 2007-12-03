@@ -29,11 +29,9 @@
 
 namespace WebCore {
 
-HTMLOptionsCollection::HTMLOptionsCollection(HTMLSelectElement* select)
-    : HTMLCollection(select, SelectOptions) {
-  ASSERT(!info);
-  info = select->collectionInfo();
-}
+HTMLOptionsCollection::HTMLOptionsCollection(
+    PassRefPtr<HTMLSelectElement> select)
+    : HTMLCollection(select.get(), SelectOptions, select->collectionInfo()) {}
 
 void HTMLOptionsCollection::add(PassRefPtr<HTMLOptionElement> element,
                                 ExceptionCode& ec) {
@@ -56,7 +54,7 @@ void HTMLOptionsCollection::add(PassRefPtr<HTMLOptionElement> element,
   }
 
   ec = 0;
-  HTMLSelectElement* select = static_cast<HTMLSelectElement*>(m_base.get());
+  HTMLSelectElement* select = static_cast<HTMLSelectElement*>(base());
 
   if (index == -1 || unsigned(index) >= length())
     select->add(newOption, 0, ec);
@@ -67,15 +65,15 @@ void HTMLOptionsCollection::add(PassRefPtr<HTMLOptionElement> element,
 }
 
 int HTMLOptionsCollection::selectedIndex() const {
-  return static_cast<HTMLSelectElement*>(m_base.get())->selectedIndex();
+  return static_cast<HTMLSelectElement*>(base())->selectedIndex();
 }
 
 void HTMLOptionsCollection::setSelectedIndex(int index) {
-  static_cast<HTMLSelectElement*>(m_base.get())->setSelectedIndex(index);
+  static_cast<HTMLSelectElement*>(base())->setSelectedIndex(index);
 }
 
 void HTMLOptionsCollection::setLength(unsigned length, ExceptionCode& ec) {
-  static_cast<HTMLSelectElement*>(m_base.get())->setLength(length, ec);
+  static_cast<HTMLSelectElement*>(base())->setLength(length, ec);
 }
 
 }  // namespace

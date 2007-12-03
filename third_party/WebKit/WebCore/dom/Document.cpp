@@ -3540,17 +3540,15 @@ PassRefPtr<HTMLCollection> Document::documentNamedItems(const String& name) {
 
 HTMLCollection::CollectionInfo* Document::nameCollectionInfo(
     HTMLCollection::Type type,
-    const String& name) {
-  HashMap<AtomicStringImpl*, HTMLCollection::CollectionInfo*>& map =
-      m_nameCollectionInfo[type - HTMLCollection::UnnamedCollectionTypes];
+    const AtomicString& name) {
+  ASSERT(type >= HTMLCollection::FirstNamedDocumentCachedType);
+  unsigned index = type - HTMLCollection::FirstNamedDocumentCachedType;
+  ASSERT(index < HTMLCollection::NumNamedDocumentCachedTypes);
 
-  AtomicString atomicName(name);
-
-  HashMap<AtomicStringImpl*, HTMLCollection::CollectionInfo*>::iterator iter =
-      map.find(atomicName.impl());
+  NamedCollectionMap& map = m_nameCollectionInfo[index];
+  NamedCollectionMap::iterator iter = map.find(name.impl());
   if (iter == map.end())
-    iter = map.add(atomicName.impl(), new HTMLCollection::CollectionInfo).first;
-
+    iter = map.add(name.impl(), new HTMLCollection::CollectionInfo).first;
   return iter->second;
 }
 
