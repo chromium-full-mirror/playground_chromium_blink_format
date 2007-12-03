@@ -529,6 +529,9 @@ void SVGInlineTextBox::paintDecoration(ETextDecoration decoration,
                                        int width,
                                        const SVGChar& svgChar,
                                        const SVGTextDecorationInfo& info) {
+  if (object()->style()->visibility() != VISIBLE)
+    return;
+
   // This function does NOT accept combinated text decorations. It's meant to be
   // invoked for just one.
   ASSERT(decoration == TDNONE || decoration == UNDERLINE ||
