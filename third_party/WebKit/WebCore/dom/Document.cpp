@@ -1914,6 +1914,10 @@ bool Document::childTypeAllowed(NodeType type) {
 }
 
 bool Document::canReplaceChild(Node* newChild, Node* oldChild) {
+  if (!oldChild)
+    // ContainerNode::replaceChild will raise a NOT_FOUND_ERR.
+    return true;
+
   if (oldChild->nodeType() == newChild->nodeType())
     return true;
 
