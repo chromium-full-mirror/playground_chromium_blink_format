@@ -55,9 +55,7 @@ void RenderSVGViewportContainer::layout() {
   if (checkForRepaint)
     oldOutlineBox = absoluteOutlineBox();
 
-  calcWidth();
-
-  m_absoluteBounds = absoluteClippedOverflowRect();
+  calcBounds();
 
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {

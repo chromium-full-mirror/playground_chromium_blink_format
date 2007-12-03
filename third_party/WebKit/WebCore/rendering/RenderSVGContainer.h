@@ -106,6 +106,8 @@ class RenderSVGContainer : public RenderObject {
   virtual void applyContentTransforms(PaintInfo&);
   virtual void applyAdditionalTransforms(PaintInfo&);
 
+  void calcBounds();
+
  private:
   int calcReplacedWidth() const;
   int calcReplacedHeight() const;
