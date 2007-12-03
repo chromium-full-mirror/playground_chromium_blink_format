@@ -60,8 +60,6 @@
 
 #include "wtf/HashMap.h"
 
-#include "kjs/JSGlobalObject.h"
-
 #include <qdebug.h>
 #include <qevent.h>
 #include <qpainter.h>
