@@ -42,9 +42,10 @@ class QWebNetworkInterface;
 
 namespace WebCore {
 class ChromeClientQt;
+class EditorClientQt;
 class FrameLoaderClientQt;
 class FrameLoadRequest;
-class EditorClientQt;
+class InspectorClientQt;
 class ResourceHandle;
 class HitTestResult;
 }
@@ -288,6 +289,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   friend class WebCore::ChromeClientQt;
   friend class WebCore::EditorClientQt;
   friend class WebCore::FrameLoaderClientQt;
+  friend class WebCore::InspectorClientQt;
   friend class WebCore::ResourceHandle;
   QWebPagePrivate* d;
 };
