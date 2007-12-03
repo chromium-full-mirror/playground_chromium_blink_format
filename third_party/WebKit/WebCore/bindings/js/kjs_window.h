@@ -79,7 +79,7 @@ class Window : public JSGlobalObject {
   Window(WebCore::DOMWindow*);
 
  public:
-  ~Window();
+  virtual ~Window();
   WebCore::DOMWindow* impl() const { return m_impl.get(); }
   void disconnectFrame();
   /**
@@ -117,7 +117,6 @@ class Window : public JSGlobalObject {
 
   void timerFired(DOMWindowTimer*);
 
-  bool isSafeScript(ExecState*) const;
   static bool isSafeScript(const ScriptInterpreter* origin,
                            const ScriptInterpreter* target);
 
@@ -162,6 +161,10 @@ class Window : public JSGlobalObject {
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+
+  virtual ExecState* globalExec();
+  virtual bool shouldInterruptScript() const;
+  virtual bool isSafeScript(ExecState*) const;
 
   enum {
     // Attributes

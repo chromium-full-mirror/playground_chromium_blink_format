@@ -240,9 +240,9 @@ JSObjectRef JSRunCopyGlobalObject(JSRunRef ref) {
   JSObjectRef result = 0;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
-    JSObject* globalObject = ptr->GlobalObject();
-    result = (JSObjectRef)KJSValueToJSObject(
-        globalObject, ptr->GetInterpreter()->globalExec());
+    JSGlobalObject* globalObject = ptr->GlobalObject();
+    result = (JSObjectRef)KJSValueToJSObject(globalObject,
+                                             globalObject->globalExec());
   }
   return result;
 }
@@ -258,7 +258,7 @@ JSObjectRef JSRunEvaluate(JSRunRef ref) {
     Completion completion = ptr->Evaluate();
     if (completion.isValueCompletion()) {
       result = (JSObjectRef)KJSValueToJSObject(
-          completion.value(), ptr->GetInterpreter()->globalExec());
+          completion.value(), ptr->GlobalObject()->globalExec());
     }
 
     if (completion.complType() == Throw) {

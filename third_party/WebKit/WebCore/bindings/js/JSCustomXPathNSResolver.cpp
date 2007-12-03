@@ -76,8 +76,8 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
 
   JSLock lock;
 
+  ExecState* exec = proxy->globalObject()->globalExec();
   ScriptInterpreter* interpreter = proxy->interpreter();
-  ExecState* exec = interpreter->globalExec();
 
   JSValue* lookupNamespaceURIFuncValue =
       m_customResolver->get(exec, "lookupNamespaceURI");

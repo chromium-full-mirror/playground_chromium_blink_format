@@ -164,7 +164,7 @@ jobject JavaJSObject::call(jstring methodName, jobjectArray args) const {
     return 0;
 
   // Lookup the function object.
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
   JSLock lock;
 
   Identifier identifier(JavaString(methodName).ustring());
@@ -219,7 +219,7 @@ jobject JavaJSObject::getMember(jstring memberName) const {
   if (!rootObject)
     return 0;
 
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
 
   JSLock lock;
   JSValue* result =
@@ -236,7 +236,7 @@ void JavaJSObject::setMember(jstring memberName, jobject value) const {
   if (!rootObject)
     return;
 
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
   JSLock lock;
   _imp->put(exec, Identifier(JavaString(memberName).ustring()),
             convertJObjectToValue(value));
@@ -249,7 +249,7 @@ void JavaJSObject::removeMember(jstring memberName) const {
   if (!rootObject)
     return;
 
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
   JSLock lock;
   _imp->deleteProperty(exec, Identifier(JavaString(memberName).ustring()));
 }
@@ -265,7 +265,7 @@ jobject JavaJSObject::getSlot(jint index) const {
   if (!rootObject)
     return 0;
 
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
 
   JSLock lock;
   JSValue* result = _imp->get(exec, (unsigned)index);
@@ -284,7 +284,7 @@ void JavaJSObject::setSlot(jint index, jobject value) const {
   if (!rootObject)
     return;
 
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
   JSLock lock;
   _imp->put(exec, (unsigned)index, convertJObjectToValue(value));
 }
@@ -298,7 +298,7 @@ jstring JavaJSObject::toString() const {
 
   JSLock lock;
   JSObject* thisObj = const_cast<JSObject*>(_imp);
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
 
   return (jstring)convertValueToJValue(exec, thisObj, object_type,
                                        "java.lang.String")
@@ -352,7 +352,7 @@ jobject JavaJSObject::convertValueToJObject(JSValue* value) const {
   if (!rootObject)
     return 0;
 
-  ExecState* exec = rootObject->interpreter()->globalExec();
+  ExecState* exec = rootObject->globalObject()->globalExec();
   JNIEnv* env = getJNIEnv();
   jobject result = 0;
 

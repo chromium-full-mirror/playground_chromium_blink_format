@@ -809,7 +809,7 @@ void InspectorController::windowScriptObjectAvailable() {
     return;
 
   m_scriptContext =
-      toRef(m_page->mainFrame()->scriptProxy()->interpreter()->globalExec());
+      toRef(m_page->mainFrame()->scriptProxy()->globalObject()->globalExec());
 
   JSObjectRef global = JSContextGetGlobalObject(m_scriptContext);
   ASSERT(global);
