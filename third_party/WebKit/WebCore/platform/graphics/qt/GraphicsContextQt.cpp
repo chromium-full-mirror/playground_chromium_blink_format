@@ -479,8 +479,9 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
   if (paintingDisabled() || !color.alpha())
     return;
 
-  // FIXME: Implement.
-  notImplemented();
+  Path path = Path::createRoundedRectangle(rect, topLeft, topRight, bottomLeft,
+                                           bottomRight);
+  m_data->p().fillPath(*path.platformPath(), QColor(color));
 }
 
 void GraphicsContext::beginPath() {
