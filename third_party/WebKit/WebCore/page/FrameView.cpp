@@ -970,7 +970,7 @@ void FrameView::setWasScrolledByUser(bool wasScrolledByUser) {
   d->m_wasScrolledByUser = wasScrolledByUser;
 }
 
-#if PLATFORM(WIN) || PLATFORM(GTK)
+#if PLATFORM(WIN) || PLATFORM(GTK) || PLATFORM(QT)
 void FrameView::layoutIfNeededRecursive() {
   // We have to crawl our entire tree looking for any FrameViews that need
   // layout and make sure they are up to date.

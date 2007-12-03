@@ -836,6 +836,7 @@ void QWebPage::paintEvent(QPaintEvent* ev) {
   time.start();
 #endif
 
+  mainFrame()->layout();
   QPainter p(this);
 
   QVector<QRect> vector = ev->region().rects();
