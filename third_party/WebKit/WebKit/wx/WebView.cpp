@@ -271,7 +271,7 @@ wxString wxWebView::RunScript(const wxString& javascript) {
       returnValue = wxString(
           result
               ->toString(
-                  m_impl->frame->scriptProxy()->interpreter()->globalExec())
+                  m_impl->frame->scriptProxy()->globalObject()->globalExec())
               .UTF8String()
               .c_str(),
           wxConvUTF8);
