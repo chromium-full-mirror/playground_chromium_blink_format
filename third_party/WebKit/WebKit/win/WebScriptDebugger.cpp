@@ -185,6 +185,5 @@ void WebScriptDebugger::leaveFrame() {
   if (FAILED(m_topStackFrame->caller(&caller)))
     return;
 
-  if (caller)
-    m_topStackFrame = caller;
+  m_topStackFrame = caller;
 }

@@ -86,10 +86,8 @@ void DebuggerDocument::getPlatformCurrentFunctionStack(
   while (frame) {
     COMPtr<IWebScriptCallFrame> caller;
     BSTR function = 0;
-    if (FAILED(frame->functionName(&function))) {
-      SysFreeString(function);
+    if (FAILED(frame->functionName(&function)))
       return;
-    }
 
     if (FAILED(frame->caller(&caller)))
       return;
