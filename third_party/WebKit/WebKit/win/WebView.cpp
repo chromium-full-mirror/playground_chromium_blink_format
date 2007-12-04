@@ -1665,12 +1665,8 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
 
       if (lParam != 0) {
         webView->deleteBackingStore();
-        if (Frame* coreFrame = core(mainFrameImpl)) {
+        if (Frame* coreFrame = core(mainFrameImpl))
           coreFrame->view()->resize(LOWORD(lParam), HIWORD(lParam));
-
-          if (!coreFrame->loader()->isLoading())
-            coreFrame->sendResizeEvent();
-        }
       }
       break;
     case WM_SHOWWINDOW:

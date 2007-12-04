@@ -124,7 +124,6 @@ enum WebScrollGranularity {
 - (void)forceLayoutWithMinimumPageWidth:(float)minPageWidth
                        maximumPageWidth:(float)maxPageWidth
                       adjustingViewSize:(BOOL)adjustSizeFlag;
-- (void)sendResizeEvent;
 - (void)sendScrollEvent;
 - (BOOL)needsLayout;
 - (void)setNeedsLayout;

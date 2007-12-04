@@ -58,8 +58,6 @@ struct WebHTMLViewInterpretKeyEventsParameters;
   NSEvent* keyDownEvent;  // Kept after handling the event.
 
   NSSize lastLayoutSize;
-  NSSize lastLayoutFrameSize;
-  BOOL laidOutAtLeastOnce;
 
   NSPoint lastScrollPosition;
 
