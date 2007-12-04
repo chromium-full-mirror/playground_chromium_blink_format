@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006, 2007 Apple, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2007 Apple Inc. All rights reserved.
  *           (C) 2007 Graham Dennis (graham.dennis@gmail.com)
  *           (C) 2007 Eric Seidel <eric@webkit.org>
  *
@@ -28,24 +28,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "JavaScriptThreading.h"
+#include "JavaScriptThreading.h"
 
-#import <CoreFoundation/CoreFoundation.h>
-#import <JavaScriptCore/JavaScriptCore.h>
-#import <pthread.h>
-#import <wtf/Assertions.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <JavaScriptCore/JavaScriptCore.h>
+#include <pthread.h>
+#include <wtf/Assertions.h>
+#include <wtf/HashSet.h>
 
 static pthread_mutex_t javaScriptThreadsMutex = PTHREAD_MUTEX_INITIALIZER;
 static bool javaScriptThreadsShouldTerminate;
 
 static const int javaScriptThreadsCount = 4;
-static CFMutableDictionaryRef javaScriptThreads() {
-  assert(pthread_mutex_trylock(&javaScriptThreadsMutex) == EBUSY);
-  static CFMutableDictionaryRef staticJavaScriptThreads;
-  if (!staticJavaScriptThreads)
-    staticJavaScriptThreads =
-        CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
-  return staticJavaScriptThreads;
+
+typedef HashSet<pthread_t> ThreadSet;
+
+static ThreadSet* javaScriptThreads() {
+  ASSERT(pthread_mutex_trylock(&javaScriptThreadsMutex) == EBUSY);
+  static ThreadSet staticJavaScriptThreads;
+  return &staticJavaScriptThreads;
 }
 
 // Loops forever, running a script and randomly respawning, until
@@ -58,12 +59,12 @@ void* runJavaScriptThread(void* arg) {
       "}";
 
   while (1) {
-    JSGlobalContextRef ctx = JSGlobalContextCreate(NULL);
+    JSGlobalContextRef ctx = JSGlobalContextCreate(0);
     JSStringRef scriptRef = JSStringCreateWithUTF8CString(script);
 
-    JSValueRef exception = NULL;
-    JSEvaluateScript(ctx, scriptRef, NULL, NULL, 0, &exception);
-    assert(!exception);
+    JSValueRef exception = 0;
+    JSEvaluateScript(ctx, scriptRef, 0, 0, 0, &exception);
+    ASSERT(!exception);
 
     JSGlobalContextRelease(ctx);
     JSStringRelease(scriptRef);
@@ -81,11 +82,11 @@ void* runJavaScriptThread(void* arg) {
     // Respawn probabilistically.
     if (random() % 5 == 0) {
       pthread_t pthread;
-      pthread_create(&pthread, NULL, &runJavaScriptThread, NULL);
+      pthread_create(&pthread, 0, &runJavaScriptThread, 0);
       pthread_detach(pthread);
 
-      CFDictionaryRemoveValue(javaScriptThreads(), pthread_self());
-      CFDictionaryAddValue(javaScriptThreads(), pthread, NULL);
+      javaScriptThreads()->remove(pthread_self());
+      javaScriptThreads()->add(pthread);
 
       pthread_mutex_unlock(&javaScriptThreadsMutex);
       return 0;
@@ -100,9 +101,9 @@ void startJavaScriptThreads() {
 
   for (int i = 0; i < javaScriptThreadsCount; i++) {
     pthread_t pthread;
-    pthread_create(&pthread, NULL, &runJavaScriptThread, NULL);
+    pthread_create(&pthread, 0, &runJavaScriptThread, 0);
     pthread_detach(pthread);
-    CFDictionaryAddValue(javaScriptThreads(), pthread, NULL);
+    javaScriptThreads()->add(pthread);
   }
 
   pthread_mutex_unlock(&javaScriptThreadsMutex);
@@ -113,15 +114,13 @@ void stopJavaScriptThreads() {
 
   javaScriptThreadsShouldTerminate = true;
 
-  pthread_t* pthreads[javaScriptThreadsCount] = {0};
-  ASSERT(CFDictionaryGetCount(javaScriptThreads()) == javaScriptThreadsCount);
-  CFDictionaryGetKeysAndValues(javaScriptThreads(), (const void**)pthreads, 0);
+  ASSERT(javaScriptThreads()->size() == javaScriptThreadsCount);
 
   pthread_mutex_unlock(&javaScriptThreadsMutex);
 
-  for (int i = 0; i < javaScriptThreadsCount; i++) {
-    pthread_t* pthread = pthreads[i];
-    pthread_join(*pthread, 0);
-    free(pthread);
+  ThreadSet::iterator end = javaScriptThreads()->end();
+  for (ThreadSet::iterator it = javaScriptThreads()->begin(); it != end; ++it) {
+    pthread_t pthread = *it;
+    pthread_join(pthread, 0);
   }
 }
