@@ -110,8 +110,10 @@ static gboolean webkit_web_view_key_event(GtkWidget* widget,
   Frame* frame = core(getFrameFromView(WEBKIT_WEB_VIEW(widget)));
   PlatformKeyboardEvent keyboardEvent(event);
 
-  if (!frame->eventHandler()->keyEvent(keyboardEvent) &&
-      event->type == GDK_KEY_PRESS) {
+  if (frame->eventHandler()->keyEvent(keyboardEvent))
+    return TRUE;
+
+  if (event->type == GDK_KEY_PRESS) {
     FrameView* view = frame->view();
 
     /* FIXME: at the very least we should be using the same code than the
