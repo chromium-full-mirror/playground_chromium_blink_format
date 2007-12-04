@@ -335,7 +335,9 @@ void FrameView::layout(bool allowSubtree) {
   // Always ensure our style info is up-to-date.  This can happen in situations
   // where
   // the layout beats any sort of style recalc update that needs to occur.
-  if (document->hasChangedChild())
+  if (m_frame->needsReapplyStyles())
+    m_frame->reapplyStyles();
+  else if (document->hasChangedChild())
     document->recalcStyle();
 
   bool subtree = d->layoutRoot;
@@ -775,7 +777,7 @@ bool FrameView::needsLayout() const {
   Document* doc = m_frame->document();
   // doc->hasChangedChild() condition can occur when using WebKit ObjC interface
   return layoutPending() || (root && root->needsLayout()) || d->layoutRoot ||
-         (doc && doc->hasChangedChild());
+         (doc && doc->hasChangedChild()) || m_frame->needsReapplyStyles();
 }
 
 void FrameView::setNeedsLayout() {

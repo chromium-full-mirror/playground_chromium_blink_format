@@ -213,9 +213,6 @@ Color WebCore::focusRingColor() {
 }
 void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
-void Frame::setNeedsReapplyStyles() {
-  notImplemented();
-}
 void Image::drawPattern(GraphicsContext*,
                         const FloatRect& srcRect,
                         const AffineTransform& patternTransform,

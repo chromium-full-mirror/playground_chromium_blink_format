@@ -112,9 +112,5 @@ DragImageRef Frame::dragImageForSelection() {
 }
 
 void Frame::dashboardRegionsChanged() {}
-
-void Frame::setNeedsReapplyStyles() {
-  notImplemented();
-}
 }
 // vim: ts=4 sw=4 et

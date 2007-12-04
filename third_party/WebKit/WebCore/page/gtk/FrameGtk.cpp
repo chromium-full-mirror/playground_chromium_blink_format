@@ -44,8 +44,4 @@ DragImageRef Frame::dragImageForSelection() {
 void Frame::dashboardRegionsChanged() {
   notImplemented();
 }
-
-void Frame::setNeedsReapplyStyles() {
-  notImplemented();
-}
 }

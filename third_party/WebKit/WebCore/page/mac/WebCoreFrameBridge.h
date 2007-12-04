@@ -309,8 +309,6 @@ rangeByAlteringCurrentSelection:
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebCoreOpenPanelResultListener>)resultListener;
 
-- (void)setNeedsReapplyStyles;
-
 - (NSView*)viewForPluginWithFrame:(NSRect)frame
                               URL:(NSURL*)URL
                    attributeNames:(NSArray*)attributeNames
