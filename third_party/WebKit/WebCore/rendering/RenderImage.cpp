@@ -177,39 +177,7 @@ void RenderImage::resetAnimation() {
   }
 }
 
-void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
-  if (!shouldPaint(paintInfo, tx, ty))
-    return;
-
-  tx += m_x;
-  ty += m_y;
-
-  if (hasBoxDecorations() && paintInfo.phase != PaintPhaseOutline &&
-      paintInfo.phase != PaintPhaseSelfOutline)
-    paintBoxDecorations(paintInfo, tx, ty);
-
-  GraphicsContext* context = paintInfo.context;
-
-  if ((paintInfo.phase == PaintPhaseOutline ||
-       paintInfo.phase == PaintPhaseSelfOutline) &&
-      style()->outlineWidth() && style()->visibility() == VISIBLE)
-    paintOutline(context, tx, ty, width(), height(), style());
-
-  if (paintInfo.phase != PaintPhaseForeground &&
-      paintInfo.phase != PaintPhaseSelection)
-    return;
-
-  if (!shouldPaintWithinRoot(paintInfo))
-    return;
-
-  bool isPrinting = document()->printing();
-  bool drawSelectionTint = isSelected() && !isPrinting;
-  if (paintInfo.phase == PaintPhaseSelection) {
-    if (selectionState() == SelectionNone)
-      return;
-    drawSelectionTint = false;
-  }
-
+void RenderImage::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
   int cWidth = contentWidth();
   int cHeight = contentHeight();
   int leftBorder = borderLeft();
@@ -217,8 +185,10 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
   int leftPad = paddingLeft();
   int topPad = paddingTop();
 
-  if (isPrinting && !view()->printImages())
+  if (document()->printing() && !view()->printImages())
     return;
+
+  GraphicsContext* context = paintInfo.context;
 
   if (!m_cachedImage || errorOccurred()) {
     if (paintInfo.phase == PaintPhaseSelection)
@@ -297,34 +267,10 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
         image(), rect, compositeOperator,
         document()->page()->inLowQualityImageInterpolationMode());
   }
-
-  // draw the selection tint even if the image itself is not available
-  if (drawSelectionTint)
-    context->fillRect(selectionRect(), selectionBackgroundColor());
 }
 
-void RenderImage::layout() {
-  ASSERT(needsLayout());
-
-  IntRect oldBounds;
-  IntRect oldOutlineBox;
-  bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint) {
-    oldBounds = absoluteClippedOverflowRect();
-    oldOutlineBox = absoluteOutlineBox();
-  }
-
-  // minimum height
-  m_height = errorOccurred() ? intrinsicSize().height() : 0;
-
-  calcWidth();
-  calcHeight();
-  adjustOverflowForBoxShadow();
-
-  if (checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
-
-  setNeedsLayout(false);
+int RenderImage::minimumReplacedHeight() const {
+  return errorOccurred() ? intrinsicSize().height() : 0;
 }
 
 HTMLMapElement* RenderImage::imageMap() {
