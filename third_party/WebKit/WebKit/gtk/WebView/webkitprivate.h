@@ -35,6 +35,7 @@
  * They are using WebCore which musn't be exposed to the outer world.
  */
 
+#include "webkitdefines.h"
 #include "webkitsettings.h"
 #include "webkitwebview.h"
 #include "webkitwebframe.h"
@@ -99,6 +100,13 @@ struct _WebKitNetworkRequestPrivate {
 WebKitWebFrame* webkit_web_frame_init_with_web_view(
     WebKitWebView*,
     WebCore::HTMLFrameOwnerElement*);
+
+// TODO: Move these to webkitwebframe.h once these functions are fully
+// implemented and their API has been discussed.
+
+WEBKIT_API GSList* webkit_web_frame_get_children(WebKitWebFrame* frame);
+
+WEBKIT_API gchar* webkit_web_frame_get_inner_text(WebKitWebFrame* frame);
 }
 
 #endif
