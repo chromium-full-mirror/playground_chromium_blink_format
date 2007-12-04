@@ -117,8 +117,11 @@ class Window : public JSGlobalObject {
 
   void timerFired(DOMWindowTimer*);
 
-  static bool isSafeScript(const ScriptInterpreter* origin,
-                           const ScriptInterpreter* target);
+  static bool isSafeScript(const JSGlobalObject* origin,
+                           const JSGlobalObject* target);
+  virtual bool isSafeScript(const JSGlobalObject* other) const {
+    return Window::isSafeScript(this, other);
+  }
 
   Location* location() const;
 
@@ -164,7 +167,7 @@ class Window : public JSGlobalObject {
 
   virtual ExecState* globalExec();
   virtual bool shouldInterruptScript() const;
-  virtual bool isSafeScript(ExecState*) const;
+  bool isSafeScript(ExecState*) const;
 
   enum {
     // Attributes

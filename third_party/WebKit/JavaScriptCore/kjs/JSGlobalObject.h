@@ -45,7 +45,7 @@ class JSGlobalObject : public JSObject {
 
   virtual bool shouldInterruptScript() const { return true; }
 
-  virtual bool isSafeScript(const JSGlobalObject*) { return true; }
+  virtual bool isSafeScript(const JSGlobalObject*) const { return true; }
 
  private:
   std::auto_ptr<Interpreter> m_interpreter;
