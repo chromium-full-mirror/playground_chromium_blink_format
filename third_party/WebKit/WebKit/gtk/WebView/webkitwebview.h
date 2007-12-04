@@ -102,6 +102,10 @@ struct _WebKitWebViewClass {
                               const gchar* message,
                               unsigned int line_number,
                               const gchar* source_id);
+  void (*select_all)(WebKitWebView* web_view);
+  void (*cut_clipboard)(WebKitWebView* web_view);
+  void (*copy_clipboard)(WebKitWebView* web_view);
+  void (*paste_clipboard)(WebKitWebView* web_view);
 
   /*
    * internal
