@@ -65,8 +65,6 @@ class FrameLoaderClientWx : public FrameLoaderClient,
 
   virtual bool provisionalItemIsTarget() const;
 
-  virtual bool privateBrowsingEnabled() const;
-
   virtual void makeDocumentView();
   virtual void makeRepresentation(DocumentLoader*);
   virtual void forceLayout();

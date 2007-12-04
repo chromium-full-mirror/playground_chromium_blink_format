@@ -240,7 +240,6 @@ class FrameLoader : Noncopyable
   void didReceiveData(ResourceLoader*, const char*, int, int lengthReceived);
   void didFinishLoad(ResourceLoader*);
   void didFailToLoad(ResourceLoader*, const ResourceError&);
-  bool privateBrowsingEnabled() const;
   const ResourceRequest& originalRequest() const;
   const ResourceRequest& initialRequest() const;
   void receivedMainResourceError(const ResourceError&, bool isComplete);
@@ -491,12 +490,7 @@ class FrameLoader : Noncopyable
   void cancelAndClear();
 
   void setTitle(const String&);
-  void dispatchDidChangeLocationWithinPage();
 
-  void dispatchDidFinishLoadToClient();
-  void updateGlobalHistoryForStandardLoad(const KURL&);
-  void updateGlobalHistoryForReload(const KURL&);
-  bool shouldGoToHistoryItem(HistoryItem*) const;
   bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
 
   void commitProvisionalLoad(PassRefPtr<CachedPage>);
@@ -798,6 +792,10 @@ class FrameLoader : Noncopyable
   RefPtr<HistoryItem> m_provisionalHistoryItem;
 
   bool m_didPerformFirstNavigation;
+
+#ifndef NDEBUG
+  bool m_didDispatchDidCommitLoad;
+#endif
 
 #if USE(LOW_BANDWIDTH_DISPLAY)
   // whether to use low bandwidth dislay, set by client

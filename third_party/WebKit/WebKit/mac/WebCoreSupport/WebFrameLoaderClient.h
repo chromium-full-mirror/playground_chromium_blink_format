@@ -63,8 +63,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual bool hasWebView() const;    // mainly for assertions
   virtual bool hasFrameView() const;  // ditto
 
-  virtual bool privateBrowsingEnabled() const;
-
   virtual void makeDocumentView();
   virtual void makeRepresentation(WebCore::DocumentLoader*);
   virtual bool hasHTMLView() const;

@@ -80,8 +80,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual bool loadProvisionalItemFromPageCache();
   virtual void invalidateCurrentItemPageCache();
 
-  virtual bool privateBrowsingEnabled() const;
-
   virtual void makeDocumentView();
   virtual void makeRepresentation(DocumentLoader*);
   virtual void forceLayout();
