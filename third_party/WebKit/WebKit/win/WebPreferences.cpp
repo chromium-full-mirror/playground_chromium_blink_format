@@ -242,6 +242,8 @@ void WebPreferences::initializeDefaultSettings() {
       CFStringCreateWithFormat(0, 0, CFSTR("%d"), WebCacheModelDocumentViewer));
   CFDictionaryAddValue(defaults, CFSTR(WebKitCacheModelPreferenceKey),
                        cacheModelRef.get());
+  CFDictionaryAddValue(defaults, CFSTR(WebKitDefaultDatabaseQuotaKey),
+                       CFSTR("5242880"));  // 5 MB
 
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitAuthorAndUserStylesEnabledPreferenceKey),
@@ -327,6 +329,26 @@ float WebPreferences::floatValueForKey(CFStringRef key) {
   return 0.0;
 }
 
+LONGLONG WebPreferences::longlongValueForKey(CFStringRef key) {
+  CFTypeRef cfVal = (CFTypeRef)valueForKey(key);
+  if (!cfVal)
+    return 0;
+
+  CFTypeID cfType = CFGetTypeID(cfVal);
+  if (cfType == CFStringGetTypeID())
+    return (LONGLONG)CFStringGetIntValue((CFStringRef)cfVal);
+  else if (cfType == CFBooleanGetTypeID()) {
+    Boolean boolVal = CFBooleanGetValue((CFBooleanRef)cfVal);
+    return (boolVal) ? 1 : 0;
+  } else if (cfType == CFNumberGetTypeID()) {
+    LONGLONG val = 0;
+    CFNumberGetValue((CFNumberRef)cfVal, kCFNumberLongLongType, &val);
+    return val;
+  }
+
+  return 0;
+}
+
 void WebPreferences::setStringValue(CFStringRef key, LPCTSTR value) {
   BSTR val = stringValueForKey(key);
   if (val && !_tcscmp(val, value))
@@ -363,6 +385,19 @@ void WebPreferences::setBoolValue(CFStringRef key, BOOL value) {
 
   CFDictionarySetValue(m_privatePrefs.get(), key,
                        value ? kCFBooleanTrue : kCFBooleanFalse);
+  if (m_autoSaves)
+    save();
+
+  postPreferencesChangesNotification();
+}
+
+void WebPreferences::setLongLongValue(CFStringRef key, LONGLONG value) {
+  if (longlongValueForKey(key) == value)
+    return;
+
+  RetainPtr<CFNumberRef> valueRef(
+      AdoptCF, CFNumberCreate(0, kCFNumberLongLongType, &value));
+  CFDictionarySetValue(m_privatePrefs.get(), key, valueRef.get());
   if (m_autoSaves)
     save();
 
@@ -1081,6 +1116,28 @@ HRESULT WebPreferences::automaticallyDetectsCacheModel(
     return E_POINTER;
 
   *automaticallyDetectsCacheModel = m_automaticallyDetectsCacheModel;
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::defaultDatabaseQuota(unsigned long long* quota) {
+  if (!quota)
+    return E_POINTER;
+
+  long long value = longlongValueForKey(CFSTR(WebKitDefaultDatabaseQuotaKey));
+  if (value < 0 || value > LLONG_MAX) {
+    value = 0;
+    setDefaultDatabaseQuota(0);
+  }
+  *quota = value;
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::setDefaultDatabaseQuota(unsigned long long quota) {
+  if (quota > LLONG_MAX)
+    quota = 0;
+  setLongLongValue(CFSTR(WebKitDefaultDatabaseQuotaKey), quota);
   return S_OK;
 }
 
