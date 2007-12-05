@@ -148,6 +148,13 @@ class ScrollView : public Widget {
 
   virtual void setParent(ScrollView*);
 
+  virtual void attachToWindow();
+  virtual void detachFromWindow();
+  bool isAttachedToWindow() const;
+
+  virtual void show();
+  virtual void hide();
+
   void addToDirtyRegion(const IntRect&);
   void scrollBackingStore(int dx,
                           int dy,

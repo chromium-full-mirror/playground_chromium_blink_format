@@ -129,6 +129,9 @@ class Widget {
   virtual void setParent(ScrollView*);
   ScrollView* parent() const;
 
+  virtual void attachToWindow() {}
+  virtual void detachFromWindow() {}
+
   virtual void geometryChanged() const {};
 
   IntRect convertToContainingWindow(const IntRect&) const;

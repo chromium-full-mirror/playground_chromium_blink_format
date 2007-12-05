@@ -142,6 +142,9 @@ class PluginViewWin : public Widget {
   virtual void handleEvent(Event*);
   virtual void setParent(ScrollView*);
 
+  virtual void attachToWindow();
+  virtual void detachFromWindow();
+
   LRESULT wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   WNDPROC pluginWndProc() const { return m_pluginWndProc; }
 
@@ -213,6 +216,7 @@ class PluginViewWin : public Widget {
   bool m_isWindowed;
   bool m_isTransparent;
   bool m_isVisible;
+  bool m_attachedToWindow;
   bool m_haveInitialized;
 
   WNDPROC m_pluginWndProc;

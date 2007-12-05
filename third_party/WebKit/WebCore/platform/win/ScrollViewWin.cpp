@@ -59,7 +59,9 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
         m_inUpdateScrollbars(false),
         m_scrollbarsAvoidingResizer(0),
         m_vScrollbarMode(ScrollbarAuto),
-        m_hScrollbarMode(ScrollbarAuto) {}
+        m_hScrollbarMode(ScrollbarAuto),
+        m_visible(false),
+        m_attachedToWindow(false) {}
 
   ~ScrollViewPrivate() {
     setHasHorizontalScrollbar(false);
@@ -90,6 +92,8 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
   RefPtr<PlatformScrollbar> m_hBar;
   HRGN m_dirtyRegion;
   HashSet<Widget*> m_children;
+  bool m_visible;
+  bool m_attachedToWindow;
 };
 
 void ScrollView::ScrollViewPrivate::setHasHorizontalScrollbar(bool hasBar) {
@@ -711,6 +715,66 @@ void ScrollView::setParent(ScrollView* parentView) {
       parent()->isFrameView())
     static_cast<FrameView*>(parent())->adjustOverlappingScrollbarCount(false);
   Widget::setParent(parentView);
+}
+
+void ScrollView::attachToWindow() {
+  if (m_data->m_attachedToWindow)
+    return;
+
+  m_data->m_attachedToWindow = true;
+
+  if (m_data->m_visible) {
+    HashSet<Widget*>::iterator end = m_data->m_children.end();
+    for (HashSet<Widget*>::iterator it = m_data->m_children.begin(); it != end;
+         ++it)
+      (*it)->attachToWindow();
+  }
+}
+
+void ScrollView::detachFromWindow() {
+  if (!m_data->m_attachedToWindow)
+    return;
+
+  if (m_data->m_visible) {
+    HashSet<Widget*>::iterator end = m_data->m_children.end();
+    for (HashSet<Widget*>::iterator it = m_data->m_children.begin(); it != end;
+         ++it)
+      (*it)->detachFromWindow();
+  }
+
+  m_data->m_attachedToWindow = false;
+}
+
+void ScrollView::show() {
+  if (!m_data->m_visible) {
+    m_data->m_visible = true;
+    if (isAttachedToWindow()) {
+      HashSet<Widget*>::iterator end = m_data->m_children.end();
+      for (HashSet<Widget*>::iterator it = m_data->m_children.begin();
+           it != end; ++it)
+        (*it)->attachToWindow();
+    }
+  }
+
+  Widget::show();
+}
+
+void ScrollView::hide() {
+  if (m_data->m_visible) {
+    if (isAttachedToWindow()) {
+      HashSet<Widget*>::iterator end = m_data->m_children.end();
+      for (HashSet<Widget*>::iterator it = m_data->m_children.begin();
+           it != end; ++it)
+        (*it)->detachFromWindow();
+    }
+    m_data->m_visible = false;
+  }
+
+  Widget::hide();
+}
+
+bool ScrollView::isAttachedToWindow() const {
+  return m_data->m_attachedToWindow;
 }
 
 void ScrollView::addToDirtyRegion(const IntRect& containingWindowRect) {
