@@ -108,9 +108,22 @@ void HTMLMediaElement::attributeChanged(Attribute* attr, bool preserveDecls) {
       scheduleLoad();
   }
   if (attrName == controlsAttr) {
+    if (!isVideo() && attached() && (controls() != (renderer() != 0))) {
+      detach();
+      attach();
+    }
     if (renderer())
       renderer()->updateFromElement();
   }
+}
+
+bool HTMLMediaElement::rendererIsNeeded(RenderStyle* style) {
+  return controls() ? HTMLElement::rendererIsNeeded(style) : false;
+}
+
+RenderObject* HTMLMediaElement::createRenderer(RenderArena* arena,
+                                               RenderStyle*) {
+  return new (arena) RenderMedia(this);
 }
 
 void HTMLMediaElement::insertedIntoDocument() {
