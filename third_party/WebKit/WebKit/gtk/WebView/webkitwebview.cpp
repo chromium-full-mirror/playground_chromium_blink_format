@@ -435,7 +435,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    */
 
   webkit_web_view_signals[NAVIGATION_REQUESTED] =
-      g_signal_new("navigation_requested", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("navigation-requested", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
                    G_STRUCT_OFFSET(WebKitWebViewClass, navigation_requested),
                    NULL, NULL, webkit_marshal_INT__OBJECT_OBJECT, G_TYPE_INT, 2,
@@ -457,7 +457,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * set custom properties on the window object using the JavaScriptCore API.
    */
   webkit_web_view_signals[WINDOW_OBJECT_CLEARED] = g_signal_new(
-      "window_object_cleared", G_TYPE_FROM_CLASS(webViewClass),
+      "window-object-cleared", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
       G_STRUCT_OFFSET(WebKitWebViewClass, window_object_cleared), NULL, NULL,
       webkit_marshal_VOID__OBJECT_POINTER_POINTER, G_TYPE_NONE, 3,
@@ -471,7 +471,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * When a #WebKitWebFrame begins to load this signal is emitted.
    */
   webkit_web_view_signals[LOAD_STARTED] = g_signal_new(
-      "load_started", G_TYPE_FROM_CLASS(webViewClass),
+      "load-started", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_TYPE_WEB_FRAME);
 
@@ -481,39 +481,39 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * @progress: the global progress
    */
   webkit_web_view_signals[LOAD_PROGRESS_CHANGED] = g_signal_new(
-      "load_progress_changed", G_TYPE_FROM_CLASS(webViewClass),
+      "load-progress-changed", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
 
   webkit_web_view_signals[LOAD_FINISHED] = g_signal_new(
-      "load_finished", G_TYPE_FROM_CLASS(webViewClass),
+      "load-finished", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_TYPE_WEB_FRAME);
 
   webkit_web_view_signals[TITLE_CHANGED] =
-      g_signal_new("title_changed", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("title-changed", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
                    G_TYPE_STRING, G_TYPE_STRING);
 
   webkit_web_view_signals[HOVERING_OVER_LINK] =
-      g_signal_new("hovering_over_link", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("hovering-over-link", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
                    G_TYPE_STRING, G_TYPE_STRING);
 
   webkit_web_view_signals[STATUS_BAR_TEXT_CHANGED] = g_signal_new(
-      "status_bar_text_changed", G_TYPE_FROM_CLASS(webViewClass),
+      "status-bar-text-changed", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
 
   webkit_web_view_signals[ICOND_LOADED] =
-      g_signal_new("icon_loaded", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("icon-loaded", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   webkit_web_view_signals[SELECTION_CHANGED] =
-      g_signal_new("selection_changed", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("selection-changed", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
@@ -529,7 +529,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * A JavaScript console message was created.
    */
   webkit_web_view_signals[CONSOLE_MESSAGE] =
-      g_signal_new("console_message", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("console-message", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
                    G_STRUCT_OFFSET(WebKitWebViewClass, console_message),
                    g_signal_accumulator_true_handled, NULL,
@@ -566,7 +566,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * A JavaScript confirm dialog was created, providing Yes and No buttons.
    */
   webkit_web_view_signals[SCRIPT_CONFIRM] = g_signal_new(
-      "script_confirm", G_TYPE_FROM_CLASS(webViewClass),
+      "script-confirm", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
       G_STRUCT_OFFSET(WebKitWebViewClass, script_confirm),
       g_signal_accumulator_true_handled, NULL,
@@ -587,7 +587,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * A JavaScript prompt dialog was created, providing an entry to input text.
    */
   webkit_web_view_signals[SCRIPT_PROMPT] = g_signal_new(
-      "script_prompt", G_TYPE_FROM_CLASS(webViewClass),
+      "script-prompt", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
       G_STRUCT_OFFSET(WebKitWebViewClass, script_prompt),
       g_signal_accumulator_true_handled, NULL,
@@ -604,7 +604,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * The default bindings for this signal is Ctrl-a.
    */
   webkit_web_view_signals[SELECT_ALL] =
-      g_signal_new("select_all", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("select-all", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
                    G_STRUCT_OFFSET(WebKitWebViewClass, select_all), NULL, NULL,
                    g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
@@ -619,7 +619,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * The default bindings for this signal are Ctrl-x and Shift-Delete.
    */
   webkit_web_view_signals[CUT_CLIPBOARD] =
-      g_signal_new("cut_clipboard", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("cut-clipboard", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
                    G_STRUCT_OFFSET(WebKitWebViewClass, cut_clipboard), NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
@@ -634,7 +634,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * The default bindings for this signal are Ctrl-c and Ctrl-Insert.
    */
   webkit_web_view_signals[COPY_CLIPBOARD] =
-      g_signal_new("copy_clipboard", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("copy-clipboard", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
                    G_STRUCT_OFFSET(WebKitWebViewClass, copy_clipboard), NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
@@ -649,7 +649,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    * The default bindings for this signal are Ctrl-v and Shift-Insert.
    */
   webkit_web_view_signals[PASTE_CLIPBOARD] =
-      g_signal_new("paste_clipboard", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("paste-clipboard", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
                    G_STRUCT_OFFSET(WebKitWebViewClass, paste_clipboard), NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
@@ -696,7 +696,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
   webViewClass->set_scroll_adjustments = webkit_web_view_set_scroll_adjustments;
   GTK_WIDGET_CLASS(webViewClass)
       ->set_scroll_adjustments_signal =
-      g_signal_new("set_scroll_adjustments", G_TYPE_FROM_CLASS(webViewClass),
+      g_signal_new("set-scroll-adjustments", G_TYPE_FROM_CLASS(webViewClass),
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
                    G_STRUCT_OFFSET(WebKitWebViewClass, set_scroll_adjustments),
                    NULL, NULL, webkit_marshal_VOID__OBJECT_OBJECT, G_TYPE_NONE,

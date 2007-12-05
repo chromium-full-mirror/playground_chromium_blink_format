@@ -213,7 +213,7 @@ bool ChromeClient::runJavaScriptPrompt(Frame* frame,
 
 void ChromeClient::setStatusbarText(const String& string) {
   CString stringMessage = string.utf8();
-  g_signal_emit_by_name(m_webPage, "status_bar_text_changed",
+  g_signal_emit_by_name(m_webPage, "status-bar-text-changed",
                         stringMessage.data());
 }
 
@@ -255,12 +255,12 @@ void ChromeClient::mouseDidMoveOverElement(const HitTestResult& hit,
     if (!url.isEmpty() && url != m_hoveredLinkURL) {
       CString titleString = hit.title().utf8();
       DeprecatedCString urlString = url.prettyURL().utf8();
-      g_signal_emit_by_name(m_webPage, "hovering_over_link", titleString.data(),
+      g_signal_emit_by_name(m_webPage, "hovering-over-link", titleString.data(),
                             urlString.data());
       m_hoveredLinkURL = url;
     }
   } else if (!isLink && !m_hoveredLinkURL.isEmpty()) {
-    g_signal_emit_by_name(m_webPage, "hovering_over_link", 0, 0);
+    g_signal_emit_by_name(m_webPage, "hovering-over-link", 0, 0);
     m_hoveredLinkURL = KURL();
   }
 }
