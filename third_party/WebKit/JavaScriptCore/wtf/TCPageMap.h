@@ -78,6 +78,8 @@ class TCMalloc_PageMap1 {
     return true;
   }
 
+  void PreallocateMoreMemory() {}
+
   // REQUIRES "k" is in range "[0,2^BITS-1]".
   // REQUIRES "k" has been ensured before.
   //
@@ -150,6 +152,11 @@ class TCMalloc_PageMap2 {
       key = ((key >> LEAF_BITS) + 1) << LEAF_BITS;
     }
     return true;
+  }
+
+  void PreallocateMoreMemory() {
+    // Allocate enough to keep track of all possible pages
+    Ensure(0, 1 << BITS);
   }
 
 #ifdef WTF_CHANGES
@@ -251,6 +258,8 @@ class TCMalloc_PageMap3 {
     }
     return true;
   }
+
+  void PreallocateMoreMemory() {}
 
 #ifdef WTF_CHANGES
   template <class Visitor, class MemoryReader>
