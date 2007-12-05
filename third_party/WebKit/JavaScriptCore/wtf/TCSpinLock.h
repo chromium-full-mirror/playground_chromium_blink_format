@@ -117,6 +117,8 @@ struct TCMalloc_SpinLock {
   // Indended to be used as CHECK(lock.IsHeld());
   inline bool IsHeld() const { return lockword_ != 0; }
 
+  inline void Init() { lockword_ = 0; }
+
   volatile unsigned int lockword_;
 };
 
