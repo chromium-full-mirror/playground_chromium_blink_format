@@ -540,7 +540,7 @@ void FrameLoader::submitForm(const char* action,
                              const String& contentType,
                              const String& boundary,
                              Event* event) {
-  ASSERT(formData.get());
+  ASSERT(formData);
 
   KURL u = completeURL(url.isNull() ? "" : url);
   // FIXME: Do we really need to special-case an empty URL?
@@ -4915,6 +4915,9 @@ bool FrameLoader::shouldTreatSchemeAsLocal(const String& scheme) {
 }
 
 void FrameLoader::dispatchDidCommitLoad() {
+  if (m_creatingInitialEmptyDocument)
+    return;
+
 #ifndef NDEBUG
   ASSERT(!m_didDispatchDidCommitLoad);
   m_didDispatchDidCommitLoad = true;
