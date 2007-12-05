@@ -66,6 +66,10 @@ unsigned PlugInInfoStore::pluginCount() const {
   notImplemented();
   return 0;
 }
+String PlugInInfoStore::pluginNameForMIMEType(const String& mimeType) {
+  notImplemented();
+  return String();
+}
 bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
   notImplemented();
   return false;
