@@ -2813,8 +2813,6 @@ static int calculateCompiledPatternLengthAndFlags(
           length++;
           if (maxRepeats > 0)
             length += (maxRepeats - 1) * (duplength + 3 + 2 * LINK_SIZE);
-          if (maxRepeats > 1)
-            length += 2 + 2 * LINK_SIZE;  // BRA/KET created in else case
         }
 
         /* When the minimum is greater than zero, we have to replicate up to
