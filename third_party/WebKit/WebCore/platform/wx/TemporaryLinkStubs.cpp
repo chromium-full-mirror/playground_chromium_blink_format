@@ -169,6 +169,10 @@ bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
   notImplemented();
   return false;
 }
+String PlugInInfoStore::pluginNameForMIMEType(const String& mimeType) {
+  notImplemented();
+  return String();
+}
 void WebCore::refreshPlugins(bool) {
   notImplemented();
 }
