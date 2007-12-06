@@ -902,6 +902,8 @@ int main(int argc, char* argv[]) {
     return -1;
   webView->Release();
 
+  viewPrivate->setShouldApplyMacFontAscentHack(TRUE);
+
   BSTR pluginPath =
       SysAllocStringLen(0, exePath().length() + _tcslen(TestPluginDir));
   _tcscpy(pluginPath, exePath().c_str());
