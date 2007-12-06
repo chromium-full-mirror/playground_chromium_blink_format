@@ -23,12 +23,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MoviePrivateQTKit_h
-#define MoviePrivateQTKit_h
+#ifndef MediaPlayerPrivateQTKit_h
+#define MediaPlayerPrivateQTKit_h
 
 #if ENABLE(VIDEO)
 
-#include "Movie.h"
+#include "MediaPlayer.h"
 #include "Timer.h"
 #include "wtf/RetainPtr.h"
 #include "wtf/Noncopyable.h"
@@ -52,10 +52,10 @@ class IntSize;
 class IntRect;
 class String;
 
-class MoviePrivate : Noncopyable {
+class MediaPlayerPrivate : Noncopyable {
  public:
-  MoviePrivate(Movie* m);
-  ~MoviePrivate();
+  MediaPlayerPrivate(MediaPlayer*);
+  ~MediaPlayerPrivate();
 
   IntSize naturalSize();
   bool hasVideo();
@@ -84,8 +84,8 @@ class MoviePrivate : Noncopyable {
 
   int dataRate() const;
 
-  Movie::NetworkState networkState();
-  Movie::ReadyState readyState();
+  MediaPlayer::NetworkState networkState();
+  MediaPlayer::ReadyState readyState();
 
   float maxTimeBuffered();
   float maxTimeSeekable();
@@ -115,23 +115,23 @@ class MoviePrivate : Noncopyable {
   void updateStates();
   void doSeek();
   void cancelSeek();
-  void seekTimerFired(Timer<MoviePrivate>*);
-  void cuePointTimerFired(Timer<MoviePrivate>*);
+  void seekTimerFired(Timer<MediaPlayerPrivate>*);
+  void cuePointTimerFired(Timer<MediaPlayerPrivate>*);
   float maxTimeLoaded();
   void startCuePointTimerIfNeeded();
 
  private:
-  Movie* m_movie;
+  MediaPlayer* m_player;
   RetainPtr<QTMovie> m_qtMovie;
   RetainPtr<QTMovieView> m_qtMovieView;
   RetainPtr<WebCoreMovieObserver> m_objcObserver;
   float m_seekTo;
   float m_endTime;
-  Timer<MoviePrivate> m_seekTimer;
-  Timer<MoviePrivate> m_cuePointTimer;
+  Timer<MediaPlayerPrivate> m_seekTimer;
+  Timer<MediaPlayerPrivate> m_cuePointTimer;
   float m_previousTimeCueTimerFired;
-  Movie::NetworkState m_networkState;
-  Movie::ReadyState m_readyState;
+  MediaPlayer::NetworkState m_networkState;
+  MediaPlayer::ReadyState m_readyState;
   bool m_startedPlaying;
   bool m_isStreaming;
 };

@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Movie_h
-#define Movie_h
+#ifndef MediaPlayer_h
+#define MediaPlayer_h
 
 #if ENABLE(VIDEO)
 
@@ -37,25 +37,25 @@ namespace WebCore {
 
 class GraphicsContext;
 class IntSize;
-class Movie;
-class MoviePrivate;
+class MediaPlayer;
+class MediaPlayerPrivate;
 class String;
 class Widget;
 
-class MovieClient {
+class MediaPlayerClient {
  public:
-  virtual ~MovieClient() {}
-  virtual void movieNetworkStateChanged(Movie*) {}
-  virtual void movieReadyStateChanged(Movie*) {}
-  virtual void movieVolumeChanged(Movie*) {}
-  virtual void movieTimeChanged(Movie*) {}
-  virtual void movieCuePointReached(Movie*, float cueTime) {}
+  virtual ~MediaPlayerClient() {}
+  virtual void mediaPlayerNetworkStateChanged(MediaPlayer*) {}
+  virtual void mediaPlayerReadyStateChanged(MediaPlayer*) {}
+  virtual void mediaPlayerVolumeChanged(MediaPlayer*) {}
+  virtual void mediaPlayerTimeChanged(MediaPlayer*) {}
+  virtual void mediaPlayerCuePointReached(MediaPlayer*, float cueTime) {}
 };
 
-class Movie : Noncopyable {
+class MediaPlayer : Noncopyable {
  public:
-  Movie(MovieClient*);
-  virtual ~Movie();
+  MediaPlayer(MediaPlayerClient*);
+  virtual ~MediaPlayer();
 
   static void getSupportedTypes(HashSet<String>&);
 
@@ -134,10 +134,10 @@ class Movie : Noncopyable {
   void cuePointReached(float cueTime);
 
  private:
-  friend class MoviePrivate;
+  friend class MediaPlayerPrivate;
 
-  MovieClient* m_movieClient;
-  MoviePrivate* m_private;
+  MediaPlayerClient* m_mediaPlayerClient;
+  MediaPlayerPrivate* m_private;
   Widget* m_parentWidget;
   IntRect m_rect;
   bool m_visible;

@@ -61,7 +61,7 @@ class RenderVideo : public RenderMedia {
   bool isWidthSpecified() const;
   bool isHeightSpecified() const;
 
-  void updateMovie();
+  void updatePlayer();
 };
 
 }  // namespace WebCore
