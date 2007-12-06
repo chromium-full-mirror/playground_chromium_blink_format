@@ -141,6 +141,15 @@ void HTMLMediaElement::removedFromDocument() {
   HTMLElement::removedFromDocument();
 }
 
+void HTMLMediaElement::attach() {
+  ASSERT(!attached());
+
+  HTMLElement::attach();
+
+  if (renderer())
+    renderer()->updateFromElement();
+}
+
 void HTMLMediaElement::scheduleLoad() {
   m_loadTimer.startOneShot(0);
 }
