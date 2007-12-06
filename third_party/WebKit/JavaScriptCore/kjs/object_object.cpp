@@ -23,6 +23,7 @@
 #include "config.h"
 #include "object_object.h"
 
+#include "JSGlobalObject.h"
 #include "operations.h"
 #include "function_object.h"
 #include <stdio.h>
