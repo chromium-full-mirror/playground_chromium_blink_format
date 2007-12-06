@@ -40,7 +40,7 @@ namespace WebCore {
 using namespace KJS;
 
 void JSDocument::mark() {
-  DOMObject::mark();
+  JSEventTargetNode::mark();
   ScriptInterpreter::markDOMNodesForDocument(static_cast<Document*>(impl()));
 }
 

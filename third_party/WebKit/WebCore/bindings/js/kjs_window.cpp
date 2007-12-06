@@ -288,7 +288,7 @@ Location* Window::location() const {
 
 // reference our special objects during garbage collection
 void Window::mark() {
-  JSObject::mark();
+  JSGlobalObject::mark();
   if (d->loc && !d->loc->marked())
     d->loc->mark();
 }
