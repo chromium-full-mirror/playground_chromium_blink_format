@@ -36,11 +36,13 @@
 #include "JSClassRef.h"
 #include "JSGlobalObject.h"
 
-#include "identifier.h"
+#include "PropertyNameArray.h"
 #include "function.h"
+#include "function_object.h"
+#include "identifier.h"
 #include "internal.h"
 #include "object.h"
-#include "PropertyNameArray.h"
+#include "object_object.h"
 
 using namespace KJS;
 
@@ -70,13 +72,13 @@ JSObjectRef JSObjectMake(JSContextRef ctx, JSClassRef jsClass, void* data) {
   ExecState* exec = toJS(ctx);
 
   if (!jsClass)
-    return toRef(new JSObject(
-        exec->lexicalInterpreter()
-            ->builtinObjectPrototype()));  // slightly more efficient
+    return toRef(
+        new JSObject(exec->lexicalGlobalObject()
+                         ->objectPrototype()));  // slightly more efficient
 
   JSValue* jsPrototype = jsClass->prototype(ctx);
   if (!jsPrototype)
-    jsPrototype = exec->lexicalInterpreter()->builtinObjectPrototype();
+    jsPrototype = exec->lexicalGlobalObject()->objectPrototype();
 
   return toRef(
       new JSCallbackObject<JSObject>(exec, jsClass, jsPrototype, data));
@@ -100,9 +102,9 @@ JSObjectRef JSObjectMakeConstructor(
   JSLock lock;
   ExecState* exec = toJS(ctx);
 
-  JSValue* jsPrototype =
-      jsClass ? jsClass->prototype(ctx)
-              : exec->dynamicInterpreter()->builtinObjectPrototype();
+  JSValue* jsPrototype = jsClass
+                             ? jsClass->prototype(ctx)
+                             : exec->dynamicGlobalObject()->objectPrototype();
 
   JSObject* constructor =
       new JSCallbackConstructor(exec, jsClass, callAsConstructor);
@@ -133,8 +135,9 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
     args.append(jsString(UString(toJS(parameterNames[i]))));
   args.append(jsString(UString(bodyRep)));
 
-  JSObject* result = exec->dynamicInterpreter()->builtinFunction()->construct(
-      exec, args, nameID, UString(sourceURLRep), startingLineNumber);
+  JSObject* result =
+      exec->dynamicGlobalObject()->functionConstructor()->construct(
+          exec, args, nameID, UString(sourceURLRep), startingLineNumber);
   if (exec->hadException()) {
     if (exception)
       *exception = toRef(exec->exception());
@@ -301,7 +304,7 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
   JSObject* jsThisObject = toJS(thisObject);
 
   if (!jsThisObject)
-    jsThisObject = exec->dynamicInterpreter()->globalObject();
+    jsThisObject = exec->dynamicGlobalObject();
 
   List argList;
   for (size_t i = 0; i < argumentCount; i++)

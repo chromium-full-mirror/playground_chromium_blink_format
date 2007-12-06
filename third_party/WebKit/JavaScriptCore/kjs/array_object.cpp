@@ -236,8 +236,8 @@ JSValue* ArrayProtoFuncConcat::callAsFunction(ExecState* exec,
                                               JSObject* thisObj,
                                               const List& args) {
   JSObject* arr = static_cast<JSObject*>(
-      exec->lexicalInterpreter()->builtinArray()->construct(exec,
-                                                            List::empty()));
+      exec->lexicalGlobalObject()->arrayConstructor()->construct(
+          exec, List::empty()));
   int n = 0;
   JSValue* curArg = thisObj;
   JSObject* curObj = static_cast<JSObject*>(thisObj);
@@ -363,8 +363,8 @@ JSValue* ArrayProtoFuncSlice::callAsFunction(ExecState* exec,
 
   // We return a new array
   JSObject* resObj = static_cast<JSObject*>(
-      exec->lexicalInterpreter()->builtinArray()->construct(exec,
-                                                            List::empty()));
+      exec->lexicalGlobalObject()->arrayConstructor()->construct(
+          exec, List::empty()));
   JSValue* result = resObj;
   double begin = args[0]->toInteger(exec);
   unsigned length =
@@ -454,8 +454,7 @@ JSValue* ArrayProtoFuncSort::callAsFunction(ExecState* exec,
         List l;
         l.append(jObj);
         l.append(minObj);
-        cmp = sortFunction
-                  ->call(exec, exec->dynamicInterpreter()->globalObject(), l)
+        cmp = sortFunction->call(exec, exec->dynamicGlobalObject(), l)
                   ->toNumber(exec);
       } else {
         cmp = (jObj->toString(exec) < minObj->toString(exec)) ? -1 : 1;
@@ -485,8 +484,8 @@ JSValue* ArrayProtoFuncSplice::callAsFunction(ExecState* exec,
                                               const List& args) {
   // 15.4.4.12 - oh boy this is huge
   JSObject* resObj = static_cast<JSObject*>(
-      exec->lexicalInterpreter()->builtinArray()->construct(exec,
-                                                            List::empty()));
+      exec->lexicalGlobalObject()->arrayConstructor()->construct(
+          exec, List::empty()));
   JSValue* result = resObj;
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
@@ -566,11 +565,11 @@ JSValue* ArrayProtoFuncFilter::callAsFunction(ExecState* exec,
     return throwError(exec, TypeError);
 
   JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicInterpreter()->globalObject()
+                            ? exec->dynamicGlobalObject()
                             : args[1]->toObject(exec);
   JSObject* resultArray = static_cast<JSObject*>(
-      exec->lexicalInterpreter()->builtinArray()->construct(exec,
-                                                            List::empty()));
+      exec->lexicalGlobalObject()->arrayConstructor()->construct(
+          exec, List::empty()));
 
   unsigned filterIndex = 0;
   unsigned length =
@@ -605,7 +604,7 @@ JSValue* ArrayProtoFuncMap::callAsFunction(ExecState* exec,
     return throwError(exec, TypeError);
 
   JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicInterpreter()->globalObject()
+                            ? exec->dynamicGlobalObject()
                             : args[1]->toObject(exec);
 
   unsigned length =
@@ -614,7 +613,8 @@ JSValue* ArrayProtoFuncMap::callAsFunction(ExecState* exec,
   List mapArgs;
   mapArgs.append(jsNumber(length));
   JSObject* resultArray = static_cast<JSObject*>(
-      exec->lexicalInterpreter()->builtinArray()->construct(exec, mapArgs));
+      exec->lexicalGlobalObject()->arrayConstructor()->construct(exec,
+                                                                 mapArgs));
 
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
     PropertySlot slot;
@@ -650,7 +650,7 @@ JSValue* ArrayProtoFuncEvery::callAsFunction(ExecState* exec,
     return throwError(exec, TypeError);
 
   JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicInterpreter()->globalObject()
+                            ? exec->dynamicGlobalObject()
                             : args[1]->toObject(exec);
 
   JSValue* result = jsBoolean(true);
@@ -690,7 +690,7 @@ JSValue* ArrayProtoFuncForEach::callAsFunction(ExecState* exec,
     return throwError(exec, TypeError);
 
   JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicInterpreter()->globalObject()
+                            ? exec->dynamicGlobalObject()
                             : args[1]->toObject(exec);
 
   unsigned length =
@@ -719,7 +719,7 @@ JSValue* ArrayProtoFuncSome::callAsFunction(ExecState* exec,
     return throwError(exec, TypeError);
 
   JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicInterpreter()->globalObject()
+                            ? exec->dynamicGlobalObject()
                             : args[1]->toObject(exec);
 
   JSValue* result = jsBoolean(false);
@@ -838,13 +838,11 @@ JSObject* ArrayObjectImp::construct(ExecState* exec, const List& args) {
     if (n != args[0]->toNumber(exec))
       return throwError(exec, RangeError,
                         "Array size is not a small enough positive integer.");
-    return new ArrayInstance(
-        exec->lexicalInterpreter()->builtinArrayPrototype(), n);
+    return new ArrayInstance(exec->lexicalGlobalObject()->arrayPrototype(), n);
   }
 
   // otherwise the array is constructed with the arguments in it
-  return new ArrayInstance(exec->lexicalInterpreter()->builtinArrayPrototype(),
-                           args);
+  return new ArrayInstance(exec->lexicalGlobalObject()->arrayPrototype(), args);
 }
 
 // ECMA 15.6.1

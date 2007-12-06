@@ -48,8 +48,8 @@ class RootObject;
 typedef PassRefPtr<RootObject> (*CreateRootObjectFunction)(void* nativeHandle);
 typedef HashCountedSet<JSObject*> ProtectCountSet;
 
-extern RootObject* findRootObject(JSObject*);
-extern RootObject* findRootObject(Interpreter*);
+extern RootObject* findProtectingRootObject(JSObject*);
+extern RootObject* findRootObject(JSGlobalObject*);
 
 class RootObject : public RefCounted<RootObject> {
   friend class JavaJSObject;
@@ -68,7 +68,6 @@ class RootObject : public RefCounted<RootObject> {
   bool gcIsProtected(JSObject*);
 
   const void* nativeHandle() const;
-  Interpreter* interpreter() const;
   JSGlobalObject* globalObject() const;
 
 #if PLATFORM(MAC)

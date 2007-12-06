@@ -26,6 +26,7 @@
 
 #include "AtomicString.h"
 #include "CookieJar.h"
+#include "DOMWindow.h"
 #include "Document.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -33,6 +34,8 @@
 #include "Page.h"
 #include "PlugInInfoStore.h"
 #include "Settings.h"
+#include "kjs_window.h"
+#include <kjs/object_object.h>
 
 #ifndef WEBCORE_NAVIGATOR_PLATFORM
 #if PLATFORM(MAC) && PLATFORM(PPC)
@@ -196,7 +199,7 @@ const ClassInfo Navigator::info = {"Navigator", 0, &NavigatorTable};
 */
 
 Navigator::Navigator(ExecState* exec, Frame* f) : m_frame(f) {
-  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
 }
 
 bool Navigator::getOwnPropertySlot(ExecState* exec,
@@ -272,7 +275,7 @@ void PluginBase::cachePluginDataIfNecessary() {
 }
 
 PluginBase::PluginBase(ExecState* exec) {
-  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
 
   cachePluginDataIfNecessary();
   m_plugInCacheRefCount++;
@@ -548,9 +551,7 @@ JSValue* MimeType::getValueProperty(ExecState* exec, int token) const {
     case Description:
       return jsString(m_info->desc);
     case EnabledPlugin: {
-      ScriptInterpreter* interpreter =
-          static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
-      Frame* frame = interpreter->frame();
+      Frame* frame = Window::retrieveActive(exec)->impl()->frame();
       ASSERT(frame);
       Settings* settings = frame->settings();
       if (settings && settings->arePluginsEnabled())

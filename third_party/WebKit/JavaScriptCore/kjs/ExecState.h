@@ -57,14 +57,16 @@ class ExecState {
 
  public:
   /**
-   * Returns the interpreter currently running code
+   * Returns the global object that was in scope when the current script started
+   * executing.
    */
-  Interpreter* dynamicInterpreter() const { return m_interpreter; }
+  JSGlobalObject* dynamicGlobalObject() const { return m_globalObject; }
 
   /**
-   * Returns the interpreter associated with the current scope's global object
+   * Returns the global object that was in scope when the current body of code
+   * was defined.
    */
-  Interpreter* lexicalInterpreter() const;
+  JSGlobalObject* lexicalGlobalObject() const;
 
   void setException(JSValue* e) { m_exception = e; }
   void clearException() { m_exception = 0; }
@@ -79,7 +81,7 @@ class ExecState {
 
   JSObject* thisValue() const { return m_thisVal; }
 
-  ExecState* callingExecState() { return m_callingExecState; }
+  ExecState* callingExecState() { return m_callingExec; }
 
   JSObject* activationObject() { return m_activation; }
   CodeType codeType() { return m_codeType; }
@@ -99,8 +101,6 @@ class ExecState {
   void popSwitch() { m_switchDepth--; }
   bool inSwitch() const { return (m_switchDepth > 0); }
 
-  void setGlobalObject(JSGlobalObject*);
-
   void mark();
 
   // This is a workaround to avoid accessing the global variables for these
@@ -112,26 +112,27 @@ class ExecState {
   LocalStorageEntry* localStorage() { return m_localStorageBuffer; }
   void updateLocalStorage();
 
- private:
-  ExecState(Interpreter* interp,
-            JSGlobalObject* glob,
+ public:
+  ExecState(JSGlobalObject* glob,
             JSObject* thisV,
             FunctionBodyNode* currentBody,
             CodeType type = GlobalCode,
             ExecState* callingExecState = 0,
+            ExecState* currentExec = 0,
             FunctionImp* function = 0,
             const List* args = 0);
   ~ExecState();
 
+ private:
   // ExecStates are always stack-allocated, and the garbage collector
   // marks the stack, so we don't need to protect the objects below from GC.
 
-  Interpreter* m_interpreter;
+  JSGlobalObject* m_globalObject;
   JSValue* m_exception;
   CommonIdentifiers* m_propertyNames;
 
-  ExecState* m_callingExecState;
-  ExecState* m_savedExecState;
+  ExecState* m_callingExec;
+  ExecState* m_savedExec;
   FunctionBodyNode* m_currentBody;
 
   FunctionImp* m_function;

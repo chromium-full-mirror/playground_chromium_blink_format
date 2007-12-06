@@ -27,6 +27,7 @@
 #include "JSLock.h"
 #include "Parser.h"
 #include "collector.h"
+#include "interpreter.h"
 #include "nodes.h"
 #include "object.h"
 #include "protect.h"
@@ -161,7 +162,8 @@ JSValue* TestFunctionImp::callAsFunction(ExecState* exec,
         return throwError(exec, GeneralError, "Could not open file.");
 
       stopWatch.start();
-      exec->dynamicInterpreter()->evaluate(fileName, 0, script.data());
+      Interpreter::evaluate(exec->dynamicGlobalObject()->globalExec(), fileName,
+                            0, script.data());
       stopWatch.stop();
 
       return jsNumber(stopWatch.getElapsedMS());
@@ -172,7 +174,8 @@ JSValue* TestFunctionImp::callAsFunction(ExecState* exec,
       if (!fillBufferWithContentsOfFile(fileName, script))
         return throwError(exec, GeneralError, "Could not open file.");
 
-      exec->dynamicInterpreter()->evaluate(fileName, 0, script.data());
+      Interpreter::evaluate(exec->dynamicGlobalObject()->globalExec(), fileName,
+                            0, script.data());
 
       return jsUndefined();
     }
@@ -221,8 +224,6 @@ int main(int argc, char** argv) {
 
 static GlobalImp* createGlobalObject() {
   GlobalImp* global = new GlobalImp;
-  Interpreter* interp = new Interpreter;
-  interp->setGlobalObject(global);  // global now owns interp.
 
   // add debug() function
   global->put(global->globalExec(), "debug",
@@ -281,8 +282,8 @@ static bool runWithScripts(const Vector<UString>& fileNames, bool prettyPrint) {
     if (prettyPrint)
       prettyPrintScript(fileName, script);
     else {
-      Completion completion =
-          globalObject->interpreter()->evaluate(fileName, 0, script.data());
+      Completion completion = Interpreter::evaluate(globalObject->globalExec(),
+                                                    fileName, 0, script.data());
       success = success && completion.complType() != Throw;
     }
   }

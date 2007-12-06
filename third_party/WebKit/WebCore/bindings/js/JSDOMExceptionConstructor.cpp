@@ -27,6 +27,7 @@
 #include "JSDOMExceptionConstructor.h"
 
 #include "ExceptionCode.h"
+#include <kjs/object_object.h>
 
 #include "JSDOMExceptionConstructor.lut.h"
 
@@ -62,7 +63,7 @@ DontDelete|ReadOnly
 */
 
 JSDOMExceptionConstructor::JSDOMExceptionConstructor(ExecState* exec) {
-  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
 }
 
 bool JSDOMExceptionConstructor::getOwnPropertySlot(

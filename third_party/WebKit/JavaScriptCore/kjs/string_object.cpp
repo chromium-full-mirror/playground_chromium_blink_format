@@ -387,7 +387,7 @@ static JSValue* replace(ExecState* exec,
     bool global = reg->global();
 
     RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-        exec->lexicalInterpreter()->builtinRegExp());
+        exec->lexicalGlobalObject()->regExpConstructor());
 
     int lastIndex = 0;
     int startPosition = 0;
@@ -431,8 +431,7 @@ static JSValue* replace(ExecState* exec,
         args.append(sourceVal);
 
         substitutedReplacement =
-            replacementFunction
-                ->call(exec, exec->dynamicInterpreter()->globalObject(), args)
+            replacementFunction->call(exec, exec->dynamicGlobalObject(), args)
                 ->toString(exec);
       } else
         substitutedReplacement =
@@ -487,8 +486,7 @@ static JSValue* replace(ExecState* exec,
     args.append(sourceVal);
 
     replacementString =
-        replacementFunction
-            ->call(exec, exec->dynamicInterpreter()->globalObject(), args)
+        replacementFunction->call(exec, exec->dynamicGlobalObject(), args)
             ->toString(exec);
   }
 
@@ -641,7 +639,7 @@ JSValue* StringProtoFuncMatch::callAsFunction(ExecState* exec,
     reg = tmpReg = new RegExp(a0->toString(exec));
   }
   RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-      exec->lexicalInterpreter()->builtinRegExp());
+      exec->lexicalGlobalObject()->regExpConstructor());
   int pos;
   int matchLength;
   regExpObj->performMatch(reg, u, 0, pos, matchLength);
@@ -671,8 +669,8 @@ JSValue* StringProtoFuncMatch::callAsFunction(ExecState* exec,
       // other browsers and because Null is a false value.
       result = jsNull();
     } else {
-      result =
-          exec->lexicalInterpreter()->builtinArray()->construct(exec, list);
+      result = exec->lexicalGlobalObject()->arrayConstructor()->construct(exec,
+                                                                          list);
     }
   }
   delete tmpReg;
@@ -705,7 +703,7 @@ JSValue* StringProtoFuncSearch::callAsFunction(ExecState* exec,
     reg = tmpReg = new RegExp(a0->toString(exec));
   }
   RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-      exec->lexicalInterpreter()->builtinRegExp());
+      exec->lexicalGlobalObject()->regExpConstructor());
   int pos;
   int matchLength;
   regExpObj->performMatch(reg, u, 0, pos, matchLength);
@@ -774,7 +772,7 @@ JSValue* StringProtoFuncSplit::callAsFunction(ExecState* exec,
   JSValue* a0 = args[0];
   JSValue* a1 = args[1];
 
-  JSObject* constructor = exec->lexicalInterpreter()->builtinArray();
+  JSObject* constructor = exec->lexicalGlobalObject()->arrayConstructor();
   JSObject* res =
       static_cast<JSObject*>(constructor->construct(exec, List::empty()));
   JSValue* result = res;
@@ -1241,7 +1239,7 @@ bool StringObjectImp::implementsConstruct() const {
 
 // ECMA 15.5.2
 JSObject* StringObjectImp::construct(ExecState* exec, const List& args) {
-  JSObject* proto = exec->lexicalInterpreter()->builtinStringPrototype();
+  JSObject* proto = exec->lexicalGlobalObject()->stringPrototype();
   if (args.size() == 0)
     return new StringInstance(proto);
   return new StringInstance(proto, args[0]->toString(exec));

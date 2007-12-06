@@ -23,6 +23,7 @@
 
 #include "PlatformString.h"
 #include "kjs_binding.h"
+#include <kjs/protect.h>
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 
@@ -122,6 +123,7 @@ class Window : public JSGlobalObject {
   virtual bool isSafeScript(const JSGlobalObject* other) const {
     return Window::isSafeScript(this, other);
   }
+  bool isSafeScript(ExecState*) const;
 
   Location* location() const;
 
@@ -147,8 +149,8 @@ class Window : public JSGlobalObject {
 
   void clear();
 
-  // Set the current "event" object
   void setCurrentEvent(WebCore::Event*);
+  WebCore::Event* currentEvent();
 
   // Set a place to put a dialog return value when the window is cleared.
   void setReturnValueSlot(JSValue** slot);
@@ -167,7 +169,6 @@ class Window : public JSGlobalObject {
 
   virtual ExecState* globalExec();
   virtual bool shouldInterruptScript() const;
-  bool isSafeScript(ExecState*) const;
 
   enum {
     // Attributes

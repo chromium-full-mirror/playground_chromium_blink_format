@@ -32,15 +32,15 @@ using namespace KJS;
 // ------------------------------ Debugger -------------------------------------
 
 namespace KJS {
-struct AttachedInterpreter {
+struct AttachedGlobalObject {
  public:
-  AttachedInterpreter(Interpreter* i, AttachedInterpreter* ai)
-      : interp(i), next(ai) {
+  AttachedGlobalObject(JSGlobalObject* o, AttachedGlobalObject* ai)
+      : globalObj(o), next(ai) {
     ++Debugger::debuggersPresent;
   }
-  ~AttachedInterpreter() { --Debugger::debuggersPresent; }
-  Interpreter* interp;
-  AttachedInterpreter* next;
+  ~AttachedGlobalObject() { --Debugger::debuggersPresent; }
+  JSGlobalObject* globalObj;
+  AttachedGlobalObject* next;
 };
 }
 
@@ -55,41 +55,42 @@ Debugger::~Debugger() {
   delete rep;
 }
 
-void Debugger::attach(Interpreter* interp) {
-  Debugger* other = interp->debugger();
+void Debugger::attach(JSGlobalObject* globalObject) {
+  Debugger* other = globalObject->debugger();
   if (other == this)
     return;
   if (other)
-    other->detach(interp);
-  interp->setDebugger(this);
-  rep->interps = new AttachedInterpreter(interp, rep->interps);
+    other->detach(globalObject);
+  globalObject->setDebugger(this);
+  rep->globalObjects =
+      new AttachedGlobalObject(globalObject, rep->globalObjects);
 }
 
-void Debugger::detach(Interpreter* interp) {
-  // iterate the addresses where AttachedInterpreter pointers are stored
+void Debugger::detach(JSGlobalObject* globalObj) {
+  // iterate the addresses where AttachedGlobalObject pointers are stored
   // so we can unlink items from the list
-  AttachedInterpreter** p = &rep->interps;
-  AttachedInterpreter* q;
+  AttachedGlobalObject** p = &rep->globalObjects;
+  AttachedGlobalObject* q;
   while ((q = *p)) {
-    if (!interp || q->interp == interp) {
+    if (!globalObj || q->globalObj == globalObj) {
       *p = q->next;
-      q->interp->setDebugger(0);
+      q->globalObj->setDebugger(0);
       delete q;
     } else
       p = &q->next;
   }
 
-  if (interp)
-    latestExceptions.remove(interp);
+  if (globalObj)
+    latestExceptions.remove(globalObj);
   else
     latestExceptions.clear();
 }
 
 bool Debugger::hasHandledException(ExecState* exec, JSValue* exception) {
-  if (latestExceptions.get(exec->dynamicInterpreter()).get() == exception)
+  if (latestExceptions.get(exec->dynamicGlobalObject()).get() == exception)
     return true;
 
-  latestExceptions.set(exec->dynamicInterpreter(), exception);
+  latestExceptions.set(exec->dynamicGlobalObject(), exception);
   return false;
 }
 

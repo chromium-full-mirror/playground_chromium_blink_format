@@ -31,6 +31,7 @@
 #include "APICast.h"
 #include "function.h"
 #include "function_object.h"
+#include <kjs/JSGlobalObject.h>
 #include <wtf/Vector.h>
 
 namespace KJS {
@@ -41,10 +42,8 @@ const ClassInfo JSCallbackFunction::info = {"CallbackFunction",
 JSCallbackFunction::JSCallbackFunction(ExecState* exec,
                                        JSObjectCallAsFunctionCallback callback,
                                        const Identifier& name)
-    : InternalFunctionImp(
-          static_cast<FunctionPrototype*>(
-              exec->lexicalInterpreter()->builtinFunctionPrototype()),
-          name),
+    : InternalFunctionImp(exec->lexicalGlobalObject()->functionPrototype(),
+                          name),
       m_callback(callback) {}
 
 // InternalFunctionImp mish-mashes constructor and function behavior -- we

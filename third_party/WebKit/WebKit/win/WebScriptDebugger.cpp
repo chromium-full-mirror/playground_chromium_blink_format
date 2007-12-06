@@ -54,13 +54,13 @@ WebScriptDebugger::WebScriptDebugger(WebFrame* frame) : m_frame(frame) {
   if (!proxy)
     return;
 
-  Interpreter* interp(proxy->interpreter());
-  attach(interp);
+  JSGlobalObject* globalObject = proxy->globalObject();
+  attach(globalObject);
 
   m_frame->webView(&m_webView);
   ASSERT(m_webView);
 
-  callEvent(proxy->globalObject()->globalExec(), -1, -1, 0, List());
+  callEvent(globalObject->globalExec(), -1, -1, 0, List());
   m_callingServer = false;
 }
 

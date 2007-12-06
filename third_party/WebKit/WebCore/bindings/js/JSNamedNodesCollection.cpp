@@ -45,7 +45,7 @@ JSNamedNodesCollection::JSNamedNodesCollection(
     ExecState* exec,
     const Vector<RefPtr<Node>>& nodes)
     : m_nodes(nodes) {
-  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
 }
 
 JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef KJS_INTERPRETER_LOCK_H
-#define KJS_INTERPRETER_LOCK_H
+#ifndef KJS_JSLock_h
+#define KJS_JSLock_h
 
 #include <wtf/Assertions.h>
 #include <wtf/Noncopyable.h>
@@ -74,4 +74,4 @@ class JSLock : Noncopyable {
 
 }  // namespace
 
-#endif  // KJS_INTERPRETER_LOCK_H
+#endif  // KJS_JSLock_h

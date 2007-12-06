@@ -54,8 +54,8 @@ void JSCustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
   if (!proxy)
     return;
 
-  ScriptInterpreter* interpreter = proxy->interpreter();
-  ExecState* exec = proxy->globalObject()->globalExec();
+  JSGlobalObject* globalObject = proxy->globalObject();
+  ExecState* exec = globalObject->globalExec();
 
   KJS::JSLock lock;
 
@@ -78,12 +78,12 @@ void JSCustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
   args.append(toJS(exec, transaction));
   args.append(toJS(exec, resultSet));
 
-  interpreter->startTimeoutCheck();
+  globalObject->startTimeoutCheck();
   if (handleEventFunc)
     handleEventFunc->call(exec, m_callback, args);
   else
     m_callback->call(exec, m_callback, args);
-  interpreter->stopTimeoutCheck();
+  globalObject->stopTimeoutCheck();
 
   if (exec->hadException()) {
     JSObject* exception = exec->exception()->toObject(exec);

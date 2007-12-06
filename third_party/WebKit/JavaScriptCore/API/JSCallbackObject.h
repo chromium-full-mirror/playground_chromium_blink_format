@@ -38,10 +38,8 @@ template <class Base>
 class JSCallbackObject : public Base {
  public:
   JSCallbackObject(ExecState*, JSClassRef, JSValue* prototype, void* data);
-  JSCallbackObject(JSClassRef, JSValue* prototype, void* data);
+  JSCallbackObject(JSClassRef);
   virtual ~JSCallbackObject();
-
-  void init(ExecState*);
 
   virtual UString className() const;
 
@@ -79,8 +77,7 @@ class JSCallbackObject : public Base {
   bool inherits(JSClassRef) const;
 
  private:
-  JSCallbackObject();  // prevent default construction
-  JSCallbackObject(const JSCallbackObject&);
+  void init(ExecState*);
 
   static JSValue* cachedValueGetter(ExecState*,
                                     JSObject*,

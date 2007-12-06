@@ -121,7 +121,7 @@ JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
 
       JSObject* applyThis;
       if (thisArg->isUndefinedOrNull())
-        applyThis = exec->dynamicInterpreter()->globalObject();
+        applyThis = exec->dynamicGlobalObject();
       else
         applyThis = thisArg->toObject(exec);
 
@@ -150,7 +150,7 @@ JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
 
       JSObject* callThis;
       if (thisArg->isUndefinedOrNull())
-        callThis = exec->dynamicInterpreter()->globalObject();
+        callThis = exec->dynamicGlobalObject();
       else
         callThis = thisArg->toObject(exec);
 
@@ -211,7 +211,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
                                  body.size(), &sourceId, &errLine, &errMsg);
 
   // notify debugger that source has been parsed
-  Debugger* dbg = exec->dynamicInterpreter()->debugger();
+  Debugger* dbg = exec->dynamicGlobalObject()->debugger();
   if (dbg) {
     // send empty sourceURL to indicate constructed code
     bool cont = dbg->sourceParsed(exec, sourceId, UString(), body, lineNumber,
@@ -229,7 +229,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
     return throwError(exec, SyntaxError, errMsg, errLine, sourceId, sourceURL);
 
   ScopeChain scopeChain;
-  scopeChain.push(exec->lexicalInterpreter()->globalObject());
+  scopeChain.push(exec->lexicalGlobalObject());
 
   FunctionImp* fimp =
       new FunctionImp(exec, functionName, functionBody.get(), scopeChain);
@@ -267,7 +267,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
 
   List consArgs;
 
-  JSObject* objCons = exec->lexicalInterpreter()->builtinObject();
+  JSObject* objCons = exec->lexicalGlobalObject()->objectConstructor();
   JSObject* prototype = objCons->construct(exec, List::empty());
   prototype->put(exec, exec->propertyNames().constructor, fimp,
                  DontEnum | DontDelete | ReadOnly);

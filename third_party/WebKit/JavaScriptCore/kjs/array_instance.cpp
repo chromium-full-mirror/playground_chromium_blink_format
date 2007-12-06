@@ -494,9 +494,7 @@ void ArrayInstance::sort(ExecState* exec) {
 
 struct CompareWithCompareFunctionArguments {
   CompareWithCompareFunctionArguments(ExecState* e, JSObject* cf)
-      : exec(e),
-        compareFunction(cf),
-        globalObject(e->dynamicInterpreter()->globalObject()) {}
+      : exec(e), compareFunction(cf), globalObject(e->dynamicGlobalObject()) {}
 
   ExecState* exec;
   JSObject* compareFunction;

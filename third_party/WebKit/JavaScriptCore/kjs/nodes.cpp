@@ -375,7 +375,7 @@ void Node::handleException(ExecState* exec, JSValue* exceptionValue) {
       exception->put(exec, "sourceURL", jsString(currentSourceURL(exec)));
     }
   }
-  Debugger* dbg = exec->dynamicInterpreter()->debugger();
+  Debugger* dbg = exec->dynamicGlobalObject()->debugger();
   if (dbg && !dbg->hasHandledException(exec, exceptionValue)) {
     bool cont =
         dbg->exception(exec, currentSourceId(exec), m_line, exceptionValue);
@@ -404,7 +404,7 @@ void StatementNode::setLoc(int firstLine, int lastLine) {
 
 // return true if the debugger wants us to stop at this point
 bool StatementNode::hitStatement(ExecState* exec) {
-  Debugger* dbg = exec->dynamicInterpreter()->debugger();
+  Debugger* dbg = exec->dynamicGlobalObject()->debugger();
   if (dbg)
     return dbg->atStatement(exec, currentSourceId(exec), firstLine(),
                             lastLine());
@@ -490,8 +490,8 @@ bool StringNode::evaluateToBoolean(ExecState*) {
 // ------------------------------ RegExpNode -----------------------------------
 
 JSValue* RegExpNode::evaluate(ExecState* exec) {
-  return exec->lexicalInterpreter()->builtinRegExp()->createRegExpImp(exec,
-                                                                      m_regExp);
+  return exec->lexicalGlobalObject()->regExpConstructor()->createRegExpImp(
+      exec, m_regExp);
 }
 
 // ------------------------------ ThisNode -------------------------------------
@@ -603,7 +603,7 @@ void ElementNode::optimizeVariableAccess(
 
 // ECMA 11.1.4
 JSValue* ElementNode::evaluate(ExecState* exec) {
-  JSObject* array = exec->lexicalInterpreter()->builtinArray()->construct(
+  JSObject* array = exec->lexicalGlobalObject()->arrayConstructor()->construct(
       exec, List::empty());
   int length = 0;
   for (ElementNode* n = this; n; n = n->next.get()) {
@@ -635,8 +635,9 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
     length =
         opt ? array->get(exec, exec->propertyNames().length)->toInt32(exec) : 0;
   } else {
-    JSValue* newArr = exec->lexicalInterpreter()->builtinArray()->construct(
-        exec, List::empty());
+    JSValue* newArr =
+        exec->lexicalGlobalObject()->arrayConstructor()->construct(
+            exec, List::empty());
     array = static_cast<JSObject*>(newArr);
     length = 0;
   }
@@ -662,8 +663,8 @@ JSValue* ObjectLiteralNode::evaluate(ExecState* exec) {
   if (list)
     return list->evaluate(exec);
 
-  return exec->lexicalInterpreter()->builtinObject()->construct(exec,
-                                                                List::empty());
+  return exec->lexicalGlobalObject()->objectConstructor()->construct(
+      exec, List::empty());
 }
 
 // ------------------------------ PropertyListNode -----------------------------
@@ -678,7 +679,7 @@ void PropertyListNode::optimizeVariableAccess(
 
 // ECMA 11.1.5
 JSValue* PropertyListNode::evaluate(ExecState* exec) {
-  JSObject* obj = exec->lexicalInterpreter()->builtinObject()->construct(
+  JSObject* obj = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, List::empty());
 
   for (PropertyListNode* p = this; p; p = p->next.get()) {
@@ -938,7 +939,7 @@ JSValue* FunctionCallValueNode::evaluate(ExecState* exec) {
   args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
-  JSObject* thisObj = exec->dynamicInterpreter()->globalObject();
+  JSObject* thisObj = exec->dynamicGlobalObject();
 
   return func->call(exec, thisObj, argList);
 }
@@ -999,7 +1000,7 @@ JSValue* FunctionCallResolveNode::inlineEvaluate(ExecState* exec) {
       // of implementation we use the global object anyway here. This guarantees
       // that in host objects you always get a valid object for this.
       if (thisObj->isActivation())
-        thisObj = exec->dynamicInterpreter()->globalObject();
+        thisObj = exec->dynamicGlobalObject();
 
       return func->call(exec, thisObj, argList);
     }
@@ -1059,7 +1060,7 @@ JSValue* LocalVarFunctionCallNode::inlineEvaluate(ExecState* exec) {
   args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
-  return func->call(exec, exec->dynamicInterpreter()->globalObject(), argList);
+  return func->call(exec, exec->dynamicGlobalObject(), argList);
 }
 
 JSValue* LocalVarFunctionCallNode::evaluate(ExecState* exec) {
@@ -3721,7 +3722,7 @@ Completion DoWhileNode::execute(ExecState* exec) {
     Completion c = statement->execute(exec);
     exec->popIteration();
 
-    if (exec->dynamicInterpreter()->timedOut())
+    if (exec->dynamicGlobalObject()->timedOut())
       return Completion(Interrupted);
 
     if (c.isValueCompletion())
@@ -3773,7 +3774,7 @@ Completion WhileNode::execute(ExecState* exec) {
     Completion c = statement->execute(exec);
     exec->popIteration();
 
-    if (exec->dynamicInterpreter()->timedOut())
+    if (exec->dynamicGlobalObject()->timedOut())
       return Completion(Interrupted);
 
     if (c.isValueCompletion())
@@ -3837,7 +3838,7 @@ Completion ForNode::execute(ExecState* exec) {
         return c;
     }
 
-    if (exec->dynamicInterpreter()->timedOut())
+    if (exec->dynamicGlobalObject()->timedOut())
       return Completion(Interrupted);
 
     if (expr3) {
@@ -4513,7 +4514,7 @@ UString FunctionBodyNode::paramString() const {
 Completion FunctionBodyNode::execute(ExecState* exec) {
   processDeclarations(exec);
 
-  if (Debugger* dbg = exec->dynamicInterpreter()->debugger()) {
+  if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (!dbg->callEvent(exec, sourceId(), lineNo(), exec->function(),
                         *exec->arguments())) {
       dbg->imp()->abort();
@@ -4523,7 +4524,7 @@ Completion FunctionBodyNode::execute(ExecState* exec) {
 
   Completion completion = BlockNode::execute(exec);
 
-  if (Debugger* dbg = exec->dynamicInterpreter()->debugger()) {
+  if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (completion.complType() == Throw)
       exec->setException(completion.value());
 
@@ -4551,7 +4552,7 @@ FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {
   FunctionImp* func =
       new FunctionImp(exec, ident, body.get(), exec->scopeChain());
 
-  JSObject* proto = exec->lexicalInterpreter()->builtinObject()->construct(
+  JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, List::empty());
   proto->put(exec, exec->propertyNames().constructor, func,
              ReadOnly | DontDelete | DontEnum);
@@ -4589,7 +4590,7 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
 
   FunctionImp* func =
       new FunctionImp(exec, ident, body.get(), exec->scopeChain());
-  JSObject* proto = exec->lexicalInterpreter()->builtinObject()->construct(
+  JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, List::empty());
   proto->put(exec, exec->propertyNames().constructor, func,
              ReadOnly | DontDelete | DontEnum);

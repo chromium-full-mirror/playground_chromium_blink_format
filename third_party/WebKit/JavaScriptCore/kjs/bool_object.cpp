@@ -44,8 +44,6 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
                                    ObjectPrototype* objectProto,
                                    FunctionPrototype* funcProto)
     : BooleanInstance(objectProto) {
-  // The constructor will be added later by Interpreter::Interpreter()
-
   putDirectFunction(
       new BooleanProtoFunc(exec, funcProto, BooleanProtoFunc::ToString, 0,
                            exec->propertyNames().toString),
@@ -107,8 +105,8 @@ bool BooleanObjectImp::implementsConstruct() const {
 
 // ECMA 15.6.2
 JSObject* BooleanObjectImp::construct(ExecState* exec, const List& args) {
-  BooleanInstance* obj(new BooleanInstance(
-      exec->lexicalInterpreter()->builtinBooleanPrototype()));
+  BooleanInstance* obj(
+      new BooleanInstance(exec->lexicalGlobalObject()->booleanPrototype()));
 
   bool b;
   if (args.size() > 0)

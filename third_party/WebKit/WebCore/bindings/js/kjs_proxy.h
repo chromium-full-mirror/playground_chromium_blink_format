@@ -29,7 +29,6 @@
 namespace KJS {
 class JSGlobalObject;
 class JSValue;
-class ScriptInterpreter;
 }
 
 namespace WebCore {
@@ -40,17 +39,16 @@ class Frame;
 class Node;
 class String;
 
-// FIXME: Rename this class to JSController and merge functions from
-// ScriptInterpreter into it.
+// FIXME: Rename this class to JSController and the Frame function to
+// javaScript().
 
 class KJSProxy {
  public:
   KJSProxy(Frame*);
   ~KJSProxy();
 
-  bool haveInterpreter() const { return m_globalObject; }
-  KJS::ScriptInterpreter* interpreter();
-  KJS::JSGlobalObject* globalObject() {
+  bool haveGlobalObject() const { return m_globalObject; }
+  JSDOMWindow* globalObject() {
     initScriptIfNeeded();
     return m_globalObject;
   }
@@ -72,6 +70,9 @@ class KJSProxy {
 
   void clearDocumentWrapper();
 
+  void setProcessingTimerCallback(bool b) { m_processingTimerCallback = b; }
+  bool processingUserGesture() const;
+
  private:
   void initScriptIfNeeded() {
     if (!m_globalObject)
@@ -82,6 +83,9 @@ class KJSProxy {
   KJS::ProtectedPtr<JSDOMWindow> m_globalObject;
   Frame* m_frame;
   int m_handlerLineno;
+
+  bool m_processingTimerCallback;
+  bool m_processingInlineCode;
 };
 }
 

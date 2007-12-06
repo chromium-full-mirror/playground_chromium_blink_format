@@ -47,11 +47,14 @@ JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
   init(exec);
 }
 
+// Global object constructor. FIXME: Move this into a JSGlobalCallbackObject
+// subclass.
 template <class Base>
-JSCallbackObject<Base>::JSCallbackObject(JSClassRef jsClass,
-                                         JSValue* prototype,
-                                         void* data)
-    : Base(prototype), m_privateData(data), m_class(JSClassRetain(jsClass)) {}
+JSCallbackObject<Base>::JSCallbackObject(JSClassRef jsClass)
+    : m_privateData(0), m_class(JSClassRetain(jsClass)) {
+  ASSERT(Base::isGlobalObject());
+  init(static_cast<JSGlobalObject*>(this)->globalExec());
+}
 
 template <class Base>
 void JSCallbackObject<Base>::init(ExecState* exec) {

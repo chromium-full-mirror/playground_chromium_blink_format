@@ -50,7 +50,7 @@ JSValue* JSSQLResultSetRowList::item(ExecState* exec, const List& args) {
   }
 
   JSObject* object =
-      new JSObject(exec->lexicalInterpreter()->builtinObjectPrototype());
+      new JSObject(exec->lexicalGlobalObject()->objectPrototype());
 
   unsigned numColumns = m_impl->columnNames().size();
   unsigned valuesIndex = index * numColumns;

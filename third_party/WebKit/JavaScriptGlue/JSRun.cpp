@@ -32,12 +32,8 @@
 JSRun::JSRun(CFStringRef source, JSFlags inFlags)
     : JSBase(kJSRunTypeID),
       fSource(CFStringToUString(source)),
-      fGlobalObject(new JSGlobalObject()),
-      fFlags(inFlags) {
-  Interpreter* interpreter = new JSInterpreter(fGlobalObject, inFlags);
-  interpreter->setGlobalObject(
-      fGlobalObject);  // fGlobalObject now owns interpreter
-}
+      fGlobalObject(new JSGlueGlobalObject(inFlags)),
+      fFlags(inFlags) {}
 
 JSRun::~JSRun() {}
 
@@ -54,12 +50,12 @@ JSGlobalObject* JSRun::GlobalObject() const {
 }
 
 Completion JSRun::Evaluate() {
-  return fGlobalObject->interpreter()->evaluate(UString(), 0, fSource.data(),
-                                                fSource.size());
+  return Interpreter::evaluate(fGlobalObject->globalExec(), UString(), 0,
+                               fSource.data(), fSource.size());
 }
 
 bool JSRun::CheckSyntax() {
-  return fGlobalObject->interpreter()
-             ->checkSyntax(UString(), 0, fSource.data(), fSource.size())
+  return Interpreter::checkSyntax(fGlobalObject->globalExec(), UString(), 0,
+                                  fSource.data(), fSource.size())
              .complType() != Throw;
 }

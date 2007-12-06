@@ -212,7 +212,7 @@ JSValue* JSXSLTProcessorPrototypeFunctionReset::callAsFunction(
 }
 
 XSLTProcessorConstructorImp::XSLTProcessorConstructorImp(ExecState* exec) {
-  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
   putDirect(exec->propertyNames().prototype, XSLTProcessorPrototype::self(exec),
             None);
 }

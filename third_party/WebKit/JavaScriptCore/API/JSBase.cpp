@@ -25,15 +25,13 @@
  */
 
 #include "config.h"
-
-#include <wtf/Platform.h>
 #include "JSBase.h"
 
 #include "APICast.h"
-
 #include <kjs/ExecState.h>
-#include <kjs/interpreter.h>
+#include <kjs/JSGlobalObject.h>
 #include <kjs/JSLock.h>
+#include <kjs/interpreter.h>
 #include <kjs/object.h>
 
 using namespace KJS;
@@ -51,9 +49,9 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
   UString::Rep* sourceURLRep =
       sourceURL ? toJS(sourceURL) : &UString::Rep::null;
   // Interpreter::evaluate sets "this" to the global object if it is NULL
-  Completion completion = exec->dynamicInterpreter()->evaluate(
-      UString(sourceURLRep), startingLineNumber, UString(scriptRep),
-      jsThisObject);
+  Completion completion = Interpreter::evaluate(
+      exec->dynamicGlobalObject()->globalExec(), UString(sourceURLRep),
+      startingLineNumber, UString(scriptRep), jsThisObject);
 
   if (completion.complType() == Throw) {
     if (exception)
@@ -79,8 +77,9 @@ bool JSCheckScriptSyntax(JSContextRef ctx,
   UString::Rep* scriptRep = toJS(script);
   UString::Rep* sourceURLRep =
       sourceURL ? toJS(sourceURL) : &UString::Rep::null;
-  Completion completion = exec->dynamicInterpreter()->checkSyntax(
-      UString(sourceURLRep), startingLineNumber, UString(scriptRep));
+  Completion completion = Interpreter::checkSyntax(
+      exec->dynamicGlobalObject()->globalExec(), UString(sourceURLRep),
+      startingLineNumber, UString(scriptRep));
   if (completion.complType() == Throw) {
     if (exception)
       *exception = toRef(completion.value());

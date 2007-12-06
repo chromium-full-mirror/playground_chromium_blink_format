@@ -55,7 +55,7 @@ class Collector {
 
   static void collectOnMainThreadOnly(JSValue*);
 
-  static size_t numInterpreters();
+  static size_t numGlobalObjects();
   static size_t numProtectedObjects();
   static HashCountedSet<const char*>* rootObjectTypeCounts();
 
@@ -90,7 +90,7 @@ class Collector {
 
   static size_t mainThreadOnlyObjectCount;
   static bool memoryFull;
-  static void reportOutOfMemoryToAllInterpreters();
+  static void reportOutOfMemoryToAllExecStates();
 };
 
 // tunable parameters

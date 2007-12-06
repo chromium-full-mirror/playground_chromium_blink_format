@@ -25,7 +25,6 @@
 #define INTERNAL_H
 
 #include "JSType.h"
-#include "interpreter.h"
 #include "object.h"
 #include "protect.h"
 #include "scope_chain.h"
@@ -100,18 +99,18 @@ class NumberImp : public JSCell {
 //                            Evaluation
 // ---------------------------------------------------------------------------
 
-struct AttachedInterpreter;
+struct AttachedGlobalObject;
 class DebuggerImp {
  public:
   DebuggerImp() {
-    interps = 0;
+    globalObjects = 0;
     isAborted = false;
   }
 
   void abort() { isAborted = true; }
   bool aborted() const { return isAborted; }
 
-  AttachedInterpreter* interps;
+  AttachedGlobalObject* globalObjects;
   bool isAborted;
 };
 

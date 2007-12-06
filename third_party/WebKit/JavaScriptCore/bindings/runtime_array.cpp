@@ -26,13 +26,15 @@
 #include "config.h"
 #include "runtime_array.h"
 
+#include "JSGlobalObject.h"
+#include "array_object.h"
+
 using namespace KJS;
 
 const ClassInfo RuntimeArray::info = {"RuntimeArray", &ArrayInstance::info, 0};
 
 RuntimeArray::RuntimeArray(ExecState* exec, Bindings::Array* a)
-    : JSObject(exec->lexicalInterpreter()->builtinArrayPrototype()),
-      _array(a) {}
+    : JSObject(exec->lexicalGlobalObject()->arrayPrototype()), _array(a) {}
 
 JSValue* RuntimeArray::lengthGetter(ExecState*,
                                     JSObject*,

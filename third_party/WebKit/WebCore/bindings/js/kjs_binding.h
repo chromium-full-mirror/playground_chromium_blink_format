@@ -25,6 +25,7 @@
 #define kjs_binding_h
 
 #include <kjs/function.h>
+#include <kjs/interpreter.h>
 #include <kjs/lookup.h>
 #include <wtf/Noncopyable.h>
 
@@ -65,15 +66,8 @@ class DOMObject : public JSObject {
 #endif
 };
 
-/**
- * We inherit from Interpreter, to save a pointer to the HTML part
- * that the interpreter runs for.
- * The interpreter also stores the DOM object -> KJS::DOMObject cache.
- */
 class ScriptInterpreter : public Interpreter {
  public:
-  ScriptInterpreter(JSGlobalObject*, WebCore::Frame*);
-
   static DOMObject* getDOMObject(void* objectHandle);
   static void putDOMObject(void* objectHandle, DOMObject*);
   static void forgetDOMObject(void* objectHandle);
@@ -89,30 +83,6 @@ class ScriptInterpreter : public Interpreter {
                                     WebCore::Document* oldDoc,
                                     WebCore::Document* newDoc);
   static void markDOMNodesForDocument(WebCore::Document*);
-
-  WebCore::Frame* frame() const { return m_frame; }
-
-  /**
-   * Set the event that is triggering the execution of a script, if any
-   */
-  void setCurrentEvent(WebCore::Event* event) { m_currentEvent = event; }
-  void setInlineCode(bool inlineCode) { m_inlineCode = inlineCode; }
-  void setProcessingTimerCallback(bool timerCallback) {
-    m_timerCallback = timerCallback;
-  }
-
-  /**
-   * "Smart" window.open policy
-   */
-  bool wasRunByUserGesture() const;
-
-  WebCore::Event* getCurrentEvent() const { return m_currentEvent; }
-
- private:
-  WebCore::Frame* m_frame;
-  WebCore::Event* m_currentEvent;
-  bool m_inlineCode;
-  bool m_timerCallback;
 };
 
 /**
@@ -122,12 +92,10 @@ template <class DOMObj, class KJSDOMObj>
 inline JSValue* cacheDOMObject(ExecState* exec, DOMObj* domObj) {
   if (!domObj)
     return jsNull();
-  ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
-  if (DOMObject* ret = interp->getDOMObject(domObj))
+  if (DOMObject* ret = ScriptInterpreter::getDOMObject(domObj))
     return ret;
   DOMObject* ret = new KJSDOMObj(exec, domObj);
-  interp->putDOMObject(domObj, ret);
+  ScriptInterpreter::putDOMObject(domObj, ret);
   return ret;
 }
 
@@ -141,12 +109,10 @@ inline JSValue* cacheSVGDOMObject(ExecState* exec,
                                   WebCore::SVGElement* context) {
   if (!domObj)
     return jsNull();
-  ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
-  if (DOMObject* ret = interp->getDOMObject(domObj))
+  if (DOMObject* ret = ScriptInterpreter::getDOMObject(domObj))
     return ret;
   DOMObject* ret = new KJSDOMObj(exec, domObj, context);
-  interp->putDOMObject(domObj, ret);
+  ScriptInterpreter::putDOMObject(domObj, ret);
   return ret;
 }
 #endif
