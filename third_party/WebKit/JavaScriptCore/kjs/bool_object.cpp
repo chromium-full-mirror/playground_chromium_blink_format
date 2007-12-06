@@ -24,8 +24,9 @@
 #include "config.h"
 #include "bool_object.h"
 
-#include "operations.h"
+#include "JSGlobalObject.h"
 #include "error_object.h"
+#include "operations.h"
 #include <wtf/Assertions.h>
 
 using namespace KJS;
