@@ -145,7 +145,9 @@ static gboolean webkit_web_view_key_press_event(GtkWidget* widget,
       return TRUE;
   }
 
-  return gtk_bindings_activate_event(GTK_OBJECT(widget), event);
+  /* Chain up to our parent class for binding activation */
+  return GTK_WIDGET_CLASS(webkit_web_view_parent_class)
+      ->key_press_event(widget, event);
 }
 
 static gboolean webkit_web_view_key_release_event(GtkWidget* widget,
@@ -156,7 +158,9 @@ static gboolean webkit_web_view_key_release_event(GtkWidget* widget,
   if (frame->eventHandler()->keyEvent(keyboardEvent))
     return TRUE;
 
-  return FALSE;
+  /* Chain up to our parent class for binding activation */
+  return GTK_WIDGET_CLASS(webkit_web_view_parent_class)
+      ->key_release_event(widget, event);
 }
 
 static gboolean webkit_web_view_button_press_event(GtkWidget* widget,

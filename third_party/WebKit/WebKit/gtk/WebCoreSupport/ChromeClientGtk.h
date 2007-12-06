@@ -30,7 +30,7 @@ namespace WebKit {
 class ChromeClient : public WebCore::ChromeClient {
  public:
   ChromeClient(WebKitWebView*);
-  WebKitWebView* webPage() const { return m_webPage; }
+  WebKitWebView* webView() const { return m_webView; }
 
   virtual void chromeDestroyed();
 
@@ -116,7 +116,7 @@ class ChromeClient : public WebCore::ChromeClient {
       unsigned long long);
 
  private:
-  WebKitWebView* m_webPage;
+  WebKitWebView* m_webView;
   WebCore::KURL m_hoveredLinkURL;
 };
 }
