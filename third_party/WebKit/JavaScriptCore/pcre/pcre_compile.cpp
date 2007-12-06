@@ -1675,7 +1675,7 @@ static bool compile_branch(int options,
               int offset = code - bralink + 1;
               uschar* bra = code - offset;
               int oldlinkoffset = getOpcodeValueAtOffset(bra, 1);
-              bralink = oldlinkoffset ? 0 : bralink - oldlinkoffset;
+              bralink = oldlinkoffset ? bralink - oldlinkoffset : 0;
               *code++ = OP_KET;
               putOpcodeValueAtOffsetAndAdvance(code, 0, offset);
               putOpcodeValueAtOffset(bra, 1, offset);
