@@ -11,7 +11,7 @@
 
  In consideration of your agreement to abide by the following terms, and subject
  to these
- terms, Apple grants you a personal, non-exclusive license, under AppleÕs
+ terms, Apple grants you a personal, non-exclusive license, under Appleâ€™s
  copyrights in
  this original Apple software (the "Apple Software"), to use, reproduce, modify
  and
@@ -117,13 +117,14 @@ static const NPUTF8* pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
 #define ID_TEST_INVOKE_DEFAULT 5
 #define ID_DESTROY_STREAM 6
 #define ID_TEST_ENUMERATE 7
-#define NUM_METHOD_IDENTIFIERS 8
+#define ID_TEST_GETINTIDENTIFIER 8
+#define NUM_METHOD_IDENTIFIERS 9
 
 static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
 static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
-    "testCallback",  "getURL",       "removeDefaultMethod",
-    "testDOMAccess", "getURLNotify", "testInvokeDefault",
-    "destroyStream", "testEnumerate"};
+    "testCallback",  "getURL",        "removeDefaultMethod",
+    "testDOMAccess", "getURLNotify",  "testInvokeDefault",
+    "destroyStream", "testEnumerate", "testGetIntIdentifier"};
 
 static NPUTF8* createCStringFromNPVariant(const NPVariant* variant) {
   size_t length = NPVARIANT_TO_STRING(*variant).UTF8Length;
@@ -345,7 +346,15 @@ static bool pluginInvoke(NPObject* header,
         browser->destroystream(obj->npp, obj->stream, NPRES_USER_BREAK);
     INT32_TO_NPVARIANT(npError, *result);
     return true;
+  } else if (name == pluginMethodIdentifiers[ID_TEST_GETINTIDENTIFIER]) {
+    if (argCount == 1 && NPVARIANT_IS_DOUBLE(args[0])) {
+      NPIdentifier identifier =
+          browser->getintidentifier((int)NPVARIANT_TO_DOUBLE(args[0]));
+      INT32_TO_NPVARIANT((int32)identifier, *result);
+      return true;
+    }
   }
+
   return false;
 }
 
