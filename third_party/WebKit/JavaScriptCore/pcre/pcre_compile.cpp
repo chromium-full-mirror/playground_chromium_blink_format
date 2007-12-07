@@ -143,18 +143,38 @@ static const char* error_text(ErrorCode code) {
   return text;
 }
 
+/* Structure for passing "static" information around between the functions
+doing the compiling. */
+
+struct CompileData {
+  CompileData() {
+    start_code = 0;
+    start_pattern = 0;
+    top_backref = 0;
+    backref_map = 0;
+    req_varyopt = 0;
+    needOuterBracket = false;
+  }
+  const uschar* start_code;   /* The start of the compiled code */
+  const UChar* start_pattern; /* The start of the pattern */
+  int top_backref;            /* Maximum back reference */
+  unsigned backref_map;       /* Bitmap of low back refs */
+  int req_varyopt;            /* "After variable item" flag for reqbyte */
+  bool needOuterBracket;
+};
+
 /* Definition to allow mutual recursion */
 
-static bool compile_regex(int,
-                          int*,
-                          uschar**,
-                          const UChar**,
-                          const UChar*,
-                          ErrorCode*,
-                          int,
-                          int*,
-                          int*,
-                          CompileData&);
+static bool compile_bracket(int,
+                            int*,
+                            uschar**,
+                            const UChar**,
+                            const UChar*,
+                            ErrorCode*,
+                            int,
+                            int*,
+                            int*,
+                            CompileData&);
 
 /*************************************************
 *            Handle escapes                      *
@@ -734,9 +754,7 @@ int _pcre_ord2utf8(int cvalue, uschar* buffer) {
 *           Compile one branch                   *
 *************************************************/
 
-/* Scan the pattern, compiling it into the code vector. If the options are
-changed during the branch, the pointer is used to change the external options
-bits.
+/* Scan the pattern, compiling it into the code vector.
 
 Arguments:
   options        the option bits
@@ -1772,15 +1790,15 @@ static bool compile_branch(int options,
         tempcode = code;
         tempreqvary = cd.req_varyopt; /* Save value before bracket */
 
-        if (!compile_regex(options, brackets, /* Extracting bracket count */
-                           &tempcode,         /* Where to put code (updated) */
-                           &ptr,              /* Input pointer (updated) */
-                           patternEnd,
-                           errorcodeptr,  /* Where to put an error message */
-                           skipbytes,     /* Skip over OP_BRANUMBER */
-                           &subfirstbyte, /* For possible first char */
-                           &subreqbyte,   /* For possible last char */
-                           cd))           /* Tables block */
+        if (!compile_bracket(options, brackets, /* Extracting bracket count */
+                             &tempcode, /* Where to put code (updated) */
+                             &ptr,      /* Input pointer (updated) */
+                             patternEnd,
+                             errorcodeptr,  /* Where to put an error message */
+                             skipbytes,     /* Skip over OP_BRANUMBER */
+                             &subfirstbyte, /* For possible first char */
+                             &subreqbyte,   /* For possible last char */
+                             cd))           /* Tables block */
           goto FAILED;
 
         /* At the end of compiling, code is still pointing to the start of the
@@ -2011,16 +2029,16 @@ Argument:
 Returns:      true on success
 */
 
-static bool compile_regex(int options,
-                          int* brackets,
-                          uschar** codeptr,
-                          const UChar** ptrptr,
-                          const UChar* patternEnd,
-                          ErrorCode* errorcodeptr,
-                          int skipbytes,
-                          int* firstbyteptr,
-                          int* reqbyteptr,
-                          CompileData& cd) {
+static bool compile_bracket(int options,
+                            int* brackets,
+                            uschar** codeptr,
+                            const UChar** ptrptr,
+                            const UChar* patternEnd,
+                            ErrorCode* errorcodeptr,
+                            int skipbytes,
+                            int* firstbyteptr,
+                            int* reqbyteptr,
+                            CompileData& cd) {
   const UChar* ptr = *ptrptr;
   uschar* code = *codeptr;
   uschar* last_branch = code;
@@ -2341,7 +2359,7 @@ static int calculateCompiledPatternLengthAndFlags(
     const UChar* pattern,
     int patternLength,
     JSRegExpIgnoreCaseOption ignoreCase,
-    CompileData& compile_block,
+    CompileData& cd,
     ErrorCode& errorcode) {
   /* Make a pass over the pattern to compute the
    amount of store required to hold the compiled code. This does not have to be
@@ -2358,7 +2376,6 @@ static int calculateCompiledPatternLengthAndFlags(
   unsigned brastackptr = 0;
   int brastack[BRASTACK_SIZE];
   uschar bralenstack[BRASTACK_SIZE];
-  int item_count = -1;
   int bracount = 0;
 
   const UChar* ptr = (const UChar*)(pattern - 1);
@@ -2367,8 +2384,6 @@ static int calculateCompiledPatternLengthAndFlags(
   while (++ptr < patternEnd) {
     int minRepeats = 0, maxRepeats = 0;
     int c = *ptr;
-
-    item_count++; /* Is zero for the first non-comment item */
 
     switch (c) {
       /* A backslashed item may be an escaped data character or it may be a
@@ -2406,9 +2421,9 @@ static int calculateCompiledPatternLengthAndFlags(
 
         if (c <= -ESC_REF) {
           int refnum = -c - ESC_REF;
-          compile_block.backref_map |= (refnum < 32) ? (1 << refnum) : 1;
-          if (refnum > compile_block.top_backref)
-            compile_block.top_backref = refnum;
+          cd.backref_map |= (refnum < 32) ? (1 << refnum) : 1;
+          if (refnum > cd.top_backref)
+            cd.top_backref = refnum;
           length += 2; /* For single back reference */
           if (safelyCheckNextChar(ptr, patternEnd, '{') &&
               is_counted_repeat(ptr + 2, patternEnd)) {
@@ -2485,6 +2500,8 @@ static int calculateCompiledPatternLengthAndFlags(
        branch. This is handled by branch_extra. */
 
       case '|':
+        if (brastackptr == 0)
+          cd.needOuterBracket = true;
         length += 1 + LINK_SIZE + branch_extra;
         continue;
 
@@ -2913,11 +2930,11 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
     return 0;
   *errorptr = NULL;
 
-  CompileData compile_block;
+  CompileData cd;
 
   ErrorCode errorcode = ERR0;
   int length = calculateCompiledPatternLengthAndFlags(
-      pattern, patternLength, ignoreCase, compile_block, errorcode);
+      pattern, patternLength, ignoreCase, cd, errorcode);
   if (errorcode)
     return returnError(errorcode, errorptr);
 
@@ -2930,14 +2947,6 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
   if (!re)
     return returnError(ERR13, errorptr);
 
-  /* Put in the magic number, and save the sizes, options, and character table
-   pointer. NULL is used for the default character tables. The nullpad field is
-   at
-   the end; it's there to help in the case when a regex compiled on a system
-   with
-   4-byte pointers is run on another with 8-byte pointers. */
-
-  re->size = (pcre_uint32)size;
   re->options = (ignoreCase ? IgnoreCaseOption : 0) |
                 (multiline ? MatchAcrossMultipleLinesOption : 0);
 
@@ -2946,8 +2955,8 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    passed around in the compile data block. */
 
   const uschar* codestart = (const uschar*)(re + 1);
-  compile_block.start_code = codestart;
-  compile_block.start_pattern = (const UChar*)pattern;
+  cd.start_code = codestart;
+  cd.start_pattern = (const UChar*)pattern;
 
   /* Set up a starting, non-extracting bracket, then compile the expression. On
    error, errorcode will be set non-zero, so we don't need to look at the result
@@ -2956,13 +2965,18 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
   const UChar* ptr = (const UChar*)pattern;
   const UChar* patternEnd = pattern + patternLength;
   uschar* code = (uschar*)codestart;
-  *code = OP_BRA;
   int firstbyte, reqbyte;
   int bracketCount = 0;
-  (void)compile_regex(re->options, &bracketCount, &code, &ptr, patternEnd,
-                      &errorcode, 0, &firstbyte, &reqbyte, compile_block);
+  if (!cd.needOuterBracket)
+    compile_branch(re->options, &bracketCount, &code, &ptr, patternEnd,
+                   &errorcode, &firstbyte, &reqbyte, cd);
+  else {
+    *code = OP_BRA;
+    compile_bracket(re->options, &bracketCount, &code, &ptr, patternEnd,
+                    &errorcode, 0, &firstbyte, &reqbyte, cd);
+  }
   re->top_bracket = bracketCount;
-  re->top_backref = compile_block.top_backref;
+  re->top_backref = cd.top_backref;
 
   /* If not reached end of pattern on success, there's an excess bracket. */
 
@@ -3006,7 +3020,7 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    matches.
    */
 
-  if (is_anchored(codestart, re->options, 0, compile_block.backref_map))
+  if (is_anchored(codestart, re->options, 0, cd.backref_map))
     re->options |= IsAnchoredOption;
   else {
     if (firstbyte < 0)
@@ -3020,8 +3034,7 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
                              : firstbyte;
         re->options |= UseFirstByteOptimizationOption;
       }
-    } else if (canApplyFirstCharOptimization(codestart, 0,
-                                             compile_block.backref_map))
+    } else if (canApplyFirstCharOptimization(codestart, 0, cd.backref_map))
       re->options |= UseMultiLineFirstByteOptimizationOption;
   }
 
