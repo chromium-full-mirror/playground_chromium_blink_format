@@ -129,6 +129,10 @@ bool DatabaseTracker::canEstablishDatabase(Document* document,
   if (!hasEntryForOrigin(originData))
     establishEntryForOrigin(originData);
 
+  // If a database already exists, you can always establish a handle to it
+  if (hasEntryForDatabase(originData, name))
+    return true;
+
   // If the new database will fit as-is, allow its creation
   unsigned long long usage = usageForOrigin(originData);
   if (usage + estimatedSize < quotaForOrigin(originData))
@@ -150,6 +154,20 @@ bool DatabaseTracker::canEstablishDatabase(Document* document,
 bool DatabaseTracker::hasEntryForOrigin(const SecurityOriginData& origin) {
   populateOrigins();
   return m_originQuotaMap->contains(origin);
+}
+
+bool DatabaseTracker::hasEntryForDatabase(const SecurityOriginData& origin,
+                                          const String& databaseIdentifier) {
+  SQLiteStatement statement(
+      m_database, "SELECT guid FROM Databases WHERE origin=? AND name=?;");
+
+  if (statement.prepare() != SQLResultOk)
+    return false;
+
+  statement.bindText(1, origin.stringIdentifier());
+  statement.bindText(2, databaseIdentifier);
+
+  return statement.step() == SQLResultRow;
 }
 
 void DatabaseTracker::establishEntryForOrigin(

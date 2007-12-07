@@ -94,6 +94,8 @@ class DatabaseTracker {
   void openTrackerDatabase();
 
   bool hasEntryForOrigin(const SecurityOriginData&);
+  bool hasEntryForDatabase(const SecurityOriginData&,
+                           const String& databaseIdentifier);
   void establishEntryForOrigin(const SecurityOriginData&);
 
   bool addDatabase(const SecurityOriginData& origin,
