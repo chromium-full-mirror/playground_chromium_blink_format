@@ -59,7 +59,7 @@ static String systemFontsDirectory() {
 
 static String fontsPlistPath() {
   static String path = pathByAppendingComponent(
-      localUserSpecificStorageDirectory(), "FontsTable.plist");
+      localUserSpecificStorageDirectory(), "FontsList.plist");
   return path;
 }
 
