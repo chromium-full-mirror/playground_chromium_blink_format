@@ -51,6 +51,7 @@ namespace WebCore {
 class DatabaseAuthorizer;
 class DatabaseThread;
 class Document;
+class SecurityOriginData;
 class SQLResultSet;
 class SQLTransactionCallback;
 class SQLTransactionErrorCallback;
@@ -92,6 +93,8 @@ class Database : public ThreadSafeShared<Database> {
   Vector<String> tableNames();
 
   Document* document() const { return m_document; }
+  SecurityOriginData securityOriginData() const;
+  String stringIdentifier() const;
 
   bool getVersionFromDatabase(String&);
   bool setVersionInDatabase(const String&);

@@ -55,6 +55,8 @@ class SQLStatement : public ThreadSafeShared<SQLStatement> {
                PassRefPtr<SQLStatementErrorCallback> errorCallback);
 
   bool execute(Database*);
+  bool lastExecutionFailedDueToQuota() const;
+
   bool hasStatementCallback() const { return m_statementCallback; }
   bool hasStatementErrorCallback() const { return m_statementErrorCallback; }
   void setVersionMismatchedError();
@@ -64,6 +66,9 @@ class SQLStatement : public ThreadSafeShared<SQLStatement> {
   SQLError* sqlError() const { return m_error.get(); }
 
  private:
+  void setFailureDueToQuota();
+  void clearFailureDueToQuota();
+
   String m_statement;
   Vector<SQLValue> m_arguments;
   RefPtr<SQLStatementCallback> m_statementCallback;
