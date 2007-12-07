@@ -625,6 +625,8 @@ class WebView : public IWebView,
       /* [retval][out] */ IWebInspector**);
 
   virtual HRESULT STDMETHODCALLTYPE clearUndoRedoOperations(void);
+  virtual HRESULT STDMETHODCALLTYPE shouldClose(
+      /* [retval][out] */ BOOL* result);
 
   virtual HRESULT STDMETHODCALLTYPE setProhibitsMainFrameScrolling(BOOL);
   virtual HRESULT STDMETHODCALLTYPE setShouldApplyMacFontAscentHack(BOOL);
