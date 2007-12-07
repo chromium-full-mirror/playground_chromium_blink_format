@@ -1,10 +1,8 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -438,11 +436,11 @@ bool ContainerNode::removeChild(Node* oldChild, ExceptionCode& ec) {
 // this differs from other remove functions because it forcibly removes all the
 // children,
 // regardless of read-only status or event exceptions, e.g.
-void ContainerNode::removeChildren() {
-  Node* n;
-
+bool ContainerNode::removeChildren() {
   if (!m_firstChild)
-    return;
+    return false;
+
+  Node* n;
 
   // do any prep work needed before actually starting to detach
   // and remove... e.g. stop loading frames, fire unload events
@@ -477,6 +475,8 @@ void ContainerNode::removeChildren() {
 
   // Dispatch a single post-removal mutation event denoting a modified subtree.
   dispatchSubtreeModifiedEvent();
+
+  return true;
 }
 
 bool ContainerNode::appendChild(PassRefPtr<Node> newChild, ExceptionCode& ec) {
@@ -659,7 +659,7 @@ void ContainerNode::removedFromTree(bool deep) {
   }
 }
 
-void ContainerNode::cloneChildNodes(Node* clone) {
+void ContainerNode::cloneChildNodes(ContainerNode* clone) {
   // disable the delete button so it's elements are not serialized into the
   // markup
   if (document()->frame())

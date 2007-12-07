@@ -94,8 +94,7 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
                             ExceptionCode&);
   virtual bool removeChild(Node* child, ExceptionCode&);
   virtual bool appendChild(PassRefPtr<Node> newChild, ExceptionCode&);
-  virtual ContainerNode* addChild(PassRefPtr<Node>);
-
+  virtual bool removeChildren();
   virtual void childrenChanged();
 
   virtual void parseMappedAttribute(MappedAttribute*);
@@ -113,6 +112,8 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
   const Vector<HTMLElement*>& listItems() const {
     if (m_recalcListItems)
       recalcListItems();
+    else
+      checkListItems();
     return m_listItems;
   }
   virtual void reset();
@@ -147,6 +148,8 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
 
  private:
   void recalcListItems() const;
+  void checkListItems() const;
+
   void deselectItems(HTMLOptionElement* excludeElement = 0);
   bool usesMenuList() const { return !m_multiple && m_size <= 1; }
   int nextSelectableListIndex(int startIndex);
@@ -176,6 +179,12 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
 
   HTMLCollection::CollectionInfo m_collectionInfo;
 };
+
+#ifdef NDEBUG
+
+inline void HTMLSelectElement::checkListItems() const {}
+
+#endif
 
 }  // namespace
 
