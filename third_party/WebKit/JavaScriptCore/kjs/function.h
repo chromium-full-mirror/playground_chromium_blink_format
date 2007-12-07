@@ -185,7 +185,7 @@ class ActivationImp : public JSVariableObject {
   };
 
  public:
-  ActivationImp::ActivationImp(ExecState* exec)
+  ActivationImp(ExecState* exec)
       : JSVariableObject(new ActivationImpData(exec)) {}
 
   virtual ~ActivationImp() { delete d(); }
