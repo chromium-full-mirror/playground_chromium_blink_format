@@ -37,10 +37,11 @@
 
 class WebViewPrivate {
  public:
-  WebViewPrivate() : frame(0), frameView(0) {}
+  WebViewPrivate() : frame(0), frameView(0), page(0) {}
 
   WTF::RefPtr<WebCore::Frame> frame;
   WTF::RefPtr<WebCore::FrameView> frameView;
+  WebCore::Page* page;
 };
 
 class WebViewFrameData {
