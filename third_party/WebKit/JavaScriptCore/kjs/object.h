@@ -479,7 +479,7 @@ class JSObject : public JSCell {
   void saveProperties(SavedProperties& p) const { _prop.save(p); }
   void restoreProperties(const SavedProperties& p) { _prop.restore(p); }
 
-  virtual bool isActivation() { return false; }
+  virtual bool isActivationObject() { return false; }
   virtual bool isGlobalObject() const { return false; }
 
  protected:

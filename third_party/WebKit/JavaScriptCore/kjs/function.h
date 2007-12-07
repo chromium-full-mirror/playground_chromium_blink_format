@@ -25,10 +25,11 @@
 #ifndef KJS_FUNCTION_H
 #define KJS_FUNCTION_H
 
+#include "JSVariableObject.h"
 #include "LocalStorage.h"
 #include "SymbolTable.h"
+#include "nodes.h"
 #include "object.h"
-#include <wtf/OwnPtr.h>
 
 namespace KJS {
 
@@ -169,20 +170,25 @@ class Arguments : public JSObject {
   mutable IndexToNameMap indexToNameMap;
 };
 
-class ActivationImp : public JSObject {
+class ActivationImp : public JSVariableObject {
  private:
-  struct ActivationImpPrivate {
-    ActivationImpPrivate(ExecState* e)
-        : exec(e), function(e->function()), argumentsObject(0) {}
+  using JSVariableObject::JSVariableObjectData;
 
-    LocalStorage localStorage;
+  struct ActivationImpData : public JSVariableObjectData {
+    ActivationImpData(ExecState* e)
+        : JSVariableObjectData(&e->function()->body->symbolTable()),
+          exec(e),
+          argumentsObject(0) {}
+
     ExecState* exec;
-    FunctionImp* function;
     Arguments* argumentsObject;
   };
 
  public:
-  ActivationImp(ExecState*);
+  ActivationImp::ActivationImp(ExecState* exec)
+      : JSVariableObject(new ActivationImpData(exec)) {}
+
+  virtual ~ActivationImp() { delete d(); }
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*,
@@ -190,17 +196,13 @@ class ActivationImp : public JSObject {
                    JSValue* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
-  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
   virtual void mark();
 
-  bool isActivation() { return true; }
-
-  LocalStorage& localStorage() { return d->localStorage; }
-  SymbolTable& symbolTable() { return *m_symbolTable; }
+  virtual bool isActivationObject() { return true; }
 
  private:
   static PropertySlot::GetValueFunc getArgumentsGetter();
@@ -209,9 +211,9 @@ class ActivationImp : public JSObject {
                                   const Identifier&,
                                   const PropertySlot& slot);
   void createArgumentsObject(ExecState*);
-
-  OwnPtr<ActivationImpPrivate> d;
-  SymbolTable* m_symbolTable;
+  ActivationImpData* d() {
+    return static_cast<ActivationImpData*>(JSVariableObject::d);
+  }
 };
 
 class GlobalFuncImp : public InternalFunctionImp {
