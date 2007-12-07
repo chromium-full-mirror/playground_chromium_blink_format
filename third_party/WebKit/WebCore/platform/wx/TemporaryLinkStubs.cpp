@@ -142,7 +142,7 @@ const WebCore::Cursor& WebCore::moveCursor() {
 }
 
 namespace WebCore {
-bool historyContains(DeprecatedString const&) {
+bool historyContains(const UChar*, unsigned) {
   return false;
 }
 }

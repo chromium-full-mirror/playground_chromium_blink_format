@@ -54,7 +54,7 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
 /* Completely empty stubs (mostly to allow DRT to run): */
 /********************************************************/
 
-bool WebCore::historyContains(DeprecatedString const&) {
+bool WebCore::historyContains(const UChar*, unsigned) {
   return false;
 }
 
