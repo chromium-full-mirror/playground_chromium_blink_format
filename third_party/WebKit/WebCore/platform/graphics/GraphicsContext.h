@@ -196,10 +196,6 @@ class GraphicsContext : Noncopyable {
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
 
-  // Functions to work around bugs in focus ring clipping on Mac.
-  void setFocusRingClip(const IntRect&);
-  void clearFocusRingClip();
-
   int textDrawingMode();
   void setTextDrawingMode(int);
 

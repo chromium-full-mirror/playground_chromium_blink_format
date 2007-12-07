@@ -446,16 +446,6 @@ void GraphicsContext::drawFocusRing(const Color& color) {
   cairo_restore(cr);
 }
 
-void GraphicsContext::setFocusRingClip(const IntRect&) {
-  // hopefully a no-op. Comment in CG version says that it exists
-  // to work around bugs in Mac focus ring clipping
-}
-
-void GraphicsContext::clearFocusRingClip() {
-  // hopefully a no-op. Comment in CG version says that it exists
-  // to work around bugs in Mac focus ring clipping
-}
-
 void GraphicsContext::drawLineForText(const IntPoint& origin,
                                       int width,
                                       bool printing) {
