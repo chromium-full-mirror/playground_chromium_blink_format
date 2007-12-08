@@ -28,6 +28,7 @@
 #include <wtf/Forward.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/RefPtr.h>
+#include "nodes.h"
 
 namespace KJS {
 
@@ -57,7 +58,9 @@ class Parser : Noncopyable {
 
   int sourceId() { return m_sourceId; }
 
-  void didFinishParsing(PassRefPtr<ProgramNode>);
+  void didFinishParsing(SourceElements* sourceElements) {
+    m_sourceElements.set(sourceElements);
+  }
 
  private:
   friend Parser& parser();
@@ -72,7 +75,7 @@ class Parser : Noncopyable {
              UString* errMsg = 0);
 
   int m_sourceId;
-  RefPtr<ProgramNode> m_progNode;
+  OwnPtr<SourceElements> m_sourceElements;
 };
 
 Parser& parser();  // Returns the singleton JavaScript parser.

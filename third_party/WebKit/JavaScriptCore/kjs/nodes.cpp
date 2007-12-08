@@ -3593,10 +3593,9 @@ static inline Completion statementListExecute(SourceElements& statements,
 
 // ------------------------------ BlockNode ------------------------------------
 
-BlockNode::BlockNode(SourceElements* children) {
-  ASSERT(children);
+BlockNode::BlockNode(SourceElements* children) : m_children(children) {
+  ASSERT(m_children);
   m_mayHaveDeclarations = true;
-  m_children.set(children);
 }
 
 void BlockNode::optimizeVariableAccess(
