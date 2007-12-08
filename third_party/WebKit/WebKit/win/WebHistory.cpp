@@ -56,7 +56,7 @@ class _WebCoreHistoryProvider : public WebCore::WebCoreHistoryProvider {
   _WebCoreHistoryProvider(IWebHistory* history);
   ~_WebCoreHistoryProvider();
 
-  virtual bool containsItem(const UChar* unicode, unsigned int length);
+  virtual bool containsURL(const UChar* unicode, unsigned length);
 
  private:
   IWebHistory* m_history;
@@ -922,8 +922,8 @@ static inline bool matchUnicodeLetter(UniChar c, UniChar lowercaseLetter) {
   return (c | 0x20) == lowercaseLetter;
 }
 
-bool _WebCoreHistoryProvider::containsItem(const UChar* unicode,
-                                           unsigned int length) {
+bool _WebCoreHistoryProvider::containsURL(const UChar* unicode,
+                                          unsigned length) {
   const int bufferSize = 1024;
   const UChar* unicodeStr = unicode;
   UChar staticStrBuffer[bufferSize];
