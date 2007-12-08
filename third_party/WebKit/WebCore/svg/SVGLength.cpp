@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
                   2007 Apple Inc.  All rights reserved.
 
     This file is part of the KDE project
@@ -239,7 +239,11 @@ bool SVGLength::setValueAsString(const String& s) {
   if (!parseNumber(ptr, end, convertedNumber, false))
     return false;
 
-  m_unit = storeUnit(extractMode(m_unit), stringToLengthType(s));
+  SVGLengthType type = stringToLengthType(s);
+  if (ptr != end && type == LengthTypeNumber)
+    return false;
+
+  m_unit = storeUnit(extractMode(m_unit), type);
   m_valueInSpecifiedUnits = convertedNumber;
   return true;
 }
