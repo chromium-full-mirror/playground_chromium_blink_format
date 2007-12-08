@@ -407,7 +407,8 @@ static Frame* createWindow(ExecState* exec,
   if (dialogArgs)
     newWindow->putDirect("dialogArguments", dialogArgs);
 
-  if (!url.startsWith("javascript:", false) || newWindow->isSafeScript(exec)) {
+  if (!url.startsWith("javascript:", false) ||
+      newWindow->allowsAccessFrom(exec)) {
     String completedURL =
         url.isEmpty() ? url : activeFrame->document()->completeURL(url);
     bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
@@ -538,15 +539,15 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
 
   switch (token) {
     case Crypto:
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       return jsUndefined();  // FIXME: implement this
     case DOMException:
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       return getDOMExceptionConstructor(exec);
     case Event_:
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       if (!d->m_evt)
         return jsUndefined();
@@ -555,7 +556,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return location();
     case Navigator_:
     case ClientInformation: {
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       // Store the navigator in the object so we get the same one each time.
       Navigator* n = new Navigator(exec, impl()->frame());
@@ -570,19 +571,19 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return n;
     }
     case Image:
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       // FIXME: this property (and the few below) probably shouldn't create a
       // new object every
       // time
       return new ImageConstructorImp(exec, impl()->frame()->document());
     case Option:
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       return new JSHTMLOptionElementConstructor(exec,
                                                 impl()->frame()->document());
     case XMLHttpRequest:
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       return new JSXMLHttpRequestConstructorImp(exec,
                                                 impl()->frame()->document());
@@ -595,7 +596,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
 #endif
 #if ENABLE(XSLT)
     case XSLTProcessor_:
-      if (!isSafeScript(exec))
+      if (!allowsAccessFrom(exec))
         return jsUndefined();
       return new XSLTProcessorConstructorImp(exec);
 #else
@@ -604,7 +605,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
 #endif
   }
 
-  if (!isSafeScript(exec))
+  if (!allowsAccessFrom(exec))
     return jsUndefined();
 
   switch (token) {
@@ -691,7 +692,7 @@ JSValue* Window::namedItemGetter(ExecState* exec,
                                  const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
   Document* doc = thisObj->impl()->frame()->document();
-  ASSERT(thisObj->isSafeScript(exec) && doc && doc->isHTMLDocument());
+  ASSERT(thisObj->allowsAccessFrom(exec) && doc && doc->isHTMLDocument());
 
   String name = propertyName;
   RefPtr<WebCore::HTMLCollection> collection = doc->windowNamedItems(name);
@@ -721,7 +722,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
         if (!canShowModalDialog(this))
           return false;
       }
-      if (isSafeScript(exec))
+      if (allowsAccessFrom(exec))
         slot.setStaticEntry(this, entry, staticFunctionGetter);
       else
         slot.setUndefined(this);
@@ -744,7 +745,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   // allow shortcuts like 'Image1' instead of document.images.Image1
   Document* doc = impl()->frame()->document();
   if (doc && doc->isHTMLDocument()) {
-    if (!isSafeScript(exec)) {
+    if (!allowsAccessFrom(exec)) {
       slot.setUndefined(this);
       return true;
     }
@@ -757,7 +758,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
     }
   }
 
-  if (!isSafeScript(exec)) {
+  if (!allowsAccessFrom(exec)) {
     slot.setUndefined(this);
     return true;
   }
@@ -772,7 +773,7 @@ void Window::put(ExecState* exec,
   const HashEntry* entry = Lookup::findEntry(&WindowTable, propertyName);
   if (entry) {
     if (entry->attr & Function) {
-      if (isSafeScript(exec))
+      if (allowsAccessFrom(exec))
         JSObject::put(exec, propertyName, value, attr);
       return;
     }
@@ -789,7 +790,8 @@ void Window::put(ExecState* exec,
               p->loader()
                   ->completeURL(DeprecatedString(value->toString(exec)))
                   .url();
-          if (!dstUrl.startsWith("javascript:", false) || isSafeScript(exec)) {
+          if (!dstUrl.startsWith("javascript:", false) ||
+              allowsAccessFrom(exec)) {
             bool userGesture = p->scriptProxy()->processingUserGesture();
             // We want a new history item if this JS was called via a user
             // gesture
@@ -800,173 +802,153 @@ void Window::put(ExecState* exec,
         return;
       }
       case Onabort:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, abortEvent, value);
         return;
       case Onblur:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, blurEvent, value);
         return;
       case Onchange:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, changeEvent, value);
         return;
       case Onclick:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, clickEvent, value);
         return;
       case Ondblclick:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, dblclickEvent, value);
         return;
       case Onerror:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, errorEvent, value);
         return;
       case Onfocus:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, focusEvent, value);
         return;
       case Onkeydown:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, keydownEvent, value);
         return;
       case Onkeypress:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, keypressEvent, value);
         return;
       case Onkeyup:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, keyupEvent, value);
         return;
       case Onload:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, loadEvent, value);
         return;
       case Onmousedown:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, mousedownEvent, value);
         return;
       case Onmousemove:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, mousemoveEvent, value);
         return;
       case Onmouseout:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, mouseoutEvent, value);
         return;
       case Onmouseover:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, mouseoverEvent, value);
         return;
       case Onmouseup:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, mouseupEvent, value);
         return;
       case OnWindowMouseWheel:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, mousewheelEvent, value);
         return;
       case Onreset:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, resetEvent, value);
         return;
       case Onresize:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, resizeEvent, value);
         return;
       case Onscroll:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, scrollEvent, value);
         return;
       case Onsearch:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, searchEvent, value);
         return;
       case Onselect:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, selectEvent, value);
         return;
       case Onsubmit:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, submitEvent, value);
         return;
       case Onbeforeunload:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, beforeunloadEvent, value);
         return;
       case Onunload:
-        if (isSafeScript(exec))
+        if (allowsAccessFrom(exec))
           setListener(exec, unloadEvent, value);
         return;
       default:
         break;
     }
   }
-  if (isSafeScript(exec))
+  if (allowsAccessFrom(exec))
     JSObject::put(exec, propertyName, value, attr);
 }
 
-static bool shouldLoadAsEmptyDocument(const KURL& url) {
-  return url.protocol().lower() == "about" || url.isEmpty();
-}
+bool Window::allowsAccessFrom(const JSGlobalObject* other) const {
+  const Frame* originFrame = static_cast<const Window*>(other)->impl()->frame();
+  if (!originFrame)
+    return false;
 
-bool Window::isSafeScript(const JSGlobalObject* origin,
-                          const JSGlobalObject* target) {
-  if (origin == target)
+  const Frame* targetFrame = impl()->frame();
+  if (!targetFrame)
+    return false;
+
+  if (originFrame == targetFrame)
     return true;
 
-  Frame* originFrame = static_cast<const Window*>(origin)->impl()->frame();
-  Frame* targetFrame = static_cast<const Window*>(target)->impl()->frame();
+  WebCore::Document* targetDocument = targetFrame->document();
 
   // JS may be attempting to access the "window" object, which should be valid,
   // even if the document hasn't been constructed yet.  If the document doesn't
   // exist yet allow JS to access the window object.
-  if (!targetFrame->document())
+  if (!targetDocument)
     return true;
 
   WebCore::Document* originDocument = originFrame->document();
-  WebCore::Document* targetDocument = targetFrame->document();
 
-  if (!targetDocument) {
-    return false;
-  }
+  const SecurityOrigin& originSecurityOrigin = originDocument->securityOrigin();
+  const SecurityOrigin& targetSecurityOrigin = targetDocument->securityOrigin();
 
-  WebCore::String targetDomain = targetDocument->domain();
-
-  // Always allow local pages to execute any JS.
-  if (targetDomain.isNull())
+  if (originSecurityOrigin.canAccess(targetSecurityOrigin))
     return true;
 
-  WebCore::String originDomain = originDocument->domain();
-
-  // if this document is being initially loaded as empty by its parent
-  // or opener, allow access from any document in the same domain as
-  // the parent or opener.
-  if (shouldLoadAsEmptyDocument(targetFrame->loader()->url())) {
-    Frame* ancestorFrame = targetFrame->loader()->opener()
-                               ? targetFrame->loader()->opener()
-                               : targetFrame->tree()->parent();
-    while (ancestorFrame &&
-           shouldLoadAsEmptyDocument(ancestorFrame->loader()->url()))
-      ancestorFrame = ancestorFrame->tree()->parent();
-    if (ancestorFrame)
-      originDomain = ancestorFrame->document()->domain();
-  }
-
-  if (targetDomain == originDomain)
-    return true;
-
-  if (!originFrame->settings()->privateBrowsingEnabled()) {
-    if (Interpreter::shouldPrintExceptions())
-      printf(
-          "Unsafe JavaScript attempt to access frame with URL %s from frame "
-          "with URL %s. Domains must match.\n",
-          targetDocument->URL().latin1(), originDocument->URL().latin1());
+  if (!targetFrame->settings()->privateBrowsingEnabled()) {
+    // FIXME: this error message should contain more specifics of why the same
+    // origin check has failed.
     String message = String::format(
         "Unsafe JavaScript attempt to access frame with URL %s from frame with "
-        "URL %s. Domains must match.\n",
-        targetDocument->URL().latin1(), originDocument->URL().latin1());
+        "URL %s. Domains, protocols and ports must match.\n",
+        targetDocument->URL().utf8().data(),
+        originDocument->URL().utf8().data());
+
+    if (Interpreter::shouldPrintExceptions())
+      printf("%s", message.utf8().data());
+
     if (Page* page = targetFrame->page())
       page->chrome()->addMessageToConsole(
           JSMessageSource, ErrorMessageLevel, message, 1,
@@ -1001,55 +983,10 @@ bool Window::shouldInterruptScript() const {
   return page->chrome()->shouldInterruptJavaScript();
 }
 
-bool Window::isSafeScript(ExecState* exec) const {
-  Frame* frame = impl()->frame();
-  if (!frame)
-    return false;
-  Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
-  if (!activeFrame)
-    return false;
-  if (activeFrame == frame)
-    return true;
-
-  WebCore::Document* thisDocument = frame->document();
-
-  // JS may be attempting to access the "window" object, which should be valid,
-  // even if the document hasn't been constructed yet.  If the document doesn't
-  // exist yet allow JS to access the window object.
-  if (!thisDocument)
-    return true;
-
-  WebCore::Document* actDocument = activeFrame->document();
-
-  const SecurityOrigin& actSecurityOrigin = actDocument->securityOrigin();
-  const SecurityOrigin& thisSecurityOrigin = thisDocument->securityOrigin();
-
-  if (actSecurityOrigin.canAccess(thisSecurityOrigin))
-    return true;
-
-  if (!frame->settings()->privateBrowsingEnabled()) {
-    // FIXME: this error message should contain more specifics of why the same
-    // origin check has failed.
-    String message = String::format(
-        "Unsafe JavaScript attempt to access frame with URL %s from frame with "
-        "URL %s. Domains, protocols and ports must match.\n",
-        thisDocument->URL().utf8().data(), actDocument->URL().utf8().data());
-
-    if (Interpreter::shouldPrintExceptions())
-      printf("%s", message.utf8().data());
-
-    if (Page* page = frame->page())
-      page->chrome()->addMessageToConsole(JSMessageSource, ErrorMessageLevel,
-                                          message, 1, String());
-  }
-
-  return false;
-}
-
 void Window::setListener(ExecState* exec,
                          const AtomicString& eventType,
                          JSValue* func) {
-  if (!isSafeScript(exec))
+  if (!allowsAccessFrom(exec))
     return;
   Frame* frame = impl()->frame();
   if (!frame)
@@ -1064,7 +1001,7 @@ void Window::setListener(ExecState* exec,
 
 JSValue* Window::getListener(ExecState* exec,
                              const AtomicString& eventType) const {
-  if (!isSafeScript(exec))
+  if (!allowsAccessFrom(exec))
     return jsUndefined();
   Frame* frame = impl()->frame();
   if (!frame)
@@ -1459,7 +1396,7 @@ JSValue* WindowProtoFuncOpen::callAsFunction(ExecState* exec,
     const Window* window = Window::retrieveWindow(frame);
     if (!completedURL.isEmpty() &&
         (!completedURL.startsWith("javascript:", false) ||
-         (window && window->isSafeScript(exec)))) {
+         (window && window->allowsAccessFrom(exec)))) {
       bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
       frame->loader()->scheduleLocationChange(
           completedURL, activeFrame->loader()->outgoingReferrer(), false,
@@ -1640,7 +1577,7 @@ JSValue* WindowProtoFuncSetTimeout::callAsFunction(ExecState* exec,
   JSValue* v = args[0];
   UString s = v->toString(exec);
 
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
   if (v->isString()) {
     int i = args[1]->toInt32(exec);
@@ -1675,7 +1612,7 @@ JSValue* WindowProtoFuncClearTimeout::callAsFunction(ExecState* exec,
 
   JSValue* v = args[0];
 
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
   (const_cast<Window*>(window))->clearTimeout(v->toInt32(exec));
   return jsUndefined();
@@ -1694,7 +1631,7 @@ JSValue* WindowProtoFuncSetInterval::callAsFunction(ExecState* exec,
   JSValue* v = args[0];
   UString s = v->toString(exec);
 
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
   if (args.size() >= 2 && v->isString()) {
     int i = args[1]->toInt32(exec);
@@ -1725,7 +1662,7 @@ JSValue* WindowProtoFuncAddEventListener::callAsFunction(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
   if (JSEventListener* listener = window->findOrCreateJSEventListener(args[1]))
     if (Document* doc = frame->document())
@@ -1744,7 +1681,7 @@ JSValue* WindowProtoFuncRemoveEventListener::callAsFunction(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
   if (JSEventListener* listener = window->findJSEventListener(args[1]))
     if (Document* doc = frame->document())
@@ -1777,7 +1714,7 @@ JSValue* WindowProtoFuncNotImplemented::callAsFunction(ExecState* exec,
     return jsUndefined();
 
   // If anyone implements these, they need the safe script security check.
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
   // Not implemented.
   return jsUndefined();
@@ -2078,7 +2015,7 @@ bool Location::getOwnPropertySlot(ExecState* exec,
       (entry->value.functionValue != &LocationProtoFuncReplace::create &&
        entry->value.functionValue != &LocationProtoFuncReload::create &&
        entry->value.functionValue != &LocationProtoFuncAssign::create)) {
-    if (!window || !window->isSafeScript(exec)) {
+    if (!window || !window->allowsAccessFrom(exec)) {
       slot.setUndefined(this);
       return true;
     }
@@ -2095,7 +2032,7 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
   DeprecatedString str = v->toString(exec);
   KURL url = m_frame->loader()->url();
   const Window* window = Window::retrieveWindow(m_frame);
-  bool sameDomainAccess = window && window->isSafeScript(exec);
+  bool sameDomainAccess = window && window->allowsAccessFrom(exec);
 
   const HashEntry* entry = Lookup::findEntry(&LocationTable, p);
 
@@ -2185,7 +2122,7 @@ JSValue* LocationProtoFuncReplace::callAsFunction(ExecState* exec,
     DeprecatedString str = args[0]->toString(exec);
     const Window* window = Window::retrieveWindow(frame);
     if (!str.startsWith("javascript:", false) ||
-        (window && window->isSafeScript(exec))) {
+        (window && window->allowsAccessFrom(exec))) {
       bool userGesture = p->scriptProxy()->processingUserGesture();
       frame->loader()->scheduleLocationChange(
           p->loader()->completeURL(str).url(), p->loader()->outgoingReferrer(),
@@ -2207,11 +2144,11 @@ JSValue* LocationProtoFuncReload::callAsFunction(ExecState* exec,
     return jsUndefined();
 
   Window* window = Window::retrieveWindow(frame);
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
   if (!frame->loader()->url().url().startsWith("javascript:", false) ||
-      (window && window->isSafeScript(exec))) {
+      (window && window->allowsAccessFrom(exec))) {
     bool userGesture = Window::retrieveActive(exec)
                            ->impl()
                            ->frame()
@@ -2242,7 +2179,7 @@ JSValue* LocationProtoFuncAssign::callAsFunction(ExecState* exec,
             ->completeURL(DeprecatedString(args[0]->toString(exec)))
             .url();
     if (!dstUrl.startsWith("javascript:", false) ||
-        (window && window->isSafeScript(exec))) {
+        (window && window->allowsAccessFrom(exec))) {
       bool userGesture = p->scriptProxy()->processingUserGesture();
       // We want a new history item if this JS was called via a user gesture
       frame->loader()->scheduleLocationChange(
@@ -2264,10 +2201,10 @@ JSValue* LocationProtoFuncToString::callAsFunction(ExecState* exec,
     return jsUndefined();
 
   Window* window = Window::retrieveWindow(frame);
-  if (!window->isSafeScript(exec))
+  if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
-  if (!frame || !Window::retrieveWindow(frame)->isSafeScript(exec))
+  if (!frame || !Window::retrieveWindow(frame)->allowsAccessFrom(exec))
     return jsString();
 
   if (!frame->loader()->url().hasPath())

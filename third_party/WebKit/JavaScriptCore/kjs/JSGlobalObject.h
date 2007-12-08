@@ -245,7 +245,7 @@ class JSGlobalObject : public JSVariableObject {
 
   virtual bool shouldInterruptScript() const { return true; }
 
-  virtual bool isSafeScript(const JSGlobalObject*) const { return true; }
+  virtual bool allowsAccessFrom(const JSGlobalObject*) const { return true; }
 
  private:
   void init();

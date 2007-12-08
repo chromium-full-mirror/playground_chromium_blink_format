@@ -83,8 +83,8 @@ static bool _isSafeScript(JavaScriptObject* obj) {
   if (!obj->originRootObject->isValid() || !obj->rootObject->isValid())
     return false;
 
-  return obj->originRootObject->globalObject()->isSafeScript(
-      obj->rootObject->globalObject());
+  return obj->rootObject->globalObject()->allowsAccessFrom(
+      obj->originRootObject->globalObject());
 }
 
 NPObject* _NPN_CreateScriptObject(NPP npp,
