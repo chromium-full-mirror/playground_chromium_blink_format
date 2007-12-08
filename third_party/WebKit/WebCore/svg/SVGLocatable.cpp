@@ -127,10 +127,9 @@ AffineTransform SVGLocatable::getTransformToElement(SVGElement* target,
                                                     ExceptionCode& ec) const {
   AffineTransform ctm = getCTM();
 
-  SVGElement* targetElement = svg_dynamic_cast(target);
-  if (targetElement && targetElement->isStyledLocatable()) {
+  if (target && target->isStyledLocatable()) {
     AffineTransform targetCTM =
-        static_cast<SVGStyledLocatableElement*>(targetElement)->getCTM();
+        static_cast<SVGStyledLocatableElement*>(target)->getCTM();
     if (!targetCTM.isInvertible()) {
       ec = SVG_MATRIX_NOT_INVERTABLE;
       return ctm;
