@@ -440,6 +440,9 @@ void ActivationImp::put(ExecState*,
 void ActivationImp::mark() {
   JSVariableObject::mark();
 
+  if (!d()->function->marked())
+    d()->function->mark();
+
   if (d()->argumentsObject && !d()->argumentsObject->marked())
     d()->argumentsObject->mark();
 }
