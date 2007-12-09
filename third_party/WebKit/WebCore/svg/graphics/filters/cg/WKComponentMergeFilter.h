@@ -26,7 +26,7 @@
 
 #import <QuartzCore/CoreImage.h>
 
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 
 @interface WKComponentMergeFilter : CIFilter {
   CIImage* inputFuncR;
@@ -37,4 +37,4 @@
 
 @end
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)

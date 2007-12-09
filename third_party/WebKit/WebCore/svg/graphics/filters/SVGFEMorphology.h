@@ -22,7 +22,7 @@
 #ifndef SVGFEMorphology_h
 #define SVGFEMorphology_h
 
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "SVGFilterEffect.h"
 
 namespace WebCore {
@@ -56,6 +56,6 @@ class SVGFEMorphology : public SVGFilterEffect {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
 
 #endif  // SVGFEMorphology_h

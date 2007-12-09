@@ -304,7 +304,7 @@ void RenderSVGContainer::calcBounds() {
 }
 
 bool RenderSVGContainer::selfWillPaint() const {
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG_FILTERS)
   const SVGRenderStyle* svgStyle = style()->svgStyle();
   AtomicString filterId(SVGURIReference::getTarget(svgStyle->filter()));
   SVGResourceFilter* filter = getFilterById(document(), filterId);
@@ -364,7 +364,7 @@ IntRect RenderSVGContainer::absoluteClippedOverflowRect() {
        current = current->nextSibling())
     repaintRect.unite(current->absoluteClippedOverflowRect());
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG_FILTERS)
   // Filters can expand the bounding box
   SVGResourceFilter* filter = getFilterById(
       document(), SVGURIReference::getTarget(style()->svgStyle()->filter()));

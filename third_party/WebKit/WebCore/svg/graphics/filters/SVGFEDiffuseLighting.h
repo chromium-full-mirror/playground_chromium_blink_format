@@ -22,7 +22,7 @@
 #ifndef SVGFEDiffuseLighting_h
 #define SVGFEDiffuseLighting_h
 
-#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "Color.h"
 #include "SVGFilterEffect.h"
 
@@ -70,6 +70,6 @@ class SVGFEDiffuseLighting : public SVGFilterEffect {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#endif  // ENABLE(SVG) && ENABLE(SVG_FILTERS)
 
 #endif  // SVGFEDiffuseLighting_h

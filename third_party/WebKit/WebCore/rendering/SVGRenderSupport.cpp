@@ -63,7 +63,7 @@ void prepareToRenderSVGContent(RenderObject* object,
     paintInfo.context->beginTransparencyLayer(opacity);
   }
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG_FILTERS)
   AtomicString filterId(SVGURIReference::getTarget(svgStyle->filter()));
 #endif
 
@@ -72,7 +72,7 @@ void prepareToRenderSVGContent(RenderObject* object,
 
   Document* document = object->document();
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG_FILTERS)
   SVGResourceFilter* newFilter = getFilterById(document, filterId);
   if (newFilter == rootFilter) {
     // Catch <text filter="url(#foo)">Test<tspan
@@ -87,7 +87,7 @@ void prepareToRenderSVGContent(RenderObject* object,
   SVGResourceClipper* clipper = getClipperById(document, clipperId);
   SVGResourceMasker* masker = getMaskerById(document, maskerId);
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG_FILTERS)
   if (filter) {
     filter->addClient(styledElement);
     filter->prepareFilter(paintInfo.context, boundingBox);
@@ -121,7 +121,7 @@ void finishRenderSVGContent(RenderObject* object,
   const RenderStyle* style = object->style();
   ASSERT(style);
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG_FILTERS)
   if (filter) {
     filter->applyFilter(paintInfo.context, boundingBox);
     paintInfo.context = savedContext;

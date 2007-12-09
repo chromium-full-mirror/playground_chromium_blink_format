@@ -254,7 +254,7 @@ void RenderSVGImage::imageChanged(CachedImage* image) {
 IntRect RenderSVGImage::absoluteClippedOverflowRect() {
   FloatRect repaintRect = absoluteTransform().mapRect(relativeBBox(true));
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
+#if ENABLE(SVG_FILTERS)
   // Filters can expand the bounding box
   SVGResourceFilter* filter = getFilterById(
       document(), SVGURIReference::getTarget(style()->svgStyle()->filter()));
