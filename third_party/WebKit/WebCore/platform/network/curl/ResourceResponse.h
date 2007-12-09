@@ -33,7 +33,7 @@ namespace WebCore {
 
 class ResourceResponse : public ResourceResponseBase {
  public:
-  ResourceResponse() : ResourceResponseBase(false) {}
+  ResourceResponse() : ResourceResponseBase(false), m_responseFired(false) {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -44,12 +44,18 @@ class ResourceResponse : public ResourceResponseBase {
                              mimeType,
                              expectedLength,
                              textEncodingName,
-                             filename) {}
+                             filename),
+        m_responseFired(false) {}
+
+  void setResponseFired(bool fired) { m_responseFired = fired; }
+  bool responseFired() { return m_responseFired; }
 
  private:
   friend class ResourceResponseBase;
 
   void doUpdateResourceResponse() {}
+
+  bool m_responseFired;
 };
 
 }  // namespace WebCore
