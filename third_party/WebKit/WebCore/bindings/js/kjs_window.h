@@ -25,31 +25,32 @@
 #include "kjs_binding.h"
 #include <kjs/protect.h>
 #include <wtf/HashMap.h>
+#include <wtf/Noncopyable.h>
 #include <wtf/OwnPtr.h>
 
 namespace WebCore {
 class AtomicString;
 class DOMWindow;
 class Frame;
-class FrameView;
-class JSDOMWindow;
 class JSEventListener;
 class JSUnprotectedEventListener;
-class Node;
 }
 
 namespace KJS {
 
+class DOMWindowTimer;
 class Location;
 class PausedTimeout;
 class ScheduledAction;
 class Window;
 class WindowFunc;
+class WindowPrivate;
 
-class PausedTimeouts {
+class PausedTimeouts : Noncopyable {
  public:
-  PausedTimeouts(PausedTimeout* a, size_t length)
-      : m_array(a), m_length(length) {}
+  PausedTimeouts(PausedTimeout* array, size_t length)
+      : m_array(array), m_length(length) {}
+
   ~PausedTimeouts();
 
   size_t numTimeouts() const { return m_length; }
@@ -62,14 +63,7 @@ class PausedTimeouts {
  private:
   PausedTimeout* m_array;
   size_t m_length;
-
-  PausedTimeouts(const PausedTimeouts&);
-  PausedTimeouts& operator=(const PausedTimeouts&);
 };
-
-class DOMWindowTimer;
-
-class WindowPrivate;
 
 // This is the only WebCore JS binding which does not inherit from DOMObject
 class Window : public JSGlobalObject {
@@ -81,30 +75,31 @@ class Window : public JSGlobalObject {
 
  public:
   virtual ~Window();
+
   WebCore::DOMWindow* impl() const { return m_impl.get(); }
+
   void disconnectFrame();
-  /**
-   * Returns and registers a window object. In case there's already a Window
-   * for the specified frame p this will be returned in order to have unique
-   * bindings.
-   */
+
+  // Returns and registers a window object. In case there's already a Window
+  // for the specified frame p this will be returned in order to have unique
+  // bindings.
   static JSValue* retrieve(WebCore::Frame*);
-  /**
-   * Returns the Window object for a given HTML frame
-   */
+
+  // Returns the Window object for a given HTML frame
   static Window* retrieveWindow(WebCore::Frame*);
-  /**
-   * returns a pointer to the Window object this javascript interpreting
-   * instance
-   * was called from.
-   */
+
+  // Returns a pointer to the Window object this javascript interpreting
+  // instance
+  // was called from.
   static Window* retrieveActive(ExecState*);
+
   virtual void mark();
+
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual void put(ExecState* exec,
+  JSValue* getValueProperty(ExecState*, int token) const;
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValue*,
                    int attr = None);
 
   int installTimeout(const UString& handler, int t, bool singleShot);
@@ -220,22 +215,22 @@ class Window : public JSGlobalObject {
                    const WebCore::AtomicString& eventType,
                    JSValue* func);
 
-  static JSValue* childFrameGetter(ExecState* exec,
+  static JSValue* childFrameGetter(ExecState*,
                                    JSObject*,
                                    const Identifier&,
-                                   const PropertySlot& slot);
-  static JSValue* namedFrameGetter(ExecState* exec,
+                                   const PropertySlot&);
+  static JSValue* namedFrameGetter(ExecState*,
                                    JSObject*,
                                    const Identifier&,
-                                   const PropertySlot& slot);
-  static JSValue* indexGetter(ExecState* exec,
+                                   const PropertySlot&);
+  static JSValue* indexGetter(ExecState*,
                               JSObject*,
                               const Identifier&,
-                              const PropertySlot& slot);
-  static JSValue* namedItemGetter(ExecState* exec,
+                              const PropertySlot&);
+  static JSValue* namedItemGetter(ExecState*,
                                   JSObject*,
                                   const Identifier&,
-                                  const PropertySlot& slot);
+                                  const PropertySlot&);
 
   void clearHelperObjectProperties();
   void clearAllTimeouts();
@@ -266,6 +261,7 @@ class ScheduledAction {
  public:
   ScheduledAction(JSValue* func, const List& args);
   ScheduledAction(const WebCore::String& code) : m_code(code) {}
+
   void execute(Window*);
 
  private:
@@ -275,13 +271,16 @@ class ScheduledAction {
 };
 
 class Location : public DOMObject {
+  friend class Window;
+
  public:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual void put(ExecState* exec,
+  JSValue* getValueProperty(ExecState*, int token) const;
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValue*,
                    int attr = None);
+
   enum {
     Hash,
     Href,
@@ -296,13 +295,15 @@ class Location : public DOMObject {
     ToString,
     Assign
   };
+
   WebCore::Frame* frame() const { return m_frame; }
+
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  private:
-  friend class Window;
   Location(WebCore::Frame*);
+
   WebCore::Frame* m_frame;
 };
 
@@ -319,4 +320,4 @@ namespace WebCore {
 KJS::JSValue* toJS(KJS::ExecState*, DOMWindow*);
 }  // namespace WebCore
 
-#endif
+#endif  // kjs_window_h
