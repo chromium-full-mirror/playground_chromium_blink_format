@@ -213,8 +213,6 @@ class Window : public JSGlobalObject {
     XSLTProcessor_
   };
 
-  void updateLayout() const;
-
  private:
   JSValue* getListener(ExecState*,
                        const WebCore::AtomicString& eventType) const;
@@ -247,18 +245,14 @@ class Window : public JSGlobalObject {
   OwnPtr<WindowPrivate> d;
 };
 
-#define FOR_EACH_CLASS(macro)                                                 \
-  macro(WindowProtoFuncAToB) macro(WindowProtoFuncBToA)                       \
-      macro(WindowProtoFuncOpen) macro(WindowProtoFuncScrollBy)               \
-          macro(WindowProtoFuncScrollTo) macro(WindowProtoFuncMoveBy) macro(  \
-              WindowProtoFuncMoveTo) macro(WindowProtoFuncResizeBy)           \
-              macro(WindowProtoFuncResizeTo) macro(WindowProtoFuncSetTimeout) \
-                  macro(WindowProtoFuncClearTimeout)                          \
-                      macro(WindowProtoFuncSetInterval)                       \
-                          macro(WindowProtoFuncAddEventListener)              \
-                              macro(WindowProtoFuncRemoveEventListener)       \
-                                  macro(WindowProtoFuncShowModalDialog)       \
-                                      macro(WindowProtoFuncNotImplemented)
+#define FOR_EACH_CLASS(macro)                                                  \
+  macro(WindowProtoFuncAToB) macro(WindowProtoFuncBToA)                        \
+      macro(WindowProtoFuncOpen) macro(WindowProtoFuncSetTimeout)              \
+          macro(WindowProtoFuncClearTimeout) macro(WindowProtoFuncSetInterval) \
+              macro(WindowProtoFuncAddEventListener)                           \
+                  macro(WindowProtoFuncRemoveEventListener)                    \
+                      macro(WindowProtoFuncShowModalDialog)                    \
+                          macro(WindowProtoFuncNotImplemented)
 
 FOR_EACH_CLASS(KJS_IMPLEMENT_PROTOTYPE_FUNCTION_WITH_CREATE)
 #undef FOR_EACH_CLASS
