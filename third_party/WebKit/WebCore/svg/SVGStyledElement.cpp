@@ -46,7 +46,9 @@ using namespace SVGNames;
 SVGStyledElement::SVGStyledElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc) {}
 
-SVGStyledElement::~SVGStyledElement() {}
+SVGStyledElement::~SVGStyledElement() {
+  SVGResource::removeClient(this);
+}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGStyledElement,
                               String,
