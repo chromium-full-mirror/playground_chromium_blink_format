@@ -2388,14 +2388,8 @@ int jsRegExpExecute(const JSRegExp* re,
 
     int returnCode = match(start_match, start_code, 2, match_block);
 
-    /* When the result is no match, if the subject's first character was a
-     newline and the PCRE_FIRSTLINE option is set, break (which will return
-     PCRE_ERROR_NOMATCH). The option requests that a match occur before the
-     first
-     newline in the subject. Otherwise, advance the pointer to the next
-     character
-     and continue - but the continuation will actually happen only when the
-     pattern is not anchored. */
+    /* When the result is no match, advance the pointer to the next character
+     and continue. */
 
     if (returnCode == MATCH_NOMATCH) {
       start_match++;

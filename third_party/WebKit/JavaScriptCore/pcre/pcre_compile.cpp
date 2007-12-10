@@ -151,30 +151,34 @@ struct CompileData {
     start_code = 0;
     start_pattern = 0;
     top_backref = 0;
-    backref_map = 0;
+    backrefMap = 0;
     req_varyopt = 0;
     needOuterBracket = false;
   }
   const uschar* start_code;   /* The start of the compiled code */
   const UChar* start_pattern; /* The start of the pattern */
   int top_backref;            /* Maximum back reference */
-  unsigned backref_map;       /* Bitmap of low back refs */
+  unsigned backrefMap;        /* Bitmap of low back refs */
   int req_varyopt;            /* "After variable item" flag for reqbyte */
   bool needOuterBracket;
 };
 
-/* Definition to allow mutual recursion */
+/* Definitions to allow mutual recursion */
 
-static bool compile_bracket(int,
-                            int*,
-                            uschar**,
-                            const UChar**,
-                            const UChar*,
-                            ErrorCode*,
-                            int,
-                            int*,
-                            int*,
-                            CompileData&);
+static bool compileBracket(int,
+                           int*,
+                           uschar**,
+                           const UChar**,
+                           const UChar*,
+                           ErrorCode*,
+                           int,
+                           int*,
+                           int*,
+                           CompileData&);
+static bool bracketIsAnchored(const uschar* code);
+static bool bracketNeedsLineStart(const uschar* code,
+                                  unsigned captureMap,
+                                  unsigned backrefMap);
 
 /*************************************************
 *            Handle escapes                      *
@@ -776,15 +780,15 @@ static inline bool safelyCheckNextChar(const UChar* ptr,
   return ((ptr + 1 < patternEnd) && ptr[1] == expected);
 }
 
-static bool compile_branch(int options,
-                           int* brackets,
-                           uschar** codeptr,
-                           const UChar** ptrptr,
-                           const UChar* patternEnd,
-                           ErrorCode* errorcodeptr,
-                           int* firstbyteptr,
-                           int* reqbyteptr,
-                           CompileData& cd) {
+static bool compileBranch(int options,
+                          int* brackets,
+                          uschar** codeptr,
+                          const UChar** ptrptr,
+                          const UChar* patternEnd,
+                          ErrorCode* errorcodeptr,
+                          int* firstbyteptr,
+                          int* reqbyteptr,
+                          CompileData& cd) {
   int repeat_type, op_type;
   int repeat_min = 0, repeat_max = 0; /* To please picky compilers */
   int bravalue = 0;
@@ -1790,15 +1794,15 @@ static bool compile_branch(int options,
         tempcode = code;
         tempreqvary = cd.req_varyopt; /* Save value before bracket */
 
-        if (!compile_bracket(options, brackets, /* Extracting bracket count */
-                             &tempcode, /* Where to put code (updated) */
-                             &ptr,      /* Input pointer (updated) */
-                             patternEnd,
-                             errorcodeptr,  /* Where to put an error message */
-                             skipbytes,     /* Skip over OP_BRANUMBER */
-                             &subfirstbyte, /* For possible first char */
-                             &subreqbyte,   /* For possible last char */
-                             cd))           /* Tables block */
+        if (!compileBracket(options, brackets, /* Extracting bracket count */
+                            &tempcode,         /* Where to put code (updated) */
+                            &ptr,              /* Input pointer (updated) */
+                            patternEnd,
+                            errorcodeptr,  /* Where to put an error message */
+                            skipbytes,     /* Skip over OP_BRANUMBER */
+                            &subfirstbyte, /* For possible first char */
+                            &subreqbyte,   /* For possible last char */
+                            cd))           /* Tables block */
           goto FAILED;
 
         /* At the end of compiling, code is still pointing to the start of the
@@ -2029,16 +2033,16 @@ Argument:
 Returns:      true on success
 */
 
-static bool compile_bracket(int options,
-                            int* brackets,
-                            uschar** codeptr,
-                            const UChar** ptrptr,
-                            const UChar* patternEnd,
-                            ErrorCode* errorcodeptr,
-                            int skipbytes,
-                            int* firstbyteptr,
-                            int* reqbyteptr,
-                            CompileData& cd) {
+static bool compileBracket(int options,
+                           int* brackets,
+                           uschar** codeptr,
+                           const UChar** ptrptr,
+                           const UChar* patternEnd,
+                           ErrorCode* errorcodeptr,
+                           int skipbytes,
+                           int* firstbyteptr,
+                           int* reqbyteptr,
+                           CompileData& cd) {
   const UChar* ptr = *ptrptr;
   uschar* code = *codeptr;
   uschar* last_branch = code;
@@ -2058,8 +2062,8 @@ static bool compile_bracket(int options,
 
     int branchfirstbyte = REQ_UNSET;
     int branchreqbyte = REQ_UNSET;
-    if (!compile_branch(options, brackets, &code, &ptr, patternEnd,
-                        errorcodeptr, &branchfirstbyte, &branchreqbyte, cd)) {
+    if (!compileBranch(options, brackets, &code, &ptr, patternEnd, errorcodeptr,
+                       &branchfirstbyte, &branchreqbyte, cd)) {
       *ptrptr = ptr;
       return false;
     }
@@ -2158,65 +2162,33 @@ static bool compile_bracket(int options,
 *************************************************/
 
 /* Try to find out if this is an anchored regular expression. Consider each
-alternative branch. If they all start with OP_SOD or OP_CIRC, or with a bracket
-all of whose alternatives start with OP_SOD or OP_CIRC (recurse ad lib), then
-it's anchored. However, if this is a multiline pattern, then only OP_SOD
-counts, since OP_CIRC can match in the middle.
-
-We can also consider a regex to be anchored if OP_SOM starts all its branches.
-This is the code for \G, which means "match at start of match position, taking
-into account the match offset".
-
-A branch is also implicitly anchored if it starts with .* and DOTALL is set,
-because that will try the rest of the pattern at all possible matching points,
-so there is no point trying again.... er ....
-
-.... except when the .* appears inside capturing parentheses, and there is a
-subsequent back reference to those parentheses. We haven't enough information
-to catch that case precisely.
-
-At first, the best we could do was to detect when .* was in capturing brackets
-and the highest back reference was greater than or equal to that level.
-However, by keeping a bitmap of the first 31 back references, we can catch some
-of the more common cases more precisely.
+alternative branch. If they all start OP_CIRC, or with a bracket
+all of whose alternatives start OP_CIRC (recurse ad lib), then
+it's anchored.
 
 Arguments:
-  code           points to start of expression (the bracket)
-  options        points to the options setting
-  bracket_map    a bitmap of which brackets we are inside while testing; this
-                  handles up to substring 31; after that we just have to take
-                  the less precise approach
-  backref_map    the back reference bitmap
-
-Returns:     true or false
+  code          points to start of expression (the bracket)
+  captureMap    a bitmap of which brackets we are inside while testing; this
+                 handles up to substring 31; all brackets after that share
+                 the zero bit
+  backrefMap    the back reference bitmap
 */
 
-static bool is_anchored(const uschar* code,
-                        int options,
-                        unsigned bracket_map,
-                        unsigned backref_map) {
+static bool branchIsAnchored(const uschar* code) {
+  const uschar* scode = firstSignificantOpCode(code);
+  int op = *scode;
+
+  /* Brackets */
+  if (op >= OP_BRA || op == OP_ASSERT || op == OP_ONCE)
+    return bracketIsAnchored(scode);
+
+  /* Check for explicit anchoring */
+  return op == OP_CIRC;
+}
+
+static bool bracketIsAnchored(const uschar* code) {
   do {
-    const uschar* scode = firstSignificantOpCode(code + 1 + LINK_SIZE);
-    int op = *scode;
-
-    /* Capturing brackets */
-    if (op > OP_BRA) {
-      op -= OP_BRA;
-      if (op > EXTRACT_BASIC_MAX)
-        op = get2ByteOpcodeValueAtOffset(scode, 2 + LINK_SIZE);
-      int new_map = bracket_map | ((op < 32) ? (1 << op) : 1);
-      if (!is_anchored(scode, options, new_map, backref_map))
-        return false;
-    }
-
-    /* Other brackets */
-    else if (op == OP_BRA || op == OP_ASSERT || op == OP_ONCE) {
-      if (!is_anchored(scode, options, bracket_map, backref_map))
-        return false;
-
-      /* Check for explicit anchoring */
-
-    } else if ((options & MatchAcrossMultipleLinesOption) || op != OP_CIRC)
+    if (!branchIsAnchored(code + 1 + LINK_SIZE))
       return false;
     code += getOpcodeValueAtOffset(code, 1);
   } while (*code == OP_ALT); /* Loop for each alternative */
@@ -2230,51 +2202,56 @@ static bool is_anchored(const uschar* code,
 /* This is called to find out if every branch starts with ^ or .* so that
 "first char" processing can be done to speed things up in multiline
 matching and for non-DOTALL patterns that start with .* (which must start at
-the beginning or after \n). As in the case of is_anchored() (see above), we
-have to take account of back references to capturing brackets that contain .*
-because in that case we can't make the assumption.
+the beginning or after \n)
+
+Except when the .* appears inside capturing parentheses, and there is a
+subsequent back reference to those parentheses. By keeping a bitmap of the
+first 31 back references, we can catch some of the more common cases more
+precisely; all the greater back references share a single bit.
 
 Arguments:
-  code           points to start of expression (the bracket)
-  bracket_map    a bitmap of which brackets we are inside while testing; this
-                  handles up to substring 31; after that we just have to take
-                  the less precise approach
-  backref_map    the back reference bitmap
+  code          points to start of expression (the bracket)
+  captureMap    a bitmap of which brackets we are inside while testing; this
+                 handles up to substring 31; all brackets after that share
+                 the zero bit
+  backrefMap    the back reference bitmap
 */
 
-static bool canApplyFirstCharOptimization(const uschar* code,
-                                          unsigned bracket_map,
-                                          unsigned backref_map) {
+static bool branchNeedsLineStart(const uschar* code,
+                                 unsigned captureMap,
+                                 unsigned backrefMap) {
+  const uschar* scode = firstSignificantOpCode(code);
+  int op = *scode;
+
+  /* Capturing brackets */
+  if (op > OP_BRA) {
+    int captureNum = op - OP_BRA;
+    if (captureNum > EXTRACT_BASIC_MAX)
+      captureNum = get2ByteOpcodeValueAtOffset(scode, 2 + LINK_SIZE);
+    int bracketMask = (captureNum < 32) ? (1 << captureNum) : 1;
+    return bracketNeedsLineStart(scode, captureMap | bracketMask, backrefMap);
+  }
+
+  /* Other brackets */
+  if (op == OP_BRA || op == OP_ASSERT || op == OP_ONCE)
+    return bracketNeedsLineStart(scode, captureMap, backrefMap);
+
+  /* .* means "start at start or after \n" if it isn't in brackets that
+   may be referenced. */
+
+  if (op == OP_TYPESTAR || op == OP_TYPEMINSTAR)
+    return scode[1] == OP_NOT_NEWLINE && !(captureMap & backrefMap);
+
+  /* Explicit ^ */
+  return op == OP_CIRC;
+}
+
+static bool bracketNeedsLineStart(const uschar* code,
+                                  unsigned captureMap,
+                                  unsigned backrefMap) {
   do {
-    const uschar* scode = firstSignificantOpCode(code + 1 + LINK_SIZE);
-    int op = *scode;
-
-    /* Capturing brackets */
-    if (op > OP_BRA) {
-      op -= OP_BRA;
-      if (op > EXTRACT_BASIC_MAX)
-        op = get2ByteOpcodeValueAtOffset(scode, 2 + LINK_SIZE);
-      int new_map = bracket_map | ((op < 32) ? (1 << op) : 1);
-      if (!canApplyFirstCharOptimization(scode, new_map, backref_map))
-        return false;
-    }
-
-    /* Other brackets */
-    else if (op == OP_BRA || op == OP_ASSERT || op == OP_ONCE) {
-      if (!canApplyFirstCharOptimization(scode, bracket_map, backref_map))
-        return false;
-
-      /* .* means "start at start or after \n" if it isn't in brackets that
-       may be referenced. */
-
-    } else if (op == OP_TYPESTAR || op == OP_TYPEMINSTAR) {
-      if (scode[1] != OP_NOT_NEWLINE || (bracket_map & backref_map))
-        return false;
-    } else if (op != OP_CIRC) /* Check for explicit circumflex */
+    if (!branchNeedsLineStart(code + 1 + LINK_SIZE, captureMap, backrefMap))
       return false;
-
-    /* Move on to the next alternative */
-
     code += getOpcodeValueAtOffset(code, 1);
   } while (*code == OP_ALT); /* Loop for each alternative */
   return true;
@@ -2421,7 +2398,7 @@ static int calculateCompiledPatternLengthAndFlags(
 
         if (c <= -ESC_REF) {
           int refnum = -c - ESC_REF;
-          cd.backref_map |= (refnum < 32) ? (1 << refnum) : 1;
+          cd.backrefMap |= (refnum < 32) ? (1 << refnum) : 1;
           if (refnum > cd.top_backref)
             cd.top_backref = refnum;
           length += 2; /* For single back reference */
@@ -2954,8 +2931,8 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    are
    passed around in the compile data block. */
 
-  const uschar* codestart = (const uschar*)(re + 1);
-  cd.start_code = codestart;
+  const uschar* codeStart = (const uschar*)(re + 1);
+  cd.start_code = codeStart;
   cd.start_pattern = (const UChar*)pattern;
 
   /* Set up a starting, non-extracting bracket, then compile the expression. On
@@ -2964,16 +2941,16 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
 
   const UChar* ptr = (const UChar*)pattern;
   const UChar* patternEnd = pattern + patternLength;
-  uschar* code = (uschar*)codestart;
+  uschar* code = (uschar*)codeStart;
   int firstbyte, reqbyte;
   int bracketCount = 0;
   if (!cd.needOuterBracket)
-    compile_branch(re->options, &bracketCount, &code, &ptr, patternEnd,
-                   &errorcode, &firstbyte, &reqbyte, cd);
+    compileBranch(re->options, &bracketCount, &code, &ptr, patternEnd,
+                  &errorcode, &firstbyte, &reqbyte, cd);
   else {
     *code = OP_BRA;
-    compile_bracket(re->options, &bracketCount, &code, &ptr, patternEnd,
-                    &errorcode, 0, &firstbyte, &reqbyte, cd);
+    compileBracket(re->options, &bracketCount, &code, &ptr, patternEnd,
+                   &errorcode, 0, &firstbyte, &reqbyte, cd);
   }
   re->top_bracket = bracketCount;
   re->top_backref = cd.top_backref;
@@ -2988,8 +2965,8 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
 
   *code++ = OP_END;
 
-  ASSERT(code - codestart <= length);
-  if (code - codestart > length)
+  ASSERT(code - codeStart <= length);
+  if (code - codeStart > length)
     errorcode = ERR7;
 
   /* Give an error if there's back reference to a non-existent capturing
@@ -3020,13 +2997,13 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    matches.
    */
 
-  if (is_anchored(codestart, re->options, 0, cd.backref_map))
+  if (cd.needOuterBracket ? bracketIsAnchored(codeStart)
+                          : branchIsAnchored(codeStart))
     re->options |= IsAnchoredOption;
   else {
     if (firstbyte < 0)
-      firstbyte = find_firstassertedchar(codestart, re->options, false);
-    if (firstbyte >= 0) /* Remove caseless flag for non-caseable chars */
-    {
+      firstbyte = find_firstassertedchar(codeStart, re->options, false);
+    if (firstbyte >= 0) {
       int ch = firstbyte & 255;
       if (ch < 127) {
         re->first_byte = ((firstbyte & REQ_IGNORE_CASE) && flipCase(ch) == ch)
@@ -3034,8 +3011,12 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
                              : firstbyte;
         re->options |= UseFirstByteOptimizationOption;
       }
-    } else if (canApplyFirstCharOptimization(codestart, 0, cd.backref_map))
-      re->options |= UseMultiLineFirstByteOptimizationOption;
+    } else {
+      if (cd.needOuterBracket
+              ? bracketNeedsLineStart(codeStart, 0, cd.backrefMap)
+              : branchNeedsLineStart(codeStart, 0, cd.backrefMap))
+        re->options |= UseMultiLineFirstByteOptimizationOption;
+    }
   }
 
   /* For an anchored pattern, we use the "required byte" only if it follows a
