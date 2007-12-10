@@ -4324,13 +4324,11 @@ Completion TryNode::execute(ExecState* exec) {
 
 FunctionBodyNode::FunctionBodyNode(SourceElements* children)
     : BlockNode(children),
-      m_sourceURL(lexer().sourceURL()),
+      m_sourceURL(parser().sourceURL()),
       m_sourceId(parser().sourceId()),
       m_initializedDeclarationStacks(false),
       m_initializedSymbolTable(false),
-      m_optimizedResolveNodes(false) {
-  setLoc(-1, -1);
-}
+      m_optimizedResolveNodes(false) {}
 
 void FunctionBodyNode::initializeDeclarationStacks(ExecState* exec) {
   DeclarationStacks::NodeStack nodeStack;

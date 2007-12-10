@@ -34,14 +34,10 @@ class RegExp;
 
 class Lexer : Noncopyable {
  public:
-  void setCode(const UString& sourceURL,
-               int startingLineNumber,
-               const UChar* c,
-               unsigned int len);
+  void setCode(int startingLineNumber, const UChar* c, unsigned int len);
   int lex();
 
   int lineNo() const { return yylineno; }
-  UString sourceURL() const { return m_sourceURL; }
 
   bool prevTerminator() const { return terminator; }
 
@@ -95,7 +91,6 @@ class Lexer : Noncopyable {
   Lexer();
 
   int yylineno;
-  UString m_sourceURL;
   bool done;
   Vector<char> m_buffer8;
   Vector<UChar> m_buffer16;
