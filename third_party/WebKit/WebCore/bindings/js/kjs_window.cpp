@@ -323,40 +323,6 @@ static HashMap<String, String> parseModalDialogFeatures(
   return map;
 }
 
-static bool boolFeature(const HashMap<String, String>& features,
-                        const char* key,
-                        bool defaultValue = false) {
-  HashMap<String, String>::const_iterator it = features.find(key);
-  if (it == features.end())
-    return defaultValue;
-  const String& value = it->second;
-  return value.isNull() || value == "1" || value == "yes" || value == "on";
-}
-
-static float floatFeature(const HashMap<String, String>& features,
-                          const char* key,
-                          float min,
-                          float max,
-                          float defaultValue) {
-  HashMap<String, String>::const_iterator it = features.find(key);
-  if (it == features.end())
-    return defaultValue;
-  // FIXME: Can't distinguish "0q" from string with no digits in it -- both
-  // return d == 0 and ok == false.
-  // Would be good to tell them apart somehow since string with no digits should
-  // be default value and
-  // "0q" should be minimum value.
-  bool ok;
-  double d = it->second.toDouble(&ok);
-  if ((d == 0 && !ok) || isnan(d))
-    return defaultValue;
-  if (d < min || max <= min)
-    return min;
-  if (d > max)
-    return max;
-  return static_cast<int>(d);
-}
-
 static Frame* createWindow(ExecState* exec,
                            Frame* openerFrame,
                            const String& url,
@@ -453,29 +419,31 @@ static JSValue* showModalDialog(ExecState* exec,
   // - help: boolFeature(features, "help", true), makes help icon appear in
   // dialog (what does it do on Windows?)
   // - unadorned: trusted && boolFeature(features, "unadorned");
+
   if (!frame)
     return jsUndefined();
 
   FloatRect screenRect = screenAvailableRect(frame->view());
 
   WindowFeatures wargs;
-  wargs.width = floatFeature(
+  wargs.width = WindowFeatures::floatFeature(
       features, "dialogwidth", 100, screenRect.width(),
       620);  // default here came from frame size of dialog in MacIE
   wargs.widthSet = true;
-  wargs.height = floatFeature(
+  wargs.height = WindowFeatures::floatFeature(
       features, "dialogheight", 100, screenRect.height(),
       450);  // default here came from frame size of dialog in MacIE
   wargs.heightSet = true;
 
-  wargs.x = floatFeature(features, "dialogleft", screenRect.x(),
-                         screenRect.right() - wargs.width, -1);
+  wargs.x = WindowFeatures::floatFeature(features, "dialogleft", screenRect.x(),
+                                         screenRect.right() - wargs.width, -1);
   wargs.xSet = wargs.x > 0;
-  wargs.y = floatFeature(features, "dialogtop", screenRect.y(),
-                         screenRect.bottom() - wargs.height, -1);
+  wargs.y =
+      WindowFeatures::floatFeature(features, "dialogtop", screenRect.y(),
+                                   screenRect.bottom() - wargs.height, -1);
   wargs.ySet = wargs.y > 0;
 
-  if (boolFeature(features, "center", true)) {
+  if (WindowFeatures::boolFeature(features, "center", true)) {
     if (!wargs.xSet) {
       wargs.x = screenRect.x() + (screenRect.width() - wargs.width) / 2;
       wargs.xSet = true;
@@ -487,9 +455,11 @@ static JSValue* showModalDialog(ExecState* exec,
   }
 
   wargs.dialog = true;
-  wargs.resizable = boolFeature(features, "resizable");
-  wargs.scrollbarsVisible = boolFeature(features, "scroll", true);
-  wargs.statusBarVisible = boolFeature(features, "status", !trusted);
+  wargs.resizable = WindowFeatures::boolFeature(features, "resizable");
+  wargs.scrollbarsVisible =
+      WindowFeatures::boolFeature(features, "scroll", true);
+  wargs.statusBarVisible =
+      WindowFeatures::boolFeature(features, "status", !trusted);
   wargs.menuBarVisible = false;
   wargs.toolBarVisible = false;
   wargs.locationBarVisible = false;
@@ -1071,141 +1041,6 @@ Event* Window::currentEvent() {
   return d->m_evt;
 }
 
-static void setWindowFeature(const String& keyString,
-                             const String& valueString,
-                             WindowFeatures& windowFeatures) {
-  int value;
-
-  if (valueString.length() ==
-          0 ||  // listing a key with no value is shorthand for key=yes
-      valueString == "yes")
-    value = 1;
-  else
-    value = valueString.toInt();
-
-  // We ignore a keyString of "resizable", which is consistent with Firefox.
-  if (keyString == "left" || keyString == "screenx") {
-    windowFeatures.xSet = true;
-    windowFeatures.x = value;
-  } else if (keyString == "top" || keyString == "screeny") {
-    windowFeatures.ySet = true;
-    windowFeatures.y = value;
-  } else if (keyString == "width" || keyString == "innerwidth") {
-    windowFeatures.widthSet = true;
-    windowFeatures.width = value;
-  } else if (keyString == "height" || keyString == "innerheight") {
-    windowFeatures.heightSet = true;
-    windowFeatures.height = value;
-  } else if (keyString == "menubar")
-    windowFeatures.menuBarVisible = value;
-  else if (keyString == "toolbar")
-    windowFeatures.toolBarVisible = value;
-  else if (keyString == "location")
-    windowFeatures.locationBarVisible = value;
-  else if (keyString == "status")
-    windowFeatures.statusBarVisible = value;
-  else if (keyString == "fullscreen")
-    windowFeatures.fullscreen = value;
-  else if (keyString == "scrollbars")
-    windowFeatures.scrollbarsVisible = value;
-}
-
-// Though isspace() considers \t and \v to be whitespace, Win IE doesn't.
-static bool isSeparator(::UChar c) {
-  return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '=' ||
-         c == ',' || c == '\0';
-}
-
-static void parseWindowFeatures(const String& features,
-                                WindowFeatures& windowFeatures) {
-  /*
-   The IE rule is: all features except for channelmode and fullscreen default to
-   YES, but
-   if the user specifies a feature string, all features default to NO. (There is
-   no public
-   standard that applies to this method.)
-
-   <http://msdn.microsoft.com/workshop/author/dhtml/reference/methods/open_0.asp>
-   We always allow a window to be resized, which is consistent with Firefox.
-   */
-
-  windowFeatures.dialog = false;
-  windowFeatures.fullscreen = false;
-
-  windowFeatures.xSet = false;
-  windowFeatures.ySet = false;
-  windowFeatures.widthSet = false;
-  windowFeatures.heightSet = false;
-
-  if (features.length() == 0) {
-    windowFeatures.menuBarVisible = true;
-    windowFeatures.statusBarVisible = true;
-    windowFeatures.toolBarVisible = true;
-    windowFeatures.locationBarVisible = true;
-    windowFeatures.scrollbarsVisible = true;
-    windowFeatures.resizable = true;
-
-    return;
-  }
-
-  windowFeatures.menuBarVisible = false;
-  windowFeatures.statusBarVisible = false;
-  windowFeatures.toolBarVisible = false;
-  windowFeatures.locationBarVisible = false;
-  windowFeatures.scrollbarsVisible = false;
-  windowFeatures.resizable = true;
-
-  // Tread lightly in this code -- it was specifically designed to mimic Win
-  // IE's parsing behavior.
-  int keyBegin, keyEnd;
-  int valueBegin, valueEnd;
-
-  int i = 0;
-  int length = features.length();
-  String buffer = features.lower();
-  while (i < length) {
-    // skip to first non-separator, but don't skip past the end of the string
-    while (isSeparator(buffer[i])) {
-      if (i >= length)
-        break;
-      i++;
-    }
-    keyBegin = i;
-
-    // skip to first separator
-    while (!isSeparator(buffer[i]))
-      i++;
-    keyEnd = i;
-
-    // skip to first '=', but don't skip past a ',' or the end of the string
-    while (buffer[i] != '=') {
-      if (buffer[i] == ',' || i >= length)
-        break;
-      i++;
-    }
-
-    // skip to first non-separator, but don't skip past a ',' or the end of the
-    // string
-    while (isSeparator(buffer[i])) {
-      if (buffer[i] == ',' || i >= length)
-        break;
-      i++;
-    }
-    valueBegin = i;
-
-    // skip to first separator
-    while (!isSeparator(buffer[i]))
-      i++;
-    valueEnd = i;
-
-    ASSERT(i <= length);
-
-    String keyString(buffer.substring(keyBegin, keyEnd - keyBegin));
-    String valueString(buffer.substring(valueBegin, valueEnd - valueBegin));
-    setWindowFeature(keyString, valueString, windowFeatures);
-  }
-}
-
 JSValue* WindowProtoFuncAToB::callAsFunction(ExecState* exec,
                                              JSObject* thisObj,
                                              const List& args) {
@@ -1325,9 +1160,8 @@ JSValue* WindowProtoFuncOpen::callAsFunction(ExecState* exec,
 
   // In the case of a named frame or a new window, we'll use the createWindow()
   // helper
-  WindowFeatures windowFeatures;
-  String features = valueToStringWithUndefinedOrNullCheck(exec, args[2]);
-  parseWindowFeatures(features, windowFeatures);
+  WindowFeatures windowFeatures(
+      valueToStringWithUndefinedOrNullCheck(exec, args[2]));
   FloatRect windowRect(windowFeatures.x, windowFeatures.y, windowFeatures.width,
                        windowFeatures.height);
   WebCore::DOMWindow::adjustWindowRect(
@@ -1701,7 +1535,7 @@ DontEnum|DontDelete|Function 0
 @end
 */
 
-Location::Location(Frame* p) : m_frame(p) {}
+Location::Location(Frame* frame) : m_frame(frame) {}
 
 JSValue* Location::getValueProperty(ExecState* exec, int token) const {
   KURL url = m_frame->loader()->url();
@@ -1733,7 +1567,7 @@ JSValue* Location::getValueProperty(ExecState* exec, int token) const {
     case Search:
       return jsString(url.query());
     default:
-      ASSERT(0);
+      ASSERT_NOT_REACHED();
       return jsUndefined();
   }
 }
@@ -1761,16 +1595,19 @@ bool Location::getOwnPropertySlot(ExecState* exec,
                                                    propertyName, slot);
 }
 
-void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
+void Location::put(ExecState* exec,
+                   const Identifier& propertyName,
+                   JSValue* value,
+                   int attr) {
   if (!m_frame)
     return;
 
-  DeprecatedString str = v->toString(exec);
+  DeprecatedString str = value->toString(exec);
   KURL url = m_frame->loader()->url();
   const Window* window = Window::retrieveWindow(m_frame);
   bool sameDomainAccess = window && window->allowsAccessFrom(exec);
 
-  const HashEntry* entry = Lookup::findEntry(&LocationTable, p);
+  const HashEntry* entry = Lookup::findEntry(&LocationTable, propertyName);
 
   if (entry) {
     // cross-domain access to the location is allowed when assigning the whole
@@ -1794,10 +1631,8 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
       case Hash: {
         if (str.startsWith("#"))
           str = str.mid(1);
-
         if (url.ref() == str)
           return;
-
         url.setRef(str);
         break;
       }
@@ -1828,7 +1663,7 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
     }
   } else {
     if (sameDomainAccess)
-      JSObject::put(exec, p, v, attr);
+      JSObject::put(exec, propertyName, value, attr);
     return;
   }
 
@@ -1851,18 +1686,18 @@ JSValue* LocationProtoFuncReplace::callAsFunction(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  Frame* p = Window::retrieveActive(exec)->impl()->frame();
-  if (p) {
-    if (!p->loader()->shouldAllowNavigation(frame))
+  Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
+  if (activeFrame) {
+    if (!activeFrame->loader()->shouldAllowNavigation(frame))
       return jsUndefined();
     DeprecatedString str = args[0]->toString(exec);
     const Window* window = Window::retrieveWindow(frame);
     if (!str.startsWith("javascript:", false) ||
         (window && window->allowsAccessFrom(exec))) {
-      bool userGesture = p->scriptProxy()->processingUserGesture();
+      bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
       frame->loader()->scheduleLocationChange(
-          p->loader()->completeURL(str).url(), p->loader()->outgoingReferrer(),
-          true, userGesture);
+          activeFrame->loader()->completeURL(str).url(),
+          activeFrame->loader()->outgoingReferrer(), true, userGesture);
     }
   }
 
@@ -1905,21 +1740,22 @@ JSValue* LocationProtoFuncAssign::callAsFunction(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  Frame* p = Window::retrieveActive(exec)->impl()->frame();
-  if (p) {
-    if (!p->loader()->shouldAllowNavigation(frame))
+  Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
+  if (activeFrame) {
+    if (!activeFrame->loader()->shouldAllowNavigation(frame))
       return jsUndefined();
     const Window* window = Window::retrieveWindow(frame);
     DeprecatedString dstUrl =
-        p->loader()
+        activeFrame->loader()
             ->completeURL(DeprecatedString(args[0]->toString(exec)))
             .url();
     if (!dstUrl.startsWith("javascript:", false) ||
         (window && window->allowsAccessFrom(exec))) {
-      bool userGesture = p->scriptProxy()->processingUserGesture();
+      bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
       // We want a new history item if this JS was called via a user gesture
       frame->loader()->scheduleLocationChange(
-          dstUrl, p->loader()->outgoingReferrer(), false, userGesture);
+          dstUrl, activeFrame->loader()->outgoingReferrer(), false,
+          userGesture);
     }
   }
 
@@ -1936,16 +1772,10 @@ JSValue* LocationProtoFuncToString::callAsFunction(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  Window* window = Window::retrieveWindow(frame);
-  if (!window->allowsAccessFrom(exec))
-    return jsUndefined();
-
-  if (!frame || !Window::retrieveWindow(frame)->allowsAccessFrom(exec))
-    return jsString();
-
-  if (!frame->loader()->url().hasPath())
-    return jsString(frame->loader()->url().prettyURL() + "/");
-  return jsString(frame->loader()->url().prettyURL());
+  const KURL& url = frame->loader()->url();
+  if (!url.hasPath())
+    return jsString(url.prettyURL() + "/");
+  return jsString(url.prettyURL());
 }
 
 /////////////////////////////////////////////////////////////////////////////
