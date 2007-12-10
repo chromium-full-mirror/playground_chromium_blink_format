@@ -113,7 +113,7 @@ void Parser::parse(int startingLineNumber,
 Parser& parser() {
   ASSERT(JSLock::currentThreadIsHoldingLock());
 
-  static Parser staticParser;
+  static Parser& staticParser = *new Parser;
   return staticParser;
 }
 
