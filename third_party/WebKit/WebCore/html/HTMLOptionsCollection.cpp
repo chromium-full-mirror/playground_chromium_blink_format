@@ -64,6 +64,10 @@ void HTMLOptionsCollection::add(PassRefPtr<HTMLOptionElement> element,
   ASSERT(ec == 0);
 }
 
+void HTMLOptionsCollection::remove(int index) {
+  static_cast<HTMLSelectElement*>(base())->remove(index);
+}
+
 int HTMLOptionsCollection::selectedIndex() const {
   return static_cast<HTMLSelectElement*>(base())->selectedIndex();
 }
