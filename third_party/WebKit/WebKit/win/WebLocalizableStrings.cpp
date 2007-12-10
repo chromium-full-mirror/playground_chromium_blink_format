@@ -44,11 +44,17 @@ using namespace WebCore;
 WebLocalizableStringsBundle WebKitLocalizableStringsBundle = {
     "com.apple.WebKit", 0};
 
-static CFBundleRef localizedStringsMainBundle;
 static HashMap<String, String> mainBundleLocStrings;
 static HashMap<String, String> frameworkLocStrings;
 
 static CFBundleRef createWebKitBundle() {
+  static CFBundleRef bundle;
+  static bool initialized;
+
+  if (initialized)
+    return bundle;
+  initialized = true;
+
   WCHAR pathStr[MAX_PATH];
   DWORD length = ::GetModuleFileNameW(gInstance, pathStr, MAX_PATH);
   if (!length ||
@@ -86,17 +92,27 @@ static CFBundleRef createWebKitBundle() {
   if (!bundleURLRef)
     return 0;
 
-  CFBundleRef bundle = CFBundleCreate(0, bundleURLRef);
+  bundle = CFBundleCreate(0, bundleURLRef);
   CFRelease(bundleURLRef);
   return bundle;
 }
 
-void SetWebLocalizedStringMainBundle(CFBundleRef bundle) {
-  if (bundle)
-    CFRetain(bundle);
-  if (localizedStringsMainBundle)
-    CFRelease(localizedStringsMainBundle);
-  localizedStringsMainBundle = bundle;
+static CFBundleRef cfBundleForStringsBundle(
+    WebLocalizableStringsBundle* stringsBundle) {
+  if (!stringsBundle) {
+    static CFBundleRef mainBundle = CFBundleGetMainBundle();
+    return mainBundle;
+  }
+
+  createWebKitBundle();
+
+  if (!stringsBundle->bundle)
+    stringsBundle->bundle = CFBundleGetBundleWithIdentifier(
+        RetainPtr<CFStringRef>(
+            AdoptCF, CFStringCreateWithCString(0, stringsBundle->identifier,
+                                               kCFStringEncodingASCII))
+            .get());
+  return stringsBundle->bundle;
 }
 
 static CFStringRef copyLocalizedStringFromBundle(
@@ -104,24 +120,9 @@ static CFStringRef copyLocalizedStringFromBundle(
     const String& key) {
   static CFStringRef notFound = CFSTR("localized string not found");
 
-  CFBundleRef bundle;
-  if (!stringsBundle) {
-    static CFBundleRef mainBundle;
-    if (!mainBundle) {
-      mainBundle = localizedStringsMainBundle;
-      if (!mainBundle)
-        return notFound;
-    }
-    bundle = mainBundle;
-  } else {
-    bundle = stringsBundle->bundle;
-    if (!bundle) {
-      bundle = createWebKitBundle();
-      if (!bundle)
-        return notFound;
-      stringsBundle->bundle = bundle;
-    }
-  }
+  CFBundleRef bundle = cfBundleForStringsBundle(stringsBundle);
+  if (!bundle)
+    return notFound;
 
   RetainPtr<CFStringRef> keyString(AdoptCF, key.createCFString());
   CFStringRef result = CFCopyLocalizedStringWithDefaultValue(
@@ -158,10 +159,12 @@ static bool findCachedString(WebLocalizableStringsBundle* stringsBundle,
 static void cacheString(WebLocalizableStringsBundle* stringsBundle,
                         const String& key,
                         const String& value) {
-  if (!stringsBundle)
+  if (!stringsBundle) {
     mainBundleLocStrings.set(key, value);
-  else if (stringsBundle)
-    frameworkLocStrings.set(key, value);
+    return;
+  }
+
+  frameworkLocStrings.set(key, value);
 }
 
 static CFStringRef localizedString(WebLocalizableStringsBundle* stringsBundle,
@@ -233,3 +236,5 @@ LPCTSTR WebLocalizedLPCTSTR(WebLocalizableStringsBundle* stringsBundle,
 
   return localizedLPCTSTR(stringsBundle, String(key));
 }
+
+void SetWebLocalizedStringMainBundle(CFBundleRef) {}
