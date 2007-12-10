@@ -854,6 +854,12 @@ void GraphicsContext::setPlatformFillColor(const Color& color) {
     return;
   setCGFillColor(platformContext(), color);
 }
+
+void GraphicsContext::setUseAntialiasing(bool enable) {
+  if (paintingDisabled())
+    return;
+  CGContextSetShouldAntialias(platformContext(), enable);
+}
 }
 
 #endif  // PLATFORM(CG)

@@ -256,6 +256,8 @@ class GraphicsContext : Noncopyable {
 
   void concatCTM(const AffineTransform&);
 
+  void setUseAntialiasing(bool = true);
+
 #if PLATFORM(WIN)
   GraphicsContext(HDC);  // FIXME: To be removed.
   HDC getWindowsContext(bool supportAlphaBlend = false,

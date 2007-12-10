@@ -852,6 +852,12 @@ IntPoint GraphicsContext::translatePoint(const IntPoint& point) const {
 }
 #endif
 
+void GraphicsContext::setUseAntialiasing(bool enable) {
+  if (paintingDisabled())
+    return;
+  notImplemented();
+}
+
 }  // namespace WebCore
 
 #endif  // PLATFORM(CAIRO)
