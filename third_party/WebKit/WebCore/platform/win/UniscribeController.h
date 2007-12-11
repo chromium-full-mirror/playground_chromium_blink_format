@@ -54,11 +54,11 @@ class UniscribeController {
 
   void itemizeShapeAndPlace(const UChar*,
                             unsigned length,
-                            bool smallCaps,
-                            GlyphBuffer* glyphBuffer);
+                            const FontData*,
+                            GlyphBuffer*);
   bool shapeAndPlaceItem(const UChar*,
                          unsigned index,
-                         bool smallCaps,
+                         const FontData*,
                          GlyphBuffer*);
   bool shape(const UChar* str,
              int len,
