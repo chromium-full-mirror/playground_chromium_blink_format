@@ -139,7 +139,7 @@ JSValue* FunctionImp::lengthGetter(ExecState*,
                                    const Identifier&,
                                    const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
-  return jsNumber(thisObj->body->numParams());
+  return jsNumber(thisObj->body->parameters().size());
 }
 
 bool FunctionImp::getOwnPropertySlot(ExecState* exec,
@@ -193,7 +193,7 @@ bool FunctionImp::deleteProperty(ExecState* exec,
 Identifier FunctionImp::getParameterName(int index) {
   Vector<Identifier>& parameters = body->parameters();
 
-  if (static_cast<size_t>(index) >= body->numParams())
+  if (static_cast<size_t>(index) >= body->parameters().size())
     return CommonIdentifiers::shared()->nullIdentifier;
 
   Identifier name = parameters[index];
@@ -732,7 +732,7 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
         int sourceId;
         int errLine;
         UString errMsg;
-        RefPtr<ProgramNode> progNode(parser().parse<ProgramNode>(
+        RefPtr<EvalNode> progNode(parser().parse<EvalNode>(
             UString(), 0, s.data(), s.size(), &sourceId, &errLine, &errMsg));
 
         Debugger* dbg = exec->dynamicGlobalObject()->debugger();

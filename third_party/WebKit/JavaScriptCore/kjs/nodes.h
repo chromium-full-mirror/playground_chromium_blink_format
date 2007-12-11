@@ -2409,49 +2409,60 @@ class ParameterNode : public Node {
   ListRefPtr<ParameterNode> next;
 };
 
-// inherited by ProgramNode
-class FunctionBodyNode : public BlockNode {
+class ScopeNode : public BlockNode {
  public:
-  FunctionBodyNode(SourceElements* children) KJS_FAST_CALL;
+  ScopeNode(SourceElements*) KJS_FAST_CALL;
+
   int sourceId() KJS_FAST_CALL { return m_sourceId; }
   const UString& sourceURL() KJS_FAST_CALL { return m_sourceURL; }
 
-  virtual Completion execute(ExecState*) KJS_FAST_CALL;
+ protected:
+  void initializeDeclarationStacks(ExecState*) KJS_FAST_CALL;
 
-  SymbolTable& symbolTable() { return m_symbolTable; }
-
-  void addParam(const Identifier& ident) KJS_FAST_CALL;
-  size_t numParams() const KJS_FAST_CALL { return m_parameters.size(); }
-  Identifier paramName(size_t pos) const KJS_FAST_CALL {
-    return m_parameters[pos];
-  }
-  UString paramString() const KJS_FAST_CALL;
-  Vector<Identifier>& parameters() KJS_FAST_CALL { return m_parameters; }
-  ALWAYS_INLINE void processDeclarations(ExecState*);
-  ALWAYS_INLINE void processDeclarationsForFunctionCode(ExecState*);
-  ALWAYS_INLINE void processDeclarationsForProgramCode(ExecState*);
+  DeclarationStacks::VarStack m_varStack;
+  DeclarationStacks::FunctionStack m_functionStack;
 
  private:
   UString m_sourceURL;
   int m_sourceId;
+};
 
-  void initializeDeclarationStacks(ExecState*);
-  bool m_initializedDeclarationStacks;
+class ProgramNode : public ScopeNode {
+ public:
+  ProgramNode(SourceElements*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
-  void initializeSymbolTable();
-  bool m_initializedSymbolTable;
+ private:
+  ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
+};
 
-  void optimizeVariableAccess();
-  bool m_optimizedResolveNodes;
+class EvalNode : public ScopeNode {
+ public:
+  EvalNode(SourceElements*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
-  // Properties that will go into the ActivationImp's local storage. (Used for
-  // initializing the ActivationImp.)
-  DeclarationStacks::VarStack m_varStack;
-  DeclarationStacks::FunctionStack m_functionStack;
+ private:
+  ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
+};
+
+class FunctionBodyNode : public ScopeNode {
+ public:
+  FunctionBodyNode(SourceElements*) KJS_FAST_CALL;
+
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
+
+  SymbolTable& symbolTable() KJS_FAST_CALL { return m_symbolTable; }
+
+  Vector<Identifier>& parameters() KJS_FAST_CALL { return m_parameters; }
+  UString paramString() const KJS_FAST_CALL;
+
+ private:
+  void initializeSymbolTable() KJS_FAST_CALL;
+  void optimizeVariableAccess() KJS_FAST_CALL;
+  ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
+
+  bool m_initialized;
   Vector<Identifier> m_parameters;
-
-  // Mapping from property name -> local storage index. (Used once to transform
-  // the AST, and subsequently for residual slow case lookups.)
   SymbolTable m_symbolTable;
 };
 
@@ -2602,11 +2613,6 @@ class SwitchNode : public StatementNode {
  private:
   RefPtr<ExpressionNode> expr;
   RefPtr<CaseBlockNode> block;
-};
-
-class ProgramNode : public FunctionBodyNode {
- public:
-  ProgramNode(SourceElements* children) KJS_FAST_CALL;
 };
 
 struct ElementList {

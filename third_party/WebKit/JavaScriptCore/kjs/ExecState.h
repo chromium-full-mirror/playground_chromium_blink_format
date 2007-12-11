@@ -39,13 +39,13 @@ enum CodeType {
 };
 
 class ActivationImp;
-class FunctionBodyNode;
 class FunctionImp;
 class GlobalFuncImp;
 class Interpreter;
 class JSGlobalObject;
 class JSVariableObject;
 class ScopeChain;
+class ScopeNode;
 struct LocalStorageEntry;
 
 /**
@@ -87,7 +87,7 @@ class ExecState {
 
   ActivationImp* activationObject() { return m_activation; }
   CodeType codeType() { return m_codeType; }
-  FunctionBodyNode* currentBody() { return m_currentBody; }
+  ScopeNode* scopeNode() { return m_scopeNode; }
   FunctionImp* function() const { return m_function; }
   const List* arguments() const { return m_arguments; }
 
@@ -117,7 +117,7 @@ class ExecState {
  public:
   ExecState(JSGlobalObject* glob,
             JSObject* thisV,
-            FunctionBodyNode* currentBody,
+            ScopeNode* scopeNode,
             CodeType type = GlobalCode,
             ExecState* callingExecState = 0,
             ExecState* currentExec = 0,
@@ -135,7 +135,7 @@ class ExecState {
 
   ExecState* m_callingExec;
   ExecState* m_savedExec;
-  FunctionBodyNode* m_currentBody;
+  ScopeNode* m_scopeNode;
 
   FunctionImp* m_function;
   const List* m_arguments;

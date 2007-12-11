@@ -250,12 +250,12 @@ static void substitute(UString& string, const UString& substring) {
 
 static inline int currentSourceId(ExecState* exec) KJS_FAST_CALL;
 static inline int currentSourceId(ExecState* exec) {
-  return exec->currentBody()->sourceId();
+  return exec->scopeNode()->sourceId();
 }
 
 static inline const UString& currentSourceURL(ExecState* exec) KJS_FAST_CALL;
 static inline const UString& currentSourceURL(ExecState* exec) {
-  return exec->currentBody()->sourceURL();
+  return exec->scopeNode()->sourceURL();
 }
 
 Completion Node::createErrorCompletion(ExecState* exec,
@@ -4322,15 +4322,19 @@ Completion TryNode::execute(ExecState* exec) {
 
 // ------------------------------ FunctionBodyNode -----------------------------
 
-FunctionBodyNode::FunctionBodyNode(SourceElements* children)
+ScopeNode::ScopeNode(SourceElements* children)
     : BlockNode(children),
       m_sourceURL(parser().sourceURL()),
-      m_sourceId(parser().sourceId()),
-      m_initializedDeclarationStacks(false),
-      m_initializedSymbolTable(false),
-      m_optimizedResolveNodes(false) {}
+      m_sourceId(parser().sourceId()) {}
 
-void FunctionBodyNode::initializeDeclarationStacks(ExecState* exec) {
+ProgramNode::ProgramNode(SourceElements* children) : ScopeNode(children) {}
+
+EvalNode::EvalNode(SourceElements* children) : ScopeNode(children) {}
+
+FunctionBodyNode::FunctionBodyNode(SourceElements* children)
+    : ScopeNode(children), m_initialized(false) {}
+
+void ScopeNode::initializeDeclarationStacks(ExecState* exec) {
   DeclarationStacks::NodeStack nodeStack;
   DeclarationStacks stacks(exec, nodeStack, m_varStack, m_functionStack);
   Node* node = statementListInitializeDeclarationStack(*m_children, nodeStack);
@@ -4349,8 +4353,6 @@ void FunctionBodyNode::initializeDeclarationStacks(ExecState* exec) {
     node = nodeStack[size];
     nodeStack.shrink(size);
   }
-
-  m_initializedDeclarationStacks = true;
 }
 
 void FunctionBodyNode::initializeSymbolTable() {
@@ -4367,8 +4369,6 @@ void FunctionBodyNode::initializeSymbolTable() {
 
   for (i = 0, size = m_functionStack.size(); i < size; ++i)
     m_symbolTable.set(m_functionStack[i]->ident.ustring().rep(), count++);
-
-  m_initializedSymbolTable = true;
 }
 
 void FunctionBodyNode::optimizeVariableAccess() {
@@ -4388,26 +4388,16 @@ void FunctionBodyNode::optimizeVariableAccess() {
     node = nodeStack[size];
     nodeStack.shrink(size);
   }
-
-  m_optimizedResolveNodes = true;
 }
 
 void FunctionBodyNode::processDeclarations(ExecState* exec) {
-  if (!m_initializedDeclarationStacks)
+  if (!m_initialized) {
     initializeDeclarationStacks(exec);
-
-  if (exec->codeType() == FunctionCode)
-    processDeclarationsForFunctionCode(exec);
-  else
-    processDeclarationsForProgramCode(exec);
-}
-
-void FunctionBodyNode::processDeclarationsForFunctionCode(ExecState* exec) {
-  if (!m_initializedSymbolTable)
     initializeSymbolTable();
-
-  if (!m_optimizedResolveNodes)
     optimizeVariableAccess();
+
+    m_initialized = true;
+  }
 
   LocalStorage& localStorage = exec->variableObject()->localStorage();
   localStorage.reserveCapacity(m_varStack.size() + m_parameters.size() +
@@ -4440,13 +4430,14 @@ void FunctionBodyNode::processDeclarationsForFunctionCode(ExecState* exec) {
   exec->updateLocalStorage();
 }
 
-void FunctionBodyNode::processDeclarationsForProgramCode(ExecState* exec) {
+void ProgramNode::processDeclarations(ExecState* exec) {
+  initializeDeclarationStacks(exec);
+
   size_t i, size;
 
-  JSObject* variableObject = exec->variableObject();
+  JSVariableObject* variableObject = exec->variableObject();
 
-  int minAttributes =
-      Internal | (exec->codeType() != EvalCode ? DontDelete : 0);
+  int minAttributes = Internal | DontDelete;
 
   for (i = 0, size = m_varStack.size(); i < size; ++i) {
     VarDeclNode* node = m_varStack[i];
@@ -4458,7 +4449,31 @@ void FunctionBodyNode::processDeclarationsForProgramCode(ExecState* exec) {
     variableObject->put(exec, node->ident, jsUndefined(), attributes);
   }
 
-  ASSERT(!m_parameters.size());
+  for (i = 0, size = m_functionStack.size(); i < size; ++i) {
+    FuncDeclNode* node = m_functionStack[i];
+    variableObject->put(exec, node->ident, node->makeFunction(exec),
+                        minAttributes);
+  }
+}
+
+void EvalNode::processDeclarations(ExecState* exec) {
+  initializeDeclarationStacks(exec);
+
+  size_t i, size;
+
+  JSVariableObject* variableObject = exec->variableObject();
+
+  int minAttributes = Internal;
+
+  for (i = 0, size = m_varStack.size(); i < size; ++i) {
+    VarDeclNode* node = m_varStack[i];
+    if (variableObject->hasProperty(exec, node->ident))
+      continue;
+    int attributes = minAttributes;
+    if (node->varType == VarDeclNode::Constant)
+      attributes |= ReadOnly;
+    variableObject->put(exec, node->ident, jsUndefined(), attributes);
+  }
 
   for (i = 0, size = m_functionStack.size(); i < size; ++i) {
     FuncDeclNode* node = m_functionStack[i];
@@ -4467,20 +4482,26 @@ void FunctionBodyNode::processDeclarationsForProgramCode(ExecState* exec) {
   }
 }
 
-void FunctionBodyNode::addParam(const Identifier& ident) {
-  m_parameters.append(ident);
-}
-
 UString FunctionBodyNode::paramString() const {
   UString s("");
-  size_t count = numParams();
+  size_t count = m_parameters.size();
   for (size_t pos = 0; pos < count; ++pos) {
     if (!s.isEmpty())
       s += ", ";
-    s += paramName(pos).ustring();
+    s += m_parameters[pos].ustring();
   }
 
   return s;
+}
+
+Completion ProgramNode::execute(ExecState* exec) {
+  processDeclarations(exec);
+  return ScopeNode::execute(exec);
+}
+
+Completion EvalNode::execute(ExecState* exec) {
+  processDeclarations(exec);
+  return ScopeNode::execute(exec);
 }
 
 Completion FunctionBodyNode::execute(ExecState* exec) {
@@ -4494,7 +4515,7 @@ Completion FunctionBodyNode::execute(ExecState* exec) {
     }
   }
 
-  Completion completion = BlockNode::execute(exec);
+  Completion completion = ScopeNode::execute(exec);
 
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (completion.complType() == Throw)
@@ -4513,7 +4534,7 @@ Completion FunctionBodyNode::execute(ExecState* exec) {
 
 void FuncDeclNode::addParams() {
   for (ParameterNode* p = param.get(); p != 0L; p = p->nextParam())
-    body->addParam(p->ident());
+    body->parameters().append(p->ident());
 }
 
 void FuncDeclNode::getDeclarations(DeclarationStacks& stacks) {
@@ -4531,7 +4552,8 @@ FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {
   func->put(exec, exec->propertyNames().prototype, proto,
             Internal | DontDelete);
 
-  func->put(exec, exec->propertyNames().length, jsNumber(body->numParams()),
+  func->put(exec, exec->propertyNames().length,
+            jsNumber(body->parameters().size()),
             ReadOnly | DontDelete | DontEnum);
   return func;
 }
@@ -4545,7 +4567,7 @@ Completion FuncDeclNode::execute(ExecState*) {
 // ECMA 13
 void FuncExprNode::addParams() {
   for (ParameterNode* p = param.get(); p != 0L; p = p->nextParam())
-    body->addParam(p->ident());
+    body->parameters().append(p->ident());
 }
 
 JSValue* FuncExprNode::evaluate(ExecState* exec) {
@@ -4579,6 +4601,4 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
   return func;
 }
 
-ProgramNode::ProgramNode(SourceElements* children)
-    : FunctionBodyNode(children) {}
-}
+}  // namespace KJS

@@ -54,8 +54,8 @@ class JSVariableObject : public JSObject {
         : symbolTable(s)  // Subclass owns this pointer.
     {}
 
-    LocalStorage localStorage;
-    SymbolTable* symbolTable;
+    LocalStorage localStorage;  // Storage for variables in the symbol table.
+    SymbolTable* symbolTable;   // Maps name -> index in localStorage.
   };
 
   JSVariableObject(JSVariableObjectData* data)
