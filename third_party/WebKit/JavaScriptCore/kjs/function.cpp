@@ -732,7 +732,7 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
         int sourceId;
         int errLine;
         UString errMsg;
-        RefPtr<ProgramNode> progNode(parser().parseProgram(
+        RefPtr<ProgramNode> progNode(parser().parse<ProgramNode>(
             UString(), 0, s.data(), s.size(), &sourceId, &errLine, &errMsg));
 
         Debugger* dbg = exec->dynamicGlobalObject()->debugger();

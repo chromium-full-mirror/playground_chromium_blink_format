@@ -27,7 +27,7 @@
 
 #include <wtf/Forward.h>
 #include <wtf/Noncopyable.h>
-#include <wtf/RefPtr.h>
+#include <wtf/OwnPtr.h>
 #include "nodes.h"
 
 namespace KJS {
@@ -40,21 +40,14 @@ struct UChar;
 
 class Parser : Noncopyable {
  public:
-  PassRefPtr<ProgramNode> parseProgram(const UString& sourceURL,
-                                       int startingLineNumber,
-                                       const UChar* code,
-                                       unsigned length,
-                                       int* sourceId = 0,
-                                       int* errLine = 0,
-                                       UString* errMsg = 0);
-
-  PassRefPtr<FunctionBodyNode> parseFunctionBody(const UString& sourceURL,
-                                                 int startingLineNumber,
-                                                 const UChar* code,
-                                                 unsigned length,
-                                                 int* sourceId = 0,
-                                                 int* errLine = 0,
-                                                 UString* errMsg = 0);
+  template <class ParsedNode>
+  PassRefPtr<ParsedNode> parse(const UString& sourceURL,
+                               int startingLineNumber,
+                               const UChar* code,
+                               unsigned length,
+                               int* sourceId = 0,
+                               int* errLine = 0,
+                               UString* errMsg = 0);
 
   UString sourceURL() const { return m_sourceURL; }
   int sourceId() const { return m_sourceId; }

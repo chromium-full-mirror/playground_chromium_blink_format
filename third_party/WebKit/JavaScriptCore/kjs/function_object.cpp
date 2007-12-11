@@ -207,9 +207,9 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
   int sourceId;
   int errLine;
   UString errMsg;
-  RefPtr<FunctionBodyNode> functionBody =
-      parser().parseFunctionBody(sourceURL, lineNumber, body.data(),
-                                 body.size(), &sourceId, &errLine, &errMsg);
+  RefPtr<FunctionBodyNode> functionBody = parser().parse<FunctionBodyNode>(
+      sourceURL, lineNumber, body.data(), body.size(), &sourceId, &errLine,
+      &errMsg);
 
   // notify debugger that source has been parsed
   Debugger* dbg = exec->dynamicGlobalObject()->debugger();
