@@ -264,7 +264,6 @@ rangeByAlteringCurrentSelection:
 - (DOMCSSStyleDeclaration*)typingStyle;
 - (void)setTypingStyle:(DOMCSSStyleDeclaration*)style
         withUndoAction:(WebCore::EditAction)undoAction;
-- (NSCellStateValue)selectionHasStyle:(DOMCSSStyleDeclaration*)style;
 
 - (void)dragSourceMovedTo:(NSPoint)windowLoc;
 - (void)dragSourceEndedAt:(NSPoint)windowLoc

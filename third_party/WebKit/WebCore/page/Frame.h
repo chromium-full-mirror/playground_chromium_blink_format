@@ -294,8 +294,6 @@ class Frame : public RefCounted<Frame> {
 
   void computeAndSetTypingStyle(CSSStyleDeclaration*,
                                 EditAction = EditActionUnspecified);
-  enum TriState { falseTriState, trueTriState, mixedTriState };
-  TriState selectionHasStyle(CSSStyleDeclaration*) const;
   String selectionStartStylePropertyValue(int stylePropertyID) const;
   void applyEditingStyleToBodyElement() const;
   void removeEditingStyleFromBodyElement() const;

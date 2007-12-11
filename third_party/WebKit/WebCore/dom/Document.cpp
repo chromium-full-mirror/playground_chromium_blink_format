@@ -68,7 +68,6 @@
 #include "HTTPParsers.h"
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
-#include "JSEditor.h"
 #include "KeyboardEvent.h"
 #include "Logging.h"
 #include "MouseEvent.h"
@@ -361,8 +360,6 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
   m_startTime = currentTime();
   m_overMinimumLayoutThreshold = false;
 
-  m_jsEditor = 0;
-
   initSecurityOrigin();
 
   static int docID = 0;
@@ -451,11 +448,6 @@ Document::~Document() {
     m_axObjectCache = 0;
   }
   m_decoder = 0;
-
-  if (m_jsEditor) {
-    delete m_jsEditor;
-    m_jsEditor = 0;
-  }
 
   unsigned count =
       sizeof(m_nameCollectionInfo) / sizeof(m_nameCollectionInfo[0]);
@@ -2883,39 +2875,44 @@ String Document::toString() const {
 
 // Support for Javascript execCommand, and related methods
 
-JSEditor* Document::jsEditor() {
-  if (!m_jsEditor)
-    m_jsEditor = new JSEditor(this);
-  return m_jsEditor;
+static Editor::Command command(Document* document,
+                               const String& commandName,
+                               bool userInterface = false) {
+  Frame* frame = document->frame();
+  if (!frame || frame->document() != document)
+    return Editor::Command();
+  return frame->editor()->command(
+      commandName,
+      userInterface ? CommandFromDOMWithUserInterface : CommandFromDOM);
 }
 
-bool Document::execCommand(const String& command,
+bool Document::execCommand(const String& commandName,
                            bool userInterface,
                            const String& value) {
-  return jsEditor()->execCommand(command, userInterface, value);
+  return command(this, commandName, userInterface).execute(value);
 }
 
-bool Document::queryCommandEnabled(const String& command) {
-  return jsEditor()->queryCommandEnabled(command);
+bool Document::queryCommandEnabled(const String& commandName) {
+  return command(this, commandName).isEnabled();
 }
 
-bool Document::queryCommandIndeterm(const String& command) {
-  return jsEditor()->queryCommandIndeterm(command);
+bool Document::queryCommandIndeterm(const String& commandName) {
+  return command(this, commandName).state() == MixedTriState;
 }
 
-bool Document::queryCommandState(const String& command) {
-  return jsEditor()->queryCommandState(command);
+bool Document::queryCommandState(const String& commandName) {
+  return command(this, commandName).state() != FalseTriState;
 }
 
-bool Document::queryCommandSupported(const String& command) {
-  return jsEditor()->queryCommandSupported(command);
+bool Document::queryCommandSupported(const String& commandName) {
+  return command(this, commandName).isSupported();
 }
 
-String Document::queryCommandValue(const String& command) {
-  return jsEditor()->queryCommandValue(command);
+String Document::queryCommandValue(const String& commandName) {
+  return command(this, commandName).value();
 }
 
-static IntRect placeholderRectForMarker(void) {
+static IntRect placeholderRectForMarker() {
   return IntRect(-1, -1, -1, -1);
 }
 
