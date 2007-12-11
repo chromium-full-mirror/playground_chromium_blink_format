@@ -453,7 +453,7 @@ void WebChromeClient::print(Frame* frame) {
 }
 
 unsigned long long WebChromeClient::requestQuotaIncreaseForNewDatabase(
-    Frame*,
+    Frame* frame,
     const SecurityOriginData& originData,
     const String& databaseDisplayName,
     unsigned long long estimatedSize) {
@@ -465,8 +465,8 @@ unsigned long long WebChromeClient::requestQuotaIncreaseForNewDatabase(
     COMPtr<IWebUIDelegatePrivate3> uiDelegatePrivate3(Query, uiDelegate);
     if (uiDelegatePrivate3 &&
         SUCCEEDED(uiDelegatePrivate3->quotaForSecurityOriginForNewDatabase(
-            m_webView, webOrigin.get(), BString(databaseDisplayName),
-            estimatedSize, &result)))
+            m_webView, kit(frame), webOrigin.get(),
+            BString(databaseDisplayName), estimatedSize, &result)))
       return result;
   }
   // an error happened - just return the current quota
@@ -475,7 +475,7 @@ unsigned long long WebChromeClient::requestQuotaIncreaseForNewDatabase(
 }
 
 unsigned long long WebChromeClient::requestQuotaIncreaseForDatabaseOperation(
-    Frame*,
+    Frame* frame,
     const SecurityOriginData& originData,
     const String& databaseIdentifier,
     unsigned long long proposedNewQuota) {
@@ -488,7 +488,7 @@ unsigned long long WebChromeClient::requestQuotaIncreaseForDatabaseOperation(
     if (uiDelegatePrivate3 &&
         SUCCEEDED(
             uiDelegatePrivate3->quotaForSecurityOriginForDatabaseOperation(
-                m_webView, webOrigin.get(), proposedNewQuota,
+                m_webView, kit(frame), webOrigin.get(), proposedNewQuota,
                 BString(databaseIdentifier), &result)))
       return result;
   }
