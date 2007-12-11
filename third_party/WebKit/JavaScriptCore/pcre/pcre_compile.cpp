@@ -179,6 +179,7 @@ static bool bracketIsAnchored(const uschar* code);
 static bool bracketNeedsLineStart(const uschar* code,
                                   unsigned captureMap,
                                   unsigned backrefMap);
+static int bracketFindFirstAssertedCharacter(const uschar* code, bool inassert);
 
 /*************************************************
 *            Handle escapes                      *
@@ -2060,8 +2061,8 @@ static bool compileBracket(int options,
   while (true) {
     /* Now compile the branch */
 
-    int branchfirstbyte = REQ_UNSET;
-    int branchreqbyte = REQ_UNSET;
+    int branchfirstbyte;
+    int branchreqbyte;
     if (!compileBranch(options, brackets, &code, &ptr, patternEnd, errorcodeptr,
                        &branchfirstbyte, &branchreqbyte, cd)) {
       *ptrptr = ptr;
@@ -2277,56 +2278,49 @@ Arguments:
 Returns:     -1 or the fixed first char
 */
 
-static int find_firstassertedchar(const uschar* code,
-                                  int options,
-                                  bool inassert) {
+static int branchFindFirstAssertedCharacter(const uschar* code, bool inassert) {
+  const uschar* scode = firstSignificantOpCodeSkippingAssertions(code);
+  int op = *scode;
+
+  if (op >= OP_BRA)
+    op = OP_BRA;
+
+  switch (op) {
+    default:
+      return -1;
+
+    case OP_BRA:
+    case OP_ASSERT:
+    case OP_ONCE:
+      return bracketFindFirstAssertedCharacter(scode, op == OP_ASSERT);
+
+    case OP_EXACT:
+      scode += 2;
+    /* Fall through */
+
+    case OP_CHAR:
+    case OP_CHAR_IGNORING_CASE:
+    case OP_ASCII_CHAR:
+    case OP_ASCII_LETTER_IGNORING_CASE:
+    case OP_PLUS:
+    case OP_MINPLUS:
+      if (!inassert)
+        return -1;
+      return scode[1];
+  }
+}
+
+static int bracketFindFirstAssertedCharacter(const uschar* code,
+                                             bool inassert) {
   int c = -1;
   do {
-    const uschar* scode =
-        firstSignificantOpCodeSkippingAssertions(code + 1 + LINK_SIZE);
-    int op = *scode;
-
-    if (op >= OP_BRA)
-      op = OP_BRA;
-
-    switch (op) {
-      default:
-        return -1;
-
-      case OP_BRA:
-      case OP_ASSERT:
-      case OP_ONCE: {
-        int d;
-        if ((d = find_firstassertedchar(scode, options, op == OP_ASSERT)) < 0)
-          return -1;
-        if (c < 0)
-          c = d;
-        else if (c != d)
-          return -1;
-        break;
-      }
-
-      case OP_EXACT:
-        scode += 2;
-      /* Fall through */
-
-      case OP_CHAR:
-      case OP_CHAR_IGNORING_CASE:
-      case OP_ASCII_CHAR:
-      case OP_ASCII_LETTER_IGNORING_CASE:
-      case OP_PLUS:
-      case OP_MINPLUS:
-        if (!inassert)
-          return -1;
-        if (c < 0) {
-          c = scode[1];
-          if (options & IgnoreCaseOption)
-            c |= REQ_IGNORE_CASE;
-        } else if (c != scode[1])
-          return -1;
-        break;
-    }
-
+    int d = branchFindFirstAssertedCharacter(code + 1 + LINK_SIZE, inassert);
+    if (d < 0)
+      return -1;
+    if (c < 0)
+      c = d;
+    else if (c != d)
+      return -1;
     code += getOpcodeValueAtOffset(code, 1);
   } while (*code == OP_ALT);
   return c;
@@ -3001,8 +2995,12 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
                           : branchIsAnchored(codeStart))
     re->options |= IsAnchoredOption;
   else {
-    if (firstbyte < 0)
-      firstbyte = find_firstassertedchar(codeStart, re->options, false);
+    if (firstbyte < 0) {
+      firstbyte = (cd.needOuterBracket
+                       ? bracketFindFirstAssertedCharacter(codeStart, false)
+                       : branchFindFirstAssertedCharacter(codeStart, false)) |
+                  ((re->options & IgnoreCaseOption) ? REQ_IGNORE_CASE : 0);
+    }
     if (firstbyte >= 0) {
       int ch = firstbyte & 255;
       if (ch < 127) {
