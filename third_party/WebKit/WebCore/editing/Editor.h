@@ -78,8 +78,8 @@ class Editor {
   }
   EditCommand* lastEditCommand() { return m_lastEditCommand.get(); }
 
-  void handleKeypress(KeyboardEvent*);
-  void handleInputMethodKeypress(KeyboardEvent*);
+  void handleKeyboardEvent(KeyboardEvent*);
+  void handleInputMethodKeydown(KeyboardEvent*);
 
   bool canEdit() const;
   bool canEditRichly() const;
@@ -163,6 +163,8 @@ class Editor {
   bool selectionStartHasStyle(CSSStyleDeclaration*) const;
 
   bool clientIsEditable() const;
+
+  static bool isTextInsertionCommand(const AtomicString&);
 
   bool execCommand(const AtomicString&, Event* triggeringEvent = 0);
 

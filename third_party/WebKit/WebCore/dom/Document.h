@@ -537,7 +537,6 @@ class Document : public ContainerNode {
 
   CSSStyleDeclaration* getOverrideStyle(Element*, const String& pseudoElt);
 
-  virtual void defaultEventHandler(Event*);
   void handleWindowEvent(Event*, bool useCapture);
   void setHTMLWindowEventListener(const AtomicString& eventType,
                                   PassRefPtr<EventListener>);

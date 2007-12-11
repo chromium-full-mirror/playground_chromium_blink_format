@@ -307,13 +307,13 @@ void EditorClientQt::toggleGrammarChecking() {
   notImplemented();
 }
 
-void EditorClientQt::handleKeypress(KeyboardEvent* event) {
+void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
   Frame* frame = m_page->d->page->focusController()->focusedOrMainFrame();
   if (!frame || !frame->document()->focusedNode())
     return;
 
   const PlatformKeyboardEvent* kevent = event->keyEvent();
-  if (!kevent || kevent->isKeyUp())
+  if (!kevent || kevent->type() == PlatformKeyboardEvent::KeyUp)
     return;
 
   Node* start = frame->selectionController()->start().node();
@@ -322,7 +322,7 @@ void EditorClientQt::handleKeypress(KeyboardEvent* event) {
 
   // FIXME: refactor all of this to use Actions or something like them
   if (start->isContentEditable()) {
-    switch (kevent->WindowsKeyCode()) {
+    switch (kevent->windowsVirtualKeyCode()) {
       case VK_RETURN:
         frame->editor()->execCommand("InsertLineBreak");
         break;
@@ -371,7 +371,7 @@ void EditorClientQt::handleKeypress(KeyboardEvent* event) {
             !kevent->text().isEmpty()) {
           frame->editor()->insertText(kevent->text(), event);
         } else if (kevent->ctrlKey()) {
-          switch (kevent->WindowsKeyCode()) {
+          switch (kevent->windowsVirtualKeyCode()) {
             case VK_A:
               frame->editor()->execCommand("SelectAll");
               break;
@@ -403,7 +403,7 @@ void EditorClientQt::handleKeypress(KeyboardEvent* event) {
           return;
     }
   } else {
-    switch (kevent->WindowsKeyCode()) {
+    switch (kevent->windowsVirtualKeyCode()) {
       case VK_UP:
         frame->editor()->execCommand("MoveUp");
         break;
@@ -426,7 +426,7 @@ void EditorClientQt::handleKeypress(KeyboardEvent* event) {
         break;
       default:
         if (kevent->ctrlKey()) {
-          switch (kevent->WindowsKeyCode()) {
+          switch (kevent->windowsVirtualKeyCode()) {
             case VK_A:
               frame->editor()->execCommand("SelectAll");
               break;
@@ -444,7 +444,7 @@ void EditorClientQt::handleKeypress(KeyboardEvent* event) {
   event->setDefaultHandled();
 }
 
-void EditorClientQt::handleInputMethodKeypress(KeyboardEvent*) {}
+void EditorClientQt::handleInputMethodKeydown(KeyboardEvent*) {}
 
 EditorClientQt::EditorClientQt(QWebPage* page)
     : m_page(page), m_editing(false), m_inUndoRedo(false) {}

@@ -87,8 +87,8 @@ class EditorClientQt : public EditorClient {
   virtual void undo();
   virtual void redo();
 
-  virtual void handleKeypress(KeyboardEvent*);
-  virtual void handleInputMethodKeypress(KeyboardEvent*);
+  virtual void handleKeyboardEvent(KeyboardEvent*);
+  virtual void handleInputMethodKeydown(KeyboardEvent*);
 
   virtual void textFieldDidBeginEditing(Element*);
   virtual void textFieldDidEndEditing(Element*);

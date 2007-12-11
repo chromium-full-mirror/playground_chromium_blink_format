@@ -613,22 +613,13 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
 void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
   RenderMenuList* menuList = static_cast<RenderMenuList*>(renderer());
 
-  // Use key press event here since sending simulated mouse events
-  // on key down blocks the proper sending of the key press event.
-  if (evt->type() == keypressEvent) {
+  if (evt->type() == keydownEvent) {
     if (!renderer() || !evt->isKeyboardEvent())
       return;
     String keyIdentifier = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
     bool handled = false;
 #if ARROW_KEYS_POP_MENU
-    if (keyIdentifier == "Enter") {
-      menuListOnChange();
-      if (form())
-        form()->submitClick(evt);
-      handled = true;
-    }
-    if (keyIdentifier == "Down" || keyIdentifier == "Up" ||
-        keyIdentifier == "U+0020") {
+    if (keyIdentifier == "Down" || keyIdentifier == "Up") {
       focus();
       // Save the selection so it can be compared to the new selection when we
       // call onChange during setSelectedIndex,
@@ -662,7 +653,39 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
       if (listIndex >= 0 && listIndex < size)
         setSelectedIndex(listToOptionIndex(listIndex));
       handled = true;
-    } else if (keyIdentifier == "Enter") {
+    }
+#endif
+    if (handled)
+      evt->setDefaultHandled();
+  }
+
+  // Use key press event here since sending simulated mouse events
+  // on key down blocks the proper sending of the key press event.
+  if (evt->type() == keypressEvent) {
+    if (!renderer() || !evt->isKeyboardEvent())
+      return;
+    int keyCode = static_cast<KeyboardEvent*>(evt)->keyCode();
+    bool handled = false;
+#if ARROW_KEYS_POP_MENU
+    if (keyCode == ' ') {
+      focus();
+      // Save the selection so it can be compared to the new selection when we
+      // call onChange during setSelectedIndex,
+      // which gets called from RenderMenuList::valueChanged, which gets called
+      // after the user makes a selection from the menu.
+      saveLastSelection();
+      menuList->showPopup();
+      handled = true;
+    }
+    if (keyCode == '\r') {
+      menuListOnChange();
+      if (form())
+        form()->submitClick(evt);
+      handled = true;
+    }
+#else
+    int listIndex = optionToListIndex(selectedIndex());
+    if (keyCode == '\r') {
       // listIndex should already be selected, but this will fire the onchange
       // handler.
       setSelectedIndex(listToOptionIndex(listIndex), true, true);
@@ -672,6 +695,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
     if (handled)
       evt->setDefaultHandled();
   }
+
   if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
       static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     focus();
@@ -768,17 +792,10 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
     // This makes sure we fire onChange for a single click.  For drag selection,
     // onChange will fire when the autoscroll timer stops.
     listBoxOnChange();
-  else if (evt->type() == keypressEvent) {
+  else if (evt->type() == keydownEvent) {
     if (!evt->isKeyboardEvent())
       return;
     String keyIdentifier = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
-
-    if (keyIdentifier == "Enter") {
-      if (form())
-        form()->submitClick(evt);
-      evt->setDefaultHandled();
-      return;
-    }
 
     int endIndex = 0;
     if (m_activeSelectionEndIndex < 0) {
@@ -820,6 +837,17 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
       updateListBoxSelection(deselectOthers);
       listBoxOnChange();
       evt->setDefaultHandled();
+    }
+  } else if (evt->type() == keypressEvent) {
+    if (!evt->isKeyboardEvent())
+      return;
+    int keyCode = static_cast<KeyboardEvent*>(evt)->keyCode();
+
+    if (keyCode == '\r') {
+      if (form())
+        form()->submitClick(evt);
+      evt->setDefaultHandled();
+      return;
     }
   }
 }

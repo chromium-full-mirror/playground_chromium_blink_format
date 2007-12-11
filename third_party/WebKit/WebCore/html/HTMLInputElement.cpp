@@ -1106,9 +1106,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     }
   }
 
-  // Before calling the base class defaultEventHandler, which will call
-  // handleKeypress, call doTextFieldCommandFromEvent.
-  if (isTextField() && evt->type() == keypressEvent && evt->isKeyboardEvent() &&
+  if (isTextField() && evt->type() == keydownEvent && evt->isKeyboardEvent() &&
       focused() && document()->frame() &&
       document()->frame()->doTextFieldCommandFromEvent(
           this, static_cast<KeyboardEvent*>(evt))) {
@@ -1168,39 +1166,9 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
   if (evt->type() == keypressEvent && evt->isKeyboardEvent()) {
     bool clickElement = false;
 
-    String key = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
+    int charCode = static_cast<KeyboardEvent*>(evt)->charCode();
 
-    if (key == "U+0020") {
-      switch (inputType()) {
-        case BUTTON:
-        case CHECKBOX:
-        case FILE:
-        case IMAGE:
-        case RESET:
-        case SUBMIT:
-          // Simulate mouse click for spacebar for these types of elements.
-          // The AppKit already does this for some, but not all, of them.
-          clickElement = true;
-          break;
-        case RADIO:
-          // If an unselected radio is tabbed into (because the entire group has
-          // nothing
-          // checked, or because of some explicit .focus() call), then allow
-          // space to check it.
-          if (!checked())
-            clickElement = true;
-          break;
-        case HIDDEN:
-        case ISINDEX:
-        case PASSWORD:
-        case RANGE:
-        case SEARCH:
-        case TEXT:
-          break;
-      }
-    }
-
-    if (key == "Enter") {
+    if (charCode == '\r') {
       switch (inputType()) {
         case CHECKBOX:
         case HIDDEN:
@@ -1223,6 +1191,48 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
           break;
         case RADIO:
           break;  // Don't do anything for enter on a radio button.
+      }
+    } else if (charCode == ' ') {
+      switch (inputType()) {
+        case BUTTON:
+        case CHECKBOX:
+        case FILE:
+        case IMAGE:
+        case RESET:
+        case SUBMIT:
+        case RADIO:
+          // Prevent scrolling down the page.
+          evt->setDefaultHandled();
+          return;
+        default:
+          break;
+      }
+    }
+
+    if (clickElement) {
+      dispatchSimulatedClick(evt);
+      evt->setDefaultHandled();
+      return;
+    }
+  }
+
+  if (evt->type() == keydownEvent && evt->isKeyboardEvent()) {
+    String key = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
+
+    if (key == "U+0020") {
+      switch (inputType()) {
+        case BUTTON:
+        case CHECKBOX:
+        case FILE:
+        case IMAGE:
+        case RESET:
+        case SUBMIT:
+        case RADIO:
+          setActive(true, true);
+          // No setDefaultHandled() - IE dispatches a keypress in this case.
+          return;
+        default:
+          break;
       }
     }
 
@@ -1265,9 +1275,46 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         }
       }
     }
+  }
+
+  if (evt->type() == keyupEvent && evt->isKeyboardEvent()) {
+    bool clickElement = false;
+
+    String key = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
+
+    if (key == "U+0020") {
+      switch (inputType()) {
+        case BUTTON:
+        case CHECKBOX:
+        case FILE:
+        case IMAGE:
+        case RESET:
+        case SUBMIT:
+          // Simulate mouse click for spacebar for these types of elements.
+          // The AppKit already does this for some, but not all, of them.
+          clickElement = true;
+          break;
+        case RADIO:
+          // If an unselected radio is tabbed into (because the entire group has
+          // nothing
+          // checked, or because of some explicit .focus() call), then allow
+          // space to check it.
+          if (!checked())
+            clickElement = true;
+          break;
+        case HIDDEN:
+        case ISINDEX:
+        case PASSWORD:
+        case RANGE:
+        case SEARCH:
+        case TEXT:
+          break;
+      }
+    }
 
     if (clickElement) {
-      dispatchSimulatedClick(evt);
+      if (active())
+        dispatchSimulatedClick(evt);
       evt->setDefaultHandled();
       return;
     }

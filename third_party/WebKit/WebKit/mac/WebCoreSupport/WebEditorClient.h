@@ -95,8 +95,8 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual void undo();
   virtual void redo();
 
-  virtual void handleKeypress(WebCore::KeyboardEvent*);
-  virtual void handleInputMethodKeypress(WebCore::KeyboardEvent*);
+  virtual void handleKeyboardEvent(WebCore::KeyboardEvent*);
+  virtual void handleInputMethodKeydown(WebCore::KeyboardEvent*);
 
   virtual void textFieldDidBeginEditing(WebCore::Element*);
   virtual void textFieldDidEndEditing(WebCore::Element*);
