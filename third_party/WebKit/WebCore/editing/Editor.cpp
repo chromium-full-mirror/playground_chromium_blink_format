@@ -2051,7 +2051,9 @@ void Editor::appendToKillRing(const String&) {}
 
 void Editor::prependToKillRing(const String&) {}
 
-String Editor::yankFromKillRing() {}
+String Editor::yankFromKillRing() {
+  return String();
+}
 
 void Editor::startNewKillRingSequence() {}
 
