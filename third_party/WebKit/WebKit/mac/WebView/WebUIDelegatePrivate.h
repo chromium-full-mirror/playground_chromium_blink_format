@@ -109,6 +109,7 @@ enum {
 /*!
     @method webView:quotaForSecurityOrigin:toCreateDatabase:withEstimatedSize:
     @param sender The WebView sending the delegate method
+    @param frame The WebFrame whose JavaScript initiated this call.
     @param origin The security origin of the database that needs a larger quota
    to create a database
     @param newDatabaseName The display name of the new database
@@ -120,6 +121,7 @@ enum {
    the entire estimated size.
 */
 - (unsigned long long)webView:(WebView*)sender
+                        frame:(WebFrame*)frame
        quotaForSecurityOrigin:(WebSecurityOrigin*)origin
              toCreateDatabase:(NSString*)newDatabaseName
             withEstimatedSize:(unsigned long long)estimatedSize;
@@ -127,6 +129,7 @@ enum {
 /*!
     @method webView:quotaForSecurityOrigin:fromProposedQuota:database:
     @param sender The WebView sending the delegate method
+    @param frame The WebFrame whose JavaScript initiated this call.
     @param origin The security origin of the database that has reached its size
    limit
     @param proposedNewQuota WebKit's best guess as to the required new quota
@@ -139,6 +142,7 @@ enum {
     possibly calling this delegate method again to request even more space
 */
 - (unsigned long long)webView:(WebView*)sender
+                        frame:(WebFrame*)frame
        quotaForSecurityOrigin:(WebSecurityOrigin*)origin
             fromProposedQuota:(unsigned long long)proposedNewQuota
                      database:(NSString*)databaseIdentifier;

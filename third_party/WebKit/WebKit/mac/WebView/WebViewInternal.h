@@ -195,9 +195,11 @@ unsigned long long CallUIDelegateReturningUnsignedLongLong(WebView*,
                                                            SEL,
                                                            id,
                                                            id,
+                                                           id,
                                                            unsigned long long);
 unsigned long long CallUIDelegateReturningUnsignedLongLong(WebView*,
                                                            SEL,
+                                                           id,
                                                            id,
                                                            unsigned long long,
                                                            id);
