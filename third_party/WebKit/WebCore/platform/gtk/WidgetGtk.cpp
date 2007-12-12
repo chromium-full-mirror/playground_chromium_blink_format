@@ -50,6 +50,7 @@ class WidgetPrivate {
   ScrollView* parent;
   GtkContainer* containingWindow;
   bool suppressInvalidation;
+  GdkCursor* cursor;
 
   GdkDrawable* gdkDrawable() const { return widget ? widget->window : 0; }
 };
@@ -59,6 +60,7 @@ Widget::Widget() : data(new WidgetPrivate) {
   data->parent = 0;
   data->containingWindow = 0;
   data->suppressInvalidation = false;
+  data->cursor = 0;
 }
 
 GtkWidget* Widget::gtkWidget() const {
@@ -110,14 +112,27 @@ void Widget::setFocus() {
                                     : GTK_WIDGET(containingWindow()));
 }
 
+Cursor Widget::cursor() {
+  return Cursor(data->cursor);
+}
+
 void Widget::setCursor(const Cursor& cursor) {
   GdkCursor* pcur = cursor.impl();
-  if (!pcur)
+
+  // http://bugs.webkit.org/show_bug.cgi?id=16388
+  // [GTK] Widget::setCursor() gets called frequently
+  //
+  // gdk_window_set_cursor() in certain GDK backends seems to be an
+  // expensive operation, so avoid it if possible.
+
+  if (pcur == data->cursor)
     return;
+
   gdk_window_set_cursor(data->gdkDrawable()
                             ? GDK_WINDOW(data->gdkDrawable())
                             : GTK_WIDGET(containingWindow())->window,
                         pcur);
+  data->cursor = pcur;
 }
 
 void Widget::show() {
