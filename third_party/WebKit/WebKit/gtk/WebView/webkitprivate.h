@@ -63,6 +63,7 @@ struct _WebKitWebViewPrivate {
 
   HashSet<GtkWidget*> children;
   bool editable;
+  GtkIMContext* imContext;
 };
 
 #define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \

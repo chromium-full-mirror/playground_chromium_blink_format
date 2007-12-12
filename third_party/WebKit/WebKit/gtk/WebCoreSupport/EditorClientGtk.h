@@ -45,6 +45,7 @@ namespace WebKit {
 class EditorClient : public WebCore::EditorClient {
  public:
   EditorClient(WebKitWebView*);
+  ~EditorClient();
 
   // from EditorClient
   virtual void pageDestroyed();
@@ -125,7 +126,6 @@ class EditorClient : public WebCore::EditorClient {
                                  WTF::Vector<WebCore::String>& guesses);
   virtual void setInputMethodState(bool enabled);
 
- private:
   WebKitWebView* m_page;
 };
 }
