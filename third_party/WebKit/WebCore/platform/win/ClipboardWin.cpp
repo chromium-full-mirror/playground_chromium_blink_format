@@ -480,7 +480,7 @@ static bool writeURL(WCDataObject* data,
   }
 
   if (withPlainText) {
-    medium.hGlobal = createGlobalData(url.url());
+    medium.hGlobal = createGlobalData(url.string());
     if (medium.hGlobal &&
         FAILED(data->SetData(plainTextWFormat(), &medium, TRUE)))
       ::GlobalFree(medium.hGlobal);
@@ -677,7 +677,7 @@ static void writeImageToDataObject(IDataObject* dataObject,
     return;
 
   HGLOBAL imageFileDescriptor = createGlobalImageFileDescriptor(
-      url.url(), element->getAttribute(altAttr), cachedImage);
+      url.string(), element->getAttribute(altAttr), cachedImage);
   if (!imageFileDescriptor)
     return;
 
@@ -734,7 +734,7 @@ void ClipboardWin::writeURL(const KURL& kurl, const String& titleStr, Frame*) {
   WebCore::writeURL(m_writableDataObject.get(), kurl, titleStr, true, true);
 
   int estimatedSize = 0;
-  String url = kurl.url();
+  String url = kurl.string();
 
   HGLOBAL urlFileDescriptor =
       createGlobalUrlFileDescriptor(url, titleStr, estimatedSize);
@@ -760,7 +760,7 @@ void ClipboardWin::writeRange(Range* selectedRange, Frame* frame) {
 
   medium.hGlobal = createGlobalData(
       markupToCF_HTML(createMarkup(selectedRange, 0, AnnotateForInterchange),
-                      selectedRange->startContainer(ec)->document()->URL()));
+                      selectedRange->startContainer(ec)->document()->url()));
   if (medium.hGlobal &&
       FAILED(m_writableDataObject->SetData(htmlFormat(), &medium, TRUE)))
     ::GlobalFree(medium.hGlobal);

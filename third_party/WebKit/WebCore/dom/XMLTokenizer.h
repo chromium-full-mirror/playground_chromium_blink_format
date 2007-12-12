@@ -186,7 +186,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
 #if ENABLE(XSLT)
 void* xmlDocPtrForString(DocLoader*,
                          const String& source,
-                         const DeprecatedString& URL);
+                         const DeprecatedString& url);
 void setLoaderForLibXMLCallbacks(DocLoader*);
 #endif
 

@@ -82,7 +82,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
   const SubstituteData& substituteData() const { return m_substituteData; }
 
-  const KURL& URL() const;
+  const KURL& url() const;
   const KURL& unreachableURL() const;
 
   KURL originalURL() const;

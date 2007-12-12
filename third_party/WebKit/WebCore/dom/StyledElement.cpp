@@ -308,10 +308,10 @@ void StyledElement::addCSSStringProperty(MappedAttribute* attr,
 
 void StyledElement::addCSSImageProperty(MappedAttribute* attr,
                                         int id,
-                                        const String& URL) {
+                                        const String& url) {
   if (!attr->decl())
     createMappedDecl(attr);
-  attr->decl()->setImageProperty(id, URL, false);
+  attr->decl()->setImageProperty(id, url, false);
 }
 
 void StyledElement::addCSSLength(MappedAttribute* attr,

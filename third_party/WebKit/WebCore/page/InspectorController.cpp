@@ -135,7 +135,7 @@ struct InspectorResource : public RefCounted<InspectorResource> {
       return Other;
 
     CachedResource* cachedResource =
-        doc->docLoader()->cachedResource(requestURL.url());
+        doc->docLoader()->cachedResource(requestURL.string());
     if (!cachedResource)
       return Other;
 
@@ -265,7 +265,7 @@ static JSValueRef addSourceToFrame(JSContextRef ctx,
       return undefined;
 
     CachedResource* cachedResource =
-        doc->docLoader()->cachedResource(resource->requestURL.url());
+        doc->docLoader()->cachedResource(resource->requestURL.string());
     if (!cachedResource)
       return undefined;
 
@@ -1014,7 +1014,7 @@ JSObjectRef InspectorController::addScriptResource(
       0);
   JSStringRelease(resourceString);
 
-  String urlString = resource->requestURL.url();
+  String urlString = resource->requestURL.string();
   JSStringRef url =
       JSStringCreateWithCharacters(urlString.characters(), urlString.length());
   JSValueRef urlValue = JSValueMakeString(m_scriptContext, url);
@@ -1135,7 +1135,7 @@ void InspectorController::updateScriptResourceRequest(
   if (!resource->scriptObject || !m_scriptContext)
     return;
 
-  String urlString = resource->requestURL.url();
+  String urlString = resource->requestURL.string();
   JSStringRef url =
       JSStringCreateWithCharacters(urlString.characters(), urlString.length());
   JSValueRef urlValue = JSValueMakeString(m_scriptContext, url);
@@ -1547,7 +1547,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     // FIXME: Should look into asserting that m_mainResource->loader == loader
     // here.
 
-    m_client->inspectedURLChanged(loader->URL().url());
+    m_client->inspectedURLChanged(loader->url().string());
 
     deleteAllValues(m_consoleMessages);
     m_consoleMessages.clear();

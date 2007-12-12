@@ -63,7 +63,7 @@ class StyledElement : public Element {
       int id,
       const String& value,
       CSSPrimitiveValue::UnitTypes = CSSPrimitiveValue::CSS_STRING);
-  void addCSSImageProperty(MappedAttribute* attr, int id, const String& URL);
+  void addCSSImageProperty(MappedAttribute*, int propertyID, const String& url);
   void addCSSColor(MappedAttribute* attr, int id, const String& c);
   void createMappedDecl(MappedAttribute* attr);
 

@@ -42,7 +42,7 @@ bool ResourceRequestBase::isEmpty() const {
 bool ResourceRequestBase::isNull() const {
   updateResourceRequest();
 
-  return m_url.url().isNull();
+  return m_url.isNull();
 }
 
 const KURL& ResourceRequestBase::url() const {

@@ -1562,6 +1562,6 @@ void HTMLParser::reportErrorToConsole(HTMLParserErrorCode errorCode,
   page->chrome()->addMessageToConsole(
       HTMLMessageSource,
       isWarning(errorCode) ? WarningMessageLevel : ErrorMessageLevel, message,
-      lineNumber, document->URL());
+      lineNumber, document->url());
 }
 }

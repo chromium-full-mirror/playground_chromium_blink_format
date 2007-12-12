@@ -66,20 +66,20 @@ void DocLoader::checkForReload(const KURL& fullURL) {
   if (m_allowStaleResources)
     return;  // Don't reload resources while pasting
   if (m_cachePolicy == CachePolicyVerify) {
-    if (!m_reloadedURLs.contains(fullURL.url())) {
-      CachedResource* existing = cache()->resourceForURL(fullURL.url());
+    if (!m_reloadedURLs.contains(fullURL.string())) {
+      CachedResource* existing = cache()->resourceForURL(fullURL.string());
       if (existing && existing->isExpired()) {
         cache()->remove(existing);
-        m_reloadedURLs.add(fullURL.url());
+        m_reloadedURLs.add(fullURL.string());
       }
     }
   } else if ((m_cachePolicy == CachePolicyReload) ||
              (m_cachePolicy == CachePolicyRefresh)) {
-    if (!m_reloadedURLs.contains(fullURL.url())) {
-      CachedResource* existing = cache()->resourceForURL(fullURL.url());
+    if (!m_reloadedURLs.contains(fullURL.string())) {
+      CachedResource* existing = cache()->resourceForURL(fullURL.string());
       if (existing)
         cache()->remove(existing);
-      m_reloadedURLs.add(fullURL.url());
+      m_reloadedURLs.add(fullURL.string());
     }
   }
 }
@@ -157,7 +157,7 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
 
   if (cache()->disabled()) {
     HashMap<String, CachedResource*>::iterator it =
-        m_docResources.find(fullURL.url());
+        m_docResources.find(fullURL.string());
 
     if (it != m_docResources.end()) {
       it->second->setDocLoader(0);

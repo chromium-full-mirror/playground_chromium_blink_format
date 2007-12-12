@@ -35,15 +35,15 @@
 
 namespace WebCore {
 
-CachedResource::CachedResource(const String& URL,
+CachedResource::CachedResource(const String& url,
                                Type type,
                                bool forCache,
                                bool sendResourceLoadCallbacks)
-    : m_lastDecodedAccessTime(0),
+    : m_url(url),
+      m_lastDecodedAccessTime(0),
       m_sendResourceLoadCallbacks(sendResourceLoadCallbacks),
       m_inCache(forCache),
       m_docLoader(0) {
-  m_url = URL;
   m_type = type;
   m_status = Pending;
   m_encodedSize = 0;

@@ -737,10 +737,8 @@ void Window::put(ExecState* exec,
         if (p) {
           if (!p->loader()->shouldAllowNavigation(impl()->frame()))
             return;
-          DeprecatedString dstUrl =
-              p->loader()
-                  ->completeURL(DeprecatedString(value->toString(exec)))
-                  .url();
+          String dstUrl =
+              p->loader()->completeURL(value->toString(exec)).string();
           if (!dstUrl.startsWith("javascript:", false) ||
               allowsAccessFrom(exec)) {
             bool userGesture = p->scriptProxy()->processingUserGesture();
@@ -894,8 +892,8 @@ bool Window::allowsAccessFrom(const JSGlobalObject* other) const {
     String message = String::format(
         "Unsafe JavaScript attempt to access frame with URL %s from frame with "
         "URL %s. Domains, protocols and ports must match.\n",
-        targetDocument->URL().utf8().data(),
-        originDocument->URL().utf8().data());
+        targetDocument->url().utf8().data(),
+        originDocument->url().utf8().data());
 
     if (Interpreter::shouldPrintExceptions())
       printf("%s", message.utf8().data());
@@ -1625,7 +1623,7 @@ void Location::put(ExecState* exec,
           return;
         if (!frame->loader()->shouldAllowNavigation(m_frame))
           return;
-        url = frame->loader()->completeURL(str).url();
+        url = frame->loader()->completeURL(str);
         break;
       }
       case Hash: {
@@ -1668,10 +1666,11 @@ void Location::put(ExecState* exec,
   }
 
   Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
-  if (!url.url().startsWith("javascript:", false) || sameDomainAccess) {
+  if (!url.deprecatedString().startsWith("javascript:", false) ||
+      sameDomainAccess) {
     bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
     m_frame->loader()->scheduleLocationChange(
-        url.url(), activeFrame->loader()->outgoingReferrer(), false,
+        url.string(), activeFrame->loader()->outgoingReferrer(), false,
         userGesture);
   }
 }
@@ -1696,7 +1695,7 @@ JSValue* LocationProtoFuncReplace::callAsFunction(ExecState* exec,
         (window && window->allowsAccessFrom(exec))) {
       bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
       frame->loader()->scheduleLocationChange(
-          activeFrame->loader()->completeURL(str).url(),
+          activeFrame->loader()->completeURL(str).string(),
           activeFrame->loader()->outgoingReferrer(), true, userGesture);
     }
   }
@@ -1718,7 +1717,8 @@ JSValue* LocationProtoFuncReload::callAsFunction(ExecState* exec,
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
-  if (!frame->loader()->url().url().startsWith("javascript:", false) ||
+  if (!frame->loader()->url().deprecatedString().startsWith("javascript:",
+                                                            false) ||
       (window && window->allowsAccessFrom(exec))) {
     bool userGesture = Window::retrieveActive(exec)
                            ->impl()
@@ -1745,10 +1745,8 @@ JSValue* LocationProtoFuncAssign::callAsFunction(ExecState* exec,
     if (!activeFrame->loader()->shouldAllowNavigation(frame))
       return jsUndefined();
     const Window* window = Window::retrieveWindow(frame);
-    DeprecatedString dstUrl =
-        activeFrame->loader()
-            ->completeURL(DeprecatedString(args[0]->toString(exec)))
-            .url();
+    String dstUrl =
+        activeFrame->loader()->completeURL(args[0]->toString(exec)).string();
     if (!dstUrl.startsWith("javascript:", false) ||
         (window && window->allowsAccessFrom(exec))) {
       bool userGesture = activeFrame->scriptProxy()->processingUserGesture();

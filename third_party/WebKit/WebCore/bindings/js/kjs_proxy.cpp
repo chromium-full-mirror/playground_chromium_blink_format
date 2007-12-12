@@ -168,7 +168,7 @@ void KJSProxy::initScript() {
 
   // FIXME: We can get rid of this (and eliminate compatMode entirely).
   String userAgent = m_frame->loader()->userAgent(
-      m_frame->document() ? m_frame->document()->URL() : KURL());
+      m_frame->document() ? m_frame->document()->url() : KURL());
   if (userAgent.find("Microsoft") >= 0 || userAgent.find("MSIE") >= 0)
     m_globalObject->setCompatMode(IECompat);
   else {

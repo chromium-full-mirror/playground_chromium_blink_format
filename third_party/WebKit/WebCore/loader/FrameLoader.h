@@ -330,11 +330,11 @@ class FrameLoader : Noncopyable
 
   void setDefersLoading(bool);
 
-  void changeLocation(const String& URL,
+  void changeLocation(const String& url,
                       const String& referrer,
                       bool lockHistory = true,
                       bool userGesture = false);
-  void changeLocation(const KURL& URL,
+  void changeLocation(const KURL&,
                       const String& referrer,
                       bool lockHistory = true,
                       bool userGesture = false);
@@ -349,15 +349,15 @@ class FrameLoader : Noncopyable
                    bool userGesture);
 
   bool requestFrame(HTMLFrameOwnerElement*,
-                    const String& URL,
+                    const String& url,
                     const AtomicString& frameName);
   Frame* loadSubframe(HTMLFrameOwnerElement*,
-                      const KURL& URL,
+                      const KURL&,
                       const String& name,
                       const String& referrer);
 
   void submitForm(const char* action,
-                  const String& URL,
+                  const String& url,
                   PassRefPtr<FormData>,
                   const String& target,
                   const String& contentType,
@@ -382,8 +382,8 @@ class FrameLoader : Noncopyable
   bool isScheduledLocationChangePending() const {
     return m_scheduledRedirection && isLocationChange(*m_scheduledRedirection);
   }
-  void scheduleHTTPRedirection(double delay, const String& URL);
-  void scheduleLocationChange(const String& URL,
+  void scheduleHTTPRedirection(double delay, const String& url);
+  void scheduleLocationChange(const String& url,
                               const String& referrer,
                               bool lockHistory = true,
                               bool userGesture = false);
@@ -406,7 +406,7 @@ class FrameLoader : Noncopyable
   void setEncoding(const String& encoding, bool userChosen);
   String encoding() const;
 
-  KJS::JSValue* executeScript(const String& URL,
+  KJS::JSValue* executeScript(const String& url,
                               int baseLine,
                               const String& script);
   KJS::JSValue* executeScript(const String& script,
@@ -449,9 +449,7 @@ class FrameLoader : Noncopyable
 
   void frameDetached();
 
-  // FIXME: Which one of these URL methods is right?
-  KURL url() const;
-  KURL URL() const;
+  const KURL& url() const { return m_URL; }
 
   void updateBaseURLForEmptyDocument();
 
@@ -474,16 +472,16 @@ class FrameLoader : Noncopyable
   bool isComplete() const;
 
   bool requestObject(RenderPart* frame,
-                     const String& URL,
+                     const String& url,
                      const AtomicString& frameName,
                      const String& serviceType,
                      const Vector<String>& paramNames,
                      const Vector<String>& paramValues);
 
-  KURL completeURL(const String& URL);
+  KURL completeURL(const String& url);
 
-  void didTellBridgeAboutLoad(const String& URL);
-  bool haveToldBridgeAboutLoad(const String& URL);
+  void didTellBridgeAboutLoad(const String& url);
+  bool haveToldBridgeAboutLoad(const String& url);
 
   KURL originalRequestURL() const;
 

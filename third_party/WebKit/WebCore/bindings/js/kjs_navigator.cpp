@@ -219,7 +219,7 @@ JSValue* Navigator::getValueProperty(ExecState* exec, int token) const {
       // Version is everything in the user agent string past the "Mozilla/"
       // prefix.
       const String userAgent = m_frame->loader()->userAgent(
-          m_frame->document() ? m_frame->document()->URL() : KURL());
+          m_frame->document() ? m_frame->document()->url() : KURL());
       return jsString(userAgent.substring(userAgent.find('/') + 1));
     }
     case Product:
@@ -234,7 +234,7 @@ JSValue* Navigator::getValueProperty(ExecState* exec, int token) const {
       return jsString(defaultLanguage());
     case UserAgent:
       return jsString(m_frame->loader()->userAgent(
-          m_frame->document() ? m_frame->document()->URL() : KURL()));
+          m_frame->document() ? m_frame->document()->url() : KURL()));
     case Platform:
       return jsString(WEBCORE_NAVIGATOR_PLATFORM);
     case _Plugins:

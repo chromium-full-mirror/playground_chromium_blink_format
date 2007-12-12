@@ -71,7 +71,7 @@ void IconLoader::startLoading() {
       SubresourceLoader::create(m_frame, this, m_frame->loader()->iconURL());
   if (!loader)
     LOG_ERROR("Failed to start load for icon at url %s",
-              m_frame->loader()->iconURL().url().ascii());
+              m_frame->loader()->iconURL().string().ascii().data());
 
   // Store the handle so we can cancel the load if stopLoading is called later.
   // But only do it if the load hasn't already completed.
@@ -157,10 +157,10 @@ void IconLoader::finishLoading(const KURL& iconURL,
   // <rdar://problem/5463392> tracks that enhancement
 
   if (!iconURL.isEmpty() && m_loadIsInProgress) {
-    iconDatabase()->setIconDataForIconURL(data, iconURL.url());
+    iconDatabase()->setIconDataForIconURL(data, iconURL.string());
     LOG(IconDatabase,
         "IconLoader::finishLoading() - Committing iconURL %s to database",
-        iconURL.url().ascii());
+        iconURL.string().ascii().data());
     m_frame->loader()->commitIconURLToIconDatabase(iconURL);
     m_frame->loader()->client()->dispatchDidReceiveIcon();
   }

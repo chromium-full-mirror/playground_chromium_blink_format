@@ -747,7 +747,7 @@ KURL WebFrame::url() const {
   if (!coreFrame)
     return KURL();
 
-  return coreFrame->loader()->URL();
+  return coreFrame->loader()->url();
 }
 
 void WebFrame::attachScriptDebugger() {
@@ -1544,7 +1544,7 @@ void WebFrame::dispatchWillPerformClientRedirect(const KURL& url,
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
   if (SUCCEEDED(d->webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->willPerformClientRedirectToURL(
-        d->webView, BString(url.url()), delay,
+        d->webView, BString(url.string()), delay,
         MarshallingHelpers::CFAbsoluteTimeToDATE(fireDate), this);
 }
 
@@ -1779,7 +1779,7 @@ void WebFrame::setTitle(const String& title, const KURL& url) {
     history.adoptRef(webHistory());
     if (history) {
       COMPtr<IWebHistoryItem> item;
-      if (SUCCEEDED(history->itemForURL(BString(url.url()), &item))) {
+      if (SUCCEEDED(history->itemForURL(BString(url.string()), &item))) {
         COMPtr<IWebHistoryItemPrivate> itemPrivate;
         if (SUCCEEDED(item->QueryInterface(IID_IWebHistoryItemPrivate,
                                            (void**)&itemPrivate)))
@@ -1804,11 +1804,11 @@ void WebFrame::updateGlobalHistoryForStandardLoad(const KURL& url) {
   if (!history)
     return;
 
-  history->addItemForURL(BString(url.url()), 0);
+  history->addItemForURL(BString(url.string()), 0);
 }
 
 void WebFrame::updateGlobalHistoryForReload(const KURL& url) {
-  BString urlBStr(url.url());
+  BString urlBStr(url.string());
 
   COMPtr<WebHistory> history;
   history.adoptRef(webHistory());
@@ -1879,7 +1879,7 @@ ResourceError WebFrame::cancelledError(const ResourceRequest& request) {
   // FIXME: Need ChickenCat to include CFNetwork/CFURLError.h to get these
   // values
   // Alternatively, we could create our own error domain/codes.
-  return ResourceError(String(WebURLErrorDomain), -999, request.url().url(),
+  return ResourceError(String(WebURLErrorDomain), -999, request.url().string(),
                        String());
 }
 
@@ -1887,8 +1887,8 @@ ResourceError WebFrame::blockedError(const ResourceRequest& request) {
   // FIXME: Need to implement the String descriptions for errors in the
   // WebKitErrorDomain and have them localized
   return ResourceError(String(WebKitErrorDomain),
-                       WebKitErrorCannotUseRestrictedPort, request.url().url(),
-                       String());
+                       WebKitErrorCannotUseRestrictedPort,
+                       request.url().string(), String());
 }
 
 ResourceError WebFrame::cannotShowURLError(const ResourceRequest&) {
@@ -1902,7 +1902,7 @@ ResourceError WebFrame::interruptForPolicyChangeError(
   // WebKitErrorDomain and have them localized
   return ResourceError(String(WebKitErrorDomain),
                        WebKitErrorFrameLoadInterruptedByPolicyChange,
-                       request.url().url(), String());
+                       request.url().string(), String());
 }
 
 ResourceError WebFrame::cannotShowMIMETypeError(const ResourceResponse&) {
@@ -2413,8 +2413,8 @@ Widget* WebFrame::createPlugin(const IntSize& pluginSize,
       ASSERT_NOT_REACHED();
   }
 
-  ResourceError resourceError(String(WebKitErrorDomain), errorCode, url.url(),
-                              String());
+  ResourceError resourceError(String(WebKitErrorDomain), errorCode,
+                              url.string(), String());
   COMPtr<IWebError> error(
       AdoptCOM, WebError::createInstance(resourceError, userInfoBag.get()));
 

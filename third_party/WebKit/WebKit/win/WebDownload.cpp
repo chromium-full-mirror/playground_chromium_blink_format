@@ -151,11 +151,11 @@ void WebDownload::init(ResourceHandle* handle,
     LOG_ERROR(
         "WebDownload - Failed to create WebDownload from existing connection "
         "(%s)",
-        request.url().url().ascii());
+        request.url().deprecatedString().ascii());
   } else
     LOG(Download,
         "WebDownload - Created WebDownload %p from existing connection (%s)",
-        this, request.url().url().ascii());
+        this, request.url().deprecatedString().ascii());
 
   // The CFURLDownload either starts successfully and retains the
   // CFURLConnection,
@@ -199,7 +199,7 @@ void WebDownload::init(const KURL& url, IWebDownloadDelegate* delegate) {
 
   LOG(Download,
       "WebDownload - Initialized download of url %s in WebDownload %p",
-      url.url().ascii(), this);
+      url.deprecatedString().ascii(), this);
 }
 
 WebDownload::~WebDownload() {
@@ -318,7 +318,7 @@ HRESULT STDMETHODCALLTYPE WebDownload::initWithRequest(
 
   LOG(Download,
       "WebDownload - initWithRequest complete, started download of url %s",
-      webRequest->resourceRequest().url().url().ascii());
+      webRequest->resourceRequest().url().deprecatedString().ascii());
   return S_OK;
 }
 

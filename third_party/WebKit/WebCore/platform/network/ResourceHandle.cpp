@@ -180,11 +180,11 @@ bool ResourceHandle::portAllowed(const ResourceRequest& request) {
 
   // Allow ports 21 and 22 for FTP URLs, as Mozilla does.
   if ((port == 21 || port == 22) &&
-      request.url().url().startsWith("ftp:", false))
+      request.url().deprecatedString().startsWith("ftp:", false))
     return true;
 
   // Allow any port number in a file URL, since the port number is ignored.
-  if (request.url().url().startsWith("file:", false))
+  if (request.url().deprecatedString().startsWith("file:", false))
     return true;
 
   return false;

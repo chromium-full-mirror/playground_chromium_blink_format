@@ -403,13 +403,13 @@ class Document : public ContainerNode {
 
   bool wellFormed() const { return m_wellFormed; }
 
-  DeprecatedString URL() const {
+  DeprecatedString url() const {
     return m_url.isEmpty() ? "about:blank" : m_url;
   }
   void setURL(const DeprecatedString& url);
 
   DeprecatedString baseURL() const {
-    return m_baseURL.isEmpty() ? URL() : m_baseURL;
+    return m_baseURL.isEmpty() ? url() : m_baseURL;
   }
   void setBaseURL(const DeprecatedString& baseURL);
 
@@ -654,7 +654,7 @@ class Document : public ContainerNode {
 
   void addImageMap(HTMLMapElement*);
   void removeImageMap(HTMLMapElement*);
-  HTMLMapElement* getImageMap(const String& URL) const;
+  HTMLMapElement* getImageMap(const String& url) const;
 
   HTMLElement* body();
   void setBody(PassRefPtr<HTMLElement>, ExceptionCode&);

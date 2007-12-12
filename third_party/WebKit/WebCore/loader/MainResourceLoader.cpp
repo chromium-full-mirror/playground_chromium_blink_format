@@ -184,8 +184,8 @@ void MainResourceLoader::willSendRequest(
                                        callContinueAfterNavigationPolicy, this);
 }
 
-static bool shouldLoadAsEmptyDocument(const KURL& URL) {
-  return URL.isEmpty() || equalIgnoringCase(String(URL.protocol()), "about");
+static bool shouldLoadAsEmptyDocument(const KURL& url) {
+  return url.isEmpty() || equalIgnoringCase(String(url.protocol()), "about");
 }
 
 void MainResourceLoader::continueAfterContentPolicy(PolicyAction contentPolicy,
@@ -316,7 +316,9 @@ void MainResourceLoader::didReceiveData(const char* data,
 }
 
 void MainResourceLoader::didFinishLoading() {
-  ASSERT(shouldLoadAsEmptyDocument(frameLoader()->URL()) || !defersLoading());
+  ASSERT(
+      shouldLoadAsEmptyDocument(frameLoader()->activeDocumentLoader()->url()) ||
+      !defersLoading());
 
   // The additional processing can do anything including possibly removing the
   // last

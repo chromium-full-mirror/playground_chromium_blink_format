@@ -70,7 +70,7 @@ class CachedResource {
     Cached      // regular case
   };
 
-  CachedResource(const String& URL,
+  CachedResource(const String& url,
                  Type,
                  bool forCache = true,
                  bool sendResourceLoadCallbacks = false);

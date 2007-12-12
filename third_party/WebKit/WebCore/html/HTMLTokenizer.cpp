@@ -532,7 +532,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const DeprecatedString& str,
     return state;
   m_executingScript++;
   DeprecatedString url =
-      scriptURL.isNull() ? m_doc->frame()->document()->URL() : scriptURL;
+      scriptURL.isNull() ? m_doc->frame()->document()->url() : scriptURL;
 
   SegmentedString* savedPrependingSrc = currentPrependingSrc;
   SegmentedString prependingSrc;

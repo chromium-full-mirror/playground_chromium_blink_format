@@ -178,13 +178,13 @@ ResourceRequest& DocumentLoader::actualRequest() {
   return m_request;
 }
 
-const KURL& DocumentLoader::URL() const {
+const KURL& DocumentLoader::url() const {
   return request().url();
 }
 
-void DocumentLoader::replaceRequestURLForAnchorScroll(const KURL& URL) {
-  m_originalRequestCopy.setURL(URL);
-  m_request.setURL(URL);
+void DocumentLoader::replaceRequestURLForAnchorScroll(const KURL& url) {
+  m_originalRequestCopy.setURL(url);
+  m_request.setURL(url);
 }
 
 void DocumentLoader::setRequest(const ResourceRequest& req) {
@@ -210,7 +210,7 @@ void DocumentLoader::setRequest(const ResourceRequest& req) {
   // Only send webView:didReceiveServerRedirectForProvisionalLoadForFrame: if
   // URL changed.
   // Also, don't send it when replacing unreachable URLs with alternate content.
-  if (!handlingUnreachableURL && oldURL.url() != req.url().url())
+  if (!handlingUnreachableURL && oldURL != req.url())
     frameLoader()->didReceiveServerRedirectForProvisionalLoadForFrame();
 }
 
@@ -636,7 +636,7 @@ bool DocumentLoader::startLoadingMainResource(unsigned long identifier) {
     LOG_ERROR(
         "could not create WebResourceHandle for URL %s -- should be caught by "
         "policy handler level",
-        m_request.url().url().ascii());
+        m_request.url().string().ascii().data());
     m_mainResourceLoader = 0;
     return false;
   }

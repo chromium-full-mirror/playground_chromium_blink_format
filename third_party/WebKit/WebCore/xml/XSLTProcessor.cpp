@@ -304,7 +304,7 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
 
   result->open();
   if (sourceIsDocument) {
-    result->setURL(ownerDocument->URL());
+    result->setURL(ownerDocument->url());
     result->setBaseURL(ownerDocument->baseURL());
   }
   result->determineParseMode(
@@ -353,7 +353,7 @@ static xsltStylesheetPtr xsltStylesheetPointer(
     cachedStylesheet = new XSLStyleSheet(stylesheetRootNode->parent()
                                              ? stylesheetRootNode->parent()
                                              : stylesheetRootNode,
-                                         stylesheetRootNode->document()->URL());
+                                         stylesheetRootNode->document()->url());
     cachedStylesheet->parseString(createMarkup(stylesheetRootNode));
   }
 
@@ -374,7 +374,7 @@ static inline xmlDocPtr xmlDocPtrFromNode(Node* sourceNode,
   if (!sourceDoc) {
     sourceDoc = (xmlDocPtr)xmlDocPtrForString(
         ownerDocument->docLoader(), createMarkup(sourceNode),
-        sourceIsDocument ? ownerDocument->URL() : DeprecatedString());
+        sourceIsDocument ? ownerDocument->url() : DeprecatedString());
     shouldDelete = (sourceDoc != 0);
   }
   return sourceDoc;

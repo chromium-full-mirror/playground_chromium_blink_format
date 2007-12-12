@@ -191,7 +191,7 @@ DragImageRef WebDragClient::createDragImageForLink(KURL& url,
   bool clipURLString = false;
   bool clipLabelString = false;
 
-  String urlString = url.url();
+  String urlString = url.string();
   String label = inLabel;
   if (label.isEmpty()) {
     drawURLString = false;
