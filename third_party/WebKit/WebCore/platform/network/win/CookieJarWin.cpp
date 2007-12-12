@@ -78,7 +78,7 @@ void setCookies(const KURL& url, const KURL& policyURL, const String& value) {
                                 urlCF.get(), policyURLCF.get());
 #else
   // FIXME: Deal with the policy URL.
-  DeprecatedString str = url.url();
+  DeprecatedString str = url.deprecatedString();
   str.append((UChar)'\0');
   DeprecatedString val = value.deprecatedString();
   val.append((UChar)'\0');
@@ -120,7 +120,7 @@ String cookies(const KURL& url) {
 
   return (CFStringRef)CFDictionaryGetValue(headerCF.get(), s_cookieCF);
 #else
-  DeprecatedString str = url.url();
+  DeprecatedString str = url.deprecatedString();
   str.append((UChar)'\0');
 
   DWORD count = str.length();

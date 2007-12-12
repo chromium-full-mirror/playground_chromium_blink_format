@@ -39,7 +39,7 @@ void FrameLoader::urlSelected(const FrameLoadRequest& request,
                               Event* /*triggering Event*/) {
   FrameWin* frameWin = static_cast<FrameWin*>(m_frame);
   if (frameWin->client())
-    frameWin->client()->openURL(request.resourceRequest().url().url(),
+    frameWin->client()->openURL(request.resourceRequest().url().string(),
                                 request.lockHistory());
 }
 

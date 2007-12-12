@@ -224,8 +224,11 @@ void FrameLoaderClientWx::dispatchDidStartProvisionalLoad() {
   if (target) {
     wxWebViewStateChangedEvent wkEvent(target);
     wkEvent.SetState(wxWEBVIEW_STATE_NEGOTIATING);
-    wkEvent.SetURL(
-        m_frame->loader()->provisionalDocumentLoader()->request().url().url());
+    wkEvent.SetURL(m_frame->loader()
+                       ->provisionalDocumentLoader()
+                       ->request()
+                       .url()
+                       .string());
     target->GetEventHandler()->ProcessEvent(wkEvent);
   }
 }
@@ -241,7 +244,8 @@ void FrameLoaderClientWx::dispatchDidCommitLoad() {
   if (target) {
     wxWebViewStateChangedEvent wkEvent(target);
     wkEvent.SetState(wxWEBVIEW_STATE_TRANSFERRING);
-    wkEvent.SetURL(m_frame->loader()->documentLoader()->request().url().url());
+    wkEvent.SetURL(
+        m_frame->loader()->documentLoader()->request().url().string());
     target->GetEventHandler()->ProcessEvent(wkEvent);
   }
 }
@@ -251,7 +255,7 @@ void FrameLoaderClientWx::dispatchDidFinishDocumentLoad() {
   if (target) {
     wxWebViewStateChangedEvent wkEvent(target);
     wkEvent.SetState(wxWEBVIEW_STATE_STOP);
-    wkEvent.SetURL(m_frame->loader()->URL().url());
+    wkEvent.SetURL(m_frame->loader()->url().string());
     target->GetEventHandler()->ProcessEvent(wkEvent);
   }
 }
@@ -305,7 +309,7 @@ void FrameLoaderClientWx::postProgressFinishedNotification() {
   if (target) {
     wxWebViewStateChangedEvent wkEvent(target);
     wkEvent.SetState(wxWEBVIEW_STATE_STOP);
-    wkEvent.SetURL(m_frame->loader()->url().url());
+    wkEvent.SetURL(m_frame->loader()->url().string());
     target->GetEventHandler()->ProcessEvent(wkEvent);
   }
 }
@@ -328,7 +332,7 @@ void FrameLoaderClientWx::willChangeTitle(DocumentLoader*) {
 }
 
 void FrameLoaderClientWx::didChangeTitle(DocumentLoader* l) {
-  setTitle(l->title(), l->URL());
+  setTitle(l->title(), l->url());
 }
 
 void FrameLoaderClientWx::finishedLoading(DocumentLoader*) {
@@ -654,7 +658,7 @@ void FrameLoaderClientWx::dispatchDecidePolicyForNavigationAction(
   if (target) {
     wxWebViewBeforeLoadEvent wkEvent(target);
     wkEvent.SetNavigationType(wxNavTypeFromWebNavType(action.type()));
-    wkEvent.SetURL(request.url().url());
+    wkEvent.SetURL(request.url().string());
 
     target->GetEventHandler()->ProcessEvent(wkEvent);
     if (wkEvent.IsCancelled())
