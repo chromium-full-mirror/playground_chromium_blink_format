@@ -785,6 +785,7 @@ class WebView : public IWebView,
   static bool s_allowSiteSpecificHacks;
 
   WebCore::Timer<WebView> m_closeWindowTimer;
+  OwnPtr<TRACKMOUSEEVENT> m_mouseOutTracker;
 };
 
 #endif
