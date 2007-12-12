@@ -75,7 +75,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
 
 void Pasteboard::writeURL(const KURL& url, const String&, Frame*) {
   if (wxTheClipboard->Open()) {
-    wxTheClipboard->SetData(new wxTextDataObject(url.url()));
+    wxTheClipboard->SetData(new wxTextDataObject(url.string()));
     wxTheClipboard->Close();
   }
 }
