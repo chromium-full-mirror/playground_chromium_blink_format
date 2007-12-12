@@ -1738,6 +1738,9 @@ Editor::Command Editor::command(const String& commandName) {
 
 Editor::Command Editor::command(const String& commandName,
                                 EditorCommandSource source) {
+  if (commandName.isEmpty())
+    return Command();
+
   static const CommandMap& commandMap = createCommandMap();
   const EditorInternalCommand* internalCommand = commandMap.get(commandName);
   return internalCommand ? Command(m_frame, internalCommand, source)
