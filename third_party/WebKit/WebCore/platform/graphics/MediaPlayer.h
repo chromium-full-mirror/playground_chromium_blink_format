@@ -49,7 +49,6 @@ class MediaPlayerClient {
   virtual void mediaPlayerReadyStateChanged(MediaPlayer*) {}
   virtual void mediaPlayerVolumeChanged(MediaPlayer*) {}
   virtual void mediaPlayerTimeChanged(MediaPlayer*) {}
-  virtual void mediaPlayerCuePointReached(MediaPlayer*, float cueTime) {}
   virtual void mediaPlayerRepaint(MediaPlayer*) {}
 };
 
@@ -86,10 +85,6 @@ class MediaPlayer : Noncopyable {
   void seek(float time);
 
   void setEndTime(float time);
-
-  void addCuePoint(float time);
-  void removeCuePoint(float time);
-  void clearCuePoints();
 
   float rate() const;
   void setRate(float);
@@ -132,7 +127,6 @@ class MediaPlayer : Noncopyable {
   void readyStateChanged();
   void volumeChanged();
   void timeChanged();
-  void cuePointReached(float cueTime);
 
   void repaint();
 
@@ -147,7 +141,6 @@ class MediaPlayer : Noncopyable {
   float m_rate;
   float m_volume;
   bool m_muted;
-  HashSet<float> m_cuePoints;
 };
 }
 

@@ -82,10 +82,6 @@ class MediaPlayerPrivate : Noncopyable {
   void seek(float time);
   void setEndTime(float time);
 
-  void addCuePoint(float time);
-  void removeCuePoint(float time);
-  void clearCuePoints();
-
   void setRate(float);
   void setVolume(float);
   void setMuted(bool);
@@ -118,9 +114,9 @@ class MediaPlayerPrivate : Noncopyable {
  private:
   void updateStates();
   void cancelSeek();
-  void cuePointTimerFired(Timer<MediaPlayerPrivate>*);
+  void endPointTimerFired(Timer<MediaPlayerPrivate>*);
   float maxTimeLoaded();
-  void startCuePointTimerIfNeeded();
+  void startEndPointTimerIfNeeded();
 
   void createGSTPlayBin(String url);
 
@@ -133,7 +129,6 @@ class MediaPlayerPrivate : Noncopyable {
   float m_endTime;
   bool m_isEndReached;
   double m_volume;
-  float m_previousTimeCueTimerFired;
   MediaPlayer::NetworkState m_networkState;
   MediaPlayer::ReadyState m_readyState;
   bool m_startedPlaying;
