@@ -541,7 +541,7 @@ void FrameLoaderClient::willChangeTitle(DocumentLoader*) {
   notImplemented();
 }
 void FrameLoaderClient::didChangeTitle(DocumentLoader* l) {
-  setTitle(l->title(), l->URL());
+  setTitle(l->title(), l->url());
 }
 void FrameLoaderClient::finalSetupForReplace(DocumentLoader*) {
   notImplemented();
