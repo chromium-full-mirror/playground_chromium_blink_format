@@ -65,8 +65,10 @@ class SVGSVGElement : public SVGStyledLocatableElement,
 
   void setContainerSize(const IntSize& containerSize) {
     m_containerSize = containerSize;
+    m_hasSetContainerSize = true;
   }
   IntSize containerSize() const { return m_containerSize; }
+  bool hasSetContainerSize() const { return m_hasSetContainerSize; }
   int relativeWidthValue() const;
   int relativeHeightValue() const;
 
@@ -181,6 +183,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   FloatPoint m_translation;
   mutable OwnPtr<SVGViewSpec> m_viewSpec;
   IntSize m_containerSize;
+  bool m_hasSetContainerSize;
 };
 
 }  // namespace WebCore
