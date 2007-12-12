@@ -98,6 +98,8 @@ WebKitWebFrame* webkit_web_frame_init_with_web_view(
 WEBKIT_API GSList* webkit_web_frame_get_children(WebKitWebFrame* frame);
 
 WEBKIT_API gchar* webkit_web_frame_get_inner_text(WebKitWebFrame* frame);
+
+WEBKIT_API void webkit_web_frame_print(WebKitWebFrame* frame);
 }
 
 #endif
