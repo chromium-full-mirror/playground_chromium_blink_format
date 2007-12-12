@@ -79,11 +79,10 @@ PlatformScrollbar::~PlatformScrollbar() {
    * the Widget does not take over ownership.
    */
   g_signal_handlers_disconnect_by_func(
-      G_OBJECT(gtkWidget()),
-      reinterpret_cast<gpointer>(PlatformScrollbar::gtkValueChanged), this);
-  g_signal_handlers_disconnect_by_func(
-      G_OBJECT(gtkWidget()), reinterpret_cast<gpointer>(gtkScrollEventCallback),
+      G_OBJECT(gtkWidget()), (gpointer)PlatformScrollbar::gtkValueChanged,
       this);
+  g_signal_handlers_disconnect_by_func(G_OBJECT(gtkWidget()),
+                                       (gpointer)gtkScrollEventCallback, this);
   g_object_unref(G_OBJECT(gtkWidget()));
 }
 
@@ -141,7 +140,8 @@ void PlatformScrollbar::geometryChanged() {
 
 void PlatformScrollbar::gtkValueChanged(GtkAdjustment*,
                                         PlatformScrollbar* that) {
-  that->setValue(gtk_adjustment_get_value(that->m_adjustment));
+  that->setValue(
+      static_cast<int>(gtk_adjustment_get_value(that->m_adjustment)));
 }
 
 static int scrollbarSize() {
