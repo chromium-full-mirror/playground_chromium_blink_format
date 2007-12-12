@@ -141,7 +141,7 @@ static int CALLBACK enumStylesCallback(const LOGFONT* logFont,
 }
 
 FontPlatformData::FontPlatformData(HFONT font,
-                                   int size,
+                                   float size,
                                    bool bold,
                                    bool oblique)
     : m_font(font),
@@ -219,7 +219,7 @@ FontPlatformData::FontPlatformData(HFONT font,
 }
 
 FontPlatformData::FontPlatformData(CGFontRef font,
-                                   int size,
+                                   float size,
                                    bool bold,
                                    bool oblique)
     : m_font(0),
