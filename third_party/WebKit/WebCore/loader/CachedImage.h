@@ -49,6 +49,8 @@ class CachedImage : public CachedResource, public ImageObserver {
            imageSize().height() > 0;
   }
 
+  void setImageContainerSize(const IntSize&);
+
   IntSize imageSize() const;  // returns the size of the complete image
   IntRect imageRect() const;  // The size of the image.
 

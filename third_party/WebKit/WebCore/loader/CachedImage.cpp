@@ -105,6 +105,11 @@ Image* CachedImage::image() const {
   return nullImage();
 }
 
+void CachedImage::setImageContainerSize(const IntSize& containerSize) {
+  if (m_image)
+    m_image->setContainerSize(containerSize);
+}
+
 IntSize CachedImage::imageSize() const {
   return (m_image ? m_image->size() : IntSize());
 }

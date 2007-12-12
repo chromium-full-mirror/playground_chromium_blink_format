@@ -58,36 +58,60 @@ SVGImage::~SVGImage() {
                                          // references to the frame
 }
 
-IntSize SVGImage::size() const {
-  IntSize defaultSize(300, 150);
-  // FIXME: Eventually we'll be passed in the dest size and can scale against
-  // that
-  IntSize destSize = defaultSize;
+void SVGImage::setContainerSize(const IntSize& containerSize) {
+  if (containerSize.width() <= 0 || containerSize.height() <= 0)
+    return;
 
+  SVGSVGElement* rootElement =
+      static_cast<SVGDocument*>(m_frame->document())->rootElement();
+  if (!rootElement)
+    return;
+
+  rootElement->setContainerSize(containerSize);
+}
+
+IntSize SVGImage::size() const {
   if (!m_frame || !m_frame->document())
     return IntSize();
 
   SVGSVGElement* rootElement =
       static_cast<SVGDocument*>(m_frame->document())->rootElement();
   if (!rootElement)
-    return defaultSize;
+    return IntSize();
 
   SVGLength width = rootElement->width();
   SVGLength height = rootElement->height();
 
   IntSize svgSize;
   if (width.unitType() == LengthTypePercentage)
-    svgSize.setWidth(
-        static_cast<int>(width.valueAsPercentage() * destSize.width()));
+    svgSize.setWidth(rootElement->relativeWidthValue());
   else
     svgSize.setWidth(static_cast<int>(width.value()));
+
   if (height.unitType() == LengthTypePercentage)
-    svgSize.setHeight(
-        static_cast<int>(height.valueAsPercentage() * destSize.height()));
+    svgSize.setHeight(rootElement->relativeHeightValue());
   else
     svgSize.setHeight(static_cast<int>(height.value()));
 
   return svgSize;
+}
+
+bool SVGImage::hasRelativeWidth() const {
+  SVGSVGElement* rootElement =
+      static_cast<SVGDocument*>(m_frame->document())->rootElement();
+  if (!rootElement)
+    return false;
+
+  return rootElement->width().unitType() == LengthTypePercentage;
+}
+
+bool SVGImage::hasRelativeHeight() const {
+  SVGSVGElement* rootElement =
+      static_cast<SVGDocument*>(m_frame->document())->rootElement();
+  if (!rootElement)
+    return false;
+
+  return rootElement->height().unitType() == LengthTypePercentage;
 }
 
 void SVGImage::draw(GraphicsContext* context,

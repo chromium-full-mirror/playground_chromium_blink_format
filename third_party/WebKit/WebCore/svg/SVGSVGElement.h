@@ -25,6 +25,7 @@
 
 #if ENABLE(SVG)
 
+#include "IntSize.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
@@ -61,6 +62,13 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void setContentStyleType(const AtomicString& type);
 
   FloatRect viewport() const;
+
+  void setContainerSize(const IntSize& containerSize) {
+    m_containerSize = containerSize;
+  }
+  IntSize containerSize() const { return m_containerSize; }
+  int relativeWidthValue() const;
+  int relativeHeightValue() const;
 
   float pixelUnitToMillimeterX() const;
   float pixelUnitToMillimeterY() const;
@@ -172,6 +180,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   TimeScheduler* m_timeScheduler;
   FloatPoint m_translation;
   mutable OwnPtr<SVGViewSpec> m_viewSpec;
+  IntSize m_containerSize;
 };
 
 }  // namespace WebCore

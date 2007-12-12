@@ -177,6 +177,9 @@ class RenderBox : public RenderObject {
                                        int height,
                                        bool includeLeftEdge = true,
                                        bool includeRightEdge = true);
+  IntSize calculateBackgroundSize(const BackgroundLayer*,
+                                  int scaledWidth,
+                                  int scaledHeight) const;
 
   virtual int staticX() const;
   virtual int staticY() const;

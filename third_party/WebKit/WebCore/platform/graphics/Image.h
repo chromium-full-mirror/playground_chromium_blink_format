@@ -82,6 +82,11 @@ class Image : Noncopyable {
 
   bool isNull() const;
 
+  // These are ony used for SVGImage right now
+  virtual void setContainerSize(const IntSize&) {}
+  virtual bool hasRelativeWidth() const { return false; }
+  virtual bool hasRelativeHeight() const { return false; }
+
   virtual IntSize size() const = 0;
   IntRect rect() const;
   int width() const;

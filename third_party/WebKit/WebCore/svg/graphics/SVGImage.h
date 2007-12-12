@@ -45,6 +45,10 @@ class SVGImage : public Image {
   SVGImage(ImageObserver*);
   ~SVGImage();
 
+  virtual void setContainerSize(const IntSize&);
+  virtual bool hasRelativeWidth() const;
+  virtual bool hasRelativeHeight() const;
+
   virtual IntSize size() const;
 
   virtual bool dataChanged(bool allDataReceived);
