@@ -450,9 +450,6 @@ bool FrameLoaderClient::shouldGoToHistoryItem(HistoryItem* item) const {
   return item != 0;
 }
 
-void FrameLoaderClient::makeDocumentView() {
-  notImplemented();
-}
 void FrameLoaderClient::makeRepresentation(DocumentLoader*) {
   notImplemented();
 }
@@ -614,9 +611,6 @@ void FrameLoaderClient::setTitle(const String& title, const KURL& url) {
                           urlString.data());
 }
 
-void FrameLoaderClient::setDocumentViewFromCachedPage(WebCore::CachedPage*) {
-  notImplemented();
-}
 void FrameLoaderClient::dispatchDidReceiveContentLength(
     DocumentLoader*,
     unsigned long identifier,
@@ -692,9 +686,6 @@ bool FrameLoaderClient::willUseArchive(ResourceLoader*,
   notImplemented();
   return false;
 }
-void FrameLoaderClient::saveDocumentViewToCachedPage(CachedPage*) {
-  notImplemented();
-}
 bool FrameLoaderClient::canCachePage() const {
   notImplemented();
   return false;
@@ -717,6 +708,16 @@ void FrameLoaderClient::updateGlobalHistoryForStandardLoad(const KURL&) {
   notImplemented();
 }
 void FrameLoaderClient::updateGlobalHistoryForReload(const KURL&) {
+  notImplemented();
+}
+
+void FrameLoaderClient::savePlatformDataToCachedPage(CachedPage*) {
+  notImplemented();
+}
+void FrameLoaderClient::transitionToCommittedFromCachedPage(CachedPage*) {
+  notImplemented();
+}
+void FrameLoaderClient::transitionToCommittedForNewPage() {
   notImplemented();
 }
 }

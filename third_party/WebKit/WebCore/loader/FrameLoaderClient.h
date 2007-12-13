@@ -78,9 +78,7 @@ class FrameLoaderClient {
 
   virtual bool hasHTMLView() const { return true; }
 
-  virtual void makeDocumentView() = 0;
   virtual void makeRepresentation(DocumentLoader*) = 0;
-  virtual void setDocumentViewFromCachedPage(CachedPage*) = 0;
   virtual void forceLayout() = 0;
   virtual void forceLayoutForNonHTML() = 0;
 
@@ -231,7 +229,10 @@ class FrameLoaderClient {
 
   virtual String userAgent(const KURL&) = 0;
 
-  virtual void saveDocumentViewToCachedPage(CachedPage*) = 0;
+  virtual void savePlatformDataToCachedPage(CachedPage*) = 0;
+  virtual void transitionToCommittedFromCachedPage(CachedPage*) = 0;
+  virtual void transitionToCommittedForNewPage() = 0;
+
   virtual bool canCachePage() const = 0;
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,

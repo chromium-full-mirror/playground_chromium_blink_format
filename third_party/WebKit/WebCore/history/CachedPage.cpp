@@ -27,6 +27,7 @@
 #include "CachedPage.h"
 
 #include "AnimationController.h"
+#include "CachedPagePlatformData.h"
 #include "Document.h"
 #include "Element.h"
 #include "EventHandler.h"
@@ -114,7 +115,7 @@ CachedPage::~CachedPage() {
   --CachedPageCounter::count;
 #endif
 
-  close();
+  clear();
 }
 
 void CachedPage::restore(Page* page) {
@@ -157,6 +158,9 @@ void CachedPage::clear() {
   if (!m_document)
     return;
 
+  if (m_cachedPagePlatformData)
+    m_cachedPagePlatformData->clear();
+
   ASSERT(m_view);
   ASSERT(m_document->frame() == m_view->frame());
 
@@ -184,6 +188,7 @@ void CachedPage::clear() {
   m_locationProperties.clear();
   m_windowBuiltins.clear();
   m_pausedTimeouts.clear();
+  m_cachedPagePlatformData.clear();
 
   gcController().garbageCollectSoon();
 }
@@ -206,6 +211,14 @@ void CachedPage::setTimeStampToNow() {
 
 double CachedPage::timeStamp() const {
   return m_timeStamp;
+}
+
+void CachedPage::setCachedPagePlatformData(CachedPagePlatformData* data) {
+  m_cachedPagePlatformData.set(data);
+}
+
+CachedPagePlatformData* CachedPage::cachedPagePlatformData() {
+  return m_cachedPagePlatformData.get();
 }
 
 }  // namespace WebCore

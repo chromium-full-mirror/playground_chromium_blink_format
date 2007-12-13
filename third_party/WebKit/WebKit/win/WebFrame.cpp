@@ -40,6 +40,7 @@
 #include "IWebUIDelegatePrivate.h"
 #include "MarshallingHelpers.h"
 #include "WebActionPropertyBag.h"
+#include "WebCachedPagePlatformData.h"
 #include "WebChromeClient.h"
 #include "WebDocumentLoader.h"
 #include "WebDownload.h"
@@ -1480,15 +1481,6 @@ bool WebFrame::hasFrameView() const {
   return !!d->frameView();
 }
 
-void WebFrame::makeDocumentView() {
-  ASSERT(core(this));
-
-  // On the mac, this is done in Frame::setView, but since we don't have
-  // separate
-  // frame views, we'll just do it here instead.
-  core(this)->loader()->resetMultipleFormSubmissionProtection();
-}
-
 void WebFrame::makeRepresentation(DocumentLoader*) {
   notImplemented();
 }
@@ -1518,10 +1510,6 @@ void WebFrame::detachedFromParent3() {
 }
 
 void WebFrame::detachedFromParent4() {
-  notImplemented();
-}
-
-void WebFrame::loadedFromCachedPage() {
   notImplemented();
 }
 
@@ -1793,8 +1781,30 @@ String WebFrame::userAgent(const KURL& url) {
   return d->webView->userAgentForKURL(url);
 }
 
-void WebFrame::setDocumentViewFromCachedPage(CachedPage*) {
-  notImplemented();
+void WebFrame::savePlatformDataToCachedPage(CachedPage* cachedPage) {
+  Frame* coreFrame = core(this);
+  if (!coreFrame)
+    return;
+
+  ASSERT(coreFrame->loader()->documentLoader() == cachedPage->documentLoader());
+
+  WebCachedPagePlatformData* webPlatformData =
+      new WebCachedPagePlatformData(static_cast<IWebDataSource*>(
+          getWebDataSource(coreFrame->loader()->documentLoader())));
+  cachedPage->setCachedPagePlatformData(webPlatformData);
+}
+
+void WebFrame::transitionToCommittedFromCachedPage(CachedPage*) {
+  transitionToCommittedForNewPage();
+}
+
+void WebFrame::transitionToCommittedForNewPage() {
+  ASSERT(core(this));
+
+  // On the mac, this is done in Frame::setView, but since we don't have
+  // separate
+  // frame views, we'll just do it here instead.
+  core(this)->loader()->resetMultipleFormSubmissionProtection();
 }
 
 void WebFrame::updateGlobalHistoryForStandardLoad(const KURL& url) {
@@ -1840,10 +1850,6 @@ bool WebFrame::shouldGoToHistoryItem(HistoryItem*) const {
 
 void WebFrame::saveViewStateToItem(HistoryItem*) {
   // FIXME: Need to save view state for page caching
-  notImplemented();
-}
-
-void WebFrame::saveDocumentViewToCachedPage(CachedPage*) {
   notImplemented();
 }
 

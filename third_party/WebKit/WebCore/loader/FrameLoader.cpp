@@ -2717,10 +2717,14 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
           updateHistoryForBackForwardNavigation();
 
           // Create a document view for this document, or used the cached view.
-          if (cachedPage)
-            m_client->setDocumentViewFromCachedPage(cachedPage.get());
-          else
-            m_client->makeDocumentView();
+          if (cachedPage) {
+            DocumentLoader* cachedDocumentLoader = cachedPage->documentLoader();
+            ASSERT(cachedDocumentLoader);
+            cachedDocumentLoader->setFrame(m_frame);
+            m_client->transitionToCommittedFromCachedPage(cachedPage.get());
+
+          } else
+            m_client->transitionToCommittedForNewPage();
         }
       break;
 
@@ -2728,13 +2732,13 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
     case FrameLoadTypeSame:
     case FrameLoadTypeReplace:
       updateHistoryForReload();
-      m_client->makeDocumentView();
+      m_client->transitionToCommittedForNewPage();
       break;
 
     // FIXME - just get rid of this case, and merge
     // FrameLoadTypeReloadAllowingStaleData with the above case
     case FrameLoadTypeReloadAllowingStaleData:
-      m_client->makeDocumentView();
+      m_client->transitionToCommittedForNewPage();
       break;
 
     case FrameLoadTypeStandard:
@@ -2747,12 +2751,12 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
       if (m_frame->view())
         m_frame->view()->suppressScrollbars(true);
 #endif
-      m_client->makeDocumentView();
+      m_client->transitionToCommittedForNewPage();
       break;
 
     case FrameLoadTypeRedirectWithLockedHistory:
       updateHistoryForRedirectWithLockedHistory();
-      m_client->makeDocumentView();
+      m_client->transitionToCommittedForNewPage();
       break;
 
     // FIXME Remove this check when dummy ds is removed (whatever "dummy ds"
@@ -3967,7 +3971,7 @@ void FrameLoader::cachePageForHistoryItem(HistoryItem* item) {
     RefPtr<CachedPage> cachedPage = CachedPage::create(page);
     cachedPage->setTimeStampToNow();
     cachedPage->setDocumentLoader(documentLoader());
-    m_client->saveDocumentViewToCachedPage(cachedPage.get());
+    m_client->savePlatformDataToCachedPage(cachedPage.get());
 
     pageCache()->add(item, cachedPage.release());
   }

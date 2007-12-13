@@ -135,7 +135,15 @@ void FrameLoaderClientQt::invalidateCurrentItemPageCache() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::makeDocumentView() {
+void FrameLoaderClientQt::savePlatformDataToCachedPage(CachedPage*) {
+  notImplemented();
+}
+
+void FrameLoaderClientQt::transitionToCommittedFromCachedPage(CachedPage*) {
+  notImplemented();
+}
+
+void FrameLoaderClientQt::transitionToCommittedForNewPage() {
   //    qDebug() << "FrameLoaderClientQt::makeDocumentView" <<
   //    m_frame->document();
 
@@ -454,10 +462,6 @@ void FrameLoaderClientQt::registerForIconNotification(bool) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::setDocumentViewFromCachedPage(CachedPage*) {
-  notImplemented();
-}
-
 void FrameLoaderClientQt::updateGlobalHistoryForStandardLoad(
     const WebCore::KURL& url) {
   emit m_webFrame->page()->addToHistory(QUrl(url.prettyURL()));
@@ -476,10 +480,6 @@ bool FrameLoaderClientQt::shouldGoToHistoryItem(
 }
 
 void FrameLoaderClientQt::saveViewStateToItem(WebCore::HistoryItem*) {
-  notImplemented();
-}
-
-void FrameLoaderClientQt::saveDocumentViewToCachedPage(CachedPage*) {
   notImplemented();
 }
 

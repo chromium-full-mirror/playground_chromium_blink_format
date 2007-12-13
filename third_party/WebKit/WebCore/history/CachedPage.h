@@ -46,6 +46,7 @@ class SavedProperties;
 
 namespace WebCore {
 
+class CachedPagePlatformData;
 class Document;
 class FrameView;
 class Node;
@@ -63,17 +64,14 @@ class CachedPage : public RefCounted<CachedPage> {
   const KURL& url() const { return m_URL; }
   void restore(Page*);
 
-  void close();
-
   void setTimeStamp(double);
   void setTimeStampToNow();
   double timeStamp() const;
   void setDocumentLoader(PassRefPtr<DocumentLoader>);
   DocumentLoader* documentLoader();
-#if PLATFORM(MAC)
-  void setDocumentView(id);
-  id documentView();
-#endif
+
+  void setCachedPagePlatformData(CachedPagePlatformData*);
+  CachedPagePlatformData* cachedPagePlatformData();
 
  private:
   CachedPage(Page*);
@@ -88,11 +86,8 @@ class CachedPage : public RefCounted<CachedPage> {
   OwnPtr<KJS::SavedProperties> m_locationProperties;
   OwnPtr<KJS::SavedBuiltins> m_windowBuiltins;
   OwnPtr<KJS::PausedTimeouts> m_pausedTimeouts;
-
-#if PLATFORM(MAC)
-  RetainPtr<id> m_documentView;
-#endif
-};  // class CachedPage
+  OwnPtr<CachedPagePlatformData> m_cachedPagePlatformData;
+};
 
 }  // namespace WebCore
 

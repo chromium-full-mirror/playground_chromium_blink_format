@@ -111,10 +111,6 @@ bool FrameLoaderClientWx::provisionalItemIsTarget() const {
   return false;
 }
 
-void FrameLoaderClientWx::makeDocumentView() {
-  notImplemented();
-}
-
 void FrameLoaderClientWx::makeRepresentation(DocumentLoader*) {
   notImplemented();
 }
@@ -445,10 +441,6 @@ void FrameLoaderClientWx::partClearedInBegin() {
   notImplemented();
 }
 
-void FrameLoaderClientWx::setDocumentViewFromCachedPage(WebCore::CachedPage*) {
-  notImplemented();
-}
-
 void FrameLoaderClientWx::updateGlobalHistoryForStandardLoad(
     const WebCore::KURL&) {
   notImplemented();
@@ -465,10 +457,6 @@ bool FrameLoaderClientWx::shouldGoToHistoryItem(WebCore::HistoryItem*) const {
 
 void FrameLoaderClientWx::saveScrollPositionAndViewStateToItem(
     WebCore::HistoryItem*) {
-  notImplemented();
-}
-
-void FrameLoaderClientWx::saveDocumentViewToCachedPage(WebCore::CachedPage*) {
   notImplemented();
 }
 
@@ -793,6 +781,18 @@ void FrameLoaderClientWx::didPerformFirstNavigation() const {
 }
 
 void FrameLoaderClientWx::registerForIconNotification(bool listen) {
+  notImplemented();
+}
+
+void FrameLoaderClientWx::savePlatformDataToCachedPage(CachedPage*) {
+  notImplemented();
+}
+
+void FrameLoaderClientWx::transitionToCommittedFromCachedPage(CachedPage*) {
+  notImplemented();
+}
+
+void FrameLoaderClientWx::transitionToCommittedForNewPage() {
   notImplemented();
 }
 }
