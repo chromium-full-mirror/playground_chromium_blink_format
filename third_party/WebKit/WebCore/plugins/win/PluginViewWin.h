@@ -128,6 +128,10 @@ class PluginViewWin : public Widget {
   void invalidateRect(NPRect*);
   void invalidateRegion(NPRegion);
   void forceRedraw();
+  void pushPopupsEnabledState(bool state);
+  void popPopupsEnabledState();
+
+  bool arePopupsAllowed() const;
 
   void disconnectStream(PluginStreamWin*);
 
@@ -188,6 +192,10 @@ class PluginViewWin : public Widget {
   Timer<PluginViewWin> m_requestTimer;
   Timer<PluginViewWin> m_invalidateTimer;
 
+  void popPopupsStateTimerFired(Timer<PluginViewWin>*);
+  Timer<PluginViewWin> m_popPopupsStateTimer;
+
+  bool dispatchNPEvent(NPEvent*);
   OwnPtr<PluginMessageThrottlerWin> m_messageThrottler;
 
   void updateWindow() const;
@@ -208,6 +216,8 @@ class PluginViewWin : public Widget {
   NPP m_instance;
   NPP_t m_instanceStruct;
   NPWindow m_npWindow;
+
+  Vector<bool, 4> m_popupStateStack;
 
   HashSet<RefPtr<PluginStreamWin>> m_streams;
   Vector<PluginRequestWin*> m_requests;

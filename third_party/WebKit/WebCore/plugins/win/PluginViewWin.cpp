@@ -80,10 +80,12 @@ class PluginRequestWin {
  public:
   PluginRequestWin(const FrameLoadRequest& frameLoadRequest,
                    bool sendNotification,
-                   void* notifyData)
+                   void* notifyData,
+                   bool shouldAllowPopups)
       : m_frameLoadRequest(frameLoadRequest),
         m_notifyData(notifyData),
-        m_sendNotification(sendNotification) {}
+        m_sendNotification(sendNotification),
+        m_shouldAllowPopups(shouldAllowPopups) {}
 
  public:
   const FrameLoadRequest& frameLoadRequest() const {
@@ -91,12 +93,13 @@ class PluginRequestWin {
   }
   void* notifyData() const { return m_notifyData; }
   bool sendNotification() const { return m_sendNotification; }
+  bool shouldAllowPopups() const { return m_shouldAllowPopups; }
 
  private:
   FrameLoadRequest m_frameLoadRequest;
   void* m_notifyData;
   bool m_sendNotification;
-  // FIXME: user gesture
+  bool m_shouldAllowPopups;
 };
 
 static const double MessageThrottleTimeInterval = 0.001;
@@ -266,6 +269,22 @@ static LRESULT CALLBACK PluginViewWndProc(HWND hWnd,
   return pluginView->wndProc(hWnd, message, wParam, lParam);
 }
 
+void PluginViewWin::popPopupsStateTimerFired(Timer<PluginViewWin>*) {
+  popPopupsEnabledState();
+}
+
+static bool isWindowsMessageUserGesture(UINT message) {
+  switch (message) {
+    case WM_LBUTTONUP:
+    case WM_MBUTTONUP:
+    case WM_RBUTTONUP:
+    case WM_KEYUP:
+      return true;
+    default:
+      return false;
+  }
+}
+
 LRESULT
 PluginViewWin::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   if (message == m_lastMessage &&
@@ -284,6 +303,19 @@ PluginViewWin::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
   m_lastMessage = message;
   m_isCallingPluginWndProc = true;
+
+  // If the plug-in doesn't explicitly support changing the pop-up state, we
+  // enable
+  // popups for all user gestures.
+  // Note that we need to pop the state in a timer, because the Flash plug-in
+  // pops up windows in response to a posted message.
+  if (m_plugin->pluginFuncs()->version < NPVERS_HAS_POPUPS_ENABLED_STATE &&
+      isWindowsMessageUserGesture(message) &&
+      !m_popPopupsStateTimer.isActive()) {
+    pushPopupsEnabledState(true);
+
+    m_popPopupsStateTimer.startOneShot(0);
+  }
 
   // Call the plug-in's window proc.
   LRESULT result =
@@ -414,6 +446,27 @@ void PluginViewWin::paintMissingPluginIcon(GraphicsContext* context,
   context->restore();
 }
 
+bool PluginViewWin::dispatchNPEvent(NPEvent* npEvent) {
+  if (!m_plugin->pluginFuncs()->event)
+    return true;
+
+  bool shouldPop = false;
+
+  if (m_plugin->pluginFuncs()->version < NPVERS_HAS_POPUPS_ENABLED_STATE &&
+      isWindowsMessageUserGesture(npEvent->event)) {
+    pushPopupsEnabledState(true);
+    shouldPop = true;
+  }
+
+  KJS::JSLock::DropAllLocks dropAllLocks;
+  bool result = m_plugin->pluginFuncs()->event(m_instance, &npEvent);
+
+  if (shouldPop)
+    popPopupsEnabledState();
+
+  return result;
+}
+
 void PluginViewWin::paint(GraphicsContext* context, const IntRect& rect) {
   if (!m_isStarted) {
     // Draw the "missing plugin" image
@@ -455,10 +508,7 @@ void PluginViewWin::paint(GraphicsContext* context, const IntRect& rect) {
   npEvent.lParam = reinterpret_cast<uint32>(&windowpos);
   npEvent.wParam = 0;
 
-  if (m_plugin->pluginFuncs()->event) {
-    KJS::JSLock::DropAllLocks dropAllLocks;
-    m_plugin->pluginFuncs()->event(m_instance, &npEvent);
-  }
+  dispatchNPEvent(&npEvent);
 
   setNPWindowRect(frameGeometry());
 
@@ -470,10 +520,7 @@ void PluginViewWin::paint(GraphicsContext* context, const IntRect& rect) {
   // ignores it so we just pass null.
   npEvent.lParam = 0;
 
-  if (m_plugin->pluginFuncs()->event) {
-    KJS::JSLock::DropAllLocks dropAllLocks;
-    m_plugin->pluginFuncs()->event(m_instance, &npEvent);
-  }
+  dispatchNPEvent(&npEvent);
 
   context->releaseWindowsContext(hdc);
 }
@@ -492,7 +539,7 @@ void PluginViewWin::handleKeyboardEvent(KeyboardEvent* event) {
   }
 
   KJS::JSLock::DropAllLocks;
-  if (!m_plugin->pluginFuncs()->event(m_instance, &npEvent))
+  if (!dispatchNPEvent(&npEvent))
     event->setDefaultHandled();
 }
 
@@ -562,7 +609,7 @@ void PluginViewWin::handleMouseEvent(MouseEvent* event) {
   HCURSOR currentCursor = ::GetCursor();
 
   KJS::JSLock::DropAllLocks;
-  if (!m_plugin->pluginFuncs()->event(m_instance, &npEvent))
+  if (!dispatchNPEvent(&npEvent))
     event->setDefaultHandled();
 
   // Currently, Widget::setCursor is always called after this function in
@@ -810,7 +857,8 @@ void PluginViewWin::performRequest(PluginRequestWin* request) {
   // Executing a script can cause the plugin view to be destroyed, so we keep a
   // reference to the parent frame.
   RefPtr<Frame> parentFrame = m_parentFrame;
-  JSValue* result = m_parentFrame->loader()->executeScript(jsString, true);
+  JSValue* result = m_parentFrame->loader()->executeScript(
+      jsString, request->shouldAllowPopups());
 
   if (request->frameLoadRequest().frameName().isNull()) {
     String resultString;
@@ -891,8 +939,8 @@ NPError PluginViewWin::load(const FrameLoadRequest& frameLoadRequest,
     return NPERR_INVALID_PARAM;
   }
 
-  PluginRequestWin* request =
-      new PluginRequestWin(frameLoadRequest, sendNotification, notifyData);
+  PluginRequestWin* request = new PluginRequestWin(
+      frameLoadRequest, sendNotification, notifyData, arePopupsAllowed());
   scheduleRequest(request);
 
   return NPERR_NO_ERROR;
@@ -1350,6 +1398,21 @@ void PluginViewWin::forceRedraw() {
     ::UpdateWindow(containingWindow());
 }
 
+void PluginViewWin::pushPopupsEnabledState(bool state) {
+  m_popupStateStack.append(state);
+}
+
+void PluginViewWin::popPopupsEnabledState() {
+  m_popupStateStack.removeLast();
+}
+
+bool PluginViewWin::arePopupsAllowed() const {
+  if (!m_popupStateStack.isEmpty())
+    return m_popupStateStack.last();
+
+  return false;
+}
+
 KJS::Bindings::Instance* PluginViewWin::bindingInstance() {
   NPObject* object = 0;
 
@@ -1494,6 +1557,7 @@ PluginViewWin::PluginViewWin(Frame* parentFrame,
       m_status(PluginStatusLoadedSuccessfully),
       m_requestTimer(this, &PluginViewWin::requestTimerFired),
       m_invalidateTimer(this, &PluginViewWin::invalidateTimerFired),
+      m_popPopupsStateTimer(this, &PluginViewWin::popPopupsStateTimerFired),
       m_paramNames(0),
       m_paramValues(0),
       m_window(0),
