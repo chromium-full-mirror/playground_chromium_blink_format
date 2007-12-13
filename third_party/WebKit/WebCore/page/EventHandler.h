@@ -136,6 +136,8 @@ class EventHandler : Noncopyable {
     m_mouseDownMayStartAutoscroll = true;
   }
 
+  bool needsKeyboardEventDisambiguationQuirks() const;
+
   bool keyEvent(const PlatformKeyboardEvent&);
   void defaultKeyboardEventHandler(KeyboardEvent*);
 
