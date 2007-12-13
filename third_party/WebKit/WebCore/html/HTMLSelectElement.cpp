@@ -486,7 +486,7 @@ PassRefPtr<HTMLOptionsCollection> HTMLSelectElement::options() {
   return new HTMLOptionsCollection(this);
 }
 
-void HTMLSelectElement::recalcListItems() const {
+void HTMLSelectElement::recalcListItems(bool updateSelectedStates) const {
   m_listItems.clear();
   HTMLOptionElement* foundSelected = 0;
   for (Node* current = firstChild(); current;
@@ -507,16 +507,18 @@ void HTMLSelectElement::recalcListItems() const {
 
     if (current->hasTagName(optionTag)) {
       m_listItems.append(static_cast<HTMLElement*>(current));
-      if (!foundSelected &&
-          (usesMenuList() ||
-           (!m_multiple &&
-            static_cast<HTMLOptionElement*>(current)->selected()))) {
-        foundSelected = static_cast<HTMLOptionElement*>(current);
-        foundSelected->setSelectedState(true);
-      } else if (foundSelected && !m_multiple &&
-                 static_cast<HTMLOptionElement*>(current)->selected()) {
-        foundSelected->setSelectedState(false);
-        foundSelected = static_cast<HTMLOptionElement*>(current);
+      if (updateSelectedStates) {
+        if (!foundSelected &&
+            (usesMenuList() ||
+             (!m_multiple &&
+              static_cast<HTMLOptionElement*>(current)->selected()))) {
+          foundSelected = static_cast<HTMLOptionElement*>(current);
+          foundSelected->setSelectedState(true);
+        } else if (foundSelected && !m_multiple &&
+                   static_cast<HTMLOptionElement*>(current)->selected()) {
+          foundSelected->setSelectedState(false);
+          foundSelected = static_cast<HTMLOptionElement*>(current);
+        }
       }
     }
     if (current->hasTagName(hrTag))
@@ -1109,7 +1111,7 @@ void HTMLSelectElement::scrollToSelection() {
 
 void HTMLSelectElement::checkListItems() const {
   Vector<HTMLElement*> items = m_listItems;
-  recalcListItems();
+  recalcListItems(false);
   ASSERT(items == m_listItems);
 }
 
