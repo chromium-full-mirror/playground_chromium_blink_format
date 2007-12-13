@@ -101,8 +101,7 @@ void InsertParagraphSeparatorCommand::doApply() {
   // InsertParagraphSeparator does.
   Node* block = enclosingBlock(pos.node());
   Position canonicalPos = VisiblePosition(pos).deepEquivalent();
-  if (!block || !block->parentNode() ||
-      block->renderer() && block->renderer()->isTableCell() ||
+  if (!block || !block->parentNode() || isTableCell(block) ||
       canonicalPos.node()->renderer() &&
           canonicalPos.node()->renderer()->isTable() ||
       canonicalPos.node()->hasTagName(hrTag)) {

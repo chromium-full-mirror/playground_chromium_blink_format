@@ -376,7 +376,8 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& from,
   Node* fromNode = from.deepEquivalent().node();
   Node* toNode = to.deepEquivalent().node();
   Node* fromNodeBlock = enclosingBlock(fromNode);
-  return !enclosingNodeOfType(fromNode, &isMailPasteAsQuotationNode) &&
+  return !enclosingNodeOfType(from.deepEquivalent(),
+                              &isMailPasteAsQuotationNode) &&
          fromNodeBlock && (!fromNodeBlock->hasTagName(blockquoteTag) ||
                            isMailBlockquote(fromNodeBlock)) &&
          enclosingListChild(fromNode) == enclosingListChild(toNode) &&
@@ -420,8 +421,8 @@ void ReplaceSelectionCommand::negateStyleRulesThatAffectAppearance() {
 void ReplaceSelectionCommand::removeUnrenderedTextNodesAtEnds() {
   document()->updateLayoutIgnorePendingStylesheets();
   if (!m_lastLeafInserted->renderer() && m_lastLeafInserted->isTextNode() &&
-      !enclosingNodeWithTag(m_lastLeafInserted.get(), selectTag) &&
-      !enclosingNodeWithTag(m_lastLeafInserted.get(), scriptTag)) {
+      !enclosingNodeWithTag(Position(m_lastLeafInserted.get(), 0), selectTag) &&
+      !enclosingNodeWithTag(Position(m_lastLeafInserted.get(), 0), scriptTag)) {
     RefPtr<Node> previous = m_firstNodeInserted == m_lastLeafInserted
                                 ? 0
                                 : m_lastLeafInserted->traversePreviousNode();
@@ -534,7 +535,8 @@ void ReplaceSelectionCommand::handlePasteAsQuotationNode() {
 
 VisiblePosition ReplaceSelectionCommand::positionAtEndOfInsertedContent() {
   Node* lastNode = m_lastLeafInserted.get();
-  Node* enclosingSelect = enclosingNodeWithTag(lastNode, selectTag);
+  Node* enclosingSelect =
+      enclosingNodeWithTag(Position(lastNode, 0), selectTag);
   if (enclosingSelect)
     lastNode = enclosingSelect;
   return VisiblePosition(Position(lastNode, maxDeepOffset(lastNode)));

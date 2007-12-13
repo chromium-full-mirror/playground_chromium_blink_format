@@ -370,8 +370,8 @@ static void appendStartMarkup(
         break;
       }
 
-      bool useRenderedText =
-          !enclosingNodeWithTag(const_cast<Node*>(node), selectTag);
+      bool useRenderedText = !enclosingNodeWithTag(
+          Position(const_cast<Node*>(node), 0), selectTag);
       DeprecatedString markup =
           escapeContentText(useRenderedText ? renderedText(node, range)
                                             : stringValueForRange(node, range));
@@ -733,7 +733,7 @@ String createMarkup(const Range* range,
     bool skipDescendants = false;
     bool addMarkupForNode = true;
 
-    if (!n->renderer() && !enclosingNodeWithTag(n, selectTag)) {
+    if (!n->renderer() && !enclosingNodeWithTag(Position(n, 0), selectTag)) {
       skipDescendants = true;
       addMarkupForNode = false;
       next = n->traverseNextSibling();
@@ -839,18 +839,18 @@ String createMarkup(const Range* range,
     if (!propertyMissingOrEqualToNone(
             checkAncestorStyle.get(),
             CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT))
-      specialCommonAncestor =
-          elementHasTextDecorationProperty(checkAncestor)
-              ? checkAncestor
-              : enclosingNodeOfType(checkAncestor,
-                                    &elementHasTextDecorationProperty);
+      specialCommonAncestor = enclosingNodeOfType(
+          Position(checkAncestor, 0), &elementHasTextDecorationProperty);
   }
 
   if (Node* enclosingAnchor = enclosingNodeWithTag(
-          specialCommonAncestor ? specialCommonAncestor : commonAncestor, aTag))
+          Position(
+              specialCommonAncestor ? specialCommonAncestor : commonAncestor,
+              0),
+          aTag))
     specialCommonAncestor = enclosingAnchor;
 
-  Node* body = enclosingNodeWithTag(commonAncestor, bodyTag);
+  Node* body = enclosingNodeWithTag(Position(commonAncestor, 0), bodyTag);
   // FIXME: Only include markup for a fully selected root (and ancestors of
   // lastClosed up to that root) if
   // there are styles/attributes on those nodes that need to be included to

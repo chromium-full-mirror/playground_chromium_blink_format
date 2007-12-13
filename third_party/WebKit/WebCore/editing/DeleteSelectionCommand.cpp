@@ -47,10 +47,6 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-static bool isTableCell(Node* node) {
-  return node && (node->hasTagName(tdTag) || node->hasTagName(thTag));
-}
-
 static bool isTableRow(const Node* node) {
   return node && node->hasTagName(trTag);
 }
@@ -185,8 +181,8 @@ void DeleteSelectionCommand::initializePositionData() {
   m_startRoot = editableRootForPosition(start);
   m_endRoot = editableRootForPosition(end);
 
-  m_startTableRow = enclosingNodeOfType(start.node(), &isTableRow);
-  m_endTableRow = enclosingNodeOfType(end.node(), &isTableRow);
+  m_startTableRow = enclosingNodeOfType(start, &isTableRow);
+  m_endTableRow = enclosingNodeOfType(end, &isTableRow);
 
   Node* startCell = enclosingTableCell(m_upstreamStart);
   Node* endCell = enclosingTableCell(m_downstreamEnd);
@@ -782,15 +778,15 @@ void DeleteSelectionCommand::saveFullySelectedAnchor() {
   // when the user begins entering text.
   VisiblePosition visibleStart = m_selectionToDelete.visibleStart();
   VisiblePosition visibleEnd = m_selectionToDelete.visibleEnd();
-  Node* startAnchor = enclosingNodeWithTag(
-      visibleStart.deepEquivalent().downstream().node(), aTag);
+  Node* startAnchor =
+      enclosingNodeWithTag(visibleStart.deepEquivalent().downstream(), aTag);
   Node* endAnchor =
-      enclosingNodeWithTag(visibleEnd.deepEquivalent().upstream().node(), aTag);
+      enclosingNodeWithTag(visibleEnd.deepEquivalent().upstream(), aTag);
 
   Node* beforeStartAnchor = enclosingNodeWithTag(
-      visibleStart.previous().deepEquivalent().downstream().node(), aTag);
-  Node* afterEndAnchor = enclosingNodeWithTag(
-      visibleEnd.next().deepEquivalent().upstream().node(), aTag);
+      visibleStart.previous().deepEquivalent().downstream(), aTag);
+  Node* afterEndAnchor =
+      enclosingNodeWithTag(visibleEnd.next().deepEquivalent().upstream(), aTag);
 
   if (startAnchor && startAnchor == endAnchor &&
       startAnchor != beforeStartAnchor && endAnchor != afterEndAnchor)

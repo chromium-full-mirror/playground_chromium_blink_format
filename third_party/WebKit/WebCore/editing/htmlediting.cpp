@@ -288,10 +288,7 @@ bool isBlock(const Node* node) {
 // the only one responsible for
 // knowing about these kinds of special cases.
 Node* enclosingBlock(Node* node) {
-  if (isBlock(node))
-    return node;
-
-  return enclosingNodeOfType(node, &isBlock);
+  return enclosingNodeOfType(Position(node, 0), &isBlock);
 }
 
 Position rangeCompliantEquivalent(const Position& pos) {
@@ -551,13 +548,14 @@ bool isListElement(Node* n) {
                 n->hasTagName(dlTag)));
 }
 
-Node* enclosingNodeWithTag(Node* node, const QualifiedName& tagName) {
-  if (!node)
+Node* enclosingNodeWithTag(const Position& p, const QualifiedName& tagName) {
+  if (p.isNull())
     return 0;
 
-  Node* root = highestEditableRoot(Position(node, 0));
-
-  for (Node* n = node->parentNode(); n; n = n->parentNode()) {
+  Node* root = highestEditableRoot(p);
+  for (Node* n = p.node(); n; n = n->parentNode()) {
+    if (root && !isContentEditable(n))
+      continue;
     if (n->hasTagName(tagName))
       return n;
     if (n == root)
@@ -567,15 +565,19 @@ Node* enclosingNodeWithTag(Node* node, const QualifiedName& tagName) {
   return 0;
 }
 
-Node* enclosingNodeOfType(Node* node, bool (*nodeIsOfType)(const Node*)) {
-  if (!node)
+Node* enclosingNodeOfType(const Position& p,
+                          bool (*nodeIsOfType)(const Node*)) {
+  if (p.isNull())
     return 0;
 
-  Node* root = highestEditableRoot(Position(node, 0));
-  if (root == node)
-    return 0;
-
-  for (Node* n = node->parentNode(); n; n = n->parentNode()) {
+  Node* root = highestEditableRoot(p);
+  for (Node* n = p.node(); n; n = n->parentNode()) {
+    // Don't return a non-editable node if the input position was editable,
+    // since
+    // the callers from editing will no doubt want to perform editing inside the
+    // returned node.
+    if (root && !isContentEditable(n))
+      continue;
     if ((*nodeIsOfType)(n))
       return n;
     if (n == root)
@@ -586,18 +588,7 @@ Node* enclosingNodeOfType(Node* node, bool (*nodeIsOfType)(const Node*)) {
 }
 
 Node* enclosingTableCell(const Position& p) {
-  if (p.isNull())
-    return 0;
-  // Note: Should theoretically start with p.node()->parentNode() if p is a
-  // position
-  // that internally means before or after p.node(), but we don't use position's
-  // like
-  // that for table cells.
-  for (Node* n = p.node(); n; n = n->parentNode())
-    if (n->renderer() && n->renderer()->isTableCell())
-      return n;
-
-  return 0;
+  return enclosingNodeOfType(p, &isTableCell);
 }
 
 Node* enclosingAnchorElement(const Position& p) {
@@ -721,6 +712,14 @@ bool isTableElement(Node* n) {
   RenderObject* renderer = n->renderer();
   return (renderer && (renderer->style()->display() == TABLE ||
                        renderer->style()->display() == INLINE_TABLE));
+}
+
+bool isTableCell(const Node* node) {
+  RenderObject* r = node->renderer();
+  if (!r)
+    return node->hasTagName(tdTag) || node->hasTagName(thTag);
+
+  return r->isTableCell();
 }
 
 PassRefPtr<Element> createDefaultParagraphElement(Document* document) {
