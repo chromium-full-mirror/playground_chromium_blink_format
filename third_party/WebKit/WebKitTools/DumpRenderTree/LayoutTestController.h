@@ -49,6 +49,7 @@ class LayoutTestController {
   void display();
   void keepWebHistory();
   void notifyDone();
+  JSStringRef pathToLocalResource(JSContextRef, JSStringRef url);
   void queueBackNavigation(int howFarBackward);
   void queueForwardNavigation(int howFarForward);
   void queueLoad(JSStringRef url, JSStringRef target);

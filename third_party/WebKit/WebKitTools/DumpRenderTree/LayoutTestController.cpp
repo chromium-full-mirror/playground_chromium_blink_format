@@ -193,6 +193,25 @@ static JSValueRef dumpTitleChangesCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef pathToLocalResourceCallback(JSContextRef context,
+                                              JSObjectRef function,
+                                              JSObjectRef thisObject,
+                                              size_t argumentCount,
+                                              const JSValueRef arguments[],
+                                              JSValueRef* exception) {
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> localPath =
+      JSValueToStringCopy(context, arguments[0], exception);
+  ASSERT(!*exception);
+
+  return JSValueMakeString(
+      context, controller->pathToLocalResource(context, localPath.get()));
+}
+
 static JSValueRef repaintSweepHorizontallyCallback(JSContextRef context,
                                                    JSObjectRef function,
                                                    JSObjectRef thisObject,
@@ -830,6 +849,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"keepWebHistory", keepWebHistoryCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"notifyDone", notifyDoneCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"pathToLocalResource", pathToLocalResourceCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"queueBackNavigation", queueBackNavigationCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
