@@ -31,7 +31,6 @@
 #include "AffineTransform.h"
 #include "AXObjectCache.h"
 #include "BitmapImage.h"
-#include "CachedPage.h"
 #include "CachedResource.h"
 #include "Clipboard.h"
 #include "ContextMenu.h"
@@ -256,10 +255,6 @@ void PlatformScrollbar::updateThumbProportion() {
   notImplemented();
 }
 void PlatformScrollbar::setRect(const IntRect&) {
-  notImplemented();
-}
-
-void CachedPage::close() {
   notImplemented();
 }
 
