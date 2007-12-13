@@ -1512,8 +1512,7 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
            (virtualKeyCode == VK_LEFT && keyEvent.ctrlKey()))
     m_page->goBack();
 
-  // Need to scroll the page if the arrow keys, space(shift), pgup/dn, or
-  // home/end are hit.
+  // Need to scroll the page if the arrow keys, pgup/dn, or home/end are hit.
   ScrollDirection direction;
   ScrollGranularity granularity;
   switch (virtualKeyCode) {
@@ -1541,10 +1540,6 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
       granularity = ScrollByDocument;
       direction = ScrollDown;
       break;
-    case VK_SPACE:
-      granularity = ScrollByPage;
-      direction = (GetKeyState(VK_SHIFT) & 0x8000) ? ScrollUp : ScrollDown;
-      break;
     case VK_PRIOR:
       granularity = ScrollByPage;
       direction = ScrollUp;
@@ -1554,10 +1549,6 @@ bool WebView::keyDown(WPARAM virtualKeyCode,
       direction = ScrollDown;
       break;
     default:
-      // We want to let Windows handle the WM_SYSCHAR event if we can't handle
-      // it
-      // We do want to return true for regular key down case so the WM_CHAR
-      // handler won't pick up unhandled messages
       return false;
   }
 
@@ -1571,7 +1562,17 @@ bool WebView::keyPress(WPARAM charCode, LPARAM keyData, bool systemKeyDown) {
 
   PlatformKeyboardEvent keyEvent(m_viewWindow, charCode, keyData,
                                  PlatformKeyboardEvent::Char, systemKeyDown);
-  return frame->eventHandler()->keyEvent(keyEvent);
+  if (frame->eventHandler()->keyEvent(keyEvent))
+    return true;
+
+  // Need to scroll the page if space is hit.
+  if (charCode == ' ') {
+    ScrollDirection direction = keyEvent.shiftKey() ? ScrollUp : ScrollDown;
+    if (!frame->eventHandler()->scrollOverflow(direction, ScrollByPage))
+      frame->view()->scroll(direction, ScrollByPage);
+    return true;
+  }
+  return false;
 }
 
 bool WebView::inResizer(LPARAM lParam) {
