@@ -131,6 +131,8 @@ class CompositeEditCommand : public EditCommand {
       const Position&,
       bool alwaysAvoidAnchors = true);
 
+  Node* splitTreeToNode(Node*, Node*, bool splitAncestor = false);
+
   Vector<RefPtr<EditCommand>> m_commands;
 
  private:

@@ -40,14 +40,12 @@ class IndentOutdentCommand : public CompositeEditCommand {
   }
 
  private:
-  void splitTreeTo(Node* start, Node* stop);
   bool modifyRange();
   EIndentType m_typeOfAction;
   int m_marginInPixels;
   void indentRegion();
   void outdentRegion();
   void outdentParagraph();
-  Node* splitTreeToNode(Node*, Node*, bool splitAncestor = false);
   Node* prepareBlockquoteLevelForInsertion(VisiblePosition&, Node**);
 };
 
