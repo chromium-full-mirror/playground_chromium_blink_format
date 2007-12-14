@@ -772,6 +772,9 @@ void FrameLoader::didExplicitOpen() {
   m_isComplete = false;
   m_didCallImplicitClose = false;
 
+  // Calling document.open counts as committing the first real document load.
+  m_committedFirstRealDocumentLoad = true;
+
   // Prevent window.open(url) -- eg window.open("about:blank") -- from blowing
   // away results
   // from a subsequent window.document.open / window.document.write call.
