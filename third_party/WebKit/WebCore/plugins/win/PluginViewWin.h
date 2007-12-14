@@ -70,7 +70,8 @@ enum PluginQuirks {
   PluginQuirkRemoveWindowlessVideoParam = 1 << 3,
   PluginQuirkThrottleWMUserPlusOneMessages = 1 << 4,
   PluginQuirkDontUnloadPlugin = 1 << 5,
-  PluginQuirkDontCallWndProcForSameMessageRecursively = 1 << 6
+  PluginQuirkDontCallWndProcForSameMessageRecursively = 1 << 6,
+  PluginQuirkHasModalMessageLoop = 1 << 7
 };
 
 enum PluginStatus {
@@ -158,6 +159,8 @@ class PluginViewWin : public Widget {
   void didFinishLoading();
   void didFail(const ResourceError&);
 
+  static bool isCallingPlugin();
+
  private:
   void setParameters(const Vector<String>& paramNames,
                      const Vector<String>& paramValues);
@@ -176,6 +179,7 @@ class PluginViewWin : public Widget {
                      void* notifyData,
                      bool sendNotification,
                      bool allowHeaders);
+  void setCallingPlugin(bool) const;
   RefPtr<PluginPackageWin> m_plugin;
   Element* m_element;
   Frame* m_parentFrame;
