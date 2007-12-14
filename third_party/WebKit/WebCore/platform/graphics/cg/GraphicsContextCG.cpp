@@ -30,6 +30,7 @@
 #if PLATFORM(CG)
 
 #include "AffineTransform.h"
+#include "FloatConversion.h"
 #include "GraphicsContextPlatformPrivate.h"
 #include "KURL.h"
 #include "Path.h"
@@ -525,18 +526,39 @@ void GraphicsContext::setShadow(const IntSize& size,
 
   if (paintingDisabled())
     return;
+  CGContextRef context = platformContext();
+
+  CGFloat width = size.width();
+  CGFloat height = size.height();
+
+#if PLATFORM(MAC)
+  // Work around <rdar://problem/5539388> by ensuring that the offsets will get
+  // truncated
+  // to the desired integer.
+  // FIXME: This is not needed post-Leopard.
+  static const CGFloat extraShadowOffset = narrowPrecisionToCGFloat(1.0 / 128);
+  if (width > 0)
+    width += extraShadowOffset;
+  else if (width < 0)
+    width -= extraShadowOffset;
+
+  if (height > 0)
+    height += extraShadowOffset;
+  else if (height < 0)
+    height -= extraShadowOffset;
+#endif
+
   // Check for an invalid color, as this means that the color was not set for
   // the shadow
   // and we should therefore just use the default shadow color.
-  CGContextRef context = platformContext();
   if (!color.isValid())
-    CGContextSetShadow(context, CGSizeMake(size.width(), -size.height()),
+    CGContextSetShadow(context, CGSizeMake(width, -height),
                        blur);  // y is flipped.
   else {
     CGColorRef colorCG = cgColor(color);
-    CGContextSetShadowWithColor(
-        context, CGSizeMake(size.width(), -size.height()),  // y is flipped.
-        blur, colorCG);
+    CGContextSetShadowWithColor(context,
+                                CGSizeMake(width, -height),  // y is flipped.
+                                blur, colorCG);
     CGColorRelease(colorCG);
   }
 }
