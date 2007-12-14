@@ -5,6 +5,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
+ *           (C) 2007 David Smith (catfish.man@gmail.com)
  * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -27,9 +28,9 @@
 #ifndef NamedMappedAttrMap_h
 #define NamedMappedAttrMap_h
 
-#include "NamedAttrMap.h"
-#include "AtomicStringList.h"
+#include "ClassNames.h"
 #include "MappedAttribute.h"
+#include "NamedAttrMap.h"
 
 namespace WebCore {
 
@@ -41,8 +42,9 @@ class NamedMappedAttrMap : public NamedAttrMap {
 
   virtual bool isMappedAttributeMap() const;
 
-  virtual void parseClassAttribute(const String& classAttr);
-  const AtomicStringList* getClassList() const { return &m_classList; }
+  void parseClassAttribute(const String&);
+
+  const ClassNames* getClassNames() const { return &m_classNames; }
 
   virtual bool hasMappedAttributes() const {
     return m_mappedAttributeCount > 0;
@@ -64,7 +66,7 @@ class NamedMappedAttrMap : public NamedAttrMap {
   }
 
  private:
-  AtomicStringList m_classList;
+  ClassNames m_classNames;
   int m_mappedAttributeCount;
 };
 

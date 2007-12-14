@@ -88,7 +88,7 @@ class StyledElement : public Element {
   void invalidateStyleAttribute();
   virtual void updateStyleAttributeIfNeeded() const;
 
-  virtual const AtomicStringList* getClassList() const;
+  virtual const ClassNames* getClassNames() const;
   virtual void attributeChanged(Attribute* attr, bool preserveDecls = false);
   virtual void parseMappedAttribute(MappedAttribute* attr);
   virtual bool mapToEntry(const QualifiedName& attrName,

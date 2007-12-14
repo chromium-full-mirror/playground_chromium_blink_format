@@ -29,6 +29,7 @@
 #include "CSSStyleSelector.h"
 #include "CSSStyleSheet.h"
 #include "CSSValueKeywords.h"
+#include "ClassNames.h"
 #include "Document.h"
 #include "HTMLNames.h"
 
@@ -118,10 +119,6 @@ void StyledElement::updateStyleAttributeIfNeeded() const {
           styleAttr, m_inlineStyleDecl->cssText());
     m_synchronizingStyleAttribute = false;
   }
-}
-
-inline static bool isClassWhitespace(UChar c) {
-  return c == ' ' || c == '\r' || c == '\n' || c == '\t';
 }
 
 StyledElement::StyledElement(const QualifiedName& name, Document* doc)
@@ -271,8 +268,8 @@ CSSMutableStyleDeclaration* StyledElement::additionalAttributeStyleDecl() {
   return 0;
 }
 
-const AtomicStringList* StyledElement::getClassList() const {
-  return namedAttrMap ? mappedAttributes()->getClassList() : 0;
+const ClassNames* StyledElement::getClassNames() const {
+  return namedAttrMap ? mappedAttributes()->getClassNames() : 0;
 }
 
 static inline int toHex(UChar c) {
