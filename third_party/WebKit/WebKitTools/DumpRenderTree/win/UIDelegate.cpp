@@ -40,6 +40,8 @@
 #include <WebKit/IWebViewPrivate.h>
 #include <stdio.h>
 
+using std::wstring;
+
 UIDelegate::UIDelegate() : m_refCount(1) {
   m_frame.bottom = 0;
   m_frame.top = 0;
@@ -140,8 +142,17 @@ HRESULT STDMETHODCALLTYPE UIDelegate::webViewAddMessageToConsole(
     /* [in] */ int lineNumber,
     /* [in] */ BSTR url,
     /* [in] */ BOOL isError) {
-  printf("CONSOLE MESSAGE: line %d: %S\n", lineNumber, message ? message : L"");
+  wstring newMessage;
+  if (message) {
+    newMessage = message;
+    int fileProtocol = newMessage.find(L"file://");
+    if (fileProtocol)
+      newMessage = newMessage.substr(0, fileProtocol) +
+                   urlSuitableForTestResult(newMessage);
+  }
 
+  printf("CONSOLE MESSAGE: line %d: %S\n", lineNumber,
+         message ? newMessage.c_str() : L"");
   return S_OK;
 }
 
