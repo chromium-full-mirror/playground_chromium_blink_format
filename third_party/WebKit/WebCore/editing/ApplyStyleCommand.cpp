@@ -797,7 +797,6 @@ void ApplyStyleCommand::removeHTMLFontStyle(CSSMutableStyleDeclaration* style,
   if (!elem->hasLocalName(fontTag))
     return;
 
-  ExceptionCode ec = 0;
   DeprecatedValueListConstIterator<CSSProperty> end;
   for (DeprecatedValueListConstIterator<CSSProperty> it =
            style->valuesIterator();
@@ -805,15 +804,12 @@ void ApplyStyleCommand::removeHTMLFontStyle(CSSMutableStyleDeclaration* style,
     switch ((*it).id()) {
       case CSS_PROP_COLOR:
         removeNodeAttribute(elem, colorAttr);
-        ASSERT(ec == 0);
         break;
       case CSS_PROP_FONT_FAMILY:
         removeNodeAttribute(elem, faceAttr);
-        ASSERT(ec == 0);
         break;
       case CSS_PROP_FONT_SIZE:
         removeNodeAttribute(elem, sizeAttr);
-        ASSERT(ec == 0);
         break;
     }
   }
