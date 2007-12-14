@@ -102,7 +102,8 @@ class ResourceHandleInternal : Noncopyable {
         m_handle(0),
         m_url(0),
         m_fileName(0),
-        m_customHeaders(0)
+        m_customHeaders(0),
+        m_cancelled(false)
 #endif
 #if PLATFORM(QT)
         ,
@@ -160,6 +161,7 @@ class ResourceHandleInternal : Noncopyable {
   struct curl_slist* m_customHeaders;
   Vector<char> m_postBytes;
   ResourceResponse m_response;
+  bool m_cancelled;
 #endif
 #if PLATFORM(QT)
   QWebNetworkJob* m_job;
