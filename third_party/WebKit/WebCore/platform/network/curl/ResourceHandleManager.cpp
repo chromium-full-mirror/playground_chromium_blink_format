@@ -80,7 +80,9 @@ ResourceHandleManager* ResourceHandleManager::sharedInstance() {
 static size_t writeCallback(void* ptr, size_t size, size_t nmemb, void* data) {
   ResourceHandle* job = static_cast<ResourceHandle*>(data);
   ResourceHandleInternal* d = job->getInternal();
-  int totalSize = size * nmemb;
+  if (d->m_cancelled)
+    return 0;
+  size_t totalSize = size * nmemb;
 
   // this shouldn't be necessary but apparently is. CURL writes the data
   // of html page even if it is a redirect that was handled internally
@@ -123,8 +125,9 @@ static size_t writeCallback(void* ptr, size_t size, size_t nmemb, void* data) {
 static size_t headerCallback(char* ptr, size_t size, size_t nmemb, void* data) {
   ResourceHandle* job = static_cast<ResourceHandle*>(data);
   ResourceHandleInternal* d = job->getInternal();
-
-  unsigned int totalSize = size * nmemb;
+  if (d->m_cancelled)
+    return 0;
+  size_t totalSize = size * nmemb;
   ResourceHandleClient* client = d->client();
 
   String header(static_cast<const char*>(ptr), totalSize);
@@ -234,9 +237,6 @@ void ResourceHandleManager::downloadTimerCallback(
     if (!msg)
       break;
 
-    if (CURLMSG_DONE != msg->msg)
-      continue;
-
     // find the node which has same d->m_handle as completed transfer
     CURL* handle = msg->easy_handle;
     ASSERT(handle);
@@ -248,6 +248,15 @@ void ResourceHandleManager::downloadTimerCallback(
       continue;
     ResourceHandleInternal* d = job->getInternal();
     ASSERT(d->m_handle == handle);
+
+    if (d->m_cancelled) {
+      removeFromCurl(job);
+      continue;
+    }
+
+    if (CURLMSG_DONE != msg->msg)
+      continue;
+
     if (CURLE_OK == msg->data.result) {
       if (d->client())
         d->client()->didFinishLoading(job);
@@ -510,7 +519,10 @@ void ResourceHandleManager::startJob(ResourceHandle* job) {
 void ResourceHandleManager::cancel(ResourceHandle* job) {
   if (removeScheduledJob(job))
     return;
-  removeFromCurl(job);
+  ResourceHandleInternal* d = job->getInternal();
+  d->m_cancelled = true;
+  if (!m_downloadTimer.isActive())
+    m_downloadTimer.startOneShot(pollTimeSeconds);
 }
 
 }  // namespace WebCore
