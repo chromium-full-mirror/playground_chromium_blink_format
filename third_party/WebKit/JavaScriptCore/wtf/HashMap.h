@@ -23,7 +23,6 @@
 #define WTF_HashMap_h
 
 #include "HashTable.h"
-#include "Vector.h"
 
 namespace WTF {
 
@@ -418,9 +417,14 @@ inline void deleteAllKeys(const HashMap<T, U, V, W, X>& collection) {
   deleteAllPairFirsts<typename HashMap<T, U, V, W, X>::KeyType>(collection);
 }
 
-template <typename T, typename U, typename V, typename W, typename X>
+template <typename T,
+          typename U,
+          typename V,
+          typename W,
+          typename X,
+          typename Y>
 inline void copyKeysToVector(const HashMap<T, U, V, W, X>& collection,
-                             Vector<T>& vector) {
+                             Y& vector) {
   typedef typename HashMap<T, U, V, W, X>::const_iterator::Keys iterator;
 
   vector.resize(collection.size());
@@ -431,9 +435,14 @@ inline void copyKeysToVector(const HashMap<T, U, V, W, X>& collection,
     vector[i] = *it;
 }
 
-template <typename T, typename U, typename V, typename W, typename X>
+template <typename T,
+          typename U,
+          typename V,
+          typename W,
+          typename X,
+          typename Y>
 inline void copyValuesToVector(const HashMap<T, U, V, W, X>& collection,
-                               Vector<U>& vector) {
+                               Y& vector) {
   typedef typename HashMap<T, U, V, W, X>::const_iterator::Values iterator;
 
   vector.resize(collection.size());
