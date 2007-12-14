@@ -1093,7 +1093,7 @@ NPObject* Frame::windowScriptNPObject() {
       KJS::JSObject* win = KJS::Window::retrieveWindow(this);
       ASSERT(win);
       KJS::Bindings::RootObject* root = bindingRootObject();
-      d->m_windowScriptNPObject = _NPN_CreateScriptObject(0, win, root, root);
+      d->m_windowScriptNPObject = _NPN_CreateScriptObject(0, win, root);
     } else {
       // JavaScript is not enabled, so we cannot bind the NPObject to the
       // JavaScript window object.
