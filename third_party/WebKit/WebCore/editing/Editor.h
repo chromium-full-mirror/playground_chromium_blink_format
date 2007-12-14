@@ -201,10 +201,6 @@ class Editor {
       const String& commandName);  // Default is CommandFromMenuOrKeyBinding.
   Command command(const String& commandName, EditorCommandSource);
 
-  // Deprecated, but used by old key binding code. Keep around until we have
-  // eliminated all callers.
-  bool execCommand(const AtomicString& commandName, Event* triggeringEvent = 0);
-
   bool insertText(const String&, Event* triggeringEvent);
   bool insertTextWithoutSendingTextEvent(const String&,
                                          bool selectInsertedText,

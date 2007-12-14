@@ -31,6 +31,7 @@
 #include "CreateLinkCommand.h"
 #include "DocumentFragment.h"
 #include "Editor.h"
+#include "EditorClient.h"
 #include "Event.h"
 #include "EventHandler.h"
 #include "FormatBlockCommand.h"
@@ -199,6 +200,26 @@ static bool executeInsertNode(Frame* frame, PassRefPtr<Node> content) {
   return executeInsertFragment(frame, fragment.release());
 }
 
+static bool expandSelectionToGranularity(Frame* frame,
+                                         TextGranularity granularity) {
+  Selection selection = frame->selectionController()->selection();
+  selection.expandUsingGranularity(granularity);
+  RefPtr<Range> newRange = selection.toRange();
+  if (!newRange)
+    return false;
+  ExceptionCode ec = 0;
+  if (newRange->collapsed(ec))
+    return false;
+  RefPtr<Range> oldRange = frame->selectionController()->selection().toRange();
+  EAffinity affinity = frame->selectionController()->affinity();
+  if (!frame->editor()->client()->shouldChangeSelectedRange(
+          oldRange.get(), newRange.get(), affinity, false))
+    return false;
+  frame->selectionController()->setSelectedRange(newRange.get(), affinity,
+                                                 true);
+  return true;
+}
+
 static TriState stateStyle(Frame* frame,
                            int propertyID,
                            const char* desiredValue) {
@@ -211,14 +232,21 @@ static String valueStyle(Frame* frame, int propertyID) {
   return frame->selectionStartStylePropertyValue(propertyID);
 }
 
-static bool canScroll(RenderObject* renderer) {
+static int verticalScrollDistance(Frame* frame) {
+  Node* focusedNode = frame->document()->focusedNode();
+  if (!focusedNode)
+    return 0;
+  RenderObject* renderer = focusedNode->renderer();
   if (!renderer)
-    return false;
+    return 0;
   RenderStyle* style = renderer->style();
   if (!style)
-    return false;
-  return style->overflowY() == OSCROLL || style->overflowY() == OAUTO ||
-         renderer->isTextArea();
+    return 0;
+  if (!(style->overflowY() == OSCROLL || style->overflowY() == OAUTO ||
+        renderer->isTextArea()))
+    return 0;
+  int height = renderer->clientHeight();
+  return max((height + 1) / 2, height - PAGE_KEEP);
 }
 
 static RefPtr<Range> unionDOMRanges(Range* a, Range* b) {
@@ -300,6 +328,78 @@ static bool executeDelete(Frame* frame,
   }
   ASSERT_NOT_REACHED();
   return false;
+}
+
+static bool executeDeleteBackward(Frame* frame,
+                                  Event*,
+                                  EditorCommandSource,
+                                  const String&) {
+  frame->editor()->deleteWithDirection(SelectionController::BACKWARD,
+                                       CharacterGranularity, false, true);
+  return true;
+}
+
+static bool executeDeleteBackwardByDecomposingPreviousCharacter(
+    Frame* frame,
+    Event*,
+    EditorCommandSource,
+    const String&) {
+  LOG_ERROR(
+      "DeleteBackwardByDecomposingPreviousCharacter is not implemented, doing "
+      "DeleteBackward instead");
+  frame->editor()->deleteWithDirection(SelectionController::BACKWARD,
+                                       CharacterGranularity, false, true);
+  return true;
+}
+
+static bool executeDeleteForward(Frame* frame,
+                                 Event*,
+                                 EditorCommandSource source,
+                                 const String&) {
+  frame->editor()->deleteWithDirection(SelectionController::FORWARD,
+                                       CharacterGranularity, false, true);
+  return true;
+}
+
+static bool executeDeleteToBeginningOfLine(Frame* frame,
+                                           Event*,
+                                           EditorCommandSource,
+                                           const String&) {
+  frame->editor()->deleteWithDirection(SelectionController::BACKWARD,
+                                       LineBoundary, true, false);
+  return true;
+}
+
+static bool executeDeleteToBeginningOfParagraph(Frame* frame,
+                                                Event*,
+                                                EditorCommandSource,
+                                                const String&) {
+  frame->editor()->deleteWithDirection(SelectionController::BACKWARD,
+                                       ParagraphBoundary, true, false);
+  return true;
+}
+
+static bool executeDeleteToEndOfLine(Frame* frame,
+                                     Event*,
+                                     EditorCommandSource,
+                                     const String&) {
+  // Despite its name, this command should delete the newline at the end of
+  // a paragraph if you are at the end of a paragraph (like
+  // DeleteToEndOfParagraph).
+  frame->editor()->deleteWithDirection(SelectionController::FORWARD,
+                                       LineBoundary, true, false);
+  return true;
+}
+
+static bool executeDeleteToEndOfParagraph(Frame* frame,
+                                          Event*,
+                                          EditorCommandSource,
+                                          const String&) {
+  // Despite its name, this command should delete the newline at the end of
+  // a paragraph if you are at the end of a paragraph.
+  frame->editor()->deleteWithDirection(SelectionController::FORWARD,
+                                       ParagraphBoundary, true, false);
+  return true;
 }
 
 static bool executeDeleteToMark(Frame* frame,
@@ -617,22 +717,6 @@ static bool executeMoveDownAndModifySelection(Frame* frame,
   return true;
 }
 
-static bool executeMoveDownByPageAndModifyCaret(Frame* frame,
-                                                Event*,
-                                                EditorCommandSource,
-                                                const String&) {
-  Node* focusedNode = frame->document()->focusedNode();
-  if (!focusedNode)
-    return false;
-  RenderObject* renderer = focusedNode->renderer();
-  if (!canScroll(renderer))
-    return false;
-  bool handledScroll = renderer->scroll(ScrollDown, ScrollByPage);
-  bool handledCaretMove = frame->selectionController()->modify(
-      SelectionController::MOVE, renderer->clientHeight() - PAGE_KEEP);
-  return handledScroll || handledCaretMove;
-}
-
 static bool executeMoveForward(Frame* frame,
                                Event*,
                                EditorCommandSource,
@@ -671,6 +755,50 @@ static bool executeMoveLeftAndModifySelection(Frame* frame,
                                        SelectionController::LEFT,
                                        CharacterGranularity, true);
   return true;
+}
+
+static bool executeMovePageDown(Frame* frame,
+                                Event*,
+                                EditorCommandSource,
+                                const String&) {
+  int distance = verticalScrollDistance(frame);
+  if (!distance)
+    return false;
+  return frame->selectionController()->modify(SelectionController::MOVE,
+                                              distance, true);
+}
+
+static bool executeMovePageDownAndModifySelection(Frame* frame,
+                                                  Event*,
+                                                  EditorCommandSource,
+                                                  const String&) {
+  int distance = verticalScrollDistance(frame);
+  if (!distance)
+    return false;
+  return frame->selectionController()->modify(SelectionController::EXTEND,
+                                              distance, true);
+}
+
+static bool executeMovePageUp(Frame* frame,
+                              Event*,
+                              EditorCommandSource,
+                              const String&) {
+  int distance = verticalScrollDistance(frame);
+  if (!distance)
+    return false;
+  return frame->selectionController()->modify(SelectionController::MOVE,
+                                              -distance, true);
+}
+
+static bool executeMovePageUpAndModifySelection(Frame* frame,
+                                                Event*,
+                                                EditorCommandSource,
+                                                const String&) {
+  int distance = verticalScrollDistance(frame);
+  if (!distance)
+    return false;
+  return frame->selectionController()->modify(SelectionController::EXTEND,
+                                              -distance, true);
 }
 
 static bool executeMoveRight(Frame* frame,
@@ -896,22 +1024,6 @@ static bool executeMoveUpAndModifySelection(Frame* frame,
   return true;
 }
 
-static bool executeMoveUpByPageAndModifyCaret(Frame* frame,
-                                              Event*,
-                                              EditorCommandSource,
-                                              const String&) {
-  Node* focusedNode = frame->document()->focusedNode();
-  if (!focusedNode)
-    return false;
-  RenderObject* renderer = focusedNode->renderer();
-  if (!canScroll(renderer))
-    return false;
-  bool handledScroll = renderer->scroll(ScrollDown, ScrollByPage);
-  bool handledCaretMove = frame->selectionController()->modify(
-      SelectionController::MOVE, -(renderer->clientHeight() - PAGE_KEEP));
-  return handledScroll || handledCaretMove;
-}
-
 static bool executeMoveWordBackward(Frame* frame,
                                     Event*,
                                     EditorCommandSource,
@@ -1052,6 +1164,27 @@ static bool executeSelectAll(Frame* frame,
   return true;
 }
 
+static bool executeSelectLine(Frame* frame,
+                              Event*,
+                              EditorCommandSource,
+                              const String&) {
+  return expandSelectionToGranularity(frame, LineGranularity);
+}
+
+static bool executeSelectParagraph(Frame* frame,
+                                   Event*,
+                                   EditorCommandSource,
+                                   const String&) {
+  return expandSelectionToGranularity(frame, ParagraphGranularity);
+}
+
+static bool executeSelectSentence(Frame* frame,
+                                  Event*,
+                                  EditorCommandSource,
+                                  const String&) {
+  return expandSelectionToGranularity(frame, SentenceGranularity);
+}
+
 static bool executeSelectToMark(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
@@ -1065,6 +1198,13 @@ static bool executeSelectToMark(Frame* frame,
   frame->selectionController()->setSelectedRange(
       unionDOMRanges(mark.get(), selection.get()).get(), DOWNSTREAM, true);
   return true;
+}
+
+static bool executeSelectWord(Frame* frame,
+                              Event*,
+                              EditorCommandSource,
+                              const String&) {
+  return expandSelectionToGranularity(frame, WordGranularity);
 }
 
 static bool executeSetMark(Frame* frame,
@@ -1105,12 +1245,11 @@ static bool executeSwapWithMark(Frame* frame,
                                 EditorCommandSource,
                                 const String&) {
   const Selection& mark = frame->mark();
-  Selection selection = frame->selectionController()->selection();
+  const Selection& selection = frame->selectionController()->selection();
   if (mark.isNone() || selection.isNone()) {
     systemBeep();
     return false;
   }
-
   frame->selectionController()->setSelection(mark);
   frame->setMark(selection);
   return true;
@@ -1388,6 +1527,27 @@ static const CommandMap& createCommandMap() {
       {"Delete",
        {executeDelete, supported, enabledInEditableText, stateNone, valueNull,
         notTextInsertion}},
+      {"DeleteBackward",
+       {executeDeleteBackward, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
+      {"DeleteBackwardByDecomposingPreviousCharacter",
+       {executeDeleteBackwardByDecomposingPreviousCharacter, supported,
+        enabledInEditableText, stateNone, valueNull, notTextInsertion}},
+      {"DeleteForward",
+       {executeDeleteForward, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
+      {"DeleteToBeginningOfLine",
+       {executeDeleteToBeginningOfLine, supported, enabledInEditableText,
+        stateNone, valueNull, notTextInsertion}},
+      {"DeleteToBeginningOfParagraph",
+       {executeDeleteToBeginningOfParagraph, supported, enabledInEditableText,
+        stateNone, valueNull, notTextInsertion}},
+      {"DeleteToEndOfLine",
+       {executeDeleteToEndOfLine, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
+      {"DeleteToEndOfParagraph",
+       {executeDeleteToEndOfParagraph, supported, enabledInEditableText,
+        stateNone, valueNull, notTextInsertion}},
       {"DeleteToMark",
        {executeDeleteToMark, supported, enabledInEditableText, stateNone,
         valueNull, notTextInsertion}},
@@ -1490,9 +1650,6 @@ static const CommandMap& createCommandMap() {
       {"MoveDownAndModifySelection",
        {executeMoveDownAndModifySelection, supported, enabledInEditableText,
         stateNone, valueNull, notTextInsertion}},
-      {"MoveDownByPageAndModifyCaret",
-       {executeMoveDownByPageAndModifyCaret, supported, enabledInEditableText,
-        stateNone, valueNull, notTextInsertion}},
       {"MoveForward",
        {executeMoveForward, supported, enabledInEditableText, stateNone,
         valueNull, notTextInsertion}},
@@ -1504,6 +1661,18 @@ static const CommandMap& createCommandMap() {
         notTextInsertion}},
       {"MoveLeftAndModifySelection",
        {executeMoveLeftAndModifySelection, supported, enabledInEditableText,
+        stateNone, valueNull, notTextInsertion}},
+      {"MovePageDown",
+       {executeMovePageDown, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
+      {"MovePageDownAndModifySelection",
+       {executeMovePageDownAndModifySelection, supported, enabledInEditableText,
+        stateNone, valueNull, notTextInsertion}},
+      {"MovePageUp",
+       {executeMovePageUp, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
+      {"MovePageUpAndModifySelection",
+       {executeMovePageUpAndModifySelection, supported, enabledInEditableText,
         stateNone, valueNull, notTextInsertion}},
       {"MoveParagraphBackwardAndModifySelection",
        {executeMoveParagraphBackwardAndModifySelection, supported,
@@ -1571,9 +1740,6 @@ static const CommandMap& createCommandMap() {
       {"MoveUpAndModifySelection",
        {executeMoveUpAndModifySelection, supported, enabledInEditableText,
         stateNone, valueNull, notTextInsertion}},
-      {"MoveUpByPageAndModifyCaret",
-       {executeMoveUpByPageAndModifyCaret, supported, enabledInEditableText,
-        stateNone, valueNull, notTextInsertion}},
       {"MoveWordBackward",
        {executeMoveWordBackward, supported, enabledInEditableText, stateNone,
         valueNull, notTextInsertion}},
@@ -1619,8 +1785,20 @@ static const CommandMap& createCommandMap() {
       {"SelectAll",
        {executeSelectAll, supported, enabled, stateNone, valueNull,
         notTextInsertion}},
+      {"SelectLine",
+       {executeSelectLine, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
+      {"SelectParagraph",
+       {executeSelectParagraph, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
+      {"SelectSentence",
+       {executeSelectSentence, supported, enabledInEditableText, stateNone,
+        valueNull, notTextInsertion}},
       {"SelectToMark",
        {executeSelectToMark, supported, enabledAnySelectionAndMark, stateNone,
+        valueNull, notTextInsertion}},
+      {"SelectWord",
+       {executeSelectWord, supported, enabledInEditableText, stateNone,
         valueNull, notTextInsertion}},
       {"SetMark",
        {executeSetMark, supported, enabledAnySelection, stateNone, valueNull,
@@ -1794,11 +1972,6 @@ String Editor::Command::value(Event* triggeringEvent) const {
 
 bool Editor::Command::isTextInsertion() const {
   return m_command && m_command->isTextInsertion;
-}
-
-bool Editor::execCommand(const AtomicString& commandName,
-                         Event* triggeringEvent) {
-  return command(commandName).execute(triggeringEvent);
 }
 
 }  // namespace WebCore

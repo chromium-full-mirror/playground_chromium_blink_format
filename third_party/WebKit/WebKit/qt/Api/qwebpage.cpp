@@ -500,20 +500,20 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
       mainFrame()->d->frame->loader()->reload();
       break;
     case Cut:
-      editor->cut();
+      command = "Cut";
       break;
     case Copy:
-      editor->copy();
+      command = "Copy";
       break;
     case Paste:
-      editor->paste();
+      command = "Paste";
       break;
 
     case Undo:
-      editor->undo();
+      command = "Undo";
       break;
     case Redo:
-      editor->redo();
+      command = "Redo";
       break;
 
     case MoveToNextChar:
@@ -624,7 +624,7 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
   }
 
   if (command)
-    editor->execCommand(command);
+    editor->command(command).execute();
 }
 
 QWebPage::NavigationRequestResponse QWebPage::navigationRequested(
