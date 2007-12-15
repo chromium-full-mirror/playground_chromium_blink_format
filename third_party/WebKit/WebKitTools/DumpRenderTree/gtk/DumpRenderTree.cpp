@@ -62,6 +62,7 @@ LayoutTestController* layoutTestController = 0;
 static WebKitWebView* webView;
 WebKitWebFrame* mainFrame = 0;
 WebKitWebFrame* topLoadingFrame = 0;
+guint waitToDumpWatchdog = 0;
 
 const unsigned maxViewHeight = 600;
 const unsigned maxViewWidth = 800;
@@ -124,7 +125,15 @@ static gchar* dumpRenderTreeAsText(WebKitWebFrame* frame) {
   return strdup("foo");
 }
 
+static void invalidateAnyPreviousWaitToDumpWatchdog() {
+  if (waitToDumpWatchdog) {
+    g_source_remove(waitToDumpWatchdog);
+    waitToDumpWatchdog = 0;
+  }
+}
+
 void dump() {
+  invalidateAnyPreviousWaitToDumpWatchdog();
   if (dumpTree) {
     char* result = 0;
 
@@ -260,6 +269,32 @@ gboolean webViewConsoleMessage(WebKitWebView* view,
   return TRUE;
 }
 
+gboolean webViewScriptAlert(WebKitWebView* view,
+                            WebKitWebFrame* frame,
+                            const gchar* message) {
+  fprintf(stdout, "ALERT: %s\n", message);
+  return TRUE;
+}
+
+gboolean webViewScriptPrompt(WebKitWebView* webView,
+                             WebKitWebFrame* frame,
+                             const gchar* message,
+                             const gchar* defaultValue,
+                             gchar** value) {
+  fprintf(stdout, "PROMPT: %s, default text: %s\n", message, defaultValue);
+  *value = g_strdup(defaultValue);
+  return TRUE;
+}
+
+gboolean webViewScriptConfirm(WebKitWebView* view,
+                              WebKitWebFrame* frame,
+                              const gchar* message,
+                              gboolean* didConfirm) {
+  fprintf(stdout, "CONFIRM: %s\n", message);
+  *didConfirm = TRUE;
+  return TRUE;
+}
+
 int main(int argc, char* argv[]) {
   struct option options[] = {
       {"horizontal-sweep", no_argument, &repaintSweepHorizontallyDefault, true},
@@ -300,6 +335,12 @@ int main(int argc, char* argv[]) {
                    G_CALLBACK(webViewWindowObjectCleared), 0);
   g_signal_connect(G_OBJECT(webView), "console-message",
                    G_CALLBACK(webViewConsoleMessage), 0);
+  g_signal_connect(G_OBJECT(webView), "script-alert",
+                   G_CALLBACK(webViewScriptAlert), 0);
+  g_signal_connect(G_OBJECT(webView), "script-prompt",
+                   G_CALLBACK(webViewScriptPrompt), 0);
+  g_signal_connect(G_OBJECT(webView), "script-confirm",
+                   G_CALLBACK(webViewScriptConfirm), 0);
 
   if (argc == optind + 1 && strcmp(argv[optind], "-") == 0) {
     char filenameBuffer[2048];
