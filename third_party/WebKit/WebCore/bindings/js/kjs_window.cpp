@@ -344,7 +344,7 @@ static Frame* createWindow(ExecState* exec,
   // up the opener,
   // openedByDOM, and dialogArguments values. Also, to decide whether to use the
   // URL we currently
-  // do an isSafeScript call using the window we create, which can't be done
+  // do an allowsAccessFrom call using the window we create, which can't be done
   // before creating it.
   // We'd have to resolve all those issues to pass the URL instead of "".
 
