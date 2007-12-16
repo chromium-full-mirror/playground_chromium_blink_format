@@ -1616,7 +1616,7 @@ static const CommandMap& createCommandMap() {
         valueNull, isTextInsertion}},
       {"InsertText",
        {executeInsertText, supported, enabledInEditableText, stateNone,
-        valueNull, notTextInsertion}},
+        valueNull, isTextInsertion}},
       {"InsertUnorderedList",
        {executeInsertUnorderedList, supported, enabledInRichlyEditableText,
         stateUnorderedList, valueNull, notTextInsertion}},
