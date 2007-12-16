@@ -24,6 +24,7 @@
 #define RenderThemeMac_h
 
 #import "RenderTheme.h"
+#import <wtf/HashMap.h>
 #import <wtf/RetainPtr.h>
 
 #ifdef __OBJC__
@@ -68,8 +69,10 @@ class RenderThemeMac : public RenderTheme {
   virtual Color platformInactiveSelectionBackgroundColor() const;
   virtual Color activeListBoxSelectionBackgroundColor() const;
 
+  virtual void platformColorsDidChange();
+
   // System fonts.
-  virtual void systemFont(int propId, FontDescription&) const;
+  virtual void systemFont(int cssValueId, FontDescription&) const;
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 
@@ -83,6 +86,8 @@ class RenderThemeMac : public RenderTheme {
   virtual bool paintCapsLockIndicator(RenderObject*,
                                       const RenderObject::PaintInfo&,
                                       const IntRect&);
+
+  virtual Color systemColor(int cssValueId) const;
 
  protected:
   // Methods for each appearance value.
@@ -253,6 +258,8 @@ class RenderThemeMac : public RenderTheme {
 
   bool m_isSliderThumbHorizontalPressed;
   bool m_isSliderThumbVerticalPressed;
+
+  mutable HashMap<int, RGBA32> m_systemColorCache;
 
   RetainPtr<WebCoreRenderThemeNotificationObserver> m_notificationObserver;
 };
