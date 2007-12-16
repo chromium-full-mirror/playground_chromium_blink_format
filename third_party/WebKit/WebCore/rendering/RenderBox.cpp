@@ -454,6 +454,7 @@ IntSize RenderBox::calculateBackgroundSize(const BackgroundLayer* bgLayer,
                                            int scaledWidth,
                                            int scaledHeight) const {
   CachedImage* bg = bgLayer->backgroundImage();
+  bg->setImageContainerSize(IntSize(m_width, m_height));
 
   if (bgLayer->isBackgroundSizeSet()) {
     int w = scaledWidth;
@@ -498,10 +499,8 @@ IntSize RenderBox::calculateBackgroundSize(const BackgroundLayer* bgLayer,
       }
     }
     return IntSize(max(1, w), max(1, h));
-  } else {
-    bg->setImageContainerSize(IntSize(m_width, m_height));
+  } else
     return bg->imageSize();
-  }
 }
 
 void RenderBox::imageChanged(CachedImage* image) {
