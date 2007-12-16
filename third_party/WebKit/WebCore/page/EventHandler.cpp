@@ -1575,8 +1575,7 @@ static EventTargetNode* eventTargetNodeForDocument(Document* doc) {
   return EventTargetNodeCast(node);
 }
 
-static bool handleAccessKey(Document* document,
-                            const PlatformKeyboardEvent& evt) {
+bool EventHandler::handleAccessKey(const PlatformKeyboardEvent& evt) {
 #if PLATFORM(MAC)
   if (evt.ctrlKey())
 #else
@@ -1584,7 +1583,7 @@ static bool handleAccessKey(Document* document,
 #endif
   {
     String key = evt.unmodifiedText();
-    Element* elem = document->getElementByAccessKey(key.lower());
+    Element* elem = m_frame->document()->getElementByAccessKey(key.lower());
     if (elem) {
       elem->accessKeyAction(false);
       return true;
@@ -1614,20 +1613,17 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
 
   // In IE, access keys are special, they are handled after default keydown
   // processing, but cannot be canceled - this is hard to match.
-  // On Windows, we process them before dispatching keypress event (and rely on
-  // WebKit to not drop WM_SYSCHAR events when a keydown representing
-  // WM_SYSKEYDOWN is canceled).
   // On Mac OS X, we process them before dispatching keydown, as the default
-  // keydown handler implements Emacs key bindings, which may conflict with
-  // access keys.
+  // keydown handler implements Emacs key bindings, which may conflict
+  // with access keys. Then we dispatch keydown, but suppress its default
+  // handling.
+  // On Windows, WebKit explicitly calls handleAccessKey() instead of
+  // dispatching a keypress event for WM_SYSCHAR messages.
   // Other platforms currently match either Mac or Windows behavior, depending
   // on whether they send combined KeyDown events.
   bool matchedAnAccessKey = false;
-  if (initialKeyEvent.type() == PlatformKeyboardEvent::Char) {
-    if (handleAccessKey(m_frame->document(), initialKeyEvent))
-      return true;
-  } else if (initialKeyEvent.type() == PlatformKeyboardEvent::KeyDown)
-    matchedAnAccessKey = handleAccessKey(m_frame->document(), initialKeyEvent);
+  if (initialKeyEvent.type() == PlatformKeyboardEvent::KeyDown)
+    matchedAnAccessKey = handleAccessKey(initialKeyEvent);
 
   // FIXME: it would be fair to let an input method handle KeyUp events before
   // DOM dispatch.

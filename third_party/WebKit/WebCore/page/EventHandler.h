@@ -138,6 +138,7 @@ class EventHandler : Noncopyable {
 
   bool needsKeyboardEventDisambiguationQuirks() const;
 
+  bool handleAccessKey(const PlatformKeyboardEvent&);
   bool keyEvent(const PlatformKeyboardEvent&);
   void defaultKeyboardEventHandler(KeyboardEvent*);
 

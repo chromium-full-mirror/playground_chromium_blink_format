@@ -384,7 +384,10 @@ static JSValueRef keyDownCallback(JSContextRef context,
     ::SetKeyboardState(newKeyState);
   }
 
-  MSG msg = makeMsg(webViewWindow, WM_KEYDOWN, virtualKeyCode, 0);
+  MSG msg =
+      makeMsg(webViewWindow,
+              (::GetKeyState(VK_MENU) & 0x8000) ? WM_SYSKEYDOWN : WM_KEYDOWN,
+              virtualKeyCode, 0);
   if (virtualKeyCode != 255)
     dispatchMessage(&msg);
   else {
@@ -394,7 +397,8 @@ static JSValueRef keyDownCallback(JSContextRef context,
   }
 
   // Tests expect that all messages are processed by the time keyDown() returns.
-  if (::PeekMessage(&msg, webViewWindow, WM_CHAR, WM_CHAR, PM_REMOVE))
+  if (::PeekMessage(&msg, webViewWindow, WM_CHAR, WM_CHAR, PM_REMOVE) ||
+      ::PeekMessage(&msg, webViewWindow, WM_SYSCHAR, WM_SYSCHAR, PM_REMOVE))
     ::DispatchMessage(&msg);
 
   MSG msgUp = makeMsg(webViewWindow, WM_KEYUP, virtualKeyCode, 0);
