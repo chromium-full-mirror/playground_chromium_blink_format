@@ -34,11 +34,18 @@
 #include "kjs_events.h"
 #include "kjs_window.h"
 
+namespace KJS {
+
+extern const struct HashTable JSEventTargetPropertiesTable;
+extern const struct HashTable JSEventTargetPrototypeTable;
+}
+
 namespace WebCore {
 
 using namespace EventNames;
 
 class AtomicString;
+class EventTarget;
 
 // Event target properties (shared across all JSEventTarget* classes)
 struct JSEventTargetProperties {
@@ -245,12 +252,6 @@ KJS::InternalFunctionImp* JSEventTargetPrototypeFunctionBase<
   return new JSEventTargetPrototypeFunction<
       JSEventTargetPrototypeFunctionIdentifier>(exec, len, name);
 }
-};
-
-// Needs to be included after above declaration
-#include "JSEventTargetBase.lut.h"
-
-namespace WebCore {
 
 // Helper function for getValueProperty/putValueProperty
 AtomicString eventNameForPropertyToken(int token);
@@ -355,6 +356,6 @@ class JSEventTargetPrototype : public KJS::JSObject {
   }
 };
 
-};  // namespace WebCore
+}  // namespace WebCore
 
 #endif  // JSEventTargetBase_h
