@@ -48,6 +48,7 @@
 #include "JSXMLHttpRequest.h"
 #include "Logging.h"
 #include "Page.h"
+#include "PausedTimeouts.h"
 #include "PlatformScreen.h"
 #include "PlugInInfoStore.h"
 #include "RenderView.h"
@@ -126,15 +127,6 @@ class DOMWindowTimer : public TimerBase {
   int m_nestingLevel;
   Window* m_object;
   ScheduledAction* m_action;
-};
-
-class PausedTimeout {
- public:
-  int timeoutId;
-  int nestingLevel;
-  double nextFireInterval;
-  double repeatInterval;
-  ScheduledAction* action;
 };
 
 }  // namespace KJS
@@ -1413,7 +1405,7 @@ int Window::installTimeout(JSValue* func,
   return installTimeout(new ScheduledAction(func, args), t, singleShot);
 }
 
-PausedTimeouts* Window::pauseTimeouts() {
+WebCore::PausedTimeouts* Window::pauseTimeouts() {
   size_t count = d->m_timeouts.size();
   if (count == 0)
     return 0;
@@ -1777,16 +1769,6 @@ JSValue* LocationProtoFuncToString::callAsFunction(ExecState* exec,
 }
 
 /////////////////////////////////////////////////////////////////////////////
-
-PausedTimeouts::~PausedTimeouts() {
-  PausedTimeout* array = m_array;
-  if (!array)
-    return;
-  size_t count = m_length;
-  for (size_t i = 0; i != count; ++i)
-    delete array[i].action;
-  delete[] array;
-}
 
 void DOMWindowTimer::fired() {
   timerNestingLevel = m_nestingLevel;
