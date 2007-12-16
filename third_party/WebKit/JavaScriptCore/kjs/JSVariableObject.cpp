@@ -33,6 +33,10 @@
 
 namespace KJS {
 
+UString::Rep* IdentifierRepHashTraits::nullRepPtr =
+    &UString::Rep::null;  // Didn't want to make a whole source file for just
+                          // this.
+
 bool JSVariableObject::deleteProperty(ExecState* exec,
                                       const Identifier& propertyName) {
   if (symbolTable().contains(propertyName.ustring().rep()))
@@ -46,7 +50,7 @@ void JSVariableObject::getPropertyNames(ExecState* exec,
   SymbolTable::const_iterator::Keys end = symbolTable().end().keys();
   for (SymbolTable::const_iterator::Keys it = symbolTable().begin().keys();
        it != end; ++it)
-    propertyNames.add(Identifier(*it));
+    propertyNames.add(Identifier(it->get()));
 
   JSObject::getPropertyNames(exec, propertyNames);
 }

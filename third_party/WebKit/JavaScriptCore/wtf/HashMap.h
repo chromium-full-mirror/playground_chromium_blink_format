@@ -457,4 +457,6 @@ inline void copyValuesToVector(const HashMap<T, U, V, W, X>& collection,
 
 using WTF::HashMap;
 
+#include "RefPtrHashMap.h"
+
 #endif /* WTF_HashMap_h */
