@@ -42,7 +42,7 @@ class FontPlatformData {
  public:
   class Deleted {};
 
-  FontPlatformData(Deleted) : m_font(NULL) {}
+  FontPlatformData(Deleted) : m_font(reinterpret_cast<wxFont*>(-1)) {}
 
   ~FontPlatformData();
 
