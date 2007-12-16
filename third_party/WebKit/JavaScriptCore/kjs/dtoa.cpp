@@ -150,7 +150,6 @@
  *	some compilers and was always used prior to 19990916, but it
  *	is not strictly legal and can cause trouble with aggressively
  *	optimizing compilers (e.g., gcc 2.95.1 under -O2).
- * #define USE_LOCALE to use the current locale's decimal_point value.
  * #define SET_INEXACT if IEEE arithmetic is being used and extra
  *	computation should be done to set the inexact flag when the
  *	result is inexact and avoid setting inexact when the result
@@ -203,10 +202,6 @@ typedef unsigned Long ULong;
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef USE_LOCALE
-#include <locale.h>
-#endif
 
 #ifdef MALLOC
 #ifdef KR_headers
@@ -1541,9 +1536,6 @@ char** se;
 #ifdef Honor_FLT_ROUNDS
   int rounding;
 #endif
-#ifdef USE_LOCALE
-  CONST_ char* s2;
-#endif
 
   sign = nz0 = nz = 0;
   dval(rv) = 0.;
@@ -1584,25 +1576,6 @@ break2:
     else if (nd < 16)
       z = 10 * z + c - '0';
   nd0 = nd;
-#ifdef USE_LOCALE
-  s1 = localeconv()->decimal_point;
-  if (c == *s1) {
-    c = '.';
-    if (*++s1) {
-      s2 = s;
-      for (;;) {
-        if (*++s2 != *s1) {
-          c = 0;
-          break;
-        }
-        if (!*++s1) {
-          s = s2;
-          break;
-        }
-      }
-    }
-  }
-#endif
   if (c == '.') {
     c = *++s;
     if (!nd) {
