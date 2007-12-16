@@ -481,7 +481,8 @@ void wxWebView::OnKeyEvents(wxKeyEvent& event) {
       Paste();
     } else {
       WebCore::PlatformKeyboardEvent wkEvent(event);
-      if (wkEvent.type() == PlatformKeyboardEvent::Char && wkEvent.altKey())
+      if (wkEvent.type() == WebCore::PlatformKeyboardEvent::Char &&
+          wkEvent.altKey())
         m_impl->frame->eventHandler()->handleAccessKey(wkEvent);
       else
         m_impl->frame->eventHandler()->keyEvent(wkEvent);
