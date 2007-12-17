@@ -1671,8 +1671,7 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
 
   node->dispatchEvent(keydown, ec, true);
   bool keydownResult = keydown->defaultHandled() || keydown->defaultPrevented();
-  if (handledByInputMethod || (keydownResult && !backwardCompatibilityMode) ||
-      initialKeyEvent.text().isEmpty())
+  if (handledByInputMethod || (keydownResult && !backwardCompatibilityMode))
     return keydownResult;
 
   // Focus may have changed during keydown handling, so refetch node.
@@ -1687,6 +1686,8 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
   PlatformKeyboardEvent keyPressEvent = initialKeyEvent;
   keyPressEvent.disambiguateKeyDownEvent(PlatformKeyboardEvent::Char,
                                          backwardCompatibilityMode);
+  if (keyPressEvent.text().isEmpty())
+    return keydownResult;
   RefPtr<KeyboardEvent> keypress =
       new KeyboardEvent(keyPressEvent, m_frame->document()->defaultView());
   keypress->setTarget(node);
