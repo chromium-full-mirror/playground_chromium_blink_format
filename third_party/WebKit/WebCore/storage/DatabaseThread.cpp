@@ -161,7 +161,7 @@ void* DatabaseThread::databaseThread() {
 }
 
 bool DatabaseThread::dispatchNextTaskIdentifier() {
-  Database* workDatabase = 0;
+  RefPtr<Database> workDatabase;
   RefPtr<DatabaseTask> task;
 
   {
@@ -186,7 +186,7 @@ bool DatabaseThread::dispatchNextTaskIdentifier() {
   if (task) {
     ASSERT(workDatabase);
     workDatabase->resetAuthorizer();
-    task->performTask(workDatabase);
+    task->performTask(workDatabase.get());
     return true;
   }
 
