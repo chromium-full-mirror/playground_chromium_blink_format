@@ -35,9 +35,12 @@ class NetscapePlugInStreamLoader;
 }
 @class NSURLRequest;
 
+class WebNetscapePlugInStreamLoaderClient;
+
 @interface WebNetscapePluginStream : WebBaseNetscapePluginStream {
   WebCore::FrameLoader* _frameLoader;
   WebCore::NetscapePlugInStreamLoader* _loader;
+  WebNetscapePlugInStreamLoaderClient* _client;
   NSURLRequest* request;
 }
 
