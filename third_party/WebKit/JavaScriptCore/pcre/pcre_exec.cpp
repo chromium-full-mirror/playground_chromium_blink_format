@@ -1985,16 +1985,6 @@ RRETURN_SWITCH:
       goto RRETURN_6;
     case 7:
       goto RRETURN_7;
-    case 9:
-      goto RRETURN_9;
-    case 10:
-      goto RRETURN_10;
-    case 11:
-      goto RRETURN_11;
-    case 12:
-      goto RRETURN_12;
-    case 13:
-      goto RRETURN_13;
     case 14:
       goto RRETURN_14;
     case 15:
