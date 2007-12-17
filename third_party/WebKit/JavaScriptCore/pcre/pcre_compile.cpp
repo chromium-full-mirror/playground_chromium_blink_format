@@ -50,6 +50,11 @@ supporting internal functions that are not used by other modules. */
 
 using namespace WTF;
 
+/* Negative values for the firstchar and reqchar variables */
+
+#define REQ_UNSET (-2)
+#define REQ_NONE (-1)
+
 /*************************************************
 *      Code parameters and static tables         *
 *************************************************/
@@ -104,16 +109,11 @@ enum ErrorCode {
   ERR17
 };
 
-/* Table of sizes for the fixed-length opcodes. It's defined in a macro so that
-the definition is next to the definition of the opcodes in pcre_internal.h. */
-
-static const uschar OP_lengths[] = {OP_LENGTHS};
-
 /* The texts of compile-time error messages. These are "char *" because they
 are passed to the outside world. */
 
-static const char* error_text(ErrorCode code) {
-  static const char error_texts[] =
+static const char* errorText(ErrorCode code) {
+  static const char errorTexts[] =
       /* 1 */
       "\\ at end of pattern\0"
       "\\c at end of pattern\0"
@@ -137,7 +137,7 @@ static const char* error_text(ErrorCode code) {
       "parentheses nested too deeply";
 
   int i = code;
-  const char* text = error_texts;
+  const char* text = errorTexts;
   while (i > 1)
     i -= !*text++;
   return text;
@@ -155,11 +155,11 @@ struct CompileData {
     req_varyopt = 0;
     needOuterBracket = false;
   }
-  const uschar* start_code;   /* The start of the compiled code */
-  const UChar* start_pattern; /* The start of the pattern */
-  int top_backref;            /* Maximum back reference */
-  unsigned backrefMap;        /* Bitmap of low back refs */
-  int req_varyopt;            /* "After variable item" flag for reqbyte */
+  const unsigned char* start_code; /* The start of the compiled code */
+  const UChar* start_pattern;      /* The start of the pattern */
+  int top_backref;                 /* Maximum back reference */
+  unsigned backrefMap;             /* Bitmap of low back refs */
+  int req_varyopt;                 /* "After variable item" flag for reqbyte */
   bool needOuterBracket;
 };
 
@@ -167,7 +167,7 @@ struct CompileData {
 
 static bool compileBracket(int,
                            int*,
-                           uschar**,
+                           unsigned char**,
                            const UChar**,
                            const UChar*,
                            ErrorCode*,
@@ -175,11 +175,12 @@ static bool compileBracket(int,
                            int*,
                            int*,
                            CompileData&);
-static bool bracketIsAnchored(const uschar* code);
-static bool bracketNeedsLineStart(const uschar* code,
+static bool bracketIsAnchored(const unsigned char* code);
+static bool bracketNeedsLineStart(const unsigned char* code,
                                   unsigned captureMap,
                                   unsigned backrefMap);
-static int bracketFindFirstAssertedCharacter(const uschar* code, bool inassert);
+static int bracketFindFirstAssertedCharacter(const unsigned char* code,
+                                             bool inassert);
 
 /*************************************************
 *            Handle escapes                      *
@@ -203,11 +204,11 @@ Returns:         zero or positive => a data character
                  on error, errorptr is set
 */
 
-static int check_escape(const UChar** ptrptr,
-                        const UChar* patternEnd,
-                        ErrorCode* errorcodeptr,
-                        int bracount,
-                        bool isclass) {
+static int checkEscape(const UChar** ptrptr,
+                       const UChar* patternEnd,
+                       ErrorCode* errorcodeptr,
+                       int bracount,
+                       bool isclass) {
   const UChar* ptr = *ptrptr + 1;
 
   /* If backslash is at the end of the pattern, it's an error. */
@@ -289,6 +290,7 @@ static int check_escape(const UChar** ptrptr,
         ptr += i - 1;
         break;
       }
+
       case 'x': {
         c = 0;
         int i;
@@ -306,6 +308,7 @@ static int check_escape(const UChar** ptrptr,
         ptr += i - 1;
         break;
       }
+
       case 'u': {
         c = 0;
         int i;
@@ -322,10 +325,8 @@ static int check_escape(const UChar** ptrptr,
         }
         ptr += i - 1;
         break;
-
-        /* Other special escapes not starting with a digit are straightforward
-         */
       }
+
       case 'c':
         if (++ptr == patternEnd) {
           *errorcodeptr = ERR2;
@@ -336,10 +337,7 @@ static int check_escape(const UChar** ptrptr,
         /* A letter is upper-cased; then the 0x40 bit is flipped. This coding
          is ASCII-specific, but then the whole concept of \cx is ASCII-specific.
          */
-
-        if (c >= 'a' && c <= 'z')
-          c -= 32;
-        c ^= 0x40;
+        c = toASCIIUpper(c) ^ 0x40;
         break;
     }
   }
@@ -363,7 +361,7 @@ Arguments:
 Returns:    true or false
 */
 
-static bool is_counted_repeat(const UChar* p, const UChar* patternEnd) {
+static bool isCountedRepeat(const UChar* p, const UChar* patternEnd) {
   if (p >= patternEnd || !isASCIIDigit(*p))
     return false;
   p++;
@@ -391,7 +389,7 @@ static bool is_counted_repeat(const UChar* p, const UChar* patternEnd) {
 *************************************************/
 
 /* Read an item of the form {n,m} and return the values. This is called only
-after is_counted_repeat() has confirmed that a repeat-count quantifier exists,
+after isCountedRepeat() has confirmed that a repeat-count quantifier exists,
 so the syntax is guaranteed to be correct, but we need to check the values.
 
 Arguments:
@@ -405,10 +403,10 @@ Returns:         pointer to '}' on success;
                  current ptr on error, with errorcodeptr set non-zero
 */
 
-static const UChar* read_repeat_counts(const UChar* p,
-                                       int* minp,
-                                       int* maxp,
-                                       ErrorCode* errorcodeptr) {
+static const UChar* readRepeatCounts(const UChar* p,
+                                     int* minp,
+                                     int* maxp,
+                                     ErrorCode* errorcodeptr) {
   int min = 0;
   int max = -1;
 
@@ -459,233 +457,38 @@ static const UChar* read_repeat_counts(const UChar* p,
 
 /* This is called by several functions that scan a compiled expression looking
 for a fixed first character, or an anchoring op code etc. It skips over things
-that do not influence this. For some calls, a change of option is important.
-For some calls, it makes sense to skip negative forward and all backward
-assertions, and also the \b assertion; for others it does not.
+that do not influence this.
 
 Arguments:
   code         pointer to the start of the group
-  skipassert   true if certain assertions are to be skipped
-
 Returns:       pointer to the first significant opcode
 */
 
-static const uschar* firstSignificantOpCode(const uschar* code) {
+static const unsigned char* firstSignificantOpcode(const unsigned char* code) {
   while (*code == OP_BRANUMBER)
-    code += OP_lengths[*code];
+    code += 3;
   return code;
 }
 
-static const uschar* firstSignificantOpCodeSkippingAssertions(
-    const uschar* code) {
+static const unsigned char* firstSignificantOpcodeSkippingAssertions(
+    const unsigned char* code) {
   while (true) {
     switch (*code) {
       case OP_ASSERT_NOT:
-        do {
-          code += getOpcodeValueAtOffset(code, 1);
-        } while (*code == OP_ALT);
-        code += OP_lengths[*code];
+        advanceToEndOfBracket(code);
+        code += 1 + LINK_SIZE;
         break;
       case OP_WORD_BOUNDARY:
       case OP_NOT_WORD_BOUNDARY:
+        ++code;
+        break;
       case OP_BRANUMBER:
-        code += OP_lengths[*code];
+        code += 3;
         break;
       default:
         return code;
     }
   }
-  ASSERT_NOT_REACHED();
-}
-
-/*************************************************
-*        Find the fixed length of a pattern      *
-*************************************************/
-
-/* Scan a pattern and compute the fixed length of subject that will match it,
-if the length is fixed. This is needed for dealing with backward assertions.
-In UTF8 mode, the result is in characters rather than bytes.
-
-Arguments:
-  code     points to the start of the pattern (the bracket)
-  options  the compiling options
-
-Returns:   the fixed length, or -1 if there is no fixed length,
-             or -2 if \C was encountered
-*/
-
-static int find_fixedlength(uschar* code, int options) {
-  int length = -1;
-
-  int branchlength = 0;
-  uschar* cc = code + 1 + LINK_SIZE;
-
-  /* Scan along the opcodes for this branch. If we get to the end of the
-   branch, check the length against that of the other branches. */
-
-  while (true) {
-    int d;
-    int op = *cc;
-    if (op >= OP_BRA)
-      op = OP_BRA;
-
-    switch (op) {
-      case OP_BRA:
-      case OP_ONCE:
-        d = find_fixedlength(cc, options);
-        if (d < 0)
-          return d;
-        branchlength += d;
-        do {
-          cc += getOpcodeValueAtOffset(cc, 1);
-        } while (*cc == OP_ALT);
-        cc += 1 + LINK_SIZE;
-        break;
-
-      /* Reached end of a branch; if it's a ket it is the end of a nested
-       call. If it's ALT it is an alternation in a nested call. If it is
-       END it's the end of the outer call. All can be handled by the same code.
-       */
-
-      case OP_ALT:
-      case OP_KET:
-      case OP_KETRMAX:
-      case OP_KETRMIN:
-      case OP_END:
-        if (length < 0)
-          length = branchlength;
-        else if (length != branchlength)
-          return -1;
-        if (*cc != OP_ALT)
-          return length;
-        cc += 1 + LINK_SIZE;
-        branchlength = 0;
-        break;
-
-      /* Skip over assertive subpatterns */
-
-      case OP_ASSERT:
-      case OP_ASSERT_NOT:
-        do {
-          cc += getOpcodeValueAtOffset(cc, 1);
-        } while (*cc == OP_ALT);
-      /* Fall through */
-
-      /* Skip over things that don't match chars */
-
-      case OP_BRANUMBER:
-      case OP_CIRC:
-      case OP_DOLL:
-      case OP_NOT_WORD_BOUNDARY:
-      case OP_WORD_BOUNDARY:
-        cc += OP_lengths[*cc];
-        break;
-
-      /* Handle literal characters */
-
-      case OP_CHAR:
-      case OP_CHAR_IGNORING_CASE:
-      case OP_NOT:
-        branchlength++;
-        cc += 2;
-        while ((*cc & 0xc0) == 0x80)
-          cc++;
-        break;
-
-      case OP_ASCII_CHAR:
-      case OP_ASCII_LETTER_IGNORING_CASE:
-        branchlength++;
-        cc += 2;
-        break;
-
-      /* Handle exact repetitions. The count is already in characters, but we
-       need to skip over a multibyte character in UTF8 mode.  */
-
-      case OP_EXACT:
-        branchlength += get2ByteOpcodeValueAtOffset(cc, 1);
-        cc += 4;
-        while ((*cc & 0x80) == 0x80)
-          cc++;
-        break;
-
-      case OP_TYPEEXACT:
-        branchlength += get2ByteOpcodeValueAtOffset(cc, 1);
-        cc += 4;
-        break;
-
-      /* Handle single-char matchers */
-
-      case OP_NOT_DIGIT:
-      case OP_DIGIT:
-      case OP_NOT_WHITESPACE:
-      case OP_WHITESPACE:
-      case OP_NOT_WORDCHAR:
-      case OP_WORDCHAR:
-      case OP_NOT_NEWLINE:
-        branchlength++;
-        cc++;
-        break;
-
-      /* Check a class for variable quantification */
-
-      case OP_XCLASS:
-        cc += getOpcodeValueAtOffset(cc, 1) - 33;
-      /* Fall through */
-
-      case OP_CLASS:
-      case OP_NCLASS:
-        cc += 33;
-
-        switch (*cc) {
-          case OP_CRSTAR:
-          case OP_CRMINSTAR:
-          case OP_CRQUERY:
-          case OP_CRMINQUERY:
-            return -1;
-
-          case OP_CRRANGE:
-          case OP_CRMINRANGE:
-            if (get2ByteOpcodeValueAtOffset(cc, 1) !=
-                get2ByteOpcodeValueAtOffset(cc, 3))
-              return -1;
-            branchlength += get2ByteOpcodeValueAtOffset(cc, 1);
-            cc += 5;
-            break;
-
-          default:
-            branchlength++;
-        }
-        break;
-
-      /* Anything else is variable length */
-
-      default:
-        return -1;
-    }
-  }
-  ASSERT_NOT_REACHED();
-}
-
-/*************************************************
-*         Complete a callout item                *
-*************************************************/
-
-/* A callout item contains the length of the next item in the pattern, which
-we can't fill in till after we have reached the relevant point. This is used
-for both automatic and manual callouts.
-
-Arguments:
-  previous_callout   points to previous callout item
-  ptr                current pattern pointer
-  cd                 pointers to tables etc
-*/
-
-static void complete_callout(uschar* previous_callout,
-                             const UChar* ptr,
-                             const CompileData& cd) {
-  int length =
-      ptr - cd.start_pattern - getOpcodeValueAtOffset(previous_callout, 2);
-  putOpcodeValueAtOffset(previous_callout, 2 + LINK_SIZE, length);
 }
 
 /*************************************************
@@ -706,11 +509,11 @@ Arguments:
 Yield:        true when range returned; false when no more
 */
 
-static bool get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
+static bool getOthercaseRange(int* cptr, int d, int* ocptr, int* odptr) {
   int c, othercase = 0;
 
   for (c = *cptr; c <= d; c++) {
-    if ((othercase = _pcre_ucp_othercase(c)) >= 0)
+    if ((othercase = kjs_pcre_ucp_othercase(c)) >= 0)
       break;
   }
 
@@ -721,7 +524,7 @@ static bool get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
   int next = othercase + 1;
 
   for (++c; c <= d; c++) {
-    if (_pcre_ucp_othercase(c) != next)
+    if (kjs_pcre_ucp_othercase(c) != next)
       break;
     next++;
   }
@@ -746,18 +549,17 @@ static bool get_othercase_range(int* cptr, int d, int* ocptr, int* odptr) {
  Returns:     number of characters placed in the buffer
  */
 
-// FIXME: This should be removed as soon as all UTF8 uses are removed from PCRE
-int _pcre_ord2utf8(int cvalue, uschar* buffer) {
+static int encodeUTF8(int cvalue, unsigned char* buffer) {
   int i;
-  for (i = 0; i < _pcre_utf8_table1_size; i++)
-    if (cvalue <= _pcre_utf8_table1[i])
+  for (i = 0; i < kjs_pcre_utf8_table1_size; i++)
+    if (cvalue <= kjs_pcre_utf8_table1[i])
       break;
   buffer += i;
   for (int j = i; j > 0; j--) {
     *buffer-- = 0x80 | (cvalue & 0x3f);
     cvalue >>= 6;
   }
-  *buffer = _pcre_utf8_table2[i] | cvalue;
+  *buffer = kjs_pcre_utf8_table2[i] | cvalue;
   return i + 1;
 }
 
@@ -789,7 +591,7 @@ static inline bool safelyCheckNextChar(const UChar* ptr,
 
 static bool compileBranch(int options,
                           int* brackets,
-                          uschar** codeptr,
+                          unsigned char** codeptr,
                           const UChar** ptrptr,
                           const UChar* patternEnd,
                           ErrorCode* errorcodeptr,
@@ -800,20 +602,18 @@ static bool compileBranch(int options,
   int repeat_min = 0, repeat_max = 0; /* To please picky compilers */
   int bravalue = 0;
   int reqvary, tempreqvary;
-  int after_manual_callout = 0;
   int c;
-  uschar* code = *codeptr;
-  uschar* tempcode;
+  unsigned char* code = *codeptr;
+  unsigned char* tempcode;
   bool groupsetfirstbyte = false;
   const UChar* ptr = *ptrptr;
   const UChar* tempptr;
-  uschar* previous = NULL;
-  uschar* previous_callout = NULL;
-  uschar classbits[32];
+  unsigned char* previous = NULL;
+  unsigned char classbits[32];
 
   bool class_utf8;
-  uschar* class_utf8data;
-  uschar utf8_char[6];
+  unsigned char* class_utf8data;
+  unsigned char utf8_char[6];
 
   /* Initialize no first byte, no required byte. REQ_UNSET means "no char
    matching encountered yet". It gets changed to REQ_NONE if we hit something
@@ -855,7 +655,7 @@ static bool compileBranch(int options,
     int subreqbyte;
     int subfirstbyte;
     int mclength;
-    uschar mcbuffer[8];
+    unsigned char mcbuffer[8];
 
     /* Next byte in the pattern */
 
@@ -865,12 +665,7 @@ static bool compileBranch(int options,
      a quantifier. */
 
     bool is_quantifier = c == '*' || c == '+' || c == '?' ||
-                         (c == '{' && is_counted_repeat(ptr + 1, patternEnd));
-
-    if (!is_quantifier && previous_callout && after_manual_callout-- <= 0) {
-      complete_callout(previous_callout, ptr, cd);
-      previous_callout = NULL;
-    }
+                         (c == '{' && isCountedRepeat(ptr + 1, patternEnd));
 
     switch (c) {
       /* The branch terminates at end of string, |, or ). */
@@ -970,7 +765,7 @@ static bool compileBranch(int options,
          the
          bit map. */
 
-        memset(classbits, 0, 32 * sizeof(uschar));
+        memset(classbits, 0, 32 * sizeof(unsigned char));
 
         /* Process characters until ] is reached. The first pass
          through the regex checked the overall syntax, so we don't need to be
@@ -989,7 +784,7 @@ static bool compileBranch(int options,
            character in them, so set class_charcount bigger than one. */
 
           if (c == '\\') {
-            c = check_escape(&ptr, patternEnd, errorcodeptr, *brackets, true);
+            c = checkEscape(&ptr, patternEnd, errorcodeptr, *brackets, true);
             if (c < 0) {
               class_charcount += 2; /* Greater than 1 is what matters */
               switch (-c) {
@@ -1056,7 +851,7 @@ static bool compileBranch(int options,
 
             if (d == '\\') {
               const UChar* oldptr = ptr;
-              d = check_escape(&ptr, patternEnd, errorcodeptr, *brackets, true);
+              d = checkEscape(&ptr, patternEnd, errorcodeptr, *brackets, true);
 
               /* \X is literal X; any other special means the '-' was literal */
               if (d < 0) {
@@ -1088,7 +883,7 @@ static bool compileBranch(int options,
                 int occ, ocd;
                 int cc = c;
                 int origd = d;
-                while (get_othercase_range(&cc, origd, &occ, &ocd)) {
+                while (getOthercaseRange(&cc, origd, &occ, &ocd)) {
                   if (occ >= c && ocd <= d)
                     continue; /* Skip embedded ranges */
 
@@ -1107,9 +902,9 @@ static bool compileBranch(int options,
                     *class_utf8data++ = XCL_SINGLE;
                   else {
                     *class_utf8data++ = XCL_RANGE;
-                    class_utf8data += _pcre_ord2utf8(occ, class_utf8data);
+                    class_utf8data += encodeUTF8(occ, class_utf8data);
                   }
-                  class_utf8data += _pcre_ord2utf8(ocd, class_utf8data);
+                  class_utf8data += encodeUTF8(ocd, class_utf8data);
                 }
               }
 
@@ -1118,8 +913,8 @@ static bool compileBranch(int options,
                overlapping ranges. */
 
               *class_utf8data++ = XCL_RANGE;
-              class_utf8data += _pcre_ord2utf8(c, class_utf8data);
-              class_utf8data += _pcre_ord2utf8(d, class_utf8data);
+              class_utf8data += encodeUTF8(c, class_utf8data);
+              class_utf8data += encodeUTF8(d, class_utf8data);
 
               /* With UCP support, we are done. Without UCP support, there is no
                caseless matching for UTF-8 characters > 127; we can use the bit
@@ -1159,13 +954,13 @@ static bool compileBranch(int options,
           if ((c > 255 || ((options & IgnoreCaseOption) && c > 127))) {
             class_utf8 = true;
             *class_utf8data++ = XCL_SINGLE;
-            class_utf8data += _pcre_ord2utf8(c, class_utf8data);
+            class_utf8data += encodeUTF8(c, class_utf8data);
 
             if (options & IgnoreCaseOption) {
               int othercase;
-              if ((othercase = _pcre_ucp_othercase(c)) >= 0) {
+              if ((othercase = kjs_pcre_ucp_othercase(c)) >= 0) {
                 *class_utf8data++ = XCL_SINGLE;
-                class_utf8data += _pcre_ord2utf8(othercase, class_utf8data);
+                class_utf8data += encodeUTF8(othercase, class_utf8data);
               }
             }
           } else {
@@ -1261,7 +1056,7 @@ static bool compileBranch(int options,
 
           /* Now fill in the complete length of the item */
 
-          putOpcodeValueAtOffset(previous, 1, code - previous);
+          putLinkValue(previous + 1, code - previous);
           break; /* End of class handling */
         }
 
@@ -1289,8 +1084,7 @@ static bool compileBranch(int options,
       case '{':
         if (!is_quantifier)
           goto NORMAL_CHAR;
-        ptr =
-            read_repeat_counts(ptr + 1, &repeat_min, &repeat_max, errorcodeptr);
+        ptr = readRepeatCounts(ptr + 1, &repeat_min, &repeat_max, errorcodeptr);
         if (*errorcodeptr)
           goto FAILED;
         goto REPEAT;
@@ -1329,6 +1123,7 @@ static bool compileBranch(int options,
         /* Save start of previous item, in case we have to move it up to make
          space
          for an inserted OP_ONCE for the additional '+' extension. */
+        /* FIXME: Probably don't need this because we don't use OP_ONCE. */
 
         tempcode = previous;
 
@@ -1361,7 +1156,7 @@ static bool compileBranch(int options,
            length rather than a small character. */
 
           if (code[-1] & 0x80) {
-            uschar* lastchar = code - 1;
+            unsigned char* lastchar = code - 1;
             while ((*lastchar & 0xc0) == 0x80)
               lastchar--;
             c = code - lastchar;            /* Length of UTF-8 character */
@@ -1411,7 +1206,7 @@ static bool compileBranch(int options,
           int prop_type = -1;
           int prop_value = -1;
 
-          uschar* oldcode = code;
+          unsigned char* oldcode = code;
           code = previous; /* Usually overwrite previous item */
 
           /* If the maximum is zero then the minimum must also be zero; Perl
@@ -1436,7 +1231,7 @@ static bool compileBranch(int options,
               *code++ = OP_QUERY + repeat_type;
             else {
               *code++ = OP_UPTO + repeat_type;
-              put2ByteOpcodeValueAtOffsetAndAdvance(code, 0, repeat_max);
+              put2ByteValueAndAdvance(code, repeat_max);
             }
           }
 
@@ -1454,7 +1249,7 @@ static bool compileBranch(int options,
               if (repeat_max == 1)
                 goto END_REPEAT;
               *code++ = OP_UPTO + repeat_type;
-              put2ByteOpcodeValueAtOffsetAndAdvance(code, 0, repeat_max - 1);
+              put2ByteValueAndAdvance(code, repeat_max - 1);
             }
           }
 
@@ -1464,7 +1259,7 @@ static bool compileBranch(int options,
           else {
             *code++ =
                 OP_EXACT + op_type; /* NB EXACT doesn't have repeat_type */
-            put2ByteOpcodeValueAtOffsetAndAdvance(code, 0, repeat_min);
+            put2ByteValueAndAdvance(code, repeat_min);
 
             /* If the maximum is unlimited, insert an OP_STAR. Before doing so,
              we have to insert the character for the previous code. For a
@@ -1503,7 +1298,7 @@ static bool compileBranch(int options,
               }
               repeat_max -= repeat_min;
               *code++ = OP_UPTO + repeat_type;
-              put2ByteOpcodeValueAtOffsetAndAdvance(code, 0, repeat_max);
+              put2ByteValueAndAdvance(code, repeat_max);
             }
           }
 
@@ -1544,10 +1339,10 @@ static bool compileBranch(int options,
             *code++ = OP_CRQUERY + repeat_type;
           else {
             *code++ = OP_CRRANGE + repeat_type;
-            put2ByteOpcodeValueAtOffsetAndAdvance(code, 0, repeat_min);
+            put2ByteValueAndAdvance(code, repeat_min);
             if (repeat_max == -1)
               repeat_max = 0; /* 2-byte encoding for max */
-            put2ByteOpcodeValueAtOffsetAndAdvance(code, 0, repeat_max);
+            put2ByteValueAndAdvance(code, repeat_max);
           }
         }
 
@@ -1555,10 +1350,10 @@ static bool compileBranch(int options,
          certain
          cases. */
 
-        else if (*previous >= OP_BRA || *previous == OP_ONCE) {
+        else if (*previous >= OP_BRA) {
           int ketoffset = 0;
           int len = code - previous;
-          uschar* bralink = NULL;
+          unsigned char* bralink = NULL;
 
           /* If the maximum repeat count is unlimited, find the end of the
            bracket
@@ -1570,10 +1365,8 @@ static bool compileBranch(int options,
            pointer. */
 
           if (repeat_max == -1) {
-            uschar* ket = previous;
-            do {
-              ket += getOpcodeValueAtOffset(ket, 1);
-            } while (*ket != OP_KET);
+            const unsigned char* ket = previous;
+            advanceToEndOfBracket(ket);
             ketoffset = code - ket;
           }
 
@@ -1634,7 +1427,7 @@ static bool compileBranch(int options,
 
               int offset = (!bralink) ? 0 : previous - bralink;
               bralink = previous;
-              putOpcodeValueAtOffsetAndAdvance(previous, 0, offset);
+              putLinkValueAllowZeroAndAdvance(previous, offset);
             }
 
             repeat_max--;
@@ -1679,7 +1472,7 @@ static bool compileBranch(int options,
                 *code++ = OP_BRA;
                 int offset = (!bralink) ? 0 : code - bralink;
                 bralink = code;
-                putOpcodeValueAtOffsetAndAdvance(code, 0, offset);
+                putLinkValueAllowZeroAndAdvance(code, offset);
               }
 
               memcpy(code, previous, len);
@@ -1691,12 +1484,12 @@ static bool compileBranch(int options,
 
             while (bralink) {
               int offset = code - bralink + 1;
-              uschar* bra = code - offset;
-              int oldlinkoffset = getOpcodeValueAtOffset(bra, 1);
-              bralink = oldlinkoffset ? bralink - oldlinkoffset : 0;
+              unsigned char* bra = code - offset;
+              int oldlinkoffset = getLinkValueAllowZero(bra + 1);
+              bralink = (!oldlinkoffset) ? 0 : bralink - oldlinkoffset;
               *code++ = OP_KET;
-              putOpcodeValueAtOffsetAndAdvance(code, 0, offset);
-              putOpcodeValueAtOffset(bra, 1, offset);
+              putLinkValueAndAdvance(code, offset);
+              putLinkValue(bra + 1, offset);
             }
           }
 
@@ -1756,7 +1549,7 @@ static bool compileBranch(int options,
 
             /* Character after (? not specially recognized */
 
-            default: /* Option setting */
+            default:
               *errorcodeptr = ERR12;
               goto FAILED;
           }
@@ -1772,7 +1565,7 @@ static bool compileBranch(int options,
           if (++(*brackets) > EXTRACT_BASIC_MAX) {
             bravalue = OP_BRA + EXTRACT_BASIC_MAX + 1;
             code[1 + LINK_SIZE] = OP_BRANUMBER;
-            put2ByteOpcodeValueAtOffset(code, 2 + LINK_SIZE, *brackets);
+            put2ByteValue(code + 2 + LINK_SIZE, *brackets);
             skipbytes = 3;
           } else
             bravalue = OP_BRA + *brackets;
@@ -1785,7 +1578,7 @@ static bool compileBranch(int options,
          a
          new setting for the ims options if they have changed. */
 
-        previous = (bravalue >= OP_ONCE) ? code : 0;
+        previous = (bravalue >= OP_BRAZERO) ? code : 0;
         *code = bravalue;
         tempcode = code;
         tempreqvary = cd.req_varyopt; /* Save value before bracket */
@@ -1820,7 +1613,7 @@ static bool compileBranch(int options,
         zerofirstbyte = firstbyte;
         groupsetfirstbyte = false;
 
-        if (bravalue >= OP_BRA || bravalue == OP_ONCE) {
+        if (bravalue >= OP_BRA) {
           /* If we have not yet set a firstbyte in this branch, take it from the
            subpattern, remembering that it was set here so that a repeat of more
            than one can replicate it as reqbyte if necessary. If the subpattern
@@ -1885,7 +1678,7 @@ static bool compileBranch(int options,
 
       case '\\':
         tempptr = ptr;
-        c = check_escape(&ptr, patternEnd, errorcodeptr, *brackets, false);
+        c = checkEscape(&ptr, patternEnd, errorcodeptr, *brackets, false);
 
         /* Handle metacharacters introduced by \. For ones like \d, the ESC_
          values
@@ -1914,7 +1707,7 @@ static bool compileBranch(int options,
             int number = -c - ESC_REF;
             previous = code;
             *code++ = OP_REF;
-            put2ByteOpcodeValueAtOffsetAndAdvance(code, 0, number);
+            put2ByteValueAndAdvance(code, number);
           }
 
           /* For the rest, we can obtain the OP value by negating the escape
@@ -1951,7 +1744,7 @@ static bool compileBranch(int options,
             *code++ = c;
           }
         } else {
-          mclength = _pcre_ord2utf8(c, mcbuffer);
+          mclength = encodeUTF8(c, mcbuffer);
 
           *code++ =
               (options & IgnoreCaseOption) ? OP_CHAR_IGNORING_CASE : OP_CHAR;
@@ -2031,7 +1824,7 @@ Returns:      true on success
 
 static bool compileBracket(int options,
                            int* brackets,
-                           uschar** codeptr,
+                           unsigned char** codeptr,
                            const UChar** ptrptr,
                            const UChar* patternEnd,
                            ErrorCode* errorcodeptr,
@@ -2040,15 +1833,15 @@ static bool compileBracket(int options,
                            int* reqbyteptr,
                            CompileData& cd) {
   const UChar* ptr = *ptrptr;
-  uschar* code = *codeptr;
-  uschar* last_branch = code;
-  uschar* start_bracket = code;
+  unsigned char* code = *codeptr;
+  unsigned char* last_branch = code;
+  unsigned char* start_bracket = code;
   int firstbyte = REQ_UNSET;
   int reqbyte = REQ_UNSET;
 
   /* Offset is set zero to mark that this bracket is still open */
 
-  putOpcodeValueAtOffset(code, 1, 0);
+  putLinkValueAllowZero(code + 1, 0);
   code += 1 + LINK_SIZE + skipbytes;
 
   /* Loop for each alternative branch */
@@ -2118,8 +1911,8 @@ static bool compileBracket(int options,
     if (ptr >= patternEnd || *ptr != '|') {
       int length = code - last_branch;
       do {
-        int prev_length = getOpcodeValueAtOffset(last_branch, 1);
-        putOpcodeValueAtOffset(last_branch, 1, length);
+        int prev_length = getLinkValueAllowZero(last_branch + 1);
+        putLinkValue(last_branch + 1, length);
         length = prev_length;
         last_branch -= length;
       } while (length > 0);
@@ -2127,7 +1920,7 @@ static bool compileBracket(int options,
       /* Fill in the ket */
 
       *code = OP_KET;
-      putOpcodeValueAtOffset(code, 1, code - start_bracket);
+      putLinkValue(code + 1, code - start_bracket);
       code += 1 + LINK_SIZE;
 
       /* Set values to pass back */
@@ -2145,7 +1938,7 @@ static bool compileBracket(int options,
      zero offset until it is closed, making it possible to detect recursion. */
 
     *code = OP_ALT;
-    putOpcodeValueAtOffset(code, 1, code - last_branch);
+    putLinkValue(code + 1, code - last_branch);
     last_branch = code;
     code += 1 + LINK_SIZE;
     ptr++;
@@ -2170,23 +1963,23 @@ Arguments:
   backrefMap    the back reference bitmap
 */
 
-static bool branchIsAnchored(const uschar* code) {
-  const uschar* scode = firstSignificantOpCode(code);
+static bool branchIsAnchored(const unsigned char* code) {
+  const unsigned char* scode = firstSignificantOpcode(code);
   int op = *scode;
 
   /* Brackets */
-  if (op >= OP_BRA || op == OP_ASSERT || op == OP_ONCE)
+  if (op >= OP_BRA || op == OP_ASSERT)
     return bracketIsAnchored(scode);
 
   /* Check for explicit anchoring */
   return op == OP_CIRC;
 }
 
-static bool bracketIsAnchored(const uschar* code) {
+static bool bracketIsAnchored(const unsigned char* code) {
   do {
     if (!branchIsAnchored(code + 1 + LINK_SIZE))
       return false;
-    code += getOpcodeValueAtOffset(code, 1);
+    code += getLinkValue(code + 1);
   } while (*code == OP_ALT); /* Loop for each alternative */
   return true;
 }
@@ -2213,23 +2006,23 @@ Arguments:
   backrefMap    the back reference bitmap
 */
 
-static bool branchNeedsLineStart(const uschar* code,
+static bool branchNeedsLineStart(const unsigned char* code,
                                  unsigned captureMap,
                                  unsigned backrefMap) {
-  const uschar* scode = firstSignificantOpCode(code);
+  const unsigned char* scode = firstSignificantOpcode(code);
   int op = *scode;
 
   /* Capturing brackets */
   if (op > OP_BRA) {
     int captureNum = op - OP_BRA;
     if (captureNum > EXTRACT_BASIC_MAX)
-      captureNum = get2ByteOpcodeValueAtOffset(scode, 2 + LINK_SIZE);
+      captureNum = get2ByteValue(scode + 2 + LINK_SIZE);
     int bracketMask = (captureNum < 32) ? (1 << captureNum) : 1;
     return bracketNeedsLineStart(scode, captureMap | bracketMask, backrefMap);
   }
 
   /* Other brackets */
-  if (op == OP_BRA || op == OP_ASSERT || op == OP_ONCE)
+  if (op == OP_BRA || op == OP_ASSERT)
     return bracketNeedsLineStart(scode, captureMap, backrefMap);
 
   /* .* means "start at start or after \n" if it isn't in brackets that
@@ -2242,13 +2035,13 @@ static bool branchNeedsLineStart(const uschar* code,
   return op == OP_CIRC;
 }
 
-static bool bracketNeedsLineStart(const uschar* code,
+static bool bracketNeedsLineStart(const unsigned char* code,
                                   unsigned captureMap,
                                   unsigned backrefMap) {
   do {
     if (!branchNeedsLineStart(code + 1 + LINK_SIZE, captureMap, backrefMap))
       return false;
-    code += getOpcodeValueAtOffset(code, 1);
+    code += getLinkValue(code + 1);
   } while (*code == OP_ALT); /* Loop for each alternative */
   return true;
 }
@@ -2273,8 +2066,9 @@ Arguments:
 Returns:     -1 or the fixed first char
 */
 
-static int branchFindFirstAssertedCharacter(const uschar* code, bool inassert) {
-  const uschar* scode = firstSignificantOpCodeSkippingAssertions(code);
+static int branchFindFirstAssertedCharacter(const unsigned char* code,
+                                            bool inassert) {
+  const unsigned char* scode = firstSignificantOpcodeSkippingAssertions(code);
   int op = *scode;
 
   if (op >= OP_BRA)
@@ -2286,7 +2080,6 @@ static int branchFindFirstAssertedCharacter(const uschar* code, bool inassert) {
 
     case OP_BRA:
     case OP_ASSERT:
-    case OP_ONCE:
       return bracketFindFirstAssertedCharacter(scode, op == OP_ASSERT);
 
     case OP_EXACT:
@@ -2305,7 +2098,7 @@ static int branchFindFirstAssertedCharacter(const uschar* code, bool inassert) {
   }
 }
 
-static int bracketFindFirstAssertedCharacter(const uschar* code,
+static int bracketFindFirstAssertedCharacter(const unsigned char* code,
                                              bool inassert) {
   int c = -1;
   do {
@@ -2316,7 +2109,7 @@ static int bracketFindFirstAssertedCharacter(const uschar* code,
       c = d;
     else if (c != d)
       return -1;
-    code += getOpcodeValueAtOffset(code, 1);
+    code += getLinkValue(code + 1);
   } while (*code == OP_ALT);
   return c;
 }
@@ -2341,7 +2134,7 @@ static int calculateCompiledPatternLengthAndFlags(
   int lastitemlength = 0;
   unsigned brastackptr = 0;
   int brastack[BRASTACK_SIZE];
-  uschar bralenstack[BRASTACK_SIZE];
+  unsigned char bralenstack[BRASTACK_SIZE];
   int bracount = 0;
 
   const UChar* ptr = (const UChar*)(pattern - 1);
@@ -2356,7 +2149,7 @@ static int calculateCompiledPatternLengthAndFlags(
        character type. */
 
       case '\\':
-        c = check_escape(&ptr, patternEnd, &errorcode, bracount, false);
+        c = checkEscape(&ptr, patternEnd, &errorcode, bracount, false);
         if (errorcode != 0)
           return -1;
 
@@ -2367,8 +2160,8 @@ static int calculateCompiledPatternLengthAndFlags(
 
           if (c > 127) {
             int i;
-            for (i = 0; i < _pcre_utf8_table1_size; i++)
-              if (c <= _pcre_utf8_table1[i])
+            for (i = 0; i < kjs_pcre_utf8_table1_size; i++)
+              if (c <= kjs_pcre_utf8_table1[i])
                 break;
             length += i;
             lastitemlength += i;
@@ -2392,9 +2185,9 @@ static int calculateCompiledPatternLengthAndFlags(
             cd.top_backref = refnum;
           length += 2; /* For single back reference */
           if (safelyCheckNextChar(ptr, patternEnd, '{') &&
-              is_counted_repeat(ptr + 2, patternEnd)) {
-            ptr = read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats,
-                                     &errorcode);
+              isCountedRepeat(ptr + 2, patternEnd)) {
+            ptr =
+                readRepeatCounts(ptr + 2, &minRepeats, &maxRepeats, &errorcode);
             if (errorcode)
               return -1;
             if ((minRepeats == 0 && (maxRepeats == 1 || maxRepeats == -1)) ||
@@ -2425,9 +2218,9 @@ static int calculateCompiledPatternLengthAndFlags(
        class, or back reference. */
 
       case '{':
-        if (!is_counted_repeat(ptr + 1, patternEnd))
+        if (!isCountedRepeat(ptr + 1, patternEnd))
           goto NORMAL_CHAR;
-        ptr = read_repeat_counts(ptr + 1, &minRepeats, &maxRepeats, &errorcode);
+        ptr = readRepeatCounts(ptr + 1, &minRepeats, &maxRepeats, &errorcode);
         if (errorcode != 0)
           return -1;
 
@@ -2493,7 +2286,7 @@ static int calculateCompiledPatternLengthAndFlags(
           /* Check for escapes */
 
           if (*ptr == '\\') {
-            c = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
+            c = checkEscape(&ptr, patternEnd, &errorcode, bracount, true);
             if (errorcode != 0)
               return -1;
 
@@ -2531,7 +2324,7 @@ static int calculateCompiledPatternLengthAndFlags(
               UChar const* hyptr = ptr++;
               if (safelyCheckNextChar(ptr, patternEnd, '\\')) {
                 ptr++;
-                d = check_escape(&ptr, patternEnd, &errorcode, bracount, true);
+                d = checkEscape(&ptr, patternEnd, &errorcode, bracount, true);
                 if (errorcode != 0)
                   return -1;
               } else if ((ptr + 1 < patternEnd) && ptr[1] != ']')
@@ -2552,7 +2345,7 @@ static int calculateCompiledPatternLengthAndFlags(
               }
 
               if ((d > 255 || (ignoreCase && d > 127))) {
-                uschar buffer[6];
+                unsigned char buffer[6];
                 if (!class_utf8) /* Allow for XCLASS overhead */
                 {
                   class_utf8 = true;
@@ -2571,7 +2364,7 @@ static int calculateCompiledPatternLengthAndFlags(
                   int occ, ocd;
                   int cc = c;
                   int origd = d;
-                  while (get_othercase_range(&cc, origd, &occ, &ocd)) {
+                  while (getOthercaseRange(&cc, origd, &occ, &ocd)) {
                     if (occ >= c && ocd <= d)
                       continue; /* Skip embedded */
 
@@ -2588,15 +2381,14 @@ static int calculateCompiledPatternLengthAndFlags(
 
                     /* An extra item is needed */
 
-                    length += 1 + _pcre_ord2utf8(occ, buffer) +
-                              ((occ == ocd) ? 0 : _pcre_ord2utf8(ocd, buffer));
+                    length += 1 + encodeUTF8(occ, buffer) +
+                              ((occ == ocd) ? 0 : encodeUTF8(ocd, buffer));
                   }
                 }
 
                 /* The length of the (possibly extended) range */
 
-                length +=
-                    1 + _pcre_ord2utf8(c, buffer) + _pcre_ord2utf8(d, buffer);
+                length += 1 + encodeUTF8(c, buffer) + encodeUTF8(d, buffer);
               }
 
             }
@@ -2610,15 +2402,14 @@ static int calculateCompiledPatternLengthAndFlags(
 
             else {
               if ((c > 255 || (ignoreCase && c > 127))) {
-                uschar buffer[6];
+                unsigned char buffer[6];
                 class_optcount = 10; /* Ensure > 1 */
                 if (!class_utf8)     /* Allow for XCLASS overhead */
                 {
                   class_utf8 = true;
                   length += LINK_SIZE + 2;
                 }
-                length +=
-                    (ignoreCase ? 2 : 1) * (1 + _pcre_ord2utf8(c, buffer));
+                length += (ignoreCase ? 2 : 1) * (1 + encodeUTF8(c, buffer));
               }
             }
           }
@@ -2648,9 +2439,9 @@ static int calculateCompiledPatternLengthAndFlags(
            we also need extra for wrapping the whole thing in a sub-pattern. */
 
           if (safelyCheckNextChar(ptr, patternEnd, '{') &&
-              is_counted_repeat(ptr + 2, patternEnd)) {
-            ptr = read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats,
-                                     &errorcode);
+              isCountedRepeat(ptr + 2, patternEnd)) {
+            ptr =
+                readRepeatCounts(ptr + 2, &minRepeats, &maxRepeats, &errorcode);
             if (errorcode != 0)
               return -1;
             if ((minRepeats == 0 && (maxRepeats == 1 || maxRepeats == -1)) ||
@@ -2757,13 +2548,12 @@ static int calculateCompiledPatternLengthAndFlags(
         } else
           duplength = 0;
 
-        /* Leave ptr at the final char; for read_repeat_counts this happens
+        /* Leave ptr at the final char; for readRepeatCounts this happens
          automatically; for the others we need an increment. */
 
         if ((ptr + 1 < patternEnd) && (c = ptr[1]) == '{' &&
-            is_counted_repeat(ptr + 2, patternEnd)) {
-          ptr =
-              read_repeat_counts(ptr + 2, &minRepeats, &maxRepeats, &errorcode);
+            isCountedRepeat(ptr + 2, patternEnd)) {
+          ptr = readRepeatCounts(ptr + 2, &minRepeats, &maxRepeats, &errorcode);
           if (errorcode)
             return -1;
         } else if (c == '*') {
@@ -2833,8 +2623,8 @@ static int calculateCompiledPatternLengthAndFlags(
 
         if (c > 127) {
           int i;
-          for (i = 0; i < _pcre_utf8_table1_size; i++)
-            if (c <= _pcre_utf8_table1[i])
+          for (i = 0; i < kjs_pcre_utf8_table1_size; i++)
+            if (c <= kjs_pcre_utf8_table1[i])
               break;
           length += i;
           lastitemlength += i;
@@ -2870,8 +2660,9 @@ Returns:        pointer to compiled data block, or NULL on error,
                 with errorptr and erroroffset set
 */
 
-static JSRegExp* returnError(ErrorCode errorcode, const char** errorptr) {
-  *errorptr = error_text(errorcode);
+static inline JSRegExp* returnError(ErrorCode errorcode,
+                                    const char** errorptr) {
+  *errorptr = errorText(errorcode);
   return 0;
 }
 
@@ -2913,7 +2704,7 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    are
    passed around in the compile data block. */
 
-  const uschar* codeStart = (const uschar*)(re + 1);
+  const unsigned char* codeStart = (const unsigned char*)(re + 1);
   cd.start_code = codeStart;
   cd.start_pattern = (const UChar*)pattern;
 
@@ -2923,7 +2714,7 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
 
   const UChar* ptr = (const UChar*)pattern;
   const UChar* patternEnd = pattern + patternLength;
-  uschar* code = (uschar*)codeStart;
+  unsigned char* code = (unsigned char*)codeStart;
   int firstbyte, reqbyte;
   int bracketCount = 0;
   if (!cd.needOuterBracket)

@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
           "128 (ASCII characters). These tables are used when no external "
           "tables are\n"
           "passed to PCRE. */\n\n"
-          "const unsigned char _pcre_default_tables[%d] = {\n\n"
+          "const unsigned char kjs_pcre_default_tables[%d] = {\n\n"
           "/* This table is a lower casing table. */\n\n",
           tables_length);
 
