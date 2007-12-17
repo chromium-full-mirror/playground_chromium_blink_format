@@ -199,7 +199,7 @@ class PluginViewWin : public Widget {
   void popPopupsStateTimerFired(Timer<PluginViewWin>*);
   Timer<PluginViewWin> m_popPopupsStateTimer;
 
-  bool dispatchNPEvent(NPEvent*);
+  bool dispatchNPEvent(NPEvent&);
   OwnPtr<PluginMessageThrottlerWin> m_messageThrottler;
 
   void updateWindow() const;
