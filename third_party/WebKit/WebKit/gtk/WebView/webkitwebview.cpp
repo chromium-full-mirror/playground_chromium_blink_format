@@ -466,6 +466,8 @@ static void webkit_web_view_finalize(GObject* object) {
 static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
   GtkBindingSet* binding_set;
 
+  webkit_init();
+
   g_type_class_add_private(webViewClass, sizeof(WebKitWebViewPrivate));
 
   /*

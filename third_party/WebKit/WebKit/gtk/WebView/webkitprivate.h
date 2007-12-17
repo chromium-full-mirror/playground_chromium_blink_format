@@ -49,6 +49,8 @@ WebKitWebView* kit(WebCore::Page*);
 }
 
 extern "C" {
+void webkit_init();
+
 #define WEBKIT_WEB_VIEW_GET_PRIVATE(obj)                    \
   (G_TYPE_INSTANCE_GET_PRIVATE((obj), WEBKIT_TYPE_WEB_VIEW, \
                                WebKitWebViewPrivate))
