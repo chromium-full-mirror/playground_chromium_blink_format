@@ -77,7 +77,7 @@ struct _WebKitWebFramePrivate {
 
   gchar* name;
   gchar* title;
-  gchar* location;
+  gchar* uri;
 };
 
 #define WEBKIT_NETWORK_REQUEST_GET_PRIVATE(obj)                    \

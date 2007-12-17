@@ -45,15 +45,18 @@ using namespace WebCore;
 
 extern "C" {
 
-enum { CLEARED, LOAD_DONE, TITLE_CHANGED, HOVERING_OVER_LINK, LAST_SIGNAL };
+enum {
+  CLEARED,
+  LOAD_COMMITTED,
+  LOAD_DONE,
+  TITLE_CHANGED,
+  HOVERING_OVER_LINK,
+  LAST_SIGNAL
+};
 
 static guint webkit_web_frame_signals[LAST_SIGNAL] = {
     0,
 };
-
-static void webkit_web_frame_real_title_changed(WebKitWebFrame* frame,
-                                                gchar* title,
-                                                gchar* location);
 
 G_DEFINE_TYPE(WebKitWebFrame, webkit_web_frame, G_TYPE_OBJECT)
 
@@ -63,7 +66,7 @@ static void webkit_web_frame_finalize(GObject* object) {
   privateData->frame->loader()->cancelAndClear();
   g_free(privateData->name);
   g_free(privateData->title);
-  g_free(privateData->location);
+  g_free(privateData->uri);
   delete privateData->frame;
 
   G_OBJECT_CLASS(webkit_web_frame_parent_class)->finalize(object);
@@ -80,17 +83,20 @@ static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
                    (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
                    NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
+  webkit_web_frame_signals[LOAD_COMMITTED] =
+      g_signal_new("load-committed", G_TYPE_FROM_CLASS(frameClass),
+                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL,
+                   NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+
   webkit_web_frame_signals[LOAD_DONE] = g_signal_new(
       "load-done", G_TYPE_FROM_CLASS(frameClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
       g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
 
-  webkit_web_frame_signals[TITLE_CHANGED] =
-      g_signal_new("title-changed", G_TYPE_FROM_CLASS(frameClass),
-                   (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
-                   G_STRUCT_OFFSET(WebKitWebFrameClass, title_changed), NULL,
-                   NULL, webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
-                   G_TYPE_STRING, G_TYPE_STRING);
+  webkit_web_frame_signals[TITLE_CHANGED] = g_signal_new(
+      "title-changed", G_TYPE_FROM_CLASS(frameClass),
+      (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION), 0, NULL, NULL,
+      webkit_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
 
   webkit_web_frame_signals[HOVERING_OVER_LINK] =
       g_signal_new("hovering-over-link", G_TYPE_FROM_CLASS(frameClass),
@@ -98,22 +104,10 @@ static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
                    NULL, webkit_marshal_VOID__STRING_STRING, G_TYPE_NONE, 2,
                    G_TYPE_STRING, G_TYPE_STRING);
 
-  frameClass->title_changed = webkit_web_frame_real_title_changed;
-
   /*
    * implementations of virtual methods
    */
   G_OBJECT_CLASS(frameClass)->finalize = webkit_web_frame_finalize;
-}
-
-static void webkit_web_frame_real_title_changed(WebKitWebFrame* frame,
-                                                gchar* title,
-                                                gchar* location) {
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  g_free(frameData->title);
-  g_free(frameData->location);
-  frameData->title = g_strdup(title);
-  frameData->location = g_strdup(location);
 }
 
 static void webkit_web_frame_init(WebKitWebFrame* frame) {
@@ -149,7 +143,7 @@ WebKitWebFrame* webkit_web_frame_new(WebKitWebView* webView) {
   frameData->webView = webView;
   frameData->name = 0;
   frameData->title = 0;
-  frameData->location = 0;
+  frameData->uri = 0;
 
   return frame;
 }
@@ -183,11 +177,11 @@ const gchar* webkit_web_frame_get_title(WebKitWebFrame* frame) {
   return frameData->title;
 }
 
-const gchar* webkit_web_frame_get_location(WebKitWebFrame* frame) {
+const gchar* webkit_web_frame_get_uri(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
   WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  return frameData->location;
+  return frameData->uri;
 }
 
 /**
