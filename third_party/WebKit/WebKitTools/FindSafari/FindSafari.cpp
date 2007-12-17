@@ -168,7 +168,7 @@ int _tmain(int argc, TCHAR* argv[]) {
       TEXT("xcopy /y /i /d \"%sSafari.exe\" \"%%TMP%%\\WebKitNightly\""),
       TEXT("xcopy /y /i /d /e \"%sSafari.resources\" "
            "\"%%TMP%%\\WebKitNightly\\Safari.resources\""),
-      TEXT("set PATH=\"%%CD%%;%s;%%PATH%%\""),
+      TEXT("set PATH=%%CD%%;%s;%%PATH%%"),
   };
 
   LPCTSTR command = TEXT("\"%TMP%\\WebKitNightly\\Safari.exe\" /customWebKit");
