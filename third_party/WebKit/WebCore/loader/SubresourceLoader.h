@@ -70,6 +70,8 @@ class SubresourceLoader : public ResourceLoader {
                               bool allAtOnce);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
+  virtual void didReceiveAuthenticationChallenge(
+      const AuthenticationChallenge&);
   virtual void receivedCancellation(const AuthenticationChallenge&);
 
  private:

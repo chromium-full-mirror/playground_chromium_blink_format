@@ -123,6 +123,14 @@ void IconLoader::didFail(SubresourceLoader* resourceLoader,
   }
 }
 
+void IconLoader::didReceiveAuthenticationChallenge(
+    SubresourceLoader* resourceLoader,
+    const AuthenticationChallenge& challenge) {
+  // We don't ever want to prompt for authentication just for a site icon, so
+  // implement this method to cancel the resource load
+  m_resourceLoader->cancel();
+}
+
 void IconLoader::didFinishLoading(SubresourceLoader* resourceLoader) {
   LOG(IconDatabase, "IconLoader::didFinishLoading() - Loader %p",
       resourceLoader);
