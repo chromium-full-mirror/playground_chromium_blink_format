@@ -65,12 +65,11 @@ static int CALLBACK metaFileEnumProc(HDC hdc,
                                      HANDLETABLE* table,
                                      CONST ENHMETARECORD* record,
                                      int tableEntries,
-                                     LPARAM hfontPtr) {
+                                     LPARAM logFont) {
   if (record->iType == EMR_EXTCREATEFONTINDIRECTW) {
     const EMREXTCREATEFONTINDIRECTW* createFontRecord =
         reinterpret_cast<const EMREXTCREATEFONTINDIRECTW*>(record);
-    *reinterpret_cast<HFONT*>(hfontPtr) =
-        CreateFontIndirect(&createFontRecord->elfw.elfLogFont);
+    *reinterpret_cast<LOGFONT*>(logFont) = createFontRecord->elfw.elfLogFont;
   }
   return true;
 }
@@ -157,8 +156,13 @@ const FontData* FontCache::getFontDataForCharacters(const Font& font,
       ScriptStringFree(&ssa);
     }
     HENHMETAFILE metaFile = CloseEnhMetaFile(metaFileDc);
-    if (scriptStringOutSucceeded)
-      EnumEnhMetaFile(0, metaFile, metaFileEnumProc, &hfont, NULL);
+    if (scriptStringOutSucceeded) {
+      LOGFONT logFont;
+      logFont.lfFaceName[0] = 0;
+      EnumEnhMetaFile(0, metaFile, metaFileEnumProc, &logFont, NULL);
+      if (logFont.lfFaceName[0])
+        hfont = CreateFontIndirect(&logFont);
+    }
     DeleteEnhMetaFile(metaFile);
   }
 
