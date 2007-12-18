@@ -326,6 +326,8 @@ IntSize ScrollView::scrollOffset() const {
 }
 
 IntSize ScrollView::maximumScroll() const {
+  if (!m_data->allowsScrolling())
+    return IntSize();
   IntSize delta =
       (m_data->m_contentsSize - IntSize(visibleWidth(), visibleHeight())) -
       scrollOffset();
@@ -655,10 +657,10 @@ void ScrollView::wheelEvent(PlatformWheelEvent& e) {
   if ((e.deltaX() < 0 && maxScrollDelta.width() > 0) ||
       (e.deltaX() > 0 && scrollOffset().width() > 0) ||
       (e.deltaY() < 0 && maxScrollDelta.height() > 0) ||
-      (e.deltaY() > 0 && scrollOffset().height() > 0))
+      (e.deltaY() > 0 && scrollOffset().height() > 0)) {
     e.accept();
-
-  scrollBy(-e.deltaX() * LINE_STEP, -e.deltaY() * LINE_STEP);
+    scrollBy(-e.deltaX() * LINE_STEP, -e.deltaY() * LINE_STEP);
+  }
 }
 
 HashSet<Widget*>* ScrollView::children() {
