@@ -728,7 +728,8 @@ static LRESULT CALLBACK PopupWndProc(HWND hWnd,
               // so that it can perform type-to-select.
               HWND webView =
                   popup->client()->clientDocument()->view()->containingWindow();
-              ::PostMessage(webView, WM_KEYDOWN, LOWORD(wParam), lParam);
+              ::PostMessage(webView, WM_KEYDOWN,
+                            LOBYTE(VkKeyScan(LOWORD(wParam))), lParam);
               ::PostMessage(webView, message, wParam, lParam);
             } else
               lResult = 1;
