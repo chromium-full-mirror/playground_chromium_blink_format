@@ -122,27 +122,15 @@ struct MatchData {
   bool ignoreCase;
 };
 
-/* Non-error returns from the match() function. Error returns are externally
-defined error codes, which are all negative. */
-
-#define MATCH_MATCH 1
-#define MATCH_NOMATCH 0
-
 /* The maximum remaining length of subject we are prepared to search for a
 req_byte match. */
 
 #define REQ_BYTE_MAX 1000
 
-/* The below limit restricts the number of recursive match calls in order to
-limit the maximum amount of storage.
+/* The below limit restricts the number of "recursive" match calls in order to
+avoid spending exponential time on complex regular expressions. */
 
-This limit is tied to the size of MatchFrame.  Right now we allow PCRE to
-allocate up
-to MATCH_RECURSION_LIMIT - 16 * sizeof(MatchFrame) bytes of "stack" space before
-we give up.
-Currently that's 100000 - 16 * (23 * 4)  ~ 90MB. */
-
-#define MATCH_RECURSION_LIMIT 100000
+static const unsigned matchLimit = 100000;
 
 #ifdef DEBUG
 /*************************************************
@@ -257,10 +245,8 @@ a bit more code and notice if we use conflicting numbers.*/
 
 #endif
 
-#define RECURSIVE_MATCH_COMMON(num)                        \
-  if (stack.size >= MATCH_RECURSION_LIMIT)                 \
-    return matchError(JSRegExpErrorRecursionLimit, stack); \
-  goto RECURSE;                                            \
+#define RECURSIVE_MATCH_COMMON(num) \
+  goto RECURSE;                     \
   RRETURN_##num : stack.popCurrentFrame();
 
 #define RECURSIVE_MATCH(num, ra, rb)                   \
@@ -303,8 +289,8 @@ Arguments:
    offsetTop  current top pointer
    md          pointer to "static" info for the match
 
-Returns:       MATCH_MATCH if matched            )  these values are >= 0
-               MATCH_NOMATCH if failed to match  )
+Returns:       1 if matched          )  these values are >= 0
+               0 if failed to match  )
                a negative error value if aborted by an error condition
                  (e.g. stopped by repeated call or recursion limit)
 */
@@ -426,11 +412,12 @@ static int match(const UChar* subjectPtr,
                  const unsigned char* instructionPtr,
                  int offsetTop,
                  MatchData& md) {
-  int isMatch = false;
+  bool isMatch = false;
   int min;
   bool minimize =
       false; /* Initialization not really needed, but some compilers think so.
                 */
+  unsigned matchCount = 0;
 
   MatchStack stack;
 
@@ -464,6 +451,8 @@ static int match(const UChar* subjectPtr,
 /* This is where control jumps back to to effect "recursion" */
 
 RECURSE:
+  if (++matchCount > matchLimit)
+    return matchError(JSRegExpErrorHitLimit, stack);
 
 /* Now start processing the operations. */
 
@@ -484,7 +473,7 @@ RECURSE:
 #ifdef USE_COMPUTED_GOTO_FOR_MATCH_OPCODE_LOOP
     NEXT_OPCODE;
 #else
-  switch (*stack.currentFrame->args.instructionPtr)
+    switch (*stack.currentFrame->args.instructionPtr)
 #endif
     {
       /* Non-capturing bracket: optimized */
@@ -607,8 +596,7 @@ RECURSE:
       }
 
       /* End of a group, repeated or non-repeating. If we are at the end of
-       an assertion "group", stop matching and return MATCH_MATCH, but record
-       the
+       an assertion "group", stop matching and return 1, but record the
        current high water mark for use by positive assertions. Do this also
        for the "once" (not-backup up) groups. */
 
@@ -1879,7 +1867,7 @@ RECURSE:
 #ifdef USE_COMPUTED_GOTO_FOR_MATCH_OPCODE_LOOP
     CAPTURING_BRACKET:
 #else
-    default:
+      default:
 #endif
       /* Opening capturing bracket. If there is space in the offset vector, save
        the current subject position in the working slot at the top of the
@@ -2037,7 +2025,6 @@ RRETURN_SWITCH:
 #endif
 
 RETURN:
-  ASSERT(isMatch == MATCH_MATCH || isMatch == MATCH_NOMATCH);
   return isMatch;
 }
 
@@ -2298,13 +2285,14 @@ int jsRegExpExecute(const JSRegExp* re,
 
     /* When the result is no match, advance the pointer to the next character
      and continue. */
-
-    if (returnCode == MATCH_NOMATCH) {
+    if (returnCode == false) {
       startMatch++;
       continue;
     }
 
-    if (returnCode != MATCH_MATCH) {
+    if (returnCode != true) {
+      ASSERT(returnCode == JSRegExpErrorHitLimit ||
+             returnCode == JSRegExpErrorNoMemory);
       DPRINTF((">>>> error: returning %d\n", rc));
       return returnCode;
     }
