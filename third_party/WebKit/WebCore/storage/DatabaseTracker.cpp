@@ -143,9 +143,11 @@ bool DatabaseTracker::canEstablishDatabase(Document* document,
   if (!(page = document->page()))
     return false;
 
+  // If no displayName was specified, pass the standard (required) name instead
   unsigned long long newQuota =
       page->chrome()->requestQuotaIncreaseForNewDatabase(
-          document->frame(), originData, displayName, estimatedSize);
+          document->frame(), originData,
+          displayName.length() > 0 ? displayName : name, estimatedSize);
   setQuota(originData, newQuota);
 
   return usage + estimatedSize <= newQuota;
