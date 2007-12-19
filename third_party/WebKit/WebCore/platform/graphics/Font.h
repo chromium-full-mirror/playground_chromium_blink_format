@@ -187,6 +187,10 @@ class Font {
   bool isFixedPitch() const;
   bool isPrinterFont() const { return m_fontDescription.usePrinterFont(); }
 
+  FontRenderingMode renderingMode() const {
+    return m_fontDescription.renderingMode();
+  }
+
   FontFamily& firstFamily() { return m_fontDescription.firstFamily(); }
   const FontFamily& family() const { return m_fontDescription.family(); }
 

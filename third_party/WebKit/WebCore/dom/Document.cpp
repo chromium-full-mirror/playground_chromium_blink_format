@@ -1083,6 +1083,7 @@ void Document::recalcStyle(StyleChange change) {
     FontDescription fontDescription;
     fontDescription.setUsePrinterFont(printing());
     if (Settings* settings = this->settings()) {
+      fontDescription.setRenderingMode(settings->fontRenderingMode());
       if (printing() && !settings->shouldPrintBackgrounds())
         _style->setForceBackgroundsToWhite(true);
       const AtomicString& stdfont = settings->standardFontFamily();
