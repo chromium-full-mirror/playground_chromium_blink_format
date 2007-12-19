@@ -298,7 +298,7 @@ void Settings::setFontRenderingMode(FontRenderingMode mode) {
 }
 
 FontRenderingMode Settings::fontRenderingMode() const {
-  return static_cast<FontRenderinMode>(m_fontRenderingMode);
+  return static_cast<FontRenderingMode>(m_fontRenderingMode);
 }
 
 }  // namespace WebCore
