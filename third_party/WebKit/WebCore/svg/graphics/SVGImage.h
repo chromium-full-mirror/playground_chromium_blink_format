@@ -46,6 +46,7 @@ class SVGImage : public Image {
   ~SVGImage();
 
   virtual void setContainerSize(const IntSize&);
+  virtual bool usesContainerSize() const;
   virtual bool hasRelativeWidth() const;
   virtual bool hasRelativeHeight() const;
 

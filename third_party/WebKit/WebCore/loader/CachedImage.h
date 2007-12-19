@@ -49,7 +49,11 @@ class CachedImage : public CachedResource, public ImageObserver {
            imageSize().height() > 0;
   }
 
+  // These are ony used for SVGImage right now
   void setImageContainerSize(const IntSize&);
+  bool usesImageContainerSize() const;
+  bool imageHasRelativeWidth() const;
+  bool imageHasRelativeHeight() const;
 
   IntSize imageSize() const;  // returns the size of the complete image
   IntRect imageRect() const;  // The size of the image.
