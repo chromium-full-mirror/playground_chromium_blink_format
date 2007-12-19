@@ -690,7 +690,8 @@ static inline bool objectIsRelayoutBoundary(const RenderObject* obj) {
   // improve performance
   return obj->isTextField() || obj->isTextArea() ||
          obj->hasOverflowClip() && !obj->style()->width().isIntrinsicOrAuto() &&
-             !obj->style()->height().isIntrinsicOrAuto()
+             !obj->style()->height().isIntrinsicOrAuto() &&
+             !obj->style()->height().isPercent()
 #if ENABLE(SVG)
          || obj->isSVGRoot()
 #endif
