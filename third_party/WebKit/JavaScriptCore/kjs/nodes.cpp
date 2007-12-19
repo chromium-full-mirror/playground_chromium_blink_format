@@ -208,12 +208,11 @@ void ParserRefCounted::deleteNewObjects() {
   newTrackedObjects = 0;
 }
 
-Node::Node() : m_mayHaveDeclarations(false), m_expectedReturnType(ObjectType) {
+Node::Node() : m_expectedReturnType(ObjectType) {
   m_line = lexer().lineNo();
 }
 
-Node::Node(JSType expectedReturn)
-    : m_mayHaveDeclarations(false), m_expectedReturnType(expectedReturn) {
+Node::Node(JSType expectedReturn) : m_expectedReturnType(expectedReturn) {
   m_line = lexer().lineNo();
 }
 
@@ -3381,9 +3380,7 @@ uint32_t AssignExprNode::evaluateToUInt32(ExecState* exec) {
 // ------------------------------ VarDeclNode ----------------------------------
 
 VarDeclNode::VarDeclNode(const Identifier& id, AssignExprNode* in, Type t)
-    : varType(t), ident(id), init(in) {
-  m_mayHaveDeclarations = true;
-}
+    : varType(t), ident(id), init(in) {}
 
 void VarDeclNode::optimizeVariableAccess(
     SymbolTable&,
@@ -3392,21 +3389,6 @@ void VarDeclNode::optimizeVariableAccess(
     nodeStack.append(next.get());
   if (init)
     nodeStack.append(init.get());
-}
-
-void VarDeclNode::getDeclarations(DeclarationStacks& stacks) {
-  if (next) {
-    ASSERT(next->mayHaveDeclarations());
-    stacks.nodeStack.append(next.get());
-  }
-
-  // The normal check to avoid overwriting pre-existing values with variable
-  // declarations doesn't work for the "arguments" property because we
-  // instantiate it lazily. So we need to check here instead.
-  if (ident == stacks.exec->propertyNames().arguments)
-    return;
-
-  stacks.varStack.append(this);
 }
 
 void VarDeclNode::handleSlowCase(ExecState* exec,
@@ -3507,11 +3489,6 @@ Completion VarStatementNode::execute(ExecState* exec) {
   return Completion(Normal);
 }
 
-void VarStatementNode::getDeclarations(DeclarationStacks& stacks) {
-  ASSERT(next->mayHaveDeclarations());
-  stacks.nodeStack.append(next.get());
-}
-
 // ------------------------------ Helper functions for handling Vectors of
 // StatementNode -------------------------------
 
@@ -3523,40 +3500,6 @@ static inline void statementListPushFIFO(SourceElements& statements,
     --it;
     stack.append((*it).get());
   }
-}
-
-static inline void statementListGetDeclarations(SourceElements& statements,
-                                                DeclarationStacks& stacks) {
-  SourceElements::iterator it = statements.end();
-  SourceElements::iterator begin = statements.begin();
-  while (it != begin) {
-    --it;
-    if ((*it)->mayHaveDeclarations())
-      stacks.nodeStack.append((*it).get());
-  }
-}
-
-static inline Node* statementListInitializeDeclarationStack(
-    SourceElements& statements,
-    DeclarationStacks::NodeStack& stack) {
-  ASSERT(!stack.size());  // Otherwise, the removeLast() call might remove
-                          // someone else's node.
-
-  SourceElements::iterator it = statements.end();
-  SourceElements::iterator begin = statements.begin();
-
-  while (it != begin) {
-    --it;
-    if ((*it)->mayHaveDeclarations())
-      stack.append((*it).get());
-  }
-
-  if (!stack.size())
-    return 0;
-
-  Node* n = stack.last();
-  stack.removeLast();
-  return n;
 }
 
 static inline Node* statementListInitializeVariableAccessStack(
@@ -3599,17 +3542,12 @@ static inline Completion statementListExecute(SourceElements& statements,
 
 BlockNode::BlockNode(SourceElements* children) : m_children(children) {
   ASSERT(m_children);
-  m_mayHaveDeclarations = true;
 }
 
 void BlockNode::optimizeVariableAccess(
     SymbolTable&,
     DeclarationStacks::NodeStack& nodeStack) {
   statementListPushFIFO(*m_children, nodeStack);
-}
-
-void BlockNode::getDeclarations(DeclarationStacks& stacks) {
-  statementListGetDeclarations(*m_children, stacks);
 }
 
 // ECMA 12.1
@@ -3674,13 +3612,6 @@ Completion IfNode::execute(ExecState* exec) {
   return statement2->execute(exec);
 }
 
-void IfNode::getDeclarations(DeclarationStacks& stacks) {
-  if (statement2 && statement2->mayHaveDeclarations())
-    stacks.nodeStack.append(statement2.get());
-  if (statement1->mayHaveDeclarations())
-    stacks.nodeStack.append(statement1.get());
-}
-
 // ------------------------------ DoWhileNode ----------------------------------
 
 void DoWhileNode::optimizeVariableAccess(
@@ -3723,11 +3654,6 @@ Completion DoWhileNode::execute(ExecState* exec) {
   return Completion();  // work around gcc 4.0 bug
 }
 
-void DoWhileNode::getDeclarations(DeclarationStacks& stacks) {
-  if (statement->mayHaveDeclarations())
-    stacks.nodeStack.append(statement.get());
-}
-
 // ------------------------------ WhileNode ------------------------------------
 
 void WhileNode::optimizeVariableAccess(
@@ -3768,11 +3694,6 @@ Completion WhileNode::execute(ExecState* exec) {
   }
 
   return Completion();  // work around gcc 4.0 bug
-}
-
-void WhileNode::getDeclarations(DeclarationStacks& stacks) {
-  if (statement->mayHaveDeclarations())
-    stacks.nodeStack.append(statement.get());
 }
 
 // ------------------------------ ForNode --------------------------------------
@@ -3829,27 +3750,16 @@ Completion ForNode::execute(ExecState* exec) {
   return Completion();  // work around gcc 4.0 bug
 }
 
-void ForNode::getDeclarations(DeclarationStacks& stacks) {
-  if (statement->mayHaveDeclarations())
-    stacks.nodeStack.append(statement.get());
-  if (expr1 && expr1->mayHaveDeclarations())
-    stacks.nodeStack.append(expr1.get());
-}
-
 // ------------------------------ ForInNode ------------------------------------
 
 ForInNode::ForInNode(ExpressionNode* l, ExpressionNode* e, StatementNode* s)
-    : init(0L), lexpr(l), expr(e), varDecl(0L), statement(s) {
-  m_mayHaveDeclarations = true;
-}
+    : init(0L), lexpr(l), expr(e), varDecl(0L), statement(s) {}
 
 ForInNode::ForInNode(const Identifier& i,
                      AssignExprNode* in,
                      ExpressionNode* e,
                      StatementNode* s)
     : ident(i), init(in), expr(e), statement(s) {
-  m_mayHaveDeclarations = true;
-
   // for( var foo = bar in baz )
   varDecl = new VarDeclNode(ident, init.get(), VarDeclNode::Variable);
   lexpr = new ResolveNode(ident);
@@ -3863,13 +3773,6 @@ void ForInNode::optimizeVariableAccess(
   nodeStack.append(lexpr.get());
   if (varDecl)
     nodeStack.append(varDecl.get());
-}
-
-void ForInNode::getDeclarations(DeclarationStacks& stacks) {
-  if (statement->mayHaveDeclarations())
-    stacks.nodeStack.append(statement.get());
-  if (varDecl && varDecl->mayHaveDeclarations())
-    stacks.nodeStack.append(varDecl.get());
 }
 
 // ECMA 12.6.4
@@ -4035,11 +3938,6 @@ Completion ReturnNode::execute(ExecState* exec) {
 
 // ------------------------------ WithNode -------------------------------------
 
-void WithNode::getDeclarations(DeclarationStacks& stacks) {
-  if (statement->mayHaveDeclarations())
-    stacks.nodeStack.append(statement.get());
-}
-
 void WithNode::optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack& nodeStack) {
   // Can't optimize within statement because "with" introduces a dynamic scope.
@@ -4072,11 +3970,6 @@ void CaseClauseNode::optimizeVariableAccess(
     statementListPushFIFO(*m_children, nodeStack);
 }
 
-void CaseClauseNode::getDeclarations(DeclarationStacks& stacks) {
-  if (m_children)
-    statementListGetDeclarations(*m_children, stacks);
-}
-
 // ECMA 12.11
 JSValue* CaseClauseNode::evaluate(ExecState* exec) {
   JSValue* v = expr->evaluate(exec);
@@ -4103,21 +3996,12 @@ void ClauseListNode::optimizeVariableAccess(
   nodeStack.append(clause.get());
 }
 
-void ClauseListNode::getDeclarations(DeclarationStacks& stacks) {
-  if (next && next->mayHaveDeclarations())
-    stacks.nodeStack.append(next.get());
-  if (clause->mayHaveDeclarations())
-    stacks.nodeStack.append(clause.get());
-}
-
 // ------------------------------ CaseBlockNode --------------------------------
 
 CaseBlockNode::CaseBlockNode(ClauseListNode* l1,
                              CaseClauseNode* d,
                              ClauseListNode* l2)
-    : list1(l1), def(d), list2(l2) {
-  m_mayHaveDeclarations = true;
-}
+    : list1(l1), def(d), list2(l2) {}
 
 void CaseBlockNode::optimizeVariableAccess(
     SymbolTable&,
@@ -4128,15 +4012,6 @@ void CaseBlockNode::optimizeVariableAccess(
     nodeStack.append(def.get());
   if (list1)
     nodeStack.append(list1.get());
-}
-
-void CaseBlockNode::getDeclarations(DeclarationStacks& stacks) {
-  if (list2 && list2->mayHaveDeclarations())
-    stacks.nodeStack.append(list2.get());
-  if (def && def->mayHaveDeclarations())
-    stacks.nodeStack.append(def.get());
-  if (list1 && list1->mayHaveDeclarations())
-    stacks.nodeStack.append(list1.get());
 }
 
 // ECMA 12.11
@@ -4210,11 +4085,6 @@ void SwitchNode::optimizeVariableAccess(
   nodeStack.append(expr.get());
 }
 
-void SwitchNode::getDeclarations(DeclarationStacks& stacks) {
-  if (block->mayHaveDeclarations())
-    stacks.nodeStack.append(block.get());
-}
-
 // ECMA 12.11
 Completion SwitchNode::execute(ExecState* exec) {
   KJS_BREAKPOINT;
@@ -4237,11 +4107,6 @@ void LabelNode::optimizeVariableAccess(
     SymbolTable&,
     DeclarationStacks::NodeStack& nodeStack) {
   nodeStack.append(statement.get());
-}
-
-void LabelNode::getDeclarations(DeclarationStacks& stacks) {
-  if (statement->mayHaveDeclarations())
-    stacks.nodeStack.append(statement.get());
 }
 
 // ECMA 12.12
@@ -4285,15 +4150,6 @@ void TryNode::optimizeVariableAccess(SymbolTable&,
   if (finallyBlock)
     nodeStack.append(finallyBlock.get());
   nodeStack.append(tryBlock.get());
-}
-
-void TryNode::getDeclarations(DeclarationStacks& stacks) {
-  if (finallyBlock && finallyBlock->mayHaveDeclarations())
-    stacks.nodeStack.append(finallyBlock.get());
-  if (catchBlock && catchBlock->mayHaveDeclarations())
-    stacks.nodeStack.append(catchBlock.get());
-  if (tryBlock->mayHaveDeclarations())
-    stacks.nodeStack.append(tryBlock.get());
 }
 
 // ECMA 12.14
@@ -4531,10 +4387,6 @@ Completion FunctionBodyNode::execute(ExecState* exec) {
 void FuncDeclNode::addParams() {
   for (ParameterNode* p = param.get(); p != 0L; p = p->nextParam())
     body->parameters().append(p->ident());
-}
-
-void FuncDeclNode::getDeclarations(DeclarationStacks& stacks) {
-  stacks.functionStack.append(this);
 }
 
 FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {

@@ -136,13 +136,6 @@ class Node : public ParserRefCounted {
 
   // Used for iterative, depth-first traversal of the node tree. Does not cross
   // function call boundaries.
-  bool mayHaveDeclarations() const { return m_mayHaveDeclarations; }
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL {
-    ASSERT_NOT_REACHED();
-  }
-
-  // Used for iterative, depth-first traversal of the node tree. Does not cross
-  // function call boundaries.
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL {}
@@ -191,7 +184,6 @@ class Node : public ParserRefCounted {
   Completion rethrowException(ExecState*) KJS_FAST_CALL;
 
   int m_line : 28;
-  bool m_mayHaveDeclarations : 1;
   unsigned m_expectedReturnType : 3;  // JSType
 };
 
@@ -2071,7 +2063,6 @@ class VarDeclNode : public ExpressionNode {
   virtual KJS::JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   void evaluateSingle(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -2091,15 +2082,12 @@ class VarDeclNode : public ExpressionNode {
 
 class VarStatementNode : public StatementNode {
  public:
-  VarStatementNode(VarDeclNode* l) KJS_FAST_CALL : next(l) {
-    m_mayHaveDeclarations = true;
-  }
+  VarStatementNode(VarDeclNode* l) KJS_FAST_CALL : next(l) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<VarDeclNode> next;
@@ -2127,9 +2115,6 @@ class SourceElementsStub : public Node {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL {
     ASSERT_NOT_REACHED();
   }
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL {
-    ASSERT_NOT_REACHED();
-  }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -2147,7 +2132,6 @@ class BlockNode : public StatementNode {
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  protected:
   OwnPtr<SourceElements> m_children;
@@ -2178,16 +2162,12 @@ class IfNode : public StatementNode {
   IfNode(ExpressionNode* e, StatementNode* s1, StatementNode* s2) KJS_FAST_CALL
       : expr(e),
         statement1(s1),
-        statement2(s2) {
-    m_mayHaveDeclarations = statement1->mayHaveDeclarations() ||
-                            (statement2 && statement2->mayHaveDeclarations());
-  }
+        statement2(s2) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<ExpressionNode> expr;
@@ -2198,15 +2178,12 @@ class IfNode : public StatementNode {
 class DoWhileNode : public StatementNode {
  public:
   DoWhileNode(StatementNode* s, ExpressionNode* e) KJS_FAST_CALL : statement(s),
-                                                                   expr(e) {
-    m_mayHaveDeclarations = true;
-  }
+                                                                   expr(e) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<StatementNode> statement;
@@ -2216,15 +2193,12 @@ class DoWhileNode : public StatementNode {
 class WhileNode : public StatementNode {
  public:
   WhileNode(ExpressionNode* e, StatementNode* s) KJS_FAST_CALL : expr(e),
-                                                                 statement(s) {
-    m_mayHaveDeclarations = true;
-  }
+                                                                 statement(s) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<ExpressionNode> expr;
@@ -2240,7 +2214,6 @@ class ForNode : public StatementNode {
                                             expr2(e2),
                                             expr3(e3),
                                             statement(s) {
-    m_mayHaveDeclarations = true;
     if (expr1)
       expr1->optimizeForUnnecessaryResult();
     if (expr3)
@@ -2252,7 +2225,6 @@ class ForNode : public StatementNode {
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<ExpressionNode> expr1;
@@ -2275,7 +2247,6 @@ class ForInNode : public StatementNode {
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   VarDeclNode* getVarDecl() { return varDecl.get(); }
 
  private:
@@ -2325,15 +2296,12 @@ class ReturnNode : public StatementNode {
 class WithNode : public StatementNode {
  public:
   WithNode(ExpressionNode* e, StatementNode* s) KJS_FAST_CALL : expr(e),
-                                                                statement(s) {
-    m_mayHaveDeclarations = true;
-  }
+                                                                statement(s) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<ExpressionNode> expr;
@@ -2344,15 +2312,12 @@ class LabelNode : public StatementNode {
  public:
   LabelNode(const Identifier& l, StatementNode* s) KJS_FAST_CALL
       : label(l),
-        statement(s) {
-    m_mayHaveDeclarations = true;
-  }
+        statement(s) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   Identifier label;
@@ -2380,15 +2345,12 @@ class TryNode : public StatementNode {
           StatementNode* f) KJS_FAST_CALL : tryBlock(b),
                                             exceptionIdent(e),
                                             catchBlock(c),
-                                            finallyBlock(f) {
-    m_mayHaveDeclarations = true;
-  }
+                                            finallyBlock(f) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<StatementNode> tryBlock;
@@ -2512,7 +2474,6 @@ class FuncDeclNode : public StatementNode {
       : ident(i),
         body(b) {
     addParams();
-    m_mayHaveDeclarations = true;
   }
   FuncDeclNode(const Identifier& i,
                ParameterNode* p,
@@ -2520,11 +2481,9 @@ class FuncDeclNode : public StatementNode {
                                                     param(p),
                                                     body(b) {
     addParams();
-    m_mayHaveDeclarations = true;
   }
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   ALWAYS_INLINE FunctionImp* makeFunction(ExecState*) KJS_FAST_CALL;
   Identifier ident;
 
@@ -2536,19 +2495,14 @@ class FuncDeclNode : public StatementNode {
 
 class CaseClauseNode : public Node {
  public:
-  CaseClauseNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {
-    m_mayHaveDeclarations = true;
-  }
+  CaseClauseNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
   CaseClauseNode(ExpressionNode* e, SourceElements* children) KJS_FAST_CALL
       : expr(e),
-        m_children(children) {
-    m_mayHaveDeclarations = true;
-  }
+        m_children(children) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -2564,13 +2518,10 @@ class CaseClauseNode : public Node {
 
 class ClauseListNode : public Node {
  public:
-  ClauseListNode(CaseClauseNode* c) KJS_FAST_CALL : clause(c) {
-    m_mayHaveDeclarations = true;
-  }
+  ClauseListNode(CaseClauseNode* c) KJS_FAST_CALL : clause(c) {}
   ClauseListNode(ClauseListNode* n, CaseClauseNode* c) KJS_FAST_CALL
       : clause(c) {
     n->next = this;
-    m_mayHaveDeclarations = true;
   }
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
@@ -2581,7 +2532,6 @@ class ClauseListNode : public Node {
   PassRefPtr<ClauseListNode> releaseNext() KJS_FAST_CALL {
     return next.release();
   }
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -2603,7 +2553,6 @@ class CaseBlockNode : public Node {
       KJS_FAST_CALL;
   Completion evalBlock(ExecState* exec, JSValue* input) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -2618,15 +2567,12 @@ class CaseBlockNode : public Node {
 class SwitchNode : public StatementNode {
  public:
   SwitchNode(ExpressionNode* e, CaseBlockNode* b) KJS_FAST_CALL : expr(e),
-                                                                  block(b) {
-    m_mayHaveDeclarations = true;
-  }
+                                                                  block(b) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
 
  private:
   RefPtr<ExpressionNode> expr;
