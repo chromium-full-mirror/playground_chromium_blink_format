@@ -206,7 +206,7 @@ class Settings {
   bool m_forceFTPDirectoryListings : 1;
   bool m_developerExtrasEnabled : 1;
   bool m_authorAndUserStylesEnabled : 1;
-  FontRenderingMode m_fontRenderingMode : 1;
+  unsigned m_fontRenderingMode : 1;
 };
 
 }  // namespace WebCore
