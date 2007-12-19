@@ -106,18 +106,29 @@ struct DeclarationStacks {
   FunctionStack& functionStack;
 };
 
-class Node : Noncopyable {
- public:
-  Node() KJS_FAST_CALL;
-  Node(PlacementNewAdoptType) KJS_FAST_CALL {}
-  virtual ~Node();
+class ParserRefCounted : Noncopyable {
+ protected:
+  ParserRefCounted() KJS_FAST_CALL;
+  ParserRefCounted(PlacementNewAdoptType) KJS_FAST_CALL {}
 
-  UString toString() const KJS_FAST_CALL;
-  int lineNo() const KJS_FAST_CALL { return m_line; }
+ public:
   void ref() KJS_FAST_CALL;
   void deref() KJS_FAST_CALL;
   unsigned refcount() KJS_FAST_CALL;
-  static void clearNewNodes() KJS_FAST_CALL;
+
+  static void deleteNewObjects() KJS_FAST_CALL;
+
+  virtual ~ParserRefCounted();
+};
+
+class Node : public ParserRefCounted {
+ public:
+  Node() KJS_FAST_CALL;
+  Node(PlacementNewAdoptType placementAdopt) KJS_FAST_CALL
+      : ParserRefCounted(placementAdopt) {}
+
+  UString toString() const KJS_FAST_CALL;
+  int lineNo() const KJS_FAST_CALL { return m_line; }
 
   // Serialization.
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL = 0;
@@ -2265,6 +2276,7 @@ class ForInNode : public StatementNode {
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual void getDeclarations(DeclarationStacks&) KJS_FAST_CALL;
+  VarDeclNode* getVarDecl() { return varDecl.get(); }
 
  private:
   Identifier ident;
@@ -2411,14 +2423,14 @@ class ParameterNode : public Node {
 
 class ScopeNode : public BlockNode {
  public:
-  ScopeNode(SourceElements*) KJS_FAST_CALL;
+  ScopeNode(SourceElements*,
+            DeclarationStacks::VarStack*,
+            DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
 
   int sourceId() KJS_FAST_CALL { return m_sourceId; }
   const UString& sourceURL() KJS_FAST_CALL { return m_sourceURL; }
 
  protected:
-  void initializeDeclarationStacks(ExecState*) KJS_FAST_CALL;
-
   DeclarationStacks::VarStack m_varStack;
   DeclarationStacks::FunctionStack m_functionStack;
 
@@ -2429,7 +2441,9 @@ class ScopeNode : public BlockNode {
 
 class ProgramNode : public ScopeNode {
  public:
-  ProgramNode(SourceElements*) KJS_FAST_CALL;
+  ProgramNode(SourceElements*,
+              DeclarationStacks::VarStack*,
+              DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
  private:
@@ -2438,7 +2452,9 @@ class ProgramNode : public ScopeNode {
 
 class EvalNode : public ScopeNode {
  public:
-  EvalNode(SourceElements*) KJS_FAST_CALL;
+  EvalNode(SourceElements*,
+           DeclarationStacks::VarStack*,
+           DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
  private:
@@ -2447,7 +2463,9 @@ class EvalNode : public ScopeNode {
 
 class FunctionBodyNode : public ScopeNode {
  public:
-  FunctionBodyNode(SourceElements*) KJS_FAST_CALL;
+  FunctionBodyNode(SourceElements*,
+                   DeclarationStacks::VarStack*,
+                   DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
 
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
@@ -2457,7 +2475,7 @@ class FunctionBodyNode : public ScopeNode {
   UString paramString() const KJS_FAST_CALL;
 
  private:
-  void initializeSymbolTable() KJS_FAST_CALL;
+  void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
   void optimizeVariableAccess() KJS_FAST_CALL;
   ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
 
