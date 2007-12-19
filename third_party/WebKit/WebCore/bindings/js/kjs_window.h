@@ -53,7 +53,7 @@ class Window : public JSGlobalObject {
   friend class WebCore::ScheduledAction;
 
  protected:
-  Window(WebCore::DOMWindow*);
+  Window(WebCore::DOMWindow*, JSValue* prototype);
 
  public:
   virtual ~Window();

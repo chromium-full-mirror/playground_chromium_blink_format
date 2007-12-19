@@ -210,7 +210,8 @@ DontDelete|Function 0
 @end
 */
 
-Window::Window(DOMWindow* window) : m_impl(window), d(new WindowPrivate) {
+Window::Window(DOMWindow* window, JSValue* prototype)
+    : JSGlobalObject(prototype), m_impl(window), d(new WindowPrivate) {
   // Window destruction is not thread-safe because of
   // the non-thread-safe WebCore structures it references.
   Collector::collectOnMainThreadOnly(this);
