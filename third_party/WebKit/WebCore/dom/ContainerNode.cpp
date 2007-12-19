@@ -389,6 +389,8 @@ bool ContainerNode::removeChild(Node* oldChild, ExceptionCode& ec) {
     return false;
   }
 
+  document()->removeFocusedNodeOfSubtree(child.get());
+
   // FIXME: After sending the mutation events, "this" could be destroyed.
   // We can prevent that by doing a "ref", but first we have to make sure
   // that no callers call with ref count == 0 and parent = 0 (as of this
@@ -446,6 +448,10 @@ bool ContainerNode::removeChildren() {
   // and remove... e.g. stop loading frames, fire unload events
   for (n = m_firstChild; n; n = n->nextSibling())
     willRemoveChild(n);
+
+  // exclude this node when looking for removed focusedNode since only children
+  // will be removed
+  document()->removeFocusedNodeOfSubtree(this, true);
 
   forbidEventDispatch();
   while ((n = m_firstChild) != 0) {

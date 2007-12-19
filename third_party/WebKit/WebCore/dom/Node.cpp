@@ -823,12 +823,7 @@ void Node::attach() {
   m_attached = true;
 }
 
-void Node::willRemove() {
-  // If the document is in the page cache, then we don't need to clear out the
-  // focused node.
-  if (!document()->inPageCache() && m_focused)
-    document()->focusedNodeRemoved(this);
-}
+void Node::willRemove() {}
 
 void Node::detach() {
   m_inDetach = true;
