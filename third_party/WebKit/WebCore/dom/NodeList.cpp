@@ -30,13 +30,21 @@
 
 namespace WebCore {
 
-NodeList::NodeList(PassRefPtr<Node> rootNode)
-    : m_rootNode(rootNode), m_caches(new Caches), m_ownsCaches(true) {
+NodeList::NodeList(PassRefPtr<Node> rootNode, bool needsNotifications)
+    : m_rootNode(rootNode),
+      m_caches(new Caches),
+      m_ownsCaches(true),
+      m_needsNotifications(needsNotifications) {
   m_rootNode->registerNodeList(this);
 }
 
-NodeList::NodeList(PassRefPtr<Node> rootNode, NodeList::Caches* info)
-    : m_rootNode(rootNode), m_caches(info), m_ownsCaches(false) {
+NodeList::NodeList(PassRefPtr<Node> rootNode,
+                   NodeList::Caches* info,
+                   bool needsNotifications)
+    : m_rootNode(rootNode),
+      m_caches(info),
+      m_ownsCaches(false),
+      m_needsNotifications(needsNotifications) {
   m_rootNode->registerNodeList(this);
 }
 

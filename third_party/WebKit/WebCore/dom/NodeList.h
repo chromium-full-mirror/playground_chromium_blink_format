@@ -48,11 +48,11 @@ class NodeList : public RefCounted<NodeList> {
     bool isItemCacheValid : 1;
   };
 
-  NodeList(PassRefPtr<Node> rootNode);
-  NodeList(PassRefPtr<Node> rootNode, Caches*);
+  NodeList(PassRefPtr<Node> rootNode, bool needsNotifications);
+  NodeList(PassRefPtr<Node> rootNode, Caches*, bool needsNotifications);
   virtual ~NodeList();
 
-  bool needsNotifications() const { return m_ownsCaches; }
+  bool needsNotifications() const { return m_needsNotifications; }
 
   // DOM methods & attributes for NodeList
   virtual unsigned length() const = 0;
@@ -72,6 +72,7 @@ class NodeList : public RefCounted<NodeList> {
   RefPtr<Node> m_rootNode;
   mutable Caches* m_caches;
   bool m_ownsCaches;
+  bool m_needsNotifications;
 
  private:
   Node* itemForwardsFromCurrent(Node* start,

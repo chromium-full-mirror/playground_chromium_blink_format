@@ -1082,10 +1082,6 @@ RenderStyle* Element::computedStyle() {
   return rd->m_computedStyle;
 }
 
-PassRefPtr<NodeList> Element::getElementsByClassName(const String& className) {
-  return new ClassNodeList(this, className);
-}
-
 void Element::cancelFocusAppearanceUpdate() {
   if (ElementRareData* rd = rareData())
     rd->m_needsFocusAppearanceUpdateSoonAfterAttach = false;

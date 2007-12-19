@@ -182,8 +182,6 @@ class Element : public ContainerNode {
   virtual void updateFocusAppearance(bool restorePreviousSelection);
   void blur();
 
-  PassRefPtr<NodeList> getElementsByClassName(const String&);
-
 #ifndef NDEBUG
   virtual void dump(TextStream*, DeprecatedString ind = "") const;
   virtual void formatForDebugger(char* buffer, unsigned length) const;

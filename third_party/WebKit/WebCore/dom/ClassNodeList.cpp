@@ -37,9 +37,10 @@
 namespace WebCore {
 
 ClassNodeList::ClassNodeList(PassRefPtr<Node> rootNode,
-                             const AtomicString& className)
-    : NodeList(rootNode) {
-  m_classNames.parseClassAttribute(className,
+                             const String& classNames,
+                             NodeList::Caches* caches)
+    : NodeList(rootNode, caches, true) {
+  m_classNames.parseClassAttribute(classNames,
                                    m_rootNode->document()->inCompatMode());
 }
 
