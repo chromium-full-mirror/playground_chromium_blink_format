@@ -3883,6 +3883,14 @@ HRESULT WebView::notifyPreferencesChanged(IWebNotification* notification) {
   settings->setForceFTPDirectoryListings(true);
   settings->setDeveloperExtrasEnabled(developerExtrasEnabled());
 
+  FontSmoothingType smoothingType;
+  hr = preferences->fontSmoothing(&smoothingType);
+  if (FAILED(hr))
+    return hr;
+  settings->setFontRenderingMode(smoothingType != FontSmoothingTypeWindows
+                                     ? NormalRenderingMode
+                                     : AlternateRenderingMode);
+
   COMPtr<IWebPreferencesPrivate> prefsPrivate(Query, preferences);
   if (prefsPrivate) {
     unsigned long long defaultQuota = 0;

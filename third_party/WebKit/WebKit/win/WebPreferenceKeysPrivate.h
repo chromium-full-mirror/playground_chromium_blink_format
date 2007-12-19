@@ -105,7 +105,7 @@
   "WebKitHistoryAgeInDaysLimit"  // default: "7"
 
 // Windows-specific keys
-#define WebKitFontSmothingTypePreferenceKey \
+#define WebKitFontSmoothingTypePreferenceKey \
   "WebKitFontSmoothingType"  // default: FontSmoothingTypeMedium (2)
 #define WebKitCookieStorageAcceptPolicyPreferenceKey \
   "WebKitCookieStorageAcceptPolicy"  // default:

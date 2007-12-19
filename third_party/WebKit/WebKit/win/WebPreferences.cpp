@@ -221,7 +221,7 @@ void WebPreferences::initializeDefaultSettings() {
                        CFSTR(""));
   CFDictionaryAddValue(defaults, CFSTR(WebKitIconDatabaseEnabledPreferenceKey),
                        kCFBooleanTrue);
-  CFDictionaryAddValue(defaults, CFSTR(WebKitFontSmothingTypePreferenceKey),
+  CFDictionaryAddValue(defaults, CFSTR(WebKitFontSmoothingTypePreferenceKey),
                        CFSTR("2"));
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitCookieStorageAcceptPolicyPreferenceKey),
@@ -978,13 +978,15 @@ HRESULT WebPreferences::setIconDatabaseEnabled(BOOL enabled)  // location)
 HRESULT STDMETHODCALLTYPE WebPreferences::fontSmoothing(
     /* [retval][out] */ FontSmoothingType* smoothingType) {
   *smoothingType = (FontSmoothingType)integerValueForKey(
-      CFSTR(WebKitFontSmothingTypePreferenceKey));
+      CFSTR(WebKitFontSmoothingTypePreferenceKey));
   return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE WebPreferences::setFontSmoothing(
     /* [in] */ FontSmoothingType smoothingType) {
-  setIntegerValue(CFSTR(WebKitFontSmothingTypePreferenceKey), smoothingType);
+  setIntegerValue(CFSTR(WebKitFontSmoothingTypePreferenceKey), smoothingType);
+  if (smoothingType == FontSmoothingTypeWindows)
+    smoothingType = FontSmoothingTypeStandard;
   wkSetFontSmoothingLevel((int)smoothingType);
   return S_OK;
 }
