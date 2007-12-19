@@ -38,7 +38,7 @@ namespace WebKit {
 ChromeClient::ChromeClient(WebKitWebView* webView) : m_webView(webView) {}
 
 void ChromeClient::chromeDestroyed() {
-  notImplemented();
+  delete this;
 }
 
 FloatRect ChromeClient::windowRect() {
