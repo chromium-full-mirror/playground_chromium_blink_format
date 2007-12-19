@@ -291,7 +291,7 @@ unsigned long long Settings::defaultDatabaseOriginQuota() const {
 }
 
 void Settings::setFontRenderingMode(FontRenderingMode mode) {
-  if (m_fontRenderingMode == mode)
+  if (fontRenderingMode() == mode)
     return;
   m_fontRenderingMode = mode;
   setNeedsReapplyStylesInAllFrames(m_page);
