@@ -4351,7 +4351,7 @@ static void gccIsCrazy() {}
 void ProgramNode::processDeclarations(ExecState* exec) {
   // If you remove this call, some SunSpider tests, including
   // bitops-nsieve-bits.js, will regress substantially on Mac, due to a ~40%
-  // increase in L2 cache misses. FIXME: WTF?
+  // increase in L2 cache misses. FIXME: <rdar://problem/5657439> WTF?
   gccIsCrazy();
 
   initializeSymbolTable(exec);
