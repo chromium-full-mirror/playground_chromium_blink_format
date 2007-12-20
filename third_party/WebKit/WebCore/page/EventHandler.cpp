@@ -300,6 +300,9 @@ bool EventHandler::handleMousePressEventSingleClick(
 
 bool EventHandler::handleMousePressEvent(
     const MouseEventWithHitTestResults& event) {
+  // Reset drag state.
+  dragState().m_dragSrc = 0;
+
   bool singleClick = event.event().clickCount() <= 1;
 
   // If we got the event back, that must mean it wasn't prevented,
