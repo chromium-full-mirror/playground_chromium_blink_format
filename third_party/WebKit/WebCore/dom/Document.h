@@ -627,7 +627,6 @@ class Document : public ContainerNode {
 
   String domain() const;
   void setDomain(const String& newDomain);
-  void setDomainInternal(const String& newDomain);
 
   String lastModified() const;
 
@@ -973,7 +972,7 @@ class Document : public ContainerNode {
 #endif
 
   void initSecurityOrigin();
-  const SecurityOrigin& securityOrigin() const { return m_securityOrigin; }
+  SecurityOrigin* securityOrigin() const { return m_securityOrigin.get(); }
 
   bool processingLoadEvent() const { return m_processingLoadEvent; }
 
@@ -991,9 +990,7 @@ class Document : public ContainerNode {
   void imageLoadEventTimerFired(Timer<Document>*);
   void updateFocusAppearanceTimerFired(Timer<Document>*);
 
-  mutable String m_domain;
-
-  SecurityOrigin m_securityOrigin;
+  RefPtr<SecurityOrigin> m_securityOrigin;
 
   RenderObject* m_savedRenderer;
   int m_secureForms;

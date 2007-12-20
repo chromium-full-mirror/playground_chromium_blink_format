@@ -122,7 +122,7 @@ bool DatabaseTracker::canEstablishDatabase(Document* document,
                                            const String& displayName,
                                            unsigned long estimatedSize) {
   SecurityOriginData originData =
-      document->securityOrigin().securityOriginData();
+      document->securityOrigin()->securityOriginData();
 
   // If this origin has no databases yet, establish an entry in the tracker
   // database with the default quota

@@ -44,6 +44,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
+#include <wtf/RefPtr.h>
 #include <wtf/Deque.h>
 
 namespace WebCore {
@@ -137,7 +138,7 @@ class Database : public ThreadSafeShared<Database> {
   void deliverPendingCallback();
 
   Document* m_document;
-  SecurityOrigin m_securityOrigin;
+  RefPtr<SecurityOrigin> m_securityOrigin;
   String m_name;
   int m_guid;
   String m_expectedVersion;
@@ -153,7 +154,7 @@ class Database : public ThreadSafeShared<Database> {
 
 #ifndef NDEBUG
   String databaseDebugName() const {
-    return m_securityOrigin.toString() + "::" + m_name;
+    return m_securityOrigin->toString() + "::" + m_name;
   }
 #endif
 

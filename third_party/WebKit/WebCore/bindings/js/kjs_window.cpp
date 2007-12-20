@@ -367,10 +367,8 @@ static Frame* createWindow(ExecState* exec,
       newFrame->loader()->changeLocation(
           KURL(completedURL.deprecatedString()),
           activeFrame->loader()->outgoingReferrer(), false, userGesture);
-      if (Document* oldDoc = openerFrame->document()) {
-        newFrame->document()->setDomainInternal(oldDoc->domain());
+      if (Document* oldDoc = openerFrame->document())
         newFrame->document()->setBaseURL(oldDoc->baseURL());
-      }
     } else if (!url.isEmpty())
       newFrame->loader()->scheduleLocationChange(
           completedURL, activeFrame->loader()->outgoingReferrer(), false,
@@ -875,10 +873,10 @@ bool Window::allowsAccessFrom(const JSGlobalObject* other) const {
 
   WebCore::Document* originDocument = originFrame->document();
 
-  const SecurityOrigin& originSecurityOrigin = originDocument->securityOrigin();
-  const SecurityOrigin& targetSecurityOrigin = targetDocument->securityOrigin();
+  const SecurityOrigin* originSecurityOrigin = originDocument->securityOrigin();
+  const SecurityOrigin* targetSecurityOrigin = targetDocument->securityOrigin();
 
-  if (originSecurityOrigin.canAccess(targetSecurityOrigin))
+  if (originSecurityOrigin->canAccess(targetSecurityOrigin))
     return true;
 
   if (!targetFrame->settings()->privateBrowsingEnabled()) {

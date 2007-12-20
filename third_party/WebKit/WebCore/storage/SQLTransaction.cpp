@@ -369,7 +369,7 @@ void SQLTransaction::postflightAndCommit() {
   // this database
   if (m_modifiedDatabase)
     DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
-        m_database->m_securityOrigin.securityOriginData(), m_database->m_name);
+        m_database->m_securityOrigin->securityOriginData(), m_database->m_name);
 
   // Transaction Step 10 - End transaction steps
   // There is no next step
@@ -432,7 +432,7 @@ void SQLTransaction::cleanupAfterTransactionErrorCallback() {
       // But if the commit was successful, notify the delegates if the
       // transaction modified this database
       DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
-          m_database->m_securityOrigin.securityOriginData(),
+          m_database->m_securityOrigin->securityOriginData(),
           m_database->m_name);
     }
 

@@ -98,7 +98,7 @@ PassRefPtr<Database> Database::openDatabase(Document* document,
     // Database object.  The question has been raised with the WHATWG
     LOG(StorageAPI, "Database %s for origin %s not allowed to be established",
         name.ascii().data(),
-        document->securityOrigin().toString().ascii().data());
+        document->securityOrigin()->toString().ascii().data());
     return 0;
   }
 
@@ -113,7 +113,7 @@ PassRefPtr<Database> Database::openDatabase(Document* document,
   }
 
   DatabaseTracker::tracker().setDatabaseDetails(
-      document->securityOrigin().securityOriginData(), name, displayName,
+      document->securityOrigin()->securityOriginData(), name, displayName,
       estimatedSize);
 
   if (Page* page = document->frame()->page())
@@ -139,7 +139,7 @@ Database::Database(Document* document,
 
   initializeThreading();
 
-  m_guid = guidForOriginAndName(m_securityOrigin.toString(), name);
+  m_guid = guidForOriginAndName(m_securityOrigin->toString(), name);
 
   {
     MutexLocker locker(guidMutex());
@@ -157,7 +157,7 @@ Database::Database(Document* document,
   ASSERT(m_databaseThread);
 
   m_filename = DatabaseTracker::tracker().fullPathForDatabase(
-      m_securityOrigin.securityOriginData(), m_name);
+      m_securityOrigin->securityOriginData(), m_name);
 }
 
 Database::~Database() {
@@ -580,7 +580,7 @@ void Database::setExpectedVersion(const String& version) {
 
 SecurityOriginData Database::securityOriginData() const {
   // Return a deep copy for ref counting thread safety
-  return m_securityOrigin.securityOriginData().copy();
+  return m_securityOrigin->securityOriginData().copy();
 }
 
 String Database::stringIdentifier() const {
