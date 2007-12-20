@@ -293,8 +293,9 @@ class JSObject : public JSCell {
    * @param propertyName The name of the property to check for
    * @return true if the object has the property, otherwise false
    */
-  bool hasProperty(ExecState* exec, const Identifier& propertyName) const;
-  bool hasProperty(ExecState* exec, unsigned propertyName) const;
+  bool hasProperty(ExecState*, const Identifier&) const;
+  bool hasProperty(ExecState*, unsigned) const;
+  bool hasOwnProperty(ExecState*, const Identifier&) const;
 
   /**
    * Removes the specified property from the object.
@@ -468,13 +469,6 @@ class JSObject : public JSCell {
   void defineSetter(ExecState* exec,
                     const Identifier& propertyName,
                     JSObject* setterFunc);
-
-  /**
-   * Remove all properties from this object.
-   * This doesn't take DontDelete into account, and isn't in the ECMA spec.
-   * It's simply a quick way to remove everything stored in the property map.
-   */
-  void clearProperties() { _prop.clear(); }
 
   void saveProperties(SavedProperties& p) const { _prop.save(p); }
   void restoreProperties(const SavedProperties& p) { _prop.restore(p); }

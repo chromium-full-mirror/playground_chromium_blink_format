@@ -81,6 +81,8 @@ ExecState::ExecState(JSGlobalObject* globalObject,
       break;
   }
 
+  m_localStorage = &m_variableObject->localStorage();
+
   if (scopeNode)
     m_globalObject->setCurrentExec(this);
 }
@@ -103,10 +105,6 @@ JSGlobalObject* ExecState::lexicalGlobalObject() const {
     return static_cast<JSGlobalObject*>(object);
 
   return dynamicGlobalObject();
-}
-
-void ExecState::updateLocalStorage() {
-  m_localStorageBuffer = m_activation->localStorage().data();
 }
 
 }  // namespace KJS

@@ -274,7 +274,7 @@ WebCore::JSLocation* Window::location() const {
 
 // reference our special objects during garbage collection
 void Window::mark() {
-  JSGlobalObject::mark();
+  Base::mark();
   if (d->loc && !d->loc->marked())
     d->loc->mark();
 }
@@ -709,7 +709,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  return JSObject::getOwnPropertySlot(exec, propertyName, slot);
+  return Base::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 void Window::put(ExecState* exec,
@@ -720,7 +720,7 @@ void Window::put(ExecState* exec,
   if (entry) {
     if (entry->attr & Function) {
       if (allowsAccessFrom(exec))
-        JSObject::put(exec, propertyName, value, attr);
+        Base::put(exec, propertyName, value, attr);
       return;
     }
     if (entry->attr & ReadOnly)
@@ -850,7 +850,7 @@ void Window::put(ExecState* exec,
     }
   }
   if (allowsAccessFrom(exec))
-    JSObject::put(exec, propertyName, value, attr);
+    Base::put(exec, propertyName, value, attr);
 }
 
 bool Window::allowsAccessFrom(const JSGlobalObject* other) const {
@@ -907,7 +907,7 @@ ExecState* Window::globalExec() {
   // frame does not destroy it
   ASSERT(impl()->frame());
   impl()->frame()->keepAlive();
-  return JSGlobalObject::globalExec();
+  return Base::globalExec();
 }
 
 bool Window::shouldInterruptScript() const {
@@ -1013,7 +1013,6 @@ void Window::clear() {
     *d->m_returnValueSlot = getDirect("returnValue");
 
   clearAllTimeouts();
-  clearProperties();
   clearHelperObjectProperties();
 
   // Now recreate a working global object for the next URL that will use us; but

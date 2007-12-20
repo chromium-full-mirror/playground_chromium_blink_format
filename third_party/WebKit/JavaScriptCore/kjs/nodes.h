@@ -2389,10 +2389,12 @@ class ScopeNode : public BlockNode {
             DeclarationStacks::VarStack*,
             DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
 
-  int sourceId() KJS_FAST_CALL { return m_sourceId; }
-  const UString& sourceURL() KJS_FAST_CALL { return m_sourceURL; }
+  int sourceId() const KJS_FAST_CALL { return m_sourceId; }
+  const UString& sourceURL() const KJS_FAST_CALL { return m_sourceURL; }
 
  protected:
+  void optimizeVariableAccess(ExecState*) KJS_FAST_CALL;
+
   DeclarationStacks::VarStack m_varStack;
   DeclarationStacks::FunctionStack m_functionStack;
 
@@ -2409,7 +2411,15 @@ class ProgramNode : public ScopeNode {
   virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
  private:
+  void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
   ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
+
+  Vector<size_t> m_varIndexes;  // Storage indexes belonging to the nodes in
+                                // m_varStack. (Recorded to avoid double
+                                // lookup.)
+  Vector<size_t> m_functionIndexes;  // Storage indexes belonging to the nodes
+                                     // in m_functionStack. (Recorded to avoid
+                                     // double lookup.)
 };
 
 class EvalNode : public ScopeNode {
@@ -2438,7 +2448,6 @@ class FunctionBodyNode : public ScopeNode {
 
  private:
   void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
-  void optimizeVariableAccess() KJS_FAST_CALL;
   ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
 
   bool m_initialized;

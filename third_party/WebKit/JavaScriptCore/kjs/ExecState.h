@@ -24,11 +24,10 @@
 #ifndef ExecState_H
 #define ExecState_H
 
-#include "value.h"
-#include "types.h"
-#include "CommonIdentifiers.h"
 #include "LabelStack.h"
+#include "LocalStorage.h"
 #include "scope_chain.h"
+#include "types.h"
 
 namespace KJS {
 
@@ -39,6 +38,7 @@ enum CodeType {
 };
 
 class ActivationImp;
+class CommonIdentifiers;
 class FunctionImp;
 class GlobalFuncImp;
 class Interpreter;
@@ -84,6 +84,7 @@ class ExecState {
   JSObject* thisValue() const { return m_thisVal; }
 
   ExecState* callingExecState() { return m_callingExec; }
+  ExecState* savedExec() { return m_savedExec; }
 
   ActivationImp* activationObject() { return m_activation; }
   CodeType codeType() { return m_codeType; }
@@ -111,8 +112,7 @@ class ExecState {
   // binaries
   const CommonIdentifiers& propertyNames() const { return *m_propertyNames; }
 
-  LocalStorageEntry* localStorage() { return m_localStorageBuffer; }
-  void updateLocalStorage();
+  LocalStorage& localStorage() { return *m_localStorage; }
 
  public:
   ExecState(JSGlobalObject* glob,
@@ -140,7 +140,7 @@ class ExecState {
   FunctionImp* m_function;
   const List* m_arguments;
   ActivationImp* m_activation;
-  LocalStorageEntry* m_localStorageBuffer;
+  LocalStorage* m_localStorage;
 
   ScopeChain m_scopeChain;
   JSVariableObject* m_variableObject;

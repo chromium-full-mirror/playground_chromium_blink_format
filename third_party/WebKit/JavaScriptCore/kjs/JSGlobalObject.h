@@ -140,6 +140,9 @@ class JSGlobalObject : public JSVariableObject {
  public:
   virtual ~JSGlobalObject();
 
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual void put(ExecState*, const Identifier&, JSValue*, int attr = None);
+
   // Linked list of all global objects.
   static JSGlobalObject* head() { return s_head; }
   JSGlobalObject* next() { return d()->next; }

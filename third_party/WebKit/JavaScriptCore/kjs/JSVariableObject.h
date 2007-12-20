@@ -40,6 +40,12 @@ class JSVariableObject : public JSObject {
   SymbolTable& symbolTable() { return *d->symbolTable; }
   LocalStorage& localStorage() { return d->localStorage; }
 
+  void saveSymbolTable(SymbolTable& s) const;
+  void restoreSymbolTable(SymbolTable& s) const;
+
+  void saveLocalStorage(SavedProperties& s) const;
+  void restoreLocalStorage(SavedProperties& s) const;
+
   virtual bool deleteProperty(ExecState*, const Identifier&);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
