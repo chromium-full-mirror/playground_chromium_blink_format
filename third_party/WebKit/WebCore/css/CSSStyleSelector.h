@@ -143,7 +143,6 @@ class CSSStyleSelector : public StyleSelector {
   bool hasSelectorForAttribute(const AtomicString& attrname);
 
   CSSFontSelector* fontSelector() { return m_fontSelector.get(); }
-  CSSFontSelector* ensureFontSelector();
 
  protected:
   /* checks if a compound selector (which can consist of multiple simple
