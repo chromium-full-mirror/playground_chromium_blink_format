@@ -20,9 +20,10 @@
  *
  */
 
-#include "JSGlobalObject.h"
 #include "config.h"
 #include "error_object.h"
+
+#include "JSGlobalObject.h"
 #include "object.h"
 #include "operations.h"
 #include "types.h"
