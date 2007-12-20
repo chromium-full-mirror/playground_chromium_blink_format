@@ -97,3 +97,7 @@ JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
   instance->end();
   return aValue;
 }
+
+Completion RuntimeMethod::execute(ExecState*) {
+  return Completion(Normal, jsUndefined());
+}

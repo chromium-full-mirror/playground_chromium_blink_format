@@ -142,17 +142,14 @@ class Node : public ParserRefCounted {
 
  protected:
   Node(JSType) KJS_FAST_CALL;  // used by ExpressionNode
+  Completion createErrorCompletion(ExecState*,
+                                   ErrorType,
+                                   const char* msg) KJS_FAST_CALL;
+  Completion createErrorCompletion(ExecState*,
+                                   ErrorType,
+                                   const char* msg,
+                                   const Identifier&) KJS_FAST_CALL;
 
-  // for use in execute()
-  JSValue* setErrorCompletion(ExecState*,
-                              ErrorType,
-                              const char* msg) KJS_FAST_CALL;
-  JSValue* setErrorCompletion(ExecState*,
-                              ErrorType,
-                              const char* msg,
-                              const Identifier&) KJS_FAST_CALL;
-
-  // for use in evaluate()
   JSValue* throwError(ExecState*, ErrorType, const char* msg) KJS_FAST_CALL;
   JSValue* throwError(ExecState*, ErrorType, const char* msg, const char*)
       KJS_FAST_CALL;
@@ -184,8 +181,7 @@ class Node : public ParserRefCounted {
   void handleException(ExecState*) KJS_FAST_CALL;
   void handleException(ExecState*, JSValue*) KJS_FAST_CALL;
 
-  // for use in execute()
-  JSValue* rethrowException(ExecState*) KJS_FAST_CALL;
+  Completion rethrowException(ExecState*) KJS_FAST_CALL;
 
   int m_line : 28;
   unsigned m_expectedReturnType : 3;  // JSType
@@ -227,7 +223,8 @@ class StatementNode : public Node {
   void setLoc(int line0, int line1) KJS_FAST_CALL;
   int firstLine() const KJS_FAST_CALL { return lineNo(); }
   int lastLine() const KJS_FAST_CALL { return m_lastLine; }
-  virtual JSValue* execute(ExecState* exec) KJS_FAST_CALL = 0;
+  bool hitStatement(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState* exec) KJS_FAST_CALL = 0;
   void pushLabel(const Identifier& id) KJS_FAST_CALL { ls.push(id); }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -235,7 +232,6 @@ class StatementNode : public Node {
   }
 
  protected:
-  bool hitStatement(ExecState*) KJS_FAST_CALL;
   LabelStack ls;
 
  private:
@@ -2090,7 +2086,7 @@ class VarStatementNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2112,9 +2108,9 @@ class SourceElementsStub : public Node {
       KJS_FAST_CALL {
     ASSERT_NOT_REACHED();
   }
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL {
+  virtual Completion execute(ExecState*) KJS_FAST_CALL {
     ASSERT_NOT_REACHED();
-    return 0;
+    return Completion();
   }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL {
     ASSERT_NOT_REACHED();
@@ -2134,7 +2130,7 @@ class BlockNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  protected:
@@ -2144,7 +2140,7 @@ class BlockNode : public StatementNode {
 class EmptyStatementNode : public StatementNode {
  public:
   EmptyStatementNode() KJS_FAST_CALL {}  // debug
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -2154,7 +2150,7 @@ class ExprStatementNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2170,7 +2166,7 @@ class IfNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2186,7 +2182,7 @@ class DoWhileNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2201,7 +2197,7 @@ class WhileNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2227,7 +2223,7 @@ class ForNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2249,7 +2245,7 @@ class ForInNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   VarDeclNode* getVarDecl() { return varDecl.get(); }
 
@@ -2266,7 +2262,7 @@ class ContinueNode : public StatementNode {
  public:
   ContinueNode() KJS_FAST_CALL {}
   ContinueNode(const Identifier& i) KJS_FAST_CALL : ident(i) {}
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2277,7 +2273,7 @@ class BreakNode : public StatementNode {
  public:
   BreakNode() KJS_FAST_CALL {}
   BreakNode(const Identifier& i) KJS_FAST_CALL : ident(i) {}
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2290,7 +2286,7 @@ class ReturnNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2304,7 +2300,7 @@ class WithNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2320,7 +2316,7 @@ class LabelNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2334,7 +2330,7 @@ class ThrowNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2353,7 +2349,7 @@ class TryNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2412,7 +2408,7 @@ class ProgramNode : public ScopeNode {
   ProgramNode(SourceElements*,
               DeclarationStacks::VarStack*,
               DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
  private:
   void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
@@ -2431,7 +2427,7 @@ class EvalNode : public ScopeNode {
   EvalNode(SourceElements*,
            DeclarationStacks::VarStack*,
            DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
  private:
   ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
@@ -2443,7 +2439,7 @@ class FunctionBodyNode : public ScopeNode {
                    DeclarationStacks::VarStack*,
                    DeclarationStacks::FunctionStack*) KJS_FAST_CALL;
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
 
   SymbolTable& symbolTable() KJS_FAST_CALL { return m_symbolTable; }
 
@@ -2495,7 +2491,7 @@ class FuncDeclNode : public StatementNode {
                                                     body(b) {
     addParams();
   }
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   ALWAYS_INLINE FunctionImp* makeFunction(ExecState*) KJS_FAST_CALL;
   Identifier ident;
@@ -2522,7 +2518,7 @@ class CaseClauseNode : public Node {
   }
 
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  JSValue* executeStatements(ExecState*) KJS_FAST_CALL;
+  Completion evalStatements(ExecState*) KJS_FAST_CALL;
 
  private:
   RefPtr<ExpressionNode> expr;
@@ -2564,7 +2560,7 @@ class CaseBlockNode : public Node {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  JSValue* executeBlock(ExecState*, JSValue* input) KJS_FAST_CALL;
+  Completion evalBlock(ExecState* exec, JSValue* input) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -2584,7 +2580,7 @@ class SwitchNode : public StatementNode {
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual Completion execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:

@@ -44,6 +44,8 @@ class RuntimeMethod : public InternalFunctionImp {
                                   JSObject* thisObj,
                                   const List& args);
 
+  virtual Completion execute(ExecState* exec);
+
  private:
   static JSValue* lengthGetter(ExecState*,
                                JSObject*,
