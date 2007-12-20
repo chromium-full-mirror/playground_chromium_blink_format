@@ -805,7 +805,29 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
           state.setEntityState(SearchSemicolon);
         if (state.entityState() == SearchSemicolon) {
           if (cBufferPos > 1) {
-            const Entity* e = findEntity(cBuffer, cBufferPos);
+            // Since the maximum length of entity name is 9,
+            // so a single char array which is allocated on
+            // the stack, its length is 10, should be OK.
+            // Also if we have an illegal character, we treat it
+            // as illegal entity name.
+            unsigned testedEntityNameLen = 0;
+            char tmpEntityNameBuffer[10];
+
+            ASSERT(cBufferPos < 10);
+            for (; testedEntityNameLen < cBufferPos; ++testedEntityNameLen) {
+              if (cBuffer[testedEntityNameLen] > 0x7e)
+                break;
+              tmpEntityNameBuffer[testedEntityNameLen] =
+                  cBuffer[testedEntityNameLen];
+            }
+
+            const Entity* e;
+
+            if (testedEntityNameLen == cBufferPos)
+              e = findEntity(tmpEntityNameBuffer, cBufferPos);
+            else
+              e = 0;
+
             if (e)
               EntityUnicodeValue = e->code;
 
@@ -900,7 +922,6 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
                 state.setInComment(false);
                 src.advance(m_lineNumber);
                 if (!src.isEmpty())
-                  // cuts off high bits, which is okay
                   cBuffer[cBufferPos++] = *src;
               } else
                 state = parseComment(src, state);
@@ -908,7 +929,6 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               m_cBufferPos = cBufferPos;
               return state;  // Finished parsing tag!
             }
-            // cuts off high bits, which is okay
             cBuffer[cBufferPos++] = *src;
             src.advance(m_lineNumber);
             break;
@@ -937,7 +957,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
         // as attribute names. ### judge if this causes problems
         if (finish || CBUFLEN == cBufferPos) {
           bool beginTag;
-          char* ptr = cBuffer;
+          UChar* ptr = cBuffer;
           unsigned int len = cBufferPos;
           cBuffer[cBufferPos] = '\0';
           if ((cBufferPos > 0) && (*ptr == '/')) {

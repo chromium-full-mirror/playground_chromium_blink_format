@@ -384,7 +384,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
 // of this buffer
 // we'll just make it large enough to handle all imaginable cases.
 #define CBUFLEN 1024
-  char cBuffer[CBUFLEN + 2];
+  UChar cBuffer[CBUFLEN + 2];
   unsigned int m_cBufferPos;
 
   SegmentedString src;
