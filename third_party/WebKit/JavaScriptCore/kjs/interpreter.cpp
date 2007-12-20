@@ -143,7 +143,8 @@ Completion Interpreter::evaluate(ExecState* exec,
   else {
     // execute the code
     ExecState newExec(globalObject, thisObj, progNode.get());
-    res = progNode->execute(&newExec);
+    JSValue* value = progNode->execute(&newExec);
+    res = Completion(newExec.completionType(), value);
   }
 
   globalObject->decRecursion();

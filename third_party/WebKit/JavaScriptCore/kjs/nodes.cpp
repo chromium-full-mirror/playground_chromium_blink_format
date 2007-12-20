@@ -46,7 +46,7 @@ namespace KJS {
 
 #define KJS_BREAKPOINT                                       \
   if (Debugger::debuggersPresent > 0 && !hitStatement(exec)) \
-    return Completion(Normal);
+    return 0;
 
 #define KJS_CHECKEXCEPTION  \
   if (exec->hadException()) \
@@ -260,23 +260,22 @@ static inline const UString& currentSourceURL(ExecState* exec) {
   return exec->scopeNode()->sourceURL();
 }
 
-Completion Node::createErrorCompletion(ExecState* exec,
-                                       ErrorType e,
-                                       const char* msg) {
-  return Completion(Throw,
-                    Error::create(exec, e, msg, lineNo(), currentSourceId(exec),
-                                  currentSourceURL(exec)));
+JSValue* Node::setErrorCompletion(ExecState* exec,
+                                  ErrorType e,
+                                  const char* msg) {
+  return exec->setThrowCompletion(Error::create(
+      exec, e, msg, lineNo(), currentSourceId(exec), currentSourceURL(exec)));
 }
 
-Completion Node::createErrorCompletion(ExecState* exec,
-                                       ErrorType e,
-                                       const char* msg,
-                                       const Identifier& ident) {
+JSValue* Node::setErrorCompletion(ExecState* exec,
+                                  ErrorType e,
+                                  const char* msg,
+                                  const Identifier& ident) {
   UString message = msg;
   substitute(message, ident.ustring());
-  return Completion(
-      Throw, Error::create(exec, e, message, lineNo(), currentSourceId(exec),
-                           currentSourceURL(exec)));
+  return exec->setThrowCompletion(Error::create(exec, e, message, lineNo(),
+                                                currentSourceId(exec),
+                                                currentSourceURL(exec)));
 }
 
 JSValue* Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
@@ -383,11 +382,11 @@ void Node::handleException(ExecState* exec, JSValue* exceptionValue) {
   }
 }
 
-Completion Node::rethrowException(ExecState* exec) {
+JSValue* Node::rethrowException(ExecState* exec) {
   JSValue* exception = exec->exception();
   exec->clearException();
   handleException(exec, exception);
-  return Completion(Throw, exception);
+  return exec->setThrowCompletion(exception);
 }
 
 // ------------------------------ StatementNode --------------------------------
@@ -401,14 +400,18 @@ void StatementNode::setLoc(int firstLine, int lastLine) {
   m_lastLine = lastLine;
 }
 
-// return true if the debugger wants us to stop at this point
+// Set normal completion and return false if the debugger wants us to stop at
+// this point.
+// FIXME: This seems like poor naming and strange design. Why false to stop? Why
+// "hit statement"?
 bool StatementNode::hitStatement(ExecState* exec) {
-  Debugger* dbg = exec->dynamicGlobalObject()->debugger();
-  if (dbg)
-    return dbg->atStatement(exec, currentSourceId(exec), firstLine(),
-                            lastLine());
-  else
-    return true;  // continue
+  Debugger* debugger = exec->dynamicGlobalObject()->debugger();
+  if (!debugger ||
+      debugger->atStatement(exec, currentSourceId(exec), firstLine(),
+                            lastLine()))
+    return true;
+  exec->setCompletionType(Normal);
+  return false;
 }
 
 // ------------------------------ NullNode -------------------------------------
@@ -3483,13 +3486,13 @@ void VarStatementNode::optimizeVariableAccess(
 }
 
 // ECMA 12.2
-Completion VarStatementNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* VarStatementNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   next->evaluate(exec);
   KJS_CHECKEXCEPTION
 
-  return Completion(Normal);
+  return exec->setNormalCompletion();
 }
 
 // ------------------------------ Helper functions for handling Vectors of
@@ -3523,22 +3526,18 @@ static inline Node* statementListInitializeVariableAccessStack(
   return (*begin).get();
 }
 
-static inline Completion statementListExecute(SourceElements& statements,
-                                              ExecState* exec) {
-  JSValue* v = 0;
-  Completion c(Normal);
-  const SourceElements::iterator end = statements.end();
-  for (SourceElements::iterator ptr = statements.begin(); ptr != end; ++ptr) {
-    c = (*ptr)->execute(exec);
-
-    if (JSValue* v2 = c.value())
-      v = v2;
-    c.setValue(v);
-
-    if (c.complType() != Normal)
-      return c;
+static inline JSValue* statementListExecute(SourceElements& statements,
+                                            ExecState* exec) {
+  JSValue* value = 0;
+  size_t size = statements.size();
+  for (size_t i = 0; i != size; ++i) {
+    JSValue* statementValue = statements[i]->execute(exec);
+    if (exec->completionType() != Normal)
+      return statementValue;
+    if (statementValue)
+      value = statementValue;
   }
-  return c;
+  return exec->setNormalCompletion(value);
 }
 
 // ------------------------------ BlockNode ------------------------------------
@@ -3554,15 +3553,15 @@ void BlockNode::optimizeVariableAccess(
 }
 
 // ECMA 12.1
-Completion BlockNode::execute(ExecState* exec) {
+JSValue* BlockNode::execute(ExecState* exec) {
   return statementListExecute(*m_children, exec);
 }
 
 // ------------------------------ EmptyStatementNode ---------------------------
 
 // ECMA 12.3
-Completion EmptyStatementNode::execute(ExecState*) {
-  return Completion(Normal);
+JSValue* EmptyStatementNode::execute(ExecState* exec) {
+  return exec->setNormalCompletion();
 }
 
 // ------------------------------ ExprStatementNode ----------------------------
@@ -3575,13 +3574,13 @@ void ExprStatementNode::optimizeVariableAccess(
 }
 
 // ECMA 12.4
-Completion ExprStatementNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* ExprStatementNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
-  JSValue* v = expr->evaluate(exec);
+  JSValue* value = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
-  return Completion(Normal, v);
+  return exec->setNormalCompletion(value);
 }
 
 // ------------------------------ IfNode ---------------------------------------
@@ -3597,8 +3596,8 @@ void IfNode::optimizeVariableAccess(SymbolTable&,
 }
 
 // ECMA 12.5
-Completion IfNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* IfNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   bool b = expr->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTION
@@ -3609,7 +3608,7 @@ Completion IfNode::execute(ExecState* exec) {
 
   // no else
   if (!statement2)
-    return Completion(Normal);
+    return exec->setNormalCompletion();
 
   // else
   return statement2->execute(exec);
@@ -3625,36 +3624,40 @@ void DoWhileNode::optimizeVariableAccess(
 }
 
 // ECMA 12.6.1
-Completion DoWhileNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* DoWhileNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   JSValue* value = 0;
 
   while (1) {
     exec->pushIteration();
-    Completion c = statement->execute(exec);
+    JSValue* statementValue = statement->execute(exec);
     exec->popIteration();
 
     if (exec->dynamicGlobalObject()->timedOut())
-      return Completion(Interrupted);
+      exec->setInterruptedCompletion();
 
-    if (c.isValueCompletion())
-      value = c.value();
+    if (statementValue)
+      value = statementValue;
 
-    if (!((c.complType() == Continue) && ls.contains(c.target()))) {
-      if ((c.complType() == Break) && ls.contains(c.target()))
-        return Completion(Normal, value);
-      if (c.complType() != Normal)
-        return c;
+    if (exec->completionType() != Normal) {
+      if (exec->completionType() == Continue &&
+          ls.contains(exec->breakOrContinueTarget()))
+        goto continueDoWhileLoop;
+      if (exec->completionType() == Break &&
+          ls.contains(exec->breakOrContinueTarget()))
+        break;
+      return statementValue;
     }
 
+  continueDoWhileLoop:
     bool b = expr->evaluateToBoolean(exec);
     KJS_CHECKEXCEPTION
     if (!b)
-      return Completion(Normal, value);
+      break;
   }
 
-  return Completion();  // work around gcc 4.0 bug
+  return exec->setNormalCompletion(value);
 }
 
 // ------------------------------ WhileNode ------------------------------------
@@ -3667,8 +3670,8 @@ void WhileNode::optimizeVariableAccess(
 }
 
 // ECMA 12.6.2
-Completion WhileNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* WhileNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   JSValue* value = 0;
 
@@ -3676,27 +3679,30 @@ Completion WhileNode::execute(ExecState* exec) {
     bool b = expr->evaluateToBoolean(exec);
     KJS_CHECKEXCEPTION
     if (!b)
-      return Completion(Normal, value);
+      break;
 
     exec->pushIteration();
-    Completion c = statement->execute(exec);
+    JSValue* statementValue = statement->execute(exec);
     exec->popIteration();
 
     if (exec->dynamicGlobalObject()->timedOut())
-      return Completion(Interrupted);
+      return exec->setInterruptedCompletion();
 
-    if (c.isValueCompletion())
-      value = c.value();
+    if (statementValue)
+      value = statementValue;
 
-    if ((c.complType() == Continue) && ls.contains(c.target()))
-      continue;
-    if ((c.complType() == Break) && ls.contains(c.target()))
-      return Completion(Normal, value);
-    if (c.complType() != Normal)
-      return c;
+    if (exec->completionType() != Normal) {
+      if (exec->completionType() == Continue &&
+          ls.contains(exec->breakOrContinueTarget()))
+        continue;
+      if (exec->completionType() == Break &&
+          ls.contains(exec->breakOrContinueTarget()))
+        break;
+      return statementValue;
+    }
   }
 
-  return Completion();  // work around gcc 4.0 bug
+  return exec->setNormalCompletion(value);
 }
 
 // ------------------------------ ForNode --------------------------------------
@@ -3713,8 +3719,8 @@ void ForNode::optimizeVariableAccess(SymbolTable&,
 }
 
 // ECMA 12.6.3
-Completion ForNode::execute(ExecState* exec) {
-  JSValue* cval = 0;
+JSValue* ForNode::execute(ExecState* exec) {
+  JSValue* value = 0;
 
   if (expr1) {
     expr1->evaluate(exec);
@@ -3726,31 +3732,36 @@ Completion ForNode::execute(ExecState* exec) {
       bool b = expr2->evaluateToBoolean(exec);
       KJS_CHECKEXCEPTION
       if (!b)
-        return Completion(Normal, cval);
+        break;
     }
 
     exec->pushIteration();
-    Completion c = statement->execute(exec);
+    JSValue* statementValue = statement->execute(exec);
     exec->popIteration();
-    if (c.isValueCompletion())
-      cval = c.value();
-    if (!((c.complType() == Continue) && ls.contains(c.target()))) {
-      if ((c.complType() == Break) && ls.contains(c.target()))
-        return Completion(Normal, cval);
-      if (c.complType() != Normal)
-        return c;
-    }
+    if (statementValue)
+      value = statementValue;
 
     if (exec->dynamicGlobalObject()->timedOut())
-      return Completion(Interrupted);
+      return exec->setInterruptedCompletion();
 
+    if (exec->completionType() != Normal) {
+      if (exec->completionType() == Continue &&
+          ls.contains(exec->breakOrContinueTarget()))
+        goto continueForLoop;
+      if (exec->completionType() == Break &&
+          ls.contains(exec->breakOrContinueTarget()))
+        break;
+      return statementValue;
+    }
+
+  continueForLoop:
     if (expr3) {
       expr3->evaluate(exec);
       KJS_CHECKEXCEPTION
     }
   }
 
-  return Completion();  // work around gcc 4.0 bug
+  return exec->setNormalCompletion(value);
 }
 
 // ------------------------------ ForInNode ------------------------------------
@@ -3779,29 +3790,24 @@ void ForInNode::optimizeVariableAccess(
 }
 
 // ECMA 12.6.4
-Completion ForInNode::execute(ExecState* exec) {
-  JSValue* e;
-  JSValue* retval = 0;
-  JSObject* v;
-  Completion c;
-  PropertyNameArray propertyNames;
+JSValue* ForInNode::execute(ExecState* exec) {
+  JSValue* value = 0;
 
   if (varDecl) {
     varDecl->evaluate(exec);
     KJS_CHECKEXCEPTION
   }
 
-  e = expr->evaluate(exec);
+  JSValue* e = expr->evaluate(exec);
 
-  // for Null and Undefined, we want to make sure not to go through
-  // the loop at all, because their object wrappers will have a
-  // property list but will throw an exception if you attempt to
-  // access any property.
+  // For Null and Undefined, we want to make sure not to go through
+  // the loop at all, because toObject will throw an exception.
   if (e->isUndefinedOrNull())
-    return Completion(Normal);
+    return exec->setNormalCompletion();
 
   KJS_CHECKEXCEPTION
-  v = e->toObject(exec);
+  JSObject* v = e->toObject(exec);
+  PropertyNameArray propertyNames;
   v->getPropertyNames(exec, propertyNames);
 
   PropertyNameArray::const_iterator end = propertyNames.end();
@@ -3867,49 +3873,49 @@ Completion ForInNode::execute(ExecState* exec) {
     KJS_CHECKEXCEPTION
 
     exec->pushIteration();
-    c = statement->execute(exec);
+    JSValue* statementValue = statement->execute(exec);
     exec->popIteration();
-    if (c.isValueCompletion())
-      retval = c.value();
+    if (statementValue)
+      value = statementValue;
 
-    if (!((c.complType() == Continue) && ls.contains(c.target()))) {
-      if ((c.complType() == Break) && ls.contains(c.target()))
+    if (exec->completionType() != Normal) {
+      if (exec->completionType() == Continue &&
+          ls.contains(exec->breakOrContinueTarget()))
+        continue;
+      if (exec->completionType() == Break &&
+          ls.contains(exec->breakOrContinueTarget()))
         break;
-      if (c.complType() != Normal) {
-        return c;
-      }
+      return statementValue;
     }
   }
 
-  return Completion(Normal, retval);
+  return exec->setNormalCompletion(value);
 }
 
 // ------------------------------ ContinueNode ---------------------------------
 
 // ECMA 12.7
-Completion ContinueNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* ContinueNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   if (ident.isEmpty() && !exec->inIteration())
-    return createErrorCompletion(exec, SyntaxError,
-                                 "Invalid continue statement.");
+    return setErrorCompletion(exec, SyntaxError, "Invalid continue statement.");
   if (!ident.isEmpty() && !exec->seenLabels()->contains(ident))
-    return createErrorCompletion(exec, SyntaxError, "Label %s not found.",
-                                 ident);
-  return Completion(Continue, &ident);
+    return setErrorCompletion(exec, SyntaxError, "Label %s not found.", ident);
+  return exec->setContinueCompletion(&ident);
 }
 
 // ------------------------------ BreakNode ------------------------------------
 
 // ECMA 12.8
-Completion BreakNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* BreakNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   if (ident.isEmpty() && !exec->inIteration() && !exec->inSwitch())
-    return createErrorCompletion(exec, SyntaxError, "Invalid break statement.");
+    return setErrorCompletion(exec, SyntaxError, "Invalid break statement.");
   if (!ident.isEmpty() && !exec->seenLabels()->contains(ident))
-    return createErrorCompletion(exec, SyntaxError, "Label %s not found.");
-  return Completion(Break, &ident);
+    return setErrorCompletion(exec, SyntaxError, "Label %s not found.");
+  return exec->setBreakCompletion(&ident);
 }
 
 // ------------------------------ ReturnNode -----------------------------------
@@ -3922,21 +3928,20 @@ void ReturnNode::optimizeVariableAccess(
 }
 
 // ECMA 12.9
-Completion ReturnNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* ReturnNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   CodeType codeType = exec->codeType();
   if (codeType != FunctionCode)
-    return createErrorCompletion(exec, SyntaxError,
-                                 "Invalid return statement.");
+    return setErrorCompletion(exec, SyntaxError, "Invalid return statement.");
 
   if (!value)
-    return Completion(ReturnValue, jsUndefined());
+    return exec->setReturnValueCompletion(jsUndefined());
 
   JSValue* v = value->evaluate(exec);
   KJS_CHECKEXCEPTION
 
-  return Completion(ReturnValue, v);
+  return exec->setReturnValueCompletion(v);
 }
 
 // ------------------------------ WithNode -------------------------------------
@@ -3948,18 +3953,18 @@ void WithNode::optimizeVariableAccess(SymbolTable&,
 }
 
 // ECMA 12.10
-Completion WithNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* WithNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   JSValue* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
   JSObject* o = v->toObject(exec);
   KJS_CHECKEXCEPTION
   exec->pushScope(o);
-  Completion res = statement->execute(exec);
+  JSValue* value = statement->execute(exec);
   exec->popScope();
 
-  return res;
+  return value;
 }
 
 // ------------------------------ CaseClauseNode -------------------------------
@@ -3982,11 +3987,10 @@ JSValue* CaseClauseNode::evaluate(ExecState* exec) {
 }
 
 // ECMA 12.11
-Completion CaseClauseNode::evalStatements(ExecState* exec) {
+JSValue* CaseClauseNode::executeStatements(ExecState* exec) {
   if (m_children)
     return statementListExecute(*m_children, exec);
-  else
-    return Completion(Normal, jsUndefined());
+  return exec->setNormalCompletion();
 }
 
 // ------------------------------ ClauseListNode -------------------------------
@@ -4018,40 +4022,35 @@ void CaseBlockNode::optimizeVariableAccess(
 }
 
 // ECMA 12.11
-Completion CaseBlockNode::evalBlock(ExecState* exec, JSValue* input) {
-  JSValue* v;
-  Completion res;
+JSValue* CaseBlockNode::executeBlock(ExecState* exec, JSValue* input) {
   ClauseListNode* a = list1.get();
-  ClauseListNode* b = list2.get();
-  CaseClauseNode* clause;
-
   while (a) {
-    clause = a->getClause();
+    CaseClauseNode* clause = a->getClause();
     a = a->getNext();
-    v = clause->evaluate(exec);
+    JSValue* v = clause->evaluate(exec);
     KJS_CHECKEXCEPTION
     if (strictEqual(exec, input, v)) {
-      res = clause->evalStatements(exec);
-      if (res.complType() != Normal)
+      JSValue* res = clause->executeStatements(exec);
+      if (exec->completionType() != Normal)
         return res;
-      while (a) {
-        res = a->getClause()->evalStatements(exec);
-        if (res.complType() != Normal)
+      for (; a; a = a->getNext()) {
+        JSValue* res = a->getClause()->executeStatements(exec);
+        if (exec->completionType() != Normal)
           return res;
-        a = a->getNext();
       }
       break;
     }
   }
 
+  ClauseListNode* b = list2.get();
   while (b) {
-    clause = b->getClause();
+    CaseClauseNode* clause = b->getClause();
     b = b->getNext();
-    v = clause->evaluate(exec);
+    JSValue* v = clause->evaluate(exec);
     KJS_CHECKEXCEPTION
     if (strictEqual(exec, input, v)) {
-      res = clause->evalStatements(exec);
-      if (res.complType() != Normal)
+      JSValue* res = clause->executeStatements(exec);
+      if (exec->completionType() != Normal)
         return res;
       goto step18;
     }
@@ -4059,16 +4058,16 @@ Completion CaseBlockNode::evalBlock(ExecState* exec, JSValue* input) {
 
   // default clause
   if (def) {
-    res = def->evalStatements(exec);
-    if (res.complType() != Normal)
+    JSValue* res = def->executeStatements(exec);
+    if (exec->completionType() != Normal)
       return res;
   }
   b = list2.get();
 step18:
   while (b) {
-    clause = b->getClause();
-    res = clause->evalStatements(exec);
-    if (res.complType() != Normal)
+    CaseClauseNode* clause = b->getClause();
+    JSValue* res = clause->executeStatements(exec);
+    if (exec->completionType() != Normal)
       return res;
     b = b->getNext();
   }
@@ -4076,7 +4075,7 @@ step18:
   // bail out on error
   KJS_CHECKEXCEPTION
 
-  return Completion(Normal);
+  return exec->setNormalCompletion();
 }
 
 // ------------------------------ SwitchNode -----------------------------------
@@ -4089,19 +4088,20 @@ void SwitchNode::optimizeVariableAccess(
 }
 
 // ECMA 12.11
-Completion SwitchNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* SwitchNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   JSValue* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   exec->pushSwitch();
-  Completion res = block->evalBlock(exec, v);
+  JSValue* result = block->executeBlock(exec, v);
   exec->popSwitch();
 
-  if ((res.complType() == Break) && ls.contains(res.target()))
-    return Completion(Normal, res.value());
-  return res;
+  if (exec->completionType() == Break &&
+      ls.contains(exec->breakOrContinueTarget()))
+    exec->setCompletionType(Normal);
+  return result;
 }
 
 // ------------------------------ LabelNode ------------------------------------
@@ -4113,16 +4113,16 @@ void LabelNode::optimizeVariableAccess(
 }
 
 // ECMA 12.12
-Completion LabelNode::execute(ExecState* exec) {
+JSValue* LabelNode::execute(ExecState* exec) {
   if (!exec->seenLabels()->push(label))
-    return createErrorCompletion(exec, SyntaxError,
-                                 "Duplicated label %s found.", label);
-  Completion e = statement->execute(exec);
+    return setErrorCompletion(exec, SyntaxError, "Duplicated label %s found.",
+                              label);
+  JSValue* result = statement->execute(exec);
   exec->seenLabels()->pop();
 
-  if ((e.complType() == Break) && (e.target() == label))
-    return Completion(Normal, e.value());
-  return e;
+  if (exec->completionType() == Break && exec->breakOrContinueTarget() == label)
+    exec->setCompletionType(Normal);
+  return result;
 }
 
 // ------------------------------ ThrowNode ------------------------------------
@@ -4134,14 +4134,14 @@ void ThrowNode::optimizeVariableAccess(
 }
 
 // ECMA 12.13
-Completion ThrowNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* ThrowNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
   JSValue* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   handleException(exec, v);
-  return Completion(Throw, v);
+  return exec->setThrowCompletion(v);
 }
 
 // ------------------------------ TryNode --------------------------------------
@@ -4156,30 +4156,33 @@ void TryNode::optimizeVariableAccess(SymbolTable&,
 }
 
 // ECMA 12.14
-Completion TryNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
+JSValue* TryNode::execute(ExecState* exec) {
+  KJS_BREAKPOINT
 
-  Completion c = tryBlock->execute(exec);
+  JSValue* result = tryBlock->execute(exec);
 
   if (Collector::isOutOfMemory())
-    return c;  // don't try to catch an out of memory exception thrown by the
-               // collector
+    return result;  // don't try to catch an out of memory exception thrown by
+                    // the collector
 
-  if (catchBlock && c.complType() == Throw) {
+  if (catchBlock && exec->completionType() == Throw) {
     JSObject* obj = new JSObject;
-    obj->put(exec, exceptionIdent, c.value(), DontDelete);
+    obj->put(exec, exceptionIdent, result, DontDelete);
     exec->pushScope(obj);
-    c = catchBlock->execute(exec);
+    result = catchBlock->execute(exec);
     exec->popScope();
   }
 
   if (finallyBlock) {
-    Completion c2 = finallyBlock->execute(exec);
-    if (c2.complType() != Normal)
-      c = c2;
+    ComplType savedCompletionType = exec->completionType();
+    JSValue* finallyResult = finallyBlock->execute(exec);
+    if (exec->completionType() != Normal)
+      result = finallyResult;
+    else
+      exec->setCompletionType(savedCompletionType);
   }
 
-  return c;
+  return result;
 }
 
 // ------------------------------ FunctionBodyNode -----------------------------
@@ -4438,40 +4441,39 @@ UString FunctionBodyNode::paramString() const {
   return s;
 }
 
-Completion ProgramNode::execute(ExecState* exec) {
+JSValue* ProgramNode::execute(ExecState* exec) {
   processDeclarations(exec);
   return ScopeNode::execute(exec);
 }
 
-Completion EvalNode::execute(ExecState* exec) {
+JSValue* EvalNode::execute(ExecState* exec) {
   processDeclarations(exec);
   return ScopeNode::execute(exec);
 }
 
-Completion FunctionBodyNode::execute(ExecState* exec) {
+JSValue* FunctionBodyNode::execute(ExecState* exec) {
   processDeclarations(exec);
 
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (!dbg->callEvent(exec, sourceId(), lineNo(), exec->function(),
                         *exec->arguments())) {
       dbg->imp()->abort();
-      return Completion(Interrupted, jsUndefined());
+      return exec->setInterruptedCompletion();
     }
   }
 
-  Completion completion = ScopeNode::execute(exec);
+  JSValue* result = ScopeNode::execute(exec);
 
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
-    if (completion.complType() == Throw)
-      exec->setException(completion.value());
-
+    if (exec->completionType() == Throw)
+      exec->setException(result);
     if (!dbg->returnEvent(exec, sourceId(), lineNo(), exec->function())) {
       dbg->imp()->abort();
-      return Completion(Interrupted, jsUndefined());
+      return exec->setInterruptedCompletion();
     }
   }
 
-  return completion;
+  return result;
 }
 
 // ------------------------------ FuncDeclNode ---------------------------------
@@ -4498,8 +4500,8 @@ FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {
   return func;
 }
 
-Completion FuncDeclNode::execute(ExecState*) {
-  return Completion(Normal);
+JSValue* FuncDeclNode::execute(ExecState* exec) {
+  return exec->setNormalCompletion();
 }
 
 // ------------------------------ FuncExprNode ---------------------------------
