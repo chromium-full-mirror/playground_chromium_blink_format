@@ -883,6 +883,8 @@ void GraphicsContext::setUseAntialiasing(bool enable) {
   CGContextSetShouldAntialias(platformContext(), enable);
 }
 
+#ifndef BUILDING_ON_TIGER  // Tiger's setCompositeOperation() is defined in
+                           // GraphicsContextMac.mm.
 void GraphicsContext::setCompositeOperation(CompositeOperator mode) {
   if (paintingDisabled())
     return;
@@ -934,6 +936,7 @@ void GraphicsContext::setCompositeOperation(CompositeOperator mode) {
   }
   CGContextSetBlendMode(platformContext(), target);
 }
+#endif
 }
 
 #endif  // PLATFORM(CG)
