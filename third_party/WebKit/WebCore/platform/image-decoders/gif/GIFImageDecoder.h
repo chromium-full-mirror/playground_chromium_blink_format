@@ -67,7 +67,8 @@ class GIFImageDecoder : public ImageDecoder {
                       unsigned char* rowBuffer,
                       unsigned char* rowEnd,
                       unsigned rowNumber,
-                      unsigned repeatCount);
+                      unsigned repeatCount,
+                      bool writeTransparentPixels);
   void frameComplete(unsigned frameIndex,
                      unsigned frameDuration,
                      RGBA32Buffer::FrameDisposalMethod disposalMethod);
