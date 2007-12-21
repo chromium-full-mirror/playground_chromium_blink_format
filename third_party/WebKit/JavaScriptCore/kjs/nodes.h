@@ -2163,10 +2163,25 @@ class ExprStatementNode : public StatementNode {
 
 class IfNode : public StatementNode {
  public:
-  IfNode(ExpressionNode* e, StatementNode* s1, StatementNode* s2) KJS_FAST_CALL
-      : expr(e),
-        statement1(s1),
-        statement2(s2) {}
+  IfNode(ExpressionNode* e, StatementNode* s) KJS_FAST_CALL : m_condition(e),
+                                                              m_ifBlock(s) {}
+  virtual void optimizeVariableAccess(SymbolTable&,
+                                      DeclarationStacks::NodeStack&)
+      KJS_FAST_CALL;
+  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+
+ protected:
+  RefPtr<ExpressionNode> m_condition;
+  RefPtr<StatementNode> m_ifBlock;
+};
+
+class IfElseNode : public IfNode {
+ public:
+  IfElseNode(ExpressionNode* e,
+             StatementNode* ifBlock,
+             StatementNode* elseBlock) KJS_FAST_CALL : IfNode(e, ifBlock),
+                                                       m_elseBlock(elseBlock) {}
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -2174,9 +2189,7 @@ class IfNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
-  RefPtr<StatementNode> statement1;
-  RefPtr<StatementNode> statement2;
+  RefPtr<StatementNode> m_elseBlock;
 };
 
 class DoWhileNode : public StatementNode {
