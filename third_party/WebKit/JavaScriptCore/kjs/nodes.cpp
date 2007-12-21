@@ -3532,10 +3532,10 @@ static inline JSValue* statementListExecute(SourceElements& statements,
   size_t size = statements.size();
   for (size_t i = 0; i != size; ++i) {
     JSValue* statementValue = statements[i]->execute(exec);
-    if (exec->completionType() != Normal)
-      return statementValue;
     if (statementValue)
       value = statementValue;
+    if (exec->completionType() != Normal)
+      return value;
   }
   return exec->setNormalCompletion(value);
 }
