@@ -58,16 +58,10 @@ class Parser : Noncopyable {
   UString sourceURL() const { return m_sourceURL; }
   int sourceId() const { return m_sourceId; }
 
-  void didFinishParsing(
-      SourceElements* sourceElements,
-      ParserRefCountedData<DeclarationStacks::VarStack>* varStack,
-      ParserRefCountedData<DeclarationStacks::FunctionStack>* funcStack,
-      int lastLine) {
-    m_sourceElements.set(sourceElements);
-    m_varDeclarations = varStack;
-    m_funcDeclarations = funcStack;
-    m_lastLine = lastLine;
-  }
+  void didFinishParsing(SourceElements*,
+                        ParserRefCountedData<DeclarationStacks::VarStack>*,
+                        ParserRefCountedData<DeclarationStacks::FunctionStack>*,
+                        int lastLine);
 
  private:
   friend Parser& parser();
