@@ -6,7 +6,6 @@
  * Copyright (C) 2006 Apple Computer, Inc.
  * Copyright (C) 2006 Michael Emmel mike.emmel@gmail.com
  * Copyright (C) 2007 Holger Hans Peter Freyther
- * Copyright (C) 2007 Pioneer Research Center USA, Inc.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -32,7 +31,8 @@
 #include "GlyphBuffer.h"
 #include "FontDescription.h"
 #include <cairo.h>
-#include <pango/pangocairo.h>
+#include <cairo-ft.h>
+#include <fontconfig/fcfreetype.h>
 
 namespace WebCore {
 
@@ -40,11 +40,9 @@ class FontPlatformData {
  public:
   class Deleted {};
   FontPlatformData(Deleted)
-      : m_context(0),
-        m_font(reinterpret_cast<PangoFont*>(-1)),
-        m_scaledFont(0) {}
+      : m_pattern(reinterpret_cast<FcPattern*>(-1)), m_scaledFont(0) {}
 
-  FontPlatformData() : m_context(0), m_font(0), m_scaledFont(0) {}
+  FontPlatformData() : m_pattern(0), m_scaledFont(0) {}
 
   FontPlatformData(const FontDescription&, const AtomicString& family);
   ~FontPlatformData();
@@ -63,11 +61,7 @@ class FontPlatformData {
 
   bool operator==(const FontPlatformData&) const;
 
-  static PangoFontMap* m_fontMap;
-  static GHashTable* m_hashTable;
-
-  PangoContext* m_context;
-  PangoFont* m_font;
+  FcPattern* m_pattern;
   FontDescription m_fontDescription;
   cairo_scaled_font_t* m_scaledFont;
 };
