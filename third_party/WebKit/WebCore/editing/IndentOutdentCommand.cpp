@@ -113,16 +113,6 @@ Node* IndentOutdentCommand::prepareBlockquoteLevelForInsertion(
   return placeholder.get();
 }
 
-static int indexForVisiblePosition(VisiblePosition& visiblePosition) {
-  if (visiblePosition.isNull())
-    return 0;
-  Position p(visiblePosition.deepEquivalent());
-  RefPtr<Range> range =
-      new Range(p.node()->document(), Position(p.node()->document(), 0),
-                rangeCompliantEquivalent(p));
-  return TextIterator::rangeLength(range.get(), true);
-}
-
 void IndentOutdentCommand::indentRegion() {
   VisiblePosition startOfSelection = endingSelection().visibleStart();
   VisiblePosition endOfSelection = endingSelection().visibleEnd();
@@ -192,6 +182,8 @@ void IndentOutdentCommand::indentRegion() {
       // point.
       RefPtr<Node> blockquote = createIndentBlockquoteElement(document());
       Position start = startOfParagraph(endOfCurrentParagraph).deepEquivalent();
+
+      // FIXME: This will break table structure.
       Node* startOfNewBlock =
           splitTreeToNode(start.node(), editableRootForPosition(start));
       insertNodeBefore(blockquote.get(), startOfNewBlock);

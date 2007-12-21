@@ -40,7 +40,6 @@ class IndentOutdentCommand : public CompositeEditCommand {
   }
 
  private:
-  bool modifyRange();
   EIndentType m_typeOfAction;
   int m_marginInPixels;
   void indentRegion();
