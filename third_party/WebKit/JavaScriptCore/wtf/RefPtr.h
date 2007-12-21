@@ -64,6 +64,11 @@ class RefPtr {
 
   T* get() const { return m_ptr; }
 
+  void clear() {
+    if (T* ptr = m_ptr)
+      ptr->deref();
+    m_ptr = 0;
+  }
   PassRefPtr<T> release() {
     PassRefPtr<T> tmp = adoptRef(m_ptr);
     m_ptr = 0;

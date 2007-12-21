@@ -44,10 +44,6 @@
 
 namespace KJS {
 
-#define KJS_BREAKPOINT                                       \
-  if (Debugger::debuggersPresent > 0 && !hitStatement(exec)) \
-    return 0;
-
 #define KJS_CHECKEXCEPTION  \
   if (exec->hadException()) \
     return rethrowException(exec);
@@ -68,12 +64,6 @@ namespace KJS {
   if (exec->hadException()) {     \
     handleException(exec);        \
     return false;                 \
-  }
-
-#define KJS_CHECKEXCEPTIONLIST \
-  if (exec->hadException()) {  \
-    handleException(exec);     \
-    return;                    \
   }
 
 #define KJS_CHECKEXCEPTIONVOID \
@@ -382,7 +372,7 @@ void Node::handleException(ExecState* exec, JSValue* exceptionValue) {
   }
 }
 
-JSValue* Node::rethrowException(ExecState* exec) {
+NEVER_INLINE JSValue* Node::rethrowException(ExecState* exec) {
   JSValue* exception = exec->exception();
   exec->clearException();
   handleException(exec, exception);
@@ -400,18 +390,36 @@ void StatementNode::setLoc(int firstLine, int lastLine) {
   m_lastLine = lastLine;
 }
 
-// Set normal completion and return false if the debugger wants us to stop at
-// this point.
-// FIXME: This seems like poor naming and strange design. Why false to stop? Why
-// "hit statement"?
-bool StatementNode::hitStatement(ExecState* exec) {
-  Debugger* debugger = exec->dynamicGlobalObject()->debugger();
-  if (!debugger ||
-      debugger->atStatement(exec, currentSourceId(exec), firstLine(),
-                            lastLine()))
-    return true;
-  exec->setCompletionType(Normal);
-  return false;
+// ------------------------------ SourceElements
+// --------------------------------
+
+void SourceElements::append(PassRefPtr<StatementNode> statement) {
+  if (Debugger::debuggersPresent)
+    m_statements.append(new BreakpointCheckStatement(statement));
+  else
+    m_statements.append(statement);
+}
+
+// ------------------------------ BreakpointCheckStatement
+// --------------------------------
+
+BreakpointCheckStatement::BreakpointCheckStatement(
+    PassRefPtr<StatementNode> statement)
+    : m_statement(statement) {
+  ASSERT(m_statement);
+}
+
+JSValue* BreakpointCheckStatement::execute(ExecState* exec) {
+  if (Debugger* debugger = exec->dynamicGlobalObject()->debugger())
+    if (!debugger->atStatement(exec, currentSourceId(exec),
+                               m_statement->firstLine(),
+                               m_statement->lastLine()))
+      return exec->setNormalCompletion();
+  return m_statement->execute(exec);
+}
+
+void BreakpointCheckStatement::streamTo(SourceStream& stream) const {
+  m_statement->streamTo(stream);
 }
 
 // ------------------------------ NullNode -------------------------------------
@@ -828,7 +836,7 @@ void ArgumentListNode::optimizeVariableAccess(
 void ArgumentListNode::evaluateList(ExecState* exec, List& list) {
   for (ArgumentListNode* n = this; n; n = n->next.get()) {
     JSValue* v = n->expr->evaluate(exec);
-    KJS_CHECKEXCEPTIONLIST
+    KJS_CHECKEXCEPTIONVOID
     list.append(v);
   }
 }
@@ -3487,8 +3495,6 @@ void VarStatementNode::optimizeVariableAccess(
 
 // ECMA 12.2
 JSValue* VarStatementNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   next->evaluate(exec);
   KJS_CHECKEXCEPTION
 
@@ -3498,10 +3504,10 @@ JSValue* VarStatementNode::execute(ExecState* exec) {
 // ------------------------------ Helper functions for handling Vectors of
 // StatementNode -------------------------------
 
-static inline void statementListPushFIFO(SourceElements& statements,
+static inline void statementListPushFIFO(StatementVector& statements,
                                          DeclarationStacks::NodeStack& stack) {
-  SourceElements::iterator it = statements.end();
-  SourceElements::iterator begin = statements.begin();
+  StatementVector::iterator it = statements.end();
+  StatementVector::iterator begin = statements.begin();
   while (it != begin) {
     --it;
     stack.append((*it).get());
@@ -3509,14 +3515,14 @@ static inline void statementListPushFIFO(SourceElements& statements,
 }
 
 static inline Node* statementListInitializeVariableAccessStack(
-    SourceElements& statements,
+    StatementVector& statements,
     DeclarationStacks::NodeStack& stack) {
   if (!statements.size())
     return 0;
 
-  SourceElements::iterator it = statements.end();
-  SourceElements::iterator begin = statements.begin();
-  SourceElements::iterator beginPlusOne = begin + 1;
+  StatementVector::iterator it = statements.end();
+  StatementVector::iterator begin = statements.begin();
+  StatementVector::iterator beginPlusOne = begin + 1;
 
   while (it != beginPlusOne) {
     --it;
@@ -3526,7 +3532,7 @@ static inline Node* statementListInitializeVariableAccessStack(
   return (*begin).get();
 }
 
-static inline JSValue* statementListExecute(SourceElements& statements,
+static inline JSValue* statementListExecute(StatementVector& statements,
                                             ExecState* exec) {
   JSValue* value = 0;
   size_t size = statements.size();
@@ -3542,20 +3548,20 @@ static inline JSValue* statementListExecute(SourceElements& statements,
 
 // ------------------------------ BlockNode ------------------------------------
 
-BlockNode::BlockNode(SourceElements* children)
-    : m_children(children ? children : new SourceElements) {
-  ASSERT(m_children);
+BlockNode::BlockNode(SourceElements* children) {
+  if (children)
+    children->releaseContentsIntoVector(m_children);
 }
 
 void BlockNode::optimizeVariableAccess(
     SymbolTable&,
     DeclarationStacks::NodeStack& nodeStack) {
-  statementListPushFIFO(*m_children, nodeStack);
+  statementListPushFIFO(m_children, nodeStack);
 }
 
 // ECMA 12.1
 JSValue* BlockNode::execute(ExecState* exec) {
-  return statementListExecute(*m_children, exec);
+  return statementListExecute(m_children, exec);
 }
 
 // ------------------------------ EmptyStatementNode ---------------------------
@@ -3576,8 +3582,6 @@ void ExprStatementNode::optimizeVariableAccess(
 
 // ECMA 12.4
 JSValue* ExprStatementNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   JSValue* value = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
@@ -3594,8 +3598,6 @@ void IfNode::optimizeVariableAccess(SymbolTable&,
 
 // ECMA 12.5
 JSValue* IfNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   bool b = m_condition->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTION
 
@@ -3613,8 +3615,6 @@ void IfElseNode::optimizeVariableAccess(
 
 // ECMA 12.5
 JSValue* IfElseNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT;
-
   bool b = m_condition->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTION
 
@@ -3635,8 +3635,6 @@ void DoWhileNode::optimizeVariableAccess(
 
 // ECMA 12.6.1
 JSValue* DoWhileNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   JSValue* value = 0;
 
   while (1) {
@@ -3681,8 +3679,6 @@ void WhileNode::optimizeVariableAccess(
 
 // ECMA 12.6.2
 JSValue* WhileNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   JSValue* value = 0;
 
   while (1) {
@@ -3897,8 +3893,6 @@ JSValue* ForInNode::execute(ExecState* exec) {
 
 // ECMA 12.7
 JSValue* ContinueNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   if (ident.isEmpty() && !exec->inIteration())
     return setErrorCompletion(exec, SyntaxError, "Invalid continue statement.");
   if (!ident.isEmpty() && !exec->seenLabels()->contains(ident))
@@ -3910,8 +3904,6 @@ JSValue* ContinueNode::execute(ExecState* exec) {
 
 // ECMA 12.8
 JSValue* BreakNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   if (ident.isEmpty() && !exec->inIteration() && !exec->inSwitch())
     return setErrorCompletion(exec, SyntaxError, "Invalid break statement.");
   if (!ident.isEmpty() && !exec->seenLabels()->contains(ident))
@@ -3930,8 +3922,6 @@ void ReturnNode::optimizeVariableAccess(
 
 // ECMA 12.9
 JSValue* ReturnNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   CodeType codeType = exec->codeType();
   if (codeType != FunctionCode)
     return setErrorCompletion(exec, SyntaxError, "Invalid return statement.");
@@ -3955,8 +3945,6 @@ void WithNode::optimizeVariableAccess(SymbolTable&,
 
 // ECMA 12.10
 JSValue* WithNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   JSValue* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
   JSObject* o = v->toObject(exec);
@@ -3975,8 +3963,7 @@ void CaseClauseNode::optimizeVariableAccess(
     DeclarationStacks::NodeStack& nodeStack) {
   if (expr)
     nodeStack.append(expr.get());
-  if (m_children)
-    statementListPushFIFO(*m_children, nodeStack);
+  statementListPushFIFO(m_children, nodeStack);
 }
 
 // ECMA 12.11
@@ -3989,9 +3976,7 @@ JSValue* CaseClauseNode::evaluate(ExecState* exec) {
 
 // ECMA 12.11
 JSValue* CaseClauseNode::executeStatements(ExecState* exec) {
-  if (m_children)
-    return statementListExecute(*m_children, exec);
-  return exec->setNormalCompletion();
+  return statementListExecute(m_children, exec);
 }
 
 // ------------------------------ ClauseListNode -------------------------------
@@ -4090,8 +4075,6 @@ void SwitchNode::optimizeVariableAccess(
 
 // ECMA 12.11
 JSValue* SwitchNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   JSValue* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
@@ -4136,8 +4119,6 @@ void ThrowNode::optimizeVariableAccess(
 
 // ECMA 12.13
 JSValue* ThrowNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   JSValue* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
@@ -4158,8 +4139,6 @@ void TryNode::optimizeVariableAccess(SymbolTable&,
 
 // ECMA 12.14
 JSValue* TryNode::execute(ExecState* exec) {
-  KJS_BREAKPOINT
-
   JSValue* result = tryBlock->execute(exec);
 
   if (Collector::isOutOfMemory())
@@ -4293,7 +4272,7 @@ void ProgramNode::initializeSymbolTable(ExecState* exec) {
 void ScopeNode::optimizeVariableAccess(ExecState* exec) {
   DeclarationStacks::NodeStack nodeStack;
   Node* node =
-      statementListInitializeVariableAccessStack(*m_children, nodeStack);
+      statementListInitializeVariableAccessStack(m_children, nodeStack);
   if (!node)
     return;
 

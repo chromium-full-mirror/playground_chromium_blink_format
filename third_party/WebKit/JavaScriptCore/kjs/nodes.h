@@ -235,7 +235,6 @@ class StatementNode : public Node {
   }
 
  protected:
-  bool hitStatement(ExecState*) KJS_FAST_CALL;
   LabelStack ls;
 
  private:
@@ -2097,35 +2096,18 @@ class VarStatementNode : public StatementNode {
   RefPtr<VarDeclNode> next;
 };
 
-typedef Vector<RefPtr<StatementNode>> SourceElements;
+typedef Vector<RefPtr<StatementNode>> StatementVector;
 
-class SourceElementsStub : public Node {
+class SourceElements : public ParserRefCounted {
  public:
-  SourceElementsStub() : m_sourceElements(new SourceElements) {}
-  void append(StatementNode* element) { m_sourceElements->append(element); }
-  SourceElements* release() {
-    SourceElements* elems = m_sourceElements.release();
-    return elems;
-  }
-  virtual void optimizeVariableAccess(SymbolTable&,
-                                      DeclarationStacks::NodeStack&)
-      KJS_FAST_CALL {
-    ASSERT_NOT_REACHED();
-  }
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL {
-    ASSERT_NOT_REACHED();
-    return 0;
-  }
-  virtual void streamTo(SourceStream&) const KJS_FAST_CALL {
-    ASSERT_NOT_REACHED();
-  }
-  virtual Precedence precedence() const {
-    ASSERT_NOT_REACHED();
-    return PrecExpression;
+  void append(PassRefPtr<StatementNode>);
+  void releaseContentsIntoVector(StatementVector& destination) {
+    ASSERT(destination.isEmpty());
+    m_statements.swap(destination);
   }
 
  private:
-  OwnPtr<SourceElements> m_sourceElements;
+  StatementVector m_statements;
 };
 
 class BlockNode : public StatementNode {
@@ -2138,7 +2120,7 @@ class BlockNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  protected:
-  OwnPtr<SourceElements> m_children;
+  StatementVector m_children;
 };
 
 class EmptyStatementNode : public StatementNode {
@@ -2526,8 +2508,10 @@ class CaseClauseNode : public Node {
  public:
   CaseClauseNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
   CaseClauseNode(ExpressionNode* e, SourceElements* children) KJS_FAST_CALL
-      : expr(e),
-        m_children(children) {}
+      : expr(e) {
+    if (children)
+      children->releaseContentsIntoVector(m_children);
+  }
   virtual void optimizeVariableAccess(SymbolTable&,
                                       DeclarationStacks::NodeStack&)
       KJS_FAST_CALL;
@@ -2542,7 +2526,7 @@ class CaseClauseNode : public Node {
 
  private:
   RefPtr<ExpressionNode> expr;
-  OwnPtr<SourceElements> m_children;
+  StatementVector m_children;
 };
 
 class ClauseListNode : public Node {
@@ -2606,6 +2590,16 @@ class SwitchNode : public StatementNode {
  private:
   RefPtr<ExpressionNode> expr;
   RefPtr<CaseBlockNode> block;
+};
+
+class BreakpointCheckStatement : public StatementNode {
+ public:
+  BreakpointCheckStatement(PassRefPtr<StatementNode>) KJS_FAST_CALL;
+  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+
+ private:
+  RefPtr<StatementNode> m_statement;
 };
 
 struct ElementList {

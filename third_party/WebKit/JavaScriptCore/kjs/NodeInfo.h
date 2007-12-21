@@ -36,7 +36,7 @@ struct NodeInfo {
 typedef NodeInfo<StatementNode*> StatementNodeInfo;
 typedef NodeInfo<CaseBlockNode*> CaseBlockNodeInfo;
 typedef NodeInfo<CaseClauseNode*> CaseClauseNodeInfo;
-typedef NodeInfo<SourceElementsStub*> SourceElementsInfo;
+typedef NodeInfo<SourceElements*> SourceElementsInfo;
 typedef NodeInfo<ClauseList> ClauseListInfo;
 typedef NodeInfo<VarDeclList> VarDeclListInfo;
 

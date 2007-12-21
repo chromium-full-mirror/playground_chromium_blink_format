@@ -75,7 +75,7 @@ void Parser::didFinishParsing(
     ParserRefCountedData<DeclarationStacks::VarStack>* varStack,
     ParserRefCountedData<DeclarationStacks::FunctionStack>* funcStack,
     int lastLine) {
-  m_sourceElements.set(sourceElements ? sourceElements : new SourceElements);
+  m_sourceElements = sourceElements ? sourceElements : new SourceElements;
   m_varDeclarations = varStack;
   m_funcDeclarations = funcStack;
   m_lastLine = lastLine;
