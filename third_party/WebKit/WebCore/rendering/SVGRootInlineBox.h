@@ -39,6 +39,8 @@ class SVGRootInlineBox : public RootInlineBox {
  public:
   SVGRootInlineBox(RenderObject* obj) : RootInlineBox(obj) {}
 
+  virtual bool isSVGRootInlineBox() { return true; }
+
   virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
 
   virtual int placeBoxesHorizontally(int x,

@@ -62,6 +62,9 @@ SVGRootInlineBox* SVGInlineTextBox::svgRootInlineBox() const {
   ASSERT(parentBox);
   ASSERT(parentBox->isRootInlineBox());
 
+  if (!parentBox->isSVGRootInlineBox())
+    return 0;
+
   return static_cast<SVGRootInlineBox*>(parentBox);
 }
 
@@ -212,6 +215,8 @@ SVGChar* SVGInlineTextBox::closestCharacterToPosition(int x,
                                                       int y,
                                                       int& offset) const {
   SVGRootInlineBox* rootBox = svgRootInlineBox();
+  if (!rootBox)
+    return 0;
 
   SVGInlineTextBoxClosestCharacterToPositionWalker walkerCallback(x, y);
   SVGTextChunkWalker<SVGInlineTextBoxClosestCharacterToPositionWalker> walker(
@@ -306,6 +311,8 @@ IntRect SVGInlineTextBox::selectionRect(int, int, int startPos, int endPos) {
   // here. This won't lead to visible bugs, but to extra work being done.
   // Investigate.
   SVGRootInlineBox* rootBox = svgRootInlineBox();
+  if (!rootBox)
+    return IntRect();
 
   SVGInlineTextBoxSelectionRectWalker walkerCallback;
   SVGTextChunkWalker<SVGInlineTextBoxSelectionRectWalker> walker(

@@ -153,7 +153,9 @@ class InlineBox {
   virtual bool isContainer() { return false; }
   virtual bool isInlineTextBox() { return false; }
   virtual bool isRootInlineBox() { return false; }
-
+#if ENABLE(SVG)
+  virtual bool isSVGRootInlineBox() { return false; }
+#endif
   virtual bool isText() const { return false; }
 
   bool isConstructed() { return m_constructed; }
