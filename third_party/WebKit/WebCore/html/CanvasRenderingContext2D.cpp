@@ -402,14 +402,14 @@ void CanvasRenderingContext2D::arc(float x,
                                    float r,
                                    float sa,
                                    float ea,
-                                   bool clockwise,
+                                   bool anticlockwise,
                                    ExceptionCode& ec) {
   ec = 0;
   if (!(r > 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
-  state().m_path.addArc(FloatPoint(x, y), r, sa, ea, clockwise);
+  state().m_path.addArc(FloatPoint(x, y), r, sa, ea, anticlockwise);
 }
 
 void CanvasRenderingContext2D::rect(float x,

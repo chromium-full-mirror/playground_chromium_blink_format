@@ -100,7 +100,7 @@ class Path {
               float radius,
               float startAngle,
               float endAngle,
-              bool clockwise);
+              bool anticlockwise);
   void addRect(const FloatRect&);
   void addEllipse(const FloatRect&);
 
