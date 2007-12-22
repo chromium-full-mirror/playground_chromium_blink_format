@@ -160,7 +160,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     PassRefPtr<Range> context,
     bool allowPlainText,
     bool& chosePlainText) {
-#if GLIB_CHECK_VERSION(2, 10, 0)
+#if GTK_CHECK_VERSION(2, 10, 0)
   GdkAtom textHtml = gdk_atom_intern_static_string("text/html");
 #else
   GdkAtom textHtml = gdk_atom_intern("text/html", false);
