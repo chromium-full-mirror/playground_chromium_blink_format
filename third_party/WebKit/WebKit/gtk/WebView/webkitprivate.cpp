@@ -26,6 +26,8 @@
 #include "FrameLoaderClientGtk.h"
 #include "Logging.h"
 #include "NotImplemented.h"
+#include "Pasteboard.h"
+#include "PasteboardHelperGtk.h"
 
 using namespace WebCore;
 
@@ -97,4 +99,6 @@ void webkit_init() {
   WebCore::DatabaseTracker::tracker().setDatabasePath(databaseDirectory);
   g_free(databaseDirectory);
 #endif
+
+  Pasteboard::generalPasteboard()->setHelper(new WebKit::PasteboardHelperGtk());
 }
