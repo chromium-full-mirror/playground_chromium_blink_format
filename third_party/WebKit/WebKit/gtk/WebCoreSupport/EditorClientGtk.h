@@ -126,7 +126,7 @@ class EditorClient : public WebCore::EditorClient {
                                  WTF::Vector<WebCore::String>& guesses);
   virtual void setInputMethodState(bool enabled);
 
-  WebKitWebView* m_page;
+  WebKitWebView* m_webView;
 };
 }
 

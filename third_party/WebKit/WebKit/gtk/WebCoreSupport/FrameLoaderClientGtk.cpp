@@ -194,23 +194,23 @@ void FrameLoaderClient::assignIdentifierToInitialRequest(
 }
 
 void FrameLoaderClient::postProgressStartedNotification() {
-  WebKitWebView* page = getViewFromFrame(m_frame);
-  g_signal_emit_by_name(page, "load-started", m_frame);
+  WebKitWebView* webView = getViewFromFrame(m_frame);
+  g_signal_emit_by_name(webView, "load-started", m_frame);
 }
 
 void FrameLoaderClient::postProgressEstimateChangedNotification() {
-  WebKitWebView* kitPage = getViewFromFrame(m_frame);
-  Page* corePage = core(kitPage);
+  WebKitWebView* webView = getViewFromFrame(m_frame);
+  Page* corePage = core(webView);
 
   g_signal_emit_by_name(
-      kitPage, "load-progress-changed",
+      webView, "load-progress-changed",
       lround(corePage->progress()->estimatedProgress() * 100));
 }
 
 void FrameLoaderClient::postProgressFinishedNotification() {
-  WebKitWebView* page = getViewFromFrame(m_frame);
+  WebKitWebView* webView = getViewFromFrame(m_frame);
 
-  g_signal_emit_by_name(page, "load-finished", m_frame);
+  g_signal_emit_by_name(webView, "load-finished", m_frame);
 }
 
 void FrameLoaderClient::frameLoaderDestroyed() {
@@ -257,12 +257,12 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
   if (!policyFunction)
     return;
 
-  WebKitWebView* page = getViewFromFrame(m_frame);
+  WebKitWebView* webView = getViewFromFrame(m_frame);
   WebKitNetworkRequest* request =
       webkit_network_request_new(resourceRequest.url().string().utf8().data());
   WebKitNavigationResponse response;
 
-  g_signal_emit_by_name(page, "navigation-requested", m_frame, request,
+  g_signal_emit_by_name(webView, "navigation-requested", m_frame, request,
                         &response);
 
   g_object_unref(request);
@@ -388,8 +388,8 @@ void FrameLoaderClient::windowObjectCleared() {
       toRef(KJS::Window::retrieve(coreFrame)->getObject());
   ASSERT(windowObject);
 
-  WebKitWebView* page = getViewFromFrame(m_frame);
-  g_signal_emit_by_name(page, "window-object-cleared", m_frame, context,
+  WebKitWebView* webView = getViewFromFrame(m_frame);
+  g_signal_emit_by_name(webView, "window-object-cleared", m_frame, context,
                         windowObject);
 
   // TODO: Re-attach debug clients if present.
@@ -502,9 +502,9 @@ void FrameLoaderClient::dispatchWillClose() {
 }
 
 void FrameLoaderClient::dispatchDidReceiveIcon() {
-  WebKitWebView* page = getViewFromFrame(m_frame);
+  WebKitWebView* webView = getViewFromFrame(m_frame);
 
-  g_signal_emit_by_name(page, "icon-loaded", m_frame);
+  g_signal_emit_by_name(webView, "icon-loaded", m_frame);
 }
 
 void FrameLoaderClient::dispatchDidStartProvisionalLoad() {}
@@ -512,9 +512,10 @@ void FrameLoaderClient::dispatchDidStartProvisionalLoad() {}
 void FrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
   g_signal_emit_by_name(m_frame, "title-changed", title.utf8().data());
 
-  WebKitWebView* page = getViewFromFrame(m_frame);
-  if (m_frame == webkit_web_view_get_main_frame(page))
-    g_signal_emit_by_name(page, "title-changed", m_frame, title.utf8().data());
+  WebKitWebView* webView = getViewFromFrame(m_frame);
+  if (m_frame == webkit_web_view_get_main_frame(webView))
+    g_signal_emit_by_name(webView, "title-changed", m_frame,
+                          title.utf8().data());
 }
 
 void FrameLoaderClient::dispatchDidCommitLoad() {
@@ -529,9 +530,9 @@ void FrameLoaderClient::dispatchDidCommitLoad() {
 
   g_signal_emit_by_name(m_frame, "load-committed");
 
-  WebKitWebView* page = getViewFromFrame(m_frame);
-  if (m_frame == webkit_web_view_get_main_frame(page))
-    g_signal_emit_by_name(page, "load-committed", m_frame);
+  WebKitWebView* webView = getViewFromFrame(m_frame);
+  if (m_frame == webkit_web_view_get_main_frame(webView))
+    g_signal_emit_by_name(webView, "load-committed", m_frame);
 }
 
 void FrameLoaderClient::dispatchDidFinishDocumentLoad() {
