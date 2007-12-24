@@ -118,6 +118,8 @@ class Image : Noncopyable {
 
   enum TileRule { StretchTile, RoundTile, RepeatTile };
 
+  virtual NativeImagePtr nativeImageForCurrentFrame() { return 0; }
+
 #if PLATFORM(MAC)
   // Accessors for native image formats.
   virtual NSImage* getNSImage() { return 0; }
@@ -169,8 +171,6 @@ class Image : Noncopyable {
   // Supporting tiled drawing
   virtual bool mayFillWithSolidColor() const { return false; }
   virtual Color solidColor() const { return Color(); }
-
-  virtual NativeImagePtr nativeImageForCurrentFrame() { return 0; }
 
   virtual void startAnimation() {}
 
