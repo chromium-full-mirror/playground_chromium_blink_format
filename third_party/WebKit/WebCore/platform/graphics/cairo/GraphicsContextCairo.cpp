@@ -414,7 +414,10 @@ void GraphicsContext::clip(const IntRect& rect) {
 
   cairo_t* cr = m_data->cr;
   cairo_rectangle(cr, rect.x(), rect.y(), rect.width(), rect.height());
+  cairo_fill_rule_t savedFillRule = cairo_get_fill_rule(cr);
+  cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
   cairo_clip(cr);
+  cairo_set_fill_rule(cr, savedFillRule);
 }
 
 void GraphicsContext::drawFocusRing(const Color& color) {
@@ -602,18 +605,21 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
     return;
 
   clip(rect);
-  Path path;
 
-  path.addEllipse(rect);
-
-  IntRect inner(rect);
-  inner.inflate(-thickness);
-  path.addEllipse(inner);
+  Path p;
+  FloatRect r(rect);
+  // Add outer ellipse
+  p.addEllipse(r);
+  // Add inner ellipse
+  r.inflate(-thickness);
+  p.addEllipse(r);
+  addPath(p);
 
   cairo_t* cr = m_data->cr;
+  cairo_fill_rule_t savedFillRule = cairo_get_fill_rule(cr);
   cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
-
-  clip(path);
+  cairo_clip(cr);
+  cairo_set_fill_rule(cr, savedFillRule);
 }
 
 void GraphicsContext::setShadow(IntSize const&, int, Color const&) {
@@ -788,11 +794,26 @@ void GraphicsContext::clip(const Path& path) {
   cairo_path_t* p = cairo_copy_path(path.platformPath()->m_cr);
   cairo_append_path(cr, p);
   cairo_path_destroy(p);
+  cairo_fill_rule_t savedFillRule = cairo_get_fill_rule(cr);
+  cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
   cairo_clip(cr);
+  cairo_set_fill_rule(cr, savedFillRule);
 }
 
-void GraphicsContext::clipOut(const Path&) {
-  notImplemented();
+void GraphicsContext::clipOut(const Path& path) {
+  if (paintingDisabled())
+    return;
+
+  cairo_t* cr = m_data->cr;
+  double x1, y1, x2, y2;
+  cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
+  cairo_rectangle(cr, x1, y1, x2 - x1, y2 - y1);
+  addPath(path);
+
+  cairo_fill_rule_t savedFillRule = cairo_get_fill_rule(cr);
+  cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
+  cairo_clip(cr);
+  cairo_set_fill_rule(cr, savedFillRule);
 }
 
 void GraphicsContext::rotate(float radians) {
@@ -809,21 +830,47 @@ void GraphicsContext::scale(const FloatSize& size) {
   cairo_scale(m_data->cr, size.width(), size.height());
 }
 
-void GraphicsContext::clipOut(const IntRect&) {
-  notImplemented();
+void GraphicsContext::clipOut(const IntRect& r) {
+  if (paintingDisabled())
+    return;
+
+  cairo_t* cr = m_data->cr;
+  double x1, y1, x2, y2;
+  cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
+  cairo_rectangle(cr, x1, x2, x2 - x1, y2 - y1);
+  cairo_rectangle(cr, r.x(), r.y(), r.width(), r.height());
+  cairo_fill_rule_t savedFillRule = cairo_get_fill_rule(cr);
+  cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
+  cairo_clip(cr);
+  cairo_set_fill_rule(cr, savedFillRule);
 }
 
-void GraphicsContext::clipOutEllipseInRect(const IntRect&) {
-  notImplemented();
+void GraphicsContext::clipOutEllipseInRect(const IntRect& r) {
+  if (paintingDisabled())
+    return;
+
+  Path p;
+  p.addEllipse(r);
+  clipOut(p);
 }
 
-void GraphicsContext::fillRoundedRect(const IntRect&,
+void GraphicsContext::fillRoundedRect(const IntRect& r,
                                       const IntSize& topLeft,
                                       const IntSize& topRight,
                                       const IntSize& bottomLeft,
                                       const IntSize& bottomRight,
-                                      const Color&) {
-  notImplemented();
+                                      const Color& color) {
+  if (paintingDisabled())
+    return;
+
+  cairo_t* cr = m_data->cr;
+  cairo_save(cr);
+  beginPath();
+  addPath(Path::createRoundedRectangle(r, topLeft, topRight, bottomLeft,
+                                       bottomRight));
+  setColor(cr, color);
+  cairo_fill(cr);
+  cairo_restore(cr);
 }
 
 #if PLATFORM(GTK)
