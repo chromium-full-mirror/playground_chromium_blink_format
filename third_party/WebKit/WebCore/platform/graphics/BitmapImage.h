@@ -127,10 +127,6 @@ class BitmapImage : public Image {
   virtual bool getHBITMAPOfSize(HBITMAP, LPSIZE);
 #endif
 
-#if PLATFORM(WX)
-  virtual wxBitmap* getWxBitmap() const;
-#endif
-
   virtual NativeImagePtr nativeImageForCurrentFrame() {
     return frameAtIndex(currentFrame());
   }
