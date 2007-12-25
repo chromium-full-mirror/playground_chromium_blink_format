@@ -96,10 +96,12 @@ void CharacterData::appendData(const String& arg, ExceptionCode& ec) {
     return;
   }
 
+  String newStr = str;
+  newStr.append(arg);
+
   StringImpl* oldStr = str;
-  str = str->copy();
+  str = newStr.impl();
   str->ref();
-  str->append(arg.impl());
 
   if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
@@ -120,10 +122,12 @@ void CharacterData::insertData(const unsigned offset,
   if (ec)
     return;
 
+  String newStr = str;
+  newStr.insert(arg, offset);
+
   StringImpl* oldStr = str;
-  str = str->copy();
+  str = newStr.impl();
   str->ref();
-  str->insert(arg.impl(), offset);
 
   if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
@@ -147,10 +151,12 @@ void CharacterData::deleteData(const unsigned offset,
   if (ec)
     return;
 
+  String newStr = str;
+  newStr.remove(offset, count);
+
   StringImpl* oldStr = str;
-  str = str->copy();
+  str = newStr.impl();
   str->ref();
-  str->remove(offset, count);
 
   if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
@@ -181,11 +187,13 @@ void CharacterData::replaceData(const unsigned offset,
   else
     realCount = count;
 
+  String newStr = str;
+  newStr.remove(offset, realCount);
+  newStr.insert(arg, offset);
+
   StringImpl* oldStr = str;
-  str = str->copy();
+  str = newStr.impl();
   str->ref();
-  str->remove(offset, realCount);
-  str->insert(arg.impl(), offset);
 
   if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
