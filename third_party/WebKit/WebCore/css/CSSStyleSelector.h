@@ -144,11 +144,12 @@ class CSSStyleSelector : public StyleSelector {
 
   CSSFontSelector* fontSelector() { return m_fontSelector.get(); }
 
- protected:
   /* checks if a compound selector (which can consist of multiple simple
      selectors)
      matches the given Element */
-  bool checkSelector(CSSSelector* selector);
+  bool checkSelector(CSSSelector*);
+
+ protected:
   enum SelectorMatch {
     SelectorMatches = 0,
     SelectorFailsLocally,
@@ -279,6 +280,7 @@ class CSSStyleSelector : public StyleSelector {
 #endif
 
   friend class CSSRuleSet;
+  friend class Node;
 };
 
 class CSSRuleData {

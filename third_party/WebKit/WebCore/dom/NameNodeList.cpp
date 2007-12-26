@@ -32,8 +32,8 @@ using namespace HTMLNames;
 
 NameNodeList::NameNodeList(Node* root,
                            const String& name,
-                           NodeList::Caches* caches)
-    : NodeList(root, caches, true), m_nodeName(name) {}
+                           DynamicNodeList::Caches* caches)
+    : DynamicNodeList(root, caches, true), m_nodeName(name) {}
 
 unsigned NameNodeList::length() const {
   return recursiveLength();

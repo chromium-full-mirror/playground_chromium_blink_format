@@ -38,6 +38,7 @@ namespace WebCore {
 class AtomicString;
 class ContainerNode;
 class Document;
+class DynamicNodeList;
 class Element;
 class Event;
 class EventListener;
@@ -495,8 +496,8 @@ class Node : public TreeShared<Node> {
                        const char* markedLabel2 = 0) const;
 #endif
 
-  void registerNodeList(NodeList*);
-  void unregisterNodeList(NodeList*);
+  void registerDynamicNodeList(DynamicNodeList*);
+  void unregisterDynamicNodeList(DynamicNodeList*);
   void notifyNodeListsChildrenChanged();
   void notifyLocalNodeListsChildrenChanged();
   void notifyNodeListsAttributeChanged();
@@ -505,9 +506,12 @@ class Node : public TreeShared<Node> {
   PassRefPtr<NodeList> getElementsByTagName(const String&);
   PassRefPtr<NodeList> getElementsByTagNameNS(const String& namespaceURI,
                                               const String& localName);
-
   PassRefPtr<NodeList> getElementsByName(const String& elementName);
   PassRefPtr<NodeList> getElementsByClassName(const String& classNames);
+
+  PassRefPtr<Element> querySelector(const String& selectors, ExceptionCode&);
+  PassRefPtr<NodeList> querySelectorAll(const String& selectors,
+                                        ExceptionCode&);
 
  private:  // members
   DocPtr<Document> m_document;
