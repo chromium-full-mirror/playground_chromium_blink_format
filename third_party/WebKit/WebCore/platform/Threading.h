@@ -165,10 +165,10 @@ class ThreadCondition : Noncopyable {
 #define WTF_USE_LOCKFREE_THREADSAFESHARED 1
 
 inline void atomicIncrement(int volatile* addened) {
-  InterlockedIncrement(addened);
+  InterlockedIncrement(reinterpret_cast<long volatile*>(addened));
 }
 inline int atomicDecrement(int volatile* addened) {
-  return InterlockedDecrement(addened);
+  return InterlockedDecrement(reinterpret_cast<long volatile*>(addened));
 }
 
 #elif COMPILER(GCC) && \
