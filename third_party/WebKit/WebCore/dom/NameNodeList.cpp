@@ -35,14 +35,6 @@ NameNodeList::NameNodeList(Node* root,
                            DynamicNodeList::Caches* caches)
     : DynamicNodeList(root, caches, true), m_nodeName(name) {}
 
-unsigned NameNodeList::length() const {
-  return recursiveLength();
-}
-
-Node* NameNodeList::item(unsigned index) const {
-  return recursiveItem(index);
-}
-
 bool NameNodeList::nodeMatches(Node* testNode) const {
   return static_cast<Element*>(testNode)->getAttribute(nameAttr) == m_nodeName;
 }

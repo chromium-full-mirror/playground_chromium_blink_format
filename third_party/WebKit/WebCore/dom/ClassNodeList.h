@@ -43,9 +43,6 @@ class ClassNodeList : public DynamicNodeList {
                 const String& classNames,
                 DynamicNodeList::Caches*);
 
-  virtual unsigned length() const;
-  virtual Node* item(unsigned index) const;
-
  private:
   virtual bool nodeMatches(Node*) const;
 
