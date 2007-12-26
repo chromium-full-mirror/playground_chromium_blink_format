@@ -39,7 +39,7 @@ class CSSSelector;
 
 class SelectorNodeList : public StaticNodeList {
  public:
-  SelectorNodeList(PassRefPtr<Node> rootNode, CSSSelector* selector);
+  SelectorNodeList(PassRefPtr<Node> rootNode, CSSSelector*);
 };
 
 }  // namespace WebCore

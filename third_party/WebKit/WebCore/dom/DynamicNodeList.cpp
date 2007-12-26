@@ -77,7 +77,6 @@ Node* DynamicNodeList::itemForwardsFromCurrent(Node* start,
                                                unsigned offset,
                                                int remainingOffset) const {
   ASSERT(remainingOffset >= 0);
-
   for (Node* n = start; n; n = n->traverseNextNode(m_rootNode.get())) {
     if (n->isElementNode()) {
       if (nodeMatches(n)) {
@@ -141,9 +140,10 @@ Node* DynamicNodeList::itemWithName(const AtomicString& elementId) const {
     if (!node || !nodeMatches(node))
       return 0;
 
-    for (Node* p = node->parentNode(); p; p = p->parentNode())
+    for (Node* p = node->parentNode(); p; p = p->parentNode()) {
       if (p == m_rootNode)
         return node;
+    }
 
     return 0;
   }
@@ -173,4 +173,5 @@ void DynamicNodeList::Caches::reset() {
   isLengthCacheValid = false;
   isItemCacheValid = false;
 }
-}
+
+}  // namespace WebCore

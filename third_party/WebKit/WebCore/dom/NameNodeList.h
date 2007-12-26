@@ -25,27 +25,25 @@
 #define NameNodeList_h
 
 #include "DynamicNodeList.h"
-#include "PlatformString.h"
+#include "AtomicString.h"
 
 namespace WebCore {
 
-/**
- * NodeList which lists all Nodes in a Element with a given "name=" tag
- */
+class String;
+
+// NodeList which lists all Nodes in a Element with a given "name" attribute
 class NameNodeList : public DynamicNodeList {
  public:
-  NameNodeList(Node* root, const String& name, DynamicNodeList::Caches*);
+  NameNodeList(PassRefPtr<Node> rootNode,
+               const String& name,
+               DynamicNodeList::Caches*);
 
-  // Other methods (not part of DOM)
-
-  virtual void rootNodeAttributeChanged() {
-    DynamicNodeList::rootNodeChildrenChanged();
-  }
+  virtual void rootNodeAttributeChanged();
 
  private:
   virtual bool nodeMatches(Node*) const;
 
-  String m_nodeName;
+  AtomicString m_nodeName;
 };
 
 }  // namespace WebCore
