@@ -540,6 +540,10 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
   // <http://bugs.webkit.org/show_bug.cgi?id=12165>
   // and <http://bugs.webkit.org/show_bug.cgi?id=12389>.
 
+  // Since many sites have charset declarations after <body> or other tags that
+  // are disallowed in <head>,
+  // we don't bail out until we've checked at least 512 bytes of input.
+
   AtomicStringImpl* enclosingTagName = 0;
 
   while (ptr + 3 < pEnd) {  // +3 guarantees that "<!--" fits in the buffer -
@@ -660,9 +664,10 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
 
           pos = endpos + 1;
         }
-      } else if (tag != scriptTag && tag != noscriptTag && tag != styleTag &&
-                 tag != linkTag && tag != metaTag && tag != objectTag &&
-                 tag != titleTag && tag != baseTag && (end || tag != htmlTag) &&
+      } else if (ptr - m_buffer.data() >= 512 && tag != scriptTag &&
+                 tag != noscriptTag && tag != styleTag && tag != linkTag &&
+                 tag != metaTag && tag != objectTag && tag != titleTag &&
+                 tag != baseTag && (end || tag != htmlTag) &&
                  !enclosingTagName && (tag != headTag) &&
                  isASCIIAlpha(tagBuffer[0])) {
         m_checkedForHeadCharset = true;
