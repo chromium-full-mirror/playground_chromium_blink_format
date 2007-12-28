@@ -546,7 +546,8 @@ void RenderLayer::addChild(RenderLayer* child, RenderLayer* beforeChild) {
 
   if (child->isOverflowOnly())
     dirtyOverflowList();
-  else {
+
+  if (!child->isOverflowOnly() || child->firstChild()) {
     // Dirty the z-order list in which we are contained.  The stackingContext()
     // can be null in the
     // case where we're building up generated content layers.  This is ok, since
@@ -576,7 +577,7 @@ RenderLayer* RenderLayer::removeChild(RenderLayer* oldChild) {
 
   if (oldChild->isOverflowOnly())
     dirtyOverflowList();
-  else {
+  if (!oldChild->isOverflowOnly() || oldChild->firstChild()) {
     // Dirty the z-order list in which we are contained.  When called via the
     // reattachment process in removeOnlyThisLayer, the layer may already be
     // disconnected
