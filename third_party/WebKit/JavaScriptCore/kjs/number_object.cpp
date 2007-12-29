@@ -377,8 +377,8 @@ static JSValue* numberToPrecision(ExecState* exec,
       ++n;
     // maintain n < 10^(precision)
     if (n >= intPow10(precision)) {
-      n = n / 10.0;
-      e = e + 1;
+      n /= 10.0;
+      e += 1;
     }
     ASSERT(intPow10(precision - 1) <= n);
     ASSERT(n < intPow10(precision));
@@ -401,7 +401,7 @@ static JSValue* numberToPrecision(ExecState* exec,
   else if (e >= 0) {
     if (e + 1 < m.size())
       return jsString(s + m.substr(0, e + 1) + "." + m.substr(e + 1));
-    return jsString(s + m.substr(0, e + 1));
+    return jsString(s + m);
   }
   return jsString(s + "0." + char_sequence('0', -(e + 1)) + m);
 }
