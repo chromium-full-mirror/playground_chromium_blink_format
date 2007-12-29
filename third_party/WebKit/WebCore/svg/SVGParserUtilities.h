@@ -91,10 +91,9 @@ bool pathFromSVGData(Path& path, const String& d);
 bool pathSegListFromSVGData(SVGPathSegList* pathSegList,
                             const String& d,
                             bool process = false);
+Vector<String> parseDelimitedString(const String& input, const char seperator);
 
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet
