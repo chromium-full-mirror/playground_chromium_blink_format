@@ -238,9 +238,8 @@ void JSObject::put(ExecState* exec,
   }
 
   if (hasGettersOrSetters) {
-    if (checkReadOnly && !canPut(exec, propertyName)) {
+    if (checkReadOnly && !canPut(exec, propertyName))
       return;
-    }
 
     obj = this;
     while (true) {

@@ -31,7 +31,7 @@
 #include <wtf/MathExtras.h>
 #include <wtf/Vector.h>
 
-using namespace KJS;
+namespace KJS {
 
 // ------------------------------ NumberInstance ----------------------------
 
@@ -96,11 +96,11 @@ static UString integer_part_noexp(double d) {
   size_t length = strlen(result);
 
   UString str = sign ? "-" : "";
-  if (decimalPoint == 9999) {
-    str += UString(result);
-  } else if (decimalPoint <= 0) {
-    str += UString("0");
-  } else {
+  if (decimalPoint == 9999)
+    str += result;
+  else if (decimalPoint <= 0)
+    str += "0";
+  else {
     Vector<char, 1024> buf(decimalPoint + 1);
 
     if (static_cast<int>(length) <= decimalPoint) {
@@ -301,13 +301,12 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
       decimalPoint += decimalAdjust;
 
       int i = 0;
-      if (sign) {
+      if (sign)
         buf[i++] = '-';
-      }
 
-      if (decimalPoint == 999) {
+      if (decimalPoint == 999)
         strcpy(buf + i, result);
-      } else {
+      else {
         buf[i++] = result[0];
 
         if (fractionDigits->isUndefined())
@@ -335,12 +334,10 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
         if (exponential < 0) {
           exponential = exponential * -1;
         }
-        if (exponential >= 100) {
+        if (exponential >= 100)
           buf[i++] = static_cast<char>('0' + exponential / 100);
-        }
-        if (exponential >= 10) {
+        if (exponential >= 10)
           buf[i++] = static_cast<char>('0' + (exponential % 100) / 10);
-        }
         buf[i++] = static_cast<char>('0' + exponential % 10);
         buf[i++] = '\0';
       }
@@ -405,19 +402,18 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
         e = 0;
       }
 
-      if (e == p - 1) {
+      if (e == p - 1)
         return jsString(s + m);
-      } else if (e >= 0) {
+      else if (e >= 0) {
         if (e + 1 < m.size())
           return jsString(s + m.substr(0, e + 1) + "." + m.substr(e + 1));
         else
           return jsString(s + m.substr(0, e + 1));
-      } else {
-        return jsString(s + "0." + char_sequence('0', -(e + 1)) + m);
       }
+      return jsString(s + "0." + char_sequence('0', -(e + 1)) + m);
     }
   }
-  return NULL;
+  return 0;
 }
 
 // ------------------------------ NumberObjectImp ------------------------------
@@ -480,25 +476,19 @@ bool NumberObjectImp::implementsConstruct() const {
 // ECMA 15.7.1
 JSObject* NumberObjectImp::construct(ExecState* exec, const List& args) {
   JSObject* proto = exec->lexicalGlobalObject()->numberPrototype();
-  NumberInstance* obj(new NumberInstance(proto));
+  NumberInstance* obj = new NumberInstance(proto);
 
-  double n;
-  if (args.isEmpty())
-    n = 0;
-  else
-    n = args[0]->toNumber(exec);
-
+  double n = args.isEmpty() ? 0 : args[0]->toNumber(exec);
   obj->setInternalValue(jsNumber(n));
-
   return obj;
 }
 
 // ECMA 15.7.2
 JSValue* NumberObjectImp::callAsFunction(ExecState* exec,
-                                         JSObject* /*thisObj*/,
+                                         JSObject*,
                                          const List& args) {
-  if (args.isEmpty())
-    return jsNumber(0);
-  else
-    return jsNumber(args[0]->toNumber(exec));
+  double n = args.isEmpty() ? 0 : args[0]->toNumber(exec);
+  return jsNumber(n);
 }
+
+}  // namespace KJS
