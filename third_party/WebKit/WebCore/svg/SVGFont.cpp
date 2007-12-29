@@ -33,6 +33,10 @@
 
 namespace WebCore {
 
+static inline bool isVerticalWritingMode(const SVGRenderStyle* style) {
+  return style->writingMode() == WM_TBRL || style->writingMode() == WM_TB;
+}
+
 void Font::drawGlyphsWithSVGFont(GraphicsContext* context,
                                  RenderObject* renderObject,
                                  const FontData* fontData,
@@ -65,19 +69,25 @@ void Font::drawGlyphsWithSVGFont(GraphicsContext* context,
       fontFace->parentNode()->hasTagName(SVGNames::fontTag))
     static_cast<SVGFontElement*>(fontFace->parentNode())->collectGlyphs(*this);
 
-  FloatPoint startPoint = point;
+  float fontSize = size();
+  unsigned unitsPerEm = fontFace->unitsPerEm();
+  bool isVerticalText = isVerticalWritingMode(style->svgStyle());
 
   SVGPaintServer* fillPaintServer =
       SVGPaintServer::fillPaintServer(style, renderObject);
   SVGPaintServer* strokePaintServer =
       SVGPaintServer::strokePaintServer(style, renderObject);
 
+  FloatPoint startPoint = point;
   for (int i = from; i < to; ++i) {
     SVGGlyphIdentifier identifier =
         fontFace->glyphIdentifierForGlyphCode(glyphBuffer.glyphAt(i));
 
+    // TODO: Support arbitary SVG content as glyph (currently limited to <glyph
+    // d="..."> situations)
     if (!identifier.pathData.isEmpty()) {
-      float scale = size() / fontFace->unitsPerEm();
+      float scale = SVGFontData::convertEmUnitToPixel(
+          size(), fontFace->unitsPerEm(), 1.0f);
 
       AffineTransform ctm;
       ctm.translate(startPoint.x(), startPoint.y());
@@ -99,7 +109,16 @@ void Font::drawGlyphsWithSVGFont(GraphicsContext* context,
       }
 
       context->restore();
-      startPoint.move(glyphBuffer.advanceAt(i), 0);
+
+      if (isVerticalText)
+        startPoint.move(
+            0, SVGFontData::convertEmUnitToPixel(fontSize, unitsPerEm,
+                                                 identifier.verticalAdvanceY));
+      else
+        startPoint.move(
+            SVGFontData::convertEmUnitToPixel(fontSize, unitsPerEm,
+                                              identifier.horizontalAdvanceX),
+            0);
     }
   }
 }
