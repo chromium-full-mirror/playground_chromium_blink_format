@@ -27,7 +27,7 @@
 #include "GlyphPageTreeNode.h"
 #include "GlyphWidthMap.h"
 #include <wtf/Noncopyable.h>
-
+#include <wtf/OwnPtr.h>
 #include <wtf/unicode/Unicode.h>
 
 #if PLATFORM(MAC)
@@ -47,6 +47,22 @@ class WidthMap;
 
 #if ENABLE(SVG_FONTS)
 class SVGFontFaceElement;
+
+struct SVGFontData {
+  SVGFontData(SVGFontFaceElement*);
+
+  // Hold pointer to our creator
+  RefPtr<SVGFontFaceElement> fontFaceElement;
+
+  // SVG Font specific metrics
+  float horizontalOriginX;
+  float horizontalOriginY;
+  float horizontalAdvanceX;
+
+  float verticalOriginX;
+  float verticalOriginY;
+  float verticalAdvanceY;
+};
 #endif
 
 enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
@@ -81,8 +97,8 @@ class FontData : Noncopyable {
   }
 
 #if ENABLE(SVG_FONTS)
-  bool isSVGFont() const { return m_isSVGFont; }
-  SVGFontFaceElement* svgFontFace() const { return m_svgFontFace.get(); }
+  bool isSVGFont() const { return m_svgFontData; }
+  SVGFontData* svgFontData() const { return m_svgFontData.get(); }
 #endif
 
   bool isCustomFont() const { return m_isCustomFont; }
@@ -137,8 +153,7 @@ class FontData : Noncopyable {
   bool m_treatAsFixedPitch;
 
 #if ENABLE(SVG_FONTS)
-  bool m_isSVGFont;
-  RefPtr<SVGFontFaceElement> m_svgFontFace;
+  OwnPtr<SVGFontData> m_svgFontData;
 #endif
 
   bool m_isCustomFont;  // Whether or not we are custom font loaded via

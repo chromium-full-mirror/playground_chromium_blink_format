@@ -39,10 +39,6 @@ SVGFontElement::SVGFontElement(const QualifiedName& tagName, Document* doc)
 
 SVGFontElement::~SVGFontElement() {}
 
-void SVGFontElement::parseMappedAttribute(MappedAttribute* attr) {
-  SVGStyledElement::parseMappedAttribute(attr);
-}
-
 void SVGFontElement::collectGlyphs(const Font& font) {
   Vector<SVGGlyphElement*> glyphElements;
   SVGMissingGlyphElement* missingGlyphElement = 0;
