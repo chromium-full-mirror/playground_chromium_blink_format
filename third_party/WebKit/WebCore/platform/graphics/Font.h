@@ -46,6 +46,7 @@ class GlyphBuffer;
 class GlyphPageTreeNode;
 class GraphicsContext;
 class IntPoint;
+class RenderObject;
 
 struct GlyphData;
 
@@ -69,7 +70,13 @@ class TextRun {
         m_directionalOverride(directionalOverride),
         m_applyRunRounding(applyRunRounding),
         m_applyWordRounding(applyWordRounding),
-        m_disableSpacing(false) {}
+        m_disableSpacing(false)
+#if ENABLE(SVG_FONTS)
+        ,
+        m_referencingRenderObject(0)
+#endif
+  {
+  }
 
   TextRun(const String& s,
           bool allowTabs = false,
@@ -88,7 +95,13 @@ class TextRun {
         m_directionalOverride(directionalOverride),
         m_applyRunRounding(applyRunRounding),
         m_applyWordRounding(applyWordRounding),
-        m_disableSpacing(false) {}
+        m_disableSpacing(false)
+#if ENABLE(SVG_FONTS)
+        ,
+        m_referencingRenderObject(0)
+#endif
+  {
+  }
 
   const UChar operator[](int i) const { return m_characters[i]; }
   const UChar* data(int i) const { return &m_characters[i]; }
@@ -120,6 +133,15 @@ class TextRun {
     m_directionalOverride = override;
   }
 
+#if ENABLE(SVG_FONTS)
+  RenderObject* referencingRenderObject() const {
+    return m_referencingRenderObject;
+  }
+  void setReferencingRenderObject(RenderObject* object) {
+    m_referencingRenderObject = object;
+  }
+#endif
+
  private:
   const UChar* m_characters;
   int m_len;
@@ -132,6 +154,10 @@ class TextRun {
   bool m_applyRunRounding;
   bool m_applyWordRounding;
   bool m_disableSpacing;
+
+#if ENABLE(SVG_FONTS)
+  RenderObject* m_referencingRenderObject;
+#endif
 };
 
 class Font {
@@ -239,6 +265,15 @@ class Font {
                   int from,
                   int to,
                   const FloatPoint&) const;
+#if ENABLE(SVG_FONTS)
+  void drawGlyphsWithSVGFont(GraphicsContext*,
+                             RenderObject*,
+                             const FontData*,
+                             const GlyphBuffer&,
+                             int from,
+                             int to,
+                             const FloatPoint&) const;
+#endif
   void drawGlyphBuffer(GraphicsContext*,
                        const GlyphBuffer&,
                        const TextRun&,

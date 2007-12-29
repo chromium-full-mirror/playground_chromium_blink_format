@@ -31,10 +31,19 @@
 
 namespace WebCore {
 
+class SVGFontFaceElement;
+
 class CSSFontFaceSrcValue : public CSSValue {
  public:
   CSSFontFaceSrcValue(const String& resource, bool local)
-      : m_resource(resource), m_isLocal(local) {}
+      : m_resource(resource),
+        m_isLocal(local)
+#if ENABLE(SVG_FONTS)
+        ,
+        m_fontFaceElement(0)
+#endif
+  {
+  }
   virtual ~CSSFontFaceSrcValue(){};
 
   const String& resource() const { return m_resource; }
@@ -45,12 +54,22 @@ class CSSFontFaceSrcValue : public CSSValue {
 
   bool isSupportedFormat() const;
 
+#if ENABLE(SVG_FONTS)
+  SVGFontFaceElement* svgFontFaceElement() const { return m_fontFaceElement; }
+  void setSVGFontFaceElement(SVGFontFaceElement* element) {
+    m_fontFaceElement = element;
+  }
+#endif
+
   virtual String cssText() const;
 
  private:
   String m_resource;
   String m_format;
   bool m_isLocal;
+#if ENABLE(SVG_FONTS)
+  SVGFontFaceElement* m_fontFaceElement;
+#endif
 };
 }
 

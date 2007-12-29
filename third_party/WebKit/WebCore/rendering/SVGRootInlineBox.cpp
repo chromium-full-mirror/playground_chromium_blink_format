@@ -696,6 +696,10 @@ TextRun svgTextRunForInlineTextBox(const UChar* c,
               textBox->m_reversed,
               textBox->m_dirOverride || style->visuallyOrdered());
 
+#if ENABLE(SVG_FONTS)
+  run.setReferencingRenderObject(textBox->textObject()->parent());
+#endif
+
   // We handle letter & word spacing ourselves
   run.disableSpacing();
   return run;

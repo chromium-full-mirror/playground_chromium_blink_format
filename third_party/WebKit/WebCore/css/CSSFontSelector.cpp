@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 Apple Inc. All rights reserved.
+ *           (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,9 +25,10 @@
  */
 
 #include "config.h"
-#include "CSSFontSelector.h"
 
+#include "CSSFontSelector.h"
 #include "AtomicString.h"
+#include "CString.h"
 #include "CSSFontFace.h"
 #include "CSSFontFaceRule.h"
 #include "CSSFontFaceSource.h"
@@ -43,6 +45,13 @@
 #include "Frame.h"
 #include "RenderObject.h"
 #include "Settings.h"
+
+#if ENABLE(SVG_FONTS)
+#include "NodeList.h"
+#include "SVGCSSFontFace.h"
+#include "SVGFontFaceElement.h"
+#include "SVGNames.h"
+#endif
 
 namespace WebCore {
 
@@ -117,17 +126,31 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 
   // Each item in the src property's list is a single CSSFontFaceSource. Put
   // them all into a CSSFontFace.
-  CSSFontFace* fontFace = new CSSFontFace(this);
+  CSSFontFace* fontFace = 0;
 
   int i;
   int srcLength = srcList->length();
+
   bool foundLocal = false;
+
+#if ENABLE(SVG_FONTS)
+  SVGFontFaceElement* svgFontFaceElement = 0;
+#endif
+
   for (i = 0; i < srcLength; i++) {
     // An item in the list either specifies a string (local font name) or a URL
     // (remote font to download).
     CSSFontFaceSrcValue* item =
         static_cast<CSSFontFaceSrcValue*>(srcList->item(i));
     CSSFontFaceSource* source = 0;
+
+#if ENABLE(SVG_FONTS)
+    // SVG Fonts support (internal fonts, living within the document)
+    svgFontFaceElement = item->svgFontFaceElement();
+    if (svgFontFaceElement)
+      break;
+#endif
+
     if (!item->isLocal()) {
       if (item->isSupportedFormat()) {
         CachedFont* cachedFont =
@@ -147,6 +170,9 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
       }
     }
 
+    if (!fontFace)
+      fontFace = new CSSFontFace(this);
+
     if (source)
       fontFace->addSource(source);
 
@@ -155,7 +181,13 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
       break;
   }
 
-  if (!fontFace->isValid()) {
+#if ENABLE(SVG_FONTS)
+  ASSERT(fontFace || svgFontFaceElement);
+#else
+  ASSERT(fontFace);
+#endif
+
+  if (fontFace && !fontFace->isValid()) {
     delete fontFace;
     return;
   }
@@ -194,10 +226,19 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
       }
     }
 
-    if (!familyName.isEmpty())
-      m_fonts.set(hashForFont(familyName.lower(), fontDescription.bold(),
-                              fontDescription.italic()),
-                  fontFace);
+    if (familyName.isEmpty())
+      continue;
+
+#if ENABLE(SVG_FONTS)
+    if (svgFontFaceElement) {
+      ASSERT(svgFontFaceElement->fontFamily() == familyName);
+      fontFace = new SVGCSSFontFace(this, svgFontFaceElement);
+    }
+#endif
+
+    m_fonts.set(hashForFont(familyName.lower(), fontDescription.bold(),
+                            fontDescription.italic()),
+                fontFace);
   }
 }
 
