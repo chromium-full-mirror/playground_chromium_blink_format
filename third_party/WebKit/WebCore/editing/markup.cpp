@@ -987,7 +987,8 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(Document* document,
 
   RefPtr<DocumentFragment> fragment = element->createContextualFragment(markup);
 
-  if (fragment && !baseURL.isEmpty() && baseURL != document->baseURL())
+  if (fragment && !baseURL.isEmpty() && baseURL != "about:blank" &&
+      baseURL != document->baseURL())
     completeURLs(fragment.get(), baseURL);
 
   return fragment.release();
