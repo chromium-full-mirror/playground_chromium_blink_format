@@ -44,4 +44,4 @@ class NodeList : public RefCounted<NodeList> {
 
 }  // namespace WebCore
 
-#endif NodeList_h
+#endif  // NodeList_h
