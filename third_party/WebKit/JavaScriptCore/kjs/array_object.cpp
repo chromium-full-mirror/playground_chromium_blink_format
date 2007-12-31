@@ -160,22 +160,15 @@ JSValue* ArrayProtoFuncToLocaleString::callAsFunction(ExecState* exec,
     if (element->isUndefinedOrNull())
       continue;
 
-    bool fallback = false;
     JSObject* o = element->toObject(exec);
     JSValue* conversionFunction =
         o->get(exec, exec->propertyNames().toLocaleString);
     if (conversionFunction->isObject() &&
-        static_cast<JSObject*>(conversionFunction)->implementsCall()) {
-      List args;
+        static_cast<JSObject*>(conversionFunction)->implementsCall())
       str += static_cast<JSObject*>(conversionFunction)
-                 ->call(exec, o, args)
+                 ->call(exec, o, List::empty())
                  ->toString(exec);
-    } else {
-      // try toString() fallback
-      fallback = true;
-    }
-
-    if (fallback)
+    else
       str += element->toString(exec);
 
     if (str.isNull()) {
@@ -247,7 +240,7 @@ JSValue* ArrayProtoFuncConcat::callAsFunction(ExecState* exec,
   List::const_iterator end = args.end();
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
-  for (;;) {
+  while (1) {
     if (curArg->isObject() && curObj->inherits(&ArrayInstance::info)) {
       unsigned int k = 0;
       // Older versions tried to optimize out getting the length of thisObj
@@ -409,30 +402,25 @@ JSValue* ArrayProtoFuncSlice::callAsFunction(ExecState* exec,
 JSValue* ArrayProtoFuncSort::callAsFunction(ExecState* exec,
                                             JSObject* thisObj,
                                             const List& args) {
-#if 0
-    printf("KJS Array::Sort length=%d\n", length);
-    for (unsigned int i = 0 ; i<length ; ++i)
-        printf("KJS Array::Sort: %d: %s\n", i, thisObj->get(exec, i)->toString(exec).ascii());
-#endif
-  JSObject* sortFunction = NULL;
+  JSObject* sortFunction = 0;
   if (!args[0]->isUndefined()) {
     sortFunction = args[0]->toObject(exec);
     if (!sortFunction->implementsCall())
-      sortFunction = NULL;
+      sortFunction = 0;
   }
 
   if (thisObj->classInfo() == &ArrayInstance::info) {
     if (sortFunction)
-      ((ArrayInstance*)thisObj)->sort(exec, sortFunction);
+      static_cast<ArrayInstance*>(thisObj)->sort(exec, sortFunction);
     else
-      ((ArrayInstance*)thisObj)->sort(exec);
+      static_cast<ArrayInstance*>(thisObj)->sort(exec);
     return thisObj;
   }
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
 
-  if (length == 0) {
+  if (!length) {
     thisObj->put(exec, exec->propertyNames().length, jsNumber(0),
                  DontEnum | DontDelete);
     return thisObj;
@@ -446,38 +434,33 @@ JSValue* ArrayProtoFuncSort::callAsFunction(ExecState* exec,
     JSValue* minObj = iObj;
     for (unsigned int j = i + 1; j < length; ++j) {
       JSValue* jObj = thisObj->get(exec, j);
-      double cmp;
-      if (jObj->isUndefined()) {
-        cmp = 1;  // don't check minObj because there's no need to differentiate
-                  // == (0) from > (1)
-      } else if (minObj->isUndefined()) {
-        cmp = -1;
-      } else if (sortFunction) {
+      double compareResult;
+      if (jObj->isUndefined())
+        compareResult = 1;  // don't check minObj because there's no need to
+                            // differentiate == (0) from > (1)
+      else if (minObj->isUndefined())
+        compareResult = -1;
+      else if (sortFunction) {
         List l;
         l.append(jObj);
         l.append(minObj);
-        cmp = sortFunction->call(exec, exec->dynamicGlobalObject(), l)
-                  ->toNumber(exec);
-      } else {
-        cmp = (jObj->toString(exec) < minObj->toString(exec)) ? -1 : 1;
-      }
-      if (cmp < 0) {
+        compareResult = sortFunction->call(exec, exec->dynamicGlobalObject(), l)
+                            ->toNumber(exec);
+      } else
+        compareResult =
+            (jObj->toString(exec) < minObj->toString(exec)) ? -1 : 1;
+
+      if (compareResult < 0) {
         themin = j;
         minObj = jObj;
       }
     }
     // Swap themin and i
     if (themin > i) {
-      // printf("KJS Array::Sort: swapping %d and %d\n", i, themin);
       thisObj->put(exec, i, minObj);
       thisObj->put(exec, themin, iObj);
     }
   }
-#if 0
-    printf("KJS Array::Sort -- Resulting array:\n");
-    for (unsigned int i = 0 ; i<length ; ++i)
-        printf("KJS Array::Sort: %d: %s\n", i, thisObj->get(exec, i)->toString(exec).ascii());
-#endif
   return thisObj;
 }
 
@@ -527,9 +510,9 @@ JSValue* ArrayProtoFuncSplice::callAsFunction(ExecState* exec,
       }
     }
   }
-  for (unsigned int k = 0; k < additionalArgs; ++k) {
+  for (unsigned int k = 0; k < additionalArgs; ++k)
     thisObj->put(exec, k + begin, args[k + 2]);
-  }
+
   thisObj->put(exec, exec->propertyNames().length,
                jsNumber(length - deleteCount + additionalArgs),
                DontEnum | DontDelete);
