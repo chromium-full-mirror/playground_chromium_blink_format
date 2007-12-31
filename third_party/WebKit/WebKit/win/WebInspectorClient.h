@@ -66,6 +66,7 @@ class WebInspectorClient : public WebCore::InspectorClient {
 
   void updateWindowTitle();
 
+  LRESULT onGetMinMaxInfo(WPARAM, LPARAM);
   LRESULT onSize(WPARAM, LPARAM);
   LRESULT onClose(WPARAM, LPARAM);
 

@@ -266,6 +266,14 @@ void WebInspectorClient::updateWindowTitle() {
   ::SetWindowText(m_hwnd, title.charactersWithNullTermination());
 }
 
+LRESULT WebInspectorClient::onGetMinMaxInfo(WPARAM, LPARAM lParam) {
+  MINMAXINFO* info = reinterpret_cast<MINMAXINFO*>(lParam);
+  POINT size = {400, 400};
+  info->ptMinTrackSize = size;
+
+  return 0;
+}
+
 LRESULT WebInspectorClient::onSize(WPARAM, LPARAM) {
   RECT rect;
   ::GetClientRect(m_hwnd, &rect);
@@ -310,6 +318,8 @@ static LRESULT CALLBACK WebInspectorWndProc(HWND hwnd,
     return ::DefWindowProc(hwnd, msg, wParam, lParam);
 
   switch (msg) {
+    case WM_GETMINMAXINFO:
+      return client->onGetMinMaxInfo(wParam, lParam);
     case WM_SIZE:
       return client->onSize(wParam, lParam);
     case WM_CLOSE:
