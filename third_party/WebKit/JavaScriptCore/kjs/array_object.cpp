@@ -411,8 +411,8 @@ JSValue* ArrayProtoFuncSort::callAsFunction(ExecState* exec,
                                             const List& args) {
 #if 0
     printf("KJS Array::Sort length=%d\n", length);
-    for ( unsigned int i = 0 ; i<length ; ++i )
-      printf("KJS Array::Sort: %d: %s\n", i, thisObj->get(exec, i)->toString(exec).ascii() );
+    for (unsigned int i = 0 ; i<length ; ++i)
+        printf("KJS Array::Sort: %d: %s\n", i, thisObj->get(exec, i)->toString(exec).ascii());
 #endif
   JSObject* sortFunction = NULL;
   if (!args[0]->isUndefined()) {
@@ -468,15 +468,15 @@ JSValue* ArrayProtoFuncSort::callAsFunction(ExecState* exec,
     }
     // Swap themin and i
     if (themin > i) {
-      // printf("KJS Array::Sort: swapping %d and %d\n", i, themin );
+      // printf("KJS Array::Sort: swapping %d and %d\n", i, themin);
       thisObj->put(exec, i, minObj);
       thisObj->put(exec, themin, iObj);
     }
   }
 #if 0
     printf("KJS Array::Sort -- Resulting array:\n");
-    for ( unsigned int i = 0 ; i<length ; ++i )
-      printf("KJS Array::Sort: %d: %s\n", i, thisObj->get(exec, i)->toString(exec).ascii() );
+    for (unsigned int i = 0 ; i<length ; ++i)
+        printf("KJS Array::Sort: %d: %s\n", i, thisObj->get(exec, i)->toString(exec).ascii());
 #endif
   return thisObj;
 }
