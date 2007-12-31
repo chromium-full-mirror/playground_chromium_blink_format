@@ -148,6 +148,8 @@ class Window : public JSGlobalObject {
     return allowsAccessFrom(exec->dynamicGlobalObject());
   }
 
+  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+
   enum {
     // Attributes
     Crypto,
