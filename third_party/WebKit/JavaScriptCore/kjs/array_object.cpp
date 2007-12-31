@@ -32,6 +32,8 @@
 #include <wtf/Assertions.h>
 #include <wtf/HashSet.h>
 
+#include <algorithm>  // for std::min
+
 namespace KJS {
 
 // ------------------------------ ArrayPrototype ----------------------------
@@ -482,7 +484,7 @@ JSValue* ArrayProtoFuncSort::callAsFunction(ExecState* exec,
 JSValue* ArrayProtoFuncSplice::callAsFunction(ExecState* exec,
                                               JSObject* thisObj,
                                               const List& args) {
-  // 15.4.4.12 - oh boy this is huge
+  // 15.4.4.12
   JSObject* resObj = static_cast<JSObject*>(
       exec->lexicalGlobalObject()->arrayConstructor()->construct(
           exec, List::empty()));
@@ -491,13 +493,12 @@ JSValue* ArrayProtoFuncSplice::callAsFunction(ExecState* exec,
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   int begin = args[0]->toUInt32(exec);
   if (begin < 0)
-    begin = maxInt(begin + length, 0);
+    begin = std::max<int>(begin + length, 0);
   else
-    begin = minInt(begin, length);
+    begin = std::min<int>(begin, length);
   unsigned int deleteCount =
-      minInt(maxInt(args[1]->toUInt32(exec), 0), length - begin);
+      std::min<int>(std::max<int>(args[1]->toUInt32(exec), 0), length - begin);
 
-  // printf( "Splicing from %d, deleteCount=%d \n", begin, deleteCount );
   for (unsigned int k = 0; k < deleteCount; k++) {
     if (JSValue* v = getProperty(exec, thisObj, k + begin))
       resObj->put(exec, k, v);
@@ -505,7 +506,7 @@ JSValue* ArrayProtoFuncSplice::callAsFunction(ExecState* exec,
   resObj->put(exec, exec->propertyNames().length, jsNumber(deleteCount),
               DontEnum | DontDelete);
 
-  unsigned int additionalArgs = maxInt(args.size() - 2, 0);
+  unsigned int additionalArgs = std::max<int>(args.size() - 2, 0);
   if (additionalArgs != deleteCount) {
     if (additionalArgs < deleteCount) {
       for (unsigned int k = begin; k < length - deleteCount; ++k) {
