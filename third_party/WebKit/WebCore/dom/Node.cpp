@@ -785,6 +785,22 @@ void Node::dump(TextStream* stream, DeprecatedString ind) const {
 void Node::attach() {
   ASSERT(!attached());
   ASSERT(!renderer() || (renderer()->style() && renderer()->parent()));
+
+  // If this node got a renderer it may be the previousRenderer() of sibling
+  // text nodes and thus affect the
+  // result of Text::rendererIsNeeded() for those nodes.
+  if (renderer()) {
+    for (Node* next = nextSibling(); next; next = next->nextSibling()) {
+      if (next->renderer())
+        break;
+      if (!next->attached())
+        break;  // Assume this means none of the following siblings are
+                // attached.
+      if (next->isTextNode())
+        next->createRendererIfNeeded();
+    }
+  }
+
   m_attached = true;
 }
 
@@ -946,7 +962,6 @@ void Node::createRendererIfNeeded() {
   if (!document()->shouldCreateRenderers())
     return;
 
-  ASSERT(!attached());
   ASSERT(!renderer());
 
   Node* parent = parentNode();
