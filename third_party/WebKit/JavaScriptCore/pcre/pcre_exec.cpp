@@ -66,6 +66,14 @@ typedef int ReturnLocation;
 typedef void* ReturnLocation;
 #endif
 
+/* Structure for building a chain of data for holding the values of
+the subject pointer at the start of each bracket, used to detect when
+an empty string has been matched by a bracket to break infinite loops. */
+struct BracketChainNode {
+  BracketChainNode* previousBracket;
+  const UChar* bracketStart;
+};
+
 struct MatchFrame {
   ReturnLocation returnLocation;
   struct MatchFrame* previousFrame;
@@ -75,7 +83,7 @@ struct MatchFrame {
     const UChar* subjectPtr;
     const unsigned char* instructionPtr;
     int offsetTop;
-    const UChar* subpatternStart;
+    BracketChainNode* bracketChain;
   } args;
 
   /* PCRE uses "fake" recursion built off of gotos, thus
@@ -102,7 +110,7 @@ struct MatchFrame {
     int saveOffset2;
     int saveOffset3;
 
-    const UChar* subpatternStart;
+    BracketChainNode bracketChainNode;
   } locals;
 };
 
@@ -321,7 +329,7 @@ struct MatchStack {
   }
 
   inline void pushNewFrame(const unsigned char* instructionPtr,
-                           const UChar* subpatternStart,
+                           BracketChainNode* bracketChain,
                            ReturnLocation returnLocation) {
     MatchFrame* newframe = allocateNextFrame();
     newframe->previousFrame = currentFrame;
@@ -329,7 +337,7 @@ struct MatchStack {
     newframe->args.subjectPtr = currentFrame->args.subjectPtr;
     newframe->args.offsetTop = currentFrame->args.offsetTop;
     newframe->args.instructionPtr = instructionPtr;
-    newframe->args.subpatternStart = subpatternStart;
+    newframe->args.bracketChain = bracketChain;
     newframe->returnLocation = returnLocation;
     size++;
 
@@ -382,7 +390,11 @@ static inline void startNewGroup(MatchFrame* currentFrame) {
    to
    this stack. */
 
-  currentFrame->locals.subpatternStart = currentFrame->args.subpatternStart;
+  currentFrame->locals.bracketChainNode.previousBracket =
+      currentFrame->args.bracketChain;
+  currentFrame->locals.bracketChainNode.bracketStart =
+      currentFrame->args.subjectPtr;
+  currentFrame->args.bracketChain = &currentFrame->locals.bracketChainNode;
 }
 
 // FIXME: "minimize" means "not greedy", we should invert the callers to ask for
@@ -445,7 +457,7 @@ static int match(const UChar* subjectPtr,
   stack.currentFrame->args.subjectPtr = subjectPtr;
   stack.currentFrame->args.instructionPtr = instructionPtr;
   stack.currentFrame->args.offsetTop = offsetTop;
-  stack.currentFrame->args.subpatternStart = 0;
+  stack.currentFrame->args.bracketChain = 0;
   startNewGroup(stack.currentFrame);
 
 /* This is where control jumps back to to effect "recursion" */
@@ -483,7 +495,7 @@ RECURSE:
       do {
         RECURSIVE_MATCH_STARTNG_NEW_GROUP(
             2, stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE,
-            stack.currentFrame->args.subpatternStart);
+            stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
         stack.currentFrame->args.instructionPtr +=
@@ -570,7 +582,7 @@ RECURSE:
             stack.currentFrame->args.instructionPtr + 1;
         RECURSIVE_MATCH_STARTNG_NEW_GROUP(
             14, stack.currentFrame->locals.startOfRepeatingBracket,
-            stack.currentFrame->args.subpatternStart);
+            stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
         advanceToEndOfBracket(
@@ -588,7 +600,7 @@ RECURSE:
         RECURSIVE_MATCH_STARTNG_NEW_GROUP(
             15,
             stack.currentFrame->locals.startOfRepeatingBracket + 1 + LINK_SIZE,
-            stack.currentFrame->args.subpatternStart);
+            stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
         stack.currentFrame->args.instructionPtr++;
@@ -606,10 +618,13 @@ RECURSE:
           : stack.currentFrame->locals.instructionPtrAtStartOfOnce =
           stack.currentFrame->args.instructionPtr -
           getLinkValue(stack.currentFrame->args.instructionPtr + 1);
-      stack.currentFrame->args.subpatternStart =
-          stack.currentFrame->locals.subpatternStart;
-      stack.currentFrame->locals.subpatternStart =
-          stack.currentFrame->previousFrame->args.subpatternStart;
+      stack.currentFrame->locals.subjectPtrAtStartOfInstruction =
+          stack.currentFrame->args.bracketChain->bracketStart;
+
+      /* Back up the stack of bracket start pointers. */
+
+      stack.currentFrame->args.bracketChain =
+          stack.currentFrame->args.bracketChain->previousBracket;
 
       if (*stack.currentFrame->locals.instructionPtrAtStartOfOnce ==
               OP_ASSERT ||
@@ -681,23 +696,23 @@ RECURSE:
       if (*stack.currentFrame->args.instructionPtr == OP_KETRMIN) {
         RECURSIVE_MATCH(16,
                         stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE,
-                        stack.currentFrame->args.subpatternStart);
+                        stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
         RECURSIVE_MATCH_STARTNG_NEW_GROUP(
             17, stack.currentFrame->locals.instructionPtrAtStartOfOnce,
-            stack.currentFrame->args.subpatternStart);
+            stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
       } else { /* OP_KETRMAX */
         RECURSIVE_MATCH_STARTNG_NEW_GROUP(
             18, stack.currentFrame->locals.instructionPtrAtStartOfOnce,
-            stack.currentFrame->args.subpatternStart);
+            stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
         RECURSIVE_MATCH(19,
                         stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE,
-                        stack.currentFrame->args.subpatternStart);
+                        stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
       }
@@ -897,7 +912,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RECURSIVE_MATCH(20, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -927,7 +942,7 @@ RECURSE:
         while (stack.currentFrame->args.subjectPtr >=
                stack.currentFrame->locals.subjectPtrAtStartOfInstruction) {
           RECURSIVE_MATCH(21, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           stack.currentFrame->args.subjectPtr -=
@@ -1012,7 +1027,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RECURSIVE_MATCH(22, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1049,7 +1064,7 @@ RECURSE:
         }
         for (;;) {
           RECURSIVE_MATCH(24, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           if (stack.currentFrame->args.subjectPtr-- ==
@@ -1122,7 +1137,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RECURSIVE_MATCH(26, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1150,7 +1165,7 @@ RECURSE:
         }
         for (;;) {
           RECURSIVE_MATCH(27, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           if (stack.currentFrame->args.subjectPtr-- ==
@@ -1285,7 +1300,7 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             RECURSIVE_MATCH(28, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             if (stack.currentFrame->locals.fi >=
@@ -1315,7 +1330,7 @@ RECURSE:
           while (stack.currentFrame->args.subjectPtr >=
                  stack.currentFrame->locals.subjectPtrAtStartOfInstruction) {
             RECURSIVE_MATCH(29, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             --stack.currentFrame->args.subjectPtr;
@@ -1340,7 +1355,7 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             RECURSIVE_MATCH(30, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             if (stack.currentFrame->locals.fi >=
@@ -1367,7 +1382,7 @@ RECURSE:
           while (stack.currentFrame->args.subjectPtr >=
                  stack.currentFrame->locals.subjectPtrAtStartOfInstruction) {
             RECURSIVE_MATCH(31, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             stack.currentFrame->args.subjectPtr -= 2;
@@ -1471,7 +1486,7 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             RECURSIVE_MATCH(38, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             int d = *stack.currentFrame->args.subjectPtr++;
@@ -1504,7 +1519,7 @@ RECURSE:
           }
           for (;;) {
             RECURSIVE_MATCH(40, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             if (stack.currentFrame->args.subjectPtr-- ==
@@ -1533,7 +1548,7 @@ RECURSE:
           for (stack.currentFrame->locals.fi = min;;
                stack.currentFrame->locals.fi++) {
             RECURSIVE_MATCH(42, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             int d = *stack.currentFrame->args.subjectPtr++;
@@ -1562,7 +1577,7 @@ RECURSE:
           }
           for (;;) {
             RECURSIVE_MATCH(44, stack.currentFrame->args.instructionPtr,
-                            stack.currentFrame->args.subpatternStart);
+                            stack.currentFrame->args.bracketChain);
             if (isMatch)
               RRETURN;
             if (stack.currentFrame->args.subjectPtr-- ==
@@ -1696,7 +1711,7 @@ RECURSE:
         for (stack.currentFrame->locals.fi = min;;
              stack.currentFrame->locals.fi++) {
           RECURSIVE_MATCH(48, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           if (stack.currentFrame->locals.fi >= stack.currentFrame->locals.max ||
@@ -1841,7 +1856,7 @@ RECURSE:
 
         for (;;) {
           RECURSIVE_MATCH(52, stack.currentFrame->args.instructionPtr,
-                          stack.currentFrame->args.subpatternStart);
+                          stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           if (stack.currentFrame->args.subjectPtr-- ==
@@ -1927,7 +1942,7 @@ RECURSE:
         do {
           RECURSIVE_MATCH_STARTNG_NEW_GROUP(
               1, stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE,
-              stack.currentFrame->args.subpatternStart);
+              stack.currentFrame->args.bracketChain);
           if (isMatch)
             RRETURN;
           stack.currentFrame->args.instructionPtr +=
