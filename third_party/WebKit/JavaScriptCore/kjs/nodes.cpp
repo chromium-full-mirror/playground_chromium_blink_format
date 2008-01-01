@@ -44,6 +44,15 @@
 
 namespace KJS {
 
+class FunctionBodyNodeWithDebuggerHooks : public FunctionBodyNode {
+ public:
+  FunctionBodyNodeWithDebuggerHooks(SourceElements*,
+                                    DeclarationStacks::VarStack*,
+                                    DeclarationStacks::FunctionStack*)
+      KJS_FAST_CALL;
+  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+};
+
 #define KJS_CHECKEXCEPTION  \
   if (exec->hadException()) \
     return rethrowException(exec);
@@ -4184,15 +4193,36 @@ ProgramNode::ProgramNode(SourceElements* children,
                          DeclarationStacks::FunctionStack* funcStack)
     : ScopeNode(children, varStack, funcStack) {}
 
+ProgramNode* ProgramNode::create(SourceElements* children,
+                                 DeclarationStacks::VarStack* varStack,
+                                 DeclarationStacks::FunctionStack* funcStack) {
+  return new ProgramNode(children, varStack, funcStack);
+}
+
 EvalNode::EvalNode(SourceElements* children,
                    DeclarationStacks::VarStack* varStack,
                    DeclarationStacks::FunctionStack* funcStack)
     : ScopeNode(children, varStack, funcStack) {}
 
+EvalNode* EvalNode::create(SourceElements* children,
+                           DeclarationStacks::VarStack* varStack,
+                           DeclarationStacks::FunctionStack* funcStack) {
+  return new EvalNode(children, varStack, funcStack);
+}
+
 FunctionBodyNode::FunctionBodyNode(SourceElements* children,
                                    DeclarationStacks::VarStack* varStack,
                                    DeclarationStacks::FunctionStack* funcStack)
     : ScopeNode(children, varStack, funcStack), m_initialized(false) {}
+
+FunctionBodyNode* FunctionBodyNode::create(
+    SourceElements* children,
+    DeclarationStacks::VarStack* varStack,
+    DeclarationStacks::FunctionStack* funcStack) {
+  if (Debugger::debuggersPresent)
+    return new FunctionBodyNodeWithDebuggerHooks(children, varStack, funcStack);
+  return new FunctionBodyNode(children, varStack, funcStack);
+}
 
 void FunctionBodyNode::initializeSymbolTable(ExecState* exec) {
   SymbolTable& symbolTable = exec->variableObject()->symbolTable();
@@ -4433,7 +4463,19 @@ JSValue* EvalNode::execute(ExecState* exec) {
 
 JSValue* FunctionBodyNode::execute(ExecState* exec) {
   processDeclarations(exec);
+  return ScopeNode::execute(exec);
+}
 
+// ------------------------------ FunctionBodyNodeWithDebuggerHooks
+// ---------------------------------
+
+FunctionBodyNodeWithDebuggerHooks::FunctionBodyNodeWithDebuggerHooks(
+    SourceElements* children,
+    DeclarationStacks::VarStack* varStack,
+    DeclarationStacks::FunctionStack* funcStack)
+    : FunctionBodyNode(children, varStack, funcStack) {}
+
+JSValue* FunctionBodyNodeWithDebuggerHooks::execute(ExecState* exec) {
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (!dbg->callEvent(exec, sourceId(), lineNo(), exec->function(),
                         *exec->arguments())) {
@@ -4442,7 +4484,7 @@ JSValue* FunctionBodyNode::execute(ExecState* exec) {
     }
   }
 
-  JSValue* result = ScopeNode::execute(exec);
+  JSValue* result = FunctionBodyNode::execute(exec);
 
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (exec->completionType() == Throw)
