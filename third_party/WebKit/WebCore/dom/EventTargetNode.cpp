@@ -112,6 +112,8 @@ bool EventTargetNode::dispatchEvent(PassRefPtr<Event> e,
 bool EventTargetNode::dispatchSubtreeModifiedEvent(bool sendChildrenChanged) {
   ASSERT(!eventDispatchForbidden());
 
+  document()->incDOMTreeVersion();
+
   // FIXME: Pull this whole if clause out of this function.
   if (sendChildrenChanged) {
     notifyNodeListsChildrenChanged();

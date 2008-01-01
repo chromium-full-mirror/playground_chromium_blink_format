@@ -321,7 +321,6 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
     child = nextChild.release();
   }
 
-  // ### set style in case it's attached
   document()->setDocumentChanged(true);
   dispatchSubtreeModifiedEvent();
   return true;
@@ -576,6 +575,7 @@ ContainerNode* ContainerNode::addChild(PassRefPtr<Node> newChild) {
   m_lastChild = newChild.get();
   allowEventDispatch();
 
+  document()->incDOMTreeVersion();
   if (inDocument())
     newChild->insertedIntoDocument();
   if (document()->hasNodeLists())

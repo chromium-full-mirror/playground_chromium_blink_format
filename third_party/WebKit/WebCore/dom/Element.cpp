@@ -428,8 +428,7 @@ void Element::setAttribute(const String& name,
     return;
   }
 
-  if (inDocument())
-    document()->incDOMTreeVersion();
+  document()->incDOMTreeVersion();
 
   if (localName == idAttr.localName())
     updateId(old ? old->value() : nullAtom, value);
@@ -448,8 +447,7 @@ void Element::setAttribute(const String& name,
 void Element::setAttribute(const QualifiedName& name,
                            StringImpl* value,
                            ExceptionCode& ec) {
-  if (inDocument())
-    document()->incDOMTreeVersion();
+  document()->incDOMTreeVersion();
 
   // allocate attributemap if necessary
   Attribute* old = attributes(false)->getAttributeItem(name);
@@ -479,8 +477,7 @@ Attribute* Element::createAttribute(const QualifiedName& name,
 }
 
 void Element::setAttributeMap(NamedAttrMap* list) {
-  if (inDocument())
-    document()->incDOMTreeVersion();
+  document()->incDOMTreeVersion();
 
   // If setting the whole map changes the id attribute, we need to call
   // updateId.
