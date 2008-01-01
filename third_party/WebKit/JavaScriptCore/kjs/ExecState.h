@@ -39,11 +39,14 @@ enum CodeType {
 
 class ActivationImp;
 class CommonIdentifiers;
+class EvalNode;
+class FunctionBodyNode;
 class FunctionImp;
 class GlobalFuncImp;
 class Interpreter;
 class JSGlobalObject;
 class JSVariableObject;
+class ProgramNode;
 class ScopeChain;
 class ScopeNode;
 struct LocalStorageEntry;
@@ -106,11 +109,10 @@ class ExecState {
 
   void mark();
 
-  // This is a workaround to avoid accessing the global variables for these
-  // identifiers in
-  // important property lookup functions, to avoid taking PIC branches in Mach-O
-  // binaries
+  // These pointers are used to avoid accessing global variables for these,
+  // to avoid taking PIC branches in Mach-O binaries.
   const CommonIdentifiers& propertyNames() const { return *m_propertyNames; }
+  const List& emptyList() const { return *m_emptyList; }
 
   LocalStorage& localStorage() { return *m_localStorage; }
 
@@ -167,15 +169,14 @@ class ExecState {
     return 0;
   }
 
- public:
-  ExecState(JSGlobalObject* glob,
-            JSObject* thisV,
-            ScopeNode* scopeNode,
-            CodeType type = GlobalCode,
-            ExecState* callingExecState = 0,
-            ExecState* currentExec = 0,
-            FunctionImp* function = 0,
-            const List* args = 0);
+  ExecState(JSGlobalObject*, JSObject* thisObject, ProgramNode*);
+  ExecState(JSGlobalObject*, EvalNode*, ExecState* callingExecState);
+  ExecState(JSGlobalObject*,
+            JSObject* thisObject,
+            FunctionBodyNode*,
+            ExecState* callingExecState,
+            FunctionImp*,
+            const List& args);
   ~ExecState();
 
  private:
@@ -185,6 +186,7 @@ class ExecState {
   JSGlobalObject* m_globalObject;
   JSValue* m_exception;
   CommonIdentifiers* m_propertyNames;
+  const List* m_emptyList;
 
   ExecState* m_callingExec;
   ExecState* m_savedExec;

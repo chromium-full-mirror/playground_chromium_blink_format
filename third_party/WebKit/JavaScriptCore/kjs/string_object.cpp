@@ -775,7 +775,7 @@ JSValue* StringProtoFuncSplit::callAsFunction(ExecState* exec,
 
   JSObject* constructor = exec->lexicalGlobalObject()->arrayConstructor();
   JSObject* res =
-      static_cast<JSObject*>(constructor->construct(exec, List::empty()));
+      static_cast<JSObject*>(constructor->construct(exec, exec->emptyList()));
   JSValue* result = res;
   UString u = s;
   int pos;

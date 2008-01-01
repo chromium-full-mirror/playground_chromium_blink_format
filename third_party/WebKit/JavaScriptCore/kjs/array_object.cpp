@@ -166,7 +166,7 @@ JSValue* ArrayProtoFuncToLocaleString::callAsFunction(ExecState* exec,
     if (conversionFunction->isObject() &&
         static_cast<JSObject*>(conversionFunction)->implementsCall())
       str += static_cast<JSObject*>(conversionFunction)
-                 ->call(exec, o, List::empty())
+                 ->call(exec, o, exec->emptyList())
                  ->toString(exec);
     else
       str += element->toString(exec);
@@ -232,7 +232,7 @@ JSValue* ArrayProtoFuncConcat::callAsFunction(ExecState* exec,
                                               const List& args) {
   JSObject* arr = static_cast<JSObject*>(
       exec->lexicalGlobalObject()->arrayConstructor()->construct(
-          exec, List::empty()));
+          exec, exec->emptyList()));
   int n = 0;
   JSValue* curArg = thisObj;
   JSObject* curObj = static_cast<JSObject*>(thisObj);
@@ -359,7 +359,7 @@ JSValue* ArrayProtoFuncSlice::callAsFunction(ExecState* exec,
   // We return a new array
   JSObject* resObj = static_cast<JSObject*>(
       exec->lexicalGlobalObject()->arrayConstructor()->construct(
-          exec, List::empty()));
+          exec, exec->emptyList()));
   JSValue* result = resObj;
   double begin = args[0]->toInteger(exec);
   unsigned length =
@@ -470,7 +470,7 @@ JSValue* ArrayProtoFuncSplice::callAsFunction(ExecState* exec,
   // 15.4.4.12
   JSObject* resObj = static_cast<JSObject*>(
       exec->lexicalGlobalObject()->arrayConstructor()->construct(
-          exec, List::empty()));
+          exec, exec->emptyList()));
   JSValue* result = resObj;
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
@@ -553,7 +553,7 @@ JSValue* ArrayProtoFuncFilter::callAsFunction(ExecState* exec,
                             : args[1]->toObject(exec);
   JSObject* resultArray = static_cast<JSObject*>(
       exec->lexicalGlobalObject()->arrayConstructor()->construct(
-          exec, List::empty()));
+          exec, exec->emptyList()));
 
   unsigned filterIndex = 0;
   unsigned length =

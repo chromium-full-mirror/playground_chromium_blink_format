@@ -85,8 +85,6 @@ class List : Noncopyable {
     markProtectedListsSlowCase();
   }
 
-  static const List& empty();  // Fast path for an empty list.
-
  private:
   static ListSet& markSet();
   static void markProtectedListsSlowCase();

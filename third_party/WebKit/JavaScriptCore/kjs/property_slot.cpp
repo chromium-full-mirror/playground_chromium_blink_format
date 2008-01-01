@@ -37,6 +37,6 @@ JSValue* PropertySlot::functionGetter(ExecState* exec,
                                       JSObject* originalObject,
                                       const Identifier&,
                                       const PropertySlot& slot) {
-  return slot.m_data.getterFunc->call(exec, originalObject, List::empty());
+  return slot.m_data.getterFunc->call(exec, originalObject, exec->emptyList());
 }
 }

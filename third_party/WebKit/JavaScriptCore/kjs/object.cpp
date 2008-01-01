@@ -350,7 +350,7 @@ static ALWAYS_INLINE JSValue* tryGetAndCallProperty(
     JSObject* o = static_cast<JSObject*>(v);
     if (o->implementsCall()) {  // spec says "not primitive type" but ...
       JSObject* thisObj = const_cast<JSObject*>(object);
-      JSValue* def = o->call(exec, thisObj, List::empty());
+      JSValue* def = o->call(exec, thisObj, exec->emptyList());
       JSType defType = def->type();
       ASSERT(defType != GetterSetterType);
       if (defType != ObjectType)

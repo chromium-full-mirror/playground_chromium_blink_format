@@ -630,7 +630,7 @@ void ElementNode::optimizeVariableAccess(
 // ECMA 11.1.4
 JSValue* ElementNode::evaluate(ExecState* exec) {
   JSObject* array = exec->lexicalGlobalObject()->arrayConstructor()->construct(
-      exec, List::empty());
+      exec, exec->emptyList());
   int length = 0;
   for (ElementNode* n = this; n; n = n->next.get()) {
     JSValue* val = n->node->evaluate(exec);
@@ -663,7 +663,7 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
   } else {
     JSValue* newArr =
         exec->lexicalGlobalObject()->arrayConstructor()->construct(
-            exec, List::empty());
+            exec, exec->emptyList());
     array = static_cast<JSObject*>(newArr);
     length = 0;
   }
@@ -690,7 +690,7 @@ JSValue* ObjectLiteralNode::evaluate(ExecState* exec) {
     return list->evaluate(exec);
 
   return exec->lexicalGlobalObject()->objectConstructor()->construct(
-      exec, List::empty());
+      exec, exec->emptyList());
 }
 
 // ------------------------------ PropertyListNode -----------------------------
@@ -706,7 +706,7 @@ void PropertyListNode::optimizeVariableAccess(
 // ECMA 11.1.5
 JSValue* PropertyListNode::evaluate(ExecState* exec) {
   JSObject* obj = exec->lexicalGlobalObject()->objectConstructor()->construct(
-      exec, List::empty());
+      exec, exec->emptyList());
 
   for (PropertyListNode* p = this; p; p = p->next.get()) {
     JSValue* v = p->node->assign->evaluate(exec);
@@ -4330,8 +4330,11 @@ void FunctionBodyNode::processDeclarations(ExecState* exec) {
 
   // We can't just resize localStorage here because that would temporarily
   // leave uninitialized entries, which would crash GC during the mark phase.
-  localStorage.reserveCapacity(m_varStack.size() + m_parameters.size() +
-                               m_functionStack.size());
+  size_t totalSize =
+      m_varStack.size() + m_parameters.size() + m_functionStack.size();
+  if (totalSize > localStorage.capacity())  // Doing this check inline avoids
+                                            // function call overhead.
+    localStorage.reserveCapacity(totalSize);
 
   int minAttributes = Internal | DontDelete;
 
@@ -4510,7 +4513,7 @@ FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {
       new FunctionImp(exec, ident, body.get(), exec->scopeChain());
 
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
-      exec, List::empty());
+      exec, exec->emptyList());
   proto->put(exec, exec->propertyNames().constructor, func,
              ReadOnly | DontDelete | DontEnum);
   func->put(exec, exec->propertyNames().prototype, proto,
@@ -4549,7 +4552,7 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
   FunctionImp* func =
       new FunctionImp(exec, ident, body.get(), exec->scopeChain());
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
-      exec, List::empty());
+      exec, exec->emptyList());
   proto->put(exec, exec->propertyNames().constructor, func,
              ReadOnly | DontDelete | DontEnum);
   func->put(exec, exec->propertyNames().prototype, proto,
