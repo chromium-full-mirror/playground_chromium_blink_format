@@ -27,15 +27,14 @@
 namespace KJS {
 
 class JSObject;
-class ExecState;
+struct ScopeChainHeapNode;
 
-class ScopeChainNode {
- public:
-  ScopeChainNode(ScopeChainNode* n, JSObject* o)
-      : next(n), object(o), refCount(1) {}
-
-  ScopeChainNode* next;
+struct ScopeChainNode {
   JSObject* object;
+  ScopeChainHeapNode* next;
+};
+
+struct ScopeChainHeapNode : ScopeChainNode {
   int refCount;
 };
 
@@ -72,10 +71,7 @@ class ScopeChain {
   ScopeChain() : _node(0) {}
   ~ScopeChain() { deref(); }
 
-  ScopeChain(const ScopeChain& c) : _node(c._node) {
-    if (_node)
-      ++_node->refCount;
-  }
+  ScopeChain(const ScopeChain&);
   ScopeChain& operator=(const ScopeChain&);
 
   bool isEmpty() const { return !_node; }
@@ -91,7 +87,6 @@ class ScopeChain {
     _node = 0;
   }
   void push(JSObject*);
-  void push(const ScopeChain&);
   void pop();
 
   void mark();
@@ -101,28 +96,61 @@ class ScopeChain {
 #endif
 
  private:
-  ScopeChainNode* _node;
+  mutable ScopeChainNode* _node;
+  ScopeChainNode m_initialTopNode;
 
-  void deref() {
-    if (_node && --_node->refCount == 0)
-      release();
-  }
+  ScopeChainHeapNode* moveToHeap() const;
+
+  void deref();
   void ref() const;
-
-  void release();
 };
 
+inline ScopeChainHeapNode* ScopeChain::moveToHeap() const {
+  if (_node != &m_initialTopNode)
+    return static_cast<ScopeChainHeapNode*>(_node);
+  ScopeChainHeapNode* heapNode = new ScopeChainHeapNode;
+  heapNode->object = m_initialTopNode.object;
+  heapNode->next = m_initialTopNode.next;
+  heapNode->refCount = 1;
+  _node = heapNode;
+  return heapNode;
+}
+
+inline ScopeChain::ScopeChain(const ScopeChain& otherChain) {
+  if (!otherChain._node)
+    _node = 0;
+  else {
+    ScopeChainHeapNode* top = otherChain.moveToHeap();
+    ++top->refCount;
+    _node = top;
+  }
+}
+
 inline void ScopeChain::ref() const {
-  for (ScopeChainNode* n = _node; n; n = n->next) {
-    if (n->refCount++ != 0)
+  ASSERT(_node != &m_initialTopNode);
+  for (ScopeChainHeapNode* n = static_cast<ScopeChainHeapNode*>(_node); n;
+       n = n->next) {
+    if (n->refCount++)
       break;
   }
 }
 
-inline ScopeChain& ScopeChain::operator=(const ScopeChain& c) {
-  c.ref();
+inline void ScopeChain::deref() {
+  ScopeChainHeapNode* node = static_cast<ScopeChainHeapNode*>(_node);
+  if (node == &m_initialTopNode)
+    node = node->next;
+  ScopeChainHeapNode* next;
+  for (; node && --node->refCount == 0; node = next) {
+    next = node->next;
+    delete node;
+  }
+}
+
+inline ScopeChain& ScopeChain::operator=(const ScopeChain& otherChain) {
+  otherChain.moveToHeap();
+  otherChain.ref();
   deref();
-  _node = c._node;
+  _node = otherChain._node;
   return *this;
 }
 
@@ -137,20 +165,26 @@ inline JSObject* ScopeChain::bottom() const {
 
 inline void ScopeChain::push(JSObject* o) {
   ASSERT(o);
-  _node = new ScopeChainNode(_node, o);
+  ScopeChainHeapNode* heapNode = moveToHeap();
+  m_initialTopNode.object = o;
+  m_initialTopNode.next = heapNode;
+  _node = &m_initialTopNode;
 }
 
 inline void ScopeChain::pop() {
   ScopeChainNode* oldNode = _node;
   ASSERT(oldNode);
-  ScopeChainNode* newNode = oldNode->next;
+  ScopeChainHeapNode* newNode = oldNode->next;
   _node = newNode;
 
-  if (--oldNode->refCount != 0) {
-    if (newNode)
-      ++newNode->refCount;
-  } else {
-    delete oldNode;
+  if (oldNode != &m_initialTopNode) {
+    ScopeChainHeapNode* oldHeapNode = static_cast<ScopeChainHeapNode*>(oldNode);
+    if (--oldHeapNode->refCount != 0) {
+      if (newNode)
+        ++newNode->refCount;
+    } else {
+      delete oldHeapNode;
+    }
   }
 }
 
