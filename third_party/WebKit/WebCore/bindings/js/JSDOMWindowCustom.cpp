@@ -20,8 +20,12 @@
 #include "config.h"
 #include "JSDOMWindow.h"
 
-#include "kjs_window.h"
+#include "Document.h"
 #include "DOMWindow.h"
+#include "ExceptionCode.h"
+#include "kjs_window.h"
+#include "kjs/object.h"
+#include "kjs/value.h"
 
 namespace WebCore {
 
@@ -80,7 +84,9 @@ bool JSDOMWindow::customGetOwnPropertySlot(KJS::ExecState* exec,
             entry->value.functionValue ==
                 &JSDOMWindowPrototypeFunctionBlur::create ||
             entry->value.functionValue ==
-                &JSDOMWindowPrototypeFunctionClose::create)
+                &JSDOMWindowPrototypeFunctionClose::create ||
+            entry->value.functionValue ==
+                &JSDOMWindowPrototypeFunctionPostMessage::create)
           slot.setStaticEntry(this, entry, KJS::staticFunctionGetter);
         else {
           if (!allowsAccessFrom(exec))
@@ -119,6 +125,24 @@ bool JSDOMWindow::customPut(KJS::ExecState* exec,
   }
 
   return false;
+}
+
+KJS::JSValue* JSDOMWindow::postMessage(KJS::ExecState* exec,
+                                       const KJS::List& args) {
+  DOMWindow* window = impl();
+
+  DOMWindow* source =
+      static_cast<JSDOMWindow*>(exec->dynamicGlobalObject())->impl();
+  String domain = source->document()->securityOrigin()->domain();
+  String uri = source->document()->documentURI();
+  String message = args[0]->toString(exec);
+
+  if (exec->hadException())
+    return KJS::jsUndefined();
+
+  window->postMessage(message, domain, uri, source);
+
+  return KJS::jsUndefined();
 }
 
 }  // namespace WebCore

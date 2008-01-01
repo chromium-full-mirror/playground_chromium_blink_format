@@ -99,6 +99,10 @@ bool Event::isWheelEvent() const {
   return false;
 }
 
+bool Event::isMessageEvent() const {
+  return false;
+}
+
 bool Event::isBeforeTextInsertedEvent() const {
   return false;
 }
