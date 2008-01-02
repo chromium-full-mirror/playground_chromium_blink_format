@@ -48,8 +48,12 @@ class MIMETypeRegistry {
   // document in a frame.
   static bool isSupportedImageResourceMIMEType(const String& mimeType);
 
+  // Check to see if a mime type is suitable for being loaded as a JavaScript
+  // resource.
+  static bool isSupportedJavaScriptMIMEType(const String& mimeType);
+
   // Check to see if a non-image mime type is suitable for being loaded as a
-  // document in a frame.
+  // document in a frame.  Includes supported JavaScript MIME types.
   static bool isSupportedNonImageMIMEType(const String& mimeType);
 
   // Check to see if a mime type is suitable for being loaded using <video> and

@@ -43,6 +43,7 @@
 namespace WebCore {
 static WTF::HashSet<String>* supportedImageResourceMIMETypes;
 static WTF::HashSet<String>* supportedImageMIMETypes;
+static WTF::HashSet<String>* supportedJavaScriptMIMETypes;
 static WTF::HashSet<String>* supportedNonImageMIMETypes;
 static WTF::HashSet<String>* supportedMediaMIMETypes;
 
@@ -117,6 +118,35 @@ static void initialiseSupportedImageMIMETypes() {
 #endif
 }
 
+static void initialiseSupportedJavaScriptMIMETypes() {
+  /*
+      Mozilla 1.8 and WinIE 7 both accept text/javascript and text/ecmascript.
+      Mozilla 1.8 accepts application/javascript, application/ecmascript, and
+     application/x-javascript, but WinIE 7 doesn't.
+      WinIE 7 accepts text/javascript1.1 - text/javascript1.3, text/jscript, and
+     text/livescript, but Mozilla 1.8 doesn't.
+      Mozilla 1.8 allows leading and trailing whitespace, but WinIE 7 doesn't.
+      Mozilla 1.8 and WinIE 7 both accept the empty string, but neither accept a
+     whitespace-only string.
+      We want to accept all the values that either of these browsers accept, but
+     not other values.
+   */
+  static const char* types[] = {
+      "text/javascript",
+      "text/ecmascript",
+      "application/javascript",
+      "application/ecmascript",
+      "application/x-javascript",
+      "text/javascript1.1",
+      "text/javascript1.2",
+      "text/javascript1.3",
+      "text/jscript",
+      "text/livescript",
+  };
+  for (size_t i = 0; i < sizeof(types) / sizeof(types[0]); ++i)
+    supportedJavaScriptMIMETypes->add(types[i]);
+}
+
 static void initialiseSupportedNonImageMimeTypes() {
   static const char* types[] = {
     "text/html",
@@ -124,7 +154,6 @@ static void initialiseSupportedNonImageMimeTypes() {
     "text/xsl",
     "text/plain",
     "text/",
-    "application/x-javascript",
     "application/xml",
     "application/xhtml+xml",
     "application/rss+xml",
@@ -154,9 +183,13 @@ static void initialiseSupportedMediaMIMETypes() {
 }
 
 static void initialiseMIMETypeRegistry() {
+  supportedJavaScriptMIMETypes = new WTF::HashSet<String>();
+  initialiseSupportedJavaScriptMIMETypes();
+
   supportedImageResourceMIMETypes = new WTF::HashSet<String>();
   supportedImageMIMETypes = new WTF::HashSet<String>();
-  supportedNonImageMIMETypes = new WTF::HashSet<String>();
+  supportedNonImageMIMETypes =
+      new WTF::HashSet<String>(*supportedJavaScriptMIMETypes);
 
   initialiseSupportedNonImageMimeTypes();
   initialiseSupportedImageMIMETypes();
@@ -183,6 +216,13 @@ bool MIMETypeRegistry::isSupportedImageResourceMIMEType(
     initialiseMIMETypeRegistry();
   return !mimeType.isEmpty() &&
          supportedImageResourceMIMETypes->contains(mimeType);
+}
+
+bool MIMETypeRegistry::isSupportedJavaScriptMIMEType(const String& mimeType) {
+  if (!supportedJavaScriptMIMETypes)
+    initialiseMIMETypeRegistry();
+  return !mimeType.isEmpty() &&
+         supportedJavaScriptMIMETypes->contains(mimeType);
 }
 
 bool MIMETypeRegistry::isSupportedNonImageMIMEType(const String& mimeType) {
