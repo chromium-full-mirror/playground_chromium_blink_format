@@ -1,7 +1,6 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003, 2007 Apple Inc.
+ *  Copyright (C) 2003, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,13 +28,13 @@
 #include "types.h"
 #include "value.h"
 
-using namespace KJS;
+namespace KJS {
 
 // ------------------------------ ErrorInstance ----------------------------
 
 const ClassInfo ErrorInstance::info = {"Error", 0, 0};
 
-ErrorInstance::ErrorInstance(JSObject* proto) : JSObject(proto) {}
+ErrorInstance::ErrorInstance(JSObject* prototype) : JSObject(prototype) {}
 
 // ------------------------------ ErrorPrototype ----------------------------
 
@@ -48,36 +47,31 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
 
   put(exec, exec->propertyNames().name, jsString("Error"), DontEnum);
   put(exec, exec->propertyNames().message, jsString("Unknown error"), DontEnum);
-  putDirectFunction(
-      new ErrorProtoFunc(exec, funcProto, exec->propertyNames().toString),
-      DontEnum);
+  putDirectFunction(new ErrorProtoFuncToString(exec, funcProto), DontEnum);
 }
 
 // ------------------------------ ErrorProtoFunc ----------------------------
 
-ErrorProtoFunc::ErrorProtoFunc(ExecState* exec,
-                               FunctionPrototype* funcProto,
-                               const Identifier& name)
-    : InternalFunctionImp(funcProto, name) {
+ErrorProtoFuncToString::ErrorProtoFuncToString(ExecState* exec,
+                                               FunctionPrototype* funcProto)
+    : InternalFunctionImp(funcProto, exec->propertyNames().toString) {
   putDirect(exec->propertyNames().length, jsNumber(0),
             DontDelete | ReadOnly | DontEnum);
 }
 
-JSValue* ErrorProtoFunc::callAsFunction(ExecState* exec,
-                                        JSObject* thisObj,
-                                        const List& /*args*/) {
-  // toString()
+JSValue* ErrorProtoFuncToString::callAsFunction(ExecState* exec,
+                                                JSObject* thisObj,
+                                                const List&) {
   UString s = "Error";
 
   JSValue* v = thisObj->get(exec, exec->propertyNames().name);
-  if (!v->isUndefined()) {
+  if (!v->isUndefined())
     s = v->toString(exec);
-  }
 
   v = thisObj->get(exec, exec->propertyNames().message);
-  if (!v->isUndefined()) {
-    s += ": " + v->toString(exec);  // Mozilla compatible format
-  }
+  if (!v->isUndefined())
+    // Mozilla compatible format
+    s += ": " + v->toString(exec);
 
   return jsString(s);
 }
@@ -126,11 +120,9 @@ JSValue* ErrorObjectImp::callAsFunction(ExecState* exec,
 
 NativeErrorPrototype::NativeErrorPrototype(ExecState* exec,
                                            ErrorPrototype* errorProto,
-                                           ErrorType et,
                                            UString name,
                                            UString message)
     : JSObject(errorProto) {
-  errType = et;
   putDirect(exec->propertyNames().name, jsString(name), 0);
   putDirect(exec->propertyNames().message, jsString(message), 0);
 }
@@ -174,3 +166,5 @@ void NativeErrorImp::mark() {
   if (proto && !proto->marked())
     proto->mark();
 }
+
+}  // namespace KJS
