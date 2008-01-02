@@ -406,7 +406,9 @@ static JSValueRef keyDownCallback(JSContextRef context,
       ::PeekMessage(&msg, webViewWindow, WM_SYSCHAR, WM_SYSCHAR, PM_REMOVE))
     ::DispatchMessage(&msg);
 
-  MSG msgUp = makeMsg(webViewWindow, WM_KEYUP, virtualKeyCode, 0);
+  MSG msgUp = makeMsg(
+      webViewWindow, (::GetKeyState(VK_MENU) & 0x8000) ? WM_SYSKEYUP : WM_KEYUP,
+      virtualKeyCode, keyData);
   ::DispatchMessage(&msgUp);
 
   if (argumentCount > 1 || needsShiftKeyModifier)
