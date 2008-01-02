@@ -52,6 +52,21 @@ enum {
   TYPE_MISMATCH_ERR = 17
 };
 
+enum ExceptionType {
+  DOMExceptionType,
+  RangeExceptionType,
+  EventExceptionType,
+  XMLHttpRequestExceptionType
+#if ENABLE(XPATH)
+  ,
+  XPathExceptionType
+#endif
+#if ENABLE(SVG)
+  ,
+  SVGExceptionType
+#endif
+};
+
 struct ExceptionCodeDescription {
   const char* typeName;  // has spaces and is suitable for use in exception
                          // description strings; maximum length is 10 characters
@@ -59,8 +74,10 @@ struct ExceptionCodeDescription {
                      // description strings; 0 if name not known; maximum length
                      // is 27 characters
   int code;  // numeric value of the exception within a particular type
+  ExceptionType type;
 };
 void getExceptionCodeDescription(ExceptionCode, ExceptionCodeDescription&);
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // ExceptionCode_h

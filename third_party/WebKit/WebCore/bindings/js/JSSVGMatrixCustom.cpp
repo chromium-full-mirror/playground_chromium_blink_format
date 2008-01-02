@@ -47,7 +47,7 @@ JSValue* JSSVGMatrix::inverse(ExecState* exec, const List&) {
       m_context.get());
 
   if (!imp.isInvertible())
-    setDOMException(exec, SVG_MATRIX_NOT_INVERTABLE);
+    setDOMException(exec, SVGException::SVG_MATRIX_NOT_INVERTABLE);
 
   return result;
 }
@@ -104,7 +104,7 @@ JSValue* JSSVGMatrix::rotateFromVector(ExecState* exec, const List& args) {
            m_context.get());
 
   if (x == 0.0 || y == 0.0)
-    setDOMException(exec, SVG_INVALID_VALUE_ERR);
+    setDOMException(exec, SVGException::SVG_INVALID_VALUE_ERR);
 
   return result;
 }

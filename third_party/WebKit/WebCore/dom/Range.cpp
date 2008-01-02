@@ -1079,7 +1079,7 @@ void Range::insertNode(PassRefPtr<Node> newNode, ExceptionCode& ec) {
       newNode->nodeType() == Node::ENTITY_NODE ||
       newNode->nodeType() == Node::NOTATION_NODE ||
       newNode->nodeType() == Node::DOCUMENT_NODE) {
-    ec = INVALID_NODE_TYPE_ERR;
+    ec = RangeException::INVALID_NODE_TYPE_ERR;
     return;
   }
 
@@ -1191,7 +1191,7 @@ void Range::checkNodeWOffset(Node* n, int offset, ExceptionCode& ec) const {
     case Node::ENTITY_NODE:
     case Node::NOTATION_NODE:
     case Node::DOCUMENT_TYPE_NODE:
-      ec = INVALID_NODE_TYPE_ERR;
+      ec = RangeException::INVALID_NODE_TYPE_ERR;
       break;
     case Node::TEXT_NODE:
     case Node::COMMENT_NODE:
@@ -1223,7 +1223,7 @@ void Range::checkNodeBA(Node* n, ExceptionCode& ec) const {
         root->nodeType() == Node::DOCUMENT_NODE ||
         root->nodeType() == Node::DOCUMENT_FRAGMENT_NODE ||
         root->isShadowNode())) {
-    ec = INVALID_NODE_TYPE_ERR;
+    ec = RangeException::INVALID_NODE_TYPE_ERR;
     return;
   }
 
@@ -1232,7 +1232,7 @@ void Range::checkNodeBA(Node* n, ExceptionCode& ec) const {
       n->nodeType() == Node::ATTRIBUTE_NODE ||
       n->nodeType() == Node::ENTITY_NODE ||
       n->nodeType() == Node::NOTATION_NODE)
-    ec = INVALID_NODE_TYPE_ERR;
+    ec = RangeException::INVALID_NODE_TYPE_ERR;
 }
 
 PassRefPtr<Range> Range::cloneRange(ExceptionCode& ec) const {
@@ -1338,7 +1338,7 @@ void Range::selectNode(Node* refNode, ExceptionCode& ec) {
     if (anc->nodeType() == Node::ENTITY_NODE ||
         anc->nodeType() == Node::NOTATION_NODE ||
         anc->nodeType() == Node::DOCUMENT_TYPE_NODE) {
-      ec = INVALID_NODE_TYPE_ERR;
+      ec = RangeException::INVALID_NODE_TYPE_ERR;
       return;
     }
   }
@@ -1348,7 +1348,7 @@ void Range::selectNode(Node* refNode, ExceptionCode& ec) {
       refNode->nodeType() == Node::ATTRIBUTE_NODE ||
       refNode->nodeType() == Node::ENTITY_NODE ||
       refNode->nodeType() == Node::NOTATION_NODE) {
-    ec = INVALID_NODE_TYPE_ERR;
+    ec = RangeException::INVALID_NODE_TYPE_ERR;
     return;
   }
 
@@ -1378,7 +1378,7 @@ void Range::selectNodeContents(Node* refNode, ExceptionCode& ec) {
     if (n->nodeType() == Node::ENTITY_NODE ||
         n->nodeType() == Node::NOTATION_NODE ||
         n->nodeType() == Node::DOCUMENT_TYPE_NODE) {
-      ec = INVALID_NODE_TYPE_ERR;
+      ec = RangeException::INVALID_NODE_TYPE_ERR;
       return;
     }
   }
@@ -1413,7 +1413,7 @@ void Range::surroundContents(PassRefPtr<Node> passNewParent,
       newParent->nodeType() == Node::DOCUMENT_TYPE_NODE ||
       newParent->nodeType() == Node::DOCUMENT_NODE ||
       newParent->nodeType() == Node::DOCUMENT_FRAGMENT_NODE) {
-    ec = INVALID_NODE_TYPE_ERR;
+    ec = RangeException::INVALID_NODE_TYPE_ERR;
     return;
   }
 
@@ -1460,13 +1460,13 @@ void Range::surroundContents(PassRefPtr<Node> passNewParent,
   if (!m_startContainer->offsetInCharacters()) {
     if (m_startOffset > 0 &&
         m_startOffset < m_startContainer->childNodeCount()) {
-      ec = BAD_BOUNDARYPOINTS_ERR;
+      ec = RangeException::BAD_BOUNDARYPOINTS_ERR;
       return;
     }
   }
   if (!m_endContainer->offsetInCharacters()) {
     if (m_endOffset > 0 && m_endOffset < m_endContainer->childNodeCount()) {
-      ec = BAD_BOUNDARYPOINTS_ERR;
+      ec = RangeException::BAD_BOUNDARYPOINTS_ERR;
       return;
     }
   }

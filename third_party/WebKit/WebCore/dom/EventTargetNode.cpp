@@ -27,6 +27,7 @@
 
 #include "Document.h"
 #include "Event.h"
+#include "EventException.h"
 #include "EventHandler.h"
 #include "EventListener.h"
 #include "EventNames.h"
@@ -98,7 +99,7 @@ bool EventTargetNode::dispatchEvent(PassRefPtr<Event> e,
   RefPtr<Event> evt(e);
   ASSERT(!eventDispatchForbidden());
   if (!evt || evt->type().isEmpty()) {
-    ec = UNSPECIFIED_EVENT_TYPE_ERR;
+    ec = EventException::UNSPECIFIED_EVENT_TYPE_ERR;
     return false;
   }
 

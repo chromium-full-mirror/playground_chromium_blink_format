@@ -33,6 +33,7 @@
 #include "ExceptionCode.h"
 #include "StringHash.h"
 #include "XPathEvaluator.h"
+#include "XPathException.h"
 #include "XPathNSResolver.h"
 #include "XPathStep.h"
 
@@ -517,7 +518,7 @@ Expression* Parser::parseStatement(const String& statement,
     if (m_gotNamespaceError)
       ec = NAMESPACE_ERR;
     else
-      ec = INVALID_EXPRESSION_ERR;
+      ec = XPathException::INVALID_EXPRESSION_ERR;
     return 0;
   }
 

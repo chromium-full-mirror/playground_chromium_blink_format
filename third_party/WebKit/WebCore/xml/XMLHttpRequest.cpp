@@ -26,8 +26,8 @@
 #include "CString.h"
 #include "Cache.h"
 #include "DOMImplementation.h"
-#include "TextResourceDecoder.h"
 #include "Event.h"
+#include "EventException.h"
 #include "EventListener.h"
 #include "EventNames.h"
 #include "ExceptionCode.h"
@@ -44,6 +44,8 @@
 #include "Settings.h"
 #include "SubresourceLoader.h"
 #include "TextEncoding.h"
+#include "TextResourceDecoder.h"
+#include "XMLHttpRequestException.h"
 #include "kjs_binding.h"
 #include <kjs/protect.h>
 #include <wtf/Vector.h>
@@ -237,7 +239,7 @@ bool XMLHttpRequest::dispatchEvent(PassRefPtr<Event> evt,
                                    bool /*tempEvent*/) {
   // FIXME: check for other error conditions enumerated in the spec.
   if (evt->type().isEmpty()) {
-    ec = UNSPECIFIED_EVENT_TYPE_ERR;
+    ec = EventException::UNSPECIFIED_EVENT_TYPE_ERR;
     return true;
   }
 
@@ -339,7 +341,7 @@ void XMLHttpRequest::open(const String& method,
   ASSERT(m_state == Uninitialized);
 
   if (!urlMatchesDocumentDomain(url)) {
-    ec = PERMISSION_DENIED;
+    ec = XMLHttpRequestException::PERMISSION_DENIED;
     return;
   }
 
@@ -354,7 +356,7 @@ void XMLHttpRequest::open(const String& method,
 
   if (methodUpper == "TRACE" || methodUpper == "TRACK" ||
       methodUpper == "CONNECT") {
-    ec = PERMISSION_DENIED;
+    ec = XMLHttpRequestException::PERMISSION_DENIED;
     return;
   }
 
@@ -471,7 +473,7 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
         response.httpStatusCode() > 0)
       processSyncLoadResults(data, response);
     else
-      ec = NETWORK_ERR;
+      ec = XMLHttpRequestException::NETWORK_ERR;
 
     return;
   }
