@@ -311,7 +311,7 @@ static bool executeDelete(Frame* frame,
       return true;
     case CommandFromDOM:
     case CommandFromDOMWithUserInterface:
-      // If the curernt selection is a caret, delete the preceding character. IE
+      // If the current selection is a caret, delete the preceding character. IE
       // performs forwardDelete, but we currently side with Firefox.
       // Doesn't scroll to make the selection visible, or modify the kill ring
       // (this time, siding with IE, not Firefox).
