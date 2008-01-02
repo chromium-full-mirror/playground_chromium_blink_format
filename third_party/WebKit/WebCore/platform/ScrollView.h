@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006, 2007, 2008 Apple Computer, Inc.  All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -123,7 +124,7 @@ class ScrollView : public Widget {
   // (like Windows), we need this method in order to do the scroll ourselves.
   void wheelEvent(PlatformWheelEvent&);
 
-  void scroll(ScrollDirection, ScrollGranularity);
+  bool scroll(ScrollDirection, ScrollGranularity);
 
 #if PLATFORM(MAC)
   NSView* getDocumentView() const;
