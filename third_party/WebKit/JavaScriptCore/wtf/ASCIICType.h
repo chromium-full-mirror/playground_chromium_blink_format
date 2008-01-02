@@ -120,6 +120,21 @@ inline bool isASCIILower(int c) {
   return c >= 'a' && c <= 'z';
 }
 
+inline bool isASCIIUpper(char c) {
+  return c >= 'A' && c <= 'Z';
+}
+inline bool isASCIIUpper(unsigned short c) {
+  return c >= 'A' && c <= 'Z';
+}
+#if !COMPILER(MSVC) || defined(_NATIVE_WCHAR_T_DEFINED)
+inline bool isASCIIUpper(wchar_t c) {
+  return c >= 'A' && c <= 'Z';
+}
+#endif
+inline bool isASCIIUpper(int c) {
+  return c >= 'A' && c <= 'Z';
+}
+
 inline bool isASCIISpace(char c) {
   return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' ||
          c == ' ';
