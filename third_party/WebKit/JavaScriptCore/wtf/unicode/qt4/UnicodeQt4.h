@@ -296,7 +296,7 @@ inline UChar32 foldCase(UChar32 c) {
 
 inline int foldCase(UChar* result,
                     int resultLength,
-                    UChar* src,
+                    const UChar* src,
                     int srcLength,
                     bool* error) {
   // FIXME: handle special casing. Easiest with some low level API in Qt
@@ -434,7 +434,7 @@ inline UChar32 foldCase(UChar32 c) {
 
 inline int foldCase(UChar* result,
                     int resultLength,
-                    UChar* src,
+                    const UChar* src,
                     int srcLength,
                     bool* error) {
   return toLower(result, resultLength, src, srcLength, error);
