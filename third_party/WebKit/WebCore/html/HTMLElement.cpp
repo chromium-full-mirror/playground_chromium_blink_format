@@ -62,7 +62,7 @@ String HTMLElement::nodeName() const {
   // chars that does not have to copy
   // the string on a hit in the hash.
   if (document()->isHTMLDocument())
-    return tagQName().localName().impl()->upper();
+    return tagQName().localName().domString().upper();
   return Element::nodeName();
 }
 

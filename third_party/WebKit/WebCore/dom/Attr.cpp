@@ -49,7 +49,7 @@ void Attr::createTextChild() {
   ASSERT(refCount());
   if (!m_attribute->value().isEmpty()) {
     RefPtr<Text> textNode =
-        document()->createTextNode(m_attribute->value().impl());
+        document()->createTextNode(m_attribute->value().domString());
 
     // This does everything appendChild() would do in this situation (assuming
     // m_ignoreChildrenChanged was set),
@@ -107,7 +107,7 @@ void Attr::setValue(const String& v, ExceptionCode& ec) {
   int e = 0;
   m_ignoreChildrenChanged++;
   removeChildren();
-  appendChild(document()->createTextNode(v.impl()), e);
+  appendChild(document()->createTextNode(v), e);
   m_ignoreChildrenChanged--;
 
   m_attribute->setValue(v.impl());

@@ -1,9 +1,8 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -39,10 +38,11 @@ class Text : public CharacterData {
 
   // DOM methods & attributes for CharacterData
 
-  Text* splitText(const unsigned offset, ExceptionCode&);
+  PassRefPtr<Text> splitText(unsigned offset, ExceptionCode&);
 
-  // DOM methods overridden from  parent classes
-  const AtomicString& localName() const;
+  // DOM methods overridden from parent classes
+
+  virtual const AtomicString& localName() const;
   virtual String nodeName() const;
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
@@ -69,7 +69,7 @@ class Text : public CharacterData {
 #endif
 
  protected:
-  virtual Text* createNew(StringImpl*);
+  virtual PassRefPtr<Text> createNew(PassRefPtr<StringImpl>);
 };
 
 }  // namespace WebCore

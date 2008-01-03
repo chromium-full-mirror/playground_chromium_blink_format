@@ -1,10 +1,8 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2006 Samuel Weinig (sam@webkit.org)
  *
  * This library is free software; you can redistribute it and/or
@@ -69,16 +67,14 @@ static bool qualifiedNameIsMalformed(const String&) {
 
 #if ENABLE(SVG)
 
-static void addString(HashSet<StringImpl*, CaseFoldingHash>& set,
+static void addString(HashSet<String, CaseFoldingHash>& set,
                       const char* string) {
-  StringImpl* s = new StringImpl(string);
-  s->ref();
-  set.add(s);
+  set.add(string);
 }
 
 static bool isSVG10Feature(const String& feature) {
   static bool initialized = false;
-  static HashSet<StringImpl*, CaseFoldingHash> svgFeatures;
+  static HashSet<String, CaseFoldingHash> svgFeatures;
   if (!initialized) {
     // Sadly, we cannot claim to implement any SVG 1.0 feature set, due to
     // lack of Font support.
@@ -96,12 +92,12 @@ static bool isSVG10Feature(const String& feature) {
     //      addString(svgFeatures, "dom.svg.all");
     initialized = true;
   }
-  return svgFeatures.contains(feature.impl());
+  return svgFeatures.contains(feature);
 }
 
 static bool isSVG11Feature(const String& feature) {
   static bool initialized = false;
-  static HashSet<StringImpl*, CaseFoldingHash> svgFeatures;
+  static HashSet<String, CaseFoldingHash> svgFeatures;
   if (!initialized) {
     // Sadly, we cannot claim to implement any of the SVG 1.1 generic feature
     // sets
@@ -159,7 +155,7 @@ static bool isSVG11Feature(const String& feature) {
     addString(svgFeatures, "Extensibility");
     initialized = true;
   }
-  return svgFeatures.contains(feature.impl());
+  return svgFeatures.contains(feature);
 }
 #endif
 
@@ -250,14 +246,7 @@ PassRefPtr<Document> DOMImplementation::createDocument(
     // - if the qualifiedName has a prefix that is "xml" and the namespaceURI is
     // different
     //   from "http://www.w3.org/XML/1998/namespace" [Namespaces].
-    int colonpos = -1;
-    unsigned i;
-    StringImpl* qname = qualifiedName.impl();
-    for (i = 0; i < qname->length() && colonpos < 0; i++) {
-      if ((*qname)[i] == ':')
-        colonpos = i;
-    }
-
+    int colonpos = qualifiedName.find(':');
     if (qualifiedNameIsMalformed(qualifiedName) ||
         (colonpos >= 0 && namespaceURI.isNull()) ||
         (colonpos == 3 && qualifiedName[0] == 'x' && qualifiedName[1] == 'm' &&
