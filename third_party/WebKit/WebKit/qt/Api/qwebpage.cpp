@@ -33,6 +33,7 @@
 #include "qwebsettings.h"
 
 #include "Frame.h"
+#include "FrameLoaderClientQt.h"
 #include "ChromeClientQt.h"
 #include "ContextMenu.h"
 #include "ContextMenuClientQt.h"
@@ -123,8 +124,6 @@ void QWebPagePrivate::createMainFrame() {
     frameData.marginWidth = 0;
     frameData.marginHeight = 0;
     mainFrame = new QWebFrame(q, &frameData);
-    QObject::connect(mainFrame, SIGNAL(titleChanged(const QString&)), q,
-                     SIGNAL(titleChanged(const QString&)));
     mainFrame->d->frameView->setFrameGeometry(q->geometry());
 
     emit q->frameCreated(mainFrame);
@@ -372,12 +371,12 @@ QWebFrame* QWebPage::mainFrame() const {
   return d->mainFrame;
 }
 
-QSize QWebPage::sizeHint() const {
-  return QSize(800, 600);
-}
-
-void QWebPage::stop() {
-  triggerAction(Stop);
+QWebFrame* QWebPage::currentFrame() const {
+  return static_cast<WebCore::FrameLoaderClientQt*>(d->page->focusController()
+                                                        ->focusedOrMainFrame()
+                                                        ->loader()
+                                                        ->client())
+      ->webFrame();
 }
 
 QWebPageHistory* QWebPage::history() const {
