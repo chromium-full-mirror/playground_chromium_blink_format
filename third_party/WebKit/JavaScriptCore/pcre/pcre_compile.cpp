@@ -149,19 +149,17 @@ doing the compiling. */
 
 struct CompileData {
   CompileData() {
-    start_code = 0;
-    start_pattern = 0;
     top_backref = 0;
     backrefMap = 0;
     req_varyopt = 0;
     needOuterBracket = false;
+    numCapturingBrackets = 0;
   }
-  const unsigned char* start_code; /* The start of the compiled code */
-  const UChar* start_pattern;      /* The start of the pattern */
-  int top_backref;                 /* Maximum back reference */
-  unsigned backrefMap;             /* Bitmap of low back refs */
-  int req_varyopt;                 /* "After variable item" flag for reqbyte */
+  int top_backref;     /* Maximum back reference */
+  unsigned backrefMap; /* Bitmap of low back refs */
+  int req_varyopt;     /* "After variable item" flag for reqbyte */
   bool needOuterBracket;
+  int numCapturingBrackets;
 };
 
 /* Definitions to allow mutual recursion */
@@ -785,7 +783,8 @@ static bool compileBranch(int options,
            character in them, so set class_charcount bigger than one. */
 
           if (c == '\\') {
-            c = checkEscape(&ptr, patternEnd, errorcodeptr, *brackets, true);
+            c = checkEscape(&ptr, patternEnd, errorcodeptr,
+                            cd.numCapturingBrackets, true);
             if (c < 0) {
               class_charcount += 2; /* Greater than 1 is what matters */
               switch (-c) {
@@ -852,7 +851,8 @@ static bool compileBranch(int options,
 
             if (d == '\\') {
               const UChar* oldptr = ptr;
-              d = checkEscape(&ptr, patternEnd, errorcodeptr, *brackets, true);
+              d = checkEscape(&ptr, patternEnd, errorcodeptr,
+                              cd.numCapturingBrackets, true);
 
               /* \X is literal X; any other special means the '-' was literal */
               if (d < 0) {
@@ -1679,7 +1679,8 @@ static bool compileBranch(int options,
 
       case '\\':
         tempptr = ptr;
-        c = checkEscape(&ptr, patternEnd, errorcodeptr, *brackets, false);
+        c = checkEscape(&ptr, patternEnd, errorcodeptr, cd.numCapturingBrackets,
+                        false);
 
         /* Handle metacharacters introduced by \. For ones like \d, the ESC_
          values
@@ -2115,20 +2116,14 @@ static int bracketFindFirstAssertedCharacter(const unsigned char* code,
   return c;
 }
 
-static int calculateCompiledPatternLengthAndFlags(
-    const UChar* pattern,
-    int patternLength,
-    JSRegExpIgnoreCaseOption ignoreCase,
-    CompileData& cd,
-    ErrorCode& errorcode) {
+static int calculateCompiledPatternLength(const UChar* pattern,
+                                          int patternLength,
+                                          JSRegExpIgnoreCaseOption ignoreCase,
+                                          CompileData& cd,
+                                          ErrorCode& errorcode) {
   /* Make a pass over the pattern to compute the
    amount of store required to hold the compiled code. This does not have to be
-   perfect as long as errors are overestimates. At the same time we can detect
-   any
-   flag settings right at the start, and extract them. Make an attempt to
-   correct
-   for any counted white space if an "extended" flag setting appears late in the
-   pattern. We can't be so clever for #-comments. */
+   perfect as long as errors are overestimates. */
 
   int length = 1 + LINK_SIZE; /* For initial BRA plus length */
   int branch_extra = 0;
@@ -2150,7 +2145,8 @@ static int calculateCompiledPatternLengthAndFlags(
        character type. */
 
       case '\\':
-        c = checkEscape(&ptr, patternEnd, &errorcode, bracount, false);
+        c = checkEscape(&ptr, patternEnd, &errorcode, cd.numCapturingBrackets,
+                        false);
         if (errorcode != 0)
           return -1;
 
@@ -2287,7 +2283,8 @@ static int calculateCompiledPatternLengthAndFlags(
           /* Check for escapes */
 
           if (*ptr == '\\') {
-            c = checkEscape(&ptr, patternEnd, &errorcode, bracount, true);
+            c = checkEscape(&ptr, patternEnd, &errorcode,
+                            cd.numCapturingBrackets, true);
             if (errorcode != 0)
               return -1;
 
@@ -2325,7 +2322,8 @@ static int calculateCompiledPatternLengthAndFlags(
               UChar const* hyptr = ptr++;
               if (safelyCheckNextChar(ptr, patternEnd, '\\')) {
                 ptr++;
-                d = checkEscape(&ptr, patternEnd, &errorcode, bracount, true);
+                d = checkEscape(&ptr, patternEnd, &errorcode,
+                                cd.numCapturingBrackets, true);
                 if (errorcode != 0)
                   return -1;
               } else if ((ptr + 1 < patternEnd) && ptr[1] != ']')
@@ -2636,6 +2634,8 @@ static int calculateCompiledPatternLengthAndFlags(
   }
 
   length += 2 + LINK_SIZE; /* For final KET and END */
+
+  cd.numCapturingBrackets = bracount;
   return length;
 }
 
@@ -2684,8 +2684,12 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
   CompileData cd;
 
   ErrorCode errorcode = ERR0;
-  int length = calculateCompiledPatternLengthAndFlags(
-      pattern, patternLength, ignoreCase, cd, errorcode);
+  /* Call this once just to count the brackets. */
+  calculateCompiledPatternLength(pattern, patternLength, ignoreCase, cd,
+                                 errorcode);
+  /* Call it again to compute the length. */
+  int length = calculateCompiledPatternLength(pattern, patternLength,
+                                              ignoreCase, cd, errorcode);
   if (errorcode)
     return returnError(errorcode, errorptr);
 
@@ -2706,8 +2710,6 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
    passed around in the compile data block. */
 
   const unsigned char* codeStart = (const unsigned char*)(re + 1);
-  cd.start_code = codeStart;
-  cd.start_pattern = (const UChar*)pattern;
 
   /* Set up a starting, non-extracting bracket, then compile the expression. On
    error, errorcode will be set non-zero, so we don't need to look at the result
