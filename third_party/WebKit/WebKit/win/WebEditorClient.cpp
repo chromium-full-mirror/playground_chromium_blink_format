@@ -402,7 +402,7 @@ void WebEditorClient::textWillBeDeletedInTextField(Element* e) {
                                                (void**)&domInputElement))) {
         BOOL result;
         formDelegate->doPlatformCommand(domInputElement,
-                                        BString(L"BackwardDelete"),
+                                        BString(L"DeleteBackward"),
                                         kit(e->document()->frame()), &result);
         domInputElement->Release();
       }
