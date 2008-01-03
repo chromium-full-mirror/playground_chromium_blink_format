@@ -43,8 +43,7 @@ inline HTMLCollection::CollectionInfo* HTMLFormCollection::formCollectionInfo(
 }
 
 HTMLFormCollection::HTMLFormCollection(PassRefPtr<HTMLFormElement> form)
-    : HTMLCollection(form.get(), FormElements, formCollectionInfo(form.get())) {
-}
+    : HTMLCollection(form.get(), Other, formCollectionInfo(form.get())) {}
 
 HTMLFormCollection::~HTMLFormCollection() {}
 
