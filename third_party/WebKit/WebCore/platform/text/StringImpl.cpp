@@ -191,6 +191,14 @@ Length StringImpl::toLength() {
   return parseLength(m_data, m_length);
 }
 
+static int countCharacter(StringImpl* string, UChar character) {
+  int count = 0;
+  int length = string->length();
+  for (int i = 0; i < length; ++i)
+    count += (*string)[i] == character;
+  return count;
+}
+
 Length* StringImpl::toCoordsArray(int& len) {
   Vector<UChar> spacified(m_length);
   for (unsigned i = 0; i < m_length; i++) {
@@ -204,7 +212,7 @@ Length* StringImpl::toCoordsArray(int& len) {
 
   str = str->simplifyWhiteSpace();
 
-  len = (str->find(' ') >= 0) + 1;
+  len = countCharacter(str.get(), ' ') + 1;
   Length* r = new Length[len];
 
   int i = 0;
@@ -217,6 +225,8 @@ Length* StringImpl::toCoordsArray(int& len) {
   }
   r[i] = parseLength(str->characters() + pos, str->length() - pos);
 
+  ASSERT(i == len - 1);
+
   return r;
 }
 
@@ -227,7 +237,7 @@ Length* StringImpl::toLengthArray(int& len) {
     return 0;
   }
 
-  len = (str->find(',') >= 0) + 1;
+  len = countCharacter(str.get(), ',') + 1;
   Length* r = new Length[len];
 
   int i = 0;
@@ -238,6 +248,8 @@ Length* StringImpl::toLengthArray(int& len) {
     r[i++] = parseLength(str->characters() + pos, pos2 - pos);
     pos = pos2 + 1;
   }
+
+  ASSERT(i == len - 1);
 
   /* IE Quirk: If the last comma is the last char skip it and reduce len by one
    */
@@ -803,6 +815,8 @@ PassRefPtr<StringImpl> StringImpl::replace(UChar pattern,
   memcpy(data.data() + dstOffset, m_data + srcSegmentStart,
          srcSegmentLength * sizeof(UChar));
 
+  ASSERT(dstOffset + srcSegmentLength == static_cast<int>(data.size()));
+
   return adopt(data);
 }
 
@@ -851,6 +865,8 @@ PassRefPtr<StringImpl> StringImpl::replace(StringImpl* pattern,
   srcSegmentLength = m_length - srcSegmentStart;
   memcpy(data.data() + dstOffset, m_data + srcSegmentStart,
          srcSegmentLength * sizeof(UChar));
+
+  ASSERT(dstOffset + srcSegmentLength == static_cast<int>(data.size()));
 
   return adopt(data);
 }
