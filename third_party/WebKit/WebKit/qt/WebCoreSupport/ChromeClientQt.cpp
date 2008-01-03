@@ -104,7 +104,7 @@ Page* ChromeClientQt::createWindow(Frame*,
   if (!newPage)
     return 0;
   KURL url = request.resourceRequest().url();
-  newPage->open(QUrl(url.prettyURL()));
+  newPage->mainFrame()->load(QUrl(url.prettyURL()));
   return newPage->d->page;
 }
 

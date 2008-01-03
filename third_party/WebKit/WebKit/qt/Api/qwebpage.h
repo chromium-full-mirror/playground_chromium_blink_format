@@ -139,10 +139,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   explicit QWebPage(QWidget* parent = 0);
   ~QWebPage();
 
-  // ### move to frame
-  void open(const QUrl& url);
-  void open(const QWebNetworkRequest& request);
-
   QWebFrame* mainFrame() const;
   QWebFrame* currentFrame() const;
 
