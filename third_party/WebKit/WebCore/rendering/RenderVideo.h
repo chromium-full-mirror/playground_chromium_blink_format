@@ -61,6 +61,8 @@ class RenderVideo : public RenderMedia {
   bool isWidthSpecified() const;
   bool isHeightSpecified() const;
 
+  IntRect videoBox() const;
+
   void updatePlayer();
 };
 
