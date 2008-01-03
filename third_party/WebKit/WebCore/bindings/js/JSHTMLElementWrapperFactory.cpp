@@ -196,7 +196,8 @@ typedef JSNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
   static JSNode* create##name##Wrapper(ExecState* exec,                   \
                                        PassRefPtr<HTMLElement> element) { \
     return new JSHTML##name##Element(                                     \
-        exec, static_cast<HTML##name##Element*>(element.get()));          \
+        JSHTML##name##ElementPrototype::self(exec),                       \
+        static_cast<HTML##name##Element*>(element.get()));                \
   }
 FOR_EACH_TAG(CREATE_WRAPPER_FUNCTION)
 #if ENABLE(VIDEO)
@@ -233,7 +234,7 @@ JSNode* createJSHTMLWrapper(ExecState* exec, PassRefPtr<HTMLElement> element) {
       map.get(element->localName().impl());
   if (createWrapperFunction)
     return createWrapperFunction(exec, element);
-  return new JSHTMLElement(exec, element.get());
+  return new JSHTMLElement(JSHTMLElementPrototype::self(exec), element.get());
 }
 
 }  // namespace WebCore

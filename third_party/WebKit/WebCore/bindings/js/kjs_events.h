@@ -107,7 +107,7 @@ KJS::JSValue* getNodeEventListener(Node*, const AtomicString& eventType);
 
 class JSClipboard : public KJS::DOMObject {
  public:
-  JSClipboard(KJS::ExecState*, Clipboard*);
+  JSClipboard(KJS::JSObject* prototype, Clipboard*);
   virtual ~JSClipboard();
 
   virtual bool getOwnPropertySlot(KJS::ExecState*,

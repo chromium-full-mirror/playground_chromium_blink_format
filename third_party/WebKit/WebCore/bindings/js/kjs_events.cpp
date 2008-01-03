@@ -365,10 +365,8 @@ DontDelete|Function 3
 KJS_DEFINE_PROTOTYPE(JSClipboardPrototype)
 KJS_IMPLEMENT_PROTOTYPE("Clipboard", JSClipboardPrototype)
 
-JSClipboard::JSClipboard(ExecState* exec, Clipboard* clipboard)
-    : m_impl(clipboard) {
-  setPrototype(JSClipboardPrototype::self(exec));
-}
+JSClipboard::JSClipboard(JSObject* prototype, Clipboard* clipboard)
+    : DOMObject(prototype), m_impl(clipboard) {}
 
 JSClipboard::~JSClipboard() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
@@ -529,7 +527,8 @@ JSValue* JSClipboardPrototypeFunctionSetDragImage::callAsFunction(
 }
 
 JSValue* toJS(ExecState* exec, Clipboard* obj) {
-  return cacheDOMObject<Clipboard, JSClipboard>(exec, obj);
+  return cacheDOMObject<Clipboard, JSClipboard, JSClipboardPrototype>(exec,
+                                                                      obj);
 }
 
 Clipboard* toClipboard(JSValue* val) {

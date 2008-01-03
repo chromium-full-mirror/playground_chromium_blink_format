@@ -65,79 +65,99 @@ JSValue* toJS(ExecState* exec, SVGPathSeg* obj, SVGElement* context) {
 
   switch (obj->pathSegType()) {
     case SVGPathSeg::PATHSEG_CLOSEPATH:
-      return cacheSVGDOMObject<SVGPathSegClosePath, JSSVGPathSegClosePath>(
+      return cacheSVGDOMObject<SVGPathSegClosePath, JSSVGPathSegClosePath,
+                               JSSVGPathSegClosePathPrototype>(
           exec, static_cast<SVGPathSegClosePath*>(obj), context);
     case SVGPathSeg::PATHSEG_MOVETO_ABS:
-      return cacheSVGDOMObject<SVGPathSegMovetoAbs, JSSVGPathSegMovetoAbs>(
+      return cacheSVGDOMObject<SVGPathSegMovetoAbs, JSSVGPathSegMovetoAbs,
+                               JSSVGPathSegMovetoAbsPrototype>(
           exec, static_cast<SVGPathSegMovetoAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_MOVETO_REL:
-      return cacheSVGDOMObject<SVGPathSegMovetoRel, JSSVGPathSegMovetoRel>(
+      return cacheSVGDOMObject<SVGPathSegMovetoRel, JSSVGPathSegMovetoRel,
+                               JSSVGPathSegMovetoRelPrototype>(
           exec, static_cast<SVGPathSegMovetoRel*>(obj), context);
     case SVGPathSeg::PATHSEG_LINETO_ABS:
-      return cacheSVGDOMObject<SVGPathSegLinetoAbs, JSSVGPathSegLinetoAbs>(
+      return cacheSVGDOMObject<SVGPathSegLinetoAbs, JSSVGPathSegLinetoAbs,
+                               JSSVGPathSegLinetoAbsPrototype>(
           exec, static_cast<SVGPathSegLinetoAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_LINETO_REL:
-      return cacheSVGDOMObject<SVGPathSegLinetoRel, JSSVGPathSegLinetoRel>(
+      return cacheSVGDOMObject<SVGPathSegLinetoRel, JSSVGPathSegLinetoRel,
+                               JSSVGPathSegLinetoRelPrototype>(
           exec, static_cast<SVGPathSegLinetoRel*>(obj), context);
     case SVGPathSeg::PATHSEG_CURVETO_CUBIC_ABS:
       return cacheSVGDOMObject<SVGPathSegCurvetoCubicAbs,
-                               JSSVGPathSegCurvetoCubicAbs>(
+                               JSSVGPathSegCurvetoCubicAbs,
+                               JSSVGPathSegCurvetoCubicAbsPrototype>(
           exec, static_cast<SVGPathSegCurvetoCubicAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_CURVETO_CUBIC_REL:
       return cacheSVGDOMObject<SVGPathSegCurvetoCubicRel,
-                               JSSVGPathSegCurvetoCubicRel>(
+                               JSSVGPathSegCurvetoCubicRel,
+                               JSSVGPathSegCurvetoCubicRelPrototype>(
           exec, static_cast<SVGPathSegCurvetoCubicRel*>(obj), context);
     case SVGPathSeg::PATHSEG_CURVETO_QUADRATIC_ABS:
       return cacheSVGDOMObject<SVGPathSegCurvetoQuadraticAbs,
-                               JSSVGPathSegCurvetoQuadraticAbs>(
+                               JSSVGPathSegCurvetoQuadraticAbs,
+                               JSSVGPathSegCurvetoQuadraticAbsPrototype>(
           exec, static_cast<SVGPathSegCurvetoQuadraticAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_CURVETO_QUADRATIC_REL:
       return cacheSVGDOMObject<SVGPathSegCurvetoQuadraticRel,
-                               JSSVGPathSegCurvetoQuadraticRel>(
+                               JSSVGPathSegCurvetoQuadraticRel,
+                               JSSVGPathSegCurvetoQuadraticRelPrototype>(
           exec, static_cast<SVGPathSegCurvetoQuadraticRel*>(obj), context);
     case SVGPathSeg::PATHSEG_ARC_ABS:
-      return cacheSVGDOMObject<SVGPathSegArcAbs, JSSVGPathSegArcAbs>(
+      return cacheSVGDOMObject<SVGPathSegArcAbs, JSSVGPathSegArcAbs,
+                               JSSVGPathSegArcAbsPrototype>(
           exec, static_cast<SVGPathSegArcAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_ARC_REL:
-      return cacheSVGDOMObject<SVGPathSegArcRel, JSSVGPathSegArcRel>(
+      return cacheSVGDOMObject<SVGPathSegArcRel, JSSVGPathSegArcRel,
+                               JSSVGPathSegArcRelPrototype>(
           exec, static_cast<SVGPathSegArcRel*>(obj), context);
     case SVGPathSeg::PATHSEG_LINETO_HORIZONTAL_ABS:
       return cacheSVGDOMObject<SVGPathSegLinetoHorizontalAbs,
-                               JSSVGPathSegLinetoHorizontalAbs>(
+                               JSSVGPathSegLinetoHorizontalAbs,
+                               JSSVGPathSegLinetoHorizontalAbsPrototype>(
           exec, static_cast<SVGPathSegLinetoHorizontalAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_LINETO_HORIZONTAL_REL:
       return cacheSVGDOMObject<SVGPathSegLinetoHorizontalRel,
-                               JSSVGPathSegLinetoHorizontalRel>(
+                               JSSVGPathSegLinetoHorizontalRel,
+                               JSSVGPathSegLinetoHorizontalRelPrototype>(
           exec, static_cast<SVGPathSegLinetoHorizontalRel*>(obj), context);
     case SVGPathSeg::PATHSEG_LINETO_VERTICAL_ABS:
       return cacheSVGDOMObject<SVGPathSegLinetoVerticalAbs,
-                               JSSVGPathSegLinetoVerticalAbs>(
+                               JSSVGPathSegLinetoVerticalAbs,
+                               JSSVGPathSegLinetoVerticalAbsPrototype>(
           exec, static_cast<SVGPathSegLinetoVerticalAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_LINETO_VERTICAL_REL:
       return cacheSVGDOMObject<SVGPathSegLinetoVerticalRel,
-                               JSSVGPathSegLinetoVerticalRel>(
+                               JSSVGPathSegLinetoVerticalRel,
+                               JSSVGPathSegLinetoVerticalRelPrototype>(
           exec, static_cast<SVGPathSegLinetoVerticalRel*>(obj), context);
     case SVGPathSeg::PATHSEG_CURVETO_CUBIC_SMOOTH_ABS:
       return cacheSVGDOMObject<SVGPathSegCurvetoCubicSmoothAbs,
-                               JSSVGPathSegCurvetoCubicSmoothAbs>(
+                               JSSVGPathSegCurvetoCubicSmoothAbs,
+                               JSSVGPathSegCurvetoCubicSmoothAbsPrototype>(
           exec, static_cast<SVGPathSegCurvetoCubicSmoothAbs*>(obj), context);
     case SVGPathSeg::PATHSEG_CURVETO_CUBIC_SMOOTH_REL:
       return cacheSVGDOMObject<SVGPathSegCurvetoCubicSmoothRel,
-                               JSSVGPathSegCurvetoCubicSmoothRel>(
+                               JSSVGPathSegCurvetoCubicSmoothRel,
+                               JSSVGPathSegCurvetoCubicSmoothRelPrototype>(
           exec, static_cast<SVGPathSegCurvetoCubicSmoothRel*>(obj), context);
     case SVGPathSeg::PATHSEG_CURVETO_QUADRATIC_SMOOTH_ABS:
       return cacheSVGDOMObject<SVGPathSegCurvetoQuadraticSmoothAbs,
-                               JSSVGPathSegCurvetoQuadraticSmoothAbs>(
+                               JSSVGPathSegCurvetoQuadraticSmoothAbs,
+                               JSSVGPathSegCurvetoQuadraticSmoothAbsPrototype>(
           exec, static_cast<SVGPathSegCurvetoQuadraticSmoothAbs*>(obj),
           context);
     case SVGPathSeg::PATHSEG_CURVETO_QUADRATIC_SMOOTH_REL:
       return cacheSVGDOMObject<SVGPathSegCurvetoQuadraticSmoothRel,
-                               JSSVGPathSegCurvetoQuadraticSmoothRel>(
+                               JSSVGPathSegCurvetoQuadraticSmoothRel,
+                               JSSVGPathSegCurvetoQuadraticSmoothRelPrototype>(
           exec, static_cast<SVGPathSegCurvetoQuadraticSmoothRel*>(obj),
           context);
     case SVGPathSeg::PATHSEG_UNKNOWN:
     default:
-      return cacheSVGDOMObject<SVGPathSeg, JSSVGPathSeg>(exec, obj, context);
+      return cacheSVGDOMObject<SVGPathSeg, JSSVGPathSeg, JSSVGPathSegPrototype>(
+          exec, obj, context);
   }
 }
 }

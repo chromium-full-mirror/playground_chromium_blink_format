@@ -198,9 +198,8 @@ const ClassInfo Navigator::info = {"Navigator", 0, &NavigatorTable};
 @end
 */
 
-Navigator::Navigator(ExecState* exec, Frame* f) : m_frame(f) {
-  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
-}
+Navigator::Navigator(JSObject* prototype, Frame* frame)
+    : DOMObject(prototype), m_frame(frame) {}
 
 bool Navigator::getOwnPropertySlot(ExecState* exec,
                                    const Identifier& propertyName,
@@ -274,9 +273,8 @@ void PluginBase::cachePluginDataIfNecessary() {
   }
 }
 
-PluginBase::PluginBase(ExecState* exec) {
-  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
-
+PluginBase::PluginBase(ExecState* exec)
+    : DOMObject(exec->lexicalGlobalObject()->objectPrototype()) {
   cachePluginDataIfNecessary();
   m_plugInCacheRefCount++;
 }

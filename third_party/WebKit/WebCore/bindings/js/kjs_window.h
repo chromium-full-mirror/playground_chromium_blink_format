@@ -35,7 +35,6 @@ class Frame;
 class JSEventListener;
 class JSLocation;
 class JSUnprotectedEventListener;
-class Location;
 class PausedTimeouts;
 class ScheduledAction;
 }
@@ -51,11 +50,10 @@ class WindowPrivate;
 class Window : public JSGlobalObject {
   typedef JSGlobalObject Base;
 
-  friend class WebCore::JSLocation;
   friend class WebCore::ScheduledAction;
 
  protected:
-  Window(WebCore::DOMWindow*, JSValue* prototype);
+  Window(JSObject* prototype, WebCore::DOMWindow*);
 
  public:
   virtual ~Window();

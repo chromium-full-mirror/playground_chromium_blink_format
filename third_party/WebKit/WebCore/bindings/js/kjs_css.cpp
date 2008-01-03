@@ -45,9 +45,8 @@ const ClassInfo JSRGBColor::info = {"RGBColor", 0, &JSRGBColorTable};
 @end
 */
 
-JSRGBColor::JSRGBColor(ExecState* exec, unsigned color) : m_color(color) {
-  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
-}
+JSRGBColor::JSRGBColor(JSObject* prototype, unsigned color)
+    : DOMObject(prototype), m_color(color) {}
 
 JSRGBColor::~JSRGBColor() {}
 
@@ -77,7 +76,7 @@ JSValue* JSRGBColor::getValueProperty(ExecState* exec, int token) const {
 
 JSValue* getJSRGBColor(ExecState* exec, unsigned color) {
   // FIXME: implement equals for RGBColor since they're not refcounted objects
-  return new JSRGBColor(exec, color);
+  return new JSRGBColor(exec->lexicalGlobalObject()->objectPrototype(), color);
 }
 
 }  // namespace WebCore

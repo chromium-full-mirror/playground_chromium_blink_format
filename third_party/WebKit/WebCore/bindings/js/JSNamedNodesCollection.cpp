@@ -42,11 +42,9 @@ const ClassInfo JSNamedNodesCollection::info = {"Collection", 0, 0};
 // so it shouldn't be a problem that it's storing all the nodes (with the same
 // name). (David)
 JSNamedNodesCollection::JSNamedNodesCollection(
-    ExecState* exec,
+    KJS::JSObject* prototype,
     const Vector<RefPtr<Node>>& nodes)
-    : m_nodes(nodes) {
-  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
-}
+    : KJS::DOMObject(prototype), m_nodes(nodes) {}
 
 JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
                                               JSObject* originalObject,

@@ -34,8 +34,8 @@ class HTMLCollection;
 
 class JSHTMLAllCollection : public JSHTMLCollection {
  public:
-  JSHTMLAllCollection(KJS::ExecState* exec, HTMLCollection* collection)
-      : JSHTMLCollection(exec, collection) {}
+  JSHTMLAllCollection(KJS::JSObject* prototype, HTMLCollection* collection)
+      : JSHTMLCollection(prototype, collection) {}
 
   virtual bool toBoolean(KJS::ExecState*) const { return false; }
   virtual bool masqueradeAsUndefined() const { return true; }

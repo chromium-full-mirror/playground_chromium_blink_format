@@ -35,9 +35,7 @@ namespace WebCore {
 using namespace KJS;
 
 ImageConstructorImp::ImageConstructorImp(ExecState* exec, Document* doc)
-    : m_doc(doc) {
-  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
-}
+    : DOMObject(exec->lexicalGlobalObject()->objectPrototype()), m_doc(doc) {}
 
 JSObject* ImageConstructorImp::construct(ExecState* exec, const List& list) {
   bool widthSet = false;

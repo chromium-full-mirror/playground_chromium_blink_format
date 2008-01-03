@@ -35,6 +35,8 @@ class JSLocation : public KJS::DOMObject {
   friend class KJS::Window;
 
  public:
+  JSLocation(KJS::JSObject* protoype, Frame*);
+
   virtual bool getOwnPropertySlot(KJS::ExecState*,
                                   const KJS::Identifier&,
                                   KJS::PropertySlot&);
@@ -65,8 +67,6 @@ class JSLocation : public KJS::DOMObject {
   static const KJS::ClassInfo info;
 
  private:
-  JSLocation(Frame*);
-
   Frame* m_frame;
 };
 

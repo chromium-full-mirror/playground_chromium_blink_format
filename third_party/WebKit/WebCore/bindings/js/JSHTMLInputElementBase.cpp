@@ -68,12 +68,9 @@ const ClassInfo JSHTMLInputElementBase::info = {"JSHTMLInputElementBase",
                                                 &JSHTMLElement::info,
                                                 &JSHTMLInputElementBaseTable};
 
-JSHTMLInputElementBase::JSHTMLInputElementBase(ExecState* exec,
+JSHTMLInputElementBase::JSHTMLInputElementBase(KJS::JSObject* prototype,
                                                PassRefPtr<HTMLInputElement> e)
-    : JSHTMLElement(exec, e.get()) {
-  // We don't really need a prototype, just use our parent class's prototype
-  setPrototype(JSHTMLElementPrototype::self(exec));
-}
+    : JSHTMLElement(prototype, e.get()) {}
 
 bool JSHTMLInputElementBase::getOwnPropertySlot(ExecState* exec,
                                                 const Identifier& propertyName,

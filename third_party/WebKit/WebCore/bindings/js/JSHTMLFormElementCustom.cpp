@@ -56,7 +56,8 @@ JSValue* JSHTMLFormElement::nameGetter(ExecState* exec,
   if (namedItems.size() == 1)
     return toJS(exec, namedItems[0].get());
   if (namedItems.size() > 1)
-    return new JSNamedNodesCollection(exec, namedItems);
+    return new JSNamedNodesCollection(
+        exec->lexicalGlobalObject()->objectPrototype(), namedItems);
   return jsUndefined();
 }
 }

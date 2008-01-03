@@ -33,7 +33,9 @@ KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLInputElementBasePrototype,
 
 class JSHTMLInputElementBase : public JSHTMLElement {
  public:
-  JSHTMLInputElementBase(KJS::ExecState*, PassRefPtr<HTMLInputElement>);
+  JSHTMLInputElementBase(KJS::JSObject* prototype,
+                         PassRefPtr<HTMLInputElement>);
+
   virtual bool getOwnPropertySlot(KJS::ExecState*,
                                   const KJS::Identifier&,
                                   KJS::PropertySlot&);

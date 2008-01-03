@@ -75,8 +75,7 @@ KJS_IMPLEMENT_PROTOTYPE("JSXMLHttpRequest", JSXMLHttpRequestPrototype)
 
 JSXMLHttpRequestConstructorImp::JSXMLHttpRequestConstructorImp(ExecState* exec,
                                                                Document* d)
-    : doc(d) {
-  setPrototype(exec->lexicalGlobalObject()->objectPrototype());
+    : DOMObject(exec->lexicalGlobalObject()->objectPrototype()), doc(d) {
   putDirect(exec->propertyNames().prototype,
             JSXMLHttpRequestPrototype::self(exec), None);
 }
@@ -87,7 +86,7 @@ bool JSXMLHttpRequestConstructorImp::implementsConstruct() const {
 
 JSObject* JSXMLHttpRequestConstructorImp::construct(ExecState* exec,
                                                     const List&) {
-  return new JSXMLHttpRequest(exec, doc.get());
+  return new JSXMLHttpRequest(JSXMLHttpRequestPrototype::self(exec), doc.get());
 }
 
 const ClassInfo JSXMLHttpRequest::info = {"JSXMLHttpRequest", 0,
@@ -229,9 +228,8 @@ void JSXMLHttpRequest::mark() {
   }
 }
 
-JSXMLHttpRequest::JSXMLHttpRequest(ExecState* exec, Document* d)
-    : m_impl(new XMLHttpRequest(d)) {
-  setPrototype(JSXMLHttpRequestPrototype::self(exec));
+JSXMLHttpRequest::JSXMLHttpRequest(JSObject* prototype, Document* d)
+    : DOMObject(prototype), m_impl(new XMLHttpRequest(d)) {
   ScriptInterpreter::putDOMObject(m_impl.get(), this);
 }
 

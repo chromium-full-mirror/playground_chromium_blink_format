@@ -42,7 +42,7 @@ namespace KJS {
 
 class JSXSLTProcessor : public DOMObject {
  public:
-  JSXSLTProcessor(ExecState* exec);
+  JSXSLTProcessor(JSObject* prototype);
   ~JSXSLTProcessor();
 
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -57,10 +57,9 @@ class JSXSLTProcessor : public DOMObject {
 class XSLTProcessorConstructorImp : public DOMObject {
  public:
   XSLTProcessorConstructorImp(ExecState*);
-  virtual bool implementsConstruct() const { return true; }
-  virtual JSObject* construct(ExecState* exec, const List& args) {
-    return new JSXSLTProcessor(exec);
-  }
+
+  virtual bool implementsConstruct() const;
+  virtual JSObject* construct(ExecState*, const List&);
 };
 
 #define FOR_EACH_CLASS(macro)                                                \

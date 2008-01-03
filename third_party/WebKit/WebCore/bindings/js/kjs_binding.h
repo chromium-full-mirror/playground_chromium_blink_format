@@ -56,14 +56,21 @@ namespace KJS {
  */
 class DOMObject : public JSObject {
  protected:
-  DOMObject() {
+  explicit DOMObject(JSValue* prototype)  // FIXME: this should take a JSObject
+                                          // once JSLocation has a real
+                                          // prototype
+      : JSObject(prototype) {
     // DOMObject destruction is not thread-safe because DOMObjects wrap
     // unsafe WebCore DOM data structures.
     Collector::collectOnMainThreadOnly(this);
   }
+
 #ifndef NDEBUG
   virtual ~DOMObject();
 #endif
+
+ private:
+  DOMObject();
 };
 
 class ScriptInterpreter : public Interpreter {
@@ -86,24 +93,24 @@ class ScriptInterpreter : public Interpreter {
 };
 
 /**
- * Retrieve from cache, or create, a KJS object around a DOM object
+ * Retrieve from cache, or create, a JS object around a DOM object
  */
-template <class DOMObj, class KJSDOMObj>
+template <class DOMObj, class JSDOMObj, class JSDOMObjPrototype>
 inline JSValue* cacheDOMObject(ExecState* exec, DOMObj* domObj) {
   if (!domObj)
     return jsNull();
   if (DOMObject* ret = ScriptInterpreter::getDOMObject(domObj))
     return ret;
-  DOMObject* ret = new KJSDOMObj(exec, domObj);
+  DOMObject* ret = new JSDOMObj(JSDOMObjPrototype::self(exec), domObj);
   ScriptInterpreter::putDOMObject(domObj, ret);
   return ret;
 }
 
 #if ENABLE(SVG)
 /**
- * Retrieve from cache, or create, a KJS object around a SVG DOM object
+ * Retrieve from cache, or create, a JS object around a SVG DOM object
  */
-template <class DOMObj, class KJSDOMObj>
+template <class DOMObj, class JSDOMObj, class JSDOMObjPrototype>
 inline JSValue* cacheSVGDOMObject(ExecState* exec,
                                   DOMObj* domObj,
                                   WebCore::SVGElement* context) {
@@ -111,7 +118,7 @@ inline JSValue* cacheSVGDOMObject(ExecState* exec,
     return jsNull();
   if (DOMObject* ret = ScriptInterpreter::getDOMObject(domObj))
     return ret;
-  DOMObject* ret = new KJSDOMObj(exec, domObj, context);
+  DOMObject* ret = new JSDOMObj(JSDOMObjPrototype::self(exec), domObj, context);
   ScriptInterpreter::putDOMObject(domObj, ret);
   return ret;
 }

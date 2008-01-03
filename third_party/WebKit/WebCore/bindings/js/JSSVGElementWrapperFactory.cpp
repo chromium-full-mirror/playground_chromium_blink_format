@@ -245,7 +245,8 @@ typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
   static JSNode* create##name##Wrapper(ExecState* exec,                  \
                                        PassRefPtr<SVGElement> element) { \
     return new JSSVG##name##Element(                                     \
-        exec, static_cast<SVG##name##Element*>(element.get()));          \
+        JSSVG##name##ElementPrototype::self(exec),                       \
+        static_cast<SVG##name##Element*>(element.get()));                \
   }
 FOR_EACH_TAG(CREATE_WRAPPER_FUNCTION)
 FOR_EACH_ANIMATION_TAG(CREATE_WRAPPER_FUNCTION)
@@ -270,7 +271,7 @@ JSNode* createJSSVGWrapper(ExecState* exec, PassRefPtr<SVGElement> element) {
       map.get(element->localName().impl());
   if (createWrapperFunction)
     return createWrapperFunction(exec, element);
-  return new JSSVGElement(exec, element.get());
+  return new JSSVGElement(JSSVGElementPrototype::self(exec), element.get());
 }
 }
 

@@ -37,7 +37,7 @@ class Node;
 
 class JSEventTargetNode : public JSNode {
  public:
-  JSEventTargetNode(KJS::ExecState*, Node*);
+  JSEventTargetNode(KJS::JSObject* prototype, Node*);
 
   void setListener(KJS::ExecState*,
                    const AtomicString& eventType,
