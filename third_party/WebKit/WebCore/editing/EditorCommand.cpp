@@ -1509,6 +1509,11 @@ static const CommandMap& createCommandMap() {
       {"BackColor",
        {executeBackColor, supported, enabledRangeInRichlyEditableText,
         stateNone, valueBackColor, notTextInsertion}},
+      {"BackwardDelete",
+       {executeDeleteBackward, supportedFromMenuOrKeyBinding,
+        enabledInEditableText, stateNone, valueNull,
+        notTextInsertion}},  // FIXME: remove BackwardDelete when Safari for
+                             // Windows stops using it.
       {"Bold",
        {executeToggleBold, supported, enabledInRichlyEditableText, stateBold,
         valueNull, notTextInsertion}},
