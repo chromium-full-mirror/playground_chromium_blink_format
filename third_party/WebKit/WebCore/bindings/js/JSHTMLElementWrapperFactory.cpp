@@ -189,7 +189,7 @@ typedef JSNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
                                                       ul,                      \
                                                       UList)  // end of macro
 
-#define FOR_EACH_VIDEO_TAG(macro) \
+#define FOR_EACH_MEDIA_TAG(macro) \
   macro(audio, Audio) macro(source, Source) macro(video, Video)  // end of macro
 
 #define CREATE_WRAPPER_FUNCTION(tag, name)                                \
@@ -199,9 +199,17 @@ typedef JSNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
         JSHTML##name##ElementPrototype::self(exec),                       \
         static_cast<HTML##name##Element*>(element.get()));                \
   }
+#define CREATE_MEDIA_WRAPPER_FUNCTION(tag, name)                          \
+  static JSNode* create##name##Wrapper(ExecState* exec,                   \
+                                       PassRefPtr<HTMLElement> element) { \
+    if (!MediaPlayer::isAvailable())                                      \
+      return new JSHTMLElement(exec, element.get());                      \
+    return new JSHTML##name##Element(                                     \
+        exec, static_cast<HTML##name##Element*>(element.get()));          \
+  }
 FOR_EACH_TAG(CREATE_WRAPPER_FUNCTION)
 #if ENABLE(VIDEO)
-FOR_EACH_VIDEO_TAG(CREATE_WRAPPER_FUNCTION)
+FOR_EACH_MEDIA_TAG(CREATE_MEDIA_WRAPPER_FUNCTION)
 #endif
 #undef CREATE_WRAPPER_FUNCTION
 
@@ -212,7 +220,7 @@ JSNode* createJSHTMLWrapper(ExecState* exec, PassRefPtr<HTMLElement> element) {
   map.set(tag##Tag.localName().impl(), create##name##Wrapper);
     FOR_EACH_TAG(ADD_TO_HASH_MAP)
 #if ENABLE(VIDEO)
-    FOR_EACH_VIDEO_TAG(ADD_TO_HASH_MAP)
+    FOR_EACH_MEDIA_TAG(ADD_TO_HASH_MAP)
 #endif
 #undef ADD_TO_HASH_MAP
     map.set(colgroupTag.localName().impl(), createTableColWrapper);

@@ -47,6 +47,7 @@
 #include "JSXMLHttpRequest.h"
 #include "JSLocation.h"
 #include "Logging.h"
+#include "MediaPlayer.h"
 #include "Page.h"
 #include "PausedTimeouts.h"
 #include "PlatformScreen.h"
@@ -529,6 +530,8 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
                                                 impl()->frame()->document());
     case Audio:
 #if ENABLE(VIDEO)
+      if (!MediaPlayer::isAvailable())
+        return jsUndefined();
       return new JSHTMLAudioElementConstructor(exec,
                                                impl()->frame()->document());
 #else
