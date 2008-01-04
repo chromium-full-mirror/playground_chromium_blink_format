@@ -253,17 +253,26 @@ IntRect ChromeClientQt::windowResizerRect() const {
   return IntRect();
 }
 
-void ChromeClientQt::addToDirtyRegion(const IntRect& r) {}
+void ChromeClientQt::addToDirtyRegion(const IntRect& r) {
+  QWidget* view = m_webPage->view();
+  if (view)
+    view->update(r);
+}
 
 void ChromeClientQt::scrollBackingStore(int dx,
                                         int dy,
                                         const IntRect& scrollViewRect,
                                         const IntRect& clipRect) {
-  // #### QWebPage
-  // m_webPage->scroll(dx, dy, scrollViewRect);
+  QWidget* view = m_webPage->view();
+  if (view)
+    view->scroll(dx, dy, scrollViewRect);
 }
 
-void ChromeClientQt::updateBackingStore() {}
+void ChromeClientQt::updateBackingStore() {
+  //     QWidget* view = m_webPage->view();
+  //     if (view)
+  //         view->update();
+}
 
 void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult&,
                                              unsigned /*modifierFlags*/) {
