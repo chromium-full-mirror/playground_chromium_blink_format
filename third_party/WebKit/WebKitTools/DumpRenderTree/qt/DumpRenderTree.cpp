@@ -41,6 +41,7 @@
 
 #include <qwebpage.h>
 #include <qwebframe.h>
+#include <qwebview.h>
 #include <qwebsettings.h>
 
 #include <unistd.h>
@@ -72,6 +73,7 @@ class WebPage : public QWebPage {
 
  private:
   DumpRenderTree* m_drt;
+  QWidget* m_view;
 };
 
 WebPage::WebPage(QWidget* parent, DumpRenderTree* drt)
@@ -115,10 +117,14 @@ DumpRenderTree::DumpRenderTree() : m_stdin(0), m_notifier(0) {
   connect(m_controller, SIGNAL(done()), this, SLOT(dump()),
           Qt::QueuedConnection);
 
-  m_page = new WebPage(0, this);
+  QWebView* view = new QWebView(0);
+  view->resize(QSize(maxViewWidth, maxViewHeight));
+  m_page = new WebPage(view, this);
+  view->setPage(m_page);
   connect(m_page, SIGNAL(frameCreated(QWebFrame*)), this,
           SLOT(connectFrame(QWebFrame*)));
-  m_page->setViewportSize(QSize(maxViewWidth, maxViewHeight));
+  connectFrame(m_page->mainFrame());
+
   m_page->mainFrame()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_page->mainFrame()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   connect(m_page->mainFrame(), SIGNAL(titleChanged(const QString&)),
@@ -131,7 +137,7 @@ DumpRenderTree::DumpRenderTree() : m_stdin(0), m_notifier(0) {
                    Qt::QueuedConnection);
   qt_drt_run(true);
   QFocusEvent event(QEvent::FocusIn, Qt::ActiveWindowFocusReason);
-  QApplication::sendEvent(m_page, &event);
+  QApplication::sendEvent(view, &event);
 }
 
 DumpRenderTree::~DumpRenderTree() {
