@@ -166,6 +166,9 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   QAction* action(WebAction action) const;
   virtual void triggerAction(WebAction action, bool checked = false);
 
+  QSize viewportSize() const;
+  void setViewportSize(const QSize& size) const;
+
  Q_SIGNALS:
   /**
    * Signal is emitted when the global progress status changes.
