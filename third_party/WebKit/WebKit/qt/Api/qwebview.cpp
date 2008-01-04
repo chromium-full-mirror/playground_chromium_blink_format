@@ -397,6 +397,9 @@ void QWebView::contextMenuEvent(QContextMenuEvent* ev) {
 
 void QWebView::wheelEvent(QWheelEvent* ev) {
   d->page->event(ev);
+
+  if (!ev->isAccepted())
+    return QWidget::wheelEvent(ev);
 }
 
 void QWebView::keyPressEvent(QKeyEvent* ev) {
@@ -409,9 +412,11 @@ void QWebView::keyReleaseEvent(QKeyEvent* ev) {
 
 void QWebView::focusInEvent(QFocusEvent* ev) {
   d->page->event(ev);
+  QWidget::focusInEvent(ev);
 }
 
 void QWebView::focusOutEvent(QFocusEvent* ev) {
+  QWidget::focusOutEvent(ev);
   d->page->event(ev);
 }
 
