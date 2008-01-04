@@ -33,6 +33,7 @@
 class QRect;
 class QPoint;
 class QPainter;
+class QPixmap;
 class QMouseEvent;
 class QWheelEvent;
 class QWebNetworkRequest;
@@ -69,7 +70,11 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QString markup() const;
   QString innerText() const;
   QString renderTreeDump() const;
+
   QString title() const;
+  QUrl url() const;
+  QPixmap icon() const;
+
   QString name() const;
 
   QList<QWebFrame*> childFrames() const;
@@ -99,6 +104,11 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
   void loadStarted();
   void loadFinished();
+
+  /**
+    * Signal is emitted when the mainframe()'s initial layout is completed.
+   */
+  void initialLayoutComplete();
 
   /**
    * Signal is emitted when an icon ("favicon") is loaded from the site.

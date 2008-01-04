@@ -146,11 +146,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
   QWebSettings* settings();
 
-  // ### move to frame
-  QString title() const;
-  QUrl url() const;
-  QPixmap icon() const;
-
   bool isModified() const;
   QUndoStack* undoStack() const;
 
@@ -192,12 +187,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   void statusBarTextChanged(const QString& text);
 
   void selectionChanged();
-
-  /**
-    * Signal is emitted when the mainframe()'s initial layout is completed.
-   */
-  // ### move to frame
-  void initialLayoutComplete();
 
   // ### call addedToHistory instead, something more signal'ish
   void addToHistory(const QUrl&);
