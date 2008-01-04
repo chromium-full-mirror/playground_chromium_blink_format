@@ -210,12 +210,12 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
       QWebFrame* frame,
       const QWebNetworkRequest& request,
       NavigationType type);
-  // ### do we need the frame? maybe include "file dialog" in the name
-  virtual QString chooseFile(QWebFrame* frame, const QString& oldFile);
-  // ### can we unify the next 3 methods? do we need the frame?
-  virtual void javaScriptAlert(QWebFrame* frame, const QString& msg);
-  virtual bool javaScriptConfirm(QWebFrame* frame, const QString& msg);
-  virtual bool javaScriptPrompt(QWebFrame* frame,
+  virtual QString chooseFile(QWebFrame* originatingFrame,
+                             const QString& oldFile);
+  virtual void javaScriptAlert(QWebFrame* originatingFrame, const QString& msg);
+  virtual bool javaScriptConfirm(QWebFrame* originatingFrame,
+                                 const QString& msg);
+  virtual bool javaScriptPrompt(QWebFrame* originatingFrame,
                                 const QString& msg,
                                 const QString& defaultValue,
                                 QString* result);
