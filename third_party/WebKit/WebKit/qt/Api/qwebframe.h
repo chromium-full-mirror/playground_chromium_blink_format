@@ -66,7 +66,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
                   const QString& mimeType = QString(),
                   const QUrl& baseUrl = QUrl());
 
-  void addToJSWindowObject(const QByteArray& name, QObject* object);
+  void addToJSWindowObject(const QString& name, QObject* object);
   QString markup() const;
   QString innerText() const;
   QString renderTreeDump() const;
