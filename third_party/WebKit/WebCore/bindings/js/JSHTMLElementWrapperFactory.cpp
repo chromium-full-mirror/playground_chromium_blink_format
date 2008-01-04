@@ -203,9 +203,11 @@ typedef JSNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
   static JSNode* create##name##Wrapper(ExecState* exec,                   \
                                        PassRefPtr<HTMLElement> element) { \
     if (!MediaPlayer::isAvailable())                                      \
-      return new JSHTMLElement(exec, element.get());                      \
+      return new JSHTMLElement(JSHTMLElementPrototype::self(exec),        \
+                               element.get());                            \
     return new JSHTML##name##Element(                                     \
-        exec, static_cast<HTML##name##Element*>(element.get()));          \
+        JSHTML##name##ElementPrototype::self(exec),                       \
+        static_cast<HTML##name##Element*>(element.get()));                \
   }
 FOR_EACH_TAG(CREATE_WRAPPER_FUNCTION)
 #if ENABLE(VIDEO)
