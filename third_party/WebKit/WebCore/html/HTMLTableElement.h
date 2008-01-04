@@ -112,6 +112,15 @@ class HTMLTableElement : public HTMLElement {
     ColsRules,
     AllRules
   };
+  enum CellBorders {
+    NoBorders,
+    SolidBorders,
+    InsetBorders,
+    SolidBordersColsOnly,
+    SolidBordersRowsOnly
+  };
+
+  CellBorders cellBorders() const;
 
   HTMLTableSectionElement* lastBody() const;
 
