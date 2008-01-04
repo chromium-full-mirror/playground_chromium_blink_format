@@ -29,6 +29,7 @@
 #include "qwebsettings.h"
 #include "qwebkitglobal.h"
 
+#include <QtCore/qobject.h>
 #include <QtGui/qwidget.h>
 class QNetworkProxy;
 class QUndoStack;
@@ -50,7 +51,7 @@ class ResourceHandle;
 class HitTestResult;
 }
 
-class QWEBKIT_EXPORT QWebPage : public QWidget {
+class QWEBKIT_EXPORT QWebPage : public QObject {
   Q_OBJECT
 
   Q_PROPERTY(bool modified READ isModified)
@@ -136,7 +137,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
     WebActionCount
   };
 
-  explicit QWebPage(QWidget* parent = 0);
+  explicit QWebPage(QObject* parent = 0);
   ~QWebPage();
 
   QWebFrame* mainFrame() const;
@@ -145,6 +146,9 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   QWebPageHistory* history() const;
 
   QWebSettings* settings();
+
+  void setView(QWidget* view);
+  QWidget* view() const;
 
   bool isModified() const;
   QUndoStack* undoStack() const;
@@ -228,8 +232,6 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
   virtual QString userAgentFor(const QUrl& url) const;
 
-  virtual void resizeEvent(QResizeEvent*);
-  virtual void paintEvent(QPaintEvent*);
   virtual void mouseMoveEvent(QMouseEvent*);
   virtual void mousePressEvent(QMouseEvent*);
   virtual void mouseDoubleClickEvent(QMouseEvent*);

@@ -62,9 +62,12 @@ void DragClientQt::startDrag(DragImageRef,
   QMimeData* clipboardData =
       static_cast<ClipboardQt*>(clipboard)->clipboardData();
   static_cast<ClipboardQt*>(clipboard)->invalidateWritableData();
-  QDrag* drag = new QDrag(m_webPage);
-  drag->setMimeData(clipboardData);
-  drag->start();
+  QWidget* view = m_webPage->view();
+  if (view) {
+    QDrag* drag = new QDrag(view);
+    drag->setMimeData(clipboardData);
+    drag->start();
+  }
 #endif
 }
 

@@ -43,24 +43,41 @@ namespace WebCore {
 
 class InspectorClientWebPage : public QWebPage {
  public:
-  InspectorClientWebPage(InspectorController* controller)
-      : QWebPage(0), m_controller(controller) {}
+  QWebPage* createWindow() {
+    QWidget* w = new QWidget(0);
+    QWebPage* page = new QWebPage(w);
+    page->setView(w);
+    connect(page, SIGNAL(destroyed()), w, SLOT(deleteLater()));
+    return page;
+  }
+};
 
-  QWebPage* createWindow() { return new QWebPage(0); }
+class InspectorClientView : public QWidget {
+ public:
+  InspectorClientView(InspectorController* controller)
+      : QWidget(0),
+        m_controller(controller),
+        m_page(new InspectorClientWebPage) {
+    m_page->setView(this);
+    connect(m_page, SIGNAL(destroyed()), SLOT(deleteLater()));
+  }
+
+  QWebPage* page() const { return m_page; }
 
  protected:
   void hideEvent(QHideEvent* ev) {
-    QWebPage::hideEvent(ev);
+    QWidget::hideEvent(ev);
     m_controller->setWindowVisible(false);
   }
 
   void closeEvent(QCloseEvent* ev) {
-    QWebPage::closeEvent(ev);
+    QWidget::closeEvent(ev);
     m_controller->setWindowVisible(false);
   }
 
  private:
   InspectorController* m_controller;
+  QWebPage* m_page;
 };
 
 InspectorClientQt::InspectorClientQt(QWebPage* page)
@@ -74,11 +91,12 @@ Page* InspectorClientQt::createPage() {
   if (m_webPage)
     return m_webPage->d->page;
 
-  m_webPage.set(new InspectorClientWebPage(
-      m_inspectedWebPage->d->page->inspectorController()));
+  InspectorClientView* view = new InspectorClientView(
+      m_inspectedWebPage->d->page->inspectorController());
+  m_webPage.set(view->page());
   m_webPage->mainFrame()->load(
       QString::fromLatin1("qrc:/webkit/inspector/inspector.html"));
-  m_webPage->setMinimumSize(400, 300);
+  m_webPage->view()->setMinimumSize(400, 300);
   return m_webPage->d->page;
 }
 
@@ -92,7 +110,7 @@ void InspectorClientQt::showWindow() {
     return;
 
   updateWindowTitle();
-  m_webPage->show();
+  m_webPage->view()->show();
   m_inspectedWebPage->d->page->inspectorController()->setWindowVisible(true);
 }
 
@@ -100,14 +118,14 @@ void InspectorClientQt::closeWindow() {
   if (!m_webPage)
     return;
 
-  m_webPage->hide();
+  m_webPage->view()->hide();
   m_inspectedWebPage->d->page->inspectorController()->setWindowVisible(false);
 }
 
 bool InspectorClientQt::windowVisible() {
   if (!m_webPage)
     return false;
-  return m_webPage->isVisible();
+  return m_webPage->view()->isVisible();
 }
 
 void InspectorClientQt::attachWindow() {
@@ -147,6 +165,6 @@ void InspectorClientQt::updateWindowTitle() {
 
   QString caption =
       QCoreApplication::translate("QWebPage", "Web Inspector - %2");
-  m_webPage->setWindowTitle(caption.arg(m_inspectedURL));
+  m_webPage->view()->setWindowTitle(caption.arg(m_inspectedURL));
 }
 }

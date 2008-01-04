@@ -94,7 +94,8 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
   void iconLoaded();
 
  protected:
-  virtual void resizeEvent(QResizeEvent* e);
+  void resizeEvent(QResizeEvent* e);
+  void paintEvent(QPaintEvent* ev);
 
  private:
   QWebViewPrivate* d;

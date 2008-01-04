@@ -201,8 +201,8 @@ void ScrollView::updateContents(const IntRect& rect, bool now) {
   // an actual paint occurs in ScrollView::paint...
 
   QRect r(containingWindowRect);
-  QWidget* container = containingWindow();
-  r = r.intersect(container->rect());
+  QWebPage* page = qwebframe()->page();
+  r = r.intersect(QRect(QPoint(0, 0), page->viewportSize()));
   if (r.isEmpty())
     return;
   // Cache the dirty spot.
@@ -211,20 +211,25 @@ void ScrollView::updateContents(const IntRect& rect, bool now) {
   else
     m_data->m_dirtyRegion = QRegion(r);
 
-  bool painting = containingWindow()->testAttribute(Qt::WA_WState_InPaintEvent);
-  if (painting && now) {
-    QWebPage* page = qobject_cast<QWebPage*>(containingWindow());
-    QPainter p(page);
-    page->mainFrame()->render(&p, m_data->m_dirtyRegion.boundingRect());
-  } else if (now) {
-    containingWindow()->repaint(m_data->m_dirtyRegion.boundingRect());
-  } else {
-    containingWindow()->update(m_data->m_dirtyRegion.boundingRect());
-  }
+#if 0
+    // ### QWebPage
+    bool painting = containingWindow()->testAttribute(Qt::WA_WState_InPaintEvent);
+    if (painting && now) {
+        QWebPage *page = qobject_cast<QWebPage*>(containingWindow());
+        QPainter p(page);
+        page->mainFrame()->render(&p, m_data->m_dirtyRegion.boundingRect());
+    } else if (now) {
+        containingWindow()->repaint(m_data->m_dirtyRegion.boundingRect());
+    } else {
+        containingWindow()->update(m_data->m_dirtyRegion.boundingRect());
+    }
+#endif
 }
 
 void ScrollView::update() {
-  containingWindow()->update(frameGeometry());
+  QWidget* window = containingWindow();
+  if (window)
+    window->update(frameGeometry());
 }
 
 int ScrollView::visibleWidth() const {

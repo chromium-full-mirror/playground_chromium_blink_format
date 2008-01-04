@@ -58,13 +58,16 @@ FloatRect ChromeClientQt::windowRect() {
   if (!m_webPage)
     return FloatRect();
 
-  return IntRect(m_webPage->topLevelWidget()->geometry());
+  QWidget* view = m_webPage->view();
+  if (!view)
+    return FloatRect();
+  return IntRect(view->topLevelWidget()->geometry());
 }
 
 FloatRect ChromeClientQt::pageRect() {
   if (!m_webPage)
     return FloatRect();
-  return FloatRect(QRectF(m_webPage->rect()));
+  return FloatRect(QRectF(QPointF(0, 0), m_webPage->viewportSize()));
 }
 
 float ChromeClientQt::scaleFactor() {
@@ -75,25 +78,38 @@ float ChromeClientQt::scaleFactor() {
 void ChromeClientQt::focus() {
   if (!m_webPage)
     return;
-  m_webPage->setFocus();
+  QWidget* view = m_webPage->view();
+  if (!view)
+    return;
+
+  view->setFocus();
 }
 
 void ChromeClientQt::unfocus() {
   if (!m_webPage)
     return;
-  m_webPage->clearFocus();
+  QWidget* view = m_webPage->view();
+  if (!view)
+    return;
+  view->clearFocus();
 }
 
 bool ChromeClientQt::canTakeFocus(FocusDirection) {
   if (!m_webPage)
     return false;
-  return m_webPage->focusPolicy() != Qt::NoFocus;
+  QWidget* view = m_webPage->view();
+  if (!view)
+    return false;
+  return view->focusPolicy() != Qt::NoFocus;
 }
 
 void ChromeClientQt::takeFocus(FocusDirection) {
   if (!m_webPage)
     return;
-  m_webPage->clearFocus();
+  QWidget* view = m_webPage->view();
+  if (!view)
+    return;
+  view->clearFocus();
 }
 
 Page* ChromeClientQt::createWindow(Frame*,
@@ -111,7 +127,10 @@ Page* ChromeClientQt::createWindow(Frame*,
 void ChromeClientQt::show() {
   if (!m_webPage)
     return;
-  m_webPage->topLevelWidget()->show();
+  QWidget* view = m_webPage->view();
+  if (!view)
+    return;
+  view->topLevelWidget()->show();
 }
 
 bool ChromeClientQt::canRunModal() {
@@ -240,7 +259,8 @@ void ChromeClientQt::scrollBackingStore(int dx,
                                         int dy,
                                         const IntRect& scrollViewRect,
                                         const IntRect& clipRect) {
-  m_webPage->scroll(dx, dy, scrollViewRect);
+  // #### QWebPage
+  // m_webPage->scroll(dx, dy, scrollViewRect);
 }
 
 void ChromeClientQt::updateBackingStore() {}

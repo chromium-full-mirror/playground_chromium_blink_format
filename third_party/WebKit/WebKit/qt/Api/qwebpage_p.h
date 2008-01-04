@@ -109,6 +109,7 @@ class QWebPagePrivate {
 
   QWebPage* q;
   QUndoStack* undoStack;
+  QWidget* view;
 
   QWebNetworkInterface* networkInterface;
 
