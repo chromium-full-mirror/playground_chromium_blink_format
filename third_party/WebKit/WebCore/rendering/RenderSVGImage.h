@@ -73,10 +73,12 @@ class RenderSVGImage : public RenderImage {
   bool calculateLocalTransform();
 
  private:
+  void calculateAbsoluteBounds();
   AffineTransform translationForAttributes();
   AffineTransform m_localTransform;
   float m_imageWidth;
   float m_imageHeight;
+  IntRect m_absoluteBounds;
 };
 
 }  // namespace WebCore
