@@ -468,8 +468,13 @@ Vector<String> PluginDatabaseWin::defaultPluginPaths() {
   return paths;
 }
 
-bool PluginDatabaseWin::isMIMETypeRegistered(const String& mimeType) const {
-  return !mimeType.isNull() && m_registeredMIMETypes.contains(mimeType);
+bool PluginDatabaseWin::isMIMETypeRegistered(const String& mimeType) {
+  if (mimeType.isNull())
+    return false;
+  if (m_registeredMIMETypes.contains(mimeType))
+    return true;
+  // No plugin was found, try refreshing the database and searching again
+  return (refresh() && m_registeredMIMETypes.contains(mimeType));
 }
 
 bool PluginDatabaseWin::isPluginBlacklisted(PluginPackageWin* plugin) {

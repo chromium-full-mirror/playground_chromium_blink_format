@@ -57,7 +57,7 @@ class PluginDatabaseWin {
 
   bool refresh();
   Vector<PluginPackageWin*> plugins() const;
-  bool isMIMETypeRegistered(const String& mimeType) const;
+  bool isMIMETypeRegistered(const String& mimeType);
   void addExtraPluginPath(const String&);
   static bool isPluginBlacklisted(PluginPackageWin* plugin);
 
