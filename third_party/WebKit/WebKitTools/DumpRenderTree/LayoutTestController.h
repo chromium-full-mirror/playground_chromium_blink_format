@@ -46,6 +46,7 @@ class LayoutTestController {
   void clearBackForwardList();
   JSStringRef copyDecodedHostName(JSStringRef name);
   JSStringRef copyEncodedHostName(JSStringRef name);
+  void execCommand(JSStringRef name, JSStringRef value);
   void display();
   void keepWebHistory();
   void notifyDone();

@@ -2769,6 +2769,20 @@ HRESULT STDMETHODCALLTYPE WebView::updateActiveState() {
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE WebView::executeCoreCommandByName(BSTR bName,
+                                                            BSTR bValue) {
+  String name(bName, SysStringLen(bName));
+  String value(bValue, SysStringLen(bValue));
+
+  m_page->focusController()
+      ->focusedOrMainFrame()
+      ->editor()
+      ->command(name)
+      .execute(value);
+
+  return S_OK;
+}
+
 HRESULT STDMETHODCALLTYPE WebView::markAllMatchesForText(BSTR str,
                                                          BOOL caseSensitive,
                                                          BOOL highlight,
