@@ -346,6 +346,10 @@ static JSValueRef keyDownCallback(JSContextRef context,
     virtualKeyCode = VK_PRIOR;
   else if (JSStringIsEqualToUTF8CString(character, "pageDown"))
     virtualKeyCode = VK_NEXT;
+  else if (JSStringIsEqualToUTF8CString(character, "home"))
+    virtualKeyCode = VK_HOME;
+  else if (JSStringIsEqualToUTF8CString(character, "end"))
+    virtualKeyCode = VK_END;
   else if (JSStringIsEqualToUTF8CString(character, "delete"))
     virtualKeyCode = VK_BACK;
   else {
