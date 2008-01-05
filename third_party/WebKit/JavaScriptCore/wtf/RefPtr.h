@@ -82,8 +82,8 @@ class RefPtr {
 
   // This conversion operator allows implicit conversion to bool but not to
   // other integer types.
-  typedef T* (RefPtr::*UnspecifiedBoolType)() const;
-  operator UnspecifiedBoolType() const { return m_ptr ? &RefPtr::get : 0; }
+  typedef T* RefPtr::*UnspecifiedBoolType;
+  operator UnspecifiedBoolType() const { return m_ptr ? &RefPtr::m_ptr : 0; }
 
   RefPtr& operator=(const RefPtr&);
   RefPtr& operator=(T*);

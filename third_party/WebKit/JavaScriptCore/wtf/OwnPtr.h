@@ -107,8 +107,8 @@ class OwnPtr : Noncopyable {
 
   // This conversion operator allows implicit conversion to bool but not to
   // other integer types.
-  typedef PtrType (OwnPtr::*UnspecifiedBoolType)() const;
-  operator UnspecifiedBoolType() const { return m_ptr ? &OwnPtr::get : 0; }
+  typedef T* OwnPtr::*UnspecifiedBoolType;
+  operator UnspecifiedBoolType() const { return m_ptr ? &OwnPtr::m_ptr : 0; }
 
   void swap(OwnPtr& o) { std::swap(m_ptr, o.m_ptr); }
 
