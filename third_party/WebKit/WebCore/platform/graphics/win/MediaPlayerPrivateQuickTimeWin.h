@@ -86,6 +86,7 @@ class MediaPlayerPrivate : QTMovieWinClient, Noncopyable {
   void paint(GraphicsContext*, const IntRect&);
 
   static void getSupportedTypes(HashSet<String>& types);
+  static bool isAvailable();
 
  private:
   void updateStates();

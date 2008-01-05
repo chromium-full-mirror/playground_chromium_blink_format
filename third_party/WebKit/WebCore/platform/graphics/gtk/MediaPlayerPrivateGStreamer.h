@@ -111,6 +111,7 @@ class MediaPlayerPrivate : Noncopyable {
   void repaint();
   void paint(GraphicsContext*, const IntRect&);
   static void getSupportedTypes(HashSet<String>&);
+  static bool isAvailable() { return true; }
 
  private:
   void updateStates();

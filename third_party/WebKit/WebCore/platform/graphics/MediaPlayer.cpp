@@ -194,7 +194,6 @@ void MediaPlayer::getSupportedTypes(HashSet<String>& types) {
 }
 
 bool MediaPlayer::isAvailable() {
-#if PLATFORM(MAC)
   static bool availabityKnown = false;
   static bool isAvailable;
   if (!availabityKnown) {
@@ -202,9 +201,6 @@ bool MediaPlayer::isAvailable() {
     availabityKnown = true;
   }
   return isAvailable;
-#else
-  return true;
-#endif
 }
 
 void MediaPlayer::networkStateChanged() {
