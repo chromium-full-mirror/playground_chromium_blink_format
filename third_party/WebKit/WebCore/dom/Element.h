@@ -137,6 +137,8 @@ class Element : public ContainerNode {
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
+  virtual bool isInputTypeHidden() const { return false; }
+
   String nodeNamePreservingCase() const;
 
   // convenience methods which ignore exceptions

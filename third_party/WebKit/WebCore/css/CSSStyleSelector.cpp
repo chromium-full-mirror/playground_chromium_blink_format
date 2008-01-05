@@ -1702,21 +1702,21 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         }
         break;
       case CSSSelector::PseudoEnabled:
-        if (e && e->isControl())
+        if (e && e->isControl() && !e->isInputTypeHidden())
           // The UI spec states that you can't match :enabled unless you are an
           // object that can
           // "receive focus and be activated."  We will limit matching of this
           // pseudo-class to elements
-          // that are controls.
+          // that are non-"hidden" controls.
           return e->isEnabled();
         break;
       case CSSSelector::PseudoDisabled:
-        if (e && e->isControl())
+        if (e && e->isControl() && !e->isInputTypeHidden())
           // The UI spec states that you can't match :enabled unless you are an
           // object that can
           // "receive focus and be activated."  We will limit matching of this
           // pseudo-class to elements
-          // that are controls.
+          // that are non-"hidden" controls.
           return !e->isEnabled();
         break;
       case CSSSelector::PseudoChecked:
