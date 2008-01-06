@@ -109,7 +109,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     CGFloat alpha = style->svgStyle()->strokeOpacity();
     CGContextSetStrokeColorSpace(contextRef, m_patternSpace);
     CGContextSetStrokePattern(contextRef, m_pattern, &alpha);
-    applyStrokeStyleToContext(contextRef, style, object);
+    applyStrokeStyleToContext(context, style, object);
 
     if (isPaintingText)
       context->setTextDrawingMode(cTextStroke);
