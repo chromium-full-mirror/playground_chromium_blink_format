@@ -170,6 +170,10 @@ inline UChar32 toTitleCase(UChar32 c) {
   return u_totitle(c);
 }
 
+inline bool isArabicChar(UChar32 c) {
+  return ublock_getCode(c) == UBLOCK_ARABIC;
+}
+
 inline bool isFormatChar(UChar32 c) {
   return u_charType(c) == U_FORMAT_CHAR;
 }
