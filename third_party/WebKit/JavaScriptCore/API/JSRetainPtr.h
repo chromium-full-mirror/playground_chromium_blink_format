@@ -82,8 +82,10 @@ class JSRetainPtr {
 
   // This conversion operator allows implicit conversion to bool but not to
   // other integer types.
-  typedef T (JSRetainPtr::*UnspecifiedBoolType)() const;
-  operator UnspecifiedBoolType() const { return m_ptr ? &JSRetainPtr::get : 0; }
+  typedef T JSRetainPtr::*UnspecifiedBoolType;
+  operator UnspecifiedBoolType() const {
+    return m_ptr ? &JSRetainPtr::m_ptr : 0;
+  }
 
   JSRetainPtr& operator=(const JSRetainPtr&);
   template <typename U>
