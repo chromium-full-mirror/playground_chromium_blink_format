@@ -1633,7 +1633,7 @@ bool parseXMLDocumentFragment(const String& string,
   sax.startElementNs = balancedStartElementNsHandler;
   sax.endElementNs = balancedEndElementNsHandler;
   sax.cdataBlock = balancedCdataBlockHandler;
-  sax.ignorableWhitespace = balancedCdataBlockHandler;
+  sax.ignorableWhitespace = balancedCharactersHandler;
   sax.comment = balancedCommentHandler;
   sax.warning = balancedWarningHandler;
   sax.initialized = XML_SAX2_MAGIC;
