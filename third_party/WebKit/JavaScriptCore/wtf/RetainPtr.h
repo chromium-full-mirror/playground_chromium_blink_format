@@ -103,7 +103,7 @@ class RetainPtr {
 
   // This conversion operator allows implicit conversion to bool but not to
   // other integer types.
-  typedef T* RetainPtr::*UnspecifiedBoolType;
+  typedef PtrType RetainPtr::*UnspecifiedBoolType;
   operator UnspecifiedBoolType() const { return m_ptr ? &RetainPtr::m_ptr : 0; }
 
   RetainPtr& operator=(const RetainPtr&);
