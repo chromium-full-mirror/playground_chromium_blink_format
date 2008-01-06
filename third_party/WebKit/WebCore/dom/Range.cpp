@@ -639,9 +639,13 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
   // ### perhaps disable node deletion notification for this range while we do
   // this?
 
+  RefPtr<DocumentFragment> fragment;
+  if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
+    fragment = new DocumentFragment(m_ownerDocument.get());
+
   ec = 0;
   if (collapsed(ec))
-    return 0;
+    return fragment.release();
   if (ec)
     return 0;
 
@@ -664,10 +668,6 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
     while (partialEnd->parentNode() != cmnRoot)
       partialEnd = partialEnd->parentNode();
   }
-
-  RefPtr<DocumentFragment> fragment;
-  if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
-    fragment = new DocumentFragment(m_ownerDocument.get());
 
   // Simple case: the start and end containers are the same. We just grab
   // everything >= start offset and < end offset
