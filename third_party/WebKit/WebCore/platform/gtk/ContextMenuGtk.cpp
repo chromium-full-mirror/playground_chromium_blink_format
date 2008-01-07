@@ -29,9 +29,10 @@ namespace WebCore {
 // TODO: ref-counting correctness checking.
 // See http://bugs.webkit.org/show_bug.cgi?id=16115
 
-static void menuItemActivated(GtkMenuItem* item, ContextMenu* menu) {
+static void menuItemActivated(GtkMenuItem* item,
+                              ContextMenuController* controller) {
   ContextMenuItem contextItem(item);
-  menu->controller()->contextMenuItemSelected(&contextItem);
+  controller->contextMenuItemSelected(&contextItem);
 }
 
 ContextMenu::ContextMenu(const HitTestResult& result)
@@ -62,7 +63,7 @@ void ContextMenu::appendItem(ContextMenuItem& item) {
 
   if (type == ActionType || type == CheckableActionType)
     g_signal_connect(platformItem, "activate", G_CALLBACK(menuItemActivated),
-                     this);
+                     controller());
 
   gtk_menu_shell_append(GTK_MENU_SHELL(m_platformDescription),
                         GTK_WIDGET(platformItem));
