@@ -30,6 +30,8 @@
 
 #include "ResourceRequestBase.h"
 
+class QNetworkRequest;
+
 namespace WebCore {
 
 struct ResourceRequest : ResourceRequestBase {
@@ -48,6 +50,10 @@ struct ResourceRequest : ResourceRequestBase {
   }
 
   ResourceRequest() : ResourceRequestBase(KURL(), UseProtocolCachePolicy) {}
+
+#if QT_VERSION >= 0x040400
+  QNetworkRequest toNetworkRequest() const;
+#endif
 
  private:
   friend class ResourceRequestBase;

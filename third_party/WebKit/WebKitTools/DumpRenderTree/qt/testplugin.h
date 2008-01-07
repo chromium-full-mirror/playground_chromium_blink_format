@@ -25,6 +25,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <qglobal.h>
+#if QT_VERSION < 0x040400
 #define QT_STATICPLUGIN
 #include <qwebobjectplugin.h>
 
@@ -44,3 +46,5 @@ class TestPlugin : public QWebObjectPlugin {
                           const QStringList& argumentNames,
                           const QStringList& argumentValues) const;
 };
+
+#endif

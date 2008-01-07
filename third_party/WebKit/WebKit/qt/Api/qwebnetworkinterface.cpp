@@ -23,6 +23,7 @@
   pages from the web. It has a memory cache for these objects.
 */
 #include <qglobal.h>
+#if QT_VERSION < 0x040400
 #include "qwebframe.h"
 #include "qwebnetworkinterface.h"
 #include "qwebnetworkinterface_p.h"
@@ -1202,3 +1203,5 @@ HostInfo::HostInfo(const QUrl& url)
       port = 443;
   }
 }
+
+#endif

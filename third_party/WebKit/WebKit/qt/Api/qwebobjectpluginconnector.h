@@ -22,6 +22,9 @@
 
 #include "qwebkitglobal.h"
 #include <QtCore/qobject.h>
+
+#if QT_VERSION < 0x040400
+
 #include "qwebnetworkinterface.h"
 
 class QWebFrame;
@@ -54,5 +57,7 @@ class QWEBKIT_EXPORT QWebObjectPluginConnector : public QObject {
 
   QWebObjectPluginConnectorPrivate* d;
 };
+
+#endif
 
 #endif

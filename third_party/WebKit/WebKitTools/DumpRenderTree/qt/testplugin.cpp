@@ -27,6 +27,8 @@
  */
 #include "testplugin.h"
 
+#if QT_VERSION < 0x040400
+
 TestPlugin::TestPlugin(QObject* parent) : QWebObjectPlugin(parent) {}
 
 TestPlugin::~TestPlugin() {}
@@ -56,3 +58,4 @@ QObject* TestPlugin::create(QWebObjectPluginConnector*,
 }
 
 Q_EXPORT_PLUGIN2(testplugin, TestPlugin)
+#endif

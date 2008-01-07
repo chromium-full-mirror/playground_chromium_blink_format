@@ -18,6 +18,7 @@
 
 */
 #include "qwebobjectpluginconnector.h"
+#if QT_VERSION < 0x040400
 #include "qwebnetworkinterface.h"
 #include "qwebnetworkinterface_p.h"
 #include "qwebframe.h"
@@ -56,3 +57,5 @@ QWebNetworkJob* QWebObjectPluginConnector::requestUrl(
   d->frame->page()->networkInterface()->addJob(job);
   return job;
 }
+
+#endif

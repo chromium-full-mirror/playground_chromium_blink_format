@@ -39,10 +39,17 @@
 #include "ChromeClientQt.h"
 #include "FrameLoaderClientQt.h"
 #include "Page.h"
+#include "QNetworkReplyHandler.h"
 
 #include "NotImplemented.h"
 
 #include <QCoreApplication>
+#include <QUrl>
+#if QT_VERSION >= 0x040400
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#endif
 
 namespace WebCore {
 
@@ -121,12 +128,22 @@ bool ResourceHandle::start(Frame* frame) {
 
   getInternal()->m_frame =
       static_cast<FrameLoaderClientQt*>(frame->loader()->client())->webFrame();
+#if QT_VERSION < 0x040400
   return QWebNetworkManager::self()->add(
       this, getInternal()->m_frame->page()->d->networkInterface);
+#else
+  ResourceHandleInternal* d = getInternal();
+  d->m_job = new QNetworkReplyHandler(this);
+  return true;
+#endif
 }
 
 void ResourceHandle::cancel() {
+#if QT_VERSION < 0x040400
   QWebNetworkManager::self()->cancel(this);
+#else
+  d->m_job->abort();
+#endif
 }
 
 bool ResourceHandle::loadsBlocked() {
@@ -151,6 +168,7 @@ void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
                                                ResourceError& error,
                                                ResourceResponse& response,
                                                Vector<char>& data) {
+#if QT_VERSION < 0x040400
   WebCoreSynchronousLoader syncLoader;
   ResourceHandle handle(request, &syncLoader, true, false, true);
 
@@ -167,6 +185,9 @@ void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
   data = syncLoader.data();
   qDebug() << data.size();
   response = syncLoader.resourceResponse();
+#else
+  notImplemented();  // #### implement me
+#endif
 }
 
 void ResourceHandle::setDefersLoading(bool defers) {

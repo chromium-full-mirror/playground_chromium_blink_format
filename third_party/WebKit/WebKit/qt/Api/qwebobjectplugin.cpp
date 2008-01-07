@@ -22,6 +22,8 @@
 #include <qcoreapplication.h>
 #include <qfileinfo.h>
 
+#if QT_VERSION < 0x040400
+
 #ifndef QT_NO_LIBRARY
 Q_GLOBAL_STATIC_WITH_ARGS(QWebFactoryLoader,
                           loader,
@@ -175,3 +177,5 @@ QStringList QWebObjectPlugin::extensionsForMimetype(
   and \a argumentValues are a set of key-value pairs passed directly
   from the &lt;param&gt; elements contained in the HTML object tag.
 */
+
+#endif

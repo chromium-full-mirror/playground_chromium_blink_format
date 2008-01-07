@@ -74,6 +74,9 @@
 #include <QUndoStack>
 #include <QUrl>
 #include <QPainter>
+#if QT_VERSION >= 0x040400
+#include <QNetworkAccessManager>
+#endif
 
 using namespace WebCore;
 
@@ -114,7 +117,11 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
 
   undoStack = 0;
   mainFrame = 0;
+#if QT_VERSION < 0x040400
   networkInterface = 0;
+#else
+  networkManager = 0;
+#endif
   insideOpenCall = false;
 
   history.d = new QWebPageHistoryPrivate(page->backForwardList());
@@ -125,8 +132,12 @@ QWebPagePrivate::~QWebPagePrivate() {
   delete undoStack;
   delete settings;
   delete page;
+#if QT_VERSION >= 0x040400
+  delete networkManager;
+#endif
 }
 
+#if QT_VERSION < 0x040400
 QWebPage::NavigationRequestResponse QWebPagePrivate::navigationRequested(
     QWebFrame* frame,
     const QWebNetworkRequest& request,
@@ -135,6 +146,16 @@ QWebPage::NavigationRequestResponse QWebPagePrivate::navigationRequested(
     return QWebPage::AcceptNavigationRequest;
   return q->navigationRequested(frame, request, type);
 }
+#else
+QWebPage::NavigationRequestResponse QWebPagePrivate::navigationRequested(
+    QWebFrame* frame,
+    const QNetworkRequest& request,
+    QWebPage::NavigationType type) {
+  if (insideOpenCall && frame == mainFrame)
+    return QWebPage::AcceptNavigationRequest;
+  return q->navigationRequested(frame, request, type);
+}
+#endif
 
 void QWebPagePrivate::createMainFrame() {
   if (!mainFrame) {
@@ -942,10 +963,18 @@ void QWebPage::setViewportSize(const QSize& size) const {
   }
 }
 
+#if QT_VERSION < 0x040400
 QWebPage::NavigationRequestResponse QWebPage::navigationRequested(
     QWebFrame* frame,
     const QWebNetworkRequest& request,
-    QWebPage::NavigationType type) {
+    QWebPage::NavigationType type)
+#else
+QWebPage::NavigationRequestResponse QWebPage::navigationRequested(
+    QWebFrame* frame,
+    const QNetworkRequest& request,
+    QWebPage::NavigationType type)
+#endif
+{
   Q_UNUSED(request)
   return AcceptNavigationRequest;
 }
@@ -1172,17 +1201,6 @@ bool QWebPage::focusNextPrevChild(bool next) {
   return false;
 }
 
-void QWebPage::setNetworkInterface(QWebNetworkInterface* interface) {
-  d->networkInterface = interface;
-}
-
-QWebNetworkInterface* QWebPage::networkInterface() const {
-  if (d->networkInterface)
-    return d->networkInterface;
-  else
-    return QWebNetworkInterface::defaultInterface();
-}
-
 QWebSettings* QWebPage::settings() {
   return d->settings;
 }
@@ -1196,6 +1214,19 @@ QString QWebPage::chooseFile(QWebFrame* parentFrame, const QString& oldFile) {
 #endif
 }
 
+#if QT_VERSION < 0x040400
+
+void QWebPage::setNetworkInterface(QWebNetworkInterface* interface) {
+  d->networkInterface = interface;
+}
+
+QWebNetworkInterface* QWebPage::networkInterface() const {
+  if (d->networkInterface)
+    return d->networkInterface;
+  else
+    return QWebNetworkInterface::defaultInterface();
+}
+
 #ifndef QT_NO_NETWORKPROXY
 void QWebPage::setNetworkProxy(const QNetworkProxy& proxy) {
   d->networkProxy = proxy;
@@ -1204,6 +1235,25 @@ void QWebPage::setNetworkProxy(const QNetworkProxy& proxy) {
 QNetworkProxy QWebPage::networkProxy() const {
   return d->networkProxy;
 }
+#endif
+
+#else
+
+void QWebPage::setNetworkAccessManager(QNetworkAccessManager* manager) {
+  if (manager == d->networkManager)
+    return;
+  delete d->networkManager;
+  d->networkManager = manager;
+}
+
+QNetworkAccessManager* QWebPage::networkAccessManager() const {
+  if (!d->networkManager) {
+    QWebPage* that = const_cast<QWebPage*>(this);
+    that->d->networkManager = new QNetworkAccessManager(that);
+  }
+  return d->networkManager;
+}
+
 #endif
 
 QString QWebPage::userAgentFor(const QUrl& url) const {

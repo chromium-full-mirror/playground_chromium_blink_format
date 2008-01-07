@@ -123,7 +123,12 @@ void QWebView::load(const QUrl& url) {
   page()->mainFrame()->load(url);
 }
 
-void QWebView::load(const QWebNetworkRequest& request) {
+#if QT_VERSION < 0x040400
+void QWebView::load(const QWebNetworkRequest& request)
+#else
+void QWebView::load(const QNetworkRequest& request)
+#endif
+{
   page()->mainFrame()->load(request);
 }
 

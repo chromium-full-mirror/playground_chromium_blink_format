@@ -23,6 +23,9 @@
 #include "qwebkitglobal.h"
 #include <QtCore/qplugin.h>
 #include <QtCore/qfactoryinterface.h>
+
+#if QT_VERSION < 0x040400
+
 class QWebObjectPluginConnector;
 class QUrl;
 
@@ -60,5 +63,7 @@ class QWEBKIT_EXPORT QWebObjectPlugin
                           const QStringList& argumentNames,
                           const QStringList& argumentValues) const = 0;
 };
+
+#endif
 
 #endif

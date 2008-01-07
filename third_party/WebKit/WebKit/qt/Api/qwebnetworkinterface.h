@@ -30,6 +30,8 @@
 
 #include "qwebkitglobal.h"
 
+#if QT_VERSION < 0x040400
+
 class QAuthenticator;
 class QNetworkProxy;
 class QSslError;
@@ -176,5 +178,7 @@ class QWEBKIT_EXPORT QWebNetworkInterface : public QObject {
   friend class WebCore::WebCoreHttp;
   QWebNetworkInterfacePrivate* d;
 };
+
+#endif
 
 #endif
