@@ -66,9 +66,10 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 
     // We put slop into this rect, since glyphs can overflow the ascent/descent
     // bounds and the left/right edges.
-    IntRect textRect(point.x() - font->lineGap(),
-                     point.y() - font->ascent(size()) - font->lineGap(),
-                     totalWidth + 2 * font->lineGap(), font->lineSpacing());
+    int lineGap = font->lineGap(size());
+    IntRect textRect(point.x() - lineGap,
+                     point.y() - font->ascent(size()) - lineGap,
+                     totalWidth + 2 * lineGap, font->lineSpacing(size()));
     HDC hdc = graphicsContext->getWindowsContext(textRect);
     SelectObject(hdc, font->m_font.hfont());
 

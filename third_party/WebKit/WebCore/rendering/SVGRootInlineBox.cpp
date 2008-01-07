@@ -567,8 +567,13 @@ struct SVGRootInlineBoxPaintWalker {
                                  textWidth, *it, info);
 
       // Paint text
+      SVGPaintServer* activePaintServer = m_fillPaintServer;
+      if (!activePaintServer)
+        activePaintServer = m_strokePaintServer;
+
+      ASSERT(activePaintServer);
       textBox->paintCharacters(m_paintInfo, m_tx, m_ty, *it, stringStart,
-                               stringLength);
+                               stringLength, activePaintServer);
 
       // Paint decorations, that have to be drawn afterwards
       if (textDecorations & LINE_THROUGH && textWidth != 0.0f)

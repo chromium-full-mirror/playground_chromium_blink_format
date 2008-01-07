@@ -24,6 +24,7 @@
 #if ENABLE(SVG_FONTS)
 #include "SVGStyledElement.h"
 
+#include <limits>
 #include "Path.h"
 
 namespace WebCore {
@@ -33,51 +34,63 @@ struct SVGFontData;
 // Describe a SVG <glyph> element
 struct SVGGlyphIdentifier {
   enum Orientation { Vertical, Horizontal, Both };
-  enum ArabicForm { Initial, Medial, Terminal, Isolated };
+
+  // SVG Font depends on exactly this order.
+  enum ArabicForm { None = 0, Isolated, Terminal, Initial, Medial };
 
   SVGGlyphIdentifier()
-      : orientation(Both),
-        arabicForm(Initial),
+      : isValid(false),
+        orientation(Both),
+        arabicForm(None),
         horizontalAdvanceX(0.0f),
         verticalOriginX(0.0f),
         verticalOriginY(0.0f),
         verticalAdvanceY(0.0f) {}
 
-  // 'glyph-name' property
+  // Used to mark our float properties as "to be inherited from SVGFontData"
+  static float inheritedValue() {
+    static float s_inheritedValue = std::numeric_limits<float>::infinity();
+    return s_inheritedValue;
+  }
+
+  bool operator==(const SVGGlyphIdentifier& other) const {
+    return isValid == other.isValid && orientation == other.orientation &&
+           arabicForm == other.arabicForm && glyphName == other.glyphName &&
+           horizontalAdvanceX == other.horizontalAdvanceX &&
+           verticalOriginX == other.verticalOriginX &&
+           verticalOriginY == other.verticalOriginY &&
+           verticalAdvanceY == other.verticalAdvanceY &&
+           pathData.debugString() == other.pathData.debugString() &&
+           languages == other.languages;
+  }
+
+  bool isValid : 1;
+
+  Orientation orientation : 2;
+  ArabicForm arabicForm : 3;
   String glyphName;
 
-  // 'orientation' property
-  Orientation orientation;
-
-  // 'arabic-form' property
-  ArabicForm arabicForm;
-
-  // 'horiz-adv-x' property
   float horizontalAdvanceX;
-
-  // 'vert-origin-x' property
   float verticalOriginX;
-
-  // 'vert-origin-y' property
   float verticalOriginY;
-
-  // 'vert-adv-y' property
   float verticalAdvanceY;
 
-  // 'd' property
   Path pathData;
-
-  // 'lang' property
   Vector<String> languages;
 };
 
 class SVGGlyphElement : public SVGStyledElement {
  public:
   SVGGlyphElement(const QualifiedName&, Document*);
+  virtual ~SVGGlyphElement();
+
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
-  SVGGlyphIdentifier buildGlyphIdentifier(SVGFontData*) const;
+  SVGGlyphIdentifier buildGlyphIdentifier() const;
+  static void inheritUnspecifiedAttributes(SVGGlyphIdentifier&, SVGFontData*);
 };
 
 }  // namespace WebCore

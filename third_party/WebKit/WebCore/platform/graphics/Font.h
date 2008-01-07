@@ -47,6 +47,7 @@ class GlyphPageTreeNode;
 class GraphicsContext;
 class IntPoint;
 class RenderObject;
+class SVGPaintServer;
 
 struct GlyphData;
 
@@ -73,7 +74,8 @@ class TextRun {
         m_disableSpacing(false)
 #if ENABLE(SVG_FONTS)
         ,
-        m_referencingRenderObject(0)
+        m_referencingRenderObject(0),
+        m_activePaintServer(0)
 #endif
   {
   }
@@ -98,7 +100,8 @@ class TextRun {
         m_disableSpacing(false)
 #if ENABLE(SVG_FONTS)
         ,
-        m_referencingRenderObject(0)
+        m_referencingRenderObject(0),
+        m_activePaintServer(0)
 #endif
   {
   }
@@ -140,6 +143,11 @@ class TextRun {
   void setReferencingRenderObject(RenderObject* object) {
     m_referencingRenderObject = object;
   }
+
+  SVGPaintServer* activePaintServer() const { return m_activePaintServer; }
+  void setActivePaintServer(SVGPaintServer* object) {
+    m_activePaintServer = object;
+  }
 #endif
 
  private:
@@ -157,6 +165,7 @@ class TextRun {
 
 #if ENABLE(SVG_FONTS)
   RenderObject* m_referencingRenderObject;
+  SVGPaintServer* m_activePaintServer;
 #endif
 };
 
@@ -259,21 +268,25 @@ class Font {
                       const FloatPoint&,
                       int from,
                       int to) const;
+#if ENABLE(SVG_FONTS)
+  void drawTextUsingSVGFont(GraphicsContext*,
+                            const TextRun&,
+                            const FloatPoint&,
+                            int from,
+                            int to) const;
+  float floatWidthUsingSVGFont(const TextRun&) const;
+  FloatRect selectionRectForTextUsingSVGFont(const TextRun&,
+                                             const IntPoint&,
+                                             int h,
+                                             int from,
+                                             int to) const;
+#endif
   void drawGlyphs(GraphicsContext*,
                   const FontData*,
                   const GlyphBuffer&,
                   int from,
                   int to,
                   const FloatPoint&) const;
-#if ENABLE(SVG_FONTS)
-  void drawGlyphsWithSVGFont(GraphicsContext*,
-                             RenderObject*,
-                             const FontData*,
-                             const GlyphBuffer&,
-                             int from,
-                             int to,
-                             const FloatPoint&) const;
-#endif
   void drawGlyphBuffer(GraphicsContext*,
                        const GlyphBuffer&,
                        const TextRun&,

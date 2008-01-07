@@ -329,7 +329,8 @@ void SVGInlineTextBox::paintCharacters(RenderObject::PaintInfo& paintInfo,
                                        int ty,
                                        const SVGChar& svgChar,
                                        const UChar* chars,
-                                       int length) {
+                                       int length,
+                                       SVGPaintServer* activePaintServer) {
   if (object()->style()->visibility() != VISIBLE ||
       paintInfo.phase == PaintPhaseOutline)
     return;
@@ -406,6 +407,13 @@ void SVGInlineTextBox::paintCharacters(RenderObject::PaintInfo& paintInfo,
   IntPoint origin((int)svgChar.x, (int)svgChar.y);
   TextRun run =
       svgTextRunForInlineTextBox(chars, length, styleToUse, this, svgChar.x);
+
+#if ENABLE(SVG_FONTS)
+  // SVG Fonts need access to the paint server used to draw the current text
+  // chunk.
+  // They need to be able to call renderPath() on a SVGPaintServer object.
+  run.setActivePaintServer(activePaintServer);
+#endif
 
   paintInfo.context->drawText(run, origin);
 

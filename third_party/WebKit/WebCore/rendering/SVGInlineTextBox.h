@@ -57,7 +57,8 @@ class SVGInlineTextBox : public InlineTextBox {
                        int ty,
                        const SVGChar&,
                        const UChar* chars,
-                       int length);
+                       int length,
+                       SVGPaintServer*);
 
   // SVGs custom paint selection method
   void paintSelection(int boxStartOffset,
