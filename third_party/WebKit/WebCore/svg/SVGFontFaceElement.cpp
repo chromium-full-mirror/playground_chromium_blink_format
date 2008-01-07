@@ -249,7 +249,7 @@ SimpleFontData* SVGFontFaceElement::createFontData(
         static_cast<int>(
             ceilf(fontElement->getAttribute(vert_origin_yAttr).toFloat()));
   else  // Match Batik's default value.
-    fontData->m_ascent = fontData->m_unitsPerEm * 0.8;
+    fontData->m_ascent = fontData->m_unitsPerEm * 0.8f;
 
   // Spec: Same syntax and semantics as the 'descent' descriptor within an
   // @font-face rule. The maximum
@@ -269,7 +269,7 @@ SimpleFontData* SVGFontFaceElement::createFontData(
     fontData->m_descent = static_cast<int>(
         ceilf(fontElement->getAttribute(vert_origin_yAttr).toFloat()));
   else  // Match Batik's default value.
-    fontData->m_descent = fontData->m_unitsPerEm * 0.2;
+    fontData->m_descent = fontData->m_unitsPerEm * 0.2f;
 
   return fontData.release();
 }
