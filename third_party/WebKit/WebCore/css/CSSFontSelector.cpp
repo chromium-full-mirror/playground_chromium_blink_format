@@ -297,7 +297,7 @@ FontData* CSSFontSelector::getFontData(const FontDescription& fontDescription,
   String family = familyName.domString().lower();
 
 #if ENABLE(SVG_FONTS)
-  RefPtr<CSSFontFace> face;
+  RefPtr<CSSSegmentedFontFace> face;
 
   if (fontDescription.smallCaps()) {
     String testFamily = family + "-webkit-svg-small-caps";
