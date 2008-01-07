@@ -258,16 +258,33 @@ void QWebFrame::load(const QWebNetworkRequest& req) {
 
 #else
 
-void QWebFrame::load(const QNetworkRequest& req) {
+void QWebFrame::load(const QNetworkRequest& req,
+                     QNetworkAccessManager::Operation operation,
+                     const QByteArray& body) {
   if (d->parentFrame())
     d->page->d->insideOpenCall = true;
 
   QUrl url = req.url();
-  QByteArray postData;  // ### FIXME = req.postData();
 
   WebCore::ResourceRequest request(KURL(url.toString()));
 
-  // ### FIXME httpHeader.method();
+  switch (operation) {
+    case QNetworkAccessManager::HeadOperation:
+      request.setHTTPMethod("HEAD");
+      break;
+    case QNetworkAccessManager::GetOperation:
+      request.setHTTPMethod("GET");
+      break;
+    case QNetworkAccessManager::PutOperation:
+      request.setHTTPMethod("PUT");
+      break;
+    case QNetworkAccessManager::PostOperation:
+      request.setHTTPMethod("POST");
+      break;
+    case QNetworkAccessManager::UnknownOperation:
+      // eh?
+      break;
+  }
 
   QList<QByteArray> httpHeaders = req.rawHeaderList();
   for (int i = 0; i < httpHeaders.size(); ++i) {
@@ -276,9 +293,9 @@ void QWebFrame::load(const QNetworkRequest& req) {
                                QString::fromLatin1(req.rawHeader(headerName)));
   }
 
-  if (!postData.isEmpty()) {
+  if (!body.isEmpty()) {
     WTF::RefPtr<WebCore::FormData> formData =
-        new WebCore::FormData(postData.constData(), postData.size());
+        new WebCore::FormData(body.constData(), body.size());
     request.setHTTPBody(formData);
   }
 

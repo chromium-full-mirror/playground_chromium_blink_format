@@ -27,6 +27,9 @@
 
 #include <QtCore/qobject.h>
 #include <QtCore/qurl.h>
+#if QT_VERSION >= 0x040400
+#include <QtNetwork/qnetworkaccessmanager.h>
+#endif
 #include "qwebkitglobal.h"
 
 class QRect;
@@ -62,7 +65,10 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 #if QT_VERSION < 0x040400
   void load(const QWebNetworkRequest& request);
 #else
-  void load(const QNetworkRequest& request);
+  void load(const QNetworkRequest& request,
+            QNetworkAccessManager::Operation operation =
+                QNetworkAccessManager::GetOperation,
+            const QByteArray& body = QByteArray());
 #endif
   void setHtml(const QString& html, const QUrl& baseUrl = QUrl());
   void setHtml(const QByteArray& html, const QUrl& baseUrl = QUrl());
