@@ -294,11 +294,10 @@ static void fillStructuresUsingTimeArgs(ExecState* exec,
   }
 
   // milliseconds
-  if (idx < numArgs) {
+  if (idx < numArgs)
     milliseconds += args[idx]->toNumber(exec);
-  } else {
+  else
     milliseconds += *ms;
-  }
 
   *ms = milliseconds;
 }
@@ -1529,13 +1528,13 @@ JSValue* DateProtoFuncSetTime::callAsFunction(ExecState* exec,
   return result;
 }
 
-JSValue* DateProtoFuncSetMilliSeconds::callAsFunction(ExecState* exec,
-                                                      JSObject* thisObj,
-                                                      const List& args) {
+static JSValue* setNewValueFromTimeArgs(ExecState* exec,
+                                        JSObject* thisObj,
+                                        const List& args,
+                                        int numArgsToUse,
+                                        bool inputIsUTC) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
-
-  const bool utc = false;
 
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
   JSValue* v = thisDateObj->internalValue();
@@ -1544,325 +1543,135 @@ JSValue* DateProtoFuncSetMilliSeconds::callAsFunction(ExecState* exec,
   double ms = milli - secs * msPerSecond;
 
   GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
+  msToGregorianDateTime(milli, inputIsUTC, t);
 
-  fillStructuresUsingTimeArgs(exec, args, 1, &ms, &t);
+  fillStructuresUsingTimeArgs(exec, args, numArgsToUse, &ms, &t);
 
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
+  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, inputIsUTC));
   thisDateObj->setInternalValue(result);
   return result;
+}
+
+static JSValue* setNewValueFromDateArgs(ExecState* exec,
+                                        JSObject* thisObj,
+                                        const List& args,
+                                        int numArgsToUse,
+                                        bool inputIsUTC) {
+  if (!thisObj->inherits(&DateInstance::info))
+    return throwError(exec, TypeError);
+
+  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
+  JSValue* v = thisDateObj->internalValue();
+  double milli = v->toNumber(exec);
+  double secs = floor(milli / msPerSecond);
+  double ms = milli - secs * msPerSecond;
+
+  GregorianDateTime t;
+  msToGregorianDateTime(milli, inputIsUTC, t);
+
+  fillStructuresUsingDateArgs(exec, args, numArgsToUse, &ms, &t);
+
+  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, inputIsUTC));
+  thisDateObj->setInternalValue(result);
+  return result;
+}
+
+JSValue* DateProtoFuncSetMilliSeconds::callAsFunction(ExecState* exec,
+                                                      JSObject* thisObj,
+                                                      const List& args) {
+  const bool inputIsUTC = false;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetUTCMilliseconds::callAsFunction(ExecState* exec,
                                                          JSObject* thisObj,
                                                          const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingTimeArgs(exec, args, 1, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = true;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetSeconds::callAsFunction(ExecState* exec,
                                                  JSObject* thisObj,
                                                  const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingTimeArgs(exec, args, 2, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = false;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetUTCSeconds::callAsFunction(ExecState* exec,
                                                     JSObject* thisObj,
                                                     const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingTimeArgs(exec, args, 2, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = true;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetMinutes::callAsFunction(ExecState* exec,
                                                  JSObject* thisObj,
                                                  const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingTimeArgs(exec, args, 3, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = false;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetUTCMinutes::callAsFunction(ExecState* exec,
                                                     JSObject* thisObj,
                                                     const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingTimeArgs(exec, args, 3, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = true;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetHours::callAsFunction(ExecState* exec,
                                                JSObject* thisObj,
                                                const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingTimeArgs(exec, args, 4, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = false;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 4, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetUTCHours::callAsFunction(ExecState* exec,
                                                   JSObject* thisObj,
                                                   const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingTimeArgs(exec, args, 4, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = true;
+  return setNewValueFromTimeArgs(exec, thisObj, args, 4, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetDate::callAsFunction(ExecState* exec,
                                               JSObject* thisObj,
                                               const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingDateArgs(exec, args, 1, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = false;
+  return setNewValueFromDateArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetUTCDate::callAsFunction(ExecState* exec,
                                                  JSObject* thisObj,
                                                  const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingDateArgs(exec, args, 1, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = true;
+  return setNewValueFromDateArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetMonth::callAsFunction(ExecState* exec,
                                                JSObject* thisObj,
                                                const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingDateArgs(exec, args, 2, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = false;
+  return setNewValueFromDateArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetUTCMonth::callAsFunction(ExecState* exec,
                                                   JSObject* thisObj,
                                                   const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingDateArgs(exec, args, 2, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = true;
+  return setNewValueFromDateArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetFullYear::callAsFunction(ExecState* exec,
                                                   JSObject* thisObj,
                                                   const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = false;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingDateArgs(exec, args, 3, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = false;
+  return setNewValueFromDateArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetUTCFullYear::callAsFunction(ExecState* exec,
                                                      JSObject* thisObj,
                                                      const List& args) {
-  if (!thisObj->inherits(&DateInstance::info))
-    return throwError(exec, TypeError);
-
-  const bool utc = true;
-
-  DateInstance* thisDateObj = static_cast<DateInstance*>(thisObj);
-  JSValue* v = thisDateObj->internalValue();
-  double milli = v->toNumber(exec);
-  double secs = floor(milli / msPerSecond);
-  double ms = milli - secs * msPerSecond;
-
-  GregorianDateTime t;
-  msToGregorianDateTime(milli, utc, t);
-
-  fillStructuresUsingDateArgs(exec, args, 3, &ms, &t);
-
-  JSValue* result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
-  thisDateObj->setInternalValue(result);
-  return result;
+  const bool inputIsUTC = true;
+  return setNewValueFromDateArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
 JSValue* DateProtoFuncSetYear::callAsFunction(ExecState* exec,
