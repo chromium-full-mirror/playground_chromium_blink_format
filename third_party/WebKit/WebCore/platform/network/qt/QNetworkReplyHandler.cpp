@@ -61,6 +61,7 @@ QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle)
 
 void QNetworkReplyHandler::abort() {
   if (m_reply) {
+    disconnect(m_reply, 0, this, 0);
     m_reply->abort();
     deleteLater();
   }
