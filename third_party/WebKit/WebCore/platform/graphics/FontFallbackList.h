@@ -27,8 +27,8 @@
 // and so this may catch someone trying to include this file in public cpp
 // files.
 
-#include "FontData.h"
 #include "FontSelector.h"
+#include "SimpleFontData.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {

@@ -183,7 +183,7 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
 
     const GlyphData& glyphData = m_font->glyphDataForCharacter(c, rtl);
     Glyph glyph = glyphData.glyph;
-    const FontData* fontData = glyphData.fontData;
+    const SimpleFontData* fontData = glyphData.fontData;
 
     ASSERT(fontData);
 
@@ -402,7 +402,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
 
   GlyphPageTreeNode* node = pageNumber ? m_pages.get(pageNumber) : m_pageZero;
   if (!node) {
-    node = GlyphPageTreeNode::getRootChild(primaryFont(), pageNumber);
+    node = GlyphPageTreeNode::getRootChild(fontDataAt(0), pageNumber);
     if (pageNumber)
       m_pages.set(pageNumber, node);
     else
@@ -437,7 +437,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
         if (data.fontData) {
           // The smallCapsFontData function should not normally return 0.
           // But if it does, we will just render the capital letter big.
-          const FontData* smallCapsFontData =
+          const SimpleFontData* smallCapsFontData =
               data.fontData->smallCapsFontData(m_fontDescription);
           if (!smallCapsFontData)
             return data;
@@ -491,7 +491,7 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
     codeUnits[1] = U16_TRAIL(c);
     codeUnitsLength = 2;
   }
-  const FontData* characterFontData =
+  const SimpleFontData* characterFontData =
       FontCache::getFontDataForCharacters(*this, codeUnits, codeUnitsLength);
   if (useSmallCapsFont)
     characterFontData = characterFontData->smallCapsFontData(m_fontDescription);
@@ -518,9 +518,9 @@ const GlyphData& Font::glyphDataForCharacter(UChar32 c,
   return data;
 }
 
-const FontData* Font::primaryFont() const {
+const SimpleFontData* Font::primaryFont() const {
   ASSERT(m_fontList);
-  return m_fontList->primaryFont(this);
+  return m_fontList->primaryFont(this)->fontDataForCharacter(' ');
 }
 
 const FontData* Font::fontDataAt(unsigned index) const {
@@ -698,14 +698,14 @@ void Font::drawGlyphBuffer(GraphicsContext* context,
                            const TextRun& run,
                            const FloatPoint& point) const {
   // Draw each contiguous run of glyphs that use the same font data.
-  const FontData* fontData = glyphBuffer.fontDataAt(0);
+  const SimpleFontData* fontData = glyphBuffer.fontDataAt(0);
   FloatSize offset = glyphBuffer.offsetAt(0);
   FloatPoint startPoint(point);
   float nextX = startPoint.x();
   int lastFrom = 0;
   int nextGlyph = 0;
   while (nextGlyph < glyphBuffer.size()) {
-    const FontData* nextFontData = glyphBuffer.fontDataAt(nextGlyph);
+    const SimpleFontData* nextFontData = glyphBuffer.fontDataAt(nextGlyph);
     FloatSize nextOffset = glyphBuffer.offsetAt(nextGlyph);
     if (nextFontData != fontData || nextOffset != offset) {
       drawGlyphs(context, fontData, glyphBuffer, lastFrom, nextGlyph - lastFrom,

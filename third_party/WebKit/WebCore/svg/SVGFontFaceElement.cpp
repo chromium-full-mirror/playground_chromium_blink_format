@@ -32,7 +32,6 @@
 #include "CSSValueKeywords.h"
 #include "CSSValueList.h"
 #include "FontCache.h"
-#include "FontData.h"
 #include "FontPlatformData.h"
 #include "SVGDefinitionSrcElement.h"
 #include "SVGFontElement.h"
@@ -147,7 +146,7 @@ String SVGFontFaceElement::fontFamily() const {
   return m_styleDeclaration->getPropertyValue(CSS_PROP_FONT_FAMILY);
 }
 
-FontData* SVGFontFaceElement::createFontData(
+SimpleFontData* SVGFontFaceElement::createFontData(
     const FontDescription& fontDescription) const {
   // We only expect to have this method called by a parent font element
   ASSERT(parentNode());
@@ -159,7 +158,7 @@ FontData* SVGFontFaceElement::createFontData(
   if (!cachedPlatformData)
     return 0;
 
-  OwnPtr<FontData> fontData(new FontData(*cachedPlatformData));
+  OwnPtr<SimpleFontData> fontData(new SimpleFontData(*cachedPlatformData));
 
   SVGFontData* svgFontData =
       new SVGFontData(const_cast<SVGFontFaceElement*>(this));

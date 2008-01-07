@@ -42,13 +42,13 @@ class SVGCSSFontFace : public CSSFontFace {
   virtual bool isValid() const;
   virtual void addSource(CSSFontFaceSource*);
 
-  virtual FontData* getFontData(const FontDescription&,
-                                bool syntheticBold,
-                                bool syntheticItalic);
+  virtual SimpleFontData* getFontData(const FontDescription&,
+                                      bool syntheticBold,
+                                      bool syntheticItalic);
 
  private:
   RefPtr<SVGFontFaceElement> m_fontFaceElement;
-  OwnPtr<FontData> m_fontData;
+  OwnPtr<SimpleFontData> m_fontData;
 };
 }
 

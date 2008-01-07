@@ -26,12 +26,12 @@
 #include "config.h"
 #include "Font.h"
 
-#include "FontData.h"
 #include "FontFallbackList.h"
 #include "GlyphBuffer.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
 #include "NotImplemented.h"
+#include "SimpleFontData.h"
 
 #include "fontprops.h"
 #include <wx/defs.h>
@@ -40,7 +40,7 @@
 namespace WebCore {
 
 void Font::drawGlyphs(GraphicsContext* graphicsContext,
-                      const FontData* font,
+                      const SimpleFontData* font,
                       const GlyphBuffer& glyphBuffer,
                       int from,
                       int numGlyphs,

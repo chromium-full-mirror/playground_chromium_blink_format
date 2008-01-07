@@ -47,6 +47,7 @@ class GlyphPageTreeNode;
 class GraphicsContext;
 class IntPoint;
 class RenderObject;
+class SimpleFontData;
 class SVGPaintServer;
 
 struct GlyphData;
@@ -253,7 +254,7 @@ class Font {
   int tabWidth() const { return 8 * spaceWidth(); }
 
 #if !PLATFORM(QT)
-  const FontData* primaryFont() const;
+  const SimpleFontData* primaryFont() const;
   const FontData* fontDataAt(unsigned) const;
   const GlyphData& glyphDataForCharacter(UChar32,
                                          bool mirror,
@@ -282,7 +283,7 @@ class Font {
                                              int to) const;
 #endif
   void drawGlyphs(GraphicsContext*,
-                  const FontData*,
+                  const SimpleFontData*,
                   const GlyphBuffer&,
                   int from,
                   int to,

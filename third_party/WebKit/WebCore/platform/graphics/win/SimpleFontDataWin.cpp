@@ -27,10 +27,11 @@
  */
 
 #include "config.h"
+#include "SimpleFontData.h"
+
 #include <winsock2.h>
 #include "Font.h"
 #include "FontCache.h"
-#include "FontData.h"
 #include "FloatRect.h"
 #include "FontDescription.h"
 #include <wtf/MathExtras.h>
@@ -53,11 +54,11 @@ static inline float scaleEmToUnits(float x, unsigned unitsPerEm) {
   return unitsPerEm ? x / (float)unitsPerEm : x;
 }
 
-void FontData::setShouldApplyMacAscentHack(bool b) {
+void SimpleFontData::setShouldApplyMacAscentHack(bool b) {
   shouldApplyMacAscentHack = b;
 }
 
-void FontData::platformInit() {
+void SimpleFontData::platformInit() {
   m_syntheticBoldOffset = m_font.syntheticBold() ? 1.0f : 0.f;
   m_scriptCache = 0;
   m_scriptFontProperties = 0;
@@ -154,7 +155,7 @@ void FontData::platformInit() {
   }
 }
 
-void FontData::platformDestroy() {
+void SimpleFontData::platformDestroy() {
   if (!isCustomFont()) {
     DeleteObject(m_font.hfont());
     CGFontRelease(m_font.cgFont());
@@ -167,20 +168,20 @@ void FontData::platformDestroy() {
   delete m_scriptFontProperties;
 }
 
-FontData* FontData::smallCapsFontData(
+SimpleFontData* SimpleFontData::smallCapsFontData(
     const FontDescription& fontDescription) const {
   if (!m_smallCapsFontData) {
     float smallCapsHeight = cSmallCapsFontSizeMultiplier * m_font.size();
     if (isCustomFont()) {
       FontPlatformData smallCapsFontData(m_font);
       smallCapsFontData.setSize(smallCapsHeight);
-      m_smallCapsFontData = new FontData(smallCapsFontData, true, false);
+      m_smallCapsFontData = new SimpleFontData(smallCapsFontData, true, false);
     } else {
       LOGFONT winfont;
       GetObject(m_font.hfont(), sizeof(LOGFONT), &winfont);
       winfont.lfHeight = -lroundf(smallCapsHeight * (m_font.useGDI() ? 1 : 32));
       HFONT hfont = CreateFontIndirect(&winfont);
-      m_smallCapsFontData = new FontData(
+      m_smallCapsFontData = new SimpleFontData(
           FontPlatformData(hfont, smallCapsHeight, fontDescription.bold(),
                            fontDescription.italic(), m_font.useGDI()));
     }
@@ -188,7 +189,8 @@ FontData* FontData::smallCapsFontData(
   return m_smallCapsFontData;
 }
 
-bool FontData::containsCharacters(const UChar* characters, int length) const {
+bool SimpleFontData::containsCharacters(const UChar* characters,
+                                        int length) const {
   // FIXME: Support custom fonts.
   if (isCustomFont())
     return false;
@@ -226,7 +228,7 @@ bool FontData::containsCharacters(const UChar* characters, int length) const {
   return true;
 }
 
-void FontData::determinePitch() {
+void SimpleFontData::determinePitch() {
   if (isCustomFont()) {
     m_treatAsFixedPitch = false;
     return;
@@ -248,7 +250,7 @@ void FontData::determinePitch() {
   ReleaseDC(0, dc);
 }
 
-float FontData::platformWidthForGlyph(Glyph glyph) const {
+float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
   if (m_font.useGDI()) {
     HDC hdc = GetDC(0);
     HGDIOBJ oldFont = SelectObject(hdc, m_font.hfont());
@@ -269,7 +271,7 @@ float FontData::platformWidthForGlyph(Glyph glyph) const {
   return advance.width + m_syntheticBoldOffset;
 }
 
-SCRIPT_FONTPROPERTIES* FontData::scriptFontProperties() const {
+SCRIPT_FONTPROPERTIES* SimpleFontData::scriptFontProperties() const {
   if (!m_scriptFontProperties) {
     m_scriptFontProperties = new SCRIPT_FONTPROPERTIES;
     memset(m_scriptFontProperties, 0, sizeof(SCRIPT_FONTPROPERTIES));

@@ -182,6 +182,7 @@ class CSSParser {
   static bool parseColor(const String&, RGBA32& rgb, bool strict);
 
   bool parseFontFaceSrc();
+  bool parseFontFaceUnicodeRange();
 
 #if ENABLE(SVG)
   bool parseSVGValue(int propId, bool important);

@@ -38,11 +38,12 @@
 namespace WebCore {
 
 class AtomicString;
-class FontData;
-class FontPlatformData;
 class Font;
+class FontPlatformData;
+class FontData;
 class FontDescription;
 class FontSelector;
+class SimpleFontData;
 
 class FontCache {
  public:
@@ -51,9 +52,9 @@ class FontCache {
                                      FontSelector*);
 
   // This method is implemented by the platform.
-  static const FontData* getFontDataForCharacters(const Font&,
-                                                  const UChar* characters,
-                                                  int length);
+  static const SimpleFontData* getFontDataForCharacters(const Font&,
+                                                        const UChar* characters,
+                                                        int length);
 
   // Also implemented by the platform.
   static void platformInit();
@@ -68,7 +69,7 @@ class FontCache {
       const FontDescription&,
       const AtomicString& family,
       bool checkingAlternateName = false);
-  static FontData* getCachedFontData(const FontPlatformData*);
+  static SimpleFontData* getCachedFontData(const FontPlatformData*);
   static FontPlatformData* getLastResortFallbackFont(const FontDescription&);
 
  private:
@@ -77,7 +78,7 @@ class FontCache {
   static FontPlatformData* createFontPlatformData(const FontDescription&,
                                                   const AtomicString& family);
 
-  friend class FontData;
+  friend class SimpleFontData;
   friend class FontFallbackList;
 };
 }

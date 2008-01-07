@@ -42,7 +42,7 @@
 namespace WebCore {
 
 typedef unsigned short Glyph;
-class FontData;
+class SimpleFontData;
 
 #if PLATFORM(CG)
 typedef Glyph GlyphBufferGlyph;
@@ -81,10 +81,12 @@ class GlyphBuffer {
     return m_advances.data() + from;
   }
 
-  const FontData* fontDataAt(int index) const { return m_fontData[index]; }
+  const SimpleFontData* fontDataAt(int index) const {
+    return m_fontData[index];
+  }
 
   void swap(int index1, int index2) {
-    const FontData* f = m_fontData[index1];
+    const SimpleFontData* f = m_fontData[index1];
     m_fontData[index1] = m_fontData[index2];
     m_fontData[index2] = f;
 
@@ -128,7 +130,7 @@ class GlyphBuffer {
   }
 
   void add(Glyph glyph,
-           const FontData* font,
+           const SimpleFontData* font,
            float width,
            const FloatSize* offset = 0) {
     m_fontData.append(font);
@@ -156,7 +158,7 @@ class GlyphBuffer {
   }
 
  private:
-  Vector<const FontData*, 2048> m_fontData;
+  Vector<const SimpleFontData*, 2048> m_fontData;
   Vector<GlyphBufferGlyph, 2048> m_glyphs;
   Vector<GlyphBufferAdvance, 2048> m_advances;
 #if PLATFORM(WIN)

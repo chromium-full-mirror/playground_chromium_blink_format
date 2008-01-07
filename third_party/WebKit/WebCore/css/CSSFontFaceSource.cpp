@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,7 +31,7 @@
 #include "CSSFontSelector.h"
 #include "DocLoader.h"
 #include "FontCache.h"
-#include "FontData.h"
+#include "SimpleFontData.h"
 #include "FontDescription.h"
 #include "GlyphPageTreeNode.h"
 
@@ -50,13 +50,8 @@ CSSFontFaceSource::~CSSFontFaceSource() {
 }
 
 void CSSFontFaceSource::pruneTable() {
-  // Make sure the glyph page tree prunes out all uses of these custom fonts.
   if (m_fontDataTable.isEmpty())
     return;
-  HashMap<int, FontData*>::iterator end = m_fontDataTable.end();
-  for (HashMap<int, FontData*>::iterator it = m_fontDataTable.begin();
-       it != end; ++it)
-    GlyphPageTreeNode::pruneTreeCustomFontData(it->second);
   deleteAllValues(m_fontDataTable);
   m_fontDataTable.clear();
 }
@@ -79,21 +74,22 @@ void CSSFontFaceSource::fontLoaded(CachedFont*) {
     m_face->fontLoaded(this);
 }
 
-FontData* CSSFontFaceSource::getFontData(const FontDescription& fontDescription,
-                                         bool syntheticBold,
-                                         bool syntheticItalic,
-                                         CSSFontSelector* fontSelector) {
+SimpleFontData* CSSFontFaceSource::getFontData(
+    const FontDescription& fontDescription,
+    bool syntheticBold,
+    bool syntheticItalic,
+    CSSFontSelector* fontSelector) {
   // If the font hasn't loaded or an error occurred, then we've got nothing.
   if (!isValid())
     return 0;
 
   if (!m_font)
-    // We're local.  Just return a FontData from the normal cache.
+    // We're local.  Just return a SimpleFontData from the normal cache.
     return FontCache::getCachedFontData(
         FontCache::getCachedFontPlatformData(fontDescription, m_string));
 
   // See if we have a mapping in our FontData cache.
-  FontData* cachedData =
+  SimpleFontData* cachedData =
       m_fontDataTable.get(fontDescription.computedPixelSize());
   if (cachedData)
     return cachedData;
@@ -104,7 +100,7 @@ FontData* CSSFontFaceSource::getFontData(const FontDescription& fontDescription,
     // ATSFontRef.
     if (!m_font->ensureCustomFontData())
       return 0;
-    cachedData = new FontData(
+    cachedData = new SimpleFontData(
         m_font->platformDataFromCustomData(fontDescription.computedPixelSize(),
                                            syntheticBold, syntheticItalic),
         true, false);
@@ -116,7 +112,7 @@ FontData* CSSFontFaceSource::getFontData(const FontDescription& fontDescription,
         FontCache::getCachedFontPlatformData(fontDescription, m_string);
     if (!tempData)
       tempData = FontCache::getLastResortFallbackFont(fontDescription);
-    cachedData = new FontData(*tempData, true, true);
+    cachedData = new SimpleFontData(*tempData, true, true);
   }
 
   m_fontDataTable.set(fontDescription.computedPixelSize(), cachedData);
