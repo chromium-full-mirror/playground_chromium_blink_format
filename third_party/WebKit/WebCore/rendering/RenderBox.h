@@ -202,6 +202,16 @@ class RenderBox : public RenderObject {
                        int ty,
                        int width,
                        int height);
+  void paintBackgrounds(GraphicsContext*,
+                        const Color&,
+                        const BackgroundLayer*,
+                        int clipY,
+                        int clipHeight,
+                        int tx,
+                        int ty,
+                        int width,
+                        int height);
+
 #if PLATFORM(MAC)
   void paintCustomHighlight(int tx,
                             int ty,
@@ -226,15 +236,6 @@ class RenderBox : public RenderObject {
                                         IntRect& destRect,
                                         IntPoint& phase,
                                         IntSize& tileSize);
-  void paintBackgrounds(GraphicsContext*,
-                        const Color&,
-                        const BackgroundLayer*,
-                        int clipY,
-                        int clipHeight,
-                        int tx,
-                        int ty,
-                        int width,
-                        int height);
 
   int containingBlockWidthForPositioned(
       const RenderObject* containingBlock) const;
