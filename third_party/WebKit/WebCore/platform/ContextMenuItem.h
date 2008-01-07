@@ -119,7 +119,12 @@ enum ContextMenuAction {
   ContextMenuItemBaseApplicationTag = 10000
 };
 
-enum ContextMenuItemType { ActionType, SeparatorType, SubmenuType };
+enum ContextMenuItemType {
+  ActionType,
+  CheckableActionType,
+  SeparatorType,
+  SubmenuType
+};
 
 #if PLATFORM(MAC)
 typedef NSMenuItem* PlatformMenuItemDescription;

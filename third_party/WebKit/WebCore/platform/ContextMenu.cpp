@@ -70,11 +70,11 @@ static void createAndAppendFontSubMenu(const HitTestResult& result,
   ContextMenuItem showFonts(ActionType, ContextMenuItemTagShowFonts,
                             contextMenuItemTagShowFonts());
 #endif
-  ContextMenuItem bold(ActionType, ContextMenuItemTagBold,
+  ContextMenuItem bold(CheckableActionType, ContextMenuItemTagBold,
                        contextMenuItemTagBold());
-  ContextMenuItem italic(ActionType, ContextMenuItemTagItalic,
+  ContextMenuItem italic(CheckableActionType, ContextMenuItemTagItalic,
                          contextMenuItemTagItalic());
-  ContextMenuItem underline(ActionType, ContextMenuItemTagUnderline,
+  ContextMenuItem underline(CheckableActionType, ContextMenuItemTagUnderline,
                             contextMenuItemTagUnderline());
   ContextMenuItem outline(ActionType, ContextMenuItemTagOutline,
                           contextMenuItemTagOutline());
@@ -112,11 +112,11 @@ static void createAndAppendSpellingAndGrammarSubMenu(
                                     contextMenuItemTagShowSpellingPanel(true));
   ContextMenuItem checkSpelling(ActionType, ContextMenuItemTagCheckSpelling,
                                 contextMenuItemTagCheckSpelling());
-  ContextMenuItem checkAsYouType(ActionType,
+  ContextMenuItem checkAsYouType(CheckableActionType,
                                  ContextMenuItemTagCheckSpellingWhileTyping,
                                  contextMenuItemTagCheckSpellingWhileTyping());
   ContextMenuItem grammarWithSpelling(
-      ActionType, ContextMenuItemTagCheckGrammarWithSpelling,
+      CheckableActionType, ContextMenuItemTagCheckGrammarWithSpelling,
       contextMenuItemTagCheckGrammarWithSpelling());
 
   spellingAndGrammarMenu.appendItem(showSpellingPanel);
@@ -137,7 +137,7 @@ static void createAndAppendSpellingSubMenu(const HitTestResult& result,
                                     contextMenuItemTagShowSpellingPanel(true));
   ContextMenuItem checkSpelling(ActionType, ContextMenuItemTagCheckSpelling,
                                 contextMenuItemTagCheckSpelling());
-  ContextMenuItem checkAsYouType(ActionType,
+  ContextMenuItem checkAsYouType(CheckableActionType,
                                  ContextMenuItemTagCheckSpellingWhileTyping,
                                  contextMenuItemTagCheckSpellingWhileTyping());
 
@@ -173,9 +173,9 @@ static void createAndAppendWritingDirectionSubMenu(
 
   ContextMenuItem defaultItem(ActionType, ContextMenuItemTagDefaultDirection,
                               contextMenuItemTagDefaultDirection());
-  ContextMenuItem ltr(ActionType, ContextMenuItemTagLeftToRight,
+  ContextMenuItem ltr(CheckableActionType, ContextMenuItemTagLeftToRight,
                       contextMenuItemTagLeftToRight());
-  ContextMenuItem rtl(ActionType, ContextMenuItemTagRightToLeft,
+  ContextMenuItem rtl(CheckableActionType, ContextMenuItemTagRightToLeft,
                       contextMenuItemTagRightToLeft());
 
   writingDirectionMenu.appendItem(defaultItem);
