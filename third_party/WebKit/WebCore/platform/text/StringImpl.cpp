@@ -841,7 +841,7 @@ PassRefPtr<StringImpl> StringImpl::replace(StringImpl* pattern,
   if (!matchCount)
     return this;
 
-  Vector<UChar> data(m_length + (matchCount * repStrLength - patternLength));
+  Vector<UChar> data(m_length + matchCount * (repStrLength - patternLength));
 
   // Construct the new data
   int srcSegmentEnd;
