@@ -27,6 +27,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(VIDEO)
+
 #include "MediaControlElements.h"
 
 #include "Event.h"
@@ -240,3 +243,4 @@ void MediaControlFullscreenButtonElement::defaultEventHandler(Event* event) {
 // ----------------------------
 
 }  // namespace WebCore
+#endif  // enable(video)
