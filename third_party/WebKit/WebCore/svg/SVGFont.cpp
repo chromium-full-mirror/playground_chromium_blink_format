@@ -25,6 +25,7 @@
 
 #include "GraphicsContext.h"
 #include "RenderObject.h"
+#include "SimpleFontData.h"
 #include "SVGGlyphElement.h"
 #include "SVGFontElement.h"
 #include "SVGFontFaceElement.h"
@@ -216,7 +217,7 @@ static inline bool isCompatibleGlyph(
 }
 
 static inline SVGFontData* svgFontAndFontFaceElementForFontData(
-    const FontData* fontData,
+    const SimpleFontData* fontData,
     SVGFontFaceElement*& fontFace,
     SVGFontElement*& font) {
   ASSERT(!fontData->isCustomFont());
@@ -365,7 +366,8 @@ void floatWidthMissingGlyphCallback(const TextRun& run,
   // Font functionality
   // in that copy of the Font object, so drawText/floatWidth end up in the
   // "simple" code paths.
-  FontData* fontData = const_cast<FontData*>(data.font->primaryFont());
+  SimpleFontData* fontData =
+      const_cast<SimpleFontData*>(data.font->primaryFont());
   SVGFontData* svgFontData = fontData->m_svgFontData.release();
 
   // Handle system font fallback
@@ -516,7 +518,7 @@ void drawTextMissingGlyphCallback(const TextRun& run,
   // "simple" code paths.
   const Font& font = data.context->font();
 
-  FontData* fontData = const_cast<FontData*>(font.primaryFont());
+  SimpleFontData* fontData = const_cast<SimpleFontData*>(font.primaryFont());
   SVGFontData* svgFontData = fontData->m_svgFontData.release();
 
   // Handle system font fallback
