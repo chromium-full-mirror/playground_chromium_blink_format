@@ -260,6 +260,7 @@ class GraphicsContext : Noncopyable {
 
 #if PLATFORM(WIN)
   GraphicsContext(HDC);  // FIXME: To be removed.
+  bool inTransparencyLayer() const;
   HDC getWindowsContext(const IntRect&,
                         bool supportAlphaBlend = true);  // The passed in rect
                                                          // is used to create a
