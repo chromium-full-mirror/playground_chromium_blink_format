@@ -35,9 +35,9 @@ class CharacterData : public EventTargetNode {
 
   // DOM methods & attributes for CharacterData
 
-  String data() const { return m_str; }
+  String data() const { return m_data; }
   void setData(const String&, ExceptionCode&);
-  unsigned length() const { return m_str->length(); }
+  unsigned length() const { return m_data->length(); }
   String substringData(unsigned offset, unsigned count, ExceptionCode&);
   void appendData(const String&, ExceptionCode&);
   void insertData(unsigned offset, const String&, ExceptionCode&);
@@ -58,7 +58,7 @@ class CharacterData : public EventTargetNode {
 
   virtual bool isCharacterDataNode() const { return true; }
   virtual int maxCharacterOffset() const;
-  StringImpl* string() { return m_str.get(); }
+  StringImpl* string() { return m_data.get(); }
   virtual void checkCharDataOperation(unsigned offset, ExceptionCode&);
 
   virtual bool offsetInCharacters() const;
@@ -69,7 +69,7 @@ class CharacterData : public EventTargetNode {
 #endif
 
  protected:
-  RefPtr<StringImpl> m_str;
+  RefPtr<StringImpl> m_data;
 
   void dispatchModifiedEvent(StringImpl* oldValue);
 };
