@@ -186,6 +186,28 @@ class RenderThemeMac : public RenderTheme {
                                              const RenderObject::PaintInfo&,
                                              const IntRect&);
 
+  virtual bool paintMediaBackground(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+  virtual bool paintMediaFullscreenButton(RenderObject*,
+                                          const RenderObject::PaintInfo&,
+                                          const IntRect&);
+  virtual bool paintMediaPlayButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+  virtual bool paintMediaMuteButton(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
+  virtual bool paintMediaSeekBackButton(RenderObject*,
+                                        const RenderObject::PaintInfo&,
+                                        const IntRect&);
+  virtual bool paintMediaSeekForwardButton(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+  virtual bool paintMediaSliderThumb(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
+
  private:
   IntRect inflateRect(const IntRect&, const IntSize&, const int* margins) const;
 
@@ -255,6 +277,7 @@ class RenderThemeMac : public RenderTheme {
   mutable RetainPtr<NSSliderCell> m_sliderThumbHorizontal;
   mutable RetainPtr<NSSliderCell> m_sliderThumbVertical;
   mutable Image* m_resizeCornerImage;
+  mutable Image* m_mediaControlBackgroundImage;
 
   bool m_isSliderThumbHorizontalPressed;
   bool m_isSliderThumbVerticalPressed;

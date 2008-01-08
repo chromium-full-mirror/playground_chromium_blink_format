@@ -4,7 +4,7 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2006 Graham Dennis (graham.dennis@gmail.com)
  *
  * This library is free software; you can redistribute it and/or
@@ -997,6 +997,14 @@ enum EAppearance {
   ButtonBevelAppearance,
   ListboxAppearance,
   ListItemAppearance,
+  MediaBackgroundAppearance,
+  MediaFullscreenButtonAppearance,
+  MediaMuteButtonAppearance,
+  MediaPlayButtonAppearance,
+  MediaSeekBackButtonAppearance,
+  MediaSeekForwardButtonAppearance,
+  MediaSliderAppearance,
+  MediaSliderThumbAppearance,
   MenulistAppearance,
   MenulistButtonAppearance,
   MenulistTextAppearance,
@@ -1492,7 +1500,10 @@ class RenderStyle {
     MEDIA_CONTROLS_PLAY_BUTTON,
     MEDIA_CONTROLS_MUTE_BUTTON,
     MEDIA_CONTROLS_TIMELINE,
-    MEDIA_CONTROLS_TIME_DISPLAY
+    MEDIA_CONTROLS_TIME_DISPLAY,
+    MEDIA_CONTROLS_SEEK_BACK_BUTTON,
+    MEDIA_CONTROLS_SEEK_FORWARD_BUTTON,
+    MEDIA_CONTROLS_FULLSCREEN_BUTTON
   };
   static const int FIRST_INTERNAL_PSEUDOID = FILE_UPLOAD_BUTTON;
 
