@@ -390,19 +390,6 @@ void FrameLoader::changeLocation(const KURL& url,
                                  const String& referrer,
                                  bool lockHistory,
                                  bool userGesture) {
-  if (url.deprecatedString().find("javascript:", 0, false) == 0) {
-    String script =
-        KURL::decode_string(url.deprecatedString().mid(strlen("javascript:")));
-    JSValue* result = executeScript(script, userGesture);
-    String scriptResult;
-    if (getString(result, scriptResult)) {
-      begin(m_URL);
-      write(scriptResult);
-      end();
-    }
-    return;
-  }
-
   ResourceRequestCachePolicy policy =
       (m_cachePolicy == CachePolicyReload) ||
               (m_cachePolicy == CachePolicyRefresh)
@@ -418,17 +405,12 @@ void FrameLoader::urlSelected(const ResourceRequest& request,
                               Event* triggeringEvent,
                               bool lockHistory,
                               bool userGesture) {
+  if (executeIfJavaScriptURL(request.url(), userGesture))
+    return;
+
   String target = _target;
   if (target.isEmpty() && m_frame->document())
     target = m_frame->document()->baseTarget();
-
-  const KURL& url = request.url();
-  if (url.deprecatedString().startsWith("javascript:", false)) {
-    executeScript(
-        KURL::decode_string(url.deprecatedString().mid(strlen("javascript:"))),
-        true);
-    return;
-  }
 
   FrameLoadRequest frameRequest(request, target);
 
@@ -469,7 +451,7 @@ bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
     return false;
 
   if (!scriptURL.isEmpty())
-    frame->loader()->replaceContentsWithScriptResult(scriptURL);
+    frame->loader()->executeIfJavaScriptURL(scriptURL);
 
   return true;
 }
@@ -554,7 +536,7 @@ void FrameLoader::submitForm(const char* action,
   DeprecatedString urlString = u.deprecatedString();
   if (urlString.startsWith("javascript:", false)) {
     m_isExecutingJavaScriptFormAction = true;
-    executeScript(KURL::decode_string(urlString.mid(strlen("javascript:"))));
+    executeIfJavaScriptURL(u);
     m_isExecutingJavaScriptFormAction = false;
     return;
   }
@@ -770,15 +752,27 @@ void FrameLoader::didExplicitOpen() {
     m_URL = m_frame->document()->url();
 }
 
-void FrameLoader::replaceContentsWithScriptResult(const KURL& url) {
-  JSValue* result = executeScript(
-      KURL::decode_string(url.deprecatedString().mid(strlen("javascript:"))));
+bool FrameLoader::executeIfJavaScriptURL(const KURL& url, bool userGesture) {
+  if (!url.deprecatedString().startsWith("javascript:", false))
+    return false;
+
+  String script =
+      KURL::decode_string(url.deprecatedString().mid(strlen("javascript:")));
+  JSValue* result = executeScript(script, userGesture);
+
   String scriptResult;
   if (!getString(result, scriptResult))
-    return;
-  begin();
+    return true;
+
+  SecurityOrigin* currentSecurityOrigin = 0;
+  if (m_frame->document())
+    currentSecurityOrigin = m_frame->document()->securityOrigin();
+
+  begin(m_URL, true, currentSecurityOrigin);
   write(scriptResult);
   end();
+
+  return true;
 }
 
 JSValue* FrameLoader::executeScript(const String& script,
@@ -916,7 +910,13 @@ void FrameLoader::begin() {
   begin(KURL());
 }
 
-void FrameLoader::begin(const KURL& url, bool dispatch) {
+void FrameLoader::begin(const KURL& url,
+                        bool dispatch,
+                        SecurityOrigin* origin) {
+  // We need to take a reference to the security origin because |clear|
+  // might destroy the document that owns it.
+  RefPtr<SecurityOrigin> forcedSecurityOrigin = origin;
+
   bool resetScripting =
       !(m_isDisplayingInitialEmptyDocument && m_frame->document() &&
         m_frame->document()->securityOrigin()->isSecureTransitionTo(url));
@@ -951,6 +951,8 @@ void FrameLoader::begin(const KURL& url, bool dispatch) {
   document->setBaseURL(baseurl.deprecatedString());
   if (m_decoder)
     document->setDecoder(m_decoder.get());
+  if (forcedSecurityOrigin)
+    document->setSecurityOrigin(forcedSecurityOrigin.get());
 
   updatePolicyBaseURL();
 

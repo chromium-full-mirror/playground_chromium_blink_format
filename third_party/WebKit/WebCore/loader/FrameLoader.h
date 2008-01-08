@@ -75,6 +75,7 @@ class ResourceError;
 class ResourceLoader;
 class ResourceRequest;
 class ResourceResponse;
+class SecurityOrigin;
 class SharedBuffer;
 class SubstituteData;
 class TextResourceDecoder;
@@ -396,7 +397,9 @@ class FrameLoader : Noncopyable
   KURL historyURL(int distance);
 
   void begin();
-  void begin(const KURL&, bool dispatchWindowObjectAvailable = true);
+  void begin(const KURL&,
+             bool dispatchWindowObjectAvailable = true,
+             SecurityOrigin* forcedSecurityOrigin = 0);
 
   void write(const char* str, int len = -1, bool flush = false);
   void write(const String&);
@@ -405,6 +408,9 @@ class FrameLoader : Noncopyable
 
   void setEncoding(const String& encoding, bool userChosen);
   String encoding() const;
+
+  // Returns true if url is a JavaScript URL.
+  bool executeIfJavaScriptURL(const KURL& url, bool userGesture = false);
 
   KJS::JSValue* executeScript(const String& url,
                               int baseLine,
@@ -593,8 +599,6 @@ class FrameLoader : Noncopyable
 
   void updatePolicyBaseURL();
   void setPolicyBaseURL(const String&);
-
-  void replaceContentsWithScriptResult(const KURL&);
 
   // Also not cool.
   void stopLoadingSubframes();

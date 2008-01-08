@@ -50,16 +50,13 @@ class SecurityOrigin : public RefCounted<SecurityOrigin> {
   bool canAccess(const SecurityOrigin*) const;
   bool isSecureTransitionTo(const KURL&) const;
 
+  bool isEmpty() const;
   String toString() const;
 
   SecurityOriginData securityOriginData() const;
 
  private:
-  SecurityOrigin();
-  bool isEmpty() const;
-
-  void clear();
-  void setForURL(const KURL& url);
+  SecurityOrigin(const KURL& url);
 
   String m_protocol;
   String m_host;
