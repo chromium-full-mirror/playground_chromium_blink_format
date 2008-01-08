@@ -40,7 +40,7 @@ Node::NodeType CDATASection::nodeType() const {
 }
 
 PassRefPtr<Node> CDATASection::cloneNode(bool /*deep*/) {
-  return new CDATASection(document(), str);
+  return new CDATASection(document(), m_str);
 }
 
 // DOM Section 1.1.1
