@@ -83,16 +83,16 @@ class CSSStyleSelector : public StyleSelector {
  public:
   CSSStyleSelector(Document*,
                    const String& userStyleSheet,
-                   StyleSheetList* styleSheets,
-                   CSSStyleSheet* mappedElementsSheet,
+                   StyleSheetList*,
+                   CSSStyleSheet*,
                    bool strictParsing,
                    bool matchAuthorAndUserStyles);
   ~CSSStyleSelector();
 
   static void loadDefaultStyle();
 
-  void initElementAndPseudoState(Element* e);
-  void initForStyleResolve(Element* e, RenderStyle* parentStyle);
+  void initElementAndPseudoState(Element*);
+  void initForStyleResolve(Element*, RenderStyle* parentStyle);
   RenderStyle* styleForElement(Element*,
                                RenderStyle* parentStyle = 0,
                                bool allowSharing = true,
@@ -107,8 +107,8 @@ class CSSStyleSelector : public StyleSelector {
 
   // These methods will give back the set of rules that matched for a given
   // element (or a pseudo-element).
-  RefPtr<CSSRuleList> styleRulesForElement(Element* e, bool authorOnly);
-  RefPtr<CSSRuleList> pseudoStyleRulesForElement(Element* e,
+  RefPtr<CSSRuleList> styleRulesForElement(Element*, bool authorOnly);
+  RefPtr<CSSRuleList> pseudoStyleRulesForElement(Element*,
                                                  StringImpl* pseudoStyle,
                                                  bool authorOnly);
 
@@ -118,7 +118,8 @@ class CSSStyleSelector : public StyleSelector {
     DeprecatedString host;  // also contains protocol
     DeprecatedString path;
     DeprecatedString file;
-  } encodedurl;
+  } m_encodedURL;
+
   void setEncodedURL(const KURL& url);
 
   // Given a CSS keyword in the range (xx-small to -webkit-xxx-large), this
@@ -134,13 +135,13 @@ class CSSStyleSelector : public StyleSelector {
   // Like the previous function, but for the keyword "smaller".
   float smallerFontSize(float size, bool quirksMode) const;
 
-  void setFontSize(FontDescription& FontDescription, float size);
+  void setFontSize(FontDescription&, float size);
   float getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
                                          float specifiedSize);
 
-  Color getColorFromPrimitiveValue(CSSPrimitiveValue* primitiveValue);
+  Color getColorFromPrimitiveValue(CSSPrimitiveValue*);
 
-  bool hasSelectorForAttribute(const AtomicString& attrname);
+  bool hasSelectorForAttribute(const AtomicString&);
 
   CSSFontSelector* fontSelector() { return m_fontSelector.get(); }
 
@@ -155,8 +156,9 @@ class CSSStyleSelector : public StyleSelector {
     SelectorFailsLocally,
     SelectorFailsCompletely
   };
-  SelectorMatch checkSelector(CSSSelector* selector,
-                              Element* e,
+
+  SelectorMatch checkSelector(CSSSelector*,
+                              Element*,
                               bool isAncestor,
                               bool isSubSelector);
 
@@ -168,18 +170,18 @@ class CSSStyleSelector : public StyleSelector {
 
   /* This function fixes up the default font size if it detects that the
      current generic font family has changed. -dwh */
-  void checkForGenericFamilyChange(RenderStyle* aStyle,
-                                   RenderStyle* aParentStyle);
+  void checkForGenericFamilyChange(RenderStyle* style,
+                                   RenderStyle* parentStyle);
   void checkForTextSizeAdjust();
 
-  void adjustRenderStyle(RenderStyle* style, Element* e);
+  void adjustRenderStyle(RenderStyle*, Element*);
 
   void addMatchedRule(CSSRuleData* rule) { m_matchedRules.append(rule); }
   void addMatchedDeclaration(CSSMutableStyleDeclaration* decl) {
     m_matchedDecls.append(decl);
   }
 
-  void matchRules(CSSRuleSet* rules, int& firstRuleIndex, int& lastRuleIndex);
+  void matchRules(CSSRuleSet*, int& firstRuleIndex, int& lastRuleIndex);
   void matchRulesForList(CSSRuleDataList* rules,
                          int& firstRuleIndex,
                          int& lastRuleIndex);
@@ -190,17 +192,17 @@ class CSSStyleSelector : public StyleSelector {
                          int startIndex,
                          int endIndex);
 
-  static CSSStyleSheet* defaultSheet;
-  static CSSStyleSheet* quirksSheet;
-  static CSSStyleSheet* viewSourceSheet;
+  static CSSStyleSheet* m_defaultSheet;
+  static CSSStyleSheet* m_quirksSheet;
+  static CSSStyleSheet* m_viewSourceSheet;
 #if ENABLE(SVG)
-  static CSSStyleSheet* svgSheet;
+  static CSSStyleSheet* m_svgSheet;
 #endif
 
-  static CSSRuleSet* defaultStyle;
-  static CSSRuleSet* defaultQuirksStyle;
-  static CSSRuleSet* defaultPrintStyle;
-  static CSSRuleSet* defaultViewSourceStyle;
+  static CSSRuleSet* m_defaultStyle;
+  static CSSRuleSet* m_defaultQuirksStyle;
+  static CSSRuleSet* m_defaultPrintStyle;
+  static CSSRuleSet* m_defaultViewSourceStyle;
 
   CSSRuleSet* m_authorStyle;
   CSSRuleSet* m_userStyle;
@@ -212,7 +214,7 @@ class CSSStyleSelector : public StyleSelector {
   Color m_backgroundColor;
 
  public:
-  static RenderStyle* styleNotYetAvailable;
+  static RenderStyle* m_styleNotYetAvailable;
 
  private:
   void init();
@@ -221,15 +223,15 @@ class CSSStyleSelector : public StyleSelector {
   void updateFont();
   void cacheBorderAndBackground();
 
-  void mapBackgroundAttachment(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundClip(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundComposite(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundOrigin(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundImage(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundRepeat(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundSize(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundXPosition(BackgroundLayer* layer, CSSValue* value);
-  void mapBackgroundYPosition(BackgroundLayer* layer, CSSValue* value);
+  void mapBackgroundAttachment(BackgroundLayer*, CSSValue*);
+  void mapBackgroundClip(BackgroundLayer*, CSSValue*);
+  void mapBackgroundComposite(BackgroundLayer*, CSSValue*);
+  void mapBackgroundOrigin(BackgroundLayer*, CSSValue*);
+  void mapBackgroundImage(BackgroundLayer*, CSSValue*);
+  void mapBackgroundRepeat(BackgroundLayer*, CSSValue*);
+  void mapBackgroundSize(BackgroundLayer*, CSSValue*);
+  void mapBackgroundXPosition(BackgroundLayer*, CSSValue*);
+  void mapBackgroundYPosition(BackgroundLayer*, CSSValue*);
 
   void mapTransitionDuration(Transition*, CSSValue*);
   void mapTransitionRepeatCount(Transition*, CSSValue*);
@@ -259,24 +261,24 @@ class CSSStyleSelector : public StyleSelector {
   RenderStyle::PseudoId dynamicPseudo;
 
   Document* m_document;  // back pointer to owner document
-  RenderStyle* style;
-  RenderStyle* parentStyle;
-  Element* element;
-  StyledElement* styledElement;
-  Node* parentNode;
-  RenderStyle::PseudoId pseudoStyle;
+  RenderStyle* m_style;
+  RenderStyle* m_parentStyle;
+  Element* m_element;
+  StyledElement* m_styledElement;
+  Node* m_parentNode;
+  RenderStyle::PseudoId m_pseudoStyle;
   CSSValue* m_lineHeightValue;
-  bool fontDirty;
-  bool isXMLDoc;
+  bool m_fontDirty;
+  bool m_isXMLDoc;
   bool m_matchAuthorAndUserStyles;
 
   RefPtr<CSSFontSelector> m_fontSelector;
 
   HashSet<AtomicStringImpl*> m_selectorAttrs;
 
-  void applyProperty(int id, CSSValue* value);
+  void applyProperty(int id, CSSValue*);
 #if ENABLE(SVG)
-  void applySVGProperty(int id, CSSValue* value);
+  void applySVGProperty(int id, CSSValue*);
 #endif
 
   friend class CSSRuleSet;
@@ -293,6 +295,7 @@ class CSSRuleData {
     if (prev)
       prev->m_next = this;
   }
+
   ~CSSRuleData() { delete m_next; }
 
   unsigned position() { return m_position; }
@@ -309,9 +312,9 @@ class CSSRuleData {
 
 class CSSRuleDataList {
  public:
-  CSSRuleDataList(unsigned pos, CSSStyleRule* rule, CSSSelector* sel) {
-    m_first = m_last = new CSSRuleData(pos, rule, sel);
-  }
+  CSSRuleDataList(unsigned pos, CSSStyleRule* rule, CSSSelector* sel)
+      : m_first(new CSSRuleData(pos, rule, sel)), m_last(m_first) {}
+
   ~CSSRuleDataList() { delete m_first; }
 
   CSSRuleData* first() { return m_first; }
@@ -326,6 +329,6 @@ class CSSRuleDataList {
   CSSRuleData* m_last;
 };
 
-}  // WebCore
+}  // namespace WebCore
 
 #endif  // CSSStyleSelector_h

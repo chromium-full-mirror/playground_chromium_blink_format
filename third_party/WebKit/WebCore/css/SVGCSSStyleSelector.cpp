@@ -45,20 +45,20 @@
 #include <stdlib.h>
 #include <wtf/MathExtras.h>
 
-#define HANDLE_INHERIT(prop, Prop)                        \
-  if (isInherit) {                                        \
-    svgstyle->set##Prop(parentStyle->svgStyle()->prop()); \
-    return;                                               \
+#define HANDLE_INHERIT(prop, Prop)                          \
+  if (isInherit) {                                          \
+    svgstyle->set##Prop(m_parentStyle->svgStyle()->prop()); \
+    return;                                                 \
   }
 
 #define HANDLE_INHERIT_AND_INITIAL(prop, Prop) \
   HANDLE_INHERIT(prop, Prop)                   \
   else if (isInitial) svgstyle->set##Prop(SVGRenderStyle::initial##Prop());
 
-#define HANDLE_INHERIT_COND(propID, prop, Prop)           \
-  if (id == propID) {                                     \
-    svgstyle->set##Prop(parentStyle->svgStyle()->prop()); \
-    return;                                               \
+#define HANDLE_INHERIT_COND(propID, prop, Prop)             \
+  if (id == propID) {                                       \
+    svgstyle->set##Prop(m_parentStyle->svgStyle()->prop()); \
+    return;                                                 \
   }
 
 #define HANDLE_INITIAL_COND(propID, Prop)                 \
@@ -108,12 +108,13 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
   if (value->isPrimitiveValue())
     primitiveValue = static_cast<CSSPrimitiveValue*>(value);
 
-  SVGRenderStyle* svgstyle = style->accessSVGStyle();
+  SVGRenderStyle* svgstyle = m_style->accessSVGStyle();
   unsigned short valueType = value->cssValueType();
 
-  bool isInherit = parentNode && valueType == CSSPrimitiveValue::CSS_INHERIT;
-  bool isInitial = valueType == CSSPrimitiveValue::CSS_INITIAL ||
-                   (!parentNode && valueType == CSSPrimitiveValue::CSS_INHERIT);
+  bool isInherit = m_parentNode && valueType == CSSPrimitiveValue::CSS_INHERIT;
+  bool isInitial =
+      valueType == CSSPrimitiveValue::CSS_INITIAL ||
+      (!m_parentNode && valueType == CSSPrimitiveValue::CSS_INHERIT);
 
   // What follows is a list that maps the CSS properties into their
   // corresponding front-end RenderStyle values. Shorthands(e.g. border,
@@ -465,7 +466,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
 
       Color col;
       if (c->colorType() == SVGColor::SVG_COLORTYPE_CURRENTCOLOR)
-        col = style->color();
+        col = m_style->color();
       else
         col = c->color();
 
@@ -481,7 +482,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
 
       Color col;
       if (c->colorType() == SVGColor::SVG_COLORTYPE_CURRENTCOLOR)
-        col = style->color();
+        col = m_style->color();
       else
         col = c->color();
 
@@ -515,7 +516,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
           return CSSStyleSelector::applyProperty(id, value);
 
         if (c->colorType() == SVGColor::SVG_COLORTYPE_CURRENTCOLOR)
-          col = style->color();
+          col = m_style->color();
         else
           col = c->color();
       }
