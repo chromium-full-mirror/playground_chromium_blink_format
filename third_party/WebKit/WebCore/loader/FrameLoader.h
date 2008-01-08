@@ -314,9 +314,7 @@ class FrameLoader : Noncopyable
   void requestFromDelegate(ResourceRequest&,
                            unsigned long& identifier,
                            ResourceError&);
-  void loadedResourceFromMemoryCache(const ResourceRequest&,
-                                     const ResourceResponse&,
-                                     int length);
+  void loadedResourceFromMemoryCache(const CachedResource*);
 
   void recursiveCheckLoadComplete();
   void checkLoadComplete();
@@ -486,8 +484,8 @@ class FrameLoader : Noncopyable
 
   KURL completeURL(const String& url);
 
-  void didTellBridgeAboutLoad(const String& url);
-  bool haveToldBridgeAboutLoad(const String& url);
+  void didTellClientAboutLoad(const String& url);
+  bool haveToldClientAboutLoad(const String& url);
 
   KURL originalRequestURL() const;
 
@@ -705,10 +703,6 @@ class FrameLoader : Noncopyable
                                        unsigned long identifier,
                                        int length);
   void dispatchDidFinishLoading(DocumentLoader*, unsigned long identifier);
-  bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
-                                              const ResourceRequest&,
-                                              const ResourceResponse&,
-                                              int length);
 
   static bool isLocationChange(const ScheduledRedirection&);
 
@@ -739,7 +733,7 @@ class FrameLoader : Noncopyable
 
   CachePolicy m_cachePolicy;
 
-  HashSet<String> m_urlsBridgeKnowsAbout;
+  HashSet<String> m_urlsClientKnowsAbout;
 
   OwnPtr<FormSubmission> m_deferredFormSubmission;
 
