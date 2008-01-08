@@ -1857,8 +1857,11 @@ bool FrameLoader::canCachePage() {
          // information.
          && !m_containsPlugIns && !m_URL.protocol().startsWith("https") &&
          m_frame->document() && !m_frame->document()->applets()->length() &&
-         !m_frame->document()->hasWindowEventListener(unloadEvent) &&
-         m_frame->page() && m_frame->page()->backForwardList()->enabled() &&
+         !m_frame->document()->hasWindowEventListener(unloadEvent)
+#if ENABLE(DATABASE)
+         && !m_frame->document()->hasOpenDatabases()
+#endif
+         && m_frame->page() && m_frame->page()->backForwardList()->enabled() &&
          m_frame->page()->backForwardList()->capacity() > 0 &&
          m_frame->page()->settings()->usesPageCache() && m_currentHistoryItem &&
          !isQuickRedirectComing() && loadType != FrameLoadTypeReload &&

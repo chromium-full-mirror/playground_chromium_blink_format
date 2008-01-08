@@ -983,6 +983,8 @@ class Document : public ContainerNode {
 
 #if ENABLE(DATABASE)
   DatabaseThread* databaseThread();
+  void setHasOpenDatabases() { m_hasOpenDatabases = true; }
+  bool hasOpenDatabases() { return m_hasOpenDatabases; }
 #endif
  protected:
   void clearXMLVersion() { m_xmlVersion = String(); }
@@ -1055,6 +1057,7 @@ class Document : public ContainerNode {
 
 #if ENABLE(DATABASE)
   RefPtr<DatabaseThread> m_databaseThread;
+  bool m_hasOpenDatabases;
 #endif
 #if USE(LOW_BANDWIDTH_DISPLAY)
   bool m_inLowBandwidthDisplay;
