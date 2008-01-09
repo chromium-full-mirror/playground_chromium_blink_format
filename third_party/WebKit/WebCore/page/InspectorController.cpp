@@ -682,7 +682,8 @@ InspectorController::~InspectorController() {
         m_scriptContext, JSObjectGetProperty(m_scriptContext, global,
                                              controllerProperty.get(), 0),
         0);
-    JSObjectSetPrivate(controller, 0);
+    if (controller)
+      JSObjectSetPrivate(controller, 0);
   }
 
   if (m_page)
