@@ -530,6 +530,8 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
                                                 impl()->frame()->document());
     case Audio:
 #if ENABLE(VIDEO)
+      if (!allowsAccessFrom(exec))
+        return jsUndefined();
       if (!MediaPlayer::isAvailable())
         return jsUndefined();
       return new JSHTMLAudioElementConstructor(exec,
