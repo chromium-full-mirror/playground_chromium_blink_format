@@ -54,11 +54,41 @@ enum {
   LAST_SIGNAL
 };
 
+enum {
+  PROP_0,
+
+  PROP_NAME,
+  PROP_TITLE,
+  PROP_URI
+};
+
 static guint webkit_web_frame_signals[LAST_SIGNAL] = {
     0,
 };
 
 G_DEFINE_TYPE(WebKitWebFrame, webkit_web_frame, G_TYPE_OBJECT)
+
+static void webkit_web_frame_get_property(GObject* object,
+                                          guint prop_id,
+                                          GValue* value,
+                                          GParamSpec* pspec) {
+  WebKitWebFrame* frame = WEBKIT_WEB_FRAME(object);
+
+  switch (prop_id) {
+    case PROP_NAME:
+      g_value_set_string(value, webkit_web_frame_get_name(frame));
+      break;
+    case PROP_TITLE:
+      g_value_set_string(value, webkit_web_frame_get_title(frame));
+      break;
+    case PROP_URI:
+      g_value_set_string(value, webkit_web_frame_get_uri(frame));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+      break;
+  }
+}
 
 static void webkit_web_frame_finalize(GObject* object) {
   WebKitWebFramePrivate* privateData =
@@ -109,7 +139,29 @@ static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
   /*
    * implementations of virtual methods
    */
-  G_OBJECT_CLASS(frameClass)->finalize = webkit_web_frame_finalize;
+  GObjectClass* objectClass = G_OBJECT_CLASS(frameClass);
+  objectClass->finalize = webkit_web_frame_finalize;
+  objectClass->get_property = webkit_web_frame_get_property;
+
+  /*
+   * properties
+   */
+  g_object_class_install_property(
+      objectClass, PROP_NAME,
+      g_param_spec_string("name", "Name", "The name of the frame", NULL,
+                          WEBKIT_PARAM_READABLE));
+
+  g_object_class_install_property(
+      objectClass, PROP_TITLE,
+      g_param_spec_string("title", "Title", "The document title of the frame",
+                          NULL, WEBKIT_PARAM_READABLE));
+
+  g_object_class_install_property(
+      objectClass, PROP_URI,
+      g_param_spec_string(
+          "uri", "URI",
+          "The current URI of the contents displayed by the frame", NULL,
+          WEBKIT_PARAM_READABLE));
 }
 
 static void webkit_web_frame_init(WebKitWebFrame* frame) {
@@ -172,6 +224,14 @@ WebKitWebFrame* webkit_web_frame_init_with_web_view(
   return frame;
 }
 
+/**
+ * webkit_web_frame_get_title:
+ * @frame: a #WebKitWebFrame
+ *
+ * Returns the @frame's document title
+ *
+ * Return value: the title of @frame
+ */
 const gchar* webkit_web_frame_get_title(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
@@ -179,6 +239,14 @@ const gchar* webkit_web_frame_get_title(WebKitWebFrame* frame) {
   return frameData->title;
 }
 
+/**
+ * webkit_web_frame_get_uri:
+ * @frame: a #WebKitWebFrame
+ *
+ * Returns the current URI of the contents displayed by the @frame
+ *
+ * Return value: the URI of @frame
+ */
 const gchar* webkit_web_frame_get_uri(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
