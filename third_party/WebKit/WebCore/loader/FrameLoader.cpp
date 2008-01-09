@@ -4825,11 +4825,8 @@ Widget* FrameLoader::createJavaAppletWidget(
     baseURLString = m_frame->document()->baseURL();
   KURL baseURL = completeURL(baseURLString);
 
-  Widget* widget = m_client->createJavaAppletWidget(size, element, baseURL,
-                                                    paramNames, paramValues);
-  if (widget && m_frame->view())
-    m_frame->view()->addChild(widget);
-  return widget;
+  return m_client->createJavaAppletWidget(size, element, baseURL, paramNames,
+                                          paramValues);
 }
 
 void FrameLoader::didChangeTitle(DocumentLoader* loader) {
