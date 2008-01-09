@@ -132,19 +132,11 @@ struct InspectorResource : public RefCounted<InspectorResource> {
     if (requestURL == loader->requestURL())
       return Doc;
 
-    FrameLoader* frameLoader = loader->frameLoader();
-    if (!frameLoader)
-      return Other;
-
-    if (requestURL == frameLoader->iconURL())
+    if (loader->frameLoader() && requestURL == loader->frameLoader()->iconURL())
       return Image;
 
-    Document* doc = frameLoader->frame()->document();
-    if (!doc)
-      return Other;
-
     CachedResource* cachedResource =
-        doc->docLoader()->cachedResource(requestURL.string());
+        frame->document()->docLoader()->cachedResource(requestURL.string());
     if (!cachedResource)
       return Other;
 
@@ -269,18 +261,11 @@ static JSValueRef addSourceToFrame(JSContextRef ctx,
   String textEncodingName;
   if (resource->requestURL == resource->loader->requestURL()) {
     buffer = resource->loader->mainResourceData();
-    textEncodingName = resource->loader->frame()->document()->inputEncoding();
+    textEncodingName = resource->frame->document()->inputEncoding();
   } else {
-    FrameLoader* frameLoader = resource->loader->frameLoader();
-    if (!frameLoader)
-      return undefined;
-
-    Document* doc = frameLoader->frame()->document();
-    if (!doc)
-      return undefined;
-
     CachedResource* cachedResource =
-        doc->docLoader()->cachedResource(resource->requestURL.string());
+        resource->frame->document()->docLoader()->cachedResource(
+            resource->requestURL.string());
     if (!cachedResource)
       return undefined;
 
@@ -355,11 +340,7 @@ static JSValueRef getResourceDocumentNode(JSContextRef ctx,
   if (!resource)
     return undefined;
 
-  FrameLoader* frameLoader = resource->loader->frameLoader();
-  if (!frameLoader)
-    return undefined;
-
-  Document* document = frameLoader->frame()->document();
+  Document* document = resource->frame->document();
   if (!document)
     return undefined;
 
@@ -1036,67 +1017,64 @@ JSObjectRef InspectorController::addScriptResource(
     InspectorResource* resource) {
   ASSERT_ARG(resource, resource);
 
-  // This happens for pages loaded from the back/forward cache.
-  if (resource->scriptObject)
-    return resource->scriptObject;
-
   ASSERT(m_scriptContext);
   ASSERT(m_scriptObject);
   if (!m_scriptContext || !m_scriptObject)
     return 0;
 
-  JSRetainPtr<JSStringRef> resourceString(
-      Adopt, JSStringCreateWithUTF8CString("Resource"));
-  JSObjectRef resourceConstructor = JSValueToObject(
-      m_scriptContext, JSObjectGetProperty(m_scriptContext, m_scriptObject,
-                                           resourceString.get(), 0),
-      0);
+  if (!resource->scriptObject) {
+    JSRetainPtr<JSStringRef> resourceString(
+        Adopt, JSStringCreateWithUTF8CString("Resource"));
+    JSObjectRef resourceConstructor = JSValueToObject(
+        m_scriptContext, JSObjectGetProperty(m_scriptContext, m_scriptObject,
+                                             resourceString.get(), 0),
+        0);
 
-  String urlString = resource->requestURL.string();
-  JSRetainPtr<JSStringRef> url(
-      Adopt,
-      JSStringCreateWithCharacters(urlString.characters(), urlString.length()));
-  JSValueRef urlValue = JSValueMakeString(m_scriptContext, url.get());
+    String urlString = resource->requestURL.string();
+    JSRetainPtr<JSStringRef> url(
+        Adopt, JSStringCreateWithCharacters(urlString.characters(),
+                                            urlString.length()));
+    JSValueRef urlValue = JSValueMakeString(m_scriptContext, url.get());
 
-  urlString = resource->requestURL.host();
-  JSRetainPtr<JSStringRef> domain(
-      Adopt,
-      JSStringCreateWithCharacters(urlString.characters(), urlString.length()));
-  JSValueRef domainValue = JSValueMakeString(m_scriptContext, domain.get());
+    urlString = resource->requestURL.host();
+    JSRetainPtr<JSStringRef> domain(
+        Adopt, JSStringCreateWithCharacters(urlString.characters(),
+                                            urlString.length()));
+    JSValueRef domainValue = JSValueMakeString(m_scriptContext, domain.get());
 
-  urlString = resource->requestURL.path();
-  JSRetainPtr<JSStringRef> path(
-      Adopt,
-      JSStringCreateWithCharacters(urlString.characters(), urlString.length()));
-  JSValueRef pathValue = JSValueMakeString(m_scriptContext, path.get());
+    urlString = resource->requestURL.path();
+    JSRetainPtr<JSStringRef> path(
+        Adopt, JSStringCreateWithCharacters(urlString.characters(),
+                                            urlString.length()));
+    JSValueRef pathValue = JSValueMakeString(m_scriptContext, path.get());
 
-  urlString = resource->requestURL.lastPathComponent();
-  JSRetainPtr<JSStringRef> lastPathComponent(
-      Adopt,
-      JSStringCreateWithCharacters(urlString.characters(), urlString.length()));
-  JSValueRef lastPathComponentValue =
-      JSValueMakeString(m_scriptContext, lastPathComponent.get());
+    urlString = resource->requestURL.lastPathComponent();
+    JSRetainPtr<JSStringRef> lastPathComponent(
+        Adopt, JSStringCreateWithCharacters(urlString.characters(),
+                                            urlString.length()));
+    JSValueRef lastPathComponentValue =
+        JSValueMakeString(m_scriptContext, lastPathComponent.get());
 
-  JSValueRef identifier =
-      JSValueMakeNumber(m_scriptContext, resource->identifier);
-  JSValueRef mainResource =
-      JSValueMakeBoolean(m_scriptContext, m_mainResource == resource);
-  JSValueRef cached = JSValueMakeBoolean(m_scriptContext, resource->cached);
+    JSValueRef identifier =
+        JSValueMakeNumber(m_scriptContext, resource->identifier);
+    JSValueRef mainResource =
+        JSValueMakeBoolean(m_scriptContext, m_mainResource == resource);
+    JSValueRef cached = JSValueMakeBoolean(m_scriptContext, resource->cached);
 
-  JSValueRef arguments[] = {scriptObjectForRequest(m_scriptContext, resource),
-                            urlValue,
-                            domainValue,
-                            pathValue,
-                            lastPathComponentValue,
-                            identifier,
-                            mainResource,
-                            cached};
-  JSObjectRef result = JSObjectCallAsConstructor(
-      m_scriptContext, resourceConstructor, 8, arguments, 0);
+    JSValueRef arguments[] = {scriptObjectForRequest(m_scriptContext, resource),
+                              urlValue,
+                              domainValue,
+                              pathValue,
+                              lastPathComponentValue,
+                              identifier,
+                              mainResource,
+                              cached};
+    JSObjectRef result = JSObjectCallAsConstructor(
+        m_scriptContext, resourceConstructor, 8, arguments, 0);
+    ASSERT(result);
 
-  resource->setScriptObject(m_scriptContext, result);
-
-  ASSERT(result);
+    resource->setScriptObject(m_scriptContext, result);
+  }
 
   JSRetainPtr<JSStringRef> addResourceString(
       Adopt, JSStringCreateWithUTF8CString("addResource"));
@@ -1105,11 +1083,11 @@ JSObjectRef InspectorController::addScriptResource(
                                            addResourceString.get(), 0),
       0);
 
-  JSValueRef addArguments[] = {result};
+  JSValueRef addArguments[] = {resource->scriptObject};
   JSObjectCallAsFunction(m_scriptContext, addResourceFunction, m_scriptObject,
                          1, addArguments, 0);
 
-  return result;
+  return resource->scriptObject;
 }
 
 JSObjectRef InspectorController::addAndUpdateScriptResource(
@@ -1583,10 +1561,6 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
     return;
 
   if (loader->frame() == m_inspectedPage->mainFrame()) {
-    ASSERT(m_mainResource);
-    // FIXME: Should look into asserting that m_mainResource->loader == loader
-    // here.
-
     m_client->inspectedURLChanged(loader->url().string());
 
     deleteAllValues(m_consoleMessages);
@@ -1603,11 +1577,19 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
 #endif
       clearNetworkTimeline();
 
-      // We don't add the main resource until its load is committed. This
-      // is needed to keep the load for a user-entered URL from showing
-      // up in the list of resources for the page they are navigating
-      // away from.
-      addAndUpdateScriptResource(m_mainResource.get());
+      if (!loader->isLoadingFromCachedPage()) {
+        ASSERT(m_mainResource && m_mainResource->loader == loader);
+        // We don't add the main resource until its load is committed. This is
+        // needed to keep the load for a user-entered URL from showing up in the
+        // list of resources for the page they are navigating away from.
+        addAndUpdateScriptResource(m_mainResource.get());
+      } else {
+        // Pages loaded from the page cache are commited before m_mainResource
+        // is the right
+        // resource for this load. Clear it and it will be assigned in
+        // identifierForInitialRequest.
+        m_mainResource = 0;
+      }
     }
   }
 
@@ -1703,6 +1685,10 @@ void InspectorController::identifierForInitialRequest(
     m_mainResource = resource;
 
   addResource(resource);
+
+  if (windowVisible() && loader->isLoadingFromCachedPage() &&
+      resource == m_mainResource)
+    addAndUpdateScriptResource(resource);
 }
 
 void InspectorController::willSendRequest(
