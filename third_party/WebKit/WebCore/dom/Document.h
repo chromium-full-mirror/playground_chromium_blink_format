@@ -213,6 +213,9 @@ class Document : public ContainerNode {
 
   void setCharset(const String&);
 
+  String contentLanguage() const { return m_contentLanguage; }
+  void setContentLanguage(const String& lang) { m_contentLanguage = lang; }
+
   String xmlEncoding() const { return m_xmlEncoding; }
   String xmlVersion() const { return m_xmlVersion; }
   bool xmlStandalone() const { return m_xmlStandalone; }
@@ -930,6 +933,8 @@ class Document : public ContainerNode {
   String m_xmlEncoding;
   String m_xmlVersion;
   bool m_xmlStandalone;
+
+  String m_contentLanguage;
 
  public:
   bool inPageCache();

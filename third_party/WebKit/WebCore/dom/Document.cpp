@@ -1865,7 +1865,8 @@ void Document::processHttpEquiv(const String& equiv, const String& content) {
     // <html:meta .....>
     if (isHTMLDocument())
       static_cast<HTMLDocument*>(this)->setCookie(content);
-  }
+  } else if (equalIgnoringCase(equiv, "content-language"))
+    setContentLanguage(content);
 }
 
 MouseEventWithHitTestResults Document::prepareMouseEvent(
