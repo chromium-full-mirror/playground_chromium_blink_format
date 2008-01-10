@@ -43,6 +43,10 @@ class SecurityOriginData;
 class SecurityOrigin : public RefCounted<SecurityOrigin> {
  public:
   static PassRefPtr<SecurityOrigin> createForFrame(Frame*);
+  static PassRefPtr<SecurityOrigin> create(const String& protocol,
+                                           const String& host,
+                                           unsigned short port,
+                                           SecurityOrigin* ownerFrameOrigin);
 
   void setDomainFromDOM(const String& newDomain);
   String domain() const { return m_host; }
@@ -56,7 +60,9 @@ class SecurityOrigin : public RefCounted<SecurityOrigin> {
   SecurityOriginData securityOriginData() const;
 
  private:
-  SecurityOrigin(const KURL& url);
+  SecurityOrigin(const String& protocol,
+                 const String& host,
+                 unsigned short port);
 
   String m_protocol;
   String m_host;
