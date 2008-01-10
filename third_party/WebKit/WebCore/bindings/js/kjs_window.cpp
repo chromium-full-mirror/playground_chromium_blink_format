@@ -279,9 +279,10 @@ void Window::mark() {
     d->loc->mark();
 }
 
-static bool allowPopUp(Frame* frame) {
-  if (!frame)
-    return false;
+static bool allowPopUp(ExecState* exec) {
+  Frame* frame = Window::retrieveActive(exec)->impl()->frame();
+
+  ASSERT(frame);
   if (frame->scriptProxy()->processingUserGesture())
     return true;
   Settings* settings = frame->settings();
@@ -395,7 +396,7 @@ static JSValue* showModalDialog(ExecState* exec,
                                 const String& url,
                                 JSValue* dialogArgs,
                                 const String& featureArgs) {
-  if (!canShowModalDialogNow(frame) || !allowPopUp(frame))
+  if (!canShowModalDialogNow(frame) || !allowPopUp(exec))
     return jsUndefined();
 
   const HashMap<String, String> features =
@@ -1121,7 +1122,7 @@ JSValue* WindowProtoFuncOpen::callAsFunction(ExecState* exec,
   // empty framenames.
   // Otherwise, illegitimate window.open() calls with no name will pass right
   // through the popup blocker.
-  if (!allowPopUp(frame) &&
+  if (!allowPopUp(exec) &&
       (frameName.isEmpty() || !frame->tree()->find(frameName)))
     return jsUndefined();
 

@@ -61,6 +61,7 @@ class LayoutTestController {
   void setCustomPolicyDelegate(bool setDelegate);
   void setMainFrameIsFirstResponder(bool flag);
   void setPrivateBrowsingEnabled(bool flag);
+  void setPopupBlockingEnabled(bool flag);
   void setTabKeyCyclesThroughElements(bool cycles);
   void setUseDashboardCompatibilityMode(bool flag);
   void setUserStyleSheetEnabled(bool flag);
