@@ -88,7 +88,7 @@ JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
   if (!imp)
     return throwError(exec, TypeError);
 
-  Instance* instance = imp->getInternalInstance();
+  RefPtr<Instance> instance = imp->getInternalInstance();
   if (!instance)
     return RuntimeObjectImp::throwInvalidAccessError(exec);
 

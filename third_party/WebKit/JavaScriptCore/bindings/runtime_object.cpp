@@ -55,7 +55,7 @@ JSValue* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
                                                 const Identifier& propertyName,
                                                 const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
-  Bindings::Instance* instance = thisObj->instance.get();
+  RefPtr<Bindings::Instance> instance = thisObj->instance;
 
   if (!instance)
     return throwInvalidAccessError(exec);
@@ -63,7 +63,7 @@ JSValue* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
   instance->begin();
 
   Class* aClass = instance->getClass();
-  JSValue* result = aClass->fallbackObject(exec, instance, propertyName);
+  JSValue* result = aClass->fallbackObject(exec, instance.get(), propertyName);
 
   instance->end();
 
@@ -75,7 +75,7 @@ JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
-  Bindings::Instance* instance = thisObj->instance.get();
+  RefPtr<Bindings::Instance> instance = thisObj->instance;
 
   if (!instance)
     return throwInvalidAccessError(exec);
@@ -83,7 +83,7 @@ JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
   instance->begin();
 
   Class* aClass = instance->getClass();
-  Field* aField = aClass->fieldNamed(propertyName, instance);
+  Field* aField = aClass->fieldNamed(propertyName, instance.get());
   JSValue* result = instance->getValueOfField(exec, aField);
 
   instance->end();
@@ -96,7 +96,7 @@ JSValue* RuntimeObjectImp::methodGetter(ExecState* exec,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
-  Bindings::Instance* instance = thisObj->instance.get();
+  RefPtr<Bindings::Instance> instance = thisObj->instance;
 
   if (!instance)
     return throwInvalidAccessError(exec);
@@ -104,7 +104,7 @@ JSValue* RuntimeObjectImp::methodGetter(ExecState* exec,
   instance->begin();
 
   Class* aClass = instance->getClass();
-  MethodList methodList = aClass->methodsNamed(propertyName, instance);
+  MethodList methodList = aClass->methodsNamed(propertyName, instance.get());
   JSValue* result = new RuntimeMethod(exec, propertyName, methodList);
 
   instance->end();
@@ -170,6 +170,7 @@ void RuntimeObjectImp::put(ExecState* exec,
     return;
   }
 
+  RefPtr<Bindings::Instance> protector(instance);
   instance->begin();
 
   // Set the value of the property.
@@ -211,6 +212,7 @@ JSValue* RuntimeObjectImp::defaultValue(ExecState* exec, JSType hint) const {
 
   JSValue* result;
 
+  RefPtr<Bindings::Instance> protector(instance);
   instance->begin();
 
   result = instance->defaultValue(hint);
@@ -233,6 +235,7 @@ JSValue* RuntimeObjectImp::callAsFunction(ExecState* exec,
   if (!instance)
     return throwInvalidAccessError(exec);
 
+  RefPtr<Bindings::Instance> protector(instance);
   instance->begin();
 
   JSValue* aValue = instance->invokeDefaultMethod(exec, args);
