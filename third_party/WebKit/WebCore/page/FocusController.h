@@ -46,7 +46,6 @@ class FocusController {
   Frame* focusedOrMainFrame();
 
   bool setInitialFocus(FocusDirection, KeyboardEvent*);
-  bool advanceFocus(KeyboardEvent*);
   bool advanceFocus(FocusDirection, KeyboardEvent*, bool initialFocus = false);
 
   bool setFocusedNode(Node*, PassRefPtr<Frame>);

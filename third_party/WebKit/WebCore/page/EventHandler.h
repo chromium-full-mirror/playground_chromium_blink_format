@@ -280,7 +280,7 @@ class EventHandler : Noncopyable {
   bool passMouseDownEventToWidget(Widget*);
   bool passWheelEventToWidget(PlatformWheelEvent&, Widget*);
 
-  void defaultTabEventHandler(Event*, bool isBackTab);
+  void defaultTabEventHandler(KeyboardEvent*);
 
   void allowDHTMLDrag(bool& flagDHTML, bool& flagUA) const;
 

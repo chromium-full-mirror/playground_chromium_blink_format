@@ -112,12 +112,6 @@ bool FocusController::setInitialFocus(FocusDirection direction,
   return advanceFocus(direction, event, true);
 }
 
-bool FocusController::advanceFocus(KeyboardEvent* event) {
-  return advanceFocus((event && event->shiftKey()) ? FocusDirectionBackward
-                                                   : FocusDirectionForward,
-                      event);
-}
-
 bool FocusController::advanceFocus(FocusDirection direction,
                                    KeyboardEvent* event,
                                    bool initialFocus) {
