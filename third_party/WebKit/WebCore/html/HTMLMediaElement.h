@@ -61,6 +61,9 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   virtual void defaultEventHandler(Event*);
 
+  // Pauses playback without changing any states or generating events
+  void setPausedInternal(bool);
+
   // DOM API
   // error state
   PassRefPtr<MediaError> error() const;
@@ -204,6 +207,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   unsigned m_loadNestingLevel;
   unsigned m_terminateLoadBelowNestingLevel;
+
+  bool m_pausedInternal;
 
   struct CallbackEntry {
     CallbackEntry() : m_voidCallback(0), m_pause(false) {}
