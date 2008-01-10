@@ -235,10 +235,14 @@ int QWebSettings::fontSize(FontSize type) const {
 /*!
     Resets the font size for \a type to the size specified in the default
    settings object.
+
+    This function has not effect on the default QWebSettings instance.
 */
 void QWebSettings::resetFontSize(FontSize type) {
-  d->fontSizes.remove(type);
-  d->apply();
+  if (d->settings) {
+    d->fontSizes.remove(type);
+    d->apply();
+  }
 }
 
 /*!
@@ -339,10 +343,14 @@ QString QWebSettings::fontFamily(FontType type) const {
 /*!
     Resets the font family for specified \a type of fonts in a web page to the
    default.
+
+    This function has not effect on the default QWebSettings instance.
 */
 void QWebSettings::resetFontFamily(FontType type) {
-  d->fontFamilies.remove(type);
-  d->apply();
+  if (d->settings) {
+    d->fontFamilies.remove(type);
+    d->apply();
+  }
 }
 
 /*!
@@ -369,8 +377,12 @@ bool QWebSettings::testAttribute(WebAttribute attr) const {
 /*!
     Clears the setting of \a attr. The global default for \a attr will be used
    instead.
+
+    This function has not effect on the default QWebSettings instance.
 */
 void QWebSettings::clearAttribute(WebAttribute attr) {
-  d->attributes.remove(attr);
-  d->apply();
+  if (d->settings) {
+    d->attributes.remove(attr);
+    d->apply();
+  }
 }
