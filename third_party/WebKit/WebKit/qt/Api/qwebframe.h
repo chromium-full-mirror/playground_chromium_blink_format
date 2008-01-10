@@ -43,6 +43,7 @@ class QNetworkRequest;
 
 class QWebFramePrivate;
 class QWebPage;
+class QRegion;
 
 namespace WebCore {
 class WidgetPrivate;
@@ -94,7 +95,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   Qt::ScrollBarPolicy horizontalScrollBarPolicy() const;
   void setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy);
 
-  void render(QPainter* painter, const QRect& source);
+  void render(QPainter* painter, const QRegion& source);
   void layout();
 
   QPoint pos() const;

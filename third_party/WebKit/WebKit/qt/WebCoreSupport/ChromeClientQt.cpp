@@ -255,8 +255,12 @@ IntRect ChromeClientQt::windowResizerRect() const {
 
 void ChromeClientQt::addToDirtyRegion(const IntRect& r) {
   QWidget* view = m_webPage->view();
-  if (view)
-    view->update(r);
+  if (view) {
+    QRect rect(r);
+    rect = rect.intersected(QRect(QPoint(0, 0), m_webPage->viewportSize()));
+    if (!r.isEmpty())
+      view->update(r);
+  }
 }
 
 void ChromeClientQt::scrollBackingStore(int dx,
@@ -268,11 +272,7 @@ void ChromeClientQt::scrollBackingStore(int dx,
     view->scroll(dx, dy, scrollViewRect);
 }
 
-void ChromeClientQt::updateBackingStore() {
-  //     QWidget* view = m_webPage->view();
-  //     if (view)
-  //         view->update();
-}
+void ChromeClientQt::updateBackingStore() {}
 
 void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult&,
                                              unsigned /*modifierFlags*/) {

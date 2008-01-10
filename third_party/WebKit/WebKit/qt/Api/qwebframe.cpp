@@ -69,6 +69,7 @@
 #if QT_VERSION >= 0x040400
 #include <qnetworkrequest.h>
 #endif
+#include <qregion.h>
 
 using namespace WebCore;
 
@@ -370,14 +371,16 @@ void QWebFrame::setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy policy) {
   d->frameView->setHScrollbarMode((ScrollbarMode)policy);
 }
 
-void QWebFrame::render(QPainter* painter, const QRect& source) {
+void QWebFrame::render(QPainter* painter, const QRegion& source) {
   if (!d->frameView || !d->frame->renderer())
     return;
 
   layout();
 
   GraphicsContext ctx(painter);
-  d->frameView->paint(&ctx, source);
+  QVector<QRect> vector = source.rects();
+  for (int i = 0; i < vector.size(); ++i)
+    d->frameView->paint(&ctx, vector.at(i));
 }
 
 void QWebFrame::layout() {
