@@ -2163,9 +2163,6 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
   m_mainFrame = webFrame;
   webFrame->Release();  // The WebFrame is owned by the Frame, so release our
                         // reference to it.
-  m_page->mainFrame()->view()->attachToWindow();
-  m_page->mainFrame()->view()->resize(frame.right - frame.left,
-                                      frame.bottom - frame.top);
 
   m_page->mainFrame()->tree()->setName(
       String(frameName, SysStringLen(frameName)));

@@ -74,6 +74,7 @@ struct WidgetPrivate {
 Widget::Widget() : data(new WidgetPrivate()) {}
 
 Widget::~Widget() {
+  Q_ASSERT(!parent());
   delete data;
   data = 0;
 }

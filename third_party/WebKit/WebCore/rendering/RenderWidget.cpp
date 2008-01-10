@@ -118,6 +118,8 @@ void RenderWidget::resizeWidget(Widget* widget, int w, int h) {
 void RenderWidget::setWidget(Widget* widget) {
   if (widget != m_widget) {
     if (m_widget) {
+      // removeFromParent is a no-op on Mac.
+      m_widget->removeFromParent();
       widgetRendererMap().remove(m_widget);
       deleteWidget();
     }
