@@ -104,7 +104,8 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
   static void loadResourceSynchronously(const ResourceRequest&,
                                         ResourceError&,
                                         ResourceResponse&,
-                                        Vector<char>& data);
+                                        Vector<char>& data,
+                                        Frame* frame);
   static bool willLoadFromCache(ResourceRequest&);
 
   ~ResourceHandle();

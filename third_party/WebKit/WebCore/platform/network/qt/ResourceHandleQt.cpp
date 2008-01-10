@@ -167,11 +167,12 @@ PassRefPtr<SharedBuffer> ResourceHandle::bufferedData() {
 void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
                                                ResourceError& error,
                                                ResourceResponse& response,
-                                               Vector<char>& data) {
-#if QT_VERSION < 0x040400
+                                               Vector<char>& data,
+                                               Frame* frame) {
   WebCoreSynchronousLoader syncLoader;
   ResourceHandle handle(request, &syncLoader, true, false, true);
 
+#if QT_VERSION < 0x040400
   if (!QWebNetworkManager::self()->add(&handle,
                                        QWebNetworkInterface::defaultInterface(),
                                        QWebNetworkManager::SynchronousJob)) {
@@ -179,15 +180,18 @@ void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
     error = ResourceError(String(), -1, String(), String());
     return;
   }
+#else
+  ResourceHandleInternal* d = handle.getInternal();
+  d->m_frame =
+      static_cast<FrameLoaderClientQt*>(frame->loader()->client())->webFrame();
+  d->m_job = new QNetworkReplyHandler(&handle);
+#endif
 
   syncLoader.waitForCompletion();
   error = syncLoader.resourceError();
   data = syncLoader.data();
   qDebug() << data.size();
   response = syncLoader.resourceResponse();
-#else
-  notImplemented();  // #### implement me
-#endif
 }
 
 void ResourceHandle::setDefersLoading(bool defers) {

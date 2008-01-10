@@ -397,7 +397,8 @@ CFURLConnectionRef ResourceHandle::releaseConnectionForDownload() {
 void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
                                                ResourceError& error,
                                                ResourceResponse& response,
-                                               Vector<char>& vector) {
+                                               Vector<char>& vector,
+                                               Frame*) {
   ASSERT(!request.isEmpty());
   CFURLResponseRef cfResponse = 0;
   CFErrorRef cfError = 0;

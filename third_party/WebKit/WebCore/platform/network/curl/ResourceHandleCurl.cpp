@@ -83,7 +83,8 @@ bool ResourceHandle::loadsBlocked() {
 void ResourceHandle::loadResourceSynchronously(const ResourceRequest&,
                                                ResourceError&,
                                                ResourceResponse&,
-                                               Vector<char>&) {
+                                               Vector<char>&,
+                                               Frame*) {
   notImplemented();
 }
 
