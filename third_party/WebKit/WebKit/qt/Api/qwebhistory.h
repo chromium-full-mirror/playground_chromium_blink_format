@@ -20,8 +20,8 @@
    sheets and html
     pages from the web. It has a memory cache for these objects.
 */
-#ifndef QWEBPAGEHISTORY_H
-#define QWEBPAGEHISTORY_H
+#ifndef QWEBHISTORY_H
+#define QWEBHISTORY_H
 
 #include <QtCore/qurl.h>
 #include <QtCore/qstring.h>
@@ -51,14 +51,13 @@ class QWEBKIT_EXPORT QWebHistoryItem {
   QWebHistoryItem(QWebHistoryItemPrivate* priv);
 
  private:
-  friend class QWebPageHistory;
+  friend class QWebHistory;
   friend class QWebPage;
   QExplicitlySharedDataPointer<QWebHistoryItemPrivate> d;
 };
 
-class QWebPageHistoryPrivate;
-// ### rename to QWebHistory
-class QWEBKIT_EXPORT QWebPageHistory {
+class QWebHistoryPrivate;
+class QWEBKIT_EXPORT QWebHistory {
  public:
   void clear();
 
@@ -79,15 +78,15 @@ class QWEBKIT_EXPORT QWebPageHistory {
   QWebHistoryItem itemAtIndex(int i) const;
 
  private:
-  QWebPageHistory();
-  ~QWebPageHistory();
+  QWebHistory();
+  ~QWebHistory();
 
   friend class QWebPage;
   friend class QWebPagePrivate;
 
-  Q_DISABLE_COPY(QWebPageHistory)
+  Q_DISABLE_COPY(QWebHistory)
 
-  QWebPageHistoryPrivate* d;
+  QWebHistoryPrivate* d;
 };
 
 #endif

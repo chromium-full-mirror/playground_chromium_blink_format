@@ -25,7 +25,6 @@
 #ifndef QWEBPAGE_H
 #define QWEBPAGE_H
 
-#include "qwebpagehistory.h"
 #include "qwebsettings.h"
 #include "qwebkitglobal.h"
 
@@ -38,6 +37,7 @@ class QWebFrame;
 class QWebNetworkRequest;
 class QNetworkRequest;
 class QNetworkAccessManager;
+class QWebHistory;
 
 class QWebPagePrivate;
 class QWebFrameData;
@@ -145,7 +145,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   QWebFrame* mainFrame() const;
   QWebFrame* currentFrame() const;
 
-  QWebPageHistory* history() const;
+  QWebHistory* history() const;
 
   QWebSettings* settings();
 
