@@ -54,7 +54,11 @@ class QWebFrameData;
 
 class QWEBKIT_EXPORT QWebFrame : public QObject {
   Q_OBJECT
- protected:
+  Q_PROPERTY(Qt::ScrollBarPolicy verticalScrollBarPolicy READ
+                 verticalScrollBarPolicy WRITE setVerticalScrollBarPolicy)
+  Q_PROPERTY(Qt::ScrollBarPolicy horizontalScrollBarPolicy READ
+                 horizontalScrollBarPolicy WRITE setHorizontalScrollBarPolicy)
+ private:
   QWebFrame(QWebPage* parent, QWebFrameData* frameData);
   QWebFrame(QWebFrame* parent, QWebFrameData* frameData);
   ~QWebFrame();
@@ -88,6 +92,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
   QString name() const;
 
+  QWebFrame* parentFrame() const;
   QList<QWebFrame*> childFrames() const;
 
   Qt::ScrollBarPolicy verticalScrollBarPolicy() const;
@@ -95,7 +100,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   Qt::ScrollBarPolicy horizontalScrollBarPolicy() const;
   void setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy);
 
-  void render(QPainter* painter, const QRegion& source);
+  void render(QPainter* painter, const QRegion& clip);
   void layout();
 
   QPoint pos() const;
