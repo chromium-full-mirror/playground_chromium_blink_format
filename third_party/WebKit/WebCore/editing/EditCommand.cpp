@@ -80,6 +80,8 @@ void EditCommand::apply() {
     }
   }
 
+  updateLayout();
+
   DeleteButtonController* deleteButtonController =
       frame->editor()->deleteButtonController();
   deleteButtonController->disable();
@@ -107,6 +109,11 @@ void EditCommand::unapply() {
 
   Frame* frame = m_document->frame();
 
+  // Changes to the document may have been made since the last editing operation
+  // that
+  // require a layout, as in <rdar://problem/5658603>.
+  updateLayout();
+
   DeleteButtonController* deleteButtonController =
       frame->editor()->deleteButtonController();
   deleteButtonController->disable();
@@ -124,6 +131,11 @@ void EditCommand::reapply() {
   ASSERT(m_document->frame());
 
   Frame* frame = m_document->frame();
+
+  // Changes to the document may have been made since the last editing operation
+  // that
+  // require a layout, as in <rdar://problem/5658603>.
+  updateLayout();
 
   DeleteButtonController* deleteButtonController =
       frame->editor()->deleteButtonController();
