@@ -48,9 +48,8 @@ class QWEBKIT_EXPORT QWebHistoryItem {
 
   QPixmap icon() const;
 
-  QWebHistoryItem(QWebHistoryItemPrivate* priv);
-
  private:
+  QWebHistoryItem(QWebHistoryItemPrivate* priv);
   friend class QWebHistory;
   friend class QWebPage;
   QExplicitlySharedDataPointer<QWebHistoryItemPrivate> d;
