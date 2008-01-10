@@ -666,6 +666,23 @@ void QWebPagePrivate::dropEvent(QDropEvent* ev) {
 #endif
 }
 
+/*!
+    \class QWebPage
+    \since 4.4
+    \brief The QWebPage class provides a widget that is used to view and edit
+   web documents.
+
+    QWebPage holds a main frame responsible for web content, settings, the
+   history
+    of navigated links as well as actions. This class can be used, together with
+   QWebFrame,
+    if you want to provide functionality like QWebView in a setup without
+   widgets.
+*/
+
+/*!
+    Constructs an empty QWebView with parent \a parent.
+*/
 QWebPage::QWebPage(QObject* parent)
     : QObject(parent), d(new QWebPagePrivate(this)) {
   setView(qobject_cast<QWidget*>(parent));
@@ -674,6 +691,9 @@ QWebPage::QWebPage(QObject* parent)
           SLOT(_q_onLoadProgressChanged(int)));
 }
 
+/*!
+    Destructor.
+*/
 QWebPage::~QWebPage() {
   FrameLoader* loader = d->mainFrame->d->frame->loader();
   if (loader)
@@ -681,11 +701,21 @@ QWebPage::~QWebPage() {
   delete d;
 }
 
+/*!
+    Returns the main frame of the page.
+
+    The main frame provides access to the hierarchy of sub-frames and is also
+   needed if you
+    want to explicitly render a web page into a given painter.
+*/
 QWebFrame* QWebPage::mainFrame() const {
   d->createMainFrame();
   return d->mainFrame;
 }
 
+/*!
+    Returns the frame currently active.
+*/
 QWebFrame* QWebPage::currentFrame() const {
   return static_cast<WebCore::FrameLoaderClientQt*>(d->page->focusController()
                                                         ->focusedOrMainFrame()
@@ -694,39 +724,66 @@ QWebFrame* QWebPage::currentFrame() const {
       ->webFrame();
 }
 
+/*!
+    Returns a pointer to the view's history of navigated web pages.
+
+*/
 QWebPageHistory* QWebPage::history() const {
   return &d->history;
 }
 
+/*!
+    Sets the view that is associated with the web page.
+
+    \sa view()
+*/
 void QWebPage::setView(QWidget* view) {
   d->view = view;
   setViewportSize(view ? view->size() : QSize(0, 0));
 }
 
+/*!
+    Returns the view widget that is associated with the web page.
+
+    \sa setView()
+*/
 QWidget* QWebPage::view() const {
   return d->view;
 }
 
+/*!
+    This function is called whenever a JavaScript program tries to print to what
+   is the console in web browsers.
+*/
 void QWebPage::javaScriptConsoleMessage(const QString& message,
                                         unsigned int lineNumber,
                                         const QString& sourceID) {}
 
+/*!
+    This function is called whenever a JavaScript program calls the alert()
+   function.
+*/
 void QWebPage::javaScriptAlert(QWebFrame* frame, const QString& msg) {
-  // FIXME frame pos...
   QMessageBox::information(d->view, mainFrame()->title(), msg, QMessageBox::Ok);
 }
 
+/*!
+    This function is called whenever a JavaScript program calls the confirm()
+   function.
+*/
 bool QWebPage::javaScriptConfirm(QWebFrame* frame, const QString& msg) {
-  // FIXME frame pos...
   return 0 == QMessageBox::information(d->view, mainFrame()->title(), msg,
                                        QMessageBox::Yes, QMessageBox::No);
 }
 
+/*!
+    This function is called whenever a JavaScript program tries to prompt the
+   user of input.
+*/
 bool QWebPage::javaScriptPrompt(QWebFrame* frame,
                                 const QString& msg,
                                 const QString& defaultValue,
                                 QString* result) {
-  // FIXME frame pos...
   bool ok = false;
 #ifndef QT_NO_INPUTDIALOG
   QString x = QInputDialog::getText(d->view, mainFrame()->title(), msg,
@@ -738,14 +795,30 @@ bool QWebPage::javaScriptPrompt(QWebFrame* frame,
   return ok;
 }
 
+/*!
+    This function is called whenever WebKit wants to create a new window, for
+   example as a result of
+    a JavaScript request to open a document in a new window.
+*/
 QWebPage* QWebPage::createWindow() {
   return 0;
 }
 
+/*!
+    This function is called whenever WebKit wants to create a new window that
+   should act as a modal dialog.
+*/
 QWebPage* QWebPage::createModalDialog() {
   return 0;
 }
 
+/*!
+    This function is called whenever WebKit encounters a HTML object element
+   with type "application/x-qt-plugin".
+    The \a classid, \a url, \a paramNames and \a paramValues correspond to the
+   HTML object element attributes and
+    child elements to configure the embeddable object.
+*/
 QObject* QWebPage::createPlugin(const QString& classid,
                                 const QUrl& url,
                                 const QStringList& paramNames,
@@ -773,6 +846,11 @@ static void openNewWindow(const QUrl& url, WebCore::Frame* frame) {
   }
 }
 
+/*!
+    This function can be called to trigger the specified \a action.
+    It is also called by QtWebKit if the user triggers the action, for example
+    through a context menu item.
+*/
 void QWebPage::triggerAction(WebAction action, bool checked) {
   WebCore::Frame* frame = d->page->focusController()->focusedOrMainFrame();
   WebCore::Editor* editor = frame->editor();
@@ -950,6 +1028,11 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
     editor->command(command).execute();
 }
 
+/*!
+    Returns the size of the viewport.
+
+    \sa setViewportSize
+*/
 QSize QWebPage::viewportSize() const {
   QWebFrame* frame = mainFrame();
   if (frame->d->frame && frame->d->frameView)
@@ -957,6 +1040,13 @@ QSize QWebPage::viewportSize() const {
   return QSize(0, 0);
 }
 
+/*!
+    Sets the size of the viewport. The size affects for example the visibility
+   of scrollbars
+    if the document is larger than the viewport.
+
+    \sa viewportSize
+*/
 void QWebPage::setViewportSize(const QSize& size) const {
   QWebFrame* frame = mainFrame();
   if (frame->d->frame && frame->d->frameView) {
@@ -982,10 +1072,22 @@ QWebPage::NavigationRequestResponse QWebPage::navigationRequested(
   return AcceptNavigationRequest;
 }
 
+/*!
+    Returns the text currently selected.
+*/
 QString QWebPage::selectedText() const {
   return d->page->focusController()->focusedOrMainFrame()->selectedText();
 }
 
+/*!
+   Returns a QAction for the specified WebAction \a action.
+
+   The action is owned by the QWebPage but you can customize the look by
+   changing its properties.
+
+   QWebPage also takes care of implementing the action, so that upon
+   triggering the corresponding action is performed on the page.
+*/
 QAction* QWebPage::action(WebAction action) const {
   if (action == QWebPage::NoWebAction)
     return 0;
@@ -1139,6 +1241,9 @@ bool QWebPage::isModified() const {
   return d->modified;
 }
 
+/*!
+    Returns a pointer to the undo stack used for editable content.
+*/
 QUndoStack* QWebPage::undoStack() const {
   if (!d->undoStack)
     d->undoStack = new QUndoStack(const_cast<QWebPage*>(this));
@@ -1204,12 +1309,19 @@ bool QWebPage::focusNextPrevChild(bool next) {
   return false;
 }
 
+/*!
+    Returns a pointe to the page's settings object.
+*/
 QWebSettings* QWebPage::settings() {
   return d->settings;
 }
 
+/*!
+    This function is called when the web content requests a file name, for
+   example
+    as a result of the user clicking on a "file upload" button in a HTML form.
+*/
 QString QWebPage::chooseFile(QWebFrame* parentFrame, const QString& oldFile) {
-// FIXME frame pos...
 #ifndef QT_NO_FILEDIALOG
   return QFileDialog::getOpenFileName(d->view, QString::null, oldFile);
 #else
@@ -1242,6 +1354,13 @@ QNetworkProxy QWebPage::networkProxy() const {
 
 #else
 
+/*!
+    Sets the QNetworkAccessManager \a manager that is responsible for serving
+   network
+    requests for this QWebPage.
+
+    \sa networkAccessManager
+*/
 void QWebPage::setNetworkAccessManager(QNetworkAccessManager* manager) {
   if (manager == d->networkManager)
     return;
@@ -1249,6 +1368,13 @@ void QWebPage::setNetworkAccessManager(QNetworkAccessManager* manager) {
   d->networkManager = manager;
 }
 
+/*!
+    Returns the QNetworkAccessManager \a manager that is responsible for serving
+   network
+    requests for this QWebPage.
+
+    \sa setNetworkAccessManager
+*/
 QNetworkAccessManager* QWebPage::networkAccessManager() const {
   if (!d->networkManager) {
     QWebPage* that = const_cast<QWebPage*>(this);
@@ -1259,6 +1385,11 @@ QNetworkAccessManager* QWebPage::networkAccessManager() const {
 
 #endif
 
+/*!
+    This function is called when a user agent for HTTP requests is needed. You
+   can re-implement this
+    function to dynamically return different user agent's for different urls.
+*/
 QString QWebPage::userAgentFor(const QUrl& url) const {
   Q_UNUSED(url)
   return QLatin1String(
@@ -1271,10 +1402,19 @@ void QWebPagePrivate::_q_onLoadProgressChanged(int) {
   m_bytesReceived = page->progress()->totalBytesReceived();
 }
 
+/*!
+    Returns the total number of bytes that were received from the network to
+   render the current page,
+    including extra content such as embedded images.
+*/
 quint64 QWebPage::totalBytes() const {
   return d->m_bytesReceived;
 }
 
+/*!
+    Returns the number of bytes that were received from the network to render
+   the current page.
+*/
 quint64 QWebPage::bytesReceived() const {
   return d->m_totalBytes;
 }
