@@ -858,8 +858,6 @@ void PluginViewWin::performRequest(PluginRequestWin* request) {
       m_streams.add(stream);
       stream->start();
     } else {
-      // Find the frame for navigation
-      //            Frame* frame =
       m_parentFrame->loader()->urlSelected(request->frameLoadRequest(), 0,
                                            false, true);
 
