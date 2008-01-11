@@ -208,8 +208,12 @@ static JSValueRef pathToLocalResourceCallback(JSContextRef context,
       Adopt, JSValueToStringCopy(context, arguments[0], exception));
   ASSERT(!*exception);
 
-  return JSValueMakeString(
-      context, controller->pathToLocalResource(context, localPath.get()));
+  JSRetainPtr<JSStringRef> convertedPath(
+      Adopt, controller->pathToLocalResource(context, localPath.get()));
+  if (!convertedPath)
+    return JSValueMakeUndefined(context);
+
+  return JSValueMakeString(context, convertedPath.get());
 }
 
 static JSValueRef repaintSweepHorizontallyCallback(JSContextRef context,
