@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2008 Collabora, Ltd. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,15 +25,13 @@
  */
 
 #include "config.h"
-#include "PluginStreamWin.h"
+#include "PluginStream.h"
 
 #include "CString.h"
 #include "DocumentLoader.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "PluginDebug.h"
-#include "PluginPackageWin.h"
-#include "PluginViewWin.h"
 #include "SharedBuffer.h"
 #include "SubresourceLoader.h"
 
@@ -51,24 +50,26 @@ static StreamMap& streams() {
   return staticStreams;
 }
 
-PluginStreamWin::PluginStreamWin(PluginViewWin* pluginView,
-                                 Frame* frame,
-                                 const ResourceRequest& resourceRequest,
-                                 bool sendNotification,
-                                 void* notifyData)
+PluginStream::PluginStream(PluginStreamClient* client,
+                           Frame* frame,
+                           const ResourceRequest& resourceRequest,
+                           bool sendNotification,
+                           void* notifyData,
+                           const NPPluginFuncs* pluginFuncs,
+                           NPP instance)
     : m_resourceRequest(resourceRequest),
+      m_client(client),
       m_frame(frame),
-      m_pluginView(pluginView),
       m_notifyData(notifyData),
       m_sendNotification(sendNotification),
-      m_loadManually(false),
       m_streamState(StreamBeforeStarted),
-      m_delayDeliveryTimer(this, &PluginStreamWin::delayDeliveryTimerFired),
+      m_loadManually(false),
+      m_delayDeliveryTimer(this, &PluginStream::delayDeliveryTimerFired),
       m_deliveryData(0),
-      m_tempFileHandle(INVALID_HANDLE_VALUE),
-      m_pluginFuncs(pluginView->plugin()->pluginFuncs()),
-      m_instance(pluginView->instance()) {
-  ASSERT(m_pluginView);
+      m_tempFileHandle(invalidPlatformFileHandle),
+      m_pluginFuncs(pluginFuncs),
+      m_instance(instance) {
+  ASSERT(m_instance);
 
   m_stream.url = 0;
   m_stream.ndata = 0;
@@ -80,7 +81,7 @@ PluginStreamWin::PluginStreamWin(PluginViewWin* pluginView,
   streams().add(&m_stream, m_instance);
 }
 
-PluginStreamWin::~PluginStreamWin() {
+PluginStream::~PluginStream() {
   ASSERT(m_streamState != StreamStarted);
   ASSERT(!m_loader);
 
@@ -89,7 +90,7 @@ PluginStreamWin::~PluginStreamWin() {
   streams().remove(&m_stream);
 }
 
-void PluginStreamWin::start() {
+void PluginStream::start() {
   ASSERT(!m_loadManually);
 
   m_loader = NetscapePlugInStreamLoader::create(m_frame, this);
@@ -99,7 +100,7 @@ void PluginStreamWin::start() {
   m_loader->load(m_resourceRequest);
 }
 
-void PluginStreamWin::stop() {
+void PluginStream::stop() {
   m_streamState = StreamStopped;
 
   if (m_loadManually) {
@@ -121,7 +122,7 @@ void PluginStreamWin::stop() {
   }
 }
 
-void PluginStreamWin::startStream() {
+void PluginStream::startStream() {
   ASSERT(m_streamState == StreamBeforeStarted);
 
   const KURL& responseURL = m_resourceResponse.url();
@@ -130,10 +131,10 @@ void PluginStreamWin::startStream() {
   // this is the
   // format used when requesting the URL.
   if (responseURL.string().startsWith("javascript:", false))
-    m_stream.url = _strdup(
+    m_stream.url = strdup(
         responseURL.decode_string(responseURL.deprecatedString()).utf8());
   else
-    m_stream.url = _strdup(responseURL.deprecatedString().utf8());
+    m_stream.url = strdup(responseURL.deprecatedString().utf8());
 
   CString mimeTypeStr = m_resourceResponse.mimeType().utf8();
 
@@ -181,7 +182,7 @@ void PluginStreamWin::startStream() {
 
   // Protect the stream if destroystream is called from within the newstream
   // handler
-  RefPtr<PluginStreamWin> protect(this);
+  RefPtr<PluginStream> protect(this);
 
   NPError npErr =
       m_pluginFuncs->newstream(m_instance, (NPMIMEType)mimeTypeStr.data(),
@@ -199,40 +200,25 @@ void PluginStreamWin::startStream() {
   if (m_transferMode == NP_NORMAL)
     return;
 
-  char tempPath[MAX_PATH];
-
-  int result = ::GetTempPathA(_countof(tempPath), tempPath);
-  if (result > 0 && result <= _countof(tempPath)) {
-    char tempFile[MAX_PATH];
-
-    if (::GetTempFileNameA(tempPath, "WKP", 0, tempFile) > 0) {
-      m_tempFileHandle =
-          ::CreateFileA(tempFile, GENERIC_READ | GENERIC_WRITE, 0, 0,
-                        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-      if (m_tempFileHandle != INVALID_HANDLE_VALUE) {
-        m_path = tempFile;
-        return;
-      }
-    }
-  }
+  m_path = openTemporaryFile("WKP", m_tempFileHandle);
 
   // Something went wrong, cancel loading the stream
-  cancelAndDestroyStream(NPRES_NETWORK_ERR);
+  if (!isHandleValid(m_tempFileHandle))
+    cancelAndDestroyStream(NPRES_NETWORK_ERR);
 }
 
-NPP PluginStreamWin::ownerForStream(NPStream* stream) {
+NPP PluginStream::ownerForStream(NPStream* stream) {
   return streams().get(stream);
 }
 
-void PluginStreamWin::cancelAndDestroyStream(NPReason reason) {
-  RefPtr<PluginStreamWin> protect(this);
+void PluginStream::cancelAndDestroyStream(NPReason reason) {
+  RefPtr<PluginStream> protect(this);
 
   destroyStream(reason);
   stop();
 }
 
-void PluginStreamWin::destroyStream(NPReason reason) {
+void PluginStream::destroyStream(NPReason reason) {
   m_reason = reason;
   if (m_reason != NPRES_DONE) {
     // Stop any pending data from being streamed
@@ -245,15 +231,14 @@ void PluginStreamWin::destroyStream(NPReason reason) {
   destroyStream();
 }
 
-void PluginStreamWin::destroyStream() {
+void PluginStream::destroyStream() {
   if (m_streamState == StreamStopped)
     return;
 
   ASSERT(m_reason != WebReasonNone);
   ASSERT(!m_deliveryData || m_deliveryData->size() == 0);
 
-  if (m_tempFileHandle != INVALID_HANDLE_VALUE)
-    ::CloseHandle(m_tempFileHandle);
+  closeFile(m_tempFileHandle);
 
   if (m_stream.ndata != 0) {
     if (m_reason == NPRES_DONE &&
@@ -277,24 +262,24 @@ void PluginStreamWin::destroyStream() {
 
   m_streamState = StreamStopped;
 
-  // disconnectStream can cause us to be deleted.
-  RefPtr<PluginStreamWin> protect(this);
+  // streamDidFinishLoading can cause us to be deleted.
+  RefPtr<PluginStream> protect(this);
   if (!m_loadManually)
-    m_pluginView->disconnectStream(this);
+    m_client->streamDidFinishLoading(this);
 
-  m_pluginView = 0;
-
-  if (!m_path.isNull())
-    ::DeleteFileA(m_path.data());
+  if (!m_path.isNull()) {
+    String tempFilePath = String::fromUTF8(m_path.data());
+    deleteFile(tempFilePath);
+  }
 }
 
-void PluginStreamWin::delayDeliveryTimerFired(Timer<PluginStreamWin>* timer) {
+void PluginStream::delayDeliveryTimerFired(Timer<PluginStream>* timer) {
   ASSERT(timer == &m_delayDeliveryTimer);
 
   deliverData();
 }
 
-void PluginStreamWin::deliverData() {
+void PluginStream::deliverData() {
   ASSERT(m_deliveryData);
 
   if (m_streamState == StreamStopped)
@@ -349,8 +334,8 @@ void PluginStreamWin::deliverData() {
   }
 }
 
-void PluginStreamWin::sendJavaScriptStream(const KURL& requestURL,
-                                           const CString& resultString) {
+void PluginStream::sendJavaScriptStream(const KURL& requestURL,
+                                        const CString& resultString) {
   didReceiveResponse(0, ResourceResponse(requestURL, "text/plain",
                                          resultString.length(), "", ""));
 
@@ -368,8 +353,8 @@ void PluginStreamWin::sendJavaScriptStream(const KURL& requestURL,
   destroyStream(resultString.isNull() ? NPRES_NETWORK_ERR : NPRES_DONE);
 }
 
-void PluginStreamWin::didReceiveResponse(NetscapePlugInStreamLoader* loader,
-                                         const ResourceResponse& response) {
+void PluginStream::didReceiveResponse(NetscapePlugInStreamLoader* loader,
+                                      const ResourceResponse& response) {
   ASSERT(loader == m_loader);
   ASSERT(m_streamState == StreamBeforeStarted);
 
@@ -378,16 +363,16 @@ void PluginStreamWin::didReceiveResponse(NetscapePlugInStreamLoader* loader,
   startStream();
 }
 
-void PluginStreamWin::didReceiveData(NetscapePlugInStreamLoader* loader,
-                                     const char* data,
-                                     int length) {
+void PluginStream::didReceiveData(NetscapePlugInStreamLoader* loader,
+                                  const char* data,
+                                  int length) {
   ASSERT(loader == m_loader);
   ASSERT(length > 0);
   ASSERT(m_streamState == StreamStarted);
 
   // If the plug-in cancels the stream in deliverData it could be deleted,
   // so protect it here.
-  RefPtr<PluginStreamWin> protect(this);
+  RefPtr<PluginStream> protect(this);
 
   if (m_transferMode != NP_ASFILEONLY) {
     if (!m_deliveryData)
@@ -400,20 +385,15 @@ void PluginStreamWin::didReceiveData(NetscapePlugInStreamLoader* loader,
     deliverData();
   }
 
-  if (m_streamState != StreamStopped &&
-      m_tempFileHandle != INVALID_HANDLE_VALUE) {
-    DWORD written;
-    bool retval = true;
-
-    retval = WriteFile(m_tempFileHandle, data, length, &written, 0);
-
-    if (!retval || (int)written != length)
+  if (m_streamState != StreamStopped && isHandleValid(m_tempFileHandle)) {
+    int bytesWritten = writeToFile(m_tempFileHandle, data, length);
+    if (bytesWritten != length)
       cancelAndDestroyStream(NPRES_NETWORK_ERR);
   }
 }
 
-void PluginStreamWin::didFail(NetscapePlugInStreamLoader* loader,
-                              const ResourceError&) {
+void PluginStream::didFail(NetscapePlugInStreamLoader* loader,
+                           const ResourceError&) {
   ASSERT(loader == m_loader);
 
   m_loader = 0;
@@ -422,7 +402,7 @@ void PluginStreamWin::didFail(NetscapePlugInStreamLoader* loader,
   destroyStream(NPRES_NETWORK_ERR);
 }
 
-void PluginStreamWin::didFinishLoading(NetscapePlugInStreamLoader* loader) {
+void PluginStream::didFinishLoading(NetscapePlugInStreamLoader* loader) {
   ASSERT(loader == m_loader);
   ASSERT(m_streamState == StreamStarted);
 

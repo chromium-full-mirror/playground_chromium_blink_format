@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2008 Collabora, Ltd. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,6 +34,7 @@
 #include "IntRect.h"
 #include "KURL.h"
 #include "PlatformString.h"
+#include "PluginStream.h"
 #include "ResourceRequest.h"
 #include "Timer.h"
 #include "Widget.h"
@@ -59,7 +61,7 @@ class KURL;
 class PluginMessageThrottlerWin;
 class PluginPackageWin;
 class PluginRequestWin;
-class PluginStreamWin;
+class PluginStream;
 class ResourceError;
 class ResourceResponse;
 
@@ -80,7 +82,7 @@ enum PluginStatus {
   PluginStatusLoadedSuccessfully
 };
 
-class PluginViewWin : public Widget {
+class PluginViewWin : public Widget, private PluginStreamClient {
   friend static LRESULT CALLBACK PluginViewWndProc(HWND, UINT, WPARAM, LPARAM);
 
  public:
@@ -134,7 +136,10 @@ class PluginViewWin : public Widget {
 
   bool arePopupsAllowed() const;
 
-  void disconnectStream(PluginStreamWin*);
+  void disconnectStream(PluginStream*);
+  void streamDidFinishLoading(PluginStream* stream) {
+    disconnectStream(stream);
+  }
 
   // Widget functions
   virtual void setFrameGeometry(const IntRect&);
@@ -223,7 +228,7 @@ class PluginViewWin : public Widget {
 
   Vector<bool, 4> m_popupStateStack;
 
-  HashSet<RefPtr<PluginStreamWin>> m_streams;
+  HashSet<RefPtr<PluginStream>> m_streams;
   Vector<PluginRequestWin*> m_requests;
 
   int m_quirks;
@@ -242,7 +247,7 @@ class PluginViewWin : public Widget {
   bool m_isCallingPluginWndProc;
 
   bool m_loadManually;
-  RefPtr<PluginStreamWin> m_manualStream;
+  RefPtr<PluginStream> m_manualStream;
 
   static PluginViewWin* s_currentPluginView;
 };
