@@ -177,19 +177,8 @@ static bool parseAspectRatio(CSSValue* value, int& h, int& v) {
   return false;
 }
 
-inline bool cmpvalue(int a, int b, MediaFeaturePrefix op) {
-  switch (op) {
-    case MinPrefix:
-      return a >= b;
-    case MaxPrefix:
-      return a <= b;
-    case NoPrefix:
-      return a == b;
-  }
-  return false;
-}
-
-inline bool cmpvalue(float a, float b, MediaFeaturePrefix op) {
+template <typename T>
+bool compareValue(T a, T b, MediaFeaturePrefix op) {
   switch (op) {
     case MinPrefix:
       return a >= b;
@@ -220,7 +209,7 @@ static bool colorMediaFeatureEval(CSSValue* value,
   float number;
   if (value)
     return numberValue(value, number) &&
-           cmpvalue(bitsPerComponent, (int)number, op);
+           compareValue(bitsPerComponent, static_cast<int>(number), op);
 
   return bitsPerComponent != 0;
 }
@@ -244,7 +233,8 @@ static bool device_aspect_ratioMediaFeatureEval(CSSValue* value,
     int h = 0;
     int v = 0;
     if (parseAspectRatio(value, h, v))
-      return v != 0 && cmpvalue((int)sg.width() * v, (int)sg.height() * h, op);
+      return v != 0 && compareValue(static_cast<int>(sg.width()) * v,
+                                    static_cast<int>(sg.height()) * h, op);
     return false;
   }
 
@@ -259,9 +249,9 @@ static bool device_pixel_ratioMediaFeatureEval(CSSValue* value,
                                                MediaFeaturePrefix op) {
   if (value)
     return value->isPrimitiveValue() &&
-           cmpvalue(page->chrome()->scaleFactor(),
-                    static_cast<CSSPrimitiveValue*>(value)->getFloatValue(),
-                    op);
+           compareValue(page->chrome()->scaleFactor(),
+                        static_cast<CSSPrimitiveValue*>(value)->getFloatValue(),
+                        op);
 
   return page->chrome()->scaleFactor() != 0;
 }
@@ -274,7 +264,7 @@ static bool gridMediaFeatureEval(CSSValue* value,
   // assume we have bitmap device
   float number;
   if (value && numberValue(value, number))
-    return cmpvalue((int)number, 0, op);
+    return compareValue(static_cast<int>(number), 0, op);
   return false;
 }
 
@@ -285,8 +275,8 @@ static bool device_heightMediaFeatureEval(CSSValue* value,
   if (value) {
     FloatRect sg = screenRect(page->mainFrame()->view());
     return value->isPrimitiveValue() &&
-           cmpvalue(
-               (int)sg.height(),
+           compareValue(
+               static_cast<int>(sg.height()),
                static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
                op);
   }
@@ -302,8 +292,8 @@ static bool device_widthMediaFeatureEval(CSSValue* value,
   if (value) {
     FloatRect sg = screenRect(page->mainFrame()->view());
     return value->isPrimitiveValue() &&
-           cmpvalue(
-               (int)sg.width(),
+           compareValue(
+               static_cast<int>(sg.width()),
                static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
                op);
   }
@@ -320,7 +310,7 @@ static bool heightMediaFeatureEval(CSSValue* value,
 
   if (value)
     return value->isPrimitiveValue() &&
-           cmpvalue(
+           compareValue(
                view->visibleHeight(),
                static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
                op);
@@ -336,7 +326,7 @@ static bool widthMediaFeatureEval(CSSValue* value,
 
   if (value)
     return value->isPrimitiveValue() &&
-           cmpvalue(
+           compareValue(
                view->visibleWidth(),
                static_cast<CSSPrimitiveValue*>(value)->computeLengthInt(style),
                op);
