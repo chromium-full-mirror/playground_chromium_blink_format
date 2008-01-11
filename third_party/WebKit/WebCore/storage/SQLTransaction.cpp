@@ -36,7 +36,7 @@
 #include "Logging.h"
 #include "Page.h"
 #include "PlatformString.h"
-#include "SecurityOriginData.h"
+#include "SecurityOrigin.h"
 #include "SQLError.h"
 #include "SQLiteTransaction.h"
 #include "SQLResultSet.h"
@@ -129,7 +129,7 @@ void SQLTransaction::openTransactionAndPreflight() {
   // <rdar://problem/5628468> tracks this task
   m_database->m_sqliteDatabase.setMaximumSize(
       DatabaseTracker::tracker().quotaForOrigin(
-          m_database->securityOriginData()));
+          m_database->securityOriginCopy().get()));
 
   ASSERT(!m_sqliteTransaction);
   m_sqliteTransaction.set(new SQLiteTransaction(m_database->m_sqliteDatabase));
@@ -208,7 +208,7 @@ void SQLTransaction::runStatements() {
       // this statement
       m_database->m_sqliteDatabase.setMaximumSize(
           DatabaseTracker::tracker().quotaForOrigin(
-              m_database->securityOriginData()));
+              m_database->securityOriginCopy().get()));
     } else {
       // If the current statement has already been run, failed due to quota
       // constraints, and we're not retrying it,
@@ -316,17 +316,17 @@ void SQLTransaction::deliverQuotaIncreaseCallback() {
   Page* page = m_database->document()->page();
   ASSERT(page);
 
-  SecurityOriginData originData = m_database->securityOriginData();
+  RefPtr<SecurityOrigin> origin = m_database->securityOriginCopy();
 
   unsigned long long currentQuota =
-      DatabaseTracker::tracker().quotaForOrigin(originData);
+      DatabaseTracker::tracker().quotaForOrigin(origin.get());
   unsigned long long newQuota =
       page->chrome()->requestQuotaIncreaseForDatabaseOperation(
-          m_database->document()->frame(), originData,
+          m_database->document()->frame(), origin.get(),
           m_database->stringIdentifier(),
           currentQuota + DefaultQuotaSizeIncrease);
 
-  DatabaseTracker::tracker().setQuota(originData, newQuota);
+  DatabaseTracker::tracker().setQuota(origin.get(), newQuota);
 
   // If the new quota ended up being larger than the old quota, we will retry
   // the statement.
@@ -369,7 +369,7 @@ void SQLTransaction::postflightAndCommit() {
   // this database
   if (m_modifiedDatabase)
     DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
-        m_database->m_securityOrigin->securityOriginData(), m_database->m_name);
+        m_database->m_securityOrigin.get(), m_database->m_name);
 
   // Transaction Step 10 - End transaction steps
   // There is no next step
@@ -432,8 +432,7 @@ void SQLTransaction::cleanupAfterTransactionErrorCallback() {
       // But if the commit was successful, notify the delegates if the
       // transaction modified this database
       DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
-          m_database->m_securityOrigin->securityOriginData(),
-          m_database->m_name);
+          m_database->m_securityOrigin.get(), m_database->m_name);
     }
 
     m_sqliteTransaction.clear();

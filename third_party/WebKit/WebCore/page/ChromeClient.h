@@ -30,7 +30,7 @@ class Frame;
 class HitTestResult;
 class IntRect;
 class Page;
-class SecurityOriginData;
+class SecurityOrigin;
 class String;
 
 struct FrameLoadRequest;
@@ -118,12 +118,12 @@ class ChromeClient {
 
   virtual unsigned long long requestQuotaIncreaseForNewDatabase(
       Frame*,
-      const SecurityOriginData& origin,
+      SecurityOrigin* origin,
       const String& databaseDisplayName,
       unsigned long long estimatedSize) = 0;
   virtual unsigned long long requestQuotaIncreaseForDatabaseOperation(
       Frame*,
-      const SecurityOriginData& origin,
+      SecurityOrigin* origin,
       const String& databaseIdentifier,
       unsigned long long proposedNewQuota) = 0;
 };

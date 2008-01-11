@@ -454,11 +454,11 @@ void WebChromeClient::print(Frame* frame) {
 
 unsigned long long WebChromeClient::requestQuotaIncreaseForNewDatabase(
     Frame* frame,
-    const SecurityOriginData& originData,
+    SecurityOrigin* origin,
     const String& databaseDisplayName,
     unsigned long long estimatedSize) {
   COMPtr<WebSecurityOrigin> webOrigin(
-      AdoptCOM, WebSecurityOrigin::createInstance(originData));
+      AdoptCOM, WebSecurityOrigin::createInstance(origin));
   unsigned long long result = 0;
   COMPtr<IWebUIDelegate> uiDelegate;
   if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
@@ -476,11 +476,11 @@ unsigned long long WebChromeClient::requestQuotaIncreaseForNewDatabase(
 
 unsigned long long WebChromeClient::requestQuotaIncreaseForDatabaseOperation(
     Frame* frame,
-    const SecurityOriginData& originData,
+    SecurityOrigin* origin,
     const String& databaseIdentifier,
     unsigned long long proposedNewQuota) {
   COMPtr<WebSecurityOrigin> webOrigin(
-      AdoptCOM, WebSecurityOrigin::createInstance(originData));
+      AdoptCOM, WebSecurityOrigin::createInstance(origin));
   unsigned long long result = 0;
   COMPtr<IWebUIDelegate> uiDelegate;
   if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {

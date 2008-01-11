@@ -37,6 +37,7 @@
 #include "WindowFeatures.h"
 #include "kjs_window.h"
 #include "PausedTimeouts.h"
+#include "SecurityOrigin.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
@@ -330,7 +331,7 @@ void Chrome::print(Frame* frame) {
 
 unsigned long long Chrome::requestQuotaIncreaseForNewDatabase(
     Frame* frame,
-    const SecurityOriginData& origin,
+    SecurityOrigin* origin,
     const String& databaseDisplayName,
     unsigned long long estimatedSize) {
   return m_client->requestQuotaIncreaseForNewDatabase(
@@ -339,7 +340,7 @@ unsigned long long Chrome::requestQuotaIncreaseForNewDatabase(
 
 unsigned long long Chrome::requestQuotaIncreaseForDatabaseOperation(
     Frame* frame,
-    const SecurityOriginData& origin,
+    SecurityOrigin* origin,
     const String& databaseIdentifier,
     unsigned long long proposedNewQuota) {
   return m_client->requestQuotaIncreaseForDatabaseOperation(

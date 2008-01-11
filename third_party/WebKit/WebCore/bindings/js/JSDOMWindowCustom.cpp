@@ -133,7 +133,7 @@ KJS::JSValue* JSDOMWindow::postMessage(KJS::ExecState* exec,
 
   DOMWindow* source =
       static_cast<JSDOMWindow*>(exec->dynamicGlobalObject())->impl();
-  String domain = source->document()->securityOrigin()->domain();
+  String domain = source->document()->securityOrigin()->host();
   String uri = source->document()->documentURI();
   String message = args[0]->toString(exec);
 

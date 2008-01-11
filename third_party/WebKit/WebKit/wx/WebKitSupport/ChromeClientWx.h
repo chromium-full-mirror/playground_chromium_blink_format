@@ -113,12 +113,12 @@ class ChromeClientWx : public ChromeClient {
 
   virtual unsigned long long requestQuotaIncreaseForNewDatabase(
       Frame*,
-      const SecurityOriginData&,
+      SecurityOrigin*,
       const String&,
       unsigned long long);
   virtual unsigned long long requestQuotaIncreaseForDatabaseOperation(
       Frame*,
-      const SecurityOriginData&,
+      SecurityOrigin*,
       const String&,
       unsigned long long);
 };

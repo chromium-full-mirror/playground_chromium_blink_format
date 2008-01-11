@@ -114,12 +114,12 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual unsigned long long requestQuotaIncreaseForNewDatabase(
       WebCore::Frame*,
-      const WebCore::SecurityOriginData& origin,
+      WebCore::SecurityOrigin* origin,
       const WebCore::String& databaseDisplayName,
       unsigned long long estimatedSize);
   virtual unsigned long long requestQuotaIncreaseForDatabaseOperation(
       WebCore::Frame*,
-      const WebCore::SecurityOriginData& origin,
+      WebCore::SecurityOrigin* origin,
       const WebCore::String& databaseIdentifier,
       unsigned long long proposedNewQuota);
 

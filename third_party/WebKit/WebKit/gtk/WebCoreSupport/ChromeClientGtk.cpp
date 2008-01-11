@@ -275,7 +275,7 @@ void ChromeClient::print(Frame* frame) {
 
 unsigned long long ChromeClient::requestQuotaIncreaseForNewDatabase(
     Frame*,
-    const SecurityOriginData&,
+    SecurityOrigin*,
     const String&,
     unsigned long long) {
   notImplemented();
@@ -284,7 +284,7 @@ unsigned long long ChromeClient::requestQuotaIncreaseForNewDatabase(
 
 unsigned long long ChromeClient::requestQuotaIncreaseForDatabaseOperation(
     Frame*,
-    const SecurityOriginData&,
+    SecurityOrigin*,
     const String&,
     unsigned long long) {
   notImplemented();

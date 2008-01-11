@@ -2640,7 +2640,7 @@ String Document::referrer() const {
 }
 
 String Document::domain() const {
-  return m_securityOrigin->domain();
+  return m_securityOrigin->host();
 }
 
 void Document::setDomain(const String& newDomain) {

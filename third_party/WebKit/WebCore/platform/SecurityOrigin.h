@@ -38,18 +38,22 @@ namespace WebCore {
 
 class Frame;
 class KURL;
-class SecurityOriginData;
 
 class SecurityOrigin : public RefCounted<SecurityOrigin> {
  public:
   static PassRefPtr<SecurityOrigin> createForFrame(Frame*);
+  static PassRefPtr<SecurityOrigin> createFromIdentifier(const String&);
   static PassRefPtr<SecurityOrigin> create(const String& protocol,
                                            const String& host,
                                            unsigned short port,
                                            SecurityOrigin* ownerFrameOrigin);
 
+  PassRefPtr<SecurityOrigin> copy();
+
   void setDomainFromDOM(const String& newDomain);
-  String domain() const { return m_host; }
+  String host() const { return m_host; }
+  String protocol() const { return m_protocol; }
+  unsigned short port() const { return m_port; }
 
   bool canAccess(const SecurityOrigin*) const;
   bool isSecureTransitionTo(const KURL&) const;
@@ -57,7 +61,14 @@ class SecurityOrigin : public RefCounted<SecurityOrigin> {
   bool isEmpty() const;
   String toString() const;
 
-  SecurityOriginData securityOriginData() const;
+  String stringIdentifier() const;
+
+  // do not use this for access checks, it's there only for using this as a
+  // hashtable key
+  bool equal(SecurityOrigin* other) const {
+    return m_protocol == other->m_protocol && m_host == other->m_host &&
+           m_port == other->m_port;
+  }
 
  private:
   SecurityOrigin(const String& protocol,

@@ -268,7 +268,7 @@ void ChromeClientWx::print(Frame*) {
 
 unsigned long long ChromeClientWx::requestQuotaIncreaseForNewDatabase(
     Frame*,
-    const SecurityOriginData&,
+    SecurityOrigin*,
     const String&,
     unsigned long long) {
   notImplemented();
@@ -277,7 +277,7 @@ unsigned long long ChromeClientWx::requestQuotaIncreaseForNewDatabase(
 
 unsigned long long ChromeClientWx::requestQuotaIncreaseForDatabaseOperation(
     Frame*,
-    const SecurityOriginData&,
+    SecurityOrigin*,
     const String&,
     unsigned long long) {
   notImplemented();
