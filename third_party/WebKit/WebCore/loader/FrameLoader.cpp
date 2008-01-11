@@ -318,9 +318,7 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
   ASSERT(!features.dialog || request.frameName().isEmpty());
 
   if (!request.frameName().isEmpty() && request.frameName() != "_blank")
-    if (Frame* frame = m_frame->tree()->find(request.frameName())) {
-      if (!shouldAllowNavigation(frame))
-        return 0;
+    if (Frame* frame = findFrameForNavigation(request.frameName())) {
       if (!request.resourceRequest().url().isEmpty())
         frame->loader()->load(request, false, true, 0, 0,
                               HashMap<String, String>());
@@ -2030,9 +2028,7 @@ void FrameLoader::load(const FrameLoadRequest& request,
   if (shouldHideReferrer(url, referrer))
     referrer = String();
 
-  Frame* targetFrame = m_frame->tree()->find(request.frameName());
-  if (!shouldAllowNavigation(targetFrame))
-    return;
+  Frame* targetFrame = findFrameForNavigation(request.frameName());
 
   if (request.resourceRequest().httpMethod() != "POST") {
     FrameLoadType loadType;
@@ -2080,7 +2076,7 @@ void FrameLoader::load(const KURL& newURL,
   NavigationAction action(newURL, newLoadType, isFormSubmission, event);
 
   if (!frameName.isEmpty()) {
-    if (Frame* targetFrame = m_frame->tree()->find(frameName))
+    if (Frame* targetFrame = findFrameForNavigation(frameName))
       targetFrame->loader()->load(newURL, referrer, newLoadType, String(),
                                   event, formState);
     else
@@ -2155,7 +2151,7 @@ void FrameLoader::load(const ResourceRequest& request,
     return;
   }
 
-  Frame* frame = m_frame->tree()->find(frameName);
+  Frame* frame = findFrameForNavigation(frameName);
   if (frame) {
     frame->loader()->load(request);
     return;
@@ -3371,7 +3367,7 @@ void FrameLoader::post(const KURL& url,
     formState = FormState::create(form, formValues, m_frame);
 
   if (!frameName.isEmpty()) {
-    if (Frame* targetFrame = m_frame->tree()->find(frameName))
+    if (Frame* targetFrame = findFrameForNavigation(frameName))
       targetFrame->loader()->load(request, action, FrameLoadTypeStandard,
                                   formState.release());
     else
@@ -4076,6 +4072,13 @@ PassRefPtr<HistoryItem> FrameLoader::createHistoryItemTree(Frame* targetFrame,
   if (m_frame == targetFrame)
     bfItem->setIsTargetItem(true);
   return bfItem;
+}
+
+Frame* FrameLoader::findFrameForNavigation(const AtomicString& name) {
+  Frame* frame = m_frame->tree()->find(name);
+  if (shouldAllowNavigation(frame))
+    return frame;
+  return 0;
 }
 
 void FrameLoader::saveScrollPositionAndViewStateToItem(HistoryItem* item) {
