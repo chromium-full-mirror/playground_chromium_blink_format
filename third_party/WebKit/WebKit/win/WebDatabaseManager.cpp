@@ -192,8 +192,8 @@ ULONG STDMETHODCALLTYPE WebDatabaseManager::Release() {
 }
 
 template <>
-struct COMVariantSetter<SecurityOrigin*>
-    : COMIUnknownVariantSetter<WebSecurityOrigin, SecurityOrigin*> {};
+struct COMVariantSetter<RefPtr<SecurityOrigin>>
+    : COMIUnknownVariantSetter<WebSecurityOrigin, RefPtr<SecurityOrigin>> {};
 
 // IWebDatabaseManager
 // -------------------------------------------------------------
