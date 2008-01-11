@@ -36,6 +36,11 @@ class GCController : Noncopyable {
 
  public:
   void garbageCollectSoon();
+  void garbageCollectNow();  // It's better to call garbageCollectSoon, unless
+                             // you have a specific reason not to.
+
+  void garbageCollectOnAlternateThreadForDebugging(
+      bool waitUntilDone);  // Used for stress testing.
 
  private:
   GCController();  // Use gcController() instead

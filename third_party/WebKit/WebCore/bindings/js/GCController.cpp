@@ -26,12 +26,19 @@
 #include "config.h"
 #include "GCController.h"
 
-#include <kjs/collector.h>
 #include <kjs/JSLock.h>
+#include <kjs/collector.h>
+#include <pthread.h>
 
 using namespace KJS;
 
 namespace WebCore {
+
+static void* collect(void*) {
+  JSLock lock;
+  Collector::collect();
+  return 0;
+}
 
 GCController& gcController() {
   static GCController staticGCController;
@@ -48,6 +55,23 @@ void GCController::garbageCollectSoon() {
 void GCController::gcTimerFired(Timer<GCController>*) {
   JSLock lock;
   Collector::collect();
+}
+
+void GCController::garbageCollectNow() {
+  JSLock lock;
+  Collector::collect();
+}
+
+void GCController::garbageCollectOnAlternateThreadForDebugging(
+    bool waitUntilDone) {
+  pthread_t thread;
+  pthread_create(&thread, NULL, collect, NULL);
+
+  if (waitUntilDone) {
+    JSLock::DropAllLocks dropLocks;  // Otherwise our lock would deadlock the
+                                     // collect thread we're joining
+    pthread_join(thread, NULL);
+  }
 }
 
 }  // namespace WebCore
