@@ -243,7 +243,7 @@ HRESULT STDMETHODCALLTYPE WebDatabaseManager::databasesWithOrigin(
 
   Vector<String> databaseNames;
   DatabaseTracker::tracker().databaseNamesForOrigin(
-      webSecurityOrigin->securityOrigi(), databaseNames);
+      webSecurityOrigin->securityOrigin(), databaseNames);
 
   COMPtr<COMEnumVariant<Vector<String>>> enumVariant(
       AdoptCOM, COMEnumVariant<Vector<String>>::adopt(databaseNames));
