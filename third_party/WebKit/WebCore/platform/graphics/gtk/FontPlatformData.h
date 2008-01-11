@@ -45,6 +45,12 @@ class FontPlatformData {
   FontPlatformData() : m_pattern(0), m_scaledFont(0) {}
 
   FontPlatformData(const FontDescription&, const AtomicString& family);
+
+  FontPlatformData(cairo_font_face_t* fontFace,
+                   int size,
+                   bool bold,
+                   bool italic);
+
   ~FontPlatformData();
 
   static bool init();
