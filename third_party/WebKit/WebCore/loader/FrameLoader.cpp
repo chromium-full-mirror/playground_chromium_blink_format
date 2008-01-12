@@ -395,6 +395,9 @@ void FrameLoader::changeLocation(const KURL& url,
           : UseProtocolCachePolicy;
   ResourceRequest request(url, referrer, policy);
 
+  if (executeIfJavaScriptURL(request.url(), userGesture))
+    return;
+
   urlSelected(request, "_self", 0, lockHistory, userGesture);
 }
 
@@ -403,7 +406,7 @@ void FrameLoader::urlSelected(const ResourceRequest& request,
                               Event* triggeringEvent,
                               bool lockHistory,
                               bool userGesture) {
-  if (executeIfJavaScriptURL(request.url(), userGesture))
+  if (executeIfJavaScriptURL(request.url(), userGesture, false))
     return;
 
   String target = _target;
@@ -534,7 +537,7 @@ void FrameLoader::submitForm(const char* action,
   DeprecatedString urlString = u.deprecatedString();
   if (urlString.startsWith("javascript:", false)) {
     m_isExecutingJavaScriptFormAction = true;
-    executeIfJavaScriptURL(u);
+    executeIfJavaScriptURL(u, false, false);
     m_isExecutingJavaScriptFormAction = false;
     return;
   }
@@ -750,7 +753,9 @@ void FrameLoader::didExplicitOpen() {
     m_URL = m_frame->document()->url();
 }
 
-bool FrameLoader::executeIfJavaScriptURL(const KURL& url, bool userGesture) {
+bool FrameLoader::executeIfJavaScriptURL(const KURL& url,
+                                         bool userGesture,
+                                         bool replaceDocument) {
   if (!url.deprecatedString().startsWith("javascript:", false))
     return false;
 
@@ -766,9 +771,14 @@ bool FrameLoader::executeIfJavaScriptURL(const KURL& url, bool userGesture) {
   if (m_frame->document())
     currentSecurityOrigin = m_frame->document()->securityOrigin();
 
-  begin(m_URL, true, currentSecurityOrigin);
-  write(scriptResult);
-  end();
+  // FIXME: We should always replace the document, but doing so
+  //        synchronously can cause crashes:
+  //        http://bugs.webkit.org/show_bug.cgi?id=16782
+  if (replaceDocument) {
+    begin(m_URL, true, currentSecurityOrigin);
+    write(scriptResult);
+    end();
+  }
 
   return true;
 }

@@ -405,7 +405,9 @@ class FrameLoader : Noncopyable
   String encoding() const;
 
   // Returns true if url is a JavaScript URL.
-  bool executeIfJavaScriptURL(const KURL& url, bool userGesture = false);
+  bool executeIfJavaScriptURL(const KURL& url,
+                              bool userGesture = false,
+                              bool replaceDocument = true);
 
   KJS::JSValue* executeScript(const String& url,
                               int baseLine,
