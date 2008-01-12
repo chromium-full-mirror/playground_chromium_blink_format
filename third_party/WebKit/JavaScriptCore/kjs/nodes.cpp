@@ -1281,10 +1281,11 @@ JSValue* PostIncResolveNode::evaluate(ExecState* exec) {
   ASSERT(iter != end);
 
   PropertySlot slot;
-  JSObject* base;
   do {
-    base = *iter;
-    if (base->getPropertySlot(exec, m_ident, slot)) {
+    if ((*iter)->getPropertySlot(exec, m_ident, slot)) {
+      // See the comment in PostIncResolveNode::evaluate().
+
+      JSObject* base = *iter;
       JSValue* v = slot.getValue(exec, base, m_ident)->toJSNumber(exec);
       base->put(exec, m_ident, jsNumber(v->toNumber(exec) + 1));
       return v;
@@ -1333,10 +1334,11 @@ JSValue* PostDecResolveNode::evaluate(ExecState* exec) {
   ASSERT(iter != end);
 
   PropertySlot slot;
-  JSObject* base;
   do {
-    base = *iter;
-    if (base->getPropertySlot(exec, m_ident, slot)) {
+    if ((*iter)->getPropertySlot(exec, m_ident, slot)) {
+      // See the comment in PostIncResolveNode::evaluate().
+
+      JSObject* base = *iter;
       JSValue* v = slot.getValue(exec, base, m_ident)->toJSNumber(exec);
       base->put(exec, m_ident, jsNumber(v->toNumber(exec) - 1));
       return v;
@@ -1750,10 +1752,11 @@ JSValue* PreIncResolveNode::evaluate(ExecState* exec) {
   ASSERT(iter != end);
 
   PropertySlot slot;
-  JSObject* base;
   do {
-    base = *iter;
-    if (base->getPropertySlot(exec, m_ident, slot)) {
+    if ((*iter)->getPropertySlot(exec, m_ident, slot)) {
+      // See the comment in PostIncResolveNode::evaluate().
+
+      JSObject* base = *iter;
       JSValue* v = slot.getValue(exec, base, m_ident);
 
       double n = v->toNumber(exec);
@@ -1795,10 +1798,11 @@ JSValue* PreDecResolveNode::evaluate(ExecState* exec) {
   ASSERT(iter != end);
 
   PropertySlot slot;
-  JSObject* base;
   do {
-    base = *iter;
-    if (base->getPropertySlot(exec, m_ident, slot)) {
+    if ((*iter)->getPropertySlot(exec, m_ident, slot)) {
+      // See the comment in PostIncResolveNode::evaluate().
+
+      JSObject* base = *iter;
       JSValue* v = slot.getValue(exec, base, m_ident);
 
       double n = v->toNumber(exec);
@@ -3165,8 +3169,12 @@ JSValue* ReadModifyResolveNode::evaluate(ExecState* exec) {
   JSObject* base;
   do {
     base = *iter;
-    if (base->getPropertySlot(exec, m_ident, slot))
+    if (base->getPropertySlot(exec, m_ident, slot)) {
+      // See the comment in PostIncResolveNode::evaluate().
+
+      base = *iter;
       goto found;
+    }
 
     ++iter;
   } while (iter != end);
@@ -3200,8 +3208,12 @@ JSValue* AssignResolveNode::evaluate(ExecState* exec) {
   JSObject* base;
   do {
     base = *iter;
-    if (base->getPropertySlot(exec, m_ident, slot))
+    if (base->getPropertySlot(exec, m_ident, slot)) {
+      // See the comment in PostIncResolveNode::evaluate().
+
+      base = *iter;
       goto found;
+    }
 
     ++iter;
   } while (iter != end);
@@ -3957,6 +3969,7 @@ JSValue* WithNode::execute(ExecState* exec) {
   KJS_CHECKEXCEPTION
   JSObject* o = v->toObject(exec);
   KJS_CHECKEXCEPTION
+  exec->dynamicGlobalObject()->tearOffActivation(exec);
   exec->pushScope(o);
   JSValue* value = statement->execute(exec);
   exec->popScope();
@@ -4156,6 +4169,7 @@ JSValue* TryNode::execute(ExecState* exec) {
   if (catchBlock && exec->completionType() == Throw) {
     JSObject* obj = new JSObject;
     obj->put(exec, exceptionIdent, result, DontDelete);
+    exec->dynamicGlobalObject()->tearOffActivation(exec);
     exec->pushScope(obj);
     result = catchBlock->execute(exec);
     exec->popScope();
@@ -4325,6 +4339,9 @@ void FunctionBodyNode::processDeclarations(ExecState* exec) {
 
     m_initialized = true;
   }
+
+  if (m_functionStack.size() != 0)
+    exec->dynamicGlobalObject()->tearOffActivation(exec);
 
   LocalStorage& localStorage = exec->variableObject()->localStorage();
 
@@ -4538,6 +4555,8 @@ void FuncExprNode::addParams() {
 }
 
 JSValue* FuncExprNode::evaluate(ExecState* exec) {
+  exec->dynamicGlobalObject()->tearOffActivation(exec);
+
   bool named = !ident.isNull();
   JSObject* functionScopeObject = 0;
 

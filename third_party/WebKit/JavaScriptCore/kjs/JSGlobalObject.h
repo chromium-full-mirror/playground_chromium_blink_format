@@ -27,6 +27,8 @@
 
 namespace KJS {
 
+class ActivationImp;
+class ActivationStackNode;
 class ArrayObjectImp;
 class ArrayPrototype;
 class BooleanObjectImp;
@@ -126,6 +128,9 @@ class JSGlobalObject : public JSVariableObject {
     NativeErrorPrototype* URIErrorPrototype;
 
     SymbolTable inlineSymbolTable;
+
+    ActivationStackNode* activations;
+    size_t activationCount;
   };
 
  public:
@@ -250,6 +255,10 @@ class JSGlobalObject : public JSVariableObject {
 
   virtual bool allowsAccessFrom(const JSGlobalObject*) const { return true; }
 
+  ActivationImp* pushActivation(ExecState*);
+  void popActivation();
+  void tearOffActivation(ExecState*, bool markAsRelic = false);
+
  private:
   void init();
 
@@ -259,6 +268,8 @@ class JSGlobalObject : public JSVariableObject {
 
   bool checkTimeout();
   void resetTimeoutCheck();
+
+  void checkActivationCount();
 
   static JSGlobalObject* s_head;
 };

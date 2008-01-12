@@ -92,6 +92,7 @@ class ScopeChain {
   }
   void push(JSObject*);
   void push(const ScopeChain&);
+  void replaceTop(JSObject*);
   void pop();
 
   void mark();
@@ -138,6 +139,11 @@ inline JSObject* ScopeChain::bottom() const {
 inline void ScopeChain::push(JSObject* o) {
   ASSERT(o);
   _node = new ScopeChainNode(_node, o);
+}
+
+inline void ScopeChain::replaceTop(JSObject* o) {
+  ASSERT(o);
+  _node->object = o;
 }
 
 inline void ScopeChain::pop() {

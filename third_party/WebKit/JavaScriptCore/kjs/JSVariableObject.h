@@ -56,6 +56,8 @@ class JSVariableObject : public JSObject {
   // without increasing their own size (since there's a hard limit on the
   // size of a JSCell).
   struct JSVariableObjectData {
+    JSVariableObjectData() {}
+
     JSVariableObjectData(SymbolTable* s)
         : symbolTable(s)  // Subclass owns this pointer.
     {}
@@ -63,6 +65,8 @@ class JSVariableObject : public JSObject {
     LocalStorage localStorage;  // Storage for variables in the symbol table.
     SymbolTable* symbolTable;   // Maps name -> index in localStorage.
   };
+
+  JSVariableObject() {}
 
   JSVariableObject(JSVariableObjectData* data)
       : d(data)  // Subclass owns this pointer.
