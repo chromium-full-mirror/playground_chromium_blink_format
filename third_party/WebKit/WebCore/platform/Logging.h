@@ -53,6 +53,7 @@ extern WTFLogChannel LogFTP;
 extern WTFLogChannel LogThreading;
 extern WTFLogChannel LogStorageAPI;
 extern WTFLogChannel LogMedia;
+extern WTFLogChannel LogPlugin;
 
 void InitializeLoggingChannelsIfNecessary();
 }

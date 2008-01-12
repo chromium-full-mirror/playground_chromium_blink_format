@@ -26,6 +26,7 @@
 #ifndef PLUGIN_DEBUG_H__
 #define PLUGIN_DEBUG_H__
 
+#include "Logging.h"
 #include "npruntime_internal.h"
 
 static const char* errorStrings[] = {
@@ -48,18 +49,12 @@ static const char* errorStrings[] = {
     "Seekable stream expected.",     /* NPERR_STREAM_NOT_SEEKABLE */
     "Unknown error code"};
 
-#ifndef NDEBUG
 #define LOG_NPERROR(err)     \
   if (err != NPERR_NO_ERROR) \
-  _RPTF2(_CRT_WARN, "%s: %s\n", __FUNCTION__, errorStrings[err])
-#define LOG_PLUGIN_NET_ERROR()                                                \
-  _RPTF1(_CRT_WARN,                                                           \
-         "%s: Stream failed due to problems with network, disk I/O, lack of " \
-         "memory, or other problems.\n",                                      \
-         __FUNCTION__)
-#else
-#define LOG_PLUGIN_NET_ERROR() ((void)0)
-#define LOG_NPERROR(err) ((void)0)
-#endif
+  LOG_VERBOSE(Plugin, "%s\n", errorStrings[err])
+#define LOG_PLUGIN_NET_ERROR()                                                 \
+  LOG_VERBOSE(Plugin,                                                          \
+              "Stream failed due to problems with network, disk I/O, lack of " \
+              "memory, or other problems.\n")
 
 #endif
