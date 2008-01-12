@@ -93,7 +93,7 @@ JSValue* FunctionImp::argumentsGetter(ExecState* exec,
 
   for (ExecState* e = exec; e; e = e->callingExecState())
     if (e->function() == thisObj) {
-      e->dynamicGlobalObject()->tearOffActivation(e, e == exec);
+      e->dynamicGlobalObject()->tearOffActivation(e, e != exec);
       return e->activationObject()->get(exec, propertyName);
     }
 
@@ -407,7 +407,7 @@ bool ActivationImp::getOwnPropertySlot(ExecState* exec,
   if (propertyName == exec->propertyNames().arguments) {
     for (ExecState* e = exec; e; e = e->callingExecState())
       if (e->function() == d()->function) {
-        e->dynamicGlobalObject()->tearOffActivation(e, e == exec);
+        e->dynamicGlobalObject()->tearOffActivation(e, e != exec);
         ActivationImp* newActivation = e->activationObject();
         slot.setCustom(newActivation, newActivation->getArgumentsGetter());
         return true;
