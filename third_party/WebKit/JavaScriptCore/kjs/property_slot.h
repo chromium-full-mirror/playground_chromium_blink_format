@@ -115,6 +115,14 @@ class PropertySlot {
     m_getValue = undefinedGetter;
   }
 
+  void setUngettable(JSObject* slotBase)  // Used to signal that you have a
+                                          // property, but trying to get it at
+                                          // this time is an error.
+  {
+    m_slotBase = slotBase;
+    m_getValue = ungettableGetter;
+  }
+
   JSObject* slotBase() const { return m_slotBase; }
 
   const HashEntry* staticEntry() const { return m_data.staticEntry; }
@@ -125,6 +133,10 @@ class PropertySlot {
                                   JSObject*,
                                   const Identifier&,
                                   const PropertySlot&);
+  static JSValue* ungettableGetter(ExecState*,
+                                   JSObject*,
+                                   const Identifier&,
+                                   const PropertySlot&);
   static JSValue* functionGetter(ExecState*,
                                  JSObject*,
                                  const Identifier&,

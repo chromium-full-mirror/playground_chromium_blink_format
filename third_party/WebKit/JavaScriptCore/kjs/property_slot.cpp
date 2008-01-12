@@ -33,6 +33,14 @@ JSValue* PropertySlot::undefinedGetter(ExecState*,
   return jsUndefined();
 }
 
+JSValue* PropertySlot::ungettableGetter(ExecState*,
+                                        JSObject*,
+                                        const Identifier&,
+                                        const PropertySlot&) {
+  ASSERT_NOT_REACHED();
+  return jsUndefined();
+}
+
 JSValue* PropertySlot::functionGetter(ExecState* exec,
                                       JSObject* originalObject,
                                       const Identifier&,
