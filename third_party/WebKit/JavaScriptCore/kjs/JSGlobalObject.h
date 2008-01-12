@@ -28,7 +28,6 @@
 namespace KJS {
 
 class ActivationImp;
-class ActivationStackNode;
 class ArrayObjectImp;
 class ArrayPrototype;
 class BooleanObjectImp;
@@ -66,6 +65,7 @@ class TypeError;
 class TypeErrorPrototype;
 class UriError;
 class UriErrorPrototype;
+struct ActivationStackNode;
 
 enum CompatMode { NativeMode, IECompat, NetscapeCompat };
 
