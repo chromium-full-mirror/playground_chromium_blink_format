@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,6 @@ class SQLiteDatabase : public Noncopyable {
 
   bool open(const String& filename);
   bool isOpen() const { return m_db; }
-  String path() const { return m_path; }
   void close();
 
   bool executeCommand(const String&);
@@ -78,7 +77,6 @@ class SQLiteDatabase : public Noncopyable {
   void setBusyTimeout(int ms);
   void setBusyHandler(int (*)(void*, int));
 
-  // TODO - add pragma and sqlite_master accessors here
   void setFullsync(bool);
 
   // Gets/sets the maximum size in bytes
@@ -111,7 +109,7 @@ class SQLiteDatabase : public Noncopyable {
 
   void setAuthorizer(PassRefPtr<SQLiteAuthorizer>);
 
-  // (un)lock's the database like a mutex
+  // (un)locks the database like a mutex
   void lock();
   void unlock();
 
@@ -127,7 +125,6 @@ class SQLiteDatabase : public Noncopyable {
 
   int pageSize();
 
-  String m_path;
   sqlite3* m_db;
   int m_lastError;
   int m_pageSize;
@@ -141,12 +138,6 @@ class SQLiteDatabase : public Noncopyable {
   ThreadIdentifier m_openingThread;
 
 };  // class SQLiteDatabase
-
-inline String escapeSQLString(const String& s) {
-  String es = s;
-  es.replace('\'', "''");
-  return es;
-}
 
 }  // namespace WebCore
 

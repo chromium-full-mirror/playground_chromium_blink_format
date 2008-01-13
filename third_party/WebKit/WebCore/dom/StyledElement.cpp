@@ -363,7 +363,7 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
   if (attr->decl()->setProperty(id, c, false))
     return;
 
-  String color = c.copy();
+  String color = c;
   // not something that fits the specs.
 
   // we're emulating IEs color parser here. It maps transparent to black,
