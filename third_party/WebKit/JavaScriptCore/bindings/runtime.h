@@ -107,6 +107,9 @@ class Instance : Noncopyable {
   static JSObject* createRuntimeObject(BindingLanguage,
                                        void* nativeInstance,
                                        PassRefPtr<RootObject>);
+  static JSObject* createRuntimeObject(Instance*);
+
+  static Instance* getInstance(JSObject*, BindingLanguage);
 
   void ref() { _refCount++; }
   void deref() {
@@ -152,6 +155,8 @@ class Instance : Noncopyable {
   RootObject* rootObject() const;
 
   virtual ~Instance();
+
+  virtual BindingLanguage getBindingLanguage() const = 0;
 
  protected:
   RefPtr<RootObject> _rootObject;

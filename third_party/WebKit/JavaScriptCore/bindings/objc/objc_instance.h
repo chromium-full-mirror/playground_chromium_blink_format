@@ -71,6 +71,10 @@ class ObjcInstance : public Instance {
   JSValue* numberValue() const;
   JSValue* booleanValue() const;
 
+  virtual BindingLanguage getBindingLanguage() const {
+    return ObjectiveCLanguage;
+  }
+
  private:
   RetainPtr<ObjectStructPtr> _instance;
   mutable ObjcClass* _class;
