@@ -49,9 +49,7 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate {
   virtual HRESULT STDMETHODCALLTYPE createWebViewWithRequest(
       /* [in] */ IWebView* sender,
       /* [in] */ IWebURLRequest* request,
-      /* [retval][out] */ IWebView** newWebView) {
-    return E_NOTIMPL;
-  }
+      /* [retval][out] */ IWebView** newWebView);
 
   virtual HRESULT STDMETHODCALLTYPE webViewShow(
       /* [in] */ IWebView* sender) {
@@ -59,9 +57,7 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate {
   }
 
   virtual HRESULT STDMETHODCALLTYPE webViewClose(
-      /* [in] */ IWebView* sender) {
-    return E_NOTIMPL;
-  }
+      /* [in] */ IWebView* sender);
 
   virtual HRESULT STDMETHODCALLTYPE webViewFocus(
       /* [in] */ IWebView* sender) {
