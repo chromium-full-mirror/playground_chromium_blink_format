@@ -190,7 +190,17 @@ void FrameLoaderClientWx::loadedFromCachedPage() {
 }
 
 void FrameLoaderClientWx::dispatchDidHandleOnloadEvents() {
-  notImplemented();
+  wxWindow* target = m_frame->view()->nativeWindow();
+  if (target) {
+    wxWebViewLoadEvent wkEvent(target);
+    wkEvent.SetState(wxWEBVIEW_LOAD_ONLOAD_HANDLED);
+    wkEvent.SetURL(m_frame->loader()
+                       ->provisionalDocumentLoader()
+                       ->request()
+                       .url()
+                       .string());
+    target->GetEventHandler()->ProcessEvent(wkEvent);
+  }
 }
 
 void FrameLoaderClientWx::dispatchDidReceiveServerRedirectForProvisionalLoad() {
@@ -218,8 +228,8 @@ void FrameLoaderClientWx::dispatchWillClose() {
 void FrameLoaderClientWx::dispatchDidStartProvisionalLoad() {
   wxWindow* target = m_frame->view()->nativeWindow();
   if (target) {
-    wxWebViewStateChangedEvent wkEvent(target);
-    wkEvent.SetState(wxWEBVIEW_STATE_NEGOTIATING);
+    wxWebViewLoadEvent wkEvent(target);
+    wkEvent.SetState(wxWEBVIEW_LOAD_NEGOTIATING);
     wkEvent.SetURL(m_frame->loader()
                        ->provisionalDocumentLoader()
                        ->request()
@@ -238,8 +248,8 @@ void FrameLoaderClientWx::dispatchDidReceiveTitle(const String& title) {
 void FrameLoaderClientWx::dispatchDidCommitLoad() {
   wxWindow* target = m_frame->view()->nativeWindow();
   if (target) {
-    wxWebViewStateChangedEvent wkEvent(target);
-    wkEvent.SetState(wxWEBVIEW_STATE_TRANSFERRING);
+    wxWebViewLoadEvent wkEvent(target);
+    wkEvent.SetState(wxWEBVIEW_LOAD_TRANSFERRING);
     wkEvent.SetURL(
         m_frame->loader()->documentLoader()->request().url().string());
     target->GetEventHandler()->ProcessEvent(wkEvent);
@@ -249,8 +259,8 @@ void FrameLoaderClientWx::dispatchDidCommitLoad() {
 void FrameLoaderClientWx::dispatchDidFinishDocumentLoad() {
   wxWindow* target = m_frame->view()->nativeWindow();
   if (target) {
-    wxWebViewStateChangedEvent wkEvent(target);
-    wkEvent.SetState(wxWEBVIEW_STATE_STOP);
+    wxWebViewLoadEvent wkEvent(target);
+    wkEvent.SetState(wxWEBVIEW_LOAD_DOC_COMPLETED);
     wkEvent.SetURL(m_frame->loader()->url().string());
     target->GetEventHandler()->ProcessEvent(wkEvent);
   }
@@ -303,8 +313,8 @@ void FrameLoaderClientWx::postProgressEstimateChangedNotification() {
 void FrameLoaderClientWx::postProgressFinishedNotification() {
   wxWindow* target = m_frame->view()->nativeWindow();
   if (target) {
-    wxWebViewStateChangedEvent wkEvent(target);
-    wkEvent.SetState(wxWEBVIEW_STATE_STOP);
+    wxWebViewLoadEvent wkEvent(target);
+    wkEvent.SetState(wxWEBVIEW_LOAD_DL_COMPLETED);
     wkEvent.SetURL(m_frame->loader()->url().string());
     target->GetEventHandler()->ProcessEvent(wkEvent);
   }

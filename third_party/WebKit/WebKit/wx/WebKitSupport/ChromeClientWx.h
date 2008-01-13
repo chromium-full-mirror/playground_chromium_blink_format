@@ -37,6 +37,7 @@ namespace WebCore {
 
 class ChromeClientWx : public ChromeClient {
  public:
+  ChromeClientWx(wxWebView*);
   virtual ~ChromeClientWx();
   virtual void chromeDestroyed();
 
@@ -121,6 +122,9 @@ class ChromeClientWx : public ChromeClient {
       SecurityOrigin*,
       const String&,
       unsigned long long);
+
+ private:
+  wxWebView* m_webView;
 };
 }
 #endif  // ChromeClientWx_H
