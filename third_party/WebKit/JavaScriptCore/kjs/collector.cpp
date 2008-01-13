@@ -1,6 +1,5 @@
 // -*- mode: c++; c-basic-offset: 4 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *  Copyright (C) 2007 Eric Seidel <eric@webkit.org>
  *
@@ -59,6 +58,10 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
+
+#if PLATFORM(SOLARIS)
+#include <thread.h>
+#endif
 
 #if HAVE(PTHREAD_NP_H)
 #include <pthread_np.h>
@@ -350,6 +353,10 @@ static inline void* currentThreadStackBase() {
   NT_TIB* pTib;
   asm("movl %%fs:0x18, %0\n" : "=r"(pTib));
   return (void*)pTib->StackBase;
+#elif PLATFORM(SOLARIS)
+  stack_t s;
+  thr_stksegment(&s);
+  return s.ss_sp;
 #elif PLATFORM(UNIX)
   static void* stackBase = 0;
   static size_t stackSize = 0;
@@ -367,12 +374,12 @@ static inline void* currentThreadStackBase() {
     pthread_getattr_np(thread, &sattr);
 #endif
     int rc = pthread_attr_getstack(&sattr, &stackBase, &stackSize);
-    (void)rc;  // FIXME: deal with error code somehow?  seems fatal...
+    (void)rc;  // FIXME: Deal with error code somehow? Seems fatal.
     ASSERT(stackBase);
     pthread_attr_destroy(&sattr);
     stackThread = thread;
   }
-  return (void*)(size_t(stackBase) + stackSize);
+  return static_cast<char*>(stackBase) + stackSize;
 #else
 #error Need a way to get the stack base on this platform
 #endif
