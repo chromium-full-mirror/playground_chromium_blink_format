@@ -54,7 +54,7 @@ class NodeSet {
   void reserveCapacity(size_t newCapacity) {
     m_nodes.reserveCapacity(newCapacity);
   }
-  void clear() { m_nodes.resize(0); }
+  void clear() { m_nodes.clear(); }
   void swap(NodeSet& other) {
     std::swap(m_isSorted, other.m_isSorted);
     m_nodes.swap(other.m_nodes);

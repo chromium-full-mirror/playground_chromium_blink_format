@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2006 Alexey Proskuryakov <ap@nypop.com>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -314,7 +314,7 @@ CString TextCodecMac::encode(const UChar* characters,
     CFStringGetBytes(cfs, range, m_encoding, lossByte, false, NULL, 0x7FFFFFFF,
                      &bufferLength);
 
-    result.resize(size + bufferLength);
+    result.grow(size + bufferLength);
     unsigned char* buffer =
         reinterpret_cast<unsigned char*>(result.data() + size);
     CFIndex charactersConverted =
@@ -340,7 +340,7 @@ CString TextCodecMac::encode(const UChar* characters,
       char entityBuffer[16];
       sprintf(entityBuffer, "&#%u;", badChar);
       size_t entityLength = strlen(entityBuffer);
-      result.resize(size + entityLength);
+      result.grow(size + entityLength);
       memcpy(result.data() + size, entityBuffer, entityLength);
       size += entityLength;
     }
