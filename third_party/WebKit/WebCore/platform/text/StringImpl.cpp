@@ -32,6 +32,7 @@
 #include "CharacterNames.h"
 #include "FloatConversion.h"
 #include "Length.h"
+#include "StringBuffer.h"
 #include "StringHash.h"
 #include "TextBreakIterator.h"
 #include "TextEncoding.h"

@@ -1085,4 +1085,8 @@ void Element::cancelFocusAppearanceUpdate() {
   if (document()->focusedNode() == this)
     document()->cancelFocusAppearanceUpdate();
 }
+
+bool Element::virtualHasTagName(const QualifiedName& name) const {
+  return hasTagName(name);
+}
 }

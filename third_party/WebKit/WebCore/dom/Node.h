@@ -92,7 +92,7 @@ class Node : public TreeShared<Node> {
 
   // DOM methods & attributes for Node
 
-  virtual bool hasTagName(const QualifiedName& name) const {
+  bool hasTagName(const QualifiedName& name) const {
     return virtualHasTagName(name);
   }
   virtual String nodeName() const = 0;
@@ -560,7 +560,7 @@ class Node : public TreeShared<Node> {
 
   virtual Node* virtualFirstChild() const;
   virtual Node* virtualLastChild() const;
-  virtual bool virtualHasTagName(const QualifiedName&) const { return false; }
+  virtual bool virtualHasTagName(const QualifiedName&) const;
 };
 
 }  // namespace
