@@ -1578,10 +1578,6 @@ int Document::elapsedTime() const {
   return static_cast<int>((currentTime() - m_startTime) * 1000);
 }
 
-void Document::write(const DeprecatedString& text) {
-  write(String(text));
-}
-
 void Document::write(const String& text) {
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())
@@ -1593,7 +1589,7 @@ void Document::write(const String& text) {
     ASSERT(m_tokenizer);
     if (!m_tokenizer)
       return;
-    write(DeprecatedString("<html>"));
+    write("<html>");
   }
   m_tokenizer->write(text, false);
 
@@ -1605,7 +1601,7 @@ void Document::write(const String& text) {
 
 void Document::writeln(const String& text) {
   write(text);
-  write(String("\n"));
+  write("\n");
 }
 
 void Document::finishParsing() {
@@ -2137,7 +2133,7 @@ void Document::recalcStyleSelector() {
 #endif
                    ) {
       Element* e = static_cast<Element*>(n);
-      DeprecatedString title = e->getAttribute(titleAttr).deprecatedString();
+      AtomicString title = e->getAttribute(titleAttr);
       bool enabledViaScript = false;
       if (e->hasLocalName(linkTag)) {
         // <LINK> element
@@ -2159,7 +2155,7 @@ void Document::recalcStyleSelector() {
           continue;
         }
         if (!l->sheet())
-          title = DeprecatedString::null;
+          title = nullAtom;
       }
 
 // Get the current preferred styleset.  This is the
@@ -2185,7 +2181,7 @@ void Document::recalcStyleSelector() {
           // we are NOT an alternate sheet, then establish
           // us as the preferred set.  Otherwise, just ignore
           // this sheet.
-          DeprecatedString rel = e->getAttribute(relAttr).deprecatedString();
+          AtomicString rel = e->getAttribute(relAttr);
           if (e->hasLocalName(styleTag) || !rel.contains("alternate"))
             m_preferredStylesheetSet = m_selectedStylesheetSet = title;
         }
@@ -2195,7 +2191,7 @@ void Document::recalcStyleSelector() {
 
 #if ENABLE(SVG)
         if (!n->isHTMLElement())
-          title = title.replace('&', "&&");
+          title = title.deprecatedString().replace('&', "&&");
 #endif
       }
     }
