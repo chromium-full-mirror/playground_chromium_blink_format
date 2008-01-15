@@ -149,8 +149,7 @@ RenderObject* HTMLFrameSetElement::createRenderer(RenderArena* arena,
 void HTMLFrameSetElement::attach() {
   // Inherit default settings from parent frameset
   // FIXME: This is not dynamic.
-  HTMLElement* node = static_cast<HTMLElement*>(parentNode());
-  while (node) {
+  for (Node* node = parentNode(); node; node = node->parentNode()) {
     if (node->hasTagName(framesetTag)) {
       HTMLFrameSetElement* frameset = static_cast<HTMLFrameSetElement*>(node);
       if (!frameBorderSet)
@@ -165,19 +164,19 @@ void HTMLFrameSetElement::attach() {
         noresize = frameset->noResize();
       break;
     }
-    node = static_cast<HTMLElement*>(node->parentNode());
   }
 
   HTMLElement::attach();
 }
 
 void HTMLFrameSetElement::defaultEventHandler(Event* evt) {
-  if (evt->isMouseEvent() && !noresize && renderer())
+  if (evt->isMouseEvent() && !noresize && renderer()) {
     if (static_cast<RenderFrameSet*>(renderer())
             ->userResize(static_cast<MouseEvent*>(evt))) {
       evt->setDefaultHandled();
       return;
     }
+  }
   HTMLElement::defaultEventHandler(evt);
 }
 
