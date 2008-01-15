@@ -209,7 +209,9 @@ void RenderText::addLineBoxRects(Vector<IntRect>& rects,
   absolutePositionForContent(x, y);
 
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox()) {
-    if (start <= box->start() && box->end() <= end) {
+    // Note: box->end() returns the index of the last character, not the index
+    // past it
+    if (start <= box->start() && box->end() < end) {
       IntRect r = IntRect(x + box->xPos(), y + box->yPos(), box->width(),
                           box->height());
       if (useSelectionHeight) {
@@ -219,9 +221,7 @@ void RenderText::addLineBoxRects(Vector<IntRect>& rects,
       }
       rects.append(r);
     } else {
-      unsigned realEnd =
-          min(box->end() + 1,
-              end);  // box->end() points at the last char, not after it
+      unsigned realEnd = min(box->end() + 1, end);
       IntRect r = box->selectionRect(x, y, start, realEnd);
       if (!r.isEmpty()) {
         if (!useSelectionHeight) {
