@@ -202,7 +202,6 @@ void WKQTMovieViewSetDrawSynchronously(QTMovieView* view, BOOL sync);
 
 CFStringRef WKCopyFoundationCacheDirectory(void);
 
-NSData* WKGetMediaControlBackgroundImageData(void);
 void WKDrawMediaFullscreenButton(CGContextRef context,
                                  CGRect rect,
                                  BOOL active);
@@ -213,6 +212,9 @@ void WKDrawMediaSeekBackButton(CGContextRef context, CGRect rect, BOOL active);
 void WKDrawMediaSeekForwardButton(CGContextRef context,
                                   CGRect rect,
                                   BOOL active);
+void WKDrawMediaSliderTrack(CGContextRef context,
+                            CGRect rect,
+                            float percentLoaded);
 void WKDrawMediaSliderThumb(CGContextRef context, CGRect rect, BOOL active);
 void WKDrawMediaUnMuteButton(CGContextRef context, CGRect rect, BOOL active);
 

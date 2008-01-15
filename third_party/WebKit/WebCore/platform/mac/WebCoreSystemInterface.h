@@ -120,7 +120,6 @@ extern BOOL (*wkGetGlyphTransformedAdvances)(CGFontRef,
 extern ATSLayoutRecord* (*wkGetGlyphVectorFirstRecord)(void* glyphVector);
 extern int (*wkGetGlyphVectorNumGlyphs)(void* glyphVector);
 extern size_t (*wkGetGlyphVectorRecordSize)(void* glyphVector);
-extern NSData* (*wkGetMediaControlBackgroundImageData)(void);
 extern void (*wkDrawMediaFullscreenButton)(CGContextRef context,
                                            CGRect rect,
                                            BOOL active);
@@ -139,6 +138,9 @@ extern void (*wkDrawMediaSeekBackButton)(CGContextRef context,
 extern void (*wkDrawMediaSeekForwardButton)(CGContextRef context,
                                             CGRect rect,
                                             BOOL active);
+extern void (*wkDrawMediaSliderTrack)(CGContextRef context,
+                                      CGRect rect,
+                                      float percentLoaded);
 extern void (*wkDrawMediaSliderThumb)(CGContextRef context,
                                       CGRect rect,
                                       BOOL active);

@@ -25,7 +25,14 @@
 
 #include "RenderTheme.h"
 
+// If you have an empty placeholder SafariThemeConstants.h, then include
+// SafariTheme.h
+// This is a workaround until a version of WebKitSupportLibrary is released with
+// an updated SafariThemeConstants.h
+#include <SafariTheme/SafariThemeConstants.h>
+#ifndef SafariThemeConstants_h
 #include <SafariTheme/SafariTheme.h>
+#endif
 
 #if PLATFORM(WIN)
 typedef void* HANDLE;
@@ -179,9 +186,6 @@ class RenderThemeSafari : public RenderTheme {
                                       const IntRect&);
 
 #if ENABLE(VIDEO)
-  virtual bool paintMediaBackground(RenderObject*,
-                                    const RenderObject::PaintInfo&,
-                                    const IntRect&);
   virtual bool paintMediaFullscreenButton(RenderObject*,
                                           const RenderObject::PaintInfo&,
                                           const IntRect&);
@@ -197,6 +201,9 @@ class RenderThemeSafari : public RenderTheme {
   virtual bool paintMediaSeekForwardButton(RenderObject*,
                                            const RenderObject::PaintInfo&,
                                            const IntRect&);
+  virtual bool paintMediaSliderTrack(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);

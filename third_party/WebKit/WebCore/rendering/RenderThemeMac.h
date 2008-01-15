@@ -186,9 +186,6 @@ class RenderThemeMac : public RenderTheme {
                                              const RenderObject::PaintInfo&,
                                              const IntRect&);
 
-  virtual bool paintMediaBackground(RenderObject*,
-                                    const RenderObject::PaintInfo&,
-                                    const IntRect&);
   virtual bool paintMediaFullscreenButton(RenderObject*,
                                           const RenderObject::PaintInfo&,
                                           const IntRect&);
@@ -204,6 +201,9 @@ class RenderThemeMac : public RenderTheme {
   virtual bool paintMediaSeekForwardButton(RenderObject*,
                                            const RenderObject::PaintInfo&,
                                            const IntRect&);
+  virtual bool paintMediaSliderTrack(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);

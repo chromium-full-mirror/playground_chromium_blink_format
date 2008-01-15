@@ -995,7 +995,6 @@ enum EAppearance {
   ButtonBevelAppearance,
   ListboxAppearance,
   ListItemAppearance,
-  MediaBackgroundAppearance,
   MediaFullscreenButtonAppearance,
   MediaMuteButtonAppearance,
   MediaPlayButtonAppearance,
