@@ -73,6 +73,7 @@ SOFT_LINK(SafariTheme,
            NSControlSize size,
            ThemeControlState state),
           (part, context, rect, size, state))
+#if !defined(SAFARI_THEME_VERSION) || SAFARI_THEME_VERSION < 2
 SOFT_LINK(SafariTheme,
           STPaintProgressIndicator,
           void,
@@ -84,6 +85,7 @@ SOFT_LINK(SafariTheme,
            ThemeControlState state,
            float value),
           (type, context, rect, size, state, value))
+#endif
 
 ThemeControlState RenderThemeSafari::determineState(RenderObject* o) const {
   ThemeControlState result = 0;
