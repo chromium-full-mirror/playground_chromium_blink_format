@@ -104,7 +104,7 @@ static inline Qt::DropAction dragOpToDropAction(unsigned actions) {
 }
 
 QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
-    : q(qq), view(0), lastHoverElement(0), modified(false) {
+    : q(qq), view(0), modified(false) {
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();
   editorClient = new EditorClientQt(q);
@@ -363,11 +363,15 @@ void QWebPagePrivate::mouseMoveEvent(QMouseEvent* ev) {
   WebCore::HitTestResult result =
       QWebFramePrivate::core(mainFrame)->eventHandler()->hitTestResultAtPoint(
           pt, false);
-  WebCore::Element* link = result.URLElement();
-  if (link != lastHoverElement) {
-    lastHoverElement = link;
-    emit q->hoveringOverLink(result.absoluteLinkURL().prettyURL(),
-                             result.title(), result.textContent());
+
+  if (result.absoluteLinkURL() != lastHoverURL ||
+      result.title() != lastHoverTitle ||
+      result.textContent() != lastHoverContent) {
+    lastHoverURL = result.absoluteLinkURL();
+    lastHoverTitle = result.title();
+    lastHoverContent = result.textContent();
+    emit q->hoveringOverLink(lastHoverURL.prettyURL(), lastHoverTitle,
+                             lastHoverContent);
   }
 }
 

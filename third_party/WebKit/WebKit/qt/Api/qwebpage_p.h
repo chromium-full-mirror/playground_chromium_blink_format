@@ -30,6 +30,9 @@
 #include "qwebhistory.h"
 #include "qwebframe.h"
 
+#include "KURL.h"
+#include "PlatformString.h"
+
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
@@ -123,7 +126,10 @@ class QWebPagePrivate {
   QWebPage* q;
   QUndoStack* undoStack;
   QWidget* view;
-  WebCore::Element* lastHoverElement;
+
+  WebCore::KURL lastHoverURL;
+  WebCore::String lastHoverTitle;
+  WebCore::String lastHoverContent;
 
   bool modified;
 
