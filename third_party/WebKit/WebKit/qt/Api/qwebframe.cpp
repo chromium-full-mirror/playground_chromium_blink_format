@@ -94,7 +94,6 @@ void QWebFramePrivate::init(QWebFrame* qframe,
 
   frame->setView(frameView.get());
   frame->init();
-  eventHandler = frame->eventHandler();
 
   QObject::connect(
       q,
