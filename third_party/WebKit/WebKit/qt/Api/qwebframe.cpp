@@ -520,6 +520,15 @@ QString QWebFrame::evaluateJavaScript(const QString& scriptSource) {
   return rc;
 }
 
+WebCore::Frame* QWebFramePrivate::core(QWebFrame* webFrame) {
+  return webFrame->d->frame.get();
+}
+
+QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
+  return static_cast<FrameLoaderClientQt*>(coreFrame->loader()->client())
+      ->webFrame();
+}
+
 /*!
   \fn void QWebFrame::cleared()
 
