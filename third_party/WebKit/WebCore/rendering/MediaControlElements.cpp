@@ -163,6 +163,8 @@ void MediaControlSeekButtonElement::defaultEventHandler(Event* event) {
       m_capturing = true;
       frame->eventHandler()->setCapturingMouseEventsNode(this);
     }
+    ExceptionCode ec;
+    m_mediaElement->pause(ec);
     m_seekTimer.startRepeating(cSeekRepeatDelay);
     event->defaultHandled();
   } else if (event->type() == mouseupEvent) {
@@ -179,7 +181,6 @@ void MediaControlSeekButtonElement::defaultEventHandler(Event* event) {
                                        ec);
       }
       m_seekTimer.stop();
-      m_mediaElement->pause(ec);
       m_seeking = false;
       event->defaultHandled();
     }
