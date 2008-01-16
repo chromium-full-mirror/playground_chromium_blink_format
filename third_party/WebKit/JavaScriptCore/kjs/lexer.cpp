@@ -80,7 +80,7 @@ Lexer::Lexer()
       pos(0),
       code(0),
       length(0),
-      bol(true),
+      atLineStart(true),
       current(0),
       next1(0),
       next2(0),
@@ -106,7 +106,7 @@ void Lexer::setCode(int startingLineNumber,
   skipLF = false;
   skipCR = false;
   error = false;
-  bol = true;
+  atLineStart = true;
 
   // read first characters
   current = (length > 0) ? code[0].uc : -1;
@@ -131,7 +131,7 @@ void Lexer::shift(unsigned int p) {
 // called on each new line
 void Lexer::nextLine() {
   yylineno++;
-  bol = true;
+  atLineStart = true;
 }
 
 void Lexer::setDone(State s) {
@@ -217,7 +217,8 @@ int Lexer::lex() {
           shift(3);
           state = InSingleLineComment;
           // same for -->
-        } else if (bol && current == '-' && next1 == '-' && next2 == '>') {
+        } else if (atLineStart && current == '-' && next1 == '-' &&
+                   next2 == '>') {
           shift(2);
           state = InSingleLineComment;
         } else {
@@ -456,7 +457,7 @@ int Lexer::lex() {
     if (!done)
       shift(1);
     if (state != Start && state != InSingleLineComment)
-      bol = false;
+      atLineStart = false;
   }
 
   // no identifiers allowed directly after numeric literal, e.g. "3in" is bad

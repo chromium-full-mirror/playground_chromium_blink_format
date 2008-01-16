@@ -131,7 +131,7 @@ class Lexer : Noncopyable {
   const UChar* code;
   unsigned int length;
   int yycolumn;
-  int bol;  // begin of line
+  int atLineStart;
   bool error;
 
   // current and following unicode characters (int to allow for -1 for
