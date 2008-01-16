@@ -832,8 +832,7 @@ QObject* QWebPage::createPlugin(const QString& classid,
 
 static WebCore::FrameLoadRequest frameLoadRequest(const QUrl& url,
                                                   WebCore::Frame* frame) {
-  WebCore::ResourceRequest rr(WebCore::KURL(url.toString()),
-                              frame->loader()->outgoingReferrer());
+  WebCore::ResourceRequest rr(url, frame->loader()->outgoingReferrer());
   return WebCore::FrameLoadRequest(rr);
 }
 
@@ -879,8 +878,7 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
       break;
     case DownloadLinkToDisk:
     case CopyLinkToClipboard:
-      editor->copyURL(WebCore::KURL(d->currentContext.linkUrl().toString()),
-                      d->currentContext.text());
+      editor->copyURL(d->currentContext.linkUrl(), d->currentContext.text());
       break;
     case OpenImageInNewWindow:
       openNewWindow(d->currentContext.imageUrl(), frame);

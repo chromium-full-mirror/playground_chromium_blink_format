@@ -36,6 +36,7 @@ class Settings;
 
 class QWebPage;
 class QWebSettingsPrivate;
+class QUrl;
 
 class QWEBKIT_EXPORT QWebSettings {
  public:
@@ -84,8 +85,8 @@ class QWEBKIT_EXPORT QWebSettings {
   bool testAttribute(WebAttribute attr) const;
   void clearAttribute(WebAttribute attr);
 
-  void setUserStyleSheetLocation(const QString& location);
-  QString userStyleSheetLocation() const;
+  void setUserStyleSheetLocation(const QUrl& location);
+  QUrl userStyleSheetLocation() const;
 
   static void setIconDatabaseEnabled(bool enabled,
                                      const QString& location = QString());

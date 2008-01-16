@@ -282,7 +282,7 @@ void QWebFrame::load(const QWebNetworkRequest& req) {
   QHttpRequestHeader httpHeader = req.httpHeader();
   QByteArray postData = req.postData();
 
-  WebCore::ResourceRequest request(KURL(url.toString()));
+  WebCore::ResourceRequest request(url);
 
   QString method = httpHeader.method();
   if (!method.isEmpty())
@@ -320,7 +320,7 @@ void QWebFrame::load(const QNetworkRequest& req,
 
   QUrl url = req.url();
 
-  WebCore::ResourceRequest request(KURL(url.toString()));
+  WebCore::ResourceRequest request(url);
 
   switch (operation) {
     case QNetworkAccessManager::HeadOperation:
@@ -366,7 +366,7 @@ void QWebFrame::load(const QNetworkRequest& req,
   URLs in the document.
 */
 void QWebFrame::setHtml(const QString& html, const QUrl& baseUrl) {
-  KURL kurl(baseUrl.toString());
+  KURL kurl(baseUrl);
   WebCore::ResourceRequest request(kurl);
   WTF::RefPtr<WebCore::SharedBuffer> data = new WebCore::SharedBuffer(
       reinterpret_cast<const uchar*>(html.unicode()), html.length() * 2);
@@ -390,7 +390,7 @@ void QWebFrame::setHtml(const QByteArray& html, const QUrl& baseUrl) {
 void QWebFrame::setContent(const QByteArray& data,
                            const QString& mimeType,
                            const QUrl& baseUrl) {
-  KURL kurl(baseUrl.toString());
+  KURL kurl(baseUrl);
   WebCore::ResourceRequest request(kurl);
   WTF::RefPtr<WebCore::SharedBuffer> buffer =
       new WebCore::SharedBuffer(data.constData(), data.length());
