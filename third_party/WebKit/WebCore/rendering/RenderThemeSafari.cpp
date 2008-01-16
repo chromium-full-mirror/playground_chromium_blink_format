@@ -210,8 +210,7 @@ bool RenderThemeSafari::isControlStyled(const RenderStyle* style,
       style->appearance() == ListboxAppearance)
     return style->border() != border;
 #if !defined(SAFARI_THEME_VERSION) || SAFARI_THEME_VERSION < 2
-  if (style->appearance() == MediaBackgroundAppearance ||
-      style->appearance() == MediaFullscreenButtonAppearance ||
+  if (style->appearance() == MediaFullscreenButtonAppearance ||
       style->appearance() == MediaMuteButtonAppearance ||
       style->appearance() == MediaPlayButtonAppearance ||
       style->appearance() == MediaSeekBackButtonAppearance ||
