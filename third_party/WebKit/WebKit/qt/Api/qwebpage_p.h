@@ -38,6 +38,7 @@ class ContextMenuClientQt;
 class ContextMenuItem;
 class ContextMenu;
 class EditorClientQt;
+class Element;
 class Node;
 class Page;
 }
@@ -122,6 +123,7 @@ class QWebPagePrivate {
   QWebPage* q;
   QUndoStack* undoStack;
   QWidget* view;
+  WebCore::Element* lastHoverElement;
 
   bool modified;
 

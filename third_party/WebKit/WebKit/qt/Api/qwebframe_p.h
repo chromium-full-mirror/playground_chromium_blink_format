@@ -34,7 +34,6 @@
 #include "wtf/RefPtr.h"
 
 namespace WebCore {
-class Element;
 class FrameLoaderClientQt;
 class Frame;
 class FrameView;
@@ -58,12 +57,7 @@ class QWebFrameData {
 class QWebFramePrivate {
  public:
   QWebFramePrivate()
-      : q(0),
-        frameLoaderClient(0),
-        frame(0),
-        frameView(0),
-        page(0),
-        lastHoverElement(0) {}
+      : q(0), frameLoaderClient(0), frame(0), frameView(0), page(0) {}
   void init(QWebFrame* qframe, WebCore::Page* page, QWebFrameData* frameData);
 
   inline QWebFrame* parentFrame() {
@@ -83,7 +77,6 @@ class QWebFramePrivate {
   WTF::RefPtr<WebCore::Frame> frame;
   WTF::RefPtr<WebCore::FrameView> frameView;
   QWebPage* page;
-  WebCore::Element* lastHoverElement;
 };
 
 #endif
