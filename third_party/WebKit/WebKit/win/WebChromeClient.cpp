@@ -343,6 +343,8 @@ bool WebChromeClient::runJavaScriptPrompt(Frame*,
   if (FAILED(m_webView->uiDelegate(&ui)))
     return false;
 
+  TimerBase::fireTimersInNestedEventLoop();
+
   BSTR resultBSTR = 0;
   if (FAILED(ui->runJavaScriptTextInputPanelWithPrompt(
           m_webView, BString(message), BString(defaultValue), &resultBSTR)))
