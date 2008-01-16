@@ -64,6 +64,7 @@ QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle)
 }
 
 void QNetworkReplyHandler::abort() {
+  m_resourceHandle = 0;
   if (m_reply) {
     disconnect(m_reply, 0, this, 0);
     m_reply->abort();
@@ -74,6 +75,8 @@ void QNetworkReplyHandler::abort() {
 void QNetworkReplyHandler::finish() {
   sendResponseIfNeeded();
 
+  if (!m_resourceHandle)
+    return;
   ResourceHandleClient* client = m_resourceHandle->client();
   m_reply->deleteLater();
   if (!client)
@@ -94,7 +97,7 @@ void QNetworkReplyHandler::finish() {
 }
 
 void QNetworkReplyHandler::sendResponseIfNeeded() {
-  if (m_responseSent)
+  if (m_responseSent || !m_resourceHandle)
     return;
   m_responseSent = true;
 
@@ -164,6 +167,9 @@ void QNetworkReplyHandler::forwardData() {
 
   // don't emit the "Document has moved here" type of HTML
   if (m_redirected)
+    return;
+
+  if (!m_resourceHandle)
     return;
 
   QByteArray data = m_reply->read(m_reply->bytesAvailable());
