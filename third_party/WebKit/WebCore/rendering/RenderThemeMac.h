@@ -277,7 +277,6 @@ class RenderThemeMac : public RenderTheme {
   mutable RetainPtr<NSSliderCell> m_sliderThumbHorizontal;
   mutable RetainPtr<NSSliderCell> m_sliderThumbVertical;
   mutable Image* m_resizeCornerImage;
-  mutable Image* m_mediaControlBackgroundImage;
 
   bool m_isSliderThumbHorizontalPressed;
   bool m_isSliderThumbVerticalPressed;
