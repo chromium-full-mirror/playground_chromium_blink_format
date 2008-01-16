@@ -79,14 +79,11 @@ bool JSDOMWindow::customGetOwnPropertySlot(KJS::ExecState* exec,
         propertyName);
     if (entry) {
       if (entry->attr & KJS::Function) {
-        if (entry->value.functionValue ==
-                &JSDOMWindowPrototypeFunctionFocus::create ||
+        if (entry->value.functionValue == jsDOMWindowPrototypeFunctionFocus ||
+            entry->value.functionValue == jsDOMWindowPrototypeFunctionBlur ||
+            entry->value.functionValue == jsDOMWindowPrototypeFunctionClose ||
             entry->value.functionValue ==
-                &JSDOMWindowPrototypeFunctionBlur::create ||
-            entry->value.functionValue ==
-                &JSDOMWindowPrototypeFunctionClose::create ||
-            entry->value.functionValue ==
-                &JSDOMWindowPrototypeFunctionPostMessage::create)
+                jsDOMWindowPrototypeFunctionPostMessage)
           slot.setStaticEntry(this, entry, KJS::staticFunctionGetter);
         else {
           if (!allowsAccessFrom(exec))

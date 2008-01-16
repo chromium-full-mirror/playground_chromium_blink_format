@@ -391,81 +391,50 @@ const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, &dateTable};
 /* Source for date_object.lut.h
    FIXMEL We could use templates to simplify the UTC variants.
 @begin dateTable 61
-  toString              &DateProtoFuncToString::create DontEnum|Function       0
-  toUTCString           &DateProtoFuncToUTCString::create
-DontEnum|Function       0
-  toDateString          &DateProtoFuncToDateString::create
-DontEnum|Function       0
-  toTimeString          &DateProtoFuncToTimeString::create
-DontEnum|Function       0
-  toLocaleString        &DateProtoFuncToLocaleString::create
-DontEnum|Function       0
-  toLocaleDateString    &DateProtoFuncToLocaleDateString::create
-DontEnum|Function       0
-  toLocaleTimeString    &DateProtoFuncToLocaleTimeString::create
-DontEnum|Function       0
-  valueOf               &DateProtoFuncValueOf::create DontEnum|Function       0
-  getTime               &DateProtoFuncGetTime::create DontEnum|Function       0
-  getFullYear           &DateProtoFuncGetFullYear::create
-DontEnum|Function       0
-  getUTCFullYear        &DateProtoFuncGetUTCFullYear::create
-DontEnum|Function       0
-  toGMTString           &DateProtoFuncToGMTString::create
-DontEnum|Function       0
-  getMonth              &DateProtoFuncGetMonth::create DontEnum|Function       0
-  getUTCMonth           &DateProtoFuncGetUTCMonth::create
-DontEnum|Function       0
-  getDate               &DateProtoFuncGetDate::create DontEnum|Function       0
-  getUTCDate            &DateProtoFuncGetUTCDate::create
-DontEnum|Function       0
-  getDay                &DateProtoFuncGetDay::create DontEnum|Function       0
-  getUTCDay             &DateProtoFuncGetUTCDay::create
-DontEnum|Function       0
-  getHours              &DateProtoFuncGetHours::create DontEnum|Function       0
-  getUTCHours           &DateProtoFuncGetUTCHours::create
-DontEnum|Function       0
-  getMinutes            &DateProtoFuncGetMinutes::create
-DontEnum|Function       0
-  getUTCMinutes         &DateProtoFuncGetUTCMinutes::create
-DontEnum|Function       0
-  getSeconds            &DateProtoFuncGetSeconds::create
-DontEnum|Function       0
-  getUTCSeconds         &DateProtoFuncGetUTCSeconds::create
-DontEnum|Function       0
-  getMilliseconds       &DateProtoFuncGetMilliSeconds::create
-DontEnum|Function       0
-  getUTCMilliseconds    &DateProtoFuncGetUTCMilliseconds::create
-DontEnum|Function       0
-  getTimezoneOffset     &DateProtoFuncGetTimezoneOffset::create
-DontEnum|Function       0
-  setTime               &DateProtoFuncSetTime::create DontEnum|Function       1
-  setMilliseconds       &DateProtoFuncSetMilliSeconds::create
-DontEnum|Function       1
-  setUTCMilliseconds    &DateProtoFuncSetUTCMilliseconds::create
-DontEnum|Function       1
-  setSeconds            &DateProtoFuncSetSeconds::create
-DontEnum|Function       2
-  setUTCSeconds         &DateProtoFuncSetUTCSeconds::create
-DontEnum|Function       2
-  setMinutes            &DateProtoFuncSetMinutes::create
-DontEnum|Function       3
-  setUTCMinutes         &DateProtoFuncSetUTCMinutes::create
-DontEnum|Function       3
-  setHours              &DateProtoFuncSetHours::create DontEnum|Function       4
-  setUTCHours           &DateProtoFuncSetUTCHours::create
-DontEnum|Function       4
-  setDate               &DateProtoFuncSetDate::create DontEnum|Function       1
-  setUTCDate            &DateProtoFuncSetUTCDate::create
-DontEnum|Function       1
-  setMonth              &DateProtoFuncSetMonth::create DontEnum|Function       2
-  setUTCMonth           &DateProtoFuncSetUTCMonth::create
-DontEnum|Function       2
-  setFullYear           &DateProtoFuncSetFullYear::create
-DontEnum|Function       3
-  setUTCFullYear        &DateProtoFuncSetUTCFullYear::create
-DontEnum|Function       3
-  setYear               &DateProtoFuncSetYear::create DontEnum|Function       1
-  getYear               &DateProtoFuncGetYear::create DontEnum|Function       0
+  toString              dateProtoFuncToString                DontEnum|Function 0
+  toUTCString           dateProtoFuncToUTCString             DontEnum|Function 0
+  toDateString          dateProtoFuncToDateString            DontEnum|Function 0
+  toTimeString          dateProtoFuncToTimeString            DontEnum|Function 0
+  toLocaleString        dateProtoFuncToLocaleString          DontEnum|Function 0
+  toLocaleDateString    dateProtoFuncToLocaleDateString      DontEnum|Function 0
+  toLocaleTimeString    dateProtoFuncToLocaleTimeString      DontEnum|Function 0
+  valueOf               dateProtoFuncValueOf                 DontEnum|Function 0
+  getTime               dateProtoFuncGetTime                 DontEnum|Function 0
+  getFullYear           dateProtoFuncGetFullYear             DontEnum|Function 0
+  getUTCFullYear        dateProtoFuncGetUTCFullYear          DontEnum|Function 0
+  toGMTString           dateProtoFuncToGMTString             DontEnum|Function 0
+  getMonth              dateProtoFuncGetMonth                DontEnum|Function 0
+  getUTCMonth           dateProtoFuncGetUTCMonth             DontEnum|Function 0
+  getDate               dateProtoFuncGetDate                 DontEnum|Function 0
+  getUTCDate            dateProtoFuncGetUTCDate              DontEnum|Function 0
+  getDay                dateProtoFuncGetDay                  DontEnum|Function 0
+  getUTCDay             dateProtoFuncGetUTCDay               DontEnum|Function 0
+  getHours              dateProtoFuncGetHours                DontEnum|Function 0
+  getUTCHours           dateProtoFuncGetUTCHours             DontEnum|Function 0
+  getMinutes            dateProtoFuncGetMinutes              DontEnum|Function 0
+  getUTCMinutes         dateProtoFuncGetUTCMinutes           DontEnum|Function 0
+  getSeconds            dateProtoFuncGetSeconds              DontEnum|Function 0
+  getUTCSeconds         dateProtoFuncGetUTCSeconds           DontEnum|Function 0
+  getMilliseconds       dateProtoFuncGetMilliSeconds         DontEnum|Function 0
+  getUTCMilliseconds    dateProtoFuncGetUTCMilliseconds      DontEnum|Function 0
+  getTimezoneOffset     dateProtoFuncGetTimezoneOffset       DontEnum|Function 0
+  setTime               dateProtoFuncSetTime                 DontEnum|Function 1
+  setMilliseconds       dateProtoFuncSetMilliSeconds         DontEnum|Function 1
+  setUTCMilliseconds    dateProtoFuncSetUTCMilliseconds      DontEnum|Function 1
+  setSeconds            dateProtoFuncSetSeconds              DontEnum|Function 2
+  setUTCSeconds         dateProtoFuncSetUTCSeconds           DontEnum|Function 2
+  setMinutes            dateProtoFuncSetMinutes              DontEnum|Function 3
+  setUTCMinutes         dateProtoFuncSetUTCMinutes           DontEnum|Function 3
+  setHours              dateProtoFuncSetHours                DontEnum|Function 4
+  setUTCHours           dateProtoFuncSetUTCHours             DontEnum|Function 4
+  setDate               dateProtoFuncSetDate                 DontEnum|Function 1
+  setUTCDate            dateProtoFuncSetUTCDate              DontEnum|Function 1
+  setMonth              dateProtoFuncSetMonth                DontEnum|Function 2
+  setUTCMonth           dateProtoFuncSetUTCMonth             DontEnum|Function 2
+  setFullYear           dateProtoFuncSetFullYear             DontEnum|Function 3
+  setUTCFullYear        dateProtoFuncSetUTCFullYear          DontEnum|Function 3
+  setYear               dateProtoFuncSetYear                 DontEnum|Function 1
+  getYear               dateProtoFuncGetYear                 DontEnum|Function 0
 @end
 */
 // ECMA 15.9.4
@@ -992,9 +961,9 @@ double timeClip(double t) {
 
 // Functions
 
-JSValue* DateProtoFuncToString::callAsFunction(ExecState* exec,
-                                               JSObject* thisObj,
-                                               const List&) {
+JSValue* dateProtoFuncToString(ExecState* exec,
+                               JSObject* thisObj,
+                               const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1011,9 +980,9 @@ JSValue* DateProtoFuncToString::callAsFunction(ExecState* exec,
   return jsString(formatDate(t) + " " + formatTime(t, utc));
 }
 
-JSValue* DateProtoFuncToUTCString::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List&) {
+JSValue* dateProtoFuncToUTCString(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1030,9 +999,9 @@ JSValue* DateProtoFuncToUTCString::callAsFunction(ExecState* exec,
   return jsString(formatDateUTCVariant(t) + " " + formatTime(t, utc));
 }
 
-JSValue* DateProtoFuncToDateString::callAsFunction(ExecState* exec,
-                                                   JSObject* thisObj,
-                                                   const List&) {
+JSValue* dateProtoFuncToDateString(ExecState* exec,
+                                   JSObject* thisObj,
+                                   const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1049,9 +1018,9 @@ JSValue* DateProtoFuncToDateString::callAsFunction(ExecState* exec,
   return jsString(formatDate(t));
 }
 
-JSValue* DateProtoFuncToTimeString::callAsFunction(ExecState* exec,
-                                                   JSObject* thisObj,
-                                                   const List&) {
+JSValue* dateProtoFuncToTimeString(ExecState* exec,
+                                   JSObject* thisObj,
+                                   const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1068,9 +1037,9 @@ JSValue* DateProtoFuncToTimeString::callAsFunction(ExecState* exec,
   return jsString(formatTime(t, utc));
 }
 
-JSValue* DateProtoFuncToLocaleString::callAsFunction(ExecState* exec,
-                                                     JSObject* thisObj,
-                                                     const List& args) {
+JSValue* dateProtoFuncToLocaleString(ExecState* exec,
+                                     JSObject* thisObj,
+                                     const List& args) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1094,9 +1063,9 @@ JSValue* DateProtoFuncToLocaleString::callAsFunction(ExecState* exec,
 #endif
 }
 
-JSValue* DateProtoFuncToLocaleDateString::callAsFunction(ExecState* exec,
-                                                         JSObject* thisObj,
-                                                         const List& args) {
+JSValue* dateProtoFuncToLocaleDateString(ExecState* exec,
+                                         JSObject* thisObj,
+                                         const List& args) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1120,9 +1089,9 @@ JSValue* DateProtoFuncToLocaleDateString::callAsFunction(ExecState* exec,
 #endif
 }
 
-JSValue* DateProtoFuncToLocaleTimeString::callAsFunction(ExecState* exec,
-                                                         JSObject* thisObj,
-                                                         const List& args) {
+JSValue* dateProtoFuncToLocaleTimeString(ExecState* exec,
+                                         JSObject* thisObj,
+                                         const List& args) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1146,9 +1115,7 @@ JSValue* DateProtoFuncToLocaleTimeString::callAsFunction(ExecState* exec,
 #endif
 }
 
-JSValue* DateProtoFuncValueOf::callAsFunction(ExecState* exec,
-                                              JSObject* thisObj,
-                                              const List&) {
+JSValue* dateProtoFuncValueOf(ExecState* exec, JSObject* thisObj, const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1161,9 +1128,7 @@ JSValue* DateProtoFuncValueOf::callAsFunction(ExecState* exec,
   return jsNumber(milli);
 }
 
-JSValue* DateProtoFuncGetTime::callAsFunction(ExecState* exec,
-                                              JSObject* thisObj,
-                                              const List&) {
+JSValue* dateProtoFuncGetTime(ExecState* exec, JSObject* thisObj, const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1176,9 +1141,9 @@ JSValue* DateProtoFuncGetTime::callAsFunction(ExecState* exec,
   return jsNumber(milli);
 }
 
-JSValue* DateProtoFuncGetFullYear::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List&) {
+JSValue* dateProtoFuncGetFullYear(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1195,9 +1160,9 @@ JSValue* DateProtoFuncGetFullYear::callAsFunction(ExecState* exec,
   return jsNumber(1900 + t.year);
 }
 
-JSValue* DateProtoFuncGetUTCFullYear::callAsFunction(ExecState* exec,
-                                                     JSObject* thisObj,
-                                                     const List&) {
+JSValue* dateProtoFuncGetUTCFullYear(ExecState* exec,
+                                     JSObject* thisObj,
+                                     const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1214,9 +1179,9 @@ JSValue* DateProtoFuncGetUTCFullYear::callAsFunction(ExecState* exec,
   return jsNumber(1900 + t.year);
 }
 
-JSValue* DateProtoFuncToGMTString::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List&) {
+JSValue* dateProtoFuncToGMTString(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1233,9 +1198,9 @@ JSValue* DateProtoFuncToGMTString::callAsFunction(ExecState* exec,
   return jsString(formatDateUTCVariant(t) + " " + formatTime(t, utc));
 }
 
-JSValue* DateProtoFuncGetMonth::callAsFunction(ExecState* exec,
-                                               JSObject* thisObj,
-                                               const List&) {
+JSValue* dateProtoFuncGetMonth(ExecState* exec,
+                               JSObject* thisObj,
+                               const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1252,9 +1217,9 @@ JSValue* DateProtoFuncGetMonth::callAsFunction(ExecState* exec,
   return jsNumber(t.month);
 }
 
-JSValue* DateProtoFuncGetUTCMonth::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List&) {
+JSValue* dateProtoFuncGetUTCMonth(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1271,9 +1236,7 @@ JSValue* DateProtoFuncGetUTCMonth::callAsFunction(ExecState* exec,
   return jsNumber(t.month);
 }
 
-JSValue* DateProtoFuncGetDate::callAsFunction(ExecState* exec,
-                                              JSObject* thisObj,
-                                              const List&) {
+JSValue* dateProtoFuncGetDate(ExecState* exec, JSObject* thisObj, const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1290,9 +1253,9 @@ JSValue* DateProtoFuncGetDate::callAsFunction(ExecState* exec,
   return jsNumber(t.monthDay);
 }
 
-JSValue* DateProtoFuncGetUTCDate::callAsFunction(ExecState* exec,
-                                                 JSObject* thisObj,
-                                                 const List&) {
+JSValue* dateProtoFuncGetUTCDate(ExecState* exec,
+                                 JSObject* thisObj,
+                                 const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1309,9 +1272,7 @@ JSValue* DateProtoFuncGetUTCDate::callAsFunction(ExecState* exec,
   return jsNumber(t.monthDay);
 }
 
-JSValue* DateProtoFuncGetDay::callAsFunction(ExecState* exec,
-                                             JSObject* thisObj,
-                                             const List&) {
+JSValue* dateProtoFuncGetDay(ExecState* exec, JSObject* thisObj, const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1328,9 +1289,9 @@ JSValue* DateProtoFuncGetDay::callAsFunction(ExecState* exec,
   return jsNumber(t.weekDay);
 }
 
-JSValue* DateProtoFuncGetUTCDay::callAsFunction(ExecState* exec,
-                                                JSObject* thisObj,
-                                                const List&) {
+JSValue* dateProtoFuncGetUTCDay(ExecState* exec,
+                                JSObject* thisObj,
+                                const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1347,9 +1308,9 @@ JSValue* DateProtoFuncGetUTCDay::callAsFunction(ExecState* exec,
   return jsNumber(t.weekDay);
 }
 
-JSValue* DateProtoFuncGetHours::callAsFunction(ExecState* exec,
-                                               JSObject* thisObj,
-                                               const List&) {
+JSValue* dateProtoFuncGetHours(ExecState* exec,
+                               JSObject* thisObj,
+                               const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1366,9 +1327,9 @@ JSValue* DateProtoFuncGetHours::callAsFunction(ExecState* exec,
   return jsNumber(t.hour);
 }
 
-JSValue* DateProtoFuncGetUTCHours::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List&) {
+JSValue* dateProtoFuncGetUTCHours(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1385,9 +1346,9 @@ JSValue* DateProtoFuncGetUTCHours::callAsFunction(ExecState* exec,
   return jsNumber(t.hour);
 }
 
-JSValue* DateProtoFuncGetMinutes::callAsFunction(ExecState* exec,
-                                                 JSObject* thisObj,
-                                                 const List&) {
+JSValue* dateProtoFuncGetMinutes(ExecState* exec,
+                                 JSObject* thisObj,
+                                 const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1404,9 +1365,9 @@ JSValue* DateProtoFuncGetMinutes::callAsFunction(ExecState* exec,
   return jsNumber(t.minute);
 }
 
-JSValue* DateProtoFuncGetUTCMinutes::callAsFunction(ExecState* exec,
-                                                    JSObject* thisObj,
-                                                    const List&) {
+JSValue* dateProtoFuncGetUTCMinutes(ExecState* exec,
+                                    JSObject* thisObj,
+                                    const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1423,9 +1384,9 @@ JSValue* DateProtoFuncGetUTCMinutes::callAsFunction(ExecState* exec,
   return jsNumber(t.minute);
 }
 
-JSValue* DateProtoFuncGetSeconds::callAsFunction(ExecState* exec,
-                                                 JSObject* thisObj,
-                                                 const List&) {
+JSValue* dateProtoFuncGetSeconds(ExecState* exec,
+                                 JSObject* thisObj,
+                                 const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1442,9 +1403,9 @@ JSValue* DateProtoFuncGetSeconds::callAsFunction(ExecState* exec,
   return jsNumber(t.second);
 }
 
-JSValue* DateProtoFuncGetUTCSeconds::callAsFunction(ExecState* exec,
-                                                    JSObject* thisObj,
-                                                    const List&) {
+JSValue* dateProtoFuncGetUTCSeconds(ExecState* exec,
+                                    JSObject* thisObj,
+                                    const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1461,9 +1422,9 @@ JSValue* DateProtoFuncGetUTCSeconds::callAsFunction(ExecState* exec,
   return jsNumber(t.second);
 }
 
-JSValue* DateProtoFuncGetMilliSeconds::callAsFunction(ExecState* exec,
-                                                      JSObject* thisObj,
-                                                      const List&) {
+JSValue* dateProtoFuncGetMilliSeconds(ExecState* exec,
+                                      JSObject* thisObj,
+                                      const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1478,9 +1439,9 @@ JSValue* DateProtoFuncGetMilliSeconds::callAsFunction(ExecState* exec,
   return jsNumber(ms);
 }
 
-JSValue* DateProtoFuncGetUTCMilliseconds::callAsFunction(ExecState* exec,
-                                                         JSObject* thisObj,
-                                                         const List&) {
+JSValue* dateProtoFuncGetUTCMilliseconds(ExecState* exec,
+                                         JSObject* thisObj,
+                                         const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1495,9 +1456,9 @@ JSValue* DateProtoFuncGetUTCMilliseconds::callAsFunction(ExecState* exec,
   return jsNumber(ms);
 }
 
-JSValue* DateProtoFuncGetTimezoneOffset::callAsFunction(ExecState* exec,
-                                                        JSObject* thisObj,
-                                                        const List&) {
+JSValue* dateProtoFuncGetTimezoneOffset(ExecState* exec,
+                                        JSObject* thisObj,
+                                        const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1514,9 +1475,9 @@ JSValue* DateProtoFuncGetTimezoneOffset::callAsFunction(ExecState* exec,
   return jsNumber(-gmtoffset(t) / minutesPerHour);
 }
 
-JSValue* DateProtoFuncSetTime::callAsFunction(ExecState* exec,
-                                              JSObject* thisObj,
-                                              const List& args) {
+JSValue* dateProtoFuncSetTime(ExecState* exec,
+                              JSObject* thisObj,
+                              const List& args) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1576,107 +1537,107 @@ static JSValue* setNewValueFromDateArgs(ExecState* exec,
   return result;
 }
 
-JSValue* DateProtoFuncSetMilliSeconds::callAsFunction(ExecState* exec,
-                                                      JSObject* thisObj,
-                                                      const List& args) {
+JSValue* dateProtoFuncSetMilliSeconds(ExecState* exec,
+                                      JSObject* thisObj,
+                                      const List& args) {
   const bool inputIsUTC = false;
   return setNewValueFromTimeArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetUTCMilliseconds::callAsFunction(ExecState* exec,
-                                                         JSObject* thisObj,
-                                                         const List& args) {
+JSValue* dateProtoFuncSetUTCMilliseconds(ExecState* exec,
+                                         JSObject* thisObj,
+                                         const List& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetSeconds::callAsFunction(ExecState* exec,
-                                                 JSObject* thisObj,
-                                                 const List& args) {
+JSValue* dateProtoFuncSetSeconds(ExecState* exec,
+                                 JSObject* thisObj,
+                                 const List& args) {
   const bool inputIsUTC = false;
   return setNewValueFromTimeArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetUTCSeconds::callAsFunction(ExecState* exec,
-                                                    JSObject* thisObj,
-                                                    const List& args) {
+JSValue* dateProtoFuncSetUTCSeconds(ExecState* exec,
+                                    JSObject* thisObj,
+                                    const List& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetMinutes::callAsFunction(ExecState* exec,
-                                                 JSObject* thisObj,
-                                                 const List& args) {
+JSValue* dateProtoFuncSetMinutes(ExecState* exec,
+                                 JSObject* thisObj,
+                                 const List& args) {
   const bool inputIsUTC = false;
   return setNewValueFromTimeArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetUTCMinutes::callAsFunction(ExecState* exec,
-                                                    JSObject* thisObj,
-                                                    const List& args) {
+JSValue* dateProtoFuncSetUTCMinutes(ExecState* exec,
+                                    JSObject* thisObj,
+                                    const List& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetHours::callAsFunction(ExecState* exec,
-                                               JSObject* thisObj,
-                                               const List& args) {
+JSValue* dateProtoFuncSetHours(ExecState* exec,
+                               JSObject* thisObj,
+                               const List& args) {
   const bool inputIsUTC = false;
   return setNewValueFromTimeArgs(exec, thisObj, args, 4, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetUTCHours::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List& args) {
+JSValue* dateProtoFuncSetUTCHours(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args) {
   const bool inputIsUTC = true;
   return setNewValueFromTimeArgs(exec, thisObj, args, 4, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetDate::callAsFunction(ExecState* exec,
-                                              JSObject* thisObj,
-                                              const List& args) {
+JSValue* dateProtoFuncSetDate(ExecState* exec,
+                              JSObject* thisObj,
+                              const List& args) {
   const bool inputIsUTC = false;
   return setNewValueFromDateArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetUTCDate::callAsFunction(ExecState* exec,
-                                                 JSObject* thisObj,
-                                                 const List& args) {
+JSValue* dateProtoFuncSetUTCDate(ExecState* exec,
+                                 JSObject* thisObj,
+                                 const List& args) {
   const bool inputIsUTC = true;
   return setNewValueFromDateArgs(exec, thisObj, args, 1, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetMonth::callAsFunction(ExecState* exec,
-                                               JSObject* thisObj,
-                                               const List& args) {
+JSValue* dateProtoFuncSetMonth(ExecState* exec,
+                               JSObject* thisObj,
+                               const List& args) {
   const bool inputIsUTC = false;
   return setNewValueFromDateArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetUTCMonth::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List& args) {
+JSValue* dateProtoFuncSetUTCMonth(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args) {
   const bool inputIsUTC = true;
   return setNewValueFromDateArgs(exec, thisObj, args, 2, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetFullYear::callAsFunction(ExecState* exec,
-                                                  JSObject* thisObj,
-                                                  const List& args) {
+JSValue* dateProtoFuncSetFullYear(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args) {
   const bool inputIsUTC = false;
   return setNewValueFromDateArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetUTCFullYear::callAsFunction(ExecState* exec,
-                                                     JSObject* thisObj,
-                                                     const List& args) {
+JSValue* dateProtoFuncSetUTCFullYear(ExecState* exec,
+                                     JSObject* thisObj,
+                                     const List& args) {
   const bool inputIsUTC = true;
   return setNewValueFromDateArgs(exec, thisObj, args, 3, inputIsUTC);
 }
 
-JSValue* DateProtoFuncSetYear::callAsFunction(ExecState* exec,
-                                              JSObject* thisObj,
-                                              const List& args) {
+JSValue* dateProtoFuncSetYear(ExecState* exec,
+                              JSObject* thisObj,
+                              const List& args) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 
@@ -1700,9 +1661,7 @@ JSValue* DateProtoFuncSetYear::callAsFunction(ExecState* exec,
   return result;
 }
 
-JSValue* DateProtoFuncGetYear::callAsFunction(ExecState* exec,
-                                              JSObject* thisObj,
-                                              const List&) {
+JSValue* dateProtoFuncGetYear(ExecState* exec, JSObject* thisObj, const List&) {
   if (!thisObj->inherits(&DateInstance::info))
     return throwError(exec, TypeError);
 

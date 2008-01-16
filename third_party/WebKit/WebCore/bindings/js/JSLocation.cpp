@@ -41,22 +41,19 @@ const ClassInfo JSLocation::info = {"Location", 0, &JSLocationTable};
 
 /*
 @begin JSLocationTable 12
-  assign        &WebCore::JSLocationProtoFuncAssign::create
-DontDelete|Function 1
-  hash          WebCore::JSLocation::Hash                          DontDelete
-  host          WebCore::JSLocation::Host                          DontDelete
-  hostname      WebCore::JSLocation::Hostname                      DontDelete
-  href          WebCore::JSLocation::Href                          DontDelete
-  pathname      WebCore::JSLocation::Pathname                      DontDelete
-  port          WebCore::JSLocation::Port                          DontDelete
-  protocol      WebCore::JSLocation::Protocol                      DontDelete
-  search        WebCore::JSLocation::Search                        DontDelete
-  toString      &WebCore::JSLocationProtoFuncToString::create
+  assign        WebCore::jsLocationProtoFuncAssign        DontDelete|Function 1
+  hash          WebCore::JSLocation::Hash                 DontDelete
+  host          WebCore::JSLocation::Host                 DontDelete
+  hostname      WebCore::JSLocation::Hostname             DontDelete
+  href          WebCore::JSLocation::Href                 DontDelete
+  pathname      WebCore::JSLocation::Pathname             DontDelete
+  port          WebCore::JSLocation::Port                 DontDelete
+  protocol      WebCore::JSLocation::Protocol             DontDelete
+  search        WebCore::JSLocation::Search               DontDelete
+  toString      WebCore::jsLocationProtoFuncToString
 DontEnum|DontDelete|Function 0
-  replace       &WebCore::JSLocationProtoFuncReplace::create
-DontDelete|Function 1
-  reload        &WebCore::JSLocationProtoFuncReload::create
-DontDelete|Function 0
+  replace       WebCore::jsLocationProtoFuncReplace       DontDelete|Function 1
+  reload        WebCore::jsLocationProtoFuncReload        DontDelete|Function 0
 @end
 */
 
@@ -110,9 +107,9 @@ bool JSLocation::getOwnPropertySlot(ExecState* exec,
 
   const HashEntry* entry = Lookup::findEntry(&JSLocationTable, propertyName);
   if (!entry || !(entry->attr & KJS::Function) ||
-      (entry->value.functionValue != &JSLocationProtoFuncReplace::create &&
-       entry->value.functionValue != &JSLocationProtoFuncReload::create &&
-       entry->value.functionValue != &JSLocationProtoFuncAssign::create)) {
+      (entry->value.functionValue != &jsLocationProtoFuncReplace &&
+       entry->value.functionValue != &jsLocationProtoFuncReload &&
+       entry->value.functionValue != &jsLocationProtoFuncAssign)) {
     if (!window || !window->allowsAccessFrom(exec)) {
       slot.setUndefined(this);
       return true;
@@ -205,9 +202,9 @@ void JSLocation::put(ExecState* exec,
   }
 }
 
-JSValue* JSLocationProtoFuncReplace::callAsFunction(ExecState* exec,
-                                                    JSObject* thisObj,
-                                                    const List& args) {
+JSValue* jsLocationProtoFuncReplace(ExecState* exec,
+                                    JSObject* thisObj,
+                                    const List& args) {
   if (!thisObj->inherits(&JSLocation::info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);
@@ -233,9 +230,9 @@ JSValue* JSLocationProtoFuncReplace::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSLocationProtoFuncReload::callAsFunction(ExecState* exec,
-                                                   JSObject* thisObj,
-                                                   const List& args) {
+JSValue* jsLocationProtoFuncReload(ExecState* exec,
+                                   JSObject* thisObj,
+                                   const List& args) {
   if (!thisObj->inherits(&JSLocation::info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);
@@ -260,9 +257,9 @@ JSValue* JSLocationProtoFuncReload::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSLocationProtoFuncAssign::callAsFunction(ExecState* exec,
-                                                   JSObject* thisObj,
-                                                   const List& args) {
+JSValue* jsLocationProtoFuncAssign(ExecState* exec,
+                                   JSObject* thisObj,
+                                   const List& args) {
   if (!thisObj->inherits(&JSLocation::info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);
@@ -290,9 +287,9 @@ JSValue* JSLocationProtoFuncAssign::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSLocationProtoFuncToString::callAsFunction(ExecState* exec,
-                                                     JSObject* thisObj,
-                                                     const List& args) {
+JSValue* jsLocationProtoFuncToString(ExecState* exec,
+                                     JSObject* thisObj,
+                                     const List& args) {
   if (!thisObj->inherits(&JSLocation::info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);

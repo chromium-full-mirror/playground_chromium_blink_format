@@ -170,6 +170,20 @@ class Arguments : public JSObject {
   mutable IndexToNameMap indexToNameMap;
 };
 
+class PrototypeFunction : public InternalFunctionImp {
+ public:
+  typedef KJS::JSValue* (*JSMemberFunction)(ExecState*, JSObject*, const List&);
+
+  PrototypeFunction(ExecState*, int len, const Identifier&, JSMemberFunction);
+
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List&);
+
+ private:
+  const JSMemberFunction m_function;
+};
+
 class GlobalFuncImp : public InternalFunctionImp {
  public:
   GlobalFuncImp(ExecState*,

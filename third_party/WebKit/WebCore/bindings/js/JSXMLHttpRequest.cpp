@@ -42,31 +42,28 @@ using namespace WebCore;
 
 /* Source for JSXMLHttpRequestPrototypeTable.
 @begin JSXMLHttpRequestPrototypeTable 7
-  abort                 &JSXMLHttpRequestPrototypeFunctionAbort::create
+  abort                 jsXMLHttpRequestPrototypeFunctionAbort
 DontDelete|Function 0
-  getAllResponseHeaders
-&JSXMLHttpRequestPrototypeFunctionGetAllResponseHeaders::create
+  getAllResponseHeaders jsXMLHttpRequestPrototypeFunctionGetAllResponseHeaders
 DontDelete|Function 0
-  getResponseHeader
-&JSXMLHttpRequestPrototypeFunctionGetResponseHeader::create
+  getResponseHeader     jsXMLHttpRequestPrototypeFunctionGetResponseHeader
 DontDelete|Function 1
-  open                  &JSXMLHttpRequestPrototypeFunctionOpen::create
+  open                  jsXMLHttpRequestPrototypeFunctionOpen
 DontDelete|Function 5
-  overrideMimeType
-&JSXMLHttpRequestPrototypeFunctionOverrideMIMEType::create DontDelete|Function 1
-  send                  &JSXMLHttpRequestPrototypeFunctionSend::create
+  overrideMimeType      jsXMLHttpRequestPrototypeFunctionOverrideMIMEType
 DontDelete|Function 1
-  setRequestHeader
-&JSXMLHttpRequestPrototypeFunctionSetRequestHeader::create DontDelete|Function 2
+  send                  jsXMLHttpRequestPrototypeFunctionSend
+DontDelete|Function 1
+  setRequestHeader      jsXMLHttpRequestPrototypeFunctionSetRequestHeader
+DontDelete|Function 2
 # from the EventTarget interface
 # FIXME: add DOM3 EventTarget methods (addEventListenerNS,
 removeEventListenerNS).
-  addEventListener
-&JSXMLHttpRequestPrototypeFunctionAddEventListener::create DontDelete|Function 3
-  removeEventListener
-&JSXMLHttpRequestPrototypeFunctionRemoveEventListener::create
+  addEventListener      jsXMLHttpRequestPrototypeFunctionAddEventListener
 DontDelete|Function 3
-  dispatchEvent         &JSXMLHttpRequestPrototypeFunctionDispatchEvent::create
+  removeEventListener   jsXMLHttpRequestPrototypeFunctionRemoveEventListener
+DontDelete|Function 3
+  dispatchEvent         jsXMLHttpRequestPrototypeFunctionDispatchEvent
 DontDelete|Function 1
 @end
 */
@@ -240,10 +237,9 @@ JSXMLHttpRequest::~JSXMLHttpRequest() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionAbort::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionAbort(ExecState* exec,
+                                                JSObject* thisObj,
+                                                const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 
@@ -253,7 +249,7 @@ JSValue* JSXMLHttpRequestPrototypeFunctionAbort::callAsFunction(
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionGetAllResponseHeaders::callAsFunction(
+JSValue* jsXMLHttpRequestPrototypeFunctionGetAllResponseHeaders(
     ExecState* exec,
     JSObject* thisObj,
     const List& args) {
@@ -269,10 +265,9 @@ JSValue* JSXMLHttpRequestPrototypeFunctionGetAllResponseHeaders::callAsFunction(
   return headers;
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionGetResponseHeader::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionGetResponseHeader(ExecState* exec,
+                                                            JSObject* thisObj,
+                                                            const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 
@@ -288,10 +283,9 @@ JSValue* JSXMLHttpRequestPrototypeFunctionGetResponseHeader::callAsFunction(
   return header;
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionOpen::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionOpen(ExecState* exec,
+                                               JSObject* thisObj,
+                                               const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 
@@ -327,10 +321,9 @@ JSValue* JSXMLHttpRequestPrototypeFunctionOpen::callAsFunction(
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionSend::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionSend(ExecState* exec,
+                                               JSObject* thisObj,
+                                               const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 
@@ -359,10 +352,9 @@ JSValue* JSXMLHttpRequestPrototypeFunctionSend::callAsFunction(
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionSetRequestHeader::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionSetRequestHeader(ExecState* exec,
+                                                           JSObject* thisObj,
+                                                           const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 
@@ -378,10 +370,9 @@ JSValue* JSXMLHttpRequestPrototypeFunctionSetRequestHeader::callAsFunction(
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionOverrideMIMEType::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionOverrideMIMEType(ExecState* exec,
+                                                           JSObject* thisObj,
+                                                           const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 
@@ -394,10 +385,9 @@ JSValue* JSXMLHttpRequestPrototypeFunctionOverrideMIMEType::callAsFunction(
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionAddEventListener::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionAddEventListener(ExecState* exec,
+                                                           JSObject* thisObj,
+                                                           const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 
@@ -419,7 +409,7 @@ JSValue* JSXMLHttpRequestPrototypeFunctionAddEventListener::callAsFunction(
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionRemoveEventListener::callAsFunction(
+JSValue* jsXMLHttpRequestPrototypeFunctionRemoveEventListener(
     ExecState* exec,
     JSObject* thisObj,
     const List& args) {
@@ -444,10 +434,9 @@ JSValue* JSXMLHttpRequestPrototypeFunctionRemoveEventListener::callAsFunction(
   return jsUndefined();
 }
 
-JSValue* JSXMLHttpRequestPrototypeFunctionDispatchEvent::callAsFunction(
-    ExecState* exec,
-    JSObject* thisObj,
-    const List& args) {
+JSValue* jsXMLHttpRequestPrototypeFunctionDispatchEvent(ExecState* exec,
+                                                        JSObject* thisObj,
+                                                        const List& args) {
   if (!thisObj->inherits(&JSXMLHttpRequest::info))
     return throwError(exec, TypeError);
 

@@ -105,7 +105,7 @@ class Plugins : public PluginBase {
                              const PropertySlot&);
 };
 
-KJS_IMPLEMENT_PROTOTYPE_FUNCTION_WITH_CREATE(PluginsFunctionRefresh)
+JSValue* pluginsFunctionRefresh(ExecState*, JSObject*, const List&);
 
 class MimeTypes : public PluginBase {
  public:
@@ -194,7 +194,7 @@ const ClassInfo Navigator::info = {"Navigator", 0, &NavigatorTable};
   vendor        Navigator::Vendor                       DontDelete|ReadOnly
   vendorSub     Navigator::VendorSub                    DontDelete|ReadOnly
   cookieEnabled Navigator::CookieEnabled                DontDelete|ReadOnly
-  javaEnabled   &NavigatorProtoFuncJavaEnabled::create  DontDelete|Function 0
+  javaEnabled   navigatorProtoFuncJavaEnabled  DontDelete|Function 0
 @end
 */
 
@@ -316,7 +316,7 @@ void PluginBase::refresh(bool reload) {
 /*
 @begin PluginsTable 2
   length        Plugins::Length                        DontDelete|ReadOnly
-  refresh       &PluginsFunctionRefresh::create        DontDelete|Function 0
+  refresh       pluginsFunctionRefresh                 DontDelete|Function 0
 @end
 */
 
@@ -569,16 +569,14 @@ bool MimeType::getOwnPropertySlot(ExecState* exec,
                                                   propertyName, slot);
 }
 
-JSValue* PluginsFunctionRefresh::callAsFunction(ExecState* exec,
-                                                JSObject*,
-                                                const List& args) {
+JSValue* pluginsFunctionRefresh(ExecState* exec, JSObject*, const List& args) {
   PluginBase::refresh(args[0]->toBoolean(exec));
   return jsUndefined();
 }
 
-JSValue* NavigatorProtoFuncJavaEnabled::callAsFunction(ExecState* exec,
-                                                       JSObject* thisObj,
-                                                       const List&) {
+JSValue* navigatorProtoFuncJavaEnabled(ExecState* exec,
+                                       JSObject* thisObj,
+                                       const List&) {
   if (!thisObj->inherits(&KJS::Navigator::info))
     return throwError(exec, TypeError);
   Navigator* nav = static_cast<Navigator*>(thisObj);
