@@ -264,7 +264,6 @@ WebCore::JSLocation* Window::location() const {
   return d->loc;
 }
 
-// reference our special objects during garbage collection
 void Window::mark() {
   Base::mark();
   if (d->loc && !d->loc->marked())
