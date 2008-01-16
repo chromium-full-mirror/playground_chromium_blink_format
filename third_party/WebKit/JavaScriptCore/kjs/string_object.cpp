@@ -851,8 +851,6 @@ JSValue* StringProtoFuncSubstr::callAsFunction(ExecState* exec,
   JSValue* a0 = args[0];
   JSValue* a1 = args[1];
 
-  double d = 0.0;
-
   double start = a0->toInteger(exec);
   double length = a1->isUndefined() ? len : a1->toInteger(exec);
   if (start >= len)
@@ -864,8 +862,8 @@ JSValue* StringProtoFuncSubstr::callAsFunction(ExecState* exec,
     if (start < 0)
       start = 0;
   }
-  if (length > len - d)
-    length = len - d;
+  if (length > len)
+    length = len;
   return jsString(s.substr(static_cast<int>(start), static_cast<int>(length)));
 }
 
