@@ -781,9 +781,7 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
                             thisObj->isGlobalObject();
 
         // enter a new execution context
-        if (!switchGlobal)
-          exec->dynamicGlobalObject()->tearOffActivation(exec);
-
+        exec->dynamicGlobalObject()->tearOffActivation(exec);
         JSGlobalObject* globalObject =
             switchGlobal ? static_cast<JSGlobalObject*>(thisObj)
                          : exec->dynamicGlobalObject();
