@@ -73,7 +73,7 @@ SOFT_LINK(SafariTheme,
            NSControlSize size,
            ThemeControlState state),
           (part, context, rect, size, state))
-#if !defined(SAFARI_THEME_VERSION) || SAFARI_THEME_VERSION < 2
+#if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 2
 SOFT_LINK(SafariTheme,
           STPaintProgressIndicator,
           void,
