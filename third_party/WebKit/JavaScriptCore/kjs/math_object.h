@@ -41,6 +41,7 @@ class MathObjectImp : public JSObject {
   enum { Euler, Ln2, Ln10, Log2E, Log10E, Pi, Sqrt1_2, Sqrt2 };
 };
 
+// Functions
 JSValue* mathProtoFuncAbs(ExecState*, JSObject*, const List&);
 JSValue* mathProtoFuncACos(ExecState*, JSObject*, const List&);
 JSValue* mathProtoFuncASin(ExecState*, JSObject*, const List&);
