@@ -141,6 +141,10 @@ void FrameLoaderClientQt::savePlatformDataToCachedPage(CachedPage*) {
   notImplemented();
 }
 
+bool FrameLoaderClientQt::privateBrowsingEnabled() const {
+  return false;
+}
+
 void FrameLoaderClientQt::transitionToCommittedFromCachedPage(CachedPage*) {
   notImplemented();
 }
@@ -162,9 +166,7 @@ void FrameLoaderClientQt::forceLayout() {
   m_frame->view()->layout();
 }
 
-void FrameLoaderClientQt::forceLayoutForNonHTML() {
-  notImplemented();
-}
+void FrameLoaderClientQt::forceLayoutForNonHTML() {}
 
 void FrameLoaderClientQt::setCopiesOnScroll() {
   // apparently mac specific
@@ -187,9 +189,7 @@ void FrameLoaderClientQt::willCloseDocument() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::detachedFromParent2() {
-  notImplemented();
-}
+void FrameLoaderClientQt::detachedFromParent2() {}
 
 void FrameLoaderClientQt::detachedFromParent3() {}
 
@@ -228,9 +228,7 @@ void FrameLoaderClientQt::dispatchDidChangeLocationWithinPage() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchWillClose() {
-  notImplemented();
-}
+void FrameLoaderClientQt::dispatchWillClose() {}
 
 void FrameLoaderClientQt::dispatchDidStartProvisionalLoad() {
   if (m_webFrame)
@@ -284,9 +282,7 @@ void FrameLoaderClientQt::dispatchWillSubmitForm(FramePolicyFunction function,
   callPolicyFunction(function, PolicyUse);
 }
 
-void FrameLoaderClientQt::dispatchDidLoadMainResource(DocumentLoader*) {
-  notImplemented();
-}
+void FrameLoaderClientQt::dispatchDidLoadMainResource(DocumentLoader*) {}
 
 void FrameLoaderClientQt::clearLoadingFromPageCache(DocumentLoader*) {
   notImplemented();
@@ -329,7 +325,7 @@ void FrameLoaderClientQt::setMainFrameDocumentReady(bool b) {
 }
 
 void FrameLoaderClientQt::willChangeTitle(DocumentLoader*) {
-  notImplemented();
+  // no need for, dispatchDidReceiveTitle is the right callback
 }
 
 void FrameLoaderClientQt::didChangeTitle(DocumentLoader*) {
@@ -353,7 +349,6 @@ void FrameLoaderClientQt::setDefersLoading(bool) {
 }
 
 bool FrameLoaderClientQt::isArchiveLoadPending(ResourceLoader*) const {
-  notImplemented();
   return false;
 }
 
@@ -377,8 +372,6 @@ bool FrameLoaderClientQt::canShowMIMEType(const String& MIMEType) const {
 
 bool FrameLoaderClientQt::representationExistsForURLScheme(
     const String& URLScheme) const {
-  notImplemented();
-  //    qDebug() << "    scheme is" << URLScheme;
   return false;
 }
 
@@ -589,9 +582,7 @@ void FrameLoaderClientQt::download(WebCore::ResourceHandle*,
 void FrameLoaderClientQt::assignIdentifierToInitialRequest(
     unsigned long identifier,
     WebCore::DocumentLoader*,
-    const WebCore::ResourceRequest&) {
-  notImplemented();
-}
+    const WebCore::ResourceRequest&) {}
 
 void FrameLoaderClientQt::dispatchWillSendRequest(
     WebCore::DocumentLoader*,
@@ -730,7 +721,6 @@ void FrameLoaderClientQt::startDownload(const WebCore::ResourceRequest&) {
 bool FrameLoaderClientQt::willUseArchive(WebCore::ResourceLoader*,
                                          const WebCore::ResourceRequest&,
                                          const WebCore::KURL&) const {
-  notImplemented();
   return false;
 }
 
@@ -906,7 +896,6 @@ Widget* FrameLoaderClientQt::createJavaAppletWidget(
 }
 
 String FrameLoaderClientQt::overrideMediaType() const {
-  notImplemented();
   return String();
 }
 
