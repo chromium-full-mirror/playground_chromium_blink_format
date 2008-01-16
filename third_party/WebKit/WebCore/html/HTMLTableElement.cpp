@@ -419,11 +419,8 @@ void HTMLTableElement::parseMappedAttribute(MappedAttribute* attr) {
       m_padding = max(0, attr->value().toInt());
     else
       m_padding = 1;
-    if (renderer() && renderer()->isTable()) {
+    if (renderer() && renderer()->isTable())
       static_cast<RenderTable*>(renderer())->setCellPadding(m_padding);
-      if (!renderer()->needsLayout())
-        renderer()->setNeedsLayout(true);
-    }
   } else if (attr->name() == colsAttr) {
     // ###
   } else if (attr->name() == vspaceAttr) {
