@@ -119,7 +119,6 @@ JSValue* stringProtoFuncToLocaleLowerCase(ExecState*, JSObject*, const List&);
 JSValue* stringProtoFuncToLocaleUpperCase(ExecState*, JSObject*, const List&);
 JSValue* stringProtoFuncLocaleCompare(ExecState*, JSObject*, const List&);
 
-#ifndef KJS_PURE_ECMA
 JSValue* stringProtoFuncBig(ExecState*, JSObject*, const List&);
 JSValue* stringProtoFuncSmall(ExecState*, JSObject*, const List&);
 JSValue* stringProtoFuncBlink(ExecState*, JSObject*, const List&);
@@ -133,7 +132,6 @@ JSValue* stringProtoFuncFontcolor(ExecState*, JSObject*, const List&);
 JSValue* stringProtoFuncFontsize(ExecState*, JSObject*, const List&);
 JSValue* stringProtoFuncAnchor(ExecState*, JSObject*, const List&);
 JSValue* stringProtoFuncLink(ExecState*, JSObject*, const List&);
-#endif  // KJS_PURE_ECMA
 
 /**
  * @internal

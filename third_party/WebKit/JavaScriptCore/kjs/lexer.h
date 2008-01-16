@@ -131,9 +131,7 @@ class Lexer : Noncopyable {
   const UChar* code;
   unsigned int length;
   int yycolumn;
-#ifndef KJS_PURE_ECMA
   int bol;  // begin of line
-#endif
   bool error;
 
   // current and following unicode characters (int to allow for -1 for

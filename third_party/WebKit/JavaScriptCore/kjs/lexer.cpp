@@ -79,12 +79,8 @@ Lexer::Lexer()
       lastToken(-1),
       pos(0),
       code(0),
-      length(0)
-#ifndef KJS_PURE_ECMA
-      ,
-      bol(true)
-#endif
-      ,
+      length(0),
+      bol(true),
       current(0),
       next1(0),
       next2(0),
@@ -110,9 +106,7 @@ void Lexer::setCode(int startingLineNumber,
   skipLF = false;
   skipCR = false;
   error = false;
-#ifndef KJS_PURE_ECMA
   bol = true;
-#endif
 
   // read first characters
   current = (length > 0) ? code[0].uc : -1;
@@ -137,9 +131,7 @@ void Lexer::shift(unsigned int p) {
 // called on each new line
 void Lexer::nextLine() {
   yylineno++;
-#ifndef KJS_PURE_ECMA
   bol = true;
-#endif
 }
 
 void Lexer::setDone(State s) {
@@ -219,7 +211,6 @@ int Lexer::lex() {
         } else if (current == '.' && isDecimalDigit(next1)) {
           record8(current);
           state = InDecimal;
-#ifndef KJS_PURE_ECMA
           // <!-- marks the beginning of a line comment (for www usage)
         } else if (current == '<' && next1 == '!' && next2 == '-' &&
                    next3 == '-') {
@@ -229,7 +220,6 @@ int Lexer::lex() {
         } else if (bol && current == '-' && next1 == '-' && next2 == '>') {
           shift(2);
           state = InSingleLineComment;
-#endif
         } else {
           token = matchPunctuator(current, next1, next2, next3);
           if (token != -1) {
@@ -465,10 +455,8 @@ int Lexer::lex() {
     // move on to the next character
     if (!done)
       shift(1);
-#ifndef KJS_PURE_ECMA
     if (state != Start && state != InSingleLineComment)
       bol = false;
-#endif
   }
 
   // no identifiers allowed directly after numeric literal, e.g. "3in" is bad
