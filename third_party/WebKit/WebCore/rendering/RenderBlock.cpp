@@ -3980,31 +3980,6 @@ static inline void stripTrailingSpace(int& inlineMax,
   }
 }
 
-// This function is to match a crazy quirk that other browsers have. Firefox
-// and Opera will allow a table cell to grow to fit an image inside it under
-// very specific cirucumstances. Not supporting the quirk has caused us to
-// mis-render some real sites. (See Bugzilla 10517.)
-static bool shouldGrowTableCellForImage(const RenderBlock* containingBlock,
-                                        const RenderObject* image,
-                                        const RenderObject* adjacentLeaf) {
-  if (!containingBlock->style()->htmlHacks())
-    return false;
-
-  if (!containingBlock->isTableCell())
-    return false;
-
-  if (!image->isImage())
-    return false;
-
-  if (adjacentLeaf && !adjacentLeaf->isImage())
-    return false;
-
-  if (!containingBlock->style()->width().isAuto())
-    return false;
-
-  return true;
-}
-
 void RenderBlock::calcInlinePrefWidths() {
   int inlineMax = 0;
   int inlineMin = 0;
@@ -4016,6 +3991,14 @@ void RenderBlock::calcInlinePrefWidths() {
   bool stripFrontSpaces = true;
   RenderObject* trailingSpaceChild = 0;
 
+  // Firefox and Opera will allow a table cell to grow to fit an image inside it
+  // under
+  // very specific cirucumstances (in order to match common WinIE renderings).
+  // Not supporting the quirk has caused us to mis-render some real sites. (See
+  // Bugzilla 10517.)
+  bool allowImagesToBreak = !style()->htmlHacks() || !isTableCell() ||
+                            !style()->width().isIntrinsicOrAuto();
+
   bool autoWrap, oldAutoWrap;
   autoWrap = oldAutoWrap = style()->autoWrap();
 
@@ -4024,11 +4007,6 @@ void RenderBlock::calcInlinePrefWidths() {
   RenderObject* prevFloat = 0;
   RenderObject* previousLeaf = 0;
   while (RenderObject* child = childIterator.next()) {
-    InlineMinMaxIterator leafIterator = childIterator;
-    RenderObject* nextLeaf = leafIterator.next();
-    while (nextLeaf && nextLeaf->isInlineFlow())
-      nextLeaf = leafIterator.next();
-
     autoWrap = child->isReplaced() ? child->parent()->style()->autoWrap()
                                    : child->style()->autoWrap();
 
@@ -4135,9 +4113,8 @@ void RenderBlock::calcInlinePrefWidths() {
         } else
           clearPreviousFloat = false;
 
-        bool growForPrevious =
-            shouldGrowTableCellForImage(this, child, previousLeaf);
-        if (!growForPrevious && (autoWrap || oldAutoWrap) ||
+        bool canBreakReplacedElement = !child->isImage() || allowImagesToBreak;
+        if (canBreakReplacedElement && (autoWrap || oldAutoWrap) ||
             clearPreviousFloat) {
           m_minPrefWidth = max(inlineMin, m_minPrefWidth);
           inlineMin = 0;
@@ -4162,12 +4139,12 @@ void RenderBlock::calcInlinePrefWidths() {
         // Add our width to the max.
         inlineMax += childMax;
 
-        if (!autoWrap || growForPrevious)
+        if (!autoWrap || !canBreakReplacedElement)
           inlineMin += childMin;
         else
           inlineMin = childMin;
 
-        if (autoWrap && !shouldGrowTableCellForImage(this, child, nextLeaf)) {
+        if (autoWrap && canBreakReplacedElement) {
           // Now check our line.
           m_minPrefWidth = max(inlineMin, m_minPrefWidth);
 
