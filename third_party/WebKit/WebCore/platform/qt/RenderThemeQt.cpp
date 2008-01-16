@@ -27,6 +27,7 @@
 #include "config.h"
 
 #include "RenderThemeQt.h"
+#include "NotImplemented.h"
 
 #include <QApplication>
 #include <QColor>
@@ -256,7 +257,8 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
 
   // Get the correct theme data for a button
   EAppearance appearance = applyTheme(panel, o);
-  Q_ASSERT(appearance == TextFieldAppearance);
+  Q_ASSERT(appearance == TextFieldAppearance ||
+           appearance == SearchFieldAppearance);
 
   // Now paint the text field.
   style->drawPrimitive(QStyle::PE_PanelLineEdit, &panel, painter, widget);
@@ -322,36 +324,42 @@ bool RenderThemeQt::paintMenuList(RenderObject* o,
 bool RenderThemeQt::paintMenuListButton(RenderObject* o,
                                         const RenderObject::PaintInfo& pi,
                                         const IntRect& r) {
+  notImplemented();
   return RenderTheme::paintMenuListButton(o, pi, r);
 }
 
 void RenderThemeQt::adjustMenuListButtonStyle(CSSStyleSelector* selector,
                                               RenderStyle* style,
                                               Element* e) const {
+  notImplemented();
   RenderTheme::adjustMenuListButtonStyle(selector, style, e);
 }
 
 bool RenderThemeQt::paintSliderTrack(RenderObject* o,
                                      const RenderObject::PaintInfo& pi,
                                      const IntRect& r) {
+  notImplemented();
   return RenderTheme::paintSliderTrack(o, pi, r);
 }
 
 bool RenderThemeQt::paintSliderThumb(RenderObject* o,
                                      const RenderObject::PaintInfo& pi,
                                      const IntRect& r) {
+  notImplemented();
   return RenderTheme::paintSliderThumb(o, pi, r);
 }
 
 bool RenderThemeQt::paintSearchField(RenderObject* o,
                                      const RenderObject::PaintInfo& pi,
                                      const IntRect& r) {
-  return RenderTheme::paintSearchField(o, pi, r);
+  paintTextField(o, pi, r);
+  return false;
 }
 
 void RenderThemeQt::adjustSearchFieldStyle(CSSStyleSelector* selector,
                                            RenderStyle* style,
                                            Element* e) const {
+  notImplemented();
   RenderTheme::adjustSearchFieldStyle(selector, style, e);
 }
 
@@ -359,6 +367,7 @@ void RenderThemeQt::adjustSearchFieldCancelButtonStyle(
     CSSStyleSelector* selector,
     RenderStyle* style,
     Element* e) const {
+  notImplemented();
   RenderTheme::adjustSearchFieldCancelButtonStyle(selector, style, e);
 }
 
@@ -366,12 +375,14 @@ bool RenderThemeQt::paintSearchFieldCancelButton(
     RenderObject* o,
     const RenderObject::PaintInfo& pi,
     const IntRect& r) {
+  notImplemented();
   return RenderTheme::paintSearchFieldCancelButton(o, pi, r);
 }
 
 void RenderThemeQt::adjustSearchFieldDecorationStyle(CSSStyleSelector* selector,
                                                      RenderStyle* style,
                                                      Element* e) const {
+  notImplemented();
   RenderTheme::adjustSearchFieldDecorationStyle(selector, style, e);
 }
 
@@ -379,6 +390,7 @@ bool RenderThemeQt::paintSearchFieldDecoration(
     RenderObject* o,
     const RenderObject::PaintInfo& pi,
     const IntRect& r) {
+  notImplemented();
   return RenderTheme::paintSearchFieldDecoration(o, pi, r);
 }
 
@@ -386,6 +398,7 @@ void RenderThemeQt::adjustSearchFieldResultsDecorationStyle(
     CSSStyleSelector* selector,
     RenderStyle* style,
     Element* e) const {
+  notImplemented();
   RenderTheme::adjustSearchFieldResultsDecorationStyle(selector, style, e);
 }
 
@@ -393,6 +406,7 @@ bool RenderThemeQt::paintSearchFieldResultsDecoration(
     RenderObject* o,
     const RenderObject::PaintInfo& pi,
     const IntRect& r) {
+  notImplemented();
   return RenderTheme::paintSearchFieldResultsDecoration(o, pi, r);
 }
 
