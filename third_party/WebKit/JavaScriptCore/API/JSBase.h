@@ -39,7 +39,7 @@ typedef const struct OpaqueJSContext* JSContextRef;
  * JSGlobalContext is a JSContext. */
 typedef struct OpaqueJSContext* JSGlobalContextRef;
 
-/*! @typedef JSString A UTF16 character buffer. The fundamental string
+/*! @typedef JSStringRef A UTF16 character buffer. The fundamental string
  * representation in JavaScript. */
 typedef struct OpaqueJSString* JSStringRef;
 

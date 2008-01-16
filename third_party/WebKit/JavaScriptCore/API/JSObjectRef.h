@@ -234,7 +234,7 @@ the names of object's properties.
 like this:
 
 void GetPropertyNames(JSContextRef ctx, JSObjectRef object,
-JSPropertyNameAccumulatorRef accumulator);
+JSPropertyNameAccumulatorRef propertyNames);
 
 Property name accumulators are used by JSObjectCopyPropertyNames and JavaScript
 for...in loops.
