@@ -50,6 +50,10 @@ class ScrollbarClient {
 
   // Used to obtain a window clip rect.
   virtual IntRect windowClipRect() const = 0;
+
+  // FIXME: It would be nice to set this state on the scroll bar instead of
+  // having to ask for it from the client at paint time.
+  virtual bool isActive() const = 0;
 };
 
 class Scrollbar : public RefCounted<Scrollbar> {

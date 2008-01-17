@@ -97,6 +97,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   // ScrollbarClient interface.
   virtual void valueChanged(Scrollbar*);
   virtual IntRect windowClipRect() const;
+  virtual bool isActive() const;
 
   int itemHeight() const;
   void valueChanged(unsigned listIndex);

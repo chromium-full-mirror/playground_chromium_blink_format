@@ -126,6 +126,7 @@ class PopupMenu : public RefCounted<PopupMenu>
   // ScrollBarClient
   virtual void valueChanged(Scrollbar*);
   virtual IntRect windowClipRect() const;
+  virtual bool isActive() const { return true; }
 #endif
 
  private:

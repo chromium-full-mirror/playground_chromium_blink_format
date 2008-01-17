@@ -29,6 +29,7 @@
 #include "Chrome.h"
 #include "ChromeClient.h"
 #include "FloatRect.h"
+#include "FocusController.h"
 #include "Frame.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
@@ -73,6 +74,7 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
 
   virtual void valueChanged(Scrollbar*);
   virtual IntRect windowClipRect() const;
+  virtual bool isActive() const;
 
   void scrollBackingStore(const IntSize& scrollDelta);
 
@@ -200,6 +202,11 @@ bool ScrollView::ScrollViewPrivate::allowsScrolling() const {
 
 IntRect ScrollView::ScrollViewPrivate::windowClipRect() const {
   return static_cast<const FrameView*>(m_view)->windowClipRect(false);
+}
+
+bool ScrollView::ScrollViewPrivate::isActive() const {
+  Page* page = static_cast<const FrameView*>(m_view)->frame()->page();
+  return page && page->focusController()->isActive();
 }
 
 ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {}
@@ -587,7 +594,7 @@ void ScrollView::paint(GraphicsContext* context, const IntRect& rect) {
   // In the end, FrameView should just merge with ScrollView.
   ASSERT(isFrameView());
 
-  if (context->paintingDisabled())
+  if (context->paintingDisabled() && !context->updatingControlTints())
     return;
 
   IntRect documentDirtyRect = rect;

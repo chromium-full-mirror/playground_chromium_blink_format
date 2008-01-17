@@ -432,6 +432,7 @@ class RenderLayer : public ScrollbarClient {
 
   virtual void valueChanged(Scrollbar*);
   virtual IntRect windowClipRect() const;
+  virtual bool isActive() const;
 
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 
