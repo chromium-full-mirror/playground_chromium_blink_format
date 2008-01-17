@@ -93,6 +93,7 @@
 #include <WebCore/Settings.h>
 #include <WebCore/SimpleFontData.h>
 #include <WebCore/TypingCommand.h>
+#include <WebCore/WindowMessageBroadcaster.h>
 #pragma warning(pop)
 #include <JavaScriptCore/collector.h>
 #include <JavaScriptCore/value.h>
@@ -240,6 +241,10 @@ static bool grammarCheckingEnabled;
 static bool s_didSetCacheModel;
 static WebCacheModel s_cacheModel = WebCacheModelDocumentViewer;
 
+enum {
+  UpdateActiveStateTimer = 1,
+};
+
 // WebView ----------------------------------------------------------------
 
 bool WebView::s_allowSiteSpecificHacks = false;
@@ -264,7 +269,8 @@ WebView::WebView()
       m_didClose(false),
       m_inIMEComposition(0),
       m_toolTipHwnd(0),
-      m_closeWindowTimer(this, &WebView::closeWindowTimerFired) {
+      m_closeWindowTimer(this, &WebView::closeWindowTimerFired),
+      m_topLevelParent(0) {
   KJS::Collector::registerAsMainThread();
 
   m_backingStoreSize.cx = m_backingStoreSize.cy = 0;
@@ -1627,6 +1633,20 @@ namespace WebCore {
 extern HCURSOR lastSetCursor;
 }
 
+static HWND findTopLevelParent(HWND window) {
+  if (!window)
+    return 0;
+
+  HWND current = window;
+  for (HWND parent = GetParent(current); current;
+       current = parent, parent = GetParent(parent))
+    if (!parent ||
+        !(GetWindowLongPtr(current, GWL_STYLE) & (WS_POPUP | WS_CHILD)))
+      return current;
+  ASSERT_NOT_REACHED();
+  return 0;
+}
+
 static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
                                        UINT message,
                                        WPARAM wParam,
@@ -1739,16 +1759,6 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       // FIXME: Merge this logic with updateActiveState, and switch this over to
       // use updateActiveState
 
-      webView->page()->focusController()->setActive(true);
-
-      // It's ok to just always do setWindowHasFocus, since we won't fire the
-      // focus event on the DOM
-      // window unless the value changes.  It's also ok to do setIsActive inside
-      // focus,
-      // because Windows has no concept of having to update control tints (e.g.,
-      // graphite vs. aqua)
-      // and therefore only needs to update the selection (which is limited to
-      // the focused frame).
       FocusController* focusController = webView->page()->focusController();
       if (Frame* frame = focusController->focusedFrame()) {
         // If the previously focused window is a child of ours (for example a
@@ -1781,8 +1791,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       // and we need to clear out the focused target.
       FocusController* focusController = webView->page()->focusController();
       webView->resetIME(focusController->focusedOrMainFrame());
-      if (GetAncestor(hWnd, GA_ROOT) != newFocusWnd) {
-        webView->page()->focusController()->setActive(false);
+      if (webView->topLevelParent() != findTopLevelParent(newFocusWnd)) {
         if (Frame* frame = focusController->focusedOrMainFrame()) {
           // If we're losing focus to a child of ours, don't send blur events.
           if (!IsChild(hWnd, newFocusWnd))
@@ -1792,6 +1801,11 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
         focusController->setFocusedFrame(0);
       break;
     }
+    case WM_WINDOWPOSCHANGED:
+      if (reinterpret_cast<WINDOWPOS*>(lParam)->flags & SWP_SHOWWINDOW)
+        webView->updateActiveStateSoon();
+      handled = false;
+      break;
     case WM_CUT:
       webView->cut(0);
       break;
@@ -1880,6 +1894,14 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       break;
     case WM_IME_SETCONTEXT:
       handled = webView->onIMESetContext(wParam, lParam);
+      break;
+    case WM_TIMER:
+      switch (wParam) {
+        case UpdateActiveStateTimer:
+          KillTimer(hWnd, UpdateActiveStateTimer);
+          webView->updateActiveState();
+          break;
+      }
       break;
     case WM_SETCURSOR:
       if (lastSetCursor) {
@@ -2162,6 +2184,7 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
   ShowWindow(m_viewWindow, SW_SHOW);
 
   initializeToolTipWindow();
+  windowAncestryDidChange();
 
   IWebNotificationCenter* notifyCenter =
       WebNotificationCenter::defaultCenterInternal();
@@ -2675,6 +2698,18 @@ HRESULT STDMETHODCALLTYPE WebView::preferencesIdentifier(
   return E_NOTIMPL;
 }
 
+void WebView::windowReceivedMessage(HWND, UINT message, WPARAM, LPARAM) {
+  switch (message) {
+    case WM_NCACTIVATE:
+      updateActiveStateSoon();
+      break;
+  }
+}
+
+void WebView::updateActiveStateSoon() const {
+  SetTimer(m_viewWindow, UpdateActiveStateTimer, 0, 0);
+}
+
 HRESULT STDMETHODCALLTYPE WebView::setHostWindow(
     /* [in] */ OLE_HANDLE oleWindow) {
   HWND window = (HWND)(ULONG64)oleWindow;
@@ -2682,6 +2717,9 @@ HRESULT STDMETHODCALLTYPE WebView::setHostWindow(
     SetParent(m_viewWindow, window);
 
   m_hostWindow = window;
+
+  if (m_viewWindow)
+    windowAncestryDidChange();
 
   return S_OK;
 }
@@ -2739,14 +2777,10 @@ HRESULT STDMETHODCALLTYPE WebView::searchFor(
 }
 
 HRESULT STDMETHODCALLTYPE WebView::updateActiveState() {
-  HWND window = ::GetAncestor(m_viewWindow, GA_ROOT);
-  HWND activeWindow = ::GetActiveWindow();
-  bool windowIsKey = window == activeWindow;
-  activeWindow = ::GetAncestor(activeWindow, GA_ROOTOWNER);
+  HWND activeWindow = GetActiveWindow();
 
-  bool windowOrSheetIsKey = windowIsKey || (window == activeWindow);
-
-  m_page->focusController()->setActive(windowOrSheetIsKey);
+  m_page->focusController()->setActive(
+      activeWindow && m_topLevelParent == findTopLevelParent(activeWindow));
 
   return S_OK;
 }
@@ -4586,6 +4620,24 @@ HRESULT STDMETHODCALLTYPE WebView::inspector(IWebInspector** inspector) {
     m_webInspector.adoptRef(WebInspector::createInstance(this));
 
   return m_webInspector.copyRefTo(inspector);
+}
+
+HRESULT STDMETHODCALLTYPE WebView::windowAncestryDidChange() {
+  HWND newParent = findTopLevelParent(m_hostWindow);
+  if (newParent == m_topLevelParent)
+    return S_OK;
+
+  if (m_topLevelParent)
+    WindowMessageBroadcaster::removeListener(m_topLevelParent, this);
+
+  m_topLevelParent = newParent;
+
+  if (m_topLevelParent)
+    WindowMessageBroadcaster::addListener(m_topLevelParent, this);
+
+  updateActiveState();
+
+  return S_OK;
 }
 
 class EnumTextMatches : public IEnumTextMatches {
