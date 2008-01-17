@@ -29,6 +29,7 @@
 #include "qwebnetworkinterface_p.h"
 #include "qwebobjectpluginconnector.h"
 #include "qwebpage.h"
+#include "qcookiejar.h"
 #include <qdebug.h>
 #include <qfile.h>
 #include <qnetworkproxy.h>
@@ -122,7 +123,8 @@ void QWebNetworkRequestPrivate::init(
                         resourceRequest->httpUserAgent());
     const QString scheme = url.scheme().toLower();
     if (scheme == QLatin1String("http") || scheme == QLatin1String("https")) {
-      QString cookies = WebCore::cookies(resourceRequest->url());
+      QString cookies =
+          QCookieJar::cookieJar()->cookies(resourceRequest->url());
       if (!cookies.isEmpty())
         httpHeader.setValue(QLatin1String("Cookie"), cookies);
     }
@@ -473,7 +475,9 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
 
   QStringList cookies = job->d->response.allValues("Set-Cookie");
   KURL url(job->url());
-  foreach (QString c, cookies) { setCookies(url, url, c); }
+  foreach (QString c, cookies) {
+    QCookieJar::cookieJar()->setCookies(url, url, c);
+  }
   QString contentType = job->d->response.value("Content-Type");
   QString encoding;
   int idx = contentType.indexOf(QLatin1Char(';'));

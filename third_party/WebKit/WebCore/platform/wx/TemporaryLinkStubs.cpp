@@ -118,16 +118,17 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
 }
 
 // cookies (we'll need a place to store these
-void WebCore::setCookies(const KURL& url,
+void WebCore::setCookies(Document* document,
+                         const KURL& url,
                          const KURL& policyURL,
                          const String& value) {
   notImplemented();
 }
-String WebCore::cookies(const KURL& url) {
+String WebCore::cookies(const Document* document, const KURL& url) {
   notImplemented();
   return String();
 }
-bool WebCore::cookiesEnabled() {
+bool WebCore::cookiesEnabled(const Document* document) {
   notImplemented();
   return false;
 }
