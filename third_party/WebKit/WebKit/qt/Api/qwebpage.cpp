@@ -27,7 +27,6 @@
 #include "qwebframe.h"
 #include "qwebpage_p.h"
 #include "qwebframe_p.h"
-#include "qwebnetworkinterface.h"
 #include "qwebhistory.h"
 #include "qwebhistory_p.h"
 #include "qwebsettings.h"
@@ -77,6 +76,8 @@
 #if QT_VERSION >= 0x040400
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#else
+#include "qwebnetworkinterface.h"
 #endif
 
 using namespace WebCore;
