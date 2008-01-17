@@ -1,7 +1,6 @@
-// -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
+ *  Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -44,33 +43,7 @@ class BooleanInstance : public JSWrapperObject {
  */
 class BooleanPrototype : public BooleanInstance {
  public:
-  BooleanPrototype(ExecState* exec,
-                   ObjectPrototype* objectProto,
-                   FunctionPrototype* funcProto);
-};
-
-/**
- * @internal
- *
- * Class to implement all methods that are properties of the
- * Boolean.prototype object
- */
-class BooleanProtoFunc : public InternalFunctionImp {
- public:
-  BooleanProtoFunc(ExecState*,
-                   FunctionPrototype*,
-                   int i,
-                   int len,
-                   const Identifier&);
-
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const List& args);
-
-  enum { ToString, ValueOf };
-
- private:
-  int id;
+  BooleanPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
 };
 
 /**
@@ -79,21 +52,15 @@ class BooleanProtoFunc : public InternalFunctionImp {
  * The initial value of the the global variable's "Boolean" property
  */
 class BooleanObjectImp : public InternalFunctionImp {
-  friend class BooleanProtoFunc;
-
  public:
-  BooleanObjectImp(ExecState* exec,
-                   FunctionPrototype* funcProto,
-                   BooleanPrototype* booleanProto);
+  BooleanObjectImp(ExecState*, FunctionPrototype*, BooleanPrototype*);
 
   virtual bool implementsConstruct() const;
-  virtual JSObject* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState*, const List&);
 
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const List& args);
+  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
 };
 
-}  // namespace
+}  // namespace KJS
 
-#endif
+#endif  // BOOL_OBJECT_H_

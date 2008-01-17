@@ -30,7 +30,7 @@ namespace KJS {
 
 class NumberInstance : public JSWrapperObject {
  public:
-  NumberInstance(JSObject* proto);
+  NumberInstance(JSObject* prototype);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -44,40 +44,7 @@ class NumberInstance : public JSWrapperObject {
  */
 class NumberPrototype : public NumberInstance {
  public:
-  NumberPrototype(ExecState* exec,
-                  ObjectPrototype* objProto,
-                  FunctionPrototype* funcProto);
-};
-
-/**
- * @internal
- *
- * Class to implement all methods that are properties of the
- * Number.prototype object
- */
-class NumberProtoFunc : public InternalFunctionImp {
- public:
-  NumberProtoFunc(ExecState*,
-                  FunctionPrototype*,
-                  int i,
-                  int len,
-                  const Identifier&);
-
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const List& args);
-
-  enum {
-    ToString,
-    ToLocaleString,
-    ValueOf,
-    ToFixed,
-    ToExponential,
-    ToPrecision
-  };
-
- private:
-  int id;
+  NumberPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
 };
 
 /**
@@ -87,27 +54,24 @@ class NumberProtoFunc : public InternalFunctionImp {
  */
 class NumberObjectImp : public InternalFunctionImp {
  public:
-  NumberObjectImp(ExecState* exec,
-                  FunctionPrototype* funcProto,
-                  NumberPrototype* numberProto);
+  NumberObjectImp(ExecState*, FunctionPrototype*, NumberPrototype*);
 
   virtual bool implementsConstruct() const;
-  virtual JSObject* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState*, const List&);
 
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const List& args);
+  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
 
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
+  JSValue* getValueProperty(ExecState*, int token) const;
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+
   enum { NaNValue, NegInfinity, PosInfinity, MaxValue, MinValue };
 
   JSObject* construct(const List&);
 };
 
-}  // namespace
+}  // namespace KJS
 
-#endif
+#endif  // NUMBER_OBJECT_H_

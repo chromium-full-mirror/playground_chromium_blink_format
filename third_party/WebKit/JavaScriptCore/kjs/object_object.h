@@ -1,7 +1,6 @@
-// -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
+ *  Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -27,8 +26,6 @@
 
 namespace KJS {
 
-class FunctionPrototype;
-
 /**
  * @internal
  *
@@ -37,40 +34,7 @@ class FunctionPrototype;
  */
 class ObjectPrototype : public JSObject {
  public:
-  ObjectPrototype(ExecState* exec, FunctionPrototype* funcProto);
-};
-
-/**
- * @internal
- *
- * Class to implement all methods that are properties of the
- * Object.prototype object
- */
-class ObjectProtoFunc : public InternalFunctionImp {
- public:
-  ObjectProtoFunc(ExecState* exec,
-                  FunctionPrototype* funcProto,
-                  int i,
-                  int len,
-                  const Identifier&);
-
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List& args);
-
-  enum {
-    ToString,
-    ToLocaleString,
-    ValueOf,
-    HasOwnProperty,
-    IsPrototypeOf,
-    PropertyIsEnumerable,
-    DefineGetter,
-    DefineSetter,
-    LookupGetter,
-    LookupSetter
-  };
-
- private:
-  int id;
+  ObjectPrototype(ExecState*, FunctionPrototype*);
 };
 
 /**
@@ -80,15 +44,13 @@ class ObjectProtoFunc : public InternalFunctionImp {
  */
 class ObjectObjectImp : public InternalFunctionImp {
  public:
-  ObjectObjectImp(ExecState* exec,
-                  ObjectPrototype* objProto,
-                  FunctionPrototype* funcProto);
+  ObjectObjectImp(ExecState*, ObjectPrototype*, FunctionPrototype*);
 
   virtual bool implementsConstruct() const;
-  virtual JSObject* construct(ExecState*, const List& args);
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List& args);
+  virtual JSObject* construct(ExecState*, const List&);
+  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
 };
 
-}  // namespace
+}  // namespace KJS
 
-#endif
+#endif  // _OBJECT_OBJECT_H_

@@ -37,9 +37,13 @@
 #include <string.h>
 #include <wtf/Assertions.h>
 
-using namespace KJS;
+namespace KJS {
 
 // ------------------------------ FunctionPrototype -------------------------
+
+static JSValue* functionProtoFuncToString(ExecState*, JSObject*, const List&);
+static JSValue* functionProtoFuncApply(ExecState*, JSObject*, const List&);
+static JSValue* functionProtoFuncCall(ExecState*, JSObject*, const List&);
 
 FunctionPrototype::FunctionPrototype(ExecState* exec) {
   static const Identifier* applyPropertyName = new Identifier("apply");
@@ -47,137 +51,116 @@ FunctionPrototype::FunctionPrototype(ExecState* exec) {
 
   putDirect(exec->propertyNames().length, jsNumber(0),
             DontDelete | ReadOnly | DontEnum);
+
   putDirectFunction(
-      new FunctionProtoFunc(exec, this, FunctionProtoFunc::ToString, 0,
-                            exec->propertyNames().toString),
+      new PrototypeFunction(exec, this, 0, exec->propertyNames().toString,
+                            functionProtoFuncToString),
       DontEnum);
-  putDirectFunction(new FunctionProtoFunc(exec, this, FunctionProtoFunc::Apply,
-                                          2, *applyPropertyName),
+  putDirectFunction(new PrototypeFunction(exec, this, 2, *applyPropertyName,
+                                          functionProtoFuncApply),
                     DontEnum);
-  putDirectFunction(new FunctionProtoFunc(exec, this, FunctionProtoFunc::Call,
-                                          1, *callPropertyName),
+  putDirectFunction(new PrototypeFunction(exec, this, 1, *callPropertyName,
+                                          functionProtoFuncCall),
                     DontEnum);
 }
 
-FunctionPrototype::~FunctionPrototype() {}
-
 // ECMA 15.3.4
-JSValue* FunctionPrototype::callAsFunction(ExecState*,
-                                           JSObject* /*thisObj*/,
-                                           const List& /*args*/) {
+JSValue* FunctionPrototype::callAsFunction(ExecState*, JSObject*, const List&) {
   return jsUndefined();
 }
 
-// ------------------------------ FunctionProtoFunc -------------------------
+// Functions
 
-FunctionProtoFunc::FunctionProtoFunc(ExecState* exec,
-                                     FunctionPrototype* funcProto,
-                                     int i,
-                                     int len,
-                                     const Identifier& name)
-    : InternalFunctionImp(funcProto, name), id(i) {
-  putDirect(exec->propertyNames().length, len,
-            DontDelete | ReadOnly | DontEnum);
-}
-
-JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
-                                           JSObject* thisObj,
-                                           const List& args) {
-  JSValue* result = NULL;
-
-  switch (id) {
-    case ToString:
-      if (!thisObj || !thisObj->inherits(&InternalFunctionImp::info)) {
+JSValue* functionProtoFuncToString(ExecState* exec,
+                                   JSObject* thisObj,
+                                   const List&) {
+  if (!thisObj || !thisObj->inherits(&InternalFunctionImp::info)) {
 #ifndef NDEBUG
-        fprintf(stderr,
-                "attempted toString() call on null or non-function object\n");
+    fprintf(stderr,
+            "attempted toString() call on null or non-function object\n");
 #endif
-        return throwError(exec, TypeError);
-      }
-      if (thisObj->inherits(&FunctionImp::info)) {
-        FunctionImp* fi = static_cast<FunctionImp*>(thisObj);
-        return jsString("function " + fi->functionName().ustring() + "(" +
-                        fi->body->paramString() + ") " + fi->body->toString());
-      } else if (thisObj->inherits(&InternalFunctionImp::info) &&
-                 !static_cast<InternalFunctionImp*>(thisObj)
-                      ->functionName()
-                      .isNull()) {
-        result = jsString("\nfunction " +
-                          static_cast<InternalFunctionImp*>(thisObj)
-                              ->functionName()
-                              .ustring() +
-                          "() {\n"
-                          "    [native code]\n}\n");
-      } else {
-        result = jsString("[function]");
-      }
-      break;
-    case Apply: {
-      JSValue* thisArg = args[0];
-      JSValue* argArray = args[1];
-      JSObject* func = thisObj;
-
-      if (!func->implementsCall())
-        return throwError(exec, TypeError);
-
-      JSObject* applyThis;
-      if (thisArg->isUndefinedOrNull())
-        applyThis = exec->dynamicGlobalObject();
-      else
-        applyThis = thisArg->toObject(exec);
-
-      List applyArgs;
-      if (!argArray->isUndefinedOrNull()) {
-        if (argArray->isObject() &&
-            (static_cast<JSObject*>(argArray)->inherits(&ArrayInstance::info) ||
-             static_cast<JSObject*>(argArray)->inherits(&Arguments::info))) {
-          JSObject* argArrayObj = static_cast<JSObject*>(argArray);
-          unsigned int length =
-              argArrayObj->get(exec, exec->propertyNames().length)
-                  ->toUInt32(exec);
-          for (unsigned int i = 0; i < length; i++)
-            applyArgs.append(argArrayObj->get(exec, i));
-        } else
-          return throwError(exec, TypeError);
-      }
-      result = func->call(exec, applyThis, applyArgs);
-    } break;
-    case Call: {
-      JSValue* thisArg = args[0];
-      JSObject* func = thisObj;
-
-      if (!func->implementsCall())
-        return throwError(exec, TypeError);
-
-      JSObject* callThis;
-      if (thisArg->isUndefinedOrNull())
-        callThis = exec->dynamicGlobalObject();
-      else
-        callThis = thisArg->toObject(exec);
-
-      List argsTail;
-      args.getSlice(1, argsTail);
-      result = func->call(exec, callThis, argsTail);
-    } break;
+    return throwError(exec, TypeError);
   }
 
-  return result;
+  if (thisObj->inherits(&FunctionImp::info)) {
+    FunctionImp* fi = static_cast<FunctionImp*>(thisObj);
+    return jsString("function " + fi->functionName().ustring() + "(" +
+                    fi->body->paramString() + ") " + fi->body->toString());
+  }
+
+  if (thisObj->inherits(&InternalFunctionImp::info) &&
+      !static_cast<InternalFunctionImp*>(thisObj)->functionName().isNull())
+    return jsString(
+        "\nfunction " +
+        static_cast<InternalFunctionImp*>(thisObj)->functionName().ustring() +
+        "() {\n    [native code]\n}\n");
+
+  return jsString("[function]");
+}
+
+JSValue* functionProtoFuncApply(ExecState* exec,
+                                JSObject* thisObj,
+                                const List& args) {
+  if (!thisObj->implementsCall())
+    return throwError(exec, TypeError);
+
+  JSValue* thisArg = args[0];
+  JSValue* argArray = args[1];
+
+  JSObject* applyThis;
+  if (thisArg->isUndefinedOrNull())
+    applyThis = exec->dynamicGlobalObject();
+  else
+    applyThis = thisArg->toObject(exec);
+
+  List applyArgs;
+  if (!argArray->isUndefinedOrNull()) {
+    if (argArray->isObject() &&
+        (static_cast<JSObject*>(argArray)->inherits(&ArrayInstance::info) ||
+         static_cast<JSObject*>(argArray)->inherits(&Arguments::info))) {
+      JSObject* argArrayObj = static_cast<JSObject*>(argArray);
+      unsigned int length =
+          argArrayObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
+      for (unsigned int i = 0; i < length; i++)
+        applyArgs.append(argArrayObj->get(exec, i));
+    } else
+      return throwError(exec, TypeError);
+  }
+
+  return thisObj->call(exec, applyThis, applyArgs);
+}
+
+JSValue* functionProtoFuncCall(ExecState* exec,
+                               JSObject* thisObj,
+                               const List& args) {
+  if (!thisObj->implementsCall())
+    return throwError(exec, TypeError);
+
+  JSValue* thisArg = args[0];
+
+  JSObject* callThis;
+  if (thisArg->isUndefinedOrNull())
+    callThis = exec->dynamicGlobalObject();
+  else
+    callThis = thisArg->toObject(exec);
+
+  List argsTail;
+  args.getSlice(1, argsTail);
+  return thisObj->call(exec, callThis, argsTail);
 }
 
 // ------------------------------ FunctionObjectImp ----------------------------
 
 FunctionObjectImp::FunctionObjectImp(ExecState* exec,
-                                     FunctionPrototype* funcProto)
-    : InternalFunctionImp(funcProto) {
-  putDirect(exec->propertyNames().prototype, funcProto,
+                                     FunctionPrototype* functionPrototype)
+    : InternalFunctionImp(functionPrototype) {
+  putDirect(exec->propertyNames().prototype, functionPrototype,
             DontEnum | DontDelete | ReadOnly);
 
-  // no. of arguments for constructor
+  // Number of arguments for constructor
   putDirect(exec->propertyNames().length, jsNumber(1),
             ReadOnly | DontDelete | DontEnum);
 }
-
-FunctionObjectImp::~FunctionObjectImp() {}
 
 bool FunctionObjectImp::implementsConstruct() const {
   return true;
@@ -192,11 +175,11 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
   UString p("");
   UString body;
   int argsSize = args.size();
-  if (argsSize == 0) {
+  if (argsSize == 0)
     body = "";
-  } else if (argsSize == 1) {
+  else if (argsSize == 1)
     body = args[0]->toString(exec);
-  } else {
+  else {
     p = args[0]->toString(exec);
     for (int k = 1; k < argsSize - 1; k++)
       p += "," + args[k]->toString(exec);
@@ -223,9 +206,9 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
     }
   }
 
-  // no program node == syntax error - throw a syntax error
+  // No program node == syntax error - throw a syntax error
   if (!functionBody)
-    // we can't return a Completion(Throw) here, so just set the exception
+    // We can't return a Completion(Throw) here, so just set the exception
     // and return it
     return throwError(exec, SyntaxError, errMsg, errLine, sourceId, sourceURL);
 
@@ -284,7 +267,9 @@ JSObject* FunctionObjectImp::construct(ExecState* exec, const List& args) {
 
 // ECMA 15.3.1 The Function Constructor Called as a Function
 JSValue* FunctionObjectImp::callAsFunction(ExecState* exec,
-                                           JSObject* /*thisObj*/,
+                                           JSObject*,
                                            const List& args) {
   return construct(exec, args);
 }
+
+}  // namespace KJS
