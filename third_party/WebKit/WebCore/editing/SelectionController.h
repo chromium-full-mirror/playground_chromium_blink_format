@@ -129,6 +129,11 @@ class SelectionController : Noncopyable {
   }
   bool isCaretBlinkingSuspended() const { return m_isCaretBlinkingSuspended; }
 
+  // Focus
+  void setFocused(bool);
+  bool isFocusedAndActive() const;
+  void pageActivationChanged();
+
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
   void showTreeForThis() const;
@@ -153,6 +158,8 @@ class SelectionController : Noncopyable {
   void notifyAccessibilityForSelectionChange(){};
 #endif
 
+  void focusedOrActiveStateChanged();
+
   Selection m_sel;
 
   IntRect m_caretRect;  // caret coordinates, size, and position
@@ -173,6 +180,7 @@ class SelectionController : Noncopyable {
   bool m_isCaretBlinkingSuspended;
 
   int m_xPosForVerticalArrowNavigation;
+  bool m_focused;
 };
 
 inline bool operator==(const SelectionController& a,

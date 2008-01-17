@@ -197,8 +197,6 @@ enum WebScrollGranularity {
 - (void)setBaseBackgroundColor:(NSColor*)backgroundColor;
 - (void)setDrawsBackground:(BOOL)drawsBackround;
 
-- (NSColor*)selectionColor;
-
 - (id)accessibilityTree;
 
 - (DOMRange*)

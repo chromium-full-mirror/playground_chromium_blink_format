@@ -1313,7 +1313,8 @@ void RenderTextControl::capsLockStateMayHaveChanged() {
             !m_multiLine &&
             static_cast<HTMLInputElement*>(n)->inputType() ==
                 HTMLInputElement::PASSWORD &&
-            f->isActive() && d->focusedNode() == n &&
+            f->selectionController()->isFocusedAndActive() &&
+            d->focusedNode() == n &&
             PlatformKeyboardEvent::currentCapsLockState();
 
   if (shouldDrawCapsLockIndicator != m_shouldDrawCapsLockIndicator) {

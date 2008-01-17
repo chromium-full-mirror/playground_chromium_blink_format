@@ -59,6 +59,7 @@
 #include "Pair.h"
 #include "Rect.h"
 #include "RenderTheme.h"
+#include "SelectionController.h"
 #include "Settings.h"
 #include "ShadowValue.h"
 #include "StyleSheetList.h"
@@ -1744,7 +1745,8 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         break;
       }
       case CSSSelector::PseudoFocus:
-        if (e && e->focused() && e->document()->frame()->isActive())
+        if (e && e->focused() &&
+            e->document()->frame()->selectionController()->isFocusedAndActive())
           return true;
         break;
       case CSSSelector::PseudoHover: {

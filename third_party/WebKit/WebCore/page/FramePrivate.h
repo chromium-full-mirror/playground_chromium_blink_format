@@ -98,7 +98,6 @@ class FramePrivate {
 
   bool m_caretVisible : 1;
   bool m_caretPaint : 1;
-  bool m_isActive : 1;
   bool m_isPainting : 1;
 
   RefPtr<CSSMutableStyleDeclaration> m_typingStyle;
@@ -113,7 +112,6 @@ class FramePrivate {
   PaintRestriction m_paintRestriction;
 
   bool m_highlightTextMatches;
-  bool m_windowHasFocus;
 
   bool m_inViewSourceMode;
 
