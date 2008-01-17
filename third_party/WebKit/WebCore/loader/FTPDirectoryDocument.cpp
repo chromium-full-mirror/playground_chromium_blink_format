@@ -242,7 +242,7 @@ static struct tm* localTimeQt(const time_t* const timep, struct tm* result) {
   return result;
 }
 
-#define localtime_s(x, y) localTimeQt(x, y)
+#define localtime_r(x, y) localTimeQt(x, y)
 #endif
 
 static String processFileDateString(const FTPTime& fileTime) {
@@ -271,7 +271,7 @@ static String processFileDateString(const FTPTime& fileTime) {
   // the current time
   struct tm now;
   time_t now_t = time(NULL);
-  localtime_s(&now_t, &now);
+  localtime_r(&now_t, &now);
 
   // localtime does "year = current year - 1900", compensate for that for
   // readability and comparison purposes
