@@ -560,6 +560,14 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
 */
 
 /*!
+  \fn void QWebFrame::urlChanged(const QUrl &url)
+
+  This signal is emitted whenever the url of the frame changes.
+
+  \sa url()
+*/
+
+/*!
   \fn void QWebFrame::hoveringOverLink(const QString &link, const QString
   &title, const QString &textContent)
 

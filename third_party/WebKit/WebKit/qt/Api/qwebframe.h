@@ -117,6 +117,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void hoveringOverLink(const QString& link,
                         const QString& title,
                         const QString& textContent);
+  void urlChanged(const QUrl& url);
 
   void loadStarted();
   void loadFinished();
