@@ -25,17 +25,19 @@
 #include "config.h"
 #include "PluginDocument.h"
 
+#include "DocumentLoader.h"
+#include "Element.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
-#include "Element.h"
+#include "HTMLEmbedElement.h"
 #include "HTMLNames.h"
+#include "MainResourceLoader.h"
 #include "Page.h"
 #include "RenderWidget.h"
 #include "SegmentedString.h"
 #include "Settings.h"
 #include "Text.h"
-#include "HTMLEmbedElement.h"
 #include "XMLTokenizer.h"
 
 namespace WebCore {
@@ -103,8 +105,13 @@ bool PluginTokenizer::writeRawData(const char* data, int len) {
         m_doc->updateLayout();
 
         if (RenderWidget* renderer =
-                static_cast<RenderWidget*>(m_embedElement->renderer()))
+                static_cast<RenderWidget*>(m_embedElement->renderer())) {
           frame->loader()->client()->redirectDataToPlugin(renderer->widget());
+          frame->loader()
+              ->activeDocumentLoader()
+              ->mainResourceLoader()
+              ->setShouldBufferData(false);
+        }
 
         finish();
       }
