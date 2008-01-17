@@ -636,6 +636,66 @@ void QWebPagePrivate::dropEvent(QDropEvent* ev) {
 }
 
 /*!
+    \enum QWebPage::WebAction
+
+    \value NoWebAction No action is triggered.
+    \value OpenLink Open the current link.
+    \value OpenLinkInNewWindow Open the current link in a new window.
+    \value OpenFrameInNewWindow Replicate the current frame in a new window.
+    \value DownloadLinkToDisk Download the current link to the disk.
+    \value CopyLinkToClipboard Copy the current link to the clipboard.
+    \value OpenImageInNewWindow Open the highlighted image in a new window.
+    \value DownloadImageToDisk Download the highlighted image to the disk.
+    \value CopyImageToClipboard Copy the highlighted image to the clipboard.
+    \value GoBack Navigate back in the history of navigated links.
+    \value GoForward Navigate forward in the history of navigated links.
+    \value Stop Stop loading the current page.
+    \value Reload Reload the current page.
+    \value Cut Cut the content currently selected into the clipboard.
+    \value Copy Copy the content currently selected into the clipboard.
+    \value Paste Paste content from the clipboard.
+    \value Undo Undo the last editing action.
+    \value Redo Redo the last editing action.
+    \value MoveToNextChar Move the cursor to the next character.
+    \value MoveToPreviousChar Move the cursor to the previous character.
+    \value MoveToNextWord Move the cursor to the next word.
+    \value MoveToPreviousWord Move the cursor to the previous word.
+    \value MoveToNextLine Move the cursor to the next line.
+    \value MoveToPreviousLine Move the cursor to the previous line.
+    \value MoveToStartOfLine Move the cursor to the start of the line.
+    \value MoveToEndOfLine Move the cursor to the end of the line.
+    \value MoveToStartOfBlock Move the cursor to the start of the block.
+    \value MoveToEndOfBlock Move the cursor to the end of the block.
+    \value MoveToStartOfDocument Move the cursor to the start of the document.
+    \value MoveToEndOfDocument Move the cursor to the end of the document.
+    \value SelectNextChar Select to the next character.
+    \value SelectPreviousChar Select to the previous character.
+    \value SelectNextWord Select to the next word.
+    \value SelectPreviousWord Select to the previous word.
+    \value SelectNextLine Select to the next line.
+    \value SelectPreviousLine Select to the previous line.
+    \value SelectStartOfLine Select to the start of the line.
+    \value SelectEndOfLine Select to the end of the line.
+    \value SelectStartOfBlock Select to the start of the block.
+    \value SelectEndOfBlock Select to the end of the block.
+    \value SelectStartOfDocument Select to the start of the document.
+    \value SelectEndOfDocument Select to the end of the document.
+    \value DeleteStartOfWord Delete to the start of the word.
+    \value DeleteEndOfWord Delete to the end of the word.
+    \value SetTextDirectionDefault Set the text direction to the default
+   direction.
+    \value SetTextDirectionLeftToRight Set the text direction to left-to-right.
+    \value SetTextDirectionRightToLeft Set the text direction to right-to-left.
+    \value ToggleBold Toggle the formatting between bold and normal weight.
+    \value ToggleItalic Toggle the formatting between italic and normal style.
+    \value ToggleUnderline Toggle underlining.
+    \value InspectElement Show the Web Inspector with the currently highlighted
+   HTML element.
+    \omitvalue WebActionCount
+
+*/
+
+/*!
     \class QWebPage
     \since 4.4
     \brief The QWebPage class provides a widget that is used to view and edit
@@ -702,7 +762,7 @@ QWebHistory* QWebPage::history() const {
 }
 
 /*!
-    Sets the view that is associated with the web page.
+    Sets the \a view that is associated with the web page.
 
     \sa view()
 */
@@ -824,6 +884,10 @@ static void openNewWindow(const QUrl& url, WebCore::Frame* frame) {
     This function can be called to trigger the specified \a action.
     It is also called by QtWebKit if the user triggers the action, for example
     through a context menu item.
+
+    If \a action is a checkable action then \a checked specified whether the
+   action
+    is toggled or not.
 */
 void QWebPage::triggerAction(WebAction action, bool checked) {
   WebCore::Frame* frame = d->page->focusController()->focusedOrMainFrame();
@@ -1001,11 +1065,6 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
     editor->command(command).execute();
 }
 
-/*!
-    Returns the size of the viewport.
-
-    \sa setViewportSize
-*/
 QSize QWebPage::viewportSize() const {
   QWebFrame* frame = mainFrame();
   if (frame->d->frame && frame->d->frameView)
@@ -1014,11 +1073,11 @@ QSize QWebPage::viewportSize() const {
 }
 
 /*!
-    Sets the size of the viewport. The size affects for example the visibility
-   of scrollbars
-    if the document is larger than the viewport.
+    \property QWebPage::viewportSize
 
-    \sa viewportSize
+    Specifies the size of the viewport. The size affects for example the
+   visibility of scrollbars
+    if the document is larger than the viewport.
 */
 void QWebPage::setViewportSize(const QSize& size) const {
   QWebFrame* frame = mainFrame();
@@ -1046,6 +1105,8 @@ QWebPage::NavigationRequestResponse QWebPage::navigationRequested(
 }
 
 /*!
+    \property QWebPage::selectedText
+
     Returns the text currently selected.
 */
 QString QWebPage::selectedText() const {
@@ -1208,7 +1269,9 @@ QAction* QWebPage::action(WebAction action) const {
 }
 
 /*!
-  Returns true if the page contains unsubmitted form data.
+    \property QWebPage::modified
+
+    Specifies if the page contains unsubmitted form data.
 */
 bool QWebPage::isModified() const {
   return d->modified;
@@ -1279,6 +1342,11 @@ bool QWebPage::event(QEvent* ev) {
   return true;
 }
 
+/*!
+    Similar to QWidget::focusNextPrevChild it focuses the next focusable web
+   element
+    if \a next is true. Otherwise the previous element is focused.
+*/
 bool QWebPage::focusNextPrevChild(bool next) {
   Q_UNUSED(next)
   return false;
@@ -1363,7 +1431,8 @@ QNetworkAccessManager* QWebPage::networkAccessManager() const {
 /*!
     This function is called when a user agent for HTTP requests is needed. You
    can re-implement this
-    function to dynamically return different user agent's for different urls.
+    function to dynamically return different user agent's for different urls,
+   based on the \a url parameter.
 */
 QString QWebPage::userAgentFor(const QUrl& url) const {
   Q_UNUSED(url)
@@ -1472,5 +1541,50 @@ QWebFrame* QWebPageContext::targetFrame() const {
     return 0;
   return d->targetFrame;
 }
+
+/*!
+    \fn void QWebPage::loadProgressChanged(int progress)
+
+    This signal is emitted when the global progress status changes.
+    The current value is provided by \a progress in percent.
+    It accumulates changes from all the child frames.
+*/
+
+/*!
+    \fn void QWebPage::hoveringOverLink(const QString &link, const QString
+   &title, const QString &textContent)
+
+    This signal is emitted when the mouse is hovering over a link.
+    The first parameter is the \a link url, the second is the link \a title
+    if any, and third \a textContent is the text content. Method is emitter with
+   both
+    empty parameters when the mouse isn't hovering over any link element.
+*/
+
+/*!
+    \fn void QWebPage::statusBarTextChanged(const QString& text)
+
+    This signal is emitted when the statusbar \a text is changed by the page.
+*/
+
+/*!
+    \fn void QWebPage::frameCreated(QWebFrame *frame)
+
+    This signal is emitted whenever the page creates a new \a frame.
+*/
+
+/*!
+    \fn void QWebPage::selectionChanged()
+
+    This signal is emitted whenever the selection changes.
+*/
+
+/*!
+    \fn void QWebPage::geometryChangeRequest(const QRect& geom)
+
+    This signal is emitted whenever the document wants to change the position
+   and size of the
+    page to \a geom. This can happen for example through JavaScript.
+*/
 
 #include "moc_qwebpage.cpp"

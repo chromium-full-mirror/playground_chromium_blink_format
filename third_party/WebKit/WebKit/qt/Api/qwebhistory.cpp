@@ -30,9 +30,10 @@
 #include <QSharedData>
 
 /*!
-  class QWebHistoryItem
+  \class QWebHistoryItem
   \since 4.4
-  \brief QWebHistoryItem represents on item in the history of a QWebPage
+  \brief The QWebHistoryItem class represents one item in the history of a
+  QWebPage
 
   QWebHistoryItem represents on entry in the history stack of a web page.
 
@@ -106,7 +107,7 @@ QWebHistoryItem::QWebHistoryItem(QWebHistoryItemPrivate* priv) {
 /*!
   \class QWebHistory
   \since 4.4
-  \brief QWebHistory represents the history of a QWebPage
+  \brief The QWebHistory class represents the history of a QWebPage
 
   Each QWebPage contains a history of visited pages that can be accessed by
   QWebPage::history().
@@ -146,7 +147,8 @@ QList<QWebHistoryItem> QWebHistory::items() const {
 }
 
 /*!
-  returns the list of items that are in the backwards history.
+  Returns the list of items that are in the backwards history.
+  At most \a maxItems entries are returned.
 */
 QList<QWebHistoryItem> QWebHistory::backItems(int maxItems) const {
   WebCore::HistoryItemVector items(maxItems);
@@ -161,7 +163,8 @@ QList<QWebHistoryItem> QWebHistory::backItems(int maxItems) const {
 }
 
 /*!
-  returns the list of items that are in the forward history.
+  Returns the list of items that are in the forward history.
+  At most \a maxItems entries are returned.
 */
 QList<QWebHistoryItem> QWebHistory::forwardItems(int maxItems) const {
   WebCore::HistoryItemVector items(maxItems);
