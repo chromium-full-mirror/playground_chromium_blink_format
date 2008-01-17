@@ -112,6 +112,7 @@ class MediaPlayerPrivate : Noncopyable {
   void endPointTimerFired(Timer<MediaPlayerPrivate>*);
   float maxTimeLoaded() const;
   void startEndPointTimerIfNeeded();
+  void disableUnsupportedTracks(unsigned& enabledTrackCount);
 
   MediaPlayer* m_player;
   RetainPtr<QTMovie> m_qtMovie;
