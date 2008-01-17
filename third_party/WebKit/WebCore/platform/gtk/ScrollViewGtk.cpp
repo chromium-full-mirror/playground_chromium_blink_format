@@ -96,6 +96,7 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
 
   virtual void valueChanged(Scrollbar*);
   virtual IntRect windowClipRect() const;
+  virtual bool isActive() const;
 
   static void adjustmentChanged(GtkAdjustment*, gpointer);
 
@@ -243,6 +244,11 @@ void ScrollView::ScrollViewPrivate::valueChanged(Scrollbar* bar) {
 
 IntRect ScrollView::ScrollViewPrivate::windowClipRect() const {
   return static_cast<const FrameView*>(view)->windowClipRect(false);
+}
+
+bool ScrollView::ScrollViewPrivate::isActive() const {
+  Page* page = static_cast<const FrameView*>(m_view)->frame()->page();
+  return page && page->focusController()->isActive();
 }
 
 ScrollView::ScrollView() : m_data(new ScrollViewPrivate(this)) {}
