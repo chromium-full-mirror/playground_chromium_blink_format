@@ -141,10 +141,6 @@ void FrameLoaderClientQt::savePlatformDataToCachedPage(CachedPage*) {
   notImplemented();
 }
 
-bool FrameLoaderClientQt::privateBrowsingEnabled() const {
-  return false;
-}
-
 void FrameLoaderClientQt::transitionToCommittedFromCachedPage(CachedPage*) {
   notImplemented();
 }
