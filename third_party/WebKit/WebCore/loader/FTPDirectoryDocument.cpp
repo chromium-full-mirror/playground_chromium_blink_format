@@ -48,6 +48,10 @@
 #include <pthread.h>
 #endif
 
+#if PLATFORM(QT)
+#include <QDateTime>
+#endif
+
 using namespace std;
 
 namespace WebCore {
@@ -207,6 +211,42 @@ static bool wasLastDayOfMonth(int year, int month, int day) {
   return lastDays[month] == day;
 }
 
+#if PLATFORM(QT)
+
+namespace WebCore {
+/*!
+ Replacement for localtime_r() which is not available on MinGW.
+
+ We use this on all of Qt's platforms for portability.
+ */
+struct tm gmtimeQt(const QDateTime& input) {
+  tm result;
+
+  const QDate date(input.date());
+  result.tm_year = date.year() - 1900;
+  result.tm_mon = date.month();
+  result.tm_mday = date.day();
+  result.tm_wday = date.dayOfWeek();
+  result.tm_yday = date.dayOfYear();
+
+  const QTime time(input.time());
+  result.tm_sec = time.second();
+  result.tm_min = time.minute();
+  result.tm_hour = time.hour();
+
+  return result;
+}
+}
+
+static struct tm* localTimeQt(const time_t* const timep, struct tm* result) {
+  const QDateTime dt(QDateTime::fromTime_t(*timep));
+  *result = WebCore::gmtimeQt(dt.toLocalTime());
+  return result;
+}
+
+#define localtime_s(x, y) localTimeQt(x, y)
+#endif
+
 static String processFileDateString(const FTPTime& fileTime) {
   // FIXME: Need to localize this string?
 
@@ -233,10 +273,7 @@ static String processFileDateString(const FTPTime& fileTime) {
   // the current time
   struct tm now;
   time_t now_t = time(NULL);
-#if PLATFORM(QT) && defined(Q_WS_WIN32)
-#define localtime_r(x, y) localtime_s(y, x)
-#endif
-  localtime_r(&now_t, &now);
+  localtime_s(&now_t, &now);
 
   // localtime does "year = current year - 1900", compensate for that for
   // readability and comparison purposes

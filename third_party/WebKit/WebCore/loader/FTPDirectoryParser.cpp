@@ -34,7 +34,23 @@
 
 using namespace WTF;
 
+#if PLATFORM(QT)
+#include <QDateTime>
+#endif
+
 namespace WebCore {
+#if PLATFORM(QT) && defined(Q_WS_WIN32)
+// Defined in FTPDirectoryDocument.cpp.
+struct tm gmtimeQt(const QDateTime& input);
+
+static struct tm* gmtimeQt(const time_t* const timep, struct tm* result) {
+  const QDateTime dt(QDateTime::fromTime_t(*timep));
+  *result = WebCore::gmtimeQt(dt);
+  return result;
+}
+
+#define gmtime_r(x, y) gmtimeQt(x, y)
+#endif
 
 FTPEntryType parseOneFTPLine(const char* line,
                              ListState& state,
@@ -111,10 +127,6 @@ FTPEntryType parseOneFTPLine(const char* line,
     }
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-#if PLATFORM(QT) && defined(Q_WS_WIN32)
-#define gmtime_r(x, y) gmtime_s(y, x)
-#endif
-
 #if defined(SUPPORT_EPLF)
     /* EPLF handling must come somewhere before /bin/dls handling. */
     if (!lstyle && (!state.listStyle || state.listStyle == 'E')) {
