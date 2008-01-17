@@ -2933,8 +2933,6 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
     vpos = PositionTop;
   else if (va == BOTTOM)
     vpos = PositionBottom;
-  else if (va == LENGTH)
-    vpos = -style()->verticalAlignLength().calcValue(lineHeight(firstLine));
   else {
     bool checkParent = parent()->isInline() &&
                        !parent()->isInlineBlockOrInlineTable() &&
@@ -2964,6 +2962,8 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
         vpos -= style(firstLine)->font().descent();
     } else if (va == BASELINE_MIDDLE)
       vpos += -lineHeight(firstLine) / 2 + baselinePosition(firstLine);
+    else if (va == LENGTH)
+      vpos -= style()->verticalAlignLength().calcValue(lineHeight(firstLine));
   }
 
   return vpos;
