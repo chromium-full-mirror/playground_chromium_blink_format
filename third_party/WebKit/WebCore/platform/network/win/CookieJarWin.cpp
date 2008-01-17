@@ -45,7 +45,7 @@ static const CFStringRef s_setCookieKeyCF = CFSTR("Set-Cookie");
 static const CFStringRef s_cookieCF = CFSTR("Cookie");
 #endif
 
-void setCookies(const Document* /*document*/,
+void setCookies(Document* /*document*/,
                 const KURL& url,
                 const KURL& policyURL,
                 const String& value) {
