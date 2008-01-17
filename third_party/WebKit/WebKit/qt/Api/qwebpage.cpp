@@ -1250,6 +1250,7 @@ bool QWebPage::event(QEvent* ev) {
     case QEvent::FocusOut:
       d->focusOutEvent(static_cast<QFocusEvent*>(ev));
       break;
+#ifndef QT_NO_DRAGANDDROP
     case QEvent::DragEnter:
       d->dragEnterEvent(static_cast<QDragEnterEvent*>(ev));
       break;
@@ -1262,6 +1263,7 @@ bool QWebPage::event(QEvent* ev) {
     case QEvent::Drop:
       d->dropEvent(static_cast<QDropEvent*>(ev));
       break;
+#endif
     default:
       return QObject::event(ev);
   }
