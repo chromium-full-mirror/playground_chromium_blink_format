@@ -24,6 +24,7 @@
 */
 #include "config.h"
 #include "qwebpage.h"
+#include "qwebview.h"
 #include "qwebframe.h"
 #include "qwebpage_p.h"
 #include "qwebframe_p.h"
@@ -769,6 +770,12 @@ bool QWebPage::javaScriptPrompt(QWebFrame* frame,
     a JavaScript request to open a document in a new window.
 */
 QWebPage* QWebPage::createWindow() {
+  QWebView* webView = qobject_cast<QWebView*>(d->view);
+  if (webView) {
+    QWebView* newView = webView->createWindow();
+    if (newView)
+      return newView->page();
+  }
   return 0;
 }
 
