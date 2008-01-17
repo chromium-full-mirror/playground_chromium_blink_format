@@ -1667,9 +1667,6 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       webView->revokeDragDrop();
       break;
     case WM_MOUSEMOVE:
-      if (webView->inResizer(lParam))
-        SetCursor(LoadCursor(0, IDC_SIZENWSE));
-    // fall through
     case WM_LBUTTONDOWN:
     case WM_MBUTTONDOWN:
     case WM_RBUTTONDOWN:
