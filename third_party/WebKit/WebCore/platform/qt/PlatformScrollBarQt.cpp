@@ -295,10 +295,7 @@ bool PlatformScrollbar::handleMousePressEvent(const PlatformMouseEvent& evt) {
   return true;
 }
 
-bool PlatformScrollbar::handleMouseReleaseEvent(const PlatformMouseEvent& evt) {
-  const QPoint pos = parent()->convertFromContainingWindow(evt.pos());
-  // qDebug() << "PlatformScrollbar::handleMouseReleaseEvent" << m_opt.rect <<
-  // pos << endl;
+bool PlatformScrollbar::handleMouseReleaseEvent(const PlatformMouseEvent&) {
   m_opt.state &= ~QStyle::State_Sunken;
   m_pressedPart = QStyle::SC_None;
   m_pressedPos = 0;
