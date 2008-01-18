@@ -157,9 +157,13 @@ void RenderTableSection::addChild(RenderObject* child,
 
   // If the next renderer is actually wrapped in an anonymous table row, we need
   // to go up and find that.
-  while (beforeChild && !beforeChild->isTableRow())
+  while (beforeChild && beforeChild->parent() != this)
     beforeChild = beforeChild->parent();
 
+  ASSERT(!beforeChild || beforeChild->isTableRow() ||
+         isTableSection && beforeChild->element() &&
+             beforeChild->element()->hasTagName(formTag) &&
+             document()->isHTMLDocument());
   RenderContainer::addChild(child, beforeChild);
 }
 
