@@ -361,7 +361,7 @@ Value FunCount::evaluate() const {
   if (!a.isNodeSet())
     return 0.0;
 
-  return a.toNodeSet().size();
+  return double(a.toNodeSet().size());
 }
 
 Value FunString::evaluate() const {
