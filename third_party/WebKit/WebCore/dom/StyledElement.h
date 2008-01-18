@@ -80,7 +80,9 @@ class StyledElement : public Element {
   CSSMutableStyleDeclaration* inlineStyleDecl() const {
     return m_inlineStyleDecl.get();
   }
-  virtual CSSMutableStyleDeclaration* additionalAttributeStyleDecl();
+  virtual bool canHaveAdditionalAttributeStyleDecls() const { return false; }
+  virtual void additionalAttributeStyleDecls(
+      Vector<CSSMutableStyleDeclaration*>&){};
   CSSMutableStyleDeclaration* getInlineStyleDecl();
   CSSStyleDeclaration* style();
   void createInlineStyleDecl();

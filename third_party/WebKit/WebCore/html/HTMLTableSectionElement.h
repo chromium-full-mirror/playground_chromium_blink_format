@@ -38,7 +38,9 @@ class HTMLTableSectionElement : public HTMLTablePartElement {
   virtual int tagPriority() const { return 8; }
   virtual bool checkDTD(const Node*);
   virtual ContainerNode* addChild(PassRefPtr<Node>);
-  virtual CSSMutableStyleDeclaration* additionalAttributeStyleDecl();
+  virtual bool canHaveAdditionalAttributeStyleDecls() const { return true; }
+  virtual void additionalAttributeStyleDecls(
+      Vector<CSSMutableStyleDeclaration*>&);
 
   PassRefPtr<HTMLElement> insertRow(int index, ExceptionCode&);
   void deleteRow(int index, ExceptionCode&);

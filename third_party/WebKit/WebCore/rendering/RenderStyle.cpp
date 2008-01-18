@@ -29,7 +29,7 @@ namespace WebCore {
 
 static RenderStyle* defaultStyle;
 
-StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Auto) {}
+StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Fixed) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
     : RefCounted<StyleSurroundData>(),

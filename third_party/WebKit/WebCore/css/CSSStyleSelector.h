@@ -276,7 +276,10 @@ class CSSStyleSelector : public StyleSelector {
 
   HashSet<AtomicStringImpl*> m_selectorAttrs;
 
+  Vector<CSSMutableStyleDeclaration*> m_additionalAttributeStyleDecls;
+
   void applyProperty(int id, CSSValue*);
+
 #if ENABLE(SVG)
   void applySVGProperty(int id, CSSValue*);
 #endif

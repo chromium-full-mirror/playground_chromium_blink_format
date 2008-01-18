@@ -790,7 +790,9 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
          m_element->getAttribute(XMLNames::langAttr)) &&
         (s->getAttribute(langAttr) == m_element->getAttribute(langAttr)) &&
         (s->getAttribute(readonlyAttr) ==
-         m_element->getAttribute(readonlyAttr))) {
+         m_element->getAttribute(readonlyAttr)) &&
+        (s->getAttribute(cellpaddingAttr) ==
+         m_element->getAttribute(cellpaddingAttr))) {
       bool isControl = s->isControl();
       if (isControl != m_element->isControl())
         return false;
@@ -981,13 +983,18 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
       // applied
       // after all attributes, since their mapped style depends on the values of
       // multiple attributes.
-      CSSMutableStyleDeclaration* attributeDecl =
-          m_styledElement->additionalAttributeStyleDecl();
-      if (attributeDecl) {
-        lastAuthorRule = m_matchedDecls.size();
-        if (firstAuthorRule == -1)
-          firstAuthorRule = lastAuthorRule;
-        addMatchedDeclaration(attributeDecl);
+      if (m_styledElement->canHaveAdditionalAttributeStyleDecls()) {
+        m_additionalAttributeStyleDecls.clear();
+        m_styledElement->additionalAttributeStyleDecls(
+            m_additionalAttributeStyleDecls);
+        if (!m_additionalAttributeStyleDecls.isEmpty()) {
+          unsigned additionalDeclsSize = m_additionalAttributeStyleDecls.size();
+          if (firstAuthorRule == -1)
+            firstAuthorRule = m_matchedDecls.size();
+          lastAuthorRule = m_matchedDecls.size() + additionalDeclsSize - 1;
+          for (unsigned i = 0; i < additionalDeclsSize; i++)
+            addMatchedDeclaration(m_additionalAttributeStyleDecls[i]);
+        }
       }
     }
 

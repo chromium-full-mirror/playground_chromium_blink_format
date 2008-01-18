@@ -45,7 +45,9 @@ class HTMLTableColElement : public HTMLTablePartElement {
   // overrides
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual CSSMutableStyleDeclaration* additionalAttributeStyleDecl();
+  virtual bool canHaveAdditionalAttributeStyleDecls() const { return true; }
+  virtual void additionalAttributeStyleDecls(
+      Vector<CSSMutableStyleDeclaration*>&);
 
   int span() const { return _span; }
 

@@ -2624,10 +2624,7 @@ int RenderObject::paddingTop() const {
   Length padding = m_style->paddingTop();
   if (padding.isPercent())
     w = containingBlock()->availableWidth();
-  w = padding.calcMinValue(w);
-  if (isTableCell() && padding.isAuto())
-    w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
-  return w;
+  return padding.calcMinValue(w);
 }
 
 int RenderObject::paddingBottom() const {
@@ -2635,10 +2632,7 @@ int RenderObject::paddingBottom() const {
   Length padding = style()->paddingBottom();
   if (padding.isPercent())
     w = containingBlock()->availableWidth();
-  w = padding.calcMinValue(w);
-  if (isTableCell() && padding.isAuto())
-    w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
-  return w;
+  return padding.calcMinValue(w);
 }
 
 int RenderObject::paddingLeft() const {
@@ -2646,10 +2640,7 @@ int RenderObject::paddingLeft() const {
   Length padding = style()->paddingLeft();
   if (padding.isPercent())
     w = containingBlock()->availableWidth();
-  w = padding.calcMinValue(w);
-  if (isTableCell() && padding.isAuto())
-    w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
-  return w;
+  return padding.calcMinValue(w);
 }
 
 int RenderObject::paddingRight() const {
@@ -2657,10 +2648,7 @@ int RenderObject::paddingRight() const {
   Length padding = style()->paddingRight();
   if (padding.isPercent())
     w = containingBlock()->availableWidth();
-  w = padding.calcMinValue(w);
-  if (isTableCell() && padding.isAuto())
-    w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
-  return w;
+  return padding.calcMinValue(w);
 }
 
 RenderView* RenderObject::view() const {

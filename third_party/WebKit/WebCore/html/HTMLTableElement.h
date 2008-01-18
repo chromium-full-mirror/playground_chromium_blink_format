@@ -99,11 +99,16 @@ class HTMLTableElement : public HTMLElement {
   // Used to obtain either a solid or outset border decl and to deal with the
   // frame
   // and rules attributes.
-  virtual CSSMutableStyleDeclaration* additionalAttributeStyleDecl();
-  CSSMutableStyleDeclaration* getSharedCellDecl();
-  CSSMutableStyleDeclaration* getSharedGroupDecl(bool rows);
+  virtual bool canHaveAdditionalAttributeStyleDecls() const { return true; }
+  virtual void additionalAttributeStyleDecls(
+      Vector<CSSMutableStyleDeclaration*>&);
+  void addSharedCellDecls(Vector<CSSMutableStyleDeclaration*>&);
+  void addSharedGroupDecls(bool rows, Vector<CSSMutableStyleDeclaration*>&);
 
  private:
+  void addSharedCellBordersDecl(Vector<CSSMutableStyleDeclaration*>&);
+  void addSharedCellPaddingDecl(Vector<CSSMutableStyleDeclaration*>&);
+
   enum TableRules {
     UnsetRules,
     NoneRules,
@@ -137,6 +142,7 @@ class HTMLTableElement : public HTMLElement {
                            // are present, to none otherwise).
 
   unsigned short m_padding;
+  RefPtr<CSSMappedAttributeDeclaration> m_paddingDecl;
 };
 
 }  // namespace

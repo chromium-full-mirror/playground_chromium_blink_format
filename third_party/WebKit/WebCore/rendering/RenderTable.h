@@ -85,9 +85,6 @@ class RenderTable : public RenderBlock {
 
   const Color& bgColor() const { return style()->backgroundColor(); }
 
-  unsigned cellPadding() const { return m_padding; }
-  void setCellPadding(unsigned);
-
   int outerBorderTop() const;
   int outerBorderBottom() const;
   int outerBorderLeft() const;
@@ -212,7 +209,6 @@ class RenderTable : public RenderBlock {
   unsigned m_rules : 4;  // Rules
 
   mutable bool m_hasColElements : 1;
-  unsigned m_padding : 22;
   mutable bool m_needsSectionRecalc : 1;
 
   short m_hSpacing;
