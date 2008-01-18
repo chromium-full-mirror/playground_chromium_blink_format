@@ -405,11 +405,15 @@ int PlatformScrollbar::verticalScrollbarWidth(
   return s->pixelMetric(QStyle::PM_ScrollBarExtent, &o, 0);
 }
 
-IntRect PlatformScrollbar::windowClipRect() const {
-  IntRect clipRect = m_opt.rect;
-  if (m_client)
-    clipRect.intersect(m_client->windowClipRect());
-  return clipRect;
+void PlatformScrollbar::invalidate() {
+  // Get the root widget.
+  ScrollView* outermostView = topLevel();
+  if (!outermostView)
+    return;
+
+  IntRect windowRect =
+      convertToContainingWindow(IntRect(0, 0, width(), height()));
+  outermostView->addToDirtyRegion(windowRect);
 }
 }
 
