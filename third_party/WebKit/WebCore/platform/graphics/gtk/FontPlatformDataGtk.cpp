@@ -56,7 +56,7 @@ FontPlatformData::FontPlatformData(const FontDescription& fontDescription,
   cairo_font_face_t* fontFace;
   static const cairo_font_options_t* defaultOptions =
       cairo_font_options_create();
-  const cairo_font_options_t* options;
+  const cairo_font_options_t* options = NULL;
   cairo_matrix_t fontMatrix;
 
   if (!FcPatternAddString(pattern, FC_FAMILY,
@@ -106,11 +106,11 @@ FontPlatformData::FontPlatformData(const FontDescription& fontDescription,
 #if GTK_CHECK_VERSION(2, 10, 0)
   if (GdkScreen* screen = gdk_screen_get_default())
     options = gdk_screen_get_font_options(screen);
-  else
-    options = defaultOptions;
-#else
-  options = defaultOptions;
 #endif
+  // gdk_screen_get_font_options() returns NULL if no default options are
+  // set, so we always have to check.
+  if (!options)
+    options = defaultOptions;
 
   m_scaledFont = cairo_scaled_font_create(fontFace, &fontMatrix, &ctm, options);
   cairo_font_face_destroy(fontFace);
