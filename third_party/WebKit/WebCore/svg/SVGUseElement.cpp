@@ -257,10 +257,12 @@ void dumpInstanceTree(unsigned int& depth,
 #endif
 
 static bool isDisallowedElement(Node* element) {
+#if ENABLE(SVG_FOREIGN_OBJECT)
   // <foreignObject> should never be contained in a <use> tree. Too dangerous
   // side effects possible.
   if (element->hasTagName(SVGNames::foreignObjectTag))
     return true;
+#endif
 
   return false;
 }

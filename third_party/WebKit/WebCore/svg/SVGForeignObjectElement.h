@@ -22,7 +22,7 @@
 #ifndef SVGForeignObjectElement_h
 #define SVGForeignObjectElement_h
 
-#if ENABLE(SVG)
+#if ENABLE(SVG) && ENABLE(SVG_FOREIGN_OBJECT)
 
 #include "SVGTests.h"
 #include "SVGLangSpace.h"
@@ -83,7 +83,7 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG)
+#endif  // ENABLE(SVG) && ENABLE(SVG_FOREIGN_OBJECT)
 #endif
 
 // vim:ts=4:noet

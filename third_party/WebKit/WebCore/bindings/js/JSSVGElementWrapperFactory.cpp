@@ -224,15 +224,22 @@ typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
 #define FOR_EACH_FILTER_TAG(macro)
 #endif
 
+#if ENABLE(SVG_FOREIGN_OBJECT)
+#define FOR_EACH_FOREIGN_OBJECT_TAG(macro) \
+  macro(foreignObject, ForeignObject)  // end of macro
+#else
+#define FOR_EACH_FOREIGN_OBJECT_TAG(macro)
+#endif
+
 #define FOR_EACH_TAG(macro)                                                   \
-  macro(a, A) macro(circle, Circle) macro(clipPath, ClipPath) macro(          \
-      cursor, Cursor) macro(defs, Defs) macro(desc, Desc)                     \
-      macro(ellipse, Ellipse) macro(foreignObject, ForeignObject) macro(      \
-          g, G) macro(image, Image) macro(linearGradient, LinearGradient)     \
-          macro(line, Line) macro(marker, Marker) macro(mask, Mask) macro(    \
-              metadata, Metadata) macro(path, Path) macro(pattern, Pattern)   \
-              macro(polyline, Polyline) macro(polygon, Polygon)               \
-                  macro(radialGradient, RadialGradient) macro(rect, Rect)     \
+  macro(a, A) macro(circle, Circle) macro(clipPath, ClipPath)                 \
+      macro(cursor, Cursor) macro(defs, Defs) macro(desc, Desc) macro(        \
+          ellipse, Ellipse) macro(g, G) macro(image, Image)                   \
+          macro(linearGradient, LinearGradient) macro(line, Line) macro(      \
+              marker, Marker) macro(mask, Mask) macro(metadata, Metadata)     \
+              macro(path, Path) macro(pattern, Pattern)                       \
+                  macro(polyline, Polyline) macro(polygon, Polygon) macro(    \
+                      radialGradient, RadialGradient) macro(rect, Rect)       \
                       macro(script, Script) macro(set, Set) macro(stop, Stop) \
                           macro(style, Style) macro(svg, SVG) macro(          \
                               switch, Switch) macro(symbol, Symbol)           \
@@ -252,6 +259,7 @@ FOR_EACH_TAG(CREATE_WRAPPER_FUNCTION)
 FOR_EACH_ANIMATION_TAG(CREATE_WRAPPER_FUNCTION)
 FOR_EACH_FONT_TAG(CREATE_WRAPPER_FUNCTION)
 FOR_EACH_FILTER_TAG(CREATE_WRAPPER_FUNCTION)
+FOR_EACH_FOREIGN_OBJECT_TAG(CREATE_WRAPPER_FUNCTION)
 
 #undef CREATE_WRAPPER_FUNCTION
 
@@ -265,6 +273,7 @@ JSNode* createJSSVGWrapper(ExecState* exec, PassRefPtr<SVGElement> element) {
     FOR_EACH_ANIMATION_TAG(ADD_TO_HASH_MAP)
     FOR_EACH_FONT_TAG(ADD_TO_HASH_MAP)
     FOR_EACH_FILTER_TAG(ADD_TO_HASH_MAP)
+    FOR_EACH_FOREIGN_OBJECT_TAG(ADD_TO_HASH_MAP)
 #undef ADD_TO_HASH_MAP
   }
   CreateSVGElementWrapperFunction createWrapperFunction =
