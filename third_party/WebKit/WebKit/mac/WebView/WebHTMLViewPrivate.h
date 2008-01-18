@@ -127,7 +127,7 @@
                                            subresources:(NSArray**)subresources;
 
 // SPI for DumpRenderTree
-- (void)_updateActiveState;
+- (void)_updateFocusedAndActiveState;
 
 // SPI for printing (should be converted to API someday). When the WebHTMLView
 // isn't being printed

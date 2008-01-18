@@ -1756,8 +1756,6 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
                                                (void**)&uiDelegatePrivate)) &&
           uiDelegatePrivate)
         uiDelegatePrivate->webViewReceivedFocus(webView);
-      // FIXME: Merge this logic with updateActiveState, and switch this over to
-      // use updateActiveState
 
       FocusController* focusController = webView->page()->focusController();
       if (Frame* frame = focusController->focusedFrame()) {
@@ -1780,8 +1778,6 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
           uiDelegatePrivate)
         uiDelegatePrivate->webViewLostFocus(webView,
                                             (OLE_HANDLE)(ULONG64)newFocusWnd);
-      // FIXME: Merge this logic with updateActiveState, and switch this over to
-      // use updateActiveState
 
       // However here we have to be careful.  If we are losing focus because of
       // a deactivate,
@@ -2776,11 +2772,20 @@ HRESULT STDMETHODCALLTYPE WebView::searchFor(
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebView::updateActiveState() {
+void WebView::updateActiveState() {
   HWND activeWindow = GetActiveWindow();
-
   m_page->focusController()->setActive(
       activeWindow && m_topLevelParent == findTopLevelParent(activeWindow));
+}
+
+HRESULT STDMETHODCALLTYPE WebView::updateFocusedAndActiveState() {
+  updateActiveState();
+
+  bool active = m_page->focusController()->isActive();
+  Frame* mainFrame = m_page->mainFrame();
+  Frame* focusedFrame = m_page->focusController()->focusedOrMainFrame();
+  mainFrame->selectionController()->setFocused(active &&
+                                               mainFrame == focusedFrame);
 
   return S_OK;
 }
