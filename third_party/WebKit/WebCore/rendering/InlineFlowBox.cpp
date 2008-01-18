@@ -453,7 +453,8 @@ void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
       setBaseline(tableCell->RenderBlock::baselinePosition(m_firstLine, true));
     } else
       setBaseline(object()->baselinePosition(m_firstLine, true));
-    if (hasTextChildren() || strictMode) {
+    if (hasTextChildren() || object()->hasBordersPaddingOrMargin() ||
+        strictMode) {
       int ascent = baseline();
       int descent = height() - ascent;
       if (maxAscent < ascent)
@@ -476,7 +477,8 @@ void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
     } else if (curr->yPos() == PositionBottom) {
       if (maxPositionBottom < curr->height())
         maxPositionBottom = curr->height();
-    } else if (curr->hasTextChildren() || strictMode) {
+    } else if (curr->hasTextChildren() ||
+               curr->object()->hasBordersPaddingOrMargin() || strictMode) {
       int ascent = curr->baseline() - curr->yPos();
       int descent = curr->height() - ascent;
       if (maxAscent < ascent)
@@ -520,7 +522,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
     else if (curr->yPos() == PositionBottom)
       curr->setYPos(y + maxHeight - curr->height());
     else {
-      if (!curr->hasTextChildren() && !strictMode)
+      if (!curr->hasTextChildren() &&
+          !curr->object()->hasBordersPaddingOrMargin() && !strictMode)
         childAffectsTopBottomPos = false;
       curr->setYPos(curr->yPos() + y + maxAscent - curr->baseline());
     }
@@ -580,7 +583,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
     setHeight(font.ascent() + font.descent());
     setYPos(yPos() + baseline() - font.ascent());
     setBaseline(font.ascent());
-    if (hasTextChildren() || strictMode) {
+    if (hasTextChildren() || object()->hasBordersPaddingOrMargin() ||
+        strictMode) {
       selectionTop = min(selectionTop, yPos());
       selectionBottom = max(selectionBottom, yPos() + height());
     }
@@ -600,7 +604,7 @@ void InlineFlowBox::shrinkBoxesWithNoTextChildren(int topPos, int bottomPos) {
 
   // See if we have text children. If not, then we need to shrink ourselves to
   // fit on the line.
-  if (!hasTextChildren()) {
+  if (!hasTextChildren() && !object()->hasBordersPaddingOrMargin()) {
     if (yPos() < topPos)
       setYPos(topPos);
     if (yPos() + height() > bottomPos)

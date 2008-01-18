@@ -1318,21 +1318,11 @@ static inline bool shouldPreserveNewline(RenderObject* object) {
 static bool inlineFlowRequiresLineBox(RenderObject* flow) {
   // FIXME: Right now, we only allow line boxes for inlines that are truly
   // empty.
-  // We need to fix this, though, because at the very least, inlines with only
-  // text
-  // children that is all whitespace should should also have line boxes.
-  if (!flow->isInlineFlow() || flow->firstChild())
-    return false;
-
-  bool hasPaddingOrMargin =
-      !(flow->paddingLeft() == 0 && flow->paddingRight() == 0 &&
-        flow->paddingTop() == 0 && flow->paddingBottom() == 0 &&
-        flow->marginLeft() == 0 && flow->marginRight() == 0 &&
-        flow->marginTop() == 0 && flow->marginBottom() == 0);
-  if (flow->hasBoxDecorations() || hasPaddingOrMargin)
-    return true;
-
-  return false;
+  // We need to fix this, though, because at the very least, inlines containing
+  // only
+  // ignorable whitespace should should also have line boxes.
+  return flow->isInlineFlow() && !flow->firstChild() &&
+         flow->hasBordersPaddingOrMargin();
 }
 
 static inline bool requiresLineBox(BidiIterator& it) {
@@ -1593,6 +1583,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       // markers and
       // start ignoring spaces.
       if (inlineFlowRequiresLineBox(o)) {
+        isLineEmpty = false;
         if (ignoringSpaces) {
           trailingSpaceObject = 0;
           addMidpoint(BidiIterator(0, o, 0));  // Stop ignoring spaces.
