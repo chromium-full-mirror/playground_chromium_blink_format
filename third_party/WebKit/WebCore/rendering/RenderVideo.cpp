@@ -135,7 +135,12 @@ bool RenderVideo::isWidthSpecified() const {
     case Fixed:
     case Percent:
       return true;
-    default:
+    case Auto:
+    case Relative:  // FIXME: Shouldn't this case return true? It doesn't for
+                    // images.
+    case Static:
+    case Intrinsic:
+    case MinIntrinsic:
       return false;
   }
   ASSERT(false);
@@ -147,7 +152,12 @@ bool RenderVideo::isHeightSpecified() const {
     case Fixed:
     case Percent:
       return true;
-    default:
+    case Auto:
+    case Relative:  // FIXME: Shouldn't this case return true? It doesn't for
+                    // images.
+    case Static:
+    case Intrinsic:
+    case MinIntrinsic:
       return false;
   }
   ASSERT(false);
