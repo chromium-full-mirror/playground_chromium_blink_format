@@ -99,7 +99,7 @@ bool DragData::containsColor() const {
 }
 
 bool DragData::canSmartReplace() const {
-  return false;
+  return SUCCEEDED(m_platformDragData->QueryGetData(smartPasteFormat()));
 }
 
 bool DragData::containsCompatibleContent() const {
