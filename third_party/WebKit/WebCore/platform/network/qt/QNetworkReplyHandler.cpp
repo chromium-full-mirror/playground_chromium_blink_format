@@ -191,7 +191,8 @@ void QNetworkReplyHandler::start() {
       break;
     case QNetworkAccessManager::PostOperation: {
       Vector<char> bytes;
-      d->m_request.httpBody()->flatten(bytes);
+      if (d->m_request.httpBody())
+        d->m_request.httpBody()->flatten(bytes);
       m_reply =
           manager->post(m_request, QByteArray(bytes.data(), bytes.size()));
       break;
@@ -202,7 +203,8 @@ void QNetworkReplyHandler::start() {
     case QNetworkAccessManager::PutOperation: {
       // ### data?
       Vector<char> bytes;
-      d->m_request.httpBody()->flatten(bytes);
+      if (d->m_request.httpBody())
+        d->m_request.httpBody()->flatten(bytes);
       m_reply = manager->put(m_request, QByteArray(bytes.data(), bytes.size()));
       break;
     }
