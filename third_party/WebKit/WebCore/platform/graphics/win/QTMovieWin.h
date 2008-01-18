@@ -46,6 +46,7 @@ class QTMovieWinClient {
 };
 
 enum {
+  QTMovieLoadStateError = -1L,
   QTMovieLoadStateLoaded = 2000L,
   QTMovieLoadStatePlayable = 10000L,
   QTMovieLoadStatePlaythroughOK = 20000L,
@@ -83,6 +84,8 @@ class QTMOVIEWIN_API QTMovieWin {
 
   void setVisible(bool);
   void paint(HDC, int x, int y);
+
+  void disableUnsupportedTracks(unsigned& enabledTrackCount);
 
   static unsigned countSupportedTypes();
   static void getSupportedType(unsigned index,
