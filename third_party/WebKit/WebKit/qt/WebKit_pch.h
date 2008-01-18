@@ -23,6 +23,11 @@
 /*
  * This is a precompiled header file for use in Xcode / Mac GCC /
  * GCC >= 3.4 / VC to greatly speed the building of QtWebKit.
+ *
+ * The order of the includes appears random and arbitrary. But unfortunately
+ * MSVC is very sensitive and behaves fairly strange when compiling with
+ * precompiled headers. Please be very careful when adding, removing or
+ * changing the order of included header files.
  */
 
 #if defined __cplusplus
@@ -49,8 +54,6 @@
 #include <wtf/HashCountedSet.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/Platform.h>
-//#include <wtf/RetainPtr.h>
-//#include <wtf/TCSpinLock.h>
 #include <wtf/RefPtr.h>
 #include <wtf/VectorTraits.h>
 #include <wtf/MathExtras.h>
@@ -58,7 +61,6 @@
 #include <wtf/OwnPtr.h>
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/ListRefPtr.h>
-//#include <wtf/MallocZoneSupport.h>
 #include <wtf/FastMalloc.h>
 #include <wtf/TCSystemAlloc.h>
 #include <wtf/StringExtras.h>
