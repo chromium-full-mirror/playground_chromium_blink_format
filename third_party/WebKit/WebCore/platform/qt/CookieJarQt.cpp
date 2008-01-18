@@ -52,10 +52,15 @@ void setCookies(Document* document,
   QUrl u(url);
   QUrl p(policyURL);
 #if QT_VERSION >= 0x040400
-  QWebFrame* frame =
-      static_cast<FrameLoaderClientQt*>(document->frame()->loader()->client())
-          ->webFrame();
-  QWebPage* page = frame->page();
+  Frame* frame = document->frame();
+  if (!frame)
+    return;
+  FrameLoader* loader = frame->loader();
+  if (!loader)
+    return;
+  QWebFrame* webFrame =
+      static_cast<FrameLoaderClientQt*>(loader->client())->webFrame();
+  QWebPage* page = webFrame->page();
   QNetworkAccessManager* manager = page->networkAccessManager();
   QNetworkCookieJar* jar = manager->cookieJar();
 
@@ -70,10 +75,15 @@ void setCookies(Document* document,
 String cookies(const Document* document, const KURL& url) {
   QUrl u(url);
 #if QT_VERSION >= 0x040400
-  QWebFrame* frame =
-      static_cast<FrameLoaderClientQt*>(document->frame()->loader()->client())
-          ->webFrame();
-  QWebPage* page = frame->page();
+  Frame* frame = document->frame();
+  if (!frame)
+    return String();
+  FrameLoader* loader = frame->loader();
+  if (!loader)
+    return String();
+  QWebFrame* webFrame =
+      static_cast<FrameLoaderClientQt*>(loader->client())->webFrame();
+  QWebPage* page = webFrame->page();
   QNetworkAccessManager* manager = page->networkAccessManager();
   QNetworkCookieJar* jar = manager->cookieJar();
 
