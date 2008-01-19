@@ -183,7 +183,7 @@ class UString {
     mutable unsigned _hash;
     bool isIdentifier;
     UString::Rep* baseString;
-    int reportedCost;
+    size_t reportedCost;
 
     // potentially shared data
     UChar* buf;
