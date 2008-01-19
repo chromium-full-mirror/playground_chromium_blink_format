@@ -595,7 +595,6 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
     return result;
   m_frame->renderer()->layer()->hitTest(HitTestRequest(true, true), result);
 
-  IntPoint widgetPoint(point);
   while (true) {
     Node* n = result.innerNode();
     if (!n || !n->renderer() || !n->renderer()->isWidget())
@@ -606,10 +605,12 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
     Frame* frame = static_cast<HTMLFrameElementBase*>(n)->contentFrame();
     if (!frame || !frame->renderer())
       break;
-    int absX, absY;
-    n->renderer()->absolutePosition(absX, absY, true);
     FrameView* view = static_cast<FrameView*>(widget);
-    widgetPoint.move(view->contentsX() - absX, view->contentsY() - absY);
+    IntPoint widgetPoint(
+        result.localPoint().x() + view->contentsX() -
+            n->renderer()->borderLeft() - n->renderer()->paddingLeft(),
+        result.localPoint().y() + view->contentsY() -
+            n->renderer()->borderTop() - n->renderer()->paddingTop());
     HitTestResult widgetHitTestResult(widgetPoint);
     frame->renderer()->layer()->hitTest(HitTestRequest(true, true),
                                         widgetHitTestResult);
