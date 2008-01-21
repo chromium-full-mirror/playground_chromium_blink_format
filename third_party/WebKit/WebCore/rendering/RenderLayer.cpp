@@ -420,17 +420,16 @@ RenderLayer* RenderLayer::stackingContext() const {
   for (; curr && !curr->m_object->isRenderView() && !curr->m_object->isRoot() &&
          curr->m_object->style()->hasAutoZIndex();
        curr = curr->parent()) {
-  }
+  };
   return curr;
 }
 
 RenderLayer* RenderLayer::enclosingPositionedAncestor() const {
   RenderLayer* curr = parent();
-  for (; curr && !curr->m_object->isRenderView() && !curr->m_object->isRoot() &&
+  for (; curr && !curr->m_object->isRenderView() &&
          !curr->m_object->isPositioned() && !curr->m_object->isRelPositioned();
        curr = curr->parent()) {
-  }
-
+  };
   return curr;
 }
 
