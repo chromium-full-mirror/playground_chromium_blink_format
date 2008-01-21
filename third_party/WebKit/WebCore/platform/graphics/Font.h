@@ -329,6 +329,8 @@ class Font {
   static bool isRoundingHackCharacter(UChar32 c) {
     return (((c & ~0xFF) == 0 && gRoundingHackCharacterTable[c]));
   }
+
+  FontSelector* fontSelector() const;
 #endif
   static bool treatAsSpace(UChar c) {
     return c == ' ' || c == '\t' || c == '\n' || c == 0x00A0;

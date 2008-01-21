@@ -54,6 +54,13 @@ bool SegmentedFontData::containsCharacters(const UChar* characters,
   return false;
 }
 
+#if ENABLE(SVG_FONTS)
+bool SegmentedFontData::isSVGFont() const {
+  // We don't support segmented svg fonts at the moment.
+  return false;
+}
+#endif
+
 bool SegmentedFontData::isCustomFont() const {
   // All segmented fonts are custom fonts.
   return true;

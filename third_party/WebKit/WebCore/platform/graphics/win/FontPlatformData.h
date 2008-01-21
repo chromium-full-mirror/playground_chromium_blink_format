@@ -56,6 +56,7 @@ class FontPlatformData {
         m_useGDI(false) {}
 
   FontPlatformData(HFONT, float size, bool bold, bool oblique, bool useGDI);
+  FontPlatformData(float size, bool bold, bool oblique);
   FontPlatformData(CGFontRef, float size, bool bold, bool oblique);
   ~FontPlatformData();
 

@@ -556,19 +556,19 @@ int Font::width(const TextRun& run) const {
 }
 
 int Font::ascent() const {
-  return primaryFont()->ascent(size());
+  return primaryFont()->ascent();
 }
 
 int Font::descent() const {
-  return primaryFont()->descent(size());
+  return primaryFont()->descent();
 }
 
 int Font::lineSpacing() const {
-  return primaryFont()->lineSpacing(size());
+  return primaryFont()->lineSpacing();
 }
 
 float Font::xHeight() const {
-  return primaryFont()->xHeight(size());
+  return primaryFont()->xHeight();
 }
 
 unsigned Font::unitsPerEm() const {
@@ -858,5 +858,9 @@ int Font::offsetForPositionForSimpleText(const TextRun& run,
   }
 
   return offset;
+}
+
+FontSelector* Font::fontSelector() const {
+  return m_fontList ? m_fontList->fontSelector() : 0;
 }
 }

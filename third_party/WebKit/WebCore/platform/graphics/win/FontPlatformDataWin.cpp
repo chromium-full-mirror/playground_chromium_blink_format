@@ -220,6 +220,14 @@ FontPlatformData::FontPlatformData(HFONT font,
   ReleaseDC(0, hdc);
 }
 
+FontPlatformData::FontPlatformData(float size, bool bold, bool oblique)
+    : m_font(0),
+      m_size(size),
+      m_cgFont(0),
+      m_syntheticBold(bold),
+      m_syntheticOblique(oblique),
+      m_useGDI(false) {}
+
 FontPlatformData::FontPlatformData(CGFontRef font,
                                    float size,
                                    bool bold,

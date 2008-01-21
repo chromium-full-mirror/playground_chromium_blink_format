@@ -28,6 +28,7 @@
 #include "GlyphPageTreeNode.h"
 #include "GlyphWidthMap.h"
 #include <wtf/OwnPtr.h>
+
 #if PLATFORM(MAC)
 typedef struct OpaqueATSUStyle* ATSUStyle;
 #endif
@@ -41,32 +42,8 @@ namespace WebCore {
 class FontDescription;
 class FontPlatformData;
 class SharedBuffer;
+class SVGFontData;
 class WidthMap;
-
-#if ENABLE(SVG_FONTS)
-class SVGFontFaceElement;
-
-struct SVGFontData {
-  SVGFontData(SVGFontFaceElement*);
-
-  // Helper function
-  static float convertEmUnitToPixel(float fontSize,
-                                    float unitsPerEm,
-                                    float value);
-
-  // Hold pointer to our creator
-  RefPtr<SVGFontFaceElement> fontFaceElement;
-
-  // SVG Font specific metrics
-  float horizontalOriginX;
-  float horizontalOriginY;
-  float horizontalAdvanceX;
-
-  float verticalOriginX;
-  float verticalOriginY;
-  float verticalAdvanceY;
-};
-#endif
 
 enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
 
@@ -74,7 +51,8 @@ class SimpleFontData : public FontData {
  public:
   SimpleFontData(const FontPlatformData&,
                  bool customFont = false,
-                 bool loading = false);
+                 bool loading = false,
+                 SVGFontData* data = 0);
   virtual ~SimpleFontData();
 
  public:
@@ -83,11 +61,11 @@ class SimpleFontData : public FontData {
       const FontDescription& fontDescription) const;
 
   // vertical metrics
-  int ascent(float fontSize) const;
-  int descent(float fontSize) const;
-  int lineSpacing(float fontSize) const;
-  int lineGap(float fontSize) const;
-  float xHeight(float fontSize) const;
+  int ascent() const { return m_ascent; }
+  int descent() const { return m_descent; }
+  int lineSpacing() const { return m_lineSpacing; }
+  int lineGap() const { return m_lineGap; }
+  float xHeight() const { return m_xHeight; }
   unsigned unitsPerEm() const { return m_unitsPerEm; }
 
   float widthForGlyph(Glyph) const;
@@ -101,16 +79,16 @@ class SimpleFontData : public FontData {
     return m_treatAsFixedPitch ? FixedPitch : VariablePitch;
   }
 
-#if ENABLE(SVG_FONTS)
-  bool isSVGFont() const { return m_svgFontData; }
-  SVGFontData* svgFontData() const { return m_svgFontData.get(); }
-#endif
-
+  virtual bool isSVGFont() const { return m_svgFontData; }
   virtual bool isCustomFont() const { return m_isCustomFont; }
   virtual bool isLoading() const { return m_isLoading; }
   virtual bool isSegmented() const;
 
   const GlyphData& missingGlyphData() const { return m_missingGlyphData; }
+
+#if ENABLE(SVG_FONTS)
+  SVGFontData* svgFontData() const { return m_svgFontData.get(); }
+#endif
 
 #if PLATFORM(MAC)
   NSFont* getNSFont() const { return m_font.font(); }

@@ -28,23 +28,15 @@
 
 #include "CSSValue.h"
 #include "PlatformString.h"
+#include "SVGFontFaceElement.h"
 
 namespace WebCore {
-
-class SVGFontFaceElement;
 
 class CSSFontFaceSrcValue : public CSSValue {
  public:
   CSSFontFaceSrcValue(const String& resource, bool local)
-      : m_resource(resource),
-        m_isLocal(local)
-#if ENABLE(SVG_FONTS)
-        ,
-        m_fontFaceElement(0)
-#endif
-  {
-  }
-  virtual ~CSSFontFaceSrcValue(){};
+      : m_resource(resource), m_isLocal(local) {}
+  virtual ~CSSFontFaceSrcValue() {}
 
   const String& resource() const { return m_resource; }
   const String& format() const { return m_format; }
@@ -55,9 +47,11 @@ class CSSFontFaceSrcValue : public CSSValue {
   bool isSupportedFormat() const;
 
 #if ENABLE(SVG_FONTS)
-  SVGFontFaceElement* svgFontFaceElement() const { return m_fontFaceElement; }
+  SVGFontFaceElement* svgFontFaceElement() const {
+    return m_svgFontFaceElement.get();
+  }
   void setSVGFontFaceElement(SVGFontFaceElement* element) {
-    m_fontFaceElement = element;
+    m_svgFontFaceElement = element;
   }
 #endif
 
@@ -67,8 +61,9 @@ class CSSFontFaceSrcValue : public CSSValue {
   String m_resource;
   String m_format;
   bool m_isLocal;
+
 #if ENABLE(SVG_FONTS)
-  SVGFontFaceElement* m_fontFaceElement;
+  RefPtr<SVGFontFaceElement> m_svgFontFaceElement;
 #endif
 };
 }
