@@ -194,6 +194,7 @@ QWebSettings::QWebSettings() : d(new QWebSettingsPrivate) {
 
   d->attributes.insert(QWebSettings::AutoLoadImages, true);
   d->attributes.insert(QWebSettings::JavascriptEnabled, true);
+  d->attributes.insert(QWebSettings::LinksIncludedInFocusChain, true);
 }
 
 /*!

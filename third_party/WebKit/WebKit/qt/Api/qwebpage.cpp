@@ -1346,8 +1346,19 @@ bool QWebPage::event(QEvent* ev) {
     if \a next is true. Otherwise the previous element is focused.
 */
 bool QWebPage::focusNextPrevChild(bool next) {
-  Q_UNUSED(next)
-  return false;
+  QKeyEvent ev(
+      QEvent::KeyPress, Qt::Key_Tab,
+      Qt::KeyboardModifiers(next ? Qt::NoModifier : Qt::ShiftModifier));
+  d->keyPressEvent(&ev);
+  bool hasFocusedNode = false;
+  Frame* frame = d->page->focusController()->focusedFrame();
+  if (frame) {
+    Document* document = frame->document();
+    hasFocusedNode = document && document->focusedNode();
+  }
+  // qDebug() << "focusNextPrevChild(" << next << ") =" << ev.isAccepted() <<
+  // "focusedNode?" << hasFocusedNode;
+  return hasFocusedNode;
 }
 
 /*!
