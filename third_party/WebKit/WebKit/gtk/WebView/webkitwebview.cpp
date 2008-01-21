@@ -410,6 +410,10 @@ static void webkit_web_view_realize(GtkWidget* widget) {
   widget->window = gdk_window_new(gtk_widget_get_parent_window(widget),
                                   &attributes, attributes_mask);
   gdk_window_set_user_data(widget->window, widget);
+
+  widget->style = gtk_style_attach(widget->style, widget->window);
+  gdk_window_set_background(widget->window,
+                            &widget->style->base[GTK_WIDGET_STATE(widget)]);
 }
 
 static void webkit_web_view_set_scroll_adjustments(WebKitWebView* webView,
