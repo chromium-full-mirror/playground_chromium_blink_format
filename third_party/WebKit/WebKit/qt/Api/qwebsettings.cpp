@@ -213,6 +213,8 @@ QWebSettings::QWebSettings(WebCore::Settings* settings)
 QWebSettings::~QWebSettings() {
   if (d->settings)
     allSettings()->removeAll(d);
+
+  delete d;
 }
 
 /*!
