@@ -54,10 +54,7 @@ class SegmentedFontData : public FontData {
   virtual const SimpleFontData* fontDataForCharacter(UChar32) const;
   virtual bool containsCharacters(const UChar*, int length) const;
 
-#if ENABLE(SVG_FONTS)
   virtual bool isSVGFont() const;
-#endif
-
   virtual bool isCustomFont() const;
   virtual bool isLoading() const;
   virtual bool isSegmented() const;
