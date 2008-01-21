@@ -100,7 +100,8 @@ void webkit_init() {
   // default location
   gchar* databaseDirectory =
       g_build_filename(g_get_user_data_dir(), "webkit", "databases", NULL);
-  WebCore::DatabaseTracker::tracker().setDatabasePath(databaseDirectory);
+  WebCore::DatabaseTracker::tracker().setDatabaseDirectoryPath(
+      databaseDirectory);
   g_free(databaseDirectory);
 #endif
 

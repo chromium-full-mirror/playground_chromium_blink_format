@@ -137,20 +137,7 @@ class SVGEmptyChromeClient : public ChromeClient {
 
   virtual void print(Frame*) {}
 
-  virtual unsigned long long requestQuotaIncreaseForNewDatabase(
-      Frame*,
-      SecurityOrigin*,
-      const String&,
-      unsigned long long) {
-    return 0;
-  }
-  virtual unsigned long long requestQuotaIncreaseForDatabaseOperation(
-      Frame*,
-      SecurityOrigin*,
-      const String&,
-      unsigned long long) {
-    return 0;
-  }
+  virtual void exceededDatabaseQuota(Frame*, const String&) {}
 };
 
 class SVGEmptyFrameLoaderClient : public FrameLoaderClient {

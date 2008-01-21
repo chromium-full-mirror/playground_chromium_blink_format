@@ -92,7 +92,6 @@
   @"WebKitUseSiteSpecificSpoofing"
 #define WebKitEditableLinkBehaviorPreferenceKey @"WebKitEditableLinkBehavior"
 #define WebKitCacheModelPreferenceKey @"WebKitCacheModelPreferenceKey"
-#define WebKitDefaultDatabaseQuotaKey @"WebKitDefaultDatabaseQuota"
 
 // CoreGraphics deferred updates are disabled if
 // WebKitEnableCoalescedUpdatesPreferenceKey is set

@@ -165,9 +165,6 @@ class Settings {
     return m_authorAndUserStylesEnabled;
   }
 
-  void setDefaultDatabaseOriginQuota(unsigned long long);
-  unsigned long long defaultDatabaseOriginQuota() const;
-
   void setFontRenderingMode(FontRenderingMode mode);
   FontRenderingMode fontRenderingMode() const;
 

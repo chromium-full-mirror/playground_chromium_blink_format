@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,6 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef DatabaseTracker_h
 #define DatabaseTracker_h
 
@@ -46,8 +47,8 @@ struct SecurityOriginTraits;
 
 class DatabaseTracker {
  public:
-  void setDatabasePath(const String&);
-  const String& databasePath();
+  void setDatabaseDirectoryPath(const String&);
+  const String& databaseDirectoryPath() const;
 
   bool canEstablishDatabase(Document*,
                             const String& name,
@@ -59,7 +60,7 @@ class DatabaseTracker {
                           unsigned long estimatedSize);
   String fullPathForDatabase(SecurityOrigin*,
                              const String& name,
-                             bool createIfNotExists = true);
+                             bool createIfDoesNotExist = true);
 
   void origins(Vector<RefPtr<SecurityOrigin>>& result);
   bool databaseNamesForOrigin(SecurityOrigin*, Vector<String>& result);
@@ -72,13 +73,10 @@ class DatabaseTracker {
   void setQuota(SecurityOrigin*, unsigned long long);
 
   void deleteAllDatabases();
-  void deleteDatabasesWithOrigin(SecurityOrigin*);
+  void deleteOrigin(SecurityOrigin*);
   void deleteDatabase(SecurityOrigin*, const String& name);
 
   void setClient(DatabaseTrackerClient*);
-
-  void setDefaultOriginQuota(unsigned long long);
-  unsigned long long defaultOriginQuota() const;
 
   // From a secondary thread, must be thread safe with its data
   void scheduleNotifyDatabaseChanged(SecurityOrigin*, const String& name);
@@ -88,11 +86,13 @@ class DatabaseTracker {
  private:
   DatabaseTracker();
 
-  void openTrackerDatabase();
+  String trackerDatabasePath() const;
+  void openTrackerDatabase(bool createIfDoesNotExist);
+
+  String originPath(SecurityOrigin*) const;
 
   bool hasEntryForOrigin(SecurityOrigin*);
   bool hasEntryForDatabase(SecurityOrigin*, const String& databaseIdentifier);
-  void establishEntryForOrigin(SecurityOrigin*);
 
   bool addDatabase(SecurityOrigin*, const String& name, const String& path);
   void populateOrigins();
@@ -100,16 +100,24 @@ class DatabaseTracker {
   bool deleteDatabaseFile(SecurityOrigin*, const String& name);
 
   SQLiteDatabase m_database;
-  mutable OwnPtr<HashMap<RefPtr<SecurityOrigin>,
-                         unsigned long long,
-                         SecurityOriginHash,
-                         SecurityOriginTraits>>
-      m_originQuotaMap;
 
-  String m_databasePath;
+  typedef HashMap<RefPtr<SecurityOrigin>,
+                  unsigned long long,
+                  SecurityOriginHash,
+                  SecurityOriginTraits>
+      QuotaMap;
+  Mutex m_quotaMapGuard;
+  mutable OwnPtr<QuotaMap> m_quotaMap;
 
-  unsigned long long m_defaultQuota;
+  String m_databaseDirectoryPath;
+
   DatabaseTrackerClient* m_client;
+
+  std::pair<SecurityOrigin*, DatabaseDetails>* m_proposedDatabase;
+
+#ifndef NDEBUG
+  ThreadIdentifier m_thread;
+#endif
 
   static void scheduleForNotification();
   static void notifyDatabasesChanged();
