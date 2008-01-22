@@ -40,6 +40,26 @@ static inline List* globalEmptyList() {
 
 // ECMA 10.2
 
+// The constructor for the globalExec pseudo-ExecState
+ExecState::ExecState(JSGlobalObject* globalObject)
+    : m_globalObject(globalObject),
+      m_exception(0),
+      m_propertyNames(CommonIdentifiers::shared()),
+      m_emptyList(globalEmptyList()),
+      m_callingExec(0),
+      m_scopeNode(0),
+      m_function(0),
+      m_arguments(0),
+      m_activation(0),
+      m_localStorage(&globalObject->localStorage()),
+      m_variableObject(globalObject),
+      m_thisVal(globalObject),
+      m_iterationDepth(0),
+      m_switchDepth(0),
+      m_codeType(GlobalCode) {
+  m_scopeChain.push(globalObject);
+}
+
 ExecState::ExecState(JSGlobalObject* globalObject,
                      JSObject* /*thisObject*/,
                      ProgramNode* programNode)
@@ -48,7 +68,6 @@ ExecState::ExecState(JSGlobalObject* globalObject,
       m_propertyNames(CommonIdentifiers::shared()),
       m_emptyList(globalEmptyList()),
       m_callingExec(0),
-      m_savedExec(0),
       m_scopeNode(programNode),
       m_function(0),
       m_arguments(0),
@@ -64,9 +83,9 @@ ExecState::ExecState(JSGlobalObject* globalObject,
   // a script with a this object that's not the same as the global object is
   // broken, and probably
   // has been for some time.
+  ASSERT(m_scopeNode);
+  activeExecStates().append(this);
   m_scopeChain.push(globalObject);
-  if (programNode)
-    globalObject->setCurrentExec(this);
 }
 
 ExecState::ExecState(JSGlobalObject* globalObject,
@@ -77,7 +96,6 @@ ExecState::ExecState(JSGlobalObject* globalObject,
       m_propertyNames(callingExec->m_propertyNames),
       m_emptyList(callingExec->m_emptyList),
       m_callingExec(callingExec),
-      m_savedExec(globalObject->currentExec()),
       m_scopeNode(evalNode),
       m_function(0),
       m_arguments(0),
@@ -89,7 +107,8 @@ ExecState::ExecState(JSGlobalObject* globalObject,
       m_iterationDepth(0),
       m_switchDepth(0),
       m_codeType(EvalCode) {
-  globalObject->setCurrentExec(this);
+  ASSERT(m_scopeNode);
+  activeExecStates().append(this);
 }
 
 ExecState::ExecState(JSGlobalObject* globalObject,
@@ -103,7 +122,6 @@ ExecState::ExecState(JSGlobalObject* globalObject,
       m_propertyNames(callingExec->m_propertyNames),
       m_emptyList(callingExec->m_emptyList),
       m_callingExec(callingExec),
-      m_savedExec(globalObject->currentExec()),
       m_scopeNode(functionBodyNode),
       m_function(func),
       m_arguments(&args),
@@ -112,28 +130,23 @@ ExecState::ExecState(JSGlobalObject* globalObject,
       m_iterationDepth(0),
       m_switchDepth(0),
       m_codeType(FunctionCode) {
+  ASSERT(m_scopeNode);
+  activeExecStates().append(this);
+
   ActivationImp* activation = globalObject->pushActivation(this);
   m_activation = activation;
   m_localStorage = &activation->localStorage();
   m_variableObject = activation;
   m_scopeChain.push(activation);
-  globalObject->setCurrentExec(this);
 }
 
 ExecState::~ExecState() {
-  if (m_codeType == FunctionCode && m_activation->needsPop())
+  ASSERT(m_scopeNode && activeExecStates().last() == this || !m_scopeNode);
+  if (m_scopeNode)
+    activeExecStates().removeLast();
+
+  if (m_activation && m_activation->needsPop())
     m_globalObject->popActivation();
-
-  m_globalObject->setCurrentExec(m_savedExec);
-}
-
-void ExecState::mark() {
-  for (ExecState* exec = this; exec; exec = exec->m_callingExec) {
-    exec->m_scopeChain.mark();
-
-    if (exec->m_savedExec != exec->m_callingExec && exec->m_savedExec)
-      exec->m_savedExec->mark();
-  }
 }
 
 JSGlobalObject* ExecState::lexicalGlobalObject() const {
@@ -145,6 +158,18 @@ JSGlobalObject* ExecState::lexicalGlobalObject() const {
     return static_cast<JSGlobalObject*>(object);
 
   return dynamicGlobalObject();
+}
+
+void ExecState::markActiveExecStates() {
+  ExecStateStack::const_iterator end = activeExecStates().end();
+  for (ExecStateStack::const_iterator it = activeExecStates().begin();
+       it != end; ++it)
+    (*it)->m_scopeChain.mark();
+}
+
+ExecStateStack& ExecState::activeExecStates() {
+  static ExecStateStack staticActiveExecStates;
+  return staticActiveExecStates;
 }
 
 }  // namespace KJS

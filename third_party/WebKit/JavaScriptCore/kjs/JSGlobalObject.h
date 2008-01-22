@@ -75,8 +75,7 @@ class JSGlobalObject : public JSVariableObject {
 
   struct JSGlobalObjectData : public JSVariableObjectData {
     JSGlobalObjectData(JSGlobalObject* globalObject)
-        : JSVariableObjectData(&inlineSymbolTable),
-          globalExec(globalObject, globalObject, 0) {}
+        : JSVariableObjectData(&inlineSymbolTable), globalExec(globalObject) {}
 
     JSGlobalObject* next;
     JSGlobalObject* prev;
@@ -85,7 +84,6 @@ class JSGlobalObject : public JSVariableObject {
     CompatMode compatMode;
 
     ExecState globalExec;
-    ExecState* currentExec;
     int recursion;
 
     unsigned timeoutTime;
@@ -233,9 +231,6 @@ class JSGlobalObject : public JSVariableObject {
 
   Debugger* debugger() const { return d()->debugger; }
   void setDebugger(Debugger* debugger) { d()->debugger = debugger; }
-
-  void setCurrentExec(ExecState* exec) { d()->currentExec = exec; }
-  ExecState* currentExec() const { return d()->currentExec; }
 
   // FIXME: Let's just pick one compatible behavior and go with it.
   void setCompatMode(CompatMode mode) { d()->compatMode = mode; }

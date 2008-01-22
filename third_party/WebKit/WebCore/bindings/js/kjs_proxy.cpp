@@ -52,10 +52,6 @@ KJSProxy::KJSProxy(Frame* frame)
       m_processingInlineCode(0) {}
 
 KJSProxy::~KJSProxy() {
-  // Check for <rdar://problem/4876466>. In theory, no JS should be executing
-  // now.
-  ASSERT(!m_globalObject || !m_globalObject->currentExec());
-
   if (m_globalObject) {
     m_globalObject = 0;
 
