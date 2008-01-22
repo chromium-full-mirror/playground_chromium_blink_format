@@ -217,9 +217,13 @@ class Font {
 
   short wordSpacing() const { return m_wordSpacing; }
   short letterSpacing() const { return m_letterSpacing; }
+#if !PLATFORM(QT)
   void setWordSpacing(short s) { m_wordSpacing = s; }
   void setLetterSpacing(short s) { m_letterSpacing = s; }
-
+#else
+  void setWordSpacing(short s);
+  void setLetterSpacing(short s);
+#endif
   bool isFixedPitch() const;
   bool isPrinterFont() const { return m_fontDescription.usePrinterFont(); }
 

@@ -36,6 +36,169 @@
 #include <limits.h>
 namespace WebCore {
 
+#if QT_VERSION >= 0x040400
+
+Font::Font() : m_letterSpacing(0), m_wordSpacing(0), m_font(), m_scFont() {
+  QFontMetrics metrics(m_font);
+  m_spaceWidth = metrics.width(QLatin1Char(' '));
+}
+
+Font::Font(const FontDescription& description,
+           short letterSpacing,
+           short wordSpacing)
+    : m_fontDescription(description),
+      m_letterSpacing(letterSpacing),
+      m_wordSpacing(wordSpacing) {
+  const FontFamily* family = &description.family();
+  QString familyName;
+  while (family) {
+    familyName += family->family();
+    family = family->next();
+    if (family)
+      familyName += QLatin1Char(',');
+  }
+
+  m_font.setFamily(familyName);
+  m_font.setPixelSize(qRound(description.computedSize()));
+  m_font.setItalic(description.italic());
+  if (description.bold()) {
+    // Qt's Bold is 75, Webkit is 63.
+    m_font.setWeight(QFont::Bold);
+  } else {
+    m_font.setWeight(description.weight());
+  }
+  bool smallCaps = description.smallCaps();
+  m_font.setCapitalization(smallCaps ? QFont::SmallCaps : QFont::MixedCase);
+
+  QFontMetrics metrics = QFontMetrics(m_font);
+  m_spaceWidth = metrics.width(QLatin1Char(' '));
+
+  if (wordSpacing)
+    m_font.setWordSpacing(wordSpacing);
+  if (letterSpacing)
+    m_font.setLetterSpacing(QFont::AbsoluteSpacing, letterSpacing);
+}
+
+void Font::setWordSpacing(short s) {
+  m_font.setWordSpacing(s);
+  m_wordSpacing = s;
+}
+void Font::setLetterSpacing(short s) {
+  m_font.setLetterSpacing(QFont::AbsoluteSpacing, s);
+  m_letterSpacing = s;
+}
+
+static QString qstring(const TextRun& run) {
+  QString string((QChar*)run.characters(), run.length());
+  QChar* uc = string.data();
+  for (int i = 0; i < string.length(); ++i) {
+    if (Font::treatAsSpace(uc[i].unicode()))
+      uc[i] = 0x20;
+    else if (Font::treatAsZeroWidthSpace(uc[i].unicode()))
+      uc[i] = 0x200c;
+  }
+  return string;
+}
+
+static QTextLine setupLayout(QTextLayout* layout, const TextRun& style) {
+  int flags = style.rtl() ? Qt::TextForceRightToLeft : Qt::TextForceLeftToRight;
+  if (style.padding())
+    flags |= Qt::TextJustificationForced;
+  layout->setFlags(flags);
+  layout->beginLayout();
+  QTextLine line = layout->createLine();
+  line.setLineWidth(INT_MAX / 256);
+  if (style.padding())
+    line.setLineWidth(line.naturalTextWidth() + style.padding());
+  layout->endLayout();
+  return line;
+}
+
+void Font::drawText(GraphicsContext* ctx,
+                    const TextRun& run,
+                    const FloatPoint& point,
+                    int from,
+                    int to) const {
+  if (to < 0)
+    to = run.length();
+  QPainter* p = ctx->platformContext();
+  Color color = ctx->fillColor();
+  p->setPen(QColor(color));
+
+  QString string = qstring(run);
+
+  if (from > 0 || to < run.length()) {
+    QTextLayout layout(string, m_font);
+    QTextLine line = setupLayout(&layout, run);
+    float x1 = line.cursorToX(from);
+    float x2 = line.cursorToX(to);
+    if (x2 < x1)
+      qSwap(x1, x2);
+
+    QFontMetrics fm(m_font);
+    int ascent = fm.ascent();
+    QRectF clip(point.x() + x1, point.y() - ascent, x2 - x1, fm.height());
+
+    p->save();
+    p->setClipRect(clip.toRect());
+    QPointF pt(point.x(), point.y() - ascent);
+    line.draw(p, pt);
+    p->restore();
+    return;
+  }
+
+  p->setFont(m_font);
+
+  QPointF pt(point.x(), point.y());
+  int flags = run.rtl() ? Qt::TextForceRightToLeft : Qt::TextForceLeftToRight;
+  p->drawText(pt, string, flags, run.padding());
+}
+
+int Font::width(const TextRun& run) const {
+  if (!run.length())
+    return 0;
+  QString string = qstring(run);
+  int w = QFontMetrics(m_font).width(string);
+  // WebKit expects us to ignore word spacing on the first character (as opposed
+  // to what Qt does)
+  if (treatAsSpace(run[0]))
+    w -= m_wordSpacing;
+
+  return w + run.padding();
+}
+
+float Font::floatWidth(const TextRun& run) const {
+  return width(run);
+}
+
+int Font::offsetForPosition(const TextRun& run,
+                            int position,
+                            bool /*includePartialGlyphs*/) const {
+  QString string = qstring(run);
+  QTextLayout layout(string, m_font);
+  QTextLine line = setupLayout(&layout, run);
+  return line.xToCursor(position);
+}
+
+FloatRect Font::selectionRectForText(const TextRun& run,
+                                     const IntPoint& pt,
+                                     int h,
+                                     int from,
+                                     int to) const {
+  QString string = qstring(run);
+  QTextLayout layout(string, m_font);
+  QTextLine line = setupLayout(&layout, run);
+
+  float x1 = line.cursorToX(from);
+  float x2 = line.cursorToX(to);
+  if (x2 < x1)
+    qSwap(x1, x2);
+
+  return FloatRect(pt.x() + x1, pt.y(), x2 - x1, h);
+}
+
+#else
+
 struct TextRunComponent {
   TextRunComponent() : font(0) {}
   TextRunComponent(const UChar* start,
@@ -117,35 +280,11 @@ Font::Font(const FontDescription& description,
   m_scFont.setPixelSize(qRound(description.computedSize() * .7));
 }
 
-Font::~Font() {}
-
-Font::Font(const Font& other)
-    : m_fontDescription(other.m_fontDescription),
-      m_letterSpacing(other.m_letterSpacing),
-      m_wordSpacing(other.m_wordSpacing),
-      m_font(other.m_font),
-      m_scFont(other.m_scFont),
-      m_spaceWidth(other.m_spaceWidth) {}
-
-Font& Font::operator=(const Font& other) {
-  m_fontDescription = other.m_fontDescription;
-  m_letterSpacing = other.m_letterSpacing;
-  m_wordSpacing = other.m_wordSpacing;
-  m_font = other.m_font;
-  m_scFont = other.m_scFont;
-  m_spaceWidth = other.m_spaceWidth;
-  return *this;
+void Font::setWordSpacing(short s) {
+  m_wordSpacing = s;
 }
-
-bool Font::operator==(const Font& other) const {
-  return m_fontDescription == other.m_fontDescription &&
-         m_letterSpacing == other.m_letterSpacing &&
-         m_wordSpacing == other.m_wordSpacing && m_font == other.m_font &&
-         m_scFont == other.m_scFont && m_spaceWidth == other.m_spaceWidth;
-}
-
-void Font::update(PassRefPtr<FontSelector>) const {
-  // don't think we need this
+void Font::setLetterSpacing(short s) {
+  m_letterSpacing = s;
 }
 
 static int generateComponents(Vector<TextRunComponent, 1024>* components,
@@ -442,6 +581,38 @@ FloatRect Font::selectionRectForText(const TextRun& run,
     qSwap(x1, x2);
 
   return FloatRect(pt.x() + x1, pt.y(), x2 - x1, h);
+}
+#endif
+
+Font::~Font() {}
+
+Font::Font(const Font& other)
+    : m_fontDescription(other.m_fontDescription),
+      m_letterSpacing(other.m_letterSpacing),
+      m_wordSpacing(other.m_wordSpacing),
+      m_font(other.m_font),
+      m_scFont(other.m_scFont),
+      m_spaceWidth(other.m_spaceWidth) {}
+
+Font& Font::operator=(const Font& other) {
+  m_fontDescription = other.m_fontDescription;
+  m_letterSpacing = other.m_letterSpacing;
+  m_wordSpacing = other.m_wordSpacing;
+  m_font = other.m_font;
+  m_scFont = other.m_scFont;
+  m_spaceWidth = other.m_spaceWidth;
+  return *this;
+}
+
+bool Font::operator==(const Font& other) const {
+  return m_fontDescription == other.m_fontDescription &&
+         m_letterSpacing == other.m_letterSpacing &&
+         m_wordSpacing == other.m_wordSpacing && m_font == other.m_font &&
+         m_scFont == other.m_scFont && m_spaceWidth == other.m_spaceWidth;
+}
+
+void Font::update(PassRefPtr<FontSelector>) const {
+  // don't think we need this
 }
 
 bool Font::isFixedPitch() const {
