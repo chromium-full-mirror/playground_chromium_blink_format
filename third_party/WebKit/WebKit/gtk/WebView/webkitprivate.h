@@ -27,9 +27,9 @@
  */
 
 #include "webkitdefines.h"
-#include "webkitsettings.h"
 #include "webkitwebview.h"
 #include "webkitwebframe.h"
+#include "webkitwebsettings.h"
 #include "webkitnetworkrequest.h"
 
 #include "Settings.h"
@@ -38,8 +38,6 @@
 #include "FrameLoaderClient.h"
 
 namespace WebKit {
-void apply(WebKitSettings*, WebCore::Settings*);
-WebKitSettings* create(WebCore::Settings*);
 WebKitWebView* getViewFromFrame(WebKitWebFrame*);
 
 WebCore::Frame* core(WebKitWebFrame*);
@@ -64,7 +62,7 @@ void webkit_init();
 typedef struct _WebKitWebViewPrivate WebKitWebViewPrivate;
 struct _WebKitWebViewPrivate {
   WebCore::Page* corePage;
-  WebCore::Settings* settings;
+  WebKitWebSettings* webSettings;
 
   WebKitWebFrame* mainFrame;
   WebCore::String applicationNameForUserAgent;
