@@ -120,13 +120,21 @@ freePattern:
 }
 
 FontPlatformData::FontPlatformData(float size, bool bold, bool italic)
-    : m_pattern(0), m_fontDescription(), m_scaledFont(0) {}
+    : m_pattern(0), m_fontDescription(), m_scaledFont(0) {
+  m_fontDescription.setSpecifiedSize(size);
+  m_fontDescription.setBold(bold);
+  m_fontDescription.setItalic(italic);
+}
 
 FontPlatformData::FontPlatformData(cairo_font_face_t* fontFace,
                                    int size,
                                    bool bold,
                                    bool italic)
     : m_pattern(0), m_fontDescription(), m_scaledFont(0) {
+  m_fontDescription.setSpecifiedSize(size);
+  m_fontDescription.setBold(bold);
+  m_fontDescription.setItalic(italic);
+
   cairo_matrix_t fontMatrix;
   cairo_matrix_init_scale(&fontMatrix, size, size);
   cairo_matrix_t ctm;
