@@ -53,7 +53,7 @@ SVGPaintServer* getPaintServerById(Document* document, const AtomicString& id) {
   return 0;
 }
 
-static SVGPaintServerSolid* sharedSolidPaintServer() {
+SVGPaintServerSolid* SVGPaintServer::sharedSolidPaintServer() {
   static SVGPaintServerSolid* _sharedSolidPaintServer = 0;
   if (!_sharedSolidPaintServer)
     _sharedSolidPaintServer = new SVGPaintServerSolid();

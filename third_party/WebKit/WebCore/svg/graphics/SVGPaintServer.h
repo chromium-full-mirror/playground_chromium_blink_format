@@ -63,6 +63,7 @@ enum SVGPaintTargetType {
 class GraphicsContext;
 class RenderObject;
 class RenderStyle;
+class SVGPaintServerSolid;
 
 class SVGPaintServer : public SVGResource {
  public:
@@ -97,6 +98,7 @@ class SVGPaintServer : public SVGResource {
                                            const RenderObject*);
   static SVGPaintServer* fillPaintServer(const RenderStyle*,
                                          const RenderObject*);
+  static SVGPaintServerSolid* sharedSolidPaintServer();
 
  protected:
 #if PLATFORM(CG)
