@@ -121,7 +121,10 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
 }
 
 SimpleFontData::~SimpleFontData() {
-  platformDestroy();
+#if ENABLE(SVG_FONTS) && !PLATFORM(QT)
+  if (!m_svgFontData || !m_svgFontData->svgFontFaceElement())
+#endif
+    platformDestroy();
 
   // We only get deleted when the cache gets cleared.  Since the
   // smallCapsRenderer is also in that cache,
