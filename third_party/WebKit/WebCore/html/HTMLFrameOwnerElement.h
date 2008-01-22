@@ -52,6 +52,8 @@ class HTMLFrameOwnerElement : public HTMLElement {
     m_createdByParser = createdByParser;
   }
 
+  virtual ScrollbarMode scrollingMode() const { return ScrollbarAuto; }
+
  private:
   friend class Frame;
   Frame* m_contentFrame;
