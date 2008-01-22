@@ -120,14 +120,15 @@ static const NPUTF8* pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
 #define ID_TEST_GETINTIDENTIFIER 8
 #define ID_TEST_GET_PROPERTY 9
 #define ID_TEST_EVALUATE 10
-#define NUM_METHOD_IDENTIFIERS 11
+#define ID_TEST_GET_PROPERTY_RETURN_VALUE 11
+#define NUM_METHOD_IDENTIFIERS 12
 
 static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
 static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
     "testCallback",    "getURL",        "removeDefaultMethod",
     "testDOMAccess",   "getURLNotify",  "testInvokeDefault",
     "destroyStream",   "testEnumerate", "testGetIntIdentifier",
-    "testGetProperty", "testEvaluate",
+    "testGetProperty", "testEvaluate",  "testGetPropertyReturnValue",
 };
 
 static NPUTF8* createCStringFromNPVariant(const NPVariant* variant) {
@@ -398,8 +399,24 @@ static bool pluginInvoke(NPObject* header,
 
     VOID_TO_NPVARIANT(*result);
     return false;
-  }
+  } else if (name ==
+                 pluginMethodIdentifiers[ID_TEST_GET_PROPERTY_RETURN_VALUE] &&
+             argCount == 2 && NPVARIANT_IS_OBJECT(args[0]) &&
+             NPVARIANT_IS_STRING(args[1])) {
+    NPUTF8* propertyString = createCStringFromNPVariant(&args[1]);
+    NPIdentifier propertyIdentifier =
+        browser->getstringidentifier(propertyString);
+    free(propertyString);
 
+    NPVariant variant;
+    bool retval = browser->getproperty(obj->npp, NPVARIANT_TO_OBJECT(args[0]),
+                                       propertyIdentifier, &variant);
+    if (retval)
+      browser->releasevariantvalue(&variant);
+
+    BOOLEAN_TO_NPVARIANT(retval, *result);
+    return true;
+  }
   return false;
 }
 
