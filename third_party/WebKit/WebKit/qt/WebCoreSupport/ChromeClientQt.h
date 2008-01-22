@@ -31,6 +31,8 @@
 #include "ChromeClient.h"
 #include "FloatRect.h"
 #include "RefCounted.h"
+#include "KURL.h"
+#include "PlatformString.h"
 
 class QWebPage;
 
@@ -116,6 +118,9 @@ class ChromeClientQt : public ChromeClient {
   virtual void exceededDatabaseQuota(Frame*, const String&);
 
   QWebPage* m_webPage;
+  WebCore::KURL lastHoverURL;
+  WebCore::String lastHoverTitle;
+  WebCore::String lastHoverContent;
 };
 }
 

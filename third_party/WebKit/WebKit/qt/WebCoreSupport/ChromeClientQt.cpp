@@ -33,6 +33,8 @@
 #include "FrameLoader.h"
 #include "FrameLoaderClientQt.h"
 #include "FrameView.h"
+#include "PlatformScrollBar.h"
+#include "HitTestResult.h"
 #include "NotImplemented.h"
 #include "WindowFeatures.h"
 
@@ -272,13 +274,23 @@ void ChromeClientQt::scrollBackingStore(int dx,
 
 void ChromeClientQt::updateBackingStore() {}
 
-void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult&,
-                                             unsigned /*modifierFlags*/) {
-  notImplemented();
+void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult& result,
+                                             unsigned modifierFlags) {
+  if (result.absoluteLinkURL() != lastHoverURL ||
+      result.title() != lastHoverTitle ||
+      result.textContent() != lastHoverContent) {
+    lastHoverURL = result.absoluteLinkURL();
+    lastHoverTitle = result.title();
+    lastHoverContent = result.textContent();
+    emit m_webPage->hoveringOverLink(lastHoverURL.prettyURL(), lastHoverTitle,
+                                     lastHoverContent);
+  }
 }
 
-void ChromeClientQt::setToolTip(const String&) {
-  notImplemented();
+void ChromeClientQt::setToolTip(const String& tip) {
+  QWidget* view = m_webPage->view();
+  if (view)
+    view->setToolTip(tip);
 }
 
 void ChromeClientQt::print(Frame*) {
