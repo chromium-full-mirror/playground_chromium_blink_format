@@ -230,24 +230,26 @@ static String pathGetFilename(String path) {
 #endif
 }
 
-PassRefPtr<FormData> HTMLFormElement::formData(const char* boundary) const {
-  DeprecatedCString enc_string = "";
+TextEncoding HTMLFormElement::dataEncoding() const {
+  if (isMailtoForm())
+    return UTF8Encoding();
 
+  TextEncoding encoding;
   String str = m_acceptcharset;
   str.replace(',', ' ');
   Vector<String> charsets = str.split(' ');
-  TextEncoding encoding;
-  Frame* frame = document()->frame();
   Vector<String>::const_iterator end = charsets.end();
   for (Vector<String>::const_iterator it = charsets.begin(); it != end; ++it)
     if ((encoding = TextEncoding(*it)).isValid())
-      break;
-  if (!encoding.isValid()) {
-    if (frame)
-      encoding = frame->loader()->encoding();
-    else
-      encoding = Latin1Encoding();
-  }
+      return encoding;
+  if (Frame* frame = document()->frame())
+    return frame->loader()->encoding();
+  return Latin1Encoding();
+}
+
+PassRefPtr<FormData> HTMLFormElement::formData(const char* boundary) const {
+  DeprecatedCString enc_string = "";
+  TextEncoding encoding = dataEncoding();
 
   RefPtr<FormData> result = new FormData;
 
@@ -351,6 +353,10 @@ void HTMLFormElement::parseEnctype(const String& type) {
     m_enctype = "application/x-www-form-urlencoded";
     m_multipart = false;
   }
+}
+
+bool HTMLFormElement::isMailtoForm() const {
+  return m_url.startsWith("mailto:", false);
 }
 
 bool HTMLFormElement::prepareSubmit(Event* event) {
@@ -471,15 +477,14 @@ void HTMLFormElement::submit(Event* event, bool activateSubmitButton) {
     firstSuccessfulSubmitButton->setActivatedSubmit(true);
 
   if (m_post) {
-    bool isMailtoForm = m_url.startsWith("mailto:", false);
-    if (m_multipart && isMailtoForm) {
+    if (m_multipart && isMailtoForm()) {
       setEnctype("application/x-www-form-urlencoded");
       m_multipart = false;
     }
 
     if (!m_multipart) {
       RefPtr<FormData> data = formData(0);
-      if (isMailtoForm) {
+      if (isMailtoForm()) {
         String body = data->flattenToString();
         if (equalIgnoringCase(enctype(), "text/plain")) {
           // Convention seems to be to decode, and s/&/\r\n/. Also, spaces are
@@ -488,7 +493,7 @@ void HTMLFormElement::submit(Event* event, bool activateSubmitButton) {
               body.replace('&', "\r\n").replace('+', ' ').deprecatedString() +
               "\r\n");
         }
-        data = new FormData((String("body=") + encodeCString(body.latin1()))
+        data = new FormData((String("body=") + encodeCString(body.utf8()))
                                 .replace('+', "%20")
                                 .latin1());
       }
