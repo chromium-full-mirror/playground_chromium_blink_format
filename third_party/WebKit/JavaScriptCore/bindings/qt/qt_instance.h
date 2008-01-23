@@ -24,6 +24,7 @@
 #include "runtime.h"
 #include "runtime_root.h"
 #include <qpointer.h>
+#include <qhash.h>
 
 class QObject;
 
@@ -32,6 +33,7 @@ namespace KJS {
 namespace Bindings {
 
 class QtClass;
+class QtField;
 
 class QtInstance : public Instance {
  public:
@@ -52,22 +54,27 @@ class QtInstance : public Instance {
                                 const List& args);
   virtual JSValue* invokeDefaultMethod(ExecState* exec, const List& args);
 
+  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+
+  virtual BindingLanguage getBindingLanguage() const { return QtLanguage; }
+
   JSValue* stringValue() const;
   JSValue* numberValue() const;
   JSValue* booleanValue() const;
 
-  QObject* getObject() const { return _object; }
-
-  virtual BindingLanguage getBindingLanguage() const { return QtLanguage; }
+  QObject* getObject() const { return m_object; }
 
   static QtInstance* getQtInstance(QObject*, PassRefPtr<RootObject>);
   static JSObject* getRuntimeObject(QtInstance*);
 
  private:
+  friend class QtClass;
   QtInstance(QObject*, PassRefPtr<RootObject>);  // Factory produced only..
-  mutable QtClass* _class;
-  QPointer<QObject> _object;
-  QObject* _hashkey;
+  mutable QtClass* m_class;
+  QPointer<QObject> m_object;
+  QObject* m_hashkey;
+  mutable QHash<QByteArray, JSValue*> m_methods;
+  mutable QHash<QString, QtField*> m_fields;
 };
 
 }  // namespace Bindings
