@@ -41,6 +41,8 @@ class QNetworkReplyHandler : public QObject {
 
   void abort();
 
+  QNetworkReply* release();
+
  private slots:
   void finish();
   void sendResponseIfNeeded();

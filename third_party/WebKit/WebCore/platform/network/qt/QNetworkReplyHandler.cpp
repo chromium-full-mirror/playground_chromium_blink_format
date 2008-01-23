@@ -70,6 +70,15 @@ void QNetworkReplyHandler::abort() {
   }
 }
 
+QNetworkReply* QNetworkReplyHandler::release() {
+  QNetworkReply* reply = m_reply;
+  if (m_reply) {
+    disconnect(m_reply, 0, this, 0);
+    m_reply = 0;
+  }
+  return reply;
+}
+
 void QNetworkReplyHandler::finish() {
   sendResponseIfNeeded();
 
