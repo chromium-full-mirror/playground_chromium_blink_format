@@ -64,6 +64,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // Pauses playback without changing any states or generating events
   void setPausedInternal(bool);
 
+  bool inPageCache() const { return m_inPageCache; }
+
   // DOM API
   // error state
   PassRefPtr<MediaError> error() const;
@@ -188,8 +190,6 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   bool m_loadedFirstFrame;
   bool m_autoplaying;
 
-  bool m_wasPlayingBeforeMovingToPageCache;
-
   unsigned m_currentLoop;
   float m_volume;
   bool m_muted;
@@ -209,6 +209,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   unsigned m_terminateLoadBelowNestingLevel;
 
   bool m_pausedInternal;
+  bool m_inPageCache;
 
   struct CallbackEntry {
     CallbackEntry() : m_voidCallback(0), m_pause(false) {}
