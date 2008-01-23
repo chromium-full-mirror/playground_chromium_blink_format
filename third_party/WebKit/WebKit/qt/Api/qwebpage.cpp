@@ -517,31 +517,48 @@ void QWebPagePrivate::keyPressEvent(QKeyEvent* ev) {
     PlatformScrollbar *h, *v;
     h = mainFrame->d->horizontalScrollBar();
     v = mainFrame->d->verticalScrollBar();
-
-    if (ev == QKeySequence::MoveToNextPage) {
+    QFont defaultFont;
+    if (view)
+      defaultFont = view->font();
+    QFontMetrics fm(defaultFont);
+    int fontHeight = fm.height();
+    if (ev == QKeySequence::MoveToNextPage || ev->key() == Qt::Key_Space) {
       if (v)
-        v->setValue(v->value() + q->viewportSize().height());
+        v->setValue(v->value() + q->viewportSize().height() - fontHeight);
     } else if (ev == QKeySequence::MoveToPreviousPage) {
       if (v)
-        v->setValue(v->value() - q->viewportSize().height());
+        v->setValue(v->value() - q->viewportSize().height() + fontHeight);
+    } else if (ev->key() == Qt::Key_Up &&
+               ev->modifiers() == Qt::ControlModifier) {
+      if (v)
+        v->setValue(0);
+    } else if (ev->key() == Qt::Key_Down &&
+               ev->modifiers() == Qt::ControlModifier) {
+      if (v)
+        v->setValue(INT_MAX);
     } else {
       switch (ev->key()) {
         case Qt::Key_Up:
           if (v)
-            v->setValue(v->value() - 10);
+            v->setValue(v->value() - fontHeight);
           break;
         case Qt::Key_Down:
           if (v)
-            v->setValue(v->value() + 10);
+            v->setValue(v->value() + fontHeight);
           break;
         case Qt::Key_Left:
           if (h)
-            h->setValue(h->value() - 10);
+            h->setValue(h->value() - fontHeight);
           break;
         case Qt::Key_Right:
           if (h)
-            h->setValue(h->value() + 10);
+            h->setValue(h->value() + fontHeight);
           break;
+        case Qt::Key_Backspace:
+          if (ev->modifiers() == Qt::ShiftModifier)
+            q->triggerAction(QWebPage::GoForward);
+          else
+            q->triggerAction(QWebPage::GoBack);
         default:
           handled = false;
           break;
