@@ -27,7 +27,8 @@
 
 namespace WebCore {
 
-QWebPopup::QWebPopup(PopupMenuClient* client) : m_client(client) {
+QWebPopup::QWebPopup(PopupMenuClient* client)
+    : m_client(client), m_popupVisible(false) {
   Q_ASSERT(m_client);
 
   setFont(m_client->clientStyle()->font().font());
@@ -40,8 +41,17 @@ void QWebPopup::exec() {
   QCoreApplication::sendEvent(this, &event);
 }
 
-void QWebPopup::hideEvent(QHideEvent* e) {
-  QComboBox::hideEvent(e);
+void QWebPopup::showPopup() {
+  QComboBox::showPopup();
+  m_popupVisible = true;
+}
+
+void QWebPopup::hidePopup() {
+  QComboBox::hidePopup();
+  if (!m_popupVisible)
+    return;
+
+  m_popupVisible = false;
   m_client->hidePopup();
 }
 

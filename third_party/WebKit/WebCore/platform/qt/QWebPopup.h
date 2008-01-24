@@ -36,14 +36,15 @@ class QWebPopup : public QComboBox {
 
   void exec();
 
- protected:
-  virtual void hideEvent(QHideEvent*);
+  virtual void showPopup();
+  virtual void hidePopup();
 
  private slots:
   void activeChanged(int);
 
  private:
   PopupMenuClient* m_client;
+  bool m_popupVisible;
 };
 }
 
