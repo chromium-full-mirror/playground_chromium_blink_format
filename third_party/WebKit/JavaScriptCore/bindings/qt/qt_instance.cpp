@@ -46,7 +46,7 @@ static InstanceJSObjectMap cachedObjects;
 // Derived RuntimeObject
 class QtRuntimeObjectImp : public RuntimeObjectImp {
  public:
-  QtRuntimeObjectImp(Instance* instance);
+  QtRuntimeObjectImp(Instance*);
   ~QtRuntimeObjectImp();
   virtual void invalidate();
 
