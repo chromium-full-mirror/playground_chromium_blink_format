@@ -1404,7 +1404,8 @@ static const KeyDownEntry keyDownEntries[] = {
     {'A', CtrlKey, "SelectAll"},
     {VK_INSERT, CtrlKey, "Copy"},
     {VK_DELETE, ShiftKey, "Cut"},
-    {VK_INSERT, ShiftKey, "Paste"} {'Z', CtrlKey, "Undo"},
+    {VK_INSERT, ShiftKey, "Paste"},
+    {'Z', CtrlKey, "Undo"},
     {'Z', CtrlKey | ShiftKey, "Redo"},
 };
 
