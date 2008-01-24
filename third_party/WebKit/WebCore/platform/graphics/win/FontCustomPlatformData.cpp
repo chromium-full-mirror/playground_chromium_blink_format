@@ -61,8 +61,7 @@ size_t getBytesWithOffset(void* info,
 }
 
 FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
-  if (!buffer)
-    return 0;
+  ASSERT_ARG(buffer, buffer);
 
   // Get CG to create the font.
   CGDataProviderDirectAccessCallbacks callbacks = {&getData, &releaseData,

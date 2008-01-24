@@ -42,6 +42,8 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(int size,
 }
 
 FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
+  ASSERT_ARG(buffer, buffer);
+
   int id = QFontDatabase::addApplicationFontFromData(
       QByteArray(buffer->data(), buffer->size()));
   if (id == -1)

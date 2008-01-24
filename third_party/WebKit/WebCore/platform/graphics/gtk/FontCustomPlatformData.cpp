@@ -41,6 +41,8 @@ static void releaseData(void* data) {
 }
 
 FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
+  ASSERT_ARG(buffer, buffer);
+
   int error;
 
   static FT_Library library = 0;
