@@ -225,7 +225,7 @@ QString QWebFrame::title() const {
   The url of this frame.
 */
 QUrl QWebFrame::url() const {
-  return QUrl((QString)d->frame->loader()->url().string());
+  return d->frame->loader()->url();
 }
 
 /*!
