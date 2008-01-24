@@ -70,7 +70,6 @@ class MediaPlayerPrivate : Noncopyable {
 
   void setRate(float);
   void setVolume(float);
-  void setMuted(bool);
 
   int dataRate() const;
 
@@ -90,7 +89,6 @@ class MediaPlayerPrivate : Noncopyable {
   void rateChanged();
   void sizeChanged();
   void timeChanged();
-  void volumeChanged();
   void didEnd();
 
   void repaint();

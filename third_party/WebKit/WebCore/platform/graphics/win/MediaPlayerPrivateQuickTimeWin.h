@@ -64,7 +64,6 @@ class MediaPlayerPrivate : QTMovieWinClient, Noncopyable {
 
   void setRate(float);
   void setVolume(float);
-  void setMuted(bool);
 
   int dataRate() const;
 

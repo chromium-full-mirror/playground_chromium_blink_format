@@ -99,8 +99,6 @@ class MediaPlayer : Noncopyable {
 
   float volume() const;
   void setVolume(float);
-  bool muted() const;
-  void setMuted(bool);
 
   int dataRate() const;
 
@@ -141,7 +139,6 @@ class MediaPlayer : Noncopyable {
   bool m_visible;
   float m_rate;
   float m_volume;
-  bool m_muted;
 };
 }
 

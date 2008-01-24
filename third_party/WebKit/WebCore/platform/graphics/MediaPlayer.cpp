@@ -47,8 +47,7 @@ MediaPlayer::MediaPlayer(MediaPlayerClient* client)
       m_parentWidget(0),
       m_visible(false),
       m_rate(1.0f),
-      m_volume(0.5f),
-      m_muted(false) {}
+      m_volume(0.5f) {}
 
 MediaPlayer::~MediaPlayer() {
   delete m_private;
@@ -126,17 +125,6 @@ void MediaPlayer::setRate(float rate) {
     return;
   m_rate = rate;
   m_private->setRate(rate);
-}
-
-bool MediaPlayer::muted() const {
-  return m_muted;
-}
-
-void MediaPlayer::setMuted(bool muted) {
-  if (muted == m_muted)
-    return;
-  m_muted = muted;
-  m_private->setMuted(muted);
 }
 
 int MediaPlayer::dataRate() const {

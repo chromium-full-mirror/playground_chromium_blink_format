@@ -309,8 +309,7 @@ void HTMLMediaElement::load(ExceptionCode& ec) {
   // 10, 11, 12, 13
   delete m_player;
   m_player = new MediaPlayer(this);
-  m_player->setVolume(m_volume);
-  m_player->setMuted(m_muted);
+  updateVolume();
   m_player->load(m_currentSrc);
   if (m_loadNestingLevel < m_terminateLoadBelowNestingLevel)
     goto end;
@@ -456,7 +455,7 @@ void HTMLMediaElement::setReadyState(ReadyState state) {
       dispatchHTMLEvent(playEvent, false, true);
     }
   }
-  updateMediaPlayer();
+  updatePlayState();
 }
 
 void HTMLMediaElement::progressEventTimerFired(Timer<HTMLMediaElement>*) {
@@ -628,7 +627,7 @@ void HTMLMediaElement::play(ExceptionCode& ec) {
 
   m_autoplaying = false;
 
-  updateMediaPlayer();
+  updatePlayState();
 }
 
 void HTMLMediaElement::pause(ExceptionCode& ec) {
@@ -648,7 +647,7 @@ void HTMLMediaElement::pause(ExceptionCode& ec) {
 
   m_autoplaying = false;
 
-  updateMediaPlayer();
+  updatePlayState();
 }
 
 unsigned HTMLMediaElement::playCount() const {
@@ -732,10 +731,8 @@ void HTMLMediaElement::setVolume(float vol, ExceptionCode& ec) {
 
   if (m_volume != vol) {
     m_volume = vol;
+    updateVolume();
     dispatchEventAsync(volumechangeEvent);
-
-    if (m_player)
-      m_player->setVolume(vol);
   }
 }
 
@@ -746,9 +743,8 @@ bool HTMLMediaElement::muted() const {
 void HTMLMediaElement::setMuted(bool muted) {
   if (m_muted != muted) {
     m_muted = muted;
+    updateVolume();
     dispatchEventAsync(volumechangeEvent);
-    if (m_player)
-      m_player->setMuted(muted);
   }
 }
 
@@ -818,17 +814,7 @@ void HTMLMediaElement::checkIfSeekNeeded() {
   if (m_currentLoop == playCount() - 1 && time > effectiveEnd())
     seek(effectiveEnd(), ec);
 
-  updateMediaPlayer();
-}
-
-void HTMLMediaElement::mediaPlayerVolumeChanged(MediaPlayer*) {
-  if (!m_player)
-    return;
-  if (m_player->volume() != m_volume || m_player->muted() != m_muted) {
-    m_volume = m_player->volume();
-    m_muted = m_player->muted();
-    dispatchEventAsync(volumechangeEvent);
-  }
+  updatePlayState();
 }
 
 void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
@@ -847,7 +833,7 @@ void HTMLMediaElement::mediaPlayerTimeChanged(MediaPlayer*) {
     dispatchHTMLEvent(endedEvent, false, true);
   }
 
-  updateMediaPlayer();
+  updatePlayState();
 }
 
 void HTMLMediaElement::mediaPlayerRepaint(MediaPlayer*) {
@@ -909,7 +895,17 @@ bool HTMLMediaElement::endedPlayback() const {
          currentLoop() == playCount() - 1;
 }
 
-void HTMLMediaElement::updateMediaPlayer() {
+void HTMLMediaElement::updateVolume() {
+  if (!m_player)
+    return;
+
+  m_player->setVolume(m_muted ? 0 : m_volume);
+
+  if (renderer())
+    renderer()->updateFromElement();
+}
+
+void HTMLMediaElement::updatePlayState() {
   if (!m_player)
     return;
 
@@ -934,7 +930,7 @@ void HTMLMediaElement::updateMediaPlayer() {
 
 void HTMLMediaElement::setPausedInternal(bool b) {
   m_pausedInternal = b;
-  updateMediaPlayer();
+  updatePlayState();
 }
 
 void HTMLMediaElement::willSaveToCache() {

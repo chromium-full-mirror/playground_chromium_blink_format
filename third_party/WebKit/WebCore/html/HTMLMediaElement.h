@@ -154,7 +154,6 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual void mediaPlayerNetworkStateChanged(MediaPlayer*);
   virtual void mediaPlayerReadyStateChanged(MediaPlayer*);
   virtual void mediaPlayerTimeChanged(MediaPlayer*);
-  virtual void mediaPlayerVolumeChanged(MediaPlayer*);
   virtual void mediaPlayerRepaint(MediaPlayer*);
 
  private:
@@ -165,7 +164,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void checkIfSeekNeeded();
 
   String pickMedia();
-  void updateMediaPlayer();
+  void updateVolume();
+  void updatePlayState();
   float effectiveStart() const;
   float effectiveEnd() const;
   float effectiveLoopStart() const;

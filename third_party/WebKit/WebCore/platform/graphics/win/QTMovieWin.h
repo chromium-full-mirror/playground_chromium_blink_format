@@ -75,7 +75,6 @@ class QTMOVIEWIN_API QTMovieWin {
   void setCurrentTime(float) const;
 
   void setVolume(float);
-  void setMuted(bool);
 
   unsigned dataSize() const;
 
