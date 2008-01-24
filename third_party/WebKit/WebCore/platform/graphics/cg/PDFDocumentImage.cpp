@@ -174,11 +174,10 @@ void PDFDocumentImage::draw(GraphicsContext* context,
   // Rotate translate image into position according to doc properties.
   adjustCTM(context);
 
-  // Media box may have non-zero origin which we ignore. Pass 1 for the page
-  // number.
-  CGContextDrawPDFDocument(context->platformContext(),
-                           FloatRect(FloatPoint(), m_mediaBox.size()),
-                           m_document, m_currentPage + 1);
+  CGContextTranslateCTM(context->platformContext(), -m_mediaBox.x(),
+                        -m_mediaBox.y());
+  CGContextDrawPDFPage(context->platformContext(),
+                       CGPDFDocumentGetPage(m_document, m_currentPage + 1));
 
   context->restore();
 
