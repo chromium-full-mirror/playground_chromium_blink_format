@@ -28,6 +28,8 @@
 
 #include "SharedTimerQt.h"
 
+#include <QApplication>
+
 namespace WebCore {
 
 SharedTimerQt* SharedTimerQt::s_self = 0;  // FIXME: staticdeleter
@@ -37,6 +39,9 @@ void setSharedTimerFiredFunction(void (*f)()) {
 }
 
 void setSharedTimerFireTime(double fireTime) {
+  if (!qApp)
+    return;
+
   qreal fireTimeMs = (fireTime - currentTime()) * 1000;
   SharedTimerQt::inst()->start(qMax(0, int(fireTimeMs)));
 }
