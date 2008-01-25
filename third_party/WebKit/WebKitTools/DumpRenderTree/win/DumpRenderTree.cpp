@@ -701,6 +701,7 @@ static void runTest(const char* pathOrURL) {
     history->setOptionalSharedHistory(0);
 
   resetWebViewToConsistentStateBeforeTesting();
+  sharedUIDelegate->resetUndoManager();
 
   prevTestBFItem = 0;
   COMPtr<IWebView> webView;
