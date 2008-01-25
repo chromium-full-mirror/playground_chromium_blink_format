@@ -247,7 +247,7 @@ String DatabaseTracker::fullPathForDatabase(SecurityOrigin* origin,
   int result = statement.step();
 
   if (result == SQLResultRow)
-    return pathByAppendingComponent(originPath, statement.getColumnText16(0));
+    return pathByAppendingComponent(originPath, statement.getColumnText(0));
   if (!createIfNotExists)
     return String();
 
@@ -312,7 +312,7 @@ void DatabaseTracker::populateOrigins() {
   int result;
   while ((result = statement.step()) == SQLResultRow) {
     RefPtr<SecurityOrigin> origin =
-        SecurityOrigin::createFromIdentifier(statement.getColumnText16(0));
+        SecurityOrigin::createFromIdentifier(statement.getColumnText(0));
     m_quotaMap->set(origin.get(), statement.getColumnInt64(1));
   }
 
@@ -343,7 +343,7 @@ bool DatabaseTracker::databaseNamesForOrigin(SecurityOrigin* origin,
 
   int result;
   while ((result = statement.step()) == SQLResultRow)
-    resultVector.append(statement.getColumnText16(0));
+    resultVector.append(statement.getColumnText(0));
 
   if (result != SQLResultDone) {
     LOG_ERROR("Failed to retrieve all database names for origin %s",
@@ -563,7 +563,7 @@ bool DatabaseTracker::addDatabase(SecurityOrigin* origin,
   if (!statement.executeCommand()) {
     LOG_ERROR("Failed to add database %s to origin %s: %s\n",
               name.ascii().data(), origin->stringIdentifier().ascii().data(),
-              statement.lastErrorMsg());
+              m_database.lastErrorMsg());
     return false;
   }
 

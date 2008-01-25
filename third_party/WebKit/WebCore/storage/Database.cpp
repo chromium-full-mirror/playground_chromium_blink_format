@@ -204,7 +204,7 @@ static bool retrieveTextResultFromDatabase(SQLiteDatabase& db,
 
   result = statement.step();
   if (result == SQLResultRow) {
-    resultString = statement.getColumnText16(0);
+    resultString = statement.getColumnText(0);
     return true;
   } else if (result == SQLResultDone) {
     resultString = String();
@@ -517,7 +517,7 @@ Vector<String> Database::performGetTableNames() {
   Vector<String> tableNames;
   int result;
   while ((result = statement.step()) == SQLResultRow) {
-    String name = statement.getColumnText16(0);
+    String name = statement.getColumnText(0);
     if (name != databaseInfoTableName())
       tableNames.append(name);
   }

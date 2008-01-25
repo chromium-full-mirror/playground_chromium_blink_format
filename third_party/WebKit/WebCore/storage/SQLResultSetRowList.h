@@ -29,10 +29,7 @@
 #ifndef SQLResultSetRowList_h
 #define SQLResultSetRowList_h
 
-#include "PlatformString.h"
-#include <wtf/RefCounted.h>
 #include "SQLValue.h"
-#include <wtf/Vector.h>
 
 namespace WebCore {
 
