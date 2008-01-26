@@ -1021,7 +1021,7 @@ JSValue* FunctionCallResolveNode::inlineEvaluate(ExecState* exec) {
       // ECMA 11.2.3 says that in this situation the this value should be null.
       // However, section 10.2.3 says that in the case where the value provided
       // by the caller is null, the global object should be used. It also says
-      // that the section does not apply to interal functions, but for
+      // that the section does not apply to internal functions, but for
       // simplicity
       // of implementation we use the global object anyway here. This guarantees
       // that in host objects you always get a valid object for this.
@@ -3915,7 +3915,7 @@ JSValue* ForInNode::execute(ExecState* exec) {
 JSValue* ContinueNode::execute(ExecState* exec) {
   if (ident.isEmpty() && !exec->inIteration())
     return setErrorCompletion(exec, SyntaxError, "Invalid continue statement.");
-  if (!ident.isEmpty() && !exec->seenLabels()->contains(ident))
+  if (!ident.isEmpty() && !exec->seenLabels().contains(ident))
     return setErrorCompletion(exec, SyntaxError, "Label %s not found.", ident);
   return exec->setContinueCompletion(&ident);
 }
@@ -3926,7 +3926,7 @@ JSValue* ContinueNode::execute(ExecState* exec) {
 JSValue* BreakNode::execute(ExecState* exec) {
   if (ident.isEmpty() && !exec->inIteration() && !exec->inSwitch())
     return setErrorCompletion(exec, SyntaxError, "Invalid break statement.");
-  if (!ident.isEmpty() && !exec->seenLabels()->contains(ident))
+  if (!ident.isEmpty() && !exec->seenLabels().contains(ident))
     return setErrorCompletion(exec, SyntaxError, "Label %s not found.");
   return exec->setBreakCompletion(&ident);
 }
@@ -4119,11 +4119,11 @@ void LabelNode::optimizeVariableAccess(
 
 // ECMA 12.12
 JSValue* LabelNode::execute(ExecState* exec) {
-  if (!exec->seenLabels()->push(label))
+  if (!exec->seenLabels().push(label))
     return setErrorCompletion(exec, SyntaxError, "Duplicated label %s found.",
                               label);
   JSValue* result = statement->execute(exec);
-  exec->seenLabels()->pop();
+  exec->seenLabels().pop();
 
   if (exec->completionType() == Break && exec->breakOrContinueTarget() == label)
     exec->setCompletionType(Normal);

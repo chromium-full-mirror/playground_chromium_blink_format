@@ -83,7 +83,7 @@ class JSGlobalObject : public JSVariableObject {
     Debugger* debugger;
     CompatMode compatMode;
 
-    ExecState globalExec;
+    GlobalExecState globalExec;
     int recursion;
 
     unsigned timeoutTime;

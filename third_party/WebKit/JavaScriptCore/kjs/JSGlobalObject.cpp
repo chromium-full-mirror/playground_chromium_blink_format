@@ -600,8 +600,7 @@ ActivationImp* JSGlobalObject::pushActivation(ExecState* exec) {
 
   StackActivation* stackEntry = &d()->activations->data[d()->activationCount++];
   stackEntry->activationStorage.init(exec);
-
-  return &(stackEntry->activationStorage);
+  return &stackEntry->activationStorage;
 }
 
 inline void JSGlobalObject::checkActivationCount() {
@@ -620,25 +619,25 @@ void JSGlobalObject::popActivation() {
 }
 
 void JSGlobalObject::tearOffActivation(ExecState* exec, bool leaveRelic) {
-  if (exec->codeType() == FunctionCode &&
-      static_cast<ActivationImp*>(exec->activationObject())->isOnStack()) {
-    ActivationImp* oldActivation =
-        static_cast<ActivationImp*>(exec->activationObject());
-    ActivationImp* newActivation =
-        new ActivationImp(*oldActivation->d(), leaveRelic);
+  ActivationImp* oldActivation = exec->activationObject();
+  if (!oldActivation || !oldActivation->isOnStack())
+    return;
 
-    if (!leaveRelic) {
-      checkActivationCount();
-      d()->activationCount--;
-    }
+  ASSERT(exec->codeType() == FunctionCode);
+  ActivationImp* newActivation =
+      new ActivationImp(*oldActivation->d(), leaveRelic);
 
-    oldActivation->d()->localStorage.shrink(0);
-
-    exec->setActivationObject(newActivation);
-    exec->setVariableObject(newActivation);
-    exec->setLocalStorage(&(newActivation->localStorage()));
-    exec->replaceScopeChainTop(newActivation);
+  if (!leaveRelic) {
+    checkActivationCount();
+    d()->activationCount--;
   }
+
+  oldActivation->d()->localStorage.shrink(0);
+
+  exec->setActivationObject(newActivation);
+  exec->setVariableObject(newActivation);
+  exec->setLocalStorage(&newActivation->localStorage());
+  exec->replaceScopeChainTop(newActivation);
 }
 
 }  // namespace KJS
