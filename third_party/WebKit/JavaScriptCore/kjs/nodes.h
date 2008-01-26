@@ -264,6 +264,13 @@ class TrueNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecPrimary; }
 };
 
+class PlaceholderTrueNode : public TrueNode {
+ public:
+  // Like TrueNode, but does not serialize as "true".
+  PlaceholderTrueNode() KJS_FAST_CALL : TrueNode() {}
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+};
+
 class NumberNode : public ExpressionNode {
  public:
   NumberNode(double v) KJS_FAST_CALL : ExpressionNode(NumberType),
@@ -2201,11 +2208,12 @@ class ForNode : public StatementNode {
           ExpressionNode* e2,
           ExpressionNode* e3,
           StatementNode* s,
-          bool e1WasVarDecl) KJS_FAST_CALL : expr1(e1 ? e1 : new TrueNode),
-                                             expr2(e2 ? e2 : new TrueNode),
-                                             expr3(e3 ? e3 : new TrueNode),
-                                             statement(s),
-                                             expr1WasVarDecl(e1WasVarDecl) {
+          bool e1WasVarDecl) KJS_FAST_CALL
+      : expr1(e1 ? e1 : new PlaceholderTrueNode),
+        expr2(e2 ? e2 : new PlaceholderTrueNode),
+        expr3(e3 ? e3 : new PlaceholderTrueNode),
+        statement(s),
+        expr1WasVarDecl(e1&& e1WasVarDecl) {
     ASSERT(expr1);
     ASSERT(expr2);
     ASSERT(expr3);
