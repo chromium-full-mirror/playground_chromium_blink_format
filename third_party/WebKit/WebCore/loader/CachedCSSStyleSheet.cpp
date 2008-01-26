@@ -32,7 +32,6 @@
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
 #include "TextResourceDecoder.h"
-#include "DeprecatedString.h"
 #include "loader.h"
 #include <wtf/Vector.h>
 

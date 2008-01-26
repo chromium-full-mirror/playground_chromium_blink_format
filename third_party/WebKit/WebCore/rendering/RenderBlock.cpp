@@ -4600,7 +4600,7 @@ void RenderBlock::updateFirstLetter() {
 
       // account for leading spaces and punctuation
       while (length < oldText->length() &&
-             (DeprecatedChar((*oldText)[length]).isSpace() ||
+             (isSpaceOrNewline((*oldText)[length]) ||
               Unicode::isPunct((*oldText)[length])))
         length++;
 

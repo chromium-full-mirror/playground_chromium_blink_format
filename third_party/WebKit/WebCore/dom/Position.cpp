@@ -654,7 +654,7 @@ Position Position::leadingWhitespacePosition(
     String string = static_cast<Text*>(prev.node())->data();
     UChar c = string[prev.offset()];
     if (considerNonCollapsibleWhitespace
-            ? (DeprecatedChar(c).isSpace() || c == noBreakSpace)
+            ? (isSpaceOrNewline(c) || c == noBreakSpace)
             : isCollapsibleWhitespace(c))
       if (isEditablePosition(prev))
         return prev;
@@ -676,7 +676,7 @@ Position Position::trailingWhitespacePosition(
   // The space must not be in another paragraph and it must be editable.
   if (!isEndOfParagraph(v) && v.next(true).isNotNull())
     if (considerNonCollapsibleWhitespace
-            ? (DeprecatedChar(c).isSpace() || c == noBreakSpace)
+            ? (isSpaceOrNewline(c) || c == noBreakSpace)
             : isCollapsibleWhitespace(c))
       return *this;
 

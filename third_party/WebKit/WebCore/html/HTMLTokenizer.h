@@ -147,9 +147,9 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
                     bool parsingTag);
   State parseProcessingInstruction(SegmentedString&, State);
   State scriptHandler(State);
-  State scriptExecution(const DeprecatedString& script,
+  State scriptExecution(const String& script,
                         State,
-                        DeprecatedString scriptURL,
+                        const String& scriptURL,
                         int baseLine = 0);
   void setSrc(const SegmentedString&);
 

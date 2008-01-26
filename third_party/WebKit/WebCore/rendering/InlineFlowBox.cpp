@@ -289,10 +289,9 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
       RenderText* rt = static_cast<RenderText*>(text->object());
       if (rt->textLength()) {
         if (needsWordSpacing &&
-            DeprecatedChar(rt->characters()[text->start()]).isSpace())
+            isSpaceOrNewline(rt->characters()[text->start()]))
           x += rt->style(m_firstLine)->font().wordSpacing();
-        needsWordSpacing =
-            !DeprecatedChar(rt->characters()[text->end()]).isSpace();
+        needsWordSpacing = !isSpaceOrNewline(rt->characters()[text->end()]);
       }
       text->setXPos(x);
 
