@@ -128,6 +128,7 @@ class Node : public ParserRefCounted {
   // Serialization.
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL = 0;
   virtual Precedence precedence() const = 0;
+  virtual bool needsParensIfLeftmost() const { return false; }
 
   // Used for iterative, depth-first traversal of the node tree. Does not cross
   // function call boundaries.
@@ -499,6 +500,7 @@ class ObjectLiteralNode : public ExpressionNode {
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
+  virtual bool needsParensIfLeftmost() const { return true; }
 
  private:
   RefPtr<PropertyListNode> list;
@@ -2473,6 +2475,7 @@ class FuncExprNode : public ExpressionNode {
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
+  virtual bool needsParensIfLeftmost() const { return true; }
 
  private:
   void addParams() KJS_FAST_CALL;

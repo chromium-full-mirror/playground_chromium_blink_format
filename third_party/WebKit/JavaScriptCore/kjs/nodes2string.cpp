@@ -41,7 +41,10 @@ enum DotExprType { DotExpr };
 
 class SourceStream {
  public:
-  SourceStream() : m_numberNeedsParens(false), m_precedence(PrecExpression) {}
+  SourceStream()
+      : m_numberNeedsParens(false),
+        m_atStartOfStatement(true),
+        m_precedence(PrecExpression) {}
   UString toString() const { return m_string; }
   SourceStream& operator<<(const Identifier&);
   SourceStream& operator<<(const UString&);
@@ -63,6 +66,7 @@ class SourceStream {
   UString m_string;
   UString m_spacesForIndentation;
   bool m_numberNeedsParens;
+  bool m_atStartOfStatement;
   Precedence m_precedence;
 };
 
@@ -149,6 +153,7 @@ static bool isParserRoundTripNumber(const UString& string) {
 
 SourceStream& SourceStream::operator<<(char c) {
   m_numberNeedsParens = false;
+  m_atStartOfStatement = false;
   UChar ch(c);
   m_string.append(ch);
   return *this;
@@ -156,6 +161,7 @@ SourceStream& SourceStream::operator<<(char c) {
 
 SourceStream& SourceStream::operator<<(const char* s) {
   m_numberNeedsParens = false;
+  m_atStartOfStatement = false;
   m_string += s;
   return *this;
 }
@@ -163,6 +169,7 @@ SourceStream& SourceStream::operator<<(const char* s) {
 SourceStream& SourceStream::operator<<(double value) {
   bool needParens = m_numberNeedsParens;
   m_numberNeedsParens = false;
+  m_atStartOfStatement = false;
 
   if (needParens)
     m_string.append('(');
@@ -175,19 +182,22 @@ SourceStream& SourceStream::operator<<(double value) {
 
 SourceStream& SourceStream::operator<<(const UString& s) {
   m_numberNeedsParens = false;
+  m_atStartOfStatement = false;
   m_string += s;
   return *this;
 }
 
 SourceStream& SourceStream::operator<<(const Identifier& s) {
   m_numberNeedsParens = false;
+  m_atStartOfStatement = false;
   m_string += s.ustring();
   return *this;
 }
 
 SourceStream& SourceStream::operator<<(const Node* n) {
   bool needParens =
-      m_precedence != PrecExpression && n->precedence() > m_precedence;
+      (m_precedence != PrecExpression && n->precedence() > m_precedence) ||
+      (m_atStartOfStatement && n->needsParensIfLeftmost());
   m_precedence = PrecExpression;
   if (n) {
     if (needParens)
@@ -201,6 +211,7 @@ SourceStream& SourceStream::operator<<(const Node* n) {
 
 SourceStream& SourceStream::operator<<(EndlType) {
   m_numberNeedsParens = false;
+  m_atStartOfStatement = true;
   m_string.append('\n');
   m_string.append(m_spacesForIndentation);
   return *this;
@@ -208,12 +219,14 @@ SourceStream& SourceStream::operator<<(EndlType) {
 
 SourceStream& SourceStream::operator<<(IndentType) {
   m_numberNeedsParens = false;
+  m_atStartOfStatement = false;
   m_spacesForIndentation += "  ";
   return *this;
 }
 
 SourceStream& SourceStream::operator<<(UnindentType) {
   m_numberNeedsParens = false;
+  m_atStartOfStatement = false;
   m_spacesForIndentation =
       m_spacesForIndentation.substr(0, m_spacesForIndentation.size() - 2);
   return *this;
