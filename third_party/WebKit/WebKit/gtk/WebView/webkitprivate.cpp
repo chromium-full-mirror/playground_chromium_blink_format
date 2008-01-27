@@ -76,7 +76,8 @@ WebKitWebView* kit(WebCore::Page* corePage) {
       static_cast<WebKit::ChromeClient*>(corePage->chrome()->client());
   return client ? client->webView() : 0;
 }
-}
+
+} /** end namespace WebCore */
 
 void webkit_init() {
   static bool isInitialized = false;
