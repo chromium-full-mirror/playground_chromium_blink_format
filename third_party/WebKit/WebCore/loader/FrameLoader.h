@@ -180,7 +180,8 @@ class FrameLoader : Noncopyable
   void load(const ResourceRequest&,
             const NavigationAction&,
             FrameLoadType,
-            PassRefPtr<FormState>);
+            PassRefPtr<FormState>,
+            const SubstituteData&);
 
   void load(DocumentLoader*);
   void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
@@ -366,7 +367,7 @@ class FrameLoader : Noncopyable
   void stopLoading(bool sendUnload);
   bool closeURL();
 
-  void didExplicitOpen();
+  void didExplicitOpen(const String& mimeType, bool replace, SharedBuffer*);
 
   KURL iconURL();
   void commitIconURLToIconDatabase(const KURL&);

@@ -285,12 +285,16 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
   String documentSource = sourceString;
 
   RefPtr<Document> result;
+  String resultMIMEType;
   if (sourceMIMEType == "text/plain") {
     result = ownerDocument->implementation()->createDocument(frame);
     transformTextStringToXHTMLDocumentString(documentSource);
-  } else
+    resultMIMEType = "application/xhtml+xml";
+  } else {
     result = ownerDocument->implementation()->createDocument(sourceMIMEType,
                                                              frame, false);
+    resultMIMEType = sourceMIMEType;
+  }
 
   // Before parsing, we need to save & detach the old document and get the new
   // document
@@ -302,7 +306,7 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
     frame->setDocument(result);
   }
 
-  result->open();
+  result->open(resultMIMEType, false);
   if (sourceIsDocument) {
     result->setURL(ownerDocument->url());
     result->setBaseURL(ownerDocument->baseURL());
