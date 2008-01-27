@@ -1,7 +1,7 @@
 // -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
- *  Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ *  Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -1182,7 +1182,7 @@ JSValue* stringProtoFuncLink(ExecState* exec,
 StringObjectImp::StringObjectImp(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  StringPrototype* stringProto)
-    : InternalFunctionImp(funcProto) {
+    : InternalFunctionImp(funcProto, stringProto->classInfo()->className) {
   // ECMA 15.5.3.1 String.prototype
   putDirect(exec->propertyNames().prototype, stringProto,
             DontEnum | DontDelete | ReadOnly);

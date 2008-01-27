@@ -315,7 +315,7 @@ struct RegExpObjectImpPrivate {
 RegExpObjectImp::RegExpObjectImp(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  RegExpPrototype* regProto)
-    : InternalFunctionImp(funcProto), d(new RegExpObjectImpPrivate) {
+    : InternalFunctionImp(funcProto, "RegExp"), d(new RegExpObjectImpPrivate) {
   // ECMA 15.10.5.1 RegExp.prototype
   putDirect(exec->propertyNames().prototype, regProto,
             DontEnum | DontDelete | ReadOnly);

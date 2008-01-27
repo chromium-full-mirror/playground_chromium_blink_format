@@ -1,7 +1,6 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2000,2003 Harri Porten (porten@kde.org)
- *  Copyright (C) 2007 Apple Inc. All rights reserved.
+ *  Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -299,11 +298,11 @@ JSValue* numberProtoFuncToFixed(ExecState* exec,
   return jsString(s + m.substr(0, kMinusf));
 }
 
-void fractionalPartToString(char* buf,
-                            int& i,
-                            const char* result,
-                            int resultLength,
-                            int fractionalDigits) {
+static void fractionalPartToString(char* buf,
+                                   int& i,
+                                   const char* result,
+                                   int resultLength,
+                                   int fractionalDigits) {
   if (fractionalDigits <= 0)
     return;
 
@@ -323,7 +322,7 @@ void fractionalPartToString(char* buf,
     buf[i++] = '0';
 }
 
-void exponentialPartToString(char* buf, int& i, int decimalPoint) {
+static void exponentialPartToString(char* buf, int& i, int decimalPoint) {
   buf[i++] = 'e';
   buf[i++] = (decimalPoint >= 0) ? '+' : '-';
   // decimalPoint can't be more than 3 digits decimal given the
@@ -474,7 +473,7 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
 
   if (e == precision - 1)
     return jsString(s + m);
-  else if (e >= 0) {
+  if (e >= 0) {
     if (e + 1 < m.size())
       return jsString(s + m.substr(0, e + 1) + "." + m.substr(e + 1));
     return jsString(s + m);
@@ -501,7 +500,7 @@ DontEnum|DontDelete|ReadOnly
 NumberObjectImp::NumberObjectImp(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  NumberPrototype* numberProto)
-    : InternalFunctionImp(funcProto) {
+    : InternalFunctionImp(funcProto, numberProto->classInfo()->className) {
   // Number.Prototype
   putDirect(exec->propertyNames().prototype, numberProto,
             DontEnum | DontDelete | ReadOnly);
@@ -532,6 +531,7 @@ JSValue* NumberObjectImp::getValueProperty(ExecState*, int token) const {
     case MinValue:
       return jsNumberCell(5E-324);
   }
+  ASSERT_NOT_REACHED();
   return jsNull();
 }
 
@@ -544,6 +544,7 @@ JSObject* NumberObjectImp::construct(ExecState* exec, const List& args) {
   JSObject* proto = exec->lexicalGlobalObject()->numberPrototype();
   NumberInstance* obj = new NumberInstance(proto);
 
+  // FIXME: Check args[0]->isUndefined() instead of args.isEmpty()?
   double n = args.isEmpty() ? 0 : args[0]->toNumber(exec);
   obj->setInternalValue(jsNumber(n));
   return obj;
@@ -553,8 +554,8 @@ JSObject* NumberObjectImp::construct(ExecState* exec, const List& args) {
 JSValue* NumberObjectImp::callAsFunction(ExecState* exec,
                                          JSObject*,
                                          const List& args) {
-  double n = args.isEmpty() ? 0 : args[0]->toNumber(exec);
-  return jsNumber(n);
+  // FIXME: Check args[0]->isUndefined() instead of args.isEmpty()?
+  return jsNumber(args.isEmpty() ? 0 : args[0]->toNumber(exec));
 }
 
 }  // namespace KJS

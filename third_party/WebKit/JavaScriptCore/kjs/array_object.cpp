@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003, 2007 Apple Inc. All rights reserved.
+ *  Copyright (C) 2003, 2007, 2008 Apple Inc. All rights reserved.
  *  Copyright (C) 2003 Peter Kelly (pmk@post.com)
  *  Copyright (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  *
@@ -803,7 +803,7 @@ JSValue* arrayProtoFuncLastIndexOf(ExecState* exec,
 ArrayObjectImp::ArrayObjectImp(ExecState* exec,
                                FunctionPrototype* funcProto,
                                ArrayPrototype* arrayProto)
-    : InternalFunctionImp(funcProto) {
+    : InternalFunctionImp(funcProto, arrayProto->classInfo()->className) {
   // ECMA 15.4.3.1 Array.prototype
   put(exec, exec->propertyNames().prototype, arrayProto,
       DontEnum | DontDelete | ReadOnly);

@@ -34,7 +34,7 @@ class ErrorInstance : public JSObject {
   static const ClassInfo info;
 };
 
-class ErrorPrototype : public JSObject {
+class ErrorPrototype : public ErrorInstance {
  public:
   ErrorPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
 };
@@ -55,13 +55,13 @@ class NativeErrorPrototype : public JSObject {
  public:
   NativeErrorPrototype(ExecState*,
                        ErrorPrototype*,
-                       UString name,
-                       UString message);
+                       const UString& name,
+                       const UString& message);
 };
 
 class NativeErrorImp : public InternalFunctionImp {
  public:
-  NativeErrorImp(ExecState*, FunctionPrototype*, JSObject*);
+  NativeErrorImp(ExecState*, FunctionPrototype*, NativeErrorPrototype*);
 
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState*, const List&);
