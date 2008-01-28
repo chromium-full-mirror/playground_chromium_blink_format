@@ -78,6 +78,11 @@ IntRect AffineTransform::mapRect(const IntRect& rect) const {
   return IntRect();
 }
 
+FloatRect AffineTransform::mapRect(const FloatRect& rect) const {
+  notImplemented();
+  return FloatRect();
+}
+
 AffineTransform& AffineTransform::scale(double sx, double sy) {
 #if USE(WXGC)
   m_transform.Scale((wxDouble)sx, (wxDouble)sy);
