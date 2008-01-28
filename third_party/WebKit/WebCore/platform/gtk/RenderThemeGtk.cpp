@@ -69,12 +69,24 @@ short RenderThemeGtk::baselinePosition(const RenderObject* o) const {
   return RenderTheme::baselinePosition(o);
 }
 
+static GtkTextDirection gtkTextDirection(TextDirection direction) {
+  switch (direction) {
+    case RTL:
+      return GTK_TEXT_DIR_RTL;
+    case LTR:
+      return GTK_TEXT_DIR_LTR;
+    default:
+      return GTK_TEXT_DIR_NONE;
+  }
+}
+
 static void adjustMozStyle(RenderStyle* style, GtkThemeWidgetType type) {
   gint left, top, right, bottom;
+  GtkTextDirection direction = gtkTextDirection(style->direction());
   gboolean inhtml = true;
 
-  if (moz_gtk_get_widget_border(type, &left, &top, &right, &bottom, inhtml) !=
-      MOZ_GTK_SUCCESS)
+  if (moz_gtk_get_widget_border(type, &left, &top, &right, &bottom, direction,
+                                inhtml) != MOZ_GTK_SUCCESS)
     return;
 
   // FIXME: This approach is likely to be incorrect. See other ports and layout
@@ -98,6 +110,7 @@ static void setMozState(RenderTheme* theme,
   state->disabled = !theme->isEnabled(o) || theme->isReadOnlyControl(o);
   state->isDefault = false;
   state->canDefault = false;
+  state->depressed = false;
 }
 
 static bool paintMozWidget(RenderTheme* theme,
@@ -135,10 +148,12 @@ static bool paintMozWidget(RenderTheme* theme,
 
   IntPoint pos = i.context->translatePoint(rect.location());
   GdkRectangle gdkRect = IntRect(pos.x(), pos.y(), rect.width(), rect.height());
+  GtkTextDirection direction = gtkTextDirection(o->style()->direction());
 
   // FIXME: Pass the real clip region.
   return moz_gtk_widget_paint(type, i.context->gdkDrawable(), &gdkRect,
-                              &gdkRect, &mozState, flags) != MOZ_GTK_SUCCESS;
+                              &gdkRect, &mozState, flags,
+                              direction) != MOZ_GTK_SUCCESS;
 }
 
 static void setButtonPadding(RenderStyle* style) {
