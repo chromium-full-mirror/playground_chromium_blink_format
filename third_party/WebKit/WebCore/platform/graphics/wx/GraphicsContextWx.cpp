@@ -348,7 +348,7 @@ void GraphicsContext::clip(const Path&) {
   notImplemented();
 }
 
-AffineTransform GraphicsContext::getCTM() {
+AffineTransform GraphicsContext::getCTM() const {
   notImplemented();
   return AffineTransform();
 }
