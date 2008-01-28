@@ -80,4 +80,11 @@ IntPoint AffineTransform::mapPoint(const IntPoint& point) const {
   // Round the point.
   return IntPoint(lround(x2), lround(y2));
 }
+
+FloatPoint AffineTransform::mapPoint(const FloatPoint& point) const {
+  double x2, y2;
+  map(point.x(), point.y(), &x2, &y2);
+
+  return FloatPoint(static_cast<float>(x2), static_cast<float>(y2));
+}
 }

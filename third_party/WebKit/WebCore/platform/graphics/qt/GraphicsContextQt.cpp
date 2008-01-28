@@ -238,6 +238,10 @@ PlatformGraphicsContext* GraphicsContext::platformContext() const {
   return m_data->p();
 }
 
+AffineTransform GraphicsContext::getCTM() const {
+  return platformContext()->combinedMatrix();
+}
+
 void GraphicsContext::savePlatformState() {
   m_data->p()->save();
 }
