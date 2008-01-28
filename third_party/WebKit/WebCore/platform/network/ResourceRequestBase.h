@@ -43,10 +43,11 @@ enum ResourceRequestCachePolicy {
                             // cache
 };
 
-struct ResourceRequest;
+class ResourceRequest;
 
 // Do not use this type directly.  Use ResourceRequest instead.
-struct ResourceRequestBase {
+class ResourceRequestBase {
+ public:
   bool isNull() const;
   bool isEmpty() const;
 

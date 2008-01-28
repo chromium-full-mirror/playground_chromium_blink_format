@@ -64,7 +64,7 @@ class SubstituteData;
 class String;
 class Widget;
 
-struct ResourceRequest;
+class ResourceRequest;
 
 typedef void (FrameLoader::*FramePolicyFunction)(PolicyAction);
 
