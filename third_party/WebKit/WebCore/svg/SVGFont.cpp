@@ -387,7 +387,9 @@ bool floatWidthUsingSVGFontCallback(const SVGGlyphIdentifier& identifier,
 void floatWidthMissingGlyphCallback(const TextRun& run,
                                     SVGTextRunWalkerMeasuredLengthData& data) {
   // Handle system font fallback
-  Font font(FontDescription(), 0, 0);  // spacing handled by SVG text code.
+  FontDescription fontDescription(data.font->fontDescription());
+  fontDescription.setFamily(*new FontFamily());
+  Font font(fontDescription, 0, 0);  // spacing handled by SVG text code.
   font.update(data.font->fontSelector());
 
   data.length += font.floatWidth(run);
@@ -516,7 +518,9 @@ bool drawTextUsingSVGFontCallback(const SVGGlyphIdentifier& identifier,
 void drawTextMissingGlyphCallback(const TextRun& run,
                                   SVGTextRunWalkerDrawTextData& data) {
   // Handle system font fallback
-  Font font(FontDescription(), 0, 0);  // spacing handled by SVG text code.
+  FontDescription fontDescription(data.context->font().fontDescription());
+  fontDescription.setFamily(*new FontFamily());
+  Font font(fontDescription, 0, 0);  // spacing handled by SVG text code.
   font.update(data.context->font().fontSelector());
 
   font.drawText(data.context, run, data.currentPoint);
