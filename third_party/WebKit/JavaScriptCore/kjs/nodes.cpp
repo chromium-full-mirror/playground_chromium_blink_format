@@ -538,7 +538,7 @@ JSValue* ThisNode::evaluate(ExecState* exec) {
 // ECMA 11.1.2 & 10.1.4
 JSValue* ResolveNode::inlineEvaluate(ExecState* exec) {
   // Check for missed optimization opportunity.
-  ASSERT(!canSkipLookup(exec, ident));
+  ASSERT(!canSkipLookup(exec, m_ident));
 
   const ScopeChain& chain = exec->scopeChain();
   ScopeChainIterator iter = chain.begin();
@@ -551,13 +551,13 @@ JSValue* ResolveNode::inlineEvaluate(ExecState* exec) {
   do {
     JSObject* o = *iter;
 
-    if (o->getPropertySlot(exec, ident, slot))
-      return slot.getValue(exec, o, ident);
+    if (o->getPropertySlot(exec, m_ident, slot))
+      return slot.getValue(exec, o, m_ident);
 
     ++iter;
   } while (iter != end);
 
-  return throwUndefinedVariableError(exec, ident);
+  return throwUndefinedVariableError(exec, m_ident);
 }
 
 JSValue* ResolveNode::evaluate(ExecState* exec) {
@@ -591,14 +591,14 @@ uint32_t ResolveNode::evaluateToUInt32(ExecState* exec) {
 void ResolveNode::optimizeVariableAccess(const SymbolTable& symbolTable,
                                          const LocalStorage&,
                                          NodeStack&) {
-  size_t index = symbolTable.get(ident.ustring().rep());
+  size_t index = symbolTable.get(m_ident.ustring().rep());
   if (index != missingSymbolMarker())
     new (this) LocalVarAccessNode(index);
 }
 
 JSValue* LocalVarAccessNode::inlineEvaluate(ExecState* exec) {
   ASSERT(exec->variableObject() == exec->scopeChain().top());
-  return exec->localStorage()[index].value;
+  return exec->localStorage()[m_index].value;
 }
 
 JSValue* LocalVarAccessNode::evaluate(ExecState* exec) {
@@ -626,10 +626,10 @@ uint32_t LocalVarAccessNode::evaluateToUInt32(ExecState* exec) {
 void ElementNode::optimizeVariableAccess(const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
-  if (next)
-    nodeStack.append(next.get());
-  ASSERT(node);
-  nodeStack.append(node.get());
+  if (m_next)
+    nodeStack.append(m_next.get());
+  ASSERT(m_node);
+  nodeStack.append(m_node.get());
 }
 
 // ECMA 11.1.4
@@ -637,10 +637,10 @@ JSValue* ElementNode::evaluate(ExecState* exec) {
   JSObject* array = exec->lexicalGlobalObject()->arrayConstructor()->construct(
       exec, exec->emptyList());
   int length = 0;
-  for (ElementNode* n = this; n; n = n->next.get()) {
-    JSValue* val = n->node->evaluate(exec);
+  for (ElementNode* n = this; n; n = n->m_next.get()) {
+    JSValue* val = n->m_node->evaluate(exec);
     KJS_CHECKEXCEPTIONVALUE
-    length += n->elision;
+    length += n->m_elision;
     array->put(exec, length++, val);
   }
   return array;
@@ -651,8 +651,8 @@ JSValue* ElementNode::evaluate(ExecState* exec) {
 void ArrayNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  if (element)
-    nodeStack.append(element.get());
+  if (m_element)
+    nodeStack.append(m_element.get());
 }
 
 // ECMA 11.1.4
@@ -660,11 +660,12 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
   JSObject* array;
   int length;
 
-  if (element) {
-    array = static_cast<JSObject*>(element->evaluate(exec));
+  if (m_element) {
+    array = static_cast<JSObject*>(m_element->evaluate(exec));
     KJS_CHECKEXCEPTIONVALUE
-    length =
-        opt ? array->get(exec, exec->propertyNames().length)->toInt32(exec) : 0;
+    length = m_opt
+                 ? array->get(exec, exec->propertyNames().length)->toInt32(exec)
+                 : 0;
   } else {
     JSValue* newArr =
         exec->lexicalGlobalObject()->arrayConstructor()->construct(
@@ -673,8 +674,8 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
     length = 0;
   }
 
-  if (opt)
-    array->put(exec, exec->propertyNames().length, jsNumber(elision + length),
+  if (m_opt)
+    array->put(exec, exec->propertyNames().length, jsNumber(m_elision + length),
                DontEnum | DontDelete);
 
   return array;
@@ -685,14 +686,14 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
 void ObjectLiteralNode::optimizeVariableAccess(const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
-  if (list)
-    nodeStack.append(list.get());
+  if (m_list)
+    nodeStack.append(m_list.get());
 }
 
 // ECMA 11.1.5
 JSValue* ObjectLiteralNode::evaluate(ExecState* exec) {
-  if (list)
-    return list->evaluate(exec);
+  if (m_list)
+    return m_list->evaluate(exec);
 
   return exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
@@ -703,9 +704,9 @@ JSValue* ObjectLiteralNode::evaluate(ExecState* exec) {
 void PropertyListNode::optimizeVariableAccess(const SymbolTable&,
                                               const LocalStorage&,
                                               NodeStack& nodeStack) {
-  if (next)
-    nodeStack.append(next.get());
-  nodeStack.append(node.get());
+  if (m_next)
+    nodeStack.append(m_next.get());
+  nodeStack.append(m_node.get());
 }
 
 // ECMA 11.1.5
@@ -713,21 +714,21 @@ JSValue* PropertyListNode::evaluate(ExecState* exec) {
   JSObject* obj = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
 
-  for (PropertyListNode* p = this; p; p = p->next.get()) {
-    JSValue* v = p->node->assign->evaluate(exec);
+  for (PropertyListNode* p = this; p; p = p->m_next.get()) {
+    JSValue* v = p->m_node->m_assign->evaluate(exec);
     KJS_CHECKEXCEPTIONVALUE
 
-    switch (p->node->type) {
+    switch (p->m_node->m_type) {
       case PropertyNode::Getter:
         ASSERT(v->isObject());
-        obj->defineGetter(exec, p->node->name(), static_cast<JSObject*>(v));
+        obj->defineGetter(exec, p->m_node->name(), static_cast<JSObject*>(v));
         break;
       case PropertyNode::Setter:
         ASSERT(v->isObject());
-        obj->defineSetter(exec, p->node->name(), static_cast<JSObject*>(v));
+        obj->defineSetter(exec, p->m_node->name(), static_cast<JSObject*>(v));
         break;
       case PropertyNode::Constant:
-        obj->put(exec, p->node->name(), v);
+        obj->put(exec, p->m_node->name(), v);
         break;
     }
   }
@@ -740,7 +741,7 @@ JSValue* PropertyListNode::evaluate(ExecState* exec) {
 void PropertyNode::optimizeVariableAccess(const SymbolTable&,
                                           const LocalStorage&,
                                           NodeStack& nodeStack) {
-  nodeStack.append(assign.get());
+  nodeStack.append(m_assign.get());
 }
 
 // ECMA 11.1.5
@@ -755,15 +756,15 @@ JSValue* PropertyNode::evaluate(ExecState*) {
 void BracketAccessorNode::optimizeVariableAccess(const SymbolTable&,
                                                  const LocalStorage&,
                                                  NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_subscript.get());
+  nodeStack.append(m_base.get());
 }
 
 // ECMA 11.2.1a
 JSValue* BracketAccessorNode::inlineEvaluate(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_subscript->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   JSObject* o = v1->toObject(exec);
   uint32_t i;
@@ -806,14 +807,14 @@ uint32_t BracketAccessorNode::evaluateToUInt32(ExecState* exec) {
 void DotAccessorNode::optimizeVariableAccess(const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
-  nodeStack.append(expr.get());
+  nodeStack.append(m_base.get());
 }
 
 // ECMA 11.2.1b
 JSValue* DotAccessorNode::inlineEvaluate(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  return v->toObject(exec)->get(exec, ident);
+  return v->toObject(exec)->get(exec, m_ident);
 }
 
 JSValue* DotAccessorNode::evaluate(ExecState* exec) {
@@ -849,16 +850,16 @@ uint32_t DotAccessorNode::evaluateToUInt32(ExecState* exec) {
 void ArgumentListNode::optimizeVariableAccess(const SymbolTable&,
                                               const LocalStorage&,
                                               NodeStack& nodeStack) {
-  if (next)
-    nodeStack.append(next.get());
-  ASSERT(expr);
-  nodeStack.append(expr.get());
+  if (m_next)
+    nodeStack.append(m_next.get());
+  ASSERT(m_expr);
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.2.4
 void ArgumentListNode::evaluateList(ExecState* exec, List& list) {
-  for (ArgumentListNode* n = this; n; n = n->next.get()) {
-    JSValue* v = n->expr->evaluate(exec);
+  for (ArgumentListNode* n = this; n; n = n->m_next.get()) {
+    JSValue* v = n->m_expr->evaluate(exec);
     KJS_CHECKEXCEPTIONVOID
     list.append(v);
   }
@@ -869,8 +870,8 @@ void ArgumentListNode::evaluateList(ExecState* exec, List& list) {
 void ArgumentsNode::optimizeVariableAccess(const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
-  if (listNode)
-    nodeStack.append(listNode.get());
+  if (m_listNode)
+    nodeStack.append(m_listNode.get());
 }
 
 // ------------------------------ NewExprNode ----------------------------------
@@ -878,20 +879,20 @@ void ArgumentsNode::optimizeVariableAccess(const SymbolTable&,
 void NewExprNode::optimizeVariableAccess(const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
-  if (args)
-    nodeStack.append(args.get());
-  nodeStack.append(expr.get());
+  if (m_args)
+    nodeStack.append(m_args.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.2.2
 
 JSValue* NewExprNode::inlineEvaluate(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   List argList;
-  if (args) {
-    args->evaluateList(exec, argList);
+  if (m_args) {
+    m_args->evaluateList(exec, argList);
     KJS_CHECKEXCEPTIONVALUE
   }
 
@@ -899,14 +900,14 @@ JSValue* NewExprNode::inlineEvaluate(ExecState* exec) {
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s) is not an object. "
                       "Cannot be used with new.",
-                      v, expr.get());
+                      v, m_expr.get());
 
   JSObject* constr = static_cast<JSObject*>(v);
   if (!constr->implementsConstruct())
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s) is not a "
                       "constructor. Cannot be used with new.",
-                      v, expr.get());
+                      v, m_expr.get());
 
   return constr->construct(exec, argList);
 }
@@ -942,19 +943,19 @@ uint32_t NewExprNode::evaluateToUInt32(ExecState* exec) {
 void FunctionCallValueNode::optimizeVariableAccess(const SymbolTable&,
                                                    const LocalStorage&,
                                                    NodeStack& nodeStack) {
-  nodeStack.append(args.get());
-  nodeStack.append(expr.get());
+  nodeStack.append(m_args.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.2.3
 JSValue* FunctionCallValueNode::evaluate(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   if (!v->isObject()) {
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s) is not object.", v,
-                      expr.get());
+                      m_expr.get());
   }
 
   JSObject* func = static_cast<JSObject*>(v);
@@ -963,11 +964,11 @@ JSValue* FunctionCallValueNode::evaluate(ExecState* exec) {
     return throwError(
         exec, TypeError,
         "Object %s (result of expression %s) does not allow calls.", v,
-        expr.get());
+        m_expr.get());
   }
 
   List argList;
-  args->evaluateList(exec, argList);
+  m_args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   JSObject* thisObj = exec->dynamicGlobalObject();
@@ -979,9 +980,9 @@ void FunctionCallResolveNode::optimizeVariableAccess(
     const SymbolTable& symbolTable,
     const LocalStorage&,
     NodeStack& nodeStack) {
-  nodeStack.append(args.get());
+  nodeStack.append(m_args.get());
 
-  size_t index = symbolTable.get(ident.ustring().rep());
+  size_t index = symbolTable.get(m_ident.ustring().rep());
   if (index != missingSymbolMarker())
     new (this) LocalVarFunctionCallNode(index);
 }
@@ -989,7 +990,7 @@ void FunctionCallResolveNode::optimizeVariableAccess(
 // ECMA 11.2.3
 JSValue* FunctionCallResolveNode::inlineEvaluate(ExecState* exec) {
   // Check for missed optimization opportunity.
-  ASSERT(!canSkipLookup(exec, ident));
+  ASSERT(!canSkipLookup(exec, m_ident));
 
   const ScopeChain& chain = exec->scopeChain();
   ScopeChainIterator iter = chain.begin();
@@ -1002,14 +1003,14 @@ JSValue* FunctionCallResolveNode::inlineEvaluate(ExecState* exec) {
   JSObject* base;
   do {
     base = *iter;
-    if (base->getPropertySlot(exec, ident, slot)) {
-      JSValue* v = slot.getValue(exec, base, ident);
+    if (base->getPropertySlot(exec, m_ident, slot)) {
+      JSValue* v = slot.getValue(exec, base, m_ident);
       KJS_CHECKEXCEPTIONVALUE
 
       if (!v->isObject())
         return throwError(exec, TypeError,
                           "Value %s (result of expression %s) is not object.",
-                          v, ident);
+                          v, m_ident);
 
       JSObject* func = static_cast<JSObject*>(v);
 
@@ -1017,10 +1018,10 @@ JSValue* FunctionCallResolveNode::inlineEvaluate(ExecState* exec) {
         return throwError(
             exec, TypeError,
             "Object %s (result of expression %s) does not allow calls.", v,
-            ident);
+            m_ident);
 
       List argList;
-      args->evaluateList(exec, argList);
+      m_args->evaluateList(exec, argList);
       KJS_CHECKEXCEPTIONVALUE
 
       JSObject* thisObj = base;
@@ -1039,7 +1040,7 @@ JSValue* FunctionCallResolveNode::inlineEvaluate(ExecState* exec) {
     ++iter;
   } while (iter != end);
 
-  return throwUndefinedVariableError(exec, ident);
+  return throwUndefinedVariableError(exec, m_ident);
 }
 
 JSValue* FunctionCallResolveNode::evaluate(ExecState* exec) {
@@ -1073,21 +1074,22 @@ uint32_t FunctionCallResolveNode::evaluateToUInt32(ExecState* exec) {
 JSValue* LocalVarFunctionCallNode::inlineEvaluate(ExecState* exec) {
   ASSERT(exec->variableObject() == exec->scopeChain().top());
 
-  JSValue* v = exec->localStorage()[index].value;
+  JSValue* v = exec->localStorage()[m_index].value;
 
   if (!v->isObject())
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s) is not object.", v,
-                      ident);
+                      m_ident);
 
   JSObject* func = static_cast<JSObject*>(v);
   if (!func->implementsCall())
     return throwError(
         exec, TypeError,
-        "Object %s (result of expression %s) does not allow calls.", v, ident);
+        "Object %s (result of expression %s) does not allow calls.", v,
+        m_ident);
 
   List argList;
-  args->evaluateList(exec, argList);
+  m_args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   return func->call(exec, exec->dynamicGlobalObject(), argList);
@@ -1124,17 +1126,17 @@ uint32_t LocalVarFunctionCallNode::evaluateToUInt32(ExecState* exec) {
 void FunctionCallBracketNode::optimizeVariableAccess(const SymbolTable&,
                                                      const LocalStorage&,
                                                      NodeStack& nodeStack) {
-  nodeStack.append(args.get());
-  nodeStack.append(subscript.get());
-  nodeStack.append(base.get());
+  nodeStack.append(m_args.get());
+  nodeStack.append(m_subscript.get());
+  nodeStack.append(m_base.get());
 }
 
 // ECMA 11.2.3
 JSValue* FunctionCallBracketNode::evaluate(ExecState* exec) {
-  JSValue* baseVal = base->evaluate(exec);
+  JSValue* baseVal = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  JSValue* subscriptVal = subscript->evaluate(exec);
+  JSValue* subscriptVal = m_subscript->evaluate(exec);
 
   JSObject* baseObj = baseVal->toObject(exec);
   uint32_t i;
@@ -1159,7 +1161,7 @@ JSValue* FunctionCallBracketNode::evaluate(ExecState* exec) {
   if (!funcVal->isObject()) {
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s[%s]) is not object.",
-                      funcVal, base.get(), subscript.get());
+                      funcVal, m_base.get(), m_subscript.get());
   }
 
   JSObject* func = static_cast<JSObject*>(funcVal);
@@ -1168,11 +1170,11 @@ JSValue* FunctionCallBracketNode::evaluate(ExecState* exec) {
     return throwError(
         exec, TypeError,
         "Object %s (result of expression %s[%s]) does not allow calls.",
-        funcVal, base.get(), subscript.get());
+        funcVal, m_base.get(), m_subscript.get());
   }
 
   List argList;
-  args->evaluateList(exec, argList);
+  m_args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   JSObject* thisObj = baseObj;
@@ -1196,34 +1198,34 @@ static const char* dotExprDoesNotAllowCallsString() {
 void FunctionCallDotNode::optimizeVariableAccess(const SymbolTable&,
                                                  const LocalStorage&,
                                                  NodeStack& nodeStack) {
-  nodeStack.append(args.get());
-  nodeStack.append(base.get());
+  nodeStack.append(m_args.get());
+  nodeStack.append(m_base.get());
 }
 
 // ECMA 11.2.3
 JSValue* FunctionCallDotNode::inlineEvaluate(ExecState* exec) {
-  JSValue* baseVal = base->evaluate(exec);
+  JSValue* baseVal = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   JSObject* baseObj = baseVal->toObject(exec);
   PropertySlot slot;
-  JSValue* funcVal = baseObj->getPropertySlot(exec, ident, slot)
-                         ? slot.getValue(exec, baseObj, ident)
+  JSValue* funcVal = baseObj->getPropertySlot(exec, m_ident, slot)
+                         ? slot.getValue(exec, baseObj, m_ident)
                          : jsUndefined();
   KJS_CHECKEXCEPTIONVALUE
 
   if (!funcVal->isObject())
     return throwError(exec, TypeError, dotExprNotAnObjectString(), funcVal,
-                      base.get(), ident);
+                      m_base.get(), m_ident);
 
   JSObject* func = static_cast<JSObject*>(funcVal);
 
   if (!func->implementsCall())
     return throwError(exec, TypeError, dotExprDoesNotAllowCallsString(),
-                      funcVal, base.get(), ident);
+                      funcVal, m_base.get(), m_ident);
 
   List argList;
-  args->evaluateList(exec, argList);
+  m_args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
   JSObject* thisObj = baseObj;
@@ -1646,12 +1648,12 @@ JSValue* DeleteValueNode::evaluate(ExecState* exec) {
 void VoidNode::optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
-  nodeStack.append(expr.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.4.2
 JSValue* VoidNode::evaluate(ExecState* exec) {
-  expr->evaluate(exec);
+  m_expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   return jsUndefined();
@@ -2053,19 +2055,19 @@ uint32_t UnaryPlusNode::evaluateToUInt32(ExecState* exec) {
 void NegateNode::optimizeVariableAccess(const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
-  nodeStack.append(expr.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.4.7
 JSValue* NegateNode::evaluate(ExecState* exec) {
   // No need to check exception, caller will do so right after evaluate()
-  return jsNumber(-expr->evaluateToNumber(exec));
+  return jsNumber(-m_expr->evaluateToNumber(exec));
 }
 
 double NegateNode::evaluateToNumber(ExecState* exec) {
   // No need to check exception, caller will do so right after
   // evaluateToNumber()
-  return -expr->evaluateToNumber(exec);
+  return -m_expr->evaluateToNumber(exec);
 }
 
 // ------------------------------ BitwiseNotNode -------------------------------
@@ -2073,12 +2075,12 @@ double NegateNode::evaluateToNumber(ExecState* exec) {
 void BitwiseNotNode::optimizeVariableAccess(const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
-  nodeStack.append(expr.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.4.8
 int32_t BitwiseNotNode::inlineEvaluateToInt32(ExecState* exec) {
-  return ~expr->evaluateToInt32(exec);
+  return ~m_expr->evaluateToInt32(exec);
 }
 
 JSValue* BitwiseNotNode::evaluate(ExecState* exec) {
@@ -2106,16 +2108,16 @@ uint32_t BitwiseNotNode::evaluateToUInt32(ExecState* exec) {
 void LogicalNotNode::optimizeVariableAccess(const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
-  nodeStack.append(expr.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 11.4.9
 JSValue* LogicalNotNode::evaluate(ExecState* exec) {
-  return jsBoolean(!expr->evaluateToBoolean(exec));
+  return jsBoolean(!m_expr->evaluateToBoolean(exec));
 }
 
 bool LogicalNotNode::evaluateToBoolean(ExecState* exec) {
-  return !expr->evaluateToBoolean(exec);
+  return !m_expr->evaluateToBoolean(exec);
 }
 
 // ------------------------------ Multiplicative Nodes
@@ -2124,15 +2126,15 @@ bool LogicalNotNode::evaluateToBoolean(ExecState* exec) {
 void MultNode::optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.5.1
 double MultNode::inlineEvaluateToNumber(ExecState* exec) {
-  double n1 = term1->evaluateToNumber(exec);
+  double n1 = m_term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  double n2 = term2->evaluateToNumber(exec);
+  double n2 = m_term2->evaluateToNumber(exec);
   return n1 * n2;
 }
 
@@ -2159,15 +2161,15 @@ uint32_t MultNode::evaluateToUInt32(ExecState* exec) {
 void DivNode::optimizeVariableAccess(const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.5.2
 double DivNode::inlineEvaluateToNumber(ExecState* exec) {
-  double n1 = term1->evaluateToNumber(exec);
+  double n1 = m_term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  double n2 = term2->evaluateToNumber(exec);
+  double n2 = m_term2->evaluateToNumber(exec);
   return n1 / n2;
 }
 
@@ -2190,15 +2192,15 @@ uint32_t DivNode::evaluateToUInt32(ExecState* exec) {
 void ModNode::optimizeVariableAccess(const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.5.3
 double ModNode::inlineEvaluateToNumber(ExecState* exec) {
-  double n1 = term1->evaluateToNumber(exec);
+  double n1 = m_term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  double n2 = term2->evaluateToNumber(exec);
+  double n2 = m_term2->evaluateToNumber(exec);
   return fmod(n1, n2);
 }
 
@@ -2319,26 +2321,26 @@ static inline double addToNumber(ExecState* exec, JSValue* v1, JSValue* v2) {
 void AddNode::optimizeVariableAccess(const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.6.1
 JSValue* AddNode::evaluate(ExecState* exec) {
-  JSValue* v1 = term1->evaluate(exec);
+  JSValue* v1 = m_term1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  JSValue* v2 = term2->evaluate(exec);
+  JSValue* v2 = m_term2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   return add(exec, v1, v2);
 }
 
 double AddNode::inlineEvaluateToNumber(ExecState* exec) {
-  JSValue* v1 = term1->evaluate(exec);
+  JSValue* v1 = m_term1->evaluate(exec);
   KJS_CHECKEXCEPTIONNUMBER
 
-  JSValue* v2 = term2->evaluate(exec);
+  JSValue* v2 = m_term2->evaluate(exec);
   KJS_CHECKEXCEPTIONNUMBER
 
   return addToNumber(exec, v1, v2);
@@ -2357,9 +2359,9 @@ uint32_t AddNode::evaluateToUInt32(ExecState* exec) {
 }
 
 double AddNumbersNode::inlineEvaluateToNumber(ExecState* exec) {
-  double n1 = term1->evaluateToNumber(exec);
+  double n1 = m_term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  double n2 = term2->evaluateToNumber(exec);
+  double n2 = m_term2->evaluateToNumber(exec);
   return n1 + n2;
 }
 
@@ -2380,10 +2382,10 @@ uint32_t AddNumbersNode::evaluateToUInt32(ExecState* exec) {
 }
 
 JSValue* AddStringsNode::evaluate(ExecState* exec) {
-  JSValue* v1 = term1->evaluate(exec);
+  JSValue* v1 = m_term1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  JSValue* v2 = term2->evaluate(exec);
+  JSValue* v2 = m_term2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   return jsString(static_cast<StringImp*>(v1)->value() +
@@ -2391,10 +2393,10 @@ JSValue* AddStringsNode::evaluate(ExecState* exec) {
 }
 
 JSValue* AddStringLeftNode::evaluate(ExecState* exec) {
-  JSValue* v1 = term1->evaluate(exec);
+  JSValue* v1 = m_term1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  JSValue* v2 = term2->evaluate(exec);
+  JSValue* v2 = m_term2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   JSValue* p2 = v2->toPrimitive(exec, UnspecifiedType);
@@ -2402,10 +2404,10 @@ JSValue* AddStringLeftNode::evaluate(ExecState* exec) {
 }
 
 JSValue* AddStringRightNode::evaluate(ExecState* exec) {
-  JSValue* v1 = term1->evaluate(exec);
+  JSValue* v1 = m_term1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  JSValue* v2 = term2->evaluate(exec);
+  JSValue* v2 = m_term2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   JSValue* p1 = v1->toPrimitive(exec, UnspecifiedType);
@@ -2415,15 +2417,15 @@ JSValue* AddStringRightNode::evaluate(ExecState* exec) {
 void SubNode::optimizeVariableAccess(const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.6.2
 double SubNode::inlineEvaluateToNumber(ExecState* exec) {
-  double n1 = term1->evaluateToNumber(exec);
+  double n1 = m_term1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  double n2 = term2->evaluateToNumber(exec);
+  double n2 = m_term2->evaluateToNumber(exec);
   return n1 - n2;
 }
 
@@ -2449,15 +2451,15 @@ uint32_t SubNode::evaluateToUInt32(ExecState* exec) {
 void LeftShiftNode::optimizeVariableAccess(const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.7.1
 int32_t LeftShiftNode::inlineEvaluateToInt32(ExecState* exec) {
-  int i1 = term1->evaluateToInt32(exec);
+  int i1 = m_term1->evaluateToInt32(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  unsigned int i2 = term2->evaluateToUInt32(exec) & 0x1f;
+  unsigned int i2 = m_term2->evaluateToUInt32(exec) & 0x1f;
   return (i1 << i2);
 }
 
@@ -2480,15 +2482,15 @@ uint32_t LeftShiftNode::evaluateToUInt32(ExecState* exec) {
 void RightShiftNode::optimizeVariableAccess(const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.7.2
 int32_t RightShiftNode::inlineEvaluateToInt32(ExecState* exec) {
-  int i1 = term1->evaluateToInt32(exec);
+  int i1 = m_term1->evaluateToInt32(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  unsigned int i2 = term2->evaluateToUInt32(exec) & 0x1f;
+  unsigned int i2 = m_term2->evaluateToUInt32(exec) & 0x1f;
   return (i1 >> i2);
 }
 
@@ -2511,15 +2513,15 @@ uint32_t RightShiftNode::evaluateToUInt32(ExecState* exec) {
 void UnsignedRightShiftNode::optimizeVariableAccess(const SymbolTable&,
                                                     const LocalStorage&,
                                                     NodeStack& nodeStack) {
-  nodeStack.append(term1.get());
-  nodeStack.append(term2.get());
+  nodeStack.append(m_term1.get());
+  nodeStack.append(m_term2.get());
 }
 
 // ECMA 11.7.3
 uint32_t UnsignedRightShiftNode::inlineEvaluateToUInt32(ExecState* exec) {
-  unsigned int i1 = term1->evaluateToUInt32(exec);
+  unsigned int i1 = m_term1->evaluateToUInt32(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  unsigned int i2 = term2->evaluateToUInt32(exec) & 0x1f;
+  unsigned int i2 = m_term2->evaluateToUInt32(exec) & 0x1f;
   return (i1 >> i2);
 }
 
@@ -2575,15 +2577,15 @@ static inline bool lessThanEq(ExecState* exec, JSValue* v1, JSValue* v2) {
 void LessNode::optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.8.1
 bool LessNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
   return lessThan(exec, v1, v2);
 }
@@ -2597,9 +2599,9 @@ bool LessNode::evaluateToBoolean(ExecState* exec) {
 }
 
 bool LessNumbersNode::inlineEvaluateToBoolean(ExecState* exec) {
-  double n1 = expr1->evaluateToNumber(exec);
+  double n1 = m_expr1->evaluateToNumber(exec);
   KJS_CHECKEXCEPTIONVALUE
-  double n2 = expr2->evaluateToNumber(exec);
+  double n2 = m_expr2->evaluateToNumber(exec);
   return n1 < n2;
 }
 
@@ -2612,9 +2614,9 @@ bool LessNumbersNode::evaluateToBoolean(ExecState* exec) {
 }
 
 bool LessStringsNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   return static_cast<StringImp*>(v1)->value() <
          static_cast<StringImp*>(v2)->value();
 }
@@ -2630,15 +2632,15 @@ bool LessStringsNode::evaluateToBoolean(ExecState* exec) {
 void GreaterNode::optimizeVariableAccess(const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.8.2
 bool GreaterNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
   return lessThan(exec, v2, v1);
 }
@@ -2654,15 +2656,15 @@ bool GreaterNode::evaluateToBoolean(ExecState* exec) {
 void LessEqNode::optimizeVariableAccess(const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.8.3
 bool LessEqNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
   return lessThanEq(exec, v1, v2);
 }
@@ -2678,15 +2680,15 @@ bool LessEqNode::evaluateToBoolean(ExecState* exec) {
 void GreaterEqNode::optimizeVariableAccess(const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.8.4
 bool GreaterEqNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
   return lessThanEq(exec, v2, v1);
 }
@@ -2702,22 +2704,22 @@ bool GreaterEqNode::evaluateToBoolean(ExecState* exec) {
 void InstanceOfNode::optimizeVariableAccess(const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.8.6
 JSValue* InstanceOfNode::evaluate(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   if (!v2->isObject())
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s) is not an object. "
                       "Cannot be used with instanceof operator.",
-                      v2, expr2.get());
+                      v2, m_expr2.get());
 
   JSObject* o2 = static_cast<JSObject*>(v2);
 
@@ -2735,16 +2737,16 @@ JSValue* InstanceOfNode::evaluate(ExecState* exec) {
 }
 
 bool InstanceOfNode::evaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
 
   if (!v2->isObject()) {
     throwError(exec, TypeError,
                "Value %s (result of expression %s) is not an object. Cannot be "
                "used with 'instanceof' operator.",
-               v2, expr2.get());
+               v2, m_expr2.get());
     return false;
   }
 
@@ -2766,38 +2768,38 @@ bool InstanceOfNode::evaluateToBoolean(ExecState* exec) {
 void InNode::optimizeVariableAccess(const SymbolTable&,
                                     const LocalStorage&,
                                     NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.8.7
 JSValue* InNode::evaluate(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   if (!v2->isObject())
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s) is not an object. "
                       "Cannot be used with 'in' operator.",
-                      v2, expr2.get());
+                      v2, m_expr2.get());
 
   return jsBoolean(static_cast<JSObject*>(v2)->hasProperty(
       exec, Identifier(v1->toString(exec))));
 }
 
 bool InNode::evaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
 
   if (!v2->isObject()) {
     throwError(exec, TypeError,
                "Value %s (result of expression %s) is not an object. Cannot be "
                "used with 'in' operator.",
-               v2, expr2.get());
+               v2, m_expr2.get());
     return false;
   }
 
@@ -2811,15 +2813,15 @@ bool InNode::evaluateToBoolean(ExecState* exec) {
 void EqualNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.9.1
 bool EqualNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
 
   return equal(exec, v1, v2);
@@ -2836,15 +2838,15 @@ bool EqualNode::evaluateToBoolean(ExecState* exec) {
 void NotEqualNode::optimizeVariableAccess(const SymbolTable&,
                                           const LocalStorage&,
                                           NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.9.2
 bool NotEqualNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
 
   return !equal(exec, v1, v2);
@@ -2861,15 +2863,15 @@ bool NotEqualNode::evaluateToBoolean(ExecState* exec) {
 void StrictEqualNode::optimizeVariableAccess(const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.9.4
 bool StrictEqualNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
 
   return strictEqual(exec, v1, v2);
@@ -2886,15 +2888,15 @@ bool StrictEqualNode::evaluateToBoolean(ExecState* exec) {
 void NotStrictEqualNode::optimizeVariableAccess(const SymbolTable&,
                                                 const LocalStorage&,
                                                 NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.9.5
 bool NotStrictEqualNode::inlineEvaluateToBoolean(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
 
   return !strictEqual(exec, v1, v2);
@@ -2914,24 +2916,24 @@ bool NotStrictEqualNode::evaluateToBoolean(ExecState* exec) {
 void BitAndNode::optimizeVariableAccess(const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.10
 JSValue* BitAndNode::evaluate(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   return jsNumberFromAnd(exec, v1, v2);
 }
 
 int32_t BitAndNode::inlineEvaluateToInt32(ExecState* exec) {
-  int32_t i1 = expr1->evaluateToInt32(exec);
+  int32_t i1 = m_expr1->evaluateToInt32(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  int32_t i2 = expr2->evaluateToInt32(exec);
+  int32_t i2 = m_expr2->evaluateToInt32(exec);
   return (i1 & i2);
 }
 
@@ -2954,14 +2956,14 @@ uint32_t BitAndNode::evaluateToUInt32(ExecState* exec) {
 void BitXOrNode::optimizeVariableAccess(const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 int32_t BitXOrNode::inlineEvaluateToInt32(ExecState* exec) {
-  int i1 = expr1->evaluateToInt32(exec);
+  int i1 = m_expr1->evaluateToInt32(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  int i2 = expr2->evaluateToInt32(exec);
+  int i2 = m_expr2->evaluateToInt32(exec);
   return (i1 ^ i2);
 }
 
@@ -2988,14 +2990,14 @@ uint32_t BitXOrNode::evaluateToUInt32(ExecState* exec) {
 void BitOrNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 int32_t BitOrNode::inlineEvaluateToInt32(ExecState* exec) {
-  int i1 = expr1->evaluateToInt32(exec);
+  int i1 = m_expr1->evaluateToInt32(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  int i2 = expr2->evaluateToInt32(exec);
+  int i2 = m_expr2->evaluateToInt32(exec);
   return (i1 | i2);
 }
 
@@ -3025,48 +3027,48 @@ uint32_t BitOrNode::evaluateToUInt32(ExecState* exec) {
 void LogicalAndNode::optimizeVariableAccess(const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.11
 JSValue* LogicalAndNode::evaluate(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   bool b1 = v1->toBoolean(exec);
   KJS_CHECKEXCEPTIONVALUE
   if (!b1)
     return v1;
-  JSValue* v2 = expr2->evaluate(exec);
+  JSValue* v2 = m_expr2->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   return v2;
 }
 
 bool LogicalAndNode::evaluateToBoolean(ExecState* exec) {
-  bool b = expr1->evaluateToBoolean(exec);
+  bool b = m_expr1->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  return b && expr2->evaluateToBoolean(exec);
+  return b && m_expr2->evaluateToBoolean(exec);
 }
 
 void LogicalOrNode::optimizeVariableAccess(const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 JSValue* LogicalOrNode::evaluate(ExecState* exec) {
-  JSValue* v1 = expr1->evaluate(exec);
+  JSValue* v1 = m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
   if (v1->toBoolean(exec))
     return v1;
-  return expr2->evaluate(exec);
+  return m_expr2->evaluate(exec);
 }
 
 bool LogicalOrNode::evaluateToBoolean(ExecState* exec) {
-  bool b = expr1->evaluateToBoolean(exec);
+  bool b = m_expr1->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  return b || expr2->evaluateToBoolean(exec);
+  return b || m_expr2->evaluateToBoolean(exec);
 }
 
 // ------------------------------ ConditionalNode ------------------------------
@@ -3074,40 +3076,41 @@ bool LogicalOrNode::evaluateToBoolean(ExecState* exec) {
 void ConditionalNode::optimizeVariableAccess(const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
-  nodeStack.append(logical.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
+  nodeStack.append(m_logical.get());
 }
 
 // ECMA 11.12
 JSValue* ConditionalNode::evaluate(ExecState* exec) {
-  bool b = logical->evaluateToBoolean(exec);
+  bool b = m_logical->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONVALUE
-  return b ? expr1->evaluate(exec) : expr2->evaluate(exec);
+  return b ? m_expr1->evaluate(exec) : m_expr2->evaluate(exec);
 }
 
 bool ConditionalNode::evaluateToBoolean(ExecState* exec) {
-  bool b = logical->evaluateToBoolean(exec);
+  bool b = m_logical->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONBOOLEAN
-  return b ? expr1->evaluateToBoolean(exec) : expr2->evaluateToBoolean(exec);
+  return b ? m_expr1->evaluateToBoolean(exec)
+           : m_expr2->evaluateToBoolean(exec);
 }
 
 double ConditionalNode::evaluateToNumber(ExecState* exec) {
-  bool b = logical->evaluateToBoolean(exec);
+  bool b = m_logical->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  return b ? expr1->evaluateToNumber(exec) : expr2->evaluateToNumber(exec);
+  return b ? m_expr1->evaluateToNumber(exec) : m_expr2->evaluateToNumber(exec);
 }
 
 int32_t ConditionalNode::evaluateToInt32(ExecState* exec) {
-  bool b = logical->evaluateToBoolean(exec);
+  bool b = m_logical->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  return b ? expr1->evaluateToInt32(exec) : expr2->evaluateToInt32(exec);
+  return b ? m_expr1->evaluateToInt32(exec) : m_expr2->evaluateToInt32(exec);
 }
 
 uint32_t ConditionalNode::evaluateToUInt32(ExecState* exec) {
-  bool b = logical->evaluateToBoolean(exec);
+  bool b = m_logical->evaluateToBoolean(exec);
   KJS_CHECKEXCEPTIONNUMBER
-  return b ? expr1->evaluateToUInt32(exec) : expr2->evaluateToUInt32(exec);
+  return b ? m_expr1->evaluateToUInt32(exec) : m_expr2->evaluateToUInt32(exec);
 }
 
 // ECMA 11.13
@@ -3486,30 +3489,30 @@ JSValue* ReadModifyBracketNode::evaluate(ExecState* exec) {
 void CommaNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 11.14
 JSValue* CommaNode::evaluate(ExecState* exec) {
-  expr1->evaluate(exec);
+  m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  return expr2->evaluate(exec);
+  return m_expr2->evaluate(exec);
 }
 
 // ------------------------------ ConstDeclNode
 // ----------------------------------
 
-ConstDeclNode::ConstDeclNode(const Identifier& id, ExpressionNode* in)
-    : ident(id), init(in) {}
+ConstDeclNode::ConstDeclNode(const Identifier& ident, ExpressionNode* init)
+    : m_ident(ident), m_init(init) {}
 
 void ConstDeclNode::optimizeVariableAccess(const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
-  if (next)
-    nodeStack.append(next.get());
-  if (init)
-    nodeStack.append(init.get());
+  if (m_next)
+    nodeStack.append(m_next.get());
+  if (m_init)
+    nodeStack.append(m_init.get());
 }
 
 void ConstDeclNode::handleSlowCase(ExecState* exec,
@@ -3526,22 +3529,22 @@ void ConstDeclNode::handleSlowCase(ExecState* exec,
 
   do {
     base = *iter;
-    if (base->getPropertySlot(exec, ident, slot))
+    if (base->getPropertySlot(exec, m_ident, slot))
       break;
 
     ++iter;
   } while (iter != end);
 
   unsigned flags = 0;
-  base->getPropertyAttributes(ident, flags);
+  base->getPropertyAttributes(m_ident, flags);
   flags |= ReadOnly;
 
-  base->put(exec, ident, val, flags);
+  base->put(exec, m_ident, val, flags);
 }
 
 // ECMA 12.2
 inline void ConstDeclNode::evaluateSingle(ExecState* exec) {
-  ASSERT(exec->variableObject()->hasOwnProperty(exec, ident) ||
+  ASSERT(exec->variableObject()->hasOwnProperty(exec, m_ident) ||
          exec->codeType() == EvalCode);  // Guaranteed by processDeclarations.
   const ScopeChain& chain = exec->scopeChain();
   JSObject* variableObject = exec->variableObject();
@@ -3550,16 +3553,16 @@ inline void ConstDeclNode::evaluateSingle(ExecState* exec) {
 
   bool inGlobalScope = ++chain.begin() == chain.end();
 
-  if (init) {
+  if (m_init) {
     if (inGlobalScope) {
-      JSValue* val = init->evaluate(exec);
+      JSValue* val = m_init->evaluate(exec);
       int flags = Internal;
       if (exec->codeType() != EvalCode)
         flags |= DontDelete;
       flags |= ReadOnly;
-      variableObject->put(exec, ident, val, flags);
+      variableObject->put(exec, m_ident, val, flags);
     } else {
-      JSValue* val = init->evaluate(exec);
+      JSValue* val = m_init->evaluate(exec);
       KJS_CHECKEXCEPTIONVOID
 
       // if the variable object is the top of the scope chain, then that must
@@ -3570,10 +3573,10 @@ inline void ConstDeclNode::evaluateSingle(ExecState* exec) {
         return handleSlowCase(exec, chain, val);
 
       unsigned flags = 0;
-      variableObject->getPropertyAttributes(ident, flags);
+      variableObject->getPropertyAttributes(m_ident, flags);
       flags |= ReadOnly;
 
-      variableObject->put(exec, ident, val, flags);
+      variableObject->put(exec, m_ident, val, flags);
     }
   }
 }
@@ -3581,11 +3584,11 @@ inline void ConstDeclNode::evaluateSingle(ExecState* exec) {
 JSValue* ConstDeclNode::evaluate(ExecState* exec) {
   evaluateSingle(exec);
 
-  if (ConstDeclNode* n = next.get()) {
+  if (ConstDeclNode* n = m_next.get()) {
     do {
       n->evaluateSingle(exec);
       KJS_CHECKEXCEPTIONVALUE
-      n = n->next.get();
+      n = n->m_next.get();
     } while (n);
   }
   return jsUndefined();
@@ -3597,13 +3600,13 @@ JSValue* ConstDeclNode::evaluate(ExecState* exec) {
 void ConstStatementNode::optimizeVariableAccess(const SymbolTable&,
                                                 const LocalStorage&,
                                                 NodeStack& nodeStack) {
-  ASSERT(next);
-  nodeStack.append(next.get());
+  ASSERT(m_next);
+  nodeStack.append(m_next.get());
 }
 
 // ECMA 12.2
 JSValue* ConstStatementNode::execute(ExecState* exec) {
-  next->evaluate(exec);
+  m_next->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   return exec->setNormalCompletion();
@@ -3684,13 +3687,13 @@ JSValue* EmptyStatementNode::execute(ExecState* exec) {
 void ExprStatementNode::optimizeVariableAccess(const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
-  ASSERT(expr);
-  nodeStack.append(expr.get());
+  ASSERT(m_expr);
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 12.4
 JSValue* ExprStatementNode::execute(ExecState* exec) {
-  JSValue* value = expr->evaluate(exec);
+  JSValue* value = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   return exec->setNormalCompletion(value);
@@ -3701,12 +3704,12 @@ JSValue* ExprStatementNode::execute(ExecState* exec) {
 void VarStatementNode::optimizeVariableAccess(const SymbolTable&,
                                               const LocalStorage&,
                                               NodeStack& nodeStack) {
-  ASSERT(expr);
-  nodeStack.append(expr.get());
+  ASSERT(m_expr);
+  nodeStack.append(m_expr.get());
 }
 
 JSValue* VarStatementNode::execute(ExecState* exec) {
-  expr->evaluate(exec);
+  m_expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   return exec->setNormalCompletion();
@@ -3754,8 +3757,8 @@ JSValue* IfElseNode::execute(ExecState* exec) {
 void DoWhileNode::optimizeVariableAccess(const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
-  nodeStack.append(statement.get());
-  nodeStack.append(expr.get());
+  nodeStack.append(m_statement.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 12.6.1
@@ -3764,7 +3767,7 @@ JSValue* DoWhileNode::execute(ExecState* exec) {
 
   while (1) {
     exec->pushIteration();
-    JSValue* statementValue = statement->execute(exec);
+    JSValue* statementValue = m_statement->execute(exec);
     exec->popIteration();
 
     if (exec->dynamicGlobalObject()->timedOut())
@@ -3775,16 +3778,16 @@ JSValue* DoWhileNode::execute(ExecState* exec) {
 
     if (exec->completionType() != Normal) {
       if (exec->completionType() == Continue &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         goto continueDoWhileLoop;
       if (exec->completionType() == Break &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         break;
       return statementValue;
     }
 
   continueDoWhileLoop:
-    bool b = expr->evaluateToBoolean(exec);
+    bool b = m_expr->evaluateToBoolean(exec);
     KJS_CHECKEXCEPTION
     if (!b)
       break;
@@ -3798,8 +3801,8 @@ JSValue* DoWhileNode::execute(ExecState* exec) {
 void WhileNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  nodeStack.append(statement.get());
-  nodeStack.append(expr.get());
+  nodeStack.append(m_statement.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 12.6.2
@@ -3807,13 +3810,13 @@ JSValue* WhileNode::execute(ExecState* exec) {
   JSValue* value = 0;
 
   while (1) {
-    bool b = expr->evaluateToBoolean(exec);
+    bool b = m_expr->evaluateToBoolean(exec);
     KJS_CHECKEXCEPTION
     if (!b)
       break;
 
     exec->pushIteration();
-    JSValue* statementValue = statement->execute(exec);
+    JSValue* statementValue = m_statement->execute(exec);
     exec->popIteration();
 
     if (exec->dynamicGlobalObject()->timedOut())
@@ -3824,10 +3827,10 @@ JSValue* WhileNode::execute(ExecState* exec) {
 
     if (exec->completionType() != Normal) {
       if (exec->completionType() == Continue &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         continue;
       if (exec->completionType() == Break &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         break;
       return statementValue;
     }
@@ -3841,27 +3844,27 @@ JSValue* WhileNode::execute(ExecState* exec) {
 void ForNode::optimizeVariableAccess(const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
-  nodeStack.append(statement.get());
-  nodeStack.append(expr3.get());
-  nodeStack.append(expr2.get());
-  nodeStack.append(expr1.get());
+  nodeStack.append(m_statement.get());
+  nodeStack.append(m_expr3.get());
+  nodeStack.append(m_expr2.get());
+  nodeStack.append(m_expr1.get());
 }
 
 // ECMA 12.6.3
 JSValue* ForNode::execute(ExecState* exec) {
   JSValue* value = 0;
 
-  expr1->evaluate(exec);
+  m_expr1->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   while (1) {
-    bool b = expr2->evaluateToBoolean(exec);
+    bool b = m_expr2->evaluateToBoolean(exec);
     KJS_CHECKEXCEPTION
     if (!b)
       break;
 
     exec->pushIteration();
-    JSValue* statementValue = statement->execute(exec);
+    JSValue* statementValue = m_statement->execute(exec);
     exec->popIteration();
     if (statementValue)
       value = statementValue;
@@ -3871,16 +3874,16 @@ JSValue* ForNode::execute(ExecState* exec) {
 
     if (exec->completionType() != Normal) {
       if (exec->completionType() == Continue &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         goto continueForLoop;
       if (exec->completionType() == Break &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         break;
       return statementValue;
     }
 
   continueForLoop:
-    expr3->evaluate(exec);
+    m_expr3->evaluate(exec);
     KJS_CHECKEXCEPTION
   }
 
@@ -3889,43 +3892,49 @@ JSValue* ForNode::execute(ExecState* exec) {
 
 // ------------------------------ ForInNode ------------------------------------
 
-ForInNode::ForInNode(ExpressionNode* l, ExpressionNode* e, StatementNode* s)
-    : init(0L), lexpr(l), expr(e), statement(s), identIsVarDecl(false) {}
+ForInNode::ForInNode(ExpressionNode* l,
+                     ExpressionNode* expr,
+                     StatementNode* statement)
+    : m_init(0L),
+      m_lexpr(l),
+      m_expr(expr),
+      m_statement(statement),
+      m_identIsVarDecl(false) {}
 
-ForInNode::ForInNode(const Identifier& i,
+ForInNode::ForInNode(const Identifier& ident,
                      ExpressionNode* in,
-                     ExpressionNode* e,
-                     StatementNode* s)
-    : ident(i),
-      lexpr(new ResolveNode(i)),
-      expr(e),
-      statement(s),
-      identIsVarDecl(true) {
+                     ExpressionNode* expr,
+                     StatementNode* statement)
+    : m_ident(ident),
+      m_lexpr(new ResolveNode(ident)),
+      m_expr(expr),
+      m_statement(statement),
+      m_identIsVarDecl(true) {
   if (in)
-    init = new AssignResolveNode(i, in);
+    m_init = new AssignResolveNode(ident, in);
   // for( var foo = bar in baz )
 }
 
 void ForInNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  nodeStack.append(statement.get());
-  nodeStack.append(expr.get());
-  nodeStack.append(lexpr.get());
-  if (init)
-    nodeStack.append(init.get());
+  nodeStack.append(m_statement.get());
+  nodeStack.append(m_expr.get());
+  nodeStack.append(m_lexpr.get());
+  if (m_init)
+    nodeStack.append(m_init.get());
 }
 
 // ECMA 12.6.4
 JSValue* ForInNode::execute(ExecState* exec) {
   JSValue* value = 0;
 
-  if (init) {
-    init->evaluate(exec);
+  if (m_init) {
+    m_init->evaluate(exec);
     KJS_CHECKEXCEPTION
   }
 
-  JSValue* e = expr->evaluate(exec);
+  JSValue* e = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   // For Null and Undefined, we want to make sure not to go through
@@ -3946,9 +3955,9 @@ JSValue* ForInNode::execute(ExecState* exec) {
 
     JSValue* str = jsOwnedString(name.ustring());
 
-    if (lexpr->isResolveNode()) {
+    if (m_lexpr->isResolveNode()) {
       const Identifier& ident =
-          static_cast<ResolveNode*>(lexpr.get())->identifier();
+          static_cast<ResolveNode*>(m_lexpr.get())->identifier();
 
       const ScopeChain& chain = exec->scopeChain();
       ScopeChainIterator iter = chain.begin();
@@ -3970,22 +3979,22 @@ JSValue* ForInNode::execute(ExecState* exec) {
 
       if (iter == end)
         o->put(exec, ident, str);
-    } else if (lexpr->isDotAccessorNode()) {
+    } else if (m_lexpr->isDotAccessorNode()) {
       const Identifier& ident =
-          static_cast<DotAccessorNode*>(lexpr.get())->identifier();
+          static_cast<DotAccessorNode*>(m_lexpr.get())->identifier();
       JSValue* v =
-          static_cast<DotAccessorNode*>(lexpr.get())->base()->evaluate(exec);
+          static_cast<DotAccessorNode*>(m_lexpr.get())->base()->evaluate(exec);
       KJS_CHECKEXCEPTION
       JSObject* o = v->toObject(exec);
 
       o->put(exec, ident, str);
     } else {
-      ASSERT(lexpr->isBracketAccessorNode());
-      JSValue* v = static_cast<BracketAccessorNode*>(lexpr.get())
+      ASSERT(m_lexpr->isBracketAccessorNode());
+      JSValue* v = static_cast<BracketAccessorNode*>(m_lexpr.get())
                        ->base()
                        ->evaluate(exec);
       KJS_CHECKEXCEPTION
-      JSValue* v2 = static_cast<BracketAccessorNode*>(lexpr.get())
+      JSValue* v2 = static_cast<BracketAccessorNode*>(m_lexpr.get())
                         ->subscript()
                         ->evaluate(exec);
       KJS_CHECKEXCEPTION
@@ -4000,17 +4009,17 @@ JSValue* ForInNode::execute(ExecState* exec) {
     KJS_CHECKEXCEPTION
 
     exec->pushIteration();
-    JSValue* statementValue = statement->execute(exec);
+    JSValue* statementValue = m_statement->execute(exec);
     exec->popIteration();
     if (statementValue)
       value = statementValue;
 
     if (exec->completionType() != Normal) {
       if (exec->completionType() == Continue &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         continue;
       if (exec->completionType() == Break &&
-          ls.contains(exec->breakOrContinueTarget()))
+          m_labelStack.contains(exec->breakOrContinueTarget()))
         break;
       return statementValue;
     }
@@ -4023,22 +4032,23 @@ JSValue* ForInNode::execute(ExecState* exec) {
 
 // ECMA 12.7
 JSValue* ContinueNode::execute(ExecState* exec) {
-  if (ident.isEmpty() && !exec->inIteration())
+  if (m_ident.isEmpty() && !exec->inIteration())
     return setErrorCompletion(exec, SyntaxError, "Invalid continue statement.");
-  if (!ident.isEmpty() && !exec->seenLabels().contains(ident))
-    return setErrorCompletion(exec, SyntaxError, "Label %s not found.", ident);
-  return exec->setContinueCompletion(&ident);
+  if (!m_ident.isEmpty() && !exec->seenLabels().contains(m_ident))
+    return setErrorCompletion(exec, SyntaxError, "Label %s not found.",
+                              m_ident);
+  return exec->setContinueCompletion(&m_ident);
 }
 
 // ------------------------------ BreakNode ------------------------------------
 
 // ECMA 12.8
 JSValue* BreakNode::execute(ExecState* exec) {
-  if (ident.isEmpty() && !exec->inIteration() && !exec->inSwitch())
+  if (m_ident.isEmpty() && !exec->inIteration() && !exec->inSwitch())
     return setErrorCompletion(exec, SyntaxError, "Invalid break statement.");
-  if (!ident.isEmpty() && !exec->seenLabels().contains(ident))
+  if (!m_ident.isEmpty() && !exec->seenLabels().contains(m_ident))
     return setErrorCompletion(exec, SyntaxError, "Label %s not found.");
-  return exec->setBreakCompletion(&ident);
+  return exec->setBreakCompletion(&m_ident);
 }
 
 // ------------------------------ ReturnNode -----------------------------------
@@ -4046,8 +4056,8 @@ JSValue* BreakNode::execute(ExecState* exec) {
 void ReturnNode::optimizeVariableAccess(const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
-  if (value)
-    nodeStack.append(value.get());
+  if (m_value)
+    nodeStack.append(m_value.get());
 }
 
 // ECMA 12.9
@@ -4056,10 +4066,10 @@ JSValue* ReturnNode::execute(ExecState* exec) {
   if (codeType != FunctionCode)
     return setErrorCompletion(exec, SyntaxError, "Invalid return statement.");
 
-  if (!value)
+  if (!m_value)
     return exec->setReturnValueCompletion(jsUndefined());
 
-  JSValue* v = value->evaluate(exec);
+  JSValue* v = m_value->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   return exec->setReturnValueCompletion(v);
@@ -4071,18 +4081,18 @@ void WithNode::optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
   // Can't optimize within statement because "with" introduces a dynamic scope.
-  nodeStack.append(expr.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 12.10
 JSValue* WithNode::execute(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTION
   JSObject* o = v->toObject(exec);
   KJS_CHECKEXCEPTION
   exec->dynamicGlobalObject()->tearOffActivation(exec);
   exec->pushScope(o);
-  JSValue* value = statement->execute(exec);
+  JSValue* value = m_statement->execute(exec);
   exec->popScope();
 
   return value;
@@ -4093,14 +4103,14 @@ JSValue* WithNode::execute(ExecState* exec) {
 void CaseClauseNode::optimizeVariableAccess(const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
-  if (expr)
-    nodeStack.append(expr.get());
+  if (m_expr)
+    nodeStack.append(m_expr.get());
   statementListPushFIFO(m_children, nodeStack);
 }
 
 // ECMA 12.11
 JSValue* CaseClauseNode::evaluate(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
   return v;
@@ -4116,32 +4126,32 @@ JSValue* CaseClauseNode::executeStatements(ExecState* exec) {
 void ClauseListNode::optimizeVariableAccess(const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
-  if (next)
-    nodeStack.append(next.get());
-  nodeStack.append(clause.get());
+  if (m_next)
+    nodeStack.append(m_next.get());
+  nodeStack.append(m_clause.get());
 }
 
 // ------------------------------ CaseBlockNode --------------------------------
 
-CaseBlockNode::CaseBlockNode(ClauseListNode* l1,
-                             CaseClauseNode* d,
-                             ClauseListNode* l2)
-    : list1(l1), def(d), list2(l2) {}
+CaseBlockNode::CaseBlockNode(ClauseListNode* list1,
+                             CaseClauseNode* defaultClause,
+                             ClauseListNode* list2)
+    : m_list1(list1), m_defaultClause(defaultClause), m_list2(list2) {}
 
 void CaseBlockNode::optimizeVariableAccess(const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
-  if (list2)
-    nodeStack.append(list2.get());
-  if (def)
-    nodeStack.append(def.get());
-  if (list1)
-    nodeStack.append(list1.get());
+  if (m_list2)
+    nodeStack.append(m_list2.get());
+  if (m_defaultClause)
+    nodeStack.append(m_defaultClause.get());
+  if (m_list1)
+    nodeStack.append(m_list1.get());
 }
 
 // ECMA 12.11
 JSValue* CaseBlockNode::executeBlock(ExecState* exec, JSValue* input) {
-  ClauseListNode* a = list1.get();
+  ClauseListNode* a = m_list1.get();
   while (a) {
     CaseClauseNode* clause = a->getClause();
     a = a->getNext();
@@ -4160,7 +4170,7 @@ JSValue* CaseBlockNode::executeBlock(ExecState* exec, JSValue* input) {
     }
   }
 
-  ClauseListNode* b = list2.get();
+  ClauseListNode* b = m_list2.get();
   while (b) {
     CaseClauseNode* clause = b->getClause();
     b = b->getNext();
@@ -4175,12 +4185,12 @@ JSValue* CaseBlockNode::executeBlock(ExecState* exec, JSValue* input) {
   }
 
   // default clause
-  if (def) {
-    JSValue* res = def->executeStatements(exec);
+  if (m_defaultClause) {
+    JSValue* res = m_defaultClause->executeStatements(exec);
     if (exec->completionType() != Normal)
       return res;
   }
-  b = list2.get();
+  b = m_list2.get();
 step18:
   while (b) {
     CaseClauseNode* clause = b->getClause();
@@ -4201,21 +4211,21 @@ step18:
 void SwitchNode::optimizeVariableAccess(const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
-  nodeStack.append(block.get());
-  nodeStack.append(expr.get());
+  nodeStack.append(m_block.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 12.11
 JSValue* SwitchNode::execute(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   exec->pushSwitch();
-  JSValue* result = block->executeBlock(exec, v);
+  JSValue* result = m_block->executeBlock(exec, v);
   exec->popSwitch();
 
   if (exec->completionType() == Break &&
-      ls.contains(exec->breakOrContinueTarget()))
+      m_labelStack.contains(exec->breakOrContinueTarget()))
     exec->setCompletionType(Normal);
   return result;
 }
@@ -4225,18 +4235,19 @@ JSValue* SwitchNode::execute(ExecState* exec) {
 void LabelNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  nodeStack.append(statement.get());
+  nodeStack.append(m_statement.get());
 }
 
 // ECMA 12.12
 JSValue* LabelNode::execute(ExecState* exec) {
-  if (!exec->seenLabels().push(label))
+  if (!exec->seenLabels().push(m_label))
     return setErrorCompletion(exec, SyntaxError, "Duplicated label %s found.",
-                              label);
-  JSValue* result = statement->execute(exec);
+                              m_label);
+  JSValue* result = m_statement->execute(exec);
   exec->seenLabels().pop();
 
-  if (exec->completionType() == Break && exec->breakOrContinueTarget() == label)
+  if (exec->completionType() == Break &&
+      exec->breakOrContinueTarget() == m_label)
     exec->setCompletionType(Normal);
   return result;
 }
@@ -4246,12 +4257,12 @@ JSValue* LabelNode::execute(ExecState* exec) {
 void ThrowNode::optimizeVariableAccess(const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
-  nodeStack.append(expr.get());
+  nodeStack.append(m_expr.get());
 }
 
 // ECMA 12.13
 JSValue* ThrowNode::execute(ExecState* exec) {
-  JSValue* v = expr->evaluate(exec);
+  JSValue* v = m_expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
   handleException(exec, v);
@@ -4265,31 +4276,31 @@ void TryNode::optimizeVariableAccess(const SymbolTable&,
                                      NodeStack& nodeStack) {
   // Can't optimize within catchBlock because "catch" introduces a dynamic
   // scope.
-  if (finallyBlock)
-    nodeStack.append(finallyBlock.get());
-  nodeStack.append(tryBlock.get());
+  if (m_finallyBlock)
+    nodeStack.append(m_finallyBlock.get());
+  nodeStack.append(m_tryBlock.get());
 }
 
 // ECMA 12.14
 JSValue* TryNode::execute(ExecState* exec) {
-  JSValue* result = tryBlock->execute(exec);
+  JSValue* result = m_tryBlock->execute(exec);
 
   if (Collector::isOutOfMemory())
     return result;  // don't try to catch an out of memory exception thrown by
                     // the collector
 
-  if (catchBlock && exec->completionType() == Throw) {
+  if (m_catchBlock && exec->completionType() == Throw) {
     JSObject* obj = new JSObject;
-    obj->put(exec, exceptionIdent, result, DontDelete);
+    obj->put(exec, m_exceptionIdent, result, DontDelete);
     exec->dynamicGlobalObject()->tearOffActivation(exec);
     exec->pushScope(obj);
-    result = catchBlock->execute(exec);
+    result = m_catchBlock->execute(exec);
     exec->popScope();
   }
 
-  if (finallyBlock) {
+  if (m_finallyBlock) {
     ComplType savedCompletionType = exec->completionType();
-    JSValue* finallyResult = finallyBlock->execute(exec);
+    JSValue* finallyResult = m_finallyBlock->execute(exec);
     if (exec->completionType() != Normal)
       result = finallyResult;
     else
@@ -4370,7 +4381,7 @@ void FunctionBodyNode::initializeSymbolTable(ExecState* exec) {
 
   for (size_t i = 0, size = m_functionStack.size(); i < size;
        ++i, ++localStorageIndex) {
-    UString::Rep* rep = m_functionStack[i]->ident.ustring().rep();
+    UString::Rep* rep = m_functionStack[i]->m_ident.ustring().rep();
     symbolTable.set(rep, localStorageIndex);
   }
 
@@ -4401,7 +4412,7 @@ void ProgramNode::initializeSymbolTable(ExecState* exec) {
   size = m_functionStack.size();
   m_functionIndexes.resize(size);
   for (size_t i = 0; i < size; ++i) {
-    UString::Rep* rep = m_functionStack[i]->ident.ustring().rep();
+    UString::Rep* rep = m_functionStack[i]->m_ident.ustring().rep();
     pair<SymbolTable::iterator, bool> result =
         symbolTable.add(rep, localStorageIndex);
     m_functionIndexes[i] = result.first->second;
@@ -4575,7 +4586,7 @@ void EvalNode::processDeclarations(ExecState* exec) {
 
   for (i = 0, size = m_functionStack.size(); i < size; ++i) {
     FuncDeclNode* node = m_functionStack[i];
-    variableObject->put(exec, node->ident, node->makeFunction(exec),
+    variableObject->put(exec, node->m_ident, node->makeFunction(exec),
                         minAttributes);
   }
 }
@@ -4642,13 +4653,13 @@ JSValue* FunctionBodyNodeWithDebuggerHooks::execute(ExecState* exec) {
 // ------------------------------ FuncDeclNode ---------------------------------
 
 void FuncDeclNode::addParams() {
-  for (ParameterNode* p = param.get(); p != 0L; p = p->nextParam())
-    body->parameters().append(p->ident());
+  for (ParameterNode* p = m_parameter.get(); p != 0L; p = p->nextParam())
+    m_body->parameters().append(p->ident());
 }
 
 FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {
   FunctionImp* func =
-      new FunctionImp(exec, ident, body.get(), exec->scopeChain());
+      new FunctionImp(exec, m_ident, m_body.get(), exec->scopeChain());
 
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
@@ -4658,7 +4669,7 @@ FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {
             Internal | DontDelete);
 
   func->put(exec, exec->propertyNames().length,
-            jsNumber(body->parameters().size()),
+            jsNumber(m_body->parameters().size()),
             ReadOnly | DontDelete | DontEnum);
   return func;
 }
@@ -4671,14 +4682,14 @@ JSValue* FuncDeclNode::execute(ExecState* exec) {
 
 // ECMA 13
 void FuncExprNode::addParams() {
-  for (ParameterNode* p = param.get(); p != 0L; p = p->nextParam())
-    body->parameters().append(p->ident());
+  for (ParameterNode* p = m_parameter.get(); p != 0L; p = p->nextParam())
+    m_body->parameters().append(p->ident());
 }
 
 JSValue* FuncExprNode::evaluate(ExecState* exec) {
   exec->dynamicGlobalObject()->tearOffActivation(exec);
 
-  bool named = !ident.isNull();
+  bool named = !m_ident.isNull();
   JSObject* functionScopeObject = 0;
 
   if (named) {
@@ -4690,7 +4701,7 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
   }
 
   FunctionImp* func =
-      new FunctionImp(exec, ident, body.get(), exec->scopeChain());
+      new FunctionImp(exec, m_ident, m_body.get(), exec->scopeChain());
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
   proto->put(exec, exec->propertyNames().constructor, func,
@@ -4700,7 +4711,7 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
 
   if (named) {
     functionScopeObject->put(
-        exec, ident, func,
+        exec, m_ident, func,
         Internal | ReadOnly | (exec->codeType() == EvalCode ? 0 : DontDelete));
     exec->popScope();
   }

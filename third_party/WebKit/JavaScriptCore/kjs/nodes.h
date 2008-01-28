@@ -229,7 +229,9 @@ class StatementNode : public Node {
   int firstLine() const KJS_FAST_CALL { return lineNo(); }
   int lastLine() const KJS_FAST_CALL { return m_lastLine; }
   virtual JSValue* execute(ExecState* exec) KJS_FAST_CALL = 0;
-  void pushLabel(const Identifier& id) KJS_FAST_CALL { ls.push(id); }
+  void pushLabel(const Identifier& ident) KJS_FAST_CALL {
+    m_labelStack.push(ident);
+  }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
     return PrecExpression;
@@ -237,7 +239,7 @@ class StatementNode : public Node {
   virtual bool isEmptyStatement() const KJS_FAST_CALL { return false; }
 
  protected:
-  LabelStack ls;
+  LabelStack m_labelStack;
 
  private:
   int m_lastLine;
@@ -355,12 +357,12 @@ class ThisNode : public ExpressionNode {
 
 class ResolveNode : public ExpressionNode {
  public:
-  ResolveNode(const Identifier& s) KJS_FAST_CALL : ident(s) {}
+  ResolveNode(const Identifier& ident) KJS_FAST_CALL : m_ident(ident) {}
 
   // Special constructor for cases where we overwrite an object in place.
   ResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
-        ident(PlacementNewAdopt) {}
+        m_ident(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
@@ -376,12 +378,12 @@ class ResolveNode : public ExpressionNode {
 
   virtual bool isLocation() const KJS_FAST_CALL { return true; }
   virtual bool isResolveNode() const KJS_FAST_CALL { return true; }
-  const Identifier& identifier() const KJS_FAST_CALL { return ident; }
+  const Identifier& identifier() const KJS_FAST_CALL { return m_ident; }
 
  protected:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
-  Identifier ident;
-  size_t index;  // Used by LocalVarAccessNode.
+  Identifier m_ident;
+  size_t m_index;  // Used by LocalVarAccessNode.
 };
 
 class LocalVarAccessNode : public ResolveNode {
@@ -389,7 +391,7 @@ class LocalVarAccessNode : public ResolveNode {
   // Overwrites a ResolveNode in place.
   LocalVarAccessNode(size_t i) KJS_FAST_CALL : ResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
-    index = i;
+    m_index = i;
   }
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
@@ -403,11 +405,13 @@ class LocalVarAccessNode : public ResolveNode {
 
 class ElementNode : public Node {
  public:
-  ElementNode(int e, ExpressionNode* n) KJS_FAST_CALL : elision(e), node(n) {}
-  ElementNode(ElementNode* l, int e, ExpressionNode* n) KJS_FAST_CALL
-      : elision(e),
-        node(n) {
-    l->next = this;
+  ElementNode(int elision, ExpressionNode* node) KJS_FAST_CALL
+      : m_elision(elision),
+        m_node(node) {}
+  ElementNode(ElementNode* l, int elision, ExpressionNode* node) KJS_FAST_CALL
+      : m_elision(elision),
+        m_node(node) {
+    l->m_next = this;
   }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -418,26 +422,29 @@ class ElementNode : public Node {
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
 
-  PassRefPtr<ElementNode> releaseNext() KJS_FAST_CALL { return next.release(); }
+  PassRefPtr<ElementNode> releaseNext() KJS_FAST_CALL {
+    return m_next.release();
+  }
 
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 
  private:
   friend class ArrayNode;
-  ListRefPtr<ElementNode> next;
-  int elision;
-  RefPtr<ExpressionNode> node;
+  ListRefPtr<ElementNode> m_next;
+  int m_elision;
+  RefPtr<ExpressionNode> m_node;
 };
 
 class ArrayNode : public ExpressionNode {
  public:
-  ArrayNode(int e) KJS_FAST_CALL : elision(e), opt(true) {}
-  ArrayNode(ElementNode* ele) KJS_FAST_CALL : element(ele),
-                                              elision(0),
-                                              opt(false) {}
-  ArrayNode(int eli, ElementNode* ele) KJS_FAST_CALL : element(ele),
-                                                       elision(eli),
-                                                       opt(true) {}
+  ArrayNode(int e) KJS_FAST_CALL : m_elision(e), m_opt(true) {}
+  ArrayNode(ElementNode* element) KJS_FAST_CALL : m_element(element),
+                                                  m_elision(0),
+                                                  m_opt(false) {}
+  ArrayNode(int elision, ElementNode* element) KJS_FAST_CALL
+      : m_element(element),
+        m_elision(elision),
+        m_opt(true) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -446,9 +453,9 @@ class ArrayNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecPrimary; }
 
  private:
-  RefPtr<ElementNode> element;
-  int elision;
-  bool opt;
+  RefPtr<ElementNode> m_element;
+  int m_elision;
+  bool m_opt;
 };
 
 class PropertyNode : public Node {
@@ -456,8 +463,8 @@ class PropertyNode : public Node {
   enum Type { Constant, Getter, Setter };
   PropertyNode(const Identifier& n, ExpressionNode* a, Type t) KJS_FAST_CALL
       : m_name(n),
-        assign(a),
-        type(t) {}
+        m_assign(a),
+        m_type(t) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -473,16 +480,16 @@ class PropertyNode : public Node {
  private:
   friend class PropertyListNode;
   Identifier m_name;
-  RefPtr<ExpressionNode> assign;
-  Type type;
+  RefPtr<ExpressionNode> m_assign;
+  Type m_type;
 };
 
 class PropertyListNode : public Node {
  public:
-  PropertyListNode(PropertyNode* n) KJS_FAST_CALL : node(n) {}
-  PropertyListNode(PropertyNode* n, PropertyListNode* l) KJS_FAST_CALL
-      : node(n) {
-    l->next = this;
+  PropertyListNode(PropertyNode* node) KJS_FAST_CALL : m_node(node) {}
+  PropertyListNode(PropertyNode* node, PropertyListNode* list) KJS_FAST_CALL
+      : m_node(node) {
+    list->m_next = this;
   }
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
@@ -495,19 +502,19 @@ class PropertyListNode : public Node {
 
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   PassRefPtr<PropertyListNode> releaseNext() KJS_FAST_CALL {
-    return next.release();
+    return m_next.release();
   }
 
  private:
   friend class ObjectLiteralNode;
-  RefPtr<PropertyNode> node;
-  ListRefPtr<PropertyListNode> next;
+  RefPtr<PropertyNode> m_node;
+  ListRefPtr<PropertyListNode> m_next;
 };
 
 class ObjectLiteralNode : public ExpressionNode {
  public:
   ObjectLiteralNode() KJS_FAST_CALL {}
-  ObjectLiteralNode(PropertyListNode* l) KJS_FAST_CALL : list(l) {}
+  ObjectLiteralNode(PropertyListNode* list) KJS_FAST_CALL : m_list(list) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -517,14 +524,15 @@ class ObjectLiteralNode : public ExpressionNode {
   virtual bool needsParensIfLeftmost() const { return true; }
 
  private:
-  RefPtr<PropertyListNode> list;
+  RefPtr<PropertyListNode> m_list;
 };
 
 class BracketAccessorNode : public ExpressionNode {
  public:
-  BracketAccessorNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
-        expr2(e2) {}
+  BracketAccessorNode(ExpressionNode* base,
+                      ExpressionNode* subscript) KJS_FAST_CALL
+      : m_base(base),
+        m_subscript(subscript) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -538,20 +546,20 @@ class BracketAccessorNode : public ExpressionNode {
 
   virtual bool isLocation() const KJS_FAST_CALL { return true; }
   virtual bool isBracketAccessorNode() const KJS_FAST_CALL { return true; }
-  ExpressionNode* base() KJS_FAST_CALL { return expr1.get(); }
-  ExpressionNode* subscript() KJS_FAST_CALL { return expr2.get(); }
+  ExpressionNode* base() KJS_FAST_CALL { return m_base.get(); }
+  ExpressionNode* subscript() KJS_FAST_CALL { return m_subscript.get(); }
 
  private:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_base;
+  RefPtr<ExpressionNode> m_subscript;
 };
 
 class DotAccessorNode : public ExpressionNode {
  public:
-  DotAccessorNode(ExpressionNode* e, const Identifier& s) KJS_FAST_CALL
-      : expr(e),
-        ident(s) {}
+  DotAccessorNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
+      : m_base(base),
+        m_ident(ident) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -565,21 +573,21 @@ class DotAccessorNode : public ExpressionNode {
 
   virtual bool isLocation() const KJS_FAST_CALL { return true; }
   virtual bool isDotAccessorNode() const KJS_FAST_CALL { return true; }
-  ExpressionNode* base() const KJS_FAST_CALL { return expr.get(); }
-  const Identifier& identifier() const KJS_FAST_CALL { return ident; }
+  ExpressionNode* base() const KJS_FAST_CALL { return m_base.get(); }
+  const Identifier& identifier() const KJS_FAST_CALL { return m_ident; }
 
  private:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
-  RefPtr<ExpressionNode> expr;
-  Identifier ident;
+  RefPtr<ExpressionNode> m_base;
+  Identifier m_ident;
 };
 
 class ArgumentListNode : public Node {
  public:
-  ArgumentListNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
-  ArgumentListNode(ArgumentListNode* l, ExpressionNode* e) KJS_FAST_CALL
-      : expr(e) {
-    l->next = this;
+  ArgumentListNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
+  ArgumentListNode(ArgumentListNode* listNode,
+                   ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {
+    listNode->m_next = this;
   }
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
@@ -592,19 +600,20 @@ class ArgumentListNode : public Node {
 
   void evaluateList(ExecState*, List&) KJS_FAST_CALL;
   PassRefPtr<ArgumentListNode> releaseNext() KJS_FAST_CALL {
-    return next.release();
+    return m_next.release();
   }
 
  private:
   friend class ArgumentsNode;
-  ListRefPtr<ArgumentListNode> next;
-  RefPtr<ExpressionNode> expr;
+  ListRefPtr<ArgumentListNode> m_next;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class ArgumentsNode : public Node {
  public:
   ArgumentsNode() KJS_FAST_CALL {}
-  ArgumentsNode(ArgumentListNode* l) KJS_FAST_CALL : listNode(l) {}
+  ArgumentsNode(ArgumentListNode* listNode) KJS_FAST_CALL
+      : m_listNode(listNode) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -615,19 +624,20 @@ class ArgumentsNode : public Node {
   }
 
   void evaluateList(ExecState* exec, List& list) KJS_FAST_CALL {
-    if (listNode)
-      listNode->evaluateList(exec, list);
+    if (m_listNode)
+      m_listNode->evaluateList(exec, list);
   }
 
  private:
-  RefPtr<ArgumentListNode> listNode;
+  RefPtr<ArgumentListNode> m_listNode;
 };
 
 class NewExprNode : public ExpressionNode {
  public:
-  NewExprNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
-  NewExprNode(ExpressionNode* e, ArgumentsNode* a) KJS_FAST_CALL : expr(e),
-                                                                   args(a) {}
+  NewExprNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
+  NewExprNode(ExpressionNode* expr, ArgumentsNode* args) KJS_FAST_CALL
+      : m_expr(expr),
+        m_args(args) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -641,15 +651,15 @@ class NewExprNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
-  RefPtr<ExpressionNode> expr;
-  RefPtr<ArgumentsNode> args;
+  RefPtr<ExpressionNode> m_expr;
+  RefPtr<ArgumentsNode> m_args;
 };
 
 class FunctionCallValueNode : public ExpressionNode {
  public:
-  FunctionCallValueNode(ExpressionNode* e, ArgumentsNode* a) KJS_FAST_CALL
-      : expr(e),
-        args(a) {}
+  FunctionCallValueNode(ExpressionNode* expr, ArgumentsNode* args) KJS_FAST_CALL
+      : m_expr(expr),
+        m_args(args) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -658,20 +668,20 @@ class FunctionCallValueNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecCall; }
 
  private:
-  RefPtr<ExpressionNode> expr;
-  RefPtr<ArgumentsNode> args;
+  RefPtr<ExpressionNode> m_expr;
+  RefPtr<ArgumentsNode> m_args;
 };
 
 class FunctionCallResolveNode : public ExpressionNode {
  public:
-  FunctionCallResolveNode(const Identifier& i, ArgumentsNode* a) KJS_FAST_CALL
-      : ident(i),
-        args(a) {}
+  FunctionCallResolveNode(const Identifier& ident,
+                          ArgumentsNode* args) KJS_FAST_CALL : m_ident(ident),
+                                                               m_args(args) {}
 
   FunctionCallResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
-        ident(PlacementNewAdopt),
-        args(PlacementNewAdopt) {}
+        m_ident(PlacementNewAdopt),
+        m_args(PlacementNewAdopt) {}
 
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
@@ -686,9 +696,9 @@ class FunctionCallResolveNode : public ExpressionNode {
 
  protected:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
-  Identifier ident;
-  RefPtr<ArgumentsNode> args;
-  size_t index;  // Used by LocalVarFunctionCallNode.
+  Identifier m_ident;
+  RefPtr<ArgumentsNode> m_args;
+  size_t m_index;  // Used by LocalVarFunctionCallNode.
 };
 
 class LocalVarFunctionCallNode : public FunctionCallResolveNode {
@@ -696,7 +706,7 @@ class LocalVarFunctionCallNode : public FunctionCallResolveNode {
   LocalVarFunctionCallNode(size_t i) KJS_FAST_CALL
       : FunctionCallResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
-    index = i;
+    m_index = i;
   }
 
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
@@ -711,11 +721,12 @@ class LocalVarFunctionCallNode : public FunctionCallResolveNode {
 
 class FunctionCallBracketNode : public ExpressionNode {
  public:
-  FunctionCallBracketNode(ExpressionNode* b,
-                          ExpressionNode* s,
-                          ArgumentsNode* a) KJS_FAST_CALL : base(b),
-                                                            subscript(s),
-                                                            args(a) {}
+  FunctionCallBracketNode(ExpressionNode* base,
+                          ExpressionNode* subscript,
+                          ArgumentsNode* args) KJS_FAST_CALL
+      : m_base(base),
+        m_subscript(subscript),
+        m_args(args) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -724,18 +735,18 @@ class FunctionCallBracketNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecCall; }
 
  protected:
-  RefPtr<ExpressionNode> base;
-  RefPtr<ExpressionNode> subscript;
-  RefPtr<ArgumentsNode> args;
+  RefPtr<ExpressionNode> m_base;
+  RefPtr<ExpressionNode> m_subscript;
+  RefPtr<ArgumentsNode> m_args;
 };
 
 class FunctionCallDotNode : public ExpressionNode {
  public:
-  FunctionCallDotNode(ExpressionNode* b,
-                      const Identifier& i,
-                      ArgumentsNode* a) KJS_FAST_CALL : base(b),
-                                                        ident(i),
-                                                        args(a) {}
+  FunctionCallDotNode(ExpressionNode* base,
+                      const Identifier& ident,
+                      ArgumentsNode* args) KJS_FAST_CALL : m_base(base),
+                                                           m_ident(ident),
+                                                           m_args(args) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -749,9 +760,9 @@ class FunctionCallDotNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
-  RefPtr<ExpressionNode> base;
-  Identifier ident;
-  RefPtr<ArgumentsNode> args;
+  RefPtr<ExpressionNode> m_base;
+  Identifier m_ident;
+  RefPtr<ArgumentsNode> m_args;
 };
 
 class PrePostResolveNode : public ExpressionNode {
@@ -856,9 +867,10 @@ class PostDecConstNode : public PostDecResolveNode {
 
 class PostfixBracketNode : public ExpressionNode {
  public:
-  PostfixBracketNode(ExpressionNode* b, ExpressionNode* s) KJS_FAST_CALL
-      : m_base(b),
-        m_subscript(s) {}
+  PostfixBracketNode(ExpressionNode* base,
+                     ExpressionNode* subscript) KJS_FAST_CALL
+      : m_base(base),
+        m_subscript(subscript) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -871,25 +883,27 @@ class PostfixBracketNode : public ExpressionNode {
 
 class PostIncBracketNode : public PostfixBracketNode {
  public:
-  PostIncBracketNode(ExpressionNode* b, ExpressionNode* s) KJS_FAST_CALL
-      : PostfixBracketNode(b, s) {}
+  PostIncBracketNode(ExpressionNode* base,
+                     ExpressionNode* subscript) KJS_FAST_CALL
+      : PostfixBracketNode(base, subscript) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PostDecBracketNode : public PostfixBracketNode {
  public:
-  PostDecBracketNode(ExpressionNode* b, ExpressionNode* s) KJS_FAST_CALL
-      : PostfixBracketNode(b, s) {}
+  PostDecBracketNode(ExpressionNode* base,
+                     ExpressionNode* subscript) KJS_FAST_CALL
+      : PostfixBracketNode(base, subscript) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PostfixDotNode : public ExpressionNode {
  public:
-  PostfixDotNode(ExpressionNode* b, const Identifier& i) KJS_FAST_CALL
-      : m_base(b),
-        m_ident(i) {}
+  PostfixDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
+      : m_base(base),
+        m_ident(ident) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -902,24 +916,25 @@ class PostfixDotNode : public ExpressionNode {
 
 class PostIncDotNode : public PostfixDotNode {
  public:
-  PostIncDotNode(ExpressionNode* b, const Identifier& i) KJS_FAST_CALL
-      : PostfixDotNode(b, i) {}
+  PostIncDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
+      : PostfixDotNode(base, ident) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PostDecDotNode : public PostfixDotNode {
  public:
-  PostDecDotNode(ExpressionNode* b, const Identifier& i) KJS_FAST_CALL
-      : PostfixDotNode(b, i) {}
+  PostDecDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
+      : PostfixDotNode(base, ident) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PostfixErrorNode : public ExpressionNode {
  public:
-  PostfixErrorNode(ExpressionNode* e, Operator o) KJS_FAST_CALL : m_expr(e),
-                                                                  m_oper(o) {}
+  PostfixErrorNode(ExpressionNode* expr, Operator oper) KJS_FAST_CALL
+      : m_expr(expr),
+        m_oper(oper) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
@@ -931,7 +946,7 @@ class PostfixErrorNode : public ExpressionNode {
 
 class DeleteResolveNode : public ExpressionNode {
  public:
-  DeleteResolveNode(const Identifier& i) KJS_FAST_CALL : m_ident(i) {}
+  DeleteResolveNode(const Identifier& ident) KJS_FAST_CALL : m_ident(ident) {}
   DeleteResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
         m_ident(PlacementNewAdopt) {}
@@ -974,9 +989,9 @@ class DeleteBracketNode : public ExpressionNode {
 
 class DeleteDotNode : public ExpressionNode {
  public:
-  DeleteDotNode(ExpressionNode* base, const Identifier& i) KJS_FAST_CALL
+  DeleteDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
       : m_base(base),
-        m_ident(i) {}
+        m_ident(ident) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -991,7 +1006,7 @@ class DeleteDotNode : public ExpressionNode {
 
 class DeleteValueNode : public ExpressionNode {
  public:
-  DeleteValueNode(ExpressionNode* e) KJS_FAST_CALL : m_expr(e) {}
+  DeleteValueNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1005,7 +1020,7 @@ class DeleteValueNode : public ExpressionNode {
 
 class VoidNode : public ExpressionNode {
  public:
-  VoidNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  VoidNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1014,14 +1029,14 @@ class VoidNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecUnary; }
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class TypeOfResolveNode : public ExpressionNode {
  public:
-  TypeOfResolveNode(const Identifier& s) KJS_FAST_CALL
+  TypeOfResolveNode(const Identifier& ident) KJS_FAST_CALL
       : ExpressionNode(StringType),
-        m_ident(s) {}
+        m_ident(ident) {}
 
   TypeOfResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
@@ -1073,8 +1088,8 @@ class TypeOfValueNode : public ExpressionNode {
 
 class PreIncResolveNode : public PrePostResolveNode {
  public:
-  PreIncResolveNode(const Identifier& s) KJS_FAST_CALL : PrePostResolveNode(s) {
-  }
+  PreIncResolveNode(const Identifier& ident) KJS_FAST_CALL
+      : PrePostResolveNode(ident) {}
 
   PreIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : PrePostResolveNode(PlacementNewAdopt) {}
@@ -1111,8 +1126,8 @@ class PreIncConstNode : public PreIncResolveNode {
 
 class PreDecResolveNode : public PrePostResolveNode {
  public:
-  PreDecResolveNode(const Identifier& s) KJS_FAST_CALL : PrePostResolveNode(s) {
-  }
+  PreDecResolveNode(const Identifier& ident) KJS_FAST_CALL
+      : PrePostResolveNode(ident) {}
 
   PreDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : PrePostResolveNode(PlacementNewAdopt) {}
@@ -1149,9 +1164,10 @@ class PreDecConstNode : public PreDecResolveNode {
 
 class PrefixBracketNode : public ExpressionNode {
  public:
-  PrefixBracketNode(ExpressionNode* b, ExpressionNode* s) KJS_FAST_CALL
-      : m_base(b),
-        m_subscript(s) {}
+  PrefixBracketNode(ExpressionNode* base,
+                    ExpressionNode* subscript) KJS_FAST_CALL
+      : m_base(base),
+        m_subscript(subscript) {}
 
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
@@ -1165,25 +1181,27 @@ class PrefixBracketNode : public ExpressionNode {
 
 class PreIncBracketNode : public PrefixBracketNode {
  public:
-  PreIncBracketNode(ExpressionNode* b, ExpressionNode* s) KJS_FAST_CALL
-      : PrefixBracketNode(b, s) {}
+  PreIncBracketNode(ExpressionNode* base,
+                    ExpressionNode* subscript) KJS_FAST_CALL
+      : PrefixBracketNode(base, subscript) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PreDecBracketNode : public PrefixBracketNode {
  public:
-  PreDecBracketNode(ExpressionNode* b, ExpressionNode* s) KJS_FAST_CALL
-      : PrefixBracketNode(b, s) {}
+  PreDecBracketNode(ExpressionNode* base,
+                    ExpressionNode* subscript) KJS_FAST_CALL
+      : PrefixBracketNode(base, subscript) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PrefixDotNode : public ExpressionNode {
  public:
-  PrefixDotNode(ExpressionNode* b, const Identifier& i) KJS_FAST_CALL
-      : m_base(b),
-        m_ident(i) {}
+  PrefixDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
+      : m_base(base),
+        m_ident(ident) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1196,24 +1214,25 @@ class PrefixDotNode : public ExpressionNode {
 
 class PreIncDotNode : public PrefixDotNode {
  public:
-  PreIncDotNode(ExpressionNode* b, const Identifier& i) KJS_FAST_CALL
-      : PrefixDotNode(b, i) {}
+  PreIncDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
+      : PrefixDotNode(base, ident) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PreDecDotNode : public PrefixDotNode {
  public:
-  PreDecDotNode(ExpressionNode* b, const Identifier& i) KJS_FAST_CALL
-      : PrefixDotNode(b, i) {}
+  PreDecDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
+      : PrefixDotNode(base, ident) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
 class PrefixErrorNode : public ExpressionNode {
  public:
-  PrefixErrorNode(ExpressionNode* e, Operator o) KJS_FAST_CALL : m_expr(e),
-                                                                 m_oper(o) {}
+  PrefixErrorNode(ExpressionNode* expr, Operator oper) KJS_FAST_CALL
+      : m_expr(expr),
+        m_oper(oper) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
@@ -1225,8 +1244,9 @@ class PrefixErrorNode : public ExpressionNode {
 
 class UnaryPlusNode : public ExpressionNode {
  public:
-  UnaryPlusNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(NumberType),
-                                                   m_expr(e) {}
+  UnaryPlusNode(ExpressionNode* expr) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1244,8 +1264,8 @@ class UnaryPlusNode : public ExpressionNode {
 
 class NegateNode : public ExpressionNode {
  public:
-  NegateNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(NumberType),
-                                                expr(e) {}
+  NegateNode(ExpressionNode* expr) KJS_FAST_CALL : ExpressionNode(NumberType),
+                                                   m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1255,13 +1275,14 @@ class NegateNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecUnary; }
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class BitwiseNotNode : public ExpressionNode {
  public:
-  BitwiseNotNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(NumberType),
-                                                    expr(e) {}
+  BitwiseNotNode(ExpressionNode* expr) KJS_FAST_CALL
+      : ExpressionNode(NumberType),
+        m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1275,13 +1296,14 @@ class BitwiseNotNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class LogicalNotNode : public ExpressionNode {
  public:
-  LogicalNotNode(ExpressionNode* e) KJS_FAST_CALL : ExpressionNode(BooleanType),
-                                                    expr(e) {}
+  LogicalNotNode(ExpressionNode* expr) KJS_FAST_CALL
+      : ExpressionNode(BooleanType),
+        m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1291,15 +1313,15 @@ class LogicalNotNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecUnary; }
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class MultNode : public ExpressionNode {
  public:
-  MultNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+  MultNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        term1(t1),
-        term2(t2) {}
+        m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1313,16 +1335,16 @@ class MultNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 };
 
 class DivNode : public ExpressionNode {
  public:
-  DivNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+  DivNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        term1(t1),
-        term2(t2) {}
+        m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1335,16 +1357,16 @@ class DivNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 };
 
 class ModNode : public ExpressionNode {
  public:
-  ModNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+  ModNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        term1(t1),
-        term2(t2) {}
+        m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1358,14 +1380,15 @@ class ModNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 };
 
 class AddNode : public ExpressionNode {
  public:
-  AddNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL : term1(t1),
-                                                                  term2(t2) {}
+  AddNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
+      : m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1377,13 +1400,13 @@ class AddNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecAdditive; }
 
  protected:
-  AddNode(ExpressionNode* t1,
-          ExpressionNode* t2,
+  AddNode(ExpressionNode* term1,
+          ExpressionNode* term2,
           JSType expectedReturn) KJS_FAST_CALL : ExpressionNode(expectedReturn),
-                                                 term1(t1),
-                                                 term2(t2) {}
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+                                                 m_term1(term1),
+                                                 m_term2(term2) {}
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 
  private:
   ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
@@ -1391,8 +1414,8 @@ class AddNode : public ExpressionNode {
 
 class AddNumbersNode : public AddNode {
  public:
-  AddNumbersNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
-      : AddNode(t1, t2, NumberType) {}
+  AddNumbersNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
+      : AddNode(term1, term2, NumberType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
   virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
@@ -1404,31 +1427,31 @@ class AddNumbersNode : public AddNode {
 
 class AddStringLeftNode : public AddNode {
  public:
-  AddStringLeftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
-      : AddNode(t1, t2, StringType) {}
+  AddStringLeftNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
+      : AddNode(term1, term2, StringType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 };
 
 class AddStringRightNode : public AddNode {
  public:
-  AddStringRightNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
-      : AddNode(t1, t2, StringType) {}
+  AddStringRightNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
+      : AddNode(term1, term2, StringType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 };
 
 class AddStringsNode : public AddNode {
  public:
-  AddStringsNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
-      : AddNode(t1, t2, StringType) {}
+  AddStringsNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
+      : AddNode(term1, term2, StringType) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
 };
 
 class SubNode : public ExpressionNode {
  public:
-  SubNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+  SubNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        term1(t1),
-        term2(t2) {}
+        m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1441,16 +1464,16 @@ class SubNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 };
 
 class LeftShiftNode : public ExpressionNode {
  public:
-  LeftShiftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+  LeftShiftNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        term1(t1),
-        term2(t2) {}
+        m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1463,16 +1486,16 @@ class LeftShiftNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 };
 
 class RightShiftNode : public ExpressionNode {
  public:
-  RightShiftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+  RightShiftNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        term1(t1),
-        term2(t2) {}
+        m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1485,16 +1508,17 @@ class RightShiftNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 };
 
 class UnsignedRightShiftNode : public ExpressionNode {
  public:
-  UnsignedRightShiftNode(ExpressionNode* t1, ExpressionNode* t2) KJS_FAST_CALL
+  UnsignedRightShiftNode(ExpressionNode* term1,
+                         ExpressionNode* term2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        term1(t1),
-        term2(t2) {}
+        m_term1(term1),
+        m_term2(term2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1507,16 +1531,16 @@ class UnsignedRightShiftNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE uint32_t inlineEvaluateToUInt32(ExecState*);
-  RefPtr<ExpressionNode> term1;
-  RefPtr<ExpressionNode> term2;
+  RefPtr<ExpressionNode> m_term1;
+  RefPtr<ExpressionNode> m_term2;
 };
 
 class LessNode : public ExpressionNode {
  public:
-  LessNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  LessNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1529,14 +1553,14 @@ class LessNode : public ExpressionNode {
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
 
  protected:
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class LessNumbersNode : public LessNode {
  public:
-  LessNumbersNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : LessNode(e1, e2) {}
+  LessNumbersNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
+      : LessNode(expr1, expr2) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
 
@@ -1546,8 +1570,8 @@ class LessNumbersNode : public LessNode {
 
 class LessStringsNode : public LessNode {
  public:
-  LessStringsNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : LessNode(e1, e2) {}
+  LessStringsNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
+      : LessNode(expr1, expr2) {}
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
 
@@ -1558,8 +1582,8 @@ class LessStringsNode : public LessNode {
 class GreaterNode : public ExpressionNode {
  public:
   GreaterNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
-        expr2(e2) {}
+      : m_expr1(e1),
+        m_expr2(e2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1570,15 +1594,15 @@ class GreaterNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class LessEqNode : public ExpressionNode {
  public:
-  LessEqNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                     expr2(e2) {
-  }
+  LessEqNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
+      : m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1589,15 +1613,15 @@ class LessEqNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class GreaterEqNode : public ExpressionNode {
  public:
-  GreaterEqNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
-      : expr1(e1),
-        expr2(e2) {}
+  GreaterEqNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
+      : m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1608,16 +1632,16 @@ class GreaterEqNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class InstanceOfNode : public ExpressionNode {
  public:
-  InstanceOfNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  InstanceOfNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1627,14 +1651,15 @@ class InstanceOfNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class InNode : public ExpressionNode {
  public:
-  InNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                 expr2(e2) {}
+  InNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
+      : m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1644,16 +1669,16 @@ class InNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class EqualNode : public ExpressionNode {
  public:
-  EqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  EqualNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1664,16 +1689,16 @@ class EqualNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class NotEqualNode : public ExpressionNode {
  public:
-  NotEqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  NotEqualNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1684,16 +1709,16 @@ class NotEqualNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class StrictEqualNode : public ExpressionNode {
  public:
-  StrictEqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  StrictEqualNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1704,16 +1729,16 @@ class StrictEqualNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class NotStrictEqualNode : public ExpressionNode {
  public:
-  NotStrictEqualNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  NotStrictEqualNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1724,16 +1749,16 @@ class NotStrictEqualNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class BitAndNode : public ExpressionNode {
  public:
-  BitAndNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  BitAndNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1747,16 +1772,16 @@ class BitAndNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class BitOrNode : public ExpressionNode {
  public:
-  BitOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  BitOrNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1770,16 +1795,16 @@ class BitOrNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class BitXOrNode : public ExpressionNode {
  public:
-  BitXOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  BitXOrNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(NumberType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1793,19 +1818,19 @@ class BitXOrNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 /**
- * expr1 && expr2, expr1 || expr2
+ * m_expr1 && m_expr2, m_expr1 || m_expr2
  */
 class LogicalAndNode : public ExpressionNode {
  public:
-  LogicalAndNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  LogicalAndNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1816,16 +1841,16 @@ class LogicalAndNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class LogicalOrNode : public ExpressionNode {
  public:
-  LogicalOrNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL
+  LogicalOrNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : ExpressionNode(BooleanType),
-        expr1(e1),
-        expr2(e2) {}
+        m_expr1(expr1),
+        m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1836,20 +1861,20 @@ class LogicalOrNode : public ExpressionNode {
 
  private:
   ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 /**
- * The ternary operator, "logical ? expr1 : expr2"
+ * The ternary operator, "m_logical ? m_expr1 : m_expr2"
  */
 class ConditionalNode : public ExpressionNode {
  public:
-  ConditionalNode(ExpressionNode* l,
-                  ExpressionNode* e1,
-                  ExpressionNode* e2) KJS_FAST_CALL : logical(l),
-                                                      expr1(e1),
-                                                      expr2(e2) {}
+  ConditionalNode(ExpressionNode* logical,
+                  ExpressionNode* expr1,
+                  ExpressionNode* expr2) KJS_FAST_CALL : m_logical(logical),
+                                                         m_expr1(expr1),
+                                                         m_expr2(expr2) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1862,9 +1887,9 @@ class ConditionalNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecConditional; }
 
  private:
-  RefPtr<ExpressionNode> logical;
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_logical;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class ReadModifyResolveNode : public ExpressionNode {
@@ -2063,9 +2088,10 @@ class AssignErrorNode : public ExpressionNode {
 
 class CommaNode : public ExpressionNode {
  public:
-  CommaNode(ExpressionNode* e1, ExpressionNode* e2) KJS_FAST_CALL : expr1(e1),
-                                                                    expr2(e2) {
-    e1->optimizeForUnnecessaryResult();
+  CommaNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
+      : m_expr1(expr1),
+        m_expr2(expr2) {
+    m_expr1->optimizeForUnnecessaryResult();
   }
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
@@ -2075,13 +2101,13 @@ class CommaNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecExpression; }
 
  private:
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
 };
 
 class ConstDeclNode : public ExpressionNode {
  public:
-  ConstDeclNode(const Identifier& id, ExpressionNode* in) KJS_FAST_CALL;
+  ConstDeclNode(const Identifier& ident, ExpressionNode* in) KJS_FAST_CALL;
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2093,12 +2119,12 @@ class ConstDeclNode : public ExpressionNode {
     return PrecExpression;
   }
   PassRefPtr<ConstDeclNode> releaseNext() KJS_FAST_CALL {
-    return next.release();
+    return m_next.release();
   }
 
-  Identifier ident;
-  ListRefPtr<ConstDeclNode> next;
-  RefPtr<ExpressionNode> init;
+  Identifier m_ident;
+  ListRefPtr<ConstDeclNode> m_next;
+  RefPtr<ExpressionNode> m_init;
 
  private:
   void handleSlowCase(ExecState*,
@@ -2108,7 +2134,7 @@ class ConstDeclNode : public ExpressionNode {
 
 class ConstStatementNode : public StatementNode {
  public:
-  ConstStatementNode(ConstDeclNode* l) KJS_FAST_CALL : next(l) {}
+  ConstStatementNode(ConstDeclNode* next) KJS_FAST_CALL : m_next(next) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2116,7 +2142,7 @@ class ConstStatementNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ConstDeclNode> next;
+  RefPtr<ConstDeclNode> m_next;
 };
 
 typedef Vector<RefPtr<StatementNode>> StatementVector;
@@ -2156,7 +2182,7 @@ class EmptyStatementNode : public StatementNode {
 
 class ExprStatementNode : public StatementNode {
  public:
-  ExprStatementNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  ExprStatementNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2164,12 +2190,12 @@ class ExprStatementNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class VarStatementNode : public StatementNode {
  public:
-  VarStatementNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  VarStatementNode(ExpressionNode* e) KJS_FAST_CALL : m_expr(e) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2177,13 +2203,14 @@ class VarStatementNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class IfNode : public StatementNode {
  public:
-  IfNode(ExpressionNode* e, StatementNode* s) KJS_FAST_CALL : m_condition(e),
-                                                              m_ifBlock(s) {}
+  IfNode(ExpressionNode* condition, StatementNode* ifBlock) KJS_FAST_CALL
+      : m_condition(condition),
+        m_ifBlock(ifBlock) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2197,10 +2224,11 @@ class IfNode : public StatementNode {
 
 class IfElseNode : public IfNode {
  public:
-  IfElseNode(ExpressionNode* e,
+  IfElseNode(ExpressionNode* condtion,
              StatementNode* ifBlock,
-             StatementNode* elseBlock) KJS_FAST_CALL : IfNode(e, ifBlock),
-                                                       m_elseBlock(elseBlock) {}
+             StatementNode* elseBlock) KJS_FAST_CALL
+      : IfNode(condtion, ifBlock),
+        m_elseBlock(elseBlock) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2213,8 +2241,9 @@ class IfElseNode : public IfNode {
 
 class DoWhileNode : public StatementNode {
  public:
-  DoWhileNode(StatementNode* s, ExpressionNode* e) KJS_FAST_CALL : statement(s),
-                                                                   expr(e) {}
+  DoWhileNode(StatementNode* statement, ExpressionNode* expr) KJS_FAST_CALL
+      : m_statement(statement),
+        m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2222,14 +2251,15 @@ class DoWhileNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<StatementNode> statement;
-  RefPtr<ExpressionNode> expr;
+  RefPtr<StatementNode> m_statement;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class WhileNode : public StatementNode {
  public:
-  WhileNode(ExpressionNode* e, StatementNode* s) KJS_FAST_CALL : expr(e),
-                                                                 statement(s) {}
+  WhileNode(ExpressionNode* expr, StatementNode* statement) KJS_FAST_CALL
+      : m_expr(expr),
+        m_statement(statement) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2237,29 +2267,29 @@ class WhileNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
-  RefPtr<StatementNode> statement;
+  RefPtr<ExpressionNode> m_expr;
+  RefPtr<StatementNode> m_statement;
 };
 
 class ForNode : public StatementNode {
  public:
-  ForNode(ExpressionNode* e1,
-          ExpressionNode* e2,
-          ExpressionNode* e3,
-          StatementNode* s,
-          bool e1WasVarDecl) KJS_FAST_CALL
-      : expr1(e1 ? e1 : new PlaceholderTrueNode),
-        expr2(e2 ? e2 : new PlaceholderTrueNode),
-        expr3(e3 ? e3 : new PlaceholderTrueNode),
-        statement(s),
-        expr1WasVarDecl(e1&& e1WasVarDecl) {
-    ASSERT(expr1);
-    ASSERT(expr2);
-    ASSERT(expr3);
+  ForNode(ExpressionNode* expr1,
+          ExpressionNode* expr2,
+          ExpressionNode* expr3,
+          StatementNode* statement,
+          bool expr1WasVarDecl) KJS_FAST_CALL
+      : m_expr1(expr1 ? expr1 : new PlaceholderTrueNode),
+        m_expr2(expr2 ? expr2 : new PlaceholderTrueNode),
+        m_expr3(expr3 ? expr3 : new PlaceholderTrueNode),
+        m_statement(statement),
+        m_expr1WasVarDecl(expr1&& expr1WasVarDecl) {
+    ASSERT(m_expr1);
+    ASSERT(m_expr2);
+    ASSERT(m_expr3);
     ASSERT(statement);
 
-    expr1->optimizeForUnnecessaryResult();
-    expr3->optimizeForUnnecessaryResult();
+    m_expr1->optimizeForUnnecessaryResult();
+    m_expr3->optimizeForUnnecessaryResult();
   }
 
   virtual void optimizeVariableAccess(const SymbolTable&,
@@ -2269,22 +2299,18 @@ class ForNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr1;
-  RefPtr<ExpressionNode> expr2;
-  RefPtr<ExpressionNode> expr3;
-  RefPtr<StatementNode> statement;
-  bool expr1WasVarDecl;
+  RefPtr<ExpressionNode> m_expr1;
+  RefPtr<ExpressionNode> m_expr2;
+  RefPtr<ExpressionNode> m_expr3;
+  RefPtr<StatementNode> m_statement;
+  bool m_expr1WasVarDecl;
 };
 
 class ForInNode : public StatementNode {
  public:
-  ForInNode(ExpressionNode* l,
-            ExpressionNode* e,
-            StatementNode* s) KJS_FAST_CALL;
-  ForInNode(const Identifier& i,
-            ExpressionNode* in,
-            ExpressionNode* e,
-            StatementNode* s) KJS_FAST_CALL;
+  ForInNode(ExpressionNode*, ExpressionNode*, StatementNode*) KJS_FAST_CALL;
+  ForInNode(const Identifier&, ExpressionNode*, ExpressionNode*, StatementNode*)
+      KJS_FAST_CALL;
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2292,39 +2318,39 @@ class ForInNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  Identifier ident;
-  RefPtr<ExpressionNode> init;
-  RefPtr<ExpressionNode> lexpr;
-  RefPtr<ExpressionNode> expr;
-  RefPtr<StatementNode> statement;
-  bool identIsVarDecl;
+  Identifier m_ident;
+  RefPtr<ExpressionNode> m_init;
+  RefPtr<ExpressionNode> m_lexpr;
+  RefPtr<ExpressionNode> m_expr;
+  RefPtr<StatementNode> m_statement;
+  bool m_identIsVarDecl;
 };
 
 class ContinueNode : public StatementNode {
  public:
   ContinueNode() KJS_FAST_CALL {}
-  ContinueNode(const Identifier& i) KJS_FAST_CALL : ident(i) {}
+  ContinueNode(const Identifier& ident) KJS_FAST_CALL : m_ident(ident) {}
   virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  Identifier ident;
+  Identifier m_ident;
 };
 
 class BreakNode : public StatementNode {
  public:
   BreakNode() KJS_FAST_CALL {}
-  BreakNode(const Identifier& i) KJS_FAST_CALL : ident(i) {}
+  BreakNode(const Identifier& ident) KJS_FAST_CALL : m_ident(ident) {}
   virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  Identifier ident;
+  Identifier m_ident;
 };
 
 class ReturnNode : public StatementNode {
  public:
-  ReturnNode(ExpressionNode* v) KJS_FAST_CALL : value(v) {}
+  ReturnNode(ExpressionNode* value) KJS_FAST_CALL : m_value(value) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2332,13 +2358,14 @@ class ReturnNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> value;
+  RefPtr<ExpressionNode> m_value;
 };
 
 class WithNode : public StatementNode {
  public:
-  WithNode(ExpressionNode* e, StatementNode* s) KJS_FAST_CALL : expr(e),
-                                                                statement(s) {}
+  WithNode(ExpressionNode* expr, StatementNode* statement) KJS_FAST_CALL
+      : m_expr(expr),
+        m_statement(statement) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2346,15 +2373,15 @@ class WithNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
-  RefPtr<StatementNode> statement;
+  RefPtr<ExpressionNode> m_expr;
+  RefPtr<StatementNode> m_statement;
 };
 
 class LabelNode : public StatementNode {
  public:
-  LabelNode(const Identifier& l, StatementNode* s) KJS_FAST_CALL
-      : label(l),
-        statement(s) {}
+  LabelNode(const Identifier& label, StatementNode* statement) KJS_FAST_CALL
+      : m_label(label),
+        m_statement(statement) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2362,13 +2389,13 @@ class LabelNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  Identifier label;
-  RefPtr<StatementNode> statement;
+  Identifier m_label;
+  RefPtr<StatementNode> m_statement;
 };
 
 class ThrowNode : public StatementNode {
  public:
-  ThrowNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  ThrowNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2376,18 +2403,19 @@ class ThrowNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
 };
 
 class TryNode : public StatementNode {
  public:
-  TryNode(StatementNode* b,
-          const Identifier& e,
-          StatementNode* c,
-          StatementNode* f) KJS_FAST_CALL : tryBlock(b),
-                                            exceptionIdent(e),
-                                            catchBlock(c),
-                                            finallyBlock(f) {}
+  TryNode(StatementNode* tryBlock,
+          const Identifier& exceptionIdent,
+          StatementNode* catchBlock,
+          StatementNode* finallyBlock) KJS_FAST_CALL
+      : m_tryBlock(tryBlock),
+        m_exceptionIdent(exceptionIdent),
+        m_catchBlock(catchBlock),
+        m_finallyBlock(finallyBlock) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2395,23 +2423,24 @@ class TryNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<StatementNode> tryBlock;
-  Identifier exceptionIdent;
-  RefPtr<StatementNode> catchBlock;
-  RefPtr<StatementNode> finallyBlock;
+  RefPtr<StatementNode> m_tryBlock;
+  Identifier m_exceptionIdent;
+  RefPtr<StatementNode> m_catchBlock;
+  RefPtr<StatementNode> m_finallyBlock;
 };
 
 class ParameterNode : public Node {
  public:
-  ParameterNode(const Identifier& i) KJS_FAST_CALL : id(i) {}
-  ParameterNode(ParameterNode* l, const Identifier& i) KJS_FAST_CALL : id(i) {
-    l->next = this;
+  ParameterNode(const Identifier& ident) KJS_FAST_CALL : m_ident(ident) {}
+  ParameterNode(ParameterNode* l, const Identifier& ident) KJS_FAST_CALL
+      : m_ident(ident) {
+    l->m_next = this;
   }
-  Identifier ident() KJS_FAST_CALL { return id; }
-  ParameterNode* nextParam() KJS_FAST_CALL { return next.get(); }
+  Identifier ident() KJS_FAST_CALL { return m_ident; }
+  ParameterNode* nextParam() KJS_FAST_CALL { return m_next.get(); }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   PassRefPtr<ParameterNode> releaseNext() KJS_FAST_CALL {
-    return next.release();
+    return m_next.release();
   }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -2421,8 +2450,8 @@ class ParameterNode : public Node {
  private:
   friend class FuncDeclNode;
   friend class FuncExprNode;
-  Identifier id;
-  ListRefPtr<ParameterNode> next;
+  Identifier m_ident;
+  ListRefPtr<ParameterNode> m_next;
 };
 
 class ScopeNode : public BlockNode {
@@ -2503,11 +2532,12 @@ class FunctionBodyNode : public ScopeNode {
 
 class FuncExprNode : public ExpressionNode {
  public:
-  FuncExprNode(const Identifier& i,
-               FunctionBodyNode* b,
-               ParameterNode* p = 0) KJS_FAST_CALL : ident(i),
-                                                     param(p),
-                                                     body(b) {
+  FuncExprNode(const Identifier& ident,
+               FunctionBodyNode* body,
+               ParameterNode* parameter = 0) KJS_FAST_CALL
+      : m_ident(ident),
+        m_parameter(parameter),
+        m_body(body) {
     addParams();
   }
   virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
@@ -2519,41 +2549,41 @@ class FuncExprNode : public ExpressionNode {
   void addParams() KJS_FAST_CALL;
   // Used for streamTo
   friend class PropertyNode;
-  Identifier ident;
-  RefPtr<ParameterNode> param;
-  RefPtr<FunctionBodyNode> body;
+  Identifier m_ident;
+  RefPtr<ParameterNode> m_parameter;
+  RefPtr<FunctionBodyNode> m_body;
 };
 
 class FuncDeclNode : public StatementNode {
  public:
-  FuncDeclNode(const Identifier& i, FunctionBodyNode* b) KJS_FAST_CALL
-      : ident(i),
-        body(b) {
+  FuncDeclNode(const Identifier& ident, FunctionBodyNode* body) KJS_FAST_CALL
+      : m_ident(ident),
+        m_body(body) {
     addParams();
   }
-  FuncDeclNode(const Identifier& i,
-               ParameterNode* p,
-               FunctionBodyNode* b) KJS_FAST_CALL : ident(i),
-                                                    param(p),
-                                                    body(b) {
+  FuncDeclNode(const Identifier& ident,
+               ParameterNode* parameter,
+               FunctionBodyNode* body) KJS_FAST_CALL : m_ident(ident),
+                                                       m_parameter(parameter),
+                                                       m_body(body) {
     addParams();
   }
   virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   ALWAYS_INLINE FunctionImp* makeFunction(ExecState*) KJS_FAST_CALL;
-  Identifier ident;
+  Identifier m_ident;
 
  private:
   void addParams() KJS_FAST_CALL;
-  RefPtr<ParameterNode> param;
-  RefPtr<FunctionBodyNode> body;
+  RefPtr<ParameterNode> m_parameter;
+  RefPtr<FunctionBodyNode> m_body;
 };
 
 class CaseClauseNode : public Node {
  public:
-  CaseClauseNode(ExpressionNode* e) KJS_FAST_CALL : expr(e) {}
+  CaseClauseNode(ExpressionNode* e) KJS_FAST_CALL : m_expr(e) {}
   CaseClauseNode(ExpressionNode* e, SourceElements* children) KJS_FAST_CALL
-      : expr(e) {
+      : m_expr(e) {
     if (children)
       children->releaseContentsIntoVector(m_children);
   }
@@ -2570,25 +2600,25 @@ class CaseClauseNode : public Node {
   JSValue* executeStatements(ExecState*) KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
+  RefPtr<ExpressionNode> m_expr;
   StatementVector m_children;
 };
 
 class ClauseListNode : public Node {
  public:
-  ClauseListNode(CaseClauseNode* c) KJS_FAST_CALL : clause(c) {}
-  ClauseListNode(ClauseListNode* n, CaseClauseNode* c) KJS_FAST_CALL
-      : clause(c) {
-    n->next = this;
+  ClauseListNode(CaseClauseNode* clause) KJS_FAST_CALL : m_clause(clause) {}
+  ClauseListNode(ClauseListNode* clauseList,
+                 CaseClauseNode* clause) KJS_FAST_CALL : m_clause(clause) {
+    clauseList->m_next = this;
   }
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  CaseClauseNode* getClause() const KJS_FAST_CALL { return clause.get(); }
-  ClauseListNode* getNext() const KJS_FAST_CALL { return next.get(); }
+  CaseClauseNode* getClause() const KJS_FAST_CALL { return m_clause.get(); }
+  ClauseListNode* getNext() const KJS_FAST_CALL { return m_next.get(); }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   PassRefPtr<ClauseListNode> releaseNext() KJS_FAST_CALL {
-    return next.release();
+    return m_next.release();
   }
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -2597,15 +2627,15 @@ class ClauseListNode : public Node {
 
  private:
   friend class CaseBlockNode;
-  RefPtr<CaseClauseNode> clause;
-  ListRefPtr<ClauseListNode> next;
+  RefPtr<CaseClauseNode> m_clause;
+  ListRefPtr<ClauseListNode> m_next;
 };
 
 class CaseBlockNode : public Node {
  public:
-  CaseBlockNode(ClauseListNode* l1,
-                CaseClauseNode* d,
-                ClauseListNode* l2) KJS_FAST_CALL;
+  CaseBlockNode(ClauseListNode* list1,
+                CaseClauseNode* defaultClause,
+                ClauseListNode* list2) KJS_FAST_CALL;
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2617,15 +2647,16 @@ class CaseBlockNode : public Node {
   }
 
  private:
-  RefPtr<ClauseListNode> list1;
-  RefPtr<CaseClauseNode> def;
-  RefPtr<ClauseListNode> list2;
+  RefPtr<ClauseListNode> m_list1;
+  RefPtr<CaseClauseNode> m_defaultClause;
+  RefPtr<ClauseListNode> m_list2;
 };
 
 class SwitchNode : public StatementNode {
  public:
-  SwitchNode(ExpressionNode* e, CaseBlockNode* b) KJS_FAST_CALL : expr(e),
-                                                                  block(b) {}
+  SwitchNode(ExpressionNode* expr, CaseBlockNode* block) KJS_FAST_CALL
+      : m_expr(expr),
+        m_block(block) {}
   virtual void optimizeVariableAccess(const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2633,8 +2664,8 @@ class SwitchNode : public StatementNode {
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
-  RefPtr<ExpressionNode> expr;
-  RefPtr<CaseBlockNode> block;
+  RefPtr<ExpressionNode> m_expr;
+  RefPtr<CaseBlockNode> m_block;
 };
 
 class BreakpointCheckStatement : public StatementNode {
@@ -2680,6 +2711,6 @@ struct ClauseList {
   ClauseListNode* tail;
 };
 
-}  // namespace
+}  // namespace KJS
 
-#endif
+#endif  // NODES_H_
