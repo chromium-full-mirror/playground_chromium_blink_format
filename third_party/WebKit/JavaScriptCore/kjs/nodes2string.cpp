@@ -46,7 +46,9 @@ class SourceStream {
       : m_numberNeedsParens(false),
         m_atStartOfStatement(true),
         m_precedence(PrecExpression) {}
+
   UString toString() const { return m_string; }
+
   SourceStream& operator<<(const Identifier&);
   SourceStream& operator<<(const UString&);
   SourceStream& operator<<(const char*);
@@ -336,7 +338,7 @@ void ArrayNode::streamTo(SourceStream& s) const {
     s << ',';
   // Parser consumes one elision comma if there's array elements
   // present in the expression.
-  if (m_opt && m_element)
+  if (m_optional && m_element)
     s << ',';
   s << ']';
 }
@@ -450,7 +452,7 @@ void PostDecDotNode::streamTo(SourceStream& s) const {
 
 void PostfixErrorNode::streamTo(SourceStream& s) const {
   s << PrecLeftHandSide << m_expr;
-  if (m_oper == OpPlusPlus)
+  if (m_operator == OpPlusPlus)
     s << "++";
   else
     s << "--";
@@ -515,7 +517,7 @@ void PreDecDotNode::streamTo(SourceStream& s) const {
 }
 
 void PrefixErrorNode::streamTo(SourceStream& s) const {
-  if (m_oper == OpPlusPlus)
+  if (m_operator == OpPlusPlus)
     s << "++" << PrecUnary << m_expr;
   else
     s << "--" << PrecUnary << m_expr;
@@ -636,7 +638,7 @@ void ConditionalNode::streamTo(SourceStream& s) const {
 }
 
 void ReadModifyResolveNode::streamTo(SourceStream& s) const {
-  s << m_ident << ' ' << operatorString(m_oper) << ' ' << PrecAssignment
+  s << m_ident << ' ' << operatorString(m_operator) << ' ' << PrecAssignment
     << m_right;
 }
 
@@ -646,7 +648,7 @@ void AssignResolveNode::streamTo(SourceStream& s) const {
 
 void ReadModifyBracketNode::streamTo(SourceStream& s) const {
   bracketNodeStreamTo(s, m_base, m_subscript);
-  s << ' ' << operatorString(m_oper) << ' ' << PrecAssignment << m_right;
+  s << ' ' << operatorString(m_operator) << ' ' << PrecAssignment << m_right;
 }
 
 void AssignBracketNode::streamTo(SourceStream& s) const {
@@ -656,7 +658,7 @@ void AssignBracketNode::streamTo(SourceStream& s) const {
 
 void ReadModifyDotNode::streamTo(SourceStream& s) const {
   dotNodeStreamTo(s, m_base, m_ident);
-  s << ' ' << operatorString(m_oper) << ' ' << PrecAssignment << m_right;
+  s << ' ' << operatorString(m_operator) << ' ' << PrecAssignment << m_right;
 }
 
 void AssignDotNode::streamTo(SourceStream& s) const {
@@ -665,7 +667,7 @@ void AssignDotNode::streamTo(SourceStream& s) const {
 }
 
 void AssignErrorNode::streamTo(SourceStream& s) const {
-  s << PrecLeftHandSide << m_left << ' ' << operatorString(m_oper) << ' '
+  s << PrecLeftHandSide << m_left << ' ' << operatorString(m_operator) << ' '
     << PrecAssignment << m_right;
 }
 

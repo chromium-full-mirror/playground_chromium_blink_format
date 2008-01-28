@@ -1,27 +1,28 @@
 /*
- *  Copyright (C) 1999-2002 Harri Porten (porten@kde.org)
- *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
- *  Copyright (C) 2007 Cameron Zwarich (cwzwarich@uwaterloo.ca)
- *  Copyright (C) 2007 Maks Orlovich
- *  Copyright (C) 2007 Eric Seidel <eric@webkit.org>
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Library General Public
- *  License as published by the Free Software Foundation; either
- *  version 2 of the License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Library General Public License for more details.
- *
- *  You should have received a copy of the GNU Library General Public License
- *  along with this library; see the file COPYING.LIB.  If not, write to
- *  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- *  Boston, MA 02110-1301, USA.
- *
- */
+*  Copyright (C) 1999-2002 Harri Porten (porten@kde.org)
+*  Copyright (C) 2001 Peter Kelly (pmk@post.com)
+*  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+* reserved.
+*  Copyright (C) 2007 Cameron Zwarich (cwzwarich@uwaterloo.ca)
+*  Copyright (C) 2007 Maks Orlovich
+*  Copyright (C) 2007 Eric Seidel <eric@webkit.org>
+*
+*  This library is free software; you can redistribute it and/or
+*  modify it under the terms of the GNU Library General Public
+*  License as published by the Free Software Foundation; either
+*  version 2 of the License, or (at your option) any later version.
+*
+*  This library is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*  Library General Public License for more details.
+*
+*  You should have received a copy of the GNU Library General Public License
+*  along with this library; see the file COPYING.LIB.  If not, write to
+*  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*  Boston, MA 02110-1301, USA.
+*
+*/
 
 #include "config.h"
 #include "nodes.h"
@@ -663,7 +664,7 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
   if (m_element) {
     array = static_cast<JSObject*>(m_element->evaluate(exec));
     KJS_CHECKEXCEPTIONVALUE
-    length = m_opt
+    length = m_optional
                  ? array->get(exec, exec->propertyNames().length)->toInt32(exec)
                  : 0;
   } else {
@@ -674,7 +675,7 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
     length = 0;
   }
 
-  if (m_opt)
+  if (m_optional)
     array->put(exec, exec->propertyNames().length, jsNumber(m_elision + length),
                DontEnum | DontDelete);
 
@@ -1158,20 +1159,18 @@ JSValue* FunctionCallBracketNode::evaluate(ExecState* exec) {
 
   KJS_CHECKEXCEPTIONVALUE
 
-  if (!funcVal->isObject()) {
+  if (!funcVal->isObject())
     return throwError(exec, TypeError,
                       "Value %s (result of expression %s[%s]) is not object.",
                       funcVal, m_base.get(), m_subscript.get());
-  }
 
   JSObject* func = static_cast<JSObject*>(funcVal);
 
-  if (!func->implementsCall()) {
+  if (!func->implementsCall())
     return throwError(
         exec, TypeError,
         "Object %s (result of expression %s[%s]) does not allow calls.",
         funcVal, m_base.get(), m_subscript.get());
-  }
 
   List argList;
   m_args->evaluateList(exec, argList);
@@ -1536,7 +1535,7 @@ JSValue* PostDecDotNode::evaluate(ExecState* exec) {
 JSValue* PostfixErrorNode::evaluate(ExecState* exec) {
   throwError(exec, ReferenceError,
              "Postfix %s operator applied to value that is not a reference.",
-             m_oper == OpPlusPlus ? "++" : "--");
+             m_operator == OpPlusPlus ? "++" : "--");
   handleException(exec);
   return jsUndefined();
 }
@@ -1562,16 +1561,15 @@ JSValue* DeleteResolveNode::evaluate(ExecState* exec) {
   ScopeChainIterator iter = chain.begin();
   ScopeChainIterator end = chain.end();
 
-  // we must always have something in the scope chain
+  // We must always have something in the scope chain
   ASSERT(iter != end);
 
   PropertySlot slot;
   JSObject* base;
   do {
     base = *iter;
-    if (base->getPropertySlot(exec, m_ident, slot)) {
+    if (base->getPropertySlot(exec, m_ident, slot))
       return jsBoolean(base->deleteProperty(exec, m_ident));
-    }
 
     ++iter;
   } while (iter != end);
@@ -1716,7 +1714,7 @@ JSValue* TypeOfResolveNode::evaluate(ExecState* exec) {
   ScopeChainIterator iter = chain.begin();
   ScopeChainIterator end = chain.end();
 
-  // we must always have something in the scope chain
+  // We must always have something in the scope chain
   ASSERT(iter != end);
 
   PropertySlot slot;
@@ -2014,7 +2012,7 @@ JSValue* PreDecDotNode::evaluate(ExecState* exec) {
 JSValue* PrefixErrorNode::evaluate(ExecState* exec) {
   throwError(exec, ReferenceError,
              "Prefix %s operator applied to value that is not a reference.",
-             m_oper == OpPlusPlus ? "++" : "--");
+             m_operator == OpPlusPlus ? "++" : "--");
   handleException(exec);
   return jsUndefined();
 }
@@ -3225,11 +3223,11 @@ JSValue* ReadModifyLocalVarNode::evaluate(ExecState* exec) {
   ASSERT(exec->variableObject() == exec->scopeChain().top());
   JSValue** slot = &exec->localStorage()[m_index].value;
 
-  ASSERT(m_oper != OpEqual);
-  JSValue* v = valueForReadModifyAssignment(exec, *slot, m_right.get(), m_oper);
+  ASSERT(m_operator != OpEqual);
+  JSValue* v =
+      valueForReadModifyAssignment(exec, *slot, m_right.get(), m_operator);
 
   KJS_CHECKEXCEPTIONVALUE
-
   *slot = v;
   return v;
 }
@@ -3254,9 +3252,9 @@ JSValue* AssignLocalVarNode::evaluate(ExecState* exec) {
 JSValue* ReadModifyConstNode::evaluate(ExecState* exec) {
   ASSERT(exec->variableObject() == exec->scopeChain().top());
   JSValue* left = exec->localStorage()[m_index].value;
-  ASSERT(m_oper != OpEqual);
+  ASSERT(m_operator != OpEqual);
   JSValue* result =
-      valueForReadModifyAssignment(exec, left, m_right.get(), m_oper);
+      valueForReadModifyAssignment(exec, left, m_right.get(), m_operator);
   KJS_CHECKEXCEPTIONVALUE
   return result;
 }
@@ -3273,7 +3271,7 @@ JSValue* ReadModifyResolveNode::evaluate(ExecState* exec) {
   ScopeChainIterator iter = chain.begin();
   ScopeChainIterator end = chain.end();
 
-  // we must always have something in the scope chain
+  // We must always have something in the scope chain
   ASSERT(iter != end);
 
   PropertySlot slot;
@@ -3290,16 +3288,16 @@ JSValue* ReadModifyResolveNode::evaluate(ExecState* exec) {
     ++iter;
   } while (iter != end);
 
-  ASSERT(m_oper != OpEqual);
+  ASSERT(m_operator != OpEqual);
   return throwUndefinedVariableError(exec, m_ident);
 
 found:
   JSValue* v;
 
-  ASSERT(m_oper != OpEqual);
+  ASSERT(m_operator != OpEqual);
   JSValue* v1 = slot.getValue(exec, base, m_ident);
   KJS_CHECKEXCEPTIONVALUE
-  v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_oper);
+  v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_operator);
 
   KJS_CHECKEXCEPTIONVALUE
 
@@ -3375,13 +3373,13 @@ JSValue* ReadModifyDotNode::evaluate(ExecState* exec) {
 
   JSValue* v;
 
-  ASSERT(m_oper != OpEqual);
+  ASSERT(m_operator != OpEqual);
   PropertySlot slot;
   JSValue* v1 = base->getPropertySlot(exec, m_ident, slot)
                     ? slot.getValue(exec, base, m_ident)
                     : jsUndefined();
   KJS_CHECKEXCEPTIONVALUE
-  v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_oper);
+  v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_operator);
 
   KJS_CHECKEXCEPTIONVALUE
 
@@ -3453,13 +3451,13 @@ JSValue* ReadModifyBracketNode::evaluate(ExecState* exec) {
   uint32_t propertyIndex;
   if (subscript->getUInt32(propertyIndex)) {
     JSValue* v;
-    ASSERT(m_oper != OpEqual);
+    ASSERT(m_operator != OpEqual);
     PropertySlot slot;
     JSValue* v1 = base->getPropertySlot(exec, propertyIndex, slot)
                       ? slot.getValue(exec, base, propertyIndex)
                       : jsUndefined();
     KJS_CHECKEXCEPTIONVALUE
-    v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_oper);
+    v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_operator);
 
     KJS_CHECKEXCEPTIONVALUE
 
@@ -3470,13 +3468,13 @@ JSValue* ReadModifyBracketNode::evaluate(ExecState* exec) {
   Identifier propertyName(subscript->toString(exec));
   JSValue* v;
 
-  ASSERT(m_oper != OpEqual);
+  ASSERT(m_operator != OpEqual);
   PropertySlot slot;
   JSValue* v1 = base->getPropertySlot(exec, propertyName, slot)
                     ? slot.getValue(exec, base, propertyName)
                     : jsUndefined();
   KJS_CHECKEXCEPTIONVALUE
-  v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_oper);
+  v = valueForReadModifyAssignment(exec, v1, m_right.get(), m_operator);
 
   KJS_CHECKEXCEPTIONVALUE
 
@@ -3521,7 +3519,7 @@ void ConstDeclNode::handleSlowCase(ExecState* exec,
   ScopeChainIterator iter = chain.begin();
   ScopeChainIterator end = chain.end();
 
-  // we must always have something in the scope chain
+  // We must always have something in the scope chain
   ASSERT(iter != end);
 
   PropertySlot slot;
@@ -3628,7 +3626,7 @@ static inline void statementListPushFIFO(StatementVector& statements,
 static inline Node* statementListInitializeVariableAccessStack(
     StatementVector& statements,
     DeclarationStacks::NodeStack& stack) {
-  if (!statements.size())
+  if (statements.isEmpty())
     return 0;
 
   StatementVector::iterator it = statements.end();
@@ -3748,7 +3746,6 @@ JSValue* IfElseNode::execute(ExecState* exec) {
 
   if (b)
     return m_ifBlock->execute(exec);
-
   return m_elseBlock->execute(exec);
 }
 
@@ -4367,7 +4364,7 @@ FunctionBodyNode* FunctionBodyNode::create(SourceElements* children,
 
 void FunctionBodyNode::initializeSymbolTable(ExecState* exec) {
   SymbolTable& symbolTable = exec->variableObject()->symbolTable();
-  ASSERT(!symbolTable.size());
+  ASSERT(symbolTable.isEmpty());
 
   size_t localStorageIndex = 0;
 
@@ -4469,7 +4466,7 @@ void FunctionBodyNode::processDeclarations(ExecState* exec) {
   if (!m_initialized)
     initializeSymbolTable(exec);
 
-  if (m_functionStack.size() != 0)
+  if (!m_functionStack.isEmpty())
     exec->dynamicGlobalObject()->tearOffActivation(exec);
 
   LocalStorage& localStorage = exec->variableObject()->localStorage();
@@ -4568,7 +4565,8 @@ void EvalNode::processDeclarations(ExecState* exec) {
   // We could optimize access to pre-existing symbols here, but SunSpider
   // reports that to be a net loss.
 
-  size_t i, size;
+  size_t i;
+  size_t size;
 
   JSVariableObject* variableObject = exec->variableObject();
 
@@ -4653,7 +4651,7 @@ JSValue* FunctionBodyNodeWithDebuggerHooks::execute(ExecState* exec) {
 // ------------------------------ FuncDeclNode ---------------------------------
 
 void FuncDeclNode::addParams() {
-  for (ParameterNode* p = m_parameter.get(); p != 0L; p = p->nextParam())
+  for (ParameterNode* p = m_parameter.get(); p; p = p->nextParam())
     m_body->parameters().append(p->ident());
 }
 
@@ -4682,7 +4680,7 @@ JSValue* FuncDeclNode::execute(ExecState* exec) {
 
 // ECMA 13
 void FuncExprNode::addParams() {
-  for (ParameterNode* p = m_parameter.get(); p != 0L; p = p->nextParam())
+  for (ParameterNode* p = m_parameter.get(); p; p = p->nextParam())
     m_body->parameters().append(p->ident());
 }
 
