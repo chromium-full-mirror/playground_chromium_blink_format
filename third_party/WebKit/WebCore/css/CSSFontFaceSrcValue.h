@@ -50,6 +50,8 @@ class CSSFontFaceSrcValue : public CSSValue {
   bool isSupportedFormat() const;
 
 #if ENABLE(SVG_FONTS)
+  bool isSVGFontFaceSrc() const;
+
   SVGFontFaceElement* svgFontFaceElement() const {
     return m_svgFontFaceElement.get();
   }

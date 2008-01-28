@@ -285,6 +285,9 @@ class Font {
                                              int h,
                                              int from,
                                              int to) const;
+  int offsetForPositionForTextUsingSVGFont(const TextRun&,
+                                           int position,
+                                           bool includePartialGlyphs) const;
 #endif
   void drawGlyphs(GraphicsContext*,
                   const SimpleFontData*,

@@ -81,6 +81,7 @@ class CSSFontFaceSource : public CachedResourceClient {
 
 #if ENABLE(SVG_FONTS)
   RefPtr<SVGFontFaceElement> m_svgFontFaceElement;
+  RefPtr<SVGFontElement> m_externalSVGFontElement;
 #endif
 };
 }
