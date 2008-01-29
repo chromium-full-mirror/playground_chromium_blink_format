@@ -389,7 +389,7 @@ void floatWidthMissingGlyphCallback(const TextRun& run,
                                     SVGTextRunWalkerMeasuredLengthData& data) {
   // Handle system font fallback
   FontDescription fontDescription(data.font->fontDescription());
-  fontDescription.setFamily(*new FontFamily());
+  fontDescription.setFamily(FontFamily());
   Font font(fontDescription, 0, 0);  // spacing handled by SVG text code.
   font.update(data.font->fontSelector());
 
@@ -522,7 +522,7 @@ void drawTextMissingGlyphCallback(const TextRun& run,
                                   SVGTextRunWalkerDrawTextData& data) {
   // Handle system font fallback
   FontDescription fontDescription(data.context->font().fontDescription());
-  fontDescription.setFamily(*new FontFamily());
+  fontDescription.setFamily(FontFamily());
   Font font(fontDescription, 0, 0);  // spacing handled by SVG text code.
   font.update(data.context->font().fontSelector());
 
