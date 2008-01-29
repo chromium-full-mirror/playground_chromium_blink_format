@@ -140,8 +140,8 @@ void ScrollView::ScrollViewPrivate::valueChanged(Scrollbar* bar) {
   if (m_scrollbarsSuppressed)
     return;
 
-  scrollBackingStore(scrollDelta);
   static_cast<FrameView*>(m_view)->frame()->sendScrollEvent();
+  scrollBackingStore(scrollDelta);
 }
 
 void ScrollView::ScrollViewPrivate::scrollBackingStore(
