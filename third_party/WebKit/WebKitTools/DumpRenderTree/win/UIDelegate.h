@@ -36,7 +36,7 @@
 
 class DRTUndoManager;
 
-class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate {
+class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate3 {
  public:
   UIDelegate();
 
@@ -370,6 +370,19 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate {
       /* [in] */ IWebView* sender,
       /* [in] */ UINT keyCode,
       /* [retval][out] */ LONG_PTR* code);
+
+  // IWebUIDelegatePrivate2
+
+  virtual HRESULT STDMETHODCALLTYPE webViewPainted(
+      /* [in] */ IWebView* sender);
+
+  // IWebUIDelegatePrivate3
+
+  virtual HRESULT STDMETHODCALLTYPE exceededDatabaseQuota(
+      /* [in] */ IWebView* sender,
+      /* [in] */ IWebFrame* frame,
+      /* [in] */ IWebSecurityOrigin* origin,
+      /* [in] */ BSTR databaseIdentifier);
 
   ULONG m_refCount;
 

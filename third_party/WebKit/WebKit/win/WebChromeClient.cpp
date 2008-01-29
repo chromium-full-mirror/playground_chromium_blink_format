@@ -462,8 +462,9 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame,
   COMPtr<IWebUIDelegate> uiDelegate;
   if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
     COMPtr<IWebUIDelegatePrivate3> uiDelegatePrivate3(Query, uiDelegate);
-    uiDelegatePrivate3->exceededDatabaseQuota(
-        m_webView, kit(frame), origin.get(), BString(databaseIdentifier));
+    if (uiDelegatePrivate3)
+      uiDelegatePrivate3->exceededDatabaseQuota(
+          m_webView, kit(frame), origin.get(), BString(databaseIdentifier));
   }
 }
 
