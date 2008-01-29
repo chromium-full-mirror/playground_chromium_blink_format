@@ -58,7 +58,7 @@ SimpleFontData::SimpleFontData(const FontPlatformData& f,
           svgFontData ? svgFontData->svgFontFaceElement() : 0) {
     m_unitsPerEm = svgFontFaceElement->unitsPerEm();
 
-    float scale = f.size();
+    double scale = f.size();
     if (m_unitsPerEm)
       scale /= m_unitsPerEm;
 
