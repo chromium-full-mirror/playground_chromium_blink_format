@@ -32,7 +32,7 @@
 #include <CFNetwork/CFURLResponsePriv.h>
 #include <wtf/RetainPtr.h>
 
-using std::min;
+using namespace std;
 
 // We would like a better value for a maximum time_t,
 // but there is no way to do that in C with any certainty.
@@ -53,6 +53,13 @@ static inline bool filenameHasSaneExtension(const String& filename) {
   return dot > 0 && dot < length - 1;
 }
 
+static time_t toTimeT(CFAbsoluteTime time) {
+  static const double maxTimeAsDouble = std::numeric_limits<time_t>::max();
+  static const double minTimeAsDouble = std::numeric_limits<time_t>::min();
+  return min(max(minTimeAsDouble, time + kCFAbsoluteTimeIntervalSince1970),
+             maxTimeAsDouble);
+}
+
 void ResourceResponse::doUpdateResourceResponse() {
   if (!m_cfResponse.get())
     return;
@@ -66,15 +73,10 @@ void ResourceResponse::doUpdateResourceResponse() {
       CFURLResponseGetExpectedContentLength(m_cfResponse.get());
   m_textEncodingName = CFURLResponseGetTextEncodingName(m_cfResponse.get());
 
-  CFAbsoluteTime expiration =
-      CFURLResponseGetExpirationTime(m_cfResponse.get());
   m_expirationDate =
-      min((time_t)(expiration + kCFAbsoluteTimeIntervalSince1970), MAX_TIME_T);
-
-  CFAbsoluteTime lastModified =
-      CFURLResponseGetLastModifiedDate(m_cfResponse.get());
-  m_lastModifiedDate = min(
-      (time_t)(lastModified + kCFAbsoluteTimeIntervalSince1970), MAX_TIME_T);
+      toTimeT(CFURLResponseGetExpirationTime(m_cfResponse.get()));
+  m_lastModifiedDate =
+      toTimeT(CFURLResponseGetLastModifiedDate(m_cfResponse.get()));
 
   RetainPtr<CFStringRef> suggestedFilename(
       AdoptCF, CFURLResponseCopySuggestedFilename(m_cfResponse.get()));
