@@ -65,6 +65,8 @@ class CachedFont : public CachedResource {
                                               bool italic);
 
 #if ENABLE(SVG_FONTS)
+  bool isSVGFont() const { return m_isSVGFont; }
+  void setSVGFont(bool isSVG) { m_isSVGFont = isSVG; }
   bool ensureSVGFontData();
   SVGFontElement* getSVGFontById(const String&) const;
 #endif
@@ -74,6 +76,7 @@ class CachedFont : public CachedResource {
   bool m_loadInitiated;
 
 #if ENABLE(SVG_FONTS)
+  bool m_isSVGFont;
   RefPtr<SVGDocument> m_externalSVGDocument;
 #endif
 

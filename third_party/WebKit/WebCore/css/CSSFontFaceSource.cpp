@@ -115,16 +115,19 @@ SimpleFontData* CSSFontFaceSource::getFontData(
   if (isLoaded()) {
     if (m_font) {
 #if ENABLE(SVG_FONTS)
-      // For SVG fonts parse the external SVG document, and extract the <font>
-      // element.
-      if (!m_font->ensureSVGFontData())
-        return 0;
+      if (m_font->isSVGFont()) {
+        // For SVG fonts parse the external SVG document, and extract the <font>
+        // element.
+        if (!m_font->ensureSVGFontData())
+          return 0;
 
-      if (!m_externalSVGFontElement)
-        m_externalSVGFontElement =
-            m_font->getSVGFontById(SVGURIReference::getTarget(m_string));
+        if (!m_externalSVGFontElement)
+          m_externalSVGFontElement =
+              m_font->getSVGFontById(SVGURIReference::getTarget(m_string));
 
-      if (m_externalSVGFontElement) {
+        if (!m_externalSVGFontElement)
+          return 0;
+
         SVGFontFaceElement* fontFaceElement = 0;
 
         // Select first <font-face> child
