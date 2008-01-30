@@ -258,7 +258,12 @@ class Font {
   int tabWidth() const { return 8 * spaceWidth(); }
 
 #if !PLATFORM(QT)
-  const SimpleFontData* primaryFont() const;
+  const SimpleFontData* primaryFont() const {
+    if (!m_cachedPrimaryFont)
+      cachePrimaryFont();
+    return m_cachedPrimaryFont;
+  }
+
   const FontData* fontDataAt(unsigned) const;
   const GlyphData& glyphDataForCharacter(UChar32,
                                          bool mirror,
@@ -322,6 +327,7 @@ class Font {
                                         int h,
                                         int from,
                                         int to) const;
+  void cachePrimaryFont() const;
 #endif
   friend struct WidthIterator;
 
@@ -353,6 +359,7 @@ class Font {
   mutable RefPtr<FontFallbackList> m_fontList;
   mutable HashMap<int, GlyphPageTreeNode*> m_pages;
   mutable GlyphPageTreeNode* m_pageZero;
+  mutable const SimpleFontData* m_cachedPrimaryFont;
 #endif
   short m_letterSpacing;
   short m_wordSpacing;
