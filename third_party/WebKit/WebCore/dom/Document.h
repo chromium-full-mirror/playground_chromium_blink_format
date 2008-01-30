@@ -32,7 +32,6 @@
 #include "DocumentMarker.h"
 #include "HTMLCollection.h"
 #include "HTMLFormElement.h"
-#include "SecurityOrigin.h"
 #include "StringHash.h"
 #include "Timer.h"
 #include <wtf/HashCountedSet.h>
@@ -48,9 +47,9 @@ class CSSStyleDeclaration;
 class CSSStyleSelector;
 class CSSStyleSheet;
 class Comment;
-class DatabaseThread;
 class DOMImplementation;
 class DOMWindow;
+class DatabaseThread;
 class DocLoader;
 class DocumentFragment;
 class DocumentType;
@@ -81,6 +80,7 @@ class ProcessingInstruction;
 class Range;
 class RegisteredEventListener;
 class RenderArena;
+class SecurityOrigin;
 class Settings;
 class SharedBuffer;
 class StyleSheet;
@@ -983,7 +983,7 @@ class Document : public ContainerNode {
   // Explicitly override the security origin for this document.
   // Note: It is dangerous to change the security origin of a document
   //       that already contains content.
-  void setSecurityOrigin(SecurityOrigin* o) { m_securityOrigin = o; }
+  void setSecurityOrigin(SecurityOrigin*);
 
   bool processingLoadEvent() const { return m_processingLoadEvent; }
 
