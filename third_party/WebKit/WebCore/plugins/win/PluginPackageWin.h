@@ -67,6 +67,9 @@ class PluginPackageWin : public RefCounted<PluginPackageWin> {
 
   const NPPluginFuncs* pluginFuncs() const { return &m_pluginFuncs; }
 
+  int compareFileVersion(unsigned compareVersionMS,
+                         unsigned compareVersionLS) const;
+
  private:
   PluginPackageWin(const String& path, const FILETIME& lastModified);
   bool fetchInfo();
