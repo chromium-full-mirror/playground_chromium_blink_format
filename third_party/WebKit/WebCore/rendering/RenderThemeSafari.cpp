@@ -212,16 +212,6 @@ bool RenderThemeSafari::isControlStyled(const RenderStyle* style,
       style->appearance() == TextAreaAppearance ||
       style->appearance() == ListboxAppearance)
     return style->border() != border;
-#if !defined(SAFARI_THEME_VERSION) || SAFARI_THEME_VERSION < 2
-  if (style->appearance() == MediaFullscreenButtonAppearance ||
-      style->appearance() == MediaMuteButtonAppearance ||
-      style->appearance() == MediaPlayButtonAppearance ||
-      style->appearance() == MediaSeekBackButtonAppearance ||
-      style->appearance() == MediaSeekForwardButtonAppearance ||
-      style->appearance() == MediaSliderAppearance ||
-      style->appearance() == MediaSliderThumbAppearance)
-    return true;
-#endif
   return RenderTheme::isControlStyled(style, border, background,
                                       backgroundColor);
 }
@@ -1246,9 +1236,8 @@ bool RenderThemeSafari::paintMediaFullscreenButton(
     RenderObject* o,
     const RenderObject::PaintInfo& paintInfo,
     const IntRect& r) {
-  ASSERT(SafariThemeLibrary());
-
 #if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 2
+  ASSERT(SafariThemeLibrary());
   paintThemePart(MediaFullscreenButtonPart,
                  paintInfo.context->platformContext(), r, NSRegularControlSize,
                  determineState(o));
@@ -1261,8 +1250,6 @@ bool RenderThemeSafari::paintMediaMuteButton(
     RenderObject* o,
     const RenderObject::PaintInfo& paintInfo,
     const IntRect& r) {
-  ASSERT(SafariThemeLibrary());
-
   Node* node = o->element();
   Node* mediaNode = node ? node->shadowAncestorNode() : 0;
   if (!mediaNode ||
@@ -1274,6 +1261,7 @@ bool RenderThemeSafari::paintMediaMuteButton(
     return false;
 
 #if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 2
+  ASSERT(SafariThemeLibrary());
   paintThemePart(
       mediaElement->muted() ? MediaUnMuteButtonPart : MediaMuteButtonPart,
       paintInfo.context->platformContext(), r, NSRegularControlSize,
@@ -1287,8 +1275,6 @@ bool RenderThemeSafari::paintMediaPlayButton(
     RenderObject* o,
     const RenderObject::PaintInfo& paintInfo,
     const IntRect& r) {
-  ASSERT(SafariThemeLibrary());
-
   Node* node = o->element();
   Node* mediaNode = node ? node->shadowAncestorNode() : 0;
   if (!mediaNode ||
@@ -1300,6 +1286,7 @@ bool RenderThemeSafari::paintMediaPlayButton(
     return false;
 
 #if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 2
+  ASSERT(SafariThemeLibrary());
   paintThemePart(
       mediaElement->canPlay() ? MediaPlayButtonPart : MediaPauseButtonPart,
       paintInfo.context->platformContext(), r, NSRegularControlSize,
@@ -1313,9 +1300,8 @@ bool RenderThemeSafari::paintMediaSeekBackButton(
     RenderObject* o,
     const RenderObject::PaintInfo& paintInfo,
     const IntRect& r) {
-  ASSERT(SafariThemeLibrary());
-
 #if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 2
+  ASSERT(SafariThemeLibrary());
   paintThemePart(MediaSeekBackButtonPart, paintInfo.context->platformContext(),
                  r, NSRegularControlSize, determineState(o));
 #endif
@@ -1327,9 +1313,8 @@ bool RenderThemeSafari::paintMediaSeekForwardButton(
     RenderObject* o,
     const RenderObject::PaintInfo& paintInfo,
     const IntRect& r) {
-  ASSERT(SafariThemeLibrary());
-
 #if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 2
+  ASSERT(SafariThemeLibrary());
   paintThemePart(MediaSeekForwardButtonPart,
                  paintInfo.context->platformContext(), r, NSRegularControlSize,
                  determineState(o));
@@ -1358,6 +1343,7 @@ bool RenderThemeSafari::paintMediaSliderTrack(
       percentLoaded = player->maxTimeBuffered() / player->duration();
 
 #if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 2
+  ASSERT(SafariThemeLibrary());
   STPaintProgressIndicator(SafariTheme::MediaType,
                            paintInfo.context->platformContext(), r,
                            NSRegularControlSize, 0, percentLoaded);
