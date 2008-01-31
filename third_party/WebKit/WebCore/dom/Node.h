@@ -152,9 +152,15 @@ class Node : public TreeShared<Node> {
 
   virtual bool isElementNode() const { return false; }
   virtual bool isHTMLElement() const { return false; }
+
 #if ENABLE(SVG)
-  virtual bool isSVGElement() const { return false; }
+  virtual
 #endif
+      bool
+      isSVGElement() const {
+    return false;
+  }
+
   virtual bool isStyledElement() const { return false; }
   virtual bool isFrameOwnerElement() const { return false; }
   virtual bool isAttributeNode() const { return false; }
