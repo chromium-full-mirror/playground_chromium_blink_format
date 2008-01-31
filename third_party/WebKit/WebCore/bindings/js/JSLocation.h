@@ -1,6 +1,7 @@
 /*
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reseved.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reseved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,6 +33,8 @@ namespace WebCore {
 class Frame;
 
 class JSLocation : public KJS::DOMObject {
+  typedef KJS::DOMObject Base;
+
   friend class KJS::Window;
 
  public:
@@ -45,6 +48,8 @@ class JSLocation : public KJS::DOMObject {
                    const KJS::Identifier&,
                    KJS::JSValue*,
                    int attr = KJS::None);
+
+  virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
 
   enum {
     Hash,
