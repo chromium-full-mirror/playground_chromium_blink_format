@@ -37,7 +37,7 @@ const SimpleFontData* SegmentedFontData::fontDataForCharacter(UChar32 c) const {
   Vector<FontDataRange>::const_iterator end = m_ranges.end();
   for (Vector<FontDataRange>::const_iterator it = m_ranges.begin(); it != end;
        ++it) {
-    if (it->from() <= c && it->to() > c)
+    if (it->from() <= c && it->to() >= c)
       return it->fontData();
   }
   return m_ranges[0].fontData();
@@ -48,7 +48,7 @@ bool SegmentedFontData::containsCharacters(const UChar* characters,
   Vector<FontDataRange>::const_iterator end = m_ranges.end();
   for (Vector<FontDataRange>::const_iterator it = m_ranges.begin(); it != end;
        ++it) {
-    if (it->from() <= characters[0] && it->to() > characters[0])
+    if (it->from() <= characters[0] && it->to() >= characters[0])
       return true;
   }
   return false;
