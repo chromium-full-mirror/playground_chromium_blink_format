@@ -206,6 +206,10 @@ rangeByAlteringCurrentSelection:
                           (WebCore::SelectionController::EDirection)direction
                     granularity:(WebCore::TextGranularity)granularity;
 - (WebCore::TextGranularity)selectionGranularity;
+- (void)smartInsertForString:(NSString*)pasteString
+              replacingRange:(DOMRange*)charRangeToReplace
+                beforeString:(NSString**)beforeString
+                 afterString:(NSString**)afterString;
 - (void)selectNSRange:(NSRange)range;
 - (NSRange)selectedNSRange;
 - (NSRange)markedTextNSRange;

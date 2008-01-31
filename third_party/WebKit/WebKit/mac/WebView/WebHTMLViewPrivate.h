@@ -137,4 +137,6 @@
 // knowsPageRange:].
 - (void)_layoutForPrinting;
 
+- (BOOL)_canSmartReplaceWithPasteboard:(NSPasteboard*)pasteboard;
+
 @end
