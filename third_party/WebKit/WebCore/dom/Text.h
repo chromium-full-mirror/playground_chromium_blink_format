@@ -60,7 +60,7 @@ class Text : public CharacterData {
 
   static PassRefPtr<Text> createWithLengthLimit(
       Document*,
-      const String&,
+      const UChar*&,
       unsigned& charsLeft,
       unsigned maxChars = cTextNodeLengthLimit);
 
