@@ -903,6 +903,8 @@ RenderStyle::RenderStyle()
       m_pseudoState(PseudoUnknown),
       m_affectedByAttributeSelectors(false),
       m_unique(false),
+      m_affectedByEmpty(false),
+      m_emptyState(false),
       m_ref(0)
 #if ENABLE(SVG)
       ,
@@ -917,6 +919,8 @@ RenderStyle::RenderStyle(bool)
       m_pseudoState(PseudoUnknown),
       m_affectedByAttributeSelectors(false),
       m_unique(false),
+      m_affectedByEmpty(false),
+      m_emptyState(false),
       m_ref(1) {
   setBitDefaults();
 
@@ -951,6 +955,8 @@ RenderStyle::RenderStyle(const RenderStyle& o)
       m_pseudoState(o.m_pseudoState),
       m_affectedByAttributeSelectors(false),
       m_unique(false),
+      m_affectedByEmpty(false),
+      m_emptyState(false),
       m_ref(0)
 #if ENABLE(SVG)
       ,

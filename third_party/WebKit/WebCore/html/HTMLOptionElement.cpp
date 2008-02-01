@@ -178,6 +178,7 @@ void HTMLOptionElement::childrenChanged() {
   HTMLSelectElement* select = getSelect();
   if (select)
     select->childrenChanged();
+  HTMLGenericFormElement::childrenChanged();
 }
 
 HTMLSelectElement* HTMLOptionElement::getSelect() const {

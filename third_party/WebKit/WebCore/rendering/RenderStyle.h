@@ -1640,6 +1640,11 @@ class RenderStyle {
   unsigned m_pseudoState : 3;  // PseudoState
   bool m_affectedByAttributeSelectors : 1;
   bool m_unique : 1;
+
+  // Bits for dynamic child matching.
+  bool m_affectedByEmpty : 1;
+  bool m_emptyState : 1;
+
   int m_ref;
 
 #if ENABLE(SVG)
@@ -2714,6 +2719,16 @@ class RenderStyle {
 
   bool unique() const { return m_unique; }
   void setUnique() { m_unique = true; }
+
+  // Methods for indicating the style is affected by dynamic updates (e.g.,
+  // children changing, our position changing in our sibling list, etc.)
+  bool affectedByEmpty() const { return m_affectedByEmpty; }
+  bool emptyState() const { return m_emptyState; }
+  void setEmptyState(bool b) {
+    m_affectedByEmpty = true;
+    m_unique = true;
+    m_emptyState = b;
+  }
 
   // Initial values for all the properties
   static bool initialBackgroundAttachment() { return true; }

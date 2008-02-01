@@ -63,6 +63,7 @@
 #include "Settings.h"
 #include "ShadowValue.h"
 #include "StyleSheetList.h"
+#include "Text.h"
 #include "UserAgentStyleSheets.h"
 #include "XMLNames.h"
 #include "loader.h"
@@ -1684,10 +1685,27 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
   if (sel->m_match == CSSSelector::PseudoClass) {
     switch (sel->pseudoType()) {
       // Pseudo classes:
-      case CSSSelector::PseudoEmpty:
-        if (!e->firstChild())
-          return true;
-        break;
+      case CSSSelector::PseudoEmpty: {
+        bool result = true;
+        for (Node* n = e->firstChild(); n; n = n->nextSibling()) {
+          if (n->isElementNode()) {
+            result = false;
+            break;
+          } else if (n->isTextNode()) {
+            Text* textNode = static_cast<Text*>(n);
+            if (!textNode->data().isEmpty()) {
+              result = false;
+              break;
+            }
+          }
+        }
+        if (m_element == e)
+          m_style->setEmptyState(result);
+        else if (e && e->renderStyle() && (e->document()->usesSiblingRules() ||
+                                           e->renderStyle()->unique()))
+          e->renderStyle()->setEmptyState(result);
+        return result;
+      }
       case CSSSelector::PseudoFirstChild: {
         // first-child matches the first child that is an element!
         if (e->parentNode() && e->parentNode()->isElementNode()) {
