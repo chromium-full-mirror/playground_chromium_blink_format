@@ -33,8 +33,6 @@
 
 namespace WebCore {
 
-class SVGDocument;
-
 class HTMLEmbedElement : public HTMLPlugInElement {
  public:
   HTMLEmbedElement(Document*);
@@ -71,10 +69,6 @@ class HTMLEmbedElement : public HTMLPlugInElement {
 
   String type() const;
   void setType(const String&);
-
-#if ENABLE(SVG)
-  SVGDocument* getSVGDocument(ExceptionCode&) const;
-#endif
 
   DeprecatedString url;
   String m_pluginPage;
