@@ -54,8 +54,10 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     const CSSProperty* const* properties,
     int numProperties)
     : CSSStyleDeclaration(parent), m_node(0) {
-  for (int i = 0; i < numProperties; ++i)
+  for (int i = 0; i < numProperties; ++i) {
+    ASSERT(properties[i]);
     m_values.append(*properties[i]);
+  }
   // FIXME: This allows duplicate properties.
 }
 
@@ -598,6 +600,7 @@ void CSSMutableStyleDeclaration::addParsedProperties(
     if (!getPropertyPriority(properties[i]->id()) ||
         properties[i]->isImportant()) {
       removeProperty(properties[i]->id(), false);
+      ASSERT(properties[i]);
       m_values.append(*properties[i]);
     }
   }
