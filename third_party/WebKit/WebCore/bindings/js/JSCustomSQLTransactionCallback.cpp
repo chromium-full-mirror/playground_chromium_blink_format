@@ -61,6 +61,7 @@ JSCustomSQLTransactionCallback::JSCustomSQLTransactionCallback(
     JSObject* callback,
     Frame* frame)
     : m_callback(callback), m_frame(frame) {
+  JSLock lock;
   gcProtect(callback);
 
 #ifndef NDEBUG
@@ -69,6 +70,7 @@ JSCustomSQLTransactionCallback::JSCustomSQLTransactionCallback(
 }
 
 static void unprotectOnMainThread(void* context) {
+  JSLock lock;
   gcUnprotect(static_cast<KJS::JSObject*>(context));
 }
 
