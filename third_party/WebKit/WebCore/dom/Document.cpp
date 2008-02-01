@@ -1087,6 +1087,7 @@ void Document::recalcStyle(StyleChange change) {
     _style->ref();
     _style->setDisplay(BLOCK);
     _style->setVisuallyOrdered(visuallyOrdered);
+    // ### make the font stuff _really_ work!!!!
 
     FontDescription fontDescription;
     fontDescription.setUsePrinterFont(printing());
@@ -1334,19 +1335,6 @@ Tokenizer* Document::createTokenizer() {
 }
 
 void Document::open() {
-  // Parameters here match the description in the DOM Level 2 specification.
-  // Note that this function is currently only used in non-JavaScript DOM
-  // bindings for the HTMLDocument class, and should not be used elsewhere.
-  open("text/html", true);
-}
-
-void Document::open(const String& mimeType, bool replace) {
-  // Calling open() during an onload handler is like a redirect, so we should
-  // not add a new
-  // history item.
-  if (m_processingLoadEvent)
-    replace = true;
-
   // This is work that we should probably do in clear(), but we can't have it
   // happen when implicitOpen() is called unless we reorganize Frame code.
   if (Document* parent = parentDocument()) {
@@ -1360,17 +1348,15 @@ void Document::open(const String& mimeType, bool replace) {
     if (m_frame->loader()->isLoadingMainResource() ||
         (tokenizer() && tokenizer()->executingScript()))
       return;
+
     if (m_frame->loader()->state() == FrameStateProvisional)
       m_frame->loader()->stopAllLoaders();
   }
 
   implicitOpen();
 
-  if (m_frame) {
-    m_textWrittenByScript = new SharedBuffer;
-    m_frame->loader()->didExplicitOpen(mimeType, replace,
-                                       m_textWrittenByScript.get());
-  }
+  if (m_frame)
+    m_frame->loader()->didExplicitOpen();
 }
 
 void Document::cancelParsing() {
@@ -1601,19 +1587,13 @@ void Document::write(const String& text) {
 #endif
 
   if (!m_tokenizer) {
-    open("text/html", false);
+    open();
     ASSERT(m_tokenizer);
     if (!m_tokenizer)
       return;
     write("<html>");
   }
-
   m_tokenizer->write(text, false);
-
-  if (m_textWrittenByScript)
-    m_textWrittenByScript->append(
-        reinterpret_cast<const char*>(text.characters()),
-        text.length() * sizeof(UChar));
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())
@@ -1646,8 +1626,6 @@ void Document::finishParsing() {
 void Document::clear() {
   delete m_tokenizer;
   m_tokenizer = 0;
-
-  m_textWrittenByScript.clear();
 
   removeChildren();
 

@@ -33,7 +33,6 @@
 #include "CString.h"
 #include "Cache.h"
 #include "CachedPage.h"
-#include "CharacterNames.h"
 #include "Chrome.h"
 #include "DOMImplementation.h"
 #include "DocLoader.h"
@@ -737,9 +736,7 @@ bool FrameLoader::didOpenURL(const KURL& url) {
   return true;
 }
 
-void FrameLoader::didExplicitOpen(const String& mimeType,
-                                  bool replace,
-                                  SharedBuffer* buffer) {
+void FrameLoader::didExplicitOpen() {
   m_isComplete = false;
   m_didCallImplicitClose = false;
 
@@ -754,46 +751,6 @@ void FrameLoader::didExplicitOpen(const String& mimeType,
   cancelRedirection();
   if (m_frame->document()->url() != "about:blank")
     m_URL = m_frame->document()->url();
-
-  bool isItemNew = false;
-
-  // Add a HistoryItem for this open.
-  RefPtr<HistoryItem> item;
-  if (replace && m_currentHistoryItem)
-    item = m_currentHistoryItem;
-  else {
-    isItemNew = true;
-    item = new HistoryItem(m_URL, m_frame->tree()->name(),
-                           m_frame->tree()->parent()
-                               ? m_frame->tree()->parent()->tree()->name()
-                               : "",
-                           "");
-    item->setIsTargetItem(true);
-    m_previousHistoryItem = m_currentHistoryItem;
-    m_currentHistoryItem = item;
-  }
-
-  // Create an alternate URL to distinguish this as a generated page.
-  // FIXME: This may need a bit of refinement. If no one can ever detect this
-  // URL, then
-  // why does this need to be generated? But if the value or uniqueness of this
-  // URL does
-  // matter, then why is it OK to use the same URL for anything generated from a
-  // document
-  // with the same URL (since we just prepend a scheme)?
-  KURL generatedURL("webkitgenerated:" + m_frame->document()->url());
-
-  // Write a BOM so that decoding will work on big-endian as well as
-  // little-endian systems.
-  ASSERT(buffer->isEmpty());
-  buffer->append(reinterpret_cast<const char*>(&byteOrderMark), sizeof(UChar));
-
-  item->setSubstituteData(
-      SubstituteData(buffer, mimeType, "UTF-16", m_URL, generatedURL));
-
-  if (isItemNew)
-    if (Page* page = m_frame->page())
-      page->backForwardList()->addItem(item.release());
 }
 
 bool FrameLoader::executeIfJavaScriptURL(const KURL& url,
@@ -2163,7 +2120,7 @@ void FrameLoader::load(const KURL& newURL,
     // must grab this now, since this load may stop the previous load and clear
     // this flag
     bool isRedirect = m_quickRedirectComing;
-    load(request, action, newLoadType, formState, SubstituteData());
+    load(request, action, newLoadType, formState);
     if (isRedirect) {
       m_quickRedirectComing = false;
       if (m_provisionalDocumentLoader)
@@ -2213,10 +2170,9 @@ void FrameLoader::load(const ResourceRequest& request,
 void FrameLoader::load(const ResourceRequest& request,
                        const NavigationAction& action,
                        FrameLoadType type,
-                       PassRefPtr<FormState> formState,
-                       const SubstituteData& substituteData) {
+                       PassRefPtr<FormState> formState) {
   RefPtr<DocumentLoader> loader =
-      m_client->createDocumentLoader(request, substituteData);
+      m_client->createDocumentLoader(request, SubstituteData());
 
   loader->setTriggeringAction(action);
   if (m_documentLoader)
@@ -2423,10 +2379,8 @@ void FrameLoader::reloadAllowingStaleData(const String& encoding) {
 
   request.setCachePolicy(ReturnCacheDataElseLoad);
 
-  RefPtr<DocumentLoader> loader = m_client->createDocumentLoader(
-      request, m_currentHistoryItem->substituteData());
-  setProvisionalHistoryItem(m_currentHistoryItem);
-
+  RefPtr<DocumentLoader> loader =
+      m_client->createDocumentLoader(request, SubstituteData());
   setPolicyDocumentLoader(loader.get());
 
   loader->setOverrideEncoding(encoding);
@@ -2451,9 +2405,8 @@ void FrameLoader::reload() {
   if (!unreachableURL.isEmpty())
     initialRequest = ResourceRequest(unreachableURL);
 
-  RefPtr<DocumentLoader> loader = m_client->createDocumentLoader(
-      initialRequest, m_currentHistoryItem->substituteData());
-  setProvisionalHistoryItem(m_currentHistoryItem);
+  RefPtr<DocumentLoader> loader =
+      m_client->createDocumentLoader(initialRequest, SubstituteData());
 
   ResourceRequest& request = loader->request();
 
@@ -3317,8 +3270,8 @@ String FrameLoader::userAgent(const KURL& url) const {
 }
 
 void FrameLoader::tokenizerProcessedData() {
-  ASSERT(m_frame->page());
-  ASSERT(m_frame->document());
+  //    ASSERT(m_frame->page());
+  //    ASSERT(m_frame->document());
 
   checkCompleted();
 }
@@ -3430,12 +3383,11 @@ void FrameLoader::post(const KURL& url,
   if (!frameName.isEmpty()) {
     if (Frame* targetFrame = findFrameForNavigation(frameName))
       targetFrame->loader()->load(request, action, FrameLoadTypeStandard,
-                                  formState.release(), SubstituteData());
+                                  formState.release());
     else
       checkNewWindowPolicy(action, request, formState.release(), frameName);
   } else
-    load(request, action, FrameLoadTypeStandard, formState.release(),
-         SubstituteData());
+    load(request, action, FrameLoadTypeStandard, formState.release());
 }
 
 bool FrameLoader::isReloading() const {
@@ -3891,7 +3843,7 @@ void FrameLoader::continueLoadAfterNewWindowPolicy(
   mainFrame->loader()->m_client->dispatchShow();
   mainFrame->loader()->setOpener(frame.get());
   mainFrame->loader()->load(request, NavigationAction(), FrameLoadTypeStandard,
-                            formState, SubstituteData());
+                            formState);
 }
 
 void FrameLoader::sendRemainingDelegateMessages(
@@ -4037,8 +3989,6 @@ void FrameLoader::cachePageForHistoryItem(HistoryItem* item) {
 bool FrameLoader::shouldTreatURLAsSameAsCurrent(const KURL& url) const {
   if (!m_currentHistoryItem)
     return false;
-  if (m_currentHistoryItem->substituteData().isValid())
-    return url == m_currentHistoryItem->substituteData().responseURL();
   return url == m_currentHistoryItem->url() ||
          url == m_currentHistoryItem->originalURL();
 }
@@ -4395,7 +4345,7 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
         action = NavigationAction(itemOriginalURL, loadType, false);
       }
 
-      load(request, action, loadType, 0, item->substituteData());
+      load(request, action, loadType, 0);
     }
   }
 }

@@ -121,8 +121,7 @@ HistoryItem::HistoryItem(const HistoryItem& item)
       m_visitCount(item.m_visitCount),
       m_formContentType(item.m_formContentType),
       m_formReferrer(item.m_formReferrer),
-      m_rssFeedReferrer(item.m_rssFeedReferrer),
-      m_substituteData(item.m_substituteData) {
+      m_rssFeedReferrer(item.m_rssFeedReferrer) {
   if (item.m_formData)
     m_formData = item.m_formData->copy();
 
@@ -327,14 +326,6 @@ String HistoryItem::rssFeedReferrer() const {
 
 void HistoryItem::setRSSFeedReferrer(const String& referrer) {
   m_rssFeedReferrer = referrer;
-}
-
-const SubstituteData& HistoryItem::substituteData() const {
-  return m_substituteData;
-}
-
-void HistoryItem::setSubstituteData(const SubstituteData& substituteData) {
-  m_substituteData = substituteData;
 }
 
 void HistoryItem::setFormInfoFromRequest(const ResourceRequest& request) {

@@ -82,7 +82,6 @@ class RegisteredEventListener;
 class RenderArena;
 class SecurityOrigin;
 class Settings;
-class SharedBuffer;
 class StyleSheet;
 class StyleSheetList;
 class Text;
@@ -391,15 +390,14 @@ class Document : public ContainerNode {
   // to get visually ordered hebrew and arabic pages right
   void setVisuallyOrdered();
 
-  void open(const String& mimeType, bool replace);
-  void open();  // Deprecated.
+  void open();
   void implicitOpen();
   void close();
   void implicitClose();
   void cancelParsing();
 
-  void write(const String&);
-  void writeln(const String&);
+  void write(const String& text);
+  void writeln(const String& text);
   void finishParsing();
   void clear();
 
@@ -1058,10 +1056,6 @@ class Document : public ContainerNode {
   bool m_useSecureKeyboardEntryWhenActive;
 
   bool m_isXHTML;
-
-  // Contains the text written to the document by script, eg through
-  // document.write().
-  RefPtr<SharedBuffer> m_textWrittenByScript;
 
   unsigned m_numNodeLists;
 

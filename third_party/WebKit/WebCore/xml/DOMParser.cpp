@@ -1,5 +1,6 @@
 /*
- *  Copyright (C) 2003, 2006, 2008 Apple Inc. All rights reserved.
+ *  This file is part of the KDE libraries
+ *  Copyright (C) 2003, 2006 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,7 +34,7 @@ PassRefPtr<Document> DOMParser::parseFromString(const String& str,
   RefPtr<Document> doc =
       DOMImplementation::instance()->createDocument(contentType, 0, false);
 
-  doc->open(contentType, false);
+  doc->open();
   doc->write(str);
   doc->finishParsing();
   doc->close();
