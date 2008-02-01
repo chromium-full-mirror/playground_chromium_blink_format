@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,7 +36,14 @@
 
 namespace WebCore {
 
-typedef Vector<void (*)()> FunctionQueue;
+struct FunctionWithContext {
+  MainThreadFunction* function;
+  void* context;
+  FunctionWithContext(MainThreadFunction* f = 0, void* c = 0)
+      : function(f), context(c) {}
+};
+
+typedef Vector<FunctionWithContext> FunctionQueue;
 
 static HWND threadingWindowHandle = 0;
 static UINT threadingFiredMessage = 0;
@@ -141,7 +148,7 @@ static void callFunctionsOnMainThread() {
 
   LOG(Threading, "Calling %u functions on the main thread", queueCopy.size());
   for (unsigned i = 0; i < queueCopy.size(); ++i)
-    queueCopy[i]();
+    queueCopy[i].function(queueCopy[i].context);
 }
 
 LRESULT CALLBACK ThreadingWindowWndProc(HWND hWnd,
@@ -176,7 +183,7 @@ void initializeThreading() {
       RegisterWindowMessage(L"com.apple.WebKit.MainThreadFired");
 }
 
-void callOnMainThread(void (*function)()) {
+void callOnMainThread(MainThreadFunction* function, void* context) {
   ASSERT(function);
   ASSERT(threadingWindowHandle);
 
@@ -187,7 +194,7 @@ void callOnMainThread(void (*function)()) {
 
   {
     MutexLocker locker(functionQueueMutex());
-    functionQueue().append(function);
+    functionQueue().append(FunctionWithContext(function, context));
   }
 
   PostMessage(threadingWindowHandle, threadingFiredMessage, 0, 0);

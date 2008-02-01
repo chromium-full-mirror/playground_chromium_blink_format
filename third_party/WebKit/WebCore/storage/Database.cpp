@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -531,7 +531,7 @@ void Database::scheduleTransactionCallback(SQLTransaction* transaction) {
   globalCallbackSet().add(this);
 
   if (!s_globalCallbackScheduled) {
-    callOnMainThread(deliverAllPendingCallbacks);
+    callOnMainThread(deliverAllPendingCallbacks, 0);
     s_globalCallbackScheduled = true;
   }
 }
@@ -572,7 +572,7 @@ String Database::version() const {
   return guidToVersionMap().get(m_guid).copy();
 }
 
-void Database::deliverAllPendingCallbacks() {
+void Database::deliverAllPendingCallbacks(void*) {
   Vector<RefPtr<Database>> databases;
   {
     MutexLocker locker(globalCallbackMutex());

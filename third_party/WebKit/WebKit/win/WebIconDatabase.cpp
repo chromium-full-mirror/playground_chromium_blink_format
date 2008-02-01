@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -275,7 +275,7 @@ void WebIconDatabase::scheduleNotificationDelivery() {
 
   if (!m_deliveryRequested) {
     m_deliveryRequested = true;
-    callOnMainThread(WebIconDatabase::deliverNotifications);
+    callOnMainThread(deliverNotifications, 0);
   }
 }
 
@@ -327,7 +327,7 @@ static void postDidAddIconNotification(const String& pageURL,
       static_cast<IWebIconDatabase*>(iconDB), userInfo.get());
 }
 
-void WebIconDatabase::deliverNotifications() {
+void WebIconDatabase::deliverNotifications(void*) {
   ASSERT(m_sharedWebIconDatabase);
   if (!m_sharedWebIconDatabase)
     return;
