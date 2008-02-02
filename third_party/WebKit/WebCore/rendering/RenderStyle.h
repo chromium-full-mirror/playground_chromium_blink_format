@@ -1645,6 +1645,16 @@ class RenderStyle {
   bool m_affectedByEmpty : 1;
   bool m_emptyState : 1;
 
+  // We optimize for :first-child and :last-child.  The other positional child
+  // selectors like nth-child or
+  // *-child-of-type, we will just give up and re-evaluate whenever children
+  // change at all.
+  bool m_childrenAffectedByFirstChildRules : 1;
+  bool m_childrenAffectedByLastChildRules : 1;
+  bool m_childrenAffectedByPositionalRules : 1;
+  bool m_firstChildState : 1;
+  bool m_lastChildState : 1;
+
   int m_ref;
 
 #if ENABLE(SVG)
@@ -2729,6 +2739,28 @@ class RenderStyle {
     m_unique = true;
     m_emptyState = b;
   }
+  bool childrenAffectedByFirstChildRules() const {
+    return m_childrenAffectedByFirstChildRules;
+  }
+  void setChildrenAffectedByFirstChildRules() {
+    m_childrenAffectedByFirstChildRules = true;
+  }
+  bool childrenAffectedByLastChildRules() const {
+    return m_childrenAffectedByLastChildRules;
+  }
+  void setChildrenAffectedByLastChildRules() {
+    m_childrenAffectedByLastChildRules = true;
+  }
+  bool childrenAffectedByPositionalRules() const {
+    return m_childrenAffectedByPositionalRules;
+  }
+  void setChildrenAffectedByPositionalRules() {
+    m_childrenAffectedByPositionalRules = true;
+  }
+  bool firstChildState() const { return m_firstChildState; }
+  void setFirstChildState() { m_firstChildState = true; }
+  bool lastChildState() const { return m_lastChildState; }
+  void setLastChildState() { m_lastChildState = true; }
 
   // Initial values for all the properties
   static bool initialBackgroundAttachment() { return true; }

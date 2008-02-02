@@ -905,6 +905,11 @@ RenderStyle::RenderStyle()
       m_unique(false),
       m_affectedByEmpty(false),
       m_emptyState(false),
+      m_childrenAffectedByFirstChildRules(false),
+      m_childrenAffectedByLastChildRules(false),
+      m_childrenAffectedByPositionalRules(false),
+      m_firstChildState(false),
+      m_lastChildState(false),
       m_ref(0)
 #if ENABLE(SVG)
       ,
@@ -921,6 +926,11 @@ RenderStyle::RenderStyle(bool)
       m_unique(false),
       m_affectedByEmpty(false),
       m_emptyState(false),
+      m_childrenAffectedByFirstChildRules(false),
+      m_childrenAffectedByLastChildRules(false),
+      m_childrenAffectedByPositionalRules(false),
+      m_firstChildState(false),
+      m_lastChildState(false),
       m_ref(1) {
   setBitDefaults();
 
@@ -957,6 +967,11 @@ RenderStyle::RenderStyle(const RenderStyle& o)
       m_unique(false),
       m_affectedByEmpty(false),
       m_emptyState(false),
+      m_childrenAffectedByFirstChildRules(false),
+      m_childrenAffectedByLastChildRules(false),
+      m_childrenAffectedByPositionalRules(false),
+      m_firstChildState(false),
+      m_lastChildState(false),
       m_ref(0)
 #if ENABLE(SVG)
       ,
