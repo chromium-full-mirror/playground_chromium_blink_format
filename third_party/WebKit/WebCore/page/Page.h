@@ -29,7 +29,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN) || (PLATFORM(WX) && PLATFORM(WIN_OS))
 typedef struct HINSTANCE__* HINSTANCE;
 #endif
 
@@ -144,7 +144,7 @@ class Page : Noncopyable {
   bool inLowQualityImageInterpolationMode() const;
   void setInLowQualityImageInterpolationMode(bool = true);
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN) || (PLATFORM(WX) && PLATFORM(WIN_OS))
   // The global DLL or application instance used for all windows.
   static void setInstanceHandle(HINSTANCE instanceHandle) {
     s_instanceHandle = instanceHandle;
@@ -178,7 +178,7 @@ class Page : Noncopyable {
 
   InspectorController* m_parentInspectorController;
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN) || (PLATFORM(WX) && defined(__WXMSW__))
   static HINSTANCE s_instanceHandle;
 #endif
 };
