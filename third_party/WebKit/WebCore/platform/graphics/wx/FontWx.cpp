@@ -50,7 +50,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 
 #if USE(WXGC)
   wxGCDC* dc = (wxGCDC*)graphicsContext->platformContext();
-  wxFont wxfont = *font->getWxFont();
+  wxFont wxfont = font->getWxFont();
   if (wxfont.IsOk())
     dc->SetFont(wxfont);
   dc->SetTextForeground(color);
@@ -58,7 +58,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
   wxDC* dc = graphicsContext->platformContext();
   dc->SetTextBackground(color);
   dc->SetTextForeground(color);
-  dc->SetFont(*font->getWxFont());
+  dc->SetFont(font->getWxFont());
 #endif
 
   // convert glyphs to wxString

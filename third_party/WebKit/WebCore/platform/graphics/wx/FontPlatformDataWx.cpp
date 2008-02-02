@@ -78,21 +78,22 @@ FontPlatformData::FontPlatformData(const FontDescription& desc,
 // we use the pixel size constructor on Windows, but we use point size on Linux
 // and Mac.
 #if __WXMSW__
-  m_font = new wxFont(wxSize(0, desc.computedPixelSize()),
-                      fontFamilyToWxFontFamily(desc.genericFamily()),
-                      italicToWxFontStyle(desc.italic()),
-                      fontWeightToWxFontWeight(desc.bold()), false,
-                      family.domString());
+  m_font =
+      wxFont(wxSize(0, -desc.computedPixelSize()),
+             fontFamilyToWxFontFamily(desc.genericFamily()),
+             italicToWxFontStyle(desc.italic()),
+             fontWeightToWxFontWeight(desc.bold()), false, family.domString());
 #else
-  m_font = new wxFont(
+  m_font = wxFont(
       desc.computedPixelSize(), fontFamilyToWxFontFamily(desc.genericFamily()),
       italicToWxFontStyle(desc.italic()), fontWeightToWxFontWeight(desc.bold()),
       false, family.domString());
 #endif
+  m_fontState = VALID;
+  m_fontHash = computeHash();
 }
 
 FontPlatformData::~FontPlatformData() {
-  if (m_font && m_font != reinterpret_cast<wxFont*>(-1))
-    delete m_font;
+  m_fontState = UNINITIALIZED;
 }
 }

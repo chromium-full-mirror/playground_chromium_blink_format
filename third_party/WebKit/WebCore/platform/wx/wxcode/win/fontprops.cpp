@@ -124,4 +124,6 @@ void GetTextExtent(const wxFont& font,
   if (hfontOld) {
     ::SelectObject(dc, hfontOld);
   }
+
+  ReleaseDC(0, dc);
 }

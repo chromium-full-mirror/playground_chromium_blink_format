@@ -115,7 +115,7 @@ class SimpleFontData : public FontData {
 #endif
 
 #if PLATFORM(WX)
-  wxFont* getWxFont() const { return m_font.font(); }
+  wxFont getWxFont() const { return m_font.font(); }
 #endif
 
  private:
