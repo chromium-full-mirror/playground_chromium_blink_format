@@ -115,6 +115,8 @@ class CSSSelector {
     PseudoEmpty,
     PseudoFirstChild,
     PseudoFirstOfType,
+    PseudoLastChild,
+    PseudoLastOfType,
     PseudoFirstLine,
     PseudoFirstLetter,
     PseudoLink,
@@ -174,7 +176,7 @@ class CSSSelector {
 
   unsigned m_relation : 3;            // enum Relation
   mutable unsigned m_match : 4;       // enum Match
-  mutable unsigned m_pseudoType : 6;  // PseudoType
+  mutable unsigned m_pseudoType : 8;  // PseudoType
 
  private:
   void extractPseudoType() const;
