@@ -102,6 +102,7 @@
 #include "UIEvent.h"
 #include "WheelEvent.h"
 #include "XMLHttpRequest.h"
+#include "XMLNames.h"
 #include "XMLTokenizer.h"
 #include "kjs_binding.h"
 #include "kjs_proxy.h"
@@ -523,8 +524,7 @@ PassRefPtr<Element> Document::createElement(const String& name,
       return 0;
     }
 
-    return HTMLElementFactory::createHTMLElement(AtomicString(name), this, 0,
-                                                 false);
+    return HTMLElementFactory::createHTMLElement(name, this, 0, false);
   } else
     return createElementNS(nullAtom, name, ec);
 }
@@ -722,6 +722,40 @@ PassRefPtr<Node> Document::adoptNode(PassRefPtr<Node> source,
   return source;
 }
 
+static bool hasNamespaceError(const QualifiedName& qName) {
+  static const AtomicString xmlnsNamespaceURI = "http://www.w3.org/2000/xmlns/";
+  static const AtomicString xmlns = "xmlns";
+  static const AtomicString xml = "xml";
+
+  // These checks are from DOM Core Level 2, createElementNS
+  // http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-DocCrElNS
+  if (qName.prefix() == emptyAtom)  // createElementNS(null, ":div")
+    return true;
+  if (qName.localName().isEmpty())  // createElementNS(null, ""),
+                                    // createElementNS(null, null),
+                                    // createElementNS()
+    return true;
+  if (!qName.prefix().isEmpty() &&
+      qName.namespaceURI().isNull())  // createElementNS(null, "html:div")
+    return true;
+  if (qName.prefix() == xml &&
+      qName.namespaceURI() !=
+          XMLNames::
+              xmlNamespaceURI)  // createElementNS("http://www.example.com",
+                                // "xml:lang")
+    return true;
+
+  // Required by DOM Level 3 Core and unspecified by DOM Level 2 Core:
+  // http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-DocCrElNS
+  // createElementNS("http://www.w3.org/2000/xmlns/", "foo:bar"),
+  // createElementNS(null, "xmlns:bar")
+  if ((qName.prefix() == xmlns && qName.namespaceURI() != xmlnsNamespaceURI) ||
+      (qName.prefix() != xmlns && qName.namespaceURI() == xmlnsNamespaceURI))
+    return true;
+
+  return false;
+}
+
 // FIXME: This should really be in a possible ElementFactory class
 PassRefPtr<Element> Document::createElement(const QualifiedName& qName,
                                             bool createdByParser,
@@ -741,6 +775,11 @@ PassRefPtr<Element> Document::createElement(const QualifiedName& qName,
   if (!e)
     e = new Element(qName, document());
 
+  // FIXME: The element factories should be fixed to not ignore qName.prefix()
+  // Instead they should pass the entire qName into element creation so we don't
+  // need to manually set the prefix after creation.
+  // Then this code can become ASSERT(qName == e.qname());
+  // and Document::createElement can stop taking ExceptionCode& as well.
   if (e && !qName.prefix().isNull()) {
     ec = 0;
     e->setPrefix(qName.prefix(), ec);
@@ -751,7 +790,7 @@ PassRefPtr<Element> Document::createElement(const QualifiedName& qName,
   return e.release();
 }
 
-PassRefPtr<Element> Document::createElementNS(const String& _namespaceURI,
+PassRefPtr<Element> Document::createElementNS(const String& namespaceURI,
                                               const String& qualifiedName,
                                               ExceptionCode& ec) {
   String prefix, localName;
@@ -760,10 +799,11 @@ PassRefPtr<Element> Document::createElementNS(const String& _namespaceURI,
     return 0;
   }
 
-  RefPtr<Element> e;
-  QualifiedName qName =
-      QualifiedName(AtomicString(prefix), AtomicString(localName),
-                    AtomicString(_namespaceURI));
+  QualifiedName qName(prefix, localName, namespaceURI);
+  if (hasNamespaceError(qName)) {
+    ec = NAMESPACE_ERR;
+    return 0;
+  }
 
   return createElement(qName, false, ec);
 }
@@ -3441,30 +3481,30 @@ Document* Document::topDocument() const {
 PassRefPtr<Attr> Document::createAttributeNS(const String& namespaceURI,
                                              const String& qualifiedName,
                                              ExceptionCode& ec) {
-  if (qualifiedName.isNull()) {
+  String prefix, localName;
+  if (!parseQualifiedName(qualifiedName, prefix, localName)) {
+    ec = INVALID_CHARACTER_ERR;
+    return 0;
+  }
+
+  QualifiedName qName(prefix, localName, namespaceURI);
+  if (hasNamespaceError(qName)) {
     ec = NAMESPACE_ERR;
     return 0;
   }
 
-  String localName = qualifiedName;
-  String prefix;
-  int colonpos;
-  if ((colonpos = qualifiedName.find(':')) >= 0) {
-    prefix = qualifiedName.substring(0, colonpos);
-    localName = qualifiedName.substring(colonpos + 1);
-  }
-
-  if (!isValidName(localName)) {
-    ec = INVALID_CHARACTER_ERR;
+  // Spec: DOM Level 2 Core:
+  // http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-DocCrAttrNS
+  if (qName.localName() == "xmlns" &&
+      qName.namespaceURI() != "http://www.w3.org/2000/xmlns/") {
+    ec = NAMESPACE_ERR;
     return 0;
   }
 
   // FIXME: Assume this is a mapped attribute, since createAttribute isn't
   // namespace-aware.  There's no harm to XML
   // documents if we're wrong.
-  return new Attr(0, this, new MappedAttribute(
-                               QualifiedName(prefix, localName, namespaceURI),
-                               StringImpl::empty()));
+  return new Attr(0, this, new MappedAttribute(qName, StringImpl::empty()));
 }
 
 #if ENABLE(SVG)
