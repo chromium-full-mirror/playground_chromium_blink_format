@@ -313,7 +313,7 @@ void Node::setPrefix(const AtomicString& /*prefix*/, ExceptionCode& ec) {
 }
 
 const AtomicString& Node::localName() const {
-  return emptyAtom;
+  return nullAtom;
 }
 
 const AtomicString& Node::namespaceURI() const {

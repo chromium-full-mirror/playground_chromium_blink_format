@@ -35,10 +35,6 @@ Comment::Comment(Document* doc) : CharacterData(doc) {}
 
 Comment::~Comment() {}
 
-const AtomicString& Comment::localName() const {
-  return commentAtom;
-}
-
 String Comment::nodeName() const {
   return commentAtom.domString();
 }

@@ -36,7 +36,6 @@ class Comment : public CharacterData {
   virtual ~Comment();
 
   // DOM methods overridden from  parent classes
-  const AtomicString& localName() const;
   virtual String nodeName() const;
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
