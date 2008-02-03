@@ -37,7 +37,7 @@ namespace WebCore {
 
 class WidgetPrivate {
  public:
-  wxScrolledWindow* nativeWindow;
+  wxWindow* nativeWindow;
   Font font;
   WidgetClient* client;
 };
@@ -47,19 +47,19 @@ Widget::Widget() : data(new WidgetPrivate) {
   data->client = 0;
 }
 
-Widget::Widget(wxScrolledWindow* win) : data(new WidgetPrivate) {
-  data->nativeWindow = win;
+Widget::Widget(wxWindow* win) : data(new WidgetPrivate) {
+  setNativeWindow(win);
 }
 
 Widget::~Widget() {
   delete data;
 }
 
-wxScrolledWindow* Widget::nativeWindow() const {
+wxWindow* Widget::nativeWindow() const {
   return data->nativeWindow;
 }
 
-void Widget::setNativeWindow(wxScrolledWindow* win) {
+void Widget::setNativeWindow(wxWindow* win) {
   data->nativeWindow = win;
 }
 

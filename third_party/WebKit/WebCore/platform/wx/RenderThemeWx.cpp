@@ -205,7 +205,7 @@ void RenderThemeWx::adjustButtonStyle(CSSStyleSelector* selector,
 bool RenderThemeWx::paintButton(RenderObject* o,
                                 const RenderObject::PaintInfo& i,
                                 const IntRect& r) {
-  wxScrolledWindow* window = o->view()->frameView()->nativeWindow();
+  wxWindow* window = o->view()->frameView()->nativeWindow();
   wxDC* dc = static_cast<wxDC*>(i.context->platformContext());
   wxASSERT(dc->IsOk());
 
