@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) 2006, 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -42,7 +42,8 @@ JSValue* JSSVGPathSegList::clear(ExecState* exec, const List& args) {
   imp->clear(ec);
 
   setDOMException(exec, ec);
-  m_context->notifyAttributeChange();
+
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
   return jsUndefined();
 }
 
@@ -57,7 +58,7 @@ JSValue* JSSVGPathSegList::initialize(ExecState* exec, const List& args) {
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
   return result;
 }
 
@@ -97,7 +98,7 @@ JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec, const List& args) {
            m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
   return result;
 }
 
@@ -118,7 +119,7 @@ JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const List& args) {
       exec, WTF::getPtr(imp->replaceItem(newItem, index, ec)), m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
   return result;
 }
 
@@ -139,7 +140,7 @@ JSValue* JSSVGPathSegList::removeItem(ExecState* exec, const List& args) {
   KJS::JSValue* result = toJS(exec, obj.get(), m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
   return result;
 }
 
@@ -153,11 +154,9 @@ JSValue* JSSVGPathSegList::appendItem(ExecState* exec, const List& args) {
       toJS(exec, WTF::getPtr(imp->appendItem(newItem, ec)), m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
   return result;
 }
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

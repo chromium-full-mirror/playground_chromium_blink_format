@@ -58,7 +58,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEImageElement,
                               preserveAspectRatio,
                               PreserveAspectRatio,
                               preserveAspectRatio,
-                              SVGNames::preserveAspectRatioAttr.localName(),
+                              SVGNames::preserveAspectRatioAttr,
                               m_preserveAspectRatio.get())
 
 void SVGFEImageElement::parseMappedAttribute(MappedAttribute* attr) {

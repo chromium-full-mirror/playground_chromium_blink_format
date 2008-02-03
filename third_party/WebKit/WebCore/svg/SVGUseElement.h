@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2007, 2008 Nikolas Zimmermann
+   <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,7 +25,6 @@
 #define SVGUseElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
@@ -32,6 +32,7 @@
 #include "SVGURIReference.h"
 
 namespace WebCore {
+
 class SVGElementInstance;
 class SVGLength;
 
@@ -49,16 +50,14 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
-  // Derived from: 'Element'
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void buildPendingResource();
 
-  // 'SVGUseElement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void notifyAttributeChange() const;
+  virtual void childrenChanged();
 
-  virtual void attributeChanged(Attribute*, bool preserveDecls = false);
+  virtual void svgAttributeChanged(const QualifiedName&);
   virtual void recalcStyle(StyleChange = NoChange);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
@@ -111,10 +110,12 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void removeDisallowedElementsFromSubtree(Node* element);
 
   void buildShadowTree(SVGElement* target, SVGElementInstance* targetInstance);
+
 #if ENABLE(SVG) && ENABLE(SVG_USE)
   void expandUseElementsInShadowTree(Node* element);
   void expandSymbolElementsInShadowTree(Node* element);
 #endif
+
   void attachShadowTree();
 
   // "Tree connector"
@@ -136,5 +137,3 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

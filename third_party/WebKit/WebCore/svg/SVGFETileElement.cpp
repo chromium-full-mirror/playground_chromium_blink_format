@@ -44,7 +44,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFETileElement,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr.localName(),
+                              SVGNames::inAttr,
                               m_in1)
 
 void SVGFETileElement::parseMappedAttribute(MappedAttribute* attr) {

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2007, 2008 Nikolas Zimmermann
+   <zimmermann@kde.org>
                   2004, 2005, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,7 +25,6 @@
 #define SVGStyledElement_h
 
 #if ENABLE(SVG)
-
 #include "AffineTransform.h"
 #include "Path.h"
 #include "SVGElement.h"
@@ -34,8 +34,6 @@
 
 namespace WebCore {
 
-class RenderPath;
-
 class SVGStyledElement : public SVGElement, public SVGStylable {
  public:
   SVGStyledElement(const QualifiedName&, Document*);
@@ -44,9 +42,10 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   virtual bool isStyled() const { return true; }
   virtual bool supportsMarkers() const { return false; }
 
-  // 'SVGStylable' functions
   virtual PassRefPtr<CSSValue> getPresentationAttribute(const String& name);
   virtual CSSStyleDeclaration* style() { return StyledElement::style(); }
+
+  bool isKnownAttribute(const QualifiedName&);
 
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual SVGResource* canvasResource() { return 0; }
@@ -54,16 +53,15 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  virtual void notifyAttributeChange() const;
-  virtual void childrenChanged();
-  void notifyResourceParentIfExistant() const;
+  virtual void svgAttributeChanged(const QualifiedName&);
 
-  virtual void attributeChanged(Attribute*, bool preserveDecls = false);
+  virtual void childrenChanged();
 
   // Centralized place to force a manual style resolution. Hacky but needed for
   // now.
   RenderStyle* resolveStyle(RenderStyle* parentStyle);
 
+  void invalidateResourcesInAncestorChain() const;
   virtual void detach();
 
  protected:
@@ -85,5 +83,3 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
 #endif  // ENABLE(SVG)
 #endif  // SVGStyledElement
-
-// vim:ts=4:noet

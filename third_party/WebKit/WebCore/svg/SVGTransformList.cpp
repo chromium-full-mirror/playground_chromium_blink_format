@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -23,7 +23,6 @@
 #include "config.h"
 
 #if ENABLE(SVG)
-
 #include "AffineTransform.h"
 #include "SVGTransform.h"
 #include "SVGSVGElement.h"
@@ -32,7 +31,8 @@
 
 using namespace WebCore;
 
-SVGTransformList::SVGTransformList() : SVGPODList<SVGTransform>() {}
+SVGTransformList::SVGTransformList(const QualifiedName& attributeName)
+    : SVGPODList<SVGTransform>(attributeName) {}
 
 SVGTransformList::~SVGTransformList() {}
 
@@ -77,5 +77,3 @@ SVGTransform SVGTransformList::concatenateForType(
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

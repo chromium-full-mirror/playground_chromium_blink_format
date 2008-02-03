@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #if ENABLE(SVG)
 #include "SVGRectElement.h"
 
@@ -50,7 +51,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               length,
                               X,
                               x,
-                              SVGNames::xAttr.localName(),
+                              SVGNames::xAttr,
                               m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
@@ -58,7 +59,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               length,
                               Y,
                               y,
-                              SVGNames::yAttr.localName(),
+                              SVGNames::yAttr,
                               m_y)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
@@ -66,7 +67,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               length,
                               Width,
                               width,
-                              SVGNames::widthAttr.localName(),
+                              SVGNames::widthAttr,
                               m_width)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
@@ -74,7 +75,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               length,
                               Height,
                               height,
-                              SVGNames::heightAttr.localName(),
+                              SVGNames::heightAttr,
                               m_height)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
@@ -82,7 +83,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               length,
                               Rx,
                               rx,
-                              SVGNames::rxAttr.localName(),
+                              SVGNames::rxAttr,
                               m_rx)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
@@ -90,7 +91,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               length,
                               Ry,
                               ry,
-                              SVGNames::ryAttr.localName(),
+                              SVGNames::ryAttr,
                               m_ry)
 
 void SVGRectElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -129,11 +130,19 @@ void SVGRectElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
-void SVGRectElement::notifyAttributeChange() const {
-  if (!document()->parsing() && renderer())
-    renderer()->setNeedsLayout(true);
+void SVGRectElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
-  SVGStyledTransformableElement::notifyAttributeChange();
+  if (!renderer())
+    return;
+
+  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
+      SVGTests::isKnownAttribute(attrName) ||
+      SVGLangSpace::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGStyledTransformableElement::isKnownAttribute(attrName))
+    renderer()->setNeedsLayout(true);
 }
 
 Path SVGRectElement::toPathData() const {
@@ -157,5 +166,3 @@ bool SVGRectElement::hasRelativeValues() const {
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

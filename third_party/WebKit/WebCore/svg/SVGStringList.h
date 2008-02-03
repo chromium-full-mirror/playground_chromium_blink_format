@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,7 +24,6 @@
 #define SVGStringList_h
 
 #if ENABLE(SVG)
-
 #include "PlatformString.h"
 #include "SVGList.h"
 
@@ -32,12 +31,10 @@ namespace WebCore {
 
 class SVGStringList : public SVGList<String> {
  public:
-  SVGStringList();
+  SVGStringList(const QualifiedName&);
   virtual ~SVGStringList();
 
-  // Internal
   void reset(const String& str);
-
   void parse(const String& data, UChar delimiter = ',');
 };
 
@@ -45,5 +42,3 @@ class SVGStringList : public SVGList<String> {
 
 #endif  // ENABLE(SVG)
 #endif  // SVGStringList_h
-
-// vim:ts=4:noet

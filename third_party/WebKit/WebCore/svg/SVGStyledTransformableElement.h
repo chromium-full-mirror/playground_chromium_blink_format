@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,17 +22,14 @@
 
 #ifndef SVGStyledTransformableElement_h
 #define SVGStyledTransformableElement_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGStyledLocatableElement.h"
 #include "SVGTransformable.h"
 
 namespace WebCore {
 
 class AffineTransform;
-class Attribute;
-class Node;
-class StringImpl;
 class SVGTransformList;
 
 class SVGStyledTransformableElement : public SVGStyledLocatableElement,
@@ -43,7 +40,6 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
 
   virtual bool isStyledTransformable() const { return true; }
 
-  // Derived from: 'SVGLocatable'
   virtual AffineTransform getCTM() const;
   virtual AffineTransform getScreenCTM() const;
   virtual SVGElement* nearestViewportElement() const;
@@ -54,13 +50,12 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
   virtual FloatRect getBBox() const;
 
   virtual void parseMappedAttribute(MappedAttribute*);
+  bool isKnownAttribute(const QualifiedName&);
 
   // "base class" methods for all the elements which render as paths
   virtual Path toPathData() const { return Path(); }
   virtual Path toClipPath() const { return toPathData(); }
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-
-  virtual void notifyAttributeChange() const;
 
  protected:
   ANIMATED_PROPERTY_DECLARATIONS(SVGStyledTransformableElement,
@@ -74,5 +69,3 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
 
 #endif  // ENABLE(SVG)
 #endif  // SVGStyledTransformableElement_h
-
-// vim:ts=4:noet

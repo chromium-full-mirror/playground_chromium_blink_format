@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -48,7 +48,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGCircleElement,
                               length,
                               Cx,
                               cx,
-                              SVGNames::cxAttr.localName(),
+                              SVGNames::cxAttr,
                               m_cx)
 ANIMATED_PROPERTY_DEFINITIONS(SVGCircleElement,
                               SVGLength,
@@ -56,7 +56,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGCircleElement,
                               length,
                               Cy,
                               cy,
-                              SVGNames::cyAttr.localName(),
+                              SVGNames::cyAttr,
                               m_cy)
 ANIMATED_PROPERTY_DEFINITIONS(SVGCircleElement,
                               SVGLength,
@@ -64,7 +64,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGCircleElement,
                               length,
                               R,
                               r,
-                              SVGNames::rAttr.localName(),
+                              SVGNames::rAttr,
                               m_r)
 
 void SVGCircleElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -88,11 +88,19 @@ void SVGCircleElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
-void SVGCircleElement::notifyAttributeChange() const {
-  if (!document()->parsing() && renderer())
-    renderer()->setNeedsLayout(true);
+void SVGCircleElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
-  SVGStyledTransformableElement::notifyAttributeChange();
+  if (!renderer())
+    return;
+
+  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
+      SVGTests::isKnownAttribute(attrName) ||
+      SVGLangSpace::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGStyledTransformableElement::isKnownAttribute(attrName))
+    renderer()->setNeedsLayout(true);
 }
 
 Path SVGCircleElement::toPathData() const {
@@ -106,5 +114,3 @@ bool SVGCircleElement::hasRelativeValues() const {
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

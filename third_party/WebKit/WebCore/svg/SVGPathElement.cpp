@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -58,7 +58,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGPathElement,
                               number,
                               PathLength,
                               pathLength,
-                              SVGNames::pathLengthAttr.localName(),
+                              SVGNames::pathLengthAttr,
                               m_pathLength)
 
 float SVGPathElement::getTotalLength() {
@@ -227,16 +227,23 @@ void SVGPathElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
-void SVGPathElement::notifyAttributeChange() const {
-  if (!document()->parsing() && renderer())
-    renderer()->setNeedsLayout(true);
+void SVGPathElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
-  SVGStyledTransformableElement::notifyAttributeChange();
+  if (!renderer())
+    return;
+
+  if (attrName == SVGNames::dAttr || attrName == SVGNames::pathLengthAttr ||
+      SVGTests::isKnownAttribute(attrName) ||
+      SVGLangSpace::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGStyledTransformableElement::isKnownAttribute(attrName))
+    renderer()->setNeedsLayout(true);
 }
 
 SVGPathSegList* SVGPathElement::pathSegList() const {
   if (!m_pathSegList)
-    m_pathSegList = new SVGPathSegList();
+    m_pathSegList = new SVGPathSegList(SVGNames::dAttr);
 
   return m_pathSegList.get();
 }
@@ -262,5 +269,3 @@ Path SVGPathElement::toPathData() const {
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

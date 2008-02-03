@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,12 +22,13 @@
 
 #ifndef SVGTextElement_h
 #define SVGTextElement_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGTextPositioningElement.h"
 #include "SVGTransformable.h"
 
 namespace WebCore {
+
 class SVGTextElement : public SVGTextPositioningElement,
                        public SVGTransformable {
  public:
@@ -36,7 +37,6 @@ class SVGTextElement : public SVGTextPositioningElement,
 
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  // 'SVGTextElement' functions
   virtual SVGElement* nearestViewportElement() const;
   virtual SVGElement* farthestViewportElement() const;
 
@@ -64,5 +64,3 @@ class SVGTextElement : public SVGTextPositioningElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

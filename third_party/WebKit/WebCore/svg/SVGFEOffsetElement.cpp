@@ -47,7 +47,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr.localName(),
+                              SVGNames::inAttr,
                               m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               float,
@@ -55,7 +55,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               number,
                               Dx,
                               dx,
-                              SVGNames::dxAttr.localName(),
+                              SVGNames::dxAttr,
                               m_dx)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               float,
@@ -63,7 +63,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               number,
                               Dy,
                               dy,
-                              SVGNames::dyAttr.localName(),
+                              SVGNames::dyAttr,
                               m_dy)
 
 void SVGFEOffsetElement::parseMappedAttribute(MappedAttribute* attr) {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,9 +24,10 @@
 #define SVGPreserveAspectRatio_h
 
 #if ENABLE(SVG)
+#include "PlatformString.h"
+#include "SVGNames.h"
 
 #include <wtf/RefCounted.h>
-#include <PlatformString.h>
 
 namespace WebCore {
 
@@ -79,6 +80,10 @@ class SVGPreserveAspectRatio : public RefCounted<SVGPreserveAspectRatio> {
                                 const UChar* end,
                                 bool validate = true);
 
+  const QualifiedName& associatedAttributeName() const {
+    return SVGNames::preserveAspectRatioAttr;
+  }
+
  protected:
   unsigned short m_align;
   unsigned short m_meetOrSlice;
@@ -88,5 +93,3 @@ class SVGPreserveAspectRatio : public RefCounted<SVGPreserveAspectRatio> {
 
 #endif  // ENABLE(SVG)
 #endif  // SVGPreserveAspectRatio_h
-
-// vim:ts=4:noet

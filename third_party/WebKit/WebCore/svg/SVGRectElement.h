@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,13 +24,13 @@
 #define SVGRectElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGTests.h"
 
 namespace WebCore {
+
 class SVGRectElement : public SVGStyledTransformableElement,
                        public SVGTests,
                        public SVGLangSpace,
@@ -41,9 +41,8 @@ class SVGRectElement : public SVGStyledTransformableElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
-  // 'SVGRectElement' functions
-  virtual void parseMappedAttribute(MappedAttribute* attr);
-  virtual void notifyAttributeChange() const;
+  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
 
   virtual Path toPathData() const;
 
@@ -77,5 +76,3 @@ class SVGRectElement : public SVGStyledTransformableElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

@@ -47,7 +47,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEFloodElement,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr.localName(),
+                              SVGNames::inAttr,
                               m_in1)
 
 void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {

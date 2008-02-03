@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2007 Rob Buis <buis@kde.org>
                   2007 Eric Seidel <eric@webkit.org>
 
@@ -66,7 +66,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGAElement,
                               string,
                               Target,
                               target,
-                              SVGNames::targetAttr.localName(),
+                              SVGNames::targetAttr,
                               m_target)
 
 void SVGAElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -125,12 +125,12 @@ void SVGAElement::defaultEventHandler(Event* evt) {
     }
 
     String target = getAttribute(SVGNames::targetAttr);
-    String xlinktarget = getAttribute(XLinkNames::showAttr);
     if (e && e->button() == MiddleButton)
       target = "_blank";
     else if (target.isEmpty())  // if target is empty, default to "_self" or use
                                 // xlink:target if set
-      target = (xlinktarget == "new") ? "_blank" : "_self";
+      target =
+          (getAttribute(XLinkNames::showAttr) == "new") ? "_blank" : "_self";
 
     String url = parseURL(href());
     if (!evt->defaultPrevented())
@@ -186,5 +186,4 @@ bool SVGAElement::childShouldCreateRenderer(Node* child) const {
 
 }  // namespace WebCore
 
-// vim:ts=4:noet
 #endif  // ENABLE(SVG)

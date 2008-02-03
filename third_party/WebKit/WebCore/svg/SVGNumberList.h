@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,15 +24,15 @@
 #define SVGNumberList_h
 
 #if ENABLE(SVG)
-
 #include "SVGList.h"
 
 namespace WebCore {
+
 class String;
 
 class SVGNumberList : public SVGList<float> {
  public:
-  SVGNumberList();
+  SVGNumberList(const QualifiedName&);
   virtual ~SVGNumberList();
 
   void parse(const String& value);
@@ -42,5 +42,3 @@ class SVGNumberList : public SVGList<float> {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -56,7 +56,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
                               length,
                               X1,
                               x1,
-                              SVGNames::x1Attr.localName(),
+                              SVGNames::x1Attr,
                               m_x1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
                               SVGLength,
@@ -64,7 +64,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
                               length,
                               Y1,
                               y1,
-                              SVGNames::y1Attr.localName(),
+                              SVGNames::y1Attr,
                               m_y1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
                               SVGLength,
@@ -72,7 +72,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
                               length,
                               X2,
                               x2,
-                              SVGNames::x2Attr.localName(),
+                              SVGNames::x2Attr,
                               m_x2)
 ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
                               SVGLength,
@@ -80,7 +80,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
                               length,
                               Y2,
                               y2,
-                              SVGNames::y2Attr.localName(),
+                              SVGNames::y2Attr,
                               m_y2)
 
 void SVGLinearGradientElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -94,6 +94,18 @@ void SVGLinearGradientElement::parseMappedAttribute(MappedAttribute* attr) {
     setY2BaseValue(SVGLength(this, LengthModeHeight, attr->value()));
   else
     SVGGradientElement::parseMappedAttribute(attr);
+}
+
+void SVGLinearGradientElement::svgAttributeChanged(
+    const QualifiedName& attrName) {
+  SVGGradientElement::svgAttributeChanged(attrName);
+
+  if (!m_resource)
+    return;
+
+  if (attrName == SVGNames::x1Attr || attrName == SVGNames::y1Attr ||
+      attrName == SVGNames::x2Attr || attrName == SVGNames::y2Attr)
+    m_resource->invalidate();
 }
 
 void SVGLinearGradientElement::buildGradient() const {
@@ -189,5 +201,3 @@ LinearGradientAttributes SVGLinearGradientElement::collectGradientProperties()
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,7 +24,6 @@
 #define SVGImageElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGImageLoader.h"
@@ -33,9 +32,9 @@
 #include "SVGURIReference.h"
 
 namespace WebCore {
+
 class SVGPreserveAspectRatio;
 class SVGLength;
-class SVGDocument;
 
 class SVGImageElement : public SVGStyledTransformableElement,
                         public SVGTests,
@@ -48,9 +47,8 @@ class SVGImageElement : public SVGStyledTransformableElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
-  // 'SVGImageElement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void notifyAttributeChange() const;
+  virtual void svgAttributeChanged(const QualifiedName&);
 
   virtual void attach();
 
@@ -96,5 +94,3 @@ class SVGImageElement : public SVGStyledTransformableElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

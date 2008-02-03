@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,16 +24,14 @@
 #define SVGPointList_h
 
 #if ENABLE(SVG)
-
 #include "SVGList.h"
 #include "FloatPoint.h"
 
 namespace WebCore {
-class SVGElement;
 
 class SVGPointList : public SVGPODList<FloatPoint> {
  public:
-  SVGPointList();
+  SVGPointList(const QualifiedName&);
   virtual ~SVGPointList();
 };
 
@@ -41,5 +39,3 @@ class SVGPointList : public SVGPODList<FloatPoint> {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

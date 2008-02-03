@@ -51,7 +51,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               length,
                               StartOffset,
                               startOffset,
-                              SVGNames::startOffsetAttr.localName(),
+                              SVGNames::startOffsetAttr,
                               m_startOffset)
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               int,
@@ -59,7 +59,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               enumeration,
                               Method,
                               method,
-                              SVGNames::methodAttr.localName(),
+                              SVGNames::methodAttr,
                               m_method)
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               int,
@@ -67,7 +67,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               enumeration,
                               Spacing,
                               spacing,
-                              SVGNames::spacingAttr.localName(),
+                              SVGNames::spacingAttr,
                               m_spacing)
 
 void SVGTextPathElement::parseMappedAttribute(MappedAttribute* attr) {

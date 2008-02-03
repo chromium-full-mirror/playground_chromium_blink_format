@@ -56,7 +56,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGCursorElement,
                               length,
                               X,
                               x,
-                              SVGNames::xAttr.localName(),
+                              SVGNames::xAttr,
                               m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGCursorElement,
                               SVGLength,
@@ -64,7 +64,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGCursorElement,
                               length,
                               Y,
                               y,
-                              SVGNames::yAttr.localName(),
+                              SVGNames::yAttr,
                               m_y)
 
 void SVGCursorElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -92,5 +92,3 @@ void SVGCursorElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,11 +22,12 @@
 
 #ifndef SVGFitToViewBox_h
 #define SVGFitToViewBox_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGElement.h"
 
 namespace WebCore {
+
 class AffineTransform;
 class SVGPreserveAspectRatio;
 
@@ -47,6 +48,7 @@ class SVGFitToViewBox {
                                                  float viewHeight) const;
 
   bool parseMappedAttribute(MappedAttribute*);
+  bool isKnownAttribute(const QualifiedName&);
 
  protected:
   virtual const SVGElement* contextElement() const = 0;
@@ -68,5 +70,3 @@ class SVGFitToViewBox {
 
 #endif  // ENABLE(SVG)
 #endif  // SVGFitToViewBox_h
-
-// vim:ts=4:noet

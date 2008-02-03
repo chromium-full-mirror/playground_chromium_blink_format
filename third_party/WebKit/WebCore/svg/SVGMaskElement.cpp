@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
                   2005 Alexander Kellett <lypanov@kde.org>
 
@@ -73,7 +73,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               enumeration,
                               MaskUnits,
                               maskUnits,
-                              SVGNames::maskUnitsAttr.localName(),
+                              SVGNames::maskUnitsAttr,
                               m_maskUnits)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               int,
@@ -81,16 +81,15 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               enumeration,
                               MaskContentUnits,
                               maskContentUnits,
-                              SVGNames::maskContentUnitsAttr.localName(),
+                              SVGNames::maskContentUnitsAttr,
                               m_maskContentUnits)
-
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               SVGLength,
                               Length,
                               length,
                               X,
                               x,
-                              SVGNames::xAttr.localName(),
+                              SVGNames::xAttr,
                               m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               SVGLength,
@@ -98,7 +97,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               length,
                               Y,
                               y,
-                              SVGNames::yAttr.localName(),
+                              SVGNames::yAttr,
                               m_y)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               SVGLength,
@@ -106,7 +105,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               length,
                               Width,
                               width,
-                              SVGNames::widthAttr.localName(),
+                              SVGNames::widthAttr,
                               m_width)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               SVGLength,
@@ -114,7 +113,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
                               length,
                               Height,
                               height,
-                              SVGNames::heightAttr.localName(),
+                              SVGNames::heightAttr,
                               m_height)
 
 void SVGMaskElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -148,6 +147,33 @@ void SVGMaskElement::parseMappedAttribute(MappedAttribute* attr) {
       return;
     SVGStyledElement::parseMappedAttribute(attr);
   }
+}
+
+void SVGMaskElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledElement::svgAttributeChanged(attrName);
+
+  if (!m_masker)
+    return;
+
+  if (attrName == SVGNames::maskUnitsAttr ||
+      attrName == SVGNames::maskContentUnitsAttr ||
+      attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
+      SVGURIReference::isKnownAttribute(attrName) ||
+      SVGTests::isKnownAttribute(attrName) ||
+      SVGLangSpace::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGStyledElement::isKnownAttribute(attrName))
+    m_masker->invalidate();
+}
+
+void SVGMaskElement::childrenChanged() {
+  SVGStyledElement::childrenChanged();
+
+  if (!m_masker)
+    return;
+
+  m_masker->invalidate();
 }
 
 auto_ptr<ImageBuffer> SVGMaskElement::drawMaskerContent(
@@ -233,18 +259,6 @@ SVGResource* SVGMaskElement::canvasResource() {
     m_masker = new SVGResourceMasker(this);
   return m_masker.get();
 }
-
-void SVGMaskElement::notifyAttributeChange() const {
-  if (!attached() || document()->parsing())
-    return;
-
-  if (m_masker) {
-    m_masker->invalidate();
-    m_masker->repaintClients();
-  }
-}
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

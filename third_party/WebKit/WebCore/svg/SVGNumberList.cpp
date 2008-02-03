@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -29,7 +29,8 @@
 
 namespace WebCore {
 
-SVGNumberList::SVGNumberList() : SVGList<float>() {}
+SVGNumberList::SVGNumberList(const QualifiedName& attributeName)
+    : SVGList<float>(attributeName) {}
 
 SVGNumberList::~SVGNumberList() {}
 
@@ -50,5 +51,4 @@ void SVGNumberList::parse(const String& value) {
 }
 }
 
-// vim:ts=4:noet
 #endif  // ENABLE(SVG)

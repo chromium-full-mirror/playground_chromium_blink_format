@@ -23,7 +23,6 @@
 #define SVGMaskElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGResourceMasker.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
@@ -32,8 +31,9 @@
 #include "SVGURIReference.h"
 
 namespace WebCore {
-class Attribute;
+
 class SVGLength;
+
 class SVGMaskElement : public SVGStyledLocatableElement,
                        public SVGURIReference,
                        public SVGTests,
@@ -44,9 +44,9 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual ~SVGMaskElement();
   virtual bool isValid() const { return SVGTests::isValid(); }
 
-  // 'SVGMaskElement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void notifyAttributeChange() const;
+  virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void childrenChanged();
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource();
@@ -91,5 +91,3 @@ class SVGMaskElement : public SVGStyledLocatableElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -45,7 +45,8 @@ SVGGradientElement::SVGGradientElement(const QualifiedName& tagName,
       SVGExternalResourcesRequired(),
       m_spreadMethod(0),
       m_gradientUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
-      m_gradientTransform(new SVGTransformList()) {}
+      m_gradientTransform(
+          new SVGTransformList(SVGNames::gradientTransformAttr)) {}
 
 SVGGradientElement::~SVGGradientElement() {}
 
@@ -55,7 +56,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGGradientElement,
                               enumeration,
                               GradientUnits,
                               gradientUnits,
-                              SVGNames::gradientUnitsAttr.localName(),
+                              SVGNames::gradientUnitsAttr,
                               m_gradientUnits)
 ANIMATED_PROPERTY_DEFINITIONS(SVGGradientElement,
                               SVGTransformList*,
@@ -63,7 +64,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGGradientElement,
                               transformList,
                               GradientTransform,
                               gradientTransform,
-                              SVGNames::gradientTransformAttr.localName(),
+                              SVGNames::gradientTransformAttr,
                               m_gradientTransform.get())
 ANIMATED_PROPERTY_DEFINITIONS(SVGGradientElement,
                               int,
@@ -71,7 +72,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGGradientElement,
                               enumeration,
                               SpreadMethod,
                               spreadMethod,
-                              SVGNames::spreadMethodAttr.localName(),
+                              SVGNames::spreadMethodAttr,
                               m_spreadMethod)
 
 void SVGGradientElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -104,12 +105,26 @@ void SVGGradientElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
-void SVGGradientElement::notifyAttributeChange() const {
-  if (!m_resource || !attached() || document()->parsing())
+void SVGGradientElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledElement::svgAttributeChanged(attrName);
+
+  if (!m_resource)
     return;
 
-  m_resource->invalidate();
-  m_resource->repaintClients();
+  if (attrName == SVGNames::gradientUnitsAttr ||
+      attrName == SVGNames::gradientTransformAttr ||
+      attrName == SVGNames::spreadMethodAttr ||
+      SVGURIReference::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGStyledElement::isKnownAttribute(attrName))
+    m_resource->invalidate();
+}
+
+void SVGGradientElement::childrenChanged() {
+  SVGStyledElement::childrenChanged();
+
+  if (m_resource)
+    m_resource->invalidate();
 }
 
 RenderObject* SVGGradientElement::createRenderer(RenderArena* arena,
@@ -130,38 +145,51 @@ SVGResource* SVGGradientElement::canvasResource() {
 
 Vector<SVGGradientStop> SVGGradientElement::buildStops() const {
   Vector<SVGGradientStop> stops;
-
-  // FIXME: Manual style resolution is a hack
   RenderStyle* gradientStyle = 0;
+
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
-    SVGElement* element = 0;
-    if (n->isSVGElement())
-      element = static_cast<SVGElement*>(n);
+    SVGElement* element = n->isSVGElement() ? static_cast<SVGElement*>(n) : 0;
+
     if (element && element->isGradientStop()) {
       SVGStopElement* stop = static_cast<SVGStopElement*>(element);
       float stopOffset = stop->offset();
 
-      if (!stop->renderer() && !gradientStyle)
-        gradientStyle = const_cast<SVGGradientElement*>(this)->styleForRenderer(
-            parent()->renderer());
+      Color color;
+      float opacity;
 
-      RenderStyle* stopStyle = stop->resolveStyle(gradientStyle);
-      Color c = stopStyle->svgStyle()->stopColor();
-      float opacity = stopStyle->svgStyle()->stopOpacity();
+      if (stop->renderer()) {
+        RenderStyle* stopStyle = stop->renderer()->style();
+        color = stopStyle->svgStyle()->stopColor();
+        opacity = stopStyle->svgStyle()->stopOpacity();
+      } else {
+        // If there is no renderer for this stop element, then a parent element
+        // set display="none" - ie. <g display="none"><linearGradient><stop>..
+        // Unfortunately we have to manually rebuild the stop style. See
+        // pservers-grad-19-b.svg
+        if (!gradientStyle)
+          gradientStyle =
+              const_cast<SVGGradientElement*>(this)->styleForRenderer(
+                  parent()->renderer());
+
+        RenderStyle* stopStyle = stop->resolveStyle(gradientStyle);
+
+        color = stopStyle->svgStyle()->stopColor();
+        opacity = stopStyle->svgStyle()->stopOpacity();
+
+        stopStyle->deref(document()->renderArena());
+      }
 
       stops.append(makeGradientStop(
-          stopOffset,
-          makeRGBA(c.red(), c.green(), c.blue(), int(opacity * 255.))));
-      stopStyle->deref(document()->renderArena());
+          stopOffset, makeRGBA(color.red(), color.green(), color.blue(),
+                               int(opacity * 255.))));
     }
   }
 
   if (gradientStyle)
     gradientStyle->deref(document()->renderArena());
+
   return stops;
 }
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

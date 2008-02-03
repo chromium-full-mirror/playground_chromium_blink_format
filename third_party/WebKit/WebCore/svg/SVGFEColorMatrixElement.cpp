@@ -35,7 +35,7 @@ SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
                                                  Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       m_type(SVG_FECOLORMATRIX_TYPE_UNKNOWN),
-      m_values(new SVGNumberList),
+      m_values(new SVGNumberList(SVGNames::valuesAttr)),
       m_filterEffect(0) {}
 
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {
@@ -48,7 +48,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr.localName(),
+                              SVGNames::inAttr,
                               m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               int,
@@ -56,7 +56,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               enumeration,
                               Type,
                               type,
-                              SVGNames::typeAttr.localName(),
+                              SVGNames::typeAttr,
                               m_type)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               SVGNumberList*,
@@ -64,7 +64,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               numberList,
                               Values,
                               values,
-                              SVGNames::valuesAttr.localName(),
+                              SVGNames::valuesAttr,
                               m_values.get())
 
 void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {

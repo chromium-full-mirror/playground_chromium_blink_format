@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,8 +22,8 @@
 
 #ifndef SVGStyledLocatableElement_h
 #define SVGStyledLocatableElement_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGLocatable.h"
 #include "SVGStyledElement.h"
 
@@ -39,7 +39,6 @@ class SVGStyledLocatableElement : public SVGStyledElement,
 
   virtual bool isStyledLocatable() const { return true; }
 
-  // 'SVGStyledLocatableElement' functions
   virtual SVGElement* nearestViewportElement() const;
   virtual SVGElement* farthestViewportElement() const;
 
@@ -52,5 +51,3 @@ class SVGStyledLocatableElement : public SVGStyledElement,
 
 #endif  // ENABLE(SVG)
 #endif  // SVGStyledLocatableElement_h
-
-// vim:ts=4:noet

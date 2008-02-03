@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2007, 2008 Nikolas Zimmermann
+   <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -70,7 +71,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               length,
                               X,
                               x,
-                              SVGNames::xAttr.localName(),
+                              SVGNames::xAttr,
                               m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               SVGLength,
@@ -78,7 +79,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               length,
                               Y,
                               y,
-                              SVGNames::yAttr.localName(),
+                              SVGNames::yAttr,
                               m_y)
 ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               SVGLength,
@@ -86,7 +87,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               length,
                               Width,
                               width,
-                              SVGNames::widthAttr.localName(),
+                              SVGNames::widthAttr,
                               m_width)
 ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               SVGLength,
@@ -94,7 +95,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               length,
                               Height,
                               height,
-                              SVGNames::heightAttr.localName(),
+                              SVGNames::heightAttr,
                               m_height)
 
 SVGElementInstance* SVGUseElement::instanceRoot() const {
@@ -136,14 +137,6 @@ void SVGUseElement::parseMappedAttribute(MappedAttribute* attr) {
 
 void SVGUseElement::insertedIntoDocument() {
   SVGElement::insertedIntoDocument();
-
-  String id = SVGURIReference::getTarget(href());
-  Element* targetElement = document()->getElementById(id);
-  if (!targetElement) {
-    document()->accessSVGExtensions()->addPendingResource(id, this);
-    return;
-  }
-
   buildPendingResource();
 }
 
@@ -154,31 +147,33 @@ void SVGUseElement::removedFromDocument() {
   m_shadowTreeRootElement = 0;
 }
 
-void SVGUseElement::attributeChanged(Attribute* attr, bool preserveDecls) {
-  // Avoid calling SVGStyledElement::attributeChanged(), as it always calls
-  // notifyAttributeChange.
-  SVGElement::attributeChanged(attr, preserveDecls);
+void SVGUseElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
   if (!attached())
     return;
 
-  // Only update the tree if x/y/width/height or xlink:href changed.
-  if (attr->name() == SVGNames::xAttr || attr->name() == SVGNames::yAttr ||
-      attr->name() == SVGNames::widthAttr ||
-      attr->name() == SVGNames::heightAttr ||
-      attr->name().matches(XLinkNames::hrefAttr))
+  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
+      SVGTests::isKnownAttribute(attrName) ||
+      SVGLangSpace::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGURIReference::isKnownAttribute(attrName) ||
+      SVGStyledTransformableElement::isKnownAttribute(attrName)) {
+    // TODO: Now that we're aware of the attribute name, we can finally optimize
+    // updating <use> attributes - to not reclone every time.
     buildPendingResource();
-  else if (m_shadowTreeRootElement)
-    m_shadowTreeRootElement->setChanged();
+
+    if (m_shadowTreeRootElement)
+      m_shadowTreeRootElement->setChanged();
+  }
 }
 
-void SVGUseElement::notifyAttributeChange() const {
+void SVGUseElement::childrenChanged() {
   if (!attached())
     return;
 
-  // NOTE: A lot of room for improvments here. This is too slow.
-  // It has to be done correctly, by implementing attributeChanged().
-  const_cast<SVGUseElement*>(this)->buildPendingResource();
+  buildPendingResource();
 
   if (m_shadowTreeRootElement)
     m_shadowTreeRootElement->setChanged();
@@ -280,6 +275,17 @@ static bool subtreeContainsDisallowedElement(Node* start) {
 }
 
 void SVGUseElement::buildPendingResource() {
+  String id = SVGURIReference::getTarget(href());
+  Element* targetElement = document()->getElementById(id);
+
+  if (!targetElement) {
+    // TODO: We want to deregister as pending resource, if our href() changed!
+    // TODO: Move to svgAttributeChanged, once we're fixing use & the new
+    // dynamic update concept.
+    document()->accessSVGExtensions()->addPendingResource(id, this);
+    return;
+  }
+
   // Do not build the shadow/instance tree for <use> elements living in a shadow
   // tree.
   // The will be expanded soon anyway - see expandUseElementsInShadowTree().
@@ -291,8 +297,6 @@ void SVGUseElement::buildPendingResource() {
     parent = parent->parentNode();
   }
 
-  String id = SVGURIReference::getTarget(href());
-  Element* targetElement = document()->getElementById(id);
   SVGElement* target = 0;
   if (targetElement && targetElement->isSVGElement())
     target = static_cast<SVGElement*>(targetElement);
@@ -902,5 +906,3 @@ void SVGUseElement::transferUseAttributesToReplacedElement(
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

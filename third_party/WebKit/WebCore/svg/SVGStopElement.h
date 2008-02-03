@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,10 +24,10 @@
 #define SVGStopElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGStyledElement.h"
 
 namespace WebCore {
+
 class SVGStopElement : public SVGStyledElement {
  public:
   SVGStopElement(const QualifiedName&, Document*);
@@ -36,7 +36,6 @@ class SVGStopElement : public SVGStyledElement {
   virtual bool isGradientStop() const { return true; }
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void notifyAttributeChange() const;
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
@@ -48,5 +47,3 @@ class SVGStopElement : public SVGStyledElement {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

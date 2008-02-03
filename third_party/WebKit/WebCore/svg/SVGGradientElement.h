@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,15 +24,16 @@
 #define SVGGradientElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGPaintServerGradient.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGStyledElement.h"
 #include "SVGURIReference.h"
 
 namespace WebCore {
+
 class SVGGradientElement;
 class SVGTransformList;
+
 class SVGGradientElement : public SVGStyledElement,
                            public SVGURIReference,
                            public SVGExternalResourcesRequired {
@@ -48,8 +49,9 @@ class SVGGradientElement : public SVGStyledElement,
   virtual ~SVGGradientElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void notifyAttributeChange() const;
+  virtual void svgAttributeChanged(const QualifiedName&);
 
+  virtual void childrenChanged();
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   virtual SVGResource* canvasResource();
@@ -93,5 +95,3 @@ class SVGGradientElement : public SVGStyledElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

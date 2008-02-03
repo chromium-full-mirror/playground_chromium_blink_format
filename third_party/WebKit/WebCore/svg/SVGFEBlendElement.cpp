@@ -45,7 +45,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr.localName(),
+                              SVGNames::inAttr,
                               m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               String,
@@ -53,7 +53,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               string,
                               In2,
                               in2,
-                              SVGNames::in2Attr.localName(),
+                              SVGNames::in2Attr,
                               m_in2)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               int,
@@ -61,7 +61,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               enumeration,
                               Mode,
                               mode,
-                              SVGNames::modeAttr.localName(),
+                              SVGNames::modeAttr,
                               m_mode)
 
 void SVGFEBlendElement::parseMappedAttribute(MappedAttribute* attr) {

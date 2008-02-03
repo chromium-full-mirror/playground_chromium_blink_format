@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -49,7 +49,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGClipPathElement,
                               enumeration,
                               ClipPathUnits,
                               clipPathUnits,
-                              SVGNames::clipPathUnitsAttr.localName(),
+                              SVGNames::clipPathUnitsAttr,
                               m_clipPathUnits)
 
 void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -67,6 +67,29 @@ void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
       return;
     SVGStyledTransformableElement::parseMappedAttribute(attr);
   }
+}
+
+void SVGClipPathElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledTransformableElement::svgAttributeChanged(attrName);
+
+  if (!m_clipper)
+    return;
+
+  if (attrName == SVGNames::clipPathUnitsAttr ||
+      SVGTests::isKnownAttribute(attrName) ||
+      SVGLangSpace::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGStyledTransformableElement::isKnownAttribute(attrName))
+    m_clipper->invalidate();
+}
+
+void SVGClipPathElement::childrenChanged() {
+  SVGStyledTransformableElement::childrenChanged();
+
+  if (!m_clipper)
+    return;
+
+  m_clipper->invalidate();
 }
 
 SVGResource* SVGClipPathElement::canvasResource() {
@@ -103,16 +126,6 @@ SVGResource* SVGClipPathElement::canvasResource() {
   clipPathStyle->deref(document()->renderArena());
   return m_clipper.get();
 }
-
-void SVGClipPathElement::notifyAttributeChange() const {
-  if (!m_clipper || !attached() || document()->parsing())
-    return;
-
-  m_clipper->invalidate();
-  m_clipper->repaintClients();
-}
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

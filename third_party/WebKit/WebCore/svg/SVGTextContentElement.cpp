@@ -60,7 +60,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextContentElement,
                               length,
                               TextLength,
                               textLength,
-                              SVGNames::textLengthAttr.localName(),
+                              SVGNames::textLengthAttr,
                               m_textLength)
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextContentElement,
                               int,
@@ -68,7 +68,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextContentElement,
                               enumeration,
                               LengthAdjust,
                               lengthAdjust,
-                              SVGNames::lengthAdjustAttr.localName(),
+                              SVGNames::lengthAdjustAttr,
                               m_lengthAdjust)
 
 static inline float cummulatedCharacterRangeLength(

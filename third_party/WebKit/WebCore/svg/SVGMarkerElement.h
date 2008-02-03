@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2007, 2008 Nikolas Zimmermann
+   <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,7 +25,6 @@
 #define SVGMarkerElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGResourceMarker.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
@@ -32,6 +32,7 @@
 #include "SVGStyledElement.h"
 
 namespace WebCore {
+
 class Document;
 class SVGAngle;
 
@@ -55,12 +56,12 @@ class SVGMarkerElement : public SVGStyledElement,
   SVGMarkerElement(const QualifiedName&, Document*);
   virtual ~SVGMarkerElement();
 
-  // 'SVGMarkerElement' functions
   void setOrientToAuto();
   void setOrientToAngle(SVGAngle*);
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void notifyAttributeChange() const;
+  virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void childrenChanged();
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource();
@@ -125,5 +126,3 @@ class SVGMarkerElement : public SVGStyledElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

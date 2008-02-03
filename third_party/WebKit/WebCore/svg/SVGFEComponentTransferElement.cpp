@@ -51,7 +51,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEComponentTransferElement,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr.localName(),
+                              SVGNames::inAttr,
                               m_in1)
 
 void SVGFEComponentTransferElement::parseMappedAttribute(

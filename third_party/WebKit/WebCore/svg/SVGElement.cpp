@@ -201,7 +201,7 @@ void SVGElement::insertedIntoDocument() {
     for (; it != end; ++it)
       (*it)->buildPendingResource();
 
-    SVGResource::repaintClients(*clients);
+    SVGResource::invalidateClients(*clients);
   }
 }
 
@@ -239,8 +239,15 @@ bool SVGElement::dispatchEvent(PassRefPtr<Event> e,
   RefPtr<FrameView> view = document()->view();
   return EventTargetNode::dispatchGenericEvent(this, e, ec, tempEvent);
 }
+
+void SVGElement::attributeChanged(Attribute* attr, bool preserveDecls) {
+  ASSERT(attr);
+  if (!attr)
+    return;
+
+  StyledElement::attributeChanged(attr, preserveDecls);
+  svgAttributeChanged(attr->name());
+}
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

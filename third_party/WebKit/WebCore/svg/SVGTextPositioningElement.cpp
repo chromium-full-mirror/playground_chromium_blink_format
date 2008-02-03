@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #if ENABLE(SVG)
 #include "SVGTextPositioningElement.h"
 
@@ -34,11 +35,11 @@ SVGTextPositioningElement::SVGTextPositioningElement(
     const QualifiedName& tagName,
     Document* doc)
     : SVGTextContentElement(tagName, doc),
-      m_x(new SVGLengthList),
-      m_y(new SVGLengthList),
-      m_dx(new SVGLengthList),
-      m_dy(new SVGLengthList),
-      m_rotate(new SVGNumberList) {}
+      m_x(new SVGLengthList(SVGNames::xAttr)),
+      m_y(new SVGLengthList(SVGNames::yAttr)),
+      m_dx(new SVGLengthList(SVGNames::dxAttr)),
+      m_dy(new SVGLengthList(SVGNames::dyAttr)),
+      m_rotate(new SVGNumberList(SVGNames::rotateAttr)) {}
 
 SVGTextPositioningElement::~SVGTextPositioningElement() {}
 
@@ -48,7 +49,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               lengthList,
                               X,
                               x,
-                              SVGNames::xAttr.localName(),
+                              SVGNames::xAttr,
                               m_x.get())
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               SVGLengthList*,
@@ -56,7 +57,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               lengthList,
                               Y,
                               y,
-                              SVGNames::yAttr.localName(),
+                              SVGNames::yAttr,
                               m_y.get())
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               SVGLengthList*,
@@ -64,7 +65,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               lengthList,
                               Dx,
                               dx,
-                              SVGNames::dxAttr.localName(),
+                              SVGNames::dxAttr,
                               m_dx.get())
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               SVGLengthList*,
@@ -72,7 +73,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               lengthList,
                               Dy,
                               dy,
-                              SVGNames::dyAttr.localName(),
+                              SVGNames::dyAttr,
                               m_dy.get())
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               SVGNumberList*,
@@ -80,7 +81,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextPositioningElement,
                               numberList,
                               Rotate,
                               rotate,
-                              SVGNames::rotateAttr.localName(),
+                              SVGNames::rotateAttr,
                               m_rotate.get())
 
 void SVGTextPositioningElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -99,5 +100,4 @@ void SVGTextPositioningElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 }
 
-// vim:ts=4:noet
 #endif  // ENABLE(SVG)

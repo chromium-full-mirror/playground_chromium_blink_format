@@ -21,14 +21,15 @@
 
 #ifndef SVGViewSpec_h
 #define SVGViewSpec_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGFitToViewBox.h"
 #include "SVGZoomAndPan.h"
 
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
+
 class SVGElement;
 class SVGSVGElement;
 class SVGTransformList;
@@ -40,7 +41,6 @@ class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
 
   bool parseViewSpec(const String&);
 
-  // 'SVGViewSpec' functions
   void setTransform(const String&);
   SVGTransformList* transform() const { return m_transform.get(); }
 
@@ -65,5 +65,3 @@ class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

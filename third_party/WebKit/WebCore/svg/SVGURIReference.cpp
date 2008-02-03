@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This library is free software; you can redistribute it and/or
@@ -19,6 +19,7 @@
 */
 
 #include "config.h"
+
 #if ENABLE(SVG)
 #include "SVGURIReference.h"
 
@@ -38,7 +39,7 @@ ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(SVGURIReference,
                                            string,
                                            Href,
                                            href,
-                                           XLinkNames::hrefAttr.localName(),
+                                           XLinkNames::hrefAttr,
                                            m_href)
 
 bool SVGURIReference::parseMappedAttribute(MappedAttribute* attr) {
@@ -48,6 +49,10 @@ bool SVGURIReference::parseMappedAttribute(MappedAttribute* attr) {
   }
 
   return false;
+}
+
+bool SVGURIReference::isKnownAttribute(const QualifiedName& attrName) {
+  return attrName.matches(XLinkNames::hrefAttr);
 }
 
 String SVGURIReference::getTarget(const String& url) {
@@ -64,5 +69,4 @@ String SVGURIReference::getTarget(const String& url) {
 }
 }
 
-// vim:ts=4:noet
 #endif  // ENABLE(SVG)

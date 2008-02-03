@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -42,7 +42,7 @@ JSValue* JSSVGTransformList::clear(ExecState* exec, const List&) {
   imp->clear(ec);
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return jsUndefined();
 }
@@ -57,12 +57,13 @@ JSValue* JSSVGTransformList::initialize(ExecState* exec, const List& args) {
   SVGPODListItem<SVGTransform>* listItem =
       listImp->initialize(new SVGPODListItem<SVGTransform>(newItem), ec).get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -82,7 +83,8 @@ JSValue* JSSVGTransformList::getItem(ExecState* exec, const List& args) {
 
   SVGPODListItem<SVGTransform>* listItem = listImp->getItem(index, ec).get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
@@ -110,12 +112,13 @@ JSValue* JSSVGTransformList::insertItemBefore(ExecState* exec,
                              ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -138,12 +141,13 @@ JSValue* JSSVGTransformList::replaceItem(ExecState* exec, const List& args) {
       listImp->replaceItem(new SVGPODListItem<SVGTransform>(newItem), index, ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -168,7 +172,7 @@ JSValue* JSSVGTransformList::removeItem(ExecState* exec, const List& args) {
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -183,17 +187,16 @@ JSValue* JSSVGTransformList::appendItem(ExecState* exec, const List& args) {
   SVGPODListItem<SVGTransform>* listItem =
       listImp->appendItem(new SVGPODListItem<SVGTransform>(newItem), ec).get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

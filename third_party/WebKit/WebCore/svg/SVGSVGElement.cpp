@@ -92,7 +92,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               length,
                               X,
                               x,
-                              SVGNames::xAttr.localName(),
+                              SVGNames::xAttr,
                               m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               SVGLength,
@@ -100,7 +100,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               length,
                               Y,
                               y,
-                              SVGNames::yAttr.localName(),
+                              SVGNames::yAttr,
                               m_y)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               SVGLength,
@@ -108,7 +108,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               length,
                               Width,
                               width,
-                              SVGNames::widthAttr.localName(),
+                              SVGNames::widthAttr,
                               m_width)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               SVGLength,
@@ -116,7 +116,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               length,
                               Height,
                               height,
-                              SVGNames::heightAttr.localName(),
+                              SVGNames::heightAttr,
                               m_height)
 
 const AtomicString& SVGSVGElement::contentScriptType() const {
@@ -275,15 +275,30 @@ void SVGSVGElement::parseMappedAttribute(MappedAttribute* attr) {
       return;
     if (SVGExternalResourcesRequired::parseMappedAttribute(attr))
       return;
-    if (SVGFitToViewBox::parseMappedAttribute(attr) && renderer()) {
-      renderer()->setNeedsLayout(true);
+    if (SVGFitToViewBox::parseMappedAttribute(attr))
       return;
-    }
     if (SVGZoomAndPan::parseMappedAttribute(attr))
       return;
 
     SVGStyledLocatableElement::parseMappedAttribute(attr);
   }
+}
+
+void SVGSVGElement::svgAttributeChanged(const QualifiedName& attrName) {
+  SVGStyledElement::svgAttributeChanged(attrName);
+
+  if (!renderer())
+    return;
+
+  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
+      SVGTests::isKnownAttribute(attrName) ||
+      SVGLangSpace::isKnownAttribute(attrName) ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
+      SVGFitToViewBox::isKnownAttribute(attrName) ||
+      SVGZoomAndPan::isKnownAttribute(attrName) ||
+      SVGStyledLocatableElement::isKnownAttribute(attrName))
+    renderer()->setNeedsLayout(true);
 }
 
 unsigned long SVGSVGElement::suspendRedraw(
@@ -463,16 +478,6 @@ bool SVGSVGElement::isOutermostSVG() const {
   // This is true whenever this is the outermost SVG, even if there are HTML
   // elements outside it
   return !parentNode()->isSVGElement();
-}
-
-void SVGSVGElement::attributeChanged(Attribute* attr, bool preserveDecls) {
-  if (attr->name() == SVGNames::xAttr || attr->name() == SVGNames::yAttr ||
-      attr->name() == SVGNames::widthAttr ||
-      attr->name() == SVGNames::heightAttr)
-    if (renderer())
-      renderer()->setNeedsLayout(true);
-
-  SVGStyledElement::attributeChanged(attr, preserveDecls);
 }
 
 AffineTransform SVGSVGElement::viewBoxToViewTransform(float viewWidth,

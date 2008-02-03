@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,7 +24,6 @@
 #define SVGPatternElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGPaintServerPattern.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
@@ -34,10 +33,10 @@
 #include "SVGURIReference.h"
 
 namespace WebCore {
+
 struct PatternAttributes;
 
 class SVGLength;
-class SVGPatternElement;
 class SVGTransformList;
 
 class SVGPatternElement : public SVGStyledElement,
@@ -52,9 +51,9 @@ class SVGPatternElement : public SVGStyledElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
-  // 'SVGPatternElement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void notifyAttributeChange() const;
+  virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void childrenChanged();
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource();
@@ -117,5 +116,3 @@ class SVGPatternElement : public SVGStyledElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

@@ -41,6 +41,7 @@ SVGResourceMasker::SVGResourceMasker(const SVGMaskElement* ownerElement)
 SVGResourceMasker::~SVGResourceMasker() {}
 
 void SVGResourceMasker::invalidate() {
+  SVGResource::invalidate();
   m_mask.clear();
 }
 

@@ -63,7 +63,7 @@ TextStream& SVGFEImage::externalRepresentation(TextStream& ts) const {
 
 void SVGFEImage::imageChanged(CachedImage*) {
   if (SVGResourceFilter* filterResource = filter())
-    filterResource->repaintClients();
+    filterResource->invalidate();
 }
 
 }  // namespace WebCore

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #if ENABLE(SVG)
 #include "SVGViewElement.h"
 
@@ -43,7 +44,7 @@ SVGViewElement::~SVGViewElement() {}
 
 SVGStringList* SVGViewElement::viewTarget() const {
   if (!m_viewTarget)
-    m_viewTarget = new SVGStringList();
+    m_viewTarget = new SVGStringList(SVGNames::viewTargetAttr);
 
   return m_viewTarget.get();
 }

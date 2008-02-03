@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -38,7 +38,7 @@ namespace WebCore {
 SVGTextElement::SVGTextElement(const QualifiedName& tagName, Document* doc)
     : SVGTextPositioningElement(tagName, doc),
       SVGTransformable(),
-      m_transform(new SVGTransformList()) {}
+      m_transform(new SVGTransformList(SVGNames::transformAttr)) {}
 
 SVGTextElement::~SVGTextElement() {}
 
@@ -48,7 +48,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextElement,
                               transformList,
                               Transform,
                               transform,
-                              SVGNames::transformAttr.localName(),
+                              SVGNames::transformAttr,
                               m_transform.get())
 
 void SVGTextElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -110,5 +110,3 @@ bool SVGTextElement::childShouldCreateRenderer(Node* child) const {
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

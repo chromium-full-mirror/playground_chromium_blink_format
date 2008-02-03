@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,20 +27,17 @@
 #define SVGResource_h
 
 #if ENABLE(SVG)
-
 #include "PlatformString.h"
-#include <wtf/RefCounted.h>
 #include "StringHash.h"
 
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
+#include <wtf/RefCounted.h>
 
 namespace WebCore {
 
 class AtomicString;
 class Document;
-class RenderPath;
-class SVGDocumentExtensions;
 class SVGStyledElement;
 class TextStream;
 
@@ -75,10 +72,6 @@ class SVGResource : public RefCounted<SVGResource> {
   virtual void invalidate();
 
   void addClient(SVGStyledElement*);
-
-  void repaintClients() const;
-  static void repaintClients(HashSet<SVGStyledElement*>);
-
   virtual SVGResourceType resourceType() const = 0;
 
   bool isPaintServer() const {
@@ -91,6 +84,7 @@ class SVGResource : public RefCounted<SVGResource> {
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
+  static void invalidateClients(HashSet<SVGStyledElement*>);
   static void removeClient(SVGStyledElement*);
 
  private:
@@ -104,5 +98,4 @@ TextStream& operator<<(TextStream&, const SVGResource&);
 }  // namespace WebCore
 
 #endif
-
 #endif  // SVGResource_h

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,14 +24,15 @@
 #define SVGList_h
 
 #if ENABLE(SVG)
-
-#include <wtf/Vector.h>
+#include "ExceptionCode.h"
+#include "SVGListTraits.h"
 
 #include <wtf/RefCounted.h>
-#include "SVGListTraits.h"
-#include "ExceptionCode.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
+
+class QualifiedName;
 
 template <typename Item>
 struct SVGListTypeOperations {
@@ -46,8 +47,14 @@ class SVGList : public RefCounted<SVGList<Item>> {
   typedef SVGListTypeOperations<Item> TypeOperations;
 
  public:
-  SVGList() {}
+  SVGList(const QualifiedName& attributeName)
+      : m_associatedAttributeName(attributeName) {}
+
   virtual ~SVGList() { m_vector.clear(); }
+
+  const QualifiedName& associatedAttributeName() const {
+    return m_associatedAttributeName;
+  }
 
   unsigned int numberOfItems() const { return m_vector.size(); }
   void clear(ExceptionCode&) { m_vector.clear(); }
@@ -118,6 +125,7 @@ class SVGList : public RefCounted<SVGList<Item>> {
 
  private:
   Vector<Item> m_vector;
+  const QualifiedName& m_associatedAttributeName;
 };
 
 template <typename Item>
@@ -140,7 +148,8 @@ class SVGPODListItem : public RefCounted<SVGPODListItem<Item>> {
 template <typename Item>
 class SVGPODList : public SVGList<RefPtr<SVGPODListItem<Item>>> {
  public:
-  SVGPODList() : SVGList<RefPtr<SVGPODListItem<Item>>>() {}
+  SVGPODList(const QualifiedName& attributeName)
+      : SVGList<RefPtr<SVGPODListItem<Item>>>(attributeName) {}
 
   Item initialize(Item newItem, ExceptionCode& ec) {
     SVGPODListItem<Item>* ptr(SVGList<RefPtr<SVGPODListItem<Item>>>::initialize(
@@ -234,5 +243,3 @@ class SVGPODList : public SVGList<RefPtr<SVGPODListItem<Item>>> {
 
 #endif  // ENABLE(SVG)
 #endif  // SVGList_h
-
-// vim:ts=4:noet

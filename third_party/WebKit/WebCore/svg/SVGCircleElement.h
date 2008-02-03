@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,7 +24,6 @@
 #define SVGCircleElement_h
 
 #if ENABLE(SVG)
-
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
@@ -41,9 +40,8 @@ class SVGCircleElement : public SVGStyledTransformableElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
-  // 'SVGCircleElement' functions
-  virtual void parseMappedAttribute(MappedAttribute* attr);
-  virtual void notifyAttributeChange() const;
+  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
 
   virtual Path toPathData() const;
 
@@ -66,5 +64,3 @@ class SVGCircleElement : public SVGStyledTransformableElement,
 
 #endif  // ENABLE(SVG)
 #endif  // SVGCircleElement_h
-
-// vim:ts=4:noet

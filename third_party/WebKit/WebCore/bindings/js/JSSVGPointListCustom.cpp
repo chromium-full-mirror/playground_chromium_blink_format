@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) 2006, 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -42,7 +42,7 @@ JSValue* JSSVGPointList::clear(ExecState* exec, const List&) {
   imp->clear(ec);
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return jsUndefined();
 }
@@ -57,12 +57,13 @@ JSValue* JSSVGPointList::initialize(ExecState* exec, const List& args) {
   SVGPODListItem<FloatPoint>* listItem =
       listImp->initialize(new SVGPODListItem<FloatPoint>(newItem), ec).get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -82,7 +83,8 @@ JSValue* JSSVGPointList::getItem(ExecState* exec, const List& args) {
 
   SVGPODListItem<FloatPoint>* listItem = listImp->getItem(index, ec).get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
@@ -108,12 +110,13 @@ JSValue* JSSVGPointList::insertItemBefore(ExecState* exec, const List& args) {
           ->insertItemBefore(new SVGPODListItem<FloatPoint>(newItem), index, ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -136,12 +139,13 @@ JSValue* JSSVGPointList::replaceItem(ExecState* exec, const List& args) {
       listImp->replaceItem(new SVGPODListItem<FloatPoint>(newItem), index, ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -166,7 +170,7 @@ JSValue* JSSVGPointList::removeItem(ExecState* exec, const List& args) {
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
@@ -181,17 +185,16 @@ JSValue* JSSVGPointList::appendItem(ExecState* exec, const List& args) {
   SVGPODListItem<FloatPoint>* listItem =
       listImp->appendItem(new SVGPODListItem<FloatPoint>(newItem), ec).get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
-      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(listItem);
+      new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
+          listItem, imp->associatedAttributeName());
 
   KJS::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
-  m_context->notifyAttributeChange();
+  m_context->svgAttributeChanged(imp->associatedAttributeName());
 
   return result;
 }
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet
