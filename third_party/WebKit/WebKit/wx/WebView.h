@@ -38,6 +38,7 @@ class WebViewFrameData;
 
 namespace WebCore {
 class ChromeClientWx;
+class FrameLoaderClientWx;
 }
 
 #ifndef SWIG
@@ -54,10 +55,11 @@ class ChromeClientWx;
 #define WXDLLIMPEXP_WEBKIT
 #endif  // SWIG
 
-class WXDLLIMPEXP_WEBKIT wxWebView : public wxScrolledWindow {
+class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   // ChromeClientWx needs to get the Page* stored by the wxWebView
   // for the createWindow function.
   friend class WebCore::ChromeClientWx;
+  friend class WebCore::FrameLoaderClientWx;
 
  public:
 // ctor(s)

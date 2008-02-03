@@ -40,6 +40,10 @@ typedef struct _GtkAdjustment GtkAdjustment;
 typedef struct HRGN__* HRGN;
 #endif
 
+#if PLATFORM(WX)
+class wxScrollWinEvent;
+#endif
+
 namespace WebCore {
 
 class FloatRect;
@@ -244,8 +248,12 @@ class ScrollView : public Widget {
 #if PLATFORM(WX)
   ScrollView();
   ~ScrollView();
+  HashSet<Widget*>* children();
+  virtual void setNativeWindow(wxWindow* window);
 
  private:
+  void adjustScrollbars(int x = -1, int y = -1, bool refresh = true);
+
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
 #endif
