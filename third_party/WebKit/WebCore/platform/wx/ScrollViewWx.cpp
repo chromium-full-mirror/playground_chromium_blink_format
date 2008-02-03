@@ -116,9 +116,8 @@ class ScrollView::ScrollViewPrivate : public wxEvtHandler {
         pos.x -= LINE_STEP;
       else
         pos.y -= LINE_STEP;
-    } else {
+    } else
       return e.Skip();
-    }
 
     m_scrollView->setContentsPos(pos.x, pos.y);
     m_scrollView->update();
@@ -163,9 +162,8 @@ void ScrollView::updateContents(const IntRect& updateRect, bool now) {
 
 void ScrollView::update() {
   wxWindow* win = nativeWindow();
-  if (win) {
+  if (win)
     win->Update();
-  }
 }
 
 int ScrollView::visibleWidth() const {
@@ -226,20 +224,19 @@ void ScrollView::scrollBy(int dx, int dy) {
 
   wxPoint delta(orig - newScrollOffset);
 
-  if (m_data->hasStaticBackground) {
+  if (m_data->hasStaticBackground)
     win->Refresh();
-  } else {
+  else
     win->ScrollWindow(delta.x, delta.y);
-  }
 
-  AdjustScrollbars();
+  adjustScrollbars();
 }
 
 void ScrollView::resizeContents(int w, int h) {
   wxWindow* win = nativeWindow();
   if (win) {
     win->SetVirtualSize(w, h);
-    AdjustScrollbars();
+    adjustScrollbars();
   }
 }
 
@@ -277,7 +274,7 @@ IntSize ScrollView::scrollOffset() const {
   return IntSize(contentsX(), contentsY());
 }
 
-void ScrollView::AdjustScrollbars(int x, int y, bool refresh) {
+void ScrollView::adjustScrollbars(int x, int y, bool refresh) {
   wxWindow* win = nativeWindow();
   if (!win)
     return;
@@ -349,25 +346,25 @@ void ScrollView::setScrollbarsMode(ScrollbarMode newMode) {
 
   if (m_data->vScrollbarMode != newMode) {
     m_data->vScrollbarMode = newMode;
-    AdjustScrollbars();
+    adjustScrollbars();
     needsAdjust = true;
   }
 
   if (needsAdjust)
-    AdjustScrollbars();
+    adjustScrollbars();
 }
 
 void ScrollView::setHScrollbarMode(ScrollbarMode newMode) {
   if (m_data->hScrollbarMode != newMode) {
     m_data->hScrollbarMode = newMode;
-    AdjustScrollbars();
+    adjustScrollbars();
   }
 }
 
 void ScrollView::setVScrollbarMode(ScrollbarMode newMode) {
   if (m_data->vScrollbarMode != newMode) {
     m_data->vScrollbarMode = newMode;
-    AdjustScrollbars();
+    adjustScrollbars();
   }
 }
 
@@ -376,9 +373,8 @@ void ScrollView::setStaticBackground(bool flag) {
 }
 
 void ScrollView::suppressScrollbars(bool suppressed, bool repaintOnSuppress) {
-  if (m_data->suppressScrollbars != suppressed) {
+  if (m_data->suppressScrollbars != suppressed)
     m_data->suppressScrollbars = suppressed;
-  }
 }
 
 IntPoint ScrollView::contentsToWindow(const IntPoint& point) const {
