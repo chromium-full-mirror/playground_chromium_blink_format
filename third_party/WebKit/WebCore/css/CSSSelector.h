@@ -117,6 +117,8 @@ class CSSSelector {
     PseudoFirstOfType,
     PseudoLastChild,
     PseudoLastOfType,
+    PseudoOnlyChild,
+    PseudoOnlyOfType,
     PseudoFirstLine,
     PseudoFirstLetter,
     PseudoLink,
