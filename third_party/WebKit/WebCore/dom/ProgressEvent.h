@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,13 +44,6 @@ class ProgressEvent : public Event {
                          bool lengthComputableArg,
                          unsigned loadedArg,
                          unsigned totalArg);
-  void initProgressEventNS(const AtomicString& namespaceURI,
-                           const AtomicString& typeArg,
-                           bool canBubbleArg,
-                           bool cancelableArg,
-                           bool lengthComputableArg,
-                           unsigned loadedArg,
-                           unsigned totalArg);
 
   bool lengthComputable() const { return m_lengthComputable; }
   unsigned loaded() const { return m_loaded; }

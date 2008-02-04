@@ -1168,8 +1168,7 @@ PassRefPtr<DocumentFragment> Range::createContextualFragment(
   Node* htmlElement = m_startContainer->isHTMLElement()
                           ? m_startContainer.get()
                           : m_startContainer->parentNode();
-
-  if (!htmlElement->isHTMLElement()) {
+  if (!htmlElement || !htmlElement->isHTMLElement()) {
     ec = NOT_SUPPORTED_ERR;
     return 0;
   }

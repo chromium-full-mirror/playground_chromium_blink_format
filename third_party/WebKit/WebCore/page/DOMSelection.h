@@ -62,7 +62,6 @@ class DOMSelection : public RefCounted<DOMSelection> {
                         int extentOffset,
                         ExceptionCode&);
   void setPosition(Node*, int offset, ExceptionCode&);
-  void setPosition(Node*, ExceptionCode&);
   void modify(const String& alter,
               const String& direction,
               const String& granularity);
