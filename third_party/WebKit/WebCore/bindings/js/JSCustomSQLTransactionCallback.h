@@ -30,7 +30,6 @@
 #define JSCustomSQLTransactionCallback_h
 
 #include "SQLTransactionCallback.h"
-#include <wtf/RefPtr.h>
 
 namespace KJS {
 class JSObject;
@@ -48,8 +47,10 @@ class JSCustomSQLTransactionCallback : public SQLTransactionCallback {
   virtual void handleEvent(SQLTransaction*, bool& raisedException);
 
  private:
-  KJS::JSObject* m_callback;
-  RefPtr<Frame> m_frame;
+  static void deleteData(void*);
+
+  class Data;
+  Data* m_data;
 };
 }
 
