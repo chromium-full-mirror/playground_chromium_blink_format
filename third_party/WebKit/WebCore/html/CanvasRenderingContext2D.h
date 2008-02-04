@@ -96,6 +96,12 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
   void scale(float sx, float sy);
   void rotate(float angleInRadians);
   void translate(float tx, float ty);
+  void transform(float m11,
+                 float m12,
+                 float m21,
+                 float m22,
+                 float dx,
+                 float dy);
 
   void setStrokeColor(const String& color);
   void setStrokeColor(float grayLevel);
