@@ -51,6 +51,12 @@ String contextMenuItemTagStop();
 String contextMenuItemTagReload();
 String contextMenuItemTagCut();
 String contextMenuItemTagPaste();
+#if PLATFORM(GTK)
+String contextMenuItemTagDelete();
+String contextMenuItemTagSelectAll();
+String contextMenuItemTagInputMethods();
+String contextMenuItemTagUnicode();
+#endif
 String contextMenuItemTagNoGuessesFound();
 String contextMenuItemTagIgnoreSpelling();
 String contextMenuItemTagLearnSpelling();
