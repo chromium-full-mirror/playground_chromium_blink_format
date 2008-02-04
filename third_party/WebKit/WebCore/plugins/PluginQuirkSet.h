@@ -41,6 +41,7 @@ enum PluginQuirk {
   PluginQuirkDontCallWndProcForSameMessageRecursively = 1 << 6,
   PluginQuirkHasModalMessageLoop = 1 << 7,
   PluginQuirkFlashURLNotifyBug = 1 << 8,
+  PluginQuirkDontClipToZeroRectWhenScrolling = 1 << 9,
 };
 
 class PluginQuirkSet {
