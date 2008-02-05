@@ -40,13 +40,20 @@
 #include <WebKit/IWebFramePrivate.h>
 #include <windows.h>
 
+#define WM_DRT_SEND_QUEUED_EVENT (WM_APP + 1)
+
 static bool down;
 static bool dragMode = true;
 static bool replayingSavedEvents;
 static int timeOffset;
 static POINT lastMousePosition;
 
-static MSG msgQueue[1024];
+struct DelayedMessage {
+  MSG msg;
+  unsigned delay;
+};
+
+static DelayedMessage msgQueue[1024];
 static unsigned endOfQueue;
 static unsigned startOfQueue;
 
@@ -100,7 +107,8 @@ static JSValueRef leapForwardCallback(JSContextRef context,
                                       const JSValueRef arguments[],
                                       JSValueRef* exception) {
   if (argumentCount > 0) {
-    timeOffset += JSValueToNumber(context, arguments[0], exception);
+    msgQueue[endOfQueue].delay =
+        JSValueToNumber(context, arguments[0], exception);
     ASSERT(!exception || !*exception);
   }
 
@@ -125,7 +133,6 @@ static MSG makeMsg(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 static LRESULT dispatchMessage(const MSG* msg) {
   ASSERT(msg);
-
   ::TranslateMessage(msg);
   return ::DispatchMessage(msg);
 }
@@ -165,7 +172,13 @@ static JSValueRef mouseDownCallback(JSContextRef context,
   down = true;
   MSG msg = makeMsg(webViewWindow, WM_LBUTTONDOWN, 0,
                     MAKELPARAM(lastMousePosition.x, lastMousePosition.y));
-  dispatchMessage(&msg);
+  if (!msgQueue[endOfQueue].delay)
+    dispatchMessage(&msg);
+  else {
+    // replaySavedEvents has the required logic to make leapForward delays work
+    msgQueue[endOfQueue++].msg = msg;
+    replaySavedEvents();
+  }
 
   return JSValueMakeUndefined(context);
 }
@@ -192,9 +205,14 @@ static void doMouseUp(MSG msg) {
         SUCCEEDED(webView->QueryInterface(IID_IDropTarget,
                                           (void**)&webViewDropTarget))) {
       POINT screenPoint = msg.pt;
-      ::ClientToScreen(webViewWindow, &screenPoint);
-      HRESULT hr = draggingInfo->dropSource()->QueryContinueDrag(0, 0);
       DWORD effect = 0;
+      ::ClientToScreen(webViewWindow, &screenPoint);
+      if (!didDragEnter) {
+        webViewDropTarget->DragEnter(draggingInfo->dataObject(), 0,
+                                     pointl(screenPoint), &effect);
+        didDragEnter = true;
+      }
+      HRESULT hr = draggingInfo->dropSource()->QueryContinueDrag(0, 0);
       webViewDropTarget->DragOver(0, pointl(screenPoint), &effect);
       if (hr == DRAGDROP_S_DROP && effect != DROPEFFECT_NONE) {
         DWORD effect = 0;
@@ -218,8 +236,8 @@ static JSValueRef mouseUpCallback(JSContextRef context,
   MSG msg = makeMsg(webViewWindow, WM_LBUTTONUP, 0,
                     MAKELPARAM(lastMousePosition.x, lastMousePosition.y));
 
-  if (dragMode && !replayingSavedEvents) {
-    msgQueue[endOfQueue++] = msg;
+  if ((dragMode && !replayingSavedEvents) || msgQueue[endOfQueue].delay) {
+    msgQueue[endOfQueue++].msg = msg;
     replaySavedEvents();
   } else
     doMouseUp(msg);
@@ -247,12 +265,11 @@ static void doMouseMove(MSG msg) {
       if (didDragEnter)
         webViewDropTarget->DragOver(MK_LBUTTON, pointl(screenPoint), &effect);
       else {
-        webViewDropTarget->DragEnter(draggingInfo->dataObject(), MK_LBUTTON,
+        webViewDropTarget->DragEnter(draggingInfo->dataObject(), 0,
                                      pointl(screenPoint), &effect);
         didDragEnter = true;
       }
       draggingInfo->dropSource()->GiveFeedback(effect);
-      replaySavedEvents();
     }
   }
 }
@@ -275,7 +292,7 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
                     MAKELPARAM(lastMousePosition.x, lastMousePosition.y));
 
   if (dragMode && down && !replayingSavedEvents) {
-    msgQueue[endOfQueue++] = msg;
+    msgQueue[endOfQueue++].msg = msg;
     return JSValueMakeUndefined(context);
   }
 
@@ -287,9 +304,10 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
 void replaySavedEvents() {
   replayingSavedEvents = true;
 
-  MSG emptyMsg = {0};
-  while (startOfQueue < endOfQueue) {
-    MSG msg = msgQueue[startOfQueue++];
+  MSG msg = {0};
+
+  while (startOfQueue < endOfQueue && !msgQueue[startOfQueue].delay) {
+    msg = msgQueue[startOfQueue++].msg;
     switch (msg.message) {
       case WM_LBUTTONUP:
         doMouseUp(msg);
@@ -297,10 +315,58 @@ void replaySavedEvents() {
       case WM_MOUSEMOVE:
         doMouseMove(msg);
         break;
+      case WM_LBUTTONDOWN:
+        dispatchMessage(&msg);
+        break;
       default:
         // Not reached
         break;
     }
+  }
+
+  int numQueuedMessages = endOfQueue - startOfQueue;
+  if (!numQueuedMessages) {
+    startOfQueue = 0;
+    endOfQueue = 0;
+    replayingSavedEvents = false;
+    ASSERT(!down);
+    return;
+  }
+
+  if (msgQueue[startOfQueue].delay) {
+    ::Sleep(msgQueue[startOfQueue].delay);
+    msgQueue[startOfQueue].delay = 0;
+  }
+
+  ::PostMessage(webViewWindow, WM_DRT_SEND_QUEUED_EVENT, 0, 0);
+  while (::GetMessage(&msg, webViewWindow, 0, 0)) {
+    // FIXME: Why do we get a WM_MOUSELEAVE? it breaks tests
+    if (msg.message == WM_MOUSELEAVE)
+      continue;
+    if (msg.message != WM_DRT_SEND_QUEUED_EVENT) {
+      dispatchMessage(&msg);
+      continue;
+    }
+    msg = msgQueue[startOfQueue++].msg;
+    switch (msg.message) {
+      case WM_LBUTTONUP:
+        doMouseUp(msg);
+        break;
+      case WM_MOUSEMOVE:
+        doMouseMove(msg);
+        break;
+      case WM_LBUTTONDOWN:
+        dispatchMessage(&msg);
+        break;
+      default:
+        // Not reached
+        break;
+    }
+    if (startOfQueue >= endOfQueue)
+      break;
+    ::Sleep(msgQueue[startOfQueue].delay);
+    msgQueue[startOfQueue].delay = 0;
+    ::PostMessage(webViewWindow, WM_DRT_SEND_QUEUED_EVENT, 0, 0);
   }
   startOfQueue = 0;
   endOfQueue = 0;
