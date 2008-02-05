@@ -20,7 +20,7 @@
    sheets and html
     pages from the web. It has a memory cache for these objects.
 */
-#include "PlugInInfoStore.h"
+#include "PluginInfoStore.h"
 #include "qdebug.h"
 #if QT_VERSION < 0x040400
 #include "qwebobjectplugin_p.h"
@@ -29,8 +29,8 @@
 
 namespace WebCore {
 
-PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned i) {
-// qDebug() << ">>>>>>>>>>> PlugInInfoStore::createPluginInfoForPluginAtIndex("
+PluginInfo* PluginInfoStore::createPluginInfoForPluginAtIndex(unsigned i) {
+// qDebug() << ">>>>>>>>>>> PluginInfoStore::createPluginInfoForPluginAtIndex("
 // << i << ")";
 
 #if QT_VERSION < 0x040400
@@ -55,9 +55,9 @@ PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned i) {
 #endif
 }
 
-unsigned PlugInInfoStore::pluginCount() const {
+unsigned PluginInfoStore::pluginCount() const {
 #if QT_VERSION < 0x040400
-  // qDebug() << ">>>>>>>>>>> PlugInInfoStore::count =" <<
+  // qDebug() << ">>>>>>>>>>> PluginInfoStore::count =" <<
   // QWebFactoryLoader::self()->keys().count();
   return QWebFactoryLoader::self()->keys().count();
 #else
@@ -65,20 +65,20 @@ unsigned PlugInInfoStore::pluginCount() const {
 #endif
 }
 
-String PlugInInfoStore::pluginNameForMIMEType(const String& mimeType) {
+String PluginInfoStore::pluginNameForMIMEType(const String& mimeType) {
   // FIXME: This method is stubbed out and should really return the name of a
   // plug-in package for
   // a given MIME type.
   return String();
 }
 
-bool PlugInInfoStore::supportsMIMEType(const WebCore::String& string) {
+bool PluginInfoStore::supportsMIMEType(const WebCore::String& string) {
 #if QT_VERSION < 0x040400
   bool supports = QWebFactoryLoader::self()->supportsMimeType(string);
 #else
   bool supports = false;
 #endif
-  // qDebug() << ">>>>>>>>>>> PlugInInfoStore::supportsMIMEType(" << string <<
+  // qDebug() << ">>>>>>>>>>> PluginInfoStore::supportsMIMEType(" << string <<
   // ") =" << supports;
   return supports;
 }

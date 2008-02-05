@@ -24,34 +24,34 @@
  */
 
 #include "config.h"
-#include "PluginDatabaseWin.h"
+#include "PluginDatabase.h"
 
-#include "PluginPackageWin.h"
-#include "PluginViewWin.h"
+#include "PluginPackage.h"
+#include "PluginView.h"
 #include "Frame.h"
 #include <windows.h>
 #include <shlwapi.h>
 
 namespace WebCore {
 
-PluginDatabaseWin* PluginDatabaseWin::installedPlugins() {
-  static PluginDatabaseWin* plugins = 0;
+PluginDatabase* PluginDatabase::installedPlugins() {
+  static PluginDatabase* plugins = 0;
 
   if (!plugins) {
-    plugins = new PluginDatabaseWin;
-    plugins->setPluginPaths(PluginDatabaseWin::defaultPluginPaths());
+    plugins = new PluginDatabase;
+    plugins->setPluginPaths(PluginDatabase::defaultPluginPaths());
     plugins->refresh();
   }
 
   return plugins;
 }
 
-void PluginDatabaseWin::addExtraPluginPath(const String& path) {
+void PluginDatabase::addExtraPluginPath(const String& path) {
   m_pluginPaths.append(path);
   refresh();
 }
 
-bool PluginDatabaseWin::refresh() {
+bool PluginDatabase::refresh() {
   PluginSet newPlugins;
 
   bool pluginSetChanged = false;
@@ -109,8 +109,8 @@ bool PluginDatabaseWin::refresh() {
   return pluginSetChanged;
 }
 
-Vector<PluginPackageWin*> PluginDatabaseWin::plugins() const {
-  Vector<PluginPackageWin*> result;
+Vector<PluginPackage*> PluginDatabase::plugins() const {
+  Vector<PluginPackage*> result;
 
   PluginSet::const_iterator end = m_plugins.end();
   for (PluginSet::const_iterator it = m_plugins.begin(); it != end; ++it)
@@ -151,7 +151,7 @@ static inline void addPluginsFromRegistry(HKEY rootKey, PluginSet& plugins) {
     if (GetFileAttributesEx(pathStr, GetFileExInfoStandard, &attributes) == 0)
       continue;
 
-    PluginPackageWin* package = PluginPackageWin::createPackage(
+    PluginPackage* package = PluginPackage::createPackage(
         String(pathStr, pathStrSize / sizeof(WCHAR) - 1),
         attributes.ftLastWriteTime);
 
@@ -162,7 +162,7 @@ static inline void addPluginsFromRegistry(HKEY rootKey, PluginSet& plugins) {
   RegCloseKey(key);
 }
 
-PluginSet PluginDatabaseWin::getPluginsInPaths() const {
+PluginSet PluginDatabase::getPluginsInPaths() const {
   // FIXME: This should be a case insensitive set.
   HashSet<String> uniqueFilenames;
   PluginSet plugins;
@@ -170,8 +170,8 @@ PluginSet PluginDatabaseWin::getPluginsInPaths() const {
   HANDLE hFind = INVALID_HANDLE_VALUE;
   WIN32_FIND_DATAW findFileData;
 
-  PluginPackageWin* oldWMPPlugin = 0;
-  PluginPackageWin* newWMPPlugin = 0;
+  PluginPackage* oldWMPPlugin = 0;
+  PluginPackage* newWMPPlugin = 0;
 
   Vector<String>::const_iterator end = m_pluginPaths.end();
   for (Vector<String>::const_iterator it = m_pluginPaths.begin(); it != end;
@@ -200,8 +200,8 @@ PluginSet PluginDatabaseWin::getPluginsInPaths() const {
       if (!uniqueFilenames.add(fullPath).second)
         continue;
 
-      PluginPackageWin* pluginPackage = PluginPackageWin::createPackage(
-          fullPath, findFileData.ftLastWriteTime);
+      PluginPackage* pluginPackage =
+          PluginPackage::createPackage(fullPath, findFileData.ftLastWriteTime);
 
       if (pluginPackage) {
         plugins.add(pluginPackage);
@@ -450,7 +450,7 @@ static inline void addMacromediaPluginPaths(Vector<String>& paths) {
   paths.append(macromediaDirectoryStr);
 }
 
-Vector<String> PluginDatabaseWin::defaultPluginPaths() {
+Vector<String> PluginDatabase::defaultPluginPaths() {
   Vector<String> paths;
   String ourPath = safariPluginsPath();
 
@@ -465,7 +465,7 @@ Vector<String> PluginDatabaseWin::defaultPluginPaths() {
   return paths;
 }
 
-bool PluginDatabaseWin::isMIMETypeRegistered(const String& mimeType) {
+bool PluginDatabase::isMIMETypeRegistered(const String& mimeType) {
   if (mimeType.isNull())
     return false;
   if (m_registeredMIMETypes.contains(mimeType))
@@ -474,13 +474,13 @@ bool PluginDatabaseWin::isMIMETypeRegistered(const String& mimeType) {
   return (refresh() && m_registeredMIMETypes.contains(mimeType));
 }
 
-PluginPackageWin* PluginDatabaseWin::pluginForMIMEType(const String& mimeType) {
+PluginPackage* PluginDatabase::pluginForMIMEType(const String& mimeType) {
   if (mimeType.isEmpty())
     return 0;
 
   String key = mimeType.lower();
   String ourPath = safariPluginsPath();
-  PluginPackageWin* plugin = 0;
+  PluginPackage* plugin = 0;
   PluginSet::const_iterator end = m_plugins.end();
 
   for (PluginSet::const_iterator it = m_plugins.begin(); it != end; ++it) {
@@ -495,14 +495,14 @@ PluginPackageWin* PluginDatabaseWin::pluginForMIMEType(const String& mimeType) {
   return plugin;
 }
 
-String PluginDatabaseWin::MIMETypeForExtension(const String& extension) const {
+String PluginDatabase::MIMETypeForExtension(const String& extension) const {
   if (extension.isEmpty())
     return String();
 
   PluginSet::const_iterator end = m_plugins.end();
   String ourPath = safariPluginsPath();
   String mimeType;
-  PluginPackageWin* plugin = 0;
+  PluginPackage* plugin = 0;
 
   for (PluginSet::const_iterator it = m_plugins.begin(); it != end; ++it) {
     MIMEToExtensionsMap::const_iterator mime_end =
@@ -527,9 +527,8 @@ String PluginDatabaseWin::MIMETypeForExtension(const String& extension) const {
   return mimeType;
 }
 
-PluginPackageWin* PluginDatabaseWin::findPlugin(const KURL& url,
-                                                String& mimeType) {
-  PluginPackageWin* plugin = pluginForMIMEType(mimeType);
+PluginPackage* PluginDatabase::findPlugin(const KURL& url, String& mimeType) {
+  PluginPackage* plugin = pluginForMIMEType(mimeType);
   String filename = url.string();
 
   if (!plugin) {
@@ -551,20 +550,19 @@ PluginPackageWin* PluginDatabaseWin::findPlugin(const KURL& url,
   return plugin;
 }
 
-PluginViewWin* PluginDatabaseWin::createPluginView(
-    Frame* parentFrame,
-    const IntSize& size,
-    Element* element,
-    const KURL& url,
-    const Vector<String>& paramNames,
-    const Vector<String>& paramValues,
-    const String& mimeType,
-    bool loadManually) {
+PluginView* PluginDatabase::createPluginView(Frame* parentFrame,
+                                             const IntSize& size,
+                                             Element* element,
+                                             const KURL& url,
+                                             const Vector<String>& paramNames,
+                                             const Vector<String>& paramValues,
+                                             const String& mimeType,
+                                             bool loadManually) {
   // if we fail to find a plugin for this MIME type, findPlugin will search for
   // a plugin by the file extension and update the MIME type, so pass a mutable
   // String
   String mimeTypeCopy = mimeType;
-  PluginPackageWin* plugin = findPlugin(url, mimeTypeCopy);
+  PluginPackage* plugin = findPlugin(url, mimeTypeCopy);
 
   // No plugin was found, try refreshing the database and searching again
   if (!plugin && refresh()) {
@@ -572,7 +570,7 @@ PluginViewWin* PluginDatabaseWin::createPluginView(
     plugin = findPlugin(url, mimeTypeCopy);
   }
 
-  return new PluginViewWin(parentFrame, size, plugin, element, url, paramNames,
-                           paramValues, mimeTypeCopy, loadManually);
+  return new PluginView(parentFrame, size, plugin, element, url, paramNames,
+                        paramValues, mimeTypeCopy, loadManually);
 }
 }

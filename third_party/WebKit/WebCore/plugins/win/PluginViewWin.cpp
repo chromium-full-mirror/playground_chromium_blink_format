@@ -25,7 +25,7 @@
  */
 
 #include "config.h"
-#include "PluginViewWin.h"
+#include "PluginView.h"
 
 #include "Document.h"
 #include "DocumentLoader.h"
@@ -47,12 +47,12 @@
 #include "Page.h"
 #include "FocusController.h"
 #include "PlatformMouseEvent.h"
-#include "PluginPackageWin.h"
+#include "PluginPackage.h"
 #include "kjs_binding.h"
 #include "kjs_proxy.h"
 #include "kjs_window.h"
 #include "PluginDebug.h"
-#include "PluginPackageWin.h"
+#include "PluginPackage.h"
 #include "npruntime_impl.h"
 #include "runtime_root.h"
 #include "Settings.h"
@@ -76,12 +76,12 @@ namespace WebCore {
 using namespace EventNames;
 using namespace HTMLNames;
 
-class PluginRequestWin {
+class PluginRequest {
  public:
-  PluginRequestWin(const FrameLoadRequest& frameLoadRequest,
-                   bool sendNotification,
-                   void* notifyData,
-                   bool shouldAllowPopups)
+  PluginRequest(const FrameLoadRequest& frameLoadRequest,
+                bool sendNotification,
+                void* notifyData,
+                bool shouldAllowPopups)
       : m_frameLoadRequest(frameLoadRequest),
         m_notifyData(notifyData),
         m_sendNotification(sendNotification),
@@ -107,7 +107,7 @@ static int s_callingPlugin;
 
 class PluginMessageThrottlerWin {
  public:
-  PluginMessageThrottlerWin(PluginViewWin* pluginView)
+  PluginMessageThrottlerWin(PluginView* pluginView)
       : m_back(0),
         m_front(0),
         m_pluginView(pluginView),
@@ -199,7 +199,7 @@ class PluginMessageThrottlerWin {
       delete message;
   }
 
-  PluginViewWin* m_pluginView;
+  PluginView* m_pluginView;
   PluginMessage* m_back;
   PluginMessage* m_front;
 
@@ -218,9 +218,9 @@ static String scriptStringIfJavaScriptURL(const KURL& url) {
   return KURL::decode_string(url.deprecatedString().mid(11));
 }
 
-PluginViewWin* PluginViewWin::s_currentPluginView = 0;
+PluginView* PluginView::s_currentPluginView = 0;
 
-const LPCWSTR kWebPluginViewWindowClassName = L"WebPluginView";
+const LPCWSTR kWebPluginViewdowClassName = L"WebPluginView";
 const LPCWSTR kWebPluginViewProperty = L"WebPluginViewProperty";
 
 static const char* MozillaUserAgent =
@@ -254,7 +254,7 @@ static bool registerPluginView() {
   wcex.hCursor = LoadCursor(0, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)COLOR_WINDOW;
   wcex.lpszMenuName = 0;
-  wcex.lpszClassName = kWebPluginViewWindowClassName;
+  wcex.lpszClassName = kWebPluginViewdowClassName;
   wcex.hIconSm = 0;
 
   return !!RegisterClassEx(&wcex);
@@ -264,13 +264,13 @@ static LRESULT CALLBACK PluginViewWndProc(HWND hWnd,
                                           UINT message,
                                           WPARAM wParam,
                                           LPARAM lParam) {
-  PluginViewWin* pluginView =
-      reinterpret_cast<PluginViewWin*>(GetProp(hWnd, kWebPluginViewProperty));
+  PluginView* pluginView =
+      reinterpret_cast<PluginView*>(GetProp(hWnd, kWebPluginViewProperty));
 
   return pluginView->wndProc(hWnd, message, wParam, lParam);
 }
 
-void PluginViewWin::popPopupsStateTimerFired(Timer<PluginViewWin>*) {
+void PluginView::popPopupsStateTimerFired(Timer<PluginView>*) {
   popPopupsEnabledState();
 }
 
@@ -287,7 +287,7 @@ static bool isWindowsMessageUserGesture(UINT message) {
 }
 
 LRESULT
-PluginViewWin::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+PluginView::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   // <rdar://5711136> Sometimes Flash will call SetCapture before creating
   // a full-screen window and will not release it, which causes the
   // full-screen window to never receive mouse events. We set/release capture
@@ -344,7 +344,7 @@ PluginViewWin::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   return result;
 }
 
-void PluginViewWin::updateWindow() const {
+void PluginView::updateWindow() const {
   if (!parent())
     return;
 
@@ -395,7 +395,7 @@ void PluginViewWin::updateWindow() const {
   }
 }
 
-IntRect PluginViewWin::windowClipRect() const {
+IntRect PluginView::windowClipRect() const {
   // Start by clipping to our bounds.
   IntRect clipRect(m_windowRect);
 
@@ -408,7 +408,7 @@ IntRect PluginViewWin::windowClipRect() const {
   return clipRect;
 }
 
-void PluginViewWin::setFrameGeometry(const IntRect& rect) {
+void PluginView::setFrameGeometry(const IntRect& rect) {
   if (m_element->document()->printing())
     return;
 
@@ -419,18 +419,18 @@ void PluginViewWin::setFrameGeometry(const IntRect& rect) {
   setNPWindowRect(rect);
 }
 
-void PluginViewWin::geometryChanged() const {
+void PluginView::geometryChanged() const {
   updateWindow();
 }
 
-void PluginViewWin::setFocus() {
+void PluginView::setFocus() {
   if (m_window)
     SetFocus(m_window);
 
   Widget::setFocus();
 }
 
-void PluginViewWin::show() {
+void PluginView::show() {
   m_isVisible = true;
 
   if (m_attachedToWindow && m_window)
@@ -439,7 +439,7 @@ void PluginViewWin::show() {
   Widget::show();
 }
 
-void PluginViewWin::hide() {
+void PluginView::hide() {
   m_isVisible = false;
 
   if (m_attachedToWindow && m_window)
@@ -448,8 +448,8 @@ void PluginViewWin::hide() {
   Widget::hide();
 }
 
-void PluginViewWin::paintMissingPluginIcon(GraphicsContext* context,
-                                           const IntRect& rect) {
+void PluginView::paintMissingPluginIcon(GraphicsContext* context,
+                                        const IntRect& rect) {
   static Image* nullPluginImage;
   if (!nullPluginImage)
     nullPluginImage = Image::loadPlatformResource("nullPlugin");
@@ -471,7 +471,7 @@ void PluginViewWin::paintMissingPluginIcon(GraphicsContext* context,
   context->restore();
 }
 
-bool PluginViewWin::dispatchNPEvent(NPEvent& npEvent) {
+bool PluginView::dispatchNPEvent(NPEvent& npEvent) {
   if (!m_plugin->pluginFuncs()->event)
     return true;
 
@@ -494,7 +494,7 @@ bool PluginViewWin::dispatchNPEvent(NPEvent& npEvent) {
   return result;
 }
 
-void PluginViewWin::paint(GraphicsContext* context, const IntRect& rect) {
+void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
   if (!m_isStarted) {
     // Draw the "missing plugin" image
     paintMissingPluginIcon(context, rect);
@@ -554,7 +554,7 @@ void PluginViewWin::paint(GraphicsContext* context, const IntRect& rect) {
   context->releaseWindowsContext(hdc, frameGeometry(), m_isTransparent);
 }
 
-void PluginViewWin::handleKeyboardEvent(KeyboardEvent* event) {
+void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
   NPEvent npEvent;
 
   npEvent.wParam = event->keyCode();
@@ -575,7 +575,7 @@ void PluginViewWin::handleKeyboardEvent(KeyboardEvent* event) {
 extern HCURSOR lastSetCursor;
 extern bool ignoreNextSetCursor;
 
-void PluginViewWin::handleMouseEvent(MouseEvent* event) {
+void PluginView::handleMouseEvent(MouseEvent* event) {
   NPEvent npEvent;
 
   IntPoint p = static_cast<FrameView*>(parent())->contentsToWindow(
@@ -649,7 +649,7 @@ void PluginViewWin::handleMouseEvent(MouseEvent* event) {
   lastSetCursor = ::GetCursor();
 }
 
-void PluginViewWin::handleEvent(Event* event) {
+void PluginView::handleEvent(Event* event) {
   if (!m_plugin || m_isWindowed)
     return;
 
@@ -659,7 +659,7 @@ void PluginViewWin::handleEvent(Event* event) {
     handleKeyboardEvent(static_cast<KeyboardEvent*>(event));
 }
 
-void PluginViewWin::setParent(ScrollView* parent) {
+void PluginView::setParent(ScrollView* parent) {
   Widget::setParent(parent);
 
   if (parent)
@@ -678,7 +678,7 @@ void PluginViewWin::setParent(ScrollView* parent) {
   }
 }
 
-void PluginViewWin::attachToWindow() {
+void PluginView::attachToWindow() {
   if (m_attachedToWindow)
     return;
 
@@ -687,7 +687,7 @@ void PluginViewWin::attachToWindow() {
     ShowWindow(m_window, SW_SHOWNA);
 }
 
-void PluginViewWin::detachFromWindow() {
+void PluginView::detachFromWindow() {
   if (!m_attachedToWindow)
     return;
 
@@ -696,7 +696,7 @@ void PluginViewWin::detachFromWindow() {
   m_attachedToWindow = false;
 }
 
-void PluginViewWin::setNPWindowRect(const IntRect& rect) {
+void PluginView::setNPWindowRect(const IntRect& rect) {
   if (!m_isStarted)
     return;
 
@@ -731,7 +731,7 @@ void PluginViewWin::setNPWindowRect(const IntRect& rect) {
   }
 }
 
-bool PluginViewWin::start() {
+bool PluginView::start() {
   if (m_isStarted)
     return false;
 
@@ -739,7 +739,7 @@ bool PluginViewWin::start() {
   ASSERT(m_plugin->pluginFuncs()->newp);
 
   NPError npErr;
-  PluginViewWin::setCurrentPluginView(this);
+  PluginView::setCurrentPluginView(this);
   {
     KJS::JSLock::DropAllLocks dropAllLocks;
     setCallingPlugin(true);
@@ -749,7 +749,7 @@ bool PluginViewWin::start() {
     setCallingPlugin(false);
     LOG_NPERROR(npErr);
   }
-  PluginViewWin::setCurrentPluginView(0);
+  PluginView::setCurrentPluginView(0);
 
   if (npErr != NPERR_NO_ERROR)
     return false;
@@ -766,7 +766,7 @@ bool PluginViewWin::start() {
   return true;
 }
 
-void PluginViewWin::stop() {
+void PluginView::stop() {
   if (!m_isStarted)
     return;
 
@@ -816,11 +816,11 @@ void PluginViewWin::stop() {
   m_instance->pdata = 0;
 }
 
-void PluginViewWin::setCurrentPluginView(PluginViewWin* pluginView) {
+void PluginView::setCurrentPluginView(PluginView* pluginView) {
   s_currentPluginView = pluginView;
 }
 
-PluginViewWin* PluginViewWin::currentPluginView() {
+PluginView* PluginView::currentPluginView() {
   return s_currentPluginView;
 }
 
@@ -856,7 +856,7 @@ static bool getString(KJSProxy* proxy, JSValue* result, String& string) {
   return true;
 }
 
-void PluginViewWin::performRequest(PluginRequestWin* request) {
+void PluginView::performRequest(PluginRequest* request) {
   // don't let a plugin start any loads if it is no longer part of a document
   // that is being
   // displayed unless the loads are in the same frame as the plugin.
@@ -926,11 +926,11 @@ void PluginViewWin::performRequest(PluginRequestWin* request) {
   }
 }
 
-void PluginViewWin::requestTimerFired(Timer<PluginViewWin>* timer) {
+void PluginView::requestTimerFired(Timer<PluginView>* timer) {
   ASSERT(timer == &m_requestTimer);
   ASSERT(m_requests.size() > 0);
 
-  PluginRequestWin* request = m_requests[0];
+  PluginRequest* request = m_requests[0];
   m_requests.remove(0);
 
   // Schedule a new request before calling performRequest since the call to
@@ -942,14 +942,14 @@ void PluginViewWin::requestTimerFired(Timer<PluginViewWin>* timer) {
   delete request;
 }
 
-void PluginViewWin::scheduleRequest(PluginRequestWin* request) {
+void PluginView::scheduleRequest(PluginRequest* request) {
   m_requests.append(request);
   m_requestTimer.startOneShot(0);
 }
 
-NPError PluginViewWin::load(const FrameLoadRequest& frameLoadRequest,
-                            bool sendNotification,
-                            void* notifyData) {
+NPError PluginView::load(const FrameLoadRequest& frameLoadRequest,
+                         bool sendNotification,
+                         void* notifyData) {
   ASSERT(frameLoadRequest.resourceRequest().httpMethod() == "GET" ||
          frameLoadRequest.resourceRequest().httpMethod() == "POST");
 
@@ -977,8 +977,8 @@ NPError PluginViewWin::load(const FrameLoadRequest& frameLoadRequest,
     }
   }
 
-  PluginRequestWin* request = new PluginRequestWin(
-      frameLoadRequest, sendNotification, notifyData, arePopupsAllowed());
+  PluginRequest* request = new PluginRequest(frameLoadRequest, sendNotification,
+                                             notifyData, arePopupsAllowed());
   scheduleRequest(request);
 
   return NPERR_NO_ERROR;
@@ -994,9 +994,9 @@ static KURL makeURL(const KURL& baseURL, const char* relativeURLString) {
   return KURL(baseURL, urlString);
 }
 
-NPError PluginViewWin::getURLNotify(const char* url,
-                                    const char* target,
-                                    void* notifyData) {
+NPError PluginView::getURLNotify(const char* url,
+                                 const char* target,
+                                 void* notifyData) {
   FrameLoadRequest frameLoadRequest;
 
   frameLoadRequest.setFrameName(target);
@@ -1006,7 +1006,7 @@ NPError PluginViewWin::getURLNotify(const char* url,
   return load(frameLoadRequest, true, notifyData);
 }
 
-NPError PluginViewWin::getURL(const char* url, const char* target) {
+NPError PluginView::getURL(const char* url, const char* target) {
   FrameLoadRequest frameLoadRequest;
 
   frameLoadRequest.setFrameName(target);
@@ -1171,14 +1171,14 @@ static inline HTTPHeaderMap parseRFC822HeaderFields(const Vector<char>& buffer,
   return headerFields;
 }
 
-NPError PluginViewWin::handlePost(const char* url,
-                                  const char* target,
-                                  uint32 len,
-                                  const char* buf,
-                                  bool file,
-                                  void* notifyData,
-                                  bool sendNotification,
-                                  bool allowHeaders) {
+NPError PluginView::handlePost(const char* url,
+                               const char* target,
+                               uint32 len,
+                               const char* buf,
+                               bool file,
+                               void* notifyData,
+                               bool sendNotification,
+                               bool allowHeaders) {
   if (!url || !len || !buf)
     return NPERR_INVALID_PARAM;
 
@@ -1265,40 +1265,40 @@ NPError PluginViewWin::handlePost(const char* url,
   return load(frameLoadRequest, sendNotification, notifyData);
 }
 
-NPError PluginViewWin::postURLNotify(const char* url,
-                                     const char* target,
-                                     uint32 len,
-                                     const char* buf,
-                                     NPBool file,
-                                     void* notifyData) {
+NPError PluginView::postURLNotify(const char* url,
+                                  const char* target,
+                                  uint32 len,
+                                  const char* buf,
+                                  NPBool file,
+                                  void* notifyData) {
   return handlePost(url, target, len, buf, file, notifyData, true, true);
 }
 
-NPError PluginViewWin::postURL(const char* url,
-                               const char* target,
-                               uint32 len,
-                               const char* buf,
-                               NPBool file) {
+NPError PluginView::postURL(const char* url,
+                            const char* target,
+                            uint32 len,
+                            const char* buf,
+                            NPBool file) {
   // As documented, only allow headers to be specified via NPP_PostURL when
   // using a file.
   return handlePost(url, target, len, buf, file, 0, false, file);
 }
 
-NPError PluginViewWin::newStream(NPMIMEType type,
-                                 const char* target,
-                                 NPStream** stream) {
+NPError PluginView::newStream(NPMIMEType type,
+                              const char* target,
+                              NPStream** stream) {
   notImplemented();
   // Unsupported
   return NPERR_GENERIC_ERROR;
 }
 
-int32 PluginViewWin::write(NPStream* stream, int32 len, void* buffer) {
+int32 PluginView::write(NPStream* stream, int32 len, void* buffer) {
   notImplemented();
   // Unsupported
   return -1;
 }
 
-NPError PluginViewWin::destroyStream(NPStream* stream, NPReason reason) {
+NPError PluginView::destroyStream(NPStream* stream, NPReason reason) {
   PluginStream* browserStream = static_cast<PluginStream*>(stream->ndata);
 
   if (!stream || PluginStream::ownerForStream(stream) != m_instance)
@@ -1308,7 +1308,7 @@ NPError PluginViewWin::destroyStream(NPStream* stream, NPReason reason) {
   return NPERR_NO_ERROR;
 }
 
-const char* PluginViewWin::userAgent() {
+const char* PluginView::userAgent() {
   if (m_quirks.contains(PluginQuirkWantsMozillaUserAgent))
     return MozillaUserAgent;
 
@@ -1317,14 +1317,14 @@ const char* PluginViewWin::userAgent() {
   return m_userAgent.data();
 }
 
-void PluginViewWin::status(const char* message) {
+void PluginView::status(const char* message) {
   String s = DeprecatedString::fromLatin1(message);
 
   if (Page* page = m_parentFrame->page())
     page->chrome()->setStatusbarText(m_parentFrame, s);
 }
 
-NPError PluginViewWin::getValue(NPNVariable variable, void* value) {
+NPError PluginView::getValue(NPNVariable variable, void* value) {
   switch (variable) {
     case NPNVWindowNPObject: {
       NPObject* windowScriptObject = m_parentFrame->windowScriptNPObject();
@@ -1371,7 +1371,7 @@ NPError PluginViewWin::getValue(NPNVariable variable, void* value) {
   }
 }
 
-NPError PluginViewWin::setValue(NPPVariable variable, void* value) {
+NPError PluginView::setValue(NPPVariable variable, void* value) {
   switch (variable) {
     case NPPVpluginWindowBool:
       m_isWindowed = value;
@@ -1385,7 +1385,7 @@ NPError PluginViewWin::setValue(NPPVariable variable, void* value) {
   }
 }
 
-void PluginViewWin::invalidateTimerFired(Timer<PluginViewWin>* timer) {
+void PluginView::invalidateTimerFired(Timer<PluginView>* timer) {
   ASSERT(timer == &m_invalidateTimer);
 
   for (unsigned i = 0; i < m_invalidRects.size(); i++)
@@ -1393,7 +1393,7 @@ void PluginViewWin::invalidateTimerFired(Timer<PluginViewWin>* timer) {
   m_invalidRects.clear();
 }
 
-void PluginViewWin::invalidateRect(NPRect* rect) {
+void PluginView::invalidateRect(NPRect* rect) {
   if (!rect) {
     invalidate();
     return;
@@ -1415,7 +1415,7 @@ void PluginViewWin::invalidateRect(NPRect* rect) {
   }
 }
 
-void PluginViewWin::invalidateRegion(NPRegion region) {
+void PluginView::invalidateRegion(NPRegion region) {
   if (m_isWindowed)
     return;
 
@@ -1429,29 +1429,29 @@ void PluginViewWin::invalidateRegion(NPRegion region) {
   Widget::invalidateRect(r);
 }
 
-void PluginViewWin::forceRedraw() {
+void PluginView::forceRedraw() {
   if (m_isWindowed)
     ::UpdateWindow(m_window);
   else
     ::UpdateWindow(containingWindow());
 }
 
-void PluginViewWin::pushPopupsEnabledState(bool state) {
+void PluginView::pushPopupsEnabledState(bool state) {
   m_popupStateStack.append(state);
 }
 
-void PluginViewWin::popPopupsEnabledState() {
+void PluginView::popPopupsEnabledState() {
   m_popupStateStack.removeLast();
 }
 
-bool PluginViewWin::arePopupsAllowed() const {
+bool PluginView::arePopupsAllowed() const {
   if (!m_popupStateStack.isEmpty())
     return m_popupStateStack.last();
 
   return false;
 }
 
-KJS::Bindings::Instance* PluginViewWin::bindingInstance() {
+KJS::Bindings::Instance* PluginView::bindingInstance() {
   NPObject* object = 0;
 
   if (!m_plugin || !m_plugin->pluginFuncs()->getvalue)
@@ -1480,7 +1480,7 @@ KJS::Bindings::Instance* PluginViewWin::bindingInstance() {
   return instance;
 }
 
-PluginViewWin::~PluginViewWin() {
+PluginView::~PluginView() {
   stop();
 
   deleteAllValues(m_requests);
@@ -1497,13 +1497,13 @@ PluginViewWin::~PluginViewWin() {
     m_plugin->unload();
 }
 
-void PluginViewWin::disconnectStream(PluginStream* stream) {
+void PluginView::disconnectStream(PluginStream* stream) {
   ASSERT(m_streams.contains(stream));
 
   m_streams.remove(stream);
 }
 
-void PluginViewWin::determineQuirks(const String& mimeType) {
+void PluginView::determineQuirks(const String& mimeType) {
   static const unsigned lastKnownUnloadableRealPlayerVersionLS = 0x000B0B24;
   static const unsigned lastKnownUnloadableRealPlayerVersionMS = 0x00060000;
 
@@ -1581,8 +1581,8 @@ void PluginViewWin::determineQuirks(const String& mimeType) {
   }
 }
 
-void PluginViewWin::setParameters(const Vector<String>& paramNames,
-                                  const Vector<String>& paramValues) {
+void PluginView::setParameters(const Vector<String>& paramNames,
+                               const Vector<String>& paramValues) {
   ASSERT(paramNames.size() == paramValues.size());
 
   unsigned size = paramNames.size();
@@ -1605,15 +1605,15 @@ void PluginViewWin::setParameters(const Vector<String>& paramNames,
   m_paramCount = paramCount;
 }
 
-PluginViewWin::PluginViewWin(Frame* parentFrame,
-                             const IntSize& size,
-                             PluginPackageWin* plugin,
-                             Element* element,
-                             const KURL& url,
-                             const Vector<String>& paramNames,
-                             const Vector<String>& paramValues,
-                             const String& mimeType,
-                             bool loadManually)
+PluginView::PluginView(Frame* parentFrame,
+                       const IntSize& size,
+                       PluginPackage* plugin,
+                       Element* element,
+                       const KURL& url,
+                       const Vector<String>& paramNames,
+                       const Vector<String>& paramValues,
+                       const String& mimeType,
+                       bool loadManually)
     : m_parentFrame(parentFrame),
       m_plugin(plugin),
       m_element(element),
@@ -1622,9 +1622,9 @@ PluginViewWin::PluginViewWin(Frame* parentFrame,
       m_baseURL(m_parentFrame->loader()->completeURL(
           m_parentFrame->document()->baseURL())),
       m_status(PluginStatusLoadedSuccessfully),
-      m_requestTimer(this, &PluginViewWin::requestTimerFired),
-      m_invalidateTimer(this, &PluginViewWin::invalidateTimerFired),
-      m_popPopupsStateTimer(this, &PluginViewWin::popPopupsStateTimerFired),
+      m_requestTimer(this, &PluginView::requestTimerFired),
+      m_invalidateTimer(this, &PluginView::invalidateTimerFired),
+      m_popPopupsStateTimer(this, &PluginView::popPopupsStateTimerFired),
       m_paramNames(0),
       m_paramValues(0),
       m_window(0),
@@ -1656,7 +1656,7 @@ PluginViewWin::PluginViewWin(Frame* parentFrame,
   resize(size);
 }
 
-void PluginViewWin::init() {
+void PluginView::init() {
   if (m_haveInitialized)
     return;
   m_haveInitialized = true;
@@ -1684,9 +1684,9 @@ void PluginViewWin::init() {
     if (m_isVisible)
       flags |= WS_VISIBLE;
 
-    m_window = CreateWindowEx(0, kWebPluginViewWindowClassName, 0, flags, 0, 0,
-                              0, 0, m_parentFrame->view()->containingWindow(),
-                              0, Page::instanceHandle(), 0);
+    m_window = CreateWindowEx(0, kWebPluginViewdowClassName, 0, flags, 0, 0, 0,
+                              0, m_parentFrame->view()->containingWindow(), 0,
+                              Page::instanceHandle(), 0);
 
     // Calling SetWindowLongPtrA here makes the window proc ASCII, which is
     // required by at least
@@ -1708,7 +1708,7 @@ void PluginViewWin::init() {
   m_status = PluginStatusLoadedSuccessfully;
 }
 
-void PluginViewWin::didReceiveResponse(const ResourceResponse& response) {
+void PluginView::didReceiveResponse(const ResourceResponse& response) {
   ASSERT(m_loadManually);
   ASSERT(!m_manualStream);
 
@@ -1721,28 +1721,28 @@ void PluginViewWin::didReceiveResponse(const ResourceResponse& response) {
   m_manualStream->didReceiveResponse(0, response);
 }
 
-void PluginViewWin::didReceiveData(const char* data, int length) {
+void PluginView::didReceiveData(const char* data, int length) {
   ASSERT(m_loadManually);
   ASSERT(m_manualStream);
 
   m_manualStream->didReceiveData(0, data, length);
 }
 
-void PluginViewWin::didFinishLoading() {
+void PluginView::didFinishLoading() {
   ASSERT(m_loadManually);
   ASSERT(m_manualStream);
 
   m_manualStream->didFinishLoading(0);
 }
 
-void PluginViewWin::didFail(const ResourceError& error) {
+void PluginView::didFail(const ResourceError& error) {
   ASSERT(m_loadManually);
   ASSERT(m_manualStream);
 
   m_manualStream->didFail(0, error);
 }
 
-void PluginViewWin::setCallingPlugin(bool b) const {
+void PluginView::setCallingPlugin(bool b) const {
   if (!m_quirks.contains(PluginQuirkHasModalMessageLoop))
     return;
 
@@ -1754,7 +1754,7 @@ void PluginViewWin::setCallingPlugin(bool b) const {
   ASSERT(s_callingPlugin >= 0);
 }
 
-bool PluginViewWin::isCallingPlugin() {
+bool PluginView::isCallingPlugin() {
   return s_callingPlugin > 0;
 }
 

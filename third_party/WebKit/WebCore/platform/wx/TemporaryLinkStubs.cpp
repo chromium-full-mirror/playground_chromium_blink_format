@@ -63,7 +63,7 @@
 #include "PlatformMenuDescription.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformScrollBar.h"
-#include "PlugInInfoStore.h"
+#include "PluginInfoStore.h"
 #include "PopupMenu.h"
 #include "RenderTheme.h"
 #include "ResourceHandle.h"
@@ -157,19 +157,19 @@ void WebCore::findWordBoundary(UChar const* str,
   *end = position;
 }
 
-PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
+PluginInfo* PluginInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
   notImplemented();
   return 0;
 }
-unsigned PlugInInfoStore::pluginCount() const {
+unsigned PluginInfoStore::pluginCount() const {
   notImplemented();
   return 0;
 }
-bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
+bool WebCore::PluginInfoStore::supportsMIMEType(const WebCore::String&) {
   notImplemented();
   return false;
 }
-String PlugInInfoStore::pluginNameForMIMEType(const String& mimeType) {
+String PluginInfoStore::pluginNameForMIMEType(const String& mimeType) {
   notImplemented();
   return String();
 }

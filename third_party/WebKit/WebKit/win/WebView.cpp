@@ -83,9 +83,9 @@
 #include <WebCore/PlatformKeyboardEvent.h>
 #include <WebCore/PlatformMouseEvent.h>
 #include <WebCore/PlatformWheelEvent.h>
-#include <WebCore/PluginDatabaseWin.h>
-#include <WebCore/PlugInInfoStore.h>
-#include <WebCore/PluginViewWin.h>
+#include <WebCore/PluginDatabase.h>
+#include <WebCore/PluginInfoStore.h>
+#include <WebCore/PluginView.h>
 #include <WebCore/ProgressTracker.h>
 #include <WebCore/ResourceHandle.h>
 #include <WebCore/ResourceHandleClient.h>
@@ -1671,7 +1671,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
   // they are delivered. We repost paint messages so that we eventually get
   // a chance to paint once the modal loop has exited, but other messages
   // aren't safe to repost, so we just drop them.
-  if (PluginViewWin::isCallingPlugin()) {
+  if (PluginView::isCallingPlugin()) {
     if (message == WM_PAINT)
       PostMessage(hWnd, message, wParam, lParam);
     return 0;
@@ -2067,7 +2067,7 @@ HRESULT STDMETHODCALLTYPE WebView::canShowMIMEType(
 
   *canShow = MIMETypeRegistry::isSupportedImageMIMEType(mimeTypeStr) ||
              MIMETypeRegistry::isSupportedNonImageMIMEType(mimeTypeStr) ||
-             PlugInInfoStore::supportsMIMEType(mimeTypeStr);
+             PluginInfoStore::supportsMIMEType(mimeTypeStr);
 
   return S_OK;
 }
@@ -4213,7 +4213,7 @@ HRESULT STDMETHODCALLTYPE WebView::setAllowSiteSpecificHacks(
 
 HRESULT STDMETHODCALLTYPE WebView::addAdditionalPluginPath(
     /* [in] */ BSTR path) {
-  PluginDatabaseWin::installedPlugins()->addExtraPluginPath(
+  PluginDatabase::installedPlugins()->addExtraPluginPath(
       String(path, SysStringLen(path)));
   return S_OK;
 }
