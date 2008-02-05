@@ -425,8 +425,6 @@ class Document : public ContainerNode {
                                 const String& sheetStr);
   void setUserStyleSheet(const String& sheet);
   const String& userStyleSheet() const { return m_usersheet; }
-  void setPrintStyleSheet(const String& sheet) { m_printSheet = sheet; }
-  const String& printStyleSheet() const { return m_printSheet; }
 
   CSSStyleSheet* elementSheet();
   CSSStyleSheet* mappedElementSheet();
@@ -810,7 +808,6 @@ class Document : public ContainerNode {
 
   RefPtr<StyleSheet> m_sheet;
   String m_usersheet;
-  String m_printSheet;
 
   // Track the number of currently loading top-level stylesheets.  Sheets
   // loaded using the @import directive are not included in this count.
