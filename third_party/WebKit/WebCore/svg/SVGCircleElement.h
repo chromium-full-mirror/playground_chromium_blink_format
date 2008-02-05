@@ -30,6 +30,7 @@
 #include "SVGTests.h"
 
 namespace WebCore {
+
 class SVGCircleElement : public SVGStyledTransformableElement,
                          public SVGTests,
                          public SVGLangSpace,
