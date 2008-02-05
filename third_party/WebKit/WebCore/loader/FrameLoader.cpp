@@ -736,9 +736,7 @@ bool FrameLoader::didOpenURL(const KURL& url) {
   return true;
 }
 
-void FrameLoader::didExplicitOpen(const String& mimeType,
-                                  bool replace,
-                                  SharedBuffer* buffer) {
+void FrameLoader::didExplicitOpen() {
   m_isComplete = false;
   m_didCallImplicitClose = false;
 
@@ -753,34 +751,6 @@ void FrameLoader::didExplicitOpen(const String& mimeType,
   cancelRedirection();
   if (m_frame->document()->url() != "about:blank")
     m_URL = m_frame->document()->url();
-
-  bool isItemNew = false;
-
-  // Add a HistoryItem for this open.
-  RefPtr<HistoryItem> item;
-  if (replace && m_currentHistoryItem)
-    item = m_currentHistoryItem;
-  else {
-    isItemNew = true;
-    item = new HistoryItem(m_URL, m_frame->tree()->name(),
-                           m_frame->tree()->parent()
-                               ? m_frame->tree()->parent()->tree()->name()
-                               : "",
-                           "");
-    item->setIsTargetItem(true);
-    m_previousHistoryItem = m_currentHistoryItem;
-    m_currentHistoryItem = item;
-  }
-
-  // Create an alternate URL to distinguish this as a generated page.
-  KURL generatedURL("webkitgenerated:" + m_frame->document()->url());
-
-  item->setSubstituteData(
-      SubstituteData(buffer, mimeType, "UTF-16", m_URL, generatedURL));
-
-  if (isItemNew)
-    if (Page* page = m_frame->page())
-      page->backForwardList()->addItem(item);
 }
 
 bool FrameLoader::executeIfJavaScriptURL(const KURL& url,
@@ -2201,16 +2171,8 @@ void FrameLoader::load(const ResourceRequest& request,
                        const NavigationAction& action,
                        FrameLoadType type,
                        PassRefPtr<FormState> formState) {
-  load(request, action, type, formState, SubstituteData());
-}
-
-void FrameLoader::load(const ResourceRequest& request,
-                       const NavigationAction& action,
-                       FrameLoadType type,
-                       PassRefPtr<FormState> formState,
-                       const SubstituteData& substituteData) {
   RefPtr<DocumentLoader> loader =
-      m_client->createDocumentLoader(request, substituteData);
+      m_client->createDocumentLoader(request, SubstituteData());
 
   loader->setTriggeringAction(action);
   if (m_documentLoader)
@@ -2417,10 +2379,8 @@ void FrameLoader::reloadAllowingStaleData(const String& encoding) {
 
   request.setCachePolicy(ReturnCacheDataElseLoad);
 
-  RefPtr<DocumentLoader> loader = m_client->createDocumentLoader(
-      request, m_currentHistoryItem->substituteData());
-  setProvisionalHistoryItem(m_currentHistoryItem);
-
+  RefPtr<DocumentLoader> loader =
+      m_client->createDocumentLoader(request, SubstituteData());
   setPolicyDocumentLoader(loader.get());
 
   loader->setOverrideEncoding(encoding);
@@ -2445,9 +2405,8 @@ void FrameLoader::reload() {
   if (!unreachableURL.isEmpty())
     initialRequest = ResourceRequest(unreachableURL);
 
-  RefPtr<DocumentLoader> loader = m_client->createDocumentLoader(
-      initialRequest, m_currentHistoryItem->substituteData());
-  setProvisionalHistoryItem(m_currentHistoryItem);
+  RefPtr<DocumentLoader> loader =
+      m_client->createDocumentLoader(initialRequest, SubstituteData());
 
   ResourceRequest& request = loader->request();
 
@@ -4030,8 +3989,6 @@ void FrameLoader::cachePageForHistoryItem(HistoryItem* item) {
 bool FrameLoader::shouldTreatURLAsSameAsCurrent(const KURL& url) const {
   if (!m_currentHistoryItem)
     return false;
-  if (m_currentHistoryItem->substituteData().isValid())
-    return url == m_currentHistoryItem->substituteData().responseURL();
   return url == m_currentHistoryItem->url() ||
          url == m_currentHistoryItem->originalURL();
 }
@@ -4388,7 +4345,7 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
         action = NavigationAction(itemOriginalURL, loadType, false);
       }
 
-      load(request, action, loadType, 0, item->substituteData());
+      load(request, action, loadType, 0);
     }
   }
 }

@@ -26,7 +26,6 @@
 
 #include "AXObjectCache.h"
 #include "CDATASection.h"
-#include "CString.h"
 #include "CSSHelper.h"
 #include "CSSStyleSelector.h"
 #include "CSSStyleSheet.h"
@@ -54,7 +53,6 @@
 #include "FrameLoader.h"
 #include "FrameTree.h"
 #include "FrameView.h"
-#include "HistoryItem.h"
 #include "HTMLBodyElement.h"
 #include "HTMLDocument.h"
 #include "HTMLElementFactory.h"
@@ -1377,18 +1375,6 @@ Tokenizer* Document::createTokenizer() {
 }
 
 void Document::open() {
-  // This method is called by various places in the WebCore code.  Arguments
-  // chosen for legacy reasons.
-  open("text/html", true);
-}
-
-void Document::open(const String& mimeType, bool replace) {
-  // Calling open() during an onload handler is like a redirect, so we should
-  // not add a new
-  // history item.
-  if (m_processingLoadEvent)
-    replace = true;
-
   // This is work that we should probably do in clear(), but we can't have it
   // happen when implicitOpen() is called unless we reorganize Frame code.
   if (Document* parent = parentDocument()) {
@@ -1409,11 +1395,8 @@ void Document::open(const String& mimeType, bool replace) {
 
   implicitOpen();
 
-  if (m_frame) {
-    m_textWrittenByScript = new SharedBuffer;
-    m_frame->loader()->didExplicitOpen(mimeType, replace,
-                                       m_textWrittenByScript.get());
-  }
+  if (m_frame)
+    m_frame->loader()->didExplicitOpen();
 }
 
 void Document::cancelParsing() {
@@ -1644,18 +1627,13 @@ void Document::write(const String& text) {
 #endif
 
   if (!m_tokenizer) {
-    open("text/html", false);
+    open();
     ASSERT(m_tokenizer);
     if (!m_tokenizer)
       return;
     write("<html>");
   }
   m_tokenizer->write(text, false);
-
-  if (m_textWrittenByScript)
-    m_textWrittenByScript->append(
-        reinterpret_cast<const char*>(text.characters()),
-        text.length() * sizeof(UChar));
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())
@@ -1688,8 +1666,6 @@ void Document::finishParsing() {
 void Document::clear() {
   delete m_tokenizer;
   m_tokenizer = 0;
-
-  m_textWrittenByScript = 0;
 
   removeChildren();
 

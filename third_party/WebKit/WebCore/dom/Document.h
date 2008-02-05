@@ -32,7 +32,6 @@
 #include "DocumentMarker.h"
 #include "HTMLCollection.h"
 #include "HTMLFormElement.h"
-#include "SharedBuffer.h"
 #include "StringHash.h"
 #include "Timer.h"
 #include <wtf/HashCountedSet.h>
@@ -392,7 +391,6 @@ class Document : public ContainerNode {
   void setVisuallyOrdered();
 
   void open();
-  void open(const String& mimeType, bool replace);
   void implicitOpen();
   void close();
   void implicitClose();
@@ -1058,10 +1056,6 @@ class Document : public ContainerNode {
   bool m_useSecureKeyboardEntryWhenActive;
 
   bool m_isXHTML;
-
-  // Contains the text written to the document by script, eg through
-  // document.write().
-  RefPtr<SharedBuffer> m_textWrittenByScript;
 
   unsigned m_numNodeLists;
 
