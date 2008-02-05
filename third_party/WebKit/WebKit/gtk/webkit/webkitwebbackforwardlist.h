@@ -45,18 +45,15 @@ G_BEGIN_DECLS
                              WebKitWebBackForwardListClass))
 
 typedef struct _WebKitWebBackForwardListPrivate WebKitWebBackForwardListPrivate;
-typedef struct _WebKitWebBackForwardList WebKitWebBackForwardList;
-typedef struct _WebKitWebBackForwardListClass WebKitWebBackForwardListClass;
 
 struct _WebKitWebBackForwardList {
-  GObject parent;
+  GObject parent_instance;
 
-  /*< private >*/
   WebKitWebBackForwardListPrivate* priv;
 };
 
 struct _WebKitWebBackForwardListClass {
-  GObjectClass parent;
+  GObjectClass parent_class;
 };
 
 WEBKIT_API GType webkit_web_back_forward_list_get_type(void);

@@ -44,18 +44,15 @@ G_BEGIN_DECLS
                              WebKitWebHistoryItemClass))
 
 typedef struct _WebKitWebHistoryItemPrivate WebKitWebHistoryItemPrivate;
-typedef struct _WebKitWebHistoryItem WebKitWebHistoryItem;
-typedef struct _WebKitWebHistoryItemClass WebKitWebHistoryItemClass;
 
 struct _WebKitWebHistoryItem {
-  GObject parent;
+  GObject parent_instance;
 
-  /*< private >*/
   WebKitWebHistoryItemPrivate* priv;
 };
 
 struct _WebKitWebHistoryItemClass {
-  GObjectClass parent;
+  GObjectClass parent_class;
 };
 
 WEBKIT_API GType webkit_web_history_item_get_type(void);

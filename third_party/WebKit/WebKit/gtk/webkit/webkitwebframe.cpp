@@ -2,6 +2,7 @@
  * Copyright (C) 2007 Holger Hans Peter Freyther
  * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  * Copyright (C) 2007 Apple Inc.
+ * Copyright (C) 2008 Christian Dywan <christian@imendio.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -91,21 +92,20 @@ static void webkit_web_frame_get_property(GObject* object,
 }
 
 static void webkit_web_frame_finalize(GObject* object) {
-  WebKitWebFramePrivate* privateData =
-      WEBKIT_WEB_FRAME_GET_PRIVATE(WEBKIT_WEB_FRAME(object));
-  privateData->frame->loader()->cancelAndClear();
-  g_free(privateData->name);
-  g_free(privateData->title);
-  g_free(privateData->uri);
-  delete privateData->frame;
+  WebKitWebFrame* frame = WEBKIT_WEB_FRAME(object);
+  WebKitWebFramePrivate* priv = frame->priv;
+
+  priv->coreFrame->loader()->cancelAndClear();
+  g_free(priv->name);
+  g_free(priv->title);
+  g_free(priv->uri);
+  delete priv->coreFrame;
 
   G_OBJECT_CLASS(webkit_web_frame_parent_class)->finalize(object);
 }
 
 static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
   webkit_init();
-
-  g_type_class_add_private(frameClass, sizeof(WebKitWebFramePrivate));
 
   /*
    * signals
@@ -162,10 +162,15 @@ static void webkit_web_frame_class_init(WebKitWebFrameClass* frameClass) {
           "uri", "URI",
           "The current URI of the contents displayed by the frame", NULL,
           WEBKIT_PARAM_READABLE));
+
+  g_type_class_add_private(frameClass, sizeof(WebKitWebFramePrivate));
 }
 
 static void webkit_web_frame_init(WebKitWebFrame* frame) {
+  WebKitWebFramePrivate* priv = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
+
   // TODO: Move constructor code here.
+  frame->priv = priv;
 }
 
 /**
@@ -181,23 +186,20 @@ WebKitWebFrame* webkit_web_frame_new(WebKitWebView* webView) {
 
   WebKitWebFrame* frame =
       WEBKIT_WEB_FRAME(g_object_new(WEBKIT_TYPE_WEB_FRAME, NULL));
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
+  WebKitWebFramePrivate* priv = frame->priv;
+  WebKitWebViewPrivate* viewPriv = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
 
-  frameData->client = new WebKit::FrameLoaderClient(frame);
-  frameData->frame = new Frame(webViewData->corePage, 0, frameData->client);
+  priv->client = new WebKit::FrameLoaderClient(frame);
+  priv->coreFrame = new Frame(viewPriv->corePage, 0, priv->client);
 
-  FrameView* frameView = new FrameView(frameData->frame);
+  FrameView* frameView = new FrameView(priv->coreFrame);
   frameView->setContainingWindow(GTK_CONTAINER(webView));
   frameView->setGtkAdjustments(
       GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
       GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)));
-  frameData->frame->setView(frameView);
-  frameData->frame->init();
-  frameData->webView = webView;
-  frameData->name = 0;
-  frameData->title = 0;
-  frameData->uri = 0;
+  priv->coreFrame->setView(frameView);
+  priv->coreFrame->init();
+  priv->webView = webView;
 
   return frame;
 }
@@ -207,19 +209,18 @@ WebKitWebFrame* webkit_web_frame_init_with_web_view(
     HTMLFrameOwnerElement* element) {
   WebKitWebFrame* frame =
       WEBKIT_WEB_FRAME(g_object_new(WEBKIT_TYPE_WEB_FRAME, NULL));
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
+  WebKitWebFramePrivate* priv = frame->priv;
+  WebKitWebViewPrivate* viewPriv = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
 
-  frameData->client = new WebKit::FrameLoaderClient(frame);
-  frameData->frame =
-      new Frame(webViewData->corePage, element, frameData->client);
+  priv->client = new WebKit::FrameLoaderClient(frame);
+  priv->coreFrame = new Frame(viewPriv->corePage, element, priv->client);
 
-  FrameView* frameView = new FrameView(frameData->frame);
+  FrameView* frameView = new FrameView(priv->coreFrame);
   frameView->setContainingWindow(GTK_CONTAINER(webView));
-  frameData->frame->setView(frameView);
+  priv->coreFrame->setView(frameView);
   frameView->deref();
-  frameData->frame->init();
-  frameData->webView = webView;
+  priv->coreFrame->init();
+  priv->webView = webView;
 
   return frame;
 }
@@ -235,8 +236,8 @@ WebKitWebFrame* webkit_web_frame_init_with_web_view(
 const gchar* webkit_web_frame_get_title(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  return frameData->title;
+  WebKitWebFramePrivate* priv = frame->priv;
+  return priv->title;
 }
 
 /**
@@ -250,8 +251,8 @@ const gchar* webkit_web_frame_get_title(WebKitWebFrame* frame) {
 const gchar* webkit_web_frame_get_uri(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  return frameData->uri;
+  WebKitWebFramePrivate* priv = frame->priv;
+  return priv->uri;
 }
 
 /**
@@ -268,8 +269,8 @@ const gchar* webkit_web_frame_get_uri(WebKitWebFrame* frame) {
 WebKitWebView* webkit_web_frame_get_web_view(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  return frameData->webView;
+  WebKitWebFramePrivate* priv = frame->priv;
+  return priv->webView;
 }
 
 /**
@@ -283,18 +284,17 @@ WebKitWebView* webkit_web_frame_get_web_view(WebKitWebFrame* frame) {
 const gchar* webkit_web_frame_get_name(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
-  WebKitWebFramePrivate* frameData = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
+  WebKitWebFramePrivate* priv = frame->priv;
 
-  if (frameData->name)
-    return frameData->name;
+  if (priv->name)
+    return priv->name;
 
   Frame* coreFrame = core(frame);
   g_return_val_if_fail(coreFrame, NULL);
 
   String string = coreFrame->tree()->name();
-  frameData->name = g_strdup(string.utf8().data());
-
-  return frameData->name;
+  priv->name = g_strdup(string.utf8().data());
+  return priv->name;
 }
 
 /**
@@ -334,7 +334,7 @@ void webkit_web_frame_load_request(WebKitWebFrame* frame,
   Frame* coreFrame = core(frame);
   g_return_if_fail(coreFrame);
 
-  // TODO: Use the ResourceRequest carried by WebKitNetworkRequest when it gets
+  // TODO: Use the ResourceRequest carried by WebKitNetworkRequest when it is
   // implemented.
   DeprecatedString string =
       DeprecatedString::fromUtf8(webkit_network_request_get_uri(request));

@@ -41,12 +41,11 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS((obj), WEBKIT_TYPE_WEB_SETTINGS, \
                              WebKitWebSettingsClass))
 
-typedef struct _WebKitWebSettings WebKitWebSettings;
 typedef struct _WebKitWebSettingsPrivate WebKitWebSettingsPrivate;
-typedef struct _WebKitWebSettingsClass WebKitWebSettingsClass;
 
 struct _WebKitWebSettings {
   GObject parent_instance;
+
   WebKitWebSettingsPrivate* priv;
 };
 

@@ -257,7 +257,9 @@ static void webkit_web_view_set_property(GObject* object,
 
 static gboolean webkit_web_view_expose_event(GtkWidget* widget,
                                              GdkEventExpose* event) {
-  Frame* frame = core(webkit_web_view_get_main_frame(WEBKIT_WEB_VIEW(widget)));
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+
+  Frame* frame = core(webView)->mainFrame();
   GdkRectangle clip;
   gdk_region_get_clipbox(event->region, &clip);
   cairo_t* cr = gdk_cairo_create(event->window);
@@ -274,8 +276,9 @@ static gboolean webkit_web_view_expose_event(GtkWidget* widget,
 
 static gboolean webkit_web_view_key_press_event(GtkWidget* widget,
                                                 GdkEventKey* event) {
-  Frame* frame =
-      core(WEBKIT_WEB_VIEW(widget))->focusController()->focusedOrMainFrame();
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+
+  Frame* frame = core(webView)->focusController()->focusedOrMainFrame();
   PlatformKeyboardEvent keyboardEvent(event);
 
   if (frame->eventHandler()->keyEvent(keyboardEvent))
@@ -320,8 +323,9 @@ static gboolean webkit_web_view_key_press_event(GtkWidget* widget,
 
 static gboolean webkit_web_view_key_release_event(GtkWidget* widget,
                                                   GdkEventKey* event) {
-  Frame* frame =
-      core(WEBKIT_WEB_VIEW(widget))->focusController()->focusedOrMainFrame();
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+
+  Frame* frame = core(webView)->focusController()->focusedOrMainFrame();
   PlatformKeyboardEvent keyboardEvent(event);
 
   if (frame->eventHandler()->keyEvent(keyboardEvent))
@@ -334,14 +338,16 @@ static gboolean webkit_web_view_key_release_event(GtkWidget* widget,
 
 static gboolean webkit_web_view_button_press_event(GtkWidget* widget,
                                                    GdkEventButton* event) {
-  Frame* frame = core(webkit_web_view_get_main_frame(WEBKIT_WEB_VIEW(widget)));
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+
+  Frame* frame = core(webView)->mainFrame();
 
   // FIXME: need to keep track of subframe focus for key events
-  gtk_widget_grab_focus(GTK_WIDGET(widget));
+  gtk_widget_grab_focus(widget);
 
   if (event->button == 3)
     return webkit_web_view_forward_context_menu_event(
-        WEBKIT_WEB_VIEW(widget), PlatformMouseEvent(event));
+        webView, PlatformMouseEvent(event));
 
   return frame->eventHandler()->handleMousePressEvent(
       PlatformMouseEvent(event));
@@ -349,36 +355,36 @@ static gboolean webkit_web_view_button_press_event(GtkWidget* widget,
 
 static gboolean webkit_web_view_button_release_event(GtkWidget* widget,
                                                      GdkEventButton* event) {
-  Frame* frame = core(webkit_web_view_get_main_frame(WEBKIT_WEB_VIEW(widget)));
-
-  WebKitWebView* web_view = WEBKIT_WEB_VIEW(widget);
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(web_view);
-  Frame* focusedFrame =
-      webViewData->corePage->focusController()->focusedFrame();
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+  WebKitWebViewPrivate* priv = webView->priv;
+  Frame* focusedFrame = core(webView)->focusController()->focusedFrame();
 
   if (focusedFrame && focusedFrame->editor()->canEdit()) {
     GdkWindow* window = gtk_widget_get_parent_window(widget);
-    gtk_im_context_set_client_window(webViewData->imContext, window);
+    gtk_im_context_set_client_window(priv->imContext, window);
 #ifdef MAEMO_CHANGES
-    hildon_gtk_im_context_filter_event(webViewData->imContext,
-                                       (GdkEvent*)event);
-    hildon_gtk_im_context_show(webViewData->imContext);
+    hildon_gtk_im_context_filter_event(priv->imContext, (GdkEvent*)event);
+    hildon_gtk_im_context_show(priv->imContext);
 #endif
   }
 
-  return frame->eventHandler()->handleMouseReleaseEvent(
+  return focusedFrame->eventHandler()->handleMouseReleaseEvent(
       PlatformMouseEvent(event));
 }
 
 static gboolean webkit_web_view_motion_event(GtkWidget* widget,
                                              GdkEventMotion* event) {
-  Frame* frame = core(webkit_web_view_get_main_frame(WEBKIT_WEB_VIEW(widget)));
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+
+  Frame* frame = core(webView)->mainFrame();
   return frame->eventHandler()->mouseMoved(PlatformMouseEvent(event));
 }
 
 static gboolean webkit_web_view_scroll_event(GtkWidget* widget,
                                              GdkEventScroll* event) {
-  Frame* frame = core(webkit_web_view_get_main_frame(WEBKIT_WEB_VIEW(widget)));
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+
+  Frame* frame = core(webView)->mainFrame();
   PlatformWheelEvent wheelEvent(event);
   return frame->eventHandler()->handleWheelEvent(wheelEvent);
 }
@@ -388,7 +394,9 @@ static void webkit_web_view_size_allocate(GtkWidget* widget,
   GTK_WIDGET_CLASS(webkit_web_view_parent_class)
       ->size_allocate(widget, allocation);
 
-  Frame* frame = core(webkit_web_view_get_main_frame(WEBKIT_WEB_VIEW(widget)));
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
+
+  Frame* frame = core(webView)->mainFrame();
   frame->view()->resize(allocation->width, allocation->height);
   frame->forceLayout();
   frame->view()->adjustViewSize();
@@ -402,7 +410,8 @@ static gboolean webkit_web_view_focus_in_event(GtkWidget* widget,
   if (GTK_WIDGET_TOPLEVEL(toplevel) &&
       gtk_window_has_toplevel_focus(GTK_WINDOW(toplevel))) {
     WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
-    Frame* frame = core(webkit_web_view_get_main_frame(webView));
+
+    Frame* frame = core(webView)->mainFrame();
     core(webView)->focusController()->setActive(frame);
   }
   return GTK_WIDGET_CLASS(webkit_web_view_parent_class)
@@ -447,9 +456,9 @@ static void webkit_web_view_set_scroll_adjustments(WebKitWebView* webView,
 static void webkit_web_view_container_add(GtkContainer* container,
                                           GtkWidget* widget) {
   WebKitWebView* webView = WEBKIT_WEB_VIEW(container);
-  WebKitWebViewPrivate* private_data = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
+  WebKitWebViewPrivate* priv = webView->priv;
 
-  private_data->children.add(widget);
+  priv->children.add(widget);
   if (GTK_WIDGET_REALIZED(container))
     gtk_widget_set_parent_window(widget, GTK_WIDGET(webView)->window);
   gtk_widget_set_parent(widget, GTK_WIDGET(container));
@@ -457,12 +466,12 @@ static void webkit_web_view_container_add(GtkContainer* container,
 
 static void webkit_web_view_container_remove(GtkContainer* container,
                                              GtkWidget* widget) {
-  WebKitWebViewPrivate* private_data =
-      WEBKIT_WEB_VIEW_GET_PRIVATE(WEBKIT_WEB_VIEW(container));
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(container);
+  WebKitWebViewPrivate* priv = webView->priv;
 
-  if (private_data->children.contains(widget)) {
+  if (priv->children.contains(widget)) {
     gtk_widget_unparent(widget);
-    private_data->children.remove(widget);
+    priv->children.remove(widget);
   }
 }
 
@@ -470,10 +479,10 @@ static void webkit_web_view_container_forall(GtkContainer* container,
                                              gboolean,
                                              GtkCallback callback,
                                              gpointer callbackData) {
-  WebKitWebViewPrivate* privateData =
-      WEBKIT_WEB_VIEW_GET_PRIVATE(WEBKIT_WEB_VIEW(container));
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(container);
+  WebKitWebViewPrivate* priv = webView->priv;
 
-  HashSet<GtkWidget*> children = privateData->children;
+  HashSet<GtkWidget*> children = priv->children;
   HashSet<GtkWidget*>::const_iterator end = children.end();
   for (HashSet<GtkWidget*>::const_iterator current = children.begin();
        current != end; ++current)
@@ -647,20 +656,20 @@ static void webkit_web_view_real_paste_clipboard(WebKitWebView* webView) {
 }
 
 static void webkit_web_view_finalize(GObject* object) {
+  WebKitWebView* webView = WEBKIT_WEB_VIEW(object);
+  WebKitWebViewPrivate* priv = webView->priv;
+
   webkit_web_view_stop_loading(WEBKIT_WEB_VIEW(object));
 
-  WebKitWebViewPrivate* webViewData =
-      WEBKIT_WEB_VIEW_GET_PRIVATE(WEBKIT_WEB_VIEW(object));
+  delete priv->corePage;
 
-  delete webViewData->corePage;
-
-  g_object_unref(webViewData->backForwardList);
-  g_object_unref(webViewData->webSettings);
-  g_object_unref(webViewData->mainFrame);
-  g_object_unref(webViewData->imContext);
-  gtk_target_list_unref(webViewData->copy_target_list);
-  gtk_target_list_unref(webViewData->paste_target_list);
-  delete webViewData->userAgent;
+  g_object_unref(priv->backForwardList);
+  g_object_unref(priv->webSettings);
+  g_object_unref(priv->mainFrame);
+  g_object_unref(priv->imContext);
+  gtk_target_list_unref(priv->copy_target_list);
+  gtk_target_list_unref(priv->paste_target_list);
+  delete priv->userAgent;
 
   G_OBJECT_CLASS(webkit_web_view_parent_class)->finalize(object);
 }
@@ -683,8 +692,6 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
   GtkBindingSet* binding_set;
 
   webkit_init();
-
-  g_type_class_add_private(webViewClass, sizeof(WebKitWebViewPrivate));
 
   /*
    * Signals
@@ -1051,14 +1058,16 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
       g_param_spec_boolean("editable", "Editable",
                            "Whether content can be modified by the user", FALSE,
                            WEBKIT_PARAM_READWRITE));
+
+  g_type_class_add_private(webViewClass, sizeof(WebKitWebViewPrivate));
 }
 
 static void webkit_web_view_screen_changed(WebKitWebView* webView,
                                            GdkScreen* previousScreen,
                                            gpointer userdata) {
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  WebKitWebSettings* webSettings = webViewData->webSettings;
-  Settings* settings = webViewData->corePage->settings();
+  WebKitWebViewPrivate* priv = webView->priv;
+  WebKitWebSettings* webSettings = priv->webSettings;
+  Settings* settings = core(webView)->settings();
 
   guint defaultFontSize, defaultMonospaceFontSize, minimumFontSize,
       minimumLogicalFontSize;
@@ -1084,9 +1093,9 @@ static void webkit_web_view_screen_changed(WebKitWebView* webView,
 }
 
 static void webkit_web_view_update_settings(WebKitWebView* webView) {
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  WebKitWebSettings* webSettings = webViewData->webSettings;
-  Settings* settings = webViewData->corePage->settings();
+  WebKitWebViewPrivate* priv = webView->priv;
+  WebKitWebSettings* webSettings = priv->webSettings;
+  Settings* settings = core(webView)->settings();
 
   gchar *defaultEncoding, *cursiveFontFamily, *defaultFontFamily,
       *fantasyFontFamily, *monospaceFontFamily, *sansSerifFontFamily,
@@ -1136,8 +1145,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
 static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
                                             GParamSpec* pspec,
                                             WebKitWebView* webView) {
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  Settings* settings = webViewData->corePage->settings();
+  Settings* settings = core(webView)->settings();
 
   const gchar* name = g_intern_string(pspec->name);
   GValue value = {0, 0};
@@ -1186,27 +1194,21 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
 }
 
 static void webkit_web_view_init(WebKitWebView* webView) {
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  webViewData->imContext = gtk_im_multicontext_new();
-  webViewData->corePage =
+  WebKitWebViewPrivate* priv = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
+  webView->priv = priv;
+
+  priv->imContext = gtk_im_multicontext_new();
+  priv->corePage =
       new Page(new WebKit::ChromeClient(webView), new WebKit::ContextMenuClient,
                new WebKit::EditorClient(webView), new WebKit::DragClient,
                new WebKit::InspectorClient);
 
-  webViewData->webSettings = webkit_web_settings_new();
-  webkit_web_view_update_settings(webView);
-  g_signal_connect(webView, "screen-changed",
-                   G_CALLBACK(webkit_web_view_screen_changed), NULL);
-  g_signal_connect(webViewData->webSettings, "notify",
-                   G_CALLBACK(webkit_web_view_settings_notify), webView);
-
   GTK_WIDGET_SET_FLAGS(webView, GTK_CAN_FOCUS);
-  webViewData->mainFrame = WEBKIT_WEB_FRAME(webkit_web_frame_new(webView));
-  webViewData->lastPopupXPosition = webViewData->lastPopupYPosition = -1;
-  webViewData->editable = false;
+  priv->mainFrame = WEBKIT_WEB_FRAME(webkit_web_frame_new(webView));
+  priv->lastPopupXPosition = priv->lastPopupYPosition = -1;
+  priv->editable = false;
 
-  /* Initialize the view's back/forward list */
-  webViewData->backForwardList =
+  priv->backForwardList =
       webkit_web_back_forward_list_new_with_web_view(webView);
 
 #if GTK_CHECK_VERSION(2, 10, 0)
@@ -1215,18 +1217,25 @@ static void webkit_web_view_init(WebKitWebView* webView) {
   GdkAtom textHtml = gdk_atom_intern("text/html", false);
 #endif
   /* Targets for copy */
-  webViewData->copy_target_list = gtk_target_list_new(NULL, 0);
-  gtk_target_list_add(webViewData->copy_target_list, textHtml, 0,
+  priv->copy_target_list = gtk_target_list_new(NULL, 0);
+  gtk_target_list_add(priv->copy_target_list, textHtml, 0,
                       WEBKIT_WEB_VIEW_TARGET_INFO_HTML);
-  gtk_target_list_add_text_targets(webViewData->copy_target_list,
+  gtk_target_list_add_text_targets(priv->copy_target_list,
                                    WEBKIT_WEB_VIEW_TARGET_INFO_TEXT);
 
   /* Targets for pasting */
-  webViewData->paste_target_list = gtk_target_list_new(NULL, 0);
-  gtk_target_list_add(webViewData->paste_target_list, textHtml, 0,
+  priv->paste_target_list = gtk_target_list_new(NULL, 0);
+  gtk_target_list_add(priv->paste_target_list, textHtml, 0,
                       WEBKIT_WEB_VIEW_TARGET_INFO_HTML);
-  gtk_target_list_add_text_targets(webViewData->paste_target_list,
+  gtk_target_list_add_text_targets(priv->paste_target_list,
                                    WEBKIT_WEB_VIEW_TARGET_INFO_TEXT);
+
+  priv->webSettings = webkit_web_settings_new();
+  webkit_web_view_update_settings(webView);
+  g_signal_connect(webView, "screen-changed",
+                   G_CALLBACK(webkit_web_view_screen_changed), NULL);
+  g_signal_connect(priv->webSettings, "notify",
+                   G_CALLBACK(webkit_web_view_settings_notify), webView);
 }
 
 GtkWidget* webkit_web_view_new(void) {
@@ -1241,13 +1250,12 @@ void webkit_web_view_set_settings(WebKitWebView* webView,
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
   g_return_if_fail(WEBKIT_IS_WEB_SETTINGS(webSettings));
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
+  WebKitWebViewPrivate* priv = webView->priv;
   g_signal_handlers_disconnect_by_func(
-      webViewData->webSettings, (gpointer)webkit_web_view_settings_notify,
-      webView);
-  g_object_unref(webViewData->webSettings);
+      priv->webSettings, (gpointer)webkit_web_view_settings_notify, webView);
+  g_object_unref(priv->webSettings);
   g_object_ref(webSettings);
-  webViewData->webSettings = webSettings;
+  priv->webSettings = webSettings;
   webkit_web_view_update_settings(webView);
   g_signal_connect(webSettings, "notify",
                    G_CALLBACK(webkit_web_view_settings_notify), webView);
@@ -1256,8 +1264,8 @@ void webkit_web_view_set_settings(WebKitWebView* webView,
 WebKitWebSettings* webkit_web_view_get_settings(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData->webSettings;
+  WebKitWebViewPrivate* priv = webView->priv;
+  return priv->webSettings;
 }
 
 /**
@@ -1286,14 +1294,12 @@ WebKitWebBackForwardList* webkit_web_view_get_back_forward_list(
     WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
 
-  WebKitWebViewPrivate* webViewData =
-      WEBKIT_WEB_VIEW_GET_PRIVATE(WEBKIT_WEB_VIEW(webView));
+  WebKitWebViewPrivate* priv = webView->priv;
 
-  if (!webViewData->corePage ||
-      !webViewData->corePage->backForwardList()->enabled())
+  if (!core(webView) || !core(webView)->backForwardList()->enabled())
     return NULL;
 
-  return webViewData->backForwardList;
+  return priv->backForwardList;
 }
 
 /**
@@ -1310,6 +1316,7 @@ gboolean webkit_web_view_go_to_back_forward_item(WebKitWebView* webView,
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), FALSE);
   g_return_val_if_fail(WEBKIT_IS_WEB_HISTORY_ITEM(item), FALSE);
 
+  // FIXME: This always returns TRUE
   core(webView)->goToItem(core(item), FrameLoadTypeIndexedBackForward);
   return TRUE;
 }
@@ -1317,6 +1324,8 @@ gboolean webkit_web_view_go_to_back_forward_item(WebKitWebView* webView,
 /**
  * webkit_web_view_go_backward:
  * @webView: the #WebKitWebView
+ *
+ * @Deprecated: Use webkit_web_view_go_back() instead.
  *
  * Go to the previous page, if there's any.
  */
@@ -1351,7 +1360,7 @@ void webkit_web_view_go_back(WebKitWebView* webView) {
 void webkit_web_view_go_back_or_forward(WebKitWebView* webView, gint steps) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
 
-  Frame* frame = core(webkit_web_view_get_main_frame(webView));
+  Frame* frame = core(webView)->mainFrame();
   frame->loader()->goBackOrForward(steps);
 }
 
@@ -1373,6 +1382,8 @@ void webkit_web_view_go_forward(WebKitWebView* webView) {
  *
  * Checks whether the view can go back to the previous page
  *
+ * @Deprecated: Use webkit_web_view_can_go_back() instead.
+ *
  * Return value: %TRUE if the page can go back, otherwise returns %FALSE
  */
 gboolean webkit_web_view_can_go_backward(WebKitWebView* webView) {
@@ -1393,9 +1404,7 @@ gboolean webkit_web_view_can_go_backward(WebKitWebView* webView) {
 gboolean webkit_web_view_can_go_back(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), FALSE);
 
-  Page* page = core(webView);
-
-  if (!page || !page->backForwardList()->backItem())
+  if (!core(webView) || !core(webView)->backForwardList()->backItem())
     return FALSE;
 
   return TRUE;
@@ -1416,7 +1425,7 @@ gboolean webkit_web_view_can_go_back_or_forward(WebKitWebView* webView,
                                                 gint steps) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), FALSE);
 
-  Frame* frame = core(webkit_web_view_get_main_frame(webView));
+  Frame* frame = core(webView)->mainFrame();
   return frame->loader()->canGoBackOrForward(steps);
 }
 
@@ -1446,7 +1455,7 @@ void webkit_web_view_open(WebKitWebView* webView, const gchar* uri) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
   g_return_if_fail(uri);
 
-  Frame* frame = core(webkit_web_view_get_main_frame(webView));
+  Frame* frame = core(webView)->mainFrame();
   DeprecatedString string = DeprecatedString::fromUtf8(uri);
   frame->loader()->load(ResourceRequest(KURL(string)));
 }
@@ -1454,8 +1463,7 @@ void webkit_web_view_open(WebKitWebView* webView, const gchar* uri) {
 void webkit_web_view_reload(WebKitWebView* webView) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
 
-  Frame* frame = core(webkit_web_view_get_main_frame(webView));
-  frame->loader()->reload();
+  core(webView)->mainFrame()->loader()->reload();
 }
 
 void webkit_web_view_load_string(WebKitWebView* webView,
@@ -1466,7 +1474,7 @@ void webkit_web_view_load_string(WebKitWebView* webView,
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
   g_return_if_fail(content);
 
-  Frame* frame = core(webkit_web_view_get_main_frame(webView));
+  Frame* frame = core(webView)->mainFrame();
 
   KURL url(baseUri ? DeprecatedString::fromUtf8(baseUri) : "");
   RefPtr<SharedBuffer> sharedBuffer =
@@ -1492,7 +1500,7 @@ void webkit_web_view_load_html_string(WebKitWebView* webView,
 void webkit_web_view_stop_loading(WebKitWebView* webView) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
 
-  Frame* frame = core(webkit_web_view_get_main_frame(webView));
+  Frame* frame = core(webView)->mainFrame();
 
   if (FrameLoader* loader = frame->loader())
     loader->stopAllLoaders();
@@ -1523,9 +1531,8 @@ gboolean webkit_web_view_search_text(WebKitWebView* webView,
   FindDirection direction =
       forward ? FindDirectionForward : FindDirectionBackward;
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData->corePage->findString(
-      String::fromUTF8(string), caseSensitivity, direction, shouldWrap);
+  return core(webView)->findString(String::fromUTF8(string), caseSensitivity,
+                                   direction, shouldWrap);
 }
 
 /**
@@ -1549,9 +1556,8 @@ guint webkit_web_view_mark_text_matches(WebKitWebView* webView,
   TextCaseSensitivity caseSensitivity =
       caseSensitive ? TextCaseSensitive : TextCaseInsensitive;
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData->corePage->markAllMatchesForText(
-      String::fromUTF8(string), caseSensitivity, false, limit);
+  return core(webView)->markAllMatchesForText(String::fromUTF8(string),
+                                              caseSensitivity, false, limit);
 }
 
 /**
@@ -1566,10 +1572,8 @@ void webkit_web_view_set_highlight_text_matches(WebKitWebView* webView,
                                                 gboolean shouldHighlight) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  WebKitWebFramePrivate* frameData =
-      WEBKIT_WEB_FRAME_GET_PRIVATE(webViewData->mainFrame);
-  frameData->frame->setMarkedTextMatchesAreHighlighted(shouldHighlight);
+  core(webView)->mainFrame()->setMarkedTextMatchesAreHighlighted(
+      shouldHighlight);
 }
 
 /**
@@ -1581,15 +1585,14 @@ void webkit_web_view_set_highlight_text_matches(WebKitWebView* webView,
 void webkit_web_view_unmark_text_matches(WebKitWebView* webView) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData->corePage->unmarkAllTextMatches();
+  return core(webView)->unmarkAllTextMatches();
 }
 
 WebKitWebFrame* webkit_web_view_get_main_frame(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData->mainFrame;
+  WebKitWebViewPrivate* priv = webView->priv;
+  return priv->mainFrame;
 }
 
 void webkit_web_view_execute_script(WebKitWebView* webView,
@@ -1597,8 +1600,7 @@ void webkit_web_view_execute_script(WebKitWebView* webView,
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
   g_return_if_fail(script);
 
-  Frame* frame = core(webkit_web_view_get_main_frame(webView));
-  if (FrameLoader* loader = frame->loader())
+  if (FrameLoader* loader = core(webView)->mainFrame()->loader())
     loader->executeScript(String::fromUTF8(script), true);
 }
 
@@ -1711,8 +1713,7 @@ void webkit_web_view_delete_selection(WebKitWebView* webView) {
 gboolean webkit_web_view_has_selection(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), FALSE);
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return !webViewData->corePage->selection().isNone();
+  return !core(webView)->selection().isNone();
 }
 
 /**
@@ -1759,10 +1760,9 @@ void webkit_web_view_select_all(WebKitWebView* webView) {
 gboolean webkit_web_view_get_editable(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), FALSE);
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  ASSERT(webViewData);
+  WebKitWebViewPrivate* priv = webView->priv;
 
-  return webViewData->editable;
+  return priv->editable;
 }
 
 /**
@@ -1786,28 +1786,27 @@ gboolean webkit_web_view_get_editable(WebKitWebView* webView) {
  */
 void webkit_web_view_set_editable(WebKitWebView* webView, gboolean flag) {
   g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
-  flag = flag != FALSE;
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  ASSERT(webViewData);
+  WebKitWebViewPrivate* priv = webView->priv;
 
-  Frame* mainFrame = core(webViewData->mainFrame);
-  g_return_if_fail(mainFrame);
+  Frame* frame = core(webView)->mainFrame();
+  g_return_if_fail(frame);
 
   // TODO: What happens when the frame is replaced?
-  if (flag == webViewData->editable)
+  flag = flag != FALSE;
+  if (flag == priv->editable)
     return;
 
-  webViewData->editable = flag;
+  priv->editable = flag;
 
   if (flag) {
-    mainFrame->applyEditingStyleToBodyElement();
+    frame->applyEditingStyleToBodyElement();
     // TODO: If the WebKitWebView is made editable and the selection is empty,
     // set it to something.
     // if (!webkit_web_view_get_selected_dom_range(webView))
     //    mainFrame->setSelectionFromNone();
   } else
-    mainFrame->removeEditingStyleFromBodyElement();
+    frame->removeEditingStyleFromBodyElement();
 }
 
 /**
@@ -1825,8 +1824,8 @@ void webkit_web_view_set_editable(WebKitWebView* webView, gboolean flag) {
 GtkTargetList* webkit_web_view_get_copy_target_list(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData->copy_target_list;
+  WebKitWebViewPrivate* priv = webView->priv;
+  return priv->copy_target_list;
 }
 
 /**
@@ -1845,7 +1844,7 @@ GtkTargetList* webkit_web_view_get_copy_target_list(WebKitWebView* webView) {
 GtkTargetList* webkit_web_view_get_paste_target_list(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData->paste_target_list;
+  WebKitWebViewPrivate* priv = webView->priv;
+  return priv->paste_target_list;
 }
 }

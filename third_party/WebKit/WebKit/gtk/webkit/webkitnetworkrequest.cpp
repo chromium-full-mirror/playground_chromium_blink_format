@@ -20,42 +20,49 @@
 #include "config.h"
 
 #include "webkitnetworkrequest.h"
-#include "webkitprivate.h"
-
-using namespace WebKit;
-using namespace WebCore;
 
 extern "C" {
 
 G_DEFINE_TYPE(WebKitNetworkRequest, webkit_network_request, G_TYPE_OBJECT);
 
-static void webkit_network_request_finalize(GObject* object) {
-  WebKitNetworkRequestPrivate* requestPrivate =
-      WEBKIT_NETWORK_REQUEST_GET_PRIVATE(object);
+struct _WebKitNetworkRequestPrivate {
+  gchar* uri;
+};
 
-  g_free(requestPrivate->uri);
+#define WEBKIT_NETWORK_REQUEST_GET_PRIVATE(obj)                    \
+  (G_TYPE_INSTANCE_GET_PRIVATE((obj), WEBKIT_TYPE_NETWORK_REQUEST, \
+                               WebKitNetworkRequestPrivate))
+
+static void webkit_network_request_finalize(GObject* object) {
+  WebKitNetworkRequest* request = WEBKIT_NETWORK_REQUEST(object);
+  WebKitNetworkRequestPrivate* priv = request->priv;
+
+  g_free(priv->uri);
 
   G_OBJECT_CLASS(webkit_network_request_parent_class)->finalize(object);
 }
 
 static void webkit_network_request_class_init(
     WebKitNetworkRequestClass* requestClass) {
-  g_type_class_add_private(requestClass, sizeof(WebKitNetworkRequestPrivate));
-
   G_OBJECT_CLASS(requestClass)->finalize = webkit_network_request_finalize;
+
+  g_type_class_add_private(requestClass, sizeof(WebKitNetworkRequestPrivate));
 }
 
-static void webkit_network_request_init(WebKitNetworkRequest* request) {}
+static void webkit_network_request_init(WebKitNetworkRequest* request) {
+  WebKitNetworkRequestPrivate* priv =
+      WEBKIT_NETWORK_REQUEST_GET_PRIVATE(request);
+  request->priv = priv;
+}
 
 WebKitNetworkRequest* webkit_network_request_new(const gchar* uri) {
   g_return_val_if_fail(uri, NULL);
 
   WebKitNetworkRequest* request =
       WEBKIT_NETWORK_REQUEST(g_object_new(WEBKIT_TYPE_NETWORK_REQUEST, NULL));
-  WebKitNetworkRequestPrivate* requestPrivate =
-      WEBKIT_NETWORK_REQUEST_GET_PRIVATE(request);
+  WebKitNetworkRequestPrivate* priv = request->priv;
 
-  requestPrivate->uri = g_strdup(uri);
+  priv->uri = g_strdup(uri);
 
   return request;
 }
@@ -65,19 +72,16 @@ void webkit_network_request_set_uri(WebKitNetworkRequest* request,
   g_return_if_fail(WEBKIT_IS_NETWORK_REQUEST(request));
   g_return_if_fail(uri);
 
-  WebKitNetworkRequestPrivate* requestPrivate =
-      WEBKIT_NETWORK_REQUEST_GET_PRIVATE(request);
+  WebKitNetworkRequestPrivate* priv = request->priv;
 
-  g_free(requestPrivate->uri);
-  requestPrivate->uri = g_strdup(uri);
+  g_free(priv->uri);
+  priv->uri = g_strdup(uri);
 }
 
 const gchar* webkit_network_request_get_uri(WebKitNetworkRequest* request) {
   g_return_val_if_fail(WEBKIT_IS_NETWORK_REQUEST(request), NULL);
 
-  WebKitNetworkRequestPrivate* requestPrivate =
-      WEBKIT_NETWORK_REQUEST_GET_PRIVATE(request);
-
-  return requestPrivate->uri;
+  WebKitNetworkRequestPrivate* priv = request->priv;
+  return priv->uri;
 }
 }

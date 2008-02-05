@@ -41,12 +41,16 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS((obj), WEBKIT_TYPE_NETWORK_REQUEST, \
                              WebKitNetworkRequestClass))
 
+typedef struct _WebKitNetworkRequestPrivate WebKitNetworkRequestPrivate;
+
 struct _WebKitNetworkRequest {
-  GObject parent;
+  GObject parent_instance;
+
+  WebKitNetworkRequestPrivate* priv;
 };
 
 struct _WebKitNetworkRequestClass {
-  GObjectClass parent;
+  GObjectClass parent_class;
 };
 
 WEBKIT_API GType webkit_network_request_get_type(void);

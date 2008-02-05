@@ -38,15 +38,16 @@ using namespace WebCore;
 namespace WebKit {
 
 WebKitWebView* getViewFromFrame(WebKitWebFrame* frame) {
-  return webkit_web_frame_get_web_view(frame);
+  WebKitWebFramePrivate* priv = frame->priv;
+  return priv->webView;
 }
 
 WebCore::Frame* core(WebKitWebFrame* frame) {
   if (!frame)
     return 0;
 
-  WebKitWebFramePrivate* frame_data = WEBKIT_WEB_FRAME_GET_PRIVATE(frame);
-  return frame_data ? frame_data->frame : 0;
+  WebKitWebFramePrivate* priv = frame->priv;
+  return priv ? priv->coreFrame : 0;
 }
 
 WebKitWebFrame* kit(WebCore::Frame* coreFrame) {
@@ -63,8 +64,8 @@ WebCore::Page* core(WebKitWebView* webView) {
   if (!webView)
     return 0;
 
-  WebKitWebViewPrivate* webViewData = WEBKIT_WEB_VIEW_GET_PRIVATE(webView);
-  return webViewData ? webViewData->corePage : 0;
+  WebKitWebViewPrivate* priv = webView->priv;
+  return priv ? priv->corePage : 0;
 }
 
 WebKitWebView* kit(WebCore::Page* corePage) {
