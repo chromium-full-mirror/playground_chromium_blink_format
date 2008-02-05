@@ -183,7 +183,6 @@ enum WebScrollGranularity {
 - (void)scrollDOMRangeToVisible:(DOMRange*)range;
 
 - (NSFont*)fontForSelection:(BOOL*)hasMultipleFonts;
-- (NSWritingDirection)baseWritingDirectionForSelectionStart;
 
 - (NSString*)stringWithData:
     (NSData*)data;  // using the encoding of the frame's main resource
