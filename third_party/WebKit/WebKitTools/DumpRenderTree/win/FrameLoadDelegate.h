@@ -112,10 +112,6 @@ class FrameLoadDelegate : public IWebFrameLoadDelegate2,
     return E_NOTIMPL;
   }
 
-  virtual HRESULT STDMETHODCALLTYPE willCloseFrame(
-      /* [in] */ IWebView* webView,
-      /* [in] */ IWebFrame* frame);
-
   virtual HRESULT STDMETHODCALLTYPE windowScriptObjectAvailable(
       /* [in] */ IWebView* sender,
       /* [in] */ JSContextRef context,
