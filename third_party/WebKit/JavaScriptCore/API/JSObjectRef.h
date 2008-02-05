@@ -835,7 +835,7 @@ JS_EXPORT JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,
 @param ctx The execution context to use.
 @param object The object whose property names you want to get.
 @result A JSPropertyNameArray containing the names object's enumerable
-properties.
+properties. Ownership follows the Create Rule.
 */
 JS_EXPORT JSPropertyNameArrayRef JSObjectCopyPropertyNames(JSContextRef ctx,
                                                            JSObjectRef object);
