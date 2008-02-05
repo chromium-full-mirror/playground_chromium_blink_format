@@ -33,6 +33,7 @@
 #include "PlatformString.h"
 #include <wtf/RefCounted.h>
 #include "StringHash.h"
+#include "SubstituteData.h"
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/RefPtr.h>
@@ -99,6 +100,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
   String formContentType() const;
   String formReferrer() const;
   String rssFeedReferrer() const;
+  const SubstituteData& substituteData() const;
 
   int visitCount() const;
 
@@ -123,6 +125,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
 
   void setRSSFeedReferrer(const String&);
   void setVisitCount(int);
+  void setSubstituteData(const SubstituteData&);
 
   void addChildItem(PassRefPtr<HistoryItem>);
   HistoryItem* childItemWithName(const String&) const;
@@ -184,6 +187,8 @@ class HistoryItem : public RefCounted<HistoryItem> {
 
   // info used to support RSS feeds
   String m_rssFeedReferrer;
+
+  SubstituteData m_substituteData;
 
   // PageCache controls these fields.
   HistoryItem* m_next;
