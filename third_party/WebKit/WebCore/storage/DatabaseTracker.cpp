@@ -34,6 +34,7 @@
 #include "DatabaseTrackerClient.h"
 #include "Document.h"
 #include "FileSystem.h"
+#include "OriginQuotaManager.h"
 #include "Page.h"
 #include "SecurityOrigin.h"
 #include "SecurityOriginHash.h"
@@ -42,6 +43,12 @@
 using namespace std;
 
 namespace WebCore {
+
+OriginQuotaManager& DatabaseTracker::originQuotaManager() {
+  populateOrigins();
+  ASSERT(m_quotaManager);
+  return *m_quotaManager;
+}
 
 DatabaseTracker& DatabaseTracker::tracker() {
   static DatabaseTracker tracker;
@@ -122,14 +129,19 @@ bool DatabaseTracker::canEstablishDatabase(Document* document,
   // can run on the database thread later.
   populateOrigins();
 
+  SecurityOrigin* origin = document->securityOrigin();
+
+  // Since we're imminently opening a database within this Document's origin,
+  // make sure this origin is being tracked by the QuotaTracker
+  // by fetching it's current usage now
+  unsigned long long usage = usageForOrigin(origin);
+
   // If a database already exists, ignore the passed-in estimated size and say
   // it's OK.
-  SecurityOrigin* origin = document->securityOrigin();
   if (hasEntryForDatabase(origin, name))
     return true;
 
   // If the database will fit, allow its creation.
-  unsigned long long usage = usageForOrigin(origin);
   unsigned long long requirement = usage + max(1UL, estimatedSize);
   if (requirement < usage)
     return false;  // If the estimated size is so big it causes an overflow,
@@ -259,6 +271,15 @@ String DatabaseTracker::fullPathForDatabase(SecurityOrigin* origin,
   if (!addDatabase(origin, name, String::format("%016llx.db", seq)))
     return String();
 
+  // If this origin's quota is being tracked (open handle to a database in this
+  // origin), add this new database
+  // to the quota manager now
+  {
+    Locker<OriginQuotaManager> locker(originQuotaManager());
+    if (originQuotaManager().tracksOrigin(origin))
+      originQuotaManager().addDatabase(origin, name, filename);
+  }
+
   return filename;
 }
 
@@ -269,6 +290,7 @@ void DatabaseTracker::populateOrigins() {
   ASSERT(currentThread() == m_thread);
 
   m_quotaMap.set(new QuotaMap);
+  m_quotaManager.set(new OriginQuotaManager);
 
   openTrackerDatabase(false);
   if (!m_database.isOpen())
@@ -443,14 +465,26 @@ unsigned long long DatabaseTracker::usageForDatabase(const String& name,
 
 unsigned long long DatabaseTracker::usageForOrigin(SecurityOrigin* origin) {
   ASSERT(currentThread() == m_thread);
+  Locker<OriginQuotaManager> locker(originQuotaManager());
+
+  // Use the OriginQuotaManager mechanism to calculate the usage
+  if (originQuotaManager().tracksOrigin(origin))
+    return originQuotaManager().diskUsage(origin);
+
+  // If the OriginQuotaManager doesn't track this origin already, prime it to do
+  // so
+  originQuotaManager().trackOrigin(origin);
+
   Vector<String> names;
   databaseNamesForOrigin(origin, names);
 
-  unsigned long long result = 0;
   for (unsigned i = 0; i < names.size(); ++i)
-    result += usageForDatabase(names[i], origin);
+    originQuotaManager().addDatabase(
+        origin, names[i], fullPathForDatabase(origin, names[i], false));
 
-  return result;
+  if (!originQuotaManager().tracksOrigin(origin))
+    return 0;
+  return originQuotaManager().diskUsage(origin);
 }
 
 unsigned long long DatabaseTracker::quotaForOrigin(SecurityOrigin* origin) {
@@ -616,6 +650,8 @@ void DatabaseTracker::deleteOrigin(SecurityOrigin* origin) {
   {
     MutexLocker lockQuotaMap(m_quotaMapGuard);
     m_quotaMap->remove(origin);
+    Locker<OriginQuotaManager> quotaManagerLocker(originQuotaManager());
+    originQuotaManager().removeOrigin(origin);
   }
 
   // If we removed the last origin, do some additional deletion.
@@ -663,6 +699,11 @@ void DatabaseTracker::deleteDatabase(SecurityOrigin* origin,
         "Unable to execute deletion of database %s from origin %s from tracker",
         name.ascii().data(), origin->stringIdentifier().ascii().data());
     return;
+  }
+
+  {
+    Locker<OriginQuotaManager> quotaManagerLocker(originQuotaManager());
+    originQuotaManager().removeDatabase(origin, name);
   }
 
   if (m_client) {

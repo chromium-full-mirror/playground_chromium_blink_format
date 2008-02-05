@@ -40,6 +40,7 @@ namespace WebCore {
 
 class DatabaseTrackerClient;
 class Document;
+class OriginQuotaManager;
 class SecurityOrigin;
 
 struct SecurityOriginHash;
@@ -81,6 +82,8 @@ class DatabaseTracker {
   // From a secondary thread, must be thread safe with its data
   void scheduleNotifyDatabaseChanged(SecurityOrigin*, const String& name);
 
+  OriginQuotaManager& originQuotaManager();
+
   static DatabaseTracker& tracker();
 
  private:
@@ -108,6 +111,8 @@ class DatabaseTracker {
       QuotaMap;
   Mutex m_quotaMapGuard;
   mutable OwnPtr<QuotaMap> m_quotaMap;
+
+  OwnPtr<OriginQuotaManager> m_quotaManager;
 
   String m_databaseDirectoryPath;
 
