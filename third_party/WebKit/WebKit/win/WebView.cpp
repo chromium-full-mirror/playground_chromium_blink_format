@@ -1909,8 +1909,10 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
     lResult = DefWindowProc(hWnd, message, wParam, lParam);
 
   // Let the client know whether we consider this message handled.
-  return (message == WM_KEYDOWN || message == WM_SYSKEYDOWN) ? !handled
-                                                             : lResult;
+  return (message == WM_KEYDOWN || message == WM_SYSKEYDOWN ||
+          message == WM_KEYUP || message == WM_SYSKEYUP)
+             ? !handled
+             : lResult;
 }
 
 bool WebView::developerExtrasEnabled() const {
