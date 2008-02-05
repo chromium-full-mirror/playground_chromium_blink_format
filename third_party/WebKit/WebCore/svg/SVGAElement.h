@@ -47,8 +47,8 @@ class SVGAElement : public SVGStyledTransformableElement,
   virtual String title() const;
 
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
 
-  // Derived from: 'SVGStyledElement'
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   virtual void defaultEventHandler(Event*);
