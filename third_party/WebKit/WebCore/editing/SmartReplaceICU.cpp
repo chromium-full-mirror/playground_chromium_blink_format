@@ -30,9 +30,12 @@
 #include "config.h"
 #include "SmartReplace.h"
 
-#include "Logging.h"
 #if !PLATFORM(CF) && USE(ICU_UNICODE)
+#include "PlatformString.h"
 #include <unicode/uset.h>
+#include <wtf/Assertions.h>
+
+namespace WebCore {
 
 // This is mostly a port of the code in WebCore/editing/SmartReplaceCF.cpp
 // except we use icu in place of CoreFoundations character classes.
@@ -43,8 +46,10 @@ static USet* getSmartSet(bool isPreviousCharacter) {
   if (!smartSet) {
     // Whitespace and newline (kCFCharacterSetWhitespaceAndNewline)
     UErrorCode ec = U_ZERO_ERROR;
-    smartSet = uset_openPattern(
-        L"[[:WSpace:] [\\u000A\\u000B\\u000C\\u000D\\u0085]]", -1, &ec);
+    String whitespaceAndNewline =
+        "[[:WSpace:] [\\u000A\\u000B\\u000C\\u000D\\u0085]]";
+    smartSet = uset_openPattern(whitespaceAndNewline.characters(),
+                                whitespaceAndNewline.length(), &ec);
     ASSERT(U_SUCCESS(ec));
 
     // CJK ranges
@@ -78,15 +83,21 @@ static USet* getSmartSet(bool isPreviousCharacter) {
         0x2F800 + 0x021E);  // CJK Compatibility Ideographs (0x2F800 - 0x2FA1D)
 
     if (isPreviousCharacter) {
-      uset_addAllCodePoints(smartSet, L"([\"\'#$/-`{", -1);
+      String punctuation = "([\"\'#$/-`{";
+      uset_addAllCodePoints(smartSet, punctuation.characters(),
+                            punctuation.length());
 
       preSmartSet = smartSet;
     } else {
-      uset_addAllCodePoints(smartSet, L")].,;:?\'!\"%*-/}", -1);
+      String punctuation = ")].,;:?\'!\"%*-/}";
+      uset_addAllCodePoints(smartSet, punctuation.characters(),
+                            punctuation.length());
 
       // Punctuation (kCFCharacterSetPunctuation)
       UErrorCode ec = U_ZERO_ERROR;
-      USet* icuPunct = uset_openPattern(L"[:P:]", -1, &ec);
+      String punctuationClass = "[:P:]";
+      USet* icuPunct = uset_openPattern(punctuationClass.characters(),
+                                        punctuationClass.length(), &ec);
       ASSERT(U_SUCCESS(ec));
       uset_addAll(smartSet, icuPunct);
       uset_close(icuPunct);
@@ -96,8 +107,6 @@ static USet* getSmartSet(bool isPreviousCharacter) {
   }
   return smartSet;
 }
-
-namespace WebCore {
 
 bool isCharacterSmartReplaceExempt(UChar32 c, bool isPreviousCharacter) {
   return uset_contains(getSmartSet(isPreviousCharacter), c);
