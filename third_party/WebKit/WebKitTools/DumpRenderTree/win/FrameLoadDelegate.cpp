@@ -228,6 +228,12 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didFailLoadWithError(
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::willCloseFrame(
+    /* [in] */ IWebView* webView,
+    /* [in] */ IWebFrame* frame) {
+  return E_NOTIMPL;
+}
+
 HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didClearWindowObject(
     /* [in] */ IWebView* webView,
     /* [in] */ JSContextRef context,
