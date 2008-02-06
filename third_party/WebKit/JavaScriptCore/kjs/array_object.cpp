@@ -262,8 +262,7 @@ JSValue* arrayProtoFuncConcat(ExecState* exec,
     curObj = static_cast<JSObject*>(curArg);  // may be 0
     ++it;
   }
-  arr->put(exec, exec->propertyNames().length, jsNumber(n),
-           DontEnum | DontDelete);
+  arr->put(exec, exec->propertyNames().length, jsNumber(n));
   return arr;
 }
 
@@ -272,13 +271,12 @@ JSValue* arrayProtoFuncPop(ExecState* exec, JSObject* thisObj, const List&) {
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   if (length == 0) {
-    thisObj->put(exec, exec->propertyNames().length, jsNumber(length),
-                 DontEnum | DontDelete);
+    thisObj->put(exec, exec->propertyNames().length, jsNumber(length));
     result = jsUndefined();
   } else {
     result = thisObj->get(exec, length - 1);
-    thisObj->put(exec, exec->propertyNames().length, jsNumber(length - 1),
-                 DontEnum | DontDelete);
+    thisObj->deleteProperty(exec, length - 1);
+    thisObj->put(exec, exec->propertyNames().length, jsNumber(length - 1));
   }
   return result;
 }
@@ -291,8 +289,7 @@ JSValue* arrayProtoFuncPush(ExecState* exec,
   for (unsigned n = 0; n < args.size(); n++)
     thisObj->put(exec, length + n, args[n]);
   length += args.size();
-  thisObj->put(exec, exec->propertyNames().length, jsNumber(length),
-               DontEnum | DontDelete);
+  thisObj->put(exec, exec->propertyNames().length, jsNumber(length));
   return jsNumber(length);
 }
 
@@ -327,8 +324,7 @@ JSValue* arrayProtoFuncShift(ExecState* exec, JSObject* thisObj, const List&) {
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   if (length == 0) {
-    thisObj->put(exec, exec->propertyNames().length, jsNumber(length),
-                 DontEnum | DontDelete);
+    thisObj->put(exec, exec->propertyNames().length, jsNumber(length));
     result = jsUndefined();
   } else {
     result = thisObj->get(exec, 0);
@@ -339,8 +335,7 @@ JSValue* arrayProtoFuncShift(ExecState* exec, JSObject* thisObj, const List&) {
         thisObj->deleteProperty(exec, k - 1);
     }
     thisObj->deleteProperty(exec, length - 1);
-    thisObj->put(exec, exec->propertyNames().length, jsNumber(length - 1),
-                 DontEnum | DontDelete);
+    thisObj->put(exec, exec->propertyNames().length, jsNumber(length - 1));
   }
   return result;
 }
@@ -389,8 +384,7 @@ JSValue* arrayProtoFuncSlice(ExecState* exec,
     if (JSValue* v = getProperty(exec, thisObj, k))
       resObj->put(exec, n, v);
   }
-  resObj->put(exec, exec->propertyNames().length, jsNumber(n),
-              DontEnum | DontDelete);
+  resObj->put(exec, exec->propertyNames().length, jsNumber(n));
   return result;
 }
 
@@ -415,11 +409,8 @@ JSValue* arrayProtoFuncSort(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
 
-  if (!length) {
-    thisObj->put(exec, exec->propertyNames().length, jsNumber(0),
-                 DontEnum | DontDelete);
+  if (!length)
     return thisObj;
-  }
 
   // "Min" sort. Not the fastest, but definitely less code than heapsort
   // or quicksort, and much less swapping than bubblesort/insertionsort.
@@ -488,8 +479,7 @@ JSValue* arrayProtoFuncSplice(ExecState* exec,
     if (JSValue* v = getProperty(exec, thisObj, k + begin))
       resObj->put(exec, k, v);
   }
-  resObj->put(exec, exec->propertyNames().length, jsNumber(deleteCount),
-              DontEnum | DontDelete);
+  resObj->put(exec, exec->propertyNames().length, jsNumber(deleteCount));
 
   unsigned additionalArgs = std::max<int>(args.size() - 2, 0);
   if (additionalArgs != deleteCount) {
@@ -515,8 +505,7 @@ JSValue* arrayProtoFuncSplice(ExecState* exec,
     thisObj->put(exec, k + begin, args[k + 2]);
 
   thisObj->put(exec, exec->propertyNames().length,
-               jsNumber(length - deleteCount + additionalArgs),
-               DontEnum | DontDelete);
+               jsNumber(length - deleteCount + additionalArgs));
   return result;
 }
 
@@ -527,17 +516,18 @@ JSValue* arrayProtoFuncUnShift(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   unsigned nrArgs = args.size();
-  for (unsigned k = length; k > 0; --k) {
-    if (JSValue* v = getProperty(exec, thisObj, k - 1))
-      thisObj->put(exec, k + nrArgs - 1, v);
-    else
-      thisObj->deleteProperty(exec, k + nrArgs - 1);
+  if (nrArgs) {
+    for (unsigned k = length; k > 0; --k) {
+      if (JSValue* v = getProperty(exec, thisObj, k - 1))
+        thisObj->put(exec, k + nrArgs - 1, v);
+      else
+        thisObj->deleteProperty(exec, k + nrArgs - 1);
+    }
   }
   for (unsigned k = 0; k < nrArgs; ++k)
     thisObj->put(exec, k, args[k]);
   JSValue* result = jsNumber(length + nrArgs);
-  thisObj->put(exec, exec->propertyNames().length, result,
-               DontEnum | DontDelete);
+  thisObj->put(exec, exec->propertyNames().length, result);
   return result;
 }
 
