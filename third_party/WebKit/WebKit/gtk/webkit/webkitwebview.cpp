@@ -1081,9 +1081,9 @@ static void webkit_web_view_screen_changed(WebKitWebView* webView,
   GdkScreen* screen = gtk_widget_has_screen(GTK_WIDGET(webView))
                           ? gtk_widget_get_screen(GTK_WIDGET(webView))
                           : gdk_screen_get_default();
-  guint DPI = gdk_screen_get_resolution(screen);
+  gdouble DPI = gdk_screen_get_resolution(screen);
 #else
-  guint DPI = 96;
+  gdouble DPI = 96;
   g_warning("Cannot retrieve resolution, falling back to 96 DPI");
 #endif
   settings->setDefaultFontSize(defaultFontSize / 72.0 * DPI);
