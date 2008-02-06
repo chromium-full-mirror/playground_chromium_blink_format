@@ -303,9 +303,9 @@ Arguments::Arguments(ExecState* exec,
   int i = 0;
   List::const_iterator end = args.end();
   for (List::const_iterator it = args.begin(); it != end; ++it, ++i) {
-    if (!indexToNameMap.isMapped(Identifier::from(i))) {
-      JSObject::put(exec, Identifier::from(i), *it, DontEnum);
-    }
+    Identifier name = Identifier::from(i);
+    if (!indexToNameMap.isMapped(name))
+      putDirect(name, *it, DontEnum);
   }
 }
 
@@ -898,8 +898,8 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                           name),
       m_function(function) {
   ASSERT_ARG(function, function);
-  put(exec, exec->propertyNames().length, jsNumber(len),
-      DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(len),
+            DontDelete | ReadOnly | DontEnum);
 }
 
 PrototypeFunction::PrototypeFunction(ExecState* exec,
@@ -909,8 +909,8 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      JSMemberFunction function)
     : InternalFunctionImp(functionPrototype, name), m_function(function) {
   ASSERT_ARG(function, function);
-  put(exec, exec->propertyNames().length, jsNumber(len),
-      DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(len),
+            DontDelete | ReadOnly | DontEnum);
 }
 
 JSValue* PrototypeFunction::callAsFunction(ExecState* exec,

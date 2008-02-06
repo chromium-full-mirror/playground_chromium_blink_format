@@ -106,10 +106,10 @@ JSObjectRef JSObjectMakeConstructor(
                              ? jsClass->prototype(ctx)
                              : exec->dynamicGlobalObject()->objectPrototype();
 
-  JSObject* constructor =
+  JSCallbackConstructor* constructor =
       new JSCallbackConstructor(exec, jsClass, callAsConstructor);
-  constructor->put(exec, exec->propertyNames().prototype, jsPrototype,
-                   DontEnum | DontDelete | ReadOnly);
+  constructor->putDirect(exec->propertyNames().prototype, jsPrototype,
+                         DontEnum | DontDelete | ReadOnly);
   return toRef(constructor);
 }
 

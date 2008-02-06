@@ -26,13 +26,13 @@
 
 // List of property names, passed to a macro so we can do set them up various
 // ways without repeating the list.
-#define KJS_COMMON_IDENTIFIERS_EACH_PROPERTY_NAME(macro)                    \
-  macro(arguments) macro(callee) macro(caller) macro(constructor)           \
-      macro(fromCharCode) macro(global) macro(ignoreCase) macro(index)      \
-          macro(input) macro(lastIndex) macro(length) macro(message)        \
-              macro(multiline) macro(name) macro(prototype) macro(source)   \
-                  macro(toExponential) macro(toFixed) macro(toLocaleString) \
-                      macro(toPrecision) macro(toString) macro(valueOf)
+#define KJS_COMMON_IDENTIFIERS_EACH_PROPERTY_NAME(macro)                      \
+  macro(arguments) macro(callee) macro(caller) macro(constructor)             \
+      macro(fromCharCode) macro(global) macro(ignoreCase) macro(index)        \
+          macro(input) macro(length) macro(message) macro(multiline)          \
+              macro(name) macro(prototype) macro(source) macro(toExponential) \
+                  macro(toFixed) macro(toLocaleString) macro(toPrecision)     \
+                      macro(toString) macro(valueOf)
 
 namespace KJS {
 

@@ -60,6 +60,8 @@ class RegExpImp : public JSObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
+  void setLastIndex(double lastIndex) { m_lastIndex = lastIndex; }
+
  private:
   bool match(ExecState*, const List& args);
 
