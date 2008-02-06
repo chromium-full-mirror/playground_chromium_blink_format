@@ -137,10 +137,10 @@ inline void Token::addAttribute(Document* doc,
                                 bool viewSourceMode) {
   if (!attrName.isEmpty()) {
     ASSERT(!attrName.contains('/'));
-    Attribute* a = new MappedAttribute(attrName, v);
+    RefPtr<MappedAttribute> a = new MappedAttribute(attrName, v);
     if (!attrs)
       attrs = new NamedMappedAttrMap(0);
-    attrs->insertAttribute(a, viewSourceMode);
+    attrs->insertAttribute(a.release(), viewSourceMode);
   }
 
   attrName = emptyAtom;
