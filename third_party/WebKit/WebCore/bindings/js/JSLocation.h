@@ -48,7 +48,7 @@ class JSLocation : public KJS::DOMObject {
                    const KJS::Identifier&,
                    KJS::JSValue*,
                    int attr = KJS::None);
-
+  virtual bool deleteProperty(KJS::ExecState*, const KJS::Identifier&);
   virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
 
   enum {
