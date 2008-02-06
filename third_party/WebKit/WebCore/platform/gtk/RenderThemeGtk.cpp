@@ -401,7 +401,7 @@ double RenderThemeGtk::caretBlinkFrequency() const {
   gint time;
 
   g_object_get(settings, "gtk-cursor-blink", &shouldBlink,
-               "gtk-cursor-blink-time", &time, 0);
+               "gtk-cursor-blink-time", &time, NULL);
 
   if (!shouldBlink)
     return 0;
