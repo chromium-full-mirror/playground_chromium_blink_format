@@ -371,7 +371,7 @@ void HTMLObjectElement::setCodeType(const String& value) {
 }
 
 String HTMLObjectElement::data() const {
-  return getAttribute(dataAttr);
+  return document()->completeURL(getAttribute(dataAttr));
 }
 
 void HTMLObjectElement::setData(const String& value) {
