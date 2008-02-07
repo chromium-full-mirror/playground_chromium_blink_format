@@ -3753,6 +3753,7 @@ int CSSParser::lex(void* yylvalWithoutType) {
     case URI:
     case STRING:
     case IDENT:
+    case NTH:
     case HEX:
     case IDSEL:
     case DIMEN:

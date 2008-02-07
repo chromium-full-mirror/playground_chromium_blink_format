@@ -1654,6 +1654,7 @@ class RenderStyle {
   bool m_childrenAffectedByPositionalRules : 1;
   bool m_firstChildState : 1;
   bool m_lastChildState : 1;
+  unsigned m_childIndex : 20;  // Plenty of bits to cache an index.
 
   int m_ref;
 
@@ -2761,6 +2762,8 @@ class RenderStyle {
   void setFirstChildState() { m_firstChildState = true; }
   bool lastChildState() const { return m_lastChildState; }
   void setLastChildState() { m_lastChildState = true; }
+  unsigned childIndex() const { return m_childIndex; }
+  void setChildIndex(unsigned index) { m_childIndex = index; }
 
   // Initial values for all the properties
   static bool initialBackgroundAttachment() { return true; }

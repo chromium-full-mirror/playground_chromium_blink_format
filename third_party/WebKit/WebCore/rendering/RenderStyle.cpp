@@ -910,6 +910,7 @@ RenderStyle::RenderStyle()
       m_childrenAffectedByPositionalRules(false),
       m_firstChildState(false),
       m_lastChildState(false),
+      m_childIndex(0),
       m_ref(0)
 #if ENABLE(SVG)
       ,
@@ -931,6 +932,7 @@ RenderStyle::RenderStyle(bool)
       m_childrenAffectedByPositionalRules(false),
       m_firstChildState(false),
       m_lastChildState(false),
+      m_childIndex(0),
       m_ref(1) {
   setBitDefaults();
 
@@ -972,6 +974,7 @@ RenderStyle::RenderStyle(const RenderStyle& o)
       m_childrenAffectedByPositionalRules(false),
       m_firstChildState(false),
       m_lastChildState(false),
+      m_childIndex(0),
       m_ref(0)
 #if ENABLE(SVG)
       ,
