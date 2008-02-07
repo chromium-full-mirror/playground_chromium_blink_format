@@ -253,6 +253,7 @@ class ScrollView : public Widget {
 
  private:
   void adjustScrollbars(int x = -1, int y = -1, bool refresh = true);
+  IntSize maximumScroll() const;
 
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
