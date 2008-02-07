@@ -80,7 +80,16 @@ void EditCommand::apply() {
     }
   }
 
-  updateLayout();
+  // Changes to the document may have been made since the last editing operation
+  // that
+  // require a layout, as in <rdar://problem/5658603>.  Low level operations,
+  // like
+  // RemoveNodeCommand, don't require a layout because the high level operations
+  // that
+  // use them perform one if one is necessary (like for the creation of
+  // VisiblePositions).
+  if (!m_parent)
+    updateLayout();
 
   DeleteButtonController* deleteButtonController =
       frame->editor()->deleteButtonController();
@@ -111,8 +120,14 @@ void EditCommand::unapply() {
 
   // Changes to the document may have been made since the last editing operation
   // that
-  // require a layout, as in <rdar://problem/5658603>.
-  updateLayout();
+  // require a layout, as in <rdar://problem/5658603>.  Low level operations,
+  // like
+  // RemoveNodeCommand, don't require a layout because the high level operations
+  // that
+  // use them perform one if one is necessary (like for the creation of
+  // VisiblePositions).
+  if (!m_parent)
+    updateLayout();
 
   DeleteButtonController* deleteButtonController =
       frame->editor()->deleteButtonController();
@@ -134,8 +149,14 @@ void EditCommand::reapply() {
 
   // Changes to the document may have been made since the last editing operation
   // that
-  // require a layout, as in <rdar://problem/5658603>.
-  updateLayout();
+  // require a layout, as in <rdar://problem/5658603>.  Low level operations,
+  // like
+  // RemoveNodeCommand, don't require a layout because the high level operations
+  // that
+  // use them perform one if one is necessary (like for the creation of
+  // VisiblePositions).
+  if (!m_parent)
+    updateLayout();
 
   DeleteButtonController* deleteButtonController =
       frame->editor()->deleteButtonController();

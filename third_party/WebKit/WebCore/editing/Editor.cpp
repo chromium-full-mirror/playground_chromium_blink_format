@@ -807,6 +807,10 @@ void Editor::appliedEditing(PassRefPtr<EditCommand> cmd) {
   // If there is no selection change, don't bother sending
   // shouldChangeSelection, but still call setSelection,
   // because there is work that it must do in this situation.
+  // The old selection can be invalid here and calling shouldChangeSelection can
+  // produce some strange calls.
+  // See <rdar://problem/5729315> Some shouldChangeSelectedDOMRange contain
+  // Ranges for selections that are no longer valid
   if (newSelection == m_frame->selectionController()->selection() ||
       m_frame->shouldChangeSelection(newSelection))
     m_frame->selectionController()->setSelection(newSelection, false);
@@ -845,6 +849,10 @@ void Editor::unappliedEditing(PassRefPtr<EditCommand> cmd) {
   // If there is no selection change, don't bother sending
   // shouldChangeSelection, but still call setSelection,
   // because there is work that it must do in this situation.
+  // The old selection can be invalid here and calling shouldChangeSelection can
+  // produce some strange calls.
+  // See <rdar://problem/5729315> Some shouldChangeSelectedDOMRange contain
+  // Ranges for selections that are no longer valid
   if (newSelection == m_frame->selectionController()->selection() ||
       m_frame->shouldChangeSelection(newSelection))
     m_frame->selectionController()->setSelection(newSelection, true);
@@ -862,6 +870,10 @@ void Editor::reappliedEditing(PassRefPtr<EditCommand> cmd) {
   // If there is no selection change, don't bother sending
   // shouldChangeSelection, but still call setSelection,
   // because there is work that it must do in this situation.
+  // The old selection can be invalid here and calling shouldChangeSelection can
+  // produce some strange calls.
+  // See <rdar://problem/5729315> Some shouldChangeSelectedDOMRange contain
+  // Ranges for selections that are no longer valid
   if (newSelection == m_frame->selectionController()->selection() ||
       m_frame->shouldChangeSelection(newSelection))
     m_frame->selectionController()->setSelection(newSelection, true);
