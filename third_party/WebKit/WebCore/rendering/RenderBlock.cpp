@@ -3020,11 +3020,13 @@ int RenderBlock::addOverhangingFloats(RenderBlock* child,
         m_floatingObjects->append(floatingObj);
       }
     } else if (makeChildPaintOtherFloats && r->noPaint &&
-               !r->node->hasLayer() && r->node->isDescendantOf(child))
+               !r->node->hasLayer() && r->node->isDescendantOf(child) &&
+               r->node->enclosingLayer() == child->enclosingLayer())
       // The float is not overhanging from this block, so if it is a descendant
       // of the child, the child should
       // paint it (the other case is that it is intruding into the child),
-      // unless it has its own layer.
+      // unless it has its own layer or enclosing
+      // layer.
       // If makeChildPaintOtherFloats is false, it means that the child must
       // already know about all the floats
       // it should paint.
