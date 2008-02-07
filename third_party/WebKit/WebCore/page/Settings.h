@@ -107,7 +107,9 @@ class Settings {
   }
 
   void setUserStyleSheetLocation(const KURL&);
-  KURL userStyleSheetLocation() const { return m_userStyleSheetLocation; }
+  const KURL& userStyleSheetLocation() const {
+    return m_userStyleSheetLocation;
+  }
 
   void setShouldPrintBackgrounds(bool);
   bool shouldPrintBackgrounds() const { return m_shouldPrintBackgrounds; }

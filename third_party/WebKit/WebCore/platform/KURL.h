@@ -118,6 +118,7 @@ class KURL {
 #endif
 
   bool isLocalFile() const;
+  String fileSystemPath() const;
 
   static DeprecatedString decode_string(const DeprecatedString&);
   static DeprecatedString decode_string(const DeprecatedString&,

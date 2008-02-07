@@ -82,6 +82,11 @@ bool getFileSize(const String& path, long long& resultSize) {
   return true;
 }
 
+bool getFileModificationTime(const String&, time_t&) {
+  notImplemented();
+  return false;
+}
+
 String pathByAppendingComponent(const String& path, const String& component) {
   if (path.endsWith(G_DIR_SEPARATOR_S))
     return path + component;

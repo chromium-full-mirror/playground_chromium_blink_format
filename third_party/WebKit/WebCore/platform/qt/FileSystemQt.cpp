@@ -53,6 +53,11 @@ bool getFileSize(const String& path, long long& result) {
   return info.exists();
 }
 
+bool getFileModificationTime(const String&, time_t&) {
+  notImplemented();
+  return false;
+}
+
 bool makeAllDirectories(const String& path) {
   return QDir::root().mkpath(path);
 }

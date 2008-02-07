@@ -158,8 +158,10 @@ class Frame : public RefCounted<Frame> {
 
   Settings* settings() const;  // can be NULL
 
+#if FRAME_LOADS_USER_STYLESHEET
   void setUserStyleSheetLocation(const KURL&);
   void setUserStyleSheet(const String& styleSheetData);
+#endif
 
   void setPrinting(bool printing,
                    float minPageWidth,

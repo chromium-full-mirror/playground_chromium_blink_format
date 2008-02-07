@@ -144,6 +144,9 @@ class Page : Noncopyable {
   bool inLowQualityImageInterpolationMode() const;
   void setInLowQualityImageInterpolationMode(bool = true);
 
+  void userStyleSheetLocationChanged();
+  const String& userStyleSheet() const;
+
 #if PLATFORM(WIN) || (PLATFORM(WX) && PLATFORM(WIN_OS))
   // The global DLL or application instance used for all windows.
   static void setInstanceHandle(HINSTANCE instanceHandle) {
@@ -177,6 +180,11 @@ class Page : Noncopyable {
   bool m_inLowQualityInterpolationMode;
 
   InspectorController* m_parentInspectorController;
+
+  String m_userStyleSheetPath;
+  mutable String m_userStyleSheet;
+  mutable bool m_didLoadUserStyleSheet;
+  mutable time_t m_userStyleSheetModificationTime;
 
 #if PLATFORM(WIN) || (PLATFORM(WX) && defined(__WXMSW__))
   static HINSTANCE s_instanceHandle;

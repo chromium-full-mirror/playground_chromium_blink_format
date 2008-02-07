@@ -26,6 +26,7 @@
 #include "config.h"
 #include "KURL.h"
 
+#include <wtf/RetainPtr.h>
 #include <wtf/Vector.h>
 #include <CoreFoundation/CFURL.h>
 
@@ -69,5 +70,21 @@ CFURLRef KURL::createCFURL() const {
     result = CFURLCreateAbsoluteURLWithBytes(
         0, bytes, urlString.length(), kCFStringEncodingISOLatin1, 0, true);
   return result;
+}
+
+String KURL::fileSystemPath() const {
+  RetainPtr<CFURLRef> cfURL(AdoptCF, createCFURL());
+  if (!cfURL)
+    return String();
+
+#if PLATFORM(WIN)
+  CFURLPathStyle pathStyle = kCFURLWindowsPathStyle;
+#else
+  CFURLPathStyle pathStyle = kCFURLPOSIXPathStyle;
+#endif
+
+  RetainPtr<CFStringRef> path(AdoptCF,
+                              CFURLCopyFileSystemPath(cfURL.get(), pathStyle));
+  return path.get();
 }
 }

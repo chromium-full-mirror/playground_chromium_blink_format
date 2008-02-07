@@ -61,6 +61,7 @@
 #include "PlatformMouseEvent.h"
 #include "PluginInfoStore.h"
 #include "RenderTheme.h"
+#include "SharedBuffer.h"
 #include "SystemTime.h"
 #include "TextBoundaries.h"
 #include "Widget.h"
@@ -100,6 +101,11 @@ float userIdleTime() {
   return 0.0;
 }
 #endif
+
+PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
+  notImplemented();
+  return 0;
+}
 }
 
 // vim: ts=4 sw=4 et

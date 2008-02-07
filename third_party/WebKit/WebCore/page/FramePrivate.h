@@ -59,7 +59,9 @@ class WebScriptObject;
 
 namespace WebCore {
 
+#if FRAME_LOADS_USER_STYLESHEET
 class UserStyleSheetLoader;
+#endif
 
 typedef HashMap<void*, RefPtr<KJS::Bindings::RootObject>> RootObjectMap;
 
@@ -106,8 +108,6 @@ class FramePrivate {
 
   FrameLoader* m_loader;
 
-  UserStyleSheetLoader* m_userStyleSheetLoader;
-
   RefPtr<Node> m_elementToDraw;
   PaintRestriction m_paintRestriction;
 
@@ -125,6 +125,9 @@ class FramePrivate {
   RefPtr<KJS::Bindings::RootObject> m_bindingRootObject;
   RootObjectMap m_rootObjects;
   NPObject* m_windowScriptNPObject;
+#if FRAME_LOADS_USER_STYLESHEET
+  UserStyleSheetLoader* m_userStyleSheetLoader;
+#endif
 #if PLATFORM(MAC)
   RetainPtr<WebScriptObject> m_windowScriptObject;
   WebCoreFrameBridge* m_bridge;
