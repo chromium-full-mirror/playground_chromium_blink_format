@@ -108,6 +108,7 @@ class SimpleFontData : public FontData {
   SCRIPT_CACHE* scriptCache() const { return &m_scriptCache; }
 
   static void setShouldApplyMacAscentHack(bool);
+  static bool shouldApplyMacAscentHack();
 #endif
 
 #if PLATFORM(GTK)
