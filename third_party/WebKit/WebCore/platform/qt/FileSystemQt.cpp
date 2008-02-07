@@ -47,7 +47,7 @@ bool deleteEmptyDirectory(const String& path) {
   return QDir::root().rmdir(path);
 }
 
-bool fileSize(const String& path, long long& result) {
+bool getFileSize(const String& path, long long& result) {
   QFileInfo info(path);
   result = info.size();
   return info.exists();

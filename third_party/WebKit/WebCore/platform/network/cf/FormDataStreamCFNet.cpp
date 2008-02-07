@@ -361,7 +361,7 @@ void setHTTPBody(CFMutableURLRequestRef request,
       length += element.m_data.size();
     else {
       long long size;
-      if (fileSize(element.m_filename, size))
+      if (getFileSize(element.m_filename, size))
         length += size;
       else
         haveLength = false;

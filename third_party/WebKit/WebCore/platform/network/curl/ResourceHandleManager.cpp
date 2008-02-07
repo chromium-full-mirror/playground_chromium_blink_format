@@ -400,7 +400,7 @@ void ResourceHandleManager::setupPOST(ResourceHandle* job,
     FormDataElement element = elements[i];
     if (element.m_type == FormDataElement::encodedFile) {
       long long fileSizeResult;
-      if (fileSize(element.m_filename, fileSizeResult)) {
+      if (getFileSize(element.m_filename, fileSizeResult)) {
         if (fileSizeResult > maxCurlOffT) {
           // File size is too big for specifying it to cURL
           chunkedTransfer = true;

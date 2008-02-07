@@ -41,7 +41,7 @@
 
 namespace WebCore {
 
-bool fileSize(const String& path, long long& result) {
+bool getFileSize(const String& path, long long& result) {
   struct _stat32i64 sb;
   String filename = path;
   int statResult = _wstat32i64(filename.charactersWithNullTermination(), &sb);
