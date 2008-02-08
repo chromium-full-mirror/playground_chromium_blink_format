@@ -128,6 +128,7 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
   CFURLConnectionRef releaseConnectionForDownload();
 
   static void setHostAllowsAnyHTTPSCertificate(const String&);
+  static void setClientCertificate(const String& host, CFDataRef);
 #endif
   PassRefPtr<SharedBuffer> bufferedData();
   static bool supportsBufferedData();
