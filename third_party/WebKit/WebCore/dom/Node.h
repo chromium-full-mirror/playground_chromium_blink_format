@@ -363,6 +363,7 @@ class Node : public TreeShared<Node> {
 
   /* Like traversePreviousNode, but visits nodes before their children. */
   Node* traversePreviousNodePostOrder(const Node* stayWithin = 0) const;
+  Node* traversePreviousSiblingPostOrder(const Node* stayWithin = 0) const;
 
   /**
    * Finds previous or next editable leaf node.

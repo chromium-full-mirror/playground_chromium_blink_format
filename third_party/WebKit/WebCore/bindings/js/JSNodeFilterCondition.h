@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2007 Apple Inc. All rights reserved.
+ *  Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,10 @@
 #define JSNodeFilterCondition_h
 
 #include "NodeFilterCondition.h"
-#include "kjs_dom.h"
+
+namespace KJS {
+class JSObject;
+}
 
 namespace WebCore {
 
@@ -31,7 +34,7 @@ class Node;
 class JSNodeFilterCondition : public NodeFilterCondition {
  public:
   JSNodeFilterCondition(KJS::JSObject* filter);
-  virtual short acceptNode(Node*) const;
+  virtual short acceptNode(Node*, KJS::JSValue*& exception) const;
   virtual void mark();
 
  protected:
