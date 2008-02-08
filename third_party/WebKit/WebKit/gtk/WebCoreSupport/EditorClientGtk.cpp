@@ -40,7 +40,8 @@ static void imContextCommitted(GtkIMContext* context,
                                EditorClient* client) {
   Frame* frame =
       core(client->m_webView)->focusController()->focusedOrMainFrame();
-  frame->editor()->insertTextWithoutSendingTextEvent(str, false);
+  frame->editor()->insertTextWithoutSendingTextEvent(String::fromUTF8(str),
+                                                     false);
 }
 
 bool EditorClient::shouldDeleteRange(Range*) {
@@ -369,9 +370,11 @@ void EditorClient::textDidChangeInTextField(Element*) {
   notImplemented();
 }
 
-bool EditorClient::doTextFieldCommandFromEvent(Element*, KeyboardEvent*) {
-  notImplemented();
-  return false;
+bool EditorClient::doTextFieldCommandFromEvent(Element* element,
+                                               KeyboardEvent* event) {
+  WebKitWebViewPrivate* priv = m_webView->priv;
+  return gtk_im_context_filter_keypress(priv->imContext,
+                                        event->keyEvent()->gdkEventKey());
 }
 
 void EditorClient::textWillBeDeletedInTextField(Element*) {
