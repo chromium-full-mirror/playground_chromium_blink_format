@@ -41,7 +41,8 @@ SelectorNodeList::SelectorNodeList(PassRefPtr<Node> rootNode,
                                    CSSSelector* querySelector) {
   Document* document = rootNode->document();
   CSSStyleSelector* styleSelector = document->styleSelector();
-  for (Node* n = rootNode->traverseNextNode(); n; n = n->traverseNextNode()) {
+  for (Node* n = rootNode->firstChild(); n;
+       n = n->traverseNextNode(rootNode.get())) {
     if (n->isElementNode()) {
       styleSelector->initElementAndPseudoState(static_cast<Element*>(n));
       for (CSSSelector* selector = querySelector; selector;
