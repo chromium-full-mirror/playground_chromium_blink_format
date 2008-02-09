@@ -56,8 +56,6 @@ class RenderThemeQt : public RenderTheme {
                                const BackgroundLayer&,
                                const Color&) const;
 
-  virtual void paintResizeControl(GraphicsContext*, const IntRect&);
-
   // The platform selection color.
   virtual Color platformActiveSelectionBackgroundColor() const;
   virtual Color platformInactiveSelectionBackgroundColor() const;
@@ -67,8 +65,6 @@ class RenderThemeQt : public RenderTheme {
   virtual void systemFont(int propId, FontDescription&) const;
 
   virtual int minimumMenuListSize(RenderStyle*) const;
-
-  virtual void adjustSliderThumbSize(RenderObject*) const;
 
  protected:
   virtual bool paintCheckbox(RenderObject* o,
