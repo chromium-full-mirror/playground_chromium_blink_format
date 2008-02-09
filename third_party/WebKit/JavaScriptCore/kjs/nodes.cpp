@@ -4675,8 +4675,7 @@ FunctionImp* FuncDeclNode::makeFunction(ExecState* exec) {
 
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
-  proto->putDirect(exec->propertyNames().constructor, func,
-                   ReadOnly | DontDelete | DontEnum);
+  proto->putDirect(exec->propertyNames().constructor, func, DontEnum);
   func->putDirect(exec->propertyNames().prototype, proto,
                   Internal | DontDelete);
   func->putDirect(exec->propertyNames().length,
@@ -4715,8 +4714,7 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
       new FunctionImp(exec, m_ident, m_body.get(), exec->scopeChain());
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
-  proto->putDirect(exec->propertyNames().constructor, func,
-                   ReadOnly | DontDelete | DontEnum);
+  proto->putDirect(exec->propertyNames().constructor, func, DontEnum);
   func->putDirect(exec->propertyNames().prototype, proto,
                   Internal | DontDelete);
 
