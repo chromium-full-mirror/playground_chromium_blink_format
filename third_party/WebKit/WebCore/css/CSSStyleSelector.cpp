@@ -754,7 +754,7 @@ static bool parseNth(const String& nth, int& a, int& b) {
         if (n == 1)
           a = -1;  // -n == -1n
         else
-          a = nth.substring(0, n - 1).toInt();
+          a = nth.substring(1, n - 1).toInt();
       } else if (!n)
         a = 1;  // n == 1n
       else
@@ -1829,7 +1829,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         if (e->parentNode() && e->parentNode()->isElementNode()) {
           Element* parentNode = static_cast<Element*>(e->parentNode());
           bool result = false;
-          if (parentNode->isFinishedParsingChildren()) {
+          if (parentNode->finishedParsingChildren()) {
             Node* n = e->nextSibling();
             while (n && !n->isElementNode())
               n = n->nextSibling();
@@ -1860,7 +1860,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             if (parentStyle)
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
           }
-          if (!parentNode->isFinishedParsingChildren())
+          if (!parentNode->finishedParsingChildren())
             return false;
           bool result = false;
           const QualifiedName& type = e->tagQName();
@@ -1888,7 +1888,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             n = n->previousSibling();
           if (!n)
             firstChild = true;
-          if (firstChild && parentNode->isFinishedParsingChildren()) {
+          if (firstChild && parentNode->finishedParsingChildren()) {
             n = e->nextSibling();
             while (n && !n->isElementNode())
               n = n->nextSibling();
@@ -1925,7 +1925,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
             }
           }
-          if (!parentNode->isFinishedParsingChildren())
+          if (!parentNode->finishedParsingChildren())
             return false;
           bool firstChild = false;
           bool lastChild = false;
@@ -2042,7 +2042,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             if (parentStyle)
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
           }
-          if (!parentNode->isFinishedParsingChildren())
+          if (!parentNode->finishedParsingChildren())
             return false;
           int count = 1;
           Node* n = e->nextSibling();
@@ -2071,7 +2071,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             if (parentStyle)
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
           }
-          if (!parentNode->isFinishedParsingChildren())
+          if (!parentNode->finishedParsingChildren())
             return false;
           int count = 1;
           const QualifiedName& type = e->tagQName();
