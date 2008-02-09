@@ -120,8 +120,8 @@ void SVGGradientElement::svgAttributeChanged(const QualifiedName& attrName) {
     m_resource->invalidate();
 }
 
-void SVGGradientElement::childrenChanged() {
-  SVGStyledElement::childrenChanged();
+void SVGGradientElement::childrenChanged(bool changedByParser) {
+  SVGStyledElement::childrenChanged(changedByParser);
 
   if (m_resource)
     m_resource->invalidate();

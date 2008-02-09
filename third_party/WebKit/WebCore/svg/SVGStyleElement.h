@@ -37,12 +37,12 @@ class SVGStyleElement : public SVGElement, public StyleElement {
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
-  virtual void childrenChanged();
+  virtual void childrenChanged(bool changedByParser = false);
 
   void setCreatedByParser(bool createdByParser) {
     m_createdByParser = createdByParser;
   }
-  virtual void finishedParsing();
+  virtual void finishParsingChildren();
 
   // 'SVGStyleElement' functions
   const AtomicString& xmlspace() const;

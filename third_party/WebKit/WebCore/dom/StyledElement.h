@@ -103,8 +103,6 @@ class StyledElement : public Element {
 
  protected:
   RefPtr<CSSMutableStyleDeclaration> m_inlineStyleDecl;
-  mutable bool m_isStyleAttributeValid : 1;
-  mutable bool m_synchronizingStyleAttribute : 1;
 };
 
 }  // namespace

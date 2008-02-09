@@ -236,7 +236,8 @@ class Node : public TreeShared<Node> {
   // Also used for script elements and some SVG elements for similar purposes,
   // but making parsing a special case in this respect should be avoided if
   // possible.
-  virtual void finishedParsing() {}
+  virtual void finishParsingChildren() {}
+  virtual void beginParsingChildren() {}
 
   // Called by the frame right before dispatching an unloadEvent. [Radar
   // 4532113]
@@ -490,7 +491,7 @@ class Node : public TreeShared<Node> {
    * node that is of the type CDATA_SECTION_NODE, TEXT_NODE or COMMENT_NODE has
    * changed its value.
    */
-  virtual void childrenChanged();
+  virtual void childrenChanged(bool changedByParser = false){};
 
   virtual String toString() const = 0;
 

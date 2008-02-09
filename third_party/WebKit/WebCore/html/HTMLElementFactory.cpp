@@ -420,8 +420,8 @@ static PassRefPtr<HTMLElement> objectConstructor(const AtomicString&,
                                                  Document* doc,
                                                  HTMLFormElement*,
                                                  bool createdByParser) {
-  RefPtr<HTMLObjectElement> object = new HTMLObjectElement(doc);
-  object->setComplete(!createdByParser);
+  RefPtr<HTMLObjectElement> object =
+      new HTMLObjectElement(doc, createdByParser);
   return object.release();
 }
 

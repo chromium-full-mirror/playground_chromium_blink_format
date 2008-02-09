@@ -330,7 +330,7 @@ bool HTMLParser::insertNode(Node* n, bool flat) {
   } else {
     if (parentAttached && !n->attached() && !m_isParsingFragment)
       n->attach();
-    n->finishedParsing();
+    n->finishParsingChildren();
   }
 
   return true;
@@ -1296,6 +1296,7 @@ void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
 }
 
 void HTMLParser::pushBlock(const AtomicString& tagName, int level) {
+  current->beginParsingChildren();
   blockStack =
       new HTMLStackElem(tagName, level, current, didRefCurrent, blockStack);
   didRefCurrent = false;
@@ -1393,7 +1394,7 @@ inline HTMLStackElem* HTMLParser::popOneBlockCommon() {
   // Also, a few elements (<applet>, <object>) need to know when all child
   // elements (<param>s) are available.
   if (current && elem->node != current)
-    current->finishedParsing();
+    current->finishParsingChildren();
 
   blockStack = elem->next;
   current = elem->node;

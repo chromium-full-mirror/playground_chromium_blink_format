@@ -53,7 +53,7 @@ class HTMLAppletElement : public HTMLPlugInElement {
 
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual void finishedParsing();
+  virtual void finishParsingChildren();
   virtual void detach();
 
 #if USE(JAVASCRIPTCORE_BINDINGS)
@@ -81,7 +81,6 @@ class HTMLAppletElement : public HTMLPlugInElement {
   String vspace() const;
   void setVspace(const String&);
 
-  virtual bool allParamsAvailable();
   void setupApplet() const;
 
   virtual void insertedIntoDocument();
@@ -89,7 +88,6 @@ class HTMLAppletElement : public HTMLPlugInElement {
 
  private:
   String oldIdAttr;
-  bool m_allParamsAvailable;
 };
 }
 

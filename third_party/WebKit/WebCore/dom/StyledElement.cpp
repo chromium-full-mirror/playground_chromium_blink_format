@@ -122,10 +122,7 @@ void StyledElement::updateStyleAttributeIfNeeded() const {
 }
 
 StyledElement::StyledElement(const QualifiedName& name, Document* doc)
-    : Element(name, doc) {
-  m_isStyleAttributeValid = true;
-  m_synchronizingStyleAttribute = false;
-}
+    : Element(name, doc) {}
 
 StyledElement::~StyledElement() {
   destroyInlineStyleDecl();

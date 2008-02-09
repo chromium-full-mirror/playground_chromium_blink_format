@@ -34,7 +34,7 @@ class SVGTitleElement : public SVGStyledElement, public SVGLangSpace {
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
-  virtual void childrenChanged();
+  virtual void childrenChanged(bool changedByParser = false);
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 };

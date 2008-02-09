@@ -266,7 +266,7 @@ class SVGElement : public StyledElement {
   // For SVGTests
   virtual bool isValid() const { return true; }
 
-  virtual void finishedParsing();
+  virtual void finishParsingChildren();
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
   virtual bool childShouldCreateRenderer(Node*) const;
 

@@ -766,6 +766,8 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
     return;
   }
 
+  newElement->beginParsingChildren();
+
   if (newElement->hasTagName(scriptTag))
     static_cast<HTMLScriptElement*>(newElement.get())->setCreatedByParser(true);
   else if (newElement->hasTagName(HTMLNames::styleTag))
@@ -805,7 +807,7 @@ void XMLTokenizer::endElementNs() {
 
   Node* n = m_currentNode;
   RefPtr<Node> parent = n->parentNode();
-  n->finishedParsing();
+  n->finishParsingChildren();
 
   // don't load external scripts for standalone documents (for now)
   if (n->isElementNode() && m_view &&
@@ -1942,7 +1944,7 @@ void XMLTokenizer::parseEndElement() {
   //         return;
 
   RefPtr<Node> parent = n->parentNode();
-  n->finishedParsing();
+  n->finishParsingChildren();
 
   // don't load external scripts for standalone documents (for now)
   if (n->isElementNode() && m_view &&

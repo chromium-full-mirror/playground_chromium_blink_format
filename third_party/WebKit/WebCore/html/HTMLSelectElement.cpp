@@ -527,9 +527,9 @@ void HTMLSelectElement::recalcListItems(bool updateSelectedStates) const {
   m_recalcListItems = false;
 }
 
-void HTMLSelectElement::childrenChanged() {
+void HTMLSelectElement::childrenChanged(bool changedByParser) {
   setRecalcListItems();
-  HTMLFormControlElementWithState::childrenChanged();
+  HTMLFormControlElementWithState::childrenChanged(changedByParser);
 }
 
 void HTMLSelectElement::setRecalcListItems() {

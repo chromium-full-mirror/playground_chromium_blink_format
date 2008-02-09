@@ -237,8 +237,8 @@ void SVGStyledElement::invalidateResourcesInAncestorChain() const {
   }
 }
 
-void SVGStyledElement::childrenChanged() {
-  SVGElement::childrenChanged();
+void SVGStyledElement::childrenChanged(bool changedByParser) {
+  SVGElement::childrenChanged(changedByParser);
   if (document()->parsing())
     return;
 

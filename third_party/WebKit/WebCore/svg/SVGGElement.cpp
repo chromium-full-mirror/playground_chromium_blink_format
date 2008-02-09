@@ -61,8 +61,8 @@ void SVGGElement::svgAttributeChanged(const QualifiedName& attrName) {
     renderer()->setNeedsLayout(true);
 }
 
-void SVGGElement::childrenChanged() {
-  SVGStyledTransformableElement::childrenChanged();
+void SVGGElement::childrenChanged(bool changedByParser) {
+  SVGStyledTransformableElement::childrenChanged(changedByParser);
 
   if (renderer())
     renderer()->setNeedsLayout(true);

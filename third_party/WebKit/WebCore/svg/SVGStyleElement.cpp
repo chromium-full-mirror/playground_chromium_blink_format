@@ -81,10 +81,10 @@ void SVGStyleElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGElement::parseMappedAttribute(attr);
 }
 
-void SVGStyleElement::finishedParsing() {
+void SVGStyleElement::finishParsingChildren() {
   StyleElement::sheet(this);
   m_createdByParser = false;
-  SVGElement::finishedParsing();
+  SVGElement::finishParsingChildren();
 }
 
 void SVGStyleElement::insertedIntoDocument() {
@@ -99,7 +99,8 @@ void SVGStyleElement::removedFromDocument() {
   StyleElement::removedFromDocument(document());
 }
 
-void SVGStyleElement::childrenChanged() {
+void SVGStyleElement::childrenChanged(bool changedByParser) {
+  SVGElement::childrenChanged(changedByParser);
   StyleElement::process(this);
 }
 

@@ -45,7 +45,7 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
-  virtual void childrenChanged();
+  virtual void childrenChanged(bool changedByParser = false);
 
   virtual SVGResource* canvasResource();
 

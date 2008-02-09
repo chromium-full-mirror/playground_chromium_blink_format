@@ -169,8 +169,8 @@ void SVGMarkerElement::svgAttributeChanged(const QualifiedName& attrName) {
   }
 }
 
-void SVGMarkerElement::childrenChanged() {
-  SVGStyledElement::childrenChanged();
+void SVGMarkerElement::childrenChanged(bool changedByParser) {
+  SVGStyledElement::childrenChanged(changedByParser);
 
   if (renderer())
     renderer()->setNeedsLayout(true);

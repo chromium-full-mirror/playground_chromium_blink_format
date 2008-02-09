@@ -31,7 +31,7 @@ class SVGFontFaceSrcElement : public SVGElement {
 
   PassRefPtr<CSSValueList> srcValue() const;
 
-  virtual void childrenChanged();
+  virtual void childrenChanged(bool changedByParser = false);
 };
 
 }  // namespace WebCore

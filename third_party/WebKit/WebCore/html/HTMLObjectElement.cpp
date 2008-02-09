@@ -47,11 +47,10 @@ namespace WebCore {
 using namespace EventNames;
 using namespace HTMLNames;
 
-HTMLObjectElement::HTMLObjectElement(Document* doc)
+HTMLObjectElement::HTMLObjectElement(Document* doc, bool createdByParser)
     : HTMLPlugInElement(objectTag, doc),
-      m_needWidgetUpdate(false),
+      m_needWidgetUpdate(!createdByParser),
       m_useFallbackContent(false),
-      m_complete(false),
       m_docNamedItem(true) {}
 
 HTMLObjectElement::~HTMLObjectElement() {
@@ -182,21 +181,12 @@ void HTMLObjectElement::updateWidget() {
     static_cast<RenderPartObject*>(renderer())->updateWidget(true);
 }
 
-void HTMLObjectElement::finishedParsing() {
-  // The parser just reached </object>.
-  setComplete(true);
-
-  HTMLPlugInElement::finishedParsing();
-}
-
-void HTMLObjectElement::setComplete(bool complete) {
-  if (complete != m_complete) {
-    m_complete = complete;
-    if (complete && !m_useFallbackContent) {
-      m_needWidgetUpdate = true;
-      if (inDocument())
-        setChanged();
-    }
+void HTMLObjectElement::finishParsingChildren() {
+  HTMLPlugInElement::finishParsingChildren();
+  if (!m_useFallbackContent) {
+    m_needWidgetUpdate = true;
+    if (inDocument())
+      setChanged();
   }
 }
 
@@ -242,13 +232,13 @@ void HTMLObjectElement::recalcStyle(StyleChange ch) {
   HTMLPlugInElement::recalcStyle(ch);
 }
 
-void HTMLObjectElement::childrenChanged() {
+void HTMLObjectElement::childrenChanged(bool changedByParser) {
   updateDocNamedItem();
   if (inDocument() && !m_useFallbackContent) {
     m_needWidgetUpdate = true;
     setChanged();
   }
-  HTMLPlugInElement::childrenChanged();
+  HTMLPlugInElement::childrenChanged(changedByParser);
 }
 
 bool HTMLObjectElement::isURLAttribute(Attribute* attr) const {

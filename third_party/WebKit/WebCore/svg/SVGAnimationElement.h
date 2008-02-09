@@ -84,7 +84,7 @@ class SVGAnimationElement : public SVGElement,
 
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual void finishedParsing();
+  virtual void finishParsingChildren();
 
   virtual bool updateAnimationBaseValueFromElement();
   bool updateAnimatedValueForElapsedSeconds(double elapsedSeconds);
