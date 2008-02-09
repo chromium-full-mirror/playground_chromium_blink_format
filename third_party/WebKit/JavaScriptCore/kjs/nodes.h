@@ -2230,6 +2230,13 @@ class CommaNode : public ExpressionNode {
   RefPtr<ExpressionNode> m_expr2;
 };
 
+class VarDeclCommaNode : public CommaNode {
+ public:
+  VarDeclCommaNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
+      : CommaNode(expr1, expr2) {}
+  virtual Precedence precedence() const { return PrecAssignment; }
+};
+
 class ConstDeclNode : public ExpressionNode {
  public:
   ConstDeclNode(const Identifier& ident, ExpressionNode* in) KJS_FAST_CALL;
