@@ -89,6 +89,9 @@ void SQLTransaction::executeSQL(
   RefPtr<SQLStatement> statement =
       new SQLStatement(sqlStatement.copy(), arguments, callback, callbackError);
 
+  if (m_database->deleted())
+    statement->setDatabaseDeletedError();
+
   if (!m_database->versionMatchesExpected())
     statement->setVersionMismatchedError();
 
@@ -126,6 +129,15 @@ void SQLTransaction::openTransactionAndPreflight() {
   ASSERT(!m_database->m_sqliteDatabase.transactionInProgress());
 
   LOG(StorageAPI, "Opening and preflighting transaction %p", this);
+
+  // If the database was deleted, jump to the error callback
+  if (m_database->deleted()) {
+    m_transactionError = new SQLError(
+        0,
+        "unable to open a transaction, because the user deleted the database");
+    handleTransactionError(false);
+    return;
+  }
 
   // Set the maximum usage for this transaction
   m_database->m_sqliteDatabase.setMaximumSize(m_database->maximumSize());
