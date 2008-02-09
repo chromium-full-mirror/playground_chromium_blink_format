@@ -345,7 +345,7 @@ class StringNode : public ExpressionNode {
 class RegExpNode : public ExpressionNode {
  public:
   RegExpNode(const UString& pattern, const UString& flags) KJS_FAST_CALL
-      : m_regExp(new RegExp(pattern, flags)) {}
+      : m_regExp(RegExp::create(pattern, flags)) {}
 
   JSValue* evaluate(ExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
