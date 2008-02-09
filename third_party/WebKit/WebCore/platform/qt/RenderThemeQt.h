@@ -66,6 +66,8 @@ class RenderThemeQt : public RenderTheme {
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 
+  virtual void adjustSliderThumbSize(RenderObject*) const;
+
  protected:
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
