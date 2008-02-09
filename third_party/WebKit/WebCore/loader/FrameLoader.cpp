@@ -2482,7 +2482,7 @@ bool FrameLoader::shouldAllowNavigation(Frame* targetFrame) const {
 }
 
 void FrameLoader::stopLoadingSubframes() {
-  for (Frame* child = m_frame->tree()->firstChild(); child;
+  for (RefPtr<Frame> child = m_frame->tree()->firstChild(); child;
        child = child->tree()->nextSibling())
     child->loader()->stopAllLoaders();
 }
