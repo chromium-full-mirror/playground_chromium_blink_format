@@ -1829,7 +1829,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         if (e->parentNode() && e->parentNode()->isElementNode()) {
           Element* parentNode = static_cast<Element*>(e->parentNode());
           bool result = false;
-          if (parentNode->finishedParsingChildren()) {
+          if (parentNode->isFinishedParsingChildren()) {
             Node* n = e->nextSibling();
             while (n && !n->isElementNode())
               n = n->nextSibling();
@@ -1860,7 +1860,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             if (parentStyle)
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
           }
-          if (!parentNode->finishedParsingChildren())
+          if (!parentNode->isFinishedParsingChildren())
             return false;
           bool result = false;
           const QualifiedName& type = e->tagQName();
@@ -1888,7 +1888,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             n = n->previousSibling();
           if (!n)
             firstChild = true;
-          if (firstChild && parentNode->finishedParsingChildren()) {
+          if (firstChild && parentNode->isFinishedParsingChildren()) {
             n = e->nextSibling();
             while (n && !n->isElementNode())
               n = n->nextSibling();
@@ -1925,7 +1925,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
             }
           }
-          if (!parentNode->finishedParsingChildren())
+          if (!parentNode->isFinishedParsingChildren())
             return false;
           bool firstChild = false;
           bool lastChild = false;
@@ -2042,7 +2042,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             if (parentStyle)
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
           }
-          if (!parentNode->finishedParsingChildren())
+          if (!parentNode->isFinishedParsingChildren())
             return false;
           int count = 1;
           Node* n = e->nextSibling();
@@ -2071,7 +2071,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             if (parentStyle)
               parentStyle->setChildrenAffectedByBackwardPositionalRules();
           }
-          if (!parentNode->finishedParsingChildren())
+          if (!parentNode->isFinishedParsingChildren())
             return false;
           int count = 1;
           const QualifiedName& type = e->tagQName();
