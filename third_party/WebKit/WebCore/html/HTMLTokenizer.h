@@ -237,6 +237,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
     void setInXmp(bool v) { setBit(InXmp, v); }
     bool inTitle() const { return testBit(InTitle); }
     void setInTitle(bool v) { setBit(InTitle, v); }
+    bool inIFrame() const { return testBit(InIFrame); }
+    void setInIFrame(bool v) { setBit(InIFrame, v); }
     bool inPlainText() const { return testBit(InPlainText); }
     void setInPlainText(bool v) { setBit(InPlainText, v); }
     bool inProcessingInstruction() const {
@@ -267,15 +269,17 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
     void setForceSynchronous(bool v) { setBit(ForceSynchronous, v); }
 
     bool inAnySpecial() const {
-      return m_bits & (InScript | InStyle | InXmp | InTextArea | InTitle);
+      return m_bits &
+             (InScript | InStyle | InXmp | InTextArea | InTitle | InIFrame);
     }
     bool hasTagState() const { return m_bits & TagMask; }
     bool hasEntityState() const { return m_bits & EntityMask; }
 
     bool needsSpecialWriteHandling() const {
-      return m_bits & (InScript | InStyle | InXmp | InTextArea | InTitle |
-                       TagMask | EntityMask | InPlainText | InComment |
-                       InServer | InProcessingInstruction | StartTag);
+      return m_bits &
+             (InScript | InStyle | InXmp | InTextArea | InTitle | InIFrame |
+              TagMask | EntityMask | InPlainText | InComment | InServer |
+              InProcessingInstruction | StartTag);
     }
 
    private:
@@ -300,7 +304,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
           1 << 20,  // FIXME: should clarify difference between skip and discard
       AllowYield = 1 << 21,
       LoadingExtScript = 1 << 22,
-      ForceSynchronous = 1 << 23
+      ForceSynchronous = 1 << 23,
+      InIFrame = 1 << 24
     };
 
     void setBit(StateBits bit, bool value) {

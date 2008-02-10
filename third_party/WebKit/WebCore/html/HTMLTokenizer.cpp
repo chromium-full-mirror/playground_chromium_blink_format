@@ -90,6 +90,7 @@ static const char xmpEnd[] = "</xmp";
 static const char styleEnd[] = "</style";
 static const char textareaEnd[] = "</textarea";
 static const char titleEnd[] = "</title";
+static const char iframeEnd[] = "</iframe";
 
 // Full support for MS Windows extensions to Latin-1.
 // Technically these extensions should only be activated for pages
@@ -292,10 +293,11 @@ HTMLTokenizer::State HTMLTokenizer::processListing(SegmentedString list,
 
 HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
                                                  State state) {
-  ASSERT(state.inTextArea() || state.inTitle() || !state.hasEntityState());
+  ASSERT(state.inTextArea() || state.inTitle() || state.inIFrame() ||
+         !state.hasEntityState());
   ASSERT(!state.hasTagState());
   ASSERT(state.inXmp() + state.inTextArea() + state.inTitle() +
-             state.inStyle() + state.inScript() ==
+             state.inStyle() + state.inScript() + state.inIFrame() ==
          1);
   if (state.inScript())
     scriptStartLineno = m_lineNumber;
@@ -339,6 +341,9 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
         } else if (state.inXmp()) {
           currToken.tagName = xmpTag.localName();
           currToken.beginTag = false;
+        } else if (state.inIFrame()) {
+          currToken.tagName = iframeTag.localName();
+          currToken.beginTag = false;
         }
         processToken();
         state.setInStyle(false);
@@ -346,6 +351,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
         state.setInTextArea(false);
         state.setInTitle(false);
         state.setInXmp(false);
+        state.setInIFrame(false);
         tquote = NoQuote;
         scriptCodeSize = scriptCodeResync = 0;
       }
@@ -374,7 +380,8 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
         tquote = NoQuote;
     }
     state.setEscaped(!state.escaped() && ch == '\\');
-    if (!scriptCodeResync && (state.inTextArea() || state.inTitle()) &&
+    if (!scriptCodeResync &&
+        (state.inTextArea() || state.inTitle() || state.inIFrame()) &&
         !src.escaped() && ch == '&') {
       UChar* scriptCodeDest = scriptCode + scriptCodeSize;
       src.advancePastNonNewline();
@@ -608,7 +615,7 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
       if (handleBrokenComments || endCharsCount > 1) {
         src.advancePastNonNewline();
         if (!(state.inTitle() || state.inScript() || state.inXmp() ||
-              state.inTextArea() || state.inStyle())) {
+              state.inTextArea() || state.inStyle() || state.inIFrame())) {
           checkScriptBuffer();
           scriptCode[scriptCodeSize] = 0;
           scriptCode[scriptCodeSize + 1] = 0;
@@ -1338,6 +1345,13 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               searchStopper = xmpEnd;
               searchStopperLen = 5;
               state.setInXmp(true);
+              state = parseSpecial(src, state);
+            }
+          } else if (tagName == iframeTag) {
+            if (beginTag) {
+              searchStopper = iframeEnd;
+              searchStopperLen = 8;
+              state.setInIFrame(true);
               state = parseSpecial(src, state);
             }
           }
