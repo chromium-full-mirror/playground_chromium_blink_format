@@ -698,7 +698,7 @@ void Element::recalcStyle(StyleChange change) {
       return;
     }
 
-    if (currentStyle && newStyle) {
+    if (currentStyle) {
       // Preserve "affected by" bits that were propagated to us from descendants
       // in the case where we didn't do a full
       // style change (e.g., only inline style changed).
@@ -718,11 +718,10 @@ void Element::recalcStyle(StyleChange change) {
         newStyle->setChildrenAffectedByLastChildRules();
     }
 
-    if (ch != NoChange) {
-      if (newStyle)
-        setRenderStyle(newStyle);
-    } else if (changed() && newStyle && (document()->usesSiblingRules() ||
-                                         document()->usesDescendantRules())) {
+    if (ch != NoChange)
+      setRenderStyle(newStyle);
+    else if (changed() && (document()->usesSiblingRules() ||
+                           document()->usesDescendantRules())) {
       // Although no change occurred, we use the new style so that the cousin
       // style sharing code won't get
       // fooled into believing this style is the same.  This is only necessary
