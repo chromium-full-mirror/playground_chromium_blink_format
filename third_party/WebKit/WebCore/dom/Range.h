@@ -141,6 +141,8 @@ class Range : public RefCounted<Range> {
   void checkNodeBA(Node*, ExceptionCode&) const;
   void checkDeleteExtract(ExceptionCode&);
   bool containedByReadOnly() const;
+  unsigned maxStartOffset() const;
+  unsigned maxEndOffset() const;
 };
 
 PassRefPtr<Range> rangeOfContents(Node*);

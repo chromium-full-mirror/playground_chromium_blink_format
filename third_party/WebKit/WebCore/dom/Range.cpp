@@ -361,13 +361,12 @@ short Range::comparePoint(Node* refNode, int offset, ExceptionCode& ec) {
     return -1;
 
   // compare to end, and point comes after
-  else if (compareBoundaryPoints(refNode, offset, m_endContainer.get(),
-                                 m_endOffset) == 1)
+  if (compareBoundaryPoints(refNode, offset, m_endContainer.get(),
+                            m_endOffset) == 1)
     return 1;
 
   // point is in the middle of this range, or on the boundary points
-  else
-    return 0;
+  return 0;
 }
 
 Range::CompareResults Range::compareNode(Node* refNode, ExceptionCode& ec) {
@@ -1202,32 +1201,35 @@ bool Range::isDetached() const {
 }
 
 void Range::checkNodeWOffset(Node* n, int offset, ExceptionCode& ec) const {
-  if (offset < 0)
-    ec = INDEX_SIZE_ERR;
-  // no return here
-
   switch (n->nodeType()) {
+    case Node::DOCUMENT_TYPE_NODE:
     case Node::ENTITY_NODE:
     case Node::NOTATION_NODE:
-    case Node::DOCUMENT_TYPE_NODE:
       ec = RangeException::INVALID_NODE_TYPE_ERR;
-      break;
-    case Node::TEXT_NODE:
-    case Node::COMMENT_NODE:
+      return;
     case Node::CDATA_SECTION_NODE:
-      if ((unsigned)offset > static_cast<CharacterData*>(n)->length())
+    case Node::COMMENT_NODE:
+    case Node::TEXT_NODE:
+      if (static_cast<unsigned>(offset) >
+          static_cast<CharacterData*>(n)->length())
         ec = INDEX_SIZE_ERR;
-      break;
+      return;
     case Node::PROCESSING_INSTRUCTION_NODE:
-      if ((unsigned)offset >
+      if (static_cast<unsigned>(offset) >
           static_cast<ProcessingInstruction*>(n)->data().length())
         ec = INDEX_SIZE_ERR;
-      break;
-    default:
-      if ((unsigned)offset > n->childNodeCount())
+      return;
+    case Node::ATTRIBUTE_NODE:
+    case Node::DOCUMENT_FRAGMENT_NODE:
+    case Node::DOCUMENT_NODE:
+    case Node::ELEMENT_NODE:
+    case Node::ENTITY_REFERENCE_NODE:
+    case Node::XPATH_NAMESPACE_NODE:
+      if (static_cast<unsigned>(offset) > n->childNodeCount())
         ec = INDEX_SIZE_ERR;
-      break;
+      return;
   }
+  ASSERT_NOT_REACHED();
 }
 
 void Range::checkNodeBA(Node* n, ExceptionCode& ec) const {
@@ -1238,6 +1240,7 @@ void Range::checkNodeBA(Node* n, ExceptionCode& ec) const {
   Node* root = n;
   while (root->parentNode())
     root = root->parentNode();
+
   if (!(root->nodeType() == Node::ATTRIBUTE_NODE ||
         root->nodeType() == Node::DOCUMENT_NODE ||
         root->nodeType() == Node::DOCUMENT_FRAGMENT_NODE ||
@@ -1405,8 +1408,7 @@ void Range::selectNodeContents(Node* refNode, ExceptionCode& ec) {
   m_startContainer = refNode;
   m_startOffset = 0;
   m_endContainer = refNode;
-  m_endOffset = refNode->offsetInCharacters() ? refNode->maxCharacterOffset()
-                                              : refNode->childNodeCount();
+  m_endOffset = maxEndOffset();
 }
 
 void Range::surroundContents(PassRefPtr<Node> passNewParent,
@@ -1426,14 +1428,23 @@ void Range::surroundContents(PassRefPtr<Node> passNewParent,
   // INVALID_NODE_TYPE_ERR: Raised if node is an Attr, Entity, DocumentType,
   // Notation,
   // Document, or DocumentFragment node.
-  if (newParent->nodeType() == Node::ATTRIBUTE_NODE ||
-      newParent->nodeType() == Node::ENTITY_NODE ||
-      newParent->nodeType() == Node::NOTATION_NODE ||
-      newParent->nodeType() == Node::DOCUMENT_TYPE_NODE ||
-      newParent->nodeType() == Node::DOCUMENT_NODE ||
-      newParent->nodeType() == Node::DOCUMENT_FRAGMENT_NODE) {
-    ec = RangeException::INVALID_NODE_TYPE_ERR;
-    return;
+  switch (newParent->nodeType()) {
+    case Node::ATTRIBUTE_NODE:
+    case Node::DOCUMENT_FRAGMENT_NODE:
+    case Node::DOCUMENT_NODE:
+    case Node::DOCUMENT_TYPE_NODE:
+    case Node::ENTITY_NODE:
+    case Node::NOTATION_NODE:
+      ec = RangeException::INVALID_NODE_TYPE_ERR;
+      return;
+    case Node::CDATA_SECTION_NODE:
+    case Node::COMMENT_NODE:
+    case Node::ELEMENT_NODE:
+    case Node::ENTITY_REFERENCE_NODE:
+    case Node::PROCESSING_INSTRUCTION_NODE:
+    case Node::TEXT_NODE:
+    case Node::XPATH_NAMESPACE_NODE:
+      break;
   }
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if an ancestor container of either
@@ -1450,6 +1461,25 @@ void Range::surroundContents(PassRefPtr<Node> passNewParent,
   if (newParent->document() != m_startContainer->document()) {
     ec = WRONG_DOCUMENT_ERR;
     return;
+  }
+
+  // BAD_BOUNDARYPOINTS_ERR: Raised if the Range partially selects a non-Text
+  // node.
+  // FIXME: The specification says non-Text. What does that mean about
+  // CDataSection, which
+  // is a kind of Text node? Use isTextNode() instead of nodeType() to include
+  // CDataSection?
+  if (m_startContainer->nodeType() != Node::TEXT_NODE) {
+    if (m_startOffset > 0 && m_startOffset < maxStartOffset()) {
+      ec = RangeException::BAD_BOUNDARYPOINTS_ERR;
+      return;
+    }
+  }
+  if (m_endContainer->nodeType() != Node::TEXT_NODE) {
+    if (m_endOffset > 0 && m_endOffset < maxEndOffset()) {
+      ec = RangeException::BAD_BOUNDARYPOINTS_ERR;
+      return;
+    }
   }
 
   // Raise a HIERARCHY_REQUEST_ERR if m_startContainer doesn't accept children
@@ -1471,24 +1501,9 @@ void Range::surroundContents(PassRefPtr<Node> passNewParent,
     return;
   }
 
-  // ### check if node would end up with a child node of a type not allowed by
-  // the type of node
-
-  // BAD_BOUNDARYPOINTS_ERR: Raised if the Range partially selects a non-text
-  // node.
-  if (!m_startContainer->offsetInCharacters()) {
-    if (m_startOffset > 0 &&
-        m_startOffset < m_startContainer->childNodeCount()) {
-      ec = RangeException::BAD_BOUNDARYPOINTS_ERR;
-      return;
-    }
-  }
-  if (!m_endContainer->offsetInCharacters()) {
-    if (m_endOffset > 0 && m_endOffset < m_endContainer->childNodeCount()) {
-      ec = RangeException::BAD_BOUNDARYPOINTS_ERR;
-      return;
-    }
-  }
+  // FIXME: Do we need a check if the node would end up with a child node of a
+  // type not
+  // allowed by the type of node?
 
   ec = 0;
   while (Node* n = newParent->firstChild()) {
@@ -1712,5 +1727,21 @@ PassRefPtr<Range> rangeOfContents(Node* node) {
   int exception = 0;
   range->selectNodeContents(node, exception);
   return range.release();
+}
+
+unsigned Range::maxStartOffset() const {
+  if (!m_startContainer)
+    return 0;
+  if (!m_startContainer->offsetInCharacters())
+    return m_startContainer->childNodeCount();
+  return m_startContainer->maxCharacterOffset();
+}
+
+unsigned Range::maxEndOffset() const {
+  if (!m_endContainer)
+    return 0;
+  if (!m_endContainer->offsetInCharacters())
+    return m_endContainer->childNodeCount();
+  return m_endContainer->maxCharacterOffset();
 }
 }
