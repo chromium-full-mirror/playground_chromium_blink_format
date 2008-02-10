@@ -35,7 +35,7 @@ class SVGStyledElement;
 
 class SVGPathSeg : public RefCounted<SVGPathSeg> {
  public:
-  SVGPathSeg() {}
+  SVGPathSeg() : RefCounted<SVGPathSeg>(0) {}
   virtual ~SVGPathSeg() {}
 
   enum SVGPathSegType {

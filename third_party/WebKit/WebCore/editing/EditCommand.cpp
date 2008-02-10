@@ -44,7 +44,7 @@ namespace WebCore {
 using namespace EventNames;
 
 EditCommand::EditCommand(Document* document)
-    : m_document(document), m_parent(0) {
+    : RefCounted<EditCommand>(0), m_document(document), m_parent(0) {
   ASSERT(m_document);
   ASSERT(m_document->frame());
   DeleteButtonController* deleteButton =

@@ -113,7 +113,8 @@ struct InspectorResource : public RefCounted<InspectorResource> {
   InspectorResource(long long identifier,
                     DocumentLoader* documentLoader,
                     Frame* frame)
-      : identifier(identifier),
+      : RefCounted<InspectorResource>(0),
+        identifier(identifier),
         loader(documentLoader),
         frame(frame),
         scriptContext(0),
@@ -202,14 +203,17 @@ struct InspectorDatabaseResource
                             String domain,
                             String name,
                             String version)
-      : database(database),
+      : RefCounted<InspectorDatabaseResource>(0),
+        database(database),
         domain(domain),
         name(name),
         version(version),
         scriptContext(0),
         scriptObject(0) {}
 
-  InspectorDatabaseResource() { setScriptObject(0, 0); }
+  InspectorDatabaseResource() : RefCounted<InspectorDatabaseResource>(0) {
+    setScriptObject(0, 0);
+  }
 
   void setScriptObject(JSContextRef context, JSObjectRef newScriptObject) {
     if (scriptContext && scriptObject)

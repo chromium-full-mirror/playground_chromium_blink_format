@@ -25,16 +25,16 @@
 
 namespace WebCore {
 
-FormData::FormData(const void* data, size_t size) {
+FormData::FormData(const void* data, size_t size) : RefCounted<FormData>(0) {
   appendData(data, size);
 }
 
-FormData::FormData(const CString& s) {
+FormData::FormData(const CString& s) : RefCounted<FormData>(0) {
   appendData(s.data(), s.length());
 }
 
 FormData::FormData(const FormData& data)
-    : RefCounted<FormData>(), m_elements(data.m_elements) {}
+    : RefCounted<FormData>(0), m_elements(data.m_elements) {}
 
 PassRefPtr<FormData> FormData::copy() const {
   return new FormData(*this);

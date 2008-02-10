@@ -38,7 +38,7 @@ class SimpleFontData;
 
 class CSSFontFace : public RefCounted<CSSFontFace> {
  public:
-  CSSFontFace() : m_segmentedFontFace(0) {}
+  CSSFontFace() : RefCounted<CSSFontFace>(0), m_segmentedFontFace(0) {}
 
   virtual ~CSSFontFace();
 

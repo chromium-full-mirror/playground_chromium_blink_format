@@ -28,13 +28,15 @@
 
 namespace WebCore {
 
-SharedBuffer::SharedBuffer() {}
+SharedBuffer::SharedBuffer() : RefCounted<SharedBuffer>(0) {}
 
-SharedBuffer::SharedBuffer(const char* data, int size) {
+SharedBuffer::SharedBuffer(const char* data, int size)
+    : RefCounted<SharedBuffer>(0) {
   m_buffer.append(data, size);
 }
 
-SharedBuffer::SharedBuffer(const unsigned char* data, int size) {
+SharedBuffer::SharedBuffer(const unsigned char* data, int size)
+    : RefCounted<SharedBuffer>(0) {
   m_buffer.append(data, size);
 }
 

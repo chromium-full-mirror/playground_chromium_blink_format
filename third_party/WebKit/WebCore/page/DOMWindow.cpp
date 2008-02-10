@@ -103,7 +103,7 @@ void DOMWindow::adjustWindowRect(const FloatRect& screen,
       max(screen.y(), min(window.y(), screen.bottom() - window.height())));
 }
 
-DOMWindow::DOMWindow(Frame* frame) : m_frame(frame) {}
+DOMWindow::DOMWindow(Frame* frame) : RefCounted<DOMWindow>(0), m_frame(frame) {}
 
 DOMWindow::~DOMWindow() {}
 

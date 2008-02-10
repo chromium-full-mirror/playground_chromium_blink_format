@@ -39,8 +39,7 @@ class SVGRenderingIntent : public RefCounted<SVGRenderingIntent> {
     RENDERING_INTENT_ABSOLUTE_COLORIMETRIC = 5
   };
 
-  SVGRenderingIntent() {}
-  ~SVGRenderingIntent() {}
+  SVGRenderingIntent() : RefCounted<SVGRenderingIntent>(0) {}
 };
 
 }  // namespace WebCore

@@ -42,7 +42,7 @@ typedef int ExceptionCode;
 // an element.
 class NamedNodeMap : public RefCounted<NamedNodeMap> {
  public:
-  NamedNodeMap() {}
+  NamedNodeMap() : RefCounted<NamedNodeMap>(0) {}
   virtual ~NamedNodeMap() {}
 
   virtual PassRefPtr<Node> getNamedItem(const String& name) const = 0;

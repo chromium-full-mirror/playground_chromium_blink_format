@@ -40,6 +40,7 @@ namespace WebCore {
 template <typename PODType>
 class JSSVGPODTypeWrapper : public RefCounted<JSSVGPODTypeWrapper<PODType>> {
  public:
+  JSSVGPODTypeWrapper() : RefCounted<JSSVGPODTypeWrapper<PODType>>(0) {}
   virtual ~JSSVGPODTypeWrapper() {}
 
   // Getter wrapper

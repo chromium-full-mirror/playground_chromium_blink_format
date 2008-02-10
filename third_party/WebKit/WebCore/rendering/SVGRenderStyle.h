@@ -342,7 +342,7 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
   static SVGRenderStyle* s_defaultStyle;
 
  private:
-  SVGRenderStyle(const SVGRenderStyle*) {}
+  SVGRenderStyle(const SVGRenderStyle*) : RefCounted<SVGRenderStyle>(0) {}
 
   void setBitDefaults() {
     svg_inherited_flags._clipRule = initialClipRule();

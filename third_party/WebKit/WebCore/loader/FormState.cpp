@@ -43,5 +43,8 @@ PassRefPtr<FormState> FormState::create(PassRefPtr<HTMLFormElement> form,
 FormState::FormState(PassRefPtr<HTMLFormElement> form,
                      const HashMap<String, String>& values,
                      PassRefPtr<Frame> sourceFrame)
-    : m_form(form), m_values(values), m_sourceFrame(sourceFrame) {}
+    : RefCounted<FormState>(0),
+      m_form(form),
+      m_values(values),
+      m_sourceFrame(sourceFrame) {}
 }

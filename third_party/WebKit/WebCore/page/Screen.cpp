@@ -37,7 +37,7 @@
 
 namespace WebCore {
 
-Screen::Screen(Frame* frame) : m_frame(frame) {}
+Screen::Screen(Frame* frame) : RefCounted<Screen>(0), m_frame(frame) {}
 
 void Screen::disconnectFrame() {
   m_frame = 0;

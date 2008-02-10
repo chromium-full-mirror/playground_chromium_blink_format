@@ -42,6 +42,7 @@ typedef int ExceptionCode;
 
 class DOMImplementation : public RefCounted<DOMImplementation> {
  public:
+  DOMImplementation() : RefCounted<DOMImplementation>(0) {}
   virtual ~DOMImplementation();
 
   // DOM methods & attributes for DOMImplementation

@@ -60,7 +60,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 CanvasRenderingContext2D::CanvasRenderingContext2D(HTMLCanvasElement* canvas)
-    : m_canvas(canvas), m_stateStack(1) {}
+    : RefCounted<CanvasRenderingContext2D>(0),
+      m_canvas(canvas),
+      m_stateStack(1) {}
 
 void CanvasRenderingContext2D::reset() {
   m_stateStack.resize(1);

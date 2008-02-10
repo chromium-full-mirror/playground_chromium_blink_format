@@ -33,7 +33,7 @@ class Node;
 
 class NodeList : public RefCounted<NodeList> {
  public:
-  NodeList() {}
+  NodeList() : RefCounted<NodeList>(0) {}
   virtual ~NodeList() {}
 
   // DOM methods & attributes for NodeList

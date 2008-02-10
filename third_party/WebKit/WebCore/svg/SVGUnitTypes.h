@@ -36,8 +36,7 @@ class SVGUnitTypes : public RefCounted<SVGUnitTypes> {
     SVG_UNIT_TYPE_OBJECTBOUNDINGBOX = 2
   };
 
-  SVGUnitTypes() {}
-  ~SVGUnitTypes() {}
+  SVGUnitTypes() : RefCounted<SVGUnitTypes>(0) {}
 };
 
 }  // namespace WebCore

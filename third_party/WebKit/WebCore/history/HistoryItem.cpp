@@ -41,7 +41,8 @@ static void defaultNotifyHistoryItemChanged() {}
 void (*notifyHistoryItemChanged)() = defaultNotifyHistoryItemChanged;
 
 HistoryItem::HistoryItem()
-    : m_lastVisitedTime(0),
+    : RefCounted<HistoryItem>(0),
+      m_lastVisitedTime(0),
       m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {}
@@ -49,7 +50,8 @@ HistoryItem::HistoryItem()
 HistoryItem::HistoryItem(const String& urlString,
                          const String& title,
                          double time)
-    : m_urlString(urlString),
+    : RefCounted<HistoryItem>(0),
+      m_urlString(urlString),
       m_originalURLString(urlString),
       m_title(title),
       m_lastVisitedTime(time),
@@ -63,7 +65,8 @@ HistoryItem::HistoryItem(const String& urlString,
                          const String& title,
                          const String& alternateTitle,
                          double time)
-    : m_urlString(urlString),
+    : RefCounted<HistoryItem>(0),
+      m_urlString(urlString),
       m_originalURLString(urlString),
       m_title(title),
       m_displayTitle(alternateTitle),
@@ -75,7 +78,8 @@ HistoryItem::HistoryItem(const String& urlString,
 }
 
 HistoryItem::HistoryItem(const KURL& url, const String& title)
-    : m_urlString(url.string()),
+    : RefCounted<HistoryItem>(0),
+      m_urlString(url.string()),
       m_originalURLString(url.string()),
       m_title(title),
       m_lastVisitedTime(0),
@@ -89,7 +93,8 @@ HistoryItem::HistoryItem(const KURL& url,
                          const String& target,
                          const String& parent,
                          const String& title)
-    : m_urlString(url.string()),
+    : RefCounted<HistoryItem>(0),
+      m_urlString(url.string()),
       m_originalURLString(url.string()),
       m_target(target),
       m_parent(parent),
@@ -107,7 +112,7 @@ HistoryItem::~HistoryItem() {
 }
 
 HistoryItem::HistoryItem(const HistoryItem& item)
-    : RefCounted<HistoryItem>(),
+    : RefCounted<HistoryItem>(0),
       m_urlString(item.m_urlString),
       m_originalURLString(item.m_originalURLString),
       m_target(item.m_target),

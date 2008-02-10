@@ -205,7 +205,8 @@ PassRefPtr<RootObject> RootObject::create(const void* nativeHandle,
 }
 
 RootObject::RootObject(const void* nativeHandle, JSGlobalObject* globalObject)
-    : m_isValid(true),
+    : RefCounted<RootObject>(0),
+      m_isValid(true),
       m_nativeHandle(nativeHandle),
       m_globalObject(globalObject) {
   ASSERT(globalObject);

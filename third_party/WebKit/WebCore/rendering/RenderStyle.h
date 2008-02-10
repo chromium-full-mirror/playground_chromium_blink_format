@@ -686,6 +686,7 @@ class StyleMultiColData : public RefCounted<StyleMultiColData> {
 
 class TransformOperation : public RefCounted<TransformOperation> {
  public:
+  TransformOperation() : RefCounted<TransformOperation>(0) {}
   virtual ~TransformOperation() {}
 
   virtual bool operator==(const TransformOperation&) const = 0;
@@ -1438,6 +1439,8 @@ struct CursorData {
 
 class CursorList : public RefCounted<CursorList> {
  public:
+  CursorList() : RefCounted<CursorList>(0) {}
+
   const CursorData& operator[](int i) const { return m_vector[i]; }
 
   bool operator==(const CursorList& o) const { return m_vector == o.m_vector; }

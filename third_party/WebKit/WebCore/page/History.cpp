@@ -31,7 +31,7 @@
 
 namespace WebCore {
 
-History::History(Frame* frame) : m_frame(frame) {}
+History::History(Frame* frame) : RefCounted<History>(0), m_frame(frame) {}
 
 Frame* History::frame() const {
   return m_frame;

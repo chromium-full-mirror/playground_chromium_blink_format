@@ -40,6 +40,8 @@ class DocumentFragment;
 
 class XSLTProcessor : public RefCounted<XSLTProcessor> {
  public:
+  XSLTProcessor() : RefCounted<XSLTProcessor>(0) {}
+
   void setXSLStylesheet(XSLStyleSheet* styleSheet) {
     m_stylesheet = styleSheet;
   }

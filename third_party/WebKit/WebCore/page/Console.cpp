@@ -37,7 +37,7 @@
 
 namespace WebCore {
 
-Console::Console(Frame* frame) : m_frame(frame) {}
+Console::Console(Frame* frame) : RefCounted<Console>(0), m_frame(frame) {}
 
 void Console::disconnectFrame() {
   m_frame = 0;

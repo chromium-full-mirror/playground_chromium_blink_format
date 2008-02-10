@@ -49,10 +49,13 @@ class Attribute : public RefCounted<Attribute> {
  public:
   // null value is forbidden !
   Attribute(const QualifiedName& name, const AtomicString& value)
-      : m_name(name), m_value(value), m_impl(0) {}
+      : RefCounted<Attribute>(0), m_name(name), m_value(value), m_impl(0) {}
 
   Attribute(const AtomicString& name, const AtomicString& value)
-      : m_name(nullAtom, name, nullAtom), m_value(value), m_impl(0) {}
+      : RefCounted<Attribute>(0),
+        m_name(nullAtom, name, nullAtom),
+        m_value(value),
+        m_impl(0) {}
 
   virtual ~Attribute() {}
 

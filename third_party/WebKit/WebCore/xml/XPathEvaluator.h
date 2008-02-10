@@ -44,6 +44,7 @@ class XPathResult;
 
 class XPathEvaluator : public RefCounted<XPathEvaluator> {
  public:
+  XPathEvaluator() : RefCounted<XPathEvaluator>(0) {}
   PassRefPtr<XPathExpression> createExpression(const String& expression,
                                                XPathNSResolver*,
                                                ExceptionCode&);

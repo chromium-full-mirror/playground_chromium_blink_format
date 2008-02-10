@@ -40,7 +40,7 @@ namespace WebCore {
 
 SVGRenderStyle* SVGRenderStyle::s_defaultStyle = 0;
 
-SVGRenderStyle::SVGRenderStyle() {
+SVGRenderStyle::SVGRenderStyle() : RefCounted<SVGRenderStyle>(0) {
   if (!s_defaultStyle)
     s_defaultStyle = new SVGRenderStyle(true);
 
@@ -56,7 +56,7 @@ SVGRenderStyle::SVGRenderStyle() {
   setBitDefaults();
 }
 
-SVGRenderStyle::SVGRenderStyle(bool) {
+SVGRenderStyle::SVGRenderStyle(bool) : RefCounted<SVGRenderStyle>(0) {
   setBitDefaults();
 
   fill.init();
@@ -70,7 +70,7 @@ SVGRenderStyle::SVGRenderStyle(bool) {
 }
 
 SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other)
-    : RefCounted<SVGRenderStyle>() {
+    : RefCounted<SVGRenderStyle>(0) {
   fill = other.fill;
   stroke = other.stroke;
   text = other.text;

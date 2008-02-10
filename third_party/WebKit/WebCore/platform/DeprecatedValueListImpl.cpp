@@ -57,14 +57,15 @@ class DeprecatedValueListImpl::Private
 inline DeprecatedValueListImpl::Private::Private(
     void (*deleteFunc)(DeprecatedValueListImplNode*),
     DeprecatedValueListImplNode* (*copyFunc)(DeprecatedValueListImplNode*))
-    : head(NULL),
+    : RefCounted<Private>(0),
+      head(NULL),
       tail(NULL),
       deleteNode(deleteFunc),
       copyNode(copyFunc),
       count(0) {}
 
 inline DeprecatedValueListImpl::Private::Private(const Private& other)
-    : RefCounted<DeprecatedValueListImpl::Private>(),
+    : RefCounted<Private>(0),
       deleteNode(other.deleteNode),
       copyNode(other.copyNode),
       count(other.count) {

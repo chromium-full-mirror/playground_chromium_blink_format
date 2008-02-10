@@ -31,7 +31,8 @@
 
 namespace WebCore {
 
-ExceptionBase::ExceptionBase(const ExceptionCodeDescription& description) {
+ExceptionBase::ExceptionBase(const ExceptionCodeDescription& description)
+    : RefCounted<ExceptionBase>(0) {
   m_code = description.code;
   if (description.name) {
     m_name = description.name;

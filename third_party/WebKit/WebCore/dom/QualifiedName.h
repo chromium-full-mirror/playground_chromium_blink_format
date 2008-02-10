@@ -33,8 +33,10 @@ class QualifiedName {
     QualifiedNameImpl(const AtomicString& p,
                       const AtomicString& l,
                       const AtomicString& n)
-        : m_prefix(p), m_localName(l), m_namespace(n) {}
-
+        : RefCounted<QualifiedNameImpl>(0),
+          m_prefix(p),
+          m_localName(l),
+          m_namespace(n) {}
     AtomicString m_prefix;
     AtomicString m_localName;
     AtomicString m_namespace;

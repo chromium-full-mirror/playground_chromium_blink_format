@@ -62,7 +62,7 @@ class NodeFilter : public RefCounted<NodeFilter> {
   };
 
   NodeFilter(PassRefPtr<NodeFilterCondition> condition)
-      : m_condition(condition) {}
+      : RefCounted<NodeFilter>(0), m_condition(condition) {}
   short acceptNode(Node*, KJS::JSValue*& exception) const;
   void mark() { m_condition->mark(); };
 

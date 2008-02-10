@@ -29,7 +29,7 @@
 
 using namespace WebCore;
 
-TimeRanges::TimeRanges(float start, float end) {
+TimeRanges::TimeRanges(float start, float end) : RefCounted<TimeRanges>(0) {
   add(start, end);
 }
 

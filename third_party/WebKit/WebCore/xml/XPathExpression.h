@@ -57,6 +57,8 @@ class XPathExpression : public RefCounted<XPathExpression> {
                                    ExceptionCode&);
 
  private:
+  XPathExpression() : RefCounted<XPathExpression>(0) {}
+
   XPath::Expression* m_topExpression;
 };
 }

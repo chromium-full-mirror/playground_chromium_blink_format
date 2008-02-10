@@ -29,10 +29,11 @@ namespace WebCore {
 
 static RenderStyle* defaultStyle;
 
-StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Fixed) {}
+StyleSurroundData::StyleSurroundData()
+    : RefCounted<StyleSurroundData>(0), margin(Fixed), padding(Fixed) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
-    : RefCounted<StyleSurroundData>(),
+    : RefCounted<StyleSurroundData>(0),
       offset(o.offset),
       margin(o.margin),
       padding(o.padding),
@@ -44,14 +45,17 @@ bool StyleSurroundData::operator==(const StyleSurroundData& o) const {
 }
 
 StyleBoxData::StyleBoxData()
-    : z_index(0), z_auto(true), boxSizing(CONTENT_BOX) {
+    : RefCounted<StyleBoxData>(0),
+      z_index(0),
+      z_auto(true),
+      boxSizing(CONTENT_BOX) {
   // Initialize our min/max widths/heights.
   min_width = min_height = RenderStyle::initialMinSize();
   max_width = max_height = RenderStyle::initialMaxSize();
 }
 
 StyleBoxData::StyleBoxData(const StyleBoxData& o)
-    : RefCounted<StyleBoxData>(),
+    : RefCounted<StyleBoxData>(0),
       width(o.width),
       height(o.height),
       min_width(o.min_width),
@@ -70,7 +74,8 @@ bool StyleBoxData::operator==(const StyleBoxData& o) const {
 }
 
 StyleVisualData::StyleVisualData()
-    : hasClip(false),
+    : RefCounted<StyleVisualData>(0),
+      hasClip(false),
       textDecoration(RenderStyle::initialTextDecoration()),
       counterIncrement(0),
       counterReset(0) {}
@@ -78,7 +83,7 @@ StyleVisualData::StyleVisualData()
 StyleVisualData::~StyleVisualData() {}
 
 StyleVisualData::StyleVisualData(const StyleVisualData& o)
-    : RefCounted<StyleVisualData>(),
+    : RefCounted<StyleVisualData>(0),
       clip(o.clip),
       hasClip(o.hasClip),
       textDecoration(o.textDecoration),
@@ -308,10 +313,11 @@ void BackgroundLayer::cullEmptyLayers() {
   }
 }
 
-StyleBackgroundData::StyleBackgroundData() {}
+StyleBackgroundData::StyleBackgroundData()
+    : RefCounted<StyleBackgroundData>(0) {}
 
 StyleBackgroundData::StyleBackgroundData(const StyleBackgroundData& o)
-    : RefCounted<StyleBackgroundData>(),
+    : RefCounted<StyleBackgroundData>(0),
       m_background(o.m_background),
       m_outline(o.m_outline) {}
 
@@ -321,14 +327,15 @@ bool StyleBackgroundData::operator==(const StyleBackgroundData& o) const {
 }
 
 StyleMarqueeData::StyleMarqueeData()
-    : increment(RenderStyle::initialMarqueeIncrement()),
+    : RefCounted<StyleMarqueeData>(0),
+      increment(RenderStyle::initialMarqueeIncrement()),
       speed(RenderStyle::initialMarqueeSpeed()),
       loops(RenderStyle::initialMarqueeLoopCount()),
       behavior(RenderStyle::initialMarqueeBehavior()),
       direction(RenderStyle::initialMarqueeDirection()) {}
 
 StyleMarqueeData::StyleMarqueeData(const StyleMarqueeData& o)
-    : RefCounted<StyleMarqueeData>(),
+    : RefCounted<StyleMarqueeData>(0),
       increment(o.increment),
       speed(o.speed),
       loops(o.loops),
@@ -341,7 +348,8 @@ bool StyleMarqueeData::operator==(const StyleMarqueeData& o) const {
 }
 
 StyleFlexibleBoxData::StyleFlexibleBoxData()
-    : flex(RenderStyle::initialBoxFlex()),
+    : RefCounted<StyleFlexibleBoxData>(0),
+      flex(RenderStyle::initialBoxFlex()),
       flex_group(RenderStyle::initialBoxFlexGroup()),
       ordinal_group(RenderStyle::initialBoxOrdinalGroup()),
       align(RenderStyle::initialBoxAlign()),
@@ -350,7 +358,7 @@ StyleFlexibleBoxData::StyleFlexibleBoxData()
       lines(RenderStyle::initialBoxLines()) {}
 
 StyleFlexibleBoxData::StyleFlexibleBoxData(const StyleFlexibleBoxData& o)
-    : RefCounted<StyleFlexibleBoxData>(),
+    : RefCounted<StyleFlexibleBoxData>(0),
       flex(o.flex),
       flex_group(o.flex_group),
       ordinal_group(o.ordinal_group),
@@ -366,7 +374,8 @@ bool StyleFlexibleBoxData::operator==(const StyleFlexibleBoxData& o) const {
 }
 
 StyleMultiColData::StyleMultiColData()
-    : m_width(0),
+    : RefCounted<StyleMultiColData>(0),
+      m_width(0),
       m_count(RenderStyle::initialColumnCount()),
       m_gap(0),
       m_autoWidth(true),
@@ -377,7 +386,7 @@ StyleMultiColData::StyleMultiColData()
       m_breakInside(RenderStyle::initialPageBreak()) {}
 
 StyleMultiColData::StyleMultiColData(const StyleMultiColData& o)
-    : RefCounted<StyleMultiColData>(),
+    : RefCounted<StyleMultiColData>(0),
       m_width(o.m_width),
       m_count(o.m_count),
       m_gap(o.m_gap),
@@ -398,12 +407,13 @@ bool StyleMultiColData::operator==(const StyleMultiColData& o) const {
 }
 
 StyleTransformData::StyleTransformData()
-    : m_operations(RenderStyle::initialTransform()),
+    : RefCounted<StyleTransformData>(0),
+      m_operations(RenderStyle::initialTransform()),
       m_x(RenderStyle::initialTransformOriginX()),
       m_y(RenderStyle::initialTransformOriginY()) {}
 
 StyleTransformData::StyleTransformData(const StyleTransformData& o)
-    : RefCounted<StyleTransformData>(),
+    : RefCounted<StyleTransformData>(0),
       m_operations(o.m_operations),
       m_x(o.m_x),
       m_y(o.m_y) {}
@@ -640,7 +650,8 @@ void Transition::fillUnsetProperties() {
 }
 
 StyleRareNonInheritedData::StyleRareNonInheritedData()
-    : lineClamp(RenderStyle::initialLineClamp()),
+    : RefCounted<StyleRareNonInheritedData>(0),
+      lineClamp(RenderStyle::initialLineClamp()),
       opacity(RenderStyle::initialOpacity()),
       m_content(0),
       m_counterDirectives(0),
@@ -663,7 +674,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
 
 StyleRareNonInheritedData::StyleRareNonInheritedData(
     const StyleRareNonInheritedData& o)
-    : RefCounted<StyleRareNonInheritedData>(),
+    : RefCounted<StyleRareNonInheritedData>(0),
       lineClamp(o.lineClamp),
       opacity(o.opacity),
       flexibleBox(o.flexibleBox),
@@ -750,7 +761,8 @@ bool StyleRareNonInheritedData::transitionDataEquivalent(
 }
 
 StyleRareInheritedData::StyleRareInheritedData()
-    : textStrokeWidth(RenderStyle::initialTextStrokeWidth()),
+    : RefCounted<StyleRareInheritedData>(0),
+      textStrokeWidth(RenderStyle::initialTextStrokeWidth()),
       textShadow(0),
       textSecurity(RenderStyle::initialTextSecurity()),
       userModify(READ_ONLY),
@@ -763,7 +775,7 @@ StyleRareInheritedData::StyleRareInheritedData()
       userSelect(RenderStyle::initialUserSelect()) {}
 
 StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
-    : RefCounted<StyleRareInheritedData>(),
+    : RefCounted<StyleRareInheritedData>(0),
       textStrokeColor(o.textStrokeColor),
       textStrokeWidth(o.textStrokeWidth),
       textFillColor(o.textFillColor),
@@ -804,7 +816,8 @@ bool StyleRareInheritedData::shadowDataEquivalent(
 }
 
 StyleInheritedData::StyleInheritedData()
-    : indent(RenderStyle::initialTextIndent()),
+    : RefCounted<StyleInheritedData>(0),
+      indent(RenderStyle::initialTextIndent()),
       line_height(RenderStyle::initialLineHeight()),
       style_image(RenderStyle::initialListStyleImage()),
       color(RenderStyle::initialColor()),
@@ -817,7 +830,7 @@ StyleInheritedData::StyleInheritedData()
 StyleInheritedData::~StyleInheritedData() {}
 
 StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
-    : RefCounted<StyleInheritedData>(),
+    : RefCounted<StyleInheritedData>(0),
       indent(o.indent),
       line_height(o.line_height),
       style_image(o.style_image),

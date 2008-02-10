@@ -89,7 +89,7 @@ class NamedAttrMap : public NamedNodeMap {
 
  protected:
   // this method is internal, does no error checking at all
-  void addAttribute(PassRefPtr<Attribute> newAttribute);
+  void addAttribute(PassRefPtr<Attribute>);
   // this method is internal, does no error checking at all
   void removeAttribute(const QualifiedName& name);
   virtual void clearAttributes();

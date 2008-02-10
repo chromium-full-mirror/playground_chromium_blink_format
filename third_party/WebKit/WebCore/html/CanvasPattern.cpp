@@ -68,7 +68,8 @@ void CanvasPattern::parseRepetitionType(const String& type,
 #if PLATFORM(CG)
 
 CanvasPattern::CanvasPattern(CGImageRef image, bool repeatX, bool repeatY)
-    : m_platformImage(image),
+    : RefCounted<CanvasPattern>(0),
+      m_platformImage(image),
       m_cachedImage(0),
       m_repeatX(repeatX),
       m_repeatY(repeatY) {}
@@ -78,7 +79,8 @@ CanvasPattern::CanvasPattern(CGImageRef image, bool repeatX, bool repeatY)
 CanvasPattern::CanvasPattern(cairo_surface_t* surface,
                              bool repeatX,
                              bool repeatY)
-    : m_platformImage(cairo_surface_reference(surface)),
+    : RefCounted<CanvasPattern>(0),
+      m_platformImage(cairo_surface_reference(surface)),
       m_cachedImage(0),
       m_repeatX(repeatX),
       m_repeatY(repeatY) {}
@@ -88,10 +90,12 @@ CanvasPattern::CanvasPattern(cairo_surface_t* surface,
 CanvasPattern::CanvasPattern(CachedImage* cachedImage,
                              bool repeatX,
                              bool repeatY)
-    :
+    : RefCounted<CanvasPattern>(0)
 #if PLATFORM(CG) || PLATFORM(CAIRO)
-      m_platformImage(0),
+      ,
+      m_platformImage(0)
 #endif
+      ,
       m_cachedImage(cachedImage),
       m_repeatX(repeatX),
       m_repeatY(repeatY) {

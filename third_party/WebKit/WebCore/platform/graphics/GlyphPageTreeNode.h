@@ -58,9 +58,10 @@ struct GlyphData {
 // although multiple nodes may reference it as their "page" if they are supposed
 // to be overriding the parent's node, but provide no additional information.
 struct GlyphPage : public RefCounted<GlyphPage> {
-  GlyphPage() : m_owner(0) {}
+  GlyphPage() : RefCounted<GlyphPage>(0), m_owner(0) {}
 
-  GlyphPage(GlyphPageTreeNode* owner) : m_owner(owner) {}
+  GlyphPage(GlyphPageTreeNode* owner)
+      : RefCounted<GlyphPage>(0), m_owner(owner) {}
 
   static const size_t size = 256;  // Covers Latin-1 in a single page.
   GlyphData m_glyphs[size];

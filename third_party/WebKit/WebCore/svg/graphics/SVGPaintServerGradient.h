@@ -128,6 +128,7 @@ class SVGPaintServerGradient : public SVGPaintServer {
   } QuartzGradientStop;
 
   struct SharedStopCache : public RefCounted<SharedStopCache> {
+    SharedStopCache() : RefCounted<SharedStopCache>(0) {}
     Vector<QuartzGradientStop> m_stops;
   };
 

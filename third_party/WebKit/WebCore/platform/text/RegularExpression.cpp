@@ -55,14 +55,17 @@ class RegularExpression::Private
   int lastMatchLength;
 };
 
-RegularExpression::Private::Private() : pattern("") {
+RegularExpression::Private::Private() : RefCounted<Private>(0), pattern("") {
   compile(true, false);
 }
 
 RegularExpression::Private::Private(DeprecatedString p,
                                     bool caseSensitive,
                                     bool glob)
-    : pattern(p), lastMatchPos(-1), lastMatchLength(-1) {
+    : RefCounted<Private>(0),
+      pattern(p),
+      lastMatchPos(-1),
+      lastMatchLength(-1) {
   compile(caseSensitive, glob);
 }
 
