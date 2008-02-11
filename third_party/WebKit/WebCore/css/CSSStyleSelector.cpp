@@ -1767,7 +1767,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
           }
         }
         if (!m_collectRulesOnly) {
-          if (m_element == e)
+          if (m_element == e && m_style)
             m_style->setEmptyState(result);
           else if (e->renderStyle() && (e->document()->usesSiblingRules() ||
                                         e->renderStyle()->unique()))
