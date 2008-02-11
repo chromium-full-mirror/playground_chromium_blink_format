@@ -58,8 +58,7 @@ void CachedCSSStyleSheet::ref(CachedResourceClient* c) {
   CachedResource::ref(c);
 
   if (!m_loading)
-    c->setCSSStyleSheet(m_url, m_decoder->encoding().name(),
-                        errorOccurred() ? "" : m_sheet);
+    c->setCSSStyleSheet(m_url, m_decoder->encoding().name(), this);
 }
 
 void CachedCSSStyleSheet::setEncoding(const String& chs) {
@@ -92,7 +91,7 @@ void CachedCSSStyleSheet::checkNotify() {
   CachedResourceClientWalker w(m_clients);
   while (CachedResourceClient* c = w.next())
     c->setCSSStyleSheet(m_response.url().string(), m_decoder->encoding().name(),
-                        m_sheet);
+                        this);
 
 #if USE(LOW_BANDWIDTH_DISPLAY)
   // if checkNotify() is called from error(), client's setCSSStyleSheet(...)
@@ -108,5 +107,18 @@ void CachedCSSStyleSheet::error() {
   m_loading = false;
   m_errorOccurred = true;
   checkNotify();
+}
+
+bool CachedCSSStyleSheet::canUseSheet(bool strict) const {
+  if (errorOccurred())
+    return false;
+
+  if (!strict)
+    return true;
+
+  // This check exactly matches Firefox.
+  String mimeType = response().mimeType();
+  return mimeType.isEmpty() || equalIgnoringCase(mimeType, "text/css") ||
+         equalIgnoringCase(mimeType, "application/x-unknown-content-type");
 }
 }

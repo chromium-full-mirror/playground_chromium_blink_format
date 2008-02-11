@@ -80,7 +80,7 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   // from CachedResourceClient
   virtual void setCSSStyleSheet(const String& url,
                                 const String& charset,
-                                const String& sheet);
+                                const CachedCSSStyleSheet* sheet);
   bool isLoading() const;
   virtual bool sheetLoaded();
 

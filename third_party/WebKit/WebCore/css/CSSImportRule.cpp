@@ -58,13 +58,14 @@ CSSImportRule::~CSSImportRule() {
 
 void CSSImportRule::setCSSStyleSheet(const String& url,
                                      const String& charset,
-                                     const String& sheet) {
+                                     const CachedCSSStyleSheet* sheet) {
   if (m_styleSheet)
     m_styleSheet->setParent(0);
   m_styleSheet = new CSSStyleSheet(this, url, charset);
 
   CSSStyleSheet* parent = parentStyleSheet();
-  m_styleSheet->parseString(sheet, !parent || parent->useStrictParsing());
+  bool strict = !parent || parent->useStrictParsing();
+  m_styleSheet->parseString(sheet->sheetText(strict), strict);
   m_loading = false;
 
   checkLoaded();

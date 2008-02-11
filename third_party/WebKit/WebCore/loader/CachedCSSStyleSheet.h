@@ -47,7 +47,9 @@ class CachedCSSStyleSheet : public CachedResource {
                       bool sendResourceLoadCallbacks = true);
   virtual ~CachedCSSStyleSheet();
 
-  const String& sheet() const { return m_sheet; }
+  const String sheetText(bool strict = true) const {
+    return canUseSheet(strict) ? m_sheet : "";
+  }
 
   virtual void ref(CachedResourceClient*);
 
@@ -59,6 +61,9 @@ class CachedCSSStyleSheet : public CachedResource {
   virtual bool schedule() const { return true; }
 
   void checkNotify();
+
+ private:
+  bool canUseSheet(bool strict) const;
 
  protected:
   String m_sheet;

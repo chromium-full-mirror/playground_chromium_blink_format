@@ -59,7 +59,7 @@ class ProcessingInstruction : public ContainerNode,
   bool checkStyleSheet();
   virtual void setCSSStyleSheet(const String& url,
                                 const String& charset,
-                                const String& sheet);
+                                const CachedCSSStyleSheet*);
 #if ENABLE(XSLT)
   virtual void setXSLStyleSheet(const String& url, const String& sheet);
 #endif

@@ -47,7 +47,7 @@ class UserStyleSheetLoader : CachedResourceClient {
  private:
   virtual void setCSSStyleSheet(const String& URL,
                                 const String& charset,
-                                const String& sheet);
+                                const CachedCSSStyleSheet* sheet);
 
   RefPtr<Document> m_document;
   CachedCSSStyleSheet* m_cachedSheet;

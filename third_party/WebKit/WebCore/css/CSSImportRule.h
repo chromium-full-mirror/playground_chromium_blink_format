@@ -55,7 +55,7 @@ class CSSImportRule : public CSSRule, public CachedResourceClient {
   // from CachedResourceClient
   virtual void setCSSStyleSheet(const String& url,
                                 const String& charset,
-                                const String& sheet);
+                                const CachedCSSStyleSheet*);
 
   virtual void insertedIntoParent();
 

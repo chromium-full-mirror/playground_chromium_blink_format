@@ -52,6 +52,7 @@ class AXObjectCache;
 class Attr;
 class Attribute;
 class CDATASection;
+class CachedCSSStyleSheet;
 class CSSStyleDeclaration;
 class CSSStyleSelector;
 class CSSStyleSheet;
@@ -431,7 +432,7 @@ class Document : public ContainerNode {
   // from cachedObjectClient
   virtual void setCSSStyleSheet(const String& url,
                                 const String& charset,
-                                const String& sheetStr);
+                                const CachedCSSStyleSheet*);
 
 #if FRAME_LOADS_USER_STYLESHEET
   void setUserStyleSheet(const String& sheet);
