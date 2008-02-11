@@ -34,7 +34,7 @@
 
 namespace WebCore {
 
-Icon::Icon() {}
+Icon::Icon() : RefCounted<Icon>(0) {}
 
 Icon::~Icon() {}
 
