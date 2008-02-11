@@ -59,7 +59,8 @@ class IntPoint;
 #if PLATFORM(WIN)
 class SharedCursor : public RefCounted<SharedCursor> {
  public:
-  SharedCursor(HCURSOR nativeCursor) : m_nativeCursor(nativeCursor) {}
+  SharedCursor(HCURSOR nativeCursor)
+      : RefCounted<SharedCoursor>(0), m_nativeCursor(nativeCursor) {}
   ~SharedCursor() { DestroyIcon(m_nativeCursor); }
   HCURSOR nativeCursor() const { return m_nativeCursor; }
 

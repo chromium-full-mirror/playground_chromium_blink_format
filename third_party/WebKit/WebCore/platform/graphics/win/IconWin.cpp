@@ -27,9 +27,9 @@
 
 namespace WebCore {
 
-Icon::Icon() : m_hIcon(0) {}
+Icon::Icon() : RefCounted<Icon>(0), m_hIcon(0) {}
 
-Icon::Icon(HICON icon) : m_hIcon(icon) {}
+Icon::Icon(HICON icon) : RefCounted<Icon>(0), m_hIcon(icon) {}
 
 Icon::~Icon() {
   if (m_hIcon)

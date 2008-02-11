@@ -260,7 +260,8 @@ void PlatformScrollbar::setRect(const IntRect&) {
   notImplemented();
 }
 
-FileChooser::FileChooser(FileChooserClient*, const String& initialFilename) {
+FileChooser::FileChooser(FileChooserClient*, const String& initialFilename)
+    : RefCounted<FileChooser>(0) {
   notImplemented();
 }
 // PassRefPtr<FileChooser> FileChooser::create(FileChooserClient*, const String&
@@ -276,7 +277,7 @@ String FileChooser::basenameForWidth(const Font&, int width) const {
   return String();
 }
 
-PopupMenu::PopupMenu(PopupMenuClient*) {
+PopupMenu::PopupMenu(PopupMenuClient*) : RefCounted<PopupMenu>(0) {
   notImplemented();
 }
 
@@ -297,7 +298,7 @@ bool PopupMenu::itemWritingDirectionIsNatural() {
   return false;
 }
 
-Icon::Icon() {
+Icon::Icon() : RefCounted<Icon>(0) {
   notImplemented();
 }
 Icon::~Icon() {
