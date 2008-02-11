@@ -23,9 +23,11 @@
 #include "config.h"
 #include "RenderThemeWin.h"
 
-#include <cairo-win32.h>
+#include "CSSValueKeywords.h"
 #include "Document.h"
 #include "GraphicsContext.h"
+#include "PlatformString.h"
+#include <cairo-win32.h>
 
 /*
  * The following constants are used to determine how a widget is drawn using
@@ -247,12 +249,12 @@ ThemeData RenderThemeWin::getThemeData(RenderObject* o) {
 
 // May need to add stuff to these later, so keep the graphics context
 // retrieval/release in some helpers.
-static HDC prepareForDrawing(GraphicsContext* g) {
-  return g->getWindowsContext();
+static HDC prepareForDrawing(GraphicsContext* g, const IntRect& r) {
+  return g->getWindowsContext(r);
 }
 
-static void doneDrawing(GraphicsContext* g, HDC hdc) {
-  g->releaseWindowsContext(hdc);
+static void doneDrawing(GraphicsContext* g, HDC hdc, const IntRect& r) {
+  g->releaseWindowsContext(hdc, r);
 }
 
 bool RenderThemeWin::paintButton(RenderObject* o,
@@ -262,7 +264,7 @@ bool RenderThemeWin::paintButton(RenderObject* o,
   ThemeData themeData = getThemeData(o);
 
   // Now paint the button.
-  HDC hdc = prepareForDrawing(i.context);
+  HDC hdc = prepareForDrawing(i.context, r);
   RECT widgetRect = r;
   if (m_themeDLL && !m_buttonTheme)
     m_buttonTheme = openTheme(0, L"Button");
@@ -283,7 +285,7 @@ bool RenderThemeWin::paintButton(RenderObject* o,
       DrawFocusRect(hdc, &widgetRect);
     }
   }
-  doneDrawing(i.context, hdc);
+  doneDrawing(i.context, hdc, r);
 
   return false;
 }
@@ -313,7 +315,7 @@ bool RenderThemeWin::paintTextField(RenderObject* o,
   ThemeData themeData = getThemeData(o);
 
   // Now paint the text field.
-  HDC hdc = prepareForDrawing(i.context);
+  HDC hdc = prepareForDrawing(i.context, r);
   RECT widgetRect = r;
   if (m_themeDLL && !m_textFieldTheme)
     m_textFieldTheme = openTheme(0, L"Edit");
@@ -328,7 +330,7 @@ bool RenderThemeWin::paintTextField(RenderObject* o,
                                                              : COLOR_WINDOW) +
                  1));
   }
-  doneDrawing(i.context, hdc);
+  doneDrawing(i.context, hdc, r);
 
   return false;
 }
@@ -370,7 +372,7 @@ bool RenderThemeWin::paintMenuList(RenderObject* o,
 bool RenderThemeWin::paintMenuListButton(RenderObject* o,
                                          const RenderObject::PaintInfo& i,
                                          const IntRect& r) {
-  HDC hdc = prepareForDrawing(i.context);
+  HDC hdc = prepareForDrawing(i.context, r);
   RECT widgetRect = r;
   if (m_themeDLL && !m_menuListTheme)
     m_menuListTheme = openTheme(0, L"Combobox");
@@ -380,8 +382,59 @@ bool RenderThemeWin::paintMenuListButton(RenderObject* o,
   else
     DrawFrameControl(hdc, &widgetRect, DFC_SCROLL,
                      DFCS_SCROLLCOMBOBOX | determineClassicState(o));
-  doneDrawing(i.context, hdc);
+  doneDrawing(i.context, hdc, r);
 
   return false;
 }
+
+void RenderThemeWin::systemFont(int propId,
+                                FontDescription& fontDescription) const {
+  static FontDescription systemFont;
+  static FontDescription smallSystemFont;
+  static FontDescription menuFont;
+  static FontDescription labelFont;
+  static FontDescription miniControlFont;
+  static FontDescription smallControlFont;
+  static FontDescription controlFont;
+
+  FontDescription* cachedDesc;
+  float fontSize = 0;
+  switch (propId) {
+    case CSS_VAL_SMALL_CAPTION:
+      cachedDesc = &smallSystemFont;
+      break;
+    case CSS_VAL_MENU:
+      cachedDesc = &menuFont;
+      break;
+    case CSS_VAL_STATUS_BAR:
+      cachedDesc = &labelFont;
+      if (!labelFont.isAbsoluteSize())
+        fontSize = 10.0f;
+      break;
+    case CSS_VAL__WEBKIT_MINI_CONTROL:
+      cachedDesc = &miniControlFont;
+      break;
+    case CSS_VAL__WEBKIT_SMALL_CONTROL:
+      cachedDesc = &smallControlFont;
+      break;
+    case CSS_VAL__WEBKIT_CONTROL:
+      cachedDesc = &controlFont;
+      break;
+    default:
+      cachedDesc = &systemFont;
+      if (!systemFont.isAbsoluteSize())
+        fontSize = 13.0f;
+  }
+
+  if (fontSize) {
+    cachedDesc->setIsAbsoluteSize(true);
+    cachedDesc->setGenericFamily(FontDescription::NoFamily);
+    cachedDesc->firstFamily().setFamily("Lucida Grande");
+    cachedDesc->setSpecifiedSize(fontSize);
+    cachedDesc->setBold(false);
+    cachedDesc->setItalic(false);
+  }
+  fontDescription = *cachedDesc;
 }
+
+}  // namespace
