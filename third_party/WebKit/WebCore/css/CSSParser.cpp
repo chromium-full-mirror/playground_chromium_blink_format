@@ -2699,7 +2699,7 @@ bool CSSParser::parseShape(int propId, bool important) {
 bool CSSParser::parseFont(bool important) {
   bool valid = true;
   Value* value = valueList->current();
-  FontValue* font = new FontValue;
+  RefPtr<FontValue> font = new FontValue;
   // optional font-style, font-variant and font-weight
   while (value) {
     int id = value->id;
@@ -2708,15 +2708,15 @@ bool CSSParser::parseFont(bool important) {
         // do nothing, it's the inital value for all three
       } else if (id == CSS_VAL_ITALIC || id == CSS_VAL_OBLIQUE) {
         if (font->style)
-          goto invalid;
+          return false;
         font->style = new CSSPrimitiveValue(id);
       } else if (id == CSS_VAL_SMALL_CAPS) {
         if (font->variant)
-          goto invalid;
+          return false;
         font->variant = new CSSPrimitiveValue(id);
       } else if (id >= CSS_VAL_BOLD && id <= CSS_VAL_LIGHTER) {
         if (font->weight)
-          goto invalid;
+          return false;
         font->weight = new CSSPrimitiveValue(id);
       } else {
         valid = false;
@@ -2755,7 +2755,7 @@ bool CSSParser::parseFont(bool important) {
     value = valueList->next();
   }
   if (!value)
-    goto invalid;
+    return false;
 
   // set undefined values to default
   if (!font->style)
@@ -2774,23 +2774,23 @@ bool CSSParser::parseFont(bool important) {
         value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
   value = valueList->next();
   if (!font->size || !value)
-    goto invalid;
+    return false;
 
   if (value->unit == Value::Operator && value->iValue == '/') {
     // line-height
     value = valueList->next();
     if (!value)
-      goto invalid;
+      return false;
     if (value->id == CSS_VAL_NORMAL) {
       // default value, nothing to do
     } else if (validUnit(value, FNumber | FLength | FPercent, strict))
       font->lineHeight = new CSSPrimitiveValue(
           value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
     else
-      goto invalid;
+      return false;
     value = valueList->next();
     if (!value)
-      goto invalid;
+      return false;
   }
 
   if (!font->lineHeight)
@@ -2800,14 +2800,10 @@ bool CSSParser::parseFont(bool important) {
   font->family = parseFontFamily();
 
   if (valueList->current() || !font->family)
-    goto invalid;
+    return false;
 
-  addProperty(CSS_PROP_FONT, font, important);
+  addProperty(CSS_PROP_FONT, font.release(), important);
   return true;
-
-invalid:
-  delete font;
-  return false;
 }
 
 PassRefPtr<CSSValueList> CSSParser::parseFontFamily() {
