@@ -60,7 +60,7 @@ class IntPoint;
 class SharedCursor : public RefCounted<SharedCursor> {
  public:
   SharedCursor(HCURSOR nativeCursor)
-      : RefCounted<SharedCoursor>(0), m_nativeCursor(nativeCursor) {}
+      : RefCounted<SharedCursor>(0), m_nativeCursor(nativeCursor) {}
   ~SharedCursor() { DestroyIcon(m_nativeCursor); }
   HCURSOR nativeCursor() const { return m_nativeCursor; }
 
