@@ -67,7 +67,8 @@ inline int wxNavTypeFromWebNavType(NavigationType type) {
   return wxWEBVIEW_NAV_OTHER;
 }
 
-FrameLoaderClientWx::FrameLoaderClientWx() : m_frame(0) {}
+FrameLoaderClientWx::FrameLoaderClientWx()
+    : RefCounted<FrameLoaderClientWx>(0), m_frame(0) {}
 
 FrameLoaderClientWx::~FrameLoaderClientWx() {}
 
