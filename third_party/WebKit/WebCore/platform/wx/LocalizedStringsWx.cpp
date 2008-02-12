@@ -217,4 +217,8 @@ String unknownFileSizeText() {
   return String("Unknown");
 }
 
+String imageTitle(const String& filename, const IntSize& size) {
+  return String();
+}
+
 }  // namespace WebCore

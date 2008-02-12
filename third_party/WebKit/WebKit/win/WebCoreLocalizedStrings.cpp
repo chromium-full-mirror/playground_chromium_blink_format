@@ -242,3 +242,6 @@ String WebCore::allFilesText() {
   return String(LPCTSTR_UI_STRING(
       "All Files", "(Windows) Form submit file upload all files pop-up"));
 }
+String WebCore::imageTitle(const String& filename, const IntSize& size) {
+  return String();
+}

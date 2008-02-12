@@ -29,6 +29,7 @@
 namespace WebCore {
 
 class String;
+class IntSize;
 
 String inputElementAltText();
 String resetButtonDefaultLabel();
@@ -105,6 +106,8 @@ String unknownFileSizeText();
 String uploadFileText();
 String allFilesText();
 #endif
+
+String imageTitle(const String& filename, const IntSize& size);
 }
 
 #endif
