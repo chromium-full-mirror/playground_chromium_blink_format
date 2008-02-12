@@ -67,6 +67,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
                  PassRefPtr<SQLTransactionCallback>,
                  PassRefPtr<SQLTransactionErrorCallback>,
                  PassRefPtr<SQLTransactionWrapper>);
+  ~SQLTransaction();
 
   void executeSQL(const String& sqlStatement,
                   const Vector<SQLValue>& arguments,
@@ -98,6 +99,10 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
   void handleTransactionError(bool inCallback);
   void deliverTransactionErrorCallback();
   void cleanupAfterTransactionErrorCallback();
+
+#ifndef NDEBUG
+  static const char* debugStepName(TransactionStepMethod);
+#endif
 
   RefPtr<SQLStatement> m_currentStatement;
 
