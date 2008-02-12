@@ -142,6 +142,9 @@ class Window : public JSGlobalObject {
   virtual bool shouldInterruptScript() const;
 
   bool allowsAccessFrom(ExecState*) const;
+  bool allowsAccessFrom(ExecState*, WebCore::String& message) const;
+
+  void printErrorMessage(const WebCore::String&) const;
 
   // Don't call this version of allowsAccessFrom -- it's a slightly incorrect
   // implementation used only by WebScriptObject
@@ -202,10 +205,6 @@ class Window : public JSGlobalObject {
                                    JSObject*,
                                    const Identifier&,
                                    const PropertySlot&);
-  static JSValue* namedFrameGetter(ExecState*,
-                                   JSObject*,
-                                   const Identifier&,
-                                   const PropertySlot&);
   static JSValue* indexGetter(ExecState*,
                               JSObject*,
                               const Identifier&,
@@ -222,7 +221,6 @@ class Window : public JSGlobalObject {
   bool allowsAccessFrom(const JSGlobalObject*,
                         WebCore::SecurityOrigin::Reason&,
                         WebCore::String& message) const;
-  void printErrorMessage(const WebCore::String&) const;
 
   RefPtr<WebCore::DOMWindow> m_impl;
   OwnPtr<WindowPrivate> d;

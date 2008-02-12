@@ -637,10 +637,12 @@ JSValue* Window::namedItemGetter(ExecState* exec,
                                  const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
   Document* doc = thisObj->impl()->frame()->document();
-  ASSERT(thisObj->allowsAccessFrom(exec) && doc && doc->isHTMLDocument());
+  ASSERT(thisObj->allowsAccessFrom(exec));
+  ASSERT(doc);
+  ASSERT(doc->isHTMLDocument());
 
-  String name = propertyName;
-  RefPtr<WebCore::HTMLCollection> collection = doc->windowNamedItems(name);
+  RefPtr<WebCore::HTMLCollection> collection =
+      doc->windowNamedItems(propertyName);
   if (collection->length() == 1)
     return toJS(exec, collection->firstItem());
   return toJS(exec, collection.get());
@@ -662,7 +664,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   const HashEntry* entry = Lookup::findEntry(&WindowTable, propertyName);
   if (entry) {
     if (entry->attr & Function) {
-      if (entry->value.functionValue == &windowProtoFuncShowModalDialog) {
+      if (entry->value.functionValue == windowProtoFuncShowModalDialog) {
         if (!canShowModalDialog(impl()->frame()))
           return false;
       }
@@ -673,6 +675,19 @@ bool Window::getOwnPropertySlot(ExecState* exec,
     } else
       slot.setStaticEntry(this, entry, staticValueGetter<Window>);
     return true;
+  }
+
+  // Do prototype lookup early so that functions and attributes in the prototype
+  // can have
+  // precedence over the index and name getters.
+  JSValue* proto = prototype();
+  if (proto->isObject()) {
+    if (static_cast<JSObject*>(proto)->getOwnPropertySlot(exec, propertyName,
+                                                          slot)) {
+      if (!allowsAccessFrom(exec))
+        slot.setUndefined(this);
+      return true;
+    }
   }
 
   // FIXME: Search the whole frame hierachy somewhere around here.
@@ -686,25 +701,20 @@ bool Window::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  // allow shortcuts like 'Image1' instead of document.images.Image1
+  if (!allowsAccessFrom(exec)) {
+    slot.setUndefined(this);
+    return true;
+  }
+
+  // Allow shortcuts like 'Image1' instead of document.images.Image1
   Document* doc = impl()->frame()->document();
   if (doc && doc->isHTMLDocument()) {
-    if (!allowsAccessFrom(exec)) {
-      slot.setUndefined(this);
-      return true;
-    }
-
     AtomicString atomicPropertyName = propertyName;
     if (static_cast<HTMLDocument*>(doc)->hasNamedItem(atomicPropertyName) ||
         doc->getElementById(atomicPropertyName)) {
       slot.setCustom(this, namedItemGetter);
       return true;
     }
-  }
-
-  if (!allowsAccessFrom(exec)) {
-    slot.setUndefined(this);
-    return true;
   }
 
   return Base::getOwnPropertySlot(exec, propertyName, slot);
@@ -873,8 +883,15 @@ bool Window::allowsAccessFrom(const JSGlobalObject* other) const {
 }
 
 bool Window::allowsAccessFrom(ExecState* exec) const {
-  SecurityOrigin::Reason reason;
   String message;
+  if (allowsAccessFrom(exec, message))
+    return true;
+  printErrorMessage(message);
+  return false;
+}
+
+bool Window::allowsAccessFrom(ExecState* exec, String& message) const {
+  SecurityOrigin::Reason reason;
   if (allowsAccessFrom(exec->dynamicGlobalObject(), reason, message))
     return true;
   if (reason == SecurityOrigin::DomainSetInDOMMismatch) {
@@ -884,7 +901,6 @@ bool Window::allowsAccessFrom(ExecState* exec) const {
     if (allowsAccessFrom(exec->lexicalGlobalObject(), reason, message))
       return true;
   }
-  printErrorMessage(message);
   return false;
 }
 
@@ -932,7 +948,7 @@ bool Window::allowsAccessFrom(const JSGlobalObject* other,
 }
 
 void Window::printErrorMessage(const String& message) const {
-  if (!message.length())
+  if (message.isEmpty())
     return;
 
   Frame* frame = impl()->frame();

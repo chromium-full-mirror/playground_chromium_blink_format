@@ -56,14 +56,8 @@ Attr* toAttr(JSValue* val, bool& ok) {
   return static_cast<Attr*>(static_cast<JSNode*>(val)->impl());
 }
 
-bool checkNodeSecurity(ExecState* exec, Node* n) {
-  if (!n)
-    return false;
-
-  // Check to see if the currently executing interpreter is allowed to access
-  // the specified node
-  KJS::Window* win = KJS::Window::retrieveWindow(n->document()->frame());
-  return win && win->allowsAccessFrom(exec);
+bool checkNodeSecurity(ExecState* exec, Node* node) {
+  return node && allowsAccessFromFrame(exec, node->document()->frame());
 }
 
 JSValue* toJS(ExecState* exec, EventTarget* target) {

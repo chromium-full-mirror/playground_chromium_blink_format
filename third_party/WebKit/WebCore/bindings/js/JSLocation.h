@@ -72,6 +72,10 @@ class JSLocation : public KJS::DOMObject {
   static const KJS::ClassInfo info;
 
  private:
+  bool customGetOwnPropertySlot(KJS::ExecState*,
+                                const KJS::Identifier&,
+                                KJS::PropertySlot&);
+
   Frame* m_frame;
 };
 

@@ -40,6 +40,7 @@
 #include "JSXMLHttpRequestException.h"
 #include "RangeException.h"
 #include "XMLHttpRequestException.h"
+#include "kjs_window.h"
 
 #if ENABLE(SVG)
 #include "JSSVGException.h"
@@ -51,8 +52,11 @@
 #include "XPathException.h"
 #endif
 
+using namespace KJS;
 using namespace WebCore;
 using namespace HTMLNames;
+
+// FIXME: Move all this stuff into the WebCore namespace.
 
 namespace KJS {
 
@@ -300,3 +304,44 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
 }
 
 }  // namespace KJS
+
+namespace WebCore {
+
+bool allowsAccessFromFrame(ExecState* exec, Frame* frame) {
+  if (!frame)
+    return false;
+  Window* window = Window::retrieveWindow(frame);
+  return window && window->allowsAccessFrom(exec);
+}
+
+bool allowsAccessFromFrame(ExecState* exec, Frame* frame, String& message) {
+  if (!frame)
+    return false;
+  Window* window = Window::retrieveWindow(frame);
+  return window && window->allowsAccessFrom(exec, message);
+}
+
+void printErrorMessageForFrame(Frame* frame, const String& message) {
+  if (!frame)
+    return;
+  if (Window* window = Window::retrieveWindow(frame))
+    window->printErrorMessage(message);
+}
+
+JSValue* nonCachingStaticFunctionGetter(ExecState* exec,
+                                        JSObject*,
+                                        const Identifier& propertyName,
+                                        const PropertySlot& slot) {
+  const HashEntry* entry = slot.staticEntry();
+  return new PrototypeFunction(exec, entry->params, propertyName,
+                               entry->value.functionValue);
+}
+
+JSValue* objectToStringFunctionGetter(ExecState* exec,
+                                      JSObject*,
+                                      const Identifier& propertyName,
+                                      const PropertySlot&) {
+  return new PrototypeFunction(exec, 0, propertyName, objectProtoFuncToString);
+}
+
+}  // namespace WebCore
