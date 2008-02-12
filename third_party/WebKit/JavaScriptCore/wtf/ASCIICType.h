@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -135,23 +135,33 @@ inline bool isASCIIUpper(int c) {
   return c >= 'A' && c <= 'Z';
 }
 
+/*
+    Statistics from a run of the PLT on the usage of isASCIISpace:
+    Hex  Name               Count
+    ---  ----               -----
+       ALL OTHER VALUES     689383
+    x20  SPACE              294720
+    x0A  NEWLINE            89059
+    x09  TAB                28320
+    x0D  CARRIAGE RETURN    0
+    x0C  FORMFEED           0
+    x0B  VERTICAL TAB       0
+
+*/
+
 inline bool isASCIISpace(char c) {
-  return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' ||
-         c == ' ';
+  return c <= ' ' && (c == ' ' || (c <= 0xD && c >= 0x9));
 }
 inline bool isASCIISpace(unsigned short c) {
-  return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' ||
-         c == ' ';
+  return c <= ' ' && (c == ' ' || (c <= 0xD && c >= 0x9));
 }
 #if !COMPILER(MSVC) || defined(_NATIVE_WCHAR_T_DEFINED)
 inline bool isASCIISpace(wchar_t c) {
-  return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' ||
-         c == ' ';
+  return c <= ' ' && (c == ' ' || (c <= 0xD && c >= 0x9));
 }
 #endif
 inline bool isASCIISpace(int c) {
-  return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' ||
-         c == ' ';
+  return c <= ' ' && (c == ' ' || (c <= 0xD && c >= 0x9));
 }
 
 inline char toASCIILower(char c) {
