@@ -529,11 +529,10 @@ void GraphicsContext::setShadow(const IntSize& size,
   CGFloat width = size.width();
   CGFloat height = size.height();
 
-#if PLATFORM(MAC)
+#ifdef BUILDING_ON_TIGER
   // Work around <rdar://problem/5539388> by ensuring that the offsets will get
   // truncated
   // to the desired integer.
-  // FIXME: This is not needed post-Leopard.
   static const CGFloat extraShadowOffset = narrowPrecisionToCGFloat(1.0 / 128);
   if (width > 0)
     width += extraShadowOffset;
