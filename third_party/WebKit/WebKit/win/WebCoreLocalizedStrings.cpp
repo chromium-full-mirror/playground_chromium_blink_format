@@ -25,8 +25,10 @@
 
 #include "config.h"
 #include "WebLocalizableStrings.h"
+#include <WebCore/IntSize.h>
 #include <WebCore/LocalizedStrings.h>
 #include <WebCore/PlatformString.h>
+#include <wtf/RetainPtr.h>
 
 using namespace WebCore;
 
@@ -242,6 +244,17 @@ String WebCore::allFilesText() {
   return String(LPCTSTR_UI_STRING(
       "All Files", "(Windows) Form submit file upload all files pop-up"));
 }
+
 String WebCore::imageTitle(const String& filename, const IntSize& size) {
-  return String();
+  static RetainPtr<CFStringRef> format(
+      AdoptCF, UI_STRING("%@ %.0f×%.0f pixels",
+                         "window title for a standalone image (uses "
+                         "multiplication symbol, not x)"));
+
+  RetainPtr<CFStringRef> filenameCF(AdoptCF, filename.createCFString());
+  RetainPtr<CFStringRef> result(
+      AdoptCF, CFStringCreateWithFormat(0, 0, format.get(), filenameCF.get(),
+                                        size.width(), size.height()));
+
+  return result.get();
 }
