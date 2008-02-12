@@ -49,7 +49,6 @@ static JSValue* objectProtoFuncPropertyIsEnumerable(ExecState*,
 static JSValue* objectProtoFuncToLocaleString(ExecState*,
                                               JSObject*,
                                               const List&);
-static JSValue* objectProtoFuncToString(ExecState*, JSObject*, const List&);
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
                                  FunctionPrototype* functionPrototype)

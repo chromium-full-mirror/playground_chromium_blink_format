@@ -37,6 +37,8 @@ class ObjectPrototype : public JSObject {
   ObjectPrototype(ExecState*, FunctionPrototype*);
 };
 
+JSValue* objectProtoFuncToString(ExecState*, JSObject*, const List&);
+
 /**
  * @internal
  *
