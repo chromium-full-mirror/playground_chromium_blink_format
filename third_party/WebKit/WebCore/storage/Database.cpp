@@ -459,9 +459,8 @@ void Database::changeVersion(
     PassRefPtr<SQLTransactionCallback> callback,
     PassRefPtr<SQLTransactionErrorCallback> errorCallback,
     PassRefPtr<VoidCallback> successCallback) {
-  // FIXME: pass successCallback, too.
   m_transactionQueue.append(
-      new SQLTransaction(this, callback, errorCallback,
+      new SQLTransaction(this, callback, errorCallback, successCallback,
                          new ChangeVersionWrapper(oldVersion, newVersion)));
   MutexLocker locker(m_transactionInProgressMutex);
   if (!m_transactionInProgress)
@@ -472,9 +471,8 @@ void Database::transaction(
     PassRefPtr<SQLTransactionCallback> callback,
     PassRefPtr<SQLTransactionErrorCallback> errorCallback,
     PassRefPtr<VoidCallback> successCallback) {
-  // FIXME: pass successCallback, too.
   m_transactionQueue.append(
-      new SQLTransaction(this, callback, errorCallback, 0));
+      new SQLTransaction(this, callback, errorCallback, successCallback, 0));
   MutexLocker locker(m_transactionInProgressMutex);
   if (!m_transactionInProgress)
     scheduleTransaction();

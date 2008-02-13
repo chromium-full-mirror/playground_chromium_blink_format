@@ -51,6 +51,7 @@ class SQLStatementErrorCallback;
 class SQLTransaction;
 class SQLValue;
 class String;
+class VoidCallback;
 
 class SQLTransactionWrapper : public ThreadSafeShared<SQLTransactionWrapper> {
  public:
@@ -66,6 +67,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
   SQLTransaction(Database*,
                  PassRefPtr<SQLTransactionCallback>,
                  PassRefPtr<SQLTransactionErrorCallback>,
+                 PassRefPtr<VoidCallback>,
                  PassRefPtr<SQLTransactionWrapper>);
   ~SQLTransaction();
 
@@ -96,6 +98,8 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
   void deliverStatementCallback();
   void deliverQuotaIncreaseCallback();
   void postflightAndCommit();
+  void deliverSuccessCallback();
+  void cleanupAfterSuccessCallback();
   void handleTransactionError(bool inCallback);
   void deliverTransactionErrorCallback();
   void cleanupAfterTransactionErrorCallback();
@@ -111,6 +115,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
   Database* m_database;
   RefPtr<SQLTransactionWrapper> m_wrapper;
   RefPtr<SQLTransactionCallback> m_callback;
+  RefPtr<VoidCallback> m_successCallback;
   RefPtr<SQLTransactionErrorCallback> m_errorCallback;
   RefPtr<SQLError> m_transactionError;
   bool m_shouldRetryCurrentStatement;
