@@ -90,7 +90,7 @@ class Database : public ThreadSafeShared<Database> {
 
   Vector<String> tableNames();
 
-  Document* document() const { return m_document; }
+  Document* document() const { return m_document.get(); }
   PassRefPtr<SecurityOrigin> securityOriginCopy() const;
   String stringIdentifier() const;
 
@@ -133,7 +133,7 @@ class Database : public ThreadSafeShared<Database> {
 
   static void deliverPendingCallback(void*);
 
-  Document* m_document;
+  RefPtr<Document> m_document;
   RefPtr<SecurityOrigin> m_securityOrigin;
   String m_name;
   int m_guid;

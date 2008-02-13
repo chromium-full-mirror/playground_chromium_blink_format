@@ -77,9 +77,7 @@ SQLTransaction::SQLTransaction(
   ASSERT(m_database);
 }
 
-SQLTransaction::~SQLTransaction() {
-  LOG(StorageAPI, "Transaction %p destructor\n", this);
-}
+SQLTransaction::~SQLTransaction() {}
 
 void SQLTransaction::executeSQL(
     const String& sqlStatement,
