@@ -66,7 +66,7 @@ class FontPlatformData {
       case UNINITIALIZED:
         return 0;
       case VALID:
-        return m_fontHash;
+        return computeHash();
     }
   }
 
@@ -79,9 +79,9 @@ class FontPlatformData {
   }
 
   unsigned computeHash() const {
+    ASSERT(m_font.Ok());
     wxCharBuffer charBuffer(m_font.GetNativeFontInfoDesc().mb_str(wxConvUTF8));
-    const char* contents = charBuffer;
-    return StringImpl::computeHash((UChar*)contents, strlen(contents));
+    return StringImpl::computeHash(charBuffer.data());
   }
 
  private:
