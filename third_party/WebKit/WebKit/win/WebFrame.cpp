@@ -2364,9 +2364,9 @@ Widget* WebFrame::createPlugin(const IntSize& pluginSize,
                                const Vector<String>& paramValues,
                                const String& mimeType,
                                bool loadManually) {
-  PluginView* pluginView = PluginDatabase::installedPlugins()->createPluginView(
-      core(this), pluginSize, element, url, paramNames, paramValues, mimeType,
-      loadManually);
+  PluginView* pluginView =
+      PluginView::create(core(this), pluginSize, element, url, paramNames,
+                         paramValues, mimeType, loadManually);
 
   if (pluginView->status() == PluginStatusLoadedSuccessfully)
     return pluginView;
@@ -2448,9 +2448,9 @@ Widget* WebFrame::createJavaAppletWidget(const IntSize& pluginSize,
                                          const KURL& /*baseURL*/,
                                          const Vector<String>& paramNames,
                                          const Vector<String>& paramValues) {
-  PluginView* pluginView = PluginDatabase::installedPlugins()->createPluginView(
-      core(this), pluginSize, element, KURL(), paramNames, paramValues,
-      "application/x-java-applet", false);
+  PluginView* pluginView =
+      PluginView::create(core(this), pluginSize, element, KURL(), paramNames,
+                         paramValues, "application/x-java-applet", false);
 
   // Check if the plugin can be loaded successfully
   if (pluginView->plugin() && pluginView->plugin()->load())
