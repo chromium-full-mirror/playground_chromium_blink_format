@@ -40,6 +40,7 @@ LayoutTestController::LayoutTestController(
       m_dumpBackForwardList(false),
       m_dumpChildFrameScrollPositions(false),
       m_dumpChildFramesAsText(false),
+      m_dumpDatabaseCallbacks(false),
       m_dumpDOMAsWebArchive(false),
       m_dumpSelectionRect(false),
       m_dumpSourceAsWebArchive(false),
@@ -105,6 +106,18 @@ static JSValueRef dumpChildFrameScrollPositionsCallback(
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpChildFrameScrollPositions(true);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef dumpDatabaseCallbacksCallback(JSContextRef context,
+                                                JSObjectRef function,
+                                                JSObjectRef thisObject,
+                                                size_t argumentCount,
+                                                const JSValueRef arguments[],
+                                                JSValueRef* exception) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpDatabaseCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -314,6 +327,20 @@ static JSValueRef addDisallowedURLCallback(JSContextRef context,
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->addDisallowedURL(url.get());
+
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef clearAllDatabasesCallback(JSContextRef context,
+                                            JSObjectRef function,
+                                            JSObjectRef thisObject,
+                                            size_t argumentCount,
+                                            const JSValueRef arguments[],
+                                            JSValueRef* exception) {
+  // Has mac & windows implementation
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->clearAllDatabases();
 
   return JSValueMakeUndefined(context);
 }
@@ -626,6 +653,26 @@ static JSValueRef setCustomPolicyDelegateCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setDatabaseQuotaCallback(JSContextRef context,
+                                           JSObjectRef function,
+                                           JSObjectRef thisObject,
+                                           size_t argumentCount,
+                                           const JSValueRef arguments[],
+                                           JSValueRef* exception) {
+  // Has mac implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+
+  double quota = JSValueToNumber(context, arguments[0], NULL);
+  if (!isnan(quota))
+    controller->setDatabaseQuota(static_cast<unsigned long long>(quota));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setMainFrameIsFirstResponderCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -905,6 +952,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"addFileToPasteboardOnDrag", addFileToPasteboardOnDragCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"clearAllDatabases", clearAllDatabasesCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearBackForwardList", clearBackForwardListCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearPersistentUserStyleSheet", clearPersistentUserStyleSheetCallback,
@@ -920,6 +969,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"dumpChildFramesAsText", dumpChildFramesAsTextCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpChildFrameScrollPositions", dumpChildFrameScrollPositionsCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"dumpDatabaseCallbacks", dumpDatabaseCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpDOMAsWebArchive", dumpDOMAsWebArchiveCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -969,6 +1020,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        setCloseRemainingWindowsWhenCompleteCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setCustomPolicyDelegate", setCustomPolicyDelegateCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setDatabaseQuota", setDatabaseQuotaCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setMainFrameIsFirstResponder", setMainFrameIsFirstResponderCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

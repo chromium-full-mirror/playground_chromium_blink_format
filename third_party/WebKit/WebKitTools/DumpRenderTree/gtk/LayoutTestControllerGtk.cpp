@@ -184,3 +184,11 @@ void LayoutTestController::setPersistentUserStyleSheetLocation(
 void LayoutTestController::clearPersistentUserStyleSheet() {
   // FIXME: implement
 }
+
+void LayoutTestController::clearAllDatabases() {
+  // FIXME: implement
+}
+
+void LayoutTestController::setDatabaseQuota(unsigned long long quota) {
+  // FIXME: implement
+}
