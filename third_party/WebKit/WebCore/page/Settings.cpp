@@ -69,8 +69,7 @@ Settings::Settings(Page* page)
       m_forceFTPDirectoryListings(false),
       m_developerExtrasEnabled(false),
       m_authorAndUserStylesEnabled(true),
-      m_fontRenderingMode(0),
-      m_needsXcodeVisibilityQuirk(false) {
+      m_fontRenderingMode(0) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -292,10 +291,6 @@ void Settings::setFontRenderingMode(FontRenderingMode mode) {
 
 FontRenderingMode Settings::fontRenderingMode() const {
   return static_cast<FontRenderingMode>(m_fontRenderingMode);
-}
-
-void Settings::setNeedsXcodeVisibilityQuirk(bool needsQuirk) {
-  m_needsXcodeVisibilityQuirk = needsQuirk;
 }
 
 }  // namespace WebCore
