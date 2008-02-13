@@ -814,7 +814,7 @@ bool DatabaseTracker::deleteDatabaseFile(SecurityOrigin* origin,
           DatabaseSet::const_iterator end = databaseSet->end();
           for (DatabaseSet::const_iterator it = databaseSet->begin(); it != end;
                ++it)
-            (*it)->markAsDeleted();
+            (*it)->markAsDeletedAndClose();
         }
       }
     }

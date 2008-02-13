@@ -92,6 +92,17 @@ class DatabaseOpenTask : public DatabaseTask {
   bool m_success;
 };
 
+class DatabaseCloseTask : public DatabaseTask {
+ public:
+  DatabaseCloseTask(Database*);
+
+ private:
+  virtual void doPerformTask();
+#ifndef NDEBUG
+  virtual const char* debugTaskName() const;
+#endif
+};
+
 class DatabaseTransactionTask : public DatabaseTask {
  public:
   DatabaseTransactionTask(PassRefPtr<SQLTransaction>);
