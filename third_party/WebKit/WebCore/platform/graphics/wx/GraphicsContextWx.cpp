@@ -447,4 +447,10 @@ void GraphicsContext::setUseAntialiasing(bool enable) {
     return;
   notImplemented();
 }
+
+void GraphicsContext::paintBuffer(ImageBuffer* buffer, const IntRect& r) {
+  if (paintingDisabled())
+    return;
+  notImplemented();
+}
 }

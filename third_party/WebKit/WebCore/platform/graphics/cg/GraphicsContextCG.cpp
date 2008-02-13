@@ -942,10 +942,12 @@ void GraphicsContext::setCompositeOperation(CompositeOperator mode) {
 #endif
 
 void GraphicsContext::paintBuffer(ImageBuffer* buffer, const IntRect& r) {
-  if (CGImageRef image =
-          CGBitmapContextCreateImage(buffer->context()->platformContext())) {
-    CGContextDrawImage(platformContext(), roundToDevicePixels(r), image);
-    CGImageRelease(image);
-  }
+  if (paintingDisabled())
+    return;
+
+    RetainPtr<CGImageRef> image(AdoptCF, CGBitmapContextCreateImage(buffer->context()->platformContext());
+    if (!image)
+        return;
+    CGContextDrawImage(platformContext(), roundToDevicePixels(r), image.get());
 }
 }
