@@ -29,7 +29,7 @@
 #define STRINGIFIED_VERSION(version) STRINGIFY(version)
 #define STRINGIFY(s) L## #s
 
-#define CURRENT_PROGID_VERSION 525
+#define CURRENT_PROGID_VERSION 526
 #define VERSION_INDEPENDENT_PRODUCTION_PROGID(className) \
   L##"WebKit." L## #className
 #define VERSION_INDEPENDENT_OPENSOURCE_PROGID(className) \
