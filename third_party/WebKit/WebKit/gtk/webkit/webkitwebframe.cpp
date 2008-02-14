@@ -292,7 +292,7 @@ const gchar* webkit_web_frame_get_name(WebKitWebFrame* frame) {
     return priv->name;
 
   Frame* coreFrame = core(frame);
-  g_return_val_if_fail(coreFrame, NULL);
+  ASSERT(coreFrame);
 
   String string = coreFrame->tree()->name();
   priv->name = g_strdup(string.utf8().data());
@@ -311,7 +311,7 @@ WebKitWebFrame* webkit_web_frame_get_parent(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
   Frame* coreFrame = core(frame);
-  g_return_val_if_fail(coreFrame, NULL);
+  ASSERT(coreFrame);
 
   return kit(coreFrame->tree()->parent());
 }
@@ -334,7 +334,7 @@ void webkit_web_frame_load_request(WebKitWebFrame* frame,
   g_return_if_fail(WEBKIT_IS_NETWORK_REQUEST(request));
 
   Frame* coreFrame = core(frame);
-  g_return_if_fail(coreFrame);
+  ASSERT(coreFrame);
 
   // TODO: Use the ResourceRequest carried by WebKitNetworkRequest when it is
   // implemented.
@@ -353,7 +353,7 @@ void webkit_web_frame_stop_loading(WebKitWebFrame* frame) {
   g_return_if_fail(WEBKIT_IS_WEB_FRAME(frame));
 
   Frame* coreFrame = core(frame);
-  g_return_if_fail(coreFrame);
+  ASSERT(coreFrame);
 
   coreFrame->loader()->stopAllLoaders();
 }
@@ -368,7 +368,7 @@ void webkit_web_frame_reload(WebKitWebFrame* frame) {
   g_return_if_fail(WEBKIT_IS_WEB_FRAME(frame));
 
   Frame* coreFrame = core(frame);
-  g_return_if_fail(coreFrame);
+  ASSERT(coreFrame);
 
   coreFrame->loader()->reload();
 }
@@ -396,7 +396,7 @@ WebKitWebFrame* webkit_web_frame_find_frame(WebKitWebFrame* frame,
   g_return_val_if_fail(name, NULL);
 
   Frame* coreFrame = core(frame);
-  g_return_val_if_fail(coreFrame, NULL);
+  ASSERT(coreFrame);
 
   String nameString = String::fromUTF8(name);
   return kit(coreFrame->tree()->find(AtomicString(nameString)));
@@ -415,7 +415,7 @@ JSGlobalContextRef webkit_web_frame_get_global_context(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
   Frame* coreFrame = core(frame);
-  g_return_val_if_fail(coreFrame, NULL);
+  ASSERT(coreFrame);
 
   return toGlobalRef(coreFrame->scriptProxy()->globalObject()->globalExec());
 }
@@ -429,9 +429,10 @@ JSGlobalContextRef webkit_web_frame_get_global_context(WebKitWebFrame* frame) {
 GSList* webkit_web_frame_get_children(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
-  GSList* children = NULL;
   Frame* coreFrame = core(frame);
+  ASSERT(coreFrame);
 
+  GSList* children = NULL;
   for (Frame* child = coreFrame->tree()->firstChild(); child;
        child = child->tree()->nextSibling()) {
     FrameLoader* loader = child->loader();
@@ -454,6 +455,8 @@ gchar* webkit_web_frame_get_inner_text(WebKitWebFrame* frame) {
   g_return_val_if_fail(WEBKIT_IS_WEB_FRAME(frame), NULL);
 
   Frame* coreFrame = core(frame);
+  ASSERT(coreFrame);
+
   FrameView* view = coreFrame->view();
 
   if (view->layoutPending())
@@ -622,6 +625,8 @@ void webkit_web_frame_print(WebKitWebFrame* frame) {
     topLevel = NULL;
 
   Frame* coreFrame = core(frame);
+  ASSERT(coreFrame);
+
   PrintContext printContext(coreFrame);
 
   GtkPrintOperation* op = gtk_print_operation_new();
