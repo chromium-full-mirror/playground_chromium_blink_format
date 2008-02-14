@@ -800,6 +800,12 @@ bool DatabaseTracker::deleteDatabaseFile(SecurityOrigin* origin,
   if (fullPath.isEmpty())
     return true;
 
+  Vector<RefPtr<Database>> deletedDatabases;
+
+  // Make sure not to hold the m_openDatabaseMapGuard mutex when calling
+  // Database::markAsDeletedAndClose(), since that can cause a deadlock
+  // during the synchronous DatabaseThread call it triggers.
+
   {
     MutexLocker openDatabaseMapLock(m_openDatabaseMapGuard);
     if (m_openDatabaseMap) {
@@ -814,11 +820,14 @@ bool DatabaseTracker::deleteDatabaseFile(SecurityOrigin* origin,
           DatabaseSet::const_iterator end = databaseSet->end();
           for (DatabaseSet::const_iterator it = databaseSet->begin(); it != end;
                ++it)
-            (*it)->markAsDeletedAndClose();
+            deletedDatabases.append(*it);
         }
       }
     }
   }
+
+  for (unsigned i = 0; i < deletedDatabases.size(); ++i)
+    deletedDatabases[i]->markAsDeletedAndClose();
 
   return deleteFile(fullPath);
 }
