@@ -852,6 +852,8 @@ void FrameLoader::clear(bool clearWindowProperties, bool clearScriptObjects) {
   if (m_frame->view())
     m_frame->view()->clear();
 
+  m_frame->setSelectionGranularity(CharacterGranularity);
+
   // Do not drop the document before the script proxy and view are cleared, as
   // some destructors
   // might still try to access the document.
