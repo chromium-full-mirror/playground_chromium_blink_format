@@ -468,7 +468,9 @@ void FrameLoaderClient::detachedFromParent3() {
 }
 
 void FrameLoaderClient::detachedFromParent4() {
-  notImplemented();
+  ASSERT(m_frame);
+  g_object_unref(m_frame);
+  m_frame = 0;
 }
 
 void FrameLoaderClient::loadedFromCachedPage() {

@@ -97,7 +97,7 @@ struct _WebKitWebViewPrivate {
                                WebKitWebFramePrivate))
 typedef struct _WebKitWebFramePrivate WebKitWebFramePrivate;
 struct _WebKitWebFramePrivate {
-  WebCore::Frame* coreFrame;
+  WTF::RefPtr<WebCore::Frame> coreFrame;
   WebCore::FrameLoaderClient* client;
   WebKitWebView* webView;
 
