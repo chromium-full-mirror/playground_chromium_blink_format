@@ -230,12 +230,12 @@ void ClipboardQt::declareAndWriteDragImage(Element* element,
   if (imageURL.isEmpty())
     return;
 
-  String fullURL = frame->document()->completeURL(parseURL(imageURL));
+  KURL fullURL = frame->document()->completeURL(parseURL(imageURL));
   if (fullURL.isEmpty())
     return;
 
   QList<QUrl> urls;
-  urls.append(QUrl(fullURL));
+  urls.append(fullURL);
 
   m_writableData->setUrls(urls);
   if (!isForDragging())
