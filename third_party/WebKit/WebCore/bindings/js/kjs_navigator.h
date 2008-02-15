@@ -1,7 +1,6 @@
-// -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
+ *  Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,19 +24,20 @@
 #include "kjs_binding.h"
 
 namespace WebCore {
-class Frame;
-}
 
-namespace KJS {
+class Frame;
 
 class Navigator : public DOMObject {
  public:
-  Navigator(JSObject* prototype, WebCore::Frame*);
+  Navigator(KJS::JSObject* prototype, Frame*);
 
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
+  virtual bool getOwnPropertySlot(KJS::ExecState*,
+                                  const KJS::Identifier&,
+                                  KJS::PropertySlot&);
+  KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
+  virtual const KJS::ClassInfo* classInfo() const { return &info; }
+  static const KJS::ClassInfo info;
+
   enum {
     AppCodeName,
     AppName,
@@ -53,14 +53,16 @@ class Navigator : public DOMObject {
     VendorSub,
     CookieEnabled
   };
-  WebCore::Frame* frame() const { return m_frame; }
+
+  Frame* frame() const { return m_frame; }
 
  private:
-  WebCore::Frame* m_frame;
+  Frame* m_frame;
 };
 
-// Functions
-JSValue* navigatorProtoFuncJavaEnabled(ExecState*, JSObject*, const List&);
+KJS::JSValue* navigatorProtoFuncJavaEnabled(KJS::ExecState*,
+                                            KJS::JSObject*,
+                                            const KJS::List&);
 
 }  // namespace
 

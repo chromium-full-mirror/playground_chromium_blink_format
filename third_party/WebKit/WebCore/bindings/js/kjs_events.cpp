@@ -35,7 +35,6 @@
 #include "HTMLNames.h"
 #include "JSEvent.h"
 #include "JSEventTargetNode.h"
-#include "KURL.h"
 #include "Page.h"
 #include "kjs_proxy.h"
 #include "kjs_window.h"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,15 +30,17 @@
 #include "JSXSLTProcessor.h"
 
 #include "XSLTProcessor.h"
-#include "JSXSLTProcessor.lut.h"
 #include "kjs_dom.h"
 #include "JSDocument.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 
+using namespace KJS;
 using namespace WebCore;
 
-namespace KJS {
+#include "JSXSLTProcessor.lut.h"
+
+namespace WebCore {
 
 const ClassInfo JSXSLTProcessor::info = {"XSLTProcessor", 0, 0};
 
@@ -76,7 +78,7 @@ JSXSLTProcessor::~JSXSLTProcessor() {
 JSValue* jsXSLTProcessorPrototypeFunctionImportStylesheet(ExecState* exec,
                                                           JSObject* thisObj,
                                                           const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 
@@ -93,7 +95,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionImportStylesheet(ExecState* exec,
 JSValue* jsXSLTProcessorPrototypeFunctionTransformToFragment(ExecState* exec,
                                                              JSObject* thisObj,
                                                              const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 
@@ -112,7 +114,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionTransformToFragment(ExecState* exec,
 JSValue* jsXSLTProcessorPrototypeFunctionTransformToDocument(ExecState* exec,
                                                              JSObject* thisObj,
                                                              const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 
@@ -132,7 +134,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionTransformToDocument(ExecState* exec,
 JSValue* jsXSLTProcessorPrototypeFunctionSetParameter(ExecState* exec,
                                                       JSObject* thisObj,
                                                       const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 
@@ -148,7 +150,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionSetParameter(ExecState* exec,
 JSValue* jsXSLTProcessorPrototypeFunctionGetParameter(ExecState* exec,
                                                       JSObject* thisObj,
                                                       const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 
@@ -165,7 +167,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionGetParameter(ExecState* exec,
 JSValue* jsXSLTProcessorPrototypeFunctionRemoveParameter(ExecState* exec,
                                                          JSObject* thisObj,
                                                          const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 
@@ -180,7 +182,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionRemoveParameter(ExecState* exec,
 JSValue* jsXSLTProcessorPrototypeFunctionClearParameters(ExecState* exec,
                                                          JSObject* thisObj,
                                                          const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 
@@ -191,7 +193,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionClearParameters(ExecState* exec,
 JSValue* jsXSLTProcessorPrototypeFunctionReset(ExecState* exec,
                                                JSObject* thisObj,
                                                const List& args) {
-  if (!thisObj->inherits(&KJS::JSXSLTProcessor::info))
+  if (!thisObj->inherits(&JSXSLTProcessor::info))
     return throwError(exec, TypeError);
   XSLTProcessor& processor = *static_cast<JSXSLTProcessor*>(thisObj)->impl();
 

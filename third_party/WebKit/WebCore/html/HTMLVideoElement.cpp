@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -127,7 +127,7 @@ void HTMLVideoElement::setHeight(int value) {
   setAttribute(heightAttr, String::number(value));
 }
 
-String HTMLVideoElement::poster() const {
+KURL HTMLVideoElement::poster() const {
   return document()->completeURL(getAttribute(posterAttr));
 }
 

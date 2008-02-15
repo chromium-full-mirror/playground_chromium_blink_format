@@ -32,7 +32,7 @@ class HTMLCollection;
 class HTMLElement;
 class JSHTMLElement;
 
-class ImageConstructorImp : public KJS::DOMObject {
+class ImageConstructorImp : public DOMObject {
  public:
   ImageConstructorImp(KJS::ExecState*, Document*);
 

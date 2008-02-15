@@ -212,11 +212,11 @@ class PluginMessageThrottlerWin {
 };
 
 static String scriptStringIfJavaScriptURL(const KURL& url) {
-  if (!url.string().startsWith("javascript:", false))
+  if (!url.protocolIs("javascript"))
     return String();
 
   // This returns an unescaped string
-  return KURL::decode_string(url.deprecatedString().mid(11));
+  return decodeURLEscapeSequences(url.string().substring(11));
 }
 
 PluginView* PluginView::s_currentPluginView = 0;
@@ -892,7 +892,7 @@ void PluginView::performRequest(PluginRequest* request) {
         KJS::JSLock::DropAllLocks dropAllLocks;
         setCallingPlugin(true);
         m_plugin->pluginFuncs()->urlnotify(m_instance,
-                                           requestURL.deprecatedString().utf8(),
+                                           requestURL.string().utf8().data(),
                                            NPRES_DONE, request->notifyData());
         setCallingPlugin(false);
       }
@@ -1626,7 +1626,7 @@ PluginView::PluginView(Frame* parentFrame,
       m_isStarted(false),
       m_url(url),
       m_baseURL(m_parentFrame->loader()->completeURL(
-          m_parentFrame->document()->baseURL())),
+          m_parentFrame->document()->baseURL().string())),
       m_status(PluginStatusLoadedSuccessfully),
       m_requestTimer(this, &PluginView::requestTimerFired),
       m_invalidateTimer(this, &PluginView::invalidateTimerFired),

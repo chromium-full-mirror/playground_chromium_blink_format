@@ -64,7 +64,7 @@ void HTMLTablePartElement::parseMappedAttribute(MappedAttribute* attr) {
     String url = parseURL(attr->value());
     if (!url.isEmpty())
       addCSSImageProperty(attr, CSS_PROP_BACKGROUND_IMAGE,
-                          document()->completeURL(url));
+                          document()->completeURL(url).string());
   } else if (attr->name() == bordercolorAttr) {
     if (!attr->value().isEmpty()) {
       addCSSColor(attr, CSS_PROP_BORDER_COLOR, attr->value());

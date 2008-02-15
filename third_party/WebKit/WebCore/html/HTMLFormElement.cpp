@@ -2,7 +2,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *           (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  *
  * This library is free software; you can redistribute it and/or
@@ -84,12 +84,7 @@ HTMLFormElement::~HTMLFormElement() {
 }
 
 bool HTMLFormElement::formWouldHaveSecureSubmission(const String& url) {
-  if (url.isNull()) {
-    return false;
-  }
-  return document()
-      ->completeURL(url.deprecatedString())
-      .startsWith("https:", false);
+  return document()->completeURL(url).protocolIs("https");
 }
 
 void HTMLFormElement::attach() {
@@ -237,7 +232,8 @@ TextEncoding HTMLFormElement::dataEncoding() const {
   TextEncoding encoding;
   String str = m_acceptcharset;
   str.replace(',', ' ');
-  Vector<String> charsets = str.split(' ');
+  Vector<String> charsets;
+  str.split(' ', charsets);
   Vector<String>::const_iterator end = charsets.end();
   for (Vector<String>::const_iterator it = charsets.begin(); it != end; ++it)
     if ((encoding = TextEncoding(*it)).isValid())
@@ -306,11 +302,10 @@ PassRefPtr<FormData> HTMLFormElement::formData(const char* boundary) const {
             hstr += "\"";
 
             if (!static_cast<HTMLInputElement*>(current)->value().isEmpty()) {
-              DeprecatedString mimeType =
-                  MIMETypeRegistry::getMIMETypeForPath(path).deprecatedString();
+              String mimeType = MIMETypeRegistry::getMIMETypeForPath(path);
               if (!mimeType.isEmpty()) {
                 hstr += "\r\nContent-Type: ";
-                hstr += mimeType.ascii();
+                hstr += mimeType.latin1().deprecatedCString();
               }
             }
           }
@@ -356,7 +351,7 @@ void HTMLFormElement::parseEnctype(const String& type) {
 }
 
 bool HTMLFormElement::isMailtoForm() const {
-  return m_url.startsWith("mailto:", false);
+  return protocolIs(m_url, "mailto");
 }
 
 bool HTMLFormElement::prepareSubmit(Event* event) {
@@ -477,7 +472,7 @@ void HTMLFormElement::submit(Event* event, bool activateSubmitButton) {
     firstSuccessfulSubmitButton->setActivatedSubmit(true);
 
   if (!m_url)
-    m_url = document()->url();
+    m_url = document()->url().string();
 
   if (m_post) {
     if (m_multipart && isMailtoForm()) {
@@ -492,9 +487,8 @@ void HTMLFormElement::submit(Event* event, bool activateSubmitButton) {
         if (equalIgnoringCase(enctype(), "text/plain")) {
           // Convention seems to be to decode, and s/&/\r\n/. Also, spaces are
           // encoded as %20.
-          body = KURL::decode_string(
-              body.replace('&', "\r\n").replace('+', ' ').deprecatedString() +
-              "\r\n");
+          body = decodeURLEscapeSequences(
+              body.replace('&', "\r\n").replace('+', ' ') + "\r\n");
         }
         data = new FormData((String("body=") + encodeCString(body.utf8()))
                                 .replace('+', "%20")

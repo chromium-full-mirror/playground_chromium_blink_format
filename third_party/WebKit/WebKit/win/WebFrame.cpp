@@ -615,10 +615,8 @@ void WebFrame::loadData(PassRefPtr<WebCore::SharedBuffer> data,
     mimeTypeString = "text/html";
 
   String encodingString(textEncodingName, SysStringLen(textEncodingName));
-  KURL baseKURL =
-      DeprecatedString((DeprecatedChar*)baseURL, SysStringLen(baseURL));
-  KURL failingKURL =
-      DeprecatedString((DeprecatedChar*)failingURL, SysStringLen(failingURL));
+  KURL baseKURL(String(baseURL, SysStringLen(baseURL)));
+  KURL failingKURL(String(failingURL, SysStringLen(failingURL)));
 
   ResourceRequest request(baseKURL);
   SubstituteData substituteData(data, mimeTypeString, encodingString,
@@ -1342,7 +1340,7 @@ void WebFrame::loadURLIntoChild(const KURL& originalURL,
       // Use the original URL to ensure we get all the side-effects, such as
       // onLoad handlers, of any redirects that happened. An example of where
       // this is needed is Radar 3213556.
-      url = childItem->originalURLString().deprecatedString();
+      url = childItem->originalURL();
       // These behaviors implied by these loadTypes should apply to the child
       // frames
       childLoadType = loadType;
@@ -2480,7 +2478,7 @@ ObjectContentType WebFrame::objectContentType(const KURL& url,
   String mimeType = mimeTypeIn;
   if (mimeType.isEmpty())
     mimeType = MIMETypeRegistry::getMIMETypeForExtension(
-        url.path().mid(url.path().findRev('.') + 1));
+        url.path().substring(url.path().reverseFind('.') + 1));
 
   if (mimeType.isEmpty())
     return ObjectContentFrame;  // Go ahead and hope that we can display the

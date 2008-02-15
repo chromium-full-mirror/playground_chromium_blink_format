@@ -27,6 +27,7 @@
 #include "WebKitDLL.h"
 #include "WebDownload.h"
 
+#include "CString.h"
 #include "DefaultDownloadDelegate.h"
 #include "MarshallingHelpers.h"
 #include "WebError.h"
@@ -151,11 +152,11 @@ void WebDownload::init(ResourceHandle* handle,
     LOG_ERROR(
         "WebDownload - Failed to create WebDownload from existing connection "
         "(%s)",
-        request.url().deprecatedString().ascii());
+        request.url().string().utf8().data());
   } else
     LOG(Download,
         "WebDownload - Created WebDownload %p from existing connection (%s)",
-        this, request.url().deprecatedString().ascii());
+        this, request.url().string().utf8().data());
 
   // The CFURLDownload either starts successfully and retains the
   // CFURLConnection,
@@ -199,7 +200,7 @@ void WebDownload::init(const KURL& url, IWebDownloadDelegate* delegate) {
 
   LOG(Download,
       "WebDownload - Initialized download of url %s in WebDownload %p",
-      url.deprecatedString().ascii(), this);
+      url.string().utf8().data(), this);
 }
 
 WebDownload::~WebDownload() {
@@ -318,7 +319,7 @@ HRESULT STDMETHODCALLTYPE WebDownload::initWithRequest(
 
   LOG(Download,
       "WebDownload - initWithRequest complete, started download of url %s",
-      webRequest->resourceRequest().url().deprecatedString().ascii());
+      webRequest->resourceRequest().url().string().utf8().data());
   return S_OK;
 }
 

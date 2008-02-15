@@ -1,9 +1,9 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
  *  Copyright (c) 2000 Daniel Molkentin (molkentin@kde.org)
  *  Copyright (c) 2000 Stefan Schimanski (schimmi@kde.org)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All Rights Reserved.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All Rights
+ * Reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -65,13 +65,14 @@
 #define WEBCORE_NAVIGATOR_VENDOR_SUB ""
 #endif  // ifndef WEBCORE_NAVIGATOR_VENDOR_SUB
 
+using namespace KJS;
 using namespace WebCore;
 
-namespace KJS {
+namespace WebCore {
 
 class PluginBase : public DOMObject {
  public:
-  PluginBase(ExecState* exec);
+  PluginBase(ExecState*);
   virtual ~PluginBase();
 
   static void refresh(bool reload);
@@ -87,7 +88,7 @@ class PluginBase : public DOMObject {
 
 class Plugins : public PluginBase {
  public:
-  Plugins(ExecState* exec) : PluginBase(exec){};
+  Plugins(ExecState* exec) : PluginBase(exec) {}
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -162,21 +163,20 @@ class MimeType : public PluginBase {
  private:
   MimeClassInfo* m_info;
 };
-
-}  // namespace
+}
 
 #include "kjs_navigator.lut.h"
 
-namespace KJS {
+namespace WebCore {
 
 const ClassInfo Plugins::info = {"PluginArray", 0, &PluginsTable};
 const ClassInfo MimeTypes::info = {"MimeTypeArray", 0, &MimeTypesTable};
 const ClassInfo Plugin::info = {"Plugin", 0, &PluginTable};
 const ClassInfo MimeType::info = {"MimeType", 0, &MimeTypeTable};
 
-Vector<PluginInfo*>* KJS::PluginBase::plugins = 0;
-Vector<MimeClassInfo*>* KJS::PluginBase::mimes = 0;
-int KJS::PluginBase::m_plugInCacheRefCount = 0;
+Vector<PluginInfo*>* PluginBase::plugins = 0;
+Vector<MimeClassInfo*>* PluginBase::mimes = 0;
+int PluginBase::m_plugInCacheRefCount = 0;
 
 const ClassInfo Navigator::info = {"Navigator", 0, &NavigatorTable};
 /*
@@ -577,10 +577,9 @@ JSValue* pluginsFunctionRefresh(ExecState* exec, JSObject*, const List& args) {
 JSValue* navigatorProtoFuncJavaEnabled(ExecState* exec,
                                        JSObject* thisObj,
                                        const List&) {
-  if (!thisObj->inherits(&KJS::Navigator::info))
+  if (!thisObj->inherits(&Navigator::info))
     return throwError(exec, TypeError);
   Navigator* nav = static_cast<Navigator*>(thisObj);
-  // javaEnabled()
   Settings* settings = nav->frame() ? nav->frame()->settings() : 0;
   return jsBoolean(settings && settings->isJavaEnabled());
 }

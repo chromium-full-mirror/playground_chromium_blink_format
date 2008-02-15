@@ -536,8 +536,8 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const String& str,
   if (m_fragment || !m_doc->frame())
     return state;
   m_executingScript++;
-  DeprecatedString url = scriptURL.isNull() ? m_doc->frame()->document()->url()
-                                            : scriptURL.deprecatedString();
+  String url = scriptURL.isNull() ? m_doc->frame()->document()->url().string()
+                                  : scriptURL;
 
   SegmentedString* savedPrependingSrc = currentPrependingSrc;
   SegmentedString prependingSrc;
@@ -1270,7 +1270,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
             Settings* settings = m_doc->settings();
             if (settings && settings->isJavaScriptEnabled()) {
               if ((a = currToken.attrs->getAttributeItem(srcAttr)))
-                scriptSrc = m_doc->completeURL(parseURL(a->value()));
+                scriptSrc = m_doc->completeURL(parseURL(a->value())).string();
               if ((a = currToken.attrs->getAttributeItem(charsetAttr)))
                 scriptSrcCharset = a->value().domString().stripWhiteSpace();
               if (scriptSrcCharset.isEmpty())
@@ -1690,7 +1690,7 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
 #ifdef TOKEN_DEBUG
     if (currToken.tagName.length()) {
       qDebug("unexpected token: %s, str: *%s*",
-             currToken.tagName.deprecatedString().latin1(),
+             currToken.tagName.latin1().data(),
              DeprecatedConstString(buffer, dest - buffer)
                  .deprecatedString()
                  .latin1());
@@ -1797,7 +1797,7 @@ void HTMLTokenizer::notifyFinished(CachedResource*) {
   // means, like javascript suspend/resume
   m_hasScriptsWaitingForStylesheets =
       !m_doc->haveStylesheetsLoaded() &&
-      pendingScripts.head()->url().startsWith("file:", false);
+      protocolIs(pendingScripts.head()->url(), "file");
   if (m_hasScriptsWaitingForStylesheets)
     return;
 

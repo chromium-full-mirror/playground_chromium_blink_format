@@ -1,8 +1,6 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 2000 Peter Kelly (pmk@post.com)
- * Copyright (C) 2006 Apple Computer, Inc.
+ * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,6 +17,7 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+
 #include "config.h"
 #include "ProcessingInstruction.h"
 
@@ -154,7 +153,7 @@ bool ProcessingInstruction::checkStyleSheet() {
 #if ENABLE(XSLT)
           if (m_isXSL)
             m_cachedSheet = document()->docLoader()->requestXSLStyleSheet(
-                document()->completeURL(href));
+                document()->completeURL(href).string());
           else
 #endif
           {
@@ -163,7 +162,7 @@ bool ProcessingInstruction::checkStyleSheet() {
               charset = document()->frame()->loader()->encoding();
 
             m_cachedSheet = document()->docLoader()->requestCSSStyleSheet(
-                document()->completeURL(href), charset);
+                document()->completeURL(href).string(), charset);
           }
           if (m_cachedSheet)
             m_cachedSheet->ref(this);

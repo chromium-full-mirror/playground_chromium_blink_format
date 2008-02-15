@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,7 +45,6 @@
 #include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "InlineTextBox.h"
-#include "KURL.h"
 #include "Logging.h"
 #include "ProcessingInstruction.h"
 #include "QualifiedName.h"
@@ -80,10 +79,6 @@ class AttributeChange {
   String m_value;
 };
 
-static inline void appendString(Vector<UChar>& result, const String& str) {
-  result.append(str.characters(), str.length());
-}
-
 static void appendAttributeValue(Vector<UChar>& result, const String& attr) {
   const UChar* uchars = attr.characters();
   unsigned len = attr.length();
@@ -98,17 +93,17 @@ static void appendAttributeValue(Vector<UChar>& result, const String& attr) {
     switch (c) {
       case '&':
         result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
-        appendString(result, ampEntity);
+        append(result, ampEntity);
         lastCopiedFrom = i + 1;
         break;
       case '<':
         result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
-        appendString(result, ltEntity);
+        append(result, ltEntity);
         lastCopiedFrom = i + 1;
         break;
       case '"':
         result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
-        appendString(result, quotEntity);
+        append(result, quotEntity);
         lastCopiedFrom = i + 1;
     }
   }
@@ -157,9 +152,9 @@ static void appendEscapedContent(Vector<UChar>& result,
     if ((c == '&') | (c == '<')) {
       result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
       if (c == '&')
-        appendString(result, ampEntity);
+        append(result, ampEntity);
       else
-        appendString(result, ltEntity);
+        append(result, ltEntity);
       lastCopiedFrom = i + 1;
     }
   }
@@ -173,23 +168,24 @@ static inline void appendDeprecatedString(Vector<UChar>& result,
 }
 
 static void appendQuotedURLAttributeValue(Vector<UChar>& result,
-                                          String urlString) {
+                                          const String& urlString) {
   UChar quoteChar = '\"';
-  if (urlString.stripWhiteSpace().startsWith("javascript:", false)) {
+  String strippedURLString = urlString.stripWhiteSpace();
+  if (protocolIs(strippedURLString, "javascript")) {
     // minimal escaping for javascript urls
-    if (urlString.contains('\"')) {
-      if (urlString.contains('\''))
-        urlString.replace('\"', "&quot;");
+    if (strippedURLString.contains('"')) {
+      if (strippedURLString.contains('\''))
+        strippedURLString.replace('\"', "&quot;");
       else
         quoteChar = '\'';
     }
     result.append(quoteChar);
-    appendString(result, urlString);
+    append(result, strippedURLString);
     result.append(quoteChar);
     return;
   }
 
-  // FIXME this does not fully match other browsers. Firefox escapes spaces and
+  // FIXME: This does not fully match other browsers. Firefox escapes spaces and
   // other special characters.
   result.append(quoteChar);
   appendAttributeValue(result, urlString);
@@ -334,10 +330,10 @@ static void appendNamespace(
     namespaces.set(pre, ns.impl());
     static const String xmlns("xmlns");
     result.append(' ');
-    appendString(result, xmlns);
+    append(result, xmlns);
     if (!prefix.isEmpty()) {
       result.append(':');
-      appendString(result, prefix);
+      append(result, prefix);
     }
 
     result.append('=');
@@ -382,7 +378,7 @@ static void appendStartMarkup(
       break;
     }
     case Node::COMMENT_NODE:
-      appendString(result, static_cast<const Comment*>(node)->toString());
+      append(result, static_cast<const Comment*>(node)->toString());
       break;
     case Node::DOCUMENT_NODE: {
       // FIXME: I think the comment below (and therefore this code) is wrong now
@@ -391,23 +387,23 @@ static void appendStartMarkup(
       const DocumentType* docType =
           static_cast<const Document*>(node)->doctype();
       if (docType)
-        appendString(result, docType->toString());
+        append(result, docType->toString());
       break;
     }
     case Node::DOCUMENT_FRAGMENT_NODE:
       break;
     case Node::DOCUMENT_TYPE_NODE:
-      appendString(result, static_cast<const DocumentType*>(node)->toString());
+      append(result, static_cast<const DocumentType*>(node)->toString());
       break;
     case Node::PROCESSING_INSTRUCTION_NODE:
-      appendString(result,
-                   static_cast<const ProcessingInstruction*>(node)->toString());
+      append(result,
+             static_cast<const ProcessingInstruction*>(node)->toString());
       break;
     case Node::ELEMENT_NODE: {
       result.append('<');
       const Element* el = static_cast<const Element*>(node);
       bool convert = convertBlocksToInlines & isBlock(const_cast<Node*>(node));
-      appendString(result, el->nodeNamePreservingCase());
+      append(result, el->nodeNamePreservingCase());
       NamedAttrMap* attrs = el->attributes();
       unsigned length = attrs->length();
       if (!documentIsHTML && namespaces && shouldAddNamespaceElem(el))
@@ -422,9 +418,9 @@ static void appendStartMarkup(
         result.append(' ');
 
         if (documentIsHTML)
-          appendString(result, attr->name().localName());
+          append(result, attr->name().localName());
         else
-          appendString(result, attr->name().toString());
+          append(result, attr->name().toString());
 
         result.append('=');
 
@@ -455,7 +451,7 @@ static void appendStartMarkup(
           style->setProperty(CSS_PROP_DISPLAY, CSS_VAL_INLINE, true);
         if (style->length() > 0) {
           static const String stylePrefix(" style=\"");
-          appendString(result, stylePrefix);
+          append(result, stylePrefix);
           appendAttributeValue(result, style->cssText());
           result.append('\"');
         }
@@ -470,7 +466,7 @@ static void appendStartMarkup(
       break;
     }
     case Node::CDATA_SECTION_NODE:
-      appendString(result, static_cast<const CDATASection*>(node)->toString());
+      append(result, static_cast<const CDATASection*>(node)->toString());
       break;
     case Node::ATTRIBUTE_NODE:
     case Node::ENTITY_NODE:
@@ -525,8 +521,7 @@ static void appendEndMarkup(Vector<UChar>& result, const Node* node) {
 
   result.append('<');
   result.append('/');
-  appendString(result,
-               static_cast<const Element*>(node)->nodeNamePreservingCase());
+  append(result, static_cast<const Element*>(node)->nodeNamePreservingCase());
   result.append('>');
 }
 
@@ -568,7 +563,7 @@ static void appendMarkup(
 static void completeURLs(Node* node, const String& baseURL) {
   Vector<AttributeChange> changes;
 
-  KURL baseURLAsKURL(baseURL.deprecatedString());
+  KURL parsedBaseURL(baseURL);
 
   Node* end = node->traverseNextSibling();
   for (Node* n = node; n != end; n = n->traverseNextNode()) {
@@ -578,11 +573,9 @@ static void completeURLs(Node* node, const String& baseURL) {
       unsigned length = attrs->length();
       for (unsigned i = 0; i < length; i++) {
         Attribute* attr = attrs->attributeItem(i);
-        if (e->isURLAttribute(attr)) {
-          String completedURL =
-              KURL(baseURLAsKURL, attr->value().deprecatedString()).string();
-          changes.append(AttributeChange(e, attr->name(), completedURL));
-        }
+        if (e->isURLAttribute(attr))
+          changes.append(AttributeChange(
+              e, attr->name(), KURL(parsedBaseURL, attr->value()).string()));
       }
     }
   }
@@ -657,10 +650,10 @@ String joinMarkups(const Vector<String> preMarkups,
   result.reserveCapacity(length);
 
   for (size_t i = preCount; i > 0; --i)
-    appendString(result, preMarkups[i - 1]);
+    append(result, preMarkups[i - 1]);
 
   for (size_t i = 0; i < postCount; ++i)
-    appendString(result, postMarkups[i]);
+    append(result, postMarkups[i]);
 
   return String::adopt(result);
 }
@@ -889,7 +882,7 @@ String createMarkup(const Range* range,
         if (style->length()) {
           Vector<UChar> openTag;
           static const String divStyle("<div style=\"");
-          appendString(openTag, divStyle);
+          append(openTag, divStyle);
           appendAttributeValue(openTag, style->cssText());
           openTag.append('\"');
           openTag.append('>');
@@ -940,7 +933,7 @@ String createMarkup(const Range* range,
       Vector<UChar> openTag;
       const String spanClassStyle =
           String("<span class=\"" AppleStyleSpanClass "\" style=\"");
-      appendString(openTag, spanClassStyle);
+      append(openTag, spanClassStyle);
       appendAttributeValue(openTag, style->cssText());
       openTag.append('\"');
       openTag.append('>');
@@ -987,7 +980,7 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(Document* document,
 
   RefPtr<DocumentFragment> fragment = element->createContextualFragment(markup);
 
-  if (fragment && !baseURL.isEmpty() && baseURL != "about:blank" &&
+  if (fragment && !baseURL.isEmpty() && baseURL != blankURL() &&
       baseURL != document->baseURL())
     completeURLs(fragment.get(), baseURL);
 
@@ -1024,7 +1017,7 @@ String createMarkup(const Node* node,
 }
 
 static void fillContainerFromString(ContainerNode* paragraph,
-                                    const DeprecatedString& string) {
+                                    const String& string) {
   Document* document = paragraph->document();
 
   ExceptionCode ec = 0;
@@ -1036,13 +1029,13 @@ static void fillContainerFromString(ContainerNode* paragraph,
 
   ASSERT(string.find('\n') == -1);
 
-  DeprecatedStringList tabList =
-      DeprecatedStringList::split('\t', string, true);
-  DeprecatedString tabText = "";
+  Vector<String> tabList;
+  string.split('\t', true, tabList);
+  String tabText = "";
   bool first = true;
-  while (!tabList.isEmpty()) {
-    DeprecatedString s = tabList.first();
-    tabList.pop_front();
+  size_t numEntries = tabList.size();
+  for (size_t i = 0; i < numEntries; ++i) {
+    const String& s = tabList[i];
 
     // append the non-tab textual part
     if (!s.isEmpty()) {
@@ -1052,15 +1045,15 @@ static void fillContainerFromString(ContainerNode* paragraph,
         tabText = "";
       }
       RefPtr<Node> textNode = document->createTextNode(
-          stringWithRebalancedWhitespace(s, first, tabList.isEmpty()));
+          stringWithRebalancedWhitespace(s, first, i + 1 == numEntries));
       paragraph->appendChild(textNode.release(), ec);
       ASSERT(ec == 0);
     }
 
     // there is a tab after every entry, except the last entry
     // (if the last character is a tab, the list gets an extra empty entry)
-    if (!tabList.isEmpty())
-      tabText += '\t';
+    if (i + 1 != numEntries)
+      tabText.append('\t');
     else if (!tabText.isEmpty()) {
       paragraph->appendChild(createTabSpanElement(document, tabText), ec);
       ASSERT(ec == 0);
@@ -1088,7 +1081,7 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
   if (text.isEmpty())
     return fragment.release();
 
-  DeprecatedString string = text.deprecatedString();
+  String string = text;
   string.replace("\r\n", "\n");
   string.replace('\r', '\n');
 
@@ -1119,14 +1112,14 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
   Node* block = enclosingBlock(context->startNode());
   bool useClonesOfEnclosingBlock = !block->hasTagName(bodyTag);
 
-  DeprecatedStringList list = DeprecatedStringList::split(
-      '\n', string, true);  // true gets us empty strings in the list
-  while (!list.isEmpty()) {
-    DeprecatedString s = list.first();
-    list.pop_front();
+  Vector<String> list;
+  string.split('\n', true, list);  // true gets us empty strings in the list
+  size_t numLines = list.size();
+  for (size_t i = 0; i < numLines; ++i) {
+    const String& s = list[i];
 
     RefPtr<Element> element;
-    if (s.isEmpty() && list.isEmpty()) {
+    if (s.isEmpty() && i + 1 == numLines) {
       // For last line, use the "magic BR" rather than a P.
       element = document->createElementNS(xhtmlNamespaceURI, "br", ec);
       ASSERT(ec == 0);

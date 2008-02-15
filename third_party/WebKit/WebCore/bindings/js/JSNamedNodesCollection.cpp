@@ -44,7 +44,7 @@ const ClassInfo JSNamedNodesCollection::info = {"Collection", 0, 0};
 JSNamedNodesCollection::JSNamedNodesCollection(
     KJS::JSObject* prototype,
     const Vector<RefPtr<Node>>& nodes)
-    : KJS::DOMObject(prototype), m_nodes(nodes) {}
+    : DOMObject(prototype), m_nodes(nodes) {}
 
 JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
                                               JSObject* originalObject,

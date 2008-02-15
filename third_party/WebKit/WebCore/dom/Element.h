@@ -128,7 +128,7 @@ class Element : public ContainerNode {
     return m_tagName.namespaceURI();
   }
 
-  virtual String baseURI() const;
+  virtual KURL baseURI() const;
 
   // DOM methods overridden from  parent classes
   virtual NodeType nodeType() const;

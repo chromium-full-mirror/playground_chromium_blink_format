@@ -355,7 +355,7 @@ void RenderFrameSet::layOutAxis(GridAxis& axis,
 
   // If we still have some left over space we probably ended up with a remainder
   // of
-  // a division. We can not spread it evenly anymore. If we have any percentage
+  // a division. We cannot spread it evenly anymore. If we have any percentage
   // columns/rows simply spread the remainder equally over all available
   // percentage columns,
   // regardless of their size.

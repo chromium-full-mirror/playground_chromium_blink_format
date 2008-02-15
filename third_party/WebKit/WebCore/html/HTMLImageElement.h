@@ -1,9 +1,7 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -25,11 +23,12 @@
 #ifndef HTMLImageElement_h
 #define HTMLImageElement_h
 
-#include "HTMLElement.h"
 #include "GraphicsTypes.h"
+#include "HTMLElement.h"
 #include "HTMLImageLoader.h"
 
 namespace WebCore {
+
 class HTMLFormElement;
 
 class HTMLImageElement : public HTMLElement {
@@ -64,8 +63,6 @@ class HTMLImageElement : public HTMLElement {
 
   String altText() const;
 
-  String imageMap() const { return usemap; }
-
   virtual bool isURLAttribute(Attribute*) const;
 
   CompositeOperator compositeOperator() const { return m_compositeOperator; }
@@ -97,13 +94,13 @@ class HTMLImageElement : public HTMLElement {
   bool isMap() const;
   void setIsMap(bool);
 
-  String longDesc() const;
+  KURL longDesc() const;
   void setLongDesc(const String&);
 
-  String lowsrc() const;
+  KURL lowsrc() const;
   void setLowsrc(const String&);
 
-  String src() const;
+  KURL src() const;
   void setSrc(const String&);
 
   String useMap() const;
@@ -121,7 +118,7 @@ class HTMLImageElement : public HTMLElement {
 
   bool haveFiredLoadEvent() const { return m_imageLoader.haveFiredLoadEvent(); }
 
- protected:
+ private:
   HTMLImageLoader m_imageLoader;
   String usemap;
   bool ismap;

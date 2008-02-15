@@ -105,7 +105,7 @@ class JSLazyEventListener : public JSEventListener {
 
 KJS::JSValue* getNodeEventListener(Node*, const AtomicString& eventType);
 
-class JSClipboard : public KJS::DOMObject {
+class JSClipboard : public DOMObject {
  public:
   JSClipboard(KJS::JSObject* prototype, Clipboard*);
   virtual ~JSClipboard();

@@ -30,7 +30,6 @@
 #include "ClipboardUtilitiesWin.h"
 #include "csshelper.h"
 #include "CString.h"
-#include "DeprecatedString.h"
 #include "Document.h"
 #include "DragData.h"
 #include "Editor.h"
@@ -149,7 +148,7 @@ static String filesystemPathFromUrlOrTitle(const String& url,
       // the path.  If we can't find it, or we're coming up with the name for a
       // link
       // we just use the entire url.
-      KURL kurl(url.deprecatedString());
+      KURL kurl(url);
       String lastComponent;
       if (!isLink && !(lastComponent = kurl.lastPathComponent()).isEmpty()) {
         len = min<DWORD>(MAX_PATH, lastComponent.length());
@@ -243,11 +242,10 @@ static HGLOBAL createGlobalHDropContent(const KURL& url,
   WCHAR filePath[MAX_PATH];
 
   if (url.isLocalFile()) {
-    DeprecatedString path = url.path();
+    String localPath = url.path();
     // windows does not enjoy a leading slash on paths
-    if (path[0] == '/')
-      path = path.mid(1);
-    String localPath = path.ascii();
+    if (localPath[0] == '/')
+      localPath = localPath.substring(1);
     LPCTSTR localPathStr = localPath.charactersWithNullTermination();
     if (wcslen(localPathStr) + 1 < MAX_PATH)
       wcscpy_s(filePath, MAX_PATH, localPathStr);
@@ -548,8 +546,8 @@ bool ClipboardWin::setData(const String& type, const String& data) {
   ClipboardDataType winType = clipboardTypeFromMIMEType(type);
 
   if (winType == ClipboardDataTypeURL)
-    return WebCore::writeURL(m_writableDataObject.get(),
-                             data.deprecatedString(), String(), false, true);
+    return WebCore::writeURL(m_writableDataObject.get(), KURL(data), String(),
+                             false, true);
 
   if (winType == ClipboardDataTypeText) {
     STGMEDIUM medium = {0};
@@ -759,9 +757,9 @@ void ClipboardWin::writeRange(Range* selectedRange, Frame* frame) {
   medium.tymed = TYMED_HGLOBAL;
   ExceptionCode ec = 0;
 
-  medium.hGlobal = createGlobalData(
-      markupToCF_HTML(createMarkup(selectedRange, 0, AnnotateForInterchange),
-                      selectedRange->startContainer(ec)->document()->url()));
+  medium.hGlobal = createGlobalData(markupToCF_HTML(
+      createMarkup(selectedRange, 0, AnnotateForInterchange),
+      selectedRange->startContainer(ec)->document()->url().string()));
   if (medium.hGlobal &&
       FAILED(m_writableDataObject->SetData(htmlFormat(), &medium, TRUE)))
     ::GlobalFree(medium.hGlobal);

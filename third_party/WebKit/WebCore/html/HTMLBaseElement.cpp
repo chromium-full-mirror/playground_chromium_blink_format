@@ -1,10 +1,8 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -62,8 +60,8 @@ void HTMLBaseElement::removedFromDocument() {
   // Since the document doesn't have a base element...
   // (This will break in the case of multiple base elements, but that's not
   // valid anyway (?))
-  document()->setBaseURL(DeprecatedString::null);
-  document()->setBaseTarget(DeprecatedString::null);
+  document()->setBaseURL(KURL());
+  document()->setBaseTarget(String());
 }
 
 void HTMLBaseElement::process() {
@@ -71,9 +69,7 @@ void HTMLBaseElement::process() {
     return;
 
   if (!m_href.isEmpty() && document()->frame())
-    document()->setBaseURL(
-        KURL(document()->frame()->loader()->url(), m_href.deprecatedString())
-            .deprecatedString());
+    document()->setBaseURL(KURL(document()->frame()->loader()->url(), m_href));
 
   if (!m_target.isEmpty())
     document()->setBaseTarget(m_target);

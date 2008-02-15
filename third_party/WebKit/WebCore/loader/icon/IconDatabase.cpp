@@ -227,12 +227,10 @@ Image* IconDatabase::iconForPageURL(const String& pageURLOriginal,
                                     bool cache) {
   ASSERT_NOT_SYNC_THREAD();
 
-  ASSERT(!pageURLOriginal.isNull());
-
-  // pageURLOriginal can not be stored without being deep copied first.
+  // pageURLOriginal cannot be stored without being deep copied first.
   // We should go our of our way to only copy it if we have to store it
 
-  if (!isOpen())
+  if (!isOpen() || pageURLOriginal.isEmpty())
     return defaultIcon(size);
 
   MutexLocker locker(m_urlAndIconLock);

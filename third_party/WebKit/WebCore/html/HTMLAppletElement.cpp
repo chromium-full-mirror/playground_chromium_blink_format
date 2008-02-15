@@ -1,10 +1,8 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Stefan Schimanski (1Stein@gmx.de)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2008 Apple Inc. ALl rights reserved.
  * Copyright (C) 2007 Trolltech ASA
  *
  * This library is free software; you can redistribute it and/or
@@ -22,6 +20,7 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+
 #include "config.h"
 #include "HTMLAppletElement.h"
 
@@ -116,7 +115,7 @@ RenderObject* HTMLAppletElement::createRenderer(RenderArena* arena,
     if (!archive.isNull())
       args.set("archive", archive);
 
-    args.set("baseURL", document()->baseURL());
+    args.set("baseURL", document()->baseURL().string());
 
     const AtomicString& mayScript = getAttribute(mayscriptAttr);
     if (!mayScript.isNull())

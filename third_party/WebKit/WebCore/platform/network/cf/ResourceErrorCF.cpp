@@ -126,8 +126,7 @@ ResourceError::operator CFErrorRef() const {
                                               m_failingURL.createCFString());
       CFDictionarySetValue(userInfo.get(), failingURLStringKey,
                            failingURLString.get());
-      RetainPtr<CFURLRef> url(
-          AdoptCF, KURL(m_failingURL.deprecatedString()).createCFURL());
+      RetainPtr<CFURLRef> url(AdoptCF, KURL(m_failingURL).createCFURL());
       CFDictionarySetValue(userInfo.get(), failingURLKey, url.get());
     }
 

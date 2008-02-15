@@ -1,10 +1,9 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,6 +20,7 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+
 #include "config.h"
 #include "HTMLScriptElement.h"
 
@@ -60,7 +60,7 @@ void HTMLScriptElement::childrenChanged(bool changedByParser) {
   // and the script element has been inserted in the document
   // we evaluate the script.
   if (!m_createdByParser && inDocument() && firstChild())
-    evaluateScript(document()->url(), text());
+    evaluateScript(document()->url().string(), text());
   HTMLElement::childrenChanged(changedByParser);
 }
 
@@ -134,7 +134,7 @@ void HTMLScriptElement::insertedIntoDocument() {
   // it should be evaluated, and evaluateScript only evaluates a script once.
   String scriptString = text();
   if (!scriptString.isEmpty())
-    evaluateScript(document()->url(), scriptString);
+    evaluateScript(document()->url().string(), scriptString);
 }
 
 void HTMLScriptElement::removedFromDocument() {
@@ -229,14 +229,14 @@ void HTMLScriptElement::evaluateScript(const String& url,
 }
 
 String HTMLScriptElement::text() const {
-  String val = "";
+  Vector<UChar> val;
 
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->isTextNode())
-      val += static_cast<Text*>(n)->data();
+      append(val, static_cast<Text*>(n)->data());
   }
 
-  return val;
+  return String::adopt(val);
 }
 
 void HTMLScriptElement::setText(const String& value) {
@@ -248,9 +248,8 @@ void HTMLScriptElement::setText(const String& value) {
     return;
   }
 
-  if (numChildren > 0) {
+  if (numChildren > 0)
     removeChildren();
-  }
 
   appendChild(document()->createTextNode(value.impl()), ec);
 }
@@ -289,7 +288,7 @@ void HTMLScriptElement::setDefer(bool defer) {
   setAttribute(deferAttr, defer ? "" : 0);
 }
 
-String HTMLScriptElement::src() const {
+KURL HTMLScriptElement::src() const {
   return document()->completeURL(getAttribute(srcAttr));
 }
 

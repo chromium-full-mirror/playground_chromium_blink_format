@@ -21,14 +21,12 @@
 #include "JSDocument.h"
 
 #include "DOMWindow.h"
-#include "Document.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "HTMLDocument.h"
 #include "JSDOMWindow.h"
 #include "JSHTMLDocument.h"
 #include "JSLocation.h"
-#include "kjs_binding.h"
 #include "kjs_proxy.h"
 
 #if ENABLE(SVG)
@@ -36,9 +34,9 @@
 #include "SVGDocument.h"
 #endif
 
-namespace WebCore {
-
 using namespace KJS;
+
+namespace WebCore {
 
 void JSDocument::mark() {
   JSEventTargetNode::mark();
@@ -50,7 +48,7 @@ JSValue* JSDocument::location(ExecState* exec) const {
   if (!frame)
     return jsNull();
 
-  KJS::Window* win = KJS::Window::retrieveWindow(frame);
+  Window* win = Window::retrieveWindow(frame);
   ASSERT(win);
   return win->location();
 }
@@ -67,7 +65,7 @@ void JSDocument::setLocation(ExecState* exec, JSValue* value) {
   Frame* activeFrame =
       static_cast<JSDOMWindow*>(exec->dynamicGlobalObject())->impl()->frame();
   if (activeFrame)
-    str = activeFrame->document()->completeURL(str);
+    str = activeFrame->document()->completeURL(str).string();
 
   bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
   frame->loader()->scheduleLocationChange(
@@ -98,7 +96,7 @@ JSValue* toJS(ExecState* exec, Document* doc) {
   // with the
   // back/forward cache.
   if (doc->frame())
-    KJS::Window::retrieveWindow(doc->frame())
+    Window::retrieveWindow(doc->frame())
         ->putDirect("document", ret, DontDelete | ReadOnly);
   else {
     size_t nodeCount = 0;

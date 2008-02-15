@@ -44,6 +44,7 @@ class Event;
 class EventListener;
 class IntRect;
 class KeyboardEvent;
+class KURL;
 class NamedAttrMap;
 class NodeList;
 class PlatformKeyboardEvent;
@@ -109,7 +110,7 @@ class Node : public TreeShared<Node> {
   virtual bool hasAttributes() const;
   virtual NamedAttrMap* attributes() const;
 
-  virtual String baseURI() const;
+  virtual KURL baseURI() const;
 
   // These should all actually return a node, but this is only important for
   // language bindings,
