@@ -211,4 +211,9 @@ bool KJSProxy::processingUserGesture() const {
   return false;
 }
 
+bool KJSProxy::isEnabled() {
+  Settings* settings = m_frame->settings();
+  return (settings && settings->isJavaScriptEnabled());
+}
+
 }  // namespace WebCore

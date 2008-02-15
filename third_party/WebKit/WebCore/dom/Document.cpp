@@ -2571,8 +2571,9 @@ PassRefPtr<EventListener> Document::createHTMLEventListener(
     const String& code,
     Node* node) {
   if (Frame* frm = frame())
-    if (KJSProxy* proxy = frm->scriptProxy())
-      return proxy->createHTMLEventHandler(functionName, code, node);
+    if (frm->scriptProxy()->isEnabled())
+      return frm->scriptProxy()->createHTMLEventHandler(functionName, code,
+                                                        node);
   return 0;
 }
 

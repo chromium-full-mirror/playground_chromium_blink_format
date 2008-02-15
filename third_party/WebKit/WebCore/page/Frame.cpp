@@ -228,11 +228,8 @@ void Frame::setView(FrameView* view) {
 }
 
 KJSProxy* Frame::scriptProxy() {
-  if (!d->m_jscript) {
-    Settings* settings = this->settings();
-    if (settings && settings->isJavaScriptEnabled())
-      d->m_jscript = new KJSProxy(this);
-  }
+  if (!d->m_jscript)
+    d->m_jscript = new KJSProxy(this);
   return d->m_jscript;
 }
 
@@ -1018,8 +1015,7 @@ void Frame::lifeSupportTimerFired(Timer<Frame>*) {
 }
 
 KJS::Bindings::RootObject* Frame::bindingRootObject() {
-  Settings* settings = this->settings();
-  if (!settings || !settings->isJavaScriptEnabled())
+  if (!scriptProxy()->isEnabled())
     return 0;
 
   if (!d->m_bindingRootObject) {
@@ -1047,8 +1043,7 @@ PassRefPtr<KJS::Bindings::RootObject> Frame::createRootObject(
 #if USE(NPOBJECT)
 NPObject* Frame::windowScriptNPObject() {
   if (!d->m_windowScriptNPObject) {
-    Settings* settings = this->settings();
-    if (settings && settings->isJavaScriptEnabled()) {
+    if (scriptProxy()->isEnabled()) {
       // JavaScript is enabled, so there is a JavaScript window object.  Return
       // an NPObject bound to the window
       // object.

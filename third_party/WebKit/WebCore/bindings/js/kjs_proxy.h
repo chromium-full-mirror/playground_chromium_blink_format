@@ -73,6 +73,8 @@ class KJSProxy {
   void setProcessingTimerCallback(bool b) { m_processingTimerCallback = b; }
   bool processingUserGesture() const;
 
+  bool isEnabled();
+
  private:
   void initScriptIfNeeded() {
     if (!m_globalObject)

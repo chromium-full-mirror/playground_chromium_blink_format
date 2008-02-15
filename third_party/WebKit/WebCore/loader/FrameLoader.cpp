@@ -790,14 +790,13 @@ JSValue* FrameLoader::executeScript(const String& script,
 JSValue* FrameLoader::executeScript(const String& url,
                                     int baseLine,
                                     const String& script) {
-  KJSProxy* proxy = m_frame->scriptProxy();
-  if (!proxy)
+  if (!m_frame->scriptProxy()->isEnabled())
     return 0;
 
   bool wasRunningScript = m_isRunningScript;
   m_isRunningScript = true;
 
-  JSValue* result = proxy->evaluate(url, baseLine, script);
+  JSValue* result = m_frame->scriptProxy()->evaluate(url, baseLine, script);
 
   if (!wasRunningScript) {
     m_isRunningScript = false;
@@ -1803,7 +1802,7 @@ bool FrameLoader::userGestureHint() {
   while (rootFrame->tree()->parent())
     rootFrame = rootFrame->tree()->parent();
 
-  if (rootFrame->scriptProxy())
+  if (rootFrame->scriptProxy()->isEnabled())
     return rootFrame->scriptProxy()->processingUserGesture();
 
   return true;  // If JavaScript is disabled, a user gesture must have initiated
@@ -2863,8 +2862,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
   m_didCallImplicitClose = true;
 
   // Delete old status bar messages (if it _was_ activated on last URL).
-  Settings* settings = m_frame->settings();
-  if (settings && settings->isJavaScriptEnabled()) {
+  if (m_frame->scriptProxy()->isEnabled()) {
     m_frame->setJSStatusBarText(String());
     m_frame->setJSDefaultStatusBarText(String());
   }
@@ -4811,8 +4809,7 @@ String FrameLoader::referrer() const {
 }
 
 void FrameLoader::dispatchWindowObjectAvailable() {
-  Settings* settings = m_frame->settings();
-  if (!settings || !settings->isJavaScriptEnabled() ||
+  if (!m_frame->scriptProxy()->isEnabled() ||
       !m_frame->scriptProxy()->haveGlobalObject())
     return;
 
@@ -5060,7 +5057,7 @@ void FrameLoader::switchOutLowBandwidthDisplayIfReady() {
       // similar to clear(), should be refactored to share more code
       oldDoc->cancelParsing();
       oldDoc->detach();
-      if (m_frame->scriptProxy())
+      if (m_frame->scriptProxy()->isEnabled())
         m_frame->scriptProxy()->clear();
       if (m_frame->view())
         m_frame->view()->clear();
