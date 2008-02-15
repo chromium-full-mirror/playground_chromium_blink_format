@@ -348,9 +348,11 @@ Widget* FrameLoaderClient::createJavaAppletWidget(
 ObjectContentType FrameLoaderClient::objectContentType(const KURL& url,
                                                        const String& mimeType) {
   String type = mimeType;
+  // We don't use MIMETypeRegistry::getMIMETypeForPath() because it returns
+  // "application/octet-stream" upon failure
   if (type.isEmpty())
     type = MIMETypeRegistry::getMIMETypeForExtension(
-        url.path().mid(url.path().findRev('.') + 1));
+        url.path().substring(url.path().reverseFind('.') + 1));
 
   if (type.isEmpty())
     return WebCore::ObjectContentFrame;
