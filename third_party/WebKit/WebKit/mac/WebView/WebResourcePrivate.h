@@ -40,8 +40,7 @@
 
 - (id)_initWithData:(NSData*)data
                 URL:(NSURL*)URL
-           response:(NSURLResponse*)response
-           MIMEType:(NSString*)MIMEType;
+           response:(NSURLResponse*)response;
 
 - (BOOL)_shouldIgnoreWhenUnarchiving;
 - (void)_ignoreWhenUnarchiving;
