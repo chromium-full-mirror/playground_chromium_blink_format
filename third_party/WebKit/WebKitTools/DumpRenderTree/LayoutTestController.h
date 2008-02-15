@@ -97,6 +97,11 @@ class LayoutTestController {
     m_dumpDatabaseCallbacks = dumpDatabaseCallbacks;
   }
 
+  bool dumpStatusCallbacks() const { return m_dumpStatusCallbacks; }
+  void setDumpStatusCallbacks(bool dumpStatusCallbacks) {
+    m_dumpStatusCallbacks = dumpStatusCallbacks;
+  }
+
   bool dumpDOMAsWebArchive() const { return m_dumpDOMAsWebArchive; }
   void setDumpDOMAsWebArchive(bool dumpDOMAsWebArchive) {
     m_dumpDOMAsWebArchive = dumpDOMAsWebArchive;
@@ -183,6 +188,7 @@ class LayoutTestController {
   bool m_dumpDOMAsWebArchive;
   bool m_dumpSelectionRect;
   bool m_dumpSourceAsWebArchive;
+  bool m_dumpStatusCallbacks;
   bool m_dumpTitleChanges;
   bool m_dumpEditingCallbacks;
   bool m_dumpResourceLoadCallbacks;

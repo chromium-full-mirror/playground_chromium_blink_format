@@ -377,3 +377,10 @@ HRESULT STDMETHODCALLTYPE UIDelegate::exceededDatabaseQuota(
 
   return S_OK;
 }
+
+HRESULT STDMETHODCALLTYPE UIDelegate::setStatusText(BSTR text) {
+  if (layoutTestController->dumpStatusCallbacks())
+    printf("UI DELEGATE STATUS CALLBACK: setStatusText:%S\n",
+           text ? text : L"");
+  return S_OK;
+}

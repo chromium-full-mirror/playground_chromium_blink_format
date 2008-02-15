@@ -45,6 +45,7 @@ LayoutTestController::LayoutTestController(
       m_dumpDOMAsWebArchive(false),
       m_dumpSelectionRect(false),
       m_dumpSourceAsWebArchive(false),
+      m_dumpStatusCallbacks(false),
       m_dumpTitleChanges(false),
       m_dumpEditingCallbacks(false),
       m_dumpResourceLoadCallbacks(false),
@@ -192,6 +193,18 @@ static JSValueRef dumpSourceAsWebArchiveCallback(JSContextRef context,
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpSourceAsWebArchive(true);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef dumpStatusCallbacksCallback(JSContextRef context,
+                                              JSObjectRef function,
+                                              JSObjectRef thisObject,
+                                              size_t argumentCount,
+                                              const JSValueRef arguments[],
+                                              JSValueRef* exception) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpStatusCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -984,6 +997,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"dumpSelectionRect", dumpSelectionRectCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpSourceAsWebArchive", dumpSourceAsWebArchiveCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"dumpStatusCallbacks", dumpStatusCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpTitleChanges", dumpTitleChangesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

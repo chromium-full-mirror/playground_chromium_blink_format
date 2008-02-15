@@ -85,9 +85,7 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate3 {
 
   virtual HRESULT STDMETHODCALLTYPE setStatusText(
       /* [in] */ IWebView* sender,
-      /* [in] */ BSTR text) {
-    return E_NOTIMPL;
-  }
+      /* [in] */ BSTR text);
 
   virtual HRESULT STDMETHODCALLTYPE webViewStatusText(
       /* [in] */ IWebView* sender,
