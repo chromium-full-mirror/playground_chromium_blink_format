@@ -26,6 +26,7 @@
 #include "config.h"
 #include "VisiblePosition.h"
 
+#include "CString.h"
 #include "Document.h"
 #include "Element.h"
 #include "HTMLNames.h"
@@ -273,7 +274,7 @@ void VisiblePosition::debugPosition(const char* msg) const {
     fprintf(stderr, "Position [%s]: null\n", msg);
   else
     fprintf(stderr, "Position [%s]: %s [%p] at %d\n", msg,
-            m_deepPosition.node()->nodeName().deprecatedString().latin1(),
+            m_deepPosition.node()->nodeName().utf8().data(),
             m_deepPosition.node(), m_deepPosition.offset());
 }
 

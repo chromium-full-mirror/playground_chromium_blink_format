@@ -72,7 +72,7 @@ static inline void mapAttributeToCSSProperty(
   }
   if (propertyId < 1)
     fprintf(stderr, "Failed to find property: %s\n",
-            attrName.localName().deprecatedString().ascii());
+            attrName.localName().domString().utf8().data());
   ASSERT(propertyId > 0);
   propertyNameToIdMap->set(attrName.localName().impl(), propertyId);
 }

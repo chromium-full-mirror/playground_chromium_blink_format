@@ -27,6 +27,7 @@
 #include "Element.h"
 
 #include "CSSStyleSelector.h"
+#include "CString.h"
 #include "ClassNames.h"
 #include "ClassNodeList.h"
 #include "Document.h"
@@ -40,6 +41,7 @@
 #include "NamedAttrMap.h"
 #include "NodeList.h"
 #include "Page.h"
+#include "PlatformString.h"
 #include "RenderBlock.h"
 #include "SelectionController.h"
 #include "TextIterator.h"
@@ -938,8 +940,8 @@ void Element::dump(TextStream* stream, DeprecatedString ind) const {
   if (namedAttrMap) {
     for (unsigned i = 0; i < namedAttrMap->length(); i++) {
       Attribute* attr = namedAttrMap->attributeItem(i);
-      *stream << " " << attr->name().localName().deprecatedString().ascii()
-              << "=\"" << attr->value().deprecatedString().ascii() << "\"";
+      *stream << " " << attr->name().localName().domString().utf8().data()
+              << "=\"" << attr->value().domString().utf8().data() << "\"";
     }
   }
 
@@ -973,7 +975,7 @@ void Element::formatForDebugger(char* buffer, unsigned length) const {
     result += s;
   }
 
-  strncpy(buffer, result.deprecatedString().latin1(), length - 1);
+  strncpy(buffer, result.utf8().data(), length - 1);
 }
 #endif
 

@@ -26,6 +26,7 @@
 #include "config.h"
 #include "SelectionController.h"
 
+#include "CString.h"
 #include "DeleteSelectionCommand.h"
 #include "Document.h"
 #include "Editor.h"
@@ -840,7 +841,7 @@ void SelectionController::debugRenderer(RenderObject* r, bool selected) const {
   if (r->node()->isElementNode()) {
     Element* element = static_cast<Element*>(r->node());
     fprintf(stderr, "%s%s\n", selected ? "==> " : "    ",
-            element->localName().deprecatedString().latin1());
+            element->localName().domString().utf8().data());
   } else if (r->isText()) {
     RenderText* textRenderer = static_cast<RenderText*>(r);
     if (textRenderer->textLength() == 0 || !textRenderer->firstTextBox()) {
