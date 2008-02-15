@@ -208,6 +208,7 @@ Console* DOMWindow::console() const {
   return m_console.get();
 }
 
+#if ENABLE(CROSS_DOCUMENT_MESSAGING)
 void DOMWindow::postMessage(const String& message,
                             const String& domain,
                             const String& uri,
@@ -216,6 +217,7 @@ void DOMWindow::postMessage(const String& message,
   document()->dispatchEvent(new MessageEvent(message, domain, uri, source), ec,
                             true);
 }
+#endif
 
 DOMSelection* DOMWindow::getSelection() {
   if (!m_selection)
