@@ -48,6 +48,7 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
 
   bool start();
   void requestTermination();
+  bool terminationRequested() const;
 
   void scheduleTask(DatabaseTask*);
   void scheduleImmediateTask(DatabaseTask*);  // This just adds the task to the

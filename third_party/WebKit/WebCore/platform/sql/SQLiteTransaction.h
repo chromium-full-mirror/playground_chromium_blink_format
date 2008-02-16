@@ -40,6 +40,7 @@ class SQLiteTransaction : public Noncopyable {
   void begin();
   void commit();
   void rollback();
+  void stop();
 
   bool inProgress() const { return m_inProgress; }
 

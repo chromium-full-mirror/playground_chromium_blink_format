@@ -104,6 +104,9 @@ class Database : public ThreadSafeShared<Database> {
 
   void close();
 
+  void stop();
+  bool stopped() const { return m_stopped; }
+
   unsigned long long databaseSize() const;
   unsigned long long maximumSize() const;
 
@@ -141,6 +144,8 @@ class Database : public ThreadSafeShared<Database> {
   String m_filename;
 
   bool m_deleted;
+
+  bool m_stopped;
 
   SQLiteDatabase m_sqliteDatabase;
   RefPtr<DatabaseAuthorizer> m_databaseAuthorizer;

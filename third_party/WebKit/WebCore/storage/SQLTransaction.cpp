@@ -85,7 +85,7 @@ void SQLTransaction::executeSQL(
     PassRefPtr<SQLStatementCallback> callback,
     PassRefPtr<SQLStatementErrorCallback> callbackError,
     ExceptionCode& e) {
-  if (!m_executeSqlAllowed) {
+  if (!m_executeSqlAllowed || m_database->stopped()) {
     e = INVALID_STATE_ERR;
     return;
   }
@@ -135,6 +135,24 @@ const char* SQLTransaction::debugStepName(
 }
 #endif
 
+void SQLTransaction::checkAndHandleClosedDatabase() {
+  if (!m_database->stopped())
+    return;
+
+  // If the database was stopped, don't do anything and cancel queued work
+  LOG(StorageAPI,
+      "Database was stopped - cancelling work for this transaction");
+  MutexLocker locker(m_statementMutex);
+  m_statementQueue.clear();
+  m_nextStep = 0;
+
+  // The current SQLite transaction should be stopped, as well
+  if (m_sqliteTransaction) {
+    m_sqliteTransaction->stop();
+    m_sqliteTransaction.clear();
+  }
+}
+
 bool SQLTransaction::performNextStep() {
   LOG(StorageAPI, "Step %s\n", debugStepName(m_nextStep));
 
@@ -144,7 +162,10 @@ bool SQLTransaction::performNextStep() {
          m_nextStep == &SQLTransaction::cleanupAfterSuccessCallback ||
          m_nextStep == &SQLTransaction::cleanupAfterTransactionErrorCallback);
 
-  (this->*m_nextStep)();
+  checkAndHandleClosedDatabase();
+
+  if (m_nextStep)
+    (this->*m_nextStep)();
 
   // If there is no nextStep after performing the above step, the transaction is
   // complete
@@ -160,7 +181,10 @@ void SQLTransaction::performPendingCallback() {
          m_nextStep == &SQLTransaction::deliverQuotaIncreaseCallback ||
          m_nextStep == &SQLTransaction::deliverSuccessCallback);
 
-  (this->*m_nextStep)();
+  checkAndHandleClosedDatabase();
+
+  if (m_nextStep)
+    (this->*m_nextStep)();
 }
 
 void SQLTransaction::openTransactionAndPreflight() {

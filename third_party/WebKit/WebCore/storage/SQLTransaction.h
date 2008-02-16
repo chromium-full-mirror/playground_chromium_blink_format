@@ -88,6 +88,8 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
 
   void enqueueStatement(PassRefPtr<SQLStatement>);
 
+  void checkAndHandleClosedDatabase();
+
   void openTransactionAndPreflight();
   void deliverTransactionCallback();
   void scheduleToRunStatements();

@@ -64,4 +64,8 @@ void SQLiteTransaction::rollback() {
   }
 }
 
+void SQLiteTransaction::stop() {
+  m_inProgress = false;
+}
+
 }  // namespace WebCore
