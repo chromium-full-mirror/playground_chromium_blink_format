@@ -893,7 +893,7 @@ void GraphicsContext::paintBuffer(ImageBuffer* buffer, const IntRect& r) {
 
 void GraphicsContext::drawImage(ImageBuffer* buffer,
                                 const FloatRect& srcRect,
-                                const FloatRect& destRect) {
+                                const FloatRect& dstRect) {
   QPainter* painter = static_cast<QPainter*>(platformContext());
   QPixmap px = *buffer->pixmap();
   if (px.isNull())

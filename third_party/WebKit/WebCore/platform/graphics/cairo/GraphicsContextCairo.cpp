@@ -892,10 +892,10 @@ void GraphicsContext::paintBuffer(ImageBuffer* buffer, const IntRect& r) {
 
 void GraphicsContext::drawImage(ImageBuffer* buffer,
                                 const FloatRect& srcRect,
-                                const FloatRect& destRect) {
-  cairo_surface_flush(m_data->surface());
+                                const FloatRect& dstRect) {
+  cairo_surface_flush(buffer->surface());
   cairo_save(platformContext());
-  cairo_set_source_surface(platformContext(), m_data->surface(), srcRect.x(),
+  cairo_set_source_surface(platformContext(), buffer->surface(), srcRect.x(),
                            srcRect.y());
   cairo_rectangle(platformContext(), dstRect.x(), dstRect.y(), dstRect.width(),
                   dstRect.height());
