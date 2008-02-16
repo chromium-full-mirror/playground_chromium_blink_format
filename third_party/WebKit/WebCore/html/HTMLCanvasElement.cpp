@@ -206,9 +206,13 @@ void HTMLCanvasElement::createDrawingContext() const {
 }
 
 GraphicsContext* HTMLCanvasElement::drawingContext() const {
+  return buffer()->context();
+}
+
+ImageBuffer* HTMLCanvasElement::buffer() const {
   if (!m_createdDrawingContext)
     createDrawingContext();
-  return m_data->context();
+  return m_data.get();
 }
 
 #if PLATFORM(CG)

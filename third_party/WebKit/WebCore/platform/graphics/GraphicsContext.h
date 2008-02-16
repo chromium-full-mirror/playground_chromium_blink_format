@@ -163,6 +163,9 @@ class GraphicsContext : Noncopyable {
                  const FloatRect& srcRect = FloatRect(0, 0, -1, -1),
                  CompositeOperator = CompositeSourceOver,
                  bool useLowQualityScale = false);
+  void drawImage(ImageBuffer*,
+                 const FloatRect& srcRect,
+                 const FloatRect& destRect);
   void drawTiledImage(Image*,
                       const IntRect& destRect,
                       const IntPoint& srcPoint,
@@ -174,6 +177,7 @@ class GraphicsContext : Noncopyable {
                       Image::TileRule hRule = Image::StretchTile,
                       Image::TileRule vRule = Image::StretchTile,
                       CompositeOperator = CompositeSourceOver);
+
   void paintBuffer(ImageBuffer*, const IntRect&);
 #if PLATFORM(CG)
   void setUseLowQualityImageInterpolation(bool = true);

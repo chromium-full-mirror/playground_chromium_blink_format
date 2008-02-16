@@ -75,6 +75,7 @@ class HTMLCanvasElement : public HTMLElement {
 
   GraphicsContext* drawingContext() const;
 
+  ImageBuffer* buffer() const;
 #if PLATFORM(CG)
   CGImageRef createPlatformImage() const;
 #elif PLATFORM(QT)
