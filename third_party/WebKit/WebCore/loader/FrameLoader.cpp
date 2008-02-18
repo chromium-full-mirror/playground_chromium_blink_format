@@ -389,7 +389,7 @@ void FrameLoader::changeLocation(const KURL& url,
                                  bool lockHistory,
                                  bool userGesture) {
   ResourceRequestCachePolicy policy =
-      !canCachePage() || (m_cachePolicy == CachePolicyReload) ||
+      (m_cachePolicy == CachePolicyReload) ||
               (m_cachePolicy == CachePolicyRefresh)
           ? ReloadIgnoringCacheData
           : UseProtocolCachePolicy;
