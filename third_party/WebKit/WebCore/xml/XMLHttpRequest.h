@@ -132,6 +132,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void changeState(XMLHttpRequestState newState);
   void callReadyStateChangeListener();
   void dropProtection();
+  void internalAbort();
 
   Document* m_doc;
 

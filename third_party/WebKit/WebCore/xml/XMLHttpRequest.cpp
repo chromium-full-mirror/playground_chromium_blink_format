@@ -309,7 +309,8 @@ void XMLHttpRequest::open(const String& method,
                           const KURL& url,
                           bool async,
                           ExceptionCode& ec) {
-  abort();
+  internalAbort();
+  m_state = Uninitialized;
   m_aborted = false;
 
   // clear stuff from possible previous load
@@ -359,6 +360,7 @@ void XMLHttpRequest::open(const String& method,
 
   m_async = async;
 
+  ASSERT(!m_loader);
   changeState(Open);
 }
 
@@ -390,15 +392,10 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
   if (!m_doc)
     return;
 
-  if (m_state != Open) {
+  if (m_state != Open || m_loader) {
     ec = INVALID_STATE_ERR;
     return;
   }
-
-  // FIXME: Should this abort or raise an exception instead if we already have a
-  // m_loader going?
-  if (m_loader)
-    return;
 
   m_aborted = false;
 
@@ -485,6 +482,23 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
 }
 
 void XMLHttpRequest::abort() {
+  bool sendFlag = m_loader;
+
+  internalAbort();
+
+  // Clear headers as required by the spec
+  m_requestHeaders.clear();
+
+  if ((m_state <= Open && !sendFlag) || m_state == Loaded)
+    m_state = Uninitialized;
+  else {
+    ASSERT(!m_loader);
+    changeState(Loaded);
+    m_state = Uninitialized;
+  }
+}
+
+void XMLHttpRequest::internalAbort() {
   bool hadLoader = m_loader;
 
   m_aborted = true;
@@ -498,8 +512,6 @@ void XMLHttpRequest::abort() {
 
   if (hadLoader)
     dropProtection();
-
-  m_state = Uninitialized;
 }
 
 void XMLHttpRequest::dropProtection() {
@@ -529,7 +541,7 @@ void XMLHttpRequest::overrideMIMEType(const String& override) {
 void XMLHttpRequest::setRequestHeader(const String& name,
                                       const String& value,
                                       ExceptionCode& ec) {
-  if (m_state != Open) {
+  if (m_state != Open || m_loader) {
     Settings* settings = m_doc ? m_doc->settings() : 0;
     if (settings && settings->usesDashboardBackwardCompatibilityMode())
       return;
@@ -651,7 +663,7 @@ String XMLHttpRequest::getStatusText(ExceptionCode& ec) const {
 void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
                                             const ResourceResponse& response) {
   if (!urlMatchesDocumentDomain(response.url())) {
-    abort();
+    internalAbort();
     return;
   }
 
@@ -703,7 +715,7 @@ void XMLHttpRequest::willSendRequest(SubresourceLoader*,
                                      ResourceRequest& request,
                                      const ResourceResponse& redirectResponse) {
   if (!urlMatchesDocumentDomain(request.url()))
-    abort();
+    internalAbort();
 }
 
 void XMLHttpRequest::didReceiveResponse(SubresourceLoader*,
@@ -767,7 +779,7 @@ void XMLHttpRequest::cancelRequests(Document* m_doc) {
   RequestsSet copy = *requests;
   RequestsSet::const_iterator end = copy.end();
   for (RequestsSet::const_iterator it = copy.begin(); it != end; ++it)
-    (*it)->abort();
+    (*it)->internalAbort();
 }
 
 void XMLHttpRequest::detachRequests(Document* m_doc) {
@@ -778,7 +790,7 @@ void XMLHttpRequest::detachRequests(Document* m_doc) {
   RequestsSet::const_iterator end = requests->end();
   for (RequestsSet::const_iterator it = requests->begin(); it != end; ++it) {
     (*it)->m_doc = 0;
-    (*it)->abort();
+    (*it)->internalAbort();
   }
   delete requests;
 }
