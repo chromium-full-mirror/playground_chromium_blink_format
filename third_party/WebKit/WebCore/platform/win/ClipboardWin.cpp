@@ -712,7 +712,7 @@ void ClipboardWin::declareAndWriteDragImage(Element* element,
   if (imageURL.isEmpty())
     return;
 
-  String fullURL = frame->document()->completeURL(parseURL(imageURL));
+  String fullURL = frame->document()->completeURL(parseURL(imageURL)).string();
   if (fullURL.isEmpty())
     return;
   STGMEDIUM medium = {0};
