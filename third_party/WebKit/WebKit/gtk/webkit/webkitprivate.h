@@ -90,6 +90,8 @@ struct _WebKitWebViewPrivate {
 
   GtkTargetList* copy_target_list;
   GtkTargetList* paste_target_list;
+
+  gboolean transparent;
 };
 
 #define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \
