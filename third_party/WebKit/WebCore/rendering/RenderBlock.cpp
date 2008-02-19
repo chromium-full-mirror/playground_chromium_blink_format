@@ -4093,12 +4093,6 @@ void RenderBlock::calcInlinePrefWidths() {
           inlineMax += childMax;
 
           child->setPrefWidthsDirty(false);
-
-          if (static_cast<RenderFlow*>(child)->isWordBreak()) {
-            // End a line and start a new line.
-            m_minPrefWidth = max(inlineMin, m_minPrefWidth);
-            inlineMin = 0;
-          }
         } else {
           // Inline replaced elts add in their margins to their min/max values.
           int margins = 0;
@@ -4179,6 +4173,12 @@ void RenderBlock::calcInlinePrefWidths() {
       } else if (child->isText()) {
         // Case (3). Text.
         RenderText* t = static_cast<RenderText*>(child);
+
+        if (t->isWordBreak()) {
+          m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+          inlineMin = 0;
+          continue;
+        }
 
         // Determine if we have a breakable character.  Pass in
         // whether or not we should ignore any spaces at the front
