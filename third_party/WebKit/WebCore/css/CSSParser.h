@@ -1,8 +1,6 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -67,8 +65,6 @@ struct Value {
   enum { Operator = 0x100000, Function = 0x100001, Q_EMS = 0x100002 };
   int unit;
 };
-
-DeprecatedString deprecatedString(const ParseString&);
 
 static inline String domString(const ParseString& ps) {
   return String(ps.characters, ps.length);
@@ -312,6 +308,10 @@ class CSSParser {
 
   friend class TransformOperationInfo;
 };
+
+int cssPropertyID(const ParseString&);
+int cssPropertyID(const String&);
+int cssValueKeywordID(const ParseString&);
 
 }  // namespace WebCore
 
