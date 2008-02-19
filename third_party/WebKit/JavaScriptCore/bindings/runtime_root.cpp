@@ -201,12 +201,11 @@ void RootObject::setCreateRootObject(
 
 PassRefPtr<RootObject> RootObject::create(const void* nativeHandle,
                                           JSGlobalObject* globalObject) {
-  return new RootObject(nativeHandle, globalObject);
+  return adoptRef(new RootObject(nativeHandle, globalObject));
 }
 
 RootObject::RootObject(const void* nativeHandle, JSGlobalObject* globalObject)
-    : RefCounted<RootObject>(0),
-      m_isValid(true),
+    : m_isValid(true),
       m_nativeHandle(nativeHandle),
       m_globalObject(globalObject) {
   ASSERT(globalObject);
