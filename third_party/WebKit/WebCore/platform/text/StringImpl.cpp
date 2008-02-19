@@ -59,8 +59,7 @@ static inline void deleteUCharVector(const UChar* p) {
 
 // This constructor is used only to create the empty string.
 StringImpl::StringImpl()
-    : RefCounted<StringImpl>(1),
-      m_length(0),
+    : m_length(0),
       m_data(0),
       m_hash(0),
       m_inTable(false),
@@ -71,8 +70,7 @@ StringImpl::StringImpl()
 // operation. Because of that, it's the one constructor that doesn't assert the
 // length is non-zero, since we support copying the empty string.
 inline StringImpl::StringImpl(const UChar* characters, unsigned length)
-    : RefCounted<StringImpl>(1),
-      m_length(length),
+    : m_length(length),
       m_hash(0),
       m_inTable(false),
       m_hasTerminatingNullCharacter(false) {
@@ -83,8 +81,7 @@ inline StringImpl::StringImpl(const UChar* characters, unsigned length)
 
 inline StringImpl::StringImpl(const StringImpl& str,
                               WithTerminatingNullCharacter)
-    : RefCounted<StringImpl>(1),
-      m_length(str.m_length),
+    : m_length(str.m_length),
       m_hash(str.m_hash),
       m_inTable(false),
       m_hasTerminatingNullCharacter(true) {
@@ -95,8 +92,7 @@ inline StringImpl::StringImpl(const StringImpl& str,
 }
 
 inline StringImpl::StringImpl(const char* characters, unsigned length)
-    : RefCounted<StringImpl>(1),
-      m_length(length),
+    : m_length(length),
       m_hash(0),
       m_inTable(false),
       m_hasTerminatingNullCharacter(false) {
@@ -112,8 +108,7 @@ inline StringImpl::StringImpl(const char* characters, unsigned length)
 }
 
 inline StringImpl::StringImpl(UChar* characters, unsigned length, AdoptBuffer)
-    : RefCounted<StringImpl>(1),
-      m_length(length),
+    : m_length(length),
       m_data(characters),
       m_hash(0),
       m_inTable(false),
