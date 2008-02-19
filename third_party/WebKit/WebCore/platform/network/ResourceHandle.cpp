@@ -39,7 +39,7 @@ ResourceHandle::ResourceHandle(const ResourceRequest& request,
                                bool defersLoading,
                                bool shouldContentSniff,
                                bool mightDownloadFromHandle)
-    : RefCounted<ResourceHandle>(0),
+    : RefCounted<ResourceHandle>(1),
       d(new ResourceHandleInternal(this,
                                    request,
                                    client,
@@ -54,9 +54,9 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
     bool defersLoading,
     bool shouldContentSniff,
     bool mightDownloadFromHandle) {
-  RefPtr<ResourceHandle> newHandle(
+  RefPtr<ResourceHandle> newHandle(adoptRef(
       new ResourceHandle(request, client, defersLoading, shouldContentSniff,
-                         mightDownloadFromHandle));
+                         mightDownloadFromHandle)));
 
   if (!portAllowed(request)) {
     newHandle->scheduleBlockedFailure();
