@@ -67,8 +67,6 @@ class UriError;
 class UriErrorPrototype;
 struct ActivationStackNode;
 
-enum CompatMode { NativeMode, IECompat, NetscapeCompat };
-
 class JSGlobalObject : public JSVariableObject {
  protected:
   using JSVariableObject::JSVariableObjectData;
@@ -81,7 +79,6 @@ class JSGlobalObject : public JSVariableObject {
     JSGlobalObject* prev;
 
     Debugger* debugger;
-    CompatMode compatMode;
 
     GlobalExecState globalExec;
     int recursion;
@@ -231,10 +228,6 @@ class JSGlobalObject : public JSVariableObject {
 
   Debugger* debugger() const { return d()->debugger; }
   void setDebugger(Debugger* debugger) { d()->debugger = debugger; }
-
-  // FIXME: Let's just pick one compatible behavior and go with it.
-  void setCompatMode(CompatMode mode) { d()->compatMode = mode; }
-  CompatMode compatMode() const { return d()->compatMode; }
 
   int recursion() { return d()->recursion; }
   void incRecursion() { ++d()->recursion; }
