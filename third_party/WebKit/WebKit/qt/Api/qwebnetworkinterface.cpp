@@ -137,9 +137,9 @@ void QWebNetworkRequestPrivate::init(
 
     // handle and perform a 'POST' request
     if (method == "POST") {
-      DeprecatedString pd =
-          resourceRequest->httpBody()->flattenToString().deprecatedString();
-      postData = QByteArray(pd.ascii(), pd.length());
+      Vector<char> data;
+      resourceRequest->httpBody()->flatten(data);
+      postData = QByteArray(data.data(), data.size());
       httpHeader.setValue(QLatin1String("content-length"),
                           QString::number(postData.size()));
     }
