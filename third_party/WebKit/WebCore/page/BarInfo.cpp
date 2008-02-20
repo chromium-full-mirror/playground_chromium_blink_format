@@ -35,8 +35,7 @@
 
 namespace WebCore {
 
-BarInfo::BarInfo(Frame* frame, Type type)
-    : RefCounted<BarInfo>(0), m_frame(frame), m_type(type) {}
+BarInfo::BarInfo(Frame* frame, Type type) : m_frame(frame), m_type(type) {}
 
 void BarInfo::disconnectFrame() {
   m_frame = 0;

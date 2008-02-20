@@ -44,7 +44,9 @@ typedef int ExceptionCode;
 
 class DOMSelection : public RefCounted<DOMSelection> {
  public:
-  DOMSelection(Frame*);
+  static PassRefPtr<DOMSelection> create(Frame* frame) {
+    return adoptRef(new DOMSelection(frame));
+  }
 
   Frame* frame() const;
   void disconnectFrame();
@@ -98,6 +100,8 @@ class DOMSelection : public RefCounted<DOMSelection> {
   // TextRange *createRange();
 
  private:
+  DOMSelection(Frame*);
+
   Frame* m_frame;
 };
 
