@@ -425,7 +425,7 @@ static inline void writeSVGInlineTextBox(TextStream& ts,
          << quoteAndEscapeNonPrintables(
                 String(textBox->textObject()->text())
                     .substring(textBox->start() + range.startOffset, offset))
-         << endl;
+         << "\n";
 
       j++;
     }
@@ -458,7 +458,7 @@ void write(TextStream& ts, const RenderSVGContainer& container, int indent) {
       ts << " {" << tagName << "}";
   }
 
-  ts << container << endl;
+  ts << container << "\n";
 
   for (RenderObject* child = container.firstChild(); child;
        child = child->nextSibling())
@@ -475,7 +475,7 @@ void write(TextStream& ts, const RenderSVGRoot& root, int indent) {
       ts << " {" << tagName << "}";
   }
 
-  ts << root << endl;
+  ts << root << "\n";
 
   for (RenderObject* child = root.firstChild(); child;
        child = child->nextSibling())
@@ -492,7 +492,7 @@ void write(TextStream& ts, const RenderSVGText& text, int indent) {
       ts << " {" << tagName << "}";
   }
 
-  ts << text << endl;
+  ts << text << "\n";
 
   for (RenderObject* child = text.firstChild(); child;
        child = child->nextSibling())
@@ -510,7 +510,7 @@ void write(TextStream& ts, const RenderSVGInlineText& text, int indent) {
   }
 
   ts << " at (" << text.xPos() << "," << text.yPos() << ") size "
-     << text.width() << "x" << text.height() << endl;
+     << text.width() << "x" << text.height() << "\n";
   writeSVGInlineText(ts, text, indent);
 }
 
@@ -524,7 +524,7 @@ void write(TextStream& ts, const RenderPath& path, int indent) {
       ts << " {" << tagName << "}";
   }
 
-  ts << path << endl;
+  ts << path << "\n";
 }
 
 void writeRenderResources(TextStream& ts, Node* parent) {
@@ -547,10 +547,11 @@ void writeRenderResources(TextStream& ts, Node* parent) {
       RefPtr<SVGPaintServer> paintServer =
           WTF::static_pointer_cast<SVGPaintServer>(resource);
       ts << "KRenderingPaintServer {id=\"" << elementId << "\" " << *paintServer
-         << "}" << endl;
+         << "}"
+         << "\n";
     } else
       ts << "KCanvasResource {id=\"" << elementId << "\" " << *resource << "}"
-         << endl;
+         << "\n";
   } while ((node = node->traverseNextNode(parent)));
 }
 
