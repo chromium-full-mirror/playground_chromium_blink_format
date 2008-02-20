@@ -83,10 +83,6 @@ class RenderFrameSet : public RenderContainer {
   bool canResizeRow(const IntPoint&) const;
   bool canResizeColumn(const IntPoint&) const;
 
-#ifndef NDEBUG
-  virtual void dump(TextStream*, DeprecatedString ind = "") const;
-#endif
-
  private:
   static const int noSplit = -1;
 

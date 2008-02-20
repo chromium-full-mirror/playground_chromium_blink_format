@@ -30,7 +30,6 @@
 #include "HTMLTableCellElement.h"
 #include "RenderTableCol.h"
 #include "RenderView.h"
-#include "TextStream.h"
 
 using namespace std;
 
@@ -948,16 +947,5 @@ void RenderTableCell::paintBoxDecorations(PaintInfo& paintInfo,
   ty -= borderTopExtra();
   paintBorder(paintInfo.context, tx, ty, w, h, style());
 }
-
-#ifndef NDEBUG
-void RenderTableCell::dump(TextStream* stream, DeprecatedString ind) const {
-  *stream << " row=" << row();
-  *stream << " col=" << col();
-  *stream << " rSpan=" << rowSpan();
-  *stream << " cSpan=" << colSpan();
-
-  RenderBlock::dump(stream, ind);
-}
-#endif
 
 }  // namespace WebCore

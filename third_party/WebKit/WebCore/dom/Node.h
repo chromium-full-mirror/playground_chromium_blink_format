@@ -410,10 +410,6 @@ class Node : public TreeShared<Node> {
   // Whether or not a selection can be started in this object
   virtual bool canStartSelection() const;
 
-#ifndef NDEBUG
-  virtual void dump(TextStream*, DeprecatedString indent = "") const;
-#endif
-
   // -----------------------------------------------------------------------------
   // Integration with rendering tree
 

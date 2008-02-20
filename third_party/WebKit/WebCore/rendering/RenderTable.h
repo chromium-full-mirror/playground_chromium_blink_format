@@ -186,10 +186,6 @@ class RenderTable : public RenderBlock {
       recalcSections();
   }
 
-#ifndef NDEBUG
-  virtual void dump(TextStream*, DeprecatedString ind = "") const;
-#endif
-
  private:
   void recalcSections() const;
 

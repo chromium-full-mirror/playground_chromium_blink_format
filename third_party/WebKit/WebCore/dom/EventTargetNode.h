@@ -114,10 +114,6 @@ class EventTargetNode : public Node, public EventTarget {
    */
   virtual bool disabled() const;
 
-#ifndef NDEBUG
-  virtual void dump(TextStream*, DeprecatedString indent = "") const;
-#endif
-
   RegisteredEventListenerList* localEventListeners() const {
     return m_regdListeners;
   }

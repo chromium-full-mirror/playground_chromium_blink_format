@@ -148,11 +148,7 @@ class RenderTableSection : public RenderContainer {
                            int ty,
                            HitTestAction);
 
-#ifndef NDEBUG
-  virtual void dump(TextStream*, DeprecatedString ind = "") const;
-#endif
-
- protected:
+ private:
   bool ensureRows(int);
   void clearGrid();
 
