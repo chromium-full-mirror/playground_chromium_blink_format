@@ -30,7 +30,7 @@
 #if ENABLE(XPATH)
 
 #include <wtf/RefCounted.h>
-#include <wtf/Forward.h>
+#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
@@ -47,7 +47,11 @@ class Expression;
 
 class XPathExpression : public RefCounted<XPathExpression> {
  public:
+  static PassRefPtr<XPathExpression> create() {
+    return adoptRef(new XPathExpression);
+  }
   ~XPathExpression();
+
   static PassRefPtr<XPathExpression> createExpression(const String& expression,
                                                       XPathNSResolver*,
                                                       ExceptionCode&);
@@ -57,7 +61,7 @@ class XPathExpression : public RefCounted<XPathExpression> {
                                    ExceptionCode&);
 
  private:
-  XPathExpression() : RefCounted<XPathExpression>(0) {}
+  XPathExpression() {}
 
   XPath::Expression* m_topExpression;
 };

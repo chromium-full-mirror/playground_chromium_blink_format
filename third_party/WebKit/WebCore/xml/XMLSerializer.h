@@ -32,8 +32,14 @@ class Node;
 
 class XMLSerializer : public RefCounted<XMLSerializer> {
  public:
-  XMLSerializer() : RefCounted<XMLSerializer>(0) {}
+  static PassRefPtr<XMLSerializer> create() {
+    return adoptRef(new XMLSerializer);
+  }
+
   String serializeToString(Node*, ExceptionCode&);
+
+ private:
+  XMLSerializer() {}
 };
 
 }  // namespace WebCore

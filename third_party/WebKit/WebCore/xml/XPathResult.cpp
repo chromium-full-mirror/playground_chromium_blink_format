@@ -52,7 +52,7 @@ class InvalidatingEventListener : public EventListener {
 };
 
 XPathResult::XPathResult(EventTargetNode* eventTarget, const Value& value)
-    : RefCounted<XPathResult>(0), m_value(value), m_eventTarget(eventTarget) {
+    : m_value(value), m_eventTarget(eventTarget) {
   m_eventListener = new InvalidatingEventListener(this);
   m_eventTarget->addEventListener(EventNames::DOMSubtreeModifiedEvent,
                                   m_eventListener, false);

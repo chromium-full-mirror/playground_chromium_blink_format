@@ -69,7 +69,7 @@ KJS_DEFINE_PROTOTYPE(XSLTProcessorPrototype)
 KJS_IMPLEMENT_PROTOTYPE("XSLTProcessor", XSLTProcessorPrototype)
 
 JSXSLTProcessor::JSXSLTProcessor(JSObject* prototype)
-    : DOMObject(prototype), m_impl(new XSLTProcessor()) {}
+    : DOMObject(prototype), m_impl(XSLTProcessor::create()) {}
 
 JSXSLTProcessor::~JSXSLTProcessor() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());

@@ -38,14 +38,21 @@ namespace XPath {
 
 class ValueData : public RefCounted<ValueData> {
  public:
-  ValueData() : RefCounted<ValueData>(0) {}
-  ValueData(const NodeSet& nodeSet)
-      : RefCounted<ValueData>(0), m_nodeSet(nodeSet) {}
-  ValueData(const String& string)
-      : RefCounted<ValueData>(0), m_string(string) {}
+  static PassRefPtr<ValueData> create() { return adoptRef(new ValueData); }
+  static PassRefPtr<ValueData> create(const NodeSet& nodeSet) {
+    return adoptRef(new ValueData(nodeSet));
+  }
+  static PassRefPtr<ValueData> create(const String& string) {
+    return adoptRef(new ValueData(string));
+  }
 
   NodeSet m_nodeSet;
   String m_string;
+
+ private:
+  ValueData() {}
+  ValueData(const NodeSet& nodeSet) : m_nodeSet(nodeSet) {}
+  ValueData(const String& string) : m_string(string) {}
 };
 
 // Copying Value objects makes their data partially shared, so care has to be
@@ -59,12 +66,12 @@ class Value {
   Value(double value) : m_type(NumberValue), m_number(value) {}
 
   Value(const char* value)
-      : m_type(StringValue), m_data(new ValueData(value)) {}
+      : m_type(StringValue), m_data(ValueData::create(value)) {}
   Value(const String& value)
-      : m_type(StringValue), m_data(new ValueData(value)) {}
+      : m_type(StringValue), m_data(ValueData::create(value)) {}
   Value(const NodeSet& value)
-      : m_type(NodeSetValue), m_data(new ValueData(value)) {}
-  Value(Node* value) : m_type(NodeSetValue), m_data(new ValueData) {
+      : m_type(NodeSetValue), m_data(ValueData::create(value)) {}
+  Value(Node* value) : m_type(NodeSetValue), m_data(ValueData::create()) {
     m_data->m_nodeSet.append(value);
   }
 
@@ -76,7 +83,7 @@ class Value {
   static const struct AdoptTag {
   } adopt;
   Value(NodeSet& value, const AdoptTag&)
-      : m_type(NodeSetValue), m_data(new ValueData) {
+      : m_type(NodeSetValue), m_data(ValueData::create()) {
     value.swap(m_data->m_nodeSet);
   }
 

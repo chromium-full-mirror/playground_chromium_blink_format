@@ -47,12 +47,13 @@ class JSCustomXPathNSResolver : public XPathNSResolver {
   static PassRefPtr<JSCustomXPathNSResolver> create(KJS::ExecState*,
                                                     KJS::JSValue*);
 
-  JSCustomXPathNSResolver(KJS::JSObject*, Frame*);
   virtual ~JSCustomXPathNSResolver();
 
   virtual String lookupNamespaceURI(const String& prefix);
 
  private:
+  JSCustomXPathNSResolver(KJS::JSObject*, Frame*);
+
   KJS::JSObject* m_customResolver;  // JSCustomXPathNSResolvers are always
                                     // temporary, thus no need to GC protect the
                                     // object.

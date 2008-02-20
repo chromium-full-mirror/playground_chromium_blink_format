@@ -40,7 +40,9 @@ class DocumentFragment;
 
 class XSLTProcessor : public RefCounted<XSLTProcessor> {
  public:
-  XSLTProcessor() : RefCounted<XSLTProcessor>(0) {}
+  static PassRefPtr<XSLTProcessor> create() {
+    return adoptRef(new XSLTProcessor);
+  }
 
   void setXSLStylesheet(XSLStyleSheet* styleSheet) {
     m_stylesheet = styleSheet;
@@ -84,6 +86,8 @@ class XSLTProcessor : public RefCounted<XSLTProcessor> {
   typedef HashMap<String, String> ParameterMap;
 
  private:
+  XSLTProcessor() {}
+
   // Convert a libxml doc ptr to a KHTML DOM Document
   RefPtr<Document> documentFromXMLDocPtr(xmlDocPtr resultDoc,
                                          xsltStylesheetPtr sheet,

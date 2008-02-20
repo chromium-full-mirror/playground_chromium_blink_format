@@ -238,8 +238,7 @@ bool XMLHttpRequest::dispatchEvent(PassRefPtr<Event> evt,
 }
 
 XMLHttpRequest::XMLHttpRequest(Document* d)
-    : RefCounted<XMLHttpRequest>(0),
-      m_doc(d),
+    : m_doc(d),
       m_async(true),
       m_loader(0),
       m_state(Uninitialized),

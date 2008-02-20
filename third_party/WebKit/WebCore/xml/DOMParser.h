@@ -29,9 +29,13 @@ class String;
 
 class DOMParser : public RefCounted<DOMParser> {
  public:
-  DOMParser() : RefCounted<DOMParser>(0) {}
+  static PassRefPtr<DOMParser> create() { return adoptRef(new DOMParser); }
+
   PassRefPtr<Document> parseFromString(const String& str,
                                        const String& contentType);
+
+ private:
+  DOMParser() {}
 };
 }
 
