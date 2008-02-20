@@ -51,6 +51,9 @@ struct ParseString {
   int length;
 
   void lower();
+
+  operator String() const { return String(characters, length); }
+  operator AtomicString() const { return AtomicString(characters, length); }
 };
 
 struct Value {
@@ -65,14 +68,6 @@ struct Value {
   enum { Operator = 0x100000, Function = 0x100001, Q_EMS = 0x100002 };
   int unit;
 };
-
-static inline String domString(const ParseString& ps) {
-  return String(ps.characters, ps.length);
-}
-
-static inline AtomicString atomicString(const ParseString& ps) {
-  return AtomicString(ps.characters, ps.length);
-}
 
 class ValueList {
  public:
