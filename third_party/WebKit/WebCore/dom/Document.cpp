@@ -340,8 +340,8 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
   m_tokenizer = 0;
   m_wellFormed = false;
 
-  pMode = Strict;
-  hMode = XHtml;
+  setParseMode(Strict);
+
   m_textColor = Color::black;
   m_listenerTypes = 0;
   m_inDocument = true;
@@ -353,13 +353,7 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
   m_usesFirstLetterRules = false;
   m_gotoAnchorNeededAfterStylesheetsLoad = false;
 
-  bool matchAuthorAndUserStyles = true;
-  if (Settings* settings = this->settings())
-    matchAuthorAndUserStyles = settings->authorAndUserStylesEnabled();
-  m_styleSelector = new CSSStyleSelector(
-      this, userStyleSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
-      !inCompatMode(), matchAuthorAndUserStyles);
-
+  m_styleSelector = 0;
   m_didCalculateStyleSelector = false;
   m_pendingStylesheets = 0;
   m_ignorePendingStylesheets = false;
@@ -494,11 +488,15 @@ void Document::resetActiveLinkColor() {
 }
 
 void Document::setDocType(PassRefPtr<DocumentType> docType) {
+  // This should never be called more than once.
+  // Note: This is not a public DOM method and can only be called by the parser.
+  ASSERT(!m_docType || !docType);
+  if (m_docType && docType)
+    return;
   m_docType = docType;
-}
-
-DocumentType* Document::doctype() const {
-  return m_docType.get();
+  if (m_docType)
+    m_docType->setDocument(this);
+  determineParseMode();
 }
 
 DOMImplementation* Document::implementation() const {
@@ -1235,6 +1233,17 @@ void Document::attach() {
   // Create the rendering tree
   setRenderer(new (m_renderArena) RenderView(this, view()));
 
+  if (!m_styleSelector) {
+    bool matchAuthorAndUserStyles = true;
+    if (Settings* docSettings = settings())
+      matchAuthorAndUserStyles = docSettings->authorAndUserStylesEnabled();
+    m_styleSelector = new CSSStyleSelector(
+        this, userStyleSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
+        !inCompatMode(), matchAuthorAndUserStyles);
+    m_styleSelector->setEncodedURL(m_url);
+    m_didCalculateStyleSelector = true;
+  }
+
   recalcStyle(Force);
 
   RenderObject* render = renderer();
@@ -1718,13 +1727,6 @@ CSSStyleSheet* Document::mappedElementSheet() {
   if (!m_mappedElementSheet)
     m_mappedElementSheet = new CSSStyleSheet(this, baseURL().string());
   return m_mappedElementSheet.get();
-}
-
-void Document::determineParseMode(const String&) {
-  // For XML documents use strict parse mode.
-  // HTML overrides this method to determine the parse mode.
-  pMode = Strict;
-  hMode = XHtml;
 }
 
 static Node* nextNodeWithExactTabIndex(Node* start,
@@ -2809,7 +2811,7 @@ HTMLMapElement* Document::getImageMap(const String& url) const {
     return 0;
   int hashPos = url.find('#');
   String name = (hashPos < 0 ? url : url.substring(hashPos + 1)).impl();
-  AtomicString mapName = hMode == XHtml ? name : name.lower();
+  AtomicString mapName = isHTMLDocument() ? name.lower() : name;
   return m_imageMapsByName.get(mapName.impl());
 }
 

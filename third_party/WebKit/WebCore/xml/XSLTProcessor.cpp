@@ -308,8 +308,6 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
     result->setURL(ownerDocument->url());
     result->setBaseURL(ownerDocument->baseURL());
   }
-  result->determineParseMode(
-      documentSource);  // Make sure we parse in the correct mode.
 
   RefPtr<TextResourceDecoder> decoder = new TextResourceDecoder(sourceMIMEType);
   decoder->setEncoding(

@@ -181,8 +181,7 @@ class Document : public ContainerNode {
 
   // DOM methods & attributes for Document
 
-  virtual DocumentType* doctype() const;  // May return 0 for HTML documents
-  DocumentType* realDocType() const { return m_docType.get(); }
+  DocumentType* doctype() const { return m_docType.get(); }
 
   DOMImplementation* implementation() const;
   virtual void childrenChanged(bool changedByParser = false);
@@ -449,18 +448,16 @@ class Document : public ContainerNode {
 
   enum ParseMode { Compat, AlmostStrict, Strict };
 
-  virtual void determineParseMode(const String&);
-  void setParseMode(ParseMode m) { pMode = m; }
-  ParseMode parseMode() const { return pMode; }
+ private:
+  virtual void determineParseMode() {}
 
-  bool inCompatMode() const { return pMode == Compat; }
-  bool inAlmostStrictMode() const { return pMode == AlmostStrict; }
-  bool inStrictMode() const { return pMode == Strict; }
+ public:
+  void setParseMode(ParseMode m) { m_parseMode = m; }
+  ParseMode parseMode() const { return m_parseMode; }
 
-  enum HTMLMode { Html3, Html4, XHtml };
-
-  void setHTMLMode(HTMLMode m) { hMode = m; }
-  HTMLMode htmlMode() const { return hMode; }
+  bool inCompatMode() const { return m_parseMode == Compat; }
+  bool inAlmostStrictMode() const { return m_parseMode == AlmostStrict; }
+  bool inStrictMode() const { return m_parseMode == Strict; }
 
   void setParsing(bool);
   bool parsing() const { return m_bParsing; }
@@ -847,8 +844,7 @@ class Document : public ContainerNode {
 
   bool m_printing;
 
-  ParseMode pMode;
-  HTMLMode hMode;
+  ParseMode m_parseMode;
 
   Color m_textColor;
 

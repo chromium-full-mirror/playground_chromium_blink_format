@@ -1041,7 +1041,6 @@ void FrameLoader::write(const char* str, int len, bool flush) {
 
   if (!m_receivedData) {
     m_receivedData = true;
-    m_frame->document()->determineParseMode(decoded);
     if (m_decoder->encoding().usesVisualOrdering())
       m_frame->document()->setVisuallyOrdered();
     m_frame->document()->recalcStyle(Node::Force);
@@ -5091,7 +5090,6 @@ void FrameLoader::switchOutLowBandwidthDisplayIfReady() {
       if (m_pendingSourceInLowBandwidthDisplay.length()) {
         // set cachePolicy to Cache to use the loaded resource
         newDoc->docLoader()->setCachePolicy(CachePolicyCache);
-        newDoc->determineParseMode(m_pendingSourceInLowBandwidthDisplay);
         if (m_decoder->encoding().usesVisualOrdering())
           newDoc->setVisuallyOrdered();
         newDoc->recalcStyle(Node::Force);

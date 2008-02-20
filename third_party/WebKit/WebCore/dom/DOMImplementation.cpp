@@ -291,10 +291,8 @@ PassRefPtr<Document> DOMImplementation::createDocument(
     doc = new Document(this, 0);
 
   // now get the interesting parts of the doctype
-  if (doctype) {
-    doc->setDocType(doctype);
-    doctype->setDocument(doc.get());
-  }
+  if (doctype)
+    doc->addChild(doctype);
 
   if (!qualifiedName.isEmpty())
     doc->addChild(doc->createElementNS(namespaceURI, qualifiedName, ec));
@@ -355,7 +353,7 @@ PassRefPtr<HTMLDocument> DOMImplementation::createHTMLDocument(
     const String& title) {
   RefPtr<HTMLDocument> d = new HTMLDocument(this, 0);
   d->open();
-  d->write("<html><head><title>" + title +
+  d->write("<!doctype html><html><head><title>" + title +
            "</title></head><body></body></html>");
   return d.release();
 }

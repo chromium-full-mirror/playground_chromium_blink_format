@@ -70,8 +70,6 @@ class HTMLDocument : public Document, public CachedResourceClient {
   virtual PassRefPtr<Element> createElement(const String& tagName,
                                             ExceptionCode&);
 
-  virtual void determineParseMode(const String&);
-
   void addNamedItem(const String& name);
   void removeNamedItem(const String& name);
   bool hasNamedItem(const String& name);
@@ -81,6 +79,9 @@ class HTMLDocument : public Document, public CachedResourceClient {
   bool hasDocExtraNamedItem(const String& name);
 
   typedef HashMap<StringImpl*, int> NameCountMap;
+
+ private:
+  virtual void determineParseMode();
 
  private:
   NameCountMap namedItemCounts;

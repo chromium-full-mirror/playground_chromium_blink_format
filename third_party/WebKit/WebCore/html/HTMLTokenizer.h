@@ -94,6 +94,43 @@ class Token {
   OwnPtr<Vector<UChar>> m_sourceInfo;
 };
 
+enum DoctypeState {
+  DoctypeBegin,
+  DoctypeBeforeName,
+  DoctypeName,
+  DoctypeAfterName,
+  DoctypeBeforePublicID,
+  DoctypePublicID,
+  DoctypeAfterPublicID,
+  DoctypeBeforeSystemID,
+  DoctypeSystemID,
+  DoctypeAfterSystemID,
+  DoctypeBogus
+};
+
+class DoctypeToken {
+ public:
+  DoctypeToken() {}
+
+  void reset() {
+    m_name.clear();
+    m_publicID.clear();
+    m_systemID.clear();
+    m_state = DoctypeBegin;
+    m_source.clear();
+  }
+
+  DoctypeState state() { return m_state; }
+  void setState(DoctypeState s) { m_state = s; }
+
+  Vector<UChar> m_name;
+  Vector<UChar> m_publicID;
+  Vector<UChar> m_systemID;
+  DoctypeState m_state;
+
+  Vector<UChar> m_source;
+};
+
 //-----------------------------------------------------------------------------
 
 class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
@@ -131,10 +168,13 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   void end();
 
   void reset();
+
   PassRefPtr<Node> processToken();
+  void processDoctypeToken();
 
   State processListing(SegmentedString, State);
   State parseComment(SegmentedString&, State);
+  State parseDoctype(SegmentedString&, State);
   State parseServer(SegmentedString&, State);
   State parseText(SegmentedString&, State);
   State parseSpecial(SegmentedString&, State);
@@ -249,6 +289,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
     }
     bool inComment() const { return testBit(InComment); }
     void setInComment(bool v) { setBit(InComment, v); }
+    bool inDoctype() const { return testBit(InDoctype); }
+    void setInDoctype(bool v) { setBit(InDoctype, v); }
     bool inTextArea() const { return testBit(InTextArea); }
     void setInTextArea(bool v) { setBit(InTextArea, v); }
     bool escaped() const { return testBit(Escaped); }
@@ -278,8 +320,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
     bool needsSpecialWriteHandling() const {
       return m_bits &
              (InScript | InStyle | InXmp | InTextArea | InTitle | InIFrame |
-              TagMask | EntityMask | InPlainText | InComment | InServer |
-              InProcessingInstruction | StartTag);
+              TagMask | EntityMask | InPlainText | InComment | InDoctype |
+              InServer | InProcessingInstruction | StartTag);
     }
 
    private:
@@ -305,7 +347,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
       AllowYield = 1 << 21,
       LoadingExtScript = 1 << 22,
       ForceSynchronous = 1 << 23,
-      InIFrame = 1 << 24
+      InIFrame = 1 << 24,
+      InDoctype = 1 << 25
     };
 
     void setBit(StateBits bit, bool value) {
@@ -320,6 +363,10 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   };
 
   State m_state;
+
+  DoctypeToken m_doctypeToken;
+  int m_doctypeSearchCount;
+  int m_doctypeSecondarySearchCount;
 
   bool brokenServer;
 
@@ -337,14 +384,14 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
 
   // Stores characters if we are scanning for a string like "</script>"
   UChar searchBuffer[10];
+
   // Counts where we are in the string we are scanning for
   int searchCount;
-  // The string we are searching for
-  const UChar* searchFor;
   // the stopper string
   const char* searchStopper;
   // the stopper len
   int searchStopperLen;
+
   // if no more data is coming, just parse what we have (including ext scripts
   // that
   // may be still downloading) and finish
