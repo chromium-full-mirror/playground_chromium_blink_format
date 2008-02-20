@@ -44,7 +44,11 @@ class SVGPatternElement;
 
 class SVGPaintServerPattern : public SVGPaintServer {
  public:
-  SVGPaintServerPattern(const SVGPatternElement*);
+  static PassRefPtr<SVGPaintServerPattern> create(
+      const SVGPatternElement* owner) {
+    return adoptRef(new SVGPaintServerPattern(owner));
+  }
+
   virtual ~SVGPaintServerPattern();
 
   virtual SVGPaintServerType type() const { return PatternPaintServer; }
@@ -80,6 +84,8 @@ class SVGPaintServerPattern : public SVGPaintServer {
 #endif
 
  private:
+  SVGPaintServerPattern(const SVGPatternElement*);
+
   OwnPtr<ImageBuffer> m_tile;
   const SVGPatternElement* m_ownerElement;
   AffineTransform m_patternTransform;

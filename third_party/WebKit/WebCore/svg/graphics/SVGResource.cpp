@@ -34,7 +34,7 @@
 
 namespace WebCore {
 
-SVGResource::SVGResource() : RefCounted<SVGResource>(0) {}
+SVGResource::SVGResource() {}
 
 struct ResourceSet {
   ResourceSet() {

@@ -31,13 +31,17 @@ namespace WebCore {
 
 class SVGPathSegArcAbs : public SVGPathSeg {
  public:
-  SVGPathSegArcAbs(float x,
-                   float y,
-                   float r1,
-                   float r2,
-                   float angle,
-                   bool largeArcFlag,
-                   bool sweepFlag);
+  static PassRefPtr<SVGPathSegArcAbs> create(float x,
+                                             float y,
+                                             float r1,
+                                             float r2,
+                                             float angle,
+                                             bool largeArcFlag,
+                                             bool sweepFlag) {
+    return adoptRef(
+        new SVGPathSegArcAbs(x, y, r1, r2, angle, largeArcFlag, sweepFlag));
+  }
+
   virtual ~SVGPathSegArcAbs();
 
   virtual unsigned short pathSegType() const { return PATHSEG_ARC_ABS; }
@@ -69,6 +73,14 @@ class SVGPathSegArcAbs : public SVGPathSeg {
   bool sweepFlag() const;
 
  private:
+  SVGPathSegArcAbs(float x,
+                   float y,
+                   float r1,
+                   float r2,
+                   float angle,
+                   bool largeArcFlag,
+                   bool sweepFlag);
+
   float m_x;
   float m_y;
   float m_r1;
@@ -81,13 +93,16 @@ class SVGPathSegArcAbs : public SVGPathSeg {
 
 class SVGPathSegArcRel : public SVGPathSeg {
  public:
-  SVGPathSegArcRel(float x,
-                   float y,
-                   float r1,
-                   float r2,
-                   float angle,
-                   bool largeArcFlag,
-                   bool sweepFlag);
+  static PassRefPtr<SVGPathSegArcRel> create(float x,
+                                             float y,
+                                             float r1,
+                                             float r2,
+                                             float angle,
+                                             bool largeArcFlag,
+                                             bool sweepFlag) {
+    return adoptRef(
+        new SVGPathSegArcRel(x, y, r1, r2, angle, largeArcFlag, sweepFlag));
+  }
   virtual ~SVGPathSegArcRel();
 
   virtual unsigned short pathSegType() const { return PATHSEG_ARC_REL; }
@@ -119,6 +134,14 @@ class SVGPathSegArcRel : public SVGPathSeg {
   bool sweepFlag() const;
 
  private:
+  SVGPathSegArcRel(float x,
+                   float y,
+                   float r1,
+                   float r2,
+                   float angle,
+                   bool largeArcFlag,
+                   bool sweepFlag);
+
   float m_x;
   float m_y;
   float m_r1;

@@ -36,7 +36,7 @@
 namespace WebCore {
 
 SVGFitToViewBox::SVGFitToViewBox()
-    : m_viewBox(), m_preserveAspectRatio(new SVGPreserveAspectRatio()) {}
+    : m_viewBox(), m_preserveAspectRatio(SVGPreserveAspectRatio::create()) {}
 
 SVGFitToViewBox::~SVGFitToViewBox() {}
 

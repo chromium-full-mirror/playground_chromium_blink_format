@@ -33,11 +33,16 @@ class SVGElement;
 
 class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
  public:
-  SVGPathSegList(const QualifiedName&);
+  static PassRefPtr<SVGPathSegList> create(const QualifiedName& attributeName) {
+    return adoptRef(new SVGPathSegList(attributeName));
+  }
   virtual ~SVGPathSegList();
 
   unsigned getPathSegAtLength(double);
   Path toPathData();
+
+ private:
+  SVGPathSegList(const QualifiedName&);
 };
 
 }  // namespace WebCore

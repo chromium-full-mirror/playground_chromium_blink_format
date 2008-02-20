@@ -46,7 +46,7 @@ SVGGradientElement::SVGGradientElement(const QualifiedName& tagName,
       m_spreadMethod(0),
       m_gradientUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
       m_gradientTransform(
-          new SVGTransformList(SVGNames::gradientTransformAttr)) {}
+          SVGTransformList::create(SVGNames::gradientTransformAttr)) {}
 
 SVGGradientElement::~SVGGradientElement() {}
 
@@ -135,9 +135,9 @@ RenderObject* SVGGradientElement::createRenderer(RenderArena* arena,
 SVGResource* SVGGradientElement::canvasResource() {
   if (!m_resource) {
     if (gradientType() == LinearGradientPaintServer)
-      m_resource = new SVGPaintServerLinearGradient(this);
+      m_resource = SVGPaintServerLinearGradient::create(this);
     else
-      m_resource = new SVGPaintServerRadialGradient(this);
+      m_resource = SVGPaintServerRadialGradient::create(this);
   }
 
   return m_resource.get();

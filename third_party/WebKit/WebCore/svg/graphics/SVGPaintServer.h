@@ -67,7 +67,6 @@ class SVGPaintServerSolid;
 
 class SVGPaintServer : public SVGResource {
  public:
-  SVGPaintServer();
   virtual ~SVGPaintServer();
 
   virtual SVGResourceType resourceType() const {
@@ -111,6 +110,8 @@ class SVGPaintServer : public SVGResource {
 #if PLATFORM(QT)
   void setPenProperties(const RenderObject*, const RenderStyle*, QPen&) const;
 #endif
+ protected:
+  SVGPaintServer();
 };
 
 TextStream& operator<<(TextStream&, const SVGPaintServer&);

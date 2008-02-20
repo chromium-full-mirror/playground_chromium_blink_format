@@ -55,7 +55,7 @@ JSValue* JSSVGPointList::initialize(ExecState* exec, const List& args) {
   SVGList<RefPtr<SVGPODListItem<FloatPoint>>>* listImp = imp;
 
   SVGPODListItem<FloatPoint>* listItem =
-      listImp->initialize(new SVGPODListItem<FloatPoint>(newItem), ec).get();
+      listImp->initialize(SVGPODListItem<FloatPoint>::copy(newItem), ec).get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
       new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
           listItem, imp->associatedAttributeName());
@@ -107,7 +107,8 @@ JSValue* JSSVGPointList::insertItemBefore(ExecState* exec, const List& args) {
 
   SVGPODListItem<FloatPoint>* listItem =
       listImp
-          ->insertItemBefore(new SVGPODListItem<FloatPoint>(newItem), index, ec)
+          ->insertItemBefore(SVGPODListItem<FloatPoint>::copy(newItem), index,
+                             ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
       new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
@@ -136,7 +137,7 @@ JSValue* JSSVGPointList::replaceItem(ExecState* exec, const List& args) {
   SVGList<RefPtr<SVGPODListItem<FloatPoint>>>* listImp = imp;
 
   SVGPODListItem<FloatPoint>* listItem =
-      listImp->replaceItem(new SVGPODListItem<FloatPoint>(newItem), index, ec)
+      listImp->replaceItem(SVGPODListItem<FloatPoint>::copy(newItem), index, ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
       new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
@@ -183,7 +184,7 @@ JSValue* JSSVGPointList::appendItem(ExecState* exec, const List& args) {
   SVGList<RefPtr<SVGPODListItem<FloatPoint>>>* listImp = imp;
 
   SVGPODListItem<FloatPoint>* listItem =
-      listImp->appendItem(new SVGPODListItem<FloatPoint>(newItem), ec).get();
+      listImp->appendItem(SVGPODListItem<FloatPoint>::copy(newItem), ec).get();
   JSSVGPODTypeWrapperCreatorForList<FloatPoint>* obj =
       new JSSVGPODTypeWrapperCreatorForList<FloatPoint>(
           listItem, imp->associatedAttributeName());

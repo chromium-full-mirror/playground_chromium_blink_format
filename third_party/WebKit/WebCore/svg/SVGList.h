@@ -28,6 +28,7 @@
 #include "SVGListTraits.h"
 
 #include <wtf/RefCounted.h>
+#include <wtf/PassRefPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -47,11 +48,7 @@ class SVGList : public RefCounted<SVGList<Item>> {
   typedef SVGListTypeOperations<Item> TypeOperations;
 
  public:
-  SVGList(const QualifiedName& attributeName)
-      : RefCounted<SVGList<Item>>(0),
-        m_associatedAttributeName(attributeName) {}
-
-  virtual ~SVGList() { m_vector.clear(); }
+  virtual ~SVGList() {}
 
   const QualifiedName& associatedAttributeName() const {
     return m_associatedAttributeName;
@@ -124,6 +121,10 @@ class SVGList : public RefCounted<SVGList<Item>> {
     return newItem;
   }
 
+ protected:
+  SVGList(const QualifiedName& attributeName)
+      : m_associatedAttributeName(attributeName) {}
+
  private:
   Vector<Item> m_vector;
   const QualifiedName& m_associatedAttributeName;
@@ -132,9 +133,12 @@ class SVGList : public RefCounted<SVGList<Item>> {
 template <typename Item>
 class SVGPODListItem : public RefCounted<SVGPODListItem<Item>> {
  public:
-  SVGPODListItem() : RefCounted<SVGPODListItem<Item>>(0), m_item() {}
-  SVGPODListItem(const Item& item)
-      : RefCounted<SVGPODListItem<Item>>(0), m_item(item) {}
+  static PassRefPtr<SVGPODListItem> create() {
+    return adoptRef(new SVGPODListItem);
+  }
+  static PassRefPtr<SVGPODListItem> copy(const Item& item) {
+    return adoptRef(new SVGPODListItem(item));
+  }
 
   operator Item&() { return m_item; }
   operator const Item&() const { return m_item; }
@@ -144,18 +148,19 @@ class SVGPODListItem : public RefCounted<SVGPODListItem<Item>> {
   void setValue(Item newItem) { m_item = newItem; }
 
  private:
+  SVGPODListItem() : m_item() {}
+  SVGPODListItem(const Item& item)
+      : RefCounted<SVGPODListItem<Item>>(), m_item(item) {}
+
   Item m_item;
 };
 
 template <typename Item>
 class SVGPODList : public SVGList<RefPtr<SVGPODListItem<Item>>> {
  public:
-  SVGPODList(const QualifiedName& attributeName)
-      : SVGList<RefPtr<SVGPODListItem<Item>>>(attributeName) {}
-
   Item initialize(Item newItem, ExceptionCode& ec) {
     SVGPODListItem<Item>* ptr(SVGList<RefPtr<SVGPODListItem<Item>>>::initialize(
-                                  new SVGPODListItem<Item>(newItem), ec)
+                                  SVGPODListItem<Item>::copy(newItem), ec)
                                   .get());
     if (!ptr)
       return Item();
@@ -202,7 +207,7 @@ class SVGPODList : public SVGList<RefPtr<SVGPODListItem<Item>>> {
   Item insertItemBefore(Item newItem, unsigned int index, ExceptionCode& ec) {
     SVGPODListItem<Item>* ptr(
         SVGList<RefPtr<SVGPODListItem<Item>>>::insertItemBefore(
-            new SVGPODListItem<Item>(newItem), index, ec)
+            SVGPODListItem<Item>::copy(newItem), index, ec)
             .get());
     if (!ptr)
       return Item();
@@ -213,7 +218,7 @@ class SVGPODList : public SVGList<RefPtr<SVGPODListItem<Item>>> {
   Item replaceItem(Item newItem, unsigned int index, ExceptionCode& ec) {
     SVGPODListItem<Item>* ptr(
         SVGList<RefPtr<SVGPODListItem<Item>>>::replaceItem(
-            new SVGPODListItem<Item>(newItem), index, ec)
+            SVGPODListItem<Item>::copy(newItem), index, ec)
             .get());
     if (!ptr)
       return Item();
@@ -232,13 +237,17 @@ class SVGPODList : public SVGList<RefPtr<SVGPODListItem<Item>>> {
 
   Item appendItem(Item newItem, ExceptionCode& ec) {
     SVGPODListItem<Item>* ptr(SVGList<RefPtr<SVGPODListItem<Item>>>::appendItem(
-                                  new SVGPODListItem<Item>(newItem), ec)
+                                  SVGPODListItem<Item>::copy(newItem), ec)
                                   .get());
     if (!ptr)
       return Item();
 
     return static_cast<const Item&>(*ptr);
   }
+
+ protected:
+  SVGPODList(const QualifiedName& attributeName)
+      : SVGList<RefPtr<SVGPODListItem<Item>>>(attributeName) {}
 };
 
 }  // namespace WebCore

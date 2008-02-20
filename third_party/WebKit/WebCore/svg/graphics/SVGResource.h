@@ -66,7 +66,6 @@ enum SVGResourceType {
 
 class SVGResource : public RefCounted<SVGResource> {
  public:
-  SVGResource();
   virtual ~SVGResource();
 
   virtual void invalidate();
@@ -86,6 +85,9 @@ class SVGResource : public RefCounted<SVGResource> {
 
   static void invalidateClients(HashSet<SVGStyledElement*>);
   static void removeClient(SVGStyledElement*);
+
+ protected:
+  SVGResource();
 
  private:
   HashSet<SVGStyledElement*> m_clients;

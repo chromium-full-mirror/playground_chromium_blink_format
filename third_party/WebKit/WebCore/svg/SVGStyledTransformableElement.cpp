@@ -40,7 +40,7 @@ SVGStyledTransformableElement::SVGStyledTransformableElement(
     Document* doc)
     : SVGStyledLocatableElement(tagName, doc),
       SVGTransformable(),
-      m_transform(new SVGTransformList(SVGNames::transformAttr)) {}
+      m_transform(SVGTransformList::create(SVGNames::transformAttr)) {}
 
 SVGStyledTransformableElement::~SVGStyledTransformableElement() {}
 

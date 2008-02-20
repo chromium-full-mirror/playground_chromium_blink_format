@@ -38,7 +38,9 @@ class RenderSVGViewportContainer;
 
 class SVGResourceMarker : public SVGResource {
  public:
-  SVGResourceMarker();
+  static PassRefPtr<SVGResourceMarker> create() {
+    return adoptRef(new SVGResourceMarker);
+  }
   virtual ~SVGResourceMarker();
 
   void setMarker(RenderSVGViewportContainer*);
@@ -68,6 +70,7 @@ class SVGResourceMarker : public SVGResource {
   virtual TextStream& externalRepresentation(TextStream&) const;
 
  private:
+  SVGResourceMarker();
   double m_refX, m_refY;
   FloatRect m_cachedBounds;
   float m_angle;

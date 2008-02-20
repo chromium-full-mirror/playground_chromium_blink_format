@@ -63,7 +63,9 @@ class GraphicsContext;
 
 class SVGResourceClipper : public SVGResource {
  public:
-  SVGResourceClipper();
+  static PassRefPtr<SVGResourceClipper> create() {
+    return adoptRef(new SVGResourceClipper);
+  }
   virtual ~SVGResourceClipper();
 
   void resetClipData();
@@ -78,6 +80,7 @@ class SVGResourceClipper : public SVGResource {
   void applyClip(GraphicsContext*, const FloatRect& boundingBox) const;
 
  private:
+  SVGResourceClipper();
   ClipDataList m_clipData;
 };
 

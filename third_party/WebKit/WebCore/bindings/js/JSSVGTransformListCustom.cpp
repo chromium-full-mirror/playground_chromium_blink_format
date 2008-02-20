@@ -55,7 +55,8 @@ JSValue* JSSVGTransformList::initialize(ExecState* exec, const List& args) {
   SVGList<RefPtr<SVGPODListItem<SVGTransform>>>* listImp = imp;
 
   SVGPODListItem<SVGTransform>* listItem =
-      listImp->initialize(new SVGPODListItem<SVGTransform>(newItem), ec).get();
+      listImp->initialize(SVGPODListItem<SVGTransform>::copy(newItem), ec)
+          .get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
       new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
           listItem, imp->associatedAttributeName());
@@ -108,7 +109,7 @@ JSValue* JSSVGTransformList::insertItemBefore(ExecState* exec,
 
   SVGPODListItem<SVGTransform>* listItem =
       listImp
-          ->insertItemBefore(new SVGPODListItem<SVGTransform>(newItem), index,
+          ->insertItemBefore(SVGPODListItem<SVGTransform>::copy(newItem), index,
                              ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
@@ -138,7 +139,8 @@ JSValue* JSSVGTransformList::replaceItem(ExecState* exec, const List& args) {
   SVGList<RefPtr<SVGPODListItem<SVGTransform>>>* listImp = imp;
 
   SVGPODListItem<SVGTransform>* listItem =
-      listImp->replaceItem(new SVGPODListItem<SVGTransform>(newItem), index, ec)
+      listImp
+          ->replaceItem(SVGPODListItem<SVGTransform>::copy(newItem), index, ec)
           .get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
       new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
@@ -185,7 +187,8 @@ JSValue* JSSVGTransformList::appendItem(ExecState* exec, const List& args) {
   SVGList<RefPtr<SVGPODListItem<SVGTransform>>>* listImp = imp;
 
   SVGPODListItem<SVGTransform>* listItem =
-      listImp->appendItem(new SVGPODListItem<SVGTransform>(newItem), ec).get();
+      listImp->appendItem(SVGPODListItem<SVGTransform>::copy(newItem), ec)
+          .get();
   JSSVGPODTypeWrapperCreatorForList<SVGTransform>* obj =
       new JSSVGPODTypeWrapperCreatorForList<SVGTransform>(
           listItem, imp->associatedAttributeName());

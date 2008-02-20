@@ -37,6 +37,10 @@ class SVGStyledElement;
 
 class SVGPreserveAspectRatio : public RefCounted<SVGPreserveAspectRatio> {
  public:
+  static PassRefPtr<SVGPreserveAspectRatio> create() {
+    return adoptRef(new SVGPreserveAspectRatio);
+  }
+
   enum SVGPreserveAspectRatioType {
     SVG_PRESERVEASPECTRATIO_UNKNOWN = 0,
     SVG_PRESERVEASPECTRATIO_NONE = 1,
@@ -57,7 +61,6 @@ class SVGPreserveAspectRatio : public RefCounted<SVGPreserveAspectRatio> {
     SVG_MEETORSLICE_SLICE = 2
   };
 
-  SVGPreserveAspectRatio();
   virtual ~SVGPreserveAspectRatio();
 
   void setAlign(unsigned short);
@@ -84,7 +87,9 @@ class SVGPreserveAspectRatio : public RefCounted<SVGPreserveAspectRatio> {
     return SVGNames::preserveAspectRatioAttr;
   }
 
- protected:
+ private:
+  SVGPreserveAspectRatio();
+
   unsigned short m_align;
   unsigned short m_meetOrSlice;
 };
