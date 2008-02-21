@@ -1824,6 +1824,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             if (lineWasTooWide || w + tmpW > width) {
               if (lBreak.obj && shouldPreserveNewline(lBreak.obj) &&
                   lBreak.obj->isText() &&
+                  !static_cast<RenderText*>(lBreak.obj)->isWordBreak() &&
                   static_cast<RenderText*>(lBreak.obj)
                           ->characters()[lBreak.pos] == '\n') {
                 if (!stoppedIgnoringSpaces && pos > 0) {
