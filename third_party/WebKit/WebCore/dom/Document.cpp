@@ -1241,7 +1241,6 @@ void Document::attach() {
         this, userStyleSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
         !inCompatMode(), matchAuthorAndUserStyles);
     m_styleSelector->setEncodedURL(m_url);
-    m_didCalculateStyleSelector = true;
   }
 
   recalcStyle(Force);
