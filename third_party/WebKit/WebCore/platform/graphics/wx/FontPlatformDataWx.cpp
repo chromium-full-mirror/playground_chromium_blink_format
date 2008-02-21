@@ -82,12 +82,12 @@ FontPlatformData::FontPlatformData(const FontDescription& desc,
       wxFont(wxSize(0, -desc.computedPixelSize()),
              fontFamilyToWxFontFamily(desc.genericFamily()),
              italicToWxFontStyle(desc.italic()),
-             fontWeightToWxFontWeight(desc.bold()), false, family.domString());
+             fontWeightToWxFontWeight(desc.bold()), false, family.string());
 #else
   m_font = wxFont(
       desc.computedPixelSize(), fontFamilyToWxFontFamily(desc.genericFamily()),
       italicToWxFontStyle(desc.italic()), fontWeightToWxFontWeight(desc.bold()),
-      false, family.domString());
+      false, family.string());
 #endif
   m_fontState = VALID;
   m_fontHash = computeHash();
