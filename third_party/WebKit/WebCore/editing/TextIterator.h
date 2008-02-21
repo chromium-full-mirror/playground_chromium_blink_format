@@ -26,7 +26,6 @@
 #ifndef TextIterator_h
 #define TextIterator_h
 
-#include "DeprecatedString.h"
 #include "InlineTextBox.h"
 #include "Range.h"
 #include <wtf/Vector.h>
@@ -35,8 +34,8 @@ namespace WebCore {
 
 // FIXME: Can't really answer this question correctly without knowing the
 // white-space mode.
-// FIXME: Move this along with the white-space position functions above
-// somewhere else in the editing directory. It doesn't belong here.
+// FIXME: Move this somewhere else in the editing directory. It doesn't belong
+// here.
 inline bool isCollapsibleWhitespace(UChar c) {
   switch (c) {
     case ' ':
@@ -229,7 +228,7 @@ class CharacterIterator {
   const UChar* characters() const {
     return m_textIterator.characters() + m_runOffset;
   }
-  DeprecatedString string(int numChars);
+  String string(int numChars);
 
   int characterOffset() const { return m_offset; }
   PassRefPtr<Range> range() const;
@@ -266,7 +265,7 @@ class WordAwareIterator {
   int m_previousLength;
 
   // many chunks from textIterator concatenated
-  DeprecatedString m_buffer;
+  Vector<UChar> m_buffer;
 
   // Did we have to look ahead in the textIterator to confirm the current chunk?
   bool m_didLookAhead;
