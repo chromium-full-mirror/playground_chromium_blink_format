@@ -2175,7 +2175,7 @@ void Document::recalcStyleSelector() {
           if (!enabledViaScript && !title.isEmpty() &&
               m_preferredStylesheetSet.isEmpty()) {
             const AtomicString& rel = e->getAttribute(relAttr);
-            if (!rel.domString().contains("alternate")) {
+            if (!rel.contains("alternate")) {
               m_preferredStylesheetSet = title;
               m_selectedStylesheetSet = title;
             }
@@ -2591,7 +2591,7 @@ void Document::setHTMLWindowEventListener(const AtomicString& eventType,
                                           Attribute* attr) {
   setHTMLWindowEventListener(
       eventType,
-      createHTMLEventListener(attr->localName().domString(), attr->value(), 0));
+      createHTMLEventListener(attr->localName().string(), attr->value(), 0));
 }
 
 void Document::dispatchImageLoadEventSoon(HTMLImageLoader* image) {
@@ -3575,8 +3575,8 @@ Vector<String> Document::formElementsState() const {
     HTMLFormControlElementWithState* e = *it;
     String value;
     if (e->saveState(value)) {
-      stateVector.append(e->name().domString());
-      stateVector.append(e->type().domString());
+      stateVector.append(e->name().string());
+      stateVector.append(e->type().string());
       stateVector.append(value);
     }
   }

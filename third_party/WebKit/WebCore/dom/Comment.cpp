@@ -36,7 +36,7 @@ Comment::Comment(Document* doc) : CharacterData(doc) {}
 Comment::~Comment() {}
 
 String Comment::nodeName() const {
-  return commentAtom.domString();
+  return commentAtom.string();
 }
 
 Node::NodeType Comment::nodeType() const {

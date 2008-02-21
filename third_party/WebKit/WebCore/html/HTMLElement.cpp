@@ -62,7 +62,7 @@ String HTMLElement::nodeName() const {
   // chars that does not have to copy
   // the string on a hit in the hash.
   if (document()->isHTMLDocument())
-    return tagQName().localName().domString().upper();
+    return tagQName().localName().string().upper();
   return Element::nodeName();
 }
 
@@ -885,8 +885,8 @@ bool HTMLElement::checkDTD(const Node* newChild) {
 void HTMLElement::setHTMLEventListener(const AtomicString& eventType,
                                        Attribute* attr) {
   Element::setHTMLEventListener(
-      eventType, document()->createHTMLEventListener(
-                     attr->localName().domString(), attr->value(), this));
+      eventType, document()->createHTMLEventListener(attr->localName().string(),
+                                                     attr->value(), this));
 }
 
 bool HTMLElement::rendererIsNeeded(RenderStyle* style) {

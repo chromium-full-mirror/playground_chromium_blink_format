@@ -314,7 +314,7 @@ Value FunLocalName::evaluate() const {
   if (!node)
     node = evaluationContext().node.get();
 
-  return node->localName().domString();
+  return node->localName().string();
 }
 
 Value FunNamespaceURI::evaluate() const {
@@ -332,7 +332,7 @@ Value FunNamespaceURI::evaluate() const {
   if (!node)
     node = evaluationContext().node.get();
 
-  return node->namespaceURI().domString();
+  return node->namespaceURI().string();
 }
 
 Value FunName::evaluate() const {
@@ -351,7 +351,7 @@ Value FunName::evaluate() const {
     node = evaluationContext().node.get();
 
   const AtomicString& prefix = node->prefix();
-  return prefix.isEmpty() ? node->localName().domString()
+  return prefix.isEmpty() ? node->localName().string()
                           : prefix + ":" + node->localName();
 }
 

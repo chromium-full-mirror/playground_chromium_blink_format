@@ -433,7 +433,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSS_PROP_FONT_FAMILY:
       // FIXME: This only returns the first family.
       return new CSSPrimitiveValue(
-          style->fontDescription().family().family().domString(),
+          style->fontDescription().family().family().string(),
           CSSPrimitiveValue::CSS_STRING);
     case CSS_PROP_FONT_SIZE:
       return new CSSPrimitiveValue(style->fontDescription().computedPixelSize(),

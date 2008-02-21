@@ -231,7 +231,7 @@ void SVGSVGElement::addSVGWindowEventListener(const AtomicString& eventType,
   // Once we propertly support SVGLoad, etc.
   RefPtr<EventListener> listener =
       document()->accessSVGExtensions()->createSVGEventListener(
-          attr->localName().domString(), attr->value(), this);
+          attr->localName().string(), attr->value(), this);
   document()->setHTMLWindowEventListener(eventType, listener.release());
 }
 

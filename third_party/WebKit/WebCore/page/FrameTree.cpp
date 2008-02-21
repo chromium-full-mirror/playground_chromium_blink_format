@@ -131,7 +131,7 @@ AtomicString FrameTree::uniqueChildName(
   String name;
   name += framePathPrefix;
   if (frame)
-    name += frame->tree()->name().domString().substring(
+    name += frame->tree()->name().string().substring(
         framePathPrefixLength, frame->tree()->name().length() -
                                    framePathPrefixLength -
                                    framePathSuffixLength);
