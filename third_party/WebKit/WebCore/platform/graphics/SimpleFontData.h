@@ -1,7 +1,7 @@
 /*
  * This file is part of the internal font implementation.
  *
- * Copyright (C) 2006 Apple Computer, Inc.
+ * Copyright (C) 2006, 2008 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -35,6 +35,10 @@ typedef struct OpaqueATSUStyle* ATSUStyle;
 
 #if PLATFORM(WIN)
 #include <usp10.h>
+#endif
+
+#if PLATFORM(CAIRO)
+#include <cairo.h>
 #endif
 
 namespace WebCore {
@@ -111,7 +115,7 @@ class SimpleFontData : public FontData {
   static bool shouldApplyMacAscentHack();
 #endif
 
-#if PLATFORM(GTK)
+#if PLATFORM(CAIRO)
   void setFont(cairo_t*) const;
 #endif
 
@@ -124,6 +128,12 @@ class SimpleFontData : public FontData {
   void platformDestroy();
 
   void commonInit();
+
+#if PLATFORM(WIN)
+  void initGDIFont();
+  void platformCommonDestroy();
+  float widthForGDIGlyph(Glyph glyph) const;
+#endif
 
  public:
   int m_ascent;

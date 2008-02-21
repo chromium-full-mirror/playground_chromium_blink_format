@@ -39,7 +39,7 @@ struct FontCustomPlatformData : Noncopyable {
   CGFontRef m_cgFont;
 };
 
-FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer);
+FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer*);
 }
 
 #endif

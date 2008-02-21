@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,15 +35,19 @@
 #include "UnicodeRange.h"
 #include <windows.h>
 #include <mlang.h>
+#if PLATFORM(CG)
 #include <ApplicationServices/ApplicationServices.h>
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
+#endif
 
 using std::min;
 
 namespace WebCore {
 
 void FontCache::platformInit() {
+#if PLATFORM(CG)
   wkSetUpFontCache(1536 * 1024 * 4);  // This size matches Mac.
+#endif
 }
 
 IMLangFontLink2* FontCache::getFontLinkInterface() {
@@ -463,7 +467,14 @@ FontPlatformData* FontCache::createFontPlatformData(
   FontPlatformData* result = new FontPlatformData(
       hfont, fontDescription.computedPixelSize(), fontDescription.bold(),
       fontDescription.italic(), useGDI);
-  if (!result->cgFont()) {
+
+#if PLATFORM(CG)
+  bool fontCreationFailed = !result->cgFont();
+#elif PLATFORM(CAIRO)
+  bool fontCreationFailed = !result->fontFace();
+#endif
+
+  if (fontCreationFailed) {
     // The creation of the CGFontRef failed for some reason.  We already
     // asserted in debug builds, but to make
     // absolutely sure that we don't use this font, go ahead and return 0 so
