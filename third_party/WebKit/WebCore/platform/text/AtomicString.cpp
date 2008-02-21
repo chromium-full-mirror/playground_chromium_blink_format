@@ -69,12 +69,16 @@ bool operator==(const AtomicString& a, const char* b) {
   return CStringTranslator::equal(impl, b);
 }
 
-StringImpl* AtomicString::add(const char* c) {
+PassRefPtr<StringImpl> AtomicString::add(const char* c) {
   if (!c)
     return 0;
   if (!*c)
     return StringImpl::empty();
-  return *stringTable->add<const char*, CStringTranslator>(c).first;
+  pair<HashSet<StringImpl*>::iterator, bool> addResult =
+      stringTable->add<const char*, CStringTranslator>(c);
+  if (!addResult.second)
+    return *addResult.first;
+  return adoptRef(*addResult.first);
 }
 
 struct UCharBuffer {
@@ -130,7 +134,7 @@ struct UCharBufferTranslator {
   }
 };
 
-StringImpl* AtomicString::add(const UChar* s, int length) {
+PassRefPtr<StringImpl> AtomicString::add(const UChar* s, int length) {
   if (!s)
     return 0;
 
@@ -138,10 +142,14 @@ StringImpl* AtomicString::add(const UChar* s, int length) {
     return StringImpl::empty();
 
   UCharBuffer buf = {s, length};
-  return *stringTable->add<UCharBuffer, UCharBufferTranslator>(buf).first;
+  pair<HashSet<StringImpl*>::iterator, bool> addResult =
+      stringTable->add<UCharBuffer, UCharBufferTranslator>(buf);
+  if (!addResult.second)
+    return *addResult.first;
+  return adoptRef(*addResult.first);
 }
 
-StringImpl* AtomicString::add(const UChar* s) {
+PassRefPtr<StringImpl> AtomicString::add(const UChar* s) {
   if (!s)
     return 0;
 
@@ -153,10 +161,14 @@ StringImpl* AtomicString::add(const UChar* s) {
     return StringImpl::empty();
 
   UCharBuffer buf = {s, length};
-  return *stringTable->add<UCharBuffer, UCharBufferTranslator>(buf).first;
+  pair<HashSet<StringImpl*>::iterator, bool> addResult =
+      stringTable->add<UCharBuffer, UCharBufferTranslator>(buf);
+  if (!addResult.second)
+    return *addResult.first;
+  return adoptRef(*addResult.first);
 }
 
-StringImpl* AtomicString::add(StringImpl* r) {
+PassRefPtr<StringImpl> AtomicString::add(StringImpl* r) {
   if (!r || r->m_inTable)
     return r;
 
@@ -173,11 +185,11 @@ void AtomicString::remove(StringImpl* r) {
   stringTable->remove(r);
 }
 
-StringImpl* AtomicString::add(const KJS::Identifier& str) {
+PassRefPtr<StringImpl> AtomicString::add(const KJS::Identifier& str) {
   return add(reinterpret_cast<const UChar*>(str.data()), str.size());
 }
 
-StringImpl* AtomicString::add(const KJS::UString& str) {
+PassRefPtr<StringImpl> AtomicString::add(const KJS::UString& str) {
   return add(reinterpret_cast<const UChar*>(str.data()), str.size());
 }
 
