@@ -265,8 +265,8 @@ static inline RenderObject* bidiNext(RenderBlock* block,
     if (!next)
       break;
 
-    if (next->isText() || next->isBR() || next->isFloating() ||
-        next->isReplaced() || next->isPositioned() ||
+    if (next->isText() || next->isFloating() || next->isReplaced() ||
+        next->isPositioned() ||
         ((!skipInlines || !next->firstChild())  // Always return EMPTY inlines.
          && next->isInlineFlow()))
       break;
@@ -300,7 +300,7 @@ static RenderObject* bidiFirst(RenderBlock* block,
       return o;  // Never skip empty inlines.
   }
 
-  if (o && !o->isText() && !o->isBR() && !o->isReplaced() && !o->isFloating() &&
+  if (o && !o->isText() && !o->isReplaced() && !o->isFloating() &&
       !o->isPositioned())
     o = bidiNext(block, o, bidi, skipInlines);
   return o;
@@ -1420,8 +1420,7 @@ static bool shouldSkipWhitespaceAfterStartObject(RenderBlock* block,
     RenderText* nextText = static_cast<RenderText*>(next);
     UChar nextChar = nextText->characters()[0];
     if (nextText->style()->isCollapsibleWhiteSpace(nextChar)) {
-      BidiIterator endMid(0, o, 0);
-      addMidpoint(endMid);
+      addMidpoint(BidiIterator(0, o, 0));
       return true;
     }
   }
@@ -1610,10 +1609,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
         lBreak.pos = 0;
       }
 
-      if (ignoringSpaces) {
-        BidiIterator startMid(0, o, 0);
-        addMidpoint(startMid);
-      }
+      if (ignoringSpaces)
+        addMidpoint(BidiIterator(0, o, 0));
+
       isLineEmpty = false;
       ignoringSpaces = false;
       currentCharacterIsSpace = false;
@@ -1713,8 +1711,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             if (autoWrap)
               tmpW += t->width(pos, 1, f, w + tmpW);
 
-            BidiIterator startMid(0, o, pos + 1);
-            addMidpoint(startMid);
+            addMidpoint(BidiIterator(0, o, pos + 1));
           }
 
           pos++;
@@ -1751,8 +1748,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               lastSpaceWordSpacing = 0;
               lastSpace = pos;  // e.g., "Foo    goo", don't add in any of the
                                 // ignored spaces.
-              BidiIterator startMid(0, o, pos);
-              addMidpoint(startMid);
+              addMidpoint(BidiIterator(0, o, pos));
               stoppedIgnoringSpaces = true;
             } else {
               // Just keep ignoring these spaces.
@@ -1814,7 +1810,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                   // Separate the trailing space into its own box, which we will
                   // resize to fit on the line in
                   // computeHorizontalPositionsForLine().
-                  BidiIterator midpoint(0, o, pos);
                   addMidpoint(BidiIterator(0, o, pos - 1));  // Stop
                   addMidpoint(BidiIterator(0, o, pos));      // Start
                 }
@@ -1830,7 +1825,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                 if (!stoppedIgnoringSpaces && pos > 0) {
                   // We need to stop right before the newline and then start up
                   // again.
-                  BidiIterator midpoint(0, o, pos);
                   addMidpoint(BidiIterator(0, o, pos - 1));  // Stop
                   addMidpoint(BidiIterator(0, o, pos));      // Start
                 }
@@ -1852,7 +1846,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             if (!stoppedIgnoringSpaces && pos > 0) {
               // We need to stop right before the newline and then start up
               // again.
-              BidiIterator midpoint(0, o, pos);
               addMidpoint(BidiIterator(0, o, pos - 1));  // Stop
               addMidpoint(BidiIterator(0, o, pos));      // Start
             }
@@ -1908,8 +1901,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
           lastSpaceWordSpacing = applyWordSpacing ? wordSpacing : 0;
           lastSpace = pos;  // e.g., "Foo    goo", don't add in any of the
                             // ignored spaces.
-          BidiIterator startMid(0, o, pos);
-          addMidpoint(startMid);
+          addMidpoint(BidiIterator(0, o, pos));
         }
 
         if (currentCharacterIsSpace && !previousCharacterIsSpace) {
