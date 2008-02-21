@@ -106,8 +106,10 @@ struct QNameComponentsTranslator {
   static void translate(QualifiedName::QualifiedNameImpl*& location,
                         const QualifiedNameComponents& components,
                         unsigned hash) {
-    location = new QualifiedName::QualifiedNameImpl(
-        components.m_prefix, components.m_localName, components.m_namespace);
+    location =
+        QualifiedName::QualifiedNameImpl::create(
+            components.m_prefix, components.m_localName, components.m_namespace)
+            .releaseRef();
   }
 };
 
@@ -120,11 +122,12 @@ QualifiedName::QualifiedName(const AtomicString& p,
   if (!gNameCache)
     gNameCache = new QNameSet;
   QualifiedNameComponents components = {p.impl(), l.impl(), n.impl()};
-  m_impl =
-      *gNameCache
-           ->add<QualifiedNameComponents, QNameComponentsTranslator>(components)
-           .first;
-  ref();
+  pair<QNameSet::iterator, bool> addResult =
+      gNameCache->add<QualifiedNameComponents, QNameComponentsTranslator>(
+          components);
+  m_impl = *addResult.first;
+  if (!addResult.second)
+    m_impl->ref();
 }
 
 QualifiedName::~QualifiedName() {
