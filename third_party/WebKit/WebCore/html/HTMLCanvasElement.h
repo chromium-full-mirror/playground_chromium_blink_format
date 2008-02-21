@@ -85,7 +85,7 @@ class HTMLCanvasElement : public HTMLElement {
 #endif
 
  private:
-  void createDrawingContext() const;
+  void createImageBuffer() const;
   void reset();
 
   bool m_rendererIsCanvas;
@@ -96,9 +96,10 @@ class HTMLCanvasElement : public HTMLElement {
   // FIXME: Web Applications 1.0 describes a security feature where we track
   // if we ever drew any images outside the domain, so we can disable toDataURL.
 
-  mutable bool m_createdDrawingContext;
-  mutable OwnPtr<ImageBuffer> m_data;
-  mutable GraphicsContext* m_drawingContext;
+  // m_createdImageBuffer means we tried to malloc the buffer.  We didn't
+  // necessarily get it.
+  mutable bool m_createdImageBuffer;
+  mutable OwnPtr<ImageBuffer> m_imageBuffer;
 };
 
 }  // namespace

@@ -68,9 +68,7 @@ static const float maxCanvasArea =
 HTMLCanvasElement::HTMLCanvasElement(Document* doc)
     : HTMLElement(canvasTag, doc),
       m_size(defaultWidth, defaultHeight),
-      m_createdDrawingContext(false),
-      m_data(),
-      m_drawingContext(0) {}
+      m_createdImageBuffer(false) {}
 
 HTMLCanvasElement::~HTMLCanvasElement() {
   if (m_2DContext)
@@ -158,11 +156,9 @@ void HTMLCanvasElement::reset() {
   IntSize oldSize = m_size;
   m_size = IntSize(w, h);
 
-  bool hadDrawingContext = m_createdDrawingContext;
-  m_createdDrawingContext = false;
-  m_data.set(0);
-  delete m_drawingContext;
-  m_drawingContext = 0;
+  bool hadImageBuffer = m_createdImageBuffer;
+  m_createdImageBuffer = false;
+  m_imageBuffer.clear();
   if (m_2DContext)
     m_2DContext->reset();
 
@@ -170,7 +166,7 @@ void HTMLCanvasElement::reset() {
     if (m_rendererIsCanvas) {
       if (oldSize != m_size)
         static_cast<RenderHTMLCanvas*>(ro)->canvasSizeChanged();
-      if (hadDrawingContext)
+      if (hadImageBuffer)
         ro->repaint();
     }
 }
@@ -179,15 +175,15 @@ void HTMLCanvasElement::paint(GraphicsContext* p, const IntRect& r) {
   if (p->paintingDisabled())
     return;
 
-  if (m_data)
-    p->paintBuffer(m_data.get(), r);
+  if (m_imageBuffer)
+    p->paintBuffer(m_imageBuffer.get(), r);
 }
 
-void HTMLCanvasElement::createDrawingContext() const {
-  ASSERT(!m_createdDrawingContext);
-  ASSERT(!m_data);
+void HTMLCanvasElement::createImageBuffer() const {
+  ASSERT(!m_createdImageBuffer);
+  ASSERT(!m_imageBuffer);
 
-  m_createdDrawingContext = true;
+  m_createdImageBuffer = true;
 
   float unscaledWidth = width();
   float unscaledHeight = height();
@@ -202,7 +198,7 @@ void HTMLCanvasElement::createDrawingContext() const {
 
   IntSize size(static_cast<unsigned>(wf), static_cast<unsigned>(hf));
 
-  m_data.set(ImageBuffer::create(size, false).release());
+  m_imageBuffer.set(ImageBuffer::create(size, false).release());
 }
 
 GraphicsContext* HTMLCanvasElement::drawingContext() const {
@@ -210,9 +206,9 @@ GraphicsContext* HTMLCanvasElement::drawingContext() const {
 }
 
 ImageBuffer* HTMLCanvasElement::buffer() const {
-  if (!m_createdDrawingContext)
-    createDrawingContext();
-  return m_data.get();
+  if (!m_createdImageBuffer)
+    createImageBuffer();
+  return m_imageBuffer.get();
 }
 
 #if PLATFORM(CG)
@@ -234,24 +230,24 @@ CGImageRef HTMLCanvasElement::createPlatformImage() const {
 #elif PLATFORM(QT)
 
 QPixmap HTMLCanvasElement::createPlatformImage() const {
-  if (!m_data)
+  if (!m_imageBuffer)
     return QPixmap();
-  return *m_data->pixmap();
+  return *m_imageBuffer->pixmap();
 }
 
 #elif PLATFORM(CAIRO)
 
 cairo_surface_t* HTMLCanvasElement::createPlatformImage() const {
-  if (!m_data)
+  if (!m_imageBuffer)
     return 0;
 
   // Note that unlike CG, our returned image is not a copy or
   // copy-on-write, but the original. This is fine, since it is only
   // ever used as a source.
 
-  cairo_surface_flush(m_data->surface());
-  cairo_surface_reference(m_data->surface());
-  return m_data->surface();
+  cairo_surface_flush(m_imageBuffer->surface());
+  cairo_surface_reference(m_imageBuffer->surface());
+  return m_imageBuffer->surface();
 }
 
 #endif
