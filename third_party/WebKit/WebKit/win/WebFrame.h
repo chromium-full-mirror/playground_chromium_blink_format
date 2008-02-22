@@ -217,22 +217,6 @@ class WebFrame : public IWebFrame,
 
   virtual HRESULT STDMETHODCALLTYPE deselectAll();
 
-  // FrameWinClient
-  virtual void ref();
-  virtual void deref();
-
-  virtual PassRefPtr<WebCore::Frame> createFrame(
-      const WebCore::KURL&,
-      const WebCore::String& name,
-      WebCore::HTMLFrameOwnerElement*,
-      const WebCore::String& referrer);
-  virtual void openURL(const WebCore::String& URL,
-                       const WebCore::Event* triggeringEvent,
-                       bool newWindow,
-                       bool lockHistory);
-  virtual void windowScriptObjectAvailable(JSContextRef context,
-                                           JSObjectRef windowObject);
-
   // FrameLoaderClient
   virtual void frameLoaderDestroyed();
   virtual bool hasWebView() const;
@@ -457,6 +441,10 @@ class WebFrame : public IWebFrame,
   virtual void detachScriptDebugger();
 
  protected:
+  PassRefPtr<WebCore::Frame> createFrame(const WebCore::KURL&,
+                                         const WebCore::String& name,
+                                         WebCore::HTMLFrameOwnerElement*,
+                                         const WebCore::String& referrer);
   void loadHTMLString(BSTR string, BSTR baseURL, BSTR unreachableURL);
   void loadData(PassRefPtr<WebCore::SharedBuffer>,
                 BSTR mimeType,
