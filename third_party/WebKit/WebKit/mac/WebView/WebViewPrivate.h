@@ -86,7 +86,6 @@ typedef enum {
 @interface WebView (WebViewEditingActionsPendingPublic)
 
 - (void)outdent:(id)sender;
-- (void)pasteAndMatchStyle:(id)sender;
 
 @end
 
