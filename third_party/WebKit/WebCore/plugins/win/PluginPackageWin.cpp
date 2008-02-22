@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,10 +28,10 @@
 #include "config.h"
 #include "PluginPackage.h"
 
-#include "Timer.h"
-#include "DeprecatedString.h"
-#include "npruntime_impl.h"
 #include "PluginDebug.h"
+#include "Timer.h"
+#include "npruntime_impl.h"
+#include <wtf/OwnArrayPtr.h>
 
 namespace WebCore {
 
@@ -43,7 +43,6 @@ static String getVersionInfo(const LPVOID versionInfoData, const String& info) {
   LPVOID buffer;
   UINT bufferLength;
   String subInfo = "\\StringfileInfo\\040904E4\\" + info;
-
   bool retval = VerQueryValueW(
       versionInfoData,
       const_cast<UChar*>(subInfo.charactersWithNullTermination()), &buffer,
@@ -51,36 +50,8 @@ static String getVersionInfo(const LPVOID versionInfoData, const String& info) {
   if (!retval || bufferLength == 0)
     return String();
 
-  // Subtract 1 from the length; we don't want the trailing 0
+  // Subtract 1 from the length; we don't want the trailing null character.
   return String(reinterpret_cast<UChar*>(buffer), bufferLength - 1);
-}
-
-static Vector<String> splitString(const String& str,
-                                  char delimiter,
-                                  int padTo) {
-  int pos = 0;
-  int newPos;
-  Vector<String> result;
-  DeprecatedString ds = str.deprecatedString();
-  String s;
-  do {
-    newPos = ds.find(delimiter, pos);
-
-    if (newPos == -1)
-      s = ds.mid(pos);
-    else
-      s = ds.mid(pos, newPos - pos);
-
-    if (!s.isEmpty())
-      result.append(s);
-
-    pos = newPos + 1;
-  } while (newPos != -1);
-
-  while (padTo != -1 && static_cast<int>(result.size()) < padTo)
-    result.append("");
-
-  return result;
 }
 
 void PluginPackage::freeLibrarySoon() {
@@ -91,7 +62,7 @@ void PluginPackage::freeLibrarySoon() {
   m_freeLibraryTimer.startOneShot(0);
 }
 
-void PluginPackage::freeLibraryTimerFired(Timer<PluginPackage>* /*timer*/) {
+void PluginPackage::freeLibraryTimerFired(Timer<PluginPackage>*) {
   ASSERT(m_module);
   ASSERT(m_loadCount == 0);
 
@@ -126,13 +97,13 @@ int PluginPackage::compareFileVersion(unsigned compareVersionMS,
 }
 
 void PluginPackage::storeFileVersion(LPVOID versionInfoData) {
-  VS_FIXEDFILEINFO* info;
+  LPVOID info;
   UINT infoSize;
-  if (!VerQueryValue(versionInfoData, TEXT("\\"), (LPVOID*)&info, &infoSize) ||
+  if (!VerQueryValue(versionInfoData, TEXT("\\"), &info, &infoSize) ||
       infoSize < sizeof(VS_FIXEDFILEINFO))
     return;
-  m_fileVersionLS = info->dwFileVersionLS;
-  m_fileVersionMS = info->dwFileVersionMS;
+  m_fileVersionLS = static_cast<VS_FIXEDFILEINFO*>(info)->dwFileVersionLS;
+  m_fileVersionMS = static_cast<VS_FIXEDFILEINFO*>(info)->dwFileVersionMS;
 }
 
 bool PluginPackage::isPluginBlacklisted() {
@@ -159,58 +130,54 @@ bool PluginPackage::fetchInfo() {
   DWORD versionInfoSize, zeroHandle;
   versionInfoSize = GetFileVersionInfoSizeW(
       m_path.charactersWithNullTermination(), &zeroHandle);
-
   if (versionInfoSize == 0)
     return false;
 
-  LPVOID versionInfoData = fastMalloc(versionInfoSize);
+  OwnArrayPtr<char> versionInfoData(new char[versionInfoSize]);
 
   if (!GetFileVersionInfoW(m_path.charactersWithNullTermination(), 0,
-                           versionInfoSize, versionInfoData)) {
-    fastFree(versionInfoData);
+                           versionInfoSize, versionInfoData.get()))
     return false;
-  }
 
-  m_name = getVersionInfo(versionInfoData, "ProductName");
-  m_description = getVersionInfo(versionInfoData, "FileDescription");
-
-  if (m_name.isNull() || m_description.isNull()) {
-    fastFree(versionInfoData);
+  m_name = getVersionInfo(versionInfoData.get(), "ProductName");
+  m_description = getVersionInfo(versionInfoData.get(), "FileDescription");
+  if (m_name.isNull() || m_description.isNull())
     return false;
-  }
 
-  storeFileVersion(versionInfoData);
+  storeFileVersion(versionInfoData.get());
 
-  if (isPluginBlacklisted()) {
-    fastFree(versionInfoData);
+  if (isPluginBlacklisted())
     return false;
-  }
 
-  Vector<String> mimeTypes =
-      splitString(getVersionInfo(versionInfoData, "MIMEType"), '|', -1);
-  Vector<String> fileExtents = splitString(
-      getVersionInfo(versionInfoData, "FileExtents"), '|', mimeTypes.size());
-  Vector<String> descriptions = splitString(
-      getVersionInfo(versionInfoData, "FileOpenName"), '|', mimeTypes.size());
+  Vector<String> types;
+  getVersionInfo(versionInfoData.get(), "MIMEType").split('|', types);
+  Vector<String> extensionLists;
+  getVersionInfo(versionInfoData.get(), "FileExtents")
+      .split('|', extensionLists);
+  Vector<String> descriptions;
+  getVersionInfo(versionInfoData.get(), "FileOpenName")
+      .split('|', descriptions);
 
-  fastFree(versionInfoData);
+  for (unsigned i = 0; i < types.size(); i++) {
+    String type = types[i].lower();
+    String description = i < descriptions.size() ? descriptions[i] : "";
+    String extensionList = i < extensionLists.size() ? extensionLists[i] : "";
 
-  for (unsigned i = 0; i < mimeTypes.size(); i++) {
-    // Get rid of the extension list in the description string
-    String description = descriptions[i];
+    Vector<String> extensionsVector;
+    extensionList.split(',', extensionsVector);
+
+    // Get rid of the extension list that may be at the end of the description
+    // string.
     int pos = description.find("(*");
     if (pos != -1) {
-      // There might be a space that we need to get rid of
+      // There might be a space that we need to get rid of.
       if (pos > 1 && description[pos - 1] == ' ')
         pos--;
-
       description = description.left(pos);
     }
 
-    mimeTypes[i] = mimeTypes[i].lower();
-
-    m_mimeToExtensions.add(mimeTypes[i], splitString(fileExtents[i], ',', -1));
-    m_mimeToDescriptions.add(mimeTypes[i], description);
+    m_mimeToExtensions.add(type, extensionsVector);
+    m_mimeToDescriptions.add(type, description);
   }
 
   return true;
@@ -273,6 +240,7 @@ bool PluginPackage::load() {
   memset(&m_browserFuncs, 0, sizeof(m_browserFuncs));
   m_browserFuncs.size = sizeof(m_browserFuncs);
   m_browserFuncs.version = NP_VERSION_MINOR;
+
   m_browserFuncs.geturl = NPN_GetURL;
   m_browserFuncs.posturl = NPN_PostURL;
   m_browserFuncs.requestread = NPN_RequestRead;
@@ -326,6 +294,7 @@ bool PluginPackage::load() {
 
   m_loadCount++;
   return true;
+
 abort:
   unloadWithoutShutdown();
   return false;
@@ -378,11 +347,11 @@ PluginPackage* PluginPackage::createPackage(const String& path,
 }
 
 unsigned PluginPackage::hash() const {
-  unsigned hashCodes[3] = {m_description.impl()->hash(),
-                           m_lastModified.dwLowDateTime,
-                           m_lastModified.dwHighDateTime};
+  const unsigned hashCodes[3] = {m_description.impl()->hash(),
+                                 m_lastModified.dwLowDateTime,
+                                 m_lastModified.dwHighDateTime};
 
-  return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
+  return StringImpl::computeHash(reinterpret_cast<const UChar*>(hashCodes),
                                  3 * sizeof(unsigned) / sizeof(UChar));
 }
 
