@@ -81,8 +81,6 @@ MediaQueryExp::MediaQueryExp(const AtomicString& mediaFeature,
   }
 }
 
-MediaQueryExp::~MediaQueryExp() {
-  delete m_value;
-}
+MediaQueryExp::~MediaQueryExp() {}
 
 }  // namespace
