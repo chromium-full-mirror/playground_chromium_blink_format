@@ -243,7 +243,8 @@ class WebFrame::WebFramePrivate {
 // WebFrame ----------------------------------------------------------------
 
 WebFrame::WebFrame()
-    : m_refCount(0),
+    : WebFrameLoaderClient(this),
+      m_refCount(0),
       d(new WebFrame::WebFramePrivate),
       m_quickRedirectComing(false),
       m_inPrintingMode(false),
@@ -1177,10 +1178,6 @@ WebHistory* WebFrame::webHistory() {
     return 0;
 
   return webHistory;
-}
-
-bool WebFrame::hasWebView() const {
-  return !!d->webView;
 }
 
 bool WebFrame::hasFrameView() const {
@@ -2662,4 +2659,8 @@ void WebFrame::unmarkAllBadGrammar() {
 
     doc->removeMarkers(DocumentMarker::Grammar);
   }
+}
+
+WebView* WebFrame::webView() const {
+  return d->webView;
 }

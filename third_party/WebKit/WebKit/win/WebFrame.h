@@ -220,7 +220,6 @@ class WebFrame : public IWebFrame,
 
   // FrameLoaderClient
   virtual void frameLoaderDestroyed();
-  virtual bool hasWebView() const;
   virtual bool hasFrameView() const;
   virtual void makeRepresentation(WebCore::DocumentLoader*);
   virtual void forceLayout();
@@ -437,6 +436,8 @@ class WebFrame : public IWebFrame,
 
   virtual void attachScriptDebugger();
   virtual void detachScriptDebugger();
+
+  WebView* webView() const;
 
  protected:
   PassRefPtr<WebCore::Frame> createFrame(const WebCore::KURL&,
