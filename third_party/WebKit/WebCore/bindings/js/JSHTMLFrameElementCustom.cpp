@@ -29,6 +29,7 @@
 #include "config.h"
 #include "JSHTMLFrameElement.h"
 
+#include "CSSHelper.h"
 #include "HTMLFrameElement.h"
 
 using namespace KJS;
@@ -38,7 +39,7 @@ namespace WebCore {
 static inline bool allowSettingJavascriptURL(ExecState* exec,
                                              HTMLFrameElement* imp,
                                              const String& value) {
-  if (protocolIs(value, "javascript")) {
+  if (protocolIs(parseURL(value), "javascript")) {
     if (!checkNodeSecurity(exec, imp->contentDocument()))
       return false;
   }

@@ -29,6 +29,7 @@
 #include "config.h"
 #include "JSAttr.h"
 
+#include "CSSHelper.h"
 #include "HTMLFrameElementBase.h"
 #include "HTMLNames.h"
 
@@ -46,7 +47,7 @@ void JSAttr::setValue(ExecState* exec, JSValue* value) {
   if (ownerElement && (ownerElement->hasTagName(iframeTag) ||
                        ownerElement->hasTagName(frameTag))) {
     if (equalIgnoringCase(imp->name(), "src") &&
-        protocolIs(attrValue, "javascript")) {
+        protocolIs(parseURL(attrValue), "javascript")) {
       if (!checkNodeSecurity(exec,
                              static_cast<HTMLFrameElementBase*>(ownerElement)
                                  ->contentDocument()))
