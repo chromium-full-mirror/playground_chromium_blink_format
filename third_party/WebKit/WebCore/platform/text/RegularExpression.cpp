@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,6 +26,7 @@
 #include "config.h"
 #include "RegularExpression.h"
 
+#include "PlatformString.h"
 #include "Logging.h"
 #include <wtf/RefCounted.h>
 #include <pcre/pcre.h>
@@ -36,19 +37,18 @@ namespace WebCore {
 const size_t maxSubstrings = 10;
 const size_t maxOffsets = 3 * maxSubstrings;
 
-class RegularExpression::Private
-    : public RefCounted<RegularExpression::Private> {
+class RegularExpression::Private : public RefCounted<Private> {
  public:
   Private();
-  Private(DeprecatedString pattern, bool caseSensitive, bool glob);
+  Private(const String& pattern, bool caseSensitive);
   ~Private();
 
-  void compile(bool caseSensitive, bool glob);
+  void compile(bool caseSensitive);
 
-  DeprecatedString pattern;
+  String pattern;
   JSRegExp* regex;
 
-  DeprecatedString lastMatchString;
+  String lastMatchString;
   int lastMatchOffsets[maxOffsets];
   int lastMatchCount;
   int lastMatchPos;
@@ -56,58 +56,21 @@ class RegularExpression::Private
 };
 
 RegularExpression::Private::Private() : RefCounted<Private>(0), pattern("") {
-  compile(true, false);
+  compile(true);
 }
 
-RegularExpression::Private::Private(DeprecatedString p,
-                                    bool caseSensitive,
-                                    bool glob)
+RegularExpression::Private::Private(const String& p, bool caseSensitive)
     : RefCounted<Private>(0),
       pattern(p),
       lastMatchPos(-1),
       lastMatchLength(-1) {
-  compile(caseSensitive, glob);
+  compile(caseSensitive);
 }
 
-static DeprecatedString RegExpFromGlob(DeprecatedString glob) {
-  DeprecatedString result = glob;
-
-  // escape regexp metacharacters which are NOT glob metacharacters
-
-  result.replace(RegularExpression("\\\\"), "\\\\");
-  result.replace(RegularExpression("\\."), "\\.");
-  result.replace(RegularExpression("\\+"), "\\+");
-  result.replace(RegularExpression("\\$"), "\\$");
-  // FIXME: incorrect for ^ inside bracket group
-  result.replace(RegularExpression("\\^"), "\\^");
-
-  // translate glob metacharacters into regexp metacharacters
-  result.replace(RegularExpression("\\*"), ".*");
-  result.replace(RegularExpression("\\?"), ".");
-
-  // Require the glob to match the whole string
-  result = "^" + result + "$";
-
-  return result;
-}
-
-void RegularExpression::Private::compile(bool caseSensitive, bool glob) {
-  DeprecatedString p;
-
-  if (glob) {
-    p = RegExpFromGlob(pattern);
-  } else {
-    p = pattern;
-  }
-  // Note we don't honor the Qt syntax for various character classes.  If we
-  // convert
-  // to a different underlying engine, we may need to change client code that
-  // relies
-  // on the regex syntax (see FrameMac.mm for a couple examples).
-
+void RegularExpression::Private::compile(bool caseSensitive) {
   const char* errorMessage;
   regex = jsRegExpCompile(
-      reinterpret_cast<const UChar*>(p.unicode()), p.length(),
+      pattern.characters(), pattern.length(),
       caseSensitive ? JSRegExpDoNotIgnoreCase : JSRegExpIgnoreCase,
       JSRegExpSingleLine, 0, &errorMessage);
   if (!regex)
@@ -118,15 +81,13 @@ RegularExpression::Private::~Private() {
   jsRegExpFree(regex);
 }
 
-RegularExpression::RegularExpression() : d(new RegularExpression::Private()) {}
+RegularExpression::RegularExpression() : d(new Private) {}
 
-RegularExpression::RegularExpression(const DeprecatedString& pattern,
-                                     bool caseSensitive,
-                                     bool glob)
-    : d(new RegularExpression::Private(pattern, caseSensitive, glob)) {}
+RegularExpression::RegularExpression(const String& pattern, bool caseSensitive)
+    : d(new Private(pattern, caseSensitive)) {}
 
-RegularExpression::RegularExpression(const char* cpattern)
-    : d(new RegularExpression::Private(cpattern, true, false)) {}
+RegularExpression::RegularExpression(const char* pattern)
+    : d(new Private(pattern, true)) {}
 
 RegularExpression::RegularExpression(const RegularExpression& re) : d(re.d) {}
 
@@ -134,58 +95,50 @@ RegularExpression::~RegularExpression() {}
 
 RegularExpression& RegularExpression::operator=(const RegularExpression& re) {
   RegularExpression tmp(re);
-  RefPtr<RegularExpression::Private> tmpD = tmp.d;
-
-  tmp.d = d;
-  d = tmpD;
-
+  tmp.d.swap(d);
   return *this;
 }
 
-DeprecatedString RegularExpression::pattern() const {
+String RegularExpression::pattern() const {
   return d->pattern;
 }
 
-int RegularExpression::match(const DeprecatedString& str,
+int RegularExpression::match(const String& str,
                              int startFrom,
                              int* matchLength) const {
   d->lastMatchString = str;
   // First 2 offsets are start and end offsets; 3rd entry is used internally by
   // pcre
-  d->lastMatchCount = jsRegExpExecute(
-      d->regex, reinterpret_cast<const UChar*>(d->lastMatchString.unicode()),
-      d->lastMatchString.length(), startFrom, d->lastMatchOffsets, maxOffsets);
+  d->lastMatchCount = jsRegExpExecute(d->regex, d->lastMatchString.characters(),
+                                      d->lastMatchString.length(), startFrom,
+                                      d->lastMatchOffsets, maxOffsets);
   if (d->lastMatchCount < 0) {
     if (d->lastMatchCount != JSRegExpErrorNoMatch)
       LOG_ERROR("RegularExpression: pcre_exec() failed with result %d",
                 d->lastMatchCount);
     d->lastMatchPos = -1;
     d->lastMatchLength = -1;
-    d->lastMatchString = DeprecatedString();
+    d->lastMatchString = String();
     return -1;
   }
 
   // 1 means 1 match; 0 means more than one match. First match is recorded in
   // offsets.
-  // ASSERT(d->lastMatchCount < 2);
   d->lastMatchPos = d->lastMatchOffsets[0];
   d->lastMatchLength = d->lastMatchOffsets[1] - d->lastMatchOffsets[0];
-  if (matchLength != NULL) {
+  if (matchLength)
     *matchLength = d->lastMatchLength;
-  }
   return d->lastMatchPos;
 }
 
-int RegularExpression::search(const DeprecatedString& str,
-                              int startFrom) const {
-  if (startFrom < 0) {
+int RegularExpression::search(const String& str, int startFrom) const {
+  if (startFrom < 0)
     startFrom = str.length() - startFrom;
-  }
-  return match(str, startFrom, NULL);
+  return match(str, startFrom, 0);
 }
 
-int RegularExpression::searchRev(const DeprecatedString& str) const {
-  // FIXME: Total hack for now.  Search forward, return the last, greedy match
+int RegularExpression::searchRev(const String& str) const {
+  // FIXME: Total hack for now. Search forward, return the last, greedy match
   int start = 0;
   int pos;
   int lastPos = -1;
@@ -194,7 +147,7 @@ int RegularExpression::searchRev(const DeprecatedString& str) const {
     int matchLength;
     pos = match(str, start, &matchLength);
     if (pos >= 0) {
-      if ((pos + matchLength) > (lastPos + lastMatchLength)) {
+      if (pos + matchLength > lastPos + lastMatchLength) {
         // replace last match if this one is later and not a subset of the last
         // match
         lastPos = pos;
@@ -216,4 +169,21 @@ int RegularExpression::pos(int n) {
 int RegularExpression::matchedLength() const {
   return d->lastMatchLength;
 }
+
+void replace(String& string,
+             const RegularExpression& target,
+             const String& replacement) {
+  int index = 0;
+  while (index < static_cast<int>(string.length())) {
+    int matchLength;
+    index = target.match(string, index, &matchLength);
+    if (index < 0)
+      break;
+    string.replace(index, matchLength, replacement);
+    index += replacement.length();
+    if (!matchLength)
+      break;  // Avoid infinite loop on 0-length matches, e.g. [a-z]*
+  }
 }
+
+}  // namespace WebCore
