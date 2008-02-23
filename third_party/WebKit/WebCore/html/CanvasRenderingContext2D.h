@@ -45,6 +45,7 @@ class FloatRect;
 class GraphicsContext;
 class HTMLCanvasElement;
 class HTMLImageElement;
+class ImageData;
 
 typedef int ExceptionCode;
 
@@ -245,6 +246,12 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
   PassRefPtr<CanvasPattern> createPattern(HTMLCanvasElement*,
                                           const String& repetitionType,
                                           ExceptionCode&);
+
+  PassRefPtr<ImageData> createImageData(float width, float height) const;
+  PassRefPtr<ImageData> getImageData(float sx,
+                                     float sy,
+                                     float sw,
+                                     float sh) const;
 
   void reset();
   void detachCanvas() { m_canvas = 0; }

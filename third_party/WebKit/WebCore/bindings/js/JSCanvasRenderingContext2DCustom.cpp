@@ -351,4 +351,9 @@ JSValue* JSCanvasRenderingContext2D::createPattern(ExecState* exec,
   return 0;
 }
 
+JSValue* JSCanvasRenderingContext2D::putImageData(ExecState* exec,
+                                                  const List& args) {
+  return jsUndefined();
+}
+
 }  // namespace WebCore
