@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
- * Copyright (C) 2007 Brent Fulgham
+ * Copyright (C) 2007 Staikos Computing Services Inc.
+ * Copyright (C) 2007 Trolltech ASA
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,53 +27,64 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
-#include "Threading.h"
+#include "MainThread.h"
+
+#include <QtCore/QObject>
+#include <QtCore/QCoreApplication>
 
 namespace WebCore {
 
-Mutex::Mutex() {
-  m_mutex.m_recursionCount = 0;
-  ::InitializeCriticalSection(&m_mutex.m_internalMutex);
+class PerformFunctionEvent : public QEvent {
+ public:
+  static const int EventType = 723;
+
+  PerformFunctionEvent(MainThreadFunction*, void* context);
+
+  void invoke();
+
+ private:
+  MainThreadFunction* m_function;
+  void* m_context;
+};
+
+class MainThreadInvoker : public QObject {
+  Q_OBJECT
+ public:
+  MainThreadInvoker();
+
+ protected:
+  bool event(QEvent*);
+};
+
+PerformFunctionEvent::PerformFunctionEvent(MainThreadFunction* function,
+                                           void* context)
+    : QEvent(static_cast<QEvent::Type>(EventType)),
+      m_function(function),
+      m_context(context) {}
+
+void PerformFunctionEvent::invoke() {
+  m_function(m_context);
 }
 
-Mutex::~Mutex() {
-  ::DeleteCriticalSection(&m_mutex.m_internalMutex);
+MainThreadInvoker::MainThreadInvoker() {
+  moveToThread(QCoreApplication::instance()->thread());
 }
 
-void Mutex::lock() {
-  ::EnterCriticalSection(&m_mutex.m_internalMutex);
-  ++m_mutex.m_recursionCount;
+bool MainThreadInvoker::event(QEvent* event) {
+  if (event->type() == PerformFunctionEvent::EventType)
+    static_cast<PerformFunctionEvent*>(event)->invoke();
+
+  return QObject::event(event);
 }
 
-bool Mutex::tryLock() {
-  // This method is modeled after the behavior of pthread_mutex_trylock,
-  // which will return an error if the lock is already owned by the
-  // current thread.  Since the primitive Win32 'TryEnterCriticalSection'
-  // treats this as a successful case, it changes the behavior of several
-  // tests in WebKit that check to see if the current thread already
-  // owned this mutex (see e.g., IconDatabase::getOrCreateIconRecord)
-  DWORD result = ::TryEnterCriticalSection(&m_mutex.m_internalMutex);
+Q_GLOBAL_STATIC(MainThreadInvoker, webkit_main_thread_invoker)
 
-  if (result != 0) {  // We got the lock
-    // If this thread already had the lock, we must unlock and
-    // return false so that we mimic the behavior of POSIX's
-    // pthread_mutex_trylock:
-    if (m_mutex.m_recursionCount > 0) {
-      ::LeaveCriticalSection(&m_mutex.m_internalMutex);
-      return false;
-    }
-
-    ++m_mutex.m_recursionCount;
-    return true;
-  }
-
-  return false;
+void callOnMainThread(MainThreadFunction* function, void* context) {
+  QCoreApplication::postEvent(webkit_main_thread_invoker(),
+                              new PerformFunctionEvent(function, context));
+}
 }
 
-void Mutex::unlock() {
-  --m_mutex.m_recursionCount;
-  ::LeaveCriticalSection(&m_mutex.m_internalMutex);
-}
-
-}  // namespace WebCore
+#include "MainThreadQt.moc"

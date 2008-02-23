@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -11,7 +11,7 @@
  * 2.  Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- * 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
+ * 3.  Neither the name of Apple Inc. ("Apple") nor the names of
  *     its contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -26,57 +26,61 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
 #include "Threading.h"
 
-#include "Logging.h"
-#include <wtf/HashMap.h>
+#include "HashMap.h"
 
-#include <errno.h>
+#include <glib.h>
 
 namespace WebCore {
+
+void initializeThreading() {
+  if (!g_thread_supported())
+    g_thread_init(NULL);
+  ASSERT(g_thread_supported());
+}
 
 static Mutex& threadMapMutex() {
   static Mutex mutex;
   return mutex;
 }
 
-static HashMap<ThreadIdentifier, pthread_t>& threadMap() {
-  static HashMap<ThreadIdentifier, pthread_t> map;
+static HashMap<ThreadIdentifier, GThread*>& threadMap() {
+  static HashMap<ThreadIdentifier, GThread*> map;
   return map;
 }
 
-static ThreadIdentifier establishIdentifierForPthreadHandle(
-    pthread_t& pthreadHandle) {
+static ThreadIdentifier establishIdentifierForThread(GThread*& thread) {
   MutexLocker locker(threadMapMutex());
 
   static ThreadIdentifier identifierCount = 1;
 
-  threadMap().add(identifierCount, pthreadHandle);
+  threadMap().add(identifierCount, thread);
 
   return identifierCount++;
 }
 
-static ThreadIdentifier identifierByPthreadHandle(
-    const pthread_t& pthreadHandle) {
+static ThreadIdentifier identifierByGthreadHandle(GThread*& thread) {
   MutexLocker locker(threadMapMutex());
 
-  HashMap<ThreadIdentifier, pthread_t>::iterator i = threadMap().begin();
+  HashMap<ThreadIdentifier, GThread*>::iterator i = threadMap().begin();
   for (; i != threadMap().end(); ++i) {
-    if (pthread_equal(i->second, pthreadHandle))
+    if (i->second == thread)
       return i->first;
   }
 
   return 0;
 }
 
-static pthread_t pthreadHandleForIdentifier(ThreadIdentifier id) {
+static GThread* threadForIdentifier(ThreadIdentifier id) {
   MutexLocker locker(threadMapMutex());
 
   return threadMap().get(id);
 }
 
-static void clearPthreadHandleForIdentifier(ThreadIdentifier id) {
+static void clearThreadForIdentifier(ThreadIdentifier id) {
   MutexLocker locker(threadMapMutex());
 
   ASSERT(threadMap().contains(id));
@@ -85,100 +89,70 @@ static void clearPthreadHandleForIdentifier(ThreadIdentifier id) {
 }
 
 ThreadIdentifier createThread(ThreadFunction entryPoint, void* data) {
-  pthread_t threadHandle;
-  if (pthread_create(&threadHandle, NULL, entryPoint, data)) {
-    LOG_ERROR("Failed to create pthread at entry point %p with data %p",
+  GThread* thread;
+  if (!(thread = g_thread_create(entryPoint, data, TRUE, 0))) {
+    LOG_ERROR("Failed to create thread at entry point %p with data %p",
               entryPoint, data);
     return 0;
   }
 
-  ThreadIdentifier threadID = establishIdentifierForPthreadHandle(threadHandle);
-  LOG(Threading, "Created thread with thread id %u", threadID);
+  ThreadIdentifier threadID = establishIdentifierForThread(thread);
   return threadID;
 }
 
 int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
   ASSERT(threadID);
 
-  pthread_t pthreadHandle = pthreadHandleForIdentifier(threadID);
+  GThread* thread = threadForIdentifier(threadID);
 
-  int joinResult = pthread_join(pthreadHandle, result);
-  if (joinResult == EDEADLK)
-    LOG_ERROR("ThreadIdentifier %u was found to be deadlocked trying to quit",
-              threadID);
+  *result = g_thread_join(thread);
 
-  clearPthreadHandleForIdentifier(threadID);
-  return joinResult;
+  clearThreadForIdentifier(threadID);
+  return 0;
 }
 
-void detachThread(ThreadIdentifier threadID) {
-  ASSERT(threadID);
-
-  pthread_t pthreadHandle = pthreadHandleForIdentifier(threadID);
-
-  pthread_detach(pthreadHandle);
-
-  clearPthreadHandleForIdentifier(threadID);
-}
+void detachThread(ThreadIdentifier) {}
 
 ThreadIdentifier currentThread() {
-  pthread_t currentThread = pthread_self();
-  if (ThreadIdentifier id = identifierByPthreadHandle(currentThread))
+  GThread* currentThread = g_thread_self();
+  if (ThreadIdentifier id = identifierByGthreadHandle(currentThread))
     return id;
-  return establishIdentifierForPthreadHandle(currentThread);
+  return establishIdentifierForThread(currentThread);
 }
 
-Mutex::Mutex() {
-  pthread_mutex_init(&m_mutex, NULL);
-}
+Mutex::Mutex() : m_mutex(g_mutex_new()) {}
 
 Mutex::~Mutex() {
-  pthread_mutex_destroy(&m_mutex);
+  g_mutex_free(m_mutex);
 }
 
 void Mutex::lock() {
-  if (pthread_mutex_lock(&m_mutex) != 0)
-    ASSERT(false);
+  g_mutex_lock(m_mutex);
 }
 
 bool Mutex::tryLock() {
-  int result = pthread_mutex_trylock(&m_mutex);
-
-  if (result == 0)
-    return true;
-  else if (result == EBUSY)
-    return false;
-
-  ASSERT(false);
-  return false;
+  return g_mutex_trylock(m_mutex);
 }
 
 void Mutex::unlock() {
-  if (pthread_mutex_unlock(&m_mutex) != 0)
-    ASSERT(false);
+  g_mutex_unlock(m_mutex);
 }
 
-ThreadCondition::ThreadCondition() {
-  pthread_cond_init(&m_condition, NULL);
-}
+ThreadCondition::ThreadCondition() : m_condition(g_cond_new()) {}
 
 ThreadCondition::~ThreadCondition() {
-  pthread_cond_destroy(&m_condition);
+  g_cond_free(m_condition);
 }
 
 void ThreadCondition::wait(Mutex& mutex) {
-  if (pthread_cond_wait(&m_condition, &mutex.impl()) != 0)
-    ASSERT(false);
+  g_cond_wait(m_condition, mutex.impl());
 }
 
 void ThreadCondition::signal() {
-  if (pthread_cond_signal(&m_condition) != 0)
-    ASSERT(false);
+  g_cond_signal(m_condition);
 }
 
 void ThreadCondition::broadcast() {
-  if (pthread_cond_broadcast(&m_condition) != 0)
-    ASSERT(false);
+  g_cond_broadcast(m_condition);
 }
-
-}  // namespace WebCore
+}

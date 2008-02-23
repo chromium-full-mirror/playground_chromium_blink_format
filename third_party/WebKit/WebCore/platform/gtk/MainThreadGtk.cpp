@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2007 Kevin Ollivier
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -10,7 +11,7 @@
  * 2.  Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- * 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
+ * 3.  Neither the name of Apple Inc. ("Apple") nor the names of
  *     its contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -27,12 +28,30 @@
  */
 
 #include "config.h"
-#include "NotImplemented.h"
-#include "Threading.h"
+#include "MainThread.h"
+
+#include <glib.h>
 
 namespace WebCore {
 
-void callOnMainThread(MainThreadFunction*, void*) {
-  notImplemented();
+struct FunctionWithContext {
+  MainThreadFunction* function;
+  void* context;
+};
+
+static gboolean callFunctionOnMainThread(gpointer data) {
+  FunctionWithContext* functionWithContext =
+      static_cast<FunctionWithContext*>(data);
+  functionWithContext->function(functionWithContext->context);
+  delete functionWithContext;
+  return FALSE;
+}
+
+void callOnMainThread(MainThreadFunction* function, void* context) {
+  ASSERT(function);
+  FunctionWithContext* functionWithContext = new FunctionWithContext;
+  functionWithContext->function = function;
+  functionWithContext->context = context;
+  g_timeout_add(0, callFunctionOnMainThread, functionWithContext);
 }
 }

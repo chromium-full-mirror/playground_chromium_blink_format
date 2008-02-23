@@ -41,6 +41,7 @@
 #include "Frame.h"
 #include "InspectorController.h"
 #include "Logging.h"
+#include "MainThread.h"
 #include "NotImplemented.h"
 #include "Page.h"
 #include "OriginQuotaManager.h"
@@ -132,7 +133,7 @@ Database::Database(Document* document,
   if (m_name.isNull())
     m_name = "";
 
-  initializeThreading();
+  initializeThreadingAndMainThread();
 
   m_guid = guidForOriginAndName(m_securityOrigin->toString(), name);
 

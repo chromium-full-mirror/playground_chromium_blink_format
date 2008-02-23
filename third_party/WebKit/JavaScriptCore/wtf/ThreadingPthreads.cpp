@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -11,7 +11,7 @@
  * 2.  Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- * 3.  Neither the name of Apple Inc. ("Apple") nor the names of
+ * 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
  *     its contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -26,83 +26,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include "config.h"
 #include "Threading.h"
 
-#include "HashMap.h"
-#include "Logging.h"
+#include <wtf/HashMap.h>
 
-#include <glib.h>
+#include <errno.h>
 
-namespace WebCore {
-
-struct FunctionWithContext {
-  MainThreadFunction* function;
-  void* context;
-};
-
-static gboolean callFunctionOnMainThread(gpointer data) {
-  FunctionWithContext* functionWithContext =
-      static_cast<FunctionWithContext*>(data);
-  functionWithContext->function(functionWithContext->context);
-  delete functionWithContext;
-  return FALSE;
-}
-
-void callOnMainThread(MainThreadFunction* function, void* context) {
-  ASSERT(function);
-  FunctionWithContext* functionWithContext = new FunctionWithContext;
-  functionWithContext->function = function;
-  functionWithContext->context = context;
-  g_timeout_add(0, callFunctionOnMainThread, functionWithContext);
-}
-
-void initializeThreading() {
-  if (!g_thread_supported())
-    g_thread_init(NULL);
-  ASSERT(g_thread_supported());
-}
+namespace WTF {
 
 static Mutex& threadMapMutex() {
   static Mutex mutex;
   return mutex;
 }
 
-static HashMap<ThreadIdentifier, GThread*>& threadMap() {
-  static HashMap<ThreadIdentifier, GThread*> map;
+static HashMap<ThreadIdentifier, pthread_t>& threadMap() {
+  static HashMap<ThreadIdentifier, pthread_t> map;
   return map;
 }
 
-static ThreadIdentifier establishIdentifierForThread(GThread*& thread) {
+static ThreadIdentifier establishIdentifierForPthreadHandle(
+    pthread_t& pthreadHandle) {
   MutexLocker locker(threadMapMutex());
 
   static ThreadIdentifier identifierCount = 1;
 
-  threadMap().add(identifierCount, thread);
+  threadMap().add(identifierCount, pthreadHandle);
 
   return identifierCount++;
 }
 
-static ThreadIdentifier identifierByGthreadHandle(GThread*& thread) {
+static ThreadIdentifier identifierByPthreadHandle(
+    const pthread_t& pthreadHandle) {
   MutexLocker locker(threadMapMutex());
 
-  HashMap<ThreadIdentifier, GThread*>::iterator i = threadMap().begin();
+  HashMap<ThreadIdentifier, pthread_t>::iterator i = threadMap().begin();
   for (; i != threadMap().end(); ++i) {
-    if (i->second == thread)
+    if (pthread_equal(i->second, pthreadHandle))
       return i->first;
   }
 
   return 0;
 }
 
-static GThread* threadForIdentifier(ThreadIdentifier id) {
+static pthread_t pthreadHandleForIdentifier(ThreadIdentifier id) {
   MutexLocker locker(threadMapMutex());
 
   return threadMap().get(id);
 }
 
-static void clearThreadForIdentifier(ThreadIdentifier id) {
+static void clearPthreadHandleForIdentifier(ThreadIdentifier id) {
   MutexLocker locker(threadMapMutex());
 
   ASSERT(threadMap().contains(id));
@@ -111,71 +84,99 @@ static void clearThreadForIdentifier(ThreadIdentifier id) {
 }
 
 ThreadIdentifier createThread(ThreadFunction entryPoint, void* data) {
-  GThread* thread;
-  if (!(thread = g_thread_create(entryPoint, data, TRUE, 0))) {
-    LOG_ERROR("Failed to create thread at entry point %p with data %p",
+  pthread_t threadHandle;
+  if (pthread_create(&threadHandle, NULL, entryPoint, data)) {
+    LOG_ERROR("Failed to create pthread at entry point %p with data %p",
               entryPoint, data);
     return 0;
   }
 
-  ThreadIdentifier threadID = establishIdentifierForThread(thread);
-  LOG(Threading, "Created thread with thread id %u", threadID);
+  ThreadIdentifier threadID = establishIdentifierForPthreadHandle(threadHandle);
   return threadID;
 }
 
 int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
   ASSERT(threadID);
 
-  GThread* thread = threadForIdentifier(threadID);
+  pthread_t pthreadHandle = pthreadHandleForIdentifier(threadID);
 
-  *result = g_thread_join(thread);
+  int joinResult = pthread_join(pthreadHandle, result);
+  if (joinResult == EDEADLK)
+    LOG_ERROR("ThreadIdentifier %u was found to be deadlocked trying to quit",
+              threadID);
 
-  clearThreadForIdentifier(threadID);
-  return 0;
+  clearPthreadHandleForIdentifier(threadID);
+  return joinResult;
 }
 
-void detachThread(ThreadIdentifier) {}
+void detachThread(ThreadIdentifier threadID) {
+  ASSERT(threadID);
+
+  pthread_t pthreadHandle = pthreadHandleForIdentifier(threadID);
+
+  pthread_detach(pthreadHandle);
+
+  clearPthreadHandleForIdentifier(threadID);
+}
 
 ThreadIdentifier currentThread() {
-  GThread* currentThread = g_thread_self();
-  if (ThreadIdentifier id = identifierByGthreadHandle(currentThread))
+  pthread_t currentThread = pthread_self();
+  if (ThreadIdentifier id = identifierByPthreadHandle(currentThread))
     return id;
-  return establishIdentifierForThread(currentThread);
+  return establishIdentifierForPthreadHandle(currentThread);
 }
 
-Mutex::Mutex() : m_mutex(g_mutex_new()) {}
+Mutex::Mutex() {
+  pthread_mutex_init(&m_mutex, NULL);
+}
 
 Mutex::~Mutex() {
-  g_mutex_free(m_mutex);
+  pthread_mutex_destroy(&m_mutex);
 }
 
 void Mutex::lock() {
-  g_mutex_lock(m_mutex);
+  if (pthread_mutex_lock(&m_mutex) != 0)
+    ASSERT(false);
 }
 
 bool Mutex::tryLock() {
-  return g_mutex_trylock(m_mutex);
+  int result = pthread_mutex_trylock(&m_mutex);
+
+  if (result == 0)
+    return true;
+  else if (result == EBUSY)
+    return false;
+
+  ASSERT(false);
+  return false;
 }
 
 void Mutex::unlock() {
-  g_mutex_unlock(m_mutex);
+  if (pthread_mutex_unlock(&m_mutex) != 0)
+    ASSERT(false);
 }
 
-ThreadCondition::ThreadCondition() : m_condition(g_cond_new()) {}
+ThreadCondition::ThreadCondition() {
+  pthread_cond_init(&m_condition, NULL);
+}
 
 ThreadCondition::~ThreadCondition() {
-  g_cond_free(m_condition);
+  pthread_cond_destroy(&m_condition);
 }
 
 void ThreadCondition::wait(Mutex& mutex) {
-  g_cond_wait(m_condition, mutex.impl());
+  if (pthread_cond_wait(&m_condition, &mutex.impl()) != 0)
+    ASSERT(false);
 }
 
 void ThreadCondition::signal() {
-  g_cond_signal(m_condition);
+  if (pthread_cond_signal(&m_condition) != 0)
+    ASSERT(false);
 }
 
 void ThreadCondition::broadcast() {
-  g_cond_broadcast(m_condition);
+  if (pthread_cond_broadcast(&m_condition) != 0)
+    ASSERT(false);
 }
-}
+
+}  // namespace WTF

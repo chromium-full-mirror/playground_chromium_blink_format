@@ -1,7 +1,6 @@
 /*
- * Copyright (C) 2007 Staikos Computing Services Inc.
- * Copyright (C) 2007 Trolltech ASA
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,63 +27,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "Threading.h"
+#ifndef MainThread_h
+#define MainThread_h
 
-#include <QtCore/QObject>
-#include <QtCore/QCoreApplication>
+#include <wtf/Threading.h>
 
 namespace WebCore {
 
-class PerformFunctionEvent : public QEvent {
- public:
-  static const int EventType = 723;
+typedef void MainThreadFunction(void*);
 
-  PerformFunctionEvent(MainThreadFunction*, void* context);
+void callOnMainThread(MainThreadFunction*, void* context);
 
-  void invoke();
+void initializeThreadingAndMainThread();
 
- private:
-  MainThreadFunction* m_function;
-  void* m_context;
-};
-
-class MainThreadInvoker : public QObject {
-  Q_OBJECT
- public:
-  MainThreadInvoker();
-
- protected:
-  bool event(QEvent*);
-};
-
-PerformFunctionEvent::PerformFunctionEvent(MainThreadFunction* function,
-                                           void* context)
-    : QEvent(static_cast<QEvent::Type>(EventType)),
-      m_function(function),
-      m_context(context) {}
-
-void PerformFunctionEvent::invoke() {
-  m_function(m_context);
+#if !PLATFORM(WIN)
+inline void initializeThreadingAndMainThread() {
+  WTF::initializeThreading();
 }
+#endif
 
-MainThreadInvoker::MainThreadInvoker() {
-  moveToThread(QCoreApplication::instance()->thread());
-}
+}  // namespace WebCore
 
-bool MainThreadInvoker::event(QEvent* event) {
-  if (event->type() == PerformFunctionEvent::EventType)
-    static_cast<PerformFunctionEvent*>(event)->invoke();
-
-  return QObject::event(event);
-}
-
-Q_GLOBAL_STATIC(MainThreadInvoker, webkit_main_thread_invoker)
-
-void callOnMainThread(MainThreadFunction* function, void* context) {
-  QCoreApplication::postEvent(webkit_main_thread_invoker(),
-                              new PerformFunctionEvent(function, context));
-}
-}
-
-#include "ThreadingQt.moc"
+#endif  // MainThread_h
