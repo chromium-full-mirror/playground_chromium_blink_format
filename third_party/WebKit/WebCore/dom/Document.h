@@ -60,6 +60,7 @@ class CSSStyleSheet;
 class Comment;
 class Database;
 class DOMImplementation;
+class DOMSelection;
 class DOMWindow;
 class DatabaseThread;
 class DocLoader;
@@ -800,6 +801,9 @@ class Document : public ContainerNode {
 
   void updateFocusAppearanceSoon();
   void cancelFocusAppearanceUpdate();
+
+  // FF method for accessing the selection added for compatability.
+  DOMSelection* getSelection() const;
 
  private:
   CSSStyleSelector* m_styleSelector;
