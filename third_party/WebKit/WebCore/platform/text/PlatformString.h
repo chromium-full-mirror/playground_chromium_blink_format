@@ -42,7 +42,6 @@ class wxString;
 namespace WebCore {
 
 class CString;
-class DeprecatedString;
 struct StringHash;
 
 class String {
@@ -255,9 +254,6 @@ class String {
                   : WTF::Unicode::LeftToRight;
   }
 
-  String(const DeprecatedString&);
-  DeprecatedString deprecatedString() const;
-
  private:
   RefPtr<StringImpl> m_impl;
 };
@@ -299,17 +295,6 @@ inline bool equalIgnoringCase(const String& a, const char* b) {
 }
 inline bool equalIgnoringCase(const char* a, const String& b) {
   return equalIgnoringCase(a, b.impl());
-}
-
-bool operator==(const String& a, const DeprecatedString& b);
-inline bool operator==(const DeprecatedString& b, const String& a) {
-  return a == b;
-}
-inline bool operator!=(const String& a, const DeprecatedString& b) {
-  return !(a == b);
-}
-inline bool operator!=(const DeprecatedString& b, const String& a) {
-  return !(a == b);
 }
 
 inline bool operator!(const String& str) {

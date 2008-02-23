@@ -26,7 +26,6 @@
 #include "config.h"
 
 #include "PlatformString.h"
-#include "DeprecatedString.h"
 
 #include <QString>
 
@@ -49,11 +48,6 @@ String::String(const QStringRef& ref) {
 
 String::operator QString() const {
   return QString(reinterpret_cast<const QChar*>(characters()), length());
-}
-
-// DeprecatedString conversions
-DeprecatedString::operator QString() const {
-  return QString(reinterpret_cast<const QChar*>(unicode()), length());
 }
 }
 
