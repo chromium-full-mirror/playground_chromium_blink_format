@@ -45,7 +45,6 @@ DragImageRef scaleDragImage(DragImageRef image, FloatSize scale) {
 DragImageRef createDragImageFromImage(Image* img) {
   notImplemented();
 
-  DragImageRef temp;
-  return temp;
+  return 0;
 }
 }
