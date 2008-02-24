@@ -1260,7 +1260,7 @@ NPError PluginView::handlePost(const char* url,
   frameLoadRequest.resourceRequest().setURL(makeURL(m_baseURL, url));
   frameLoadRequest.resourceRequest().addHTTPHeaderFields(headerFields);
   frameLoadRequest.resourceRequest().setHTTPBody(
-      PassRefPtr<FormData>(new FormData(postData, postDataLength)));
+      FormData::create(postData, postDataLength));
   frameLoadRequest.setFrameName(target);
 
   return load(frameLoadRequest, sendNotification, notifyData);
