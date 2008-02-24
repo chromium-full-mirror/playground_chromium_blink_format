@@ -24,6 +24,7 @@
 
 #include "Assertions.h"
 #include "FastMalloc.h"
+#include "Noncopyable.h"
 #include "VectorTraits.h"
 #include <limits>
 #include <stdlib.h>
@@ -217,7 +218,7 @@ struct VectorTypeOperations {
 };
 
 template <typename T>
-class VectorBufferBase {
+class VectorBufferBase : Noncopyable {
  public:
   void allocateBuffer(size_t newCapacity) {
     ASSERT(newCapacity >= m_capacity);
@@ -335,7 +336,7 @@ class VectorBuffer : private VectorBufferBase<T> {
 template <typename T, size_t inlineCapacity = 0>
 class Vector {
  private:
-  typedef VectorBuffer<T, inlineCapacity> Impl;
+  typedef VectorBuffer<T, inlineCapacity> Buffer;
   typedef VectorTypeOperations<T> TypeOperations;
 
  public:
@@ -346,7 +347,7 @@ class Vector {
 
   Vector() : m_size(0) {}
 
-  explicit Vector(size_t size) : m_size(size), m_impl(size) {
+  explicit Vector(size_t size) : m_size(size), m_buffer(size) {
     TypeOperations::initialize(begin(), end());
   }
 
@@ -361,23 +362,23 @@ class Vector {
   Vector& operator=(const Vector<T, otherCapacity>&);
 
   size_t size() const { return m_size; }
-  size_t capacity() const { return m_impl.capacity(); }
+  size_t capacity() const { return m_buffer.capacity(); }
   bool isEmpty() const { return !size(); }
 
   T& at(size_t i) {
     ASSERT(i < size());
-    return m_impl.buffer()[i];
+    return m_buffer.buffer()[i];
   }
   const T& at(size_t i) const {
     ASSERT(i < size());
-    return m_impl.buffer()[i];
+    return m_buffer.buffer()[i];
   }
 
   T& operator[](size_t i) { return at(i); }
   const T& operator[](size_t i) const { return at(i); }
 
-  T* data() { return m_impl.buffer(); }
-  const T* data() const { return m_impl.buffer(); }
+  T* data() { return m_buffer.buffer(); }
+  const T* data() const { return m_buffer.buffer(); }
 
   iterator begin() { return data(); }
   iterator end() { return begin() + m_size; }
@@ -429,7 +430,7 @@ class Vector {
     shrink(size() - 1);
   }
 
-  Vector(size_t size, const T& val) : m_size(size), m_impl(size) {
+  Vector(size_t size, const T& val) : m_size(size), m_buffer(size) {
     TypeOperations::uninitializedFill(begin(), end(), val);
   }
 
@@ -443,7 +444,7 @@ class Vector {
 
   void swap(Vector<T, inlineCapacity>& other) {
     std::swap(m_size, other.m_size);
-    m_impl.swap(other.m_impl);
+    m_buffer.swap(other.m_buffer);
   }
 
  private:
@@ -453,19 +454,19 @@ class Vector {
   U* expandCapacity(size_t newMinCapacity, U*);
 
   size_t m_size;
-  Impl m_impl;
+  Buffer m_buffer;
 };
 
 template <typename T, size_t inlineCapacity>
 Vector<T, inlineCapacity>::Vector(const Vector& other)
-    : m_size(other.size()), m_impl(other.capacity()) {
+    : m_size(other.size()), m_buffer(other.capacity()) {
   TypeOperations::uninitializedCopy(other.begin(), other.end(), begin());
 }
 
 template <typename T, size_t inlineCapacity>
 template <size_t otherCapacity>
 Vector<T, inlineCapacity>::Vector(const Vector<T, otherCapacity>& other)
-    : m_size(other.size()), m_impl(other.capacity()) {
+    : m_size(other.size()), m_buffer(other.capacity()) {
   TypeOperations::uninitializedCopy(other.begin(), other.end(), begin());
 }
 
@@ -592,9 +593,9 @@ void Vector<T, inlineCapacity>::reserveCapacity(size_t newCapacity) {
     return;
   T* oldBuffer = begin();
   T* oldEnd = end();
-  m_impl.allocateBuffer(newCapacity);
+  m_buffer.allocateBuffer(newCapacity);
   TypeOperations::move(oldBuffer, oldEnd, begin());
-  m_impl.deallocateBuffer(oldBuffer);
+  m_buffer.deallocateBuffer(oldBuffer);
 }
 
 // Templatizing these is better than just letting the conversion happen
@@ -621,13 +622,13 @@ inline void Vector<T, inlineCapacity>::append(const U& val) {
   if (size() == capacity())
     ptr = expandCapacity(size() + 1, ptr);
 
-// FIXME: MSVC7 generates compilation errors when trying to assign
-// a pointer to a Vector of its base class (i.e. can't downcast). So far
-// I've been unable to determine any logical reason for this, so I can
-// only assume it is a bug with the compiler. Casting is very bad
-// however because it subverts implicit conversions, so a better
-// solution is direly needed.
 #if COMPILER(MSVC7)
+  // FIXME: MSVC7 generates compilation errors when trying to assign
+  // a pointer to a Vector of its base class (i.e. can't downcast). So far
+  // I've been unable to determine any logical reason for this, so I can
+  // only assume it is a bug with the compiler. Casting is a bad solution,
+  // however, because it subverts implicit conversions, so a better
+  // one is needed.
   new (end()) T(static_cast<T>(*ptr));
 #else
   new (end()) T(*ptr);
@@ -718,7 +719,7 @@ inline void Vector<T, inlineCapacity>::remove(size_t position) {
 
 template <typename T, size_t inlineCapacity>
 inline T* Vector<T, inlineCapacity>::releaseBuffer() {
-  T* buffer = m_impl.releaseBuffer();
+  T* buffer = m_buffer.releaseBuffer();
   if (inlineCapacity && !buffer && m_size) {
     // If the vector had some data, but no buffer to release,
     // that means it was using the inline buffer. In that case,
