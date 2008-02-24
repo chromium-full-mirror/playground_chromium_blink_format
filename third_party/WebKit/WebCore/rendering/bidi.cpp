@@ -1428,6 +1428,29 @@ static bool shouldSkipWhitespaceAfterStartObject(RenderBlock* block,
   return false;
 }
 
+void RenderBlock::fitBelowFloats(int widthToFit, int& availableWidth) {
+  ASSERT(widthToFit > availableWidth);
+
+  int floatBottom;
+  int lastFloatBottom = m_height;
+  int newLineWidth = availableWidth;
+  while (true) {
+    floatBottom = nextFloatBottomBelow(lastFloatBottom);
+    if (!floatBottom)
+      break;
+
+    newLineWidth = lineWidth(floatBottom);
+    lastFloatBottom = floatBottom;
+    if (newLineWidth >= widthToFit)
+      break;
+  }
+
+  if (newLineWidth > availableWidth) {
+    m_height = lastFloatBottom;
+    availableWidth = newLineWidth;
+  }
+}
+
 BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                                             BidiState& bidi) {
   // eliminate spaces at beginning of line
@@ -1770,23 +1793,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
           applyWordSpacing = wordSpacing && currentCharacterIsSpace &&
                              !previousCharacterIsSpace;
 
-          if (autoWrap && w + tmpW > width && !w) {
-            int fb = nearestFloatBottom(m_height);
-            int newLineWidth = lineWidth(fb);
-            // See if |tmpW| will fit on the new line.  As long as it does not,
-            // keep adjusting our float bottom until we find some room.
-            int lastFloatBottom = m_height;
-            while (lastFloatBottom < fb && tmpW > newLineWidth) {
-              lastFloatBottom = fb;
-              fb = nearestFloatBottom(fb);
-              newLineWidth = lineWidth(fb);
-            }
-
-            if (!w && m_height < fb && width < newLineWidth) {
-              m_height = fb;
-              width = newLineWidth;
-            }
-          }
+          if (!w && autoWrap && tmpW > width)
+            fitBelowFloats(tmpW, width);
 
           if (autoWrap || breakWords) {
             // If we break only after white-space, consider the current
@@ -1957,7 +1965,11 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               checkForBreak = true;
           } else if (nextText->isWordBreak())
             checkForBreak = true;
-          bool willFitOnLine = (w + tmpW <= width);
+          bool willFitOnLine = w + tmpW <= width;
+          if (!willFitOnLine && !w) {
+            fitBelowFloats(tmpW, width);
+            willFitOnLine = tmpW <= width;
+          }
           bool canPlaceOnLine = willFitOnLine || !autoWrapWasEverTrueOnLine;
           if (canPlaceOnLine && checkForBreak) {
             w += tmpW;
@@ -1975,20 +1987,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
           o->style()->collapseWhiteSpace())
         trailingSpaceObject = 0;
 
-      int fb = nearestFloatBottom(m_height);
-      int newLineWidth = lineWidth(fb);
-      // See if |tmpW| will fit on the new line.  As long as it does not,
-      // keep adjusting our float bottom until we find some room.
-      int lastFloatBottom = m_height;
-      while (lastFloatBottom < fb && tmpW > newLineWidth) {
-        lastFloatBottom = fb;
-        fb = nearestFloatBottom(fb);
-        newLineWidth = lineWidth(fb);
-      }
-      if (!w && m_height < fb && width < newLineWidth) {
-        m_height = fb;
-        width = newLineWidth;
-      }
+      if (w)
+        goto end;
+
+      fitBelowFloats(tmpW, width);
 
       // |width| may have been adjusted because we got shoved down past a float
       // (thus

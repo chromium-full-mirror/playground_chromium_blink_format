@@ -171,6 +171,7 @@ class RenderBlock : public RenderFlow {
                       int& repaintTop);
   bool generatesLineBoxesForInlineChild(RenderObject*);
   int skipWhitespace(BidiIterator&, BidiState&);
+  void fitBelowFloats(int widthToFit, int& availableWidth);
   BidiIterator findNextLineBreak(BidiIterator& start, BidiState& info);
   RootInlineBox* constructLine(const BidiIterator& start,
                                const BidiIterator& end);
@@ -220,7 +221,7 @@ class RenderBlock : public RenderFlow {
                            int yoffset,
                            bool makeChildPaintOtherFloats);
 
-  int nearestFloatBottom(int height) const;
+  int nextFloatBottomBelow(int) const;
   int floatBottom() const;
   inline int leftBottom();
   inline int rightBottom();

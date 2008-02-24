@@ -2662,16 +2662,19 @@ int RenderBlock::lineWidth(int y) const {
   return (result < 0) ? 0 : result;
 }
 
-int RenderBlock::nearestFloatBottom(int height) const {
+int RenderBlock::nextFloatBottomBelow(int height) const {
   if (!m_floatingObjects)
     return 0;
-  int bottom = 0;
+
+  int bottom = INT_MAX;
   FloatingObject* r;
   DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
-  for (; (r = it.current()); ++it)
-    if (r->endY > height && (r->endY < bottom || bottom == 0))
-      bottom = r->endY;
-  return max(bottom, height);
+  for (; (r = it.current()); ++it) {
+    if (r->endY > height)
+      bottom = min(r->endY, bottom);
+  }
+
+  return bottom == INT_MAX ? 0 : bottom;
 }
 
 int RenderBlock::floatBottom() const {
@@ -3162,7 +3165,7 @@ int RenderBlock::getClearDelta(RenderObject* child) {
   // (and wish to avoid floats by default).
   // FIXME: Note that the remaining space checks aren't quite accurate, since
   // you should be able to clear only some floats (the minimum # needed
-  // to fit) and not all (we should be using nearestFloatBottom and looping).
+  // to fit) and not all (we should be using nextFloatBottomBelow and looping).
   // Do not allow tables to wrap in quirks or even in almost strict mode
   // (ebay on the PLT, finance.yahoo.com in the real world, versiontracker.com
   // forces even almost strict mode not to work)
