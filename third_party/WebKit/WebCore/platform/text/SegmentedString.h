@@ -20,23 +20,22 @@
 #ifndef SegmentedString_h
 #define SegmentedString_h
 
-#include "DeprecatedValueList.h"
 #include "PlatformString.h"
+#include <wtf/Deque.h>
 
 namespace WebCore {
 
 class SegmentedString;
 
 class SegmentedSubstring {
- private:
-  friend class SegmentedString;
-
+ public:
   SegmentedSubstring()
       : m_length(0), m_current(0), m_doNotExcludeLineNumbers(true) {}
   SegmentedSubstring(const String& str)
-      : m_string(str), m_length(str.length()), m_doNotExcludeLineNumbers(true) {
-    m_current = m_length == 0 ? 0 : m_string.characters();
-  }
+      : m_length(str.length()),
+        m_current(str.isEmpty() ? 0 : str.characters()),
+        m_string(str),
+        m_doNotExcludeLineNumbers(true) {}
 
   SegmentedSubstring(const UChar* str, int length)
       : m_length(length),
@@ -64,9 +63,12 @@ class SegmentedSubstring {
     }
   }
 
-  String m_string;
+ public:
   int m_length;
   const UChar* m_current;
+
+ private:
+  String m_string;
   bool m_doNotExcludeLineNumbers;
 };
 
@@ -178,7 +180,7 @@ class SegmentedString {
   UChar m_pushedChar2;
   SegmentedSubstring m_currentString;
   const UChar* m_currentChar;
-  DeprecatedValueList<SegmentedSubstring> m_substrings;
+  Deque<SegmentedSubstring> m_substrings;
   bool m_composite;
 };
 }
