@@ -125,11 +125,10 @@ bool StringInstance::getOwnPropertySlot(ExecState* exec,
 
 void StringInstance::put(ExecState* exec,
                          const Identifier& propertyName,
-                         JSValue* value,
-                         int attr) {
+                         JSValue* value) {
   if (propertyName == exec->propertyNames().length)
     return;
-  JSObject::put(exec, propertyName, value, attr);
+  JSObject::put(exec, propertyName, value);
 }
 
 bool StringInstance::deleteProperty(ExecState* exec,

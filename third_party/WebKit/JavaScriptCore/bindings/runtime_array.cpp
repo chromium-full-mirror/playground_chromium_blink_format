@@ -85,8 +85,7 @@ bool RuntimeArray::getOwnPropertySlot(ExecState* exec,
 
 void RuntimeArray::put(ExecState* exec,
                        const Identifier& propertyName,
-                       JSValue* value,
-                       int attr) {
+                       JSValue* value) {
   if (propertyName == exec->propertyNames().length) {
     throwError(exec, RangeError);
     return;
@@ -99,10 +98,10 @@ void RuntimeArray::put(ExecState* exec,
     return;
   }
 
-  JSObject::put(exec, propertyName, value, attr);
+  JSObject::put(exec, propertyName, value);
 }
 
-void RuntimeArray::put(ExecState* exec, unsigned index, JSValue* value, int) {
+void RuntimeArray::put(ExecState* exec, unsigned index, JSValue* value) {
   if (index >= getLength()) {
     throwError(exec, RangeError);
     return;

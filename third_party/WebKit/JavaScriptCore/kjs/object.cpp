@@ -198,8 +198,7 @@ static void throwSetterError(ExecState* exec) {
 // ECMA 8.6.2.2
 void JSObject::put(ExecState* exec,
                    const Identifier& propertyName,
-                   JSValue* value,
-                   int attr) {
+                   JSValue* value) {
   ASSERT(value);
 
   if (propertyName == exec->propertyNames().underscoreProto) {
@@ -213,11 +212,6 @@ void JSObject::put(ExecState* exec,
     setPrototype(value);
     return;
   }
-
-  // The put calls from JavaScript execution either have no attributes set, or
-  // in some cases
-  // have DontDelete set. For those calls, respect the ReadOnly flag.
-  bool checkReadOnly = !(attr & ~DontDelete);
 
   // Check if there are any setters or getters in the prototype chain
   JSObject* obj = this;
@@ -235,12 +229,12 @@ void JSObject::put(ExecState* exec,
   }
 
   if (hasGettersOrSetters) {
-    if (checkReadOnly && !canPut(exec, propertyName))
+    unsigned attributes;
+    if (_prop.get(propertyName, attributes) && attributes & ReadOnly)
       return;
 
     obj = this;
     while (true) {
-      unsigned attributes;
       if (JSValue* gs = obj->_prop.get(propertyName, attributes)) {
         if (attributes & GetterSetter) {
           JSObject* setterFunc = static_cast<GetterSetterImp*>(gs)->getSetter();
@@ -269,29 +263,11 @@ void JSObject::put(ExecState* exec,
     }
   }
 
-  _prop.put(propertyName, value, attr, checkReadOnly);
+  _prop.put(propertyName, value, 0, true);
 }
 
-void JSObject::put(ExecState* exec,
-                   unsigned propertyName,
-                   JSValue* value,
-                   int attr) {
-  put(exec, Identifier::from(propertyName), value, attr);
-}
-
-// ECMA 8.6.2.3
-bool JSObject::canPut(ExecState*, const Identifier& propertyName) const {
-  unsigned attributes;
-
-  // Don't look in the prototype here. We can always put an override
-  // in the object, even if the prototype has a ReadOnly property.
-  // Also, there is no need to check the static property table, as this
-  // would have been done by the subclass already.
-
-  if (!_prop.get(propertyName, attributes))
-    return true;
-
-  return !(attributes & ReadOnly);
+void JSObject::put(ExecState* exec, unsigned propertyName, JSValue* value) {
+  put(exec, Identifier::from(propertyName), value);
 }
 
 // ECMA 8.6.2.4

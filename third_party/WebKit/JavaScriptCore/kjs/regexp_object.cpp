@@ -194,16 +194,12 @@ JSValue* RegExpImp::getValueProperty(ExecState*, int token) const {
 
 void RegExpImp::put(ExecState* exec,
                     const Identifier& propertyName,
-                    JSValue* value,
-                    int attributes) {
-  lookupPut<RegExpImp, JSObject>(exec, propertyName, value, attributes,
-                                 &RegExpImpTable, this);
+                    JSValue* value) {
+  lookupPut<RegExpImp, JSObject>(exec, propertyName, value, &RegExpImpTable,
+                                 this);
 }
 
-void RegExpImp::putValueProperty(ExecState* exec,
-                                 int token,
-                                 JSValue* value,
-                                 int) {
+void RegExpImp::putValueProperty(ExecState* exec, int token, JSValue* value) {
   UNUSED_PARAM(token);
   ASSERT(token == LastIndex);
   m_lastIndex = value->toInteger(exec);
@@ -446,16 +442,14 @@ JSValue* RegExpObjectImp::getValueProperty(ExecState*, int token) const {
 
 void RegExpObjectImp::put(ExecState* exec,
                           const Identifier& propertyName,
-                          JSValue* value,
-                          int attr) {
-  lookupPut<RegExpObjectImp, InternalFunctionImp>(
-      exec, propertyName, value, attr, &RegExpObjectImpTable, this);
+                          JSValue* value) {
+  lookupPut<RegExpObjectImp, InternalFunctionImp>(exec, propertyName, value,
+                                                  &RegExpObjectImpTable, this);
 }
 
 void RegExpObjectImp::putValueProperty(ExecState* exec,
                                        int token,
-                                       JSValue* value,
-                                       int) {
+                                       JSValue* value) {
   switch (token) {
     case Input:
       d->lastInput = value->toString(exec);

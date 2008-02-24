@@ -44,9 +44,8 @@ bool JSHTMLEmbedElement::customGetOwnPropertySlot(
 
 bool JSHTMLEmbedElement::customPut(ExecState* exec,
                                    const Identifier& propertyName,
-                                   JSValue* value,
-                                   int attr) {
-  return runtimeObjectCustomPut(exec, propertyName, value, attr,
+                                   JSValue* value) {
+  return runtimeObjectCustomPut(exec, propertyName, value,
                                 static_cast<HTMLElement*>(impl()));
 }
 

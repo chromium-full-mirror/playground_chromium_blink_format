@@ -41,14 +41,8 @@ class ArrayInstance : public JSObject {
   virtual bool getOwnPropertySlot(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
-  virtual void put(ExecState*,
-                   const Identifier& propertyName,
-                   JSValue*,
-                   int attributes = None);
-  virtual void put(ExecState*,
-                   unsigned propertyName,
-                   JSValue*,
-                   int attributes = None);
+  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual void put(ExecState*, unsigned propertyName, JSValue*);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);

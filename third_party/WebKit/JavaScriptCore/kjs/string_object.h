@@ -41,10 +41,7 @@ class StringInstance : public JSWrapperObject {
                                   unsigned propertyName,
                                   PropertySlot&);
 
-  virtual void put(ExecState* exec,
-                   const Identifier& propertyName,
-                   JSValue*,
-                   int attr = None);
+  virtual void put(ExecState* exec, const Identifier& propertyName, JSValue*);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 

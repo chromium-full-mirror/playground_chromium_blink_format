@@ -79,10 +79,7 @@ class Window : public JSGlobalObject {
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
-  virtual void put(ExecState*,
-                   const Identifier& propertyName,
-                   JSValue*,
-                   int attr = None);
+  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
 
   int installTimeout(const UString& handler, int t, bool singleShot);
   int installTimeout(JSValue* function,

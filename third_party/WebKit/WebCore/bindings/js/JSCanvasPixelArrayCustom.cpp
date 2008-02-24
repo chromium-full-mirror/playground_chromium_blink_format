@@ -43,17 +43,14 @@ JSValue* JSCanvasPixelArray::indexGetter(ExecState* exec,
       static_cast<JSCanvasPixelArray*>(slot.slotBase())->impl();
   unsigned index = slot.index();
   unsigned char result;
-  if (array->get(index, result))
-    return jsNumber(result);
-  return jsUndefined();
+  if (!array->get(index, result))
+    return jsUndefined();
+  return jsNumber(result);
 }
 
 void JSCanvasPixelArray::indexSetter(ExecState* exec,
                                      unsigned index,
-                                     JSValue* value,
-                                     int) {
-  if (index >= m_impl->length())
-    return;
+                                     JSValue* value) {
   double pixelValue = value->toNumber(exec);
   if (exec->hadException())
     return;

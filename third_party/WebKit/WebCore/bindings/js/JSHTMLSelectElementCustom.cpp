@@ -65,8 +65,7 @@ void selectIndexSetter(HTMLSelectElement* select,
 
 void JSHTMLSelectElement::indexSetter(KJS::ExecState* exec,
                                       unsigned index,
-                                      KJS::JSValue* value,
-                                      int attr) {
+                                      KJS::JSValue* value) {
   selectIndexSetter(static_cast<HTMLSelectElement*>(impl()), exec, index,
                     value);
 }

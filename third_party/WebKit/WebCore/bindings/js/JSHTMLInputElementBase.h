@@ -42,9 +42,8 @@ class JSHTMLInputElementBase : public JSHTMLElement {
   KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
   virtual void put(KJS::ExecState*,
                    const KJS::Identifier& propertyName,
-                   JSValue*,
-                   int attr);
-  void putValueProperty(KJS::ExecState*, int token, KJS::JSValue*, int attr);
+                   JSValue*);
+  void putValueProperty(KJS::ExecState*, int token, KJS::JSValue*);
   virtual const KJS::ClassInfo* classInfo() const { return &info; }
   static const KJS::ClassInfo info;
   enum { SelectionStart, SelectionEnd };

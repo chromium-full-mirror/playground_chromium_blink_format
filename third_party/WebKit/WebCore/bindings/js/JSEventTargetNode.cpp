@@ -46,16 +46,14 @@ JSValue* JSEventTargetNode::getValueProperty(ExecState* exec, int token) const {
 
 void JSEventTargetNode::put(ExecState* exec,
                             const Identifier& propertyName,
-                            JSValue* value,
-                            int attr) {
-  m_base.put<JSNode>(this, exec, propertyName, value, attr);
+                            JSValue* value) {
+  m_base.put<JSNode>(this, exec, propertyName, value);
 }
 
 void JSEventTargetNode::putValueProperty(ExecState* exec,
                                          int token,
-                                         JSValue* value,
-                                         int attr) {
-  m_base.putValueProperty(this, exec, token, value, attr);
+                                         JSValue* value) {
+  m_base.putValueProperty(this, exec, token, value);
 }
 
 void JSEventTargetNode::setListener(ExecState* exec,

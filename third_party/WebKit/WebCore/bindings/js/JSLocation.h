@@ -44,10 +44,7 @@ class JSLocation : public DOMObject {
                                   const KJS::Identifier&,
                                   KJS::PropertySlot&);
   KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
-  virtual void put(KJS::ExecState*,
-                   const KJS::Identifier&,
-                   KJS::JSValue*,
-                   int attr = KJS::None);
+  virtual void put(KJS::ExecState*, const KJS::Identifier&, KJS::JSValue*);
   virtual bool deleteProperty(KJS::ExecState*, const KJS::Identifier&);
   virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
 

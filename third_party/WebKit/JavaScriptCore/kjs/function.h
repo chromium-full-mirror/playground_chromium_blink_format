@@ -67,10 +67,7 @@ class FunctionImp : public InternalFunctionImp {
               const ScopeChain&);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState*,
-                   const Identifier& propertyName,
-                   JSValue* value,
-                   int attr = None);
+  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
   virtual bool implementsConstruct() const { return true; }
@@ -135,10 +132,7 @@ class Arguments : public JSObject {
             ActivationImp* act);
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState*,
-                   const Identifier& propertyName,
-                   JSValue* value,
-                   int attr = None);
+  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

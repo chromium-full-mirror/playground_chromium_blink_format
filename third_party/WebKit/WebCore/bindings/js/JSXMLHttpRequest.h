@@ -72,9 +72,8 @@ class JSXMLHttpRequest : public DOMObject {
   KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
   virtual void put(KJS::ExecState*,
                    const KJS::Identifier& propertyName,
-                   KJS::JSValue*,
-                   int attr);
-  void putValueProperty(KJS::ExecState*, int token, KJS::JSValue*, int attr);
+                   KJS::JSValue*);
+  void putValueProperty(KJS::ExecState*, int token, KJS::JSValue*);
   virtual bool toBoolean(KJS::ExecState*) const { return true; }
   virtual void mark();
 

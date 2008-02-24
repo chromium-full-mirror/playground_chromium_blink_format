@@ -134,8 +134,7 @@ class JSEventTargetBase {
   void putValueProperty(const JSEventTarget* owner,
                         KJS::ExecState* exec,
                         int token,
-                        KJS::JSValue* value,
-                        int attr) {
+                        KJS::JSValue* value) {
     AtomicString eventName = eventNameForPropertyToken(token);
     if (!eventName.isEmpty())
       owner->setListener(exec, eventName, value);
@@ -158,11 +157,9 @@ class JSEventTargetBase {
   void put(JSEventTarget* owner,
            KJS::ExecState* exec,
            const KJS::Identifier& propertyName,
-           KJS::JSValue* value,
-           int attr) {
-    KJS::lookupPut<JSEventTarget, JSParent>(exec, propertyName, value, attr,
-                                            &KJS::JSEventTargetPropertiesTable,
-                                            owner);
+           KJS::JSValue* value) {
+    KJS::lookupPut<JSEventTarget, JSParent>(
+        exec, propertyName, value, &KJS::JSEventTargetPropertiesTable, owner);
   }
 };
 
@@ -196,8 +193,7 @@ class JSEventTargetPrototype : public KJS::JSObject {
     KJS::JSObject* newObject =
         new JSEventTargetPrototype<JSEventTargetPrototypeParent,
                                    JSEventTargetPrototypeInformation>(exec);
-    globalObject->putDirect(*prototypeName, newObject,
-                            KJS::Internal | KJS::DontEnum);
+    globalObject->putDirect(*prototypeName, newObject, KJS::DontEnum);
     return newObject;
   }
 

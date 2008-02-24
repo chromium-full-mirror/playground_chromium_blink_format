@@ -723,13 +723,12 @@ bool Window::getOwnPropertySlot(ExecState* exec,
 
 void Window::put(ExecState* exec,
                  const Identifier& propertyName,
-                 JSValue* value,
-                 int attr) {
+                 JSValue* value) {
   const HashEntry* entry = Lookup::findEntry(&WindowTable, propertyName);
   if (entry) {
     if (entry->attr & Function) {
       if (allowsAccessFrom(exec))
-        Base::put(exec, propertyName, value, attr);
+        Base::put(exec, propertyName, value);
       return;
     }
     if (entry->attr & ReadOnly)
@@ -746,7 +745,7 @@ void Window::put(ExecState* exec,
             if (settings->usesDashboardBackwardCompatibilityMode() &&
                 !p->tree()->parent()) {
               if (allowsAccessFrom(exec))
-                putDirect(propertyName, value, attr);
+                putDirect(propertyName, value);
               return;
             }
           }
@@ -870,7 +869,7 @@ void Window::put(ExecState* exec,
     }
   }
   if (allowsAccessFrom(exec))
-    Base::put(exec, propertyName, value, attr);
+    Base::put(exec, propertyName, value);
 }
 
 bool Window::allowsAccessFrom(const JSGlobalObject* other) const {

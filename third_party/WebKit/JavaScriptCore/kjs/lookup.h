@@ -255,7 +255,6 @@ template <class ThisImp>
 inline bool lookupPut(ExecState* exec,
                       const Identifier& propertyName,
                       JSValue* value,
-                      int attr,
                       const HashTable* table,
                       ThisImp* thisObj) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
@@ -264,9 +263,9 @@ inline bool lookupPut(ExecState* exec,
     return false;
 
   if (entry->attr & Function)  // function: put as override property
-    thisObj->JSObject::put(exec, propertyName, value, attr);
+    thisObj->putDirect(propertyName, value);
   else if (!(entry->attr & ReadOnly))
-    thisObj->putValueProperty(exec, entry->value.intValue, value, attr);
+    thisObj->putValueProperty(exec, entry->value.intValue, value);
 
   return true;
 }
@@ -281,12 +280,11 @@ template <class ThisImp, class ParentImp>
 inline void lookupPut(ExecState* exec,
                       const Identifier& propertyName,
                       JSValue* value,
-                      int attr,
                       const HashTable* table,
                       ThisImp* thisObj) {
-  if (!lookupPut<ThisImp>(exec, propertyName, value, attr, table, thisObj))
-    thisObj->ParentImp::put(exec, propertyName, value,
-                            attr);  // not found: forward to parent
+  if (!lookupPut<ThisImp>(exec, propertyName, value, table, thisObj))
+    thisObj->ParentImp::put(exec, propertyName,
+                            value);  // not found: forward to parent
 }
 
 /**
@@ -306,7 +304,7 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
     return static_cast<JSObject*>(obj);
   }
   JSObject* newObject = new ClassCtor(exec);
-  globalObject->putDirect(propertyName, newObject, Internal | DontEnum);
+  globalObject->putDirect(propertyName, newObject, DontEnum);
   return newObject;
 }
 

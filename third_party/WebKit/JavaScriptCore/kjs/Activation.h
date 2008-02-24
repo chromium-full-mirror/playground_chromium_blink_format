@@ -59,7 +59,11 @@ class ActivationImp : public JSVariableObject {
   void init(ExecState*);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState*, const Identifier&, JSValue*, int attr = None);
+  virtual void put(ExecState*, const Identifier&, JSValue*);
+  virtual void initializeVariable(ExecState*,
+                                  const Identifier&,
+                                  JSValue*,
+                                  unsigned attributes);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -68,7 +72,7 @@ class ActivationImp : public JSVariableObject {
   virtual void mark();
   void markChildren();
 
-  virtual bool isActivationObject() { return true; }
+  virtual bool isActivationObject() const { return true; }
 
   bool isOnStack() const { return d()->isOnStack; }
   bool needsPop() const { return d()->isOnStack || d()->leftRelic; }

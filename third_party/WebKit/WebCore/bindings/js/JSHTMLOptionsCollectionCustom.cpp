@@ -60,8 +60,7 @@ void JSHTMLOptionsCollection::setLength(ExecState* exec, JSValue* value) {
 
 void JSHTMLOptionsCollection::indexSetter(ExecState* exec,
                                           unsigned index,
-                                          JSValue* value,
-                                          int attr) {
+                                          JSValue* value) {
   HTMLOptionsCollection* imp = static_cast<HTMLOptionsCollection*>(impl());
   HTMLSelectElement* base = static_cast<HTMLSelectElement*>(imp->base());
   selectIndexSetter(base, exec, index, value);

@@ -54,8 +54,8 @@ class RegExpImp : public JSObject {
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
-  void put(ExecState*, const Identifier&, JSValue*, int attributes = None);
-  void putValueProperty(ExecState*, int token, JSValue*, int attributes);
+  void put(ExecState*, const Identifier&, JSValue*);
+  void putValueProperty(ExecState*, int token, JSValue*);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -95,11 +95,8 @@ class RegExpObjectImp : public InternalFunctionImp {
   virtual JSObject* construct(ExecState*, const List&);
   JSObject* createRegExpImp(ExecState*, PassRefPtr<RegExp>);
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
-  virtual void put(ExecState*,
-                   const Identifier&,
-                   JSValue*,
-                   int attributes = None);
-  void putValueProperty(ExecState*, int token, JSValue*, int attributes);
+  virtual void put(ExecState*, const Identifier&, JSValue*);
+  void putValueProperty(ExecState*, int token, JSValue*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   virtual const ClassInfo* classInfo() const { return &info; }
