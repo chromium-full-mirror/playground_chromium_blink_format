@@ -437,10 +437,12 @@ inline void Deque<T>::expandCapacityIfNeeded() {
   if (m_start) {
     if (m_end + 1 != m_start)
       return;
-  } else {
-    if (m_end && m_end != m_buffer.capacity() - 1)
+  } else if (m_end) {
+    if (m_end != m_buffer.capacity() - 1)
       return;
-  }
+  } else if (m_buffer.capacity())
+    return;
+
   expandCapacity();
 }
 
@@ -482,12 +484,14 @@ inline void Deque<T>::append(const U& value) {
 template <typename T>
 template <typename U>
 inline void Deque<T>::prepend(const U& value) {
+  checkValidity();
   expandCapacityIfNeeded();
   if (!m_start)
     m_start = m_buffer.capacity() - 1;
   else
     --m_start;
   new (&m_buffer.buffer()[m_start]) T(value);
+  checkValidity();
 }
 
 template <typename T>
