@@ -159,8 +159,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void transitionToCommittedFromCachedPage(WebCore::CachedPage*);
   virtual void transitionToCommittedForNewPage();
 
-  virtual void updateGlobalHistoryForStandardLoad(const WebCore::KURL&);
-  virtual void updateGlobalHistoryForReload(const WebCore::KURL&);
+  virtual void updateGlobalHistory(const WebCore::KURL&);
   virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
   virtual void saveViewStateToItem(WebCore::HistoryItem*);
   virtual bool canCachePage() const;

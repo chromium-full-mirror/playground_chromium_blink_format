@@ -184,8 +184,7 @@ class FrameLoaderClient {
   virtual void finishedLoading(DocumentLoader*) = 0;
   virtual void finalSetupForReplace(DocumentLoader*) = 0;
 
-  virtual void updateGlobalHistoryForStandardLoad(const KURL&) = 0;
-  virtual void updateGlobalHistoryForReload(const KURL&) = 0;
+  virtual void updateGlobalHistory(const KURL&) = 0;
   virtual bool shouldGoToHistoryItem(HistoryItem*) const = 0;
 
   virtual ResourceError cancelledError(const ResourceRequest&) = 0;

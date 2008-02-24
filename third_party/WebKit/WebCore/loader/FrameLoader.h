@@ -560,13 +560,14 @@ class FrameLoader : Noncopyable
   void recursiveGoToItem(HistoryItem*, HistoryItem*, FrameLoadType);
   bool childFramesMatchItem(HistoryItem*) const;
 
-  void addHistoryForCurrentLocation();
   void updateHistoryForBackForwardNavigation();
   void updateHistoryForReload();
   void updateHistoryForStandardLoad();
   void updateHistoryForRedirectWithLockedHistory();
   void updateHistoryForClientRedirect();
   void updateHistoryForCommit();
+
+  void updateGlobalHistory();
 
   void redirectionTimerFired(Timer<FrameLoader>*);
   void checkCompletedTimerFired(Timer<FrameLoader>*);
