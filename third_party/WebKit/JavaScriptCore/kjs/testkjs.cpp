@@ -26,6 +26,7 @@
 #include "JSGlobalObject.h"
 #include "JSLock.h"
 #include "Parser.h"
+#include "array_object.h"
 #include "collector.h"
 #include "interpreter.h"
 #include "nodes.h"
@@ -222,7 +223,7 @@ int main(int argc, char** argv) {
   return res;
 }
 
-static GlobalImp* createGlobalObject() {
+static GlobalImp* createGlobalObject(Vector<UString>& arguments) {
   GlobalImp* global = new GlobalImp;
 
   // add debug() function
@@ -244,6 +245,12 @@ static GlobalImp* createGlobalObject() {
               new TestFunctionImp(TestFunctionImp::Run, 1));
   global->put(global->globalExec(), "load",
               new TestFunctionImp(TestFunctionImp::Load, 1));
+
+  JSObject* array = global->arrayConstructor()->construct(
+      global->globalExec(), global->globalExec()->emptyList());
+  for (size_t i = 0; i < arguments.size(); ++i)
+    array->put(global->globalExec(), i, jsString(arguments[i]));
+  global->put(global->globalExec(), "arguments", array);
 
   Interpreter::setShouldPrintExceptions(true);
   return global;
@@ -267,8 +274,10 @@ static bool prettyPrintScript(const UString& fileName,
   return true;
 }
 
-static bool runWithScripts(const Vector<UString>& fileNames, bool prettyPrint) {
-  GlobalImp* globalObject = createGlobalObject();
+static bool runWithScripts(const Vector<UString>& fileNames,
+                           Vector<UString>& arguments,
+                           bool prettyPrint) {
+  GlobalImp* globalObject = createGlobalObject(arguments);
   Vector<char> script;
 
   bool success = true;
@@ -290,26 +299,42 @@ static bool runWithScripts(const Vector<UString>& fileNames, bool prettyPrint) {
   return success;
 }
 
+static void printUsageStatement() {
+  fprintf(stderr,
+          "Usage: testkjs -f file1 [-f file2...][-p][-- arguments...]\n");
+  exit(-1);
+}
+
 static void parseArguments(int argc,
                            char** argv,
                            Vector<UString>& fileNames,
+                           Vector<UString>& arguments,
                            bool& prettyPrint) {
-  if (argc < 2) {
-    fprintf(stderr, "Usage: testkjs file1 [file2...]\n");
-    exit(-1);
-  }
+  if (argc < 3)
+    printUsageStatement();
 
-  for (int i = 1; i < argc; i++) {
-    const char* fileName = argv[i];
-    if (strcmp(fileName, "-f") ==
-        0)  // mozilla test driver script uses "-f" prefix for files
+  int i = 1;
+  for (; i < argc; ++i) {
+    const char* arg = argv[i];
+    if (strcmp(arg, "-f") == 0) {
+      if (++i == argc)
+        printUsageStatement();
+      fileNames.append(argv[i]);
       continue;
-    if (strcmp(fileName, "-p") == 0) {
+    }
+    if (strcmp(arg, "-p") == 0) {
       prettyPrint = true;
       continue;
     }
-    fileNames.append(fileName);
+    if (strcmp(arg, "--") == 0) {
+      ++i;
+      break;
+    }
+    break;
   }
+
+  for (; i < argc; ++i)
+    arguments.append(argv[i]);
 }
 
 int kjsmain(int argc, char** argv) {
@@ -317,9 +342,10 @@ int kjsmain(int argc, char** argv) {
 
   bool prettyPrint = false;
   Vector<UString> fileNames;
-  parseArguments(argc, argv, fileNames, prettyPrint);
+  Vector<UString> arguments;
+  parseArguments(argc, argv, fileNames, arguments, prettyPrint);
 
-  bool success = runWithScripts(fileNames, prettyPrint);
+  bool success = runWithScripts(fileNames, arguments, prettyPrint);
 
 #ifndef NDEBUG
   Collector::collect();
