@@ -1466,10 +1466,6 @@ void Range::surroundContents(PassRefPtr<Node> passNewParent,
 
   // BAD_BOUNDARYPOINTS_ERR: Raised if the Range partially selects a non-Text
   // node.
-  // FIXME: The specification says non-Text. What does that mean about
-  // CDataSection, which
-  // is a kind of Text node? Use isTextNode() instead of nodeType() to include
-  // CDataSection?
   if (m_startContainer->nodeType() != Node::TEXT_NODE) {
     if (m_startOffset > 0 && m_startOffset < maxStartOffset()) {
       ec = RangeException::BAD_BOUNDARYPOINTS_ERR;
