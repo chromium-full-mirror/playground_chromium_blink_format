@@ -512,7 +512,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
     // we need to do this slightly modified bit of one of the write() cases
     // because we want to prepend to pendingSrc rather than appending
     // if there's no previous prependingSrc
-    if (state.loadingExtScript()) {
+    if (!pendingScripts.isEmpty()) {
       if (currentPrependingSrc) {
         currentPrependingSrc->append(prependingSrc);
       } else {
@@ -574,7 +574,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const String& str,
     // we need to do this slightly modified bit of one of the write() cases
     // because we want to prepend to pendingSrc rather than appending
     // if there's no previous prependingSrc
-    if (state.loadingExtScript()) {
+    if (!pendingScripts.isEmpty()) {
       if (currentPrependingSrc)
         currentPrependingSrc->append(prependingSrc);
       else
