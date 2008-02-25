@@ -344,8 +344,12 @@ enum EMarginCollapse { MCOLLAPSE, MSEPARATE, MDISCARD };
 
 class StyleSurroundData : public RefCounted<StyleSurroundData> {
  public:
-  StyleSurroundData();
-  StyleSurroundData(const StyleSurroundData& o);
+  static PassRefPtr<StyleSurroundData> create() {
+    return adoptRef(new StyleSurroundData);
+  }
+  PassRefPtr<StyleSurroundData> copy() const {
+    return adoptRef(new StyleSurroundData(*this));
+  }
 
   bool operator==(const StyleSurroundData& o) const;
   bool operator!=(const StyleSurroundData& o) const { return !(*this == o); }
@@ -354,6 +358,10 @@ class StyleSurroundData : public RefCounted<StyleSurroundData> {
   LengthBox margin;
   LengthBox padding;
   BorderData border;
+
+ private:
+  StyleSurroundData();
+  StyleSurroundData(const StyleSurroundData&);
 };
 
 //------------------------------------------------
@@ -363,12 +371,12 @@ enum EBoxSizing { CONTENT_BOX, BORDER_BOX };
 
 class StyleBoxData : public RefCounted<StyleBoxData> {
  public:
-  StyleBoxData();
-  StyleBoxData(const StyleBoxData& o);
-
-  // copy and assignment
-  //    StyleBoxData(const StyleBoxData &other);
-  //    const StyleBoxData &operator = (const StyleBoxData &other);
+  static PassRefPtr<StyleBoxData> create() {
+    return adoptRef(new StyleBoxData);
+  }
+  PassRefPtr<StyleBoxData> copy() const {
+    return adoptRef(new StyleBoxData(*this));
+  }
 
   bool operator==(const StyleBoxData& o) const;
   bool operator!=(const StyleBoxData& o) const { return !(*this == o); }
@@ -387,6 +395,10 @@ class StyleBoxData : public RefCounted<StyleBoxData> {
   int z_index;
   bool z_auto : 1;
   unsigned boxSizing : 1;  // EBoxSizing
+
+ private:
+  StyleBoxData();
+  StyleBoxData(const StyleBoxData&);
 };
 
 //------------------------------------------------
@@ -432,9 +444,13 @@ enum EUnicodeBidi { UBNormal, Embed, Override };
 
 class StyleVisualData : public RefCounted<StyleVisualData> {
  public:
-  StyleVisualData();
+  static PassRefPtr<StyleVisualData> create() {
+    return adoptRef(new StyleVisualData);
+  }
+  PassRefPtr<StyleVisualData> copy() const {
+    return adoptRef(new StyleVisualData(*this));
+  }
   ~StyleVisualData();
-  StyleVisualData(const StyleVisualData&);
 
   bool operator==(const StyleVisualData& o) const {
     return (clip == o.clip && hasClip == o.hasClip &&
@@ -451,6 +467,10 @@ class StyleVisualData : public RefCounted<StyleVisualData> {
 
   short counterIncrement;  // ok, so these are not visual mode specific
   short counterReset;  // can't go to inherited, since these are not inherited
+
+ private:
+  StyleVisualData();
+  StyleVisualData(const StyleVisualData&);
 };
 
 //------------------------------------------------
@@ -609,9 +629,13 @@ struct BackgroundLayer {
 
 class StyleBackgroundData : public RefCounted<StyleBackgroundData> {
  public:
-  StyleBackgroundData();
+  static PassRefPtr<StyleBackgroundData> create() {
+    return adoptRef(new StyleBackgroundData);
+  }
+  PassRefPtr<StyleBackgroundData> copy() const {
+    return adoptRef(new StyleBackgroundData(*this));
+  }
   ~StyleBackgroundData() {}
-  StyleBackgroundData(const StyleBackgroundData& o);
 
   bool operator==(const StyleBackgroundData& o) const;
   bool operator!=(const StyleBackgroundData& o) const { return !(*this == o); }
@@ -619,6 +643,10 @@ class StyleBackgroundData : public RefCounted<StyleBackgroundData> {
   BackgroundLayer m_background;
   Color m_color;
   OutlineValue m_outline;
+
+ private:
+  StyleBackgroundData();
+  StyleBackgroundData(const StyleBackgroundData& o);
 };
 
 //------------------------------------------------
@@ -658,7 +686,7 @@ class StyleMarqueeData : public RefCounted<StyleMarqueeData> {
 
  private:
   StyleMarqueeData();
-  StyleMarqueeData(const StyleMarqueeData& o);
+  StyleMarqueeData(const StyleMarqueeData&);
 };
 
 // CSS3 Multi Column Layout
@@ -695,7 +723,7 @@ class StyleMultiColData : public RefCounted<StyleMultiColData> {
 
  private:
   StyleMultiColData();
-  StyleMultiColData(const StyleMultiColData& o);
+  StyleMultiColData(const StyleMultiColData&);
 };
 
 // CSS Transforms (may become part of CSS3)
@@ -946,7 +974,7 @@ class StyleFlexibleBoxData : public RefCounted<StyleFlexibleBoxData> {
 
  private:
   StyleFlexibleBoxData();
-  StyleFlexibleBoxData(const StyleFlexibleBoxData& o);
+  StyleFlexibleBoxData(const StyleFlexibleBoxData&);
 };
 
 // This struct holds information about shadows for the text-shadow and
@@ -1264,9 +1292,13 @@ struct Transition {
 // actually uses one of these properties.
 class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
  public:
-  StyleRareNonInheritedData();
+  static PassRefPtr<StyleRareNonInheritedData> create() {
+    return adoptRef(new StyleRareNonInheritedData);
+  }
+  PassRefPtr<StyleRareNonInheritedData> copy() const {
+    return adoptRef(new StyleRareNonInheritedData(*this));
+  }
   ~StyleRareNonInheritedData();
-  StyleRareNonInheritedData(const StyleRareNonInheritedData&);
 
 #if ENABLE(XBL)
   bool bindingsEquivalent(const StyleRareNonInheritedData&) const;
@@ -1312,6 +1344,10 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
 #if ENABLE(XBL)
   BindingURI* bindingURI;  // The XBL binding URI list.
 #endif
+
+ private:
+  StyleRareNonInheritedData();
+  StyleRareNonInheritedData(const StyleRareNonInheritedData&);
 };
 
 // This struct is for rarely used inherited CSS3, CSS2, and WebKit-specific
@@ -1321,9 +1357,13 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
 // actually uses one of these properties.
 class StyleRareInheritedData : public RefCounted<StyleRareInheritedData> {
  public:
-  StyleRareInheritedData();
+  static PassRefPtr<StyleRareInheritedData> create() {
+    return adoptRef(new StyleRareInheritedData);
+  }
+  PassRefPtr<StyleRareInheritedData> copy() const {
+    return adoptRef(new StyleRareInheritedData(*this));
+  }
   ~StyleRareInheritedData();
-  StyleRareInheritedData(const StyleRareInheritedData& o);
 
   bool operator==(const StyleRareInheritedData& o) const;
   bool operator!=(const StyleRareInheritedData& o) const {
@@ -1348,6 +1388,10 @@ class StyleRareInheritedData : public RefCounted<StyleRareInheritedData> {
   bool textSizeAdjust : 1;      // An Apple extension.
   unsigned resize : 2;          // EResize
   unsigned userSelect : 1;      // EUserSelect
+
+ private:
+  StyleRareInheritedData();
+  StyleRareInheritedData(const StyleRareInheritedData&);
 };
 
 //------------------------------------------------
@@ -1381,9 +1425,13 @@ enum EPageBreak { PBAUTO, PBALWAYS, PBAVOID };
 
 class StyleInheritedData : public RefCounted<StyleInheritedData> {
  public:
-  StyleInheritedData();
+  static PassRefPtr<StyleInheritedData> create() {
+    return adoptRef(new StyleInheritedData);
+  }
+  PassRefPtr<StyleInheritedData> copy() const {
+    return adoptRef(new StyleInheritedData(*this));
+  }
   ~StyleInheritedData();
-  StyleInheritedData(const StyleInheritedData& o);
 
   bool operator==(const StyleInheritedData& o) const;
   bool operator!=(const StyleInheritedData& o) const { return !(*this == o); }
@@ -1406,6 +1454,10 @@ class StyleInheritedData : public RefCounted<StyleInheritedData> {
   short widows;
   short orphans;
   unsigned page_break_inside : 2;  // EPageBreak
+
+ private:
+  StyleInheritedData();
+  StyleInheritedData(const StyleInheritedData&);
 };
 
 enum EEmptyCell { SHOW, HIDE };
@@ -1656,15 +1708,15 @@ class RenderStyle {
   } noninherited_flags;
 
   // non-inherited attributes
-  DeprecatedDataRef<StyleBoxData> box;
-  DeprecatedDataRef<StyleVisualData> visual;
-  DeprecatedDataRef<StyleBackgroundData> background;
-  DeprecatedDataRef<StyleSurroundData> surround;
-  DeprecatedDataRef<StyleRareNonInheritedData> rareNonInheritedData;
+  DataRef<StyleBoxData> box;
+  DataRef<StyleVisualData> visual;
+  DataRef<StyleBackgroundData> background;
+  DataRef<StyleSurroundData> surround;
+  DataRef<StyleRareNonInheritedData> rareNonInheritedData;
 
   // inherited attributes
-  DeprecatedDataRef<StyleRareInheritedData> rareInheritedData;
-  DeprecatedDataRef<StyleInheritedData> inherited;
+  DataRef<StyleRareInheritedData> rareInheritedData;
+  DataRef<StyleInheritedData> inherited;
 
   // list of associated pseudo styles
   RenderStyle* pseudoStyle;
