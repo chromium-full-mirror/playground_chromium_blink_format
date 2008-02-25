@@ -1,10 +1,8 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2005 Apple Computer, Inc.
+ * Copyright (C) 2003, 2005, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -26,20 +24,57 @@
 #ifndef DataRef_h
 #define DataRef_h
 
+#include <wtf/RefPtr.h>
+
 namespace WebCore {
 
 template <typename T>
 class DataRef {
  public:
-  DataRef() : m_data(0) {}
+  const T* get() const { return m_data.get(); }
 
-  DataRef(const DataRef<T>& d) {
+  const T& operator*() const { return *m_data; }
+  const T* operator->() const { return m_data.get(); }
+
+  T* access() {
+    if (!m_data->hasOneRef())
+      m_data = m_data->copy();
+    return m_data.get();
+  }
+
+  void init() {
+    ASSERT(!m_data);
+    m_data = T::create();
+  }
+
+  bool operator==(const DataRef<T>& o) const {
+    ASSERT(m_data);
+    ASSERT(o.m_data);
+    return m_data == o.m_data || *m_data == *o.m_data;
+  }
+
+  bool operator!=(const DataRef<T>& o) const {
+    ASSERT(m_data);
+    ASSERT(o.m_data);
+    return m_data != o.m_data && *m_data != *o.m_data;
+  }
+
+ private:
+  RefPtr<T> m_data;
+};
+
+template <typename T>
+class DeprecatedDataRef {
+ public:
+  DeprecatedDataRef() : m_data(0) {}
+
+  DeprecatedDataRef(const DeprecatedDataRef<T>& d) {
     ASSERT(d.m_data);
     m_data = d.m_data;
     m_data->ref();
   }
 
-  ~DataRef() {
+  ~DeprecatedDataRef() {
     if (m_data)
       m_data->deref();
   }
@@ -64,7 +99,7 @@ class DataRef {
     m_data->ref();
   }
 
-  DataRef<T>& operator=(const DataRef<T>& d) {
+  DeprecatedDataRef<T>& operator=(const DeprecatedDataRef<T>& d) {
     ASSERT(d.m_data);
     d.m_data->ref();
     if (m_data)
@@ -73,13 +108,13 @@ class DataRef {
     return *this;
   }
 
-  bool operator==(const DataRef<T>& o) const {
+  bool operator==(const DeprecatedDataRef<T>& o) const {
     ASSERT(m_data);
     ASSERT(o.m_data);
     return m_data == o.m_data || *m_data == *o.m_data;
   }
 
-  bool operator!=(const DataRef<T>& o) const {
+  bool operator!=(const DeprecatedDataRef<T>& o) const {
     ASSERT(m_data);
     ASSERT(o.m_data);
     return m_data != o.m_data && *m_data != *o.m_data;
