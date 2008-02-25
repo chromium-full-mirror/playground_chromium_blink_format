@@ -1,7 +1,6 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2004-2007 Apple Inc.
+ *  Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *  Copyright (C) 2006 Bjoern Graf (bjoern.graf@gmail.com)
  *
  *  This library is free software; you can redistribute it and/or
@@ -28,6 +27,7 @@
 #include "Parser.h"
 #include "array_object.h"
 #include "collector.h"
+#include "function.h"
 #include "interpreter.h"
 #include "nodes.h"
 #include "object.h"
@@ -56,6 +56,14 @@ using namespace WTF;
 
 static bool fillBufferWithContentsOfFile(const UString& fileName,
                                          Vector<char>& buffer);
+
+static JSValue* functionPrint(ExecState*, JSObject*, const List&);
+static JSValue* functionDebug(ExecState*, JSObject*, const List&);
+static JSValue* functionGC(ExecState*, JSObject*, const List&);
+static JSValue* functionVersion(ExecState*, JSObject*, const List&);
+static JSValue* functionRun(ExecState*, JSObject*, const List&);
+static JSValue* functionLoad(ExecState*, JSObject*, const List&);
+static JSValue* functionQuit(ExecState*, JSObject*, const List&);
 
 class StopWatch {
  public:
@@ -110,82 +118,92 @@ long StopWatch::getElapsedMS() {
 #endif
 }
 
-class GlobalImp : public JSGlobalObject {
+class GlobalObject : public JSGlobalObject {
  public:
+  GlobalObject(Vector<UString>& arguments);
   virtual UString className() const { return "global"; }
 };
-COMPILE_ASSERT(!IsInteger<GlobalImp>::value, WTF_IsInteger_GlobalImp_false);
+COMPILE_ASSERT(!IsInteger<GlobalObject>::value,
+               WTF_IsInteger_GlobalObject_false);
 
-class TestFunctionImp : public JSObject {
- public:
-  enum TestFunctionType { Print, Debug, Quit, GC, Version, Run, Load };
+GlobalObject::GlobalObject(Vector<UString>& arguments) {
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 1,
+                                          "debug", functionDebug));
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 1,
+                                          "print", functionPrint));
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 0,
+                                          "quit", functionQuit));
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 0,
+                                          "gc", functionGC));
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 1,
+                                          "version", functionVersion));
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 1,
+                                          "run", functionRun));
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 1,
+                                          "load", functionLoad));
 
-  TestFunctionImp(TestFunctionType i, int length);
-  virtual bool implementsCall() const { return true; }
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const List& args);
+  JSObject* array =
+      arrayConstructor()->construct(globalExec(), globalExec()->emptyList());
+  for (size_t i = 0; i < arguments.size(); ++i)
+    array->put(globalExec(), i, jsString(arguments[i]));
+  putDirect("arguments", array);
 
- private:
-  TestFunctionType m_type;
-};
-
-TestFunctionImp::TestFunctionImp(TestFunctionType i, int length)
-    : JSObject(), m_type(i) {
-  putDirect(Identifier("length"), length, DontDelete | ReadOnly | DontEnum);
+  Interpreter::setShouldPrintExceptions(true);
 }
 
-JSValue* TestFunctionImp::callAsFunction(ExecState* exec,
-                                         JSObject*,
-                                         const List& args) {
-  switch (m_type) {
-    case Print:
-      printf("%s\n", args[0]->toString(exec).UTF8String().c_str());
-      return jsUndefined();
-    case Debug:
-      fprintf(stderr, "--> %s\n", args[0]->toString(exec).UTF8String().c_str());
-      return jsUndefined();
-    case GC: {
-      JSLock lock;
-      Collector::collect();
-      return jsUndefined();
-    }
-    case Version:
-      // We need this function for compatibility with the Mozilla JS tests but
-      // for now
-      // we don't actually do any version-specific handling
-      return jsUndefined();
-    case Run: {
-      StopWatch stopWatch;
-      UString fileName = args[0]->toString(exec);
-      Vector<char> script;
-      if (!fillBufferWithContentsOfFile(fileName, script))
-        return throwError(exec, GeneralError, "Could not open file.");
+JSValue* functionPrint(ExecState* exec, JSObject*, const List& args) {
+  printf("%s\n", args[0]->toString(exec).UTF8String().c_str());
+  return jsUndefined();
+}
 
-      stopWatch.start();
-      Interpreter::evaluate(exec->dynamicGlobalObject()->globalExec(), fileName,
-                            0, script.data());
-      stopWatch.stop();
+JSValue* functionDebug(ExecState* exec, JSObject*, const List& args) {
+  fprintf(stderr, "--> %s\n", args[0]->toString(exec).UTF8String().c_str());
+  return jsUndefined();
+}
 
-      return jsNumber(stopWatch.getElapsedMS());
-    }
-    case Load: {
-      UString fileName = args[0]->toString(exec);
-      Vector<char> script;
-      if (!fillBufferWithContentsOfFile(fileName, script))
-        return throwError(exec, GeneralError, "Could not open file.");
+JSValue* functionGC(ExecState*, JSObject*, const List&) {
+  JSLock lock;
+  Collector::collect();
+  return jsUndefined();
+}
 
-      Interpreter::evaluate(exec->dynamicGlobalObject()->globalExec(), fileName,
-                            0, script.data());
+JSValue* functionVersion(ExecState*, JSObject*, const List&) {
+  // We need this function for compatibility with the Mozilla JS tests but for
+  // now
+  // we don't actually do any version-specific handling
+  return jsUndefined();
+}
 
-      return jsUndefined();
-    }
-    case Quit:
-      exit(0);
-    default:
-      abort();
-  }
-  return 0;
+JSValue* functionRun(ExecState* exec, JSObject*, const List& args) {
+  StopWatch stopWatch;
+  UString fileName = args[0]->toString(exec);
+  Vector<char> script;
+  if (!fillBufferWithContentsOfFile(fileName, script))
+    return throwError(exec, GeneralError, "Could not open file.");
+
+  stopWatch.start();
+  Interpreter::evaluate(exec->dynamicGlobalObject()->globalExec(), fileName, 0,
+                        script.data());
+  stopWatch.stop();
+
+  return jsNumber(stopWatch.getElapsedMS());
+}
+
+JSValue* functionLoad(ExecState* exec, JSObject*, const List& args) {
+  UString fileName = args[0]->toString(exec);
+  Vector<char> script;
+  if (!fillBufferWithContentsOfFile(fileName, script))
+    return throwError(exec, GeneralError, "Could not open file.");
+
+  Interpreter::evaluate(exec->dynamicGlobalObject()->globalExec(), fileName, 0,
+                        script.data());
+
+  return jsUndefined();
+}
+
+JSValue* functionQuit(ExecState*, JSObject*, const List&) {
+  exit(0);
+  return jsUndefined();
 }
 
 // Use SEH for Release builds only to get rid of the crash report dialog
@@ -223,39 +241,6 @@ int main(int argc, char** argv) {
   return res;
 }
 
-static GlobalImp* createGlobalObject(Vector<UString>& arguments) {
-  GlobalImp* global = new GlobalImp;
-
-  // add debug() function
-  global->put(global->globalExec(), "debug",
-              new TestFunctionImp(TestFunctionImp::Debug, 1));
-  // add "print" for compatibility with the mozilla js shell
-  global->put(global->globalExec(), "print",
-              new TestFunctionImp(TestFunctionImp::Print, 1));
-  // add "quit" for compatibility with the mozilla js shell
-  global->put(global->globalExec(), "quit",
-              new TestFunctionImp(TestFunctionImp::Quit, 0));
-  // add "gc" for compatibility with the mozilla js shell
-  global->put(global->globalExec(), "gc",
-              new TestFunctionImp(TestFunctionImp::GC, 0));
-  // add "version" for compatibility with the mozilla js shell
-  global->put(global->globalExec(), "version",
-              new TestFunctionImp(TestFunctionImp::Version, 1));
-  global->put(global->globalExec(), "run",
-              new TestFunctionImp(TestFunctionImp::Run, 1));
-  global->put(global->globalExec(), "load",
-              new TestFunctionImp(TestFunctionImp::Load, 1));
-
-  JSObject* array = global->arrayConstructor()->construct(
-      global->globalExec(), global->globalExec()->emptyList());
-  for (size_t i = 0; i < arguments.size(); ++i)
-    array->put(global->globalExec(), i, jsString(arguments[i]));
-  global->put(global->globalExec(), "arguments", array);
-
-  Interpreter::setShouldPrintExceptions(true);
-  return global;
-}
-
 static bool prettyPrintScript(const UString& fileName,
                               const Vector<char>& script) {
   int errLine = 0;
@@ -277,7 +262,7 @@ static bool prettyPrintScript(const UString& fileName,
 static bool runWithScripts(const Vector<UString>& fileNames,
                            Vector<UString>& arguments,
                            bool prettyPrint) {
-  GlobalImp* globalObject = createGlobalObject(arguments);
+  GlobalObject* globalObject = new GlobalObject(arguments);
   Vector<char> script;
 
   bool success = true;
