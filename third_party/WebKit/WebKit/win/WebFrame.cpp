@@ -1180,16 +1180,8 @@ WebHistory* WebFrame::webHistory() {
   return webHistory;
 }
 
-bool WebFrame::hasFrameView() const {
-  return !!d->frameView();
-}
-
 void WebFrame::makeRepresentation(DocumentLoader*) {
   notImplemented();
-}
-
-void WebFrame::forceLayout() {
-  core(this)->forceLayout(true);
 }
 
 void WebFrame::forceLayoutForNonHTML() {

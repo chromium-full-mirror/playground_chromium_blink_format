@@ -220,9 +220,7 @@ class WebFrame : public IWebFrame,
 
   // FrameLoaderClient
   virtual void frameLoaderDestroyed();
-  virtual bool hasFrameView() const;
   virtual void makeRepresentation(WebCore::DocumentLoader*);
-  virtual void forceLayout();
   virtual void forceLayoutForNonHTML();
   virtual void setCopiesOnScroll();
   virtual void detachedFromParent1();
