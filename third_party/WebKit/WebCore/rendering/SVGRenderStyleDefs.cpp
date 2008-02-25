@@ -35,13 +35,13 @@
 
 using namespace WebCore;
 
-StyleFillData::StyleFillData() : RefCounted<StyleFillData>(0) {
+StyleFillData::StyleFillData() {
   paint = SVGRenderStyle::initialFillPaint();
   opacity = SVGRenderStyle::initialFillOpacity();
 }
 
 StyleFillData::StyleFillData(const StyleFillData& other)
-    : RefCounted<StyleFillData>(0) {
+    : RefCounted<StyleFillData>() {
   paint = other.paint;
   opacity = other.opacity;
 }
@@ -65,7 +65,7 @@ bool StyleFillData::operator==(const StyleFillData& other) const {
   return paint == other.paint;
 }
 
-StyleStrokeData::StyleStrokeData() : RefCounted<StyleStrokeData>(0) {
+StyleStrokeData::StyleStrokeData() {
   width = SVGRenderStyle::initialStrokeWidth();
   paint = SVGRenderStyle::initialStrokePaint();
   opacity = SVGRenderStyle::initialStrokeOpacity();
@@ -75,7 +75,7 @@ StyleStrokeData::StyleStrokeData() : RefCounted<StyleStrokeData>(0) {
 }
 
 StyleStrokeData::StyleStrokeData(const StyleStrokeData& other)
-    : RefCounted<StyleStrokeData>(0) {
+    : RefCounted<StyleStrokeData>() {
   width = other.width;
   paint = other.paint;
   opacity = other.opacity;
@@ -90,13 +90,13 @@ bool StyleStrokeData::operator==(const StyleStrokeData& other) const {
          (dashOffset == other.dashOffset) && (dashArray == other.dashArray);
 }
 
-StyleStopData::StyleStopData() : RefCounted<StyleStopData>(0) {
+StyleStopData::StyleStopData() {
   color = SVGRenderStyle::initialStopColor();
   opacity = SVGRenderStyle::initialStopOpacity();
 }
 
 StyleStopData::StyleStopData(const StyleStopData& other)
-    : RefCounted<StyleStopData>(0) {
+    : RefCounted<StyleStopData>() {
   color = other.color;
   opacity = other.opacity;
 }
@@ -105,12 +105,12 @@ bool StyleStopData::operator==(const StyleStopData& other) const {
   return (color == other.color) && (opacity == other.opacity);
 }
 
-StyleTextData::StyleTextData() : RefCounted<StyleTextData>(0) {
+StyleTextData::StyleTextData() {
   kerning = SVGRenderStyle::initialKerning();
 }
 
 StyleTextData::StyleTextData(const StyleTextData& other)
-    : RefCounted<StyleTextData>(0) {
+    : RefCounted<StyleTextData>() {
   kerning = other.kerning;
 }
 
@@ -118,12 +118,12 @@ bool StyleTextData::operator==(const StyleTextData& other) const {
   return kerning == other.kerning;
 }
 
-StyleClipData::StyleClipData() : RefCounted<StyleClipData>(0) {
+StyleClipData::StyleClipData() {
   clipPath = SVGRenderStyle::initialClipPath();
 }
 
 StyleClipData::StyleClipData(const StyleClipData& other)
-    : RefCounted<StyleClipData>(0) {
+    : RefCounted<StyleClipData>() {
   clipPath = other.clipPath;
 }
 
@@ -131,12 +131,12 @@ bool StyleClipData::operator==(const StyleClipData& other) const {
   return (clipPath == other.clipPath);
 }
 
-StyleMaskData::StyleMaskData() : RefCounted<StyleMaskData>(0) {
+StyleMaskData::StyleMaskData() {
   maskElement = SVGRenderStyle::initialMaskElement();
 }
 
 StyleMaskData::StyleMaskData(const StyleMaskData& other)
-    : RefCounted<StyleMaskData>(0) {
+    : RefCounted<StyleMaskData>() {
   maskElement = other.maskElement;
 }
 
@@ -144,14 +144,14 @@ bool StyleMaskData::operator==(const StyleMaskData& other) const {
   return (maskElement == other.maskElement);
 }
 
-StyleMarkerData::StyleMarkerData() : RefCounted<StyleMarkerData>(0) {
+StyleMarkerData::StyleMarkerData() {
   startMarker = SVGRenderStyle::initialStartMarker();
   midMarker = SVGRenderStyle::initialMidMarker();
   endMarker = SVGRenderStyle::initialEndMarker();
 }
 
 StyleMarkerData::StyleMarkerData(const StyleMarkerData& other)
-    : RefCounted<StyleMarkerData>(0) {
+    : RefCounted<StyleMarkerData>() {
   startMarker = other.startMarker;
   midMarker = other.midMarker;
   endMarker = other.endMarker;
@@ -162,7 +162,7 @@ bool StyleMarkerData::operator==(const StyleMarkerData& other) const {
           endMarker == other.endMarker);
 }
 
-StyleMiscData::StyleMiscData() : RefCounted<StyleMiscData>(0) {
+StyleMiscData::StyleMiscData() {
   floodColor = SVGRenderStyle::initialFloodColor();
   floodOpacity = SVGRenderStyle::initialFloodOpacity();
   lightingColor = SVGRenderStyle::initialLightingColor();
@@ -170,7 +170,7 @@ StyleMiscData::StyleMiscData() : RefCounted<StyleMiscData>(0) {
 }
 
 StyleMiscData::StyleMiscData(const StyleMiscData& other)
-    : RefCounted<StyleMiscData>(0) {
+    : RefCounted<StyleMiscData>() {
   filter = other.filter;
   floodColor = other.floodColor;
   floodOpacity = other.floodOpacity;

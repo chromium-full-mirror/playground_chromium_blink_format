@@ -1744,7 +1744,7 @@ class RenderStyle {
   int m_ref;
 
 #if ENABLE(SVG)
-  DeprecatedDataRef<SVGRenderStyle> m_svgStyle;
+  DataRef<SVGRenderStyle> m_svgStyle;
 #endif
 
   // !END SYNC!
