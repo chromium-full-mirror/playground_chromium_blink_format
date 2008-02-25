@@ -80,7 +80,6 @@ static bool betweenMidpoints;
 
 static bool isLineEmpty = true;
 static bool previousLineBrokeCleanly = true;
-static int numSpaces;
 
 static int getBPMWidth(int childValue, Length cssUnit) {
   if (!cssUnit.isIntrinsicOrAuto())
@@ -361,18 +360,6 @@ inline void BidiState::addRun(BidiRun* bidiRun) {
   m_runCount++;
 
   sLogicallyLastBidiRun = bidiRun;
-
-  // Compute the number of spaces in this run,
-  if (bidiRun->obj && bidiRun->obj->isText()) {
-    RenderText* text = static_cast<RenderText*>(bidiRun->obj);
-    if (text->characters()) {
-      for (int i = bidiRun->m_start; i < bidiRun->m_stop; i++) {
-        UChar c = text->characters()[i];
-        if (c == ' ' || c == '\n' || c == '\t')
-          numSpaces++;
-      }
-    }
-  }
 }
 
 static void chopMidpointsAt(RenderObject* obj, unsigned pos) {
@@ -639,6 +626,9 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
   int totWidth = lineBox->getFlowSpacingWidth();
   BidiRun* r = 0;
   bool needsWordSpacing = false;
+  unsigned numSpaces = 0;
+  ETextAlign textAlign = style()->textAlign();
+
   for (r = sFirstBidiRun; r; r = r->next()) {
     if (!r->box || r->obj->isPositioned() || r->box->isLineBreak())
       continue;  // Positioned objects are only participating to figure out
@@ -647,6 +637,16 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
     // Similarly, line break boxes have no effect on the width.
     if (r->obj->isText()) {
       RenderText* rt = static_cast<RenderText*>(r->obj);
+
+      if (textAlign == JUSTIFY) {
+        const UChar* characters = rt->characters();
+        for (int i = r->m_start; i < r->m_stop; i++) {
+          UChar c = characters[i];
+          if (c == ' ' || c == '\n' || c == '\t')
+            numSpaces++;
+        }
+      }
+
       int textWidth =
           rt->width(r->m_start, r->m_stop - r->m_start, totWidth, m_firstLine);
       int rtLength = rt->textLength();
@@ -688,7 +688,7 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
   // end up
   // justifying text.
   int x = leftOffset(m_height);
-  switch (style()->textAlign()) {
+  switch (textAlign) {
     case LEFT:
     case WEBKIT_LEFT:
       // The direction of the block should determine what happens with wide
@@ -697,10 +697,9 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
       // left.
       if (style()->direction() == RTL && totWidth > availableWidth)
         x -= (totWidth - availableWidth);
-      numSpaces = 0;
       break;
     case JUSTIFY:
-      if (numSpaces != 0 && !reachedEnd && !lineBox->endsWithBreak())
+      if (numSpaces && !reachedEnd && !lineBox->endsWithBreak())
         break;
     // fall through
     case TAAUTO:
@@ -716,27 +715,26 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
       // side of the block.
       if (style()->direction() == RTL || totWidth < availableWidth)
         x += availableWidth - totWidth;
-      numSpaces = 0;
       break;
     case CENTER:
     case WEBKIT_CENTER:
       int xd = (availableWidth - totWidth) / 2;
       x += xd > 0 ? xd : 0;
-      numSpaces = 0;
       break;
   }
 
-  if (numSpaces > 0) {
+  if (numSpaces) {
     for (r = sFirstBidiRun; r; r = r->next()) {
       if (!r->box)
         continue;
 
       int spaceAdd = 0;
-      if (numSpaces > 0 && r->obj->isText() && !r->compact) {
-        // get the number of spaces in the run
-        int spaces = 0;
+      if (numSpaces && r->obj->isText() && !r->compact) {
+        unsigned spaces = 0;
+        const UChar* characters =
+            static_cast<RenderText*>(r->obj)->characters();
         for (int i = r->m_start; i < r->m_stop; i++) {
-          UChar c = static_cast<RenderText*>(r->obj)->characters()[i];
+          UChar c = characters[i];
           if (c == ' ' || c == '\n' || c == '\t')
             spaces++;
         }
@@ -799,8 +797,6 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
       m_height += lineHeight(m_firstLine, true);
     return;
   }
-
-  numSpaces = 0;
 
   bidi.createBidiRunsForLine(start, end, style()->visuallyOrdered(),
                              previousLineBrokeCleanly);
