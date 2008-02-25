@@ -307,12 +307,13 @@ PluginView::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   }
 
   if (message == m_lastMessage &&
-      m_quirks.contains(PluginQuirkDontCallWndProcForSameMessageRecursively) &&
+      m_plugin->quirks().contains(
+          PluginQuirkDontCallWndProcForSameMessageRecursively) &&
       m_isCallingPluginWndProc)
     return 1;
 
   if (message == WM_USER + 1 &&
-      m_quirks.contains(PluginQuirkThrottleWMUserPlusOneMessages)) {
+      m_plugin->quirks().contains(PluginQuirkThrottleWMUserPlusOneMessages)) {
     if (!m_messageThrottler)
       m_messageThrottler.set(new PluginMessageThrottlerWin(this));
 
@@ -370,8 +371,8 @@ void PluginView::updateWindow() const {
     // To prevent flashes while scrolling, we disable drawing during the window
     // update process by clipping the window to the zero rect.
 
-    bool clipToZeroRect =
-        !m_quirks.contains(PluginQuirkDontClipToZeroRectWhenScrolling);
+    bool clipToZeroRect = !m_plugin->quirks().contains(
+        PluginQuirkDontClipToZeroRectWhenScrolling);
 
     if (clipToZeroRect) {
       rgn = ::CreateRectRgn(0, 0, 0, 0);
@@ -796,7 +797,8 @@ void PluginView::stop() {
   // Clear the window
   m_npWindow.window = 0;
   if (m_plugin->pluginFuncs()->setwindow &&
-      !m_quirks.contains(PluginQuirkDontSetNullWindowHandleOnDestroy)) {
+      !m_plugin->quirks().contains(
+          PluginQuirkDontSetNullWindowHandleOnDestroy)) {
     setCallingPlugin(true);
     m_plugin->pluginFuncs()->setwindow(m_instance, &m_npWindow);
     setCallingPlugin(false);
@@ -879,7 +881,7 @@ void PluginView::performRequest(PluginRequest* request) {
       PluginStream* stream = new PluginStream(
           this, m_parentFrame, request->frameLoadRequest().resourceRequest(),
           request->sendNotification(), request->notifyData(),
-          plugin()->pluginFuncs(), instance(), m_quirks);
+          plugin()->pluginFuncs(), instance(), m_plugin->quirks());
       m_streams.add(stream);
       stream->start();
     } else {
@@ -922,7 +924,7 @@ void PluginView::performRequest(PluginRequest* request) {
     RefPtr<PluginStream> stream = new PluginStream(
         this, m_parentFrame, request->frameLoadRequest().resourceRequest(),
         request->sendNotification(), request->notifyData(),
-        plugin()->pluginFuncs(), instance(), m_quirks);
+        plugin()->pluginFuncs(), instance(), m_plugin->quirks());
     m_streams.add(stream);
     stream->sendJavaScriptStream(requestURL, cstr);
   }
@@ -1310,7 +1312,7 @@ NPError PluginView::destroyStream(NPStream* stream, NPReason reason) {
 }
 
 const char* PluginView::userAgent() {
-  if (m_quirks.contains(PluginQuirkWantsMozillaUserAgent))
+  if (m_plugin->quirks().contains(PluginQuirkWantsMozillaUserAgent))
     return MozillaUserAgent;
 
   if (m_userAgent.isNull())
@@ -1405,7 +1407,7 @@ void PluginView::invalidateRect(NPRect* rect) {
     RECT invalidRect(r);
     InvalidateRect(m_window, &invalidRect, FALSE);
   } else {
-    if (m_quirks.contains(PluginQuirkThrottleInvalidate)) {
+    if (m_plugin->quirks().contains(PluginQuirkThrottleInvalidate)) {
       m_invalidRects.append(r);
       if (!m_invalidateTimer.isActive())
         m_invalidateTimer.startOneShot(0.001);
@@ -1492,7 +1494,7 @@ PluginView::~PluginView() {
 
   m_parentFrame->cleanupScriptObjectsForPlugin(this);
 
-  if (m_plugin && !m_quirks.contains(PluginQuirkDontUnloadPlugin))
+  if (m_plugin && !m_plugin->quirks().contains(PluginQuirkDontUnloadPlugin))
     m_plugin->unload();
 }
 
@@ -1500,88 +1502,6 @@ void PluginView::disconnectStream(PluginStream* stream) {
   ASSERT(m_streams.contains(stream));
 
   m_streams.remove(stream);
-}
-
-void PluginView::determineQuirks(const String& mimeType) {
-  static const unsigned lastKnownUnloadableRealPlayerVersionLS = 0x000B0B24;
-  static const unsigned lastKnownUnloadableRealPlayerVersionMS = 0x00060000;
-
-  if (mimeType == "application/x-shockwave-flash") {
-    // The flash plugin only requests windowless plugins if we return a mozilla
-    // user agent
-    m_quirks.add(PluginQuirkWantsMozillaUserAgent);
-    m_quirks.add(PluginQuirkThrottleInvalidate);
-    m_quirks.add(PluginQuirkThrottleWMUserPlusOneMessages);
-    m_quirks.add(PluginQuirkFlashURLNotifyBug);
-  }
-
-  if (m_plugin->name().contains("Microsoft") &&
-      m_plugin->name().contains("Windows Media")) {
-    // The WMP plugin sets its size on the first NPP_SetWindow call and never
-    // updates its size, so
-    // call SetWindow when the plugin view has a correct size
-    m_quirks.add(PluginQuirkDeferFirstSetWindowCall);
-
-    // Windowless mode does not work at all with the WMP plugin so just remove
-    // that parameter
-    // and don't pass it to the plug-in.
-    m_quirks.add(PluginQuirkRemoveWindowlessVideoParam);
-
-    // WMP has a modal message loop that it enters whenever we call it or
-    // ask it to paint. This modal loop can deliver messages to other
-    // windows in WebKit at times when they are not expecting them (for
-    // example, delivering a WM_PAINT message during a layout), and these
-    // can cause crashes.
-    m_quirks.add(PluginQuirkHasModalMessageLoop);
-  }
-
-  // VLC hangs on NPP_Destroy if we call NPP_SetWindow with a null window handle
-  if (m_plugin->name() == "VLC Multimedia Plugin")
-    m_quirks.add(PluginQuirkDontSetNullWindowHandleOnDestroy);
-
-  // The DivX plugin sets its size on the first NPP_SetWindow call and never
-  // updates its size, so
-  // call SetWindow when the plugin view has a correct size
-  if (mimeType == "video/divx")
-    m_quirks.add(PluginQuirkDeferFirstSetWindowCall);
-
-  // FIXME: This is a workaround for a problem in our NPRuntime bindings; if a
-  // plug-in creates an
-  // NPObject and passes it to a function it's not possible to see what root
-  // object that NPObject belongs to.
-  // Thus, we don't know that the object should be invalidated when the plug-in
-  // instance goes away.
-  // See <rdar://problem/5487742>.
-  if (mimeType == "application/x-silverlight")
-    m_quirks.add(PluginQuirkDontUnloadPlugin);
-
-  if (MIMETypeRegistry::isJavaAppletMIMEType(mimeType)) {
-    // Because a single process cannot create multiple VMs, and we cannot
-    // reliably unload a
-    // Java VM, we cannot unload the Java plugin, or we'll lose reference to our
-    // only VM
-    m_quirks.add(PluginQuirkDontUnloadPlugin);
-
-    // Setting the window region to an empty region causes bad scrolling repaint
-    // problems
-    // with the Java plug-in.
-    m_quirks.add(PluginQuirkDontClipToZeroRectWhenScrolling);
-  }
-
-  if (mimeType == "audio/x-pn-realaudio-plugin") {
-    // Prevent the Real plugin from calling the Window Proc recursively, causing
-    // the stack to overflow.
-    m_quirks.add(PluginQuirkDontCallWndProcForSameMessageRecursively);
-
-    // Unloading RealPlayer versions newer than 10.5 can cause a hang; see
-    // rdar://5669317.
-    // FIXME: Resume unloading when this bug in the RealPlayer Plug-In is fixed
-    // (rdar://5713147)
-    if (m_plugin->compareFileVersion(lastKnownUnloadableRealPlayerVersionMS,
-                                     lastKnownUnloadableRealPlayerVersionLS) >
-        0)
-      m_quirks.add(PluginQuirkDontUnloadPlugin);
-  }
 }
 
 void PluginView::setParameters(const Vector<String>& paramNames,
@@ -1595,7 +1515,7 @@ void PluginView::setParameters(const Vector<String>& paramNames,
   m_paramValues = reinterpret_cast<char**>(fastMalloc(sizeof(char*) * size));
 
   for (unsigned i = 0; i < size; i++) {
-    if (m_quirks.contains(PluginQuirkRemoveWindowlessVideoParam) &&
+    if (m_plugin->quirks().contains(PluginQuirkRemoveWindowlessVideoParam) &&
         equalIgnoringCase(paramNames[i], "windowlessvideo"))
       continue;
 
@@ -1650,7 +1570,6 @@ PluginView::PluginView(Frame* parentFrame,
   m_instance->ndata = this;
 
   m_mimeType = mimeType.utf8();
-  determineQuirks(mimeType);
 
   setParameters(paramNames, paramValues);
 
@@ -1705,7 +1624,7 @@ void PluginView::init() {
     m_npWindow.window = 0;
   }
 
-  if (!m_quirks.contains(PluginQuirkDeferFirstSetWindowCall))
+  if (!m_plugin->quirks().contains(PluginQuirkDeferFirstSetWindowCall))
     setNPWindowRect(frameGeometry());
 
   m_status = PluginStatusLoadedSuccessfully;
@@ -1718,7 +1637,7 @@ void PluginView::didReceiveResponse(const ResourceResponse& response) {
   m_manualStream = new PluginStream(
       this, m_parentFrame,
       m_parentFrame->loader()->activeDocumentLoader()->request(), false, 0,
-      plugin()->pluginFuncs(), instance(), m_quirks);
+      plugin()->pluginFuncs(), instance(), m_plugin->quirks());
   m_manualStream->setLoadManually(true);
 
   m_manualStream->didReceiveResponse(0, response);
@@ -1746,7 +1665,7 @@ void PluginView::didFail(const ResourceError& error) {
 }
 
 void PluginView::setCallingPlugin(bool b) const {
-  if (!m_quirks.contains(PluginQuirkHasModalMessageLoop))
+  if (!m_plugin->quirks().contains(PluginQuirkHasModalMessageLoop))
     return;
 
   if (b)

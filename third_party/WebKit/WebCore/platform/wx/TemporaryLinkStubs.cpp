@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2008 Collabora, Ltd.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -63,7 +64,8 @@
 #include "PlatformMenuDescription.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformScrollBar.h"
-#include "PluginInfoStore.h"
+#include "PluginDatabase.h"
+#include "PluginPackage.h"
 #include "PopupMenu.h"
 #include "RenderTheme.h"
 #include "ResourceHandle.h"
@@ -158,23 +160,35 @@ void WebCore::findWordBoundary(UChar const* str,
   *end = position;
 }
 
-PluginInfo* PluginInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
+PluginSet PluginDatabase::getPluginsInPaths() const {
   notImplemented();
-  return 0;
+  return PluginSet();
 }
-unsigned PluginInfoStore::pluginCount() const {
+Vector<String> PluginDatabase::defaultPluginPaths() {
   notImplemented();
-  return 0;
+  return Vector<String>();
 }
-bool WebCore::PluginInfoStore::supportsMIMEType(const WebCore::String&) {
+bool PluginDatabase::isPreferredPluginPath(const String&) const {
   notImplemented();
   return false;
 }
-String PluginInfoStore::pluginNameForMIMEType(const String& mimeType) {
+bool PluginPackage::fetchInfo() {
   notImplemented();
-  return String();
+  return false;
 }
-void WebCore::refreshPlugins(bool) {
+unsigned PluginPackage::hash() const {
+  notImplemented();
+  return 0;
+}
+bool PluginPackage::equal(const PluginPackage&, const PluginPackage&) {
+  notImplemented();
+  return false;
+}
+bool PluginPackage::load() {
+  notImplemented();
+  return false;
+}
+PluginPackage::~PluginPackage() {
   notImplemented();
 }
 

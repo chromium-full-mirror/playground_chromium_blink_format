@@ -34,7 +34,8 @@
 #include "GlobalHistory.h"
 #include "KURL.h"
 #include "NotImplemented.h"
-#include "PluginInfoStore.h"
+#include "PluginDatabase.h"
+#include "PluginPackage.h"
 #include "SharedBuffer.h"
 
 using namespace WebCore;
@@ -59,23 +60,35 @@ bool WebCore::historyContains(const UChar*, unsigned) {
   return false;
 }
 
-PluginInfo* PluginInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
+PluginSet PluginDatabase::getPluginsInPaths() const {
   notImplemented();
-  return 0;
+  return PluginSet();
 }
-unsigned PluginInfoStore::pluginCount() const {
+Vector<String> PluginDatabase::defaultPluginPaths() {
   notImplemented();
-  return 0;
+  return Vector<String>();
 }
-String PluginInfoStore::pluginNameForMIMEType(const String& mimeType) {
-  notImplemented();
-  return String();
-}
-bool WebCore::PluginInfoStore::supportsMIMEType(const WebCore::String&) {
+bool PluginDatabase::isPreferredPluginPath(const String&) const {
   notImplemented();
   return false;
 }
-void WebCore::refreshPlugins(bool) {
+bool PluginPackage::fetchInfo() {
+  notImplemented();
+  return false;
+}
+unsigned PluginPackage::hash() const {
+  notImplemented();
+  return 0;
+}
+bool PluginPackage::equal(const PluginPackage&, const PluginPackage&) {
+  notImplemented();
+  return false;
+}
+bool PluginPackage::load() {
+  notImplemented();
+  return false;
+}
+PluginPackage::~PluginPackage() {
   notImplemented();
 }
 
