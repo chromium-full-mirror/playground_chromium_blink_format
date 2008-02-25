@@ -864,8 +864,6 @@ class Document : public ContainerNode {
   unsigned short m_listenerTypes;
   RefPtr<StyleSheetList> m_styleSheets;
 
-  typedef DeprecatedValueList<RefPtr<RegisteredEventListener>>
-      RegisteredEventListenerList;
   RegisteredEventListenerList m_windowEventListeners;
 
   typedef HashMap<FormElementKey,
