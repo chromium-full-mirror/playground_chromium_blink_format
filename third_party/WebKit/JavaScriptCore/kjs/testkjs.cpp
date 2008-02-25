@@ -63,6 +63,7 @@ static JSValue* functionGC(ExecState*, JSObject*, const List&);
 static JSValue* functionVersion(ExecState*, JSObject*, const List&);
 static JSValue* functionRun(ExecState*, JSObject*, const List&);
 static JSValue* functionLoad(ExecState*, JSObject*, const List&);
+static JSValue* functionReadline(ExecState*, JSObject*, const List&);
 static JSValue* functionQuit(ExecState*, JSObject*, const List&);
 
 class StopWatch {
@@ -141,6 +142,8 @@ GlobalObject::GlobalObject(Vector<UString>& arguments) {
                                           "run", functionRun));
   putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 1,
                                           "load", functionLoad));
+  putDirectFunction(new PrototypeFunction(globalExec(), functionPrototype(), 0,
+                                          "readline", functionReadline));
 
   JSObject* array =
       arrayConstructor()->construct(globalExec(), globalExec()->emptyList());
@@ -199,6 +202,19 @@ JSValue* functionLoad(ExecState* exec, JSObject*, const List& args) {
                         script.data());
 
   return jsUndefined();
+}
+
+JSValue* functionReadline(ExecState*, JSObject*, const List&) {
+  Vector<char, 256> line;
+  int c;
+  while ((c = getchar()) != EOF) {
+    // FIXME: Should we also break on \r?
+    if (c == '\n')
+      break;
+    line.append(c);
+  }
+  line.append('\0');
+  return jsString(line.data());
 }
 
 JSValue* functionQuit(ExecState*, JSObject*, const List&) {
