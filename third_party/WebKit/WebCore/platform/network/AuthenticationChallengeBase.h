@@ -58,7 +58,8 @@ class AuthenticationChallengeBase {
  protected:
   // The AuthenticationChallenge subclass may "shadow" this method to compare
   // platform specific fields
-  static bool platformCompare(const ResourceError& a, const ResourceError& b) {
+  static bool platformCompare(const AuthenticationChallengeBase& a,
+                              const AuthenticationChallengeBase& b) {
     return true;
   }
 
