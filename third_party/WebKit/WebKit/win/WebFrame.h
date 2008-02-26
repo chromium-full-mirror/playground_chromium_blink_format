@@ -337,10 +337,6 @@ class WebFrame : public IWebFrame,
       unsigned long identifier,
       const WebCore::AuthenticationChallenge&);
 
-  virtual void postProgressStartedNotification();
-  virtual void postProgressEstimateChangedNotification();
-  virtual void postProgressFinishedNotification();
-
   virtual PassRefPtr<WebCore::Frame> createFrame(
       const WebCore::KURL& url,
       const WebCore::String& name,

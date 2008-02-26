@@ -56,6 +56,11 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidFinishLoad();
   virtual void dispatchDidFirstLayout();
   virtual void dispatchShow();
+
+  virtual void postProgressStartedNotification();
+  virtual void postProgressEstimateChangedNotification();
+  virtual void postProgressFinishedNotification();
+
   virtual PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(
       const WebCore::ResourceRequest&,
       const WebCore::SubstituteData&);
