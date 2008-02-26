@@ -235,7 +235,6 @@ class WebFrame : public IWebFrame,
   virtual void setMainFrameDocumentReady(bool);
   virtual void willChangeTitle(WebCore::DocumentLoader*);
   virtual void didChangeTitle(WebCore::DocumentLoader*);
-  virtual void finishedLoading(WebCore::DocumentLoader*);
   virtual void finalSetupForReplace(WebCore::DocumentLoader*);
   virtual void setDefersLoading(bool);
   virtual bool isArchiveLoadPending(WebCore::ResourceLoader*) const;
@@ -263,8 +262,6 @@ class WebFrame : public IWebFrame,
   virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
   virtual void saveViewStateToItem(WebCore::HistoryItem*);
   virtual bool canCachePage(void) const;
-  virtual void setMainDocumentError(WebCore::DocumentLoader*,
-                                    const WebCore::ResourceError&);
   virtual WebCore::ResourceError cancelledError(
       const WebCore::ResourceRequest&);
   virtual WebCore::ResourceError blockedError(const WebCore::ResourceRequest&);
@@ -277,7 +274,6 @@ class WebFrame : public IWebFrame,
   virtual WebCore::ResourceError fileDoesNotExistError(
       const WebCore::ResourceResponse&);
   virtual bool shouldFallBack(const WebCore::ResourceError&);
-  virtual void committedLoad(WebCore::DocumentLoader*, const char*, int);
   virtual void dispatchDecidePolicyForMIMEType(WebCore::FramePolicyFunction,
                                                const WebCore::String& MIMEType,
                                                const WebCore::ResourceRequest&);
@@ -337,15 +333,6 @@ class WebFrame : public IWebFrame,
       unsigned long identifier,
       const WebCore::AuthenticationChallenge&);
 
-  virtual WebCore::Widget* createPlugin(const WebCore::IntSize&,
-                                        WebCore::Element*,
-                                        const WebCore::KURL&,
-                                        const Vector<WebCore::String>&,
-                                        const Vector<WebCore::String>&,
-                                        const WebCore::String&,
-                                        bool loadManually);
-  virtual void redirectDataToPlugin(WebCore::Widget* pluginWidget);
-
   virtual WebCore::Widget* createJavaAppletWidget(
       const WebCore::IntSize&,
       WebCore::Element*,
@@ -370,7 +357,6 @@ class WebFrame : public IWebFrame,
                             WebCore::HTMLFrameOwnerElement*);
   WebCore::Frame* impl();
   void invalidate();
-  void receivedData(const char*, int, const WebCore::String&);
   void unmarkAllMisspellings();
   void unmarkAllBadGrammar();
 
