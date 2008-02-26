@@ -1183,10 +1183,6 @@ void WebFrame::setCopiesOnScroll() {
   notImplemented();
 }
 
-void WebFrame::detachedFromParent1() {
-  notImplemented();
-}
-
 void WebFrame::detachedFromParent2() {
   notImplemented();
 }
