@@ -1439,6 +1439,8 @@ void RenderBlock::fitBelowFloats(int widthToFit, int& availableWidth) {
 
 BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                                             BidiState& bidi) {
+  bool appliedStartWidth = start.pos > 0;
+
   // eliminate spaces at beginning of line
   int width = skipWhitespace(start, bidi);
   int w = 0;
@@ -1646,6 +1648,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
         tmpW +=
             o->width() + o->marginLeft() + o->marginRight() + inlineWidth(o);
     } else if (o->isText()) {
+      if (!pos)
+        appliedStartWidth = false;
+
       RenderText* t = static_cast<RenderText*>(o);
 
       int strlen = t->textLength();
@@ -1658,9 +1663,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       int wordSpacing = o->style()->wordSpacing();
       int lastSpaceWordSpacing = 0;
 
-      bool appliedStartWidth =
-          pos > 0;  // If the span originated on a previous line,
-                    // then assume the start width has been applied.
       int wrapW = tmpW + inlineWidth(o, !appliedStartWidth, true);
       int charWidth = 0;
       int nextBreakable = -1;
