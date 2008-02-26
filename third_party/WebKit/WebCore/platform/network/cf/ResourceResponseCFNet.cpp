@@ -112,4 +112,9 @@ void ResourceResponse::platformLazyInit() {
   } else
     m_httpStatusCode = 0;
 }
+
+bool ResourceResponse::platformCompare(const ResourceResponse& a,
+                                       const ResourceResponse& b) {
+  return CFEqual(a.cfURLResponse(), b.cfURLResponse());
+}
 }
