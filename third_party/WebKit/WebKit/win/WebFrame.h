@@ -337,14 +337,6 @@ class WebFrame : public IWebFrame,
       unsigned long identifier,
       const WebCore::AuthenticationChallenge&);
 
-  virtual PassRefPtr<WebCore::Frame> createFrame(
-      const WebCore::KURL& url,
-      const WebCore::String& name,
-      WebCore::HTMLFrameOwnerElement* ownerElement,
-      const WebCore::String& referrer,
-      bool allowsScrolling,
-      int marginWidth,
-      int marginHeight);
   virtual WebCore::Widget* createPlugin(const WebCore::IntSize&,
                                         WebCore::Element*,
                                         const WebCore::KURL&,
@@ -416,19 +408,12 @@ class WebFrame : public IWebFrame,
   WebView* webView() const;
 
  protected:
-  PassRefPtr<WebCore::Frame> createFrame(const WebCore::KURL&,
-                                         const WebCore::String& name,
-                                         WebCore::HTMLFrameOwnerElement*,
-                                         const WebCore::String& referrer);
   void loadHTMLString(BSTR string, BSTR baseURL, BSTR unreachableURL);
   void loadData(PassRefPtr<WebCore::SharedBuffer>,
                 BSTR mimeType,
                 BSTR textEncodingName,
                 BSTR baseURL,
                 BSTR failingURL);
-  void loadURLIntoChild(const WebCore::KURL&,
-                        const WebCore::String& referrer,
-                        WebFrame* childFrame);
   const Vector<WebCore::IntRect>& computePageRects(HDC printDC);
   void setPrinting(bool printing,
                    float minPageWidth,
