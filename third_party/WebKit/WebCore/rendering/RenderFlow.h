@@ -120,6 +120,8 @@ class RenderFlow : public RenderContainer {
 
   virtual bool hasColumns() const { return m_hasColumns; }
 
+  void calcMargins(int containerWidth);
+
   void checkConsistency() const;
 
  private:

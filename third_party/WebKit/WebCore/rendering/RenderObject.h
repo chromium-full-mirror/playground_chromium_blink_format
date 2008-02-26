@@ -352,11 +352,13 @@ class RenderObject : public CachedResourceClient {
   bool hasBoxDecorations() const { return m_paintBackground; }
   bool mustRepaintBackgroundOrBorder() const;
 
-  bool hasBordersPaddingOrMargin() const {
-    return borderLeft() != 0 || borderRight() != 0 || borderTop() != 0 ||
-           borderBottom() != 0 || paddingLeft() != 0 || paddingRight() != 0 ||
-           paddingTop() != 0 || paddingBottom() != 0 || marginLeft() != 0 ||
-           marginRight() != 0 || marginTop() != 0 || marginBottom() != 0;
+  bool hasHorizontalBordersPaddingOrMargin() const {
+    return hasHorizontalBordersOrPadding() || marginLeft() != 0 ||
+           marginRight() != 0;
+  }
+  bool hasHorizontalBordersOrPadding() const {
+    return borderLeft() != 0 || borderRight() != 0 || paddingLeft() != 0 ||
+           paddingRight() != 0;
   }
 
   bool needsLayout() const {

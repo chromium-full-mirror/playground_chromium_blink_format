@@ -929,6 +929,11 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* graphicsContext,
         (!nextline.isEmpty() && l - ow < tx + nextline.right()) ? -ow : ow, ow);
 }
 
+void RenderFlow::calcMargins(int containerWidth) {
+  m_marginLeft = style()->marginLeft().calcMinValue(containerWidth);
+  m_marginRight = style()->marginRight().calcMinValue(containerWidth);
+}
+
 #ifndef NDEBUG
 
 void RenderFlow::checkConsistency() const {
