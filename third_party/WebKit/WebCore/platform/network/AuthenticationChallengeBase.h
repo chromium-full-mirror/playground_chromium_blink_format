@@ -22,47 +22,26 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef AuthenticationChallenge_h
-#define AuthenticationChallenge_h
+#ifndef AuthenticationChallengeBase_h
+#define AuthenticationChallengeBase_h
 
 #include "Credential.h"
 #include "ProtectionSpace.h"
 #include "ResourceResponse.h"
 #include "ResourceError.h"
 
-#include <wtf/RefPtr.h>
-
-#if PLATFORM(MAC)
-#include <wtf/RetainPtr.h>
-#ifndef __OBJC__
-typedef struct objc_object* id;
-class NSURLAuthenticationChallenge;
-#else
-@class NSURLAuthenticationChallenge;
-#endif
-#endif
-
-#if USE(CFNETWORK)
-typedef struct _CFURLAuthChallenge* CFURLAuthChallengeRef;
-#endif
-
 namespace WebCore {
 
-class ResourceHandle;
+class AuthenticationChallenge;
 
-class AuthenticationChallenge {
+class AuthenticationChallengeBase {
  public:
-  AuthenticationChallenge();
-  AuthenticationChallenge(const ProtectionSpace& protectionSpace,
-                          const Credential& proposedCredential,
-                          unsigned previousFailureCount,
-                          const ResourceResponse& response,
-                          const ResourceError& error);
-#if PLATFORM(MAC)
-  AuthenticationChallenge(NSURLAuthenticationChallenge*);
-#elif USE(CFNETWORK)
-  AuthenticationChallenge(CFURLAuthChallengeRef, ResourceHandle* sourceHandle);
-#endif
+  AuthenticationChallengeBase();
+  AuthenticationChallengeBase(const ProtectionSpace& protectionSpace,
+                              const Credential& proposedCredential,
+                              unsigned previousFailureCount,
+                              const ResourceResponse& response,
+                              const ResourceError& error);
 
   unsigned previousFailureCount() const;
   const Credential& proposedCredential() const;
@@ -73,35 +52,32 @@ class AuthenticationChallenge {
   bool isNull() const;
   void nullify();
 
-#if PLATFORM(MAC)
-  id sender() const { return m_sender.get(); }
-  NSURLAuthenticationChallenge* nsURLAuthenticationChallenge() const {
-    return m_macChallenge.get();
+  static bool compare(const AuthenticationChallenge& a,
+                      const AuthenticationChallenge& b);
+
+ protected:
+  // The AuthenticationChallenge subclass may "shadow" this method to compare
+  // platform specific fields
+  static bool platformCompare(const ResourceError& a, const ResourceError& b) {
+    return true;
   }
-#elif USE(CFNETWORK)
-  ResourceHandle* sourceHandle() const { return m_sourceHandle.get(); }
-  CFURLAuthChallengeRef cfURLAuthChallengeRef() const {
-    return m_cfChallenge.get();
-  }
-#endif
- private:
+
   bool m_isNull;
   ProtectionSpace m_protectionSpace;
   Credential m_proposedCredential;
   unsigned m_previousFailureCount;
   ResourceResponse m_failureResponse;
   ResourceError m_error;
-
-#if PLATFORM(MAC)
-  RetainPtr<id> m_sender;
-  RetainPtr<NSURLAuthenticationChallenge*> m_macChallenge;
-#elif USE(CFNETWORK)
-  RefPtr<ResourceHandle> m_sourceHandle;
-  RetainPtr<CFURLAuthChallengeRef> m_cfChallenge;
-#endif
 };
 
-bool operator==(const AuthenticationChallenge&, const AuthenticationChallenge&);
-bool operator!=(const AuthenticationChallenge&, const AuthenticationChallenge&);
+inline bool operator==(const AuthenticationChallenge& a,
+                       const AuthenticationChallenge& b) {
+  return AuthenticationChallengeBase::compare(a, b);
 }
+inline bool operator!=(const AuthenticationChallenge& a,
+                       const AuthenticationChallenge& b) {
+  return !(a == b);
+}
+}
+
 #endif

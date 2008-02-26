@@ -29,13 +29,11 @@
 
 #include "ResourceResponseBase.h"
 
-#include "NotImplemented.h"
-
 namespace WebCore {
 
 class ResourceResponse : public ResourceResponseBase {
  public:
-  ResourceResponse() : ResourceResponseBase(false) {}
+  ResourceResponse() {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -47,11 +45,6 @@ class ResourceResponse : public ResourceResponseBase {
                              expectedLength,
                              textEncodingName,
                              filename) {}
-
- private:
-  friend class ResourceResponseBase;
-
-  void doUpdateResourceResponse() { notImplemented(); }
 };
 
 }  // namespace WebCore

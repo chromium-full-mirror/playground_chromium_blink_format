@@ -35,10 +35,12 @@ namespace WebCore {
 
 class ResourceResponse : public ResourceResponseBase {
  public:
-  ResourceResponse() : ResourceResponseBase() {}
+  ResourceResponse() : m_isUpToDate(true) {}
 
   ResourceResponse(CFURLResponseRef cfResponse)
-      : ResourceResponseBase(!cfResponse), m_cfResponse(cfResponse) {}
+      : m_cfResponse(cfResponse), m_isUpToDate(false) {
+    m_isNull = !cfResponse;
+  }
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -56,9 +58,12 @@ class ResourceResponse : public ResourceResponseBase {
  private:
   friend class ResourceResponseBase;
 
-  void doUpdateResourceResponse();
+  void platformLazyInit();
+  static bool platformCompare(const ResourceResponse& a,
+                              const ResourceResponse& b);
 
   RetainPtr<CFURLResponseRef> m_cfResponse;
+  bool m_isUpToDate;
 };
 
 }  // namespace WebCore
