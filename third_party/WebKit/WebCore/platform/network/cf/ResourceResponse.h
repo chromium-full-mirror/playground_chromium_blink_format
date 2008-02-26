@@ -51,7 +51,8 @@ class ResourceResponse : public ResourceResponseBase {
                              mimeType,
                              expectedLength,
                              textEncodingName,
-                             filename) {}
+                             filename),
+        m_isUpToDate(true) {}
 
   CFURLResponseRef cfURLResponse() const;
 
