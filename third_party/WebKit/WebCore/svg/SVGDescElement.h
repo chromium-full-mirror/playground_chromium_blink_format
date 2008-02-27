@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,12 +22,13 @@
 
 #ifndef SVGDescElement_h
 #define SVGDescElement_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGLangSpace.h"
 #include "SVGStyledElement.h"
 
 namespace WebCore {
+
 class SVGDescElement : public SVGStyledElement, public SVGLangSpace {
  public:
   SVGDescElement(const QualifiedName&, Document*);
@@ -42,5 +43,3 @@ class SVGDescElement : public SVGStyledElement, public SVGLangSpace {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet
