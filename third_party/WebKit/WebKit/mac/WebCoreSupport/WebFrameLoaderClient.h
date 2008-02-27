@@ -267,8 +267,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void registerForIconNotification(bool listen);
 
   void deliverArchivedResourcesAfterDelay() const;
-  bool canUseArchivedResource(NSURLRequest*) const;
-  bool canUseArchivedResource(NSURLResponse*) const;
   void deliverArchivedResources(WebCore::Timer<WebFrameLoaderClient>*);
 
   void setOriginalURLForDownload(WebDownload*,
