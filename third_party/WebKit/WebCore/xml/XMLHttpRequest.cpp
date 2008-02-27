@@ -308,6 +308,7 @@ void XMLHttpRequest::open(const String& method,
                           bool async,
                           ExceptionCode& ec) {
   internalAbort();
+  XMLHttpRequestState previousState = m_state;
   m_state = Uninitialized;
   m_aborted = false;
 
@@ -359,7 +360,13 @@ void XMLHttpRequest::open(const String& method,
   m_async = async;
 
   ASSERT(!m_loader);
-  changeState(Open);
+
+  // Check previous state to avoid dispatching readyState event
+  // when calling open several times in a row.
+  if (previousState != Open)
+    changeState(Open);
+  else
+    m_state = Open;
 }
 
 void XMLHttpRequest::open(const String& method,
