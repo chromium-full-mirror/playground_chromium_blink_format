@@ -45,7 +45,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
  public:
   virtual bool hasWebView() const;
   virtual bool hasFrameView() const;
+
   virtual void forceLayout();
+
   virtual void dispatchDidHandleOnloadEvents();
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
   virtual void dispatchDidCancelClientRedirect();
@@ -61,8 +63,11 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidFinishDocumentLoad();
   virtual void dispatchDidFinishLoad();
   virtual void dispatchDidFirstLayout();
+
+  virtual WebCore::Frame* dispatchCreatePage();
   virtual void dispatchShow();
 
+  virtual void dispatchDidLoadMainResource(WebCore::DocumentLoader*);
   virtual void setMainDocumentError(WebCore::DocumentLoader*,
                                     const WebCore::ResourceError&);
 

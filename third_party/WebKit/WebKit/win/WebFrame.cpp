@@ -150,13 +150,6 @@ Frame* core(const WebFrame* webFrame) {
   return const_cast<WebFrame*>(webFrame)->impl();
 }
 
-WebView* kit(Page* page) {
-  return page
-             ? static_cast<WebChromeClient*>(page->chrome()->client())
-                   ->webView()
-             : 0;
-}
-
 //-----------------------------------------------------------------------------
 
 static Element* elementFromDOMElement(IDOMElement* element) {
@@ -1118,19 +1111,6 @@ void WebFrame::dispatchWillSubmitForm(FramePolicyFunction function,
   (coreFrame->loader()->*function)(PolicyUse);
 }
 
-void WebFrame::dispatchDidLoadMainResource(DocumentLoader* loader) {
-  if (WebScriptDebugServer::listenerCount() > 0) {
-    Frame* coreFrame = core(this);
-    if (!coreFrame)
-      return;
-
-    WebScriptDebugServer::sharedWebScriptDebugServer()
-        ->didLoadMainResourceForDataSource(
-            kit(coreFrame->page()),
-            loader ? static_cast<WebDocumentLoader*>(loader)->dataSource() : 0);
-  }
-}
-
 void WebFrame::revertToProvisionalState(DocumentLoader*) {
   notImplemented();
 }
@@ -1531,27 +1511,6 @@ void WebFrame::dispatchDidFailLoad(const ResourceError& error) {
     webError.adoptRef(WebError::createInstance(error));
     frameLoadDelegate->didFailLoadWithError(d->webView, webError.get(), this);
   }
-}
-
-Frame* WebFrame::dispatchCreatePage() {
-  COMPtr<IWebUIDelegate> ui;
-
-  if (SUCCEEDED(d->webView->uiDelegate(&ui))) {
-    COMPtr<IWebView> newWebView;
-
-    if (SUCCEEDED(ui->createWebViewWithRequest(d->webView, 0, &newWebView))) {
-      COMPtr<IWebFrame> mainFrame;
-
-      if (SUCCEEDED(newWebView->mainFrame(&mainFrame))) {
-        COMPtr<WebFrame> mainFrameImpl;
-
-        if (SUCCEEDED(mainFrame->QueryInterface(IID_WebFrame,
-                                                (void**)&mainFrameImpl)))
-          return core(mainFrameImpl.get());
-      }
-    }
-  }
-  return 0;
 }
 
 void WebFrame::startDownload(const ResourceRequest&) {

@@ -228,7 +228,6 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual void cancelPolicyCheck();
   virtual void dispatchWillSubmitForm(WebCore::FramePolicyFunction,
                                       PassRefPtr<WebCore::FormState>);
-  virtual void dispatchDidLoadMainResource(WebCore::DocumentLoader*);
   virtual void revertToProvisionalState(WebCore::DocumentLoader*);
   virtual void clearUnarchivingState(WebCore::DocumentLoader*);
   virtual void setMainFrameDocumentReady(bool);
@@ -315,7 +314,6 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       int length);
   virtual void dispatchDidFailProvisionalLoad(const WebCore::ResourceError&);
   virtual void dispatchDidFailLoad(const WebCore::ResourceError&);
-  virtual WebCore::Frame* dispatchCreatePage();
   virtual void startDownload(const WebCore::ResourceRequest&);
   virtual void dispatchDidReceiveAuthenticationChallenge(
       WebCore::DocumentLoader*,
