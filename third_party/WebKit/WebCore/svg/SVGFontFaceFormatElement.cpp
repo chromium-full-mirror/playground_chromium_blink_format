@@ -33,8 +33,12 @@ SVGFontFaceFormatElement::SVGFontFaceFormatElement(const QualifiedName& tagName,
                                                    Document* doc)
     : SVGElement(tagName, doc) {}
 
-void SVGFontFaceFormatElement::childrenChanged(bool changedByParser) {
-  SVGElement::childrenChanged(changedByParser);
+void SVGFontFaceFormatElement::childrenChanged(bool changedByParser,
+                                               Node* beforeChange,
+                                               Node* afterChange,
+                                               int childCountDelta) {
+  SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                              childCountDelta);
 
   if (!parentNode() || !parentNode()->hasTagName(font_face_uriTag))
     return;

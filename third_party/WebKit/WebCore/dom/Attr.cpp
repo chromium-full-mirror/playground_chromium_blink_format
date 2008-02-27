@@ -137,11 +137,15 @@ bool Attr::childTypeAllowed(NodeType type) {
   }
 }
 
-void Attr::childrenChanged(bool changedByParser) {
+void Attr::childrenChanged(bool changedByParser,
+                           Node* beforeChange,
+                           Node* afterChange,
+                           int childCountDelta) {
   if (m_ignoreChildrenChanged > 0)
     return;
 
-  Node::childrenChanged(changedByParser);
+  Node::childrenChanged(changedByParser, beforeChange, afterChange,
+                        childCountDelta);
 
   // FIXME: We should include entity references in the value
 

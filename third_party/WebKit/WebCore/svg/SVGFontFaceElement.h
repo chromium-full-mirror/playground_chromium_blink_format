@@ -37,7 +37,10 @@ class SVGFontFaceElement : public SVGElement {
 
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  virtual void childrenChanged(bool changedByParser = false);
+  virtual void childrenChanged(bool changedByParser = false,
+                               Node* beforeChange = 0,
+                               Node* afterChange = 0,
+                               int childCountDelta = 0);
   virtual void insertedIntoDocument();
 
   unsigned unitsPerEm() const;

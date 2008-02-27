@@ -197,8 +197,12 @@ void SVGPatternElement::svgAttributeChanged(const QualifiedName& attrName) {
     m_resource->invalidate();
 }
 
-void SVGPatternElement::childrenChanged(bool changedByParser) {
-  SVGStyledElement::childrenChanged(changedByParser);
+void SVGPatternElement::childrenChanged(bool changedByParser,
+                                        Node* beforeChange,
+                                        Node* afterChange,
+                                        int childCountDelta) {
+  SVGStyledElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                                    childCountDelta);
 
   if (!m_resource)
     return;

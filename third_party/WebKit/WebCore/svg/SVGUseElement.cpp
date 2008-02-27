@@ -169,8 +169,12 @@ void SVGUseElement::svgAttributeChanged(const QualifiedName& attrName) {
   }
 }
 
-void SVGUseElement::childrenChanged(bool changedByParser) {
-  SVGElement::childrenChanged(changedByParser);
+void SVGUseElement::childrenChanged(bool changedByParser,
+                                    Node* beforeChange,
+                                    Node* afterChange,
+                                    int childCountDelta) {
+  SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                              childCountDelta);
 
   if (!attached())
     return;

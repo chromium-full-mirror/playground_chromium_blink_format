@@ -167,8 +167,12 @@ void SVGMaskElement::svgAttributeChanged(const QualifiedName& attrName) {
     m_masker->invalidate();
 }
 
-void SVGMaskElement::childrenChanged(bool changedByParser) {
-  SVGStyledElement::childrenChanged(changedByParser);
+void SVGMaskElement::childrenChanged(bool changedByParser,
+                                     Node* beforeChange,
+                                     Node* afterChange,
+                                     int childCountDelta) {
+  SVGStyledElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                                    childCountDelta);
 
   if (!m_masker)
     return;

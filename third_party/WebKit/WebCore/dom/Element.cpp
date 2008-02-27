@@ -840,8 +840,12 @@ static void checkStyleRules(Element* e,
   checkLastChildRules(e, style);
 }
 
-void Element::childrenChanged(bool changedByParser) {
-  ContainerNode::childrenChanged(changedByParser);
+void Element::childrenChanged(bool changedByParser,
+                              Node* beforeChange,
+                              Node* afterChange,
+                              int childCountDelta) {
+  ContainerNode::childrenChanged(changedByParser, beforeChange, afterChange,
+                                 childCountDelta);
   if (!changedByParser)
     checkStyleRules(this, renderStyle(), false);
 }

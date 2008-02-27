@@ -55,7 +55,10 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void buildPendingResource();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void childrenChanged(bool changedByParser = false);
+  virtual void childrenChanged(bool changedByParser = false,
+                               Node* beforeChange = 0,
+                               Node* afterChange = 0,
+                               int childCountDelta = 0);
 
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void recalcStyle(StyleChange = NoChange);

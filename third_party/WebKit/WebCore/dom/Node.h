@@ -487,7 +487,10 @@ class Node : public TreeShared<Node> {
    * node that is of the type CDATA_SECTION_NODE, TEXT_NODE or COMMENT_NODE has
    * changed its value.
    */
-  virtual void childrenChanged(bool changedByParser = false){};
+  virtual void childrenChanged(bool changedByParser = false,
+                               Node* beforeChange = 0,
+                               Node* afterChange = 0,
+                               int childCountDelta = 0){};
 
   virtual String toString() const = 0;
 

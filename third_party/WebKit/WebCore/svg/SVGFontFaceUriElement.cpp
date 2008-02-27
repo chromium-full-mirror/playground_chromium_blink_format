@@ -43,8 +43,12 @@ PassRefPtr<CSSFontFaceSrcValue> SVGFontFaceUriElement::srcValue() const {
   return src.release();
 }
 
-void SVGFontFaceUriElement::childrenChanged(bool changedByParser) {
-  SVGElement::childrenChanged(changedByParser);
+void SVGFontFaceUriElement::childrenChanged(bool changedByParser,
+                                            Node* beforeChange,
+                                            Node* afterChange,
+                                            int childCountDelta) {
+  SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                              childCountDelta);
 
   if (!parentNode() || !parentNode()->hasTagName(font_face_srcTag))
     return;

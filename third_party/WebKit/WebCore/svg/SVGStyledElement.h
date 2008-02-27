@@ -55,7 +55,10 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
   virtual void svgAttributeChanged(const QualifiedName&);
 
-  virtual void childrenChanged(bool changedByParser = false);
+  virtual void childrenChanged(bool changedByParser = false,
+                               Node* beforeChange = 0,
+                               Node* afterChange = 0,
+                               int childCountDelta = 0);
 
   // Centralized place to force a manual style resolution. Hacky but needed for
   // now.

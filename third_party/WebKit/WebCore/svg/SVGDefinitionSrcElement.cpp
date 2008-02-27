@@ -31,8 +31,12 @@ SVGDefinitionSrcElement::SVGDefinitionSrcElement(const QualifiedName& tagName,
                                                  Document* doc)
     : SVGElement(tagName, doc) {}
 
-void SVGDefinitionSrcElement::childrenChanged(bool changedByParser) {
-  SVGElement::childrenChanged(changedByParser);
+void SVGDefinitionSrcElement::childrenChanged(bool changedByParser,
+                                              Node* beforeChange,
+                                              Node* afterChange,
+                                              int childCountDelta) {
+  SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                              childCountDelta);
   if (parentNode() && parentNode()->hasTagName(SVGNames::font_faceTag))
     static_cast<SVGFontFaceElement*>(parentNode())->rebuildFontFace();
 }

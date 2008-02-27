@@ -37,7 +37,10 @@ class SVGStyleElement : public SVGElement, public StyleElement {
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
-  virtual void childrenChanged(bool changedByParser = false);
+  virtual void childrenChanged(bool changedByParser = false,
+                               Node* beforeChange = 0,
+                               Node* afterChange = 0,
+                               int childCountDelta = 0);
 
   void setCreatedByParser(bool createdByParser) {
     m_createdByParser = createdByParser;
