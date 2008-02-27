@@ -57,7 +57,7 @@ class EventTargetNode : public Node, public EventTarget {
                          bool cancelable);
   EventListener* getHTMLEventListener(const AtomicString& eventType);
 
-  bool dispatchSubtreeModifiedEvent(bool childrenChanged = true);
+  bool dispatchSubtreeModifiedEvent();
   void dispatchWindowEvent(const AtomicString& eventType,
                            bool canBubble,
                            bool cancelable);
