@@ -253,11 +253,8 @@ class WebFrame : public IWebFrame,
   virtual void addHistoryItemForFragmentScroll();
   virtual void didFinishLoad();
   virtual void prepareForDataSourceReplacement();
-  virtual void setTitle(const WebCore::String& title, const WebCore::KURL&);
   virtual WebCore::String userAgent(const WebCore::KURL&);
   virtual void transitionToCommittedFromCachedPage(WebCore::CachedPage*);
-  virtual void updateGlobalHistory(const WebCore::KURL&);
-  virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
   virtual void saveViewStateToItem(WebCore::HistoryItem*);
   virtual WebCore::ResourceError cancelledError(
       const WebCore::ResourceRequest&);
@@ -377,7 +374,6 @@ class WebFrame : public IWebFrame,
                                     IDOMElement* againstElement,
                                     BSTR* result);
   HRESULT canProvideDocumentSource(bool* result);
-  WebHistory* webHistory();
 
   COMPtr<WebFramePolicyListener> setUpPolicyListener(
       WebCore::FramePolicyFunction function);
