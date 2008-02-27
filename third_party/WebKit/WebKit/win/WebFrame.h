@@ -68,12 +68,11 @@ interface IWebHistoryItemPrivate;
 WebFrame* kit(WebCore::Frame*);
 WebCore::Frame* core(WebFrame*);
 
-extern const GUID IID_WebFrame;
-
-class WebFrame : public IWebFrame,
-                 IWebFramePrivate,
-                 IWebDocumentText,
-                 public WebFrameLoaderClient {
+class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
+    : public IWebFrame,
+      IWebFramePrivate,
+      IWebDocumentText,
+      public WebFrameLoaderClient {
  public:
   static WebFrame* createInstance();
 
