@@ -29,7 +29,6 @@
 #include "CString.h"
 #include "CachedImage.h"
 #include "ClipboardUtilitiesWin.h"
-#include "DeprecatedCString.h"
 #include "Document.h"
 #include "DragData.h"
 #include "Editor.h"
@@ -471,8 +470,9 @@ static bool writeURL(WCDataObject* data,
     success = true;
 
   if (withHTML) {
-    medium.hGlobal =
-        createGlobalData(markupToCF_HTML(urlToMarkup(url, title), ""));
+    Vector<char> cfhtmlData;
+    markupToCF_HTML(urlToMarkup(url, title), "", cfhtmlData);
+    medium.hGlobal = createGlobalData(cfhtmlData);
     if (medium.hGlobal && FAILED(data->SetData(htmlFormat(), &medium, TRUE)))
       ::GlobalFree(medium.hGlobal);
     else
@@ -721,8 +721,9 @@ void ClipboardWin::declareAndWriteDragImage(Element* element,
   ExceptionCode ec = 0;
 
   // Put img tag on the clipboard referencing the image
-  medium.hGlobal =
-      createGlobalData(markupToCF_HTML(imageToMarkup(fullURL), ""));
+  Vector<char> data;
+  markupToCF_HTML(imageToMarkup(fullURL), "", data);
+  medium.hGlobal = createGlobalData(data);
   if (medium.hGlobal &&
       FAILED(m_writableDataObject->SetData(htmlFormat(), &medium, TRUE)))
     ::GlobalFree(medium.hGlobal);
@@ -758,9 +759,11 @@ void ClipboardWin::writeRange(Range* selectedRange, Frame* frame) {
   medium.tymed = TYMED_HGLOBAL;
   ExceptionCode ec = 0;
 
-  medium.hGlobal = createGlobalData(markupToCF_HTML(
-      createMarkup(selectedRange, 0, AnnotateForInterchange),
-      selectedRange->startContainer(ec)->document()->url().string()));
+  Vector<char> data;
+  markupToCF_HTML(createMarkup(selectedRange, 0, AnnotateForInterchange),
+                  selectedRange->startContainer(ec)->document()->url().string(),
+                  data);
+  medium.hGlobal = createGlobalData(data);
   if (medium.hGlobal &&
       FAILED(m_writableDataObject->SetData(htmlFormat(), &medium, TRUE)))
     ::GlobalFree(medium.hGlobal);
