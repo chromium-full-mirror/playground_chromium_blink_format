@@ -75,6 +75,11 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::ResourceRequest&,
       const WebCore::SubstituteData&);
 
+  virtual void savePlatformDataToCachedPage(WebCore::CachedPage*);
+  virtual void transitionToCommittedForNewPage();
+
+  virtual bool canCachePage() const;
+
   virtual PassRefPtr<WebCore::Frame> createFrame(
       const WebCore::KURL& url,
       const WebCore::String& name,
