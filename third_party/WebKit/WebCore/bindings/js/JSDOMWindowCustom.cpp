@@ -77,8 +77,7 @@ bool JSDOMWindow::customGetOwnPropertySlot(ExecState* exec,
   // because we always allow access to some function, just different ones
   // depending whether access
   // is allowed.
-  String dummyMessage;
-  bool allowsAccess = allowsAccessFrom(exec, dummyMessage);
+  bool allowsAccess = allowsAccessFromNoErrorMessage(exec);
 
   // Look for overrides before looking at any of our own properties.
   if (JSGlobalObject::getOwnPropertySlot(exec, propertyName, slot)) {

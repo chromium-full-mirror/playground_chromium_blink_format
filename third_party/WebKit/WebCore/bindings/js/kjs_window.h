@@ -139,6 +139,7 @@ class Window : public JSGlobalObject {
   virtual bool shouldInterruptScript() const;
 
   bool allowsAccessFrom(ExecState*) const;
+  bool allowsAccessFromNoErrorMessage(ExecState*) const;
   bool allowsAccessFrom(ExecState*, WebCore::String& message) const;
 
   void printErrorMessage(const WebCore::String&) const;
@@ -216,9 +217,12 @@ class Window : public JSGlobalObject {
   int installTimeout(WebCore::ScheduledAction*, int interval, bool singleShot);
 
   bool allowsAccessFromPrivate(const JSGlobalObject*,
-                               WebCore::SecurityOrigin::Reason&,
-                               WebCore::String& message) const;
-  bool allowsAccessFromPrivate(ExecState*, WebCore::String& message) const;
+                               WebCore::SecurityOrigin::Reason&) const;
+  bool allowsAccessFromPrivate(const ExecState*,
+                               WebCore::SecurityOrigin::Reason&) const;
+  WebCore::String crossDomainAccessErrorMessage(
+      const JSGlobalObject*,
+      WebCore::SecurityOrigin::Reason) const;
 
   RefPtr<WebCore::DOMWindow> m_impl;
   OwnPtr<WindowPrivate> d;
