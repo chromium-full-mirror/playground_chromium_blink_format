@@ -100,9 +100,6 @@ bool PluginPackage::load() {
   notImplemented();
   return false;
 }
-PluginPackage::~PluginPackage() {
-  notImplemented();
-}
 
 namespace WebCore {
 

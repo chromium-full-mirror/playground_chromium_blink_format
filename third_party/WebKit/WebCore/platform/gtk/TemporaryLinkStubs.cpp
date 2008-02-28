@@ -88,9 +88,6 @@ bool PluginPackage::load() {
   notImplemented();
   return false;
 }
-PluginPackage::~PluginPackage() {
-  notImplemented();
-}
 
 Color WebCore::focusRingColor() {
   return 0xFF0000FF;

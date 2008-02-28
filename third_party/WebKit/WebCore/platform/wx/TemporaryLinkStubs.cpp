@@ -188,9 +188,6 @@ bool PluginPackage::load() {
   notImplemented();
   return false;
 }
-PluginPackage::~PluginPackage() {
-  notImplemented();
-}
 
 void Widget::setIsSelected(bool) {
   notImplemented();
