@@ -309,12 +309,20 @@ Position Position::upstream() const {
   PositionIterator lastVisible = *this;
   PositionIterator currentPos = lastVisible;
   bool startEditable = startNode->isContentEditable();
+  Node* lastNode = startNode;
   for (; !currentPos.atStart(); currentPos.decrement()) {
     Node* currentNode = currentPos.node();
 
-    bool currentEditable = currentNode->isContentEditable();
-    if (startEditable && !currentEditable || !startEditable && currentEditable)
-      break;
+    // Don't check for an editability change if we haven't moved to a different
+    // node,
+    // to avoid the expense of computing isContentEditable().
+    if (currentNode != lastNode) {
+      // Don't change editability.
+      bool currentEditable = currentNode->isContentEditable();
+      if (startEditable != currentEditable)
+        break;
+      lastNode = currentNode;
+    }
 
     // Don't enter a new enclosing block flow or table element.  There is code
     // below that
@@ -391,12 +399,20 @@ Position Position::downstream() const {
   PositionIterator lastVisible = *this;
   PositionIterator currentPos = lastVisible;
   bool startEditable = startNode->isContentEditable();
+  Node* lastNode = startNode;
   for (; !currentPos.atEnd(); currentPos.increment()) {
     Node* currentNode = currentPos.node();
 
-    bool currentEditable = currentNode->isContentEditable();
-    if (startEditable && !currentEditable || !startEditable && currentEditable)
-      break;
+    // Don't check for an editability change if we haven't moved to a different
+    // node,
+    // to avoid the expense of computing isContentEditable().
+    if (currentNode != lastNode) {
+      // Don't change editability.
+      bool currentEditable = currentNode->isContentEditable();
+      if (startEditable != currentEditable)
+        break;
+      lastNode = currentNode;
+    }
 
     // stop before going above the body, up into the head
     // return the last visible streamer position
