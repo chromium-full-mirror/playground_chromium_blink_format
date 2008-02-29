@@ -1528,7 +1528,7 @@ CSSStyleSelector::SelectorMatch CSSStyleSelector::checkSelector(
         RenderStyle* parentStyle =
             (m_element == e) ? m_parentStyle : e->parentNode()->renderStyle();
         if (parentStyle)
-          parentStyle->setChildrenAffectedByForwardPositionalRules();
+          parentStyle->setChildrenAffectedByDirectAdjacentRules();
       }
       Node* n = e->previousSibling();
       while (n && !n->isElementNode())

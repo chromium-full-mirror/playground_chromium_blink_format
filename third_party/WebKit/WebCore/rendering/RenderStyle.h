@@ -1735,11 +1735,12 @@ class RenderStyle {
   // change at all.
   bool m_childrenAffectedByFirstChildRules : 1;
   bool m_childrenAffectedByLastChildRules : 1;
+  bool m_childrenAffectedByDirectAdjacentRules : 1;
   bool m_childrenAffectedByForwardPositionalRules : 1;
   bool m_childrenAffectedByBackwardPositionalRules : 1;
   bool m_firstChildState : 1;
   bool m_lastChildState : 1;
-  unsigned m_childIndex : 19;  // Plenty of bits to cache an index.
+  unsigned m_childIndex : 18;  // Plenty of bits to cache an index.
 
   int m_ref;
 
@@ -2824,6 +2825,10 @@ class RenderStyle {
     m_unique = true;
     m_emptyState = b;
   }
+  bool childrenAffectedByPositionalRules() const {
+    return childrenAffectedByForwardPositionalRules() ||
+           childrenAffectedByBackwardPositionalRules();
+  }
   bool childrenAffectedByFirstChildRules() const {
     return m_childrenAffectedByFirstChildRules;
   }
@@ -2835,6 +2840,12 @@ class RenderStyle {
   }
   void setChildrenAffectedByLastChildRules() {
     m_childrenAffectedByLastChildRules = true;
+  }
+  bool childrenAffectedByDirectAdjacentRules() const {
+    return m_childrenAffectedByDirectAdjacentRules;
+  }
+  void setChildrenAffectedByDirectAdjacentRules() {
+    m_childrenAffectedByDirectAdjacentRules = true;
   }
   bool childrenAffectedByForwardPositionalRules() const {
     return m_childrenAffectedByForwardPositionalRules;
