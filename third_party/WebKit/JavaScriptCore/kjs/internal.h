@@ -102,16 +102,9 @@ class NumberImp : public JSCell {
 struct AttachedGlobalObject;
 class DebuggerImp {
  public:
-  DebuggerImp() {
-    globalObjects = 0;
-    isAborted = false;
-  }
-
-  void abort() { isAborted = true; }
-  bool aborted() const { return isAborted; }
+  DebuggerImp() { globalObjects = 0; }
 
   AttachedGlobalObject* globalObjects;
-  bool isAborted;
 };
 
 #ifndef NDEBUG

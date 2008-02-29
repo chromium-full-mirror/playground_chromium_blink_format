@@ -384,12 +384,8 @@ void Node::handleException(ExecState* exec, JSValue* exceptionValue) {
     }
   }
   Debugger* dbg = exec->dynamicGlobalObject()->debugger();
-  if (dbg && !dbg->hasHandledException(exec, exceptionValue)) {
-    bool cont =
-        dbg->exception(exec, currentSourceId(exec), m_line, exceptionValue);
-    if (!cont)
-      dbg->imp()->abort();
-  }
+  if (dbg && !dbg->hasHandledException(exec, exceptionValue))
+    dbg->exception(exec, currentSourceId(exec), m_line, exceptionValue);
 }
 
 NEVER_INLINE JSValue* Node::rethrowException(ExecState* exec) {
@@ -4638,10 +4634,8 @@ FunctionBodyNodeWithDebuggerHooks::FunctionBodyNodeWithDebuggerHooks(
 JSValue* FunctionBodyNodeWithDebuggerHooks::execute(ExecState* exec) {
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (!dbg->callEvent(exec, sourceId(), lineNo(), exec->function(),
-                        *exec->arguments())) {
-      dbg->imp()->abort();
+                        *exec->arguments()))
       return exec->setInterruptedCompletion();
-    }
   }
 
   JSValue* result = FunctionBodyNode::execute(exec);
@@ -4649,10 +4643,8 @@ JSValue* FunctionBodyNodeWithDebuggerHooks::execute(ExecState* exec) {
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {
     if (exec->completionType() == Throw)
       exec->setException(result);
-    if (!dbg->returnEvent(exec, sourceId(), lineNo(), exec->function())) {
-      dbg->imp()->abort();
+    if (!dbg->returnEvent(exec, sourceId(), lineNo(), exec->function()))
       return exec->setInterruptedCompletion();
-    }
   }
 
   return result;
