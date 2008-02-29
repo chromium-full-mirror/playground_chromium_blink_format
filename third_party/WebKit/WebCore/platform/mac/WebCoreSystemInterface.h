@@ -155,7 +155,6 @@ extern void (*wkGetWheelEventDeltas)(NSEvent*,
                                      float* deltaY,
                                      BOOL* continuous);
 extern OSStatus (*wkInitializeGlyphVector)(int count, void* glyphs);
-extern NSString* (*wkPathFromFont)(NSFont*);
 extern void (*wkPopupMenu)(NSMenu*,
                            NSPoint location,
                            float width,
