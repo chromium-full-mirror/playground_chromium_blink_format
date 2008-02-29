@@ -178,7 +178,6 @@ extern void (*wkSignalCFReadStreamError)(CFReadStreamRef stream,
                                          CFStreamError* error);
 extern void (*wkSignalCFReadStreamHasBytes)(CFReadStreamRef stream);
 extern BOOL (*wkSupportsMultipartXMixedReplace)(NSMutableURLRequest*);
-extern float (*wkSecondsSinceLastInputEvent)(void);
 
 #ifdef BUILDING_ON_TIGER
 extern void (*wkGetFontMetrics)(CGFontRef,
