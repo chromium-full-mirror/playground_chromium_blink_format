@@ -138,11 +138,6 @@ BOOL WKGetGlyphTransformedAdvances(CGFontRef,
                                    ATSGlyphRef* glyph,
                                    CGSize* advance);
 CGFontRef WKGetCGFontFromNSFont(NSFont* font);
-void WKGetFontMetrics(CGFontRef font,
-                      int* ascent,
-                      int* descent,
-                      int* lineGap,
-                      unsigned* unitsPerEm);
 NSFont* WKGetFontInLanguageForRange(NSFont* font,
                                     NSString* string,
                                     NSRange range);
@@ -151,6 +146,16 @@ void WKSetCGFontRenderingMode(CGContextRef cgContext, NSFont* font);
 ATSUFontID WKGetNSFontATSUFontId(NSFont* font);
 void WKReleaseStyleGroup(void* group);
 BOOL WKCGContextGetShouldSmoothFonts(CGContextRef cgContext);
+
+#ifdef BUILDING_ON_TIGER
+// CGFontGetAscent, CGFontGetDescent, CGFontGetLeading and CGFontGetUnitsPerEm
+// were not available until Leopard
+void WKGetFontMetrics(CGFontRef font,
+                      int* ascent,
+                      int* descent,
+                      int* lineGap,
+                      unsigned* unitsPerEm);
+#endif
 
 void WKSetPatternBaseCTM(CGContextRef, CGAffineTransform);
 void WKSetPatternPhaseInUserSpace(CGContextRef, CGPoint);
