@@ -25,9 +25,11 @@
 #include "config.h"
 #include "ProtectionSpace.h"
 
+#if PLATFORM(CF) && !PLATFORM(MAC)
 #include "AuthenticationCF.h"
 #include <CFNetwork/CFURLProtectionSpacePriv.h>
 #include <wtf/RetainPtr.h>
+#endif
 
 namespace WebCore {
 
@@ -80,9 +82,17 @@ ProtectionSpaceAuthenticationScheme ProtectionSpace::authenticationScheme()
 }
 
 bool ProtectionSpace::receivesCredentialSecurely() const {
+#if PLATFORM(CF) && !PLATFORM(MAC)
   RetainPtr<CFURLProtectionSpaceRef> cfSpace(AdoptCF, createCF(*this));
   return cfSpace &&
          CFURLProtectionSpaceReceivesCredentialSecurely(cfSpace.get());
+#else
+  return (m_serverType == ProtectionSpaceServerHTTPS ||
+          m_serverType == ProtectionSpaceServerFTPS ||
+          m_serverType == ProtectionSpaceProxyHTTPS ||
+          m_authenticationScheme ==
+              ProtectionSpaceAuthenticationSchemeHTTPDigest);
+#endif
 }
 
 bool operator==(const ProtectionSpace& a, const ProtectionSpace& b) {
