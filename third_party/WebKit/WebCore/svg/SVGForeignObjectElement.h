@@ -23,7 +23,6 @@
 #define SVGForeignObjectElement_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FOREIGN_OBJECT)
-
 #include "SVGTests.h"
 #include "SVGLangSpace.h"
 #include "SVGURIReference.h"
@@ -32,7 +31,6 @@
 
 namespace WebCore {
 class SVGLength;
-class SVGDocument;
 
 class SVGForeignObjectElement : public SVGStyledTransformableElement,
                                 public SVGTests,
@@ -45,6 +43,7 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
 
   bool childShouldCreateRenderer(Node*) const;
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
@@ -85,5 +84,3 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
 
 #endif  // ENABLE(SVG) && ENABLE(SVG_FOREIGN_OBJECT)
 #endif
-
-// vim:ts=4:noet
