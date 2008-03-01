@@ -318,6 +318,7 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   HRESULT postPreferencesChangesNotification();
 
  protected:
+  void setValueForKey(CFStringRef key, CFPropertyListRef value);
   const void* valueForKey(CFStringRef key);
   BSTR stringValueForKey(CFStringRef key);
   int integerValueForKey(CFStringRef key);

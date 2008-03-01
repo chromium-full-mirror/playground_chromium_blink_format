@@ -258,6 +258,12 @@ const void* WebPreferences::valueForKey(CFStringRef key) {
   return value;
 }
 
+void WebPreferences::setValueForKey(CFStringRef key, CFPropertyListRef value) {
+  CFDictionarySetValue(m_privatePrefs.get(), key, value);
+  if (m_autoSaves)
+    save();
+}
+
 BSTR WebPreferences::stringValueForKey(CFStringRef key) {
   CFStringRef str = (CFStringRef)valueForKey(key);
 
@@ -357,9 +363,7 @@ void WebPreferences::setStringValue(CFStringRef key, LPCTSTR value) {
       AdoptCF, CFStringCreateWithCharactersNoCopy(0, (UniChar*)_wcsdup(value),
                                                   (CFIndex)_tcslen(value),
                                                   kCFAllocatorMalloc));
-  CFDictionarySetValue(m_privatePrefs.get(), key, valueRef.get());
-  if (m_autoSaves)
-    save();
+  setValueForKey(key, valueRef.get());
 
   postPreferencesChangesNotification();
 }
@@ -370,9 +374,7 @@ void WebPreferences::setIntegerValue(CFStringRef key, int value) {
 
   RetainPtr<CFNumberRef> valueRef(
       AdoptCF, CFNumberCreate(0, kCFNumberSInt32Type, &value));
-  CFDictionarySetValue(m_privatePrefs.get(), key, valueRef.get());
-  if (m_autoSaves)
-    save();
+  setValueForKey(key, valueRef.get());
 
   postPreferencesChangesNotification();
 }
@@ -381,10 +383,7 @@ void WebPreferences::setBoolValue(CFStringRef key, BOOL value) {
   if (boolValueForKey(key) == value)
     return;
 
-  CFDictionarySetValue(m_privatePrefs.get(), key,
-                       value ? kCFBooleanTrue : kCFBooleanFalse);
-  if (m_autoSaves)
-    save();
+  setValueForKey(key, value ? kCFBooleanTrue : kCFBooleanFalse);
 
   postPreferencesChangesNotification();
 }
@@ -395,9 +394,7 @@ void WebPreferences::setLongLongValue(CFStringRef key, LONGLONG value) {
 
   RetainPtr<CFNumberRef> valueRef(
       AdoptCF, CFNumberCreate(0, kCFNumberLongLongType, &value));
-  CFDictionarySetValue(m_privatePrefs.get(), key, valueRef.get());
-  if (m_autoSaves)
-    save();
+  setValueForKey(key, valueRef.get());
 
   postPreferencesChangesNotification();
 }
