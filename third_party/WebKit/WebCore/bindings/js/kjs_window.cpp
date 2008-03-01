@@ -684,8 +684,8 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   // precedence over the index and name getters.
   JSValue* proto = prototype();
   if (proto->isObject()) {
-    if (static_cast<JSObject*>(proto)->getOwnPropertySlot(exec, propertyName,
-                                                          slot)) {
+    if (static_cast<JSObject*>(proto)->getPropertySlot(exec, propertyName,
+                                                       slot)) {
       if (!allowsAccessFrom(exec))
         slot.setUndefined(this);
       return true;
