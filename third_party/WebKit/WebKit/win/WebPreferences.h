@@ -319,7 +319,7 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
 
  protected:
   void setValueForKey(CFStringRef key, CFPropertyListRef value);
-  const void* valueForKey(CFStringRef key);
+  RetainPtr<CFPropertyListRef> valueForKey(CFStringRef key);
   BSTR stringValueForKey(CFStringRef key);
   int integerValueForKey(CFStringRef key);
   BOOL boolValueForKey(CFStringRef key);
@@ -333,8 +333,8 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   static void initializeDefaultSettings();
   void save();
   void load();
-  void migrateDefaultSettingsFromSafari3Beta();
-  void removeValuesMatchingDefaultSettings();
+  void migrateWebKitPreferencesToCFPreferences();
+  void copyWebKitPreferencesToCFPreferences(CFDictionaryRef);
 
  protected:
   ULONG m_refCount;

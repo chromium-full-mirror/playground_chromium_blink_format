@@ -126,6 +126,9 @@
 #define WebKitDidMigrateDefaultSettingsFromSafari3BetaPreferenceKey \
   "WebKitDidMigrateDefaultSettingsFromSafari3BetaPreferenceKey"
 
+#define WebKitDidMigrateWebKitPreferencesToCFPreferencesPreferenceKey \
+  "WebKitDidMigrateWebKitPreferencesToCFPreferences"
+
 #define WebKitDeveloperExtrasEnabledPreferenceKey "WebKitDeveloperExtras"
 #define DisableWebKitDeveloperExtrasPreferenceKey "DisableWebKitDeveloperExtras"
 
