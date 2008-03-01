@@ -342,9 +342,6 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   bool m_autoSaves;
   bool m_automaticallyDetectsCacheModel;
   unsigned m_numWebViews;
-
-  static CFDictionaryRef s_defaultSettings;
-  static WebPreferences* s_standardPreferences;
 };
 
 #endif
