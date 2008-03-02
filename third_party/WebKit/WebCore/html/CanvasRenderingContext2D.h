@@ -252,6 +252,15 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
                                      float sy,
                                      float sw,
                                      float sh) const;
+  void putImageData(ImageData*, float dx, float dy, ExceptionCode&);
+  void putImageData(ImageData*,
+                    float dx,
+                    float dy,
+                    float dirtyX,
+                    float dirtyY,
+                    float dirtyWidth,
+                    float dirtyHeight,
+                    ExceptionCode&);
 
   void reset();
   void detachCanvas() { m_canvas = 0; }

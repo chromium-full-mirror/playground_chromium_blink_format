@@ -49,6 +49,7 @@ namespace WebCore {
 
 class GraphicsContext;
 class ImageData;
+class IntPoint;
 class IntRect;
 class RenderObject;
 
@@ -69,6 +70,9 @@ class ImageBuffer : Noncopyable {
 #endif
 
   PassRefPtr<ImageData> getImageData(const IntRect& rect) const;
+  void putImageData(ImageData* source,
+                    const IntRect& sourceRect,
+                    const IntPoint& destPoint);
 
  private:
   void* m_data;
