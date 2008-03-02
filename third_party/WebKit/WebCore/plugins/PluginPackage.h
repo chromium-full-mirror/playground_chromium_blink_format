@@ -67,7 +67,9 @@ class PluginPackage : public RefCounted<PluginPackage> {
 
   const NPPluginFuncs* pluginFuncs() const { return &m_pluginFuncs; }
   int compareFileVersion(const PlatformModuleVersion&) const;
+  int compare(const PluginPackage&) const;
   PluginQuirkSet quirks() const { return m_quirks; }
+  const PlatformModuleVersion& version() const { return m_moduleVersion; }
 
  private:
   PluginPackage(const String& path, const PlatformFileTime& lastModified);

@@ -80,9 +80,13 @@ Vector<String> PluginDatabase::defaultPluginPaths() {
   notImplemented();
   return Vector<String>();
 }
-bool PluginDatabase::isPreferredPluginPath(const String&) const {
+bool PluginDatabase::isPreferredPluginPath(const String&) {
   notImplemented();
   return false;
+}
+int PluginPackage::compare(const PluginPackage&) const {
+  notImplemented();
+  return 0;
 }
 bool PluginPackage::fetchInfo() {
   notImplemented();
