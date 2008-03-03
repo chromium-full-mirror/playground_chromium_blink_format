@@ -38,7 +38,7 @@
 #endif
 
 #if USE(JAVASCRIPTCORE_BINDINGS)
-#include <bindings/runtime_object.h>
+#include <bindings/runtime.h>
 #endif
 
 namespace WebCore {
