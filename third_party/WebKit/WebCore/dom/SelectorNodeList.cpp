@@ -44,7 +44,9 @@ SelectorNodeList::SelectorNodeList(PassRefPtr<Node> rootNode,
   for (Node* n = rootNode->firstChild(); n;
        n = n->traverseNextNode(rootNode.get())) {
     if (n->isElementNode()) {
-      styleSelector->initElementAndPseudoState(static_cast<Element*>(n));
+      Element* element = static_cast<Element*>(n);
+      styleSelector->initElementAndPseudoState(element);
+      styleSelector->initForStyleResolve(element, 0);
       for (CSSSelector* selector = querySelector; selector;
            selector = selector->next()) {
         if (styleSelector->checkSelector(selector)) {
