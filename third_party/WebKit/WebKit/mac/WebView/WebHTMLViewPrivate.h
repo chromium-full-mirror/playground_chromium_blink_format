@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,13 +29,8 @@
 #import <WebKit/WebHTMLView.h>
 
 @class DOMDocumentFragment;
-@class DOMElement;
 @class DOMNode;
 @class DOMRange;
-@class WebArchive;
-@class WebFrameBridge;
-@class WebView;
-@class WebFrame;
 @class WebPluginController;
 
 @protocol WebHTMLHighlighter
@@ -102,11 +97,13 @@
 - (BOOL)_isEditable;
 
 - (BOOL)_transparentBackground;
-- (void)_setTransparentBackground:(BOOL)f;
+- (void)_setTransparentBackground:(BOOL)isBackgroundTransparent;
 
 - (void)_setToolTip:(NSString*)string;
 
-// SPI's for Mail.
+// SPI used by Mail.
+// FIXME: These should all be moved to WebView; we won't always have a
+// WebHTMLView.
 - (NSImage*)_selectionDraggingImage;
 - (NSRect)_selectionDraggingRect;
 - (DOMNode*)_insertOrderedList;

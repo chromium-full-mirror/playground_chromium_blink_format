@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,35 +27,25 @@
 #define Editor_h
 
 #include "ClipboardAccessPolicy.h"
+#include "Color.h"
+#include "EditAction.h"
 #include "EditorDeleteAction.h"
 #include "EditorInsertAction.h"
-#include "Frame.h"
 #include "SelectionController.h"
-#include <wtf/Forward.h>
-#include <wtf/OwnPtr.h>
-#include <wtf/RefPtr.h>
-
-#if PLATFORM(MAC)
-class NSString;
-class NSURL;
-#endif
 
 namespace WebCore {
 
+class CSSStyleDeclaration;
 class Clipboard;
 class DeleteButtonController;
-class DocumentFragment;
 class EditCommand;
-class EditorInternalCommand;
 class EditorClient;
-class EventTargetNode;
-class Frame;
+class EditorInternalCommand;
 class HTMLElement;
+class HitTestResult;
 class Pasteboard;
-class Range;
-class SelectionController;
-class Selection;
 class SimpleFontData;
+class Text;
 
 struct CompositionUnderline {
   CompositionUnderline() : startOffset(0), endOffset(0), thick(false) {}
@@ -118,9 +108,9 @@ class Editor {
   void outdent();
   void transpose();
 
-  bool shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
-                            PassRefPtr<Range> replacingDOMRange,
-                            EditorInsertAction givenAction);
+  bool shouldInsertFragment(PassRefPtr<DocumentFragment>,
+                            PassRefPtr<Range>,
+                            EditorInsertAction);
   bool shouldInsertText(const String&, Range*, EditorInsertAction) const;
   bool shouldShowDeleteInterface(HTMLElement*) const;
   bool shouldDeleteRange(Range*) const;
@@ -204,7 +194,7 @@ class Editor {
   bool insertText(const String&, Event* triggeringEvent);
   bool insertTextWithoutSendingTextEvent(const String&,
                                          bool selectInsertedText,
-                                         Event* triggeringEvent = 0);
+                                         Event* triggeringEvent);
   bool insertLineBreak();
   bool insertParagraphSeparator();
 
@@ -285,10 +275,6 @@ class Editor {
   void clear();
 
   Selection selectionForCommand(Event*);
-
-#if PLATFORM(MAC)
-  NSString* userVisibleString(NSURL*);
-#endif
 
   void appendToKillRing(const String&);
   void prependToKillRing(const String&);
