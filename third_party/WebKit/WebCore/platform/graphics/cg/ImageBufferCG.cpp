@@ -186,7 +186,7 @@ void ImageBuffer::putImageData(ImageData* source,
   ASSERT(originy <= sourceRect.bottom());
 
   int endy = destPoint.y() + sourceRect.bottom();
-  ASSERT(endx <= m_size.height());
+  ASSERT(endy <= m_size.height());
   int numRows = endy - desty;
 
   unsigned srcBytesPerRow = 4 * source->width();
