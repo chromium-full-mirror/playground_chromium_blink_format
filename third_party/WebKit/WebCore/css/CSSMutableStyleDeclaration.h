@@ -99,10 +99,6 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
     removeProperty(propertyID, notifyChanged, false, ec);
   }
 
-  void clear();
-
-  void setChanged(StyleChangeType changeType = FullStyleChange);
-
   // setLengthProperty treats integers as pixels! (Needed for conversion of HTML
   // attributes.)
   void setLengthProperty(int propertyId,
@@ -134,6 +130,8 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
   void merge(CSSMutableStyleDeclaration*, bool argOverridesOnConflict = true);
 
  private:
+  void setChanged();
+
   String getShorthandValue(const int* properties, int number) const;
   String getLayeredShorthandValue(const int* properties, unsigned number) const;
   String get4Values(const int* properties) const;
