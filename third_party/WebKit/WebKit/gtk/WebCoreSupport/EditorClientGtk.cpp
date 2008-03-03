@@ -41,7 +41,7 @@ static void imContextCommitted(GtkIMContext* context,
   Frame* frame =
       core(client->m_webView)->focusController()->focusedOrMainFrame();
   frame->editor()->insertTextWithoutSendingTextEvent(String::fromUTF8(str),
-                                                     false);
+                                                     false, 0);
 }
 
 bool EditorClient::shouldDeleteRange(Range*) {
