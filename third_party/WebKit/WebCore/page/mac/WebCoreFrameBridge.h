@@ -278,7 +278,6 @@ rangeByAlteringCurrentSelection:
 
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
 
-- (void)dashboardRegionsChanged:(NSMutableDictionary*)regions;
 - (void)willPopupMenu:(NSMenu*)menu;
 
 - (NSRect)customHighlightRect:(NSString*)type

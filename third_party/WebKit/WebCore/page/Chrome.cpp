@@ -330,6 +330,12 @@ void Chrome::print(Frame* frame) {
   m_client->print(frame);
 }
 
+// --------
+
+void ChromeClient::dashboardRegionsChanged() {}
+
+// --------
+
 PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {
   const HashSet<Page*>* group = page->frameNamespace();
 

@@ -208,8 +208,6 @@ class Frame : public RefCounted<Frame> {
 
   String documentTypeString() const;
 
-  void dashboardRegionsChanged();
-
   void clearScriptProxy();
   void clearDOMWindow();
 
