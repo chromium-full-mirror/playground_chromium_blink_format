@@ -53,20 +53,6 @@ class String;
 
 enum WebCoreDeviceType { WebCoreDeviceScreen, WebCoreDevicePrinter };
 
-enum WebScrollDirection {
-  WebScrollUp,
-  WebScrollDown,
-  WebScrollLeft,
-  WebScrollRight
-};
-
-enum WebScrollGranularity {
-  WebScrollLine,
-  WebScrollPage,
-  WebScrollDocument,
-  WebScrollWheel
-};
-
 @protocol WebCoreOpenPanelResultListener<NSObject>
 - (void)chooseFilename:(NSString*)fileName;
 - (void)cancel;
@@ -103,9 +89,6 @@ enum WebScrollGranularity {
 - (void)clearFrame;
 
 - (NSURL*)baseURL;
-
-- (BOOL)scrollOverflowInDirection:(WebScrollDirection)direction
-                      granularity:(WebScrollGranularity)granularity;
 
 - (void)createFrameViewWithNSView:(NSView*)view
                       marginWidth:(int)mw
