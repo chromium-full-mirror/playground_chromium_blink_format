@@ -30,6 +30,7 @@
 #include "HTMLFrameElement.h"
 #include "HTMLFrameOwnerElement.h"
 #include "HTMLNames.h"
+#include "JSDOMWindow.h"
 #include "Language.h"
 #include "MIMETypeRegistry.h"
 #include "NotImplemented.h"
@@ -386,8 +387,7 @@ void FrameLoaderClient::windowObjectCleared() {
   // when there are no handlers.
   JSGlobalContextRef context =
       toGlobalRef(coreFrame->scriptProxy()->globalObject()->globalExec());
-  JSObjectRef windowObject =
-      toRef(KJS::Window::retrieve(coreFrame)->getObject());
+  JSObjectRef windowObject = toRef(coreFrame->scriptProxy()->globalObject());
   ASSERT(windowObject);
 
   WebKitWebView* webView = getViewFromFrame(m_frame);
