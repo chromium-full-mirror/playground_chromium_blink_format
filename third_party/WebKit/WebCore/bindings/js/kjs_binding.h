@@ -153,6 +153,8 @@ inline KJS::JSValue* toJS(KJS::ExecState* exec, PassRefPtr<T> ptr) {
   return toJS(exec, ptr.get());
 }
 
+bool checkNodeSecurity(KJS::ExecState*, Node*);
+
 // Helpers for Window, History, and Location classes to implement cross-domain
 // policy.
 // Besides the cross-domain check, they need non-caching versions of

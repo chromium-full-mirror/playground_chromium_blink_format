@@ -212,6 +212,8 @@ class JSEventTargetPrototype : public KJS::JSObject {
   }
 };
 
+KJS::JSValue* toJS(KJS::ExecState*, EventTarget*);
+
 }  // namespace WebCore
 
 #endif  // JSEventTargetBase_h

@@ -29,6 +29,7 @@
 #include "kjs_binding.h"
 
 #include "DOMCoreException.h"
+#include "Document.h"
 #include "EventException.h"
 #include "ExceptionCode.h"
 #include "HTMLImageElement.h"
@@ -319,6 +320,10 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
 
   ASSERT(errorObject);
   exec->setException(errorObject);
+}
+
+bool checkNodeSecurity(ExecState* exec, Node* node) {
+  return node && allowsAccessFromFrame(exec, node->document()->frame());
 }
 
 bool allowsAccessFromFrame(ExecState* exec, Frame* frame) {
