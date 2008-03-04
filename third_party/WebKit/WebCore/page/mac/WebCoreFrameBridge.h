@@ -90,10 +90,6 @@ enum WebCoreDeviceType { WebCoreDeviceScreen, WebCoreDevicePrinter };
 
 - (NSURL*)baseURL;
 
-- (void)createFrameViewWithNSView:(NSView*)view
-                      marginWidth:(int)mw
-                     marginHeight:(int)mh;
-
 - (void)reapplyStylesForDeviceType:(WebCoreDeviceType)deviceType;
 - (void)forceLayoutAdjustingViewSize:(BOOL)adjustSizeFlag;
 - (void)forceLayoutWithMinimumPageWidth:(float)minPageWidth
