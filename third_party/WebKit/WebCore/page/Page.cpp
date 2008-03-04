@@ -42,6 +42,7 @@
 #include "StringHash.h"
 #include "TextResourceDecoder.h"
 #include "Widget.h"
+#include "kjs_proxy.h"
 #include <kjs/collector.h>
 #include <kjs/JSLock.h>
 #include <wtf/HashMap.h>
@@ -89,7 +90,8 @@ Page::Page(ChromeClient* chromeClient,
       m_inLowQualityInterpolationMode(false),
       m_parentInspectorController(0),
       m_didLoadUserStyleSheet(false),
-      m_userStyleSheetModificationTime(0) {
+      m_userStyleSheetModificationTime(0),
+      m_debugger(0) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
     setFocusRingColorChangeFunction(setNeedsReapplyStyles);
@@ -363,6 +365,25 @@ const String& Page::userStyleSheet() const {
       TextResourceDecoder("text/css").decode(data->data(), data->size());
 
   return m_userStyleSheet;
+}
+
+void Page::setDebuggerForAllPages(Debugger* debugger) {
+  ASSERT(allPages);
+
+  HashSet<Page*>::iterator end = allPages->end();
+  for (HashSet<Page*>::iterator it = allPages->begin(); it != end; ++it)
+    (*it)->setDebugger(debugger);
+}
+
+void Page::setDebugger(Debugger* debugger) {
+  if (m_debugger == debugger)
+    return;
+
+  m_debugger = debugger;
+
+  for (Frame* frame = m_mainFrame.get(); frame;
+       frame = frame->tree()->traverseNext())
+    frame->scriptProxy()->attachDebugger(m_debugger);
 }
 
 }  // namespace WebCore

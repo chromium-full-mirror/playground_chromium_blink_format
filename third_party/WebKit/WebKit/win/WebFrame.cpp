@@ -48,8 +48,6 @@
 #include "WebView.h"
 #include "WebDataSource.h"
 #include "WebHistoryItem.h"
-#include "WebScriptDebugger.h"
-#include "WebScriptDebugServer.h"
 #include "WebURLResponse.h"
 #pragma warning(push, 0)
 #include <WebCore/BString.h>
@@ -224,8 +222,7 @@ WebFrame::WebFrame()
       d(new WebFrame::WebFramePrivate),
       m_quickRedirectComing(false),
       m_inPrintingMode(false),
-      m_pageHeight(0),
-      m_scriptDebugger(0) {
+      m_pageHeight(0) {
   WebFrameCount++;
   gClassCount++;
 }
@@ -527,15 +524,6 @@ KURL WebFrame::url() const {
     return KURL();
 
   return coreFrame->loader()->url();
-}
-
-void WebFrame::attachScriptDebugger() {
-  if (!m_scriptDebugger && core(this)->scriptProxy()->haveGlobalObject())
-    m_scriptDebugger.set(new WebScriptDebugger(this));
-}
-
-void WebFrame::detachScriptDebugger() {
-  m_scriptDebugger.clear();
 }
 
 HRESULT STDMETHODCALLTYPE WebFrame::stopLoading(void) {
@@ -1510,11 +1498,6 @@ void WebFrame::windowObjectCleared() {
                                    d->webView, context, windowObject, this)))
       frameLoadDelegate->windowScriptObjectAvailable(d->webView, context,
                                                      windowObject);
-  }
-
-  if (WebScriptDebugServer::listenerCount() > 0) {
-    detachScriptDebugger();
-    attachScriptDebugger();
   }
 }
 

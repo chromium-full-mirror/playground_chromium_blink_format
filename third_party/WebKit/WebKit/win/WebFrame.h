@@ -60,7 +60,6 @@ typedef struct OpaqueJSValue* JSObjectRef;
 class WebFrame;
 class WebFramePolicyListener;
 class WebHistory;
-class WebScriptDebugger;
 class WebView;
 
 interface IWebHistoryItemPrivate;
@@ -350,9 +349,6 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
 
   WebCore::KURL url() const;
 
-  virtual void attachScriptDebugger();
-  virtual void detachScriptDebugger();
-
   WebView* webView() const;
 
  protected:
@@ -379,9 +375,6 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   bool m_inPrintingMode;
   Vector<WebCore::IntRect> m_pageRects;
   int m_pageHeight;  // height of the page adjusted by margins
-
- private:
-  OwnPtr<WebScriptDebugger> m_scriptDebugger;
 };
 
 #endif

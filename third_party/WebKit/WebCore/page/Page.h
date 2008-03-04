@@ -33,6 +33,10 @@
 typedef struct HINSTANCE__* HINSTANCE;
 #endif
 
+namespace KJS {
+class Debugger;
+}
+
 typedef enum TextCaseSensitivity { TextCaseSensitive, TextCaseInsensitive };
 
 typedef enum FindDirection { FindDirectionForward, FindDirectionBackward };
@@ -147,6 +151,10 @@ class Page : Noncopyable {
   void userStyleSheetLocationChanged();
   const String& userStyleSheet() const;
 
+  static void setDebuggerForAllPages(KJS::Debugger*);
+  void setDebugger(KJS::Debugger*);
+  KJS::Debugger* debugger() const { return m_debugger; }
+
 #if PLATFORM(WIN) || (PLATFORM(WX) && PLATFORM(WIN_OS))
   // The global DLL or application instance used for all windows.
   static void setInstanceHandle(HINSTANCE instanceHandle) {
@@ -185,6 +193,8 @@ class Page : Noncopyable {
   mutable String m_userStyleSheet;
   mutable bool m_didLoadUserStyleSheet;
   mutable time_t m_userStyleSheetModificationTime;
+
+  KJS::Debugger* m_debugger;
 
 #if PLATFORM(WIN) || (PLATFORM(WX) && defined(__WXMSW__))
   static HINSTANCE s_instanceHandle;

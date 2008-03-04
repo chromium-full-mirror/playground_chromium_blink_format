@@ -35,6 +35,7 @@
 #include "Settings.h"
 #include "kjs_events.h"
 #include "kjs_window.h"
+#include <kjs/debugger.h>
 
 #if ENABLE(SVG)
 #include "JSSVGLazyEventListener.h"
@@ -161,6 +162,9 @@ void KJSProxy::initScript() {
 
   m_globalObject = new JSDOMWindow(m_frame->domWindow());
 
+  if (Page* page = m_frame->page())
+    attachDebugger(page->debugger());
+
   m_frame->loader()->dispatchWindowObjectAvailable();
 }
 
@@ -202,6 +206,16 @@ bool KJSProxy::processingUserGesture() const {
 bool KJSProxy::isEnabled() {
   Settings* settings = m_frame->settings();
   return (settings && settings->isJavaScriptEnabled());
+}
+
+void KJSProxy::attachDebugger(Debugger* debugger) {
+  if (!m_globalObject)
+    return;
+
+  if (debugger)
+    debugger->attach(m_globalObject);
+  else if (Debugger* currentDebugger = m_globalObject->debugger())
+    currentDebugger->detach(m_globalObject);
 }
 
 }  // namespace WebCore

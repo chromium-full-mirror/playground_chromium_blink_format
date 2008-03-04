@@ -75,6 +75,8 @@ class KJSProxy {
 
   bool isEnabled();
 
+  void attachDebugger(KJS::Debugger*);
+
  private:
   void initScriptIfNeeded() {
     if (!m_globalObject)
