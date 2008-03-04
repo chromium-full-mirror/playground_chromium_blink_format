@@ -52,12 +52,15 @@ class JSXSLTProcessor : public DOMObject {
   RefPtr<XSLTProcessor> m_impl;
 };
 
-class XSLTProcessorConstructorImp : public DOMObject {
+class JSXSLTProcessorConstructor : public DOMObject {
  public:
-  XSLTProcessorConstructorImp(KJS::ExecState*);
+  JSXSLTProcessorConstructor(KJS::ExecState*);
 
   virtual bool implementsConstruct() const;
   virtual KJS::JSObject* construct(KJS::ExecState*, const KJS::List&);
+
+  virtual const KJS::ClassInfo* classInfo() const { return &info; }
+  static const KJS::ClassInfo info;
 };
 
 KJS::JSValue* jsXSLTProcessorPrototypeFunctionImportStylesheet(

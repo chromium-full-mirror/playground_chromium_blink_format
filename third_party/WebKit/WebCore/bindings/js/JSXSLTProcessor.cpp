@@ -44,7 +44,7 @@ namespace WebCore {
 const ClassInfo JSXSLTProcessor::info = {"XSLTProcessor", 0, 0};
 
 /*
-@begin XSLTProcessorPrototypeTable 7
+@begin JSXSLTProcessorPrototypeTable 7
   importStylesheet      jsXSLTProcessorPrototypeFunctionImportStylesheet
 DontDelete|Function 1
   transformToFragment   jsXSLTProcessorPrototypeFunctionTransformToFragment
@@ -64,8 +64,8 @@ DontDelete|Function 0
 @end
 */
 
-KJS_DEFINE_PROTOTYPE(XSLTProcessorPrototype)
-KJS_IMPLEMENT_PROTOTYPE("XSLTProcessor", XSLTProcessorPrototype)
+KJS_DEFINE_PROTOTYPE(JSXSLTProcessorPrototype)
+KJS_IMPLEMENT_PROTOTYPE("XSLTProcessor", JSXSLTProcessorPrototype)
 
 JSXSLTProcessor::JSXSLTProcessor(JSObject* prototype)
     : DOMObject(prototype), m_impl(XSLTProcessor::create()) {}
@@ -200,21 +200,24 @@ JSValue* jsXSLTProcessorPrototypeFunctionReset(ExecState* exec,
   return jsUndefined();
 }
 
-XSLTProcessorConstructorImp::XSLTProcessorConstructorImp(ExecState* exec)
+const ClassInfo JSXSLTProcessorConstructor::info = {"XSLTProcessorConsructor",
+                                                    0, 0};
+
+JSXSLTProcessorConstructor::JSXSLTProcessorConstructor(ExecState* exec)
     : DOMObject(exec->lexicalGlobalObject()->objectPrototype()) {
-  putDirect(exec->propertyNames().prototype, XSLTProcessorPrototype::self(exec),
-            None);
+  putDirect(exec->propertyNames().prototype,
+            JSXSLTProcessorPrototype::self(exec), None);
 }
 
-bool XSLTProcessorConstructorImp::implementsConstruct() const {
+bool JSXSLTProcessorConstructor::implementsConstruct() const {
   return true;
 }
 
-JSObject* XSLTProcessorConstructorImp::construct(ExecState* exec,
-                                                 const List& args) {
-  return new JSXSLTProcessor(XSLTProcessorPrototype::self(exec));
+JSObject* JSXSLTProcessorConstructor::construct(ExecState* exec,
+                                                const List& args) {
+  return new JSXSLTProcessor(JSXSLTProcessorPrototype::self(exec));
 }
 
-}  // namespace KJS
+}  // namespace WebCore
 
 #endif  // ENABLE(XSLT)

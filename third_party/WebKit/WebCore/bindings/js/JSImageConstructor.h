@@ -31,8 +31,11 @@ class JSImageConstructor : public DOMObject {
  public:
   JSImageConstructor(KJS::ExecState*, Document*);
 
-  virtual bool implementsConstruct() const { return true; }
+  virtual bool implementsConstruct() const;
   virtual KJS::JSObject* construct(KJS::ExecState*, const KJS::List&);
+
+  virtual const KJS::ClassInfo* classInfo() const { return &info; }
+  static const KJS::ClassInfo info;
 
  private:
   RefPtr<Document> m_document;

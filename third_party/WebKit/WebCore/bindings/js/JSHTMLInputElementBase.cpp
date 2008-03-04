@@ -42,8 +42,7 @@ DontDelete|Function 2
 @end
 */
 
-KJS_IMPLEMENT_PROTOTYPE("JSHTMLInputElementBase",
-                        JSHTMLInputElementBasePrototype)
+KJS_IMPLEMENT_PROTOTYPE("HTMLInputElementBase", JSHTMLInputElementBasePrototype)
 
 JSValue* jsHTMLInputElementBaseFunctionSetSelectionRange(ExecState* exec,
                                                          JSObject* thisObj,
@@ -54,9 +53,8 @@ JSValue* jsHTMLInputElementBaseFunctionSetSelectionRange(ExecState* exec,
   return jsUndefined();
 }
 
-const ClassInfo JSHTMLInputElementBase::info = {"JSHTMLInputElementBase",
-                                                &JSHTMLElement::info,
-                                                &JSHTMLInputElementBaseTable};
+const ClassInfo JSHTMLInputElementBase::info = {
+    "HTMLInputElementBase", &JSHTMLElement::info, &JSHTMLInputElementBaseTable};
 
 JSHTMLInputElementBase::JSHTMLInputElementBase(KJS::JSObject* prototype,
                                                PassRefPtr<HTMLInputElement> e)
