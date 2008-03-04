@@ -31,11 +31,6 @@
 
 #include "WebKit.h"
 
-#include <JavaScriptCore/ExecState.h>
-#pragma warning(push, 0)
-#include <WebCore/COMPtr.h>
-#pragma warning(pop)
-
 namespace KJS {
 class ExecState;
 class JSValue;
@@ -44,11 +39,10 @@ class UString;
 
 class WebScriptCallFrame : public IWebScriptCallFrame {
  public:
-  static WebScriptCallFrame* createInstance(KJS::ExecState*,
-                                            IWebScriptCallFrame* caller);
+  static WebScriptCallFrame* createInstance(KJS::ExecState*);
 
  private:
-  WebScriptCallFrame(KJS::ExecState*, IWebScriptCallFrame* caller);
+  WebScriptCallFrame(KJS::ExecState*);
   virtual ~WebScriptCallFrame();
 
  public:
@@ -89,7 +83,6 @@ class WebScriptCallFrame : public IWebScriptCallFrame {
   ULONG m_refCount;
 
   KJS::ExecState* m_state;
-  COMPtr<IWebScriptCallFrame> m_caller;
 };
 
 #endif

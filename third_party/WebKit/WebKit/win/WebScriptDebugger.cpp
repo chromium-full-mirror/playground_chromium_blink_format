@@ -45,10 +45,9 @@
 using namespace WebCore;
 using namespace KJS;
 
-WebScriptDebugger::WebScriptDebugger(WebFrame* frame) : m_frame(frame) {
+WebScriptDebugger::WebScriptDebugger(WebFrame* frame)
+    : m_frame(frame), m_callingServer(false) {
   ASSERT(m_frame);
-
-  m_callingServer = true;
 
   KJSProxy* proxy = core(m_frame)->scriptProxy();
   if (!proxy)
@@ -59,9 +58,6 @@ WebScriptDebugger::WebScriptDebugger(WebFrame* frame) : m_frame(frame) {
 
   m_frame->webView(&m_webView);
   ASSERT(m_webView);
-
-  callEvent(globalObject->globalExec(), -1, -1, 0, List());
-  m_callingServer = false;
 }
 
 bool WebScriptDebugger::sourceParsed(ExecState*,
@@ -101,7 +97,7 @@ bool WebScriptDebugger::sourceParsed(ExecState*,
   return true;
 }
 
-bool WebScriptDebugger::callEvent(ExecState* state,
+bool WebScriptDebugger::callEvent(ExecState* exec,
                                   int sourceId,
                                   int lineno,
                                   JSObject* /*function*/,
@@ -111,16 +107,17 @@ bool WebScriptDebugger::callEvent(ExecState* state,
 
   m_callingServer = true;
 
-  enterFrame(state);
+  COMPtr<WebScriptCallFrame> callFrame(
+      AdoptCOM, WebScriptCallFrame::createInstance(exec));
   WebScriptDebugServer::sharedWebScriptDebugServer()->didEnterCallFrame(
-      m_webView.get(), m_topStackFrame.get(), sourceId, lineno, m_frame);
+      m_webView.get(), callFrame.get(), sourceId, lineno, m_frame);
 
   m_callingServer = false;
 
   return true;
 }
 
-bool WebScriptDebugger::atStatement(ExecState*,
+bool WebScriptDebugger::atStatement(ExecState* exec,
                                     int sourceId,
                                     int firstLine,
                                     int /*lastLine*/) {
@@ -129,15 +126,17 @@ bool WebScriptDebugger::atStatement(ExecState*,
 
   m_callingServer = true;
 
+  COMPtr<WebScriptCallFrame> callFrame(
+      AdoptCOM, WebScriptCallFrame::createInstance(exec));
   WebScriptDebugServer::sharedWebScriptDebugServer()->willExecuteStatement(
-      m_webView.get(), m_topStackFrame.get(), sourceId, firstLine, m_frame);
+      m_webView.get(), callFrame.get(), sourceId, firstLine, m_frame);
 
   m_callingServer = false;
 
   return true;
 }
 
-bool WebScriptDebugger::returnEvent(ExecState*,
+bool WebScriptDebugger::returnEvent(ExecState* exec,
                                     int sourceId,
                                     int lineno,
                                     JSObject* /*function*/) {
@@ -146,16 +145,17 @@ bool WebScriptDebugger::returnEvent(ExecState*,
 
   m_callingServer = true;
 
-  leaveFrame();
+  COMPtr<WebScriptCallFrame> callFrame(
+      AdoptCOM, WebScriptCallFrame::createInstance(exec->callingExecState()));
   WebScriptDebugServer::sharedWebScriptDebugServer()->willLeaveCallFrame(
-      m_webView.get(), m_topStackFrame.get(), sourceId, lineno, m_frame);
+      m_webView.get(), callFrame.get(), sourceId, lineno, m_frame);
 
   m_callingServer = false;
 
   return true;
 }
 
-bool WebScriptDebugger::exception(ExecState*,
+bool WebScriptDebugger::exception(ExecState* exec,
                                   int sourceId,
                                   int lineno,
                                   JSValue* /*exception */) {
@@ -164,26 +164,12 @@ bool WebScriptDebugger::exception(ExecState*,
 
   m_callingServer = true;
 
+  COMPtr<WebScriptCallFrame> callFrame(
+      AdoptCOM, WebScriptCallFrame::createInstance(exec));
   WebScriptDebugServer::sharedWebScriptDebugServer()->exceptionWasRaised(
-      m_webView.get(), m_topStackFrame.get(), sourceId, lineno, m_frame);
+      m_webView.get(), callFrame.get(), sourceId, lineno, m_frame);
 
   m_callingServer = false;
 
   return true;
-}
-
-void WebScriptDebugger::enterFrame(ExecState* state) {
-  m_topStackFrame = WebScriptCallFrame::createInstance(
-      state, m_topStackFrame.get());  // Set the top as the caller
-}
-
-void WebScriptDebugger::leaveFrame() {
-  if (!m_topStackFrame)
-    return;
-
-  COMPtr<IWebScriptCallFrame> caller;
-  if (FAILED(m_topStackFrame->caller(&caller)))
-    return;
-
-  m_topStackFrame = caller;
 }

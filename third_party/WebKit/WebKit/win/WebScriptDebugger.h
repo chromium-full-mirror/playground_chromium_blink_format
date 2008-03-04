@@ -74,13 +74,9 @@ class WebScriptDebugger : public KJS::Debugger {
                  KJS::JSValue* exception);
 
  private:
-  void enterFrame(KJS::ExecState*);
-  void leaveFrame();
   bool m_callingServer;
-
   WebFrame* m_frame;
   COMPtr<IWebView> m_webView;
-  COMPtr<IWebScriptCallFrame> m_topStackFrame;
 };
 
 #endif

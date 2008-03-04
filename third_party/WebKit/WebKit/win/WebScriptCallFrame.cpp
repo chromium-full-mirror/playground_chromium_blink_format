@@ -27,11 +27,11 @@
  */
 
 #include "config.h"
-#include "WebKitDLL.h"
 #include "WebScriptCallFrame.h"
 
 #include "COMEnumVariant.h"
 #include "Function.h"
+#include "WebKitDLL.h"
 
 #include <JavaScriptCore/Interpreter.h>
 #include <JavaScriptCore/JSGlobalObject.h>
@@ -80,12 +80,19 @@ UString WebScriptCallFrame::jsValueToString(KJS::ExecState* state,
 // WebScriptCallFrame
 // -----------------------------------------------------------
 
-WebScriptCallFrame::WebScriptCallFrame(ExecState* state,
-                                       IWebScriptCallFrame* caller)
-    : m_refCount(0) {
-  m_state = state;
-  m_caller = caller;
+static ExecState* callingFunctionOrGlobalExecState(ExecState* exec) {
+  for (ExecState* current = exec; current;
+       current = current->callingExecState())
+    if (current->codeType() == FunctionCode ||
+        current->codeType() == GlobalCode)
+      return current;
+  return 0;
+}
 
+WebScriptCallFrame::WebScriptCallFrame(ExecState* state)
+    : m_refCount(0), m_state(callingFunctionOrGlobalExecState(state)) {
+  ASSERT_ARG(state, state);
+  ASSERT(m_state);
   gClassCount++;
 }
 
@@ -93,10 +100,8 @@ WebScriptCallFrame::~WebScriptCallFrame() {
   gClassCount--;
 }
 
-WebScriptCallFrame* WebScriptCallFrame::createInstance(
-    ExecState* state,
-    IWebScriptCallFrame* caller) {
-  WebScriptCallFrame* instance = new WebScriptCallFrame(state, caller);
+WebScriptCallFrame* WebScriptCallFrame::createInstance(ExecState* state) {
+  WebScriptCallFrame* instance = new WebScriptCallFrame(state);
   instance->AddRef();
   return instance;
 }
@@ -134,7 +139,14 @@ ULONG STDMETHODCALLTYPE WebScriptCallFrame::Release() {
 
 HRESULT STDMETHODCALLTYPE WebScriptCallFrame::caller(
     /* [out, retval] */ IWebScriptCallFrame** callFrame) {
-  return m_caller.copyRefTo(callFrame);
+  if (!callFrame)
+    return E_POINTER;
+
+  *callFrame =
+      m_state->callingExecState()
+          ? WebScriptCallFrame::createInstance(m_state->callingExecState())
+          : 0;
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE WebScriptCallFrame::functionName(
