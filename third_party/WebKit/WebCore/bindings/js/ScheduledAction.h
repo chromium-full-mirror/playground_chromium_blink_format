@@ -26,12 +26,13 @@
 #include <wtf/Vector.h>
 
 namespace KJS {
-class Window;
 class JSValue;
 class List;
 }
 
 namespace WebCore {
+
+class JSDOMWindowBase;
 
 /**
  * An action (either function or string) to be executed after a specified
@@ -43,7 +44,7 @@ class ScheduledAction {
   ScheduledAction(KJS::JSValue* func, const KJS::List& args);
   ScheduledAction(const String& code) : m_code(code) {}
 
-  void execute(KJS::Window*);
+  void execute(JSDOMWindowBase*);
 
  private:
   KJS::ProtectedPtr<KJS::JSValue> m_func;

@@ -33,6 +33,7 @@
 #include "ExceptionCode.h"
 #include "JSCustomSQLStatementCallback.h"
 #include "JSCustomSQLStatementErrorCallback.h"
+#include "JSDOMWindow.h"
 #include "SQLTransaction.h"
 #include "kjs_window.h"
 
@@ -87,7 +88,8 @@ JSValue* JSSQLTransaction::executeSql(ExecState* exec, const List& args) {
       return jsUndefined();
     }
 
-    if (Frame* frame = Window::retrieveActive(exec)->impl()->frame())
+    if (Frame* frame =
+            toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame())
       callback = new JSCustomSQLStatementCallback(object, frame);
   }
 
@@ -99,7 +101,8 @@ JSValue* JSSQLTransaction::executeSql(ExecState* exec, const List& args) {
       return jsUndefined();
     }
 
-    if (Frame* frame = Window::retrieveActive(exec)->impl()->frame())
+    if (Frame* frame =
+            toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame())
       errorCallback = new JSCustomSQLStatementErrorCallback(object, frame);
   }
 

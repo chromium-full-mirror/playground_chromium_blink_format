@@ -27,6 +27,9 @@
 #include "config.h"
 #include "JSEventTargetNode.h"
 
+#include "JSDOMWindow.h"
+#include "kjs_window.h"
+
 namespace WebCore {
 
 using namespace KJS;
@@ -63,8 +66,7 @@ void JSEventTargetNode::setListener(ExecState* exec,
   if (frame)
     EventTargetNodeCast(impl())->setHTMLEventListener(
         eventType,
-        KJS::Window::retrieveWindow(frame)->findOrCreateJSEventListener(func,
-                                                                        true));
+        toJSDOMWindow(frame)->findOrCreateJSEventListener(func, true));
 }
 
 JSValue* JSEventTargetNode::getListener(const AtomicString& eventType) const {

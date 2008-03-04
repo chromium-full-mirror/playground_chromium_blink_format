@@ -44,6 +44,7 @@
 #include "GraphicsContext.h"
 #include "HTMLFrameOwnerElement.h"
 #include "InspectorClient.h"
+#include "JSDOMWindow.h"
 #include "JSRange.h"
 #include "Page.h"
 #include "Range.h"
@@ -594,7 +595,7 @@ static JSValueRef inspectedWindow(JSContextRef ctx,
   if (!controller)
     return JSValueMakeUndefined(ctx);
 
-  return toRef(KJS::Window::retrieve(controller->inspectedPage()->mainFrame()));
+  return toRef(toJSDOMWindow(controller->inspectedPage()->mainFrame()));
 }
 
 static JSValueRef localizedStrings(JSContextRef ctx,

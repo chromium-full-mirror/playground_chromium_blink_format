@@ -33,8 +33,8 @@
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
+#include "JSDOMWindow.h"
 #include "Page.h"
-
 #include "kjs_binding.h"
 #include "kjs_proxy.h"
 #include "kjs_window.h"
@@ -56,7 +56,8 @@ PassRefPtr<JSCustomXPathNSResolver> JSCustomXPathNSResolver::create(
   }
 
   return new JSCustomXPathNSResolver(
-      resolverObject, KJS::Window::retrieveActive(exec)->impl()->frame());
+      resolverObject,
+      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame());
 }
 
 JSCustomXPathNSResolver::JSCustomXPathNSResolver(JSObject* customResolver,

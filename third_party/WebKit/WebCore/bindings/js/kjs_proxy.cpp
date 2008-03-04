@@ -81,7 +81,8 @@ JSValue* KJSProxy::evaluate(const String& filename,
   // so we start the keep alive timer here.
   m_frame->keepAlive();
 
-  JSValue* thisNode = Window::retrieve(m_frame);
+  // FIXME: Can this call to toJSDOMWindow be replaced by using m_globalObject.
+  JSValue* thisNode = toJSDOMWindow(m_frame);
 
   m_globalObject->startTimeoutCheck();
   Completion comp = Interpreter::evaluate(
@@ -125,9 +126,8 @@ EventListener* KJSProxy::createHTMLEventHandler(const String& functionName,
                                                 Node* node) {
   initScriptIfNeeded();
   JSLock lock;
-  return new JSLazyEventListener(functionName, code,
-                                 Window::retrieveWindow(m_frame), node,
-                                 m_handlerLineno);
+  return new JSLazyEventListener(functionName, code, toJSDOMWindow(m_frame),
+                                 node, m_handlerLineno);
 }
 
 #if ENABLE(SVG)
@@ -136,9 +136,8 @@ EventListener* KJSProxy::createSVGEventHandler(const String& functionName,
                                                Node* node) {
   initScriptIfNeeded();
   JSLock lock;
-  return new JSSVGLazyEventListener(functionName, code,
-                                    Window::retrieveWindow(m_frame), node,
-                                    m_handlerLineno);
+  return new JSSVGLazyEventListener(functionName, code, toJSDOMWindow(m_frame),
+                                    node, m_handlerLineno);
 }
 #endif
 

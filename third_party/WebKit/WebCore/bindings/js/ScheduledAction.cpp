@@ -1,7 +1,8 @@
 /*
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2006 Jon Shier (jshier@iastate.edu)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reseved.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reseved.
  *  Copyright (C) 2006 Alexey Proskuryakov (ap@webkit.org)
  *
  *  This library is free software; you can redistribute it and/or
@@ -29,6 +30,7 @@
 #include "Document.h"
 #include "Frame.h"
 #include "FrameLoader.h"
+#include "JSDOMWindow.h"
 #include "Page.h"
 #include "kjs_proxy.h"
 #include "kjs_window.h"
@@ -44,7 +46,7 @@ ScheduledAction::ScheduledAction(JSValue* func, const List& args)
     m_args.append(*it);
 }
 
-void ScheduledAction::execute(Window* window) {
+void ScheduledAction::execute(JSDOMWindowBase* window) {
   RefPtr<Frame> frame = window->impl()->frame();
   if (!frame)
     return;
@@ -53,7 +55,7 @@ void ScheduledAction::execute(Window* window) {
     return;
 
   KJSProxy* scriptProxy = frame->scriptProxy();
-  Window* globalObject = scriptProxy->globalObject();
+  JSDOMWindow* globalObject = scriptProxy->globalObject();
 
   scriptProxy->setProcessingTimerCallback(true);
 

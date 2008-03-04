@@ -69,10 +69,13 @@
 #include "JSXSLTProcessor.h"
 #endif
 
-using namespace WebCore;
-using namespace EventNames;
+#include "kjs_window.lut.h"
 
-namespace KJS {
+using namespace KJS;
+
+namespace WebCore {
+
+using namespace EventNames;
 
 static int lastUsedTimeoutId;
 
@@ -80,15 +83,15 @@ static int timerNestingLevel = 0;
 const int cMaxTimerNestingLevel = 5;
 const double cMinimumTimerInterval = 0.010;
 
-struct WindowPrivate {
-  WindowPrivate() : loc(0), m_evt(0), m_returnValueSlot(0) {}
+struct JSDOMWindowBasePrivate {
+  JSDOMWindowBasePrivate() : loc(0), m_evt(0), m_returnValueSlot(0) {}
 
-  Window::ListenersMap jsEventListeners;
-  Window::ListenersMap jsHTMLEventListeners;
-  Window::UnprotectedListenersMap jsUnprotectedEventListeners;
-  Window::UnprotectedListenersMap jsUnprotectedHTMLEventListeners;
-  mutable WebCore::JSLocation* loc;
-  WebCore::Event* m_evt;
+  JSDOMWindowBase::ListenersMap jsEventListeners;
+  JSDOMWindowBase::ListenersMap jsHTMLEventListeners;
+  JSDOMWindowBase::UnprotectedListenersMap jsUnprotectedEventListeners;
+  JSDOMWindowBase::UnprotectedListenersMap jsUnprotectedHTMLEventListeners;
+  mutable JSLocation* loc;
+  Event* m_evt;
   JSValue** m_returnValueSlot;
 
   typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
@@ -99,8 +102,8 @@ class DOMWindowTimer : public TimerBase {
  public:
   DOMWindowTimer(int timeoutId,
                  int nestingLevel,
-                 Window* object,
-                 WebCore::ScheduledAction* action)
+                 JSDOMWindowBase* object,
+                 ScheduledAction* action)
       : m_timeoutId(timeoutId),
         m_nestingLevel(nestingLevel),
         m_object(object),
@@ -116,9 +119,9 @@ class DOMWindowTimer : public TimerBase {
   int nestingLevel() const { return m_nestingLevel; }
   void setNestingLevel(int n) { m_nestingLevel = n; }
 
-  WebCore::ScheduledAction* action() const { return m_action; }
-  WebCore::ScheduledAction* takeAction() {
-    WebCore::ScheduledAction* a = m_action;
+  ScheduledAction* action() const { return m_action; }
+  ScheduledAction* takeAction() {
+    ScheduledAction* a = m_action;
     m_action = 0;
     return a;
   }
@@ -128,83 +131,83 @@ class DOMWindowTimer : public TimerBase {
 
   int m_timeoutId;
   int m_nestingLevel;
-  Window* m_object;
-  WebCore::ScheduledAction* m_action;
+  JSDOMWindowBase* m_object;
+  ScheduledAction* m_action;
 };
 
-}  // namespace KJS
+////////////////////// JSDOMWindowBase Object ////////////////////////
 
-#include "kjs_window.lut.h"
-
-namespace KJS {
-
-////////////////////// Window Object ////////////////////////
-
-const ClassInfo Window::info = {"Window", 0, &WindowTable};
+const ClassInfo JSDOMWindowBase::info = {"Window", 0, &JSDOMWindowBaseTable};
 
 /*
-@begin WindowTable 118
-# Warning, when adding a function to this object you need to add a case in
-Window::get
+@begin JSDOMWindowBaseTable 118
 # -- Functions --
-  atob                  windowProtoFuncAToB                DontDelete|Function 1
-  btoa                  windowProtoFuncBToA                DontDelete|Function 1
-  open                  windowProtoFuncOpen                DontDelete|Function 3
-  setTimeout            windowProtoFuncSetTimeout          DontDelete|Function 2
-  clearTimeout          windowProtoFuncClearTimeout        DontDelete|Function 1
-  setInterval           windowProtoFuncSetInterval         DontDelete|Function 2
-  clearInterval         windowProtoFuncClearTimeout        DontDelete|Function 1
-  addEventListener      windowProtoFuncAddEventListener    DontDelete|Function 3
-  removeEventListener   windowProtoFuncRemoveEventListener DontDelete|Function 3
-  showModalDialog       windowProtoFuncShowModalDialog     DontDelete|Function 1
+  atob                  WebCore::windowProtoFuncAToB DontDelete|Function 1
+  btoa                  WebCore::windowProtoFuncBToA DontDelete|Function 1
+  open                  WebCore::windowProtoFuncOpen DontDelete|Function 3
+  setTimeout            WebCore::windowProtoFuncSetTimeout DontDelete|Function 2
+  clearTimeout          WebCore::windowProtoFuncClearTimeout
+DontDelete|Function 1
+  setInterval           WebCore::windowProtoFuncSetInterval
+DontDelete|Function 2
+  clearInterval         WebCore::windowProtoFuncClearTimeout
+DontDelete|Function 1
+  addEventListener      WebCore::windowProtoFuncAddEventListener
+DontDelete|Function 3
+  removeEventListener   WebCore::windowProtoFuncRemoveEventListener
+DontDelete|Function 3
+  showModalDialog       WebCore::windowProtoFuncShowModalDialog
+DontDelete|Function 1
 # Not implemented
-  captureEvents         windowProtoFuncNotImplemented      DontDelete|Function 0
-  releaseEvents         windowProtoFuncNotImplemented      DontDelete|Function 0
+  captureEvents         WebCore::windowProtoFuncNotImplemented
+DontDelete|Function 0
+  releaseEvents         WebCore::windowProtoFuncNotImplemented
+DontDelete|Function 0
 
 # -- Attributes --
-  crypto                Window::Crypto              DontDelete|ReadOnly
-  event                 Window::Event_              DontDelete
-  location              Window::Location_           DontDelete
-  navigator             Window::Navigator_          DontDelete
-  clientInformation     Window::ClientInformation   DontDelete
+  crypto                WebCore::JSDOMWindowBase::Crypto DontDelete|ReadOnly
+  event                 WebCore::JSDOMWindowBase::Event_             DontDelete
+  location              WebCore::JSDOMWindowBase::Location_          DontDelete
+  navigator             WebCore::JSDOMWindowBase::Navigator_         DontDelete
+  clientInformation     WebCore::JSDOMWindowBase::ClientInformation  DontDelete
 # -- Event Listeners --
-  onabort               Window::Onabort             DontDelete
-  onblur                Window::Onblur              DontDelete
-  onchange              Window::Onchange            DontDelete
-  onclick               Window::Onclick             DontDelete
-  ondblclick            Window::Ondblclick          DontDelete
-  onerror               Window::Onerror             DontDelete
-  onfocus               Window::Onfocus             DontDelete
-  onkeydown             Window::Onkeydown           DontDelete
-  onkeypress            Window::Onkeypress          DontDelete
-  onkeyup               Window::Onkeyup             DontDelete
-  onload                Window::Onload              DontDelete
-  onmousedown           Window::Onmousedown         DontDelete
-  onmousemove           Window::Onmousemove         DontDelete
-  onmouseout            Window::Onmouseout          DontDelete
-  onmouseover           Window::Onmouseover         DontDelete
-  onmouseup             Window::Onmouseup           DontDelete
-  onmousewheel          Window::OnWindowMouseWheel  DontDelete
-  onreset               Window::Onreset             DontDelete
-  onresize              Window::Onresize            DontDelete
-  onscroll              Window::Onscroll            DontDelete
-  onsearch              Window::Onsearch            DontDelete
-  onselect              Window::Onselect            DontDelete
-  onsubmit              Window::Onsubmit            DontDelete
-  onunload              Window::Onunload            DontDelete
-  onbeforeunload        Window::Onbeforeunload      DontDelete
+  onabort               WebCore::JSDOMWindowBase::Onabort            DontDelete
+  onblur                WebCore::JSDOMWindowBase::Onblur             DontDelete
+  onchange              WebCore::JSDOMWindowBase::Onchange           DontDelete
+  onclick               WebCore::JSDOMWindowBase::Onclick            DontDelete
+  ondblclick            WebCore::JSDOMWindowBase::Ondblclick         DontDelete
+  onerror               WebCore::JSDOMWindowBase::Onerror            DontDelete
+  onfocus               WebCore::JSDOMWindowBase::Onfocus            DontDelete
+  onkeydown             WebCore::JSDOMWindowBase::Onkeydown          DontDelete
+  onkeypress            WebCore::JSDOMWindowBase::Onkeypress         DontDelete
+  onkeyup               WebCore::JSDOMWindowBase::Onkeyup            DontDelete
+  onload                WebCore::JSDOMWindowBase::Onload             DontDelete
+  onmousedown           WebCore::JSDOMWindowBase::Onmousedown        DontDelete
+  onmousemove           WebCore::JSDOMWindowBase::Onmousemove        DontDelete
+  onmouseout            WebCore::JSDOMWindowBase::Onmouseout         DontDelete
+  onmouseover           WebCore::JSDOMWindowBase::Onmouseover        DontDelete
+  onmouseup             WebCore::JSDOMWindowBase::Onmouseup          DontDelete
+  onmousewheel          WebCore::JSDOMWindowBase::OnWindowMouseWheel DontDelete
+  onreset               WebCore::JSDOMWindowBase::Onreset            DontDelete
+  onresize              WebCore::JSDOMWindowBase::Onresize           DontDelete
+  onscroll              WebCore::JSDOMWindowBase::Onscroll           DontDelete
+  onsearch              WebCore::JSDOMWindowBase::Onsearch           DontDelete
+  onselect              WebCore::JSDOMWindowBase::Onselect           DontDelete
+  onsubmit              WebCore::JSDOMWindowBase::Onsubmit           DontDelete
+  onunload              WebCore::JSDOMWindowBase::Onunload           DontDelete
+  onbeforeunload        WebCore::JSDOMWindowBase::Onbeforeunload     DontDelete
 # -- Constructors --
-  Audio                 Window::Audio               DontDelete
-  Image                 Window::Image               DontDelete
-  Option                Window::Option              DontDelete
-  XMLHttpRequest        Window::XMLHttpRequest      DontDelete
-  XSLTProcessor         Window::XSLTProcessor_      DontDelete
+  Audio                 WebCore::JSDOMWindowBase::Audio              DontDelete
+  Image                 WebCore::JSDOMWindowBase::Image              DontDelete
+  Option                WebCore::JSDOMWindowBase::Option             DontDelete
+  XMLHttpRequest        WebCore::JSDOMWindowBase::XMLHttpRequest     DontDelete
+  XSLTProcessor         WebCore::JSDOMWindowBase::XSLTProcessor_     DontDelete
 @end
 */
 
-Window::Window(JSObject* prototype, DOMWindow* window)
-    : JSGlobalObject(prototype), m_impl(window), d(new WindowPrivate) {
-  // Window destruction is not thread-safe because of
+JSDOMWindowBase::JSDOMWindowBase(JSObject* prototype, DOMWindow* window)
+    : JSGlobalObject(prototype), m_impl(window), d(new JSDOMWindowBasePrivate) {
+  // JSDOMWindowBase destruction is not thread-safe because of
   // the non-thread-safe WebCore structures it references.
   Collector::collectOnMainThreadOnly(this);
 
@@ -212,7 +215,7 @@ Window::Window(JSObject* prototype, DOMWindow* window)
   setTimeoutTime(10000);
 }
 
-Window::~Window() {
+JSDOMWindowBase::~JSDOMWindowBase() {
   clearAllTimeouts();
 
   // Clear any backpointers to the window
@@ -236,44 +239,21 @@ Window::~Window() {
     i1->second->clearWindowObj();
 }
 
-Window* Window::retrieveWindow(Frame* frame) {
-  JSObject* o = retrieve(frame)->getObject();
-
-  ASSERT(o || !frame->scriptProxy()->isEnabled());
-  return static_cast<Window*>(o);
-}
-
-Window* Window::retrieveActive(ExecState* exec) {
-  JSGlobalObject* globalObject = exec->dynamicGlobalObject();
-  ASSERT(globalObject);
-  return static_cast<Window*>(globalObject);
-}
-
-JSValue* Window::retrieve(Frame* frame) {
-  ASSERT(frame);
-  if (frame->scriptProxy()->isEnabled())
-    return frame->scriptProxy()
-        ->globalObject();  // the Global object is the "window"
-
-  return jsUndefined();  // This can happen with JS disabled on the domain of
-                         // that window
-}
-
-WebCore::JSLocation* Window::location() const {
+JSLocation* JSDOMWindowBase::location() const {
   if (!d->loc)
     d->loc = new JSLocation(
         0, impl()->frame());  // FIXME: we need to pass a prototype.
   return d->loc;
 }
 
-void Window::mark() {
+void JSDOMWindowBase::mark() {
   Base::mark();
   if (d->loc && !d->loc->marked())
     d->loc->mark();
 }
 
 static bool allowPopUp(ExecState* exec) {
-  Frame* frame = Window::retrieveActive(exec)->impl()->frame();
+  Frame* frame = toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
 
   ASSERT(frame);
   if (frame->scriptProxy()->processingUserGesture())
@@ -319,7 +299,8 @@ static Frame* createWindow(ExecState* exec,
                            const String& frameName,
                            const WindowFeatures& windowFeatures,
                            JSValue* dialogArgs) {
-  Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
+  Frame* activeFrame =
+      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
 
   ResourceRequest request;
   if (activeFrame)
@@ -358,7 +339,7 @@ static Frame* createWindow(ExecState* exec,
   newFrame->loader()->setOpener(openerFrame);
   newFrame->loader()->setOpenedByDOM();
 
-  Window* newWindow = Window::retrieveWindow(newFrame);
+  JSDOMWindow* newWindow = toJSDOMWindow(newFrame);
 
   if (dialogArgs)
     newWindow->putDirect("dialogArguments", dialogArgs);
@@ -467,17 +448,18 @@ static JSValue* showModalDialog(ExecState* exec,
   if (!dialogFrame)
     return jsUndefined();
 
-  Window* dialogWindow = Window::retrieveWindow(dialogFrame);
+  JSDOMWindow* dialogWindow = toJSDOMWindow(dialogFrame);
 
   // Get the return value either just before clearing the dialog window's
-  // properties (in Window::clear), or when on return from runModal.
+  // properties (in JSDOMWindowBase::clear), or when on return from runModal.
   JSValue* returnValue = 0;
   dialogWindow->setReturnValueSlot(&returnValue);
   dialogFrame->page()->chrome()->runModal();
   dialogWindow->setReturnValueSlot(0);
 
   // If we don't have a return value, get it now.
-  // Either Window::clear was not called yet, or there was no return value,
+  // Either JSDOMWindowBase::clear was not called yet, or there was no return
+  // value,
   // and in that case, there's no harm in trying again (no benefit either).
   if (!returnValue)
     returnValue = dialogWindow->getDirect("returnValue");
@@ -485,7 +467,7 @@ static JSValue* showModalDialog(ExecState* exec,
   return returnValue ? returnValue : jsUndefined();
 }
 
-JSValue* Window::getValueProperty(ExecState* exec, int token) const {
+JSValue* JSDOMWindowBase::getValueProperty(ExecState* exec, int token) const {
   ASSERT(impl()->frame());
 
   switch (token) {
@@ -510,8 +492,9 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       // that fail
       // the security check the first time, but not subsequent times, seems
       // weird.
-      const_cast<Window*>(this)->putDirect("navigator", n, DontDelete);
-      const_cast<Window*>(this)->putDirect("clientInformation", n, DontDelete);
+      const_cast<JSDOMWindowBase*>(this)->putDirect("navigator", n, DontDelete);
+      const_cast<JSDOMWindowBase*>(this)->putDirect("clientInformation", n,
+                                                    DontDelete);
       return n;
     }
     case Image:
@@ -611,48 +594,49 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
   return jsUndefined();
 }
 
-JSValue* Window::childFrameGetter(ExecState*,
-                                  JSObject*,
-                                  const Identifier& propertyName,
-                                  const PropertySlot& slot) {
-  return retrieve(static_cast<Window*>(slot.slotBase())
-                      ->impl()
-                      ->frame()
-                      ->tree()
-                      ->child(AtomicString(propertyName)));
+JSValue* JSDOMWindowBase::childFrameGetter(ExecState* exec,
+                                           JSObject*,
+                                           const Identifier& propertyName,
+                                           const PropertySlot& slot) {
+  return toJS(exec, static_cast<JSDOMWindowBase*>(slot.slotBase())
+                        ->impl()
+                        ->frame()
+                        ->tree()
+                        ->child(AtomicString(propertyName))
+                        ->domWindow());
 }
 
-JSValue* Window::indexGetter(ExecState*,
-                             JSObject*,
-                             const Identifier&,
-                             const PropertySlot& slot) {
-  return retrieve(static_cast<Window*>(slot.slotBase())
-                      ->impl()
-                      ->frame()
-                      ->tree()
-                      ->child(slot.index()));
+JSValue* JSDOMWindowBase::indexGetter(ExecState* exec,
+                                      JSObject*,
+                                      const Identifier&,
+                                      const PropertySlot& slot) {
+  return toJS(exec, static_cast<JSDOMWindowBase*>(slot.slotBase())
+                        ->impl()
+                        ->frame()
+                        ->tree()
+                        ->child(slot.index())
+                        ->domWindow());
 }
 
-JSValue* Window::namedItemGetter(ExecState* exec,
-                                 JSObject* originalObject,
-                                 const Identifier& propertyName,
-                                 const PropertySlot& slot) {
-  Window* thisObj = static_cast<Window*>(slot.slotBase());
+JSValue* JSDOMWindowBase::namedItemGetter(ExecState* exec,
+                                          JSObject* originalObject,
+                                          const Identifier& propertyName,
+                                          const PropertySlot& slot) {
+  JSDOMWindowBase* thisObj = static_cast<JSDOMWindowBase*>(slot.slotBase());
   Document* doc = thisObj->impl()->frame()->document();
   ASSERT(thisObj->allowsAccessFrom(exec));
   ASSERT(doc);
   ASSERT(doc->isHTMLDocument());
 
-  RefPtr<WebCore::HTMLCollection> collection =
-      doc->windowNamedItems(propertyName);
+  RefPtr<HTMLCollection> collection = doc->windowNamedItems(propertyName);
   if (collection->length() == 1)
     return toJS(exec, collection->firstItem());
   return toJS(exec, collection.get());
 }
 
-bool Window::getOwnPropertySlot(ExecState* exec,
-                                const Identifier& propertyName,
-                                PropertySlot& slot) {
+bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         PropertySlot& slot) {
   // Check for child frames by name before built-in properties to
   // match Mozilla. This does not match IE, but some sites end up
   // naming frames things that conflict with window properties that
@@ -663,7 +647,8 @@ bool Window::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  const HashEntry* entry = Lookup::findEntry(&WindowTable, propertyName);
+  const HashEntry* entry =
+      Lookup::findEntry(&JSDOMWindowBaseTable, propertyName);
   if (entry) {
     if (entry->attr & Function) {
       if (entry->value.functionValue == windowProtoFuncShowModalDialog) {
@@ -675,7 +660,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
       else
         slot.setUndefined(this);
     } else
-      slot.setStaticEntry(this, entry, staticValueGetter<Window>);
+      slot.setStaticEntry(this, entry, staticValueGetter<JSDOMWindowBase>);
     return true;
   }
 
@@ -722,10 +707,11 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   return Base::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-void Window::put(ExecState* exec,
-                 const Identifier& propertyName,
-                 JSValue* value) {
-  const HashEntry* entry = Lookup::findEntry(&WindowTable, propertyName);
+void JSDOMWindowBase::put(ExecState* exec,
+                          const Identifier& propertyName,
+                          JSValue* value) {
+  const HashEntry* entry =
+      Lookup::findEntry(&JSDOMWindowBaseTable, propertyName);
   if (entry) {
     if (entry->attr & Function) {
       if (allowsAccessFrom(exec))
@@ -737,7 +723,8 @@ void Window::put(ExecState* exec,
 
     switch (entry->value.intValue) {
       case Location_: {
-        if (Frame* p = Window::retrieveActive(exec)->impl()->frame()) {
+        if (Frame* p =
+                toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame()) {
           // To avoid breaking old widgets, make "var location =" in a top-level
           // frame create
           // a property named "location" instead of performing a navigation
@@ -873,7 +860,7 @@ void Window::put(ExecState* exec,
     Base::put(exec, propertyName, value);
 }
 
-bool Window::allowsAccessFrom(const JSGlobalObject* other) const {
+bool JSDOMWindowBase::allowsAccessFrom(const JSGlobalObject* other) const {
   SecurityOrigin::Reason reason;
   if (allowsAccessFromPrivate(other, reason))
     return true;
@@ -881,7 +868,7 @@ bool Window::allowsAccessFrom(const JSGlobalObject* other) const {
   return false;
 }
 
-bool Window::allowsAccessFrom(ExecState* exec) const {
+bool JSDOMWindowBase::allowsAccessFrom(ExecState* exec) const {
   SecurityOrigin::Reason reason;
   if (allowsAccessFromPrivate(exec, reason))
     return true;
@@ -890,12 +877,12 @@ bool Window::allowsAccessFrom(ExecState* exec) const {
   return false;
 }
 
-bool Window::allowsAccessFromNoErrorMessage(ExecState* exec) const {
+bool JSDOMWindowBase::allowsAccessFromNoErrorMessage(ExecState* exec) const {
   SecurityOrigin::Reason reason;
   return allowsAccessFromPrivate(exec, reason);
 }
 
-bool Window::allowsAccessFrom(ExecState* exec, String& message) const {
+bool JSDOMWindowBase::allowsAccessFrom(ExecState* exec, String& message) const {
   SecurityOrigin::Reason reason;
   if (allowsAccessFromPrivate(exec, reason))
     return true;
@@ -903,7 +890,7 @@ bool Window::allowsAccessFrom(ExecState* exec, String& message) const {
   return false;
 }
 
-ALWAYS_INLINE bool Window::allowsAccessFromPrivate(
+ALWAYS_INLINE bool JSDOMWindowBase::allowsAccessFromPrivate(
     const ExecState* exec,
     SecurityOrigin::Reason& reason) const {
   if (allowsAccessFromPrivate(exec->dynamicGlobalObject(), reason))
@@ -918,10 +905,11 @@ ALWAYS_INLINE bool Window::allowsAccessFromPrivate(
   return false;
 }
 
-ALWAYS_INLINE bool Window::allowsAccessFromPrivate(
+ALWAYS_INLINE bool JSDOMWindowBase::allowsAccessFromPrivate(
     const JSGlobalObject* other,
     SecurityOrigin::Reason& reason) const {
-  const Frame* originFrame = static_cast<const Window*>(other)->impl()->frame();
+  const Frame* originFrame =
+      static_cast<const JSDOMWindowBase*>(other)->impl()->frame();
   if (!originFrame) {
     reason = SecurityOrigin::GenericMismatch;
     return false;
@@ -937,7 +925,7 @@ ALWAYS_INLINE bool Window::allowsAccessFromPrivate(
     return false;
   }
 
-  WebCore::Document* targetDocument = targetFrame->document();
+  Document* targetDocument = targetFrame->document();
 
   // JS may be attempting to access the "window" object, which should be valid,
   // even if the document hasn't been constructed yet.  If the document doesn't
@@ -945,7 +933,7 @@ ALWAYS_INLINE bool Window::allowsAccessFromPrivate(
   if (!targetDocument)
     return true;
 
-  WebCore::Document* originDocument = originFrame->document();
+  Document* originDocument = originFrame->document();
 
   const SecurityOrigin* originSecurityOrigin = originDocument->securityOrigin();
   const SecurityOrigin* targetSecurityOrigin = targetDocument->securityOrigin();
@@ -956,14 +944,16 @@ ALWAYS_INLINE bool Window::allowsAccessFromPrivate(
   return false;
 }
 
-String Window::crossDomainAccessErrorMessage(const JSGlobalObject* other,
-                                             SecurityOrigin::Reason) const {
-  const Frame* originFrame = static_cast<const Window*>(other)->impl()->frame();
+String JSDOMWindowBase::crossDomainAccessErrorMessage(
+    const JSGlobalObject* other,
+    SecurityOrigin::Reason) const {
+  const Frame* originFrame =
+      static_cast<const JSDOMWindowBase*>(other)->impl()->frame();
   const Frame* targetFrame = impl()->frame();
   if (!originFrame || !targetFrame)
     return String();
-  WebCore::Document* targetDocument = targetFrame->document();
-  WebCore::Document* originDocument = originFrame->document();
+  Document* targetDocument = targetFrame->document();
+  Document* originDocument = originFrame->document();
   if (!originDocument || !targetDocument)
     return String();
   // FIXME: this error message should contain more specifics of why the same
@@ -975,7 +965,7 @@ String Window::crossDomainAccessErrorMessage(const JSGlobalObject* other,
       originDocument->url().string().utf8().data());
 }
 
-void Window::printErrorMessage(const String& message) const {
+void JSDOMWindowBase::printErrorMessage(const String& message) const {
   if (message.isEmpty())
     return;
 
@@ -995,7 +985,7 @@ void Window::printErrorMessage(const String& message) const {
         String());  // FIXME: provide a real line number and source URL.
 }
 
-ExecState* Window::globalExec() {
+ExecState* JSDOMWindowBase::globalExec() {
   // We need to make sure that any script execution happening in this
   // frame does not destroy it
   ASSERT(impl()->frame());
@@ -1003,7 +993,7 @@ ExecState* Window::globalExec() {
   return Base::globalExec();
 }
 
-bool Window::shouldInterruptScript() const {
+bool JSDOMWindowBase::shouldInterruptScript() const {
   ASSERT(impl()->frame());
   Page* page = impl()->frame()->page();
 
@@ -1020,9 +1010,9 @@ bool Window::shouldInterruptScript() const {
   return page->chrome()->shouldInterruptJavaScript();
 }
 
-void Window::setListener(ExecState* exec,
-                         const AtomicString& eventType,
-                         JSValue* func) {
+void JSDOMWindowBase::setListener(ExecState* exec,
+                                  const AtomicString& eventType,
+                                  JSValue* func) {
   ASSERT(impl()->frame());
   Document* doc = impl()->frame()->document();
   if (!doc)
@@ -1032,20 +1022,20 @@ void Window::setListener(ExecState* exec,
                                   findOrCreateJSEventListener(func, true));
 }
 
-JSValue* Window::getListener(ExecState* exec,
-                             const AtomicString& eventType) const {
+JSValue* JSDOMWindowBase::getListener(ExecState* exec,
+                                      const AtomicString& eventType) const {
   ASSERT(impl()->frame());
   Document* doc = impl()->frame()->document();
   if (!doc)
     return jsUndefined();
 
-  WebCore::EventListener* listener = doc->getHTMLWindowEventListener(eventType);
+  EventListener* listener = doc->getHTMLWindowEventListener(eventType);
   if (listener && static_cast<JSEventListener*>(listener)->listenerObj())
     return static_cast<JSEventListener*>(listener)->listenerObj();
   return jsNull();
 }
 
-JSEventListener* Window::findJSEventListener(JSValue* val, bool html) {
+JSEventListener* JSDOMWindowBase::findJSEventListener(JSValue* val, bool html) {
   if (!val->isObject())
     return 0;
   JSObject* object = static_cast<JSObject*>(val);
@@ -1054,7 +1044,8 @@ JSEventListener* Window::findJSEventListener(JSValue* val, bool html) {
   return listeners.get(object);
 }
 
-JSEventListener* Window::findOrCreateJSEventListener(JSValue* val, bool html) {
+JSEventListener* JSDOMWindowBase::findOrCreateJSEventListener(JSValue* val,
+                                                              bool html) {
   JSEventListener* listener = findJSEventListener(val, html);
   if (listener)
     return listener;
@@ -1065,11 +1056,12 @@ JSEventListener* Window::findOrCreateJSEventListener(JSValue* val, bool html) {
 
   // Note that the JSEventListener constructor adds it to our jsEventListeners
   // list
-  return new JSEventListener(object, this, html);
+  return new JSEventListener(object, toJSDOMWindow(this), html);
 }
 
-JSUnprotectedEventListener* Window::findJSUnprotectedEventListener(JSValue* val,
-                                                                   bool html) {
+JSUnprotectedEventListener* JSDOMWindowBase::findJSUnprotectedEventListener(
+    JSValue* val,
+    bool html) {
   if (!val->isObject())
     return 0;
   JSObject* object = static_cast<JSObject*>(val);
@@ -1078,9 +1070,9 @@ JSUnprotectedEventListener* Window::findJSUnprotectedEventListener(JSValue* val,
   return listeners.get(object);
 }
 
-JSUnprotectedEventListener* Window::findOrCreateJSUnprotectedEventListener(
-    JSValue* val,
-    bool html) {
+JSUnprotectedEventListener*
+JSDOMWindowBase::findOrCreateJSUnprotectedEventListener(JSValue* val,
+                                                        bool html) {
   JSUnprotectedEventListener* listener =
       findJSUnprotectedEventListener(val, html);
   if (listener)
@@ -1091,15 +1083,15 @@ JSUnprotectedEventListener* Window::findOrCreateJSUnprotectedEventListener(
 
   // The JSUnprotectedEventListener constructor adds it to our
   // jsUnprotectedEventListeners map.
-  return new JSUnprotectedEventListener(object, this, html);
+  return new JSUnprotectedEventListener(object, toJSDOMWindow(this), html);
 }
 
-void Window::clearHelperObjectProperties() {
+void JSDOMWindowBase::clearHelperObjectProperties() {
   d->loc = 0;
   d->m_evt = 0;
 }
 
-void Window::clear() {
+void JSDOMWindowBase::clear() {
   JSLock lock;
 
   if (d->m_returnValueSlot && !*d->m_returnValueSlot)
@@ -1118,20 +1110,20 @@ void Window::clear() {
   gcController().garbageCollectSoon();
 }
 
-void Window::setCurrentEvent(Event* evt) {
+void JSDOMWindowBase::setCurrentEvent(Event* evt) {
   d->m_evt = evt;
 }
 
-Event* Window::currentEvent() {
+Event* JSDOMWindowBase::currentEvent() {
   return d->m_evt;
 }
 
 JSValue* windowProtoFuncAToB(ExecState* exec,
                              JSObject* thisObj,
                              const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  if (!static_cast<Window*>(thisObj)->allowsAccessFrom(exec))
+  if (!static_cast<JSDOMWindowBase*>(thisObj)->allowsAccessFrom(exec))
     return jsUndefined();
 
   if (args.size() < 1)
@@ -1161,9 +1153,9 @@ JSValue* windowProtoFuncAToB(ExecState* exec,
 JSValue* windowProtoFuncBToA(ExecState* exec,
                              JSObject* thisObj,
                              const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  if (!static_cast<Window*>(thisObj)->allowsAccessFrom(exec))
+  if (!static_cast<JSDOMWindowBase*>(thisObj)->allowsAccessFrom(exec))
     return jsUndefined();
 
   if (args.size() < 1)
@@ -1192,16 +1184,17 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
 JSValue* windowProtoFuncOpen(ExecState* exec,
                              JSObject* thisObj,
                              const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  Window* window = static_cast<Window*>(thisObj);
+  JSDOMWindowBase* window = static_cast<JSDOMWindowBase*>(thisObj);
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
   Frame* frame = window->impl()->frame();
   if (!frame)
     return jsUndefined();
-  Frame* activeFrame = Window::retrieveActive(exec)->impl()->frame();
+  Frame* activeFrame =
+      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!activeFrame)
     return jsUndefined();
 
@@ -1239,7 +1232,7 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
     if (!urlString.isEmpty())
       completedURL = activeFrame->document()->completeURL(urlString).string();
 
-    const Window* targetedWindow = Window::retrieveWindow(frame);
+    const JSDOMWindow* targetedWindow = toJSDOMWindow(frame);
     if (!completedURL.isEmpty() &&
         (!protocolIs(completedURL, "javascript") ||
          (targetedWindow && targetedWindow->allowsAccessFrom(exec)))) {
@@ -1248,7 +1241,7 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
           completedURL, activeFrame->loader()->outgoingReferrer(), false,
           userGesture);
     }
-    return Window::retrieve(frame);
+    return toJS(exec, frame->domWindow());
   }
 
   // In the case of a named frame or a new window, we'll use the createWindow()
@@ -1257,8 +1250,8 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
       valueToStringWithUndefinedOrNullCheck(exec, args[2]));
   FloatRect windowRect(windowFeatures.x, windowFeatures.y, windowFeatures.width,
                        windowFeatures.height);
-  WebCore::DOMWindow::adjustWindowRect(
-      screenAvailableRect(page->mainFrame()->view()), windowRect, windowRect);
+  DOMWindow::adjustWindowRect(screenAvailableRect(page->mainFrame()->view()),
+                              windowRect, windowRect);
 
   windowFeatures.x = windowRect.x();
   windowFeatures.y = windowRect.y();
@@ -1270,15 +1263,15 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  return Window::retrieve(frame);  // global object
+  return toJS(exec, frame->domWindow());  // global object
 }
 
 JSValue* windowProtoFuncSetTimeout(ExecState* exec,
                                    JSObject* thisObj,
                                    const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  Window* window = static_cast<Window*>(thisObj);
+  JSDOMWindowBase* window = static_cast<JSDOMWindowBase*>(thisObj);
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1300,10 +1293,9 @@ JSValue* windowProtoFuncClearTimeout(ExecState* exec,
                                      JSObject* thisObj,
                                      const List& args) {
   // Also the implementation for window.clearInterval()
-
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  Window* window = static_cast<Window*>(thisObj);
+  JSDOMWindowBase* window = static_cast<JSDOMWindowBase*>(thisObj);
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1314,9 +1306,9 @@ JSValue* windowProtoFuncClearTimeout(ExecState* exec,
 JSValue* windowProtoFuncSetInterval(ExecState* exec,
                                     JSObject* thisObj,
                                     const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  Window* window = static_cast<Window*>(thisObj);
+  JSDOMWindowBase* window = static_cast<JSDOMWindowBase*>(thisObj);
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1338,11 +1330,12 @@ JSValue* windowProtoFuncSetInterval(ExecState* exec,
 JSValue* windowProtoFuncAddEventListener(ExecState* exec,
                                          JSObject* thisObj,
                                          const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  Window* window = static_cast<Window*>(thisObj);
+  JSDOMWindowBase* window = static_cast<JSDOMWindowBase*>(thisObj);
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
+
   Frame* frame = window->impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -1360,11 +1353,12 @@ JSValue* windowProtoFuncAddEventListener(ExecState* exec,
 JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
                                             JSObject* thisObj,
                                             const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  Window* window = static_cast<Window*>(thisObj);
+  JSDOMWindowBase* window = static_cast<JSDOMWindowBase*>(thisObj);
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
+
   Frame* frame = window->impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -1381,9 +1375,12 @@ JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
 JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
                                         JSObject* thisObj,
                                         const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
-  Window* window = static_cast<Window*>(thisObj);
+  JSDOMWindowBase* window = static_cast<JSDOMWindowBase*>(thisObj);
+  if (!window->allowsAccessFrom(exec))
+    return jsUndefined();
+
   Frame* frame = window->impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -1396,26 +1393,26 @@ JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
 JSValue* windowProtoFuncNotImplemented(ExecState* exec,
                                        JSObject* thisObj,
                                        const List& args) {
-  if (!thisObj->inherits(&Window::info))
+  if (!thisObj->inherits(&JSDOMWindowBase::info))
     return throwError(exec, TypeError);
 
   return jsUndefined();
 }
 
-void Window::setReturnValueSlot(JSValue** slot) {
+void JSDOMWindowBase::setReturnValueSlot(JSValue** slot) {
   d->m_returnValueSlot = slot;
 }
 
 ////////////////////// timeouts ////////////////////////
 
-void Window::clearAllTimeouts() {
+void JSDOMWindowBase::clearAllTimeouts() {
   deleteAllValues(d->m_timeouts);
   d->m_timeouts.clear();
 }
 
-int Window::installTimeout(WebCore::ScheduledAction* a,
-                           int t,
-                           bool singleShot) {
+int JSDOMWindowBase::installTimeout(ScheduledAction* a,
+                                    int t,
+                                    bool singleShot) {
   int timeoutId = ++lastUsedTimeoutId;
 
   // avoid wraparound going negative on us
@@ -1440,19 +1437,20 @@ int Window::installTimeout(WebCore::ScheduledAction* a,
   return timeoutId;
 }
 
-int Window::installTimeout(const UString& handler, int t, bool singleShot) {
-  return installTimeout(new WebCore::ScheduledAction(handler), t, singleShot);
+int JSDOMWindowBase::installTimeout(const UString& handler,
+                                    int t,
+                                    bool singleShot) {
+  return installTimeout(new ScheduledAction(handler), t, singleShot);
 }
 
-int Window::installTimeout(JSValue* func,
-                           const List& args,
-                           int t,
-                           bool singleShot) {
-  return installTimeout(new WebCore::ScheduledAction(func, args), t,
-                        singleShot);
+int JSDOMWindowBase::installTimeout(JSValue* func,
+                                    const List& args,
+                                    int t,
+                                    bool singleShot) {
+  return installTimeout(new ScheduledAction(func, args), t, singleShot);
 }
 
-WebCore::PausedTimeouts* Window::pauseTimeouts() {
+PausedTimeouts* JSDOMWindowBase::pauseTimeouts() {
   size_t count = d->m_timeouts.size();
   if (count == 0)
     return 0;
@@ -1460,7 +1458,7 @@ WebCore::PausedTimeouts* Window::pauseTimeouts() {
   PausedTimeout* t = new PausedTimeout[count];
   PausedTimeouts* result = new PausedTimeouts(t, count);
 
-  WindowPrivate::TimeoutsMap::iterator it = d->m_timeouts.begin();
+  JSDOMWindowBasePrivate::TimeoutsMap::iterator it = d->m_timeouts.begin();
   for (size_t i = 0; i != count; ++i, ++it) {
     int timeoutId = it->first;
     DOMWindowTimer* timer = it->second;
@@ -1478,7 +1476,7 @@ WebCore::PausedTimeouts* Window::pauseTimeouts() {
   return result;
 }
 
-void Window::resumeTimeouts(PausedTimeouts* timeouts) {
+void JSDOMWindowBase::resumeTimeouts(PausedTimeouts* timeouts) {
   if (!timeouts)
     return;
   size_t count = timeouts->numTimeouts();
@@ -1493,7 +1491,7 @@ void Window::resumeTimeouts(PausedTimeouts* timeouts) {
   delete[] array;
 }
 
-void Window::clearTimeout(int timeoutId, bool delAction) {
+void JSDOMWindowBase::clearTimeout(int timeoutId, bool delAction) {
   // timeout IDs have to be positive, and 0 and -1 are unsafe to
   // even look up since they are the empty and deleted value
   // respectively
@@ -1503,7 +1501,7 @@ void Window::clearTimeout(int timeoutId, bool delAction) {
   delete d->m_timeouts.take(timeoutId);
 }
 
-void Window::timerFired(DOMWindowTimer* timer) {
+void JSDOMWindowBase::timerFired(DOMWindowTimer* timer) {
   // Simple case for non-one-shot timers.
   if (timer->isActive()) {
     int timeoutId = timer->timeoutId();
@@ -1527,7 +1525,7 @@ void Window::timerFired(DOMWindowTimer* timer) {
   }
 
   // Delete timer before executing the action for one-shot timers.
-  WebCore::ScheduledAction* action = timer->takeAction();
+  ScheduledAction* action = timer->takeAction();
   d->m_timeouts.remove(timer->timeoutId());
   delete timer;
   action->execute(this);
@@ -1536,29 +1534,29 @@ void Window::timerFired(DOMWindowTimer* timer) {
   delete action;
 }
 
-void Window::disconnectFrame() {
+void JSDOMWindowBase::disconnectFrame() {
   clearAllTimeouts();
   if (d->loc)
     d->loc->m_frame = 0;
 }
 
-Window::ListenersMap& Window::jsEventListeners() {
+JSDOMWindowBase::ListenersMap& JSDOMWindowBase::jsEventListeners() {
   return d->jsEventListeners;
 }
 
-Window::ListenersMap& Window::jsHTMLEventListeners() {
+JSDOMWindowBase::ListenersMap& JSDOMWindowBase::jsHTMLEventListeners() {
   return d->jsHTMLEventListeners;
 }
 
-Window::UnprotectedListenersMap& Window::jsUnprotectedEventListeners() {
+JSDOMWindowBase::UnprotectedListenersMap&
+JSDOMWindowBase::jsUnprotectedEventListeners() {
   return d->jsUnprotectedEventListeners;
 }
 
-Window::UnprotectedListenersMap& Window::jsUnprotectedHTMLEventListeners() {
+JSDOMWindowBase::UnprotectedListenersMap&
+JSDOMWindowBase::jsUnprotectedHTMLEventListeners() {
   return d->jsUnprotectedHTMLEventListeners;
 }
-
-/////////////////////////////////////////////////////////////////////////////
 
 void DOMWindowTimer::fired() {
   timerNestingLevel = m_nestingLevel;
@@ -1566,19 +1564,28 @@ void DOMWindowTimer::fired() {
   timerNestingLevel = 0;
 }
 
-}  // namespace KJS
-
-using namespace KJS;
-
-namespace WebCore {
-
 JSValue* toJS(ExecState*, DOMWindow* domWindow) {
   if (!domWindow)
     return jsNull();
   Frame* frame = domWindow->frame();
   if (!frame)
     return jsNull();
-  return Window::retrieve(frame);
+
+  // FIXME: is this check needed?
+  if (!frame->scriptProxy()->isEnabled())
+    return jsNull();
+
+  return frame->scriptProxy()->globalObject();
+}
+
+JSDOMWindow* toJSDOMWindow(Frame* frame) {
+  if (!frame || !frame->scriptProxy()->isEnabled())
+    return 0;
+  return frame->scriptProxy()->globalObject();
+}
+
+JSDOMWindow* toJSDOMWindow(JSGlobalObject* globalObject) {
+  return static_cast<JSDOMWindow*>(globalObject);
 }
 
 }  // namespace WebCore

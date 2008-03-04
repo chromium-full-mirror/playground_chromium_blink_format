@@ -148,9 +148,9 @@ bool SecurityOrigin::canAccess(const SecurityOrigin* other,
   // but
   //    there is a host and port match we deny access but signal this to the
   //    client.
-  //    In this case Window::allowsAccessFrom() will recheck against the lexical
-  //    global
-  //    object and allow access if that check passes.
+  //    In this case JSDOMWindowBase::allowsAccessFrom() will recheck against
+  //    the
+  //    lexical global object and allow access if that check passes.
   //
   // This matches the behavior of Firefox 2 and Internet Explorer 6.
   //

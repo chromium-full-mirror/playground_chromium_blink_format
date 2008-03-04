@@ -28,14 +28,11 @@
 #include "kjs_html.h"
 #include <kjs/protect.h>
 
-namespace KJS {
-class Window;
-}
-
 namespace WebCore {
 
 class Clipboard;
 class Event;
+class JSDOMWindow;
 
 class JSAbstractEventListener : public EventListener {
  public:
@@ -44,7 +41,7 @@ class JSAbstractEventListener : public EventListener {
   virtual void handleEvent(Event*, bool isWindowEvent);
   virtual bool isHTMLEventListener() const;
   virtual KJS::JSObject* listenerObj() const = 0;
-  virtual KJS::Window* windowObj() const = 0;
+  virtual JSDOMWindow* windowObj() const = 0;
 
  private:
   bool m_html;
@@ -53,41 +50,41 @@ class JSAbstractEventListener : public EventListener {
 class JSUnprotectedEventListener : public JSAbstractEventListener {
  public:
   JSUnprotectedEventListener(KJS::JSObject* listener,
-                             KJS::Window*,
+                             JSDOMWindow*,
                              bool html = false);
   virtual ~JSUnprotectedEventListener();
 
   virtual KJS::JSObject* listenerObj() const;
-  virtual KJS::Window* windowObj() const;
+  virtual JSDOMWindow* windowObj() const;
   void clearWindowObj();
   void mark();
 
  private:
   KJS::JSObject* m_listener;
-  KJS::Window* m_win;
+  JSDOMWindow* m_win;
 };
 
 class JSEventListener : public JSAbstractEventListener {
  public:
-  JSEventListener(KJS::JSObject* listener, KJS::Window*, bool html = false);
+  JSEventListener(KJS::JSObject* listener, JSDOMWindow*, bool html = false);
   virtual ~JSEventListener();
 
   virtual KJS::JSObject* listenerObj() const;
-  virtual KJS::Window* windowObj() const;
+  virtual JSDOMWindow* windowObj() const;
   void clearWindowObj();
 
  protected:
   mutable KJS::ProtectedPtr<KJS::JSObject> m_listener;
 
  private:
-  KJS::ProtectedPtr<KJS::Window> m_win;
+  KJS::ProtectedPtr<JSDOMWindow> m_win;
 };
 
 class JSLazyEventListener : public JSEventListener {
  public:
   JSLazyEventListener(const String& functionName,
                       const String& code,
-                      KJS::Window*,
+                      JSDOMWindow*,
                       Node*,
                       int lineNumber = 0);
   virtual KJS::JSObject* listenerObj() const;

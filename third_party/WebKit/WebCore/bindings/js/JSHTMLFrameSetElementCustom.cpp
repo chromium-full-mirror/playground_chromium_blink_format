@@ -30,6 +30,7 @@
 #include "HTMLFrameElement.h"
 #include "HTMLFrameSetElement.h"
 #include "HTMLNames.h"
+#include "JSDOMWindow.h"
 #include "kjs_binding.h"
 #include "kjs_window.h"
 
@@ -55,7 +56,7 @@ JSValue* JSHTMLFrameSetElement::nameGetter(ExecState* exec,
   Node* frame = element->children()->namedItem(propertyName);
   if (Document* doc =
           static_cast<HTMLFrameElement*>(frame)->contentDocument()) {
-    if (KJS::Window* window = KJS::Window::retrieveWindow(doc->frame()))
+    if (JSDOMWindow* window = toJSDOMWindow(doc->frame()))
       return window;
   }
 
