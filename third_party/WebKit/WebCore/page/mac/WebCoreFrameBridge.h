@@ -263,8 +263,6 @@ rangeByAlteringCurrentSelection:
 
 @protocol WebCoreFrameBridge
 
-- (NSWindow*)window;
-
 - (NSResponder*)firstResponder;
 - (void)makeFirstResponder:(NSResponder*)responder;
 
