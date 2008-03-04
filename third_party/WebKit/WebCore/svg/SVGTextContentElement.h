@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -49,12 +49,9 @@ class SVGTextContentElement : public SVGStyledElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
   virtual bool isTextContent() const { return true; }
 
-  // 'SVGTextContentElement' functions
   long getNumberOfChars() const;
   float getComputedTextLength() const;
-  float getSubStringLength(long charnum,
-                           unsigned long nchars,
-                           ExceptionCode&) const;
+  float getSubStringLength(long charnum, long nchars, ExceptionCode&) const;
   FloatPoint getStartPositionOfChar(long charnum, ExceptionCode&) const;
   FloatPoint getEndPositionOfChar(long charnum, ExceptionCode&) const;
   FloatRect getExtentOfChar(long charnum, ExceptionCode&) const;
@@ -86,5 +83,3 @@ class SVGTextContentElement : public SVGStyledElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet
