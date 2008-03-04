@@ -419,7 +419,6 @@ class Frame : public RefCounted<Frame> {
  public:
   NSDictionary* fontAttributesForSelectionStart() const;
   NSWritingDirection baseWritingDirectionForSelectionStart() const;
-  void issuePasteCommand();
 
 #endif
 };

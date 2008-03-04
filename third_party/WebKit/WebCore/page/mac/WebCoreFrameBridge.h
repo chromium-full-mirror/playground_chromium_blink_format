@@ -276,8 +276,6 @@ rangeByAlteringCurrentSelection:
 // Deprecated, use getAppletInView: instead.
 - (jobject)pollForAppletInView:(NSView*)view;
 
-- (void)issuePasteCommand;
-
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
 
 - (void)dashboardRegionsChanged:(NSMutableDictionary*)regions;
