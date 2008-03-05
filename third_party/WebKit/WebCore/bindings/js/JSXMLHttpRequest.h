@@ -77,7 +77,7 @@ class JSXMLHttpRequest : public DOMObject {
                    const KJS::Identifier& propertyName,
                    KJS::JSValue*);
   void putValueProperty(KJS::ExecState*, int token, KJS::JSValue*);
-  virtual bool toBoolean(KJS::ExecState*) const { return true; }
+
   virtual void mark();
 
   XMLHttpRequest* impl() const { return m_impl.get(); }
