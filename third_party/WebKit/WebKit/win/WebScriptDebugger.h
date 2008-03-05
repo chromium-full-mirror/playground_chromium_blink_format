@@ -57,20 +57,6 @@ class WebScriptDebugger : public KJS::Debugger {
                     int errorLine,
                     const KJS::UString& errorMsg);
 
-  bool callEvent(KJS::ExecState*,
-                 int sourceId,
-                 int lineno,
-                 KJS::JSObject* function,
-                 const KJS::List& args);
-  bool returnEvent(KJS::ExecState*,
-                   int sourceId,
-                   int lineno,
-                   KJS::JSObject* function);
-  bool exception(KJS::ExecState*,
-                 int sourceId,
-                 int lineno,
-                 KJS::JSValue* exception);
-
  protected:
   WebScriptDebugger();
   ~WebScriptDebugger();
