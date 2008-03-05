@@ -98,6 +98,4 @@ NSString* toNSString(const KJS::UString&);
 - (WebCoreScriptCallFrame*)caller;
 - (KJS::ExecState*)state;
 
-- (id)_convertValueToObjcValue:(KJS::JSValue*)value;
-
 @end
