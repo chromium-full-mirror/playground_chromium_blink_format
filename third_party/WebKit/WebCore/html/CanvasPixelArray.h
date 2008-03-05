@@ -50,7 +50,7 @@ class CanvasPixelArray : public RefCounted<CanvasPixelArray> {
       value = 0;
     else if (value > 255)
       value = 255;
-    m_data[index] = lround(value);
+    m_data[index] = static_cast<unsigned char>(value + 0.5);
   }
 
   bool get(unsigned index, unsigned char& result) const {
