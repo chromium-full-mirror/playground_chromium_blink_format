@@ -1,6 +1,7 @@
 /*
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reseved.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reseved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,7 +33,7 @@ class List;
 
 namespace WebCore {
 
-class JSDOMWindowBase;
+class JSDOMWindow;
 
 /**
  * An action (either function or string) to be executed after a specified
@@ -44,7 +45,7 @@ class ScheduledAction {
   ScheduledAction(KJS::JSValue* func, const KJS::List& args);
   ScheduledAction(const String& code) : m_code(code) {}
 
-  void execute(JSDOMWindowBase*);
+  void execute(JSDOMWindow*);
 
  private:
   KJS::ProtectedPtr<KJS::JSValue> m_func;
