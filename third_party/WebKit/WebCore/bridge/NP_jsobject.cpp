@@ -33,11 +33,12 @@
 #include <kjs/PropertyNameArray.h>
 #include "c_utility.h"
 #include <kjs/interpreter.h>
+#include "PlatformString.h"
 #include "npruntime_impl.h"
 #include "npruntime_priv.h"
-
 #include "runtime_root.h"
 
+using WebCore::String;
 using namespace KJS;
 using namespace KJS::Bindings;
 
@@ -204,14 +205,10 @@ bool _NPN_Evaluate(NPP, NPObject* o, NPString* s, NPVariant* variant) {
     ExecState* exec = rootObject->globalObject()->globalExec();
 
     JSLock lock;
-    NPUTF16* scriptString;
-    unsigned int UTF16Length;
-    convertNPStringToUTF16(s, &scriptString,
-                           &UTF16Length);  // requires free() of returned memory
+    String scriptString = convertNPStringToUTF16(s);
     rootObject->globalObject()->startTimeoutCheck();
     Completion completion = Interpreter::evaluate(
-        rootObject->globalObject()->globalExec(), UString(), 0,
-        UString(reinterpret_cast<const UChar*>(scriptString), UTF16Length));
+        rootObject->globalObject()->globalExec(), UString(), 0, scriptString);
     rootObject->globalObject()->stopTimeoutCheck();
     ComplType type = completion.complType();
 
@@ -222,8 +219,6 @@ bool _NPN_Evaluate(NPP, NPObject* o, NPString* s, NPVariant* variant) {
         result = jsUndefined();
     } else
       result = jsUndefined();
-
-    free(scriptString);
 
     convertValueToNPVariant(exec, result, variant);
 
