@@ -32,16 +32,18 @@
 
 #include "NP_jsobject.h"
 #include "c_instance.h"
-#include "JSGlobalObject.h"
+#include <kjs/JSGlobalObject.h>
 #include "npruntime_impl.h"
 #include "npruntime_priv.h"
 #include "runtime_object.h"
 #include "runtime_root.h"
-#include "Platform.h"
 #include <wtf/Assertions.h>
-#include <wtf/unicode/UTF8.h>
 
-using namespace WTF::Unicode;
+// FIXME: Rewrite convertUTF8ToUTF16WithLatin1Fallback to not use the WTF UTF-8
+// support.
+#if 0
+#include <wtf/unicode/UTF8.h>
+#endif
 
 namespace KJS {
 namespace Bindings {
@@ -51,41 +53,40 @@ static void convertUTF8ToUTF16WithLatin1Fallback(const NPUTF8* UTF8Chars,
                                                  int UTF8Length,
                                                  NPUTF16** UTF16Chars,
                                                  unsigned int* UTF16Length) {
-  ASSERT(UTF8Chars || UTF8Length == 0);
-  ASSERT(UTF16Chars);
+#if 0
+    ASSERT(UTF8Chars || UTF8Length == 0);
+    ASSERT(UTF16Chars);
+    
+    if (UTF8Length == -1)
+        UTF8Length = static_cast<int>(strlen(UTF8Chars));
 
-  if (UTF8Length == -1)
-    UTF8Length = static_cast<int>(strlen(UTF8Chars));
+    *UTF16Length = UTF8Length; 
+    *UTF16Chars = static_cast<NPUTF16*>(malloc(sizeof(NPUTF16) * (*UTF16Length)));
+    
+    const char* sourcestart = UTF8Chars;
+    const char* sourceend = sourcestart + UTF8Length;
 
-  *UTF16Length = UTF8Length;
-  *UTF16Chars = static_cast<NPUTF16*>(malloc(sizeof(NPUTF16) * (*UTF16Length)));
+    ::UChar* targetstart = reinterpret_cast< ::UChar*>(*UTF16Chars);
+    ::UChar* targetend = targetstart + UTF8Length;
+    
+    ConversionResult result = convertUTF8ToUTF16(&sourcestart, sourceend, &targetstart, targetend);
+    
+    *UTF16Length = targetstart - reinterpret_cast< ::UChar*>(*UTF16Chars);
 
-  const char* sourcestart = UTF8Chars;
-  const char* sourceend = sourcestart + UTF8Length;
-
-  ::UChar* targetstart = reinterpret_cast<::UChar*>(*UTF16Chars);
-  ::UChar* targetend = targetstart + UTF8Length;
-
-  ConversionResult result =
-      convertUTF8ToUTF16(&sourcestart, sourceend, &targetstart, targetend);
-
-  *UTF16Length = targetstart - reinterpret_cast<::UChar*>(*UTF16Chars);
-
-  // Check to see if the conversion was successful
-  // Some plugins return invalid UTF-8 in NPVariantType_String, see
-  // <http://bugs.webkit.org/show_bug.cgi?id=5163>
-  // There is no "bad data" for latin1. It is unlikely that the plugin was
-  // really sending text in this encoding,
-  // but it should have used UTF-8, and now we are simply avoiding a crash.
-  if (result != conversionOK) {
-    *UTF16Length = UTF8Length;
-
-    if (!*UTF16Chars)  // If the memory wasn't allocated, allocate it.
-      *UTF16Chars = (NPUTF16*)malloc(sizeof(NPUTF16) * (*UTF16Length));
-
-    for (unsigned i = 0; i < *UTF16Length; i++)
-      (*UTF16Chars)[i] = UTF8Chars[i] & 0xFF;
-  }
+    // Check to see if the conversion was successful
+    // Some plugins return invalid UTF-8 in NPVariantType_String, see <http://bugs.webkit.org/show_bug.cgi?id=5163>
+    // There is no "bad data" for latin1. It is unlikely that the plugin was really sending text in this encoding,
+    // but it should have used UTF-8, and now we are simply avoiding a crash.
+    if (result != conversionOK) {
+        *UTF16Length = UTF8Length;
+        
+        if (!*UTF16Chars)   // If the memory wasn't allocated, allocate it.
+            *UTF16Chars = (NPUTF16*)malloc(sizeof(NPUTF16) * (*UTF16Length));
+ 
+        for (unsigned i = 0; i < *UTF16Length; i++)
+            (*UTF16Chars)[i] = UTF8Chars[i] & 0xFF;
+    }
+#endif
 }
 
 // Variant value must be released with NPReleaseVariantValue()
