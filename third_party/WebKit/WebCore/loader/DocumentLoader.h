@@ -50,6 +50,7 @@ class HistoryItem;
 class KURL;
 class MainResourceLoader;
 class ResourceLoader;
+class SchedulePair;
 class SharedBuffer;
 class SubstituteData;
 
@@ -115,6 +116,11 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void setPrimaryLoadComplete(bool);
   void setTitle(const String&);
   String overrideEncoding() const;
+
+#if PLATFORM(MAC)
+  void schedule(SchedulePair*);
+  void unschedule(SchedulePair*);
+#endif
 
   void addResponse(const ResourceResponse&);
   const ResponseVector& responses() const;

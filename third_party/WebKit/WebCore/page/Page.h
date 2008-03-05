@@ -26,6 +26,9 @@
 #include "ContextMenuController.h"
 #include "FrameLoaderTypes.h"
 #include "PlatformString.h"
+#if PLATFORM(MAC)
+#include "SchedulePair.h"
+#endif
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 
@@ -137,6 +140,16 @@ class Page : Noncopyable {
                                      bool shouldHighlight,
                                      unsigned);
   void unmarkAllTextMatches();
+
+#if PLATFORM(MAC)
+  void addSchedulePair(PassRefPtr<SchedulePair>);
+  void removeSchedulePair(PassRefPtr<SchedulePair>);
+  SchedulePairHashSet* scheduledRunLoopPairs() {
+    return m_scheduledRunLoopPairs.get();
+  }
+
+  OwnPtr<SchedulePairHashSet> m_scheduledRunLoopPairs;
+#endif
 
   const Selection& selection() const;
 
