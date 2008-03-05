@@ -44,6 +44,9 @@ class JSValue;
 class List;
 }
 
+WebFrame* webFrame(KJS::ExecState*);
+WebView* webView(KJS::ExecState*);
+
 class WebScriptDebugger : public KJS::Debugger {
  public:
   bool sourceParsed(KJS::ExecState*,
@@ -59,7 +62,6 @@ class WebScriptDebugger : public KJS::Debugger {
                  int lineno,
                  KJS::JSObject* function,
                  const KJS::List& args);
-  bool atStatement(KJS::ExecState*, int sourceId, int firstLine, int lastLine);
   bool returnEvent(KJS::ExecState*,
                    int sourceId,
                    int lineno,
@@ -73,10 +75,7 @@ class WebScriptDebugger : public KJS::Debugger {
   WebScriptDebugger();
   ~WebScriptDebugger();
 
- private:
   bool m_callingServer;
-  WebFrame* m_frame;
-  COMPtr<IWebView> m_webView;
 };
 
 #endif
