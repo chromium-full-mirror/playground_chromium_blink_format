@@ -1368,8 +1368,10 @@ static void appendEncodedHostname(UCharBuffer& buffer,
   // certainly OK.
   const unsigned hostnameBufferLength = 2048;
 
-  if (strLen > hostnameBufferLength || charactersAreAllASCII(str, strLen))
+  if (strLen > hostnameBufferLength || charactersAreAllASCII(str, strLen)) {
     buffer.append(str, strLen);
+    return;
+  }
 
 #if USE(ICU_UNICODE)
   UChar hostnameBuffer[hostnameBufferLength];
@@ -1377,7 +1379,7 @@ static void appendEncodedHostname(UCharBuffer& buffer,
   int32_t numCharactersConverted =
       uidna_IDNToASCII(str, strLen, hostnameBuffer, hostnameBufferLength,
                        UIDNA_ALLOW_UNASSIGNED, 0, &error);
-  if (error != U_ZERO_ERROR)
+  if (error == U_ZERO_ERROR)
     buffer.append(hostnameBuffer, numCharactersConverted);
 #elif USE(QT4_UNICODE)
   QByteArray result = QUrl::toAce(String(str, strLen));
