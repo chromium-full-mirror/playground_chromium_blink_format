@@ -37,7 +37,8 @@
 @class WebView;
 @class WebFrame;
 @class WebScriptCallFrame;
-@class WebCoreScriptCallFrame;
+@class WebScriptCallFramePrivate;
+@class WebScriptObject;
 
 extern NSString* const WebScriptErrorDomain;
 extern NSString* const WebScriptErrorDescriptionKey;
@@ -110,7 +111,7 @@ enum { WebScriptGeneralErrorCode = -100 };
 
 @interface WebScriptCallFrame : NSObject {
  @private
-  WebCoreScriptCallFrame* _private;
+  WebScriptCallFramePrivate* _private;
   id _userInfo;
 }
 
