@@ -73,15 +73,9 @@ class RootObject : public RefCounted<RootObject> {
 #if PLATFORM(MAC)
   // Must be called from the thread that will be used to access JavaScript.
   static void setCreateRootObject(CreateRootObjectFunction);
-  static CreateRootObjectFunction createRootObject() {
-    return _createRootObject;
-  }
+  static CreateRootObjectFunction createRootObject();
 
-  static CFRunLoopRef runLoop() { return _runLoop; }
-  static CFRunLoopSourceRef performJavaScriptSource() {
-    return _performJavaScriptSource;
-  }
-
+  static CFRunLoopRef runLoop();
   static void dispatchToJavaScriptThread(JSObjectCallContext* context);
 #endif
 
@@ -98,12 +92,6 @@ class RootObject : public RefCounted<RootObject> {
   ProtectCountSet m_protectCountSet;
 
   HashSet<RuntimeObjectImp*> m_runtimeObjects;
-
-#if PLATFORM(MAC)
-  static CreateRootObjectFunction _createRootObject;
-  static CFRunLoopRef _runLoop;
-  static CFRunLoopSourceRef _performJavaScriptSource;
-#endif
 };
 
 }  // namespace Bindings
