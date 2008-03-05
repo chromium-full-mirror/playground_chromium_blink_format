@@ -21,7 +21,7 @@
 #ifndef RenderThemeSafari_h
 #define RenderThemeSafari_h
 
-#ifdef USE_SAFARI_THEME
+#if USE(SAFARI_THEME)
 
 #include "RenderTheme.h"
 
@@ -254,6 +254,6 @@ class RenderThemeSafari : public RenderTheme {
 
 }  // namespace WebCore
 
-#endif  // defined(USE_SAFARI_THEME)
+#endif  // #if USE(SAFARI_THEME)
 
 #endif  // RenderThemeSafari_h
