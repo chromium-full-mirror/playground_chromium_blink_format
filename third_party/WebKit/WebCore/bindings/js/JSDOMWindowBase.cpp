@@ -22,7 +22,7 @@
  */
 
 #include "config.h"
-#include "kjs_window.h"
+#include "JSDOMWindowBase.h"
 
 #include "Base64.h"
 #include "CString.h"
@@ -70,7 +70,7 @@
 #include "JSXSLTProcessor.h"
 #endif
 
-#include "kjs_window.lut.h"
+#include "JSDOMWindowBase.lut.h"
 
 using namespace KJS;
 

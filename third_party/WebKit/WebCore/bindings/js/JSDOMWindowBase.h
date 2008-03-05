@@ -19,15 +19,14 @@
  * USA
  */
 
-#ifndef kjs_window_h
-#define kjs_window_h
+#ifndef JSDOMWindowBase_h
+#define JSDOMWindowBase_h
 
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
 #include "kjs_binding.h"
 #include <kjs/protect.h>
 #include <wtf/HashMap.h>
-#include <wtf/Noncopyable.h>
 #include <wtf/OwnPtr.h>
 
 namespace WebCore {
@@ -257,4 +256,4 @@ JSDOMWindow* toJSDOMWindow(KJS::JSGlobalObject*);
 
 }  // namespace WebCore
 
-#endif  // kjs_window_h
+#endif  // JSDOMWindowBase_h
