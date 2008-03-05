@@ -46,8 +46,6 @@ class List;
 
 class WebScriptDebugger : public KJS::Debugger {
  public:
-  static WebScriptDebugger& shared();
-
   bool sourceParsed(KJS::ExecState*,
                     int sourceId,
                     const KJS::UString& sourceURL,
@@ -71,10 +69,11 @@ class WebScriptDebugger : public KJS::Debugger {
                  int lineno,
                  KJS::JSValue* exception);
 
- private:
+ protected:
   WebScriptDebugger();
   ~WebScriptDebugger();
 
+ private:
   bool m_callingServer;
   WebFrame* m_frame;
   COMPtr<IWebView> m_webView;
