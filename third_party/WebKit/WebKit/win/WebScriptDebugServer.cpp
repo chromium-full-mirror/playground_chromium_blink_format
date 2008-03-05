@@ -29,9 +29,10 @@
 #include "WebScriptDebugServer.h"
 
 #include "WebScriptCallFrame.h"
-#include "WebScriptDebugger.h"
 #include "WebView.h"
 #pragma warning(push, 0)
+#include <WebCore/DOMWindow.h>
+#include <WebCore/JSDOMWindow.h>
 #include <WebCore/Page.h>
 #pragma warning(pop)
 #include <kjs/ExecState.h>
@@ -48,6 +49,19 @@ static unsigned s_ListenerCount = 0;
 static OwnPtr<WebScriptDebugServer> s_SharedWebScriptDebugServer;
 static bool s_dying = false;
 
+static Frame* frame(ExecState* exec) {
+  JSDOMWindow* window = static_cast<JSDOMWindow*>(exec->dynamicGlobalObject());
+  return window->impl()->frame();
+}
+
+static WebFrame* webFrame(ExecState* exec) {
+  return kit(frame(exec));
+}
+
+static WebView* webView(ExecState* exec) {
+  return kit(frame(exec)->page());
+}
+
 unsigned WebScriptDebugServer::listenerCount() {
   return s_ListenerCount;
 };
@@ -56,7 +70,7 @@ unsigned WebScriptDebugServer::listenerCount() {
 // ------------------------------------------------------------
 
 WebScriptDebugServer::WebScriptDebugServer()
-    : m_refCount(0), m_paused(false), m_step(false) {
+    : m_refCount(0), m_paused(false), m_step(false), m_callingServer(false) {
   gClassCount++;
 }
 
