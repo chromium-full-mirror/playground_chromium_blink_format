@@ -1,9 +1,7 @@
-// -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2004, 2006, 2007 Apple Inc. All rights reserved.
+ *  Copyright (C) 2004, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,14 +19,15 @@
  * USA
  */
 
-#ifndef kjs_css_h
-#define kjs_css_h
+#ifndef JSRGBColor_h
+#define JSRGBColor_h
 
 #include "Color.h"
 #include "kjs_binding.h"
 
 namespace WebCore {
 
+// FIXME: JSRGBColor should have a proper Prototype and Constructor
 class JSRGBColor : public DOMObject {
  public:
   JSRGBColor(KJS::JSObject* prototype, unsigned color);
@@ -38,7 +37,6 @@ class JSRGBColor : public DOMObject {
                                   const KJS::Identifier&,
                                   KJS::PropertySlot&);
   KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
-  // no put - all read-only
 
   virtual const KJS::ClassInfo* classInfo() const { return &info; }
   static const KJS::ClassInfo info;
@@ -55,4 +53,4 @@ KJS::JSValue* getJSRGBColor(KJS::ExecState*, unsigned color);
 
 }  // namespace WebCore
 
-#endif  // kjs_css_h
+#endif  // JSRGBColor_h
