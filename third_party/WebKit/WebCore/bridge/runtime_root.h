@@ -45,7 +45,6 @@ namespace Bindings {
 
 class RootObject;
 
-typedef PassRefPtr<RootObject> (*CreateRootObjectFunction)(void* nativeHandle);
 typedef HashCountedSet<JSObject*> ProtectCountSet;
 
 extern RootObject* findProtectingRootObject(JSObject*);
@@ -72,8 +71,7 @@ class RootObject : public RefCounted<RootObject> {
 
 #if PLATFORM(MAC)
   // Must be called from the thread that will be used to access JavaScript.
-  static void setCreateRootObject(CreateRootObjectFunction);
-  static CreateRootObjectFunction createRootObject();
+  static void initializeJNIThreading();
 
   static CFRunLoopRef runLoop();
   static void dispatchToJavaScriptThread(JSObjectCallContext* context);
