@@ -33,6 +33,7 @@
  @private
   WebFrame* _webFrame;
   WebCoreScriptDebugger* _debugger;
+  WebScriptCallFrame* _current;  // top of stack
 }
 
 - (WebScriptDebugger*)initWithWebFrame:(WebFrame*)webFrame;

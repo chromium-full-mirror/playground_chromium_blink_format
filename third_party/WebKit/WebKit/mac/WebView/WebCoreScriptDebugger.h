@@ -47,9 +47,8 @@ NSString* toNSString(const KJS::UString&);
 @protocol WebScriptDebugger
 
 - (WebScriptObject*)globalObject;  // return the WebView's windowScriptObject
-- (WebScriptCallFrame*)newFrameWithGlobalObject:(WebScriptObject*)globalObj
-                                         caller:(WebScriptCallFrame*)caller
-                                          state:(KJS::ExecState*)state;
+- (WebScriptCallFrame*)enterFrame:(KJS::ExecState*)state;
+- (WebScriptCallFrame*)leaveFrame;
 
 // debugger callbacks
 - (void)parsedSource:(NSString*)source
@@ -77,7 +76,6 @@ NSString* toNSString(const KJS::UString&);
  @private
   id<WebScriptDebugger> _delegate;  // interface to WebKit (not retained)
   WebScriptObject* _globalObj;      // the global object's proxy (not retained)
-  WebScriptCallFrame* _current;     // top of stack
   WebCoreScriptDebuggerImp* _debugger;  // [KJS::Debugger]
 }
 
