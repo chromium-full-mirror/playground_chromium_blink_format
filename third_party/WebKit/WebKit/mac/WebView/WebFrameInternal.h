@@ -44,7 +44,7 @@
 @class WebFrameView;
 @class WebFrameBridge;
 @class WebHistoryItem;
-@class WebScriptDebugger;
+class WebCoreScriptDebuggerImp;
 
 #ifdef __cplusplus
 
@@ -97,7 +97,7 @@ WebView* getWebView(WebFrame* webFrame);
  @public
   WebFrameView* webFrameView;
   WebFrameBridge* bridge;
-  WebScriptDebugger* scriptDebugger;
+  WebCoreScriptDebuggerImp* scriptDebugger;
   id internalLoadDelegate;
 }
 @end
