@@ -303,13 +303,23 @@ static int findFirstOf(const UChar* s,
   return -1;
 }
 
-// KURL
-
 inline bool KURL::protocolIs(const String& string, const char* protocol) {
   return WebCore::protocolIs(string, protocol);
 }
 
-KURL::KURL() : m_isValid(false) {}
+void KURL::invalidate() {
+  m_isValid = false;
+  m_schemeEnd = 0;
+  m_userStart = 0;
+  m_userEnd = 0;
+  m_passwordEnd = 0;
+  m_hostEnd = 0;
+  m_portEnd = 0;
+  m_pathEnd = 0;
+  m_pathAfterLastSlash = 0;
+  m_queryEnd = 0;
+  m_fragmentEnd = 0;
+}
 
 KURL::KURL(const char* url) {
   if (!url || url[0] != '/') {
@@ -359,10 +369,12 @@ KURL::KURL(const KURL& base,
 void KURL::init(const KURL& base,
                 const String& relative,
                 const TextEncoding& encoding) {
-  // Allow at least absolute URLs to resolve against an empty URL.
+  // Allow resolutions with a null or empty base URL, but not with any other
+  // invalid one.
+  // FIXME: Is this a good rule?
   if (!base.m_isValid && !base.isEmpty()) {
     m_string = relative;
-    m_isValid = false;
+    invalidate();
     return;
   }
 
@@ -436,10 +448,10 @@ void KURL::init(const KURL& base,
     // unless the relative URL is a single fragment.
     if (!base.isHierarchical()) {
       if (str[0] == '#')
-        parse(base.m_string.left(base.queryEndPos) + str);
+        parse(base.m_string.left(base.m_queryEnd) + str);
       else {
         m_string = relative;
-        m_isValid = false;
+        invalidate();
       }
       return;
     }
@@ -452,20 +464,20 @@ void KURL::init(const KURL& base,
         break;
       case '#':
         // must be fragment-only reference
-        parse(base.m_string.left(base.queryEndPos) + str);
+        parse(base.m_string.left(base.m_queryEnd) + str);
         break;
       case '?':
         // query-only reference, special case needed for non-URL results
-        parse(base.m_string.left(base.pathEndPos) + str);
+        parse(base.m_string.left(base.m_pathEnd) + str);
         break;
       case '/':
         // must be net-path or absolute-path reference
         if (str[1] == '/') {
           // net-path
-          parse(base.m_string.left(base.schemeEndPos + 1) + str);
+          parse(base.m_string.left(base.m_schemeEnd + 1) + str);
         } else {
           // abs-path
-          parse(base.m_string.left(base.portEndPos) + str);
+          parse(base.m_string.left(base.m_portEnd) + str);
         }
         break;
       default: {
@@ -473,7 +485,7 @@ void KURL::init(const KURL& base,
 
         // Base part plus relative part plus one possible slash added in between
         // plus terminating \0 byte.
-        CharBuffer buffer(base.pathEndPos + 1 + len + 1);
+        CharBuffer buffer(base.m_pathEnd + 1 + len + 1);
 
         char* bufferPos = buffer.data();
 
@@ -485,13 +497,13 @@ void KURL::init(const KURL& base,
           baseStringBuffer[i] = static_cast<char>(baseCharacters[i]);
         const char* baseString = baseStringBuffer.data();
         const char* baseStringStart = baseString;
-        const char* pathStart = baseStringStart + base.portEndPos;
+        const char* pathStart = baseStringStart + base.m_portEnd;
         while (baseStringStart < pathStart)
           *bufferPos++ = *baseStringStart++;
         char* bufferPathStart = bufferPos;
 
         // now copy the base path
-        const char* baseStringEnd = baseString + base.pathEndPos;
+        const char* baseStringEnd = baseString + base.m_pathEnd;
 
         // go back to the last slash
         while (baseStringEnd > baseStringStart && baseStringEnd[-1] != '/')
@@ -499,8 +511,8 @@ void KURL::init(const KURL& base,
 
         if (baseStringEnd == baseStringStart) {
           // no path in base, add a path separator if necessary
-          if (base.schemeEndPos + 1 != base.pathEndPos && *str != '\0' &&
-              *str != '?' && *str != '#')
+          if (base.m_schemeEnd + 1 != base.m_pathEnd && *str && *str != '?' &&
+              *str != '#')
             *bufferPos++ = '/';
         } else {
           bufferPos += copyPathRemovingDots(bufferPos, baseStringStart, 0,
@@ -510,8 +522,7 @@ void KURL::init(const KURL& base,
         const char* relStringStart = str;
         const char* relStringPos = relStringStart;
 
-        while (*relStringPos != '\0' && *relStringPos != '?' &&
-               *relStringPos != '#') {
+        while (*relStringPos && *relStringPos != '?' && *relStringPos != '#') {
           if (relStringPos[0] == '.' && bufferPos[-1] == '/') {
             if (isPathSegmentEndChar(relStringPos[1])) {
               // skip over "." segment
@@ -556,19 +567,19 @@ void KURL::init(const KURL& base,
 }
 
 bool KURL::hasPath() const {
-  return m_isValid && pathEndPos != portEndPos;
+  return m_pathEnd != m_portEnd;
 }
 
 String KURL::lastPathComponent() const {
   if (!hasPath())
     return String();
 
-  int end = pathEndPos - 1;
+  int end = m_pathEnd - 1;
   if (m_string[end] == '/')
     --end;
 
   int start = m_string.reverseFind('/', end);
-  if (start < portEndPos)
+  if (start < m_portEnd)
     return String();
   ++start;
 
@@ -576,65 +587,48 @@ String KURL::lastPathComponent() const {
 }
 
 String KURL::protocol() const {
-  if (!m_isValid)
-    return String();
-
-  return m_string.left(schemeEndPos);
+  return m_string.left(m_schemeEnd);
 }
 
 String KURL::host() const {
-  if (!m_isValid)
-    return String();
-
   int start =
-      (passwordEndPos == userStartPos) ? passwordEndPos : passwordEndPos + 1;
-  return decodeURLEscapeSequences(
-      m_string.substring(start, hostEndPos - start));
+      (m_passwordEnd == m_userStart) ? m_passwordEnd : m_passwordEnd + 1;
+  return decodeURLEscapeSequences(m_string.substring(start, m_hostEnd - start));
 }
 
 unsigned short KURL::port() const {
-  if (!m_isValid)
-    return 0;
-
-  if (hostEndPos == portEndPos)
+  if (m_hostEnd == m_portEnd)
     return 0;
 
   int number =
-      m_string.substring(hostEndPos + 1, portEndPos - hostEndPos - 1).toInt();
+      m_string.substring(m_hostEnd + 1, m_portEnd - m_hostEnd - 1).toInt();
   if (number < 0 || number > 0xFFFF)
     return 0;
   return number;
 }
 
 String KURL::pass() const {
-  if (!m_isValid)
-    return String();
-
-  if (passwordEndPos == userEndPos)
+  if (m_passwordEnd == m_userEnd)
     return String();
 
   return decodeURLEscapeSequences(
-      m_string.substring(userEndPos + 1, passwordEndPos - userEndPos - 1));
+      m_string.substring(m_userEnd + 1, m_passwordEnd - m_userEnd - 1));
 }
 
 String KURL::user() const {
-  if (!m_isValid)
-    return String();
-
   return decodeURLEscapeSequences(
-      m_string.substring(userStartPos, userEndPos - userStartPos));
+      m_string.substring(m_userStart, m_userEnd - m_userStart));
 }
 
 String KURL::ref() const {
-  if (!m_isValid || fragmentEndPos == queryEndPos)
+  if (m_fragmentEnd == m_queryEnd)
     return String();
 
-  return m_string.substring(queryEndPos + 1,
-                            fragmentEndPos - (queryEndPos + 1));
+  return m_string.substring(m_queryEnd + 1, m_fragmentEnd - (m_queryEnd + 1));
 }
 
 bool KURL::hasRef() const {
-  return m_isValid && fragmentEndPos != queryEndPos;
+  return m_fragmentEnd != m_queryEnd;
 }
 
 static inline void assertProtocolIsGood(const char* protocol) {
@@ -652,27 +646,21 @@ bool KURL::protocolIs(const char* protocol) const {
   assertProtocolIsGood(protocol);
   if (!m_isValid)
     return false;
-  for (int i = 0; i < schemeEndPos; ++i) {
+  for (int i = 0; i < m_schemeEnd; ++i) {
     if (!protocol[i] || toASCIILower(m_string[i]) != protocol[i])
       return false;
   }
-  return !protocol[schemeEndPos];  // We should have consumed all characters in
-                                   // the argument.
+  return !protocol[m_schemeEnd];  // We should have consumed all characters in
+                                  // the argument.
 }
 
 String KURL::query() const {
-  if (!m_isValid)
-    return String();
-
-  return m_string.substring(pathEndPos, queryEndPos - pathEndPos);
+  return m_string.substring(m_pathEnd, m_queryEnd - m_pathEnd);
 }
 
 String KURL::path() const {
-  if (!m_isValid)
-    return String();
-
   return decodeURLEscapeSequences(
-      m_string.substring(portEndPos, pathEndPos - portEndPos));
+      m_string.substring(m_portEnd, m_pathEnd - m_portEnd));
 }
 
 void KURL::setProtocol(const String& s) {
@@ -681,42 +669,42 @@ void KURL::setProtocol(const String& s) {
     return;
   }
 
-  parse(s + m_string.substring(schemeEndPos));
+  parse(s + m_string.substring(m_schemeEnd));
 }
 
 void KURL::setHost(const String& s) {
   if (!m_isValid)
     return;
 
-  bool slashSlashNeeded = userStartPos == schemeEndPos + 1;
+  bool slashSlashNeeded = m_userStart == m_schemeEnd + 1;
   int hostStart =
-      (passwordEndPos == userStartPos) ? passwordEndPos : passwordEndPos + 1;
+      (m_passwordEnd == m_userStart) ? m_passwordEnd : m_passwordEnd + 1;
 
   parse(m_string.left(hostStart) + (slashSlashNeeded ? "//" : "") + s +
-        m_string.substring(hostEndPos));
+        m_string.substring(m_hostEnd));
 }
 
 void KURL::setPort(unsigned short i) {
   if (!m_isValid)
     return;
 
-  bool colonNeeded = portEndPos == hostEndPos;
-  int portStart = (colonNeeded ? hostEndPos : hostEndPos + 1);
+  bool colonNeeded = m_portEnd == m_hostEnd;
+  int portStart = (colonNeeded ? m_hostEnd : m_hostEnd + 1);
 
   parse(m_string.left(portStart) + (colonNeeded ? ":" : "") +
-        String::number(i) + m_string.substring(portEndPos));
+        String::number(i) + m_string.substring(m_portEnd));
 }
 
 void KURL::setHostAndPort(const String& hostAndPort) {
   if (!m_isValid)
     return;
 
-  bool slashSlashNeeded = userStartPos == schemeEndPos + 1;
+  bool slashSlashNeeded = m_userStart == m_schemeEnd + 1;
   int hostStart =
-      (passwordEndPos == userStartPos) ? passwordEndPos : passwordEndPos + 1;
+      (m_passwordEnd == m_userStart) ? m_passwordEnd : m_passwordEnd + 1;
 
   parse(m_string.left(hostStart) + (slashSlashNeeded ? "//" : "") +
-        hostAndPort + m_string.substring(portEndPos));
+        hostAndPort + m_string.substring(m_portEnd));
 }
 
 void KURL::setUser(const String& user) {
@@ -724,21 +712,20 @@ void KURL::setUser(const String& user) {
     return;
 
   String u;
-  int end = userEndPos;
+  int end = m_userEnd;
   if (!user.isEmpty()) {
     u = user;
-    if (userStartPos == schemeEndPos + 1)
+    if (m_userStart == m_schemeEnd + 1)
       u = "//" + u;
     // Add '@' if we didn't have one before.
-    if (end == hostEndPos || (end == passwordEndPos && m_string[end] != '@'))
+    if (end == m_hostEnd || (end == m_passwordEnd && m_string[end] != '@'))
       u.append('@');
   } else {
     // Remove '@' if we now have neither user nor password.
-    if (userEndPos == passwordEndPos && end != hostEndPos &&
-        m_string[end] == '@')
+    if (m_userEnd == m_passwordEnd && end != m_hostEnd && m_string[end] == '@')
       end += 1;
   }
-  parse(m_string.left(userStartPos) + u + m_string.substring(end));
+  parse(m_string.left(m_userStart) + u + m_string.substring(end));
 }
 
 void KURL::setPass(const String& password) {
@@ -746,26 +733,26 @@ void KURL::setPass(const String& password) {
     return;
 
   String p;
-  int end = passwordEndPos;
+  int end = m_passwordEnd;
   if (!password.isEmpty()) {
     p = ":" + password + "@";
-    if (userEndPos == schemeEndPos + 1)
+    if (m_userEnd == m_schemeEnd + 1)
       p = "//" + p;
     // Eat the existing '@' since we are going to add our own.
-    if (end != hostEndPos && m_string[end] == '@')
+    if (end != m_hostEnd && m_string[end] == '@')
       end += 1;
   } else {
     // Remove '@' if we now have neither user nor password.
-    if (userStartPos == userEndPos && end != hostEndPos && m_string[end] == '@')
+    if (m_userStart == m_userEnd && end != m_hostEnd && m_string[end] == '@')
       end += 1;
   }
-  parse(m_string.left(userEndPos) + p + m_string.substring(end));
+  parse(m_string.left(m_userEnd) + p + m_string.substring(end));
 }
 
 void KURL::setRef(const String& s) {
   if (!m_isValid)
     return;
-  parse(m_string.left(queryEndPos) + (s.isEmpty() ? "" : "#" + s));
+  parse(m_string.left(m_queryEnd) + (s.isEmpty() ? "" : "#" + s));
 }
 
 void KURL::setQuery(const String& query) {
@@ -773,18 +760,18 @@ void KURL::setQuery(const String& query) {
     return;
 
   if ((query.isEmpty() || query[0] != '?') && !query.isNull())
-    parse(m_string.left(pathEndPos) + "?" + query +
-          m_string.substring(queryEndPos));
+    parse(m_string.left(m_pathEnd) + "?" + query +
+          m_string.substring(m_queryEnd));
   else
-    parse(m_string.left(pathEndPos) + query + m_string.substring(queryEndPos));
+    parse(m_string.left(m_pathEnd) + query + m_string.substring(m_queryEnd));
 }
 
 void KURL::setPath(const String& s) {
   if (!m_isValid)
     return;
 
-  parse(m_string.left(portEndPos) + encodeWithURLEscapeSequences(s) +
-        m_string.substring(pathEndPos));
+  parse(m_string.left(m_portEnd) + encodeWithURLEscapeSequences(s) +
+        m_string.substring(m_pathEnd));
 }
 
 String KURL::prettyURL() const {
@@ -798,8 +785,8 @@ String KURL::prettyURL() const {
 
   Vector<UChar> authority;
 
-  if (hostEndPos != passwordEndPos) {
-    if (userEndPos != userStartPos) {
+  if (m_hostEnd != m_passwordEnd) {
+    if (m_userEnd != m_userStart) {
       append(authority, user());
       authority.append('@');
     }
@@ -822,7 +809,7 @@ String KURL::prettyURL() const {
   append(result, path());
   append(result, query());
 
-  if (fragmentEndPos != queryEndPos) {
+  if (m_fragmentEnd != m_queryEnd) {
     result.append('#');
     append(result, ref());
   }
@@ -954,19 +941,16 @@ static int copyPathRemovingDots(char* dst,
           // ".." segments - we choose to drop them since some web content
           // relies on this.
           baseStringPos += 3;
-          if (dst > bufferPathStart + 1) {
+          if (dst > bufferPathStart + 1)
             dst--;
-          }
           // Note that these two while blocks differ subtly.
           // The first helps to remove multiple adjoining slashes as we rewind.
           // The +1 to bufferPathStart in the first while block prevents eating
           // a leading slash
-          while (dst > bufferPathStart + 1 && dst[-1] == '/') {
+          while (dst > bufferPathStart + 1 && dst[-1] == '/')
             dst--;
-          }
-          while (dst > bufferPathStart && dst[-1] != '/') {
+          while (dst > bufferPathStart && dst[-1] != '/')
             dst--;
-          }
           continue;
         }
       }
@@ -1006,31 +990,27 @@ void KURL::parse(const String& string) {
 }
 
 void KURL::parse(const char* url, const String* originalString) {
-  m_isValid = true;
-
   if (!url || url[0] == '\0') {
     // valid URL must be non-empty
     m_string = originalString ? *originalString : url;
-    m_isValid = false;
+    invalidate();
     return;
   }
 
   if (!isSchemeFirstChar(url[0])) {
     // scheme must start with an alphabetic character
     m_string = originalString ? *originalString : url;
-    m_isValid = false;
+    invalidate();
     return;
   }
 
   int schemeEnd = 0;
-
-  while (isSchemeChar(url[schemeEnd])) {
+  while (isSchemeChar(url[schemeEnd]))
     schemeEnd++;
-  }
 
   if (url[schemeEnd] != ':') {
     m_string = originalString ? *originalString : url;
-    m_isValid = false;
+    invalidate();
     return;
   }
 
@@ -1048,15 +1028,15 @@ void KURL::parse(const char* url, const String* originalString) {
   if (hierarchical && url[schemeEnd + 2] == '/') {
     // part after the scheme must be a net_path, parse the authority section
 
-    // FIXME: Authority characters may be scanned twice.
+    // FIXME: Authority characters may be scanned twice, and it would be nice to
+    // be faster.
     userStart += 2;
     userEnd = userStart;
 
     int colonPos = 0;
     while (isUserInfoChar(url[userEnd])) {
-      if (url[userEnd] == ':' && colonPos == 0) {
+      if (url[userEnd] == ':' && colonPos == 0)
         colonPos = userEnd;
-      }
       userEnd++;
     }
 
@@ -1080,7 +1060,7 @@ void KURL::parse(const char* url, const String* originalString) {
     } else {
       // invalid character
       m_string = originalString ? *originalString : url;
-      m_isValid = false;
+      invalidate();
       return;
     }
 
@@ -1089,21 +1069,19 @@ void KURL::parse(const char* url, const String* originalString) {
     // IPV6 IP address
     if (url[hostEnd] == '[') {
       hostEnd++;
-      while (isIPv6Char(url[hostEnd])) {
+      while (isIPv6Char(url[hostEnd]))
         hostEnd++;
-      }
-      if (url[hostEnd] == ']') {
+      if (url[hostEnd] == ']')
         hostEnd++;
-      } else {
+      else {
         // invalid character
         m_string = originalString ? *originalString : url;
-        m_isValid = false;
+        invalidate();
         return;
       }
     } else {
-      while (isHostnameChar(url[hostEnd])) {
+      while (isHostnameChar(url[hostEnd]))
         hostEnd++;
-      }
     }
 
     if (url[hostEnd] == ':') {
@@ -1111,9 +1089,8 @@ void KURL::parse(const char* url, const String* originalString) {
 
       // possible start of port
       portEnd = portStart;
-      while (isASCIIDigit(url[portEnd])) {
+      while (isASCIIDigit(url[portEnd]))
         portEnd++;
-      }
     } else {
       portStart = portEnd = hostEnd;
     }
@@ -1121,7 +1098,7 @@ void KURL::parse(const char* url, const String* originalString) {
     if (!isPathSegmentEndChar(url[portEnd])) {
       // invalid character
       m_string = originalString ? *originalString : url;
-      m_isValid = false;
+      invalidate();
       return;
     }
   } else {
@@ -1134,52 +1111,23 @@ void KURL::parse(const char* url, const String* originalString) {
 
   int pathStart = portEnd;
   int pathEnd = pathStart;
-  int queryStart;
-  int queryEnd;
-  int fragmentStart;
-  int fragmentEnd;
+  while (url[pathEnd] && url[pathEnd] != '?' && url[pathEnd] != '#')
+    pathEnd++;
 
-  if (!hierarchical) {
-    while (url[pathEnd] != '\0' && url[pathEnd] != '?' && url[pathEnd] != '#')
-      pathEnd++;
+  int queryStart = pathEnd;
+  int queryEnd = queryStart;
+  if (url[queryStart] == '?') {
+    while (url[queryEnd] && url[queryEnd] != '#')
+      queryEnd++;
+  }
 
-    queryStart = pathEnd;
-    queryEnd = queryStart;
-    if (url[queryStart] == '?') {
-      while (url[queryEnd] != '\0' && url[queryEnd] != '#')
-        queryEnd++;
-    }
-
-    fragmentStart = queryEnd;
+  int fragmentStart = queryEnd;
+  int fragmentEnd = fragmentStart;
+  if (url[fragmentStart] == '#') {
+    fragmentStart++;
     fragmentEnd = fragmentStart;
-    if (url[fragmentStart] == '#') {
-      fragmentStart++;
-      fragmentEnd = fragmentStart;
-      while (url[fragmentEnd] != '\0')
-        fragmentEnd++;
-    }
-  } else {
-    while (url[pathEnd] != '\0' && url[pathEnd] != '?' && url[pathEnd] != '#') {
-      pathEnd++;
-    }
-
-    queryStart = pathEnd;
-    queryEnd = queryStart;
-    if (url[queryStart] == '?') {
-      while (url[queryEnd] != '\0' && url[queryEnd] != '#') {
-        queryEnd++;
-      }
-    }
-
-    fragmentStart = queryEnd;
-    fragmentEnd = fragmentStart;
-    if (url[fragmentStart] == '#') {
-      fragmentStart++;
-      fragmentEnd = fragmentStart;
-      while (url[fragmentEnd] != '\0') {
-        fragmentEnd++;
-      }
-    }
+    while (url[fragmentEnd])
+      fragmentEnd++;
   }
 
   // assemble it all, remembering the real ranges
@@ -1193,9 +1141,8 @@ void KURL::parse(const char* url, const String* originalString) {
   const char* schemeEndPtr = url + schemeEnd;
   while (strPtr < schemeEndPtr)
     *p++ = *strPtr++;
-  schemeEndPos = p - buffer.data();
+  m_schemeEnd = p - buffer.data();
 
-  // Check if we're http or https.
   bool isHTTPorHTTPS =
       matchLetter(url[0], 'h') && matchLetter(url[1], 't') &&
       matchLetter(url[2], 't') && matchLetter(url[3], 'p') &&
@@ -1231,25 +1178,17 @@ void KURL::parse(const char* url, const String* originalString) {
   // authority
   if (isFile ? !degenFilePath
              : (haveNonHostAuthorityPart || hostStart != hostEnd)) {
-    // if ((isFile && !degenFilePath) || haveNonHostAuthorityPart || hostStart
-    // != hostEnd) {
-    // still adds // for file://localhost, file://
-
-    // if (!(isFile && degenFilePath) && (haveNonHostAuthorityPart || hostStart
-    // != hostEnd)) {
-    // doesn't add // for things like file:///foo
-
     *p++ = '/';
     *p++ = '/';
 
-    userStartPos = p - buffer.data();
+    m_userStart = p - buffer.data();
 
     // copy in the user
     strPtr = url + userStart;
     const char* userEndPtr = url + userEnd;
     while (strPtr < userEndPtr)
       *p++ = *strPtr++;
-    userEndPos = p - buffer.data();
+    m_userEnd = p - buffer.data();
 
     // copy in the password
     if (passwordEnd != passwordStart) {
@@ -1259,10 +1198,10 @@ void KURL::parse(const char* url, const String* originalString) {
       while (strPtr < passwordEndPtr)
         *p++ = *strPtr++;
     }
-    passwordEndPos = p - buffer.data();
+    m_passwordEnd = p - buffer.data();
 
     // If we had any user info, add "@"
-    if (p - buffer.data() != userStartPos)
+    if (p - buffer.data() != m_userStart)
       *p++ = '@';
 
     // copy in the host, except in the case of a file URL with
@@ -1273,7 +1212,7 @@ void KURL::parse(const char* url, const String* originalString) {
       while (strPtr < hostEndPtr)
         *p++ = *strPtr++;
     }
-    hostEndPos = p - buffer.data();
+    m_hostEnd = p - buffer.data();
 
     // copy in the port
     if (hostEnd != portStart) {
@@ -1283,9 +1222,9 @@ void KURL::parse(const char* url, const String* originalString) {
       while (strPtr < portEndPtr)
         *p++ = *strPtr++;
     }
-    portEndPos = p - buffer.data();
+    m_portEnd = p - buffer.data();
   } else {
-    userStartPos = userEndPos = passwordEndPos = hostEndPos = portEndPos =
+    m_userStart = m_userEnd = m_passwordEnd = m_hostEnd = m_portEnd =
         p - buffer.data();
   }
 
@@ -1295,40 +1234,53 @@ void KURL::parse(const char* url, const String* originalString) {
     *p++ = '/';
 
   // add path, escaping bad characters
-  if (hierarchical && hasSlashDotOrDotDot(url)) {
-    CharBuffer path_buffer(pathEnd - pathStart + 1);
-    copyPathRemovingDots(path_buffer.data(), url, pathStart, pathEnd);
-    appendEscapingBadChars(p, path_buffer.data(), strlen(path_buffer.data()));
-  } else
+  if (!hierarchical || !hasSlashDotOrDotDot(url))
     appendEscapingBadChars(p, url + pathStart, pathEnd - pathStart);
+  else {
+    CharBuffer pathBuffer(pathEnd - pathStart + 1);
+    size_t length =
+        copyPathRemovingDots(pathBuffer.data(), url, pathStart, pathEnd);
+    appendEscapingBadChars(p, pathBuffer.data(), length);
+  }
 
-  pathEndPos = p - buffer.data();
+  m_pathEnd = p - buffer.data();
+
+  // Find the position after the last slash in the path, or
+  // the position before the path if there are no slashes in it.
+  int i;
+  for (i = m_pathEnd; i > m_portEnd; --i) {
+    if (buffer[i - 1] == '/')
+      break;
+  }
+  m_pathAfterLastSlash = i;
 
   // add query, escaping bad characters
   appendEscapingBadChars(p, url + queryStart, queryEnd - queryStart);
-  queryEndPos = p - buffer.data();
+  m_queryEnd = p - buffer.data();
 
   // add fragment, escaping bad characters
   if (fragmentEnd != queryEnd) {
     *p++ = '#';
     appendEscapingBadChars(p, url + fragmentStart, fragmentEnd - fragmentStart);
   }
-  fragmentEndPos = p - buffer.data();
+  m_fragmentEnd = p - buffer.data();
 
-  ASSERT(p - buffer.data() <= (int)buffer.size());
+  ASSERT(p - buffer.data() <= static_cast<int>(buffer.size()));
 
   // If we didn't end up actually changing the original string and
   // it was already in a String, reuse it to avoid extra allocation.
-  if (originalString && strncmp(buffer.data(), url, fragmentEndPos) == 0)
+  if (originalString && strncmp(buffer.data(), url, m_fragmentEnd) == 0)
     m_string = *originalString;
   else
-    m_string = String(buffer.data(), fragmentEndPos);
+    m_string = String(buffer.data(), m_fragmentEnd);
+
+  m_isValid = true;
 }
 
 bool equalIgnoringRef(const KURL& a, const KURL& b) {
-  if (a.queryEndPos != b.queryEndPos)
+  if (a.m_queryEnd != b.m_queryEnd)
     return false;
-  unsigned queryLength = a.queryEndPos;
+  unsigned queryLength = a.m_queryEnd;
   for (unsigned i = 0; i < queryLength; ++i)
     if (a.string()[i] != b.string()[i])
       return false;
@@ -1591,8 +1543,8 @@ static String substituteBackslashes(const String& string) {
 bool KURL::isHierarchical() const {
   if (!m_isValid)
     return false;
-  ASSERT(m_string[schemeEndPos] == ':');
-  return m_string[schemeEndPos + 1] == '/';
+  ASSERT(m_string[m_schemeEnd] == ':');
+  return m_string[m_schemeEnd + 1] == '/';
 }
 
 void KURL::copyToBuffer(CharBuffer& buffer) const {
