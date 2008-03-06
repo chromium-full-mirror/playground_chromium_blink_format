@@ -42,12 +42,14 @@ class List;
 class UString;
 }
 
-@class WebCoreScriptDebugger;
 @class WebScriptCallFrame;
+@class WebScriptDebugger;
+
+NSString* toNSString(const KJS::UString&);
 
 class WebCoreScriptDebuggerImp : public KJS::Debugger {
  public:
-  WebCoreScriptDebuggerImp(WebCoreScriptDebugger*, KJS::JSGlobalObject*);
+  WebCoreScriptDebuggerImp(WebScriptDebugger*, KJS::JSGlobalObject*);
 
   virtual bool sourceParsed(KJS::ExecState*,
                             int sourceID,
@@ -75,7 +77,7 @@ class WebCoreScriptDebuggerImp : public KJS::Debugger {
                          KJS::JSValue* exception);
 
  private:
-  WebCoreScriptDebugger* m_debugger;
+  WebScriptDebugger* m_debugger;
   bool m_callingDelegate;
   WebScriptCallFrame* m_topCallFrame;
 };
