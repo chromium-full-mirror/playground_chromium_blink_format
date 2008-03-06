@@ -448,7 +448,11 @@ static void appendStartMarkup(
         if (annotate) {
           RefPtr<CSSMutableStyleDeclaration> styleFromMatchedRules =
               styleFromMatchedRulesForElement(const_cast<Element*>(el));
-          style->merge(styleFromMatchedRules.get());
+          // Styles from the inline style declaration, held in the variable
+          // "style", take precedence
+          // over those from matched rules.
+          styleFromMatchedRules->merge(style.get());
+          style = styleFromMatchedRules;
         }
         if (convert)
           style->setProperty(CSS_PROP_DISPLAY, CSS_VAL_INLINE, true);
