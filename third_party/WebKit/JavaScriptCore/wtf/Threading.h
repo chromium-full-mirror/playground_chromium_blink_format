@@ -94,6 +94,13 @@ class QWaitCondition;
 
 #include <stdint.h>
 
+// For portability, we do not use thread-safe statics natively supported by some
+// compilers (e.g. gcc).
+#define AtomicallyInitializedStatic(T, name)     \
+  WTF::atomicallyInitializedStaticMutex->lock(); \
+  static T name;                                 \
+  WTF::atomicallyInitializedStaticMutex->unlock();
+
 namespace WTF {
 
 typedef uint32_t ThreadIdentifier;
@@ -240,8 +247,13 @@ class ThreadSafeShared : Noncopyable {
 
 void initializeThreading();
 
+extern Mutex* atomicallyInitializedStaticMutex;
+
 #if !PLATFORM(GTK)
-inline void initializeThreading() {}
+inline void initializeThreading() {
+  if (!atomicallyInitializedStaticMutex)
+    atomicallyInitializedStaticMutex = new Mutex;
+}
 #endif
 
 }  // namespace WTF

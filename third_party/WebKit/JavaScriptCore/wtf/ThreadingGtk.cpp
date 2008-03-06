@@ -36,9 +36,14 @@
 
 namespace WTF {
 
+Mutex* atomicallyInitializedStaticMutex;
+
 void initializeThreading() {
-  if (!g_thread_supported())
+  if (!g_thread_supported()) {
     g_thread_init(NULL);
+    ASSERT(!atomicallyInitializedStaticMutex);
+    atomicallyInitializedStaticMutex = new Mutex;
+  }
   ASSERT(g_thread_supported());
 }
 
