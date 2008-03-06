@@ -125,20 +125,19 @@ using namespace HTMLNames;
       currChild->clear##Prop();                                           \
       currChild = currChild->next();                                      \
     }                                                                     \
-    return;                                                               \
-  }                                                                       \
-  if (isInitial) {                                                        \
+  } else if (isInitial) {                                                 \
     LayerType* currChild = m_style->access##LayerType##s();               \
     currChild->set##Prop(RenderStyle::initial##Prop());                   \
     for (currChild = currChild->next(); currChild;                        \
          currChild = currChild->next())                                   \
       currChild->clear##Prop();                                           \
-    return;                                                               \
   }
 
 #define HANDLE_MULTILAYER_VALUE(layerType, LayerType, prop, Prop, value)    \
   {                                                                         \
     HANDLE_MULTILAYER_INHERIT_AND_INITIAL(layerType, LayerType, prop, Prop) \
+    if (isInherit || isInitial)                                             \
+      return;                                                               \
     LayerType* currChild = m_style->access##LayerType##s();                 \
     LayerType* prevChild = 0;                                               \
     if (value->isValueList()) {                                             \
@@ -172,9 +171,6 @@ using namespace HTMLNames;
 
 #define HANDLE_BACKGROUND_VALUE(prop, Prop, value) \
   HANDLE_MULTILAYER_VALUE(backgroundLayer, BackgroundLayer, prop, Prop, value)
-
-#define HANDLE_TRANSITION_INHERIT_AND_INITIAL(prop, Prop) \
-  HANDLE_MULTILAYER_INHERIT_AND_INITIAL(transition, Transition, prop, Prop)
 
 #define HANDLE_TRANSITION_VALUE(prop, Prop, value) \
   HANDLE_MULTILAYER_VALUE(transition, Transition, prop, Prop, value)
