@@ -112,7 +112,9 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void exceededDatabaseQuota(WebCore::Frame*, const WebCore::String&);
 
-  virtual WebView* webView() const { return m_webView; }
+  virtual void populateVisitedLinks();
+
+  WebView* webView() const { return m_webView; }
 
  private:
   COMPtr<IWebUIDelegate> uiDelegate();

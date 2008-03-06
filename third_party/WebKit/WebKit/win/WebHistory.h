@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,41 +32,21 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <wtf/RetainPtr.h>
 
-//-----------------------------------------------------------------------------
-
-// {3DE04E59-93F9-4369-8B43-976458D7E319}
-DEFINE_GUID(IID_IWebHistoryPrivate,
-            0x3de04e59,
-            0x93f9,
-            0x4369,
-            0x8b,
-            0x43,
-            0x97,
-            0x64,
-            0x58,
-            0xd7,
-            0xe3,
-            0x19);
-
-interface IWebHistoryPrivate : public IUnknown {
- public:
-  virtual HRESULT STDMETHODCALLTYPE addItemForURL(
-      /* [in] */ BSTR url,
-      /* [in] */ BSTR title) = 0;
-  virtual HRESULT STDMETHODCALLTYPE containsItemForURLString(
-      /* [in] */ void* urlCFString,
-      /* [retval][out] */ BOOL* contains) = 0;
-};
+namespace WebCore {
+class KURL;
+class PageGroup;
+class String;
+}
 
 //-----------------------------------------------------------------------------
 
 class WebPreferences;
 
-class WebHistory : public IWebHistory, IWebHistoryPrivate {
+class WebHistory : public IWebHistory {
  public:
   static WebHistory* createInstance();
 
- protected:
+ private:
   WebHistory();
   ~WebHistory();
 
@@ -130,12 +110,11 @@ class WebHistory : public IWebHistory, IWebHistoryPrivate {
       /* [retval][out] */ int* limit);
 
   // WebHistory
-  static IWebHistoryPrivate* optionalSharedHistoryInternal();
-  virtual HRESULT STDMETHODCALLTYPE addItemForURL(BSTR url, BSTR title);
-  virtual HRESULT STDMETHODCALLTYPE containsItemForURLString(void* urlCFString,
-                                                             BOOL* contains);
+  static WebHistory* sharedHistory();
+  void addItem(const WebCore::KURL&, const WebCore::String&);
+  void addVisitedLinksToPageGroup(WebCore::PageGroup&);
 
- protected:
+ private:
   enum NotificationType {
     kWebHistoryItemsAddedNotification = 0,
     kWebHistoryItemsRemovedNotification = 1,
@@ -164,13 +143,11 @@ class WebHistory : public IWebHistory, IWebHistoryPrivate {
   BSTR getNotificationString(NotificationType notifyType);
   HRESULT itemForURLString(CFStringRef urlString, IWebHistoryItem** item);
 
- protected:
   ULONG m_refCount;
   RetainPtr<CFMutableDictionaryRef> m_entriesByURL;
   RetainPtr<CFMutableArrayRef> m_datesWithEntries;
   RetainPtr<CFMutableArrayRef> m_entriesByDate;
   COMPtr<WebPreferences> m_preferences;
-  static IWebHistory* m_optionalSharedHistory;
 };
 
 #endif

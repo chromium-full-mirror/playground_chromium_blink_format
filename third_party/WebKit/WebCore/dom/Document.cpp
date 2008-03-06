@@ -1247,7 +1247,6 @@ void Document::attach() {
     m_styleSelector = new CSSStyleSelector(
         this, userStyleSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
         !inCompatMode(), matchAuthorAndUserStyles);
-    m_styleSelector->setEncodedURL(m_url);
   }
 
   recalcStyle(Force);
@@ -1663,9 +1662,6 @@ void Document::setURL(const KURL& url) {
     return;
 
   m_url = url;
-  if (m_styleSelector)
-    m_styleSelector->setEncodedURL(url);
-
   m_isAllowedToLoadLocalResources = shouldBeAllowedToLoadLocalResources();
 }
 
@@ -2247,7 +2243,6 @@ void Document::recalcStyleSelector() {
   m_styleSelector = new CSSStyleSelector(
       this, userStyleSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
       !inCompatMode(), matchAuthorAndUserStyles);
-  m_styleSelector->setEncodedURL(m_url);
   m_didCalculateStyleSelector = true;
 }
 

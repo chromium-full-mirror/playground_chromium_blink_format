@@ -133,6 +133,8 @@ class ChromeClient {
 
   virtual void dashboardRegionsChanged();
 
+  virtual void populateVisitedLinks();
+
  protected:
   virtual ~ChromeClient() {}
 };

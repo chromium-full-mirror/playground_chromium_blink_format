@@ -142,12 +142,6 @@ const WebCore::Cursor& WebCore::moveCursor() {
   return localCursor;
 }
 
-namespace WebCore {
-bool historyContains(const UChar*, unsigned) {
-  return false;
-}
-}
-
 void WebCore::findWordBoundary(UChar const* str,
                                int len,
                                int position,
