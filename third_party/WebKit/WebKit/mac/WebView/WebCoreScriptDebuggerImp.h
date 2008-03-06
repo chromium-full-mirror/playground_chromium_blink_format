@@ -45,13 +45,12 @@ class UString;
 }
 
 @class WebScriptCallFrame;
-@class WebScriptDebugger;
 
 NSString* toNSString(const KJS::UString&);
 
 class WebCoreScriptDebuggerImp : public KJS::Debugger {
  public:
-  WebCoreScriptDebuggerImp(WebScriptDebugger*, KJS::JSGlobalObject*);
+  WebCoreScriptDebuggerImp(KJS::JSGlobalObject*);
 
   virtual bool sourceParsed(KJS::ExecState*,
                             int sourceID,
@@ -79,7 +78,6 @@ class WebCoreScriptDebuggerImp : public KJS::Debugger {
                          KJS::JSValue* exception);
 
  private:
-  WebScriptDebugger* m_debugger;
   bool m_callingDelegate;
   RetainPtr<WebScriptCallFrame> m_topCallFrame;
 };
