@@ -33,6 +33,8 @@
 
 #include <JavaScriptCore/debugger.h>
 
+#include <wtf/RetainPtr.h>
+
 namespace KJS {
 class ExecState;
 class JSGlobalObject;
@@ -79,7 +81,7 @@ class WebCoreScriptDebuggerImp : public KJS::Debugger {
  private:
   WebScriptDebugger* m_debugger;
   bool m_callingDelegate;
-  WebScriptCallFrame* m_topCallFrame;
+  RetainPtr<WebScriptCallFrame> m_topCallFrame;
 };
 
 #endif  // WebCoreScriptDebuggerImp_h
