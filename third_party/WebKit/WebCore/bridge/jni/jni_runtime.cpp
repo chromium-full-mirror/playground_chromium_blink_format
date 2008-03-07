@@ -52,15 +52,15 @@ JavaParameter::JavaParameter(JNIEnv* env, jstring type) {
 JavaField::JavaField(JNIEnv* env, jobject aField) {
   // Get field type
   jobject fieldType =
-      callJNIObjectMethod(aField, "getType", "()Ljava/lang/Class;");
-  jstring fieldTypeName = (jstring)callJNIObjectMethod(fieldType, "getName",
-                                                       "()Ljava/lang/String;");
+      callJNIMethod<jobject>(aField, "getType", "()Ljava/lang/Class;");
+  jstring fieldTypeName = (jstring)callJNIMethod<jobject>(
+      fieldType, "getName", "()Ljava/lang/String;");
   _type = JavaString(env, fieldTypeName);
   _JNIType = JNITypeFromClassName(_type.UTF8String());
 
   // Get field name
-  jstring fieldName =
-      (jstring)callJNIObjectMethod(aField, "getName", "()Ljava/lang/String;");
+  jstring fieldName = (jstring)callJNIMethod<jobject>(aField, "getName",
+                                                      "()Ljava/lang/String;");
   _name = JavaString(env, fieldName);
 
   _field = new JObjectWrapper(aField);
@@ -261,23 +261,23 @@ void JavaField::setValueToInstance(ExecState* exec,
 JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
   // Get return type
   jobject returnType =
-      callJNIObjectMethod(aMethod, "getReturnType", "()Ljava/lang/Class;");
-  jstring returnTypeName = (jstring)callJNIObjectMethod(returnType, "getName",
-                                                        "()Ljava/lang/String;");
+      callJNIMethod<jobject>(aMethod, "getReturnType", "()Ljava/lang/Class;");
+  jstring returnTypeName = (jstring)callJNIMethod<jobject>(
+      returnType, "getName", "()Ljava/lang/String;");
   _returnType = JavaString(env, returnTypeName);
   _JNIReturnType = JNITypeFromClassName(_returnType.UTF8String());
   env->DeleteLocalRef(returnType);
   env->DeleteLocalRef(returnTypeName);
 
   // Get method name
-  jstring methodName =
-      (jstring)callJNIObjectMethod(aMethod, "getName", "()Ljava/lang/String;");
+  jstring methodName = (jstring)callJNIMethod<jobject>(aMethod, "getName",
+                                                       "()Ljava/lang/String;");
   _name = JavaString(env, methodName);
   env->DeleteLocalRef(methodName);
 
   // Get parameters
-  jarray jparameters = (jarray)callJNIObjectMethod(aMethod, "getParameterTypes",
-                                                   "()[Ljava/lang/Class;");
+  jarray jparameters = (jarray)callJNIMethod<jobject>(
+      aMethod, "getParameterTypes", "()[Ljava/lang/Class;");
   _numParameters = env->GetArrayLength(jparameters);
   _parameters = new JavaParameter[_numParameters];
 
@@ -285,7 +285,7 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
   for (i = 0; i < _numParameters; i++) {
     jobject aParameter =
         env->GetObjectArrayElement((jobjectArray)jparameters, i);
-    jstring parameterName = (jstring)callJNIObjectMethod(
+    jstring parameterName = (jstring)callJNIMethod<jobject>(
         aParameter, "getName", "()Ljava/lang/String;");
     _parameters[i] = JavaParameter(env, parameterName);
     env->DeleteLocalRef(aParameter);
@@ -298,9 +298,9 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
   _methodID = 0;
 
   jclass modifierClass = env->FindClass("java/lang/reflect/Modifier");
-  int modifiers = callJNIIntMethod(aMethod, "getModifiers", "()I");
-  _isStatic = (bool)callJNIStaticBooleanMethod(modifierClass, "isStatic",
-                                               "(I)Z", modifiers);
+  int modifiers = callJNIMethod<jint>(aMethod, "getModifiers", "()I");
+  _isStatic = (bool)callJNIStaticMethod<jboolean>(modifierClass, "isStatic",
+                                                  "(I)Z", modifiers);
 }
 
 JavaMethod::~JavaMethod() {

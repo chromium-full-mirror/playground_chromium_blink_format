@@ -33,7 +33,7 @@ using namespace KJS::Bindings;
 
 JavaClass::JavaClass(jobject anInstance) {
   jobject aClass =
-      callJNIObjectMethod(anInstance, "getClass", "()Ljava/lang/Class;");
+      callJNIMethod<jobject>(anInstance, "getClass", "()Ljava/lang/Class;");
 
   if (!aClass) {
     fprintf(stderr, "%s:  unable to call getClass on instance %p\n",
@@ -41,8 +41,8 @@ JavaClass::JavaClass(jobject anInstance) {
     return;
   }
 
-  jstring className =
-      (jstring)callJNIObjectMethod(aClass, "getName", "()Ljava/lang/String;");
+  jstring className = (jstring)callJNIMethod<jobject>(aClass, "getName",
+                                                      "()Ljava/lang/String;");
   const char* classNameC = getCharactersFromJString(className);
   _name = strdup(classNameC);
   releaseCharactersForJString(className, classNameC);
@@ -51,8 +51,8 @@ JavaClass::JavaClass(jobject anInstance) {
   JNIEnv* env = getJNIEnv();
 
   // Get the fields
-  jarray fields = (jarray)callJNIObjectMethod(aClass, "getFields",
-                                              "()[Ljava/lang/reflect/Field;");
+  jarray fields = (jarray)callJNIMethod<jobject>(
+      aClass, "getFields", "()[Ljava/lang/reflect/Field;");
   int numFields = env->GetArrayLength(fields);
   for (i = 0; i < numFields; i++) {
     jobject aJField = env->GetObjectArrayElement((jobjectArray)fields, i);
@@ -66,8 +66,8 @@ JavaClass::JavaClass(jobject anInstance) {
   }
 
   // Get the methods
-  jarray methods = (jarray)callJNIObjectMethod(aClass, "getMethods",
-                                               "()[Ljava/lang/reflect/Method;");
+  jarray methods = (jarray)callJNIMethod<jobject>(
+      aClass, "getMethods", "()[Ljava/lang/reflect/Method;");
   int numMethods = env->GetArrayLength(methods);
   for (i = 0; i < numMethods; i++) {
     jobject aJMethod = env->GetObjectArrayElement((jobjectArray)methods, i);
