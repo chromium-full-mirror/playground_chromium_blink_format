@@ -502,8 +502,10 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame,
 }
 
 void WebChromeClient::populateVisitedLinks() {
-  WebHistory::sharedHistory()->addVisitedLinksToPageGroup(
-      m_webView->page()->group());
+  WebHistory* history = WebHistory::sharedHistory();
+  if (!history)
+    return;
+  history->addVisitedLinksToPageGroup(m_webView->page()->group());
 }
 
 COMPtr<IWebUIDelegate> WebChromeClient::uiDelegate() {
