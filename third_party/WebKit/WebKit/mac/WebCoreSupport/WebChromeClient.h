@@ -119,6 +119,8 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void dashboardRegionsChanged();
 
+  virtual void runOpenPanel(PassRefPtr<WebCore::FileChooser>);
+
  private:
   WebView* m_webView;
 };

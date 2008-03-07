@@ -135,6 +135,10 @@ class ChromeClient {
 
   virtual void populateVisitedLinks();
 
+#if PLATFORM(MAC)
+  virtual void runOpenPanel(PassRefPtr<FileChooser>);
+#endif
+
  protected:
   virtual ~ChromeClient() {}
 };

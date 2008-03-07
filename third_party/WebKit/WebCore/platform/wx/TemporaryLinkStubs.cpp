@@ -267,15 +267,6 @@ void PlatformScrollbar::setRect(const IntRect&) {
   notImplemented();
 }
 
-FileChooser::FileChooser(FileChooserClient*, const String& initialFilename)
-    : RefCounted<FileChooser>(0) {
-  notImplemented();
-}
-// PassRefPtr<FileChooser> FileChooser::create(FileChooserClient*, const String&
-// initialFilename) { notImplemented(); return PassRefPtr<FileChooser>(); }
-FileChooser::~FileChooser() {
-  notImplemented();
-}
 void FileChooser::openFileChooser(Document*) {
   notImplemented();
 }
