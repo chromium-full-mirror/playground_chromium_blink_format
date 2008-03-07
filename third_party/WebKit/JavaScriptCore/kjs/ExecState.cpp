@@ -87,8 +87,11 @@ inline ExecState::ExecState(JSGlobalObject* globalObject,
 }
 
 inline ExecState::ExecState(JSGlobalObject* globalObject,
+                            JSObject* thisObject,
                             EvalNode* evalNode,
-                            ExecState* callingExec)
+                            ExecState* callingExec,
+                            const ScopeChain& scopeChain,
+                            JSVariableObject* variableObject)
     : m_globalObject(globalObject),
       m_exception(0),
       m_propertyNames(callingExec->m_propertyNames),
@@ -99,9 +102,9 @@ inline ExecState::ExecState(JSGlobalObject* globalObject,
       m_arguments(0),
       m_activation(0),
       m_localStorage(callingExec->m_localStorage),
-      m_scopeChain(callingExec->m_scopeChain),
-      m_variableObject(callingExec->m_variableObject),
-      m_thisValue(callingExec->m_thisValue),
+      m_scopeChain(scopeChain),
+      m_variableObject(variableObject),
+      m_thisValue(thisObject),
       m_iterationDepth(0),
       m_switchDepth(0),
       m_codeType(EvalCode) {
@@ -179,9 +182,17 @@ InterpreterExecState::~InterpreterExecState() {
 }
 
 EvalExecState::EvalExecState(JSGlobalObject* globalObject,
+                             JSObject* thisObj,
                              EvalNode* evalNode,
-                             ExecState* callingExec)
-    : ExecState(globalObject, evalNode, callingExec) {
+                             ExecState* callingExec,
+                             const ScopeChain& scopeChain,
+                             JSVariableObject* variableObject)
+    : ExecState(globalObject,
+                thisObj,
+                evalNode,
+                callingExec,
+                scopeChain,
+                variableObject) {
   inlineActiveExecStates().append(this);
 }
 

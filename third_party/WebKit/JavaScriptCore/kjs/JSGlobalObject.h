@@ -48,6 +48,7 @@ class NumberObjectImp;
 class NumberPrototype;
 class ObjectObjectImp;
 class ObjectPrototype;
+class PrototypeReflexiveFunction;
 class RangeError;
 class RangeErrorPrototype;
 class ReferenceError;
@@ -105,6 +106,8 @@ class JSGlobalObject : public JSVariableObject {
     NativeErrorImp* syntaxErrorConstructor;
     NativeErrorImp* typeErrorConstructor;
     NativeErrorImp* URIErrorConstructor;
+
+    PrototypeReflexiveFunction* evalFunction;
 
     ObjectPrototype* objectPrototype;
     FunctionPrototype* functionPrototype;
@@ -191,6 +194,8 @@ class JSGlobalObject : public JSVariableObject {
   NativeErrorImp* URIErrorConstructor() const {
     return d()->URIErrorConstructor;
   }
+
+  PrototypeReflexiveFunction* evalFunction() const { return d()->evalFunction; }
 
   ObjectPrototype* objectPrototype() const { return d()->objectPrototype; }
   FunctionPrototype* functionPrototype() const {

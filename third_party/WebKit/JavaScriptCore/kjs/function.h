@@ -149,7 +149,9 @@ class Arguments : public JSObject {
 
 class PrototypeFunction : public InternalFunctionImp {
  public:
-  typedef KJS::JSValue* (*JSMemberFunction)(ExecState*, JSObject*, const List&);
+  typedef JSValue* (*JSMemberFunction)(ExecState*,
+                                       JSObject* thisObj,
+                                       const List&);
 
   PrototypeFunction(ExecState*, int len, const Identifier&, JSMemberFunction);
   PrototypeFunction(ExecState*,
@@ -166,8 +168,34 @@ class PrototypeFunction : public InternalFunctionImp {
   const JSMemberFunction m_function;
 };
 
+// Just like PrototypeFunction, but callbacks also get passed the JS function
+// object.
+class PrototypeReflexiveFunction : public InternalFunctionImp {
+ public:
+  typedef JSValue* (*JSMemberFunction)(ExecState*,
+                                       PrototypeReflexiveFunction*,
+                                       JSObject* thisObj,
+                                       const List&);
+
+  PrototypeReflexiveFunction(ExecState*,
+                             FunctionPrototype*,
+                             int len,
+                             const Identifier&,
+                             JSMemberFunction);
+
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List&);
+
+ private:
+  const JSMemberFunction m_function;
+};
+
 // Global Functions
-JSValue* globalFuncEval(ExecState*, JSObject*, const List&);
+JSValue* globalFuncEval(ExecState*,
+                        PrototypeReflexiveFunction*,
+                        JSObject*,
+                        const List&);
 JSValue* globalFuncParseInt(ExecState*, JSObject*, const List&);
 JSValue* globalFuncParseFloat(ExecState*, JSObject*, const List&);
 JSValue* globalFuncIsNaN(ExecState*, JSObject*, const List&);
@@ -181,6 +209,13 @@ JSValue* globalFuncUnescape(ExecState*, JSObject*, const List&);
 #ifndef NDEBUG
 JSValue* globalFuncKJSPrint(ExecState*, JSObject*, const List&);
 #endif
+
+JSValue* eval(ExecState*,
+              const ScopeChain&,
+              JSVariableObject*,
+              JSGlobalObject*,
+              JSObject* thisObj,
+              const List& args);
 
 static const double mantissaOverflowLowerBound = 9007199254740992.0;
 double parseIntOverflow(const char*, int length, int radix);

@@ -165,7 +165,12 @@ class ExecState : Noncopyable {
  protected:
   ExecState(JSGlobalObject*);
   ExecState(JSGlobalObject*, JSObject* thisObject, ProgramNode*);
-  ExecState(JSGlobalObject*, EvalNode*, ExecState* callingExecState);
+  ExecState(JSGlobalObject*,
+            JSObject* thisObject,
+            EvalNode*,
+            ExecState* callingExecState,
+            const ScopeChain&,
+            JSVariableObject*);
   ExecState(JSGlobalObject*,
             JSObject* thisObject,
             FunctionBodyNode*,
@@ -218,7 +223,12 @@ class InterpreterExecState : public ExecState {
 
 class EvalExecState : public ExecState {
  public:
-  EvalExecState(JSGlobalObject*, EvalNode*, ExecState* callingExecState);
+  EvalExecState(JSGlobalObject*,
+                JSObject* thisObj,
+                EvalNode*,
+                ExecState* callingExec,
+                const ScopeChain&,
+                JSVariableObject*);
   ~EvalExecState();
 };
 

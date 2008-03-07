@@ -76,6 +76,9 @@ class ScopeChain {
     if (_node)
       ++_node->refCount;
   }
+
+  ScopeChain(JSObject* o) : _node(new ScopeChainNode(0, o)) {}
+
   ScopeChain& operator=(const ScopeChain&);
 
   bool isEmpty() const { return !_node; }

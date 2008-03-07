@@ -32,7 +32,7 @@
           macro(input) macro(length) macro(message) macro(multiline)          \
               macro(name) macro(prototype) macro(source) macro(toExponential) \
                   macro(toFixed) macro(toLocaleString) macro(toPrecision)     \
-                      macro(toString) macro(valueOf)
+                      macro(toString) macro(valueOf) macro(eval)
 
 namespace KJS {
 
