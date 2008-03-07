@@ -49,6 +49,9 @@ class HTMLDocument : public Document, public CachedResourceClient {
 
   String compatMode() const;
 
+  Element* activeElement();
+  bool hasFocus();
+
   String bgColor();
   void setBgColor(const String&);
   String fgColor();
