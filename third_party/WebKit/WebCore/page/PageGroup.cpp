@@ -36,6 +36,18 @@ namespace WebCore {
 
 static bool shouldTrackVisitedLinks;
 
+// To use a hash value as a key for a hash table, we need to eliminate the
+// "deleted" value, which is negative one. That could be done by changing
+// the hash function to never generate negative one, but this works and is
+// still relatively efficient.
+static inline unsigned avoidDeletedValue(unsigned hash) {
+  ASSERT(hash);
+  unsigned newHash = hash | (!(hash + 1) << 31);
+  ASSERT(newHash);
+  ASSERT(newHash != 0xFFFFFFFF);
+  return newHash;
+}
+
 PageGroup::PageGroup(Page* page) : m_visitedLinksPopulated(false) {
   ASSERT(page);
   m_pages.add(page);
@@ -180,9 +192,8 @@ bool PageGroup::isLinkVisited(Document* document,
   if (!length)
     return false;
 
-  // FIXME: It is strange that we do not do further processing on strings that
-  // have "://" in them.
-  // That's clearly incorrect for at least these reasons:
+  // FIXME: It is wrong that we do not do further processing on strings that
+  // have "://" in them:
   //    1) The "://" could be in the query or anchor.
   //    2) The URL's path could have a "/./" or a "/../" or a "//" sequence in
   //    it.
@@ -195,7 +206,7 @@ bool PageGroup::isLinkVisited(Document* document,
 
   if (hasColonSlashSlash && !needsTrailingSlash(characters, length))
     return m_visitedLinkHashes.contains(
-        StringImpl::computeHash(characters, length));
+        avoidDeletedValue(attributeURL.string().impl()->hash()));
 
   Vector<UChar, 512> buffer;
 
@@ -211,8 +222,8 @@ bool PageGroup::isLinkVisited(Document* document,
     // end of the path, *before* the query or anchor.
     buffer.append(characters, length);
     buffer.append('/');
-    return m_visitedLinkHashes.contains(
-        StringImpl::computeHash(buffer.data(), buffer.size()));
+    return m_visitedLinkHashes.contains(avoidDeletedValue(
+        StringImpl::computeHash(buffer.data(), buffer.size())));
   }
 
   const KURL& baseURL = document->baseURL();
@@ -238,20 +249,21 @@ bool PageGroup::isLinkVisited(Document* document,
   }
 
   return m_visitedLinkHashes.contains(
-      StringImpl::computeHash(buffer.data(), buffer.size()));
+      avoidDeletedValue(StringImpl::computeHash(buffer.data(), buffer.size())));
 }
 
 void PageGroup::addVisitedLink(const KURL& url) {
   if (!shouldTrackVisitedLinks)
     return;
   ASSERT(!url.isEmpty());
-  m_visitedLinkHashes.add(url.string().impl()->hash());
+  m_visitedLinkHashes.add(avoidDeletedValue(url.string().impl()->hash()));
 }
 
 void PageGroup::addVisitedLink(const UChar* characters, size_t length) {
   if (!shouldTrackVisitedLinks)
     return;
-  m_visitedLinkHashes.add(StringImpl::computeHash(characters, length));
+  m_visitedLinkHashes.add(
+      avoidDeletedValue(StringImpl::computeHash(characters, length)));
 }
 
 void PageGroup::removeVisitedLinks() {
