@@ -44,9 +44,13 @@
 #include "HTMLNames.h"
 #include "ImageBuffer.h"
 #include "ImageData.h"
+#include "KURL.h"
 #include "NotImplemented.h"
+#include "Page.h"
 #include "RenderHTMLCanvas.h"
+#include "SecurityOrigin.h"
 #include "Settings.h"
+#include <kjs/interpreter.h>
 #include <wtf/MathExtras.h>
 
 #if PLATFORM(QT)
@@ -113,6 +117,14 @@ CanvasStyle* CanvasRenderingContext2D::strokeStyle() const {
 void CanvasRenderingContext2D::setStrokeStyle(PassRefPtr<CanvasStyle> style) {
   if (!style)
     return;
+
+  if (m_canvas->originClean()) {
+    if (CanvasPattern* pattern = style->pattern()) {
+      if (!pattern->originClean())
+        m_canvas->setOriginTainted();
+    }
+  }
+
   state().m_strokeStyle = style;
   GraphicsContext* c = drawingContext();
   if (!c)
@@ -128,6 +140,14 @@ CanvasStyle* CanvasRenderingContext2D::fillStyle() const {
 void CanvasRenderingContext2D::setFillStyle(PassRefPtr<CanvasStyle> style) {
   if (!style)
     return;
+
+  if (m_canvas->originClean()) {
+    if (CanvasPattern* pattern = style->pattern()) {
+      if (!pattern->originClean())
+        m_canvas->setOriginTainted();
+    }
+  }
+
   state().m_fillStyle = style;
   GraphicsContext* c = drawingContext();
   if (!c)
@@ -913,6 +933,14 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
             FloatRect(x, y, width, height), ec);
 }
 
+void CanvasRenderingContext2D::checkOrigin(const KURL& url) {
+  RefPtr<SecurityOrigin> origin =
+      SecurityOrigin::create(url.protocol(), url.host(), url.port(), 0);
+  SecurityOrigin::Reason reason;
+  if (!m_canvas->document()->securityOrigin()->canAccess(origin.get(), reason))
+    m_canvas->setOriginTainted();
+}
+
 void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
                                          const FloatRect& srcRect,
                                          const FloatRect& dstRect,
@@ -939,6 +967,9 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
   CachedImage* cachedImage = image->cachedImage();
   if (!cachedImage)
     return;
+
+  if (m_canvas->originClean())
+    checkOrigin(KURL(cachedImage->url()));
 
   FloatRect sourceRect = c->roundToDevicePixels(srcRect);
   FloatRect destRect = c->roundToDevicePixels(dstRect);
@@ -997,6 +1028,9 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
   if (!buffer)
     return;
 
+  if (!canvas->originClean())
+    m_canvas->setOriginTainted();
+
   willDraw(destRect);
   c->drawImage(buffer, sourceRect, destRect);
 }
@@ -1020,6 +1054,9 @@ void CanvasRenderingContext2D::drawImageFromRect(
   CachedImage* cachedImage = image->cachedImage();
   if (!cachedImage)
     return;
+
+  if (m_canvas->originClean())
+    checkOrigin(KURL(cachedImage->url()));
 
   GraphicsContext* c = drawingContext();
   if (!c)
@@ -1069,7 +1106,17 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
   CanvasPattern::parseRepetitionType(repetitionType, repeatX, repeatY, ec);
   if (ec)
     return 0;
-  return new CanvasPattern(image ? image->cachedImage() : 0, repeatX, repeatY);
+
+  bool originClean = true;
+  if (CachedImage* cachedImage = image->cachedImage()) {
+    KURL url(cachedImage->url());
+    RefPtr<SecurityOrigin> origin =
+        SecurityOrigin::create(url.protocol(), url.host(), url.port(), 0);
+    SecurityOrigin::Reason reason;
+    originClean =
+        m_canvas->document()->securityOrigin()->canAccess(origin.get(), reason);
+  }
+  return new CanvasPattern(image->cachedImage(), repeatX, repeatY, originClean);
 }
 
 PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
@@ -1087,7 +1134,7 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
   if (!image)
     return 0;
   PassRefPtr<CanvasPattern> pattern =
-      new CanvasPattern(image, repeatX, repeatY);
+      new CanvasPattern(image, repeatX, repeatY, canvas->originClean());
   CGImageRelease(image);
   return pattern;
 #elif PLATFORM(CAIRO)
@@ -1095,7 +1142,7 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
   if (!surface)
     return 0;
   PassRefPtr<CanvasPattern> pattern =
-      new CanvasPattern(surface, repeatX, repeatY);
+      new CanvasPattern(surface, repeatX, repeatY, canvas->originClean());
   cairo_surface_destroy(surface);
   return pattern;
 #else
@@ -1245,10 +1292,36 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::createImageData(
   return createEmptyImageData(scaledSize);
 }
 
+void CanvasRenderingContext2D::printSecurityExceptionMessage() const {
+  static const char* message =
+      "Call to getImageData failed due to tainted canvas.\n";
+
+  Frame* frame = m_canvas->document()->frame();
+  if (!frame)
+    return;
+  if (frame->settings()->privateBrowsingEnabled())
+    return;
+  if (KJS::Interpreter::shouldPrintExceptions())
+    printf("%s", message);
+  if (Page* page = frame->page())
+    page->chrome()->addMessageToConsole(
+        JSMessageSource, ErrorMessageLevel, message, 1,
+        String());  // FIXME: provide a real line number and source URL.
+}
+
 PassRefPtr<ImageData> CanvasRenderingContext2D::getImageData(float sx,
                                                              float sy,
                                                              float sw,
                                                              float sh) const {
+  if (!m_canvas->originClean()) {
+    // FIXME: the WHATWG specification says that this should raise a "security
+    // exception", but does not currently
+    // define what one is.  For now, we will silently fail with only a log
+    // message.
+    printSecurityExceptionMessage();
+    return 0;
+  }
+
   FloatRect unscaledRect(sx, sy, sw, sh);
   IntRect scaledRect = m_canvas ? m_canvas->convertLogicalToDevice(unscaledRect)
                                 : enclosingIntRect(unscaledRect);

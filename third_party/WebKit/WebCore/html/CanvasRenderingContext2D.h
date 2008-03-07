@@ -46,6 +46,7 @@ class GraphicsContext;
 class HTMLCanvasElement;
 class HTMLImageElement;
 class ImageData;
+class KURL;
 
 typedef int ExceptionCode;
 
@@ -302,6 +303,10 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
   void applyFillPattern();
 
   void clearPathForDashboardBackwardCompatibilityMode();
+
+  void checkOrigin(const KURL&);
+
+  void printSecurityExceptionMessage() const;
 
   HTMLCanvasElement* m_canvas;
   Vector<State, 1> m_stateStack;
