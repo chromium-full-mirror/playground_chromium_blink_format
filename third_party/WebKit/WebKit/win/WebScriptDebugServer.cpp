@@ -33,7 +33,7 @@
 #pragma warning(push, 0)
 #include <WebCore/DOMWindow.h>
 #include <WebCore/JSDOMWindow.h>
-#include <WebCore/Page.h>
+#include <WebCore/JavaScriptDebugServer.h>
 #pragma warning(pop)
 #include <kjs/ExecState.h>
 #include <wtf/Assertions.h>
@@ -69,7 +69,7 @@ unsigned WebScriptDebugServer::listenerCount() {
 // ------------------------------------------------------------
 
 WebScriptDebugServer::WebScriptDebugServer()
-    : m_refCount(0), m_paused(false), m_step(false), m_callingListeners(false) {
+    : m_refCount(0), m_paused(false), m_step(false) {
   gClassCount++;
 }
 
@@ -92,13 +92,6 @@ WebScriptDebugServer* WebScriptDebugServer::sharedWebScriptDebugServer() {
   }
 
   return server;
-}
-
-void WebScriptDebugServer::pageCreated(Page* page) {
-  ASSERT_ARG(page, page);
-
-  if (s_ListenerCount > 0)
-    page->setDebugger(sharedWebScriptDebugServer());
 }
 
 // IUnknown -------------------------------------------------------------------
@@ -152,7 +145,7 @@ HRESULT STDMETHODCALLTYPE WebScriptDebugServer::addListener(
     return E_POINTER;
 
   if (!s_ListenerCount)
-    Page::setDebuggerForAllPages(sharedWebScriptDebugServer());
+    JavaScriptDebugServer::shared().addListener(this);
 
   ++s_ListenerCount;
   s_Listeners.add(listener);
@@ -175,7 +168,7 @@ HRESULT STDMETHODCALLTYPE WebScriptDebugServer::removeListener(
 
   ASSERT(s_ListenerCount >= 1);
   if (--s_ListenerCount == 0) {
-    Page::setDebuggerForAllPages(0);
+    JavaScriptDebugServer::shared().removeListener(this);
     resume();
   }
 
@@ -275,55 +268,46 @@ void WebScriptDebugServer::didLoadMainResourceForDataSource(
     (**it).didLoadMainResourceForDataSource(webView, dataSource);
 }
 
-bool WebScriptDebugServer::sourceParsed(ExecState* exec,
-                                        int sourceID,
-                                        const UString& sourceURL,
-                                        const UString& source,
-                                        int startingLineNumber,
-                                        int errorLine,
-                                        const UString& /*errorMsg*/) {
-  if (m_callingListeners)
-    return true;
-
-  m_callingListeners = true;
-
-  if (listenerCount() <= 0)
-    return true;
-
-  BString bSource = String(source);
-  BString bSourceURL = String(sourceURL);
+void WebScriptDebugServer::didParseSource(ExecState* exec,
+                                          const String& source,
+                                          int startingLineNumber,
+                                          const String& sourceURL,
+                                          int sourceID) {
+  BString bSource = source;
+  BString bSourceURL = sourceURL;
 
   ListenerSet listenersCopy = s_Listeners;
   ListenerSet::iterator end = listenersCopy.end();
-  if (errorLine == -1) {
-    for (ListenerSet::iterator it = listenersCopy.begin(); it != end; ++it)
-      (**it).didParseSource(webView(exec), bSource, startingLineNumber,
-                            bSourceURL, sourceID, webFrame(exec));
-  } else {
-    // FIXME: the error var should be made with the information in the errorMsg.
-    // It is not a simple
-    // UString to BSTR conversion there is some logic involved that I don't
-    // fully understand yet.
-    BString error(L"An Error Occurred.");
-    for (ListenerSet::iterator it = listenersCopy.begin(); it != end; ++it)
-      (**it).failedToParseSource(webView(exec), bSource, startingLineNumber,
-                                 bSourceURL, error, webFrame(exec));
-  }
-
-  m_callingListeners = false;
-  return true;
+  for (ListenerSet::iterator it = listenersCopy.begin(); it != end; ++it)
+    (**it).didParseSource(webView(exec), bSource, startingLineNumber,
+                          bSourceURL, sourceID, webFrame(exec));
 }
 
-bool WebScriptDebugServer::callEvent(ExecState* exec,
-                                     int sourceID,
-                                     int lineNumber,
-                                     JSObject* /*function*/,
-                                     const List& /*args*/) {
-  if (m_callingListeners)
-    return true;
+void WebScriptDebugServer::failedToParseSource(ExecState* exec,
+                                               const String& source,
+                                               int startingLineNumber,
+                                               const String& sourceURL,
+                                               int errorLine,
+                                               const String& errorMessage) {
+  BString bSource = source;
+  BString bSourceURL = sourceURL;
 
-  m_callingListeners = true;
+  // FIXME: the error var should be made with the information in the errorMsg.
+  // It is not a simple
+  // UString to BSTR conversion there is some logic involved that I don't fully
+  // understand yet.
+  BString error(L"An Error Occurred.");
 
+  ListenerSet listenersCopy = s_Listeners;
+  ListenerSet::iterator end = listenersCopy.end();
+  for (ListenerSet::iterator it = listenersCopy.begin(); it != end; ++it)
+    (**it).failedToParseSource(webView(exec), bSource, startingLineNumber,
+                               bSourceURL, error, webFrame(exec));
+}
+
+void WebScriptDebugServer::didEnterCallFrame(ExecState* exec,
+                                             int sourceID,
+                                             int lineNumber) {
   COMPtr<WebScriptCallFrame> callFrame(
       AdoptCOM, WebScriptCallFrame::createInstance(exec));
   ListenerSet listenersCopy = s_Listeners;
@@ -333,45 +317,25 @@ bool WebScriptDebugServer::callEvent(ExecState* exec,
                              lineNumber, webFrame(exec));
 
   suspendProcessIfPaused();
-
-  m_callingListeners = false;
-
-  return true;
 }
 
-bool WebScriptDebugServer::atStatement(ExecState* exec,
-                                       int sourceID,
-                                       int firstLine,
-                                       int /*lastLine*/) {
-  if (m_callingListeners)
-    return true;
-
-  m_callingListeners = true;
-
+void WebScriptDebugServer::willExecuteStatement(ExecState* exec,
+                                                int sourceID,
+                                                int lineNumber) {
   COMPtr<WebScriptCallFrame> callFrame(
       AdoptCOM, WebScriptCallFrame::createInstance(exec));
   ListenerSet listenersCopy = s_Listeners;
   ListenerSet::iterator end = listenersCopy.end();
   for (ListenerSet::iterator it = listenersCopy.begin(); it != end; ++it)
     (**it).willExecuteStatement(webView(exec), callFrame.get(), sourceID,
-                                firstLine, webFrame(exec));
+                                lineNumber, webFrame(exec));
 
   suspendProcessIfPaused();
-
-  m_callingListeners = false;
-
-  return true;
 }
 
-bool WebScriptDebugServer::returnEvent(ExecState* exec,
-                                       int sourceID,
-                                       int lineNumber,
-                                       JSObject* /*function*/) {
-  if (m_callingListeners)
-    return true;
-
-  m_callingListeners = true;
-
+void WebScriptDebugServer::willLeaveCallFrame(ExecState* exec,
+                                              int sourceID,
+                                              int lineNumber) {
   COMPtr<WebScriptCallFrame> callFrame(
       AdoptCOM, WebScriptCallFrame::createInstance(exec->callingExecState()));
   ListenerSet listenersCopy = s_Listeners;
@@ -381,21 +345,11 @@ bool WebScriptDebugServer::returnEvent(ExecState* exec,
                               lineNumber, webFrame(exec));
 
   suspendProcessIfPaused();
-
-  m_callingListeners = false;
-
-  return true;
 }
 
-bool WebScriptDebugServer::exception(ExecState* exec,
-                                     int sourceID,
-                                     int lineNumber,
-                                     JSValue* /*exception */) {
-  if (m_callingListeners)
-    return true;
-
-  m_callingListeners = true;
-
+void WebScriptDebugServer::exceptionWasRaised(ExecState* exec,
+                                              int sourceID,
+                                              int lineNumber) {
   COMPtr<WebScriptCallFrame> callFrame(
       AdoptCOM, WebScriptCallFrame::createInstance(exec));
   ListenerSet listenersCopy = s_Listeners;
@@ -405,10 +359,6 @@ bool WebScriptDebugServer::exception(ExecState* exec,
                               lineNumber, webFrame(exec));
 
   suspendProcessIfPaused();
-
-  m_callingListeners = false;
-
-  return true;
 }
 
 void WebScriptDebugServer::serverDidDie() {
