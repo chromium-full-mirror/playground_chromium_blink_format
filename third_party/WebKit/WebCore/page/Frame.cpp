@@ -1052,7 +1052,7 @@ PassRefPtr<KJS::Bindings::RootObject> Frame::createRootObject(
   return rootObject.release();
 }
 
-#if USE(NPOBJECT)
+#if ENABLE(NETSCAPE_PLUGIN_API)
 NPObject* Frame::windowScriptNPObject() {
   if (!d->m_windowScriptNPObject) {
     if (scriptProxy()->isEnabled()) {
@@ -1112,7 +1112,7 @@ void Frame::clearScriptObjects() {
     d->m_bindingRootObject = 0;
   }
 
-#if USE(NPOBJECT)
+#if ENABLE(NETSCAPE_PLUGIN_API)
   if (d->m_windowScriptNPObject) {
     // Call _NPN_DeallocateObject() instead of _NPN_ReleaseObject() so that we
     // don't leak if a plugin fails to release the window
@@ -1890,8 +1890,11 @@ FramePrivate::FramePrivate(Page* page,
       m_inViewSourceMode(false),
       frameCount(0),
       m_prohibitsScrolling(false),
-      m_needsReapplyStyles(false),
+      m_needsReapplyStyles(false)
+#if ENABLE(NETSCAPE_PLUGIN_API)
+      ,
       m_windowScriptNPObject(0)
+#endif
 #if FRAME_LOADS_USER_STYLESHEET
       ,
       m_userStyleSheetLoader(0)

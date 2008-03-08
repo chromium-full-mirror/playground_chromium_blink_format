@@ -41,7 +41,7 @@ class KeyboardEvent;
 - (void)_selectionChanged;
 - (void)_updateFontPanel;
 - (BOOL)_canSmartCopyOrDelete;
-#ifndef __LP64__
+#if ENABLE(NETSCAPE_PLUGIN_API)
 - (void)_pauseNullEventsForAllNetscapePlugins;
 - (void)_resumeNullEventsForAllNetscapePlugins;
 #endif

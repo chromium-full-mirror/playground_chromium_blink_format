@@ -188,7 +188,7 @@ class Frame : public RefCounted<Frame> {
   WebScriptObject* windowScriptObject();
 #endif
 
-#if USE(NPOBJECT)
+#if ENABLE(NETSCAPE_PLUGIN_API)
   NPObject* windowScriptNPObject();
 #endif
 
