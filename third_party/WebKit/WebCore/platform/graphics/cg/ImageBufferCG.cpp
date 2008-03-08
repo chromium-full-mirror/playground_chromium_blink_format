@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Nikolas Zimmermann <zimmermann@kde.org>
- * Copyright (C) 2008 Apple, Inc
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,11 +27,16 @@
 #include "config.h"
 #include "ImageBuffer.h"
 
+#include "Base64.h"
+#include "CString.h"
 #include "GraphicsContext.h"
 #include "ImageData.h"
-
+#include "MIMETypeRegistry.h"
+#include "PlatformString.h"
 #include <ApplicationServices/ApplicationServices.h>
 #include <wtf/Assertions.h>
+#include <wtf/OwnArrayPtr.h>
+#include <wtf/RetainPtr.h>
 
 using namespace std;
 
@@ -217,4 +222,68 @@ void ImageBuffer::putImageData(ImageData* source,
     srcRows += srcBytesPerRow;
   }
 }
+
+String ImageBuffer::toDataURL(const String& mimeType) const {
+  ASSERT(MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(mimeType));
+
+  RetainPtr<CGImageRef> image(
+      AdoptCF, CGBitmapContextCreateImage(context()->platformContext()));
+  if (!image)
+    return String("data:,");
+
+  size_t width = CGImageGetWidth(image.get());
+  size_t height = CGImageGetHeight(image.get());
+
+  OwnArrayPtr<uint32_t> imageData(new uint32_t[width * height]);
+
+  RetainPtr<CGContextRef> bitmapContext(
+      AdoptCF, CGBitmapContextCreate(imageData.get(), width, height,
+                                     CGImageGetBitsPerComponent(image.get()),
+                                     CGImageGetBytesPerRow(image.get()),
+                                     CGImageGetColorSpace(image.get()),
+                                     kCGImageAlphaPremultipliedFirst));
+  if (!bitmapContext)
+    return String("data:,");
+
+  CGContextSaveGState(bitmapContext.get());
+  CGContextTranslateCTM(bitmapContext.get(), 0, height);
+  CGContextScaleCTM(bitmapContext.get(), 1.0f, -1.0f);
+  CGContextDrawImage(bitmapContext.get(), CGRectMake(0.0f, 0.0f, width, height),
+                     image.get());
+  CGContextRestoreGState(bitmapContext.get());
+
+  RetainPtr<CGImageRef> transformedImage(
+      AdoptCF, CGBitmapContextCreateImage(bitmapContext.get()));
+  if (!transformedImage)
+    return String("data:,");
+
+  RetainPtr<CFMutableDataRef> transformedImageData(
+      AdoptCF, CFDataCreateMutable(kCFAllocatorDefault, 0));
+  if (!transformedImageData)
+    return String("data:,");
+
+  RetainPtr<CFStringRef> imageUTI(
+      AdoptCF, UTTypeCreatePreferredIdentifierForTag(
+                   kUTTagClassMIMEType, mimeType.createCFString(), 0));
+  RetainPtr<CGImageDestinationRef> imageDestination(
+      AdoptCF, CGImageDestinationCreateWithData(transformedImageData.get(),
+                                                imageUTI.get(), 1, 0));
+  if (!imageDestination)
+    return String("data:,");
+
+  CGImageDestinationAddImage(imageDestination.get(), transformedImage.get(), 0);
+  CGImageDestinationFinalize(imageDestination.get());
+
+  Vector<char> in;
+  in.append(CFDataGetBytePtr(transformedImageData.get()),
+            CFDataGetLength(transformedImageData.get()));
+
+  Vector<char> out;
+  base64Encode(in, out);
+  out.append('\0');
+
+  return String::format("data:%s;base64,%s", mimeType.utf8().data(),
+                        out.data());
 }
+
+}  // namespace WebCore

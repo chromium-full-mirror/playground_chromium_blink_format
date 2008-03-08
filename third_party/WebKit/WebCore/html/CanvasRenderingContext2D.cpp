@@ -1293,7 +1293,7 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::createImageData(
 }
 
 void CanvasRenderingContext2D::printSecurityExceptionMessage() const {
-  static const char* message =
+  const char* const message =
       "Call to getImageData failed due to tainted canvas.\n";
 
   Frame* frame = m_canvas->document()->frame();

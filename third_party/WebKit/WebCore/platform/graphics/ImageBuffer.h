@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Nikolas Zimmermann <zimmermann@kde.org>
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -52,6 +52,7 @@ class ImageData;
 class IntPoint;
 class IntRect;
 class RenderObject;
+class String;
 
 class ImageBuffer : Noncopyable {
  public:
@@ -74,6 +75,8 @@ class ImageBuffer : Noncopyable {
                     const IntRect& sourceRect,
                     const IntPoint& destPoint);
 
+  String toDataURL(const String& mimeType) const;
+
  private:
   void* m_data;
   IntSize m_size;
@@ -92,6 +95,7 @@ class ImageBuffer : Noncopyable {
   mutable cairo_surface_t* m_surface;
 #endif
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // ImageBuffer_h

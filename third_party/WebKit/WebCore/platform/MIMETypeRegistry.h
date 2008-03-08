@@ -48,6 +48,9 @@ class MIMETypeRegistry {
   // document in a frame.
   static bool isSupportedImageResourceMIMEType(const String& mimeType);
 
+  // Check to see if a mime type is suitable for being encoded.
+  static bool isSupportedImageMIMETypeForEncoding(const String& mimeType);
+
   // Check to see if a mime type is suitable for being loaded as a JavaScript
   // resource.
   static bool isSupportedJavaScriptMIMEType(const String& mimeType);
@@ -65,6 +68,7 @@ class MIMETypeRegistry {
 
   static HashSet<String>& getSupportedImageMIMETypes();
   static HashSet<String>& getSupportedImageResourceMIMETypes();
+  static HashSet<String>& getSupportedImageMIMETypesForEncoding();
   static HashSet<String>& getSupportedNonImageMIMETypes();
   static HashSet<String>& getSupportedMediaMIMETypes();
 };
