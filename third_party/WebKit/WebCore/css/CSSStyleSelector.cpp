@@ -335,7 +335,7 @@ void CSSStyleSelector::init() {
 
 CSSStyleSelector::~CSSStyleSelector() {
   delete m_medium;
-  delete m_rootDefaultStyle;
+  ::delete m_rootDefaultStyle;
   delete m_authorStyle;
   delete m_userStyle;
 }
