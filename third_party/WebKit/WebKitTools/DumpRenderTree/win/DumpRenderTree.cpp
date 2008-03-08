@@ -608,8 +608,10 @@ void dump() {
       dumpBackForwardListForAllWindows();
   }
 
-  if (printSeparators)
+  if (printSeparators) {
     puts("#EOF");
+    fputs("#EOF\n", stderr);
+  }
 
   if (dumpPixels) {
     if (layoutTestController->dumpAsText() ||
@@ -1103,6 +1105,7 @@ int main(int argc, char* argv[]) {
 
       runTest(filenameBuffer);
       fflush(stdout);
+      fflush(stderr);
     }
   } else {
     printSeparators = tests.size() > 1;
