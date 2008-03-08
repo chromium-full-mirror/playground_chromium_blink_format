@@ -103,7 +103,9 @@ void CanvasRenderingContext2D::restore() {
   ASSERT(m_stateStack.size() >= 1);
   if (m_stateStack.size() <= 1)
     return;
+  m_path.transform(state().m_transform);
   m_stateStack.removeLast();
+  m_path.transform(state().m_transform.inverse());
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
@@ -292,7 +294,8 @@ void CanvasRenderingContext2D::scale(float sx, float sy) {
   if (!c)
     return;
   c->scale(FloatSize(sx, sy));
-  state().m_path.transform(AffineTransform().scale(1.0 / sx, 1.0 / sy));
+  state().m_transform.scale(sx, sy);
+  m_path.transform(AffineTransform().scale(1.0 / sx, 1.0 / sy));
 }
 
 void CanvasRenderingContext2D::rotate(float angleInRadians) {
@@ -300,7 +303,8 @@ void CanvasRenderingContext2D::rotate(float angleInRadians) {
   if (!c)
     return;
   c->rotate(angleInRadians);
-  state().m_path.transform(
+  state().m_transform.rotate(angleInRadians / piDouble * 180.0);
+  m_path.transform(
       AffineTransform().rotate(-angleInRadians / piDouble * 180.0));
 }
 
@@ -309,7 +313,8 @@ void CanvasRenderingContext2D::translate(float tx, float ty) {
   if (!c)
     return;
   c->translate(tx, ty);
-  state().m_path.transform(AffineTransform().translate(-tx, -ty));
+  state().m_transform.translate(tx, ty);
+  m_path.transform(AffineTransform().translate(-tx, -ty));
 }
 
 void CanvasRenderingContext2D::transform(float m11,
@@ -328,7 +333,8 @@ void CanvasRenderingContext2D::transform(float m11,
     return;
   AffineTransform transform(m11, m12, m21, m22, dx, dy);
   c->concatCTM(transform);
-  state().m_path.transform(transform.inverse());
+  state().m_transform.multiply(transform);
+  m_path.transform(transform.inverse());
 }
 
 void CanvasRenderingContext2D::setStrokeColor(const String& color) {
@@ -395,26 +401,26 @@ void CanvasRenderingContext2D::setFillColor(float c,
 }
 
 void CanvasRenderingContext2D::beginPath() {
-  state().m_path.clear();
+  m_path.clear();
 }
 
 void CanvasRenderingContext2D::closePath() {
-  state().m_path.closeSubpath();
+  m_path.closeSubpath();
 }
 
 void CanvasRenderingContext2D::moveTo(float x, float y) {
-  state().m_path.moveTo(FloatPoint(x, y));
+  m_path.moveTo(FloatPoint(x, y));
 }
 
 void CanvasRenderingContext2D::lineTo(float x, float y) {
-  state().m_path.addLineTo(FloatPoint(x, y));
+  m_path.addLineTo(FloatPoint(x, y));
 }
 
 void CanvasRenderingContext2D::quadraticCurveTo(float cpx,
                                                 float cpy,
                                                 float x,
                                                 float y) {
-  state().m_path.addQuadCurveTo(FloatPoint(cpx, cpy), FloatPoint(x, y));
+  m_path.addQuadCurveTo(FloatPoint(cpx, cpy), FloatPoint(x, y));
 }
 
 void CanvasRenderingContext2D::bezierCurveTo(float cp1x,
@@ -423,8 +429,8 @@ void CanvasRenderingContext2D::bezierCurveTo(float cp1x,
                                              float cp2y,
                                              float x,
                                              float y) {
-  state().m_path.addBezierCurveTo(FloatPoint(cp1x, cp1y),
-                                  FloatPoint(cp2x, cp2y), FloatPoint(x, y));
+  m_path.addBezierCurveTo(FloatPoint(cp1x, cp1y), FloatPoint(cp2x, cp2y),
+                          FloatPoint(x, y));
 }
 
 void CanvasRenderingContext2D::arcTo(float x0,
@@ -438,7 +444,7 @@ void CanvasRenderingContext2D::arcTo(float x0,
     ec = INDEX_SIZE_ERR;
     return;
   }
-  state().m_path.addArcTo(FloatPoint(x0, y0), FloatPoint(x1, y1), r);
+  m_path.addArcTo(FloatPoint(x0, y0), FloatPoint(x1, y1), r);
 }
 
 void CanvasRenderingContext2D::arc(float x,
@@ -453,7 +459,7 @@ void CanvasRenderingContext2D::arc(float x,
     ec = INDEX_SIZE_ERR;
     return;
   }
-  state().m_path.addArc(FloatPoint(x, y), r, sa, ea, anticlockwise);
+  m_path.addArc(FloatPoint(x, y), r, sa, ea, anticlockwise);
 }
 
 void CanvasRenderingContext2D::rect(float x,
@@ -466,7 +472,7 @@ void CanvasRenderingContext2D::rect(float x,
     ec = INDEX_SIZE_ERR;
     return;
   }
-  state().m_path.addRect(FloatRect(x, y, width, height));
+  m_path.addRect(FloatRect(x, y, width, height));
 }
 
 void CanvasRenderingContext2D::
@@ -474,7 +480,7 @@ void CanvasRenderingContext2D::
   if (m_canvas)
     if (Settings* settings = m_canvas->document()->settings())
       if (settings->usesDashboardBackwardCompatibilityMode())
-        state().m_path.clear();
+        m_path.clear();
 }
 
 void CanvasRenderingContext2D::fill() {
@@ -483,9 +489,9 @@ void CanvasRenderingContext2D::fill() {
     return;
 
   c->beginPath();
-  c->addPath(state().m_path);
-  if (!state().m_path.isEmpty())
-    willDraw(state().m_path.boundingRect());
+  c->addPath(m_path);
+  if (!m_path.isEmpty())
+    willDraw(m_path.boundingRect());
 
 #if PLATFORM(CG)
   if (state().m_fillStyle->gradient()) {
@@ -502,7 +508,7 @@ void CanvasRenderingContext2D::fill() {
     CGContextFillPath(c->platformContext());
   }
 #elif PLATFORM(QT)
-  QPainterPath* path = state().m_path.platformPath();
+  QPainterPath* path = m_path.platformPath();
   QPainter* p = static_cast<QPainter*>(c->platformContext());
   if (state().m_fillStyle->gradient()) {
     p->fillPath(*path,
@@ -535,14 +541,14 @@ void CanvasRenderingContext2D::stroke() {
   if (!c)
     return;
   c->beginPath();
-  c->addPath(state().m_path);
+  c->addPath(m_path);
 
-  if (!state().m_path.isEmpty()) {
+  if (!m_path.isEmpty()) {
     // FIXME: This is insufficient, need to use
     // CGContextReplacePathWithStrokedPath to expand to required bounds
     float lineWidth = state().m_lineWidth;
     float inset = lineWidth / 2;
-    FloatRect boundingRect = state().m_path.boundingRect();
+    FloatRect boundingRect = m_path.boundingRect();
     boundingRect.inflate(inset);
     willDraw(boundingRect);
   }
@@ -564,7 +570,7 @@ void CanvasRenderingContext2D::stroke() {
     CGContextStrokePath(c->platformContext());
   }
 #elif PLATFORM(QT)
-  QPainterPath* path = state().m_path.platformPath();
+  QPainterPath* path = m_path.platformPath();
   QPainter* p = static_cast<QPainter*>(c->platformContext());
   if (state().m_strokeStyle->gradient()) {
     p->save();
@@ -581,12 +587,12 @@ void CanvasRenderingContext2D::stroke() {
   cairo_save(cr);
   if (state().m_strokeStyle->gradient()) {
     cairo_set_source(cr, state().m_strokeStyle->gradient()->platformShading());
-    c->addPath(state().m_path);
+    c->addPath(m_path);
     cairo_stroke(cr);
   } else {
     if (state().m_strokeStyle->pattern())
       applyStrokePattern();
-    c->addPath(state().m_path);
+    c->addPath(m_path);
     cairo_stroke(cr);
   }
   cairo_restore(cr);
@@ -599,7 +605,7 @@ void CanvasRenderingContext2D::clip() {
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
-  c->clip(state().m_path);
+  c->clip(m_path);
   clearPathForDashboardBackwardCompatibilityMode();
 }
 
@@ -614,7 +620,7 @@ bool CanvasRenderingContext2D::isPointInPath(const float x, const float y) {
   if (!ctm.isInvertible())
     return false;
   FloatPoint transformedPoint = ctm.inverse().mapPoint(point);
-  return state().m_path.contains(transformedPoint);
+  return m_path.contains(transformedPoint);
 }
 
 void CanvasRenderingContext2D::clearRect(float x,
