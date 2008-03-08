@@ -139,6 +139,16 @@ class ChromeClient {
   virtual void runOpenPanel(PassRefPtr<FileChooser>);
 #endif
 
+  virtual FloatRect customHighlightRect(Node*,
+                                        const AtomicString& type,
+                                        const FloatRect& lineRect);
+  virtual void paintCustomHighlight(Node*,
+                                    const AtomicString& type,
+                                    const FloatRect& boxRect,
+                                    const FloatRect& lineRect,
+                                    bool behindText,
+                                    bool entireLine);
+
  protected:
   virtual ~ChromeClient() {}
 };

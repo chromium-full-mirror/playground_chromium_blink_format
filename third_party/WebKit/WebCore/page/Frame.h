@@ -399,19 +399,6 @@ class Frame : public RefCounted<Frame> {
  private:
   NSImage* imageFromRect(NSRect) const;
 
-  // === to be moved into Chrome
-
- public:
-  FloatRect customHighlightLineRect(const AtomicString& type,
-                                    const FloatRect& lineRect,
-                                    Node*);
-  void paintCustomHighlight(const AtomicString& type,
-                            const FloatRect& boxRect,
-                            const FloatRect& lineRect,
-                            bool text,
-                            bool line,
-                            Node*);
-
   // === to be moved into Editor
 
  public:
