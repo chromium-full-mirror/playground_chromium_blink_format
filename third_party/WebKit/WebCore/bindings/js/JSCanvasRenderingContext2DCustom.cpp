@@ -332,7 +332,7 @@ JSValue* JSCanvasRenderingContext2D::createPattern(ExecState* exec,
         context
             ->createPattern(static_cast<HTMLImageElement*>(
                                 static_cast<JSHTMLElement*>(args[0])->impl()),
-                            args[1]->toString(exec), ec)
+                            valueToStringWithNullCheck(exec, args[1]), ec)
             .get());
     setDOMException(exec, ec);
     return pattern;
@@ -344,7 +344,7 @@ JSValue* JSCanvasRenderingContext2D::createPattern(ExecState* exec,
         context
             ->createPattern(static_cast<HTMLCanvasElement*>(
                                 static_cast<JSHTMLElement*>(args[0])->impl()),
-                            args[1]->toString(exec), ec)
+                            valueToStringWithNullCheck(exec, args[1]), ec)
             .get());
     setDOMException(exec, ec);
     return pattern;
