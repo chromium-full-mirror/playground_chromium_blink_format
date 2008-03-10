@@ -37,8 +37,6 @@ class FunctionBodyNode;
 class ProgramNode;
 class UString;
 
-struct UChar;
-
 template <typename T>
 struct ParserRefCountedData : ParserRefCounted {
   T data;

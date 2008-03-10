@@ -68,7 +68,8 @@ struct SVGAnimatedTypeWrapperKey {
 struct SVGAnimatedTypeWrapperKeyHash {
   static unsigned hash(const SVGAnimatedTypeWrapperKey& key) {
     return StringImpl::computeHash(
-        (::UChar*)&key, sizeof(SVGAnimatedTypeWrapperKey) / sizeof(::UChar));
+        reinterpret_cast<const UChar*>(&key),
+        sizeof(SVGAnimatedTypeWrapperKey) / sizeof(UChar));
   }
 
   static bool equal(const SVGAnimatedTypeWrapperKey& a,

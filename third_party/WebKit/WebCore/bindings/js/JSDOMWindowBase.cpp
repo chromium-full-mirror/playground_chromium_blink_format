@@ -1121,7 +1121,7 @@ JSValue* windowProtoFuncAToB(ExecState* exec,
 
   Vector<char> in(s.size());
   for (int i = 0; i < s.size(); ++i)
-    in[i] = static_cast<char>(s.data()[i].unicode());
+    in[i] = static_cast<char>(s.data()[i]);
   Vector<char> out;
 
   if (!base64Decode(in, out))
@@ -1153,7 +1153,7 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
 
   Vector<char> in(s.size());
   for (int i = 0; i < s.size(); ++i)
-    in[i] = static_cast<char>(s.data()[i].unicode());
+    in[i] = static_cast<char>(s.data()[i]);
   Vector<char> out;
 
   base64Encode(in, out);

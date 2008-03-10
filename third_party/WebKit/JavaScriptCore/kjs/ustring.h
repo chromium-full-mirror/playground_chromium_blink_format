@@ -30,16 +30,8 @@
 #include <wtf/FastMalloc.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
+#include <wtf/unicode/Unicode.h>
 #include <wtf/Vector.h>
-
-/* On some ARM platforms GCC won't pack structures by default so sizeof(UChar)
-   will end up being != 2 which causes crashes since the code depends on that.
-   */
-#if COMPILER(GCC) && PLATFORM(FORCE_PACK)
-#define PACK_STRUCT __attribute__((packed))
-#else
-#define PACK_STRUCT
-#endif
 
 /**
  * @internal
@@ -56,53 +48,6 @@ using WTF::PlacementNewAdoptType;
 using WTF::PlacementNewAdopt;
 
 class UString;
-
-/**
- * @short Unicode character.
- *
- * UChar represents a 16 bit Unicode character. It's internal data
- * representation is compatible to XChar2b and QChar. It's therefore
- * possible to exchange data with X and Qt with shallow copies.
- */
-struct UChar {
-  /**
-   * Construct a character with uninitialized value.
-   */
-  UChar();
-  /**
-   * Construct a character with the value denoted by the arguments.
-   * @param h higher byte
-   * @param l lower byte
-   */
-  UChar(unsigned char h, unsigned char l);
-  /**
-   * Construct a character with the given value.
-   * @param u 16 bit Unicode value
-   */
-  UChar(char u);
-  UChar(unsigned char u);
-  UChar(unsigned short u);
-  /**
-   * @return The higher byte of the character.
-   */
-  unsigned char high() const { return static_cast<unsigned char>(uc >> 8); }
-  /**
-   * @return The lower byte of the character.
-   */
-  unsigned char low() const { return static_cast<unsigned char>(uc); }
-  /**
-   * @return the 16 bit Unicode value of the character
-   */
-  unsigned short unicode() const { return uc; }
-
-  unsigned short uc;
-} PACK_STRUCT;
-
-inline UChar::UChar() {}
-inline UChar::UChar(unsigned char h, unsigned char l) : uc(h << 8 | l) {}
-inline UChar::UChar(char u) : uc((unsigned char)u) {}
-inline UChar::UChar(unsigned char u) : uc(u) {}
-inline UChar::UChar(unsigned short u) : uc(u) {}
 
 /**
  * @short 8 bit char based string class
@@ -284,11 +229,10 @@ class UString {
    */
   UString& append(const UString&);
   UString& append(const char*);
-  UString& append(unsigned short);
+  UString& append(UChar);
   UString& append(char c) {
     return append(static_cast<unsigned short>(static_cast<unsigned char>(c)));
   }
-  UString& append(UChar c) { return append(c.uc); }
 
   /**
    * @return The string converted to the 8-bit string type CString().
@@ -428,9 +372,6 @@ class UString {
   RefPtr<Rep> m_rep;
 };
 
-inline bool operator==(const UChar& c1, const UChar& c2) {
-  return (c1.uc == c2.uc);
-}
 bool operator==(const UString& s1, const UString& s2);
 inline bool operator!=(const UString& s1, const UString& s2) {
   return !KJS::operator==(s1, s2);

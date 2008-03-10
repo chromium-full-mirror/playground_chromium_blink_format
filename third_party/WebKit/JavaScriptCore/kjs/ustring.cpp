@@ -157,15 +157,11 @@ bool operator==(const CString& c1, const CString& c2) {
 
 // Hack here to avoid a global with a constructor; point to an unsigned short
 // instead of a UChar.
-static unsigned short almostUChar;
+static UChar sharedEmptyChar;
 UString::Rep UString::Rep::null = {0, 0, 1, 0, 0, &UString::Rep::null,
                                    0, 0, 0, 0, 0, 0};
-UString::Rep UString::Rep::empty = {0, 0,
-                                    1, 0,
-                                    0, &UString::Rep::empty,
-                                    0, reinterpret_cast<UChar*>(&almostUChar),
-                                    0, 0,
-                                    0, 0};
+UString::Rep UString::Rep::empty = {
+    0, 0, 1, 0, 0, &UString::Rep::empty, 0, &sharedEmptyChar, 0, 0, 0, 0};
 const int normalStatBufferSize = 4096;
 static char* statBuffer = 0;  // FIXME: This buffer is never deallocated.
 static int statBufferSize = 0;
@@ -261,8 +257,8 @@ unsigned UString::Rep::computeHash(const UChar* s, int len) {
 
   // Main loop
   for (; l > 0; l--) {
-    hash += s[0].uc;
-    tmp = (s[1].uc << 11) ^ hash;
+    hash += s[0];
+    tmp = (s[1] << 11) ^ hash;
     hash = (hash << 16) ^ tmp;
     s += 2;
     hash += hash >> 11;
@@ -270,7 +266,7 @@ unsigned UString::Rep::computeHash(const UChar* s, int len) {
 
   // Handle end case
   if (rem) {
-    hash += s[0].uc;
+    hash += s[0];
     hash ^= hash << 11;
     hash += hash >> 17;
   }
@@ -422,7 +418,8 @@ UString::UString(const char* c) {
     m_rep = &Rep::null;
   else {
     for (size_t i = 0; i < length; i++)
-      d[i].uc = c[i];
+      d[i] = static_cast<unsigned char>(
+          c[i]);  // use unsigned char to zero-extend instead of sign-extend
     m_rep = Rep::create(d, static_cast<int>(length));
   }
 }
@@ -772,7 +769,8 @@ UString& UString::append(const char* t) {
     UChar* d = const_cast<UChar*>(data());
     if (d) {
       for (int i = 0; i < tSize; ++i)
-        d[thisSize + i] = t[i];
+        d[thisSize + i] = static_cast<unsigned char>(
+            t[i]);  // use unsigned char to zero-extend instead of sign-extend
       m_rep->len = length;
       m_rep->_hash = 0;
     }
@@ -783,7 +781,8 @@ UString& UString::append(const char* t) {
     UChar* d = const_cast<UChar*>(data());
     if (d) {
       for (int i = 0; i < tSize; ++i)
-        d[thisSize + i] = t[i];
+        d[thisSize + i] = static_cast<unsigned char>(
+            t[i]);  // use unsigned char to zero-extend instead of sign-extend
       m_rep = Rep::create(m_rep, 0, length);
     }
   } else {
@@ -796,7 +795,8 @@ UString& UString::append(const char* t) {
     else {
       memcpy(d, data(), thisSize * sizeof(UChar));
       for (int i = 0; i < tSize; ++i)
-        d[thisSize + i] = t[i];
+        d[thisSize + i] = static_cast<unsigned char>(
+            t[i]);  // use unsigned char to zero-extend instead of sign-extend
       m_rep = Rep::create(d, length);
       m_rep->capacity = newCapacity;
     }
@@ -805,7 +805,7 @@ UString& UString::append(const char* t) {
   return *this;
 }
 
-UString& UString::append(unsigned short c) {
+UString& UString::append(UChar c) {
   int thisOffset = m_rep->offset;
   int length = size();
 
@@ -879,7 +879,7 @@ char* UString::ascii() const {
   char* q = statBuffer;
   const UChar* limit = p + length;
   while (p != limit) {
-    *q = static_cast<char>(p->uc);
+    *q = static_cast<char>(p[0]);
     ++p;
     ++q;
   }
@@ -915,7 +915,8 @@ UString& UString::operator=(const char* c) {
     m_rep = Rep::create(d, l);
   }
   for (int i = 0; i < l; i++)
-    d[i].uc = c[i];
+    d[i] = static_cast<unsigned char>(
+        c[i]);  // use unsigned char to zero-extend instead of sign-extend
 
   return *this;
 }
@@ -924,7 +925,7 @@ bool UString::is8Bit() const {
   const UChar* u = data();
   const UChar* limit = u + size();
   while (u < limit) {
-    if (u->uc > 0xFF)
+    if (u[0] > 0xFF)
       return false;
     ++u;
   }
@@ -1063,7 +1064,7 @@ uint32_t UString::toStrictUInt32(bool* ok) const {
   if (len == 0)
     return 0;
   const UChar* p = m_rep->data();
-  unsigned short c = p->unicode();
+  unsigned short c = p[0];
 
   // If the first digit is 0, only 0 itself is OK.
   if (c == '0') {
@@ -1099,7 +1100,7 @@ uint32_t UString::toStrictUInt32(bool* ok) const {
     }
 
     // Get next character.
-    c = (++p)->unicode();
+    c = *(++p);
   }
 }
 
@@ -1115,10 +1116,10 @@ int UString::find(const UString& f, int pos) const {
   const UChar* end = data() + sz - fsz;
   int fsizeminusone = (fsz - 1) * sizeof(UChar);
   const UChar* fdata = f.data();
-  unsigned short fchar = fdata->uc;
+  unsigned short fchar = fdata[0];
   ++fdata;
   for (const UChar* c = data() + pos; c <= end; c++)
-    if (c->uc == fchar && !memcmp(c + 1, fdata, fsizeminusone))
+    if (c[0] == fchar && !memcmp(c + 1, fdata, fsizeminusone))
       return static_cast<int>(c - data());
 
   return -1;
@@ -1203,7 +1204,7 @@ bool operator==(const UString& s1, const char* s2) {
   const UChar* u = s1.data();
   const UChar* uend = u + s1.size();
   while (u != uend && *s2) {
-    if (u->uc != (unsigned char)*s2)
+    if (u[0] != (unsigned char)*s2)
       return false;
     s2++;
     u++;
@@ -1225,7 +1226,7 @@ bool operator<(const UString& s1, const UString& s2) {
     l++;
   }
   if (l < lmin)
-    return (c1->uc < c2->uc);
+    return (c1[0] < c2[0]);
 
   return (l1 < l2);
 }
@@ -1244,7 +1245,7 @@ int compare(const UString& s1, const UString& s2) {
   }
 
   if (l < lmin)
-    return (c1->uc > c2->uc) ? 1 : -1;
+    return (c1[0] > c2[0]) ? 1 : -1;
 
   if (l1 == l2)
     return 0;
@@ -1259,7 +1260,7 @@ CString UString::UTF8String(bool strict) const {
 
   // Convert to runs of 8-bit characters.
   char* p = buffer.data();
-  const ::UChar* d = reinterpret_cast<const ::UChar*>(&data()->uc);
+  const UChar* d = reinterpret_cast<const UChar*>(&data()[0]);
   ConversionResult result =
       convertUTF16ToUTF8(&d, d + length, &p, p + buffer.size(), strict);
   if (result != conversionOK)
