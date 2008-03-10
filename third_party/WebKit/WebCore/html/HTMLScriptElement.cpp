@@ -81,8 +81,8 @@ void HTMLScriptElement::parseMappedAttribute(MappedAttribute* attr) {
 
     const AtomicString& url = attr->value();
     if (!url.isEmpty()) {
-      m_cachedScript = document()->docLoader()->requestScript(
-          url, getAttribute(charsetAttr));
+      m_cachedScript =
+          document()->docLoader()->requestScript(url, scriptCharset());
       if (m_cachedScript)
         m_cachedScript->ref(this);
       else
@@ -118,14 +118,8 @@ void HTMLScriptElement::insertedIntoDocument() {
 
   const AtomicString& url = getAttribute(srcAttr);
   if (!url.isEmpty()) {
-    String scriptSrcCharset =
-        getAttribute(charsetAttr).string().stripWhiteSpace();
-    if (scriptSrcCharset.isEmpty()) {
-      if (Frame* frame = document()->frame())
-        scriptSrcCharset = frame->loader()->encoding();
-    }
     m_cachedScript =
-        document()->docLoader()->requestScript(url, scriptSrcCharset);
+        document()->docLoader()->requestScript(url, scriptCharset());
     if (m_cachedScript)
       m_cachedScript->ref(this);
     else
@@ -305,5 +299,17 @@ String HTMLScriptElement::type() const {
 
 void HTMLScriptElement::setType(const String& value) {
   setAttribute(typeAttr, value);
+}
+
+String HTMLScriptElement::scriptCharset() const {
+  // First we try to get encoding from charset attribute.
+  String charset = getAttribute(charsetAttr).string().stripWhiteSpace();
+  // If charset has not been declared in script tag, fall back
+  // to frame encoding.
+  if (charset.isEmpty()) {
+    if (Frame* frame = document()->frame())
+      charset = frame->loader()->encoding();
+  }
+  return charset;
 }
 }
