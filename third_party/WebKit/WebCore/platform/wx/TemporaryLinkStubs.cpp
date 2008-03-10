@@ -65,6 +65,7 @@
 #include "PlatformMenuDescription.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformScrollBar.h"
+#include "PluginData.h"
 #include "PluginDatabase.h"
 #include "PluginPackage.h"
 #include "PopupMenu.h"
@@ -448,4 +449,11 @@ PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
   notImplemented();
   return 0;
 }
+}
+
+void PluginData::initPlugins() {
+  notImplemented();
+}
+void PluginData::refresh() {
+  notImplemented();
 }
