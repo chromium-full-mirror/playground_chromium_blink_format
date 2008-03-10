@@ -39,7 +39,7 @@ unsigned PluginArray::length() const {
   return data->plugins().size();
 }
 
-Plugin* PluginArray::item(unsigned index) {
+PassRefPtr<Plugin> PluginArray::item(unsigned index) {
   PluginData* data = getPluginData();
   if (!data)
     return 0;
@@ -61,7 +61,7 @@ bool PluginArray::canGetItemsForName(const AtomicString& propertyName) {
   return false;
 }
 
-Plugin* PluginArray::nameGetter(const AtomicString& propertyName) {
+PassRefPtr<Plugin> PluginArray::nameGetter(const AtomicString& propertyName) {
   PluginData* data = getPluginData();
   if (!data)
     return 0;
