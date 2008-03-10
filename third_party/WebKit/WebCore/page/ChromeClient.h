@@ -25,12 +25,13 @@
 #include <wtf/Forward.h>
 #include <wtf/Vector.h>
 
-typedef class _jobject* jobject;
+#if PLATFORM(MAC)
+#include "WebCoreKeyboardUIMode.h"
+#endif
 
 #ifndef __OBJC__
 class NSMenu;
 class NSResponder;
-class NSView;
 #endif
 
 namespace WebCore {
@@ -135,10 +136,6 @@ class ChromeClient {
 
   virtual void populateVisitedLinks();
 
-#if PLATFORM(MAC)
-  virtual void runOpenPanel(PassRefPtr<FileChooser>);
-#endif
-
   virtual FloatRect customHighlightRect(Node*,
                                         const AtomicString& type,
                                         const FloatRect& lineRect);
@@ -148,6 +145,12 @@ class ChromeClient {
                                     const FloatRect& lineRect,
                                     bool behindText,
                                     bool entireLine);
+
+#if PLATFORM(MAC)
+  virtual void runOpenPanel(PassRefPtr<FileChooser>);
+
+  virtual KeyboardUIMode keyboardUIMode() { return KeyboardAccessDefault; }
+#endif
 
  protected:
   virtual ~ChromeClient() {}

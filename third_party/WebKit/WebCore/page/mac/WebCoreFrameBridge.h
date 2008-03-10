@@ -232,8 +232,6 @@ rangeByAlteringCurrentSelection:
 
 - (void)willPopupMenu:(NSMenu*)menu;
 
-- (WebCore::KeyboardUIMode)keyboardUIMode;
-
 @end
 
 // This interface definition allows those who hold a WebCoreFrameBridge * to

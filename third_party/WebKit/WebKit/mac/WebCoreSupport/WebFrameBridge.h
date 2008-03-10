@@ -36,17 +36,10 @@ class Page;
 @class WebFrame;
 @class WebFrameView;
 
-@protocol WebOpenPanelResultListener;
-
 @interface WebFrameBridge : WebCoreFrameBridge<WebCoreFrameBridge> {
  @public
   WebFrame* _frame;
-
- @private
-  WebCore::KeyboardUIMode _keyboardUIMode;
-  BOOL _keyboardUIModeAccessed;
 }
-
 - (id)initMainFrameWithPage:(WebCore::Page*)page
                   frameName:(const WebCore::String&)name
                   frameView:(WebFrameView*)frameView;
@@ -54,7 +47,5 @@ class Page;
                          frameName:(const WebCore::String&)name
                          frameView:(WebFrameView*)frameView;
 - (void)close;
-
 - (WebFrame*)webFrame;
-
 @end

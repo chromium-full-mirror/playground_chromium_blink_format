@@ -132,6 +132,8 @@ class WebChromeClient : public WebCore::ChromeClient {
                                     bool behindText,
                                     bool entireLine);
 
+  virtual WebCore::KeyboardUIMode keyboardUIMode();
+
  private:
   WebView* m_webView;
 };
