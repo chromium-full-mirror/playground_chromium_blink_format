@@ -98,6 +98,7 @@ class KJSProxy;
 class KURL;
 class Node;
 class Page;
+class PluginData;
 class Range;
 class RegularExpression;
 class RenderPart;

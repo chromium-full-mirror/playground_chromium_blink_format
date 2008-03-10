@@ -27,7 +27,6 @@
 #include "qwebframe.h"
 #include "qwebnetworkinterface.h"
 #include "qwebnetworkinterface_p.h"
-#include "qwebobjectpluginconnector.h"
 #include "qwebpage.h"
 #include "qcookiejar.h"
 #include <qdebug.h>
@@ -339,7 +338,7 @@ void QWebNetworkJob::setErrorString(const QString& errorString) {
   returns true if the job has been cancelled by the WebKit framework
 */
 bool QWebNetworkJob::cancelled() const {
-  return !d->resourceHandle && !d->connector;
+  return !d->resourceHandle;
 }
 
 /*!
@@ -419,7 +418,6 @@ bool QWebNetworkManager::add(ResourceHandle* handle,
   handle->getInternal()->m_job = job;
   job->d->resourceHandle = handle;
   job->d->interface = interface;
-  job->d->connector = 0;
 
   job->d->request.init(handle->request());
 
@@ -450,7 +448,6 @@ void QWebNetworkManager::cancel(ResourceHandle* handle) {
   DEBUG() << "QWebNetworkManager::cancel:"
           << job->d->request.httpHeader.toString();
   job->d->resourceHandle = 0;
-  job->d->connector = 0;
   job->d->interface->cancelJob(job);
   handle->getInternal()->m_job = 0;
 }
@@ -466,7 +463,7 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
     client = job->d->resourceHandle->client();
     if (!client)
       return;
-  } else if (!job->d->connector) {
+  } else {
     return;
   }
 
@@ -539,8 +536,6 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
 
   if (client)
     client->didReceiveResponse(job->d->resourceHandle, response);
-  if (job->d->connector)
-    emit job->d->connector->started(job);
 }
 
 void QWebNetworkManager::data(QWebNetworkJob* job, const QByteArray& data) {
@@ -553,7 +548,7 @@ void QWebNetworkManager::data(QWebNetworkJob* job, const QByteArray& data) {
     client = job->d->resourceHandle->client();
     if (!client)
       return;
-  } else if (!job->d->connector) {
+  } else {
     return;
   }
 
@@ -564,8 +559,6 @@ void QWebNetworkManager::data(QWebNetworkJob* job, const QByteArray& data) {
   if (client)
     client->didReceiveData(job->d->resourceHandle, data.constData(),
                            data.length(), data.length() /*FixMe*/);
-  if (job->d->connector)
-    emit job->d->connector->data(job, data);
 }
 
 void QWebNetworkManager::finished(QWebNetworkJob* job, int errorCode) {
@@ -581,7 +574,7 @@ void QWebNetworkManager::finished(QWebNetworkJob* job, int errorCode) {
     client = job->d->resourceHandle->client();
     if (!client)
       return;
-  } else if (!job->d->connector) {
+  } else {
     job->deref();
     return;
   }
@@ -610,9 +603,6 @@ void QWebNetworkManager::finished(QWebNetworkJob* job, int errorCode) {
       client->didFinishLoading(job->d->resourceHandle);
     }
   }
-
-  if (job->d->connector)
-    emit job->d->connector->finished(job, errorCode);
 
   DEBUG() << "receivedFinished done" << job->d->request.url;
 

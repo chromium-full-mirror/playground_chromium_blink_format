@@ -38,8 +38,8 @@
 #include "MediaList.h"
 #include "MIMETypeRegistry.h"
 #include "Page.h"
+#include "PluginData.h"
 #include "PluginDocument.h"
-#include "PluginInfoStore.h"
 #include "RegularExpression.h"
 #include "Settings.h"
 #include "TextDocument.h"
@@ -378,10 +378,14 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
     return new FTPDirectoryDocument(this, frame);
 #endif
 
+  PluginData* pluginData = 0;
+  if (frame && frame->page())
+    pluginData = frame->page()->pluginData();
+
   // PDF is one image type for which a plugin can override built-in support.
   // We do not want QuickTime to take over all image types, obviously.
-  if ((type == "application/pdf" || type == "text/pdf") &&
-      PluginInfoStore::supportsMIMEType(type))
+  if ((type == "application/pdf" || type == "text/pdf") && pluginData &&
+      pluginData->supportsMimeType(type))
     return new PluginDocument(this, frame);
   if (Image::supportsType(type))
     return new ImageDocument(this, frame);
@@ -391,7 +395,7 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   // fundamental type that the browser is expected to handle,
   // and also serves as an optimization to prevent loading the plug-in database
   // in the common case.
-  if (type != "text/plain" && PluginInfoStore::supportsMIMEType(type))
+  if (type != "text/plain" && pluginData && pluginData->supportsMimeType(type))
     return new PluginDocument(this, frame);
   if (isTextMIMEType(type))
     return new TextDocument(this, frame);

@@ -56,6 +56,7 @@ class InspectorClient;
 class InspectorController;
 class Node;
 class PageGroup;
+class PluginData;
 class ProgressTracker;
 class Selection;
 class SelectionController;
@@ -75,6 +76,9 @@ class Page : Noncopyable {
        DragClient*,
        InspectorClient*);
   ~Page();
+
+  static void refreshPlugins(bool reload);
+  PluginData* pluginData() const;
 
   EditorClient* editorClient() const { return m_editorClient; }
 
@@ -199,6 +203,8 @@ class Page : Noncopyable {
   RefPtr<BackForwardList> m_backForwardList;
   RefPtr<Frame> m_mainFrame;
   RefPtr<Node> m_focusedNode;
+
+  mutable RefPtr<PluginData> m_pluginData;
 
   EditorClient* m_editorClient;
 

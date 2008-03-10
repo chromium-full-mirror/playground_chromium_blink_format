@@ -35,6 +35,7 @@
 #include "NotImplemented.h"
 #include "PluginDatabase.h"
 #include "PluginPackage.h"
+#include "PluginData.h"
 #include "SharedBuffer.h"
 
 using namespace WebCore;
@@ -116,5 +117,12 @@ String KURL::fileSystemPath() const {
 PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
   notImplemented();
   return 0;
+}
+
+void PluginData::initPlugins() {
+  notImplemented();
+}
+void PluginData::refresh() {
+  notImplemented();
 }
 }

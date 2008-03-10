@@ -43,6 +43,7 @@ class QWebHistory;
 class QWebPagePrivate;
 class QWebFrameData;
 class QWebNetworkInterface;
+class QWebPluginFactory;
 
 namespace WebCore {
 class ChromeClientQt;
@@ -170,6 +171,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 #else
   void setNetworkAccessManager(QNetworkAccessManager* manager);
   QNetworkAccessManager* networkAccessManager() const;
+
+  void setPluginFactory(QWebPluginFactory* factory);
+  QWebPluginFactory* pluginFactory() const;
 #endif
 
   quint64 totalBytes() const;
