@@ -311,7 +311,8 @@ class GraphicsContext : Noncopyable {
   static void destroyGraphicsContextPrivate(GraphicsContextPrivate*);
 
   GraphicsContextPrivate* m_common;
-  GraphicsContextPlatformPrivate* m_data;
+  GraphicsContextPlatformPrivate*
+      m_data;  // Deprecated; m_commmon can just be downcasted. To be removed.
 };
 
 }  // namespace WebCore
