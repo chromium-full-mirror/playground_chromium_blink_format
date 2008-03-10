@@ -231,7 +231,7 @@ class UString {
   UString& append(const char*);
   UString& append(UChar);
   UString& append(char c) {
-    return append(static_cast<unsigned short>(static_cast<unsigned char>(c)));
+    return append(static_cast<UChar>(static_cast<unsigned char>(c)));
   }
 
   /**
