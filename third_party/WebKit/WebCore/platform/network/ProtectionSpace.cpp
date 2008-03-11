@@ -25,7 +25,7 @@
 #include "config.h"
 #include "ProtectionSpace.h"
 
-#if PLATFORM(CF) && !PLATFORM(MAC)
+#if USE(CFNETWORK) && !PLATFORM(MAC)
 #include "AuthenticationCF.h"
 #include <CFNetwork/CFURLProtectionSpacePriv.h>
 #include <wtf/RetainPtr.h>
@@ -82,7 +82,7 @@ ProtectionSpaceAuthenticationScheme ProtectionSpace::authenticationScheme()
 }
 
 bool ProtectionSpace::receivesCredentialSecurely() const {
-#if PLATFORM(CF) && !PLATFORM(MAC)
+#if USE(CFNETWORK) && !PLATFORM(MAC)
   RetainPtr<CFURLProtectionSpaceRef> cfSpace(AdoptCF, createCF(*this));
   return cfSpace &&
          CFURLProtectionSpaceReceivesCredentialSecurely(cfSpace.get());
