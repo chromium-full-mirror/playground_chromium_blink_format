@@ -174,10 +174,9 @@ void QWebFrame::addToJSWindowObject(const QString& name, QObject* object) {
   KJS::JSObject* runtimeObject = KJS::Bindings::Instance::createRuntimeObject(
       KJS::Bindings::Instance::QtLanguage, object, root);
 
-  window->put(
-      window->globalExec(),
-      KJS::Identifier((const KJS::UChar*)name.constData(), name.length()),
-      runtimeObject);
+  window->put(window->globalExec(),
+              KJS::Identifier((const UChar*)name.constData(), name.length()),
+              runtimeObject);
 }
 
 /*!
