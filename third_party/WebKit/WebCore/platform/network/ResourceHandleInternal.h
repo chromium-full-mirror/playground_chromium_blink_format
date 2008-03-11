@@ -44,6 +44,10 @@
 #include <curl/curl.h>
 #endif
 
+#if USE(SOUP)
+#include <libsoup/soup.h>
+#endif
+
 #if PLATFORM(QT)
 class QWebFrame;
 class QWebNetworkJob;
@@ -110,6 +114,10 @@ class ResourceHandleInternal : Noncopyable {
         m_formDataElementIndex(0),
         m_formDataElementDataOffset(0)
 #endif
+#if USE(SOUP)
+        ,
+        m_msg(0)
+#endif
 #if PLATFORM(QT)
         ,
         m_job(0),
@@ -172,6 +180,11 @@ class ResourceHandleInternal : Noncopyable {
   size_t m_formDataElementIndex;
   size_t m_formDataElementDataOffset;
   Vector<char> m_postBytes;
+#endif
+#if USE(SOUP)
+  SoupMessage* m_msg;
+  SoupSession* session;
+  ResourceResponse m_response;
 #endif
 #if PLATFORM(QT)
 #if QT_VERSION < 0x040400
