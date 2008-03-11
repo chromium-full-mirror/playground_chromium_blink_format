@@ -286,6 +286,9 @@ class MainWindow : public QMainWindow {
     bar->addAction(view->action(QWebPage::GoBack));
     bar->addAction(view->action(QWebPage::Stop));
     bar->addAction(view->action(QWebPage::GoForward));
+    QAction* reloadAction = view->pageAction(QWebPage::Reload);
+    reloadAction->setShortcut(QKeySequence::Refresh);
+    bar->addAction(reloadAction);
     bar->addSeparator();
     bar->addAction(view->action(QWebPage::Cut));
     bar->addAction(view->action(QWebPage::Copy));
