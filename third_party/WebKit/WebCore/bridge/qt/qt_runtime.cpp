@@ -658,7 +658,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
 
       if (re.caseSensitivity() == Qt::CaseInsensitive)
         uflags = "i";  // ### Can't do g or m
-      UString ustring((KJS::UChar*)re.pattern().utf16(), re.pattern().length());
+      UString ustring((UChar*)re.pattern().utf16(), re.pattern().length());
       args.append(jsString(ustring));
       args.append(jsString(uflags));
       return regExpObj->construct(exec, args);
@@ -752,7 +752,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
   qConvDebug() << "fallback path for" << variant << variant.userType();
 
   QString string = variant.toString();
-  UString ustring((KJS::UChar*)string.utf16(), string.length());
+  UString ustring((UChar*)string.utf16(), string.length());
   return jsString(ustring);
 }
 
