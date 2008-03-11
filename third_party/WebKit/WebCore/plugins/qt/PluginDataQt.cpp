@@ -28,6 +28,7 @@
 namespace WebCore {
 
 void PluginData::initPlugins() {
+#if QT_VERSION > 0x040400
   QWebPage* webPage =
       static_cast<ChromeClientQt*>(m_page->chrome()->client())->m_webPage;
   QWebPluginFactory* factory = webPage->pluginFactory();
@@ -55,6 +56,7 @@ void PluginData::initPlugins() {
 
     m_plugins.append(info);
   }
+#endif
 }
 
 void PluginData::refresh() {
