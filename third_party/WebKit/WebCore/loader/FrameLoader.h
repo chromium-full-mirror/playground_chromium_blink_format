@@ -566,6 +566,7 @@ class FrameLoader : Noncopyable
   void updateHistoryForRedirectWithLockedHistory();
   void updateHistoryForClientRedirect();
   void updateHistoryForCommit();
+  void updateHistoryForAnchorScroll();
 
   void redirectionTimerFired(Timer<FrameLoader>*);
   void checkCompletedTimerFired(Timer<FrameLoader>*);
