@@ -71,20 +71,6 @@ static Node* previousRenderedEditable(Node* node) {
   return 0;
 }
 
-Position::Position(Node* node, int offset) : m_node(node), m_offset(offset) {}
-
-Position::Position(const PositionIterator& it)
-    : m_node(it.m_parent),
-      m_offset(it.m_child
-                   ? it.m_child->nodeIndex()
-                   : (it.m_parent->hasChildNodes() ? maxDeepOffset(it.m_parent)
-                                                   : it.m_offset)) {}
-
-void Position::clear() {
-  m_node = 0;
-  m_offset = 0;
-}
-
 Element* Position::documentElement() const {
   if (Node* n = node())
     if (Element* e = n->document()->documentElement())
@@ -734,9 +720,9 @@ void Position::formatForDebugger(char* buffer, unsigned length) const {
   else {
     char s[1024];
     result += "offset ";
-    result += String::number(m_offset);
+    result += String::number(offset());
     result += " of ";
-    m_node->formatForDebugger(s, sizeof(s));
+    node()->formatForDebugger(s, sizeof(s));
     result += s;
   }
 
@@ -744,24 +730,18 @@ void Position::formatForDebugger(char* buffer, unsigned length) const {
 }
 
 void Position::showTreeForThis() const {
-  if (m_node)
-    m_node->showTreeForThis();
+  if (node())
+    node()->showTreeForThis();
 }
 
 #endif
 
 Position startPosition(const Range* r) {
-  if (!r || r->isDetached())
-    return Position();
-  ExceptionCode ec;
-  return Position(r->startContainer(ec), r->startOffset(ec));
+  return r ? r->startPosition() : Position();
 }
 
 Position endPosition(const Range* r) {
-  if (!r || r->isDetached())
-    return Position();
-  ExceptionCode ec;
-  return Position(r->endContainer(ec), r->endOffset(ec));
+  return r ? r->endPosition() : Position();
 }
 
 }  // namespace WebCore

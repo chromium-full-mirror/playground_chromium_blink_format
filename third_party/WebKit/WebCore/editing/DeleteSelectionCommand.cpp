@@ -666,11 +666,11 @@ void DeleteSelectionCommand::mergeParagraphs() {
     return;
   }
 
-  RefPtr<Range> range = new Range(
+  RefPtr<Range> range = Range::create(
       document(),
       rangeCompliantEquivalent(startOfParagraphToMove.deepEquivalent()),
       rangeCompliantEquivalent(endOfParagraphToMove.deepEquivalent()));
-  RefPtr<Range> rangeToBeReplaced = new Range(
+  RefPtr<Range> rangeToBeReplaced = Range::create(
       document(), rangeCompliantEquivalent(mergeDestination.deepEquivalent()),
       rangeCompliantEquivalent(mergeDestination.deepEquivalent()));
   if (!document()->frame()->editor()->client()->shouldMoveRangeAfterDelete(

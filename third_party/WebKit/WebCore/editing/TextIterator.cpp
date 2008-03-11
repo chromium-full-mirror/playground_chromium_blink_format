@@ -118,7 +118,7 @@ TextIterator::TextIterator(const Range* r,
   m_endOffset = endOffset;
 
   // set up the current node for processing
-  m_node = r->startNode();
+  m_node = r->firstNode();
   if (m_node == 0)
     return;
   m_offset = m_node == m_startContainer ? m_startOffset : 0;
@@ -126,7 +126,7 @@ TextIterator::TextIterator(const Range* r,
   m_handledChildren = false;
 
   // calculate first out of bounds node
-  m_pastEndNode = r->pastEndNode();
+  m_pastEndNode = r->pastLastNode();
 
   // initialize node processing state
   m_needAnotherNewline = false;
@@ -693,15 +693,15 @@ PassRefPtr<Range> TextIterator::range() const {
       m_positionEndOffset += index;
       m_positionOffsetBaseNode = 0;
     }
-    return new Range(m_positionNode->document(), m_positionNode,
-                     m_positionStartOffset, m_positionNode,
-                     m_positionEndOffset);
+    return Range::create(m_positionNode->document(), m_positionNode,
+                         m_positionStartOffset, m_positionNode,
+                         m_positionEndOffset);
   }
 
   // otherwise, return the end of the overall range we were given
   if (m_endContainer)
-    return new Range(m_endContainer->document(), m_endContainer, m_endOffset,
-                     m_endContainer, m_endOffset);
+    return Range::create(m_endContainer->document(), m_endContainer,
+                         m_endOffset, m_endContainer, m_endOffset);
 
   return 0;
 }
@@ -915,12 +915,12 @@ void SimplifiedBackwardsTextIterator::emitCharacter(UChar c,
 
 PassRefPtr<Range> SimplifiedBackwardsTextIterator::range() const {
   if (m_positionNode)
-    return new Range(m_positionNode->document(), m_positionNode,
-                     m_positionStartOffset, m_positionNode,
-                     m_positionEndOffset);
+    return Range::create(m_positionNode->document(), m_positionNode,
+                         m_positionStartOffset, m_positionNode,
+                         m_positionEndOffset);
 
-  return new Range(m_startNode->document(), m_startNode, m_startOffset,
-                   m_startNode, m_startOffset);
+  return Range::create(m_startNode->document(), m_startNode, m_startOffset,
+                       m_startNode, m_startOffset);
 }
 
 // --------
@@ -1199,7 +1199,7 @@ PassRefPtr<Range> TextIterator::subrange(Range* entireRange,
   RefPtr<Range> end = chars.range();
 
   ExceptionCode ec = 0;
-  RefPtr<Range> result(new Range(
+  RefPtr<Range> result(Range::create(
       entireRange->ownerDocument(), start->startContainer(ec),
       start->startOffset(ec), end->startContainer(ec), end->startOffset(ec)));
   ASSERT(!ec);

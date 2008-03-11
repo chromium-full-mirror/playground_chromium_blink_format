@@ -260,8 +260,8 @@ void CompositeEditCommand::inputText(const String& text,
   int offset = 0;
   int length = text.length();
   RefPtr<Range> startRange =
-      new Range(document(), Position(document()->documentElement(), 0),
-                endingSelection().start());
+      Range::create(document(), Position(document()->documentElement(), 0),
+                    endingSelection().start());
   int startIndex = TextIterator::rangeLength(startRange.get());
   int newline;
   do {
@@ -770,7 +770,7 @@ void CompositeEditCommand::moveParagraphs(
 
       startIndex = 0;
       if (startInParagraph) {
-        RefPtr<Range> startRange = new Range(
+        RefPtr<Range> startRange = Range::create(
             document(),
             rangeCompliantEquivalent(startOfParagraphToMove.deepEquivalent()),
             rangeCompliantEquivalent(visibleStart.deepEquivalent()));
@@ -779,7 +779,7 @@ void CompositeEditCommand::moveParagraphs(
 
       endIndex = 0;
       if (endInParagraph) {
-        RefPtr<Range> endRange = new Range(
+        RefPtr<Range> endRange = Range::create(
             document(),
             rangeCompliantEquivalent(startOfParagraphToMove.deepEquivalent()),
             rangeCompliantEquivalent(visibleEnd.deepEquivalent()));
@@ -802,7 +802,7 @@ void CompositeEditCommand::moveParagraphs(
   // positions"
   Position startRangeCompliant = rangeCompliantEquivalent(start);
   Position endRangeCompliant = rangeCompliantEquivalent(end);
-  RefPtr<Range> range = new Range(
+  RefPtr<Range> range = Range::create(
       document(), startRangeCompliant.node(), startRangeCompliant.offset(),
       endRangeCompliant.node(), endRangeCompliant.offset());
 
@@ -873,8 +873,8 @@ void CompositeEditCommand::moveParagraphs(
   }
 
   RefPtr<Range> startToDestinationRange(
-      new Range(document(), Position(document(), 0),
-                rangeCompliantEquivalent(destination.deepEquivalent())));
+      Range::create(document(), Position(document(), 0),
+                    rangeCompliantEquivalent(destination.deepEquivalent())));
   destinationIndex =
       TextIterator::rangeLength(startToDestinationRange.get(), true);
 

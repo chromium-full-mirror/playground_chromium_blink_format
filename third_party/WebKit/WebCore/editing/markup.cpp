@@ -248,8 +248,7 @@ static String renderedText(const Node* node, const Range* range) {
 
   Position start(const_cast<Node*>(node), startOffset);
   Position end(const_cast<Node*>(node), endOffset);
-  Range r(node->document(), start, end);
-  return plainText(&r);
+  return plainText(Range::create(node->document(), start, end).get());
 }
 
 static PassRefPtr<CSSMutableStyleDeclaration> styleFromMatchedRulesForElement(
@@ -676,7 +675,7 @@ String createMarkup(const Range* range,
   static const String interchangeNewlineString =
       String("<br class=\"") + AppleInterchangeNewline + "\">";
 
-  if (!range || range->isDetached())
+  if (!range)
     return "";
 
   Document* document = range->ownerDocument();
@@ -691,6 +690,9 @@ String createMarkup(const Range* range,
       frame ? frame->editor()->deleteButtonController() : 0;
   RefPtr<Range> updatedRange = avoidIntersectionWithNode(
       range, deleteButton ? deleteButton->containerElement() : 0);
+  if (!updatedRange)
+    return "";
+
   if (deleteButton)
     deleteButton->disable();
 
@@ -708,11 +710,11 @@ String createMarkup(const Range* range,
 
   Vector<String> markups;
   Vector<String> preMarkups;
-  Node* pastEnd = updatedRange->pastEndNode();
+  Node* pastEnd = updatedRange->pastLastNode();
   Node* lastClosed = 0;
   Vector<Node*> ancestorsToClose;
 
-  Node* startNode = updatedRange->startNode();
+  Node* startNode = updatedRange->firstNode();
   VisiblePosition visibleStart(updatedRange->startPosition(),
                                VP_DEFAULT_AFFINITY);
   VisiblePosition visibleEnd(updatedRange->endPosition(), VP_DEFAULT_AFFINITY);
@@ -1095,7 +1097,7 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
   if (!context)
     return 0;
 
-  Node* styleNode = context->startNode();
+  Node* styleNode = context->firstNode();
   if (!styleNode) {
     styleNode = context->startPosition().node();
     if (!styleNode)
@@ -1136,7 +1138,7 @@ PassRefPtr<DocumentFragment> createFragmentFromText(Range* context,
   }
 
   // Break string into paragraphs. Extra line breaks turn into empty paragraphs.
-  Node* block = enclosingBlock(context->startNode());
+  Node* block = enclosingBlock(context->firstNode());
   bool useClonesOfEnclosingBlock = !block->hasTagName(bodyTag);
 
   Vector<String> list;

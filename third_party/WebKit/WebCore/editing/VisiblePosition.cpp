@@ -295,8 +295,8 @@ PassRefPtr<Range> makeRange(const VisiblePosition& start,
                             const VisiblePosition& end) {
   Position s = rangeCompliantEquivalent(start);
   Position e = rangeCompliantEquivalent(end);
-  return new Range(s.node()->document(), s.node(), s.offset(), e.node(),
-                   e.offset());
+  return Range::create(s.node()->document(), s.node(), s.offset(), e.node(),
+                       e.offset());
 }
 
 VisiblePosition startVisiblePosition(const Range* r, EAffinity affinity) {

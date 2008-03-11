@@ -407,11 +407,11 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
   Node* scope = highestAncestor(visibleStart.deepEquivalent().node());
   Position rangeStart(scope, 0);
   RefPtr<Range> startRange =
-      new Range(document(), rangeStart,
-                rangeCompliantEquivalent(visibleStart.deepEquivalent()));
+      Range::create(document(), rangeStart,
+                    rangeCompliantEquivalent(visibleStart.deepEquivalent()));
   RefPtr<Range> endRange =
-      new Range(document(), rangeStart,
-                rangeCompliantEquivalent(visibleEnd.deepEquivalent()));
+      Range::create(document(), rangeStart,
+                    rangeCompliantEquivalent(visibleEnd.deepEquivalent()));
   int startIndex = TextIterator::rangeLength(startRange.get(), true);
   int endIndex = TextIterator::rangeLength(endRange.get(), true);
 
@@ -704,9 +704,9 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
     if (start == end && start.node()->hasTagName(brTag))
       end = positionAfterNode(start.node());
     // Add the style to selected inline runs.
-    Node* pastEnd = Range(document(), rangeCompliantEquivalent(start),
-                          rangeCompliantEquivalent(end))
-                        .pastEndNode();
+    Node* pastEnd = Range::create(document(), rangeCompliantEquivalent(start),
+                                  rangeCompliantEquivalent(end))
+                        ->pastLastNode();
     for (Node* next; node && node != pastEnd; node = next) {
       next = node->traverseNextNode();
 

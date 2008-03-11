@@ -453,7 +453,7 @@ const SimpleFontData* Editor::fontForSelection(bool& hasMultipleFonts) const {
   RefPtr<Range> range = m_frame->selectionController()->toRange();
   Node* startNode = range->editingStartPosition().node();
   if (startNode) {
-    Node* pastEnd = range->pastEndNode();
+    Node* pastEnd = range->pastLastNode();
     // In the loop below, n should eventually match pastEnd and not become nil,
     // but we've seen at least one
     // unreproducible case where this didn't happen, so check for nil also.
@@ -1250,7 +1250,7 @@ void Editor::setComposition(const String& text,
       unsigned start = min(baseOffset + selectionStart, extentOffset);
       unsigned end = min(max(start, baseOffset + selectionEnd), extentOffset);
       RefPtr<Range> selectedRange =
-          new Range(baseNode->document(), baseNode, start, baseNode, end);
+          Range::create(baseNode->document(), baseNode, start, baseNode, end);
       m_frame->selectionController()->setSelectedRange(selectedRange.get(),
                                                        DOWNSTREAM, false);
     }
@@ -1365,7 +1365,7 @@ static PassRefPtr<Range> paragraphAlignedRangeForRange(
   setEnd(paragraphRange.get(), endOfParagraph(arbitraryRange->endPosition()));
 
   // Compute offset from start of expanded range to start of original range
-  RefPtr<Range> offsetAsRange = new Range(
+  RefPtr<Range> offsetAsRange = Range::create(
       paragraphRange->startContainer(ec)->document(),
       paragraphRange->startPosition(), arbitraryRange->startPosition());
   offsetIntoParagraphAlignedRange =
@@ -1897,13 +1897,12 @@ static void markMisspellingsOrBadGrammar(Editor* editor,
     return;
 
   RefPtr<Range> searchRange(selection.toRange());
-  if (!searchRange || searchRange->isDetached())
+  if (!searchRange)
     return;
 
   // If we're not in an editable node, bail.
-  int exception = 0;
-  Node* editableNode = searchRange->startContainer(exception);
-  if (!editableNode->isContentEditable())
+  Node* editableNode = searchRange->startContainer();
+  if (!editableNode || !editableNode->isContentEditable())
     return;
 
   // Get the spell checker if it is available
@@ -1974,8 +1973,8 @@ PassRefPtr<Range> Editor::compositionRange() const {
   unsigned end = min(max(start, m_compositionEnd), length);
   if (start >= end)
     return 0;
-  return new Range(m_compositionNode->document(), m_compositionNode.get(),
-                   start, m_compositionNode.get(), end);
+  return Range::create(m_compositionNode->document(), m_compositionNode.get(),
+                       start, m_compositionNode.get(), end);
 }
 
 bool Editor::getCompositionSelection(unsigned& selectionStart,
