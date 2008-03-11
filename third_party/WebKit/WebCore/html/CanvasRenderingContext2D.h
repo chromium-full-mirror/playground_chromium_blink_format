@@ -253,7 +253,8 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
   PassRefPtr<ImageData> getImageData(float sx,
                                      float sy,
                                      float sw,
-                                     float sh) const;
+                                     float sh,
+                                     ExceptionCode&) const;
   void putImageData(ImageData*, float dx, float dy, ExceptionCode&);
   void putImageData(ImageData*,
                     float dx,
@@ -307,8 +308,6 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
   void clearPathForDashboardBackwardCompatibilityMode();
 
   void checkOrigin(const KURL&);
-
-  void printSecurityExceptionMessage() const;
 
   HTMLCanvasElement* m_canvas;
   Vector<State, 1> m_stateStack;

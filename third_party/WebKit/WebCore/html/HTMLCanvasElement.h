@@ -67,7 +67,7 @@ class HTMLCanvasElement : public HTMLElement {
   void setWidth(int);
   void setHeight(int);
 
-  String toDataURL(const String& mimeType);
+  String toDataURL(const String& mimeType, ExceptionCode&);
 
   CanvasRenderingContext* getContext(const String&);
 
@@ -102,8 +102,6 @@ class HTMLCanvasElement : public HTMLElement {
  private:
   void createImageBuffer() const;
   void reset();
-
-  void printSecurityExceptionMessage() const;
 
   bool m_rendererIsCanvas;
 
