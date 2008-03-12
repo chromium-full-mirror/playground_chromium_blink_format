@@ -133,13 +133,11 @@ BOOL WKGetGlyphTransformedAdvances(CGFontRef,
                                    CGAffineTransform* m,
                                    ATSGlyphRef* glyph,
                                    CGSize* advance);
-CGFontRef WKGetCGFontFromNSFont(NSFont* font);
 NSFont* WKGetFontInLanguageForRange(NSFont* font,
                                     NSString* string,
                                     NSRange range);
 NSFont* WKGetFontInLanguageForCharacter(NSFont* font, UniChar ch);
 void WKSetCGFontRenderingMode(CGContextRef cgContext, NSFont* font);
-ATSUFontID WKGetNSFontATSUFontId(NSFont* font);
 void WKReleaseStyleGroup(void* group);
 BOOL WKCGContextGetShouldSmoothFonts(CGContextRef cgContext);
 
@@ -151,6 +149,10 @@ void WKGetFontMetrics(CGFontRef font,
                       int* descent,
                       int* lineGap,
                       unsigned* unitsPerEm);
+// CTFontCopyGraphicsFont was not available until Leopard
+CGFontRef WKGetCGFontFromNSFont(NSFont* font);
+// CTFontGetPlatformFont was not available until Leopard
+ATSUFontID WKGetNSFontATSUFontId(NSFont* font);
 #endif
 
 void WKSetPatternBaseCTM(CGContextRef, CGAffineTransform);
