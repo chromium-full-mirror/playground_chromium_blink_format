@@ -85,7 +85,7 @@ class FramePrivate {
   String m_kjsStatusBarText;
   String m_kjsDefaultStatusBarText;
 
-  int m_zoomFactor;
+  float m_zoomFactor;
   bool m_zoomFactorIsTextOnly;
 
   TextGranularity m_selectionGranularity;

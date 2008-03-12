@@ -215,8 +215,8 @@ class Frame : public RefCounted<Frame> {
                         float oldBottom,
                         float bottomLimit);
 
-  void setZoomFactor(int percent, bool isTextOnly);
-  int zoomFactor() const;
+  void setZoomFactor(float scale, bool isTextOnly);
+  float zoomFactor() const;
   bool isZoomFactorTextOnly() const;
 
   bool prohibitsScrolling() const;

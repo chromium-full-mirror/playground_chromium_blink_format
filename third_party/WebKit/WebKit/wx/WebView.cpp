@@ -366,7 +366,7 @@ bool wxWebView::CanIncreaseTextSize() const {
 void wxWebView::IncreaseTextSize() {
   if (CanIncreaseTextSize()) {
     m_textMagnifier = m_textMagnifier * TextSizeMultiplierRatio;
-    m_impl->frame->setZoomFactor((int)rint(m_textMagnifier * 100), true);
+    m_impl->frame->setZoomFactor(m_textMagnifier, true);
   }
 }
 
@@ -381,7 +381,7 @@ bool wxWebView::CanDecreaseTextSize() const {
 void wxWebView::DecreaseTextSize() {
   if (CanDecreaseTextSize()) {
     m_textMagnifier = m_textMagnifier / TextSizeMultiplierRatio;
-    m_impl->frame->setZoomFactor((int)rint(m_textMagnifier * 100), true);
+    m_impl->frame->setZoomFactor(m_textMagnifier, true);
   }
 }
 
