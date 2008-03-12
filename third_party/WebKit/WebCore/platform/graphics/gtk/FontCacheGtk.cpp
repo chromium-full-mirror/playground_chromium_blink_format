@@ -66,7 +66,13 @@ FontPlatformData* FontCache::getLastResortFallbackFont(
 bool FontCache::fontExists(const FontDescription& fontDescription,
                            const AtomicString& family) {
   FontPlatformData platformData(fontDescription, family);
+#if defined(USE_PANGO)
+  return platformData.m_font != 0;
+#elif defined(USE_FREETYPE)
   return platformData.m_pattern != 0;
+#else
+#error "Must define a font backend"
+#endif
 }
 
 FontPlatformData* FontCache::createFontPlatformData(
