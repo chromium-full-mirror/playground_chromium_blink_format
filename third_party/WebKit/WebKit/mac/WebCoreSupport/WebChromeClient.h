@@ -134,6 +134,11 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual WebCore::KeyboardUIMode keyboardUIMode();
 
+  virtual NSResponder* firstResponder();
+  virtual void makeFirstResponder(NSResponder*);
+
+  virtual void willPopUpMenu(NSMenu*);
+
  private:
   WebView* m_webView;
 };

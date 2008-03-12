@@ -36,7 +36,7 @@ class Page;
 @class WebFrame;
 @class WebFrameView;
 
-@interface WebFrameBridge : WebCoreFrameBridge<WebCoreFrameBridge> {
+@interface WebFrameBridge : WebCoreFrameBridge {
  @public
   WebFrame* _frame;
 }

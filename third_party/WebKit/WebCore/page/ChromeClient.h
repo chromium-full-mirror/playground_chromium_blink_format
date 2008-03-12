@@ -150,6 +150,11 @@ class ChromeClient {
   virtual void runOpenPanel(PassRefPtr<FileChooser>);
 
   virtual KeyboardUIMode keyboardUIMode() { return KeyboardAccessDefault; }
+
+  virtual NSResponder* firstResponder() { return 0; }
+  virtual void makeFirstResponder(NSResponder*) {}
+
+  virtual void willPopUpMenu(NSMenu*) {}
 #endif
 
  protected:
