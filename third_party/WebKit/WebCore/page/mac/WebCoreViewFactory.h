@@ -23,12 +23,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@class NSArray;
-@class NSDictionary;
-@class NSMenu;
-@class NSString;
-@class NSView;
-@class WebCoreFrameBridge;
 @class WebCoreTextMarker;
 @class WebCoreTextMarkerRange;
 
@@ -117,8 +111,6 @@
 - (AXUIElementRef)AXUIElementForElement:(id)element;
 - (void)unregisterUniqueIdForUIElement:(id)element;
 
-- (WebCoreFrameBridge*)bridgeForView:(NSView*)aView;
-
 - (NSString*)AXWebAreaText;
 - (NSString*)AXLinkText;
 - (NSString*)AXListMarkerText;
@@ -130,11 +122,8 @@
 
 @end
 
-@interface WebCoreViewFactory : NSObject {
-}
-
+@interface WebCoreViewFactory : NSObject
 + (WebCoreViewFactory*)sharedFactory;
-
 @end
 
 @interface WebCoreViewFactory (SubclassResponsibility)<WebCoreViewFactory>

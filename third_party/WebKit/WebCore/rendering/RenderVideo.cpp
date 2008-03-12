@@ -49,7 +49,7 @@ RenderVideo::RenderVideo(HTMLMediaElement* video)
 RenderVideo::~RenderVideo() {
   if (MediaPlayer* p = player()) {
     p->setVisible(false);
-    p->setParentWidget(0);
+    p->setFrameView(0);
   }
 }
 
@@ -125,7 +125,7 @@ void RenderVideo::updatePlayer() {
   absolutePosition(x, y);
   IntRect videoBounds = videoBox();
   videoBounds.move(x, y);
-  mediaPlayer->setParentWidget(doc->view());
+  mediaPlayer->setFrameView(doc->view());
   mediaPlayer->setRect(videoBounds);
   mediaPlayer->setVisible(true);
 }

@@ -35,12 +35,12 @@
 
 namespace WebCore {
 
+class FrameView;
 class GraphicsContext;
 class IntSize;
 class MediaPlayer;
 class MediaPlayerPrivate;
 class String;
-class Widget;
 
 class MediaPlayerClient {
  public:
@@ -63,8 +63,7 @@ class MediaPlayer : Noncopyable {
   IntSize naturalSize();
   bool hasVideo();
 
-  Widget* parentWidget() const { return m_parentWidget; }
-  void setParentWidget(Widget* parent) { m_parentWidget = parent; }
+  void setFrameView(FrameView* frameView) { m_frameView = frameView; }
 
   IntRect rect() const { return m_rect; }
   void setRect(const IntRect& r);
@@ -134,7 +133,7 @@ class MediaPlayer : Noncopyable {
 
   MediaPlayerClient* m_mediaPlayerClient;
   MediaPlayerPrivate* m_private;
-  Widget* m_parentWidget;
+  FrameView* m_frameView;
   IntRect m_rect;
   bool m_visible;
   float m_rate;

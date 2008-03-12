@@ -145,9 +145,9 @@ class FrameView : public ScrollView {
   void addWidgetToUpdate(RenderPartObject*);
   void removeWidgetToUpdate(RenderPartObject*);
 
-// FIXME: This method should be used by all platforms, but currently depends on
-// ScrollView::children,
-// which not all methods have. Once FrameView and ScrollView are merged, this
+// FIXME: This function should be used by all platforms, but currently depends
+// on ScrollView::children,
+// which not all platforms have. Once FrameView and ScrollView are merged, this
 // #if should be removed.
 #if PLATFORM(WIN) || PLATFORM(GTK) || PLATFORM(QT)
   void layoutIfNeededRecursive();
