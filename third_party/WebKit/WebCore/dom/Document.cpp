@@ -454,10 +454,8 @@ Document::~Document() {
 
   deleteAllValues(m_markers);
 
-  if (m_axObjectCache) {
-    delete m_axObjectCache;
-    m_axObjectCache = 0;
-  }
+  clearAXObjectCache();
+
   m_decoder = 0;
 
   unsigned count =
@@ -1233,6 +1231,7 @@ void Document::updateLayoutIgnorePendingStylesheets() {
 void Document::attach() {
   ASSERT(!attached());
   ASSERT(!m_inPageCache);
+  ASSERT(!m_axObjectCache);
 
   if (!m_renderArena)
     m_renderArena = new RenderArena();
@@ -1262,6 +1261,8 @@ void Document::attach() {
 void Document::detach() {
   ASSERT(attached());
   ASSERT(!m_inPageCache);
+
+  clearAXObjectCache();
 
   RenderObject* render = renderer();
 
@@ -1319,6 +1320,20 @@ void Document::removeAllDisconnectedNodeEventListeners() {
   m_disconnectedNodesWithEventListeners.clear();
 }
 
+void Document::clearAXObjectCache() {
+  // clear cache in top document
+  if (m_axObjectCache) {
+    delete m_axObjectCache;
+    m_axObjectCache = 0;
+    return;
+  }
+
+  // ask the top-level document to clear its cache
+  Document* doc = topDocument();
+  if (doc != this)
+    doc->clearAXObjectCache();
+}
+
 AXObjectCache* Document::axObjectCache() const {
   // The only document that actually has a AXObjectCache is the top-level
   // document.  This is because we need to be able to get from any
@@ -1334,6 +1349,15 @@ AXObjectCache* Document::axObjectCache() const {
     // In some pages with frames, the cache is created before the sub-webarea is
     // inserted into the tree.  Here, we catch that case and just toss the old
     // cache and start over.
+    // NOTE: This recovery may no longer be needed. I have been unable to
+    // trigger
+    // it again. See rdar://5794454
+    // FIXME: Can this be fixed when inserting the subframe instead of now?
+    // FIXME: If this function was called to get the cache in order to remove
+    // an AXObject, we are now deleting the cache as a whole and returning a
+    // new empty cache that does not contain the AXObject! That should actually
+    // be OK. I am concerned about other cases like this where accessing the
+    // cache blows away the AXObject being operated on.
     delete m_axObjectCache;
     m_axObjectCache = 0;
   }
