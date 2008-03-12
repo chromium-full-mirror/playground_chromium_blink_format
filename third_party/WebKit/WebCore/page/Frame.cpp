@@ -158,11 +158,6 @@ Frame::Frame(Page* page,
 Frame::~Frame() {
   setView(0);
   loader()->clearRecordedFormValues();
-
-#if PLATFORM(MAC)
-  setBridge(0);
-#endif
-
   loader()->cancelAndClear();
 
   // FIXME: We should not be doing all this work inside the destructor
@@ -1902,8 +1897,7 @@ FramePrivate::FramePrivate(Page* page,
 #endif
 #if PLATFORM(MAC)
       ,
-      m_windowScriptObject(nil),
-      m_bridge(nil)
+      m_windowScriptObject(nil)
 #endif
 {
 }
