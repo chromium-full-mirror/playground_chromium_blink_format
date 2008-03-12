@@ -39,7 +39,7 @@
                                WebDocumentSelection,
                                WebDocumentElement,
                                _WebDocumentViewState,
-                               _WebDocumentTextSizing> {
+                               _WebDocumentZooming> {
   NSView* previewView;
   PDFView* PDFSubview;
   NSString* path;

@@ -173,6 +173,29 @@ incremental searching), NO to begin search after the selected text.
 - (BOOL)allowsUndo;
 - (void)setAllowsUndo:(BOOL)flag;
 
+/*!
+    @method setPageSizeMultiplier:
+    @abstract Change the zoom factor of the page in views managed by this
+   webView.
+    @param multiplier A fractional percentage value, 1.0 is 100%.
+*/
+- (void)setPageSizeMultiplier:(float)multiplier;
+
+/*!
+    @method pageSizeMultiplier
+    @result The page size multipler.
+*/
+- (float)pageSizeMultiplier;
+
+// Commands for doing page zoom.  Will end up in WebView (WebIBActions)
+// <NSUserInterfaceValidations>
+- (BOOL)canZoomPageIn;
+- (IBAction)zoomPageIn:(id)sender;
+- (BOOL)canZoomPageOut;
+- (IBAction)zoomPageOut:(id)sender;
+- (BOOL)canResetPageZoom;
+- (IBAction)resetPageZoom:(id)sender;
+
 @end
 
 @interface WebView (WebPrivate)
