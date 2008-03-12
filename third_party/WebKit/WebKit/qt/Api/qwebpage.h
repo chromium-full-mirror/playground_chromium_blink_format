@@ -171,10 +171,10 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 #else
   void setNetworkAccessManager(QNetworkAccessManager* manager);
   QNetworkAccessManager* networkAccessManager() const;
+#endif
 
   void setPluginFactory(QWebPluginFactory* factory);
   QWebPluginFactory* pluginFactory() const;
-#endif
 
   quint64 totalBytes() const;
   quint64 bytesReceived() const;

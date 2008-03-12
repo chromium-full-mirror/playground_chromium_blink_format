@@ -1452,6 +1452,8 @@ QNetworkAccessManager* QWebPage::networkAccessManager() const {
   return d->networkManager;
 }
 
+#endif
+
 void QWebPage::setPluginFactory(QWebPluginFactory* factory) {
   d->pluginFactory = factory;
 }
@@ -1459,8 +1461,6 @@ void QWebPage::setPluginFactory(QWebPluginFactory* factory) {
 QWebPluginFactory* QWebPage::pluginFactory() const {
   return d->pluginFactory;
 }
-
-#endif
 
 /*!
     This function is called when a user agent for HTTP requests is needed. You
