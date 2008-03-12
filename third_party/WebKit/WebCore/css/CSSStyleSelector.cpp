@@ -3490,7 +3490,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         // already based on the font size.
         if (type != CSSPrimitiveValue::CSS_EMS &&
             type != CSSPrimitiveValue::CSS_EXS && m_style->textSizeAdjust() &&
-            m_document->frame()) {
+            m_document->frame() && m_document->frame()->shouldApplyTextZoom()) {
           multiplier = m_document->frame()->zoomFactor();
         }
         lineHeight = Length(
@@ -5229,7 +5229,9 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
   int minLogicalSize = settings->minimumLogicalFontSize();
 
   float zoomPercent =
-      m_document->frame() ? m_document->frame()->zoomFactor() : 1.0f;
+      m_document->frame() && m_document->frame()->shouldApplyTextZoom()
+          ? m_document->frame()->zoomFactor()
+          : 1.0f;
   float zoomedSize = specifiedSize * zoomPercent;
 
   // Apply the hard minimum first.  We only apply the hard minimum if after
