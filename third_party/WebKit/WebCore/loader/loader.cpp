@@ -163,8 +163,7 @@ void Loader::cancelRequests(DocLoader* docLoader) {
   for (HostMap::iterator it = m_hosts.begin(); it != end; ++it) {
     Host* host = it->second;
     if (host->hasRequests())
-      ;
-    host->cancelRequests(docLoader);
+      host->cancelRequests(docLoader);
   }
 
   scheduleServePendingRequests();

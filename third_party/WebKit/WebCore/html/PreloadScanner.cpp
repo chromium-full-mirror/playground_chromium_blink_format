@@ -367,7 +367,7 @@ void PreloadScanner::tokenize(const SegmentedString& source) {
           m_source.prepend(
               SegmentedString(String(tmpString.data(), tmpString.size())));
           if (!match ||
-              (!isWhitespace(tmpChar) && tmpChar != '>' & tmpChar != '/')) {
+              (!isWhitespace(tmpChar) && tmpChar != '>' && tmpChar != '/')) {
             m_state = Data;
             continue;
           }
