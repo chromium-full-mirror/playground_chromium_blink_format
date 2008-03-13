@@ -2290,7 +2290,7 @@ bool FrameLoader::shouldHideReferrer(const KURL& url, const String& referrer) {
 }
 
 const ResourceRequest& FrameLoader::initialRequest() const {
-  return activeDocumentLoader()->initialRequest();
+  return activeDocumentLoader()->originalRequest();
 }
 
 void FrameLoader::receivedData(const char* data, int length) {
@@ -4855,7 +4855,7 @@ void FrameLoader::setTitle(const String& title) {
 }
 
 KURL FrameLoader::originalRequestURL() const {
-  return activeDocumentLoader()->initialRequest().url();
+  return activeDocumentLoader()->originalRequest().url();
 }
 
 String FrameLoader::referrer() const {

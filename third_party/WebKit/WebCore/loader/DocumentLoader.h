@@ -80,9 +80,6 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   const ResourceRequest& request() const;
   ResourceRequest& request();
   void setRequest(const ResourceRequest&);
-  const ResourceRequest& actualRequest() const;
-  ResourceRequest& actualRequest();
-  const ResourceRequest& initialRequest() const;
 
   const SubstituteData& substituteData() const { return m_substituteData; }
 
