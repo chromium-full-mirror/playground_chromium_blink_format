@@ -122,7 +122,7 @@ PassRefPtr<QtInstance> QtInstance::getQtInstance(
 
   foreach (QtInstance* instance, cachedInstances.values(o)) {
     if (instance->rootObject() == rootObject)
-      return instance.get();
+      return instance;
   }
 
   RefPtr<QtInstance> ret = adoptRef(new QtInstance(o, rootObject));
@@ -136,7 +136,7 @@ JSObject* QtInstance::getRuntimeObject(PassRefPtr<QtInstance> instance) {
   JSObject* ret = cachedObjects.value(instance.get());
   if (!ret) {
     ret = new QtRuntimeObjectImp(instance);
-    cachedObjects.insert(ret->getInternalInstance(), ret);
+    cachedObjects.insert(instance.get(), ret);
   }
   return ret;
 }

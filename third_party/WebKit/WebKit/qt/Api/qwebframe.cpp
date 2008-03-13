@@ -56,6 +56,7 @@
 #include "runtime.h"
 #include "runtime_root.h"
 #include "JSDOMWindow.h"
+#include "qt_instance.h"
 #include "kjs_proxy.h"
 #include "kjs_binding.h"
 #include "ExecState.h"
@@ -172,7 +173,7 @@ void QWebFrame::addToJSWindowObject(const QString& name, QObject* object) {
   }
 
   KJS::JSObject* runtimeObject = KJS::Bindings::Instance::createRuntimeObject(
-      KJS::Bindings::Instance::QtLanguage, object, root);
+      KJS::Bindings::QtInstance::create(object, root));
 
   window->put(window->globalExec(),
               KJS::Identifier((const UChar*)name.constData(), name.length()),
