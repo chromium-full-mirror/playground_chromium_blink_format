@@ -37,6 +37,7 @@ const ClassInfo RuntimeObjectImp::info = {"RuntimeObject", 0, 0};
 RuntimeObjectImp::RuntimeObjectImp(PassRefPtr<Bindings::Instance> i)
     : instance(i) {
   instance->rootObject()->addRuntimeObject(this);
+  Collector::collectOnMainThreadOnly(this);
 }
 
 RuntimeObjectImp::~RuntimeObjectImp() {
