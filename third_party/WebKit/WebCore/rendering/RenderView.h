@@ -48,6 +48,11 @@ class RenderView : public RenderBlock {
   int docHeight() const;
   int docWidth() const;
 
+  // The same as the FrameView's visibleHeight/visibleWidth with the zoom factor
+  // applied.
+  int zoomedHeight() const;
+  int zoomedWidth() const;
+
   FrameView* frameView() const { return m_frameView; }
 
   virtual bool hasOverhangingFloats() { return false; }

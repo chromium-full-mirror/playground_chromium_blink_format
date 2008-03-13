@@ -1473,9 +1473,9 @@ void RenderBox::calcHeight() {
   // <html> block in quirks mode.  Only apply this quirk if the block is normal
   // flow and no height
   // is specified.
-  if (stretchesToViewHeight()) {
+  if (stretchesToViewHeight() && !document()->printing()) {
     int margins = collapsedMarginTop() + collapsedMarginBottom();
-    int visHeight = view()->frameView()->visibleHeight();
+    int visHeight = view()->zoomedHeight();
     if (isRoot())
       m_height = max(m_height, visHeight - margins);
     else {
