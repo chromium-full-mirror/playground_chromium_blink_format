@@ -221,7 +221,6 @@ template <typename T>
 class VectorBufferBase : Noncopyable {
  public:
   void allocateBuffer(size_t newCapacity) {
-    ASSERT(newCapacity >= m_capacity);
     m_capacity = newCapacity;
     if (newCapacity > std::numeric_limits<size_t>::max() / sizeof(T))
       CRASH();
@@ -394,6 +393,7 @@ class Vector {
   void grow(size_t size);
   void resize(size_t size);
   void reserveCapacity(size_t newCapacity);
+  void shrinkCapacity(size_t newCapacity);
 
   void clear() {
     if (m_size)
@@ -596,6 +596,21 @@ void Vector<T, inlineCapacity>::reserveCapacity(size_t newCapacity) {
   T* oldEnd = end();
   m_buffer.allocateBuffer(newCapacity);
   TypeOperations::move(oldBuffer, oldEnd, begin());
+  m_buffer.deallocateBuffer(oldBuffer);
+}
+
+template <typename T, size_t inlineCapacity>
+void Vector<T, inlineCapacity>::shrinkCapacity(size_t newCapacity) {
+  if (newCapacity >= capacity())
+    return;
+
+  T* oldBuffer = begin();
+  if (newCapacity > 0) {
+    T* oldEnd = end();
+    m_buffer.allocateBuffer(newCapacity);
+    TypeOperations::move(oldBuffer, oldEnd, begin());
+  }
+  m_size = min(m_size, newCapacity);
   m_buffer.deallocateBuffer(oldBuffer);
 }
 
