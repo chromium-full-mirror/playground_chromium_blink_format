@@ -32,7 +32,8 @@
 
 namespace WebCore {
 
-KJS::Bindings::Instance* Frame::createScriptInstanceForWidget(Widget*) {
+PassRefPtr<KJS::Bindings::Instance> Frame::createScriptInstanceForWidget(
+    Widget*) {
   notImplemented();
   return 0;
 }
