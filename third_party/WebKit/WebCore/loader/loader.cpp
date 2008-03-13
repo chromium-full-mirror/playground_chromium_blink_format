@@ -216,8 +216,8 @@ void Loader::didReceiveData(SubresourceLoader* loader,
     // eof.
     // The resource data will change as the next part is loaded, so we need to
     // make a copy.
-    SharedBuffer* copiedData = new SharedBuffer(data, size);
-    object->data(copiedData, true);
+    RefPtr<SharedBuffer> copiedData = SharedBuffer::create(data, size);
+    object->data(copiedData.release(), true);
   } else if (request->isIncremental())
     object->data(loader->resourceData(), false);
 }

@@ -45,9 +45,15 @@ namespace WebCore {
 
 class SharedBuffer : public RefCounted<SharedBuffer> {
  public:
-  SharedBuffer();
-  SharedBuffer(const char*, int);
-  SharedBuffer(const unsigned char*, int);
+  static PassRefPtr<SharedBuffer> create() {
+    return adoptRef(new SharedBuffer);
+  }
+  static PassRefPtr<SharedBuffer> create(const char* c, int i) {
+    return adoptRef(new SharedBuffer(c, i));
+  }
+  static PassRefPtr<SharedBuffer> create(const unsigned char* c, int i) {
+    return adoptRef(new SharedBuffer(c, i));
+  }
 
   static PassRefPtr<SharedBuffer> createWithContentsOfFile(
       const String& filePath);
@@ -72,6 +78,10 @@ class SharedBuffer : public RefCounted<SharedBuffer> {
   PassRefPtr<SharedBuffer> copy() const;
 
  private:
+  SharedBuffer();
+  SharedBuffer(const char*, int);
+  SharedBuffer(const unsigned char*, int);
+
   void clearPlatformData();
   void maybeTransferPlatformData();
   bool hasPlatformData() const;
