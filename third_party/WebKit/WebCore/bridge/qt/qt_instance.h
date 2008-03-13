@@ -65,8 +65,8 @@ class QtInstance : public Instance {
 
   QObject* getObject() const { return m_object; }
 
-  static QtInstance* getQtInstance(QObject*, PassRefPtr<RootObject>);
-  static JSObject* getRuntimeObject(QtInstance*);
+  static PassRefPtr<QtInstance> getQtInstance(QObject*, PassRefPtr<RootObject>);
+  static JSObject* getRuntimeObject(PassRefPtr<QtInstance>);
 
  private:
   friend class QtClass;

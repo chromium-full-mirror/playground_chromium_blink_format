@@ -220,8 +220,8 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
           resultValue = JavaArray::convertJObjectToArray(exec, result.l,
                                                          arrayType, rootObject);
         } else {
-          resultValue = Instance::createRuntimeObject(Instance::JavaLanguage,
-                                                      result.l, rootObject);
+          resultValue = Instance::createRuntimeObject(
+              JavaInstance::create(result.l, rootObject));
         }
       } else {
         resultValue = jsUndefined();

@@ -26,6 +26,7 @@
 #define _JNI_INSTANCE_H_
 
 #include "runtime.h"
+#include "runtime_root.h"
 
 #include <JavaVM/jni.h>
 
@@ -61,7 +62,11 @@ class JObjectWrapper {
 
 class JavaInstance : public Instance {
  public:
-  JavaInstance(jobject instance, PassRefPtr<RootObject>);
+  static PassRefPtr<JavaInstance> create(jobject instance,
+                                         PassRefPtr<RootObject> rootObject) {
+    return adoptRef(new JavaInstance(instance, rootObject));
+  }
+
   ~JavaInstance();
 
   virtual Class* getClass() const;
@@ -85,6 +90,8 @@ class JavaInstance : public Instance {
   virtual BindingLanguage getBindingLanguage() const { return JavaLanguage; }
 
  private:
+  JavaInstance(jobject instance, PassRefPtr<RootObject>);
+
   RefPtr<JObjectWrapper> _instance;
   mutable JavaClass* _class;
 };

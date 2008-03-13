@@ -140,7 +140,7 @@ JSValue* convertNPVariantToValue(ExecState*,
       return ((JavaScriptObject*)obj)->imp;
 
     // Wrap NPObject in a CInstance.
-    return Instance::createRuntimeObject(Instance::CLanguage, obj, rootObject);
+    return Instance::createRuntimeObject(CInstance::create(obj, rootObject));
   }
 
   return jsUndefined();

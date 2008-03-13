@@ -42,6 +42,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
@@ -91,7 +92,7 @@ class PluginView : public Widget, private PluginStreamClient {
   void setNPWindowRect(const IntRect&);
   static PluginView* currentPluginView();
 
-  KJS::Bindings::Instance* bindingInstance();
+  PassRefPtr<KJS::Bindings::Instance> bindingInstance();
 
   PluginStatus status() const { return m_status; }
 
