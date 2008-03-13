@@ -661,16 +661,20 @@ bool Frame::isZoomFactorTextOnly() const {
 bool Frame::shouldApplyTextZoom() const {
   if (d->m_zoomFactor == 1.0f || !d->m_zoomFactorIsTextOnly)
     return false;
+#if ENABLE(SVG)
   if (d->m_doc && d->m_doc->isSVGDocument())
     return false;
+#endif
   return true;
 }
 
 bool Frame::shouldApplyPageZoom() const {
   if (d->m_zoomFactor == 1.0f || d->m_zoomFactorIsTextOnly)
     return false;
+#if ENABLE(SVG)
   if (d->m_doc && d->m_doc->isSVGDocument())
     return false;
+#endif
   return true;
 }
 
