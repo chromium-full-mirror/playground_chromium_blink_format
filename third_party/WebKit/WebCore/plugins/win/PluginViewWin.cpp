@@ -1473,11 +1473,12 @@ PassRefPtr<KJS::Bindings::Instance> PluginView::bindingInstance() {
 
   RefPtr<KJS::Bindings::RootObject> root = m_parentFrame->createRootObject(
       this, m_parentFrame->scriptProxy()->globalObject());
-    RefPtr<KJS::Bindings::Instance> instance = KJS::Bindings::CInstance::create(obj, object, root.release();
+  RefPtr<KJS::Bindings::Instance> instance =
+      KJS::Bindings::CInstance::create(object, root.release());
 
-    _NPN_ReleaseObject(object);
+  _NPN_ReleaseObject(object);
 
-    return instance.release();
+  return instance.release();
 }
 
 PluginView::~PluginView() {
