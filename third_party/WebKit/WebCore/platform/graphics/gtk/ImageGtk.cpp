@@ -41,7 +41,7 @@ void BitmapImage::invalidatePlatformData() {}
 Image* Image::loadPlatformResource(const char* name) {
   Vector<char> arr = loadResourceIntoArray(name);
   BitmapImage* img = new BitmapImage;
-  RefPtr<SharedBuffer> buffer = new SharedBuffer(arr.data(), arr.size());
+  RefPtr<SharedBuffer> buffer = SharedBuffer::create(arr.data(), arr.size());
   img->setData(buffer, true);
   return img;
 }
