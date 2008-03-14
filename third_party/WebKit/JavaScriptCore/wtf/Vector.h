@@ -227,7 +227,11 @@ class VectorBufferBase : Noncopyable {
     m_buffer = static_cast<T*>(fastMalloc(newCapacity * sizeof(T)));
   }
 
-  void deallocateBuffer(T* bufferToDeallocate) { fastFree(bufferToDeallocate); }
+  void deallocateBuffer(T* bufferToDeallocate) {
+    if (m_buffer == bufferToDeallocate)
+      m_buffer = 0;
+    fastFree(bufferToDeallocate);
+  }
 
   T* buffer() { return m_buffer; }
   const T* buffer() const { return m_buffer; }
@@ -297,13 +301,15 @@ class VectorBuffer : private VectorBufferBase<T> {
   VectorBuffer() : Base(inlineBuffer(), inlineCapacity) {}
 
   VectorBuffer(size_t capacity) : Base(inlineBuffer(), inlineCapacity) {
-    if (capacity > inlineCapacity)
-      allocateBuffer(capacity);
+    allocateBuffer(capacity);
   }
 
   ~VectorBuffer() { deallocateBuffer(buffer()); }
 
-  using Base::allocateBuffer;
+  void allocateBuffer(size_t newCapacity) {
+    if (newCapacity > inlineCapacity)
+      Base::allocateBuffer(newCapacity);
+  }
 
   void deallocateBuffer(T* bufferToDeallocate) {
     if (bufferToDeallocate == inlineBuffer())
@@ -604,13 +610,15 @@ void Vector<T, inlineCapacity>::shrinkCapacity(size_t newCapacity) {
   if (newCapacity >= capacity())
     return;
 
+  resize(min(m_size, newCapacity));
+
   T* oldBuffer = begin();
   if (newCapacity > 0) {
     T* oldEnd = end();
     m_buffer.allocateBuffer(newCapacity);
-    TypeOperations::move(oldBuffer, oldEnd, begin());
+    TypeOperations::moveOverlapping(oldBuffer, oldEnd, begin());
   }
-  m_size = min(m_size, newCapacity);
+
   m_buffer.deallocateBuffer(oldBuffer);
 }
 
