@@ -29,57 +29,22 @@
 #include "config.h"
 #include "MainThread.h"
 
-#include "Logging.h"
 #include "Page.h"
 #include <windows.h>
 
 namespace WebCore {
 
-struct FunctionWithContext {
-  MainThreadFunction* function;
-  void* context;
-  FunctionWithContext(MainThreadFunction* f = 0, void* c = 0)
-      : function(f), context(c) {}
-};
-
-typedef Vector<FunctionWithContext> FunctionQueue;
-
-static HWND threadingWindowHandle = 0;
-static UINT threadingFiredMessage = 0;
+static HWND threadingWindowHandle;
+static UINT threadingFiredMessage;
 const LPCWSTR kThreadingWindowClassName = L"ThreadingWindowClass";
-static bool processingCustomThreadingMessage = false;
-
-static Mutex& functionQueueMutex() {
-  static Mutex staticFunctionQueueMutex;
-  return staticFunctionQueueMutex;
-}
-
-static FunctionQueue& functionQueue() {
-  static FunctionQueue staticFunctionQueue;
-  return staticFunctionQueue;
-}
-
-static void callFunctionsOnMainThread() {
-  FunctionQueue queueCopy;
-  {
-    MutexLocker locker(functionQueueMutex());
-    queueCopy.swap(functionQueue());
-  }
-
-  LOG(Threading, "Calling %u functions on the main thread", queueCopy.size());
-  for (unsigned i = 0; i < queueCopy.size(); ++i)
-    queueCopy[i].function(queueCopy[i].context);
-}
 
 LRESULT CALLBACK ThreadingWindowWndProc(HWND hWnd,
                                         UINT message,
                                         WPARAM wParam,
                                         LPARAM lParam) {
-  if (message == threadingFiredMessage) {
-    processingCustomThreadingMessage = true;
-    callFunctionsOnMainThread();
-    processingCustomThreadingMessage = false;
-  } else
+  if (message == threadingFiredMessage)
+    dispatchFunctionsFromMainThread();
+  else
     return DefWindowProc(hWnd, message, wParam, lParam);
   return 0;
 }
@@ -105,20 +70,8 @@ void initializeThreadingAndMainThread() {
       RegisterWindowMessage(L"com.apple.WebKit.MainThreadFired");
 }
 
-void callOnMainThread(MainThreadFunction* function, void* context) {
-  ASSERT(function);
+void scheduleDispatchFunctionsOnMainThread() {
   ASSERT(threadingWindowHandle);
-
-  if (processingCustomThreadingMessage)
-    LOG(Threading,
-        "callOnMainThread() called recursively.  Beware of nested "
-        "PostMessage()s");
-
-  {
-    MutexLocker locker(functionQueueMutex());
-    functionQueue().append(FunctionWithContext(function, context));
-  }
-
   PostMessage(threadingWindowHandle, threadingFiredMessage, 0, 0);
 }
 

@@ -36,19 +36,6 @@
 
 namespace WebCore {
 
-class PerformFunctionEvent : public QEvent {
- public:
-  static const int EventType = 723;
-
-  PerformFunctionEvent(MainThreadFunction*, void* context);
-
-  void invoke();
-
- private:
-  MainThreadFunction* m_function;
-  void* m_context;
-};
-
 class MainThreadInvoker : public QObject {
   Q_OBJECT
  public:
@@ -58,32 +45,18 @@ class MainThreadInvoker : public QObject {
   bool event(QEvent*);
 };
 
-PerformFunctionEvent::PerformFunctionEvent(MainThreadFunction* function,
-                                           void* context)
-    : QEvent(static_cast<QEvent::Type>(EventType)),
-      m_function(function),
-      m_context(context) {}
-
-void PerformFunctionEvent::invoke() {
-  m_function(m_context);
-}
-
 MainThreadInvoker::MainThreadInvoker() {
   moveToThread(QCoreApplication::instance()->thread());
 }
 
-bool MainThreadInvoker::event(QEvent* event) {
-  if (event->type() == PerformFunctionEvent::EventType)
-    static_cast<PerformFunctionEvent*>(event)->invoke();
-
-  return QObject::event(event);
+bool MainThreadInvoker::event(QEvent*) {
+  dispatchFunctionsFromMainThread();
 }
 
 Q_GLOBAL_STATIC(MainThreadInvoker, webkit_main_thread_invoker)
 
-void callOnMainThread(MainThreadFunction* function, void* context) {
-  QCoreApplication::postEvent(webkit_main_thread_invoker(),
-                              new PerformFunctionEvent(function, context));
+void scheduleDispatchFunctionsOnMainThread() {
+  QCoreApplication::postEvent(webkit_main_thread_invoker(), 0);
 }
 }
 
