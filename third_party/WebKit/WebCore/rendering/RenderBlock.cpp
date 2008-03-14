@@ -4559,9 +4559,11 @@ void RenderBlock::updateFirstLetter() {
   while (currChild && currChild->needsLayout() &&
          (!currChild->isReplaced() || currChild->isFloatingOrPositioned()) &&
          !currChild->isText()) {
-    if (currChild->isFloatingOrPositioned())
+    if (currChild->isFloatingOrPositioned()) {
+      if (currChild->style()->styleType() == RenderStyle::FIRST_LETTER)
+        break;
       currChild = currChild->nextSibling();
-    else
+    } else
       currChild = currChild->firstChild();
   }
 
