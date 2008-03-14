@@ -176,7 +176,9 @@ class Frame : public RefCounted<Frame> {
                                                          KJS::JSGlobalObject*);
 
 #if PLATFORM(MAC)
+#if ENABLE(MAC_JAVA_BRIDGE)
   static void initJavaJSBindings();
+#endif
   WebScriptObject* windowScriptObject();
 #endif
 

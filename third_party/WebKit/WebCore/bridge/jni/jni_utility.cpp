@@ -26,6 +26,8 @@
 #include "config.h"
 #include "jni_utility.h"
 
+#if ENABLE(MAC_JAVA_BRIDGE)
+
 #include "jni_runtime.h"
 #include "runtime_array.h"
 #include "runtime_object.h"
@@ -575,3 +577,5 @@ jvalue convertValueToJValue(ExecState* exec,
 }  // end of namespace Bindings
 
 }  // end of namespace KJS
+
+#endif  // ENABLE(MAC_JAVA_BRIDGE)

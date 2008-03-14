@@ -275,7 +275,9 @@ class FrameLoaderClient {
   virtual void registerForIconNotification(bool listen = true) = 0;
 
 #if PLATFORM(MAC)
+#if ENABLE(MAC_JAVA_BRIDGE)
   virtual jobject javaApplet(NSView*) { return 0; }
+#endif
   virtual NSCachedURLResponse* willCacheResponse(
       DocumentLoader*,
       unsigned long identifier,

@@ -140,7 +140,7 @@ Frame::Frame(Page* page,
 
   XMLNames::init();
 
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) && ENABLE(MAC_JAVA_BRIDGE)
   static bool initializedJavaJSBindings;
   if (!initializedJavaJSBindings) {
     initializedJavaJSBindings = true;

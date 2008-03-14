@@ -22,8 +22,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
 #include "jni_class.h"
+
+#if ENABLE(MAC_JAVA_BRIDGE)
 
 #include <kjs/identifier.h>
 #include "jni_utility.h"
@@ -134,3 +137,5 @@ bool JavaClass::isBooleanClass() const {
 bool JavaClass::isStringClass() const {
   return strcmp(_name, "java.lang.String") == 0;
 }
+
+#endif  // ENABLE(MAC_JAVA_BRIDGE)
