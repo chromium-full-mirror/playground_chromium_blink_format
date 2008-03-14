@@ -542,8 +542,10 @@ JSObject* DateObjectImp::construct(ExecState* exec, const List& args) {
 JSValue* DateObjectImp::callAsFunction(ExecState* /*exec*/,
                                        JSObject* /*thisObj*/,
                                        const List& /*args*/) {
-  time_t t = time(0);
-  GregorianDateTime ts(*localtime(&t));
+  time_t localTime = time(0);
+  tm localTM;
+  getLocalTime(&localTime, &localTM);
+  GregorianDateTime ts(localTM);
   return jsString(formatDate(ts) + " " + formatTime(ts, false));
 }
 

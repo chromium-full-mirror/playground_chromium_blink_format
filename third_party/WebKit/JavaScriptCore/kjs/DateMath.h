@@ -54,6 +54,7 @@ double gregorianDateTimeToMS(const GregorianDateTime&, double, bool inputIsUTC);
 double getUTCOffset();
 int equivalentYearForDST(int year);
 double getCurrentUTCTime();
+void getLocalTime(const time_t*, tm*);
 
 const char* const weekdayName[7] = {"Mon", "Tue", "Wed", "Thu",
                                     "Fri", "Sat", "Sun"};
