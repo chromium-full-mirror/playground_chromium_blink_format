@@ -1226,4 +1226,16 @@ void Element::cancelFocusAppearanceUpdate() {
 bool Element::virtualHasTagName(const QualifiedName& name) const {
   return hasTagName(name);
 }
+
+void Element::normalizeAttributes() {
+  // Normalize attributes.
+  NamedAttrMap* attrs = attributes(true);
+  if (!attrs)
+    return;
+  unsigned numAttrs = attrs->length();
+  for (unsigned i = 0; i < numAttrs; i++) {
+    if (Attr* attr = attrs->attributeItem(i)->attr())
+      attr->normalize();
+  }
+}
 }

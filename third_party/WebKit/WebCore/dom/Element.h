@@ -130,7 +130,7 @@ class Element : public ContainerNode {
 
   virtual KURL baseURI() const;
 
-  // DOM methods overridden from  parent classes
+  // DOM methods overridden from parent classes
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
   virtual String nodeName() const;
@@ -141,6 +141,8 @@ class Element : public ContainerNode {
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
+
+  void normalizeAttributes();
 
   virtual bool isInputTypeHidden() const { return false; }
 

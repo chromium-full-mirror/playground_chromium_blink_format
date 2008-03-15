@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "Range.h"
+#include "RangeException.h"
 
 #include "CString.h"
 #include "Document.h"
@@ -30,8 +31,10 @@
 #include "ExceptionCode.h"
 #include "HTMLElement.h"
 #include "HTMLNames.h"
+#include "NodeWithIndex.h"
+#include "NodeWithIndexAfter.h"
+#include "NodeWithIndexBefore.h"
 #include "ProcessingInstruction.h"
-#include "RangeException.h"
 #include "RenderBlock.h"
 #include "Text.h"
 #include "TextIterator.h"
@@ -68,6 +71,8 @@ inline Range::Range(PassRefPtr<Document> ownerDocument)
 #ifndef NDEBUG
   ++RangeCounter::count;
 #endif
+
+  m_ownerDocument->attachRange(this);
 }
 
 PassRefPtr<Range> Range::create(PassRefPtr<Document> ownerDocument) {
@@ -85,6 +90,8 @@ inline Range::Range(PassRefPtr<Document> ownerDocument,
 #ifndef NDEBUG
   ++RangeCounter::count;
 #endif
+
+  m_ownerDocument->attachRange(this);
 
   // Simply setting the containers and offsets directly would not do any of the
   // checking
@@ -113,6 +120,9 @@ PassRefPtr<Range> Range::create(PassRefPtr<Document> ownerDocument,
 }
 
 Range::~Range() {
+  if (m_start.container)
+    m_ownerDocument->detachRange(this);
+
 #ifndef NDEBUG
   --RangeCounter::count;
 #endif
@@ -160,11 +170,8 @@ Node* Range::commonAncestorContainer(ExceptionCode& ec) const {
     return 0;
   }
 
-  Node* commonAncestor =
-      commonAncestorContainer(m_start.container.get(), m_end.container.get());
-  if (!commonAncestor)  // should never happen
-    ec = WRONG_DOCUMENT_ERR;
-  return commonAncestor;
+  return commonAncestorContainer(m_start.container.get(),
+                                 m_end.container.get());
 }
 
 Node* Range::commonAncestorContainer(Node* containerA, Node* containerB) {
@@ -302,14 +309,10 @@ bool Range::isPointInRange(Node* refNode, int offset, ExceptionCode& ec) {
   if (ec)
     return false;
 
-  // point is not before the start and not after the end
-  if ((compareBoundaryPoints(refNode, offset, m_start.container.get(),
-                             m_start.offset) != -1) &&
-      (compareBoundaryPoints(refNode, offset, m_end.container.get(),
-                             m_end.offset) != 1))
-    return true;
-  else
-    return false;
+  return compareBoundaryPoints(refNode, offset, m_start.container.get(),
+                               m_start.offset) >= 0 &&
+         compareBoundaryPoints(refNode, offset, m_end.container.get(),
+                               m_end.offset) <= 0;
 }
 
 short Range::comparePoint(Node* refNode, int offset, ExceptionCode& ec) {
@@ -383,7 +386,7 @@ Range::CompareResults Range::compareNode(Node* refNode, ExceptionCode& ec) {
   }
 
   Node* parentNode = refNode->parentNode();
-  unsigned nodeIndex = refNode->nodeIndex();
+  int nodeIndex = refNode->nodeIndex();
 
   if (!parentNode) {
     // if the node is the top document we should return NODE_BEFORE_AND_AFTER
@@ -551,7 +554,7 @@ short Range::compareBoundaryPoints(Node* containerA,
   }
 
   // Should never reach this point.
-  ASSERT(0);
+  ASSERT_NOT_REACHED();
   return 0;
 }
 
@@ -567,12 +570,6 @@ bool Range::boundaryPointsValid() const {
 }
 
 void Range::deleteContents(ExceptionCode& ec) {
-  if (!m_start.container) {
-    ec = INVALID_STATE_ERR;
-    return;
-  }
-
-  ec = 0;
   checkDeleteExtract(ec);
   if (ec)
     return;
@@ -597,7 +594,7 @@ bool Range::intersectsNode(Node* refNode, ExceptionCode& ec) {
   }
 
   Node* parentNode = refNode->parentNode();
-  unsigned nodeIndex = refNode->nodeIndex();
+  int nodeIndex = refNode->nodeIndex();
 
   if (!parentNode) {
     // if the node is the top document we should return NODE_BEFORE_AND_AFTER
@@ -606,13 +603,12 @@ bool Range::intersectsNode(Node* refNode, ExceptionCode& ec) {
     return false;
   }
 
-  if (comparePoint(parentNode, nodeIndex, ec) == -1 &&  // starts before start
-      comparePoint(parentNode, nodeIndex + 1, ec) == -1) {  // ends before start
+  if (comparePoint(parentNode, nodeIndex, ec) < 0 &&      // starts before start
+      comparePoint(parentNode, nodeIndex + 1, ec) < 0) {  // ends before start
     return false;
-  } else if (comparePoint(parentNode, nodeIndex, ec) ==
-                 1 &&  // starts after end
-             comparePoint(parentNode, nodeIndex + 1, ec) ==
-                 1) {  // ends after end
+  } else if (comparePoint(parentNode, nodeIndex, ec) > 0 &&  // starts after end
+             comparePoint(parentNode, nodeIndex + 1, ec) >
+                 0) {  // ends after end
     return false;
   }
 
@@ -621,11 +617,9 @@ bool Range::intersectsNode(Node* refNode, ExceptionCode& ec) {
 
 PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
                                                     ExceptionCode& ec) {
-  // ### when mutation events are implemented, we will have to take into account
-  // situations where the tree is being transformed while we delete - ugh!
-
-  // ### perhaps disable node deletion notification for this range while we do
-  // this?
+  // FIXME: To work properly with mutation events, we will have to take into
+  // account
+  // situations where the tree is being transformed while we work on it - ugh!
 
   RefPtr<DocumentFragment> fragment;
   if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
@@ -661,9 +655,10 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
   // Simple case: the start and end containers are the same. We just grab
   // everything >= start offset and < end offset
   if (m_start.container == m_end.container) {
-    if (m_start.container->nodeType() == Node::TEXT_NODE ||
-        m_start.container->nodeType() == Node::CDATA_SECTION_NODE ||
-        m_start.container->nodeType() == Node::COMMENT_NODE) {
+    Node::NodeType startNodeType = m_start.container->nodeType();
+    if (startNodeType == Node::TEXT_NODE ||
+        startNodeType == Node::CDATA_SECTION_NODE ||
+        startNodeType == Node::COMMENT_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
         RefPtr<CharacterData> c = static_pointer_cast<CharacterData>(
             m_start.container->cloneNode(true));
@@ -671,13 +666,10 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
         c->deleteData(0, m_start.offset, ec);
         fragment->appendChild(c.release(), ec);
       }
-      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS) {
+      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS)
         static_cast<CharacterData*>(m_start.container.get())
             ->deleteData(m_start.offset, m_end.offset - m_start.offset, ec);
-        m_start.container->document()->updateLayout();
-      }
-    } else if (m_start.container->nodeType() ==
-               Node::PROCESSING_INSTRUCTION_NODE) {
+    } else if (startNodeType == Node::PROCESSING_INSTRUCTION_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
         RefPtr<ProcessingInstruction> c =
             static_pointer_cast<ProcessingInstruction>(
@@ -697,12 +689,13 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
     } else {
       Node* n = m_start.container->firstChild();
       int i;
-      for (i = 0; n && i < m_start.offset; i++)  // skip until m_start.offset
+      for (i = 0; n && i < m_start.offset; i++)  // skip until start offset
         n = n->nextSibling();
-      while (n && i < m_end.offset) {  // delete until m_end.offset
+      int endOffset = m_end.offset;
+      while (n && i < endOffset) {  // delete until end offset
         Node* next = n->nextSibling();
         if (action == EXTRACT_CONTENTS)
-          fragment->appendChild(n, ec);  // will remove n from it's parent
+          fragment->appendChild(n, ec);  // will remove n from its parent
         else if (action == CLONE_CONTENTS)
           fragment->appendChild(n->cloneNode(true), ec);
         else
@@ -711,8 +704,6 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
         i++;
       }
     }
-    if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS)
-      collapse(true, ec);
     return fragment.release();
   }
 
@@ -736,27 +727,25 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
   RefPtr<Node> leftContents;
   if (m_start.container != commonRoot) {
     // process the left-hand side of the range, up until the last ancestor of
-    // m_start.container before commonRoot
-    if (m_start.container->nodeType() == Node::TEXT_NODE ||
-        m_start.container->nodeType() == Node::CDATA_SECTION_NODE ||
-        m_start.container->nodeType() == Node::COMMENT_NODE) {
+    // start container before commonRoot
+    Node::NodeType startNodeType = m_start.container->nodeType();
+    if (startNodeType == Node::TEXT_NODE ||
+        startNodeType == Node::CDATA_SECTION_NODE ||
+        startNodeType == Node::COMMENT_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
         RefPtr<CharacterData> c = static_pointer_cast<CharacterData>(
             m_start.container->cloneNode(true));
         c->deleteData(0, m_start.offset, ec);
         leftContents = c.release();
       }
-      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS) {
+      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS)
         static_cast<CharacterData*>(m_start.container.get())
             ->deleteData(
                 m_start.offset,
                 static_cast<CharacterData*>(m_start.container.get())->length() -
                     m_start.offset,
                 ec);
-        m_start.container->document()->updateLayout();
-      }
-    } else if (m_start.container->nodeType() ==
-               Node::PROCESSING_INSTRUCTION_NODE) {
+    } else if (startNodeType == Node::PROCESSING_INSTRUCTION_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
         RefPtr<ProcessingInstruction> c =
             static_pointer_cast<ProcessingInstruction>(
@@ -774,14 +763,13 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
         leftContents = m_start.container->cloneNode(false);
       Node* n = m_start.container->firstChild();
-      for (int i = 0; n && i < m_start.offset;
-           i++)  // skip until m_start.offset
+      for (int i = 0; n && i < m_start.offset; i++)  // skip until start offset
         n = n->nextSibling();
       while (n) {  // process until end
         Node* next = n->nextSibling();
         if (action == EXTRACT_CONTENTS)
-          leftContents->appendChild(
-              n, ec);  // will remove n from m_start.container
+          leftContents->appendChild(n,
+                                    ec);  // will remove n from start container
         else if (action == CLONE_CONTENTS)
           leftContents->appendChild(n->cloneNode(true), ec);
         else
@@ -813,13 +801,14 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
     }
   }
 
-  RefPtr<Node> rightContents = 0;
+  RefPtr<Node> rightContents;
   if (m_end.container != commonRoot) {
     // delete the right-hand side of the range, up until the last ancestor of
-    // m_end.container before commonRoot
-    if (m_end.container->nodeType() == Node::TEXT_NODE ||
-        m_end.container->nodeType() == Node::CDATA_SECTION_NODE ||
-        m_end.container->nodeType() == Node::COMMENT_NODE) {
+    // end container before commonRoot
+    Node::NodeType endNodeType = m_end.container->nodeType();
+    if (endNodeType == Node::TEXT_NODE ||
+        endNodeType == Node::CDATA_SECTION_NODE ||
+        endNodeType == Node::COMMENT_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
         RefPtr<CharacterData> c = static_pointer_cast<CharacterData>(
             m_end.container->cloneNode(true));
@@ -830,13 +819,10 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
             ec);
         rightContents = c;
       }
-      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS) {
+      if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS)
         static_cast<CharacterData*>(m_end.container.get())
             ->deleteData(0, m_end.offset, ec);
-        m_start.container->document()->updateLayout();
-      }
-    } else if (m_end.container->nodeType() ==
-               Node::PROCESSING_INSTRUCTION_NODE) {
+    } else if (endNodeType == Node::PROCESSING_INSTRUCTION_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
         RefPtr<ProcessingInstruction> c =
             static_pointer_cast<ProcessingInstruction>(
@@ -854,7 +840,7 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
         rightContents = m_end.container->cloneNode(false);
       Node* n = m_end.container->firstChild();
       if (n && m_end.offset) {
-        for (int i = 0; i + 1 < m_end.offset; i++) {  // skip to m_end.offset
+        for (int i = 0; i + 1 < m_end.offset; i++) {  // skip to end.offset
           Node* next = n->nextSibling();
           if (!next)
             break;
@@ -865,7 +851,7 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
           prev = n->previousSibling();
           if (action == EXTRACT_CONTENTS)
             rightContents->insertBefore(n, rightContents->firstChild(),
-                                        ec);  // will remove n from it's parent
+                                        ec);  // will remove n from its parent
           else if (action == CLONE_CONTENTS)
             rightContents->insertBefore(n->cloneNode(true),
                                         rightContents->firstChild(), ec);
@@ -883,13 +869,12 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
         rightContentsParent->appendChild(rightContents, ec);
         rightContents = rightContentsParent;
       }
-
       Node* prev;
       for (; n; n = prev) {
         prev = n->previousSibling();
         if (action == EXTRACT_CONTENTS)
           rightContents->insertBefore(n, rightContents->firstChild(),
-                                      ec);  // will remove n from it's parent
+                                      ec);  // will remove n from its parent
         else if (action == CLONE_CONTENTS)
           rightContents->insertBefore(n->cloneNode(true),
                                       rightContents->firstChild(), ec);
@@ -904,9 +889,8 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
 
   Node* processStart;  // child of commonRoot
   if (m_start.container == commonRoot) {
-    int i;
     processStart = m_start.container->firstChild();
-    for (i = 0; i < m_start.offset; i++)
+    for (int i = 0; i < m_start.offset; i++)
       processStart = processStart->nextSibling();
   } else {
     processStart = m_start.container.get();
@@ -916,9 +900,8 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
   }
   Node* processEnd;  // child of commonRoot
   if (m_end.container == commonRoot) {
-    int i;
     processEnd = m_end.container->firstChild();
-    for (i = 0; i < m_end.offset; i++)
+    for (int i = 0; i < m_end.offset; i++)
       processEnd = processEnd->nextSibling();
   } else {
     processEnd = m_end.container.get();
@@ -937,7 +920,6 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
   if (processStart) {
     for (n = processStart; n && n != processEnd; n = next) {
       next = n->nextSibling();
-
       if (action == EXTRACT_CONTENTS)
         fragment->appendChild(n, ec);  // will remove from commonRoot
       else if (action == CLONE_CONTENTS)
@@ -950,30 +932,10 @@ PassRefPtr<DocumentFragment> Range::processContents(ActionType action,
   if ((action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) && rightContents)
     fragment->appendChild(rightContents, ec);
 
-  // collapse to the proper position - see spec section 2.6
-  if (action == EXTRACT_CONTENTS || action == DELETE_CONTENTS) {
-    if (!partialStart && !partialEnd)
-      collapse(true, ec);
-    else if (partialStart) {
-      m_start.container = partialStart->parentNode();
-      m_end.container = partialStart->parentNode();
-      m_start.offset = m_end.offset = partialStart->nodeIndex() + 1;
-    } else if (partialEnd) {
-      m_start.container = partialEnd->parentNode();
-      m_end.container = partialEnd->parentNode();
-      m_start.offset = m_end.offset = partialEnd->nodeIndex();
-    }
-  }
   return fragment.release();
 }
 
 PassRefPtr<DocumentFragment> Range::extractContents(ExceptionCode& ec) {
-  if (!m_start.container) {
-    ec = INVALID_STATE_ERR;
-    return 0;
-  }
-
-  ec = 0;
   checkDeleteExtract(ec);
   if (ec)
     return 0;
@@ -1073,7 +1035,7 @@ void Range::insertNode(PassRefPtr<Node> newNode, ExceptionCode& ec) {
     return;
   }
 
-  unsigned endOffsetDelta = 0;
+  int endOffsetDelta = 0;
   if (m_start.container->nodeType() == Node::TEXT_NODE ||
       m_start.container->nodeType() == Node::CDATA_SECTION_NODE) {
     RefPtr<Text> newText = static_cast<Text*>(m_start.container.get())
@@ -1108,8 +1070,8 @@ String Range::toString(ExceptionCode& ec) const {
 
   Vector<UChar> result;
 
-  Node* pastEnd = pastLastNode();
-  for (Node* n = firstNode(); n != pastEnd; n = n->traverseNextNode()) {
+  Node* pastLast = pastLastNode();
+  for (Node* n = firstNode(); n != pastLast; n = n->traverseNextNode()) {
     if (n->nodeType() == Node::TEXT_NODE ||
         n->nodeType() == Node::CDATA_SECTION_NODE) {
       String data = static_cast<CharacterData*>(n)->data();
@@ -1173,6 +1135,8 @@ void Range::detach(ExceptionCode& ec) {
     ec = INVALID_STATE_ERR;
     return;
   }
+
+  m_ownerDocument->detachRange(this);
 
   m_start.clear();
   m_end.clear();
@@ -1580,11 +1544,17 @@ void Range::setStartBefore(Node* refNode, ExceptionCode& ec) {
 }
 
 void Range::checkDeleteExtract(ExceptionCode& ec) {
+  if (!m_start.container) {
+    ec = INVALID_STATE_ERR;
+    return;
+  }
+
+  ec = 0;
   if (!commonAncestorContainer(ec) || ec)
     return;
 
-  Node* pastEnd = pastLastNode();
-  for (Node* n = firstNode(); n != pastEnd; n = n->traverseNextNode()) {
+  Node* pastLast = pastLastNode();
+  for (Node* n = firstNode(); n != pastLast; n = n->traverseNextNode()) {
     if (n->isReadOnlyNode()) {
       ec = NO_MODIFICATION_ALLOWED_ERR;
       return;
@@ -1756,5 +1726,133 @@ int Range::maxEndOffset() const {
   if (!m_end.container->offsetInCharacters())
     return m_end.container->childNodeCount();
   return m_end.container->maxCharacterOffset();
+}
+
+static inline void endpointNodeChildrenChanged(Position& endpoint,
+                                               NodeWithIndexAfter& beforeChange,
+                                               NodeWithIndexBefore& afterChange,
+                                               int childCountDelta) {
+  if (endpoint.container != afterChange.parent())
+    return;
+  if (beforeChange.indexAfter() >= endpoint.offset)
+    return;
+  if (childCountDelta < 0 && afterChange.indexBefore() >= endpoint.offset)
+    endpoint.offset = afterChange.indexBefore();
+  else
+    endpoint.offset += childCountDelta;
+}
+
+void Range::nodeChildrenChanged(NodeWithIndexAfter& beforeChange,
+                                NodeWithIndexBefore& afterChange,
+                                int childCountDelta) {
+  ASSERT(afterChange.parent());
+  ASSERT(afterChange.parent()->document() == m_ownerDocument);
+  ASSERT(childCountDelta);
+  endpointNodeChildrenChanged(m_start, beforeChange, afterChange,
+                              childCountDelta);
+  endpointNodeChildrenChanged(m_end, beforeChange, afterChange,
+                              childCountDelta);
+}
+
+static inline void endpointNodeWillBeRemoved(Position& endpoint,
+                                             NodeWithIndex& nodeToBeRemoved) {
+  for (Node* n = endpoint.container.get(); n; n = n->parentNode()) {
+    if (n == nodeToBeRemoved.node()) {
+      endpoint.container = nodeToBeRemoved.node()->parentNode();
+      endpoint.offset = nodeToBeRemoved.index();
+    }
+  }
+}
+
+void Range::nodeWillBeRemoved(NodeWithIndex& nodeToBeRemoved) {
+  ASSERT(nodeToBeRemoved.node());
+  ASSERT(nodeToBeRemoved.node()->document() == m_ownerDocument);
+  ASSERT(nodeToBeRemoved.node() != m_ownerDocument);
+  ASSERT(nodeToBeRemoved.node()->parentNode());
+  endpointNodeWillBeRemoved(m_start, nodeToBeRemoved);
+  endpointNodeWillBeRemoved(m_end, nodeToBeRemoved);
+}
+
+static inline void endpointTextInserted(Position& endpoint,
+                                        Node* text,
+                                        unsigned offset,
+                                        unsigned length) {
+  if (endpoint.container != text)
+    return;
+  if (offset >= static_cast<unsigned>(endpoint.offset))
+    return;
+  endpoint.offset += length;
+}
+
+void Range::textInserted(Node* text, unsigned offset, unsigned length) {
+  ASSERT(text);
+  ASSERT(text->document() == m_ownerDocument);
+  endpointTextInserted(m_start, text, offset, length);
+  endpointTextInserted(m_end, text, offset, length);
+}
+
+static inline void endpointTextRemoved(Position& endpoint,
+                                       Node* text,
+                                       unsigned offset,
+                                       unsigned length) {
+  if (endpoint.container != text)
+    return;
+  if (offset >= static_cast<unsigned>(endpoint.offset))
+    return;
+  if (offset + length >= static_cast<unsigned>(endpoint.offset))
+    endpoint.offset = offset;
+  else
+    endpoint.offset -= length;
+}
+
+void Range::textRemoved(Node* text, unsigned offset, unsigned length) {
+  ASSERT(text);
+  ASSERT(text->document() == m_ownerDocument);
+  endpointTextRemoved(m_start, text, offset, length);
+  endpointTextRemoved(m_end, text, offset, length);
+}
+
+static inline void endpointTextNodesMerged(Position& endpoint,
+                                           NodeWithIndex& oldNode,
+                                           unsigned offset) {
+  if (endpoint.container == oldNode.node()) {
+    endpoint.container = oldNode.node()->previousSibling();
+    endpoint.offset += offset;
+  } else if (endpoint.container == oldNode.node()->parentNode() &&
+             endpoint.offset == oldNode.index()) {
+    endpoint.container = oldNode.node()->previousSibling();
+    endpoint.offset = offset;
+  }
+}
+
+void Range::textNodesMerged(NodeWithIndex& oldNode, unsigned offset) {
+  ASSERT(oldNode.node());
+  ASSERT(oldNode.node()->document() == m_ownerDocument);
+  ASSERT(oldNode.node()->parentNode());
+  ASSERT(oldNode.node()->isTextNode());
+  ASSERT(oldNode.node()->previousSibling());
+  ASSERT(oldNode.node()->previousSibling()->isTextNode());
+  endpointTextNodesMerged(m_start, oldNode, offset);
+  endpointTextNodesMerged(m_end, oldNode, offset);
+}
+
+static inline void endpointTextNodesSplit(Position& endpoint, Text* oldNode) {
+  if (endpoint.container != oldNode)
+    return;
+  if (endpoint.offset <= static_cast<int>(oldNode->length()))
+    return;
+  endpoint.container = oldNode->nextSibling();
+  endpoint.offset -= oldNode->length();
+}
+
+void Range::textNodeSplit(Text* oldNode) {
+  ASSERT(oldNode);
+  ASSERT(oldNode->document() == m_ownerDocument);
+  ASSERT(oldNode->parentNode());
+  ASSERT(oldNode->isTextNode());
+  ASSERT(oldNode->nextSibling());
+  ASSERT(oldNode->nextSibling()->isTextNode());
+  endpointTextNodesSplit(m_start, oldNode);
+  endpointTextNodesSplit(m_end, oldNode);
 }
 }

@@ -704,10 +704,10 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
     if (start == end && start.node()->hasTagName(brTag))
       end = positionAfterNode(start.node());
     // Add the style to selected inline runs.
-    Node* pastEnd = Range::create(document(), rangeCompliantEquivalent(start),
-                                  rangeCompliantEquivalent(end))
-                        ->pastLastNode();
-    for (Node* next; node && node != pastEnd; node = next) {
+    Node* pastLast = Range::create(document(), rangeCompliantEquivalent(start),
+                                   rangeCompliantEquivalent(end))
+                         ->pastLastNode();
+    for (Node* next; node && node != pastLast; node = next) {
       next = node->traverseNextNode();
 
       if (!node->renderer() || !node->isContentEditable())
@@ -741,7 +741,7 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
       Node* runStart = node;
       // Find the end of the run.
       Node* sibling = node->nextSibling();
-      while (sibling && sibling != pastEnd &&
+      while (sibling && sibling != pastLast &&
              (!sibling->isElementNode() || sibling->hasTagName(brTag)) &&
              !isBlock(sibling)) {
         node = sibling;

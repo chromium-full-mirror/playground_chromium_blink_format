@@ -37,18 +37,15 @@ namespace WebCore {
 
 // DOM Section 1.1.1
 
-// ### allow having children in text nodes for entities, comments etc.
+Text::Text(Document* document, const String& text)
+    : CharacterData(document, text) {}
 
-Text::Text(Document* doc, const String& _text) : CharacterData(doc, _text) {}
-
-Text::Text(Document* doc) : CharacterData(doc) {}
+Text::Text(Document* document) : CharacterData(document) {}
 
 Text::~Text() {}
 
 PassRefPtr<Text> Text::splitText(unsigned offset, ExceptionCode& ec) {
   ec = 0;
-
-  // FIXME: This does not copy markers
 
   // INDEX_SIZE_ERR: Raised if the specified offset is negative or greater than
   // the number of 16-bit units in data.
@@ -73,6 +70,9 @@ PassRefPtr<Text> Text::splitText(unsigned offset, ExceptionCode& ec) {
     parentNode()->insertBefore(newText.get(), nextSibling(), ec);
   if (ec)
     return 0;
+
+  if (parentNode())
+    document()->textNodeSplit(this);
 
   if (renderer())
     static_cast<RenderText*>(renderer())->setText(m_data);
@@ -247,9 +247,10 @@ void Text::attach() {
 }
 
 void Text::recalcStyle(StyleChange change) {
-  if (change != NoChange && parentNode())
+  if (change != NoChange && parentNode()) {
     if (renderer())
       renderer()->setStyle(parentNode()->renderer()->style());
+  }
   if (changed() && renderer() && renderer()->isText())
     static_cast<RenderText*>(renderer())->setText(m_data);
   setChanged(NoStyleChange);
@@ -265,7 +266,6 @@ PassRefPtr<Text> Text::createNew(PassRefPtr<StringImpl> string) {
 }
 
 String Text::toString() const {
-  // FIXME: substitute entity references as needed!
   return nodeValue();
 }
 

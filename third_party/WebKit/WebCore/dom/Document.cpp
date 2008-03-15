@@ -80,6 +80,9 @@
 #include "NameNodeList.h"
 #include "NodeFilter.h"
 #include "NodeIterator.h"
+#include "NodeWithIndex.h"
+#include "NodeWithIndexAfter.h"
+#include "NodeWithIndexBefore.h"
 #include "OverflowEvent.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
@@ -419,6 +422,7 @@ Document::~Document() {
   ASSERT(!renderer());
   ASSERT(!m_inPageCache);
   ASSERT(!m_savedRenderer);
+  ASSERT(m_ranges.isEmpty());
 
   removeAllEventListeners();
 
@@ -2489,16 +2493,71 @@ void Document::detachNodeIterator(NodeIterator* ni) {
   m_nodeIterators.remove(ni);
 }
 
-void Document::notifyBeforeNodeRemoval(Node* n) {
-  if (Frame* f = frame()) {
-    f->selectionController()->nodeWillBeRemoved(n);
-    f->dragCaretController()->nodeWillBeRemoved(n);
-  }
+void Document::nodeChildrenChanged(ContainerNode* container,
+                                   Node* beforeChange,
+                                   Node* afterChange,
+                                   int childCountDelta) {
+  NodeWithIndexAfter beforeChangeWithIndex(beforeChange);
+  NodeWithIndexBefore afterChangeWithIndex(container, afterChange);
+  HashSet<Range*>::const_iterator end = m_ranges.end();
+  for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != end; ++it)
+    (*it)->nodeChildrenChanged(beforeChangeWithIndex, afterChangeWithIndex,
+                               childCountDelta);
+}
 
-  HashSet<NodeIterator*>::const_iterator end = m_nodeIterators.end();
+void Document::nodeWillBeRemoved(Node* n) {
+  HashSet<NodeIterator*>::const_iterator nodeIteratorsEnd =
+      m_nodeIterators.end();
   for (HashSet<NodeIterator*>::const_iterator it = m_nodeIterators.begin();
-       it != end; ++it)
-    (*it)->notifyBeforeNodeRemoval(n);
+       it != nodeIteratorsEnd; ++it)
+    (*it)->nodeWillBeRemoved(n);
+
+  NodeWithIndex nodeWithIndex(n);
+  HashSet<Range*>::const_iterator rangesEnd = m_ranges.end();
+  for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != rangesEnd;
+       ++it)
+    (*it)->nodeWillBeRemoved(nodeWithIndex);
+
+  if (Frame* frame = this->frame()) {
+    frame->selectionController()->nodeWillBeRemoved(n);
+    frame->dragCaretController()->nodeWillBeRemoved(n);
+  }
+}
+
+void Document::textInserted(Node* text, unsigned offset, unsigned length) {
+  HashSet<Range*>::const_iterator end = m_ranges.end();
+  for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != end; ++it)
+    (*it)->textInserted(text, offset, length);
+
+  // Update the markers for spelling and grammar checking.
+  shiftMarkers(text, offset, length);
+}
+
+void Document::textRemoved(Node* text, unsigned offset, unsigned length) {
+  HashSet<Range*>::const_iterator end = m_ranges.end();
+  for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != end; ++it)
+    (*it)->textRemoved(text, offset, length);
+
+  // Update the markers for spelling and grammar checking.
+  removeMarkers(text, offset, length);
+  shiftMarkers(text, offset + length, 0 - length);
+}
+
+void Document::textNodesMerged(Text* oldNode, unsigned offset) {
+  NodeWithIndex oldNodeWithIndex(oldNode);
+  HashSet<Range*>::const_iterator end = m_ranges.end();
+  for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != end; ++it)
+    (*it)->textNodesMerged(oldNodeWithIndex, offset);
+
+  // FIXME: This should update markers for spelling and grammar checking.
+}
+
+void Document::textNodeSplit(Text* oldNode) {
+  HashSet<Range*>::const_iterator end = m_ranges.end();
+  for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != end; ++it)
+    (*it)->textNodeSplit(oldNode);
+
+  // FIXME: This should update markers for spelling and grammar checking.
 }
 
 DOMWindow* Document::defaultView() const {
@@ -2543,9 +2602,8 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
   return 0;
 }
 
-CSSStyleDeclaration* Document::getOverrideStyle(Element* /*elt*/,
-                                                const String& /*pseudoElt*/) {
-  return 0;  // ###
+CSSStyleDeclaration* Document::getOverrideStyle(Element*, const String&) {
+  return 0;
 }
 
 void Document::handleWindowEvent(Event* evt, bool useCapture) {
@@ -4064,5 +4122,15 @@ void Document::stopDatabases() {
 }
 
 #endif
+
+void Document::attachRange(Range* range) {
+  ASSERT(!m_ranges.contains(range));
+  m_ranges.add(range);
+}
+
+void Document::detachRange(Range* range) {
+  ASSERT(m_ranges.contains(range));
+  m_ranges.remove(range);
+}
 
 }  // namespace WebCore

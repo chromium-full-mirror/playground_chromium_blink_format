@@ -50,7 +50,7 @@ class NodeIterator : public Traversal {
   }
 
   // This function is called before any node is removed from the document tree.
-  void notifyBeforeNodeRemoval(Node* nodeToBeRemoved);
+  void nodeWillBeRemoved(Node*);
 
   // For non-JS bindings. Silently ignores the JavaScript exception if any.
   Node* nextNode(ExceptionCode& ec) {

@@ -36,9 +36,9 @@ using namespace EventNames;
 
 CharacterData::CharacterData(Document* doc) : EventTargetNode(doc) {}
 
-CharacterData::CharacterData(Document* doc, const String& _text)
-    : EventTargetNode(doc) {
-  m_data = _text.impl() ? _text.impl() : StringImpl::empty();
+CharacterData::CharacterData(Document* document, const String& text)
+    : EventTargetNode(document) {
+  m_data = text.impl() ? text.impl() : StringImpl::empty();
 }
 
 CharacterData::~CharacterData() {}
@@ -53,6 +53,7 @@ void CharacterData::setData(const String& data, ExceptionCode& ec) {
   if (equal(m_data.get(), data.impl()))
     return;
 
+  int oldLength = length();
   RefPtr<StringImpl> oldStr = m_data;
   m_data = data.impl();
 
@@ -64,11 +65,11 @@ void CharacterData::setData(const String& data, ExceptionCode& ec) {
 
   dispatchModifiedEvent(oldStr.get());
 
-  document()->removeMarkers(this);
+  document()->textRemoved(this, 0, oldLength);
 }
 
-String CharacterData::substringData(const unsigned offset,
-                                    const unsigned count,
+String CharacterData::substringData(unsigned offset,
+                                    unsigned count,
                                     ExceptionCode& ec) {
   ec = 0;
   checkCharDataOperation(offset, ec);
@@ -103,7 +104,7 @@ void CharacterData::appendData(const String& arg, ExceptionCode& ec) {
   dispatchModifiedEvent(oldStr.get());
 }
 
-void CharacterData::insertData(const unsigned offset,
+void CharacterData::insertData(unsigned offset,
                                const String& arg,
                                ExceptionCode& ec) {
   ec = 0;
@@ -125,21 +126,25 @@ void CharacterData::insertData(const unsigned offset,
 
   dispatchModifiedEvent(oldStr.get());
 
-  // update the markers for spell checking and grammar checking
-  unsigned length = arg.length();
-  document()->shiftMarkers(this, offset, length);
+  document()->textInserted(this, offset, arg.length());
 }
 
-void CharacterData::deleteData(const unsigned offset,
-                               const unsigned count,
+void CharacterData::deleteData(unsigned offset,
+                               unsigned count,
                                ExceptionCode& ec) {
   ec = 0;
   checkCharDataOperation(offset, ec);
   if (ec)
     return;
 
+  unsigned realCount;
+  if (offset + count > length())
+    realCount = length() - offset;
+  else
+    realCount = count;
+
   String newStr = m_data;
-  newStr.remove(offset, count);
+  newStr.remove(offset, realCount);
 
   RefPtr<StringImpl> oldStr = m_data;
   m_data = newStr.impl();
@@ -153,13 +158,11 @@ void CharacterData::deleteData(const unsigned offset,
 
   dispatchModifiedEvent(oldStr.get());
 
-  // update the markers for spell checking and grammar checking
-  document()->removeMarkers(this, offset, count);
-  document()->shiftMarkers(this, offset + count, -static_cast<int>(count));
+  document()->textRemoved(this, offset, realCount);
 }
 
-void CharacterData::replaceData(const unsigned offset,
-                                const unsigned count,
+void CharacterData::replaceData(unsigned offset,
+                                unsigned count,
                                 const String& arg,
                                 ExceptionCode& ec) {
   ec = 0;
@@ -168,8 +171,8 @@ void CharacterData::replaceData(const unsigned offset,
     return;
 
   unsigned realCount;
-  if (offset + count > m_data->length())
-    realCount = m_data->length() - offset;
+  if (offset + count > length())
+    realCount = length() - offset;
   else
     realCount = count;
 
@@ -190,9 +193,8 @@ void CharacterData::replaceData(const unsigned offset,
   dispatchModifiedEvent(oldStr.get());
 
   // update the markers for spell checking and grammar checking
-  int diff = arg.length() - count;
-  document()->removeMarkers(this, offset, count);
-  document()->shiftMarkers(this, offset + count, diff);
+  document()->textRemoved(this, offset, realCount);
+  document()->textInserted(this, offset, arg.length());
 }
 
 String CharacterData::nodeValue() const {
@@ -200,14 +202,12 @@ String CharacterData::nodeValue() const {
 }
 
 bool CharacterData::containsOnlyWhitespace() const {
-  if (m_data)
-    return m_data->containsOnlyWhitespace();
-  return true;
+  return !m_data || m_data->containsOnlyWhitespace();
 }
 
-void CharacterData::setNodeValue(const String& _nodeValue, ExceptionCode& ec) {
+void CharacterData::setNodeValue(const String& nodeValue, ExceptionCode& ec) {
   // NO_MODIFICATION_ALLOWED_ERR: taken care of by setData()
-  setData(_nodeValue, ec);
+  setData(nodeValue, ec);
 }
 
 void CharacterData::dispatchModifiedEvent(StringImpl* prevValue) {
@@ -223,14 +223,13 @@ void CharacterData::dispatchModifiedEvent(StringImpl* prevValue) {
   dispatchSubtreeModifiedEvent();
 }
 
-void CharacterData::checkCharDataOperation(const unsigned offset,
-                                           ExceptionCode& ec) {
+void CharacterData::checkCharDataOperation(unsigned offset, ExceptionCode& ec) {
   ec = 0;
 
   // INDEX_SIZE_ERR: Raised if the specified offset is negative or greater than
   // the number of 16-bit
   // units in data.
-  if (offset > m_data->length()) {
+  if (offset > length()) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -243,11 +242,11 @@ void CharacterData::checkCharDataOperation(const unsigned offset,
 }
 
 int CharacterData::maxCharacterOffset() const {
-  return (int)length();
+  return static_cast<int>(length());
 }
 
 bool CharacterData::rendererIsNeeded(RenderStyle* style) {
-  if (!m_data || m_data->length() == 0)
+  if (!m_data || !length())
     return false;
   return EventTargetNode::rendererIsNeeded(style);
 }
