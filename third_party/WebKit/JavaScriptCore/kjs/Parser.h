@@ -59,6 +59,8 @@ class Parser : Noncopyable {
   void didFinishParsing(SourceElements*,
                         ParserRefCountedData<DeclarationStacks::VarStack>*,
                         ParserRefCountedData<DeclarationStacks::FunctionStack>*,
+                        bool usesEval,
+                        bool needsClosure,
                         int lastLine);
 
  private:
@@ -78,6 +80,8 @@ class Parser : Noncopyable {
   RefPtr<ParserRefCountedData<DeclarationStacks::VarStack>> m_varDeclarations;
   RefPtr<ParserRefCountedData<DeclarationStacks::FunctionStack>>
       m_funcDeclarations;
+  bool m_usesEval;
+  bool m_needsClosure;
   int m_lastLine;
 };
 
@@ -100,7 +104,8 @@ PassRefPtr<ParsedNode> Parser::parse(const UString& sourceURL,
   RefPtr<ParsedNode> node =
       ParsedNode::create(m_sourceElements.release().get(),
                          m_varDeclarations ? &m_varDeclarations->data : 0,
-                         m_funcDeclarations ? &m_funcDeclarations->data : 0);
+                         m_funcDeclarations ? &m_funcDeclarations->data : 0,
+                         m_usesEval, m_needsClosure);
   m_varDeclarations = 0;
   m_funcDeclarations = 0;
   m_sourceURL = UString();

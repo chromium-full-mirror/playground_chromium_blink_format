@@ -49,7 +49,9 @@ class FunctionBodyNodeWithDebuggerHooks : public FunctionBodyNode {
  public:
   FunctionBodyNodeWithDebuggerHooks(SourceElements*,
                                     VarStack*,
-                                    FunctionStack*) KJS_FAST_CALL;
+                                    FunctionStack*,
+                                    bool usesEval,
+                                    bool needsClosure) KJS_FAST_CALL;
   virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
 };
 
@@ -4348,10 +4350,14 @@ JSValue* TryNode::execute(ExecState* exec) {
 
 ScopeNode::ScopeNode(SourceElements* children,
                      VarStack* varStack,
-                     FunctionStack* funcStack)
+                     FunctionStack* funcStack,
+                     bool usesEval,
+                     bool needsClosure)
     : BlockNode(children),
       m_sourceURL(parser().sourceURL()),
-      m_sourceId(parser().sourceId()) {
+      m_sourceId(parser().sourceId()),
+      m_usesEval(usesEval),
+      m_needsClosure(needsClosure) {
   if (varStack)
     m_varStack = *varStack;
   if (funcStack)
@@ -4362,41 +4368,56 @@ ScopeNode::ScopeNode(SourceElements* children,
 
 ProgramNode::ProgramNode(SourceElements* children,
                          VarStack* varStack,
-                         FunctionStack* funcStack)
-    : ScopeNode(children, varStack, funcStack) {}
+                         FunctionStack* funcStack,
+                         bool usesEval,
+                         bool needsClosure)
+    : ScopeNode(children, varStack, funcStack, usesEval, needsClosure) {}
 
 ProgramNode* ProgramNode::create(SourceElements* children,
                                  VarStack* varStack,
-                                 FunctionStack* funcStack) {
-  return new ProgramNode(children, varStack, funcStack);
+                                 FunctionStack* funcStack,
+                                 bool usesEval,
+                                 bool needsClosure) {
+  return new ProgramNode(children, varStack, funcStack, usesEval, needsClosure);
 }
 
 // ------------------------------ EvalNode -----------------------------
 
 EvalNode::EvalNode(SourceElements* children,
                    VarStack* varStack,
-                   FunctionStack* funcStack)
-    : ScopeNode(children, varStack, funcStack) {}
+                   FunctionStack* funcStack,
+                   bool usesEval,
+                   bool needsClosure)
+    : ScopeNode(children, varStack, funcStack, usesEval, needsClosure) {}
 
 EvalNode* EvalNode::create(SourceElements* children,
                            VarStack* varStack,
-                           FunctionStack* funcStack) {
-  return new EvalNode(children, varStack, funcStack);
+                           FunctionStack* funcStack,
+                           bool usesEval,
+                           bool needsClosure) {
+  return new EvalNode(children, varStack, funcStack, usesEval, needsClosure);
 }
 
 // ------------------------------ FunctionBodyNode -----------------------------
 
 FunctionBodyNode::FunctionBodyNode(SourceElements* children,
                                    VarStack* varStack,
-                                   FunctionStack* funcStack)
-    : ScopeNode(children, varStack, funcStack), m_initialized(false) {}
+                                   FunctionStack* funcStack,
+                                   bool usesEval,
+                                   bool needsClosure)
+    : ScopeNode(children, varStack, funcStack, usesEval, needsClosure),
+      m_initialized(false) {}
 
 FunctionBodyNode* FunctionBodyNode::create(SourceElements* children,
                                            VarStack* varStack,
-                                           FunctionStack* funcStack) {
+                                           FunctionStack* funcStack,
+                                           bool usesEval,
+                                           bool needsClosure) {
   if (Debugger::debuggersPresent)
-    return new FunctionBodyNodeWithDebuggerHooks(children, varStack, funcStack);
-  return new FunctionBodyNode(children, varStack, funcStack);
+    return new FunctionBodyNodeWithDebuggerHooks(children, varStack, funcStack,
+                                                 usesEval, needsClosure);
+  return new FunctionBodyNode(children, varStack, funcStack, usesEval,
+                              needsClosure);
 }
 
 void FunctionBodyNode::initializeSymbolTable(ExecState* exec) {
@@ -4657,8 +4678,10 @@ JSValue* FunctionBodyNode::execute(ExecState* exec) {
 FunctionBodyNodeWithDebuggerHooks::FunctionBodyNodeWithDebuggerHooks(
     SourceElements* children,
     DeclarationStacks::VarStack* varStack,
-    DeclarationStacks::FunctionStack* funcStack)
-    : FunctionBodyNode(children, varStack, funcStack) {}
+    DeclarationStacks::FunctionStack* funcStack,
+    bool usesEval,
+    bool needsClosure)
+    : FunctionBodyNode(children, varStack, funcStack, usesEval, needsClosure) {}
 
 JSValue* FunctionBodyNodeWithDebuggerHooks::execute(ExecState* exec) {
   if (Debugger* dbg = exec->dynamicGlobalObject()->debugger()) {

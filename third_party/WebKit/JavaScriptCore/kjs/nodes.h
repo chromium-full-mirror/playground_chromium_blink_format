@@ -2635,11 +2635,18 @@ class ParameterNode : public Node {
 
 class ScopeNode : public BlockNode {
  public:
-  ScopeNode(SourceElements*, VarStack*, FunctionStack*) KJS_FAST_CALL;
+  ScopeNode(SourceElements*,
+            VarStack*,
+            FunctionStack*,
+            bool usesEval,
+            bool needsClosure) KJS_FAST_CALL;
 
   int sourceId() const KJS_FAST_CALL { return m_sourceId; }
   const UString& sourceURL() const KJS_FAST_CALL { return m_sourceURL; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+
+  bool usesEval() const { return m_usesEval; }
+  bool needsClosure() const { return m_needsClosure; }
 
  protected:
   void optimizeVariableAccess(ExecState*) KJS_FAST_CALL;
@@ -2650,18 +2657,26 @@ class ScopeNode : public BlockNode {
  private:
   UString m_sourceURL;
   int m_sourceId;
+  bool m_usesEval;
+  bool m_needsClosure;
 };
 
 class ProgramNode : public ScopeNode {
  public:
   static ProgramNode* create(SourceElements*,
                              VarStack*,
-                             FunctionStack*) KJS_FAST_CALL;
+                             FunctionStack*,
+                             bool usesEval,
+                             bool needsClosure) KJS_FAST_CALL;
 
   virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
 
  private:
-  ProgramNode(SourceElements*, VarStack*, FunctionStack*) KJS_FAST_CALL;
+  ProgramNode(SourceElements*,
+              VarStack*,
+              FunctionStack*,
+              bool usesEval,
+              bool needsClosure) KJS_FAST_CALL;
 
   void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
   ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
@@ -2678,12 +2693,18 @@ class EvalNode : public ScopeNode {
  public:
   static EvalNode* create(SourceElements*,
                           VarStack*,
-                          FunctionStack*) KJS_FAST_CALL;
+                          FunctionStack*,
+                          bool usesEval,
+                          bool needsClosure) KJS_FAST_CALL;
 
   virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
 
  private:
-  EvalNode(SourceElements*, VarStack*, FunctionStack*) KJS_FAST_CALL;
+  EvalNode(SourceElements*,
+           VarStack*,
+           FunctionStack*,
+           bool usesEval,
+           bool needsClosure) KJS_FAST_CALL;
 
   ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
 };
@@ -2692,7 +2713,9 @@ class FunctionBodyNode : public ScopeNode {
  public:
   static FunctionBodyNode* create(SourceElements*,
                                   VarStack*,
-                                  FunctionStack*) KJS_FAST_CALL;
+                                  FunctionStack*,
+                                  bool usesEval,
+                                  bool needsClosure) KJS_FAST_CALL;
 
   virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
 
@@ -2702,7 +2725,11 @@ class FunctionBodyNode : public ScopeNode {
   UString paramString() const KJS_FAST_CALL;
 
  protected:
-  FunctionBodyNode(SourceElements*, VarStack*, FunctionStack*) KJS_FAST_CALL;
+  FunctionBodyNode(SourceElements*,
+                   VarStack*,
+                   FunctionStack*,
+                   bool usesEval,
+                   bool needsClosure) KJS_FAST_CALL;
 
  private:
   void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
