@@ -192,7 +192,8 @@ class FrameLoader : Noncopyable
 
   static bool shouldHideReferrer(const KURL& url, const String& referrer);
 
-  Frame* createWindow(const FrameLoadRequest&,
+  Frame* createWindow(FrameLoader* frameLoaderForFrameLookup,
+                      const FrameLoadRequest&,
                       const WindowFeatures&,
                       bool& created);
 
