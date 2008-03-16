@@ -32,10 +32,10 @@
 #include "KURL.h"
 #include "PlatformString.h"
 #include "wtf/RefPtr.h"
+#include "Frame.h"
 
 namespace WebCore {
 class FrameLoaderClientQt;
-class Frame;
 class FrameView;
 class HTMLFrameOwnerElement;
 class PlatformScrollbar;
