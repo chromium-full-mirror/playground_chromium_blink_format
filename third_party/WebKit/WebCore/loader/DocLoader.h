@@ -105,7 +105,7 @@ class DocLoader {
   int requestCount();
 
   void clearPreloads();
-  void registerPreload(CachedResource*);
+  void preload(CachedResource::Type type, const String& url);
   void printPreloadStats();
 
  private:
@@ -113,7 +113,8 @@ class DocLoader {
                                   const String& url,
                                   const String* charset = 0,
                                   bool skipCanLoadCheck = false,
-                                  bool sendResourceLoadCallbacks = true);
+                                  bool sendResourceLoadCallbacks = true,
+                                  bool isPreload = false);
 
   void checkForReload(const KURL&);
   void checkCacheObjectStatus(CachedResource*);

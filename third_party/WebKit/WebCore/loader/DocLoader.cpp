@@ -159,7 +159,8 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
                                            const String& url,
                                            const String* charset,
                                            bool skipCanLoadCheck,
-                                           bool sendResourceLoadCallbacks) {
+                                           bool sendResourceLoadCallbacks,
+                                           bool isPreload) {
   KURL fullURL = m_doc->completeURL(url);
 
   if (cache()->disabled()) {
@@ -179,7 +180,7 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
 
   CachedResource* resource =
       cache()->requestResource(this, type, fullURL, charset, skipCanLoadCheck,
-                               sendResourceLoadCallbacks);
+                               sendResourceLoadCallbacks, isPreload);
   if (resource) {
     m_docResources.set(resource->url(), resource);
     checkCacheObjectStatus(resource);
@@ -260,8 +261,15 @@ int DocLoader::requestCount() {
   return m_requestCount;
 }
 
-void DocLoader::registerPreload(CachedResource* resource) {
-  if (!resource || resource->isLoaded() || m_preloads.contains(resource))
+void DocLoader::preload(CachedResource::Type type, const String& url) {
+  String encoding = m_doc->frame()->loader()->encoding();
+  CachedResource* resource = requestResource(
+      type, url,
+      (type == CachedResource::Script || type == CachedResource::CSSStyleSheet)
+          ? &encoding
+          : 0,
+      false, true, true);
+  if (!resource || m_preloads.contains(resource))
     return;
   resource->increasePreloadCount();
   m_preloads.add(resource);
@@ -302,27 +310,28 @@ void DocLoader::printPreloadStats() {
     else if (res->preloadResult() ==
              CachedResource::PreloadReferencedWhileComplete)
       printf("HIT COMPLETE PRELOAD %s\n", res->url().latin1().data());
-        else if (res->preloadResult() == CachedResource::PreloadReferencedWhileLoading
-            printf("HIT LOADING PRELOAD %s\n", res->url().latin1().data());
-        
-        if (res->type() == CachedResource::Script) {
+    else if (res->preloadResult() ==
+             CachedResource::PreloadReferencedWhileLoading)
+      printf("HIT LOADING PRELOAD %s\n", res->url().latin1().data());
+
+    if (res->type() == CachedResource::Script) {
       scripts++;
       if (res->preloadResult() < CachedResource::PreloadReferencedWhileLoading)
         scriptMisses++;
-        } else if (res->type() == CachedResource::CSSStyleSheet) {
+    } else if (res->type() == CachedResource::CSSStyleSheet) {
       stylesheets++;
       if (res->preloadResult() < CachedResource::PreloadReferencedWhileLoading)
         stylesheetMisses++;
-        } else {
+    } else {
       images++;
       if (res->preloadResult() < CachedResource::PreloadReferencedWhileLoading)
         imageMisses++;
-        }
-        
-        if (res->errorOccurred())
-            cache()->remove(res);
-        
-        res->decreasePreloadCount();
+    }
+
+    if (res->errorOccurred())
+      cache()->remove(res);
+
+    res->decreasePreloadCount();
   }
   m_preloads.clear();
 

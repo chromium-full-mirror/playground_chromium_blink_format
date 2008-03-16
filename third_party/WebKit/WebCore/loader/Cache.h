@@ -106,7 +106,8 @@ class Cache : Noncopyable {
                                   const KURL& url,
                                   const String* charset = 0,
                                   bool skipCanLoadCheck = false,
-                                  bool sendResourceLoadCallbacks = true);
+                                  bool sendResourceLoadCallbacks = true,
+                                  bool isPreload = false);
 
   // Sets the cache's memory capacities, in bytes. These will hold only
   // approximately,
