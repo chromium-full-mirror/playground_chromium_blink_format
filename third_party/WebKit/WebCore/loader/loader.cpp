@@ -293,7 +293,6 @@ void Loader::Host::didFail(SubresourceLoader* loader, bool cancelled) {
     docLoader->decrementRequestCount();
 
   CachedResource* resource = request->cachedResource();
-  delete request;
 
   if (!cancelled) {
     docLoader->setLoadInProgress(true);
@@ -303,6 +302,8 @@ void Loader::Host::didFail(SubresourceLoader* loader, bool cancelled) {
   docLoader->setLoadInProgress(false);
   if (cancelled || !resource->isPreloaded())
     cache()->remove(resource);
+
+  delete request;
 
   servePendingRequests();
 }
