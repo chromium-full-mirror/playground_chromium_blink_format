@@ -33,7 +33,6 @@
 #include "FTPDirectoryDocument.h"
 #include "KURL.h"
 #include "NotImplemented.h"
-#include "PluginDatabase.h"
 #include "PluginPackage.h"
 #include "PluginData.h"
 #include "SharedBuffer.h"
@@ -56,18 +55,6 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
 /* Completely empty stubs (mostly to allow DRT to run): */
 /********************************************************/
 
-PluginSet PluginDatabase::getPluginsInPaths() const {
-  notImplemented();
-  return PluginSet();
-}
-Vector<String> PluginDatabase::defaultPluginPaths() {
-  notImplemented();
-  return Vector<String>();
-}
-bool PluginDatabase::isPreferredPluginPath(const String&) {
-  notImplemented();
-  return false;
-}
 int PluginPackage::compare(const PluginPackage&) const {
   notImplemented();
   return 0;
