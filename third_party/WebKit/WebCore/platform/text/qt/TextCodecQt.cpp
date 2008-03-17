@@ -97,11 +97,11 @@ String TextCodecQt::decode(const char* bytes, size_t length, bool flush) {
 
 CString TextCodecQt::encode(const UChar* characters,
                             size_t length,
-                            bool allowEntities) {
+                            UnencodableHandling) {
   if (!length)
     return "";
 
-  // FIXME: do something sensible with allowEntities
+  // FIXME: do something sensible with UnencodableHandling
 
   QByteArray ba = m_codec->fromUnicode(
       reinterpret_cast<const QChar*>(characters), length, 0);
