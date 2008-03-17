@@ -192,8 +192,8 @@ class ScrollView : public Widget {
 #endif
 
 #if PLATFORM(GTK)
- private:
-  virtual void setGtkAdjustments(GtkAdjustment* hadj, GtkAdjustment* vadj);
+ public:
+  void setGtkAdjustments(GtkAdjustment* hadj, GtkAdjustment* vadj);
 #endif
 
 #if PLATFORM(WX)
