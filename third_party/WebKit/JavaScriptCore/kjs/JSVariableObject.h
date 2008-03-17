@@ -53,6 +53,9 @@ class JSVariableObject : public JSObject {
 
   virtual void mark();
 
+  virtual bool isVariableObject() const;
+  virtual bool isDynamicScope() const = 0;
+
  protected:
   // Subclasses of JSVariableObject can subclass this struct to add data
   // without increasing their own size (since there's a hard limit on the

@@ -641,4 +641,8 @@ void JSGlobalObject::tearOffActivation(ExecState* exec, bool leaveRelic) {
   exec->replaceScopeChainTop(newActivation);
 }
 
+bool JSGlobalObject::isDynamicScope() const {
+  return true;
+}
+
 }  // namespace KJS

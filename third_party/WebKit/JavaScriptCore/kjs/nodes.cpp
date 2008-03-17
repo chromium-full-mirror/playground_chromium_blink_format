@@ -443,7 +443,8 @@ void BreakpointCheckStatement::streamTo(SourceStream& stream) const {
   m_statement->streamTo(stream);
 }
 
-void BreakpointCheckStatement::optimizeVariableAccess(const SymbolTable&,
+void BreakpointCheckStatement::optimizeVariableAccess(ExecState*,
+                                                      const SymbolTable&,
                                                       const LocalStorage&,
                                                       NodeStack& nodeStack) {
   nodeStack.append(m_statement.get());
@@ -593,12 +594,38 @@ uint32_t ResolveNode::evaluateToUInt32(ExecState* exec) {
   return v->toUInt32(exec);
 }
 
-void ResolveNode::optimizeVariableAccess(const SymbolTable& symbolTable,
+void ResolveNode::optimizeVariableAccess(ExecState* exec,
+                                         const SymbolTable& symbolTable,
                                          const LocalStorage&,
                                          NodeStack&) {
   size_t index = symbolTable.get(m_ident.ustring().rep());
-  if (index != missingSymbolMarker())
+  if (index != missingSymbolMarker()) {
     new (this) LocalVarAccessNode(index);
+    return;
+  }
+
+  if (m_ident == exec->propertyNames().arguments)
+    return;
+  const ScopeChain& chain = exec->scopeChain();
+  ScopeChainIterator iter = chain.begin();
+  ScopeChainIterator end = chain.end();
+  size_t depth = 0;
+  for (; iter != end; ++iter, ++depth) {
+    JSObject* currentScope = *iter;
+    if (!currentScope->isVariableObject())
+      break;
+    JSVariableObject* currentVariableObject =
+        static_cast<JSVariableObject*>(currentScope);
+    index = currentVariableObject->symbolTable().get(m_ident.ustring().rep());
+    if (index != missingSymbolMarker()) {
+      new (this) ScopedVarAccessNode(index, depth);
+      return;
+    }
+    if (currentVariableObject->isDynamicScope())
+      break;
+  }
+  if (depth > 0)
+    new (this) NonLocalVarAccessNode(depth);
 }
 
 JSValue* LocalVarAccessNode::inlineEvaluate(ExecState* exec) {
@@ -626,9 +653,87 @@ uint32_t LocalVarAccessNode::evaluateToUInt32(ExecState* exec) {
   return inlineEvaluate(exec)->toUInt32(exec);
 }
 
+JSValue* ScopedVarAccessNode::inlineEvaluate(ExecState* exec) {
+  const ScopeChain& chain = exec->scopeChain();
+  ScopeChainIterator iter = chain.begin();
+  for (size_t i = 0; i < m_scopeDepth; ++iter, ++i)
+    ASSERT(iter != chain.end());
+  JSObject* scope = *iter;
+  ASSERT(scope->isActivationObject() || scope->isGlobalObject());
+  JSVariableObject* variableObject = static_cast<JSVariableObject*>(scope);
+  return variableObject->localStorage()[m_index].value;
+}
+
+JSValue* ScopedVarAccessNode::evaluate(ExecState* exec) {
+  return inlineEvaluate(exec);
+}
+
+double ScopedVarAccessNode::evaluateToNumber(ExecState* exec) {
+  return inlineEvaluate(exec)->toNumber(exec);
+}
+
+bool ScopedVarAccessNode::evaluateToBoolean(ExecState* exec) {
+  return inlineEvaluate(exec)->toBoolean(exec);
+}
+
+int32_t ScopedVarAccessNode::evaluateToInt32(ExecState* exec) {
+  return inlineEvaluate(exec)->toInt32(exec);
+}
+
+uint32_t ScopedVarAccessNode::evaluateToUInt32(ExecState* exec) {
+  return inlineEvaluate(exec)->toUInt32(exec);
+}
+
+JSValue* NonLocalVarAccessNode::inlineEvaluate(ExecState* exec) {
+  // Check for missed optimization opportunity.
+  ASSERT(!canSkipLookup(exec, m_ident));
+
+  const ScopeChain& chain = exec->scopeChain();
+  ScopeChainIterator iter = chain.begin();
+  ScopeChainIterator end = chain.end();
+  for (size_t i = 0; i < m_scopeDepth; ++i, ++iter)
+    ASSERT(iter != end);
+
+  // we must always have something in the scope chain
+  ASSERT(iter != end);
+
+  PropertySlot slot;
+  do {
+    JSObject* o = *iter;
+
+    if (o->getPropertySlot(exec, m_ident, slot))
+      return slot.getValue(exec, o, m_ident);
+
+    ++iter;
+  } while (iter != end);
+
+  return throwUndefinedVariableError(exec, m_ident);
+}
+
+JSValue* NonLocalVarAccessNode::evaluate(ExecState* exec) {
+  return inlineEvaluate(exec);
+}
+
+double NonLocalVarAccessNode::evaluateToNumber(ExecState* exec) {
+  return inlineEvaluate(exec)->toNumber(exec);
+}
+
+bool NonLocalVarAccessNode::evaluateToBoolean(ExecState* exec) {
+  return inlineEvaluate(exec)->toBoolean(exec);
+}
+
+int32_t NonLocalVarAccessNode::evaluateToInt32(ExecState* exec) {
+  return inlineEvaluate(exec)->toInt32(exec);
+}
+
+uint32_t NonLocalVarAccessNode::evaluateToUInt32(ExecState* exec) {
+  return inlineEvaluate(exec)->toUInt32(exec);
+}
+
 // ------------------------------ ElementNode ----------------------------------
 
-void ElementNode::optimizeVariableAccess(const SymbolTable&,
+void ElementNode::optimizeVariableAccess(ExecState*,
+                                         const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
   if (m_next)
@@ -653,7 +758,8 @@ JSValue* ElementNode::evaluate(ExecState* exec) {
 
 // ------------------------------ ArrayNode ------------------------------------
 
-void ArrayNode::optimizeVariableAccess(const SymbolTable&,
+void ArrayNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   if (m_element)
@@ -688,7 +794,8 @@ JSValue* ArrayNode::evaluate(ExecState* exec) {
 
 // ------------------------------ ObjectLiteralNode ----------------------------
 
-void ObjectLiteralNode::optimizeVariableAccess(const SymbolTable&,
+void ObjectLiteralNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
   if (m_list)
@@ -706,7 +813,8 @@ JSValue* ObjectLiteralNode::evaluate(ExecState* exec) {
 
 // ------------------------------ PropertyListNode -----------------------------
 
-void PropertyListNode::optimizeVariableAccess(const SymbolTable&,
+void PropertyListNode::optimizeVariableAccess(ExecState*,
+                                              const SymbolTable&,
                                               const LocalStorage&,
                                               NodeStack& nodeStack) {
   if (m_next)
@@ -743,7 +851,8 @@ JSValue* PropertyListNode::evaluate(ExecState* exec) {
 
 // ------------------------------ PropertyNode -----------------------------
 
-void PropertyNode::optimizeVariableAccess(const SymbolTable&,
+void PropertyNode::optimizeVariableAccess(ExecState*,
+                                          const SymbolTable&,
                                           const LocalStorage&,
                                           NodeStack& nodeStack) {
   nodeStack.append(m_assign.get());
@@ -758,7 +867,8 @@ JSValue* PropertyNode::evaluate(ExecState*) {
 // ------------------------------ BracketAccessorNode
 // --------------------------------
 
-void BracketAccessorNode::optimizeVariableAccess(const SymbolTable&,
+void BracketAccessorNode::optimizeVariableAccess(ExecState*,
+                                                 const SymbolTable&,
                                                  const LocalStorage&,
                                                  NodeStack& nodeStack) {
   nodeStack.append(m_subscript.get());
@@ -809,7 +919,8 @@ uint32_t BracketAccessorNode::evaluateToUInt32(ExecState* exec) {
 // ------------------------------ DotAccessorNode
 // --------------------------------
 
-void DotAccessorNode::optimizeVariableAccess(const SymbolTable&,
+void DotAccessorNode::optimizeVariableAccess(ExecState*,
+                                             const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
   nodeStack.append(m_base.get());
@@ -852,7 +963,8 @@ uint32_t DotAccessorNode::evaluateToUInt32(ExecState* exec) {
 
 // ------------------------------ ArgumentListNode -----------------------------
 
-void ArgumentListNode::optimizeVariableAccess(const SymbolTable&,
+void ArgumentListNode::optimizeVariableAccess(ExecState*,
+                                              const SymbolTable&,
                                               const LocalStorage&,
                                               NodeStack& nodeStack) {
   if (m_next)
@@ -872,7 +984,8 @@ void ArgumentListNode::evaluateList(ExecState* exec, List& list) {
 
 // ------------------------------ ArgumentsNode --------------------------------
 
-void ArgumentsNode::optimizeVariableAccess(const SymbolTable&,
+void ArgumentsNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   if (m_listNode)
@@ -881,7 +994,8 @@ void ArgumentsNode::optimizeVariableAccess(const SymbolTable&,
 
 // ------------------------------ NewExprNode ----------------------------------
 
-void NewExprNode::optimizeVariableAccess(const SymbolTable&,
+void NewExprNode::optimizeVariableAccess(ExecState*,
+                                         const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
   if (m_args)
@@ -1008,7 +1122,8 @@ inline JSValue* ExpressionNode::resolveAndCall(ExecState* exec,
   return throwUndefinedVariableError(exec, ident);
 }
 
-void EvalFunctionCallNode::optimizeVariableAccess(const SymbolTable&,
+void EvalFunctionCallNode::optimizeVariableAccess(ExecState*,
+                                                  const SymbolTable&,
                                                   const LocalStorage&,
                                                   NodeStack& nodeStack) {
   nodeStack.append(m_args.get());
@@ -1019,7 +1134,8 @@ JSValue* EvalFunctionCallNode::evaluate(ExecState* exec) {
                                       m_args.get());
 }
 
-void FunctionCallValueNode::optimizeVariableAccess(const SymbolTable&,
+void FunctionCallValueNode::optimizeVariableAccess(ExecState*,
+                                                   const SymbolTable&,
                                                    const LocalStorage&,
                                                    NodeStack& nodeStack) {
   nodeStack.append(m_args.get());
@@ -1056,6 +1172,7 @@ JSValue* FunctionCallValueNode::evaluate(ExecState* exec) {
 }
 
 void FunctionCallResolveNode::optimizeVariableAccess(
+    ExecState*,
     const SymbolTable& symbolTable,
     const LocalStorage&,
     NodeStack& nodeStack) {
@@ -1154,7 +1271,8 @@ uint32_t LocalVarFunctionCallNode::evaluateToUInt32(ExecState* exec) {
   return v->toUInt32(exec);
 }
 
-void FunctionCallBracketNode::optimizeVariableAccess(const SymbolTable&,
+void FunctionCallBracketNode::optimizeVariableAccess(ExecState*,
+                                                     const SymbolTable&,
                                                      const LocalStorage&,
                                                      NodeStack& nodeStack) {
   nodeStack.append(m_args.get());
@@ -1224,7 +1342,8 @@ static const char* dotExprDoesNotAllowCallsString() {
   return "Object %s (result of expression %s.%s) does not allow calls.";
 }
 
-void FunctionCallDotNode::optimizeVariableAccess(const SymbolTable&,
+void FunctionCallDotNode::optimizeVariableAccess(ExecState*,
+                                                 const SymbolTable&,
                                                  const LocalStorage&,
                                                  NodeStack& nodeStack) {
   nodeStack.append(m_args.get());
@@ -1300,6 +1419,7 @@ uint32_t FunctionCallDotNode::evaluateToUInt32(ExecState* exec) {
 
 // Increment
 void PostIncResolveNode::optimizeVariableAccess(
+    ExecState*,
     const SymbolTable& symbolTable,
     const LocalStorage& localStorage,
     NodeStack&) {
@@ -1362,6 +1482,7 @@ void PostIncLocalVarNode::optimizeForUnnecessaryResult() {
 
 // Decrement
 void PostDecResolveNode::optimizeVariableAccess(
+    ExecState*,
     const SymbolTable& symbolTable,
     const LocalStorage& localStorage,
     NodeStack&) {
@@ -1448,7 +1569,8 @@ void PostDecLocalVarNode::optimizeForUnnecessaryResult() {
 // ------------------------------ PostfixBracketNode
 // ----------------------------------
 
-void PostfixBracketNode::optimizeVariableAccess(const SymbolTable&,
+void PostfixBracketNode::optimizeVariableAccess(ExecState*,
+                                                const SymbolTable&,
                                                 const LocalStorage&,
                                                 NodeStack& nodeStack) {
   nodeStack.append(m_subscript.get());
@@ -1525,7 +1647,8 @@ JSValue* PostDecBracketNode::evaluate(ExecState* exec) {
 // ------------------------------ PostfixDotNode
 // ----------------------------------
 
-void PostfixDotNode::optimizeVariableAccess(const SymbolTable&,
+void PostfixDotNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   nodeStack.append(m_base.get());
@@ -1577,7 +1700,8 @@ JSValue* PostfixErrorNode::evaluate(ExecState* exec) {
 // ------------------------------ DeleteResolveNode
 // -----------------------------------
 
-void DeleteResolveNode::optimizeVariableAccess(const SymbolTable& symbolTable,
+void DeleteResolveNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable& symbolTable,
                                                const LocalStorage&,
                                                NodeStack&) {
   size_t index = symbolTable.get(m_ident.ustring().rep());
@@ -1618,7 +1742,8 @@ JSValue* LocalVarDeleteNode::evaluate(ExecState*) {
 // ------------------------------ DeleteBracketNode
 // -----------------------------------
 
-void DeleteBracketNode::optimizeVariableAccess(const SymbolTable&,
+void DeleteBracketNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
   nodeStack.append(m_subscript.get());
@@ -1644,7 +1769,8 @@ JSValue* DeleteBracketNode::evaluate(ExecState* exec) {
 // ------------------------------ DeleteDotNode
 // -----------------------------------
 
-void DeleteDotNode::optimizeVariableAccess(const SymbolTable&,
+void DeleteDotNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   nodeStack.append(m_base.get());
@@ -1661,7 +1787,8 @@ JSValue* DeleteDotNode::evaluate(ExecState* exec) {
 // ------------------------------ DeleteValueNode
 // -----------------------------------
 
-void DeleteValueNode::optimizeVariableAccess(const SymbolTable&,
+void DeleteValueNode::optimizeVariableAccess(ExecState*,
+                                             const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -1677,7 +1804,8 @@ JSValue* DeleteValueNode::evaluate(ExecState* exec) {
 
 // ------------------------------ VoidNode -------------------------------------
 
-void VoidNode::optimizeVariableAccess(const SymbolTable&,
+void VoidNode::optimizeVariableAccess(ExecState*,
+                                      const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -1696,7 +1824,8 @@ JSValue* VoidNode::evaluate(ExecState* exec) {
 // ------------------------------ TypeOfValueNode
 // -----------------------------------
 
-void TypeOfValueNode::optimizeVariableAccess(const SymbolTable&,
+void TypeOfValueNode::optimizeVariableAccess(ExecState*,
+                                             const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -1729,7 +1858,8 @@ static JSValue* typeStringForValue(JSValue* v) {
   }
 }
 
-void TypeOfResolveNode::optimizeVariableAccess(const SymbolTable& symbolTable,
+void TypeOfResolveNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable& symbolTable,
                                                const LocalStorage&,
                                                NodeStack&) {
   size_t index = symbolTable.get(m_ident.ustring().rep());
@@ -1781,7 +1911,8 @@ JSValue* TypeOfValueNode::evaluate(ExecState* exec) {
 // ------------------------------ PrefixResolveNode
 // ----------------------------------
 
-void PreIncResolveNode::optimizeVariableAccess(const SymbolTable& symbolTable,
+void PreIncResolveNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable& symbolTable,
                                                const LocalStorage& localStorage,
                                                NodeStack&) {
   size_t index = symbolTable.get(m_ident.ustring().rep());
@@ -1832,7 +1963,8 @@ JSValue* PreIncResolveNode::evaluate(ExecState* exec) {
   return throwUndefinedVariableError(exec, m_ident);
 }
 
-void PreDecResolveNode::optimizeVariableAccess(const SymbolTable& symbolTable,
+void PreDecResolveNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable& symbolTable,
                                                const LocalStorage& localStorage,
                                                NodeStack&) {
   size_t index = symbolTable.get(m_ident.ustring().rep());
@@ -1918,7 +2050,8 @@ JSValue* PostDecConstNode::evaluate(ExecState* exec) {
 // ------------------------------ PrefixBracketNode
 // ----------------------------------
 
-void PrefixBracketNode::optimizeVariableAccess(const SymbolTable&,
+void PrefixBracketNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
   nodeStack.append(m_subscript.get());
@@ -1998,7 +2131,8 @@ JSValue* PreDecBracketNode::evaluate(ExecState* exec) {
 // ------------------------------ PrefixDotNode
 // ----------------------------------
 
-void PrefixDotNode::optimizeVariableAccess(const SymbolTable&,
+void PrefixDotNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   nodeStack.append(m_base.get());
@@ -2053,7 +2187,8 @@ JSValue* PrefixErrorNode::evaluate(ExecState* exec) {
 
 // ------------------------------ UnaryPlusNode --------------------------------
 
-void UnaryPlusNode::optimizeVariableAccess(const SymbolTable&,
+void UnaryPlusNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -2084,7 +2219,8 @@ uint32_t UnaryPlusNode::evaluateToUInt32(ExecState* exec) {
 
 // ------------------------------ NegateNode -----------------------------------
 
-void NegateNode::optimizeVariableAccess(const SymbolTable&,
+void NegateNode::optimizeVariableAccess(ExecState*,
+                                        const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -2104,7 +2240,8 @@ double NegateNode::evaluateToNumber(ExecState* exec) {
 
 // ------------------------------ BitwiseNotNode -------------------------------
 
-void BitwiseNotNode::optimizeVariableAccess(const SymbolTable&,
+void BitwiseNotNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -2137,7 +2274,8 @@ uint32_t BitwiseNotNode::evaluateToUInt32(ExecState* exec) {
 
 // ------------------------------ LogicalNotNode -------------------------------
 
-void LogicalNotNode::optimizeVariableAccess(const SymbolTable&,
+void LogicalNotNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -2155,7 +2293,8 @@ bool LogicalNotNode::evaluateToBoolean(ExecState* exec) {
 // ------------------------------ Multiplicative Nodes
 // -----------------------------------
 
-void MultNode::optimizeVariableAccess(const SymbolTable&,
+void MultNode::optimizeVariableAccess(ExecState*,
+                                      const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2191,7 +2330,8 @@ uint32_t MultNode::evaluateToUInt32(ExecState* exec) {
   return JSValue::toUInt32(inlineEvaluateToNumber(exec));
 }
 
-void DivNode::optimizeVariableAccess(const SymbolTable&,
+void DivNode::optimizeVariableAccess(ExecState*,
+                                     const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2222,7 +2362,8 @@ uint32_t DivNode::evaluateToUInt32(ExecState* exec) {
   return JSValue::toUInt32(inlineEvaluateToNumber(exec));
 }
 
-void ModNode::optimizeVariableAccess(const SymbolTable&,
+void ModNode::optimizeVariableAccess(ExecState*,
+                                     const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2352,7 +2493,8 @@ static inline double addToNumber(ExecState* exec, JSValue* v1, JSValue* v2) {
   return addSlowCaseToNumber(exec, v1, v2);
 }
 
-void AddNode::optimizeVariableAccess(const SymbolTable&,
+void AddNode::optimizeVariableAccess(ExecState*,
+                                     const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2448,7 +2590,8 @@ JSValue* AddStringRightNode::evaluate(ExecState* exec) {
   return jsString(p1->toString(exec) + static_cast<StringImp*>(v2)->value());
 }
 
-void SubNode::optimizeVariableAccess(const SymbolTable&,
+void SubNode::optimizeVariableAccess(ExecState*,
+                                     const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2482,7 +2625,8 @@ uint32_t SubNode::evaluateToUInt32(ExecState* exec) {
 // ------------------------------ Shift Nodes
 // ------------------------------------
 
-void LeftShiftNode::optimizeVariableAccess(const SymbolTable&,
+void LeftShiftNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2513,7 +2657,8 @@ uint32_t LeftShiftNode::evaluateToUInt32(ExecState* exec) {
   return inlineEvaluateToInt32(exec);
 }
 
-void RightShiftNode::optimizeVariableAccess(const SymbolTable&,
+void RightShiftNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2544,7 +2689,8 @@ uint32_t RightShiftNode::evaluateToUInt32(ExecState* exec) {
   return inlineEvaluateToInt32(exec);
 }
 
-void UnsignedRightShiftNode::optimizeVariableAccess(const SymbolTable&,
+void UnsignedRightShiftNode::optimizeVariableAccess(ExecState*,
+                                                    const SymbolTable&,
                                                     const LocalStorage&,
                                                     NodeStack& nodeStack) {
   nodeStack.append(m_term1.get());
@@ -2608,7 +2754,8 @@ static inline bool lessThanEq(ExecState* exec, JSValue* v1, JSValue* v2) {
            static_cast<const StringImp*>(p1)->value());
 }
 
-void LessNode::optimizeVariableAccess(const SymbolTable&,
+void LessNode::optimizeVariableAccess(ExecState*,
+                                      const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2663,7 +2810,8 @@ bool LessStringsNode::evaluateToBoolean(ExecState* exec) {
   return inlineEvaluateToBoolean(exec);
 }
 
-void GreaterNode::optimizeVariableAccess(const SymbolTable&,
+void GreaterNode::optimizeVariableAccess(ExecState*,
+                                         const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2687,7 +2835,8 @@ bool GreaterNode::evaluateToBoolean(ExecState* exec) {
   return inlineEvaluateToBoolean(exec);
 }
 
-void LessEqNode::optimizeVariableAccess(const SymbolTable&,
+void LessEqNode::optimizeVariableAccess(ExecState*,
+                                        const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2711,7 +2860,8 @@ bool LessEqNode::evaluateToBoolean(ExecState* exec) {
   return inlineEvaluateToBoolean(exec);
 }
 
-void GreaterEqNode::optimizeVariableAccess(const SymbolTable&,
+void GreaterEqNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2735,7 +2885,8 @@ bool GreaterEqNode::evaluateToBoolean(ExecState* exec) {
   return inlineEvaluateToBoolean(exec);
 }
 
-void InstanceOfNode::optimizeVariableAccess(const SymbolTable&,
+void InstanceOfNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2799,7 +2950,8 @@ bool InstanceOfNode::evaluateToBoolean(ExecState* exec) {
   return o2->hasInstance(exec, v1);
 }
 
-void InNode::optimizeVariableAccess(const SymbolTable&,
+void InNode::optimizeVariableAccess(ExecState*,
+                                    const SymbolTable&,
                                     const LocalStorage&,
                                     NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2844,7 +2996,8 @@ bool InNode::evaluateToBoolean(ExecState* exec) {
 // ------------------------------ Equality Nodes
 // ------------------------------------
 
-void EqualNode::optimizeVariableAccess(const SymbolTable&,
+void EqualNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2869,7 +3022,8 @@ bool EqualNode::evaluateToBoolean(ExecState* exec) {
   return inlineEvaluateToBoolean(exec);
 }
 
-void NotEqualNode::optimizeVariableAccess(const SymbolTable&,
+void NotEqualNode::optimizeVariableAccess(ExecState*,
+                                          const SymbolTable&,
                                           const LocalStorage&,
                                           NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2894,7 +3048,8 @@ bool NotEqualNode::evaluateToBoolean(ExecState* exec) {
   return inlineEvaluateToBoolean(exec);
 }
 
-void StrictEqualNode::optimizeVariableAccess(const SymbolTable&,
+void StrictEqualNode::optimizeVariableAccess(ExecState*,
+                                             const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2919,7 +3074,8 @@ bool StrictEqualNode::evaluateToBoolean(ExecState* exec) {
   return inlineEvaluateToBoolean(exec);
 }
 
-void NotStrictEqualNode::optimizeVariableAccess(const SymbolTable&,
+void NotStrictEqualNode::optimizeVariableAccess(ExecState*,
+                                                const SymbolTable&,
                                                 const LocalStorage&,
                                                 NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2947,7 +3103,8 @@ bool NotStrictEqualNode::evaluateToBoolean(ExecState* exec) {
 // ------------------------------ Bit Operation Nodes
 // ----------------------------------
 
-void BitAndNode::optimizeVariableAccess(const SymbolTable&,
+void BitAndNode::optimizeVariableAccess(ExecState*,
+                                        const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -2987,7 +3144,8 @@ uint32_t BitAndNode::evaluateToUInt32(ExecState* exec) {
   return inlineEvaluateToInt32(exec);
 }
 
-void BitXOrNode::optimizeVariableAccess(const SymbolTable&,
+void BitXOrNode::optimizeVariableAccess(ExecState*,
+                                        const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -3021,7 +3179,8 @@ uint32_t BitXOrNode::evaluateToUInt32(ExecState* exec) {
   return inlineEvaluateToInt32(exec);
 }
 
-void BitOrNode::optimizeVariableAccess(const SymbolTable&,
+void BitOrNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -3058,7 +3217,8 @@ uint32_t BitOrNode::evaluateToUInt32(ExecState* exec) {
 // ------------------------------ Binary Logical Nodes
 // ----------------------------
 
-void LogicalAndNode::optimizeVariableAccess(const SymbolTable&,
+void LogicalAndNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -3084,7 +3244,8 @@ bool LogicalAndNode::evaluateToBoolean(ExecState* exec) {
   return b && m_expr2->evaluateToBoolean(exec);
 }
 
-void LogicalOrNode::optimizeVariableAccess(const SymbolTable&,
+void LogicalOrNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -3107,7 +3268,8 @@ bool LogicalOrNode::evaluateToBoolean(ExecState* exec) {
 
 // ------------------------------ ConditionalNode ------------------------------
 
-void ConditionalNode::optimizeVariableAccess(const SymbolTable&,
+void ConditionalNode::optimizeVariableAccess(ExecState*,
+                                             const SymbolTable&,
                                              const LocalStorage&,
                                              NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -3223,6 +3385,7 @@ static ALWAYS_INLINE JSValue* valueForReadModifyAssignment(
 // -----------------------------------
 
 void ReadModifyResolveNode::optimizeVariableAccess(
+    ExecState*,
     const SymbolTable& symbolTable,
     const LocalStorage& localStorage,
     NodeStack& nodeStack) {
@@ -3239,7 +3402,8 @@ void ReadModifyResolveNode::optimizeVariableAccess(
 // ------------------------------ AssignResolveNode
 // -----------------------------------
 
-void AssignResolveNode::optimizeVariableAccess(const SymbolTable& symbolTable,
+void AssignResolveNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable& symbolTable,
                                                const LocalStorage& localStorage,
                                                NodeStack& nodeStack) {
   nodeStack.append(m_right.get());
@@ -3386,7 +3550,8 @@ found:
 // ------------------------------ ReadModifyDotNode
 // -----------------------------------
 
-void AssignDotNode::optimizeVariableAccess(const SymbolTable&,
+void AssignDotNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   nodeStack.append(m_right.get());
@@ -3406,7 +3571,8 @@ JSValue* AssignDotNode::evaluate(ExecState* exec) {
   return v;
 }
 
-void ReadModifyDotNode::optimizeVariableAccess(const SymbolTable&,
+void ReadModifyDotNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
   nodeStack.append(m_right.get());
@@ -3447,7 +3613,8 @@ JSValue* AssignErrorNode::evaluate(ExecState* exec) {
 // ------------------------------ AssignBracketNode
 // -----------------------------------
 
-void AssignBracketNode::optimizeVariableAccess(const SymbolTable&,
+void AssignBracketNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
   nodeStack.append(m_right.get());
@@ -3479,7 +3646,8 @@ JSValue* AssignBracketNode::evaluate(ExecState* exec) {
   base->put(exec, propertyName, v);
   return v;
 }
-void ReadModifyBracketNode::optimizeVariableAccess(const SymbolTable&,
+void ReadModifyBracketNode::optimizeVariableAccess(ExecState*,
+                                                   const SymbolTable&,
                                                    const LocalStorage&,
                                                    NodeStack& nodeStack) {
   nodeStack.append(m_right.get());
@@ -3531,7 +3699,8 @@ JSValue* ReadModifyBracketNode::evaluate(ExecState* exec) {
 
 // ------------------------------ CommaNode ------------------------------------
 
-void CommaNode::optimizeVariableAccess(const SymbolTable&,
+void CommaNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   nodeStack.append(m_expr2.get());
@@ -3551,7 +3720,8 @@ JSValue* CommaNode::evaluate(ExecState* exec) {
 ConstDeclNode::ConstDeclNode(const Identifier& ident, ExpressionNode* init)
     : m_ident(ident), m_init(init) {}
 
-void ConstDeclNode::optimizeVariableAccess(const SymbolTable&,
+void ConstDeclNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   if (m_next)
@@ -3635,7 +3805,8 @@ JSValue* ConstDeclNode::evaluate(ExecState* exec) {
 // ------------------------------ ConstStatementNode
 // -----------------------------
 
-void ConstStatementNode::optimizeVariableAccess(const SymbolTable&,
+void ConstStatementNode::optimizeVariableAccess(ExecState*,
+                                                const SymbolTable&,
                                                 const LocalStorage&,
                                                 NodeStack& nodeStack) {
   ASSERT(m_next);
@@ -3702,7 +3873,8 @@ BlockNode::BlockNode(SourceElements* children) {
     children->releaseContentsIntoVector(m_children);
 }
 
-void BlockNode::optimizeVariableAccess(const SymbolTable&,
+void BlockNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   statementListPushFIFO(m_children, nodeStack);
@@ -3722,7 +3894,8 @@ JSValue* EmptyStatementNode::execute(ExecState* exec) {
 
 // ------------------------------ ExprStatementNode ----------------------------
 
-void ExprStatementNode::optimizeVariableAccess(const SymbolTable&,
+void ExprStatementNode::optimizeVariableAccess(ExecState*,
+                                               const SymbolTable&,
                                                const LocalStorage&,
                                                NodeStack& nodeStack) {
   ASSERT(m_expr);
@@ -3739,7 +3912,8 @@ JSValue* ExprStatementNode::execute(ExecState* exec) {
 
 // ------------------------------ VarStatementNode ----------------------------
 
-void VarStatementNode::optimizeVariableAccess(const SymbolTable&,
+void VarStatementNode::optimizeVariableAccess(ExecState*,
+                                              const SymbolTable&,
                                               const LocalStorage&,
                                               NodeStack& nodeStack) {
   ASSERT(m_expr);
@@ -3755,7 +3929,8 @@ JSValue* VarStatementNode::execute(ExecState* exec) {
 
 // ------------------------------ IfNode ---------------------------------------
 
-void IfNode::optimizeVariableAccess(const SymbolTable&,
+void IfNode::optimizeVariableAccess(ExecState*,
+                                    const SymbolTable&,
                                     const LocalStorage&,
                                     NodeStack& nodeStack) {
   nodeStack.append(m_ifBlock.get());
@@ -3772,11 +3947,12 @@ JSValue* IfNode::execute(ExecState* exec) {
   return exec->setNormalCompletion();
 }
 
-void IfElseNode::optimizeVariableAccess(const SymbolTable& symbolTable,
+void IfElseNode::optimizeVariableAccess(ExecState* exec,
+                                        const SymbolTable& symbolTable,
                                         const LocalStorage& localStorage,
                                         NodeStack& nodeStack) {
   nodeStack.append(m_elseBlock.get());
-  IfNode::optimizeVariableAccess(symbolTable, localStorage, nodeStack);
+  IfNode::optimizeVariableAccess(exec, symbolTable, localStorage, nodeStack);
 }
 
 // ECMA 12.5
@@ -3791,7 +3967,8 @@ JSValue* IfElseNode::execute(ExecState* exec) {
 
 // ------------------------------ DoWhileNode ----------------------------------
 
-void DoWhileNode::optimizeVariableAccess(const SymbolTable&,
+void DoWhileNode::optimizeVariableAccess(ExecState*,
+                                         const SymbolTable&,
                                          const LocalStorage&,
                                          NodeStack& nodeStack) {
   nodeStack.append(m_statement.get());
@@ -3835,7 +4012,8 @@ JSValue* DoWhileNode::execute(ExecState* exec) {
 
 // ------------------------------ WhileNode ------------------------------------
 
-void WhileNode::optimizeVariableAccess(const SymbolTable&,
+void WhileNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   nodeStack.append(m_statement.get());
@@ -3878,7 +4056,8 @@ JSValue* WhileNode::execute(ExecState* exec) {
 
 // ------------------------------ ForNode --------------------------------------
 
-void ForNode::optimizeVariableAccess(const SymbolTable&,
+void ForNode::optimizeVariableAccess(ExecState*,
+                                     const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
   nodeStack.append(m_statement.get());
@@ -3952,7 +4131,8 @@ ForInNode::ForInNode(const Identifier& ident,
   // for( var foo = bar in baz )
 }
 
-void ForInNode::optimizeVariableAccess(const SymbolTable&,
+void ForInNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   nodeStack.append(m_statement.get());
@@ -4093,7 +4273,8 @@ JSValue* BreakNode::execute(ExecState* exec) {
 
 // ------------------------------ ReturnNode -----------------------------------
 
-void ReturnNode::optimizeVariableAccess(const SymbolTable&,
+void ReturnNode::optimizeVariableAccess(ExecState*,
+                                        const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
   if (m_value)
@@ -4117,7 +4298,8 @@ JSValue* ReturnNode::execute(ExecState* exec) {
 
 // ------------------------------ WithNode -------------------------------------
 
-void WithNode::optimizeVariableAccess(const SymbolTable&,
+void WithNode::optimizeVariableAccess(ExecState*,
+                                      const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack& nodeStack) {
   // Can't optimize within statement because "with" introduces a dynamic scope.
@@ -4140,7 +4322,8 @@ JSValue* WithNode::execute(ExecState* exec) {
 
 // ------------------------------ CaseClauseNode -------------------------------
 
-void CaseClauseNode::optimizeVariableAccess(const SymbolTable&,
+void CaseClauseNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   if (m_expr)
@@ -4163,7 +4346,8 @@ JSValue* CaseClauseNode::executeStatements(ExecState* exec) {
 
 // ------------------------------ ClauseListNode -------------------------------
 
-void ClauseListNode::optimizeVariableAccess(const SymbolTable&,
+void ClauseListNode::optimizeVariableAccess(ExecState*,
+                                            const SymbolTable&,
                                             const LocalStorage&,
                                             NodeStack& nodeStack) {
   if (m_next)
@@ -4178,7 +4362,8 @@ CaseBlockNode::CaseBlockNode(ClauseListNode* list1,
                              ClauseListNode* list2)
     : m_list1(list1), m_defaultClause(defaultClause), m_list2(list2) {}
 
-void CaseBlockNode::optimizeVariableAccess(const SymbolTable&,
+void CaseBlockNode::optimizeVariableAccess(ExecState*,
+                                           const SymbolTable&,
                                            const LocalStorage&,
                                            NodeStack& nodeStack) {
   if (m_list2)
@@ -4248,7 +4433,8 @@ step18:
 
 // ------------------------------ SwitchNode -----------------------------------
 
-void SwitchNode::optimizeVariableAccess(const SymbolTable&,
+void SwitchNode::optimizeVariableAccess(ExecState*,
+                                        const SymbolTable&,
                                         const LocalStorage&,
                                         NodeStack& nodeStack) {
   nodeStack.append(m_block.get());
@@ -4272,7 +4458,8 @@ JSValue* SwitchNode::execute(ExecState* exec) {
 
 // ------------------------------ LabelNode ------------------------------------
 
-void LabelNode::optimizeVariableAccess(const SymbolTable&,
+void LabelNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   nodeStack.append(m_statement.get());
@@ -4294,7 +4481,8 @@ JSValue* LabelNode::execute(ExecState* exec) {
 
 // ------------------------------ ThrowNode ------------------------------------
 
-void ThrowNode::optimizeVariableAccess(const SymbolTable&,
+void ThrowNode::optimizeVariableAccess(ExecState*,
+                                       const SymbolTable&,
                                        const LocalStorage&,
                                        NodeStack& nodeStack) {
   nodeStack.append(m_expr.get());
@@ -4311,7 +4499,8 @@ JSValue* ThrowNode::execute(ExecState* exec) {
 
 // ------------------------------ TryNode --------------------------------------
 
-void TryNode::optimizeVariableAccess(const SymbolTable&,
+void TryNode::optimizeVariableAccess(ExecState*,
+                                     const SymbolTable&,
                                      const LocalStorage&,
                                      NodeStack& nodeStack) {
   // Can't optimize within catchBlock because "catch" introduces a dynamic
@@ -4509,7 +4698,7 @@ void ScopeNode::optimizeVariableAccess(ExecState* exec) {
   const SymbolTable& symbolTable = exec->variableObject()->symbolTable();
   const LocalStorage& localStorage = exec->variableObject()->localStorage();
   while (true) {
-    node->optimizeVariableAccess(symbolTable, localStorage, nodeStack);
+    node->optimizeVariableAccess(exec, symbolTable, localStorage, nodeStack);
 
     size_t size = nodeStack.size();
     if (!size)

@@ -495,6 +495,10 @@ ActivationImp::ActivationData::ActivationData(const ActivationData& old)
       argumentsObject(old.argumentsObject),
       isOnStack(false) {}
 
+bool ActivationImp::isDynamicScope() const {
+  return d()->function->body->usesEval();
+}
+
 // ------------------------------ Global Functions
 // -----------------------------------
 
