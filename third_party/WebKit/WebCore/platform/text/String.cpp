@@ -538,11 +538,13 @@ Vector<char> String::ascii() const {
 #endif
 
 CString String::latin1() const {
-  return Latin1Encoding().encode(characters(), length());
+  return Latin1Encoding().encode(characters(), length(),
+                                 QuestionMarksForUnencodables);
 }
 
 CString String::utf8() const {
-  return UTF8Encoding().encode(characters(), length());
+  return UTF8Encoding().encode(characters(), length(),
+                               QuestionMarksForUnencodables);
 }
 
 String String::fromUTF8(const char* string, size_t size) {

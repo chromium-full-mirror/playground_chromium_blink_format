@@ -284,7 +284,8 @@ PassRefPtr<FormData> HTMLFormElement::formData(const char* boundary) const {
             // in the website's character set.
             appendString(header, "; filename=\"");
             appendString(header, encoding.encode(filename.characters(),
-                                                 filename.length(), true));
+                                                 filename.length(),
+                                                 QuestionMarksForUnencodables));
             header.append('"');
 
             if (!path.isEmpty()) {

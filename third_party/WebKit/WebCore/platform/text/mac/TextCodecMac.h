@@ -44,9 +44,7 @@ class TextCodecMac : public TextCodec {
   virtual ~TextCodecMac();
 
   virtual String decode(const char*, size_t length, bool flush = false);
-  virtual CString encode(const UChar*,
-                         size_t length,
-                         bool allowEntities = false);
+  virtual CString encode(const UChar*, size_t length, UnencodableHandling);
 
  private:
   OSStatus decode(const unsigned char* inputBuffer,

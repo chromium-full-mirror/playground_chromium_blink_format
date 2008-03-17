@@ -289,6 +289,28 @@ static UChar getGbkEscape(UChar32 codePoint) {
   }
 }
 
+// Invalid character handler when writing escaped entities for unrepresentable
+// characters. See the declaration of TextCodec::encode for more.
+static void urlEscapedEntityCallback(const void* context,
+                                     UConverterFromUnicodeArgs* fromUArgs,
+                                     const UChar* codeUnits,
+                                     int32_t length,
+                                     UChar32 codePoint,
+                                     UConverterCallbackReason reason,
+                                     UErrorCode* err) {
+  if (reason == UCNV_UNASSIGNED) {
+    *err = U_ZERO_ERROR;
+
+    UnencodableReplacementArray entity;
+    int entityLen = TextCodec::getUnencodableReplacement(
+        codePoint, URLEncodedEntitiesForUnencodables, entity);
+    ucnv_cbFromUWriteBytes(fromUArgs, entity, entityLen, 0, err);
+  } else
+    UCNV_FROM_U_CALLBACK_ESCAPE(context, fromUArgs, codeUnits, length,
+                                codePoint, reason, err);
+}
+
+// Substitutes special GBK characters, escaping all other unassigned entities.
 static void gbkCallbackEscape(const void* context,
                               UConverterFromUnicodeArgs* fromUArgs,
                               const UChar* codeUnits,
@@ -301,6 +323,29 @@ static void gbkCallbackEscape(const void* context,
     const UChar* source = &outChar;
     *err = U_ZERO_ERROR;
     ucnv_cbFromUWriteUChars(fromUArgs, &source, source + 1, 0, err);
+    return;
+  }
+  UCNV_FROM_U_CALLBACK_ESCAPE(context, fromUArgs, codeUnits, length, codePoint,
+                              reason, err);
+}
+
+// Combines both gbkUrlEscapedEntityCallback and GBK character substitution.
+static void gbkUrlEscapedEntityCallack(const void* context,
+                                       UConverterFromUnicodeArgs* fromUArgs,
+                                       const UChar* codeUnits,
+                                       int32_t length,
+                                       UChar32 codePoint,
+                                       UConverterCallbackReason reason,
+                                       UErrorCode* err) {
+  if (reason == UCNV_UNASSIGNED) {
+    if (UChar outChar = getGbkEscape(codePoint)) {
+      const UChar* source = &outChar;
+      *err = U_ZERO_ERROR;
+      ucnv_cbFromUWriteUChars(fromUArgs, &source, source + 1, 0, err);
+      return;
+    }
+    urlEscapedEntityCallback(context, fromUArgs, codeUnits, length, codePoint,
+                             reason, err);
     return;
   }
   UCNV_FROM_U_CALLBACK_ESCAPE(context, fromUArgs, codeUnits, length, codePoint,
@@ -327,7 +372,7 @@ static void gbkCallbackSubstitute(const void* context,
 
 CString TextCodecICU::encode(const UChar* characters,
                              size_t length,
-                             bool allowEntities) {
+                             UnencodableHandling handling) {
   if (!length)
     return "";
 
@@ -347,17 +392,26 @@ CString TextCodecICU::encode(const UChar* characters,
 
   UErrorCode err = U_ZERO_ERROR;
 
-  if (allowEntities)
-    ucnv_setFromUCallBack(
-        m_converterICU,
-        m_needsGBKFallbacks ? gbkCallbackEscape : UCNV_FROM_U_CALLBACK_ESCAPE,
-        UCNV_ESCAPE_XML_DEC, 0, 0, &err);
-  else {
-    ucnv_setSubstChars(m_converterICU, "?", 1, &err);
-    ucnv_setFromUCallBack(m_converterICU,
-                          m_needsGBKFallbacks ? gbkCallbackSubstitute
+  switch (handling) {
+    case QuestionMarksForUnencodables:
+      ucnv_setSubstChars(m_converterICU, "?", 1, &err);
+      ucnv_setFromUCallBack(
+          m_converterICU, m_needsGBKFallbacks ? gbkCallbackSubstitute
                                               : UCNV_FROM_U_CALLBACK_SUBSTITUTE,
-                          0, 0, 0, &err);
+          0, 0, 0, &err);
+      break;
+    case EntitiesForUnencodables:
+      ucnv_setFromUCallBack(
+          m_converterICU,
+          m_needsGBKFallbacks ? gbkCallbackEscape : UCNV_FROM_U_CALLBACK_ESCAPE,
+          UCNV_ESCAPE_XML_DEC, 0, 0, &err);
+      break;
+    case URLEncodedEntitiesForUnencodables:
+      ucnv_setFromUCallBack(m_converterICU,
+                            m_needsGBKFallbacks ? gbkUrlEscapedEntityCallack
+                                                : urlEscapedEntityCallback,
+                            0, 0, 0, &err);
+      break;
   }
 
   ASSERT(U_SUCCESS(err));

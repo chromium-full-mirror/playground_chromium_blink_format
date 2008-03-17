@@ -292,7 +292,7 @@ String TextCodecMac::decode(const char* bytes, size_t length, bool flush) {
 
 CString TextCodecMac::encode(const UChar* characters,
                              size_t length,
-                             bool allowEntities) {
+                             UnencodableHandling handling) {
   // FIXME: We should really use TEC here instead of CFString for consistency
   // with the other direction.
 
@@ -307,7 +307,7 @@ CString TextCodecMac::encode(const UChar* characters,
   CFIndex charactersLeft = CFStringGetLength(cfs);
   Vector<char> result;
   size_t size = 0;
-  UInt8 lossByte = allowEntities ? 0 : '?';
+  UInt8 lossByte = handling == QuestionMarksForUnencodables ? '?' : 0;
   while (charactersLeft > 0) {
     CFRange range = CFRangeMake(startPos, charactersLeft);
     CFIndex bufferLength;
@@ -337,11 +337,10 @@ CString TextCodecMac::encode(const UChar* characters,
           ++charactersConverted;
         }
       }
-      char entityBuffer[16];
-      sprintf(entityBuffer, "&#%u;", badChar);
-      size_t entityLength = strlen(entityBuffer);
+      UnencodableReplacementArray entity;
+      int entityLength = getUnencodableReplacement(badChar, handling, entity);
       result.grow(size + entityLength);
-      memcpy(result.data() + size, entityBuffer, entityLength);
+      memcpy(result.data() + size, entity, entityLength);
       size += entityLength;
     }
 
