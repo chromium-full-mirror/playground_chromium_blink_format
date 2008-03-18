@@ -48,6 +48,8 @@ class WebNodeHighlight : WebCore::WindowMessageListener {
   void updateWindow();
   bool visible() const;
 
+  HWND window() const { return m_overlay; }
+
  private:
   virtual void windowReceivedMessage(HWND, UINT message, WPARAM, LPARAM);
 
