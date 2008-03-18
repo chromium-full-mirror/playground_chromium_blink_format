@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2008 Collabora Ltd.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,21 +39,25 @@ class NSView;
 
 #if PLATFORM(WIN)
 typedef struct HWND__* HWND;
+typedef HWND PlatformWidget;
 #endif
 
 #if PLATFORM(GTK)
 typedef struct _GdkDrawable GdkDrawable;
 typedef struct _GtkWidget GtkWidget;
 typedef struct _GtkContainer GtkContainer;
+typedef GtkWidget* PlatformWidget;
 #endif
 
 #if PLATFORM(QT)
 class QWidget;
 class QWebFrame;
+typedef QWidget* PlatformWidget;
 #endif
 
 #if PLATFORM(WX)
 class wxWindow;
+typedef wxWindow* PlatformWidget;
 #endif
 
 namespace WebCore {
@@ -122,10 +127,10 @@ class Widget {
 
   virtual void handleEvent(Event*) {}
 
-#if PLATFORM(WIN)
-  void setContainingWindow(HWND);
-  HWND containingWindow() const;
+  void setContainingWindow(PlatformWidget);
+  PlatformWidget containingWindow() const;
 
+#if PLATFORM(WIN)
   virtual void setParent(ScrollView*);
   ScrollView* parent() const;
 
@@ -150,9 +155,6 @@ class Widget {
   virtual void setParent(ScrollView*);
   ScrollView* parent() const;
 
-  void setContainingWindow(GtkContainer*);
-  GtkContainer* containingWindow() const;
-
   virtual void geometryChanged() const;
 
   IntRect convertToContainingWindow(const IntRect&) const;
@@ -174,8 +176,6 @@ class Widget {
 #if PLATFORM(QT)
   void setNativeWidget(QWidget* widget);
   QWidget* nativeWidget() const;
-
-  QWidget* containingWindow() const;
 
   QWebFrame* qwebframe() const;
   void setQWebFrame(QWebFrame* webFrame);

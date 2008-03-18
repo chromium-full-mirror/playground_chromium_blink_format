@@ -47,7 +47,7 @@ class WidgetPrivate {
   IntRect frameRect;
 
   ScrollView* parent;
-  GtkContainer* containingWindow;
+  GtkWidget* containingWindow;
   bool suppressInvalidation;
   GdkCursor* cursor;
 
@@ -75,11 +75,11 @@ Widget::~Widget() {
   delete data;
 }
 
-void Widget::setContainingWindow(GtkContainer* containingWindow) {
+void Widget::setContainingWindow(PlatformWidget containingWindow) {
   data->containingWindow = containingWindow;
 }
 
-GtkContainer* Widget::containingWindow() const {
+PlatformWidget Widget::containingWindow() const {
   return data->containingWindow;
 }
 
