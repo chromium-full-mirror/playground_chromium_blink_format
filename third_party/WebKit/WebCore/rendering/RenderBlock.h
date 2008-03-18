@@ -4,7 +4,8 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2007 David Smith (catfish.man@gmail.com)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Computer, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -151,8 +152,23 @@ class RenderBlock : public RenderFlow {
   virtual RenderObject* layoutLegend(bool relayoutChildren) { return 0; };
 
   // the implementation of the following functions is in bidi.cpp
+  struct FloatWithRect {
+    FloatWithRect(RenderObject* f)
+        : object(f),
+          rect(IntRect(f->xPos() - f->marginLeft(),
+                       f->yPos() - f->marginTop(),
+                       f->width() + f->marginLeft() + f->marginRight(),
+                       f->height() + f->marginTop() + f->marginBottom())) {}
+
+    RenderObject* object;
+    IntRect rect;
+  };
+
   void bidiReorderLine(BidiState&, const BidiIterator& end);
-  RootInlineBox* determineStartPosition(bool fullLayout, BidiState&);
+  RootInlineBox* determineStartPosition(bool& fullLayout,
+                                        BidiState&,
+                                        Vector<FloatWithRect>& floats,
+                                        unsigned& numCleanFloats);
   RootInlineBox* determineEndPosition(RootInlineBox* startBox,
                                       BidiIterator& cleanLineStart,
                                       BidiStatus& cleanLineBidiStatus,
@@ -199,7 +215,7 @@ class RenderBlock : public RenderFlow {
   void removeFloatingObject(RenderObject*);
 
   // called from lineWidth, to position the floats added in the last line.
-  void positionNewFloats();
+  bool positionNewFloats();
   void clearFloats();
   int getClearDelta(RenderObject* child);
   virtual void markAllDescendantsWithFloatsForLayout(
@@ -430,6 +446,8 @@ class RenderBlock : public RenderFlow {
   void adjustForBorderFit(int x, int& left, int& right)
       const;  // Helper function for borderFitAdjust
 
+  void markLinesDirtyInVerticalRange(int top, int bottom);
+
  protected:
   void newLine();
   virtual bool hasLineIfEmpty() const;
@@ -454,7 +472,8 @@ class RenderBlock : public RenderFlow {
           left(0),
           width(0),
           m_type(type),
-          noPaint(false) {}
+          noPaint(false),
+          m_isDescendant(false) {}
 
     Type type() { return static_cast<Type>(m_type); }
 
@@ -465,6 +484,7 @@ class RenderBlock : public RenderFlow {
     int width;
     unsigned m_type : 1;  // Type (left or right aligned)
     bool noPaint : 1;
+    bool m_isDescendant : 1;
   };
 
   // The following helper functions and structs are used by layoutBlockChildren.
@@ -630,6 +650,7 @@ class RenderBlock : public RenderFlow {
           m_topNeg(topNegDefault(o)),
           m_bottomPos(bottomPosDefault(o)),
           m_bottomNeg(bottomNegDefault(o)) {}
+
     static int topPosDefault(const RenderBlock* o) {
       return o->marginTop() > 0 ? o->marginTop() : 0;
     }

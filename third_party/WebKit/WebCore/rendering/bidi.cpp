@@ -792,8 +792,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
   // Figure out if we should clear out our line boxes.
   // FIXME: Handle resize eventually!
   // FIXME: Do something better when floats are present.
-  bool fullLayout = !firstLineBox() || !firstChild() || selfNeedsLayout() ||
-                    relayoutChildren || containsFloats();
+  bool fullLayout =
+      !firstLineBox() || !firstChild() || selfNeedsLayout() || relayoutChildren;
   if (fullLayout)
     deleteLineBoxes();
 
@@ -815,7 +815,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
     // layout replaced elements
     bool endOfInline = false;
     RenderObject* o = bidiFirst(this, 0, false);
-    bool hasFloat = false;
+    Vector<FloatWithRect> floats;
     int containerWidth = max(0, containingBlockWidth());
     while (o) {
       o->invalidateVerticalPosition();
@@ -834,9 +834,10 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
           o->containingBlock()->insertPositionedObject(o);
         else {
           if (o->isFloating())
-            hasFloat = true;
+            floats.append(FloatWithRect(o));
           else if (fullLayout || o->needsLayout())  // Replaced elements
             o->dirtyLineBoxes(fullLayout);
+
           o->layoutIfNeeded();
         }
       } else if (o->isText() || (o->isInlineFlow() && !endOfInline)) {
@@ -852,9 +853,11 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       o = bidiNext(this, o, 0, false, &endOfInline);
     }
 
-    if (hasFloat)
-      fullLayout =
-          true;  // FIXME: Will need to find a way to optimize floats some day.
+    // We want to skip ahead to the first dirty line
+    BidiState start;
+    unsigned floatIndex;
+    RootInlineBox* startLine =
+        determineStartPosition(fullLayout, start, floats, floatIndex);
 
     if (fullLayout && !selfNeedsLayout()) {
       setNeedsLayout(true, false);  // Mark ourselves as needing a full layout.
@@ -874,15 +877,14 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       }
     }
 
+    FloatingObject* lastFloat =
+        m_floatingObjects ? m_floatingObjects->last() : 0;
+
     if (!smidpoints)
       smidpoints = new Vector<BidiIterator>();
 
     sNumMidpoints = 0;
     sCurrMidpoint = 0;
-
-    // We want to skip ahead to the first dirty line
-    BidiState start;
-    RootInlineBox* startLine = determineStartPosition(fullLayout, start);
 
     // We also find the first clean line and extract these lines.  We will add
     // them back
@@ -913,7 +915,15 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
     BidiIterator end = start.position();
 
+    if (!fullLayout && end.atEnd() && lastRootBox() &&
+        lastRootBox()->firstChild()->object()->isBR() &&
+        lastRootBox()->object()->firstChild()->style()->clear() != CNONE) {
+      m_clearStatus = lastRootBox()->object()->firstChild()->style()->clear();
+      newLine();
+    }
+
     bool endLineMatched = false;
+
     while (!end.atEnd()) {
       // FIXME: Is this check necessary before the first iteration or can it be
       // moved to the end?
@@ -987,6 +997,28 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         newLine();
       }
 
+      if (m_floatingObjects) {
+        if (lastFloat) {
+          for (FloatingObject* f = m_floatingObjects->last(); f != lastFloat;
+               f = m_floatingObjects->prev()) {
+          }
+          m_floatingObjects->next();
+        } else
+          m_floatingObjects->first();
+        for (FloatingObject* f = m_floatingObjects->current(); f;
+             f = m_floatingObjects->next()) {
+          lastRootBox()->floats().append(f->node);
+          ASSERT(f->node == floats[floatIndex].object);
+          // If a float's geometry has changed, give up on syncing with clean
+          // lines.
+          if (floats[floatIndex].rect !=
+              IntRect(f->left, f->startY, f->width, f->endY - f->startY))
+            endLine = 0;
+          floatIndex++;
+        }
+        lastFloat = m_floatingObjects->last();
+      }
+
       sNumMidpoints = 0;
       sCurrMidpoint = 0;
       start.setPosition(end);
@@ -996,18 +1028,24 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       if (endLineMatched) {
         // Attach all the remaining lines, and then adjust their y-positions as
         // needed.
-        for (RootInlineBox* line = endLine; line; line = line->nextRootBox())
-          line->attachLine();
-
-        // Now apply the offset to each line if needed.
         int delta = m_height - endLineYPos;
-        if (delta) {
-          for (RootInlineBox* line = endLine; line;
-               line = line->nextRootBox()) {
+        for (RootInlineBox* line = endLine; line; line = line->nextRootBox()) {
+          line->attachLine();
+          if (delta) {
             repaintTop = min(repaintTop, line->topOverflow() + min(delta, 0));
             repaintBottom =
                 max(repaintBottom, line->bottomOverflow() + max(delta, 0));
             line->adjustPosition(0, delta);
+          }
+          if (Vector<RenderObject*>* cleanLineFloats = line->floatsPtr()) {
+            Vector<RenderObject*>::iterator end = cleanLineFloats->end();
+            for (Vector<RenderObject*>::iterator f = cleanLineFloats->begin();
+                 f != end; ++f) {
+              int floatTop = (*f)->yPos() - (*f)->marginTop();
+              insertFloatingObject(*f);
+              m_height = floatTop + delta;
+              positionNewFloats();
+            }
           }
         }
         m_height = lastRootBox()->blockHeight();
@@ -1024,17 +1062,30 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         }
       }
     }
+    if (m_floatingObjects) {
+      // In case we have a float on the last line, it might not be positioned up
+      // to now.
+      // This has to be done before adding in the bottom border/padding, or the
+      // float will
+      // include the padding incorrectly. -dwh
+      if (positionNewFloats() && lastRootBox()) {
+        if (lastFloat) {
+          for (FloatingObject* f = m_floatingObjects->last(); f != lastFloat;
+               f = m_floatingObjects->prev()) {
+          }
+          m_floatingObjects->next();
+        } else
+          m_floatingObjects->first();
+        for (FloatingObject* f = m_floatingObjects->current(); f;
+             f = m_floatingObjects->next())
+          lastRootBox()->floats().append(f->node);
+        lastFloat = m_floatingObjects->last();
+      }
+    }
   }
 
   sNumMidpoints = 0;
   sCurrMidpoint = 0;
-
-  // in case we have a float on the last line, it might not be positioned up to
-  // now.
-  // This has to be done before adding in the bottom border/padding, or the
-  // float will
-  // include the padding incorrectly. -dwh
-  positionNewFloats();
 
   // Now add in the bottom border/padding.
   m_height += toAdd;
@@ -1056,10 +1107,55 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
     checkLinesForTextOverflow();
 }
 
-RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
-                                                   BidiState& start) {
+RootInlineBox* RenderBlock::determineStartPosition(
+    bool& fullLayout,
+    BidiState& start,
+    Vector<FloatWithRect>& floats,
+    unsigned& numCleanFloats) {
   RootInlineBox* curr = 0;
   RootInlineBox* last = 0;
+
+  bool dirtiedByFloat = false;
+  if (!fullLayout) {
+    size_t floatIndex = 0;
+    for (curr = firstRootBox(); curr && !curr->isDirty();
+         curr = curr->nextRootBox()) {
+      if (Vector<RenderObject*>* cleanLineFloats = curr->floatsPtr()) {
+        Vector<RenderObject*>::iterator end = cleanLineFloats->end();
+        for (Vector<RenderObject*>::iterator o = cleanLineFloats->begin();
+             o != end; ++o) {
+          RenderObject* f = *o;
+          IntSize newSize(f->width() + f->marginLeft() + f->marginRight(),
+                          f->height() + f->marginTop() + f->marginBottom());
+          ASSERT(floatIndex < floats.size());
+          if (floats[floatIndex].object != f) {
+            // A new float has been inserted before this line or before its last
+            // known float.
+            // Just do a full layout.
+            fullLayout = true;
+            break;
+          }
+          if (floats[floatIndex].rect.size() != newSize) {
+            int floatTop = f->yPos() - f->marginTop();
+            ASSERT(floatTop == floats[floatIndex].rect.y());
+            curr->markDirty();
+            markLinesDirtyInVerticalRange(
+                curr->blockHeight(),
+                floatTop +
+                    max(floats[floatIndex].rect.height(), newSize.height()));
+            floats[floatIndex].rect.setSize(newSize);
+            dirtiedByFloat = true;
+          }
+          floatIndex++;
+        }
+      }
+      if (dirtiedByFloat || fullLayout)
+        break;
+    }
+    // Check if a new float has been inserted after the last known float.
+    if (!curr && floatIndex < floats.size())
+      fullLayout = true;
+  }
 
   if (fullLayout) {
     // Nuke all our lines.
@@ -1074,18 +1170,16 @@ RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
       ASSERT(!firstLineBox() && !lastLineBox());
     }
   } else {
-    for (curr = firstRootBox(); curr && !curr->isDirty();
-         curr = curr->nextRootBox()) {
-    }
     if (curr) {
       // We have a dirty line.
       if (RootInlineBox* prevRootBox = curr->prevRootBox()) {
         // We have a previous line.
-        if (!prevRootBox->endsWithBreak() ||
-            prevRootBox->lineBreakObj()->isText() &&
-                prevRootBox->lineBreakPos() >=
-                    static_cast<RenderText*>(prevRootBox->lineBreakObj())
-                        ->textLength())
+        if (!dirtiedByFloat &&
+            (!prevRootBox->endsWithBreak() ||
+             prevRootBox->lineBreakObj()->isText() &&
+                 prevRootBox->lineBreakPos() >=
+                     static_cast<RenderText*>(prevRootBox->lineBreakObj())
+                         ->textLength()))
           // The previous line didn't break cleanly or broke at a newline
           // that has been deleted, so treat it as dirty too.
           curr = prevRootBox;
@@ -1099,6 +1193,28 @@ RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
 
     // If we have no dirty lines, then last is just the last root box.
     last = curr ? curr->prevRootBox() : lastRootBox();
+  }
+
+  numCleanFloats = 0;
+  if (!floats.isEmpty()) {
+    int savedHeight = m_height;
+    // Restore floats from clean lines.
+    RootInlineBox* line = firstRootBox();
+    while (line != curr) {
+      if (Vector<RenderObject*>* cleanLineFloats = line->floatsPtr()) {
+        Vector<RenderObject*>::iterator end = cleanLineFloats->end();
+        for (Vector<RenderObject*>::iterator f = cleanLineFloats->begin();
+             f != end; ++f) {
+          insertFloatingObject(*f);
+          m_height = (*f)->yPos() - (*f)->marginTop();
+          positionNewFloats();
+          ASSERT(floats[numCleanFloats].object == *f);
+          numCleanFloats++;
+        }
+      }
+      line = line->nextRootBox();
+    }
+    m_height = savedHeight;
   }
 
   m_firstLine = !last;
@@ -1117,6 +1233,7 @@ RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
                || (style()->unicodeBidi() == UBNormal && isSVGText())
 #endif
         ;
+
     BidiContext* context =
         new BidiContext(ltr ? 0 : 1, ltr ? LeftToRight : RightToLeft,
                         style()->unicodeBidi() == Override);
@@ -1175,8 +1292,32 @@ bool RenderBlock::matchedEndLine(const BidiState& start,
                                  int& endYPos,
                                  int& repaintBottom,
                                  int& repaintTop) {
-  if (start.position() == endLineStart)
-    return start.status() == endLineStatus;
+  if (start.position() == endLineStart) {
+    if (start.status() != endLineStatus)
+      return false;
+
+    int delta = m_height - endYPos;
+    if (!delta || !m_floatingObjects)
+      return true;
+
+    // See if any floats end in the range along which we want to shift the lines
+    // vertically.
+    int top = min(m_height, endYPos);
+
+    RootInlineBox* lastLine = endLine;
+    while (RootInlineBox* nextLine = lastLine->nextRootBox())
+      lastLine = nextLine;
+
+    int bottom = lastLine->blockHeight() + abs(delta);
+
+    for (FloatingObject* f = m_floatingObjects->first(); f;
+         f = m_floatingObjects->next()) {
+      if (f->endY >= top && f->endY < bottom)
+        return false;
+    }
+
+    return true;
+  }
 
   // The first clean line doesn't match, but we can check a handful of following
   // lines to try
@@ -1194,6 +1335,25 @@ bool RenderBlock::matchedEndLine(const BidiState& start,
       // Set our yPos to be the block height of endLine.
       if (result)
         endYPos = line->blockHeight();
+
+      int delta = m_height - endYPos;
+      if (delta && m_floatingObjects) {
+        // See if any floats end in the range along which we want to shift the
+        // lines vertically.
+        int top = min(m_height, endYPos);
+
+        RootInlineBox* lastLine = endLine;
+        while (RootInlineBox* nextLine = lastLine->nextRootBox())
+          lastLine = nextLine;
+
+        int bottom = lastLine->blockHeight() + abs(delta);
+
+        for (FloatingObject* f = m_floatingObjects->first(); f;
+             f = m_floatingObjects->next()) {
+          if (f->endY >= top && f->endY < bottom)
+            return false;
+        }
+      }
 
       // Now delete the lines that we failed to sync.
       RootInlineBox* boxToDelete = endLine;
