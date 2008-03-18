@@ -46,7 +46,6 @@ class RenderFlow : public RenderContainer {
         m_lineHeight(-1),
         m_childrenInline(true),
         m_firstLine(false),
-        m_clearStatus(CNONE),
         m_topMarginQuirk(false),
         m_bottomMarginQuirk(false),
         m_hasMarkupTruncation(false),
@@ -145,7 +144,6 @@ class RenderFlow : public RenderContainer {
   // from RenderBlock
   bool m_childrenInline : 1;
   bool m_firstLine : 1;
-  unsigned m_clearStatus : 2;  // EClear
   bool m_topMarginQuirk : 1;
   bool m_bottomMarginQuirk : 1;
   bool m_hasMarkupTruncation : 1;

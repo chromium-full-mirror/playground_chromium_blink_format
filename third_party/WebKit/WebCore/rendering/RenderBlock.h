@@ -184,7 +184,7 @@ class RenderBlock : public RenderFlow {
   int skipWhitespace(BidiIterator&);
   int skipWhitespace(BidiState&);
   void fitBelowFloats(int widthToFit, int& availableWidth);
-  BidiIterator findNextLineBreak(BidiState&);
+  BidiIterator findNextLineBreak(BidiState&, EClear* clear = 0);
   RootInlineBox* constructLine(unsigned runCount,
                                BidiRun* firstRun,
                                BidiRun* lastRun,
@@ -449,7 +449,7 @@ class RenderBlock : public RenderFlow {
   void markLinesDirtyInVerticalRange(int top, int bottom);
 
  protected:
-  void newLine();
+  void newLine(EClear);
   virtual bool hasLineIfEmpty() const;
   bool layoutOnlyPositionedObjects();
 

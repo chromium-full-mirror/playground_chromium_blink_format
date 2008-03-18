@@ -571,7 +571,6 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   int previousHeight = m_height;
   m_height = 0;
   m_overflowHeight = 0;
-  m_clearStatus = CNONE;
 
   // We use four values, maxTopPos, maxPosNeg, maxBottomPos, and maxBottomNeg,
   // to track
@@ -2557,11 +2556,11 @@ bool RenderBlock::positionNewFloats() {
   return true;
 }
 
-void RenderBlock::newLine() {
+void RenderBlock::newLine(EClear clear) {
   positionNewFloats();
   // set y position
   int newY = 0;
-  switch (m_clearStatus) {
+  switch (clear) {
     case CLEFT:
       newY = leftBottom();
       break;
@@ -2575,7 +2574,6 @@ void RenderBlock::newLine() {
   }
   if (m_height < newY)
     m_height = newY;
-  m_clearStatus = CNONE;
 }
 
 int RenderBlock::leftOffset() const {

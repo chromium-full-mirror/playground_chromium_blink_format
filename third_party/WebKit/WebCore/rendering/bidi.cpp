@@ -917,10 +917,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
     if (!fullLayout && end.atEnd() && lastRootBox() &&
         lastRootBox()->firstChild()->object()->isBR() &&
-        lastRootBox()->object()->firstChild()->style()->clear() != CNONE) {
-      m_clearStatus = lastRootBox()->object()->firstChild()->style()->clear();
-      newLine();
-    }
+        lastRootBox()->object()->firstChild()->style()->clear() != CNONE)
+      newLine(lastRootBox()->object()->firstChild()->style()->clear());
 
     bool endLineMatched = false;
 
@@ -939,7 +937,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         buildCompactRuns(firstChild(), start);
         start.setPosition(BidiIterator(this, firstChild()->nextSibling(), 0));
       }
-      end = findNextLineBreak(start);
+      EClear clear = CNONE;
+      end = findNextLineBreak(start, &clear);
       if (start.position().atEnd()) {
         start.deleteRuns();
         break;
@@ -994,7 +993,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         }
 
         m_firstLine = false;
-        newLine();
+        newLine(clear);
       }
 
       if (m_floatingObjects) {
@@ -1578,7 +1577,7 @@ void RenderBlock::fitBelowFloats(int widthToFit, int& availableWidth) {
   }
 }
 
-BidiIterator RenderBlock::findNextLineBreak(BidiState& start) {
+BidiIterator RenderBlock::findNextLineBreak(BidiState& start, EClear* clear) {
   ASSERT(start.position().block == this);
 
   bool appliedStartWidth = start.position().pos > 0;
@@ -1663,12 +1662,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiState& start) {
         trailingSpaceObject = 0;
         previousLineBrokeCleanly = true;
 
-        if (!isLineEmpty) {
-          // only check the clear status for non-empty lines.
-          EClear clear = o->style()->clear();
-          if (clear != CNONE)
-            m_clearStatus = (EClear)(m_clearStatus | clear);
-        }
+        if (!isLineEmpty && clear)
+          *clear = o->style()->clear();
       }
       goto end;
     }
