@@ -222,7 +222,7 @@ void JSObject::put(ExecState* exec,
       break;
     }
 
-    if (!obj->_proto->isObject())
+    if (obj->_proto == jsNull())
       break;
 
     obj = static_cast<JSObject*>(obj->_proto);
