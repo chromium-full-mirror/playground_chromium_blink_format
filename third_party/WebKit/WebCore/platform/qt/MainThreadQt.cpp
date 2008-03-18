@@ -41,22 +41,23 @@ class MainThreadInvoker : public QObject {
  public:
   MainThreadInvoker();
 
- protected:
-  bool event(QEvent*);
+ private Q_SLOTS:
+  void dispatch();
 };
 
 MainThreadInvoker::MainThreadInvoker() {
   moveToThread(QCoreApplication::instance()->thread());
 }
 
-bool MainThreadInvoker::event(QEvent*) {
+void MainThreadInvoker::dispatch() {
   dispatchFunctionsFromMainThread();
 }
 
 Q_GLOBAL_STATIC(MainThreadInvoker, webkit_main_thread_invoker)
 
 void scheduleDispatchFunctionsOnMainThread() {
-  QCoreApplication::postEvent(webkit_main_thread_invoker(), 0);
+  QMetaObject::invokeMethod(webkit_main_thread_invoker(), "dispatch",
+                            Qt::QueuedConnection);
 }
 }
 
