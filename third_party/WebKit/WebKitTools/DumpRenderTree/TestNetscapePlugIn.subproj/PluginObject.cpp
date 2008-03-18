@@ -434,7 +434,7 @@ static bool testGetProperty(PluginObject* obj,
                             const NPVariant* args,
                             uint32_t argCount,
                             NPVariant* result) {
-  if (argCount > 0)
+  if (argCount == 0)
     return false;
 
   NPObject* object;
