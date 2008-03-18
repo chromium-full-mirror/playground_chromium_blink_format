@@ -88,7 +88,7 @@ bool HTMLFrameElementBase::isURLAllowed(const AtomicString& URLString) const {
 }
 
 void HTMLFrameElementBase::openURL() {
-  ASSERT(!m_name.isEmpty());
+  ASSERT(!m_frameName.isEmpty());
 
   if (!isURLAllowed(m_URL))
     return;
@@ -100,7 +100,7 @@ void HTMLFrameElementBase::openURL() {
   if (!parentFrame)
     return;
 
-  parentFrame->loader()->requestFrame(this, m_URL, m_name);
+  parentFrame->loader()->requestFrame(this, m_URL, m_frameName);
   if (contentFrame())
     contentFrame()->setInViewSourceMode(viewSourceMode());
 }
@@ -112,9 +112,9 @@ void HTMLFrameElementBase::parseMappedAttribute(MappedAttribute* attr) {
     // Important to call through to base for the id attribute so the hasID bit
     // gets set.
     HTMLFrameOwnerElement::parseMappedAttribute(attr);
-    m_name = attr->value();
+    m_frameName = attr->value();
   } else if (attr->name() == nameAttr) {
-    m_name = attr->value();
+    m_frameName = attr->value();
     // FIXME: If we are already attached, this doesn't actually change the
     // frame's name.
     // FIXME: If we are already attached, this doesn't check for frame name
@@ -153,12 +153,12 @@ void HTMLFrameElementBase::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void HTMLFrameElementBase::setNameAndOpenURL() {
-  m_name = getAttribute(nameAttr);
-  if (m_name.isNull())
-    m_name = getAttribute(idAttr);
+  m_frameName = getAttribute(nameAttr);
+  if (m_frameName.isNull())
+    m_frameName = getAttribute(idAttr);
 
   if (Frame* parentFrame = document()->frame())
-    m_name = parentFrame->tree()->uniqueChildName(m_name);
+    m_frameName = parentFrame->tree()->uniqueChildName(m_frameName);
 
   openURL();
 }

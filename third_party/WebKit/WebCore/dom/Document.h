@@ -218,6 +218,7 @@ class Document : public ContainerNode {
                                     bool createdByParser,
                                     ExceptionCode& ec);
   Element* getElementById(const AtomicString&) const;
+  bool hasElementWithId(AtomicStringImpl* id) const;
 
   Element* elementFromPoint(int x, int y) const;
   String readyState() const;
@@ -1107,6 +1108,11 @@ class Document : public ContainerNode {
   bool m_inLowBandwidthDisplay;
 #endif
 };
+
+inline bool Document::hasElementWithId(AtomicStringImpl* id) const {
+  ASSERT(id);
+  return m_elementsById.contains(id) || m_duplicateIds.contains(id);
+}
 
 }  // namespace WebCore
 

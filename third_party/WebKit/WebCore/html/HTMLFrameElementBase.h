@@ -90,7 +90,7 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
   static void setNameAndOpenURLCallback(Node*);
 
   AtomicString m_URL;
-  AtomicString m_name;
+  AtomicString m_frameName;
 
   ScrollbarMode m_scrolling;
 

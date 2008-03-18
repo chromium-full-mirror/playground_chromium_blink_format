@@ -787,7 +787,7 @@ PassRefPtr<Element> Document::createElementNS(const String& _namespaceURI,
 }
 
 Element* Document::getElementById(const AtomicString& elementId) const {
-  if (elementId.length() == 0)
+  if (elementId.isEmpty())
     return 0;
 
   Element* element = m_elementsById.get(elementId.impl());
@@ -844,12 +844,13 @@ void Document::setCharset(const String& charset) {
 }
 
 void Document::setXMLVersion(const String& version, ExceptionCode& ec) {
-  // FIXME: also raise NOT_SUPPORTED_ERR if the version is set to a value that
-  // is not supported by this Document.
   if (!implementation()->hasFeature("XML", String())) {
     ec = NOT_SUPPORTED_ERR;
     return;
   }
+
+  // FIXME: Also raise NOT_SUPPORTED_ERR if the version is set to a value that
+  // is not supported by this Document.
 
   m_xmlVersion = version;
 }

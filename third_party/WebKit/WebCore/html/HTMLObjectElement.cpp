@@ -119,21 +119,21 @@ void HTMLObjectElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == onunloadAttr) {
     setHTMLEventListener(unloadEvent, attr);
   } else if (attr->name() == nameAttr) {
-    String newNameAttr = attr->value();
+    const AtomicString& newName = attr->value();
     if (isDocNamedItem() && inDocument() && document()->isHTMLDocument()) {
-      HTMLDocument* doc = static_cast<HTMLDocument*>(document());
-      doc->removeNamedItem(oldNameAttr);
-      doc->addNamedItem(newNameAttr);
+      HTMLDocument* document = static_cast<HTMLDocument*>(this->document());
+      document->removeNamedItem(m_name);
+      document->addNamedItem(newName);
     }
-    oldNameAttr = newNameAttr;
+    m_name = newName;
   } else if (attr->name() == idAttr) {
-    String newIdAttr = attr->value();
+    const AtomicString& newId = attr->value();
     if (isDocNamedItem() && inDocument() && document()->isHTMLDocument()) {
-      HTMLDocument* doc = static_cast<HTMLDocument*>(document());
-      doc->removeDocExtraNamedItem(oldIdAttr);
-      doc->addDocExtraNamedItem(newIdAttr);
+      HTMLDocument* document = static_cast<HTMLDocument*>(this->document());
+      document->removeExtraNamedItem(m_id);
+      document->addExtraNamedItem(newId);
     }
-    oldIdAttr = newIdAttr;
+    m_id = newId;
     // also call superclass
     HTMLPlugInElement::parseMappedAttribute(attr);
   } else
@@ -214,9 +214,9 @@ void HTMLObjectElement::detach() {
 
 void HTMLObjectElement::insertedIntoDocument() {
   if (isDocNamedItem() && document()->isHTMLDocument()) {
-    HTMLDocument* doc = static_cast<HTMLDocument*>(document());
-    doc->addNamedItem(oldNameAttr);
-    doc->addDocExtraNamedItem(oldIdAttr);
+    HTMLDocument* document = static_cast<HTMLDocument*>(this->document());
+    document->addNamedItem(m_name);
+    document->addExtraNamedItem(m_id);
   }
 
   HTMLPlugInElement::insertedIntoDocument();
@@ -224,9 +224,9 @@ void HTMLObjectElement::insertedIntoDocument() {
 
 void HTMLObjectElement::removedFromDocument() {
   if (isDocNamedItem() && document()->isHTMLDocument()) {
-    HTMLDocument* doc = static_cast<HTMLDocument*>(document());
-    doc->removeNamedItem(oldNameAttr);
-    doc->removeDocExtraNamedItem(oldIdAttr);
+    HTMLDocument* document = static_cast<HTMLDocument*>(this->document());
+    document->removeNamedItem(m_name);
+    document->removeExtraNamedItem(m_id);
   }
 
   HTMLPlugInElement::removedFromDocument();
@@ -332,13 +332,13 @@ void HTMLObjectElement::updateDocNamedItem() {
     child = child->nextSibling();
   }
   if (isNamedItem != wasNamedItem && document()->isHTMLDocument()) {
-    HTMLDocument* doc = static_cast<HTMLDocument*>(document());
+    HTMLDocument* document = static_cast<HTMLDocument*>(this->document());
     if (isNamedItem) {
-      doc->addNamedItem(oldNameAttr);
-      doc->addDocExtraNamedItem(oldIdAttr);
+      document->addNamedItem(m_name);
+      document->addExtraNamedItem(m_id);
     } else {
-      doc->removeNamedItem(oldNameAttr);
-      doc->removeDocExtraNamedItem(oldIdAttr);
+      document->removeNamedItem(m_name);
+      document->removeExtraNamedItem(m_id);
     }
   }
   m_docNamedItem = isNamedItem;

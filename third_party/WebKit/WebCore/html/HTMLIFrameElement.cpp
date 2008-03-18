@@ -1,11 +1,9 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Simon Hausmann (hausmann@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,6 +20,7 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+
 #include "config.h"
 #include "HTMLIFrameElement.h"
 
@@ -67,13 +66,13 @@ void HTMLIFrameElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attr->name() == alignAttr)
     addHTMLAlignment(attr);
   else if (attr->name() == nameAttr) {
-    String newNameAttr = attr->value();
+    const AtomicString& newName = attr->value();
     if (inDocument() && document()->isHTMLDocument()) {
-      HTMLDocument* doc = static_cast<HTMLDocument*>(document());
-      doc->removeDocExtraNamedItem(oldNameAttr);
-      doc->addDocExtraNamedItem(newNameAttr);
+      HTMLDocument* document = static_cast<HTMLDocument*>(this->document());
+      document->removeExtraNamedItem(m_name);
+      document->addExtraNamedItem(newName);
     }
-    oldNameAttr = newNameAttr;
+    m_name = newName;
   } else if (attr->name() == frameborderAttr) {
     // Frame border doesn't really match the HTML4 spec definition for iframes.
     // It simply adds
@@ -95,19 +94,15 @@ RenderObject* HTMLIFrameElement::createRenderer(RenderArena* arena,
 }
 
 void HTMLIFrameElement::insertedIntoDocument() {
-  if (document()->isHTMLDocument()) {
-    HTMLDocument* doc = static_cast<HTMLDocument*>(document());
-    doc->addDocExtraNamedItem(oldNameAttr);
-  }
+  if (document()->isHTMLDocument())
+    static_cast<HTMLDocument*>(document())->addExtraNamedItem(m_name);
 
   HTMLFrameElementBase::insertedIntoDocument();
 }
 
 void HTMLIFrameElement::removedFromDocument() {
-  if (document()->isHTMLDocument()) {
-    HTMLDocument* doc = static_cast<HTMLDocument*>(document());
-    doc->removeDocExtraNamedItem(oldNameAttr);
-  }
+  if (document()->isHTMLDocument())
+    static_cast<HTMLDocument*>(document())->removeExtraNamedItem(m_name);
 
   HTMLFrameElementBase::removedFromDocument();
 }

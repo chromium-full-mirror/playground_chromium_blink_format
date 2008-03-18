@@ -121,7 +121,7 @@ class HTMLObjectElement : public HTMLPlugInElement {
 
  private:
   void updateDocNamedItem();
-  String oldIdAttr;
+  AtomicString m_id;
   bool m_docNamedItem;
 };
 }

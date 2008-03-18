@@ -123,8 +123,8 @@ class HTMLImageElement : public HTMLElement {
   String usemap;
   bool ismap;
   HTMLFormElement* m_form;
-  String oldNameAttr;
-  String oldIdAttr;
+  AtomicString m_name;
+  AtomicString m_id;
   CompositeOperator m_compositeOperator;
 };
 

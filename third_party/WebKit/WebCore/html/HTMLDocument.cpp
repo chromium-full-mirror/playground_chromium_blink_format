@@ -1,7 +1,8 @@
-/**
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -292,8 +293,9 @@ PassRefPtr<Element> HTMLDocument::createElement(const String& name,
                                                false);
 }
 
-static void addItemToMap(HTMLDocument::NameCountMap& map, const String& name) {
-  if (name.length() == 0)
+static void addItemToMap(HTMLDocument::NameCountMap& map,
+                         const AtomicString& name) {
+  if (name.isEmpty())
     return;
 
   HTMLDocument::NameCountMap::iterator it = map.find(name.impl());
@@ -304,8 +306,8 @@ static void addItemToMap(HTMLDocument::NameCountMap& map, const String& name) {
 }
 
 static void removeItemFromMap(HTMLDocument::NameCountMap& map,
-                              const String& name) {
-  if (name.length() == 0)
+                              const AtomicString& name) {
+  if (name.isEmpty())
     return;
 
   HTMLDocument::NameCountMap::iterator it = map.find(name.impl());
@@ -321,28 +323,20 @@ static void removeItemFromMap(HTMLDocument::NameCountMap& map,
     it->second = newVal;
 }
 
-void HTMLDocument::addNamedItem(const String& name) {
-  addItemToMap(namedItemCounts, name);
+void HTMLDocument::addNamedItem(const AtomicString& name) {
+  addItemToMap(m_namedItemCounts, name);
 }
 
-void HTMLDocument::removeNamedItem(const String& name) {
-  removeItemFromMap(namedItemCounts, name);
+void HTMLDocument::removeNamedItem(const AtomicString& name) {
+  removeItemFromMap(m_namedItemCounts, name);
 }
 
-bool HTMLDocument::hasNamedItem(const String& name) {
-  return namedItemCounts.get(name.impl()) != 0;
+void HTMLDocument::addExtraNamedItem(const AtomicString& name) {
+  addItemToMap(m_extraNamedItemCounts, name);
 }
 
-void HTMLDocument::addDocExtraNamedItem(const String& name) {
-  addItemToMap(docExtraNamedItemCounts, name);
-}
-
-void HTMLDocument::removeDocExtraNamedItem(const String& name) {
-  removeItemFromMap(docExtraNamedItemCounts, name);
-}
-
-bool HTMLDocument::hasDocExtraNamedItem(const String& name) {
-  return docExtraNamedItemCounts.get(name.impl()) != 0;
+void HTMLDocument::removeExtraNamedItem(const AtomicString& name) {
+  removeItemFromMap(m_extraNamedItemCounts, name);
 }
 
 void HTMLDocument::determineParseMode() {
@@ -410,5 +404,11 @@ void HTMLDocument::determineParseMode() {
 
   if (inCompatMode() != wasInCompatMode)
     updateStyleSelector();
+}
+
+void HTMLDocument::clear() {
+  // FIXME: This does nothing, and that seems unlikely to be correct.
+  // We've long had a comment saying that IE doesn't support this.
+  // But I do see it in the documentation for Mozilla.
 }
 }
