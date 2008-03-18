@@ -27,6 +27,7 @@
 #include "ExecState.h"
 #include "JSVariableObject.h"
 #include "object.h"
+#include "function.h"
 
 namespace KJS {
 
@@ -90,6 +91,13 @@ class ActivationImp : public JSVariableObject {
     return static_cast<ActivationData*>(JSVariableObject::d);
   }
 };
+
+inline void ActivationImp::init(ExecState* exec) {
+  d()->exec = exec;
+  d()->function = exec->function();
+  d()->symbolTable = &exec->function()->body->symbolTable();
+  d()->argumentsObject = 0;
+}
 
 const size_t activationStackNodeSize = 32;
 
