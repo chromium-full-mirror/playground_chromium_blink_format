@@ -43,6 +43,10 @@ class AuthenticationChallenge : public AuthenticationChallengeBase {
                                     previousFailureCount,
                                     response,
                                     error) {}
+
+  ResourceHandle* sourceHandle() const { return m_sourceHandle.get(); }
+
+  RefPtr<ResourceHandle> m_sourceHandle;
 };
 }
 

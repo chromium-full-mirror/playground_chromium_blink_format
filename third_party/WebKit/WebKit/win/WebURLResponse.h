@@ -93,17 +93,23 @@ class WebURLResponse : public IWebHTTPURLResponse, IWebURLResponsePrivate {
 
  protected:
   HRESULT suggestedFileExtension(BSTR* result);
+
+#if USE(CFNETWORK)
   CFDictionaryRef certificateDictionary() const;
+#endif
 
  protected:
   ULONG m_refCount;
   WebCore::ResourceResponse m_response;
+
+#if USE(CFNETWORK)
   mutable RetainPtr<CFDictionaryRef> m_SSLCertificateInfo;  // this ensures
                                                             // certificate
                                                             // contexts are
                                                             // valid for the
                                                             // lifetime of this
                                                             // WebURLResponse.
+#endif
 };
 
 #endif

@@ -79,6 +79,12 @@ void WebCoreSynchronousLoader::didFail(ResourceHandle*,
   m_error = error;
 }
 
+static HashSet<String>& allowsAnyHTTPSCertificateHosts() {
+  static HashSet<String> hosts;
+
+  return hosts;
+}
+
 ResourceHandleInternal::~ResourceHandleInternal() {
   free(m_url);
   if (m_customHeaders)
@@ -109,6 +115,23 @@ PassRefPtr<SharedBuffer> ResourceHandle::bufferedData() {
 bool ResourceHandle::supportsBufferedData() {
   return false;
 }
+
+void ResourceHandle::setHostAllowsAnyHTTPSCertificate(const String& host) {
+  allowsAnyHTTPSCertificateHosts().add(host.lower());
+}
+
+#if PLATFORM(WIN) && PLATFORM(CF)
+// FIXME:  The CFDataRef will need to be something else when
+// building without
+static HashMap<String, RetainPtr<CFDataRef>>& clientCerts() {
+  static HashMap<String, RetainPtr<CFDataRef>> certs;
+  return certs;
+}
+
+void ResourceHandle::setClientCertificate(const String& host, CFDataRef cert) {
+  clientCerts().set(host.lower(), cert);
+}
+#endif
 
 void ResourceHandle::setDefersLoading(bool defers) {
   d->m_defersLoading = defers;

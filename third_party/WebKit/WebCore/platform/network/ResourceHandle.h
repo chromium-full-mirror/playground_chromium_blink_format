@@ -132,8 +132,14 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
   static CFRunLoopRef loaderRunLoop();
   CFURLConnectionRef connection() const;
   CFURLConnectionRef releaseConnectionForDownload();
-
   static void setHostAllowsAnyHTTPSCertificate(const String&);
+  static void setClientCertificate(const String& host, CFDataRef);
+#endif
+
+#if PLATFORM(WIN) && USE(CURL)
+  static void setHostAllowsAnyHTTPSCertificate(const String&);
+#endif
+#if PLATFORM(WIN) && USE(CURL) && PLATFORM(CF)
   static void setClientCertificate(const String& host, CFDataRef);
 #endif
 
@@ -158,7 +164,7 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
                                                  LPARAM);
 #endif
 
-#if PLATFORM(GTK) || PLATFORM(QT) || PLATFORM(WX)
+#if PLATFORM(QT) || USE(CURL)
   ResourceHandleInternal* getInternal() { return d.get(); }
 #endif
 
