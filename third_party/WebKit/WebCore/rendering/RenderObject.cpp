@@ -823,7 +823,8 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
 
   // Make sure we have a valid background image.
   CachedImage* bg = bgLayer->backgroundImage();
-  bool shouldPaintBackgroundImage = bg && bg->canRender();
+  bool shouldPaintBackgroundImage =
+      bg && bg->canRender(style()->effectiveZoom());
 
   // These are always percents or auto.
   if (shouldPaintBackgroundImage &&
@@ -838,7 +839,8 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
   if (style()->hasBorder()) {
     // Border images are not ok.
     CachedImage* borderImage = style()->borderImage().image();
-    bool shouldPaintBorderImage = borderImage && borderImage->canRender();
+    bool shouldPaintBorderImage =
+        borderImage && borderImage->canRender(style()->effectiveZoom());
 
     // If the image hasn't loaded, we're still using the normal border style.
     if (shouldPaintBorderImage && borderImage->isLoaded())
@@ -1350,7 +1352,8 @@ void RenderObject::paintBorder(GraphicsContext* graphicsContext,
                                bool begin,
                                bool end) {
   CachedImage* borderImage = style->borderImage().image();
-  bool shouldPaintBackgroundImage = borderImage && borderImage->canRender();
+  bool shouldPaintBackgroundImage =
+      borderImage && borderImage->canRender(style->effectiveZoom());
   if (shouldPaintBackgroundImage)
     shouldPaintBackgroundImage =
         paintBorderImage(graphicsContext, tx, ty, w, h, style);

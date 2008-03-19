@@ -71,7 +71,7 @@ CachedImage::~CachedImage() {
 void CachedImage::ref(CachedResourceClient* c) {
   CachedResource::ref(c);
 
-  if (!imageRect().isEmpty())
+  if (m_image && !m_image->rect().isEmpty())
     c->imageChanged(this);
 
   if (!m_loading)
@@ -131,12 +131,24 @@ bool CachedImage::imageHasRelativeHeight() const {
   return false;
 }
 
-IntSize CachedImage::imageSize() const {
-  return (m_image ? m_image->size() : IntSize());
+IntSize CachedImage::imageSize(float multiplier) const {
+  if (!m_image)
+    return IntSize();
+  if (multiplier == 1.0f)
+    return m_image->size();
+  return IntSize(m_image->size().width() * multiplier,
+                 m_image->size().height() * multiplier);
 }
 
-IntRect CachedImage::imageRect() const {
-  return (m_image ? m_image->rect() : IntRect());
+IntRect CachedImage::imageRect(float multiplier) const {
+  if (!m_image)
+    return IntRect();
+  if (multiplier == 1.0f)
+    return m_image->rect();
+  return IntRect(m_image->rect().x() * multiplier,
+                 m_image->rect().y() * multiplier,
+                 m_image->rect().width() * multiplier,
+                 m_image->rect().height() * multiplier);
 }
 
 void CachedImage::notifyObservers() {

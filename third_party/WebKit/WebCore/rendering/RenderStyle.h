@@ -456,7 +456,7 @@ class StyleVisualData : public RefCounted<StyleVisualData> {
     return (clip == o.clip && hasClip == o.hasClip &&
             counterIncrement == o.counterIncrement &&
             counterReset == o.counterReset &&
-            textDecoration == o.textDecoration);
+            textDecoration == o.textDecoration && m_zoom == o.m_zoom);
   }
   bool operator!=(const StyleVisualData& o) const { return !(*this == o); }
 
@@ -467,6 +467,8 @@ class StyleVisualData : public RefCounted<StyleVisualData> {
 
   short counterIncrement;  // ok, so these are not visual mode specific
   short counterReset;  // can't go to inherited, since these are not inherited
+
+  float m_zoom;
 
  private:
   StyleVisualData();
@@ -1447,6 +1449,8 @@ class StyleInheritedData : public RefCounted<StyleInheritedData> {
   Font font;
   Color color;
 
+  float m_effectiveZoom;
+
   short horizontal_border_spacing;
   short vertical_border_spacing;
 
@@ -2007,6 +2011,9 @@ class RenderStyle {
   int wordSpacing() const { return inherited->font.wordSpacing(); }
   int letterSpacing() const { return inherited->font.letterSpacing(); }
 
+  float zoom() const { return visual->m_zoom; }
+  float effectiveZoom() const { return inherited->m_effectiveZoom; }
+
   TextDirection direction() const {
     return static_cast<TextDirection>(inherited_flags._direction);
   }
@@ -2499,6 +2506,11 @@ class RenderStyle {
   void setTextDecoration(int v) { SET_VAR(visual, textDecoration, v); }
   void setDirection(TextDirection v) { inherited_flags._direction = v; }
   void setLineHeight(Length v) { SET_VAR(inherited, line_height, v) }
+  void setZoom(float f) {
+    SET_VAR(visual, m_zoom, f);
+    setEffectiveZoom(effectiveZoom() * zoom());
+  }
+  void setEffectiveZoom(float f) { SET_VAR(inherited, m_effectiveZoom, f) }
 
   void setWhiteSpace(EWhiteSpace v) { inherited_flags._white_space = v; }
 
@@ -2919,6 +2931,7 @@ class RenderStyle {
   static Length initialLineHeight() { return Length(-100.0, Percent); }
   static ETextAlign initialTextAlign() { return TAAUTO; }
   static ETextDecoration initialTextDecoration() { return TDNONE; }
+  static float initialZoom() { return 1.0f; }
   static int initialOutlineOffset() { return 0; }
   static float initialOpacity() { return 1.0f; }
   static EBoxAlignment initialBoxAlign() { return BSTRETCH; }

@@ -54,6 +54,9 @@ class RenderVideo : public RenderMedia {
 
   void updateFromElement();
 
+ protected:
+  virtual void intrinsicSizeChanged() { videoSizeChanged(); }
+
  private:
   int calcAspectRatioWidth() const;
   int calcAspectRatioHeight() const;

@@ -2349,6 +2349,7 @@ void CSSStyleSelector::applyDeclarations(bool applyFirst,
           case CSS_PROP_FONT_WEIGHT:
           case CSS_PROP__WEBKIT_TEXT_SIZE_ADJUST:
           case CSS_PROP_FONT_VARIANT:
+          case CSS_PROP_ZOOM:
             // these have to be applied first, because other properties use the
             // computed
             // values of these porperties.
@@ -2405,6 +2406,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
   CSSPrimitiveValue* primitiveValue = 0;
   if (value->isPrimitiveValue())
     primitiveValue = static_cast<CSSPrimitiveValue*>(value);
+
+  float zoomFactor = m_style->effectiveZoom();
 
   Length l;
   bool apply = false;
@@ -2770,7 +2773,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                                  HorizontalBorderSpacing)
       if (!primitiveValue)
         return;
-      short spacing = primitiveValue->computeLengthShort(m_style);
+      short spacing = primitiveValue->computeLengthShort(m_style, zoomFactor);
       m_style->setHorizontalBorderSpacing(spacing);
       return;
     }
@@ -2778,7 +2781,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       HANDLE_INHERIT_AND_INITIAL(verticalBorderSpacing, VerticalBorderSpacing)
       if (!primitiveValue)
         return;
-      short spacing = primitiveValue->computeLengthShort(m_style);
+      short spacing = primitiveValue->computeLengthShort(m_style, zoomFactor);
       m_style->setVerticalBorderSpacing(spacing);
       return;
     }
@@ -2969,7 +2972,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           width = 5;
           break;
         case CSS_VAL_INVALID:
-          width = primitiveValue->computeLengthShort(m_style);
+          width = primitiveValue->computeLengthShort(m_style, zoomFactor);
           break;
         default:
           return;
@@ -3023,7 +3026,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       } else {
         if (!primitiveValue)
           return;
-        width = primitiveValue->computeLengthInt(m_style);
+        width = primitiveValue->computeLengthInt(m_style, zoomFactor);
       }
       switch (id) {
         case CSS_PROP_LETTER_SPACING:
@@ -3177,8 +3180,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
               type < CSSPrimitiveValue::CSS_DEG)
             // Handle our quirky margin units if we have them.
-            l = Length(primitiveValue->computeLengthIntForLength(m_style),
-                       Fixed, primitiveValue->isQuirkValue());
+            l = Length(
+                primitiveValue->computeLengthIntForLength(m_style, zoomFactor),
+                Fixed, primitiveValue->isQuirkValue());
           else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
             l = Length(primitiveValue->getDoubleValue(), Percent);
           else
@@ -3281,7 +3285,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         unsigned short type = primitiveValue->primitiveType();
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG)
-          l = Length(primitiveValue->computeLengthIntForLength(m_style), Fixed);
+          l = Length(
+              primitiveValue->computeLengthIntForLength(m_style, zoomFactor),
+              Fixed);
         else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
           l = Length(primitiveValue->getDoubleValue(), Percent);
         else
@@ -3347,7 +3353,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         Length l;
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG)
-          l = Length(primitiveValue->computeLengthIntForLength(m_style), Fixed);
+          l = Length(
+              primitiveValue->computeLengthIntForLength(m_style, zoomFactor),
+              Fixed);
         else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
           l = Length(primitiveValue->getDoubleValue(), Percent);
 
@@ -3419,7 +3427,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
              type != CSSPrimitiveValue::CSS_EXS));
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG)
-          size = primitiveValue->computeLengthFloat(m_parentStyle, false);
+          size = primitiveValue->computeLengthFloat(m_parentStyle, true);
         else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
           size = (primitiveValue->getFloatValue() * oldSize) / 100.0f;
         else
@@ -3484,15 +3492,10 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         lineHeight = Length(-100.0, Percent);
       else if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
                type < CSSPrimitiveValue::CSS_DEG) {
-        double multiplier = 1.0;
-        // Scale for the font zoom factor only for types other than "em" and
-        // "ex", since those are
-        // already based on the font size.
-        if (type != CSSPrimitiveValue::CSS_EMS &&
-            type != CSSPrimitiveValue::CSS_EXS && m_style->textSizeAdjust() &&
-            m_document->frame() && m_document->frame()->shouldApplyTextZoom()) {
-          multiplier = m_document->frame()->zoomFactor();
-        }
+        double multiplier = m_style->effectiveZoom();
+        if (m_style->textSizeAdjust() && m_document->frame() &&
+            m_document->frame()->shouldApplyTextZoom())
+          multiplier *= m_document->frame()->textZoomFactor();
         lineHeight = Length(
             primitiveValue->computeLengthIntForLength(m_style, multiplier),
             Fixed);
@@ -3796,6 +3799,29 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       return;
     }
 
+    case CSS_PROP_ZOOM: {
+      // Reset the zoom in effect before we do anything.  This allows the
+      // setZoom method to accurately compute a new
+      // zoom in effect.
+      m_style->setEffectiveZoom(m_parentStyle ? m_parentStyle->effectiveZoom()
+                                              : RenderStyle::initialZoom());
+
+      // Now we can handle inherit and initial.
+      HANDLE_INHERIT_AND_INITIAL(zoom, Zoom)
+
+      // Handle normal/reset, numbers and percentages.
+      int type = primitiveValue->primitiveType();
+      if (primitiveValue->getIdent() == CSS_VAL_NORMAL)
+        m_style->setZoom(RenderStyle::initialZoom());
+      else if (primitiveValue->getIdent() == CSS_VAL_RESET) {
+        m_style->setEffectiveZoom(RenderStyle::initialZoom());
+        m_style->setZoom(RenderStyle::initialZoom());
+      } else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
+        m_style->setZoom(primitiveValue->getFloatValue() / 100.0f);
+      else if (type == CSSPrimitiveValue::CSS_NUMBER)
+        m_style->setZoom(primitiveValue->getFloatValue());
+      return;
+    }
     // shorthand properties
     case CSS_PROP_BACKGROUND:
       if (isInitial) {
@@ -4143,8 +4169,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       if (!pair)
         return;
 
-      int width = pair->first()->computeLengthInt(m_style);
-      int height = pair->second()->computeLengthInt(m_style);
+      int width = pair->first()->computeLengthInt(m_style, zoomFactor);
+      int height = pair->second()->computeLengthInt(m_style, zoomFactor);
       if (width < 0 || height < 0)
         return;
 
@@ -4176,7 +4202,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
     case CSS_PROP_OUTLINE_OFFSET:
       HANDLE_INHERIT_AND_INITIAL(outlineOffset, OutlineOffset)
-      m_style->setOutlineOffset(primitiveValue->computeLengthInt(m_style));
+      m_style->setOutlineOffset(
+          primitiveValue->computeLengthInt(m_style, zoomFactor));
       return;
 
     case CSS_PROP_TEXT_SHADOW:
@@ -4203,9 +4230,10 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       int len = list->length();
       for (int i = 0; i < len; i++) {
         ShadowValue* item = static_cast<ShadowValue*>(list->item(i));
-        int x = item->x->computeLengthInt(m_style);
-        int y = item->y->computeLengthInt(m_style);
-        int blur = item->blur ? item->blur->computeLengthInt(m_style) : 0;
+        int x = item->x->computeLengthInt(m_style, zoomFactor);
+        int y = item->y->computeLengthInt(m_style, zoomFactor);
+        int blur =
+            item->blur ? item->blur->computeLengthInt(m_style, zoomFactor) : 0;
         Color color;
         if (item->color)
           color = getColorFromPrimitiveValue(item->color.get());
@@ -4322,7 +4350,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         m_style->setHasNormalColumnGap();
         return;
       }
-      m_style->setColumnGap(primitiveValue->computeLengthFloat(m_style));
+      m_style->setColumnGap(
+          primitiveValue->computeLengthFloat(m_style, zoomFactor));
       return;
     }
     case CSS_PROP__WEBKIT_COLUMN_WIDTH: {
@@ -4336,7 +4365,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         m_style->setHasAutoColumnWidth();
         return;
       }
-      m_style->setColumnWidth(primitiveValue->computeLengthFloat(m_style));
+      m_style->setColumnWidth(
+          primitiveValue->computeLengthFloat(m_style, zoomFactor));
       return;
     }
     case CSS_PROP__WEBKIT_COLUMN_RULE_STYLE:
@@ -4609,11 +4639,11 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           else if (primitiveValue->getIdent() == CSS_VAL_THICK)
             result *= 5;
           CSSPrimitiveValue val(result, CSSPrimitiveValue::CSS_EMS);
-          width = val.computeLengthFloat(m_style);
+          width = val.computeLengthFloat(m_style, zoomFactor);
           break;
         }
         default:
-          width = primitiveValue->computeLengthFloat(m_style);
+          width = primitiveValue->computeLengthFloat(m_style, zoomFactor);
           break;
       }
       m_style->setTextStrokeWidth(width);
@@ -4772,7 +4802,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       int type = primitiveValue->primitiveType();
       if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
           type < CSSPrimitiveValue::CSS_DEG)
-        l = Length(primitiveValue->computeLengthIntForLength(m_style), Fixed);
+        l = Length(
+            primitiveValue->computeLengthIntForLength(m_style, zoomFactor),
+            Fixed);
       else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
         l = Length(primitiveValue->getDoubleValue(), Percent);
       else
@@ -4788,7 +4820,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       int type = primitiveValue->primitiveType();
       if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
           type < CSSPrimitiveValue::CSS_DEG)
-        l = Length(primitiveValue->computeLengthIntForLength(m_style), Fixed);
+        l = Length(
+            primitiveValue->computeLengthIntForLength(m_style, zoomFactor),
+            Fixed);
       else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
         l = Length(primitiveValue->getDoubleValue(), Percent);
       else
@@ -4979,11 +5013,14 @@ void CSSStyleSelector::mapBackgroundSize(BackgroundLayer* layer,
   int firstType = first->primitiveType();
   int secondType = second->primitiveType();
 
+  float zoomFactor = m_style->effectiveZoom();
+
   if (firstType == CSSPrimitiveValue::CSS_UNKNOWN)
     firstLength = Length(Auto);
   else if (firstType > CSSPrimitiveValue::CSS_PERCENTAGE &&
            firstType < CSSPrimitiveValue::CSS_DEG)
-    firstLength = Length(first->computeLengthIntForLength(m_style), Fixed);
+    firstLength =
+        Length(first->computeLengthIntForLength(m_style, zoomFactor), Fixed);
   else if (firstType == CSSPrimitiveValue::CSS_PERCENTAGE)
     firstLength = Length(first->getDoubleValue(), Percent);
   else
@@ -4993,7 +5030,8 @@ void CSSStyleSelector::mapBackgroundSize(BackgroundLayer* layer,
     secondLength = Length(Auto);
   else if (secondType > CSSPrimitiveValue::CSS_PERCENTAGE &&
            secondType < CSSPrimitiveValue::CSS_DEG)
-    secondLength = Length(second->computeLengthIntForLength(m_style), Fixed);
+    secondLength =
+        Length(second->computeLengthIntForLength(m_style, zoomFactor), Fixed);
   else if (secondType == CSSPrimitiveValue::CSS_PERCENTAGE)
     secondLength = Length(second->getDoubleValue(), Percent);
   else
@@ -5014,12 +5052,15 @@ void CSSStyleSelector::mapBackgroundXPosition(BackgroundLayer* layer,
   if (!value->isPrimitiveValue())
     return;
 
+  float zoomFactor = m_style->effectiveZoom();
+
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
   Length l;
   int type = primitiveValue->primitiveType();
   if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
       type < CSSPrimitiveValue::CSS_DEG)
-    l = Length(primitiveValue->computeLengthIntForLength(m_style), Fixed);
+    l = Length(primitiveValue->computeLengthIntForLength(m_style, zoomFactor),
+               Fixed);
   else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
     l = Length(primitiveValue->getDoubleValue(), Percent);
   else
@@ -5037,12 +5078,15 @@ void CSSStyleSelector::mapBackgroundYPosition(BackgroundLayer* layer,
   if (!value->isPrimitiveValue())
     return;
 
+  float zoomFactor = m_style->effectiveZoom();
+
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
   Length l;
   int type = primitiveValue->primitiveType();
   if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
       type < CSSPrimitiveValue::CSS_DEG)
-    l = Length(primitiveValue->computeLengthIntForLength(m_style), Fixed);
+    l = Length(primitiveValue->computeLengthIntForLength(m_style, zoomFactor),
+               Fixed);
   else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
     l = Length(primitiveValue->getDoubleValue(), Percent);
   else
@@ -5228,11 +5272,11 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
   int minSize = settings->minimumFontSize();
   int minLogicalSize = settings->minimumLogicalFontSize();
 
-  float zoomPercent =
-      m_document->frame() && m_document->frame()->shouldApplyTextZoom()
-          ? m_document->frame()->zoomFactor()
-          : 1.0f;
-  float zoomedSize = specifiedSize * zoomPercent;
+  float zoomFactor = m_style->effectiveZoom();
+  if (m_document->frame() && m_document->frame()->shouldApplyTextZoom())
+    zoomFactor *= m_document->frame()->textZoomFactor();
+
+  float zoomedSize = specifiedSize * zoomFactor;
 
   // Apply the hard minimum first.  We only apply the hard minimum if after
   // zooming we're still too small.

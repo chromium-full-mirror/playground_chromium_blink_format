@@ -73,7 +73,8 @@ StyleVisualData::StyleVisualData()
     : hasClip(false),
       textDecoration(RenderStyle::initialTextDecoration()),
       counterIncrement(0),
-      counterReset(0) {}
+      counterReset(0),
+      m_zoom(RenderStyle::initialZoom()) {}
 
 StyleVisualData::~StyleVisualData() {}
 
@@ -83,7 +84,8 @@ StyleVisualData::StyleVisualData(const StyleVisualData& o)
       hasClip(o.hasClip),
       textDecoration(o.textDecoration),
       counterIncrement(o.counterIncrement),
-      counterReset(o.counterReset) {}
+      counterReset(o.counterReset),
+      m_zoom(RenderStyle::initialZoom()) {}
 
 BackgroundLayer::BackgroundLayer()
     : m_image(RenderStyle::initialBackgroundImage()),
@@ -808,6 +810,7 @@ StyleInheritedData::StyleInheritedData()
       line_height(RenderStyle::initialLineHeight()),
       style_image(RenderStyle::initialListStyleImage()),
       color(RenderStyle::initialColor()),
+      m_effectiveZoom(RenderStyle::initialZoom()),
       horizontal_border_spacing(RenderStyle::initialHorizontalBorderSpacing()),
       vertical_border_spacing(RenderStyle::initialVerticalBorderSpacing()),
       widows(RenderStyle::initialWidows()),
@@ -824,6 +827,7 @@ StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
       cursorData(o.cursorData),
       font(o.font),
       color(o.color),
+      m_effectiveZoom(o.m_effectiveZoom),
       horizontal_border_spacing(o.horizontal_border_spacing),
       vertical_border_spacing(o.vertical_border_spacing),
       widows(o.widows),
@@ -843,6 +847,7 @@ bool StyleInheritedData::operator==(const StyleInheritedData& o) const {
          style_image == o.style_image &&
          cursorDataEqvuialent(cursorData.get(), o.cursorData.get()) &&
          font == o.font && color == o.color &&
+         m_effectiveZoom == o.m_effectiveZoom &&
          horizontal_border_spacing == o.horizontal_border_spacing &&
          vertical_border_spacing == o.vertical_border_spacing &&
          widows == o.widows && orphans == o.orphans &&
@@ -1252,6 +1257,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
     return Layout;
   if (visual->counterIncrement != other->visual->counterIncrement ||
       visual->counterReset != other->visual->counterReset)
+    return Layout;
+
+  if (inherited->m_effectiveZoom != other->inherited->m_effectiveZoom)
     return Layout;
 
   // Make sure these left/top/right/bottom checks stay below all layout checks

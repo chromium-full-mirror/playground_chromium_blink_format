@@ -41,6 +41,9 @@ class RenderHTMLCanvas : public RenderReplaced {
   virtual void paintReplaced(PaintInfo& paintInfo, int tx, int ty);
 
   void canvasSizeChanged();
+
+ protected:
+  virtual void intrinsicSizeChanged() { canvasSizeChanged(); }
 };
 
 }  // namespace WebCore

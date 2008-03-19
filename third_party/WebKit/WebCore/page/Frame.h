@@ -223,6 +223,12 @@ class Frame : public RefCounted<Frame> {
   bool isZoomFactorTextOnly() const;
   bool shouldApplyTextZoom() const;
   bool shouldApplyPageZoom() const;
+  float pageZoomFactor() const {
+    return shouldApplyPageZoom() ? zoomFactor() : 1.0f;
+  }
+  float textZoomFactor() const {
+    return shouldApplyTextZoom() ? zoomFactor() : 1.0f;
+  }
 
   bool prohibitsScrolling() const;
   void setProhibitsScrolling(const bool);

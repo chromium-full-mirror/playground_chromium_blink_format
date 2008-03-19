@@ -83,6 +83,8 @@ class RenderImage : public RenderReplaced {
     return m_cachedImage && m_cachedImage->errorOccurred();
   }
 
+  virtual void intrinsicSizeChanged() { imageChanged(m_cachedImage); }
+
  private:
   int calcAspectRatioWidth() const;
   int calcAspectRatioHeight() const;

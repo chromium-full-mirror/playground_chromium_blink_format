@@ -70,7 +70,7 @@ static const int computedProperties[] = {
     CSS_PROP_TEXT_TRANSFORM, CSS_PROP_TOP, CSS_PROP_UNICODE_BIDI,
     CSS_PROP_VERTICAL_ALIGN, CSS_PROP_VISIBILITY, CSS_PROP_WHITE_SPACE,
     CSS_PROP_WIDOWS, CSS_PROP_WIDTH, CSS_PROP_WORD_SPACING, CSS_PROP_WORD_WRAP,
-    CSS_PROP_Z_INDEX,
+    CSS_PROP_Z_INDEX, CSS_PROP_ZOOM,
 
     CSS_PROP__WEBKIT_APPEARANCE, CSS_PROP__WEBKIT_BACKGROUND_CLIP,
     CSS_PROP__WEBKIT_BACKGROUND_COMPOSITE, CSS_PROP__WEBKIT_BACKGROUND_ORIGIN,
@@ -746,6 +746,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->hasAutoZIndex())
         return new CSSPrimitiveValue(CSS_VAL_AUTO);
       return new CSSPrimitiveValue(style->zIndex(),
+                                   CSSPrimitiveValue::CSS_NUMBER);
+    case CSS_PROP_ZOOM:
+      return new CSSPrimitiveValue(style->zoom(),
                                    CSSPrimitiveValue::CSS_NUMBER);
     case CSS_PROP__WEBKIT_BOX_SIZING:
       if (style->boxSizing() == CONTENT_BOX)

@@ -219,7 +219,7 @@ int CSSPrimitiveValue::computeLengthInt(RenderStyle* style) {
 }
 
 int CSSPrimitiveValue::computeLengthInt(RenderStyle* style, double multiplier) {
-  double result = multiplier * computeLengthDouble(style);
+  double result = computeLengthDouble(style, multiplier);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -253,7 +253,7 @@ int CSSPrimitiveValue::computeLengthIntForLength(RenderStyle* style) {
 // different overflow.
 int CSSPrimitiveValue::computeLengthIntForLength(RenderStyle* style,
                                                  double multiplier) {
-  double result = multiplier * computeLengthDouble(style);
+  double result = computeLengthDouble(style, multiplier);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -280,7 +280,7 @@ short CSSPrimitiveValue::computeLengthShort(RenderStyle* style) {
 
 short CSSPrimitiveValue::computeLengthShort(RenderStyle* style,
                                             double multiplier) {
-  double result = multiplier * computeLengthDouble(style);
+  double result = computeLengthDouble(style, multiplier);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -293,26 +293,46 @@ short CSSPrimitiveValue::computeLengthShort(RenderStyle* style,
 }
 
 float CSSPrimitiveValue::computeLengthFloat(RenderStyle* style,
-                                            bool applyZoomFactor) {
-  return static_cast<float>(computeLengthDouble(style, applyZoomFactor));
+                                            bool computingFontSize) {
+  return static_cast<float>(computeLengthDouble(style, 1.0, computingFontSize));
+}
+
+float CSSPrimitiveValue::computeLengthFloat(RenderStyle* style,
+                                            double multiplier,
+                                            bool computingFontSize) {
+  return static_cast<float>(
+      computeLengthDouble(style, multiplier, computingFontSize));
 }
 
 double CSSPrimitiveValue::computeLengthDouble(RenderStyle* style,
-                                              bool applyZoomFactor) {
+                                              double multiplier,
+                                              bool computingFontSize) {
   unsigned short type = primitiveType();
+
+  // We do not apply the zoom factor when we are computing the value of the
+  // font-size property.  The zooming
+  // for font sizes is much more complicated, since we have to worry about
+  // enforcing the minimum font size preference
+  // as well as enforcing the implicit "smart minimum."  In addition the CSS
+  // property text-size-adjust is used to
+  // prevent text from zooming at all.  Therefore we will not apply the zoom
+  // here if we are computing font-size.
+  bool applyZoomMultiplier = !computingFontSize;
 
   double factor = 1.0;
   switch (type) {
     case CSS_EMS:
-      factor = applyZoomFactor ? style->fontDescription().computedSize()
-                               : style->fontDescription().specifiedSize();
+      applyZoomMultiplier = false;
+      factor = computingFontSize ? style->fontDescription().specifiedSize()
+                                 : style->fontDescription().computedSize();
       break;
     case CSS_EXS:
-      // FIXME: We have a bug right now where the zoom will be applied multiple
-      // times to EX units.
+      // FIXME: We have a bug right now where the zoom will be applied twice to
+      // EX units.
       // We really need to compute EX using fontMetrics for the original
       // specifiedSize and not use
       // our actual constructed rendering font.
+      applyZoomMultiplier = false;
       factor = style->font().xHeight();
       break;
     case CSS_PX:
@@ -337,7 +357,7 @@ double CSSPrimitiveValue::computeLengthDouble(RenderStyle* style,
       return -1.0;
   }
 
-  return getDoubleValue() * factor;
+  return getDoubleValue() * factor * (applyZoomMultiplier ? multiplier : 1.0f);
 }
 
 void CSSPrimitiveValue::setFloatValue(unsigned short unitType,
