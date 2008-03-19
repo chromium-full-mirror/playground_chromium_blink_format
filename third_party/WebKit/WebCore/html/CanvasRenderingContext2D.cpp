@@ -456,7 +456,7 @@ void CanvasRenderingContext2D::arc(float x,
                                    bool anticlockwise,
                                    ExceptionCode& ec) {
   ec = 0;
-  if (!(r > 0)) {
+  if (!(r >= 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
