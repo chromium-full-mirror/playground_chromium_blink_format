@@ -306,8 +306,9 @@ bool JSObject::deleteProperty(ExecState* /*exec*/,
 
   // Look in the static hashtable of properties
   const HashEntry* entry = findPropertyHashEntry(propertyName);
-  if (entry && entry->attr & DontDelete)
+  if (entry && entry->attributes & DontDelete)
     return false;  // this builtin property can't be deleted
+  // FIXME: Should the code here actually do some deletion?
   return true;
 }
 
@@ -380,7 +381,7 @@ const HashEntry* JSObject::findPropertyHashEntry(
     const Identifier& propertyName) const {
   for (const ClassInfo* info = classInfo(); info; info = info->parentClass) {
     if (const HashTable* propHashTable = info->propHashTable) {
-      if (const HashEntry* e = Lookup::findEntry(propHashTable, propertyName))
+      if (const HashEntry* e = propHashTable->entry(propertyName))
         return e;
     }
   }
@@ -491,7 +492,7 @@ bool JSObject::getPropertyAttributes(const Identifier& propertyName,
   // Look in the static hashtable of properties
   const HashEntry* e = findPropertyHashEntry(propertyName);
   if (e) {
-    attributes = e->attr;
+    attributes = e->attributes;
     return true;
   }
 
@@ -502,19 +503,22 @@ void JSObject::getPropertyNames(ExecState* exec,
                                 PropertyNameArray& propertyNames) {
   _prop.getEnumerablePropertyNames(propertyNames);
 
-  // Add properties from the static hashtable of properties
-  const ClassInfo* info = classInfo();
-  while (info) {
-    if (info->propHashTable) {
-      int size = info->propHashTable->size;
-      const HashEntry* e = info->propHashTable->entries;
-      for (int i = 0; i < size; ++i, ++e) {
-        if (e->s && !(e->attr & DontEnum))
-          propertyNames.add(e->s);
-      }
+  // Add properties from the static hashtables of properties
+  for (const ClassInfo* info = classInfo(); info; info = info->parentClass) {
+    const HashTable* table = info->propHashTable;
+    if (!table)
+      continue;
+    if (!table->table)
+      table->createTable();
+    ASSERT(table->table);
+    int hashSizeMask = table->hashSizeMask;
+    const HashEntry* e = table->table;
+    for (int i = 0; i <= hashSizeMask; ++i, ++e) {
+      if (e->key && !(e->attributes & DontEnum))
+        propertyNames.add(Identifier(e->key));
     }
-    info = info->parentClass;
   }
+
   if (_proto->isObject())
     static_cast<JSObject*>(_proto)->getPropertyNames(exec, propertyNames);
 }

@@ -622,11 +622,10 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  const HashEntry* entry =
-      Lookup::findEntry(&JSDOMWindowBaseTable, propertyName);
+  const HashEntry* entry = JSDOMWindowBaseTable.entry(propertyName);
   if (entry) {
-    if (entry->attr & Function) {
-      if (entry->value.functionValue == windowProtoFuncShowModalDialog) {
+    if (entry->attributes & Function) {
+      if (entry->functionValue == windowProtoFuncShowModalDialog) {
         if (!canShowModalDialog(impl()->frame()))
           return false;
       }
@@ -687,18 +686,17 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
 void JSDOMWindowBase::put(ExecState* exec,
                           const Identifier& propertyName,
                           JSValue* value) {
-  const HashEntry* entry =
-      Lookup::findEntry(&JSDOMWindowBaseTable, propertyName);
+  const HashEntry* entry = JSDOMWindowBaseTable.entry(propertyName);
   if (entry) {
-    if (entry->attr & Function) {
+    if (entry->attributes & Function) {
       if (allowsAccessFrom(exec))
         Base::put(exec, propertyName, value);
       return;
     }
-    if (entry->attr & ReadOnly)
+    if (entry->attributes & ReadOnly)
       return;
 
-    switch (entry->value.intValue) {
+    switch (entry->integerValue) {
       case Location_: {
         if (Frame* p =
                 toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame()) {

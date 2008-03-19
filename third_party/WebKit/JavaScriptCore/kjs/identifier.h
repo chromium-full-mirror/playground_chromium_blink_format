@@ -72,6 +72,8 @@ class Identifier {
   static bool equal(const UString::Rep*, const UChar*, int length);
   static bool equal(const UString::Rep*, const UString::Rep*);
 
+  static PassRefPtr<UString::Rep> add(const char*);
+
  private:
   UString _ustring;
 
@@ -82,7 +84,6 @@ class Identifier {
     return equal(a._ustring.rep(), b);
   }
 
-  static PassRefPtr<UString::Rep> add(const char*);
   static PassRefPtr<UString::Rep> add(const UChar*, int length);
   static PassRefPtr<UString::Rep> add(UString::Rep* r) {
     if (r->isIdentifier)
