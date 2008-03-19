@@ -722,7 +722,8 @@ void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout,
         RenderObject* parent = last->parent();
         if (!parent->normalChildNeedsLayout()) {
           parent->setChildNeedsLayout(true, false);
-          parent->markContainingBlocksForLayout(scheduleRelayout, newRoot);
+          if (parent != newRoot)
+            parent->markContainingBlocksForLayout(scheduleRelayout, newRoot);
         }
       }
       if (o->m_posChildNeedsLayout)
