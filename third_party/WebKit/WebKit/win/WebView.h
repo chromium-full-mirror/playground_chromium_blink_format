@@ -639,6 +639,10 @@ class WebView : public IWebView,
 
   virtual HRESULT STDMETHODCALLTYPE windowAncestryDidChange();
 
+  virtual HRESULT STDMETHODCALLTYPE paintDocumentRectToContext(
+      /* [in] */ RECT rect,
+      /* [in] */ OLE_HANDLE dc);
+
   // WebView
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
