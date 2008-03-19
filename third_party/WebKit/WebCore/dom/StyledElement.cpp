@@ -418,7 +418,7 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
         return;
     }
   }
-  attr->decl()->setProperty(id, CSS_VAL_BLACK, false);
+  attr->decl()->setProperty(id, CSSValueBlack, false);
 }
 
 void StyledElement::createMappedDecl(MappedAttribute* attr) {

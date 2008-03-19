@@ -85,10 +85,10 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
   // defined.
   const CSSMutableStyleDeclaration* style = fontFaceRule->style();
   RefPtr<CSSValue> fontFamily =
-      style->getPropertyCSSValue(CSS_PROP_FONT_FAMILY);
-  RefPtr<CSSValue> src = style->getPropertyCSSValue(CSS_PROP_SRC);
+      style->getPropertyCSSValue(CSSPropertyFontFamily);
+  RefPtr<CSSValue> src = style->getPropertyCSSValue(CSSPropertySrc);
   RefPtr<CSSValue> unicodeRange =
-      style->getPropertyCSSValue(CSS_PROP_UNICODE_RANGE);
+      style->getPropertyCSSValue(CSSPropertyUnicodeRange);
   if (!fontFamily || !src || !fontFamily->isValueList() ||
       !src->isValueList() || unicodeRange && !unicodeRange->isValueList())
     return;
@@ -108,24 +108,24 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
   FontDescription fontDescription;
 
   if (RefPtr<CSSValue> fontStyle =
-          style->getPropertyCSSValue(CSS_PROP_FONT_STYLE))
+          style->getPropertyCSSValue(CSSPropertyFontStyle))
     fontDescription.setItalic(
         static_cast<CSSPrimitiveValue*>(fontStyle.get())->getIdent() !=
-        CSS_VAL_NORMAL);
+        CSSValueNormal);
 
   if (RefPtr<CSSValue> fontWeight =
-          style->getPropertyCSSValue(CSS_PROP_FONT_WEIGHT)) {
+          style->getPropertyCSSValue(CSSPropertyFontWeight)) {
     // FIXME: Need to support weights for real, since we're effectively limiting
     // the number of supported weights to two.
     // This behavior could also result in the "last kinda bold variant"
     // described winning even if it isn't the best match for bold.
     switch (static_cast<CSSPrimitiveValue*>(fontWeight.get())->getIdent()) {
-      case CSS_VAL_BOLD:
-      case CSS_VAL_BOLDER:
-      case CSS_VAL_600:
-      case CSS_VAL_700:
-      case CSS_VAL_800:
-      case CSS_VAL_900:
+      case CSSValueBold:
+      case CSSValueBolder:
+      case CSSValue600:
+      case CSSValue700:
+      case CSSValue800:
+      case CSSValue900:
         fontDescription.setWeight(cBoldWeight);
       default:
         break;
@@ -133,10 +133,10 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
   }
 
   if (RefPtr<CSSValue> fontVariant =
-          style->getPropertyCSSValue(CSS_PROP_FONT_VARIANT))
+          style->getPropertyCSSValue(CSSPropertyFontVariant))
     fontDescription.setSmallCaps(
         static_cast<CSSPrimitiveValue*>(fontVariant.get())->getIdent() ==
-        CSS_VAL_SMALL_CAPS);
+        CSSValueSmallCaps);
 
   // Each item in the src property's list is a single CSSFontFaceSource. Put
   // them all into a CSSFontFace.
@@ -227,19 +227,19 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
       // defining what font to use for those types.
       String familyName;
       switch (item->getIdent()) {
-        case CSS_VAL_SERIF:
+        case CSSValueSerif:
           familyName = "-webkit-serif";
           break;
-        case CSS_VAL_SANS_SERIF:
+        case CSSValueSansSerif:
           familyName = "-webkit-sans-serif";
           break;
-        case CSS_VAL_CURSIVE:
+        case CSSValueCursive:
           familyName = "-webkit-cursive";
           break;
-        case CSS_VAL_FANTASY:
+        case CSSValueFantasy:
           familyName = "-webkit-fantasy";
           break;
-        case CSS_VAL_MONOSPACE:
+        case CSSValueMonospace:
           familyName = "-webkit-monospace";
           break;
         default:

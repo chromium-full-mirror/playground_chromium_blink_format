@@ -168,11 +168,11 @@ void SVGForeignObjectElement::svgAttributeChanged(
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
   if (attrName == SVGNames::widthAttr) {
-    addCSSPropertyAndNotifyAttributeMap(this, attrName, CSS_PROP_WIDTH,
+    addCSSPropertyAndNotifyAttributeMap(this, attrName, CSSPropertyWidth,
                                         width().valueAsString());
     return;
   } else if (attrName == SVGNames::heightAttr) {
-    addCSSPropertyAndNotifyAttributeMap(this, attrName, CSS_PROP_HEIGHT,
+    addCSSPropertyAndNotifyAttributeMap(this, attrName, CSSPropertyHeight,
                                         height().valueAsString());
     return;
   }

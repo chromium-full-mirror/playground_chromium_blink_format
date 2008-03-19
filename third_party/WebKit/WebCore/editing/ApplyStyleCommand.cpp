@@ -122,7 +122,7 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
 
     // Changing the whitespace style in a tab span would collapse the tab into a
     // space.
-    if (property->id() == CSS_PROP_WHITE_SPACE &&
+    if (property->id() == CSSPropertyWhiteSpace &&
         (isTabSpanTextNode(position.node()) ||
          isTabSpanNode((position.node()))))
       continue;
@@ -133,10 +133,11 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
 
     // Add this property
 
-    if (property->id() == CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT) {
+    if (property->id() == CSSPropertyWebkitTextDecorationsInEffect) {
       // we have to special-case text decorations
-      CSSProperty alteredProperty = CSSProperty(
-          CSS_PROP_TEXT_DECORATION, property->value(), property->isImportant());
+      CSSProperty alteredProperty =
+          CSSProperty(CSSPropertyTextDecoration, property->value(),
+                      property->isImportant());
       styleText += alteredProperty.cssText();
     } else
       styleText += property->cssText();
@@ -158,30 +159,30 @@ bool StyleChange::checkForLegacyHTMLStyleChange(const CSSProperty* property) {
 
   String valueText(property->value()->cssText());
   switch (property->id()) {
-    case CSS_PROP_FONT_WEIGHT:
+    case CSSPropertyFontWeight:
       if (equalIgnoringCase(valueText, "bold")) {
         m_applyBold = true;
         return true;
       }
       break;
-    case CSS_PROP_FONT_STYLE:
+    case CSSPropertyFontStyle:
       if (equalIgnoringCase(valueText, "italic") ||
           equalIgnoringCase(valueText, "oblique")) {
         m_applyItalic = true;
         return true;
       }
       break;
-    case CSS_PROP_COLOR: {
+    case CSSPropertyColor: {
       RGBA32 rgba = 0;
       CSSParser::parseColor(rgba, valueText);
       Color color(rgba);
       m_applyFontColor = color.name();
       return true;
     }
-    case CSS_PROP_FONT_FAMILY:
+    case CSSPropertyFontFamily:
       m_applyFontFace = valueText;
       return true;
-    case CSS_PROP_FONT_SIZE:
+    case CSSPropertyFontSize:
       if (property->value()->cssValueType() == CSSValue::CSS_PRIMITIVE_VALUE) {
         CSSPrimitiveValue* value =
             static_cast<CSSPrimitiveValue*>(property->value());
@@ -452,15 +453,15 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
 
 void ApplyStyleCommand::applyRelativeFontStyleChange(
     CSSMutableStyleDeclaration* style) {
-  RefPtr<CSSValue> value = style->getPropertyCSSValue(CSS_PROP_FONT_SIZE);
+  RefPtr<CSSValue> value = style->getPropertyCSSValue(CSSPropertyFontSize);
   if (value) {
     // Explicit font size overrides any delta.
-    style->removeProperty(CSS_PROP__WEBKIT_FONT_SIZE_DELTA);
+    style->removeProperty(CSSPropertyWebkitFontSizeDelta);
     return;
   }
 
   // Get the adjustment amount out of the style.
-  value = style->getPropertyCSSValue(CSS_PROP__WEBKIT_FONT_SIZE_DELTA);
+  value = style->getPropertyCSSValue(CSSPropertyWebkitFontSizeDelta);
   if (!value)
     return;
   float adjustment = NoFontDelta;
@@ -473,7 +474,7 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
       adjustment = primitiveValue->getFloatValue();
     }
   }
-  style->removeProperty(CSS_PROP__WEBKIT_FONT_SIZE_DELTA);
+  style->removeProperty(CSSPropertyWebkitFontSizeDelta);
   if (adjustment == NoFontDelta)
     return;
 
@@ -571,13 +572,13 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
     float desiredFontSize =
         max(MinimumFontSize, startingFontSizes.get(node) + adjustment);
     RefPtr<CSSValue> value =
-        inlineStyleDecl->getPropertyCSSValue(CSS_PROP_FONT_SIZE);
+        inlineStyleDecl->getPropertyCSSValue(CSSPropertyFontSize);
     if (value) {
-      inlineStyleDecl->removeProperty(CSS_PROP_FONT_SIZE, true);
+      inlineStyleDecl->removeProperty(CSSPropertyFontSize, true);
       currentFontSize = computedFontSize(node);
     }
     if (currentFontSize != desiredFontSize) {
-      inlineStyleDecl->setProperty(CSS_PROP_FONT_SIZE,
+      inlineStyleDecl->setProperty(CSSPropertyFontSize,
                                    String::number(desiredFontSize) + "px",
                                    false, false);
       setNodeAttribute(elem, styleAttr, inlineStyleDecl->cssText());
@@ -767,11 +768,11 @@ bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclaration* style,
            style->valuesIterator();
        it != end; ++it) {
     switch ((*it).id()) {
-      case CSS_PROP_FONT_WEIGHT:
+      case CSSPropertyFontWeight:
         if (elem->hasLocalName(bTag))
           return true;
         break;
-      case CSS_PROP_FONT_STYLE:
+      case CSSPropertyFontStyle:
         if (elem->hasLocalName(iTag))
           return true;
     }
@@ -802,13 +803,13 @@ void ApplyStyleCommand::removeHTMLFontStyle(CSSMutableStyleDeclaration* style,
            style->valuesIterator();
        it != end; ++it) {
     switch ((*it).id()) {
-      case CSS_PROP_COLOR:
+      case CSSPropertyColor:
         removeNodeAttribute(elem, colorAttr);
         break;
-      case CSS_PROP_FONT_FAMILY:
+      case CSSPropertyFontFamily:
         removeNodeAttribute(elem, faceAttr);
         break;
-      case CSS_PROP_FONT_SIZE:
+      case CSSPropertyFontSize:
         removeNodeAttribute(elem, sizeAttr);
         break;
     }
@@ -833,7 +834,7 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclaration* style,
        it != end; ++it) {
     int propertyID = (*it).id();
     RefPtr<CSSValue> value = decl->getPropertyCSSValue(propertyID);
-    if (value && (propertyID != CSS_PROP_WHITE_SPACE || !isTabSpanNode(elem)))
+    if (value && (propertyID != CSSPropertyWhiteSpace || !isTabSpanNode(elem)))
       removeCSSProperty(decl, propertyID);
   }
 
@@ -858,7 +859,7 @@ static bool hasTextDecorationProperty(Node* node) {
   Element* element = static_cast<Element*>(node);
   CSSComputedStyleDeclaration style(element);
   RefPtr<CSSValue> value =
-      style.getPropertyCSSValue(CSS_PROP_TEXT_DECORATION, DoNotUpdateLayout);
+      style.getPropertyCSSValue(CSSPropertyTextDecoration, DoNotUpdateLayout);
   return value && !equalIgnoringCase(value->cssText(), "none");
 }
 
@@ -887,14 +888,14 @@ ApplyStyleCommand::extractTextDecorationStyle(Node* node) {
   if (!style)
     return 0;
 
-  int properties[1] = {CSS_PROP_TEXT_DECORATION};
+  int properties[1] = {CSSPropertyTextDecoration};
   RefPtr<CSSMutableStyleDeclaration> textDecorationStyle =
       style->copyPropertiesInSet(properties, 1);
 
   RefPtr<CSSValue> property =
-      style->getPropertyCSSValue(CSS_PROP_TEXT_DECORATION);
+      style->getPropertyCSSValue(CSSPropertyTextDecoration);
   if (property && !equalIgnoringCase(property->cssText(), "none"))
-    removeCSSProperty(style.get(), CSS_PROP_TEXT_DECORATION);
+    removeCSSProperty(style.get(), CSSPropertyTextDecoration);
 
   return textDecorationStyle.release();
 }
@@ -913,15 +914,15 @@ ApplyStyleCommand::extractAndNegateTextDecorationStyle(Node* node) {
       new CSSComputedStyleDeclaration(element);
   ASSERT(computedStyle);
 
-  int properties[1] = {CSS_PROP_TEXT_DECORATION};
+  int properties[1] = {CSSPropertyTextDecoration};
   RefPtr<CSSMutableStyleDeclaration> textDecorationStyle =
       computedStyle->copyPropertiesInSet(properties, 1);
 
   RefPtr<CSSValue> property =
-      computedStyle->getPropertyCSSValue(CSS_PROP_TEXT_DECORATION);
+      computedStyle->getPropertyCSSValue(CSSPropertyTextDecoration);
   if (property && !equalIgnoringCase(property->cssText(), "none")) {
     RefPtr<CSSMutableStyleDeclaration> newStyle = textDecorationStyle->copy();
-    newStyle->setProperty(CSS_PROP_TEXT_DECORATION, "none");
+    newStyle->setProperty(CSSPropertyTextDecoration, "none");
     applyTextDecorationStyle(node, newStyle.get());
   }
 
@@ -1034,15 +1035,14 @@ void ApplyStyleCommand::removeInlineStyle(
   ASSERT(Range::compareBoundaryPoints(start, end) <= 0);
 
   RefPtr<CSSValue> textDecorationSpecialProperty =
-      style->getPropertyCSSValue(CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT);
+      style->getPropertyCSSValue(CSSPropertyWebkitTextDecorationsInEffect);
 
   if (textDecorationSpecialProperty) {
     pushDownTextDecorationStyleAtBoundaries(start.downstream(), end.upstream());
     style = style->copy();
-    style->setProperty(CSS_PROP_TEXT_DECORATION,
-                       textDecorationSpecialProperty->cssText(),
-                       style->getPropertyPriority(
-                           CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT));
+    style->setProperty(
+        CSSPropertyTextDecoration, textDecorationSpecialProperty->cssText(),
+        style->getPropertyPriority(CSSPropertyWebkitTextDecorationsInEffect));
   }
 
   // The s and e variables store the positions used to set the ending selection
@@ -1417,7 +1417,7 @@ float ApplyStyleCommand::computedFontSize(const Node* node) {
     return 0;
 
   RefPtr<CSSPrimitiveValue> value = static_pointer_cast<CSSPrimitiveValue>(
-      computedStyle->getPropertyCSSValue(CSS_PROP_FONT_SIZE));
+      computedStyle->getPropertyCSSValue(CSSPropertyFontSize));
   if (!value)
     return 0;
 
