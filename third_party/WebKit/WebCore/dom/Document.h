@@ -84,10 +84,8 @@ class HTMLInputElement;
 class HTMLMapElement;
 class IntPoint;
 class MouseEventWithHitTestResults;
-class NameNodeList;
 class NodeFilter;
 class NodeIterator;
-class NodeList;
 class Page;
 class PlatformMouseEvent;
 class ProcessingInstruction;
@@ -817,9 +815,12 @@ class Document : public ContainerNode {
   }
 #endif
 
-  void addNodeList() { m_numNodeLists++; }
-  void removeNodeList() { m_numNodeLists--; }
-  bool hasNodeLists() const { return m_numNodeLists != 0; }
+  void addNodeListCache() { ++m_numNodeListCaches; }
+  void removeNodeListCache() {
+    ASSERT(m_numNodeListCaches > 0);
+    --m_numNodeListCaches;
+  }
+  bool hasNodeListCaches() const { return m_numNodeListCaches; }
 
   void updateFocusAppearanceSoon();
   void cancelFocusAppearanceUpdate();
@@ -1094,7 +1095,7 @@ class Document : public ContainerNode {
 
   bool m_isXHTML;
 
-  unsigned m_numNodeLists;
+  unsigned m_numNodeListCaches;
 
 #if ENABLE(DATABASE)
   RefPtr<DatabaseThread> m_databaseThread;

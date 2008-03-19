@@ -38,8 +38,6 @@ class NameNodeList : public DynamicNodeList {
                const String& name,
                DynamicNodeList::Caches*);
 
-  virtual void rootNodeAttributeChanged();
-
  private:
   virtual bool nodeMatches(Node*) const;
 

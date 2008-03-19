@@ -695,7 +695,7 @@ void ContainerNode::childrenChanged(bool changedByParser,
   if (!changedByParser && childCountDelta)
     document()->nodeChildrenChanged(this, beforeChange, afterChange,
                                     childCountDelta);
-  if (document()->hasNodeLists())
+  if (document()->hasNodeListCaches())
     notifyNodeListsChildrenChanged();
 }
 

@@ -34,11 +34,7 @@ using namespace HTMLNames;
 NameNodeList::NameNodeList(PassRefPtr<Node> rootNode,
                            const String& name,
                            DynamicNodeList::Caches* caches)
-    : DynamicNodeList(rootNode, caches, true), m_nodeName(name) {}
-
-void NameNodeList::rootNodeAttributeChanged() {
-  DynamicNodeList::rootNodeChildrenChanged();
-}
+    : DynamicNodeList(rootNode, caches), m_nodeName(name) {}
 
 bool NameNodeList::nodeMatches(Node* testNode) const {
   ASSERT(testNode->isElementNode());

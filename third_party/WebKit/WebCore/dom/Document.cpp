@@ -316,7 +316,7 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
       m_isAllowedToLoadLocalResources(false),
       m_useSecureKeyboardEntryWhenActive(false),
       m_isXHTML(isXHTML),
-      m_numNodeLists(0)
+      m_numNodeListCaches(0)
 #if ENABLE(DATABASE)
       ,
       m_hasOpenDatabases(false)
@@ -476,6 +476,8 @@ Document::~Document() {
 
   if (m_styleSheets)
     m_styleSheets->documentDestroyed();
+
+  m_document = 0;
 }
 
 void Document::resetLinkColor() {

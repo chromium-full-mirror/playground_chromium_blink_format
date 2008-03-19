@@ -32,7 +32,7 @@ namespace WebCore {
 TagNodeList::TagNodeList(PassRefPtr<Node> rootNode,
                          const AtomicString& namespaceURI,
                          const AtomicString& localName)
-    : DynamicNodeList(rootNode, true),
+    : DynamicNodeList(rootNode),
       m_namespaceURI(namespaceURI),
       m_localName(localName) {
   ASSERT(m_namespaceURI.isNull() || !m_namespaceURI.isEmpty());

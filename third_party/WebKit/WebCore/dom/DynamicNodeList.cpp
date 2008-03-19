@@ -28,29 +28,24 @@
 
 namespace WebCore {
 
-DynamicNodeList::DynamicNodeList(PassRefPtr<Node> rootNode,
-                                 bool needsNotifications)
-    : m_rootNode(rootNode),
-      m_caches(new Caches),
-      m_ownsCaches(true),
-      m_needsNotifications(needsNotifications) {
+DynamicNodeList::DynamicNodeList(PassRefPtr<Node> rootNode)
+    : m_rootNode(rootNode), m_caches(new Caches), m_ownsCaches(true) {
   m_rootNode->registerDynamicNodeList(this);
 }
 
 DynamicNodeList::DynamicNodeList(PassRefPtr<Node> rootNode,
-                                 DynamicNodeList::Caches* info,
-                                 bool needsNotifications)
-    : m_rootNode(rootNode),
-      m_caches(info),
-      m_ownsCaches(false),
-      m_needsNotifications(needsNotifications) {
+                                 DynamicNodeList::Caches* caches)
+    : m_rootNode(rootNode), m_caches(caches), m_ownsCaches(false) {
   m_rootNode->registerDynamicNodeList(this);
+  ++caches->refCount;
 }
 
 DynamicNodeList::~DynamicNodeList() {
   m_rootNode->unregisterDynamicNodeList(this);
   if (m_ownsCaches)
     delete m_caches;
+  else
+    --m_caches->refCount;
 }
 
 unsigned DynamicNodeList::length() const {
@@ -159,14 +154,17 @@ Node* DynamicNodeList::itemWithName(const AtomicString& elementId) const {
   return 0;
 }
 
-void DynamicNodeList::rootNodeChildrenChanged() {
+void DynamicNodeList::invalidateCache() {
+  // This should only be called for node lists that own their own caches.
+  ASSERT(m_ownsCaches);
   m_caches->reset();
 }
 
-void DynamicNodeList::rootNodeAttributeChanged() {}
-
 DynamicNodeList::Caches::Caches()
-    : lastItem(0), isLengthCacheValid(false), isItemCacheValid(false) {}
+    : lastItem(0),
+      isLengthCacheValid(false),
+      isItemCacheValid(false),
+      refCount(0) {}
 
 void DynamicNodeList::Caches::reset() {
   lastItem = 0;
