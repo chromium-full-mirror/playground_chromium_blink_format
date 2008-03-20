@@ -610,6 +610,12 @@ void CSSMutableStyleDeclaration::addParsedProperties(
   // functions in this class.
 }
 
+void CSSMutableStyleDeclaration::addParsedProperty(
+    const CSSProperty& property) {
+  removeProperty(property.id(), false);
+  m_values.append(property);
+}
+
 void CSSMutableStyleDeclaration::setLengthProperty(int propertyId,
                                                    const String& value,
                                                    bool important,
