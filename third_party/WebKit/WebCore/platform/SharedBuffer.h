@@ -60,8 +60,10 @@ class SharedBuffer : public RefCounted<SharedBuffer> {
 
 #if PLATFORM(MAC)
   NSData* createNSData();
-  CFDataRef createCFData();
   static PassRefPtr<SharedBuffer> wrapNSData(NSData* data);
+#endif
+#if PLATFORM(CF)
+  CFDataRef createCFData();
 #endif
 
   const char* data() const;
@@ -87,9 +89,9 @@ class SharedBuffer : public RefCounted<SharedBuffer> {
   bool hasPlatformData() const;
 
   Vector<char> m_buffer;
-#if PLATFORM(MAC)
-  SharedBuffer(NSData* nsdata);
-  RetainPtr<NSData> m_nsData;
+#if PLATFORM(CF)
+  SharedBuffer(CFDataRef);
+  RetainPtr<CFDataRef> m_cfData;
 #endif
 };
 }
