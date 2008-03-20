@@ -74,6 +74,15 @@ struct _WebKitWebViewClass {
    */
   WebKitWebView* (*create_web_view)(WebKitWebView* web_view);
 
+  /*
+   * TODO: FIXME: Create something like WebPolicyDecisionListener_Protocol
+   * instead
+   */
+  WebKitNavigationResponse (*navigation_requested)(
+      WebKitWebView* web_view,
+      WebKitWebFrame* frame,
+      WebKitNetworkRequest* request);
+
   void (*window_object_cleared)(WebKitWebView* web_view,
                                 WebKitWebFrame* frame,
                                 JSGlobalContextRef context,
