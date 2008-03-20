@@ -74,9 +74,6 @@ class JavaInstance : public Instance {
 
   virtual Class* getClass() const;
 
-  virtual void begin();
-  virtual void end();
-
   virtual JSValue* valueOf() const;
   virtual JSValue* defaultValue(JSType hint) const;
 
@@ -91,6 +88,10 @@ class JavaInstance : public Instance {
   JSValue* booleanValue() const;
 
   virtual BindingLanguage getBindingLanguage() const { return JavaLanguage; }
+
+ protected:
+  virtual void virtualBegin();
+  virtual void virtualEnd();
 
  private:
   JavaInstance(jobject instance, PassRefPtr<RootObject>);

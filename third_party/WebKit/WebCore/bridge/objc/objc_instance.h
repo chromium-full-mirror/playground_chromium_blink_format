@@ -46,9 +46,6 @@ class ObjcInstance : public Instance {
 
   virtual Class* getClass() const;
 
-  virtual void begin();
-  virtual void end();
-
   virtual JSValue* valueOf() const;
   virtual JSValue* defaultValue(JSType hint) const;
 
@@ -77,6 +74,10 @@ class ObjcInstance : public Instance {
   virtual BindingLanguage getBindingLanguage() const {
     return ObjectiveCLanguage;
   }
+
+ protected:
+  virtual void virtualBegin();
+  virtual void virtualEnd();
 
  private:
   ObjcInstance(ObjectStructPtr instance, PassRefPtr<RootObject>);

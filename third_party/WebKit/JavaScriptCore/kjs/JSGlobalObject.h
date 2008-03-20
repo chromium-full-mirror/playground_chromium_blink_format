@@ -68,6 +68,8 @@ class UriError;
 class UriErrorPrototype;
 struct ActivationStackNode;
 
+typedef Vector<ExecState*, 16> ExecStateStack;
+
 class JSGlobalObject : public JSVariableObject {
  protected:
   using JSVariableObject::JSVariableObjectData;
@@ -126,6 +128,8 @@ class JSGlobalObject : public JSVariableObject {
     NativeErrorPrototype* URIErrorPrototype;
 
     SymbolTable inlineSymbolTable;
+
+    ExecStateStack activeExecStates;
 
     ActivationStackNode* activations;
     size_t activationCount;
@@ -257,6 +261,8 @@ class JSGlobalObject : public JSVariableObject {
   void tearOffActivation(ExecState*, bool markAsRelic = false);
 
   virtual bool isDynamicScope() const;
+
+  ExecStateStack& activeExecStates() const { return d()->activeExecStates; }
 
  private:
   void init();
