@@ -691,7 +691,8 @@ VisiblePosition RenderContainer::positionForCoordinates(int x, int y) {
 
 void RenderContainer::addLineBoxRects(Vector<IntRect>& rects,
                                       unsigned start,
-                                      unsigned end) {
+                                      unsigned end,
+                                      bool) {
   if (!m_firstChild && (isInline() || isAnonymousBlock())) {
     int x, y;
     absolutePositionForContent(x, y);

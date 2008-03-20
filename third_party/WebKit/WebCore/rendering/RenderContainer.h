@@ -69,7 +69,8 @@ class RenderContainer : public RenderBox {
 
   virtual void addLineBoxRects(Vector<IntRect>&,
                                unsigned startOffset = 0,
-                               unsigned endOffset = UINT_MAX);
+                               unsigned endOffset = UINT_MAX,
+                               bool useSelectionHeight = false);
 
  private:
   RenderObject* m_firstChild;
