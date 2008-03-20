@@ -436,6 +436,33 @@ class WebView : public IWebView,
 
   virtual HRESULT STDMETHODCALLTYPE setGrammarCheckingEnabled(BOOL enabled);
 
+  virtual HRESULT STDMETHODCALLTYPE setPageSizeMultiplier(
+      /* [in] */ float multiplier);
+
+  virtual HRESULT STDMETHODCALLTYPE pageSizeMultiplier(
+      /* [retval][out] */ float* multiplier);
+
+  virtual HRESULT STDMETHODCALLTYPE canZoomPageIn(
+      /* [in] */ IUnknown* sender,
+      /* [retval][out] */ BOOL* result);
+
+  virtual HRESULT STDMETHODCALLTYPE zoomPageIn(
+      /* [in] */ IUnknown* sender);
+
+  virtual HRESULT STDMETHODCALLTYPE canZoomPageOut(
+      /* [in] */ IUnknown* sender,
+      /* [retval][out] */ BOOL* result);
+
+  virtual HRESULT STDMETHODCALLTYPE zoomPageOut(
+      /* [in] */ IUnknown* sender);
+
+  virtual HRESULT STDMETHODCALLTYPE canResetPageZoom(
+      /* [in] */ IUnknown* sender,
+      /* [retval][out] */ BOOL* result);
+
+  virtual HRESULT STDMETHODCALLTYPE resetPageZoom(
+      /* [in] */ IUnknown* sender);
+
   // IWebViewUndoableEditing
 
   virtual HRESULT STDMETHODCALLTYPE replaceSelectionWithNode(
@@ -733,6 +760,16 @@ class WebView : public IWebView,
 
   void updateActiveState();
 
+ private:
+  void setZoomMultiplier(float multiplier, bool isTextOnly);
+  float zoomMultiplier(bool isTextOnly);
+  bool canZoomIn(bool isTextOnly);
+  HRESULT zoomIn(bool isTextOnly);
+  bool canZoomOut(bool isTextOnly);
+  HRESULT zoomOut(bool isTextOnly);
+  bool canResetZoom(bool isTextOnly);
+  HRESULT resetZoom(bool isTextOnly);
+
  protected:
   HIMC getIMMContext();
   void releaseIMMContext(HIMC);
@@ -780,7 +817,8 @@ class WebView : public IWebView,
   bool m_useBackForwardList;
   WebCore::String m_userAgentCustom;
   WebCore::String m_userAgentStandard;
-  float m_textSizeMultiplier;
+  float m_zoomMultiplier;
+  bool m_zoomMultiplierIsTextOnly;
   WebCore::String m_overrideEncoding;
   WebCore::String m_applicationName;
   bool m_mouseActivated;
