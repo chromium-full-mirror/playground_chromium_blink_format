@@ -198,22 +198,11 @@ WebHistoryItem::mergeAutoCompleteHints(IWebHistoryItem* otherItem) {
   if (!otherItem)
     return E_FAIL;
 
-  if (otherItem == this)
-    return S_OK;
+  COMPtr<WebHistoryItem> otherWebHistoryItem(Query, otherItem);
+  if (!otherWebHistoryItem)
+    return E_FAIL;
 
-  IWebHistoryItemPrivate* otherItemPriv;
-  HRESULT hr = otherItem->QueryInterface(IID_IWebHistoryItemPrivate,
-                                         (void**)&otherItemPriv);
-  if (FAILED(hr))
-    return hr;
-
-  int otherVisitCount;
-  hr = otherItemPriv->visitCount(&otherVisitCount);
-  otherItemPriv->Release();
-  if (FAILED(hr))
-    return hr;
-
-  m_historyItem->setVisitCount(otherVisitCount);
+  m_historyItem->mergeAutoCompleteHints(otherWebHistoryItem->historyItem());
 
   return S_OK;
 }
@@ -327,7 +316,7 @@ HRESULT STDMETHODCALLTYPE WebHistoryItem::children(unsigned* outChildCount,
 HRESULT STDMETHODCALLTYPE WebHistoryItem::QueryInterface(REFIID riid,
                                                          void** ppvObject) {
   *ppvObject = 0;
-  if (IsEqualGUID(riid, CLSID_WebHistoryItem))
+  if (IsEqualGUID(riid, __uuidof(WebHistoryItem)))
     *ppvObject = this;
   else if (IsEqualGUID(riid, IID_IUnknown))
     *ppvObject = static_cast<IWebHistoryItem*>(this);
