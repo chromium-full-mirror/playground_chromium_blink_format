@@ -77,6 +77,9 @@ class KJSProxy {
 
   void attachDebugger(KJS::Debugger*);
 
+  void setPaused(bool b) { m_paused = b; }
+  bool isPaused() const { return m_paused; }
+
  private:
   void initScriptIfNeeded() {
     if (!m_globalObject)
@@ -90,6 +93,7 @@ class KJSProxy {
 
   bool m_processingTimerCallback;
   bool m_processingInlineCode;
+  bool m_paused;
 };
 }
 

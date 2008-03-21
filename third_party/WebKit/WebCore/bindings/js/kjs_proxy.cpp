@@ -49,7 +49,8 @@ KJSProxy::KJSProxy(Frame* frame)
     : m_frame(frame),
       m_handlerLineno(0),
       m_processingTimerCallback(0),
-      m_processingInlineCode(0) {}
+      m_processingInlineCode(0),
+      m_paused(false) {}
 
 KJSProxy::~KJSProxy() {
   if (m_globalObject) {
