@@ -89,6 +89,11 @@ inline FunctionExecState::~FunctionExecState() {
 
   if (m_activation->needsPop())
     m_globalObject->popActivation();
+
+  if (m_inlineScopeChainNode.next) {
+    m_scopeChain.popInlineScopeNode();
+    m_inlineScopeChainNode.next = 0;
+  }
 }
 
 }  // namespace KJS

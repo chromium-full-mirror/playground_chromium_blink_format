@@ -98,6 +98,7 @@ class ScopeChain {
   void push(ScopeChainNode*);
   void replaceTop(JSObject*);
   void pop();
+  void popInlineScopeNode();
 
   void mark();
 
@@ -170,6 +171,10 @@ inline void ScopeChain::pop() {
   } else {
     delete oldNode;
   }
+}
+
+inline void ScopeChain::popInlineScopeNode() {
+  _node = _node->next;
 }
 
 }  // namespace KJS
