@@ -43,6 +43,8 @@ struct FunctionWithContext {
 
 typedef Vector<FunctionWithContext> FunctionQueue;
 
+static bool callbacksPaused;
+
 static Mutex& functionQueueMutex() {
   static Mutex staticFunctionQueueMutex;
   return staticFunctionQueueMutex;
@@ -54,6 +56,9 @@ static FunctionQueue& functionQueue() {
 }
 
 void dispatchFunctionsFromMainThread() {
+  if (callbacksPaused)
+    return;
+
   FunctionQueue queueCopy;
   {
     MutexLocker locker(functionQueueMutex());
@@ -75,6 +80,16 @@ void callOnMainThread(MainThreadFunction* function, void* context) {
   }
 
   scheduleDispatchFunctionsOnMainThread();
+}
+
+void setMainThreadCallbacksPaused(bool paused) {
+  if (callbacksPaused == paused)
+    return;
+
+  callbacksPaused = paused;
+
+  if (!callbacksPaused)
+    scheduleDispatchFunctionsOnMainThread();
 }
 
 }  // namespace WebCore
