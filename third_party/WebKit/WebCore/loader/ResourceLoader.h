@@ -147,9 +147,15 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   bool defersLoading() const { return m_defersLoading; }
 
   RefPtr<ResourceHandle> m_handle;
+  RefPtr<Frame> m_frame;
+  RefPtr<DocumentLoader> m_documentLoader;
+  ResourceResponse m_response;
 
  private:
   ResourceRequest m_request;
+  RefPtr<SharedBuffer> m_resourceData;
+
+  unsigned long m_identifier;
 
   bool m_reachedTerminalState;
   bool m_cancelled;
@@ -158,17 +164,8 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   bool m_sendResourceLoadCallbacks;
   bool m_shouldContentSniff;
   bool m_shouldBufferData;
-
- protected:
-  // FIXME: Once everything is made cross platform, these can be private instead
-  // of protected
-  RefPtr<Frame> m_frame;
-  RefPtr<DocumentLoader> m_documentLoader;
-  ResourceResponse m_response;
-  unsigned long m_identifier;
-
-  RefPtr<SharedBuffer> m_resourceData;
   bool m_defersLoading;
+
   ResourceRequest m_deferredRequest;
 };
 }
