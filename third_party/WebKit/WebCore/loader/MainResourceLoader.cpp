@@ -175,10 +175,7 @@ void MainResourceLoader::willSendRequest(
       isPostOrRedirectAfterPost(newRequest, redirectResponse))
     newRequest.setCachePolicy(ReloadIgnoringCacheData);
 
-  if (!newRequest.isNull()) {
-    ResourceLoader::willSendRequest(newRequest, redirectResponse);
-    setRequest(newRequest);
-  }
+  ResourceLoader::willSendRequest(newRequest, redirectResponse);
 
   // Don't set this on the first request. It is set when the main load was
   // started.
