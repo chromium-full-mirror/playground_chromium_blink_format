@@ -152,6 +152,8 @@ class PluginView : public Widget, private PluginStreamClient {
 
   bool arePopupsAllowed() const;
 
+  void setJavaScriptPaused(bool);
+
   void disconnectStream(PluginStream*);
   void streamDidFinishLoading(PluginStream* stream) {
     disconnectStream(stream);
@@ -275,6 +277,9 @@ class PluginView : public Widget, private PluginStreamClient {
 
   bool m_loadManually;
   RefPtr<PluginStream> m_manualStream;
+
+  bool m_isJavaScriptPaused;
+  bool m_requestTimerWasActive;
 
   static PluginView* s_currentPluginView;
 };
