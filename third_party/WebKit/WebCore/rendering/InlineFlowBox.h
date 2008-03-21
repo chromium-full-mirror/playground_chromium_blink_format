@@ -97,7 +97,7 @@ class InlineFlowBox : public InlineRunBox {
   virtual void clearTruncation();
 
   virtual void paintBoxDecorations(RenderObject::PaintInfo&, int tx, int ty);
-  void paintBackgrounds(GraphicsContext*,
+  void paintBackgrounds(const RenderObject::PaintInfo&,
                         const Color&,
                         const BackgroundLayer*,
                         int my,
@@ -106,7 +106,7 @@ class InlineFlowBox : public InlineRunBox {
                         int ty,
                         int w,
                         int h);
-  void paintBackground(GraphicsContext*,
+  void paintBackground(const RenderObject::PaintInfo&,
                        const Color&,
                        const BackgroundLayer*,
                        int my,

@@ -2217,7 +2217,7 @@ bool CSSParser::parseBackgroundProperty(int propId,
         case CSSPropertyWebkitBackgroundClip:
         case CSSPropertyWebkitBackgroundOrigin:
           if (val->id == CSSValueBorder || val->id == CSSValuePadding ||
-              val->id == CSSValueContent) {
+              val->id == CSSValueContent || val->id == CSSValueText) {
             currValue = new CSSPrimitiveValue(val->id);
             valueList->next();
           }

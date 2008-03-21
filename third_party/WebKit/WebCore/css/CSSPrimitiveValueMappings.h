@@ -314,6 +314,9 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(EBackgroundBox e)
     case BGCONTENT:
       m_value.ident = CSSValueContent;
       break;
+    case BGTEXT:
+      m_value.ident = CSSValueText;
+      break;
   }
 }
 
@@ -326,6 +329,8 @@ inline CSSPrimitiveValue::operator EBackgroundBox() const {
       return BGPADDING;
     case CSSValueContent:
       return BGCONTENT;
+    case CSSValueText:
+      return BGTEXT;
     default:
       ASSERT_NOT_REACHED();
       return BGBORDER;

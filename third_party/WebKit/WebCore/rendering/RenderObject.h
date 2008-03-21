@@ -85,7 +85,8 @@ enum PaintPhase {
   PaintPhaseChildOutlines,
   PaintPhaseSelfOutline,
   PaintPhaseSelection,
-  PaintPhaseCollapsedTableBorders
+  PaintPhaseCollapsedTableBorders,
+  PaintPhaseTextClip
 };
 
 enum PaintRestriction {
@@ -565,7 +566,7 @@ class RenderObject : public CachedResourceClient {
   // RenderBox implements this.
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty) {}
 
-  virtual void paintBackgroundExtended(GraphicsContext*,
+  virtual void paintBackgroundExtended(const PaintInfo&,
                                        const Color&,
                                        const BackgroundLayer*,
                                        int clipy,
@@ -574,8 +575,7 @@ class RenderObject : public CachedResourceClient {
                                        int ty,
                                        int width,
                                        int height,
-                                       bool includeLeftEdge = true,
-                                       bool includeRightEdge = true) {}
+                                       InlineFlowBox* box = 0) {}
 
   /*
    * Calculates the actual width of the object (only for non inline

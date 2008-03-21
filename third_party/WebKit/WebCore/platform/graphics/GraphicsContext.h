@@ -201,6 +201,7 @@ class GraphicsContext : Noncopyable {
                           const IntSize& topRight,
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
+  void clipToImageBuffer(const IntRect&, const ImageBuffer*);
 
   int textDrawingMode();
   void setTextDrawingMode(int);

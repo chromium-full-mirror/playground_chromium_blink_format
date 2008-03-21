@@ -384,7 +384,8 @@ void RenderFlow::paintLines(PaintInfo& paintInfo, int tx, int ty) {
       paintInfo.phase != PaintPhaseSelection &&
       paintInfo.phase != PaintPhaseOutline &&
       paintInfo.phase != PaintPhaseSelfOutline &&
-      paintInfo.phase != PaintPhaseChildOutlines)
+      paintInfo.phase != PaintPhaseChildOutlines &&
+      paintInfo.phase != PaintPhaseTextClip)
     return;
 
   bool inlineFlow = isInlineFlow();

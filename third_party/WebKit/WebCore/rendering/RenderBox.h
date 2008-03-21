@@ -166,7 +166,7 @@ class RenderBox : public RenderObject {
                             EAffinity = UPSTREAM,
                             int* extraWidthToEndOfLine = 0);
 
-  virtual void paintBackgroundExtended(GraphicsContext*,
+  virtual void paintBackgroundExtended(const PaintInfo&,
                                        const Color&,
                                        const BackgroundLayer*,
                                        int clipY,
@@ -175,8 +175,7 @@ class RenderBox : public RenderObject {
                                        int ty,
                                        int width,
                                        int height,
-                                       bool includeLeftEdge = true,
-                                       bool includeRightEdge = true);
+                                       InlineFlowBox* = 0);
   IntSize calculateBackgroundSize(const BackgroundLayer*,
                                   int scaledWidth,
                                   int scaledHeight) const;
@@ -193,7 +192,7 @@ class RenderBox : public RenderObject {
   virtual void imageChanged(CachedImage*);
 
  protected:
-  void paintBackground(GraphicsContext*,
+  void paintBackground(const PaintInfo&,
                        const Color&,
                        const BackgroundLayer*,
                        int clipY,
@@ -202,7 +201,7 @@ class RenderBox : public RenderObject {
                        int ty,
                        int width,
                        int height);
-  void paintBackgrounds(GraphicsContext*,
+  void paintBackgrounds(const PaintInfo&,
                         const Color&,
                         const BackgroundLayer*,
                         int clipY,

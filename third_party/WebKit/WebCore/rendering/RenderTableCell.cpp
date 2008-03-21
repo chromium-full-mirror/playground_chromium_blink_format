@@ -937,7 +937,7 @@ void RenderTableCell::paintBackgroundsBehindCell(
       paintInfo.context->save();
       paintInfo.context->clip(clipRect);
     }
-    paintBackgrounds(paintInfo.context, c, bgLayer, my, mh, tx, ty, w, h);
+    paintBackgrounds(paintInfo, c, bgLayer, my, mh, tx, ty, w, h);
     if (shouldClip)
       paintInfo.context->restore();
   }

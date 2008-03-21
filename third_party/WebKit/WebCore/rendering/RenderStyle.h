@@ -476,7 +476,7 @@ class StyleVisualData : public RefCounted<StyleVisualData> {
 };
 
 //------------------------------------------------
-enum EBackgroundBox { BGBORDER, BGPADDING, BGCONTENT };
+enum EBackgroundBox { BGBORDER, BGPADDING, BGCONTENT, BGTEXT };
 
 enum EBackgroundRepeat { REPEAT, REPEAT_X, REPEAT_Y, NO_REPEAT };
 

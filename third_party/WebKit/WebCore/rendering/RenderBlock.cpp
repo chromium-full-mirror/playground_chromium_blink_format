@@ -1640,7 +1640,9 @@ void RenderBlock::paintColumns(PaintInfo& paintInfo,
     int finalX = tx + currXOffset;
     int finalY = ty + currYOffset;
     if (paintingFloats)
-      paintFloats(info, finalX, finalY, paintInfo.phase == PaintPhaseSelection);
+      paintFloats(info, finalX, finalY,
+                  paintInfo.phase == PaintPhaseSelection ||
+                      paintInfo.phase == PaintPhaseTextClip);
     else
       paintContents(info, finalX, finalY);
 
@@ -1795,12 +1797,14 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
 
   // 4. paint floats.
   if (!inlineFlow &&
-      (paintPhase == PaintPhaseFloat || paintPhase == PaintPhaseSelection)) {
+      (paintPhase == PaintPhaseFloat || paintPhase == PaintPhaseSelection ||
+       paintPhase == PaintPhaseTextClip)) {
     if (m_hasColumns)
       paintColumns(paintInfo, scrolledX, scrolledY, true);
     else
       paintFloats(paintInfo, scrolledX, scrolledY,
-                  paintPhase == PaintPhaseSelection);
+                  paintPhase == PaintPhaseSelection ||
+                      paintPhase == PaintPhaseTextClip);
   }
 
   // 5. paint outline.
@@ -1841,7 +1845,7 @@ void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
 void RenderBlock::paintFloats(PaintInfo& paintInfo,
                               int tx,
                               int ty,
-                              bool paintSelection) {
+                              bool preservePhase) {
   if (!m_floatingObjects)
     return;
 
@@ -1852,13 +1856,13 @@ void RenderBlock::paintFloats(PaintInfo& paintInfo,
     if (r->m_shouldPaint && !r->m_renderer->hasLayer()) {
       PaintInfo currentPaintInfo(paintInfo);
       currentPaintInfo.phase =
-          paintSelection ? PaintPhaseSelection : PaintPhaseBlockBackground;
+          preservePhase ? paintInfo.phase : PaintPhaseBlockBackground;
       int currentTX =
           tx + r->m_left - r->m_renderer->xPos() + r->m_renderer->marginLeft();
       int currentTY =
           ty + r->m_top - r->m_renderer->yPos() + r->m_renderer->marginTop();
       r->m_renderer->paint(currentPaintInfo, currentTX, currentTY);
-      if (!paintSelection) {
+      if (!preservePhase) {
         currentPaintInfo.phase = PaintPhaseChildBlockBackgrounds;
         r->m_renderer->paint(currentPaintInfo, currentTX, currentTY);
         currentPaintInfo.phase = PaintPhaseFloat;
