@@ -55,9 +55,9 @@ static PassRefPtr<CanvasStyle> toHTMLCanvasStyle(ExecState* exec,
   if (!value->isObject())
     return 0;
   JSObject* object = static_cast<JSObject*>(value);
-  if (object->inherits(&JSCanvasGradient::info))
+  if (object->inherits(&JSCanvasGradient::s_info))
     return new CanvasStyle(static_cast<JSCanvasGradient*>(object)->impl());
-  if (object->inherits(&JSCanvasPattern::info))
+  if (object->inherits(&JSCanvasPattern::s_info))
     return new CanvasStyle(static_cast<JSCanvasPattern*>(object)->impl());
   return 0;
 }
@@ -190,7 +190,7 @@ JSValue* JSCanvasRenderingContext2D::drawImage(ExecState* exec,
   JSObject* o = static_cast<JSObject*>(value);
 
   ExceptionCode ec = 0;
-  if (o->inherits(&JSHTMLImageElement::info)) {
+  if (o->inherits(&JSHTMLImageElement::s_info)) {
     HTMLImageElement* imgElt = static_cast<HTMLImageElement*>(
         static_cast<JSHTMLElement*>(args[0])->impl());
     switch (args.size()) {
@@ -216,7 +216,7 @@ JSValue* JSCanvasRenderingContext2D::drawImage(ExecState* exec,
       default:
         return throwError(exec, SyntaxError);
     }
-  } else if (o->inherits(&JSHTMLCanvasElement::info)) {
+  } else if (o->inherits(&JSHTMLCanvasElement::s_info)) {
     HTMLCanvasElement* canvas = static_cast<HTMLCanvasElement*>(
         static_cast<JSHTMLElement*>(args[0])->impl());
     switch (args.size()) {
@@ -259,7 +259,7 @@ JSValue* JSCanvasRenderingContext2D::drawImageFromRect(ExecState* exec,
     return throwError(exec, TypeError);
   JSObject* o = static_cast<JSObject*>(value);
 
-  if (!o->inherits(&JSHTMLImageElement::info))
+  if (!o->inherits(&JSHTMLImageElement::s_info))
     return throwError(exec, TypeError);
   context->drawImageFromRect(
       static_cast<HTMLImageElement*>(
@@ -325,7 +325,7 @@ JSValue* JSCanvasRenderingContext2D::createPattern(ExecState* exec,
     return throwError(exec, TypeError);
   JSObject* o = static_cast<JSObject*>(value);
 
-  if (o->inherits(&JSHTMLImageElement::info)) {
+  if (o->inherits(&JSHTMLImageElement::s_info)) {
     ExceptionCode ec;
     JSValue* pattern = toJS(
         exec,
@@ -337,7 +337,7 @@ JSValue* JSCanvasRenderingContext2D::createPattern(ExecState* exec,
     setDOMException(exec, ec);
     return pattern;
   }
-  if (o->inherits(&JSHTMLCanvasElement::info)) {
+  if (o->inherits(&JSHTMLCanvasElement::s_info)) {
     ExceptionCode ec;
     JSValue* pattern = toJS(
         exec,

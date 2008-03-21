@@ -69,7 +69,7 @@ DontDelete|Function 1
 KJS_DEFINE_PROTOTYPE(JSXMLHttpRequestPrototype)
 KJS_IMPLEMENT_PROTOTYPE("XMLHttpRequest", JSXMLHttpRequestPrototype)
 
-const ClassInfo JSXMLHttpRequestConstructor::info = {
+const ClassInfo JSXMLHttpRequestConstructor::s_info = {
     "XMLHttpRequestConstructor", 0, 0};
 
 JSXMLHttpRequestConstructor::JSXMLHttpRequestConstructor(ExecState* exec,
@@ -89,8 +89,8 @@ JSObject* JSXMLHttpRequestConstructor::construct(ExecState* exec, const List&) {
                               m_document.get());
 }
 
-const ClassInfo JSXMLHttpRequest::info = {"XMLHttpRequest", 0,
-                                          &JSXMLHttpRequestTable};
+const ClassInfo JSXMLHttpRequest::s_info = {"XMLHttpRequest", 0,
+                                            &JSXMLHttpRequestTable};
 
 /* Source for JSXMLHttpRequestTable.
 @begin JSXMLHttpRequestTable 7
@@ -241,7 +241,7 @@ JSXMLHttpRequest::~JSXMLHttpRequest() {
 JSValue* jsXMLHttpRequestPrototypeFunctionAbort(ExecState* exec,
                                                 JSObject* thisObj,
                                                 const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -254,7 +254,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionGetAllResponseHeaders(
     ExecState* exec,
     JSObject* thisObj,
     const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -269,7 +269,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionGetAllResponseHeaders(
 JSValue* jsXMLHttpRequestPrototypeFunctionGetResponseHeader(ExecState* exec,
                                                             JSObject* thisObj,
                                                             const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -287,7 +287,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionGetResponseHeader(ExecState* exec,
 JSValue* jsXMLHttpRequestPrototypeFunctionOpen(ExecState* exec,
                                                JSObject* thisObj,
                                                const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -324,7 +324,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionOpen(ExecState* exec,
 JSValue* jsXMLHttpRequestPrototypeFunctionSend(ExecState* exec,
                                                JSObject* thisObj,
                                                const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -333,7 +333,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionSend(ExecState* exec,
   String body;
 
   if (args.size() >= 1) {
-    if (args[0]->toObject(exec)->inherits(&JSDocument::info))
+    if (args[0]->toObject(exec)->inherits(&JSDocument::s_info))
       body = static_cast<Document*>(
                  static_cast<JSDocument*>(args[0]->toObject(exec))->impl())
                  ->toString();
@@ -355,7 +355,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionSend(ExecState* exec,
 JSValue* jsXMLHttpRequestPrototypeFunctionSetRequestHeader(ExecState* exec,
                                                            JSObject* thisObj,
                                                            const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -373,7 +373,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionSetRequestHeader(ExecState* exec,
 JSValue* jsXMLHttpRequestPrototypeFunctionOverrideMIMEType(ExecState* exec,
                                                            JSObject* thisObj,
                                                            const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -388,7 +388,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionOverrideMIMEType(ExecState* exec,
 JSValue* jsXMLHttpRequestPrototypeFunctionAddEventListener(ExecState* exec,
                                                            JSObject* thisObj,
                                                            const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -413,7 +413,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionRemoveEventListener(
     ExecState* exec,
     JSObject* thisObj,
     const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
@@ -437,7 +437,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionRemoveEventListener(
 JSValue* jsXMLHttpRequestPrototypeFunctionDispatchEvent(ExecState* exec,
                                                         JSObject* thisObj,
                                                         const List& args) {
-  if (!thisObj->inherits(&JSXMLHttpRequest::info))
+  if (!thisObj->inherits(&JSXMLHttpRequest::s_info))
     return throwError(exec, TypeError);
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);

@@ -36,7 +36,7 @@ using namespace KJS;
 
 namespace WebCore {
 
-const ClassInfo JSLocation::info = {"Location", 0, &JSLocationTable};
+const ClassInfo JSLocation::s_info = {"Location", 0, &JSLocationTable};
 
 /*
 @begin JSLocationTable 12
@@ -247,7 +247,7 @@ void JSLocation::getPropertyNames(ExecState* exec,
 JSValue* jsLocationProtoFuncReplace(ExecState* exec,
                                     JSObject* thisObj,
                                     const List& args) {
-  if (!thisObj->inherits(&JSLocation::info))
+  if (!thisObj->inherits(&JSLocation::s_info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);
   Frame* frame = location->frame();
@@ -276,7 +276,7 @@ JSValue* jsLocationProtoFuncReplace(ExecState* exec,
 JSValue* jsLocationProtoFuncReload(ExecState* exec,
                                    JSObject* thisObj,
                                    const List& args) {
-  if (!thisObj->inherits(&JSLocation::info))
+  if (!thisObj->inherits(&JSLocation::s_info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);
   Frame* frame = location->frame();
@@ -302,7 +302,7 @@ JSValue* jsLocationProtoFuncReload(ExecState* exec,
 JSValue* jsLocationProtoFuncAssign(ExecState* exec,
                                    JSObject* thisObj,
                                    const List& args) {
-  if (!thisObj->inherits(&JSLocation::info))
+  if (!thisObj->inherits(&JSLocation::s_info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);
   Frame* frame = location->frame();
@@ -333,7 +333,7 @@ JSValue* jsLocationProtoFuncAssign(ExecState* exec,
 JSValue* jsLocationProtoFuncToString(ExecState* exec,
                                      JSObject* thisObj,
                                      const List& args) {
-  if (!thisObj->inherits(&JSLocation::info))
+  if (!thisObj->inherits(&JSLocation::s_info))
     return throwError(exec, TypeError);
   JSLocation* location = static_cast<JSLocation*>(thisObj);
   Frame* frame = location->frame();

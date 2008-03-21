@@ -159,7 +159,7 @@ bool retrieveEventTargetAndCorrespondingNode(KJS::ExecState*,
                                              KJS::JSObject* thisObj,
                                              Node*& eventNode,
                                              EventTarget*& eventTarget) {
-  if (!thisObj->inherits(&JSNode::info))
+  if (!thisObj->inherits(&JSNode::s_info))
     return false;
 
   JSEventTargetNode* jsNode = static_cast<JSEventTargetNode*>(thisObj);
