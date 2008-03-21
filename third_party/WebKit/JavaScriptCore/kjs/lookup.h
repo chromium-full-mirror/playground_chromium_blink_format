@@ -320,9 +320,8 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
   const ClassInfo ClassPrototype::info = {ClassName "Prototype", 0,            \
                                           &ClassPrototype##Table};             \
   JSObject* ClassPrototype::self(ExecState* exec) {                            \
-    static Identifier* prototypeIdentifier =                                   \
-        new Identifier("[[" ClassName ".prototype]]");                         \
-    return KJS::cacheGlobalObject<ClassPrototype>(exec, *prototypeIdentifier); \
+    return KJS::cacheGlobalObject<ClassPrototype>(                             \
+        exec, Identifier("[[" ClassName ".prototype]]"));                      \
   }                                                                            \
   bool ClassPrototype::getOwnPropertySlot(                                     \
       ExecState* exec, const Identifier& propertyName, PropertySlot& slot) {   \

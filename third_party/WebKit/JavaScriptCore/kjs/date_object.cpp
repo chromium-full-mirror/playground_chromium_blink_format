@@ -470,18 +470,15 @@ DateObjectImp::DateObjectImp(ExecState* exec,
                              FunctionPrototype* funcProto,
                              DatePrototype* dateProto)
     : InternalFunctionImp(funcProto, dateProto->classInfo()->className) {
-  static const Identifier* parsePropertyName = new Identifier("parse");
-  static const Identifier* UTCPropertyName = new Identifier("UTC");
-
   putDirect(exec->propertyNames().prototype, dateProto,
             DontEnum | DontDelete | ReadOnly);
   putDirectFunction(
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::Parse, 1,
-                            *parsePropertyName),
+                            CommonIdentifiers::shared()->parse),
       DontEnum);
   putDirectFunction(
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::UTC, 7,
-                            *UTCPropertyName),
+                            CommonIdentifiers::shared()->UTC),
       DontEnum);
   putDirect(exec->propertyNames().length, 7, ReadOnly | DontDelete | DontEnum);
 }
