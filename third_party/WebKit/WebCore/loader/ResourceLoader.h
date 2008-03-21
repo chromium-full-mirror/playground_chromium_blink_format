@@ -167,7 +167,6 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   ResourceResponse m_response;
   unsigned long m_identifier;
 
-  KURL m_originalURL;
   RefPtr<SharedBuffer> m_resourceData;
   bool m_defersLoading;
   ResourceRequest m_deferredRequest;

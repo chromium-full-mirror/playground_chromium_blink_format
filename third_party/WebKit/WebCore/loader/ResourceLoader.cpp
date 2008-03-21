@@ -105,8 +105,6 @@ bool ResourceLoader::load(const ResourceRequest& r) {
   ASSERT(m_deferredRequest.isNull());
   ASSERT(!frameLoader()->isArchiveLoadPending(this));
 
-  m_originalURL = r.url();
-
   ResourceRequest clientRequest(r);
   willSendRequest(clientRequest, ResourceResponse());
   if (clientRequest.isNull()) {
@@ -114,7 +112,7 @@ bool ResourceLoader::load(const ResourceRequest& r) {
     return false;
   }
 
-  if (frameLoader()->willUseArchive(this, clientRequest, m_originalURL))
+  if (frameLoader()->willUseArchive(this, clientRequest, r.url()))
     return true;
 
   if (m_defersLoading) {

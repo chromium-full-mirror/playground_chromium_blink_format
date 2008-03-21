@@ -134,7 +134,7 @@ void SubresourceLoader::willSendRequest(
     ResourceRequest& newRequest,
     const ResourceResponse& redirectResponse) {
   ResourceLoader::willSendRequest(newRequest, redirectResponse);
-  if (!newRequest.isNull() && m_originalURL != newRequest.url() && m_client)
+  if (!newRequest.isNull() && request().url() != newRequest.url() && m_client)
     m_client->willSendRequest(this, newRequest, redirectResponse);
 }
 
