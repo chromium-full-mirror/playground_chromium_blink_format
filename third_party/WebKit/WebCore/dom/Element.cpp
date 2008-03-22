@@ -1064,12 +1064,11 @@ void Element::setAttributeNS(const String& namespaceURI,
                              const String& value,
                              ExceptionCode& ec) {
   String prefix, localName;
-  if (!Document::parseQualifiedName(qualifiedName, prefix, localName)) {
-    ec = INVALID_CHARACTER_ERR;
+  if (!Document::parseQualifiedName(qualifiedName, prefix, localName, ec))
     return;
-  }
-  setAttribute(QualifiedName(prefix, localName, namespaceURI), value.impl(),
-               ec);
+
+  QualifiedName qName(prefix, localName, namespaceURI);
+  setAttribute(qName, value.impl(), ec);
 }
 
 void Element::removeAttribute(const String& name, ExceptionCode& ec) {
