@@ -1573,8 +1573,8 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
           return false;
         break;
       case CSSSelector::List: {
-        // The selector's value can't contain a space, or it's totally bogus.
-        if (sel->m_value.contains(' '))
+        // Ignore empty selectors or selectors containing spaces
+        if (sel->m_value.contains(' ') || sel->m_value.isEmpty())
           return false;
 
         int startSearchAt = 0;
