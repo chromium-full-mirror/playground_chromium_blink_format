@@ -96,7 +96,6 @@ class FrameView : public ScrollView {
 
   bool needsFullRepaint() const;
   void repaintRectangle(const IntRect&, bool immediate);
-  void addRepaintInfo(RenderObject*, const IntRect&);
 
   void resetScrollbars();
 

@@ -734,12 +734,10 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
       repaintRect.intersect(IntRect(0, 0, m_width, m_height));
     }
 
-    RenderView* v = view();
     // Make sure the rect is still non-empty after intersecting for overflow
     // above
-    if (!repaintRect.isEmpty() && v && v->frameView())
-      v->frameView()->addRepaintInfo(
-          this,
+    if (!repaintRect.isEmpty())
+      repaintRectangle(
           repaintRect);  // We need to do a partial repaint of our content.
   }
   setNeedsLayout(false);
