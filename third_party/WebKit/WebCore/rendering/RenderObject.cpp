@@ -540,6 +540,7 @@ RenderObject* RenderObject::offsetParent() const {
     return 0;
 
   bool skipTables = isPositioned() || isRelPositioned();
+  float currZoom = style()->effectiveZoom();
   RenderObject* curr = parent();
   while (curr &&
          (!curr->element() || (!curr->isPositioned() &&
@@ -549,6 +550,10 @@ RenderObject* RenderObject::offsetParent() const {
          curr->element()->hasTagName(tdTag) ||
          curr->element()->hasTagName(thTag)))
       break;
+    float newZoom = curr->style()->effectiveZoom();
+    if (currZoom != newZoom)
+      break;
+    currZoom = newZoom;
     curr = curr->parent();
   }
   return curr;
