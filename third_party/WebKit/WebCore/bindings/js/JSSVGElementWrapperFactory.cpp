@@ -24,6 +24,7 @@
 #include "JSSVGElementWrapperFactory.h"
 
 #include "JSSVGAElement.h"
+#include "JSSVGAltGlyphElement.h"
 #include "JSSVGAnimateColorElement.h"
 #include "JSSVGAnimateElement.h"
 #include "JSSVGAnimateTransformElement.h"
@@ -97,6 +98,7 @@
 #include "SVGNames.h"
 
 #include "SVGAElement.h"
+#include "SVGAltGlyphElement.h"
 #include "SVGAnimateColorElement.h"
 #include "SVGAnimateElement.h"
 #include "SVGAnimateTransformElement.h"
@@ -231,21 +233,21 @@ typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
 #define FOR_EACH_FOREIGN_OBJECT_TAG(macro)
 #endif
 
-#define FOR_EACH_TAG(macro)                                                   \
-  macro(a, A) macro(circle, Circle) macro(clipPath, ClipPath)                 \
-      macro(cursor, Cursor) macro(defs, Defs) macro(desc, Desc) macro(        \
-          ellipse, Ellipse) macro(g, G) macro(image, Image)                   \
-          macro(linearGradient, LinearGradient) macro(line, Line) macro(      \
-              marker, Marker) macro(mask, Mask) macro(metadata, Metadata)     \
-              macro(path, Path) macro(pattern, Pattern)                       \
-                  macro(polyline, Polyline) macro(polygon, Polygon) macro(    \
-                      radialGradient, RadialGradient) macro(rect, Rect)       \
-                      macro(script, Script) macro(set, Set) macro(stop, Stop) \
-                          macro(style, Style) macro(svg, SVG) macro(          \
-                              switch, Switch) macro(symbol, Symbol)           \
-                              macro(text, Text) macro(textPath, TextPath)     \
-                                  macro(title, Title) macro(tref, TRef)       \
-                                      macro(tspan, TSpan) macro(use, Use)     \
+#define FOR_EACH_TAG(macro)                                                    \
+  macro(a, A) macro(altGlyph, AltGlyph) macro(circle, Circle)                  \
+      macro(clipPath, ClipPath) macro(cursor, Cursor) macro(defs, Defs) macro( \
+          desc, Desc) macro(ellipse, Ellipse) macro(g, G) macro(image, Image)  \
+          macro(linearGradient, LinearGradient) macro(line, Line) macro(       \
+              marker, Marker) macro(mask, Mask) macro(metadata, Metadata)      \
+              macro(path, Path) macro(pattern, Pattern)                        \
+                  macro(polyline, Polyline) macro(polygon, Polygon) macro(     \
+                      radialGradient, RadialGradient) macro(rect, Rect)        \
+                      macro(script, Script) macro(set, Set) macro(stop, Stop)  \
+                          macro(style, Style) macro(svg, SVG) macro(           \
+                              switch, Switch) macro(symbol, Symbol)            \
+                              macro(text, Text) macro(textPath, TextPath)      \
+                                  macro(title, Title) macro(tref, TRef)        \
+                                      macro(tspan, TSpan) macro(use, Use)      \
                                           macro(view, View)  // end of macro
 
 #define CREATE_WRAPPER_FUNCTION(tag, name)                               \
