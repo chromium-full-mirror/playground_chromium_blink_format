@@ -195,15 +195,13 @@ static void initializeSupportedNonImageMimeTypes() {
 #if PLATFORM(MAC)
     "application/x-webarchive",
 #endif
-    "multipart/x-mixed-replace"
 #if ENABLE(SVG)
-    ,
-    "image/svg+xml"
+    "image/svg+xml",
 #endif
 #if ENABLE(FTPDIR)
-    ,
-    "application/x-ftp-directory"
+    "application/x-ftp-directory",
 #endif
+    "multipart/x-mixed-replace"
   };
   for (size_t i = 0; i < sizeof(types) / sizeof(types[0]); ++i)
     supportedNonImageMIMETypes->add(types[i]);

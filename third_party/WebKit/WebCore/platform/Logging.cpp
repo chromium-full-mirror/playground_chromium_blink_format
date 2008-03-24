@@ -65,4 +65,5 @@ WTFLogChannel LogStorageAPI = {0x00800000, "WebCoreLogLevel", WTFLogChannelOff};
 WTFLogChannel LogMedia = {0x01000000, "WebCoreLogLevel", WTFLogChannelOff};
 
 WTFLogChannel LogPlugin = {0x02000000, "WebCoreLogLevel", WTFLogChannelOff};
+WTFLogChannel LogArchives = {0x04000000, "WebCoreLogLevel", WTFLogChannelOff};
 }
