@@ -583,11 +583,11 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
   cairo_set_fill_rule(cr, savedFillRule);
 }
 
-void GraphicsContext::setShadow(IntSize const&, int, Color const&) {
+void GraphicsContext::setPlatformShadow(IntSize const&, int, Color const&) {
   notImplemented();
 }
 
-void GraphicsContext::clearShadow() {
+void GraphicsContext::clearPlatformShadow() {
   notImplemented();
 }
 

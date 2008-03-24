@@ -38,7 +38,8 @@ struct GraphicsContextState {
         strokeColor(Color::black),
         fillColor(Color::black),
         textDrawingMode(cTextFill),
-        paintingDisabled(false) {}
+        paintingDisabled(false),
+        shadowBlur(0) {}
 
   Font font;
   StrokeStyle strokeStyle;
@@ -47,6 +48,9 @@ struct GraphicsContextState {
   Color fillColor;
   int textDrawingMode;
   bool paintingDisabled;
+  IntSize shadowSize;
+  unsigned shadowBlur;
+  Color shadowColor;
 };
 
 class GraphicsContextPrivate {
