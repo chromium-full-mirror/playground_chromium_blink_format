@@ -1,6 +1,4 @@
-// -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2003 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
@@ -20,8 +18,8 @@
  *
  */
 
-#ifndef _KJS_DTOA_H_
-#define _KJS_DTOA_H_
+#ifndef KJS_dtoa_h
+#define KJS_dtoa_h
 
 extern "C" double kjs_strtod(const char* s00, char** se);
 extern "C" char* kjs_dtoa(double d,
@@ -32,4 +30,4 @@ extern "C" char* kjs_dtoa(double d,
                           char** rve);
 extern "C" void kjs_freedtoa(char* s);
 
-#endif /* _KJS_DTOA_H */
+#endif /* KJS_dtoa_h */

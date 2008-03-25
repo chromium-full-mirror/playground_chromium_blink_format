@@ -3,6 +3,7 @@
  * The author of this software is David M. Gay.
  *
  * Copyright (c) 1991, 2000, 2001 by Lucent Technologies.
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose without fee is hereby granted, provided that this entire notice
@@ -18,19 +19,19 @@
  ***************************************************************/
 
 /* Please send bug reports to
-        David M. Gay
-        Bell Laboratories, Room 2C-463
-        600 Mountain Avenue
-        Murray Hill, NJ 07974-0636
-        U.S.A.
-        dmg@bell-labs.com
+    David M. Gay
+    Bell Laboratories, Room 2C-463
+    600 Mountain Avenue
+    Murray Hill, NJ 07974-0636
+    U.S.A.
+    dmg@bell-labs.com
  */
 
 /* On a machine with IEEE extended-precision registers, it is
  * necessary to specify double-precision (53-bit) rounding precision
  * before invoking strtod or dtoa.  If the machine uses (the equivalent
  * of) Intel 80x87 arithmetic, the call
- *	_control87(PC_53, MCW_PC);
+ *    _control87(PC_53, MCW_PC);
  * does this with many compilers.  Whether this or another call is
  * appropriate depends on the compiler; for this to work, it may be
  * necessary to #include "float.h" or another system-dependent header
@@ -49,123 +50,115 @@
  *
  * Modifications:
  *
- *	1. We only require IEEE, IBM, or VAX double-precision
- *		arithmetic (not IEEE double-extended).
- *	2. We get by with floating-point arithmetic in a case that
- *		Clinger missed -- when we're computing d * 10^n
- *		for a small integer d and the integer n is not too
- *		much larger than 22 (the maximum integer k for which
- *		we can represent 10^k exactly), we may be able to
- *		compute (d*10^k) * 10^(e-k) with just one roundoff.
- *	3. Rather than a bit-at-a-time adjustment of the binary
- *		result in the hard case, we use floating-point
- *		arithmetic to determine the adjustment to within
- *		one bit; only in really hard cases do we need to
- *		compute a second residual.
- *	4. Because of 3., we don't need a large table of powers of 10
- *		for ten-to-e (just some small tables, e.g. of 10^k
- *		for 0 <= k <= 22).
+ *    1. We only require IEEE, IBM, or VAX double-precision
+ *        arithmetic (not IEEE double-extended).
+ *    2. We get by with floating-point arithmetic in a case that
+ *        Clinger missed -- when we're computing d * 10^n
+ *        for a small integer d and the integer n is not too
+ *        much larger than 22 (the maximum integer k for which
+ *        we can represent 10^k exactly), we may be able to
+ *        compute (d*10^k) * 10^(e-k) with just one roundoff.
+ *    3. Rather than a bit-at-a-time adjustment of the binary
+ *        result in the hard case, we use floating-point
+ *        arithmetic to determine the adjustment to within
+ *        one bit; only in really hard cases do we need to
+ *        compute a second residual.
+ *    4. Because of 3., we don't need a large table of powers of 10
+ *        for ten-to-e (just some small tables, e.g. of 10^k
+ *        for 0 <= k <= 22).
  */
 
 /*
  * #define IEEE_8087 for IEEE-arithmetic machines where the least
- *	significant byte has the lowest address.
+ *    significant byte has the lowest address.
  * #define IEEE_MC68k for IEEE-arithmetic machines where the most
- *	significant byte has the lowest address.
- * #define Long int on machines with 32-bit ints and 64-bit longs.
+ *    significant byte has the lowest address.
  * #define IBM for IBM mainframe-style floating-point arithmetic.
  * #define VAX for VAX-style floating-point arithmetic (D_floating).
  * #define No_leftright to omit left-right logic in fast floating-point
- *	computation of dtoa.
+ *    computation of dtoa.
  * #define Honor_FLT_ROUNDS if FLT_ROUNDS can assume the values 2 or 3
- *	and strtod and dtoa should round accordingly.
+ *    and strtod and dtoa should round accordingly.
  * #define Check_FLT_ROUNDS if FLT_ROUNDS can assume the values 2 or 3
- *	and Honor_FLT_ROUNDS is not #defined.
+ *    and Honor_FLT_ROUNDS is not #defined.
  * #define RND_PRODQUOT to use rnd_prod and rnd_quot (assembly routines
- *	that use extended-precision instructions to compute rounded
- *	products and quotients) with IBM.
+ *    that use extended-precision instructions to compute rounded
+ *    products and quotients) with IBM.
  * #define ROUND_BIASED for IEEE-format with biased rounding.
  * #define Inaccurate_Divide for IEEE-format with correctly rounded
- *	products but inaccurate quotients, e.g., for Intel i860.
- * #define NO_LONG_LONG on machines that do not have a "long long"
- *	integer type (of >= 64 bits).  On such machines, you can
- *	#define Just_16 to store 16 bits per 32-bit Long when doing
- *	high-precision integer arithmetic.  Whether this speeds things
- *	up or slows things down depends on the machine and the number
- *	being converted.  If long long is available and the name is
- *	something other than "long long", #define Llong to be the name,
- *	and if "unsigned Llong" does not work as an unsigned version of
- *	Llong, #define #ULLong to be the corresponding unsigned type.
- * #define KR_headers for old-style C function headers.
+ *    products but inaccurate quotients, e.g., for Intel i860.
+ * #define USE_LONG_LONG on machines that have a "long long"
+ *    integer type (of >= 64 bits), and performance testing shows that
+ *    it is faster than 32-bit fallback (which is often not the case
+ *    on 32-bit machines). On such machines, you can #define Just_16
+ *    to store 16 bits per 32-bit int32_t when doing high-precision integer
+ *    arithmetic.  Whether this speeds things up or slows things down
+ *    depends on the machine and the number being converted.
  * #define Bad_float_h if your system lacks a float.h or if it does not
- *	define some or all of DBL_DIG, DBL_MAX_10_EXP, DBL_MAX_EXP,
- *	FLT_RADIX, FLT_ROUNDS, and DBL_MAX.
- * #define MALLOC your_malloc, where your_malloc(n) acts like malloc(n)
- *	if memory is available and otherwise does something you deem
- *	appropriate.  If MALLOC is undefined, malloc will be invoked
- *	directly -- and assumed always to succeed.
+ *    define some or all of DBL_DIG, DBL_MAX_10_EXP, DBL_MAX_EXP,
+ *    FLT_RADIX, FLT_ROUNDS, and DBL_MAX.
  * #define Omit_Private_Memory to omit logic (added Jan. 1998) for making
- *	memory allocations from a private pool of memory when possible.
- *	When used, the private pool is PRIVATE_MEM bytes long:  2304 bytes,
- *	unless #defined to be a different length.  This default length
- *	suffices to get rid of MALLOC calls except for unusual cases,
- *	such as decimal-to-binary conversion of a very long string of
- *	digits.  The longest string dtoa can return is about 751 bytes
- *	long.  For conversions by strtod of strings of 800 digits and
- *	all dtoa conversions in single-threaded executions with 8-byte
- *	pointers, PRIVATE_MEM >= 7400 appears to suffice; with 4-byte
- *	pointers, PRIVATE_MEM >= 7112 appears adequate.
+ *    memory allocations from a private pool of memory when possible.
+ *    When used, the private pool is PRIVATE_MEM bytes long:  2304 bytes,
+ *    unless #defined to be a different length.  This default length
+ *    suffices to get rid of MALLOC calls except for unusual cases,
+ *    such as decimal-to-binary conversion of a very long string of
+ *    digits.  The longest string dtoa can return is about 751 bytes
+ *    long.  For conversions by strtod of strings of 800 digits and
+ *    all dtoa conversions in single-threaded executions with 8-byte
+ *    pointers, PRIVATE_MEM >= 7400 appears to suffice; with 4-byte
+ *    pointers, PRIVATE_MEM >= 7112 appears adequate.
  * #define INFNAN_CHECK on IEEE systems to cause strtod to check for
- *	Infinity and NaN (case insensitively).  On some systems (e.g.,
- *	some HP systems), it may be necessary to #define NAN_WORD0
- *	appropriately -- to the most significant word of a quiet NaN.
- *	(On HP Series 700/800 machines, -DNAN_WORD0=0x7ff40000 works.)
- *	When INFNAN_CHECK is #defined and No_Hex_NaN is not #defined,
- *	strtod also accepts (case insensitively) strings of the form
- *	NaN(x), where x is a string of hexadecimal digits and spaces;
- *	if there is only one string of hexadecimal digits, it is taken
- *	for the 52 fraction bits of the resulting NaN; if there are two
- *	or more strings of hex digits, the first is for the high 20 bits,
- *	the second and subsequent for the low 32 bits, with intervening
- *	white space ignored; but if this results in none of the 52
- *	fraction bits being on (an IEEE Infinity symbol), then NAN_WORD0
- *	and NAN_WORD1 are used instead.
+ *    Infinity and NaN (case insensitively).  On some systems (e.g.,
+ *    some HP systems), it may be necessary to #define NAN_WORD0
+ *    appropriately -- to the most significant word of a quiet NaN.
+ *    (On HP Series 700/800 machines, -DNAN_WORD0=0x7ff40000 works.)
+ *    When INFNAN_CHECK is #defined and No_Hex_NaN is not #defined,
+ *    strtod also accepts (case insensitively) strings of the form
+ *    NaN(x), where x is a string of hexadecimal digits and spaces;
+ *    if there is only one string of hexadecimal digits, it is taken
+ *    for the 52 fraction bits of the resulting NaN; if there are two
+ *    or more strings of hex digits, the first is for the high 20 bits,
+ *    the second and subsequent for the low 32 bits, with intervening
+ *    white space ignored; but if this results in none of the 52
+ *    fraction bits being on (an IEEE Infinity symbol), then NAN_WORD0
+ *    and NAN_WORD1 are used instead.
  * #define MULTIPLE_THREADS if the system offers preemptively scheduled
- *	multiple threads.  In this case, you must provide (or suitably
- *	#define) two locks, acquired by ACQUIRE_DTOA_LOCK(n) and freed
- *	by FREE_DTOA_LOCK(n) for n = 0 or 1.  (The second lock, accessed
- *	in pow5mult, ensures lazy evaluation of only one copy of high
- *	powers of 5; omitting this lock would introduce a small
- *	probability of wasting memory, but would otherwise be harmless.)
- *	You must also invoke freedtoa(s) to free the value s returned by
- *	dtoa.  You may do so whether or not MULTIPLE_THREADS is #defined.
+ *    multiple threads.  In this case, you must provide (or suitably
+ *    #define) two locks, acquired by ACQUIRE_DTOA_LOCK(n) and freed
+ *    by FREE_DTOA_LOCK(n) for n = 0 or 1.  (The second lock, accessed
+ *    in pow5mult, ensures lazy evaluation of only one copy of high
+ *    powers of 5; omitting this lock would introduce a small
+ *    probability of wasting memory, but would otherwise be harmless.)
+ *    You must also invoke freedtoa(s) to free the value s returned by
+ *    dtoa.  You may do so whether or not MULTIPLE_THREADS is #defined.
  * #define NO_IEEE_Scale to disable new (Feb. 1997) logic in strtod that
- *	avoids underflows on inputs whose result does not underflow.
- *	If you #define NO_IEEE_Scale on a machine that uses IEEE-format
- *	floating-point numbers and flushes underflows to zero rather
- *	than implementing gradual underflow, then you must also #define
- *	Sudden_Underflow.
+ *    avoids underflows on inputs whose result does not underflow.
+ *    If you #define NO_IEEE_Scale on a machine that uses IEEE-format
+ *    floating-point numbers and flushes underflows to zero rather
+ *    than implementing gradual underflow, then you must also #define
+ *    Sudden_Underflow.
  * #define YES_ALIAS to permit aliasing certain double values with
- *	arrays of ULongs.  This leads to slightly better code with
- *	some compilers and was always used prior to 19990916, but it
- *	is not strictly legal and can cause trouble with aggressively
- *	optimizing compilers (e.g., gcc 2.95.1 under -O2).
+ *    arrays of ULongs.  This leads to slightly better code with
+ *    some compilers and was always used prior to 19990916, but it
+ *    is not strictly legal and can cause trouble with aggressively
+ *    optimizing compilers (e.g., gcc 2.95.1 under -O2).
  * #define SET_INEXACT if IEEE arithmetic is being used and extra
- *	computation should be done to set the inexact flag when the
- *	result is inexact and avoid setting inexact when the result
- *	is exact.  In this case, dtoa.c must be compiled in
- *	an environment, perhaps provided by #include "dtoa.c" in a
- *	suitable wrapper, that defines two functions,
- *		int get_inexact(void);
- *		void clear_inexact(void);
- *	such that get_inexact() returns a nonzero value if the
- *	inexact bit is already set, and clear_inexact() sets the
- *	inexact bit to 0.  When SET_INEXACT is #defined, strtod
- *	also does extra computations to set the underflow and overflow
- *	flags when appropriate (i.e., when the result is tiny and
- *	inexact or when it is a numeric value rounded to +-infinity).
+ *    computation should be done to set the inexact flag when the
+ *    result is inexact and avoid setting inexact when the result
+ *    is exact.  In this case, dtoa.c must be compiled in
+ *    an environment, perhaps provided by #include "dtoa.c" in a
+ *    suitable wrapper, that defines two functions,
+ *        int get_inexact(void);
+ *        void clear_inexact(void);
+ *    such that get_inexact() returns a nonzero value if the
+ *    inexact bit is already set, and clear_inexact() sets the
+ *    inexact bit to 0.  When SET_INEXACT is #defined, strtod
+ *    also does extra computations to set the underflow and overflow
+ *    flags when appropriate (i.e., when the result is tiny and
+ *    inexact or when it is a numeric value rounded to +-infinity).
  * #define NO_ERRNO if strtod should not assign errno = ERANGE when
- *	the result overflows to +-Infinity or underflows to 0.
+ *    the result overflows to +-Infinity or underflows to 0.
  */
 
 #include "config.h"
@@ -186,41 +179,18 @@
 #endif
 #define INFNAN_CHECK
 
-#ifndef Long
-#define Long int
-#endif
-#ifndef ULong
-typedef unsigned Long ULong;
-#endif
-
-#ifdef DEBUG
-#include <stdio.h>
-#define Bug(x)                  \
-  {                             \
-    fprintf(stderr, "%s\n", x); \
-    exit(1);                    \
-  }
-#endif
-
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef MALLOC
-#ifdef KR_headers
-extern char* MALLOC();
-#else
-extern void* MALLOC(size_t);
-#endif
-#else
-#define MALLOC malloc
-#endif
+#include <wtf/Assertions.h>
+#include <wtf/FastMalloc.h>
 
 #ifndef Omit_Private_Memory
 #ifndef PRIVATE_MEM
 #define PRIVATE_MEM 2304
 #endif
 #define PRIVATE_mem ((PRIVATE_MEM + sizeof(double) - 1) / sizeof(double))
-static double private_mem[PRIVATE_mem], *pmem_next = private_mem;
+static double private_mem[PRIVATE_mem];
+static double* pmem_next = private_mem;
 #endif
 
 #undef IEEE_Arith
@@ -274,20 +244,8 @@ static double private_mem[PRIVATE_mem], *pmem_next = private_mem;
 #include <math.h>
 #endif
 
-#define strtod kjs_strtod
-#define dtoa kjs_dtoa
-#define freedtoa kjs_freedtoa
-
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef CONST_
-#ifdef KR_headers
-#define CONST_ /* blank */
-#else
-#define CONST_ const
-#endif
 #endif
 
 #if defined(IEEE_8087) + defined(IEEE_MC68k) + defined(IEEE_ARM) + \
@@ -299,17 +257,17 @@ Exactly one of IEEE_8087, IEEE_ARM, IEEE_MC68k, VAX, or
 
                                                          typedef union {
   double d;
-  ULong L[2];
+  uint32_t L[2];
 } U;
 
 #ifdef YES_ALIAS
 #define dval(x) x
 #ifdef IEEE_8087
-#define word0(x) ((ULong*)&x)[1]
-#define word1(x) ((ULong*)&x)[0]
+#define word0(x) ((uint32_t*)&x)[1]
+#define word1(x) ((uint32_t*)&x)[0]
 #else
-#define word0(x) ((ULong*)&x)[0]
-#define word1(x) ((ULong*)&x)[1]
+#define word0(x) ((uint32_t*)&x)[0]
+#define word1(x) ((uint32_t*)&x)[1]
 #endif
 #else
 #ifdef IEEE_8087
@@ -335,12 +293,6 @@ Exactly one of IEEE_8087, IEEE_ARM, IEEE_MC68k, VAX, or
   (((unsigned short*)a)[0] = (unsigned short)b, \
    ((unsigned short*)a)[1] = (unsigned short)c, a++)
 #endif
-
-/* #define P DBL_MANT_DIG */
-/* Ten_pmax = floor(P*log(2)/log(5)) */
-/* Bletch = (highest power of 2 < DBL_MAX_10_EXP) / 16 */
-/* Quick_max = floor((P-1)*log(FLT_RADIX)/log(10) - 1) */
-/* Int_max = floor(P*log(FLT_RADIX)/log(10) - 1) */
 
 #ifdef IEEE_Arith
 #define Exp_shift 20
@@ -458,11 +410,7 @@ Exactly one of IEEE_8087, IEEE_ARM, IEEE_MC68k, VAX, or
 #ifdef RND_PRODQUOT
 #define rounded_product(a, b) a = rnd_prod(a, b)
 #define rounded_quotient(a, b) a = rnd_quot(a, b)
-#ifdef KR_headers
-extern double rnd_prod(), rnd_quot();
-#else
 extern double rnd_prod(double, double), rnd_quot(double, double);
-#endif
 #else
 #define rounded_product(a, b) a *= b
 #define rounded_quotient(a, b) a /= b
@@ -475,30 +423,18 @@ extern double rnd_prod(double, double), rnd_quot(double, double);
 #define Pack_32
 #endif
 
-#ifdef KR_headers
-#define FFFFFFFF ((((unsigned long)0xffff) << 16) | (unsigned long)0xffff)
-#else
-#define FFFFFFFF 0xffffffffUL
-#endif
+#define USE_LONG_LONG
 
-#ifdef NO_LONG_LONG
-#undef ULLong
+#ifndef USE_LONG_LONG
 #ifdef Just_16
 #undef Pack_32
-/* When Pack_32 is not defined, we store 16 bits per 32-bit Long.
+/* When Pack_32 is not defined, we store 16 bits per 32-bit int32_t.
  * This makes some inner loops simpler and sometimes saves work
  * during multiplications, but it often seems to make things slightly
- * slower.  Hence the default is now to store 32 bits per Long.
+ * slower.  Hence the default is now to store 32 bits per int32_t.
  */
 #endif
-#else /* long long available */
-#ifndef Llong
-#define Llong long long
 #endif
-#ifndef ULLong
-#define ULLong unsigned Llong
-#endif
-#endif /* NO_LONG_LONG */
 
 #ifndef MULTIPLE_THREADS
 #define ACQUIRE_DTOA_LOCK(n) /*nothing*/
@@ -510,41 +446,30 @@ extern double rnd_prod(double, double), rnd_quot(double, double);
 struct Bigint {
   struct Bigint* next;
   int k, maxwds, sign, wds;
-  ULong x[1];
+  uint32_t x[1];
 };
-
-typedef struct Bigint Bigint;
 
 static Bigint* freelist[Kmax + 1];
 
-static Bigint* Balloc
-#ifdef KR_headers
-    (k) int k;
-#else
-    (int k)
-#endif
-{
-  int x;
+static Bigint* Balloc(int k) {
   Bigint* rv;
-#ifndef Omit_Private_Memory
-  unsigned int len;
-#endif
 
   ACQUIRE_DTOA_LOCK(0);
   if ((rv = freelist[k])) {
     freelist[k] = rv->next;
   } else {
-    x = 1 << k;
+    int x = 1 << k;
 #ifdef Omit_Private_Memory
-    rv = (Bigint*)MALLOC(sizeof(Bigint) + (x - 1) * sizeof(ULong));
+    rv = (Bigint*)fastMalloc(sizeof(Bigint) + (x - 1) * sizeof(uint32_t));
 #else
-    len = (sizeof(Bigint) + (x - 1) * sizeof(ULong) + sizeof(double) - 1) /
-          sizeof(double);
+    unsigned int len =
+        (sizeof(Bigint) + (x - 1) * sizeof(uint32_t) + sizeof(double) - 1) /
+        sizeof(double);
     if (pmem_next - private_mem + len <= (unsigned)PRIVATE_mem) {
       rv = (Bigint*)pmem_next;
       pmem_next += len;
     } else
-      rv = (Bigint*)MALLOC(len * sizeof(double));
+      rv = (Bigint*)fastMalloc(len * sizeof(double));
 #endif
     rv->k = k;
     rv->maxwds = x;
@@ -554,13 +479,7 @@ static Bigint* Balloc
   return rv;
 }
 
-static void Bfree
-#ifdef KR_headers
-    (v) Bigint* v;
-#else
-    (Bigint* v)
-#endif
-{
+static void Bfree(Bigint* v) {
   if (v) {
     ACQUIRE_DTOA_LOCK(0);
     v->next = freelist[v->k];
@@ -571,96 +490,76 @@ static void Bfree
 
 #define Bcopy(x, y)                        \
   memcpy((char*)&x->sign, (char*)&y->sign, \
-         y->wds * sizeof(Long) + 2 * sizeof(int))
+         y->wds * sizeof(int32_t) + 2 * sizeof(int))
 
-static Bigint* multadd
-#ifdef KR_headers
-    (b, m, a) Bigint* b;
-int m, a;
-#else
-    (Bigint* b, int m, int a) /* multiply by m and add a */
-#endif
+static Bigint* multadd(Bigint* b, int m, int a) /* multiply by m and add a */
 {
-  int i, wds;
-#ifdef ULLong
-  ULong* x;
-  ULLong carry, y;
+#ifdef USE_LONG_LONG
+  unsigned long long carry;
 #else
-  ULong carry, *x, y;
-#ifdef Pack_32
-  ULong xi, z;
+  uint32_t carry;
 #endif
-#endif
-  Bigint* b1;
 
-  wds = b->wds;
-  x = b->x;
-  i = 0;
+  int wds = b->wds;
+  uint32_t* x = b->x;
+  int i = 0;
   carry = a;
   do {
-#ifdef ULLong
-    y = *x * (ULLong)m + carry;
+#ifdef USE_LONG_LONG
+    unsigned long long y = *x * (unsigned long long)m + carry;
     carry = y >> 32;
-    *x++ = (ULong)y & FFFFFFFF;
+    *x++ = (uint32_t)y & 0xffffffffUL;
 #else
 #ifdef Pack_32
-    xi = *x;
-    y = (xi & 0xffff) * m + carry;
-    z = (xi >> 16) * m + (y >> 16);
+    uint32_t xi = *x;
+    uint32_t y = (xi & 0xffff) * m + carry;
+    uint32_t z = (xi >> 16) * m + (y >> 16);
     carry = z >> 16;
     *x++ = (z << 16) + (y & 0xffff);
 #else
-    y = *x * m + carry;
+    uint32_t y = *x * m + carry;
     carry = y >> 16;
     *x++ = y & 0xffff;
 #endif
 #endif
   } while (++i < wds);
+
   if (carry) {
     if (wds >= b->maxwds) {
-      b1 = Balloc(b->k + 1);
+      Bigint* b1 = Balloc(b->k + 1);
       Bcopy(b1, b);
       Bfree(b);
       b = b1;
     }
-    b->x[wds++] = (ULong)carry;
+    b->x[wds++] = (uint32_t)carry;
     b->wds = wds;
   }
   return b;
 }
 
-static Bigint* s2b
-#ifdef KR_headers
-    (s, nd0, nd, y9) CONST_ char* s;
-int nd0, nd;
-ULong y9;
-#else
-    (CONST_ char* s, int nd0, int nd, ULong y9)
-#endif
-{
-  Bigint* b;
-  int i, k;
-  Long x, y;
+static Bigint* s2b(const char* s, int nd0, int nd, uint32_t y9) {
+  int k;
+  int32_t y;
+  int32_t x = (nd + 8) / 9;
 
-  x = (nd + 8) / 9;
-  for (k = 0, y = 1; x > y; y <<= 1, k++)
-    ;
+  for (k = 0, y = 1; x > y; y <<= 1, k++) {
+  }
 #ifdef Pack_32
-  b = Balloc(k);
+  Bigint* b = Balloc(k);
   b->x[0] = y9;
   b->wds = 1;
 #else
-  b = Balloc(k + 1);
+  Bigint* b = Balloc(k + 1);
   b->x[0] = y9 & 0xffff;
   b->wds = (b->x[1] = y9 >> 16) ? 2 : 1;
 #endif
 
-  i = 9;
+  int i = 9;
   if (9 < nd0) {
     s += 9;
-    do
+    do {
       b = multadd(b, 10, *s++ - '0');
-    while (++i < nd0);
+    } while (++i < nd0);
     s++;
   } else
     s += 10;
@@ -669,14 +568,8 @@ ULong y9;
   return b;
 }
 
-static int hi0bits
-#ifdef KR_headers
-    (x) register ULong x;
-#else
-    (register ULong x)
-#endif
-{
-  register int k = 0;
+static int hi0bits(uint32_t x) {
+  int k = 0;
 
   if (!(x & 0xffff0000)) {
     k = 16;
@@ -702,15 +595,9 @@ static int hi0bits
   return k;
 }
 
-static int lo0bits
-#ifdef KR_headers
-    (y) ULong* y;
-#else
-    (ULong* y)
-#endif
-{
-  register int k;
-  register ULong x = *y;
+static int lo0bits(uint32_t* y) {
+  int k;
+  uint32_t x = *y;
 
   if (x & 7) {
     if (x & 1)
@@ -749,13 +636,7 @@ static int lo0bits
   return k;
 }
 
-static Bigint* i2b
-#ifdef KR_headers
-    (i) int i;
-#else
-    (int i)
-#endif
-{
+static Bigint* i2b(int i) {
   Bigint* b;
 
   b = Balloc(1);
@@ -764,25 +645,15 @@ static Bigint* i2b
   return b;
 }
 
-static Bigint *mult
-#ifdef KR_headers
-    (a, b) Bigint *a,
-    *b;
-#else
-    (Bigint* a, Bigint* b)
-#endif
-{
+static Bigint* mult(Bigint* a, Bigint* b) {
   Bigint* c;
   int k, wa, wb, wc;
-  ULong *x, *xa, *xae, *xb, *xbe, *xc, *xc0;
-  ULong y;
-#ifdef ULLong
-  ULLong carry, z;
+  uint32_t *x, *xa, *xae, *xb, *xbe, *xc, *xc0;
+  uint32_t y;
+#ifdef USE_LONG_LONG
+  unsigned long long carry, z;
 #else
-  ULong carry, z;
-#ifdef Pack_32
-  ULong z2;
-#endif
+  uint32_t carry, z;
 #endif
 
   if (a->wds < b->wds) {
@@ -804,41 +675,41 @@ static Bigint *mult
   xb = b->x;
   xbe = xb + wb;
   xc0 = c->x;
-#ifdef ULLong
+#ifdef USE_LONG_LONG
   for (; xb < xbe; xc0++) {
     if ((y = *xb++)) {
       x = xa;
       xc = xc0;
       carry = 0;
       do {
-        z = *x++ * (ULLong)y + *xc + carry;
+        z = *x++ * (unsigned long long)y + *xc + carry;
         carry = z >> 32;
-        *xc++ = (ULong)z & FFFFFFFF;
+        *xc++ = (uint32_t)z & 0xffffffffUL;
       } while (x < xae);
-      *xc = (ULong)carry;
+      *xc = (uint32_t)carry;
     }
   }
 #else
 #ifdef Pack_32
   for (; xb < xbe; xb++, xc0++) {
-    if (y = *xb & 0xffff) {
+    if ((y = *xb & 0xffff)) {
       x = xa;
       xc = xc0;
       carry = 0;
       do {
         z = (*x & 0xffff) * y + (*xc & 0xffff) + carry;
         carry = z >> 16;
-        z2 = (*x++ >> 16) * y + (*xc >> 16) + carry;
+        uint32_t z2 = (*x++ >> 16) * y + (*xc >> 16) + carry;
         carry = z2 >> 16;
         Storeinc(xc, z2, z);
       } while (x < xae);
       *xc = carry;
     }
-    if (y = *xb >> 16) {
+    if ((y = *xb >> 16)) {
       x = xa;
       xc = xc0;
       carry = 0;
-      z2 = *xc;
+      uint32_t z2 = *xc;
       do {
         z = (*x & 0xffff) * y + (*xc >> 16) + carry;
         carry = z >> 16;
@@ -851,7 +722,7 @@ static Bigint *mult
   }
 #else
   for (; xb < xbe; xc0++) {
-    if (y = *xb++) {
+    if ((y = *xb++)) {
       x = xa;
       xc = xc0;
       carry = 0;
@@ -865,22 +736,15 @@ static Bigint *mult
   }
 #endif
 #endif
-  for (xc0 = c->x, xc = xc0 + wc; wc > 0 && !*--xc; --wc)
-    ;
+  for (xc0 = c->x, xc = xc0 + wc; wc > 0 && !*--xc; --wc) {
+  }
   c->wds = wc;
   return c;
 }
 
 static Bigint* p5s;
 
-static Bigint* pow5mult
-#ifdef KR_headers
-    (b, k) Bigint* b;
-int k;
-#else
-    (Bigint* b, int k)
-#endif
-{
+static Bigint* pow5mult(Bigint* b, int k) {
   Bigint *b1, *p5, *p51;
   int i;
   static int p05[3] = {5, 25, 125};
@@ -930,17 +794,10 @@ int k;
   return b;
 }
 
-static Bigint* lshift
-#ifdef KR_headers
-    (b, k) Bigint* b;
-int k;
-#else
-    (Bigint* b, int k)
-#endif
-{
+static Bigint* lshift(Bigint* b, int k) {
   int i, k1, n, n1;
   Bigint* b1;
-  ULong *x, *x1, *xe, z;
+  uint32_t *x, *x1, *xe, z;
 
 #ifdef Pack_32
   n = k >> 5;
@@ -976,38 +833,27 @@ int k;
       *x1++ = *x << k & 0xffff | z;
       z = *x++ >> k1;
     } while (x < xe);
-    if (*x1 = z)
+    if ((*x1 = z))
       ++n1;
   }
 #endif
   else
-    do
+    do {
       *x1++ = *x++;
-    while (x < xe);
+    } while (x < xe);
   b1->wds = n1 - 1;
   Bfree(b);
   return b1;
 }
 
-static int cmp
-#ifdef KR_headers
-    (a, b) Bigint *a,
-    *b;
-#else
-    (Bigint* a, Bigint* b)
-#endif
-{
-  ULong *xa, *xa0, *xb, *xb0;
+static int cmp(Bigint* a, Bigint* b) {
+  uint32_t *xa, *xa0, *xb, *xb0;
   int i, j;
 
   i = a->wds;
   j = b->wds;
-#ifdef DEBUG
-  if (i > 1 && !a->x[i - 1])
-    Bug("cmp called with a->x[a->wds-1] == 0");
-  if (j > 1 && !b->x[j - 1])
-    Bug("cmp called with b->x[b->wds-1] == 0");
-#endif
+  ASSERT(i <= 1 || a->x[i - 1]);
+  ASSERT(j <= 1 || b->x[j - 1]);
   if (i -= j)
     return i;
   xa0 = a->x;
@@ -1023,25 +869,10 @@ static int cmp
   return 0;
 }
 
-static Bigint *diff
-#ifdef KR_headers
-    (a, b) Bigint *a,
-    *b;
-#else
-    (Bigint* a, Bigint* b)
-#endif
-{
+static Bigint* diff(Bigint* a, Bigint* b) {
   Bigint* c;
   int i, wa, wb;
-  ULong *xa, *xae, *xb, *xbe, *xc;
-#ifdef ULLong
-  ULLong borrow, y;
-#else
-  ULong borrow, y;
-#ifdef Pack_32
-  ULong z;
-#endif
-#endif
+  uint32_t *xa, *xae, *xb, *xbe, *xc;
 
   i = cmp(a, b);
   if (!i) {
@@ -1066,42 +897,43 @@ static Bigint *diff
   xb = b->x;
   xbe = xb + wb;
   xc = c->x;
-  borrow = 0;
-#ifdef ULLong
+#ifdef USE_LONG_LONG
+  unsigned long long borrow = 0;
   do {
-    y = (ULLong)*xa++ - *xb++ - borrow;
-    borrow = y >> 32 & (ULong)1;
-    *xc++ = (ULong)y & FFFFFFFF;
+    unsigned long long y = (unsigned long long)*xa++ - *xb++ - borrow;
+    borrow = y >> 32 & (uint32_t)1;
+    *xc++ = (uint32_t)y & 0xffffffffUL;
   } while (xb < xbe);
   while (xa < xae) {
-    y = *xa++ - borrow;
-    borrow = y >> 32 & (ULong)1;
-    *xc++ = (ULong)y & FFFFFFFF;
+    unsigned long long y = *xa++ - borrow;
+    borrow = y >> 32 & (uint32_t)1;
+    *xc++ = (uint32_t)y & 0xffffffffUL;
   }
 #else
+  uint32_t borrow = 0;
 #ifdef Pack_32
   do {
-    y = (*xa & 0xffff) - (*xb & 0xffff) - borrow;
+    uint32_t y = (*xa & 0xffff) - (*xb & 0xffff) - borrow;
     borrow = (y & 0x10000) >> 16;
-    z = (*xa++ >> 16) - (*xb++ >> 16) - borrow;
+    uint32_t z = (*xa++ >> 16) - (*xb++ >> 16) - borrow;
     borrow = (z & 0x10000) >> 16;
     Storeinc(xc, z, y);
   } while (xb < xbe);
   while (xa < xae) {
-    y = (*xa & 0xffff) - borrow;
+    uint32_t y = (*xa & 0xffff) - borrow;
     borrow = (y & 0x10000) >> 16;
-    z = (*xa++ >> 16) - borrow;
+    uint32_t z = (*xa++ >> 16) - borrow;
     borrow = (z & 0x10000) >> 16;
     Storeinc(xc, z, y);
   }
 #else
   do {
-    y = *xa++ - *xb++ - borrow;
+    uint32_t y = *xa++ - *xb++ - borrow;
     borrow = (y & 0x10000) >> 16;
     *xc++ = y & 0xffff;
   } while (xb < xbe);
   while (xa < xae) {
-    y = *xa++ - borrow;
+    uint32_t y = *xa++ - borrow;
     borrow = (y & 0x10000) >> 16;
     *xc++ = y & 0xffff;
   }
@@ -1113,14 +945,8 @@ static Bigint *diff
   return c;
 }
 
-static double ulp
-#ifdef KR_headers
-    (x) double x;
-#else
-    (double x)
-#endif
-{
-  register Long L;
+static double ulp(double x) {
+  register int32_t L;
   double a;
 
   L = (word0(x) & Exp_mask) - (P - 1) * Exp_msk1;
@@ -1152,19 +978,16 @@ static double ulp
   return dval(a);
 }
 
-static double b2d
-#ifdef KR_headers
-    (a, e) Bigint* a;
-int* e;
-#else
-    (Bigint* a, int* e)
-#endif
-{
-  ULong *xa, *xa0, w, y, z;
+static double b2d(Bigint* a, int* e) {
+  uint32_t* xa;
+  uint32_t* xa0;
+  uint32_t w;
+  uint32_t y;
+  uint32_t z;
   int k;
   double d;
 #ifdef VAX
-  ULong d0, d1;
+  uint32_t d0, d1;
 #else
 #define d0 word0(d)
 #define d1 word1(d)
@@ -1173,10 +996,7 @@ int* e;
   xa0 = a->x;
   xa = xa0 + a->wds;
   y = *--xa;
-#ifdef DEBUG
-  if (!y)
-    Bug("zero y in b2d");
-#endif
+  ASSERT(y);
   k = hi0bits(y);
   *e = 32 - k;
 #ifdef Pack_32
@@ -1222,22 +1042,15 @@ ret_d:
   return dval(d);
 }
 
-static Bigint* d2b
-#ifdef KR_headers
-    (d, e, bits) double d;
-int *e, *bits;
-#else
-    (double d, int* e, int* bits)
-#endif
-{
+static Bigint* d2b(double d, int* e, int* bits) {
   Bigint* b;
   int de, k;
-  ULong *x, y, z;
+  uint32_t *x, y, z;
 #ifndef Sudden_Underflow
   int i;
 #endif
 #ifdef VAX
-  ULong d0, d1;
+  uint32_t d0, d1;
   d0 = word0(d) >> 16 | word0(d) << 16;
   d1 = word1(d) >> 16 | word1(d) << 16;
 #else
@@ -1275,10 +1088,7 @@ int *e, *bits;
 #endif
         b->wds = (x[1] = z) ? 2 : 1;
   } else {
-#ifdef DEBUG
-    if (!z)
-      Bug("Zero passed to d2b");
-#endif
+    ASSERT(z);
     k = lo0bits(&z);
     x[0] = z;
 #ifndef Sudden_Underflow
@@ -1288,8 +1098,8 @@ int *e, *bits;
     k += 32;
   }
 #else
-  if (y = d1) {
-    if (k = lo0bits(&y))
+  if ((y = d1)) {
+    if ((k = lo0bits(&y))) {
       if (k >= 16) {
         x[0] = y | z << 32 - k & 0xffff;
         x[1] = z >> k - 16 & 0xffff;
@@ -1302,7 +1112,7 @@ int *e, *bits;
         x[3] = z >> k + 16;
         i = 3;
       }
-    else {
+    } else {
       x[0] = y & 0xffff;
       x[1] = y >> 16;
       x[2] = z & 0xffff;
@@ -1310,10 +1120,7 @@ int *e, *bits;
       i = 3;
     }
   } else {
-#ifdef DEBUG
-    if (!z)
-      Bug("Zero passed to d2b");
-#endif
+    ASSERT(z);
     k = lo0bits(&z);
     if (k >= 16) {
       x[0] = z;
@@ -1334,7 +1141,7 @@ int *e, *bits;
 #endif
 #ifdef IBM
     *e = (de - Bias - (P - 1) << 2) + k;
-    *bits = 4 * P + 8 - k - hi0bits(word0(d) & Frac_mask);
+    *bits = (4 * P) + 8 - k - hi0bits(word0(d) & Frac_mask);
 #else
   *e = de - Bias - (P - 1) + k;
   *bits = P - k;
@@ -1343,7 +1150,7 @@ int *e, *bits;
   } else {
     *e = de - Bias - (P - 1) + 1 + k;
 #ifdef Pack_32
-    *bits = 32 * i - hi0bits(x[i - 1]);
+    *bits = (32 * i) - hi0bits(x[i - 1]);
 #else
     *bits = (i + 2) * 16 - hi0bits(x[i]);
 #endif
@@ -1354,14 +1161,7 @@ int *e, *bits;
 #undef d0
 #undef d1
 
-static double ratio
-#ifdef KR_headers
-    (a, b) Bigint *a,
-    *b;
-#else
-    (Bigint* a, Bigint* b)
-#endif
-{
+static double ratio(Bigint* a, Bigint* b) {
   double da, db;
   int k, ka, kb;
 
@@ -1394,26 +1194,27 @@ static double ratio
   return dval(da) / dval(db);
 }
 
-static CONST_ double tens[] = {1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9,
-                               1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17,
-                               1e18, 1e19, 1e20, 1e21, 1e22
+static const double tens[] = {1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9,
+                              1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17,
+                              1e18, 1e19, 1e20, 1e21, 1e22
 #ifdef VAX
-                               ,
-                               1e23, 1e24
+                              ,
+                              1e23, 1e24
 #endif
 };
 
-static CONST_ double
+static const double
 #ifdef IEEE_Arith
     bigtens[] = {1e16, 1e32, 1e64, 1e128, 1e256};
-static CONST_ double tinytens[] = {1e-16, 1e-32, 1e-64, 1e-128,
+static const double tinytens[] = {1e-16, 1e-32, 1e-64, 1e-128,
 #ifdef Avoid_Underflow
-                                   9007199254740992. * 9007199254740992.e-256
+                                  9007199254740992. * 9007199254740992.e-256
 /* = 2^106 * 1e-53 */
 #else
-                                   1e-256
+                                  1e-256
 #endif
 };
+
 /* The factor of 2^53 in tinytens[4] helps us avoid setting the underflow */
 /* flag unnecessarily.  It leads to a song and dance at the end of strtod. */
 #define Scale_Bit 0x10
@@ -1421,11 +1222,11 @@ static CONST_ double tinytens[] = {1e-16, 1e-32, 1e-64, 1e-128,
 #else
 #ifdef IBM
     bigtens[] = {1e16, 1e32, 1e64};
-static CONST_ double tinytens[] = {1e-16, 1e-32, 1e-64};
+static const double tinytens[] = {1e-16, 1e-32, 1e-64};
 #define n_bigtens 3
 #else
     bigtens[] = {1e16, 1e32};
-static CONST_ double tinytens[] = {1e-16, 1e-32};
+static const double tinytens[] = {1e-16, 1e-32};
 #define n_bigtens 2
 #endif
 #endif
@@ -1444,16 +1245,9 @@ static CONST_ double tinytens[] = {1e-16, 1e-32};
 #define NAN_WORD1 0
 #endif
 
-static int match
-#ifdef KR_headers
-    (sp, t) char **sp,
-    *t;
-#else
-    (CONST_ char** sp, CONST_ char* t)
-#endif
-{
+static int match(const char** sp, const char* t) {
   int c, d;
-  CONST_ char* s = *sp;
+  const char* s = *sp;
 
   while ((d = *t++)) {
     if ((c = *++s) >= 'A' && c <= 'Z')
@@ -1466,23 +1260,16 @@ static int match
 }
 
 #ifndef No_Hex_NaN
-static void hexnan
-#ifdef KR_headers
-    (rvp, sp) double* rvp;
-CONST_ char** sp;
-#else
-    (double* rvp, CONST_ char** sp)
-#endif
-{
-  ULong c, x[2];
-  CONST_ char* s;
+static void hexnan(double* rvp, const char** sp) {
+  uint32_t c, x[2];
+  const char* s;
   int havedig, udx0, xshift;
 
   x[0] = x[1] = 0;
   havedig = xshift = 0;
   udx0 = 1;
   s = *sp;
-  while ((c = *(CONST_ unsigned char*)++s)) {
+  while ((c = *(const unsigned char*)++s)) {
     if (c >= '0' && c <= '9')
       c -= '0';
     else if (c >= 'a' && c <= 'f')
@@ -1518,23 +1305,16 @@ CONST_ char** sp;
 #endif /*No_Hex_NaN*/
 #endif /* INFNAN_CHECK */
 
-double strtod
-#ifdef KR_headers
-    (s00, se) CONST_ char* s00;
-char** se;
-#else
-    (CONST_ char* s00, char** se)
-#endif
-{
+double kjs_strtod(const char* s00, char** se) {
 #ifdef Avoid_Underflow
   int scale;
 #endif
   int bb2, bb5, bbe, bd2, bd5, bbbits, bs2, c, dsign, e, e1, esign, i, j, k, nd,
       nd0, nf, nz, nz0, sign;
-  CONST_ char *s, *s0, *s1;
+  const char *s, *s0, *s1;
   double aadj, aadj1, adj, rv, rv0;
-  Long L;
-  ULong y, z;
+  int32_t L;
+  uint32_t y, z;
   Bigint *bb = NULL, *bb1 = NULL, *bd = NULL, *bd0 = NULL, *bs = NULL,
          *delta = NULL;
 #ifdef SET_INEXACT
@@ -1570,8 +1350,8 @@ char** se;
 break2:
   if (*s == '0') {
     nz0 = 1;
-    while (*++s == '0')
-      ;
+    while (*++s == '0') {
+    }
     if (!*s)
       goto ret;
   }
@@ -1579,9 +1359,9 @@ break2:
   y = z = 0;
   for (nd = nf = 0; (c = *s) >= '0' && c <= '9'; nd++, s++)
     if (nd < 9)
-      y = 10 * y + c - '0';
+      y = (10 * y) + c - '0';
     else if (nd < 16)
-      z = 10 * z + c - '0';
+      z = (10 * z) + c - '0';
   nd0 = nd;
   if (c == '.') {
     c = *++s;
@@ -1607,9 +1387,9 @@ break2:
           else if (nd <= DBL_DIG + 1)
             z *= 10;
         if (nd++ < 9)
-          y = 10 * y + c;
+          y = (10 * y) + c;
         else if (nd <= DBL_DIG + 1)
-          z = 10 * z + c;
+          z = (10 * z) + c;
         nz = 0;
       }
     }
@@ -1635,7 +1415,7 @@ dig_done:
         L = c - '0';
         s1 = s;
         while ((c = *++s) >= '0' && c <= '9')
-          L = 10 * L + c - '0';
+          L = (10 * L) + c - '0';
         if (s - s1 > 8 || L > 19999)
           /* Avoid confusion from exponents
            * so large that e might overflow.
@@ -1866,7 +1646,7 @@ dig_done:
         if (e1 & 1)
           dval(rv) *= tinytens[j];
       if (scale &&
-          (j = 2 * P + 1 - ((word0(rv) & Exp_mask) >> Exp_shift)) > 0) {
+          (j = (2 * P) + 1 - ((word0(rv) & Exp_mask) >> Exp_shift)) > 0) {
         /* scaled rv is denormal; zap j low bits */
         if (j >= 32) {
           word1(rv) = 0;
@@ -1947,7 +1727,7 @@ for (;;) {
 #else /*Avoid_Underflow*/
 #ifdef Sudden_Underflow
 #ifdef IBM
-      j = 1 + 4 * P - 3 - bbbits + ((bbe + bbbits - 1) & 3);
+      j = 1 + (4 * P) - 3 - bbbits + ((bbe + bbbits - 1) & 3);
 #else
       j = P + 1 - bbbits;
 #endif
@@ -2043,7 +1823,6 @@ for (;;) {
     if (adj < 1.)
       adj = 1.;
     if (adj <= 0x7ffffffe) {
-      /* adj = rounding ? ceil(adj) : floor(adj); */
       y = adj;
       if (y != adj) {
         if (!((rounding >> 1) ^ dsign))
@@ -2251,7 +2030,7 @@ for (;;) {
 #ifdef Avoid_Underflow
     if (scale && y <= 2 * P * Exp_msk1) {
       if (aadj <= 0x7fffffff) {
-        if ((z = (ULong)aadj) <= 0)
+        if ((z = (uint32_t)aadj) <= 0)
           z = 1;
         aadj = z;
         aadj1 = dsign ? aadj : -aadj;
@@ -2288,7 +2067,7 @@ for (;;) {
         /* Compute adj so that the IEEE rounding rules will
          * correctly round rv + adj in some half-way cases.
          * If rv * ulp(rv) is denormalized (i.e.,
-         * y <= (P-1)*Exp_msk1), we must adjust aadj to avoid
+         * y <= (P - 1) * Exp_msk1), we must adjust aadj to avoid
          * trouble from bits lost to denormalization;
          * example: 1.2e-307 .
          */
@@ -2309,7 +2088,7 @@ for (;;) {
 #endif
     if (y == z) {
       /* Can we stop now? */
-      L = (Long)aadj;
+      L = (int32_t)aadj;
       aadj -= L;
       /* The tolerances below are conservative. */
       if (dsign || word1(rv) || word0(rv) & Bndry_mask) {
@@ -2363,30 +2142,20 @@ ret : if (se)* se = (char*)s;
 return sign ? -dval(rv) : dval(rv);
 }
 
-static int quorem
-#ifdef KR_headers
-    (b, S) Bigint *b,
-    *S;
-#else
-      (Bigint * b, Bigint * S)
-#endif
-{
+static int quorem(Bigint* b, Bigint* S) {
   int n;
-  ULong *bx, *bxe, q, *sx, *sxe;
-#ifdef ULLong
-  ULLong borrow, carry, y, ys;
+  uint32_t *bx, *bxe, q, *sx, *sxe;
+#ifdef USE_LONG_LONG
+  unsigned long long borrow, carry, y, ys;
 #else
-    ULong borrow, carry, y, ys;
+    uint32_t borrow, carry, y, ys;
 #ifdef Pack_32
-    ULong si, z, zs;
+    uint32_t si, z, zs;
 #endif
 #endif
 
   n = S->wds;
-#ifdef DEBUG
-  /*debug*/ if (b->wds > n)
-    /*debug*/ Bug("oversize b in quorem");
-#endif
+  ASSERT_WITH_MESSAGE(b->wds <= n, "oversize b in quorem");
   if (b->wds < n)
     return 0;
   sx = S->x;
@@ -2394,20 +2163,17 @@ static int quorem
   bx = b->x;
   bxe = bx + n;
   q = *bxe / (*sxe + 1); /* ensure q <= true quotient */
-#ifdef DEBUG
-  /*debug*/ if (q > 9)
-    /*debug*/ Bug("oversized quotient in quorem");
-#endif
+  ASSERT_WITH_MESSAGE(q <= 9, "oversized quotient in quorem");
   if (q) {
     borrow = 0;
     carry = 0;
     do {
-#ifdef ULLong
-      ys = *sx++ * (ULLong)q + carry;
+#ifdef USE_LONG_LONG
+      ys = *sx++ * (unsigned long long)q + carry;
       carry = ys >> 32;
-      y = *bx - (ys & FFFFFFFF) - borrow;
-      borrow = y >> 32 & (ULong)1;
-      *bx++ = (ULong)y & FFFFFFFF;
+      y = *bx - (ys & 0xffffffffUL) - borrow;
+      borrow = y >> 32 & (uint32_t)1;
+      *bx++ = (uint32_t)y & 0xffffffffUL;
 #else
 #ifdef Pack_32
         si = *sx++;
@@ -2442,12 +2208,12 @@ static int quorem
     bx = b->x;
     sx = S->x;
     do {
-#ifdef ULLong
+#ifdef USE_LONG_LONG
       ys = *sx++ + carry;
       carry = ys >> 32;
-      y = *bx - (ys & FFFFFFFF) - borrow;
-      borrow = y >> 32 & (ULong)1;
-      *bx++ = (ULong)y & FFFFFFFF;
+      y = *bx - (ys & 0xffffffffUL) - borrow;
+      borrow = y >> 32 & (uint32_t)1;
+      *bx++ = (uint32_t)y & 0xffffffffUL;
 #else
 #ifdef Pack_32
         si = *sx++;
@@ -2483,20 +2249,15 @@ static int quorem
 static char* dtoa_result;
 #endif
 
-static char*
-#ifdef KR_headers
-    rv_alloc(i) int i;
-#else
-  rv_alloc(int i)
-#endif
-{
-  int j, k, *r;
+static char* rv_alloc(int i) {
+  int k;
 
-  j = sizeof(ULong);
-  for (k = 0; sizeof(Bigint) - sizeof(ULong) - sizeof(int) + j <= (unsigned)i;
+  int j = sizeof(uint32_t);
+  for (k = 0;
+       sizeof(Bigint) - sizeof(uint32_t) - sizeof(int) + j <= (unsigned)i;
        j <<= 1)
     k++;
-  r = (int*)Balloc(k);
+  int* r = (int*)Balloc(k);
   *r = k;
   return
 #ifndef MULTIPLE_THREADS
@@ -2505,18 +2266,10 @@ static char*
           (char*)(r + 1);
 }
 
-static char *
-#ifdef KR_headers
-    nrv_alloc(s, rve, n) char *s,
-    **rve;
-int n;
-#else
-  nrv_alloc(CONST_ char* s, char** rve, int n)
-#endif
-{
-  char *rv, *t;
+static char* nrv_alloc(const char* s, char** rve, int n) {
+  char* rv = rv_alloc(n);
+  char* t = rv;
 
-  t = rv = rv_alloc(n);
   while ((*t = *s++))
     t++;
   if (rve)
@@ -2530,13 +2283,7 @@ int n;
  * when MULTIPLE_THREADS is not defined.
  */
 
-void
-#ifdef KR_headers
-    freedtoa(s) char* s;
-#else
-  freedtoa(char* s)
-#endif
-{
+void kjs_freedtoa(char* s) {
   Bigint* b = (Bigint*)((int*)s - 1);
   b->maxwds = 1 << (b->k = *(int*)b);
   Bfree(b);
@@ -2552,84 +2299,81 @@ void
  * Guy L. Steele, Jr. and Jon L. White [Proc. ACM SIGPLAN '90, pp. 92-101].
  *
  * Modifications:
- *	1. Rather than iterating, we use a simple numeric overestimate
- *	   to determine k = floor(log10(d)).  We scale relevant
- *	   quantities using O(log2(k)) rather than O(k) multiplications.
- *	2. For some modes > 2 (corresponding to ecvt and fcvt), we don't
- *	   try to generate digits strictly left to right.  Instead, we
- *	   compute with fewer bits and propagate the carry if necessary
- *	   when rounding the final digit up.  This is often faster.
- *	3. Under the assumption that input will be rounded nearest,
- *	   mode 0 renders 1e23 as 1e23 rather than 9.999999999999999e22.
- *	   That is, we allow equality in stopping tests when the
- *	   round-nearest rule will give the same floating-point value
- *	   as would satisfaction of the stopping test with strict
- *	   inequality.
- *	4. We remove common factors of powers of 2 from relevant
- *	   quantities.
- *	5. When converting floating-point integers less than 1e16,
- *	   we use floating-point arithmetic rather than resorting
- *	   to multiple-precision integers.
- *	6. When asked to produce fewer than 15 digits, we first try
- *	   to get by with floating-point arithmetic; we resort to
- *	   multiple-precision integer arithmetic only if we cannot
- *	   guarantee that the floating-point calculation has given
- *	   the correctly rounded result.  For k requested digits and
- *	   "uniformly" distributed input, the probability is
- *	   something like 10^(k-15) that we must resort to the Long
- *	   calculation.
+ *    1. Rather than iterating, we use a simple numeric overestimate
+ *       to determine k = floor(log10(d)).  We scale relevant
+ *       quantities using O(log2(k)) rather than O(k) multiplications.
+ *    2. For some modes > 2 (corresponding to ecvt and fcvt), we don't
+ *       try to generate digits strictly left to right.  Instead, we
+ *       compute with fewer bits and propagate the carry if necessary
+ *       when rounding the final digit up.  This is often faster.
+ *    3. Under the assumption that input will be rounded nearest,
+ *       mode 0 renders 1e23 as 1e23 rather than 9.999999999999999e22.
+ *       That is, we allow equality in stopping tests when the
+ *       round-nearest rule will give the same floating-point value
+ *       as would satisfaction of the stopping test with strict
+ *       inequality.
+ *    4. We remove common factors of powers of 2 from relevant
+ *       quantities.
+ *    5. When converting floating-point integers less than 1e16,
+ *       we use floating-point arithmetic rather than resorting
+ *       to multiple-precision integers.
+ *    6. When asked to produce fewer than 15 digits, we first try
+ *       to get by with floating-point arithmetic; we resort to
+ *       multiple-precision integer arithmetic only if we cannot
+ *       guarantee that the floating-point calculation has given
+ *       the correctly rounded result.  For k requested digits and
+ *       "uniformly" distributed input, the probability is
+ *       something like 10^(k-15) that we must resort to the int32_t
+ *       calculation.
  */
 
-char* dtoa
-#ifdef KR_headers
-    (d, mode, ndigits, decpt, sign, rve) double d;
-int mode, ndigits, *decpt, *sign;
-char** rve;
-#else
-      (double d, int mode, int ndigits, int* decpt, int* sign, char** rve)
-#endif
-{
-  /*	Arguments ndigits, decpt, sign are similar to those
-         of ecvt and fcvt; trailing zeros are suppressed from
-         the returned string.  If not null, *rve is set to point
-         to the end of the return value.  If d is +-Infinity or NaN,
-         then *decpt is set to 9999.
+char* kjs_dtoa(double d,
+               int mode,
+               int ndigits,
+               int* decpt,
+               int* sign,
+               char** rve) {
+  /*    Arguments ndigits, decpt, sign are similar to those
+     of ecvt and fcvt; trailing zeros are suppressed from
+     the returned string.  If not null, *rve is set to point
+     to the end of the return value.  If d is +-Infinity or NaN,
+     then *decpt is set to 9999.
 
-         mode:
-                 0 ==> shortest string that yields d when read in
-                         and rounded to nearest.
-                 1 ==> like 0, but with Steele & White stopping rule;
-                         e.g. with IEEE P754 arithmetic , mode 0 gives
-                         1e23 whereas mode 1 gives 9.999999999999999e22.
-                 2 ==> max(1,ndigits) significant digits.  This gives a
-                         return value similar to that of ecvt, except
-                         that trailing zeros are suppressed.
-                 3 ==> through ndigits past the decimal point.  This
-                         gives a return value similar to that from fcvt,
-                         except that trailing zeros are suppressed, and
-                         ndigits can be negative.
-                 4,5 ==> similar to 2 and 3, respectively, but (in
-                         round-nearest mode) with the tests of mode 0 to
-                         possibly return a shorter string that rounds to d.
-                         With IEEE arithmetic and compilation with
-                         -DHonor_FLT_ROUNDS, modes 4 and 5 behave the same
-                         as modes 2 and 3 when FLT_ROUNDS != 1.
-                 6-9 ==> Debugging modes similar to mode - 4:  don't try
-                         fast floating-point estimate (if applicable).
+     mode:
+         0 ==> shortest string that yields d when read in
+             and rounded to nearest.
+         1 ==> like 0, but with Steele & White stopping rule;
+             e.g. with IEEE P754 arithmetic , mode 0 gives
+             1e23 whereas mode 1 gives 9.999999999999999e22.
+         2 ==> max(1,ndigits) significant digits.  This gives a
+             return value similar to that of ecvt, except
+             that trailing zeros are suppressed.
+         3 ==> through ndigits past the decimal point.  This
+             gives a return value similar to that from fcvt,
+             except that trailing zeros are suppressed, and
+             ndigits can be negative.
+         4,5 ==> similar to 2 and 3, respectively, but (in
+             round-nearest mode) with the tests of mode 0 to
+             possibly return a shorter string that rounds to d.
+             With IEEE arithmetic and compilation with
+             -DHonor_FLT_ROUNDS, modes 4 and 5 behave the same
+             as modes 2 and 3 when FLT_ROUNDS != 1.
+         6-9 ==> Debugging modes similar to mode - 4:  don't try
+             fast floating-point estimate (if applicable).
 
-                 Values of mode other than 0-9 are treated as mode 0.
+         Values of mode other than 0-9 are treated as mode 0.
 
-                 Sufficient space is allocated to the return value
-                 to hold the suppressed trailing zeros.
-         */
+         Sufficient space is allocated to the return value
+         to hold the suppressed trailing zeros.
+     */
 
   int bbits, b2, b5, be, dig, i, ieps, ilim = 0, ilim0, ilim1 = 0, j, j1, k, k0,
                                        k_check, leftright, m2, m5, s2, s5,
                                        spec_case, try_quick;
-  Long L;
+  int32_t L;
 #ifndef Sudden_Underflow
   int denorm;
-  ULong x;
+  uint32_t x;
 #endif
   Bigint *b, *b1, *delta, *mlo = NULL, *mhi, *S;
   double d2, ds, eps;
@@ -2643,7 +2387,7 @@ char** rve;
 
 #ifndef MULTIPLE_THREADS
   if (dtoa_result) {
-    freedtoa(dtoa_result);
+    kjs_freedtoa(dtoa_result);
     dtoa_result = 0;
   }
 #endif
@@ -2706,15 +2450,15 @@ char** rve;
     dval(d2) /= 1 << j;
 #endif
 
-  /* log(x)	~=~ log(1.5) + (x-1.5)/1.5
-   * log10(x)	 =  log(x) / log(10)
-   *		~=~ log(1.5)/log(10) + (x-1.5)/(1.5*log(10))
+  /* log(x)    ~=~ log(1.5) + (x-1.5)/1.5
+   * log10(x)     =  log(x) / log(10)
+   *        ~=~ log(1.5)/log(10) + (x-1.5)/(1.5*log(10))
    * log10(d) = (i-Bias)*log(2)/log(10) + log10(d2)
    *
    * This suggests computing an approximation k to log10(d) by
    *
    * k = (i - Bias)*0.301029995663981
-   *	+ ( (d2-1.5)*0.289529654602168 + 0.176091259055681 );
+   *    + ( (d2-1.5)*0.289529654602168 + 0.176091259055681 );
    *
    * We want k to be too large rather than too small.
    * The error in the first-order Taylor series approximation
@@ -2748,7 +2492,7 @@ else {
 }
 #endif
 ds = (dval(d2) - 1.5) * 0.289529654602168 + 0.1760912590558 +
-     i * 0.301029995663981;
+     (i * 0.301029995663981);
 k = (int)ds;
 if (ds < 0. && ds != k)
   k--; /* want k = floor(ds) */
@@ -2840,19 +2584,21 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
       dval(d) /= bigtens[n_bigtens - 1];
       ieps++;
     }
-    for (; j; j >>= 1, i++)
+    for (; j; j >>= 1, i++) {
       if (j & 1) {
         ieps++;
         ds *= bigtens[i];
       }
+    }
     dval(d) /= ds;
   } else if ((j1 = -k)) {
     dval(d) *= tens[j1 & 0xf];
-    for (j = j1 >> 4; j; j >>= 1, i++)
+    for (j = j1 >> 4; j; j >>= 1, i++) {
       if (j & 1) {
         ieps++;
         dval(d) *= bigtens[i];
       }
+    }
   }
   if (k_check && dval(d) < 1. && ilim > 0) {
     if (ilim1 <= 0)
@@ -2862,7 +2608,7 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
     dval(d) *= 10.;
     ieps++;
   }
-  dval(eps) = ieps * dval(d) + 7.;
+  dval(eps) = (ieps * dval(d)) + 7.;
   word0(eps) -= (P - 1) * Exp_msk1;
   if (ilim == 0) {
     S = mhi = 0;
@@ -2878,7 +2624,7 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
     /* Use Steele & White method of only
      * generating digits needed.
      */
-    dval(eps) = 0.5 / tens[ilim - 1] - dval(eps);
+    dval(eps) = (0.5 / tens[ilim - 1]) - dval(eps);
     for (i = 0;;) {
       L = (long int)dval(d);
       dval(d) -= L;
@@ -2897,7 +2643,7 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
     /* Generate ilim digits, then fix them up. */
     dval(eps) *= tens[ilim - 1];
     for (i = 1;; i++, dval(d) *= 10.) {
-      L = (Long)(dval(d));
+      L = (int32_t)(dval(d));
       if (!(dval(d) -= L))
         ilim = i;
       *s++ = '0' + (int)L;
@@ -2935,7 +2681,7 @@ if (be >= 0 && k <= Int_max) {
     goto one_digit;
   }
   for (i = 1;; i++, dval(d) *= 10.) {
-    L = (Long)(dval(d) / ds);
+    L = (int32_t)(dval(d) / ds);
     dval(d) -= L * ds;
 #ifdef Check_FLT_ROUNDS
     /* If FLT_ROUNDS == 2, L will usually be high by 1 */
@@ -2953,13 +2699,14 @@ if (be >= 0 && k <= Int_max) {
     }
     if (i == ilim) {
 #ifdef Honor_FLT_ROUNDS
-      if (mode > 1)
+      if (mode > 1) {
         switch (rounding) {
           case 0:
             goto ret1;
           case 2:
             goto bump_up;
         }
+      }
 #endif
       dval(d) += dval(d);
       if (dval(d) > ds || dval(d) == ds && L & 1) {
@@ -2987,7 +2734,7 @@ if (leftright) {
       denorm ? be + (Bias + (P - 1) - 1 + 1) :
 #endif
 #ifdef IBM
-             1 + 4 * P - 3 - bbits + ((bbits + be - 1) & 3);
+             1 + (4 * P) - 3 - bbits + ((bbits + be - 1) & 3);
 #else
             1 + P - bbits;
 #endif
@@ -3050,7 +2797,7 @@ if ((mode < 2 || leftright)
 if ((i = ((s5 ? 32 - hi0bits(S->x[S->wds - 1]) : 1) + s2) & 0x1f))
   i = 32 - i;
 #else
-      if (i = ((s5 ? 32 - hi0bits(S->x[S->wds - 1]) : 1) + s2) & 0xf)
+      if ((i = ((s5 ? 32 - hi0bits(S->x[S->wds - 1]) : 1) + s2) & 0xf))
         i = 16 - i;
 #endif
 if (i > 4) {
@@ -3144,13 +2891,14 @@ if (leftright) {
         goto accept_dig;
       }
 #ifdef Honor_FLT_ROUNDS
-      if (mode > 1)
+      if (mode > 1) {
         switch (rounding) {
           case 0:
             goto accept_dig;
           case 2:
             goto keep_dig;
         }
+      }
 #endif /*Honor_FLT_ROUNDS*/
       if (j1 > 0) {
         b = lshift(b, 1);
@@ -3256,6 +3004,7 @@ if (rve)
   *rve = s;
 return s0;
 }
+
 #ifdef __cplusplus
 }
 #endif
