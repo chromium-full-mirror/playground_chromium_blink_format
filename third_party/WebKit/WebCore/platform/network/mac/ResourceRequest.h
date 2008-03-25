@@ -59,6 +59,7 @@ class ResourceRequest : public ResourceRequestBase {
   ResourceRequest(NSURLRequest* nsRequest)
       : ResourceRequestBase(), m_nsRequest(nsRequest) {}
 
+  void applyWebArchiveHackForMail();
   NSURLRequest* nsURLRequest() const;
 
  private:

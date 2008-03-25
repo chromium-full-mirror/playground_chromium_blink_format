@@ -53,6 +53,8 @@ class JSValue;
 
 namespace WebCore {
 
+class Archive;
+class ArchiveResource;
 class AuthenticationChallenge;
 class CachedPage;
 class Document;
@@ -151,7 +153,6 @@ class FrameLoader : Noncopyable
   void prepareForLoadStart();
   void setupForReplace();
   void setupForReplaceByMIMEType(const String& newMIMEType);
-  void finalSetupForReplace(DocumentLoader*);
   void load(const KURL&, Event*);
   void load(const FrameLoadRequest&,
             bool lockHistory,
@@ -184,6 +185,9 @@ class FrameLoader : Noncopyable
 
   void load(DocumentLoader*);
   void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
+
+  void loadURLIntoChildFrame(const KURL&, const String& referer, Frame*);
+  void loadArchive(PassRefPtr<Archive> archive);
 
   static bool canLoad(const KURL&, const String& referrer);
   static bool canLoad(const KURL&, const Document*);
@@ -252,10 +256,12 @@ class FrameLoader : Noncopyable
   ResourceError cancelledError(const ResourceRequest&) const;
   ResourceError fileDoesNotExistError(const ResourceResponse&) const;
   ResourceError blockedError(const ResourceRequest&) const;
-  bool willUseArchive(ResourceLoader*,
-                      const ResourceRequest&,
-                      const KURL&) const;
+  bool scheduleArchiveLoad(ResourceLoader*,
+                           const ResourceRequest&,
+                           const KURL&);
+#ifndef NDEBUG
   bool isArchiveLoadPending(ResourceLoader*) const;
+#endif
   void cannotShowMIMEType(const ResourceResponse&);
   ResourceError interruptionForPolicyChangeError(const ResourceRequest&);
 
@@ -573,6 +579,9 @@ class FrameLoader : Noncopyable
   void checkCompletedTimerFired(Timer<FrameLoader>*);
   void checkLoadCompleteTimerFired(Timer<FrameLoader>*);
 
+  void deliverArchivedResourcesAfterDelay();
+  void archiveResourceDeliveryTimerFired(Timer<FrameLoader>*);
+
   void cancelRedirection(bool newLoadInProgress = false);
 
   void started();
@@ -789,6 +798,11 @@ class FrameLoader : Noncopyable
   RefPtr<HistoryItem> m_provisionalHistoryItem;
 
   bool m_didPerformFirstNavigation;
+
+  typedef HashMap<RefPtr<ResourceLoader>, RefPtr<ArchiveResource>>
+      ArchiveResourceMap;
+  ArchiveResourceMap m_pendingArchiveResources;
+  Timer<FrameLoader> m_archiveResourceDeliveryTimer;
 
 #ifndef NDEBUG
   bool m_didDispatchDidCommitLoad;

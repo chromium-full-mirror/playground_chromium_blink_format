@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,19 +26,17 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import "WebArchive.h"
+#import <JavaScriptCore/Forward.h>
 
-@class WebArchive;
-@class WebResource;
-
-@interface WebUnarchivingState : NSObject {
-  NSMutableDictionary* archivedSubframes;
-  NSMutableDictionary* archivedResources;
+namespace WebCore {
+class LegacyWebArchive;
 }
 
-- (void)addArchive:(WebArchive*)archive;
-- (void)addResource:(WebResource*)resource;
-- (WebResource*)archivedResourceForURL:(NSURL*)URL;
-- (WebArchive*)popSubframeArchiveWithFrameName:(NSString*)frameName;
+@interface WebArchive (WebInternal)
+
+- (id)_initWithCoreLegacyWebArchive:
+    (WTF::PassRefPtr<WebCore::LegacyWebArchive>)coreLegacyWebArchive;
+- (WebCore::LegacyWebArchive*)_coreLegacyWebArchive;
 
 @end

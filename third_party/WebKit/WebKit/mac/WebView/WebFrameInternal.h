@@ -140,10 +140,6 @@ _createSubframeWithOwnerElement:(WebCore::HTMLFrameOwnerElement*)ownerElement
 - (WebFrame*)_findFrameWithSelection;
 - (void)_clearSelectionInOtherFrames;
 
-- (void)_loadURL:(NSURL*)URL
-        referrer:(NSString*)referrer
-       intoChild:(WebFrame*)childFrame;
-
 - (void)_attachScriptDebugger;
 - (void)_detachScriptDebugger;
 
