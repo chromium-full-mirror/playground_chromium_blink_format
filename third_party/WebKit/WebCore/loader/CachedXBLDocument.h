@@ -42,7 +42,7 @@ class CachedResourceClient;
 #if ENABLE(XBL)
 class CachedXBLDocument : public CachedResource {
  public:
-  CachedXBLDocument(DocLoader*, const String& url);
+  CachedXBLDocument(const String& url);
   virtual ~CachedXBLDocument();
 
   XBL::XBLDocument* document() const { return m_document; }

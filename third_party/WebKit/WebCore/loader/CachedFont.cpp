@@ -48,23 +48,26 @@
 
 namespace WebCore {
 
-CachedFont::CachedFont(DocLoader* dl, const String& url)
+CachedFont::CachedFont(const String& url)
     : CachedResource(url, FontResource),
-      m_fontData(0)
+      m_fontData(0),
+      m_loadInitiated(false)
 #if ENABLE(SVG_FONTS)
       ,
       m_isSVGFont(false)
 #endif
 {
-  // Don't load the file yet.  Wait for an access before triggering the load.
-  m_loading = true;
-  m_loadInitiated = false;
 }
 
 CachedFont::~CachedFont() {
 #if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK)
   delete m_fontData;
 #endif
+}
+
+void CachedFont::load(DocLoader* docLoader) {
+  // Don't load the file yet.  Wait for an access before triggering the load.
+  m_loading = true;
 }
 
 void CachedFont::ref(CachedResourceClient* c) {

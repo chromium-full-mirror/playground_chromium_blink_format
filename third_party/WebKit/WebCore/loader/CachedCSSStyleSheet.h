@@ -40,11 +40,7 @@ class TextResourceDecoder;
 
 class CachedCSSStyleSheet : public CachedResource {
  public:
-  CachedCSSStyleSheet(DocLoader*,
-                      const String& URL,
-                      const String& charset,
-                      bool skipCanLoadCheck = false,
-                      bool sendResourceLoadCallbacks = true);
+  CachedCSSStyleSheet(const String& URL, const String& charset);
   virtual ~CachedCSSStyleSheet();
 
   const String sheetText(bool strict = true) const {

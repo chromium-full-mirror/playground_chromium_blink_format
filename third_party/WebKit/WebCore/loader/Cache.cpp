@@ -62,31 +62,24 @@ Cache::Cache()
       m_deadSize(0) {}
 
 static CachedResource* createResource(CachedResource::Type type,
-                                      DocLoader* docLoader,
                                       const KURL& url,
-                                      const String* charset,
-                                      bool skipCanLoadCheck = false,
-                                      bool sendResourceLoadCallbacks = true) {
+                                      const String& charset) {
   switch (type) {
     case CachedResource::ImageResource:
-      // User agent images need to null check the docloader.  No other resources
-      // need to.
-      return new CachedImage(docLoader, url.string(), true /* for cache */);
+      return new CachedImage(url.string());
     case CachedResource::CSSStyleSheet:
-      return new CachedCSSStyleSheet(docLoader, url.string(), *charset,
-                                     skipCanLoadCheck,
-                                     sendResourceLoadCallbacks);
+      return new CachedCSSStyleSheet(url.string(), charset);
     case CachedResource::Script:
-      return new CachedScript(docLoader, url.string(), *charset);
+      return new CachedScript(url.string(), charset);
     case CachedResource::FontResource:
-      return new CachedFont(docLoader, url.string());
+      return new CachedFont(url.string());
 #if ENABLE(XSLT)
     case CachedResource::XSLStyleSheet:
-      return new CachedXSLStyleSheet(docLoader, url.string());
+      return new CachedXSLStyleSheet(url.string());
 #endif
 #if ENABLE(XBL)
     case CachedResource::XBLStyleSheet:
-      return new CachedXBLDocument(docLoader, url.string());
+      return new CachedXBLDocument(url.string());
 #endif
     default:
       break;
@@ -98,9 +91,7 @@ static CachedResource* createResource(CachedResource::Type type,
 CachedResource* Cache::requestResource(DocLoader* docLoader,
                                        CachedResource::Type type,
                                        const KURL& url,
-                                       const String* charset,
-                                       bool skipCanLoadCheck,
-                                       bool sendResourceLoadCallbacks,
+                                       const String& charset,
                                        bool isPreload) {
   // FIXME: Do we really need to special-case an empty URL?
   // Would it be better to just go on with the cache code and let it fail later?
@@ -113,7 +104,7 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
   if (resource) {
     if (isPreload && !resource->isPreloaded())
       return 0;
-    if (!skipCanLoadCheck && FrameLoader::restrictAccessToLocal() &&
+    if (FrameLoader::restrictAccessToLocal() &&
         !FrameLoader::canLoad(*resource, docLoader->doc())) {
       Document* doc = docLoader->doc();
       if (doc && !isPreload)
@@ -121,7 +112,7 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
       return 0;
     }
   } else {
-    if (!skipCanLoadCheck && FrameLoader::restrictAccessToLocal() &&
+    if (FrameLoader::restrictAccessToLocal() &&
         !FrameLoader::canLoad(url, docLoader->doc())) {
       Document* doc = docLoader->doc();
       if (doc && !isPreload)
@@ -130,10 +121,16 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
     }
 
     // The resource does not exist. Create it.
-    resource = createResource(type, docLoader, url, charset, skipCanLoadCheck,
-                              sendResourceLoadCallbacks);
+    resource = createResource(type, url, charset);
     ASSERT(resource);
-    ASSERT(resource->inCache());
+
+    // Pretend the resource is in the cache, to prevent it from being deleted
+    // during the load() call.
+    // FIXME: CachedResource should just use normal refcounting instead.
+    resource->setInCache(true);
+
+    resource->load(docLoader);
+
     if (!disabled()) {
       m_resources.set(url.string(), resource);  // The size will be added in
                                                 // later once the resource is
@@ -172,6 +169,26 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
 #endif
 
   return resource;
+}
+
+CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(DocLoader* docLoader,
+                                                     const String& url,
+                                                     const String& charset) {
+  CachedCSSStyleSheet* userSheet = new CachedCSSStyleSheet(url, charset);
+
+  // Pretend the resource is in the cache, to prevent it from being deleted
+  // during the load() call.
+  // FIXME: CachedResource should just use normal refcounting instead.
+  userSheet->setInCache(true);
+  // Don't load incrementally, skip load checks, don't send resource load
+  // callbacks.
+  userSheet->load(docLoader, false, true, false);
+  if (!disabled())
+    m_resources.set(url, userSheet);
+  else
+    userSheet->setInCache(false);
+
+  return userSheet;
 }
 
 CachedResource* Cache::resourceForURL(const String& url) {
@@ -331,7 +348,8 @@ void Cache::remove(CachedResource* resource) {
     int delta = -static_cast<int>(resource->size());
     if (delta)
       adjustSize(resource->referenced(), delta);
-  }
+  } else
+    ASSERT(m_resources.get(resource->url()) != resource);
 
   if (resource->canDelete())
     delete resource;

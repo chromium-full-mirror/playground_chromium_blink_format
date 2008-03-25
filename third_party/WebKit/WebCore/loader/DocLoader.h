@@ -57,8 +57,7 @@ class DocLoader {
 
   CachedImage* requestImage(const String& url);
   CachedCSSStyleSheet* requestCSSStyleSheet(const String& url,
-                                            const String& charset,
-                                            bool isUserStyleSheet = false);
+                                            const String& charset);
   CachedCSSStyleSheet* requestUserCSSStyleSheet(const String& url,
                                                 const String& charset);
   CachedScript* requestScript(const String& url, const String& charset);
@@ -111,9 +110,7 @@ class DocLoader {
  private:
   CachedResource* requestResource(CachedResource::Type,
                                   const String& url,
-                                  const String* charset = 0,
-                                  bool skipCanLoadCheck = false,
-                                  bool sendResourceLoadCallbacks = true,
+                                  const String& charset,
                                   bool isPreload = false);
 
   void checkForReload(const KURL&);
