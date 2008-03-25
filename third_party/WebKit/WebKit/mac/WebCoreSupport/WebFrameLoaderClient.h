@@ -259,9 +259,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual jobject javaApplet(NSView*);
 #endif
 
-  void deliverArchivedResourcesAfterDelay() const;
-  void deliverArchivedResources(WebCore::Timer<WebFrameLoaderClient>*);
-
   void setOriginalURLForDownload(WebDownload*,
                                  const WebCore::ResourceRequest&) const;
 
@@ -276,7 +273,4 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   RetainPtr<WebFramePolicyListener> m_policyListener;
   WebCore::FramePolicyFunction m_policyFunction;
-
-  mutable ResourceMap m_pendingArchivedResources;
-  mutable WebCore::Timer<WebFrameLoaderClient> m_archivedResourcesDeliveryTimer;
 };
