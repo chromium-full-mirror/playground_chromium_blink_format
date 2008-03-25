@@ -90,6 +90,7 @@ class FrameViewPrivate {
     firstLayout = true;
     m_wasScrolledByUser = false;
     lastLayoutSize = IntSize();
+    lastZoomFactor = 1.0f;
   }
 
   bool doFullRepaint;
@@ -116,6 +117,7 @@ class FrameViewPrivate {
   bool isTransparent;
   Color baseBackgroundColor;
   IntSize lastLayoutSize;
+  float lastZoomFactor;
 
   String m_mediaType;
 
@@ -427,6 +429,7 @@ void FrameView::layout(bool allowSubtree) {
         d->firstLayout = false;
         didFirstLayout = true;
         d->lastLayoutSize = IntSize(width(), height());
+        d->lastZoomFactor = root->style()->zoom();
 
         // Set the initial vMode to AlwaysOn if we're auto.
         if (vMode == ScrollbarAuto)
@@ -881,8 +884,11 @@ void FrameView::performPostLayoutTasks() {
 
   if (!root->printing()) {
     IntSize currentSize = IntSize(width(), height());
-    bool resized = !d->firstLayout && currentSize != d->lastLayoutSize;
+    float currentZoomFactor = root->style()->zoom();
+    bool resized = !d->firstLayout && (currentSize != d->lastLayoutSize ||
+                                       currentZoomFactor != d->lastZoomFactor);
     d->lastLayoutSize = currentSize;
+    d->lastZoomFactor = currentZoomFactor;
     if (resized)
       m_frame->sendResizeEvent();
   }

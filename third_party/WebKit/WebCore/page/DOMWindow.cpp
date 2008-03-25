@@ -389,7 +389,7 @@ int DOMWindow::innerHeight() const {
   if (!view)
     return 0;
 
-  return view->height();
+  return view->width() / m_frame->pageZoomFactor();
 }
 
 int DOMWindow::innerWidth() const {
@@ -400,7 +400,7 @@ int DOMWindow::innerWidth() const {
   if (!view)
     return 0;
 
-  return view->width();
+  return view->width() / m_frame->pageZoomFactor();
 }
 
 int DOMWindow::screenX() const {
@@ -438,7 +438,7 @@ int DOMWindow::scrollX() const {
   if (doc)
     doc->updateLayoutIgnorePendingStylesheets();
 
-  return view->contentsX();
+  return view->contentsX() / m_frame->pageZoomFactor();
 }
 
 int DOMWindow::scrollY() const {
@@ -454,7 +454,7 @@ int DOMWindow::scrollY() const {
   if (doc)
     doc->updateLayoutIgnorePendingStylesheets();
 
-  return view->contentsY();
+  return view->contentsY() / m_frame->pageZoomFactor();
 }
 
 bool DOMWindow::closed() const {
@@ -644,7 +644,8 @@ void DOMWindow::scrollTo(int x, int y) const {
   if (!view)
     return;
 
-  view->setContentsPos(x, y);
+  view->setContentsPos(x * m_frame->pageZoomFactor(),
+                       y * m_frame->pageZoomFactor());
 }
 
 void DOMWindow::moveBy(float x, float y) const {
