@@ -44,6 +44,7 @@ class InspectorClient;
 class Node;
 class ResourceResponse;
 class ResourceError;
+class SharedBuffer;
 
 struct ConsoleMessage;
 struct InspectorDatabaseResource;
@@ -129,6 +130,9 @@ class InspectorController {
   void didFailLoading(DocumentLoader*,
                       unsigned long identifier,
                       const ResourceError&);
+  void resourceRetrievedByXMLHttpRequest(unsigned long identifier,
+                                         PassRefPtr<SharedBuffer> data,
+                                         const String& encoding);
 
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,

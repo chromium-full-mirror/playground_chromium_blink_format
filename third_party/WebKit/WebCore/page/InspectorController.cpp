@@ -104,11 +104,22 @@ struct ConsoleMessage {
 };
 
 #pragma mark -
+#pragma mark XMLHttpRequestResource Class
+
+struct XMLHttpRequestResource {
+  XMLHttpRequestResource(PassRefPtr<SharedBuffer> data, const String& encoding)
+      : data(data), encoding(encoding) {}
+
+  RefPtr<SharedBuffer> data;
+  String encoding;
+};
+
+#pragma mark -
 #pragma mark InspectorResource Struct
 
 struct InspectorResource : public RefCounted<InspectorResource> {
   // Keep these in sync with WebInspector.Resource.Type
-  enum Type { Doc, Stylesheet, Image, Font, Script, Other };
+  enum Type { Doc, Stylesheet, Image, Font, Script, XHR, Other };
 
   static PassRefPtr<InspectorResource> create(long long identifier,
                                               DocumentLoader* documentLoader,
@@ -116,9 +127,12 @@ struct InspectorResource : public RefCounted<InspectorResource> {
     return adoptRef(new InspectorResource(identifier, documentLoader, frame));
   }
 
-  virtual ~InspectorResource() { setScriptObject(0, 0); }
+  ~InspectorResource() { setScriptObject(0, 0); }
 
-  virtual Type type() const {
+  Type type() const {
+    if (xmlHttpRequestResource)
+      return XHR;
+
     if (requestURL == loader->requestURL())
       return Doc;
 
@@ -159,9 +173,27 @@ struct InspectorResource : public RefCounted<InspectorResource> {
       JSValueProtect(context, newScriptObject);
   }
 
+  void setXMLHttpRequestProperties(PassRefPtr<SharedBuffer> data,
+                                   const String& encoding) {
+    xmlHttpRequestResource.set(new XMLHttpRequestResource(data, encoding));
+  }
+
+  PassRefPtr<SharedBuffer> data() {
+    if (xmlHttpRequestResource)
+      return xmlHttpRequestResource->data;
+    return loader->mainResourceData();
+  }
+
+  String encoding() {
+    if (xmlHttpRequestResource)
+      return xmlHttpRequestResource->encoding;
+    return frame->document()->inputEncoding();
+  }
+
   long long identifier;
   RefPtr<DocumentLoader> loader;
   RefPtr<Frame> frame;
+  OwnPtr<XMLHttpRequestResource> xmlHttpRequestResource;
   KURL requestURL;
   HTTPHeaderMap requestHeaderFields;
   HTTPHeaderMap responseHeaderFields;
@@ -186,6 +218,7 @@ struct InspectorResource : public RefCounted<InspectorResource> {
       : identifier(identifier),
         loader(documentLoader),
         frame(frame),
+        xmlHttpRequestResource(0),
         scriptContext(0),
         scriptObject(0),
         expectedContentLength(0),
@@ -197,37 +230,6 @@ struct InspectorResource : public RefCounted<InspectorResource> {
         startTime(-1.0),
         responseReceivedTime(-1.0),
         endTime(-1.0) {}
-};
-
-#pragma mark -
-#pragma mark InspectorCachedXMLHttpRequestResource Class
-
-struct InspectorCachedXMLHttpRequestResource : public InspectorResource {
-  static PassRefPtr<InspectorResource> create(long long identifier,
-                                              DocumentLoader* documentLoader,
-                                              Frame* frame) {
-    return adoptRef(new InspectorCachedXMLHttpRequestResource(
-        identifier, documentLoader, frame));
-  }
-
-  virtual Type type() const { return m_type; }
-  void setType(Type type) { m_type = type; }
-
-  SharedBuffer* data() const { return m_data.get(); }
-  void setData(SharedBuffer* data) { m_data = data; }
-
-  String encoding() const { return m_encoding; }
-  void setEncoding(String encoding) { m_encoding = encoding; }
-
- private:
-  InspectorCachedXMLHttpRequestResource(long long identifier,
-                                        DocumentLoader* documentLoader,
-                                        Frame* frame)
-      : InspectorResource(identifier, documentLoader, frame) {}
-
-  Type m_type;
-  String m_encoding;
-  RefPtr<SharedBuffer> m_data;
 };
 
 #pragma mark -
@@ -307,8 +309,8 @@ static JSValueRef addSourceToFrame(JSContextRef ctx,
   RefPtr<SharedBuffer> buffer;
   String textEncodingName;
   if (resource->requestURL == resource->loader->requestURL()) {
-    buffer = resource->loader->mainResourceData();
-    textEncodingName = resource->frame->document()->inputEncoding();
+    buffer = resource->data();
+    textEncodingName = resource->encoding();
   } else {
     CachedResource* cachedResource =
         resource->frame->document()->docLoader()->cachedResource(
@@ -1872,6 +1874,20 @@ void InspectorController::didFailLoading(DocumentLoader* loader,
                          resource->responseReceivedTime, resource->endTime);
     updateScriptResource(resource.get(), resource->finished, resource->failed);
   }
+}
+
+void InspectorController::resourceRetrievedByXMLHttpRequest(
+    unsigned long identifier,
+    PassRefPtr<SharedBuffer> data,
+    const String& encoding) {
+  if (!enabled())
+    return;
+
+  InspectorResource* resource = m_resources.get(identifier).get();
+  if (!resource)
+    return;
+
+  resource->setXMLHttpRequestProperties(data, encoding);
 }
 
 #if ENABLE(DATABASE)
