@@ -49,7 +49,9 @@ class Element : public ContainerNode {
   const AtomicString& getIDAttribute() const;
   bool hasAttribute(const QualifiedName&) const;
   const AtomicString& getAttribute(const QualifiedName&) const;
-  void setAttribute(const QualifiedName&, StringImpl* value, ExceptionCode&);
+  void setAttribute(const QualifiedName&,
+                    const AtomicString& value,
+                    ExceptionCode&);
   void removeAttribute(const QualifiedName&, ExceptionCode&);
 
   bool hasAttributes() const;
@@ -62,10 +64,12 @@ class Element : public ContainerNode {
   const AtomicString& getAttributeNS(const String& namespaceURI,
                                      const String& localName) const;
 
-  void setAttribute(const String& name, const String& value, ExceptionCode&);
+  void setAttribute(const String& name,
+                    const AtomicString& value,
+                    ExceptionCode&);
   void setAttributeNS(const String& namespaceURI,
                       const String& qualifiedName,
-                      const String& value,
+                      const AtomicString& value,
                       ExceptionCode&);
 
   void scrollIntoView(bool alignToTop = true);
@@ -149,7 +153,7 @@ class Element : public ContainerNode {
   String nodeNamePreservingCase() const;
 
   // convenience methods which ignore exceptions
-  void setAttribute(const QualifiedName&, const String& value);
+  void setAttribute(const QualifiedName&, const AtomicString& value);
   void setBooleanAttribute(const QualifiedName& name, bool);
 
   virtual NamedAttrMap* attributes() const;
@@ -174,7 +178,7 @@ class Element : public ContainerNode {
   virtual bool childTypeAllowed(NodeType);
 
   virtual Attribute* createAttribute(const QualifiedName& name,
-                                     StringImpl* value);
+                                     const AtomicString& value);
 
   void dispatchAttrRemovalEvent(Attribute*);
   void dispatchAttrAdditionEvent(Attribute*);
