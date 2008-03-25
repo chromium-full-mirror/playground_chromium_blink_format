@@ -3135,6 +3135,7 @@ void FrameLoader::finishedLoadingDocument(DocumentLoader* loader) {
   loader->addAllArchiveResources(archive.get());
 
   ArchiveResource* mainResource = archive->mainResource();
+  loader->setParsedArchiveData(mainResource->data());
   continueLoadWithData(mainResource->data(), mainResource->mimeType(),
                        mainResource->textEncoding(), mainResource->url());
 }

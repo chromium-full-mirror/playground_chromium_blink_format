@@ -474,6 +474,14 @@ void DocumentLoader::clearArchiveResources() {
   m_archiveResourceCollection.clear();
 }
 
+void DocumentLoader::setParsedArchiveData(PassRefPtr<SharedBuffer> data) {
+  m_parsedArchiveData = data;
+}
+
+SharedBuffer* DocumentLoader::parsedArchiveData() const {
+  return m_parsedArchiveData.get();
+}
+
 void DocumentLoader::addResponse(const ResourceResponse& r) {
   if (!m_stopRecordingResponses)
     m_responses.append(r);
