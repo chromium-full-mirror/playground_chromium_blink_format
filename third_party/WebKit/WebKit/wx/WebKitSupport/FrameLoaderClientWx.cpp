@@ -296,10 +296,6 @@ void FrameLoaderClientWx::revertToProvisionalState(DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClientWx::clearUnarchivingState(DocumentLoader*) {
-  notImplemented();
-}
-
 void FrameLoaderClientWx::postProgressStartedNotification() {
   notImplemented();
 }
@@ -340,27 +336,6 @@ void FrameLoaderClientWx::didChangeTitle(DocumentLoader* l) {
 }
 
 void FrameLoaderClientWx::finishedLoading(DocumentLoader*) {
-  notImplemented();
-}
-
-void FrameLoaderClientWx::finalSetupForReplace(DocumentLoader*) {
-  notImplemented();
-}
-
-void FrameLoaderClientWx::setDefersLoading(bool) {
-  notImplemented();
-}
-
-bool FrameLoaderClientWx::isArchiveLoadPending(ResourceLoader*) const {
-  notImplemented();
-  return false;
-}
-
-void FrameLoaderClientWx::cancelPendingArchiveLoad(ResourceLoader*) {
-  notImplemented();
-}
-
-void FrameLoaderClientWx::clearArchivedResources() {
   notImplemented();
 }
 
@@ -666,13 +641,6 @@ void FrameLoaderClientWx::dispatchUnableToImplementPolicy(
 
 void FrameLoaderClientWx::startDownload(const ResourceRequest&) {
   notImplemented();
-}
-
-bool FrameLoaderClientWx::willUseArchive(ResourceLoader*,
-                                         const ResourceRequest&,
-                                         const KURL&) const {
-  notImplemented();
-  return false;
 }
 
 PassRefPtr<Frame> FrameLoaderClientWx::createFrame(

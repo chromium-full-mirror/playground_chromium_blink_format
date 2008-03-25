@@ -228,15 +228,9 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual void dispatchWillSubmitForm(WebCore::FramePolicyFunction,
                                       PassRefPtr<WebCore::FormState>);
   virtual void revertToProvisionalState(WebCore::DocumentLoader*);
-  virtual void clearUnarchivingState(WebCore::DocumentLoader*);
   virtual void setMainFrameDocumentReady(bool);
   virtual void willChangeTitle(WebCore::DocumentLoader*);
   virtual void didChangeTitle(WebCore::DocumentLoader*);
-  virtual void finalSetupForReplace(WebCore::DocumentLoader*);
-  virtual void setDefersLoading(bool);
-  virtual bool isArchiveLoadPending(WebCore::ResourceLoader*) const;
-  virtual void cancelPendingArchiveLoad(WebCore::ResourceLoader*);
-  virtual void clearArchivedResources();
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
   virtual bool canShowMIMEType(const WebCore::String& MIMEType) const;
   virtual bool representationExistsForURLScheme(
@@ -278,9 +272,6 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&);
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
-  virtual bool willUseArchive(WebCore::ResourceLoader*,
-                              const WebCore::ResourceRequest&,
-                              const WebCore::KURL& originalURL) const;
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,
                         const WebCore::ResourceRequest&,

@@ -120,7 +120,6 @@ class FrameLoaderClientWx : public FrameLoaderClient,
 
   virtual void dispatchDidLoadMainResource(DocumentLoader*);
   virtual void revertToProvisionalState(DocumentLoader*);
-  virtual void clearUnarchivingState(DocumentLoader*);
 
   virtual void postProgressStartedNotification();
   virtual void postProgressEstimateChangedNotification();
@@ -132,12 +131,7 @@ class FrameLoaderClientWx : public FrameLoaderClient,
   virtual void willChangeTitle(DocumentLoader*);
   virtual void didChangeTitle(DocumentLoader*);
   virtual void finishedLoading(DocumentLoader*);
-  virtual void finalSetupForReplace(DocumentLoader*);
 
-  virtual void setDefersLoading(bool);
-  virtual bool isArchiveLoadPending(ResourceLoader*) const;
-  virtual void cancelPendingArchiveLoad(ResourceLoader*);
-  virtual void clearArchivedResources();
   virtual bool canShowMIMEType(const String& MIMEType) const;
   virtual bool representationExistsForURLScheme(const String& URLScheme) const;
   virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const;
@@ -230,9 +224,6 @@ class FrameLoaderClientWx : public FrameLoaderClient,
   virtual void dispatchUnableToImplementPolicy(const ResourceError&);
 
   virtual void startDownload(const ResourceRequest&);
-  virtual bool willUseArchive(ResourceLoader*,
-                              const ResourceRequest&,
-                              const KURL&) const;
 
   // FIXME: This should probably not be here, but it's needed for the tests
   // currently

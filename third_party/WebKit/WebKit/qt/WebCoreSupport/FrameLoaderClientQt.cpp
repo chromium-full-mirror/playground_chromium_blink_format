@@ -301,10 +301,6 @@ void FrameLoaderClientQt::revertToProvisionalState(DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::clearUnarchivingState(DocumentLoader*) {
-  notImplemented();
-}
-
 void FrameLoaderClientQt::postProgressStartedNotification() {
   if (m_webFrame && m_frame->page())
     emit loadStarted();
@@ -342,26 +338,6 @@ void FrameLoaderClientQt::finishedLoading(DocumentLoader* loader) {
     fl->setEncoding(m_response.textEncodingName(), false);
     m_firstData = false;
   }
-}
-
-void FrameLoaderClientQt::finalSetupForReplace(DocumentLoader*) {
-  notImplemented();
-}
-
-void FrameLoaderClientQt::setDefersLoading(bool) {
-  notImplemented();
-}
-
-bool FrameLoaderClientQt::isArchiveLoadPending(ResourceLoader*) const {
-  return false;
-}
-
-void FrameLoaderClientQt::cancelPendingArchiveLoad(ResourceLoader*) {
-  notImplemented();
-}
-
-void FrameLoaderClientQt::clearArchivedResources() {
-  // don't think we need to do anything here currently
 }
 
 bool FrameLoaderClientQt::canShowMIMEType(const String& MIMEType) const {
@@ -743,12 +719,6 @@ void FrameLoaderClientQt::startDownload(
   QWebPage* page = m_webFrame->page();
   emit m_webFrame->page()->download(request.toNetworkRequest());
 #endif
-}
-
-bool FrameLoaderClientQt::willUseArchive(WebCore::ResourceLoader*,
-                                         const WebCore::ResourceRequest&,
-                                         const WebCore::KURL&) const {
-  return false;
 }
 
 PassRefPtr<Frame> FrameLoaderClientQt::createFrame(

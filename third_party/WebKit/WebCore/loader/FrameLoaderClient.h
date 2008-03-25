@@ -164,7 +164,6 @@ class FrameLoaderClient {
   virtual void dispatchDidLoadMainResource(DocumentLoader*) = 0;
   virtual void revertToProvisionalState(DocumentLoader*) = 0;
   virtual void setMainDocumentError(DocumentLoader*, const ResourceError&) = 0;
-  virtual void clearUnarchivingState(DocumentLoader*) = 0;
 
   // Maybe these should go into a ProgressTrackerClient some day
   virtual void willChangeEstimatedProgress() {}
@@ -182,7 +181,6 @@ class FrameLoaderClient {
 
   virtual void committedLoad(DocumentLoader*, const char*, int) = 0;
   virtual void finishedLoading(DocumentLoader*) = 0;
-  virtual void finalSetupForReplace(DocumentLoader*) = 0;
 
   virtual void updateGlobalHistory(const KURL&) = 0;
   virtual bool shouldGoToHistoryItem(HistoryItem*) const = 0;
@@ -197,15 +195,6 @@ class FrameLoaderClient {
   virtual ResourceError fileDoesNotExistError(const ResourceResponse&) = 0;
 
   virtual bool shouldFallBack(const ResourceError&) = 0;
-
-  virtual void setDefersLoading(bool) = 0;
-
-  virtual bool willUseArchive(ResourceLoader*,
-                              const ResourceRequest&,
-                              const KURL& originalURL) const = 0;
-  virtual bool isArchiveLoadPending(ResourceLoader*) const = 0;
-  virtual void cancelPendingArchiveLoad(ResourceLoader*) = 0;
-  virtual void clearArchivedResources() = 0;
 
   virtual bool canHandleRequest(const ResourceRequest&) const = 0;
   virtual bool canShowMIMEType(const String& MIMEType) const = 0;

@@ -128,18 +128,12 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void clearLoadingFromPageCache(DocumentLoader*);
   virtual bool isLoadingFromPageCache(DocumentLoader*);
   virtual void revertToProvisionalState(DocumentLoader*);
-  virtual void clearUnarchivingState(DocumentLoader*);
 
   virtual void setMainFrameDocumentReady(bool);
   virtual void willChangeTitle(DocumentLoader*);
   virtual void didChangeTitle(DocumentLoader*);
   virtual void finishedLoading(DocumentLoader*);
-  virtual void finalSetupForReplace(DocumentLoader*);
 
-  virtual void setDefersLoading(bool);
-  virtual bool isArchiveLoadPending(ResourceLoader*) const;
-  virtual void cancelPendingArchiveLoad(ResourceLoader*);
-  virtual void clearArchivedResources();
   virtual bool canShowMIMEType(const String& MIMEType) const;
   virtual bool representationExistsForURLScheme(const String& URLScheme) const;
   virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const;
@@ -239,9 +233,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
 
   virtual void startDownload(const WebCore::ResourceRequest&);
-  virtual bool willUseArchive(WebCore::ResourceLoader*,
-                              const WebCore::ResourceRequest&,
-                              const WebCore::KURL&) const;
 
   virtual void postProgressStartedNotification();
   virtual void postProgressEstimateChangedNotification();
