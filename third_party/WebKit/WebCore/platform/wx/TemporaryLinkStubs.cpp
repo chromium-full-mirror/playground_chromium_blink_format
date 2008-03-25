@@ -190,10 +190,10 @@ void Widget::setIsSelected(bool) {
   notImplemented();
 }
 
-void GraphicsContext::setShadow(IntSize const&, int, Color const&) {
+void GraphicsContext::setPlatformShadow(IntSize const&, int, Color const&) {
   notImplemented();
 }
-void GraphicsContext::clearShadow() {
+void GraphicsContext::clearPlatformShadow() {
   notImplemented();
 }
 void GraphicsContext::beginTransparencyLayer(float) {
