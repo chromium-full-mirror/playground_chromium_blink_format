@@ -389,7 +389,7 @@ int DOMWindow::innerHeight() const {
   if (!view)
     return 0;
 
-  return view->width() / m_frame->pageZoomFactor();
+  return view->height() / m_frame->pageZoomFactor();
 }
 
 int DOMWindow::innerWidth() const {
