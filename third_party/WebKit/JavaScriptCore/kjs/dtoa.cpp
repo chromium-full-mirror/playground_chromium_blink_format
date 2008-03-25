@@ -179,6 +179,7 @@
 #endif
 #define INFNAN_CHECK
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wtf/Assertions.h>
