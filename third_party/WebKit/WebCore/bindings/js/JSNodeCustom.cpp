@@ -160,8 +160,7 @@ void JSNode::mark() {
   ASSERT(marked());
 }
 
-JSValue* toJS(ExecState* exec, PassRefPtr<Node> n) {
-  Node* node = n.get();
+JSValue* toJS(ExecState* exec, Node* node) {
   if (!node)
     return jsNull();
 
@@ -173,10 +172,10 @@ JSValue* toJS(ExecState* exec, PassRefPtr<Node> n) {
   switch (node->nodeType()) {
     case Node::ELEMENT_NODE:
       if (node->isHTMLElement())
-        ret = createJSHTMLWrapper(exec, static_pointer_cast<HTMLElement>(n));
+        ret = createJSHTMLWrapper(exec, static_cast<HTMLElement*>(node));
 #if ENABLE(SVG)
       else if (node->isSVGElement())
-        ret = createJSSVGWrapper(exec, static_pointer_cast<SVGElement>(n));
+        ret = createJSSVGWrapper(exec, static_cast<SVGElement*>(node));
 #endif
       else
         ret = new JSElement(JSElementPrototype::self(exec),
