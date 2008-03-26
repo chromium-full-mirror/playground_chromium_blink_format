@@ -29,6 +29,7 @@
 #include "SimpleFontData.h"
 #include "SVGFontData.h"
 #include "SVGGlyphElement.h"
+#include "SVGGlyphMap.h"
 #include "SVGFontElement.h"
 #include "SVGFontFaceElement.h"
 #include "SVGMissingGlyphElement.h"
@@ -281,9 +282,6 @@ struct SVGTextRunWalker {
     // Should hold true for SVG text, otherwhise sth. is wrong
     ASSERT(to - from == run.length());
 
-    int maximumHashKeyLength = m_fontElement->maximumHashKeyLength();
-    ASSERT(maximumHashKeyLength >= 0);
-
     Vector<SVGGlyphIdentifier::ArabicForm> chars(charactersWithArabicForm(
         String(run.data(from), run.length()), run.rtl()));
 
@@ -299,45 +297,35 @@ struct SVGTextRunWalker {
       // define a ligature. This needs to be
       // extended to the n-th next character (where n is
       // 'characterLookupRange'), to check for any possible ligature.
-      characterLookupRange = maximumHashKeyLength + i >= endOfScanRange
-                                 ? endOfScanRange - i
-                                 : maximumHashKeyLength;
+      characterLookupRange = endOfScanRange - i;
 
-      // FIXME: instead of checking from longest string to shortest, this should
-      // really scan in order
-      // of the glyphs and pick the first match
-      while (characterLookupRange > 0 && !foundGlyph) {
-        String lookupString(
-            run.data(run.rtl() ? run.length() - (i + characterLookupRange) : i),
-            characterLookupRange);
+      String lookupString(
+          run.data(run.rtl() ? run.length() - (i + characterLookupRange) : i),
+          characterLookupRange);
 
-        Vector<SVGGlyphIdentifier> glyphs =
-            m_fontElement->glyphIdentifiersForString(lookupString);
-        Vector<SVGGlyphIdentifier>::iterator it = glyphs.begin();
-        Vector<SVGGlyphIdentifier>::iterator end = glyphs.end();
+      Vector<SVGGlyphIdentifier> glyphs;
+      m_fontElement->getGlyphIdentifiersForString(lookupString, glyphs);
+      Vector<SVGGlyphIdentifier>::iterator it = glyphs.begin();
+      Vector<SVGGlyphIdentifier>::iterator end = glyphs.end();
 
-        for (; it != end; ++it) {
-          identifier = *it;
+      for (; it != end; ++it) {
+        identifier = *it;
 
-          unsigned int startPosition =
-              run.rtl() ? run.length() - (i + lookupString.length()) : i;
-          unsigned int endPosition = startPosition + lookupString.length();
+        unsigned int startPosition =
+            run.rtl() ? run.length() - (i + lookupString.length()) : i;
+        unsigned int endPosition = startPosition + lookupString.length();
 
-          if (identifier.isValid &&
-              isCompatibleGlyph(identifier, isVerticalText, language, chars,
-                                startPosition, endPosition)) {
-            ASSERT(characterLookupRange > 0);
-            i += characterLookupRange - 1;
-            m_walkerData.charsConsumed += characterLookupRange;
+        if (identifier.isValid &&
+            isCompatibleGlyph(identifier, isVerticalText, language, chars,
+                              startPosition, endPosition)) {
+          ASSERT(characterLookupRange > 0);
+          i += identifier.nameLength - 1;
+          m_walkerData.charsConsumed += identifier.nameLength;
 
-            foundGlyph = true;
-            SVGGlyphElement::inheritUnspecifiedAttributes(identifier,
-                                                          m_fontData);
-            break;
-          }
+          foundGlyph = true;
+          SVGGlyphElement::inheritUnspecifiedAttributes(identifier, m_fontData);
+          break;
         }
-
-        characterLookupRange--;
       }
 
       if (!foundGlyph) {
