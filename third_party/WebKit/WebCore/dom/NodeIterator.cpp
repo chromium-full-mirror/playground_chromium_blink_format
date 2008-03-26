@@ -78,13 +78,14 @@ NodeIterator::~NodeIterator() {
   root()->document()->detachNodeIterator(this);
 }
 
-Node* NodeIterator::nextNode(ExceptionCode& ec, JSValue*& exception) {
+PassRefPtr<Node> NodeIterator::nextNode(ExceptionCode& ec,
+                                        JSValue*& exception) {
   if (m_detached) {
     ec = INVALID_STATE_ERR;
     return 0;
   }
 
-  Node* result = 0;
+  RefPtr<Node> result;
 
   m_candidateNode = m_referenceNode;
   while (m_candidateNode.moveToNext(root())) {
@@ -92,28 +93,30 @@ Node* NodeIterator::nextNode(ExceptionCode& ec, JSValue*& exception) {
     // In other words, FILTER_REJECT does not pass over descendants
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
     exception = 0;
-    bool nodeWasAccepted = acceptNode(m_candidateNode.node.get(), exception) ==
+    RefPtr<Node> provisionalResult = m_candidateNode.node;
+    bool nodeWasAccepted = acceptNode(provisionalResult.get(), exception) ==
                            NodeFilter::FILTER_ACCEPT;
     if (exception)
       break;
     if (nodeWasAccepted) {
       m_referenceNode = m_candidateNode;
-      result = m_referenceNode.node.get();
+      result = provisionalResult.release();
       break;
     }
   }
 
   m_candidateNode.clear();
-  return result;
+  return result.release();
 }
 
-Node* NodeIterator::previousNode(ExceptionCode& ec, JSValue*& exception) {
+PassRefPtr<Node> NodeIterator::previousNode(ExceptionCode& ec,
+                                            JSValue*& exception) {
   if (m_detached) {
     ec = INVALID_STATE_ERR;
     return 0;
   }
 
-  Node* result = 0;
+  RefPtr<Node> result;
 
   m_candidateNode = m_referenceNode;
   while (m_candidateNode.moveToPrevious(root())) {
@@ -121,19 +124,20 @@ Node* NodeIterator::previousNode(ExceptionCode& ec, JSValue*& exception) {
     // In other words, FILTER_REJECT does not pass over descendants
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
     exception = 0;
-    bool nodeWasAccepted = acceptNode(m_candidateNode.node.get(), exception) ==
+    RefPtr<Node> provisionalResult = m_candidateNode.node;
+    bool nodeWasAccepted = acceptNode(provisionalResult.get(), exception) ==
                            NodeFilter::FILTER_ACCEPT;
     if (exception)
       break;
     if (nodeWasAccepted) {
       m_referenceNode = m_candidateNode;
-      result = m_referenceNode.node.get();
+      result = provisionalResult.release();
       break;
     }
   }
 
   m_candidateNode.clear();
-  return result;
+  return result.release();
 }
 
 void NodeIterator::detach() {
@@ -143,6 +147,7 @@ void NodeIterator::detach() {
 }
 
 void NodeIterator::nodeWillBeRemoved(Node* removedNode) {
+  updateForNodeRemoval(removedNode, m_candidateNode);
   updateForNodeRemoval(removedNode, m_referenceNode);
 }
 
