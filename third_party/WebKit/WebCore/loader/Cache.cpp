@@ -174,6 +174,11 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
 CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(DocLoader* docLoader,
                                                      const String& url,
                                                      const String& charset) {
+  if (CachedResource* existing = m_resources.get(url))
+    return existing->type() == CachedResource::CSSStyleSheet
+               ? static_cast<CachedCSSStyleSheet*>(existing)
+               : 0;
+
   CachedCSSStyleSheet* userSheet = new CachedCSSStyleSheet(url, charset);
 
   // Pretend the resource is in the cache, to prevent it from being deleted
