@@ -81,8 +81,13 @@ class SVGInlineTextBox : public InlineTextBox {
   SVGRootInlineBox* svgRootInlineBox() const;
 
   // Helper functions shared with SVGRootInlineBox
-  float calculateGlyphWidth(RenderStyle*, int offset) const;
-  float calculateGlyphHeight(RenderStyle*, int offset) const;
+  float calculateGlyphWidth(RenderStyle* style,
+                            int offset,
+                            int extraCharsAvailable,
+                            int& charsConsumed) const;
+  float calculateGlyphHeight(RenderStyle*,
+                             int offset,
+                             int extraCharsAvailable) const;
 
   FloatRect calculateGlyphBoundaries(RenderStyle*,
                                      int offset,

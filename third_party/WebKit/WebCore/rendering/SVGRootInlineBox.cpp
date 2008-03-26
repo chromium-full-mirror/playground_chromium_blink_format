@@ -767,11 +767,14 @@ static float cummulatedWidthOrHeightOfTextChunk(SVGTextChunk& chunk,
         int offset = box->m_reversed ? box->end() - i - positionOffset + 1
                                      : box->start() + i + positionOffset - 1;
 
+        // FIXME: does this need to change to handle multichar glyphs?
+        int charsConsumed = 1;
         if (calcWidthOnly) {
-          float lastGlyphWidth = box->calculateGlyphWidth(style, offset);
+          float lastGlyphWidth =
+              box->calculateGlyphWidth(style, offset, 0, charsConsumed);
           length += currentCharacter.x - lastCharacter.x - lastGlyphWidth;
         } else {
-          float lastGlyphHeight = box->calculateGlyphHeight(style, offset);
+          float lastGlyphHeight = box->calculateGlyphHeight(style, offset, 0);
           length += currentCharacter.y - lastCharacter.y - lastGlyphHeight;
         }
       }
@@ -1183,7 +1186,8 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
   const SVGRenderStyle* svgStyle = style->svgStyle();
   bool isVerticalText = isVerticalWritingMode(svgStyle);
 
-  for (unsigned i = 0; i < length; ++i) {
+  int charsConsumed = 0;
+  for (unsigned i = 0; i < length; i += charsConsumed) {
     SVGChar svgChar;
 
     if (info.inPathLayout())
@@ -1192,13 +1196,18 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
     float glyphWidth = 0.0f;
     float glyphHeight = 0.0f;
 
+    int extraCharsAvailable = length - i - 1;
+
     if (textBox->m_reversed) {
-      glyphWidth = svgTextBox->calculateGlyphWidth(style, textBox->end() - i);
-      glyphHeight = svgTextBox->calculateGlyphHeight(style, textBox->end() - i);
+      glyphWidth = svgTextBox->calculateGlyphWidth(
+          style, textBox->end() - i, extraCharsAvailable, charsConsumed);
+      glyphHeight = svgTextBox->calculateGlyphHeight(style, textBox->end() - i,
+                                                     extraCharsAvailable);
     } else {
-      glyphWidth = svgTextBox->calculateGlyphWidth(style, textBox->start() + i);
-      glyphHeight =
-          svgTextBox->calculateGlyphHeight(style, textBox->start() + i);
+      glyphWidth = svgTextBox->calculateGlyphWidth(
+          style, textBox->start() + i, extraCharsAvailable, charsConsumed);
+      glyphHeight = svgTextBox->calculateGlyphHeight(
+          style, textBox->start() + i, extraCharsAvailable);
     }
 
     bool assignedX = false;
@@ -1384,9 +1393,13 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
     } else
       info.curx += glyphAdvance + spacing;
 
-    // Advance to next character
-    info.svgChars.append(svgChar);
-    info.processedSingleCharacter();
+    // Advance to next character group
+    for (int k = 0; k < charsConsumed; ++k) {
+      info.svgChars.append(svgChar);
+      info.processedSingleCharacter();
+      svgChar.drawnSeperated = false;
+      svgChar.newTextChunk = false;
+    }
   }
 }
 

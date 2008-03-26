@@ -203,6 +203,9 @@ class Font {
 
   int width(const TextRun&) const;
   float floatWidth(const TextRun&) const;
+  float floatWidth(const TextRun& run,
+                   int extraCharsAvailable,
+                   int& charsConsumed) const;
 
   int offsetForPosition(const TextRun&,
                         int position,
@@ -285,6 +288,9 @@ class Font {
                             int from,
                             int to) const;
   float floatWidthUsingSVGFont(const TextRun&) const;
+  float floatWidthUsingSVGFont(const TextRun&,
+                               int extraCharsAvailable,
+                               int& charsConsumed) const;
   FloatRect selectionRectForTextUsingSVGFont(const TextRun&,
                                              const IntPoint&,
                                              int h,

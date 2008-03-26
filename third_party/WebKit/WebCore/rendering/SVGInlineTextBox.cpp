@@ -69,14 +69,19 @@ SVGRootInlineBox* SVGInlineTextBox::svgRootInlineBox() const {
 }
 
 float SVGInlineTextBox::calculateGlyphWidth(RenderStyle* style,
-                                            int offset) const {
+                                            int offset,
+                                            int extraCharsAvailable,
+                                            int& charsConsumed) const {
   ASSERT(style);
-  return style->font().floatWidth(svgTextRunForInlineTextBox(
-      textObject()->text()->characters() + offset, 1, style, this, 0));
+  return style->font().floatWidth(
+      svgTextRunForInlineTextBox(textObject()->text()->characters() + offset, 1,
+                                 style, this, 0),
+      extraCharsAvailable, charsConsumed);
 }
 
 float SVGInlineTextBox::calculateGlyphHeight(RenderStyle* style,
-                                             int offset) const {
+                                             int offset,
+                                             int extraCharsAvailable) const {
   ASSERT(style);
 
   // This is just a guess, and the only purpose of this function is to
@@ -94,10 +99,13 @@ FloatRect SVGInlineTextBox::calculateGlyphBoundaries(
   // Take RTL text into account and pick right glyph width/height.
   float glyphWidth = 0.0f;
 
+  // FIXME: account for multi-character glyphs
+  int charsConsumed;
   if (!m_reversed)
-    glyphWidth = calculateGlyphWidth(style, offset);
+    glyphWidth = calculateGlyphWidth(style, offset, 0, charsConsumed);
   else
-    glyphWidth = calculateGlyphWidth(style, start() + end() - offset);
+    glyphWidth =
+        calculateGlyphWidth(style, start() + end() - offset, 0, charsConsumed);
 
   float x1 = svgChar.x;
   float x2 = svgChar.x + glyphWidth;

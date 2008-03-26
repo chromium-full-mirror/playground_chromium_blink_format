@@ -97,10 +97,13 @@ static inline float cummulatedCharacterRangeLength(
       if (textBox->m_reversed)
         newOffset = textBox->start() + textBox->end() - newOffset;
 
+      // FIXME: does this handle multichar glyphs ok? not sure
+      int charsConsumed = 0;
       if (isVerticalText)
-        textLength += textBox->calculateGlyphHeight(style, newOffset);
+        textLength += textBox->calculateGlyphHeight(style, newOffset, 0);
       else
-        textLength += textBox->calculateGlyphWidth(style, newOffset);
+        textLength +=
+            textBox->calculateGlyphWidth(style, newOffset, 0, charsConsumed);
     }
 
     if (!usesFullRange) {
@@ -213,13 +216,17 @@ struct SVGInlineTextBoxQueryWalker {
             if (textBox->m_reversed)
               newOffset = textBox->start() + textBox->end() - newOffset;
 
+            int charsConsumed;
             if (isVerticalText)
               m_queryPointResult.move(
-                  it->x,
-                  it->y + textBox->calculateGlyphHeight(style, newOffset));
+                  it->x, it->y +
+                             textBox->calculateGlyphHeight(style, newOffset,
+                                                           end - it));
             else
               m_queryPointResult.move(
-                  it->x + textBox->calculateGlyphWidth(style, newOffset),
+                  it->x +
+                      textBox->calculateGlyphWidth(style, newOffset, end - it,
+                                                   charsConsumed),
                   it->y);
 
             m_stopProcessing = true;

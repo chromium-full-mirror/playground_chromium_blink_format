@@ -41,6 +41,7 @@ struct SVGGlyphIdentifier {
 
   SVGGlyphIdentifier()
       : isValid(false),
+        priority(0),
         orientation(Both),
         arabicForm(None),
         horizontalAdvanceX(0.0f),
@@ -66,6 +67,7 @@ struct SVGGlyphIdentifier {
   }
 
   bool isValid : 1;
+  int priority;
 
   Orientation orientation : 2;
   ArabicForm arabicForm : 3;
