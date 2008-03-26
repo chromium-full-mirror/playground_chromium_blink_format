@@ -50,7 +50,11 @@ void TextCodecUserDefined::registerCodecs(TextCodecRegistrar registrar) {
   registrar("x-user-defined", newStreamingTextDecoderUserDefined, 0);
 }
 
-String TextCodecUserDefined::decode(const char* bytes, size_t length, bool) {
+String TextCodecUserDefined::decode(const char* bytes,
+                                    size_t length,
+                                    bool,
+                                    bool,
+                                    bool&) {
   StringBuffer buffer(length);
 
   for (size_t i = 0; i < length; ++i) {

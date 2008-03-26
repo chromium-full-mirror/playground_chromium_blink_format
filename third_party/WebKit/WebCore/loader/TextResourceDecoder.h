@@ -54,6 +54,8 @@ class TextResourceDecoder : public RefCounted<TextResourceDecoder> {
   String decode(const char* data, size_t length);
   String flush();
 
+  bool sawError() const { return m_sawError; }
+
  private:
   enum ContentType {
     PlainText,
@@ -78,6 +80,7 @@ class TextResourceDecoder : public RefCounted<TextResourceDecoder> {
   bool m_checkedForBOM;
   bool m_checkedForCSSCharset;
   bool m_checkedForHeadCharset;
+  bool m_sawError;
 };
 }
 

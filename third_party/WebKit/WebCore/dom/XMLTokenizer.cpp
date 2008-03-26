@@ -46,6 +46,7 @@
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
+#include "TextResourceDecoder.h"
 #ifndef USE_QXMLSTREAM
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
@@ -654,6 +655,10 @@ bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
     parse();
   }
 #endif
+
+  if (m_doc->decoder() && m_doc->decoder()->sawError())
+    // If the decoder saw an error, report it as fatal (stops parsing)
+    handleError(fatal, "Encoding error", lineNumber(), columnNumber());
 
   return false;
 }

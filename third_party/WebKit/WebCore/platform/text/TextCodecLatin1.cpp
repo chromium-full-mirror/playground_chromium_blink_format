@@ -118,7 +118,11 @@ void TextCodecLatin1::registerCodecs(TextCodecRegistrar registrar) {
   registrar("US-ASCII", newStreamingTextDecoderWindowsLatin1, 0);
 }
 
-String TextCodecLatin1::decode(const char* bytes, size_t length, bool) {
+String TextCodecLatin1::decode(const char* bytes,
+                               size_t length,
+                               bool,
+                               bool,
+                               bool&) {
   StringBuffer characters(length);
 
   // Convert the string a fast way and simultaneously do an efficient check to

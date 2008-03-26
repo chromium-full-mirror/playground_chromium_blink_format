@@ -65,7 +65,11 @@ void TextCodecUTF16::registerCodecs(TextCodecRegistrar registrar) {
   registrar("UTF-16BE", newStreamingTextDecoderUTF16BE, 0);
 }
 
-String TextCodecUTF16::decode(const char* bytes, size_t length, bool) {
+String TextCodecUTF16::decode(const char* bytes,
+                              size_t length,
+                              bool,
+                              bool stopOnError,
+                              bool& sawError) {
   if (!length)
     return String();
 

@@ -45,7 +45,11 @@ class TextCodecICU : public TextCodec {
   TextCodecICU(const TextEncoding&);
   virtual ~TextCodecICU();
 
-  virtual String decode(const char*, size_t length, bool flush = false);
+  virtual String decode(const char*,
+                        size_t length,
+                        bool flush,
+                        bool stopOnError,
+                        bool& sawError);
   virtual CString encode(const UChar*, size_t length, UnencodableHandling);
 
  private:
@@ -55,6 +59,14 @@ class TextCodecICU : public TextCodec {
   void setNeedsGBKFallbacks(bool needsFallbacks) {
     m_needsGBKFallbacks = needsFallbacks;
   }
+
+  int decodeToBuffer(UChar* buffer,
+                     UChar* bufferLimit,
+                     const char*& source,
+                     const char* sourceLimit,
+                     int32_t* offsets,
+                     bool flush,
+                     UErrorCode& err);
 
   TextEncoding m_encoding;
   unsigned m_numBufferedBytes;
