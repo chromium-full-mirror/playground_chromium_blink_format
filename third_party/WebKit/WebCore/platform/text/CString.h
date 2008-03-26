@@ -26,6 +26,8 @@
 #ifndef CString_h
 #define CString_h
 
+#include "SharedBuffer.h"
+
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
@@ -40,6 +42,10 @@ class CStringBuffer : public RefCounted<CStringBuffer> {
 
   char* data() { return m_vector.data(); }
   size_t length() const { return m_vector.size(); }
+
+  PassRefPtr<SharedBuffer> releaseBuffer() {
+    return SharedBuffer::adoptVector(m_vector);
+  }
 
  private:
   CStringBuffer(unsigned length) : m_vector(length) {}
@@ -61,6 +67,8 @@ class CString {
   unsigned length() const;
 
   bool isNull() const { return !m_buffer; }
+
+  PassRefPtr<SharedBuffer> releaseBuffer();
 
  private:
   void copyBufferIfNeeded();

@@ -60,6 +60,8 @@ class SharedBuffer : public RefCounted<SharedBuffer> {
   static PassRefPtr<SharedBuffer> createWithContentsOfFile(
       const String& filePath);
 
+  static PassRefPtr<SharedBuffer> adoptVector(Vector<char>& vector);
+
 #if PLATFORM(MAC)
   NSData* createNSData();
   static PassRefPtr<SharedBuffer> wrapNSData(NSData* data);
