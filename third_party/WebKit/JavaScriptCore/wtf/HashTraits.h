@@ -147,8 +147,12 @@ struct HashTraits<signed char> : GenericHashTraits<int> {
   static signed char deletedValue() { return -1; }
 };
 template <>
-struct HashTraits<short> : GenericHashTraits<int> {
+struct HashTraits<short> : GenericHashTraits<short> {
   static short deletedValue() { return -1; }
+};
+template <>
+struct HashTraits<unsigned short> : GenericHashTraits<unsigned short> {
+  static short deletedValue() { return static_cast<unsigned short>(-1); }
 };
 template <>
 struct HashTraits<int> : GenericHashTraits<int> {
