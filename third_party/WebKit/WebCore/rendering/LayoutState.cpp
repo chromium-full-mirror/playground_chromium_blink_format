@@ -83,10 +83,8 @@ LayoutState::LayoutState(LayoutState* prev,
   // present.
 }
 
-LayoutState::LayoutState(RenderObject* root) {
+LayoutState::LayoutState(RenderObject* root) : m_clipped(false) {
   RenderObject* container = root->container();
-  m_clipped = true;
-  m_clipRect = container->absoluteClippedOverflowRect();
   int x = 0;
   int y = 0;
   container->absolutePosition(x, y);
