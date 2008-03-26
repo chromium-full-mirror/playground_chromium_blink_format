@@ -35,7 +35,10 @@ class CSSValueList : public CSSValue {
   virtual ~CSSValueList();
 
   unsigned length() const { return m_values.size(); }
-  CSSValue* item(unsigned index) { return m_values[index].get(); }
+  CSSValue* item(unsigned);
+  CSSValue* itemWithoutBoundsCheck(unsigned index) {
+    return m_values[index].get();
+  }
 
   virtual bool isValueList() { return true; }
 

@@ -31,6 +31,12 @@ CSSValueList::CSSValueList(bool isSpaceSeparated)
 
 CSSValueList::~CSSValueList() {}
 
+CSSValue* CSSValueList::item(unsigned index) {
+  if (index >= m_values.size())
+    return 0;
+  return m_values[index].get();
+}
+
 unsigned short CSSValueList::cssValueType() const {
   return CSS_VALUE_LIST;
 }

@@ -151,7 +151,7 @@ using namespace HTMLNames;
           currChild = new LayerType();                                      \
           prevChild->setNext(currChild);                                    \
         }                                                                   \
-        map##Prop(currChild, valueList->item(i));                           \
+        map##Prop(currChild, valueList->itemWithoutBoundsCheck(i));         \
         prevChild = currChild;                                              \
         currChild = currChild->next();                                      \
       }                                                                     \
@@ -2381,7 +2381,9 @@ static void applyCounterList(RenderStyle* style,
 
   int length = list ? list->length() : 0;
   for (int i = 0; i < length; ++i) {
-    Pair* pair = static_cast<CSSPrimitiveValue*>(list->item(i))->getPairValue();
+    Pair* pair =
+        static_cast<CSSPrimitiveValue*>(list->itemWithoutBoundsCheck(i))
+            ->getPairValue();
     AtomicString identifier =
         static_cast<CSSPrimitiveValue*>(pair->first())->getStringValue();
     // FIXME: What about overflow?
@@ -2801,7 +2803,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         int len = list->length();
         m_style->setCursor(CURSOR_AUTO);
         for (int i = 0; i < len; i++) {
-          CSSValue* item = list->item(i);
+          CSSValue* item = list->itemWithoutBoundsCheck(i);
           if (!item->isPrimitiveValue())
             continue;
           primitiveValue = static_cast<CSSPrimitiveValue*>(item);
@@ -3589,7 +3591,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
         bool didSet = false;
         for (int i = 0; i < len; i++) {
-          CSSValue* item = list->item(i);
+          CSSValue* item = list->itemWithoutBoundsCheck(i);
           if (!item->isPrimitiveValue())
             continue;
 
@@ -3692,7 +3694,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       fontDescription.setGenericFamily(FontDescription::NoFamily);
 
       for (int i = 0; i < len; i++) {
-        CSSValue* item = list->item(i);
+        CSSValue* item = list->itemWithoutBoundsCheck(i);
         if (!item->isPrimitiveValue())
           continue;
         CSSPrimitiveValue* val = static_cast<CSSPrimitiveValue*>(item);
@@ -3769,7 +3771,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         CSSValueList* list = static_cast<CSSValueList*>(value);
         int len = list->length();
         for (int i = 0; i < len; i++) {
-          CSSValue* item = list->item(i);
+          CSSValue* item = list->itemWithoutBoundsCheck(i);
           if (!item->isPrimitiveValue())
             continue;
           primitiveValue = static_cast<CSSPrimitiveValue*>(item);
@@ -4033,7 +4035,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       CSSValueList* list = static_cast<CSSValueList*>(value);
       bool firstBinding = true;
       for (unsigned int i = 0; i < list->length(); i++) {
-        CSSValue* item = list->item(i);
+        CSSValue* item = list->itemWithoutBoundsCheck(i);
         CSSPrimitiveValue* val = static_cast<CSSPrimitiveValue*>(item);
         if (val->primitiveType() == CSSPrimitiveValue::CSS_URI) {
           if (firstBinding) {
@@ -4227,7 +4229,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       CSSValueList* list = static_cast<CSSValueList*>(value);
       int len = list->length();
       for (int i = 0; i < len; i++) {
-        ShadowValue* item = static_cast<ShadowValue*>(list->item(i));
+        ShadowValue* item =
+            static_cast<ShadowValue*>(list->itemWithoutBoundsCheck(i));
         int x = item->x->computeLengthInt(m_style, zoomFactor);
         int y = item->y->computeLengthInt(m_style, zoomFactor);
         int blur =
@@ -4655,11 +4658,11 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         unsigned size = list->length();
         for (unsigned i = 0; i < size; i++) {
           CSSTransformValue* val =
-              static_cast<CSSTransformValue*>(list->item(i));
+              static_cast<CSSTransformValue*>(list->itemWithoutBoundsCheck(i));
           CSSValueList* values = val->values();
 
-          CSSPrimitiveValue* firstValue =
-              static_cast<CSSPrimitiveValue*>(values->item(0));
+          CSSPrimitiveValue* firstValue = static_cast<CSSPrimitiveValue*>(
+              values->itemWithoutBoundsCheck(0));
 
           switch (val->type()) {
             case CSSTransformValue::ScaleTransformOperation:
@@ -4674,7 +4677,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                 if (val->type() == CSSTransformValue::ScaleTransformOperation) {
                   if (values->length() > 1) {
                     CSSPrimitiveValue* secondValue =
-                        static_cast<CSSPrimitiveValue*>(values->item(1));
+                        static_cast<CSSPrimitiveValue*>(
+                            values->itemWithoutBoundsCheck(1));
                     sy = secondValue->getDoubleValue();
                   } else
                     sy = sx;
@@ -4701,7 +4705,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                     CSSTransformValue::TranslateTransformOperation) {
                   if (values->length() > 1) {
                     CSSPrimitiveValue* secondValue =
-                        static_cast<CSSPrimitiveValue*>(values->item(1));
+                        static_cast<CSSPrimitiveValue*>(
+                            values->itemWithoutBoundsCheck(1));
                     ty = convertToLength(secondValue, m_style, &ok);
                   } else
                     ty = tx;
@@ -4743,7 +4748,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                 if (val->type() == CSSTransformValue::SkewTransformOperation) {
                   if (values->length() > 1) {
                     CSSPrimitiveValue* secondValue =
-                        static_cast<CSSPrimitiveValue*>(values->item(1));
+                        static_cast<CSSPrimitiveValue*>(
+                            values->itemWithoutBoundsCheck(1));
                     angleY = secondValue->getDoubleValue();
                     if (secondValue->primitiveType() ==
                         CSSPrimitiveValue::CSS_RAD)
@@ -4762,16 +4768,16 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
               break;
             }
             case CSSTransformValue::MatrixTransformOperation: {
-              CSSPrimitiveValue* secondValue =
-                  static_cast<CSSPrimitiveValue*>(values->item(1));
-              CSSPrimitiveValue* thirdValue =
-                  static_cast<CSSPrimitiveValue*>(values->item(2));
-              CSSPrimitiveValue* fourthValue =
-                  static_cast<CSSPrimitiveValue*>(values->item(3));
-              CSSPrimitiveValue* fifthValue =
-                  static_cast<CSSPrimitiveValue*>(values->item(4));
-              CSSPrimitiveValue* sixthValue =
-                  static_cast<CSSPrimitiveValue*>(values->item(5));
+              CSSPrimitiveValue* secondValue = static_cast<CSSPrimitiveValue*>(
+                  values->itemWithoutBoundsCheck(1));
+              CSSPrimitiveValue* thirdValue = static_cast<CSSPrimitiveValue*>(
+                  values->itemWithoutBoundsCheck(2));
+              CSSPrimitiveValue* fourthValue = static_cast<CSSPrimitiveValue*>(
+                  values->itemWithoutBoundsCheck(3));
+              CSSPrimitiveValue* fifthValue = static_cast<CSSPrimitiveValue*>(
+                  values->itemWithoutBoundsCheck(4));
+              CSSPrimitiveValue* sixthValue = static_cast<CSSPrimitiveValue*>(
+                  values->itemWithoutBoundsCheck(5));
               MatrixTransformOperation* matrix = new MatrixTransformOperation(
                   firstValue->getDoubleValue(), secondValue->getDoubleValue(),
                   thirdValue->getDoubleValue(), fourthValue->getDoubleValue(),
