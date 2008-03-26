@@ -1833,21 +1833,21 @@ void InspectorController::didFinishLoading(DocumentLoader* loader,
   if (!enabled())
     return;
 
-  InspectorResource* resource = m_resources.get(identifier).get();
+  RefPtr<InspectorResource> resource = m_resources.get(identifier);
   if (!resource)
     return;
 
-  removeResource(resource);
+  removeResource(resource.get());
 
   resource->finished = true;
   resource->endTime = currentTime();
 
-  addResource(resource);
+  addResource(resource.get());
 
   if (windowVisible() && resource->scriptObject) {
-    updateScriptResource(resource, resource->startTime,
+    updateScriptResource(resource.get(), resource->startTime,
                          resource->responseReceivedTime, resource->endTime);
-    updateScriptResource(resource, resource->finished);
+    updateScriptResource(resource.get(), resource->finished);
   }
 }
 
@@ -1857,22 +1857,22 @@ void InspectorController::didFailLoading(DocumentLoader* loader,
   if (!enabled())
     return;
 
-  InspectorResource* resource = m_resources.get(identifier).get();
+  RefPtr<InspectorResource> resource = m_resources.get(identifier);
   if (!resource)
     return;
 
-  removeResource(resource);
+  removeResource(resource.get());
 
   resource->finished = true;
   resource->failed = true;
   resource->endTime = currentTime();
 
-  addResource(resource);
+  addResource(resource.get());
 
   if (windowVisible() && resource->scriptObject) {
-    updateScriptResource(resource, resource->startTime,
+    updateScriptResource(resource.get(), resource->startTime,
                          resource->responseReceivedTime, resource->endTime);
-    updateScriptResource(resource, resource->finished, resource->failed);
+    updateScriptResource(resource.get(), resource->finished, resource->failed);
   }
 }
 
