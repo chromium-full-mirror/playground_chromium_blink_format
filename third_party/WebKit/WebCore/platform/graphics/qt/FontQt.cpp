@@ -171,6 +171,13 @@ float Font::floatWidth(const TextRun& run) const {
   return width(run);
 }
 
+float Font::floatWidth(const TextRun& run,
+                       int /*extraCharsAvailable*/,
+                       int& charsConsumed) const {
+  charsConsumed = run.length();
+  return width(run);
+}
+
 int Font::offsetForPosition(const TextRun& run,
                             int position,
                             bool /*includePartialGlyphs*/) const {
@@ -475,6 +482,13 @@ int Font::width(const TextRun& run) const {
 }
 
 float Font::floatWidth(const TextRun& run) const {
+  return width(run);
+}
+
+float Font::floatWidth(const TextRun& run,
+                       int /*extraCharsAvailable*/,
+                       int& charsConsumed) const {
+  charsConsumed = run.length();
   return width(run);
 }
 
