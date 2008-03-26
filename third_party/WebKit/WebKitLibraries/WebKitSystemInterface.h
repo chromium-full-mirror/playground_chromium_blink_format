@@ -153,6 +153,8 @@ void WKGetFontMetrics(CGFontRef font,
 CGFontRef WKGetCGFontFromNSFont(NSFont* font);
 // CTFontGetPlatformFont was not available until Leopard
 ATSUFontID WKGetNSFontATSUFontId(NSFont* font);
+// CGFontCopyFullName was not available until Leopard
+CFStringRef WKCopyFullFontName(CGFontRef font);
 #endif
 
 void WKSetPatternBaseCTM(CGContextRef, CGAffineTransform);

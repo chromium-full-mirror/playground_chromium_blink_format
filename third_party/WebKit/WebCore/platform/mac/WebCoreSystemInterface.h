@@ -183,6 +183,7 @@ extern void (*wkGetFontMetrics)(CGFontRef,
                                 int* descent,
                                 int* lineGap,
                                 unsigned* unitsPerEm);
+extern CFStringRef (*wkCopyFullFontName)(CGFontRef font);
 extern BOOL (*wkSupportsMultipartXMixedReplace)(NSMutableURLRequest*);
 #endif
 
