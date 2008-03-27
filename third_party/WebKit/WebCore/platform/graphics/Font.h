@@ -48,6 +48,7 @@ class GraphicsContext;
 class IntPoint;
 class RenderObject;
 class SimpleFontData;
+class SVGFontElement;
 class SVGPaintServer;
 
 struct GlyphData;
@@ -205,7 +206,8 @@ class Font {
   float floatWidth(const TextRun&) const;
   float floatWidth(const TextRun& run,
                    int extraCharsAvailable,
-                   int& charsConsumed) const;
+                   int& charsConsumed,
+                   String& glyphName) const;
 
   int offsetForPosition(const TextRun&,
                         int position,
@@ -290,7 +292,8 @@ class Font {
   float floatWidthUsingSVGFont(const TextRun&) const;
   float floatWidthUsingSVGFont(const TextRun&,
                                int extraCharsAvailable,
-                               int& charsConsumed) const;
+                               int& charsConsumed,
+                               String& glyphName) const;
   FloatRect selectionRectForTextUsingSVGFont(const TextRun&,
                                              const IntPoint&,
                                              int h,
@@ -358,6 +361,11 @@ class Font {
     return c < 0x20 || (c >= 0x7F && c < 0xA0) || c == 0x200e || c == 0x200f ||
            c >= 0x202a && c <= 0x202e;
   }
+
+#if ENABLE(SVG_FONTS)
+  bool isSVGFont() const;
+  SVGFontElement* svgFont() const;
+#endif
 
  private:
   FontDescription m_fontDescription;

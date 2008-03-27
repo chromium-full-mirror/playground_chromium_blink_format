@@ -44,7 +44,7 @@ void SVGGlyphElement::insertedIntoDocument() {
   Node* fontNode = parentNode();
   if (fontNode && fontNode->hasTagName(fontTag)) {
     if (SVGFontElement* element = static_cast<SVGFontElement*>(fontNode))
-      element->addGlyphToCache(this);
+      element->invalidateGlyphCache();
   }
   SVGStyledElement::insertedIntoDocument();
 }
@@ -53,7 +53,7 @@ void SVGGlyphElement::removedFromDocument() {
   Node* fontNode = parentNode();
   if (fontNode && fontNode->hasTagName(fontTag)) {
     if (SVGFontElement* element = static_cast<SVGFontElement*>(fontNode))
-      element->removeGlyphFromCache(this);
+      element->invalidateGlyphCache();
   }
   SVGStyledElement::removedFromDocument();
 }

@@ -84,7 +84,8 @@ class SVGInlineTextBox : public InlineTextBox {
   float calculateGlyphWidth(RenderStyle* style,
                             int offset,
                             int extraCharsAvailable,
-                            int& charsConsumed) const;
+                            int& charsConsumed,
+                            String& glyphName) const;
   float calculateGlyphHeight(RenderStyle*,
                              int offset,
                              int extraCharsAvailable) const;
