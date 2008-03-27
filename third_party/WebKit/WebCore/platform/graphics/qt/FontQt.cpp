@@ -173,8 +173,10 @@ float Font::floatWidth(const TextRun& run) const {
 
 float Font::floatWidth(const TextRun& run,
                        int /*extraCharsAvailable*/,
-                       int& charsConsumed) const {
+                       int& charsConsumed,
+                       String& glyphName) const {
   charsConsumed = run.length();
+  glyphName = "";
   return width(run);
 }
 
