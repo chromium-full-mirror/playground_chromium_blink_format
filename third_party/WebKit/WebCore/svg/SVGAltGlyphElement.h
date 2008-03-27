@@ -28,6 +28,8 @@
 #include "SVGURIReference.h"
 
 namespace WebCore {
+class SVGGlyphElement;
+
 class SVGAltGlyphElement : public SVGTextPositioningElement,
                            public SVGURIReference {
  public:
@@ -41,6 +43,8 @@ class SVGAltGlyphElement : public SVGTextPositioningElement,
   void setGlyphRef(const AtomicString&, ExceptionCode&);
   const AtomicString& format() const;
   void setFormat(const AtomicString&, ExceptionCode&);
+
+  SVGGlyphElement* glyphElement() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

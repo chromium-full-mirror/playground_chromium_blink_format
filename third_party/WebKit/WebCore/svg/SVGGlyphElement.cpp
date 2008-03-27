@@ -46,6 +46,7 @@ void SVGGlyphElement::insertedIntoDocument() {
     if (SVGFontElement* element = static_cast<SVGFontElement*>(fontNode))
       element->addGlyphToCache(this);
   }
+  SVGStyledElement::insertedIntoDocument();
 }
 
 void SVGGlyphElement::removedFromDocument() {
@@ -54,6 +55,7 @@ void SVGGlyphElement::removedFromDocument() {
     if (SVGFontElement* element = static_cast<SVGFontElement*>(fontNode))
       element->removeGlyphFromCache(this);
   }
+  SVGStyledElement::removedFromDocument();
 }
 
 static inline SVGGlyphIdentifier::ArabicForm parseArabicForm(

@@ -27,7 +27,9 @@
 #include "ExceptionCode.h"
 #include "RenderInline.h"
 #include "RenderSVGTSpan.h"
+#include "SVGGlyphElement.h"
 #include "SVGNames.h"
+#include "XLinkNames.h"
 
 namespace WebCore {
 
@@ -58,13 +60,20 @@ const AtomicString& SVGAltGlyphElement::format() const {
 bool SVGAltGlyphElement::childShouldCreateRenderer(Node* child) const {
   if (child->isTextNode())
     return true;
-
   return false;
 }
 
 RenderObject* SVGAltGlyphElement::createRenderer(RenderArena* arena,
                                                  RenderStyle*) {
   return new (arena) RenderSVGTSpan(this);
+}
+
+SVGGlyphElement* SVGAltGlyphElement::glyphElement() const {
+  Element* elt =
+      document()->getElementById(getTarget(getAttribute(XLinkNames::hrefAttr)));
+  if (!elt || !elt->hasTagName(SVGNames::glyphTag))
+    return 0;
+  return static_cast<SVGGlyphElement*>(elt);
 }
 }
 
