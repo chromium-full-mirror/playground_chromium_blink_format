@@ -191,13 +191,14 @@ typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
 #endif
 
 #if ENABLE(SVG_FONTS)
-#define FOR_EACH_FONT_TAG(macro)                                         \
-  macro(definition_src, DefinitionSrc) macro(font, Font)                 \
-      macro(font_face, FontFace) macro(font_face_format, FontFaceFormat) \
-          macro(font_face_name, FontFaceName)                            \
-              macro(font_face_src, FontFaceSrc)                          \
-                  macro(font_face_uri, FontFaceUri) macro(glyph, Glyph)  \
-                      macro(missing_glyph, MissingGlyph)
+#define FOR_EACH_FONT_TAG(macro)                                            \
+  macro(altGlyph, AltGlyph) macro(definition_src, DefinitionSrc)            \
+      macro(font, Font) macro(font_face, FontFace)                          \
+          macro(font_face_format, FontFaceFormat)                           \
+              macro(font_face_name, FontFaceName)                           \
+                  macro(font_face_src, FontFaceSrc)                         \
+                      macro(font_face_uri, FontFaceUri) macro(glyph, Glyph) \
+                          macro(missing_glyph, MissingGlyph)
 // end of macro
 
 #else
@@ -233,21 +234,21 @@ typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
 #define FOR_EACH_FOREIGN_OBJECT_TAG(macro)
 #endif
 
-#define FOR_EACH_TAG(macro)                                                    \
-  macro(a, A) macro(altGlyph, AltGlyph) macro(circle, Circle)                  \
-      macro(clipPath, ClipPath) macro(cursor, Cursor) macro(defs, Defs) macro( \
-          desc, Desc) macro(ellipse, Ellipse) macro(g, G) macro(image, Image)  \
-          macro(linearGradient, LinearGradient) macro(line, Line) macro(       \
-              marker, Marker) macro(mask, Mask) macro(metadata, Metadata)      \
-              macro(path, Path) macro(pattern, Pattern)                        \
-                  macro(polyline, Polyline) macro(polygon, Polygon) macro(     \
-                      radialGradient, RadialGradient) macro(rect, Rect)        \
-                      macro(script, Script) macro(set, Set) macro(stop, Stop)  \
-                          macro(style, Style) macro(svg, SVG) macro(           \
-                              switch, Switch) macro(symbol, Symbol)            \
-                              macro(text, Text) macro(textPath, TextPath)      \
-                                  macro(title, Title) macro(tref, TRef)        \
-                                      macro(tspan, TSpan) macro(use, Use)      \
+#define FOR_EACH_TAG(macro)                                                   \
+  macro(a, A) macro(circle, Circle) macro(clipPath, ClipPath)                 \
+      macro(cursor, Cursor) macro(defs, Defs) macro(desc, Desc) macro(        \
+          ellipse, Ellipse) macro(g, G) macro(image, Image)                   \
+          macro(linearGradient, LinearGradient) macro(line, Line) macro(      \
+              marker, Marker) macro(mask, Mask) macro(metadata, Metadata)     \
+              macro(path, Path) macro(pattern, Pattern)                       \
+                  macro(polyline, Polyline) macro(polygon, Polygon) macro(    \
+                      radialGradient, RadialGradient) macro(rect, Rect)       \
+                      macro(script, Script) macro(set, Set) macro(stop, Stop) \
+                          macro(style, Style) macro(svg, SVG) macro(          \
+                              switch, Switch) macro(symbol, Symbol)           \
+                              macro(text, Text) macro(textPath, TextPath)     \
+                                  macro(title, Title) macro(tref, TRef)       \
+                                      macro(tspan, TSpan) macro(use, Use)     \
                                           macro(view, View)  // end of macro
 
 #define CREATE_WRAPPER_FUNCTION(tag, name)                               \

@@ -37,8 +37,11 @@ SVGTSpanElement::SVGTSpanElement(const QualifiedName& tagName, Document* doc)
 SVGTSpanElement::~SVGTSpanElement() {}
 
 bool SVGTSpanElement::childShouldCreateRenderer(Node* child) const {
-  if (child->isTextNode() || child->hasTagName(SVGNames::altGlyphTag) ||
-      child->hasTagName(SVGNames::tspanTag) ||
+  if (child->isTextNode()
+#if ENABLE(SVG_FONTS)
+      || child->hasTagName(SVGNames::altGlyphTag)
+#endif
+      || child->hasTagName(SVGNames::tspanTag) ||
       child->hasTagName(SVGNames::trefTag) ||
       child->hasTagName(SVGNames::textPathTag))
     return true;

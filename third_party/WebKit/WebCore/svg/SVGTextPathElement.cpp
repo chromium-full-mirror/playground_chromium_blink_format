@@ -98,8 +98,11 @@ RenderObject* SVGTextPathElement::createRenderer(RenderArena* arena,
 }
 
 bool SVGTextPathElement::childShouldCreateRenderer(Node* child) const {
-  if (child->isTextNode() || child->hasTagName(SVGNames::altGlyphTag) ||
-      child->hasTagName(SVGNames::trefTag) ||
+  if (child->isTextNode()
+#if ENABLE(SVG_FONTS)
+      || child->hasTagName(SVGNames::altGlyphTag)
+#endif
+      || child->hasTagName(SVGNames::trefTag) ||
       child->hasTagName(SVGNames::tspanTag) ||
       child->hasTagName(SVGNames::textPathTag))
     return true;

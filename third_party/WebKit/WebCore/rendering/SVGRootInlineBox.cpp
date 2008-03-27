@@ -1402,11 +1402,13 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
       }
     }
 
+    double kerning = 0.0;
+    lastGlyph.isValid = false;
+#if ENABLE(SVG_FONTS)
     SVGFontElement* svgFont = 0;
     if (style->font().isSVGFont())
       svgFont = style->font().svgFont();
 
-    double kerning = 0.0;
     if (lastGlyph.isValid && style->font().isSVGFont()) {
       SVGHorizontalKerningPair kerningPair;
       if (svgFont->getHorizontalKerningPairForStringsAndGlyphs(
@@ -1419,9 +1421,8 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
       lastGlyph.unicode = unicodeStr;
       lastGlyph.glyphName = glyphName;
       lastGlyph.isValid = true;
-    } else {
-      lastGlyph.isValid = false;
     }
+#endif
 
     svgChar.x -= (float)kerning;
 
