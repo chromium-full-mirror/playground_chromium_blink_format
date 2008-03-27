@@ -332,6 +332,7 @@ bool HTMLParser::insertNode(Node* n, bool flat) {
       // also
       // assumes that newNode is neither 0 nor a pointer to the document.
       pushBlock(localName, tagPriority);
+      newNode->beginParsingChildren();
       ASSERT(!didRefCurrent);
       newNode->ref();
       current = newNode;
@@ -428,6 +429,7 @@ bool HTMLParser::handleError(Node* n,
                       &current->localName());
 
         pushBlock(localName, tagPriority);
+        newNode->beginParsingChildren();
         setCurrent(newNode);
         if (!n->attached() && !m_isParsingFragment)
           n->attach();
@@ -577,6 +579,7 @@ bool HTMLParser::handleError(Node* n,
                 static_cast<HTMLElement*>(n)->endTagRequirement() !=
                     TagStatusForbidden) {
               pushBlock(localName, tagPriority);
+              n->beginParsingChildren();
               setCurrent(n);
               inStrayTableContent++;
               blockStack->strayTableContent = true;
@@ -1277,6 +1280,7 @@ void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
 
     // Now push a new stack element for this node we just created.
     pushBlock(elem->tagName, elem->level);
+    newNode->beginParsingChildren();
 
     // Set our strayTableContent boolean if needed, so that the reopened tag
     // also knows
@@ -1300,7 +1304,6 @@ void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
 }
 
 void HTMLParser::pushBlock(const AtomicString& tagName, int level) {
-  current->beginParsingChildren();
   blockStack =
       new HTMLStackElem(tagName, level, current, didRefCurrent, blockStack);
   didRefCurrent = false;
