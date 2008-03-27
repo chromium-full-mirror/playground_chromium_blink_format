@@ -302,7 +302,6 @@ String TextCodecICU::decode(const char* bytes,
                      err);
     } while (source < sourceLimit);
     sawError = true;
-    LOG_ERROR("ICU conversion error");
   }
 
   String resultString = String::adopt(result);
