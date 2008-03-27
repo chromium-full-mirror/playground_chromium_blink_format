@@ -190,6 +190,10 @@ class SVGAnimationElement : public SVGElement,
     FloatPoint control1;
     FloatPoint control2;
   };
+
+  double m_animationBegin;
+  double m_animationEnd;
+
   Vector<KeySpline> m_keySplines;
 };
 
