@@ -75,6 +75,8 @@ class HTMLEmbedElement : public HTMLPlugInElement {
   const String& url() const { return m_url; }
   const String& serviceType() const { return m_serviceType; }
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
  private:
   String m_url;
   String m_pluginPage;

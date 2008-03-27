@@ -86,4 +86,13 @@ String HTMLParamElement::valueType() const {
 void HTMLParamElement::setValueType(const String& value) {
   setAttribute(valuetypeAttr, value);
 }
+
+void HTMLParamElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  if (!equalIgnoringCase(name(), "data") &&
+      !equalIgnoringCase(name(), "movie") && !equalIgnoringCase(name(), "src"))
+    return;
+
+  urls.append(value());
+}
 }

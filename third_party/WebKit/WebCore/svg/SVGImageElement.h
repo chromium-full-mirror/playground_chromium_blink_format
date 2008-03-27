@@ -54,6 +54,8 @@ class SVGImageElement : public SVGStyledTransformableElement,
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
  protected:
   virtual bool haveLoadedRequiredResources();
 

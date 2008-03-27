@@ -170,6 +170,11 @@ void SVGImageElement::attach() {
   if (RenderSVGImage* imageObj = static_cast<RenderSVGImage*>(renderer()))
     imageObj->setCachedImage(m_imageLoader.image());
 }
+
+void SVGImageElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  urls.append(href());
+}
 }
 
 #endif  // ENABLE(SVG)

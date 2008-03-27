@@ -112,6 +112,8 @@ class HTMLObjectElement : public HTMLPlugInElement {
 
   bool containsJavaApplet() const;
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
   String m_serviceType;
   String m_url;
   String m_classId;

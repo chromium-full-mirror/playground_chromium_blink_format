@@ -98,6 +98,8 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
                                    bool& alternate,
                                    bool& icon);
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
  protected:
   CachedCSSStyleSheet* m_cachedSheet;
   RefPtr<CSSStyleSheet> m_sheet;

@@ -224,4 +224,9 @@ String HTMLEmbedElement::type() const {
 void HTMLEmbedElement::setType(const String& value) {
   setAttribute(typeAttr, value);
 }
+
+void HTMLEmbedElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  urls.append(src());
+}
 }

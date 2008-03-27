@@ -48,6 +48,8 @@ class SVGCursorElement : public SVGElement,
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 

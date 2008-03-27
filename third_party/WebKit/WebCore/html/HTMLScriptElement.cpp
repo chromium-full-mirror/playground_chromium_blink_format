@@ -312,4 +312,9 @@ String HTMLScriptElement::scriptCharset() const {
   }
   return charset;
 }
+
+void HTMLScriptElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  urls.append(src().string());
+}
 }

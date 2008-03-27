@@ -102,6 +102,8 @@ class HTMLTableCellElement : public HTMLTablePartElement {
   String width() const;
   void setWidth(const String&);
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
  protected:
   int _row;
   int _col;

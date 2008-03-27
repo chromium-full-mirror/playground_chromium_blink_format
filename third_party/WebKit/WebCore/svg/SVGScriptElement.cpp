@@ -55,6 +55,11 @@ void SVGScriptElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGElement::parseMappedAttribute(attr);
   }
 }
+
+void SVGScriptElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  urls.append(href());
+}
 }
 
 // vim:ts=4:noet

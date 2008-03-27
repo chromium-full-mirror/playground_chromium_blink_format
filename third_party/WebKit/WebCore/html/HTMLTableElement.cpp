@@ -736,4 +736,9 @@ String HTMLTableElement::width() const {
 void HTMLTableElement::setWidth(const String& value) {
   setAttribute(widthAttr, value);
 }
+
+void HTMLTableElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  urls.append(getAttribute(HTMLNames::backgroundAttr).string());
+}
 }

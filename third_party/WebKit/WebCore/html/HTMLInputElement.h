@@ -204,6 +204,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
 
   virtual void didRestoreFromCache();
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
  protected:
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();

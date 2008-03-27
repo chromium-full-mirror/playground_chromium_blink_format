@@ -111,6 +111,8 @@ class Node : public TreeShared<Node> {
 
   virtual KURL baseURI() const;
 
+  void getSubresourceURLs(Vector<KURL>&) const;
+
   // These should all actually return a node, but this is only important for
   // language bindings,
   // which will already know and hold a ref on the right node to return.
@@ -533,6 +535,8 @@ class Node : public TreeShared<Node> {
  protected:
   virtual void willMoveToNewOwnerDocument() {}
   virtual void didMoveToNewOwnerDocument() {}
+
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const {}
 
   OwnPtr<NodeListsNodeData> m_nodeLists;
 

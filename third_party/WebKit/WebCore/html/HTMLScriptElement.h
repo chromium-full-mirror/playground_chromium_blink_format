@@ -85,6 +85,8 @@ class HTMLScriptElement : public HTMLElement, public CachedResourceClient {
   // BOM).
   String scriptCharset() const;
 
+  virtual void getSubresourceAttributeStrings(Vector<String>&) const;
+
  private:
   CachedScript* m_cachedScript;
   bool m_createdByParser;

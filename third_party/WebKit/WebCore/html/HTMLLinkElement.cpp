@@ -331,4 +331,12 @@ String HTMLLinkElement::type() const {
 void HTMLLinkElement::setType(const String& value) {
   setAttribute(typeAttr, value);
 }
+
+void HTMLLinkElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  if (!m_isStyleSheet && !m_isIcon)
+    return;
+
+  urls.append(href().string());
+}
 }

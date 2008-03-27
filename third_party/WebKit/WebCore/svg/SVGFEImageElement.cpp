@@ -105,6 +105,11 @@ SVGFEImage* SVGFEImageElement::filterEffect(SVGResourceFilter* filter) const {
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;
 }
+
+bool SVGFEImageElement::getSubresourceAttributeStrings(
+    Vector<String>& urls) const {
+  urls.append(href());
+}
 }
 
 #endif  // ENABLE(SVG)
