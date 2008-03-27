@@ -38,7 +38,6 @@
 #include "FrameView.h"
 #include "GCController.h"
 #include "JSDOMWindow.h"
-#include "JSLocation.h"
 #include "Logging.h"
 #include "Page.h"
 #include "PausedTimeouts.h"
@@ -82,7 +81,6 @@ CachedPage::CachedPage(Page* page)
       m_mousePressNode(page->mainFrame()->eventHandler()->mousePressNode()),
       m_URL(page->mainFrame()->loader()->url()),
       m_windowProperties(new SavedProperties),
-      m_locationProperties(new SavedProperties),
       m_windowLocalStorage(new SavedProperties),
       m_windowBuiltins(new SavedBuiltins) {
 #ifndef NDEBUG
@@ -102,7 +100,6 @@ CachedPage::CachedPage(Page* page)
     window->saveBuiltins(*m_windowBuiltins.get());
     window->saveProperties(*m_windowProperties.get());
     window->saveLocalStorage(*m_windowLocalStorage.get());
-    window->location()->saveProperties(*m_locationProperties.get());
     m_pausedTimeouts.set(window->pauseTimeouts());
   }
 
@@ -134,7 +131,6 @@ void CachedPage::restore(Page* page) {
     window->restoreBuiltins(*m_windowBuiltins.get());
     window->restoreProperties(*m_windowProperties.get());
     window->restoreLocalStorage(*m_windowLocalStorage.get());
-    window->location()->restoreProperties(*m_locationProperties.get());
     window->resumeTimeouts(m_pausedTimeouts.get());
   }
 
@@ -189,7 +185,6 @@ void CachedPage::clear() {
   JSLock lock;
 
   m_windowProperties.clear();
-  m_locationProperties.clear();
   m_windowBuiltins.clear();
   m_pausedTimeouts.clear();
   m_cachedPagePlatformData.clear();

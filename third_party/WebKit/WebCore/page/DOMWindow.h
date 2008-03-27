@@ -44,6 +44,7 @@ class Element;
 class FloatRect;
 class Frame;
 class History;
+class Location;
 class Navigator;
 class Screen;
 
@@ -76,6 +77,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
   BarInfo* toolbar() const;
   Navigator* navigator() const;
   Navigator* clientInformation() const { return navigator(); }
+  Location* location() const;
 
   DOMSelection* getSelection();
 
@@ -192,6 +194,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
   BarInfo* optionalToolbar() const { return m_toolbar.get(); }
   Console* optionalConsole() const { return m_console.get(); }
   Navigator* optionalNavigator() const { return m_navigator.get(); }
+  Location* optionalLocation() const { return m_location.get(); }
 
  private:
   DOMWindow(Frame*);
@@ -208,6 +211,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
   mutable RefPtr<BarInfo> m_toolbar;
   mutable RefPtr<Console> m_console;
   mutable RefPtr<Navigator> m_navigator;
+  mutable RefPtr<Location> m_location;
 };
 
 }  // namespace WebCore
