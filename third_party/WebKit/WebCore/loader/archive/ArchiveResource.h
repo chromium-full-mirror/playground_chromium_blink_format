@@ -42,6 +42,9 @@ class ArchiveResource : public RefCounted<ArchiveResource> {
  public:
   static PassRefPtr<ArchiveResource> create(PassRefPtr<SharedBuffer>,
                                             const KURL&,
+                                            const ResourceResponse&);
+  static PassRefPtr<ArchiveResource> create(PassRefPtr<SharedBuffer>,
+                                            const KURL&,
                                             const String& mimeType,
                                             const String& textEncoding,
                                             const String& frameName);
@@ -66,6 +69,9 @@ class ArchiveResource : public RefCounted<ArchiveResource> {
   }
 
  private:
+  ArchiveResource(PassRefPtr<SharedBuffer>,
+                  const KURL&,
+                  const ResourceResponse&);
   ArchiveResource(PassRefPtr<SharedBuffer>,
                   const KURL&,
                   const String& mimeType,
