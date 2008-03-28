@@ -157,6 +157,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   String m_encoding;
 
   RefPtr<TextResourceDecoder> m_decoder;
+  unsigned long m_identifier;
 
   // Unlike most strings in the DOM, we keep this as a KJS::UString, not a
   // WebCore::String.

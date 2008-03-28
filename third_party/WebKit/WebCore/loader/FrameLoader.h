@@ -201,10 +201,10 @@ class FrameLoader : Noncopyable
                       const WindowFeatures&,
                       bool& created);
 
-  void loadResourceSynchronously(const ResourceRequest&,
-                                 ResourceError&,
-                                 ResourceResponse&,
-                                 Vector<char>& data);
+  unsigned long loadResourceSynchronously(const ResourceRequest&,
+                                          ResourceError&,
+                                          ResourceResponse&,
+                                          Vector<char>& data);
 
   bool canHandleRequest(const ResourceRequest&);
 
