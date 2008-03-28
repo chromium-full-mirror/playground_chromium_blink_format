@@ -223,8 +223,6 @@ _documentFragmentWithMarkupString:(NSString*)markupString
 - (void)_dragSourceEndedAt:(NSPoint)windowLoc
                  operation:(NSDragOperation)operation;
 
-- (void)_getAllResourceDatas:(NSArray**)datas andResponses:(NSArray**)responses;
-
 - (BOOL)_canProvideDocumentSource;
 - (BOOL)_canSaveAsWebArchive;
 
