@@ -35,6 +35,9 @@
 
 namespace WebCore {
 
+class Frame;
+class Node;
+
 class LegacyWebArchive : public Archive {
  public:
   static PassRefPtr<LegacyWebArchive> create();
@@ -43,6 +46,11 @@ class LegacyWebArchive : public Archive {
       PassRefPtr<ArchiveResource> mainResource,
       Vector<PassRefPtr<ArchiveResource>>& subresources,
       Vector<PassRefPtr<LegacyWebArchive>>& subframeArchives);
+  static PassRefPtr<LegacyWebArchive> create(Node*);
+  static PassRefPtr<LegacyWebArchive> create(Frame*);
+  static PassRefPtr<LegacyWebArchive> create(const String& markupString,
+                                             Frame*,
+                                             Vector<Node*>& nodes);
 
   RetainPtr<CFDataRef> rawDataRepresentation();
 
