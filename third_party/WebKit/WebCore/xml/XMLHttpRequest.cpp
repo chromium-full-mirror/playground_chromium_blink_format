@@ -447,8 +447,8 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
       // thread
       KJS::JSLock::DropAllLocks dropLocks;
       if (m_doc->frame())
-        m_doc->frame()->loader()->loadResourceSynchronously(request, error,
-                                                            response, data);
+        m_identifier = m_doc->frame()->loader()->loadResourceSynchronously(
+            request, error, response, data);
     }
 
     m_loader = 0;
@@ -706,6 +706,12 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
     KJS::JSLock lock;
     if (m_decoder)
       m_responseText += m_decoder->flush();
+  }
+
+  if (Frame* frame = m_doc->frame()) {
+    if (Page* page = frame->page())
+      page->inspectorController()->resourceRetrievedByXMLHttpRequest(
+          m_loader ? m_loader->identifier() : m_identifier, m_responseText);
   }
 
   if (Frame* frame = m_doc->frame()) {
