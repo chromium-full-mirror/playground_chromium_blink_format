@@ -28,6 +28,7 @@
 #include "array_object.h"
 #include "collector.h"
 #include "function.h"
+#include "InitializeThreading.h"
 #include "interpreter.h"
 #include "nodes.h"
 #include "object.h"
@@ -344,6 +345,8 @@ static void parseArguments(int argc,
 }
 
 int kjsmain(int argc, char** argv) {
+  initializeThreading();
+
   JSLock lock;
 
   bool prettyPrint = false;
