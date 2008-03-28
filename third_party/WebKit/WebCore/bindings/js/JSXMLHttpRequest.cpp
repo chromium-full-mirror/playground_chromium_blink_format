@@ -300,7 +300,7 @@ JSValue* jsXMLHttpRequestPrototypeFunctionOpen(ExecState* exec,
   Frame* frame = toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!frame)
     return jsUndefined();
-  KURL url = frame->loader()->completeURL(args[1]->toString(exec));
+  const KURL& url = frame->loader()->completeURL(args[1]->toString(exec));
 
   bool async = true;
   if (args.size() >= 3)
