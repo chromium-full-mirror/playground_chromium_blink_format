@@ -36,7 +36,6 @@
 @interface WebArchiver : NSObject {
 }
 
-+ (WebArchive*)archiveNode:(DOMNode*)node;
 + (WebArchive*)archiveRange:(DOMRange*)range;
 + (WebArchive*)archiveSelectionInFrame:(WebFrame*)frame;
 + (WebArchive*)archiveFrame:(WebFrame*)frame;
