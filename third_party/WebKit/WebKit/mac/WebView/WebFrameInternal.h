@@ -165,7 +165,6 @@ _createSubframeWithOwnerElement:(WebCore::HTMLFrameOwnerElement*)ownerElement
 - (NSString*)_selectedString;
 - (NSString*)_stringForRange:(DOMRange*)range;
 
-- (NSString*)_markupStringFromNode:(DOMNode*)node nodes:(NSArray**)nodes;
 - (NSString*)_markupStringFromRange:(DOMRange*)range nodes:(NSArray**)nodes;
 
 - (NSRect)_caretRectAtNode:(DOMNode*)node

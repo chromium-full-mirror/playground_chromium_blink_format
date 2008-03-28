@@ -1224,4 +1224,20 @@ PassRefPtr<DocumentFragment> createFragmentFromNodes(
 
   return fragment.release();
 }
+
+String createFullMarkup(const Node* node) {
+  if (!node)
+    return String();
+
+  Document* document = node->document();
+  if (!document)
+    return String();
+
+  Frame* frame = document->frame();
+  if (!frame)
+    return String();
+
+  // FIXME: This is never "for interchange". Is that right?
+  return frame->documentTypeString() + createMarkup(node, IncludeNode, 0);
+}
 }

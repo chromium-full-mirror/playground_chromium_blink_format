@@ -55,6 +55,8 @@ String createMarkup(const Range*,
 String createMarkup(const Node*,
                     EChildrenOnly = IncludeNode,
                     Vector<Node*>* = 0);
+
+String createFullMarkup(const Node*);
 }
 
 #endif  // markup_h
