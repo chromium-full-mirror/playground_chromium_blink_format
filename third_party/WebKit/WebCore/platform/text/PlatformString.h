@@ -42,6 +42,7 @@ class wxString;
 namespace WebCore {
 
 class CString;
+class SharedBuffer;
 struct StringHash;
 
 class String {
@@ -391,6 +392,8 @@ inline int reverseFind(const UChar* characters,
 inline void append(Vector<UChar>& vector, const String& string) {
   vector.append(string.characters(), string.length());
 }
+
+PassRefPtr<SharedBuffer> utf8Buffer(const String&);
 
 }  // namespace WebCore
 
