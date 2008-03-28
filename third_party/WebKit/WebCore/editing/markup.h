@@ -57,6 +57,7 @@ String createMarkup(const Node*,
                     Vector<Node*>* = 0);
 
 String createFullMarkup(const Node*);
+String createFullMarkup(const Range*);
 }
 
 #endif  // markup_h

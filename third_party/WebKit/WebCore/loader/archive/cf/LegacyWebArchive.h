@@ -37,6 +37,7 @@ namespace WebCore {
 
 class Frame;
 class Node;
+class Range;
 
 class LegacyWebArchive : public Archive {
  public:
@@ -48,6 +49,7 @@ class LegacyWebArchive : public Archive {
       Vector<PassRefPtr<LegacyWebArchive>>& subframeArchives);
   static PassRefPtr<LegacyWebArchive> create(Node*);
   static PassRefPtr<LegacyWebArchive> create(Frame*);
+  static PassRefPtr<LegacyWebArchive> create(Range*);
   static PassRefPtr<LegacyWebArchive> create(const String& markupString,
                                              Frame*,
                                              Vector<Node*>& nodes);
