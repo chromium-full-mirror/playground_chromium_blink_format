@@ -126,8 +126,12 @@ void PlatformScrollbar::geometryChanged() {
   IntRect windowRect =
       IntRect(frameView->contentsToWindow(frameGeometry().location()),
               frameGeometry().size());
-  GtkAllocation allocation = {windowRect.x(), windowRect.y(),
-                              windowRect.width(), windowRect.height()};
+
+  IntSize sz = frameGeometry().size();
+  sz.clampNegativeToZero();
+
+  GtkAllocation allocation = {windowRect.x(), windowRect.y(), sz.width(),
+                              sz.height()};
   gtk_widget_size_allocate(gtkWidget(), &allocation);
 }
 
