@@ -49,6 +49,7 @@ class LegacyWebArchive : public Archive {
       Vector<PassRefPtr<LegacyWebArchive>>& subframeArchives);
   static PassRefPtr<LegacyWebArchive> create(Node*);
   static PassRefPtr<LegacyWebArchive> create(Frame*);
+  static PassRefPtr<LegacyWebArchive> createFromSelection(Frame* frame);
   static PassRefPtr<LegacyWebArchive> create(Range*);
   static PassRefPtr<LegacyWebArchive> create(const String& markupString,
                                              Frame*,
