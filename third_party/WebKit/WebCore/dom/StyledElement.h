@@ -69,12 +69,12 @@ class StyledElement : public Element {
   void createMappedDecl(MappedAttribute* attr);
 
   static CSSMappedAttributeDeclaration* getMappedAttributeDecl(
-      MappedAttributeEntry type,
-      Attribute* attr);
-  static void setMappedAttributeDecl(MappedAttributeEntry type,
-                                     Attribute* attr,
-                                     CSSMappedAttributeDeclaration* decl);
-  static void removeMappedAttributeDecl(MappedAttributeEntry type,
+      MappedAttributeEntry,
+      Attribute*);
+  static void setMappedAttributeDecl(MappedAttributeEntry,
+                                     Attribute*,
+                                     CSSMappedAttributeDeclaration*);
+  static void removeMappedAttributeDecl(MappedAttributeEntry,
                                         const QualifiedName& attrName,
                                         const AtomicString& attrValue);
 
@@ -91,7 +91,12 @@ class StyledElement : public Element {
   void invalidateStyleAttribute();
   virtual void updateStyleAttributeIfNeeded() const;
 
-  virtual const ClassNames* getClassNames() const;
+  const ClassNames& classNames() const {
+    ASSERT(hasClass());
+    ASSERT(mappedAttributes());
+    return mappedAttributes()->classNames();
+  }
+
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual bool mapToEntry(const QualifiedName& attrName,

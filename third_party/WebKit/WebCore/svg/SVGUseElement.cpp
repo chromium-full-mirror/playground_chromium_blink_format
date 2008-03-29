@@ -736,7 +736,7 @@ void SVGUseElement::expandSymbolElementsInShadowTree(Node* element) {
         new SVGSVGElement(SVGNames::svgTag, document());
 
     // Transfer all attributes from <symbol> to the new <svg> element
-    *svgElement->attributes() = *element->attributes();
+    svgElement->attributes()->setAttributes(*element->attributes());
 
     // Explicitly re-set width/height values
     String widthString = String::number(width().value());
@@ -890,7 +890,7 @@ void SVGUseElement::transferUseAttributesToReplacedElement(
   ASSERT(from);
   ASSERT(to);
 
-  *to->attributes() = *from->attributes();
+  to->attributes()->setAttributes(*from->attributes());
 
   ExceptionCode ec = 0;
 

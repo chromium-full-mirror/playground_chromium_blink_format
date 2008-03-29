@@ -386,9 +386,10 @@ void CSSStyleSelector::matchRules(CSSRuleSet* rules,
     matchRulesForList(rules->getIDRules(m_element->getIDAttribute().impl()),
                       firstRuleIndex, lastRuleIndex);
   if (m_element->hasClass()) {
-    const ClassNames& classNames = *m_element->getClassNames();
-    size_t classNamesSize = classNames.size();
-    for (size_t i = 0; i < classNamesSize; ++i)
+    ASSERT(m_styledElement);
+    const ClassNames& classNames = m_styledElement->classNames();
+    size_t size = classNames.size();
+    for (size_t i = 0; i < size; ++i)
       matchRulesForList(rules->getClassRules(classNames[i].impl()),
                         firstRuleIndex, lastRuleIndex);
   }
@@ -1531,27 +1532,26 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
     return false;
 
   if (sel->hasTag()) {
-    const AtomicString& localName = e->localName();
-    const AtomicString& ns = e->namespaceURI();
     const AtomicString& selLocalName = sel->m_tag.localName();
+    if (selLocalName != starAtom && selLocalName != e->localName())
+      return false;
     const AtomicString& selNS = sel->m_tag.namespaceURI();
-
-    if ((selLocalName != starAtom && localName != selLocalName) ||
-        (selNS != starAtom && ns != selNS))
+    if (selNS != starAtom && selNS != e->namespaceURI())
       return false;
   }
 
   if (sel->hasAttribute()) {
-    if (sel->m_match == CSSSelector::Class) {
-      if (!e->hasClass())
-        return false;
-      return e->getClassNames()->contains(sel->m_value);
-    } else if (sel->m_match == CSSSelector::Id)
+    if (sel->m_match == CSSSelector::Class)
+      return e->hasClass() &&
+             static_cast<StyledElement*>(e)->classNames().contains(
+                 sel->m_value);
+
+    if (sel->m_match == CSSSelector::Id)
       return e->hasID() && e->getIDAttribute() == sel->m_value;
-    else if (m_style &&
-             (e != m_element || !m_styledElement ||
-              (!m_styledElement->isMappedAttribute(sel->m_attr) &&
-               sel->m_attr != typeAttr && sel->m_attr != readonlyAttr))) {
+
+    if (m_style && (e != m_element || !m_styledElement ||
+                    (!m_styledElement->isMappedAttribute(sel->m_attr) &&
+                     sel->m_attr != typeAttr && sel->m_attr != readonlyAttr))) {
       m_style->setAffectedByAttributeSelectors();  // Special-case the "type"
                                                    // and "readonly" attributes
                                                    // so input form controls can
