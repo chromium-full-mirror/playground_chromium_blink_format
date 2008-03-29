@@ -35,7 +35,4 @@
 
 @interface WebArchiver : NSObject {
 }
-
-+ (WebArchive*)archiveSelectionInFrame:(WebFrame*)frame;
-
 @end
