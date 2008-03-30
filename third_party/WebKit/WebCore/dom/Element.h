@@ -61,11 +61,11 @@ class Element : public ContainerNode {
   const AtomicString& getAttributeNS(const String& namespaceURI,
                                      const String& localName) const;
 
-  void setAttribute(const String& name,
+  void setAttribute(const AtomicString& name,
                     const AtomicString& value,
                     ExceptionCode&);
-  void setAttributeNS(const String& namespaceURI,
-                      const String& qualifiedName,
+  void setAttributeNS(const AtomicString& namespaceURI,
+                      const AtomicString& qualifiedName,
                       const AtomicString& value,
                       ExceptionCode&);
 

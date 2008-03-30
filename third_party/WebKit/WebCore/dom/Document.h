@@ -189,7 +189,7 @@ class Document : public ContainerNode {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
   Element* documentElement() const;
-  virtual PassRefPtr<Element> createElement(const String& tagName,
+  virtual PassRefPtr<Element> createElement(const AtomicString& tagName,
                                             ExceptionCode&);
   PassRefPtr<DocumentFragment> createDocumentFragment();
   PassRefPtr<Text> createTextNode(const String& data);

@@ -530,7 +530,7 @@ Element* Document::documentElement() const {
   return m_documentElement.get();
 }
 
-PassRefPtr<Element> Document::createElement(const String& name,
+PassRefPtr<Element> Document::createElement(const AtomicString& name,
                                             ExceptionCode& ec) {
   if (!isValidName(name)) {
     ec = INVALID_CHARACTER_ERR;
