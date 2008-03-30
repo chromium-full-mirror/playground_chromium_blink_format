@@ -141,12 +141,12 @@ KJS::JSValue* jsStringOrFalse(const KURL&);  // boolean false if the URL is null
 // unlikely to save memory.
 KJS::JSValue* jsOwnedStringOrNull(const KJS::UString&);
 
-String valueToStringWithNullCheck(
+KJS::UString valueToStringWithNullCheck(
     KJS::ExecState*,
-    KJS::JSValue*);  // null String if the value is null
-String valueToStringWithUndefinedOrNullCheck(
+    KJS::JSValue*);  // null if the value is null
+KJS::UString valueToStringWithUndefinedOrNullCheck(
     KJS::ExecState*,
-    KJS::JSValue*);  // null String if the value is null or undefined
+    KJS::JSValue*);  // null if the value is null or undefined
 
 template <typename T>
 inline KJS::JSValue* toJS(KJS::ExecState* exec, PassRefPtr<T> ptr) {
