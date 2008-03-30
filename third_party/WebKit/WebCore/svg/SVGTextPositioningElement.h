@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2008 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -37,6 +37,8 @@ class SVGTextPositioningElement : public SVGTextContentElement {
   virtual ~SVGTextPositioningElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
+
+  bool isKnownAttribute(const QualifiedName&);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGTextPositioningElement,

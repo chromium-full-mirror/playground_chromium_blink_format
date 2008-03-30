@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2008 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -47,6 +47,8 @@ class SVGTextElement : public SVGTextPositioningElement,
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool childShouldCreateRenderer(Node*) const;
+
+  virtual void svgAttributeChanged(const QualifiedName&);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
