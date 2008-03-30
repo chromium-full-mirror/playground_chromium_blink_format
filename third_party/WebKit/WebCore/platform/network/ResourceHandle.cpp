@@ -34,6 +34,8 @@
 
 namespace WebCore {
 
+static bool portAllowed(const ResourceRequest&);
+
 ResourceHandle::ResourceHandle(const ResourceRequest& request,
                                ResourceHandleClient* client,
                                bool defersLoading,
@@ -57,8 +59,13 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
       new ResourceHandle(request, client, defersLoading, shouldContentSniff,
                          mightDownloadFromHandle)));
 
+  if (!request.url().isValid()) {
+    newHandle->scheduleFailure(InvalidURLFailure);
+    return newHandle.release();
+  }
+
   if (!portAllowed(request)) {
-    newHandle->scheduleBlockedFailure();
+    newHandle->scheduleFailure(BlockedFailure);
     return newHandle.release();
   }
 
@@ -68,13 +75,25 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
   return 0;
 }
 
-void ResourceHandle::scheduleBlockedFailure() {
+void ResourceHandle::scheduleFailure(FailureType type) {
+  d->m_failureType = type;
   d->m_failureTimer.startOneShot(0);
 }
 
-void ResourceHandle::fireBlockedFailure(Timer<ResourceHandle>* timer) {
-  if (client())
-    client()->wasBlocked(this);
+void ResourceHandle::fireFailure(Timer<ResourceHandle>*) {
+  if (!client())
+    return;
+
+  switch (d->m_failureType) {
+    case BlockedFailure:
+      client()->wasBlocked(this);
+      return;
+    case InvalidURLFailure:
+      client()->cannotShowURL(this);
+      return;
+  }
+
+  ASSERT_NOT_REACHED();
 }
 
 ResourceHandleClient* ResourceHandle::client() const {
@@ -98,7 +117,7 @@ void ResourceHandle::clearAuthentication() {
   d->m_currentWebChallenge.nullify();
 }
 
-bool ResourceHandle::portAllowed(const ResourceRequest& request) {
+static bool portAllowed(const ResourceRequest& request) {
   unsigned short port = request.url().port();
 
   // Since most URLs don't have a port, return early for the "no port" case.

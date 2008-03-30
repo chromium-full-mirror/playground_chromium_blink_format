@@ -92,6 +92,8 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
                  bool shouldContentSniff,
                  bool mightDownloadFromHandle);
 
+  enum FailureType { BlockedFailure, InvalidURLFailure };
+
  public:
   // FIXME: should not need the Frame
   static PassRefPtr<ResourceHandle> create(
@@ -183,15 +185,14 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
 
   const ResourceRequest& request() const;
 
-  void fireBlockedFailure(Timer<ResourceHandle>*);
+  void fireFailure(Timer<ResourceHandle>*);
 
  private:
-  static bool portAllowed(const ResourceRequest&);
-
-  void scheduleBlockedFailure();
+  void scheduleFailure(FailureType);
 
   bool start(Frame*);
 
+  friend class ResourceHandleInternal;
   OwnPtr<ResourceHandleInternal> d;
 };
 }

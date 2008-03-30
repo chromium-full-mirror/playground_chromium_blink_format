@@ -61,6 +61,7 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   virtual void cancel(const ResourceError&);
   ResourceError cancelledError();
   ResourceError blockedError();
+  ResourceError cannotShowURLError();
 
   virtual void setDefersLoading(bool);
 
@@ -84,7 +85,6 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   void willStopBufferingData(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
-  virtual void wasBlocked();
 
   virtual void didReceiveAuthenticationChallenge(
       const AuthenticationChallenge&);
@@ -103,6 +103,7 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
   virtual void wasBlocked(ResourceHandle*);
+  virtual void cannotShowURL(ResourceHandle*);
   virtual void willStopBufferingData(ResourceHandle*,
                                      const char* data,
                                      int length) {
