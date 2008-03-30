@@ -93,7 +93,7 @@ static inline bool equal(StringImpl* string,
 
 #if PLATFORM(ARM)
   const UChar* stringCharacters = string->characters();
-  for (unsigned i = 0; i != strLength; ++i) {
+  for (unsigned i = 0; i != length; ++i) {
     if (*stringCharacters++ != *characters++)
       return false;
   }
