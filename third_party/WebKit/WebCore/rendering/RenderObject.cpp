@@ -1977,6 +1977,7 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
   if (view->printing())
     return;  // Don't repaint if we're printing.
   IntRect absRect(r);
+  absRect.move(view->layoutDelta());
   computeAbsoluteRepaintRect(absRect);
   view->repaintViewRectangle(absRect, immediate);
 }
