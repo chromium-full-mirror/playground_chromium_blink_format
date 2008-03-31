@@ -427,10 +427,10 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
     // FIXME: must use xmlEncoding for documents.
     String charset = "UTF-8";
 
-    TextEncoding m_encoding(charset);
-    if (!m_encoding.isValid())  // FIXME: report an error?
-      m_encoding = UTF8Encoding();
-    request.setHTTPBody(FormData::create(m_encoding.encode(
+    TextEncoding encoding(charset);
+    if (!encoding.isValid())  // FIXME: report an error?
+      encoding = UTF8Encoding();
+    request.setHTTPBody(FormData::create(encoding.encode(
         body.characters(), body.length(), EntitiesForUnencodables)));
   }
 
@@ -734,9 +734,9 @@ void XMLHttpRequest::willSendRequest(SubresourceLoader*,
 void XMLHttpRequest::didReceiveResponse(SubresourceLoader*,
                                         const ResourceResponse& response) {
   m_response = response;
-  m_encoding = extractCharsetFromMediaType(m_mimeTypeOverride);
-  if (m_encoding.isEmpty())
-    m_encoding = response.textEncodingName();
+  m_responseEncoding = extractCharsetFromMediaType(m_mimeTypeOverride);
+  if (m_responseEncoding.isEmpty())
+    m_responseEncoding = response.textEncodingName();
 }
 
 void XMLHttpRequest::receivedCancellation(
@@ -752,8 +752,8 @@ void XMLHttpRequest::didReceiveData(SubresourceLoader*,
     changeState(Sent);
 
   if (!m_decoder) {
-    if (!m_encoding.isEmpty())
-      m_decoder = new TextResourceDecoder("text/plain", m_encoding);
+    if (!m_responseEncoding.isEmpty())
+      m_decoder = new TextResourceDecoder("text/plain", m_responseEncoding);
     // allow TextResourceDecoder to look inside the m_response if it's XML or
     // HTML
     else if (responseIsXML())

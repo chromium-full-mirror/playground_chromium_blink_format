@@ -78,8 +78,6 @@ class ResourceResponseBase {
 
   static bool compare(const ResourceResponse& a, const ResourceResponse& b);
 
-  const ResourceResponse& asResourceResponse() const;
-
  protected:
   ResourceResponseBase()
       : m_expectedContentLength(0),
