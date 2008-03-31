@@ -61,7 +61,7 @@ class PluginDatabase {
   void setPluginDirectories(const Vector<String>& directories) {
     m_pluginDirectories = directories;
   }
-  PluginSet getPluginsInDirectories() const;
+  void getPluginsInDirectories(PluginSet&) const;
 
   PluginPackage* pluginForMIMEType(const String& mimeType);
   String MIMETypeForExtension(const String& extension) const;
