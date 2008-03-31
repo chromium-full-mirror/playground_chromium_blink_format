@@ -55,8 +55,7 @@ void PluginPackage::freeLibraryTimerFired(Timer<PluginPackage>*) {
   m_module = 0;
 }
 
-PluginPackage::PluginPackage(const String& path,
-                             const PlatformFileTime& lastModified)
+PluginPackage::PluginPackage(const String& path, const time_t& lastModified)
     : m_path(path),
       m_moduleVersion(0),
       m_module(0),
@@ -104,7 +103,7 @@ void PluginPackage::unloadWithoutShutdown() {
 
 PassRefPtr<PluginPackage> PluginPackage::createPackage(
     const String& path,
-    const PlatformFileTime& lastModified) {
+    const time_t& lastModified) {
   RefPtr<PluginPackage> package =
       adoptRef(new PluginPackage(path, lastModified));
 

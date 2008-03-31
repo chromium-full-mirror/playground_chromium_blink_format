@@ -47,7 +47,6 @@ class String;
 
 #if PLATFORM(WIN)
 typedef HANDLE PlatformFileHandle;
-typedef time_t PlatformFileTime;
 typedef HMODULE PlatformModule;
 const PlatformFileHandle invalidPlatformFileHandle = INVALID_HANDLE_VALUE;
 
@@ -62,7 +61,6 @@ struct PlatformModuleVersion {
 };
 #else
 typedef int PlatformFileHandle;
-typedef time_t PlatformFileTime;
 #if PLATFORM(GTK)
 typedef GModule* PlatformModule;
 #else
