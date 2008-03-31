@@ -39,7 +39,7 @@ PluginDatabase* PluginDatabase::installedPlugins() {
 
   if (!plugins) {
     plugins = new PluginDatabase;
-    plugins->setPluginPaths(PluginDatabase::defaultPluginPaths());
+    plugins->setPluginDirectories(PluginDatabase::defaultPluginDirectories());
     plugins->refresh();
   }
 
@@ -55,8 +55,8 @@ bool PluginDatabase::isMIMETypeRegistered(const String& mimeType) {
   return (refresh() && m_registeredMIMETypes.contains(mimeType));
 }
 
-void PluginDatabase::addExtraPluginPath(const String& path) {
-  m_pluginPaths.append(path);
+void PluginDatabase::addExtraPluginDirectory(const String& directory) {
+  m_pluginDirectories.append(directory);
   refresh();
 }
 
@@ -66,7 +66,7 @@ bool PluginDatabase::refresh() {
   bool pluginSetChanged = false;
 
   // Create a new set of plugins
-  newPlugins = getPluginsInPaths();
+  newPlugins = getPluginsInDirectories();
 
   if (!m_plugins.isEmpty()) {
     m_registeredMIMETypes.clear();

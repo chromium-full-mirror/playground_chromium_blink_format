@@ -153,11 +153,11 @@ void WebCore::findWordBoundary(UChar const* str,
   *end = position;
 }
 
-PluginSet PluginDatabase::getPluginsInPaths() const {
+PluginSet PluginDatabase::getPluginsInDirectories() const {
   notImplemented();
   return PluginSet();
 }
-Vector<String> PluginDatabase::defaultPluginPaths() {
+Vector<String> PluginDatabase::defaultPluginDirectories() {
   notImplemented();
   return Vector<String>();
 }

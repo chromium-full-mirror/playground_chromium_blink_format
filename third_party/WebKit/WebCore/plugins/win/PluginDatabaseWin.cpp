@@ -79,7 +79,7 @@ static inline void addPluginsFromRegistry(HKEY rootKey, PluginSet& plugins) {
   RegCloseKey(key);
 }
 
-PluginSet PluginDatabase::getPluginsInPaths() const {
+PluginSet PluginDatabase::getPluginsInDirectories() const {
   // FIXME: This should be a case insensitive set.
   HashSet<String> uniqueFilenames;
   PluginSet plugins;
@@ -90,9 +90,9 @@ PluginSet PluginDatabase::getPluginsInPaths() const {
   RefPtr<PluginPackage> oldWMPPlugin;
   RefPtr<PluginPackage> newWMPPlugin;
 
-  Vector<String>::const_iterator end = m_pluginPaths.end();
-  for (Vector<String>::const_iterator it = m_pluginPaths.begin(); it != end;
-       ++it) {
+  Vector<String>::const_iterator end = m_pluginDirectories.end();
+  for (Vector<String>::const_iterator it = m_pluginDirectories.begin();
+       it != end; ++it) {
     String pattern = *it + "\\*";
 
     hFind =
@@ -188,7 +188,7 @@ static inline bool compareVersions(const Vector<int>& versionA,
   return false;
 }
 
-static inline void addMozillaPluginPaths(Vector<String>& paths) {
+static inline void addMozillaPluginDirectories(Vector<String>& directories) {
   // Enumerate all Mozilla plugin directories in the registry
   HKEY key;
   LONG result;
@@ -215,17 +215,18 @@ static inline void addMozillaPluginPaths(Vector<String>& paths) {
                             0, KEY_READ, &extensionsKey);
 
       if (result == ERROR_SUCCESS) {
-        // Now get the plugins path
-        WCHAR pluginsPathStr[_MAX_PATH];
-        DWORD pluginsPathSize = sizeof(pluginsPathStr);
+        // Now get the plugins directory
+        WCHAR pluginsDirectoryStr[_MAX_PATH];
+        DWORD pluginsDirectorySize = sizeof(pluginsDirectoryStr);
         DWORD type;
 
         result = RegQueryValueEx(extensionsKey, TEXT("Plugins"), 0, &type,
-                                 (LPBYTE)&pluginsPathStr, &pluginsPathSize);
+                                 (LPBYTE)&pluginsDirectoryStr,
+                                 &pluginsDirectorySize);
 
         if (result == ERROR_SUCCESS && type == REG_SZ)
-          paths.append(
-              String(pluginsPathStr, pluginsPathSize / sizeof(WCHAR) - 1));
+          directories.append(String(pluginsDirectoryStr,
+                                    pluginsDirectorySize / sizeof(WCHAR) - 1));
 
         RegCloseKey(extensionsKey);
       }
@@ -235,7 +236,8 @@ static inline void addMozillaPluginPaths(Vector<String>& paths) {
   }
 }
 
-static inline void addWindowsMediaPlayerPluginPath(Vector<String>& paths) {
+static inline void addWindowsMediaPlayerPluginDirectory(
+    Vector<String>& directories) {
   // The new WMP Firefox plugin is installed in \PFiles\Plugins if it can't find
   // any Firefox installs
   WCHAR pluginDirectoryStr[_MAX_PATH + 1];
@@ -245,7 +247,7 @@ static inline void addWindowsMediaPlayerPluginPath(Vector<String>& paths) {
 
   if (pluginDirectorySize > 0 &&
       pluginDirectorySize <= _countof(pluginDirectoryStr))
-    paths.append(String(pluginDirectoryStr, pluginDirectorySize - 1));
+    directories.append(String(pluginDirectoryStr, pluginDirectorySize - 1));
 
   DWORD type;
   WCHAR installationDirectoryStr[_MAX_PATH];
@@ -257,11 +259,11 @@ static inline void addWindowsMediaPlayerPluginPath(Vector<String>& paths) {
                  (LPBYTE)&installationDirectoryStr, &installationDirectorySize);
 
   if (result == ERROR_SUCCESS && type == REG_SZ)
-    paths.append(String(installationDirectoryStr,
-                        installationDirectorySize / sizeof(WCHAR) - 1));
+    directories.append(String(installationDirectoryStr,
+                              installationDirectorySize / sizeof(WCHAR) - 1));
 }
 
-static inline void addQuickTimePluginPath(Vector<String>& paths) {
+static inline void addQuickTimePluginDirectory(Vector<String>& directories) {
   DWORD type;
   WCHAR installationDirectoryStr[_MAX_PATH];
   DWORD installationDirectorySize = sizeof(installationDirectoryStr);
@@ -275,11 +277,11 @@ static inline void addQuickTimePluginPath(Vector<String>& paths) {
     String pluginDir = String(installationDirectoryStr,
                               installationDirectorySize / sizeof(WCHAR) - 1) +
                        "\\plugins";
-    paths.append(pluginDir);
+    directories.append(pluginDir);
   }
 }
 
-static inline void addAdobeAcrobatPluginPath(Vector<String>& paths) {
+static inline void addAdobeAcrobatPluginDirectory(Vector<String>& directories) {
   HKEY key;
   HRESULT result =
       RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT("Software\\Adobe\\Acrobat Reader"),
@@ -321,24 +323,24 @@ static inline void addAdobeAcrobatPluginPath(Vector<String>& paths) {
                         &acrobatInstallPathSize);
 
     if (result == ERROR_SUCCESS) {
-      String acrobatPluginPath =
+      String acrobatPluginDirectory =
           String(acrobatInstallPathStr,
                  acrobatInstallPathSize / sizeof(WCHAR) - 1) +
           "\\browser";
-      paths.append(acrobatPluginPath);
+      directories.append(acrobatPluginDirectory);
     }
   }
 
   RegCloseKey(key);
 }
 
-static inline String safariPluginsPath() {
+static inline String safariPluginsDirectory() {
   WCHAR moduleFileNameStr[_MAX_PATH];
-  static String pluginsPath;
-  static bool cachedPluginPath = false;
+  static String pluginsDirectory;
+  static bool cachedPluginDirectory = false;
 
-  if (!cachedPluginPath) {
-    cachedPluginPath = true;
+  if (!cachedPluginDirectory) {
+    cachedPluginDirectory = true;
 
     int moduleFileNameLen = GetModuleFileName(0, moduleFileNameStr, _MAX_PATH);
 
@@ -348,13 +350,13 @@ static inline String safariPluginsPath() {
     if (!PathRemoveFileSpec(moduleFileNameStr))
       goto exit;
 
-    pluginsPath = String(moduleFileNameStr) + "\\Plugins";
+    pluginsDirectory = String(moduleFileNameStr) + "\\Plugins";
   }
 exit:
-  return pluginsPath;
+  return pluginsDirectory;
 }
 
-static inline void addMacromediaPluginPaths(Vector<String>& paths) {
+static inline void addMacromediaPluginDirectories(Vector<String>& directories) {
   WCHAR systemDirectoryStr[MAX_PATH];
 
   if (GetSystemDirectory(systemDirectoryStr, _countof(systemDirectoryStr)) == 0)
@@ -364,33 +366,33 @@ static inline void addMacromediaPluginPaths(Vector<String>& paths) {
 
   PathCombine(macromediaDirectoryStr, systemDirectoryStr,
               TEXT("macromed\\Flash"));
-  paths.append(macromediaDirectoryStr);
+  directories.append(macromediaDirectoryStr);
 
   PathCombine(macromediaDirectoryStr, systemDirectoryStr,
               TEXT("macromed\\Shockwave 10"));
-  paths.append(macromediaDirectoryStr);
+  directories.append(macromediaDirectoryStr);
 }
 
-Vector<String> PluginDatabase::defaultPluginPaths() {
-  Vector<String> paths;
-  String ourPath = safariPluginsPath();
+Vector<String> PluginDatabase::defaultPluginDirectories() {
+  Vector<String> directories;
+  String ourDirectory = safariPluginsDirectory();
 
-  if (!ourPath.isNull())
-    paths.append(ourPath);
-  addQuickTimePluginPath(paths);
-  addAdobeAcrobatPluginPath(paths);
-  addMozillaPluginPaths(paths);
-  addWindowsMediaPlayerPluginPath(paths);
-  addMacromediaPluginPaths(paths);
+  if (!ourDirectory.isNull())
+    directories.append(ourDirectory);
+  addQuickTimePluginDirectory(directories);
+  addAdobeAcrobatPluginDirectory(directories);
+  addMozillaPluginDirectories(directories);
+  addWindowsMediaPlayerPluginDirectory(directories);
+  addMacromediaPluginDirectories(directories);
 
-  return paths;
+  return directories;
 }
 
-bool PluginDatabase::isPreferredPluginPath(const String& path) {
-  String ourPath = safariPluginsPath();
+bool PluginDatabase::isPreferredPluginDirectory(const String& directory) {
+  String ourDirectory = safariPluginsDirectory();
 
-  if (!ourPath.isNull() && !path.isNull())
-    return ourPath == path;
+  if (!ourDirectory.isNull() && !directory.isNull())
+    return ourDirectory == directory;
 
   return false;
 }

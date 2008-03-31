@@ -4280,10 +4280,10 @@ HRESULT STDMETHODCALLTYPE WebView::setAllowSiteSpecificHacks(
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebView::addAdditionalPluginPath(
-    /* [in] */ BSTR path) {
-  PluginDatabase::installedPlugins()->addExtraPluginPath(
-      String(path, SysStringLen(path)));
+HRESULT STDMETHODCALLTYPE WebView::addAdditionalPluginDirectory(
+    /* [in] */ BSTR directory) {
+  PluginDatabase::installedPlugins()->addExtraPluginDirectory(
+      String(directory, SysStringLen(directory)));
   return S_OK;
 }
 

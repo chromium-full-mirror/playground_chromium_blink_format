@@ -648,8 +648,8 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE setAllowSiteSpecificHacks(
       /* [in] */ BOOL allows);
 
-  virtual HRESULT STDMETHODCALLTYPE addAdditionalPluginPath(
-      /* [in] */ BSTR path);
+  virtual HRESULT STDMETHODCALLTYPE addAdditionalPluginDirectory(
+      /* [in] */ BSTR directory);
 
   virtual HRESULT STDMETHODCALLTYPE loadBackForwardListFromOtherView(
       /* [in] */ IWebView* otherView);
