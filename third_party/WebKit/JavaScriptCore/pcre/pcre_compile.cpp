@@ -688,14 +688,18 @@ static bool compileBranch(int options,
         if (options & MatchAcrossMultipleLinesOption) {
           if (firstbyte == REQ_UNSET)
             firstbyte = REQ_NONE;
-        }
+          *code++ = OP_BOL;
+        } else
+          *code++ = OP_CIRC;
         previous = NULL;
-        *code++ = OP_CIRC;
         break;
 
       case '$':
         previous = NULL;
-        *code++ = OP_DOLL;
+        if (options & MatchAcrossMultipleLinesOption)
+          *code++ = OP_EOL;
+        else
+          *code++ = OP_DOLL;
         break;
 
       /* There can never be a first char if '.' is first, whatever happens about
@@ -2034,7 +2038,7 @@ static bool branchNeedsLineStart(const unsigned char* code,
     return scode[1] == OP_NOT_NEWLINE && !(captureMap & backrefMap);
 
   /* Explicit ^ */
-  return op == OP_CIRC;
+  return op == OP_CIRC || op == OP_BOL;
 }
 
 static bool bracketNeedsLineStart(const unsigned char* code,

@@ -211,50 +211,50 @@ OP_EOD must correspond in order to the list of escapes immediately above.
 Note that whenever this list is updated, the two macro definitions that follow
 must also be updated to match. */
 
-#define FOR_EACH_OPCODE(macro)                                                           \
-  macro(END)                                                                             \
-                                                                                         \
-      macro(NOT_WORD_BOUNDARY) macro(WORD_BOUNDARY) macro(NOT_DIGIT) macro(DIGIT) macro( \
-          NOT_WHITESPACE) macro(WHITESPACE) macro(NOT_WORDCHAR) macro(WORDCHAR)          \
-                                                                                         \
-          macro(NOT_NEWLINE)                                                             \
-                                                                                         \
-              macro(CIRC) macro(DOLL) macro(CHAR) macro(CHAR_IGNORING_CASE) macro(       \
-                  ASCII_CHAR) macro(ASCII_LETTER_IGNORING_CASE) macro(NOT)               \
-                                                                                         \
-                  macro(STAR) macro(MINSTAR) macro(PLUS) macro(MINPLUS) macro(           \
-                      QUERY) macro(MINQUERY) macro(UPTO) macro(MINUPTO) macro(EXACT)     \
-                                                                                         \
-                      macro(NOTSTAR) macro(NOTMINSTAR) macro(NOTPLUS) macro(             \
-                          NOTMINPLUS) macro(NOTQUERY) macro(NOTMINQUERY)                 \
-                          macro(NOTUPTO) macro(NOTMINUPTO) macro(NOTEXACT)               \
-                                                                                         \
-                              macro(TYPESTAR) macro(TYPEMINSTAR) macro(                  \
-                                  TYPEPLUS) macro(TYPEMINPLUS) macro(TYPEQUERY)          \
-                                  macro(TYPEMINQUERY) macro(TYPEUPTO) macro(             \
-                                      TYPEMINUPTO) macro(TYPEEXACT)                      \
-                                                                                         \
-                                      macro(CRSTAR) macro(CRMINSTAR) macro(              \
-                                          CRPLUS) macro(CRMINPLUS)                       \
-                                          macro(CRQUERY) macro(CRMINQUERY) macro(        \
-                                              CRRANGE) macro(CRMINRANGE)                 \
-                                                                                         \
-                                              macro(CLASS) macro(                        \
-                                                  NCLASS) macro(XCLASS)                  \
-                                                                                         \
-                                                  macro(REF)                             \
-                                                                                         \
-                                                      macro(ALT) macro(KET) macro(       \
-                                                          KETRMAX) macro(KETRMIN)        \
-                                                                                         \
-                                                          macro(ASSERT) macro(           \
-                                                              ASSERT_NOT)                \
-                                                                                         \
-                                                              macro(BRAZERO) macro(      \
-                                                                  BRAMINZERO)            \
-                                                                  macro(                 \
-                                                                      BRANUMBER)         \
-                                                                      macro(             \
+#define FOR_EACH_OPCODE(macro)                                                                           \
+  macro(END)                                                                                             \
+                                                                                                         \
+      macro(NOT_WORD_BOUNDARY) macro(WORD_BOUNDARY) macro(NOT_DIGIT) macro(DIGIT) macro(                 \
+          NOT_WHITESPACE) macro(WHITESPACE) macro(NOT_WORDCHAR) macro(WORDCHAR)                          \
+                                                                                                         \
+          macro(NOT_NEWLINE)                                                                             \
+                                                                                                         \
+              macro(CIRC) macro(DOLL) macro(BOL) macro(EOL) macro(CHAR) macro(CHAR_IGNORING_CASE) macro( \
+                  ASCII_CHAR) macro(ASCII_LETTER_IGNORING_CASE) macro(NOT)                               \
+                                                                                                         \
+                  macro(STAR) macro(MINSTAR) macro(PLUS) macro(MINPLUS) macro(                           \
+                      QUERY) macro(MINQUERY) macro(UPTO) macro(MINUPTO) macro(EXACT)                     \
+                                                                                                         \
+                      macro(NOTSTAR) macro(NOTMINSTAR) macro(NOTPLUS) macro(                             \
+                          NOTMINPLUS) macro(NOTQUERY) macro(NOTMINQUERY)                                 \
+                          macro(NOTUPTO) macro(NOTMINUPTO) macro(NOTEXACT)                               \
+                                                                                                         \
+                              macro(TYPESTAR) macro(TYPEMINSTAR) macro(                                  \
+                                  TYPEPLUS) macro(TYPEMINPLUS) macro(TYPEQUERY)                          \
+                                  macro(TYPEMINQUERY) macro(TYPEUPTO) macro(                             \
+                                      TYPEMINUPTO) macro(TYPEEXACT)                                      \
+                                                                                                         \
+                                      macro(CRSTAR) macro(CRMINSTAR) macro(                              \
+                                          CRPLUS) macro(CRMINPLUS)                                       \
+                                          macro(CRQUERY) macro(CRMINQUERY) macro(                        \
+                                              CRRANGE) macro(CRMINRANGE)                                 \
+                                                                                                         \
+                                              macro(CLASS) macro(                                        \
+                                                  NCLASS) macro(XCLASS)                                  \
+                                                                                                         \
+                                                  macro(REF)                                             \
+                                                                                                         \
+                                                      macro(ALT) macro(KET) macro(                       \
+                                                          KETRMAX) macro(KETRMIN)                        \
+                                                                                                         \
+                                                          macro(ASSERT) macro(                           \
+                                                              ASSERT_NOT)                                \
+                                                                                                         \
+                                                              macro(BRAZERO) macro(                      \
+                                                                  BRAMINZERO)                            \
+                                                                  macro(                                 \
+                                                                      BRANUMBER)                         \
+                                                                      macro(                             \
                                                                           BRA)
 
 #define OPCODE_ENUM_VALUE(opcode) OP_##opcode,
