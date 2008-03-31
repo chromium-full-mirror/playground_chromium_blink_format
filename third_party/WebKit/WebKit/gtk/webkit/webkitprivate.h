@@ -30,7 +30,6 @@
 #include <webkit/webkitwebview.h>
 #include <webkit/webkitwebframe.h>
 #include <webkit/webkitwebsettings.h>
-#include <webkit/webkitnetworkrequest.h>
 #include <webkit/webkitwebbackforwardlist.h>
 
 #include "BackForwardList.h"
@@ -105,14 +104,6 @@ struct _WebKitWebFramePrivate {
 
   gchar* name;
   gchar* title;
-  gchar* uri;
-};
-
-#define WEBKIT_NETWORK_REQUEST_GET_PRIVATE(obj)                    \
-  (G_TYPE_INSTANCE_GET_PRIVATE((obj), WEBKIT_TYPE_NETWORK_REQUEST, \
-                               WebKitNetworkRequestPrivate))
-typedef struct _WebKitNetworkRequestPrivate WebKitNetworkRequestPrivate;
-struct _WebKitNetworkRequestPrivate {
   gchar* uri;
 };
 
