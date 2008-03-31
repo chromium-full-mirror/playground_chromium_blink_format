@@ -43,8 +43,9 @@ typedef HashMap<String, Vector<String>> MIMEToExtensionsMap;
 class PluginPackage : public RefCounted<PluginPackage> {
  public:
   ~PluginPackage();
-  static PluginPackage* createPackage(const String& path,
-                                      const PlatformFileTime& lastModified);
+  static PassRefPtr<PluginPackage> createPackage(
+      const String& path,
+      const PlatformFileTime& lastModified);
 
   String name() const { return m_name; }
   String description() const { return m_description; }

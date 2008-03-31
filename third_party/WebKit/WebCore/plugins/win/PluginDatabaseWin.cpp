@@ -67,7 +67,7 @@ static inline void addPluginsFromRegistry(HKEY rootKey, PluginSet& plugins) {
     if (GetFileAttributesEx(pathStr, GetFileExInfoStandard, &attributes) == 0)
       continue;
 
-    PluginPackage* package = PluginPackage::createPackage(
+    RefPtr<PluginPackage> package = PluginPackage::createPackage(
         String(pathStr, pathStrSize / sizeof(WCHAR) - 1),
         attributes.ftLastWriteTime);
 
@@ -86,8 +86,8 @@ PluginSet PluginDatabase::getPluginsInPaths() const {
   HANDLE hFind = INVALID_HANDLE_VALUE;
   WIN32_FIND_DATAW findFileData;
 
-  PluginPackage* oldWMPPlugin = 0;
-  PluginPackage* newWMPPlugin = 0;
+  RefPtr<PluginPackage> oldWMPPlugin;
+  RefPtr<PluginPackage> newWMPPlugin;
 
   Vector<String>::const_iterator end = m_pluginPaths.end();
   for (Vector<String>::const_iterator it = m_pluginPaths.begin(); it != end;
@@ -116,7 +116,7 @@ PluginSet PluginDatabase::getPluginsInPaths() const {
       if (!uniqueFilenames.add(fullPath).second)
         continue;
 
-      PluginPackage* pluginPackage =
+      RefPtr<PluginPackage> pluginPackage =
           PluginPackage::createPackage(fullPath, findFileData.ftLastWriteTime);
 
       if (pluginPackage) {
