@@ -48,8 +48,10 @@ class PluginPackage : public RefCounted<PluginPackage> {
 
   const String& name() const { return m_name; }
   const String& description() const { return m_description; }
+  const String& path() const { return m_path; }
   const String& fileName() const { return m_fileName; }
   const String& parentDirectory() const { return m_parentDirectory; }
+  time_t lastModified() const { return m_lastModified; }
 
   const MIMEToDescriptionsMap& mimeToDescriptions() const {
     return m_mimeToDescriptions;
