@@ -35,7 +35,7 @@ SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
                                                  Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       m_type(SVG_FECOLORMATRIX_TYPE_UNKNOWN),
-      m_values(new SVGNumberList(SVGNames::valuesAttr)),
+      m_values(SVGNumberList::create(SVGNames::valuesAttr)),
       m_filterEffect(0) {}
 
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {

@@ -109,22 +109,24 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
                               height,
                               SVGNames::heightAttr,
                               m_height)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              long,
-                              Integer,
-                              integer,
-                              FilterResX,
-                              filterResX,
-                              "filterResX",
-                              m_filterResX)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              long,
-                              Integer,
-                              integer,
-                              FilterResY,
-                              filterResY,
-                              "filterResY",
-                              m_filterResY)
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(SVGFilterElement,
+                                                     long,
+                                                     Integer,
+                                                     integer,
+                                                     FilterResX,
+                                                     filterResX,
+                                                     SVGNames::filterResAttr,
+                                                     "filterResX",
+                                                     m_filterResX)
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(SVGFilterElement,
+                                                     long,
+                                                     Integer,
+                                                     integer,
+                                                     FilterResY,
+                                                     filterResY,
+                                                     SVGNames::filterResAttr,
+                                                     "filterResY",
+                                                     m_filterResY)
 
 void SVGFilterElement::setFilterRes(unsigned long, unsigned long) const {}
 

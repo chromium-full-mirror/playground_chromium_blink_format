@@ -36,7 +36,7 @@ SVGComponentTransferFunctionElement::SVGComponentTransferFunctionElement(
     Document* doc)
     : SVGElement(tagName, doc),
       m_type(SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN),
-      m_tableValues(new SVGNumberList),
+      m_tableValues(SVGNumberList::create(SVGNames::tableValuesAttr)),
       m_slope(1.0f),
       m_intercept(0.0f),
       m_amplitude(1.0f),

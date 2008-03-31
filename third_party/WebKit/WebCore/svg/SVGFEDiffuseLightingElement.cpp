@@ -72,22 +72,26 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
                               surfaceScale,
                               SVGNames::surfaceScaleAttr,
                               m_surfaceScale)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
-                              float,
-                              Number,
-                              number,
-                              KernelUnitLengthX,
-                              kernelUnitLengthX,
-                              "kernelUnitLengthX",
-                              m_kernelUnitLengthX)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
-                              float,
-                              Number,
-                              number,
-                              KernelUnitLengthY,
-                              kernelUnitLengthY,
-                              "kernelUnitLengthY",
-                              m_kernelUnitLengthY)
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
+    SVGFEDiffuseLightingElement,
+    float,
+    Number,
+    number,
+    KernelUnitLengthX,
+    kernelUnitLengthX,
+    SVGNames::kernelUnitLengthAttr,
+    "kernelUnitLengthX",
+    m_kernelUnitLengthX)
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
+    SVGFEDiffuseLightingElement,
+    float,
+    Number,
+    number,
+    KernelUnitLengthY,
+    kernelUnitLengthY,
+    SVGNames::kernelUnitLengthAttr,
+    "kernelUnitLengthY",
+    m_kernelUnitLengthY)
 
 void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

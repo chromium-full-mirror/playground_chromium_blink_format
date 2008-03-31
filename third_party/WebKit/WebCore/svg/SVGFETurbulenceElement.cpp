@@ -45,22 +45,26 @@ SVGFETurbulenceElement::~SVGFETurbulenceElement() {
   delete m_filterEffect;
 }
 
-ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
-                              float,
-                              Number,
-                              number,
-                              BaseFrequencyX,
-                              baseFrequencyX,
-                              "baseFrequencyX",
-                              m_baseFrequencyX)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
-                              float,
-                              Number,
-                              number,
-                              BaseFrequencyY,
-                              baseFrequencyY,
-                              "baseFrequencyY",
-                              m_baseFrequencyY)
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
+    SVGFETurbulenceElement,
+    float,
+    Number,
+    number,
+    BaseFrequencyX,
+    baseFrequencyX,
+    SVGNames::baseFrequencyAttr,
+    "baseFrequencyX",
+    m_baseFrequencyX)
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
+    SVGFETurbulenceElement,
+    float,
+    Number,
+    number,
+    BaseFrequencyY,
+    baseFrequencyY,
+    SVGNames::baseFrequencyAttr,
+    "baseFrequencyY",
+    m_baseFrequencyY)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               float,
                               Number,
