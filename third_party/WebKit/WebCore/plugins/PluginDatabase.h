@@ -79,6 +79,7 @@ class PluginDatabase {
   HashSet<String> m_registeredMIMETypes;
   PluginSet m_plugins;
   HashMap<String, RefPtr<PluginPackage>> m_pluginsByPath;
+  HashMap<String, time_t> m_pluginPathsWithTimes;
 };
 
 }  // namespace WebCore
