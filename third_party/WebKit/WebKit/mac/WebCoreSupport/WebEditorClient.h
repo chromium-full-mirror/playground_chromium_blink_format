@@ -76,7 +76,6 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual void didWriteSelectionToPasteboard();
   virtual void didSetSelectionTypesForPasteboard();
 
-  virtual NSData* dataForArchivedSelection(WebCore::Frame*);
   virtual NSString* userVisibleString(NSURL*);
 #ifdef BUILDING_ON_TIGER
   virtual NSArray* pasteboardTypesForSelection(WebCore::Frame*);
