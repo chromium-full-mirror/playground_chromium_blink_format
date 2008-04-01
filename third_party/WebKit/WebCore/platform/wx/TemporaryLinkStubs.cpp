@@ -155,7 +155,6 @@ void WebCore::findWordBoundary(UChar const* str,
 
 void PluginDatabase::getPluginPathsInDirectories(HashSet<String>&) const {
   notImplemented();
-  return PluginSet();
 }
 Vector<String> PluginDatabase::defaultPluginDirectories() {
   notImplemented();
