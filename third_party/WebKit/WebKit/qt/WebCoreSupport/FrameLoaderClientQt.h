@@ -67,6 +67,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
  public:
   FrameLoaderClientQt();
   ~FrameLoaderClientQt();
+  virtual void frameLoaderDestroyed();
+
   void setFrame(QWebFrame* webFrame, Frame* frame);
   QWebFrame* webFrame() const;
 
@@ -82,85 +84,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void detachedFromParent2();
   virtual void detachedFromParent3();
   virtual void detachedFromParent4();
-
-  virtual void frameLoaderDestroyed();
-  virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
-
-  virtual void dispatchDidHandleOnloadEvents();
-  virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
-  virtual void dispatchDidCancelClientRedirect();
-  virtual void dispatchWillPerformClientRedirect(const KURL&,
-                                                 double interval,
-                                                 double fireDate);
-  virtual void dispatchDidChangeLocationWithinPage();
-  virtual void dispatchWillClose();
-  virtual void dispatchDidReceiveIcon();
-  virtual void dispatchDidStartProvisionalLoad();
-  virtual void dispatchDidReceiveTitle(const String& title);
-  virtual void dispatchDidCommitLoad();
-
-  virtual void dispatchDidFinishDocumentLoad();
-  virtual void dispatchDidFinishLoad();
-  virtual void dispatchDidFirstLayout();
-
-  virtual void dispatchShow();
-  virtual void cancelPolicyCheck();
-
-  virtual void dispatchWillSubmitForm(FramePolicyFunction,
-                                      PassRefPtr<FormState>);
-
-  virtual void dispatchDidLoadMainResource(DocumentLoader*);
-  virtual void revertToProvisionalState(DocumentLoader*);
-
-  virtual void setMainFrameDocumentReady(bool);
-  virtual void willChangeTitle(DocumentLoader*);
-  virtual void didChangeTitle(DocumentLoader*);
-  virtual void finishedLoading(DocumentLoader*);
-
-  virtual bool canShowMIMEType(const String& MIMEType) const;
-  virtual bool representationExistsForURLScheme(const String& URLScheme) const;
-  virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const;
-
-  virtual void frameLoadCompleted();
-  virtual void restoreViewState();
-  virtual void provisionalLoadStarted();
-  virtual void didFinishLoad();
-  virtual void prepareForDataSourceReplacement();
-  virtual void setTitle(const String& title, const KURL&);
-
-  virtual String userAgent(const WebCore::KURL&);
-
-  virtual void savePlatformDataToCachedPage(WebCore::CachedPage*);
-  virtual void transitionToCommittedFromCachedPage(WebCore::CachedPage*);
-  virtual void transitionToCommittedForNewPage();
-
-  virtual void updateGlobalHistory(const WebCore::KURL&);
-  virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
-  virtual void saveViewStateToItem(WebCore::HistoryItem*);
-  virtual bool canCachePage() const;
-
-  virtual void setMainDocumentError(WebCore::DocumentLoader*,
-                                    const WebCore::ResourceError&);
-  virtual void committedLoad(WebCore::DocumentLoader*, const char*, int);
-  virtual WebCore::ResourceError cancelledError(
-      const WebCore::ResourceRequest&);
-  virtual WebCore::ResourceError blockedError(const WebCore::ResourceRequest&);
-  virtual WebCore::ResourceError cannotShowURLError(
-      const WebCore::ResourceRequest&);
-  virtual WebCore::ResourceError interruptForPolicyChangeError(
-      const WebCore::ResourceRequest&);
-  virtual WebCore::ResourceError cannotShowMIMETypeError(
-      const WebCore::ResourceResponse&);
-  virtual WebCore::ResourceError fileDoesNotExistError(
-      const WebCore::ResourceResponse&);
-  virtual bool shouldFallBack(const WebCore::ResourceError&);
-  virtual WTF::PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(
-      const WebCore::ResourceRequest&,
-      const WebCore::SubstituteData&);
-  virtual void download(WebCore::ResourceHandle*,
-                        const WebCore::ResourceRequest&,
-                        const WebCore::ResourceRequest&,
-                        const WebCore::ResourceResponse&);
 
   virtual void assignIdentifierToInitialRequest(
       unsigned long identifier,
@@ -190,15 +113,33 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void dispatchDidFailLoading(WebCore::DocumentLoader*,
                                       unsigned long,
                                       const WebCore::ResourceError&);
-
   virtual bool dispatchDidLoadResourceFromMemoryCache(
       WebCore::DocumentLoader*,
       const WebCore::ResourceRequest&,
       const WebCore::ResourceResponse&,
       int);
-  virtual void dispatchDidFailProvisionalLoad(const WebCore::ResourceError&);
+
+  virtual void dispatchDidHandleOnloadEvents();
+  virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
+  virtual void dispatchDidCancelClientRedirect();
+  virtual void dispatchWillPerformClientRedirect(const KURL&,
+                                                 double interval,
+                                                 double fireDate);
+  virtual void dispatchDidChangeLocationWithinPage();
+  virtual void dispatchWillClose();
+  virtual void dispatchDidReceiveIcon();
+  virtual void dispatchDidStartProvisionalLoad();
+  virtual void dispatchDidReceiveTitle(const String& title);
+  virtual void dispatchDidCommitLoad();
+  virtual void dispatchDidFailProvisionalLoad(const ResourceError&);
   virtual void dispatchDidFailLoad(const WebCore::ResourceError&);
+  virtual void dispatchDidFinishDocumentLoad();
+  virtual void dispatchDidFinishLoad();
+  virtual void dispatchDidFirstLayout();
+
   virtual WebCore::Frame* dispatchCreatePage();
+  virtual void dispatchShow();
+
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction function,
                                                const WebCore::String&,
                                                const WebCore::ResourceRequest&);
@@ -211,13 +152,72 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
       FramePolicyFunction function,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&);
+  virtual void cancelPolicyCheck();
+
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
 
-  virtual void startDownload(const WebCore::ResourceRequest&);
+  virtual void dispatchWillSubmitForm(FramePolicyFunction,
+                                      PassRefPtr<FormState>);
+
+  virtual void dispatchDidLoadMainResource(DocumentLoader*);
+  virtual void revertToProvisionalState(DocumentLoader*);
+  virtual void setMainDocumentError(DocumentLoader*, const ResourceError&);
 
   virtual void postProgressStartedNotification();
   virtual void postProgressEstimateChangedNotification();
   virtual void postProgressFinishedNotification();
+
+  virtual void setMainFrameDocumentReady(bool);
+
+  virtual void startDownload(const WebCore::ResourceRequest&);
+
+  virtual void willChangeTitle(DocumentLoader*);
+  virtual void didChangeTitle(DocumentLoader*);
+
+  virtual void committedLoad(WebCore::DocumentLoader*, const char*, int);
+  virtual void finishedLoading(DocumentLoader*);
+
+  virtual void updateGlobalHistory(const KURL&);
+  virtual bool shouldGoToHistoryItem(HistoryItem*) const;
+
+  virtual ResourceError cancelledError(const ResourceRequest&);
+  virtual ResourceError blockedError(const ResourceRequest&);
+  virtual ResourceError cannotShowURLError(const ResourceRequest&);
+  virtual ResourceError interruptForPolicyChangeError(const ResourceRequest&);
+
+  virtual ResourceError cannotShowMIMETypeError(const ResourceResponse&);
+  virtual ResourceError fileDoesNotExistError(const ResourceResponse&);
+
+  virtual bool shouldFallBack(const ResourceError&);
+
+  virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
+  virtual bool canShowMIMEType(const String& MIMEType) const;
+  virtual bool representationExistsForURLScheme(const String& URLScheme) const;
+  virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const;
+
+  virtual void frameLoadCompleted();
+  virtual void saveViewStateToItem(WebCore::HistoryItem*);
+  virtual void restoreViewState();
+  virtual void provisionalLoadStarted();
+  virtual void didFinishLoad();
+  virtual void prepareForDataSourceReplacement();
+
+  virtual WTF::PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(
+      const WebCore::ResourceRequest&,
+      const WebCore::SubstituteData&);
+  virtual void setTitle(const String& title, const KURL&);
+
+  virtual String userAgent(const WebCore::KURL&);
+
+  virtual void savePlatformDataToCachedPage(WebCore::CachedPage*);
+  virtual void transitionToCommittedFromCachedPage(WebCore::CachedPage*);
+  virtual void transitionToCommittedForNewPage();
+
+  virtual bool canCachePage() const;
+  virtual void download(WebCore::ResourceHandle*,
+                        const WebCore::ResourceRequest&,
+                        const WebCore::ResourceRequest&,
+                        const WebCore::ResourceResponse&);
 
   virtual PassRefPtr<Frame> createFrame(const KURL& url,
                                         const String& name,
@@ -234,6 +234,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
                                const String&,
                                bool);
   virtual void redirectDataToPlugin(Widget* pluginWidget);
+
   virtual Widget* createJavaAppletWidget(const IntSize&,
                                          Element*,
                                          const KURL& baseURL,
