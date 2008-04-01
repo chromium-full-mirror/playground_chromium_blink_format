@@ -111,7 +111,10 @@ class DOMObject : public WebScriptObject, public IDOMObject {
   }
 };
 
-class DOMNode : public DOMObject, public IDOMNode, public IDOMEventTarget {
+class DECLSPEC_UUID("062AEEE3-9E42-44DC-A8A9-236B216FE011") DOMNode
+    : public DOMObject,
+      public IDOMNode,
+      public IDOMEventTarget {
  protected:
   DOMNode(WebCore::Node* n);
   ~DOMNode();

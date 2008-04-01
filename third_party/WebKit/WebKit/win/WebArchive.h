@@ -61,6 +61,9 @@ class WebArchive : public IWebArchive {
   virtual HRESULT STDMETHODCALLTYPE initWithData(
       /* [in] */ IStream*);
 
+  virtual HRESULT STDMETHODCALLTYPE initWithNode(
+      /* [in] */ IDOMNode*);
+
   virtual HRESULT STDMETHODCALLTYPE mainResource(
       /* [out, retval] */ IWebResource**);
 
