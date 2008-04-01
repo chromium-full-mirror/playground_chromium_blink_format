@@ -42,6 +42,8 @@ class RenderMenuList : public RenderFlexibleBox, private PopupMenuClient {
   RenderMenuList(HTMLSelectElement*);
   ~RenderMenuList();
 
+  HTMLSelectElement* selectElement();
+
   virtual bool isMenuList() const { return true; }
 
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
