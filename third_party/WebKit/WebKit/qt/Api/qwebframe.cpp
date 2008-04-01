@@ -86,7 +86,6 @@ void QWebFramePrivate::init(QWebFrame* qframe,
   frameLoaderClient->setFrame(qframe, frame.get());
 
   FrameView* frameView = new FrameView(frame.get());
-  frameView->setQWebFrame(qframe);
   if (!frameData->allowsScrolling)
     frameView->setScrollbarsMode(ScrollbarAlwaysOff);
   if (frameData->marginWidth != -1)

@@ -171,7 +171,7 @@ void QWebPagePrivate::createMainFrame() {
     frameData.marginWidth = 0;
     frameData.marginHeight = 0;
     mainFrame = new QWebFrame(q, &frameData);
-    mainFrame->d->frameView->setFrameGeometry(
+    mainFrame->d->frame->view()->setFrameGeometry(
         IntRect(IntPoint(0, 0), q->viewportSize()));
 
     emit q->frameCreated(mainFrame);
@@ -1529,7 +1529,7 @@ QWebPageContext::QWebPageContext(const WebCore::HitTestResult& hitTest)
   }
   WebCore::Frame* frame = hitTest.targetFrame();
   if (frame)
-    d->targetFrame = frame->view()->qwebframe();
+    d->targetFrame = QWebFramePrivate::kit(frame);
 }
 
 QWebPageContext::QWebPageContext() : d(0) {}
