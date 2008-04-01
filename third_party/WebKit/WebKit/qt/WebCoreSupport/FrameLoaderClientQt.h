@@ -73,30 +73,15 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual bool hasWebView() const;    // mainly for assertions
   virtual bool hasFrameView() const;  // ditto
 
-  virtual bool hasBackForwardList() const;
-  virtual void resetBackForwardList();
-
-  virtual bool provisionalItemIsTarget() const;
-  virtual bool loadProvisionalItemFromPageCache();
-  virtual void invalidateCurrentItemPageCache();
-
   virtual void makeRepresentation(DocumentLoader*);
   virtual void forceLayout();
   virtual void forceLayoutForNonHTML();
 
   virtual void setCopiesOnScroll();
 
-  virtual LoadErrorResetToken* tokenForLoadErrorReset();
-  virtual void resetAfterLoadError(LoadErrorResetToken*);
-  virtual void doNotResetAfterLoadError(LoadErrorResetToken*);
-
-  virtual void willCloseDocument();
-
   virtual void detachedFromParent2();
   virtual void detachedFromParent3();
   virtual void detachedFromParent4();
-
-  virtual void loadedFromCachedPage();
 
   virtual void frameLoaderDestroyed();
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
@@ -125,8 +110,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
                                       PassRefPtr<FormState>);
 
   virtual void dispatchDidLoadMainResource(DocumentLoader*);
-  virtual void clearLoadingFromPageCache(DocumentLoader*);
-  virtual bool isLoadingFromPageCache(DocumentLoader*);
   virtual void revertToProvisionalState(DocumentLoader*);
 
   virtual void setMainFrameDocumentReady(bool);
@@ -141,8 +124,6 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void frameLoadCompleted();
   virtual void restoreViewState();
   virtual void provisionalLoadStarted();
-  virtual bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
-  virtual void addHistoryItemForFragmentScroll();
   virtual void didFinishLoad();
   virtual void prepareForDataSourceReplacement();
   virtual void setTitle(const String& title, const KURL&);
