@@ -34,7 +34,8 @@ FontCustomPlatformData::~FontCustomPlatformData() {
 
 FontPlatformData FontCustomPlatformData::fontPlatformData(int size,
                                                           bool bold,
-                                                          bool italic) {
+                                                          bool italic,
+                                                          FontRenderingMode) {
   return FontPlatformData(m_cgFont, (ATSUFontID)m_atsFont, size, bold, italic);
 }
 
