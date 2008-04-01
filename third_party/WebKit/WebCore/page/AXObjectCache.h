@@ -31,15 +31,10 @@
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/RefPtr.h>
-#if PLATFORM(MAC)
-#include <wtf/RetainPtr.h>
-#endif
 
 #ifdef __OBJC__
-@class AccessibilityObjectWrapper;
 @class WebCoreTextMarker;
 #else
-class AccessibilityObjectWrapper;
 class WebCoreTextMarker;
 #endif
 
@@ -64,8 +59,11 @@ class AXObjectCache {
 
   void removeAXID(AccessibilityObject*);
 
+#if PLATFORM(MAC)
+  // FIXME: Move this to AccessibilityObjectWrapper.
   WebCoreTextMarker* textMarkerForVisiblePosition(const VisiblePosition&);
   VisiblePosition visiblePositionForTextMarker(WebCoreTextMarker*);
+#endif
 
   void childrenChanged(RenderObject*);
   void postNotification(RenderObject*, const String& message);

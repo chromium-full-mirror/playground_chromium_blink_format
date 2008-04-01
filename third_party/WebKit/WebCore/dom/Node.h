@@ -128,7 +128,7 @@ class Node : public TreeShared<Node> {
   virtual bool appendChild(PassRefPtr<Node> newChild, ExceptionCode&);
 
   virtual void remove(ExceptionCode&);
-  virtual bool hasChildNodes() const;
+  bool hasChildNodes() const { return firstChild(); }
   virtual PassRefPtr<Node> cloneNode(bool deep) = 0;
   virtual const AtomicString& localName() const;
   virtual const AtomicString& namespaceURI() const;

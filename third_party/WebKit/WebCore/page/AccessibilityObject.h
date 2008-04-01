@@ -32,6 +32,7 @@
 #include "VisiblePosition.h"
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
+
 #if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
 #endif
@@ -368,7 +369,6 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
                                     const UChar* chars,
                                     int length);
   AccessibilityObject* AXLinkElementForNode(Node*);
-
 #endif
 
  private:
@@ -376,6 +376,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   RefPtr<HTMLAreaElement> m_areaElement;
   Vector<RefPtr<AccessibilityObject>> m_children;
   unsigned m_id;
+
 #if PLATFORM(MAC)
   RetainPtr<AccessibilityObjectWrapper> m_wrapper;
 #endif
