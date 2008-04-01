@@ -54,9 +54,9 @@ PassRefPtr<JSCustomXPathNSResolver> JSCustomXPathNSResolver::create(
     return 0;
   }
 
-  return new JSCustomXPathNSResolver(
+  return adoptRef(new JSCustomXPathNSResolver(
       resolverObject,
-      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame());
+      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame()));
 }
 
 JSCustomXPathNSResolver::JSCustomXPathNSResolver(JSObject* customResolver,
