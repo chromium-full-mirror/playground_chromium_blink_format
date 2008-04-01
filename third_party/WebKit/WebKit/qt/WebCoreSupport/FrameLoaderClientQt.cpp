@@ -155,13 +155,7 @@ void FrameLoaderClientQt::detachedFromParent2() {}
 
 void FrameLoaderClientQt::detachedFromParent3() {}
 
-void FrameLoaderClientQt::detachedFromParent4() {
-  if (!m_webFrame)
-    return;
-  m_webFrame->d->frame = 0;
-  m_webFrame = 0;
-  m_frame = 0;
-}
+void FrameLoaderClientQt::detachedFromParent4() {}
 
 void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
   // don't need this one
@@ -348,8 +342,10 @@ void FrameLoaderClientQt::dispatchDidReceiveIcon() {
 }
 
 void FrameLoaderClientQt::frameLoaderDestroyed() {
-  Q_ASSERT(m_webFrame == 0);
-  Q_ASSERT(m_frame == 0);
+  delete m_webFrame;
+  m_frame = 0;
+  m_webFrame = 0;
+
   delete this;
 }
 
@@ -677,7 +673,7 @@ PassRefPtr<Frame> FrameLoaderClientQt::createFrame(
   QWebFrame* webFrame = new QWebFrame(m_webFrame, &frameData);
   emit m_webFrame->page()->frameCreated(webFrame);
 
-  RefPtr<Frame> childFrame = adoptRef(webFrame->d->frame.get());
+  RefPtr<Frame> childFrame = adoptRef(webFrame->d->frame);
 
   // FIXME: All of the below should probably be moved over into WebCore
   childFrame->tree()->setName(name);
