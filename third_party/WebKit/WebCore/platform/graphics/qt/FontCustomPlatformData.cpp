@@ -35,7 +35,8 @@ FontCustomPlatformData::~FontCustomPlatformData() {
 
 FontPlatformData FontCustomPlatformData::fontPlatformData(int size,
                                                           bool bold,
-                                                          bool italic) {
+                                                          bool italic,
+                                                          FontRenderingMode) {
   FontPlatformData result;
   result.handle = handle;
   return result;

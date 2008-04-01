@@ -23,6 +23,7 @@
 #ifndef FontCustomPlatformData_h_
 #define FontCustomPlatformData_h_
 
+#include "FontDescription.h"
 #include <wtf/Noncopyable.h>
 
 namespace WebCore {
@@ -36,7 +37,10 @@ struct FontCustomPlatformData : Noncopyable {
   int handle;  // for use with
                // QFontDatabase::addApplicationFont/removeApplicationFont
 
-  FontPlatformData fontPlatformData(int size, bool bold, bool italic);
+  FontPlatformData fontPlatformData(int size,
+                                    bool bold,
+                                    bool italic,
+                                    FontRenderingMode = NormalRenderingMode);
 };
 
 FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer);
