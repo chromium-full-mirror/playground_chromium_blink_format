@@ -31,7 +31,9 @@
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/RefPtr.h>
+#if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
+#endif
 
 #ifdef __OBJC__
 @class AccessibilityObjectWrapper;
@@ -84,8 +86,10 @@ class AXObjectCache {
 
   AXID getAXID(AccessibilityObject*);
 
+#if PLATFORM(MAC)
   HashMap<RenderObject*, RefPtr<AccessibilityObject>> m_objects;
   HashSet<AXID, IntHash<AXID>, AXIDHashTraits> m_idsInUse;
+#endif
 };
 
 #if !PLATFORM(MAC)
