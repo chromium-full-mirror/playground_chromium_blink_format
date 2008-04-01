@@ -83,9 +83,9 @@ void QWebFramePrivate::init(QWebFrame* qframe,
 
   frameLoaderClient = new FrameLoaderClientQt();
   frame = new Frame(webcorePage, frameData->ownerElement, frameLoaderClient);
-  frameLoaderClient->setFrame(qframe, frame.get());
+  frameLoaderClient->setFrame(qframe, frame);
 
-  FrameView* frameView = new FrameView(frame.get());
+  FrameView* frameView = new FrameView(frame);
   if (!frameData->allowsScrolling)
     frameView->setScrollbarsMode(ScrollbarAlwaysOff);
   if (frameData->marginWidth != -1)
@@ -93,7 +93,7 @@ void QWebFramePrivate::init(QWebFrame* qframe,
   if (frameData->marginHeight != -1)
     frameView->setMarginHeight(frameData->marginHeight);
 
-  frame->setView(frameView.get());
+  frame->setView(frameView);
   frame->init();
   frameView->deref();
 
@@ -165,7 +165,7 @@ QWebFrame::~QWebFrame() {
 */
 void QWebFrame::addToJSWindowObject(const QString& name, QObject* object) {
   KJS::JSLock lock;
-  JSDOMWindow* window = toJSDOMWindow(d->frame.get());
+  JSDOMWindow* window = toJSDOMWindow(d->frame);
   KJS::Bindings::RootObject* root = d->frame->bindingRootObject();
   if (!window) {
     qDebug() << "Warning: couldn't get window object";
@@ -535,7 +535,7 @@ QString QWebFrame::evaluateJavaScript(const QString& scriptSource) {
 }
 
 WebCore::Frame* QWebFramePrivate::core(QWebFrame* webFrame) {
-  return webFrame->d->frame.get();
+  return webFrame->d->frame;
 }
 
 QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {

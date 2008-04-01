@@ -79,7 +79,7 @@ class QWebFramePrivate {
 
   QWebFrame* q;
   WebCore::FrameLoaderClientQt* frameLoaderClient;
-  WTF::RefPtr<WebCore::Frame> frame;
+  WebCore::Frame* frame;
   QWebPage* page;
 };
 
