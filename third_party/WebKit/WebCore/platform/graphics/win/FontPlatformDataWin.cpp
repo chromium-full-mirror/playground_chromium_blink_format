@@ -67,7 +67,7 @@ FontPlatformData::FontPlatformData(HFONT font,
                                    bool bold,
                                    bool oblique,
                                    bool useGDI)
-    : m_font(font),
+    : m_font(RefCountedHFONT::create(font)),
       m_size(size)
 #if PLATFORM(CG)
       ,
@@ -87,10 +87,10 @@ FontPlatformData::FontPlatformData(HFONT font,
   SelectObject(hdc, font);
   UINT bufferSize = GetOutlineTextMetrics(hdc, 0, NULL);
 
-  ASSERT_WITH_MESSAGE(bufferSize != 0,
+  ASSERT_WITH_MESSAGE(bufferSize,
                       "Bitmap fonts not supported with CoreGraphics.");
 
-  if (bufferSize != 0) {
+  if (bufferSize) {
     OUTLINETEXTMETRICW* metrics = (OUTLINETEXTMETRICW*)malloc(bufferSize);
 
     GetOutlineTextMetricsW(hdc, bufferSize, metrics);
@@ -139,8 +139,7 @@ FontPlatformData::FontPlatformData(HFONT font,
 }
 
 FontPlatformData::FontPlatformData(float size, bool bold, bool oblique)
-    : m_font(0),
-      m_size(size)
+    : m_size(size)
 #if PLATFORM(CG)
       ,
       m_cgFont(0)

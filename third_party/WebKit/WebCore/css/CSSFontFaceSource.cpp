@@ -153,11 +153,11 @@ SimpleFontData* CSSFontFaceSource::getFontData(
           }
 
           SVGFontData* svgFontData = new SVGFontData(fontFaceElement);
-          fontData.set(
-              new SimpleFontData(m_font->platformDataFromCustomData(
-                                     fontDescription.computedPixelSize(),
-                                     syntheticBold, syntheticItalic),
-                                 true, false, svgFontData));
+          fontData.set(new SimpleFontData(
+              m_font->platformDataFromCustomData(
+                  fontDescription.computedPixelSize(), syntheticBold,
+                  syntheticItalic, fontDescription.renderingMode()),
+              true, false, svgFontData));
         }
       } else
 #endif
@@ -167,10 +167,11 @@ SimpleFontData* CSSFontFaceSource::getFontData(
         if (!m_font->ensureCustomFontData())
           return 0;
 
-        fontData.set(new SimpleFontData(m_font->platformDataFromCustomData(
-                                            fontDescription.computedPixelSize(),
-                                            syntheticBold, syntheticItalic),
-                                        true, false));
+        fontData.set(new SimpleFontData(
+            m_font->platformDataFromCustomData(
+                fontDescription.computedPixelSize(), syntheticBold,
+                syntheticItalic, fontDescription.renderingMode()),
+            true, false));
       }
     } else {
 #if ENABLE(SVG_FONTS)
@@ -187,6 +188,8 @@ SimpleFontData* CSSFontFaceSource::getFontData(
   } else {
     // Kick off the load now.
     m_font->beginLoadIfNeeded(fontSelector->docLoader());
+    // FIXME: m_string is a URL so it makes no sense to pass it as a family
+    // name.
     FontPlatformData* tempData =
         FontCache::getCachedFontPlatformData(fontDescription, m_string);
     if (!tempData)

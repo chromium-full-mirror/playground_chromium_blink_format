@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -108,16 +108,19 @@ bool CachedFont::ensureCustomFontData() {
   return m_fontData;
 }
 
-FontPlatformData CachedFont::platformDataFromCustomData(float size,
-                                                        bool bold,
-                                                        bool italic) {
+FontPlatformData CachedFont::platformDataFromCustomData(
+    float size,
+    bool bold,
+    bool italic,
+    FontRenderingMode renderingMode) {
 #if ENABLE(SVG_FONTS)
   if (m_externalSVGDocument)
     return FontPlatformData(size, bold, italic);
 #endif
 #if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK)
   ASSERT(m_fontData);
-  return m_fontData->fontPlatformData(static_cast<int>(size), bold, italic);
+  return m_fontData->fontPlatformData(static_cast<int>(size), bold, italic,
+                                      renderingMode);
 #else
   return FontPlatformData();
 #endif

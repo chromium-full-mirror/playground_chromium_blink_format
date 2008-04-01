@@ -126,11 +126,6 @@ void SimpleFontData::platformInit() {
 }
 
 void SimpleFontData::platformDestroy() {
-  if (!isCustomFont()) {
-    DeleteObject(m_font.hfont());
-    CGFontRelease(m_font.cgFont());
-  }
-
   platformCommonDestroy();
 }
 

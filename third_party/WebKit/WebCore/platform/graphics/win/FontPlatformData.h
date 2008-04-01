@@ -26,6 +26,8 @@
 #define FontPlatformData_H
 
 #include "StringImpl.h"
+#include <wtf/RetainPtr.h>
+#include <wtf/Refcounted.h>
 
 #if PLATFORM(CAIRO)
 #include <cairo-win32.h>
@@ -44,11 +46,8 @@ class FontPlatformData {
 
   // Used for deleted values in the font cache's hash tables.
   FontPlatformData(Deleted)
-      : m_font((HFONT)-1)
-#if PLATFORM(CG)
-        ,
-        m_cgFont(0)
-#elif PLATFORM(CAIRO)
+      : m_font(RefCountedHFONT::createDeleted())
+#if PLATFORM(CAIRO)
         ,
         m_fontFace(0)
 #endif
@@ -60,15 +59,11 @@ class FontPlatformData {
   }
 
   FontPlatformData()
-      : m_font(0)
-#if PLATFORM(CG)
-        ,
-        m_cgFont(0)
-#elif PLATFORM(CAIRO)
-        ,
-        m_fontFace(0)
+#if PLATFORM(CAIRO)
+      : m_fontFace(0),
+#else
+      :
 #endif
-        ,
         m_size(0),
         m_syntheticBold(false),
         m_syntheticOblique(false),
@@ -79,17 +74,20 @@ class FontPlatformData {
   FontPlatformData(float size, bool bold, bool oblique);
 
 #if PLATFORM(CG)
-  FontPlatformData(CGFontRef, float size, bool bold, bool oblique);
+  FontPlatformData(HFONT,
+                   CGFontRef,
+                   float size,
+                   bool bold,
+                   bool oblique,
+                   bool useGDI);
 #elif PLATFORM(CAIRO)
   FontPlatformData(cairo_font_face_t*, float size, bool bold, bool oblique);
 #endif
   ~FontPlatformData();
 
-  void platformDataInit(HFONT font, float size, HDC hdc, WCHAR* faceName);
-
-  HFONT hfont() const { return m_font; }
+  HFONT hfont() const { return m_font->hfont(); }
 #if PLATFORM(CG)
-  CGFontRef cgFont() const { return m_cgFont; }
+  CGFontRef cgFont() const { return m_cgFont.get(); }
 #elif PLATFORM(CAIRO)
   void setFont(cairo_t* ft) const;
   cairo_font_face_t* fontFace() const { return m_fontFace; }
@@ -102,10 +100,7 @@ class FontPlatformData {
   bool syntheticOblique() const { return m_syntheticOblique; }
   bool useGDI() const { return m_useGDI; }
 
-  unsigned hash() const {
-    return StringImpl::computeHash((UChar*)(&m_font),
-                                   sizeof(HFONT) / sizeof(UChar));
-  }
+  unsigned hash() const { return m_font->hash(); }
 
   bool operator==(const FontPlatformData& other) const {
     return m_font == other.m_font &&
@@ -121,9 +116,37 @@ class FontPlatformData {
   }
 
  private:
-  HFONT m_font;
+  class RefCountedHFONT : public RefCounted<RefCountedHFONT> {
+   public:
+    static PassRefPtr<RefCountedHFONT> create(HFONT hfont) {
+      return adoptRef(new RefCountedHFONT(hfont));
+    }
+    static PassRefPtr<RefCountedHFONT> createDeleted() {
+      return adoptRef(new RefCountedHFONT(reinterpret_cast<HFONT>(-1)));
+    }
+
+    ~RefCountedHFONT() {
+      if (m_hfont != reinterpret_cast<HFONT>(-1))
+        DeleteObject(m_hfont);
+    }
+
+    HFONT hfont() const { return m_hfont; }
+    unsigned hash() const {
+      return StringImpl::computeHash(reinterpret_cast<const UChar*>(&m_hfont),
+                                     sizeof(HFONT) / sizeof(UChar));
+    }
+
+   private:
+    RefCountedHFONT(HFONT hfont) : m_hfont(hfont) {}
+
+    HFONT m_hfont;
+  };
+
+  void platformDataInit(HFONT font, float size, HDC hdc, WCHAR* faceName);
+
+  RefPtr<RefCountedHFONT> m_font;
 #if PLATFORM(CG)
-  CGFontRef m_cgFont;
+  RetainPtr<CGFontRef> m_cgFont;
 #elif PLATFORM(CAIRO)
   cairo_font_face_t* m_fontFace;
   cairo_scaled_font_t* m_scaledFont;
