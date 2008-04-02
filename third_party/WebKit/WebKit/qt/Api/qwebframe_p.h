@@ -61,7 +61,10 @@ class QWebFramePrivate {
         verticalScrollBarPolicy(Qt::ScrollBarAsNeeded),
         frameLoaderClient(0),
         frame(0),
-        page(0) {}
+        page(0),
+        allowsScrolling(true),
+        marginWidth(-1),
+        marginHeight(-1) {}
   void init(QWebFrame* qframe, WebCore::Page* page, QWebFrameData* frameData);
 
   inline QWebFrame* parentFrame() {
@@ -81,6 +84,10 @@ class QWebFramePrivate {
   WebCore::FrameLoaderClientQt* frameLoaderClient;
   WebCore::Frame* frame;
   QWebPage* page;
+
+  bool allowsScrolling;
+  int marginWidth;
+  int marginHeight;
 };
 
 #endif

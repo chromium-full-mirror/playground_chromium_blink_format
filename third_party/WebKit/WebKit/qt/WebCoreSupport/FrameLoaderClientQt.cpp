@@ -39,6 +39,7 @@
 #include "Page.h"
 #include "PluginData.h"
 #include "ProgressTracker.h"
+#include "RenderPart.h"
 #include "ResourceRequest.h"
 #include "HistoryItem.h"
 #include "HTMLFormElement.h"
@@ -125,16 +126,45 @@ void FrameLoaderClientQt::savePlatformDataToCachedPage(CachedPage*) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::transitionToCommittedFromCachedPage(CachedPage*) {
-  notImplemented();
-}
+void FrameLoaderClientQt::transitionToCommittedFromCachedPage(CachedPage*) {}
 
 void FrameLoaderClientQt::transitionToCommittedForNewPage() {
-  //    qDebug() << "FrameLoaderClientQt::makeDocumentView" <<
-  //    m_frame->document();
+  ASSERT(m_frame);
+  ASSERT(m_webFrame);
 
-  //     if (!m_frame->document())
-  //         m_frame->loader()->createEmptyDocument();
+  Page* page = m_frame->page();
+  ASSERT(page);
+
+  bool isMainFrame = m_frame == page->mainFrame();
+
+  m_frame->setView(0);
+
+  FrameView* frameView;
+  if (isMainFrame)
+    frameView = new FrameView(m_frame, m_webFrame->page()->viewportSize());
+  else
+    frameView = new FrameView(m_frame);
+
+  if (!m_webFrame->d->allowsScrolling)
+    frameView->setScrollbarsMode(ScrollbarAlwaysOff);
+  if (m_webFrame->d->marginWidth != -1)
+    frameView->setMarginWidth(m_webFrame->d->marginWidth);
+  if (m_webFrame->d->marginHeight != -1)
+    frameView->setMarginHeight(m_webFrame->d->marginHeight);
+  if (m_webFrame->d->horizontalScrollBarPolicy != Qt::ScrollBarAsNeeded)
+    frameView->setHScrollbarMode(
+        (ScrollbarMode)m_webFrame->d->horizontalScrollBarPolicy);
+  if (m_webFrame->d->verticalScrollBarPolicy != Qt::ScrollBarAsNeeded)
+    frameView->setVScrollbarMode(
+        (ScrollbarMode)m_webFrame->d->verticalScrollBarPolicy);
+
+  m_frame->setView(frameView);
+  // FrameViews are created with a ref count of 1. Release this ref since we've
+  // assigned it to frame.
+  frameView->deref();
+
+  if (m_frame->ownerRenderer())
+    m_frame->ownerRenderer()->setWidget(frameView);
 }
 
 void FrameLoaderClientQt::makeRepresentation(DocumentLoader*) {
@@ -383,13 +413,10 @@ bool FrameLoaderClientQt::shouldGoToHistoryItem(
   return true;
 }
 
-void FrameLoaderClientQt::saveViewStateToItem(WebCore::HistoryItem*) {
-  notImplemented();
-}
+void FrameLoaderClientQt::saveViewStateToItem(WebCore::HistoryItem*) {}
 
 bool FrameLoaderClientQt::canCachePage() const {
-  // don't do any caching for now
-  return false;
+  return true;
 }
 
 void FrameLoaderClientQt::setMainDocumentError(
