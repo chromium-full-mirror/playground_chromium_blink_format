@@ -108,7 +108,7 @@ static inline Qt::DropAction dragOpToDropAction(unsigned actions) {
 }
 
 QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
-    : q(qq), view(0), modified(false) {
+    : q(qq), view(0), modified(false), viewportSize(QSize(0, 0)) {
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();
   editorClient = new EditorClientQt(q);
@@ -1082,10 +1082,10 @@ void QWebPage::triggerAction(WebAction action, bool checked) {
 }
 
 QSize QWebPage::viewportSize() const {
-  QWebFrame* frame = mainFrame();
-  if (frame->d->frame && frame->d->frame->view())
-    return frame->d->frame->view()->frameGeometry().size();
-  return QSize(0, 0);
+  if (d->mainFrame && d->mainFrame->d->frame->view())
+    return d->mainFrame->d->frame->view()->frameGeometry().size();
+
+  return d->viewportSize;
 }
 
 /*!
@@ -1096,6 +1096,8 @@ QSize QWebPage::viewportSize() const {
     if the document is larger than the viewport.
 */
 void QWebPage::setViewportSize(const QSize& size) const {
+  d->viewportSize = size;
+
   QWebFrame* frame = mainFrame();
   if (frame->d->frame && frame->d->frame->view()) {
     WebCore::FrameView* view = frame->d->frame->view();
