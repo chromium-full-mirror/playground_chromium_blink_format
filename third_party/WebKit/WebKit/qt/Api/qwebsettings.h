@@ -96,6 +96,11 @@ class QWEBKIT_EXPORT QWebSettings {
   static void setWebGraphic(WebGraphic type, const QPixmap& graphic);
   static QPixmap webGraphic(WebGraphic type);
 
+  static void setPageCacheCapacity(int numberOfPages);
+  static void setObjectCacheCapacities(int cacheMinDeadCapacity,
+                                       int cacheMaxDead,
+                                       int totalCapacity);
+
  private:
   friend class QWebPagePrivate;
   friend class QWebSettingsPrivate;
