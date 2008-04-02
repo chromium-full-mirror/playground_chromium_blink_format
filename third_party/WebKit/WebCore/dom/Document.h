@@ -530,10 +530,7 @@ class Document : public ContainerNode {
   void attachRange(Range*);
   void detachRange(Range*);
 
-  void nodeChildrenChanged(ContainerNode* container,
-                           Node* beforeChange,
-                           Node* afterChange,
-                           int childCountDelta);
+  void nodeChildrenChanged(ContainerNode*);
   void nodeWillBeRemoved(Node*);
 
   void textInserted(Node*, unsigned offset, unsigned length);

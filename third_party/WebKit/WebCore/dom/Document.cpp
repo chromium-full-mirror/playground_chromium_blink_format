@@ -80,8 +80,6 @@
 #include "NodeFilter.h"
 #include "NodeIterator.h"
 #include "NodeWithIndex.h"
-#include "NodeWithIndexAfter.h"
-#include "NodeWithIndexBefore.h"
 #include "OverflowEvent.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
@@ -2510,16 +2508,10 @@ void Document::detachNodeIterator(NodeIterator* ni) {
   m_nodeIterators.remove(ni);
 }
 
-void Document::nodeChildrenChanged(ContainerNode* container,
-                                   Node* beforeChange,
-                                   Node* afterChange,
-                                   int childCountDelta) {
-  NodeWithIndexAfter beforeChangeWithIndex(beforeChange);
-  NodeWithIndexBefore afterChangeWithIndex(container, afterChange);
+void Document::nodeChildrenChanged(ContainerNode* container) {
   HashSet<Range*>::const_iterator end = m_ranges.end();
   for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != end; ++it)
-    (*it)->nodeChildrenChanged(beforeChangeWithIndex, afterChangeWithIndex,
-                               childCountDelta);
+    (*it)->nodeChildrenChanged(container);
 }
 
 void Document::nodeWillBeRemoved(Node* n) {
@@ -2529,11 +2521,10 @@ void Document::nodeWillBeRemoved(Node* n) {
        it != nodeIteratorsEnd; ++it)
     (*it)->nodeWillBeRemoved(n);
 
-  NodeWithIndex nodeWithIndex(n);
   HashSet<Range*>::const_iterator rangesEnd = m_ranges.end();
   for (HashSet<Range*>::const_iterator it = m_ranges.begin(); it != rangesEnd;
        ++it)
-    (*it)->nodeWillBeRemoved(nodeWithIndex);
+    (*it)->nodeWillBeRemoved(n);
 
   if (Frame* frame = this->frame()) {
     frame->selectionController()->nodeWillBeRemoved(n);

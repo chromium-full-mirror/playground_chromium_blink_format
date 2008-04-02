@@ -25,21 +25,14 @@
 #ifndef Range_h
 #define Range_h
 
-#include "Position.h"
+#include "RangeBoundaryPoint.h"
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
 
-typedef int ExceptionCode;
-
 class DocumentFragment;
-class Document;
 class NodeWithIndex;
-class NodeWithIndexAfter;
-class NodeWithIndexBefore;
-class IntRect;
-class String;
 class Text;
 
 class Range : public RefCounted<Range> {
@@ -56,10 +49,10 @@ class Range : public RefCounted<Range> {
   ~Range();
 
   Document* ownerDocument() const { return m_ownerDocument.get(); }
-  Node* startContainer() const { return m_start.container.get(); }
-  int startOffset() const { return m_start.posOffset; }
-  Node* endContainer() const { return m_end.container.get(); }
-  int endOffset() const { return m_end.posOffset; }
+  Node* startContainer() const { return m_start.container(); }
+  int startOffset() const { return m_start.offset(); }
+  Node* endContainer() const { return m_end.container(); }
+  int endOffset() const { return m_end.offset(); }
 
   Node* startContainer(ExceptionCode&) const;
   int startOffset(ExceptionCode&) const;
@@ -115,8 +108,8 @@ class Range : public RefCounted<Range> {
   void surroundContents(PassRefPtr<Node>, ExceptionCode&);
   void setStartBefore(Node*, ExceptionCode&);
 
-  const Position& startPosition() const { return m_start; }
-  const Position& endPosition() const { return m_end; }
+  const Position& startPosition() const { return m_start.position(); }
+  const Position& endPosition() const { return m_end.position(); }
 
   Node* firstNode() const;
   Node* pastLastNode() const;
@@ -126,10 +119,8 @@ class Range : public RefCounted<Range> {
   IntRect boundingBox();
   void addLineBoxRects(Vector<IntRect>&, bool useSelectionHeight = false);
 
-  void nodeChildrenChanged(NodeWithIndexAfter& beforeChange,
-                           NodeWithIndexBefore& afterChange,
-                           int childCountDelta);
-  void nodeWillBeRemoved(NodeWithIndex&);
+  void nodeChildrenChanged(ContainerNode*);
+  void nodeWillBeRemoved(Node*);
 
   void textInserted(Node*, unsigned offset, unsigned length);
   void textRemoved(Node*, unsigned offset, unsigned length);
@@ -148,7 +139,7 @@ class Range : public RefCounted<Range> {
         PassRefPtr<Node> endContainer,
         int endOffset);
 
-  void checkNodeWOffset(Node*, int offset, ExceptionCode&) const;
+  Node* checkNodeWOffset(Node*, int offset, ExceptionCode&) const;
   void checkNodeBA(Node*, ExceptionCode&) const;
   void checkDeleteExtract(ExceptionCode&);
   bool containedByReadOnly() const;
@@ -159,8 +150,8 @@ class Range : public RefCounted<Range> {
   PassRefPtr<DocumentFragment> processContents(ActionType, ExceptionCode&);
 
   RefPtr<Document> m_ownerDocument;
-  Position m_start;
-  Position m_end;
+  RangeBoundaryPoint m_start;
+  RangeBoundaryPoint m_end;
 };
 
 PassRefPtr<Range> rangeOfContents(Node*);
