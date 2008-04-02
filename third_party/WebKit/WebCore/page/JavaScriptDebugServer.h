@@ -47,18 +47,25 @@ class JavaScriptDebugServer : KJS::Debugger {
   void addListener(JavaScriptDebugListener*);
   void removeListener(JavaScriptDebugListener*);
 
+  void addListener(JavaScriptDebugListener*, Page*);
+  void removeListener(JavaScriptDebugListener*, Page*);
+
   void pageCreated(Page*);
 
   typedef HashSet<JavaScriptDebugListener*> ListenerSet;
+  typedef void (JavaScriptDebugListener::*JavaScriptExecutionCallback)(
+      KJS::ExecState*,
+      int sourceID,
+      int lineNumber);
 
  private:
   JavaScriptDebugServer();
   ~JavaScriptDebugServer();
 
-  typedef void (JavaScriptDebugListener::*JavaScriptExecutionCallback)(
-      KJS::ExecState*,
-      int sourceID,
-      int lineNumber);
+  bool hasListeners() const {
+    return !m_listeners.isEmpty() || !m_pageListenersMap.isEmpty();
+  }
+
   void dispatchFunctionToListeners(JavaScriptExecutionCallback,
                                    KJS::ExecState*,
                                    int sourceID,
@@ -89,6 +96,8 @@ class JavaScriptDebugServer : KJS::Debugger {
                          int lineNumber,
                          KJS::JSValue* exception);
 
+  typedef HashMap<Page*, ListenerSet*> PageListenersMap;
+  PageListenersMap m_pageListenersMap;
   ListenerSet m_listeners;
   bool m_callingListeners;
 };
