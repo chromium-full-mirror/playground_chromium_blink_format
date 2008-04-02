@@ -33,6 +33,7 @@ namespace WTF {
 
 Mutex* atomicallyInitializedStaticMutex;
 
+void initializeThreading() {}
 ThreadIdentifier createThread(ThreadFunction, void*) {
   return 0;
 }

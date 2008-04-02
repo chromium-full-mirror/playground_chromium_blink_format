@@ -30,7 +30,8 @@
 #include "config.h"
 #include "Threading.h"
 
-#include "HashMap.h"
+#include <wtf/HashMap.h>
+#include <wtf/MathExtras.h>
 
 #include <glib.h>
 
@@ -43,6 +44,7 @@ void initializeThreading() {
     g_thread_init(NULL);
     ASSERT(!atomicallyInitializedStaticMutex);
     atomicallyInitializedStaticMutex = new Mutex;
+    wtf_random_init();
   }
   ASSERT(g_thread_supported());
 }

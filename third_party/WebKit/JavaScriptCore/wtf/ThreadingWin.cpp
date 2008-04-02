@@ -65,10 +65,18 @@
 
 #include <windows.h>
 #include <wtf/HashMap.h>
+#include <wtf/MathExtras.h>
 
 namespace WTF {
 
 Mutex* atomicallyInitializedStaticMutex;
+
+void initializeThreading() {
+  if (!atomicallyInitializedStaticMutex) {
+    atomicallyInitializedStaticMutex = new Mutex;
+    wtf_random_init();
+  }
+}
 
 static Mutex& threadMapMutex() {
   static Mutex mutex;
