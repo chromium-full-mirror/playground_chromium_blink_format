@@ -58,8 +58,13 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                                FloatRect& maskRect) const;
 
  protected:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGMaskElement,
+                                         SVGURIReference,
+                                         String,
+                                         Href,
+                                         href)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGMaskElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
@@ -84,7 +89,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                  Height,
                                  height)
 
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
   RefPtr<SVGResourceMasker> m_masker;

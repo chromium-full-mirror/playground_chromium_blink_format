@@ -61,11 +61,16 @@ class SVGAElement : public SVGStyledTransformableElement,
   virtual bool childShouldCreateRenderer(Node*) const;
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGAElement,
+                                         SVGURIReference,
+                                         String,
+                                         Href,
+                                         href)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGAElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)

@@ -36,7 +36,7 @@ class SVGTransformList;
 
 class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
  public:
-  SVGViewSpec(const SVGSVGElement*);
+  SVGViewSpec(SVGSVGElement*);
   virtual ~SVGViewSpec();
 
   bool parseViewSpec(const String&);
@@ -53,11 +53,11 @@ class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
   SVGElement* viewTarget() const;
 
  protected:
-  virtual const SVGElement* contextElement() const;
+  virtual SVGElement* contextElement();
 
  private:
   mutable RefPtr<SVGTransformList> m_transform;
-  const SVGSVGElement* m_contextElement;
+  SVGSVGElement* m_contextElement;
   String m_viewTargetString;
 };
 

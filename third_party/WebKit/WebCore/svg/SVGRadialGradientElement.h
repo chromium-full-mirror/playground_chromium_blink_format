@@ -48,7 +48,7 @@ class SVGRadialGradientElement : public SVGGradientElement {
   RadialGradientAttributes collectGradientProperties() const;
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,

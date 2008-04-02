@@ -40,6 +40,8 @@ class SVGNumberList : public SVGList<float> {
 
   void parse(const String& value);
 
+  String valueAsString() const;
+
  private:
   SVGNumberList(const QualifiedName&);
 };

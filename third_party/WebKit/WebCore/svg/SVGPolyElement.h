@@ -55,13 +55,14 @@ class SVGPolyElement : public SVGStyledTransformableElement,
   virtual bool supportsMarkers() const { return true; }
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
   bool m_ignoreAttributeChanges : 1;
   mutable RefPtr<SVGPointList> m_points;
 
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGPolyElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)

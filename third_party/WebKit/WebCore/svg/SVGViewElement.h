@@ -47,20 +47,23 @@ class SVGViewElement : public SVGStyledElement,
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
   mutable RefPtr<SVGStringList> m_viewTarget;
 
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGViewElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGViewElement,
+                                         SVGFitToViewBox,
                                          FloatRect,
                                          ViewBox,
                                          viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGViewElement,
+                                         SVGFitToViewBox,
                                          SVGPreserveAspectRatio*,
                                          PreserveAspectRatio,
                                          preserveAspectRatio)

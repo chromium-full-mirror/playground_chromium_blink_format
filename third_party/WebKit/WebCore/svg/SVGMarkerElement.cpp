@@ -42,10 +42,10 @@ SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       SVGFitToViewBox(),
-      m_refX(this, LengthModeWidth),
-      m_refY(this, LengthModeHeight),
-      m_markerWidth(this, LengthModeWidth),
-      m_markerHeight(this, LengthModeHeight),
+      m_refX(SVGLength(this, LengthModeWidth)),
+      m_refY(SVGLength(this, LengthModeHeight)),
+      m_markerWidth(SVGLength(this, LengthModeWidth)),
+      m_markerHeight(SVGLength(this, LengthModeHeight)),
       m_markerUnits(SVG_MARKERUNITS_STROKEWIDTH),
       m_orientType(0),
       m_orientAngle(new SVGAngle()) {
@@ -106,15 +106,16 @@ ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(SVGMarkerElement,
                                                      SVGNames::orientAttr,
                                                      "orientType",
                                                      m_orientType)
-ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(SVGMarkerElement,
-                                                     SVGAngle*,
-                                                     Angle,
-                                                     angle,
-                                                     OrientAngle,
-                                                     orientAngle,
-                                                     SVGNames::orientAttr,
-                                                     "orientAngle",
-                                                     m_orientAngle.get())
+ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED_WITH_CUSTOM_IDENTIFIER(
+    SVGMarkerElement,
+    SVGAngle,
+    Angle,
+    angle,
+    OrientAngle,
+    orientAngle,
+    SVGNames::orientAttr,
+    "orientAngle",
+    m_orientAngle)
 
 void SVGMarkerElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::markerUnitsAttr) {

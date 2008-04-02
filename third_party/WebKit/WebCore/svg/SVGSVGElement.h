@@ -139,7 +139,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void inheritViewAttributes(SVGViewElement*);
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
   friend class RenderSVGRoot;
   friend class RenderSVGViewportContainer;
@@ -152,15 +152,18 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void addSVGWindowEventListener(const AtomicString& eventType,
                                  const Attribute* attr);
 
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGSVGElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGSVGElement,
+                                         SVGFitToViewBox,
                                          FloatRect,
                                          ViewBox,
                                          viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGSVGElement,
+                                         SVGFitToViewBox,
                                          SVGPreserveAspectRatio*,
                                          PreserveAspectRatio,
                                          preserveAspectRatio)

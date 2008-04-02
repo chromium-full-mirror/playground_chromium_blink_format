@@ -45,7 +45,7 @@ class Element : public ContainerNode {
 
   const AtomicString& getIDAttribute() const;
   bool hasAttribute(const QualifiedName&) const;
-  const AtomicString& getAttribute(const QualifiedName&) const;
+  virtual const AtomicString& getAttribute(const QualifiedName&) const;
   void setAttribute(const QualifiedName&,
                     const AtomicString& value,
                     ExceptionCode&);
@@ -57,7 +57,7 @@ class Element : public ContainerNode {
   bool hasAttributeNS(const String& namespaceURI,
                       const String& localName) const;
 
-  const AtomicString& getAttribute(const String& name) const;
+  virtual const AtomicString& getAttribute(const String& name) const;
   const AtomicString& getAttributeNS(const String& namespaceURI,
                                      const String& localName) const;
 

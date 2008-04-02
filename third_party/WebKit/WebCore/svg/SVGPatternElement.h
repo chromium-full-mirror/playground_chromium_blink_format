@@ -24,12 +24,13 @@
 #define SVGPatternElement_h
 
 #if ENABLE(SVG)
-#include "SVGPaintServerPattern.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
+#include "SVGPaintServerPattern.h"
 #include "SVGStyledElement.h"
 #include "SVGTests.h"
+#include "SVGTransformList.h"
 #include "SVGURIReference.h"
 
 namespace WebCore {
@@ -37,7 +38,6 @@ namespace WebCore {
 struct PatternAttributes;
 
 class SVGLength;
-class SVGTransformList;
 
 class SVGPatternElement : public SVGStyledElement,
                           public SVGURIReference,
@@ -62,16 +62,23 @@ class SVGPatternElement : public SVGStyledElement,
   virtual SVGResource* canvasResource();
 
  protected:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGPatternElement,
+                                         SVGURIReference,
+                                         String,
+                                         Href,
+                                         href)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGPatternElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGPatternElement,
+                                         SVGFitToViewBox,
                                          FloatRect,
                                          ViewBox,
                                          viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGPatternElement,
+                                         SVGFitToViewBox,
                                          SVGPreserveAspectRatio*,
                                          PreserveAspectRatio,
                                          preserveAspectRatio)
@@ -106,7 +113,7 @@ class SVGPatternElement : public SVGStyledElement,
 
   mutable RefPtr<SVGPaintServerPattern> m_resource;
 
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
   friend class SVGPaintServerPattern;
