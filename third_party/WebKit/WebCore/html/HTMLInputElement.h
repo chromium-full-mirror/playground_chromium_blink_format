@@ -92,6 +92,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
   }
   bool isSearchField() const { return m_type == SEARCH; }
   virtual bool isInputTypeHidden() const { return m_type == HIDDEN; }
+  virtual bool isPasswordField() const { return m_type == PASSWORD; }
 
   bool checked() const { return m_checked; }
   void setChecked(bool, bool sendChangeEvent = false);

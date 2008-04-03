@@ -172,16 +172,14 @@ bool AccessibilityObject::isAttachment() const {
   return isWidget;
 }
 
-bool isPasswordFieldElement(Node* node) {
-  if (!node || !node->hasTagName(inputTag))
-    return false;
-
-  HTMLInputElement* input = static_cast<HTMLInputElement*>(node);
-  return input->inputType() == HTMLInputElement::PASSWORD;
-}
-
 bool AccessibilityObject::isPasswordField() const {
-  return m_renderer && isPasswordFieldElement(m_renderer->element());
+  if (!m_renderer)
+    return 0;
+  if (!m_renderer->element())
+    return 0;
+  if (!m_renderer->element()->isHTMLElement())
+    return 0;
+  return static_cast<HTMLElement*>(m_renderer->element())->isPasswordField();
 }
 
 int AccessibilityObject::headingLevel(Node* node) const {
@@ -731,11 +729,6 @@ bool AccessibilityObject::isEnabled() {
 }
 
 void AccessibilityObject::press() {
-  if (isAttachment()) {
-    performPressActionForAttachment();
-    return;
-  }
-
   Element* actionElem = actionElement();
   if (!actionElem)
     return;
@@ -793,6 +786,12 @@ void AccessibilityObject::documentLinks(
 FrameView* AccessibilityObject::documentFrameView() {
   // this is the RenderObject's Document's Frame's FrameView
   return m_renderer->document()->view();
+}
+
+Widget* AccessibilityObject::widgetForAttachmentView() {
+  if (!isAttachment())
+    return 0;
+  return static_cast<RenderWidget*>(m_renderer)->widget();
 }
 
 FrameView* AccessibilityObject::frameViewIfRenderView() {
@@ -1178,7 +1177,11 @@ IntRect AccessibilityObject::doAXBoundsForTextMarkerRange(
       ourrect = boundingBox;
   }
 
-  return convertViewRectToScreenCoords(ourrect);
+#if PLATFORM(MAC)
+  return m_renderer->document()->view()->contentsToScreen(ourrect);
+#else
+  return ourrect;
+#endif
 }
 
 int AccessibilityObject::doAXLengthForTextMarkerRange(
@@ -1214,7 +1217,12 @@ VisiblePosition AccessibilityObject::doAXTextMarkerForPosition(
   // locate the node containing the point
   IntPoint pointResult;
   while (1) {
-    IntPoint ourpoint = convertAbsolutePointToViewCoords(point, frameView);
+    IntPoint ourpoint;
+#if PLATFORM(MAC)
+    ourpoint = frameView->screenToContents(point);
+#else
+    ourpoint = point;
+#endif
     HitTestRequest request(true, true);
     HitTestResult result(ourpoint);
     renderer->layer()->hitTest(request, result);
@@ -1563,12 +1571,6 @@ AccessibilityObject::PlainTextRange AccessibilityObject::doAXRangeForLine(
 // returns an
 // an error in that case. We return textControl->text().length(), 1. Does this
 // matter?
-
-// NOTE: Any existing callers of this function need to run code like this on the
-// NSPoint
-// before passing it into this function as an IntPoint:
-// NSPoint windowCoord = [[view window] convertScreenToBase: point];
-// doAXTextMarkerForPosition([view convertPoint:windowCoord fromView:nil]);
 AccessibilityObject::PlainTextRange AccessibilityObject::doAXRangeForPosition(
     const IntPoint& point) {
   int index = indexForTextMarker(doAXTextMarkerForPosition(point));

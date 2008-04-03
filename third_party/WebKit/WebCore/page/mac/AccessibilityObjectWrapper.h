@@ -28,8 +28,17 @@
 
 #import <wtf/RefPtr.h>
 
+#ifdef __OBJC__
+@class WebCoreTextMarker;
+@class WebCoreTextMarkerRange;
+#else
+class WebCoreTextMarker;
+class WebCoreTextMarkerRange;
+#endif
+
 namespace WebCore {
 class AccessibilityObject;
+class VisiblePosition;
 }
 
 @interface AccessibilityObjectWrapper : NSObject {

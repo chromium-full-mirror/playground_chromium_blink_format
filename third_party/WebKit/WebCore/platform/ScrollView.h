@@ -121,6 +121,11 @@ class ScrollView : public Widget {
 
   bool scroll(ScrollDirection, ScrollGranularity);
 
+#if PLATFORM(MAC)
+  IntRect contentsToScreen(const IntRect&) const;
+  IntPoint screenToContents(const IntPoint&) const;
+#endif
+
 #if PLATFORM(MAC) && defined __OBJC__
  public:
   NSView* documentView() const;
