@@ -287,6 +287,7 @@ QUrl QWebSettings::userStyleSheetLocation() const {
 */
 void QWebSettings::setIconDatabaseEnabled(bool enabled,
                                           const QString& location) {
+  WebCore::iconDatabase()->delayDatabaseCleanup();
   WebCore::iconDatabase()->setEnabled(enabled);
   if (enabled) {
     QFileInfo info(location);
@@ -305,6 +306,17 @@ void QWebSettings::setIconDatabaseEnabled(bool enabled,
 bool QWebSettings::iconDatabaseEnabled() {
   return WebCore::iconDatabase()->isEnabled() &&
          WebCore::iconDatabase()->isOpen();
+}
+
+/*!
+    This will remove all the data from the icon database. If no
+    icon database is enabled noting is going to happen.
+
+    \sa iconDatabaseEnabled()
+*/
+void QWebSettings::clearIconDatabase() {
+  if (iconDatabaseEnabled())
+    WebCore::iconDatabase()->removeAllIcons();
 }
 
 /*!

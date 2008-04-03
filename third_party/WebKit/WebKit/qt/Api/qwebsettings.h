@@ -92,6 +92,7 @@ class QWEBKIT_EXPORT QWebSettings {
   static void setIconDatabaseEnabled(bool enabled,
                                      const QString& location = QString());
   static bool iconDatabaseEnabled();
+  static void clearIconDatabase();
   static QPixmap iconForUrl(const QUrl& url);
 
   static void setWebGraphic(WebGraphic type, const QPixmap& graphic);
