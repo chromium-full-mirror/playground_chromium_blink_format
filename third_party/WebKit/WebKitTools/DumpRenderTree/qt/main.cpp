@@ -153,7 +153,8 @@ int main(int argc, char* argv[]) {
   if (args.last() == QLatin1String("-")) {
     dumper.open();
   } else {
-    if (!args.last().startsWith("/") && !args.last().startsWith("file:")) {
+    if (!args.last().startsWith("/") && !args.last().startsWith("file:") &&
+        !args.last().startsWith("http:") && !args.last().startsWith("https:")) {
       QString path = QDir::currentPath();
       if (!path.endsWith('/'))
         path.append('/');
