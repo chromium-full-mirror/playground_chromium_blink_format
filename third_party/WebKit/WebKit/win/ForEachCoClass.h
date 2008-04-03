@@ -32,9 +32,9 @@
 #include "ProgIDMacros.h"
 
 #define FOR_EACH_COCLASS(macro)                                              \
-  macro(CFDictionaryPropertyBag) macro(WebCache) macro(WebDatabaseManager)   \
-      macro(WebDownload) macro(WebError) macro(WebHistory)                   \
-          macro(WebHistoryItem) macro(WebIconDatabase)                       \
+  macro(CFDictionaryPropertyBag) macro(WebArchive) macro(WebCache)           \
+      macro(WebDatabaseManager) macro(WebDownload) macro(WebError)           \
+          macro(WebHistory) macro(WebHistoryItem) macro(WebIconDatabase)     \
               macro(WebJavaScriptCollector) macro(WebKitStatistics)          \
                   macro(WebMutableURLRequest) macro(WebNotificationCenter)   \
                       macro(WebPreferences) macro(WebScrollBar)              \
