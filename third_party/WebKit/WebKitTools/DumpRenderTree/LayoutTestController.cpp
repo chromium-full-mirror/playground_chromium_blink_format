@@ -147,18 +147,6 @@ static JSValueRef dumpEditingCallbacksCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-static JSValueRef dumpFrameLoadCallbacksCallback(JSContextRef context,
-                                                 JSObjectRef function,
-                                                 JSObjectRef thisObject,
-                                                 size_t argumentCount,
-                                                 const JSValueRef arguments[],
-                                                 JSValueRef* exception) {
-  LayoutTestController* controller =
-      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->setDumpFrameLoadCallbacks(true);
-  return JSValueMakeUndefined(context);
-}
-
 static JSValueRef dumpResourceLoadCallbacksCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -989,8 +977,6 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"dumpDOMAsWebArchive", dumpDOMAsWebArchiveCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpEditingCallbacks", dumpEditingCallbacksCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"dumpFrameLoadCallbacks", dumpFrameLoadCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpResourceLoadCallbacks", dumpResourceLoadCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
