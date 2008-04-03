@@ -30,8 +30,6 @@
 
 namespace WebCore {
 
-class String;
-
 class SVGTransformList : public SVGPODList<SVGTransform> {
  public:
   static PassRefPtr<SVGTransformList> create(
@@ -46,8 +44,6 @@ class SVGTransformList : public SVGPODList<SVGTransform> {
   // Internal use only
   SVGTransform concatenate() const;
   SVGTransform concatenateForType(SVGTransform::SVGTransformType) const;
-
-  String valueAsString() const;
 
  private:
   SVGTransformList(const QualifiedName&);

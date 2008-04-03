@@ -40,14 +40,10 @@ class SVGTRefElement : public SVGTextPositioningElement,
   bool childShouldCreateRenderer(Node*) const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGTRefElement,
-                                         SVGURIReference,
-                                         String,
-                                         Href,
-                                         href)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
 
   void updateReferencedText();
 };

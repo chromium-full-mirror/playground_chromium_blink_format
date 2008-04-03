@@ -37,7 +37,7 @@ class SVGFEFloodElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFEFlood* filterEffect(SVGResourceFilter*) const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEFloodElement, String, String, In1, in1)

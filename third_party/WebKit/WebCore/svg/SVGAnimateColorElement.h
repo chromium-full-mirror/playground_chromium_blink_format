@@ -42,7 +42,7 @@ class SVGAnimateColorElement : public SVGAnimationElement {
   virtual void applyAnimatedValueToElement();
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
   virtual bool updateAnimatedValue(EAnimationMode,
                                    float timePercentage,

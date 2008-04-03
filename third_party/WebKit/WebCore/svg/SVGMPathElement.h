@@ -42,7 +42,7 @@ class SVGMPathElement : public SVGElement,
   SVGPathElement* pathElement();
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 };
 
 }  // namespace WebCore

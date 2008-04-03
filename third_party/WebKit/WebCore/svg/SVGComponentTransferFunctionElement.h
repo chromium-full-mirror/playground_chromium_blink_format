@@ -42,7 +42,6 @@ class SVGComponentTransferFunctionElement : public SVGElement {
   SVGComponentTransferFunction transferFunction() const;
 
  private:
-  ANIMATED_PROPERTY_START_DECLARATIONS(SVGComponentTransferFunctionElement)
   ANIMATED_PROPERTY_DECLARATIONS(SVGComponentTransferFunctionElement,
                                  int,
                                  int,

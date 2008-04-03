@@ -38,7 +38,6 @@ class SVGFELightElement : public SVGElement {
   virtual void parseMappedAttribute(MappedAttribute*);
 
  private:
-  ANIMATED_PROPERTY_START_DECLARATIONS(SVGFELightElement)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
                                  float,
                                  float,
