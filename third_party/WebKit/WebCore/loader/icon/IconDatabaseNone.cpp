@@ -86,8 +86,7 @@ bool IconDatabase::isPrivateBrowsingEnabled() const {
 void IconDatabase::readIconForPageURLFromDisk(const String&) {}
 
 Image* IconDatabase::iconForPageURL(const String& pageURL,
-                                    const IntSize& size,
-                                    bool cache) {
+                                    const IntSize& size) {
   return defaultIcon(size);
 }
 
