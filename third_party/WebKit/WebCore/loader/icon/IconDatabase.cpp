@@ -224,8 +224,7 @@ void IconDatabase::removeAllIcons() {
 }
 
 Image* IconDatabase::iconForPageURL(const String& pageURLOriginal,
-                                    const IntSize& size,
-                                    bool cache) {
+                                    const IntSize& size) {
   ASSERT_NOT_SYNC_THREAD();
 
   // pageURLOriginal cannot be stored without being deep copied first.
