@@ -1177,9 +1177,9 @@ void FrameLoader::startIconLoader() {
             "registering for notification and requesting load from disk",
             urlString.ascii().data());
         m_client->registerForIconNotification();
-        iconDatabase()->iconForPageURL(m_URL.string(), IntSize(0, 0));
-        iconDatabase()->iconForPageURL(originalRequestURL().string(),
-                                       IntSize(0, 0));
+        iconDatabase()->readIconForPageURLFromDisk(m_URL.string());
+        iconDatabase()->readIconForPageURLFromDisk(
+            originalRequestURL().string());
       } else
         m_client->dispatchDidReceiveIcon();
 

@@ -57,6 +57,8 @@ class SharedBuffer;
 class SQLTransaction;
 #endif
 
+enum IconLoadStatus { IconNotFound, IconLoadScheduled, IconFound };
+
 enum IconLoadDecision { IconLoadYes, IconLoadNo, IconLoadUnknown };
 
 class IconDatabase : Noncopyable {
@@ -69,7 +71,7 @@ class IconDatabase : Noncopyable {
 
   void removeAllIcons();
 
-  Image* iconForPageURL(const String&, const IntSize&);
+  IconLoadStatus iconForPageURL(const String&, const IntSize&, Image**);
   void readIconForPageURLFromDisk(const String&);
   String iconURLForPageURL(const String&);
   Image* defaultIcon(const IntSize&);

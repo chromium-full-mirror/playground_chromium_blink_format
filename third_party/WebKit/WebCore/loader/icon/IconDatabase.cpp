@@ -223,15 +223,20 @@ void IconDatabase::removeAllIcons() {
   wakeSyncThread();
 }
 
-Image* IconDatabase::iconForPageURL(const String& pageURLOriginal,
-                                    const IntSize& size) {
+IconLoadStatus IconDatabase::iconForPageURL(const String& pageURLOriginal,
+                                            const IntSize& size,
+                                            Image** outImage) {
   ASSERT_NOT_SYNC_THREAD();
+
+  *outImage = 0;
 
   // pageURLOriginal cannot be stored without being deep copied first.
   // We should go our of our way to only copy it if we have to store it
 
-  if (!isOpen() || pageURLOriginal.isEmpty())
-    return defaultIcon(size);
+  if (!isOpen() || pageURLOriginal.isEmpty()) {
+    *outImage = defaultIcon(size);
+    return IconNotFound;
+  }
 
   MutexLocker locker(m_urlAndIconLock);
 
@@ -257,7 +262,7 @@ Image* IconDatabase::iconForPageURL(const String& pageURLOriginal,
     if (!m_iconURLImportComplete)
       m_pageURLsInterestedInIcons.add(pageURLCopy);
 
-    return 0;
+    return IconNotFound;
   }
 
   IconRecord* iconRecord = pageRecord->iconRecord();
@@ -268,14 +273,14 @@ Image* IconDatabase::iconForPageURL(const String& pageURLOriginal,
   // the iconURL mapping is complete so
   // we can just bail now
   if (!m_iconURLImportComplete && !iconRecord)
-    return 0;
+    return IconNotFound;
 
   // The only way we should *not* have an icon record is if this pageURL is
   // retained but has no icon yet - make sure of that
   ASSERT(iconRecord || m_retainedPageURLs.contains(pageURLOriginal));
 
   if (!iconRecord)
-    return 0;
+    return IconNotFound;
 
   // If it's a new IconRecord object that doesn't have its imageData set yet,
   // mark it to be read by the background thread
@@ -287,14 +292,14 @@ Image* IconDatabase::iconForPageURL(const String& pageURLOriginal,
     m_pageURLsInterestedInIcons.add(pageURLCopy);
     m_iconsPendingReading.add(iconRecord);
     wakeSyncThread();
-    return 0;
+    return IconLoadScheduled;
   }
 
   // If the size parameter was (0, 0) that means the caller of this method just
   // wanted the read from disk to be kicked off
   // and isn't actually interested in the image return value
   if (size == IntSize(0, 0))
-    return 0;
+    return IconFound;
 
   // PARANOID DISCUSSION: This method makes some assumptions.  It returns a
   // WebCore::image which the icon database might dispose of at anytime in the
@@ -315,7 +320,8 @@ Image* IconDatabase::iconForPageURL(const String& pageURLOriginal,
   // So the only time the data will be set from the second thread is when it is
   // INITIALLY being read in from the database, but we would never
   // delete the image on the secondary thread if the image already exists.
-  return iconRecord->image(size);
+  *outImage = iconRecord->image(size);
+  return IconFound;
 }
 
 void IconDatabase::readIconForPageURLFromDisk(const String& pageURL) {
@@ -325,7 +331,8 @@ void IconDatabase::readIconForPageURLFromDisk(const String& pageURL) {
   // special way of telling
   // that method "I don't care about the actual Image, i just want you to make
   // sure you're getting it from disk.
-  iconForPageURL(pageURL, IntSize(0, 0));
+  Image* dummy;
+  iconForPageURL(pageURL, IntSize(0, 0), &dummy);
 }
 
 String IconDatabase::iconURLForPageURL(const String& pageURLOriginal) {
