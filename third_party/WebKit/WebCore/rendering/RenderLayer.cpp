@@ -974,16 +974,23 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
   if (!document->frame()->eventHandler()->mousePressed())
     return;
 
+  float zoomFactor = renderer->style()->effectiveZoom();
+
   IntSize newOffset =
       offsetFromResizeCorner(document->view()->windowToContents(evt.pos()));
+  newOffset.setWidth(newOffset.width() / zoomFactor);
+  newOffset.setHeight(newOffset.height() / zoomFactor);
 
-  IntSize currentSize = IntSize(renderer->width(), renderer->height());
-
+  IntSize currentSize =
+      IntSize(renderer->width() / zoomFactor, renderer->height() / zoomFactor);
   IntSize minimumSize = element->minimumSizeForResizing().shrunkTo(currentSize);
   element->setMinimumSizeForResizing(minimumSize);
 
+  IntSize adjustedOldOffset =
+      IntSize(oldOffset.width() / zoomFactor, oldOffset.height() / zoomFactor);
+
   IntSize difference =
-      (currentSize + newOffset - oldOffset).expandedTo(minimumSize) -
+      (currentSize + newOffset - adjustedOldOffset).expandedTo(minimumSize) -
       currentSize;
 
   CSSStyleDeclaration* style = element->style();
@@ -995,18 +1002,21 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
     if (element && element->isControl()) {
       // Make implicit margins from the theme explicit (see
       // <http://bugs.webkit.org/show_bug.cgi?id=9547>).
-      style->setProperty(CSSPropertyMarginLeft,
-                         String::number(renderer->marginLeft()) + "px", false,
-                         ec);
-      style->setProperty(CSSPropertyMarginRight,
-                         String::number(renderer->marginRight()) + "px", false,
-                         ec);
+      style->setProperty(
+          CSSPropertyMarginLeft,
+          String::number(renderer->marginLeft() / zoomFactor) + "px", false,
+          ec);
+      style->setProperty(
+          CSSPropertyMarginRight,
+          String::number(renderer->marginRight() / zoomFactor) + "px", false,
+          ec);
     }
     int baseWidth = renderer->width() -
                     (isBoxSizingBorder ? 0 : renderer->borderLeft() +
                                                  renderer->paddingLeft() +
                                                  renderer->borderRight() +
                                                  renderer->paddingRight());
+    baseWidth = baseWidth / zoomFactor;
     style->setProperty(CSSPropertyWidth,
                        String::number(baseWidth + difference.width()) + "px",
                        false, ec);
@@ -1016,18 +1026,20 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
     if (element && element->isControl()) {
       // Make implicit margins from the theme explicit (see
       // <http://bugs.webkit.org/show_bug.cgi?id=9547>).
-      style->setProperty(CSSPropertyMarginTop,
-                         String::number(renderer->marginTop()) + "px", false,
-                         ec);
-      style->setProperty(CSSPropertyMarginBottom,
-                         String::number(renderer->marginBottom()) + "px", false,
-                         ec);
+      style->setProperty(
+          CSSPropertyMarginTop,
+          String::number(renderer->marginTop() / zoomFactor) + "px", false, ec);
+      style->setProperty(
+          CSSPropertyMarginBottom,
+          String::number(renderer->marginBottom() / zoomFactor) + "px", false,
+          ec);
     }
     int baseHeight = renderer->height() -
                      (isBoxSizingBorder ? 0 : renderer->borderTop() +
                                                   renderer->paddingTop() +
                                                   renderer->borderBottom() +
                                                   renderer->paddingBottom());
+    baseHeight = baseHeight / zoomFactor;
     style->setProperty(CSSPropertyHeight,
                        String::number(baseHeight + difference.height()) + "px",
                        false, ec);
