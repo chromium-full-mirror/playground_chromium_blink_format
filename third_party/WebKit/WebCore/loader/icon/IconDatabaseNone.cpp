@@ -85,11 +85,9 @@ bool IconDatabase::isPrivateBrowsingEnabled() const {
 
 void IconDatabase::readIconForPageURLFromDisk(const String&) {}
 
-IconLoadStatus IconDatabase::iconForPageURL(const String& pageURL,
-                                            const IntSize& size,
-                                            Image** outImage) {
-  *outImage = defaultIcon(size);
-  return IconNotFound;
+Image* IconDatabase::iconForPageURL(const String& pageURL,
+                                    const IntSize& size) {
+  return defaultIcon(size);
 }
 
 IconLoadDecision IconDatabase::loadDecisionForIconURL(const String&,

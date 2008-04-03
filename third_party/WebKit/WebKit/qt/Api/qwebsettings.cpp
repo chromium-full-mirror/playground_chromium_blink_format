@@ -324,9 +324,8 @@ void QWebSettings::clearIconDatabase() {
     If there is no icon for the url a null QIcon is returned.
 */
 QPixmap QWebSettings::iconForUrl(const QUrl& url) {
-  WebCore::Image* image = 0;
-  WebCore::iconDatabase()->iconForPageURL(WebCore::KURL(url).string(),
-                                          WebCore::IntSize(16, 16), &image);
+  WebCore::Image* image = WebCore::iconDatabase()->iconForPageURL(
+      WebCore::KURL(url).string(), WebCore::IntSize(16, 16));
   if (!image) {
     return QPixmap();
   }
