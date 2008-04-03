@@ -46,7 +46,7 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
   CanvasStyle(PassRefPtr<CanvasPattern>);
 
   String color() const { return m_color; }
-  CanvasGradient* gradient() const { return m_gradient.get(); }
+  CanvasGradient* canvasGradient() const { return m_gradient.get(); }
   CanvasPattern* pattern() const { return m_pattern.get(); }
 
 // These do nothing for gradients or patterns.

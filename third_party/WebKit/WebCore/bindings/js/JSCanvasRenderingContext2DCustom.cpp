@@ -41,8 +41,8 @@ using namespace KJS;
 namespace WebCore {
 
 static JSValue* toJS(ExecState* exec, CanvasStyle* style) {
-  if (style->gradient())
-    return toJS(exec, style->gradient());
+  if (style->canvasGradient())
+    return toJS(exec, style->canvasGradient());
   if (style->pattern())
     return toJS(exec, style->pattern());
   return jsString(style->color());
