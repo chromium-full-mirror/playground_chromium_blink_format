@@ -84,6 +84,9 @@ class CSSStyleSheet : public StyleSheet {
 
   bool loadCompleted() const { return m_loadCompleted; }
 
+  virtual void addSubresourceURLStrings(HashSet<String>&,
+                                        const String& baseURL) const;
+
  protected:
   Document* m_doc;
   CSSNamespace* m_namespaces;

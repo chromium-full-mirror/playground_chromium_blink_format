@@ -26,6 +26,8 @@
 #include "StyleList.h"
 #include "PlatformString.h"
 
+#include <wtf/HashSet.h>
+
 namespace WebCore {
 
 class Node;
@@ -61,6 +63,9 @@ class StyleSheet : public StyleList {
   virtual bool isLoading() { return false; }
 
   virtual void styleSheetChanged() {}
+
+  virtual void addSubresourceURLStrings(HashSet<String>&,
+                                        const String& baseURL) const {}
 
  protected:
   Node* m_parentNode;
