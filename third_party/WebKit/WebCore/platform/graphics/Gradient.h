@@ -33,10 +33,15 @@
 
 #if PLATFORM(CG)
 typedef struct CGShading* CGShadingRef;
+typedef CGShadingRef PlatformGradient;
 #elif PLATFORM(QT)
 class QGradient;
+typedef QGradient PlatformGradient;
 #elif PLATFORM(CAIRO)
 typedef struct _cairo_pattern cairo_pattern_t;
+typedef cairo_pattern_t PlatformGradient;
+#else
+typedef void* PlatformGradient;
 #endif
 
 namespace WebCore {
@@ -53,13 +58,7 @@ class Gradient : public Noncopyable {
 
   void getColor(float value, float* r, float* g, float* b, float* a) const;
 
-#if PLATFORM(CG)
-  CGShadingRef platformGradient();
-#elif PLATFORM(QT)
-  QGradient* platformGradient();
-#elif PLATFORM(CAIRO)
-  cairo_pattern_t* platformGradient();
-#endif
+  PlatformGradient platformGradient();
 
   struct ColorStop {
     float stop;
@@ -74,10 +73,9 @@ class Gradient : public Noncopyable {
   };
 
  private:
-#if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(CAIRO)
   void platformInit() { m_gradient = 0; }
   void platformDestroy();
-#endif
+
   int findStop(float value) const;
 
   bool m_radial;
@@ -87,13 +85,7 @@ class Gradient : public Noncopyable {
   mutable bool m_stopsSorted;
   mutable int m_lastStop;
 
-#if PLATFORM(CG)
-  CGShadingRef m_gradient;
-#elif PLATFORM(QT)
-  QGradient* m_gradient;
-#elif PLATFORM(CAIRO)
-  cairo_pattern_t* m_gradient;
-#endif
+  PlatformGradient m_gradient;
 };
 
 }  // namespace
