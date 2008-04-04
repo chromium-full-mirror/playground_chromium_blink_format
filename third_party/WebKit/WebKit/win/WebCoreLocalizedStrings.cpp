@@ -247,7 +247,7 @@ String WebCore::allFilesText() {
 
 String WebCore::imageTitle(const String& filename, const IntSize& size) {
   static RetainPtr<CFStringRef> format(
-      AdoptCF, UI_STRING("%@ %.0f×%.0f pixels",
+      AdoptCF, UI_STRING("%@ %dÃ—%d pixels",
                          "window title for a standalone image (uses "
                          "multiplication symbol, not x)"));
 
