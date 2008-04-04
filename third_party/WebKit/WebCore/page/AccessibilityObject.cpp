@@ -146,12 +146,16 @@ bool AccessibilityObject::isWebArea() const {
 }
 
 bool AccessibilityObject::isImageButton() const {
-  return m_renderer->isImage() && m_renderer->element() &&
+  return isImage() && m_renderer->element() &&
          m_renderer->element()->hasTagName(inputTag);
 }
 
+bool AccessibilityObject::isRenderImage() const {
+  return isImage() && !strcmp(m_renderer->renderName(), "RenderImage");
+}
+
 bool AccessibilityObject::isAnchor() const {
-  return m_areaElement || (!m_renderer->isImage() && m_renderer->element() &&
+  return m_areaElement || (!isImage() && m_renderer->element() &&
                            m_renderer->element()->isLink());
 }
 
@@ -168,7 +172,7 @@ bool AccessibilityObject::isAttachment() const {
   bool isWidget = m_renderer && m_renderer->isWidget();
 
   // assert that a widget is a replaced element that is not an image
-  ASSERT(!isWidget || (m_renderer->isReplaced() && !m_renderer->isImage()));
+  ASSERT(!isWidget || (m_renderer->isReplaced() && !isImage()));
   return isWidget;
 }
 
@@ -452,7 +456,7 @@ String AccessibilityObject::accessibilityDescription() {
   if (!m_renderer || m_areaElement)
     return String();
 
-  if (m_renderer->isImage()) {
+  if (isImage()) {
     if (m_renderer->element() && m_renderer->element()->isHTMLElement()) {
       const AtomicString& alt = static_cast<HTMLElement*>(m_renderer->element())
                                     ->getAttribute(altAttr);
@@ -590,7 +594,7 @@ bool AccessibilityObject::accessibilityIsIgnored() {
            !mouseButtonListener();
 
   // ignore images seemingly used as spacers
-  if (m_renderer->isImage()) {
+  if (isRenderImage()) {
     // informal standard is to ignore images with zero-length alt strings
     Node* node = m_renderer->element();
     if (node && node->isElementNode()) {
@@ -682,7 +686,7 @@ KURL AccessibilityObject::url() {
     if (HTMLAnchorElement* anchor = anchorElement())
       return anchor->href();
   }
-  if (m_renderer->isImage() && m_renderer->element() &&
+  if (isImage() && m_renderer->element() &&
       m_renderer->element()->hasTagName(imgTag))
     return static_cast<HTMLImageElement*>(m_renderer->element())->src();
 
@@ -747,9 +751,8 @@ RenderObject* AccessibilityObject::topRenderer() {
 }
 
 RenderTextControl* AccessibilityObject::textControl() {
-  if (!m_renderer->isTextField() && !m_renderer->isTextArea())
-    ;
-  return 0;
+  if (!isTextControl())
+    return 0;
 
   return static_cast<RenderTextControl*>(m_renderer);
 }
@@ -1426,9 +1429,8 @@ AccessibilityObject::doAXPreviousParagraphStartTextMarkerForTextMarker(
 // NOTE: Consider providing this utility method as AX API
 VisiblePosition AccessibilityObject::textMarkerForIndex(unsigned indexValue,
                                                         bool lastIndexOK) {
-  if (!m_renderer->isTextField() && !m_renderer->isTextArea())
-    ;
-  return VisiblePosition();
+  if (!isTextControl())
+    return VisiblePosition();
 
   RenderTextControl* textControl = static_cast<RenderTextControl*>(m_renderer);
 
@@ -1493,7 +1495,7 @@ AccessibilityObject::rangeForTextMarkerRange(
 
 // NOTE: Consider providing this utility method as AX API
 int AccessibilityObject::indexForTextMarker(VisiblePosition position) {
-  if (!m_renderer->isTextField() && !m_renderer->isTextArea())
+  if (!isTextControl())
     return -1;
 
   Node* node = position.deepEquivalent().node();
@@ -1515,7 +1517,7 @@ int AccessibilityObject::indexForTextMarker(VisiblePosition position) {
 // object that contains the line number.
 AccessibilityObject::PlainTextRange AccessibilityObject::doAXRangeForLine(
     unsigned lineNumber) {
-  if (!m_renderer->isTextField() && !m_renderer->isTextArea())
+  if (!isTextControl())
     return PlainTextRange();
 
   // iterate to the specified line
@@ -1588,7 +1590,7 @@ AccessibilityObject::PlainTextRange AccessibilityObject::doAXRangeForPosition(
 // given index.
 AccessibilityObject::PlainTextRange AccessibilityObject::doAXRangeForIndex(
     unsigned index) {
-  if (!m_renderer->isTextField() && !m_renderer->isTextArea())
+  if (!isTextControl())
     return PlainTextRange();
 
   RenderTextControl* textControl = static_cast<RenderTextControl*>(m_renderer);
@@ -1618,7 +1620,7 @@ String AccessibilityObject::doAXStringForRange(const PlainTextRange& range) {
   if (range.length == 0)
     return "";
 
-  if (!m_renderer->isTextField() && !m_renderer->isTextArea())
+  if (!isTextControl())
     return String();
 
   RenderTextControl* textControl = static_cast<RenderTextControl*>(m_renderer);
@@ -1707,7 +1709,7 @@ AccessibilityRole AccessibilityObject::roleValue() {
   if (m_areaElement)
     return WebCoreLinkRole;
   if (m_renderer->element() && m_renderer->element()->isLink()) {
-    if (m_renderer->isImage())
+    if (isImage())
       return ImageMapRole;
     return WebCoreLinkRole;
   }
@@ -1717,7 +1719,7 @@ AccessibilityRole AccessibilityObject::roleValue() {
     return ButtonRole;
   if (m_renderer->isText())
     return StaticTextRole;
-  if (m_renderer->isImage()) {
+  if (isImage()) {
     if (isImageButton())
       return ButtonRole;
     return ImageRole;
@@ -1867,7 +1869,7 @@ void AccessibilityObject::addChildren() {
 
   // for a RenderImage, add the <area> elements as individual accessibility
   // objects
-  if (m_renderer->isImage() && !m_areaElement) {
+  if (isRenderImage() && !m_areaElement) {
     HTMLMapElement* map = static_cast<RenderImage*>(m_renderer)->imageMap();
     if (map) {
       for (Node* current = map->firstChild(); current;

@@ -328,6 +328,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   Vector<RefPtr<AccessibilityObject>> m_children;
   unsigned m_id;
 
+  bool isRenderImage() const;
+
 #if PLATFORM(MAC)
   RetainPtr<AccessibilityObjectWrapper> m_wrapper;
 #endif
