@@ -465,7 +465,10 @@ IntSize RenderBox::calculateBackgroundSize(const BackgroundLayer* bgLayer,
                                            int scaledWidth,
                                            int scaledHeight) const {
   CachedImage* bg = bgLayer->backgroundImage();
-  bg->setImageContainerSize(IntSize(m_width, m_height));
+  bg->setImageContainerSize(
+      IntSize(scaledWidth, scaledHeight));  // Use the box established by
+                                            // background-origin (it's like we
+                                            // have a background-size of 100%).
 
   if (bgLayer->isBackgroundSizeSet()) {
     int w = scaledWidth;
