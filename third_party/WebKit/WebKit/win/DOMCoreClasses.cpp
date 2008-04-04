@@ -988,7 +988,7 @@ DOMElement::font(WebFontDescription* webFontDescription) {
   webFontDescription->family = family.characters();
   webFontDescription->familyLength = family.length();
   webFontDescription->size = fontDescription.computedSize();
-  webFontDescription->bold = fontDescription.bold();
+  webFontDescription->bold = fontDescription.weight() >= FontWeight600;
   webFontDescription->italic = fontDescription.italic();
 
   return S_OK;

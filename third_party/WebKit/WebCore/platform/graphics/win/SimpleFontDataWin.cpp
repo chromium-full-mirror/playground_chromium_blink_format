@@ -107,8 +107,8 @@ SimpleFontData* SimpleFontData::smallCapsFontData(
       winfont.lfHeight = -lroundf(smallCapsHeight * (m_font.useGDI() ? 1 : 32));
       HFONT hfont = CreateFontIndirect(&winfont);
       m_smallCapsFontData = new SimpleFontData(
-          FontPlatformData(hfont, smallCapsHeight, fontDescription.bold(),
-                           fontDescription.italic(), m_font.useGDI()));
+          FontPlatformData(hfont, smallCapsHeight, m_font.syntheticBold(),
+                           m_font.syntheticOblique(), m_font.useGDI()));
     }
   }
   return m_smallCapsFontData;

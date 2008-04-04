@@ -4,6 +4,7 @@
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
  * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
  * reserved.
+ * Copyright (C) 2007 Nicholas Shanks <webkit@nickshanks.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -30,8 +31,19 @@
 
 namespace WebCore {
 
-const unsigned cNormalWeight = 50;
-const unsigned cBoldWeight = 63;
+enum FontWeight {
+  FontWeight100,
+  FontWeight200,
+  FontWeight300,
+  FontWeight400,
+  FontWeight500,
+  FontWeight600,
+  FontWeight700,
+  FontWeight800,
+  FontWeight900,
+  FontWeightNormal = FontWeight400,
+  FontWeightBold = FontWeight700
+};
 
 class FontDescription {
  public:
@@ -51,7 +63,7 @@ class FontDescription {
         m_italic(false),
         m_smallCaps(false),
         m_isAbsoluteSize(false),
-        m_weight(cNormalWeight),
+        m_weight(FontWeightNormal),
         m_genericFamily(NoFamily),
         m_usePrinterFont(false),
         m_renderingMode(NormalRenderingMode),
@@ -67,11 +79,12 @@ class FontDescription {
   float specifiedSize() const { return m_specifiedSize; }
   float computedSize() const { return m_computedSize; }
   bool italic() const { return m_italic; }
-  bool bold() const { return weight() == cBoldWeight; }
   int computedPixelSize() const { return int(m_computedSize + 0.5f); }
   bool smallCaps() const { return m_smallCaps; }
   bool isAbsoluteSize() const { return m_isAbsoluteSize; }
-  unsigned weight() const { return m_weight; }
+  FontWeight weight() const { return static_cast<FontWeight>(m_weight); }
+  FontWeight lighterWeight() const;
+  FontWeight bolderWeight() const;
   GenericFamilyType genericFamily() const {
     return static_cast<GenericFamilyType>(m_genericFamily);
   }
@@ -85,10 +98,9 @@ class FontDescription {
   void setComputedSize(float s) { m_computedSize = s; }
   void setSpecifiedSize(float s) { m_specifiedSize = s; }
   void setItalic(bool i) { m_italic = i; }
-  void setBold(bool b) { m_weight = (b ? cBoldWeight : cNormalWeight); }
   void setSmallCaps(bool c) { m_smallCaps = c; }
   void setIsAbsoluteSize(bool s) { m_isAbsoluteSize = s; }
-  void setWeight(unsigned w) { m_weight = w; }
+  void setWeight(FontWeight w) { m_weight = w; }
   void setGenericFamily(GenericFamilyType genericFamily) {
     m_genericFamily = genericFamily;
   }
@@ -109,7 +121,7 @@ class FontDescription {
   bool m_smallCaps : 1;
   bool m_isAbsoluteSize : 1;  // Whether or not CSS specified an explicit size
                               // (logical sizes like "medium" don't count).
-  unsigned m_weight : 8;
+  unsigned m_weight : 8;      // FontWeight
   unsigned m_genericFamily : 3;  // GenericFamilyType
   bool m_usePrinterFont : 1;
 

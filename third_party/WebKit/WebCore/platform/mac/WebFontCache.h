@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2007 Nicholas Shanks <webkit@nickshanks.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,5 +29,6 @@
 @interface WebFontCache : NSObject
 + (NSFont*)fontWithFamily:(NSString*)desiredFamily
                    traits:(NSFontTraitMask)desiredTraits
+                   weight:(int)desiredWeight
                      size:(float)size;
 @end

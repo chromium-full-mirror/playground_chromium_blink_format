@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc. All rights reserved.
+ * Copyright (C) 2007 Nicholas Shanks <webkit@nickshanks.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,27 +43,27 @@ struct FontPlatformDataCacheKey {
   FontPlatformDataCacheKey(
       const AtomicString& family = AtomicString(),
       unsigned size = 0,
-      bool bold = false,
+      unsigned weight = 0,
       bool italic = false,
       bool isPrinterFont = false,
       FontRenderingMode renderingMode = NormalRenderingMode)
       : m_family(family),
         m_size(size),
-        m_bold(bold),
+        m_weight(weight),
         m_italic(italic),
         m_printerFont(isPrinterFont),
         m_renderingMode(renderingMode) {}
 
   bool operator==(const FontPlatformDataCacheKey& other) const {
     return equalIgnoringCase(m_family, other.m_family) &&
-           m_size == other.m_size && m_bold == other.m_bold &&
+           m_size == other.m_size && m_weight == other.m_weight &&
            m_italic == other.m_italic && m_printerFont == other.m_printerFont &&
            m_renderingMode == other.m_renderingMode;
   }
 
   AtomicString m_family;
   unsigned m_size;
-  bool m_bold;
+  unsigned m_weight;
   bool m_italic;
   bool m_printerFont;
   FontRenderingMode m_renderingMode;
@@ -70,13 +71,12 @@ struct FontPlatformDataCacheKey {
 
 inline unsigned computeHash(const FontPlatformDataCacheKey& fontKey) {
   unsigned hashCodes[4] = {
-      CaseFoldingHash::hash(fontKey.m_family), fontKey.m_size,
-      static_cast<unsigned>(fontKey.m_bold) << 3 |
-          static_cast<unsigned>(fontKey.m_italic) << 2 |
+      CaseFoldingHash::hash(fontKey.m_family), fontKey.m_size, fontKey.m_weight,
+      static_cast<unsigned>(fontKey.m_italic) << 2 |
           static_cast<unsigned>(fontKey.m_printerFont) << 1 |
           static_cast<unsigned>(fontKey.m_renderingMode)};
   return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
-                                 4 * sizeof(unsigned) / sizeof(UChar));
+                                 sizeof(hashCodes) / sizeof(UChar));
 }
 
 struct FontPlatformDataCacheKeyHash {
@@ -97,11 +97,11 @@ struct FontPlatformDataCacheKeyTraits
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
   static const FontPlatformDataCacheKey& deletedValue() {
-    static FontPlatformDataCacheKey key(nullAtom, 0xFFFFFFFFU, false, false);
+    static FontPlatformDataCacheKey key(nullAtom, 0xFFFFFFFFU);
     return key;
   }
   static const FontPlatformDataCacheKey& emptyValue() {
-    static FontPlatformDataCacheKey key(nullAtom, 0, false, false);
+    static FontPlatformDataCacheKey key(nullAtom);
     return key;
   }
 };
@@ -148,10 +148,10 @@ FontPlatformData* FontCache::getCachedFontPlatformData(
     platformInit();
   }
 
-  FontPlatformDataCacheKey key(familyName, fontDescription.computedPixelSize(),
-                               fontDescription.bold(), fontDescription.italic(),
-                               fontDescription.usePrinterFont(),
-                               fontDescription.renderingMode());
+  FontPlatformDataCacheKey key(
+      familyName, fontDescription.computedPixelSize(), fontDescription.weight(),
+      fontDescription.italic(), fontDescription.usePrinterFont(),
+      fontDescription.renderingMode());
   FontPlatformData* result = 0;
   bool foundResult;
   FontPlatformDataCache::iterator it = gFontPlatformDataCache->find(key);
