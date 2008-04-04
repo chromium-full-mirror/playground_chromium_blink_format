@@ -85,7 +85,7 @@ class FontPlatformData {
   static bool init();
 
   bool isFixedPitch();
-  float size() const { return m_fontDescription.specifiedSize(); }
+  float size() const { return m_size; }
 
   void setFont(cairo_t*) const;
 
@@ -108,7 +108,9 @@ class FontPlatformData {
 #else
 #error "Must defined a font backend"
 #endif
-  FontDescription m_fontDescription;
+  float m_size;
+  bool m_syntheticBold;
+  bool m_syntheticOblique;
   cairo_scaled_font_t* m_scaledFont;
 };
 }
