@@ -316,7 +316,7 @@ void RenderTableSection::setCellWidths() {
     view()->popLayoutState();
 }
 
-void RenderTableSection::calcRowHeight() {
+int RenderTableSection::calcRowHeight() {
   RenderTableCell* cell;
 
   int spacing = table()->vBorderSpacing();
@@ -400,6 +400,8 @@ void RenderTableSection::calcRowHeight() {
 
   if (pushedLayoutState)
     view()->popLayoutState();
+
+  return m_rowPos[m_gridRows];
 }
 
 int RenderTableSection::layoutRows(int toAdd) {
@@ -414,9 +416,6 @@ int RenderTableSection::layoutRows(int toAdd) {
   m_overflowTop = 0;
   m_overflowHeight = 0;
   m_hasOverflowingCell = false;
-
-  if (table()->collapseBorders())
-    recalcOuterBorder();
 
   if (toAdd && totalRows && (m_rowPos[totalRows] || !nextSibling())) {
     int totalHeight = m_rowPos[totalRows] + toAdd;

@@ -60,7 +60,7 @@ class RenderTableSection : public RenderContainer {
   void addCell(RenderTableCell*, RenderObject* row);
 
   void setCellWidths();
-  void calcRowHeight();
+  int calcRowHeight();
   int layoutRows(int height);
 
   RenderTable* table() const { return static_cast<RenderTable*>(parent()); }
