@@ -326,8 +326,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   void clearChildren();
   void removeAXObjectID();
 
-  bool isDetached() const { return !m_renderer; };
-  bool isRenderImage() const;
+  bool isDetached() const { return !m_renderer; }
 
 #if PLATFORM(MAC)
   RetainPtr<AccessibilityObjectWrapper> m_wrapper;

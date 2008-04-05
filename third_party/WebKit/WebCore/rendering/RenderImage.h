@@ -40,6 +40,7 @@ class RenderImage : public RenderReplaced {
   virtual const char* renderName() const { return "RenderImage"; }
 
   virtual bool isImage() const { return true; }
+  virtual bool isRenderImage() const { return true; }
 
   virtual void paintReplaced(PaintInfo& paintInfo, int tx, int ty);
 
