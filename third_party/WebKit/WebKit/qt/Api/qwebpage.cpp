@@ -1578,7 +1578,7 @@ QUrl QWebPageContext::linkUrl() const {
 QUrl QWebPageContext::imageUrl() const {
   if (!d)
     return QUrl();
-  return d->linkUrl;
+  return d->imageUrl;
 }
 
 QPixmap QWebPageContext::image() const {
