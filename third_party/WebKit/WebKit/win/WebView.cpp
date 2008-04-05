@@ -227,6 +227,8 @@ const int WM_VISTA_MOUSEHWHEEL = 0x020E;
 
 static const int maxToolTipWidth = 250;
 
+static const int delayBeforeDeletingBackingStoreMsec = 5000;
+
 static ATOM registerWebView();
 static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
                                        UINT message,
@@ -248,6 +250,7 @@ static WebCacheModel s_cacheModel = WebCacheModelDocumentViewer;
 
 enum {
   UpdateActiveStateTimer = 1,
+  DeleteBackingStoreTimer = 2,
 };
 
 // WebView ----------------------------------------------------------------
@@ -912,6 +915,8 @@ void WebView::paint(HDC dc, LPARAM options) {
     EndPaint(m_viewWindow, &ps);
 
   m_paintCount--;
+
+  deleteBackingStoreSoon();
 }
 
 void WebView::paintIntoBackingStore(FrameView* frameView,
@@ -1904,6 +1909,10 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
           KillTimer(hWnd, UpdateActiveStateTimer);
           webView->updateActiveState();
           break;
+        case DeleteBackingStoreTimer:
+          KillTimer(hWnd, DeleteBackingStoreTimer);
+          webView->deleteBackingStore();
+          break;
       }
       break;
     case WM_SETCURSOR:
@@ -2734,6 +2743,11 @@ void WebView::windowReceivedMessage(HWND, UINT message, WPARAM, LPARAM) {
 
 void WebView::updateActiveStateSoon() const {
   SetTimer(m_viewWindow, UpdateActiveStateTimer, 0, 0);
+}
+
+void WebView::deleteBackingStoreSoon() const {
+  SetTimer(m_viewWindow, DeleteBackingStoreTimer,
+           delayBeforeDeletingBackingStoreMsec, 0);
 }
 
 HRESULT STDMETHODCALLTYPE WebView::setHostWindow(
