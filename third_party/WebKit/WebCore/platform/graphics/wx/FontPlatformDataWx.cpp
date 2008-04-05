@@ -53,8 +53,8 @@ static wxFontFamily fontFamilyToWxFontFamily(const int family) {
   }
 }
 
-static wxFontWeight fontWeightToWxFontWeight(bool isBold) {
-  if (isBold)
+static wxFontWeight fontWeightToWxFontWeight(FontWeight weight) {
+  if (weight >= FontWeight600)
     return wxFONTWEIGHT_BOLD;
 
   return wxFONTWEIGHT_NORMAL;
@@ -82,12 +82,12 @@ FontPlatformData::FontPlatformData(const FontDescription& desc,
       wxFont(wxSize(0, -desc.computedPixelSize()),
              fontFamilyToWxFontFamily(desc.genericFamily()),
              italicToWxFontStyle(desc.italic()),
-             fontWeightToWxFontWeight(desc.bold()), false, family.string());
+             fontWeightToWxFontWeight(desc.weight()), false, family.string());
 #else
   m_font = wxFont(
       desc.computedPixelSize(), fontFamilyToWxFontFamily(desc.genericFamily()),
-      italicToWxFontStyle(desc.italic()), fontWeightToWxFontWeight(desc.bold()),
-      false, family.string());
+      italicToWxFontStyle(desc.italic()),
+      fontWeightToWxFontWeight(desc.weight()), false, family.string());
 #endif
   m_fontState = VALID;
   m_fontHash = computeHash();
