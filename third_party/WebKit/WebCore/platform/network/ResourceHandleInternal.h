@@ -117,7 +117,8 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if USE(SOUP)
         ,
-        m_msg(0)
+        m_msg(0),
+        m_cancelled(false)
 #endif
 #if PLATFORM(QT)
         ,
@@ -185,8 +186,8 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if USE(SOUP)
   SoupMessage* m_msg;
-  SoupSession* session;
   ResourceResponse m_response;
+  bool m_cancelled;
 #endif
 #if PLATFORM(QT)
 #if QT_VERSION < 0x040400
