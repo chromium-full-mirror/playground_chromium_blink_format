@@ -39,12 +39,15 @@ namespace WTF {
 
 Mutex* atomicallyInitializedStaticMutex;
 
+static ThreadIdentifier mainThreadIdentifier;
+
 void initializeThreading() {
   if (!g_thread_supported()) {
     g_thread_init(NULL);
     ASSERT(!atomicallyInitializedStaticMutex);
     atomicallyInitializedStaticMutex = new Mutex;
     wtf_random_init();
+    mainThreadIdentifier = currentThread();
   }
   ASSERT(g_thread_supported());
 }
@@ -125,6 +128,10 @@ ThreadIdentifier currentThread() {
   if (ThreadIdentifier id = identifierByGthreadHandle(currentThread))
     return id;
   return establishIdentifierForThread(currentThread);
+}
+
+bool isMainThread() {
+  return currentThread() == mainThreadIdentifier;
 }
 
 Mutex::Mutex() : m_mutex(g_mutex_new()) {}

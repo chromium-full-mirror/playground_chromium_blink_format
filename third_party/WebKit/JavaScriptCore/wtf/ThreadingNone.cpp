@@ -44,6 +44,9 @@ void detachThread(ThreadIdentifier) {}
 ThreadIdentifier currentThread() {
   return 0;
 }
+bool isMainThread() {
+  return false;
+}
 
 Mutex::Mutex() {}
 Mutex::~Mutex() {}

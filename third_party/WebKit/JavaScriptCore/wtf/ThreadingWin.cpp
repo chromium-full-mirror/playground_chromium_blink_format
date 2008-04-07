@@ -63,6 +63,7 @@
 #include "config.h"
 #include "Threading.h"
 
+#include "MainThread.h"
 #include <windows.h>
 #include <wtf/HashMap.h>
 #include <wtf/MathExtras.h>
@@ -71,10 +72,14 @@ namespace WTF {
 
 Mutex* atomicallyInitializedStaticMutex;
 
+static ThreadIdentifier mainThreadIdentifier;
+
 void initializeThreading() {
   if (!atomicallyInitializedStaticMutex) {
     atomicallyInitializedStaticMutex = new Mutex;
     wtf_random_init();
+    initializeMainThread();
+    mainThreadIdentifier = currentThread();
   }
 }
 
@@ -154,6 +159,10 @@ void detachThread(ThreadIdentifier threadID) {
 
 ThreadIdentifier currentThread() {
   return static_cast<ThreadIdentifier>(::GetCurrentThreadId());
+}
+
+bool isMainThread() {
+  return currentThread() == mainThreadIdentifier;
 }
 
 Mutex::Mutex() {
