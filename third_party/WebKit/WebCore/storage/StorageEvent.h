@@ -26,8 +26,6 @@
 #ifndef StorageEvent_h
 #define StorageEvent_h
 
-// FIXME: More code will go here
-
 #include "Event.h"
 #include <wtf/RefPtr.h>
 
@@ -37,6 +35,14 @@ class DOMWindow;
 
 class StorageEvent : public Event {
  public:
+  StorageEvent();
+  StorageEvent(const AtomicString& type,
+               const String& key,
+               const String& oldValue,
+               const String& newValue,
+               const String& uri,
+               DOMWindow* source);
+
   const String& key() const { return m_key; }
   const String& oldValue() const { return m_oldValue; }
   const String& newValue() const { return m_newValue; }
@@ -50,7 +56,15 @@ class StorageEvent : public Event {
                         const String& oldValue,
                         const String& newValue,
                         const String& uri,
-                        DOMWindow* source) {}
+                        DOMWindow* source);
+
+  // Needed once we support init<blank>EventNS
+  // void initStorageEventNS(in DOMString namespaceURI, in DOMString typeArg, in
+  // boolean canBubbleArg, in boolean cancelableArg, in DOMString keyArg, in
+  // DOMString oldValueArg, in DOMString newValueArg, in DOMString uriArg, in
+  // Window sourceArg);
+
+  virtual bool isStorageEvent() const { return true; }
 
  private:
   String m_key;

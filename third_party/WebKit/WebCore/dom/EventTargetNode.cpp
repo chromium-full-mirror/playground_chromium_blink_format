@@ -44,6 +44,10 @@
 #include "TextEvent.h"
 #include "WheelEvent.h"
 
+#if ENABLE(DOM_STORAGE)
+#include "StorageEvent.h"
+#endif
+
 namespace WebCore {
 
 using namespace EventNames;
@@ -374,6 +378,21 @@ bool EventTargetNode::dispatchProgressEvent(const AtomicString& eventType,
       new ProgressEvent(eventType, lengthComputableArg, loadedArg, totalArg),
       ec, true);
 }
+
+#if ENABLE(DOM_STORAGE)
+void EventTargetNode::dispatchStorageEvent(const AtomicString& eventType,
+                                           const String& key,
+                                           const String& oldValue,
+                                           const String& newValue,
+                                           Frame* source) {
+  ASSERT(!eventDispatchForbidden());
+  ExceptionCode ec = 0;
+  dispatchEvent(
+      new StorageEvent(eventType, key, oldValue, newValue,
+                       source->document()->documentURI(), source->domWindow()),
+      ec, true);
+}
+#endif
 
 void EventTargetNode::removeHTMLEventListener(const AtomicString& eventType) {
   if (!m_regdListeners)  // nothing to remove

@@ -60,6 +60,9 @@ class PluginData;
 class ProgressTracker;
 class Selection;
 class SelectionController;
+#if ENABLE(DOM_STORAGE)
+class SessionStorage;
+#endif
 class Settings;
 class KURL;
 
@@ -191,6 +194,11 @@ class Page : Noncopyable {
   static void allVisitedStateChanged(PageGroup*);
   static void visitedStateChanged(PageGroup*, unsigned visitedHash);
 
+#if ENABLE(DOM_STORAGE)
+  SessionStorage* sessionStorage(bool optionalCreate = true);
+  void setSessionStorage(PassRefPtr<SessionStorage>);
+#endif
+
  private:
   void initGroup();
 
@@ -231,6 +239,9 @@ class Page : Noncopyable {
 
   KJS::Debugger* m_debugger;
 
+#if ENABLE(DOM_STORAGE)
+  RefPtr<SessionStorage> m_sessionStorage;
+#endif
 #if PLATFORM(WIN) || (PLATFORM(WX) && defined(__WXMSW__))
   static HINSTANCE s_instanceHandle;
 #endif

@@ -48,6 +48,11 @@ class Location;
 class Navigator;
 class Screen;
 
+#if ENABLE(DOM_STORAGE)
+class SessionStorage;
+class Storage;
+#endif
+
 typedef int ExceptionCode;
 
 class DOMWindow : public RefCounted<DOMWindow> {
@@ -164,6 +169,12 @@ class DOMWindow : public RefCounted<DOMWindow> {
                                     ExceptionCode&);
 #endif
 
+#if ENABLE(DOM_STORAGE)
+  // HTML 5 key/value storage
+  Storage* sessionStorage() const;
+  Storage* localStorage() const;
+#endif
+
   Console* console() const;
 
 #if ENABLE(CROSS_DOCUMENT_MESSAGING)
@@ -195,6 +206,9 @@ class DOMWindow : public RefCounted<DOMWindow> {
   Console* optionalConsole() const { return m_console.get(); }
   Navigator* optionalNavigator() const { return m_navigator.get(); }
   Location* optionalLocation() const { return m_location.get(); }
+#if ENABLE(DOM_STORAGE)
+  Storage* optionalSessionStorage() const { return m_sessionStorage.get(); }
+#endif
 
  private:
   DOMWindow(Frame*);
@@ -212,6 +226,9 @@ class DOMWindow : public RefCounted<DOMWindow> {
   mutable RefPtr<Console> m_console;
   mutable RefPtr<Navigator> m_navigator;
   mutable RefPtr<Location> m_location;
+#if ENABLE(DOM_STORAGE)
+  mutable RefPtr<Storage> m_sessionStorage;
+#endif
 };
 
 }  // namespace WebCore
