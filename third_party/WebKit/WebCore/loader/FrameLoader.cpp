@@ -1031,7 +1031,7 @@ void FrameLoader::write(const char* str, int len, bool flush) {
     m_decoder = new TextResourceDecoder(
         m_responseMIMEType,
         settings ? settings->defaultTextEncodingName() : String());
-    if (m_encoding.isNull()) {
+    if (m_encoding.isEmpty()) {
       Frame* parentFrame = m_frame->tree()->parent();
       SecurityOrigin::Reason reason;
       if (parentFrame &&
