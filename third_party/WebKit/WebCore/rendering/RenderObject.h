@@ -708,11 +708,12 @@ class RenderObject : public CachedResourceClient {
   // in.  Any code that wants to
   // accurately deal with the contents of a cell must call this function instad
   // of absolutePosition.
-  void absolutePositionForContent(int& xPos,
+  bool absolutePositionForContent(int& xPos,
                                   int& yPos,
                                   bool fixed = false) const {
-    absolutePosition(xPos, yPos, fixed);
+    bool result = absolutePosition(xPos, yPos, fixed);
     yPos += borderTopExtra();
+    return result;
   }
 
   // width and height are without margins but include paddings and borders
