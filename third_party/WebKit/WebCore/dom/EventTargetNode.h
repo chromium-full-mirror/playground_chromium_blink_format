@@ -95,13 +95,11 @@ class EventTargetNode : public Node, public EventTarget {
                              bool lengthComputableArg,
                              unsigned loadedArg,
                              unsigned totalArg);
-#if ENABLE(DOM_STORAGE)
   void dispatchStorageEvent(const AtomicString& eventType,
                             const String& key,
                             const String& oldValue,
                             const String& newValue,
                             Frame* source);
-#endif
 
   virtual void handleLocalEvents(Event*, bool useCapture);
 
