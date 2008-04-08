@@ -397,15 +397,11 @@ static int CALLBACK matchImprovingEnumProc(CONST LOGFONT* candidate,
     return 1;
   }
 
-  if (!matchData->m_desiredItalic) {
-    // Prefer the candidate if it helps us lose undesired italics.
-    if (matchData->m_chosen.lfItalic && !candidate->lfItalic) {
+  if (!candidate->lfItalic != !matchData->m_chosen.lfItalic) {
+    if (!candidate->lfItalic == !matchData->m_desiredItalic)
       matchData->m_chosen = *candidate;
-      return 1;
-    }
-    // Reject the candidate if it adds undesired italics.
-    if (candidate->lfItalic && !matchData->m_chosen.lfItalic)
-      return 1;
+
+    return 1;
   }
 
   unsigned chosenWeightDeltaMagnitude =
@@ -453,14 +449,19 @@ static HFONT createGDIFont(const AtomicString& family,
     return 0;
 
   matchData.m_chosen.lfHeight = -size;
+  matchData.m_chosen.lfWidth = 0;
+  matchData.m_chosen.lfEscapement = 0;
+  matchData.m_chosen.lfOrientation = 0;
   matchData.m_chosen.lfUnderline = false;
   matchData.m_chosen.lfStrikeOut = false;
+  matchData.m_chosen.lfCharSet = DEFAULT_CHARSET;
 #if PLATFORM(CG)
   matchData.m_chosen.lfOutPrecision = OUT_TT_ONLY_PRECIS;
 #else
   matchData.m_chosen.lfOutPrecision = OUT_TT_PRECIS;
 #endif
-  matchData.m_chosen.lfQuality = CLEARTYPE_QUALITY;
+  matchData.m_chosen.lfQuality = DEFAULT_QUALITY;
+  matchData.m_chosen.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
   return CreateFontIndirect(&matchData.m_chosen);
 }
