@@ -45,6 +45,7 @@ class WebDropSource : public IDropSource {
 
  private:
   WebDropSource(WebView* webView);
+  ~WebDropSource();
   long m_ref;
   bool m_dropped;
   COMPtr<WebView> m_webView;

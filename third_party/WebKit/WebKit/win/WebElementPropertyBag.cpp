@@ -43,9 +43,13 @@ using namespace WebCore;
 
 // WebElementPropertyBag -----------------------------------------------
 WebElementPropertyBag::WebElementPropertyBag(const HitTestResult& result)
-    : m_result(new HitTestResult(result)), m_refCount(0) {}
+    : m_result(new HitTestResult(result)), m_refCount(0) {
+  gClassCount++;
+}
 
-WebElementPropertyBag::~WebElementPropertyBag() {}
+WebElementPropertyBag::~WebElementPropertyBag() {
+  gClassCount--;
+}
 
 WebElementPropertyBag* WebElementPropertyBag::createInstance(
     const HitTestResult& result) {

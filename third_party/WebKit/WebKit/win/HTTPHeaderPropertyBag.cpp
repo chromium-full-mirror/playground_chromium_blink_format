@@ -27,13 +27,20 @@
 #include "HTTPHeaderPropertyBag.h"
 
 #include "HTTPHeaderMap.h"
+#include "WebKitDLL.h"
 
 #include <WebCore/BString.h>
 
 // HTTPHeaderPropertyBag -----------------------------------------------
 
 HTTPHeaderPropertyBag::HTTPHeaderPropertyBag(WebURLResponse* response)
-    : m_refCount(1), m_response(response) {}
+    : m_refCount(1), m_response(response) {
+  gClassCount++;
+}
+
+HTTPHeaderPropertyBag::~HTTPHeaderPropertyBag() {
+  gClassCount--;
+}
 
 HTTPHeaderPropertyBag* HTTPHeaderPropertyBag::createInstance(
     WebURLResponse* response) {

@@ -51,7 +51,7 @@ class __declspec(uuid("3DBD89EB-CEFB-4ddb-8D1A-5BE47ED4E929"))
       /* [in] */ VARIANT* pVar);
 
  protected:
-  virtual ~HTTPHeaderPropertyBag() {}
+  virtual ~HTTPHeaderPropertyBag();
 
  private:
   HTTPHeaderPropertyBag(WebURLResponse*);

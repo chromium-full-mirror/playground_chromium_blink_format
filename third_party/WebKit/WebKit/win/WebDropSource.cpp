@@ -25,6 +25,8 @@
 
 #include "config.h"
 #include "WebDropSource.h"
+
+#include "WebKitDLL.h"
 #include "WebView.h"
 
 #include <WebCore/DragActions.h>
@@ -46,7 +48,13 @@ HRESULT WebDropSource::createInstance(WebView* webView, IDropSource** result) {
 }
 
 WebDropSource::WebDropSource(WebView* webView)
-    : m_ref(1), m_dropped(false), m_webView(webView) {}
+    : m_ref(1), m_dropped(false), m_webView(webView) {
+  gClassCount++;
+}
+
+WebDropSource::~WebDropSource() {
+  gClassCount--;
+}
 
 STDMETHODIMP WebDropSource::QueryInterface(REFIID riid, void** ppvObject) {
   *ppvObject = 0;

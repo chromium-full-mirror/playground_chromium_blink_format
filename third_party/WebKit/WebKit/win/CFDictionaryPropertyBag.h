@@ -35,6 +35,7 @@ class CFDictionaryPropertyBag : public IPropertyBag {
 
  protected:
   CFDictionaryPropertyBag();
+  ~CFDictionaryPropertyBag();
 
  public:
   // IUnknown

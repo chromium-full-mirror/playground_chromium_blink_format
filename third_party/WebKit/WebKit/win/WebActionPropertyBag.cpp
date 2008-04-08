@@ -43,9 +43,13 @@ using namespace WebCore;
 // WebActionPropertyBag ------------------------------------------------
 WebActionPropertyBag::WebActionPropertyBag(const NavigationAction& action,
                                            Frame* frame)
-    : m_refCount(0), m_action(action), m_frame(frame) {}
+    : m_refCount(0), m_action(action), m_frame(frame) {
+  gClassCount++;
+}
 
-WebActionPropertyBag::~WebActionPropertyBag() {}
+WebActionPropertyBag::~WebActionPropertyBag() {
+  gClassCount--;
+}
 
 WebActionPropertyBag* WebActionPropertyBag::createInstance(
     const NavigationAction& action,

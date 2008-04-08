@@ -32,7 +32,13 @@
 
 // CFDictionaryPropertyBag -----------------------------------------------
 
-CFDictionaryPropertyBag::CFDictionaryPropertyBag() : m_refCount(1) {}
+CFDictionaryPropertyBag::CFDictionaryPropertyBag() : m_refCount(1) {
+  gClassCount++;
+}
+
+CFDictionaryPropertyBag::~CFDictionaryPropertyBag() {
+  gClassCount--;
+}
 
 CFDictionaryPropertyBag* CFDictionaryPropertyBag::createInstance() {
   CFDictionaryPropertyBag* instance = new CFDictionaryPropertyBag();

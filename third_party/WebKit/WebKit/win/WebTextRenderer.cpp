@@ -29,6 +29,8 @@
 #include "config.h"
 #include "WebTextRenderer.h"
 
+#include "WebKitDLL.h"
+
 #include <CoreFoundation/CFString.h>
 #include <WebKitSystemInterface/WebKitSystemInterface.h>
 #include <wtf/RetainPtr.h>
@@ -39,9 +41,13 @@ WebTextRenderer* WebTextRenderer::createInstance() {
   return instance;
 }
 
-WebTextRenderer::WebTextRenderer() : m_refCount(0) {}
+WebTextRenderer::WebTextRenderer() : m_refCount(0) {
+  gClassCount++;
+}
 
-WebTextRenderer::~WebTextRenderer() {}
+WebTextRenderer::~WebTextRenderer() {
+  gClassCount--;
+}
 
 HRESULT STDMETHODCALLTYPE WebTextRenderer::QueryInterface(const IID& riid,
                                                           void** ppvObject) {
