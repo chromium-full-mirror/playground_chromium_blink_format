@@ -41,13 +41,14 @@
 #include "Frame.h"
 #include "InspectorController.h"
 #include "Logging.h"
-#include "MainThread.h"
 #include "NotImplemented.h"
 #include "Page.h"
 #include "OriginQuotaManager.h"
 #include "SQLiteDatabase.h"
 #include "SQLiteStatement.h"
 #include "SQLResultSet.h"
+#include <kjs/InitializeThreading.h>
+#include <wtf/MainThread.h>
 
 namespace WebCore {
 
@@ -133,7 +134,7 @@ Database::Database(Document* document,
   if (m_name.isNull())
     m_name = "";
 
-  initializeThreadingAndMainThread();
+  KJS::initializeThreading();
 
   m_guid = guidForOriginAndName(m_securityOrigin->toString(), name);
 

@@ -1,19 +1,18 @@
 /*
  * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
- * Copyright (C) 2007 Justin Haygood (jhaygood@reaktix.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  *
  * 1.  Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ *     notice, this list of conditions and the following disclaimer. 
  * 2.  Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- * 3.  Neither the name of Apple Inc. ("Apple") nor the names of
+ *     documentation and/or other materials provided with the distribution. 
+ * 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
  *     its contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *     from this software without specific prior written permission. 
  *
  * THIS SOFTWARE IS PROVIDED BY APPLE AND ITS CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -26,20 +25,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+#import "config.h"
+#import "MainThread.h"
 
-#include "config.h"
-#include "MainThread.h"
+#import <Foundation/NSThread.h>
 
-#include <glib.h>
+@interface WTFMainThreadCaller : NSObject {
+}
+- (void)call;
+@end
 
-namespace WebCore {
+@implementation WTFMainThreadCaller
 
-static gboolean timeoutFired(gpointer) {
-  dispatchFunctionsFromMainThread();
-  return FALSE;
+- (void)call
+{
+    WTF::dispatchFunctionsFromMainThread();
 }
 
-void scheduleDispatchFunctionsOnMainThread() {
-  g_timeout_add(0, timeoutFired, 0);
+@end // implementation WTFMainThreadCaller
+
+namespace WTF {
+
+void scheduleDispatchFunctionsOnMainThread()
+{
+    WTFMainThreadCaller *caller = [[WTFMainThreadCaller alloc] init];
+    [caller performSelectorOnMainThread:@selector(call) withObject:nil waitUntilDone:NO];
+    [caller release];
 }
-}
+
+} // namespace WTF

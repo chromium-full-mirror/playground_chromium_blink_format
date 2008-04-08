@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2007 Staikos Computing Services Inc.
- * Copyright (C) 2007 Trolltech ASA
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007 Kevin Ollivier
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,34 +29,7 @@
 #include "config.h"
 #include "MainThread.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QCoreApplication>
+namespace WTF {
 
-namespace WebCore {
-
-class MainThreadInvoker : public QObject {
-  Q_OBJECT
- public:
-  MainThreadInvoker();
-
- private Q_SLOTS:
-  void dispatch();
-};
-
-MainThreadInvoker::MainThreadInvoker() {
-  moveToThread(QCoreApplication::instance()->thread());
+void scheduleDispatchFunctionsOnMainThread() {}
 }
-
-void MainThreadInvoker::dispatch() {
-  dispatchFunctionsFromMainThread();
-}
-
-Q_GLOBAL_STATIC(MainThreadInvoker, webkit_main_thread_invoker)
-
-void scheduleDispatchFunctionsOnMainThread() {
-  QMetaObject::invokeMethod(webkit_main_thread_invoker(), "dispatch",
-                            Qt::QueuedConnection);
-}
-}
-
-#include "MainThreadQt.moc"

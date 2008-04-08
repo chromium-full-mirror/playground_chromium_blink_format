@@ -29,10 +29,10 @@
 #include "config.h"
 #include "MainThread.h"
 
-#include "Page.h"
+#include "Assertions.h"
 #include <windows.h>
 
-namespace WebCore {
+namespace WTF {
 
 static HWND threadingWindowHandle;
 static UINT threadingFiredMessage;
@@ -49,23 +49,20 @@ LRESULT CALLBACK ThreadingWindowWndProc(HWND hWnd,
   return 0;
 }
 
-void initializeThreadingAndMainThread() {
+void initializeMainThread() {
   if (threadingWindowHandle)
     return;
-
-  KJS::initializeThreading();
 
   WNDCLASSEX wcex;
   memset(&wcex, 0, sizeof(WNDCLASSEX));
   wcex.cbSize = sizeof(WNDCLASSEX);
   wcex.lpfnWndProc = ThreadingWindowWndProc;
-  wcex.hInstance = Page::instanceHandle();
   wcex.lpszClassName = kThreadingWindowClassName;
   RegisterClassEx(&wcex);
 
-  threadingWindowHandle = CreateWindow(
-      kThreadingWindowClassName, 0, 0, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0,
-      HWND_MESSAGE, 0, Page::instanceHandle(), 0);
+  threadingWindowHandle =
+      CreateWindow(kThreadingWindowClassName, 0, 0, CW_USEDEFAULT, 0,
+                   CW_USEDEFAULT, 0, HWND_MESSAGE, 0, 0, 0);
   threadingFiredMessage =
       RegisterWindowMessage(L"com.apple.WebKit.MainThreadFired");
 }

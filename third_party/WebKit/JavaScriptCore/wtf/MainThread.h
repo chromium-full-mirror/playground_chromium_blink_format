@@ -30,27 +30,24 @@
 #ifndef MainThread_h
 #define MainThread_h
 
-#include <kjs/InitializeThreading.h>
-
-namespace WebCore {
+namespace WTF {
 
 typedef void MainThreadFunction(void*);
 
 void callOnMainThread(MainThreadFunction*, void* context);
 void setMainThreadCallbacksPaused(bool paused);
 
-void initializeThreadingAndMainThread();
-
-#if !PLATFORM(WIN)
-inline void initializeThreadingAndMainThread() {
-  KJS::initializeThreading();
-}
+#if PLATFORM(WIN)
+void initializeMainThread();
 #endif
 
 // These functions are internal to the callOnMainThread implementation.
 void dispatchFunctionsFromMainThread();
 void scheduleDispatchFunctionsOnMainThread();
 
-}  // namespace WebCore
+}  // namespace WTF
+
+using WTF::callOnMainThread;
+using WTF::setMainThreadCallbacksPaused;
 
 #endif  // MainThread_h
