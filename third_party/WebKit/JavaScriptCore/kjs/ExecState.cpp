@@ -41,7 +41,7 @@ static inline List* globalEmptyList() {
 // ECMA 10.2
 
 // The constructor for the globalExec pseudo-ExecState
-inline ExecState::ExecState(JSGlobalObject* globalObject)
+inline ExecState::ExecState(JSGlobalObject* globalObject, JSObject* thisObject)
     : m_globalObject(globalObject),
       m_exception(0),
       m_propertyNames(CommonIdentifiers::shared()),
@@ -54,7 +54,8 @@ inline ExecState::ExecState(JSGlobalObject* globalObject)
       m_localStorage(&globalObject->localStorage()),
       m_inlineScopeChainNode(0, 0),
       m_variableObject(globalObject),
-      m_thisValue(globalObject),
+      m_thisValue(thisObject),
+      m_globalThisValue(thisObject),
       m_iterationDepth(0),
       m_switchDepth(0),
       m_codeType(GlobalCode) {
@@ -77,6 +78,7 @@ inline ExecState::ExecState(JSGlobalObject* globalObject,
       m_inlineScopeChainNode(0, 0),
       m_variableObject(globalObject),
       m_thisValue(thisObject),
+      m_globalThisValue(thisObject),
       m_iterationDepth(0),
       m_switchDepth(0),
       m_codeType(GlobalCode) {
@@ -104,6 +106,7 @@ inline ExecState::ExecState(JSGlobalObject* globalObject,
       m_inlineScopeChainNode(0, 0),
       m_variableObject(variableObject),
       m_thisValue(thisObject),
+      m_globalThisValue(thisObject),
       m_iterationDepth(0),
       m_switchDepth(0),
       m_codeType(EvalCode) {
@@ -117,8 +120,9 @@ JSGlobalObject* ExecState::lexicalGlobalObject() const {
   return m_globalObject;
 }
 
-GlobalExecState::GlobalExecState(JSGlobalObject* globalObject)
-    : ExecState(globalObject) {}
+GlobalExecState::GlobalExecState(JSGlobalObject* globalObject,
+                                 JSObject* thisObject)
+    : ExecState(globalObject, thisObject) {}
 
 GlobalExecState::~GlobalExecState() {}
 

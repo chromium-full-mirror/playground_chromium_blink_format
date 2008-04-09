@@ -76,8 +76,9 @@ class JSGlobalObject : public JSVariableObject {
   using JSVariableObject::JSVariableObjectData;
 
   struct JSGlobalObjectData : public JSVariableObjectData {
-    JSGlobalObjectData(JSGlobalObject* globalObject)
-        : JSVariableObjectData(&inlineSymbolTable), globalExec(globalObject) {}
+    JSGlobalObjectData(JSGlobalObject* globalObject, JSObject* thisValue)
+        : JSVariableObjectData(&inlineSymbolTable),
+          globalExec(globalObject, thisValue) {}
 
     JSGlobalObject* next;
     JSGlobalObject* prev;
@@ -137,11 +138,13 @@ class JSGlobalObject : public JSVariableObject {
   };
 
  public:
-  JSGlobalObject() : JSVariableObject(new JSGlobalObjectData(this)) { init(); }
+  JSGlobalObject() : JSVariableObject(new JSGlobalObjectData(this, this)) {
+    init();
+  }
 
  protected:
-  JSGlobalObject(JSValue* proto)
-      : JSVariableObject(proto, new JSGlobalObjectData(this)) {
+  JSGlobalObject(JSValue* proto, JSObject* globalThisValue)
+      : JSVariableObject(proto, new JSGlobalObjectData(this, globalThisValue)) {
     init();
   }
 
@@ -250,6 +253,7 @@ class JSGlobalObject : public JSVariableObject {
   virtual void mark();
 
   virtual bool isGlobalObject() const { return true; }
+  virtual JSGlobalObject* toGlobalObject(ExecState*) const;
 
   virtual ExecState* globalExec();
 

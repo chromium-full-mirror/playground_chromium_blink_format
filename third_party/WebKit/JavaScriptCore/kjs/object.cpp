@@ -255,7 +255,7 @@ void JSObject::put(ExecState* exec,
           List args;
           args.append(value);
 
-          setterFunc->call(exec, this, args);
+          setterFunc->call(exec, this->toThisObject(exec), args);
           return;
         } else {
           // If there's an existing property on the object or one of its
@@ -332,7 +332,8 @@ static ALWAYS_INLINE JSValue* tryGetAndCallProperty(
     JSObject* o = static_cast<JSObject*>(v);
     if (o->implementsCall()) {  // spec says "not primitive type" but ...
       JSObject* thisObj = const_cast<JSObject*>(object);
-      JSValue* def = o->call(exec, thisObj, exec->emptyList());
+      JSValue* def =
+          o->call(exec, thisObj->toThisObject(exec), exec->emptyList());
       JSType defType = def->type();
       ASSERT(defType != GetterSetterType);
       if (defType != ObjectType)
@@ -420,6 +421,44 @@ void JSObject::defineSetter(ExecState*,
 
   _prop.setHasGetterSetterProperties(true);
   gs->setSetter(setterFunc);
+}
+
+JSValue* JSObject::lookupGetter(ExecState*, const Identifier& propertyName) {
+  JSObject* obj = this;
+  while (true) {
+    JSValue* v = obj->getDirect(propertyName);
+    if (v) {
+      if (v->type() != GetterSetterType)
+        return jsUndefined();
+      JSObject* funcObj = static_cast<GetterSetterImp*>(v)->getGetter();
+      if (!funcObj)
+        return jsUndefined();
+      return funcObj;
+    }
+
+    if (!obj->prototype() || !obj->prototype()->isObject())
+      return jsUndefined();
+    obj = static_cast<JSObject*>(obj->prototype());
+  }
+}
+
+JSValue* JSObject::lookupSetter(ExecState*, const Identifier& propertyName) {
+  JSObject* obj = this;
+  while (true) {
+    JSValue* v = obj->getDirect(propertyName);
+    if (v) {
+      if (v->type() != GetterSetterType)
+        return jsUndefined();
+      JSObject* funcObj = static_cast<GetterSetterImp*>(v)->getSetter();
+      if (!funcObj)
+        return jsUndefined();
+      return funcObj;
+    }
+
+    if (!obj->prototype() || !obj->prototype()->isObject())
+      return jsUndefined();
+    obj = static_cast<JSObject*>(obj->prototype());
+  }
 }
 
 bool JSObject::implementsConstruct() const {
@@ -545,6 +584,14 @@ JSObject* JSObject::toObject(ExecState*) const {
   return const_cast<JSObject*>(this);
 }
 
+JSObject* JSObject::toThisObject(ExecState*) const {
+  return const_cast<JSObject*>(this);
+}
+
+JSGlobalObject* JSObject::toGlobalObject(ExecState*) const {
+  return 0;
+}
+
 void JSObject::putDirect(const Identifier& propertyName,
                          JSValue* value,
                          int attr) {
@@ -567,7 +614,7 @@ void JSObject::fillGetterPropertySlot(PropertySlot& slot, JSValue** location) {
   GetterSetterImp* gs = static_cast<GetterSetterImp*>(*location);
   JSObject* getterFunc = gs->getGetter();
   if (getterFunc)
-    slot.setGetterSlot(this, getterFunc);
+    slot.setGetterSlot(this->toThisObject(0), getterFunc);
   else
     slot.setUndefined(this);
 }

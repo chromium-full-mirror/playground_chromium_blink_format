@@ -78,6 +78,7 @@ class ExecState : Noncopyable {
   void setVariableObject(JSVariableObject* v) { m_variableObject = v; }
 
   JSObject* thisValue() const { return m_thisValue; }
+  JSObject* globalThisValue() const { return m_globalThisValue; }
 
   ExecState* callingExecState() { return m_callingExec; }
 
@@ -160,7 +161,7 @@ class ExecState : Noncopyable {
   }
 
  protected:
-  ExecState(JSGlobalObject*);
+  ExecState(JSGlobalObject*, JSObject* thisObject);
   ExecState(JSGlobalObject*, JSObject* thisObject, ProgramNode*);
   ExecState(JSGlobalObject*,
             JSObject* thisObject,
@@ -170,6 +171,7 @@ class ExecState : Noncopyable {
             JSVariableObject*);
   ExecState(JSGlobalObject*,
             JSObject* thisObject,
+            JSObject* globalThisValue,
             FunctionBodyNode*,
             ExecState* callingExecState,
             FunctionImp*,
@@ -196,7 +198,9 @@ class ExecState : Noncopyable {
   ScopeChain m_scopeChain;
   ScopeChainNode m_inlineScopeChainNode;
   JSVariableObject* m_variableObject;
+
   JSObject* m_thisValue;
+  JSObject* m_globalThisValue;
 
   LabelStack m_labelStack;
   int m_iterationDepth;
@@ -209,7 +213,7 @@ class ExecState : Noncopyable {
 
 class GlobalExecState : public ExecState {
  public:
-  GlobalExecState(JSGlobalObject*);
+  GlobalExecState(JSGlobalObject*, JSObject* thisObject);
   ~GlobalExecState();
 };
 
@@ -234,6 +238,7 @@ class FunctionExecState : public ExecState {
  public:
   FunctionExecState(JSGlobalObject*,
                     JSObject* thisObject,
+                    JSObject* globalThisValue,
                     FunctionBodyNode*,
                     ExecState* callingExecState,
                     FunctionImp*,

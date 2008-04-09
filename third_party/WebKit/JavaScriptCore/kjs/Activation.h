@@ -70,6 +70,8 @@ class ActivationImp : public JSVariableObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
+  virtual JSObject* toThisObject(ExecState*) const;
+
   virtual void mark();
   void markChildren();
 

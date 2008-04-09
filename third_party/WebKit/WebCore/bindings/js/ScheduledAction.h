@@ -33,7 +33,7 @@ class List;
 
 namespace WebCore {
 
-class JSDOMWindow;
+class JSDOMWindowWrapper;
 
 /**
  * An action (either function or string) to be executed after a specified
@@ -45,7 +45,7 @@ class ScheduledAction {
   ScheduledAction(KJS::JSValue* func, const KJS::List& args);
   ScheduledAction(const String& code) : m_code(code) {}
 
-  void execute(JSDOMWindow*);
+  void execute(JSDOMWindowWrapper*);
 
  private:
   KJS::ProtectedPtr<KJS::JSValue> m_func;

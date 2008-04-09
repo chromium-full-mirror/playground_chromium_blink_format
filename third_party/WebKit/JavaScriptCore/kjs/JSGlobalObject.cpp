@@ -369,7 +369,7 @@ void JSGlobalObject::reset(JSValue* prototype) {
 
   d()->evalFunction = new PrototypeReflexiveFunction(
       exec, d()->functionPrototype, 1, exec->propertyNames().eval,
-      globalFuncEval);
+      globalFuncEval, this);
   putDirectFunction(d()->evalFunction, DontEnum);
   putDirectFunction(new PrototypeFunction(exec, d()->functionPrototype, 2,
                                           "parseInt", globalFuncParseInt),
@@ -599,6 +599,10 @@ void JSGlobalObject::mark() {
   markIfNeeded(d()->syntaxErrorPrototype);
   markIfNeeded(d()->typeErrorPrototype);
   markIfNeeded(d()->URIErrorPrototype);
+}
+
+JSGlobalObject* JSGlobalObject::toGlobalObject(ExecState*) const {
+  return const_cast<JSGlobalObject*>(this);
 }
 
 ExecState* JSGlobalObject::globalExec() {

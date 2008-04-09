@@ -430,7 +430,7 @@ JSValue* arrayProtoFuncSort(ExecState* exec,
         List l;
         l.append(jObj);
         l.append(minObj);
-        compareResult = sortFunction->call(exec, exec->dynamicGlobalObject(), l)
+        compareResult = sortFunction->call(exec, exec->globalThisValue(), l)
                             ->toNumber(exec);
       } else
         compareResult =
@@ -539,9 +539,8 @@ JSValue* arrayProtoFuncFilter(ExecState* exec,
   if (!eachFunction->implementsCall())
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicGlobalObject()
-                            : args[1]->toObject(exec);
+  JSObject* applyThis = args[1]->isUndefinedOrNull() ? exec->globalThisValue()
+                                                     : args[1]->toObject(exec);
   JSObject* resultArray = static_cast<JSObject*>(
       exec->lexicalGlobalObject()->arrayConstructor()->construct(
           exec, exec->emptyList()));
@@ -578,9 +577,8 @@ JSValue* arrayProtoFuncMap(ExecState* exec,
   if (!eachFunction->implementsCall())
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicGlobalObject()
-                            : args[1]->toObject(exec);
+  JSObject* applyThis = args[1]->isUndefinedOrNull() ? exec->globalThisValue()
+                                                     : args[1]->toObject(exec);
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
@@ -624,9 +622,8 @@ JSValue* arrayProtoFuncEvery(ExecState* exec,
   if (!eachFunction->implementsCall())
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicGlobalObject()
-                            : args[1]->toObject(exec);
+  JSObject* applyThis = args[1]->isUndefinedOrNull() ? exec->globalThisValue()
+                                                     : args[1]->toObject(exec);
 
   JSValue* result = jsBoolean(true);
 
@@ -664,9 +661,8 @@ JSValue* arrayProtoFuncForEach(ExecState* exec,
   if (!eachFunction->implementsCall())
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicGlobalObject()
-                            : args[1]->toObject(exec);
+  JSObject* applyThis = args[1]->isUndefinedOrNull() ? exec->globalThisValue()
+                                                     : args[1]->toObject(exec);
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
@@ -693,9 +689,8 @@ JSValue* arrayProtoFuncSome(ExecState* exec,
   if (!eachFunction->implementsCall())
     return throwError(exec, TypeError);
 
-  JSObject* applyThis = args[1]->isUndefinedOrNull()
-                            ? exec->dynamicGlobalObject()
-                            : args[1]->toObject(exec);
+  JSObject* applyThis = args[1]->isUndefinedOrNull() ? exec->globalThisValue()
+                                                     : args[1]->toObject(exec);
 
   JSValue* result = jsBoolean(false);
 

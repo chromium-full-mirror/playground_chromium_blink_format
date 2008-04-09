@@ -181,14 +181,19 @@ class PrototypeReflexiveFunction : public InternalFunctionImp {
                              FunctionPrototype*,
                              int len,
                              const Identifier&,
-                             JSMemberFunction);
+                             JSMemberFunction,
+                             JSGlobalObject* expectedThisObject);
 
+  virtual void mark();
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List&);
 
+  JSGlobalObject* cachedGlobalObject() const { return m_cachedGlobalObject; }
+
  private:
   const JSMemberFunction m_function;
+  JSGlobalObject* m_cachedGlobalObject;
 };
 
 // Global Functions

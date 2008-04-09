@@ -75,8 +75,9 @@ void FunctionImp::mark() {
 JSValue* FunctionImp::callAsFunction(ExecState* exec,
                                      JSObject* thisObj,
                                      const List& args) {
-  FunctionExecState newExec(exec->dynamicGlobalObject(), thisObj, body.get(),
-                            exec, this, args);
+  FunctionExecState newExec(exec->dynamicGlobalObject(), thisObj,
+                            exec->globalThisValue(), body.get(), exec, this,
+                            args);
   JSValue* result = body->execute(&newExec);
   if (newExec.completionType() == ReturnValue)
     return result;
@@ -482,6 +483,10 @@ void ActivationImp::createArgumentsObject(ExecState* exec) {
       new Arguments(exec, d()->exec->function(), *d()->exec->arguments(), this);
 }
 
+JSObject* ActivationImp::toThisObject(ExecState* exec) const {
+  return exec->globalThisValue();
+}
+
 ActivationImp::ActivationData::ActivationData(const ActivationData& old)
     : JSVariableObjectData(old),
       exec(old.exec),
@@ -769,8 +774,7 @@ JSValue* globalFuncEval(ExecState* exec,
                         PrototypeReflexiveFunction* function,
                         JSObject* thisObj,
                         const List& args) {
-  JSGlobalObject* globalObject =
-      thisObj->isGlobalObject() ? static_cast<JSGlobalObject*>(thisObj) : 0;
+  JSGlobalObject* globalObject = thisObj->toGlobalObject(exec);
 
   if (!globalObject || globalObject->evalFunction() != function)
     return throwError(exec, EvalError,
@@ -778,7 +782,8 @@ JSValue* globalFuncEval(ExecState* exec,
                       "object from which eval originated");
 
   ScopeChain scopeChain(globalObject);
-  return eval(exec, scopeChain, globalObject, globalObject, globalObject, args);
+  return eval(exec, scopeChain, globalObject, globalObject,
+              function->cachedGlobalObject()->toThisObject(exec), args);
 }
 
 JSValue* globalFuncParseInt(ExecState* exec, JSObject*, const List& args) {
@@ -933,9 +938,13 @@ PrototypeReflexiveFunction::PrototypeReflexiveFunction(
     FunctionPrototype* functionPrototype,
     int len,
     const Identifier& name,
-    JSMemberFunction function)
-    : InternalFunctionImp(functionPrototype, name), m_function(function) {
+    JSMemberFunction function,
+    JSGlobalObject* cachedGlobalObject)
+    : InternalFunctionImp(functionPrototype, name),
+      m_function(function),
+      m_cachedGlobalObject(cachedGlobalObject) {
   ASSERT_ARG(function, function);
+  ASSERT_ARG(cachedGlobalObject, cachedGlobalObject);
   putDirect(exec->propertyNames().length, jsNumber(len),
             DontDelete | ReadOnly | DontEnum);
 }
@@ -944,6 +953,12 @@ JSValue* PrototypeReflexiveFunction::callAsFunction(ExecState* exec,
                                                     JSObject* thisObj,
                                                     const List& args) {
   return m_function(exec, this, thisObj, args);
+}
+
+void PrototypeReflexiveFunction::mark() {
+  InternalFunctionImp::mark();
+  if (!m_cachedGlobalObject->marked())
+    m_cachedGlobalObject->mark();
 }
 
 }  // namespace KJS

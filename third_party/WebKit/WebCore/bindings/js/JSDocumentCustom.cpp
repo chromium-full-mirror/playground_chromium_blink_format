@@ -95,7 +95,8 @@ JSValue* toJS(ExecState* exec, Document* doc) {
   // with the
   // back/forward cache.
   if (doc->frame())
-    toJSDOMWindow(doc->frame())
+    toJSDOMWindowWrapper(doc->frame())
+        ->window()
         ->putDirect("document", ret, DontDelete | ReadOnly);
   else {
     size_t nodeCount = 0;

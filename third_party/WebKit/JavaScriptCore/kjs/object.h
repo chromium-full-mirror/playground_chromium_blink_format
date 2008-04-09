@@ -414,6 +414,9 @@ class JSObject : public JSCell {
   virtual UString toString(ExecState* exec) const;
   virtual JSObject* toObject(ExecState* exec) const;
 
+  virtual JSObject* toThisObject(ExecState*) const;
+  virtual JSGlobalObject* toGlobalObject(ExecState*) const;
+
   virtual bool getPropertyAttributes(const Identifier& propertyName,
                                      unsigned& attributes) const;
 
@@ -440,12 +443,14 @@ class JSObject : public JSCell {
 
   void fillGetterPropertySlot(PropertySlot& slot, JSValue** location);
 
-  void defineGetter(ExecState* exec,
-                    const Identifier& propertyName,
-                    JSObject* getterFunc);
-  void defineSetter(ExecState* exec,
-                    const Identifier& propertyName,
-                    JSObject* setterFunc);
+  virtual void defineGetter(ExecState*,
+                            const Identifier& propertyName,
+                            JSObject* getterFunction);
+  virtual void defineSetter(ExecState*,
+                            const Identifier& propertyName,
+                            JSObject* setterFunction);
+  virtual JSValue* lookupGetter(ExecState*, const Identifier& propertyName);
+  virtual JSValue* lookupSetter(ExecState*, const Identifier& propertyName);
 
   void saveProperties(SavedProperties& p) const { _prop.save(p); }
   void restoreProperties(const SavedProperties& p) { _prop.restore(p); }

@@ -1130,17 +1130,6 @@ inline JSValue* ExpressionNode::resolveAndCall(ExecState* exec,
       args->evaluateList(exec, argList);
       KJS_CHECKEXCEPTIONVALUE
 
-      JSObject* thisObj = base;
-      // ECMA 11.2.3 says that in this situation the this value should be null.
-      // However, section 10.2.3 says that in the case where the value provided
-      // by the caller is null, the global object should be used. It also says
-      // that the section does not apply to internal functions, but for
-      // simplicity
-      // of implementation we use the global object anyway here. This guarantees
-      // that in host objects you always get a valid object for this.
-      if (thisObj->isActivationObject())
-        thisObj = exec->dynamicGlobalObject();
-
       if (callerType == EvalOperator) {
         if (base == exec->lexicalGlobalObject() &&
             func == exec->lexicalGlobalObject()->evalFunction()) {
@@ -1149,6 +1138,8 @@ inline JSValue* ExpressionNode::resolveAndCall(ExecState* exec,
                       exec->dynamicGlobalObject(), exec->thisValue(), argList);
         }
       }
+
+      JSObject* thisObj = base->toThisObject(exec);
       return func->call(exec, thisObj, argList);
     }
     ++iter;
@@ -1201,8 +1192,7 @@ JSValue* FunctionCallValueNode::evaluate(ExecState* exec) {
   m_args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
-  JSObject* thisObj = exec->dynamicGlobalObject();
-
+  JSObject* thisObj = exec->globalThisValue();
   return func->call(exec, thisObj, argList);
 }
 
@@ -1286,7 +1276,8 @@ JSValue* LocalVarFunctionCallNode::inlineEvaluate(ExecState* exec) {
   m_args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
-  return func->call(exec, exec->dynamicGlobalObject(), argList);
+  JSObject* thisObj = exec->globalThisValue();
+  return func->call(exec, thisObj, argList);
 }
 
 JSValue* LocalVarFunctionCallNode::evaluate(ExecState* exec) {
@@ -1338,7 +1329,8 @@ JSValue* ScopedVarFunctionCallNode::inlineEvaluate(ExecState* exec) {
   m_args->evaluateList(exec, argList);
   KJS_CHECKEXCEPTIONVALUE
 
-  return func->call(exec, exec->dynamicGlobalObject(), argList);
+  JSObject* thisObj = exec->globalThisValue();
+  return func->call(exec, thisObj, argList);
 }
 
 JSValue* ScopedVarFunctionCallNode::evaluate(ExecState* exec) {
@@ -1463,6 +1455,8 @@ JSValue* FunctionCallBracketNode::evaluate(ExecState* exec) {
   ASSERT(thisObj->isObject());
   ASSERT(!thisObj->isActivationObject());
 
+  // No need to call toThisObject() on the thisObj as it is known not to be the
+  // GlobalObject or ActivationObject
   return func->call(exec, thisObj, argList);
 }
 
@@ -1515,6 +1509,8 @@ JSValue* FunctionCallDotNode::inlineEvaluate(ExecState* exec) {
   ASSERT(thisObj->isObject());
   ASSERT(!thisObj->isActivationObject());
 
+  // No need to call toThisObject() on the thisObj as it is known not to be the
+  // GlobalObject or ActivationObject
   return func->call(exec, thisObj, argList);
 }
 

@@ -103,7 +103,7 @@ JSValue* functionProtoFuncApply(ExecState* exec,
 
   JSObject* applyThis;
   if (thisArg->isUndefinedOrNull())
-    applyThis = exec->dynamicGlobalObject();
+    applyThis = exec->globalThisValue();
   else
     applyThis = thisArg->toObject(exec);
 
@@ -134,7 +134,7 @@ JSValue* functionProtoFuncCall(ExecState* exec,
 
   JSObject* callThis;
   if (thisArg->isUndefinedOrNull())
-    callThis = exec->dynamicGlobalObject();
+    callThis = exec->globalThisValue();
   else
     callThis = thisArg->toObject(exec);
 
