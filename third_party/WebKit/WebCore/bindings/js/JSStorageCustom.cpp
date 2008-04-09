@@ -29,6 +29,7 @@
 #if ENABLE(DOM_STORAGE)
 
 #include "PlatformString.h"
+#include <kjs/PropertyNameArray.h>
 #include "Storage.h"
 
 using namespace KJS;
@@ -47,6 +48,16 @@ JSValue* JSStorage::nameGetter(ExecState* exec,
                                const PropertySlot& slot) {
   JSStorage* thisObj = static_cast<JSStorage*>(slot.slotBase());
   return jsStringOrNull(thisObj->impl()->getItem(propertyName));
+}
+
+bool JSStorage::customGetPropertyNames(ExecState* exec,
+                                       PropertyNameArray& propertyNames) {
+  ExceptionCode ec;
+  unsigned length = m_impl->length();
+  for (unsigned i = 0; i < length; ++i)
+    propertyNames.add(m_impl->key(i, ec));
+
+  return true;
 }
 
 bool JSStorage::customPut(ExecState* exec,
