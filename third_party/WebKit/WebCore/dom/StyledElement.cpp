@@ -107,15 +107,14 @@ void StyledElement::invalidateStyleAttribute() {
   m_isStyleAttributeValid = false;
 }
 
-void StyledElement::updateStyleAttributeIfNeeded() const {
-  if (!m_isStyleAttributeValid) {
-    m_isStyleAttributeValid = true;
-    m_synchronizingStyleAttribute = true;
-    if (m_inlineStyleDecl)
-      const_cast<StyledElement*>(this)->setAttribute(
-          styleAttr, m_inlineStyleDecl->cssText());
-    m_synchronizingStyleAttribute = false;
-  }
+void StyledElement::updateStyleAttribute() const {
+  ASSERT(!m_isStyleAttributeValid);
+  m_isStyleAttributeValid = true;
+  m_synchronizingStyleAttribute = true;
+  if (m_inlineStyleDecl)
+    const_cast<StyledElement*>(this)->setAttribute(
+        styleAttr, m_inlineStyleDecl->cssText());
+  m_synchronizingStyleAttribute = false;
 }
 
 StyledElement::StyledElement(const QualifiedName& name, Document* doc)

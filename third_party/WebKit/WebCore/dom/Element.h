@@ -229,7 +229,7 @@ class Element : public ContainerNode {
 
   virtual void createAttributeMap() const;
 
-  virtual void updateStyleAttributeIfNeeded() const {}
+  virtual void updateStyleAttribute() const {}
 
   void updateFocusAppearanceSoonAfterAttach();
   void cancelFocusAppearanceUpdate();

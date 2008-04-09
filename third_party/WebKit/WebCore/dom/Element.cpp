@@ -174,7 +174,8 @@ NamedAttrMap* Element::attributes() const {
 }
 
 NamedAttrMap* Element::attributes(bool readonly) const {
-  updateStyleAttributeIfNeeded();
+  if (!m_isStyleAttributeValid)
+    updateStyleAttribute();
   if (!readonly && !namedAttrMap)
     createAttributeMap();
   return namedAttrMap.get();
@@ -193,8 +194,8 @@ bool Element::hasAttribute(const QualifiedName& name) const {
 }
 
 const AtomicString& Element::getAttribute(const QualifiedName& name) const {
-  if (name == styleAttr)
-    updateStyleAttributeIfNeeded();
+  if (name == styleAttr && !m_isStyleAttributeValid)
+    updateStyleAttribute();
 
   if (namedAttrMap)
     if (Attribute* a = namedAttrMap->getAttributeItem(name))
@@ -433,8 +434,8 @@ static inline bool shouldIgnoreAttributeCase(const Element* e) {
 
 const AtomicString& Element::getAttribute(const String& name) const {
   String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
-  if (localName == styleAttr.localName())
-    updateStyleAttributeIfNeeded();
+  if (localName == styleAttr.localName() && !m_isStyleAttributeValid)
+    updateStyleAttribute();
 
   if (namedAttrMap)
     if (Attribute* a = namedAttrMap->getAttributeItem(localName))
@@ -547,7 +548,8 @@ void Element::setAttributeMap(PassRefPtr<NamedAttrMap> list) {
 }
 
 bool Element::hasAttributes() const {
-  updateStyleAttributeIfNeeded();
+  if (!m_isStyleAttributeValid)
+    updateStyleAttribute();
   return namedAttrMap && namedAttrMap->length() > 0;
 }
 
@@ -662,8 +664,7 @@ void Element::insertedIntoDocument() {
   ContainerNode::insertedIntoDocument();
 
   if (hasID()) {
-    NamedAttrMap* attrs = attributes(true);
-    if (attrs) {
+    if (NamedAttrMap* attrs = namedAttrMap.get()) {
       Attribute* idItem = attrs->getAttributeItem(idAttr);
       if (idItem && !idItem->isNull())
         updateId(nullAtom, idItem->value());
@@ -673,8 +674,7 @@ void Element::insertedIntoDocument() {
 
 void Element::removedFromDocument() {
   if (hasID()) {
-    NamedAttrMap* attrs = attributes(true);
-    if (attrs) {
+    if (NamedAttrMap* attrs = namedAttrMap.get()) {
       Attribute* idItem = attrs->getAttributeItem(idAttr);
       if (idItem && !idItem->isNull())
         updateId(idItem->value(), nullAtom);
