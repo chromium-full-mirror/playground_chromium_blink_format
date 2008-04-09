@@ -434,7 +434,7 @@ void RenderThemeWin::systemFont(int propId,
     cachedDesc->setGenericFamily(FontDescription::NoFamily);
     cachedDesc->firstFamily().setFamily("Lucida Grande");
     cachedDesc->setSpecifiedSize(fontSize);
-    cachedDesc->setBold(false);
+    cachedDesc->setWeight(FontWeightNormal);
     cachedDesc->setItalic(false);
   }
   fontDescription = *cachedDesc;
