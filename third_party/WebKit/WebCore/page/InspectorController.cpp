@@ -691,7 +691,11 @@ static JSValueRef inspectedWindow(JSContextRef ctx,
   if (!controller)
     return JSValueMakeUndefined(ctx);
 
-  return toRef(toJSDOMWindow(controller->inspectedPage()->mainFrame()));
+  JSDOMWindow* window = toJSDOMWindow(controller->inspectedPage()->mainFrame());
+  if (!window)
+    return JSValueMakeNull(ctx);
+
+  return toRef(window);
 }
 
 static JSValueRef localizedStrings(JSContextRef ctx,
