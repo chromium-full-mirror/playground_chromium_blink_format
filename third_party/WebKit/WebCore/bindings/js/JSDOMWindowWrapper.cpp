@@ -31,11 +31,9 @@
 
 #include "Frame.h"
 #include "JSDOMWindow.h"
+#include "DOMWindow.h"
 #include "kjs_proxy.h"
 #include <kjs/object_object.h>
-
-#include "CString.h"
-#include "PlatformString.h"
 
 using namespace KJS;
 
@@ -43,8 +41,10 @@ namespace WebCore {
 
 const ClassInfo JSDOMWindowWrapper::s_info = {"JSDOMWindowWrapper", 0, 0};
 
-JSDOMWindowWrapper::JSDOMWindowWrapper() {
-  Collector::collectOnMainThreadOnly(this);
+JSDOMWindowWrapper::JSDOMWindowWrapper(DOMWindow* domWindow)
+    : Base(jsNull()), m_window(0) {
+  m_window = new JSDOMWindow(domWindow, this);
+  setPrototype(m_window->prototype());
 }
 
 JSDOMWindowWrapper::~JSDOMWindowWrapper() {}
@@ -55,7 +55,7 @@ JSDOMWindowWrapper::~JSDOMWindowWrapper() {}
 
 void JSDOMWindowWrapper::mark() {
   Base::mark();
-  if (!m_window->marked())
+  if (m_window && !m_window->marked())
     m_window->mark();
 }
 

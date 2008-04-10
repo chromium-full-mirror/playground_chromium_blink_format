@@ -52,7 +52,7 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
   friend class ScheduledAction;
 
  protected:
-  JSDOMWindowBase(KJS::JSObject* prototype, DOMWindow*);
+  JSDOMWindowBase(KJS::JSObject* prototype, DOMWindow*, JSDOMWindowWrapper*);
 
  public:
   virtual ~JSDOMWindowBase();
