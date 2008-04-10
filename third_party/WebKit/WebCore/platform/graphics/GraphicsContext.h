@@ -81,6 +81,7 @@ const int cMisspellingLinePatternGapWidth = 1;
 
 class AffineTransform;
 class Font;
+class Gradient;
 class GraphicsContextPrivate;
 class GraphicsContextPlatformPrivate;
 class ImageBuffer;
@@ -133,6 +134,7 @@ class GraphicsContext : Noncopyable {
 
   void fillRect(const IntRect&, const Color&);
   void fillRect(const FloatRect&, const Color&);
+  void fillRect(const IntRect&, Gradient&);
   void fillRoundedRect(const IntRect&,
                        const IntSize& topLeft,
                        const IntSize& topRight,
