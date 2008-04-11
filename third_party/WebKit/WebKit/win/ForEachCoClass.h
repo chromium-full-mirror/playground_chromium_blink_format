@@ -45,6 +45,8 @@
                           macro(WebView) macro(WebArchive)                     \
                               macro(WebCoreStatistics)  // end of macro
 
+// Everything below this point is deprecated. Please do not use.
+
 #define WEBKITCLASS_MEMBER(cls) cls##Class,
 enum WebKitClass { FOR_EACH_COCLASS(WEBKITCLASS_MEMBER) WebKitClassSentinel };
 #undef WEBKITCLASS_MEMBER
