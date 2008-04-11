@@ -34,7 +34,7 @@
 
 namespace WebCore {
 
-class OriginStorage;
+class StorageArea;
 class Page;
 
 class SessionStorage : public RefCounted<SessionStorage> {
@@ -42,7 +42,7 @@ class SessionStorage : public RefCounted<SessionStorage> {
   static PassRefPtr<SessionStorage> create(Page*);
   PassRefPtr<SessionStorage> copy(Page*);
 
-  PassRefPtr<OriginStorage> originStorage(SecurityOrigin*);
+  PassRefPtr<StorageArea> storageArea(SecurityOrigin*);
 
 #ifndef NDEBUG
   Page* page() { return m_page; }
@@ -54,11 +54,11 @@ class SessionStorage : public RefCounted<SessionStorage> {
   Page* m_page;
 
   typedef HashMap<RefPtr<SecurityOrigin>,
-                  RefPtr<OriginStorage>,
+                  RefPtr<StorageArea>,
                   SecurityOriginHash,
                   SecurityOriginTraits>
-      OriginStorageMap;
-  OriginStorageMap m_originStorageMap;
+      StorageAreaMap;
+  StorageAreaMap m_storageAreaMap;
 };
 
 }  // namespace WebCore
