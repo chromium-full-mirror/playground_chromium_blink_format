@@ -39,6 +39,7 @@
 #include "RenderSVGTransformableContainer.h"
 #include "RenderSVGInline.h"
 #include "ResourceRequest.h"
+#include "SVGSMILElement.h"
 #include "SVGNames.h"
 #include "XLinkNames.h"
 
@@ -142,11 +143,22 @@ void SVGAElement::defaultEventHandler(Event* evt) {
       target =
           (getAttribute(XLinkNames::showAttr) == "new") ? "_blank" : "_self";
 
-    String url = parseURL(href());
-    if (!evt->defaultPrevented())
+    if (!evt->defaultPrevented()) {
+      String url = parseURL(href());
+      if (url.startsWith("#")) {
+        Element* targetElement = document()->getElementById(url.substring(1));
+        if (SVGSMILElement::isTimingElement(targetElement)) {
+          SVGSMILElement* timed = static_cast<SVGSMILElement*>(targetElement);
+          timed->beginByLinkActivation();
+          evt->setDefaultHandled();
+          SVGStyledTransformableElement::defaultEventHandler(evt);
+          return;
+        }
+      }
       if (document()->frame())
         document()->frame()->loader()->urlSelected(document()->completeURL(url),
                                                    target, evt, false, true);
+    }
 
     evt->setDefaultHandled();
   }

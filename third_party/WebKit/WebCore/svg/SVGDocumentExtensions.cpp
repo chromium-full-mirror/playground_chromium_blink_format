@@ -34,7 +34,7 @@
 #include "FrameLoader.h"
 #include "Page.h"
 #include "SVGSVGElement.h"
-#include "TimeScheduler.h"
+#include "SMILTimeContainer.h"
 #include "XMLTokenizer.h"
 #include "kjs_proxy.h"
 
@@ -74,7 +74,7 @@ void SVGDocumentExtensions::startAnimations() {
   HashSet<SVGSVGElement*>::iterator end = m_timeContainers.end();
   for (HashSet<SVGSVGElement*>::iterator itr = m_timeContainers.begin();
        itr != end; ++itr)
-    (*itr)->timeScheduler()->startAnimations();
+    (*itr)->timeContainer()->begin();
 #endif
 }
 

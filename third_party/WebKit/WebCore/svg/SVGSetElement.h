@@ -35,14 +35,15 @@ class SVGSetElement : public SVGAnimationElement {
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
-  virtual bool updateAnimatedValue(EAnimationMode,
-                                   float timePercentage,
-                                   unsigned valueIndex,
-                                   float percentagePast);
-  virtual bool calculateFromAndToValues(EAnimationMode, unsigned valueIndex);
+  virtual bool calculateFromAndToValues(const String& fromString,
+                                        const String& toString);
+  virtual bool calculateFromAndByValues(const String& fromString,
+                                        const String& byString);
+  virtual bool updateAnimatedValue(float percentage);
+  virtual void applyAnimatedValueToElement(unsigned repeat);
 
  private:
-  String m_savedTo;
+  String m_animatedValue;
 };
 
 }  // namespace WebCore

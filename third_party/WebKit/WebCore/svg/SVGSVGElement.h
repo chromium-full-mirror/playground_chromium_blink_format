@@ -39,7 +39,7 @@ class SVGLength;
 class SVGTransform;
 class SVGViewSpec;
 class SVGViewElement;
-class TimeScheduler;
+class SMILTimeContainer;
 class SVGSVGElement : public SVGStyledLocatableElement,
                       public SVGTests,
                       public SVGLangSpace,
@@ -88,7 +88,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   FloatPoint currentTranslate() const;
   void setCurrentTranslate(const FloatPoint&);
 
-  TimeScheduler* timeScheduler() { return m_timeScheduler; }
+  SMILTimeContainer* timeContainer() const { return m_timeContainer.get(); }
 
   void pauseAnimations();
   void unpauseAnimations();
@@ -178,8 +178,11 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                  Height,
                                  height)
 
+  virtual void willSaveToCache();
+  virtual void willRestoreFromCache();
+
   bool m_useCurrentView;
-  TimeScheduler* m_timeScheduler;
+  RefPtr<SMILTimeContainer> m_timeContainer;
   FloatPoint m_translation;
   mutable OwnPtr<SVGViewSpec> m_viewSpec;
   IntSize m_containerSize;
