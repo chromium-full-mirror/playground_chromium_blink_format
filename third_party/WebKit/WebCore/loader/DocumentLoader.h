@@ -141,6 +141,14 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   PassRefPtr<ArchiveResource> mainResource() const;
   void getSubresources(Vector<PassRefPtr<ArchiveResource>>&) const;
 
+  bool scheduleArchiveLoad(ResourceLoader*,
+                           const ResourceRequest&,
+                           const KURL&);
+#ifndef NDEBUG
+  bool isArchiveLoadPending(ResourceLoader*) const;
+#endif
+  void cancelPendingArchiveLoad(ResourceLoader*);
+
   void addResponse(const ResourceResponse&);
   const ResponseVector& responses() const { return m_responses; }
 
@@ -203,6 +211,9 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void commitLoad(const char*, int);
   bool doesProgressiveLoad(const String& MIMEType) const;
 
+  void deliverArchivedResourcesAfterDelay();
+  void archiveResourceDeliveryTimerFired(Timer<DocumentLoader>*);
+
   Frame* m_frame;
 
   RefPtr<MainResourceLoader> m_mainResourceLoader;
@@ -260,6 +271,11 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   // page cache.
   ResponseVector m_responses;
   bool m_stopRecordingResponses;
+
+  typedef HashMap<RefPtr<ResourceLoader>, RefPtr<ArchiveResource>>
+      ArchiveResourceMap;
+  ArchiveResourceMap m_pendingArchiveResources;
+  Timer<DocumentLoader> m_archiveResourceDeliveryTimer;
 
   OwnPtr<ArchiveResourceCollection> m_archiveResourceCollection;
   RefPtr<SharedBuffer> m_parsedArchiveData;

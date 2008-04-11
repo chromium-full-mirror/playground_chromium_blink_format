@@ -211,7 +211,6 @@ class FrameLoader : Noncopyable
   // Also not cool.
   void stopAllLoaders();
   void stopForUserCancel(bool deferCheckLoadComplete = false);
-  void cancelPendingArchiveLoad(ResourceLoader*);
 
   bool isLoadingMainResource() const { return m_isLoadingMainResource; }
   bool isLoading() const;
@@ -257,12 +256,7 @@ class FrameLoader : Noncopyable
   ResourceError fileDoesNotExistError(const ResourceResponse&) const;
   ResourceError blockedError(const ResourceRequest&) const;
   ResourceError cannotShowURLError(const ResourceRequest&) const;
-  bool scheduleArchiveLoad(ResourceLoader*,
-                           const ResourceRequest&,
-                           const KURL&);
-#ifndef NDEBUG
-  bool isArchiveLoadPending(ResourceLoader*) const;
-#endif
+
   void cannotShowMIMEType(const ResourceResponse&);
   ResourceError interruptionForPolicyChangeError(const ResourceRequest&);
 
@@ -580,9 +574,6 @@ class FrameLoader : Noncopyable
   void checkCompletedTimerFired(Timer<FrameLoader>*);
   void checkLoadCompleteTimerFired(Timer<FrameLoader>*);
 
-  void deliverArchivedResourcesAfterDelay();
-  void archiveResourceDeliveryTimerFired(Timer<FrameLoader>*);
-
   void cancelRedirection(bool newLoadInProgress = false);
 
   void started();
@@ -799,11 +790,6 @@ class FrameLoader : Noncopyable
   RefPtr<HistoryItem> m_provisionalHistoryItem;
 
   bool m_didPerformFirstNavigation;
-
-  typedef HashMap<RefPtr<ResourceLoader>, RefPtr<ArchiveResource>>
-      ArchiveResourceMap;
-  ArchiveResourceMap m_pendingArchiveResources;
-  Timer<FrameLoader> m_archiveResourceDeliveryTimer;
 
 #ifndef NDEBUG
   bool m_didDispatchDidCommitLoad;
