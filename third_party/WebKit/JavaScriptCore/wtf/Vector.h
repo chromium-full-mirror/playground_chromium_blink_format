@@ -572,7 +572,8 @@ void Vector<T, inlineCapacity>::resize(size_t size) {
   else {
     if (size > capacity())
       expandCapacity(size);
-    TypeOperations::initialize(end(), begin() + size);
+    if (begin())
+      TypeOperations::initialize(end(), begin() + size);
   }
 
   m_size = size;
@@ -590,7 +591,8 @@ void Vector<T, inlineCapacity>::grow(size_t size) {
   ASSERT(size >= m_size);
   if (size > capacity())
     expandCapacity(size);
-  TypeOperations::initialize(end(), begin() + size);
+  if (begin())
+    TypeOperations::initialize(end(), begin() + size);
   m_size = size;
 }
 
@@ -601,7 +603,8 @@ void Vector<T, inlineCapacity>::reserveCapacity(size_t newCapacity) {
   T* oldBuffer = begin();
   T* oldEnd = end();
   m_buffer.allocateBuffer(newCapacity);
-  TypeOperations::move(oldBuffer, oldEnd, begin());
+  if (begin())
+    TypeOperations::move(oldBuffer, oldEnd, begin());
   m_buffer.deallocateBuffer(oldBuffer);
 }
 
@@ -632,8 +635,11 @@ template <typename T, size_t inlineCapacity>
 template <typename U>
 void Vector<T, inlineCapacity>::append(const U* data, size_t dataSize) {
   size_t newSize = m_size + dataSize;
-  if (newSize > capacity())
+  if (newSize > capacity()) {
     data = expandCapacity(newSize, data);
+    if (!begin())
+      return;
+  }
   T* dest = end();
   for (size_t i = 0; i < dataSize; ++i)
     new (&dest[i]) T(data[i]);
@@ -644,8 +650,11 @@ template <typename T, size_t inlineCapacity>
 template <typename U>
 inline void Vector<T, inlineCapacity>::append(const U& val) {
   const U* ptr = &val;
-  if (size() == capacity())
+  if (size() == capacity()) {
     ptr = expandCapacity(size() + 1, ptr);
+    if (!begin())
+      return;
+  }
 
 #if COMPILER(MSVC7)
   // FIXME: MSVC7 generates compilation errors when trying to assign
@@ -686,8 +695,11 @@ void Vector<T, inlineCapacity>::insert(size_t position,
                                        size_t dataSize) {
   ASSERT(position <= size());
   size_t newSize = m_size + dataSize;
-  if (newSize > capacity())
+  if (newSize > capacity()) {
     data = expandCapacity(newSize, data);
+    if (!begin())
+      return;
+  }
   T* spot = begin() + position;
   TypeOperations::moveOverlapping(spot, end(), spot + dataSize);
   for (size_t i = 0; i < dataSize; ++i)
@@ -700,8 +712,11 @@ template <typename U>
 inline void Vector<T, inlineCapacity>::insert(size_t position, const U& val) {
   ASSERT(position <= size());
   const U* data = &val;
-  if (size() == capacity())
+  if (size() == capacity()) {
     data = expandCapacity(size() + 1, data);
+    if (!begin())
+      return;
+  }
   T* spot = begin() + position;
   TypeOperations::moveOverlapping(spot, end(), spot + 1);
   new (spot) T(*data);

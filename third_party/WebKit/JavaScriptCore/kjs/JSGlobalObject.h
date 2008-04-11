@@ -135,6 +135,10 @@ class JSGlobalObject : public JSVariableObject {
 
     ActivationStackNode* activations;
     size_t activationCount;
+
+    OwnPtr<HashSet<JSObject*>> arrayVisitedElements;  // Global data shared by
+                                                      // array prototype
+                                                      // functions.
   };
 
  public:
@@ -268,6 +272,12 @@ class JSGlobalObject : public JSVariableObject {
   virtual bool isDynamicScope() const;
 
   ExecStateStack& activeExecStates() const { return d()->activeExecStates; }
+
+  HashSet<JSObject*>& arrayVisitedElements() {
+    if (!d()->arrayVisitedElements)
+      d()->arrayVisitedElements.set(new HashSet<JSObject*>);
+    return *d()->arrayVisitedElements;
+  }
 
  private:
   void init();
