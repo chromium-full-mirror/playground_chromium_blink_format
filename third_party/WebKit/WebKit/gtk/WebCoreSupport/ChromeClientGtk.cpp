@@ -31,6 +31,7 @@
 #include "webkitprivate.h"
 #include "NotImplemented.h"
 #include "WindowFeatures.h"
+#include "DatabaseTracker.h"
 
 using namespace WebCore;
 
@@ -289,7 +290,12 @@ void ChromeClient::print(Frame* frame) {
   webkit_web_frame_print(kit(frame));
 }
 
-void ChromeClient::exceededDatabaseQuota(Frame*, const String&) {
+void ChromeClient::exceededDatabaseQuota(Frame* frame, const String&) {
+  // Set to 5M for testing
+  // FIXME: Make this configurable
   notImplemented();
+  const unsigned long long defaultQuota = 5 * 1024 * 1024;
+  DatabaseTracker::tracker().setQuota(frame->document()->securityOrigin(),
+                                      defaultQuota);
 }
 }
