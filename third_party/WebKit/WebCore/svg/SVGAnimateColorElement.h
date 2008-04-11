@@ -23,7 +23,7 @@
 
 #ifndef SVGAnimateColorElement_h
 #define SVGAnimateColorElement_h
-#if ENABLE(SVG)
+#if ENABLE(SVG_ANIMATION)
 
 #include "SVGAnimationElement.h"
 #include "ColorDistance.h"
@@ -57,7 +57,7 @@ class SVGAnimateColorElement : public SVGAnimationElement {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG)
+#endif  // ENABLE(SVG_ANIMATION)
 #endif  // KSVG_SVGAnimateColorElementImpl_H
 
 // vim:ts=4:noet

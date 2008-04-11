@@ -21,7 +21,7 @@
 */
 
 #include "config.h"
-#if ENABLE(SVG)
+#if ENABLE(SVG_ANIMATION)
 #include "SVGSetElement.h"
 #include "Document.h"
 #include "SVGDocumentExtensions.h"
@@ -58,4 +58,4 @@ bool SVGSetElement::updateAnimatedValue(float percentage) {
 }
 
 // vim:ts=4:noet
-#endif  // ENABLE(SVG)
+#endif  // ENABLE(SVG_ANIMATION)

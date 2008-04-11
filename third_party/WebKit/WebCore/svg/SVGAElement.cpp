@@ -145,6 +145,7 @@ void SVGAElement::defaultEventHandler(Event* evt) {
 
     if (!evt->defaultPrevented()) {
       String url = parseURL(href());
+#if ENABLE(SVG_ANIMATION)
       if (url.startsWith("#")) {
         Element* targetElement = document()->getElementById(url.substring(1));
         if (SVGSMILElement::isTimingElement(targetElement)) {
@@ -155,6 +156,7 @@ void SVGAElement::defaultEventHandler(Event* evt) {
           return;
         }
       }
+#endif
       if (document()->frame())
         document()->frame()->loader()->urlSelected(document()->completeURL(url),
                                                    target, evt, false, true);
