@@ -818,7 +818,7 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
     // with our
     // non-first-line style.
     if (parent() && object()->style()->hasBorder()) {
-      CachedImage* borderImage = object()->style()->borderImage().image();
+      StyleImage* borderImage = object()->style()->borderImage().image();
       bool hasBorderImage =
           borderImage && borderImage->canRender(styleToUse->effectiveZoom());
       if (hasBorderImage && !borderImage->isLoaded())

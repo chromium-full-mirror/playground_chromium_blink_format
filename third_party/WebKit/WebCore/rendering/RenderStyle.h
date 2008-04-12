@@ -31,7 +31,7 @@
  *
  * The order of the values in the enums have to agree with the order specified
  * in CSSValueKeywords.in, otherwise some optimizations in the parser will fail,
- * and produce invaliud results.
+ * and produce invalid results.
  */
 
 #include "AffineTransform.h"
@@ -148,6 +148,7 @@ class StyleImage : public RefCounted<StyleImage> {
   virtual PassRefPtr<CSSValue> cssValue() = 0;
 
   virtual bool canRender(float multiplier) const { return true; }
+  virtual bool isLoaded() const { return true; }
   virtual IntSize imageSize(float multiplier) const = 0;
   virtual void setImageContainerSize(const IntSize&) = 0;
   virtual void addClient(RenderObject*) = 0;
@@ -169,6 +170,7 @@ class StyleCachedImage : public StyleImage {
   virtual PassRefPtr<CSSValue> cssValue();
 
   virtual bool canRender(float multiplier) const;
+  virtual bool isLoaded() const;
   virtual IntSize imageSize(float multiplier) const;
   virtual void setImageContainerSize(const IntSize&);
   virtual void addClient(RenderObject*);
@@ -308,7 +310,7 @@ class BorderImage {
  public:
   BorderImage()
       : m_image(0), m_horizontalRule(BI_STRETCH), m_verticalRule(BI_STRETCH) {}
-  BorderImage(CachedImage* image,
+  BorderImage(StyleImage* image,
               LengthBox slices,
               EBorderImageRule h,
               EBorderImageRule v)
@@ -324,7 +326,7 @@ class BorderImage {
   }
 
   bool hasImage() const { return m_image != 0; }
-  CachedImage* image() const { return m_image; }
+  StyleImage* image() const { return m_image.get(); }
 
   EBorderImageRule horizontalRule() const {
     return static_cast<EBorderImageRule>(m_horizontalRule);
@@ -333,7 +335,7 @@ class BorderImage {
     return static_cast<EBorderImageRule>(m_verticalRule);
   }
 
-  CachedImage* m_image;
+  RefPtr<StyleImage> m_image;
   LengthBox m_slices;
   unsigned m_horizontalRule : 2;  // EBorderImageRule
   unsigned m_verticalRule : 2;    // EBorderImageRule

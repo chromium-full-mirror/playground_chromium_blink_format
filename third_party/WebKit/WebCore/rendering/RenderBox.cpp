@@ -524,7 +524,7 @@ void RenderBox::imageChanged(CachedImage* image) {
       !view())
     return;
 
-  if (isInlineFlow() || style()->borderImage().image() == image) {
+  if (isInlineFlow() || style()->borderImage().image()->data() == image) {
     repaint();
     return;
   }
