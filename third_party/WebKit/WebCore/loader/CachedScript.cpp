@@ -50,8 +50,8 @@ CachedScript::CachedScript(const String& url, const String& charset)
 
 CachedScript::~CachedScript() {}
 
-void CachedScript::ref(CachedResourceClient* c) {
-  CachedResource::ref(c);
+void CachedScript::addClient(CachedResourceClient* c) {
+  CachedResource::addClient(c);
   if (!m_loading)
     c->notifyFinished(this);
 }

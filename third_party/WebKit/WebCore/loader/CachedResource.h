@@ -90,8 +90,8 @@ class CachedResource {
   const String& url() const { return m_url; }
   Type type() const { return m_type; }
 
-  virtual void ref(CachedResourceClient*);
-  void deref(CachedResourceClient*);
+  virtual void addClient(CachedResourceClient*);
+  void removeClient(CachedResourceClient*);
   bool referenced() const { return !m_clients.isEmpty(); }
 
   enum PreloadResult {

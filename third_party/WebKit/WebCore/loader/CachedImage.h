@@ -64,7 +64,7 @@ class CachedImage : public CachedResource, public ImageObserver {
   IntRect imageRect(float multiplier)
       const;  // The size of the currently decoded portion of the image.
 
-  virtual void ref(CachedResourceClient*);
+  virtual void addClient(CachedResourceClient*);
 
   virtual void allReferencesRemoved();
   virtual void destroyDecodedData();

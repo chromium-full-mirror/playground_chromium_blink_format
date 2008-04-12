@@ -64,7 +64,7 @@ ProcessingInstruction::ProcessingInstruction(Document* doc,
 
 ProcessingInstruction::~ProcessingInstruction() {
   if (m_cachedSheet)
-    m_cachedSheet->deref(this);
+    m_cachedSheet->removeClient(this);
 }
 
 void ProcessingInstruction::setData(const String& data, ExceptionCode& ec) {
@@ -157,7 +157,7 @@ bool ProcessingInstruction::checkStyleSheet() {
           m_loading = true;
           document()->addPendingSheet();
           if (m_cachedSheet)
-            m_cachedSheet->deref(this);
+            m_cachedSheet->removeClient(this);
 #if ENABLE(XSLT)
           if (m_isXSL)
             m_cachedSheet = document()->docLoader()->requestXSLStyleSheet(
@@ -173,7 +173,7 @@ bool ProcessingInstruction::checkStyleSheet() {
                 document()->completeURL(href).string(), charset);
           }
           if (m_cachedSheet)
-            m_cachedSheet->ref(this);
+            m_cachedSheet->addClient(this);
 #if ENABLE(XSLT)
           return !m_isXSL;
 #endif
@@ -225,7 +225,7 @@ void ProcessingInstruction::setXSLStyleSheet(const String& url,
 void ProcessingInstruction::parseStyleSheet(const String& sheet) {
   m_sheet->parseString(sheet, true);
   if (m_cachedSheet)
-    m_cachedSheet->deref(this);
+    m_cachedSheet->removeClient(this);
   m_cachedSheet = 0;
 
   m_loading = false;

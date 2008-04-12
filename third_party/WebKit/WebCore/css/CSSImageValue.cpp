@@ -36,7 +36,7 @@ CSSImageValue::CSSImageValue()
 
 CSSImageValue::~CSSImageValue() {
   if (m_image)
-    m_image->deref(this);
+    m_image->removeClient(this);
 }
 
 CachedImage* CSSImageValue::image(DocLoader* loader) {
@@ -57,7 +57,7 @@ CachedImage* CSSImageValue::image(DocLoader* loader, const String& url) {
     }
 
     if (m_image)
-      m_image->ref(this);
+      m_image->addClient(this);
   }
 
   return m_image;

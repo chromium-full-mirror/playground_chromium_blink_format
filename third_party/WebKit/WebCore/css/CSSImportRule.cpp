@@ -52,7 +52,7 @@ CSSImportRule::~CSSImportRule() {
   if (m_styleSheet)
     m_styleSheet->setParent(0);
   if (m_cachedSheet)
-    m_cachedSheet->deref(this);
+    m_cachedSheet->removeClient(this);
 }
 
 void CSSImportRule::setCSSStyleSheet(const String& url,
@@ -108,7 +108,7 @@ void CSSImportRule::insertedIntoParent() {
     if (parentSheet && parentSheet->loadCompleted() && parentSheet->doc())
       parentSheet->doc()->addPendingSheet();
     m_loading = true;
-    m_cachedSheet->ref(this);
+    m_cachedSheet->addClient(this);
   }
 }
 

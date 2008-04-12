@@ -48,8 +48,8 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(const String& url,
 
 CachedCSSStyleSheet::~CachedCSSStyleSheet() {}
 
-void CachedCSSStyleSheet::ref(CachedResourceClient* c) {
-  CachedResource::ref(c);
+void CachedCSSStyleSheet::addClient(CachedResourceClient* c) {
+  CachedResource::addClient(c);
 
   if (!m_loading)
     c->setCSSStyleSheet(m_url, m_decoder->encoding().name(), this);

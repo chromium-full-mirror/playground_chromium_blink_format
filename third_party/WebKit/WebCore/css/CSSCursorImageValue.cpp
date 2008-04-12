@@ -99,7 +99,7 @@ bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element) {
     if (m_image &&
         m_image->url() !=
             element->document()->completeURL(cursorElement->href())) {
-      m_image->deref(this);
+      m_image->removeClient(this);
       m_image = 0;
 
       m_accessedImage = false;

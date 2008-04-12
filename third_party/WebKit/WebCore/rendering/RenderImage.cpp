@@ -52,17 +52,17 @@ RenderImage::RenderImage(Node* node)
 
 RenderImage::~RenderImage() {
   if (m_cachedImage)
-    m_cachedImage->deref(this);
+    m_cachedImage->removeClient(this);
 }
 
 void RenderImage::setCachedImage(CachedImage* newImage) {
   if (m_isAnonymousImage || m_cachedImage == newImage)
     return;
   if (m_cachedImage)
-    m_cachedImage->deref(this);
+    m_cachedImage->removeClient(this);
   m_cachedImage = newImage;
   if (m_cachedImage) {
-    m_cachedImage->ref(this);
+    m_cachedImage->addClient(this);
     if (m_cachedImage->errorOccurred())
       imageChanged(m_cachedImage);
   }

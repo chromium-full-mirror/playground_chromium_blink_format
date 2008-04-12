@@ -109,7 +109,7 @@ void CachedResource::setRequest(Request* request) {
     delete this;
 }
 
-void CachedResource::ref(CachedResourceClient* c) {
+void CachedResource::addClient(CachedResourceClient* c) {
   if (m_preloadResult == PreloadNotReferenced) {
     if (isLoaded())
       m_preloadResult = PreloadReferencedWhileComplete;
@@ -123,7 +123,7 @@ void CachedResource::ref(CachedResourceClient* c) {
   m_clients.add(c);
 }
 
-void CachedResource::deref(CachedResourceClient* c) {
+void CachedResource::removeClient(CachedResourceClient* c) {
   ASSERT(m_clients.contains(c));
   m_clients.remove(c);
   if (canDelete() && !inCache())

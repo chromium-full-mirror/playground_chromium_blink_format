@@ -108,7 +108,7 @@ CanvasPattern::CanvasPattern(CachedImage* cachedImage,
       m_repeatY(repeatY),
       m_originClean(originClean) {
   if (cachedImage)
-    cachedImage->ref(this);
+    cachedImage->addClient(this);
 }
 
 CanvasPattern::~CanvasPattern() {
@@ -117,7 +117,7 @@ CanvasPattern::~CanvasPattern() {
     cairo_surface_destroy(m_platformImage);
 #endif
   if (m_cachedImage)
-    m_cachedImage->deref(this);
+    m_cachedImage->removeClient(this);
 }
 
 #if PLATFORM(CG)
