@@ -618,10 +618,10 @@ void ClipboardWin::setDragImage(CachedImage* image,
     return;
 
   if (m_dragImage)
-    m_dragImage->deref(this);
+    m_dragImage->removeClient(this);
   m_dragImage = image;
   if (m_dragImage)
-    m_dragImage->ref(this);
+    m_dragImage->addClient(this);
 
   m_dragLoc = loc;
   m_dragImageElement = node;
