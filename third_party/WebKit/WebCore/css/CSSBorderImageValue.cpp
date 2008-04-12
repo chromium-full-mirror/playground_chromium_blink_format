@@ -23,13 +23,12 @@
 #include "config.h"
 #include "CSSBorderImageValue.h"
 
-#include "CSSImageValue.h"
 #include "PlatformString.h"
 #include "Rect.h"
 
 namespace WebCore {
 
-CSSBorderImageValue::CSSBorderImageValue(PassRefPtr<CSSImageValue> image,
+CSSBorderImageValue::CSSBorderImageValue(PassRefPtr<CSSValue> image,
                                          PassRefPtr<Rect> imageRect,
                                          int horizontalRule,
                                          int verticalRule)

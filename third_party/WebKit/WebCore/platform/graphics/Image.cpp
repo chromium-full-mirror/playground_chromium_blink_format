@@ -114,9 +114,6 @@ void Image::drawTiled(GraphicsContext* ctxt,
                       const FloatPoint& srcPoint,
                       const FloatSize& scaledTileSize,
                       CompositeOperator op) {
-  if (!nativeImageForCurrentFrame())
-    return;
-
   if (mayFillWithSolidColor()) {
     fillWithSolidColor(ctxt, destRect, solidColor(), op);
     return;
@@ -171,9 +168,6 @@ void Image::drawTiled(GraphicsContext* ctxt,
                       TileRule hRule,
                       TileRule vRule,
                       CompositeOperator op) {
-  if (!nativeImageForCurrentFrame())
-    return;
-
   if (mayFillWithSolidColor()) {
     fillWithSolidColor(ctxt, dstRect, solidColor(), op);
     return;

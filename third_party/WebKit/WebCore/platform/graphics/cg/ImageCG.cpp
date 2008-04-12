@@ -60,6 +60,34 @@ void FrameData::clear() {
 // Image Class
 // ================================================
 
+BitmapImage::BitmapImage(CGImageRef cgImage, ImageObserver* observer)
+    : Image(observer),
+      m_currentFrame(0),
+      m_frames(0),
+      m_frameTimer(0),
+      m_repetitionCount(0),
+      m_repetitionsComplete(0),
+      m_isSolidColor(false),
+      m_animatingImageType(false),
+      m_animationFinished(true),
+      m_allDataReceived(true),
+      m_haveSize(true),
+      m_sizeAvailable(true),
+      m_decodedSize(0),
+      m_haveFrameCount(true),
+      m_frameCount(1) {
+  initPlatformData();
+
+  CGFloat width = CGImageGetWidth(cgImage);
+  CGFloat height = CGImageGetHeight(cgImage);
+  m_decodedSize = width * height * 4;
+  m_size = IntSize(width, height);
+
+  m_frames.grow(1);
+  m_frames[0].m_frame = cgImage;
+  checkForSolidColor();
+}
+
 // Drawing Routines
 
 void BitmapImage::checkForSolidColor() {
@@ -146,9 +174,8 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 
   // Flip the coords.
   ctxt->setCompositeOperation(compositeOp);
-  CGContextTranslateCTM(context, ir.origin.x, ir.origin.y);
+  CGContextTranslateCTM(context, ir.origin.x, ir.origin.y + ir.size.height);
   CGContextScaleCTM(context, 1, -1);
-  CGContextTranslateCTM(context, 0, -ir.size.height);
 
   // Translated to origin, now draw at 0,0.
   ir.origin.x = ir.origin.y = 0;
@@ -198,6 +225,8 @@ void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatPoint& phase,
                         CompositeOperator op,
                         const FloatRect& destRect) {
+  if (!nativeImageForCurrentFrame())
+    return;
   ASSERT(patternTransform.isInvertible());
   if (!patternTransform.isInvertible())
     // Avoid a hang under CGContextDrawTiledImage on release builds.
@@ -207,9 +236,9 @@ void Image::drawPattern(GraphicsContext* ctxt,
   ctxt->save();
   CGContextClipToRect(context, destRect);
   ctxt->setCompositeOperation(op);
-  CGContextTranslateCTM(context, destRect.x(), destRect.y());
+  CGContextTranslateCTM(context, destRect.x(),
+                        destRect.y() + destRect.height());
   CGContextScaleCTM(context, 1, -1);
-  CGContextTranslateCTM(context, 0, -destRect.height());
 
   // Compute the scaled tile size.
   float scaledTileHeight =

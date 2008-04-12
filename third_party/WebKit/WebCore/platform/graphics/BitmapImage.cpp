@@ -54,7 +54,9 @@ BitmapImage::BitmapImage(ImageObserver* observer)
       m_allDataReceived(false),
       m_haveSize(false),
       m_sizeAvailable(false),
-      m_decodedSize(0) {
+      m_decodedSize(0),
+      m_haveFrameCount(false),
+      m_frameCount(0) {
   initPlatformData();
 }
 
@@ -144,13 +146,20 @@ bool BitmapImage::dataChanged(bool allDataReceived) {
   m_allDataReceived = allDataReceived;
   m_source.setData(m_data.get(), allDataReceived);
 
+  // Clear the frame count.
+  m_haveFrameCount = false;
+
   // Image properties will not be available until the first frame of the file
   // reaches kCGImageStatusIncomplete.
   return isSizeAvailable();
 }
 
 size_t BitmapImage::frameCount() {
-  return m_source.frameCount();
+  if (!m_haveFrameCount) {
+    m_haveFrameCount = true;
+    m_frameCount = m_source.frameCount();
+  }
+  return m_frameCount;
 }
 
 bool BitmapImage::isSizeAvailable() {

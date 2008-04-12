@@ -464,11 +464,10 @@ void RenderBox::paintBackground(const PaintInfo& paintInfo,
 IntSize RenderBox::calculateBackgroundSize(const BackgroundLayer* bgLayer,
                                            int scaledWidth,
                                            int scaledHeight) const {
-  CachedImage* bg = bgLayer->backgroundImage();
+  StyleImage* bg = bgLayer->backgroundImage();
   bg->setImageContainerSize(
-      IntSize(scaledWidth, scaledHeight));  // Use the box established by
-                                            // background-origin (it's like we
-                                            // have a background-size of 100%).
+      IntSize(scaledWidth,
+              scaledHeight));  // Use the box established by background-origin.
 
   if (bgLayer->isBackgroundSizeSet()) {
     int w = scaledWidth;
@@ -514,6 +513,7 @@ IntSize RenderBox::calculateBackgroundSize(const BackgroundLayer* bgLayer,
         h = bg->imageSize(style()->effectiveZoom()).height();
       }
     }
+
     return IntSize(max(1, w), max(1, h));
   } else
     return bg->imageSize(style()->effectiveZoom());
@@ -571,7 +571,8 @@ void RenderBox::imageChanged(CachedImage* image) {
 
   for (const BackgroundLayer* bgLayer = style()->backgroundLayers();
        bgLayer && !didFullRepaint; bgLayer = bgLayer->next()) {
-    if (image == bgLayer->backgroundImage()) {
+    if (bgLayer->backgroundImage() &&
+        image == bgLayer->backgroundImage()->data()) {
       IntRect repaintRect;
       IntPoint phase;
       IntSize tileSize;
@@ -737,7 +738,6 @@ void RenderBox::paintBackgroundExtended(const PaintInfo& paintInfo,
       return;
 
     GraphicsContext* maskImageContext = maskImage->context();
-    maskImageContext->save();
     maskImageContext->translate(-maskRect.x(), -maskRect.y());
 
     // Now add the text to the clip.  We do this by painting using a special
@@ -754,7 +754,7 @@ void RenderBox::paintBackgroundExtended(const PaintInfo& paintInfo,
     context->clipToImageBuffer(maskRect, maskImage.get());
   }
 
-  CachedImage* bg = bgLayer->backgroundImage();
+  StyleImage* bg = bgLayer->backgroundImage();
   bool shouldPaintBackgroundImage =
       bg && bg->canRender(style()->effectiveZoom());
   Color bgColor = c;
@@ -841,8 +841,8 @@ void RenderBox::paintBackgroundExtended(const PaintInfo& paintInfo,
     calculateBackgroundImageGeometry(bgLayer, tx, ty, w, h, destRect, phase,
                                      tileSize);
     if (!destRect.isEmpty())
-      context->drawTiledImage(bg->image(), destRect, phase, tileSize,
-                              bgLayer->backgroundComposite());
+      context->drawTiledImage(bg->image(this, tileSize), destRect, phase,
+                              tileSize, bgLayer->backgroundComposite());
   }
 
   if (bgLayer->backgroundClip() != BGBORDER)

@@ -186,6 +186,8 @@ class CSSParser {
   bool parseShadow(int propId, bool important);
   bool parseBorderImage(int propId, bool important);
 
+  bool parseGradient(RefPtr<CSSValue>&);
+
   PassRefPtr<CSSValue> parseTransform();
   bool parseTransformOrigin(int propId,
                             int& propId1,

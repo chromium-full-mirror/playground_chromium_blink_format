@@ -38,6 +38,8 @@ class CSSImageValue : public CSSPrimitiveValue, public CachedResourceClient {
 
   virtual CachedImage* image(DocLoader*);
 
+  virtual bool isImageValue() const { return true; }
+
  protected:
   CachedImage* image(DocLoader*, const String& url);
 

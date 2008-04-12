@@ -55,6 +55,7 @@ class KURL;
 class MediaQueryEvaluator;
 class Node;
 class Settings;
+class StyleImage;
 class StyleSheet;
 class StyleSheetList;
 class StyledElement;
@@ -228,6 +229,8 @@ class CSSStyleSelector : Noncopyable {
 #if ENABLE(SVG)
   void applySVGProperty(int id, CSSValue*);
 #endif
+
+  StyleImage* createStyleImage(CSSValue* value);
 
   PseudoState checkPseudoState(Element*, bool checkVisited = true);
 

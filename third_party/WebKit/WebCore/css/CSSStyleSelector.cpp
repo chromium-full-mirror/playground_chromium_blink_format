@@ -4078,8 +4078,11 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
             static_cast<CSSBorderImageValue*>(value);
 
         // Set the image (this kicks off the load).
-        image.m_image =
-            borderImage->m_image->image(m_element->document()->docLoader());
+        if (borderImage->imageValue())
+          image.m_image = borderImage->imageValue()->image(
+              m_element->document()->docLoader());
+        else
+          return;  // FIXME: Add gradient support.
 
         // Set up a length box to represent our image slices.
         LengthBox& l = image.m_slices;
@@ -4978,6 +4981,19 @@ void CSSStyleSelector::mapBackgroundOrigin(BackgroundLayer* layer,
   layer->setBackgroundOrigin(*primitiveValue);
 }
 
+StyleImage* CSSStyleSelector::createStyleImage(CSSValue* value) {
+  if (value->isImageValue()) {
+    CachedImage* image = static_cast<CSSImageValue*>(value)->image(
+        m_element->document()->docLoader());
+    if (image)
+      return new StyleCachedImage(image);
+    return 0;
+  }
+  if (value->isImageGeneratorValue())
+    return new StyleGeneratedImage(static_cast<CSSImageGeneratorValue*>(value));
+  return 0;
+}
+
 void CSSStyleSelector::mapBackgroundImage(BackgroundLayer* layer,
                                           CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
@@ -4985,12 +5001,7 @@ void CSSStyleSelector::mapBackgroundImage(BackgroundLayer* layer,
     return;
   }
 
-  if (!value->isPrimitiveValue())
-    return;
-
-  CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
-  layer->setBackgroundImage(static_cast<CSSImageValue*>(primitiveValue)
-                                ->image(m_element->document()->docLoader()));
+  layer->setBackgroundImage(createStyleImage(value));
 }
 
 void CSSStyleSelector::mapBackgroundRepeat(BackgroundLayer* layer,

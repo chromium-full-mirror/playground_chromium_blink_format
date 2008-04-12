@@ -723,7 +723,7 @@ void InlineFlowBox::paintBackground(const RenderObject::PaintInfo& paintInfo,
                                     int ty,
                                     int w,
                                     int h) {
-  CachedImage* bg = bgLayer->backgroundImage();
+  StyleImage* bg = bgLayer->backgroundImage();
   bool hasBackgroundImage =
       bg && bg->canRender(object()->style()->effectiveZoom());
   if ((!hasBackgroundImage && !object()->style()->hasBorderRadius()) ||

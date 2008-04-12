@@ -264,8 +264,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return new CSSPrimitiveValue(style->backgroundColor().rgb());
     case CSSPropertyBackgroundImage:
       if (style->backgroundImage())
-        return new CSSPrimitiveValue(style->backgroundImage()->url(),
-                                     CSSPrimitiveValue::CSS_URI);
+        return style->backgroundImage()->cssValue();
       return new CSSPrimitiveValue(CSSValueNone);
     case CSSPropertyWebkitBackgroundSize: {
       RefPtr<CSSValueList> list = new CSSValueList(true);

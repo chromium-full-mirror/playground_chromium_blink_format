@@ -71,6 +71,7 @@ class String;
 class ImageObserver;
 
 class Image : Noncopyable {
+  friend class GeneratedImage;
   friend class GraphicsContext;
 
  public:
@@ -145,7 +146,7 @@ class Image : Noncopyable {
                                  const Color& color,
                                  CompositeOperator op);
 
- private:
+ protected:
 #if PLATFORM(WIN)
   virtual void drawFrameMatchingSourceSize(GraphicsContext*,
                                            const FloatRect& dstRect,

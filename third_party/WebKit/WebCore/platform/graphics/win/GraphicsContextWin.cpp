@@ -56,7 +56,7 @@ void GraphicsContextPlatformPrivate::restore() {
   RestoreDC(m_hdc, -1);
 }
 
-void GraphicsContextPlatformPrivate::clip(const IntRect& clipRect) {
+void GraphicsContextPlatformPrivate::clip(const FloatRect& clipRect) {
   if (!m_hdc)
     return;
   IntersectClipRect(m_hdc, clipRect.x(), clipRect.y(), clipRect.right(),

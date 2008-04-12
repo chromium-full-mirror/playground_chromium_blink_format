@@ -109,7 +109,9 @@ BitmapImage::BitmapImage(const QPixmap& pixmap, ImageObserver* observer)
       m_allDataReceived(false),
       m_haveSize(false),
       m_sizeAvailable(false),
-      m_decodedSize(0) {
+      m_decodedSize(0),
+      m_haveFrameCount(false),
+      m_frameCount(0) {
   m_pixmap = new QPixmap(pixmap);
 }
 
