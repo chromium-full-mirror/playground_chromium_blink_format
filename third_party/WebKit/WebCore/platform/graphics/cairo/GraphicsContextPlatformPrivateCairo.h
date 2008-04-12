@@ -77,7 +77,7 @@ class GraphicsContextPlatformPrivate {
   // On everything else, we do nothing.
   void save() {}
   void restore() {}
-  void clip(const IntRect&) {}
+  void clip(const FloatRect&) {}
   void clip(const Path&) {}
   void scale(const FloatSize&) {}
   void rotate(float) {}
