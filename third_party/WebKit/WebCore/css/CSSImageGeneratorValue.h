@@ -32,6 +32,7 @@
 #include "IntSizeHash.h"
 #include <wtf/HashMap.h>
 #include <wtf/HashCountedSet.h>
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
@@ -39,10 +40,12 @@ namespace WebCore {
 
 class Image;
 class IntSize;
+class StyleGeneratedImage;
 class RenderObject;
 
 class CSSImageGeneratorValue : public CSSValue {
  public:
+  CSSImageGeneratorValue();
   virtual ~CSSImageGeneratorValue();
 
   virtual bool isImageGeneratorValue() const { return true; }
@@ -50,6 +53,8 @@ class CSSImageGeneratorValue : public CSSValue {
   void addClient(RenderObject*, const IntSize&);
   void removeClient(RenderObject*);
   virtual Image* image(RenderObject*, const IntSize&) = 0;
+
+  StyleGeneratedImage* generatedImage();
 
  protected:
   Image* getImage(RenderObject*, const IntSize&);
@@ -60,6 +65,9 @@ class CSSImageGeneratorValue : public CSSValue {
   HashMap<RenderObject*, IntSize>
       m_clients;  // A map from RenderObjects to image sizes.
   HashMap<IntSize, Image*> m_images;  // A map from sizes to generated images.
+
+  RefPtr<StyleGeneratedImage> m_image;
+  bool m_accessedImage;
 };
 
 }  // namespace WebCore

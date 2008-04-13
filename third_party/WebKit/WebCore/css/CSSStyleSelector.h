@@ -230,7 +230,7 @@ class CSSStyleSelector : Noncopyable {
   void applySVGProperty(int id, CSSValue*);
 #endif
 
-  StyleImage* createStyleImage(CSSValue* value);
+  PassRefPtr<StyleImage> createStyleImage(CSSValue* value);
 
   PseudoState checkPseudoState(Element*, bool checkVisited = true);
 

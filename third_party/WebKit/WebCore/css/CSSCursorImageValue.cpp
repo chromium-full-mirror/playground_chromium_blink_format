@@ -27,6 +27,8 @@
 #include "DocLoader.h"
 #include "PlatformString.h"
 
+#include "RenderStyle.h"
+
 #if ENABLE(SVG)
 #include "SVGCursorElement.h"
 #include "SVGURIReference.h"
@@ -97,9 +99,9 @@ bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element) {
       m_hotspot.setY(y);
 
     if (m_image &&
-        m_image->url() !=
+        m_image->cachedImage()->url() !=
             element->document()->completeURL(cursorElement->href())) {
-      m_image->removeClient(this);
+      m_image->cachedImage()->removeClient(this);
       m_image = 0;
 
       m_accessedImage = false;
@@ -115,7 +117,7 @@ bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element) {
   return false;
 }
 
-CachedImage* CSSCursorImageValue::image(DocLoader* loader) {
+StyleCachedImage* CSSCursorImageValue::cachedImage(DocLoader* loader) {
   String url = getStringValue();
 
 #if ENABLE(SVG)
@@ -126,7 +128,7 @@ CachedImage* CSSCursorImageValue::image(DocLoader* loader) {
   }
 #endif
 
-  return CSSImageValue::image(loader, url);
+  return CSSImageValue::cachedImage(loader, url);
 }
 
 }  // namespace WebCore

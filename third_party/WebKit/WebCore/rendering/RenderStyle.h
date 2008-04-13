@@ -170,6 +170,8 @@ class StyleCachedImage : public StyleImage {
 
   virtual PassRefPtr<CSSValue> cssValue();
 
+  CachedImage* cachedImage() const { return m_image; }
+
   virtual bool canRender(float multiplier) const;
   virtual bool isLoaded() const;
   virtual bool errorOccurred() const;
@@ -185,10 +187,9 @@ class StyleCachedImage : public StyleImage {
 
 class StyleGeneratedImage : public StyleImage {
  public:
-  StyleGeneratedImage(PassRefPtr<CSSImageGeneratorValue> val)
-      : m_generator(val) {}
+  StyleGeneratedImage(CSSImageGeneratorValue* val) : m_generator(val) {}
 
-  virtual void* data() const { return m_generator.get(); }
+  virtual void* data() const { return m_generator; }
 
   virtual bool isGeneratedImage() const { return true; }
 
@@ -201,7 +202,8 @@ class StyleGeneratedImage : public StyleImage {
   virtual Image* image(RenderObject*, const IntSize&) const;
 
  private:
-  RefPtr<CSSImageGeneratorValue> m_generator;
+  CSSImageGeneratorValue*
+      m_generator;  // The generator holds a reference to us.
   IntSize m_containerSize;
 };
 

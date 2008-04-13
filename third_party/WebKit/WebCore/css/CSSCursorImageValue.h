@@ -40,7 +40,7 @@ class CSSCursorImageValue : public CSSImageValue {
   IntPoint hotspot() const { return m_hotspot; }
 
   bool updateIfSVGCursorIsUsed(Element*);
-  virtual CachedImage* image(DocLoader*);
+  virtual StyleCachedImage* cachedImage(DocLoader*);
 
  private:
   IntPoint m_hotspot;
