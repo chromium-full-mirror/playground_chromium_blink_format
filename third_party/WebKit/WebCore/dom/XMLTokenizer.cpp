@@ -1991,7 +1991,7 @@ void XMLTokenizer::parseEndElement() {
       if ((m_pendingScript =
                m_doc->docLoader()->requestScript(scriptHref, charset))) {
         m_scriptElement = scriptElement;
-        m_pendingScript->ref(this);
+        m_pendingScript->addClient(this);
 
         // m_pendingScript will be 0 if script was already loaded and ref()
         // executed it
