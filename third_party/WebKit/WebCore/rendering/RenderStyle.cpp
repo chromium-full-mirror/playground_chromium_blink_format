@@ -31,6 +31,21 @@ namespace WebCore {
 
 static RenderStyle* defaultStyle;
 
+static bool imagesEquivalent(StyleImage* image1, StyleImage* image2) {
+  if (image1 != image2) {
+    if (!image1 || !image2)
+      return false;
+    return *image1 == *image2;
+  }
+  return true;
+}
+
+bool BorderImage::operator==(const BorderImage& o) const {
+  return imagesEquivalent(m_image.get(), o.m_image.get()) &&
+         m_slices == o.m_slices && m_horizontalRule == o.m_horizontalRule &&
+         m_verticalRule == o.m_verticalRule;
+}
+
 StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Fixed) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
@@ -99,6 +114,10 @@ bool StyleCachedImage::canRender(float multiplier) const {
 
 bool StyleCachedImage::isLoaded() const {
   return m_image->isLoaded();
+}
+
+bool StyleCachedImage::errorOccurred() const {
+  return m_image->errorOccurred();
 }
 
 IntSize StyleCachedImage::imageSize(float multiplier) const {
@@ -227,10 +246,11 @@ bool BackgroundLayer::operator==(const BackgroundLayer& o) const {
   // only used during initial construction
   // to propagate patterns into layers.  All layer comparisons happen after
   // values have all been filled in anyway.
-  return m_image == o.m_image && m_xPosition == o.m_xPosition &&
-         m_yPosition == o.m_yPosition && m_bgAttachment == o.m_bgAttachment &&
-         m_bgClip == o.m_bgClip && m_bgComposite == o.m_bgComposite &&
-         m_bgOrigin == o.m_bgOrigin && m_bgRepeat == o.m_bgRepeat &&
+  return imagesEquivalent(m_image.get(), o.m_image.get()) &&
+         m_xPosition == o.m_xPosition && m_yPosition == o.m_yPosition &&
+         m_bgAttachment == o.m_bgAttachment && m_bgClip == o.m_bgClip &&
+         m_bgComposite == o.m_bgComposite && m_bgOrigin == o.m_bgOrigin &&
+         m_bgRepeat == o.m_bgRepeat &&
          m_backgroundSize.width == o.m_backgroundSize.width &&
          m_backgroundSize.height == o.m_backgroundSize.height &&
          ((m_next && o.m_next) ? *m_next == *o.m_next : m_next == o.m_next);
@@ -869,7 +889,7 @@ bool StyleRareInheritedData::shadowDataEquivalent(
 StyleInheritedData::StyleInheritedData()
     : indent(RenderStyle::initialTextIndent()),
       line_height(RenderStyle::initialLineHeight()),
-      style_image(RenderStyle::initialListStyleImage()),
+      list_style_image(RenderStyle::initialListStyleImage()),
       color(RenderStyle::initialColor()),
       m_effectiveZoom(RenderStyle::initialZoom()),
       horizontal_border_spacing(RenderStyle::initialHorizontalBorderSpacing()),
@@ -884,7 +904,7 @@ StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
     : RefCounted<StyleInheritedData>(),
       indent(o.indent),
       line_height(o.line_height),
-      style_image(o.style_image),
+      list_style_image(o.list_style_image),
       cursorData(o.cursorData),
       font(o.font),
       color(o.color),
@@ -895,7 +915,7 @@ StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
       orphans(o.orphans),
       page_break_inside(o.page_break_inside) {}
 
-static bool cursorDataEqvuialent(const CursorList* c1, const CursorList* c2) {
+static bool cursorDataEquivalent(const CursorList* c1, const CursorList* c2) {
   if (c1 == c2)
     return true;
   if (!c1 && c2 || c1 && !c2)
@@ -905,8 +925,8 @@ static bool cursorDataEqvuialent(const CursorList* c1, const CursorList* c2) {
 
 bool StyleInheritedData::operator==(const StyleInheritedData& o) const {
   return indent == o.indent && line_height == o.line_height &&
-         style_image == o.style_image &&
-         cursorDataEqvuialent(cursorData.get(), o.cursorData.get()) &&
+         imagesEquivalent(list_style_image.get(), o.list_style_image.get()) &&
+         cursorDataEquivalent(cursorData.get(), o.cursorData.get()) &&
          font == o.font && color == o.color &&
          m_effectiveZoom == o.m_effectiveZoom &&
          horizontal_border_spacing == o.horizontal_border_spacing &&
@@ -1237,7 +1257,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 
   if (inherited->indent != other->inherited->indent ||
       inherited->line_height != other->inherited->line_height ||
-      inherited->style_image != other->inherited->style_image ||
+      inherited->list_style_image != other->inherited->list_style_image ||
       inherited->font != other->inherited->font ||
       inherited->horizontal_border_spacing !=
           other->inherited->horizontal_border_spacing ||

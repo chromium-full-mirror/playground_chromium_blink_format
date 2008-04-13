@@ -520,8 +520,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     }
     case CSSPropertyListStyleImage:
       if (style->listStyleImage())
-        return new CSSPrimitiveValue(style->listStyleImage()->url(),
-                                     CSSPrimitiveValue::CSS_URI);
+        return style->listStyleImage()->cssValue();
       return new CSSPrimitiveValue(CSSValueNone);
     case CSSPropertyListStylePosition:
       return new CSSPrimitiveValue(style->listStylePosition());

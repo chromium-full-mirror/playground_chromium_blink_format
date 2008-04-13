@@ -929,6 +929,13 @@ bool CSSParser::parseValue(int propId, bool important) {
               KURL(styleElement->baseURL(), uri).string(), styleElement);
           valueList->next();
         }
+      } else if (value->unit == Value::Function &&
+                 equalIgnoringCase(value->function->name,
+                                   "-webkit-gradient(")) {
+        if (parseGradient(parsedValue))
+          valueList->next();
+        else
+          return false;
       }
       break;
 
