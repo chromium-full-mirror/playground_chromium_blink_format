@@ -67,9 +67,8 @@ bool canHaveChildrenForEditing(const Node* node) {
          !node->hasTagName(imgTag) && !node->hasTagName(buttonTag) &&
          !node->hasTagName(inputTag) && !node->hasTagName(textareaTag) &&
          !node->hasTagName(objectTag) && !node->hasTagName(iframeTag) &&
-         !node->hasTagName(buttonTag) && !node->hasTagName(embedTag) &&
-         !node->hasTagName(appletTag) && !node->hasTagName(selectTag) &&
-         !node->isTextNode();
+         !node->hasTagName(embedTag) && !node->hasTagName(appletTag) &&
+         !node->hasTagName(selectTag) && !node->isTextNode();
 }
 
 // Compare two positions, taking into account the possibility that one or both
