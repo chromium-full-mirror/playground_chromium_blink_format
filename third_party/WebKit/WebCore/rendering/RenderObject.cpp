@@ -50,7 +50,7 @@
 #include "RenderArena.h"
 #include "RenderCounter.h"
 #include "RenderFlexibleBox.h"
-#include "RenderImage.h"
+#include "RenderImageGeneratedContent.h"
 #include "RenderInline.h"
 #include "RenderListItem.h"
 #include "RenderTableCell.h"
@@ -96,12 +96,11 @@ RenderObject* RenderObject::createObject(Node* node, RenderStyle* style) {
   const ContentData* contentData = style->contentData();
   if (contentData && !contentData->m_next &&
       contentData->m_type == CONTENT_OBJECT && doc != node) {
-    RenderImage* image = new (arena) RenderImage(node);
+    RenderImageGeneratedContent* image =
+        new (arena) RenderImageGeneratedContent(node);
     image->setStyle(style);
-    if (CachedResource* resource = contentData->m_content.m_object)
-      if (resource->type() == CachedResource::ImageResource)
-        image->setCachedImage(static_cast<CachedImage*>(resource));
-    image->setIsAnonymousImage(true);
+    if (StyleImage* styleImage = contentData->m_content.m_image)
+      image->setStyleImage(styleImage);
     return image;
   }
 

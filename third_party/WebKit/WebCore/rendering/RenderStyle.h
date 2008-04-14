@@ -151,11 +151,13 @@ class StyleImage : public RefCounted<StyleImage> {
   virtual bool isLoaded() const { return true; }
   virtual bool errorOccurred() const { return false; }
   virtual IntSize imageSize(float multiplier) const = 0;
+  virtual bool imageHasRelativeWidth() const = 0;
+  virtual bool imageHasRelativeHeight() const = 0;
+  virtual bool usesImageContainerSize() const = 0;
   virtual void setImageContainerSize(const IntSize&) = 0;
   virtual void addClient(RenderObject*) = 0;
   virtual void removeClient(RenderObject*) = 0;
   virtual Image* image(RenderObject*, const IntSize&) const = 0;
-
   virtual bool isCachedImage() const { return false; }
   virtual bool isGeneratedImage() const { return false; }
 };
@@ -176,6 +178,9 @@ class StyleCachedImage : public StyleImage {
   virtual bool isLoaded() const;
   virtual bool errorOccurred() const;
   virtual IntSize imageSize(float multiplier) const;
+  virtual bool imageHasRelativeWidth() const;
+  virtual bool imageHasRelativeHeight() const;
+  virtual bool usesImageContainerSize() const;
   virtual void setImageContainerSize(const IntSize&);
   virtual void addClient(RenderObject*);
   virtual void removeClient(RenderObject*);
@@ -196,6 +201,9 @@ class StyleGeneratedImage : public StyleImage {
   virtual PassRefPtr<CSSValue> cssValue();
 
   virtual IntSize imageSize(float multiplier) const;
+  virtual bool imageHasRelativeWidth() const { return true; }
+  virtual bool imageHasRelativeHeight() const { return true; }
+  virtual bool usesImageContainerSize() const { return true; }
   virtual void setImageContainerSize(const IntSize&);
   virtual void addClient(RenderObject*);
   virtual void removeClient(RenderObject*);
@@ -590,7 +598,7 @@ struct BackgroundLayer {
   bool isBackgroundCompositeSet() const { return m_compositeSet; }
   bool isBackgroundSizeSet() const { return m_backgroundSizeSet; }
 
-  void setBackgroundImage(PassRefPtr<StyleImage> i) {
+  void setBackgroundImage(StyleImage* i) {
     m_image = i;
     m_imageSet = true;
   }
@@ -1237,7 +1245,7 @@ struct ContentData : Noncopyable {
 
   ContentType m_type;
   union {
-    CachedResource* m_object;
+    StyleImage* m_image;
     StringImpl* m_text;
     CounterContent* m_counter;
   } m_content;
@@ -2616,7 +2624,7 @@ class RenderStyle {
   void setListStyleType(EListStyleType v) {
     inherited_flags._list_style_type = v;
   }
-  void setListStyleImage(PassRefPtr<StyleImage> v) {
+  void setListStyleImage(StyleImage* v) {
     if (inherited->list_style_image != v)
       inherited.access()->list_style_image = v;
   }
@@ -2857,7 +2865,7 @@ class RenderStyle {
   bool contentDataEquivalent(const RenderStyle* otherStyle) const;
   void clearContent();
   void setContent(StringImpl*, bool add = false);
-  void setContent(CachedResource*, bool add = false);
+  void setContent(StyleImage*, bool add = false);
   void setContent(CounterContent*, bool add = false);
 
   const CounterDirectiveMap* counterDirectives() const;
