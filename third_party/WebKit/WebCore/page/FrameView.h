@@ -126,6 +126,9 @@ class FrameView : public ScrollView {
   void addSlowRepaintObject();
   void removeSlowRepaintObject();
 
+  void beginDeferredRepaints();
+  void endDeferredRepaints();
+
   void updateDashboardRegions();
   void updateControlTints();
 
