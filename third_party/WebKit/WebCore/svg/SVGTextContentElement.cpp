@@ -2,8 +2,6 @@
     Copyright (C) 2004, 2005, 2007, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007, 2008 Rob Buis <buis@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -71,7 +69,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGTextContentElement,
                               SVGNames::lengthAdjustAttr,
                               m_lengthAdjust)
 
-static inline float cummulatedCharacterRangeLength(
+static inline float cumulativeCharacterRangeLength(
     const Vector<SVGChar>::iterator& start,
     const Vector<SVGChar>::iterator& end,
     SVGInlineTextBox* textBox,
@@ -162,7 +160,7 @@ struct SVGInlineTextBoxQueryWalker {
       }
       case TextLength: {
         float textLength =
-            cummulatedCharacterRangeLength(start, end, textBox, startOffset, -1,
+            cumulativeCharacterRangeLength(start, end, textBox, startOffset, -1,
                                            -1, isVerticalText, m_atCharacter);
 
         if (isVerticalText)
@@ -177,7 +175,7 @@ struct SVGInlineTextBoxQueryWalker {
         long startPosition = m_queryStartPosition;
         long length = m_queryLength;
 
-        float textLength = cummulatedCharacterRangeLength(
+        float textLength = cumulativeCharacterRangeLength(
             start, end, textBox, startOffset, startPosition, length,
             isVerticalText, m_atCharacter);
 
