@@ -69,6 +69,8 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
   virtual Path toClipPath() const;
 
+  static void removeDisallowedElementsFromSubtree(Node* element);
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
@@ -110,7 +112,6 @@ class SVGUseElement : public SVGStyledTransformableElement,
       SVGElement* target,
       SVGElementInstance* targetInstance);
   void alterShadowTreeForSVGTag(SVGElement* target);
-  void removeDisallowedElementsFromSubtree(Node* element);
 
   void buildShadowTree(SVGElement* target, SVGElementInstance* targetInstance);
 

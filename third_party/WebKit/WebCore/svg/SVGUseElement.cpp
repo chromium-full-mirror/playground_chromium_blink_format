@@ -44,6 +44,7 @@
 #include "SVGLength.h"
 #include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
+#include "SVGSMILElement.h"
 #include "SVGSVGElement.h"
 #include "SVGSymbolElement.h"
 #include "XLinkNames.h"
@@ -261,6 +262,10 @@ static bool isDisallowedElement(Node* element) {
   // <foreignObject> should never be contained in a <use> tree. Too dangerous
   // side effects possible.
   if (element->hasTagName(SVGNames::foreignObjectTag))
+    return true;
+#endif
+#if ENABLE(SVG_ANIMATION)
+  if (SVGSMILElement::isSMILElement(element))
     return true;
 #endif
 
@@ -559,21 +564,19 @@ void SVGUseElement::alterShadowTreeForSVGTag(SVGElement* target) {
     target->setAttribute(SVGNames::heightAttr, heightString);
 }
 
-void SVGUseElement::removeDisallowedElementsFromSubtree(Node* element) {
-  ExceptionCode ec = 0;
-
-  for (RefPtr<Node> child = element->firstChild(); child;
-       child = child->nextSibling()) {
-    if (isDisallowedElement(child.get())) {
-      ASSERT(child->parent());
-      child->parent()->removeChild(child.get(), ec);
-      ASSERT(ec == 0);
-
-      continue;
-    }
-
-    if (child->hasChildNodes())
-      removeDisallowedElementsFromSubtree(child.get());
+void SVGUseElement::removeDisallowedElementsFromSubtree(Node* subtree) {
+  ASSERT(!subtree->inDocument());
+  ExceptionCode ec;
+  Node* node = subtree->firstChild();
+  while (node) {
+    if (isDisallowedElement(node)) {
+      Node* next = node->traverseNextSibling(subtree);
+      // The subtree is not in document so this won't generate events that could
+      // mutate the tree.
+      node->parent()->removeChild(node, ec);
+      node = next;
+    } else
+      node = node->traverseNextNode(subtree);
   }
 }
 

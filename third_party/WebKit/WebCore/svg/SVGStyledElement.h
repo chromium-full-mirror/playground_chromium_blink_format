@@ -67,6 +67,8 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   void invalidateResourcesInAncestorChain() const;
   virtual void detach();
 
+  void setInstanceUpdatesBlocked(bool);
+
  protected:
   virtual bool hasRelativeValues() const { return true; }
 

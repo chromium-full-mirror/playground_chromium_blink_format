@@ -42,7 +42,7 @@ class SVGSMILElement : public SVGElement {
   SVGSMILElement(const QualifiedName&, Document*);
   virtual ~SVGSMILElement();
 
-  static bool isTimingElement(Element* element);
+  static bool isSMILElement(Node* node);
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void attributeChanged(Attribute*, bool preserveDecls);
