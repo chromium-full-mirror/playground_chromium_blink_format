@@ -81,6 +81,11 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   virtual void notifyFinished(CachedResource* finishedObj);
 
 #ifndef USE_QXMLSTREAM
+
+  friend bool parseXMLDocumentFragment(const String& chunk,
+                                       DocumentFragment* fragment,
+                                       Element* parent);
+
   // callbacks from parser SAX
   void error(ErrorType, const char* message, va_list args)
       WTF_ATTRIBUTE_PRINTF(3, 0);
@@ -129,7 +134,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   int columnNumber() const;
 
  private:
-  void initializeParserContext();
+  void initializeParserContext(const char* chunk = 0);
   void setCurrentNode(Node*);
 
   void insertErrorMessageBlock();
