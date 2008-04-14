@@ -38,26 +38,26 @@
 
 namespace WebCore {
 
-PassRefPtr<StorageArea> StorageArea::create(Page* page,
-                                            SecurityOrigin* origin) {
-  return adoptRef(new StorageArea(page, origin));
+PassRefPtr<StorageArea> StorageArea::create(SecurityOrigin* origin,
+                                            Page* page) {
+  return adoptRef(new StorageArea(origin, page));
 }
 
-StorageArea::StorageArea(Page* page, SecurityOrigin* origin)
+StorageArea::StorageArea(SecurityOrigin* origin, Page* page)
     : m_page(page),
       m_securityOrigin(origin),
       m_storageMap(StorageMap::create()) {}
 
-StorageArea::StorageArea(Page* page,
-                         SecurityOrigin* origin,
+StorageArea::StorageArea(SecurityOrigin* origin,
+                         Page* page,
                          PassRefPtr<StorageMap> map)
     : m_page(page), m_securityOrigin(origin), m_storageMap(map) {}
 
 StorageArea::~StorageArea() {}
 
-PassRefPtr<StorageArea> StorageArea::copy(Page* newPage,
-                                          SecurityOrigin* origin) {
-  return adoptRef(new StorageArea(newPage, origin, m_storageMap));
+PassRefPtr<StorageArea> StorageArea::copy(SecurityOrigin* origin,
+                                          Page* newPage) {
+  return adoptRef(new StorageArea(origin, newPage, m_storageMap));
 }
 
 unsigned StorageArea::length() const {
@@ -129,7 +129,7 @@ void StorageArea::dispatchStorageEvent(const String& key,
                                        Frame* sourceFrame) {
   // For SessionStorage events, each frame in the page's frametree with the same
   // origin as this Storage needs to be notified of the change
-  for (Frame* frame = m_page->mainFrame(); frame;
+  for (Frame* frame = m_page ? m_page->mainFrame() : 0; frame;
        frame = frame->tree()->traverseNext()) {
     if (frame->document()->securityOrigin()->equal(m_securityOrigin.get())) {
       if (HTMLElement* body = frame->document()->body())
