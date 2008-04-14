@@ -371,9 +371,14 @@ class RenderObject : public CachedResourceClient {
   }
 
   bool needsLayout() const {
-    return m_needsLayout || m_normalChildNeedsLayout || m_posChildNeedsLayout;
+    return m_needsLayout || m_normalChildNeedsLayout || m_posChildNeedsLayout ||
+           m_needsPositionedMovementLayout;
   }
   bool selfNeedsLayout() const { return m_needsLayout; }
+  bool needsPositionedMovementLayoutOnly() const {
+    return m_needsPositionedMovementLayout && !m_needsLayout &&
+           !m_normalChildNeedsLayout && !m_posChildNeedsLayout;
+  }
   bool posChildNeedsLayout() const { return m_posChildNeedsLayout; }
   bool normalChildNeedsLayout() const { return m_normalChildNeedsLayout; }
 
@@ -455,7 +460,7 @@ class RenderObject : public CachedResourceClient {
                                      RenderObject* newRoot = 0);
   void setNeedsLayout(bool b, bool markParents = true);
   void setChildNeedsLayout(bool b, bool markParents = true);
-
+  void setNeedsPositionedMovementLayout();
   void setPrefWidthsDirty(bool, bool markParents = true);
   void invalidateContainerPrefWidths();
 
@@ -601,6 +606,11 @@ class RenderObject : public CachedResourceClient {
     if (needsLayout())
       layout();
   }
+
+  // Called when a positioned object moves but doesn't change size.  A
+  // simplified layout is done
+  // that just updates the object's position.
+  virtual void layoutDoingPositionedMovementOnly(){};
 
   // used for element state updates that cannot be fixed with a
   // repaint and do not need a relayout
@@ -1130,6 +1140,7 @@ class RenderObject : public CachedResourceClient {
   mutable short m_verticalPosition : 15;
 
   bool m_needsLayout : 1;
+  bool m_needsPositionedMovementLayout : 1;
   bool m_normalChildNeedsLayout : 1;
   bool m_posChildNeedsLayout : 1;
   bool m_prefWidthsDirty : 1;

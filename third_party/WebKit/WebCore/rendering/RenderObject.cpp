@@ -182,6 +182,7 @@ RenderObject::RenderObject(Node* node)
       ,
       m_verticalPosition(PositionUndefined),
       m_needsLayout(false),
+      m_needsPositionedMovementLayout(false),
       m_normalChildNeedsLayout(false),
       m_posChildNeedsLayout(false),
       m_prefWidthsDirty(false),
@@ -681,6 +682,7 @@ void RenderObject::setNeedsLayout(bool b, bool markParents) {
   } else {
     m_posChildNeedsLayout = false;
     m_normalChildNeedsLayout = false;
+    m_needsPositionedMovementLayout = false;
   }
 }
 
@@ -693,6 +695,17 @@ void RenderObject::setChildNeedsLayout(bool b, bool markParents) {
   } else {
     m_posChildNeedsLayout = false;
     m_normalChildNeedsLayout = false;
+    m_needsPositionedMovementLayout = false;
+  }
+}
+
+void RenderObject::setNeedsPositionedMovementLayout() {
+  bool alreadyNeededLayout = needsLayout();
+  m_needsPositionedMovementLayout = true;
+  if (!alreadyNeededLayout) {
+    markContainingBlocksForLayout();
+    if (hasLayer())
+      layer()->setNeedsFullRepaint();
   }
 }
 
@@ -2435,7 +2448,8 @@ void RenderObject::setStyle(RenderStyle* style) {
         parent() && (parent()->isBlockFlow() || parent()->isInlineFlow());
 
     // reset style flags
-    if (d == RenderStyle::Layout) {
+    if (d == RenderStyle::Layout ||
+        d == RenderStyle::LayoutPositionedMovementOnly) {
       m_floating = false;
       m_positioned = false;
       m_relPositioned = false;
@@ -2486,6 +2500,9 @@ void RenderObject::setStyle(RenderStyle* style) {
   // need to relayout.
   if (d == RenderStyle::Layout && m_parent)
     setNeedsLayoutAndPrefWidthsRecalc();
+  else if (d == RenderStyle::LayoutPositionedMovementOnly && m_parent &&
+           !isText())
+    setNeedsPositionedMovementLayout();
   else if (m_parent && !isText() &&
            (d == RenderStyle::RepaintLayer || d == RenderStyle::Repaint))
     // Do a repaint with the new style now, e.g., for example if we go from

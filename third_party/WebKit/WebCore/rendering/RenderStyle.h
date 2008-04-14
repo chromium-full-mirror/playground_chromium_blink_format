@@ -2879,7 +2879,13 @@ class RenderStyle {
   // (3) RepaintLayer - The layer and its descendant layers needs to be
   // repainted.
   // (4) Layout - A layout is required.
-  enum Diff { Equal, Repaint, RepaintLayer, Layout };
+  enum Diff {
+    Equal,
+    Repaint,
+    RepaintLayer,
+    LayoutPositionedMovementOnly,
+    Layout
+  };
   Diff diff(const RenderStyle* other) const;
 
   bool isDisplayReplacedType() {
