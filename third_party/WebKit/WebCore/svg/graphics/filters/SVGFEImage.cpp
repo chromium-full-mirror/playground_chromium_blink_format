@@ -34,7 +34,7 @@ SVGFEImage::SVGFEImage(SVGResourceFilter* filter)
 
 SVGFEImage::~SVGFEImage() {
   if (m_cachedImage)
-    m_cachedImage->deref(this);
+    m_cachedImage->removeClient(this);
 }
 
 CachedImage* SVGFEImage::cachedImage() const {
@@ -46,12 +46,12 @@ void SVGFEImage::setCachedImage(CachedImage* image) {
     return;
 
   if (m_cachedImage)
-    m_cachedImage->deref(this);
+    m_cachedImage->removeClient(this);
 
   m_cachedImage = image;
 
   if (m_cachedImage)
-    m_cachedImage->ref(this);
+    m_cachedImage->addClient(this);
 }
 
 TextStream& SVGFEImage::externalRepresentation(TextStream& ts) const {
