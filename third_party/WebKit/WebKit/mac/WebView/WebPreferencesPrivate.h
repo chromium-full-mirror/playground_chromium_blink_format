@@ -93,6 +93,8 @@ extern NSString* WebPreferencesRemovedNotification;
 - (void)_setForceFTPDirectoryListings:(BOOL)force;
 - (BOOL)_forceFTPDirectoryListings;
 
+- (BOOL)_webArchiveDebugModeEnabled;
+
 // Other private methods
 - (void)_postPreferencesChangesNotification;
 + (WebPreferences*)_getInstanceForIdentifier:(NSString*)identifier;
