@@ -144,9 +144,9 @@ DocumentLoader::DocumentLoader(const ResourceRequest& req,
       m_isClientRedirect(false),
       m_loadingFromCachedPage(false),
       m_stopRecordingResponses(false),
-      m_archiveResourceDeliveryTimer(
+      m_substituteResourceDeliveryTimer(
           this,
-          &DocumentLoader::archiveResourceDeliveryTimerFired) {}
+          &DocumentLoader::substituteResourceDeliveryTimerFired) {}
 
 FrameLoader* DocumentLoader::frameLoader() const {
   if (!m_frame)
@@ -477,7 +477,7 @@ PassRefPtr<Archive> DocumentLoader::popArchiveForSubframe(
 
 void DocumentLoader::clearArchiveResources() {
   m_archiveResourceCollection.clear();
-  m_archiveResourceDeliveryTimer.stop();
+  m_substituteResourceDeliveryTimer.stop();
 }
 
 void DocumentLoader::setParsedArchiveData(PassRefPtr<SharedBuffer> data) {
@@ -533,30 +533,32 @@ void DocumentLoader::getSubresources(
   return;
 }
 
-void DocumentLoader::deliverArchivedResourcesAfterDelay() {
-  if (m_pendingArchiveResources.isEmpty())
+void DocumentLoader::deliverSubstituteResourcesAfterDelay() {
+  if (m_pendingSubstituteResources.isEmpty())
     return;
   ASSERT(m_frame && m_frame->page());
   if (m_frame->page()->defersLoading())
     return;
-  if (!m_archiveResourceDeliveryTimer.isActive())
-    m_archiveResourceDeliveryTimer.startOneShot(0);
+  if (!m_substituteResourceDeliveryTimer.isActive())
+    m_substituteResourceDeliveryTimer.startOneShot(0);
 }
 
-void DocumentLoader::archiveResourceDeliveryTimerFired(Timer<DocumentLoader>*) {
-  if (m_pendingArchiveResources.isEmpty())
+void DocumentLoader::substituteResourceDeliveryTimerFired(
+    Timer<DocumentLoader>*) {
+  if (m_pendingSubstituteResources.isEmpty())
     return;
   ASSERT(m_frame && m_frame->page());
   if (m_frame->page()->defersLoading())
     return;
 
-  ArchiveResourceMap copy;
-  copy.swap(m_pendingArchiveResources);
+  SubstituteResourceMap copy;
+  copy.swap(m_pendingSubstituteResources);
 
-  ArchiveResourceMap::const_iterator end = copy.end();
-  for (ArchiveResourceMap::const_iterator it = copy.begin(); it != end; ++it) {
+  SubstituteResourceMap::const_iterator end = copy.end();
+  for (SubstituteResourceMap::const_iterator it = copy.begin(); it != end;
+       ++it) {
     RefPtr<ResourceLoader> loader = it->first;
-    ArchiveResource* resource = it->second.get();
+    SubstituteResource* resource = it->second.get();
 
     SharedBuffer* data = resource->data();
 
@@ -567,17 +569,17 @@ void DocumentLoader::archiveResourceDeliveryTimerFired(Timer<DocumentLoader>*) {
 }
 
 #ifndef NDEBUG
-bool DocumentLoader::isArchiveLoadPending(ResourceLoader* loader) const {
-  return m_pendingArchiveResources.contains(loader);
+bool DocumentLoader::isSubstituteLoadPending(ResourceLoader* loader) const {
+  return m_pendingSubstituteResources.contains(loader);
 }
 #endif
 
-void DocumentLoader::cancelPendingArchiveLoad(ResourceLoader* loader) {
-  if (m_pendingArchiveResources.isEmpty())
+void DocumentLoader::cancelPendingSubstituteLoad(ResourceLoader* loader) {
+  if (m_pendingSubstituteResources.isEmpty())
     return;
-  m_pendingArchiveResources.remove(loader);
-  if (m_pendingArchiveResources.isEmpty())
-    m_archiveResourceDeliveryTimer.stop();
+  m_pendingSubstituteResources.remove(loader);
+  if (m_pendingSubstituteResources.isEmpty())
+    m_substituteResourceDeliveryTimer.stop();
 }
 
 bool DocumentLoader::scheduleArchiveLoad(ResourceLoader* loader,
@@ -590,8 +592,8 @@ bool DocumentLoader::scheduleArchiveLoad(ResourceLoader* loader,
   if (!resource)
     return false;
 
-  m_pendingArchiveResources.set(loader, resource);
-  deliverArchivedResourcesAfterDelay();
+  m_pendingSubstituteResources.set(loader, resource);
+  deliverSubstituteResourcesAfterDelay();
 
   return true;
 }
@@ -664,7 +666,7 @@ void DocumentLoader::setDefersLoading(bool defers) {
   setAllDefersLoading(m_subresourceLoaders, defers);
   setAllDefersLoading(m_plugInStreamLoaders, defers);
   if (!defers)
-    deliverArchivedResourcesAfterDelay();
+    deliverSubstituteResourcesAfterDelay();
 }
 
 void DocumentLoader::stopLoadingPlugIns() {
