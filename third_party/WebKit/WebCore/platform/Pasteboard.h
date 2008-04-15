@@ -101,6 +101,10 @@ class Pasteboard : Noncopyable {
                                                 bool allowPlainText,
                                                 bool& chosePlainText);
   String plainText(Frame* = 0);
+#if PLATFORM(QT)
+  bool isSelectionMode() const;
+  void setSelectionMode(bool selectionMode);
+#endif
 
 #if PLATFORM(GTK)
   void setHelper(PasteboardHelper*);
@@ -121,6 +125,10 @@ class Pasteboard : Noncopyable {
 
 #if PLATFORM(GTK)
   PasteboardHelper* m_helper;
+#endif
+
+#if PLATFORM(QT)
+  bool m_selectionMode;
 #endif
 };
 

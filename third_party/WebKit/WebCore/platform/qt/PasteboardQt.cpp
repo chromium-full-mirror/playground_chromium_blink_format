@@ -45,7 +45,7 @@
 
 namespace WebCore {
 
-Pasteboard::Pasteboard() {}
+Pasteboard::Pasteboard() : m_selectionMode(false) {}
 
 Pasteboard* Pasteboard::generalPasteboard() {
   static Pasteboard* pasteboard = 0;
@@ -60,7 +60,8 @@ void Pasteboard::writeSelection(Range* selectedRange, bool, Frame* frame) {
   text.replace(QChar(0xa0), QLatin1Char(' '));
   md->setText(text);
   md->setHtml(createMarkup(selectedRange, 0, AnnotateForInterchange));
-  QApplication::clipboard()->setMimeData(md);
+  QApplication::clipboard()->setMimeData(
+      md, m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
 }
 
 bool Pasteboard::canSmartReplace() {
@@ -68,7 +69,8 @@ bool Pasteboard::canSmartReplace() {
 }
 
 String Pasteboard::plainText(Frame*) {
-  return QApplication::clipboard()->text();
+  return QApplication::clipboard()->text(
+      m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
 }
 
 PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
@@ -76,7 +78,8 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     PassRefPtr<Range> context,
     bool allowPlainText,
     bool& chosePlainText) {
-  const QMimeData* mimeData = QApplication::clipboard()->mimeData();
+  const QMimeData* mimeData = QApplication::clipboard()->mimeData(
+      m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
 
   chosePlainText = false;
 
@@ -108,7 +111,8 @@ void Pasteboard::writeURL(const KURL& _url, const String&, Frame*) {
   QString url = _url.string();
   md->setText(url);
   md->setUrls(QList<QUrl>() << QUrl(url));
-  QApplication::clipboard()->setMimeData(md, QClipboard::Clipboard);
+  QApplication::clipboard()->setMimeData(
+      md, m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
 }
 
 void Pasteboard::writeImage(Node* node, const KURL&, const String&) {
@@ -128,6 +132,15 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String&) {
 }
 
 void Pasteboard::clear() {
-  QApplication::clipboard()->clear();
+  QApplication::clipboard()->clear(m_selectionMode ? QClipboard::Selection
+                                                   : QClipboard::Clipboard);
+}
+
+bool Pasteboard::isSelectionMode() const {
+  return m_selectionMode;
+}
+
+void Pasteboard::setSelectionMode(bool selectionMode) {
+  m_selectionMode = selectionMode;
 }
 }
