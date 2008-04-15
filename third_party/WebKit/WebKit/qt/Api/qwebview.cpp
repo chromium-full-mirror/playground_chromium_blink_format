@@ -48,6 +48,7 @@ QWebView::QWebView(QWidget* parent) : QWidget(parent) {
   pal.setBrush(QPalette::Background, Qt::white);
 
   setAttribute(Qt::WA_OpaquePaintEvent);
+  setAttribute(Qt::WA_InputMethodEnabled);
 
   setPalette(pal);
   setAcceptDrops(true);
@@ -523,6 +524,19 @@ bool QWebView::focusNextPrevChild(bool next) {
   if (d->page && d->page->focusNextPrevChild(next))
     return true;
   return QWidget::focusNextPrevChild(next);
+}
+
+/*!\reimp
+*/
+QVariant QWebView::inputMethodQuery(Qt::InputMethodQuery property) const {
+  return d->page->inputMethodQuery(property);
+}
+
+/*!\reimp
+*/
+void QWebView::inputMethodEvent(QInputMethodEvent* e) {
+  if (d->page)
+    d->page->event(e);
 }
 
 /*!

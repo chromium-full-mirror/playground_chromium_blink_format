@@ -513,7 +513,11 @@ bool EditorClientQt::isEditing() const {
   return m_editing;
 }
 
-void EditorClientQt::setInputMethodState(bool) {}
+void EditorClientQt::setInputMethodState(bool active) {
+  QWidget* view = m_page->view();
+  if (view)
+    view->setAttribute(Qt::WA_InputMethodEnabled, active);
+}
 }
 
 // vim: ts=4 sw=4 et

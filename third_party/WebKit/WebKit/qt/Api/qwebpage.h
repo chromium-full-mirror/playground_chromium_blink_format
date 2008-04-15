@@ -194,6 +194,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   virtual bool event(QEvent*);
   virtual bool focusNextPrevChild(bool next);
 
+  QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
+
  Q_SIGNALS:
   void loadProgressChanged(int progress);
   void hoveringOverLink(const QString& link,

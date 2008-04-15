@@ -118,6 +118,8 @@ class QWebPagePrivate {
   void dragMoveEvent(QDragMoveEvent*);
   void dropEvent(QDropEvent*);
 
+  void inputMethodEvent(QInputMethodEvent*);
+
   WebCore::ChromeClientQt* chromeClient;
   WebCore::ContextMenuClientQt* contextMenuClient;
   WebCore::EditorClientQt* editorClient;
