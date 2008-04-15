@@ -102,6 +102,11 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   Qt::ScrollBarPolicy horizontalScrollBarPolicy() const;
   void setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy);
 
+  void setScrollBarValue(Qt::Orientation orientation, int value);
+  int scrollBarValue(Qt::Orientation orientation) const;
+  int scrollBarMinimum(Qt::Orientation orientation) const;
+  int scrollBarMaximum(Qt::Orientation orientation) const;
+
   void render(QPainter* painter, const QRegion& clip);
   void layout();
 
