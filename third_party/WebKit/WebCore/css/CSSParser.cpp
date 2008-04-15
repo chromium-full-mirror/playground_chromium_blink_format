@@ -1126,7 +1126,8 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSSValueNormal || id == CSSValueReset)
         valid_primitive = true;
       else
-        valid_primitive = (!id && validUnit(value, FNumber | FPercent, true));
+        valid_primitive =
+            (!id && validUnit(value, FNumber | FPercent | FNonNeg, true));
       break;
 
     case CSSPropertyTableLayout:  // auto | fixed | inherit
