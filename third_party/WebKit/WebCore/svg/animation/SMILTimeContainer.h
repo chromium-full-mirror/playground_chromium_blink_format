@@ -31,6 +31,7 @@
 #include "SMILTime.h"
 #include "Timer.h"
 #include <wtf/HashSet.h>
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
@@ -39,7 +40,9 @@ class SVGSMILElement;
 
 class SMILTimeContainer : public RefCounted<SMILTimeContainer> {
  public:
-  SMILTimeContainer();
+  static PassRefPtr<SMILTimeContainer> create() {
+    return adoptRef(new SMILTimeContainer);
+  }
 
   void schedule(SVGSMILElement*);
   void unschedule(SVGSMILElement*);
@@ -54,6 +57,8 @@ class SMILTimeContainer : public RefCounted<SMILTimeContainer> {
   void resume();
 
  private:
+  SMILTimeContainer();
+
   void timerFired(Timer<SMILTimeContainer>*);
   void startTimer(SMILTime fireTime, SMILTime minimumDelay = 0);
   void updateAnimations(SMILTime elapsed);
