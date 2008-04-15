@@ -68,6 +68,9 @@ extern NSString* WebPreferencesRemovedNotification;
 - (BOOL)automaticallyDetectsCacheModel;
 - (void)setAutomaticallyDetectsCacheModel:(BOOL)automaticallyDetectsCacheModel;
 
+- (BOOL)webArchiveDebugModeEnabled;
+- (void)setWebArchiveDebugModeEnabled:(BOOL)webArchiveDebugModeEnabled;
+
 // zero means do AutoScale
 - (float)PDFScaleFactor;
 - (void)setPDFScaleFactor:(float)scale;
@@ -92,8 +95,6 @@ extern NSString* WebPreferencesRemovedNotification;
 - (void)_setFTPDirectoryTemplatePath:(NSString*)path;
 - (void)_setForceFTPDirectoryListings:(BOOL)force;
 - (BOOL)_forceFTPDirectoryListings;
-
-- (BOOL)_webArchiveDebugModeEnabled;
 
 // Other private methods
 - (void)_postPreferencesChangesNotification;
