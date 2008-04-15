@@ -208,6 +208,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
   Location* optionalLocation() const { return m_location.get(); }
 #if ENABLE(DOM_STORAGE)
   Storage* optionalSessionStorage() const { return m_sessionStorage.get(); }
+  Storage* optionalLocalStorage() const { return m_sessionStorage.get(); }
 #endif
 
  private:
@@ -228,6 +229,7 @@ class DOMWindow : public RefCounted<DOMWindow> {
   mutable RefPtr<Location> m_location;
 #if ENABLE(DOM_STORAGE)
   mutable RefPtr<Storage> m_sessionStorage;
+  mutable RefPtr<Storage> m_localStorage;
 #endif
 };
 

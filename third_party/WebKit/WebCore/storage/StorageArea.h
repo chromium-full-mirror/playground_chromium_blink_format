@@ -35,6 +35,7 @@ namespace WebCore {
 class Frame;
 class Page;
 class SecurityOrigin;
+class StorageAreaClient;
 class StorageMap;
 class String;
 typedef int ExceptionCode;
@@ -43,7 +44,9 @@ class StorageArea : public RefCounted<StorageArea> {
  public:
   virtual ~StorageArea();
 
-  static PassRefPtr<StorageArea> create(SecurityOrigin*, Page*);
+  static PassRefPtr<StorageArea> create(SecurityOrigin*,
+                                        Page*,
+                                        PassRefPtr<StorageAreaClient>);
   PassRefPtr<StorageArea> copy(SecurityOrigin*, Page*);
 
   unsigned length() const;
@@ -57,18 +60,22 @@ class StorageArea : public RefCounted<StorageArea> {
 
   bool contains(const String& key) const;
 
- private:
-  StorageArea(SecurityOrigin*, Page*);
-  StorageArea(SecurityOrigin*, Page*, PassRefPtr<StorageMap>);
+  void setClient(PassRefPtr<StorageAreaClient> client);
 
-  void dispatchStorageEvent(const String& key,
-                            const String& oldValue,
-                            const String& newValue,
-                            Frame* sourceFrame);
+  Page* page() { return m_page; }
+  SecurityOrigin* securityOrigin() { return m_securityOrigin.get(); }
+
+ private:
+  StorageArea(SecurityOrigin*, Page*, PassRefPtr<StorageAreaClient>);
+  StorageArea(SecurityOrigin*,
+              Page*,
+              PassRefPtr<StorageMap>,
+              PassRefPtr<StorageAreaClient>);
 
   Page* m_page;
   RefPtr<SecurityOrigin> m_securityOrigin;
   RefPtr<StorageMap> m_storageMap;
+  RefPtr<StorageAreaClient> m_client;
 };
 
 }  // namespace WebCore
