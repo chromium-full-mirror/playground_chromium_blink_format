@@ -350,9 +350,9 @@ QWebPage* WebPage::createWindow() {
 #include "main.moc"
 
 int main(int argc, char** argv) {
+  QApplication app(argc, argv);
   QString url =
       QString("%1/%2").arg(QDir::homePath()).arg(QLatin1String("index.html"));
-  QApplication app(argc, argv);
 
   QWebSettings::setPageCacheCapacity(4);
   QWebSettings::setObjectCacheCapacities(
