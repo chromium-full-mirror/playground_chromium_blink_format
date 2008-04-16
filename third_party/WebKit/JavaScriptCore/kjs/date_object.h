@@ -22,13 +22,12 @@
 #ifndef DATE_OBJECT_H
 #define DATE_OBJECT_H
 
+#include "DateMath.h"
 #include "function.h"
 #include "JSWrapperObject.h"
 #include "lookup.h"
 
 namespace KJS {
-
-struct GregorianDateTime;
 
 class FunctionPrototype;
 class ObjectPrototype;
@@ -36,6 +35,7 @@ class ObjectPrototype;
 class DateInstance : public JSWrapperObject {
  public:
   DateInstance(JSObject* proto);
+  virtual ~DateInstance();
 
   bool getTime(GregorianDateTime&, int& offset) const;
   bool getUTCTime(GregorianDateTime&) const;
@@ -44,6 +44,20 @@ class DateInstance : public JSWrapperObject {
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+
+  void msToGregorianDateTime(double,
+                             bool outputIsUTC,
+                             GregorianDateTime&) const;
+
+ private:
+  struct Cache {
+    double m_gregorianDateTimeCachedForMS;
+    GregorianDateTime m_cachedGregorianDateTime;
+    double m_gregorianDateTimeUTCCachedForMS;
+    GregorianDateTime m_cachedGregorianDateTimeUTC;
+  };
+
+  mutable Cache* m_cache;
 };
 
 /**
