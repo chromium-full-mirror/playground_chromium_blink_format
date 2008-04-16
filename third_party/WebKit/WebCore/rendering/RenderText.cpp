@@ -335,28 +335,6 @@ VisiblePosition RenderText::positionForCoordinates(int x, int y) {
       DOWNSTREAM);
 }
 
-static RenderObject* lastRendererOnPrevLine(InlineBox* box) {
-  if (!box)
-    return 0;
-
-  RootInlineBox* root = box->root();
-  if (!root)
-    return 0;
-
-  if (root->endsWithBreak())
-    return 0;
-
-  RootInlineBox* prevRoot = root->prevRootBox();
-  if (!prevRoot)
-    return 0;
-
-  InlineBox* lastChild = prevRoot->lastChild();
-  if (!lastChild)
-    return 0;
-
-  return lastChild->object();
-}
-
 static inline bool atLineWrap(InlineTextBox* box, int offset) {
   return box->nextTextBox() && !box->nextOnLine() &&
          offset == box->m_start + box->m_len;
@@ -381,14 +359,8 @@ IntRect RenderText::caretRect(int offset,
         InlineTextBox* prevBox = box->prevTextBox();
         if (offset == box->m_start && affinity == UPSTREAM && prevBox &&
             !box->prevOnLine()) {
-          if (prevBox) {
-            box = prevBox;
-            offset = box->m_start + box->m_len;
-          } else {
-            RenderObject* object = lastRendererOnPrevLine(box);
-            if (object)
-              return object->caretRect(0, affinity);
-          }
+          box = prevBox;
+          offset = box->m_start + box->m_len;
         }
       }
       break;
