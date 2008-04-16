@@ -43,10 +43,10 @@ class JSVariableObject : public JSObject {
   void saveLocalStorage(SavedProperties&) const;
   void restoreLocalStorage(const SavedProperties&);
 
-  virtual void initializeVariable(ExecState*,
-                                  const Identifier&,
-                                  JSValue*,
-                                  unsigned attributes) = 0;
+  virtual void putWithAttributes(ExecState*,
+                                 const Identifier&,
+                                 JSValue*,
+                                 unsigned attributes) = 0;
 
   virtual bool deleteProperty(ExecState*, const Identifier&);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
@@ -86,9 +86,9 @@ class JSVariableObject : public JSObject {
 
   bool symbolTableGet(const Identifier&, PropertySlot&);
   bool symbolTablePut(const Identifier&, JSValue*);
-  bool symbolTableInitializeVariable(const Identifier&,
-                                     JSValue*,
-                                     unsigned attributes);
+  bool symbolTablePutWithAttributes(const Identifier&,
+                                    JSValue*,
+                                    unsigned attributes);
   bool symbolTableInsert(const Identifier&, JSValue*, unsigned attributes);
 
   JSVariableObjectData* d;
@@ -131,7 +131,7 @@ inline bool JSVariableObject::symbolTablePut(const Identifier& propertyName,
   return true;
 }
 
-inline bool JSVariableObject::symbolTableInitializeVariable(
+inline bool JSVariableObject::symbolTablePutWithAttributes(
     const Identifier& propertyName,
     JSValue* value,
     unsigned attributes) {

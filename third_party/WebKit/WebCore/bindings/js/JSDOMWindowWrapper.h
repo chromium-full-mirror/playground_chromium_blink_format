@@ -65,6 +65,10 @@ class JSDOMWindowWrapper : public DOMObject {
   virtual void put(KJS::ExecState*,
                    const KJS::Identifier& propertyName,
                    KJS::JSValue*);
+  virtual void putWithAttributes(KJS::ExecState*,
+                                 const KJS::Identifier& propertyName,
+                                 KJS::JSValue*,
+                                 unsigned attributes);
   virtual bool deleteProperty(KJS::ExecState*,
                               const KJS::Identifier& propertyName);
   virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
