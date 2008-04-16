@@ -41,6 +41,22 @@ class List;
 namespace WebCore {
 
 class Frame;
+class String;
+
+enum MessageSource {
+  HTMLMessageSource,
+  XMLMessageSource,
+  JSMessageSource,
+  CSSMessageSource,
+  OtherMessageSource
+};
+
+enum MessageLevel {
+  TipMessageLevel,
+  LogMessageLevel,
+  WarningMessageLevel,
+  ErrorMessageLevel
+};
 
 class Console : public RefCounted<Console> {
  public:
@@ -49,6 +65,12 @@ class Console : public RefCounted<Console> {
   }
 
   void disconnectFrame();
+
+  void addMessage(MessageSource,
+                  MessageLevel,
+                  const String& message,
+                  unsigned lineNumber,
+                  const String& sourceURL);
 
   void error(KJS::ExecState*, const KJS::List& arguments);
   void info(KJS::ExecState*, const KJS::List& arguments);

@@ -31,6 +31,8 @@
 
 #include "CString.h"
 #include "CachedResource.h"
+#include "Console.h"
+#include "DOMWindow.h"
 #include "DocLoader.h"
 #include "Document.h"
 #include "DocumentLoader.h"
@@ -2277,8 +2279,8 @@ bool InspectorController::handleException(JSValueRef exception,
   String message(JSStringGetCharactersPtr(messageString.get()),
                  JSStringGetLength(messageString.get()));
 
-  m_page->chrome()->addMessageToConsole(JSMessageSource, ErrorMessageLevel,
-                                        message, lineNumber, __FILE__);
+  m_page->mainFrame()->domWindow()->console()->addMessage(
+      JSMessageSource, ErrorMessageLevel, message, lineNumber, __FILE__);
   return true;
 }
 

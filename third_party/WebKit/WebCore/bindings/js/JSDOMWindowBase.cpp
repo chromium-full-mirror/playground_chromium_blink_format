@@ -26,7 +26,7 @@
 
 #include "Base64.h"
 #include "CString.h"
-#include "Chrome.h"
+#include "Console.h"
 #include "DOMWindow.h"
 #include "Element.h"
 #include "EventListener.h"
@@ -912,10 +912,9 @@ void JSDOMWindowBase::printErrorMessage(const String& message) const {
   if (Interpreter::shouldPrintExceptions())
     printf("%s", message.utf8().data());
 
-  if (Page* page = frame->page())
-    page->chrome()->addMessageToConsole(
-        JSMessageSource, ErrorMessageLevel, message, 1,
-        String());  // FIXME: provide a real line number and source URL.
+  frame->domWindow()->console()->addMessage(
+      JSMessageSource, ErrorMessageLevel, message, 1,
+      String());  // FIXME: provide a real line number and source URL.
 }
 
 ExecState* JSDOMWindowBase::globalExec() {

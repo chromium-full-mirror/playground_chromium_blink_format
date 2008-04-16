@@ -23,7 +23,7 @@
 #include "kjs_events.h"
 
 #include "CString.h"
-#include "Chrome.h"
+#include "Console.h"
 #include "DOMWindow.h"
 #include "Document.h"
 #include "Event.h"
@@ -33,7 +33,6 @@
 #include "JSDOMWindow.h"
 #include "JSEvent.h"
 #include "JSEventTargetNode.h"
-#include "Page.h"
 #include "kjs_proxy.h"
 #include <kjs/function_object.h>
 
@@ -110,9 +109,8 @@ void JSAbstractEventListener::handleEvent(Event* ele, bool isWindowEvent) {
       String sourceURL = exception->get(exec, "sourceURL")->toString(exec);
       if (Interpreter::shouldPrintExceptions())
         printf("(event handler):%s\n", message.utf8().data());
-      if (Page* page = frame->page())
-        page->chrome()->addMessageToConsole(JSMessageSource, ErrorMessageLevel,
-                                            message, lineNumber, sourceURL);
+      frame->domWindow()->console()->addMessage(
+          JSMessageSource, ErrorMessageLevel, message, lineNumber, sourceURL);
       exec->clearException();
     } else {
       if (!retval->isUndefinedOrNull() && event->storesResultAsString())

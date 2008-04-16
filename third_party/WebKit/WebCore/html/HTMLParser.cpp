@@ -28,6 +28,8 @@
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "Comment.h"
+#include "Console.h"
+#include "DOMWindow.h"
 #include "DocumentFragment.h"
 #include "DocumentType.h"
 #include "Frame.h"
@@ -48,7 +50,6 @@
 #include "HTMLTableSectionElement.h"
 #include "HTMLTokenizer.h"
 #include "LocalizedStrings.h"
-#include "Page.h"
 #include "Settings.h"
 #include "Text.h"
 
@@ -1536,10 +1537,6 @@ void HTMLParser::reportErrorToConsole(HTMLParserErrorCode errorCode,
   if (!frame)
     return;
 
-  Page* page = frame->page();
-  if (!page)
-    return;
-
   HTMLTokenizer* htmlTokenizer =
       static_cast<HTMLTokenizer*>(document->tokenizer());
   int lineNumber = htmlTokenizer->lineNumber() + 1;
@@ -1574,7 +1571,7 @@ void HTMLParser::reportErrorToConsole(HTMLParserErrorCode errorCode,
   message.replace("%tag1", tag1);
   message.replace("%tag2", tag2);
 
-  page->chrome()->addMessageToConsole(
+  frame->domWindow()->console()->addMessage(
       HTMLMessageSource,
       isWarning(errorCode) ? WarningMessageLevel : ErrorMessageLevel, message,
       lineNumber, document->url().string());

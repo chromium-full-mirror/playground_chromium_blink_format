@@ -22,7 +22,8 @@
 #include "config.h"
 #include "kjs_proxy.h"
 
-#include "Chrome.h"
+#include "Console.h"
+#include "DOMWindow.h"
 #include "Document.h"
 #include "Event.h"
 #include "EventNames.h"
@@ -99,9 +100,9 @@ JSValue* KJSProxy::evaluate(const String& filename,
         comp.value()->toObject(exec)->get(exec, "line")->toInt32(exec);
     UString sourceURL =
         comp.value()->toObject(exec)->get(exec, "sourceURL")->toString(exec);
-    if (Page* page = m_frame->page())
-      page->chrome()->addMessageToConsole(JSMessageSource, ErrorMessageLevel,
-                                          errorMessage, lineNumber, sourceURL);
+    m_frame->domWindow()->console()->addMessage(JSMessageSource,
+                                                ErrorMessageLevel, errorMessage,
+                                                lineNumber, sourceURL);
   }
 
   m_processingInlineCode = false;

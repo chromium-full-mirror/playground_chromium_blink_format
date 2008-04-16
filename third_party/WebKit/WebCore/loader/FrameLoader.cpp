@@ -37,6 +37,7 @@
 #include "CachedPage.h"
 #include "Chrome.h"
 #include "DOMImplementation.h"
+#include "DOMWindow.h"
 #include "DocLoader.h"
 #include "Document.h"
 #include "DocumentLoader.h"
@@ -491,7 +492,7 @@ Frame* FrameLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
   }
 
   if (!canLoad(url, referrer)) {
-    FrameLoader::reportLocalLoadFailed(m_frame->page(), url.string());
+    FrameLoader::reportLocalLoadFailed(m_frame, url.string());
     return 0;
   }
 
@@ -1828,7 +1829,7 @@ bool FrameLoader::loadPlugin(RenderPart* renderer,
       pluginElement = static_cast<Element*>(renderer->node());
 
     if (!canLoad(url, frame()->document())) {
-      FrameLoader::reportLocalLoadFailed(m_frame->page(), url.string());
+      FrameLoader::reportLocalLoadFailed(m_frame, url.string());
       return false;
     }
 
@@ -2137,7 +2138,7 @@ void FrameLoader::load(const FrameLoadRequest& request,
   ASSERT(frame()->document());
   if (url.protocolIs("file")) {
     if (!canLoad(url, frame()->document()) && !canLoad(url, referrer)) {
-      FrameLoader::reportLocalLoadFailed(m_frame->page(), url.string());
+      FrameLoader::reportLocalLoadFailed(m_frame, url.string());
       return;
     }
   }
@@ -2364,12 +2365,14 @@ bool FrameLoader::canLoad(const CachedResource& resource, const Document* doc) {
   return doc && doc->isAllowedToLoadLocalResources();
 }
 
-void FrameLoader::reportLocalLoadFailed(const Page* page, const String& url) {
+void FrameLoader::reportLocalLoadFailed(Frame* frame, const String& url) {
   ASSERT(!url.isEmpty());
-  if (page)
-    page->chrome()->addMessageToConsole(
-        JSMessageSource, ErrorMessageLevel,
-        "Not allowed to load local resource: " + url, 0, String());
+  if (!frame)
+    return;
+
+  frame->domWindow()->console()->addMessage(
+      JSMessageSource, ErrorMessageLevel,
+      "Not allowed to load local resource: " + url, 0, String());
 }
 
 bool FrameLoader::shouldHideReferrer(const KURL& url, const String& referrer) {
@@ -2575,9 +2578,8 @@ bool FrameLoader::shouldAllowNavigation(Frame* targetFrame) const {
       printf("%s", message.utf8().data());
 
     // FIXME: should we print to the console of the activeFrame as well?
-    if (Page* page = targetFrame->page())
-      page->chrome()->addMessageToConsole(JSMessageSource, ErrorMessageLevel,
-                                          message, 1, String());
+    targetFrame->domWindow()->console()->addMessage(
+        JSMessageSource, ErrorMessageLevel, message, 1, String());
   }
 
   return false;
