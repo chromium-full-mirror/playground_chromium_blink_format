@@ -618,7 +618,7 @@ UString UString::from(double d) {
   int decimalPoint;
   int sign;
 
-  char* result = kjs_dtoa(d, 0, 0, &decimalPoint, &sign, NULL);
+  char* result = dtoa(d, 0, &decimalPoint, &sign, NULL);
   int length = static_cast<int>(strlen(result));
 
   int i = 0;
@@ -672,7 +672,7 @@ UString UString::from(double d) {
     buf[i++] = '\0';
   }
 
-  kjs_freedtoa(result);
+  freedtoa(result);
 
   return UString(buf);
 }
@@ -1004,7 +1004,7 @@ double UString::toDouble(bool tolerateTrailingJunk,
   } else {
     // regular number ?
     char* end;
-    d = kjs_strtod(c, &end);
+    d = strtod(c, &end);
     if ((d != 0.0 || end != c) && d != Inf && d != -Inf) {
       c = end;
     } else {

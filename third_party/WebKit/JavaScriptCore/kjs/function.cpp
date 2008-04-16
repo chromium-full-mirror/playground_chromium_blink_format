@@ -694,7 +694,7 @@ static double parseInt(const UString& s, int radix) {
 
   if (number >= mantissaOverflowLowerBound) {
     if (radix == 10)
-      number = kjs_strtod(
+      number = strtod(
           s.substr(firstDigitPosition, p - firstDigitPosition).ascii(), 0);
     else if (radix == 2 || radix == 4 || radix == 8 || radix == 16 ||
              radix == 32)

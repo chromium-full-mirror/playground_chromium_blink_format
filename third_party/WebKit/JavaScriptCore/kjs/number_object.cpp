@@ -95,7 +95,7 @@ NumberPrototype::NumberPrototype(ExecState* exec,
 static UString integer_part_noexp(double d) {
   int decimalPoint;
   int sign;
-  char* result = kjs_dtoa(d, 0, 0, &decimalPoint, &sign, NULL);
+  char* result = dtoa(d, 0, &decimalPoint, &sign, NULL);
   bool resultIsInfOrNan = (decimalPoint == 9999);
   size_t length = strlen(result);
 
@@ -117,7 +117,7 @@ static UString integer_part_noexp(double d) {
     str += UString(buf.data());
   }
 
-  kjs_freedtoa(result);
+  freedtoa(result);
 
   return str;
 }
@@ -382,7 +382,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
 
   int decimalPoint;
   int sign;
-  char* result = kjs_dtoa(x, 0, 0, &decimalPoint, &sign, NULL);
+  char* result = dtoa(x, 0, &decimalPoint, &sign, NULL);
   size_t resultLength = strlen(result);
   decimalPoint += decimalAdjust;
 
@@ -407,7 +407,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
   }
   ASSERT(i <= 80);
 
-  kjs_freedtoa(result);
+  freedtoa(result);
 
   return jsString(buf);
 }
