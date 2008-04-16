@@ -440,17 +440,19 @@ static int compareByStringPairForQSort(const void* a, const void* b) {
   return compare(va->second, vb->second);
 }
 
-static ExecState* execForCompareByStringForQSort = 0;
-static int compareByStringForQSort(const void* a, const void* b) {
-  ExecState* exec = execForCompareByStringForQSort;
+class ArraySortComparator {
+ public:
+  ArraySortComparator(ExecState* exec) : m_exec(exec) {}
 
-  JSValue* va = *static_cast<JSValue* const*>(a);
-  JSValue* vb = *static_cast<JSValue* const*>(b);
-  ASSERT(!va->isUndefined());
-  ASSERT(!vb->isUndefined());
+  bool operator()(JSValue* va, JSValue* vb) {
+    ASSERT(!va->isUndefined());
+    ASSERT(!vb->isUndefined());
+    return compare(va->toString(m_exec), vb->toString(m_exec)) < 0;
+  }
 
-  return compare(va->toString(exec), vb->toString(exec));
-}
+ private:
+  ExecState* m_exec;
+};
 
 void ArrayInstance::sort(ExecState* exec) {
   unsigned lengthNotIncludingUndefined = compactForSorting();
@@ -488,11 +490,9 @@ void ArrayInstance::sort(ExecState* exec) {
     return;
   }
 
-  ExecState* oldExec = execForCompareByStringForQSort;
-  execForCompareByStringForQSort = exec;
-  qsort(m_storage->m_vector, lengthNotIncludingUndefined, sizeof(JSValue*),
-        compareByStringForQSort);
-  execForCompareByStringForQSort = oldExec;
+  std::sort(m_storage->m_vector,
+            m_storage->m_vector + lengthNotIncludingUndefined,
+            ArraySortComparator(exec));
 }
 
 struct CompareWithCompareFunctionArguments {
