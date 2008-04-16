@@ -70,8 +70,7 @@ class Parser : Noncopyable {
 
  private:
   friend Parser& parser();
-  template <typename T>
-  friend class WTF::ThreadSpecific;
+  friend class WTF::ThreadSpecific<Parser>;
 
   Parser();  // Use parser() instead.
   void parse(int startingLineNumber,

@@ -52,8 +52,7 @@ namespace KJS {
 class CommonIdentifiers : Noncopyable {
  private:
   CommonIdentifiers();
-  template <typename T>
-  friend class ::WTF::ThreadSpecific;
+  friend class WTF::ThreadSpecific<CommonIdentifiers>;
 
  public:
   static CommonIdentifiers* shared();

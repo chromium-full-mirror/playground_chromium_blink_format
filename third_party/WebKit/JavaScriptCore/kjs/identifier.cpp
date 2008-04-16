@@ -31,6 +31,7 @@
 #include <wtf/HashSet.h>
 #if USE(MULTIPLE_THREADS)
 #include <wtf/ThreadSpecific.h>
+using namespace WTF;
 #endif
 
 namespace WTF {

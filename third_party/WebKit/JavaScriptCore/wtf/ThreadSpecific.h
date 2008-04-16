@@ -59,7 +59,7 @@ class ThreadSpecific : Noncopyable {
 #endif
 };
 
-#if USE(PTHREADS)
+#if USE(PTHREADS) || PLATFORM(WIN)
 template <typename T>
 inline ThreadSpecific<T>::ThreadSpecific() {
   pthread_key_create(&m_key, destroy);
