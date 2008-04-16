@@ -29,6 +29,9 @@
 #include <wtf/Assertions.h>
 #include <wtf/FastMalloc.h>
 #include <wtf/HashSet.h>
+#if USE(MULTIPLE_THREADS)
+#include <wtf/ThreadSpecific.h>
+#endif
 
 namespace WTF {
 
@@ -57,23 +60,30 @@ namespace KJS {
 typedef HashSet<UString::Rep*> IdentifierTable;
 typedef HashMap<const char*, UString::Rep*, PtrHash<const char*>>
     LiteralIdentifierTable;
-static IdentifierTable* table;
-static LiteralIdentifierTable* literalTable;
 
 static inline IdentifierTable& identifierTable() {
-  ASSERT(JSLock::lockCount() > 0);
-
-  if (!table)
-    table = new IdentifierTable;
+#if USE(MULTIPLE_THREADS)
+  static ThreadSpecific<IdentifierTable> table;
   return *table;
+#else
+  static IdentifierTable table;
+  return table;
+#endif
 }
 
 static inline LiteralIdentifierTable& literalIdentifierTable() {
-  ASSERT(JSLock::lockCount() > 0);
+#if USE(MULTIPLE_THREADS)
+  static ThreadSpecific<LiteralIdentifierTable> table;
+  return *table;
+#else
+  static LiteralIdentifierTable table;
+  return table;
+#endif
+}
 
-  if (!literalTable)
-    literalTable = new LiteralIdentifierTable;
-  return *literalTable;
+void Identifier::initializeIdentifierThreading() {
+  identifierTable();
+  literalIdentifierTable();
 }
 
 bool Identifier::equal(const UString::Rep* r, const char* s) {

@@ -31,6 +31,11 @@
 #include <wtf/RefPtr.h>
 #include "nodes.h"
 
+namespace WTF {
+template <typename T>
+class ThreadSpecific;
+}
+
 namespace KJS {
 
 class FunctionBodyNode;
@@ -65,6 +70,8 @@ class Parser : Noncopyable {
 
  private:
   friend Parser& parser();
+  template <typename T>
+  friend class WTF::ThreadSpecific;
 
   Parser();  // Use parser() instead.
   void parse(int startingLineNumber,

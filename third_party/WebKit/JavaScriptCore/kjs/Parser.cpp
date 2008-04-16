@@ -27,6 +27,9 @@
 
 #include "lexer.h"
 #include <wtf/HashSet.h>
+#if USE(MULTIPLE_THREADS)
+#include <wtf/ThreadSpecific.h>
+#endif
 #include <wtf/Vector.h>
 
 extern int kjsyyparse(void*);
@@ -86,10 +89,13 @@ void Parser::didFinishParsing(
 }
 
 Parser& parser() {
-  ASSERT(JSLock::currentThreadIsHoldingLock());
-
-  static Parser& staticParser = *new Parser;
+#if USE(MULTIPLE_THREADS)
+  static ThreadSpecific<Parser> staticParser;
+  return *staticParser;
+#else
+  static Parser staticParser;
   return staticParser;
+#endif
 }
 
 }  // namespace KJS
