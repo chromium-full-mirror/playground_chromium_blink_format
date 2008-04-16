@@ -68,6 +68,8 @@ class SubresourceLoader : public ResourceLoader {
       const AuthenticationChallenge&);
   virtual void receivedCancellation(const AuthenticationChallenge&);
 
+  void clearClient() { m_client = 0; }
+
  private:
   SubresourceLoader(Frame*,
                     SubresourceLoaderClient*,
