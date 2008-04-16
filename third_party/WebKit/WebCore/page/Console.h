@@ -30,7 +30,13 @@
 #define Console_h
 
 #include <wtf/RefCounted.h>
-#include "PlatformString.h"
+
+#include <wtf/PassRefPtr.h>
+
+namespace KJS {
+class ExecState;
+class List;
+}
 
 namespace WebCore {
 
@@ -44,10 +50,10 @@ class Console : public RefCounted<Console> {
 
   void disconnectFrame();
 
-  void error(const String& message);
-  void info(const String& message);
-  void log(const String& message);
-  void warn(const String& message);
+  void error(KJS::ExecState*, const KJS::List& arguments);
+  void info(KJS::ExecState*, const KJS::List& arguments);
+  void log(KJS::ExecState*, const KJS::List& arguments);
+  void warn(KJS::ExecState*, const KJS::List& arguments);
 
  private:
   Console(Frame*);
