@@ -104,7 +104,9 @@ class DocLoader {
   int requestCount();
 
   void clearPreloads();
-  void preload(CachedResource::Type type, const String& url);
+  void preload(CachedResource::Type type,
+               const String& url,
+               const String& charset);
   void printPreloadStats();
 
  private:

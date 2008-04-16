@@ -107,6 +107,7 @@ class PreloadScanner : Noncopyable {
   AtomicString m_lastStartTag;
 
   String m_urlToLoad;
+  String m_charset;
   bool m_linkIsStyleSheet;
 
   enum CSSState {

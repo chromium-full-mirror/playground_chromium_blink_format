@@ -107,7 +107,8 @@ void PreloadScanner::reset() {
   m_attributeValue.clear();
   m_lastStartTag = AtomicString();
 
-  m_urlToLoad = "";
+  m_urlToLoad = String();
+  m_charset = String();
   m_linkIsStyleSheet = false;
   m_lastCharacterIndex = 0;
   clearLastCharacters();
@@ -677,6 +678,8 @@ void PreloadScanner::processAttribute() {
   if (tag == scriptTag || tag == imgTag) {
     if (attribute == srcAttr && m_urlToLoad.isEmpty())
       m_urlToLoad = parseURL(value);
+    else if (attribute == charsetAttr)
+      m_charset = value;
   } else if (tag == linkTag) {
     if (attribute == hrefAttr && m_urlToLoad.isEmpty())
       m_urlToLoad = parseURL(value);
@@ -686,7 +689,8 @@ void PreloadScanner::processAttribute() {
       bool icon = false;
       HTMLLinkElement::tokenizeRelAttribute(value, styleSheet, alternate, icon);
       m_linkIsStyleSheet = styleSheet && !alternate && !icon;
-    }
+    } else if (attribute == charsetAttr)
+      m_charset = value;
   }
 }
 
@@ -803,15 +807,17 @@ void PreloadScanner::emitTag() {
   }
 
   if (tag == scriptTag)
-    m_document->docLoader()->preload(CachedResource::Script, m_urlToLoad);
+    m_document->docLoader()->preload(CachedResource::Script, m_urlToLoad,
+                                     m_charset);
   else if (tag == imgTag)
-    m_document->docLoader()->preload(CachedResource::ImageResource,
-                                     m_urlToLoad);
+    m_document->docLoader()->preload(CachedResource::ImageResource, m_urlToLoad,
+                                     String());
   else if (tag == linkTag && m_linkIsStyleSheet)
-    m_document->docLoader()->preload(CachedResource::CSSStyleSheet,
-                                     m_urlToLoad);
+    m_document->docLoader()->preload(CachedResource::CSSStyleSheet, m_urlToLoad,
+                                     m_charset);
 
   m_urlToLoad = String();
+  m_charset = String();
   m_linkIsStyleSheet = false;
 }
 
@@ -821,7 +827,8 @@ void PreloadScanner::emitCSSRule() {
     String value(m_cssRuleValue.data(), m_cssRuleValue.size());
     String url = parseURL(value);
     if (!url.isEmpty())
-      m_document->docLoader()->preload(CachedResource::CSSStyleSheet, url);
+      m_document->docLoader()->preload(CachedResource::CSSStyleSheet, url,
+                                       String());
   }
   m_cssRule.clear();
   m_cssRuleValue.clear();
