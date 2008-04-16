@@ -93,6 +93,12 @@ class InspectorController {
 
   void addMessageToConsole(MessageSource,
                            MessageLevel,
+                           KJS::ExecState*,
+                           const KJS::List& arguments,
+                           unsigned lineNumber,
+                           const String& sourceID);
+  void addMessageToConsole(MessageSource,
+                           MessageLevel,
                            const String& message,
                            unsigned lineNumber,
                            const String& sourceID);
@@ -154,6 +160,7 @@ class InspectorController {
  private:
   void focusNode();
 
+  void addConsoleMessage(ConsoleMessage*);
   void addScriptConsoleMessage(const ConsoleMessage*);
 
   void addResource(InspectorResource*);
