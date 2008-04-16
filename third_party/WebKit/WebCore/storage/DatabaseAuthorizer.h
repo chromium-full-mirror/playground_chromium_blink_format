@@ -34,7 +34,9 @@ namespace WebCore {
 
 class DatabaseAuthorizer : public SQLiteAuthorizer {
  public:
-  DatabaseAuthorizer();
+  static PassRefPtr<DatabaseAuthorizer> create() {
+    return adoptRef(new DatabaseAuthorizer);
+  }
 
   virtual int createTable(const String& tableName);
   virtual int createTempTable(const String& tableName);
@@ -83,7 +85,9 @@ class DatabaseAuthorizer : public SQLiteAuthorizer {
   bool lastActionChangedDatabase() const { return m_lastActionChangedDatabase; }
 
  private:
+  DatabaseAuthorizer();
   int denyBasedOnTableName(const String&);
+
   bool m_securityEnabled;
   bool m_lastActionWasInsert;
   bool m_lastActionChangedDatabase;

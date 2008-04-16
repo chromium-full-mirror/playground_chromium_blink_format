@@ -209,7 +209,7 @@ inline int atomicDecrement(int volatile* addend) {
 template <class T>
 class ThreadSafeShared : Noncopyable {
  public:
-  ThreadSafeShared() : m_refCount(0) {}
+  ThreadSafeShared(int initialRefCount = 1) : m_refCount(initialRefCount) {}
 
   void ref() {
 #if USE(LOCKFREE_THREADSAFESHARED)

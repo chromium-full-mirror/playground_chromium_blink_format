@@ -49,10 +49,10 @@ class String;
 
 class SQLStatement : public ThreadSafeShared<SQLStatement> {
  public:
-  SQLStatement(const String& statement,
-               const Vector<SQLValue>& arguments,
-               PassRefPtr<SQLStatementCallback> callback,
-               PassRefPtr<SQLStatementErrorCallback> errorCallback);
+  static PassRefPtr<SQLStatement> create(const String&,
+                                         const Vector<SQLValue>&,
+                                         PassRefPtr<SQLStatementCallback>,
+                                         PassRefPtr<SQLStatementErrorCallback>);
 
   bool execute(Database*);
   bool lastExecutionFailedDueToQuota() const;
@@ -68,6 +68,11 @@ class SQLStatement : public ThreadSafeShared<SQLStatement> {
   SQLError* sqlError() const { return m_error.get(); }
 
  private:
+  SQLStatement(const String& statement,
+               const Vector<SQLValue>& arguments,
+               PassRefPtr<SQLStatementCallback> callback,
+               PassRefPtr<SQLStatementErrorCallback> errorCallback);
+
   void setFailureDueToQuota();
   void clearFailureDueToQuota();
 

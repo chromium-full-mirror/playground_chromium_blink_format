@@ -64,11 +64,13 @@ class SQLTransactionWrapper : public ThreadSafeShared<SQLTransactionWrapper> {
 
 class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
  public:
-  SQLTransaction(Database*,
-                 PassRefPtr<SQLTransactionCallback>,
-                 PassRefPtr<SQLTransactionErrorCallback>,
-                 PassRefPtr<VoidCallback>,
-                 PassRefPtr<SQLTransactionWrapper>);
+  static PassRefPtr<SQLTransaction> create(
+      Database*,
+      PassRefPtr<SQLTransactionCallback>,
+      PassRefPtr<SQLTransactionErrorCallback>,
+      PassRefPtr<VoidCallback>,
+      PassRefPtr<SQLTransactionWrapper>);
+
   ~SQLTransaction();
 
   void executeSQL(const String& sqlStatement,
@@ -83,6 +85,12 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
   Database* database() { return m_database.get(); }
 
  private:
+  SQLTransaction(Database*,
+                 PassRefPtr<SQLTransactionCallback>,
+                 PassRefPtr<SQLTransactionErrorCallback>,
+                 PassRefPtr<VoidCallback>,
+                 PassRefPtr<SQLTransactionWrapper>);
+
   typedef void (SQLTransaction::*TransactionStepMethod)();
   TransactionStepMethod m_nextStep;
 
