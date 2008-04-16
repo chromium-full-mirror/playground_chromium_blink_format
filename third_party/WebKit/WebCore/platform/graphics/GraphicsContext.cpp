@@ -323,7 +323,7 @@ void GraphicsContext::drawImage(Image* image,
                                 const FloatRect& src,
                                 CompositeOperator op,
                                 bool useLowQualityScale) {
-  if (paintingDisabled())
+  if (paintingDisabled() || !image)
     return;
 
   float tsw = src.width();
@@ -359,7 +359,7 @@ void GraphicsContext::drawTiledImage(Image* image,
                                      const IntPoint& srcPoint,
                                      const IntSize& tileSize,
                                      CompositeOperator op) {
-  if (paintingDisabled())
+  if (paintingDisabled() || !image)
     return;
 
   image->drawTiled(this, rect, srcPoint, tileSize, op);
@@ -371,7 +371,7 @@ void GraphicsContext::drawTiledImage(Image* image,
                                      Image::TileRule hRule,
                                      Image::TileRule vRule,
                                      CompositeOperator op) {
-  if (paintingDisabled())
+  if (paintingDisabled() || !image)
     return;
 
   if (hRule == Image::StretchTile && vRule == Image::StretchTile)

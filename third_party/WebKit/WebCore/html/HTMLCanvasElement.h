@@ -51,10 +51,20 @@ class FloatPoint;
 class FloatRect;
 class FloatSize;
 class GraphicsContext;
+class HTMLCanvasElement;
 class ImageBuffer;
 class IntPoint;
 class InttRect;
 class IntSize;
+
+class CanvasObserver {
+ public:
+  virtual ~CanvasObserver(){};
+
+  virtual void canvasChanged(HTMLCanvasElement* element,
+                             const FloatRect& changedRect) = 0;
+  virtual void canvasResized(HTMLCanvasElement* element) = 0;
+};
 
 class HTMLCanvasElement : public HTMLElement {
  public:
@@ -77,6 +87,11 @@ class HTMLCanvasElement : public HTMLElement {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   IntSize size() const { return m_size; }
+  void setSize(const IntSize& size) {
+    setWidth(size.width());
+    setHeight(size.height());
+  }
+
   void willDraw(const FloatRect&);
 
   void paint(GraphicsContext*, const IntRect&);
@@ -101,6 +116,8 @@ class HTMLCanvasElement : public HTMLElement {
 
   static const float MaxCanvasArea;
 
+  void setObserver(CanvasObserver* o) { m_observer = o; }
+
  private:
   void createImageBuffer() const;
   void reset();
@@ -109,6 +126,7 @@ class HTMLCanvasElement : public HTMLElement {
 
   RefPtr<CanvasRenderingContext2D> m_2DContext;
   IntSize m_size;
+  CanvasObserver* m_observer;
 
   bool m_originClean;
 

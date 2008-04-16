@@ -72,6 +72,7 @@ const float HTMLCanvasElement::MaxCanvasArea =
 HTMLCanvasElement::HTMLCanvasElement(Document* doc)
     : HTMLElement(canvasTag, doc),
       m_size(defaultWidth, defaultHeight),
+      m_observer(0),
       m_originClean(true),
       m_createdImageBuffer(false) {}
 
@@ -149,6 +150,8 @@ CanvasRenderingContext* HTMLCanvasElement::getContext(const String& type) {
 }
 
 void HTMLCanvasElement::willDraw(const FloatRect& rect) {
+  m_imageBuffer->clearImage();
+
   if (RenderObject* ro = renderer()) {
 #ifdef CANVAS_INCREMENTAL_REPAINT
     // Handle CSS triggered scaling
@@ -163,6 +166,9 @@ void HTMLCanvasElement::willDraw(const FloatRect& rect) {
     ro->repaint();
 #endif
   }
+
+  if (m_observer)
+    m_observer->canvasChanged(this, rect);
 }
 
 void HTMLCanvasElement::reset() {
@@ -190,14 +196,20 @@ void HTMLCanvasElement::reset() {
       if (hadImageBuffer)
         ro->repaint();
     }
+
+  if (m_observer)
+    m_observer->canvasResized(this);
 }
 
-void HTMLCanvasElement::paint(GraphicsContext* p, const IntRect& r) {
-  if (p->paintingDisabled())
+void HTMLCanvasElement::paint(GraphicsContext* context, const IntRect& r) {
+  if (context->paintingDisabled())
     return;
 
-  if (m_imageBuffer)
-    p->paintBuffer(m_imageBuffer.get(), r);
+  if (m_imageBuffer) {
+    Image* image = m_imageBuffer->image();
+    if (image)
+      context->drawImage(image, r);
+  }
 }
 
 IntRect HTMLCanvasElement::convertLogicalToDevice(

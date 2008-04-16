@@ -130,9 +130,6 @@ void BitmapImage::draw(GraphicsContext* ctxt,
                        const FloatRect& dstRect,
                        const FloatRect& srcRect,
                        CompositeOperator compositeOp) {
-  if (!m_source.initialized())
-    return;
-
   CGRect fr = ctxt->roundToDevicePixels(srcRect);
   CGRect ir = ctxt->roundToDevicePixels(dstRect);
 
@@ -227,6 +224,7 @@ void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatRect& destRect) {
   if (!nativeImageForCurrentFrame())
     return;
+
   ASSERT(patternTransform.isInvertible());
   if (!patternTransform.isInvertible())
     // Avoid a hang under CGContextDrawTiledImage on release builds.
