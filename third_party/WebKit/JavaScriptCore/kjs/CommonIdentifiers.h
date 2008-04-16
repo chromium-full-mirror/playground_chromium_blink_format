@@ -53,7 +53,7 @@ class CommonIdentifiers : Noncopyable {
  private:
   CommonIdentifiers();
   template <typename T>
-  friend class WTF::ThreadSpecific;
+  friend class ::WTF::ThreadSpecific;
 
  public:
   static CommonIdentifiers* shared();
