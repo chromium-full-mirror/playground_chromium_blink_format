@@ -33,6 +33,7 @@
 namespace WebCore {
 
 class KURL;
+class LocalStorage;
 class Page;
 
 class PageGroup : Noncopyable {
@@ -53,12 +54,15 @@ class PageGroup : Noncopyable {
   static void setShouldTrackVisitedLinks(bool);
   static void removeAllVisitedLinks();
 
+  LocalStorage* localStorage();
+
  private:
   void addVisitedLink(unsigned stringHash);
 
   HashSet<Page*> m_pages;
   HashSet<unsigned, AlreadyHashed> m_visitedLinkHashes;
   bool m_visitedLinksPopulated;
+  RefPtr<LocalStorage> m_localStorage;
 };
 
 }  // namespace WebCore

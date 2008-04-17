@@ -36,8 +36,9 @@
 
 namespace WebCore {
 
-LocalStorageArea::LocalStorageArea(SecurityOrigin* origin)
-    : StorageArea(origin) {}
+LocalStorageArea::LocalStorageArea(SecurityOrigin* origin,
+                                   LocalStorage* localStorage)
+    : StorageArea(origin), m_localStorage(localStorage) {}
 
 void LocalStorageArea::itemChanged(const String& key,
                                    const String& oldValue,

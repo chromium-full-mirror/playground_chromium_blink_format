@@ -30,20 +30,23 @@
 
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
-#include <wtf/Noncopyable.h>
 
 namespace WebCore {
 
+class LocalStorageArea;
+class PageGroup;
 class StorageArea;
 
-class LocalStorage : Noncopyable {
+class LocalStorage : public RefCounted<LocalStorage> {
  public:
-  static LocalStorage& sharedLocalStorage();
+  static PassRefPtr<LocalStorage> create(PageGroup* group) {
+    return adoptRef(new LocalStorage(group));
+  }
 
   PassRefPtr<StorageArea> storageArea(SecurityOrigin*);
 
  private:
-  LocalStorage();
+  LocalStorage(PageGroup*);
 
   typedef HashMap<RefPtr<SecurityOrigin>,
                   RefPtr<StorageArea>,
@@ -51,6 +54,8 @@ class LocalStorage : Noncopyable {
                   SecurityOriginTraits>
       StorageAreaMap;
   StorageAreaMap m_storageAreaMap;
+
+  PageGroup* m_group;
 };
 
 }  // namespace WebCore

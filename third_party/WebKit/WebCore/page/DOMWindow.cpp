@@ -49,6 +49,7 @@
 #include "Location.h"
 #include "Navigator.h"
 #include "Page.h"
+#include "PageGroup.h"
 #include "PlatformScreen.h"
 #include "PlatformString.h"
 #include "Screen.h"
@@ -292,9 +293,12 @@ Storage* DOMWindow::localStorage() const {
   if (!document)
     return 0;
 
+  Page* page = document->page();
+  if (!page)
+    return 0;
+
   RefPtr<StorageArea> storageArea =
-      LocalStorage::sharedLocalStorage().storageArea(
-          document->securityOrigin());
+      page->group().localStorage()->storageArea(document->securityOrigin());
   m_localStorage = Storage::create(m_frame, storageArea.release());
   return m_localStorage.get();
 }
