@@ -224,8 +224,10 @@ class ExpressionNode : public Node {
   // even if the result has no semantic relevance
   virtual void optimizeForUnnecessaryResult() {}
 
- protected:
+  // This needs to be in public in order to compile using GCC 3.x
   typedef enum { EvalOperator, FunctionCall } CallerType;
+
+ protected:
   template <CallerType, bool>
   inline JSValue* resolveAndCall(ExecState*,
                                  const Identifier&,
