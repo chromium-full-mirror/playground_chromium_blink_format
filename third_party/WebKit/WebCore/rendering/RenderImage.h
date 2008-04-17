@@ -46,7 +46,7 @@ class RenderImage : public RenderReplaced {
 
   virtual int minimumReplacedHeight() const;
 
-  virtual void imageChanged(CachedImage*);
+  virtual void imageChanged(WrappedImagePtr);
 
   bool setImageSizeForAltText(CachedImage* newImage = 0);
 
@@ -97,8 +97,9 @@ class RenderImage : public RenderReplaced {
   virtual IntSize imageSize(float multiplier) const {
     return m_cachedImage ? m_cachedImage->imageSize(multiplier) : IntSize();
   }
+  virtual WrappedImagePtr imagePtr() const { return m_cachedImage; }
 
-  virtual void intrinsicSizeChanged() { imageChanged(m_cachedImage); }
+  virtual void intrinsicSizeChanged() { imageChanged(imagePtr()); }
 
  private:
   int calcAspectRatioWidth() const;

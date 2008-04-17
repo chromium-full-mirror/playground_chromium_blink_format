@@ -1226,7 +1226,7 @@ bool RenderObject::paintBorderImage(GraphicsContext* graphicsContext,
   // happen, since the tiling function
   // doesn't have any understanding of the zoom that is in effect on the tile.
   borderImage->setImageContainerSize(IntSize(w, h));
-  IntSize imageSize = borderImage->imageSize(1.0f);
+  IntSize imageSize = borderImage->imageSize(this, 1.0f);
   int imageWidth = imageSize.width();
   int imageHeight = imageSize.height();
 
@@ -3261,6 +3261,10 @@ bool RenderObject::isScrollable() const {
 
 AnimationController* RenderObject::animationController() const {
   return document()->frame()->animationController();
+}
+
+void RenderObject::imageChanged(CachedImage* image) {
+  return imageChanged(static_cast<WrappedImagePtr>(image));
 }
 
 #if ENABLE(SVG)

@@ -135,13 +135,13 @@ enum EPosition {
 
 enum EFloat { FNONE = 0, FLEFT, FRIGHT };
 
+typedef void* WrappedImagePtr;
+
 class StyleImage : public RefCounted<StyleImage> {
  public:
   StyleImage() : RefCounted<StyleImage>(0) {}
 
   virtual ~StyleImage() {}
-
-  virtual void* data() const = 0;
 
   bool operator==(const StyleImage& other) { return data() == other.data(); }
 
@@ -150,7 +150,7 @@ class StyleImage : public RefCounted<StyleImage> {
   virtual bool canRender(float multiplier) const { return true; }
   virtual bool isLoaded() const { return true; }
   virtual bool errorOccurred() const { return false; }
-  virtual IntSize imageSize(float multiplier) const = 0;
+  virtual IntSize imageSize(const RenderObject*, float multiplier) const = 0;
   virtual bool imageHasRelativeWidth() const = 0;
   virtual bool imageHasRelativeHeight() const = 0;
   virtual bool usesImageContainerSize() const = 0;
@@ -158,6 +158,7 @@ class StyleImage : public RefCounted<StyleImage> {
   virtual void addClient(RenderObject*) = 0;
   virtual void removeClient(RenderObject*) = 0;
   virtual Image* image(RenderObject*, const IntSize&) const = 0;
+  virtual WrappedImagePtr data() const = 0;
   virtual bool isCachedImage() const { return false; }
   virtual bool isGeneratedImage() const { return false; }
 };
@@ -166,7 +167,7 @@ class StyleCachedImage : public StyleImage {
  public:
   StyleCachedImage(CachedImage* image) : m_image(image) {}
 
-  virtual void* data() const { return m_image; }
+  virtual WrappedImagePtr data() const { return m_image; }
 
   virtual bool isCachedImage() const { return true; }
 
@@ -177,7 +178,7 @@ class StyleCachedImage : public StyleImage {
   virtual bool canRender(float multiplier) const;
   virtual bool isLoaded() const;
   virtual bool errorOccurred() const;
-  virtual IntSize imageSize(float multiplier) const;
+  virtual IntSize imageSize(const RenderObject*, float multiplier) const;
   virtual bool imageHasRelativeWidth() const;
   virtual bool imageHasRelativeHeight() const;
   virtual bool usesImageContainerSize() const;
@@ -192,18 +193,19 @@ class StyleCachedImage : public StyleImage {
 
 class StyleGeneratedImage : public StyleImage {
  public:
-  StyleGeneratedImage(CSSImageGeneratorValue* val) : m_generator(val) {}
+  StyleGeneratedImage(CSSImageGeneratorValue* val, bool fixedSize)
+      : m_generator(val), m_fixedSize(fixedSize) {}
 
-  virtual void* data() const { return m_generator; }
+  virtual WrappedImagePtr data() const { return m_generator; }
 
   virtual bool isGeneratedImage() const { return true; }
 
   virtual PassRefPtr<CSSValue> cssValue();
 
-  virtual IntSize imageSize(float multiplier) const;
-  virtual bool imageHasRelativeWidth() const { return true; }
-  virtual bool imageHasRelativeHeight() const { return true; }
-  virtual bool usesImageContainerSize() const { return true; }
+  virtual IntSize imageSize(const RenderObject*, float multiplier) const;
+  virtual bool imageHasRelativeWidth() const { return !m_fixedSize; }
+  virtual bool imageHasRelativeHeight() const { return !m_fixedSize; }
+  virtual bool usesImageContainerSize() const { return !m_fixedSize; }
   virtual void setImageContainerSize(const IntSize&);
   virtual void addClient(RenderObject*);
   virtual void removeClient(RenderObject*);
@@ -213,6 +215,7 @@ class StyleGeneratedImage : public StyleImage {
   CSSImageGeneratorValue*
       m_generator;  // The generator holds a reference to us.
   IntSize m_containerSize;
+  bool m_fixedSize;
 };
 
 //------------------------------------------------

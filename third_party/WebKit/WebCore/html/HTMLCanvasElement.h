@@ -88,8 +88,13 @@ class HTMLCanvasElement : public HTMLElement {
 
   IntSize size() const { return m_size; }
   void setSize(const IntSize& size) {
+    if (size == m_size)
+      return;
+    m_ignoreReset = true;
     setWidth(size.width());
     setHeight(size.height());
+    m_ignoreReset = false;
+    reset();
   }
 
   void willDraw(const FloatRect&);
@@ -129,6 +134,7 @@ class HTMLCanvasElement : public HTMLElement {
   CanvasObserver* m_observer;
 
   bool m_originClean;
+  bool m_ignoreReset;
 
   // m_createdImageBuffer means we tried to malloc the buffer.  We didn't
   // necessarily get it.

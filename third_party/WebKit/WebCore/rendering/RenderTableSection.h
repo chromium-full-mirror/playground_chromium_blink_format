@@ -120,7 +120,7 @@ class RenderTableSection : public RenderContainer {
   int outerBorderRight() const { return m_outerBorderRight; }
 
   virtual void paint(PaintInfo&, int tx, int ty);
-  virtual void imageChanged(CachedImage*);
+  virtual void imageChanged(WrappedImagePtr);
 
   int numRows() const { return m_gridRows; }
   int numColumns() const;

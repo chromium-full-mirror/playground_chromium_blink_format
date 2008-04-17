@@ -74,6 +74,7 @@ HTMLCanvasElement::HTMLCanvasElement(Document* doc)
       m_size(defaultWidth, defaultHeight),
       m_observer(0),
       m_originClean(true),
+      m_ignoreReset(false),
       m_createdImageBuffer(false) {}
 
 HTMLCanvasElement::~HTMLCanvasElement() {
@@ -172,6 +173,9 @@ void HTMLCanvasElement::willDraw(const FloatRect& rect) {
 }
 
 void HTMLCanvasElement::reset() {
+  if (m_ignoreReset)
+    return;
+
   bool ok;
   int w = getAttribute(widthAttr).toInt(&ok);
   if (!ok)

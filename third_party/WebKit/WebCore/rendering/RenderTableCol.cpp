@@ -79,10 +79,7 @@ IntRect RenderTableCol::absoluteClippedOverflowRect() {
   return IntRect();
 }
 
-void RenderTableCol::imageChanged(CachedImage* image) {
-  if (!image || !image->canRender(style()->effectiveZoom()) || !parent())
-    return;
-
+void RenderTableCol::imageChanged(WrappedImagePtr image) {
   // FIXME: Repaint only the rect the image paints in.
   repaint();
 }
