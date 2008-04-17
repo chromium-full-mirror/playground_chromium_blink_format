@@ -29,6 +29,8 @@
 #include "config.h"
 #include "DocumentLoader.h"
 
+#include "ApplicationCache.h"
+#include "ApplicationCacheGroup.h"
 #include "ArchiveResourceCollection.h"
 #include "CachedPage.h"
 #include "DocLoader.h"
@@ -146,7 +148,13 @@ DocumentLoader::DocumentLoader(const ResourceRequest& req,
       m_stopRecordingResponses(false),
       m_substituteResourceDeliveryTimer(
           this,
-          &DocumentLoader::substituteResourceDeliveryTimerFired) {}
+          &DocumentLoader::substituteResourceDeliveryTimerFired)
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+      ,
+      m_candidateApplicationCacheGroup(0)
+#endif
+{
+}
 
 FrameLoader* DocumentLoader::frameLoader() const {
   if (!m_frame)
@@ -157,6 +165,13 @@ FrameLoader* DocumentLoader::frameLoader() const {
 DocumentLoader::~DocumentLoader() {
   ASSERT(!m_frame || frameLoader()->activeDocumentLoader() != this ||
          !frameLoader()->isLoading());
+
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  if (m_applicationCache)
+    m_applicationCache->group()->documentLoaderDestroyed(this);
+  else if (m_candidateApplicationCacheGroup)
+    m_candidateApplicationCacheGroup->documentLoaderDestroyed(this);
+#endif
 }
 
 PassRefPtr<SharedBuffer> DocumentLoader::mainResourceData() const {
@@ -640,19 +655,19 @@ void DocumentLoader::loadFromCachedPage(PassRefPtr<CachedPage> cachedPage) {
   frameLoader()->commitProvisionalLoad(cachedPage);
 }
 
-KURL DocumentLoader::originalURL() const {
+const KURL& DocumentLoader::originalURL() const {
   return m_originalRequestCopy.url();
 }
 
-KURL DocumentLoader::requestURL() const {
+const KURL& DocumentLoader::requestURL() const {
   return request().url();
 }
 
-KURL DocumentLoader::responseURL() const {
+const KURL& DocumentLoader::responseURL() const {
   return m_response.url();
 }
 
-String DocumentLoader::responseMIMEType() const {
+const String& DocumentLoader::responseMIMEType() const {
   return m_response.mimeType();
 }
 
@@ -757,4 +772,35 @@ void DocumentLoader::iconLoadDecisionAvailable() {
   if (m_frame)
     m_frame->loader()->iconLoadDecisionAvailable();
 }
+
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+void DocumentLoader::setCandidateApplicationCacheGroup(
+    ApplicationCacheGroup* group) {
+  ASSERT(!m_applicationCache);
+  m_candidateApplicationCacheGroup = group;
+}
+
+void DocumentLoader::setApplicationCache(
+    PassRefPtr<ApplicationCache> applicationCache) {
+  if (m_candidateApplicationCacheGroup) {
+    ASSERT(!m_applicationCache);
+    m_candidateApplicationCacheGroup = 0;
+  }
+
+  m_applicationCache = applicationCache;
+}
+
+ApplicationCache* DocumentLoader::toplevelApplicationCache() const {
+  if (!m_frame)
+    return 0;
+
+  if (m_applicationCache)
+    return m_applicationCache.get();
+
+  if (Page* page = m_frame->page())
+    return page->mainFrame()->loader()->documentLoader()->applicationCache();
+
+  return 0;
+}
+#endif
 }

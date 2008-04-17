@@ -43,6 +43,10 @@
 
 namespace WebCore {
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+class ApplicationCache;
+class ApplicationCacheGroup;
+#endif
 class Archive;
 class ArchiveResource;
 class ArchiveResourceCollection;
@@ -90,10 +94,10 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   const KURL& url() const;
   const KURL& unreachableURL() const;
 
-  KURL originalURL() const;
-  KURL requestURL() const;
-  KURL responseURL() const;
-  String responseMIMEType() const;
+  const KURL& originalURL() const;
+  const KURL& requestURL() const;
+  const KURL& responseURL() const;
+  const String& responseMIMEType() const;
 
   void replaceRequestURLForAnchorScroll(const KURL&);
   bool isStopping() const { return m_isStopping; }
@@ -201,6 +205,19 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
   bool deferMainResourceDataLoad() const { return m_deferMainResourceDataLoad; }
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  void setCandidateApplicationCacheGroup(ApplicationCacheGroup* group);
+  ApplicationCacheGroup* candidateApplicationCacheGroup() const {
+    return m_candidateApplicationCacheGroup;
+  }
+
+  void setApplicationCache(PassRefPtr<ApplicationCache> applicationCache);
+  ApplicationCache* applicationCache() const {
+    return m_applicationCache.get();
+  }
+  ApplicationCache* toplevelApplicationCache() const;
+#endif
+
  protected:
   bool m_deferMainResourceDataLoad;
 
@@ -280,6 +297,16 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
   OwnPtr<ArchiveResourceCollection> m_archiveResourceCollection;
   RefPtr<SharedBuffer> m_parsedArchiveData;
+
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  // The application cache that the document loader is associated with (if any).
+  RefPtr<ApplicationCache> m_applicationCache;
+
+  // Before an application cache has finished loading, this will be the
+  // candidate application
+  // group that the document loader is associated with.
+  ApplicationCacheGroup* m_candidateApplicationCacheGroup;
+#endif
 };
 }
 
