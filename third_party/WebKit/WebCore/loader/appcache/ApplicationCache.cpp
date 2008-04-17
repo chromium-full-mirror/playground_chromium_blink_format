@@ -36,7 +36,7 @@ namespace WebCore {
 
 ApplicationCache::ApplicationCache(ApplicationCacheGroup* group)
     : m_group(group), m_manifest(0) {
-  ASSERT(m_group);
+  ASSERT_ARG(group);
 }
 
 ApplicationCache::~ApplicationCache() {
@@ -45,9 +45,8 @@ ApplicationCache::~ApplicationCache() {
 
 void ApplicationCache::setManifestResource(
     PassRefPtr<ApplicationCacheResource> manifest) {
-  ASSERT(manifest);
+  ASSERT_ARG(manifest);
   ASSERT(!m_manifest);
-
   ASSERT(manifest->type() & ApplicationCacheResource::Manifest);
 
   m_manifest = manifest.get();
@@ -57,7 +56,7 @@ void ApplicationCache::setManifestResource(
 
 void ApplicationCache::addResource(
     PassRefPtr<ApplicationCacheResource> resource) {
-  ASSERT(resource);
+  ASSERT_ARG(resource);
 
   const String& url = resource->url();
 
@@ -146,7 +145,6 @@ void ApplicationCache::dump() {
     ApplicationCacheResource::dumpType(it->second->type());
   }
 }
-
 #endif
 }
 
