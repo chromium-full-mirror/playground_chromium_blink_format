@@ -34,12 +34,19 @@ namespace WebCore {
 
 class ApplicationCache;
 class DocumentLoader;
+class Frame;
 
 class ApplicationCacheGroup {
  public:
-  const KURL& manifestURL() const { return m_manifestURL; }
+  enum Status { Idle, Checking, Downloading };
 
+  const KURL& manifestURL() const { return m_manifestURL; }
+  Status status() const { return Idle; }
+
+  void update(Frame*) {}
   void cacheDestroyed(ApplicationCache*) {}
+
+  ApplicationCache* newestCache() const { return 0; }
 
   void documentLoaderDestroyed(DocumentLoader*) {}
 

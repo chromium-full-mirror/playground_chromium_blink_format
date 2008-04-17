@@ -39,6 +39,7 @@
 namespace WebCore {
 
 class AtomicString;
+class DOMApplicationCache;
 class Event;
 class EventListener;
 class EventTargetNode;
@@ -57,7 +58,9 @@ class EventTarget {
  public:
   virtual EventTargetNode* toNode();
   virtual XMLHttpRequest* toXMLHttpRequest();
-
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  virtual DOMApplicationCache* toDOMApplicationCache();
+#endif
 #if ENABLE(SVG)
   virtual SVGElementInstance* toSVGElementInstance();
 #endif

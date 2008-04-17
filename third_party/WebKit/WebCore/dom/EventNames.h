@@ -30,17 +30,17 @@ namespace EventNames {
 #define DOM_EVENT_NAMES_FOR_EACH(macro)                                                  \
                                                                                          \
   macro(abort) macro(beforecopy) macro(beforecut) macro(beforepaste) macro(              \
-      beforeunload) macro(blur) macro(change) macro(click) macro(contextmenu)            \
-      macro(copy) macro(cut) macro(dblclick) macro(drag) macro(dragend) macro(           \
-          dragenter) macro(dragleave) macro(dragover) macro(dragstart)                   \
-          macro(drop) macro(error) macro(focus) macro(input) macro(keydown) macro(       \
-              keypress) macro(keyup) macro(load) macro(message) macro(mousedown)         \
-              macro(mousemove) macro(mouseout) macro(mouseover) macro(                   \
-                  mouseup) macro(mousewheel) macro(overflowchanged)                      \
-                  macro(paste) macro(readystatechange) macro(reset) macro(               \
-                      resize) macro(scroll) macro(search) macro(select)                  \
+      beforeunload) macro(blur) macro(cached) macro(change) macro(checking)              \
+      macro(click) macro(contextmenu) macro(copy) macro(cut) macro(dblclick) macro(      \
+          downloading) macro(drag) macro(dragend) macro(dragenter) macro(dragleave)      \
+          macro(dragover) macro(dragstart) macro(drop) macro(error) macro(focus) macro(  \
+              input) macro(keydown) macro(keypress) macro(keyup) macro(load)             \
+              macro(message) macro(mousedown) macro(mousemove) macro(mouseout) macro(    \
+                  mouseover) macro(mouseup) macro(mousewheel) macro(noupdate)            \
+                  macro(overflowchanged) macro(paste) macro(readystatechange) macro(     \
+                      reset) macro(resize) macro(scroll) macro(search) macro(select)     \
                       macro(selectstart) macro(storage) macro(submit) macro(             \
-                          textInput) macro(unload) macro(zoom)                           \
+                          textInput) macro(unload) macro(updateready) macro(zoom)        \
                                                                                          \
                           macro(DOMActivate) macro(DOMAttrModified) macro(               \
                               DOMCharacterDataModified) macro(DOMFocusIn)                \
