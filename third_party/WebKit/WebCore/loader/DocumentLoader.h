@@ -215,7 +215,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   ApplicationCache* applicationCache() const {
     return m_applicationCache.get();
   }
-  ApplicationCache* toplevelApplicationCache() const;
+  ApplicationCache* topLevelApplicationCache() const;
 #endif
 
  protected:
