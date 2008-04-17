@@ -23,34 +23,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef StorageAreaClient_h
-#define StorageAreaClient_h
+#ifndef LocalStorageArea_h
+#define LocalStorageArea_h
 
-#include <wtf/RefCounted.h>
+#include "StorageArea.h"
+
+#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
-class StorageArea;
-class String;
-
-class StorageAreaClient : public RefCounted<StorageAreaClient> {
+class LocalStorageArea : public StorageArea {
  public:
-  virtual ~StorageAreaClient() {}
+  static PassRefPtr<LocalStorageArea> create(SecurityOrigin* origin) {
+    return adoptRef(new LocalStorageArea(origin));
+  }
 
-  virtual void itemChanged(StorageArea*,
-                           const String& key,
+ private:
+  LocalStorageArea(SecurityOrigin*);
+
+  virtual void itemChanged(const String& key,
                            const String& oldValue,
                            const String& newValue,
-                           Frame* sourceFrame) = 0;
-  virtual void itemRemoved(StorageArea*,
-                           const String& key,
+                           Frame* sourceFrame);
+  virtual void itemRemoved(const String& key,
                            const String& oldValue,
-                           Frame* sourceFrame) = 0;
+                           Frame* sourceFrame);
 
- protected:
-  StorageAreaClient() {}
+  void dispatchStorageEvent(const String& key,
+                            const String& oldValue,
+                            const String& newValue,
+                            Frame* sourceFrame);
 };
 
 }  // namespace WebCore
 
-#endif  // StorageAreaClient_h
+#endif  // LocalStorageArea_h
