@@ -69,11 +69,11 @@ class AXObjectCache {
   void childrenChanged(RenderObject*);
   static void enableAccessibility() { gAccessibilityEnabled = true; }
   static bool accessibilityEnabled() { return gAccessibilityEnabled; }
+  void handleFocusedUIElementChanged();
 
 #if PLATFORM(MAC)
   AXID getAXID(AccessibilityObject*);
   void removeAXID(AccessibilityObject*);
-  void handleFocusedUIElementChanged();
   bool isIDinUse(AXID id) const { return m_idsInUse.contains(id); }
 #endif
 
@@ -85,7 +85,8 @@ class AXObjectCache {
 #endif
 };
 
-#if !PLATFORM(MAC)
+#if !HAVE(ACCESSIBILITY)
+inline void AXObjectCache::handleFocusedUIElementChanged() {}
 inline void AXObjectCache::detachWrapper(AccessibilityObject*) {}
 inline void AXObjectCache::attachWrapper(AccessibilityObject*) {}
 inline void AXObjectCache::postNotification(RenderObject*, const String&) {}
