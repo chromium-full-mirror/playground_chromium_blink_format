@@ -72,7 +72,6 @@ static bool dumpPixels;
 static bool dumpAllPixels;
 static bool printSeparators;
 static bool leakChecking = false;
-static bool timedOut = false;
 static bool threaded = false;
 static RetainPtr<CFStringRef> persistentUserStyleSheetLocation;
 
@@ -101,9 +100,6 @@ HWND webViewWindow;
 LayoutTestController* layoutTestController = 0;
 CFRunLoopTimerRef waitToDumpWatchdog = 0;
 
-static const unsigned timeoutValue = 60000;
-static const unsigned timeoutId = 10;
-
 const unsigned maxViewWidth = 800;
 const unsigned maxViewHeight = 600;
 
@@ -123,12 +119,6 @@ static LRESULT CALLBACK DumpRenderTreeWndProc(HWND hWnd,
                                               WPARAM wParam,
                                               LPARAM lParam) {
   switch (msg) {
-    case WM_TIMER:
-      // The test ran long enough to time out
-      timedOut = true;
-      PostQuitMessage(0);
-      return 0;
-      break;
     case WM_DESTROY:
       for (unsigned i = openWindows().size() - 1; i >= 0; --i) {
         if (openWindows()[i] == hWnd) {
@@ -712,7 +702,6 @@ static void runTest(const char* pathOrURL) {
   ::layoutTestController = new LayoutTestController(false, false);
   done = false;
   topLoadingFrame = 0;
-  timedOut = false;
 
   if (shouldLogFrameLoadDelegates(pathOrURL))
     layoutTestController->setDumpFrameLoadCallbacks(true);
@@ -738,9 +727,6 @@ static void runTest(const char* pathOrURL) {
   HWND hostWindow;
   webView->hostWindow(reinterpret_cast<OLE_HANDLE*>(&hostWindow));
 
-  // Set the test timeout timer
-  SetTimer(hostWindow, timeoutId, timeoutValue, 0);
-
   COMPtr<IWebMutableURLRequest> request;
   HRESULT hr = CoCreateInstance(CLSID_WebMutableURLRequest, 0, CLSCTX_ALL,
                                 IID_IWebMutableURLRequest, (void**)&request);
@@ -764,15 +750,6 @@ static void runTest(const char* pathOrURL) {
       continue;
     TranslateMessage(&msg);
     DispatchMessage(&msg);
-  }
-  KillTimer(hostWindow, timeoutId);
-
-  if (timedOut) {
-    fprintf(stderr, "ERROR: Timed out running %s\n", pathOrURL);
-    printf("ERROR: Timed out loading page\n");
-
-    if (printSeparators)
-      puts("#EOF");
   }
 
   frame->stopLoading();
