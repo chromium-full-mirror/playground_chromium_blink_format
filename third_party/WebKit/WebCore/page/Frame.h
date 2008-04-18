@@ -144,7 +144,7 @@ class Frame : public RefCounted<Frame> {
   void setDocument(PassRefPtr<Document>);
 
   void clearTimers();
-  static void clearTimers(FrameView*);
+  static void clearTimers(FrameView*, Document*);
 
   // Convenience, to avoid repeating the code to dig down to get this.
   UChar backslashAsCurrencySymbol() const;

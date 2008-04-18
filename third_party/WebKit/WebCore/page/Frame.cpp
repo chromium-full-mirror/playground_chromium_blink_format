@@ -1450,11 +1450,10 @@ void Frame::sendScrollEvent() {
   doc->dispatchHTMLEvent(scrollEvent, true, false);
 }
 
-void Frame::clearTimers(FrameView* view) {
+void Frame::clearTimers(FrameView* view, Document* document) {
   if (view) {
     view->unscheduleRelayout();
     if (view->frame()) {
-      Document* document = view->frame()->document();
       if (document && document->renderer() && document->renderer()->hasLayer())
         document->renderer()->layer()->suspendMarquees();
       view->frame()->animationController()->suspendAnimations();
@@ -1463,7 +1462,7 @@ void Frame::clearTimers(FrameView* view) {
 }
 
 void Frame::clearTimers() {
-  clearTimers(d->m_view.get());
+  clearTimers(d->m_view.get(), document());
 }
 
 RenderStyle* Frame::styleForSelectionStart(Node*& nodeToRemove) const {
