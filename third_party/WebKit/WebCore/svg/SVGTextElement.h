@@ -44,6 +44,7 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual AffineTransform getCTM() const;
   virtual AffineTransform getScreenCTM() const;
   virtual AffineTransform animatedLocalTransform() const;
+  virtual AffineTransform* supplementalTransform();
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool childShouldCreateRenderer(Node*) const;
@@ -54,12 +55,14 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  mutable AffineTransform m_localMatrix;
   ANIMATED_PROPERTY_DECLARATIONS(SVGTextElement,
                                  SVGTransformList*,
                                  RefPtr<SVGTransformList>,
                                  Transform,
                                  transform)
+
+  // Used by <animateMotion>
+  OwnPtr<AffineTransform> m_supplementalTransform;
 };
 
 }  // namespace WebCore

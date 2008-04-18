@@ -278,6 +278,8 @@ class SVGElement : public StyledElement {
 
   void sendSVGLoadEventIfPossible(bool sendParentLoadEvents = false);
 
+  virtual AffineTransform* supplementalTransform() { return 0; }
+
   // Forwarded properties (declared/defined anywhere else in the inheritance
   // structure)
 
