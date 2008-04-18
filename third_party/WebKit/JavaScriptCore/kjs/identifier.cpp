@@ -58,8 +58,37 @@ struct DefaultHash<KJS::UString::Rep*> {
 
 namespace KJS {
 
-typedef HashSet<UString::Rep*> IdentifierTable;
-typedef HashMap<const char*, UString::Rep*, PtrHash<const char*>>
+class IdentifierTable {
+ public:
+  ~IdentifierTable() {
+    HashSet<UString::Rep*>::iterator end = m_table.end();
+    for (HashSet<UString::Rep*>::iterator iter = m_table.begin(); iter != end;
+         ++iter)
+      (*iter)->identifierTable = 0;
+  }
+
+  std::pair<HashSet<UString::Rep*>::iterator, bool> add(UString::Rep* value) {
+    std::pair<HashSet<UString::Rep*>::iterator, bool> result =
+        m_table.add(value);
+    (*result.first)->identifierTable = this;
+    return result;
+  }
+
+  template <typename U, typename V>
+  std::pair<HashSet<UString::Rep*>::iterator, bool> add(U value) {
+    std::pair<HashSet<UString::Rep*>::iterator, bool> result =
+        m_table.add<U, V>(value);
+    (*result.first)->identifierTable = this;
+    return result;
+  }
+
+  void remove(UString::Rep* r) { m_table.remove(r); }
+
+ private:
+  HashSet<UString::Rep*> m_table;
+};
+
+typedef HashMap<const char*, RefPtr<UString::Rep>, PtrHash<const char*>>
     LiteralIdentifierTable;
 
 static inline IdentifierTable& identifierTable() {
@@ -134,7 +163,6 @@ struct CStringTranslator {
 
     UString::Rep* r =
         UString::Rep::create(d, static_cast<int>(length)).releaseRef();
-    r->isIdentifier = true;
     r->rc = 0;
     r->_hash = hash;
 
@@ -162,7 +190,6 @@ PassRefPtr<UString::Rep> Identifier::add(const char* c) {
   UString::Rep* addedString =
       *identifierTable().add<const char*, CStringTranslator>(c).first;
   literalTableLocalRef.add(c, addedString);
-  addedString->ref();
 
   return addedString;
 }
@@ -189,7 +216,6 @@ struct UCharBufferTranslator {
       d[i] = buf.s[i];
 
     UString::Rep* r = UString::Rep::create(d, buf.length).releaseRef();
-    r->isIdentifier = true;
     r->rc = 0;
     r->_hash = hash;
 
@@ -208,21 +234,18 @@ PassRefPtr<UString::Rep> Identifier::add(const UChar* s, int length) {
 }
 
 PassRefPtr<UString::Rep> Identifier::addSlowCase(UString::Rep* r) {
-  ASSERT(!r->isIdentifier);
+  ASSERT(!r->identifierTable);
 
   if (r->len == 0) {
     UString::Rep::empty.hash();
     return &UString::Rep::empty;
   }
 
-  UString::Rep* result = *identifierTable().add(r).first;
-  if (result == r)
-    r->isIdentifier = true;
-  return result;
+  return *identifierTable().add(r).first;
 }
 
 void Identifier::remove(UString::Rep* r) {
-  identifierTable().remove(r);
+  r->identifierTable->remove(r);
 }
 
 }  // namespace KJS
