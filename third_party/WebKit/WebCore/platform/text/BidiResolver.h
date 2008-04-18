@@ -154,6 +154,7 @@ class BidiResolver : public Noncopyable {
   unsigned runCount() const { return m_runCount; }
 
   void addRun(Run*);
+  void prependRun(Run*);
   void deleteRuns();
 
  protected:
@@ -184,6 +185,18 @@ inline void BidiResolver<Iterator, Run>::addRun(Run* run) {
   else
     m_lastRun->m_next = run;
   m_lastRun = run;
+  m_runCount++;
+}
+
+template <class Iterator, class Run>
+inline void BidiResolver<Iterator, Run>::prependRun(Run* run) {
+  ASSERT(!run->m_next);
+
+  if (!m_lastRun)
+    m_lastRun = run;
+  else
+    run->m_next = m_firstRun;
+  m_firstRun = run;
   m_runCount++;
 }
 

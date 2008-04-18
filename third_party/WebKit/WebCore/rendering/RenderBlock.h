@@ -193,7 +193,7 @@ class RenderBlock : public RenderFlow {
   InlineFlowBox* createLineBoxes(RenderObject*);
   void computeHorizontalPositionsForLine(RootInlineBox*,
                                          BidiRun* firstRun,
-                                         BidiRun* logicallyLastRun,
+                                         BidiRun* trailingSpaceRun,
                                          bool reachedEnd);
   void computeVerticalPositionsForLine(RootInlineBox*, BidiRun*);
   void checkLinesForOverflow();
