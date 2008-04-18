@@ -146,6 +146,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     WebActionCount
   };
 
+  enum FindFlag { FindBackward, FindCaseSensitively, FindWrapsAroundDocument };
+  Q_DECLARE_FLAGS(FindFlags, FindFlag);
+
   explicit QWebPage(QObject* parent = 0);
   ~QWebPage();
 
@@ -195,6 +198,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   virtual bool focusNextPrevChild(bool next);
 
   QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
+
+  bool find(const QString& subString, FindFlags options = 0);
 
  Q_SIGNALS:
   void loadProgressChanged(int progress);
@@ -267,5 +272,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   friend class WebCore::ResourceHandle;
   QWebPagePrivate* d;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QWebPage::FindFlags)
 
 #endif
