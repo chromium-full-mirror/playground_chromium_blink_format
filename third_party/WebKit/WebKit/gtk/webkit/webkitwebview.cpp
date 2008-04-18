@@ -371,8 +371,6 @@ static gboolean webkit_web_view_button_press_event(GtkWidget* widget,
                                                    GdkEventButton* event) {
   WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
 
-  Frame* frame = core(webView)->mainFrame();
-
   // FIXME: need to keep track of subframe focus for key events
   gtk_widget_grab_focus(widget);
 
@@ -380,6 +378,7 @@ static gboolean webkit_web_view_button_press_event(GtkWidget* widget,
     return webkit_web_view_forward_context_menu_event(
         webView, PlatformMouseEvent(event));
 
+  Frame* frame = core(webView)->mainFrame();
   if (!frame->view())
     return FALSE;
 
@@ -391,6 +390,7 @@ static gboolean webkit_web_view_button_release_event(GtkWidget* widget,
                                                      GdkEventButton* event) {
   WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
   WebKitWebViewPrivate* priv = webView->priv;
+
   Frame* focusedFrame = core(webView)->focusController()->focusedFrame();
 
   if (focusedFrame && focusedFrame->editor()->canEdit()) {
@@ -402,10 +402,11 @@ static gboolean webkit_web_view_button_release_event(GtkWidget* widget,
 #endif
   }
 
-  if (!focusedFrame->view())
+  Frame* mainFrame = core(webView)->mainFrame();
+  if (!mainFrame->view())
     return FALSE;
 
-  return focusedFrame->eventHandler()->handleMouseReleaseEvent(
+  return mainFrame->eventHandler()->handleMouseReleaseEvent(
       PlatformMouseEvent(event));
 }
 
