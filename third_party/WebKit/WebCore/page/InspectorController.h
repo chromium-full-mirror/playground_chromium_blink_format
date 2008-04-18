@@ -195,6 +195,9 @@ class InspectorController {
 
   bool handleException(JSValueRef exception, unsigned lineNumber) const;
 
+  void showWindow();
+  void closeWindow();
+
   Page* m_inspectedPage;
   InspectorClient* m_client;
   Page* m_page;

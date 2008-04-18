@@ -1140,7 +1140,7 @@ void InspectorController::scriptObjectReady() {
   JSValueProtect(m_scriptContext, m_scriptObject);
 
   // Make sure our window is visible now that the page loaded
-  m_client->showWindow();
+  showWindow();
 }
 
 void InspectorController::show() {
@@ -1153,12 +1153,11 @@ void InspectorController::show() {
       return;
     m_page->setParentInspectorController(this);
 
-    // m_client->showWindow() will be called after the page loads in
-    // scriptObjectReady()
+    // showWindow() will be called after the page loads in scriptObjectReady()
     return;
   }
 
-  m_client->showWindow();
+  showWindow();
 }
 
 void InspectorController::showConsole() {
@@ -1193,7 +1192,7 @@ void InspectorController::close() {
   if (!enabled())
     return;
 
-  m_client->closeWindow();
+  closeWindow();
   if (m_page)
     m_page->setParentInspectorController(0);
 
@@ -1203,6 +1202,16 @@ void InspectorController::close() {
   m_page = 0;
   m_scriptObject = 0;
   m_scriptContext = 0;
+}
+
+void InspectorController::showWindow() {
+  ASSERT(enabled());
+
+  m_client->showWindow();
+}
+
+void InspectorController::closeWindow() {
+  m_client->closeWindow();
 }
 
 static void addHeaders(JSContextRef context,
