@@ -591,9 +591,9 @@ void Frame::selectionLayoutChanged() {
     }
   }
 
-  if (!renderer())
+  RenderView* canvas = contentRenderer();
+  if (!canvas)
     return;
-  RenderView* canvas = static_cast<RenderView*>(renderer());
 
   Selection selection = selectionController()->selection();
 
@@ -1151,16 +1151,20 @@ void Frame::clearScriptObjects() {
   clearPlatformScriptObjects();
 }
 
-RenderObject* Frame::renderer() const {
+RenderView* Frame::contentRenderer() const {
   Document* doc = document();
-  return doc ? doc->renderer() : 0;
+  if (!doc)
+    return 0;
+  RenderObject* object = doc->renderer();
+  ASSERT(object->isRenderView());
+  return static_cast<RenderView*>(object);
 }
 
 HTMLFrameOwnerElement* Frame::ownerElement() const {
   return d->m_ownerElement;
 }
 
-RenderPart* Frame::ownerRenderer() {
+RenderPart* Frame::ownerRenderer() const {
   HTMLFrameOwnerElement* ownerElement = d->m_ownerElement;
   if (!ownerElement)
     return 0;
@@ -1169,7 +1173,7 @@ RenderPart* Frame::ownerRenderer() {
 
 // returns FloatRect because going through IntRect would truncate any floats
 FloatRect Frame::selectionRect(bool clipToVisibleContent) const {
-  RenderView* root = static_cast<RenderView*>(renderer());
+  RenderView* root = contentRenderer();
   if (!root)
     return IntRect();
 
@@ -1181,7 +1185,7 @@ FloatRect Frame::selectionRect(bool clipToVisibleContent) const {
 
 void Frame::selectionTextRects(Vector<FloatRect>& rects,
                                bool clipToVisibleContent) const {
-  RenderView* root = static_cast<RenderView*>(renderer());
+  RenderView* root = contentRenderer();
   if (!root)
     return;
 
@@ -1318,7 +1322,7 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
   if (isTopLevelPainter)
     s_currentPaintTimeStamp = currentTime();
 
-  if (renderer()) {
+  if (contentRenderer()) {
     ASSERT(d->m_view && !d->m_view->needsLayout());
     ASSERT(!d->m_isPainting);
 
@@ -1328,15 +1332,16 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     RenderObject* eltRenderer =
         d->m_elementToDraw ? d->m_elementToDraw->renderer() : 0;
     if (d->m_paintRestriction == PaintRestrictionNone)
-      renderer()->document()->invalidateRenderedRectsForMarkersInRect(rect);
-    renderer()->layer()->paint(p, rect, d->m_paintRestriction, eltRenderer);
+      document()->invalidateRenderedRectsForMarkersInRect(rect);
+    contentRenderer()->layer()->paint(p, rect, d->m_paintRestriction,
+                                      eltRenderer);
 
     d->m_isPainting = false;
 
     // Regions may have changed as a result of the visibility/z-index of element
     // changing.
-    if (renderer()->document()->dashboardRegionsDirty())
-      renderer()->view()->frameView()->updateDashboardRegions();
+    if (document()->dashboardRegionsDirty())
+      view()->updateDashboardRegions();
   } else
     LOG_ERROR("called Frame::paint with nil renderer");
 
@@ -1356,7 +1361,7 @@ void Frame::adjustPageHeight(float* newBottom,
                              float oldTop,
                              float oldBottom,
                              float bottomLimit) {
-  RenderView* root = static_cast<RenderView*>(document()->renderer());
+  RenderView* root = contentRenderer();
   if (root) {
     // Use a context with painting disabled.
     GraphicsContext context((PlatformGraphicsContext*)0);
@@ -1656,7 +1661,7 @@ unsigned Frame::markAllMatchesForText(const String& target,
   // rect for
   // each text match.
   Document* doc = document();
-  if (doc && d->m_view && renderer()) {
+  if (doc && d->m_view && contentRenderer()) {
     doc->updateLayout();  // Ensure layout is up to date.
     IntRect visibleRect(enclosingIntRect(d->m_view->visibleContentRect()));
     GraphicsContext context((PlatformGraphicsContext*)0);
@@ -1884,7 +1889,7 @@ Document* Frame::documentAtPoint(const IntPoint& point) {
   IntPoint pt = view()->windowToContents(point);
   HitTestResult result = HitTestResult(pt);
 
-  if (renderer())
+  if (contentRenderer())
     result = eventHandler()->hitTestResultAtPoint(pt, false);
   return result.innerNode() ? result.innerNode()->document() : 0;
 }
