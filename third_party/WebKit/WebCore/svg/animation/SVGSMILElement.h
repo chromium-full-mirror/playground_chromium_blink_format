@@ -174,7 +174,6 @@ class SVGSMILElement : public SVGElement {
 
   RefPtr<SMILTimeContainer> m_timeContainer;
 
-  mutable RefPtr<SVGElement> m_targetElement;
   mutable SMILTime m_cachedDur;
   mutable SMILTime m_cachedRepeatDur;
   mutable SMILTime m_cachedRepeatCount;
