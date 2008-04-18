@@ -5184,7 +5184,7 @@ void CSSStyleSelector::mapTransitionTimingFunction(Transition* transition,
         transition->setTransitionTimingFunction(
             TimingFunction(LinearTimingFunction));
         break;
-      case CSSValueAuto:
+      case CSSValueEase:
         transition->setTransitionTimingFunction(TimingFunction());
         break;
       case CSSValueEaseIn:
