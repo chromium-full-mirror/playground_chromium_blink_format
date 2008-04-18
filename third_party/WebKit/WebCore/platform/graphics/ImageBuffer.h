@@ -85,7 +85,7 @@ class ImageBuffer : Noncopyable {
   }
 #endif
 
-  void clearImage() { m_image.release(); }
+  void clearImage() { m_image.clear(); }
 
   PassRefPtr<ImageData> getImageData(const IntRect& rect) const;
   void putImageData(ImageData* source,
