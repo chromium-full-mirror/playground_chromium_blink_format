@@ -54,7 +54,9 @@ class PageGroup : Noncopyable {
   static void setShouldTrackVisitedLinks(bool);
   static void removeAllVisitedLinks();
 
+#if ENABLE(DOM_STORAGE)
   LocalStorage* localStorage();
+#endif
 
  private:
   void addVisitedLink(unsigned stringHash);
@@ -62,7 +64,10 @@ class PageGroup : Noncopyable {
   HashSet<Page*> m_pages;
   HashSet<unsigned, AlreadyHashed> m_visitedLinkHashes;
   bool m_visitedLinksPopulated;
+
+#if ENABLE(DOM_STORAGE)
   RefPtr<LocalStorage> m_localStorage;
+#endif
 };
 
 }  // namespace WebCore
