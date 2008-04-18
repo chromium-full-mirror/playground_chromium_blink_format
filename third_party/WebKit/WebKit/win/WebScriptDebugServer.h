@@ -84,16 +84,16 @@ class WebScriptDebugServer : public IWebScriptDebugServer,
 
   // JavaScriptDebugListener
   virtual void didParseSource(KJS::ExecState*,
-                              const WebCore::String& source,
+                              const KJS::UString& source,
                               int startingLineNumber,
-                              const WebCore::String& sourceURL,
+                              const KJS::UString& sourceURL,
                               int sourceID);
   virtual void failedToParseSource(KJS::ExecState*,
-                                   const WebCore::String& source,
+                                   const KJS::UString& source,
                                    int startingLineNumber,
-                                   const WebCore::String& sourceURL,
+                                   const KJS::UString& sourceURL,
                                    int errorLine,
-                                   const WebCore::String& errorMessage);
+                                   const KJS::UString& errorMessage);
   virtual void didEnterCallFrame(KJS::ExecState*, int sourceID, int lineNumber);
   virtual void willExecuteStatement(KJS::ExecState*,
                                     int sourceID,

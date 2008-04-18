@@ -269,9 +269,9 @@ void WebScriptDebugServer::didLoadMainResourceForDataSource(
 }
 
 void WebScriptDebugServer::didParseSource(ExecState* exec,
-                                          const String& source,
+                                          const UString& source,
                                           int startingLineNumber,
-                                          const String& sourceURL,
+                                          const UString& sourceURL,
                                           int sourceID) {
   BString bSource = source;
   BString bSourceURL = sourceURL;
@@ -284,11 +284,11 @@ void WebScriptDebugServer::didParseSource(ExecState* exec,
 }
 
 void WebScriptDebugServer::failedToParseSource(ExecState* exec,
-                                               const String& source,
+                                               const UString& source,
                                                int startingLineNumber,
-                                               const String& sourceURL,
+                                               const UString& sourceURL,
                                                int errorLine,
-                                               const String& errorMessage) {
+                                               const UString& errorMessage) {
   BString bSource = source;
   BString bSourceURL = sourceURL;
 

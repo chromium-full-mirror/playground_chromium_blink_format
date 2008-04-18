@@ -111,9 +111,9 @@ void JavaScriptDebugServer::pageCreated(Page* page) {
 
 static void dispatchDidParseSource(const ListenerSet& listeners,
                                    ExecState* exec,
-                                   const String& source,
+                                   const UString& source,
                                    int startingLineNumber,
-                                   const String& sourceURL,
+                                   const UString& sourceURL,
                                    int sourceID) {
   Vector<JavaScriptDebugListener*> copy;
   copyToVector(listeners, copy);
@@ -124,11 +124,11 @@ static void dispatchDidParseSource(const ListenerSet& listeners,
 
 static void dispatchFailedToParseSource(const ListenerSet& listeners,
                                         ExecState* exec,
-                                        const String& source,
+                                        const UString& source,
                                         int startingLineNumber,
-                                        const String& sourceURL,
+                                        const UString& sourceURL,
                                         int errorLine,
-                                        const String& errorMessage) {
+                                        const UString& errorMessage) {
   Vector<JavaScriptDebugListener*> copy;
   copyToVector(listeners, copy);
   for (size_t i = 0; i < copy.size(); ++i)

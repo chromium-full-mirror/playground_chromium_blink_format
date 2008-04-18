@@ -2304,17 +2304,18 @@ bool InspectorController::handleException(JSValueRef exception,
 #pragma mark JavaScriptDebugListener functions
 
 void InspectorController::didParseSource(ExecState*,
-                                         const String& /*source*/,
+                                         const UString& /*source*/,
                                          int /*startingLineNumber*/,
-                                         const String& /*sourceURL*/,
+                                         const UString& /*sourceURL*/,
                                          int /*sourceID*/) {}
 
 void InspectorController::failedToParseSource(ExecState*,
-                                              const String& /*source*/,
+                                              const UString& /*source*/,
                                               int /*startingLineNumber*/,
-                                              const String& /*sourceURL*/,
+                                              const UString& /*sourceURL*/,
                                               int /*errorLine*/,
-                                              const String& /*errorMessage*/) {}
+                                              const UString& /*errorMessage*/) {
+}
 
 void InspectorController::didEnterCallFrame(ExecState*,
                                             int /*sourceID*/,

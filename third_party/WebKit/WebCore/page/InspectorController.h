@@ -204,16 +204,16 @@ class InspectorController : JavaScriptDebugListener {
   void closeWindow();
 
   virtual void didParseSource(KJS::ExecState*,
-                              const String& source,
+                              const KJS::UString& source,
                               int startingLineNumber,
-                              const String& sourceURL,
+                              const KJS::UString& sourceURL,
                               int sourceID);
   virtual void failedToParseSource(KJS::ExecState*,
-                                   const String& source,
+                                   const KJS::UString& source,
                                    int startingLineNumber,
-                                   const String& sourceURL,
+                                   const KJS::UString& sourceURL,
                                    int errorLine,
-                                   const String& errorMessage);
+                                   const KJS::UString& errorMessage);
   virtual void didEnterCallFrame(KJS::ExecState*, int sourceID, int lineNumber);
   virtual void willExecuteStatement(KJS::ExecState*,
                                     int sourceID,
