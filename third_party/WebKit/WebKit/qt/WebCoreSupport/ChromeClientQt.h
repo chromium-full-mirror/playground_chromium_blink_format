@@ -121,6 +121,10 @@ class ChromeClientQt : public ChromeClient {
   WebCore::KURL lastHoverURL;
   WebCore::String lastHoverTitle;
   WebCore::String lastHoverContent;
+
+  bool toolBarsVisible;
+  bool statusBarVisible;
+  bool menuBarVisible;
 };
 }
 

@@ -63,7 +63,7 @@ Q_GLOBAL_STATIC(QList<QWebSettingsPrivate*>, allSettings);
 
 void QWebSettingsPrivate::apply() {
   if (settings) {
-    QWebSettingsPrivate* global = QWebSettings::defaultSettings()->d;
+    QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
 
     QString family = fontFamilies.value(
         QWebSettings::StandardFont,
@@ -167,12 +167,12 @@ void QWebSettingsPrivate::apply() {
 }
 
 /*!
-    Returns the global default settings object.
+    Returns the global settings object.
 
     Any setting changed on the default object is automatically applied to all
     QWebPage instances where the particular setting is not overriden already.
 */
-QWebSettings* QWebSettings::defaultSettings() {
+QWebSettings* QWebSettings::globalSettings() {
   static QWebSettings* global = 0;
   if (!global)
     global = new QWebSettings;
@@ -244,7 +244,7 @@ void QWebSettings::setFontSize(FontSize type, int size) {
 int QWebSettings::fontSize(FontSize type) const {
   int defaultValue = 0;
   if (d->settings) {
-    QWebSettingsPrivate* global = QWebSettings::defaultSettings()->d;
+    QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
     defaultValue = global->fontSizes.value(type);
   }
   return d->fontSizes.value(type, defaultValue);
@@ -270,7 +270,7 @@ void QWebSettings::resetFontSize(FontSize type) {
 
     \sa userStyleSheetLocation
 */
-void QWebSettings::setUserStyleSheetLocation(const QUrl& location) {
+void QWebSettings::setUserStyleSheetUrl(const QUrl& location) {
   d->userStyleSheetLocation = location;
   d->apply();
 }
@@ -280,40 +280,46 @@ void QWebSettings::setUserStyleSheetLocation(const QUrl& location) {
 
     \sa setUserStyleSheetLocation
 */
-QUrl QWebSettings::userStyleSheetLocation() const {
+QUrl QWebSettings::userStyleSheetUrl() const {
   return d->userStyleSheetLocation;
 }
 
 /*!
-    Enables or disables the icon database. The icon database is used to store
+    Sets the \a path of the icon database. The icon database is used to store
    favicons
     associated with web sites.
 
-    If \a enabled is true then \a location must be specified and point to an
-   existing directory
-    where the icons are stored.
+    The \a path must point to an existing directory where the icons are stored.
+
+    If \a path is empty then the icon database is disabled.
 */
-void QWebSettings::setIconDatabaseEnabled(bool enabled,
-                                          const QString& location) {
+void QWebSettings::setIconDatabasePath(const QString& path) {
   WebCore::iconDatabase()->delayDatabaseCleanup();
-  WebCore::iconDatabase()->setEnabled(enabled);
-  if (enabled) {
-    QFileInfo info(location);
+
+  if (!path.isEmpty()) {
+    WebCore::iconDatabase()->setEnabled(true);
+    QFileInfo info(path);
     if (info.isDir() && info.isWritable())
-      WebCore::iconDatabase()->open(location);
+      WebCore::iconDatabase()->open(path);
   } else {
+    WebCore::iconDatabase()->setEnabled(false);
     WebCore::iconDatabase()->close();
   }
 }
 
 /*!
-    Returns whether the icon database is enabled or not.
+    Returns whether the path of the icon database or an empty string if the icon
+   database is disabled.
 
-    \sa setIconDatabaseEnabled
+    \sa setIconDatabasePath
 */
-bool QWebSettings::iconDatabaseEnabled() {
-  return WebCore::iconDatabase()->isEnabled() &&
-         WebCore::iconDatabase()->isOpen();
+QString QWebSettings::iconDatabasePath() {
+  if (WebCore::iconDatabase()->isEnabled() &&
+      WebCore::iconDatabase()->isOpen()) {
+    return WebCore::iconDatabase()->databasePath();
+  } else {
+    return QString();
+  }
 }
 
 /*!
@@ -323,7 +329,7 @@ bool QWebSettings::iconDatabaseEnabled() {
     \sa iconDatabaseEnabled()
 */
 void QWebSettings::clearIconDatabase() {
-  if (iconDatabaseEnabled())
+  if (WebCore::iconDatabase()->isEnabled() && WebCore::iconDatabase()->isOpen())
     WebCore::iconDatabase()->removeAllIcons();
 }
 
@@ -331,7 +337,7 @@ void QWebSettings::clearIconDatabase() {
     Returns the site icon for \a url
     If there is no icon for the url a null QIcon is returned.
 */
-QPixmap QWebSettings::iconForUrl(const QUrl& url) {
+QIcon QWebSettings::iconForUrl(const QUrl& url) {
   WebCore::Image* image = WebCore::iconDatabase()->iconForPageURL(
       WebCore::KURL(url).string(), WebCore::IntSize(16, 16));
   if (!image) {
@@ -365,10 +371,17 @@ QPixmap QWebSettings::webGraphic(WebGraphic type) {
 }
 
 /*!
- @internal
+    Sets the maximum number of pages to hold in the memory cache to \a pages.
 */
-void QWebSettings::setPageCacheCapacity(int numberOfPages) {
-  WebCore::pageCache()->setCapacity(qMax(0, numberOfPages));
+void QWebSettings::setMaximumPagesInCache(int pages) {
+  WebCore::pageCache()->setCapacity(qMax(0, pages));
+}
+
+/*
+    Returns the maximum number of web pages that are kept in the memory cache.
+*/
+int QWebSettings::maximumPagesInCache() {
+  return WebCore::pageCache()->capacity();
 }
 
 /*!
@@ -383,35 +396,36 @@ void QWebSettings::setObjectCacheCapacities(int cacheMinDeadCapacity,
 }
 
 /*!
-    Sets the default font family to \a family for the specified \a type of font.
+    Sets the default font family to \a family for the specified \a which of
+   font.
 */
-void QWebSettings::setFontFamily(FontType type, const QString& family) {
-  d->fontFamilies.insert(type, family);
+void QWebSettings::setFontFamily(FontFamily which, const QString& family) {
+  d->fontFamilies.insert(which, family);
   d->apply();
 }
 
 /*!
-    Returns the default font family to \a family for the specified \a type of
+    Returns the default font family to \a family for the specified \a which of
    font.
 */
-QString QWebSettings::fontFamily(FontType type) const {
+QString QWebSettings::fontFamily(FontFamily which) const {
   QString defaultValue;
   if (d->settings) {
-    QWebSettingsPrivate* global = QWebSettings::defaultSettings()->d;
-    defaultValue = global->fontFamilies.value(type);
+    QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
+    defaultValue = global->fontFamilies.value(which);
   }
-  return d->fontFamilies.value(type, defaultValue);
+  return d->fontFamilies.value(which, defaultValue);
 }
 
 /*!
-    Resets the font family for specified \a type of fonts in a web page to the
+    Resets the font family for specified \a which of fonts in a web page to the
    default.
 
     This function has not effect on the default QWebSettings instance.
 */
-void QWebSettings::resetFontFamily(FontType type) {
+void QWebSettings::resetFontFamily(FontFamily which) {
   if (d->settings) {
-    d->fontFamilies.remove(type);
+    d->fontFamilies.remove(which);
     d->apply();
   }
 }
@@ -431,19 +445,19 @@ void QWebSettings::setAttribute(WebAttribute attr, bool on) {
 bool QWebSettings::testAttribute(WebAttribute attr) const {
   bool defaultValue = false;
   if (d->settings) {
-    QWebSettingsPrivate* global = QWebSettings::defaultSettings()->d;
+    QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
     defaultValue = global->attributes.value(attr);
   }
   return d->attributes.value(attr, defaultValue);
 }
 
 /*!
-    Clears the setting of \a attr. The global default for \a attr will be used
+    Resets the setting of \a attr. The global default for \a attr will be used
    instead.
 
     This function has not effect on the default QWebSettings instance.
 */
-void QWebSettings::clearAttribute(WebAttribute attr) {
+void QWebSettings::resetAttribute(WebAttribute attr) {
   if (d->settings) {
     d->attributes.remove(attr);
     d->apply();

@@ -60,10 +60,10 @@ static QPixmap loadResourcePixmap(const char* name) {
   else if (resource == "nullPlugin")
     pixmap = QWebSettings::webGraphic(QWebSettings::MissingPluginGraphic);
   else if (resource == "urlIcon")
-    pixmap = QWebSettings::webGraphic(QWebSettings::DefaultFaviconGraphic);
+    pixmap = QWebSettings::webGraphic(QWebSettings::DefaultFrameIconGraphic);
   else if (resource == "textAreaResizeCorner")
     pixmap =
-        QWebSettings::webGraphic(QWebSettings::TextAreaResizeCornerGraphic);
+        QWebSettings::webGraphic(QWebSettings::TextAreaSizeGripCornerGraphic);
 
   return pixmap;
 }

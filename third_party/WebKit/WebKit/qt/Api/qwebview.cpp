@@ -107,14 +107,16 @@ void QWebView::setPage(QWebPage* page) {
     connect(mainFrame, SIGNAL(loadFinished()), this, SIGNAL(loadFinished()));
     connect(mainFrame, SIGNAL(titleChanged(const QString&)), this,
             SIGNAL(titleChanged(const QString&)));
-    connect(mainFrame, SIGNAL(iconLoaded()), this, SIGNAL(iconLoaded()));
+    connect(mainFrame, SIGNAL(iconChanged()), this, SIGNAL(iconChanged()));
     connect(mainFrame, SIGNAL(urlChanged(const QUrl&)), this,
             SIGNAL(urlChanged(const QUrl&)));
 
-    connect(d->page, SIGNAL(loadProgressChanged(int)), this,
-            SIGNAL(loadProgressChanged(int)));
-    connect(d->page, SIGNAL(statusBarTextChanged(const QString&)), this,
-            SIGNAL(statusBarTextChanged(const QString&)));
+    connect(d->page, SIGNAL(loadProgress(int)), this,
+            SIGNAL(loadProgress(int)));
+    connect(d->page, SIGNAL(statusBarMessage(const QString&)), this,
+            SIGNAL(statusBarMessage(const QString&)));
+    connect(d->page, SIGNAL(linkClicked(const QUrl&)), this,
+            SIGNAL(linkClicked(const QUrl&)));
 
     connect(d->page, SIGNAL(microFocusChanged()), this,
             SLOT(updateMicroFocus()));
@@ -168,9 +170,11 @@ void QWebView::setHtml(const QByteArray& html, const QUrl& baseUrl) {
 /*!
     Sets the content of the web view to the specified content \a data. If the \a
    mimeType argument
-    is empty it is assumed that the content is HTML.
+    is empty it is currently assumed that the content is HTML but in future
+   versions we may introduce
+    auto-detection.
 
-    External objects referenced in the HTML document are located relative to \a
+    External objects referenced in the content are located relative to \a
    baseUrl.
 */
 void QWebView::setContent(const QByteArray& data,
@@ -227,10 +231,10 @@ QUrl QWebView::url() const {
     \property QWebView::icon
     \brief the icon associated with the web page currently viewed.
 */
-QPixmap QWebView::icon() const {
+QIcon QWebView::icon() const {
   if (d->page)
     return d->page->mainFrame()->icon();
-  return QPixmap();
+  return QIcon();
 }
 
 /*!
@@ -247,7 +251,7 @@ QString QWebView::selectedText() const {
     Returns a pointer to a QAction that encapsulates the specified web action \a
    action.
 */
-QAction* QWebView::action(QWebPage::WebAction action) const {
+QAction* QWebView::pageAction(QWebPage::WebAction action) const {
   return page()->action(action);
 }
 
@@ -261,7 +265,7 @@ QAction* QWebView::action(QWebPage::WebAction action) const {
     \snippet
    doc/src/snippets/code/src.3rdparty.webkit.WebKit.qt.Api.qwebview.cpp 2
 */
-void QWebView::triggerAction(QWebPage::WebAction action, bool checked) {
+void QWebView::triggerPageAction(QWebPage::WebAction action, bool checked) {
   page()->triggerAction(action, checked);
 }
 
@@ -279,10 +283,13 @@ bool QWebView::isModified() const {
   return false;
 }
 
-Qt::TextInteractionFlags QWebView::textInteractionFlags() const {
-  // ### FIXME (add to page)
-  return Qt::TextInteractionFlags();
+/*
+Qt::TextInteractionFlags QWebView::textInteractionFlags() const
+{
+    // ### FIXME (add to page)
+    return Qt::TextInteractionFlags();
 }
+*/
 
 /*!
     \property QWebView::textInteractionFlags
@@ -291,10 +298,13 @@ Qt::TextInteractionFlags QWebView::textInteractionFlags() const {
     Specifies how the user can interact with the text on the page.
 */
 
-void QWebView::setTextInteractionFlags(Qt::TextInteractionFlags flags) {
-  Q_UNUSED(flags)
-  // ### FIXME (add to page)
+/*
+void QWebView::setTextInteractionFlags(Qt::TextInteractionFlags flags)
+{
+    Q_UNUSED(flags)
+    // ### FIXME (add to page)
 }
+*/
 
 /*!
     \reimp
@@ -304,17 +314,17 @@ QSize QWebView::sizeHint() const {
 }
 
 /*!
-  \property QWebView::textZoomFactor
+  \property QWebView::textSizeMultiplier
 
-  This property defines the zoom factor for all text in percent.
+  This property defines the scaling factor for all text in the frame.
 */
 
-void QWebView::setTextZoomFactor(int percent) {
-  page()->mainFrame()->setTextZoomFactor(percent);
+void QWebView::setTextSizeMultiplier(qreal factor) {
+  page()->mainFrame()->setTextSizeMultiplier(factor);
 }
 
-int QWebView::textZoomFactor() const {
-  return page()->mainFrame()->textZoomFactor();
+qreal QWebView::textSizeMultiplier() const {
+  return page()->mainFrame()->textSizeMultiplier();
 }
 
 /*!
@@ -323,9 +333,9 @@ int QWebView::textZoomFactor() const {
     Returns true of \a subString was found and selects the match visually;
    otherwise returns false;
 */
-bool QWebView::find(const QString& subString, QWebPage::FindFlags options) {
+bool QWebView::findText(const QString& subString, QWebPage::FindFlags options) {
   if (d->page)
-    return d->page->find(subString, options);
+    return d->page->findText(subString, options);
   return false;
 }
 
@@ -352,9 +362,9 @@ void QWebView::stop() {
     \snippet
    doc/src/snippets/code/src.3rdparty.webkit.WebKit.qt.Api.qwebview.cpp 4
 */
-void QWebView::backward() {
+void QWebView::back() {
   if (d->page)
-    d->page->triggerAction(QWebPage::GoBack);
+    d->page->triggerAction(QWebPage::Back);
 }
 
 /*!
@@ -369,7 +379,7 @@ void QWebView::backward() {
 */
 void QWebView::forward() {
   if (d->page)
-    d->page->triggerAction(QWebPage::GoForward);
+    d->page->triggerAction(QWebPage::Forward);
 }
 
 /*!
@@ -410,11 +420,12 @@ void QWebView::paintEvent(QPaintEvent* ev) {
 }
 
 /*!
-    This function is called whenever WebKit wants to create a new window, for
-   example as a result of
+    This function is called whenever WebKit wants to create a new window of the
+   given \a type, for example as a result of
     a JavaScript request to open a document in a new window.
 */
-QWebView* QWebView::createWindow() {
+QWebView* QWebView::createWindow(QWebPage::WebWindowType type) {
+  Q_UNUSED(type)
   return 0;
 }
 
@@ -571,13 +582,13 @@ void QWebView::inputMethodEvent(QInputMethodEvent* e) {
 */
 
 /*!
-    \fn void QWebView::statusBarTextChanged(const QString& text)
+    \fn void QWebView::statusBarMessage(const QString& text)
 
     This signal is emitted when the statusbar \a text is changed by the page.
 */
 
 /*!
-    \fn void QWebView::iconLoaded()
+    \fn void QWebView::iconChanged()
 
     This signal is emitted whenever the icon of the page is loaded or changes.
 */
@@ -601,9 +612,20 @@ void QWebView::inputMethodEvent(QInputMethodEvent* e) {
 */
 
 /*!
-    \fn void QWebView::loadProgressChanged(int progress)
+    \fn void QWebView::loadProgress(int progress)
 
     This signal is emitted when the global progress status changes.
-    The current value is provided by \a progress in percent.
+    The current value is provided by \a progress and scales from 0 to 100,
+    which is the default range of QProgressBar.
     It accumulates changes from all the child frames.
+*/
+
+/*!
+    \fn void QWebView::linkClicked(const QUrl &url)
+
+    This signal is emitted when the user clicks on a link and the page's
+    linkDelegationPolicy property allows the delegation of the clicked link
+    to this signal.
+
+    \sa QWebPage::linkDelegationPolicy()
 */
