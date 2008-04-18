@@ -99,11 +99,6 @@
 #include "SVGViewSpec.h"
 #endif
 
-#if ENABLE(DOM_STORAGE)
-#include "SessionStorage.h"
-#include "StorageArea.h"
-#endif
-
 using KJS::UString;
 using KJS::JSLock;
 using KJS::JSValue;
@@ -351,11 +346,6 @@ Frame* FrameLoader::createWindow(FrameLoader* frameLoaderForFrameLookup,
       oldPage->chrome()->createWindow(m_frame, requestWithReferrer, features);
   if (!page)
     return 0;
-
-#if ENABLE(DOM_STORAGE)
-  if (SessionStorage* oldSessionStorage = oldPage->sessionStorage(false))
-    page->setSessionStorage(oldSessionStorage->copy(page));
-#endif
 
   Frame* frame = page->mainFrame();
   if (request.frameName() != "_blank")
