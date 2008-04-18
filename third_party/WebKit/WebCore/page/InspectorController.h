@@ -29,6 +29,8 @@
 #ifndef InspectorController_h
 #define InspectorController_h
 
+#include "JavaScriptDebugListener.h"
+
 #include "Console.h"
 #include <JavaScriptCore/JSContextRef.h>
 #include <wtf/HashMap.h>
@@ -56,7 +58,7 @@ struct InspectorDatabaseResource;
 struct InspectorResource;
 class ResourceRequest;
 
-class InspectorController {
+class InspectorController : JavaScriptDebugListener {
  public:
   typedef HashMap<long long, RefPtr<InspectorResource>> ResourcesMap;
   typedef HashMap<RefPtr<Frame>, ResourcesMap*> FrameResourcesMap;
@@ -155,6 +157,9 @@ class InspectorController {
 
   void moveWindowBy(float x, float y) const;
 
+  void startDebuggingAndReloadInspectedPage();
+  void stopDebugging();
+
   void drawNodeHighlight(GraphicsContext&) const;
 
  private:
@@ -197,6 +202,28 @@ class InspectorController {
 
   void showWindow();
   void closeWindow();
+
+  virtual void didParseSource(KJS::ExecState*,
+                              const String& source,
+                              int startingLineNumber,
+                              const String& sourceURL,
+                              int sourceID);
+  virtual void failedToParseSource(KJS::ExecState*,
+                                   const String& source,
+                                   int startingLineNumber,
+                                   const String& sourceURL,
+                                   int errorLine,
+                                   const String& errorMessage);
+  virtual void didEnterCallFrame(KJS::ExecState*, int sourceID, int lineNumber);
+  virtual void willExecuteStatement(KJS::ExecState*,
+                                    int sourceID,
+                                    int lineNumber);
+  virtual void willLeaveCallFrame(KJS::ExecState*,
+                                  int sourceID,
+                                  int lineNumber);
+  virtual void exceptionWasRaised(KJS::ExecState*,
+                                  int sourceID,
+                                  int lineNumber);
 
   Page* m_inspectedPage;
   InspectorClient* m_client;
