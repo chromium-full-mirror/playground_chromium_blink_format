@@ -56,6 +56,8 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
                                       unsigned repeat,
                                       SVGSMILElement* resultElement);
   virtual void applyResultsToTarget();
+  virtual float calculateDistance(const String& fromString,
+                                  const String& toString);
 
   SVGTransform parseTransformValue(const String&) const;
 

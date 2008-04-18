@@ -47,6 +47,8 @@ class SVGAnimateElement : public SVGAnimationElement {
                                       unsigned repeat,
                                       SVGSMILElement* resultElement);
   virtual void applyResultsToTarget();
+  virtual float calculateDistance(const String& fromString,
+                                  const String& toString);
 
  private:
   enum PropertyType { NumberProperty, ColorProperty, StringProperty };

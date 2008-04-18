@@ -123,6 +123,13 @@ class SVGAnimationElement : public SVGSMILElement,
                                        String& from,
                                        String& to);
 
+  virtual float calculateDistance(const String& fromString,
+                                  const String& toString) {
+    return -1.f;
+  }
+
+  void calculateKeyTimesForCalcModePaced();
+
  protected:
   bool m_animationValid;
 

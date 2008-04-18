@@ -53,6 +53,8 @@ class SVGAnimateMotionElement : public SVGAnimationElement {
                                       unsigned repeat,
                                       SVGSMILElement* resultElement);
   virtual void applyResultsToTarget();
+  virtual float calculateDistance(const String& fromString,
+                                  const String& toString);
 
  private:
   FloatSize m_animatedTranslation;

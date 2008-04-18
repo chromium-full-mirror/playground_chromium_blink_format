@@ -26,8 +26,10 @@
 #include "SVGAnimateElement.h"
 
 #include "ColorDistance.h"
+#include "FloatConversion.h"
 #include "SVGColor.h"
 #include "SVGParserUtilities.h"
+#include <math.h>
 
 using namespace std;
 
@@ -220,6 +222,30 @@ void SVGAnimateElement::applyResultsToTarget() {
     valueToApply = m_animatedString;
 
   setTargetAttributeAnimatedValue(valueToApply);
+}
+
+float SVGAnimateElement::calculateDistance(const String& fromString,
+                                           const String& toString) {
+  m_propertyType = determinePropertyType(attributeName());
+  if (m_propertyType == NumberProperty) {
+    double from;
+    double to;
+    String unit;
+    if (!parseNumberValueAndUnit(fromString, from, unit))
+      return -1.f;
+    if (!parseNumberValueAndUnit(toString, to, unit))
+      return -1.f;
+    return narrowPrecisionToFloat(fabs(to - from));
+  } else if (m_propertyType == ColorProperty) {
+    Color from = SVGColor::colorFromRGBColorString(fromString);
+    if (!from.isValid())
+      return -1.f;
+    Color to = SVGColor::colorFromRGBColorString(toString);
+    if (!to.isValid())
+      return -1.f;
+    return ColorDistance(from, to).distance();
+  }
+  return -1.f;
 }
 }
 

@@ -25,11 +25,13 @@
 #if ENABLE(SVG) && ENABLE(SVG_ANIMATION)
 #include "SVGAnimateMotionElement.h"
 
+#include "FloatConversion.h"
 #include "RenderObject.h"
 #include "SVGMPathElement.h"
 #include "SVGParserUtilities.h"
 #include "SVGPathElement.h"
 #include "SVGTransformList.h"
+#include <math.h>
 
 namespace WebCore {
 
@@ -198,6 +200,19 @@ void SVGAnimateMotionElement::calculateAnimatedValue(
 }
 
 void SVGAnimateMotionElement::applyResultsToTarget() {}
+
+float SVGAnimateMotionElement::calculateDistance(const String& fromString,
+                                                 const String& toString) {
+  FloatPoint from;
+  FloatPoint to;
+  if (!parsePoint(fromString, from))
+    return -1.f;
+  if (!parsePoint(toString, to))
+    return -1.f;
+  FloatSize diff = to - from;
+  return narrowPrecisionToFloat(
+      sqrt(diff.width() * diff.width() + diff.height() * diff.height()));
+}
 }
 
 #endif  // ENABLE(SVG)
