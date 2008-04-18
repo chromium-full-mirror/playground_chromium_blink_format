@@ -1,5 +1,6 @@
 /*
  Copyright (C) 2007 Eric Seidel <eric@webkit.org>
+ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
  This file is part of the WebKit project
 
@@ -36,8 +37,6 @@ class SVGAnimateMotionElement : public SVGAnimationElement {
 
   virtual bool hasValidTarget() const;
 
-  virtual void applyAnimatedValueToElement(unsigned repeat);
-
   virtual void parseMappedAttribute(MappedAttribute*);
 
   Path animationPath();
@@ -45,13 +44,15 @@ class SVGAnimateMotionElement : public SVGAnimationElement {
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
-  virtual bool updateAnimatedValue(float percent);
+  virtual void resetToBaseValue(const String&);
   virtual bool calculateFromAndToValues(const String& fromString,
                                         const String& toString);
   virtual bool calculateFromAndByValues(const String& fromString,
                                         const String& byString);
-
-  virtual void startedActiveInterval();
+  virtual void calculateAnimatedValue(float percentage,
+                                      unsigned repeat,
+                                      SVGSMILElement* resultElement);
+  virtual void applyResultsToTarget();
 
  private:
   FloatSize m_animatedTranslation;
