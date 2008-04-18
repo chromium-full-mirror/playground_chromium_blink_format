@@ -29,8 +29,8 @@
 #ifndef Console_h
 #define Console_h
 
+#include "PlatformString.h"
 #include <wtf/RefCounted.h>
-
 #include <wtf/PassRefPtr.h>
 
 namespace KJS {
@@ -76,7 +76,7 @@ class Console : public RefCounted<Console> {
   void info(KJS::ExecState*, const KJS::List& arguments);
   void log(KJS::ExecState*, const KJS::List& arguments);
   void warn(KJS::ExecState*, const KJS::List& arguments);
-  void profile(KJS::ExecState*, const KJS::List& arguments) const;
+  void profile(const String& title) const;
   void profileEnd() const;
 
  private:
