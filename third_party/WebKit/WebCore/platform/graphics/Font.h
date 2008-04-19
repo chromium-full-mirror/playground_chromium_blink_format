@@ -108,7 +108,7 @@ class TextRun {
   {
   }
 
-  const UChar operator[](int i) const { return m_characters[i]; }
+  UChar operator[](int i) const { return m_characters[i]; }
   const UChar* data(int i) const { return &m_characters[i]; }
 
   const UChar* characters() const { return m_characters; }

@@ -59,7 +59,7 @@ void ResourceRequestBase::setURL(const KURL& url) {
   m_platformRequestUpdated = false;
 }
 
-const ResourceRequestCachePolicy ResourceRequestBase::cachePolicy() const {
+ResourceRequestCachePolicy ResourceRequestBase::cachePolicy() const {
   updateResourceRequest();
 
   return m_cachePolicy;

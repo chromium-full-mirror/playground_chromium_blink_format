@@ -54,7 +54,7 @@ class ResourceRequestBase {
   const KURL& url() const;
   void setURL(const KURL& url);
 
-  const ResourceRequestCachePolicy cachePolicy() const;
+  ResourceRequestCachePolicy cachePolicy() const;
   void setCachePolicy(ResourceRequestCachePolicy cachePolicy);
 
   double timeoutInterval() const;

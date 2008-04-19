@@ -948,7 +948,7 @@ bool UString::is8Bit() const {
   return true;
 }
 
-const UChar UString::operator[](int pos) const {
+UChar UString::operator[](int pos) const {
   if (pos >= size())
     return '\0';
   return data()[pos];

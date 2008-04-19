@@ -309,7 +309,7 @@ class UString {
   /**
    * Const character at specified position.
    */
-  const UChar operator[](int pos) const;
+  UChar operator[](int pos) const;
 
   /**
    * Attempts an conversion to a number. Apart from floating point numbers,
