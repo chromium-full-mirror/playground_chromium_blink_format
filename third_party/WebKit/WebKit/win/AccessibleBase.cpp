@@ -191,7 +191,7 @@ HRESULT STDMETHODCALLTYPE AccessibleBase::accDoDefaultAction(VARIANT) {
 
 HRESULT AccessibleBase::getAccessibilityObjectForChild(
     VARIANT vChild,
-    Accessibi lityObject*& childObj) const {
+    AccessibilityObject*& childObj) const {
   childObj = 0;
 
   if (!m_object)
