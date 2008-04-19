@@ -303,4 +303,8 @@ void Settings::setWebArchiveDebugModeEnabled(bool enabled) {
   m_webArchiveDebugModeEnabled = enabled;
 }
 
+void Settings::setLocalStorageDatabasePath(const String& path) {
+  m_localStorageDatabasePath = path;
+}
+
 }  // namespace WebCore

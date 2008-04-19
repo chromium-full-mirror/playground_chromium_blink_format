@@ -81,6 +81,8 @@
   @"WebKitAuthorAndUserStylesEnabledPreferenceKey"
 #define WebKitWebArchiveDebugModeEnabledPreferenceKey \
   @"WebKitWebArchiveDebugModeEnabledPreferenceKey"
+#define WebKitLocalStorageDatabasePathPreferenceKey \
+  @"WebKitLocalStorageDatabasePathPreferenceKey"
 
 // These are private both because callers should be using the cover methods and
 // because the
