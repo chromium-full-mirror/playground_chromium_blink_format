@@ -4823,6 +4823,19 @@ bool WebView::onGetObject(WPARAM wParam,
       lResult = procPtr(__uuidof(IAccessible), wParam, accessible.get()));
 }
 
+STDMETHODIMP WebView::AccessibleObjectFromWindow(HWND hwnd,
+                                                 DWORD objectID,
+                                                 REFIID riid,
+                                                 void** ppObject) {
+  ASSERT(accessibilityLib);
+  static LPFNACCESSIBLEOBJECTFROMWINDOW procPtr =
+      reinterpret_cast<LPFNACCESSIBLEOBJECTFROMWINDOW>(
+          ::GetProcAddress(accessibilityLib, "AccessibleObjectFromWindow"));
+  if (!procPtr)
+    return E_FAIL;
+  return procPtr(hwnd, objectID, riid, ppObject);
+}
+
 class EnumTextMatches : public IEnumTextMatches {
   long m_ref;
   UINT m_index;
