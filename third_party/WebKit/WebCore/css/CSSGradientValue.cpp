@@ -64,7 +64,7 @@ String CSSGradientValue::cssText() const {
     else if (m_stops[i].m_stop == 1)
       result += "to(" + m_stops[i].m_color->cssText() + ")";
     else
-      result += "color-stop(" + String::number(m_stops[i].m_stop) +
+      result += "color-stop(" + String::number(m_stops[i].m_stop) + ", " +
                 m_stops[i].m_color->cssText() + ")";
   }
   result += ")";
