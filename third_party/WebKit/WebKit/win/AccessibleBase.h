@@ -119,6 +119,11 @@ class AccessibleBase : public IAccessible,
   AccessibleBase(AccessibilityObject*);
   virtual ~AccessibleBase();
 
+  HRESULT getAccessibilityObjectForChild(VARIANT vChild,
+                                         AccessibilityObject*&) const;
+
+  static AccessibleBase* wrapper(AccessibilityObject*);
+
   int m_refCount;
 
  private:
