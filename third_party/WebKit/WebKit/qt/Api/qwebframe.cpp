@@ -45,7 +45,7 @@
 #include "Element.h"
 #include "Document.h"
 #include "DragData.h"
-#include "RenderObject.h"
+#include "RenderView.h"
 #include "GraphicsContext.h"
 #include "PlatformScrollBar.h"
 #include "PlatformMouseEvent.h"
@@ -198,7 +198,7 @@ QString QWebFrame::renderTreeDump() const {
   if (d->frame->view() && d->frame->view()->layoutPending())
     d->frame->view()->layout();
 
-  return externalRepresentation(d->frame->renderer());
+  return externalRepresentation(d->frame->contentRenderer());
 }
 
 /*!
@@ -524,7 +524,7 @@ int QWebFrame::scrollBarMinimum(Qt::Orientation orientation) const {
   Render the frame into \a painter clipping to \a clip.
 */
 void QWebFrame::render(QPainter* painter, const QRegion& clip) {
-  if (!d->frame->view() || !d->frame->renderer())
+  if (!d->frame->view() || !d->frame->contentRenderer())
     return;
 
   d->frame->view()->layoutIfNeededRecursive();
@@ -540,7 +540,7 @@ void QWebFrame::render(QPainter* painter, const QRegion& clip) {
   Render the frame into \a painter.
 */
 void QWebFrame::render(QPainter* painter) {
-  if (!d->frame->view() || !d->frame->renderer())
+  if (!d->frame->view() || !d->frame->contentRenderer())
     return;
 
   d->frame->view()->layoutIfNeededRecursive();
