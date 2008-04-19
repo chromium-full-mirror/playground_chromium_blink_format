@@ -38,6 +38,7 @@
 #include <WebCore/ResourceHandleClient.h>
 #pragma warning(pop)
 
+#include <oleacc.h>
 #include <WTF/RefPtr.h>
 #include <WTF/HashMap.h>
 #include <WTF/OwnPtr.h>
@@ -341,6 +342,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   WebCore::KURL url() const;
 
   WebView* webView() const;
+
+  COMPtr<IAccessible> accessible() const;
 
  protected:
   void loadHTMLString(BSTR string, BSTR baseURL, BSTR unreachableURL);
