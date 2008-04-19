@@ -164,6 +164,8 @@ SVGAnimationElement::AnimationMode SVGAnimationElement::animationMode() const {
   // http://www.w3.org/TR/2001/REC-smil-animation-20010904/#AnimFuncValues
   if (hasTagName(SVGNames::setTag))
     return ToAnimation;
+  if (!animationPath().isEmpty())
+    return PathAnimation;
   if (hasAttribute(SVGNames::valuesAttr))
     return ValuesAnimation;
   if (!toValue().isEmpty())
@@ -426,7 +428,8 @@ void SVGAnimationElement::startedActiveInterval() {
          (m_keySplines.size() && m_keySplines.size() == m_values.size() - 1));
     if (calcMode == CalcModePaced && m_animationValid)
       calculateKeyTimesForCalcModePaced();
-  }
+  } else if (animationMode == PathAnimation)
+    m_animationValid = true;
 }
 
 void SVGAnimationElement::updateAnimation(float percent,

@@ -27,6 +27,7 @@
 #if ENABLE(SVG_ANIMATION)
 
 #include "ElementTimeControl.h"
+#include "Path.h"
 #include "SMILTime.h"
 #include "SVGSMILElement.h"
 #include "SVGExternalResourcesRequired.h"
@@ -85,7 +86,8 @@ class SVGAnimationElement : public SVGSMILElement,
     ByAnimation,
     ValuesAnimation,
     FromToAnimation,
-    FromByAnimation
+    FromByAnimation,
+    PathAnimation
   };
   AnimationMode animationMode() const;
 
@@ -117,16 +119,16 @@ class SVGAnimationElement : public SVGSMILElement,
   virtual void calculateAnimatedValue(float percentage,
                                       unsigned repeat,
                                       SVGSMILElement* resultElement) = 0;
+  virtual float calculateDistance(const String& fromString,
+                                  const String& toString) {
+    return -1.f;
+  }
+  virtual Path animationPath() const { return Path(); }
 
   void currentValuesForValuesAnimation(float percent,
                                        float& effectivePercent,
                                        String& from,
                                        String& to);
-
-  virtual float calculateDistance(const String& fromString,
-                                  const String& toString) {
-    return -1.f;
-  }
 
   void calculateKeyTimesForCalcModePaced();
 

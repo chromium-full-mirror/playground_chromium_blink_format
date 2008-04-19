@@ -39,9 +39,7 @@ class SVGAnimateMotionElement : public SVGAnimationElement {
 
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  Path animationPath();
-
- protected:
+ private:
   virtual const SVGElement* contextElement() const { return this; }
 
   virtual void resetToBaseValue(const String&);
@@ -55,8 +53,11 @@ class SVGAnimateMotionElement : public SVGAnimationElement {
   virtual void applyResultsToTarget();
   virtual float calculateDistance(const String& fromString,
                                   const String& toString);
+  virtual Path animationPath() const;
 
- private:
+  enum RotateMode { RotateAngle, RotateAuto, RotateAutoReverse };
+  RotateMode rotateMode() const;
+
   FloatSize m_animatedTranslation;
   float m_animatedAngle;
 
@@ -71,8 +72,6 @@ class SVGAnimateMotionElement : public SVGAnimationElement {
 
   Path m_path;
   Vector<float> m_keyPoints;
-  enum RotateMode { AngleMode, AutoMode, AutoReverseMode };
-  RotateMode m_rotateMode;
   float m_angle;
 };
 
