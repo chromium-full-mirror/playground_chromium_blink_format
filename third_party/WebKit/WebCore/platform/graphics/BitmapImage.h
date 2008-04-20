@@ -92,6 +92,8 @@ class BitmapImage : public Image {
   BitmapImage(const QPixmap& pixmap, ImageObserver* = 0);
 #elif PLATFORM(CG)
   BitmapImage(CGImageRef, ImageObserver* = 0);
+#elif PLATFORM(CAIRO)
+  BitmapImage(cairo_surface_t*, ImageObserver* = 0);
 #endif
   BitmapImage(ImageObserver* = 0);
   ~BitmapImage();

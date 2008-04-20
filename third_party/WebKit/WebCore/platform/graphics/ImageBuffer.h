@@ -70,7 +70,6 @@ class ImageBuffer : Noncopyable {
   GraphicsContext* context() const;
 
 #if PLATFORM(CG)
-  Image* image() const;
   CGImageRef cgImage() const { return image()->getCGImageRef(); }
 #elif PLATFORM(QT)
   QPixmap* pixmap() const;
@@ -78,7 +77,9 @@ class ImageBuffer : Noncopyable {
   cairo_surface_t* surface() const;
 #endif
 
-#if !PLATFORM(CG)
+#if PLATFORM(CG) || PLATFORM(CAIRO)
+  Image* image() const;
+#else
   Image* image() const {
     notImplemented();
     return 0;
