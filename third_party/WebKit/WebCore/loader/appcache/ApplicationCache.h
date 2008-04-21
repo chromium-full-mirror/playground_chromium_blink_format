@@ -79,6 +79,8 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   ResourceMap::const_iterator begin() const { return m_resources.begin(); }
   ResourceMap::const_iterator end() const { return m_resources.end(); }
 
+  static bool requestIsHTTPOrHTTPSGet(const ResourceRequest&);
+
  private:
   ApplicationCache(ApplicationCacheGroup*);
 
