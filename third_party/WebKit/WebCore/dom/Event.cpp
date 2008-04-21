@@ -119,6 +119,10 @@ bool Event::isProgressEvent() const {
   return false;
 }
 
+bool Event::isXMLHttpRequestProgressEvent() const {
+  return false;
+}
+
 #if ENABLE(SVG)
 bool Event::isSVGZoomEvent() const {
   return false;

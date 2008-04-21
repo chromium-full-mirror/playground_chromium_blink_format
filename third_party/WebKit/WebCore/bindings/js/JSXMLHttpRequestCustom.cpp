@@ -57,6 +57,11 @@ void JSXMLHttpRequest::mark() {
           static_cast<JSUnprotectedEventListener*>(m_impl->onLoadListener()))
     onLoadListener->mark();
 
+  if (JSUnprotectedEventListener* onProgressListener =
+          static_cast<JSUnprotectedEventListener*>(
+              m_impl->onProgressListener()))
+    onProgressListener->mark();
+
   typedef XMLHttpRequest::EventListenersMap EventListenersMap;
   typedef XMLHttpRequest::ListenerVector ListenerVector;
   EventListenersMap& eventListeners = m_impl->eventListeners();
@@ -101,6 +106,24 @@ void JSXMLHttpRequest::setOnload(ExecState*, JSValue* value) {
   if (Document* document = impl()->document()) {
     if (Frame* frame = document->frame())
       impl()->setOnLoadListener(
+          toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                       true));
+  }
+}
+
+JSValue* JSXMLHttpRequest::onprogress(ExecState*) const {
+  if (JSUnprotectedEventListener* listener =
+          static_cast<JSUnprotectedEventListener*>(
+              impl()->onProgressListener()))
+    if (JSObject* listenerObj = listener->listenerObj())
+      return listenerObj;
+  return jsNull();
+}
+
+void JSXMLHttpRequest::setOnprogress(ExecState*, JSValue* value) {
+  if (Document* document = impl()->document()) {
+    if (Frame* frame = document->frame())
+      impl()->setOnProgressListener(
           toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
                                                                        true));
   }
