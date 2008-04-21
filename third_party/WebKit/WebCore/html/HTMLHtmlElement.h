@@ -39,6 +39,10 @@ class HTMLHtmlElement : public HTMLElement {
   virtual int tagPriority() const { return 11; }
   virtual bool checkDTD(const Node* newChild);
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  virtual void insertedIntoDocument();
+#endif
+
   String version() const;
   void setVersion(const String&);
 };

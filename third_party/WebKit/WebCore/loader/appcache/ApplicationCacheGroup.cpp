@@ -50,11 +50,62 @@ CacheGroupMap& cacheGroupMap() {
   return cacheGroupMap;
 }
 
+// In order to quickly determinate if a given resource exists in an application
+// cache,
+// we keep a hash set of the hosts of the manifest URLs of all cache groups.
+typedef HashSet<unsigned, AlreadyHashed> CacheHostSet;
+
+CacheHostSet& cacheHostSet() {
+  static CacheHostSet cacheHostSet;
+
+  return cacheHostSet;
+}
+
 ApplicationCacheGroup::ApplicationCacheGroup(const KURL& manifestURL)
     : m_manifestURL(manifestURL),
       m_status(Idle),
       m_newestCache(0),
       m_frame(0) {}
+
+static unsigned urlHostHash(const KURL& url) {
+  unsigned hostStart = url.hostStart();
+  unsigned hostEnd = url.hostEnd();
+
+  return AlreadyHashed::avoidDeletedValue(StringImpl::computeHash(
+      url.string().characters() + hostStart, hostEnd - hostStart));
+}
+
+ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
+    const ResourceRequest& request,
+    DocumentLoader* loader) {
+  if (!ApplicationCache::requestIsHTTPOrHTTPSGet(request))
+    return 0;
+
+  ASSERT(loader->frame());
+  ASSERT(loader->frame()->page());
+  if (loader->frame() != loader->frame()->page()->mainFrame())
+    return 0;
+
+  const KURL& url = request.url();
+  if (!cacheHostSet().contains(urlHostHash(url)))
+    return 0;
+
+  CacheGroupMap::const_iterator end = cacheGroupMap().end();
+  for (CacheGroupMap::const_iterator it = cacheGroupMap().begin(); it != end;
+       ++it) {
+    ApplicationCacheGroup* group = it->second;
+
+    if (!protocolHostAndPortAreEqual(url, group->manifestURL()))
+      continue;
+
+    if (ApplicationCache* cache = group->newestCache()) {
+      if (cache->resourceForURL(url))
+        return cache;
+    }
+  }
+
+  return 0;
+}
 
 void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   ASSERT(frame && frame->page());
@@ -62,17 +113,17 @@ void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   DocumentLoader* documentLoader = frame->loader()->documentLoader();
   ASSERT(!documentLoader->applicationCache());
 
+  if (manifestURL.isNull()) {
+    selectCacheWithoutManifestURL(frame);
+    return;
+  }
+
   ApplicationCache* mainResourceCache =
       documentLoader->mainResourceApplicationCache();
 
   // Check if the main resource is being loaded as part of navigation of the
   // main frame
   bool isMainFrame = frame->page()->mainFrame() == frame;
-
-  if (manifestURL.isNull()) {
-    selectCacheWithoutManifestURL(frame);
-    return;
-  }
 
   if (!isMainFrame) {
     if (mainResourceCache &&
@@ -126,6 +177,7 @@ void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   if (result.second) {
     group = new ApplicationCacheGroup(manifestURL);
     result.first->second = group;
+    cacheHostSet().add(urlHostHash(manifestURL));
   } else {
     group = result.first->second;
     cache = group->newestCache();
