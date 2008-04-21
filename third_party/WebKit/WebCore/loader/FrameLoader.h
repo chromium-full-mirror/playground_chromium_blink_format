@@ -224,7 +224,8 @@ class FrameLoader : Noncopyable
 
   DocumentLoader* activeDocumentLoader() const;
   DocumentLoader* documentLoader() const;
-  DocumentLoader* provisionalDocumentLoader();
+  DocumentLoader* policyDocumentLoader() const;
+  DocumentLoader* provisionalDocumentLoader() const;
   FrameState state() const;
   static double timeOfLastCompletedLoad();
 
