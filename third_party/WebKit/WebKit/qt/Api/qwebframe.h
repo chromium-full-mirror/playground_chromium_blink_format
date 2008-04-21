@@ -61,7 +61,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   Q_PROPERTY(qreal textSizeMultiplier READ textSizeMultiplier WRITE
                  setTextSizeMultiplier)
   Q_PROPERTY(QString title READ title)
-  Q_PROPERTY(QUrl url READ url)
+  Q_PROPERTY(QUrl url READ url WRITE setUrl)
   Q_PROPERTY(QIcon icon READ icon)
  private:
   QWebFrame(QWebPage* parent, QWebFrameData* frameData);
@@ -92,6 +92,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QString renderTreeDump() const;
 
   QString title() const;
+  void setUrl(const QUrl& url);
   QUrl url() const;
   QIcon icon() const;
 

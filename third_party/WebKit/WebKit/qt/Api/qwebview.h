@@ -41,7 +41,7 @@ class QWebNetworkRequest;
 class QWEBKIT_EXPORT QWebView : public QWidget {
   Q_OBJECT
   Q_PROPERTY(QString title READ title)
-  Q_PROPERTY(QUrl url READ url WRITE load)
+  Q_PROPERTY(QUrl url READ url WRITE setUrl)
   Q_PROPERTY(QIcon icon READ icon)
   Q_PROPERTY(QString selectedText READ selectedText)
   Q_PROPERTY(bool modified READ isModified)
@@ -75,6 +75,7 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
   QWebSettings* settings() const;
 
   QString title() const;
+  void setUrl(const QUrl& url);
   QUrl url() const;
   QIcon icon() const;
 
