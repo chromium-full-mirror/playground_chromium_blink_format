@@ -27,6 +27,7 @@
 
 #include <QtCore/qobject.h>
 #include <QtCore/qurl.h>
+#include <QtCore/qvariant.h>
 #include <QtGui/qicon.h>
 #if QT_VERSION >= 0x040400
 #include <QtNetwork/qnetworkaccessmanager.h>
@@ -120,7 +121,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QRect geometry() const;
 
  public Q_SLOTS:
-  QString evaluateJavaScript(const QString& scriptSource);
+  QVariant evaluateJavaScript(const QString& scriptSource);
   void print(QPrinter* printer) const;
 
  Q_SIGNALS:

@@ -28,6 +28,7 @@
 #include <qbytearray.h>
 #include <qmetaobject.h>
 #include <qpointer.h>
+#include <qvariant.h>
 
 namespace KJS {
 namespace Bindings {
@@ -238,6 +239,11 @@ class QtConnectionObject : public QObject {
   ProtectedPtr<JSObject> m_thisObject;
   ProtectedPtr<JSObject> m_funcObject;
 };
+
+QVariant convertValueToQVariant(ExecState* exec,
+                                JSValue* value,
+                                QMetaType::Type hint,
+                                int* distance);
 
 }  // namespace Bindings
 }  // namespace KJS
