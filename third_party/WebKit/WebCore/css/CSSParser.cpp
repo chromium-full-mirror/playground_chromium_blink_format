@@ -1723,7 +1723,7 @@ bool CSSParser::parseFillShorthand(int propId,
   ShorthandScope scope(this, propId);
 
   bool parsedProperty[cMaxFillProperties] = {false};
-  RefPtr<CSSValue> values[numProperties];
+  RefPtr<CSSValue> values[cMaxFillProperties];
   RefPtr<CSSValue> positionYValue;
   int i;
 
