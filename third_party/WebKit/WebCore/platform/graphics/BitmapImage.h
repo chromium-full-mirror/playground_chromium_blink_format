@@ -88,9 +88,7 @@ class BitmapImage : public Image {
   friend class GraphicsContext;
 
  public:
-#if PLATFORM(QT)
-  BitmapImage(const QPixmap& pixmap, ImageObserver* = 0);
-#elif PLATFORM(CG)
+#if PLATFORM(CG)
   BitmapImage(CGImageRef, ImageObserver* = 0);
 #elif PLATFORM(CAIRO)
   BitmapImage(cairo_surface_t*, ImageObserver* = 0);
@@ -231,10 +229,6 @@ class BitmapImage : public Image {
 
   mutable bool m_haveFrameCount;
   size_t m_frameCount;
-
-#if PLATFORM(QT)
-  QPixmap* m_pixmap;
-#endif
 };
 }
 
