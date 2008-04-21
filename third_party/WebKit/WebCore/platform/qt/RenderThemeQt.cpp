@@ -112,7 +112,8 @@ bool RenderThemeQt::isControlStyled(const RenderStyle* style,
                                     const BackgroundLayer& background,
                                     const Color& backgroundColor) const {
   if (style->appearance() == TextFieldAppearance ||
-      style->appearance() == TextAreaAppearance)
+      style->appearance() == TextAreaAppearance ||
+      style->appearance() == ListboxAppearance)
     return style->border() != border;
 
   return RenderTheme::isControlStyled(style, border, background,
