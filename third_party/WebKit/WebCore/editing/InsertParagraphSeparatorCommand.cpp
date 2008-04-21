@@ -44,9 +44,9 @@ using namespace HTMLNames;
 
 InsertParagraphSeparatorCommand::InsertParagraphSeparatorCommand(
     Document* document,
-    bool useDefaultParagraphElement)
+    bool mustUseDefaultParagraphElement)
     : CompositeEditCommand(document),
-      m_useDefaultParagraphElement(useDefaultParagraphElement) {}
+      m_mustUseDefaultParagraphElement(mustUseDefaultParagraphElement) {}
 
 bool InsertParagraphSeparatorCommand::preservesTypingStyle() const {
   return true;
@@ -77,6 +77,21 @@ void InsertParagraphSeparatorCommand::applyStyleAfterInsertion() {
   endingStyle.diff(m_style.get());
   if (m_style->length() > 0)
     applyStyle(m_style.get());
+}
+
+bool InsertParagraphSeparatorCommand::shouldUseDefaultParagraphElement(
+    Node* enclosingBlock) const {
+  if (m_mustUseDefaultParagraphElement)
+    return true;
+
+  // Assumes that if there was a range selection, it was already deleted.
+  if (!isEndOfBlock(endingSelection().visibleStart()))
+    return false;
+
+  return enclosingBlock->hasTagName(h1Tag) ||
+         enclosingBlock->hasTagName(h2Tag) ||
+         enclosingBlock->hasTagName(h3Tag) ||
+         enclosingBlock->hasTagName(h4Tag) || enclosingBlock->hasTagName(h5Tag);
 }
 
 void InsertParagraphSeparatorCommand::doApply() {
@@ -141,7 +156,7 @@ void InsertParagraphSeparatorCommand::doApply() {
     blockToInsert =
         static_pointer_cast<Node>(createDefaultParagraphElement(document()));
     nestNewBlock = true;
-  } else if (m_useDefaultParagraphElement)
+  } else if (shouldUseDefaultParagraphElement(startBlock))
     blockToInsert =
         static_pointer_cast<Node>(createDefaultParagraphElement(document()));
   else

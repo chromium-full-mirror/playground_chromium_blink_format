@@ -41,11 +41,13 @@ class InsertParagraphSeparatorCommand : public CompositeEditCommand {
   void calculateStyleBeforeInsertion(const Position&);
   void applyStyleAfterInsertion();
 
+  bool shouldUseDefaultParagraphElement(Node*) const;
+
   virtual bool preservesTypingStyle() const;
 
   RefPtr<CSSMutableStyleDeclaration> m_style;
 
-  bool m_useDefaultParagraphElement;
+  bool m_mustUseDefaultParagraphElement;
 };
 }
 
