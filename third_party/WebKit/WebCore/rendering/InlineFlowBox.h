@@ -99,7 +99,7 @@ class InlineFlowBox : public InlineRunBox {
   virtual void paintBoxDecorations(RenderObject::PaintInfo&, int tx, int ty);
   void paintBackgrounds(const RenderObject::PaintInfo&,
                         const Color&,
-                        const BackgroundLayer*,
+                        const FillLayer*,
                         int my,
                         int mh,
                         int tx,
@@ -108,7 +108,7 @@ class InlineFlowBox : public InlineRunBox {
                         int h);
   void paintBackground(const RenderObject::PaintInfo&,
                        const Color&,
-                       const BackgroundLayer*,
+                       const FillLayer*,
                        int my,
                        int mh,
                        int tx,

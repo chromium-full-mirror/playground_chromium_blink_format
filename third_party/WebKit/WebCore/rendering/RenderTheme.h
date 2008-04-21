@@ -59,7 +59,7 @@ class RenderTheme {
                    Element*,
                    bool UAHasAppearance,
                    const BorderData&,
-                   const BackgroundLayer&,
+                   const FillLayer&,
                    const Color& backgroundColor);
 
   // This method is called to paint the widget as a background of the
@@ -99,7 +99,7 @@ class RenderTheme {
   // the native appearance.
   virtual bool isControlStyled(const RenderStyle*,
                                const BorderData&,
-                               const BackgroundLayer&,
+                               const FillLayer&,
                                const Color& backgroundColor) const;
 
   // A general method asking if any control tinting is supported at all.

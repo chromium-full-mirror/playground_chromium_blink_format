@@ -201,7 +201,7 @@ void RenderThemeSafari::systemFont(int propId,
 
 bool RenderThemeSafari::isControlStyled(const RenderStyle* style,
                                         const BorderData& border,
-                                        const BackgroundLayer& background,
+                                        const FillLayer& background,
                                         const Color& backgroundColor) const {
   // If we didn't find SafariTheme.dll we won't be able to paint any themed
   // controls.

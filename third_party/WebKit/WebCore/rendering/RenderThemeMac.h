@@ -60,7 +60,7 @@ class RenderThemeMac : public RenderTheme {
 
   virtual bool isControlStyled(const RenderStyle*,
                                const BorderData&,
-                               const BackgroundLayer&,
+                               const FillLayer&,
                                const Color& backgroundColor) const;
 
   virtual Color platformActiveSelectionBackgroundColor() const;

@@ -701,7 +701,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
 void InlineFlowBox::paintBackgrounds(const RenderObject::PaintInfo& paintInfo,
                                      const Color& c,
-                                     const BackgroundLayer* bgLayer,
+                                     const FillLayer* bgLayer,
                                      int my,
                                      int mh,
                                      int _tx,
@@ -716,14 +716,14 @@ void InlineFlowBox::paintBackgrounds(const RenderObject::PaintInfo& paintInfo,
 
 void InlineFlowBox::paintBackground(const RenderObject::PaintInfo& paintInfo,
                                     const Color& c,
-                                    const BackgroundLayer* bgLayer,
+                                    const FillLayer* bgLayer,
                                     int my,
                                     int mh,
                                     int tx,
                                     int ty,
                                     int w,
                                     int h) {
-  StyleImage* bg = bgLayer->backgroundImage();
+  StyleImage* bg = bgLayer->image();
   bool hasBackgroundImage =
       bg && bg->canRender(object()->style()->effectiveZoom());
   if ((!hasBackgroundImage && !object()->style()->hasBorderRadius()) ||

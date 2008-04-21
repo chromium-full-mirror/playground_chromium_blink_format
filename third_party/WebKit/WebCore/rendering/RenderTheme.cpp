@@ -44,7 +44,7 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
                               Element* e,
                               bool UAHasAppearance,
                               const BorderData& border,
-                              const BackgroundLayer& background,
+                              const FillLayer& background,
                               const Color& backgroundColor) {
   // Force inline and table display styles to be inline-block (except for table-
   // which is block)
@@ -320,7 +320,7 @@ bool RenderTheme::isControlContainer(EAppearance appearance) const {
 
 bool RenderTheme::isControlStyled(const RenderStyle* style,
                                   const BorderData& border,
-                                  const BackgroundLayer& background,
+                                  const FillLayer& background,
                                   const Color& backgroundColor) const {
   switch (style->appearance()) {
     case PushButtonAppearance:

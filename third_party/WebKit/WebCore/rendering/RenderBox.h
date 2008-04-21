@@ -168,7 +168,7 @@ class RenderBox : public RenderObject {
 
   virtual void paintBackgroundExtended(const PaintInfo&,
                                        const Color&,
-                                       const BackgroundLayer*,
+                                       const FillLayer*,
                                        int clipY,
                                        int clipHeight,
                                        int tx,
@@ -176,7 +176,7 @@ class RenderBox : public RenderObject {
                                        int width,
                                        int height,
                                        InlineFlowBox* = 0);
-  IntSize calculateBackgroundSize(const BackgroundLayer*,
+  IntSize calculateBackgroundSize(const FillLayer*,
                                   int scaledWidth,
                                   int scaledHeight) const;
 
@@ -203,7 +203,7 @@ class RenderBox : public RenderObject {
  protected:
   void paintBackground(const PaintInfo&,
                        const Color&,
-                       const BackgroundLayer*,
+                       const FillLayer*,
                        int clipY,
                        int clipHeight,
                        int tx,
@@ -212,7 +212,7 @@ class RenderBox : public RenderObject {
                        int height);
   void paintBackgrounds(const PaintInfo&,
                         const Color&,
-                        const BackgroundLayer*,
+                        const FillLayer*,
                         int clipY,
                         int clipHeight,
                         int tx,
@@ -236,7 +236,7 @@ class RenderBox : public RenderObject {
  private:
   void paintRootBoxDecorations(PaintInfo&, int tx, int ty);
 
-  void calculateBackgroundImageGeometry(const BackgroundLayer*,
+  void calculateBackgroundImageGeometry(const FillLayer*,
                                         int tx,
                                         int ty,
                                         int w,

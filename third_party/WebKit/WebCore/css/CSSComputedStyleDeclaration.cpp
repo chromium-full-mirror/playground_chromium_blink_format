@@ -282,9 +282,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return new CSSPrimitiveValue(CSSValueFixed);
     case CSSPropertyWebkitBackgroundClip:
     case CSSPropertyWebkitBackgroundOrigin: {
-      EBackgroundBox box = (propertyID == CSSPropertyWebkitBackgroundClip
-                                ? style->backgroundClip()
-                                : style->backgroundOrigin());
+      EFillBox box = (propertyID == CSSPropertyWebkitBackgroundClip
+                          ? style->backgroundClip()
+                          : style->backgroundOrigin());
       return new CSSPrimitiveValue(box);
     }
     case CSSPropertyBackgroundPosition: {

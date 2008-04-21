@@ -575,7 +575,7 @@ class RenderObject : public CachedResourceClient {
 
   virtual void paintBackgroundExtended(const PaintInfo&,
                                        const Color&,
-                                       const BackgroundLayer*,
+                                       const FillLayer*,
                                        int clipy,
                                        int cliph,
                                        int tx,

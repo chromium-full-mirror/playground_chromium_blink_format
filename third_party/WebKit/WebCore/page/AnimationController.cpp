@@ -123,10 +123,10 @@ class CompositeImplicitAnimation : public Noncopyable {
 ImplicitAnimation::ImplicitAnimation(const Transition* transition)
     : m_fromStyle(0),
       m_toStyle(0),
-      m_property(transition->transitionProperty()),
-      m_function(transition->transitionTimingFunction()),
-      m_duration(transition->transitionDuration() / 1000.0),
-      m_repeatCount(transition->transitionRepeatCount()),
+      m_property(transition->property()),
+      m_function(transition->timingFunction()),
+      m_duration(transition->duration() / 1000.0),
+      m_repeatCount(transition->repeatCount()),
       m_iteration(0),
       m_finished(false),
       m_startTime(currentTime()),
@@ -419,9 +419,9 @@ RenderStyle* CompositeImplicitAnimation::animate(RenderObject* renderer,
   if (m_animations.isEmpty()) {
     for (const Transition* transition = currentTransitions; transition;
          transition = transition->next()) {
-      int property = transition->transitionProperty();
-      int duration = transition->transitionDuration();
-      int repeatCount = transition->transitionRepeatCount();
+      int property = transition->property();
+      int duration = transition->duration();
+      int repeatCount = transition->repeatCount();
       if (property && duration && repeatCount &&
           !m_animations.contains(property)) {
         ImplicitAnimation* animation = new ImplicitAnimation(transition);
