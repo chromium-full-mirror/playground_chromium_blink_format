@@ -151,7 +151,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     FindCaseSensitively = 2,
     FindWrapsAroundDocument = 4
   };
-  Q_DECLARE_FLAGS(FindFlags, FindFlag);
+  Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
   enum LinkDelegationPolicy {
     DontDelegateLinks,
@@ -275,7 +275,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
  private:
   Q_PRIVATE_SLOT(d, void _q_onLoadProgressChanged(int))
-  Q_PRIVATE_SLOT(d, void _q_webActionTriggered(bool checked));
+  Q_PRIVATE_SLOT(d, void _q_webActionTriggered(bool checked))
+  QWebPagePrivate* d;
+
   friend class QWebFrame;
   friend class QWebPagePrivate;
   friend class WebCore::ChromeClientQt;
@@ -283,7 +285,6 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   friend class WebCore::FrameLoaderClientQt;
   friend class WebCore::InspectorClientQt;
   friend class WebCore::ResourceHandle;
-  QWebPagePrivate* d;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QWebPage::FindFlags)
