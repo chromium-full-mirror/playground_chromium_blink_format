@@ -138,7 +138,6 @@ void Console::profileEnd() const {
   // that is in the profiler and display it in some new cool way, as opposed to
   // just printing
   // it or dumping it to the console.
-  Profiler::profiler()->printDataInspectorStyle();
 }
 
 void Console::warn(ExecState* exec, const List& arguments) {
