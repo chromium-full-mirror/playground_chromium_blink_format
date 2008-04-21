@@ -820,7 +820,8 @@ void XMLHttpRequest::dispatchProgressEvent(long long expectedLength) {
   // false.
   evt = new XMLHttpRequestProgressEvent(
       progressEvent, expectedLength && m_receivedLength <= expectedLength,
-      m_receivedLength, expectedLength);
+      static_cast<unsigned>(m_receivedLength),
+      static_cast<unsigned>(expectedLength));
 
   if (m_onProgressListener) {
     evt->setTarget(this);
