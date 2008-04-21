@@ -46,6 +46,7 @@ namespace WebCore {
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 class ApplicationCache;
 class ApplicationCacheGroup;
+class ApplicationCacheResource;
 #endif
 class Archive;
 class ArchiveResource;
@@ -206,6 +207,10 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   bool deferMainResourceDataLoad() const { return m_deferMainResourceDataLoad; }
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  bool scheduleApplicationCacheLoad(ResourceLoader*,
+                                    const ResourceRequest&,
+                                    const KURL& originalURL);
+
   void setCandidateApplicationCacheGroup(ApplicationCacheGroup* group);
   ApplicationCacheGroup* candidateApplicationCacheGroup() const {
     return m_candidateApplicationCacheGroup;
@@ -216,8 +221,9 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
     return m_applicationCache.get();
   }
   ApplicationCache* topLevelApplicationCache() const;
-#endif
 
+  ApplicationCache* mainResourceApplicationCache() const;
+#endif
  protected:
   bool m_deferMainResourceDataLoad;
 
@@ -306,6 +312,10 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   // candidate application
   // group that the document loader is associated with.
   ApplicationCacheGroup* m_candidateApplicationCacheGroup;
+
+  // Once the main resource has finished loading, this is the application cache
+  // it was loaded from (if any).
+  RefPtr<ApplicationCache> m_mainResourceApplicationCache;
 #endif
 };
 }

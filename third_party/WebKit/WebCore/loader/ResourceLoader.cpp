@@ -64,7 +64,13 @@ ResourceLoader::ResourceLoader(Frame* frame,
       m_sendResourceLoadCallbacks(sendResourceLoadCallbacks),
       m_shouldContentSniff(shouldContentSniff),
       m_shouldBufferData(true),
-      m_defersLoading(frame->page()->defersLoading()) {}
+      m_defersLoading(frame->page()->defersLoading())
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+      ,
+      m_wasLoadedFromApplicationCache(false)
+#endif
+{
+}
 
 ResourceLoader::~ResourceLoader() {
   ASSERT(m_reachedTerminalState);
@@ -114,6 +120,14 @@ bool ResourceLoader::load(const ResourceRequest& r) {
 
   if (m_documentLoader->scheduleArchiveLoad(this, clientRequest, r.url()))
     return true;
+
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+  if (m_documentLoader->scheduleApplicationCacheLoad(this, clientRequest,
+                                                     r.url())) {
+    m_wasLoadedFromApplicationCache = true;
+    return true;
+  }
+#endif
 
   if (m_defersLoading) {
     m_deferredRequest = clientRequest;
