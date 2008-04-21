@@ -25,6 +25,7 @@
 #include "runtime_root.h"
 #include <qpointer.h>
 #include <qhash.h>
+#include <qset.h>
 
 namespace KJS {
 
@@ -53,6 +54,8 @@ class QtInstance : public Instance {
 
   virtual bool implementsCall() const;
 
+  virtual void mark();  // This isn't inherited
+
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
                                 const List& args);
@@ -73,12 +76,14 @@ class QtInstance : public Instance {
 
  private:
   friend class QtClass;
+  friend class QtField;
   QtInstance(QObject*, PassRefPtr<RootObject>);  // Factory produced only..
   mutable QtClass* m_class;
   QPointer<QObject> m_object;
   QObject* m_hashkey;
   mutable QHash<QByteArray, JSValue*> m_methods;
   mutable QHash<QString, QtField*> m_fields;
+  mutable QSet<JSValue*> m_children;
   mutable QtRuntimeMetaMethod* m_defaultMethod;
   mutable int m_defaultMethodIndex;
 };
