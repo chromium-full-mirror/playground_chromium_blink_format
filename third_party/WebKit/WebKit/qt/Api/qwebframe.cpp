@@ -79,6 +79,11 @@
 
 using namespace WebCore;
 
+// from text/qfont.cpp
+QT_BEGIN_NAMESPACE
+extern Q_GUI_EXPORT int qt_defaultDpi();
+QT_END_NAMESPACE
+
 void QWebFramePrivate::init(QWebFrame* qframe,
                             WebCore::Page* webcorePage,
                             QWebFrameData* frameData) {
@@ -590,9 +595,6 @@ QRect QWebFrame::geometry() const {
   Prints the frame to the given \a printer.
 */
 void QWebFrame::print(QPrinter* printer) const {
-  // from text/qfont.cpp
-  extern Q_GUI_EXPORT int qt_defaultDpi();
-
   const qreal zoomFactorX = printer->logicalDpiX() / qt_defaultDpi();
   const qreal zoomFactorY = printer->logicalDpiY() / qt_defaultDpi();
 
