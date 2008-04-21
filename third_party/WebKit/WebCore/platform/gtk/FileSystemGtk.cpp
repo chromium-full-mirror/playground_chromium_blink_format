@@ -85,9 +85,19 @@ bool getFileSize(const String& path, long long& resultSize) {
   return true;
 }
 
-bool getFileModificationTime(const String&, time_t&) {
-  notImplemented();
-  return false;
+bool getFileModificationTime(const String& path, time_t& modifiedTime) {
+  gchar* filename = g_filename_from_utf8(path.utf8().data(), -1, 0, 0, 0);
+  if (!filename)
+    return false;
+
+  struct stat statResult;
+  gint result = g_stat(filename, &statResult);
+  g_free(filename);
+  if (result != 0)
+    return false;
+
+  modifiedTime = statResult.st_mtime;
+  return true;
 }
 
 String pathByAppendingComponent(const String& path, const String& component) {
