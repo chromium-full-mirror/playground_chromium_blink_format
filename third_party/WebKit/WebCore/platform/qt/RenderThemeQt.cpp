@@ -256,6 +256,8 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
   if (widget)
     panel.initFrom(widget);
   panel.rect = r;
+  panel.lineWidth =
+      style->pixelMetric(QStyle::PM_DefaultFrameWidth, &panel, widget);
   panel.state |= QStyle::State_Sunken;
   panel.features = QStyleOptionFrameV2::None;
 
