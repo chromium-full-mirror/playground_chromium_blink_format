@@ -59,6 +59,9 @@ void HTMLHtmlElement::insertedIntoDocument() {
   if (!document()->parsing())
     return;
 
+  if (!document()->frame())
+    return;
+
   // Check the manifest attribute
   AtomicString manifest = getAttribute(manifestAttr);
   if (manifest.isNull())
