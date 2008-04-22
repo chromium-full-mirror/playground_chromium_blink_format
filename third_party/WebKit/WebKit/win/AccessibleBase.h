@@ -30,12 +30,10 @@
 #include <WebCore/AccessibilityObject.h>
 #include <WebCore/AccessibilityObjectWrapperWin.h>
 
-using WebCore::AccessibilityObject;
-
 class AccessibleBase : public IAccessible,
                        public WebCore::AccessibilityObjectWrapper {
  public:
-  static AccessibleBase* createInstance(AccessibilityObject*);
+  static AccessibleBase* createInstance(WebCore::AccessibilityObject*);
 
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
@@ -116,13 +114,17 @@ class AccessibleBase : public IAccessible,
   }
 
  protected:
-  AccessibleBase(AccessibilityObject*);
+  AccessibleBase(WebCore::AccessibilityObject*);
   virtual ~AccessibleBase();
 
-  HRESULT getAccessibilityObjectForChild(VARIANT vChild,
-                                         AccessibilityObject*&) const;
+  virtual WebCore::String name() const;
+  virtual WebCore::String value() const;
+  virtual WebCore::String description() const;
 
-  static AccessibleBase* wrapper(AccessibilityObject*);
+  HRESULT getAccessibilityObjectForChild(VARIANT vChild,
+                                         WebCore::AccessibilityObject*&) const;
+
+  static AccessibleBase* wrapper(WebCore::AccessibilityObject*);
 
   int m_refCount;
 

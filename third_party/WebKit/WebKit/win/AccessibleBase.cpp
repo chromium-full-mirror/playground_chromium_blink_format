@@ -127,16 +127,61 @@ HRESULT STDMETHODCALLTYPE AccessibleBase::get_accChild(VARIANT vChild,
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE AccessibleBase::get_accName(VARIANT, BSTR*) {
-  return E_NOTIMPL;
+HRESULT STDMETHODCALLTYPE AccessibleBase::get_accName(VARIANT vChild,
+                                                      BSTR* name) {
+  if (!name)
+    return E_POINTER;
+
+  *name = 0;
+
+  AccessibilityObject* childObj;
+  HRESULT hr = getAccessibilityObjectForChild(vChild, childObj);
+
+  if (FAILED(hr))
+    return hr;
+
+  if (*name = BString(wrapper(childObj)->name()).release())
+    return S_OK;
+  return S_FALSE;
 }
 
-HRESULT STDMETHODCALLTYPE AccessibleBase::get_accValue(VARIANT, BSTR*) {
-  return E_NOTIMPL;
+HRESULT STDMETHODCALLTYPE AccessibleBase::get_accValue(VARIANT vChild,
+                                                       BSTR* value) {
+  if (!value)
+    return E_POINTER;
+
+  *value = 0;
+
+  AccessibilityObject* childObj;
+  HRESULT hr = getAccessibilityObjectForChild(vChild, childObj);
+
+  if (FAILED(hr))
+    return hr;
+
+  if (*value = BString(wrapper(childObj)->value()).release())
+    return S_OK;
+  return S_FALSE;
 }
 
-HRESULT STDMETHODCALLTYPE AccessibleBase::get_accDescription(VARIANT, BSTR*) {
-  return E_NOTIMPL;
+HRESULT STDMETHODCALLTYPE
+AccessibleBase::get_accDescription(VARIANT vChild, BSTR* description) {
+  if (!description)
+    return E_POINTER;
+
+  *description = 0;
+
+  AccessibilityObject* childObj;
+  HRESULT hr = getAccessibilityObjectForChild(vChild, childObj);
+
+  if (FAILED(hr))
+    return hr;
+
+  // TODO: Description, for SELECT subitems, should be a string describing
+  // the position of the item in its group and of the group in the list (see
+  // Firefox).
+  if (*description = BString(wrapper(childObj)->description()).release())
+    return S_OK;
+  return S_FALSE;
 }
 
 HRESULT STDMETHODCALLTYPE AccessibleBase::get_accRole(VARIANT, VARIANT*) {
@@ -187,6 +232,28 @@ HRESULT STDMETHODCALLTYPE AccessibleBase::accHitTest(long, long, VARIANT*) {
 
 HRESULT STDMETHODCALLTYPE AccessibleBase::accDoDefaultAction(VARIANT) {
   return E_NOTIMPL;
+}
+
+// AccessibleBase
+String AccessibleBase::name() const {
+  return m_object->title();
+}
+
+String AccessibleBase::value() const {
+  return m_object->stringValue();
+}
+
+String AccessibleBase::description() const {
+  String desc = m_object->accessibilityDescription();
+  if (desc.isNull())
+    return desc;
+
+  // From the Mozilla MSAA implementation:
+  // "Signal to screen readers that this description is speakable and is not
+  // a formatted positional information description. Don't localize the
+  // 'Description: ' part of this string, it will be parsed out by assistive
+  // technologies."
+  return "Description: " + desc;
 }
 
 HRESULT AccessibleBase::getAccessibilityObjectForChild(
