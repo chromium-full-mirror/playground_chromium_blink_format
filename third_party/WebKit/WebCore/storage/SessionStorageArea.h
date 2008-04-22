@@ -44,7 +44,7 @@ class SessionStorageArea : public StorageArea {
 
  private:
   SessionStorageArea(SecurityOrigin*, Page*);
-  SessionStorageArea(SecurityOrigin*, Page*, PassRefPtr<StorageMap>);
+  SessionStorageArea(SecurityOrigin*, Page*, SessionStorageArea*);
 
   virtual void itemChanged(const String& key,
                            const String& oldValue,

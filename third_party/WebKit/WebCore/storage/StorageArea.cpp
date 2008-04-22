@@ -37,8 +37,8 @@ namespace WebCore {
 StorageArea::StorageArea(SecurityOrigin* origin)
     : m_securityOrigin(origin), m_storageMap(StorageMap::create()) {}
 
-StorageArea::StorageArea(SecurityOrigin* origin, PassRefPtr<StorageMap> map)
-    : m_securityOrigin(origin), m_storageMap(map) {}
+StorageArea::StorageArea(SecurityOrigin* origin, StorageArea* area)
+    : m_securityOrigin(origin), m_storageMap(area->m_storageMap) {}
 
 StorageArea::~StorageArea() {}
 
@@ -65,12 +65,7 @@ void StorageArea::setItem(const String& key,
                           const String& value,
                           ExceptionCode& ec,
                           Frame* frame) {
-  // Per the spec, inserting a NULL value into the map is the same as removing
-  // the key altogether
-  if (value.isNull()) {
-    removeItem(key, frame);
-    return;
-  }
+  ASSERT(!value.isNull());
 
   // FIXME: For LocalStorage where a disk quota will be enforced, here is where
   // we need to do quota checking.
@@ -105,9 +100,5 @@ void StorageArea::removeItem(const String& key, Frame* frame) {
 
 bool StorageArea::contains(const String& key) const {
   return m_storageMap->contains(key);
-}
-
-PassRefPtr<StorageMap> StorageArea::storageMap() {
-  return m_storageMap;
 }
 }

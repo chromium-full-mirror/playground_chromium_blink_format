@@ -58,9 +58,7 @@ class StorageArea : public RefCounted<StorageArea> {
 
  protected:
   StorageArea(SecurityOrigin*);
-  StorageArea(SecurityOrigin*, PassRefPtr<StorageMap>);
-
-  PassRefPtr<StorageMap> storageMap();
+  StorageArea(SecurityOrigin*, StorageArea*);
 
  private:
   virtual void itemChanged(const String& key,
