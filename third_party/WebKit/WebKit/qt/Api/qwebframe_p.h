@@ -90,4 +90,25 @@ class QWebFramePrivate {
   int marginHeight;
 };
 
+class QWebHitTestResultPrivate {
+ public:
+  QWebHitTestResultPrivate()
+      : isContentEditable(false), isContentSelected(false) {}
+  QWebHitTestResultPrivate(const WebCore::HitTestResult& hitTest);
+
+  QPoint pos;
+  QString title;
+  QString linkText;
+  QUrl linkUrl;
+  QString linkTitle;
+  QPointer<QWebFrame> linkTargetFrame;
+  QString alternateText;
+  QUrl imageUrl;
+  QPixmap pixmap;
+  bool isContentEditable;
+  bool isContentSelected;
+  QPointer<QWebFrame> frame;
+  RefPtr<WebCore::Node> innerNonSharedNode;
+};
+
 #endif
