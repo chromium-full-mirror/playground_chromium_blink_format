@@ -128,15 +128,21 @@ class SVGAnimationElement : public SVGSMILElement,
   void currentValuesForValuesAnimation(float percent,
                                        float& effectivePercent,
                                        String& from,
-                                       String& to);
-
+                                       String& to) const;
   void calculateKeyTimesForCalcModePaced();
+  float calculatePercentFromKeyPoints(float percent) const;
+  void currentValuesFromKeyPoints(float percent,
+                                  float& effectivePercent,
+                                  String& from,
+                                  String& to) const;
+  float calculatePercentForSpline(float percent, unsigned splineIndex) const;
 
  protected:
   bool m_animationValid;
 
   Vector<String> m_values;
   Vector<float> m_keyTimes;
+  Vector<float> m_keyPoints;
   Vector<UnitBezier> m_keySplines;
   String m_lastValuesAnimationFrom;
   String m_lastValuesAnimationTo;
