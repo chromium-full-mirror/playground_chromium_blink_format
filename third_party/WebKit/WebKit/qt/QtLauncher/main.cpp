@@ -197,7 +197,7 @@ class ClearButton : public QPushButton {
     int width = height;  // parentWidget()->geometry().width();
 
     painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setPen(Qt::lightGray);
+    painter.setPen(hasFocus() ? Qt::darkGray : Qt::lightGray);
     painter.setBrush(isDown() ? QColor(140, 140, 190)
                               : underMouse() ? QColor(220, 220, 255)
                                              : QColor(200, 200, 230));
@@ -321,6 +321,7 @@ class MainWindow : public QMainWindow {
   void changeLocation() {
     QUrl url(urlEdit->text());
     view->load(url);
+    view->setFocus(Qt::OtherFocusReason);
   }
   void loadFinished() { urlEdit->setText(view->url().toString()); }
   void showLinkHover(const QString& link, const QString& toolTip) {
