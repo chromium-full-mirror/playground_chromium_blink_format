@@ -108,7 +108,7 @@ void RenderThemeQt::adjustRepaintRect(const RenderObject* o, IntRect& r) {
 
 bool RenderThemeQt::isControlStyled(const RenderStyle* style,
                                     const BorderData& border,
-                                    const BackgroundLayer& background,
+                                    const FillLayer& background,
                                     const Color& backgroundColor) const {
   if (style->appearance() == TextFieldAppearance ||
       style->appearance() == TextAreaAppearance ||

@@ -55,7 +55,7 @@ class RenderThemeQt : public RenderTheme {
 
   virtual bool isControlStyled(const RenderStyle*,
                                const BorderData&,
-                               const BackgroundLayer&,
+                               const FillLayer&,
                                const Color&) const;
 
   // The platform selection color.
