@@ -64,6 +64,14 @@ typedef void* (*NPN_GetJavaEnvProcPtr)(void);
 typedef void* (*NPN_GetJavaPeerProcPtr)(NPP instance);
 typedef void (*NPN_PushPopupsEnabledStateProcPtr)(NPP instance, NPBool enabled);
 typedef void (*NPN_PopPopupsEnabledStateProcPtr)(NPP instance);
+typedef void (*NPN_PluginThreadAsyncCallProcPtr)(NPP npp,
+                                                 void (*func)(void*),
+                                                 void* userData);
+typedef bool (*NPN_ConstructProcPtr)(NPP npp,
+                                     NPObject* obj,
+                                     const NPVariant* args,
+                                     uint32_t argCount,
+                                     NPVariant* result);
 
 typedef void (*NPN_ReleaseVariantValueProcPtr)(NPVariant* variant);
 
@@ -208,6 +216,8 @@ typedef struct _NPNetscapeFuncs {
   NPN_PushPopupsEnabledStateProcPtr pushpopupsenabledstate;
   NPN_PopPopupsEnabledStateProcPtr poppopupsenabledstate;
   NPN_EnumerateProcPtr enumerate;
+  NPN_PluginThreadAsyncCallProcPtr pluginthreadasynccall;
+  NPN_ConstructProcPtr construct;
 } NPNetscapeFuncs;
 
 typedef struct _NPPluginFuncs {

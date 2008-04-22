@@ -411,6 +411,11 @@ bool NPN_Enumerate(NPP npp,
                    NPObject* npobj,
                    NPIdentifier** identifier,
                    uint32_t* count);
+bool NPN_Construct(NPP npp,
+                   NPObject* npobj,
+                   const NPVariant* args,
+                   uint32_t argCount,
+                   NPVariant* result);
 
 /*
     NPN_SetException may be called to trigger a script exception upon return
