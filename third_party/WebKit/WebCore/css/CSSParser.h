@@ -230,6 +230,7 @@ class CSSParser {
   MediaQuery* createFloatingMediaQuery(MediaQuery::Restrictor,
                                        const String&,
                                        Vector<MediaQueryExp*>*);
+  MediaQuery* createFloatingMediaQuery(Vector<MediaQueryExp*>*);
   MediaQuery* sinkFloatingMediaQuery(MediaQuery*);
 
  public:
