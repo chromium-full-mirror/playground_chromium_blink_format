@@ -120,6 +120,8 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QPoint pos() const;
   QRect geometry() const;
 
+  virtual bool event(QEvent*);
+
  public Q_SLOTS:
   QVariant evaluateJavaScript(const QString& scriptSource);
   void print(QPrinter* printer) const;

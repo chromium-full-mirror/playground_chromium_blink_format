@@ -614,6 +614,12 @@ QRect QWebFrame::geometry() const {
   return d->frame->view()->frameGeometry();
 }
 
+/*! \reimp
+*/
+bool QWebFrame::event(QEvent* e) {
+  return QObject::event(e);
+}
+
 /*!
   Prints the frame to the given \a printer.
 */
