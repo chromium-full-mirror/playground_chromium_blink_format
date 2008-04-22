@@ -1786,7 +1786,7 @@ QWebPluginFactory* QWebPage::pluginFactory() const {
     The default implementation returns the following value:
 
     "Mozilla/5.0 (%Platform%; %Security%; %Subplatform%; %Locale%)
-   AppleWebKit/%WebKitVersion% (KHTML, like Gecko, Safari) %AppVersion"
+   AppleWebKit/%WebKitVersion% (KHTML, like Gecko, Safari/419.3) %AppVersion"
 
     In this string the following values are replaced at run-time:
     \list
@@ -1946,12 +1946,13 @@ QString QWebPage::userAgentForUrl(const QUrl& url) const {
   if (d->view)
     locale = d->view->locale();
   QString name = locale.name();
-  name[2] = '-';
+  name[2] = QLatin1Char('-');
   ua.append(name);
-  ua.append(") ");
+  ua.append(QLatin1String(") "));
 
   // webkit/qt version
-  ua.append("AppleWebKit/" WEBKIT_VERSION " (KHTML, like Gecko, Safari) ");
+  ua.append(QLatin1String("AppleWebKit/" WEBKIT_VERSION
+                          " (KHTML, like Gecko, Safari/419.3) "));
 
   // Application name/version
   QString appName = QCoreApplication::applicationName();
@@ -1962,8 +1963,8 @@ QString QWebPage::userAgentForUrl(const QUrl& url) const {
       ua.append(QLatin1Char('/') + appVer);
   } else {
     // Qt version
-    ua.append("Qt/");
-    ua.append(qVersion());
+    ua.append(QLatin1String("Qt/"));
+    ua.append(QLatin1String(qVersion()));
   }
   return ua;
 }
