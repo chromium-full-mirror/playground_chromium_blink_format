@@ -166,16 +166,16 @@ class RenderBox : public RenderObject {
                             EAffinity = UPSTREAM,
                             int* extraWidthToEndOfLine = 0);
 
-  virtual void paintBackgroundExtended(const PaintInfo&,
-                                       const Color&,
-                                       const FillLayer*,
-                                       int clipY,
-                                       int clipHeight,
-                                       int tx,
-                                       int ty,
-                                       int width,
-                                       int height,
-                                       InlineFlowBox* = 0);
+  virtual void paintFillLayerExtended(const PaintInfo&,
+                                      const Color&,
+                                      const FillLayer*,
+                                      int clipY,
+                                      int clipHeight,
+                                      int tx,
+                                      int ty,
+                                      int width,
+                                      int height,
+                                      InlineFlowBox* = 0);
   IntSize calculateBackgroundSize(const FillLayer*,
                                   int scaledWidth,
                                   int scaledHeight) const;
@@ -189,6 +189,7 @@ class RenderBox : public RenderObject {
   virtual IntRect getClipRect(int tx, int ty);
 
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
+  virtual void paintMask(PaintInfo& paintInfo, int tx, int ty);
   virtual void imageChanged(WrappedImagePtr);
 
   // Called when a positioned object moves but doesn't change size.  A
@@ -201,7 +202,16 @@ class RenderBox : public RenderObject {
   }
 
  protected:
-  void paintBackground(const PaintInfo&,
+  void paintFillLayer(const PaintInfo&,
+                      const Color&,
+                      const FillLayer*,
+                      int clipY,
+                      int clipHeight,
+                      int tx,
+                      int ty,
+                      int width,
+                      int height);
+  void paintFillLayers(const PaintInfo&,
                        const Color&,
                        const FillLayer*,
                        int clipY,
@@ -210,15 +220,6 @@ class RenderBox : public RenderObject {
                        int ty,
                        int width,
                        int height);
-  void paintBackgrounds(const PaintInfo&,
-                        const Color&,
-                        const FillLayer*,
-                        int clipY,
-                        int clipHeight,
-                        int tx,
-                        int ty,
-                        int width,
-                        int height);
 
 #if PLATFORM(MAC)
   void paintCustomHighlight(int tx,

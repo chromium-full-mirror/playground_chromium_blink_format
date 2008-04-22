@@ -86,7 +86,8 @@ enum PaintPhase {
   PaintPhaseSelfOutline,
   PaintPhaseSelection,
   PaintPhaseCollapsedTableBorders,
-  PaintPhaseTextClip
+  PaintPhaseTextClip,
+  PaintPhaseMask
 };
 
 enum PaintRestriction {
@@ -419,6 +420,8 @@ class RenderObject : public CachedResourceClient {
 
   bool hasTransform() const { return m_hasTransform; }
 
+  bool hasMask() const { return style() && style()->hasMask(); }
+
  private:
   bool includeVerticalScrollbarSize() const {
     return hasOverflowClip() &&
@@ -483,7 +486,7 @@ class RenderObject : public CachedResourceClient {
 
   void scheduleRelayout();
 
-  void updateBackgroundImages(RenderStyle* oldStyle);
+  void updateFillImages(const FillLayer*, const FillLayer*);
 
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
@@ -572,17 +575,17 @@ class RenderObject : public CachedResourceClient {
 
   // RenderBox implements this.
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty) {}
-
-  virtual void paintBackgroundExtended(const PaintInfo&,
-                                       const Color&,
-                                       const FillLayer*,
-                                       int clipy,
-                                       int cliph,
-                                       int tx,
-                                       int ty,
-                                       int width,
-                                       int height,
-                                       InlineFlowBox* box = 0) {}
+  virtual void paintMask(PaintInfo&, int tx, int ty) {}
+  virtual void paintFillExtended(const PaintInfo&,
+                                 const Color&,
+                                 const FillLayer*,
+                                 int clipy,
+                                 int cliph,
+                                 int tx,
+                                 int ty,
+                                 int width,
+                                 int height,
+                                 InlineFlowBox* box = 0) {}
 
   /*
    * Calculates the actual width of the object (only for non inline

@@ -669,6 +669,9 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
         } else if (!object()->isInlineContinuation())
           paintInfo.outlineObjects->add(flowObject());
       }
+    } else if (paintInfo.phase == PaintPhaseMask) {
+      paintMask(paintInfo, tx, ty);
+      return;
     } else {
       // 1. Paint our background, border and box-shadow.
       paintBoxDecorations(paintInfo, tx, ty);
@@ -677,6 +680,9 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
       paintTextDecorations(paintInfo, tx, ty, false);
     }
   }
+
+  if (paintInfo.phase == PaintPhaseMask)
+    return;
 
   PaintPhase paintPhase = paintInfo.phase == PaintPhaseChildOutlines
                               ? PaintPhaseOutline
@@ -699,39 +705,38 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
     paintTextDecorations(paintInfo, tx, ty, true);
 }
 
-void InlineFlowBox::paintBackgrounds(const RenderObject::PaintInfo& paintInfo,
-                                     const Color& c,
-                                     const FillLayer* bgLayer,
-                                     int my,
-                                     int mh,
-                                     int _tx,
-                                     int _ty,
-                                     int w,
-                                     int h) {
-  if (!bgLayer)
-    return;
-  paintBackgrounds(paintInfo, c, bgLayer->next(), my, mh, _tx, _ty, w, h);
-  paintBackground(paintInfo, c, bgLayer, my, mh, _tx, _ty, w, h);
-}
-
-void InlineFlowBox::paintBackground(const RenderObject::PaintInfo& paintInfo,
+void InlineFlowBox::paintFillLayers(const RenderObject::PaintInfo& paintInfo,
                                     const Color& c,
-                                    const FillLayer* bgLayer,
+                                    const FillLayer* fillLayer,
                                     int my,
                                     int mh,
-                                    int tx,
-                                    int ty,
+                                    int _tx,
+                                    int _ty,
                                     int w,
                                     int h) {
-  StyleImage* bg = bgLayer->image();
-  bool hasBackgroundImage =
-      bg && bg->canRender(object()->style()->effectiveZoom());
-  if ((!hasBackgroundImage && !object()->style()->hasBorderRadius()) ||
+  if (!fillLayer)
+    return;
+  paintFillLayers(paintInfo, c, fillLayer->next(), my, mh, _tx, _ty, w, h);
+  paintFillLayer(paintInfo, c, fillLayer, my, mh, _tx, _ty, w, h);
+}
+
+void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
+                                   const Color& c,
+                                   const FillLayer* fillLayer,
+                                   int my,
+                                   int mh,
+                                   int tx,
+                                   int ty,
+                                   int w,
+                                   int h) {
+  StyleImage* img = fillLayer->image();
+  bool hasFillImage = img && img->canRender(object()->style()->effectiveZoom());
+  if ((!hasFillImage && !object()->style()->hasBorderRadius()) ||
       (!prevLineBox() && !nextLineBox()) || !parent())
-    object()->paintBackgroundExtended(paintInfo, c, bgLayer, my, mh, tx, ty, w,
-                                      h, this);
+    object()->paintFillExtended(paintInfo, c, fillLayer, my, mh, tx, ty, w, h,
+                                this);
   else {
-    // We have a background image that spans multiple lines.
+    // We have a fill image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
     // Think of background painting on inlines as though you had one long line,
     // a single continuous
@@ -752,8 +757,8 @@ void InlineFlowBox::paintBackground(const RenderObject::PaintInfo& paintInfo,
       totalWidth += curr->width();
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
-    object()->paintBackgroundExtended(paintInfo, c, bgLayer, my, mh, startX, ty,
-                                      totalWidth, h, this);
+    object()->paintFillExtended(paintInfo, c, fillLayer, my, mh, startX, ty,
+                                totalWidth, h, this);
     paintInfo.context->restore();
   }
 }
@@ -811,8 +816,8 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
       paintBoxShadow(context, styleToUse, tx, ty, w, h);
 
     Color c = styleToUse->backgroundColor();
-    paintBackgrounds(paintInfo, c, styleToUse->backgroundLayers(), my, mh, tx,
-                     ty, w, h);
+    paintFillLayers(paintInfo, c, styleToUse->backgroundLayers(), my, mh, tx,
+                    ty, w, h);
 
     // :first-line cannot be used to put borders on a line. Always paint borders
     // with our
@@ -859,6 +864,33 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
       }
     }
   }
+}
+
+void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
+                              int tx,
+                              int ty) {
+  if (!object()->shouldPaintWithinRoot(paintInfo) ||
+      object()->style()->visibility() != VISIBLE ||
+      paintInfo.phase != PaintPhaseMask)
+    return;
+
+  // Move x/y to our coordinates.
+  tx += m_x;
+  ty += m_y;
+
+  int w = width();
+  int h = height();
+
+  int my = max(ty, paintInfo.rect.y());
+  int mh;
+  if (ty < paintInfo.rect.y())
+    mh = max(0, h - (paintInfo.rect.y() - ty));
+  else
+    mh = min(paintInfo.rect.height(), h);
+
+  if (object()->hasMask())
+    paintFillLayers(paintInfo, Color(), object()->style()->maskLayers(), my, mh,
+                    tx, ty, w, h);
 }
 
 static bool shouldDrawTextDecoration(RenderObject* obj) {

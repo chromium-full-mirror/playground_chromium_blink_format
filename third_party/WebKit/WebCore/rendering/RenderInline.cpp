@@ -314,7 +314,7 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects,
 }
 
 bool RenderInline::requiresLayer() {
-  return isRelPositioned() || style()->opacity() < 1.0f;
+  return isRelPositioned() || isTransparent() || hasMask();
 }
 
 int RenderInline::width() const {

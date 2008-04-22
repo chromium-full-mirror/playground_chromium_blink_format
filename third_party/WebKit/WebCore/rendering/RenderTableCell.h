@@ -99,6 +99,7 @@ class RenderTableCell : public RenderBlock {
 
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
+  virtual void paintMask(PaintInfo& paintInfo, int tx, int ty);
   void paintCollapsedBorder(GraphicsContext*, int x, int y, int w, int h);
   void paintBackgroundsBehindCell(PaintInfo&,
                                   int tx,

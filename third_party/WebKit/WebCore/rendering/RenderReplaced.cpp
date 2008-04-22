@@ -103,8 +103,14 @@ void RenderReplaced::paint(PaintInfo& paintInfo, int tx, int ty) {
   ty += m_y;
 
   if (hasBoxDecorations() && (paintInfo.phase == PaintPhaseForeground ||
-                              paintInfo.phase == PaintPhaseSelection))
+                              paintInfo.phase == PaintPhaseSelection) &&
+      style()->visibility() == VISIBLE)
     paintBoxDecorations(paintInfo, tx, ty);
+
+  if (paintInfo.phase == PaintPhaseMask) {
+    paintMask(paintInfo, tx, ty);
+    return;
+  }
 
   if ((paintInfo.phase == PaintPhaseOutline ||
        paintInfo.phase == PaintPhaseSelfOutline) &&

@@ -141,6 +141,7 @@ void SVGImage::draw(GraphicsContext* context,
     return;
 
   context->save();
+  context->setCompositeOperation(compositeOp);
   context->clip(enclosingIntRect(dstRect));
   context->translate(dstRect.location().x(), dstRect.location().y());
   context->scale(FloatSize(dstRect.width() / srcRect.width(),
@@ -218,6 +219,7 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     m_frame->loader()->begin(KURL());  // create the empty document
     m_frame->loader()->write(m_data->data(), m_data->size());
     m_frame->loader()->end();
+    m_frameView->setTransparent(true);  // SVG Images are transparent.
   }
   return m_frameView;
 }
