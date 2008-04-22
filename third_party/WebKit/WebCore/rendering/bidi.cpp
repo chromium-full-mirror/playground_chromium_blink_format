@@ -1061,10 +1061,13 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
                 }
               }
               if (shouldReorder) {
-                if (direction == LTR)
+                if (direction == LTR) {
                   start.moveRunToEnd(trailingSpaceRun);
-                else
+                  trailingSpaceRun->m_level = 0;
+                } else {
                   start.moveRunToBeginning(trailingSpaceRun);
+                  trailingSpaceRun->m_level = 1;
+                }
               }
             }
           } else
