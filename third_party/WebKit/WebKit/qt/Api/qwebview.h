@@ -128,6 +128,7 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
 
   virtual QWebView* createWindow(QWebPage::WebWindowType type);
 
+  virtual void changeEvent(QEvent*);
   virtual void mouseMoveEvent(QMouseEvent*);
   virtual void mousePressEvent(QMouseEvent*);
   virtual void mouseDoubleClickEvent(QMouseEvent*);

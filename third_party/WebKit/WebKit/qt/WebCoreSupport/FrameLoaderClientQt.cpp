@@ -191,6 +191,9 @@ void FrameLoaderClientQt::transitionToCommittedForNewPage() {
   // assigned it to frame.
   frameView->deref();
 
+  if (m_webFrame && m_webFrame->page())
+    m_webFrame->d->updateBackground();
+
   if (m_frame->ownerRenderer())
     m_frame->ownerRenderer()->setWidget(frameView);
 }

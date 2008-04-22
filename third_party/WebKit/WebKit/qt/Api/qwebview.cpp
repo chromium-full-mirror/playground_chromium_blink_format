@@ -76,6 +76,7 @@ QWebPage* QWebView::page() const {
   if (!d->page) {
     QWebView* that = const_cast<QWebView*>(this);
     that->setPage(new QWebPage(that));
+    d->page->setPalette(palette());
   }
   return d->page;
 }
@@ -601,6 +602,15 @@ QVariant QWebView::inputMethodQuery(Qt::InputMethodQuery property) const {
 void QWebView::inputMethodEvent(QInputMethodEvent* e) {
   if (d->page)
     d->page->event(e);
+}
+
+/*!\reimp
+*/
+void QWebView::changeEvent(QEvent* e) {
+  if (d->page && e->type() == QEvent::PaletteChange) {
+    d->page->setPalette(palette());
+  }
+  QWidget::changeEvent(e);
 }
 
 /*!
