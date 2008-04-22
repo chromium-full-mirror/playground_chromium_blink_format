@@ -120,6 +120,7 @@ class AccessibleBase : public IAccessible,
   virtual WebCore::String name() const;
   virtual WebCore::String value() const;
   virtual WebCore::String description() const;
+  virtual long role() const;
 
   HRESULT getAccessibilityObjectForChild(VARIANT vChild,
                                          WebCore::AccessibilityObject*&) const;
