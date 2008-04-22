@@ -223,6 +223,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void setPalette(const QPalette& palette);
   QPalette palette() const;
 
+  bool swallowContextMenuEvent(QContextMenuEvent* event);
+  void updatePositionDependentActions(const QPoint& pos);
+
   enum Extension {};
   class ExtensionOption {};
   class ExtensionReturn {};

@@ -366,6 +366,14 @@ bool QWebView::findText(const QString& subString, QWebPage::FindFlags options) {
 /*! \reimp
 */
 bool QWebView::event(QEvent* e) {
+  if (e->type() == QEvent::ContextMenu && d->page) {
+    QContextMenuEvent* event = static_cast<QContextMenuEvent*>(e);
+    if (d->page->swallowContextMenuEvent(event)) {
+      e->accept();
+      return true;
+    }
+    d->page->updatePositionDependentActions(event->pos());
+  }
   return QWidget::event(e);
 }
 
