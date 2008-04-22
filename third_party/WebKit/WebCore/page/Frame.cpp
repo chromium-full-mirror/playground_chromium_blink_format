@@ -189,6 +189,8 @@ Frame::~Frame() {
     d->m_view->clearFrame();
   }
 
+  disconnectPlatformScriptObjects();
+
   ASSERT(!d->m_lifeSupportTimer.isActive());
 
 #if FRAME_LOADS_USER_STYLESHEET

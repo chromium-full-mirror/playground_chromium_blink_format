@@ -162,6 +162,7 @@ class Frame : public RefCounted<Frame> {
 
  private:
   void clearPlatformScriptObjects();
+  void disconnectPlatformScriptObjects();
 
   void lifeSupportTimerFired(Timer<Frame>*);
 
