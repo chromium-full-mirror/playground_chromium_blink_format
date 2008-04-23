@@ -427,7 +427,9 @@ void GraphicsContext::fillRect(const FloatRect& rect, Generator& generator) {
 // native context
 // immediately.
 void GraphicsContext::setPlatformTextDrawingMode(int mode) {}
+#endif
 
+#if !PLATFORM(CG) && !PLATFORM(CAIRO)
 // Other platforms need to implement this.
 void GraphicsContext::clipToImageBuffer(const FloatRect&, const ImageBuffer*) {
   notImplemented();

@@ -583,6 +583,14 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
   cairo_set_fill_rule(cr, savedFillRule);
 }
 
+void GraphicsContext::clipToImageBuffer(const FloatRect& rect,
+                                        const ImageBuffer* imageBuffer) {
+  if (paintingDisabled())
+    return;
+
+  notImplemented();
+}
+
 void GraphicsContext::setPlatformShadow(IntSize const&, int, Color const&) {
   notImplemented();
 }
