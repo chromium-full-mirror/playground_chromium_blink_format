@@ -871,7 +871,7 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
                               int ty) {
   if (!object()->shouldPaintWithinRoot(paintInfo) ||
       object()->style()->visibility() != VISIBLE ||
-      paintInfo.phase != PaintPhaseMask)
+      paintInfo.phase != PaintPhaseMask || !object()->hasMask())
     return;
 
   // Move x/y to our coordinates.
@@ -888,9 +888,8 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
   else
     mh = min(paintInfo.rect.height(), h);
 
-  if (object()->hasMask())
-    paintFillLayers(paintInfo, Color(), object()->style()->maskLayers(), my, mh,
-                    tx, ty, w, h);
+  paintFillLayers(paintInfo, Color(), object()->style()->maskLayers(), my, mh,
+                  tx, ty, w, h);
 }
 
 static bool shouldDrawTextDecoration(RenderObject* obj) {

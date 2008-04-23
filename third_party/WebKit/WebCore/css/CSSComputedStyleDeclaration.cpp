@@ -95,13 +95,14 @@ static const int computedProperties[] = {
     CSSPropertyWebkitMarqueeStyle, CSSPropertyWebkitMaskAttachment,
     CSSPropertyWebkitMaskImage, CSSPropertyWebkitMaskPosition,
     CSSPropertyWebkitMaskRepeat, CSSPropertyWebkitMaskClip,
-    CSSPropertyWebkitMaskOrigin, CSSPropertyWebkitMaskSize,
-    CSSPropertyWebkitNbspMode, CSSPropertyWebkitRtlOrdering,
-    CSSPropertyWebkitTextDecorationsInEffect, CSSPropertyWebkitTextFillColor,
-    CSSPropertyWebkitTextSecurity, CSSPropertyWebkitTextStrokeColor,
-    CSSPropertyWebkitTextStrokeWidth, CSSPropertyWebkitUserDrag,
-    CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect,
-    CSSPropertyWebkitDashboardRegion, CSSPropertyWebkitBorderBottomLeftRadius,
+    CSSPropertyWebkitMaskComposite, CSSPropertyWebkitMaskOrigin,
+    CSSPropertyWebkitMaskSize, CSSPropertyWebkitNbspMode,
+    CSSPropertyWebkitRtlOrdering, CSSPropertyWebkitTextDecorationsInEffect,
+    CSSPropertyWebkitTextFillColor, CSSPropertyWebkitTextSecurity,
+    CSSPropertyWebkitTextStrokeColor, CSSPropertyWebkitTextStrokeWidth,
+    CSSPropertyWebkitUserDrag, CSSPropertyWebkitUserModify,
+    CSSPropertyWebkitUserSelect, CSSPropertyWebkitDashboardRegion,
+    CSSPropertyWebkitBorderBottomLeftRadius,
     CSSPropertyWebkitBorderBottomRightRadius,
     CSSPropertyWebkitBorderTopLeftRadius, CSSPropertyWebkitBorderTopRightRadius
 
@@ -580,6 +581,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->maskAttachment())
         return new CSSPrimitiveValue(CSSValueScroll);
       return new CSSPrimitiveValue(CSSValueFixed);
+    case CSSPropertyWebkitMaskComposite:
+      return new CSSPrimitiveValue(style->maskComposite());
     case CSSPropertyWebkitMaskClip:
     case CSSPropertyWebkitMaskOrigin: {
       EFillBox box =
