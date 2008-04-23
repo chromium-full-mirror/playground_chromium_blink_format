@@ -46,10 +46,6 @@ class VisiblePosition;
 
 typedef unsigned AXID;
 
-struct AXIDHashTraits : WTF::GenericHashTraits<unsigned> {
-  static TraitType deletedValue() { return UINT_MAX; }
-};
-
 struct TextMarkerData {
   AXID axID;
   Node* node;
@@ -81,7 +77,7 @@ class AXObjectCache {
   HashMap<RenderObject*, RefPtr<AccessibilityObject>> m_objects;
   static bool gAccessibilityEnabled;
 #if PLATFORM(MAC)
-  HashSet<AXID, IntHash<AXID>, AXIDHashTraits> m_idsInUse;
+  HashSet<AXID> m_idsInUse;
 #endif
 };
 
