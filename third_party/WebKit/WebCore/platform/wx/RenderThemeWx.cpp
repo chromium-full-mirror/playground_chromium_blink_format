@@ -79,7 +79,7 @@ class RenderThemeWx : public RenderTheme {
 
   virtual bool isControlStyled(const RenderStyle*,
                                const BorderData&,
-                               const BackgroundLayer&,
+                               const FillLayer&,
                                const Color&) const;
 
   virtual bool controlSupportsTints(const RenderObject*) const;
@@ -106,7 +106,7 @@ RenderTheme* theme() {
 
 bool RenderThemeWx::isControlStyled(const RenderStyle* style,
                                     const BorderData& border,
-                                    const BackgroundLayer& background,
+                                    const FillLayer& background,
                                     const Color& backgroundColor) const {
   if (style->appearance() == TextFieldAppearance ||
       style->appearance() == TextAreaAppearance)
