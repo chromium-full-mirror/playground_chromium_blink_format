@@ -549,6 +549,8 @@ class FrameLoader : Noncopyable
   bool shouldAllowNavigation(Frame* targetFrame) const;
   Frame* findFrameForNavigation(const AtomicString& name);
 
+  void startIconLoader();
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
@@ -680,8 +682,6 @@ class FrameLoader : Noncopyable
   void scheduleRedirection(ScheduledRedirection*);
   void startRedirectionTimer();
   void stopRedirectionTimer();
-
-  void startIconLoader();
 
 #if USE(LOW_BANDWIDTH_DISPLAY)
   // implementation of CachedResourceClient

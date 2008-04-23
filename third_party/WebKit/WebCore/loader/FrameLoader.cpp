@@ -1122,9 +1122,6 @@ void FrameLoader::endIfNotLoadingMainResource() {
     // subframe is the
     // last one to complete.
     checkCompleted();
-
-  if (m_documentLoader && !m_documentLoader->isLoadingFromCachedPage())
-    startIconLoader();
 }
 
 void FrameLoader::iconLoadDecisionAvailable() {
