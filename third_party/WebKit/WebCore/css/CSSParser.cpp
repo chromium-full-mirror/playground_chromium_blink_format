@@ -1200,6 +1200,7 @@ bool CSSParser::parseValue(int propId, bool important) {
 #endif
       break;
     case CSSPropertyWebkitBorderImage:
+    case CSSPropertyWebkitMaskBoxImage:
       if (id == CSSValueNone)
         valid_primitive = true;
       else
@@ -3549,8 +3550,8 @@ bool CSSParser::parseBorderImage(int propId, bool important) {
     if (context.allowNumber() &&
         validUnit(val, FInteger | FNonNeg | FPercent, true)) {
       context.commitNumber(val);
-    } else if (context.allowSlash() && val->unit == Value::Operator &&
-               val->iValue == '/') {
+    } else if (propId == CSSPropertyWebkitBorderImage && context.allowSlash() &&
+               val->unit == Value::Operator && val->iValue == '/') {
       context.commitSlash();
     } else if (context.allowWidth() &&
                (val->id == CSSValueThin || val->id == CSSValueMedium ||

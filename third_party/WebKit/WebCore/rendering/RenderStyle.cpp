@@ -40,7 +40,7 @@ static bool imagesEquivalent(StyleImage* image1, StyleImage* image2) {
   return true;
 }
 
-bool BorderImage::operator==(const BorderImage& o) const {
+bool NinePieceImage::operator==(const NinePieceImage& o) const {
   return imagesEquivalent(m_image.get(), o.m_image.get()) &&
          m_slices == o.m_slices && m_horizontalRule == o.m_horizontalRule &&
          m_verticalRule == o.m_verticalRule;
@@ -1403,7 +1403,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   }
 
   if (rareNonInheritedData->opacity != other->rareNonInheritedData->opacity ||
-      rareNonInheritedData->m_mask != other->rareNonInheritedData->m_mask)
+      rareNonInheritedData->m_mask != other->rareNonInheritedData->m_mask ||
+      rareNonInheritedData->m_maskBoxImage !=
+          other->rareNonInheritedData->m_maskBoxImage)
     return RepaintLayer;
 
   if (inherited->color != other->inherited->color ||

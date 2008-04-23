@@ -319,37 +319,40 @@ struct CollapsedBorderValue {
   EBorderPrecedence precedence;
 };
 
-enum EBorderImageRule { BI_STRETCH, BI_ROUND, BI_REPEAT };
+enum ENinePieceImageRule { StretchImageRule, RoundImageRule, RepeatImageRule };
 
-class BorderImage {
+class NinePieceImage {
  public:
-  BorderImage()
-      : m_image(0), m_horizontalRule(BI_STRETCH), m_verticalRule(BI_STRETCH) {}
-  BorderImage(StyleImage* image,
-              LengthBox slices,
-              EBorderImageRule h,
-              EBorderImageRule v)
+  NinePieceImage()
+      : m_image(0),
+        m_horizontalRule(StretchImageRule),
+        m_verticalRule(StretchImageRule) {}
+  NinePieceImage(StyleImage* image,
+                 LengthBox slices,
+                 ENinePieceImageRule h,
+                 ENinePieceImageRule v)
       : m_image(image),
         m_slices(slices),
         m_horizontalRule(h),
         m_verticalRule(v) {}
 
-  bool operator==(const BorderImage& o) const;
+  bool operator==(const NinePieceImage& o) const;
+  bool operator!=(const NinePieceImage& o) const { return !(*this == o); }
 
   bool hasImage() const { return m_image != 0; }
   StyleImage* image() const { return m_image.get(); }
 
-  EBorderImageRule horizontalRule() const {
-    return static_cast<EBorderImageRule>(m_horizontalRule);
+  ENinePieceImageRule horizontalRule() const {
+    return static_cast<ENinePieceImageRule>(m_horizontalRule);
   }
-  EBorderImageRule verticalRule() const {
-    return static_cast<EBorderImageRule>(m_verticalRule);
+  ENinePieceImageRule verticalRule() const {
+    return static_cast<ENinePieceImageRule>(m_verticalRule);
   }
 
   RefPtr<StyleImage> m_image;
   LengthBox m_slices;
-  unsigned m_horizontalRule : 2;  // EBorderImageRule
-  unsigned m_verticalRule : 2;    // EBorderImageRule
+  unsigned m_horizontalRule : 2;  // ENinePieceImageRule
+  unsigned m_verticalRule : 2;    // ENinePieceImageRule
 };
 
 class BorderData {
@@ -359,7 +362,7 @@ class BorderData {
   BorderValue top;
   BorderValue bottom;
 
-  BorderImage image;
+  NinePieceImage image;
 
   IntSize topLeft;
   IntSize topRight;
@@ -1450,6 +1453,7 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
   Transition* m_transition;
 
   FillLayer m_mask;
+  NinePieceImage m_maskBoxImage;
 
 #if ENABLE(XBL)
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1997,7 +2001,7 @@ class RenderStyle {
   const BorderValue& borderTop() const { return surround->border.top; }
   const BorderValue& borderBottom() const { return surround->border.bottom; }
 
-  const BorderImage& borderImage() const { return surround->border.image; }
+  const NinePieceImage& borderImage() const { return surround->border.image; }
 
   IntSize borderTopLeftRadius() const { return surround->border.topLeft; }
   IntSize borderTopRightRadius() const { return surround->border.topRight; }
@@ -2224,6 +2228,9 @@ class RenderStyle {
   const FillLayer* maskLayers() const {
     return &(rareNonInheritedData->m_mask);
   }
+  const NinePieceImage& maskBoxImage() const {
+    return rareNonInheritedData->m_maskBoxImage;
+  }
 
   // returns true for collapsing borders, false for separate borders
   bool borderCollapse() const { return inherited_flags._border_collapse; }
@@ -2433,7 +2440,10 @@ class RenderStyle {
     return !rareNonInheritedData->m_transform->m_operations.isEmpty();
   }
   void applyTransform(AffineTransform&, const IntSize& borderBoxSize) const;
-  bool hasMask() const { return rareNonInheritedData->m_mask.hasImage(); }
+  bool hasMask() const {
+    return rareNonInheritedData->m_mask.hasImage() ||
+           rareNonInheritedData->m_maskBoxImage.hasImage();
+  }
   // End CSS3 Getters
 
   // Apple-specific property getter methods
@@ -2506,7 +2516,7 @@ class RenderStyle {
   void resetBorderRight() { SET_VAR(surround, border.right, BorderValue()) }
   void resetBorderBottom() { SET_VAR(surround, border.bottom, BorderValue()) }
   void resetBorderLeft() { SET_VAR(surround, border.left, BorderValue()) }
-  void resetBorderImage() { SET_VAR(surround, border.image, BorderImage()) }
+  void resetBorderImage() { SET_VAR(surround, border.image, NinePieceImage()) }
   void resetBorderRadius() {
     resetBorderTopLeftRadius();
     resetBorderTopRightRadius();
@@ -2530,7 +2540,7 @@ class RenderStyle {
 
   void setBackgroundColor(const Color& v) { SET_VAR(background, m_color, v) }
 
-  void setBorderImage(const BorderImage& b) {
+  void setBorderImage(const NinePieceImage& b) {
     SET_VAR(surround, border.image, b)
   }
 
@@ -2679,6 +2689,9 @@ class RenderStyle {
       accessMaskLayers()->cullEmptyLayers();
       accessMaskLayers()->fillUnsetProperties();
     }
+  }
+  void setMaskBoxImage(const NinePieceImage& b) {
+    SET_VAR(rareNonInheritedData, m_maskBoxImage, b)
   }
 
   void setBorderCollapse(bool collapse) {
@@ -3046,7 +3059,7 @@ class RenderStyle {
   // Initial values for all the properties
   static bool initialBorderCollapse() { return false; }
   static EBorderStyle initialBorderStyle() { return BNONE; }
-  static BorderImage initialBorderImage() { return BorderImage(); }
+  static NinePieceImage initialNinePieceImage() { return NinePieceImage(); }
   static IntSize initialBorderRadius() { return IntSize(0, 0); }
   static ECaptionSide initialCaptionSide() { return CAPTOP; }
   static EClear initialClear() { return CNONE; }

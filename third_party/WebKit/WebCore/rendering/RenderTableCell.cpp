@@ -984,6 +984,8 @@ void RenderTableCell::paintMask(PaintInfo& paintInfo, int tx, int ty) {
 
   paintFillLayers(paintInfo, Color(), style()->maskLayers(), my, mh, tx, ty, w,
                   h);
+  paintNinePieceImage(paintInfo.context, tx, ty, w, h, style(),
+                      style()->maskBoxImage());
 }
 
 }  // namespace WebCore
