@@ -576,16 +576,16 @@ class RenderObject : public CachedResourceClient {
   // RenderBox implements this.
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty) {}
   virtual void paintMask(PaintInfo&, int tx, int ty) {}
-  virtual void paintFillExtended(const PaintInfo&,
-                                 const Color&,
-                                 const FillLayer*,
-                                 int clipy,
-                                 int cliph,
-                                 int tx,
-                                 int ty,
-                                 int width,
-                                 int height,
-                                 InlineFlowBox* box = 0) {}
+  virtual void paintFillLayerExtended(const PaintInfo&,
+                                      const Color&,
+                                      const FillLayer*,
+                                      int clipy,
+                                      int cliph,
+                                      int tx,
+                                      int ty,
+                                      int width,
+                                      int height,
+                                      InlineFlowBox* box = 0) {}
 
   /*
    * Calculates the actual width of the object (only for non inline
