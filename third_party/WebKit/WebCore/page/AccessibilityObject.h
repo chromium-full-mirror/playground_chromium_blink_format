@@ -243,6 +243,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   String textUnderElement() const;
   String selectedText() const;
   const AtomicString& accessKey() const;
+  const String& actionVerb() const;
   Widget* widget() const;
   Widget* widgetForAttachmentView() const;
   void getDocumentLinks(Vector<RefPtr<AccessibilityObject>>&) const;

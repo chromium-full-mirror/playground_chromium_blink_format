@@ -353,8 +353,20 @@ AccessibleBase::get_accFocus(VARIANT* pvFocusedChild) {
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE AccessibleBase::get_accDefaultAction(VARIANT, BSTR*) {
-  return E_NOTIMPL;
+HRESULT STDMETHODCALLTYPE AccessibleBase::get_accDefaultAction(VARIANT vChild,
+                                                               BSTR* action) {
+  if (!action)
+    return E_POINTER;
+
+  AccessibilityObject* childObj;
+  HRESULT hr = getAccessibilityObjectForChild(vChild, childObj);
+
+  if (FAILED(hr))
+    return hr;
+
+  if (*action = BString(childObj->actionVerb()).release())
+    return S_OK;
+  return S_FALSE;
 }
 
 HRESULT STDMETHODCALLTYPE
