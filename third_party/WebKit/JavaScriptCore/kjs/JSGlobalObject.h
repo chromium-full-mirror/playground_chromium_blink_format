@@ -136,6 +136,8 @@ class JSGlobalObject : public JSVariableObject {
     ActivationStackNode* activations;
     size_t activationCount;
 
+    unsigned pageGroupIdentifier;
+
     OwnPtr<HashSet<JSObject*>> arrayVisitedElements;  // Global data shared by
                                                       // array prototype
                                                       // functions.
@@ -238,6 +240,11 @@ class JSGlobalObject : public JSVariableObject {
   NativeErrorPrototype* URIErrorPrototype() const {
     return d()->URIErrorPrototype;
   }
+
+  void setPageGroupIdentifier(unsigned value) {
+    d()->pageGroupIdentifier = value;
+  }
+  unsigned pageGroupIdentifier() const { return d()->pageGroupIdentifier; }
 
   void saveBuiltins(SavedBuiltins&) const;
   void restoreBuiltins(const SavedBuiltins&);

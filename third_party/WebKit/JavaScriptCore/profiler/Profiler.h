@@ -45,7 +45,7 @@ class Profiler {
   static Profiler* profiler();
   static void debugLog(UString);
 
-  void startProfiling();
+  void startProfiling(unsigned Identifier);
   void stopProfiling();
   void willExecute(ExecState*, JSObject* calledFunction);
   void willExecute(ExecState*,
@@ -58,11 +58,12 @@ class Profiler {
   void printDataSampleStyle() const;
 
  private:
-  Profiler() : m_profiling(false) {}
+  Profiler() : m_profiling(false), m_pageGroupIdentifier(0) {}
 
   void insertStackNamesInTree(const Vector<UString>& callStackNames);
 
   bool m_profiling;
+  unsigned m_pageGroupIdentifier;
 
   // FIXME: Make this a vector of FunctionCallProfiles where each one is the
   // root of a new thread.

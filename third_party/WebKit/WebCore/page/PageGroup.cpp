@@ -37,11 +37,17 @@
 
 namespace WebCore {
 
+static unsigned getUniqueIdentifier() {
+  static unsigned currentIdentifier = 0;
+  return ++currentIdentifier;
+}
+
 // --------
 
 static bool shouldTrackVisitedLinks;
 
-PageGroup::PageGroup(Page* page) : m_visitedLinksPopulated(false) {
+PageGroup::PageGroup(Page* page)
+    : m_visitedLinksPopulated(false), m_identifier(getUniqueIdentifier()) {
   ASSERT(page);
   m_pages.add(page);
 }

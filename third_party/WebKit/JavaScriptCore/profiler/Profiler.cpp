@@ -30,8 +30,9 @@
 #include "Profiler.h"
 
 #include "FunctionCallProfile.h"
-#include <kjs/ExecState.h>
-#include <kjs/function.h>
+#include "JSGlobalObject.h"
+#include "ExecState.h"
+#include "function.h"
 
 #include <stdio.h>
 
@@ -54,9 +55,11 @@ Profiler* Profiler::profiler() {
   return sharedProfiler;
 }
 
-void Profiler::startProfiling() {
+void Profiler::startProfiling(unsigned pageGroupIdentifier) {
   if (m_profiling)
     return;
+
+  m_pageGroupIdentifier = pageGroupIdentifier;
 
   // FIXME: When multi-threading is supported this will be a vector and calls
   // into the profiler will need to know which thread it is executing on.
@@ -70,7 +73,9 @@ void Profiler::stopProfiling() {
 }
 
 void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
-  if (!m_profiling)
+  if (!m_profiling ||
+      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
+          m_pageGroupIdentifier)
     return;
 
   Vector<UString> callStackNames;
@@ -81,7 +86,9 @@ void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
 void Profiler::willExecute(ExecState* exec,
                            const UString& sourceURL,
                            int startingLineNumber) {
-  if (!m_profiling)
+  if (!m_profiling ||
+      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
+          m_pageGroupIdentifier)
     return;
 
   Vector<UString> callStackNames;
@@ -90,7 +97,9 @@ void Profiler::willExecute(ExecState* exec,
 }
 
 void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
-  if (!m_profiling)
+  if (!m_profiling ||
+      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
+          m_pageGroupIdentifier)
     return;
 
   Vector<UString> callStackNames;
@@ -101,7 +110,9 @@ void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
 void Profiler::didExecute(ExecState* exec,
                           const UString& sourceURL,
                           int startingLineNumber) {
-  if (!m_profiling)
+  if (!m_profiling ||
+      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
+          m_pageGroupIdentifier)
     return;
 
   Vector<UString> callStackNames;

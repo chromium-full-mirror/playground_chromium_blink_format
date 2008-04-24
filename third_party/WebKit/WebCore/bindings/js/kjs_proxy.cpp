@@ -33,6 +33,7 @@
 #include "JSDocument.h"
 #include "JSDOMWindow.h"
 #include "Page.h"
+#include "PageGroup.h"
 #include "Settings.h"
 #include "kjs_events.h"
 #include <kjs/debugger.h>
@@ -117,6 +118,8 @@ void KJSProxy::clear() {
   // (we used to delete and re-create it, previously)
   if (m_windowWrapper)
     m_windowWrapper->clear();
+
+  m_windowWrapper->window()->setPageGroupIdentifier(0);
 }
 
 EventListener* KJSProxy::createHTMLEventHandler(const String& functionName,
@@ -159,8 +162,11 @@ void KJSProxy::initScript() {
 
   m_windowWrapper = new JSDOMWindowWrapper(m_frame->domWindow());
 
-  if (Page* page = m_frame->page())
+  if (Page* page = m_frame->page()) {
     attachDebugger(page->debugger());
+    m_windowWrapper->window()->setPageGroupIdentifier(
+        page->group().identifier());
+  }
 
   m_frame->loader()->dispatchWindowObjectAvailable();
 }
