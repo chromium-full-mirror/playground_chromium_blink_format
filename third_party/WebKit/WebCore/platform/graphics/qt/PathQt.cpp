@@ -176,10 +176,10 @@ String Path::debugString() const {
 
     switch (cur.type) {
       case QPainterPath::MoveToElement:
-        ret += QString("M %1 %2").arg(cur.x).arg(cur.y);
+        ret += QString(QLatin1String("M %1 %2")).arg(cur.x).arg(cur.y);
         break;
       case QPainterPath::LineToElement:
-        ret += QString("L %1 %2").arg(cur.x).arg(cur.y);
+        ret += QString(QLatin1String("L %1 %2")).arg(cur.x).arg(cur.y);
         break;
       case QPainterPath::CurveToElement: {
         const QPainterPath::Element& c1 = m_path->elementAt(i + 1);
@@ -188,7 +188,7 @@ String Path::debugString() const {
         Q_ASSERT(c1.type == QPainterPath::CurveToDataElement);
         Q_ASSERT(c2.type == QPainterPath::CurveToDataElement);
 
-        ret += QString("C %1 %2 %3 %4 %5 %6")
+        ret += QString(QLatin1String("C %1 %2 %3 %4 %5 %6"))
                    .arg(cur.x)
                    .arg(cur.y)
                    .arg(c1.x)
