@@ -53,7 +53,7 @@ class WebEditorClient : public WebCore::EditorClient {
 
   virtual bool shouldBeginEditing(WebCore::Range*);
   virtual bool shouldEndEditing(WebCore::Range*);
-  virtual bool shouldInsertText(WebCore::String,
+  virtual bool shouldInsertText(const WebCore::String&,
                                 WebCore::Range*,
                                 WebCore::EditorInsertAction);
 

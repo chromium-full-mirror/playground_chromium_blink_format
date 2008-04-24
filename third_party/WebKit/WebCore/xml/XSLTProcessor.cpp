@@ -326,8 +326,8 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
 }
 
 static inline RefPtr<DocumentFragment> createFragmentFromSource(
-    String sourceString,
-    String sourceMIMEType,
+    const String& sourceString,
+    const String& sourceMIMEType,
     Node* sourceNode,
     Document* outputDoc) {
   RefPtr<DocumentFragment> fragment = new DocumentFragment(outputDoc);

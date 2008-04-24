@@ -129,7 +129,7 @@ class SVGSMILElement : public SVGElement {
     enum Type { EventBase, Syncbase, AccessKey };
     Condition(Type,
               BeginOrEnd beginOrEnd,
-              String baseID,
+              const String& baseID,
               const String& name,
               SMILTime offset,
               int repeats = -1);

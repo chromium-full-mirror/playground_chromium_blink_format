@@ -132,7 +132,7 @@ bool EditorClientQt::shouldEndEditing(WebCore::Range* range) {
   return true;
 }
 
-bool EditorClientQt::shouldInsertText(String string,
+bool EditorClientQt::shouldInsertText(const String& string,
                                       Range* range,
                                       EditorInsertAction action) {
   if (dumpEditingCallbacks) {

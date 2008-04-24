@@ -75,7 +75,7 @@ MediaControlShadowRootElement::MediaControlShadowRootElement(
 MediaControlInputElement::MediaControlInputElement(
     Document* doc,
     RenderStyle::PseudoId pseudo,
-    String type,
+    const String& type,
     HTMLMediaElement* mediaElement)
     : HTMLInputElement(doc), m_mediaElement(mediaElement) {
   setInputType(type);

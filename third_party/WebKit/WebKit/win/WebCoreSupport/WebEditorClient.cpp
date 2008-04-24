@@ -234,7 +234,7 @@ bool WebEditorClient::shouldInsertNode(Node* /*node*/,
   return true;
 }
 
-bool WebEditorClient::shouldInsertText(String /*str*/,
+bool WebEditorClient::shouldInsertText(const String& /*str*/,
                                        Range* /* replacingRange */,
                                        EditorInsertAction /*givenAction*/) {
   notImplemented();

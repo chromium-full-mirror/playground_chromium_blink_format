@@ -79,7 +79,7 @@ class ConditionEventListener : public EventListener {
 
 SVGSMILElement::Condition::Condition(Type type,
                                      BeginOrEnd beginOrEnd,
-                                     String baseID,
+                                     const String& baseID,
                                      const String& name,
                                      SMILTime offset,
                                      int repeats)

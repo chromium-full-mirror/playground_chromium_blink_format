@@ -201,7 +201,7 @@ static int randomNumber() {
 // behavior in
 // certain edge cases (see basename(3) specification for examples).
 // Consider this if it ever needs to become a general purpose method.
-static String pathGetFilename(String path) {
+static String pathGetFilename(const String& path) {
 #if PLATFORM(QT)
   return QFileInfo(path).fileName();
 #elif PLATFORM(WX)

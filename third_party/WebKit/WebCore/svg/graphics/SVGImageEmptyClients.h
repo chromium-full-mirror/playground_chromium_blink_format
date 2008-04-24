@@ -397,7 +397,7 @@ class SVGEmptyEditorClient : public EditorClient {
   }
   //  virtual bool shouldInsertNode(Node*, Range* replacingRange,
   //  WebViewInsertAction) { return false; }
-  virtual bool shouldInsertText(String, Range*, EditorInsertAction) {
+  virtual bool shouldInsertText(const String&, Range*, EditorInsertAction) {
     return false;
   }
   virtual bool shouldChangeSelectedRange(Range* fromRange,

@@ -68,7 +68,7 @@ class MediaPlayer : Noncopyable {
   IntRect rect() const { return m_rect; }
   void setRect(const IntRect& r);
 
-  void load(String url);
+  void load(const String& url);
   void cancelLoad();
 
   bool visible() const;

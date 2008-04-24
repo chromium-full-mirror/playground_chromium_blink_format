@@ -66,7 +66,7 @@ class EditorClient : public WebCore::EditorClient {
   virtual bool shouldInsertNode(WebCore::Node*,
                                 WebCore::Range*,
                                 WebCore::EditorInsertAction);
-  virtual bool shouldInsertText(WebCore::String,
+  virtual bool shouldInsertText(const WebCore::String&,
                                 WebCore::Range*,
                                 WebCore::EditorInsertAction);
   virtual bool shouldChangeSelectedRange(WebCore::Range* fromRange,

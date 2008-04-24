@@ -55,7 +55,7 @@ MediaPlayer::~MediaPlayer() {
   delete m_private;
 }
 
-void MediaPlayer::load(String url) {
+void MediaPlayer::load(const String& url) {
   m_private->load(url);
 }
 
