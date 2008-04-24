@@ -62,6 +62,7 @@ class QNetworkReplyHandler : public QObject {
   bool m_responseSent;
   QNetworkAccessManager::Operation m_method;
   QNetworkRequest m_request;
+  uint m_startTime;
 };
 
 // Self destructing QIODevice for FormData
