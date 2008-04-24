@@ -22,6 +22,7 @@
 #define InlineBox_h
 
 #include "RenderObject.h"  // needed for RenderObject::PaintInfo
+#include "TextDirection.h"
 
 namespace WebCore {
 
@@ -46,6 +47,7 @@ class InlineBox {
         m_parent(0),
         m_firstLine(false),
         m_constructed(false),
+        m_bidiEmbeddingLevel(0),
         m_dirty(false),
         m_extracted(false),
         m_includeLeftEdge(false),
@@ -54,7 +56,7 @@ class InlineBox {
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBox(false),
-        m_reversed(false),
+        m_dirOverride(false),
         m_treatAsText(true),
         m_determinedIfNextOnLineExists(false),
         m_determinedIfPrevOnLineExists(false),
@@ -92,6 +94,7 @@ class InlineBox {
         m_parent(parent),
         m_firstLine(firstLine),
         m_constructed(constructed),
+        m_bidiEmbeddingLevel(0),
         m_dirty(dirty),
         m_extracted(extracted),
         m_includeLeftEdge(false),
@@ -100,7 +103,7 @@ class InlineBox {
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
         m_hasEllipsisBox(false),
-        m_reversed(false),
+        m_dirOverride(false),
         m_treatAsText(true),
         m_determinedIfNextOnLineExists(false),
         m_determinedIfPrevOnLineExists(false),
@@ -226,6 +229,18 @@ class InlineBox {
   virtual int caretMaxOffset() const;
   virtual unsigned caretMaxRenderedOffset() const;
 
+  unsigned char bidiLevel() const { return m_bidiEmbeddingLevel; }
+  void setBidiLevel(unsigned char level) { m_bidiEmbeddingLevel = level; }
+  TextDirection direction() const {
+    return m_bidiEmbeddingLevel % 2 ? RTL : LTR;
+  }
+  int caretLeftmostOffset() const {
+    return direction() == LTR ? caretMinOffset() : caretMaxOffset();
+  }
+  int caretRightmostOffset() const {
+    return direction() == LTR ? caretMaxOffset() : caretMinOffset();
+  }
+
   virtual void clearTruncation() {}
 
   bool isDirty() const { return m_dirty; }
@@ -271,6 +286,7 @@ class InlineBox {
 
  private:
   bool m_constructed : 1;
+  unsigned char m_bidiEmbeddingLevel : 6;
 
  protected:
   bool m_dirty : 1;
@@ -290,7 +306,6 @@ class InlineBox {
 
   // for InlineTextBox
  public:
-  bool m_reversed : 1;
   bool m_dirOverride : 1;
   bool m_treatAsText : 1;  // Whether or not to treat a <br> as text for the
                            // purposes of line height.

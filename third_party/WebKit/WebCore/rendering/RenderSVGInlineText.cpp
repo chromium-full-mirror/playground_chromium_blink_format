@@ -125,8 +125,8 @@ InlineTextBox* RenderSVGInlineText::createInlineTextBox() {
   return new (renderArena()) SVGInlineTextBox(this);
 }
 
-IntRect RenderSVGInlineText::caretRect(int offset,
-                                       EAffinity affinity,
+IntRect RenderSVGInlineText::caretRect(InlineBox* inlineBox,
+                                       int caretOffset,
                                        int* extraWidthToEndOfLine) {
   // SVG doesn't have any editable content where a caret rect would be needed
   return IntRect();
@@ -152,7 +152,7 @@ VisiblePosition RenderSVGInlineText::positionForCoordinates(int x, int y) {
                                       offset)) {
       // If we're not at the end/start of the box, stop looking for other
       // selected boxes.
-      if (!box->m_reversed) {
+      if (box->direction() == LTR) {
         if (offset <= (int)box->end() + 1)
           break;
       } else {

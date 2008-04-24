@@ -162,8 +162,8 @@ class RenderBox : public RenderObject {
 
   virtual RenderLayer* layer() const { return m_layer; }
 
-  virtual IntRect caretRect(int offset,
-                            EAffinity = UPSTREAM,
+  virtual IntRect caretRect(InlineBox*,
+                            int caretOffset,
                             int* extraWidthToEndOfLine = 0);
 
   virtual void paintFillLayerExtended(const PaintInfo&,

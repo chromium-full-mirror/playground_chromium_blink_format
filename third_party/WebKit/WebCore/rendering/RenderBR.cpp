@@ -100,8 +100,4 @@ VisiblePosition RenderBR::positionForCoordinates(int /*x*/, int /*y*/) {
   return VisiblePosition(element(), 0, DOWNSTREAM);
 }
 
-InlineBox* RenderBR::inlineBox(int /*offset*/, EAffinity /*affinity*/) {
-  return firstTextBox();
-}
-
 }  // namespace WebCore

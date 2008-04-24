@@ -2563,8 +2563,8 @@ bool RenderObject::absolutePosition(int& xPos, int& yPos, bool f) const {
   }
 }
 
-IntRect RenderObject::caretRect(int offset,
-                                EAffinity affinity,
+IntRect RenderObject::caretRect(InlineBox* inlineBox,
+                                int caretOffset,
                                 int* extraWidthToEndOfLine) {
   if (extraWidthToEndOfLine)
     *extraWidthToEndOfLine = 0;
@@ -3184,7 +3184,8 @@ int RenderObject::caretMinOffset() const {
 }
 
 int RenderObject::caretMaxOffset() const {
-  return isReplaced() ? 1 : 0;
+  return isReplaced() ? (element() ? max(1U, element()->childNodeCount()) : 1)
+                      : 0;
 }
 
 unsigned RenderObject::caretMaxRenderedOffset() const {
@@ -3197,10 +3198,6 @@ int RenderObject::previousOffset(int current) const {
 
 int RenderObject::nextOffset(int current) const {
   return current + 1;
-}
-
-InlineBox* RenderObject::inlineBox(int offset, EAffinity affinity) {
-  return inlineBoxWrapper();
 }
 
 int RenderObject::maxTopMargin(bool positive) const {

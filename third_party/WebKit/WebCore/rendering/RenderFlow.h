@@ -104,8 +104,8 @@ class RenderFlow : public RenderContainer {
   virtual int leftmostPosition(bool includeOverflowInterior = true,
                                bool includeSelf = true) const;
 
-  virtual IntRect caretRect(int offset,
-                            EAffinity = UPSTREAM,
+  virtual IntRect caretRect(InlineBox*,
+                            int caretOffset,
                             int* extraWidthToEndOfLine = 0);
 
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);

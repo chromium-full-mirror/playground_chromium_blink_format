@@ -28,6 +28,7 @@
 
 #include "Node.h"
 #include "Position.h"
+#include "TextDirection.h"
 
 namespace WebCore {
 
@@ -43,6 +44,8 @@ namespace WebCore {
 // constructors auto-correct UPSTREAM to DOWNSTREAM if the
 // position is not at a line break.
 #define VP_UPSTREAM_IF_POSSIBLE UPSTREAM
+
+class InlineBox;
 
 class VisiblePosition {
  public:
@@ -80,6 +83,17 @@ class VisiblePosition {
     return m_deepPosition.isNotNull()
                ? m_deepPosition.node()->rootEditableElement()
                : 0;
+  }
+
+  void getInlineBoxAndOffset(InlineBox*& inlineBox, int& caretOffset) const {
+    m_deepPosition.getInlineBoxAndOffset(m_affinity, inlineBox, caretOffset);
+  }
+
+  void getInlineBoxAndOffset(TextDirection primaryDirection,
+                             InlineBox*& inlineBox,
+                             int& caretOffset) const {
+    m_deepPosition.getInlineBoxAndOffset(m_affinity, primaryDirection,
+                                         inlineBox, caretOffset);
   }
 
   IntRect caretRect() const;

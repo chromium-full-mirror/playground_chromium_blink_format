@@ -979,8 +979,12 @@ static VisiblePosition updateAXLineStartForVisiblePosition(
     if (!p.node())
       break;
     renderer = p.node()->renderer();
-    if (!renderer || renderer->inlineBox(p.offset(), tempPosition.affinity()) ||
-        (renderer->isRenderBlock() && p.offset() == 0))
+    if (!renderer || renderer->isRenderBlock() && !p.offset())
+      break;
+    InlineBox* box;
+    int ignoredCaretOffset;
+    p.getInlineBoxAndOffset(tempPosition.affinity(), box, ignoredCaretOffset);
+    if (box)
       break;
     startPosition = tempPosition;
   }

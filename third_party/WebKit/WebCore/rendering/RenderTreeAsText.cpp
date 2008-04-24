@@ -317,8 +317,8 @@ static void writeTextRun(TextStream& ts,
                          const InlineTextBox& run) {
   ts << "text run at (" << run.m_x << "," << run.m_y << ") width "
      << run.m_width;
-  if (run.m_reversed || run.m_dirOverride) {
-    ts << (run.m_reversed ? " RTL" : " LTR");
+  if (run.direction() == RTL || run.m_dirOverride) {
+    ts << (run.direction() == RTL ? " RTL" : " LTR");
     if (run.m_dirOverride)
       ts << " override";
   }

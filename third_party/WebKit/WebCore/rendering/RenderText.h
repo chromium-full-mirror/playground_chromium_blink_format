@@ -141,8 +141,8 @@ class RenderText : public RenderObject {
   }
   virtual void setSelectionState(SelectionState s);
   virtual IntRect selectionRect(bool clipToVisibleContent = true);
-  virtual IntRect caretRect(int offset,
-                            EAffinity,
+  virtual IntRect caretRect(InlineBox*,
+                            int caretOffset,
                             int* extraWidthToEndOfLine = 0);
 
   virtual int marginLeft() const {
@@ -156,8 +156,6 @@ class RenderText : public RenderObject {
 
   InlineTextBox* firstTextBox() const { return m_firstTextBox; }
   InlineTextBox* lastTextBox() const { return m_lastTextBox; }
-
-  virtual InlineBox* inlineBox(int offset, EAffinity = UPSTREAM);
 
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;

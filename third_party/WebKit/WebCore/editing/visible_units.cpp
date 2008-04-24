@@ -263,11 +263,11 @@ static RootInlineBox* rootBoxForLine(const VisiblePosition& c) {
   if (!renderer)
     return 0;
 
-  InlineBox* box = renderer->inlineBox(p.offset(), c.affinity());
-  if (!box)
-    return 0;
+  InlineBox* box;
+  int offset;
+  c.getInlineBoxAndOffset(box, offset);
 
-  return box->root();
+  return box ? box->root() : 0;
 }
 
 static VisiblePosition positionAvoidingFirstPositionInTable(
@@ -452,7 +452,9 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
 
   RenderBlock* containingBlock = 0;
   RootInlineBox* root = 0;
-  InlineBox* box = renderer->inlineBox(p.offset(), visiblePosition.affinity());
+  InlineBox* box;
+  int ignoredCaretOffset;
+  visiblePosition.getInlineBoxAndOffset(box, ignoredCaretOffset);
   if (box) {
     root = box->root()->prevRootBox();
     if (root)
@@ -474,7 +476,8 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
       Position pos(n, caretMinOffset(n));
       if (pos.isCandidate()) {
         ASSERT(n->renderer());
-        box = n->renderer()->inlineBox(caretMaxOffset(n));
+        Position maxPos(n, caretMaxOffset(n));
+        maxPos.getInlineBoxAndOffset(DOWNSTREAM, box, ignoredCaretOffset);
         if (box) {
           // previous root line box found
           root = box->root();
@@ -526,7 +529,9 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
 
   RenderBlock* containingBlock = 0;
   RootInlineBox* root = 0;
-  InlineBox* box = renderer->inlineBox(p.offset(), visiblePosition.affinity());
+  InlineBox* box;
+  int ignoredCaretOffset;
+  visiblePosition.getInlineBoxAndOffset(box, ignoredCaretOffset);
   if (box) {
     root = box->root()->nextRootBox();
     if (root)
@@ -548,7 +553,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
       Position pos(n, caretMinOffset(n));
       if (pos.isCandidate()) {
         ASSERT(n->renderer());
-        box = n->renderer()->inlineBox(caretMinOffset(n));
+        pos.getInlineBoxAndOffset(DOWNSTREAM, box, ignoredCaretOffset);
         if (box) {
           // next root line box found
           root = box->root();

@@ -502,8 +502,6 @@ class RenderObject : public CachedResourceClient {
   virtual void setInlineBoxWrapper(InlineBox*);
   virtual void deleteLineBoxWrapper();
 
-  virtual InlineBox* inlineBox(int offset = 0, EAffinity = UPSTREAM);
-
   // for discussion of lineHeight see CSS2 spec
   virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
   // for the vertical-align property of inline elements
@@ -1038,8 +1036,8 @@ class RenderObject : public CachedResourceClient {
    * line -
    * useful for character range rect computations
    */
-  virtual IntRect caretRect(int offset,
-                            EAffinity = UPSTREAM,
+  virtual IntRect caretRect(InlineBox*,
+                            int caretOffset,
                             int* extraWidthToEndOfLine = 0);
 
   virtual int lowestPosition(bool /*includeOverflowInterior*/ = true,

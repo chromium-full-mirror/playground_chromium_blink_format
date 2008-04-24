@@ -699,7 +699,7 @@ TextRun svgTextRunForInlineTextBox(const UChar* c,
   ASSERT(style);
 
   TextRun run(c, len, false, static_cast<int>(xPos), textBox->toAdd(),
-              textBox->m_reversed,
+              textBox->direction() == RTL,
               textBox->m_dirOverride || style->visuallyOrdered());
 
 #if ENABLE(SVG_FONTS)
@@ -765,8 +765,9 @@ static float cummulatedWidthOrHeightOfTextChunk(SVGTextChunk& chunk,
         SVGChar& lastCharacter = *(itSearch - 1);
         SVGChar& currentCharacter = *itSearch;
 
-        int offset = box->m_reversed ? box->end() - i - positionOffset + 1
-                                     : box->start() + i + positionOffset - 1;
+        int offset = box->direction() == RTL
+                         ? box->end() - i - positionOffset + 1
+                         : box->start() + i + positionOffset - 1;
 
         // FIXME: does this need to change to handle multichar glyphs?
         int charsConsumed = 1;
@@ -1206,7 +1207,7 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
 
     String unicodeStr;
     String glyphName;
-    if (textBox->m_reversed) {
+    if (textBox->direction() == RTL) {
       glyphWidth = svgTextBox->calculateGlyphWidth(style, textBox->end() - i,
                                                    extraCharsAvailable,
                                                    charsConsumed, glyphName);
@@ -1279,11 +1280,12 @@ void SVGRootInlineBox::buildLayoutInformationForTextBox(
                     calculateKerning(textBox->object()->element()->renderer());
 
     const UChar* currentCharacter =
-        text->characters() +
-        (textBox->m_reversed ? textBox->end() - i : textBox->start() + i);
+        text->characters() + (textBox->direction() == RTL
+                                  ? textBox->end() - i
+                                  : textBox->start() + i);
     const UChar* lastCharacter = 0;
 
-    if (textBox->m_reversed) {
+    if (textBox->direction() == RTL) {
       if (i < textBox->end())
         lastCharacter = text->characters() + textBox->end() - i + 1;
     } else {
