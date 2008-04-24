@@ -559,16 +559,18 @@ void QWebPagePrivate::keyPressEvent(QKeyEvent* ev) {
     int fontHeight = fm.height();
     if (ev == QKeySequence::MoveToNextPage || ev->key() == Qt::Key_Space) {
       if (v)
-        v->setValue(v->value() + q->viewportSize().height() - fontHeight);
+        v->setValue(v->value() + q->viewportSize().height() - fontHeight * 2);
     } else if (ev == QKeySequence::MoveToPreviousPage) {
       if (v)
-        v->setValue(v->value() - q->viewportSize().height() + fontHeight);
+        v->setValue(v->value() - q->viewportSize().height() + fontHeight * 2);
     } else if (ev->key() == Qt::Key_Up &&
-               ev->modifiers() == Qt::ControlModifier) {
+                   ev->modifiers() == Qt::ControlModifier ||
+               ev->key() == Qt::Key_Home) {
       if (v)
         v->setValue(0);
     } else if (ev->key() == Qt::Key_Down &&
-               ev->modifiers() == Qt::ControlModifier) {
+                   ev->modifiers() == Qt::ControlModifier ||
+               ev->key() == Qt::Key_End) {
       if (v)
         v->setValue(INT_MAX);
     } else {
