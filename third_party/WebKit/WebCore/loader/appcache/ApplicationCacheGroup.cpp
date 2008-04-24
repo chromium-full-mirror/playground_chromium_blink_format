@@ -337,7 +337,10 @@ void ApplicationCacheGroup::didReceiveResponse(
 
   unsigned type = m_pendingEntries.get(url);
 
-  ASSERT(!(type & ApplicationCacheResource::Implicit));
+  // If this is an initial cache attempt, we should not get implicit resources
+  // delivered here.
+  if (!m_newestCache)
+    ASSERT(!(type & ApplicationCacheResource::Implicit));
 
   m_currentResource = ApplicationCacheResource::create(url, response, type);
 }
@@ -579,15 +582,23 @@ void ApplicationCacheGroup::checkIfLoadIsComplete() {
 }
 
 void ApplicationCacheGroup::startLoadingEntry() {
-  // Get the first URL in the entry table that is not implicit
+  ASSERT(m_cacheBeingUpdated);
+
   EntryMap::const_iterator it = m_pendingEntries.begin();
-  EntryMap::const_iterator end = m_pendingEntries.end();
 
-  while (it->second & ApplicationCacheResource::Implicit) {
-    ++it;
+  // If this is an initial cache attempt, we do not want to fetch any implicit
+  // entries,
+  // since those are fed to us by the normal loader machinery.
+  if (!m_newestCache) {
+    // Get the first URL in the entry table that is not implicit
+    EntryMap::const_iterator end = m_pendingEntries.end();
 
-    if (it == end)
-      return;
+    while (it->second & ApplicationCacheResource::Implicit) {
+      ++it;
+
+      if (it == end)
+        return;
+    }
   }
 
   // FIXME: Fire progress event.
