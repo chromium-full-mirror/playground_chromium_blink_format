@@ -137,4 +137,8 @@ bool makeAllDirectories(const String& path) {
   return true;
 }
 
+String pathGetFileName(const String& path) {
+  return path.substring(path.reverseFind('/') + 1);
+}
+
 }  // namespace WebCore

@@ -120,7 +120,8 @@ String homeDirectoryPath() {
 }
 
 String pathGetFileName(const String& path) {
-  return String(PathFindFileName(String(path).charactersWithNullTermination()));
+  return String(
+      ::PathFindFileName(String(path).charactersWithNullTermination()));
 }
 
 static String bundleName() {
