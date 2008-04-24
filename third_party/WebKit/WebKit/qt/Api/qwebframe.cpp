@@ -610,7 +610,7 @@ void QWebFrame::setTextSizeMultiplier(qreal factor) {
 }
 
 qreal QWebFrame::textSizeMultiplier() const {
-  return qreal(d->frame->zoomFactor()) / 100.;
+  return d->frame->zoomFactor();
 }
 
 /*!
@@ -674,8 +674,8 @@ void QWebFrame::print(QPrinter* printer) const {
 
   QRect qprinterRect = printer->pageRect();
 
-  IntRect pageRect(0, 0, qprinterRect.width() / zoomFactorX,
-                   qprinterRect.height() / zoomFactorY);
+  IntRect pageRect(0, 0, int(qprinterRect.width() / zoomFactorX),
+                   int(qprinterRect.height() / zoomFactorY));
 
   printContext.begin(pageRect.width());
 

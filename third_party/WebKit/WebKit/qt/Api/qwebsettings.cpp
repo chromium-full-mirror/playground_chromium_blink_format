@@ -60,13 +60,14 @@ static WebGraphicHash* graphics() {
 
   if (hash->isEmpty()) {
     hash->insert(QWebSettings::MissingImageGraphic,
-                 QPixmap(":webkit/resources/missingImage.png"));
+                 QPixmap(QLatin1String(":webkit/resources/missingImage.png")));
     hash->insert(QWebSettings::MissingPluginGraphic,
-                 QPixmap(":webkit/resources/nullPlugin.png"));
+                 QPixmap(QLatin1String(":webkit/resources/nullPlugin.png")));
     hash->insert(QWebSettings::DefaultFrameIconGraphic,
-                 QPixmap(":webkit/resources/urlIcon.png"));
-    hash->insert(QWebSettings::TextAreaSizeGripCornerGraphic,
-                 QPixmap(":webkit/resources/textAreaResizeCorner.png"));
+                 QPixmap(QLatin1String(":webkit/resources/urlIcon.png")));
+    hash->insert(
+        QWebSettings::TextAreaSizeGripCornerGraphic,
+        QPixmap(QLatin1String(":webkit/resources/textAreaResizeCorner.png")));
   }
 
   return hash;
