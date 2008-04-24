@@ -121,7 +121,7 @@ class ScrollView : public Widget {
 
   bool scroll(ScrollDirection, ScrollGranularity);
 
-#if PLATFORM(MAC)
+#if HAVE(ACCESSIBILITY)
   IntRect contentsToScreen(const IntRect&) const;
   IntPoint screenToContents(const IntPoint&) const;
 #endif
