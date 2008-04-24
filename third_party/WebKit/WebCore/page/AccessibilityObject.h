@@ -257,7 +257,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 
   void detach();
   void makeRangeVisible(const PlainTextRange&);
-  void press();
+  bool press() const;
+  bool performDefaultAction() const { return press(); }
   void childrenChanged();
 
   VisiblePositionRange visiblePositionRange() const;
