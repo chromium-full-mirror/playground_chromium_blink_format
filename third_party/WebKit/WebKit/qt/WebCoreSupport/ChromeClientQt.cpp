@@ -42,6 +42,8 @@
 #include "qwebpage_p.h"
 #include "qwebframe_p.h"
 
+#include <qtooltip.h>
+
 namespace WebCore {
 
 ChromeClientQt::ChromeClientQt(QWebPage* webPage) : m_webPage(webPage) {
@@ -296,8 +298,14 @@ void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult& result,
 void ChromeClientQt::setToolTip(const String& tip) {
 #ifndef QT_NO_TOOLTIP
   QWidget* view = m_webPage->view();
-  if (view)
-    view->setToolTip(tip);
+  QString dtip = tip;
+  if (!tip.isEmpty())
+    dtip = QLatin1String("<p>") + tip + QLatin1String("</p>");
+  if (view) {
+    view->setToolTip(dtip);
+    if (tip.isEmpty())
+      QToolTip::hideText();
+  }
 #else
   Q_UNUSED(tip);
 #endif
