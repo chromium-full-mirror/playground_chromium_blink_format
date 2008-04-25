@@ -979,6 +979,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
     bool endLineMatched = false;
     bool checkForEndLineMatch = endLine;
+    int lastHeight = m_height;
 
     while (!end.atEnd()) {
       // FIXME: Is this check necessary before the first iteration or can it be
@@ -1134,7 +1135,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
           m_floatingObjects->first();
         for (FloatingObject* f = m_floatingObjects->current(); f;
              f = m_floatingObjects->next()) {
-          lastRootBox()->floats().append(f->m_renderer);
+          if (f->m_bottom > lastHeight)
+            lastRootBox()->floats().append(f->m_renderer);
           ASSERT(f->m_renderer == floats[floatIndex].object);
           // If a float's geometry has changed, give up on syncing with clean
           // lines.
@@ -1146,6 +1148,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         lastFloat = m_floatingObjects->last();
       }
 
+      lastHeight = m_height;
       sNumMidpoints = 0;
       sCurrMidpoint = 0;
       start.setPosition(end);
@@ -1204,8 +1207,10 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         } else
           m_floatingObjects->first();
         for (FloatingObject* f = m_floatingObjects->current(); f;
-             f = m_floatingObjects->next())
-          lastRootBox()->floats().append(f->m_renderer);
+             f = m_floatingObjects->next()) {
+          if (f->m_bottom > lastHeight)
+            lastRootBox()->floats().append(f->m_renderer);
+        }
         lastFloat = m_floatingObjects->last();
       }
     }
