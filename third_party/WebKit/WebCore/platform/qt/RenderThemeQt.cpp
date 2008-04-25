@@ -256,7 +256,8 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
   // Get the correct theme data for a text field
   EAppearance appearance = applyTheme(panel, o);
   if (appearance != TextFieldAppearance &&
-      appearance != SearchFieldAppearance && appearance != TextAreaAppearance)
+      appearance != SearchFieldAppearance && appearance != TextAreaAppearance &&
+      appearance != ListboxAppearance)
     return true;
 
   // Now paint the text field.
