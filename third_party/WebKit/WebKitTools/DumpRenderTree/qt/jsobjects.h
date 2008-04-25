@@ -67,6 +67,7 @@ class LayoutTestController : public QObject {
   void waitUntilDone();
   void notifyDone();
   void dumpEditingCallbacks();
+  void dumpResourceLoadCallbacks();
   void queueReload();
   void provisionalLoad();
   void setCloseRemainingWindowsWhenComplete(bool = false) {}

@@ -66,9 +66,16 @@
 #endif
 
 static bool dumpFrameLoaderCallbacks = false;
+static bool dumpResourceLoadCallbacks = false;
+
+static QMap<unsigned long, QString> dumpAssignedUrls;
 
 void QWEBKIT_EXPORT qt_dump_frame_loader(bool b) {
   dumpFrameLoaderCallbacks = b;
+}
+
+void QWEBKIT_EXPORT qt_dump_resource_load_callbacks(bool b) {
+  dumpResourceLoadCallbacks = b;
 }
 
 // Compare with WebKitTools/DumpRenderTree/mac/FrameLoadDelegate.mm
@@ -91,6 +98,30 @@ static QString drtDescriptionSuitableForTestResult(WebCore::Frame* _frame) {
 static QString drtDescriptionSuitableForTestResult(const WebCore::KURL& _url) {
   QUrl url = _url;
   return url.toString();
+}
+
+static QString drtDescriptionSuitableForTestResult(
+    const WebCore::ResourceError& error) {
+  QString failingURL = error.failingURL();
+  return QString::fromLatin1(
+             "<NSError domain NSURLErrorDomain, code %1, failing URL \"%2\">")
+      .arg(error.errorCode())
+      .arg(failingURL);
+}
+
+static QString drtDescriptionSuitableForTestResult(
+    const WebCore::ResourceRequest& request) {
+  QString url = request.url().string();
+  return QString::fromLatin1("<NSURLRequest %1>").arg(url);
+}
+
+static QString drtDescriptionSuitableForTestResult(
+    const WebCore::ResourceResponse& response) {
+  QString text = response.httpStatusText();
+  if (text.isEmpty())
+    return QLatin1String("(null)");
+
+  return text;
 }
 
 namespace WebCore {
@@ -625,14 +656,24 @@ void FrameLoaderClientQt::download(WebCore::ResourceHandle* handle,
 
 void FrameLoaderClientQt::assignIdentifierToInitialRequest(
     unsigned long identifier,
-    WebCore::DocumentLoader*,
-    const WebCore::ResourceRequest&) {}
+    WebCore::DocumentLoader* loader,
+    const WebCore::ResourceRequest& request) {
+  if (dumpResourceLoadCallbacks)
+    dumpAssignedUrls[identifier] =
+        drtDescriptionSuitableForTestResult(request.url());
+}
 
 void FrameLoaderClientQt::dispatchWillSendRequest(
     WebCore::DocumentLoader*,
-    unsigned long,
-    WebCore::ResourceRequest& request,
-    const WebCore::ResourceResponse& response) {
+    unsigned long identifier,
+    WebCore::ResourceRequest& newRequest,
+    const WebCore::ResourceResponse& redirectResponse) {
+  if (dumpResourceLoadCallbacks)
+    printf("%s - willSendRequest %s redirectResponse %s\n",
+           qPrintable(dumpAssignedUrls[identifier]),
+           qPrintable(drtDescriptionSuitableForTestResult(newRequest)),
+           qPrintable(drtDescriptionSuitableForTestResult(redirectResponse)));
+
   // seems like the Mac code doesn't do anything here by default neither
   // qDebug() << "FrameLoaderClientQt::dispatchWillSendRequest" <<
   // request.isNull() << request.url().string`();
@@ -672,8 +713,13 @@ void FrameLoaderClientQt::dispatchDidFinishLoading(
 
 void FrameLoaderClientQt::dispatchDidFailLoading(
     WebCore::DocumentLoader* loader,
-    unsigned long,
-    const WebCore::ResourceError&) {
+    unsigned long identifier,
+    const WebCore::ResourceError& error) {
+  if (dumpResourceLoadCallbacks)
+    printf("%s - didFailLoadingWithError: %s\n",
+           qPrintable(dumpAssignedUrls[identifier]),
+           qPrintable(drtDescriptionSuitableForTestResult(error)));
+
   if (m_firstData) {
     FrameLoader* fl = loader->frameLoader();
     fl->setEncoding(m_response.textEncodingName(), false);
