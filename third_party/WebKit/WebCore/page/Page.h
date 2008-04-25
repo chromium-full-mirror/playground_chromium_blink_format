@@ -102,7 +102,7 @@ class Page : Noncopyable {
   void goToItem(HistoryItem*, FrameLoadType);
 
   void setGroupName(const String&);
-  const String& groupName() const { return m_groupName; }
+  const String& groupName() const;
 
   PageGroup& group() {
     if (!m_group)

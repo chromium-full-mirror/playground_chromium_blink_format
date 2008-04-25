@@ -38,7 +38,10 @@ class Page;
 
 class PageGroup : Noncopyable {
  public:
+  PageGroup(const String& name);
   PageGroup(Page*);
+
+  static PageGroup* pageGroup(const String& groupName);
 
   const HashSet<Page*>& pages() const { return m_pages; }
 
@@ -54,6 +57,7 @@ class PageGroup : Noncopyable {
   static void setShouldTrackVisitedLinks(bool);
   static void removeAllVisitedLinks();
 
+  const String& name() { return m_name; }
   unsigned identifier() { return m_identifier; }
 
 #if ENABLE(DOM_STORAGE)
@@ -62,6 +66,8 @@ class PageGroup : Noncopyable {
 
  private:
   void addVisitedLink(unsigned stringHash);
+
+  String m_name;
 
   HashSet<Page*> m_pages;
   HashSet<unsigned, AlreadyHashed> m_visitedLinkHashes;
