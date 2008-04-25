@@ -242,6 +242,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void repaintRequested(const QRect& dirtyRect);
   void scrollRequested(int dx, int dy, const QRect& scrollViewRect);
   void windowCloseRequested();
+  void printRequested(QWebFrame* frame);
   void linkClicked(const QUrl& url);
 
   void toolBarVisibilityChangeRequested(bool visible);

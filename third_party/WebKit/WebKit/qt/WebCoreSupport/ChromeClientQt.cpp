@@ -313,8 +313,8 @@ void ChromeClientQt::setToolTip(const String& tip) {
 #endif
 }
 
-void ChromeClientQt::print(Frame*) {
-  notImplemented();
+void ChromeClientQt::print(Frame* frame) {
+  emit m_webPage->printRequested(QWebFramePrivate::kit(frame));
 }
 
 void ChromeClientQt::exceededDatabaseQuota(Frame*, const String&) {
