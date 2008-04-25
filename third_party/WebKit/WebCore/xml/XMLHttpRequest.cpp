@@ -84,6 +84,7 @@ static void removeFromRequestsByDocument(Document* doc, XMLHttpRequest* req) {
 static bool isSafeRequestHeader(const String& name) {
   static HashSet<String, CaseFoldingHash> forbiddenHeaders;
   static String proxyString("proxy-");
+  static String secString("sec-");
 
   if (forbiddenHeaders.isEmpty()) {
     forbiddenHeaders.add("accept-charset");
@@ -104,7 +105,8 @@ static bool isSafeRequestHeader(const String& name) {
   }
 
   return !forbiddenHeaders.contains(name) &&
-         !name.startsWith(proxyString, false);
+         !name.startsWith(proxyString, false) &&
+         !name.startsWith(secString, false);
 }
 
 // Determines if a string is a valid token, as defined by
