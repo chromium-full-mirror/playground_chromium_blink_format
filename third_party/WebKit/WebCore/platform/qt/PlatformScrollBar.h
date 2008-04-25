@@ -69,6 +69,8 @@ class PlatformScrollbar : public Widget, public Scrollbar {
   void autoscrollTimerFired(Timer<PlatformScrollbar>*);
   void invalidate();
 
+  int maximum() const { return m_totalSize - m_visibleSize; }
+
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
