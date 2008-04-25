@@ -562,6 +562,9 @@ void GraphicsContext::drawFocusRing(const Color& color) {
     return;
 
   QPainter* p = m_data->p();
+  const bool antiAlias = p->testRenderHint(QPainter::Antialiasing);
+  p->setRenderHint(QPainter::Antialiasing,
+                   m_data->antiAliasingForRectsAndLines);
 
   const QPen oldPen = p->pen();
   const QBrush oldBrush = p->brush();
@@ -585,6 +588,8 @@ void GraphicsContext::drawFocusRing(const Color& color) {
 #endif
   p->setPen(oldPen);
   p->setBrush(oldBrush);
+
+  p->setRenderHint(QPainter::Antialiasing, antiAlias);
 }
 
 void GraphicsContext::drawLineForText(const IntPoint& origin,
