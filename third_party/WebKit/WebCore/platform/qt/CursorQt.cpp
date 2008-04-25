@@ -78,7 +78,13 @@ class Cursors {
         SizeBDiagCursor(QCursor(Qt::SizeBDiagCursor)),
         SplitHCursor(QCursor(Qt::SplitHCursor)),
         SplitVCursor(QCursor(Qt::SplitVCursor)),
-        BlankCursor(QCursor(Qt::BlankCursor))
+        NoDropCursor(QCursor(Qt::ForbiddenCursor)),
+        BlankCursor(QCursor(Qt::BlankCursor)),
+        ZoomInCursor(QCursor(
+            QPixmap(QLatin1String(":/webkit/resources/zoomInCursor.png")))),
+        ZoomOutCursor(QCursor(
+            QPixmap(QLatin1String(":/webkit/resources/zoomOutCursor.png"))))
+
 #endif
   {
   }
@@ -102,7 +108,10 @@ class Cursors {
   Cursor SizeBDiagCursor;
   Cursor SplitHCursor;
   Cursor SplitVCursor;
+  Cursor NoDropCursor;
   Cursor BlankCursor;
+  Cursor ZoomInCursor;
+  Cursor ZoomOutCursor;
 };
 
 Cursors* Cursors::s_self = 0;
@@ -212,7 +221,7 @@ const Cursor& contextMenuCursor() {
 }
 
 const Cursor& noDropCursor() {
-  return Cursors::self()->PointerCursor;
+  return Cursors::self()->NoDropCursor;
 }
 
 const Cursor& copyCursor() {
@@ -232,16 +241,15 @@ const Cursor& noneCursor() {
 }
 
 const Cursor& notAllowedCursor() {
-  // FIXME: Build fix -- what is correct here?
-  return Cursors::self()->BlankCursor;
+  return Cursors::self()->NoDropCursor;
 }
 
 const Cursor& zoomInCursor() {
-  return Cursors::self()->PointerCursor;
+  return Cursors::self()->ZoomInCursor;
 }
 
 const Cursor& zoomOutCursor() {
-  return Cursors::self()->PointerCursor;
+  return Cursors::self()->ZoomOutCursor;
 }
 }
 
