@@ -112,7 +112,8 @@ qint64 FormDataIODevice::writeData(const char*, qint64) {
 void FormDataIODevice::setParent(QNetworkReply* reply) {
   QIODevice::setParent(reply);
 
-  connect(reply, SIGNAL(finished()), SLOT(slotFinished()));
+  connect(reply, SIGNAL(finished()), SLOT(slotFinished()),
+          Qt::QueuedConnection);
 }
 
 bool FormDataIODevice::isSequential() const {
@@ -356,16 +357,18 @@ void QNetworkReplyHandler::start() {
 
   m_reply->setParent(this);
 
-  connect(m_reply, SIGNAL(finished()), this, SLOT(finish()));
+  connect(m_reply, SIGNAL(finished()), this, SLOT(finish()),
+          Qt::QueuedConnection);
 
   // For http(s) we know that the headers are complete upon metaDataChanged()
   // emission, so we
   // can send the response as early as possible
   if (scheme == QLatin1String("http") || scheme == QLatin1String("https"))
     connect(m_reply, SIGNAL(metaDataChanged()), this,
-            SLOT(sendResponseIfNeeded()));
+            SLOT(sendResponseIfNeeded()), Qt::QueuedConnection);
 
-  connect(m_reply, SIGNAL(readyRead()), this, SLOT(forwardData()));
+  connect(m_reply, SIGNAL(readyRead()), this, SLOT(forwardData()),
+          Qt::QueuedConnection);
 }
 }
 
