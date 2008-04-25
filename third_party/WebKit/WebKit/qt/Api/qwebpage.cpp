@@ -564,12 +564,12 @@ void QWebPagePrivate::keyPressEvent(QKeyEvent* ev) {
       if (v)
         v->setValue(v->value() - q->viewportSize().height() + fontHeight * 2);
     } else if (ev->key() == Qt::Key_Up &&
-                   ev->modifiers() == Qt::ControlModifier ||
+                   ev->modifiers() & Qt::ControlModifier ||
                ev->key() == Qt::Key_Home) {
       if (v)
         v->setValue(0);
     } else if (ev->key() == Qt::Key_Down &&
-                   ev->modifiers() == Qt::ControlModifier ||
+                   ev->modifiers() & Qt::ControlModifier ||
                ev->key() == Qt::Key_End) {
       if (v)
         v->setValue(INT_MAX);
