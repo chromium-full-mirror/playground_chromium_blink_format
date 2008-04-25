@@ -425,6 +425,7 @@ bool RenderThemeQt::supportsFocus(EAppearance appearance) const {
     case ButtonAppearance:
     case TextFieldAppearance:
     case TextAreaAppearance:
+    case ListboxAppearance:
     case MenulistAppearance:
     case RadioAppearance:
     case CheckboxAppearance:
