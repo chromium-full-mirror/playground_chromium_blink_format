@@ -71,7 +71,8 @@ Settings::Settings(Page* page)
       m_authorAndUserStylesEnabled(true),
       m_needsSiteSpecificQuirks(false),
       m_fontRenderingMode(0),
-      m_webArchiveDebugModeEnabled(false) {
+      m_webArchiveDebugModeEnabled(false),
+      m_offlineWebApplicationCacheEnabled(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -305,6 +306,10 @@ void Settings::setWebArchiveDebugModeEnabled(bool enabled) {
 
 void Settings::setLocalStorageDatabasePath(const String& path) {
   m_localStorageDatabasePath = path;
+}
+
+void Settings::setOfflineWebApplicationCacheEnabled(bool enabled) {
+  m_offlineWebApplicationCacheEnabled = enabled;
 }
 
 }  // namespace WebCore

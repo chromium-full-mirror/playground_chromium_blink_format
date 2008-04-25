@@ -183,6 +183,11 @@ class Settings {
     return m_localStorageDatabasePath;
   }
 
+  void setOfflineWebApplicationCacheEnabled(bool);
+  bool offlineWebApplicationCacheEnabled() const {
+    return m_offlineWebApplicationCacheEnabled;
+  }
+
  private:
   Page* m_page;
 
@@ -222,6 +227,7 @@ class Settings {
   bool m_needsSiteSpecificQuirks : 1;
   unsigned m_fontRenderingMode : 1;
   bool m_webArchiveDebugModeEnabled : 1;
+  bool m_offlineWebApplicationCacheEnabled : 1;
 };
 
 }  // namespace WebCore

@@ -38,6 +38,7 @@
 #include "MainResourceLoader.h"
 #include "ManifestParser.h"
 #include "Page.h"
+#include "Settings.h"
 #include <wtf/HashMap.h>
 
 namespace WebCore {
@@ -109,6 +110,9 @@ ApplicationCache* ApplicationCacheGroup::cacheForMainRequest(
 
 void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
   ASSERT(frame && frame->page());
+
+  if (!frame->settings()->offlineWebApplicationCacheEnabled())
+    return;
 
   DocumentLoader* documentLoader = frame->loader()->documentLoader();
   ASSERT(!documentLoader->applicationCache());
@@ -225,6 +229,9 @@ void ApplicationCacheGroup::selectCache(Frame* frame, const KURL& manifestURL) {
 }
 
 void ApplicationCacheGroup::selectCacheWithoutManifestURL(Frame* frame) {
+  if (!frame->settings()->offlineWebApplicationCacheEnabled())
+    return;
+
   DocumentLoader* documentLoader = frame->loader()->documentLoader();
   ASSERT(!documentLoader->applicationCache());
 
