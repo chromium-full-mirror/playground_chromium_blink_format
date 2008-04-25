@@ -839,7 +839,7 @@ bool DocumentLoader::scheduleApplicationCacheLoad(
     const ResourceRequest& request,
     const KURL& originalURL) {
   if (!frameLoader()->frame()->settings() ||
-      !frameLoader()->frame()->offlineWebApplicationCacheEnabled())
+      !frameLoader()->frame()->settings()->offlineWebApplicationCacheEnabled())
     return false;
 
   if (request.url() != originalURL)
