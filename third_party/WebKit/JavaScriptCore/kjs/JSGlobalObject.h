@@ -58,7 +58,6 @@ class ReferenceErrorPrototype;
 class RegExpObjectImp;
 class RegExpPrototype;
 class RuntimeMethod;
-class SavedBuiltins;
 class ScopeChain;
 class StringObjectImp;
 class StringPrototype;
@@ -245,9 +244,6 @@ class JSGlobalObject : public JSVariableObject {
     d()->pageGroupIdentifier = value;
   }
   unsigned pageGroupIdentifier() const { return d()->pageGroupIdentifier; }
-
-  void saveBuiltins(SavedBuiltins&) const;
-  void restoreBuiltins(const SavedBuiltins&);
 
   void setTimeoutTime(unsigned timeoutTime) { d()->timeoutTime = timeoutTime; }
   void startTimeoutCheck();
