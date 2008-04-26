@@ -31,7 +31,7 @@ class JSSVGLazyEventListener : public JSLazyEventListener {
  public:
   JSSVGLazyEventListener(const String& functionName,
                          const String& code,
-                         JSDOMWindowWrapper*,
+                         JSDOMWindow*,
                          Node*,
                          int lineNumber = 0);
 

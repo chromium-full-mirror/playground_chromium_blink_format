@@ -41,6 +41,7 @@
 #include "HTMLDocument.h"
 #include "JSAudioConstructor.h"
 #include "JSDOMWindow.h"
+#include "JSDOMWindow.h"
 #include "JSEvent.h"
 #include "JSHTMLCollection.h"
 #include "JSHTMLOptionElementConstructor.h"
@@ -224,20 +225,20 @@ JSDOMWindowBase::~JSDOMWindowBase() {
   ListenersMap::iterator i2 = d->jsEventListeners.begin();
   ListenersMap::iterator e2 = d->jsEventListeners.end();
   for (; i2 != e2; ++i2)
-    i2->second->clearWindowWrapper();
+    i2->second->clearWindow();
   i2 = d->jsHTMLEventListeners.begin();
   e2 = d->jsHTMLEventListeners.end();
   for (; i2 != e2; ++i2)
-    i2->second->clearWindowWrapper();
+    i2->second->clearWindow();
 
   UnprotectedListenersMap::iterator i1 = d->jsUnprotectedEventListeners.begin();
   UnprotectedListenersMap::iterator e1 = d->jsUnprotectedEventListeners.end();
   for (; i1 != e1; ++i1)
-    i1->second->clearWindowWrapper();
+    i1->second->clearWindow();
   i1 = d->jsUnprotectedHTMLEventListeners.begin();
   e1 = d->jsUnprotectedHTMLEventListeners.end();
   for (; i1 != e1; ++i1)
-    i1->second->clearWindowWrapper();
+    i1->second->clearWindow();
 }
 
 static bool allowPopUp(ExecState* exec) {
@@ -988,7 +989,7 @@ JSEventListener* JSDOMWindowBase::findOrCreateJSEventListener(JSValue* val,
 
   // Note that the JSEventListener constructor adds it to our jsEventListeners
   // list
-  return new JSEventListener(object, wrapper(), html);
+  return new JSEventListener(object, static_cast<JSDOMWindow*>(this), html);
 }
 
 JSUnprotectedEventListener* JSDOMWindowBase::findJSUnprotectedEventListener(
@@ -1015,7 +1016,8 @@ JSDOMWindowBase::findOrCreateJSUnprotectedEventListener(JSValue* val,
 
   // The JSUnprotectedEventListener constructor adds it to our
   // jsUnprotectedEventListeners map.
-  return new JSUnprotectedEventListener(object, wrapper(), html);
+  return new JSUnprotectedEventListener(object, static_cast<JSDOMWindow*>(this),
+                                        html);
 }
 
 void JSDOMWindowBase::clearHelperObjectProperties() {
