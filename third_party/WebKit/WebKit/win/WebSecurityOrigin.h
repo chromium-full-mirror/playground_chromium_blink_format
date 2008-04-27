@@ -58,7 +58,7 @@ class DECLSPEC_UUID("6EB8D98F-2723-4472-88D3-5936F9D6E631") WebSecurityOrigin
   virtual HRESULT STDMETHODCALLTYPE protocol(
       /* [retval][out] */ BSTR* result);
 
-  virtual HRESULT STDMETHODCALLTYPE domain(
+  virtual HRESULT STDMETHODCALLTYPE host(
       /* [retval][out] */ BSTR* result);
 
   virtual HRESULT STDMETHODCALLTYPE port(

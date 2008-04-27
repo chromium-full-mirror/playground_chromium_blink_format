@@ -96,7 +96,7 @@ HRESULT STDMETHODCALLTYPE WebSecurityOrigin::protocol(
   return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebSecurityOrigin::domain(
+HRESULT STDMETHODCALLTYPE WebSecurityOrigin::host(
     /* [retval][out] */ BSTR* result) {
   if (!result)
     return E_POINTER;

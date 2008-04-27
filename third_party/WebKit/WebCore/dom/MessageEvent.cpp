@@ -40,13 +40,11 @@ using namespace EventNames;
 MessageEvent::MessageEvent() {}
 
 MessageEvent::MessageEvent(const String& data,
-                           const String& domain,
-                           const String& uri,
+                           const String& origin,
                            DOMWindow* source)
     : Event(messageEvent, true, true),
       m_data(data),
-      m_domain(domain),
-      m_uri(uri),
+      m_origin(origin),
       m_source(source) {}
 
 MessageEvent::~MessageEvent() {}
@@ -55,8 +53,7 @@ void MessageEvent::initMessageEvent(const AtomicString& type,
                                     bool canBubble,
                                     bool cancelable,
                                     const String& data,
-                                    const String& domain,
-                                    const String& uri,
+                                    const String& origin,
                                     DOMWindow* source) {
   if (dispatched())
     return;
@@ -64,8 +61,7 @@ void MessageEvent::initMessageEvent(const AtomicString& type,
   initEvent(type, canBubble, cancelable);
 
   m_data = data;
-  m_domain = domain;
-  m_uri = uri;
+  m_origin = origin;
   m_source = source;
 }
 
