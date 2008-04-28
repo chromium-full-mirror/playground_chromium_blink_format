@@ -240,7 +240,7 @@ static QWebPage::WebAction webActionForContextMenuAction(
 QMenu* QWebPagePrivate::createContextMenu(
     const WebCore::ContextMenu* webcoreMenu,
     const QList<WebCore::ContextMenuItem>* items) {
-  QMenu* menu = new QMenu;
+  QMenu* menu = new QMenu(view);
   for (int i = 0; i < items->count(); ++i) {
     const ContextMenuItem& item = items->at(i);
     switch (item.type()) {
