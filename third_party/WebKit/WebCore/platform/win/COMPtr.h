@@ -65,7 +65,7 @@ class COMPtr {
 
   // Hash table deleted values, which are only constructed and never copied or
   // destroyed.
-  COMPtr(HashTableDeletedValueType) : m_ptr(hashTableDeletedValue()) {}
+  COMPtr(WTF::HashTableDeletedValueType) : m_ptr(hashTableDeletedValue()) {}
   bool isHashTableDeletedValue() const {
     return m_ptr == hashTableDeletedValue();
   }
@@ -231,7 +231,7 @@ template <typename P>
 struct HashTraits<COMPtr<P>> : GenericHashTraits<COMPtr<P>> {
   static const bool emptyValueIsZero = true;
   static void constructDeletedValue(COMPtr<P>* slot) {
-    new (slot) COMPtr<P>(HashTableDeletedValue);
+    new (slot) COMPtr<P>(WTF::HashTableDeletedValue);
   }
   static bool isDeletedValue(const COMPtr<P>& value) {
     return value.isHashTableDeletedValue();
