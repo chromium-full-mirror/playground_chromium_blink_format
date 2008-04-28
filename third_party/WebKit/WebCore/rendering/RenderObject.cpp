@@ -1781,29 +1781,49 @@ void RenderObject::paintBoxShadow(GraphicsContext* context,
                                   const RenderStyle* s,
                                   bool begin,
                                   bool end) {
-  if (!s->boxShadow())
-    return;
-
   // FIXME: Deal with border-image.  Would be great to use border-image as a
   // mask.
-  context->save();
-  context->setShadow(IntSize(s->boxShadow()->x, s->boxShadow()->y),
-                     s->boxShadow()->blur, s->boxShadow()->color);
+
   IntRect rect(tx, ty, w, h);
-  if (s->hasBorderRadius()) {
-    IntSize topLeft = begin ? s->borderTopLeftRadius() : IntSize();
-    IntSize topRight = end ? s->borderTopRightRadius() : IntSize();
-    IntSize bottomLeft = begin ? s->borderBottomLeftRadius() : IntSize();
-    IntSize bottomRight = end ? s->borderBottomRightRadius() : IntSize();
-    context->clipOutRoundedRect(rect, topLeft, topRight, bottomLeft,
-                                bottomRight);
-    context->fillRoundedRect(rect, topLeft, topRight, bottomLeft, bottomRight,
-                             Color::black);
-  } else {
-    context->clipOut(rect);
-    context->fillRect(IntRect(tx, ty, w, h), Color::black);
+  bool hasBorderRadius = s->hasBorderRadius();
+  bool hasOpaqueBackground =
+      s->backgroundColor().isValid() && s->backgroundColor().alpha() == 255;
+  for (ShadowData* shadow = s->boxShadow(); shadow; shadow = shadow->next) {
+    context->save();
+
+    IntSize shadowOffset(shadow->x, shadow->y);
+    int shadowBlur = shadow->blur;
+    IntRect fillRect(rect);
+
+    if (hasBorderRadius) {
+      IntRect shadowRect(rect);
+      shadowRect.inflate(shadowBlur);
+      shadowRect.move(shadowOffset);
+      context->clip(shadowRect);
+
+      IntSize extraOffset(w + max(0, shadowOffset.width()) + shadowBlur, 0);
+      shadowOffset -= extraOffset;
+      fillRect.move(extraOffset);
+    }
+
+    context->setShadow(shadowOffset, shadowBlur, shadow->color);
+    if (hasBorderRadius) {
+      IntSize topLeft = begin ? s->borderTopLeftRadius() : IntSize();
+      IntSize topRight = end ? s->borderTopRightRadius() : IntSize();
+      IntSize bottomLeft = begin ? s->borderBottomLeftRadius() : IntSize();
+      IntSize bottomRight = end ? s->borderBottomRightRadius() : IntSize();
+      if (!hasOpaqueBackground)
+        context->clipOutRoundedRect(rect, topLeft, topRight, bottomLeft,
+                                    bottomRight);
+      context->fillRoundedRect(fillRect, topLeft, topRight, bottomLeft,
+                               bottomRight, Color::black);
+    } else {
+      if (!hasOpaqueBackground)
+        context->clipOut(rect);
+      context->fillRect(fillRect, Color::black);
+    }
+    context->restore();
   }
-  context->restore();
 }
 
 void RenderObject::addLineBoxRects(Vector<IntRect>&,
@@ -2063,7 +2083,10 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   ShadowData* boxShadow = style()->boxShadow();
   int width = abs(newOutlineBox.width() - oldOutlineBox.width());
   if (width) {
-    int shadowRight = boxShadow ? max(boxShadow->x + boxShadow->blur, 0) : 0;
+    int shadowRight = 0;
+    for (ShadowData* shadow = boxShadow; shadow; shadow = shadow->next)
+      shadowRight = max(shadow->x + shadow->blur, shadowRight);
+
     int borderWidth =
         max(-outlineStyle->outlineOffset(),
             max(borderRight(),
@@ -2083,7 +2106,10 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   }
   int height = abs(newOutlineBox.height() - oldOutlineBox.height());
   if (height) {
-    int shadowBottom = boxShadow ? max(boxShadow->y + boxShadow->blur, 0) : 0;
+    int shadowBottom = 0;
+    for (ShadowData* shadow = boxShadow; shadow; shadow = shadow->next)
+      shadowBottom = max(shadow->y + shadow->blur, shadowBottom);
+
     int borderHeight =
         max(-outlineStyle->outlineOffset(),
             max(borderBottom(),
@@ -2192,17 +2218,17 @@ Color RenderObject::selectionBackgroundColor() const {
 
 Color RenderObject::selectionForegroundColor() const {
   Color color;
-  if (style()->userSelect() != SELECT_NONE) {
-    RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SELECTION);
-    if (pseudoStyle) {
-      color = pseudoStyle->textFillColor();
-      if (!color.isValid())
-        color = pseudoStyle->color();
-    } else
-      color = document()->frame()->selectionController()->isFocusedAndActive()
-                  ? theme()->platformActiveSelectionForegroundColor()
-                  : theme()->platformInactiveSelectionForegroundColor();
-  }
+  if (style()->userSelect() == SELECT_NONE)
+    return color;
+
+  if (RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SELECTION)) {
+    color = pseudoStyle->textFillColor();
+    if (!color.isValid())
+      color = pseudoStyle->color();
+  } else
+    color = document()->frame()->selectionController()->isFocusedAndActive()
+                ? theme()->platformActiveSelectionForegroundColor()
+                : theme()->platformInactiveSelectionForegroundColor();
 
   return color;
 }
@@ -3226,10 +3252,23 @@ void RenderObject::adjustRectForOutlineAndShadow(IntRect& rect) const {
                         ? continuation()->style()->outlineSize()
                         : style()->outlineSize();
   if (ShadowData* boxShadow = style()->boxShadow()) {
-    int shadowLeft = min(boxShadow->x - boxShadow->blur - outlineSize, 0);
-    int shadowRight = max(boxShadow->x + boxShadow->blur + outlineSize, 0);
-    int shadowTop = min(boxShadow->y - boxShadow->blur - outlineSize, 0);
-    int shadowBottom = max(boxShadow->y + boxShadow->blur + outlineSize, 0);
+    int shadowLeft = 0;
+    int shadowRight = 0;
+    int shadowTop = 0;
+    int shadowBottom = 0;
+
+    do {
+      shadowLeft =
+          min(boxShadow->x - boxShadow->blur - outlineSize, shadowLeft);
+      shadowRight =
+          max(boxShadow->x + boxShadow->blur + outlineSize, shadowRight);
+      shadowTop = min(boxShadow->y - boxShadow->blur - outlineSize, shadowTop);
+      shadowBottom =
+          max(boxShadow->y + boxShadow->blur + outlineSize, shadowBottom);
+
+      boxShadow = boxShadow->next;
+    } while (boxShadow);
+
     rect.move(shadowLeft, shadowTop);
     rect.setWidth(rect.width() - shadowLeft + shadowRight);
     rect.setHeight(rect.height() - shadowTop + shadowBottom);
