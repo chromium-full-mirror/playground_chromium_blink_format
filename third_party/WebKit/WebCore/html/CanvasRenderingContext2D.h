@@ -145,7 +145,7 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
            float ea,
            bool clockwise,
            ExceptionCode&);
-  void rect(float x, float y, float width, float height, ExceptionCode&);
+  void rect(float x, float y, float width, float height);
 
   void fill();
   void stroke();
@@ -153,15 +153,10 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
 
   bool isPointInPath(const float x, const float y);
 
-  void clearRect(float x, float y, float width, float height, ExceptionCode&);
-  void fillRect(float x, float y, float width, float height, ExceptionCode&);
-  void strokeRect(float x, float y, float width, float height, ExceptionCode&);
-  void strokeRect(float x,
-                  float y,
-                  float width,
-                  float height,
-                  float lineWidth,
-                  ExceptionCode&);
+  void clearRect(float x, float y, float width, float height);
+  void fillRect(float x, float y, float width, float height);
+  void strokeRect(float x, float y, float width, float height);
+  void strokeRect(float x, float y, float width, float height, float lineWidth);
 
   void setShadow(float width, float height, float blur);
   void setShadow(float width, float height, float blur, const String& color);
