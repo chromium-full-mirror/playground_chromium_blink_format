@@ -54,7 +54,12 @@ static inline bool operator==(const MappedAttributeKey& a,
 struct MappedAttributeKeyTraits : WTF::GenericHashTraits<MappedAttributeKey> {
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
-  static MappedAttributeKey deletedValue() { return eLastEntry; }
+  static void constructDeletedValue(MappedAttributeKey* slot) {
+    slot->type = eLastEntry;
+  }
+  static bool isDeletedValue(const MappedAttributeKey& value) {
+    return value.type == eLastEntry;
+  }
 };
 
 struct MappedAttributeHash {

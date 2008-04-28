@@ -47,8 +47,11 @@ struct SVGAnimatedTypeWrapperKey {
   SVGAnimatedTypeWrapperKey() : element(0), attributeName(0) {}
 
   // Deleted value
-  explicit SVGAnimatedTypeWrapperKey(bool)
-      : element(reinterpret_cast<SVGElement*>(-1)), attributeName(0) {}
+  SVGAnimatedTypeWrapperKey(WTF::HashTableDeletedValueType)
+      : element(reinterpret_cast<SVGElement*>(-1)) {}
+  bool isHashTableDeletedValue() const {
+    return element == reinterpret_cast<SVGElement*>(-1);
+  }
 
   SVGAnimatedTypeWrapperKey(const SVGElement* _element,
                             const AtomicString& _attributeName)
@@ -83,16 +86,12 @@ struct SVGAnimatedTypeWrapperKeyHash {
 struct SVGAnimatedTypeWrapperKeyHashTraits
     : WTF::GenericHashTraits<SVGAnimatedTypeWrapperKey> {
   static const bool emptyValueIsZero = true;
-  static const bool needsDestruction = false;
 
-  static const SVGAnimatedTypeWrapperKey& deletedValue() {
-    static SVGAnimatedTypeWrapperKey deletedKey(true);
-    return deletedKey;
+  static void constructDeletedValue(SVGAnimatedTypeWrapperKey* slot) {
+    new (slot) SVGAnimatedTypeWrapperKey(WTF::HashTableDeletedValue);
   }
-
-  static const SVGAnimatedTypeWrapperKey& emptyValue() {
-    static SVGAnimatedTypeWrapperKey emptyKey;
-    return emptyKey;
+  static bool isDeletedValue(const SVGAnimatedTypeWrapperKey& value) {
+    return value.isHashTableDeletedValue();
   }
 };
 

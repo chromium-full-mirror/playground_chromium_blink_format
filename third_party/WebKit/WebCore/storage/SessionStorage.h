@@ -61,8 +61,7 @@ class SessionStorage : public RefCounted<SessionStorage> {
 
   typedef HashMap<RefPtr<SecurityOrigin>,
                   RefPtr<SessionStorageArea>,
-                  SecurityOriginHash,
-                  SecurityOriginTraits>
+                  SecurityOriginHash>
       SessionStorageAreaMap;
   SessionStorageAreaMap m_storageAreaMap;
 };

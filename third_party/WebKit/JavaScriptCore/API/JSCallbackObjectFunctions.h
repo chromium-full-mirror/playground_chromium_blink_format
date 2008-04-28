@@ -1,6 +1,6 @@
 // -*- mode: c++; c-basic-offset: 4 -*-
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Eric Seidel <eric@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -371,7 +371,7 @@ void JSCallbackObject<Base>::getPropertyNames(
         StaticValueEntry* entry = it->second;
         if (entry->getProperty &&
             !(entry->attributes & kJSPropertyAttributeDontEnum))
-          propertyNames.add(Identifier(name));
+          propertyNames.add(name);
       }
     }
 
@@ -383,7 +383,7 @@ void JSCallbackObject<Base>::getPropertyNames(
         UString::Rep* name = it->first.get();
         StaticFunctionEntry* entry = it->second;
         if (!(entry->attributes & kJSPropertyAttributeDontEnum))
-          propertyNames.add(Identifier(name));
+          propertyNames.add(name);
       }
     }
   }

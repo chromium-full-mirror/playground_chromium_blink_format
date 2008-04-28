@@ -50,8 +50,7 @@ class LocalStorage : public RefCounted<LocalStorage> {
 
   typedef HashMap<RefPtr<SecurityOrigin>,
                   RefPtr<StorageArea>,
-                  SecurityOriginHash,
-                  SecurityOriginTraits>
+                  SecurityOriginHash>
       StorageAreaMap;
   StorageAreaMap m_storageAreaMap;
 

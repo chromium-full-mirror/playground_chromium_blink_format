@@ -110,18 +110,14 @@ class DatabaseTracker {
 
   typedef HashMap<RefPtr<SecurityOrigin>,
                   unsigned long long,
-                  SecurityOriginHash,
-                  SecurityOriginTraits>
+                  SecurityOriginHash>
       QuotaMap;
   Mutex m_quotaMapGuard;
   mutable OwnPtr<QuotaMap> m_quotaMap;
 
   typedef HashSet<Database*> DatabaseSet;
   typedef HashMap<String, DatabaseSet*> DatabaseNameMap;
-  typedef HashMap<RefPtr<SecurityOrigin>,
-                  DatabaseNameMap*,
-                  SecurityOriginHash,
-                  SecurityOriginTraits>
+  typedef HashMap<RefPtr<SecurityOrigin>, DatabaseNameMap*, SecurityOriginHash>
       DatabaseOriginMap;
 
   Mutex m_openDatabaseMapGuard;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc. All rights reserved.
+ * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Nicholas Shanks <webkit@nickshanks.com>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,8 @@
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 
+using namespace WTF;
+
 namespace WebCore {
 
 struct FontPlatformDataCacheKey {
@@ -54,6 +56,12 @@ struct FontPlatformDataCacheKey {
         m_printerFont(isPrinterFont),
         m_renderingMode(renderingMode) {}
 
+  FontPlatformDataCacheKey(HashTableDeletedValueType)
+      : m_size(hashTableDeletedSize()) {}
+  bool isHashTableDeletedValue() const {
+    return m_size == hashTableDeletedSize();
+  }
+
   bool operator==(const FontPlatformDataCacheKey& other) const {
     return equalIgnoringCase(m_family, other.m_family) &&
            m_size == other.m_size && m_weight == other.m_weight &&
@@ -67,6 +75,9 @@ struct FontPlatformDataCacheKey {
   bool m_italic;
   bool m_printerFont;
   FontRenderingMode m_renderingMode;
+
+ private:
+  static unsigned hashTableDeletedSize() { return 0xFFFFFFFFU; }
 };
 
 inline unsigned computeHash(const FontPlatformDataCacheKey& fontKey) {
@@ -95,14 +106,15 @@ struct FontPlatformDataCacheKeyHash {
 struct FontPlatformDataCacheKeyTraits
     : WTF::GenericHashTraits<FontPlatformDataCacheKey> {
   static const bool emptyValueIsZero = true;
-  static const bool needsDestruction = false;
-  static const FontPlatformDataCacheKey& deletedValue() {
-    static FontPlatformDataCacheKey key(nullAtom, 0xFFFFFFFFU);
-    return key;
-  }
   static const FontPlatformDataCacheKey& emptyValue() {
     static FontPlatformDataCacheKey key(nullAtom);
     return key;
+  }
+  static void constructDeletedValue(FontPlatformDataCacheKey* slot) {
+    new (slot) FontPlatformDataCacheKey(HashTableDeletedValue);
+  }
+  static bool isDeletedValue(const FontPlatformDataCacheKey& value) {
+    return value.isHashTableDeletedValue();
   }
 };
 
@@ -196,13 +208,15 @@ struct FontDataCacheKeyHash {
 struct FontDataCacheKeyTraits : WTF::GenericHashTraits<FontPlatformData> {
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
-  static const FontPlatformData& deletedValue() {
-    static FontPlatformData key = FontPlatformData::Deleted();
-    return key;
-  }
   static const FontPlatformData& emptyValue() {
     static FontPlatformData key;
     return key;
+  }
+  static void constructDeletedValue(FontPlatformData* slot) {
+    new (slot) FontPlatformData(HashTableDeletedValue);
+  }
+  static bool isDeletedValue(const FontPlatformData& value) {
+    return value.isHashTableDeletedValue();
   }
 };
 

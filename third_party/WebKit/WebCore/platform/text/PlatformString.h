@@ -60,6 +60,15 @@ class String {
   String(PassRefPtr<StringImpl> i) : m_impl(i) {}
   String(RefPtr<StringImpl> i) : m_impl(i) {}
 
+  void swap(String& o) { m_impl.swap(o.m_impl); }
+
+  // Hash table deleted values, which are only constructed and never copied or
+  // destroyed.
+  String(WTF::HashTableDeletedValueType) : m_impl(WTF::HashTableDeletedValue) {}
+  bool isHashTableDeletedValue() const {
+    return m_impl.isHashTableDeletedValue();
+  }
+
   static String adopt(StringBuffer& buffer) {
     return StringImpl::adopt(buffer);
   }
@@ -302,6 +311,10 @@ inline bool equalIgnoringCase(const char* a, const String& b) {
 
 inline bool operator!(const String& str) {
   return str.isNull();
+}
+
+inline void swap(String& a, String& b) {
+  a.swap(b);
 }
 
 // String Operations
