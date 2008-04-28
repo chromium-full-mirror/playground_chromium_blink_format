@@ -190,7 +190,9 @@ void QWebFrame::addToJavaScriptWindowObject(const QString& name,
 }
 
 /*!
-  returns the markup (HTML) contained in the current frame.
+    Returns the markup (HTML) contained in the current frame.
+
+    \sa setHtml(), toPlainText()
 */
 QString QWebFrame::toHtml() const {
   if (!d->frame->document())
@@ -199,7 +201,9 @@ QString QWebFrame::toHtml() const {
 }
 
 /*!
-  returns the content of this frame as plain text.
+    Returns the content of this frame as plain text.
+
+    \sa toHtml()
 */
 QString QWebFrame::toPlainText() const {
   if (d->frame->view() && d->frame->view()->layoutPending())
@@ -210,7 +214,7 @@ QString QWebFrame::toPlainText() const {
 }
 
 /*!
-  returns a dump of the rendering tree. Mainly useful for debugging html.
+    Returns a dump of the rendering tree. Mainly useful for debugging html.
 */
 QString QWebFrame::renderTreeDump() const {
   if (d->frame->view() && d->frame->view()->layoutPending())
@@ -222,6 +226,8 @@ QString QWebFrame::renderTreeDump() const {
 /*!
     \property QWebFrame::title
     \brief the title of the frame as defined by the HTML &lt;title&gt; element
+
+    \sa titleChanged()
 */
 
 QString QWebFrame::title() const {
@@ -234,6 +240,8 @@ QString QWebFrame::title() const {
 /*!
     \property QWebFrame::url
     \brief the url of the frame currently viewed
+
+    \sa urlChanged()
 */
 
 void QWebFrame::setUrl(const QUrl& url) {
@@ -249,6 +257,8 @@ QUrl QWebFrame::url() const {
 /*!
     \property QWebFrame::icon
     \brief the icon associated with this frame
+
+    \sa iconChanged()
 */
 
 QIcon QWebFrame::icon() const {
@@ -274,6 +284,8 @@ QWebPage* QWebFrame::page() const {
 
   \note The view remains the same until enough data has arrived to display the
   new \a url.
+
+  \sa setUrl(), setHtml(), setContent()
 */
 void QWebFrame::load(const QUrl& url) {
 #if QT_VERSION < 0x040400
@@ -331,6 +343,8 @@ void QWebFrame::load(const QWebNetworkRequest& req) {
 
   \note The view remains the same until enough data has arrived to display the
   new \a url.
+
+  \sa setUrl()
 */
 void QWebFrame::load(const QNetworkRequest& req,
                      QNetworkAccessManager::Operation operation,
@@ -390,6 +404,8 @@ void QWebFrame::load(const QNetworkRequest& req,
   script can be specified through the charset attribute of the HTML script tag.
   It is also possible
   for the encoding to be specified by web server.
+
+  \sa toHtml()
 */
 void QWebFrame::setHtml(const QString& html, const QUrl& baseUrl) {
   KURL kurl(baseUrl);
@@ -417,6 +433,8 @@ void QWebFrame::setHtml(const QByteArray& html, const QUrl& baseUrl) {
   auto-detection.
 
   External objects referenced in the content are located relative to \a baseUrl.
+
+  \sa toHtml()
 */
 void QWebFrame::setContent(const QByteArray& data,
                            const QString& mimeType,
@@ -438,6 +456,8 @@ void QWebFrame::setContent(const QByteArray& data,
   main frame.
 
   This is equivalent to qobject_cast<QWebFrame*>(frame->parent()).
+
+  \sa childFrames()
 */
 QWebFrame* QWebFrame::parentFrame() const {
   return d->parentFrame();
@@ -445,6 +465,8 @@ QWebFrame* QWebFrame::parentFrame() const {
 
 /*!
   Returns a list of all frames that are direct children of this frame.
+
+  \sa parentFrame()
 */
 QList<QWebFrame*> QWebFrame::childFrames() const {
   QList<QWebFrame*> rc;
@@ -500,6 +522,8 @@ void QWebFrame::setScrollBarPolicy(Qt::Orientation orientation,
   value <= maximum.
 
   Changing the value also updates the thumb position.
+
+  \sa scrollBarMinimum(), scrollBarMaximum()
 */
 void QWebFrame::setScrollBarValue(Qt::Orientation orientation, int value) {
   PlatformScrollbar* sb;
@@ -518,6 +542,8 @@ void QWebFrame::setScrollBarValue(Qt::Orientation orientation, int value) {
   Returns the current value for the scrollbar with orientation \a orientation,
   or 0
   if no scrollbar is found for \a orientation.
+
+  \sa scrollBarMinimum(), scrollBarMaximum()
 */
 int QWebFrame::scrollBarValue(Qt::Orientation orientation) const {
   PlatformScrollbar* sb;
@@ -533,6 +559,8 @@ int QWebFrame::scrollBarValue(Qt::Orientation orientation) const {
   Returns the maximum value for the scrollbar with orientation \a orientation,
   or 0
   if no scrollbar is found for \a orientation.
+
+  \sa scrollBarMinimum()
 */
 int QWebFrame::scrollBarMaximum(Qt::Orientation orientation) const {
   PlatformScrollbar* sb;
@@ -547,6 +575,8 @@ int QWebFrame::scrollBarMaximum(Qt::Orientation orientation) const {
   Returns the minimum value for the scrollbar with orientation \a orientation.
 
   The minimum value is always 0.
+
+  \sa scrollBarMaximum()
 */
 int QWebFrame::scrollBarMinimum(Qt::Orientation orientation) const {
   return 0;
@@ -554,6 +584,8 @@ int QWebFrame::scrollBarMinimum(Qt::Orientation orientation) const {
 
 /*!
   Render the frame into \a painter clipping to \a clip.
+
+  \sa print()
 */
 void QWebFrame::render(QPainter* painter, const QRegion& clip) {
   if (!d->frame->view() || !d->frame->contentRenderer())
@@ -596,7 +628,7 @@ qreal QWebFrame::textSizeMultiplier() const {
 }
 
 /*!
-  returns the position of the frame relative to it's parent frame.
+    Returns the position of the frame relative to it's parent frame.
 */
 QPoint QWebFrame::pos() const {
   if (!d->frame->view())
@@ -606,7 +638,7 @@ QPoint QWebFrame::pos() const {
 }
 
 /*!
-  return the geometry of the frame relative to it's parent frame.
+    Return the geometry of the frame relative to it's parent frame.
 */
 QRect QWebFrame::geometry() const {
   if (!d->frame->view())
@@ -645,7 +677,9 @@ bool QWebFrame::event(QEvent* e) {
 }
 
 /*!
-  Prints the frame to the given \a printer.
+    Prints the frame to the given \a printer.
+
+    \sa render()
 */
 void QWebFrame::print(QPrinter* printer) const {
   const qreal zoomFactorX = printer->logicalDpiX() / qt_defaultDpi();
@@ -731,7 +765,9 @@ void QWebFrame::print(QPrinter* printer) const {
 }
 
 /*!
-  Evaluate JavaScript defined by \a scriptSource using this frame as context.
+    Evaluate JavaScript defined by \a scriptSource using this frame as context.
+
+    \sa addToJavaScriptWindowObject(), javaScriptWindowObjectCleared()
 */
 QVariant QWebFrame::evaluateJavaScript(const QString& scriptSource) {
   KJSProxy* proxy = d->frame->scriptProxy();
@@ -770,6 +806,8 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
   This signal is emitted when the frame is completely loaded. \a ok will
   indicate whether the load
   was successful or any error occurred.
+
+  \sa loadFinished(), loadStarted()
 */
 
 /*!
@@ -799,12 +837,16 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
   \fn void QWebFrame::loadStarted()
 
   This signal is emitted when a new load of the frame is started.
+
+  \sa loadFinished()
 */
 
 /*!
   \fn void QWebFrame::loadFinished()
 
   This signal is emitted when a load of the frame is finished.
+
+  \sa loadStarted()
 */
 
 /*!
@@ -820,6 +862,8 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
 
   This signal is emitted when the icon ("favicon") associated with the frame has
   been loaded.
+
+  \sa icon()
 */
 
 /*!
