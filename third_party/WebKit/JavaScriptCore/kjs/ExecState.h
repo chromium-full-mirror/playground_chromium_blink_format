@@ -57,7 +57,7 @@ struct PerThreadData {
   const HashTable* stringTable;
 
   CommonIdentifiers* propertyNames;
-  const List emptyList;
+  List emptyList;
 };
 
 // Represents the current state of script execution.
