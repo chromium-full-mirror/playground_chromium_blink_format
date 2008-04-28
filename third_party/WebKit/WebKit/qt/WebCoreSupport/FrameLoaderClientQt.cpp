@@ -127,7 +127,11 @@ static QString drtDescriptionSuitableForTestResult(
 namespace WebCore {
 
 FrameLoaderClientQt::FrameLoaderClientQt()
-    : m_frame(0), m_webFrame(0), m_firstData(false), m_policyFunction(0) {
+    : m_frame(0),
+      m_webFrame(0),
+      m_firstData(false),
+      m_policyFunction(0),
+      m_loadSucceeded(false) {
   connect(this, SIGNAL(sigCallPolicyFunction(int)), this,
           SLOT(slotCallPolicyFunction(int)), Qt::QueuedConnection);
 }
@@ -142,10 +146,12 @@ void FrameLoaderClientQt::setFrame(QWebFrame* webFrame, Frame* frame) {
     return;
   }
 
-  connect(this, SIGNAL(loadStarted()), m_webFrame, SIGNAL(loadStarted()));
+  connect(this, SIGNAL(loadStarted()), m_webFrame->page(),
+          SIGNAL(loadStarted()));
   connect(this, SIGNAL(loadProgress(int)), m_webFrame->page(),
           SIGNAL(loadProgress(int)));
-  connect(this, SIGNAL(loadFinished()), m_webFrame, SIGNAL(loadFinished()));
+  connect(this, SIGNAL(loadFinished(bool)), m_webFrame->page(),
+          SIGNAL(loadFinished(bool)));
   connect(this, SIGNAL(titleChanged(const QString&)), m_webFrame,
           SIGNAL(titleChanged(const QString&)));
 }
@@ -353,8 +359,8 @@ void FrameLoaderClientQt::dispatchDidFinishLoad() {
     printf("%s - didFinishLoadForFrame\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
-  if (m_webFrame)
-    emit m_webFrame->loadDone(true);
+  m_loadSucceeded = true;
+
   if (m_frame->tree()->parent() || !m_webFrame)
     return;
   m_webFrame->page()->d->updateNavigationActions();
@@ -406,7 +412,7 @@ void FrameLoaderClientQt::postProgressEstimateChangedNotification() {
 
 void FrameLoaderClientQt::postProgressFinishedNotification() {
   if (m_webFrame && m_frame->page())
-    emit loadFinished();
+    emit loadFinished(m_loadSucceeded);
 }
 
 void FrameLoaderClientQt::setMainFrameDocumentReady(bool b) {
@@ -748,8 +754,7 @@ void FrameLoaderClientQt::dispatchDidFailProvisionalLoad(
     printf("%s - didFailProvisionalLoadWithError\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
-  if (m_webFrame)
-    emit m_webFrame->loadDone(false);
+  m_loadSucceeded = false;
 }
 
 void FrameLoaderClientQt::dispatchDidFailLoad(const WebCore::ResourceError&) {
@@ -757,8 +762,7 @@ void FrameLoaderClientQt::dispatchDidFailLoad(const WebCore::ResourceError&) {
     printf("%s - didFailLoadWithError\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
-  if (m_webFrame)
-    emit m_webFrame->loadDone(false);
+  m_loadSucceeded = false;
 }
 
 WebCore::Frame* FrameLoaderClientQt::dispatchCreatePage() {

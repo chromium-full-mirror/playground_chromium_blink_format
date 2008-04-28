@@ -63,7 +63,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   void sigCallPolicyFunction(int);
   void loadStarted();
   void loadProgress(int d);
-  void loadFinished();
+  void loadFinished(bool);
   void titleChanged(const QString& title);
 
  public:
@@ -260,6 +260,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   ResourceResponse m_response;
   bool m_firstData;
   FramePolicyFunction m_policyFunction;
+  bool m_loadSucceeded;
 };
 }
 

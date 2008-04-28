@@ -231,7 +231,10 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   virtual bool supportsExtension(Extension extension) const;
 
  Q_SIGNALS:
+  void loadStarted();
   void loadProgress(int progress);
+  void loadFinished(bool ok);
+
   void linkHovered(const QString& link,
                    const QString& title,
                    const QString& textContent);

@@ -276,8 +276,8 @@ class MainWindow : public QMainWindow {
 
     connect(view, SIGNAL(loadStarted()), info, SLOT(startLoad()));
     connect(view, SIGNAL(loadProgress(int)), info, SLOT(changeLoad(int)));
-    connect(view, SIGNAL(loadFinished()), info, SLOT(endLoad()));
-    connect(view, SIGNAL(loadFinished()), this, SLOT(loadFinished()));
+    connect(view, SIGNAL(loadFinished(bool)), info, SLOT(endLoad()));
+    connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished()));
     connect(view, SIGNAL(titleChanged(const QString&)), this,
             SLOT(setWindowTitle(const QString&)));
     connect(view->page(),

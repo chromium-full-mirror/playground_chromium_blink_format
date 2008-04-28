@@ -134,14 +134,6 @@ void QWebFramePrivate::updateBackground() {
     A frame can be loaded using load() or setUrl(). Alternatively, if you have
     the HTML content readily available, you can use setHtml() instead.
 
-    The loadStarted() signal is emitted when the frame begins to load.The
-    loadProgress() signal, on the other hand, is emitted whenever an element
-    of the web frame completes loading, such as an embedded image, a script,
-    etc. Finally, the loadFinished() signal is emitted when the frame has
-    loaded completely. The loadDone() signal is also emitted to indicate if
-    a frame has loaded. It's argument - either \c true or \c false - indicates
-    load success or failure.
-
     The page() function returns a pointer to the web page object. See
     \l{Elements of QWebView} for an explanation of how web
     frames are related to a web page and web view.
@@ -833,15 +825,6 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
 */
 
 /*!
-    \fn void QWebFrame::loadDone(bool ok)
-
-    This signal is emitted when the frame is completely loaded.
-    \a ok will indicate whether the load was successful or any error occurred.
-
-    \sa loadFinished(), loadStarted()
-*/
-
-/*!
     \fn void QWebFrame::provisionalLoad()
     \internal
 */
@@ -861,22 +844,6 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
     This signal is emitted when the \a url of the frame changes.
 
     \sa url()
-*/
-
-/*!
-    \fn void QWebFrame::loadStarted()
-
-    This signal is emitted when a new load of the frame is started.
-
-    \sa loadFinished()
-*/
-
-/*!
-    \fn void QWebFrame::loadFinished()
-
-    This signal is emitted when a load of the frame is finished.
-
-    \sa loadStarted()
 */
 
 /*!

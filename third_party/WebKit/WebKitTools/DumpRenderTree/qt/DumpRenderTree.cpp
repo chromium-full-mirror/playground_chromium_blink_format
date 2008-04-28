@@ -141,6 +141,9 @@ DumpRenderTree::DumpRenderTree() : m_stdin(0), m_notifier(0) {
           SLOT(connectFrame(QWebFrame*)));
   connectFrame(m_page->mainFrame());
 
+  connect(m_page, SIGNAL(loadFinished(bool)), m_controller,
+          SLOT(maybeDump(bool)));
+
   m_page->mainFrame()->setScrollBarPolicy(Qt::Horizontal,
                                           Qt::ScrollBarAlwaysOff);
   m_page->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
@@ -294,11 +297,6 @@ void DumpRenderTree::connectFrame(QWebFrame* frame) {
           SLOT(initJSObjects()));
   connect(frame, SIGNAL(provisionalLoad()), layoutTestController(),
           SLOT(provisionalLoad()));
-
-  if (frame == m_page->mainFrame()) {
-    connect(frame, SIGNAL(loadDone(bool)), layoutTestController(),
-            SLOT(maybeDump(bool)));
-  }
 }
 
 QWebPage* DumpRenderTree::createWindow() {

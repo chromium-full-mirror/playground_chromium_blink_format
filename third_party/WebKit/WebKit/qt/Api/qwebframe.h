@@ -166,13 +166,10 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
  Q_SIGNALS:
   void javaScriptWindowObjectCleared();
-  void loadDone(bool ok);
+
   void provisionalLoad();
   void titleChanged(const QString& title);
   void urlChanged(const QUrl& url);
-
-  void loadStarted();
-  void loadFinished();
 
   void initialLayoutCompleted();
 
