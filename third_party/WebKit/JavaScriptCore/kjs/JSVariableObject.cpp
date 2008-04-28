@@ -54,14 +54,15 @@ void JSVariableObject::getPropertyNames(ExecState* exec,
   JSObject::getPropertyNames(exec, propertyNames);
 }
 
-bool JSVariableObject::getPropertyAttributes(const Identifier& propertyName,
+bool JSVariableObject::getPropertyAttributes(ExecState* exec,
+                                             const Identifier& propertyName,
                                              unsigned& attributes) const {
   size_t index = symbolTable().get(propertyName.ustring().rep());
   if (index != missingSymbolMarker()) {
     attributes = localStorage()[index].attributes;
     return true;
   }
-  return JSObject::getPropertyAttributes(propertyName, attributes);
+  return JSObject::getPropertyAttributes(exec, propertyName, attributes);
 }
 
 void JSVariableObject::mark() {

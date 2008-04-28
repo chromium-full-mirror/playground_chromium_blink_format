@@ -33,7 +33,7 @@ using namespace KJS;
 namespace WebCore {
 
 const ClassInfo JSQuarantinedObjectWrapper::s_info = {
-    "JSQuarantinedObjectWrapper", 0, 0};
+    "JSQuarantinedObjectWrapper", 0, 0, 0};
 
 JSQuarantinedObjectWrapper* JSQuarantinedObjectWrapper::asWrapper(
     JSValue* value) {

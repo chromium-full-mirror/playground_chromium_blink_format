@@ -30,7 +30,7 @@ using namespace KJS;
 namespace WebCore {
 
 const ClassInfo JSXMLHttpRequestConstructor::s_info = {
-    "XMLHttpRequestConstructor", 0, 0};
+    "XMLHttpRequestConstructor", 0, 0, 0};
 
 JSXMLHttpRequestConstructor::JSXMLHttpRequestConstructor(ExecState* exec,
                                                          Document* document)

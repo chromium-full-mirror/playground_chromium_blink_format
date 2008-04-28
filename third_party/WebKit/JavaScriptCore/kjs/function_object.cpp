@@ -53,11 +53,11 @@ FunctionPrototype::FunctionPrototype(ExecState* exec) {
                             functionProtoFuncToString),
       DontEnum);
   putDirectFunction(
-      new PrototypeFunction(exec, this, 2, CommonIdentifiers::shared()->apply,
+      new PrototypeFunction(exec, this, 2, exec->propertyNames().apply,
                             functionProtoFuncApply),
       DontEnum);
   putDirectFunction(
-      new PrototypeFunction(exec, this, 1, CommonIdentifiers::shared()->call,
+      new PrototypeFunction(exec, this, 1, exec->propertyNames().call,
                             functionProtoFuncCall),
       DontEnum);
 }

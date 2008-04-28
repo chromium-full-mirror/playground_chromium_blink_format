@@ -85,11 +85,16 @@ Lexer::Lexer()
       current(0),
       next1(0),
       next2(0),
-      next3(0) {
+      next3(0),
+      mainTable(KJS::mainTable) {
   m_buffer8.reserveCapacity(initialReadBufferCapacity);
   m_buffer16.reserveCapacity(initialReadBufferCapacity);
   m_strings.reserveCapacity(initialStringTableCapacity);
   m_identifiers.reserveCapacity(initialStringTableCapacity);
+}
+
+Lexer::~Lexer() {
+  delete[] mainTable.table;
 }
 
 void Lexer::setCode(int startingLineNumber, const UChar* c, unsigned int len) {

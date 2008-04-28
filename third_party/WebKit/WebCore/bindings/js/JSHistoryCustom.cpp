@@ -52,7 +52,7 @@ bool JSHistory::customGetOwnPropertySlot(ExecState* exec,
 
   // Check for the few functions that we allow, even when called cross-domain.
   const HashEntry* entry =
-      JSHistoryPrototype::s_info.propHashTable->entry(propertyName);
+      JSHistoryPrototype::s_info.propHashTable(exec)->entry(propertyName);
   if (entry) {
     // Allow access to back(), forward() and go() from any frame.
     if ((entry->attributes & Function) &&

@@ -354,7 +354,7 @@ static bool fillStructuresUsingDateArgs(ExecState* exec,
 
 // ------------------------------ DateInstance ------------------------------
 
-const ClassInfo DateInstance::info = {"Date", 0, 0};
+const ClassInfo DateInstance::info = {"Date", 0, 0, 0};
 
 DateInstance::DateInstance(JSObject* proto)
     : JSWrapperObject(proto), m_cache(0) {}
@@ -434,7 +434,8 @@ static inline bool isTime_tSigned() {
 
 // ------------------------------ DatePrototype -----------------------------
 
-const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, &dateTable};
+const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, 0,
+                                       ExecState::dateTable};
 
 /* Source for date_object.lut.h
    FIXMEL We could use templates to simplify the UTC variants.
@@ -496,8 +497,8 @@ DatePrototype::DatePrototype(ExecState*, ObjectPrototype* objectProto)
 bool DatePrototype::getOwnPropertySlot(ExecState* exec,
                                        const Identifier& propertyName,
                                        PropertySlot& slot) {
-  return getStaticFunctionSlot<JSObject>(exec, &dateTable, this, propertyName,
-                                         slot);
+  return getStaticFunctionSlot<JSObject>(exec, ExecState::dateTable(exec), this,
+                                         propertyName, slot);
 }
 
 // ------------------------------ DateObjectImp --------------------------------
@@ -512,11 +513,11 @@ DateObjectImp::DateObjectImp(ExecState* exec,
             DontEnum | DontDelete | ReadOnly);
   putDirectFunction(
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::Parse, 1,
-                            CommonIdentifiers::shared()->parse),
+                            exec->propertyNames().parse),
       DontEnum);
   putDirectFunction(
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::UTC, 7,
-                            CommonIdentifiers::shared()->UTC),
+                            exec->propertyNames().UTC),
       DontEnum);
   putDirect(exec->propertyNames().length, 7, ReadOnly | DontDelete | DontEnum);
 }

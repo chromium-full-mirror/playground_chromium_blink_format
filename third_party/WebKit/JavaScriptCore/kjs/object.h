@@ -67,8 +67,19 @@ struct ClassInfo {
   const ClassInfo* parentClass;
   /**
    * Static hash-table of properties.
+   * For classes that can be used from multiple threads, it is accessed via a
+   * getter function that would typically return a pointer to thread-specific
+   * value.
    */
-  const HashTable* propHashTable;
+  const HashTable* propHashTable(ExecState* exec) const {
+    if (classPropHashTableGetterFunction)
+      return classPropHashTableGetterFunction(exec);
+    return staticPropHashTable;
+  }
+
+  const HashTable* staticPropHashTable;
+  typedef const HashTable* (*ClassPropHashTableGetterFunction)(ExecState*);
+  const ClassPropHashTableGetterFunction classPropHashTableGetterFunction;
 };
 
 // This is an internal value object which stores getter and setter functions
@@ -148,8 +159,8 @@ class JSObject : public JSCell {
    * And in your source file:
    *
    * \code
-   *   const ClassInfo BarImp::info = { "Bar", 0, 0 }; // no parent class
-   *   const ClassInfo FooImp::info = { "Foo", &BarImp::info, 0 };
+   *   const ClassInfo BarImp::info = { "Bar", 0, 0, 0 }; // no parent class
+   *   const ClassInfo FooImp::info = { "Foo", &BarImp::info, 0, 0 };
    * \endcode
    *
    * @see inherits()
@@ -426,7 +437,8 @@ class JSObject : public JSCell {
   virtual JSObject* toThisObject(ExecState*) const;
   virtual JSGlobalObject* toGlobalObject(ExecState*) const;
 
-  virtual bool getPropertyAttributes(const Identifier& propertyName,
+  virtual bool getPropertyAttributes(ExecState*,
+                                     const Identifier& propertyName,
                                      unsigned& attributes) const;
 
   // WebCore uses this to make document.all and style.filter undetectable
@@ -469,7 +481,8 @@ class JSObject : public JSCell {
   PropertyMap _prop;
 
  private:
-  const HashEntry* findPropertyHashEntry(const Identifier& propertyName) const;
+  const HashEntry* findPropertyHashEntry(ExecState*,
+                                         const Identifier& propertyName) const;
   JSValue* _proto;
 };
 

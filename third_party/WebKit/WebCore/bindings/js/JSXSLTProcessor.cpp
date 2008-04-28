@@ -41,7 +41,7 @@ using namespace WebCore;
 
 namespace WebCore {
 
-const ClassInfo JSXSLTProcessor::s_info = {"XSLTProcessor", 0, 0};
+const ClassInfo JSXSLTProcessor::s_info = {"XSLTProcessor", 0, 0, 0};
 
 /*
 @begin JSXSLTProcessorPrototypeTable 7
@@ -202,7 +202,7 @@ JSValue* jsXSLTProcessorPrototypeFunctionReset(ExecState* exec,
 }
 
 const ClassInfo JSXSLTProcessorConstructor::s_info = {"XSLTProcessorConsructor",
-                                                      0, 0};
+                                                      0, 0, 0};
 
 JSXSLTProcessorConstructor::JSXSLTProcessorConstructor(ExecState* exec)
     : DOMObject(exec->lexicalGlobalObject()->objectPrototype()) {

@@ -24,6 +24,7 @@
 #ifndef Lexer_h
 #define Lexer_h
 
+#include "lookup.h"
 #include "ustring.h"
 #include <wtf/Vector.h>
 
@@ -97,6 +98,7 @@ class Lexer : Noncopyable {
   friend Lexer& lexer();
   friend class WTF::ThreadSpecific<Lexer>;
   Lexer();
+  ~Lexer();
 
   int yylineno;
   bool done;
@@ -149,6 +151,8 @@ class Lexer : Noncopyable {
 
   UString m_pattern;
   UString m_flags;
+
+  const HashTable mainTable;
 };
 
 Lexer& lexer();  // Returns the singletone JavaScript lexer.

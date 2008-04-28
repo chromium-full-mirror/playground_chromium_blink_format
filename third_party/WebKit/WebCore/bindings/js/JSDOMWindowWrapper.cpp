@@ -39,7 +39,7 @@ using namespace KJS;
 
 namespace WebCore {
 
-const ClassInfo JSDOMWindowWrapper::s_info = {"JSDOMWindowWrapper", 0, 0};
+const ClassInfo JSDOMWindowWrapper::s_info = {"JSDOMWindowWrapper", 0, 0, 0};
 
 JSDOMWindowWrapper::JSDOMWindowWrapper(DOMWindow* domWindow)
     : Base(jsNull()), m_window(0) {
@@ -92,9 +92,10 @@ void JSDOMWindowWrapper::getPropertyNames(ExecState* exec,
   m_window->getPropertyNames(exec, propertyNames);
 }
 
-bool JSDOMWindowWrapper::getPropertyAttributes(const Identifier& propertyName,
+bool JSDOMWindowWrapper::getPropertyAttributes(KJS::ExecState* exec,
+                                               const Identifier& propertyName,
                                                unsigned& attributes) const {
-  return m_window->getPropertyAttributes(propertyName, attributes);
+  return m_window->getPropertyAttributes(exec, propertyName, attributes);
 }
 
 void JSDOMWindowWrapper::defineGetter(ExecState* exec,

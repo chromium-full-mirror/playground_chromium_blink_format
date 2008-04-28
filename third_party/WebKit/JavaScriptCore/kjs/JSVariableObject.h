@@ -53,7 +53,8 @@ class JSVariableObject : public JSObject {
   virtual bool isVariableObject() const;
   virtual bool isDynamicScope() const = 0;
 
-  virtual bool getPropertyAttributes(const Identifier& propertyName,
+  virtual bool getPropertyAttributes(ExecState*,
+                                     const Identifier& propertyName,
                                      unsigned& attributes) const;
 
  protected:

@@ -94,6 +94,7 @@
 #include <WebCore/TypingCommand.h>
 #include <WebCore/WindowMessageBroadcaster.h>
 #pragma warning(pop)
+#include <kjs/InitializeThreading.h>
 #include <JavaScriptCore/value.h>
 #include <CFNetwork/CFURLCachePriv.h>
 #include <CFNetwork/CFURLProtocolPriv.h>
@@ -284,6 +285,8 @@ WebView::WebView()
       m_closeWindowTimer(this, &WebView::closeWindowTimerFired),
       m_topLevelParent(0),
       m_deleteBackingStoreTimerActive(false) {
+  KJS::initializeThreading();
+
   m_backingStoreSize.cx = m_backingStoreSize.cy = 0;
 
   CoCreateInstance(CLSID_DragDropHelper, 0, CLSCTX_INPROC_SERVER,

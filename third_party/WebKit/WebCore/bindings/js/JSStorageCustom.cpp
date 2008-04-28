@@ -69,8 +69,8 @@ bool JSStorage::customPut(ExecState* exec,
   // fooled, we need to check
   // the native property slots manually.
   PropertySlot slot;
-  if (getStaticValueSlot<JSStorage, Base>(exec, s_info.propHashTable, this,
-                                          propertyName, slot))
+  if (getStaticValueSlot<JSStorage, Base>(exec, s_info.propHashTable(exec),
+                                          this, propertyName, slot))
     return false;
 
   JSValue* prototype = this->prototype();

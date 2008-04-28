@@ -206,7 +206,7 @@ class JSEventTargetPrototype : public KJS::JSObject {
   virtual const KJS::ClassInfo* classInfo() const {
     static const KJS::ClassInfo s_classInfo = {
         JSEventTargetPrototypeInformation::prototypeClassName(), 0,
-        &KJS::JSEventTargetPrototypeTable};
+        &KJS::JSEventTargetPrototypeTable, 0};
     return &s_classInfo;
   }
 };

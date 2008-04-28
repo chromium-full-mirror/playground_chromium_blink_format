@@ -72,7 +72,8 @@ class JSDOMWindowWrapper : public DOMObject {
   virtual bool deleteProperty(KJS::ExecState*,
                               const KJS::Identifier& propertyName);
   virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
-  virtual bool getPropertyAttributes(const KJS::Identifier& propertyName,
+  virtual bool getPropertyAttributes(KJS::ExecState*,
+                                     const KJS::Identifier& propertyName,
                                      unsigned& attributes) const;
   virtual void defineGetter(KJS::ExecState*,
                             const KJS::Identifier& propertyName,

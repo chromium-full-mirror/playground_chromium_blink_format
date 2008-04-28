@@ -42,6 +42,7 @@ class EvalError;
 class EvalErrorPrototype;
 class FunctionObjectImp;
 class FunctionPrototype;
+struct HashTable;
 class JSGlobalObject;
 class NativeErrorImp;
 class NativeErrorPrototype;
@@ -67,6 +68,7 @@ class TypeErrorPrototype;
 class UriError;
 class UriErrorPrototype;
 struct ActivationStackNode;
+struct ThreadClassInfoHashTables;
 
 typedef Vector<ExecState*, 16> ExecStateStack;
 
@@ -75,16 +77,14 @@ class JSGlobalObject : public JSVariableObject {
   using JSVariableObject::JSVariableObjectData;
 
   struct JSGlobalObjectData : public JSVariableObjectData {
-    JSGlobalObjectData(JSGlobalObject* globalObject, JSObject* thisValue)
-        : JSVariableObjectData(&inlineSymbolTable),
-          globalExec(globalObject, thisValue) {}
+    JSGlobalObjectData() : JSVariableObjectData(&inlineSymbolTable) {}
 
     JSGlobalObject* next;
     JSGlobalObject* prev;
 
     Debugger* debugger;
 
-    GlobalExecState globalExec;
+    OwnPtr<GlobalExecState> globalExec;
     int recursion;
 
     unsigned timeoutTime;
@@ -140,17 +140,17 @@ class JSGlobalObject : public JSVariableObject {
     OwnPtr<HashSet<JSObject*>> arrayVisitedElements;  // Global data shared by
                                                       // array prototype
                                                       // functions.
+
+    PerThreadData perThreadData;
   };
 
  public:
-  JSGlobalObject() : JSVariableObject(new JSGlobalObjectData(this, this)) {
-    init();
-  }
+  JSGlobalObject() : JSVariableObject(new JSGlobalObjectData) { init(this); }
 
  protected:
   JSGlobalObject(JSValue* proto, JSObject* globalThisValue)
-      : JSVariableObject(proto, new JSGlobalObjectData(this, globalThisValue)) {
-    init();
+      : JSVariableObject(proto, new JSGlobalObjectData) {
+    init(globalThisValue);
   }
 
  public:
@@ -282,8 +282,15 @@ class JSGlobalObject : public JSVariableObject {
     return *d()->arrayVisitedElements;
   }
 
+  // Per-thread hash tables, cached on the global object for faster access.
+  const PerThreadData* perThreadData() const { return &d()->perThreadData; }
+
+  // Initialize and/or retrieve per-thread hash tables - use perThreadData() for
+  // faster access instead.
+  static ThreadClassInfoHashTables* threadClassInfoHashTables();
+
  private:
-  void init();
+  void init(JSObject* thisValue);
 
   JSGlobalObjectData* d() const {
     return static_cast<JSGlobalObjectData*>(JSVariableObject::d);
