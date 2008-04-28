@@ -1080,7 +1080,7 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
     m_canvas->setOriginTainted();
 
   willDraw(destRect);
-  c->drawImage(buffer->image(), sourceRect, destRect);
+  c->drawImage(buffer->image(), destRect, sourceRect);
 }
 
 // FIXME: Why isn't this just another overload of drawImage? Why have a
