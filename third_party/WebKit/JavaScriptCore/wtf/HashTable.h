@@ -77,7 +77,6 @@ template <typename Key,
           typename KeyTraits>
 class HashTableConstIterator;
 
-#if CHECK_HASHTABLE_ITERATORS
 template <typename Key,
           typename Value,
           typename Extractor,
@@ -105,7 +104,9 @@ void removeIterator(HashTableConstIterator<Key,
                                            HashFunctions,
                                            Traits,
                                            KeyTraits>*);
-#else
+
+#if !CHECK_HASHTABLE_ITERATORS
+
 template <typename Key,
           typename Value,
           typename Extractor,
@@ -133,6 +134,7 @@ inline void removeIterator(HashTableConstIterator<Key,
                                                   HashFunctions,
                                                   Traits,
                                                   KeyTraits>*) {}
+
 #endif
 
 typedef enum { HashItemKnownGood } HashItemKnownGoodTag;
@@ -918,9 +920,9 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
   ++m_keyCount;
 
   if (shouldExpand()) {
-    // FIXME: this makes an extra copy on expand. Probably not that bad since
+    // FIXME: This makes an extra copy on expand. Probably not that bad since
     // expand is rare, but would be better to have a version of expand that can
-    // follow a pivot entry and return the new position
+    // follow a pivot entry and return the new position.
     KeyType enteredKey = Extractor::extract(*entry);
     expand();
     return std::make_pair(find(enteredKey), true);
@@ -973,9 +975,9 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
   HashTranslator::translate(*entry, key, extra, h);
   ++m_keyCount;
   if (shouldExpand()) {
-    // FIXME: this makes an extra copy on expand. Probably not that bad since
+    // FIXME: This makes an extra copy on expand. Probably not that bad since
     // expand is rare, but would be better to have a version of expand that can
-    // follow a pivot entry and return the new position
+    // follow a pivot entry and return the new position.
     KeyType enteredKey = Extractor::extract(*entry);
     expand();
     return std::make_pair(find(enteredKey), true);
@@ -1004,7 +1006,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::reinsert(
 #endif
 
   Mover<ValueType, Traits::needsDestruction>::move(
-      entry, *(lookupForWriting(Extractor::extract(entry)).first));
+      entry, *lookupForWriting(Extractor::extract(entry)).first);
 }
 
 template <typename Key,
@@ -1546,164 +1548,6 @@ inline bool operator!=(const HashTableIteratorAdapter<T, U>& a,
                        const HashTableIteratorAdapter<T, U>& b) {
   return a.m_impl != b.m_impl;
 }
-
-// reference count manager
-
-template <typename ValueTraits, typename ValueStorageTraits>
-struct NeedsRef {
-  static const bool value =
-      ValueTraits::needsRef && !ValueStorageTraits::needsRef;
-};
-template <typename FirstTraits,
-          typename SecondTraits,
-          typename ValueStorageTraits>
-struct NeedsRef<PairBaseHashTraits<FirstTraits, SecondTraits>,
-                ValueStorageTraits> {
-  typedef typename ValueStorageTraits::FirstTraits FirstStorageTraits;
-  typedef typename ValueStorageTraits::SecondTraits SecondStorageTraits;
-  static const bool firstNeedsRef =
-      NeedsRef<FirstTraits, FirstStorageTraits>::value;
-  static const bool secondNeedsRef =
-      NeedsRef<SecondTraits, SecondStorageTraits>::value;
-  static const bool value = firstNeedsRef || secondNeedsRef;
-};
-
-template <bool needsRef, typename ValueTraits, typename ValueStorageTraits>
-struct RefCounterBase;
-
-template <typename ValueTraits, typename ValueStorageTraits>
-struct RefCounterBase<false, ValueTraits, ValueStorageTraits> {
-  typedef typename ValueStorageTraits::TraitType ValueStorageType;
-  static void ref(const ValueStorageType&) {}
-  static void deref(const ValueStorageType&) {}
-};
-
-template <typename ValueTraits, typename ValueStorageTraits>
-struct RefCounterBase<true, ValueTraits, ValueStorageTraits> {
-  typedef typename ValueStorageTraits::TraitType ValueStorageType;
-  static void ref(const ValueStorageType& v) { ValueTraits::ref(v); }
-  static void deref(const ValueStorageType& v) { ValueTraits::deref(v); }
-};
-
-template <typename ValueTraits, typename ValueStorageTraits>
-struct RefCounter {
-  typedef typename ValueTraits::TraitType ValueType;
-  typedef typename ValueStorageTraits::TraitType ValueStorageType;
-  static const bool needsRef = NeedsRef<ValueTraits, ValueStorageTraits>::value;
-  typedef RefCounterBase<needsRef, ValueTraits, ValueStorageTraits> Base;
-  static void ref(const ValueStorageType& v) { Base::ref(v); }
-  static void deref(const ValueStorageType& v) { Base::deref(v); }
-};
-
-template <typename FirstTraits,
-          typename SecondTraits,
-          typename ValueStorageTraits>
-struct RefCounter<PairBaseHashTraits<FirstTraits, SecondTraits>,
-                  ValueStorageTraits> {
-  typedef typename FirstTraits::TraitType FirstType;
-  typedef typename SecondTraits::TraitType SecondType;
-  typedef typename ValueStorageTraits::FirstTraits FirstStorageTraits;
-  typedef typename ValueStorageTraits::SecondTraits SecondStorageTraits;
-  typedef typename ValueStorageTraits::TraitType ValueStorageType;
-  static const bool firstNeedsRef =
-      NeedsRef<FirstTraits, FirstStorageTraits>::value;
-  static const bool secondNeedsRef =
-      NeedsRef<SecondTraits, SecondStorageTraits>::value;
-  typedef RefCounterBase<firstNeedsRef, FirstTraits, FirstStorageTraits>
-      FirstBase;
-  typedef RefCounterBase<secondNeedsRef, SecondTraits, SecondStorageTraits>
-      SecondBase;
-  static void ref(const ValueStorageType& v) {
-    FirstBase::ref(v.first);
-    SecondBase::ref(v.second);
-  }
-  static void deref(const ValueStorageType& v) {
-    FirstBase::deref(v.first);
-    SecondBase::deref(v.second);
-  }
-};
-
-template <bool needsRef, typename HashTableType, typename ValueTraits>
-struct HashTableRefCounterBase;
-
-template <typename HashTableType, typename ValueTraits>
-struct HashTableRefCounterBase<false, HashTableType, ValueTraits> {
-  static void refAll(HashTableType&) {}
-  static void derefAll(HashTableType&) {}
-};
-
-template <typename HashTableType, typename ValueTraits>
-struct HashTableRefCounterBase<true, HashTableType, ValueTraits> {
-  typedef typename HashTableType::iterator iterator;
-  typedef RefCounter<ValueTraits, typename HashTableType::ValueTraits>
-      ValueRefCounter;
-  static void refAll(HashTableType&);
-  static void derefAll(HashTableType&);
-};
-
-template <typename HashTableType, typename ValueTraits>
-void HashTableRefCounterBase<true, HashTableType, ValueTraits>::refAll(
-    HashTableType& table) {
-  iterator end = table.end();
-  for (iterator it = table.begin(); it != end; ++it)
-    ValueRefCounter::ref(*it);
-}
-
-template <typename HashTableType, typename ValueTraits>
-void HashTableRefCounterBase<true, HashTableType, ValueTraits>::derefAll(
-    HashTableType& table) {
-  iterator end = table.end();
-  for (iterator it = table.begin(); it != end; ++it)
-    ValueRefCounter::deref(*it);
-}
-
-template <typename HashTableType, typename ValueTraits>
-struct HashTableRefCounter {
-  static const bool needsRef =
-      NeedsRef<ValueTraits, typename HashTableType::ValueTraits>::value;
-  typedef HashTableRefCounterBase<needsRef, HashTableType, ValueTraits> Base;
-  static void refAll(HashTableType& table) { Base::refAll(table); }
-  static void derefAll(HashTableType& table) { Base::derefAll(table); }
-};
-
-// helper template for HashMap and HashSet.
-template <bool needsRef,
-          typename FromType,
-          typename ToType,
-          typename FromTraits>
-struct Assigner;
-
-template <typename FromType, typename ToType, typename FromTraits>
-struct Assigner<false, FromType, ToType, FromTraits> {
-  typedef union {
-    FromType m_from;
-    ToType m_to;
-  } UnionType;
-
-  static void assign(const FromType& from, ToType& to) {
-    reinterpret_cast<UnionType*>(&to)->m_from = from;
-  }
-};
-
-template <typename FromType, typename ToType, typename FromTraits>
-struct Assigner<true, FromType, ToType, FromTraits> {
-  static void assign(const FromType& from, ToType& to) {
-    ToType oldTo = to;
-    memcpy(&to, &from, sizeof(FromType));
-    FromTraits::ref(to);
-    FromTraits::deref(oldTo);
-  }
-};
-
-template <typename FromType, typename FromTraits>
-struct Assigner<false, FromType, FromType, FromTraits> {
-  static void assign(const FromType& from, FromType& to) { to = from; }
-};
-
-template <typename FromType, typename FromTraits>
-struct Assigner<true, FromType, FromType, FromTraits> {
-  static void assign(const FromType& from, FromType& to) { to = from; }
-};
 
 }  // namespace WTF
 

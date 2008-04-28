@@ -38,7 +38,7 @@ class HashMap {
  private:
   typedef KeyTraitsArg KeyTraits;
   typedef MappedTraitsArg MappedTraits;
-  typedef PairBaseHashTraits<KeyTraits, MappedTraits> ValueTraits;
+  typedef PairHashTraits<KeyTraits, MappedTraits> ValueTraits;
 
  public:
   typedef typename KeyTraits::TraitType KeyType;
@@ -48,36 +48,18 @@ class HashMap {
  private:
   typedef HashArg HashFunctions;
 
-  typedef typename HashKeyStorageTraits<HashFunctions, KeyTraits>::Hash
-      StorageHashFunctions;
-
-  typedef typename HashKeyStorageTraits<HashFunctions, KeyTraits>::Traits
-      KeyStorageTraits;
-  typedef typename MappedTraits::StorageTraits MappedStorageTraits;
-  typedef PairHashTraits<KeyStorageTraits, MappedStorageTraits>
-      ValueStorageTraits;
-
-  typedef typename KeyStorageTraits::TraitType KeyStorageType;
-  typedef typename MappedStorageTraits::TraitType MappedStorageType;
-  typedef typename ValueStorageTraits::TraitType ValueStorageType;
-
-  typedef HashTable<KeyStorageType,
-                    ValueStorageType,
-                    PairFirstExtractor<ValueStorageType>,
-                    StorageHashFunctions,
-                    ValueStorageTraits,
-                    KeyStorageTraits>
+  typedef HashTable<KeyType,
+                    ValueType,
+                    PairFirstExtractor<ValueType>,
+                    HashFunctions,
+                    ValueTraits,
+                    KeyTraits>
       HashTableType;
 
  public:
   typedef HashTableIteratorAdapter<HashTableType, ValueType> iterator;
   typedef HashTableConstIteratorAdapter<HashTableType, ValueType>
       const_iterator;
-
-  HashMap();
-  HashMap(const HashMap&);
-  HashMap& operator=(const HashMap&);
-  ~HashMap();
 
   void swap(HashMap&);
 
@@ -114,8 +96,6 @@ class HashMap {
 
  private:
   pair<iterator, bool> inlineAdd(const KeyType&, const MappedType&);
-  void refAll();
-  void derefAll();
 
   HashTableType m_impl;
 };
@@ -127,110 +107,26 @@ struct PairFirstExtractor {
   }
 };
 
-template <bool canReplaceDeletedKey,
-          typename ValueType,
-          typename ValueTraits,
-          typename ValueStorageTraits,
-          typename HashFunctions>
-struct HashMapTranslator;
-
-template <typename ValueType,
-          typename ValueTraits,
-          typename ValueStorageTraits,
-          typename HashFunctions>
-struct HashMapTranslator<true,
-                         ValueType,
-                         ValueTraits,
-                         ValueStorageTraits,
-                         HashFunctions> {
+template <typename ValueType, typename ValueTraits, typename HashFunctions>
+struct HashMapTranslator {
   typedef typename ValueType::first_type KeyType;
   typedef typename ValueType::second_type MappedType;
-  typedef typename ValueStorageTraits::TraitType ValueStorageType;
-  typedef typename ValueStorageTraits::FirstTraits KeyStorageTraits;
-  typedef typename KeyStorageTraits::TraitType KeyStorageType;
-  typedef typename ValueStorageTraits::SecondTraits MappedStorageTraits;
-  typedef typename MappedStorageTraits::TraitType MappedStorageType;
-  typedef typename ValueTraits::FirstTraits KeyTraits;
-  typedef typename ValueTraits::SecondTraits MappedTraits;
 
   static unsigned hash(const KeyType& key) { return HashFunctions::hash(key); }
-  static bool equal(const KeyStorageType& a, const KeyType& b) {
-    return HashFunctions::equal(*(KeyType*)&a, b);
+  static bool equal(const KeyType& a, const KeyType& b) {
+    return HashFunctions::equal(a, b);
   }
-  static void translate(ValueStorageType& location,
+  static void translate(ValueType& location,
                         const KeyType& key,
                         const MappedType& mapped) {
     location.first = key;
     location.second = mapped;
   }
 };
-
-template <typename ValueType,
-          typename ValueTraits,
-          typename ValueStorageTraits,
-          typename HashFunctions>
-struct HashMapTranslator<false,
-                         ValueType,
-                         ValueTraits,
-                         ValueStorageTraits,
-                         HashFunctions> {
-  typedef typename ValueType::first_type KeyType;
-  typedef typename ValueType::second_type MappedType;
-  typedef typename ValueStorageTraits::TraitType ValueStorageType;
-  typedef typename ValueStorageTraits::FirstTraits KeyStorageTraits;
-  typedef typename KeyStorageTraits::TraitType KeyStorageType;
-  typedef typename ValueStorageTraits::SecondTraits MappedStorageTraits;
-  typedef typename MappedStorageTraits::TraitType MappedStorageType;
-  typedef typename ValueTraits::FirstTraits KeyTraits;
-  typedef typename ValueTraits::SecondTraits MappedTraits;
-
-  static unsigned hash(const KeyType& key) { return HashFunctions::hash(key); }
-  static bool equal(const KeyStorageType& a, const KeyType& b) {
-    return HashFunctions::equal(*(KeyType*)&a, b);
-  }
-  static void translate(ValueStorageType& location,
-                        const KeyType& key,
-                        const MappedType& mapped) {
-    location.first = key;
-    location.second = mapped;
-  }
-};
-
-template <typename T, typename U, typename V, typename W, typename X>
-inline void HashMap<T, U, V, W, X>::refAll() {
-  HashTableRefCounter<HashTableType, ValueTraits>::refAll(m_impl);
-}
-
-template <typename T, typename U, typename V, typename W, typename X>
-inline void HashMap<T, U, V, W, X>::derefAll() {
-  HashTableRefCounter<HashTableType, ValueTraits>::derefAll(m_impl);
-}
-
-template <typename T, typename U, typename V, typename W, typename X>
-inline HashMap<T, U, V, W, X>::HashMap() {}
-
-template <typename T, typename U, typename V, typename W, typename X>
-inline HashMap<T, U, V, W, X>::HashMap(const HashMap& other)
-    : m_impl(other.m_impl) {
-  refAll();
-}
-
-template <typename T, typename U, typename V, typename W, typename X>
-inline HashMap<T, U, V, W, X>& HashMap<T, U, V, W, X>::operator=(
-    const HashMap& other) {
-  HashMap tmp(other);
-  swap(tmp);
-  return *this;
-}
 
 template <typename T, typename U, typename V, typename W, typename X>
 inline void HashMap<T, U, V, W, X>::swap(HashMap& other) {
   m_impl.swap(other.m_impl);
-}
-
-template <typename T, typename U, typename V, typename W, typename X>
-inline HashMap<T, U, V, W, X>::~HashMap() {
-  derefAll();
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
@@ -274,28 +170,25 @@ HashMap<T, U, V, W, X>::end() const {
 template <typename T, typename U, typename V, typename W, typename X>
 inline typename HashMap<T, U, V, W, X>::iterator HashMap<T, U, V, W, X>::find(
     const KeyType& key) {
-  return m_impl.find(*(const KeyStorageType*)&key);
+  return m_impl.find(key);
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
 inline typename HashMap<T, U, V, W, X>::const_iterator
 HashMap<T, U, V, W, X>::find(const KeyType& key) const {
-  return m_impl.find(*(const KeyStorageType*)&key);
+  return m_impl.find(key);
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
 inline bool HashMap<T, U, V, W, X>::contains(const KeyType& key) const {
-  return m_impl.contains(*(const KeyStorageType*)&key);
+  return m_impl.contains(key);
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
 inline pair<typename HashMap<T, U, V, W, X>::iterator, bool>
 HashMap<T, U, V, W, X>::inlineAdd(const KeyType& key,
                                   const MappedType& mapped) {
-  const bool canReplaceDeletedKey =
-      !KeyTraits::needsDestruction || KeyStorageTraits::needsDestruction;
-  typedef HashMapTranslator<canReplaceDeletedKey, ValueType, ValueTraits,
-                            ValueStorageTraits, HashFunctions>
+  typedef HashMapTranslator<ValueType, ValueTraits, HashFunctions>
       TranslatorType;
   return m_impl.template add<KeyType, MappedType, TranslatorType>(key, mapped);
 }
@@ -304,9 +197,10 @@ template <typename T, typename U, typename V, typename W, typename X>
 pair<typename HashMap<T, U, V, W, X>::iterator, bool>
 HashMap<T, U, V, W, X>::set(const KeyType& key, const MappedType& mapped) {
   pair<iterator, bool> result = inlineAdd(key, mapped);
-  if (!result.second)
+  if (!result.second) {
     // add call above didn't change anything, so set the mapped value
     result.first->second = mapped;
+  }
   return result;
 }
 
@@ -319,11 +213,10 @@ HashMap<T, U, V, W, X>::add(const KeyType& key, const MappedType& mapped) {
 template <typename T, typename U, typename V, typename W, typename MappedTraits>
 typename HashMap<T, U, V, W, MappedTraits>::MappedType
 HashMap<T, U, V, W, MappedTraits>::get(const KeyType& key) const {
-  ValueStorageType* entry =
-      const_cast<HashTableType&>(m_impl).lookup(*(const KeyStorageType*)&key);
+  ValueType* entry = const_cast<HashTableType&>(m_impl).lookup(key);
   if (!entry)
     return MappedTraits::emptyValue();
-  return ((ValueType*)entry)->second;
+  return entry->second;
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
@@ -331,7 +224,6 @@ inline void HashMap<T, U, V, W, X>::remove(iterator it) {
   if (it.m_impl == m_impl.end())
     return;
   m_impl.checkTableConsistency();
-  RefCounter<ValueTraits, ValueStorageTraits>::deref(*it.m_impl);
   m_impl.removeWithoutEntryConsistencyCheck(it.m_impl);
 }
 
@@ -342,7 +234,6 @@ inline void HashMap<T, U, V, W, X>::remove(const KeyType& key) {
 
 template <typename T, typename U, typename V, typename W, typename X>
 inline void HashMap<T, U, V, W, X>::clear() {
-  derefAll();
   m_impl.clear();
 }
 
@@ -388,7 +279,7 @@ void deleteAllPairSeconds(HashTableType& collection) {
   typedef typename HashTableType::const_iterator iterator;
   iterator end = collection.end();
   for (iterator it = collection.begin(); it != end; ++it)
-    delete *(MappedType*)&it->second;
+    delete it->second;
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
@@ -401,7 +292,7 @@ void deleteAllPairFirsts(HashTableType& collection) {
   typedef typename HashTableType::const_iterator iterator;
   iterator end = collection.end();
   for (iterator it = collection.begin(); it != end; ++it)
-    delete *(KeyType*)&it->first;
+    delete it->first;
 }
 
 template <typename T, typename U, typename V, typename W, typename X>

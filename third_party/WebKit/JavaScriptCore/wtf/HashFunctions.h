@@ -144,9 +144,9 @@ struct PtrHash {
 };
 template <typename P>
 struct PtrHash<RefPtr<P>> : PtrHash<P*> {
-  static unsigned hash(const RefPtr<P>& key) {
-    return PtrHash<P*>::hash(key.get());
-  }
+  using PtrHash<P*>::hash;
+  static unsigned hash(const RefPtr<P>& key) { return hash(key.get()); }
+  using PtrHash<P*>::equal;
   static bool equal(const RefPtr<P>& a, const RefPtr<P>& b) { return a == b; }
   static bool equal(P* a, const RefPtr<P>& b) { return a == b; }
   static bool equal(const RefPtr<P>& a, P* b) { return a == b; }

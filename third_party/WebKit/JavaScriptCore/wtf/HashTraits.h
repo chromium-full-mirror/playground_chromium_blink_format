@@ -146,9 +146,7 @@ struct GenericHashTraitsBase<true, T> {
 template <typename T>
 struct GenericHashTraits : GenericHashTraitsBase<IsInteger<T>::value, T> {
   typedef T TraitType;
-  typedef HashTraits<T> StorageTraits;
   static T emptyValue() { return T(); }
-  static const bool needsRef = false;
 };
 
 template <typename T>
@@ -196,9 +194,6 @@ struct HashTraits<RefPtr<P>> : GenericHashTraits<RefPtr<P>> {
 
 // special traits for pairs, helpful for their use in HashMap implementation
 
-template <typename FirstTraits, typename SecondTraits>
-struct PairHashTraits;
-
 template <typename FirstTraitsArg, typename SecondTraitsArg>
 struct PairHashTraits
     : GenericHashTraits<pair<typename FirstTraitsArg::TraitType,
@@ -226,19 +221,9 @@ struct PairHashTraits
   }
 };
 
-template <typename FirstTraits, typename SecondTraits>
-struct PairBaseHashTraits : PairHashTraits<FirstTraits, SecondTraits> {};
-
 template <typename First, typename Second>
 struct HashTraits<pair<First, Second>>
     : public PairHashTraits<HashTraits<First>, HashTraits<Second>> {};
-
-// obsolete code sharing traits -- to be deleted
-template <typename HashArg, typename TraitsArg>
-struct HashKeyStorageTraits {
-  typedef HashArg Hash;
-  typedef TraitsArg Traits;
-};
 
 }  // namespace WTF
 
