@@ -38,6 +38,7 @@ class RenderStyle;
 class RenderThemeQt : public RenderTheme {
  public:
   RenderThemeQt();
+  virtual ~RenderThemeQt();
 
   virtual bool supportsHover(const RenderStyle*) const;
   virtual bool supportsFocusRing(const RenderStyle* style) const;
@@ -162,6 +163,9 @@ class RenderThemeQt : public RenderTheme {
 
   int m_buttonFontPixelSize;
   QString m_buttonFontFamily;
+
+  QStyle* m_fallbackStyle;
+  QStyle* fallbackStyle();
 };
 
 class StylePainter {
