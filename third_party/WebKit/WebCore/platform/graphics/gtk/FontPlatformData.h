@@ -45,13 +45,12 @@ namespace WebCore {
 
 class FontPlatformData {
  public:
-  class Deleted {};
-  FontPlatformData(Deleted)
+  FontPlatformData(WTF::HashTableDeletedValueType)
 #if defined(USE_FREETYPE)
-      : m_pattern(reinterpret_cast<FcPattern*>(-1))
+      : m_pattern(hashTableDeletedFontValue())
 #elif defined(USE_PANGO)
       : m_context(0),
-        m_font(reinterpret_cast<PangoFont*>(-1))
+        m_font(hashTableDeletedFontValue())
 #else
 #error "Must defined a font backend"
 #endif
@@ -96,6 +95,13 @@ class FontPlatformData {
   }
 
   bool operator==(const FontPlatformData&) const;
+  bool isHashTableDeletedValue() const {
+#if defined(USE_FREETYPE)
+    return m_pattern == hashTableDeletedFontValue();
+#elif defined(USE_PANGO)
+    return m_font == hashTableDeletedFontValue();
+#endif
+  };
 
 #if defined(USE_FREETYPE)
   FcPattern* m_pattern;
@@ -112,6 +118,17 @@ class FontPlatformData {
   bool m_syntheticBold;
   bool m_syntheticOblique;
   cairo_scaled_font_t* m_scaledFont;
+
+ private:
+#if defined(USE_FREETYPE)
+  static FcPattern* hashTableDeletedFontValue() {
+    return reinterpret_cast<FcPattern*>(-1);
+  }
+#elif defined(USE_PANGO)
+  static PangoFont* hashTableDeletedFontValue() {
+    return reinterpret_cast<PangoFont*>(-1);
+  }
+#endif
 };
 }
 
