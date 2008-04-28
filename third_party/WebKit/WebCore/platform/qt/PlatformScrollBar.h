@@ -58,6 +58,7 @@ class PlatformScrollbar : public Widget, public Scrollbar {
   virtual bool handleMouseOutEvent(const PlatformMouseEvent&);
   virtual bool handleMousePressEvent(const PlatformMouseEvent&);
   virtual bool handleMouseReleaseEvent(const PlatformMouseEvent&);
+  virtual bool handleContextMenuEvent(const PlatformMouseEvent&);
 
   bool isEnabled() const;
 
@@ -87,6 +88,8 @@ class PlatformScrollbar : public Widget, public Scrollbar {
   ScrollGranularity pressedPartScrollGranularity();
 
   bool thumbUnderMouse();
+
+  int pixelPosToRangeValue(int pos) const;
 
   int m_pressedPos;
   QStyle::SubControl m_pressedPart;
