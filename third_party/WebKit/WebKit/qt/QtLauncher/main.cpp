@@ -39,6 +39,8 @@
 #include <QPrintPreviewDialog>
 #endif
 
+#include <QtUiTools/QUiLoader>
+
 class InfoWidget : public QProgressBar {
   Q_OBJECT
  public:
@@ -258,6 +260,10 @@ class WebPage : public QWebPage {
   inline WebPage(QWidget* parent) : QWebPage(parent) {}
 
   virtual QWebPage* createWindow(QWebPage::WebWindowType);
+  virtual QObject* createPlugin(const QString&,
+                                const QUrl&,
+                                const QStringList&,
+                                const QStringList&);
 };
 
 class MainWindow : public QMainWindow {
@@ -398,6 +404,17 @@ class MainWindow : public QMainWindow {
 QWebPage* WebPage::createWindow(QWebPage::WebWindowType) {
   MainWindow* mw = new MainWindow;
   return mw->webPage();
+}
+
+QObject* WebPage::createPlugin(const QString& classId,
+                               const QUrl& url,
+                               const QStringList& paramNames,
+                               const QStringList& paramValues) {
+  Q_UNUSED(url);
+  Q_UNUSED(paramNames);
+  Q_UNUSED(paramValues);
+  QUiLoader loader;
+  return loader.createWidget(classId, view());
 }
 
 #include "main.moc"
