@@ -387,7 +387,8 @@ void QWebPagePrivate::mouseMoveEvent(QMouseEvent* ev) {
   if (!frame->view())
     return;
 
-  frame->eventHandler()->mouseMoved(PlatformMouseEvent(ev, 0));
+  bool accepted = frame->eventHandler()->mouseMoved(PlatformMouseEvent(ev, 0));
+  ev->setAccepted(accepted);
 }
 
 void QWebPagePrivate::mousePressEvent(QMouseEvent* ev) {
@@ -402,7 +403,9 @@ void QWebPagePrivate::mousePressEvent(QMouseEvent* ev) {
     return;
   }
 
-  frame->eventHandler()->handleMousePressEvent(PlatformMouseEvent(ev, 1));
+  bool accepted =
+      frame->eventHandler()->handleMousePressEvent(PlatformMouseEvent(ev, 1));
+  ev->setAccepted(accepted);
 }
 
 void QWebPagePrivate::mouseDoubleClickEvent(QMouseEvent* ev) {
@@ -410,7 +413,9 @@ void QWebPagePrivate::mouseDoubleClickEvent(QMouseEvent* ev) {
   if (!frame->view())
     return;
 
-  frame->eventHandler()->handleMousePressEvent(PlatformMouseEvent(ev, 2));
+  bool accepted =
+      frame->eventHandler()->handleMousePressEvent(PlatformMouseEvent(ev, 2));
+  ev->setAccepted(accepted);
 
   tripleClickTimer.start(QApplication::doubleClickInterval(), q);
   tripleClick = ev->pos();
@@ -421,7 +426,9 @@ void QWebPagePrivate::mouseTripleClickEvent(QMouseEvent* ev) {
   if (!frame->view())
     return;
 
-  frame->eventHandler()->handleMousePressEvent(PlatformMouseEvent(ev, 3));
+  bool accepted =
+      frame->eventHandler()->handleMousePressEvent(PlatformMouseEvent(ev, 3));
+  ev->setAccepted(accepted);
 }
 
 void QWebPagePrivate::mouseReleaseEvent(QMouseEvent* ev) {
@@ -429,7 +436,9 @@ void QWebPagePrivate::mouseReleaseEvent(QMouseEvent* ev) {
   if (!frame->view())
     return;
 
-  frame->eventHandler()->handleMouseReleaseEvent(PlatformMouseEvent(ev, 0));
+  bool accepted =
+      frame->eventHandler()->handleMouseReleaseEvent(PlatformMouseEvent(ev, 0));
+  ev->setAccepted(accepted);
 
 #ifndef QT_NO_CLIPBOARD
   if (QApplication::clipboard()->supportsSelection()) {
