@@ -83,6 +83,9 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   void Stop();
   void Reload();
 
+  bool CanGoBack();
+  bool CanGoForward();
+
   bool CanCut();
   bool CanCopy();
   bool CanPaste();
