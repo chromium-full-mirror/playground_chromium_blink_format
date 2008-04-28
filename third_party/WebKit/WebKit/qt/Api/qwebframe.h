@@ -118,7 +118,6 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
             const QByteArray& body = QByteArray());
 #endif
   void setHtml(const QString& html, const QUrl& baseUrl = QUrl());
-  void setHtml(const QByteArray& html, const QUrl& baseUrl = QUrl());
   void setContent(const QByteArray& data,
                   const QString& mimeType = QString(),
                   const QUrl& baseUrl = QUrl());
