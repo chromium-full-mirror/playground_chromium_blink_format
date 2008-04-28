@@ -258,8 +258,7 @@ bool QWebHistory::canGoForward() const {
 
 /*!
   Set the current item to be the previous item in the history and goes to the
-  page;
-  i.e., goes back one history item.
+  corresponding page; i.e., goes back one history item.
 
   \sa forward(), goToItem()
 */
@@ -271,8 +270,8 @@ void QWebHistory::back() {
 }
 
 /*!
-  Sets the current item to be the next item in the history and goes to the page;
-  i.e., goes forward one history item.
+  Sets the current item to be the next item in the history and goes to the
+  corresponding page; i.e., goes forward one history item.
 
   \sa back(), goToItem()
 */
