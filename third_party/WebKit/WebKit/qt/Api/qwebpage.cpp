@@ -47,6 +47,7 @@
 #include "FrameLoader.h"
 #include "FrameLoadRequest.h"
 #include "KURL.h"
+#include "Logging.h"
 #include "Image.h"
 #include "InspectorClientQt.h"
 #include "InspectorController.h"
@@ -117,6 +118,8 @@ static inline Qt::DropAction dragOpToDropAction(unsigned actions) {
 
 QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
     : q(qq), view(0), modified(false), viewportSize(QSize(0, 0)) {
+  WebCore::InitializeLoggingChannelsIfNecessary();
+
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();
   editorClient = new EditorClientQt(q);
