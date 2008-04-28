@@ -41,11 +41,9 @@ namespace WebCore {
 
 class FontPlatformData {
  public:
-  class Deleted {};
-
   enum FontState { UNINITIALIZED, DELETED, VALID };
 
-  FontPlatformData(Deleted) : m_fontState(DELETED) {}
+  FontPlatformData(WTF::HashTableDeletedValueType) : m_fontState(DELETED) {}
 
   ~FontPlatformData();
 
@@ -77,6 +75,8 @@ class FontPlatformData {
     else
       return m_fontState == other.m_fontState;
   }
+
+  bool isHashTableDeletedValue() const { return m_fontState == DELETED; }
 
   unsigned computeHash() const {
     ASSERT(m_font.Ok());
