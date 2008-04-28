@@ -67,10 +67,12 @@ ClipboardQt::ClipboardQt(ClipboardAccessPolicy policy, bool forDragging)
   Q_ASSERT(policy == ClipboardReadable || policy == ClipboardWritable ||
            policy == ClipboardNumb);
 
+#ifndef QT_NO_CLIPBOARD
   if (policy != ClipboardWritable) {
     Q_ASSERT(!forDragging);
     m_readableData = QApplication::clipboard()->mimeData();
   }
+#endif
 }
 
 ClipboardQt::~ClipboardQt() {
@@ -107,17 +109,21 @@ void ClipboardQt::clearData(const String& type) {
       m_writableData = 0;
     }
   }
+#ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
     QApplication::clipboard()->setMimeData(m_writableData);
+#endif
 }
 
 void ClipboardQt::clearAllData() {
   if (policy() != ClipboardWritable)
     return;
 
+#ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
     QApplication::clipboard()->setMimeData(0);
   else
+#endif
     delete m_writableData;
   m_writableData = 0;
 }
@@ -143,8 +149,10 @@ bool ClipboardQt::setData(const String& type, const String& data) {
   QByteArray array(reinterpret_cast<const char*>(data.characters()),
                    data.length() * 2);
   m_writableData->setData(QString(type), array);
+#ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
     QApplication::clipboard()->setMimeData(m_writableData);
+#endif
   return true;
 }
 
@@ -237,8 +245,10 @@ void ClipboardQt::declareAndWriteDragImage(Element* element,
   urls.append(fullURL);
 
   m_writableData->setUrls(urls);
+#ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
     QApplication::clipboard()->setMimeData(m_writableData);
+#endif
 }
 
 void ClipboardQt::writeURL(const KURL& url, const String&, Frame* frame) {
@@ -249,8 +259,10 @@ void ClipboardQt::writeURL(const KURL& url, const String&, Frame* frame) {
   if (!m_writableData)
     m_writableData = new QMimeData;
   m_writableData->setUrls(urls);
+#ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
     QApplication::clipboard()->setMimeData(m_writableData);
+#endif
 }
 
 void ClipboardQt::writeRange(Range* range, Frame* frame) {
@@ -263,8 +275,10 @@ void ClipboardQt::writeRange(Range* range, Frame* frame) {
   text.replace(QChar(0xa0), QLatin1Char(' '));
   m_writableData->setText(text);
   m_writableData->setHtml(createMarkup(range, 0, AnnotateForInterchange));
+#ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
     QApplication::clipboard()->setMimeData(m_writableData);
+#endif
 }
 
 bool ClipboardQt::hasData() {

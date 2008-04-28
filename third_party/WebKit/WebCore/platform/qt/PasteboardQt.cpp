@@ -67,8 +67,10 @@ void Pasteboard::writeSelection(Range* selectedRange, bool, Frame* frame) {
   html += QLatin1String("</body></html>");
   md->setHtml(html);
 
+#ifndef QT_NO_CLIPBOARD
   QApplication::clipboard()->setMimeData(
       md, m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
+#endif
 }
 
 bool Pasteboard::canSmartReplace() {
@@ -76,8 +78,12 @@ bool Pasteboard::canSmartReplace() {
 }
 
 String Pasteboard::plainText(Frame*) {
+#ifndef QT_NO_CLIPBOARD
   return QApplication::clipboard()->text(
       m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
+#else
+  return String();
+#endif
 }
 
 PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
@@ -85,6 +91,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     PassRefPtr<Range> context,
     bool allowPlainText,
     bool& chosePlainText) {
+#ifndef QT_NO_CLIPBOARD
   const QMimeData* mimeData = QApplication::clipboard()->mimeData(
       m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
 
@@ -107,24 +114,27 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     if (fragment)
       return fragment.release();
   }
-
+#endif
   return 0;
 }
 
 void Pasteboard::writeURL(const KURL& _url, const String&, Frame*) {
   ASSERT(!_url.isEmpty());
 
+#ifndef QT_NO_CLIPBOARD
   QMimeData* md = new QMimeData;
   QString url = _url.string();
   md->setText(url);
   md->setUrls(QList<QUrl>() << QUrl(url));
   QApplication::clipboard()->setMimeData(
       md, m_selectionMode ? QClipboard::Selection : QClipboard::Clipboard);
+#endif
 }
 
 void Pasteboard::writeImage(Node* node, const KURL&, const String&) {
   ASSERT(node && node->renderer() && node->renderer()->isImage());
 
+#ifndef QT_NO_CLIPBOARD
   CachedImage* cachedImage =
       static_cast<RenderImage*>(node->renderer())->cachedImage();
   ASSERT(cachedImage);
@@ -136,6 +146,7 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String&) {
   ASSERT(pixmap);
 
   QApplication::clipboard()->setPixmap(*pixmap, QClipboard::Clipboard);
+#endif
 }
 
 /* This function is called from Editor::tryDHTMLCopy before actually set the
