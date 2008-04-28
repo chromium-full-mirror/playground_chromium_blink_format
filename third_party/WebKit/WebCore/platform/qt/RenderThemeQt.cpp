@@ -101,7 +101,7 @@ RenderThemeQt::~RenderThemeQt() {
 // for some widget painting, we need to fallback to Windows style
 QStyle* RenderThemeQt::fallbackStyle() {
   if (!m_fallbackStyle)
-    m_fallbackStyle = QStyleFactory::create("windows");
+    m_fallbackStyle = QStyleFactory::create(QLatin1String("windows"));
 
   if (!m_fallbackStyle)
     m_fallbackStyle = QApplication::style();
