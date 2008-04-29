@@ -258,7 +258,7 @@ static void paintTextWithShadows(GraphicsContext* context,
                                  int h,
                                  ShadowData* shadow,
                                  bool stroked) {
-  while (true) {
+  do {
     IntSize extraOffset;
 
     if (shadow) {
@@ -299,9 +299,7 @@ static void paintTextWithShadows(GraphicsContext* context,
       context->clearShadow();
 
     shadow = shadow->next;
-    if (stroked)
-      continue;
-  }
+  } while (shadow || stroked);
 }
 
 void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
