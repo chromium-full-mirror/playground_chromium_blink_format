@@ -105,6 +105,7 @@ class QWebPagePrivate {
 
   void shortcutOverrideEvent(QKeyEvent*);
   void leaveEvent(QEvent*);
+  bool handleScrolling(QKeyEvent*);
 
   WebCore::ChromeClientQt* chromeClient;
   WebCore::ContextMenuClientQt* contextMenuClient;
