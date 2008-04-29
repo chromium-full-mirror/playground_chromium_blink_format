@@ -40,7 +40,7 @@ HTMLLegendElement::HTMLLegendElement(Document* doc, HTMLFormElement* f)
 HTMLLegendElement::~HTMLLegendElement() {}
 
 bool HTMLLegendElement::isFocusable() const {
-  return false;
+  return HTMLElement::isFocusable();
 }
 
 RenderObject* HTMLLegendElement::createRenderer(RenderArena* arena,
@@ -95,6 +95,9 @@ Element* HTMLLegendElement::formElement() {
 }
 
 void HTMLLegendElement::focus(bool) {
+  if (isFocusable())
+    Element::focus();
+
   // to match other browsers, never restore previous selection
   if (Element* element = formElement())
     element->focus(false);

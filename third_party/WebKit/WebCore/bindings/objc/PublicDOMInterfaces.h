@@ -224,8 +224,6 @@
 - (BOOL)hasAttribute:(NSString*)name;
 - (BOOL)hasAttributeNS:(NSString*)namespaceURI:(NSString*)localName;
 - (BOOL)hasAttributeNS:(NSString*)namespaceURI localName:(NSString*)localName;
-- (void)focus;
-- (void)blur;
 - (void)scrollIntoView:(BOOL)alignWithTop;
 - (void)scrollIntoViewIfNeeded:(BOOL)centerIfNeeded;
 @end
@@ -315,12 +313,9 @@
 @property(copy) NSString* rel;
 @property(copy) NSString* rev;
 @property(copy) NSString* shape;
-@property int tabIndex;
 @property(copy) NSString* target;
 @property(copy) NSString* type;
 @property(readonly, copy) NSURL* absoluteLinkURL;
-- (void)blur;
-- (void)focus;
 @end
 
 @interface DOMHTMLAppletElement : DOMHTMLElement
@@ -344,7 +339,6 @@
 @property(copy) NSString* href;
 @property BOOL noHref;
 @property(copy) NSString* shape;
-@property int tabIndex;
 @property(copy) NSString* target;
 @property(readonly, copy) NSURL* absoluteLinkURL;
 @end
@@ -378,7 +372,6 @@
 @property(copy) NSString* accessKey;
 @property BOOL disabled;
 @property(copy) NSString* name;
-@property int tabIndex;
 @property(readonly, copy) NSString* type;
 @property(copy) NSString* value;
 @end
@@ -427,6 +420,9 @@
 @property(copy) NSString* contentEditable;
 @property(readonly) BOOL isContentEditable;
 @property(readonly, copy) NSString* titleDisplayString;
+@property int tabIndex;
+- (void)blur;
+- (void)focus;
 @end
 
 @interface DOMHTMLEmbedElement : DOMHTMLElement
@@ -543,14 +539,11 @@
 @property BOOL readOnly;
 @property(copy) NSString* size;
 @property(copy) NSString* src;
-@property int tabIndex;
 @property(copy) NSString* type;
 @property(copy) NSString* useMap;
 @property(copy) NSString* value;
 @property(readonly, copy) NSString* altDisplayString;
 @property(readonly, copy) NSURL* absoluteImageURL;
-- (void)blur;
-- (void)focus;
 - (void)select;
 - (void)click;
 @end
@@ -636,7 +629,6 @@
 @property int hspace;
 @property(copy) NSString* name;
 @property(copy) NSString* standby;
-@property int tabIndex;
 @property(copy) NSString* type;
 @property(copy) NSString* useMap;
 @property int vspace;
@@ -707,12 +699,9 @@
 @property BOOL multiple;
 @property(copy) NSString* name;
 @property int size;
-@property int tabIndex;
 - (void)add:(DOMHTMLElement*)element:(DOMHTMLElement*)before;
 - (void)add:(DOMHTMLElement*)element before:(DOMHTMLElement*)before;
 - (void)remove:(int)index;
-- (void)blur;
-- (void)focus;
 @end
 
 @interface DOMHTMLStyleElement : DOMHTMLElement
@@ -809,11 +798,8 @@
 @property(copy) NSString* name;
 @property BOOL readOnly;
 @property int rows;
-@property int tabIndex;
 @property(readonly, copy) NSString* type;
 @property(copy) NSString* value;
-- (void)blur;
-- (void)focus;
 - (void)select;
 @end
 

@@ -41,7 +41,6 @@
 #include "ExceptionCode.h"
 #include "Frame.h"
 #include "HTMLNames.h"
-#include "HTMLNames.h"
 #include "Logging.h"
 #include "NameNodeList.h"
 #include "NamedAttrMap.h"
@@ -132,7 +131,8 @@ Node::Node(Document* doc)
       m_hovered(false),
       m_inActiveChain(false),
       m_inDetach(false),
-      m_inSubtreeMark(false) {
+      m_inSubtreeMark(false),
+      m_tabIndexSetExplicitly(false) {
 #ifndef NDEBUG
   if (shouldIgnoreLeaks)
     ignoreSet.add(this);
@@ -361,11 +361,11 @@ void Node::setChanged(StyleChangeType changeType) {
 }
 
 bool Node::isFocusable() const {
-  return false;
+  return m_tabIndexSetExplicitly;
 }
 
 bool Node::isKeyboardFocusable(KeyboardEvent*) const {
-  return isFocusable();
+  return isFocusable() && m_tabIndex >= 0;
 }
 
 bool Node::isMouseFocusable() const {

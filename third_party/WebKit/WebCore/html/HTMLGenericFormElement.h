@@ -94,6 +94,7 @@ class HTMLGenericFormElement : public HTMLElement {
   virtual void setActivatedSubmit(bool flag) {}
 
   void setTabIndex(int);
+  short tabIndex() const;
 
   void formDestroyed() { m_form = 0; }
 

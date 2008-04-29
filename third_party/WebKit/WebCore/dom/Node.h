@@ -277,8 +277,7 @@ class Node : public TreeShared<Node> {
   virtual void setActive(bool b = true, bool pause = false) { m_active = b; }
   virtual void setHovered(bool b = true) { m_hovered = b; }
 
-  short tabIndex() const { return m_tabIndex; }
-  void setTabIndex(short i) { m_tabIndex = i; }
+  virtual short tabIndex() const { return m_tabIndex; }
 
   /**
    * Whether this node can receive the keyboard focus.
@@ -531,16 +530,19 @@ class Node : public TreeShared<Node> {
   Node* m_previous;
   Node* m_next;
   RenderObject* m_renderer;
+  short m_tabIndex;
 
  protected:
   virtual void willMoveToNewOwnerDocument() {}
   virtual void didMoveToNewOwnerDocument() {}
 
   virtual void getSubresourceAttributeStrings(Vector<String>&) const {}
+  void setTabIndexExplicitly(short i) {
+    m_tabIndex = i;
+    m_tabIndexSetExplicitly = true;
+  }
 
   OwnPtr<NodeListsNodeData> m_nodeLists;
-
-  short m_tabIndex;
 
   // make sure we don't use more than 16 bits here -- adding more would increase
   // the size of all Nodes
@@ -565,9 +567,11 @@ class Node : public TreeShared<Node> {
 
  public:
   bool m_inSubtreeMark : 1;
-  // 1 bit left
 
  private:
+  bool m_tabIndexSetExplicitly : 1;
+  // no bits left
+
   Element* ancestorElement() const;
 
   virtual Node* virtualFirstChild() const;
