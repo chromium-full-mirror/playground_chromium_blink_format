@@ -57,6 +57,12 @@ void LocalStorageArea::itemRemoved(const String& key,
   dispatchStorageEvent(key, oldValue, String(), sourceFrame);
 }
 
+void LocalStorageArea::areaCleared(Frame* sourceFrame) {
+  // FIXME: Flag this clearing to be written out to the persistent store
+
+  dispatchStorageEvent(String(), String(), String(), sourceFrame);
+}
+
 void LocalStorageArea::dispatchStorageEvent(const String& key,
                                             const String& oldValue,
                                             const String& newValue,

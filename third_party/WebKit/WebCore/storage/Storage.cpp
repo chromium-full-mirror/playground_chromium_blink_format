@@ -82,6 +82,13 @@ void Storage::removeItem(const String& key) {
   m_storageArea->removeItem(key, m_frame);
 }
 
+void Storage::clear() {
+  if (!m_frame)
+    return;
+
+  m_storageArea->clear(m_frame);
+}
+
 bool Storage::contains(const String& key) const {
   if (!m_frame)
     return false;

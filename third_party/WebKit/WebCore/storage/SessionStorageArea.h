@@ -53,6 +53,7 @@ class SessionStorageArea : public StorageArea {
   virtual void itemRemoved(const String& key,
                            const String& oldValue,
                            Frame* sourceFrame);
+  virtual void areaCleared(Frame* sourceFrame);
 
   void dispatchStorageEvent(const String& key,
                             const String& oldValue,

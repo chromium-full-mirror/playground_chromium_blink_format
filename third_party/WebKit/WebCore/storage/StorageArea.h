@@ -60,6 +60,7 @@ class StorageArea : public RefCounted<StorageArea> {
   virtual void removeItem(const String& key, Frame* sourceFrame) {
     internalRemoveItem(key, sourceFrame);
   }
+  virtual void clear(Frame* sourceFrame) { internalClear(sourceFrame); }
   virtual bool contains(const String& key) const {
     return internalContains(key);
   }
@@ -78,6 +79,7 @@ class StorageArea : public RefCounted<StorageArea> {
                        ExceptionCode&,
                        Frame* sourceFrame);
   void internalRemoveItem(const String&, Frame* sourceFrame);
+  void internalClear(Frame* sourceFrame);
   bool internalContains(const String& key) const;
 
  private:
@@ -88,6 +90,7 @@ class StorageArea : public RefCounted<StorageArea> {
   virtual void itemRemoved(const String& key,
                            const String& oldValue,
                            Frame* sourceFrame) = 0;
+  virtual void areaCleared(Frame* sourceFrame) = 0;
 
   RefPtr<SecurityOrigin> m_securityOrigin;
   RefPtr<StorageMap> m_storageMap;

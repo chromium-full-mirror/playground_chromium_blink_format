@@ -66,6 +66,10 @@ void SessionStorageArea::itemRemoved(const String& key,
   dispatchStorageEvent(key, oldValue, String(), sourceFrame);
 }
 
+void SessionStorageArea::areaCleared(Frame* sourceFrame) {
+  dispatchStorageEvent(String(), String(), String(), sourceFrame);
+}
+
 void SessionStorageArea::dispatchStorageEvent(const String& key,
                                               const String& oldValue,
                                               const String& newValue,
