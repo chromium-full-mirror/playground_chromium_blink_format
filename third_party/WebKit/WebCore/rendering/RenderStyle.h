@@ -38,6 +38,7 @@
 #include "CSSHelper.h"
 #include "CSSImageGeneratorValue.h"
 #include "CSSPrimitiveValue.h"
+#include "CSSReflectValue.h"
 #include "CSSValueList.h"
 #include "Color.h"
 #include "CSSCursorImageValue.h"
@@ -963,8 +964,8 @@ class TranslateTransformOperation : public TransformOperation {
   }
 
   virtual void apply(AffineTransform& transform, const IntSize& borderBoxSize) {
-    transform.translate(m_x.calcValue(borderBoxSize.width()),
-                        m_y.calcValue(borderBoxSize.height()));
+    transform.translate(m_x.calcFloatValue(borderBoxSize.width()),
+                        m_y.calcFloatValue(borderBoxSize.height()));
   }
 
   virtual TransformOperation* blend(const TransformOperation* from,
@@ -1396,6 +1397,33 @@ struct Transition {
   Transition* m_next;
 };
 
+class StyleReflection : public RefCounted<StyleReflection> {
+ public:
+  StyleReflection()
+      : RefCounted<StyleReflection>(0),
+        m_direction(ReflectionBelow),
+        m_offset(0, Fixed) {}
+
+  bool operator==(const StyleReflection& o) const {
+    return m_direction == o.m_direction && m_offset == o.m_offset &&
+           m_mask == o.m_mask;
+  }
+  bool operator!=(const StyleReflection& o) const { return !(*this == o); }
+
+  CSSReflectionDirection direction() const { return m_direction; }
+  Length offset() const { return m_offset; }
+  const NinePieceImage& mask() const { return m_mask; }
+
+  void setDirection(CSSReflectionDirection dir) { m_direction = dir; }
+  void setOffset(const Length& l) { m_offset = l; }
+  void setMask(const NinePieceImage& image) { m_mask = image; }
+
+ private:
+  CSSReflectionDirection m_direction;
+  Length m_offset;
+  NinePieceImage m_mask;
+};
+
 // This struct is for rarely used non-inherited CSS3, CSS2, and WebKit-specific
 // properties.
 // By grouping them together, we save space, and only allocate this object when
@@ -1421,6 +1449,7 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
   }
 
   bool shadowDataEquivalent(const StyleRareNonInheritedData& o) const;
+  bool reflectionDataEquivalent(const StyleRareNonInheritedData& o) const;
   bool transitionDataEquivalent(const StyleRareNonInheritedData&) const;
 
   int lineClamp;  // An Apple extension.
@@ -1449,6 +1478,8 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
   unsigned m_appearance : 6;                // EAppearance
   unsigned m_borderFit : 1;                 // EBorderFit
   ShadowData* m_boxShadow;                  // For box-shadow decorations.
+
+  RefPtr<StyleReflection> m_boxReflect;
 
   Transition* m_transition;
 
@@ -2330,6 +2361,9 @@ class RenderStyle {
     return static_cast<EBoxAlignment>(rareNonInheritedData->flexibleBox->pack);
   }
   ShadowData* boxShadow() const { return rareNonInheritedData->m_boxShadow; }
+  StyleReflection* boxReflect() const {
+    return rareNonInheritedData->m_boxReflect.get();
+  }
   EBoxSizing boxSizing() const {
     return static_cast<EBoxSizing>(box->boxSizing);
   }
@@ -2819,6 +2853,10 @@ class RenderStyle {
     SET_VAR(rareNonInheritedData.access()->flexibleBox, pack, p);
   }
   void setBoxShadow(ShadowData* val, bool add = false);
+  void setBoxReflect(const PassRefPtr<StyleReflection>& reflect) {
+    if (rareNonInheritedData->m_boxReflect != reflect)
+      rareNonInheritedData.access()->m_boxReflect = reflect;
+  }
   void setBoxSizing(EBoxSizing s) { SET_VAR(box, boxSizing, s); }
   void setMarqueeIncrement(const Length& f) {
     SET_VAR(rareNonInheritedData.access()->marquee, increment, f);
@@ -3110,6 +3148,7 @@ class RenderStyle {
   static int initialBoxFlexGroup() { return 1; }
   static int initialBoxOrdinalGroup() { return 1; }
   static EBoxSizing initialBoxSizing() { return CONTENT_BOX; }
+  static StyleReflection* initialBoxReflect() { return 0; }
   static int initialMarqueeLoopCount() { return -1; }
   static int initialMarqueeSpeed() { return 85; }
   static Length initialMarqueeIncrement() { return Length(6, Fixed); }

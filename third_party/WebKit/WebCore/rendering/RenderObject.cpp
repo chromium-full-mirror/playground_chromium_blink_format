@@ -198,6 +198,7 @@ RenderObject::RenderObject(Node* node)
       m_hasLayer(false),
       m_hasOverflowClip(false),
       m_hasTransform(false),
+      m_hasReflection(false),
       m_hasOverrideSize(false),
       m_hasCounterNodeMap(false) {
 #ifndef NDEBUG
@@ -485,7 +486,7 @@ RenderLayer* RenderObject::enclosingLayer() const {
 
 bool RenderObject::requiresLayer() {
   return isRoot() || isPositioned() || isRelPositioned() || isTransparent() ||
-         hasOverflowClip() || hasTransform() || hasMask();
+         hasOverflowClip() || hasTransform() || hasMask() || hasReflection();
 }
 
 RenderBlock* RenderObject::firstLineBlock() const {
@@ -2478,6 +2479,7 @@ void RenderObject::setStyle(RenderStyle* style) {
     m_paintBackground = false;
     m_hasOverflowClip = false;
     m_hasTransform = false;
+    m_hasReflection = false;
   }
 
   if (view()->frameView()) {
@@ -2505,14 +2507,10 @@ void RenderObject::setStyle(RenderStyle* style) {
   updateFillImages(oldStyle ? oldStyle->maskLayers() : 0,
                    m_style ? m_style->maskLayers() : 0);
 
-  StyleImage* oldBorderImage = oldStyle ? oldStyle->borderImage().image() : 0;
-  StyleImage* newBorderImage = m_style ? m_style->borderImage().image() : 0;
-  if (oldBorderImage != newBorderImage) {
-    if (oldBorderImage)
-      oldBorderImage->removeClient(this);
-    if (newBorderImage)
-      newBorderImage->addClient(this);
-  }
+  updateImage(oldStyle ? oldStyle->borderImage().image() : 0,
+              m_style ? m_style->borderImage().image() : 0);
+  updateImage(oldStyle ? oldStyle->maskBoxImage().image() : 0,
+              m_style ? m_style->maskBoxImage().image() : 0);
 
   if (m_style)
     m_style->ref();
@@ -2568,6 +2566,15 @@ void RenderObject::updateFillImages(const FillLayer* oldLayers,
     if (currNew->image() &&
         (!oldLayers || !oldLayers->containsImage(currNew->image())))
       currNew->image()->addClient(this);
+  }
+}
+
+void RenderObject::updateImage(StyleImage* oldImage, StyleImage* newImage) {
+  if (oldImage != newImage) {
+    if (oldImage)
+      oldImage->removeClient(this);
+    if (newImage)
+      newImage->addClient(this);
   }
 }
 
@@ -3297,6 +3304,38 @@ AnimationController* RenderObject::animationController() const {
 
 void RenderObject::imageChanged(CachedImage* image) {
   return imageChanged(static_cast<WrappedImagePtr>(image));
+}
+
+IntRect RenderObject::reflectionBox() const {
+  IntRect result;
+  if (!m_style->boxReflect())
+    return result;
+  IntRect box = borderBox();
+  result = box;
+  switch (m_style->boxReflect()->direction()) {
+    case ReflectionBelow:
+      result.move(0, box.height() + reflectionOffset());
+      break;
+    case ReflectionAbove:
+      result.move(0, -box.height() - reflectionOffset());
+      break;
+    case ReflectionLeft:
+      result.move(-box.width() - reflectionOffset(), 0);
+      break;
+    case ReflectionRight:
+      result.move(box.width() + reflectionOffset(), 0);
+      break;
+  }
+  return result;
+}
+
+int RenderObject::reflectionOffset() const {
+  if (!m_style->boxReflect())
+    return 0;
+  if (m_style->boxReflect()->direction() == ReflectionLeft ||
+      m_style->boxReflect()->direction() == ReflectionRight)
+    return m_style->boxReflect()->offset().calcValue(borderBox().width());
+  return m_style->boxReflect()->offset().calcValue(borderBox().height());
 }
 
 #if ENABLE(SVG)

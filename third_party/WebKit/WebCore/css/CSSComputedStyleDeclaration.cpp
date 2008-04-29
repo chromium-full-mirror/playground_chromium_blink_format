@@ -83,27 +83,28 @@ static const int computedProperties[] = {
     CSSPropertyWebkitBoxDirection, CSSPropertyWebkitBoxFlex,
     CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
     CSSPropertyWebkitBoxOrdinalGroup, CSSPropertyWebkitBoxOrient,
-    CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxShadow,
-    CSSPropertyWebkitBoxSizing, CSSPropertyWebkitColumnBreakAfter,
-    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
-    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
-    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
-    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnWidth,
-    CSSPropertyWebkitHighlight, CSSPropertyWebkitLineBreak,
-    CSSPropertyWebkitLineClamp, CSSPropertyWebkitMarginBottomCollapse,
-    CSSPropertyWebkitMarginTopCollapse, CSSPropertyWebkitMarqueeDirection,
-    CSSPropertyWebkitMarqueeIncrement, CSSPropertyWebkitMarqueeRepetition,
-    CSSPropertyWebkitMarqueeStyle, CSSPropertyWebkitMaskAttachment,
-    CSSPropertyWebkitMaskBoxImage, CSSPropertyWebkitMaskImage,
-    CSSPropertyWebkitMaskPosition, CSSPropertyWebkitMaskRepeat,
-    CSSPropertyWebkitMaskClip, CSSPropertyWebkitMaskComposite,
-    CSSPropertyWebkitMaskOrigin, CSSPropertyWebkitMaskSize,
-    CSSPropertyWebkitNbspMode, CSSPropertyWebkitRtlOrdering,
-    CSSPropertyWebkitTextDecorationsInEffect, CSSPropertyWebkitTextFillColor,
-    CSSPropertyWebkitTextSecurity, CSSPropertyWebkitTextStrokeColor,
-    CSSPropertyWebkitTextStrokeWidth, CSSPropertyWebkitUserDrag,
-    CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect,
-    CSSPropertyWebkitDashboardRegion, CSSPropertyWebkitBorderBottomLeftRadius,
+    CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxReflect,
+    CSSPropertyWebkitBoxShadow, CSSPropertyWebkitBoxSizing,
+    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
+    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
+    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
+    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
+    CSSPropertyWebkitColumnWidth, CSSPropertyWebkitHighlight,
+    CSSPropertyWebkitLineBreak, CSSPropertyWebkitLineClamp,
+    CSSPropertyWebkitMarginBottomCollapse, CSSPropertyWebkitMarginTopCollapse,
+    CSSPropertyWebkitMarqueeDirection, CSSPropertyWebkitMarqueeIncrement,
+    CSSPropertyWebkitMarqueeRepetition, CSSPropertyWebkitMarqueeStyle,
+    CSSPropertyWebkitMaskAttachment, CSSPropertyWebkitMaskBoxImage,
+    CSSPropertyWebkitMaskImage, CSSPropertyWebkitMaskPosition,
+    CSSPropertyWebkitMaskRepeat, CSSPropertyWebkitMaskClip,
+    CSSPropertyWebkitMaskComposite, CSSPropertyWebkitMaskOrigin,
+    CSSPropertyWebkitMaskSize, CSSPropertyWebkitNbspMode,
+    CSSPropertyWebkitRtlOrdering, CSSPropertyWebkitTextDecorationsInEffect,
+    CSSPropertyWebkitTextFillColor, CSSPropertyWebkitTextSecurity,
+    CSSPropertyWebkitTextStrokeColor, CSSPropertyWebkitTextStrokeWidth,
+    CSSPropertyWebkitUserDrag, CSSPropertyWebkitUserModify,
+    CSSPropertyWebkitUserSelect, CSSPropertyWebkitDashboardRegion,
+    CSSPropertyWebkitBorderBottomLeftRadius,
     CSSPropertyWebkitBorderBottomRightRadius,
     CSSPropertyWebkitBorderTopLeftRadius, CSSPropertyWebkitBorderTopRightRadius
 
@@ -216,6 +217,24 @@ static PassRefPtr<CSSValue> valueForNinePieceImage(
   return new CSSBorderImageValue(imageValue, rect,
                                  valueForRepeatRule(image.m_horizontalRule),
                                  valueForRepeatRule(image.m_verticalRule));
+}
+
+static PassRefPtr<CSSValue> valueForReflection(
+    const StyleReflection* reflection) {
+  if (!reflection)
+    return new CSSPrimitiveValue(CSSValueNone);
+
+  RefPtr<CSSReflectValue> reflectValue = new CSSReflectValue();
+  reflectValue->setDirection(reflection->direction());
+  if (reflection->offset().isPercent())
+    reflectValue->setOffset(new CSSPrimitiveValue(
+        reflection->offset().percent(), CSSPrimitiveValue::CSS_PERCENTAGE));
+  else
+    reflectValue->setOffset(new CSSPrimitiveValue(reflection->offset().value(),
+                                                  CSSPrimitiveValue::CSS_PX));
+
+  reflectValue->setMask(valueForNinePieceImage(reflection->mask()));
+  return reflectValue.release();
 }
 
 static PassRefPtr<CSSValue> getPositionOffsetValue(RenderStyle* style,
@@ -445,6 +464,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
         return 0;
       return new CSSPrimitiveValue(boxPack);
     }
+    case CSSPropertyWebkitBoxReflect:
+      return valueForReflection(style->boxReflect());
     case CSSPropertyWebkitBoxShadow:
       return valueForShadow(style->boxShadow());
     case CSSPropertyCaptionSide:

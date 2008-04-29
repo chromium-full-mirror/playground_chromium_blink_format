@@ -135,6 +135,7 @@ typedef HashSet<RenderFlow*> RenderFlowSequencedSet;
 class RenderObject : public CachedResourceClient {
   friend class RenderContainer;
   friend class RenderSVGContainer;
+  friend class RenderLayer;
 
  public:
   // Anonymous objects should pass the document as their node, and they will
@@ -419,7 +420,6 @@ class RenderObject : public CachedResourceClient {
   virtual int horizontalScrollbarHeight() const;
 
   bool hasTransform() const { return m_hasTransform; }
-
   bool hasMask() const { return style() && style()->hasMask(); }
 
  private:
@@ -483,10 +483,12 @@ class RenderObject : public CachedResourceClient {
   void setHasOverflowClip(bool b = true) { m_hasOverflowClip = b; }
   void setHasLayer(bool b = true) { m_hasLayer = b; }
   void setHasTransform(bool b = true) { m_hasTransform = b; }
+  void setHasReflection(bool b = true) { m_hasReflection = b; }
 
   void scheduleRelayout();
 
   void updateFillImages(const FillLayer*, const FillLayer*);
+  void updateImage(StyleImage*, StyleImage*);
 
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
@@ -956,6 +958,10 @@ class RenderObject : public CachedResourceClient {
   bool isTransparent() const { return style()->opacity() < 1.0f; }
   float opacity() const { return style()->opacity(); }
 
+  bool hasReflection() const { return m_hasReflection; }
+  IntRect reflectionBox() const;
+  int reflectionOffset() const;
+
   // Applied as a "slop" to dirty rect checks during the outline painting
   // phase's dirty-rect checks.
   int maximalOutlineSize(PaintPhase) const;
@@ -1164,6 +1170,7 @@ class RenderObject : public CachedResourceClient {
   bool m_hasLayer : 1;
   bool m_hasOverflowClip : 1;
   bool m_hasTransform : 1;
+  bool m_hasReflection : 1;
 
   bool m_hasOverrideSize : 1;
 

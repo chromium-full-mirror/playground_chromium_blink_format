@@ -188,13 +188,15 @@ class CSSParser {
 
   // CSS3 Parsing Routines (for properties specific to CSS3)
   bool parseShadow(int propId, bool important);
-  bool parseBorderImage(int propId, bool important);
+  bool parseBorderImage(int propId, bool important, RefPtr<CSSValue>&);
+
+  bool parseReflect(int propId, bool important);
 
   // Image generators
   bool parseCanvas(RefPtr<CSSValue>&);
   bool parseGradient(RefPtr<CSSValue>&);
 
-  PassRefPtr<CSSValue> parseTransform();
+  PassRefPtr<CSSValueList> parseTransform();
   bool parseTransformOrigin(int propId,
                             int& propId1,
                             int& propId2,

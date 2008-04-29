@@ -557,6 +557,12 @@ void InlineFlowBox::placeBoxesVertically(int y,
         overflowBottom = max(overflowBottom, textShadow->y + textShadow->blur);
       }
 
+      if (curr->object()->hasReflection()) {
+        overflowTop = min(overflowTop, curr->object()->reflectionBox().y());
+        overflowBottom =
+            max(overflowBottom, curr->object()->reflectionBox().bottom());
+      }
+
       if (curr->isInlineFlowBox()) {
         newHeight +=
             curr->object()->borderTop() + curr->object()->paddingTop() +
@@ -889,7 +895,7 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
                               int ty) {
   if (!object()->shouldPaintWithinRoot(paintInfo) ||
       object()->style()->visibility() != VISIBLE ||
-      paintInfo.phase != PaintPhaseMask || !object()->hasMask())
+      paintInfo.phase != PaintPhaseMask)
     return;
 
   // Move x/y to our coordinates.
@@ -906,10 +912,12 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
   else
     mh = min(paintInfo.rect.height(), h);
 
-  paintFillLayers(paintInfo, Color(), object()->style()->maskLayers(), my, mh,
-                  tx, ty, w, h);
+  if (paintInfo.phase == PaintPhaseMask)
+    paintFillLayers(paintInfo, Color(), object()->style()->maskLayers(), my, mh,
+                    tx, ty, w, h);
 
-  StyleImage* maskBoxImage = object()->style()->maskBoxImage().image();
+  const NinePieceImage& maskNinePieceImage = object()->style()->maskBoxImage();
+  StyleImage* maskBoxImage = maskNinePieceImage.image();
   bool hasBoxImage =
       maskBoxImage &&
       maskBoxImage->canRender(object()->style()->effectiveZoom());
@@ -918,11 +926,10 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
 
   // The simple case is where we are the only box for this object.  In those
   // cases only a single call to draw is required.
-  if (!prevLineBox() && !nextLineBox())
+  if (!prevLineBox() && !nextLineBox()) {
     object()->paintNinePieceImage(paintInfo.context, tx, ty, w, h,
-                                  object()->style(),
-                                  object()->style()->maskBoxImage());
-  else {
+                                  object()->style(), maskNinePieceImage);
+  } else {
     // We have a mask image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
     int xOffsetOnLine = 0;
@@ -935,8 +942,7 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
     object()->paintNinePieceImage(paintInfo.context, startX, ty, totalWidth, h,
-                                  object()->style(),
-                                  object()->style()->maskBoxImage());
+                                  object()->style(), maskNinePieceImage);
     paintInfo.context->restore();
   }
 }
