@@ -790,11 +790,27 @@ void FrameLoaderClientQt::dispatchDecidePolicyForMIMEType(
 
 void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
     FramePolicyFunction function,
-    const WebCore::NavigationAction&,
-    const WebCore::ResourceRequest&,
+    const WebCore::NavigationAction& action,
+    const WebCore::ResourceRequest& request,
     const WebCore::String&) {
   Q_ASSERT(!m_policyFunction);
+  Q_ASSERT(m_webFrame);
   m_policyFunction = function;
+#if QT_VERSION < 0x040400
+  QWebNetworkRequest r(request);
+#else
+  QNetworkRequest r(request.toNetworkRequest());
+#endif
+  QWebPage* page = m_webFrame->page();
+
+  if (!page->d->acceptNavigationRequest(
+          0, r, QWebPage::NavigationType(action.type()))) {
+    if (action.type() == NavigationTypeFormSubmitted ||
+        action.type() == NavigationTypeFormResubmitted)
+      m_frame->loader()->resetMultipleFormSubmissionProtection();
+    slotCallPolicyFunction(PolicyIgnore);
+    return;
+  }
   slotCallPolicyFunction(PolicyUse);
 }
 
@@ -803,26 +819,24 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
     const WebCore::NavigationAction& action,
     const WebCore::ResourceRequest& request) {
   Q_ASSERT(!m_policyFunction);
+  Q_ASSERT(m_webFrame);
   m_policyFunction = function;
-  if (m_webFrame) {
 #if QT_VERSION < 0x040400
-    QWebNetworkRequest r(request);
+  QWebNetworkRequest r(request);
 #else
-    QNetworkRequest r(request.toNetworkRequest());
+  QNetworkRequest r(request.toNetworkRequest());
 #endif
-    QWebPage* page = m_webFrame->page();
+  QWebPage* page = m_webFrame->page();
 
-    if (!page->d->acceptNavigationRequest(
-            m_webFrame, r, QWebPage::NavigationType(action.type()))) {
-      if (action.type() == NavigationTypeFormSubmitted ||
-          action.type() == NavigationTypeFormResubmitted)
-        m_frame->loader()->resetMultipleFormSubmissionProtection();
-      slotCallPolicyFunction(PolicyIgnore);
-      return;
-    }
+  if (!page->d->acceptNavigationRequest(
+          m_webFrame, r, QWebPage::NavigationType(action.type()))) {
+    if (action.type() == NavigationTypeFormSubmitted ||
+        action.type() == NavigationTypeFormResubmitted)
+      m_frame->loader()->resetMultipleFormSubmissionProtection();
+    slotCallPolicyFunction(PolicyIgnore);
+    return;
   }
   slotCallPolicyFunction(PolicyUse);
-  return;
 }
 
 void FrameLoaderClientQt::dispatchUnableToImplementPolicy(
