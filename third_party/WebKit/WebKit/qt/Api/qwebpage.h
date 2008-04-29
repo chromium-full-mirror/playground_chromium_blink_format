@@ -266,13 +266,13 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
                                 const QStringList& paramNames,
                                 const QStringList& paramValues);
 
-#if QT_VERSION < 0x040400
+#if QT_VERSION >= 0x040400
   virtual bool acceptNavigationRequest(QWebFrame* frame,
-                                       const QWebNetworkRequest& request,
+                                       const QNetworkRequest& request,
                                        NavigationType type);
 #else
   virtual bool acceptNavigationRequest(QWebFrame* frame,
-                                       const QNetworkRequest& request,
+                                       const QWebNetworkRequest& request,
                                        NavigationType type);
 #endif
   virtual QString chooseFile(QWebFrame* originatingFrame,
