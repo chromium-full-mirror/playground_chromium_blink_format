@@ -58,9 +58,12 @@ class FunctionCallProfile {
   double printDataSampleStyle(int indentLevel) const;
 
  private:
+  void endAndRecordCall();
+
   UString m_functionName;
   double m_timeSum;
   double m_startTime;
+  unsigned m_numberOfCalls;
 
   Deque<FunctionCallProfile*> m_children;
 };
