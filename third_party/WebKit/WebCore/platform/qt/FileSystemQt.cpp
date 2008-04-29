@@ -79,6 +79,11 @@ String pathGetFileName(const String& path) {
   return QFileInfo(path).fileName();
 }
 
+String directoryName(const String& path) {
+  notImplemented();
+  return String();
+}
+
 bool unloadModule(PlatformModule) {
   notImplemented();
   return false;

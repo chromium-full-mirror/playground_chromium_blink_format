@@ -82,6 +82,11 @@ String pathGetFileName(const String& path) {
   return wxFileName(path).GetFullName();
 }
 
+String directoryName(const String& path) {
+  notImplemented();
+  return String();
+}
+
 CString openTemporaryFile(const char* prefix, PlatformFileHandle& handle) {
   notImplemented();
   handle = invalidPlatformFileHandle;

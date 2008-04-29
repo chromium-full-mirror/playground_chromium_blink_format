@@ -139,6 +139,11 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void willPopUpMenu(NSMenu*);
 
+  virtual bool shouldReplaceWithGeneratedFileForUpload(
+      const WebCore::String& path,
+      WebCore::String& generatedFilename);
+  virtual WebCore::String generateReplacementFile(const WebCore::String& path);
+
  private:
   WebView* m_webView;
 };

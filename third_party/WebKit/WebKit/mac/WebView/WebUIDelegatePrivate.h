@@ -122,4 +122,9 @@ enum {
     createWebViewWithRequest:(NSURLRequest*)request
               windowFeatures:(NSDictionary*)features;
 
+- (BOOL)webView:(WebView*)sender
+    shouldReplaceUploadFile:(NSString*)path
+     usingGeneratedFilename:(NSString**)filename;
+- (NSString*)webView:(WebView*)sender generateReplacementFile:(NSString*)path;
+
 @end

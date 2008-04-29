@@ -130,6 +130,11 @@ String pathGetFileName(const String& pathName) {
   return fileName;
 }
 
+String directoryName(const String& path) {
+  notImplemented();
+  return String();
+}
+
 CString openTemporaryFile(const char* prefix, PlatformFileHandle& handle) {
   gchar* filename = g_strdup_printf("%sXXXXXX", prefix);
   gchar* tempPath = g_build_filename(g_get_tmp_dir(), filename, NULL);

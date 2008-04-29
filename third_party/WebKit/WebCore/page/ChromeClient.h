@@ -146,6 +146,11 @@ class ChromeClient {
                                     bool behindText,
                                     bool entireLine);
 
+  virtual bool shouldReplaceWithGeneratedFileForUpload(
+      const String& path,
+      String& generatedFilename);
+  virtual String generateReplacementFile(const String& path);
+
 #if PLATFORM(MAC)
   virtual void runOpenPanel(PassRefPtr<FileChooser>);
 
