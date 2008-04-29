@@ -205,7 +205,9 @@ class InspectorController : JavaScriptDebugListener {
                           const JSValueRef arguments[],
                           JSValueRef& exception) const;
 
-  bool handleException(JSValueRef exception, unsigned lineNumber) const;
+  bool handleException(JSContextRef,
+                       JSValueRef exception,
+                       unsigned lineNumber) const;
 
   void showWindow();
   void closeWindow();
