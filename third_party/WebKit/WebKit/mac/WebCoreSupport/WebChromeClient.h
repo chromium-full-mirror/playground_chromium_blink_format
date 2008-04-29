@@ -117,7 +117,9 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void populateVisitedLinks();
 
+#if ENABLE(DASHBOARD_SUPPORT)
   virtual void dashboardRegionsChanged();
+#endif
 
   virtual void runOpenPanel(PassRefPtr<WebCore::FileChooser>);
 

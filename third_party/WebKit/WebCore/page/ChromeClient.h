@@ -47,7 +47,6 @@ class Page;
 class String;
 class Widget;
 
-struct DashboardRegionValue;
 struct FrameLoadRequest;
 struct WindowFeatures;
 
@@ -132,7 +131,9 @@ class ChromeClient {
 
   virtual void exceededDatabaseQuota(Frame*, const String& databaseName) = 0;
 
+#if ENABLE(DASHBOARD_SUPPORT)
   virtual void dashboardRegionsChanged();
+#endif
 
   virtual void populateVisitedLinks();
 

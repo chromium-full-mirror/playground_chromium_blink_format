@@ -58,8 +58,12 @@ Settings::Settings(Page* page)
       m_isJavaScriptEnabled(false),
       m_javaScriptCanOpenWindowsAutomatically(false),
       m_shouldPrintBackgrounds(false),
-      m_textAreasAreResizable(false),
-      m_usesDashboardBackwardCompatibilityMode(false),
+      m_textAreasAreResizable(false)
+#if ENABLE(DASHBOARD_SUPPORT)
+      ,
+      m_usesDashboardBackwardCompatibilityMode(false)
+#endif
+      ,
       m_needsAdobeFrameReloadingQuirk(false),
       m_needsKeyboardEventDisambiguationQuirks(false),
       m_isDOMPasteAllowed(false),
@@ -216,11 +220,13 @@ void Settings::setEditableLinkBehavior(
   m_editableLinkBehavior = editableLinkBehavior;
 }
 
+#if ENABLE(DASHBOARD_SUPPORT)
 void Settings::setUsesDashboardBackwardCompatibilityMode(
     bool usesDashboardBackwardCompatibilityMode) {
   m_usesDashboardBackwardCompatibilityMode =
       usesDashboardBackwardCompatibilityMode;
 }
+#endif
 
 // FIXME: This quirk is needed because of Radar 4674537 and 5211271. We need to
 // phase it out once Adobe

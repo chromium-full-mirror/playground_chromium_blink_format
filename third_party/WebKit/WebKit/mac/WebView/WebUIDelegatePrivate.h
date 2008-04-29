@@ -28,6 +28,10 @@
 
 #import <WebKit/WebUIDelegate.h>
 
+#if !defined(ENABLE_DASHBOARD_SUPPORT)
+#define ENABLE_DASHBOARD_SUPPORT 1
+#endif
+
 // Mail on Tiger expects the old value for WebMenuItemTagSearchInGoogle
 #define WebMenuItemTagSearchInGoogle OldWebMenuItemTagSearchWeb
 
@@ -78,10 +82,12 @@ enum {
 - (NSView*)webView:(WebView*)webView
     plugInViewWithArguments:(NSDictionary*)arguments;
 
+#if ENABLE_DASHBOARD_SUPPORT
 // regions is an dictionary whose keys are regions label and values are arrays
 // of WebDashboardRegions.
 - (void)webView:(WebView*)webView
     dashboardRegionsChanged:(NSDictionary*)regions;
+#endif
 
 - (void)webView:(WebView*)sender
       dragImage:(NSImage*)anImage

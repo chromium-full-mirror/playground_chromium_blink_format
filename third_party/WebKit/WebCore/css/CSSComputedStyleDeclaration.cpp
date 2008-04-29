@@ -31,12 +31,16 @@
 #include "CSSPropertyNames.h"
 #include "CSSValueList.h"
 #include "CachedImage.h"
-#include "DashboardRegion.h"
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "Pair.h"
+#include "Rect.h"
 #include "RenderObject.h"
 #include "ShadowValue.h"
+
+#if ENABLE(DASHBOARD_SUPPORT)
+#include "DashboardRegion.h"
+#endif
 
 namespace WebCore {
 
@@ -103,7 +107,10 @@ static const int computedProperties[] = {
     CSSPropertyWebkitTextFillColor, CSSPropertyWebkitTextSecurity,
     CSSPropertyWebkitTextStrokeColor, CSSPropertyWebkitTextStrokeWidth,
     CSSPropertyWebkitUserDrag, CSSPropertyWebkitUserModify,
-    CSSPropertyWebkitUserSelect, CSSPropertyWebkitDashboardRegion,
+    CSSPropertyWebkitUserSelect,
+#if ENABLE(DASHBOARD_SUPPORT)
+    CSSPropertyWebkitDashboardRegion,
+#endif
     CSSPropertyWebkitBorderBottomLeftRadius,
     CSSPropertyWebkitBorderBottomRightRadius,
     CSSPropertyWebkitBorderTopLeftRadius, CSSPropertyWebkitBorderTopRightRadius
@@ -903,6 +910,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->boxSizing() == CONTENT_BOX)
         return new CSSPrimitiveValue(CSSValueContentBox);
       return new CSSPrimitiveValue(CSSValueBorderBox);
+#if ENABLE(DASHBOARD_SUPPORT)
     case CSSPropertyWebkitDashboardRegion: {
       const Vector<StyleDashboardRegion>& regions = style->dashboardRegions();
       unsigned count = regions.size();
@@ -937,6 +945,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       return new CSSPrimitiveValue(firstRegion.release());
     }
+#endif
     case CSSPropertyWebkitAppearance:
       return new CSSPrimitiveValue(style->appearance());
     case CSSPropertyWebkitBorderImage:

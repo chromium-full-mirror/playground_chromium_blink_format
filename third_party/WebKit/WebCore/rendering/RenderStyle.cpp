@@ -807,11 +807,13 @@ bool StyleRareNonInheritedData::bindingsEquivalent(
 
 bool StyleRareNonInheritedData::operator==(
     const StyleRareNonInheritedData& o) const {
-  return lineClamp == o.lineClamp &&
-         m_dashboardRegions == o.m_dashboardRegions && opacity == o.opacity &&
-         flexibleBox == o.flexibleBox && marquee == o.marquee &&
-         m_multiCol == o.m_multiCol && m_transform == o.m_transform &&
-         m_content == o.m_content &&
+  return lineClamp == o.lineClamp
+#if ENABLE(DASHBOARD_SUPPORT)
+         && m_dashboardRegions == o.m_dashboardRegions
+#endif
+         && opacity == o.opacity && flexibleBox == o.flexibleBox &&
+         marquee == o.marquee && m_multiCol == o.m_multiCol &&
+         m_transform == o.m_transform && m_content == o.m_content &&
          m_counterDirectives == o.m_counterDirectives &&
          userDrag == o.userDrag && textOverflow == o.textOverflow &&
          marginTopCollapse == o.marginTopCollapse &&
@@ -1274,10 +1276,12 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
             *other->rareNonInheritedData->m_transform.get())
       return Layout;
 
+#if ENABLE(DASHBOARD_SUPPORT)
     // If regions change, trigger a relayout to re-calc regions.
     if (rareNonInheritedData->m_dashboardRegions !=
         other->rareNonInheritedData->m_dashboardRegions)
       return Layout;
+#endif
   }
 
   if (rareInheritedData.get() != other->rareInheritedData.get()) {
@@ -1784,6 +1788,7 @@ CounterDirectiveMap& RenderStyle::accessCounterDirectives() {
   return *map;
 }
 
+#if ENABLE(DASHBOARD_SUPPORT)
 const Vector<StyleDashboardRegion>& RenderStyle::initialDashboardRegions() {
   static Vector<StyleDashboardRegion> emptyList;
   return emptyList;
@@ -1806,6 +1811,7 @@ const Vector<StyleDashboardRegion>& RenderStyle::noneDashboardRegions() {
   }
   return noneList;
 }
+#endif
 
 void RenderStyle::adjustTransitions() {
   if (transitions()) {

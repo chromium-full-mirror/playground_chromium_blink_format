@@ -112,6 +112,7 @@ enum VerticalPositionHint {
   PositionUndefined = 0x1fff
 };
 
+#if ENABLE(DASHBOARD_SUPPORT)
 struct DashboardRegionValue {
   bool operator==(const DashboardRegionValue& o) const {
     return type == o.type && bounds == o.bounds && clip == o.clip &&
@@ -124,6 +125,7 @@ struct DashboardRegionValue {
   IntRect clip;
   int type;
 };
+#endif
 
 // FIXME: This should be a HashSequencedSet, but we don't have that data
 // structure yet.
@@ -629,8 +631,10 @@ class RenderObject : public CachedResourceClient {
 
   virtual void updateWidgetPosition();
 
+#if ENABLE(DASHBOARD_SUPPORT)
   void addDashboardRegions(Vector<DashboardRegionValue>&);
   void collectDashboardRegions(Vector<DashboardRegionValue>&);
+#endif
 
   // Used to signal a specific subrect within an object that must be repainted
   // after

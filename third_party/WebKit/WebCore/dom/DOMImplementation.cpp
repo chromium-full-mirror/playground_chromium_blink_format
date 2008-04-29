@@ -350,8 +350,10 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
 
 #if ENABLE(SVG)
   if (type == "image/svg+xml") {
+#if ENABLE(DASHBOARD_SUPPORT)
     Settings* settings = frame ? frame->settings() : 0;
     if (!settings || !settings->usesDashboardBackwardCompatibilityMode())
+#endif
       return new SVGDocument(this, frame);
   }
 #endif

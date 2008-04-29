@@ -118,7 +118,9 @@ class XPathNSResolver;
 class XPathResult;
 #endif
 
+#if ENABLE(DASHBOARD_SUPPORT)
 struct DashboardRegionValue;
+#endif
 struct HitTestRequest;
 
 typedef int ExceptionCode;
@@ -1019,12 +1021,14 @@ class Document : public ContainerNode {
 
   UChar backslashAsCurrencySymbol() const;
 
+#if ENABLE(DASHBOARD_SUPPORT)
   void setDashboardRegionsDirty(bool f) { m_dashboardRegionsDirty = f; }
   bool dashboardRegionsDirty() const { return m_dashboardRegionsDirty; }
   bool hasDashboardRegions() const { return m_hasDashboardRegions; }
   void setHasDashboardRegions(bool f) { m_hasDashboardRegions = f; }
   const Vector<DashboardRegionValue>& dashboardRegions() const;
   void setDashboardRegions(const Vector<DashboardRegionValue>&);
+#endif
 
   void removeAllEventListenersFromAllNodes();
 
@@ -1109,9 +1113,11 @@ class Document : public ContainerNode {
   SVGDocumentExtensions* m_svgExtensions;
 #endif
 
+#if ENABLE(DASHBOARD_SUPPORT)
   Vector<DashboardRegionValue> m_dashboardRegions;
   bool m_hasDashboardRegions;
   bool m_dashboardRegionsDirty;
+#endif
 
   HashMap<String, RefPtr<HTMLCanvasElement>> m_cssCanvasElements;
 

@@ -508,7 +508,9 @@ void FrameView::layout(bool allowSubtree) {
     root->document()->axObjectCache()->postNotificationToElement(
         root, "AXLayoutComplete");
 #endif
+#if ENABLE(DASHBOARD_SUPPORT)
   updateDashboardRegions();
+#endif
 
   if (didFirstLayout)
     m_frame->loader()->didFirstLayout();
@@ -1054,6 +1056,7 @@ IntRect FrameView::windowClipRectForLayer(const RenderLayer* layer,
   return intersection(clipRect, windowClipRect());
 }
 
+#if ENABLE(DASHBOARD_SUPPORT)
 void FrameView::updateDashboardRegions() {
   Document* document = m_frame->document();
   if (!document->hasDashboardRegions())
@@ -1068,6 +1071,7 @@ void FrameView::updateDashboardRegions() {
     return;
   page->chrome()->client()->dashboardRegionsChanged();
 }
+#endif
 
 void FrameView::updateControlTints() {
   // This is called when control tints are changed from aqua/graphite to clear

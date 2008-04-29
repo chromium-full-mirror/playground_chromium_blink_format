@@ -53,7 +53,6 @@
 #include "CSSValueKeywords.h"
 #include "CSSValueList.h"
 #include "Counter.h"
-#include "DashboardRegion.h"
 #include "Document.h"
 #include "FloatConversion.h"
 #include "FontFamilyValue.h"
@@ -61,8 +60,13 @@
 #include "MediaList.h"
 #include "MediaQueryExp.h"
 #include "Pair.h"
+#include "Rect.h"
 #include "ShadowValue.h"
 #include <kjs/dtoa.h>
+
+#if ENABLE(DASHBOARD_SUPPORT)
+#include "DashboardRegion.h"
+#endif
 
 #define YYDEBUG 0
 
@@ -1523,11 +1527,13 @@ bool CSSParser::parseValue(int propId, bool important) {
         valid_primitive = true;
       break;
 
+#if ENABLE(DASHBOARD_SUPPORT)
     case CSSPropertyWebkitDashboardRegion:  // <dashboard-region> |
                                             // <dashboard-region>
       if (value->unit == Value::Function || id == CSSValueNone)
         return parseDashboardRegions(propId, important);
       break;
+#endif
     // End Apple-specific properties
 
     /* shorthand properties */
@@ -2529,6 +2535,8 @@ bool CSSParser::parseTransitionProperty(int propId, RefPtr<CSSValue>& result) {
   return false;
 }
 
+#if ENABLE(DASHBOARD_SUPPORT)
+
 #define DASHBOARD_REGION_NUM_PARAMETERS 6
 #define DASHBOARD_REGION_SHORT_NUM_PARAMETERS 2
 
@@ -2673,6 +2681,8 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
 
   return valid;
 }
+
+#endif /* ENABLE(DASHBOARD_SUPPORT) */
 
 PassRefPtr<CSSValue> CSSParser::parseCounterContent(ValueList* args,
                                                     bool counters) {

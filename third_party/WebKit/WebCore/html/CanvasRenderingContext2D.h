@@ -300,7 +300,9 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
   void applyStrokePattern();
   void applyFillPattern();
 
+#if ENABLE(DASHBOARD_SUPPORT)
   void clearPathForDashboardBackwardCompatibilityMode();
+#endif
 
   void checkOrigin(const KURL&);
 
