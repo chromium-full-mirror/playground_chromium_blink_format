@@ -257,7 +257,7 @@ void dumpFrameScrollPosition(IWebFrame* frame) {
     return;
 
   COMPtr<IWebFramePrivate> framePrivate;
-  if (FAILED(frame->QueryInterface(framePrivate.adoptionPointer())))
+  if (FAILED(frame->QueryInterface(&framePrivate)))
     return;
 
   SIZE scrollPosition;
@@ -267,7 +267,7 @@ void dumpFrameScrollPosition(IWebFrame* frame) {
   if (abs(scrollPosition.cx) > 0.00000001 ||
       abs(scrollPosition.cy) > 0.00000001) {
     COMPtr<IWebFrame> parent;
-    if (FAILED(frame->parentFrame(parent.adoptionPointer())))
+    if (FAILED(frame->parentFrame(&parent)))
       return;
     if (parent) {
       BSTR name;
@@ -282,7 +282,7 @@ void dumpFrameScrollPosition(IWebFrame* frame) {
 
   if (::layoutTestController->dumpChildFrameScrollPositions()) {
     COMPtr<IEnumVARIANT> enumKids;
-    if (FAILED(frame->childFrames(enumKids.adoptionPointer())))
+    if (FAILED(frame->childFrames(&enumKids)))
       return;
     VARIANT var;
     VariantInit(&var);
@@ -301,18 +301,18 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
     return L"";
 
   COMPtr<IDOMDocument> document;
-  if (FAILED(frame->DOMDocument(document.adoptionPointer())))
+  if (FAILED(frame->DOMDocument(&document)))
     return L"";
 
   COMPtr<IDOMElement> documentElement;
-  if (FAILED(document->documentElement(documentElement.adoptionPointer())))
+  if (FAILED(document->documentElement(&documentElement)))
     return L"";
 
   wstring result;
 
   // Add header for all but the main frame.
   COMPtr<IWebFrame> parent;
-  if (FAILED(frame->parentFrame(parent.adoptionPointer())))
+  if (FAILED(frame->parentFrame(&parent)))
     return L"";
   if (parent) {
     BSTR name = L"";
@@ -328,7 +328,7 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
 
   BSTR innerText = 0;
   COMPtr<IDOMElementPrivate> docPrivate;
-  if (SUCCEEDED(documentElement->QueryInterface(docPrivate.adoptionPointer())))
+  if (SUCCEEDED(documentElement->QueryInterface(&docPrivate)))
     docPrivate->innerText(&innerText);
 
   result.append(innerText ? innerText : L"", SysStringLen(innerText));
@@ -338,7 +338,7 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
 
   if (::layoutTestController->dumpChildFramesAsText()) {
     COMPtr<IEnumVARIANT> enumKids;
-    if (FAILED(frame->childFrames(enumKids.adoptionPointer())))
+    if (FAILED(frame->childFrames(&enumKids)))
       return L"";
     VARIANT var;
     VariantInit(&var);
@@ -356,13 +356,11 @@ static wstring dumpFramesAsText(IWebFrame* frame) {
 
 static int compareHistoryItems(const void* item1, const void* item2) {
   COMPtr<IWebHistoryItemPrivate> itemA;
-  if (FAILED(
-          (*(COMPtr<IUnknown>*)item1)->QueryInterface(itemA.adoptionPointer())))
+  if (FAILED((*(COMPtr<IUnknown>*)item1)->QueryInterface(&itemA)))
     return 0;
 
   COMPtr<IWebHistoryItemPrivate> itemB;
-  if (FAILED(
-          (*(COMPtr<IUnknown>*)item2)->QueryInterface(itemB.adoptionPointer())))
+  if (FAILED((*(COMPtr<IUnknown>*)item2)->QueryInterface(&itemB)))
     return 0;
 
   BSTR targetA;
@@ -400,7 +398,7 @@ static void dumpHistoryItem(IWebHistoryItem* item, int indent, bool current) {
   SysFreeString(url);
 
   COMPtr<IWebHistoryItemPrivate> itemPrivate;
-  if (FAILED(item->QueryInterface(itemPrivate.adoptionPointer())))
+  if (FAILED(item->QueryInterface(&itemPrivate)))
     return;
 
   BSTR target;
@@ -451,7 +449,7 @@ static void dumpHistoryItem(IWebHistoryItem* item, int indent, bool current) {
 
   for (unsigned i = 0; i < kidsCount; ++i) {
     COMPtr<IWebHistoryItem> item;
-    kidsVector[i]->QueryInterface(item.adoptionPointer());
+    kidsVector[i]->QueryInterface(&item);
     dumpHistoryItem(item.get(), indent + 4, false);
   }
 
@@ -466,7 +464,7 @@ static void dumpBackForwardList(IWebView* webView) {
   printf("\n============== Back Forward List ==============\n");
 
   COMPtr<IWebBackForwardList> bfList;
-  if (FAILED(webView->backForwardList(bfList.adoptionPointer())))
+  if (FAILED(webView->backForwardList(&bfList)))
     return;
 
   // Print out all items in the list after prevTestBFItem, which was from the
@@ -482,23 +480,23 @@ static void dumpBackForwardList(IWebView* webView) {
 
   for (int i = forwardListCount; i > 0; --i) {
     COMPtr<IWebHistoryItem> item;
-    if (FAILED(bfList->itemAtIndex(i, item.adoptionPointer())))
+    if (FAILED(bfList->itemAtIndex(i, &item)))
       return;
     // something is wrong if the item from the last test is in the forward part
     // of the b/f list
     assert(item != prevTestBFItem);
     COMPtr<IUnknown> itemUnknown;
-    item->QueryInterface(itemUnknown.adoptionPointer());
+    item->QueryInterface(&itemUnknown);
     itemsToPrint.append(itemUnknown);
   }
 
   COMPtr<IWebHistoryItem> currentItem;
-  if (FAILED(bfList->currentItem(currentItem.adoptionPointer())))
+  if (FAILED(bfList->currentItem(&currentItem)))
     return;
 
   assert(currentItem != prevTestBFItem);
   COMPtr<IUnknown> currentItemUnknown;
-  currentItem->QueryInterface(currentItemUnknown.adoptionPointer());
+  currentItem->QueryInterface(&currentItemUnknown);
   itemsToPrint.append(currentItemUnknown);
   int currentItemIndex = itemsToPrint.size() - 1;
 
@@ -508,18 +506,18 @@ static void dumpBackForwardList(IWebView* webView) {
 
   for (int i = -1; i >= -backListCount; --i) {
     COMPtr<IWebHistoryItem> item;
-    if (FAILED(bfList->itemAtIndex(i, item.adoptionPointer())))
+    if (FAILED(bfList->itemAtIndex(i, &item)))
       return;
     if (item == prevTestBFItem)
       break;
     COMPtr<IUnknown> itemUnknown;
-    item->QueryInterface(itemUnknown.adoptionPointer());
+    item->QueryInterface(&itemUnknown);
     itemsToPrint.append(itemUnknown);
   }
 
   for (int i = itemsToPrint.size() - 1; i >= 0; --i) {
     COMPtr<IWebHistoryItem> historyItemToPrint;
-    itemsToPrint[i]->QueryInterface(historyItemToPrint.adoptionPointer());
+    itemsToPrint[i]->QueryInterface(&historyItemToPrint);
     dumpHistoryItem(historyItemToPrint.get(), 8, i == currentItemIndex);
   }
 
@@ -537,10 +535,9 @@ static void dumpBackForwardListForAllWindows() {
 
 void dump() {
   COMPtr<IWebDataSource> dataSource;
-  if (SUCCEEDED(frame->dataSource(dataSource.adoptionPointer()))) {
+  if (SUCCEEDED(frame->dataSource(&dataSource))) {
     COMPtr<IWebURLResponse> response;
-    if (SUCCEEDED(dataSource->response(response.adoptionPointer())) &&
-        response) {
+    if (SUCCEEDED(dataSource->response(&response)) && response) {
       BSTR mimeType;
       if (SUCCEEDED(response->MIMEType(&mimeType)))
         ::layoutTestController->setDumpAsText(
@@ -575,7 +572,7 @@ void dump() {
       ::SendMessage(webViewWindow, WM_PAINT, 0, 0);
 
       COMPtr<IWebFramePrivate> framePrivate;
-      if (FAILED(frame->QueryInterface(framePrivate.adoptionPointer())))
+      if (FAILED(frame->QueryInterface(&framePrivate)))
         goto fail;
       framePrivate->renderTreeAsExternalRepresentation(&resultString);
     }
@@ -631,7 +628,7 @@ static bool shouldLogFrameLoadDelegates(const char* pathOrURL) {
 
 static void resetWebViewToConsistentStateBeforeTesting() {
   COMPtr<IWebView> webView;
-  if (FAILED(frame->webView(webView.adoptionPointer())))
+  if (FAILED(frame->webView(&webView)))
     return;
 
   webView->setPolicyDelegate(0);
@@ -643,7 +640,7 @@ static void resetWebViewToConsistentStateBeforeTesting() {
   }
 
   COMPtr<IWebPreferences> preferences;
-  if (SUCCEEDED(webView->preferences(preferences.adoptionPointer()))) {
+  if (SUCCEEDED(webView->preferences(&preferences))) {
     preferences->setPrivateBrowsingEnabled(FALSE);
     preferences->setJavaScriptCanOpenWindowsAutomatically(TRUE);
 
@@ -721,10 +718,10 @@ static void runTest(const char* pathOrURL) {
 
   prevTestBFItem = 0;
   COMPtr<IWebView> webView;
-  if (SUCCEEDED(frame->webView(webView.adoptionPointer()))) {
+  if (SUCCEEDED(frame->webView(&webView))) {
     COMPtr<IWebBackForwardList> bfList;
-    if (SUCCEEDED(webView->backForwardList(bfList.adoptionPointer())))
-      bfList->currentItem(prevTestBFItem.adoptionPointer());
+    if (SUCCEEDED(webView->backForwardList(&bfList)))
+      bfList->currentItem(&prevTestBFItem);
   }
 
   WorkQueue::shared()->clear();
@@ -960,7 +957,7 @@ IWebView* createWebViewAndOffscreenWindow(HWND* webViewWindow) {
     return 0;
 
   COMPtr<IWebViewPrivate> viewPrivate;
-  if (FAILED(webView->QueryInterface(viewPrivate.adoptionPointer())))
+  if (FAILED(webView->QueryInterface(&viewPrivate)))
     return 0;
 
   viewPrivate->setShouldApplyMacFontAscentHack(TRUE);
@@ -995,7 +992,7 @@ IWebView* createWebViewAndOffscreenWindow(HWND* webViewWindow) {
     return 0;
 
   COMPtr<IWebViewEditing> viewEditing;
-  if (FAILED(webView->QueryInterface(viewEditing.adoptionPointer())))
+  if (FAILED(webView->QueryInterface(&viewEditing)))
     return 0;
 
   if (FAILED(viewEditing->setEditingDelegate(sharedEditingDelegate.get())))
@@ -1006,7 +1003,7 @@ IWebView* createWebViewAndOffscreenWindow(HWND* webViewWindow) {
     return 0;
 
   COMPtr<IWebPreferences> preferences;
-  if (FAILED(webView->preferences(preferences.adoptionPointer())))
+  if (FAILED(webView->preferences(&preferences)))
     return 0;
 
   initializePreferences(preferences.get());
@@ -1061,8 +1058,7 @@ int main(int argc, char* argv[]) {
   if (FAILED(CoCreateInstance(CLSID_WebIconDatabase, 0, CLSCTX_ALL,
                               IID_IWebIconDatabase, (void**)&tmpIconDatabase)))
     return -1;
-  if (FAILED(
-          tmpIconDatabase->sharedIconDatabase(iconDatabase.adoptionPointer())))
+  if (FAILED(tmpIconDatabase->sharedIconDatabase(&iconDatabase)))
     return -1;
 
   if (FAILED(webView->mainFrame(&frame)))

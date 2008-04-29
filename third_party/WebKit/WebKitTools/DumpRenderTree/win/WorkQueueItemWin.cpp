@@ -57,8 +57,7 @@ void LoadItem::invoke() const {
     targetFrame = frame;
   else {
     BSTR targetBSTR = SysAllocString(targetString.c_str());
-    bool failed = FAILED(
-        frame->findFrameNamed(targetBSTR, targetFrame.adoptionPointer()));
+    bool failed = FAILED(frame->findFrameNamed(targetBSTR, &targetFrame));
     SysFreeString(targetBSTR);
     if (failed)
       return;
@@ -82,17 +81,17 @@ void LoadItem::invoke() const {
 
 void ReloadItem::invoke() const {
   COMPtr<IWebView> webView;
-  if (FAILED(frame->webView(webView.adoptionPointer())))
+  if (FAILED(frame->webView(&webView)))
     return;
 
   COMPtr<IWebIBActions> webActions;
-  if (SUCCEEDED(webView->QueryInterface(webActions.adoptionPointer())))
+  if (SUCCEEDED(webView->QueryInterface(&webActions)))
     webActions->reload(0);
 }
 
 void ScriptItem::invoke() const {
   COMPtr<IWebView> webView;
-  if (FAILED(frame->webView(webView.adoptionPointer())))
+  if (FAILED(frame->webView(&webView)))
     return;
 
   wstring scriptString = jsStringRefToWString(script());
@@ -106,7 +105,7 @@ void ScriptItem::invoke() const {
 
 void BackForwardItem::invoke() const {
   COMPtr<IWebView> webView;
-  if (FAILED(frame->webView(webView.adoptionPointer())))
+  if (FAILED(frame->webView(&webView)))
     return;
 
   BOOL result;
@@ -121,11 +120,11 @@ void BackForwardItem::invoke() const {
   }
 
   COMPtr<IWebBackForwardList> bfList;
-  if (FAILED(webView->backForwardList(bfList.adoptionPointer())))
+  if (FAILED(webView->backForwardList(&bfList)))
     return;
 
   COMPtr<IWebHistoryItem> item;
-  if (FAILED(bfList->itemAtIndex(m_howFar, item.adoptionPointer())))
+  if (FAILED(bfList->itemAtIndex(m_howFar, &item)))
     return;
 
   webView->goToBackForwardItem(item.get(), &result);

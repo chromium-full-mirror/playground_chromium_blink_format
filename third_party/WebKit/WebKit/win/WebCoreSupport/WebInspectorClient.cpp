@@ -135,7 +135,7 @@ Page* WebInspectorClient::createPage() {
                                          WebPreferences::createInstance());
   COMPtr<IWebPreferences> iPreferences;
   if (FAILED(tempPreferences->initWithIdentifier(
-          BString(L"WebInspectorPreferences"), iPreferences.adoptionPointer())))
+          BString(L"WebInspectorPreferences"), &iPreferences)))
     return 0;
   COMPtr<WebPreferences> preferences(Query, iPreferences);
   if (!preferences)

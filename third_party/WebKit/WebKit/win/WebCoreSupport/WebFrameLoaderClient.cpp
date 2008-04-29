@@ -91,8 +91,7 @@ void WebFrameLoaderClient::assignIdentifierToInitialRequest(
     const ResourceRequest& request) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return;
 
   COMPtr<WebMutableURLRequest> webURLRequest(
@@ -109,8 +108,7 @@ void WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(
 
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (SUCCEEDED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer()))) {
+  if (SUCCEEDED(webView->resourceLoadDelegate(&resourceLoadDelegate))) {
     COMPtr<WebURLAuthenticationChallenge> webChallenge(
         AdoptCOM, WebURLAuthenticationChallenge::createInstance(challenge));
     if (SUCCEEDED(resourceLoadDelegate->didReceiveAuthenticationChallenge(
@@ -132,8 +130,7 @@ void WebFrameLoaderClient::dispatchDidCancelAuthenticationChallenge(
     const AuthenticationChallenge& challenge) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return;
 
   COMPtr<WebURLAuthenticationChallenge> webChallenge(
@@ -149,8 +146,7 @@ void WebFrameLoaderClient::dispatchWillSendRequest(
     const ResourceResponse& redirectResponse) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return;
 
   COMPtr<WebMutableURLRequest> webURLRequest(
@@ -162,7 +158,7 @@ void WebFrameLoaderClient::dispatchWillSendRequest(
   if (FAILED(resourceLoadDelegate->willSendRequest(
           webView, identifier, webURLRequest.get(),
           webURLRedirectResponse.get(), getWebDataSource(loader),
-          newWebURLRequest.adoptionPointer())))
+          &newWebURLRequest)))
     return;
 
   if (webURLRequest == newWebURLRequest)
@@ -181,8 +177,7 @@ void WebFrameLoaderClient::dispatchDidReceiveResponse(
     const ResourceResponse& response) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return;
 
   COMPtr<WebURLResponse> webURLResponse(
@@ -197,8 +192,7 @@ void WebFrameLoaderClient::dispatchDidReceiveContentLength(
     int length) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return;
 
   resourceLoadDelegate->didReceiveContentLength(webView, identifier, length,
@@ -209,8 +203,7 @@ void WebFrameLoaderClient::dispatchDidFinishLoading(DocumentLoader* loader,
                                                     unsigned long identifier) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return;
 
   resourceLoadDelegate->didFinishLoadingFromDataSource(
@@ -222,8 +215,7 @@ void WebFrameLoaderClient::dispatchDidFailLoading(DocumentLoader* loader,
                                                   const ResourceError& error) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return;
 
   COMPtr<WebError> webError(AdoptCOM, WebError::createInstance(error));
@@ -234,8 +226,7 @@ void WebFrameLoaderClient::dispatchDidFailLoading(DocumentLoader* loader,
 void WebFrameLoaderClient::dispatchDidHandleOnloadEvents() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegatePrivate> frameLoadDelegatePriv;
-  if (SUCCEEDED(webView->frameLoadDelegatePrivate(
-          frameLoadDelegatePriv.adoptionPointer())) &&
+  if (SUCCEEDED(webView->frameLoadDelegatePrivate(&frameLoadDelegatePriv)) &&
       frameLoadDelegatePriv)
     frameLoadDelegatePriv->didHandleOnloadEventsForFrame(webView, m_webFrame);
 }
@@ -244,8 +235,7 @@ void WebFrameLoaderClient::
     dispatchDidReceiveServerRedirectForProvisionalLoad() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->didReceiveServerRedirectForProvisionalLoadForFrame(
         webView, m_webFrame);
 }
@@ -253,8 +243,7 @@ void WebFrameLoaderClient::
 void WebFrameLoaderClient::dispatchDidCancelClientRedirect() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->didCancelClientRedirectForFrame(webView, m_webFrame);
 }
 
@@ -263,8 +252,7 @@ void WebFrameLoaderClient::dispatchWillPerformClientRedirect(const KURL& url,
                                                              double fireDate) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->willPerformClientRedirectToURL(
         webView, BString(url.string()), delay,
         MarshallingHelpers::CFAbsoluteTimeToDATE(fireDate), m_webFrame);
@@ -273,16 +261,14 @@ void WebFrameLoaderClient::dispatchWillPerformClientRedirect(const KURL& url,
 void WebFrameLoaderClient::dispatchDidChangeLocationWithinPage() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->didChangeLocationWithinPageForFrame(webView, m_webFrame);
 }
 
 void WebFrameLoaderClient::dispatchWillClose() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->willCloseFrame(webView, m_webFrame);
 }
 
@@ -293,32 +279,28 @@ void WebFrameLoaderClient::dispatchDidReceiveIcon() {
 void WebFrameLoaderClient::dispatchDidStartProvisionalLoad() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->didStartProvisionalLoadForFrame(webView, m_webFrame);
 }
 
 void WebFrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->didReceiveTitle(webView, BString(title), m_webFrame);
 }
 
 void WebFrameLoaderClient::dispatchDidCommitLoad() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->didCommitLoadForFrame(webView, m_webFrame);
 }
 
 void WebFrameLoaderClient::dispatchDidFinishDocumentLoad() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegatePrivate> frameLoadDelegatePriv;
-  if (SUCCEEDED(webView->frameLoadDelegatePrivate(
-          frameLoadDelegatePriv.adoptionPointer())) &&
+  if (SUCCEEDED(webView->frameLoadDelegatePrivate(&frameLoadDelegatePriv)) &&
       frameLoadDelegatePriv)
     frameLoadDelegatePriv->didFinishDocumentLoadForFrame(webView, m_webFrame);
 }
@@ -326,16 +308,14 @@ void WebFrameLoaderClient::dispatchDidFinishDocumentLoad() {
 void WebFrameLoaderClient::dispatchDidFinishLoad() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(
-          webView->frameLoadDelegate(frameLoadDelegate.adoptionPointer())))
+  if (SUCCEEDED(webView->frameLoadDelegate(&frameLoadDelegate)))
     frameLoadDelegate->didFinishLoadForFrame(webView, m_webFrame);
 }
 
 void WebFrameLoaderClient::dispatchDidFirstLayout() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegatePrivate> frameLoadDelegatePriv;
-  if (SUCCEEDED(webView->frameLoadDelegatePrivate(
-          frameLoadDelegatePriv.adoptionPointer())) &&
+  if (SUCCEEDED(webView->frameLoadDelegatePrivate(&frameLoadDelegatePriv)) &&
       frameLoadDelegatePriv)
     frameLoadDelegatePriv->didFirstLayoutInFrame(webView, m_webFrame);
 }
@@ -344,16 +324,15 @@ Frame* WebFrameLoaderClient::dispatchCreatePage() {
   WebView* webView = m_webFrame->webView();
 
   COMPtr<IWebUIDelegate> ui;
-  if (FAILED(webView->uiDelegate(ui.adoptionPointer())))
+  if (FAILED(webView->uiDelegate(&ui)))
     return 0;
 
   COMPtr<IWebView> newWebView;
-  if (FAILED(ui->createWebViewWithRequest(webView, 0,
-                                          newWebView.adoptionPointer())))
+  if (FAILED(ui->createWebViewWithRequest(webView, 0, &newWebView)))
     return 0;
 
   COMPtr<IWebFrame> mainFrame;
-  if (FAILED(newWebView->mainFrame(mainFrame.adoptionPointer())))
+  if (FAILED(newWebView->mainFrame(&mainFrame)))
     return 0;
 
   COMPtr<WebFrame> mainFrameImpl(Query, mainFrame);
@@ -363,7 +342,7 @@ Frame* WebFrameLoaderClient::dispatchCreatePage() {
 void WebFrameLoaderClient::dispatchShow() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebUIDelegate> ui;
-  if (SUCCEEDED(webView->uiDelegate(ui.adoptionPointer())))
+  if (SUCCEEDED(webView->uiDelegate(&ui)))
     ui->webViewShow(webView);
 }
 
@@ -506,8 +485,7 @@ PassRefPtr<DocumentLoader> WebFrameLoaderClient::createDocumentLoader(
 void WebFrameLoaderClient::setTitle(const String& title, const KURL& url) {
   BOOL privateBrowsingEnabled = FALSE;
   COMPtr<IWebPreferences> preferences;
-  if (SUCCEEDED(
-          m_webFrame->webView()->preferences(preferences.adoptionPointer())))
+  if (SUCCEEDED(m_webFrame->webView()->preferences(&preferences)))
     preferences->privateBrowsingEnabled(&privateBrowsingEnabled);
   if (privateBrowsingEnabled)
     return;
@@ -518,8 +496,7 @@ void WebFrameLoaderClient::setTitle(const String& title, const KURL& url) {
     return;
 
   COMPtr<IWebHistoryItem> item;
-  if (FAILED(
-          history->itemForURL(BString(url.string()), item.adoptionPointer())))
+  if (FAILED(history->itemForURL(BString(url.string()), &item)))
     return;
 
   COMPtr<IWebHistoryItemPrivate> itemPrivate(Query, item);
@@ -720,8 +697,7 @@ Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
 
   WebView* webView = m_webFrame->webView();
-  if (FAILED(webView->resourceLoadDelegate(
-          resourceLoadDelegate.adoptionPointer())))
+  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return pluginView;
 
   RetainPtr<CFMutableDictionaryRef> userInfo(

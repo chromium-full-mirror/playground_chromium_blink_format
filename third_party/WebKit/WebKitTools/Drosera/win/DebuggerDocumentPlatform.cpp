@@ -88,7 +88,7 @@ void DebuggerDocument::getPlatformCurrentFunctionStack(
     if (FAILED(frame->functionName(&function)))
       return;
 
-    if (FAILED(frame->caller(caller.adoptionPointer())))
+    if (FAILED(frame->caller(&caller)))
       return;
 
     if (!function) {
@@ -117,7 +117,7 @@ void DebuggerDocument::getPlatformLocalScopeVariableNamesForCallFrame(
   VariantInit(&var);
 
   COMPtr<IEnumVARIANT> localScopeVariableNames;
-  if (FAILED(cframe->variableNames(localScopeVariableNames.adoptionPointer())))
+  if (FAILED(cframe->variableNames(&localScopeVariableNames)))
     return;
 
   while (localScopeVariableNames->Next(1, &var, 0) == S_OK) {
