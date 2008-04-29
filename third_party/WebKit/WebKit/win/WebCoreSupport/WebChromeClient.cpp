@@ -135,7 +135,8 @@ Page* WebChromeClient::createWindow(Frame*,
         AdoptCOM, WebMutableURLRequest::createInstance(
                       frameLoadRequest.resourceRequest()));
     COMPtr<IWebView> dialog;
-    if (FAILED(delegate->createModalDialog(m_webView, request.get(), &dialog)))
+    if (FAILED(delegate->createModalDialog(m_webView, request.get(),
+                                           dialog.adoptionPointer())))
       return 0;
     return core(dialog.get());
   }
@@ -268,7 +269,7 @@ void WebChromeClient::addMessageToConsole(const String& message,
                                           unsigned line,
                                           const String& url) {
   COMPtr<IWebUIDelegate> uiDelegate;
-  if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
+  if (SUCCEEDED(m_webView->uiDelegate(uiDelegate.adoptionPointer()))) {
     COMPtr<IWebUIDelegatePrivate> uiPrivate;
     if (SUCCEEDED(uiDelegate->QueryInterface(IID_IWebUIDelegatePrivate,
                                              (void**)&uiPrivate)))
@@ -326,14 +327,14 @@ void WebChromeClient::closeWindowSoon() {
 
 void WebChromeClient::runJavaScriptAlert(Frame*, const String& message) {
   COMPtr<IWebUIDelegate> ui;
-  if (SUCCEEDED(m_webView->uiDelegate(&ui)))
+  if (SUCCEEDED(m_webView->uiDelegate(ui.adoptionPointer())))
     ui->runJavaScriptAlertPanelWithMessage(m_webView, BString(message));
 }
 
 bool WebChromeClient::runJavaScriptConfirm(Frame*, const String& message) {
   BOOL result = FALSE;
   COMPtr<IWebUIDelegate> ui;
-  if (SUCCEEDED(m_webView->uiDelegate(&ui)))
+  if (SUCCEEDED(m_webView->uiDelegate(ui.adoptionPointer())))
     ui->runJavaScriptConfirmPanelWithMessage(m_webView, BString(message),
                                              &result);
   return !!result;
@@ -344,7 +345,7 @@ bool WebChromeClient::runJavaScriptPrompt(Frame*,
                                           const String& defaultValue,
                                           String& result) {
   COMPtr<IWebUIDelegate> ui;
-  if (FAILED(m_webView->uiDelegate(&ui)))
+  if (FAILED(m_webView->uiDelegate(ui.adoptionPointer())))
     return false;
 
   TimerBase::fireTimersInNestedEventLoop();
@@ -365,14 +366,14 @@ bool WebChromeClient::runJavaScriptPrompt(Frame*,
 
 void WebChromeClient::setStatusbarText(const String& statusText) {
   COMPtr<IWebUIDelegate> uiDelegate;
-  if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
+  if (SUCCEEDED(m_webView->uiDelegate(uiDelegate.adoptionPointer()))) {
     uiDelegate->setStatusText(m_webView, BString(statusText));
   }
 }
 
 bool WebChromeClient::shouldInterruptJavaScript() {
   COMPtr<IWebUIDelegate> uiDelegate;
-  if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
+  if (SUCCEEDED(m_webView->uiDelegate(uiDelegate.adoptionPointer()))) {
     COMPtr<IWebUIDelegatePrivate> uiPrivate;
     if (SUCCEEDED(uiDelegate->QueryInterface(IID_IWebUIDelegatePrivate,
                                              (void**)&uiPrivate))) {
@@ -436,7 +437,7 @@ void WebChromeClient::updateBackingStore() {
 void WebChromeClient::mouseDidMoveOverElement(const HitTestResult& result,
                                               unsigned modifierFlags) {
   COMPtr<IWebUIDelegate> uiDelegate;
-  if (FAILED(m_webView->uiDelegate(&uiDelegate)))
+  if (FAILED(m_webView->uiDelegate(uiDelegate.adoptionPointer())))
     return;
 
   COMPtr<WebElementPropertyBag> element;
@@ -452,7 +453,7 @@ void WebChromeClient::setToolTip(const String& toolTip) {
 void WebChromeClient::print(Frame* frame) {
   COMPtr<IWebUIDelegate> uiDelegate;
   COMPtr<IWebUIDelegate2> uiDelegate2;
-  if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate)))
+  if (SUCCEEDED(m_webView->uiDelegate(uiDelegate.adoptionPointer())))
     if (SUCCEEDED(uiDelegate->QueryInterface(IID_IWebUIDelegate2,
                                              (void**)&uiDelegate2)))
       uiDelegate2->printFrame(m_webView, kit(frame));
@@ -464,7 +465,7 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame,
       AdoptCOM,
       WebSecurityOrigin::createInstance(frame->document()->securityOrigin()));
   COMPtr<IWebUIDelegate> uiDelegate;
-  if (SUCCEEDED(m_webView->uiDelegate(&uiDelegate))) {
+  if (SUCCEEDED(m_webView->uiDelegate(uiDelegate.adoptionPointer()))) {
     COMPtr<IWebUIDelegatePrivate3> uiDelegatePrivate3(Query, uiDelegate);
     if (uiDelegatePrivate3)
       uiDelegatePrivate3->exceededDatabaseQuota(
@@ -510,7 +511,7 @@ void WebChromeClient::populateVisitedLinks() {
 
 COMPtr<IWebUIDelegate> WebChromeClient::uiDelegate() {
   COMPtr<IWebUIDelegate> delegate;
-  m_webView->uiDelegate(&delegate);
+  m_webView->uiDelegate(delegate.adoptionPointer());
   return delegate;
 }
 

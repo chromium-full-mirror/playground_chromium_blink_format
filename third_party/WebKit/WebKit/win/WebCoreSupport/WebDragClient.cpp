@@ -77,7 +77,7 @@ DragDestinationAction WebDragClient::actionMaskForDrag(DragData* dragData) {
   // allow
   // any action
   WebDragDestinationAction mask = WebDragDestinationActionAny;
-  if (SUCCEEDED(m_webView->uiDelegate(&delegateRef)))
+  if (SUCCEEDED(m_webView->uiDelegate(delegateRef.adoptionPointer())))
     delegateRef->dragDestinationActionMaskForDraggingInfo(
         m_webView, dragData->platformData(), &mask);
 
@@ -91,7 +91,7 @@ void WebDragClient::willPerformDragDestinationAction(
   // so we just call the delegate, and don't worry about whether it's
   // implemented
   COMPtr<IWebUIDelegate> delegateRef = 0;
-  if (SUCCEEDED(m_webView->uiDelegate(&delegateRef)))
+  if (SUCCEEDED(m_webView->uiDelegate(delegateRef.adoptionPointer())))
     delegateRef->willPerformDragDestinationAction(
         m_webView, (WebDragDestinationAction)action, dragData->platformData());
 }
@@ -102,7 +102,7 @@ DragSourceAction WebDragClient::dragSourceActionMaskForPoint(
   WebDragSourceAction action = WebDragSourceActionAny;
   POINT localpt =
       core(m_webView)->mainFrame()->view()->windowToContents(windowPoint);
-  if (SUCCEEDED(m_webView->uiDelegate(&delegateRef)))
+  if (SUCCEEDED(m_webView->uiDelegate(delegateRef.adoptionPointer())))
     delegateRef->dragSourceActionMaskForPoint(m_webView, &localpt, &action);
   return (DragSourceAction)action;
 }
@@ -126,7 +126,8 @@ void WebDragClient::startDrag(DragImageRef image,
   COMPtr<IDataObject> dataObject;
   COMPtr<WebView> viewProtector = m_webView;
   COMPtr<IDropSource> source;
-  if (FAILED(WebDropSource::createInstance(m_webView, &source)))
+  if (FAILED(
+          WebDropSource::createInstance(m_webView, source.adoptionPointer())))
     return;
 
   dataObject = static_cast<ClipboardWin*>(clipboard)->dataObject();
@@ -155,7 +156,7 @@ void WebDragClient::startDrag(DragImageRef image,
     DWORD okEffect = DROPEFFECT_COPY | DROPEFFECT_LINK | DROPEFFECT_MOVE;
     DWORD effect;
     COMPtr<IWebUIDelegate> ui;
-    if (SUCCEEDED(m_webView->uiDelegate(&ui))) {
+    if (SUCCEEDED(m_webView->uiDelegate(ui.adoptionPointer()))) {
       COMPtr<IWebUIDelegatePrivate> uiPrivate;
       if (SUCCEEDED(ui->QueryInterface(IID_IWebUIDelegatePrivate,
                                        (void**)&uiPrivate)))

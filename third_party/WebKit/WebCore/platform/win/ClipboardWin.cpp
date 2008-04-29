@@ -520,7 +520,7 @@ void ClipboardWin::clearAllData() {
     return;
 
   m_writableDataObject = 0;
-  WCDataObject::createInstance(&m_writableDataObject);
+  WCDataObject::createInstance(m_writableDataObject.adoptionPointer());
   m_dataObject = m_writableDataObject;
 }
 
@@ -596,7 +596,7 @@ HashSet<String> ClipboardWin::types() const {
 
   COMPtr<IEnumFORMATETC> itr;
 
-  if (FAILED(m_dataObject->EnumFormatEtc(0, &itr)))
+  if (FAILED(m_dataObject->EnumFormatEtc(0, itr.adoptionPointer())))
     return results;
 
   if (!itr)
@@ -788,7 +788,7 @@ bool ClipboardWin::hasData() {
     return false;
 
   COMPtr<IEnumFORMATETC> itr;
-  if (FAILED(m_dataObject->EnumFormatEtc(0, &itr)))
+  if (FAILED(m_dataObject->EnumFormatEtc(0, itr.adoptionPointer())))
     return false;
 
   if (!itr)

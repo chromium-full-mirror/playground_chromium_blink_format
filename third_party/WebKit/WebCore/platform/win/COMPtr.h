@@ -85,7 +85,7 @@ class COMPtr {
   T& operator*() const { return *m_ptr; }
   T* operator->() const { return m_ptr; }
 
-  T** operator&() {
+  T** adoptionPointer() {
     ASSERT(!m_ptr);
     return &m_ptr;
   }

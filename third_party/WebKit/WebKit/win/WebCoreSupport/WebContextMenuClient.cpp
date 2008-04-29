@@ -100,7 +100,7 @@ static HMENU fixMenuReceivedFromOldSafari(IWebUIDelegate* uiDelegate,
 
 HMENU WebContextMenuClient::getCustomMenuFromDefaultItems(ContextMenu* menu) {
   COMPtr<IWebUIDelegate> uiDelegate;
-  if (FAILED(m_webView->uiDelegate(&uiDelegate)))
+  if (FAILED(m_webView->uiDelegate(uiDelegate.adoptionPointer())))
     return menu->platformDescription();
 
   ASSERT(uiDelegate);
@@ -125,7 +125,7 @@ void WebContextMenuClient::contextMenuItemSelected(
   ASSERT(item->type() == ActionType || item->type() == CheckableActionType);
 
   COMPtr<IWebUIDelegate> uiDelegate;
-  if (FAILED(m_webView->uiDelegate(&uiDelegate)))
+  if (FAILED(m_webView->uiDelegate(uiDelegate.adoptionPointer())))
     return;
 
   ASSERT(uiDelegate);
@@ -140,7 +140,7 @@ void WebContextMenuClient::contextMenuItemSelected(
 
 void WebContextMenuClient::downloadURL(const KURL& url) {
   COMPtr<IWebDownloadDelegate> downloadDelegate;
-  if (FAILED(m_webView->downloadDelegate(&downloadDelegate))) {
+  if (FAILED(m_webView->downloadDelegate(downloadDelegate.adoptionPointer()))) {
     // If the WebView doesn't successfully provide a download delegate we'll
     // pass a null one
     // into the WebDownload - which may or may not decide to use a
