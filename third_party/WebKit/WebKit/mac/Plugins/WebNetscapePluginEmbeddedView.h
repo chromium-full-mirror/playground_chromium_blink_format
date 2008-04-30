@@ -42,4 +42,5 @@
 @interface WebNetscapePluginEmbeddedView : WebBaseNetscapePluginView {
 }
 @end
+
 #endif
