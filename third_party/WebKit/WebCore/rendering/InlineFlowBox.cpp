@@ -737,11 +737,12 @@ void InlineFlowBox::paintFillLayers(const RenderObject::PaintInfo& paintInfo,
                                     int _tx,
                                     int _ty,
                                     int w,
-                                    int h) {
+                                    int h,
+                                    CompositeOperator op) {
   if (!fillLayer)
     return;
-  paintFillLayers(paintInfo, c, fillLayer->next(), my, mh, _tx, _ty, w, h);
-  paintFillLayer(paintInfo, c, fillLayer, my, mh, _tx, _ty, w, h);
+  paintFillLayers(paintInfo, c, fillLayer->next(), my, mh, _tx, _ty, w, h, op);
+  paintFillLayer(paintInfo, c, fillLayer, my, mh, _tx, _ty, w, h, op);
 }
 
 void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
@@ -752,13 +753,14 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
                                    int tx,
                                    int ty,
                                    int w,
-                                   int h) {
+                                   int h,
+                                   CompositeOperator op) {
   StyleImage* img = fillLayer->image();
   bool hasFillImage = img && img->canRender(object()->style()->effectiveZoom());
   if ((!hasFillImage && !object()->style()->hasBorderRadius()) ||
       (!prevLineBox() && !nextLineBox()) || !parent())
     object()->paintFillLayerExtended(paintInfo, c, fillLayer, my, mh, tx, ty, w,
-                                     h, this);
+                                     h, this, op);
   else {
     // We have a fill image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
@@ -782,7 +784,7 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
     object()->paintFillLayerExtended(paintInfo, c, fillLayer, my, mh, startX,
-                                     ty, totalWidth, h, this);
+                                     ty, totalWidth, h, this, op);
     paintInfo.context->restore();
   }
 }
@@ -912,12 +914,24 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
   else
     mh = min(paintInfo.rect.height(), h);
 
-  if (paintInfo.phase == PaintPhaseMask)
-    paintFillLayers(paintInfo, Color(), object()->style()->maskLayers(), my, mh,
-                    tx, ty, w, h);
-
+  // Figure out if we need to push a transparency layer to render our mask.
+  bool pushTransparencyLayer = false;
   const NinePieceImage& maskNinePieceImage = object()->style()->maskBoxImage();
-  StyleImage* maskBoxImage = maskNinePieceImage.image();
+  StyleImage* maskBoxImage = object()->style()->maskBoxImage().image();
+  if ((maskBoxImage && object()->style()->maskLayers()->hasImage()) ||
+      object()->style()->maskLayers()->next())
+    pushTransparencyLayer = true;
+
+  CompositeOperator compositeOp = CompositeDestinationIn;
+  if (pushTransparencyLayer) {
+    paintInfo.context->setCompositeOperation(CompositeDestinationIn);
+    paintInfo.context->beginTransparencyLayer(1.0f);
+    compositeOp = CompositeSourceOver;
+  }
+
+  paintFillLayers(paintInfo, Color(), object()->style()->maskLayers(), my, mh,
+                  tx, ty, w, h, compositeOp);
+
   bool hasBoxImage =
       maskBoxImage &&
       maskBoxImage->canRender(object()->style()->effectiveZoom());
@@ -928,7 +942,8 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
   // cases only a single call to draw is required.
   if (!prevLineBox() && !nextLineBox()) {
     object()->paintNinePieceImage(paintInfo.context, tx, ty, w, h,
-                                  object()->style(), maskNinePieceImage);
+                                  object()->style(), maskNinePieceImage,
+                                  compositeOp);
   } else {
     // We have a mask image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
@@ -942,9 +957,13 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
     object()->paintNinePieceImage(paintInfo.context, startX, ty, totalWidth, h,
-                                  object()->style(), maskNinePieceImage);
+                                  object()->style(), maskNinePieceImage,
+                                  compositeOp);
     paintInfo.context->restore();
   }
+
+  if (pushTransparencyLayer)
+    paintInfo.context->endTransparencyLayer();
 }
 
 static bool shouldDrawTextDecoration(RenderObject* obj) {

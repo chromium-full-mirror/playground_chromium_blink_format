@@ -423,6 +423,7 @@ class RenderObject : public CachedResourceClient {
 
   bool hasTransform() const { return m_hasTransform; }
   bool hasMask() const { return style() && style()->hasMask(); }
+  virtual IntRect maskClipRect() { return borderBox(); }
 
  private:
   bool includeVerticalScrollbarSize() const {
@@ -560,7 +561,8 @@ class RenderObject : public CachedResourceClient {
                            int w,
                            int h,
                            const RenderStyle*,
-                           const NinePieceImage&);
+                           const NinePieceImage&,
+                           CompositeOperator = CompositeSourceOver);
   void paintOutline(GraphicsContext*,
                     int tx,
                     int ty,
@@ -588,7 +590,9 @@ class RenderObject : public CachedResourceClient {
                                       int ty,
                                       int width,
                                       int height,
-                                      InlineFlowBox* box = 0) {}
+                                      InlineFlowBox* box = 0,
+                                      CompositeOperator = CompositeSourceOver) {
+  }
 
   /*
    * Calculates the actual width of the object (only for non inline

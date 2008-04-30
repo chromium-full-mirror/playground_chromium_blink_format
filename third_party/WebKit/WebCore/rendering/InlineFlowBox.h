@@ -106,7 +106,8 @@ class InlineFlowBox : public InlineRunBox {
                        int tx,
                        int ty,
                        int w,
-                       int h);
+                       int h,
+                       CompositeOperator = CompositeSourceOver);
   void paintFillLayer(const RenderObject::PaintInfo&,
                       const Color&,
                       const FillLayer*,
@@ -115,7 +116,8 @@ class InlineFlowBox : public InlineRunBox {
                       int tx,
                       int ty,
                       int w,
-                      int h);
+                      int h,
+                      CompositeOperator = CompositeSourceOver);
   void paintBoxShadow(GraphicsContext*,
                       RenderStyle*,
                       int tx,
