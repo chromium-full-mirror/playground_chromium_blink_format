@@ -226,6 +226,7 @@
 #endif
 
 #if PLATFORM(MAC) || PLATFORM(WIN)
+#define ENABLE_DASHBOARD_SUPPORT 1
 #define HAVE_ACCESSIBILITY 1
 #endif
 
@@ -252,7 +253,7 @@
 #endif
 
 #if !defined(ENABLE_DASHBOARD_SUPPORT)
-#define ENABLE_DASHBOARD_SUPPORT 1
+#define ENABLE_DASHBOARD_SUPPORT 0
 #endif
 
 #endif /* WTF_Platform_h */
