@@ -234,7 +234,7 @@ struct HashTraits<COMPtr<P>> : GenericHashTraits<COMPtr<P>> {
     *slot = reinterpret_cast<P*>(-1);
   }
   static bool isDeletedValue(const COMPtr<P>& value) {
-    value == reinterpret_cast<P*>(-1);
+    return value == reinterpret_cast<P*>(-1);
   }
 };
 
