@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2005, 2005 Alexander Kellett <lypanov@kde.org>
+                  2008 Rob Buis <buis@kde.org>
 
     This file is part of the WebKit project
 
@@ -74,7 +75,8 @@ void SVGImageLoader::dispatchLoadEvent() {
     if (image()->errorOccurred()) {
       // FIXME: We're supposed to put the document in an "error state" per the
       // spec.
-    } else
+    } else if (static_cast<SVGImageElement*>(element())
+                   ->externalResourcesRequiredBaseValue())
       static_cast<SVGElement*>(element())->sendSVGLoadEventIfPossible(true);
   }
 }
