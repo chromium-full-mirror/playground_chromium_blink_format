@@ -51,6 +51,7 @@ class RenderMedia : public RenderReplaced {
   virtual RenderObject* firstChild() const;
   virtual RenderObject* lastChild() const;
   virtual void removeChild(RenderObject*);
+  virtual void destroy();
 
   virtual void layout();
 
