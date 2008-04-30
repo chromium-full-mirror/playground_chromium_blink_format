@@ -26,6 +26,8 @@
 #ifndef WebNetscapePluginEventHandler_h
 #define WebNetscapePluginEventHandler_h
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
+
 @class NSEvent;
 @class WebBaseNetscapePluginView;
 
@@ -62,5 +64,7 @@ class WebNetscapePluginEventHandler {
   WebBaseNetscapePluginView* m_pluginView;
   bool m_currentEventIsUserGesture;
 };
+
+#endif  // ENABLE(NETSCAPE_PLUGIN_API)
 
 #endif  // WebNetscapePluginEventHandler_h

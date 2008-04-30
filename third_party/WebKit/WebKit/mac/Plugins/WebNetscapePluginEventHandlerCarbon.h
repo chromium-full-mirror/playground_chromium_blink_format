@@ -23,6 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
+
 #ifndef WebNetscapePluginEventHandlerCarbon_h
 #define WebNetscapePluginEventHandlerCarbon_h
 
@@ -73,3 +75,5 @@ class WebNetscapePluginEventHandlerCarbon
 };
 
 #endif  // WebNetscapePluginEventHandlerCarbon_h
+
+#endif  // ENABLE(NETSCAPE_PLUGIN_API)
