@@ -69,25 +69,26 @@ static Font makeFont(const WebFontDescription& description) {
   return font;
 }
 
-void DrawTextAtPoint(CGContextRef cgContext,
-                     LPCTSTR text,
-                     int length,
-                     POINT point,
-                     const WebFontDescription& description,
-                     CGColorRef color,
-                     int underlinedIndex,
-                     bool drawAsPassword) {
-  GraphicsContext context(cgContext);
-
-  String drawString(text, length);
-  if (drawAsPassword)
-    drawString = drawString.impl()->secure(WebCore::bullet);
-  WebCoreDrawTextAtPoint(context, drawString, point, makeFont(description),
-                         color, underlinedIndex);
-}
+// Text shadow is added post 3.1.1.  In order for nightlies to not break Safari
+// 3.1.1, we should still allow
+// the old WebTextRenderInfo that has a smaller structSize than the current one
+// with the new text shadow data members.
+struct WebTextRenderInfoWithoutShadow {
+  DWORD structSize;
+  CGContextRef cgContext;
+  LPCTSTR text;
+  int length;
+  POINT pt;
+  const WebFontDescription* description;
+  CGColorRef color;
+  int underlinedIndex;
+  bool drawAsPassword;
+  int overrideSmoothingLevel;  // pass in -1 if caller does not want to override
+                               // smoothing level
+};
 
 void WebDrawText(WebTextRenderInfo* info) {
-  if (!info || info->structSize != sizeof(WebTextRenderInfo) ||
+  if (!info || info->structSize < sizeof(WebTextRenderInfoWithoutShadow) ||
       !info->cgContext || !info->description)
     return;
 
@@ -97,9 +98,26 @@ void WebDrawText(WebTextRenderInfo* info) {
     wkSetFontSmoothingLevel(info->overrideSmoothingLevel);
   }
 
-  DrawTextAtPoint(info->cgContext, info->text, info->length, info->pt,
-                  *(info->description), info->color, info->underlinedIndex,
-                  info->drawAsPassword);
+  {
+    GraphicsContext context(info->cgContext);
+    String drawString(info->text, info->length);
+    if (info->drawAsPassword)
+      drawString = drawString.impl()->secure(WebCore::bullet);
+
+    context.save();
+
+    // Set shadow setting
+    if (info->structSize == sizeof(WebTextRenderInfo) &&
+        (info->shadowOffset.cx || info->shadowOffset.cy || info->shadowBlur ||
+         info->shadowColor))
+      context.setShadow(info->shadowOffset, info->shadowBlur,
+                        info->shadowColor);
+
+    WebCoreDrawTextAtPoint(context, drawString, info->pt,
+                           makeFont(*(info->description)), info->color,
+                           info->underlinedIndex);
+    context.restore();
+  }
 
   if (info->overrideSmoothingLevel >= 0)
     wkSetFontSmoothingLevel(oldFontSmoothingLevel);

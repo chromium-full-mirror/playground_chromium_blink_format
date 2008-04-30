@@ -56,16 +56,11 @@ struct WebTextRenderInfo {
   bool drawAsPassword;
   int overrideSmoothingLevel;  // pass in -1 if caller does not want to override
                                // smoothing level
+  SIZE shadowOffset;
+  int shadowBlur;
+  CGColorRef shadowColor;
 };
 
-void DrawTextAtPoint(CGContextRef,
-                     LPCTSTR text,
-                     int length,
-                     POINT,
-                     const WebFontDescription&,
-                     CGColorRef,
-                     int underlinedIndex = -1,
-                     bool drawAsPassword = false);
 void WebDrawText(WebTextRenderInfo*);
 float TextFloatWidth(LPCTSTR text, int length, const WebFontDescription&);
 void FontMetrics(const WebFontDescription&,
