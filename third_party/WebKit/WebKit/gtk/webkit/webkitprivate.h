@@ -62,6 +62,9 @@ void webkit_init();
 #define WEBKIT_PARAM_READABLE                             \
   ((GParamFlags)(G_PARAM_READABLE | G_PARAM_STATIC_NAME | \
                  G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB))
+#define WEBKIT_PARAM_WRITABLE                             \
+  ((GParamFlags)(G_PARAM_WRITABLE | G_PARAM_STATIC_NAME | \
+                 G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB))
 #define WEBKIT_PARAM_READWRITE                             \
   ((GParamFlags)(G_PARAM_READWRITE | G_PARAM_STATIC_NAME | \
                  G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB))
@@ -90,7 +93,9 @@ struct _WebKitWebViewPrivate {
   GtkTargetList* copy_target_list;
   GtkTargetList* paste_target_list;
 
-  gboolean transparent;
+  GdkColor bg_color;
+  guint16 bg_alpha;
+  gboolean bg_color_set;
 
   GtkAdjustment* horizontalAdjustment;
   GtkAdjustment* verticalAdjustment;
