@@ -81,6 +81,7 @@ class ProcessingInstruction : public ContainerNode,
   String m_data;
   String m_localHref;
   String m_title;
+  String m_media;
   CachedResource* m_cachedSheet;
   RefPtr<StyleSheet> m_sheet;
   bool m_loading;

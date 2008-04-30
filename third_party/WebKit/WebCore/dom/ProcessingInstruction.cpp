@@ -31,6 +31,7 @@
 #include "FrameLoader.h"
 #include "XSLStyleSheet.h"
 #include "XMLTokenizer.h"  // for parseAttributes()
+#include "MediaList.h"
 
 namespace WebCore {
 
@@ -137,6 +138,7 @@ bool ProcessingInstruction::checkStyleSheet() {
     String alternate = attrs.get("alternate");
     m_alternate = alternate == "yes";
     m_title = attrs.get("title");
+    m_media = attrs.get("media");
 
     if (href.length() > 1) {
       if (href[0] == '#') {
@@ -210,6 +212,8 @@ void ProcessingInstruction::setCSSStyleSheet(const String& url,
   m_sheet = new CSSStyleSheet(this, url, charset);
   parseStyleSheet(sheet->sheetText());
   m_sheet->setTitle(m_title);
+  m_sheet->setMedia(
+      new MediaList((CSSStyleSheet*)m_sheet.get(), m_media, false));
   m_sheet->setDisabled(m_alternate);
 }
 
