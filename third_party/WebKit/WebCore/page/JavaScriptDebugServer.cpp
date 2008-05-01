@@ -139,7 +139,7 @@ static void dispatchFailedToParseSource(const ListenerSet& listeners,
 static Page* toPage(ExecState* exec) {
   ASSERT_ARG(exec, exec);
 
-  JSDOMWindow* window = toJSDOMWindow(exec->dynamicGlobalObject());
+  JSDOMWindow* window = asJSDOMWindow(exec->dynamicGlobalObject());
   ASSERT(window);
 
   return window->impl()->frame()->page();

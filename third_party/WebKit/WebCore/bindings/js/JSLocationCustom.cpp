@@ -127,7 +127,7 @@ static void navigateIfAllowed(ExecState* exec,
                               const KURL& url,
                               bool lockHistory) {
   Frame* activeFrame =
-      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
+      asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!url.protocolIs("javascript") || allowsAccessFromFrame(exec, frame)) {
     bool userGesture = activeFrame->scriptProxy()->processingUserGesture();
     frame->loader()->scheduleLocationChange(
@@ -141,7 +141,7 @@ void JSLocation::setHref(ExecState* exec, JSValue* value) {
   ASSERT(frame);
 
   Frame* activeFrame =
-      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
+      asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!activeFrame)
     return;
   if (!activeFrame->loader()->shouldAllowNavigation(frame))
@@ -238,7 +238,7 @@ JSValue* JSLocation::replace(ExecState* exec, const List& args) {
     return jsUndefined();
 
   Frame* activeFrame =
-      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
+      asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!activeFrame)
     return jsUndefined();
   if (!activeFrame->loader()->shouldAllowNavigation(frame))
@@ -261,7 +261,7 @@ JSValue* JSLocation::reload(ExecState* exec, const List& args) {
 
   if (!frame->loader()->url().protocolIs("javascript") ||
       (window && window->allowsAccessFrom(exec))) {
-    bool userGesture = toJSDOMWindow(exec->dynamicGlobalObject())
+    bool userGesture = asJSDOMWindow(exec->dynamicGlobalObject())
                            ->impl()
                            ->frame()
                            ->scriptProxy()
@@ -277,7 +277,7 @@ JSValue* JSLocation::assign(ExecState* exec, const List& args) {
     return jsUndefined();
 
   Frame* activeFrame =
-      toJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
+      asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!activeFrame)
     return jsUndefined();
   if (!activeFrame->loader()->shouldAllowNavigation(frame))
