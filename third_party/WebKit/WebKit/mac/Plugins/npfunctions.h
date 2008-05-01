@@ -69,7 +69,7 @@ typedef void (*NPN_PluginThreadAsyncCallProcPtr)(NPP npp,
                                                  void* userData);
 typedef uint32_t (*NPN_ScheduleTimerProcPtr)(
     NPP npp,
-    int32_t interval,
+    uint32_t interval,
     NPBool repeat,
     void (*timerFunc)(NPP npp, uint32_t timerID));
 typedef void (*NPN_UnscheduleTimerProcPtr)(NPP npp, uint32_t timerID);
