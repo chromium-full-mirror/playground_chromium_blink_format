@@ -192,6 +192,12 @@ class ResourceHandle : public RefCounted<ResourceHandle> {
   void fireFailure(Timer<ResourceHandle>*);
 
  private:
+#if USE(SOUP)
+  bool startData(String urlString);
+  bool startHttp(String urlString);
+  bool startGio(String urlString);
+#endif
+
   void scheduleFailure(FailureType);
 
   bool start(Frame*);

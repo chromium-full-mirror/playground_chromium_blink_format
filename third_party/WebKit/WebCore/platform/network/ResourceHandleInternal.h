@@ -118,7 +118,13 @@ class ResourceHandleInternal : Noncopyable {
 #if USE(SOUP)
         ,
         m_msg(0),
-        m_cancelled(false)
+        m_cancelled(false),
+        m_gfile(0),
+        m_input_stream(0),
+        m_cancellable(0),
+        m_buffer(0),
+        m_bufsize(0),
+        m_total(0)
 #endif
 #if PLATFORM(QT)
         ,
@@ -188,6 +194,11 @@ class ResourceHandleInternal : Noncopyable {
   SoupMessage* m_msg;
   ResourceResponse m_response;
   bool m_cancelled;
+  GFile* m_gfile;
+  GInputStream* m_input_stream;
+  GCancellable* m_cancellable;
+  char* m_buffer;
+  gsize m_bufsize, m_total;
 #endif
 #if PLATFORM(QT)
 #if QT_VERSION < 0x040400
