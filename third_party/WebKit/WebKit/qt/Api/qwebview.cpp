@@ -517,11 +517,11 @@ bool QWebView::event(QEvent* e) {
         d->usesWebCoreCursor = true;
         d->setCursor(d->webCoreCursor);
       }
+#endif
+#endif
+    } else if (e->type() == QEvent::Leave) {
+      d->page->event(e);
     }
-#endif
-#endif
-  } else if (e->type() == QEvent::Leave) {
-    d->page->event(e);
   }
 
   return QWidget::event(e);
