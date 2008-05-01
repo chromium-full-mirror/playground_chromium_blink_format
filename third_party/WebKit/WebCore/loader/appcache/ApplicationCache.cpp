@@ -34,13 +34,16 @@
 
 namespace WebCore {
 
-ApplicationCache::ApplicationCache(ApplicationCacheGroup* group)
-    : m_group(group), m_manifest(0) {
-  ASSERT(group);
-}
+ApplicationCache::ApplicationCache() : m_group(0), m_manifest(0) {}
 
 ApplicationCache::~ApplicationCache() {
-  m_group->cacheDestroyed(this);
+  if (m_group)
+    m_group->cacheDestroyed(this);
+}
+
+void ApplicationCache::setGroup(ApplicationCacheGroup* group) {
+  ASSERT(!m_group);
+  m_group = group;
 }
 
 void ApplicationCache::setManifestResource(

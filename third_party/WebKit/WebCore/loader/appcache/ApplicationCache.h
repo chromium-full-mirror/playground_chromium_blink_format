@@ -46,8 +46,8 @@ class ResourceRequest;
 
 class ApplicationCache : public RefCounted<ApplicationCache> {
  public:
-  static PassRefPtr<ApplicationCache> create(ApplicationCacheGroup* group) {
-    return adoptRef(new ApplicationCache(group));
+  static PassRefPtr<ApplicationCache> create() {
+    return adoptRef(new ApplicationCache);
   }
   ~ApplicationCache();
 
@@ -57,6 +57,7 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   void setManifestResource(PassRefPtr<ApplicationCacheResource> manifest);
   ApplicationCacheResource* manifestResource() const { return m_manifest; }
 
+  void setGroup(ApplicationCacheGroup*);
   ApplicationCacheGroup* group() const { return m_group; }
 
   ApplicationCacheResource* resourceForRequest(const ResourceRequest&);
@@ -82,7 +83,7 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   static bool requestIsHTTPOrHTTPSGet(const ResourceRequest&);
 
  private:
-  ApplicationCache(ApplicationCacheGroup*);
+  ApplicationCache();
 
   ApplicationCacheGroup* m_group;
   ResourceMap m_resources;
