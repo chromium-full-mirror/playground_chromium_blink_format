@@ -238,15 +238,15 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
       xform.eDy = point.y();
       ModifyWorldTransform(hdc, &xform, MWT_LEFTMULTIPLY);
       ExtTextOut(hdc, 0, 0, ETO_GLYPH_INDEX, 0,
-                 reinterpret_cast<WCHAR*>(glyphBuffer.glyphs(from)), numGlyphs,
-                 gdiAdvances.data());
+                 reinterpret_cast<const WCHAR*>(glyphBuffer.glyphs(from)),
+                 numGlyphs, gdiAdvances.data());
       if (font->m_syntheticBoldOffset) {
         xform.eM21 = 0;
         xform.eDx = font->m_syntheticBoldOffset;
         xform.eDy = 0;
         ModifyWorldTransform(hdc, &xform, MWT_LEFTMULTIPLY);
         ExtTextOut(hdc, 0, 0, ETO_GLYPH_INDEX, 0,
-                   reinterpret_cast<WCHAR*>(glyphBuffer.glyphs(from)),
+                   reinterpret_cast<const WCHAR*>(glyphBuffer.glyphs(from)),
                    numGlyphs, gdiAdvances.data());
       }
     } else {
