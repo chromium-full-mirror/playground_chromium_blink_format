@@ -67,11 +67,12 @@ typedef void (*NPN_PopPopupsEnabledStateProcPtr)(NPP instance);
 typedef void (*NPN_PluginThreadAsyncCallProcPtr)(NPP npp,
                                                  void (*func)(void*),
                                                  void* userData);
-typedef bool (*NPN_ConstructProcPtr)(NPP npp,
-                                     NPObject* obj,
-                                     const NPVariant* args,
-                                     uint32_t argCount,
-                                     NPVariant* result);
+typedef uint32_t (*NPN_ScheduleTimerProcPtr)(
+    NPP npp,
+    int32_t interval,
+    NPBool repeat,
+    void (*timerFunc)(NPP npp, uint32_t timerID));
+typedef void (*NPN_UnscheduleTimerProcPtr)(NPP npp, uint32_t timerID);
 
 typedef void (*NPN_ReleaseVariantValueProcPtr)(NPVariant* variant);
 
@@ -124,6 +125,11 @@ typedef bool (*NPN_EnumerateProcPtr)(NPP npp,
                                      NPObject* npobj,
                                      NPIdentifier** identifier,
                                      uint32_t* count);
+typedef bool (*NPN_ConstructProcPtr)(NPP npp,
+                                     NPObject* obj,
+                                     const NPVariant* args,
+                                     uint32_t argCount,
+                                     NPVariant* result);
 
 typedef NPError (*NPP_NewProcPtr)(NPMIMEType pluginType,
                                   NPP instance,
@@ -218,6 +224,8 @@ typedef struct _NPNetscapeFuncs {
   NPN_EnumerateProcPtr enumerate;
   NPN_PluginThreadAsyncCallProcPtr pluginthreadasynccall;
   NPN_ConstructProcPtr construct;
+  NPN_ScheduleTimerProcPtr scheduletimer;
+  NPN_UnscheduleTimerProcPtr unscheduletimer;
 } NPNetscapeFuncs;
 
 typedef struct _NPPluginFuncs {

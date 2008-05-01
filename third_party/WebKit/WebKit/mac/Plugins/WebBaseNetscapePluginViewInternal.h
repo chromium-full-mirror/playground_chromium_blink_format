@@ -31,5 +31,6 @@
 
 @interface WebBaseNetscapePluginView (WebInternal)
 - (BOOL)sendEvent:(void*)event isDrawRect:(BOOL)eventIsDrawRect;
+- (NPEventModel)eventModel;
 @end
 #endif
