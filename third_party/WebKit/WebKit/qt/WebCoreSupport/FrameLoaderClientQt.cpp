@@ -2,6 +2,7 @@
  * Copyright (C) 2006 Zack Rusin <zack@kde.org>
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  * Copyright (C) 2007-2008 Trolltech ASA
+ * Copyright (C) 2008 Collabora Ltd. All rights reserved.
  *
  * All rights reserved.
  *
@@ -38,6 +39,7 @@
 #include "ResourceResponse.h"
 #include "Page.h"
 #include "PluginData.h"
+#include "PluginDatabase.h"
 #include "ProgressTracker.h"
 #include "RenderPart.h"
 #include "ResourceRequest.h"
@@ -129,6 +131,7 @@ namespace WebCore {
 FrameLoaderClientQt::FrameLoaderClientQt()
     : m_frame(0),
       m_webFrame(0),
+      m_pluginView(0),
       m_firstData(false),
       m_policyFunction(0),
       m_loadSucceeded(false) {
@@ -444,10 +447,16 @@ void FrameLoaderClientQt::didChangeTitle(DocumentLoader*) {
 }
 
 void FrameLoaderClientQt::finishedLoading(DocumentLoader* loader) {
-  if (m_firstData) {
-    FrameLoader* fl = loader->frameLoader();
-    fl->setEncoding(m_response.textEncodingName(), false);
-    m_firstData = false;
+  if (!m_pluginView) {
+    if (m_firstData) {
+      FrameLoader* fl = loader->frameLoader();
+      fl->setEncoding(m_response.textEncodingName(), false);
+      m_firstData = false;
+    }
+  } else {
+    m_pluginView->didFinishLoading();
+    m_pluginView = 0;
+    m_hasSentResponseToPlugin = false;
   }
 }
 
@@ -569,23 +578,37 @@ bool FrameLoaderClientQt::canCachePage() const {
 void FrameLoaderClientQt::setMainDocumentError(
     WebCore::DocumentLoader* loader,
     const WebCore::ResourceError& error) {
-  if (m_firstData) {
-    loader->frameLoader()->setEncoding(m_response.textEncodingName(), false);
-    m_firstData = false;
+  if (!m_pluginView) {
+    if (m_firstData) {
+      loader->frameLoader()->setEncoding(m_response.textEncodingName(), false);
+      m_firstData = false;
+    }
+  } else {
+    m_pluginView->didFail(error);
+    m_pluginView = 0;
+    m_hasSentResponseToPlugin = false;
   }
 }
 
 void FrameLoaderClientQt::committedLoad(WebCore::DocumentLoader* loader,
                                         const char* data,
                                         int length) {
-  if (!m_frame)
-    return;
-  FrameLoader* fl = loader->frameLoader();
-  if (m_firstData) {
-    fl->setEncoding(m_response.textEncodingName(), false);
-    m_firstData = false;
+  if (!m_pluginView) {
+    if (!m_frame)
+      return;
+    FrameLoader* fl = loader->frameLoader();
+    if (m_firstData) {
+      fl->setEncoding(m_response.textEncodingName(), false);
+      m_firstData = false;
+    }
+    fl->addData(data, length);
+  } else {
+    if (!m_hasSentResponseToPlugin) {
+      m_pluginView->didReceiveResponse(loader->response());
+      m_hasSentResponseToPlugin = true;
+    }
+    m_pluginView->didReceiveData(data, length);
   }
-  fl->addData(data, length);
 }
 
 WebCore::ResourceError FrameLoaderClientQt::cancelledError(
@@ -923,7 +946,7 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
       _mimeType == "application/x-qt-styled-widget")
     return ObjectContentOtherPlugin;
 
-  if (url.isEmpty())
+  if (url.isEmpty() && !_mimeType.length())
     return ObjectContentNone;
 
   String mimeType = _mimeType;
@@ -937,6 +960,9 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
 
   if (MIMETypeRegistry::isSupportedImageMIMEType(mimeType))
     return ObjectContentImage;
+
+  if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(mimeType))
+    return ObjectContentNetscapePlugin;
 
   if (m_frame->page() &&
       m_frame->page()->pluginData()->supportsMimeType(mimeType))
@@ -958,7 +984,7 @@ static const CSSPropertyID qstyleSheetProperties[] = {
 const unsigned numqStyleSheetProperties =
     sizeof(qstyleSheetProperties) / sizeof(qstyleSheetProperties[0]);
 
-Widget* FrameLoaderClientQt::createPlugin(const IntSize&,
+Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
                                           Element* element,
                                           const KURL& url,
                                           const Vector<String>& paramNames,
@@ -1007,35 +1033,39 @@ Widget* FrameLoaderClientQt::createPlugin(const IntSize&,
 
       widget->setStyleSheet(styleSheet);
     }
-  }
 
 #if QT_VERSION >= 0x040400
-  if (!object) {
-    QWebPluginFactory* factory = m_webFrame->page()->pluginFactory();
-    if (factory)
-      object = factory->create(mimeType, qurl, params, values);
-  }
+    if (!object) {
+      QWebPluginFactory* factory = m_webFrame->page()->pluginFactory();
+      if (factory)
+        object = factory->create(mimeType, qurl, params, values);
+    }
 #endif
 
-  if (object) {
-    QWidget* widget = qobject_cast<QWidget*>(object);
-    QWidget* view = m_webFrame->page()->view();
-    if (widget && view) {
-      widget->setParent(view);
-      Widget* w = new Widget();
-      w->setNativeWidget(widget);
-      return w;
+    if (object) {
+      QWidget* widget = qobject_cast<QWidget*>(object);
+      QWidget* view = m_webFrame->page()->view();
+      if (widget && view) {
+        widget->setParent(view);
+        Widget* w = new Widget();
+        w->setNativeWidget(widget);
+        return w;
+      }
+      // FIXME: make things work for widgetless plugins as well
+      delete object;
     }
-    // FIXME: make things work for widgetless plugins as well
-    delete object;
+  } else {  // NPAPI Plugins
+    PluginView* pluginView =
+        PluginView::create(m_frame, pluginSize, element, url, paramNames,
+                           paramValues, mimeType, loadManually);
+    return pluginView;
   }
 
   return 0;
 }
 
 void FrameLoaderClientQt::redirectDataToPlugin(Widget* pluginWidget) {
-  notImplemented();
-  return;
+  m_pluginView = static_cast<PluginView*>(pluginWidget);
 }
 
 Widget* FrameLoaderClientQt::createJavaAppletWidget(

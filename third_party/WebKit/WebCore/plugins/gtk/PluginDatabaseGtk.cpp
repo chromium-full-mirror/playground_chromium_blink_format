@@ -29,6 +29,7 @@
 
 #include "CString.h"
 #include "PluginPackage.h"
+#include <gdkconfig.h>
 
 namespace WebCore {
 
@@ -58,6 +59,8 @@ void PluginDatabase::getPluginPathsInDirectories(HashSet<String>& paths) const {
 Vector<String> PluginDatabase::defaultPluginDirectories() {
   Vector<String> directories;
   gchar* directory;
+
+  directory = 0;
 
 #if defined(GDK_WINDOWING_X11)
   directory = g_build_filename(g_get_home_dir(), ".mozilla", "plugins", NULL);
@@ -97,6 +100,21 @@ Vector<String> PluginDatabase::defaultPluginDirectories() {
 }
 
 bool PluginDatabase::isPreferredPluginDirectory(const String& directory) {
-  return false;
+  gchar* homePath;
+  bool retval = false;
+
+  homePath = 0;
+
+#if defined(GDK_WINDOWING_X11)
+  homePath = g_build_filename(g_get_home_dir(), ".mozilla", "plugins", 0);
+#elif defined(GDK_WINDOWING_WIN32)
+  homePath = g_build_filename(g_get_home_dir(), "Application Data", "Mozilla",
+                              "plugins", 0);
+#endif
+
+  if (homePath)
+    retval = (strcmp(homePath, (directory.utf8()).data()) == 0);
+
+  return retval;
 }
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
- * Copyright (C) 2008 Collabora, Ltd. All rights reserved.
+ * Copyright (C) 2008 Collabora Ltd. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -214,6 +214,8 @@ class PluginView : public Widget, private PluginStreamClient {
                      void* notifyData,
                      bool sendNotification,
                      bool allowHeaders);
+  NPError handlePostReadFile(Vector<char>& buffer, uint32 len, const char* buf);
+  static void freeStringArray(char** stringArray, int length);
   void setCallingPlugin(bool) const;
   RefPtr<PluginPackage> m_plugin;
   Element* m_element;
@@ -263,6 +265,10 @@ class PluginView : public Widget, private PluginStreamClient {
   bool m_isVisible;
   bool m_attachedToWindow;
   bool m_haveInitialized;
+
+#if PLATFORM(GTK) || defined(Q_WS_X11)
+  bool m_needsXEmbed;
+#endif
 
 #if PLATFORM(WIN)
   OwnPtr<PluginMessageThrottlerWin> m_messageThrottler;

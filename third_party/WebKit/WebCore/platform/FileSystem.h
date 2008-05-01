@@ -33,6 +33,10 @@
 #if PLATFORM(GTK)
 #include <gmodule.h>
 #endif
+#if PLATFORM(QT)
+#include <QFile>
+#include <QLibrary>
+#endif
 
 #include <time.h>
 
@@ -59,6 +63,11 @@ struct PlatformModuleVersion {
   PlatformModuleVersion(unsigned lsb, unsigned msb)
       : leastSig(lsb), mostSig(msb) {}
 };
+#elif PLATFORM(QT)
+typedef QFile* PlatformFileHandle;
+typedef QLibrary* PlatformModule;
+const PlatformFileHandle invalidPlatformFileHandle = 0;
+typedef unsigned PlatformModuleVersion;
 #else
 typedef int PlatformFileHandle;
 #if PLATFORM(GTK)
