@@ -67,12 +67,12 @@ typedef void (*NPN_PopPopupsEnabledStateProcPtr)(NPP instance);
 typedef void (*NPN_PluginThreadAsyncCallProcPtr)(NPP npp,
                                                  void (*func)(void*),
                                                  void* userData);
-typedef uint32_t (*NPN_ScheduleTimerProcPtr)(
-    NPP npp,
-    uint32_t interval,
-    NPBool repeat,
-    void (*timerFunc)(NPP npp, uint32_t timerID));
-typedef void (*NPN_UnscheduleTimerProcPtr)(NPP npp, uint32_t timerID);
+typedef uint32 (*NPN_ScheduleTimerProcPtr)(NPP npp,
+                                           uint32 interval,
+                                           NPBool repeat,
+                                           void (*timerFunc)(NPP npp,
+                                                             uint32 timerID));
+typedef void (*NPN_UnscheduleTimerProcPtr)(NPP npp, uint32 timerID);
 
 typedef void (*NPN_ReleaseVariantValueProcPtr)(NPVariant* variant);
 
