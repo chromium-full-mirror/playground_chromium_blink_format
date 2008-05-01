@@ -103,14 +103,19 @@ void closeFile(PlatformFileHandle& handle) {
 }
 
 int writeToFile(PlatformFileHandle handle, const char* data, int length) {
-  if (handle && handle->exists() && handle->isWritable()) {
-    handle->write(data, length);
-  }
+  if (handle && handle->exists() && handle->isWritable())
+    return handle->write(data, length);
+
+  return 0;
 }
 
 bool unloadModule(PlatformModule module) {
-  if (module->unload())
+  if (module->unload()) {
     delete module;
+    return true;
+  }
+
+  return false;
 }
 }
 
