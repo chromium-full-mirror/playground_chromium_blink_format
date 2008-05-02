@@ -66,7 +66,7 @@
 #include <wtf/MathExtras.h>
 
 #if ENABLE(XSLT)
-#include "JSXSLTProcessor.h"
+#include "JSXSLTProcessorConstructor.h"
 #endif
 
 #include "JSDOMWindowBase.lut.h"
@@ -200,7 +200,7 @@ DontDelete|Function 0
   Image                 WebCore::JSDOMWindowBase::Image              DontDelete
   Option                WebCore::JSDOMWindowBase::Option             DontDelete
   XMLHttpRequest        WebCore::JSDOMWindowBase::XMLHttpRequest     DontDelete
-  XSLTProcessor         WebCore::JSDOMWindowBase::XSLTProcessor_     DontDelete
+  XSLTProcessor         WebCore::JSDOMWindowBase::XSLTProcessor      DontDelete
 @end
 */
 
@@ -490,7 +490,7 @@ JSValue* JSDOMWindowBase::getValueProperty(ExecState* exec, int token) const {
 #else
       return jsUndefined();
 #endif
-    case XSLTProcessor_:
+    case XSLTProcessor:
 #if ENABLE(XSLT)
       if (!allowsAccessFrom(exec))
         return jsUndefined();

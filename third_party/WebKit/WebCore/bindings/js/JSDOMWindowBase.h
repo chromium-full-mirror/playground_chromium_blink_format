@@ -177,7 +177,7 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
     Image,
     Option,
     XMLHttpRequest,
-    XSLTProcessor_
+    XSLTProcessor
   };
 
  private:
