@@ -129,15 +129,12 @@ void SecurityOrigin::setDomainFromDOM(const String& newDomain) {
   m_domain = newDomain.lower();
 }
 
-bool SecurityOrigin::canAccess(const SecurityOrigin* other,
-                               Reason& reason) const {
+bool SecurityOrigin::canAccess(const SecurityOrigin* other) const {
   if (FrameLoader::shouldTreatSchemeAsLocal(m_protocol))
     return true;
 
-  if (m_noAccess || other->m_noAccess) {
-    reason = SecurityOrigin::GenericMismatch;
+  if (m_noAccess || other->m_noAccess)
     return false;
-  }
 
   // Here are three cases where we should permit access:
   //
@@ -175,14 +172,11 @@ bool SecurityOrigin::canAccess(const SecurityOrigin* other,
       if (m_domain == other->m_domain)
         return true;
     } else {
-      if (m_host == other->m_host && m_port == other->m_port) {
-        reason = DomainSetInDOMMismatch;
+      if (m_host == other->m_host && m_port == other->m_port)
         return false;
-      }
     }
   }
 
-  reason = SecurityOrigin::GenericMismatch;
   return false;
 }
 
@@ -192,8 +186,7 @@ bool SecurityOrigin::isSecureTransitionTo(const KURL& url) const {
     return true;
 
   RefPtr<SecurityOrigin> other = SecurityOrigin::create(url);
-  Reason reason;
-  return canAccess(other.get(), reason);
+  return canAccess(other.get());
 }
 
 String SecurityOrigin::toString() const {

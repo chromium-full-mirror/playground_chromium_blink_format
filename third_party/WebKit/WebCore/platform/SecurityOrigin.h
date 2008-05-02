@@ -55,8 +55,7 @@ class SecurityOrigin : public ThreadSafeShared<SecurityOrigin> {
   String domain() const { return m_domain; }
   unsigned short port() const { return m_port; }
 
-  enum Reason { GenericMismatch, DomainSetInDOMMismatch };
-  bool canAccess(const SecurityOrigin*, Reason&) const;
+  bool canAccess(const SecurityOrigin*) const;
   bool isSecureTransitionTo(const KURL&) const;
 
   bool isEmpty() const;
