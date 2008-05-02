@@ -85,6 +85,7 @@ class HTMLImageLoader;
 class HTMLInputElement;
 class HTMLMapElement;
 class IntPoint;
+class JSNode;
 class MouseEventWithHitTestResults;
 class NodeFilter;
 class NodeIterator;
@@ -1135,6 +1136,13 @@ class Document : public ContainerNode {
   bool m_isXHTML;
 
   unsigned m_numNodeListCaches;
+
+ public:
+  typedef HashMap<WebCore::Node*, JSNode*> JSWrapperCache;
+  JSWrapperCache& wrapperCache() { return m_wrapperCache; }
+
+ private:
+  JSWrapperCache m_wrapperCache;
 
 #if ENABLE(DATABASE)
   RefPtr<DatabaseThread> m_databaseThread;
