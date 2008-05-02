@@ -279,27 +279,6 @@ String FileChooser::basenameForWidth(const Font&, int width) const {
   return String();
 }
 
-PopupMenu::PopupMenu(PopupMenuClient*) : RefCounted<PopupMenu>(0) {
-  notImplemented();
-}
-
-PopupMenu::~PopupMenu() {
-  notImplemented();
-}
-void PopupMenu::show(const IntRect&, FrameView*, int index) {
-  notImplemented();
-}
-void PopupMenu::hide() {
-  notImplemented();
-}
-void PopupMenu::updateFromElement() {
-  notImplemented();
-}
-bool PopupMenu::itemWritingDirectionIsNatural() {
-  notImplemented();
-  return false;
-}
-
 Icon::Icon() : RefCounted<Icon>(0) {
   notImplemented();
 }
