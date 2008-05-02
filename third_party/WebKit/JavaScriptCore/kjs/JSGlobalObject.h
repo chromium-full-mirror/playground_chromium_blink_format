@@ -283,7 +283,7 @@ class JSGlobalObject : public JSVariableObject {
   }
 
   // Per-thread hash tables, cached on the global object for faster access.
-  const PerThreadData* perThreadData() const { return &d()->perThreadData; }
+  PerThreadData* perThreadData() { return &d()->perThreadData; }
 
   // Initialize and/or retrieve per-thread hash tables - use perThreadData() for
   // faster access instead.

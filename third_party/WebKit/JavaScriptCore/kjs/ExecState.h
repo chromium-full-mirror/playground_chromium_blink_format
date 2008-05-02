@@ -60,6 +60,8 @@ struct PerThreadData {
   List emptyList;
 
   Heap* heap;
+
+  unsigned functionCallDepth;
 };
 
 // Represents the current state of script execution.
@@ -145,6 +147,8 @@ class ExecState : Noncopyable {
 
   Heap* heap() const { return m_perThreadData->heap; }
 
+  unsigned& functionCallDepth() { return m_perThreadData->functionCallDepth; }
+
   LocalStorage& localStorage() { return *m_localStorage; }
   void setLocalStorage(LocalStorage* s) { m_localStorage = s; }
 
@@ -227,7 +231,7 @@ class ExecState : Noncopyable {
 
   ExecState* m_callingExec;
 
-  const PerThreadData* m_perThreadData;
+  PerThreadData* m_perThreadData;
 
   ScopeNode* m_scopeNode;
 
