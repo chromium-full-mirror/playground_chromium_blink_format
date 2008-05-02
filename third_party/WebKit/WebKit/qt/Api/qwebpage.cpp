@@ -2061,6 +2061,9 @@ QNetworkAccessManager* QWebPage::networkAccessManager() const {
    embedded into this
     QWebPage.
 
+    Note: The plugin factory is only used if the QWebSettings::PluginsEnabled
+   attribute is enabled.
+
     \sa pluginFactory()
 */
 void QWebPage::setPluginFactory(QWebPluginFactory* factory) {
