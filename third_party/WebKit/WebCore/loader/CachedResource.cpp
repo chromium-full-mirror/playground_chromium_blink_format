@@ -71,7 +71,7 @@ CachedResource::CachedResource(const String& url, Type type)
 CachedResource::~CachedResource() {
   ASSERT(!inCache());
   ASSERT(!m_deleted);
-  ASSERT(cache()->resourceForURL(url()) != this);
+  ASSERT(url().isNull() || cache()->resourceForURL(url()) != this);
 #ifndef NDEBUG
   m_deleted = true;
 #endif
