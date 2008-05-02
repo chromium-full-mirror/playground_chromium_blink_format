@@ -366,8 +366,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
   graphicsContext->getShadow(shadowSize, shadowBlur, shadowColor);
 
   bool hasSimpleShadow = graphicsContext->textDrawingMode() == cTextFill &&
-                         shadowColor.isValid() && !shadowBlur &&
-                         !shadowSize.isEmpty();
+                         shadowColor.isValid() && !shadowBlur;
   if (hasSimpleShadow) {
     // Paint simple shadows ourselves instead of relying on CG shadows, to avoid
     // losing subpixel antialiasing.
