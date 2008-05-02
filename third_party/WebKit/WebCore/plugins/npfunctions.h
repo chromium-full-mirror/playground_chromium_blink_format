@@ -22,9 +22,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef _NPFUNCTIONS_H_
-#define _NPFUNCTIONS_H_
+#ifndef NPFUNCTIONS_H
+#define NPFUNCTIONS_H
 
 #include "npruntime.h"
 #include "npapi.h"
@@ -91,6 +90,15 @@ typedef void* (*NPN_GetJavaEnvProcPtr)(void);
 typedef void* (*NPN_GetJavaPeerProcPtr)(NPP instance);
 typedef void (*NPN_PushPopupsEnabledStateProcPtr)(NPP instance, NPBool enabled);
 typedef void (*NPN_PopPopupsEnabledStateProcPtr)(NPP instance);
+typedef void (*NPN_PluginThreadAsyncCallProcPtr)(NPP npp,
+                                                 void (*func)(void*),
+                                                 void* userData);
+typedef uint32 (*NPN_ScheduleTimerProcPtr)(NPP npp,
+                                           uint32 interval,
+                                           NPBool repeat,
+                                           void (*timerFunc)(NPP npp,
+                                                             uint32 timerID));
+typedef void (*NPN_UnscheduleTimerProcPtr)(NPP npp, uint32 timerID);
 
 typedef void (*NPN_ReleaseVariantValueProcPtr)(NPVariant* variant);
 
@@ -143,9 +151,6 @@ typedef bool (*NPN_EnumerateProcPtr)(NPP npp,
                                      NPObject* npobj,
                                      NPIdentifier** identifier,
                                      uint32_t* count);
-typedef void (*NPN_PluginThreadAsyncCallProcPtr)(NPP npp,
-                                                 void (*func)(void*),
-                                                 void* userData);
 typedef bool (*NPN_ConstructProcPtr)(NPP npp,
                                      NPObject* obj,
                                      const NPVariant* args,
@@ -190,7 +195,6 @@ typedef NPError (*NPP_GetValueProcPtr)(NPP instance,
 typedef NPError (*NPP_SetValueProcPtr)(NPP instance,
                                        NPNVariable variable,
                                        void* value);
-typedef EXPORTED_CALLBACK(void, NPP_ShutdownProcPtr)(void);
 
 typedef void* (*NPP_GetJavaClassProcPtr)(void);
 typedef void* JRIGlobalRef;  // not using this right now
@@ -245,6 +249,8 @@ typedef struct _NPNetscapeFuncs {
   NPN_EnumerateProcPtr enumerate;
   NPN_PluginThreadAsyncCallProcPtr pluginthreadasynccall;
   NPN_ConstructProcPtr construct;
+  NPN_ScheduleTimerProcPtr scheduletimer;
+  NPN_UnscheduleTimerProcPtr unscheduletimer;
 } NPNetscapeFuncs;
 
 typedef struct _NPPluginFuncs {
@@ -266,10 +272,9 @@ typedef struct _NPPluginFuncs {
   NPP_SetValueProcPtr setvalue;
 } NPPluginFuncs;
 
-#if defined(XP_WIN)
 typedef EXPORTED_CALLBACK(NPError, NP_InitializeFuncPtr)(NPNetscapeFuncs*);
 typedef EXPORTED_CALLBACK(NPError, NP_GetEntryPointsFuncPtr)(NPPluginFuncs*);
-#endif
+typedef EXPORTED_CALLBACK(void, NPP_ShutdownProcPtr)(void);
 
 #if defined(XP_MACOSX)
 typedef void (*BP_CreatePluginMIMETypesPreferencesFuncPtr)(void);
