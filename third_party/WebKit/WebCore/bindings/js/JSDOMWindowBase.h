@@ -28,6 +28,10 @@
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 
+namespace KJS {
+class ExecState;
+}
+
 namespace WebCore {
 
 class AtomicString;
@@ -85,17 +89,20 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
 
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is GC-protected.
-  JSEventListener* findOrCreateJSEventListener(KJS::JSValue*,
+  JSEventListener* findOrCreateJSEventListener(KJS::ExecState*,
+                                               KJS::JSValue*,
                                                bool html = false);
 
   // Finds a wrapper of a GC-unprotected JS EventListener, returns 0 if no
   // existing one.
-  JSUnprotectedEventListener* findJSUnprotectedEventListener(KJS::JSValue*,
+  JSUnprotectedEventListener* findJSUnprotectedEventListener(KJS::ExecState*,
+                                                             KJS::JSValue*,
                                                              bool html = false);
 
   // Finds or creates a wrapper of a JS EventListener. JS EventListener object
   // is *NOT* GC-protected.
   JSUnprotectedEventListener* findOrCreateJSUnprotectedEventListener(
+      KJS::ExecState*,
       KJS::JSValue*,
       bool html = false);
 

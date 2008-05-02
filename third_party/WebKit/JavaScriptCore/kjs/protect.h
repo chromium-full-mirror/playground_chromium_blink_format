@@ -30,11 +30,15 @@
 namespace KJS {
 
 inline void gcProtect(JSValue* val) {
-  Collector::protect(val);
+  Heap* heap = Heap::heap(val);
+  if (heap)
+    heap->protect(val);
 }
 
 inline void gcUnprotect(JSValue* val) {
-  Collector::unprotect(val);
+  Heap* heap = Heap::heap(val);
+  if (heap)
+    heap->unprotect(val);
 }
 
 inline void gcProtectNullTolerant(JSValue* val) {

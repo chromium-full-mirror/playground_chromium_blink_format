@@ -297,7 +297,7 @@ JSValue* JSLocation::toString(ExecState* exec, const List&) {
   if (!allowsAccessFromFrame(exec, frame))
     return jsUndefined();
 
-  return jsString(impl()->toString());
+  return jsString(exec, impl()->toString());
 }
 
 }  // namespace WebCore

@@ -46,8 +46,8 @@ class ObjcInstance : public Instance {
 
   virtual Class* getClass() const;
 
-  virtual JSValue* valueOf() const;
-  virtual JSValue* defaultValue(JSType hint) const;
+  virtual JSValue* valueOf(ExecState*) const;
+  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
 
   virtual bool implementsCall() const;
 
@@ -67,8 +67,8 @@ class ObjcInstance : public Instance {
 
   ObjectStructPtr getObject() const { return _instance.get(); }
 
-  JSValue* stringValue() const;
-  JSValue* numberValue() const;
+  JSValue* stringValue(ExecState*) const;
+  JSValue* numberValue(ExecState*) const;
   JSValue* booleanValue() const;
 
   virtual BindingLanguage getBindingLanguage() const {

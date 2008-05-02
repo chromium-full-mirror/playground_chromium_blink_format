@@ -76,8 +76,9 @@ UString StringImp::toString(ExecState*) const {
 }
 
 JSObject* StringImp::toObject(ExecState* exec) const {
-  return new StringInstance(exec->lexicalGlobalObject()->stringPrototype(),
-                            const_cast<StringImp*>(this));
+  return new (exec)
+      StringInstance(exec->lexicalGlobalObject()->stringPrototype(),
+                     const_cast<StringImp*>(this));
 }
 
 // ------------------------------ NumberImp ------------------------------------

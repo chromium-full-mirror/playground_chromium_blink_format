@@ -109,7 +109,7 @@ class Instance : public RefCounted<Instance> {
   static void setCurrentGlobalObject(JSGlobalObject*);
   static JSGlobalObject* currentGlobalObject();
 
-  static JSObject* createRuntimeObject(PassRefPtr<Instance>);
+  static JSObject* createRuntimeObject(ExecState*, PassRefPtr<Instance>);
   static Instance* getInstance(JSObject*, BindingLanguage);
 
   // These functions are called before and after the main entry points into
@@ -143,9 +143,11 @@ class Instance : public RefCounted<Instance> {
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&) {}
 
-  virtual JSValue* defaultValue(JSType hint) const = 0;
+  virtual JSValue* defaultValue(ExecState*, JSType hint) const = 0;
 
-  virtual JSValue* valueOf() const { return jsString(getClass()->name()); }
+  virtual JSValue* valueOf(ExecState* exec) const {
+    return jsString(exec, getClass()->name());
+  }
 
   RootObject* rootObject() const;
 

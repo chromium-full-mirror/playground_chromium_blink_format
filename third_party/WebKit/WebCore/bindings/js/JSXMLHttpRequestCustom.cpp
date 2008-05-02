@@ -85,12 +85,12 @@ JSValue* JSXMLHttpRequest::onreadystatechange(ExecState*) const {
   return jsNull();
 }
 
-void JSXMLHttpRequest::setOnreadystatechange(ExecState*, JSValue* value) {
+void JSXMLHttpRequest::setOnreadystatechange(ExecState* exec, JSValue* value) {
   if (Document* document = impl()->document()) {
     if (Frame* frame = document->frame())
       impl()->setOnReadyStateChangeListener(
-          toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
-                                                                       true));
+          toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
+              exec, value, true));
   }
 }
 
@@ -102,12 +102,12 @@ JSValue* JSXMLHttpRequest::onload(ExecState*) const {
   return jsNull();
 }
 
-void JSXMLHttpRequest::setOnload(ExecState*, JSValue* value) {
+void JSXMLHttpRequest::setOnload(ExecState* exec, JSValue* value) {
   if (Document* document = impl()->document()) {
     if (Frame* frame = document->frame())
       impl()->setOnLoadListener(
-          toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
-                                                                       true));
+          toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
+              exec, value, true));
   }
 }
 
@@ -120,12 +120,12 @@ JSValue* JSXMLHttpRequest::onprogress(ExecState*) const {
   return jsNull();
 }
 
-void JSXMLHttpRequest::setOnprogress(ExecState*, JSValue* value) {
+void JSXMLHttpRequest::setOnprogress(ExecState* exec, JSValue* value) {
   if (Document* document = impl()->document()) {
     if (Frame* frame = document->frame())
       impl()->setOnProgressListener(
-          toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
-                                                                       true));
+          toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
+              exec, value, true));
   }
 }
 
@@ -200,8 +200,8 @@ JSValue* JSXMLHttpRequest::getResponseHeader(ExecState* exec,
     return throwError(exec, SyntaxError, "Not enough arguments");
 
   ExceptionCode ec = 0;
-  JSValue* header =
-      jsStringOrNull(impl()->getResponseHeader(args[0]->toString(exec), ec));
+  JSValue* header = jsStringOrNull(
+      exec, impl()->getResponseHeader(args[0]->toString(exec), ec));
   setDOMException(exec, ec);
   return header;
 }
@@ -222,8 +222,8 @@ JSValue* JSXMLHttpRequest::addEventListener(ExecState* exec, const List& args) {
   if (!frame)
     return jsUndefined();
   JSUnprotectedEventListener* listener =
-      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(args[1],
-                                                                   true);
+      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
+          exec, args[1], true);
   if (!listener)
     return jsUndefined();
   impl()->addEventListener(args[0]->toString(exec), listener,
@@ -240,8 +240,8 @@ JSValue* JSXMLHttpRequest::removeEventListener(ExecState* exec,
   if (!frame)
     return jsUndefined();
   JSUnprotectedEventListener* listener =
-      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(args[1],
-                                                                   true);
+      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
+          exec, args[1], true);
   if (!listener)
     return jsUndefined();
   impl()->removeEventListener(args[0]->toString(exec), listener,

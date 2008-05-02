@@ -48,10 +48,7 @@ namespace KJS {
 
 class JSLock : Noncopyable {
  public:
-  JSLock() {
-    lock();
-    registerThread();
-  }
+  JSLock() { lock(); }
 
   ~JSLock() { unlock(); }
 
@@ -59,8 +56,6 @@ class JSLock : Noncopyable {
   static void unlock();
   static int lockCount();
   static bool currentThreadIsHoldingLock();
-
-  static void registerThread();
 
   class DropAllLocks : Noncopyable {
    public:

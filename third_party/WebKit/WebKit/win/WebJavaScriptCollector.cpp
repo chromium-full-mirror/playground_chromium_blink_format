@@ -101,6 +101,6 @@ HRESULT STDMETHODCALLTYPE WebJavaScriptCollector::objectCount(
     return E_POINTER;
   }
 
-  *count = (UINT)Collector::size();
+  *count = (UINT)Heap::threadHeap()->size();
   return S_OK;
 }

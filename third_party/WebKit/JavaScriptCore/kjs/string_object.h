@@ -32,9 +32,9 @@ namespace KJS {
 
 class StringInstance : public JSWrapperObject {
  public:
-  StringInstance(JSObject* proto);
+  StringInstance(ExecState*, JSObject* proto);
   StringInstance(JSObject* proto, StringImp*);
-  StringInstance(JSObject* proto, const UString&);
+  StringInstance(ExecState*, JSObject* proto, const UString&);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*,
@@ -68,9 +68,10 @@ class StringInstance : public JSWrapperObject {
 // WebCore uses this to make style.filter undetectable
 class StringInstanceThatMasqueradesAsUndefined : public StringInstance {
  public:
-  StringInstanceThatMasqueradesAsUndefined(JSObject* proto,
+  StringInstanceThatMasqueradesAsUndefined(ExecState* exec,
+                                           JSObject* proto,
                                            const UString& string)
-      : StringInstance(proto, string) {}
+      : StringInstance(exec, proto, string) {}
   virtual bool masqueradeAsUndefined() const { return true; }
   virtual bool toBoolean(ExecState*) const { return false; }
 };

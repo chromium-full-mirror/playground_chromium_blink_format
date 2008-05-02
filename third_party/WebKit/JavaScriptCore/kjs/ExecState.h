@@ -58,6 +58,8 @@ struct PerThreadData {
 
   CommonIdentifiers* propertyNames;
   List emptyList;
+
+  Heap* heap;
 };
 
 // Represents the current state of script execution.
@@ -140,6 +142,8 @@ class ExecState : Noncopyable {
   static const HashTable* stringTable(ExecState* exec) {
     return exec->m_perThreadData->stringTable;
   }
+
+  Heap* heap() const { return m_perThreadData->heap; }
 
   LocalStorage& localStorage() { return *m_localStorage; }
   void setLocalStorage(LocalStorage* s) { m_localStorage = s; }

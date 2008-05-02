@@ -47,7 +47,7 @@ bool JSXMLHttpRequestConstructor::implementsConstruct() const {
 JSObject* JSXMLHttpRequestConstructor::construct(ExecState* exec, const List&) {
   RefPtr<XMLHttpRequest> xmlHttpRequest =
       XMLHttpRequest::create(m_document.get());
-  JSXMLHttpRequest* ret = new JSXMLHttpRequest(
+  JSXMLHttpRequest* ret = new (exec) JSXMLHttpRequest(
       JSXMLHttpRequestPrototype::self(exec), xmlHttpRequest.get());
   ScriptInterpreter::putDOMObject(xmlHttpRequest.get(), ret);
   return ret;

@@ -111,10 +111,10 @@ class RegExpObjectImp : public InternalFunctionImp {
   const UString& input() const;
 
  private:
-  JSValue* getBackref(unsigned) const;
-  JSValue* getLastParen() const;
-  JSValue* getLeftContext() const;
-  JSValue* getRightContext() const;
+  JSValue* getBackref(ExecState*, unsigned) const;
+  JSValue* getLastParen(ExecState*) const;
+  JSValue* getLeftContext(ExecState*) const;
+  JSValue* getRightContext(ExecState*) const;
 
   OwnPtr<RegExpObjectImpPrivate> d;
 

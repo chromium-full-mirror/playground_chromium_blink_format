@@ -294,7 +294,7 @@ bool JSRunCheckSyntax(JSRunRef ref) {
 */
 void JSCollect(void) {
   JSLock lock;
-  Collector::collect();
+  getThreadGlobalExecState()->heap()->collect();
 }
 
 /*
@@ -549,7 +549,6 @@ CFMutableArrayRef JSCreateJSArrayFromCFArray(CFArrayRef array) {
 
 void JSLockInterpreter() {
   JSLock::lock();
-  JSLock::registerThread();
 }
 
 void JSUnlockInterpreter() {

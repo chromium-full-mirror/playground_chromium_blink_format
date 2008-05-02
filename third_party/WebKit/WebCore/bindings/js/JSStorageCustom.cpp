@@ -47,7 +47,7 @@ JSValue* JSStorage::nameGetter(ExecState* exec,
                                const Identifier& propertyName,
                                const PropertySlot& slot) {
   JSStorage* thisObj = static_cast<JSStorage*>(slot.slotBase());
-  return jsStringOrNull(thisObj->impl()->getItem(propertyName));
+  return jsStringOrNull(exec, thisObj->impl()->getItem(propertyName));
 }
 
 bool JSStorage::customGetPropertyNames(ExecState* exec,

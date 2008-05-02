@@ -71,16 +71,16 @@ JSObjectRef JSObjectMake(JSContextRef ctx, JSClassRef jsClass, void* data) {
   ExecState* exec = toJS(ctx);
 
   if (!jsClass)
-    return toRef(
-        new JSObject(exec->lexicalGlobalObject()
-                         ->objectPrototype()));  // slightly more efficient
+    return toRef(new (exec) JSObject(
+        exec->lexicalGlobalObject()
+            ->objectPrototype()));  // slightly more efficient
 
   JSValue* jsPrototype = jsClass->prototype(ctx);
   if (!jsPrototype)
     jsPrototype = exec->lexicalGlobalObject()->objectPrototype();
 
   return toRef(
-      new JSCallbackObject<JSObject>(exec, jsClass, jsPrototype, data));
+      new (exec) JSCallbackObject<JSObject>(exec, jsClass, jsPrototype, data));
 }
 
 JSObjectRef JSObjectMakeFunctionWithCallback(
@@ -91,7 +91,7 @@ JSObjectRef JSObjectMakeFunctionWithCallback(
   ExecState* exec = toJS(ctx);
   Identifier nameID = name ? Identifier(toJS(name)) : Identifier("anonymous");
 
-  return toRef(new JSCallbackFunction(exec, callAsFunction, nameID));
+  return toRef(new (exec) JSCallbackFunction(exec, callAsFunction, nameID));
 }
 
 JSObjectRef JSObjectMakeConstructor(
@@ -106,7 +106,7 @@ JSObjectRef JSObjectMakeConstructor(
                              : exec->dynamicGlobalObject()->objectPrototype();
 
   JSCallbackConstructor* constructor =
-      new JSCallbackConstructor(exec, jsClass, callAsConstructor);
+      new (exec) JSCallbackConstructor(exec, jsClass, callAsConstructor);
   constructor->putDirect(exec->propertyNames().prototype, jsPrototype,
                          DontEnum | DontDelete | ReadOnly);
   return toRef(constructor);
@@ -131,8 +131,8 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
 
   List args;
   for (unsigned i = 0; i < parameterCount; i++)
-    args.append(jsString(UString(toJS(parameterNames[i]))));
-  args.append(jsString(UString(bodyRep)));
+    args.append(jsString(exec, UString(toJS(parameterNames[i]))));
+  args.append(jsString(exec, UString(bodyRep)));
 
   JSObject* result =
       exec->dynamicGlobalObject()->functionConstructor()->construct(

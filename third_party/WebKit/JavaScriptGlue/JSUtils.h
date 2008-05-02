@@ -69,6 +69,8 @@ inline void ReleaseCFType(CFTypeRef x) {
     CFRelease(x);
 }
 
+ExecState* getThreadGlobalExecState();
+
 enum { kJSInvalidTypeID = 0, kJSObjectTypeID, kJSRunTypeID };
 
 enum {
