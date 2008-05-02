@@ -94,7 +94,7 @@ JSObject* Instance::createRuntimeObject(ExecState* exec,
 #if PLATFORM(QT)
   if (instance->getBindingLanguage() == QtLanguage)
     return QtInstance::getRuntimeObject(
-        static_cast<QtInstance*>(instance.get()));
+        exec, static_cast<QtInstance*>(instance.get()));
 #endif
   JSLock lock;
 
