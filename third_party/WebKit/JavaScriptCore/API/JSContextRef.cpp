@@ -28,6 +28,7 @@
 #include "JSContextRef.h"
 
 #include "APICast.h"
+#include "InitializeThreading.h"
 #include "JSCallbackObject.h"
 #include "JSClassRef.h"
 #include "JSGlobalObject.h"
@@ -37,6 +38,8 @@
 using namespace KJS;
 
 JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass) {
+  initializeThreading();
+
   JSLock lock;
 
   if (!globalObjectClass) {

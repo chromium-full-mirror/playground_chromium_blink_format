@@ -29,9 +29,10 @@
 
 #include "APICast.h"
 #include <kjs/ExecState.h>
+#include <kjs/InitializeThreading.h>
+#include <kjs/interpreter.h>
 #include <kjs/JSGlobalObject.h>
 #include <kjs/JSLock.h>
-#include <kjs/interpreter.h>
 #include <kjs/object.h>
 
 using namespace KJS;
@@ -89,7 +90,12 @@ bool JSCheckScriptSyntax(JSContextRef ctx,
   return true;
 }
 
-void JSGarbageCollect(JSContextRef) {
+void JSGarbageCollect(JSContextRef ctx) {
+  // Unlikely, but it is legal to call JSGarbageCollect(0) before actually doing
+  // anything that would implicitly call initializeThreading().
+  if (!ctx)
+    initializeThreading();
+
   JSLock lock;
 
   // It might seem that we have a context passed to this function, and can use
