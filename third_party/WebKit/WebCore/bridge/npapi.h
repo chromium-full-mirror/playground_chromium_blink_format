@@ -455,7 +455,7 @@ typedef struct _NPCocoaEvent {
     struct {
       NPBool hasFocus;
     } focus;
-  };
+  } event;
 } NPCocoaEvent;
 
 #endif
