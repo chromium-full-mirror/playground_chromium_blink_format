@@ -304,8 +304,10 @@ void RenderSlider::setValueForPosition(int position) {
   static_cast<HTMLInputElement*>(node())->setValueFromRenderer(
       String::number(val));
 
-  if (position != currentPosition())
+  if (position != currentPosition()) {
     setCurrentPosition(position);
+    static_cast<HTMLInputElement*>(node())->onChange();
+  }
 }
 
 double RenderSlider::setPositionFromValue(bool inLayout) {
