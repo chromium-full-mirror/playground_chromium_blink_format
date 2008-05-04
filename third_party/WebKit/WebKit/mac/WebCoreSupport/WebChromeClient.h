@@ -77,7 +77,7 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void addMessageToConsole(const WebCore::String& message,
                                    unsigned int lineNumber,
-                                   const WebCore::String& sourceID);
+                                   const WebCore::String& sourceURL);
 
   virtual bool canRunBeforeUnloadConfirmPanel();
   virtual bool runBeforeUnloadConfirmPanel(const WebCore::String& message,
