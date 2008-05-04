@@ -42,6 +42,7 @@ CSSImageGeneratorValue::~CSSImageGeneratorValue() {
 
 void CSSImageGeneratorValue::addClient(RenderObject* renderer,
                                        const IntSize& size) {
+  ref();
   if (!size.isEmpty())
     m_sizes.add(size);
   m_clients.add(renderer, size);
@@ -55,6 +56,7 @@ void CSSImageGeneratorValue::removeClient(RenderObject* renderer) {
       delete m_images.take(size);
   }
   m_clients.remove(renderer);
+  deref();
 }
 
 Image* CSSImageGeneratorValue::getImage(RenderObject* renderer,
