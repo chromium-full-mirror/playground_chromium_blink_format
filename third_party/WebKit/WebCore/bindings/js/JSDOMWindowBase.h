@@ -147,9 +147,6 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
     // Attributes
     Crypto,
     Event_,
-    Location_,
-    Navigator_,
-    ClientInformation,
 
     // Event Listeners
     Onabort,
@@ -179,7 +176,6 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
     Onbeforeunload,
 
     // Constructors
-    DOMException,
     Audio,
     Image,
     Option,
