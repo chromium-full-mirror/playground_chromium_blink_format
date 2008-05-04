@@ -27,7 +27,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameTree.h"
-#include "JSDOMWindowWrapper.h"
+#include "JSDOMWindowShell.h"
 #include "Settings.h"
 #include "kjs_proxy.h"
 #include <kjs/object.h>
@@ -247,8 +247,8 @@ JSValue* JSDOMWindow::postMessage(ExecState* exec, const List& args) {
 DOMWindow* toDOMWindow(JSValue* val) {
   if (val->isObject(&JSDOMWindow::s_info))
     return static_cast<JSDOMWindow*>(val)->impl();
-  if (val->isObject(&JSDOMWindowWrapper::s_info))
-    return static_cast<JSDOMWindowWrapper*>(val)->impl();
+  if (val->isObject(&JSDOMWindowShell::s_info))
+    return static_cast<JSDOMWindowShell*>(val)->impl();
   return 0;
 }
 

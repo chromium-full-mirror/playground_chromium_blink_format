@@ -477,7 +477,7 @@ static JSValueRef getResourceDocumentNode(JSContextRef ctx,
     return undefined;
 
   ExecState* exec =
-      toJSDOMWindowWrapper(resource->frame.get())->window()->globalExec();
+      toJSDOMWindowShell(resource->frame.get())->window()->globalExec();
 
   KJS::JSLock lock;
   JSValueRef documentValue =

@@ -95,7 +95,7 @@ JSValue* toJS(ExecState* exec, Document* doc) {
   // with the
   // back/forward cache.
   if (doc->frame())
-    toJSDOMWindowWrapper(doc->frame())
+    toJSDOMWindowShell(doc->frame())
         ->window()
         ->putDirect("document", ret, DontDelete | ReadOnly);
   else {

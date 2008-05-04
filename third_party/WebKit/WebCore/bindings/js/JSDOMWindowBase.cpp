@@ -84,8 +84,8 @@ const int cMaxTimerNestingLevel = 5;
 const double cMinimumTimerInterval = 0.010;
 
 struct JSDOMWindowBasePrivate {
-  JSDOMWindowBasePrivate(JSDOMWindowWrapper* wrapper)
-      : m_evt(0), m_returnValueSlot(0), m_wrapper(wrapper) {}
+  JSDOMWindowBasePrivate(JSDOMWindowShell* shell)
+      : m_evt(0), m_returnValueSlot(0), m_shell(shell) {}
 
   JSDOMWindowBase::ListenersMap jsEventListeners;
   JSDOMWindowBase::ListenersMap jsHTMLEventListeners;
@@ -93,7 +93,7 @@ struct JSDOMWindowBasePrivate {
   JSDOMWindowBase::UnprotectedListenersMap jsUnprotectedHTMLEventListeners;
   Event* m_evt;
   JSValue** m_returnValueSlot;
-  JSDOMWindowWrapper* m_wrapper;
+  JSDOMWindowShell* m_shell;
 
   typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
   TimeoutsMap m_timeouts;
@@ -206,10 +206,10 @@ DontDelete|Function 0
 
 JSDOMWindowBase::JSDOMWindowBase(JSObject* prototype,
                                  DOMWindow* window,
-                                 JSDOMWindowWrapper* wrapper)
-    : JSGlobalObject(prototype, wrapper),
+                                 JSDOMWindowShell* shell)
+    : JSGlobalObject(prototype, shell),
       m_impl(window),
-      d(new JSDOMWindowBasePrivate(wrapper)) {
+      d(new JSDOMWindowBasePrivate(shell)) {
   // Time in milliseconds before the script timeout handler kicks in.
   setTimeoutTime(10000);
 }
@@ -1001,20 +1001,20 @@ Event* JSDOMWindowBase::currentEvent() {
 }
 
 JSObject* JSDOMWindowBase::toThisObject(ExecState*) const {
-  return wrapper();
+  return shell();
 }
 
-JSDOMWindowWrapper* JSDOMWindowBase::wrapper() const {
-  return d->m_wrapper;
+JSDOMWindowShell* JSDOMWindowBase::shell() const {
+  return d->m_shell;
 }
 
 JSValue* windowProtoFuncAToB(ExecState* exec,
                              JSObject* thisObj,
                              const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1046,9 +1046,9 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
                              JSObject* thisObj,
                              const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1079,9 +1079,9 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
                              JSObject* thisObj,
                              const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1165,9 +1165,9 @@ JSValue* windowProtoFuncSetTimeout(ExecState* exec,
                                    JSObject* thisObj,
                                    const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1192,9 +1192,9 @@ JSValue* windowProtoFuncClearTimeout(ExecState* exec,
                                      const List& args) {
   // Also the implementation for window.clearInterval()
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1206,9 +1206,9 @@ JSValue* windowProtoFuncSetInterval(ExecState* exec,
                                     JSObject* thisObj,
                                     const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1232,9 +1232,9 @@ JSValue* windowProtoFuncAddEventListener(ExecState* exec,
                                          JSObject* thisObj,
                                          const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1256,9 +1256,9 @@ JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
                                             JSObject* thisObj,
                                             const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1279,9 +1279,9 @@ JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
                                         JSObject* thisObj,
                                         const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowWrapper*>(thisObj)->window();
+  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1298,7 +1298,7 @@ JSValue* windowProtoFuncNotImplemented(ExecState* exec,
                                        JSObject* thisObj,
                                        const List& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowWrapper::s_info))
+  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
   return jsUndefined();
 }
@@ -1410,7 +1410,7 @@ void JSDOMWindowBase::timerFired(DOMWindowTimer* timer) {
   if (timer->isActive()) {
     int timeoutId = timer->timeoutId();
 
-    timer->action()->execute(wrapper());
+    timer->action()->execute(shell());
     // The DOMWindowTimer object may have been deleted or replaced during
     // execution,
     // so we re-fetch it.
@@ -1432,7 +1432,7 @@ void JSDOMWindowBase::timerFired(DOMWindowTimer* timer) {
   ScheduledAction* action = timer->takeAction();
   d->m_timeouts.remove(timer->timeoutId());
   delete timer;
-  action->execute(wrapper());
+  action->execute(shell());
 
   JSLock lock;
   delete action;
@@ -1472,13 +1472,13 @@ JSValue* toJS(ExecState*, DOMWindow* domWindow) {
   Frame* frame = domWindow->frame();
   if (!frame)
     return jsNull();
-  return frame->scriptProxy()->windowWrapper();
+  return frame->scriptProxy()->windowShell();
 }
 
 JSDOMWindow* toJSDOMWindow(Frame* frame) {
   if (!frame)
     return 0;
-  return frame->scriptProxy()->windowWrapper()->window();
+  return frame->scriptProxy()->windowShell()->window();
 }
 
 JSDOMWindow* asJSDOMWindow(JSGlobalObject* globalObject) {

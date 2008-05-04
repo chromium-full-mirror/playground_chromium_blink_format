@@ -44,8 +44,8 @@ ScheduledAction::ScheduledAction(JSValue* func, const List& args)
     m_args.append(*it);
 }
 
-void ScheduledAction::execute(JSDOMWindowWrapper* windowWrapper) {
-  RefPtr<Frame> frame = windowWrapper->window()->impl()->frame();
+void ScheduledAction::execute(JSDOMWindowShell* windowShell) {
+  RefPtr<Frame> frame = windowShell->window()->impl()->frame();
   if (!frame)
     return;
 
@@ -59,7 +59,7 @@ void ScheduledAction::execute(JSDOMWindowWrapper* windowWrapper) {
   if (JSValue* func = m_func.get()) {
     JSLock lock;
     if (func->isObject() && static_cast<JSObject*>(func)->implementsCall()) {
-      JSDOMWindow* window = windowWrapper->window();
+      JSDOMWindow* window = windowShell->window();
       ExecState* exec = window->globalExec();
 
       List args;
@@ -68,7 +68,7 @@ void ScheduledAction::execute(JSDOMWindowWrapper* windowWrapper) {
         args.append(m_args[i]);
 
       window->startTimeoutCheck();
-      static_cast<JSObject*>(func)->call(exec, windowWrapper, args);
+      static_cast<JSObject*>(func)->call(exec, windowShell, args);
       window->stopTimeoutCheck();
       if (exec->hadException()) {
         JSObject* exception = exec->exception()->toObject(exec);
