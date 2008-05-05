@@ -94,7 +94,8 @@ DEFINE_EVENT_TYPE(wxEVT_WEBVIEW_LOAD)
 wxWebViewLoadEvent::wxWebViewLoadEvent(wxWindow* win) {
   SetEventType(wxEVT_WEBVIEW_LOAD);
   SetEventObject(win);
-  SetId(win->GetId());
+  if (win)
+    SetId(win->GetId());
 }
 
 IMPLEMENT_DYNAMIC_CLASS(wxWebViewBeforeLoadEvent, wxCommandEvent)
@@ -105,7 +106,8 @@ wxWebViewBeforeLoadEvent::wxWebViewBeforeLoadEvent(wxWindow* win) {
   m_cancelled = false;
   SetEventType(wxEVT_WEBVIEW_BEFORE_LOAD);
   SetEventObject(win);
-  SetId(win->GetId());
+  if (win)
+    SetId(win->GetId());
 }
 
 IMPLEMENT_DYNAMIC_CLASS(wxWebViewNewWindowEvent, wxCommandEvent)
@@ -115,7 +117,8 @@ DEFINE_EVENT_TYPE(wxEVT_WEBVIEW_NEW_WINDOW)
 wxWebViewNewWindowEvent::wxWebViewNewWindowEvent(wxWindow* win) {
   SetEventType(wxEVT_WEBVIEW_NEW_WINDOW);
   SetEventObject(win);
-  SetId(win->GetId());
+  if (win)
+    SetId(win->GetId());
 }
 
 IMPLEMENT_DYNAMIC_CLASS(wxWebViewRightClickEvent, wxCommandEvent)
@@ -125,7 +128,8 @@ DEFINE_EVENT_TYPE(wxEVT_WEBVIEW_RIGHT_CLICK)
 wxWebViewRightClickEvent::wxWebViewRightClickEvent(wxWindow* win) {
   SetEventType(wxEVT_WEBVIEW_RIGHT_CLICK);
   SetEventObject(win);
-  SetId(win->GetId());
+  if (win)
+    SetId(win->GetId());
 }
 
 IMPLEMENT_DYNAMIC_CLASS(wxWebViewConsoleMessageEvent, wxCommandEvent)
@@ -135,7 +139,8 @@ DEFINE_EVENT_TYPE(wxEVT_WEBVIEW_CONSOLE_MESSAGE)
 wxWebViewConsoleMessageEvent::wxWebViewConsoleMessageEvent(wxWindow* win) {
   SetEventType(wxEVT_WEBVIEW_CONSOLE_MESSAGE);
   SetEventObject(win);
-  SetId(win->GetId());
+  if (win)
+    SetId(win->GetId());
 }
 
 //---------------------------------------------------------
