@@ -185,6 +185,11 @@ class Settings {
     return m_localStorageDatabasePath;
   }
 
+  void disableRangeMutationForOldAppleMail(bool);
+  bool rangeMutationDisabledForOldAppleMail() const {
+    return m_rangeMutationDisabledForOldAppleMail;
+  }
+
   void setApplicationChromeMode(bool);
   bool inApplicationChromeMode() const { return m_inApplicationChromeMode; }
 
@@ -236,6 +241,7 @@ class Settings {
   bool m_webArchiveDebugModeEnabled : 1;
   bool m_inApplicationChromeMode : 1;
   bool m_offlineWebApplicationCacheEnabled : 1;
+  bool m_rangeMutationDisabledForOldAppleMail : 1;
 };
 
 }  // namespace WebCore
