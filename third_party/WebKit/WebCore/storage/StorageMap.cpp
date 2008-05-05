@@ -111,7 +111,7 @@ PassRefPtr<StorageMap> StorageMap::setItem(const String& key,
     oldValue = String();
   } else {
     oldValue = addResult.first->second;
-    m_map.set(key, value);
+    addResult.first->second = value;
   }
 
   invalidateIterator();
