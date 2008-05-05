@@ -174,20 +174,20 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
     ASSERT(beforeChild->parent());
     ASSERT(beforeChild->parent()->isAnonymousBlock());
 
-    if (newChild->isInline()) {
+    if (newChild->isInline() ||
+        beforeChild->parent()->firstChild() != beforeChild)
       beforeChild->parent()->addChild(newChild, beforeChild);
-      return;
-    } else if (beforeChild->parent()->firstChild() != beforeChild)
-      return beforeChild->parent()->addChild(newChild, beforeChild);
     else
-      return addChildToFlow(newChild, beforeChild->parent());
+      addChildToFlow(newChild, beforeChild->parent());
+
+    return;
   }
 
   // A block has to either have all of its children inline, or all of its
   // children as blocks.
   // So, if our children are currently inline and a block child has to be
   // inserted, we move all our
-  // inline children into anonymous block boxes
+  // inline children into anonymous block boxes.
   if (m_childrenInline && !newChild->isInline() &&
       !newChild->isFloatingOrPositioned()) {
     // This is a block with inline content. Wrap the inline content in anonymous
@@ -200,28 +200,24 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       ASSERT(beforeChild->isAnonymousBlock());
       ASSERT(beforeChild->parent() == this);
     }
-  } else if (!m_childrenInline && !newChild->isFloatingOrPositioned()) {
+  } else if (!m_childrenInline &&
+             (newChild->isFloatingOrPositioned() || newChild->isInline())) {
     // If we're inserting an inline child but all of our children are blocks,
     // then we have to make sure
     // it is put into an anomyous block box. We try to use an existing anonymous
     // box if possible, otherwise
     // a new one is created and inserted into our list of children in the
     // appropriate position.
-    if (newChild->isInline()) {
-      if (beforeChild) {
-        if (beforeChild->previousSibling() &&
-            beforeChild->previousSibling()->isAnonymousBlock()) {
-          beforeChild->previousSibling()->addChild(newChild);
-          return;
-        }
-      } else {
-        if (lastChild() && lastChild()->isAnonymousBlock()) {
-          lastChild()->addChild(newChild);
-          return;
-        }
-      }
+    RenderObject* afterChild =
+        beforeChild ? beforeChild->previousSibling() : lastChild();
 
-      // no suitable existing anonymous box - create a new one
+    if (afterChild && afterChild->isAnonymousBlock()) {
+      afterChild->addChild(newChild);
+      return;
+    }
+
+    if (newChild->isInline()) {
+      // No suitable existing anonymous box - create a new one.
       RenderBlock* newBox = createAnonymousBlock();
       RenderContainer::addChild(newBox, beforeChild);
       newBox->addChild(newChild);
