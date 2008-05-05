@@ -1170,6 +1170,7 @@ enum EAppearance {
   SquareButtonAppearance,
   ButtonAppearance,
   ButtonBevelAppearance,
+  DefaultButtonAppearance,
   ListboxAppearance,
   ListItemAppearance,
   MediaFullscreenButtonAppearance,

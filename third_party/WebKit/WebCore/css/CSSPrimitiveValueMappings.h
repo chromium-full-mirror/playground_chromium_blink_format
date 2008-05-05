@@ -185,6 +185,9 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(EAppearance e) : m_type(CSS_IDENT) {
     case ButtonBevelAppearance:
       m_value.ident = CSSValueButtonBevel;
       break;
+    case DefaultButtonAppearance:
+      m_value.ident = CSSValueDefaultButton;
+      break;
     case ListboxAppearance:
       m_value.ident = CSSValueListbox;
       break;

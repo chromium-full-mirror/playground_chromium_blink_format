@@ -185,6 +185,9 @@ class Settings {
     return m_localStorageDatabasePath;
   }
 
+  void setApplicationChromeMode(bool);
+  bool inApplicationChromeMode() const { return m_inApplicationChromeMode; }
+
   void setOfflineWebApplicationCacheEnabled(bool);
   bool offlineWebApplicationCacheEnabled() const {
     return m_offlineWebApplicationCacheEnabled;
@@ -231,6 +234,7 @@ class Settings {
   bool m_needsSiteSpecificQuirks : 1;
   unsigned m_fontRenderingMode : 1;
   bool m_webArchiveDebugModeEnabled : 1;
+  bool m_inApplicationChromeMode : 1;
   bool m_offlineWebApplicationCacheEnabled : 1;
 };
 

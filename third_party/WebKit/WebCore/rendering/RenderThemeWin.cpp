@@ -182,6 +182,7 @@ Color RenderThemeWin::platformInactiveSelectionForegroundColor() const {
 bool RenderThemeWin::supportsFocus(EAppearance appearance) {
   switch (appearance) {
     case PushButtonAppearance:
+    case DefaultButtonAppearance:
     case ButtonAppearance:
     case TextFieldAppearance:
     case TextAreaAppearance:

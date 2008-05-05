@@ -292,6 +292,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setAuthorAndUserStylesEnabled(BOOL);
   virtual HRESULT STDMETHODCALLTYPE authorAndUserStylesEnabled(BOOL*);
 
+  virtual HRESULT STDMETHODCALLTYPE inApplicationChromeMode(
+      /* [retval][out] */ BOOL* enabled);
+
+  virtual HRESULT STDMETHODCALLTYPE setApplicationChromeMode(
+      /* [in] */ BOOL enabled);
+
   // WebPreferences
 
   // This method accesses a different preference key than
