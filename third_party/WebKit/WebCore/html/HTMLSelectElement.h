@@ -123,6 +123,7 @@ class HTMLSelectElement : public HTMLFormControlElementWithState {
 
   virtual void defaultEventHandler(Event*);
   virtual void accessKeyAction(bool sendToAnyElement);
+  void accessKeySetSelectedIndex(int);
 
   void setMultiple(bool);
 

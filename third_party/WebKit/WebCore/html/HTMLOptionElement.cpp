@@ -120,10 +120,16 @@ void HTMLOptionElement::setText(const String& text, ExceptionCode& ec) {
   appendChild(new Text(document(), text), ec);
 }
 
+void HTMLOptionElement::accessKeyAction(bool sendToAnyElement) {
+  HTMLSelectElement* select = ownerSelectElement();
+  if (select)
+    select->accessKeySetSelectedIndex(index());
+}
+
 int HTMLOptionElement::index() const {
   // Let's do this dynamically. Might be a bit slow, but we're sure
   // we won't forget to update a member variable in some cases...
-  HTMLSelectElement* select = getSelect();
+  HTMLSelectElement* select = ownerSelectElement();
   if (select) {
     const Vector<HTMLElement*>& items = select->listItems();
     int l = items.size();
@@ -162,7 +168,7 @@ void HTMLOptionElement::setValue(const String& value) {
 void HTMLOptionElement::setSelected(bool selected) {
   if (m_selected == selected)
     return;
-  if (HTMLSelectElement* select = getSelect())
+  if (HTMLSelectElement* select = ownerSelectElement())
     select->setSelectedIndex(selected ? index() : -1, false);
   m_selected = selected;
 }
@@ -178,17 +184,21 @@ void HTMLOptionElement::childrenChanged(bool changedByParser,
                                         Node* beforeChange,
                                         Node* afterChange,
                                         int childCountDelta) {
-  HTMLSelectElement* select = getSelect();
+  HTMLSelectElement* select = ownerSelectElement();
   if (select)
     select->childrenChanged(changedByParser);
   HTMLGenericFormElement::childrenChanged(changedByParser, beforeChange,
                                           afterChange, childCountDelta);
 }
 
-HTMLSelectElement* HTMLOptionElement::getSelect() const {
+HTMLSelectElement* HTMLOptionElement::ownerSelectElement() const {
   Node* select = parentNode();
   while (select && !select->hasTagName(selectTag))
     select = select->parentNode();
+
+  if (!select)
+    return 0;
+
   return static_cast<HTMLSelectElement*>(select);
 }
 
@@ -232,7 +242,7 @@ bool HTMLOptionElement::disabled() const {
 
 void HTMLOptionElement::insertedIntoDocument() {
   HTMLSelectElement* select;
-  if (selected() && (select = getSelect()))
+  if (selected() && (select = ownerSelectElement()))
     select->scrollToSelection();
 
   HTMLGenericFormElement::insertedIntoDocument();

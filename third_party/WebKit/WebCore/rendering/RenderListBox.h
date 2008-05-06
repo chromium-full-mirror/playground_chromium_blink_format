@@ -78,8 +78,10 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   void setOptionsChanged(bool changed) { m_optionsChanged = changed; }
 
   int listIndexAtOffset(int x, int y);
+  IntRect itemBoundingBoxRect(int tx, int ty, int index);
 
   bool scrollToRevealElementAtListIndex(int index);
+  bool listIndexIsVisible(int index);
 
   virtual bool shouldAutoscroll() const { return true; }
   virtual void autoscroll();
@@ -105,11 +107,9 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   int numVisibleItems() const;
   int numItems() const;
   int listHeight() const;
-  IntRect itemBoundingBoxRect(int tx, int ty, int index);
   void paintScrollbar(PaintInfo&);
   void paintItemForeground(PaintInfo&, int tx, int ty, int listIndex);
   void paintItemBackground(PaintInfo&, int tx, int ty, int listIndex);
-  bool listIndexIsVisible(int index);
   void scrollToRevealSelection();
 
   bool m_optionsChanged;

@@ -65,7 +65,7 @@ class HTMLOptionElement : public HTMLGenericFormElement {
   void setSelected(bool);
   void setSelectedState(bool);
 
-  HTMLSelectElement* getSelect() const;
+  HTMLSelectElement* ownerSelectElement() const;
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
@@ -83,6 +83,7 @@ class HTMLOptionElement : public HTMLGenericFormElement {
   virtual bool disabled() const;
 
   virtual void insertedIntoDocument();
+  virtual void accessKeyAction(bool);
 
  private:
   String m_value;

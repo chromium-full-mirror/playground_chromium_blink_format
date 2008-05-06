@@ -28,6 +28,8 @@
 
 namespace WebCore {
 
+class HTMLSelectElement;
+
 class HTMLOptGroupElement : public HTMLGenericFormElement {
  public:
   HTMLOptGroupElement(Document*, HTMLFormElement* = 0);
@@ -60,6 +62,8 @@ class HTMLOptGroupElement : public HTMLGenericFormElement {
   void setLabel(const String&);
 
   String groupLabelText() const;
+  HTMLSelectElement* ownerSelectElement() const;
+  virtual void accessKeyAction(bool sendToAnyElement);
 
  private:
   void recalcSelectOptions();

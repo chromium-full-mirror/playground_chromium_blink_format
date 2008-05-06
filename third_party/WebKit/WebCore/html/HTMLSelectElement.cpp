@@ -25,6 +25,7 @@
 #include "config.h"
 #include "HTMLSelectElement.h"
 
+#include "AXObjectCache.h"
 #include "CSSPropertyNames.h"
 #include "CSSStyleSelector.h"
 #include "CharacterNames.h"
@@ -534,6 +535,9 @@ void HTMLSelectElement::childrenChanged(bool changedByParser,
   setRecalcListItems();
   HTMLFormControlElementWithState::childrenChanged(
       changedByParser, beforeChange, afterChange, childCountDelta);
+
+  if (AXObjectCache::accessibilityEnabled() && renderer())
+    renderer()->document()->axObjectCache()->childrenChanged(renderer());
 }
 
 void HTMLSelectElement::setRecalcListItems() {
@@ -1044,6 +1048,26 @@ int HTMLSelectElement::previousSelectableListIndex(int startIndex) {
 void HTMLSelectElement::accessKeyAction(bool sendToAnyElement) {
   focus();
   dispatchSimulatedClick(0, sendToAnyElement);
+}
+
+void HTMLSelectElement::accessKeySetSelectedIndex(int index) {
+  // first bring into focus the list box
+  if (!focused())
+    accessKeyAction(false);
+
+  // if this index is already selected, unselect. otherwise update the selected
+  // index
+  Node* listNode = item(index);
+  if (listNode && listNode->hasTagName(optionTag)) {
+    HTMLOptionElement* listElement = static_cast<HTMLOptionElement*>(listNode);
+    if (listElement->selected())
+      listElement->setSelectedState(false);
+    else
+      setSelectedIndex(index, false, true);
+  }
+
+  listBoxOnChange();
+  scrollToSelection();
 }
 
 void HTMLSelectElement::setMultiple(bool multiple) {
