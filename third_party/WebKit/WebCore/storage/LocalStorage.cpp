@@ -96,7 +96,7 @@ String LocalStorage::fullDatabaseFilename(SecurityOrigin* origin) {
   }
 
   return pathByAppendingComponent(
-      m_path, origin->databaseIdentifier() + ".LocalStorage");
+      m_path, origin->databaseIdentifier() + ".localstorage");
 }
 
 void LocalStorage::performImport() {
