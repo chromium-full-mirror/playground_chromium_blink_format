@@ -276,9 +276,6 @@ void ApplicationCacheGroup::setNewestCache(
   m_newestCache = newestCache;
   m_caches.add(m_newestCache.get());
   m_newestCache->setGroup(this);
-
-  // Store the cache
-  cacheStorage().storeNewestCache(this);
 }
 
 void ApplicationCacheGroup::update(Frame* frame) {
@@ -553,6 +550,9 @@ void ApplicationCacheGroup::checkIfLoadIsComplete() {
   }
 
   setNewestCache(m_cacheBeingUpdated.release());
+
+  // Store the cache
+  cacheStorage().storeNewestCache(this);
 
   callListeners(isUpgradeAttempt ? &DOMApplicationCache::callUpdateReadyListener
                                  : &DOMApplicationCache::callCachedListener,
