@@ -50,6 +50,9 @@ class FloatRect;
 class Frame;
 class History;
 class Location;
+#if ENABLE(CROSS_DOCUMENT_MESSAGING)
+class PostMessageTimer;
+#endif
 class Navigator;
 class Screen;
 
@@ -193,11 +196,13 @@ class DOMWindow : public RefCounted<DOMWindow> {
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   DOMApplicationCache* applicationCache() const;
 #endif
+
 #if ENABLE(CROSS_DOCUMENT_MESSAGING)
   void postMessage(const String& message,
                    const String& targetOrigin,
                    DOMWindow* source,
-                   ExceptionCode& ecForSender) const;
+                   ExceptionCode&);
+  void postMessageTimerFired(PostMessageTimer*);
 #endif
 
   void scrollBy(int x, int y) const;
