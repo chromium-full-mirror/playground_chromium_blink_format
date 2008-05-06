@@ -141,4 +141,15 @@ PassRefPtr<StorageMap> StorageMap::removeItem(const String& key,
 bool StorageMap::contains(const String& key) const {
   return m_map.contains(key);
 }
+
+void StorageMap::importItem(const String& key, const String& value) const {
+  // Be sure to copy the keys/values as items imported on a background thread
+  // are destined
+  // to cross a thread boundary
+  pair<HashMap<String, String>::iterator, bool> result =
+      m_map.add(key.copy(), String());
+
+  if (result.second)
+    result.first->second = value.copy();
+}
 }

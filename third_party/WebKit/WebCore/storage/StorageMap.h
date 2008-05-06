@@ -49,6 +49,8 @@ class StorageMap : public RefCounted<StorageMap> {
 
   bool contains(const String& key) const;
 
+  void importItem(const String& key, const String& value) const;
+
  private:
   StorageMap();
   PassRefPtr<StorageMap> copy();
