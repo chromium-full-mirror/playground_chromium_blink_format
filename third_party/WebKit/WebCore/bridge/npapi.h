@@ -423,6 +423,7 @@ typedef enum {
 
 typedef struct _NPNSString NPNSString;
 typedef struct _NPNSWindow NPNSWindow;
+typedef struct _NPNSMenu NPNSMenu;
 
 typedef struct _NPCocoaEvent {
   NPCocoaEventType type;
@@ -492,6 +493,12 @@ typedef struct _NPPrint {
     NPEmbedPrint embedPrint; /* if mode is NP_EMBED */
   } print;
 } NPPrint;
+
+#ifdef XP_MACOSX
+typedef NPNSMenu NPMenu;
+#else
+typedef void* NPMenu;
+#endif
 
 #if defined(XP_MAC) || defined(XP_MACOSX)
 
@@ -802,6 +809,7 @@ uint32 NPN_ScheduleTimer(NPP instance,
                          NPBool repeat,
                          void (*timerFunc)(NPP npp, uint32 timerID));
 void NPN_UnscheduleTimer(NPP instance, uint32 timerID);
+NPError NPN_PopUpContextMenu(NPP instance, NPMenu* menu);
 
 #ifdef __cplusplus
 } /* end extern "C" */
