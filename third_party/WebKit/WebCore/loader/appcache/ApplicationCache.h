@@ -70,6 +70,7 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   void removeDynamicEntry(const String& url);
 
   void setOnlineWhitelist(const HashSet<String>& onlineWhitelist);
+  const HashSet<String>& onlineWhitelist() const { return m_onlineWhitelist; }
   bool isURLInOnlineWhitelist(const KURL&);
 
 #ifndef NDEBUG
@@ -79,6 +80,9 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   typedef HashMap<String, RefPtr<ApplicationCacheResource>> ResourceMap;
   ResourceMap::const_iterator begin() const { return m_resources.begin(); }
   ResourceMap::const_iterator end() const { return m_resources.end(); }
+
+  void setStorageID(unsigned storageID) { m_storageID = storageID; }
+  unsigned storageID() const { return m_storageID; }
 
   static bool requestIsHTTPOrHTTPSGet(const ResourceRequest&);
 
@@ -90,6 +94,8 @@ class ApplicationCache : public RefCounted<ApplicationCache> {
   ApplicationCacheResource* m_manifest;
 
   HashSet<String> m_onlineWhitelist;
+
+  unsigned m_storageID;
 };
 
 }  // namespace WebCore

@@ -48,7 +48,8 @@ ApplicationCacheGroup::ApplicationCacheGroup(const KURL& manifestURL)
     : m_manifestURL(manifestURL),
       m_status(Idle),
       m_newestCache(0),
-      m_frame(0) {}
+      m_frame(0),
+      m_storageID(0) {}
 
 ApplicationCacheGroup::~ApplicationCacheGroup() {
   ASSERT(!m_newestCache);
@@ -275,6 +276,9 @@ void ApplicationCacheGroup::setNewestCache(
   m_newestCache = newestCache;
   m_caches.add(m_newestCache.get());
   m_newestCache->setGroup(this);
+
+  // Store the cache
+  cacheStorage().storeNewestCache(this);
 }
 
 void ApplicationCacheGroup::update(Frame* frame) {

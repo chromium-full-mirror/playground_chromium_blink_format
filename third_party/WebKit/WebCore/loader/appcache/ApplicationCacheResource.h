@@ -53,7 +53,10 @@ class ApplicationCacheResource : public SubstituteResource {
   }
 
   unsigned type() const { return m_type; }
-  void addType(unsigned type) { m_type |= type; }
+  void addType(unsigned type);
+
+  void setStorageID(unsigned storageID) { m_storageID = storageID; }
+  unsigned storageID() const { return m_storageID; }
 
 #ifndef NDEBUG
   static void dumpType(unsigned type);
@@ -66,6 +69,7 @@ class ApplicationCacheResource : public SubstituteResource {
                            PassRefPtr<SharedBuffer> buffer);
 
   unsigned m_type;
+  unsigned m_storageID;
 };
 
 }  // namespace WebCore

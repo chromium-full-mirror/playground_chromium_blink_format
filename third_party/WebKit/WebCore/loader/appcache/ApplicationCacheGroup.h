@@ -63,6 +63,9 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   const KURL& manifestURL() const { return m_manifestURL; }
   Status status() const { return m_status; }
 
+  void setStorageID(unsigned storageID) { m_storageID = storageID; }
+  unsigned storageID() const { return m_storageID; }
+
   void update(Frame*);
   void cacheDestroyed(ApplicationCache*);
 
@@ -127,6 +130,8 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
 
   // Frame used for fetching resources when updating
   Frame* m_frame;
+
+  unsigned m_storageID;
 
   RefPtr<ResourceHandle> m_currentHandle;
   RefPtr<ApplicationCacheResource> m_currentResource;
