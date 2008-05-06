@@ -69,6 +69,7 @@
                           timerFunc:
                               (void (*)(NPP npp, uint32 timerID))timerFunc;
 - (void)unscheduleTimer:(uint32)timerID;
+- (NPError)popUpContextMenu:(NPMenu*)menu;
 
 @end
 #endif
