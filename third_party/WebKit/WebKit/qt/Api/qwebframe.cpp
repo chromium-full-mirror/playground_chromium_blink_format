@@ -963,7 +963,7 @@ QWebHitTestResult::~QWebHitTestResult() {
     Returns true if the hit test result is null; otherwise returns false.
 */
 bool QWebHitTestResult::isNull() const {
-  return d;
+  return !d;
 }
 
 /*!
