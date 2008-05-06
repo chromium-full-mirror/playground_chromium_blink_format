@@ -41,6 +41,9 @@ class LocalStorageArea : public StorageArea {
     return adoptRef(new LocalStorageArea(origin, localStorage));
   }
 
+  void performImport();
+  void performSync();
+
  private:
   LocalStorageArea(SecurityOrigin*, LocalStorage*);
 
