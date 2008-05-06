@@ -106,4 +106,8 @@ void StorageArea::internalClear(Frame* frame) {
 bool StorageArea::internalContains(const String& key) const {
   return m_storageMap->contains(key);
 }
+
+void StorageArea::importItem(const String& key, const String& value) {
+  m_storageMap->importItem(key, value);
+}
 }

@@ -82,6 +82,10 @@ class StorageArea : public RefCounted<StorageArea> {
   void internalClear(Frame* sourceFrame);
   bool internalContains(const String& key) const;
 
+  // This is meant to be called from a background thread for LocalStorageArea's
+  // background thread import procedure.
+  void importItem(const String& key, const String& value);
+
  private:
   virtual void itemChanged(const String& key,
                            const String& oldValue,
