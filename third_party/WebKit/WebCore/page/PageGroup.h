@@ -42,6 +42,7 @@ class PageGroup : Noncopyable {
   PageGroup(Page*);
 
   static PageGroup* pageGroup(const String& groupName);
+  static void closeLocalStorage();
 
   const HashSet<Page*>& pages() const { return m_pages; }
 

@@ -45,6 +45,8 @@ class LocalStorage : public RefCounted<LocalStorage> {
 
   PassRefPtr<StorageArea> storageArea(Frame* sourceFrame, SecurityOrigin*);
 
+  void close();
+
  private:
   LocalStorage(PageGroup*, const String& path);
 
