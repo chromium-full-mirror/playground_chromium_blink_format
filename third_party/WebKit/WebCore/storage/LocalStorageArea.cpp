@@ -52,6 +52,7 @@ LocalStorageArea::LocalStorageArea(SecurityOrigin* origin,
     : StorageArea(origin),
       m_syncTimer(this, &LocalStorageArea::syncTimerFired),
       m_itemsCleared(false),
+      m_finalSyncScheduled(false),
       m_localStorage(localStorage),
       m_clearItemsWhileSyncing(false),
       m_syncScheduled(false),
@@ -59,6 +60,16 @@ LocalStorageArea::LocalStorageArea(SecurityOrigin* origin,
   ASSERT(m_localStorage);
 
   m_localStorage->scheduleImport(this);
+}
+
+LocalStorageArea::~LocalStorageArea() {
+  ASSERT(!m_syncTimer.isActive());
+}
+
+void LocalStorageArea::scheduleFinalSync() {
+  m_syncTimer.stop();
+  syncTimerFired(&m_syncTimer);
+  m_finalSyncScheduled = true;
 }
 
 unsigned LocalStorageArea::length() const {
@@ -226,6 +237,7 @@ void LocalStorageArea::dispatchStorageEvent(const String& key,
 void LocalStorageArea::scheduleItemForSync(const String& key,
                                            const String& value) {
   ASSERT(isMainThread());
+  ASSERT(!m_finalSyncScheduled);
 
   m_changedItems.set(key, value);
   if (!m_syncTimer.isActive())
@@ -234,6 +246,7 @@ void LocalStorageArea::scheduleItemForSync(const String& key,
 
 void LocalStorageArea::scheduleClear() {
   ASSERT(isMainThread());
+  ASSERT(!m_finalSyncScheduled);
 
   m_changedItems.clear();
   m_itemsCleared = true;

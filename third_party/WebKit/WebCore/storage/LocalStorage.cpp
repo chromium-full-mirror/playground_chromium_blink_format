@@ -65,7 +65,7 @@ PassRefPtr<StorageArea> LocalStorage::storageArea(Frame* sourceFrame,
   // need to
   // sync its existance and quota out to disk via an task of type AreaSync
 
-  RefPtr<StorageArea> storageArea;
+  RefPtr<LocalStorageArea> storageArea;
   if (storageArea = m_storageAreaMap.get(origin))
     return storageArea.release();
 
@@ -113,6 +113,11 @@ void LocalStorage::performSync() {
 
 void LocalStorage::close() {
   ASSERT(isMainThread());
+
+  LocalStorageAreaMap::iterator end = m_storageAreaMap.end();
+  for (LocalStorageAreaMap::iterator it = m_storageAreaMap.begin(); it != end;
+       ++it)
+    it->second->scheduleFinalSync();
 
   if (m_thread) {
     m_thread->terminate();

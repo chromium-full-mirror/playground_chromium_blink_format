@@ -57,10 +57,10 @@ class LocalStorage : public ThreadSafeShared<LocalStorage> {
   LocalStorage(PageGroup*, const String& path);
 
   typedef HashMap<RefPtr<SecurityOrigin>,
-                  RefPtr<StorageArea>,
+                  RefPtr<LocalStorageArea>,
                   SecurityOriginHash>
-      StorageAreaMap;
-  StorageAreaMap m_storageAreaMap;
+      LocalStorageAreaMap;
+  LocalStorageAreaMap m_storageAreaMap;
 
   PageGroup* m_group;
   RefPtr<LocalStorageThread> m_thread;
