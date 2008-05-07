@@ -159,6 +159,9 @@ ApplicationCacheGroup* ApplicationCacheStorage::cacheGroupForURL(
     }
   }
 
+  if (!m_database.isOpen())
+    return 0;
+
   // Check the database. Look for all cache groups with a newest cache.
   SQLiteStatement statement(m_database,
                             "SELECT id, manifestURL, newestCache FROM "
@@ -508,8 +511,12 @@ PassRefPtr<ApplicationCache> ApplicationCacheStorage::loadCache(
       "CacheResources ON CacheEntries.resource=CacheResources.id "
       "INNER JOIN CacheResourceData ON "
       "CacheResourceData.id=CacheResources.data WHERE CacheEntries.cache=?");
-  if (cacheStatement.prepare() != SQLResultOk)
+  if (cacheStatement.prepare() != SQLResultOk) {
+    LOG_ERROR("Could not prepare cache statement, error \"%s\"",
+              m_database.lastErrorMsg());
     return 0;
+  }
+
   cacheStatement.bindInt64(1, storageID);
 
   RefPtr<ApplicationCache> cache = ApplicationCache::create();
