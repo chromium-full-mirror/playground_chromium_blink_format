@@ -79,6 +79,7 @@ PageGroup* PageGroup::pageGroup(const String& groupName) {
 }
 
 void PageGroup::closeLocalStorage() {
+#if ENABLE(DOM_STORAGE)
   if (!pageGroups)
     return;
 
@@ -88,6 +89,7 @@ void PageGroup::closeLocalStorage() {
     if (LocalStorage* localStorage = it->second->localStorage())
       localStorage->close();
   }
+#endif
 }
 
 void PageGroup::addPage(Page* page) {
