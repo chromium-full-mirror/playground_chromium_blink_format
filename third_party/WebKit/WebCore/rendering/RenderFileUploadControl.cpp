@@ -279,6 +279,17 @@ void RenderFileUploadControl::receiveDroppedFile(const String& filename) {
   m_fileChooser->chooseFile(filename);
 }
 
+String RenderFileUploadControl::buttonValue() {
+  if (!m_button)
+    return String();
+
+  return m_button->value();
+}
+
+String RenderFileUploadControl::fileTextValue() {
+  return m_fileChooser->basenameForWidth(style()->font(), maxFilenameWidth());
+}
+
 HTMLFileUploadInnerButtonElement::HTMLFileUploadInnerButtonElement(
     Document* doc,
     Node* shadowParent)
