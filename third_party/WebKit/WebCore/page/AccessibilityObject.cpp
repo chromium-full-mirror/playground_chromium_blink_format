@@ -140,7 +140,19 @@ String AccessibilityObject::stringValue() const {
   return String();
 }
 
+String AccessibilityObject::ariaAccessiblityName(const String&) const {
+  return String();
+}
+
+String AccessibilityObject::ariaLabeledByAttribute() const {
+  return String();
+}
+
 String AccessibilityObject::title() const {
+  return String();
+}
+
+String AccessibilityObject::ariaDescribedByAttribute() const {
   return String();
 }
 
