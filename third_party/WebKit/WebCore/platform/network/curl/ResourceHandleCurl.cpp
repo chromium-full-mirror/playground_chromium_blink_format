@@ -89,8 +89,6 @@ ResourceHandleInternal::~ResourceHandleInternal() {
   free(m_url);
   if (m_customHeaders)
     curl_slist_free_all(m_customHeaders);
-  if (m_file)
-    fclose(m_file);
 }
 
 ResourceHandle::~ResourceHandle() {

@@ -43,6 +43,7 @@
 
 #if USE(CURL)
 #include <curl/curl.h>
+#include "FormDataStreamCurl.h"
 #endif
 
 #if USE(SOUP)
@@ -111,9 +112,7 @@ class ResourceHandleInternal : Noncopyable {
         m_url(0),
         m_customHeaders(0),
         m_cancelled(false),
-        m_file(0),
-        m_formDataElementIndex(0),
-        m_formDataElementDataOffset(0)
+        m_formDataStream(loader)
 #endif
 #if USE(SOUP)
         ,
@@ -185,9 +184,7 @@ class ResourceHandleInternal : Noncopyable {
   ResourceResponse m_response;
   bool m_cancelled;
 
-  FILE* m_file;
-  size_t m_formDataElementIndex;
-  size_t m_formDataElementDataOffset;
+  FormDataStream m_formDataStream;
   Vector<char> m_postBytes;
 #endif
 #if USE(SOUP)
