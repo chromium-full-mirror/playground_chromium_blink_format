@@ -380,6 +380,9 @@ class RenderObject : public CachedResourceClient {
            m_needsPositionedMovementLayout;
   }
   bool selfNeedsLayout() const { return m_needsLayout; }
+  bool needsPositionedMovementLayout() const {
+    return m_needsPositionedMovementLayout;
+  }
   bool needsPositionedMovementLayoutOnly() const {
     return m_needsPositionedMovementLayout && !m_needsLayout &&
            !m_normalChildNeedsLayout && !m_posChildNeedsLayout;
