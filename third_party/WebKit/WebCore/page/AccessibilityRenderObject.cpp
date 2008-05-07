@@ -1023,6 +1023,14 @@ RenderObject* AccessibilityRenderObject::topRenderer() const {
   return m_renderer->document()->topDocument()->renderer();
 }
 
+Document* AccessibilityRenderObject::document() const {
+  return m_renderer->document();
+}
+
+FrameView* AccessibilityRenderObject::topDocumentFrameView() const {
+  return topRenderer()->view()->frameView();
+}
+
 Widget* AccessibilityRenderObject::widget() const {
   if (!m_renderer->isWidget())
     return 0;
@@ -1050,6 +1058,14 @@ void AccessibilityRenderObject::getDocumentLinks(
     }
     curr = coll->nextItem();
   }
+}
+
+FrameView* AccessibilityRenderObject::documentFrameView() const {
+  if (!m_renderer || !m_renderer->document())
+    return 0;
+
+  // this is the RenderObject's Document's Frame's FrameView
+  return m_renderer->document()->view();
 }
 
 Widget* AccessibilityRenderObject::widgetForAttachmentView() const {

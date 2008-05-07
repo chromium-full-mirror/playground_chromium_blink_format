@@ -175,4 +175,8 @@ void AXObjectCache::childrenChanged(RenderObject* renderer) {
     obj->childrenChanged();
 }
 
+void AXObjectCache::selectedChildrenChanged(RenderObject* renderer) {
+  postNotificationToElement(renderer, "AXSelectedChildrenChanged");
+}
+
 }  // namespace WebCore
