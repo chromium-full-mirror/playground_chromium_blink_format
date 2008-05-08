@@ -358,7 +358,7 @@ void DOMWindow::postMessage(const String& message,
 
   // Schedule the message.
   PostMessageTimer* timer = new PostMessageTimer(
-      this, new MessageEvent(message, sourceOrigin, source), target.get());
+      this, new MessageEvent(message, sourceOrigin, "", source), target.get());
   timer->startOneShot(0);
 }
 
