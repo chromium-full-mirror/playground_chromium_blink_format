@@ -455,6 +455,9 @@ String Frame::searchForLabelsBeforeElement(const Vector<String>& labels,
 String Frame::matchLabelsAgainstElement(const Vector<String>& labels,
                                         Element* element) {
   String name = element->getAttribute(nameAttr);
+  if (name.isEmpty())
+    return String();
+
   // Make numbers and _'s in field names behave like word boundaries, e.g.,
   // "address2"
   replace(name, RegularExpression("\\d"), " ");
