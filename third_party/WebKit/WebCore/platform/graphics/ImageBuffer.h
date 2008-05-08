@@ -77,7 +77,7 @@ class ImageBuffer : Noncopyable {
   cairo_surface_t* surface() const;
 #endif
 
-#if PLATFORM(CG) || PLATFORM(CAIRO)
+#if PLATFORM(CG) || PLATFORM(CAIRO) || PLATFORM(QT)
   Image* image() const;
 #else
   Image* image() const {
