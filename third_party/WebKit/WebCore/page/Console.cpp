@@ -127,14 +127,14 @@ void Console::log(ExecState* exec, const List& arguments) {
       JSMessageSource, LogMessageLevel, exec, arguments, 0, url);
 }
 
-void Console::profile(const String& /*title*/) const {
+void Console::profile(const String& title) const {
   // FIXME: Figure out something to do with the title passed in so that it can
   // be displayed by the inspector.
   Page* page = m_frame->page();
   if (!page)
     return;
 
-  Profiler::profiler()->startProfiling(page->group().identifier());
+  Profiler::profiler()->startProfiling(page->group().identifier(), title);
 }
 
 void Console::profileEnd() const {
