@@ -29,10 +29,11 @@
 #include "config.h"
 #include "Profiler.h"
 
-#include "FunctionCallProfile.h"
-#include "JSGlobalObject.h"
 #include "ExecState.h"
 #include "function.h"
+#include "FunctionCallProfile.h"
+#include "JSGlobalObject.h"
+#include "Profile.h"
 
 #include <stdio.h>
 
@@ -55,21 +56,25 @@ Profiler* Profiler::profiler() {
   return sharedProfiler;
 }
 
-void Profiler::startProfiling(unsigned pageGroupIdentifier) {
+void Profiler::startProfiling(unsigned pageGroupIdentifier,
+                              const UString& title) {
   if (m_profiling)
     return;
 
   m_pageGroupIdentifier = pageGroupIdentifier;
 
-  // FIXME: When multi-threading is supported this will be a vector and calls
-  // into the profiler will need to know which thread it is executing on.
-  m_callTree.set(new FunctionCallProfile("Thread_1"));
+  m_currentProfile.set(new Profile(title));
   m_profiling = true;
 }
 
 void Profiler::stopProfiling() {
   m_profiling = false;
-  m_callTree->stopProfiling();
+
+  if (!m_currentProfile)
+    return;
+
+  m_currentProfile->stopProfiling();
+  m_allProfiles.append(m_currentProfile.release());
 }
 
 void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
@@ -80,7 +85,7 @@ void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
 
   Vector<UString> callStackNames;
   getStackNames(callStackNames, exec, calledFunction);
-  insertStackNamesInTree(callStackNames);
+  m_currentProfile->willExecute(callStackNames);
 }
 
 void Profiler::willExecute(ExecState* exec,
@@ -93,7 +98,7 @@ void Profiler::willExecute(ExecState* exec,
 
   Vector<UString> callStackNames;
   getStackNames(callStackNames, exec, sourceURL, startingLineNumber);
-  insertStackNamesInTree(callStackNames);
+  m_currentProfile->willExecute(callStackNames);
 }
 
 void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
@@ -104,7 +109,7 @@ void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
 
   Vector<UString> callStackNames;
   getStackNames(callStackNames, exec, calledFunction);
-  m_callTree->didExecute(callStackNames, 0);
+  m_currentProfile->didExecute(callStackNames);
 }
 
 void Profiler::didExecute(ExecState* exec,
@@ -117,30 +122,7 @@ void Profiler::didExecute(ExecState* exec,
 
   Vector<UString> callStackNames;
   getStackNames(callStackNames, exec, sourceURL, startingLineNumber);
-  m_callTree->didExecute(callStackNames, 0);
-}
-
-void Profiler::insertStackNamesInTree(const Vector<UString>& callStackNames) {
-  FunctionCallProfile* callTreeInsertionPoint = 0;
-  FunctionCallProfile* foundNameInTree = m_callTree.get();
-  NameIterator callStackLocation = callStackNames.begin();
-
-  while (callStackLocation != callStackNames.end() && foundNameInTree) {
-    callTreeInsertionPoint = foundNameInTree;
-    foundNameInTree = callTreeInsertionPoint->findChild(*callStackLocation);
-    ++callStackLocation;
-  }
-
-  if (!foundNameInTree) {  // Insert remains of the stack into the call tree.
-    --callStackLocation;
-    for (FunctionCallProfile* next; callStackLocation != callStackNames.end();
-         ++callStackLocation) {
-      next = new FunctionCallProfile(*callStackLocation);
-      callTreeInsertionPoint->addChild(next);
-      callTreeInsertionPoint = next;
-    }
-  } else  // We are calling a function that is already in the call tree.
-    foundNameInTree->willExecute();
+  m_currentProfile->didExecute(callStackNames);
 }
 
 void getStackNames(Vector<UString>& names, ExecState* exec) {
@@ -187,37 +169,12 @@ UString getFunctionName(FunctionImp* functionImp) {
          UString::from(lineNumber);
 }
 
-void Profiler::printDataInspectorStyle() const {
-  printf("Profiler Call graph:\n");
-  m_callTree->printDataInspectorStyle(0);
+void Profiler::printDataInspectorStyle(unsigned whichProfile) const {
+  m_allProfiles[whichProfile]->printDataInspectorStyle();
 }
 
-typedef pair<UString::Rep*, unsigned> NameCountPair;
-
-static inline bool functionNameCountPairComparator(const NameCountPair a,
-                                                   const NameCountPair b) {
-  return a.second > b.second;
-}
-
-void Profiler::printDataSampleStyle() const {
-  typedef Vector<NameCountPair> NameCountPairVector;
-
-  FunctionCallHashCount countedFunctions;
-  printf("Call graph:\n");
-  m_callTree->printDataSampleStyle(0, countedFunctions);
-
-  printf("\nTotal number in stack:\n");
-  NameCountPairVector sortedFunctions(countedFunctions.size());
-  copyToVector(countedFunctions, sortedFunctions);
-
-  std::sort(sortedFunctions.begin(), sortedFunctions.end(),
-            functionNameCountPairComparator);
-  for (NameCountPairVector::iterator it = sortedFunctions.begin();
-       it != sortedFunctions.end(); ++it)
-    printf("        %-12d%s\n", (*it).second,
-           UString((*it).first).UTF8String().c_str());
-
-  printf("\nSort by top of stack, same collapsed (when >= 5):\n");
+void Profiler::printDataSampleStyle(unsigned whichProfile) const {
+  m_allProfiles[whichProfile]->printDataSampleStyle();
 }
 
 void Profiler::debugLog(UString message) {
