@@ -316,9 +316,9 @@ void MediaPlayerPrivate::updateStates() {
     const QMetaObject* metaObj = this->metaObject();
     QMetaEnum networkStates =
         metaObj->enumerator(metaObj->indexOfEnumerator("NetworkState"));
-    qDebug("Network state changed from '%s' to '%s'",
-           networkStates.valueToKey(oldNetworkState),
-           networkStates.valueToKey(m_networkState));
+    LOG(Media, "Network state changed from '%s' to '%s'",
+        networkStates.valueToKey(oldNetworkState),
+        networkStates.valueToKey(m_networkState));
     m_player->networkStateChanged();
   }
 
@@ -326,9 +326,9 @@ void MediaPlayerPrivate::updateStates() {
     const QMetaObject* metaObj = this->metaObject();
     QMetaEnum readyStates =
         metaObj->enumerator(metaObj->indexOfEnumerator("ReadyState"));
-    qDebug("Ready state changed from '%s' to '%s'",
-           readyStates.valueToKey(oldReadyState),
-           readyStates.valueToKey(m_readyState));
+    LOG(Media, "Ready state changed from '%s' to '%s'",
+        readyStates.valueToKey(oldReadyState),
+        readyStates.valueToKey(m_readyState));
     m_player->readyStateChanged();
   }
 }
