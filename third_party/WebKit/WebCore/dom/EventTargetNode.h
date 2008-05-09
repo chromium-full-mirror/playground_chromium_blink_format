@@ -60,6 +60,7 @@ class EventTargetNode : public Node, public EventTarget {
   EventListener* getHTMLEventListener(const AtomicString& eventType);
 
   bool dispatchSubtreeModifiedEvent();
+  void dispatchWindowEvent(PassRefPtr<Event>);
   void dispatchWindowEvent(const AtomicString& eventType,
                            bool canBubble,
                            bool cancelable);
