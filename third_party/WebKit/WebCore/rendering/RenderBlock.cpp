@@ -4740,11 +4740,7 @@ void RenderBlock::updateFirstLetter() {
 
     RenderObject* firstLetter = RenderFlow::createAnonymousFlow(
         document(), pseudoStyle);  // anonymous box
-    // FIXME: This adds in the wrong place if list markers were skipped above.
-    // Should be
-    // firstLetterContainer->addChild(firstLetter, currChild);
-    firstLetterContainer->addChild(firstLetter,
-                                   firstLetterContainer->firstChild());
+    firstLetterContainer->addChild(firstLetter, currChild);
 
     // The original string is going to be either a generated content string or a
     // DOM node's
