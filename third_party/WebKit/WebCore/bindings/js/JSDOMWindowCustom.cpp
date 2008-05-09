@@ -132,11 +132,8 @@ bool JSDOMWindow::customGetOwnPropertySlot(ExecState* exec,
     if ((entry->attributes & Function) &&
         (entry->functionValue == jsDOMWindowPrototypeFunctionBlur ||
          entry->functionValue == jsDOMWindowPrototypeFunctionClose ||
-         entry->functionValue == jsDOMWindowPrototypeFunctionFocus
-#if ENABLE(CROSS_DOCUMENT_MESSAGING)
-         || entry->functionValue == jsDOMWindowPrototypeFunctionPostMessage
-#endif
-         )) {
+         entry->functionValue == jsDOMWindowPrototypeFunctionFocus ||
+         entry->functionValue == jsDOMWindowPrototypeFunctionPostMessage)) {
       if (!allowsAccess) {
         slot.setStaticEntry(this, entry, nonCachingStaticFunctionGetter);
         return true;
@@ -222,7 +219,6 @@ void JSDOMWindow::setLocation(ExecState* exec, JSValue* value) {
   }
 }
 
-#if ENABLE(CROSS_DOCUMENT_MESSAGING)
 JSValue* JSDOMWindow::postMessage(ExecState* exec, const List& args) {
   DOMWindow* window = impl();
 
@@ -242,7 +238,6 @@ JSValue* JSDOMWindow::postMessage(ExecState* exec, const List& args) {
 
   return jsUndefined();
 }
-#endif
 
 DOMWindow* toDOMWindow(JSValue* val) {
   if (val->isObject(&JSDOMWindow::s_info))

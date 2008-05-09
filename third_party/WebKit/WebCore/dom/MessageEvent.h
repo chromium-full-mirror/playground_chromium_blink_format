@@ -28,8 +28,6 @@
 #ifndef MessageEvent_h
 #define MessageEvent_h
 
-#if ENABLE(CROSS_DOCUMENT_MESSAGING)
-
 #include "Event.h"
 
 namespace WebCore {
@@ -68,7 +66,5 @@ class MessageEvent : public Event {
 };
 
 }  // namespace WebCore
-
-#endif  // ENABLE(CROSS_DOCUMENT_MESSAGING)
 
 #endif  // MessageEvent_h

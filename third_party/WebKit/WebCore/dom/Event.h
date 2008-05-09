@@ -103,9 +103,7 @@ class Event : public RefCounted<Event> {
   virtual bool isTextEvent() const;
   virtual bool isDragEvent() const;  // a subset of mouse events
   virtual bool isClipboardEvent() const;
-#if ENABLE(CROSS_DOCUMENT_MESSAGING)
   virtual bool isMessageEvent() const;
-#endif
   virtual bool isWheelEvent() const;
   virtual bool isBeforeTextInsertedEvent() const;
   virtual bool isOverflowEvent() const;
