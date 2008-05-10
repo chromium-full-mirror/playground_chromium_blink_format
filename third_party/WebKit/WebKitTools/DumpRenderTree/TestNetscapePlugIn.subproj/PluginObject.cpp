@@ -426,7 +426,7 @@ static bool testGetIntIdentifier(PluginObject*,
 
   NPIdentifier identifier =
       browser->getintidentifier((int)NPVARIANT_TO_DOUBLE(args[0]));
-  INT32_TO_NPVARIANT((int32)identifier, *result);
+  INT32_TO_NPVARIANT((int32)(long long)identifier, *result);
   return true;
 }
 
