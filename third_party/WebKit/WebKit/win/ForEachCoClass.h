@@ -70,6 +70,7 @@ static LPCOLESTR* s_progIDs = openSourceProgIDs;
 #define PROGID(className) progIDForClass(className##Class)
 
 void setUseOpenSourceWebKit(bool);
+void shutDownWebKit();
 LPCOLESTR progIDForClass(WebKitClass);
 
 #endif  // !defined(ForEachCoClass_h)

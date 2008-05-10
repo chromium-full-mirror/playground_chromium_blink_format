@@ -35,9 +35,7 @@
 #include "WebScriptDebugServer.h"
 #pragma warning(push, 0)
 #include <WebCore/COMPtr.h>
-#include <WebCore/IconDatabase.h>
 #include <WebCore/Page.h>
-#include <WebCore/PageGroup.h>
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/Widget.h>
 #include <wtf/Vector.h>
@@ -53,11 +51,6 @@ HINSTANCE gInstance;
 static CLSID gRegCLSIDs[] = {FOR_EACH_COCLASS(CLSID_FOR_CLASS)};
 #undef CLSID_FOR_CLASS
 
-void shutDownWebKit() {
-  WebCore::iconDatabase()->close();
-  WebCore::PageGroup::closeLocalStorage();
-}
-
 STDAPI_(BOOL)
 DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /*lpReserved*/) {
   switch (ul_reason_for_call) {
@@ -68,9 +61,6 @@ DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /*lpReserved*/) {
       return TRUE;
 
     case DLL_PROCESS_DETACH:
-      shutDownWebKit();
-      break;
-
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
       break;
