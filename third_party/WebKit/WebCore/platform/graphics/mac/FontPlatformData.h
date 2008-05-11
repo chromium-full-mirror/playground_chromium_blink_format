@@ -102,6 +102,8 @@ struct FontPlatformData {
                                    sizeof(hashCodes) / sizeof(UChar));
   }
 
+  const FontPlatformData& operator=(const FontPlatformData& f);
+
   bool operator==(const FontPlatformData& other) const {
     return m_font == other.m_font && m_syntheticBold == other.m_syntheticBold &&
            m_syntheticOblique == other.m_syntheticOblique &&
