@@ -57,6 +57,7 @@ class ApplicationCacheResource : public SubstituteResource {
 
   void setStorageID(unsigned storageID) { m_storageID = storageID; }
   unsigned storageID() const { return m_storageID; }
+  void clearStorageID() { m_storageID = 0; }
 
 #ifndef NDEBUG
   static void dumpType(unsigned type);

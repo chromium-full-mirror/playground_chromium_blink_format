@@ -55,6 +55,8 @@ class ApplicationCacheStorage {
 
   void remove(ApplicationCache*);
 
+  void empty();
+
  private:
   PassRefPtr<ApplicationCache> loadCache(unsigned storageID);
   ApplicationCacheGroup* loadCacheGroup(const KURL& manifestURL);
