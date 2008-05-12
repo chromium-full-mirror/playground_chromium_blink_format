@@ -210,6 +210,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   bool scheduleApplicationCacheLoad(ResourceLoader*,
                                     const ResourceRequest&,
                                     const KURL& originalURL);
+  bool shouldLoadResourceFromApplicationCache(const ResourceRequest&,
+                                              ApplicationCacheResource*&);
 
   void setCandidateApplicationCacheGroup(ApplicationCacheGroup* group);
   ApplicationCacheGroup* candidateApplicationCacheGroup() const {

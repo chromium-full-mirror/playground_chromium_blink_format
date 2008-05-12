@@ -834,17 +834,9 @@ ApplicationCache* DocumentLoader::mainResourceApplicationCache() const {
   return 0;
 }
 
-bool DocumentLoader::scheduleApplicationCacheLoad(
-    ResourceLoader* loader,
+bool DocumentLoader::shouldLoadResourceFromApplicationCache(
     const ResourceRequest& request,
-    const KURL& originalURL) {
-  if (!frameLoader()->frame()->settings() ||
-      !frameLoader()->frame()->settings()->offlineWebApplicationCacheEnabled())
-    return false;
-
-  if (request.url() != originalURL)
-    return false;
-
+    ApplicationCacheResource*& resource) {
   ApplicationCache* cache = topLevelApplicationCache();
   if (!cache)
     return false;
@@ -856,14 +848,32 @@ bool DocumentLoader::scheduleApplicationCacheLoad(
   if (cache->isURLInOnlineWhitelist(request.url()))
     return false;
 
-  ApplicationCacheResource* resource = cache->resourceForURL(request.url());
+  resource = cache->resourceForURL(request.url());
 
-  // FIXME: Handle opportunistic caching namespaces
-  if (!resource || (resource->type() & ApplicationCacheResource::Foreign))
-    // A null resource means that the load should fail.
-    m_pendingSubstituteResources.set(loader, 0);
-  else
-    m_pendingSubstituteResources.set(loader, resource);
+  // Don't load foreign resources.
+  if (resource && (resource->type() & ApplicationCacheResource::Foreign))
+    resource = 0;
+
+  return true;
+}
+
+bool DocumentLoader::scheduleApplicationCacheLoad(
+    ResourceLoader* loader,
+    const ResourceRequest& request,
+    const KURL& originalURL) {
+  if (!frameLoader()->frame()->settings() ||
+      !frameLoader()->frame()->settings()->offlineWebApplicationCacheEnabled())
+    return false;
+
+  if (request.url() != originalURL)
+    return false;
+
+  ApplicationCacheResource* resource;
+  if (!shouldLoadResourceFromApplicationCache(request, resource))
+    // FIXME: Handle opportunistic caching namespaces
+    return false;
+
+  m_pendingSubstituteResources.set(loader, resource);
   deliverSubstituteResourcesAfterDelay();
 
   return true;

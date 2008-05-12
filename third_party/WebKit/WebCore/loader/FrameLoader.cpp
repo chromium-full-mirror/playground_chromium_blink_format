@@ -30,6 +30,10 @@
 #include "config.h"
 #include "FrameLoader.h"
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+#include "ApplicationCache.h"
+#include "ApplicationCacheResource.h"
+#endif
 #include "Archive.h"
 #include "ArchiveFactory.h"
 #include "CString.h"
@@ -3592,8 +3596,20 @@ unsigned long FrameLoader::loadResourceSynchronously(
   if (error.isNull()) {
     ASSERT(!newRequest.isNull());
     didTellClientAboutLoad(newRequest.url().string());
-    ResourceHandle::loadResourceSynchronously(newRequest, error, response, data,
-                                              m_frame);
+
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+    ApplicationCacheResource* resource;
+    if (documentLoader()->shouldLoadResourceFromApplicationCache(newRequest,
+                                                                 resource)) {
+      if (resource) {
+        response = resource->response();
+        data.append(resource->data()->data(), resource->data()->size());
+      } else
+        error = cannotShowURLError(newRequest);
+    } else
+#endif
+      ResourceHandle::loadResourceSynchronously(newRequest, error, response,
+                                                data, m_frame);
   }
 
   sendRemainingDelegateMessages(identifier, response, data.size(), error);
