@@ -27,6 +27,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import <JavaScriptCore/WebKitAvailability.h>
 
 @class NSError;
 @class WebFrame;
@@ -249,6 +250,7 @@
     instead.
 */
 - (void)webView:(WebView*)webView
-    windowScriptObjectAvailable:(WebScriptObject*)windowScriptObject;
+    windowScriptObjectAvailable:(WebScriptObject*)windowScriptObject
+    AVAILABLE_WEBKIT_VERSION_1_3_AND_LATER_BUT_DEPRECATED_IN_WEBKIT_VERSION_3_0;
 
 @end
