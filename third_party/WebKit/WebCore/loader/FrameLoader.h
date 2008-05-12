@@ -551,6 +551,8 @@ class FrameLoader : Noncopyable
 
   void startIconLoader();
 
+  void applyUserAgent(ResourceRequest& request);
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
@@ -676,8 +678,6 @@ class FrameLoader : Noncopyable
 
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
   void handleUnimplementablePolicy(const ResourceError&);
-
-  void applyUserAgent(ResourceRequest& request);
 
   void scheduleRedirection(ScheduledRedirection*);
   void startRedirectionTimer();

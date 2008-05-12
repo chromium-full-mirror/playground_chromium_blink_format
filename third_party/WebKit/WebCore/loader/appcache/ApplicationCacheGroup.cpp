@@ -300,8 +300,12 @@ void ApplicationCacheGroup::update(Frame* frame) {
   ASSERT(!m_manifestResource);
 
   // FIXME: Handle defer loading
+
+  ResourceRequest request(m_manifestURL);
+  m_frame->loader()->applyUserAgent(request);
+
   m_manifestHandle =
-      ResourceHandle::create(m_manifestURL, this, frame, false, true, false);
+      ResourceHandle::create(request, this, m_frame, false, true, false);
 }
 
 void ApplicationCacheGroup::didReceiveResponse(
@@ -590,8 +594,12 @@ void ApplicationCacheGroup::startLoadingEntry() {
   // HTTP cache.
 
   ASSERT(!m_currentHandle);
+
+  ResourceRequest request(it->first);
+  m_frame->loader()->applyUserAgent(request);
+
   m_currentHandle =
-      ResourceHandle::create(it->first, this, m_frame, false, true, false);
+      ResourceHandle::create(request, this, m_frame, false, true, false);
 }
 
 void ApplicationCacheGroup::addEntry(const String& url, unsigned type) {
