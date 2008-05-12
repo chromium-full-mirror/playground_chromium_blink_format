@@ -57,7 +57,7 @@ class WebNetscapePluginEventHandlerCocoa
 
  private:
   bool sendMouseEvent(NSEvent*, NPCocoaEventType);
-  void sendKeyEvent(NSEvent*, NPCocoaEventType);
+  bool sendKeyEvent(NSEvent*, NPCocoaEventType);
   bool sendEvent(NPCocoaEvent*);
 };
 
