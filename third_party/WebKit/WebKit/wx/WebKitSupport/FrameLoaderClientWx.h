@@ -34,6 +34,8 @@
 #include "RefCounted.h"
 #include "ResourceResponse.h"
 
+class wxWebView;
+
 namespace WebCore {
 
 class AuthenticationChallenge;
@@ -52,6 +54,7 @@ class FrameLoaderClientWx : public FrameLoaderClient,
   FrameLoaderClientWx();
   ~FrameLoaderClientWx();
   void setFrame(Frame* frame);
+  void setWebView(wxWebView* webview);
   virtual void detachFrameLoader();
 
   virtual void ref();
@@ -263,6 +266,7 @@ class FrameLoaderClientWx : public FrameLoaderClient,
 
  private:
   Frame* m_frame;
+  wxWebView* m_webView;
   ResourceResponse m_response;
   bool m_firstData;
 };
