@@ -1,4 +1,4 @@
-/* This file is part of the KDE project
+/*
    Copyright (C) 2002, 2003 The Karbon Developers
                  2006, 2007 Rob Buis <buis@kde.org>
 
@@ -22,9 +22,10 @@
 #define SVGParserUtilities_h
 #if ENABLE(SVG)
 
-#include <PlatformString.h>
+#include "ParserUtilities.h"
 
 namespace WebCore {
+
 class Path;
 class SVGPointList;
 class SVGPathSegList;
@@ -37,19 +38,19 @@ bool parseNumberOptionalNumber(const String& s, float& h, float& v);
 
 // SVG allows several different whitespace characters:
 // http://www.w3.org/TR/SVG/paths.html#PathDataBNF
-static inline bool isWhitespace(const UChar& c) {
+inline bool isWhitespace(const UChar& c) {
   return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
 }
 
-static inline bool skipOptionalSpaces(const UChar*& ptr, const UChar* end) {
+inline bool skipOptionalSpaces(const UChar*& ptr, const UChar* end) {
   while (ptr < end && isWhitespace(*ptr))
     ptr++;
   return ptr < end;
 }
 
-static inline bool skipOptionalSpacesOrDelimiter(const UChar*& ptr,
-                                                 const UChar* end,
-                                                 UChar delimiter = ',') {
+inline bool skipOptionalSpacesOrDelimiter(const UChar*& ptr,
+                                          const UChar* end,
+                                          UChar delimiter = ',') {
   if (ptr < end && !isWhitespace(*ptr) && *ptr != delimiter)
     return false;
   if (skipOptionalSpaces(ptr, end)) {
@@ -59,31 +60,6 @@ static inline bool skipOptionalSpacesOrDelimiter(const UChar*& ptr,
     }
   }
   return ptr < end;
-}
-
-static inline bool skipString(const UChar*& ptr,
-                              const UChar* end,
-                              const UChar* name,
-                              int length) {
-  if (end - ptr < length)
-    return false;
-  if (memcmp(name, ptr, sizeof(UChar) * length))
-    return false;
-  ptr += length;
-  return true;
-}
-
-static inline bool skipString(const UChar*& ptr,
-                              const UChar* end,
-                              const char* str) {
-  int length = strlen(str);
-  if (end - ptr < length)
-    return false;
-  for (int i = 0; i < length; ++i)
-    if (ptr[i] != str[i])
-      return false;
-  ptr += length;
-  return true;
 }
 
 bool pointsListFromSVGData(SVGPointList* pointsList, const String& points);
@@ -96,4 +72,4 @@ Vector<String> parseDelimitedString(const String& input, const char seperator);
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
-#endif
+#endif  // SVGParserUtilities_h
