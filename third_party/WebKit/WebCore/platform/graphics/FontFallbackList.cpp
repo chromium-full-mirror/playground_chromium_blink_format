@@ -36,18 +36,29 @@
 namespace WebCore {
 
 FontFallbackList::FontFallbackList()
-    : RefCounted<FontFallbackList>(0),
-      m_familyIndex(0),
+    : m_familyIndex(0),
       m_pitch(UnknownPitch),
       m_loadingCustomFonts(false),
       m_fontSelector(0) {}
 
 void FontFallbackList::invalidate(PassRefPtr<FontSelector> fontSelector) {
+  releaseFontData();
   m_fontList.clear();
   m_familyIndex = 0;
   m_pitch = UnknownPitch;
   m_loadingCustomFonts = false;
   m_fontSelector = fontSelector;
+}
+
+void FontFallbackList::releaseFontData() {
+  unsigned numFonts = m_fontList.size();
+  for (unsigned i = 0; i < numFonts; ++i) {
+    if (!m_fontList[i].second) {
+      ASSERT(!m_fontList[i].first->isSegmented());
+      FontCache::releaseFontData(
+          static_cast<const SimpleFontData*>(m_fontList[i].first));
+    }
+  }
 }
 
 void FontFallbackList::determinePitch(const Font* font) const {
@@ -68,8 +79,8 @@ void FontFallbackList::determinePitch(const Font* font) const {
 const FontData* FontFallbackList::fontDataAt(const Font* font,
                                              unsigned realizedFontIndex) const {
   if (realizedFontIndex < m_fontList.size())
-    return m_fontList[realizedFontIndex];  // This fallback font is already in
-                                           // our list.
+    return m_fontList[realizedFontIndex]
+        .first;  // This fallback font is already in our list.
 
   // Make sure we're not passing in some crazy value here.
   ASSERT(realizedFontIndex == m_fontList.size());
@@ -86,7 +97,8 @@ const FontData* FontFallbackList::fontDataAt(const Font* font,
   const FontData* result =
       FontCache::getFontData(*font, m_familyIndex, m_fontSelector.get());
   if (result) {
-    m_fontList.append(result);
+    m_fontList.append(
+        pair<const FontData*, bool>(result, result->isCustomFont()));
     if (result->isLoading())
       m_loadingCustomFonts = true;
   }
@@ -112,6 +124,8 @@ const FontData* FontFallbackList::fontDataForCharacters(const Font* font,
 
 void FontFallbackList::setPlatformFont(const FontPlatformData& platformData) {
   m_familyIndex = cAllFamiliesScanned;
-  m_fontList.append(FontCache::getCachedFontData(&platformData));
+  const FontData* fontData = FontCache::getCachedFontData(&platformData);
+  m_fontList.append(
+      pair<const FontData*, bool>(fontData, fontData->isCustomFont()));
 }
 }
