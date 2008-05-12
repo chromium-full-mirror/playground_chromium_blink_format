@@ -152,6 +152,11 @@ _createSubframeWithOwnerElement:(WebCore::HTMLFrameOwnerElement*)ownerElement
 // should be used instead.
 - (WebDataSource*)_dataSource;
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
+- (void)_recursive_resumeNullEventsForAllNetscapePlugins;
+- (void)_recursive_pauseNullEventsForAllNetscapePlugins;
+#endif
+
 - (BOOL)_needsLayout;
 - (void)_drawRect:(NSRect)rect;
 - (NSArray*)_computePageRectsWithPrintWidthScaleFactor:

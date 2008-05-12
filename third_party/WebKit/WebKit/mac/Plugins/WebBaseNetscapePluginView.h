@@ -150,6 +150,8 @@ typedef struct _NPPluginTextInputFuncs NPPluginTextInputFuncs;
 - (BOOL)start;
 - (BOOL)isStarted;
 - (void)stop;
+- (void)stopTimers;
+- (void)restartTimers;
 
 - (WebFrame*)webFrame;
 - (WebDataSource*)dataSource;

@@ -40,6 +40,8 @@
                   behindText:(BOOL)text
                   entireLine:(BOOL)line
              representedNode:(DOMNode*)node;
+- (void)_resumeNullEventsForAllNetscapePlugins;
+- (void)_pauseNullEventsForAllNetscapePlugins;
 
 // the following methods are deprecated and will be removed once Mail switches
 // to the new methods <rdar://problem/5050528>
