@@ -299,7 +299,7 @@ void JSCollect() {
   initializeThreading();
 
   JSLock lock;
-  getThreadGlobalExecState()->heap()->collect();
+  Collector::collect();
 }
 
 /*
@@ -557,6 +557,7 @@ CFMutableArrayRef JSCreateJSArrayFromCFArray(CFArrayRef array) {
 void JSLockInterpreter() {
   initializeThreading();
   JSLock::lock();
+  JSLock::registerThread();
 }
 
 void JSUnlockInterpreter() {

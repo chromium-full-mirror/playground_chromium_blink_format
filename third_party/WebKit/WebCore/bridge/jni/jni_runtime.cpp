@@ -76,8 +76,8 @@ JSValue* JavaArray::convertJObjectToArray(ExecState* exec,
   if (type[0] != '[')
     return jsUndefined();
 
-  return new (exec)
-      RuntimeArray(exec, new JavaArray((jobject)anObject, type, rootObject));
+  return new RuntimeArray(exec,
+                          new JavaArray((jobject)anObject, type, rootObject));
 }
 
 jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
@@ -101,7 +101,7 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
         jvalue args[1];
 
         args[0].l = jinstance;
-        dispatchJNICall(exec, rootObject->nativeHandle(), fieldJInstance, false,
+        dispatchJNICall(rootObject->nativeHandle(), fieldJInstance, false,
                         returnType, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
           throwError(exec, GeneralError, exceptionDescription->toString(exec));
@@ -131,7 +131,7 @@ JSValue* JavaField::valueFromInstance(ExecState* exec,
                                                     instance->rootObject());
       } else if (anObject != 0) {
         jsresult = Instance::createRuntimeObject(
-            exec, JavaInstance::create(anObject, instance->rootObject()));
+            JavaInstance::create(anObject, instance->rootObject()));
       }
     } break;
 
@@ -151,7 +151,7 @@ JSValue* JavaField::valueFromInstance(ExecState* exec,
       jvalue result = dispatchValueFromInstance(
           exec, instance, "getInt", "(Ljava/lang/Object;)I", int_type);
       value = result.i;
-      jsresult = jsNumber(exec, (int)value);
+      jsresult = jsNumber((int)value);
     } break;
 
     case long_type:
@@ -161,7 +161,7 @@ JSValue* JavaField::valueFromInstance(ExecState* exec,
       jvalue result = dispatchValueFromInstance(
           exec, instance, "getDouble", "(Ljava/lang/Object;)D", double_type);
       value = result.i;
-      jsresult = jsNumber(exec, (double)value);
+      jsresult = jsNumber((double)value);
     } break;
     default:
       break;
@@ -193,7 +193,7 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
 
         args[0].l = jinstance;
         args[1] = javaValue;
-        dispatchJNICall(exec, rootObject->nativeHandle(), fieldJInstance, false,
+        dispatchJNICall(rootObject->nativeHandle(), fieldJInstance, false,
                         void_type, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
           throwError(exec, GeneralError, exceptionDescription->toString(exec));
@@ -490,7 +490,7 @@ JSValue* JavaArray::valueAt(ExecState* exec, unsigned int index) const {
       }
       // or array of other object type?
       return Instance::createRuntimeObject(
-          exec, JavaInstance::create(anObject, rootObject()));
+          JavaInstance::create(anObject, rootObject()));
     }
 
     case boolean_type: {
@@ -504,14 +504,14 @@ JSValue* JavaArray::valueAt(ExecState* exec, unsigned int index) const {
       jbyteArray byteArray = (jbyteArray)javaArray();
       jbyte aByte;
       env->GetByteArrayRegion(byteArray, index, 1, &aByte);
-      return jsNumber(exec, aByte);
+      return jsNumber(aByte);
     }
 
     case char_type: {
       jcharArray charArray = (jcharArray)javaArray();
       jchar aChar;
       env->GetCharArrayRegion(charArray, index, 1, &aChar);
-      return jsNumber(exec, aChar);
+      return jsNumber(aChar);
       break;
     }
 
@@ -519,35 +519,35 @@ JSValue* JavaArray::valueAt(ExecState* exec, unsigned int index) const {
       jshortArray shortArray = (jshortArray)javaArray();
       jshort aShort;
       env->GetShortArrayRegion(shortArray, index, 1, &aShort);
-      return jsNumber(exec, aShort);
+      return jsNumber(aShort);
     }
 
     case int_type: {
       jintArray intArray = (jintArray)javaArray();
       jint anInt;
       env->GetIntArrayRegion(intArray, index, 1, &anInt);
-      return jsNumber(exec, anInt);
+      return jsNumber(anInt);
     }
 
     case long_type: {
       jlongArray longArray = (jlongArray)javaArray();
       jlong aLong;
       env->GetLongArrayRegion(longArray, index, 1, &aLong);
-      return jsNumber(exec, aLong);
+      return jsNumber(aLong);
     }
 
     case float_type: {
       jfloatArray floatArray = (jfloatArray)javaArray();
       jfloat aFloat;
       env->GetFloatArrayRegion(floatArray, index, 1, &aFloat);
-      return jsNumber(exec, aFloat);
+      return jsNumber(aFloat);
     }
 
     case double_type: {
       jdoubleArray doubleArray = (jdoubleArray)javaArray();
       jdouble aDouble;
       env->GetDoubleArrayRegion(doubleArray, index, 1, &aDouble);
-      return jsNumber(exec, aDouble);
+      return jsNumber(aDouble);
     }
     default:
       break;

@@ -3105,8 +3105,6 @@ struct ClauseList {
   ClauseListNode* tail;
 };
 
-void initializeNodesThreading();
-
 }  // namespace KJS
 
 #endif  // NODES_H_

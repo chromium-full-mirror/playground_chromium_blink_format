@@ -87,8 +87,8 @@ extern const double Inf = NaNInf.doubles.Inf_Double;
 static const double D16 = 65536.0;
 static const double D32 = 4294967296.0;
 
-void* JSCell::operator new(size_t size, ExecState* exec) {
-  return exec->heap()->allocate(size);
+void* JSCell::operator new(size_t size) {
+  return Collector::allocate(size);
 }
 
 bool JSCell::getUInt32(uint32_t&) const {
@@ -197,24 +197,24 @@ const JSObject* JSCell::getObject() const {
   return isObject() ? static_cast<const JSObject*>(this) : 0;
 }
 
-JSCell* jsString(ExecState* exec, const char* s) {
-  return new (exec) StringImp(s ? s : "");
+JSCell* jsString(const char* s) {
+  return new StringImp(s ? s : "");
 }
 
-JSCell* jsString(ExecState* exec, const UString& s) {
-  return s.isNull() ? new (exec) StringImp("") : new (exec) StringImp(s);
+JSCell* jsString(const UString& s) {
+  return s.isNull() ? new StringImp("") : new StringImp(s);
 }
 
-JSCell* jsOwnedString(ExecState* exec, const UString& s) {
-  return s.isNull() ? new (exec) StringImp("", StringImp::HasOtherOwner)
-                    : new (exec) StringImp(s, StringImp::HasOtherOwner);
+JSCell* jsOwnedString(const UString& s) {
+  return s.isNull() ? new StringImp("", StringImp::HasOtherOwner)
+                    : new StringImp(s, StringImp::HasOtherOwner);
 }
 
 // This method includes a PIC branch to set up the NumberImp's vtable, so we
 // quarantine
 // it in a separate function to keep the normal case speedy.
-JSValue* jsNumberCell(ExecState* exec, double d) {
-  return new (exec) NumberImp(d);
+JSValue* jsNumberCell(double d) {
+  return new NumberImp(d);
 }
 
 }  // namespace KJS

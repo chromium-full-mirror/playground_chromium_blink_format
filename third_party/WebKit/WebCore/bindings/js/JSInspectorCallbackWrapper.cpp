@@ -58,8 +58,8 @@ JSValue* JSInspectorCallbackWrapper::wrap(ExecState* unwrappedExec,
   JSValue* prototype = unwrappedObject->prototype();
   JSValue* wrappedPrototype = prototype ? wrap(unwrappedExec, prototype) : 0;
 
-  return new (unwrappedExec) JSInspectorCallbackWrapper(
-      unwrappedExec, unwrappedObject, wrappedPrototype);
+  return new JSInspectorCallbackWrapper(unwrappedExec, unwrappedObject,
+                                        wrappedPrototype);
 }
 
 JSInspectorCallbackWrapper::JSInspectorCallbackWrapper(

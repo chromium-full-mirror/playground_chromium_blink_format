@@ -163,8 +163,8 @@ class JSGlobalObject : public JSVariableObject {
                                  JSValue* value,
                                  unsigned attributes);
 
-  // Per-thread linked list of all global objects.
-  static JSGlobalObject*& head();
+  // Linked list of all global objects.
+  static JSGlobalObject* head() { return s_head; }
   JSGlobalObject* next() { return d()->next; }
 
   // Resets the global object to contain only built-in properties, sets
@@ -283,13 +283,11 @@ class JSGlobalObject : public JSVariableObject {
   }
 
   // Per-thread hash tables, cached on the global object for faster access.
-  PerThreadData* perThreadData() { return &d()->perThreadData; }
+  const PerThreadData* perThreadData() const { return &d()->perThreadData; }
 
   // Initialize and/or retrieve per-thread hash tables - use perThreadData() for
   // faster access instead.
   static ThreadClassInfoHashTables* threadClassInfoHashTables();
-
-  void* operator new(size_t);
 
  private:
   void init(JSObject* thisValue);
@@ -303,6 +301,8 @@ class JSGlobalObject : public JSVariableObject {
 
   void deleteActivationStack();
   void checkActivationCount();
+
+  static JSGlobalObject* s_head;
 };
 
 inline bool JSGlobalObject::timedOut() {

@@ -48,7 +48,7 @@ static JSValue* getNamedItems(ExecState* exec,
   if (namedItems.size() == 1)
     return toJS(exec, namedItems[0].get());
 
-  return new (exec) JSNamedNodesCollection(
+  return new JSNamedNodesCollection(
       exec->lexicalGlobalObject()->objectPrototype(), namedItems);
 }
 
@@ -137,19 +137,17 @@ JSValue* toJS(ExecState* exec, HTMLCollection* collection) {
 
   switch (collection->type()) {
     case HTMLCollection::SelectOptions:
-      ret = new (exec) JSHTMLOptionsCollection(
+      ret = new JSHTMLOptionsCollection(
           JSHTMLOptionsCollectionPrototype::self(exec),
           static_cast<HTMLOptionsCollection*>(collection));
       break;
     case HTMLCollection::DocAll:
-      ret = new (exec)
-          JSHTMLAllCollection(JSHTMLCollectionPrototype::self(exec),
-                              static_cast<HTMLCollection*>(collection));
+      ret = new JSHTMLAllCollection(JSHTMLCollectionPrototype::self(exec),
+                                    static_cast<HTMLCollection*>(collection));
       break;
     default:
-      ret =
-          new (exec) JSHTMLCollection(JSHTMLCollectionPrototype::self(exec),
-                                      static_cast<HTMLCollection*>(collection));
+      ret = new JSHTMLCollection(JSHTMLCollectionPrototype::self(exec),
+                                 static_cast<HTMLCollection*>(collection));
       break;
   }
 

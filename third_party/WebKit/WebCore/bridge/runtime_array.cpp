@@ -36,12 +36,12 @@ const ClassInfo RuntimeArray::s_info = {"RuntimeArray", &ArrayInstance::info, 0,
 RuntimeArray::RuntimeArray(ExecState* exec, Bindings::Array* a)
     : JSObject(exec->lexicalGlobalObject()->arrayPrototype()), _array(a) {}
 
-JSValue* RuntimeArray::lengthGetter(ExecState* exec,
+JSValue* RuntimeArray::lengthGetter(ExecState*,
                                     JSObject*,
                                     const Identifier&,
                                     const PropertySlot& slot) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(slot.slotBase());
-  return jsNumber(exec, thisObj->getLength());
+  return jsNumber(thisObj->getLength());
 }
 
 JSValue* RuntimeArray::indexGetter(ExecState* exec,

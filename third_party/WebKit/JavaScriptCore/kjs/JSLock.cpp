@@ -76,6 +76,10 @@ bool JSLock::currentThreadIsHoldingLock() {
   return !!pthread_getspecific(didLockJSMutex);
 }
 
+void JSLock::registerThread() {
+  Collector::registerThread();
+}
+
 JSLock::DropAllLocks::DropAllLocks() : m_lockCount(0) {
   pthread_once(&createDidLockJSMutexOnce, createDidLockJSMutex);
 
@@ -104,6 +108,8 @@ bool JSLock::currentThreadIsHoldingLock() {
 void JSLock::lock() {}
 
 void JSLock::unlock() {}
+
+void JSLock::registerThread() {}
 
 JSLock::DropAllLocks::DropAllLocks() {}
 

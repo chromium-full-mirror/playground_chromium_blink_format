@@ -50,7 +50,11 @@ class DOMObject : public KJS::JSObject {
   explicit DOMObject(KJS::JSValue* prototype)  // FIXME: this should take a
                                                // JSObject once JSLocation has a
                                                // real prototype
-      : JSObject(prototype) {}
+      : JSObject(prototype) {
+    // DOMObject destruction is not thread-safe because DOMObjects wrap
+    // unsafe WebCore DOM data structures.
+    KJS::Collector::collectOnMainThreadOnly(this);
+  }
 
 #ifndef NDEBUG
   virtual ~DOMObject();
@@ -81,7 +85,7 @@ inline KJS::JSValue* cacheDOMObject(KJS::ExecState* exec, DOMObj* domObj) {
     return KJS::jsNull();
   if (DOMObject* ret = ScriptInterpreter::getDOMObject(domObj))
     return ret;
-  DOMObject* ret = new (exec) JSDOMObj(JSDOMObjPrototype::self(exec), domObj);
+  DOMObject* ret = new JSDOMObj(JSDOMObjPrototype::self(exec), domObj);
   ScriptInterpreter::putDOMObject(domObj, ret);
   return ret;
 }
@@ -96,8 +100,7 @@ inline KJS::JSValue* cacheSVGDOMObject(KJS::ExecState* exec,
     return KJS::jsNull();
   if (DOMObject* ret = ScriptInterpreter::getDOMObject(domObj))
     return ret;
-  DOMObject* ret =
-      new (exec) JSDOMObj(JSDOMObjPrototype::self(exec), domObj, context);
+  DOMObject* ret = new JSDOMObj(JSDOMObjPrototype::self(exec), domObj, context);
   ScriptInterpreter::putDOMObject(domObj, ret);
   return ret;
 }
@@ -121,28 +124,22 @@ class DOMExceptionTranslator : Noncopyable {
   ExceptionCode m_code;
 };
 
-KJS::JSValue* jsStringOrNull(KJS::ExecState*,
-                             const String&);  // null if the string is null
-KJS::JSValue* jsStringOrNull(KJS::ExecState*,
-                             const KURL&);  // null if the URL is null
+KJS::JSValue* jsStringOrNull(const String&);  // null if the string is null
+KJS::JSValue* jsStringOrNull(const KURL&);    // null if the URL is null
 
 KJS::JSValue* jsStringOrUndefined(
-    KJS::ExecState*,
     const String&);  // undefined if the string is null
-KJS::JSValue* jsStringOrUndefined(KJS::ExecState*,
-                                  const KURL&);  // undefined if the URL is null
+KJS::JSValue* jsStringOrUndefined(const KURL&);  // undefined if the URL is null
 
 KJS::JSValue* jsStringOrFalse(
-    KJS::ExecState*,
     const String&);  // boolean false if the string is null
-KJS::JSValue* jsStringOrFalse(KJS::ExecState*,
-                              const KURL&);  // boolean false if the URL is null
+KJS::JSValue* jsStringOrFalse(const KURL&);  // boolean false if the URL is null
 
 // See JavaScriptCore for explanation: Should be used for any UString that is
 // already owned by another
 // object, to let the engine know that collecting the JSString wrapper is
 // unlikely to save memory.
-KJS::JSValue* jsOwnedStringOrNull(KJS::ExecState*, const KJS::UString&);
+KJS::JSValue* jsOwnedStringOrNull(const KJS::UString&);
 
 KJS::UString valueToStringWithNullCheck(
     KJS::ExecState*,

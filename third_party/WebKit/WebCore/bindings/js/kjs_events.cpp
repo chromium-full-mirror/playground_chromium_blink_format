@@ -254,8 +254,7 @@ JSObject* JSLazyEventListener::listenerObj() const {
 }
 
 JSValue* JSLazyEventListener::eventParameterName() const {
-  static ProtectedPtr<JSValue> eventString =
-      jsString(window()->globalExec(), "event");
+  static ProtectedPtr<JSValue> eventString = jsString("event");
   return eventString.get();
 }
 
@@ -274,7 +273,7 @@ void JSLazyEventListener::parseCode() const {
 
     UString sourceURL(frame->loader()->url().string());
     args.append(eventParameterName());
-    args.append(jsString(exec, m_code));
+    args.append(jsString(m_code));
     m_listener = constr->construct(exec, args, m_functionName, sourceURL,
                                    m_lineNumber);  // FIXME: is globalExec ok ?
 

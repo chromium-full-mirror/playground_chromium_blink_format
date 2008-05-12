@@ -65,7 +65,7 @@ void JSEventTargetNode::setListener(ExecState* exec,
   if (frame)
     EventTargetNodeCast(impl())->setHTMLEventListener(
         eventType,
-        toJSDOMWindow(frame)->findOrCreateJSEventListener(exec, func, true));
+        toJSDOMWindow(frame)->findOrCreateJSEventListener(func, true));
 }
 
 JSValue* JSEventTargetNode::getListener(const AtomicString& eventType) const {

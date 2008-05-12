@@ -76,7 +76,7 @@ ArrayInstance::ArrayInstance(JSObject* prototype, unsigned initialLength)
   m_storage = static_cast<ArrayStorage*>(
       fastZeroedMalloc(storageSize(initialCapacity)));
 
-  Heap::heap(this)->reportExtraMemoryCost(initialCapacity * sizeof(JSValue*));
+  Collector::reportExtraMemoryCost(initialCapacity * sizeof(JSValue*));
 }
 
 ArrayInstance::ArrayInstance(JSObject* prototype, const List& list)
@@ -127,11 +127,11 @@ JSValue* ArrayInstance::getItem(unsigned i) const {
   return value ? value : jsUndefined();
 }
 
-JSValue* ArrayInstance::lengthGetter(ExecState* exec,
+JSValue* ArrayInstance::lengthGetter(ExecState*,
                                      JSObject*,
                                      const Identifier&,
                                      const PropertySlot& slot) {
-  return jsNumber(exec, static_cast<ArrayInstance*>(slot.slotBase())->m_length);
+  return jsNumber(static_cast<ArrayInstance*>(slot.slotBase())->m_length);
 }
 
 ALWAYS_INLINE bool ArrayInstance::inlineGetOwnPropertySlot(ExecState* exec,

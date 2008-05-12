@@ -208,12 +208,10 @@ void QWebFrame::addToJavaScriptWindowObject(const QString& name,
     return;
   }
 
-  KJS::ExecState* exec = window->globalExec();
-
   KJS::JSObject* runtimeObject = KJS::Bindings::Instance::createRuntimeObject(
-      exec, KJS::Bindings::QtInstance::create(object, root));
+      KJS::Bindings::QtInstance::create(object, root));
 
-  window->put(exec,
+  window->put(window->globalExec(),
               KJS::Identifier((const UChar*)name.constData(), name.length()),
               runtimeObject);
 }

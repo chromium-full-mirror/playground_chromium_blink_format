@@ -509,7 +509,7 @@ JSValue* JSCallbackObject<Base>::staticFunctionGetter(
         if (JSObjectCallAsFunctionCallback callAsFunction =
                 entry->callAsFunction) {
           JSObject* o =
-              new (exec) JSCallbackFunction(exec, callAsFunction, propertyName);
+              new JSCallbackFunction(exec, callAsFunction, propertyName);
           thisObj->putDirect(propertyName, o, entry->attributes);
           return o;
         }

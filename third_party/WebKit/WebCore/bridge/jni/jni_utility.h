@@ -280,8 +280,7 @@ T callJNIStaticMethod(jclass cls,
   return result;
 }
 
-bool dispatchJNICall(ExecState*,
-                     const void* targetAppletView,
+bool dispatchJNICall(const void* targetAppletView,
                      jobject obj,
                      bool isStatic,
                      JNIType returnType,

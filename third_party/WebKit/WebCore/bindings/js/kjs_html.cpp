@@ -54,7 +54,7 @@ static JSObject* getRuntimeObject(ExecState* exec, Node* node) {
         plugInElement->getInstance()->rootObject())
       // The instance is owned by the PlugIn element.
       return KJS::Bindings::Instance::createRuntimeObject(
-          exec, plugInElement->getInstance());
+          plugInElement->getInstance());
   }
 #endif
 

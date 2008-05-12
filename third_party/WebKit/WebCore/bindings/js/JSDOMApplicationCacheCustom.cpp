@@ -72,8 +72,8 @@ JSValue* JSDOMApplicationCache::addEventListener(ExecState* exec,
   if (!frame)
     return jsUndefined();
   JSUnprotectedEventListener* listener =
-      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-          exec, args[1], true);
+      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(args[1],
+                                                                   true);
   if (!listener)
     return jsUndefined();
   impl()->addEventListener(args[0]->toString(exec), listener,
@@ -87,8 +87,8 @@ JSValue* JSDOMApplicationCache::removeEventListener(ExecState* exec,
   if (!frame)
     return jsUndefined();
   JSUnprotectedEventListener* listener =
-      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-          exec, args[1], true);
+      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(args[1],
+                                                                   true);
   if (!listener)
     return jsUndefined();
   impl()->removeEventListener(args[0]->toString(exec), listener,
@@ -105,11 +105,11 @@ JSValue* JSDOMApplicationCache::dispatchEvent(KJS::ExecState* exec,
   return jsBoolean(result);
 }
 
-void JSDOMApplicationCache::setOnchecking(ExecState* exec, JSValue* value) {
+void JSDOMApplicationCache::setOnchecking(ExecState*, JSValue* value) {
   if (Frame* frame = impl()->frame())
     impl()->setOnCheckingListener(
-        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-            exec, value, true));
+        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                     true));
 }
 
 JSValue* JSDOMApplicationCache::onchecking(ExecState*) const {
@@ -121,11 +121,11 @@ JSValue* JSDOMApplicationCache::onchecking(ExecState*) const {
   return jsNull();
 }
 
-void JSDOMApplicationCache::setOnerror(ExecState* exec, JSValue* value) {
+void JSDOMApplicationCache::setOnerror(ExecState*, JSValue* value) {
   if (Frame* frame = impl()->frame())
     impl()->setOnErrorListener(
-        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-            exec, value, true));
+        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                     true));
 }
 
 JSValue* JSDOMApplicationCache::onerror(ExecState*) const {
@@ -136,11 +136,11 @@ JSValue* JSDOMApplicationCache::onerror(ExecState*) const {
   return jsNull();
 }
 
-void JSDOMApplicationCache::setOnnoupdate(ExecState* exec, JSValue* value) {
+void JSDOMApplicationCache::setOnnoupdate(ExecState*, JSValue* value) {
   if (Frame* frame = impl()->frame())
     impl()->setOnNoUpdateListener(
-        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-            exec, value, true));
+        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                     true));
 }
 
 JSValue* JSDOMApplicationCache::onnoupdate(ExecState*) const {
@@ -152,11 +152,11 @@ JSValue* JSDOMApplicationCache::onnoupdate(ExecState*) const {
   return jsNull();
 }
 
-void JSDOMApplicationCache::setOndownloading(ExecState* exec, JSValue* value) {
+void JSDOMApplicationCache::setOndownloading(ExecState*, JSValue* value) {
   if (Frame* frame = impl()->frame())
     impl()->setOnDownloadingListener(
-        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-            exec, value, true));
+        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                     true));
 }
 
 JSValue* JSDOMApplicationCache::ondownloading(ExecState*) const {
@@ -168,11 +168,11 @@ JSValue* JSDOMApplicationCache::ondownloading(ExecState*) const {
   return jsNull();
 }
 
-void JSDOMApplicationCache::setOnprogress(ExecState* exec, JSValue* value) {
+void JSDOMApplicationCache::setOnprogress(ExecState*, JSValue* value) {
   if (Frame* frame = impl()->frame())
     impl()->setOnProgressListener(
-        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-            exec, value, true));
+        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                     true));
 }
 
 JSValue* JSDOMApplicationCache::onprogress(ExecState*) const {
@@ -184,11 +184,11 @@ JSValue* JSDOMApplicationCache::onprogress(ExecState*) const {
   return jsNull();
 }
 
-void JSDOMApplicationCache::setOnupdateready(ExecState* exec, JSValue* value) {
+void JSDOMApplicationCache::setOnupdateready(ExecState*, JSValue* value) {
   if (Frame* frame = impl()->frame())
     impl()->setOnUpdateReadyListener(
-        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-            exec, value, true));
+        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                     true));
 }
 
 JSValue* JSDOMApplicationCache::onupdateready(ExecState*) const {
@@ -200,11 +200,11 @@ JSValue* JSDOMApplicationCache::onupdateready(ExecState*) const {
   return jsNull();
 }
 
-void JSDOMApplicationCache::setOncached(ExecState* exec, JSValue* value) {
+void JSDOMApplicationCache::setOncached(ExecState*, JSValue* value) {
   if (Frame* frame = impl()->frame())
     impl()->setOnCachedListener(
-        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(
-            exec, value, true));
+        toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(value,
+                                                                     true));
 }
 
 JSValue* JSDOMApplicationCache::oncached(ExecState*) const {

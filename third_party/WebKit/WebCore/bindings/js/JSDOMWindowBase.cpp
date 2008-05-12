@@ -210,6 +210,10 @@ JSDOMWindowBase::JSDOMWindowBase(JSObject* prototype,
     : JSGlobalObject(prototype, shell),
       m_impl(window),
       d(new JSDOMWindowBasePrivate(shell)) {
+  // JSDOMWindowBase destruction is not thread-safe because of
+  // the non-thread-safe WebCore structures it references.
+  Collector::collectOnMainThreadOnly(this);
+
   // Time in milliseconds before the script timeout handler kicks in.
   setTimeoutTime(10000);
 }
@@ -466,24 +470,23 @@ JSValue* JSDOMWindowBase::getValueProperty(ExecState* exec, int token) const {
       // FIXME: this property (and the few below) probably shouldn't create a
       // new object every
       // time
-      return new (exec) JSImageConstructor(exec, impl()->frame()->document());
+      return new JSImageConstructor(exec, impl()->frame()->document());
     case Option:
       if (!allowsAccessFrom(exec))
         return jsUndefined();
-      return new (exec)
-          JSHTMLOptionElementConstructor(exec, impl()->frame()->document());
+      return new JSHTMLOptionElementConstructor(exec,
+                                                impl()->frame()->document());
     case XMLHttpRequest:
       if (!allowsAccessFrom(exec))
         return jsUndefined();
-      return new (exec)
-          JSXMLHttpRequestConstructor(exec, impl()->frame()->document());
+      return new JSXMLHttpRequestConstructor(exec, impl()->frame()->document());
     case Audio:
 #if ENABLE(VIDEO)
       if (!allowsAccessFrom(exec))
         return jsUndefined();
       if (!MediaPlayer::isAvailable())
         return jsUndefined();
-      return new (exec) JSAudioConstructor(exec, impl()->frame()->document());
+      return new JSAudioConstructor(exec, impl()->frame()->document());
 #else
       return jsUndefined();
 #endif
@@ -491,7 +494,7 @@ JSValue* JSDOMWindowBase::getValueProperty(ExecState* exec, int token) const {
 #if ENABLE(XSLT)
       if (!allowsAccessFrom(exec))
         return jsUndefined();
-      return new (exec) JSXSLTProcessorConstructor(exec);
+      return new JSXSLTProcessorConstructor(exec);
 #else
       return jsUndefined();
 #endif
@@ -906,8 +909,8 @@ void JSDOMWindowBase::setListener(ExecState* exec,
   if (!doc)
     return;
 
-  doc->setHTMLWindowEventListener(
-      eventType, findOrCreateJSEventListener(exec, func, true));
+  doc->setHTMLWindowEventListener(eventType,
+                                  findOrCreateJSEventListener(func, true));
 }
 
 JSValue* JSDOMWindowBase::getListener(ExecState* exec,
@@ -932,8 +935,7 @@ JSEventListener* JSDOMWindowBase::findJSEventListener(JSValue* val, bool html) {
   return listeners.get(object);
 }
 
-JSEventListener* JSDOMWindowBase::findOrCreateJSEventListener(ExecState* exec,
-                                                              JSValue* val,
+JSEventListener* JSDOMWindowBase::findOrCreateJSEventListener(JSValue* val,
                                                               bool html) {
   JSEventListener* listener = findJSEventListener(val, html);
   if (listener)
@@ -949,7 +951,6 @@ JSEventListener* JSDOMWindowBase::findOrCreateJSEventListener(ExecState* exec,
 }
 
 JSUnprotectedEventListener* JSDOMWindowBase::findJSUnprotectedEventListener(
-    ExecState* exec,
     JSValue* val,
     bool html) {
   if (!val->isObject())
@@ -961,11 +962,10 @@ JSUnprotectedEventListener* JSDOMWindowBase::findJSUnprotectedEventListener(
 }
 
 JSUnprotectedEventListener*
-JSDOMWindowBase::findOrCreateJSUnprotectedEventListener(ExecState* exec,
-                                                        JSValue* val,
+JSDOMWindowBase::findOrCreateJSUnprotectedEventListener(JSValue* val,
                                                         bool html) {
   JSUnprotectedEventListener* listener =
-      findJSUnprotectedEventListener(exec, val, html);
+      findJSUnprotectedEventListener(val, html);
   if (listener)
     return listener;
   if (!val->isObject())
@@ -1023,7 +1023,7 @@ JSValue* windowProtoFuncAToB(ExecState* exec,
 
   JSValue* v = args[0];
   if (v->isNull())
-    return jsString(exec);
+    return jsString();
 
   UString s = v->toString(exec);
   if (!s.is8Bit()) {
@@ -1039,7 +1039,7 @@ JSValue* windowProtoFuncAToB(ExecState* exec,
   if (!base64Decode(in, out))
     return throwError(exec, GeneralError, "Cannot decode base64");
 
-  return jsString(exec, String(out.data(), out.size()));
+  return jsString(String(out.data(), out.size()));
 }
 
 JSValue* windowProtoFuncBToA(ExecState* exec,
@@ -1057,7 +1057,7 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
 
   JSValue* v = args[0];
   if (v->isNull())
-    return jsString(exec);
+    return jsString();
 
   UString s = v->toString(exec);
   if (!s.is8Bit()) {
@@ -1072,7 +1072,7 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
 
   base64Encode(in, out);
 
-  return jsString(exec, String(out.data(), out.size()));
+  return jsString(String(out.data(), out.size()));
 }
 
 JSValue* windowProtoFuncOpen(ExecState* exec,
@@ -1173,14 +1173,12 @@ JSValue* windowProtoFuncSetTimeout(ExecState* exec,
 
   JSValue* v = args[0];
   if (v->isString())
-    return jsNumber(
-        exec, window->installTimeout(v->toString(exec), args[1]->toInt32(exec),
-                                     true /*single shot*/));
+    return jsNumber(window->installTimeout(
+        v->toString(exec), args[1]->toInt32(exec), true /*single shot*/));
   if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
     List argsTail;
     args.getSlice(2, argsTail);
-    return jsNumber(exec,
-                    window->installTimeout(v, argsTail, args[1]->toInt32(exec),
+    return jsNumber(window->installTimeout(v, argsTail, args[1]->toInt32(exec),
                                            true /*single shot*/));
   }
 
@@ -1216,12 +1214,11 @@ JSValue* windowProtoFuncSetInterval(ExecState* exec,
     JSValue* v = args[0];
     int delay = args[1]->toInt32(exec);
     if (v->isString())
-      return jsNumber(exec,
-                      window->installTimeout(v->toString(exec), delay, false));
+      return jsNumber(window->installTimeout(v->toString(exec), delay, false));
     if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
       List argsTail;
       args.getSlice(2, argsTail);
-      return jsNumber(exec, window->installTimeout(v, argsTail, delay, false));
+      return jsNumber(window->installTimeout(v, argsTail, delay, false));
     }
   }
 
@@ -1243,7 +1240,7 @@ JSValue* windowProtoFuncAddEventListener(ExecState* exec,
     return jsUndefined();
 
   if (JSEventListener* listener =
-          window->findOrCreateJSEventListener(exec, args[1])) {
+          window->findOrCreateJSEventListener(args[1])) {
     if (Document* doc = frame->document())
       doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
                                   listener, args[2]->toBoolean(exec));

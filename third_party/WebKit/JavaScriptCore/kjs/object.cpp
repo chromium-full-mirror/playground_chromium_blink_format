@@ -61,16 +61,12 @@ namespace KJS {
 
 // ------------------------------ Object ---------------------------------------
 
-JSValue* NEVER_INLINE throwStackSizeExceededError(ExecState* exec) {
-  // This function takes a PIC branch to access a string literal, so moving it
-  // out of JSObject::call() improves performance.
-  return throwError(exec, RangeError, "Maximum call stack size exceeded.");
-}
-
 JSValue* JSObject::call(ExecState* exec, JSObject* thisObj, const List& args) {
   ASSERT(implementsCall());
 
 #if KJS_MAX_STACK > 0
+  static int depth = 0;  // sum of all extant function calls
+
 #if JAVASCRIPT_CALL_TRACING
   static bool tracing = false;
   if (traceJavaScript() && !tracing) {
@@ -87,14 +83,9 @@ JSValue* JSObject::call(ExecState* exec, JSObject* thisObj, const List& args) {
   }
 #endif
 
-  unsigned& depth = exec->functionCallDepth();
   if (++depth > KJS_MAX_STACK) {
-    // FIXME: secondary threads probably need a different limit than main
-    // thread.
-    // Ideally, the limit should be calculated from available stack space, and
-    // not just hardcoded.
     --depth;
-    return throwStackSizeExceededError(exec);
+    return throwError(exec, RangeError, "Maximum call stack size exceeded.");
   }
 #endif
 
@@ -166,8 +157,6 @@ UString JSObject::className() const {
 }
 
 JSValue* JSObject::get(ExecState* exec, const Identifier& propertyName) const {
-  ASSERT(Heap::threadHeap() == Heap::heap(this));
-
   PropertySlot slot;
 
   if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
@@ -177,8 +166,6 @@ JSValue* JSObject::get(ExecState* exec, const Identifier& propertyName) const {
 }
 
 JSValue* JSObject::get(ExecState* exec, unsigned propertyName) const {
-  ASSERT(Heap::threadHeap() == Heap::heap(this));
-
   PropertySlot slot;
   if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
     return slot.getValue(exec, const_cast<JSObject*>(this), propertyName);
@@ -220,7 +207,6 @@ void JSObject::put(ExecState* exec,
                    const Identifier& propertyName,
                    JSValue* value) {
   ASSERT(value);
-  ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
   if (propertyName == exec->propertyNames().underscoreProto) {
     JSObject* proto = value->getObject();
@@ -424,7 +410,7 @@ const HashEntry* JSObject::findPropertyHashEntry(
   return 0;
 }
 
-void JSObject::defineGetter(ExecState* exec,
+void JSObject::defineGetter(ExecState*,
                             const Identifier& propertyName,
                             JSObject* getterFunc) {
   JSValue* o = getDirect(propertyName);
@@ -433,7 +419,7 @@ void JSObject::defineGetter(ExecState* exec,
   if (o && o->type() == GetterSetterType) {
     gs = static_cast<GetterSetterImp*>(o);
   } else {
-    gs = new (exec) GetterSetterImp;
+    gs = new GetterSetterImp;
     putDirect(propertyName, gs, GetterSetter);
   }
 
@@ -441,7 +427,7 @@ void JSObject::defineGetter(ExecState* exec,
   gs->setGetter(getterFunc);
 }
 
-void JSObject::defineSetter(ExecState* exec,
+void JSObject::defineSetter(ExecState*,
                             const Identifier& propertyName,
                             JSObject* setterFunc) {
   JSValue* o = getDirect(propertyName);
@@ -450,7 +436,7 @@ void JSObject::defineSetter(ExecState* exec,
   if (o && o->type() == GetterSetterType) {
     gs = static_cast<GetterSetterImp*>(o);
   } else {
-    gs = new (exec) GetterSetterImp;
+    gs = new GetterSetterImp;
     putDirect(propertyName, gs, GetterSetter);
   }
 
@@ -634,11 +620,8 @@ void JSObject::putDirect(const Identifier& propertyName,
   _prop.put(propertyName, value, attr);
 }
 
-void JSObject::putDirect(ExecState* exec,
-                         const Identifier& propertyName,
-                         int value,
-                         int attr) {
-  _prop.put(propertyName, jsNumber(exec, value), attr);
+void JSObject::putDirect(const Identifier& propertyName, int value, int attr) {
+  _prop.put(propertyName, jsNumber(value), attr);
 }
 
 void JSObject::removeDirect(const Identifier& propertyName) {
@@ -705,18 +688,18 @@ JSObject* Error::create(ExecState* exec,
 
   List args;
   if (message.isEmpty())
-    args.append(jsString(exec, errorNames[errtype]));
+    args.append(jsString(errorNames[errtype]));
   else
-    args.append(jsString(exec, message));
+    args.append(jsString(message));
   JSObject* err = static_cast<JSObject*>(cons->construct(exec, args));
 
   if (lineno != -1)
-    err->put(exec, "line", jsNumber(exec, lineno));
+    err->put(exec, "line", jsNumber(lineno));
   if (sourceId != -1)
-    err->put(exec, "sourceId", jsNumber(exec, sourceId));
+    err->put(exec, "sourceId", jsNumber(sourceId));
 
   if (!sourceURL.isNull())
-    err->put(exec, "sourceURL", jsString(exec, sourceURL));
+    err->put(exec, "sourceURL", jsString(sourceURL));
 
   return err;
 }

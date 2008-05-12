@@ -92,9 +92,9 @@ JSValue* JSHTMLInputElementBase::getValueProperty(ExecState* exec,
   ASSERT(input.canHaveSelection());
   switch (token) {
     case SelectionStart:
-      return jsNumber(exec, input.selectionStart());
+      return jsNumber(input.selectionStart());
     case SelectionEnd:
-      return jsNumber(exec, input.selectionEnd());
+      return jsNumber(input.selectionEnd());
   }
   ASSERT_NOT_REACHED();
   return jsUndefined();

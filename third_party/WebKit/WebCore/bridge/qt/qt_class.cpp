@@ -81,9 +81,9 @@ JSValue* QtClass::fallbackObject(ExecState* exec,
       (index = m_metaObject->indexOfMethod(normal)) != -1) {
     QMetaMethod m = m_metaObject->method(index);
     if (m.access() != QMetaMethod::Private) {
-      JSValue* val = new (exec)
-          QtRuntimeMetaMethod(exec, identifier, static_cast<QtInstance*>(inst),
-                              index, normal, false);
+      JSValue* val = new QtRuntimeMetaMethod(exec, identifier,
+                                             static_cast<QtInstance*>(inst),
+                                             index, normal, false);
       qtinst->m_methods.insert(name, val);
       return val;
     }
@@ -100,9 +100,9 @@ JSValue* QtClass::fallbackObject(ExecState* exec,
     signature.truncate(signature.indexOf('('));
 
     if (normal == signature) {
-      JSValue* val = new (exec)
-          QtRuntimeMetaMethod(exec, identifier, static_cast<QtInstance*>(inst),
-                              index, normal, false);
+      JSValue* val = new QtRuntimeMetaMethod(exec, identifier,
+                                             static_cast<QtInstance*>(inst),
+                                             index, normal, false);
       qtinst->m_methods.insert(name, val);
       return val;
     }

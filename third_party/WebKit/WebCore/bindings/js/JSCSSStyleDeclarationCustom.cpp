@@ -140,10 +140,9 @@ JSValue* JSCSSStyleDeclaration::nameGetter(ExecState* exec,
   RefPtr<CSSValue> v = thisObj->impl()->getPropertyCSSValue(prop);
   if (v) {
     if (pixelOrPos && v->cssValueType() == CSSValue::CSS_PRIMITIVE_VALUE)
-      return jsNumber(exec,
-                      static_pointer_cast<CSSPrimitiveValue>(v)->getFloatValue(
-                          CSSPrimitiveValue::CSS_PX));
-    return jsStringOrNull(exec, v->cssText());
+      return jsNumber(static_pointer_cast<CSSPrimitiveValue>(v)->getFloatValue(
+          CSSPrimitiveValue::CSS_PX));
+    return jsStringOrNull(v->cssText());
   }
 
   // If the property is a shorthand property (such as "padding"),
@@ -152,11 +151,11 @@ JSValue* JSCSSStyleDeclaration::nameGetter(ExecState* exec,
   // Make the SVG 'filter' attribute undetectable, to avoid confusion with the
   // IE 'filter' attribute.
   if (propertyName == "filter")
-    return new (exec) StringInstanceThatMasqueradesAsUndefined(
-        exec, exec->lexicalGlobalObject()->stringPrototype(),
+    return new StringInstanceThatMasqueradesAsUndefined(
+        exec->lexicalGlobalObject()->stringPrototype(),
         thisObj->impl()->getPropertyValue(prop));
 
-  return jsString(exec, thisObj->impl()->getPropertyValue(prop));
+  return jsString(thisObj->impl()->getPropertyValue(prop));
 }
 
 bool JSCSSStyleDeclaration::customPut(ExecState* exec,

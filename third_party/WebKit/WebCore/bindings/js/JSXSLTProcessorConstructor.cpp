@@ -53,8 +53,8 @@ bool JSXSLTProcessorConstructor::implementsConstruct() const {
 JSObject* JSXSLTProcessorConstructor::construct(ExecState* exec,
                                                 const List& args) {
   RefPtr<XSLTProcessor> xsltProcessor = XSLTProcessor::create();
-  return new (exec) JSXSLTProcessor(JSXSLTProcessorPrototype::self(exec),
-                                    xsltProcessor.get());
+  return new JSXSLTProcessor(JSXSLTProcessorPrototype::self(exec),
+                             xsltProcessor.get());
 }
 
 }  // namespace WebCore

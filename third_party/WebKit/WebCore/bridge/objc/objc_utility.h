@@ -75,7 +75,7 @@ class RootObject;
 ObjcValue convertValueToObjcValue(ExecState* exec,
                                   JSValue* value,
                                   ObjcValueType type);
-JSValue* convertNSStringToString(ExecState* exec, NSString* nsstring);
+JSValue* convertNSStringToString(NSString* nsstring);
 JSValue* convertObjcValueToValue(ExecState* exec,
                                  void* buffer,
                                  ObjcValueType type,

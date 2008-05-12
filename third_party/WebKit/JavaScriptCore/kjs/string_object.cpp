@@ -41,9 +41,8 @@ namespace KJS {
 
 const ClassInfo StringInstance::info = {"String", 0, 0, 0};
 
-StringInstance::StringInstance(ExecState* exec, JSObject* proto)
-    : JSWrapperObject(proto) {
-  setInternalValue(jsString(exec, ""));
+StringInstance::StringInstance(JSObject* proto) : JSWrapperObject(proto) {
+  setInternalValue(jsString(""));
 }
 
 StringInstance::StringInstance(JSObject* proto, StringImp* string)
@@ -51,41 +50,39 @@ StringInstance::StringInstance(JSObject* proto, StringImp* string)
   setInternalValue(string);
 }
 
-StringInstance::StringInstance(ExecState* exec,
-                               JSObject* proto,
-                               const UString& string)
+StringInstance::StringInstance(JSObject* proto, const UString& string)
     : JSWrapperObject(proto) {
-  setInternalValue(jsString(exec, string));
+  setInternalValue(jsString(string));
 }
 
-JSValue* StringInstance::lengthGetter(ExecState* exec,
+JSValue* StringInstance::lengthGetter(ExecState*,
                                       JSObject*,
                                       const Identifier&,
                                       const PropertySlot& slot) {
-  return jsNumber(exec, static_cast<StringInstance*>(slot.slotBase())
-                            ->internalValue()
-                            ->value()
-                            .size());
+  return jsNumber(static_cast<StringInstance*>(slot.slotBase())
+                      ->internalValue()
+                      ->value()
+                      .size());
 }
 
-JSValue* StringInstance::indexGetter(ExecState* exec,
+JSValue* StringInstance::indexGetter(ExecState*,
                                      JSObject*,
                                      const Identifier&,
                                      const PropertySlot& slot) {
-  return jsString(exec, static_cast<StringInstance*>(slot.slotBase())
-                            ->internalValue()
-                            ->value()
-                            .substr(slot.index(), 1));
+  return jsString(static_cast<StringInstance*>(slot.slotBase())
+                      ->internalValue()
+                      ->value()
+                      .substr(slot.index(), 1));
 }
 
-static JSValue* stringInstanceNumericPropertyGetter(ExecState* exec,
+static JSValue* stringInstanceNumericPropertyGetter(ExecState*,
                                                     JSObject*,
                                                     unsigned index,
                                                     const PropertySlot& slot) {
-  return jsString(exec, static_cast<StringInstance*>(slot.slotBase())
-                            ->internalValue()
-                            ->value()
-                            .substr(index, 1));
+  return jsString(static_cast<StringInstance*>(slot.slotBase())
+                      ->internalValue()
+                      ->value()
+                      .substr(index, 1));
 }
 
 bool StringInstance::getOwnPropertySlot(ExecState* exec,
@@ -185,9 +182,9 @@ const ClassInfo StringPrototype::info = {"String", &StringInstance::info, 0,
 */
 // ECMA 15.5.4
 StringPrototype::StringPrototype(ExecState* exec, ObjectPrototype* objProto)
-    : StringInstance(exec, objProto) {
+    : StringInstance(objProto) {
   // The constructor will be added later, after StringObjectImp has been built
-  putDirect(exec->propertyNames().length, jsNumber(exec, 0),
+  putDirect(exec->propertyNames().length, jsNumber(0),
             DontDelete | ReadOnly | DontEnum);
 }
 
@@ -385,10 +382,10 @@ static JSValue* replace(ExecState* exec,
           if (matchStart < 0)
             args.append(jsUndefined());
           else
-            args.append(jsString(exec, source.substr(matchStart, matchLen)));
+            args.append(jsString(source.substr(matchStart, matchLen)));
         }
 
-        args.append(jsNumber(exec, completeMatchStart));
+        args.append(jsNumber(completeMatchStart));
         args.append(sourceVal);
 
         substitutedReplacement =
@@ -428,7 +425,7 @@ static JSValue* replace(ExecState* exec,
     if (result == source)
       return sourceVal;
 
-    return jsString(exec, result);
+    return jsString(result);
   }
 
   // First arg is a string
@@ -442,8 +439,8 @@ static JSValue* replace(ExecState* exec,
   if (replacementFunction) {
     List args;
 
-    args.append(jsString(exec, source.substr(matchPos, matchLen)));
-    args.append(jsNumber(exec, matchPos));
+    args.append(jsString(source.substr(matchPos, matchLen)));
+    args.append(jsNumber(matchPos));
     args.append(sourceVal);
 
     replacementString =
@@ -451,8 +448,8 @@ static JSValue* replace(ExecState* exec,
             ->toString(exec);
   }
 
-  return jsString(exec, source.substr(0, matchPos) + replacementString +
-                            source.substr(matchPos + matchLen));
+  return jsString(source.substr(0, matchPos) + replacementString +
+                  source.substr(matchPos + matchLen));
 }
 
 JSValue* stringProtoFuncToString(ExecState* exec,
@@ -490,7 +487,7 @@ JSValue* stringProtoFuncCharAt(ExecState* exec,
     u = s.substr(static_cast<int>(dpos), 1);
   else
     u = "";
-  return jsString(exec, u);
+  return jsString(u);
 }
 
 JSValue* stringProtoFuncCharCodeAt(ExecState* exec,
@@ -508,9 +505,9 @@ JSValue* stringProtoFuncCharCodeAt(ExecState* exec,
   JSValue* a0 = args[0];
   double dpos = a0->toInteger(exec);
   if (dpos >= 0 && dpos < len)
-    result = jsNumber(exec, s[static_cast<int>(dpos)]);
+    result = jsNumber(s[static_cast<int>(dpos)]);
   else
-    result = jsNaN(exec);
+    result = jsNaN();
   return result;
 }
 
@@ -527,7 +524,7 @@ JSValue* stringProtoFuncConcat(ExecState* exec,
   for (List::const_iterator it = args.begin(); it != end; ++it) {
     s += (*it)->toString(exec);
   }
-  return jsString(exec, s);
+  return jsString(s);
 }
 
 JSValue* stringProtoFuncIndexOf(ExecState* exec,
@@ -548,7 +545,7 @@ JSValue* stringProtoFuncIndexOf(ExecState* exec,
     dpos = 0;
   else if (dpos > len)
     dpos = len;
-  return jsNumber(exec, s.find(u2, static_cast<int>(dpos)));
+  return jsNumber(s.find(u2, static_cast<int>(dpos)));
 }
 
 JSValue* stringProtoFuncLastIndexOf(ExecState* exec,
@@ -570,7 +567,7 @@ JSValue* stringProtoFuncLastIndexOf(ExecState* exec,
     dpos = 0;
   else if (!(dpos <= len))  // true for NaN
     dpos = len;
-  return jsNumber(exec, s.rfind(u2, static_cast<int>(dpos)));
+  return jsNumber(s.rfind(u2, static_cast<int>(dpos)));
 }
 
 JSValue* stringProtoFuncMatch(ExecState* exec,
@@ -615,7 +612,7 @@ JSValue* stringProtoFuncMatch(ExecState* exec,
     List list;
     int lastIndex = 0;
     while (pos >= 0) {
-      list.append(jsString(exec, u.substr(pos, matchLength)));
+      list.append(jsString(u.substr(pos, matchLength)));
       lastIndex = pos;
       pos += matchLength == 0 ? 1 : matchLength;
       regExpObj->performMatch(reg.get(), u, pos, pos, matchLength);
@@ -664,7 +661,7 @@ JSValue* stringProtoFuncSearch(ExecState* exec,
   int pos;
   int matchLength;
   regExpObj->performMatch(reg.get(), u, 0, pos, matchLength);
-  return jsNumber(exec, pos);
+  return jsNumber(pos);
 }
 
 JSValue* stringProtoFuncReplace(ExecState* exec,
@@ -678,7 +675,7 @@ JSValue* stringProtoFuncReplace(ExecState* exec,
 
   StringImp* sVal = thisObj->inherits(&StringInstance::info)
                         ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(exec, s));
+                        : static_cast<StringImp*>(jsString(s));
 
   JSValue* a0 = args[0];
   JSValue* a1 = args[1];
@@ -710,10 +707,10 @@ JSValue* stringProtoFuncSlice(ExecState* exec,
     if (to > len)
       to = len;
     return jsString(
-        exec, s.substr(static_cast<int>(from), static_cast<int>(to - from)));
+        s.substr(static_cast<int>(from), static_cast<int>(to - from)));
   }
 
-  return jsString(exec, "");
+  return jsString("");
 }
 
 JSValue* stringProtoFuncSplit(ExecState* exec,
@@ -742,7 +739,7 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
     RegExp* reg = static_cast<RegExpImp*>(a0)->regExp();
     if (u.isEmpty() && reg->match(u, 0) >= 0) {
       // empty string matched by regexp -> empty array
-      res->put(exec, exec->propertyNames().length, jsNumber(exec, 0));
+      res->put(exec, exec->propertyNames().length, jsNumber(0));
       return result;
     }
     pos = 0;
@@ -754,7 +751,7 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
       int mlen = ovector[1] - ovector[0];
       pos = mpos + (mlen == 0 ? 1 : mlen);
       if (mpos != p0 || mlen) {
-        res->put(exec, i, jsString(exec, u.substr(p0, mpos - p0)));
+        res->put(exec, i, jsString(u.substr(p0, mpos - p0)));
         p0 = mpos + mlen;
         i++;
       }
@@ -764,7 +761,7 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
           res->put(exec, i++, jsUndefined());
         else
           res->put(exec, i++,
-                   jsString(exec, u.substr(spos, ovector[si * 2 + 1] - spos)));
+                   jsString(u.substr(spos, ovector[si * 2 + 1] - spos)));
       }
     }
   } else {
@@ -772,15 +769,15 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
     if (u2.isEmpty()) {
       if (u.isEmpty()) {
         // empty separator matches empty string -> empty array
-        res->put(exec, exec->propertyNames().length, jsNumber(exec, 0));
+        res->put(exec, exec->propertyNames().length, jsNumber(0));
         return result;
       } else {
         while (static_cast<uint32_t>(i) != limit && i < u.size() - 1)
-          res->put(exec, i++, jsString(exec, u.substr(p0++, 1)));
+          res->put(exec, i++, jsString(u.substr(p0++, 1)));
       }
     } else {
       while (static_cast<uint32_t>(i) != limit && (pos = u.find(u2, p0)) >= 0) {
-        res->put(exec, i, jsString(exec, u.substr(p0, pos - p0)));
+        res->put(exec, i, jsString(u.substr(p0, pos - p0)));
         p0 = pos + u2.size();
         i++;
       }
@@ -788,8 +785,8 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
   }
   // add remaining string, if any
   if (static_cast<uint32_t>(i) != limit)
-    res->put(exec, i++, jsString(exec, u.substr(p0)));
-  res->put(exec, exec->propertyNames().length, jsNumber(exec, i));
+    res->put(exec, i++, jsString(u.substr(p0)));
+  res->put(exec, exec->propertyNames().length, jsNumber(i));
   return result;
 }
 
@@ -809,9 +806,9 @@ JSValue* stringProtoFuncSubstr(ExecState* exec,
   double start = a0->toInteger(exec);
   double length = a1->isUndefined() ? len : a1->toInteger(exec);
   if (start >= len)
-    return jsString(exec, "");
+    return jsString("");
   if (length < 0)
-    return jsString(exec, "");
+    return jsString("");
   if (start < 0) {
     start += len;
     if (start < 0)
@@ -819,8 +816,7 @@ JSValue* stringProtoFuncSubstr(ExecState* exec,
   }
   if (length > len)
     length = len;
-  return jsString(exec,
-                  s.substr(static_cast<int>(start), static_cast<int>(length)));
+  return jsString(s.substr(static_cast<int>(start), static_cast<int>(length)));
 }
 
 JSValue* stringProtoFuncSubstring(ExecState* exec,
@@ -857,7 +853,7 @@ JSValue* stringProtoFuncSubstring(ExecState* exec,
     end = start;
     start = temp;
   }
-  return jsString(exec, s.substr((int)start, (int)end - (int)start));
+  return jsString(s.substr((int)start, (int)end - (int)start));
 }
 
 JSValue* stringProtoFuncToLowerCase(ExecState* exec,
@@ -871,7 +867,7 @@ JSValue* stringProtoFuncToLowerCase(ExecState* exec,
 
   StringImp* sVal = thisObj->inherits(&StringInstance::info)
                         ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(exec, s));
+                        : static_cast<StringImp*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -891,7 +887,7 @@ JSValue* stringProtoFuncToLowerCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
+  return jsString(UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncToUpperCase(ExecState* exec,
@@ -905,7 +901,7 @@ JSValue* stringProtoFuncToUpperCase(ExecState* exec,
 
   StringImp* sVal = thisObj->inherits(&StringInstance::info)
                         ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(exec, s));
+                        : static_cast<StringImp*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -925,7 +921,7 @@ JSValue* stringProtoFuncToUpperCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
+  return jsString(UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncToLocaleLowerCase(ExecState* exec,
@@ -941,7 +937,7 @@ JSValue* stringProtoFuncToLocaleLowerCase(ExecState* exec,
   // locale-sensitive mappings that aren't implemented.
   StringImp* sVal = thisObj->inherits(&StringInstance::info)
                         ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(exec, s));
+                        : static_cast<StringImp*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -961,7 +957,7 @@ JSValue* stringProtoFuncToLocaleLowerCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
+  return jsString(UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncToLocaleUpperCase(ExecState* exec,
@@ -975,7 +971,7 @@ JSValue* stringProtoFuncToLocaleUpperCase(ExecState* exec,
 
   StringImp* sVal = thisObj->inherits(&StringInstance::info)
                         ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(exec, s));
+                        : static_cast<StringImp*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -995,14 +991,14 @@ JSValue* stringProtoFuncToLocaleUpperCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
+  return jsString(UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncLocaleCompare(ExecState* exec,
                                       JSObject* thisObj,
                                       const List& args) {
   if (args.size() < 1)
-    return jsNumber(exec, 0);
+    return jsNumber(0);
 
   // This optimizes the common case that thisObj is a StringInstance
   UString s =
@@ -1010,7 +1006,7 @@ JSValue* stringProtoFuncLocaleCompare(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
   JSValue* a0 = args[0];
-  return jsNumber(exec, localeCompare(s, a0->toString(exec)));
+  return jsNumber(localeCompare(s, a0->toString(exec)));
 }
 
 JSValue* stringProtoFuncBig(ExecState* exec, JSObject* thisObj, const List&) {
@@ -1019,7 +1015,7 @@ JSValue* stringProtoFuncBig(ExecState* exec, JSObject* thisObj, const List&) {
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<big>" + s + "</big>");
+  return jsString("<big>" + s + "</big>");
 }
 
 JSValue* stringProtoFuncSmall(ExecState* exec, JSObject* thisObj, const List&) {
@@ -1028,7 +1024,7 @@ JSValue* stringProtoFuncSmall(ExecState* exec, JSObject* thisObj, const List&) {
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<small>" + s + "</small>");
+  return jsString("<small>" + s + "</small>");
 }
 
 JSValue* stringProtoFuncBlink(ExecState* exec, JSObject* thisObj, const List&) {
@@ -1037,7 +1033,7 @@ JSValue* stringProtoFuncBlink(ExecState* exec, JSObject* thisObj, const List&) {
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<blink>" + s + "</blink>");
+  return jsString("<blink>" + s + "</blink>");
 }
 
 JSValue* stringProtoFuncBold(ExecState* exec, JSObject* thisObj, const List&) {
@@ -1046,7 +1042,7 @@ JSValue* stringProtoFuncBold(ExecState* exec, JSObject* thisObj, const List&) {
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<b>" + s + "</b>");
+  return jsString("<b>" + s + "</b>");
 }
 
 JSValue* stringProtoFuncFixed(ExecState* exec, JSObject* thisObj, const List&) {
@@ -1055,7 +1051,7 @@ JSValue* stringProtoFuncFixed(ExecState* exec, JSObject* thisObj, const List&) {
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<tt>" + s + "</tt>");
+  return jsString("<tt>" + s + "</tt>");
 }
 
 JSValue* stringProtoFuncItalics(ExecState* exec,
@@ -1066,7 +1062,7 @@ JSValue* stringProtoFuncItalics(ExecState* exec,
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<i>" + s + "</i>");
+  return jsString("<i>" + s + "</i>");
 }
 
 JSValue* stringProtoFuncStrike(ExecState* exec,
@@ -1077,7 +1073,7 @@ JSValue* stringProtoFuncStrike(ExecState* exec,
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<strike>" + s + "</strike>");
+  return jsString("<strike>" + s + "</strike>");
 }
 
 JSValue* stringProtoFuncSub(ExecState* exec, JSObject* thisObj, const List&) {
@@ -1086,7 +1082,7 @@ JSValue* stringProtoFuncSub(ExecState* exec, JSObject* thisObj, const List&) {
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<sub>" + s + "</sub>");
+  return jsString("<sub>" + s + "</sub>");
 }
 
 JSValue* stringProtoFuncSup(ExecState* exec, JSObject* thisObj, const List&) {
@@ -1095,7 +1091,7 @@ JSValue* stringProtoFuncSup(ExecState* exec, JSObject* thisObj, const List&) {
       thisObj->inherits(&StringInstance::info)
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
-  return jsString(exec, "<sup>" + s + "</sup>");
+  return jsString("<sup>" + s + "</sup>");
 }
 
 JSValue* stringProtoFuncFontcolor(ExecState* exec,
@@ -1107,8 +1103,8 @@ JSValue* stringProtoFuncFontcolor(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
   JSValue* a0 = args[0];
-  return jsString(
-      exec, "<font color=\"" + a0->toString(exec) + "\">" + s + "</font>");
+  return jsString("<font color=\"" + a0->toString(exec) + "\">" + s +
+                  "</font>");
 }
 
 JSValue* stringProtoFuncFontsize(ExecState* exec,
@@ -1120,8 +1116,7 @@ JSValue* stringProtoFuncFontsize(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
   JSValue* a0 = args[0];
-  return jsString(exec,
-                  "<font size=\"" + a0->toString(exec) + "\">" + s + "</font>");
+  return jsString("<font size=\"" + a0->toString(exec) + "\">" + s + "</font>");
 }
 
 JSValue* stringProtoFuncAnchor(ExecState* exec,
@@ -1133,7 +1128,7 @@ JSValue* stringProtoFuncAnchor(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
   JSValue* a0 = args[0];
-  return jsString(exec, "<a name=\"" + a0->toString(exec) + "\">" + s + "</a>");
+  return jsString("<a name=\"" + a0->toString(exec) + "\">" + s + "</a>");
 }
 
 JSValue* stringProtoFuncLink(ExecState* exec,
@@ -1145,7 +1140,7 @@ JSValue* stringProtoFuncLink(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
   JSValue* a0 = args[0];
-  return jsString(exec, "<a href=\"" + a0->toString(exec) + "\">" + s + "</a>");
+  return jsString("<a href=\"" + a0->toString(exec) + "\">" + s + "</a>");
 }
 
 // ------------------------------ StringObjectImp ------------------------------
@@ -1158,12 +1153,12 @@ StringObjectImp::StringObjectImp(ExecState* exec,
   putDirect(exec->propertyNames().prototype, stringProto,
             DontEnum | DontDelete | ReadOnly);
 
-  putDirectFunction(new (exec) StringObjectFuncImp(
-                        exec, funcProto, exec->propertyNames().fromCharCode),
+  putDirectFunction(new StringObjectFuncImp(exec, funcProto,
+                                            exec->propertyNames().fromCharCode),
                     DontEnum);
 
   // no. of arguments for constructor
-  putDirect(exec->propertyNames().length, jsNumber(exec, 1),
+  putDirect(exec->propertyNames().length, jsNumber(1),
             ReadOnly | DontDelete | DontEnum);
 }
 
@@ -1175,8 +1170,8 @@ bool StringObjectImp::implementsConstruct() const {
 JSObject* StringObjectImp::construct(ExecState* exec, const List& args) {
   JSObject* proto = exec->lexicalGlobalObject()->stringPrototype();
   if (args.size() == 0)
-    return new (exec) StringInstance(exec, proto);
-  return new (exec) StringInstance(exec, proto, args[0]->toString(exec));
+    return new StringInstance(proto);
+  return new StringInstance(proto, args[0]->toString(exec));
 }
 
 // ECMA 15.5.1
@@ -1184,10 +1179,10 @@ JSValue* StringObjectImp::callAsFunction(ExecState* exec,
                                          JSObject* /*thisObj*/,
                                          const List& args) {
   if (args.isEmpty())
-    return jsString(exec, "");
+    return jsString("");
   else {
     JSValue* v = args[0];
-    return jsString(exec, v->toString(exec));
+    return jsString(v->toString(exec));
   }
 }
 
@@ -1198,7 +1193,7 @@ StringObjectFuncImp::StringObjectFuncImp(ExecState* exec,
                                          FunctionPrototype* funcProto,
                                          const Identifier& name)
     : InternalFunctionImp(funcProto, name) {
-  putDirect(exec->propertyNames().length, jsNumber(exec, 1),
+  putDirect(exec->propertyNames().length, jsNumber(1),
             DontDelete | ReadOnly | DontEnum);
 }
 
@@ -1218,7 +1213,7 @@ JSValue* StringObjectFuncImp::callAsFunction(ExecState* exec,
   } else
     s = "";
 
-  return jsString(exec, s);
+  return jsString(s);
 }
 
 }  // namespace KJS

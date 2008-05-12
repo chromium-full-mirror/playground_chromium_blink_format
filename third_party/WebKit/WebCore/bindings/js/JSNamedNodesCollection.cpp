@@ -52,7 +52,7 @@ JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
                                               const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
       static_cast<JSNamedNodesCollection*>(slot.slotBase());
-  return jsNumber(exec, thisObj->m_nodes.size());
+  return jsNumber(thisObj->m_nodes.size());
 }
 
 JSValue* JSNamedNodesCollection::indexGetter(ExecState* exec,

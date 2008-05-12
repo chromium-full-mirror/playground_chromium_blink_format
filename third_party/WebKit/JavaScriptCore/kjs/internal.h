@@ -46,7 +46,7 @@ class FunctionPrototype;
 class StringImp : public JSCell {
  public:
   StringImp(const UString& v) : val(v) {
-    Heap::heap(this)->reportExtraMemoryCost(v.cost());
+    Collector::reportExtraMemoryCost(v.cost());
   }
   enum HasOtherOwnerType { HasOtherOwner };
   StringImp(const UString& value, HasOtherOwnerType) : val(value) {}
@@ -68,7 +68,7 @@ class StringImp : public JSCell {
 
 class NumberImp : public JSCell {
   friend class ConstantValues;
-  friend JSValue* jsNumberCell(ExecState*, double);
+  friend JSValue* jsNumberCell(double);
 
  public:
   double value() const { return val; }
@@ -83,9 +83,7 @@ class NumberImp : public JSCell {
   virtual UString toString(ExecState* exec) const;
   virtual JSObject* toObject(ExecState* exec) const;
 
-  void* operator new(size_t size, ExecState* exec) {
-    return exec->heap()->allocateNumber(size);
-  }
+  void* operator new(size_t size) { return Collector::allocateNumber(size); }
 
  private:
   NumberImp(double v) : val(v) {}
