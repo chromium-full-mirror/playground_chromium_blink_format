@@ -167,9 +167,6 @@ static int valueForRepeatRule(int rule) {
     default:
       return CSSValueStretch;
   }
-
-  ASSERT_NOT_REACHED();
-  return CSSValueStretch;
 }
 
 static PassRefPtr<CSSValue> valueForNinePieceImage(
