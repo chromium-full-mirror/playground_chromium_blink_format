@@ -77,9 +77,6 @@ class TextCodec : Noncopyable {
   static int getUnencodableReplacement(unsigned codePoint,
                                        UnencodableHandling,
                                        UnencodableReplacementArray);
-
- protected:
-  static void appendOmittingBOM(Vector<UChar>&, const UChar*, size_t length);
 };
 
 typedef void (*EncodingNameRegistrar)(const char* alias, const char* name);
