@@ -41,8 +41,7 @@ const JSClassDefinition kJSClassDefinitionEmpty = {0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
                              OpaqueJSClass* protoClass)
-    // FIXME: <rdar://problem/4949018>
-    : className(definition->className),
+    : className(UString::Rep::createFromUTF8(definition->className)),
       parentClass(definition->parentClass),
       prototypeClass(0),
       staticValues(0),
@@ -62,11 +61,13 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
   if (const JSStaticValue* staticValue = definition->staticValues) {
     staticValues = new StaticValuesTable();
     while (staticValue->name) {
-      // FIXME: <rdar://problem/4949018>
-      staticValues->add(Identifier(staticValue->name).ustring().rep(),
-                        new StaticValueEntry(staticValue->getProperty,
-                                             staticValue->setProperty,
-                                             staticValue->attributes));
+      staticValues->add(
+          Identifier(UString::Rep::createFromUTF8(staticValue->name).get())
+              .ustring()
+              .rep(),
+          new StaticValueEntry(staticValue->getProperty,
+                               staticValue->setProperty,
+                               staticValue->attributes));
       ++staticValue;
     }
   }
@@ -74,9 +75,10 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
   if (const JSStaticFunction* staticFunction = definition->staticFunctions) {
     staticFunctions = new StaticFunctionsTable();
     while (staticFunction->name) {
-      // FIXME: <rdar://problem/4949018>
       staticFunctions->add(
-          Identifier(staticFunction->name).ustring().rep(),
+          Identifier(UString::Rep::createFromUTF8(staticFunction->name).get())
+              .ustring()
+              .rep(),
           new StaticFunctionEntry(staticFunction->callAsFunction,
                                   staticFunction->attributes));
       ++staticFunction;
