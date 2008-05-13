@@ -29,13 +29,23 @@
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
 
+#ifndef NDEBUG
+#include "CString.h"
+#endif
+
 namespace WebCore {
 
 AccessItem::AccessItem(const String& accessItemString)
-    : m_wildcard(false),
+    : m_valid(false),
+      m_wildcard(false),
       m_domainWildcard(false),
       m_portWildcard(false),
-      m_port(0) {
+      m_port(0)
+#ifndef NDEBUG
+      ,
+      m_string(accessItemString)
+#endif
+{
   parseAccessItem(accessItemString);
 }
 
@@ -54,5 +64,11 @@ void AccessItem::parseAccessItem(const String& accessItemString) {
 bool AccessItem::matches(const SecurityOrigin* accessControlOrigin) {
   return false;
 }
+
+#ifndef NDEBUG
+void AccessItem::show() {
+  printf("    AccessItem::show: %s\n", m_string.utf8().data());
+}
+#endif
 
 }  // namespace WebCore

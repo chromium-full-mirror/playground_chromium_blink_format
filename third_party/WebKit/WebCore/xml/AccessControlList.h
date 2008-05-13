@@ -42,6 +42,10 @@ class AccessControlList : Noncopyable {
 
   bool checkOrigin(const SecurityOrigin* accessControlOrigin);
 
+#ifndef NDEBUG
+  void show();
+#endif
+
  private:
   void parseAccessControlHeader(const String&);
 
