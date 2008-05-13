@@ -182,7 +182,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   mutable bool m_createdDocument;
   mutable RefPtr<Document> m_responseXML;
 
-  bool m_aborted;
+  bool m_error;
 
   // Used for onprogress tracking
   long long m_receivedLength;
