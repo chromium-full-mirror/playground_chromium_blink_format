@@ -88,14 +88,14 @@ JSValue* JSInspectedObjectWrapper::prepareIncomingValue(ExecState*,
   ASSERT_WITH_MESSAGE(
       wrapper, "Objects passed to JSInspectedObjectWrapper must be wrapped");
   if (!wrapper)
-    return 0;
+    return jsUndefined();
 
-  if (wrapper->unwrappedExecStateMatches(unwrappedExecState())) {
+  if (wrapper->allowsUnwrappedAccessFrom(unwrappedExecState())) {
     ASSERT_WITH_MESSAGE(wrapper->inherits(&s_info),
                         "A wrapper contains an object from the inspected page "
                         "but is not a JSInspectedObjectWrapper");
     if (!wrapper->inherits(&s_info))
-      return 0;
+      return jsUndefined();
 
     // Return the unwrapped object so the inspected page never sees one of its
     // own objects in wrapped form.
@@ -107,7 +107,7 @@ JSValue* JSInspectedObjectWrapper::prepareIncomingValue(ExecState*,
                       "not an Inspector callback was passed to a "
                       "JSInspectedObjectWrapper");
   if (!wrapper->inherits(&JSInspectorCallbackWrapper::s_info))
-    return 0;
+    return jsUndefined();
 
   return wrapper;
 }

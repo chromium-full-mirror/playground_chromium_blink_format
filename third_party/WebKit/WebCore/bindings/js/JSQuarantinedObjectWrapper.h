@@ -39,7 +39,7 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
   KJS::JSObject* unwrappedObject() const { return m_unwrappedObject; }
   KJS::ExecState* unwrappedExecState() const;
 
-  bool unwrappedExecStateMatches(const KJS::ExecState*) const;
+  bool allowsUnwrappedAccessFrom(const KJS::ExecState*) const;
 
   virtual bool getOwnPropertySlot(KJS::ExecState*,
                                   const KJS::Identifier&,

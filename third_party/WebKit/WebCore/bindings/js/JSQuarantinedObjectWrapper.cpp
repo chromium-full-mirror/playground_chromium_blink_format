@@ -74,9 +74,10 @@ JSQuarantinedObjectWrapper::JSQuarantinedObjectWrapper(
 
 JSQuarantinedObjectWrapper::~JSQuarantinedObjectWrapper() {}
 
-bool JSQuarantinedObjectWrapper::unwrappedExecStateMatches(
+bool JSQuarantinedObjectWrapper::allowsUnwrappedAccessFrom(
     const ExecState* exec) const {
-  return m_unwrappedGlobalObject == exec->dynamicGlobalObject();
+  return m_unwrappedGlobalObject->pageGroupIdentifier() ==
+         exec->dynamicGlobalObject()->pageGroupIdentifier();
 }
 
 ExecState* JSQuarantinedObjectWrapper::unwrappedExecState() const {
@@ -265,18 +266,18 @@ JSValue* JSQuarantinedObjectWrapper::callAsFunction(ExecState* exec,
                                                     JSObject* thisObj,
                                                     const List& args) {
   if (!allowsCallAsFunction())
-    return 0;
+    return jsUndefined();
 
   JSObject* preparedThisObj =
       static_cast<JSObject*>(prepareIncomingValue(exec, thisObj));
   if (!preparedThisObj)
-    return 0;
+    return jsUndefined();
 
   List preparedArgs;
   for (size_t i = 0; i < args.size(); ++i) {
     JSValue* preparedValue = prepareIncomingValue(exec, args[i]);
     if (!preparedValue)
-      return 0;
+      return jsUndefined();
     preparedArgs.append(preparedValue);
   }
 
