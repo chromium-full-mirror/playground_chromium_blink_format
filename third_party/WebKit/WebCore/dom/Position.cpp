@@ -856,7 +856,7 @@ void Position::getInlineBoxAndOffset(EAffinity affinity,
         return;
       }
 
-      if (caretOffset == caretMinOffset ^ affinity == UPSTREAM)
+      if ((caretOffset == caretMinOffset) ^ (affinity == UPSTREAM))
         break;
 
       candidate = box;
