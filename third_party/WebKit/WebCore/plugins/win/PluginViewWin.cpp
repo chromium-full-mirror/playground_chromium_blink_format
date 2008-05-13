@@ -644,6 +644,8 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
 
   if (retval == 0 || bytesRead != attrs.nFileSizeLow)
     return NPERR_FILE_NOT_FOUND;
+
+  return NPERR_NO_ERROR;
 }
 
 NPError PluginView::getValue(NPNVariable variable, void* value) {
