@@ -453,8 +453,8 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
                   direction() == RTL,
                   m_dirOverride || styleToUse->visuallyOrdered());
 
-  int sPos;
-  int ePos;
+  int sPos = 0;
+  int ePos = 0;
   if (paintSelectedTextOnly || paintSelectedTextSeparately)
     selectionStartEnd(sPos, ePos);
 
