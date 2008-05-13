@@ -117,6 +117,7 @@ class Widget {
   WidgetClient* client() const;
 
   virtual bool isFrameView() const;
+  virtual bool isPluginView() const { return false; }
 
   virtual void removeFromParent();
 
