@@ -40,12 +40,12 @@ typedef Vector<UString>::const_iterator NameIterator;
 Profile::Profile(const UString& title) : m_title(title) {
   // FIXME: When multi-threading is supported this will be a vector and calls
   // into the profiler will need to know which thread it is executing on.
-  m_callTree.set(new FunctionCallProfile("Thread_1"));
+  m_callTree = FunctionCallProfile::create("Thread_1");
 }
 
 void Profile::willExecute(const Vector<UString>& callStackNames) {
-  FunctionCallProfile* callTreeInsertionPoint = 0;
-  FunctionCallProfile* foundNameInTree = m_callTree.get();
+  RefPtr<FunctionCallProfile> callTreeInsertionPoint;
+  RefPtr<FunctionCallProfile> foundNameInTree = m_callTree;
   NameIterator callStackLocation = callStackNames.begin();
 
   while (callStackLocation != callStackNames.end() && foundNameInTree) {
@@ -56,9 +56,9 @@ void Profile::willExecute(const Vector<UString>& callStackNames) {
 
   if (!foundNameInTree) {  // Insert remains of the stack into the call tree.
     --callStackLocation;
-    for (FunctionCallProfile* next; callStackLocation != callStackNames.end();
-         ++callStackLocation) {
-      next = new FunctionCallProfile(*callStackLocation);
+    for (RefPtr<FunctionCallProfile> next;
+         callStackLocation != callStackNames.end(); ++callStackLocation) {
+      next = FunctionCallProfile::create(*callStackLocation);
       callTreeInsertionPoint->addChild(next);
       callTreeInsertionPoint = next;
     }
@@ -66,7 +66,7 @@ void Profile::willExecute(const Vector<UString>& callStackNames) {
     foundNameInTree->willExecute();
 }
 
-void Profile::didExecute(Vector<UString> stackNames) {
+void Profile::didExecute(const Vector<UString>& stackNames) {
   m_callTree->didExecute(stackNames, 0);
 }
 
@@ -77,8 +77,8 @@ void Profile::printDataInspectorStyle() const {
 
 typedef pair<UString::Rep*, unsigned> NameCountPair;
 
-static inline bool functionNameCountPairComparator(const NameCountPair a,
-                                                   const NameCountPair b) {
+static inline bool functionNameCountPairComparator(const NameCountPair& a,
+                                                   const NameCountPair& b) {
   return a.second > b.second;
 }
 

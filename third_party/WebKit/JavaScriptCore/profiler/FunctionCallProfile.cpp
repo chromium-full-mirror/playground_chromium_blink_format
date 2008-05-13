@@ -41,10 +41,6 @@ FunctionCallProfile::FunctionCallProfile(const UString& name)
   m_startTime = getCurrentUTCTime();
 }
 
-FunctionCallProfile::~FunctionCallProfile() {
-  deleteAllValues(m_children);
-}
-
 void FunctionCallProfile::willExecute() {
   m_startTime = getCurrentUTCTime();
 }
@@ -67,7 +63,7 @@ void FunctionCallProfile::didExecute(Vector<UString> stackNames,
   }
 }
 
-void FunctionCallProfile::addChild(FunctionCallProfile* child) {
+void FunctionCallProfile::addChild(RefPtr<FunctionCallProfile>& child) {
   if (!child)
     return;
 
@@ -84,7 +80,7 @@ FunctionCallProfile* FunctionCallProfile::findChild(const UString& name) {
   for (StackIterator currentChild = m_children.begin();
        currentChild != m_children.end(); ++currentChild) {
     if ((*currentChild)->functionName() == name)
-      return *currentChild;
+      return (*currentChild).get();
   }
 
   return 0;

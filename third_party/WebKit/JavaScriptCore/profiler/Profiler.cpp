@@ -63,7 +63,7 @@ void Profiler::startProfiling(unsigned pageGroupIdentifier,
 
   m_pageGroupIdentifier = pageGroupIdentifier;
 
-  m_currentProfile.set(new Profile(title));
+  m_currentProfile = Profile::create(title);
   m_profiling = true;
 }
 

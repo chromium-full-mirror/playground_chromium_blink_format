@@ -30,7 +30,7 @@
 #define Profiler_h
 
 #include "Profile.h"
-#include <wtf/OwnPtr.h>
+#include <wtf/RefPtr.h>
 
 namespace KJS {
 
@@ -43,8 +43,6 @@ class Profiler {
   static Profiler* profiler();
   static void debugLog(UString);
 
-  ~Profiler() { deleteAllValues(m_allProfiles); }
-
   void startProfiling(unsigned pageGroupIdentifier, const UString&);
   void stopProfiling();
 
@@ -55,10 +53,10 @@ class Profiler {
   void didExecute(ExecState*, JSObject* calledFunction);
   void didExecute(ExecState*, const UString& sourceURL, int startingLineNumber);
 
-  Vector<Profile*>& allProfiles() { return m_allProfiles; };
+  const Vector<RefPtr<Profile>>& allProfiles() { return m_allProfiles; };
   void clearProfiles() {
     if (!m_profiling)
-      deleteAllValues(m_allProfiles);
+      m_allProfiles.clear();
   };
 
   void printDataInspectorStyle(unsigned whichProfile) const;
@@ -70,8 +68,8 @@ class Profiler {
   bool m_profiling;
   unsigned m_pageGroupIdentifier;
 
-  OwnPtr<Profile> m_currentProfile;
-  Vector<Profile*> m_allProfiles;
+  RefPtr<Profile> m_currentProfile;
+  Vector<RefPtr<Profile>> m_allProfiles;
 };
 
 }  // namespace KJS
