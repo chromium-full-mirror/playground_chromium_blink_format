@@ -2274,34 +2274,18 @@ bool InspectorController::handleException(JSContextRef context,
 #pragma mark -
 #pragma mark JavaScriptDebugListener functions
 
-void InspectorController::didParseSource(ExecState*,
-                                         const UString& /*source*/,
+void InspectorController::didParseSource(const UString& /*source*/,
                                          int /*startingLineNumber*/,
                                          const UString& /*sourceURL*/,
                                          int /*sourceID*/) {}
 
-void InspectorController::failedToParseSource(ExecState*,
-                                              const UString& /*source*/,
+void InspectorController::failedToParseSource(const UString& /*source*/,
                                               int /*startingLineNumber*/,
                                               const UString& /*sourceURL*/,
                                               int /*errorLine*/,
                                               const UString& /*errorMessage*/) {
 }
 
-void InspectorController::didEnterCallFrame(ExecState*,
-                                            int /*sourceID*/,
-                                            int /*lineNumber*/) {}
-
-void InspectorController::willExecuteStatement(ExecState*,
-                                               int /*sourceID*/,
-                                               int /*lineNumber*/) {}
-
-void InspectorController::willLeaveCallFrame(ExecState*,
-                                             int /*sourceID*/,
-                                             int /*lineNumber*/) {}
-
-void InspectorController::exceptionWasRaised(ExecState*,
-                                             int /*sourceID*/,
-                                             int /*lineNumber*/) {}
+void InspectorController::didPause() {}
 
 }  // namespace WebCore

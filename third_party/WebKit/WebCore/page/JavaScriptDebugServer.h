@@ -33,11 +33,16 @@
 
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
+#include <wtf/RefPtr.h>
 
 namespace WebCore {
 
 class Frame;
+class FrameView;
 class Page;
+class PageGroup;
+class PausedTimeouts;
+class JavaScriptCallFrame;
 class JavaScriptDebugListener;
 
 class JavaScriptDebugServer : KJS::Debugger {
@@ -50,13 +55,24 @@ class JavaScriptDebugServer : KJS::Debugger {
   void addListener(JavaScriptDebugListener*, Page*);
   void removeListener(JavaScriptDebugListener*, Page*);
 
+  void addBreakpoint(int sourceID, unsigned lineNumber);
+  void removeBreakpoint(int sourceID, unsigned lineNumber);
+  bool hasBreakpoint(int sourceID, unsigned lineNumber) const;
+  void clearBreakpoints();
+
+  void pauseOnNextStatement();
+  void resume();
+
+  void stepIntoStatement();
+  void stepOverStatement();
+  void stepOutOfFunction();
+
+  JavaScriptCallFrame* currentCallFrame();
+
   void pageCreated(Page*);
 
   typedef HashSet<JavaScriptDebugListener*> ListenerSet;
-  typedef void (JavaScriptDebugListener::*JavaScriptExecutionCallback)(
-      KJS::ExecState*,
-      int sourceID,
-      int lineNumber);
+  typedef void (JavaScriptDebugListener::*JavaScriptExecutionCallback)();
 
  private:
   JavaScriptDebugServer();
@@ -65,11 +81,16 @@ class JavaScriptDebugServer : KJS::Debugger {
   bool hasListeners() const {
     return !m_listeners.isEmpty() || !m_pageListenersMap.isEmpty();
   }
+  bool hasListenersInterestedInPage(Page*);
+
+  void setJavaScriptPaused(const PageGroup&, bool paused);
+  void setJavaScriptPaused(Page*, bool paused);
+  void setJavaScriptPaused(Frame*, bool paused);
+  void setJavaScriptPaused(FrameView*, bool paused);
 
   void dispatchFunctionToListeners(JavaScriptExecutionCallback,
-                                   KJS::ExecState*,
-                                   int sourceID,
-                                   int lineNumber);
+                                   KJS::ExecState*);
+  void pauseIfNeeded(KJS::ExecState* exec, int sourceID, int lineNumber);
 
   virtual bool sourceParsed(KJS::ExecState*,
                             int sourceID,
@@ -100,6 +121,12 @@ class JavaScriptDebugServer : KJS::Debugger {
   PageListenersMap m_pageListenersMap;
   ListenerSet m_listeners;
   bool m_callingListeners;
+  bool m_pauseOnNextStatement;
+  bool m_paused;
+  KJS::ExecState* m_pauseOnExecState;
+  RefPtr<JavaScriptCallFrame> m_currentCallFrame;
+  HashMap<RefPtr<Frame>, PausedTimeouts*> m_pausedTimeouts;
+  HashMap<int, HashSet<unsigned>*> m_breakpoints;
 };
 
 }  // namespace WebCore
