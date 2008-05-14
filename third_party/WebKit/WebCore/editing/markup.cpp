@@ -88,6 +88,7 @@ static void appendAttributeValue(Vector<UChar>& result, const String& attr) {
   unsigned lastCopiedFrom = 0;
 
   static const String ampEntity("&amp;");
+  static const String gtEntity("&gt;");
   static const String ltEntity("&lt;");
   static const String quotEntity("&quot;");
   static const String nbspEntity("&nbsp;");
@@ -103,6 +104,11 @@ static void appendAttributeValue(Vector<UChar>& result, const String& attr) {
       case '<':
         result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
         append(result, ltEntity);
+        lastCopiedFrom = i + 1;
+        break;
+      case '>':
+        result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
+        append(result, gtEntity);
         lastCopiedFrom = i + 1;
         break;
       case '"':
@@ -128,6 +134,7 @@ static String escapeContentText(const String& in) {
   unsigned lastCopiedFrom = 0;
 
   static const String ampEntity("&amp;");
+  static const String gtEntity("&gt;");
   static const String ltEntity("&lt;");
   static const String nbspEntity("&nbsp;");
 
@@ -146,6 +153,11 @@ static String escapeContentText(const String& in) {
       case '<':
         s.append(characters + lastCopiedFrom, i - lastCopiedFrom);
         append(s, ltEntity);
+        lastCopiedFrom = i + 1;
+        break;
+      case '>':
+        s.append(characters + lastCopiedFrom, i - lastCopiedFrom);
+        append(s, gtEntity);
         lastCopiedFrom = i + 1;
         break;
       case noBreakSpace:
@@ -168,6 +180,7 @@ static void appendEscapedContent(Vector<UChar>& result,
   unsigned lastCopiedFrom = 0;
 
   static const String ampEntity("&amp;");
+  static const String gtEntity("&gt;");
   static const String ltEntity("&lt;");
   static const String nbspEntity("&nbsp;");
 
@@ -182,6 +195,11 @@ static void appendEscapedContent(Vector<UChar>& result,
       case '<':
         result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
         append(result, ltEntity);
+        lastCopiedFrom = i + 1;
+        break;
+      case '>':
+        result.append(uchars + lastCopiedFrom, i - lastCopiedFrom);
+        append(result, gtEntity);
         lastCopiedFrom = i + 1;
         break;
       case noBreakSpace:
