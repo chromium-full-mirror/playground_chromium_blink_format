@@ -78,7 +78,7 @@ static JSValueRef getTotalTime(JSContextRef ctx,
 
   FunctionCallProfile* functionCallProfile =
       static_cast<FunctionCallProfile*>(JSObjectGetPrivate(thisObject));
-  return JSValueMakeNumber(ctx, functionCallProfile->milliSecs());
+  return JSValueMakeNumber(ctx, functionCallProfile->totalTime());
 }
 
 static JSValueRef getSelfTime(JSContextRef ctx,
@@ -92,7 +92,7 @@ static JSValueRef getSelfTime(JSContextRef ctx,
 
   FunctionCallProfile* functionCallProfile =
       static_cast<FunctionCallProfile*>(JSObjectGetPrivate(thisObject));
-  return JSValueMakeNumber(ctx, functionCallProfile->milliSecs());
+  return JSValueMakeNumber(ctx, functionCallProfile->selfTime());
 }
 
 static JSValueRef getNumberOfCalls(JSContextRef ctx,
