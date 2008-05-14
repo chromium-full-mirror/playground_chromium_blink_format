@@ -28,6 +28,7 @@
 #include "EditorClient.h"
 #include "DOMWindow.h"
 #include "DragController.h"
+#include "EventNames.h"
 #include "FileSystem.h"
 #include "FocusController.h"
 #include "Frame.h"
@@ -38,6 +39,7 @@
 #include "InspectorController.h"
 #include "JavaScriptDebugServer.h"
 #include "Logging.h"
+#include "NetworkStateNotifier.h"
 #include "Navigator.h"
 #include "PageGroup.h"
 #include "PluginData.h"
@@ -61,6 +63,8 @@
 
 namespace WebCore {
 
+using namespace EventNames;
+
 static HashSet<Page*>* allPages;
 
 #ifndef NDEBUG
@@ -76,6 +80,36 @@ struct PageCounter {
 int PageCounter::count = 0;
 static PageCounter pageCounter;
 #endif
+
+static void networkStateChanged() {
+  Vector<RefPtr<Frame>> frames;
+
+  // Get all the frames of all the pages in all the page groups
+  HashSet<Page*>::iterator end = allPages->end();
+  for (HashSet<Page*>::iterator it = allPages->begin(); it != end; ++it) {
+    for (Frame* frame = (*it)->mainFrame(); frame;
+         frame = frame->tree()->traverseNext())
+      frames.append(frame);
+  }
+
+  AtomicString eventName =
+      networkStateNotifier().onLine() ? onlineEvent : offlineEvent;
+
+  for (unsigned i = 0; i < frames.size(); i++) {
+    Document* document = frames[i]->document();
+
+    if (!document)
+      continue;
+
+    // If the document does not have a body the event should be dispatched to
+    // the document
+    EventTargetNode* eventTarget = document->body();
+    if (!eventTarget)
+      eventTarget = document;
+
+    eventTarget->dispatchHTMLEvent(eventName, false, false);
+  }
+}
 
 Page::Page(ChromeClient* chromeClient,
            ContextMenuClient* contextMenuClient,
@@ -105,6 +139,8 @@ Page::Page(ChromeClient* chromeClient,
   if (!allPages) {
     allPages = new HashSet<Page*>;
     setFocusRingColorChangeFunction(setNeedsReapplyStyles);
+
+    networkStateNotifier().setNetworkStateChangedFunction(networkStateChanged);
   }
 
   ASSERT(!allPages->contains(this));

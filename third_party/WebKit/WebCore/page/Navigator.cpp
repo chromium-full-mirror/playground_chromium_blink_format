@@ -30,6 +30,7 @@
 #include "FrameLoaderClient.h"
 #include "Language.h"
 #include "MimeTypeArray.h"
+#include "NetworkStateNotifier.h"
 #include "PlatformString.h"
 #include "PluginArray.h"
 #include "PluginData.h"
@@ -151,6 +152,10 @@ bool Navigator::javaEnabled() const {
   if (!m_frame)
     return false;
   return m_frame->settings()->isJavaEnabled();
+}
+
+bool Navigator::onLine() const {
+  return networkStateNotifier().onLine();
 }
 
 }  // namespace WebCore

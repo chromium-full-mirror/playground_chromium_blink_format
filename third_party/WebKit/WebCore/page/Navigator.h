@@ -57,6 +57,8 @@ class Navigator : public RefCounted<Navigator> {
   bool cookieEnabled() const;
   bool javaEnabled() const;
 
+  bool onLine() const;
+
  private:
   Navigator(Frame*);
   Frame* m_frame;
