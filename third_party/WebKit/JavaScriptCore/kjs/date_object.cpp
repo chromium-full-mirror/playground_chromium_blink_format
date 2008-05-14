@@ -92,7 +92,7 @@ class DateObjectFuncImp : public InternalFunctionImp {
                                   JSObject* thisObj,
                                   const List& args);
 
-  enum { Parse, UTC };
+  enum { Parse, UTC, Now };
 
  private:
   int id;
@@ -519,6 +519,10 @@ DateObjectImp::DateObjectImp(ExecState* exec,
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::UTC, 7,
                             exec->propertyNames().UTC),
       DontEnum);
+  putDirectFunction(
+      new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::Now, 0,
+                            exec->propertyNames().now),
+      DontEnum);
   putDirect(exec->propertyNames().length, 7, ReadOnly | DontDelete | DontEnum);
 }
 
@@ -601,30 +605,33 @@ DateObjectFuncImp::DateObjectFuncImp(ExecState* exec,
 JSValue* DateObjectFuncImp::callAsFunction(ExecState* exec,
                                            JSObject*,
                                            const List& args) {
-  if (id == Parse) {
+  if (id == Parse)
     return jsNumber(parseDate(args[0]->toString(exec)));
-  } else {  // UTC
-    int n = args.size();
-    if (isnan(args[0]->toNumber(exec)) || isnan(args[1]->toNumber(exec)) ||
-        (n >= 3 && isnan(args[2]->toNumber(exec))) ||
-        (n >= 4 && isnan(args[3]->toNumber(exec))) ||
-        (n >= 5 && isnan(args[4]->toNumber(exec))) ||
-        (n >= 6 && isnan(args[5]->toNumber(exec))) ||
-        (n >= 7 && isnan(args[6]->toNumber(exec)))) {
-      return jsNaN();
-    }
-
-    GregorianDateTime t;
-    int year = args[0]->toInt32(exec);
-    t.year = (year >= 0 && year <= 99) ? year : year - 1900;
-    t.month = args[1]->toInt32(exec);
-    t.monthDay = (n >= 3) ? args[2]->toInt32(exec) : 1;
-    t.hour = args[3]->toInt32(exec);
-    t.minute = args[4]->toInt32(exec);
-    t.second = args[5]->toInt32(exec);
-    double ms = (n >= 7) ? args[6]->toNumber(exec) : 0;
-    return jsNumber(gregorianDateTimeToMS(t, ms, true));
+  else if (id == Now)
+    return jsNumber(getCurrentUTCTime());
+}
+else {  // UTC
+  int n = args.size();
+  if (isnan(args[0]->toNumber(exec)) || isnan(args[1]->toNumber(exec)) ||
+      (n >= 3 && isnan(args[2]->toNumber(exec))) ||
+      (n >= 4 && isnan(args[3]->toNumber(exec))) ||
+      (n >= 5 && isnan(args[4]->toNumber(exec))) ||
+      (n >= 6 && isnan(args[5]->toNumber(exec))) ||
+      (n >= 7 && isnan(args[6]->toNumber(exec)))) {
+    return jsNaN();
   }
+
+  GregorianDateTime t;
+  int year = args[0]->toInt32(exec);
+  t.year = (year >= 0 && year <= 99) ? year : year - 1900;
+  t.month = args[1]->toInt32(exec);
+  t.monthDay = (n >= 3) ? args[2]->toInt32(exec) : 1;
+  t.hour = args[3]->toInt32(exec);
+  t.minute = args[4]->toInt32(exec);
+  t.second = args[5]->toInt32(exec);
+  double ms = (n >= 7) ? args[6]->toNumber(exec) : 0;
+  return jsNumber(gregorianDateTimeToMS(t, ms, true));
+}
 }
 
 // -----------------------------------------------------------------------------
