@@ -391,7 +391,9 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
   if (dataStatement.prepare() != SQLResultOk)
     return false;
 
-  dataStatement.bindBlob(1, resource->data()->data(), resource->data()->size());
+  if (resource->data()->size())
+    dataStatement.bindBlob(1, resource->data()->data(),
+                           resource->data()->size());
 
   if (!dataStatement.executeCommand())
     return false;
