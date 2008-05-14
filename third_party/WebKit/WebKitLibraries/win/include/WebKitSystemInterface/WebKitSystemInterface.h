@@ -47,6 +47,9 @@ void wkSetFontSmoothingLevel(int type);
 int wkGetFontSmoothingLevel();
 uint32_t wkSetFontSmoothingStyle(CGContextRef cg, bool fontAllowsSmoothing);
 void wkRestoreFontSmoothingStyle(CGContextRef cg, uint32_t oldStyle);
+void wkSetCGContextFontRenderingStyle(CGContextRef,
+                                      bool isSystemFont,
+                                      bool isPrinterFont);
 void wkGetGlyphAdvances(CGFontRef,
                         const CGAffineTransform&,
                         bool isSystemFont,
