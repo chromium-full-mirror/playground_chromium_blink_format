@@ -1169,13 +1169,23 @@ InspectorController::~InspectorController() {
   if (m_page)
     m_page->setParentInspectorController(0);
 
-  stopDebugging();
+  // m_inspectedPage should have been cleared in inspectedPageDestroyed().
+  ASSERT(!m_inspectedPage);
 
   deleteAllValues(m_frameResources);
   deleteAllValues(m_consoleMessages);
 }
 
+void InspectorController::inspectedPageDestroyed() {
+  ASSERT(m_inspectedPage);
+  stopDebugging();
+  m_inspectedPage = 0;
+}
+
 bool InspectorController::enabled() const {
+  if (!m_inspectedPage)
+    return false;
+
   return m_inspectedPage->settings()->developerExtrasEnabled();
 }
 
@@ -2088,6 +2098,8 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
   if (!enabled())
     return;
 
+  ASSERT(m_inspectedPage);
+
   if (loader->frame() == m_inspectedPage->mainFrame()) {
     m_client->inspectedURLChanged(loader->url().string());
 
@@ -2182,6 +2194,8 @@ void InspectorController::didLoadResourceFromMemoryCache(
   resource->responseReceivedTime = resource->startTime;
   resource->endTime = resource->startTime;
 
+  ASSERT(m_inspectedPage);
+
   if (loader->frame() == m_inspectedPage->mainFrame() &&
       request.url() == loader->requestURL())
     m_mainResource = resource;
@@ -2203,6 +2217,8 @@ void InspectorController::identifierForInitialRequest(
       InspectorResource::create(identifier, loader, loader->frame());
 
   updateResourceRequest(resource.get(), request);
+
+  ASSERT(m_inspectedPage);
 
   if (loader->frame() == m_inspectedPage->mainFrame() &&
       request.url() == loader->requestURL())
@@ -2374,6 +2390,8 @@ void InspectorController::moveWindowBy(float x, float y) const {
 }
 
 void InspectorController::startDebuggingAndReloadInspectedPage() {
+  ASSERT(m_inspectedPage);
+
   JavaScriptDebugServer::shared().addListener(this, m_inspectedPage);
   m_debuggerAttached = true;
   JavaScriptDebugServer::shared().clearBreakpoints();
@@ -2381,6 +2399,8 @@ void InspectorController::startDebuggingAndReloadInspectedPage() {
 }
 
 void InspectorController::stopDebugging() {
+  ASSERT(m_inspectedPage);
+
   JavaScriptDebugServer::shared().removeListener(this, m_inspectedPage);
   m_debuggerAttached = false;
 }
@@ -2525,6 +2545,8 @@ void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
     // <img>.
     lineBoxRects.append(boundingBox);
   }
+
+  ASSERT(m_inspectedPage);
 
   FrameView* view = m_inspectedPage->mainFrame()->view();
   FloatRect overlayRect = view->visibleContentRect();
