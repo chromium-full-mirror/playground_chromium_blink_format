@@ -58,6 +58,7 @@ JavaScriptDebugServer& JavaScriptDebugServer::shared() {
 
 JavaScriptDebugServer::JavaScriptDebugServer()
     : m_callingListeners(false),
+      m_pauseOnExceptions(false),
       m_pauseOnNextStatement(false),
       m_paused(false),
       m_pauseOnExecState(0) {}
@@ -173,6 +174,10 @@ bool JavaScriptDebugServer::hasBreakpoint(int sourceID,
 void JavaScriptDebugServer::clearBreakpoints() {
   deleteAllValues(m_breakpoints);
   m_breakpoints.clear();
+}
+
+void JavaScriptDebugServer::setPauseOnExceptions(bool pause) {
+  m_pauseOnExceptions = pause;
 }
 
 void JavaScriptDebugServer::pauseOnNextStatement() {
@@ -480,9 +485,8 @@ bool JavaScriptDebugServer::exception(ExecState* exec,
   else
     m_currentCallFrame =
         JavaScriptCallFrame::create(exec, 0, sourceID, lineNumber);
-  // FIXME: ideally this should only pause if a "pause on exception" flag is
-  // set,
-  // not m_pauseOnNextStatement, etc.
+  if (m_pauseOnExceptions)
+    m_pauseOnNextStatement = true;
   pauseIfNeeded(exec, sourceID, lineNumber);
   return true;
 }
