@@ -545,7 +545,6 @@ PluginView::PluginView(Frame* parentFrame,
       m_popPopupsStateTimer(this, &PluginView::popPopupsStateTimerFired),
       m_paramNames(0),
       m_paramValues(0),
-      m_window(0),
       m_isWindowed(true),
       m_isTransparent(false),
       m_isVisible(false),
@@ -562,6 +561,7 @@ PluginView::PluginView(Frame* parentFrame,
       m_isCallingPluginWndProc(false)
 #endif
       ,
+      m_window(0),
       m_loadManually(loadManually),
       m_manualStream(0),
       m_isJavaScriptPaused(false) {

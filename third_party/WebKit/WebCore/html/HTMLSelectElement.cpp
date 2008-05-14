@@ -646,8 +646,8 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
       for (listIndex += 1; listIndex >= 0 && listIndex < size &&
                            (listItems()[listIndex]->disabled() ||
                             !listItems()[listIndex]->hasTagName(optionTag));
-           ++listIndex)
-        ;
+           ++listIndex) {
+      }
 
       if (listIndex >= 0 && listIndex < size)
         setSelectedIndex(listToOptionIndex(listIndex));
@@ -657,8 +657,8 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
       for (listIndex -= 1; listIndex >= 0 && listIndex < size &&
                            (listItems()[listIndex]->disabled() ||
                             !listItems()[listIndex]->hasTagName(optionTag));
-           --listIndex)
-        ;
+           --listIndex) {
+      }
 
       if (listIndex >= 0 && listIndex < size)
         setSelectedIndex(listToOptionIndex(listIndex));

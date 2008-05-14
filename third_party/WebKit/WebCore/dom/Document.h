@@ -148,7 +148,7 @@ class FormElementKey {
   void ref() const;
   void deref() const;
 
-  static AtomicStringImpl* const hashTableDeletedValue() {
+  static AtomicStringImpl* hashTableDeletedValue() {
     return reinterpret_cast<AtomicStringImpl*>(-1);
   }
 
