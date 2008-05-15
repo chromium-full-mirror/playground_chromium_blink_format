@@ -3816,7 +3816,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                           CSSValueXxSmall + fontDescription.keywordSize() - 1,
                           m_style->htmlHacks(), false));
         fontDescription.setGenericFamily(initialDesc.genericFamily());
-        fontDescription.setFamily(initialDesc.firstFamily());
+        if (!initialDesc.firstFamily().familyIsEmpty())
+          fontDescription.setFamily(initialDesc.firstFamily());
         if (m_style->setFontDescription(fontDescription))
           m_fontDirty = true;
         return;
