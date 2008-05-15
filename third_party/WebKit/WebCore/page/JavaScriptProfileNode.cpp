@@ -94,6 +94,34 @@ static JSValueRef getSelfTime(JSContextRef ctx,
   return JSValueMakeNumber(ctx, profileNode->selfTime());
 }
 
+static JSValueRef getTotalPercent(JSContextRef ctx,
+                                  JSObjectRef thisObject,
+                                  JSStringRef propertyName,
+                                  JSValueRef* exception) {
+  KJS::JSLock lock;
+
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  ProfileNode* profileNode =
+      static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeNumber(ctx, profileNode->totalPercent());
+}
+
+static JSValueRef getSelfPercent(JSContextRef ctx,
+                                 JSObjectRef thisObject,
+                                 JSStringRef propertyName,
+                                 JSValueRef* exception) {
+  KJS::JSLock lock;
+
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  ProfileNode* profileNode =
+      static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeNumber(ctx, profileNode->selfPercent());
+}
+
 static JSValueRef getNumberOfCalls(JSContextRef ctx,
                                    JSObjectRef thisObject,
                                    JSStringRef propertyName,
@@ -175,6 +203,8 @@ JSClassRef ProfileNodeClass() {
       {"functionName", getFunctionName, 0, kJSPropertyAttributeNone},
       {"totalTime", getTotalTime, 0, kJSPropertyAttributeNone},
       {"selfTime", getSelfTime, 0, kJSPropertyAttributeNone},
+      {"totalPercent", getTotalPercent, 0, kJSPropertyAttributeNone},
+      {"selfPercent", getSelfPercent, 0, kJSPropertyAttributeNone},
       {"numberOfCalls", getNumberOfCalls, 0, kJSPropertyAttributeNone},
       {"children", getChildren, 0, kJSPropertyAttributeNone},
       {0, 0, 0, 0}};
