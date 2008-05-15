@@ -191,6 +191,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isCheckboxOrRadio() const { return false; };
   virtual bool isListBox() const { return false; };
   virtual bool isFileUploadButton() const { return false; };
+  virtual bool isProgressIndicator() const { return false; };
 
   virtual bool isChecked() const { return false; };
   virtual bool isEnabled() const { return false; };
@@ -215,6 +216,9 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool accessibilityIsIgnored() const { return true; };
 
   virtual int intValue() const;
+  virtual float valueForRange() const { return 0.0f; }
+  virtual float maxValueForRange() const { return 0.0f; }
+  virtual float minValueForRange() const { return 0.0f; }
   virtual int layoutCount() const;
   static bool isARIAControl(AccessibilityRole);
   static bool isARIAInput(AccessibilityRole);

@@ -221,11 +221,28 @@ bool AccessibilityRenderObject::isFileUploadButton() const {
   return false;
 }
 
+bool AccessibilityRenderObject::isProgressIndicator() const {
+  return roleValue() == ProgressIndicatorRole;
+}
+
 bool AccessibilityRenderObject::isPressed() const {
   ASSERT(m_renderer);
   if (roleValue() != ButtonRole)
     return false;
-  return m_renderer->node() && m_renderer->node()->active();
+
+  Node* node = m_renderer->node();
+  if (!node)
+    return false;
+
+  // If this is an ARIA button, check the aria-pressed attribute rather than
+  // node()->active()
+  if (ariaRoleAttribute() == ButtonRole) {
+    if (equalIgnoringCase(getAttribute(aria_pressedAttr).string(), "true"))
+      return true;
+    return false;
+  }
+
+  return node->active();
 }
 
 bool AccessibilityRenderObject::isIndeterminate() const {
@@ -267,9 +284,19 @@ bool AccessibilityRenderObject::isOffScreen() const {
 
 int AccessibilityRenderObject::headingLevel(Node* node) {
   // headings can be in block flow and non-block flow
-
   if (!node)
     return 0;
+
+  if (RenderObject* renderer = node->renderer()) {
+    AccessibilityObject* axObjectForNode =
+        node->document()->axObjectCache()->get(renderer);
+    if (axObjectForNode->ariaRoleAttribute() == HeadingRole) {
+      if (!node->isElementNode())
+        return 0;
+      Element* element = static_cast<Element*>(node);
+      return element->getAttribute(aria_levelAttr).toInt();
+    }
+  }
 
   if (node->hasTagName(h1Tag))
     return 1;
@@ -289,17 +316,6 @@ int AccessibilityRenderObject::headingLevel(Node* node) {
   if (node->hasTagName(h6Tag))
     return 6;
 
-  // FIXME: When we implement ARIA's level property, this needs to return that
-  // instead of 1.
-  RenderObject* renderer = node->renderer();
-  if (!renderer)
-    return 0;
-
-  AccessibilityObject* axObjectForNode =
-      node->document()->axObjectCache()->get(renderer);
-  if (axObjectForNode->ariaRoleAttribute() == HeadingRole)
-    return 1;
-
   return 0;
 }
 
@@ -309,6 +325,19 @@ bool AccessibilityRenderObject::isHeading() const {
 
 bool AccessibilityRenderObject::isLink() const {
   return roleValue() == WebCoreLinkRole;
+}
+
+const AtomicString& AccessibilityRenderObject::getAttribute(
+    const QualifiedName& attribute) const {
+  Node* node = m_renderer->element();
+  if (!node)
+    return nullAtom;
+
+  if (!node->isElementNode())
+    return nullAtom;
+
+  Element* element = static_cast<Element*>(node);
+  return element->getAttribute(attribute);
 }
 
 HTMLAnchorElement* AccessibilityRenderObject::anchorElement() const {
@@ -463,10 +492,40 @@ int AccessibilityRenderObject::intValue() const {
     return headingLevel(m_renderer->element());
 
   Node* node = m_renderer->element();
-  if (node && isCheckboxOrRadio() && ariaRoleAttribute() == UnknownRole)
-    return static_cast<HTMLInputElement*>(node)->checked();
+  if (!node || !isCheckboxOrRadio())
+    return 0;
 
-  return 0;
+  // If this is an ARIA checkbox or radio, check the aria-checked attribute
+  // rather than node()->checked()
+  AccessibilityRole ariaRole = ariaRoleAttribute();
+  if (ariaRole == RadioButtonRole || ariaRole == CheckBoxRole) {
+    if (equalIgnoringCase(getAttribute(aria_checkedAttr).string(), "true"))
+      return true;
+    return false;
+  }
+
+  return static_cast<HTMLInputElement*>(node)->checked();
+}
+
+float AccessibilityRenderObject::valueForRange() const {
+  if (!isProgressIndicator())
+    return 0.0f;
+
+  return getAttribute(aria_valuenowAttr).toFloat();
+}
+
+float AccessibilityRenderObject::maxValueForRange() const {
+  if (!isProgressIndicator())
+    return 0.0f;
+
+  return getAttribute(aria_valuemaxAttr).toFloat();
+}
+
+float AccessibilityRenderObject::minValueForRange() const {
+  if (!isProgressIndicator())
+    return 0.0f;
+
+  return getAttribute(aria_valueminAttr).toFloat();
 }
 
 String AccessibilityRenderObject::stringValue() const {
@@ -566,16 +625,18 @@ String AccessibilityRenderObject::ariaAccessiblityName(const String& s) const {
 
 String AccessibilityRenderObject::ariaLabeledByAttribute() const {
   Node* node = m_renderer->node();
-  if (!node || !node->isElementNode())
+  if (!node)
+    return String();
+
+  if (!node->isElementNode())
     return String();
 
   // The ARIA spec uses the British spelling: "labelled." It seems prudent to
   // support the American
   // spelling ("labeled") as well.
-  Element* element = static_cast<Element*>(node);
-  String idList = element->getAttribute(aria_labeledbyAttr).string();
+  String idList = getAttribute(aria_labeledbyAttr).string();
   if (idList.isEmpty()) {
-    idList = element->getAttribute(aria_labelledbyAttr).string();
+    idList = getAttribute(aria_labelledbyAttr).string();
     if (idList.isEmpty())
       return String();
   }
@@ -626,8 +687,7 @@ String AccessibilityRenderObject::title() const {
     return textUnderElement();
 
   if (isLink()) {
-    Element* element = static_cast<Element*>(node);
-    const AtomicString& title = element->getAttribute(titleAttr);
+    const AtomicString& title = getAttribute(titleAttr);
     if (!title.isEmpty())
       return title;
 
@@ -641,12 +701,7 @@ String AccessibilityRenderObject::title() const {
 }
 
 String AccessibilityRenderObject::ariaDescribedByAttribute() const {
-  Node* node = m_renderer->node();
-  if (!node || !node->isElementNode())
-    return String();
-
-  Element* element = static_cast<Element*>(node);
-  String idList = element->getAttribute(aria_describedbyAttr).string();
+  String idList = getAttribute(aria_describedbyAttr).string();
   if (idList.isEmpty())
     return String();
 
@@ -940,7 +995,9 @@ String AccessibilityRenderObject::selectedText() const {
 
 const AtomicString& AccessibilityRenderObject::accessKey() const {
   Node* node = m_renderer->element();
-  if (!node || !node->isElementNode())
+  if (!node)
+    return nullAtom;
+  if (!node->isElementNode())
     return nullAtom;
   return static_cast<Element*>(node)->getAttribute(accesskeyAttr);
 }
@@ -1545,9 +1602,13 @@ static const ARIARoleMap& createARIARoleMap() {
   };
 
   static const RoleEntry roles[] = {
-      {String("button"), ButtonRole},    {String("checkbox"), CheckBoxRole},
-      {String("heading"), HeadingRole},  {String("img"), ImageRole},
-      {String("link"), WebCoreLinkRole}, {String("radio"), RadioButtonRole},
+      {String("button"), ButtonRole},
+      {String("checkbox"), CheckBoxRole},
+      {String("heading"), HeadingRole},
+      {String("img"), ImageRole},
+      {String("link"), WebCoreLinkRole},
+      {String("progressbar"), ProgressIndicatorRole},
+      {String("radio"), RadioButtonRole},
       {String("textbox"), TextAreaRole}};
   ARIARoleMap& roleMap = *new ARIARoleMap;
 
@@ -1564,12 +1625,7 @@ static AccessibilityRole ariaRoleToWebCoreRole(String value) {
 }
 
 AccessibilityRole AccessibilityRenderObject::ariaRoleAttribute() const {
-  Node* node = m_renderer->node();
-  if (!node || !node->isElementNode())
-    return UnknownRole;
-
-  Element* element = static_cast<Element*>(node);
-  String ariaRole = element->getAttribute(roleAttr).string();
+  String ariaRole = getAttribute(roleAttr).string();
   if (ariaRole.isNull() || ariaRole.isEmpty())
     return UnknownRole;
 
@@ -1716,7 +1772,7 @@ bool AccessibilityRenderObject::canSetFocusAttribute() const {
 }
 
 bool AccessibilityRenderObject::canSetValueAttribute() const {
-  return isTextControl();
+  return isTextControl() || isProgressIndicator();
 }
 
 bool AccessibilityRenderObject::canSetTextRangeAttributes() const {
