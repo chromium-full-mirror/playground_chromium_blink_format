@@ -65,9 +65,6 @@
 #include "PlatformMenuDescription.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformScrollBar.h"
-#include "PluginData.h"
-#include "PluginDatabase.h"
-#include "PluginPackage.h"
 #include "PopupMenu.h"
 #include "RenderTheme.h"
 #include "ResourceHandle.h"
@@ -155,38 +152,6 @@ void WebCore::findWordBoundary(UChar const* str,
   notImplemented();
   *start = position;
   *end = position;
-}
-
-void PluginDatabase::getPluginPathsInDirectories(HashSet<String>&) const {
-  notImplemented();
-}
-Vector<String> PluginDatabase::defaultPluginDirectories() {
-  notImplemented();
-  return Vector<String>();
-}
-bool PluginDatabase::isPreferredPluginDirectory(const String&) {
-  notImplemented();
-  return false;
-}
-int PluginPackage::compare(const PluginPackage&) const {
-  notImplemented();
-  return 0;
-}
-bool PluginPackage::fetchInfo() {
-  notImplemented();
-  return false;
-}
-unsigned PluginPackage::hash() const {
-  notImplemented();
-  return 0;
-}
-bool PluginPackage::equal(const PluginPackage&, const PluginPackage&) {
-  notImplemented();
-  return false;
-}
-bool PluginPackage::load() {
-  notImplemented();
-  return false;
 }
 
 void Widget::setIsSelected(bool) {
@@ -431,11 +396,4 @@ PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {
   notImplemented();
   return 0;
 }
-}
-
-void PluginData::initPlugins() {
-  notImplemented();
-}
-void PluginData::refresh() {
-  notImplemented();
 }
