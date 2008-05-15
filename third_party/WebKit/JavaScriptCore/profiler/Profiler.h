@@ -59,6 +59,8 @@ class Profiler {
       m_allProfiles.clear();
   };
 
+  Profile* currentProfile() const { return m_currentProfile.get(); }
+
   void printDataInspectorStyle(unsigned whichProfile) const;
   void printDataSampleStyle(unsigned whichProfile) const;
 

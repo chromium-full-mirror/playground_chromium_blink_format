@@ -49,6 +49,8 @@ class Profile : public RefCounted<Profile> {
   const UString& title() const { return m_title; };
   ProfileNode* callTree() const { return m_callTree.get(); };
 
+  double totalTime() const { return m_callTree->totalTime(); }
+
   void printDataInspectorStyle() const;
   void printDataSampleStyle() const;
 
