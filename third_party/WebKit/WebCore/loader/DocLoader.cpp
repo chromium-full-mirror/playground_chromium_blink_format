@@ -268,7 +268,9 @@ void DocLoader::clearPreloads() {
        it != end; ++it) {
     CachedResource* res = *it;
     res->decreasePreloadCount();
-    if (res->preloadResult() == CachedResource::PreloadNotReferenced)
+    if (res->canDelete() && !res->inCache())
+      delete res;
+    else if (res->preloadResult() == CachedResource::PreloadNotReferenced)
       cache()->remove(res);
   }
   m_preloads.clear();
