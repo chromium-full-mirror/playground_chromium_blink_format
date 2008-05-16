@@ -232,7 +232,7 @@ bool ApplicationCacheStorage::executeSQLCommand(const String& sql) {
   return result;
 }
 
-static const int SchemaVersion = 1;
+static const int SchemaVersion = 2;
 
 void ApplicationCacheStorage::verifySchemaVersion() {
   if (m_database.tableExists("SchemaVersion")) {
@@ -304,8 +304,9 @@ void ApplicationCacheStorage::openDatabase(bool createIfDoesNotExist) {
   executeSQLCommand(
       "CREATE TABLE IF NOT EXISTS CacheResources (id INTEGER PRIMARY KEY "
       "AUTOINCREMENT, url TEXT NOT NULL ON CONFLICT FAIL, "
-      "statusCode INTEGER NOT NULL, responseURL TEXT NOT NULL, headers TEXT, "
-      "data INTEGER NOT NULL ON CONFLICT FAIL)");
+      "statusCode INTEGER NOT NULL, responseURL TEXT NOT NULL, mimeType TEXT, "
+      "textEncodingName TEXT, headers TEXT, data INTEGER NOT NULL ON CONFLICT "
+      "FAIL)");
   executeSQLCommand(
       "CREATE TABLE IF NOT EXISTS CacheResourceData (id INTEGER PRIMARY KEY "
       "AUTOINCREMENT, data BLOB)");
@@ -449,10 +450,10 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
 
   String headers = String::adopt(stringBuilder);
 
-  SQLiteStatement resourceStatement(m_database,
-                                    "INSERT INTO CacheResources (url, "
-                                    "statusCode, responseURL, headers, data) "
-                                    "VALUES (?, ?, ?, ?, ?)");
+  SQLiteStatement resourceStatement(
+      m_database,
+      "INSERT INTO CacheResources (url, statusCode, responseURL, headers, "
+      "data, mimeType, textEncodingName) VALUES (?, ?, ?, ?, ?, ?, ?)");
   if (resourceStatement.prepare() != SQLResultOk)
     return false;
 
@@ -461,6 +462,8 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
   resourceStatement.bindText(3, resource->response().url());
   resourceStatement.bindText(4, headers);
   resourceStatement.bindInt64(5, dataId);
+  resourceStatement.bindText(6, resource->response().mimeType());
+  resourceStatement.bindText(7, resource->response().textEncodingName());
 
   if (!executeStatement(resourceStatement))
     return false;
@@ -539,8 +542,9 @@ PassRefPtr<ApplicationCache> ApplicationCacheStorage::loadCache(
     unsigned storageID) {
   SQLiteStatement cacheStatement(
       m_database,
-      "SELECT url, type, CacheResourceData.data FROM CacheEntries INNER JOIN "
-      "CacheResources ON CacheEntries.resource=CacheResources.id "
+      "SELECT url, type, mimeType, textEncodingName, headers, "
+      "CacheResourceData.data FROM CacheEntries INNER JOIN CacheResources ON "
+      "CacheEntries.resource=CacheResources.id "
       "INNER JOIN CacheResourceData ON "
       "CacheResourceData.id=CacheResources.data WHERE CacheEntries.cache=?");
   if (cacheStatement.prepare() != SQLResultOk) {
@@ -560,11 +564,15 @@ PassRefPtr<ApplicationCache> ApplicationCacheStorage::loadCache(
     unsigned type = (unsigned)cacheStatement.getColumnInt64(1);
 
     Vector<char> blob;
-    cacheStatement.getColumnBlobAsVector(2, blob);
+    cacheStatement.getColumnBlobAsVector(5, blob);
 
     RefPtr<SharedBuffer> data = SharedBuffer::adoptVector(blob);
 
-    ResourceResponse response(url, "text/html", data->size(), "UTF-8", "");
+    String mimeType = cacheStatement.getColumnText(2);
+    String textEncodingName = cacheStatement.getColumnText(3);
+
+    ResourceResponse response(url, mimeType, data->size(), textEncodingName,
+                              "");
 
     RefPtr<ApplicationCacheResource> resource =
         ApplicationCacheResource::create(url, response, type, data.release());
