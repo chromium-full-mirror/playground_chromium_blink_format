@@ -177,6 +177,9 @@ class Page : Noncopyable {
   void userStyleSheetLocationChanged();
   const String& userStyleSheet() const;
 
+  void setPendingUnloadEventCount(int frameUnloadEventCount);
+  unsigned pendingUnloadEventCount();
+
   static void setDebuggerForAllPages(KJS::Debugger*);
   void setDebugger(KJS::Debugger*);
   KJS::Debugger* debugger() const { return m_debugger; }
@@ -238,6 +241,8 @@ class Page : Noncopyable {
   PageGroup* m_group;
 
   KJS::Debugger* m_debugger;
+
+  unsigned m_pendingUnloadEventCount;
 
 #if ENABLE(DOM_STORAGE)
   RefPtr<SessionStorage> m_sessionStorage;

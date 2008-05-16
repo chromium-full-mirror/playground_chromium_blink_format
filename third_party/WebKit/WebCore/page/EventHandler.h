@@ -160,6 +160,9 @@ class EventHandler : Noncopyable {
 
   void capsLockStateMayHaveChanged();
 
+  unsigned pendingFrameUnloadEventCount();
+  void setPendingFrameUnloadEventCount(int delta);
+
 #if PLATFORM(MAC)
   PassRefPtr<KeyboardEvent> currentKeyboardEvent() const;
 
@@ -351,6 +354,8 @@ class EventHandler : Noncopyable {
   PlatformMouseEvent m_mouseDown;
 
   static unsigned s_accessKeyModifiers;
+
+  unsigned m_pendingFrameUnloadEventCount;
 
 #if PLATFORM(MAC)
   NSView* m_mouseDownView;

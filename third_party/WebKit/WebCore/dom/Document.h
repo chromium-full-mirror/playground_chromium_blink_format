@@ -606,6 +606,8 @@ class Document : public ContainerNode {
                                  bool useCapture);
   bool hasWindowEventListener(const AtomicString& eventType);
 
+  void setPendingFrameUnloadEventCount(int frameUnloadEventCount);
+
   PassRefPtr<EventListener> createHTMLEventListener(const String& functionName,
                                                     const String& code,
                                                     Node*);
