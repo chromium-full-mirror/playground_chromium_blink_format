@@ -181,6 +181,7 @@ void AXObjectCache::selectedChildrenChanged(RenderObject* renderer) {
 }
 #endif
 
+#if HAVE(ACCESSIBILITY)
 void AXObjectCache::handleActiveDescendantChanged(RenderObject* renderer) {
   if (!renderer)
     return;
@@ -188,5 +189,6 @@ void AXObjectCache::handleActiveDescendantChanged(RenderObject* renderer) {
   if (obj)
     obj->handleActiveDescendantChanged();
 }
+#endif
 
 }  // namespace WebCore
