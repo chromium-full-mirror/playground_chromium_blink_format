@@ -2553,15 +2553,23 @@ static void drawHighlightForBoxes(GraphicsContext& context,
   drawOutlinedRect(context, contentBox, contentBoxColor);
 }
 
+static inline void convertFromFrameToMainFrame(Frame* frame, IntRect& rect) {
+  rect = frame->page()->mainFrame()->view()->windowToContents(
+      frame->view()->contentsToWindow(rect));
+}
+
 void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
   if (!m_highlightedNode)
     return;
 
   RenderObject* renderer = m_highlightedNode->renderer();
-  if (!renderer)
+  Frame* containingFrame = m_highlightedNode->document()->frame();
+  if (!renderer || !containingFrame)
     return;
 
   IntRect contentBox = renderer->absoluteContentBox();
+  IntRect boundingBox = renderer->absoluteBoundingBoxRect();
+
   // FIXME: Should we add methods to RenderObject to obtain these rects?
   IntRect paddingBox(
       contentBox.x() - renderer->paddingLeft(),
@@ -2579,7 +2587,11 @@ void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
       borderBox.width() + renderer->marginLeft() + renderer->marginRight(),
       borderBox.height() + renderer->marginTop() + renderer->marginBottom());
 
-  IntRect boundingBox = renderer->absoluteBoundingBoxRect();
+  convertFromFrameToMainFrame(containingFrame, contentBox);
+  convertFromFrameToMainFrame(containingFrame, paddingBox);
+  convertFromFrameToMainFrame(containingFrame, borderBox);
+  convertFromFrameToMainFrame(containingFrame, marginBox);
+  convertFromFrameToMainFrame(containingFrame, boundingBox);
 
   Vector<IntRect> lineBoxRects;
   if (renderer->isInline() ||
@@ -2587,6 +2599,10 @@ void InspectorController::drawNodeHighlight(GraphicsContext& context) const {
     // FIXME: We should show margins/padding/border for inlines.
     renderer->addLineBoxRects(lineBoxRects);
   }
+
+  for (unsigned i = 0; i < lineBoxRects.size(); ++i)
+    convertFromFrameToMainFrame(containingFrame, lineBoxRects[i]);
+
   if (lineBoxRects.isEmpty() && contentBox.isEmpty()) {
     // If we have no line boxes and our content box is empty, we'll just draw
     // our bounding box.
