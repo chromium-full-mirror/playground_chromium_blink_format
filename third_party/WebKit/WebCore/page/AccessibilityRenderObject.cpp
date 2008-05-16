@@ -1187,6 +1187,9 @@ VisiblePositionRange AccessibilityRenderObject::visiblePositionRange() const {
 
   // construct VisiblePositions for start and end
   Node* node = m_renderer->element();
+  if (!node)
+    return VisiblePositionRange();
+
   VisiblePosition startPos = VisiblePosition(node, 0, VP_DEFAULT_AFFINITY);
   VisiblePosition endPos =
       VisiblePosition(node, maxDeepOffset(node), VP_DEFAULT_AFFINITY);
@@ -1332,11 +1335,17 @@ void AccessibilityRenderObject::doSetAXSelectedTextMarkerRange(
   if (textMarkerRange.start.isNull() || textMarkerRange.end.isNull())
     return;
 
-  // make selection and tell the document to use it
-  Selection newSelection =
-      Selection(textMarkerRange.start, textMarkerRange.end);
-  m_renderer->document()->frame()->selectionController()->setSelection(
-      newSelection);
+  // make selection and tell the document to use it. if it's zero length, then
+  // move to that position
+  if (textMarkerRange.start == textMarkerRange.end) {
+    m_renderer->document()->frame()->selectionController()->moveTo(
+        textMarkerRange.start, true);
+  } else {
+    Selection newSelection =
+        Selection(textMarkerRange.start, textMarkerRange.end);
+    m_renderer->document()->frame()->selectionController()->setSelection(
+        newSelection);
+  }
 }
 
 VisiblePosition AccessibilityRenderObject::doAXTextMarkerForPosition(
@@ -1893,7 +1902,7 @@ void AccessibilityRenderObject::addChildren() {
   for (RefPtr<AccessibilityObject> obj = firstChild(); obj;
        obj = obj->nextSibling()) {
     if (obj->accessibilityIsIgnored()) {
-      if (!m_haveChildren)
+      if (!obj->hasChildren())
         obj->addChildren();
       Vector<RefPtr<AccessibilityObject>> children = obj->children();
       unsigned length = children.size();

@@ -213,6 +213,8 @@ class EventHandler : Noncopyable {
   bool handleMouseDraggedEvent(const MouseEventWithHitTestResults&);
   bool handleMouseReleaseEvent(const MouseEventWithHitTestResults&);
 
+  void handleKeyboardSelectionMovement(KeyboardEvent*);
+
   Cursor selectCursor(const MouseEventWithHitTestResults&, PlatformScrollbar*);
 
   void hoverTimerFired(Timer<EventHandler>*);
