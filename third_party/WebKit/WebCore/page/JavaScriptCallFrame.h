@@ -59,6 +59,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
 
   String functionName() const;
   const KJS::ScopeChain& scopeChain() const { return m_exec->scopeChain(); }
+  KJS::JSObject* thisObject() const;
   KJS::JSValue* evaluate(const KJS::UString& script,
                          KJS::JSValue*& exception) const;
 
