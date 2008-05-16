@@ -158,7 +158,7 @@ class Element : public ContainerNode {
   NamedAttrMap* attributes(bool readonly) const;
 
   // This method is called whenever an attribute is added, changed or removed.
-  virtual void attributeChanged(Attribute*, bool preserveDecls = false) {}
+  virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
   // not part of the DOM
   void setAttributeMap(PassRefPtr<NamedAttrMap>);

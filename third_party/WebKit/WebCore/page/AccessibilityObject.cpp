@@ -66,10 +66,6 @@ AccessibilityObject::~AccessibilityObject() {
   ASSERT(isDetached());
 }
 
-PassRefPtr<AccessibilityObject> AccessibilityObject::create() {
-  return adoptRef(new AccessibilityObject());
-}
-
 void AccessibilityObject::detach() {
   removeAXObjectID();
 #if HAVE(ACCESSIBILITY)

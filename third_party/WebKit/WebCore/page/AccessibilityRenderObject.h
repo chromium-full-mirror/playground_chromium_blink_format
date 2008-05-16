@@ -168,6 +168,11 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual void detach();
   virtual void childrenChanged();
   virtual void addChildren();
+  virtual void selectedChildren(Vector<RefPtr<AccessibilityObject>>&);
+  virtual void visibleChildren(Vector<RefPtr<AccessibilityObject>>&);
+  virtual bool shouldFocusActiveDescendant() const;
+  virtual AccessibilityObject* activeDescendant() const;
+  virtual void handleActiveDescendantChanged();
 
   virtual VisiblePositionRange visiblePositionRange() const;
   virtual VisiblePositionRange doAXTextMarkerRangeForLine(unsigned) const;
@@ -198,6 +203,10 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual void removeAXObjectID();
 
   virtual bool isDetached() const { return !m_renderer; }
+
+ private:
+  void ariaListboxSelectedChildren(Vector<RefPtr<AccessibilityObject>>&);
+  void ariaListboxVisibleChildren(Vector<RefPtr<AccessibilityObject>>&);
 };
 
 }  // namespace WebCore
