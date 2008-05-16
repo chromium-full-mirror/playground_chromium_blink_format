@@ -435,7 +435,6 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
 
   // Serialize the headers
   Vector<UChar> stringBuilder;
-  String separator(": ");
 
   HTTPHeaderMap::const_iterator end =
       resource->response().httpHeaderFields().end();
@@ -538,6 +537,34 @@ void ApplicationCacheStorage::storeNewestCache(ApplicationCacheGroup* group) {
   storeCacheTransaction.commit();
 }
 
+static inline void parseHeader(const UChar* header,
+                               size_t headerLength,
+                               ResourceResponse& response) {
+  int pos = find(header, headerLength, ':');
+  ASSERT(pos != -1);
+
+  String headerName = String(header, pos);
+  String headerValue = String(header + pos + 1, headerLength - pos - 1);
+
+  response.setHTTPHeaderField(headerName, headerValue);
+}
+
+static inline void parseHeaders(const String& headers,
+                                ResourceResponse& response) {
+  int startPos = 0;
+  int endPos;
+  while ((endPos = headers.find('\n', startPos)) != -1) {
+    ASSERT(startPos != endPos);
+
+    parseHeader(headers.characters() + startPos, endPos - startPos, response);
+
+    startPos = endPos + 1;
+  }
+
+  if (startPos != static_cast<int>(headers.length()))
+    parseHeader(headers.characters(), headers.length(), response);
+}
+
 PassRefPtr<ApplicationCache> ApplicationCacheStorage::loadCache(
     unsigned storageID) {
   SQLiteStatement cacheStatement(
@@ -573,6 +600,9 @@ PassRefPtr<ApplicationCache> ApplicationCacheStorage::loadCache(
 
     ResourceResponse response(url, mimeType, data->size(), textEncodingName,
                               "");
+
+    String headers = cacheStatement.getColumnText(4);
+    parseHeaders(headers, response);
 
     RefPtr<ApplicationCacheResource> resource =
         ApplicationCacheResource::create(url, response, type, data.release());
