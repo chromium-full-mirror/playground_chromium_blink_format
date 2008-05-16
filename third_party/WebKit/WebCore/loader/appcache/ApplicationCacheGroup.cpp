@@ -646,7 +646,9 @@ void ApplicationCacheGroup::startLoadingEntry() {
     }
   }
 
-  // FIXME: Fire progress event.
+  callListenersOnAssociatedDocuments(
+      &DOMApplicationCache::callProgressListener);
+
   // FIXME: If this is an upgrade attempt, the newest cache should be used as an
   // HTTP cache.
 
