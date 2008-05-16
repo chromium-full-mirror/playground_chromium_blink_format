@@ -170,14 +170,6 @@ UString getFunctionName(FunctionImp* functionImp) {
          UString::from(lineNumber);
 }
 
-void Profiler::printDataInspectorStyle(unsigned whichProfile) const {
-  m_allProfiles[whichProfile]->printDataInspectorStyle();
-}
-
-void Profiler::printDataSampleStyle(unsigned whichProfile) const {
-  m_allProfiles[whichProfile]->printDataSampleStyle();
-}
-
 void Profiler::debugLog(UString message) {
   printf("Profiler Log: %s\n", message.UTF8String().c_str());
 }

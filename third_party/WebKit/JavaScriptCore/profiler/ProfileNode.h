@@ -30,7 +30,7 @@
 #define ProfileNode_h
 
 #include <kjs/ustring.h>
-#include <wtf/Deque.h>
+#include <wtf/Vector.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 #include <wtf/StrHash.h>
@@ -39,7 +39,7 @@ namespace KJS {
 
 class ProfileNode;
 
-typedef Deque<RefPtr<ProfileNode>>::const_iterator StackIterator;
+typedef Vector<RefPtr<ProfileNode>>::const_iterator StackIterator;
 typedef HashCountedSet<UString::Rep*> FunctionCallHashCount;
 
 class ProfileNode : public RefCounted<ProfileNode> {
@@ -62,7 +62,15 @@ class ProfileNode : public RefCounted<ProfileNode> {
   double totalPercent() const { return m_totalPercent; }
   double selfPercent() const { return m_selfPercent; }
   unsigned numberOfCalls() const { return m_numberOfCalls; }
-  const Deque<RefPtr<ProfileNode>>& children() { return m_children; }
+  const Vector<RefPtr<ProfileNode>>& children() { return m_children; }
+
+  // Sorting functions
+  void sortTotalTimeDescending();
+  void sortTotalTimeAscending();
+  void sortSelfTimeDescending();
+  void sortSelfTimeAscending();
+  void sortCallsDescending();
+  void sortCallsAscending();
 
   void printDataInspectorStyle(int indentLevel) const;
   double printDataSampleStyle(int indentLevel, FunctionCallHashCount&) const;
@@ -80,7 +88,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
   double m_selfPercent;
   unsigned m_numberOfCalls;
 
-  Deque<RefPtr<ProfileNode>> m_children;
+  Vector<RefPtr<ProfileNode>> m_children;
 };
 
 }  // namespace KJS

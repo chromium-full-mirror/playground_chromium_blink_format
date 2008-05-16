@@ -147,7 +147,7 @@ static JSValueRef getChildren(JSContextRef ctx,
 
   ProfileNode* profileNode =
       static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
-  const Deque<RefPtr<ProfileNode>>& children = profileNode->children();
+  const Vector<RefPtr<ProfileNode>>& children = profileNode->children();
 
   JSObjectRef global = JSContextGetGlobalObject(ctx);
 
@@ -180,7 +180,7 @@ static JSValueRef getChildren(JSContextRef ctx,
   if (exception && *exception)
     return JSValueMakeUndefined(ctx);
 
-  for (Deque<RefPtr<ProfileNode>>::const_iterator it = children.begin();
+  for (Vector<RefPtr<ProfileNode>>::const_iterator it = children.begin();
        it != children.end(); ++it) {
     JSValueRef arg0 = toRef(toJS(toJS(ctx), (*it).get()));
     JSObjectCallAsFunction(ctx, pushFunction, result, 1, &arg0, exception);
