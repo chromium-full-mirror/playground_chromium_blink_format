@@ -83,6 +83,8 @@
   @"WebKitWebArchiveDebugModeEnabledPreferenceKey"
 #define WebKitLocalStorageDatabasePathPreferenceKey \
   @"WebKitLocalStorageDatabasePathPreferenceKey"
+#define WebKitEnableFullDocumentTeardownPreferenceKey \
+  @"WebKitEnableFullDocumentTeardown"
 #define WebKitOfflineWebApplicationCacheEnabledPreferenceKey \
   @"WebKitOfflineWebApplicationCacheEnabled"
 
