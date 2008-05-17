@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -284,6 +284,8 @@ void WebPreferences::initializeDefaultSettings() {
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitUsesPageCachePreferenceKey),
                        kCFBooleanTrue);
+  CFDictionaryAddValue(
+      defaults, CFSTR(WebKitLocalStorageDatabasePathPreferenceKey), CFSTR(""));
 
   RetainPtr<CFStringRef> cacheModelRef(
       AdoptCF,
@@ -1144,6 +1146,19 @@ HRESULT STDMETHODCALLTYPE
 WebPreferences::offlineWebApplicationCacheEnabled(BOOL* enabled) {
   *enabled = boolValueForKey(
       CFSTR(WebKitOfflineWebApplicationCacheEnabledPreferenceKey));
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::localStorageDatabasePath(BSTR* location) {
+  *location =
+      stringValueForKey(CFSTR(WebKitLocalStorageDatabasePathPreferenceKey));
+  return (*location) ? S_OK : E_FAIL;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::setLocalStorageDatabasePath(BSTR location) {
+  setStringValue(CFSTR(WebKitLocalStorageDatabasePathPreferenceKey), location);
   return S_OK;
 }
 
