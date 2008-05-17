@@ -2691,7 +2691,9 @@ void Document::removeHTMLWindowEventListener(const AtomicString& eventType) {
     if ((*it)->eventType() == eventType &&
         (*it)->listener()->isHTMLEventListener()) {
       if (eventType == ((AtomicString)unloadEvent))
-        setPendingFrameUnloadEventCount(-1);
+        removePendingFrameUnloadEventCount();
+      else if (eventType == ((AtomicString)beforeunloadEvent))
+        removePendingFrameBeforeUnloadEventCount();
       m_windowEventListeners.remove(it);
       return;
     }
@@ -2701,7 +2703,9 @@ void Document::addWindowEventListener(const AtomicString& eventType,
                                       PassRefPtr<EventListener> listener,
                                       bool useCapture) {
   if (eventType == ((AtomicString)unloadEvent))
-    setPendingFrameUnloadEventCount(1);
+    addPendingFrameUnloadEventCount();
+  else if (eventType == ((AtomicString)beforeunloadEvent))
+    addPendingFrameBeforeUnloadEventCount();
   // Remove existing identical listener set with identical arguments.
   // The DOM 2 spec says that "duplicate instances are discarded" in this case.
   removeWindowEventListener(eventType, listener.get(), useCapture);
@@ -2717,7 +2721,9 @@ void Document::removeWindowEventListener(const AtomicString& eventType,
   for (; it != m_windowEventListeners.end(); ++it)
     if (*(*it) == rl) {
       if (eventType == ((AtomicString)unloadEvent))
-        setPendingFrameUnloadEventCount(-1);
+        removePendingFrameUnloadEventCount();
+      else if (eventType == ((AtomicString)beforeunloadEvent))
+        removePendingFrameBeforeUnloadEventCount();
       m_windowEventListeners.remove(it);
       return;
     }
@@ -2732,9 +2738,24 @@ bool Document::hasWindowEventListener(const AtomicString& eventType) {
   return false;
 }
 
-void Document::setPendingFrameUnloadEventCount(int delta) {
+void Document::addPendingFrameUnloadEventCount() {
   if (m_frame)
-    m_frame->eventHandler()->setPendingFrameUnloadEventCount(delta);
+    m_frame->eventHandler()->addPendingFrameUnloadEventCount();
+}
+
+void Document::removePendingFrameUnloadEventCount() {
+  if (m_frame)
+    m_frame->eventHandler()->removePendingFrameUnloadEventCount();
+}
+
+void Document::addPendingFrameBeforeUnloadEventCount() {
+  if (m_frame)
+    m_frame->eventHandler()->addPendingFrameBeforeUnloadEventCount();
+}
+
+void Document::removePendingFrameBeforeUnloadEventCount() {
+  if (m_frame)
+    m_frame->eventHandler()->removePendingFrameBeforeUnloadEventCount();
 }
 
 PassRefPtr<EventListener> Document::createHTMLEventListener(

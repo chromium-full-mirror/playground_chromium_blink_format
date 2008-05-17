@@ -136,7 +136,8 @@ Page::Page(ChromeClient* chromeClient,
       m_userStyleSheetModificationTime(0),
       m_group(0),
       m_debugger(0),
-      m_pendingUnloadEventCount(0) {
+      m_pendingUnloadEventCount(0),
+      m_pendingBeforeUnloadEventCount(0) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
     setFocusRingColorChangeFunction(setNeedsReapplyStyles);
@@ -524,9 +525,19 @@ unsigned Page::pendingUnloadEventCount() {
   return m_pendingUnloadEventCount;
 }
 
-void Page::setPendingUnloadEventCount(int delta) {
+void Page::changePendingUnloadEventCount(int delta) {
   ASSERT((delta + (int)m_pendingUnloadEventCount) >= 0);
   m_pendingUnloadEventCount += delta;
+  return;
+}
+
+unsigned Page::pendingBeforeUnloadEventCount() {
+  return m_pendingBeforeUnloadEventCount;
+}
+
+void Page::changePendingBeforeUnloadEventCount(int delta) {
+  ASSERT((delta + (int)m_pendingBeforeUnloadEventCount) >= 0);
+  m_pendingBeforeUnloadEventCount += delta;
   return;
 }
 
