@@ -54,10 +54,16 @@ class ResourceErrorBase {
     return m_localizedDescription;
   }
 
+  void setIsCancellation(bool isCancellation) {
+    m_isCancellation = isCancellation;
+  }
+  bool isCancellation() const { return m_isCancellation; }
+
   static bool compare(const ResourceError& a, const ResourceError& b);
 
  protected:
-  ResourceErrorBase() : m_errorCode(0), m_isNull(true) {}
+  ResourceErrorBase()
+      : m_errorCode(0), m_isNull(true), m_isCancellation(false) {}
 
   ResourceErrorBase(const String& domain,
                     int errorCode,
@@ -67,7 +73,8 @@ class ResourceErrorBase {
         m_errorCode(errorCode),
         m_failingURL(failingURL),
         m_localizedDescription(localizedDescription),
-        m_isNull(false) {}
+        m_isNull(false),
+        m_isCancellation(false) {}
 
   void lazyInit() const;
 
@@ -86,6 +93,7 @@ class ResourceErrorBase {
   String m_failingURL;
   String m_localizedDescription;
   bool m_isNull;
+  bool m_isCancellation;
 };
 
 inline bool operator==(const ResourceError& a, const ResourceError& b) {

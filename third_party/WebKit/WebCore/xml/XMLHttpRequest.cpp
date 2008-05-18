@@ -330,13 +330,7 @@ void XMLHttpRequest::open(const String& method,
 
   // clear stuff from possible previous load
   m_requestHeaders.clear();
-  m_response = ResourceResponse();
-  {
-    KJS::JSLock lock;
-    m_responseText = "";
-  }
-  m_createdDocument = false;
-  m_responseXML = 0;
+  clearResponseEntityBody();
 
   ASSERT(m_state == UNSENT);
 
@@ -487,10 +481,19 @@ void XMLHttpRequest::loadRequestSynchronously(ResourceRequest& request,
   // No exception for file:/// resources, see <rdar://problem/4962298>.
   // Also, if we have an HTTP response, then it wasn't a network error in fact.
   if (error.isNull() || request.url().isLocalFile() ||
-      response.httpStatusCode() > 0)
+      response.httpStatusCode() > 0) {
     processSyncLoadResults(data, response);
-  else
-    ec = XMLHttpRequestException::NETWORK_ERR;
+    return;
+  }
+
+  if (error.isCancellation()) {
+    abortError();
+    ec = XMLHttpRequestException::ABORT_ERR;
+    return;
+  }
+
+  networkError();
+  ec = XMLHttpRequestException::NETWORK_ERR;
 }
 
 void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
@@ -553,6 +556,38 @@ void XMLHttpRequest::internalAbort() {
 
   if (hadLoader)
     dropProtection();
+}
+
+void XMLHttpRequest::clearResponseEntityBody() {
+  m_response = ResourceResponse();
+  {
+    KJS::JSLock lock;
+    m_responseText = "";
+  }
+  m_createdDocument = false;
+  m_responseXML = 0;
+}
+
+void XMLHttpRequest::genericError() {
+  clearResponseEntityBody();
+  m_requestHeaders.clear();
+  m_error = true;
+
+  // The spec says we should "Synchronously switch the state to DONE." and then
+  // "Synchronously dispatch a readystatechange event on the object"
+  // but this does not match Firefox.
+}
+
+void XMLHttpRequest::networkError() {
+  genericError();
+  // FIXME: we need to "Synchronously dispatch a progress event called error on
+  // the object" here.
+}
+
+void XMLHttpRequest::abortError() {
+  genericError();
+  // FIXME: we need to "Synchronously dispatch a progress event called abort on
+  // the object" here.
 }
 
 void XMLHttpRequest::dropProtection() {
@@ -725,8 +760,15 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
   didFinishLoading(0);
 }
 
-void XMLHttpRequest::didFail(SubresourceLoader* loader, const ResourceError&) {
-  didFinishLoading(loader);
+void XMLHttpRequest::didFail(SubresourceLoader* loader,
+                             const ResourceError& error) {
+  if (error.isCancellation()) {
+    abortError();
+    return;
+  }
+
+  networkError();
+  return;
 }
 
 void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
