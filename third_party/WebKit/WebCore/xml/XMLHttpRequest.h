@@ -139,6 +139,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   bool responseIsXML() const;
 
   String getRequestHeader(const String& name) const;
+  void setRequestHeaderInternal(const String& name, const String& value);
 
   void changeState(XMLHttpRequestState newState);
   void callReadyStateChangeListener();
