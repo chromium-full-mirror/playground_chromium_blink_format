@@ -314,18 +314,16 @@ NPError PluginView::load(const FrameLoadRequest& frameLoadRequest,
 
   if (!jsString.isNull()) {
     Settings* settings = m_parentFrame->settings();
-    if (!settings || !settings->isJavaScriptEnabled()) {
-      // Return NPERR_GENERIC_ERROR if JS is disabled. This is what Mozilla
-      // does.
-      return NPERR_GENERIC_ERROR;
-    }
 
+    // Return NPERR_GENERIC_ERROR if JS is disabled. This is what Mozilla does.
+    if (!settings || !settings->isJavaScriptEnabled())
+      return NPERR_GENERIC_ERROR;
+
+    // For security reasons, only allow JS requests to be made on the frame that
+    // contains the plug-in.
     if (!targetFrameName.isNull() &&
-        m_parentFrame->tree()->find(targetFrameName) != m_parentFrame) {
-      // For security reasons, only allow JS requests to be made on the frame
-      // that contains the plug-in.
+        m_parentFrame->tree()->find(targetFrameName) != m_parentFrame)
       return NPERR_INVALID_PARAM;
-    }
   }
 
   PluginRequest* request = new PluginRequest(frameLoadRequest, sendNotification,

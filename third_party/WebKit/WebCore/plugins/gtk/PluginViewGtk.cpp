@@ -352,28 +352,25 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
 
 NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
   switch (variable) {
-    case NPNVToolkit: {
+    case NPNVToolkit:
 #if PLATFORM(GTK)
       *((uint32*)value) = 2;
 #else
       *((uint32*)value) = 0;
 #endif
       return NPERR_NO_ERROR;
-    }
 
-    case NPNVSupportsXEmbedBool: {
+    case NPNVSupportsXEmbedBool:
 #if defined(GDK_WINDOWING_X11)
       *((uint32*)value) = true;
 #else
       *((uint32*)value) = false;
 #endif
       return NPERR_NO_ERROR;
-    }
 
-    case NPNVjavascriptEnabledBool: {
+    case NPNVjavascriptEnabledBool:
       *((uint32*)value) = true;
       return NPERR_NO_ERROR;
-    }
 
     default:
       return NPERR_GENERIC_ERROR;
@@ -382,7 +379,7 @@ NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
 
 NPError PluginView::getValue(NPNVariable variable, void* value) {
   switch (variable) {
-    case NPNVxDisplay: {
+    case NPNVxDisplay:
 #if defined(GDK_WINDOWING_X11)
       if (m_needsXEmbed)
         *(void**)value = (void*)GDK_DISPLAY();
@@ -392,10 +389,9 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
 #else
       return NPERR_GENERIC_ERROR;
 #endif
-    }
 
 #if defined(GDK_WINDOWING_X11)
-    case NPNVxtAppContext: {
+    case NPNVxtAppContext:
       if (!m_needsXEmbed) {
         *(void**)value = XtDisplayToApplicationContext(
             GTK_XTBIN(m_window)->xtclient.xtdisplay);
@@ -403,7 +399,6 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
         return NPERR_NO_ERROR;
       } else
         return NPERR_GENERIC_ERROR;
-    }
 #endif
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
@@ -458,6 +453,7 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
 #endif
       return NPERR_NO_ERROR;
     }
+
     default:
       return getValueStatic(variable, value);
   }

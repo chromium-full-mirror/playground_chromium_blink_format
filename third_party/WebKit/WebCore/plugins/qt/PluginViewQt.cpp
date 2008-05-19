@@ -305,20 +305,17 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
 
 NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
   switch (variable) {
-    case NPNVToolkit: {
+    case NPNVToolkit:
       *((uint32*)value) = 0;
       return NPERR_NO_ERROR;
-    }
 
-    case NPNVSupportsXEmbedBool: {
+    case NPNVSupportsXEmbedBool:
       *((uint32*)value) = true;
       return NPERR_NO_ERROR;
-    }
 
-    case NPNVjavascriptEnabledBool: {
+    case NPNVjavascriptEnabledBool:
       *((uint32*)value) = true;
       return NPERR_NO_ERROR;
-    }
 
     default:
       return NPERR_GENERIC_ERROR;
@@ -327,17 +324,15 @@ NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
 
 NPError PluginView::getValue(NPNVariable variable, void* value) {
   switch (variable) {
-    case NPNVxDisplay: {
+    case NPNVxDisplay:
       if (m_window)
         *(void**)value = m_window->x11Info().display();
       else
         *(void**)value = containingWindow()->x11Info().display();
       return NPERR_NO_ERROR;
-    }
 
-    case NPNVxtAppContext: {
+    case NPNVxtAppContext:
       return NPERR_GENERIC_ERROR;
-    }
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
     case NPNVWindowNPObject: {
