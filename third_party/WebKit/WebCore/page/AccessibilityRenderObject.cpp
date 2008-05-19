@@ -683,6 +683,10 @@ String AccessibilityRenderObject::title() const {
   if (!ariaLabel.isEmpty())
     return ariaLabel;
 
+  const AtomicString& title = getAttribute(titleAttr);
+  if (!title.isEmpty())
+    return title;
+
   bool isInputTag = node->hasTagName(inputTag);
   if (isInputTag) {
     HTMLInputElement* input = static_cast<HTMLInputElement*>(node);
@@ -700,13 +704,8 @@ String AccessibilityRenderObject::title() const {
       isHeading())
     return textUnderElement();
 
-  if (isLink()) {
-    const AtomicString& title = getAttribute(titleAttr);
-    if (!title.isEmpty())
-      return title;
-
+  if (isLink())
     return textUnderElement();
-  }
 
   return String();
 }
