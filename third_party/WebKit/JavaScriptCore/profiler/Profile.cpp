@@ -35,39 +35,39 @@
 
 namespace KJS {
 
-typedef Vector<UString>::const_iterator NameIterator;
-
 Profile::Profile(const UString& title) : m_title(title) {
   // FIXME: When multi-threading is supported this will be a vector and calls
   // into the profiler will need to know which thread it is executing on.
   m_callTree = ProfileNode::create("Thread_1");
 }
 
+// The callStackNames are in order of bottom of the stack to top of the stack so
+// we iterate it backwards.
 void Profile::willExecute(const Vector<UString>& callStackNames) {
   RefPtr<ProfileNode> callTreeInsertionPoint;
   RefPtr<ProfileNode> foundNameInTree = m_callTree;
-  NameIterator callStackLocation = callStackNames.begin();
 
-  while (callStackLocation != callStackNames.end() && foundNameInTree) {
+  int i = callStackNames.size();
+  while (foundNameInTree && i) {
     callTreeInsertionPoint = foundNameInTree;
-    foundNameInTree = callTreeInsertionPoint->findChild(*callStackLocation);
-    ++callStackLocation;
+    foundNameInTree = callTreeInsertionPoint->findChild(callStackNames[--i]);
   }
 
   if (!foundNameInTree) {  // Insert remains of the stack into the call tree.
-    --callStackLocation;
-    for (RefPtr<ProfileNode> next; callStackLocation != callStackNames.end();
-         ++callStackLocation) {
-      next = ProfileNode::create(*callStackLocation);
+    for (RefPtr<ProfileNode> next; i >= 0; callTreeInsertionPoint = next) {
+      next = ProfileNode::create(callStackNames[i--]);
       callTreeInsertionPoint->addChild(next);
-      callTreeInsertionPoint = next;
     }
   } else  // We are calling a function that is already in the call tree.
     foundNameInTree->willExecute();
 }
 
 void Profile::didExecute(const Vector<UString>& stackNames) {
-  m_callTree->didExecute(stackNames, 0);
+  ASSERT(stackNames.size());
+  if (!stackNames.size())
+    return;
+
+  m_callTree->didExecute(stackNames, stackNames.size() - 1);
 }
 
 void Profile::printDataInspectorStyle() const {
