@@ -145,8 +145,8 @@ bool PluginView::start() {
   ASSERT(m_plugin->pluginFuncs()->newp);
 
   NPError npErr;
-  PluginView::setCurrentPluginView(this);
   {
+    PluginView::setCurrentPluginView(this);
     KJS::JSLock::DropAllLocks dropAllLocks;
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->newp((NPMIMEType)m_mimeType.data(),
@@ -154,8 +154,8 @@ bool PluginView::start() {
                                           m_paramNames, m_paramValues, NULL);
     setCallingPlugin(false);
     LOG_NPERROR(npErr);
+    PluginView::setCurrentPluginView(0);
   }
-  PluginView::setCurrentPluginView(0);
 
   if (npErr != NPERR_NO_ERROR)
     return false;
@@ -233,12 +233,14 @@ void PluginView::performRequest(PluginRequest* request) {
       // FIXME: <rdar://problem/4807469> This should be sent when the document
       // has finished loading
       if (request->sendNotification()) {
+        PluginView::setCurrentPluginView(this);
         KJS::JSLock::DropAllLocks dropAllLocks;
         setCallingPlugin(true);
         m_plugin->pluginFuncs()->urlnotify(m_instance,
                                            requestURL.string().utf8().data(),
                                            NPRES_DONE, request->notifyData());
         setCallingPlugin(false);
+        PluginView::setCurrentPluginView(0);
       }
     }
     return;
@@ -470,11 +472,13 @@ PassRefPtr<KJS::Bindings::Instance> PluginView::bindingInstance() {
 
   NPError npErr;
   {
+    PluginView::setCurrentPluginView(this);
     KJS::JSLock::DropAllLocks dropAllLocks;
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->getvalue(
         m_instance, NPPVpluginScriptableNPObject, &object);
     setCallingPlugin(false);
+    PluginView::setCurrentPluginView(0);
   }
 
   if (npErr != NPERR_NO_ERROR || !object)

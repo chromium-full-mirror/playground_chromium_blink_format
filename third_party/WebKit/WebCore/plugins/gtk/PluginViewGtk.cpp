@@ -222,10 +222,12 @@ void PluginView::setNPWindowRect(const IntRect& rect) {
     return;
 
   if (m_plugin->pluginFuncs()->setwindow) {
+    PluginView::setCurrentPluginView(this);
     KJS::JSLock::DropAllLocks dropAllLocks;
     setCallingPlugin(true);
     m_plugin->pluginFuncs()->setwindow(m_instance, &m_npWindow);
     setCallingPlugin(false);
+    PluginView::setCurrentPluginView(0);
 
     if (!m_isWindowed)
       return;
@@ -279,16 +281,20 @@ void PluginView::stop() {
   if (m_plugin->pluginFuncs()->setwindow &&
       !m_plugin->quirks().contains(
           PluginQuirkDontSetNullWindowHandleOnDestroy)) {
+    PluginView::setCurrentPluginView(this);
     setCallingPlugin(true);
     m_plugin->pluginFuncs()->setwindow(m_instance, &m_npWindow);
     setCallingPlugin(false);
+    PluginView::setCurrentPluginView(0);
   }
 
   // Destroy the plugin
   {
+    PluginView::setCurrentPluginView(this);
     setCallingPlugin(true);
     m_plugin->pluginFuncs()->destroy(m_instance, 0);
     setCallingPlugin(false);
+    PluginView::setCurrentPluginView(0);
   }
 
   m_instance->pdata = 0;
@@ -306,6 +312,11 @@ const char* PluginView::userAgent() {
     m_userAgent = m_parentFrame->loader()->userAgent(m_url).utf8();
 
   return m_userAgent.data();
+}
+
+const char* PluginView::userAgentStatic() {
+  // FIXME - Lie and say we are Mozilla
+  return MozillaUserAgent;
 }
 
 NPError PluginView::handlePostReadFile(Vector<char>& buffer,
@@ -339,20 +350,8 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
   return NPERR_NO_ERROR;
 }
 
-NPError PluginView::getValue(NPNVariable variable, void* value) {
+NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
   switch (variable) {
-#if defined(GDK_WINDOWING_X11)
-    case NPNVxtAppContext: {
-      if (!m_needsXEmbed) {
-        *(void**)value = XtDisplayToApplicationContext(
-            GTK_XTBIN(m_window)->xtclient.xtdisplay);
-
-        return NPERR_NO_ERROR;
-      } else
-        return NPERR_GENERIC_ERROR;
-    }
-#endif
-
     case NPNVToolkit: {
 #if PLATFORM(GTK)
       *((uint32*)value) = 2;
@@ -370,6 +369,42 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
 #endif
       return NPERR_NO_ERROR;
     }
+
+    case NPNVjavascriptEnabledBool: {
+      *((uint32*)value) = true;
+      return NPERR_NO_ERROR;
+    }
+
+    default:
+      return NPERR_GENERIC_ERROR;
+  }
+}
+
+NPError PluginView::getValue(NPNVariable variable, void* value) {
+  switch (variable) {
+    case NPNVxDisplay: {
+#if defined(GDK_WINDOWING_X11)
+      if (m_needsXEmbed)
+        *(void**)value = (void*)GDK_DISPLAY();
+      else
+        *(void**)value = (void*)GTK_XTBIN(m_window)->xtclient.xtdisplay;
+      return NPERR_NO_ERROR;
+#else
+      return NPERR_GENERIC_ERROR;
+#endif
+    }
+
+#if defined(GDK_WINDOWING_X11)
+    case NPNVxtAppContext: {
+      if (!m_needsXEmbed) {
+        *(void**)value = XtDisplayToApplicationContext(
+            GTK_XTBIN(m_window)->xtclient.xtdisplay);
+
+        return NPERR_NO_ERROR;
+      } else
+        return NPERR_GENERIC_ERROR;
+    }
+#endif
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
     case NPNVWindowNPObject: {
@@ -424,7 +459,7 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
       return NPERR_NO_ERROR;
     }
     default:
-      return NPERR_GENERIC_ERROR;
+      return getValueStatic(variable, value);
   }
 }
 
@@ -485,9 +520,15 @@ void PluginView::init() {
     return;
   }
 
-  if (m_plugin->pluginFuncs()->getvalue)
+  if (m_plugin->pluginFuncs()->getvalue) {
+    PluginView::setCurrentPluginView(this);
+    KJS::JSLock::DropAllLocks dropAllLocks;
+    setCallingPlugin(true);
     m_plugin->pluginFuncs()->getvalue(m_instance, NPPVpluginNeedsXEmbed,
                                       &m_needsXEmbed);
+    setCallingPlugin(false);
+    PluginView::setCurrentPluginView(0);
+  }
 
 #if defined(GDK_WINDOWING_X11)
   if (m_needsXEmbed) {
