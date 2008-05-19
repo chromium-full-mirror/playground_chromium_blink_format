@@ -54,6 +54,7 @@
 #include <WebCore/Cache.h>
 #include <WebCore/ContextMenu.h>
 #include <WebCore/ContextMenuController.h>
+#include <WebCore/CookieStorageWin.h>
 #include <WebCore/CString.h>
 #include <WebCore/Cursor.h>
 #include <WebCore/Document.h>
@@ -4100,10 +4101,8 @@ HRESULT updateSharedSettingsFromPreferencesIfNeeded(
     return hr;
 
   // Set cookie storage accept policy
-  if (CFHTTPCookieStorageRef defaultCookieStorage =
-          wkGetDefaultHTTPCookieStorage())
-    CFHTTPCookieStorageSetCookieAcceptPolicy(defaultCookieStorage,
-                                             acceptPolicy);
+  if (CFHTTPCookieStorageRef cookieStorage = currentCookieStorage())
+    CFHTTPCookieStorageSetCookieAcceptPolicy(cookieStorage, acceptPolicy);
 
   return S_OK;
 }

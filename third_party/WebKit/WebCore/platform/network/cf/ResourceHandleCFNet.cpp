@@ -31,6 +31,7 @@
 
 #include "AuthenticationCF.h"
 #include "AuthenticationChallenge.h"
+#include "CookieStorageWin.h"
 #include "CString.h"
 #include "DocLoader.h"
 #include "Frame.h"
@@ -282,11 +283,11 @@ static CFURLRequestRef makeFinalRequest(const ResourceRequest& request,
   if (sslProps)
     CFURLRequestSetSSLProperties(newRequest, sslProps.get());
 
-  if (CFHTTPCookieStorageRef defaultCookieStorage =
-          wkGetDefaultHTTPCookieStorage())
+  if (CFHTTPCookieStorageRef cookieStorage = currentCookieStorage()) {
+    CFURLRequestSetHTTPCookieStorage(newRequest, cookieStorage);
     CFURLRequestSetHTTPCookieStorageAcceptPolicy(
-        newRequest,
-        CFHTTPCookieStorageGetCookieAcceptPolicy(defaultCookieStorage));
+        newRequest, CFHTTPCookieStorageGetCookieAcceptPolicy(cookieStorage));
+  }
 
   return newRequest;
 }

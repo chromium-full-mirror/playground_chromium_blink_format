@@ -79,6 +79,10 @@ void ResourceRequest::doUpdatePlatformRequest() {
   CFURLRequestSetShouldHandleHTTPCookies(cfRequest, allowHTTPCookies());
 
   if (m_cfRequest) {
+    RetainPtr<CFHTTPCookieStorageRef> cookieStorage(
+        AdoptCF, CFURLRequestCopyHTTPCookieStorage(m_cfRequest.get()));
+    if (cookieStorage)
+      CFURLRequestSetHTTPCookieStorage(cfRequest, cookieStorage.get());
     CFURLRequestSetHTTPCookieStorageAcceptPolicy(
         cfRequest,
         CFURLRequestGetHTTPCookieStorageAcceptPolicy(m_cfRequest.get()));

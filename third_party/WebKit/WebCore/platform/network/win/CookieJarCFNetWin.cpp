@@ -26,6 +26,7 @@
 #include "config.h"
 #include "CookieJar.h"
 
+#include "CookieStorageWin.h"
 #include "KURL.h"
 #include "PlatformString.h"
 #include "Document.h"
@@ -49,8 +50,8 @@ void setCookies(Document* /*document*/,
   if (value.isEmpty())
     return;
 
-  CFHTTPCookieStorageRef defaultCookieStorage = wkGetDefaultHTTPCookieStorage();
-  if (!defaultCookieStorage)
+  CFHTTPCookieStorageRef cookieStorage = currentCookieStorage();
+  if (!cookieStorage)
     return;
 
   RetainPtr<CFURLRef> urlCF(AdoptCF, url.createCFURL());
@@ -72,13 +73,13 @@ void setCookies(Document* /*document*/,
       AdoptCF, CFHTTPCookieCreateWithResponseHeaderFields(
                    kCFAllocatorDefault, headerFieldsCF.get(), urlCF.get()));
 
-  CFHTTPCookieStorageSetCookies(defaultCookieStorage, cookiesCF.get(),
-                                urlCF.get(), policyURLCF.get());
+  CFHTTPCookieStorageSetCookies(cookieStorage, cookiesCF.get(), urlCF.get(),
+                                policyURLCF.get());
 }
 
 String cookies(const Document* /*document*/, const KURL& url) {
-  CFHTTPCookieStorageRef defaultCookieStorage = wkGetDefaultHTTPCookieStorage();
-  if (!defaultCookieStorage)
+  CFHTTPCookieStorageRef cookieStorage = currentCookieStorage();
+  if (!cookieStorage)
     return String();
 
   String cookieString;
@@ -87,8 +88,8 @@ String cookies(const Document* /*document*/, const KURL& url) {
   bool secure = equalIgnoringCase(url.protocol(), "https");
 
   RetainPtr<CFArrayRef> cookiesCF(
-      AdoptCF, CFHTTPCookieStorageCopyCookiesForURL(defaultCookieStorage,
-                                                    urlCF.get(), secure));
+      AdoptCF,
+      CFHTTPCookieStorageCopyCookiesForURL(cookieStorage, urlCF.get(), secure));
 
   // <rdar://problem/5632883> CFHTTPCookieStorage happily stores an empty
   // cookie, which would be sent as "Cookie: =".
@@ -113,9 +114,8 @@ String cookies(const Document* /*document*/, const KURL& url) {
 bool cookiesEnabled(const Document* /*document*/) {
   CFHTTPCookieStorageAcceptPolicy policy =
       CFHTTPCookieStorageAcceptPolicyOnlyFromMainDocumentDomain;
-  if (CFHTTPCookieStorageRef defaultCookieStorage =
-          wkGetDefaultHTTPCookieStorage())
-    policy = CFHTTPCookieStorageGetCookieAcceptPolicy(defaultCookieStorage);
+  if (CFHTTPCookieStorageRef cookieStorage = currentCookieStorage())
+    policy = CFHTTPCookieStorageGetCookieAcceptPolicy(cookieStorage);
   return policy == CFHTTPCookieStorageAcceptPolicyOnlyFromMainDocumentDomain ||
          policy == CFHTTPCookieStorageAcceptPolicyAlways;
 }
