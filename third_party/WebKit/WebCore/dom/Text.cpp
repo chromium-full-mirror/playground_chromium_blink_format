@@ -265,10 +265,6 @@ PassRefPtr<Text> Text::createNew(PassRefPtr<StringImpl> string) {
   return new Text(document(), string);
 }
 
-String Text::toString() const {
-  return nodeValue();
-}
-
 PassRefPtr<Text> Text::createWithLengthLimit(Document* doc,
                                              const String& text,
                                              unsigned& charsLeft,

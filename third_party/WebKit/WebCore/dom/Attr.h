@@ -81,7 +81,6 @@ class Attr : public ContainerNode {
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
-  virtual String toString() const;
 
   Attribute* attr() const { return m_attribute.get(); }
   const QualifiedName& qualifiedName() const { return m_attribute->name(); }

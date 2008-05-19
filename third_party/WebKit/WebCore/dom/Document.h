@@ -722,8 +722,6 @@ class Document : public ContainerNode {
 
   HTMLHeadElement* head();
 
-  String toString() const;
-
   bool execCommand(const String& command,
                    bool userInterface = false,
                    const String& value = String());

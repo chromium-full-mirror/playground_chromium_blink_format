@@ -37,7 +37,6 @@ class EntityReference : public ContainerNode {
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
   virtual bool childTypeAllowed(NodeType);
-  virtual String toString() const;
 
  private:
   String m_entityName;

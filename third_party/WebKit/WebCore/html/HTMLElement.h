@@ -84,8 +84,6 @@ class HTMLElement : public StyledElement {
 
   virtual bool isGenericFormElement() const { return false; }
 
-  virtual String toString() const;
-
   virtual HTMLTagStatus endTagRequirement() const;
   virtual int tagPriority() const;
   virtual bool childAllowed(

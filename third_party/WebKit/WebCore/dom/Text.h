@@ -59,8 +59,6 @@ class Text : public CharacterData {
   virtual void recalcStyle(StyleChange = NoChange);
   virtual bool childTypeAllowed(NodeType);
 
-  virtual String toString() const;
-
   static PassRefPtr<Text> createWithLengthLimit(
       Document*,
       const String&,
