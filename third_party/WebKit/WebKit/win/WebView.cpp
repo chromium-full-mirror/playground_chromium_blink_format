@@ -49,6 +49,7 @@
 #include "WebPreferences.h"
 #pragma warning(push, 0)
 #include <CoreGraphics/CGContext.h>
+#include <WebCore/ApplicationCacheStorage.h>
 #include <WebCore/AXObjectCache.h>
 #include <WebCore/BString.h>
 #include <WebCore/Cache.h>
@@ -2153,6 +2154,18 @@ HRESULT STDMETHODCALLTYPE WebView::URLTitleFromPasteboard(
   return E_NOTIMPL;
 }
 
+static void WebKitSetApplicationCachePathIfNecessary() {
+  static bool initialized = false;
+  if (initialized)
+    return;
+
+  String path = localUserSpecificStorageDirectory();
+  if (!path.isNull())
+    cacheStorage().setCacheDirectory(path);
+
+  initialized = true;
+}
+
 HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
     /* [in] */ RECT frame,
     /* [in] */ BSTR frameName,
@@ -2185,6 +2198,7 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
   m_preferences = sharedPreferences;
 
   WebKitSetWebDatabasesPathIfNecessary();
+  WebKitSetApplicationCachePathIfNecessary();
 
   m_page = new Page(new WebChromeClient(this), new WebContextMenuClient(this),
                     new WebEditorClient(this), new WebDragClient(this),
