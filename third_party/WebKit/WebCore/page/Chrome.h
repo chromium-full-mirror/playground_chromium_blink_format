@@ -117,6 +117,9 @@ class Chrome : Noncopyable {
 
   void print(Frame*);
 
+  void enableSuddenTermination();
+  void disableSuddenTermination();
+
 #if PLATFORM(MAC)
   void focusNSView(NSView*);
 #endif

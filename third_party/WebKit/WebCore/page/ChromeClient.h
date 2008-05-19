@@ -152,6 +152,9 @@ class ChromeClient {
       String& generatedFilename);
   virtual String generateReplacementFile(const String& path);
 
+  virtual void enableSuddenTermination();
+  virtual void disableSuddenTermination();
+
 #if PLATFORM(MAC)
   virtual void runOpenPanel(PassRefPtr<FileChooser>);
 
