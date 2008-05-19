@@ -601,6 +601,10 @@ void PluginView::stop() {
   m_instance->pdata = 0;
 }
 
+const char* PluginView::userAgentStatic() {
+  return 0;
+}
+
 const char* PluginView::userAgent() {
   if (m_plugin->quirks().contains(PluginQuirkWantsMozillaUserAgent))
     return MozillaUserAgent;
@@ -646,6 +650,10 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
     return NPERR_FILE_NOT_FOUND;
 
   return NPERR_NO_ERROR;
+}
+
+NPError PluginView::getValueStatic(NPNVariable variable, void* value) {
+  return NPERR_GENERIC_ERROR;
 }
 
 NPError PluginView::getValue(NPNVariable variable, void* value) {
