@@ -47,8 +47,9 @@ class NetworkStateNotifier {
   bool m_isOnLine;
   void (*m_networkStateChangedFunction)();
 
-#if PLATFORM(MAC)
   void updateState();
+
+#if PLATFORM(MAC)
   void networkStateChangeTimerFired(Timer<NetworkStateNotifier>*);
 
   static void dynamicStoreCallback(SCDynamicStoreRef,
@@ -57,11 +58,23 @@ class NetworkStateNotifier {
 
   RetainPtr<SCDynamicStoreRef> m_store;
   Timer<NetworkStateNotifier> m_networkStateChangeTimer;
+
+#elif PLATFORM(WIN)
+  static void CALLBACK addrChangeCallback(void*, BOOLEAN timedOut);
+  static void callAddressChanged(void*);
+  void addressChanged();
+
+  void registerForAddressChange();
+  HANDLE m_waitHandle;
+  OVERLAPPED m_overlapped;
 #endif
 };
 
-#if !PLATFORM(MAC)
+#if !PLATFORM(MAC) && !PLATFORM(WIN)
 inline NetworkStateNotifier::NetworkStateNotifier() : m_isOnLine(true) {}
+
+inline void updateState() {}
+
 #endif
 
 NetworkStateNotifier& networkStateNotifier();
