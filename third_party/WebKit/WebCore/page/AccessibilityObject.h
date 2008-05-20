@@ -248,6 +248,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual IntRect boundingBoxRect() const;
   virtual IntRect elementRect() const;
   virtual IntSize size() const;
+  IntPoint clickPoint() const;
 
   virtual KURL url() const;
   virtual PlainTextRange selectedTextRange() const;
