@@ -188,9 +188,12 @@ CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(DocLoader* docLoader,
   // Don't load incrementally, skip load checks, don't send resource load
   // callbacks.
   userSheet->load(docLoader, false, true, false);
-  if (!disabled())
+  if (!disabled()) {
     m_resources.set(url, userSheet);
-  else
+    // This will move the resource to the front of its LRU list and increase its
+    // access count.
+    resourceAccessed(userSheet);
+  } else
     userSheet->setInCache(false);
 
   return userSheet;
@@ -448,6 +451,7 @@ void Cache::insertInLRUList(CachedResource* resource) {
   ASSERT(!resource->m_nextInAllResourcesList &&
          !resource->m_prevInAllResourcesList);
   ASSERT(resource->inCache());
+  ASSERT(resource->accessCount() > 0);
 
   LRUList* list = lruListFor(resource);
 
