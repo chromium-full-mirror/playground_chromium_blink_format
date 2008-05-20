@@ -392,6 +392,7 @@ inline bool operator!=(const UString& s1, const UString& s2) {
   return !KJS::operator==(s1, s2);
 }
 bool operator<(const UString& s1, const UString& s2);
+bool operator>(const UString& s1, const UString& s2);
 bool operator==(const UString& s1, const char* s2);
 inline bool operator!=(const UString& s1, const char* s2) {
   return !KJS::operator==(s1, s2);

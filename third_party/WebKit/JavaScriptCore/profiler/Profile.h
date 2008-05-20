@@ -42,8 +42,8 @@ class Profile : public RefCounted<Profile> {
     return adoptRef(new Profile(title));
   }
 
-  void willExecute(const Vector<UString>& callStackNames);
-  void didExecute(const Vector<UString>& stackNames);
+  void willExecute(const Vector<CallIdentifier>& CallIdentifier);
+  void didExecute(const Vector<CallIdentifier>& CallIdentifier);
 
   void stopProfiling() { m_callTree->stopProfiling(); };
   const UString& title() const { return m_title; };
@@ -69,8 +69,6 @@ class Profile : public RefCounted<Profile> {
   Profile(const UString& title);
 
   UString m_title;
-
-  void insertStackNamesInTree(const Vector<UString>& callStackNames);
 
   RefPtr<ProfileNode> m_callTree;
 };
