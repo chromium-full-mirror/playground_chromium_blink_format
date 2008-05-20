@@ -71,8 +71,8 @@ class ProfileNode : public RefCounted<ProfileNode> {
   void sortSelfTimeAscending();
   void sortCallsDescending();
   void sortCallsAscending();
-  void sortFileNameDescending();
-  void sortFileNameAscending();
+  void sortFunctionNameDescending();
+  void sortFunctionNameAscending();
 
   void endAndRecordCall();
 
