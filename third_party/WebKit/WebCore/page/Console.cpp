@@ -130,11 +130,12 @@ void Console::log(ExecState* exec, const List& arguments) {
       JSMessageSource, LogMessageLevel, exec, arguments, 0, url.string());
 }
 
-void Console::profile(ExecState* exec, const String& title) const {
+void Console::profile(ExecState* exec, const List& arguments) const {
   Page* page = m_frame->page();
   if (!page)
     return;
 
+  const UString& title = arguments[0]->toString(exec);
   Profiler::profiler()->startProfiling(exec, page->group().identifier(), title);
 }
 
