@@ -29,7 +29,7 @@
 
 namespace WebCore {
 
-CSSImageValue::CSSImageValue(const String& url, StyleBase* style)
+CSSImageValue::CSSImageValue(const String& url)
     : CSSPrimitiveValue(url, CSS_URI), m_accessedImage(false) {}
 
 CSSImageValue::CSSImageValue()
@@ -66,6 +66,19 @@ StyleCachedImage* CSSImageValue::cachedImage(DocLoader* loader,
   }
 
   return m_image.get();
+}
+
+String CSSImageValue::cachedImageURL() {
+  if (!m_image)
+    return String();
+  return m_image->cachedImage()->url();
+}
+
+void CSSImageValue::clearCachedImage() {
+  if (m_image)
+    m_image->cachedImage()->removeClient(this);
+  m_image = 0;
+  m_accessedImage = false;
 }
 
 }  // namespace WebCore

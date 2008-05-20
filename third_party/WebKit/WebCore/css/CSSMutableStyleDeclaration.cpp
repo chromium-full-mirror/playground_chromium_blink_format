@@ -614,7 +614,7 @@ void CSSMutableStyleDeclaration::setImageProperty(int propertyId,
                                                   bool important) {
   removeProperty(propertyId);
   m_values.append(
-      CSSProperty(propertyId, new CSSImageValue(url, this), important));
+      CSSProperty(propertyId, CSSImageValue::create(url), important));
   setChanged();
 }
 

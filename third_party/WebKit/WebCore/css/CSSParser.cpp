@@ -865,11 +865,9 @@ bool CSSParser::parseValue(int propId, bool important) {
         } else if (strict && nrcoords == 2)
           hotspot = IntPoint(coords[0], coords[1]);
         if (strict || coords.size() == 0) {
-          if (!uri.isEmpty()) {
-            list->append(new CSSCursorImageValue(
-                KURL(styleElement->baseURL(), uri).string(), hotspot,
-                styleElement));
-          }
+          if (!uri.isEmpty())
+            list->append(CSSCursorImageValue::create(
+                KURL(styleElement->baseURL(), uri).string(), hotspot));
         }
         if ((strict && !value) ||
             (value &&
@@ -937,14 +935,14 @@ bool CSSParser::parseValue(int propId, bool important) {
     }
     case CSSPropertyListStyleImage:  // <uri> | none | inherit
       if (id == CSSValueNone) {
-        parsedValue = new CSSImageValue();
+        parsedValue = CSSImageValue::create();
         valueList->next();
       } else if (value->unit == CSSPrimitiveValue::CSS_URI) {
         // ### allow string in non strict mode?
         String uri = parseURL(value->string);
         if (!uri.isEmpty()) {
-          parsedValue = new CSSImageValue(
-              KURL(styleElement->baseURL(), uri).string(), styleElement);
+          parsedValue = CSSImageValue::create(
+              KURL(styleElement->baseURL(), uri).string());
           valueList->next();
         }
       } else if (value->unit == Value::Function &&
@@ -2026,8 +2024,8 @@ bool CSSParser::parseContent(int propId, bool important) {
     if (val->unit == CSSPrimitiveValue::CSS_URI) {
       // url
       String value = parseURL(val->string);
-      parsedValue = new CSSImageValue(
-          KURL(styleElement->baseURL(), value).string(), styleElement);
+      parsedValue =
+          CSSImageValue::create(KURL(styleElement->baseURL(), value).string());
     } else if (val->unit == Value::Function) {
       // attr(X) | counter(X [,Y]) | counters(X, Y, [,Z]) |
       // -webkit-gradient(...)
@@ -2097,14 +2095,14 @@ PassRefPtr<CSSValue> CSSParser::parseBackgroundColor() {
 
 bool CSSParser::parseFillImage(RefPtr<CSSValue>& value) {
   if (valueList->current()->id == CSSValueNone) {
-    value = new CSSImageValue();
+    value = CSSImageValue::create();
     return true;
   }
   if (valueList->current()->unit == CSSPrimitiveValue::CSS_URI) {
     String uri = parseURL(valueList->current()->string);
     if (!uri.isEmpty())
-      value = new CSSImageValue(KURL(styleElement->baseURL(), uri).string(),
-                                styleElement);
+      value =
+          CSSImageValue::create(KURL(styleElement->baseURL(), uri).string());
     return true;
   }
   if (valueList->current()->unit == Value::Function) {
@@ -3615,8 +3613,8 @@ bool CSSParser::parseBorderImage(int propId,
     String uri = parseURL(val->string);
     if (uri.isEmpty())
       return false;
-    context.commitImage(new CSSImageValue(
-        KURL(styleElement->baseURL(), uri).string(), styleElement));
+    context.commitImage(
+        CSSImageValue::create(KURL(styleElement->baseURL(), uri).string()));
   } else if (val->unit == Value::Function) {
     RefPtr<CSSValue> value;
     if ((equalIgnoringCase(val->function->name, "-webkit-gradient(") &&
