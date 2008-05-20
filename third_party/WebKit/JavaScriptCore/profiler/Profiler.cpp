@@ -205,8 +205,4 @@ void getCallIdentifierFromFunctionImp(FunctionImp* functionImp,
                                         functionImp->body->lineNo()));
 }
 
-void Profiler::debugLog(UString message) {
-  printf("Profiler Log: %s\n", message.UTF8String().c_str());
-}
-
 }  // namespace KJS

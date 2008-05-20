@@ -61,9 +61,10 @@ class Profile : public RefCounted<Profile> {
     m_callTree->sortFunctionNameDescending();
   }
   void sortFunctionNameAscending() { m_callTree->sortFunctionNameAscending(); }
-
-  void printDataInspectorStyle() const;
-  void printDataSampleStyle() const;
+#ifndef NDEBUG
+  void debugPrintData() const;
+  void debugPrintDataSampleStyle() const;
+#endif
 
  private:
   Profile(const UString& title);

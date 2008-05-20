@@ -41,7 +41,6 @@ class JSObject;
 class Profiler {
  public:
   static Profiler* profiler();
-  static void debugLog(UString);
 
   void startProfiling(ExecState*, unsigned pageGroupIdentifier, const UString&);
   void stopProfiling();

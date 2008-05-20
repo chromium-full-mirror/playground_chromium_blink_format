@@ -100,10 +100,11 @@ class ProfileNode : public RefCounted<ProfileNode> {
   void endAndRecordCall();
 
   void calculatePercentages(double totalProfileTime);
-
-  void printDataInspectorStyle(int indentLevel) const;
-  double printDataSampleStyle(int indentLevel, FunctionCallHashCount&) const;
-
+#ifndef NDEBUG
+  void debugPrintData(int indentLevel) const;
+  double debugPrintDataSampleStyle(int indentLevel,
+                                   FunctionCallHashCount&) const;
+#endif
  private:
   ProfileNode(const CallIdentifier& callIdentifier);
 

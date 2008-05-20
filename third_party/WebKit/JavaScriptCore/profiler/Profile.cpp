@@ -69,9 +69,10 @@ void Profile::didExecute(const Vector<CallIdentifier>& callIdentifiers) {
   m_callTree->didExecute(callIdentifiers, callIdentifiers.size() - 1);
 }
 
-void Profile::printDataInspectorStyle() const {
+#ifndef NDEBUG
+void Profile::debugPrintData() const {
   printf("Call graph:\n");
-  m_callTree->printDataInspectorStyle(0);
+  m_callTree->debugPrintData(0);
 }
 
 typedef pair<UString::Rep*, unsigned> NameCountPair;
@@ -81,12 +82,12 @@ static inline bool functionNameCountPairComparator(const NameCountPair& a,
   return a.second > b.second;
 }
 
-void Profile::printDataSampleStyle() const {
+void Profile::debugPrintDataSampleStyle() const {
   typedef Vector<NameCountPair> NameCountPairVector;
 
   FunctionCallHashCount countedFunctions;
   printf("Call graph:\n");
-  m_callTree->printDataSampleStyle(0, countedFunctions);
+  m_callTree->debugPrintDataSampleStyle(0, countedFunctions);
 
   printf("\nTotal number in stack:\n");
   NameCountPairVector sortedFunctions(countedFunctions.size());
@@ -101,5 +102,6 @@ void Profile::printDataSampleStyle() const {
 
   printf("\nSort by top of stack, same collapsed (when >= 5):\n");
 }
+#endif
 
 }  // namespace KJS
