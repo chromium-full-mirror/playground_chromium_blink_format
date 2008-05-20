@@ -1189,7 +1189,8 @@ PassRefPtr<Element> Node::querySelector(const String& selectors,
     return 0;
   }
 
-  CSSStyleSelector* styleSelector = document()->styleSelector();
+  CSSStyleSelector::SelectorChecker selectorChecker(
+      document(), !document()->inCompatMode());
   CSSSelector* querySelector =
       static_cast<CSSStyleRule*>(rule.get())->selector();
 
@@ -1198,11 +1199,9 @@ PassRefPtr<Element> Node::querySelector(const String& selectors,
   for (Node* n = firstChild(); n; n = n->traverseNextNode(this)) {
     if (n->isElementNode()) {
       Element* element = static_cast<Element*>(n);
-      styleSelector->initElementAndPseudoState(element);
-      styleSelector->initForStyleResolve(element, 0);
       for (CSSSelector* selector = querySelector; selector;
            selector = selector->next()) {
-        if (styleSelector->checkSelector(selector))
+        if (selectorChecker.checkSelector(selector, element))
           return element;
       }
     }
