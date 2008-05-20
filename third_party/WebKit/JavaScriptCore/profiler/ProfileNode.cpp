@@ -43,11 +43,11 @@ ProfileNode::ProfileNode(const UString& name)
       m_totalPercent(0.0),
       m_selfPercent(0.0),
       m_numberOfCalls(0) {
-  m_startTime = getCurrentUTCTime();
+  m_startTime = getCurrentUTCTimeWithMicroseconds();
 }
 
 void ProfileNode::willExecute() {
-  m_startTime = getCurrentUTCTime();
+  m_startTime = getCurrentUTCTimeWithMicroseconds();
 }
 
 // We start at the end of stackNames and work our way forwards since the names
@@ -224,7 +224,7 @@ void ProfileNode::sortFileNameAscending() {
 }
 
 void ProfileNode::endAndRecordCall() {
-  m_totalTime += getCurrentUTCTime() - m_startTime;
+  m_totalTime += getCurrentUTCTimeWithMicroseconds() - m_startTime;
   m_startTime = 0.0;
 
   ++m_numberOfCalls;
