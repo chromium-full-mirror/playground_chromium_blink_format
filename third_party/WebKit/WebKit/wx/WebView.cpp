@@ -266,7 +266,7 @@ wxString wxWebView::GetPageSource() {
     WebCore::Document* doc = m_impl->frame->document();
 
     if (doc) {
-      wxString source = doc->toString();
+      wxString source = createMarkup(doc);
       return source;
     }
   }
