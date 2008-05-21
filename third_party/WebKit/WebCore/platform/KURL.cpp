@@ -448,7 +448,8 @@ void KURL::init(const KURL& base,
     // unless the relative URL is a single fragment.
     if (!base.isHierarchical()) {
       if (str[0] == '#')
-        parse(base.m_string.left(base.m_queryEnd) + str);
+        parse(base.m_string.left(base.m_queryEnd) +
+              (allASCII ? String(str) : String::fromUTF8(str)));
       else {
         m_string = relative;
         invalidate();
@@ -464,20 +465,24 @@ void KURL::init(const KURL& base,
         break;
       case '#':
         // must be fragment-only reference
-        parse(base.m_string.left(base.m_queryEnd) + str);
+        parse(base.m_string.left(base.m_queryEnd) +
+              (allASCII ? String(str) : String::fromUTF8(str)));
         break;
       case '?':
         // query-only reference, special case needed for non-URL results
-        parse(base.m_string.left(base.m_pathEnd) + str);
+        parse(base.m_string.left(base.m_pathEnd) +
+              (allASCII ? String(str) : String::fromUTF8(str)));
         break;
       case '/':
         // must be net-path or absolute-path reference
         if (str[1] == '/') {
           // net-path
-          parse(base.m_string.left(base.m_schemeEnd + 1) + str);
+          parse(base.m_string.left(base.m_schemeEnd + 1) +
+                (allASCII ? String(str) : String::fromUTF8(str)));
         } else {
           // abs-path
-          parse(base.m_string.left(base.m_portEnd) + str);
+          parse(base.m_string.left(base.m_portEnd) +
+                (allASCII ? String(str) : String::fromUTF8(str)));
         }
         break;
       default: {
