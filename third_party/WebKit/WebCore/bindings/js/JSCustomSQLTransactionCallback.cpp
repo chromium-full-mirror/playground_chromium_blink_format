@@ -146,8 +146,6 @@ void JSCustomSQLTransactionCallback::handleEvent(SQLTransaction* transaction,
         exception->get(exec, exec->propertyNames().message)->toString(exec);
     int lineNumber = exception->get(exec, "line")->toInt32(exec);
     String sourceURL = exception->get(exec, "sourceURL")->toString(exec);
-    if (Interpreter::shouldPrintExceptions())
-      printf("SQLTransactionCallback: %s\n", message.utf8().data());
     m_data->frame()->domWindow()->console()->addMessage(
         JSMessageSource, ErrorMessageLevel, message, lineNumber, sourceURL);
     exec->clearException();

@@ -2603,9 +2603,6 @@ bool FrameLoader::shouldAllowNavigation(Frame* targetFrame) const {
         targetDocument->url().string().utf8().data(),
         activeDocument->url().string().utf8().data());
 
-    if (KJS::Interpreter::shouldPrintExceptions())
-      printf("%s", message.utf8().data());
-
     // FIXME: should we print to the console of the activeFrame as well?
     targetFrame->domWindow()->console()->addMessage(
         JSMessageSource, ErrorMessageLevel, message, 1, String());

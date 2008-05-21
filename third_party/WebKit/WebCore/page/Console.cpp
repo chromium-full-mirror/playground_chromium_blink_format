@@ -30,6 +30,7 @@
 #include "Console.h"
 
 #include "ChromeClient.h"
+#include "CString.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameTree.h"
@@ -37,6 +38,7 @@
 #include "Page.h"
 #include "PageGroup.h"
 #include "PlatformString.h"
+#include <kjs/interpreter.h>
 #include <kjs/list.h>
 #include <profiler/Profiler.h>
 
@@ -48,6 +50,94 @@ Console::Console(Frame* frame) : m_frame(frame) {}
 
 void Console::disconnectFrame() {
   m_frame = 0;
+}
+
+static void printSourceURLAndLine(const String& sourceURL,
+                                  unsigned lineNumber) {
+  if (!sourceURL.isEmpty()) {
+    if (lineNumber > 0)
+      printf("%s:%d: ", sourceURL.utf8().data(), lineNumber);
+    else
+      printf("%s: ", sourceURL.utf8().data());
+  }
+}
+
+static void printMessageSourceAndLevelPrefix(MessageSource source,
+                                             MessageLevel level) {
+  const char* sourceString;
+  switch (source) {
+    case HTMLMessageSource:
+      sourceString = "HTML";
+      break;
+    case XMLMessageSource:
+      sourceString = "XML";
+      break;
+    case JSMessageSource:
+      sourceString = "JS";
+      break;
+    case CSSMessageSource:
+      sourceString = "CSS";
+      break;
+    default:
+      ASSERT_NOT_REACHED();
+    // Fall thru.
+    case OtherMessageSource:
+      sourceString = "OTHER";
+      break;
+  }
+
+  const char* levelString;
+  switch (level) {
+    case TipMessageLevel:
+      levelString = "TIP";
+      break;
+    default:
+      ASSERT_NOT_REACHED();
+    // Fall thru.
+    case LogMessageLevel:
+      levelString = "LOG";
+      break;
+    case WarningMessageLevel:
+      levelString = "WARN";
+      break;
+    case ErrorMessageLevel:
+      levelString = "ERROR";
+      break;
+  }
+
+  printf("%s %s:", sourceString, levelString);
+}
+
+static void printToStandardOut(MessageSource source,
+                               MessageLevel level,
+                               const String& message,
+                               const String& sourceURL,
+                               unsigned lineNumber) {
+  if (!Interpreter::shouldPrintExceptions())
+    return;
+
+  printSourceURLAndLine(sourceURL, lineNumber);
+  printMessageSourceAndLevelPrefix(source, level);
+
+  printf(" %s\n", message.utf8().data());
+}
+
+static void printToStandardOut(MessageLevel level,
+                               ExecState* exec,
+                               const List& arguments,
+                               const KURL& url) {
+  if (!Interpreter::shouldPrintExceptions())
+    return;
+
+  printSourceURLAndLine(url.prettyURL(), 0);
+  printMessageSourceAndLevelPrefix(JSMessageSource, level);
+
+  for (size_t i = 0; i < arguments.size(); ++i) {
+    UString argAsString = arguments[i]->toString(exec);
+    printf(" %s", argAsString.UTF8String().c_str());
+  }
+
+  printf("\n");
 }
 
 void Console::addMessage(MessageSource source,
@@ -68,6 +158,8 @@ void Console::addMessage(MessageSource source,
 
   page->inspectorController()->addMessageToConsole(source, level, message,
                                                    lineNumber, sourceURL);
+
+  printToStandardOut(source, level, message, sourceURL, lineNumber);
 }
 
 void Console::error(ExecState* exec, const List& arguments) {
@@ -88,6 +180,8 @@ void Console::error(ExecState* exec, const List& arguments) {
   page->chrome()->client()->addMessageToConsole(message, 0, prettyURL);
   page->inspectorController()->addMessageToConsole(
       JSMessageSource, ErrorMessageLevel, exec, arguments, 0, url.string());
+
+  printToStandardOut(ErrorMessageLevel, exec, arguments, url);
 }
 
 void Console::info(ExecState* exec, const List& arguments) {
@@ -108,6 +202,8 @@ void Console::info(ExecState* exec, const List& arguments) {
   page->chrome()->client()->addMessageToConsole(message, 0, prettyURL);
   page->inspectorController()->addMessageToConsole(
       JSMessageSource, LogMessageLevel, exec, arguments, 0, url.string());
+
+  printToStandardOut(LogMessageLevel, exec, arguments, url);
 }
 
 void Console::log(ExecState* exec, const List& arguments) {
@@ -128,6 +224,8 @@ void Console::log(ExecState* exec, const List& arguments) {
   page->chrome()->client()->addMessageToConsole(message, 0, prettyURL);
   page->inspectorController()->addMessageToConsole(
       JSMessageSource, LogMessageLevel, exec, arguments, 0, url.string());
+
+  printToStandardOut(LogMessageLevel, exec, arguments, url);
 }
 
 void Console::assertCondition(bool condition,
@@ -152,6 +250,8 @@ void Console::assertCondition(bool condition,
 
   page->inspectorController()->addMessageToConsole(
       JSMessageSource, ErrorMessageLevel, exec, arguments, 0, url.string());
+
+  printToStandardOut(ErrorMessageLevel, exec, arguments, url);
 }
 
 void Console::profile(ExecState* exec, const List& arguments) const {
@@ -195,6 +295,8 @@ void Console::warn(ExecState* exec, const List& arguments) {
   page->chrome()->client()->addMessageToConsole(message, 0, prettyURL);
   page->inspectorController()->addMessageToConsole(
       JSMessageSource, WarningMessageLevel, exec, arguments, 0, url.string());
+
+  printToStandardOut(WarningMessageLevel, exec, arguments, url);
 }
 
 }  // namespace WebCore
