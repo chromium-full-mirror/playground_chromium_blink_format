@@ -61,9 +61,37 @@ static JSValueRef getFunctionName(JSContextRef ctx,
 
   ProfileNode* profileNode =
       static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
-  return JSValueMakeString(
-      ctx, JSStringCreateWithCharacters(profileNode->functionName().data(),
-                                        profileNode->functionName().size()));
+  JSRetainPtr<JSStringRef> functionNameString(
+      Adopt, JSStringCreateWithCharacters(profileNode->functionName().data(),
+                                          profileNode->functionName().size()));
+  return JSValueMakeString(ctx, functionNameString.get());
+}
+
+static JSValueRef getURL(JSContextRef ctx,
+                         JSObjectRef thisObject,
+                         JSStringRef propertyName,
+                         JSValueRef* exception) {
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  ProfileNode* profileNode =
+      static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> urlString(
+      Adopt, JSStringCreateWithCharacters(profileNode->url().data(),
+                                          profileNode->url().size()));
+  return JSValueMakeString(ctx, urlString.get());
+}
+
+static JSValueRef getLineNumber(JSContextRef ctx,
+                                JSObjectRef thisObject,
+                                JSStringRef propertyName,
+                                JSValueRef* exception) {
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  ProfileNode* profileNode =
+      static_cast<ProfileNode*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeNumber(ctx, profileNode->lineNumber());
 }
 
 static JSValueRef getTotalTime(JSContextRef ctx,
@@ -329,6 +357,8 @@ static void finalize(JSObjectRef object) {
 JSClassRef ProfileNodeClass() {
   static JSStaticValue staticValues[] = {
       {"functionName", getFunctionName, 0, kJSPropertyAttributeNone},
+      {"url", getURL, 0, kJSPropertyAttributeNone},
+      {"lineNumber", getLineNumber, 0, kJSPropertyAttributeNone},
       {"totalTime", getTotalTime, 0, kJSPropertyAttributeNone},
       {"selfTime", getSelfTime, 0, kJSPropertyAttributeNone},
       {"totalPercent", getTotalPercent, 0, kJSPropertyAttributeNone},
