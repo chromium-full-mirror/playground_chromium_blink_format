@@ -240,7 +240,7 @@ IndexToNameMap::IndexToNameMap(FunctionImp* func, const List& args) {
   _map = new Identifier[args.size()];
   this->size = args.size();
 
-  int i = 0;
+  unsigned i = 0;
   List::const_iterator end = args.end();
   for (List::const_iterator it = args.begin(); it != end; ++i, ++it)
     _map[i] = func->getParameterName(
@@ -253,7 +253,7 @@ IndexToNameMap::~IndexToNameMap() {
 
 bool IndexToNameMap::isMapped(const Identifier& index) const {
   bool indexIsNumber;
-  int indexAsNumber = index.toUInt32(&indexIsNumber);
+  unsigned indexAsNumber = index.toStrictUInt32(&indexIsNumber);
 
   if (!indexIsNumber)
     return false;
@@ -269,24 +269,20 @@ bool IndexToNameMap::isMapped(const Identifier& index) const {
 
 void IndexToNameMap::unMap(const Identifier& index) {
   bool indexIsNumber;
-  int indexAsNumber = index.toUInt32(&indexIsNumber);
+  unsigned indexAsNumber = index.toStrictUInt32(&indexIsNumber);
 
   ASSERT(indexIsNumber && indexAsNumber < size);
 
   _map[indexAsNumber] = CommonIdentifiers::shared()->nullIdentifier;
 }
 
-Identifier& IndexToNameMap::operator[](int index) {
-  return _map[index];
-}
-
 Identifier& IndexToNameMap::operator[](const Identifier& index) {
   bool indexIsNumber;
-  int indexAsNumber = index.toUInt32(&indexIsNumber);
+  unsigned indexAsNumber = index.toStrictUInt32(&indexIsNumber);
 
   ASSERT(indexIsNumber && indexAsNumber < size);
 
-  return (*this)[indexAsNumber];
+  return _map[indexAsNumber];
 }
 
 // ------------------------------ Arguments ---------------------------------
