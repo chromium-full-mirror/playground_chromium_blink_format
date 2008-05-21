@@ -681,7 +681,7 @@ template <class Abstractor, unsigned maxDepth, class BSet>
 inline typename AVLTree<Abstractor, maxDepth, BSet>::handle
 AVLTree<Abstractor, maxDepth, BSet>::search(
     key k,
-    AVLTree<Abstractor, maxDepth, BSet>::SearchType st) {
+    typename AVLTree<Abstractor, maxDepth, BSet>::SearchType st) {
   const int MASK_HIGH_BIT = (int)~((~(unsigned)0) >> 1);
 
   int cmp, target_cmp;
