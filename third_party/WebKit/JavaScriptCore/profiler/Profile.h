@@ -61,6 +61,11 @@ class Profile : public RefCounted<Profile> {
     m_callTree->sortFunctionNameDescending();
   }
   void sortFunctionNameAscending() { m_callTree->sortFunctionNameAscending(); }
+
+  void focus(const CallIdentifier& callIdentifier) {
+    m_callTree->focus(callIdentifier);
+  }
+
 #ifndef NDEBUG
   void debugPrintData() const;
   void debugPrintDataSampleStyle() const;

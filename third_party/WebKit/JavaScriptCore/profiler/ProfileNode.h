@@ -86,6 +86,9 @@ class ProfileNode : public RefCounted<ProfileNode> {
   unsigned numberOfCalls() const { return m_numberOfCalls; }
   void setNumberOfCalls(unsigned number) { m_numberOfCalls = number; }
   const Vector<RefPtr<ProfileNode>>& children() { return m_children; }
+  bool visible() const { return m_visible; }
+  void setVisible(bool visible) { m_visible = visible; }
+  void setTreeVisible(bool visible);
 
   // Sorting functions
   void sortTotalTimeDescending();
@@ -97,9 +100,12 @@ class ProfileNode : public RefCounted<ProfileNode> {
   void sortFunctionNameDescending();
   void sortFunctionNameAscending();
 
-  void endAndRecordCall();
+  bool focus(const CallIdentifier& callIdentifier);
+  void restoreAll();
 
+  void endAndRecordCall();
   void calculatePercentages(double totalProfileTime);
+
 #ifndef NDEBUG
   void debugPrintData(int indentLevel) const;
   double debugPrintDataSampleStyle(int indentLevel,
@@ -116,6 +122,8 @@ class ProfileNode : public RefCounted<ProfileNode> {
   double m_totalPercent;
   double m_selfPercent;
   unsigned m_numberOfCalls;
+
+  bool m_visible;
 
   Vector<RefPtr<ProfileNode>> m_children;
 };
