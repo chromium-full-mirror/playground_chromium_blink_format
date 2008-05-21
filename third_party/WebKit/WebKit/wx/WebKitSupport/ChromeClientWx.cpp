@@ -40,7 +40,7 @@
 #endif
 #include <wx/textdlg.h>
 
-#include "WebFrame.h"
+#include "WebBrowserShell.h"
 #include "WebView.h"
 #include "WebViewPrivate.h"
 
@@ -99,7 +99,7 @@ Page* ChromeClientWx::createWindow(Frame*,
   // when that event is not handled.
 
   Page* myPage = 0;
-  wxWebFrame* newFrame = new wxWebFrame(wxTheApp->GetAppName());
+  wxWebBrowserShell* newFrame = new wxWebBrowserShell(wxTheApp->GetAppName());
 
   if (newFrame->webview) {
     newFrame->webview->LoadURL(request.resourceRequest().url().string());
