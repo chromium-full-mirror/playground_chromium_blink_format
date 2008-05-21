@@ -353,7 +353,8 @@ class Vector {
   Vector() : m_size(0) {}
 
   explicit Vector(size_t size) : m_size(size), m_buffer(size) {
-    TypeOperations::initialize(begin(), end());
+    if (begin())
+      TypeOperations::initialize(begin(), end());
   }
 
   ~Vector() { clear(); }
@@ -438,7 +439,8 @@ class Vector {
   }
 
   Vector(size_t size, const T& val) : m_size(size), m_buffer(size) {
-    TypeOperations::uninitializedFill(begin(), end(), val);
+    if (begin())
+      TypeOperations::uninitializedFill(begin(), end(), val);
   }
 
   void fill(const T&, size_t);
@@ -467,14 +469,16 @@ class Vector {
 template <typename T, size_t inlineCapacity>
 Vector<T, inlineCapacity>::Vector(const Vector& other)
     : m_size(other.size()), m_buffer(other.capacity()) {
-  TypeOperations::uninitializedCopy(other.begin(), other.end(), begin());
+  if (begin())
+    TypeOperations::uninitializedCopy(other.begin(), other.end(), begin());
 }
 
 template <typename T, size_t inlineCapacity>
 template <size_t otherCapacity>
 Vector<T, inlineCapacity>::Vector(const Vector<T, otherCapacity>& other)
     : m_size(other.size()), m_buffer(other.capacity()) {
-  TypeOperations::uninitializedCopy(other.begin(), other.end(), begin());
+  if (begin())
+    TypeOperations::uninitializedCopy(other.begin(), other.end(), begin());
 }
 
 template <typename T, size_t inlineCapacity>
@@ -488,6 +492,8 @@ Vector<T, inlineCapacity>& Vector<T, inlineCapacity>::operator=(
   else if (other.size() > capacity()) {
     clear();
     reserveCapacity(other.size());
+    if (!begin())
+      return *this;
   }
 
   std::copy(other.begin(), other.begin() + size(), begin());
@@ -509,6 +515,8 @@ Vector<T, inlineCapacity>& Vector<T, inlineCapacity>::operator=(
   else if (other.size() > capacity()) {
     clear();
     reserveCapacity(other.size());
+    if (!begin())
+      return *this;
   }
 
   std::copy(other.begin(), other.begin() + size(), begin());
@@ -525,6 +533,8 @@ void Vector<T, inlineCapacity>::fill(const T& val, size_t newSize) {
   else if (newSize > capacity()) {
     clear();
     reserveCapacity(newSize);
+    if (!begin())
+      return;
   }
 
   std::fill(begin(), end(), val);

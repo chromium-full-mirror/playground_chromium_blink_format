@@ -68,7 +68,7 @@ class ArrayInstance : public JSObject {
                                 PropertySlot&);
 
   void setLength(unsigned);
-  void increaseVectorLength(unsigned newLength);
+  bool increaseVectorLength(unsigned newLength);
 
   unsigned compactForSorting();
 
