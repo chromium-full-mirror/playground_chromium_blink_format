@@ -62,31 +62,52 @@ Profiler* Profiler::profiler() {
   return sharedProfiler;
 }
 
-void Profiler::startProfiling(ExecState* exec,
-                              unsigned pageGroupIdentifier,
-                              const UString& title) {
-  if (m_profiling)
-    return;
-
-  m_pageGroupIdentifier = pageGroupIdentifier;
-
-  m_currentProfile = Profile::create(title);
-  m_profiling = true;
-
-  Vector<CallIdentifier> callIdentifiers;
-  getCallIdentifiers(exec, callIdentifiers);
-  m_currentProfile->willExecute(callIdentifiers);
+Profile* Profiler::findProfile(ExecState* exec, const UString& title) const {
+  ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
+  for (size_t i = 0; i < m_currentProfiles.size(); ++i)
+    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
+        (title.isNull() || m_currentProfiles[i]->title() == title))
+      return m_currentProfiles[i].get();
+  return 0;
 }
 
-void Profiler::stopProfiling() {
-  m_profiling = false;
+void Profiler::startProfiling(ExecState* exec, const UString& title) {
+  ASSERT_ARG(exec, exec);
 
-  if (!m_currentProfile)
-    return;
+  // Check if we currently have a Profile for this global ExecState and title.
+  // If so return early and don't create a new Profile.
+  ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
+  for (size_t i = 0; i < m_currentProfiles.size(); ++i)
+    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
+        m_currentProfiles[i]->title() == title)
+      return;
 
-  m_currentProfile->stopProfiling();
-  m_allProfiles.append(m_currentProfile.release());
-  m_currentProfile = 0;
+  RefPtr<Profile> profile = Profile::create(
+      title, globalExec, exec->lexicalGlobalObject()->pageGroupIdentifier());
+  m_currentProfiles.append(profile);
+
+  // Update the profile with the current call identifiers that started the
+  // profiling.
+  Vector<CallIdentifier> callIdentifiers;
+  getCallIdentifiers(exec, callIdentifiers);
+  profile->willExecute(callIdentifiers);
+}
+
+PassRefPtr<Profile> Profiler::stopProfiling(ExecState* exec,
+                                            const UString& title) {
+  ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
+  for (ssize_t i = m_currentProfiles.size() - 1; i >= 0; --i) {
+    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
+        (title.isNull() || m_currentProfiles[i]->title() == title)) {
+      m_currentProfiles[i]->stopProfiling();
+
+      PassRefPtr<Profile> prpProfile = m_currentProfiles[i].release();
+      m_currentProfiles.remove(i);
+      return prpProfile;
+    }
+  }
+
+  return 0;
 }
 
 static inline bool shouldExcludeFunction(ExecState* exec,
@@ -103,10 +124,18 @@ static inline bool shouldExcludeFunction(ExecState* exec,
   return false;
 }
 
+static inline void dispatchFunctionToProfiles(
+    const Vector<RefPtr<Profile>>& profiles,
+    Profile::ProfileFunction function,
+    const Vector<CallIdentifier>& callIdentifiers,
+    unsigned currentPageGroupIdentifier) {
+  for (size_t i = 0; i < profiles.size(); ++i)
+    if (profiles[i]->pageGroupIdentifier() == currentPageGroupIdentifier)
+      (profiles[i].get()->*function)(callIdentifiers);
+}
+
 void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
-  if (!m_profiling ||
-      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
-          m_pageGroupIdentifier)
+  if (m_currentProfiles.isEmpty())
     return;
 
   if (shouldExcludeFunction(exec, calledFunction))
@@ -114,26 +143,28 @@ void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {
 
   Vector<CallIdentifier> callIdentifiers;
   getCallIdentifiers(exec, calledFunction, callIdentifiers);
-  m_currentProfile->willExecute(callIdentifiers);
+
+  dispatchFunctionToProfiles(
+      m_currentProfiles, &Profile::willExecute, callIdentifiers,
+      exec->lexicalGlobalObject()->pageGroupIdentifier());
 }
 
 void Profiler::willExecute(ExecState* exec,
                            const UString& sourceURL,
                            int startingLineNumber) {
-  if (!m_profiling ||
-      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
-          m_pageGroupIdentifier)
+  if (m_currentProfiles.isEmpty())
     return;
 
   Vector<CallIdentifier> callIdentifiers;
   getCallIdentifiers(exec, sourceURL, startingLineNumber, callIdentifiers);
-  m_currentProfile->willExecute(callIdentifiers);
+
+  dispatchFunctionToProfiles(
+      m_currentProfiles, &Profile::willExecute, callIdentifiers,
+      exec->lexicalGlobalObject()->pageGroupIdentifier());
 }
 
 void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
-  if (!m_profiling ||
-      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
-          m_pageGroupIdentifier)
+  if (m_currentProfiles.isEmpty())
     return;
 
   if (shouldExcludeFunction(exec, calledFunction))
@@ -141,20 +172,24 @@ void Profiler::didExecute(ExecState* exec, JSObject* calledFunction) {
 
   Vector<CallIdentifier> callIdentifiers;
   getCallIdentifiers(exec, calledFunction, callIdentifiers);
-  m_currentProfile->didExecute(callIdentifiers);
+
+  dispatchFunctionToProfiles(
+      m_currentProfiles, &Profile::didExecute, callIdentifiers,
+      exec->lexicalGlobalObject()->pageGroupIdentifier());
 }
 
 void Profiler::didExecute(ExecState* exec,
                           const UString& sourceURL,
                           int startingLineNumber) {
-  if (!m_profiling ||
-      exec->lexicalGlobalObject()->pageGroupIdentifier() !=
-          m_pageGroupIdentifier)
+  if (m_currentProfiles.isEmpty())
     return;
 
   Vector<CallIdentifier> callIdentifiers;
   getCallIdentifiers(exec, sourceURL, startingLineNumber, callIdentifiers);
-  m_currentProfile->didExecute(callIdentifiers);
+
+  dispatchFunctionToProfiles(
+      m_currentProfiles, &Profile::didExecute, callIdentifiers,
+      exec->lexicalGlobalObject()->pageGroupIdentifier());
 }
 
 void getCallIdentifiers(ExecState* exec,

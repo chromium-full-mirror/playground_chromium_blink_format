@@ -38,6 +38,7 @@
 #include <wtf/Vector.h>
 
 namespace KJS {
+class Profile;
 class UString;
 }
 
@@ -106,6 +107,10 @@ class InspectorController : JavaScriptDebugListener {
                            const String& message,
                            unsigned lineNumber,
                            const String& sourceID);
+
+  void addProfile(PassRefPtr<KJS::Profile>);
+  void addScriptProfile(KJS::Profile* profile);
+  const Vector<RefPtr<KJS::Profile>>& profiles() const { return m_profiles; }
 
   void attachWindow();
   void detachWindow();
@@ -248,6 +253,7 @@ class InspectorController : JavaScriptDebugListener {
   ResourcesMap m_resources;
   FrameResourcesMap m_frameResources;
   Vector<ConsoleMessage*> m_consoleMessages;
+  Vector<RefPtr<KJS::Profile>> m_profiles;
 #if ENABLE(DATABASE)
   DatabaseResourcesSet m_databaseResources;
 #endif

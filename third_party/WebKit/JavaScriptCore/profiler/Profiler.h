@@ -35,15 +35,16 @@
 namespace KJS {
 
 class ExecState;
-class FunctionImp;
 class JSObject;
 
 class Profiler {
  public:
   static Profiler* profiler();
 
-  void startProfiling(ExecState*, unsigned pageGroupIdentifier, const UString&);
-  void stopProfiling();
+  void startProfiling(ExecState*, const UString& title);
+  PassRefPtr<Profile> stopProfiling(ExecState*, const UString& title);
+
+  Profile* findProfile(ExecState*, const UString& title) const;
 
   void willExecute(ExecState*, JSObject* calledFunction);
   void willExecute(ExecState*,
@@ -52,22 +53,12 @@ class Profiler {
   void didExecute(ExecState*, JSObject* calledFunction);
   void didExecute(ExecState*, const UString& sourceURL, int startingLineNumber);
 
-  const Vector<RefPtr<Profile>>& allProfiles() { return m_allProfiles; };
-  void clearProfiles() {
-    if (!m_profiling)
-      m_allProfiles.clear();
+  const Vector<RefPtr<Profile>>& currentProfiles() {
+    return m_currentProfiles;
   };
 
-  Profile* currentProfile() const { return m_currentProfile.get(); }
-
  private:
-  Profiler() : m_profiling(false), m_pageGroupIdentifier(0) {}
-
-  bool m_profiling;
-  unsigned m_pageGroupIdentifier;
-
-  RefPtr<Profile> m_currentProfile;
-  Vector<RefPtr<Profile>> m_allProfiles;
+  Vector<RefPtr<Profile>> m_currentProfiles;
 };
 
 }  // namespace KJS
