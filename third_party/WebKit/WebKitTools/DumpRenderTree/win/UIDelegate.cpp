@@ -362,6 +362,20 @@ HRESULT STDMETHODCALLTYPE UIDelegate::webViewClose(
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE UIDelegate::webViewFocus(
+    /* [in] */ IWebView* sender) {
+  HWND hostWindow;
+  sender->hostWindow(reinterpret_cast<OLE_HANDLE*>(&hostWindow));
+  SetForegroundWindow(hostWindow);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE UIDelegate::webViewUnfocus(
+    /* [in] */ IWebView* sender) {
+  SetForegroundWindow(GetDesktopWindow());
+  return S_OK;
+}
+
 HRESULT STDMETHODCALLTYPE UIDelegate::webViewPainted(
     /* [in] */ IWebView* sender) {
   return S_OK;
