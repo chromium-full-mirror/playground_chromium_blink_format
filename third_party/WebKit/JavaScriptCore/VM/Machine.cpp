@@ -2047,8 +2047,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         registerFile->setSafeForReentry(true);
 #if JAVASCRIPT_PROFILING
         JSValue* result =
-            callEval(exec, static_cast<JSObject*>(v), thisObject, scopeChain,
-                     registerFile, r, argv, argc, exceptionValue);
+            callEval(exec, static_cast<JSObject*>(funcVal), thisObject,
+                     scopeChain, registerFile, r, argv, argc, exceptionValue);
 #else
           JSValue* result = callEval(exec, thisObject, scopeChain, registerFile,
                                      r, argv, argc, exceptionValue);
