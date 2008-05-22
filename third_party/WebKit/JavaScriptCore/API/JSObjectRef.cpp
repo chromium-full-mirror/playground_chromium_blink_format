@@ -327,7 +327,8 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
 
 bool JSObjectIsConstructor(JSContextRef, JSObjectRef object) {
   JSObject* jsObject = toJS(object);
-  return jsObject->implementsConstruct();
+  ConstructData constructData;
+  return jsObject->getConstructData(constructData) != ConstructTypeNone;
 }
 
 JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,

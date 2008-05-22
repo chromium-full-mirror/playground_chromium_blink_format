@@ -102,8 +102,8 @@ BooleanObjectImp::BooleanObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-bool BooleanObjectImp::implementsConstruct() const {
-  return true;
+ConstructType BooleanObjectImp::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 // ECMA 15.6.2

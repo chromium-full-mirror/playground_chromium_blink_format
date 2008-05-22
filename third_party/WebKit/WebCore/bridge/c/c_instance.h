@@ -53,7 +53,7 @@ class CInstance : public Instance {
   virtual JSValue* valueOf() const;
   virtual JSValue* defaultValue(JSType hint) const;
 
-  virtual bool implementsCall() const;
+  virtual KJS::CallType getCallData(KJS::CallData&);
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,

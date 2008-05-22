@@ -35,6 +35,7 @@
 #include "Page.h"
 #include "PageGroup.h"
 #include "Settings.h"
+#include "StringSourceProvider.h"
 #include "kjs_events.h"
 #include <kjs/debugger.h>
 
@@ -86,7 +87,8 @@ JSValue* KJSProxy::evaluate(const String& filename,
 
   m_windowShell->window()->startTimeoutCheck();
   Completion comp = Interpreter::evaluate(
-      exec, filename, baseLine, str.characters(), str.length(), m_windowShell);
+      exec, exec->dynamicGlobalObject()->globalScopeChain(), filename, baseLine,
+      StringSourceProvider::create(str), m_windowShell);
   m_windowShell->window()->stopTimeoutCheck();
 
   if (comp.complType() == Normal || comp.complType() == ReturnValue) {

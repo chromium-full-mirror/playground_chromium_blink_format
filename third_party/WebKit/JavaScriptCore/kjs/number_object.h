@@ -56,7 +56,7 @@ class NumberObjectImp : public InternalFunctionImp {
  public:
   NumberObjectImp(ExecState*, FunctionPrototype*, NumberPrototype*);
 
-  virtual bool implementsConstruct() const;
+  virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);
 
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);

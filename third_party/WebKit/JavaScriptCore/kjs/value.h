@@ -23,6 +23,8 @@
 #ifndef KJS_VALUE_H
 #define KJS_VALUE_H
 
+#include "CallData.h"
+#include "ConstructData.h"
 #include "JSImmediate.h"
 #include "collector.h"
 #include "ustring.h"
@@ -35,6 +37,7 @@ class JSObject;
 class JSCell;
 
 struct ClassInfo;
+struct Instruction;
 
 /**
  * JSValue is the base type for all primitives (Undefined, Null, Boolean,
@@ -69,10 +72,14 @@ class JSValue : Noncopyable {
   bool getBoolean() const;  // false if not a boolean
   bool getNumber(double&) const;
   double getNumber() const;  // NaN if not a number
+  double uncheckedGetNumber() const;
   bool getString(UString&) const;
   UString getString() const;          // null string if not a string
   JSObject* getObject();              // NULL if not an object
   const JSObject* getObject() const;  // NULL if not an object
+
+  CallType getCallData(CallData&);
+  ConstructType getConstructData(ConstructData&);
 
   // Extracting integer values.
   bool getUInt32(uint32_t&) const;
@@ -85,6 +92,9 @@ class JSValue : Noncopyable {
   bool getPrimitiveNumber(ExecState* exec, double& number, JSValue*& value);
 
   bool toBoolean(ExecState* exec) const;
+
+  // toNumber conversion is expected to be side effect free if an exception has
+  // been set in the ExecState already.
   double toNumber(ExecState* exec) const;
   JSValue* toJSNumber(ExecState*) const;  // Fast path for when you expect that
                                           // the value is an immediate number.
@@ -133,6 +143,7 @@ class JSCell : public JSValue {
   friend class StringImp;
   friend class JSObject;
   friend class GetterSetterImp;
+  friend class JSPropertyNameIterator;
 
  private:
   JSCell();
@@ -153,6 +164,9 @@ class JSCell : public JSValue {
   UString getString() const;          // null string if not a string
   JSObject* getObject();              // NULL if not an object
   const JSObject* getObject() const;  // NULL if not an object
+
+  virtual CallType getCallData(CallData&);
+  virtual ConstructType getConstructData(ConstructData&);
 
   // Extracting integer values.
   virtual bool getUInt32(uint32_t&) const;
@@ -177,7 +191,33 @@ class JSCell : public JSValue {
   bool marked() const;
 };
 
-JSValue* jsNumberCell(double);
+class NumberImp : public JSCell {
+  friend JSValue* jsNumberCell(double);
+
+ public:
+  double value() const { return val; }
+
+  virtual JSType type() const;
+
+  virtual JSValue* toPrimitive(ExecState*,
+                               JSType preferred = UnspecifiedType) const;
+  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
+  virtual bool toBoolean(ExecState* exec) const;
+  virtual double toNumber(ExecState* exec) const;
+  virtual UString toString(ExecState* exec) const;
+  virtual JSObject* toObject(ExecState* exec) const;
+
+  void* operator new(size_t size) { return Collector::allocateNumber(size); }
+
+ private:
+  NumberImp(double v) : val(v) {}
+
+  virtual bool getUInt32(uint32_t&) const;
+  virtual bool getTruncatedInt32(int32_t&) const;
+  virtual bool getTruncatedUInt32(uint32_t&) const;
+
+  double val;
+};
 
 JSCell* jsString(const UString&);  // returns empty string if passed null string
 JSCell* jsString(const char* = "");  // returns empty string if passed 0
@@ -190,7 +230,13 @@ JSCell* jsOwnedString(const UString&);
 extern const double NaN;
 extern const double Inf;
 
-inline JSValue* jsUndefined() {
+// Beware marking this function ALWAYS_INLINE: It takes a PIC branch, so
+// inlining it may not always be a win.
+inline JSValue* jsNumberCell(double d) {
+  return new NumberImp(d);
+}
+
+ALWAYS_INLINE JSValue* jsUndefined() {
   return JSImmediate::undefinedImmediate();
 }
 
@@ -342,6 +388,13 @@ inline double JSValue::getNumber() const {
                                         : asCell()->getNumber();
 }
 
+inline double JSValue::uncheckedGetNumber() const {
+  ASSERT(JSImmediate::isImmediate(this) || asCell()->isNumber());
+  return JSImmediate::isImmediate(this)
+             ? JSImmediate::toDouble(this)
+             : static_cast<const NumberImp*>(this)->value();
+}
+
 inline bool JSValue::getString(UString& s) const {
   return !JSImmediate::isImmediate(this) && asCell()->getString(s);
 }
@@ -356,6 +409,17 @@ inline JSObject* JSValue::getObject() {
 
 inline const JSObject* JSValue::getObject() const {
   return JSImmediate::isImmediate(this) ? 0 : asCell()->getObject();
+}
+
+inline CallType JSValue::getCallData(CallData& callData) {
+  return JSImmediate::isImmediate(this) ? CallTypeNone
+                                        : asCell()->getCallData(callData);
+}
+
+inline ConstructType JSValue::getConstructData(ConstructData& constructData) {
+  return JSImmediate::isImmediate(this)
+             ? ConstructTypeNone
+             : asCell()->getConstructData(constructData);
 }
 
 ALWAYS_INLINE bool JSValue::getUInt32(uint32_t& v) const {

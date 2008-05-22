@@ -29,7 +29,10 @@
 
 #include "internal.h"
 #include "regexp.h"
+#include "RegisterID.h"
+#include "SourceRange.h"
 #include "SymbolTable.h"
+#include <wtf/UnusedParam.h>
 #include <wtf/ListRefPtr.h>
 #include <wtf/MathExtras.h>
 #include <wtf/OwnPtr.h>
@@ -44,9 +47,13 @@
 namespace KJS {
 
 class ArgumentsNode;
+class CodeBlock;
+class CodeGenerator;
 class ConstDeclNode;
 class FuncDeclNode;
 class Node;
+class EvalCodeBlock;
+class ProgramCodeBlock;
 class PropertyListNode;
 class SourceStream;
 
@@ -129,8 +136,40 @@ class Node : public ParserRefCounted {
   Node(PlacementNewAdoptType placementAdopt) KJS_FAST_CALL
       : ParserRefCounted(placementAdopt) {}
 
+  /*
+      Return value: The register holding the production's value.
+               dst: An optional parameter specifying the most efficient
+                    destination at which to store the production's value.
+                    The callee must honor dst.
+
+      dst provides for a crude form of copy propagation. For example,
+
+      x = 1
+
+      becomes
+
+      load r[x], 1
+
+      instead of
+
+      load r0, 1
+      mov r[x], r0
+
+      because the assignment node, "x =", passes r[x] as dst to the number
+      node, "1".
+  */
+  virtual RegisterID* emitCode(CodeGenerator&,
+                               RegisterID* dst = 0) KJS_FAST_CALL {
+    ASSERT_WITH_MESSAGE(0, "Don't know how to generate code for:\n%s\n",
+                        toString().ascii());
+    UNUSED_PARAM(dst);
+    return 0;
+  }  // FIXME: Make this pure virtual.
+
   UString toString() const KJS_FAST_CALL;
   int lineNo() const KJS_FAST_CALL { return m_line; }
+
+  virtual bool isReturnNode() const KJS_FAST_CALL { return false; }
 
   // Serialization.
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL = 0;
@@ -139,7 +178,7 @@ class Node : public ParserRefCounted {
 
   // Used for iterative, depth-first traversal of the node tree. Does not cross
   // function call boundaries.
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL {}
@@ -148,48 +187,63 @@ class Node : public ParserRefCounted {
   Node(JSType) KJS_FAST_CALL;  // used by ExpressionNode
 
   // for use in execute()
-  JSValue* setErrorCompletion(ExecState*,
+  JSValue* setErrorCompletion(OldInterpreterExecState*,
                               ErrorType,
                               const char* msg) KJS_FAST_CALL;
-  JSValue* setErrorCompletion(ExecState*,
+  JSValue* setErrorCompletion(OldInterpreterExecState*,
                               ErrorType,
                               const char* msg,
                               const Identifier&) KJS_FAST_CALL;
 
   // for use in evaluate()
-  JSValue* throwError(ExecState*, ErrorType, const char* msg) KJS_FAST_CALL;
-  JSValue* throwError(ExecState*, ErrorType, const char* msg, const char*)
-      KJS_FAST_CALL;
-  JSValue* throwError(ExecState*, ErrorType, const char* msg, JSValue*, Node*)
-      KJS_FAST_CALL;
-  JSValue* throwError(ExecState*, ErrorType, const char* msg, const Identifier&)
-      KJS_FAST_CALL;
-  JSValue* throwError(ExecState*,
+  JSValue* throwError(OldInterpreterExecState*,
+                      ErrorType,
+                      const char* msg) KJS_FAST_CALL;
+  JSValue* throwError(OldInterpreterExecState*,
+                      ErrorType,
+                      const char* msg,
+                      const char*) KJS_FAST_CALL;
+  JSValue* throwError(OldInterpreterExecState*,
+                      ErrorType,
+                      const char* msg,
+                      JSValue*,
+                      Node*) KJS_FAST_CALL;
+  JSValue* throwError(OldInterpreterExecState*,
+                      ErrorType,
+                      const char* msg,
+                      const Identifier&) KJS_FAST_CALL;
+  JSValue* throwError(OldInterpreterExecState*,
                       ErrorType,
                       const char* msg,
                       JSValue*,
                       const Identifier&) KJS_FAST_CALL;
-  JSValue* throwError(ExecState*,
+  JSValue* throwError(OldInterpreterExecState*,
                       ErrorType,
                       const char* msg,
                       JSValue*,
                       Node*,
                       Node*) KJS_FAST_CALL;
-  JSValue* throwError(ExecState*,
+  JSValue* throwError(OldInterpreterExecState*,
                       ErrorType,
                       const char* msg,
                       JSValue*,
                       Node*,
                       const Identifier&) KJS_FAST_CALL;
 
-  JSValue* throwUndefinedVariableError(ExecState*,
+  RegisterID* emitThrowError(CodeGenerator&, ErrorType, const char* msg);
+  RegisterID* emitThrowError(CodeGenerator&,
+                             ErrorType,
+                             const char* msg,
+                             const Identifier&);
+
+  JSValue* throwUndefinedVariableError(OldInterpreterExecState*,
                                        const Identifier&) KJS_FAST_CALL;
 
-  void handleException(ExecState*) KJS_FAST_CALL;
-  void handleException(ExecState*, JSValue*) KJS_FAST_CALL;
+  void handleException(OldInterpreterExecState*) KJS_FAST_CALL;
+  void handleException(OldInterpreterExecState*, JSValue*) KJS_FAST_CALL;
 
   // for use in execute()
-  JSValue* rethrowException(ExecState*) KJS_FAST_CALL;
+  JSValue* rethrowException(OldInterpreterExecState*) KJS_FAST_CALL;
 
   int m_line : 28;
   unsigned m_expectedReturnType : 3;  // JSType
@@ -214,11 +268,11 @@ class ExpressionNode : public Node {
     return static_cast<JSType>(m_expectedReturnType);
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL = 0;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL = 0;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
 
   // Used to optimize those nodes that do extra work when returning a result,
   // even if the result has no semantic relevance
@@ -229,7 +283,7 @@ class ExpressionNode : public Node {
 
  protected:
   template <CallerType, bool>
-  inline JSValue* resolveAndCall(ExecState*,
+  inline JSValue* resolveAndCall(OldInterpreterExecState*,
                                  const Identifier&,
                                  ArgumentsNode*,
                                  size_t = 0);
@@ -241,7 +295,9 @@ class StatementNode : public Node {
   void setLoc(int line0, int line1) KJS_FAST_CALL;
   int firstLine() const KJS_FAST_CALL { return lineNo(); }
   int lastLine() const KJS_FAST_CALL { return m_lastLine; }
-  virtual JSValue* execute(ExecState* exec) KJS_FAST_CALL = 0;
+
+  virtual JSValue* execute(OldInterpreterExecState* exec) KJS_FAST_CALL = 0;
+
   virtual void pushLabel(const Identifier& ident) KJS_FAST_CALL {
     m_labelStack.push(ident);
   }
@@ -261,7 +317,10 @@ class StatementNode : public Node {
 class NullNode : public ExpressionNode {
  public:
   NullNode() KJS_FAST_CALL : ExpressionNode(NullType) {}
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 };
@@ -270,8 +329,12 @@ class FalseNode : public ExpressionNode {
  public:
   FalseNode() KJS_FAST_CALL : ExpressionNode(BooleanType) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL { return false; }
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL {
+    return false;
+  }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 };
@@ -280,8 +343,12 @@ class TrueNode : public ExpressionNode {
  public:
   TrueNode() KJS_FAST_CALL : ExpressionNode(BooleanType) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL { return true; }
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL {
+    return true;
+  }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 };
@@ -299,11 +366,13 @@ class NumberNode : public ExpressionNode {
   NumberNode(double v) KJS_FAST_CALL : ExpressionNode(NumberType),
                                        m_double(v) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const {
     return signbit(m_double) ? PrecUnary : PrecPrimary;
@@ -324,9 +393,9 @@ class ImmediateNumberNode : public NumberNode {
     ASSERT(v == JSImmediate::from(d));
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
   virtual void setValue(double d) KJS_FAST_CALL {
     m_double = d;
@@ -344,9 +413,11 @@ class StringNode : public ExpressionNode {
   StringNode(const UString* v) KJS_FAST_CALL : ExpressionNode(StringType),
                                                m_value(*v) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -359,7 +430,9 @@ class RegExpNode : public ExpressionNode {
   RegExpNode(const UString& pattern, const UString& flags) KJS_FAST_CALL
       : m_regExp(RegExp::create(pattern, flags)) {}
 
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -371,7 +444,9 @@ class ThisNode : public ExpressionNode {
  public:
   ThisNode() KJS_FAST_CALL {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 };
@@ -385,16 +460,17 @@ class ResolveNode : public ExpressionNode {
       : ExpressionNode(PlacementNewAdopt),
         m_ident(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -403,48 +479,48 @@ class ResolveNode : public ExpressionNode {
   const Identifier& identifier() const KJS_FAST_CALL { return m_ident; }
 
  protected:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
   Identifier m_ident;
-  size_t m_index;       // Used by LocalVarAccessNode and ScopedVarAccessNode.
+  int m_index;          // Used by LocalVarAccessNode and ScopedVarAccessNode.
   size_t m_scopeDepth;  // Used by ScopedVarAccessNode
 };
 
 class LocalVarAccessNode : public ResolveNode {
  public:
   // Overwrites a ResolveNode in place.
-  LocalVarAccessNode(size_t i) KJS_FAST_CALL : ResolveNode(PlacementNewAdopt) {
+  LocalVarAccessNode(int i) KJS_FAST_CALL : ResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 };
 
 class ScopedVarAccessNode : public ResolveNode {
  public:
   // Overwrites a ResolveNode in place.
-  ScopedVarAccessNode(size_t i, size_t scopeDepth) KJS_FAST_CALL
+  ScopedVarAccessNode(int i, size_t scopeDepth) KJS_FAST_CALL
       : ResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
     m_scopeDepth = scopeDepth;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 };
 
 class NonLocalVarAccessNode : public ResolveNode {
@@ -456,14 +532,14 @@ class NonLocalVarAccessNode : public ResolveNode {
     m_scopeDepth = scopeDepth;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 };
 
 class ElementNode : public Node {
@@ -483,7 +559,7 @@ class ElementNode : public Node {
     return PrecExpression;
   }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -492,7 +568,7 @@ class ElementNode : public Node {
     return m_next.release();
   }
 
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
   friend class ArrayNode;
@@ -514,11 +590,13 @@ class ArrayNode : public ExpressionNode {
         m_elision(elision),
         m_optional(true) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
@@ -538,7 +616,7 @@ class PropertyNode : public Node {
                                           m_assign(assign),
                                           m_type(type) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -548,7 +626,7 @@ class PropertyNode : public Node {
     return PrecExpression;
   }
 
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   const Identifier& name() const { return m_name; }
 
  private:
@@ -567,7 +645,8 @@ class PropertyListNode : public Node {
     list->m_next = this;
   }
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -577,7 +656,7 @@ class PropertyListNode : public Node {
     return PrecExpression;
   }
 
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   PassRefPtr<PropertyListNode> releaseNext() KJS_FAST_CALL {
     return m_next.release();
   }
@@ -594,11 +673,12 @@ class ObjectLiteralNode : public ExpressionNode {
 
   ObjectLiteralNode(PropertyListNode* list) KJS_FAST_CALL : m_list(list) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
   virtual bool needsParensIfLeftmost() const { return true; }
@@ -614,15 +694,17 @@ class BracketAccessorNode : public ExpressionNode {
       : m_base(base),
         m_subscript(subscript) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
 
@@ -632,7 +714,7 @@ class BracketAccessorNode : public ExpressionNode {
   ExpressionNode* subscript() KJS_FAST_CALL { return m_subscript.get(); }
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_base;
   RefPtr<ExpressionNode> m_subscript;
@@ -644,15 +726,16 @@ class DotAccessorNode : public ExpressionNode {
       : m_base(base),
         m_ident(ident) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
 
@@ -662,7 +745,7 @@ class DotAccessorNode : public ExpressionNode {
   const Identifier& identifier() const KJS_FAST_CALL { return m_ident; }
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_base;
   Identifier m_ident;
@@ -677,7 +760,8 @@ class ArgumentListNode : public Node {
     listNode->m_next = this;
   }
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -687,13 +771,11 @@ class ArgumentListNode : public Node {
     return PrecExpression;
   }
 
-  void evaluateList(ExecState*, List&) KJS_FAST_CALL;
+  void evaluateList(OldInterpreterExecState*, List&) KJS_FAST_CALL;
   PassRefPtr<ArgumentListNode> releaseNext() KJS_FAST_CALL {
     return m_next.release();
   }
 
- private:
-  friend class ArgumentsNode;
   ListRefPtr<ArgumentListNode> m_next;
   RefPtr<ExpressionNode> m_expr;
 };
@@ -705,7 +787,7 @@ class ArgumentsNode : public Node {
   ArgumentsNode(ArgumentListNode* listNode) KJS_FAST_CALL
       : m_listNode(listNode) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -715,12 +797,11 @@ class ArgumentsNode : public Node {
     return PrecExpression;
   }
 
-  void evaluateList(ExecState* exec, List& list) KJS_FAST_CALL {
+  void evaluateList(OldInterpreterExecState* exec, List& list) KJS_FAST_CALL {
     if (m_listNode)
       m_listNode->evaluateList(exec, list);
   }
 
- private:
   RefPtr<ArgumentListNode> m_listNode;
 };
 
@@ -732,20 +813,22 @@ class NewExprNode : public ExpressionNode {
       : m_expr(expr),
         m_args(args) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecLeftHandSide; }
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr;
   RefPtr<ArgumentsNode> m_args;
@@ -755,11 +838,12 @@ class EvalFunctionCallNode : public ExpressionNode {
  public:
   EvalFunctionCallNode(ArgumentsNode* args) KJS_FAST_CALL : m_args(args) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
 
@@ -773,11 +857,12 @@ class FunctionCallValueNode : public ExpressionNode {
       : m_expr(expr),
         m_args(args) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
 
@@ -797,20 +882,22 @@ class FunctionCallResolveNode : public ExpressionNode {
         m_ident(PlacementNewAdopt),
         m_args(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
 
  protected:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 
   Identifier m_ident;
   RefPtr<ArgumentsNode> m_args;
@@ -821,39 +908,39 @@ class FunctionCallResolveNode : public ExpressionNode {
 
 class LocalVarFunctionCallNode : public FunctionCallResolveNode {
  public:
-  LocalVarFunctionCallNode(size_t i) KJS_FAST_CALL
+  LocalVarFunctionCallNode(int i) KJS_FAST_CALL
       : FunctionCallResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 };
 
 class ScopedVarFunctionCallNode : public FunctionCallResolveNode {
  public:
-  ScopedVarFunctionCallNode(size_t i, size_t depth) KJS_FAST_CALL
+  ScopedVarFunctionCallNode(int i, size_t depth) KJS_FAST_CALL
       : FunctionCallResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
     m_scopeDepth = depth;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 };
 
 class NonLocalVarFunctionCallNode : public FunctionCallResolveNode {
@@ -863,14 +950,14 @@ class NonLocalVarFunctionCallNode : public FunctionCallResolveNode {
     m_scopeDepth = depth;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 };
 
 class FunctionCallBracketNode : public ExpressionNode {
@@ -882,11 +969,12 @@ class FunctionCallBracketNode : public ExpressionNode {
         m_subscript(subscript),
         m_args(args) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
 
@@ -904,20 +992,21 @@ class FunctionCallDotNode : public ExpressionNode {
                                                            m_ident(ident),
                                                            m_args(args) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecCall; }
 
  private:
-  ALWAYS_INLINE JSValue* inlineEvaluate(ExecState*);
+  ALWAYS_INLINE JSValue* inlineEvaluate(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_base;
   Identifier m_ident;
@@ -947,11 +1036,12 @@ class PostIncResolveNode : public PrePostResolveNode {
   PostIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : PrePostResolveNode(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
   virtual void optimizeForUnnecessaryResult();
@@ -959,25 +1049,25 @@ class PostIncResolveNode : public PrePostResolveNode {
 
 class PostIncLocalVarNode : public PostIncResolveNode {
  public:
-  PostIncLocalVarNode(size_t i) KJS_FAST_CALL
+  PostIncLocalVarNode(int i) KJS_FAST_CALL
       : PostIncResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void optimizeForUnnecessaryResult();
 };
 
 class PostIncConstNode : public PostIncResolveNode {
  public:
-  PostIncConstNode(size_t i) KJS_FAST_CALL
+  PostIncConstNode(int i) KJS_FAST_CALL
       : PostIncResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class PostDecResolveNode : public PrePostResolveNode {
@@ -988,11 +1078,13 @@ class PostDecResolveNode : public PrePostResolveNode {
   PostDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : PrePostResolveNode(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
   virtual void optimizeForUnnecessaryResult();
@@ -1000,32 +1092,32 @@ class PostDecResolveNode : public PrePostResolveNode {
 
 class PostDecLocalVarNode : public PostDecResolveNode {
  public:
-  PostDecLocalVarNode(size_t i) KJS_FAST_CALL
+  PostDecLocalVarNode(int i) KJS_FAST_CALL
       : PostDecResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void optimizeForUnnecessaryResult();
 
  private:
-  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
+  ALWAYS_INLINE double inlineEvaluateToNumber(OldInterpreterExecState*);
 };
 
 class PostDecConstNode : public PostDecResolveNode {
  public:
-  PostDecConstNode(size_t i) KJS_FAST_CALL
+  PostDecConstNode(int i) KJS_FAST_CALL
       : PostDecResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class PostfixBracketNode : public ExpressionNode {
@@ -1035,7 +1127,7 @@ class PostfixBracketNode : public ExpressionNode {
       : m_base(base),
         m_subscript(subscript) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1052,7 +1144,9 @@ class PostIncBracketNode : public PostfixBracketNode {
                      ExpressionNode* subscript) KJS_FAST_CALL
       : PostfixBracketNode(base, subscript) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1062,7 +1156,9 @@ class PostDecBracketNode : public PostfixBracketNode {
                      ExpressionNode* subscript) KJS_FAST_CALL
       : PostfixBracketNode(base, subscript) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1072,7 +1168,7 @@ class PostfixDotNode : public ExpressionNode {
       : m_base(base),
         m_ident(ident) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1088,7 +1184,9 @@ class PostIncDotNode : public PostfixDotNode {
   PostIncDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
       : PostfixDotNode(base, ident) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1097,7 +1195,9 @@ class PostDecDotNode : public PostfixDotNode {
   PostDecDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
       : PostfixDotNode(base, ident) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1107,7 +1207,8 @@ class PostfixErrorNode : public ExpressionNode {
       : m_expr(expr),
         m_operator(oper) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
 
@@ -1124,11 +1225,13 @@ class DeleteResolveNode : public ExpressionNode {
       : ExpressionNode(PlacementNewAdopt),
         m_ident(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1140,7 +1243,7 @@ class LocalVarDeleteNode : public DeleteResolveNode {
  public:
   LocalVarDeleteNode() KJS_FAST_CALL : DeleteResolveNode(PlacementNewAdopt) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class DeleteBracketNode : public ExpressionNode {
@@ -1150,11 +1253,13 @@ class DeleteBracketNode : public ExpressionNode {
       : m_base(base),
         m_subscript(subscript) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1169,11 +1274,13 @@ class DeleteDotNode : public ExpressionNode {
       : m_base(base),
         m_ident(ident) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1186,11 +1293,13 @@ class DeleteValueNode : public ExpressionNode {
  public:
   DeleteValueNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1202,11 +1311,13 @@ class VoidNode : public ExpressionNode {
  public:
   VoidNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1226,12 +1337,13 @@ class TypeOfResolveNode : public ExpressionNode {
     m_expectedReturnType = StringType;
   }
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1244,14 +1356,14 @@ class TypeOfResolveNode : public ExpressionNode {
 
 class LocalVarTypeOfNode : public TypeOfResolveNode {
  public:
-  LocalVarTypeOfNode(size_t i) KJS_FAST_CALL
+  LocalVarTypeOfNode(int i) KJS_FAST_CALL
       : TypeOfResolveNode(PlacementNewAdopt) {
     m_expectedReturnType = StringType;
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class TypeOfValueNode : public ExpressionNode {
@@ -1260,11 +1372,13 @@ class TypeOfValueNode : public ExpressionNode {
       : ExpressionNode(StringType),
         m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1280,36 +1394,36 @@ class PreIncResolveNode : public PrePostResolveNode {
   PreIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : PrePostResolveNode(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 };
 
 class PreIncLocalVarNode : public PreIncResolveNode {
  public:
-  PreIncLocalVarNode(size_t i) KJS_FAST_CALL
+  PreIncLocalVarNode(int i) KJS_FAST_CALL
       : PreIncResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class PreIncConstNode : public PreIncResolveNode {
  public:
-  PreIncConstNode(size_t i) KJS_FAST_CALL
-      : PreIncResolveNode(PlacementNewAdopt) {
+  PreIncConstNode(int i) KJS_FAST_CALL : PreIncResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class PreDecResolveNode : public PrePostResolveNode {
@@ -1320,36 +1434,36 @@ class PreDecResolveNode : public PrePostResolveNode {
   PreDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : PrePostResolveNode(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 };
 
 class PreDecLocalVarNode : public PreDecResolveNode {
  public:
-  PreDecLocalVarNode(size_t i) KJS_FAST_CALL
+  PreDecLocalVarNode(int i) KJS_FAST_CALL
       : PreDecResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class PreDecConstNode : public PreDecResolveNode {
  public:
-  PreDecConstNode(size_t i) KJS_FAST_CALL
-      : PreDecResolveNode(PlacementNewAdopt) {
+  PreDecConstNode(int i) KJS_FAST_CALL : PreDecResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class PrefixBracketNode : public ExpressionNode {
@@ -1359,7 +1473,7 @@ class PrefixBracketNode : public ExpressionNode {
       : m_base(base),
         m_subscript(subscript) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1376,7 +1490,9 @@ class PreIncBracketNode : public PrefixBracketNode {
                     ExpressionNode* subscript) KJS_FAST_CALL
       : PrefixBracketNode(base, subscript) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1386,7 +1502,9 @@ class PreDecBracketNode : public PrefixBracketNode {
                     ExpressionNode* subscript) KJS_FAST_CALL
       : PrefixBracketNode(base, subscript) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1396,7 +1514,7 @@ class PrefixDotNode : public ExpressionNode {
       : m_base(base),
         m_ident(ident) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -1412,7 +1530,9 @@ class PreIncDotNode : public PrefixDotNode {
   PreIncDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
       : PrefixDotNode(base, ident) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1421,7 +1541,9 @@ class PreDecDotNode : public PrefixDotNode {
   PreDecDotNode(ExpressionNode* base, const Identifier& ident) KJS_FAST_CALL
       : PrefixDotNode(base, ident) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 };
 
@@ -1431,7 +1553,8 @@ class PrefixErrorNode : public ExpressionNode {
       : m_expr(expr),
         m_operator(oper) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1446,15 +1569,16 @@ class UnaryPlusNode : public ExpressionNode {
       : ExpressionNode(NumberType),
         m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1467,12 +1591,13 @@ class NegateNode : public ExpressionNode {
   NegateNode(ExpressionNode* expr) KJS_FAST_CALL : ExpressionNode(NumberType),
                                                    m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1486,20 +1611,21 @@ class BitwiseNotNode : public ExpressionNode {
       : ExpressionNode(NumberType),
         m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr;
 };
@@ -1510,12 +1636,13 @@ class LogicalNotNode : public ExpressionNode {
       : ExpressionNode(BooleanType),
         m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
 
@@ -1530,20 +1657,21 @@ class MultNode : public ExpressionNode {
         m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMultiplicitave; }
 
  private:
-  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
+  ALWAYS_INLINE double inlineEvaluateToNumber(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_term1;
   RefPtr<ExpressionNode> m_term2;
@@ -1556,19 +1684,20 @@ class DivNode : public ExpressionNode {
         m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMultiplicitave; }
 
  private:
-  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
+  ALWAYS_INLINE double inlineEvaluateToNumber(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_term1;
   RefPtr<ExpressionNode> m_term2;
@@ -1581,20 +1710,21 @@ class ModNode : public ExpressionNode {
         m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMultiplicitave; }
 
  private:
-  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
+  ALWAYS_INLINE double inlineEvaluateToNumber(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_term1;
   RefPtr<ExpressionNode> m_term2;
@@ -1606,14 +1736,15 @@ class AddNode : public ExpressionNode {
       : m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAdditive; }
 
@@ -1628,7 +1759,7 @@ class AddNode : public ExpressionNode {
   RefPtr<ExpressionNode> m_term2;
 
  private:
-  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
+  ALWAYS_INLINE double inlineEvaluateToNumber(OldInterpreterExecState*);
 };
 
 class AddNumbersNode : public AddNode {
@@ -1636,13 +1767,14 @@ class AddNumbersNode : public AddNode {
   AddNumbersNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : AddNode(term1, term2, NumberType) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*) KJS_FAST_CALL;
+  ALWAYS_INLINE double inlineEvaluateToNumber(OldInterpreterExecState*)
+      KJS_FAST_CALL;
 };
 
 class AddStringLeftNode : public AddNode {
@@ -1650,7 +1782,7 @@ class AddStringLeftNode : public AddNode {
   AddStringLeftNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : AddNode(term1, term2, StringType) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class AddStringRightNode : public AddNode {
@@ -1658,7 +1790,7 @@ class AddStringRightNode : public AddNode {
   AddStringRightNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : AddNode(term1, term2, StringType) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class AddStringsNode : public AddNode {
@@ -1666,7 +1798,7 @@ class AddStringsNode : public AddNode {
   AddStringsNode(ExpressionNode* term1, ExpressionNode* term2) KJS_FAST_CALL
       : AddNode(term1, term2, StringType) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class SubNode : public ExpressionNode {
@@ -1676,19 +1808,20 @@ class SubNode : public ExpressionNode {
         m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAdditive; }
 
  private:
-  ALWAYS_INLINE double inlineEvaluateToNumber(ExecState*);
+  ALWAYS_INLINE double inlineEvaluateToNumber(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_term1;
   RefPtr<ExpressionNode> m_term2;
@@ -1701,19 +1834,20 @@ class LeftShiftNode : public ExpressionNode {
         m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecShift; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_term1;
   RefPtr<ExpressionNode> m_term2;
@@ -1726,19 +1860,20 @@ class RightShiftNode : public ExpressionNode {
         m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecShift; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_term1;
   RefPtr<ExpressionNode> m_term2;
@@ -1752,19 +1887,20 @@ class UnsignedRightShiftNode : public ExpressionNode {
         m_term1(term1),
         m_term2(term2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecShift; }
 
  private:
-  ALWAYS_INLINE uint32_t inlineEvaluateToUInt32(ExecState*);
+  ALWAYS_INLINE uint32_t inlineEvaluateToUInt32(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_term1;
   RefPtr<ExpressionNode> m_term2;
@@ -1777,17 +1913,18 @@ class LessNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
  protected:
   RefPtr<ExpressionNode> m_expr1;
@@ -1799,11 +1936,11 @@ class LessNumbersNode : public LessNode {
   LessNumbersNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : LessNode(expr1, expr2) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 };
 
 class LessStringsNode : public LessNode {
@@ -1811,11 +1948,11 @@ class LessStringsNode : public LessNode {
   LessStringsNode(ExpressionNode* expr1, ExpressionNode* expr2) KJS_FAST_CALL
       : LessNode(expr1, expr2) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 };
 
 class GreaterNode : public ExpressionNode {
@@ -1824,17 +1961,18 @@ class GreaterNode : public ExpressionNode {
       : m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -1846,17 +1984,18 @@ class LessEqNode : public ExpressionNode {
       : m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -1868,17 +2007,18 @@ class GreaterEqNode : public ExpressionNode {
       : m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -1891,12 +2031,13 @@ class InstanceOfNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1911,12 +2052,14 @@ class InNode : public ExpressionNode {
       : m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 
@@ -1932,17 +2075,18 @@ class EqualNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -1955,17 +2099,18 @@ class NotEqualNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -1978,17 +2123,18 @@ class StrictEqualNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2001,17 +2147,18 @@ class NotStrictEqualNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecEquality; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2024,20 +2171,21 @@ class BitAndNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecBitwiseAnd; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2050,20 +2198,21 @@ class BitOrNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecBitwiseOr; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2076,20 +2225,21 @@ class BitXOrNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecBitwiseXor; }
 
  private:
-  ALWAYS_INLINE int32_t inlineEvaluateToInt32(ExecState*);
+  ALWAYS_INLINE int32_t inlineEvaluateToInt32(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2105,17 +2255,18 @@ class LogicalAndNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecLogicalAnd; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2128,17 +2279,18 @@ class LogicalOrNode : public ExpressionNode {
         m_expr1(expr1),
         m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecLogicalOr; }
 
  private:
-  ALWAYS_INLINE bool inlineEvaluateToBoolean(ExecState*);
+  ALWAYS_INLINE bool inlineEvaluateToBoolean(OldInterpreterExecState*);
 
   RefPtr<ExpressionNode> m_expr1;
   RefPtr<ExpressionNode> m_expr2;
@@ -2155,15 +2307,16 @@ class ConditionalNode : public ExpressionNode {
                                                          m_expr1(expr1),
                                                          m_expr2(expr2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  virtual bool evaluateToBoolean(ExecState*) KJS_FAST_CALL;
-  virtual double evaluateToNumber(ExecState*) KJS_FAST_CALL;
-  virtual int32_t evaluateToInt32(ExecState*) KJS_FAST_CALL;
-  virtual uint32_t evaluateToUInt32(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual bool evaluateToBoolean(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual double evaluateToNumber(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual int32_t evaluateToInt32(OldInterpreterExecState*) KJS_FAST_CALL;
+  virtual uint32_t evaluateToUInt32(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecConditional; }
 
@@ -2177,68 +2330,80 @@ class ReadModifyResolveNode : public ExpressionNode {
  public:
   ReadModifyResolveNode(const Identifier& ident,
                         Operator oper,
-                        ExpressionNode* right) KJS_FAST_CALL : m_ident(ident),
-                                                               m_operator(oper),
-                                                               m_right(right) {}
+                        ExpressionNode* right,
+                        bool rightHasAssignments) KJS_FAST_CALL
+      : m_ident(ident),
+        m_right(right),
+        m_operator(oper),
+        m_rightHasAssignments(rightHasAssignments) {}
 
   ReadModifyResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
         m_ident(PlacementNewAdopt),
-        m_right(PlacementNewAdopt) {}
+        m_right(PlacementNewAdopt),
+        m_rightHasAssignments(true) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
 
  protected:
   Identifier m_ident;
-  Operator m_operator;
   RefPtr<ExpressionNode> m_right;
   size_t m_index;  // Used by ReadModifyLocalVarNode.
+  Operator m_operator : 31;
+  bool m_rightHasAssignments : 1;
 };
 
 class ReadModifyLocalVarNode : public ReadModifyResolveNode {
  public:
-  ReadModifyLocalVarNode(size_t i) KJS_FAST_CALL
+  ReadModifyLocalVarNode(int i) KJS_FAST_CALL
       : ReadModifyResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class ReadModifyConstNode : public ReadModifyResolveNode {
  public:
-  ReadModifyConstNode(size_t i) KJS_FAST_CALL
+  ReadModifyConstNode(int i) KJS_FAST_CALL
       : ReadModifyResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class AssignResolveNode : public ExpressionNode {
  public:
   AssignResolveNode(const Identifier& ident,
-                    ExpressionNode* right) KJS_FAST_CALL : m_ident(ident),
-                                                           m_right(right) {}
+                    ExpressionNode* right,
+                    bool rightHasAssignments) KJS_FAST_CALL
+      : m_ident(ident),
+        m_right(right),
+        m_rightHasAssignments(rightHasAssignments) {}
 
   AssignResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
       : ExpressionNode(PlacementNewAdopt),
         m_ident(PlacementNewAdopt),
         m_right(PlacementNewAdopt) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
 
@@ -2246,24 +2411,25 @@ class AssignResolveNode : public ExpressionNode {
   Identifier m_ident;
   RefPtr<ExpressionNode> m_right;
   size_t m_index;  // Used by ReadModifyLocalVarNode.
+  bool m_rightHasAssignments;
 };
 
 class AssignLocalVarNode : public AssignResolveNode {
  public:
-  AssignLocalVarNode(size_t i) KJS_FAST_CALL
+  AssignLocalVarNode(int i) KJS_FAST_CALL
       : AssignResolveNode(PlacementNewAdopt) {
     ASSERT(i != missingSymbolMarker());
     m_index = i;
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class AssignConstNode : public AssignResolveNode {
  public:
   AssignConstNode() KJS_FAST_CALL : AssignResolveNode(PlacementNewAdopt) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class ReadModifyBracketNode : public ExpressionNode {
@@ -2271,41 +2437,55 @@ class ReadModifyBracketNode : public ExpressionNode {
   ReadModifyBracketNode(ExpressionNode* base,
                         ExpressionNode* subscript,
                         Operator oper,
-                        ExpressionNode* right) KJS_FAST_CALL
+                        ExpressionNode* right,
+                        bool subscriptHasAssignments,
+                        bool rightHasAssignments) KJS_FAST_CALL
       : m_base(base),
         m_subscript(subscript),
+        m_right(right),
         m_operator(oper),
-        m_right(right) {}
+        m_subscriptHasAssignments(subscriptHasAssignments),
+        m_rightHasAssignments(rightHasAssignments) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
 
  protected:
   RefPtr<ExpressionNode> m_base;
   RefPtr<ExpressionNode> m_subscript;
-  Operator m_operator;
   RefPtr<ExpressionNode> m_right;
+  Operator m_operator : 30;
+  bool m_subscriptHasAssignments : 1;
+  bool m_rightHasAssignments : 1;
 };
 
 class AssignBracketNode : public ExpressionNode {
  public:
   AssignBracketNode(ExpressionNode* base,
                     ExpressionNode* subscript,
-                    ExpressionNode* right) KJS_FAST_CALL
+                    ExpressionNode* right,
+                    bool subscriptHasAssignments,
+                    bool rightHasAssignments) KJS_FAST_CALL
       : m_base(base),
         m_subscript(subscript),
-        m_right(right) {}
+        m_right(right),
+        m_subscriptHasAssignments(subscriptHasAssignments),
+        m_rightHasAssignments(rightHasAssignments) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
 
@@ -2313,21 +2493,27 @@ class AssignBracketNode : public ExpressionNode {
   RefPtr<ExpressionNode> m_base;
   RefPtr<ExpressionNode> m_subscript;
   RefPtr<ExpressionNode> m_right;
+  bool m_subscriptHasAssignments : 1;
+  bool m_rightHasAssignments : 1;
 };
 
 class AssignDotNode : public ExpressionNode {
  public:
   AssignDotNode(ExpressionNode* base,
                 const Identifier& ident,
-                ExpressionNode* right) KJS_FAST_CALL : m_base(base),
-                                                       m_ident(ident),
-                                                       m_right(right) {}
+                ExpressionNode* right,
+                bool rightHasAssignments) KJS_FAST_CALL
+      : m_base(base),
+        m_ident(ident),
+        m_right(right),
+        m_rightHasAssignments(rightHasAssignments) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
 
@@ -2335,6 +2521,7 @@ class AssignDotNode : public ExpressionNode {
   RefPtr<ExpressionNode> m_base;
   Identifier m_ident;
   RefPtr<ExpressionNode> m_right;
+  bool m_rightHasAssignments;
 };
 
 class ReadModifyDotNode : public ExpressionNode {
@@ -2342,24 +2529,30 @@ class ReadModifyDotNode : public ExpressionNode {
   ReadModifyDotNode(ExpressionNode* base,
                     const Identifier& ident,
                     Operator oper,
-                    ExpressionNode* right) KJS_FAST_CALL : m_base(base),
-                                                           m_ident(ident),
-                                                           m_operator(oper),
-                                                           m_right(right) {}
+                    ExpressionNode* right,
+                    bool rightHasAssignments) KJS_FAST_CALL
+      : m_base(base),
+        m_ident(ident),
+        m_right(right),
+        m_operator(oper),
+        m_rightHasAssignments(rightHasAssignments) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
 
  protected:
   RefPtr<ExpressionNode> m_base;
   Identifier m_ident;
-  Operator m_operator;
   RefPtr<ExpressionNode> m_right;
+  Operator m_operator : 31;
+  bool m_rightHasAssignments : 1;
 };
 
 class AssignErrorNode : public ExpressionNode {
@@ -2370,7 +2563,8 @@ class AssignErrorNode : public ExpressionNode {
                                                          m_operator(oper),
                                                          m_right(right) {}
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecAssignment; }
 
@@ -2388,11 +2582,12 @@ class CommaNode : public ExpressionNode {
     m_expr1->optimizeForUnnecessaryResult();
   }
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecExpression; }
 
@@ -2412,12 +2607,12 @@ class ConstDeclNode : public ExpressionNode {
  public:
   ConstDeclNode(const Identifier& ident, ExpressionNode* in) KJS_FAST_CALL;
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual KJS::JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  void evaluateSingle(ExecState*) KJS_FAST_CALL;
+  virtual KJS::JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  void evaluateSingle(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -2431,8 +2626,11 @@ class ConstDeclNode : public ExpressionNode {
   ListRefPtr<ConstDeclNode> m_next;
   RefPtr<ExpressionNode> m_init;
 
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual RegisterID* emitCodeSingle(CodeGenerator&) KJS_FAST_CALL;
+
  private:
-  void handleSlowCase(ExecState*,
+  void handleSlowCase(OldInterpreterExecState*,
                       const ScopeChain&,
                       JSValue*) KJS_FAST_CALL NEVER_INLINE;
 };
@@ -2441,12 +2639,14 @@ class ConstStatementNode : public StatementNode {
  public:
   ConstStatementNode(ConstDeclNode* next) KJS_FAST_CALL : m_next(next) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
  private:
   RefPtr<ConstDeclNode> m_next;
@@ -2470,11 +2670,12 @@ class BlockNode : public StatementNode {
  public:
   BlockNode(SourceElements* children) KJS_FAST_CALL;
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  protected:
@@ -2486,7 +2687,9 @@ class EmptyStatementNode : public StatementNode {
   EmptyStatementNode() KJS_FAST_CALL  // debug
   {}
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual bool isEmptyStatement() const KJS_FAST_CALL { return true; }
 };
@@ -2495,11 +2698,12 @@ class ExprStatementNode : public StatementNode {
  public:
   ExprStatementNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2510,11 +2714,13 @@ class VarStatementNode : public StatementNode {
  public:
   VarStatementNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2527,11 +2733,12 @@ class IfNode : public StatementNode {
       : m_condition(condition),
         m_ifBlock(ifBlock) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  protected:
@@ -2547,11 +2754,12 @@ class IfElseNode : public IfNode {
       : IfNode(condtion, ifBlock),
         m_elseBlock(elseBlock) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2564,11 +2772,12 @@ class DoWhileNode : public StatementNode {
       : m_statement(statement),
         m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2582,11 +2791,12 @@ class WhileNode : public StatementNode {
       : m_expr(expr),
         m_statement(statement) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2615,11 +2825,12 @@ class ForNode : public StatementNode {
     m_expr3->optimizeForUnnecessaryResult();
   }
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2636,11 +2847,12 @@ class ForInNode : public StatementNode {
   ForInNode(const Identifier&, ExpressionNode*, ExpressionNode*, StatementNode*)
       KJS_FAST_CALL;
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2658,7 +2870,8 @@ class ContinueNode : public StatementNode {
 
   ContinueNode(const Identifier& ident) KJS_FAST_CALL : m_ident(ident) {}
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2671,7 +2884,8 @@ class BreakNode : public StatementNode {
 
   BreakNode(const Identifier& ident) KJS_FAST_CALL : m_ident(ident) {}
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2682,12 +2896,14 @@ class ReturnNode : public StatementNode {
  public:
   ReturnNode(ExpressionNode* value) KJS_FAST_CALL : m_value(value) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual bool isReturnNode() const KJS_FAST_CALL { return true; }
 
  private:
   RefPtr<ExpressionNode> m_value;
@@ -2699,11 +2915,12 @@ class WithNode : public StatementNode {
       : m_expr(expr),
         m_statement(statement) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2717,11 +2934,12 @@ class LabelNode : public StatementNode {
       : m_label(label),
         m_statement(statement) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual void pushLabel(const Identifier& ident) KJS_FAST_CALL {
     m_statement->pushLabel(ident);
@@ -2736,11 +2954,12 @@ class ThrowNode : public StatementNode {
  public:
   ThrowNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -2758,12 +2977,15 @@ class TryNode : public StatementNode {
         m_catchBlock(catchBlock),
         m_finallyBlock(finallyBlock) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+
+  virtual RegisterID* emitCode(CodeGenerator&,
+                               RegisterID* dst = 0) KJS_FAST_CALL;
 
  private:
   RefPtr<StatementNode> m_tryBlock;
@@ -2815,7 +3037,7 @@ class ScopeNode : public BlockNode {
   bool needsClosure() const { return m_needsClosure; }
 
  protected:
-  void optimizeVariableAccess(ExecState*) KJS_FAST_CALL;
+  void optimizeVariableAccess(OldInterpreterExecState*) KJS_FAST_CALL;
 
   VarStack m_varStack;
   FunctionStack m_functionStack;
@@ -2834,8 +3056,16 @@ class ProgramNode : public ScopeNode {
                              FunctionStack*,
                              bool usesEval,
                              bool needsClosure) KJS_FAST_CALL;
+  virtual ~ProgramNode();
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
+
+  ProgramCodeBlock& code(ScopeChainNode* scopeChain,
+                         bool canCreateGlobals) KJS_FAST_CALL {
+    if (!m_code)
+      generateCode(scopeChain, canCreateGlobals);
+    return *m_code;
+  }
 
  private:
   ProgramNode(SourceElements*,
@@ -2844,8 +3074,12 @@ class ProgramNode : public ScopeNode {
               bool usesEval,
               bool needsClosure) KJS_FAST_CALL;
 
-  void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
-  ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
+  void generateCode(ScopeChainNode*, bool) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  void initializeSymbolTable(OldInterpreterExecState*) KJS_FAST_CALL;
+  ALWAYS_INLINE void processDeclarations(OldInterpreterExecState*)
+      KJS_FAST_CALL;
 
   Vector<size_t> m_varIndexes;  // Storage indexes belonging to the nodes in
                                 // m_varStack. (Recorded to avoid double
@@ -2853,6 +3087,8 @@ class ProgramNode : public ScopeNode {
   Vector<size_t> m_functionIndexes;  // Storage indexes belonging to the nodes
                                      // in m_functionStack. (Recorded to avoid
                                      // double lookup.)
+
+  OwnPtr<ProgramCodeBlock> m_code;
 };
 
 class EvalNode : public ScopeNode {
@@ -2862,8 +3098,15 @@ class EvalNode : public ScopeNode {
                           FunctionStack*,
                           bool usesEval,
                           bool needsClosure) KJS_FAST_CALL;
+  virtual ~EvalNode();
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
+
+  EvalCodeBlock& code(ScopeChainNode* scopeChain) KJS_FAST_CALL {
+    if (!m_code)
+      generateCode(scopeChain);
+    return *m_code;
+  }
 
  private:
   EvalNode(SourceElements*,
@@ -2872,7 +3115,12 @@ class EvalNode : public ScopeNode {
            bool usesEval,
            bool needsClosure) KJS_FAST_CALL;
 
-  ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
+  ALWAYS_INLINE void processDeclarations(OldInterpreterExecState*)
+      KJS_FAST_CALL;
+  void generateCode(ScopeChainNode*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  OwnPtr<EvalCodeBlock> m_code;
 };
 
 class FunctionBodyNode : public ScopeNode {
@@ -2882,13 +3130,33 @@ class FunctionBodyNode : public ScopeNode {
                                   FunctionStack*,
                                   bool usesEval,
                                   bool needsClosure) KJS_FAST_CALL;
-
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
-
-  SymbolTable& symbolTable() KJS_FAST_CALL { return m_symbolTable; }
+  virtual ~FunctionBodyNode();
 
   Vector<Identifier>& parameters() KJS_FAST_CALL { return m_parameters; }
   UString paramString() const KJS_FAST_CALL;
+
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  SymbolTable& symbolTable() { return m_symbolTable; }  // FIXME: Remove this
+
+  CodeBlock& code(ScopeChainNode* scopeChain) KJS_FAST_CALL {
+    ASSERT(scopeChain);
+    if (!m_code)
+      generateCode(scopeChain);
+    return *m_code;
+  }
+
+  CodeBlock& generatedCode() KJS_FAST_CALL {
+    ASSERT(m_code);
+    return *m_code;
+  }
+
+  void mark();
+
+  void setSource(const SourceRange& source) { m_source = source; }
+  UString toSourceString() const KJS_FAST_CALL {
+    return UString("{") + m_source.toString() + UString("}");
+  }
 
  protected:
   FunctionBodyNode(SourceElements*,
@@ -2898,29 +3166,35 @@ class FunctionBodyNode : public ScopeNode {
                    bool needsClosure) KJS_FAST_CALL;
 
  private:
-  void initializeSymbolTable(ExecState*) KJS_FAST_CALL;
-  ALWAYS_INLINE void processDeclarations(ExecState*) KJS_FAST_CALL;
+  void generateCode(ScopeChainNode*) KJS_FAST_CALL;
 
-  bool m_initialized;
   Vector<Identifier> m_parameters;
   SymbolTable m_symbolTable;
+  OwnPtr<CodeBlock> m_code;
+  SourceRange m_source;
 };
 
 class FuncExprNode : public ExpressionNode {
  public:
   FuncExprNode(const Identifier& ident,
                FunctionBodyNode* body,
+               const SourceRange& source,
                ParameterNode* parameter = 0) KJS_FAST_CALL
       : m_ident(ident),
         m_parameter(parameter),
         m_body(body) {
     addParams();
+    m_body->setSource(source);
   }
 
-  virtual JSValue* evaluate(ExecState*) KJS_FAST_CALL;
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+  FunctionImp* makeFunction(ExecState*, ScopeChainNode*) KJS_FAST_CALL;
+  virtual JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
   virtual bool needsParensIfLeftmost() const { return true; }
+
+  FunctionBodyNode* body() { return m_body.get(); }
 
  private:
   void addParams() KJS_FAST_CALL;
@@ -2934,25 +3208,26 @@ class FuncExprNode : public ExpressionNode {
 
 class FuncDeclNode : public StatementNode {
  public:
-  FuncDeclNode(const Identifier& ident, FunctionBodyNode* body) KJS_FAST_CALL
+  FuncDeclNode(const Identifier& ident,
+               FunctionBodyNode* body,
+               const SourceRange& source,
+               ParameterNode* parameter = 0) KJS_FAST_CALL
       : m_ident(ident),
+        m_parameter(parameter),
         m_body(body) {
     addParams();
+    m_body->setSource(source);
   }
 
-  FuncDeclNode(const Identifier& ident,
-               ParameterNode* parameter,
-               FunctionBodyNode* body) KJS_FAST_CALL : m_ident(ident),
-                                                       m_parameter(parameter),
-                                                       m_body(body) {
-    addParams();
-  }
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  ALWAYS_INLINE FunctionImp* makeFunction(ExecState*) KJS_FAST_CALL;
+  FunctionImp* makeFunction(ExecState*, ScopeChainNode*) KJS_FAST_CALL;
 
   Identifier m_ident;
+
+  FunctionBodyNode* body() { return m_body.get(); }
 
  private:
   void addParams() KJS_FAST_CALL;
@@ -2971,7 +3246,7 @@ class CaseClauseNode : public Node {
       children->releaseContentsIntoVector(m_children);
   }
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -2981,8 +3256,11 @@ class CaseClauseNode : public Node {
     return PrecExpression;
   }
 
-  JSValue* evaluate(ExecState*) KJS_FAST_CALL;
-  JSValue* executeStatements(ExecState*) KJS_FAST_CALL;
+  JSValue* evaluate(OldInterpreterExecState*) KJS_FAST_CALL;
+  JSValue* executeStatements(OldInterpreterExecState*) KJS_FAST_CALL;
+
+  ExpressionNode* expr() const { return m_expr.get(); }
+  StatementVector& children() { return m_children; }
 
  private:
   RefPtr<ExpressionNode> m_expr;
@@ -2998,7 +3276,7 @@ class ClauseListNode : public Node {
     clauseList->m_next = this;
   }
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
@@ -3023,13 +3301,20 @@ class CaseBlockNode : public Node {
  public:
   CaseBlockNode(ClauseListNode* list1,
                 CaseClauseNode* defaultClause,
-                ClauseListNode* list2) KJS_FAST_CALL;
+                ClauseListNode* list2) KJS_FAST_CALL
+      : m_list1(list1),
+        m_defaultClause(defaultClause),
+        m_list2(list2) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  RegisterID* emitCodeForBlock(CodeGenerator&,
+                               RegisterID* input,
+                               RegisterID* dst = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  JSValue* executeBlock(ExecState*, JSValue* input) KJS_FAST_CALL;
+  JSValue* executeBlock(OldInterpreterExecState*, JSValue* input) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const {
     ASSERT_NOT_REACHED();
@@ -3048,11 +3333,13 @@ class SwitchNode : public StatementNode {
       : m_expr(expr),
         m_block(block) {}
 
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
  private:
@@ -3064,9 +3351,9 @@ class BreakpointCheckStatement : public StatementNode {
  public:
   BreakpointCheckStatement(PassRefPtr<StatementNode>) KJS_FAST_CALL;
 
-  virtual JSValue* execute(ExecState*) KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual void optimizeVariableAccess(ExecState*,
+  virtual void optimizeVariableAccess(OldInterpreterExecState*,
                                       const SymbolTable&,
                                       const LocalStorage&,
                                       NodeStack&) KJS_FAST_CALL;

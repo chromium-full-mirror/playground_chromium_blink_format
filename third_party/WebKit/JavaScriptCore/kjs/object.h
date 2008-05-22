@@ -327,16 +327,6 @@ class JSObject : public JSCell {
   virtual JSValue* defaultValue(ExecState* exec, JSType hint) const;
 
   /**
-   * Whether or not the object implements the construct() method. If this
-   * returns false you should not call the construct() method on this
-   * object (typically, an assertion will fail to indicate this).
-   *
-   * @return true if this object implements the construct() method, otherwise
-   * false
-   */
-  virtual bool implementsConstruct() const;
-
-  /**
    * Creates a new object based on this object. Typically this means the
    * following:
    * 1. A new object is created
@@ -353,8 +343,8 @@ class JSObject : public JSCell {
    * will be set. This can be tested for with ExecState::hadException().
    * Under some circumstances, the exception object may also be returned.
    *
-   * Note: This function should not be called if implementsConstruct() returns
-   * false, in which case it will result in an assertion failure.
+   * Note: This function should not be called if getConstructData() returns
+   * ConstructTypeNone, in which case it will result in an assertion failure.
    *
    * @param exec The current execution state
    * @param args The arguments to be passed to call() once the new object has
@@ -370,16 +360,6 @@ class JSObject : public JSCell {
                               const Identifier& functionName,
                               const UString& sourceURL,
                               int lineNumber);
-
-  /**
-   * Whether or not the object implements the call() method. If this returns
-   * false you should not call the call() method on this object (typically,
-   * an assertion will fail to indicate this).
-   *
-   * @return true if this object implements the call() method, otherwise
-   * false
-   */
-  virtual bool implementsCall() const;
 
   /**
    * Calls this object as if it is a function.
@@ -398,7 +378,9 @@ class JSObject : public JSCell {
    * @param args List of arguments to be passed to the function
    * @return The return value from the function
    */
+  bool implementsCall();
   JSValue* call(ExecState* exec, JSObject* thisObj, const List& args);
+
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);
@@ -454,6 +436,10 @@ class JSObject : public JSCell {
   JSValue** getDirectLocation(const Identifier& propertyName) {
     return _prop.getLocation(propertyName);
   }
+  JSValue** getDirectLocation(const Identifier& propertyName,
+                              bool& isWriteable) {
+    return _prop.getLocation(propertyName, isWriteable);
+  }
   void putDirect(const Identifier& propertyName, JSValue* value, int attr = 0);
   void putDirect(const Identifier& propertyName, int value, int attr = 0);
   void removeDirect(const Identifier& propertyName);
@@ -479,6 +465,10 @@ class JSObject : public JSCell {
 
  protected:
   PropertyMap _prop;
+  bool getOwnPropertySlotForWrite(ExecState*,
+                                  const Identifier&,
+                                  PropertySlot&,
+                                  bool& slotIsWriteable);
 
  private:
   const HashEntry* findPropertyHashEntry(ExecState*,
@@ -571,6 +561,24 @@ inline bool JSValue::isObject(const ClassInfo* c) const {
   return !JSImmediate::isImmediate(this) && asCell()->isObject(c);
 }
 
+inline JSValue* JSObject::get(ExecState* exec,
+                              const Identifier& propertyName) const {
+  PropertySlot slot;
+
+  if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
+    return slot.getValue(exec, const_cast<JSObject*>(this), propertyName);
+
+  return jsUndefined();
+}
+
+inline JSValue* JSObject::get(ExecState* exec, unsigned propertyName) const {
+  PropertySlot slot;
+  if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
+    return slot.getValue(exec, const_cast<JSObject*>(this), propertyName);
+
+  return jsUndefined();
+}
+
 // It may seem crazy to inline a function this large but it makes a big
 // difference
 // since this is function very hot in variable lookup
@@ -588,6 +596,55 @@ inline bool JSObject::getPropertySlot(ExecState* exec,
 
     object = static_cast<JSObject*>(proto);
   }
+}
+
+inline bool JSObject::getPropertySlot(ExecState* exec,
+                                      unsigned propertyName,
+                                      PropertySlot& slot) {
+  JSObject* imp = this;
+
+  while (true) {
+    if (imp->getOwnPropertySlot(exec, propertyName, slot))
+      return true;
+
+    JSValue* proto = imp->_proto;
+    if (!proto->isObject())
+      break;
+
+    imp = static_cast<JSObject*>(proto);
+  }
+
+  return false;
+}
+
+// It may seem crazy to inline a function this large, especially a virtual
+// function,
+// but it makes a big difference to property lookup that derived classes can
+// inline their
+// base class call to this.
+ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
+    ExecState* exec,
+    const Identifier& propertyName,
+    PropertySlot& slot,
+    bool& slotIsWriteable) {
+  if (JSValue** location = getDirectLocation(propertyName, slotIsWriteable)) {
+    if (_prop.hasGetterSetterProperties() &&
+        location[0]->type() == GetterSetterType) {
+      slotIsWriteable = false;
+      fillGetterPropertySlot(slot, location);
+    } else
+      slot.setValueSlot(this, location);
+    return true;
+  }
+
+  // non-standard Netscape extension
+  if (propertyName == exec->propertyNames().underscoreProto) {
+    slot.setValueSlot(this, &_proto);
+    slotIsWriteable = true;
+    return true;
+  }
+
+  return false;
 }
 
 // It may seem crazy to inline a function this large, especially a virtual
@@ -616,16 +673,16 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
   return false;
 }
 
-inline void ScopeChain::release() {
-  // This function is only called by deref(),
-  // Deref ensures these conditions are true.
-  ASSERT(_node && _node->refCount == 0);
-  ScopeChainNode* n = _node;
-  do {
-    ScopeChainNode* next = n->next;
-    delete n;
-    n = next;
-  } while (n && --n->refCount == 0);
+inline void JSObject::putDirect(const Identifier& propertyName,
+                                JSValue* value,
+                                int attr) {
+  _prop.put(propertyName, value, attr);
+}
+
+inline void JSObject::putDirect(const Identifier& propertyName,
+                                int value,
+                                int attr) {
+  _prop.put(propertyName, jsNumber(value), attr);
 }
 
 inline JSValue* JSObject::toPrimitive(ExecState* exec,

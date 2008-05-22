@@ -192,18 +192,16 @@ void Profiler::didExecute(ExecState* exec,
       exec->lexicalGlobalObject()->pageGroupIdentifier());
 }
 
-void getCallIdentifiers(ExecState* exec,
-                        Vector<CallIdentifier>& callIdentifiers) {
-  for (ExecState* currentState = exec; currentState;
-       currentState = currentState->callingExecState()) {
-    if (FunctionImp* functionImp = currentState->function())
-      getCallIdentifierFromFunctionImp(functionImp, callIdentifiers);
-    else if (ScopeNode* scopeNode = currentState->scopeNode())
-      callIdentifiers.append(CallIdentifier(
-          GlobalCodeExecution, scopeNode->sourceURL(),
-          (scopeNode->lineNo() +
-           1)));  // FIXME: Why is the line number always off by one?
-  }
+void getCallIdentifiers(ExecState*, Vector<CallIdentifier>&) {
+  ASSERT_NOT_REACHED();
+#if 0
+    for (ExecState* currentState = exec; currentState; currentState = currentState->callingExecState()) {
+        if (FunctionImp* functionImp = currentState->function())
+            getCallIdentifierFromFunctionImp(functionImp, callIdentifiers);
+        else if (ScopeNode* scopeNode = currentState->scopeNode())
+            callIdentifiers.append(CallIdentifier(GlobalCodeExecution, scopeNode->sourceURL(), (scopeNode->lineNo() + 1)) );   // FIXME: Why is the line number always off by one?
+    }
+#endif
 }
 
 void getCallIdentifiers(ExecState* exec,

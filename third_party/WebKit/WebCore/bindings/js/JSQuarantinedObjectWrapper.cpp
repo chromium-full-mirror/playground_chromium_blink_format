@@ -210,8 +210,9 @@ bool JSQuarantinedObjectWrapper::deleteProperty(ExecState* exec,
   return result;
 }
 
-bool JSQuarantinedObjectWrapper::implementsConstruct() const {
-  return m_unwrappedObject->implementsConstruct();
+KJS::ConstructType JSQuarantinedObjectWrapper::getConstructData(
+    KJS::ConstructData& data) {
+  return m_unwrappedObject->getConstructData(data);
 }
 
 JSObject* JSQuarantinedObjectWrapper::construct(ExecState* exec,
@@ -258,8 +259,10 @@ bool JSQuarantinedObjectWrapper::hasInstance(ExecState* exec, JSValue* value) {
   return result;
 }
 
-bool JSQuarantinedObjectWrapper::implementsCall() const {
-  return m_unwrappedObject->implementsCall();
+CallType JSQuarantinedObjectWrapper::getCallData(CallData&) {
+  CallData temp;
+  return m_unwrappedObject->getCallData(temp) != CallTypeNone ? CallTypeNative
+                                                              : CallTypeNone;
 }
 
 JSValue* JSQuarantinedObjectWrapper::callAsFunction(ExecState* exec,

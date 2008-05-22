@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "JSHTMLObjectElement.h"
+#include "JSHTMLObjectElementCustom.h"
 
 #include "HTMLObjectElement.h"
 #include "kjs_html.h"
@@ -48,8 +48,10 @@ bool JSHTMLObjectElement::customPut(ExecState* exec,
                                 static_cast<HTMLElement*>(impl()));
 }
 
-bool JSHTMLObjectElement::implementsCall() const {
-  return runtimeObjectImplementsCall(static_cast<HTMLElement*>(impl()));
+CallType JSHTMLObjectElement::getCallData(CallData&) {
+  return runtimeObjectImplementsCall(static_cast<HTMLElement*>(impl()))
+             ? CallTypeNative
+             : CallTypeNone;
 }
 
 JSValue* JSHTMLObjectElement::callAsFunction(ExecState* exec,

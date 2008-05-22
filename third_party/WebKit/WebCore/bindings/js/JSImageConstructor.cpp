@@ -35,8 +35,8 @@ JSImageConstructor::JSImageConstructor(ExecState* exec, Document* document)
     : DOMObject(exec->lexicalGlobalObject()->objectPrototype()),
       m_document(document) {}
 
-bool JSImageConstructor::implementsConstruct() const {
-  return true;
+ConstructType JSImageConstructor::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 JSObject* JSImageConstructor::construct(ExecState* exec, const List& args) {

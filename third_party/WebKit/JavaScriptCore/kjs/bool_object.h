@@ -55,7 +55,7 @@ class BooleanObjectImp : public InternalFunctionImp {
  public:
   BooleanObjectImp(ExecState*, FunctionPrototype*, BooleanPrototype*);
 
-  virtual bool implementsConstruct() const;
+  virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);
 
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);

@@ -81,11 +81,11 @@ UString WebScriptCallFrame::jsValueToString(KJS::ExecState* state,
 // -----------------------------------------------------------
 
 static ExecState* callingFunctionOrGlobalExecState(ExecState* exec) {
-  for (ExecState* current = exec; current;
-       current = current->callingExecState())
-    if (current->codeType() == FunctionCode ||
-        current->codeType() == GlobalCode)
-      return current;
+#if 0
+    for (ExecState* current = exec; current; current = current->callingExecState())
+        if (current->codeType() == FunctionCode || current->codeType() == GlobalCode)
+            return current;
+#endif
   return 0;
 }
 
@@ -141,11 +141,9 @@ HRESULT STDMETHODCALLTYPE WebScriptCallFrame::caller(
     /* [out, retval] */ IWebScriptCallFrame** callFrame) {
   if (!callFrame)
     return E_POINTER;
-
-  *callFrame =
-      m_state->callingExecState()
-          ? WebScriptCallFrame::createInstance(m_state->callingExecState())
-          : 0;
+#if 0
+    *callFrame = m_state->callingExecState() ? WebScriptCallFrame::createInstance(m_state->callingExecState()) : 0;
+#endif
   return S_OK;
 }
 
@@ -155,18 +153,18 @@ HRESULT STDMETHODCALLTYPE WebScriptCallFrame::functionName(
     return E_POINTER;
 
   *funcName = 0;
+#if 0
+    if (!m_state->scopeNode())
+        return S_OK;
 
-  if (!m_state->scopeNode())
-    return S_OK;
+    FunctionImp* func = m_state->function();
+    if (!func)
+        return E_FAIL;
 
-  FunctionImp* func = m_state->function();
-  if (!func)
-    return E_FAIL;
-
-  const Identifier& funcIdent = func->functionName();
-  if (!funcIdent.isEmpty())
-    *funcName = WebCore::BString(funcIdent).release();
-
+    const Identifier& funcIdent = func->functionName();
+    if (!funcIdent.isEmpty())
+        *funcName = WebCore::BString(funcIdent).release();
+#endif
   return S_OK;
 }
 
@@ -200,13 +198,12 @@ HRESULT STDMETHODCALLTYPE WebScriptCallFrame::variableNames(
   *variableNames = 0;
 
   PropertyNameArray propertyNames;
+#if 0
+    m_state->scopeChain().top()->getPropertyNames(m_state, propertyNames);
+    // FIXME: It would be more efficient to use ::adopt here, but PropertyNameArray doesn't have a swap function.
+    *variableNames = COMEnumVariant<PropertyNameArray>::createInstance(propertyNames);
 
-  m_state->scopeChain().top()->getPropertyNames(m_state, propertyNames);
-  // FIXME: It would be more efficient to use ::adopt here, but
-  // PropertyNameArray doesn't have a swap function.
-  *variableNames =
-      COMEnumVariant<PropertyNameArray>::createInstance(propertyNames);
-
+#endif
   return S_OK;
 }
 
@@ -224,57 +221,56 @@ HRESULT STDMETHODCALLTYPE WebScriptCallFrame::valueForVariable(
   Identifier identKey(reinterpret_cast<UChar*>(key), SysStringLen(key));
 
   JSValue* jsvalue = 0;
-  ScopeChain scopeChain = m_state->scopeChain();
-  for (ScopeChainIterator it = scopeChain.begin();
-       it != scopeChain.end() && !jsvalue; ++it)
-    jsvalue = (*it)->get(m_state, identKey);
-
-  *value = WebCore::BString(jsValueToString(m_state, jsvalue)).release();
+#if 0
+    ScopeChain scopeChain = m_state->scopeChain();
+    for (ScopeChainIterator it = scopeChain.begin(); it != scopeChain.end() && !jsvalue; ++it)
+        jsvalue = (*it)->get(m_state, identKey);
+    *value = WebCore::BString(jsValueToString(m_state, jsvalue)).release();
+#endif
 
   return S_OK;
 }
 
 JSValue* WebScriptCallFrame::valueByEvaluatingJavaScriptFromString(
     BSTR script) {
-  ExecState* state = m_state;
-  JSGlobalObject* globObj = state->dynamicGlobalObject();
+#if 0
+    ExecState* state = m_state;
+    JSGlobalObject* globObj = state->dynamicGlobalObject();
 
-  // find "eval"
-  JSObject* eval = 0;
-  if (state->scopeNode()) {  // "eval" won't work without context (i.e. at
-                             // global scope)
-    JSValue* v = globObj->get(state, "eval");
-    if (v->isObject() && static_cast<JSObject*>(v)->implementsCall())
-      eval = static_cast<JSObject*>(v);
-    else
-      // no "eval" - fallback operates on global exec state
-      state = globObj->globalExec();
-  }
+    // find "eval"
+    JSObject* eval = 0;
+    if (state->scopeNode()) {  // "eval" won't work without context (i.e. at global scope)
+        JSValue* v = globObj->get(state, "eval");
+        if (v->isObject() && static_cast<JSObject*>(v)->implementsCall())
+            eval = static_cast<JSObject*>(v);
+        else
+            // no "eval" - fallback operates on global exec state
+            state = globObj->globalExec();
+    }
 
-  JSValue* savedException = state->exception();
-  state->clearException();
+    JSValue* savedException = state->exception();
+    state->clearException();
 
-  UString code(reinterpret_cast<UChar*>(script), SysStringLen(script));
+    UString code(reinterpret_cast<UChar*>(script), SysStringLen(script));
 
-  // evaluate
-  JSValue* scriptExecutionResult;
-  if (eval) {
-    List args;
-    args.append(jsString(code));
-    scriptExecutionResult = eval->call(state, 0, args);
-  } else
-    // no "eval", or no context (i.e. global scope) - use global fallback
-    scriptExecutionResult =
-        Interpreter::evaluate(state, UString(), 0, code.data(), code.size(),
-                              globObj)
-            .value();
+    // evaluate
+    JSValue* scriptExecutionResult;
+    if (eval) {
+        List args;
+        args.append(jsString(code));
+        scriptExecutionResult = eval->call(state, 0, args);
+    } else
+        // no "eval", or no context (i.e. global scope) - use global fallback
+        scriptExecutionResult = Interpreter::evaluate(state, UString(), 0, code.data(), code.size(), globObj).value();
 
-  if (state->hadException())
-    scriptExecutionResult = state->exception();  // (may be redundant depending
-                                                 // on which eval path was used)
-  state->setException(savedException);
+    if (state->hadException())
+        scriptExecutionResult = state->exception();    // (may be redundant depending on which eval path was used)
+    state->setException(savedException);
 
-  return scriptExecutionResult;
+    return scriptExecutionResult;
+#else
+  return jsNull();
+#endif
 }
 
 template <>

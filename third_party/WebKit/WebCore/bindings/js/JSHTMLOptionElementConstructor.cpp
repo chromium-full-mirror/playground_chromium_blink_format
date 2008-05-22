@@ -41,8 +41,8 @@ JSHTMLOptionElementConstructor::JSHTMLOptionElementConstructor(
             ReadOnly | DontDelete | DontEnum);
 }
 
-bool JSHTMLOptionElementConstructor::implementsConstruct() const {
-  return true;
+ConstructType JSHTMLOptionElementConstructor::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 JSObject* JSHTMLOptionElementConstructor::construct(ExecState* exec,

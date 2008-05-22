@@ -21,21 +21,22 @@
  *
  */
 
-#ifndef _KJSDEBUGGER_H_
-#define _KJSDEBUGGER_H_
+#ifndef Debugger_h
+#define Debugger_h
 
-#include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 #include "protect.h"
 
 namespace KJS {
 
-class DebuggerImp;
+class DebuggerCallFrame;
 class ExecState;
 class JSGlobalObject;
 class JSObject;
 class JSValue;
-class UString;
 class List;
+class SourceProvider;
+class UString;
 
 /**
  * @internal
@@ -43,12 +44,6 @@ class List;
  * Provides an interface which receives notification about various
  * script-execution related events such as statement execution and function
  * calls.
- *
- * WARNING: This interface is still a work in progress and is not yet
- * offically publicly available. It is likely to change in binary incompatible
- * (and possibly source incompatible) ways in future versions. It is
- * anticipated that at some stage the interface will be frozen and made
- * available for general use.
  */
 class Debugger {
  public:
@@ -63,8 +58,6 @@ class Debugger {
    */
   virtual ~Debugger();
 
-  DebuggerImp* imp() const { return rep; }
-
   /**
    * Attaches the debugger to specified global object. This will cause this
    * object to receive notification of events during execution.
@@ -76,18 +69,13 @@ class Debugger {
    * original debugger to be detached.
    *
    * @param The global object to attach to.
-   *
-   * @see detach()
    */
   void attach(JSGlobalObject*);
 
   /**
    * Detach the debugger from a global object.
    *
-   * @param The global object to detach from. If 0, the debugger will be
-   * detached from all global objects to which it is attached.
-   *
-   * @see attach()
+   * @param The global object to detach from.
    */
   void detach(JSGlobalObject*);
 
@@ -111,32 +99,14 @@ class Debugger {
    * error, or -1 if the source code was valid and parsed successfully
    * @param errorMsg The error description, or null if the source code
      was valid and parsed successfully
-   * @return true if execution should be continue, false if it should
-   * be aborted
    */
-  virtual bool sourceParsed(ExecState* exec,
+  virtual void sourceParsed(ExecState*,
                             int sourceId,
                             const UString& sourceURL,
-                            const UString& source,
+                            const SourceProvider& source,
                             int startingLineNumber,
                             int errorLine,
-                            const UString& errorMsg);
-
-  /**
-   * Called when all functions/programs associated with a particular
-   * sourceId have been deleted. After this function has been called for
-   * a particular sourceId, that sourceId will not be used again.
-   *
-   * The default implementation does nothing. Override this method if
-   * you want to process this event.
-   *
-   * @param exec The current execution state
-   * @param sourceId The ID of the source code (corresponds to the
-   * sourceId supplied in other functions such as atLine()
-   * @return true if execution should be continue, false if it should
-   * be aborted
-   */
-  virtual bool sourceUnused(ExecState* exec, int sourceId);
+                            const UString& errorMsg) = 0;
 
   /**
    * Called when an exception is thrown during script execution.
@@ -148,15 +118,10 @@ class Debugger {
    * @param sourceId The ID of the source code being executed
    * @param lineno The line at which the error occurred
    * @param exceptionObj The exception object
-   * @return true if execution should be continue, false if it should
-   * be aborted
    */
-  virtual bool exception(ExecState* exec,
+  virtual void exception(const DebuggerCallFrame&,
                          int sourceId,
-                         int lineno,
-                         JSValue* exception);
-
-  bool hasHandledException(ExecState*, JSValue*);
+                         int lineno) = 0;
 
   /**
    * Called when a line of the script is reached (before it is executed)
@@ -170,13 +135,10 @@ class Debugger {
    * executed
    * @param lastLine The ending line of the statement  that is about to be
    * executed (usually the same as firstLine)
-   * @return true if execution should be continue, false if it should
-   * be aborted
    */
-  virtual bool atStatement(ExecState* exec,
+  virtual void atStatement(const DebuggerCallFrame&,
                            int sourceId,
-                           int firstLine,
-                           int lastLine);
+                           int lineno) = 0;
   /**
    * Called on each function call. Use together with @ref #returnEvent
    * if you want to keep track of the call stack.
@@ -191,17 +153,10 @@ class Debugger {
    * @param exec The current execution state
    * @param sourceId The ID of the source code being executed
    * @param lineno The line that is about to be executed
-   * @param function The function being called
-   * @param args The arguments that were passed to the function
-   * line is being executed
-   * @return true if execution should be continue, false if it should
-   * be aborted
    */
-  virtual bool callEvent(ExecState* exec,
+  virtual void callEvent(const DebuggerCallFrame&,
                          int sourceId,
-                         int lineno,
-                         JSObject* function,
-                         const List& args);
+                         int lineno) = 0;
 
   /**
    * Called on each function exit. The function being returned from is that
@@ -217,22 +172,15 @@ class Debugger {
    * @param exec The current execution state
    * @param sourceId The ID of the source code being executed
    * @param lineno The line that is about to be executed
-   * @param function The function being called
-   * @return true if execution should be continue, false if it should
-   * be aborted
    */
-  virtual bool returnEvent(ExecState* exec,
+  virtual void returnEvent(const DebuggerCallFrame&,
                            int sourceId,
-                           int lineno,
-                           JSObject* function);
+                           int lineno) = 0;
 
  private:
-  DebuggerImp* rep;
-  HashMap<JSGlobalObject*, ProtectedPtr<JSValue>> latestExceptions;
-
- public:
-  static int debuggersPresent;
+  HashSet<JSGlobalObject*> m_globalObjects;
 };
-}
+
+}  // namespace KJS
 
 #endif

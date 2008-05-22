@@ -88,6 +88,11 @@ static JSRetainPtr<JSStringRef> jsStringRef(const char* str) {
   return JSRetainPtr<JSStringRef>(Adopt, JSStringCreateWithUTF8CString(str));
 }
 
+static JSRetainPtr<JSStringRef> jsStringRef(const SourceProvider& str) {
+  return JSRetainPtr<JSStringRef>(
+      Adopt, JSStringCreateWithCharacters(str.data(), str.length()));
+}
+
 static JSRetainPtr<JSStringRef> jsStringRef(const String& str) {
   return JSRetainPtr<JSStringRef>(
       Adopt, JSStringCreateWithCharacters(str.characters(), str.length()));
@@ -956,8 +961,7 @@ static JSValueRef currentCallFrame(JSContextRef ctx,
   if (!callFrame || !callFrame->isValid())
     return JSValueMakeNull(ctx);
 
-  ExecState* globalExec =
-      callFrame->execState()->lexicalGlobalObject()->globalExec();
+  ExecState* globalExec = callFrame->scopeChain()->globalObject()->globalExec();
 
   JSLock lock;
   return toRef(
@@ -2498,13 +2502,13 @@ void InspectorController::setPauseOnExceptions(bool pause) {
 void InspectorController::pauseInDebugger() {
   if (!m_debuggerAttached)
     return;
-  JavaScriptDebugServer::shared().pauseOnNextStatement();
+  JavaScriptDebugServer::shared().pauseProgram();
 }
 
 void InspectorController::resumeDebugger() {
   if (!m_debuggerAttached)
     return;
-  JavaScriptDebugServer::shared().resume();
+  JavaScriptDebugServer::shared().continueProgram();
 }
 
 void InspectorController::stepOverStatementInDebugger() {
@@ -2695,7 +2699,8 @@ bool InspectorController::handleException(JSContextRef context,
 #pragma mark -
 #pragma mark JavaScriptDebugListener functions
 
-void InspectorController::didParseSource(const UString& source,
+void InspectorController::didParseSource(ExecState*,
+                                         const SourceProvider& source,
                                          int startingLineNumber,
                                          const UString& sourceURL,
                                          int sourceID) {
@@ -2714,7 +2719,8 @@ void InspectorController::didParseSource(const UString& source,
                arguments, exception);
 }
 
-void InspectorController::failedToParseSource(const UString& source,
+void InspectorController::failedToParseSource(ExecState*,
+                                              const SourceProvider& source,
                                               int startingLineNumber,
                                               const UString& sourceURL,
                                               int errorLine,
@@ -2722,7 +2728,7 @@ void InspectorController::failedToParseSource(const UString& source,
   JSValueRef sourceURLValue =
       JSValueMakeString(m_scriptContext, jsStringRef(sourceURL).get());
   JSValueRef sourceValue =
-      JSValueMakeString(m_scriptContext, jsStringRef(source).get());
+      JSValueMakeString(m_scriptContext, jsStringRef(source.data()).get());
   JSValueRef startingLineNumberValue =
       JSValueMakeNumber(m_scriptContext, startingLineNumber);
   JSValueRef errorLineValue = JSValueMakeNumber(m_scriptContext, errorLine);

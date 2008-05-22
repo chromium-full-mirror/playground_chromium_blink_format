@@ -56,8 +56,8 @@ bool JSCallbackConstructor::implementsHasInstance() const {
   return true;
 }
 
-bool JSCallbackConstructor::implementsConstruct() const {
-  return true;
+ConstructType JSCallbackConstructor::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 JSObject* JSCallbackConstructor::construct(ExecState* exec, const List& args) {

@@ -1162,8 +1162,8 @@ StringObjectImp::StringObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-bool StringObjectImp::implementsConstruct() const {
-  return true;
+ConstructType StringObjectImp::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 // ECMA 15.5.2

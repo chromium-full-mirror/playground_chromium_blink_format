@@ -35,6 +35,10 @@
 #include <wtf/HashSet.h>
 #include <wtf/RefPtr.h>
 
+namespace KJS {
+class DebuggerCallFrame;
+}
+
 namespace WebCore {
 
 class Frame;
@@ -63,9 +67,8 @@ class JavaScriptDebugServer : KJS::Debugger {
   bool pauseOnExceptions() const { return m_pauseOnExceptions; }
   void setPauseOnExceptions(bool);
 
-  void pauseOnNextStatement();
-  void resume();
-
+  void pauseProgram();
+  void continueProgram();
   void stepIntoStatement();
   void stepOverStatement();
   void stepOutOfFunction();
@@ -91,34 +94,28 @@ class JavaScriptDebugServer : KJS::Debugger {
   void setJavaScriptPaused(Frame*, bool paused);
   void setJavaScriptPaused(FrameView*, bool paused);
 
-  void dispatchFunctionToListeners(JavaScriptExecutionCallback,
-                                   KJS::ExecState*);
-  void pauseIfNeeded(KJS::ExecState* exec, int sourceID, int lineNumber);
+  void dispatchFunctionToListeners(JavaScriptExecutionCallback, Page*);
+  void pauseIfNeeded(Page*);
 
-  virtual bool sourceParsed(KJS::ExecState*,
+  virtual void sourceParsed(KJS::ExecState*,
                             int sourceID,
                             const KJS::UString& sourceURL,
-                            const KJS::UString& source,
+                            const KJS::SourceProvider& source,
                             int startingLineNumber,
                             int errorLine,
                             const KJS::UString& errorMsg);
-  virtual bool callEvent(KJS::ExecState*,
+  virtual void callEvent(const KJS::DebuggerCallFrame&,
                          int sourceID,
-                         int lineNumber,
-                         KJS::JSObject* function,
-                         const KJS::List& args);
-  virtual bool atStatement(KJS::ExecState*,
+                         int lineNumber);
+  virtual void atStatement(const KJS::DebuggerCallFrame&,
                            int sourceID,
-                           int firstLine,
-                           int lastLine);
-  virtual bool returnEvent(KJS::ExecState*,
+                           int firstLine);
+  virtual void returnEvent(const KJS::DebuggerCallFrame&,
                            int sourceID,
-                           int lineNumber,
-                           KJS::JSObject* function);
-  virtual bool exception(KJS::ExecState*,
+                           int lineNumber);
+  virtual void exception(const KJS::DebuggerCallFrame&,
                          int sourceID,
-                         int lineNumber,
-                         KJS::JSValue* exception);
+                         int lineNumber);
 
   typedef HashMap<Page*, ListenerSet*> PageListenersMap;
   PageListenersMap m_pageListenersMap;
@@ -127,7 +124,8 @@ class JavaScriptDebugServer : KJS::Debugger {
   bool m_pauseOnExceptions;
   bool m_pauseOnNextStatement;
   bool m_paused;
-  KJS::ExecState* m_pauseOnExecState;
+  bool m_doneProcessingDebuggerEvents;
+  JavaScriptCallFrame* m_pauseOnCallFrame;
   RefPtr<JavaScriptCallFrame> m_currentCallFrame;
   HashMap<RefPtr<Frame>, PausedTimeouts*> m_pausedTimeouts;
   HashMap<int, HashSet<unsigned>*> m_breakpoints;

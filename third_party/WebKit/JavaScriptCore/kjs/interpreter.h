@@ -23,6 +23,7 @@
 #ifndef KJS_Interpreter_h
 #define KJS_Interpreter_h
 
+#include <wtf/PassRefPtr.h>
 #include <wtf/unicode/Unicode.h>
 
 namespace KJS {
@@ -30,6 +31,8 @@ namespace KJS {
 class Completion;
 class ExecState;
 class JSValue;
+class ScopeChain;
+class SourceProvider;
 class UString;
 
 class Interpreter {
@@ -48,8 +51,7 @@ class Interpreter {
   static Completion checkSyntax(ExecState*,
                                 const UString& sourceURL,
                                 int startingLineNumber,
-                                const UChar* code,
-                                int codeLength);
+                                PassRefPtr<SourceProvider> source);
 
   /**
    * Evaluates the supplied ECMAScript code.
@@ -67,15 +69,16 @@ class Interpreter {
    * @return A completion object representing the result of the execution.
    */
   static Completion evaluate(ExecState*,
+                             ScopeChain&,
                              const UString& sourceURL,
                              int startingLineNumber,
                              const UString& code,
                              JSValue* thisV = 0);
   static Completion evaluate(ExecState*,
+                             ScopeChain&,
                              const UString& sourceURL,
                              int startingLineNumber,
-                             const UChar* code,
-                             int codeLength,
+                             PassRefPtr<SourceProvider>,
                              JSValue* thisV = 0);
 
   static bool shouldPrintExceptions();

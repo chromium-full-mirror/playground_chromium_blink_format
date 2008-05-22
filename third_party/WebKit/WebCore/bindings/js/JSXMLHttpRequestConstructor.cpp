@@ -40,8 +40,9 @@ JSXMLHttpRequestConstructor::JSXMLHttpRequestConstructor(ExecState* exec,
             JSXMLHttpRequestPrototype::self(exec), None);
 }
 
-bool JSXMLHttpRequestConstructor::implementsConstruct() const {
-  return true;
+KJS::ConstructType JSXMLHttpRequestConstructor::getConstructData(
+    KJS::ConstructData& data) {
+  return ConstructTypeNative;
 }
 
 JSObject* JSXMLHttpRequestConstructor::construct(ExecState* exec, const List&) {

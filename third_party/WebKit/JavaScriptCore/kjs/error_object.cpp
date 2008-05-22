@@ -84,8 +84,8 @@ ErrorObjectImp::ErrorObjectImp(ExecState* exec,
             DontDelete | ReadOnly | DontEnum);
 }
 
-bool ErrorObjectImp::implementsConstruct() const {
-  return true;
+ConstructType ErrorObjectImp::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 // ECMA 15.9.3
@@ -139,8 +139,8 @@ NativeErrorImp::NativeErrorImp(ExecState* exec,
             DontDelete | ReadOnly | DontEnum);
 }
 
-bool NativeErrorImp::implementsConstruct() const {
-  return true;
+ConstructType NativeErrorImp::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 JSObject* NativeErrorImp::construct(ExecState* exec, const List& args) {

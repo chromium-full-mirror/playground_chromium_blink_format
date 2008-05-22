@@ -35,7 +35,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLNames.h"
 #include "JSDOMCoreException.h"
-#include "JSDOMWindow.h"
+#include "JSDOMWindowCustom.h"
 #include "JSEventException.h"
 #include "JSNode.h"
 #include "JSRangeException.h"

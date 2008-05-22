@@ -1,7 +1,7 @@
 // -*- c-basic-offset: 4 -*-
 /*
  *  Copyright (C) 2007 Eric Seidel <eric@webkit.org>
- *  Copyright (C) 2007 Apple Inc. All rights reserved.
+ *  Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -24,11 +24,13 @@
 #define KJS_GlobalObject_h
 
 #include "JSVariableObject.h"
-#include "Activation.h"
+#include "RegisterFile.h"
+#include "RegisterFileStack.h"
+#include <wtf/HashSet.h>
+#include <wtf/OwnPtr.h>
 
 namespace KJS {
 
-class ActivationImp;
 class ArrayObjectImp;
 class ArrayPrototype;
 class BooleanObjectImp;
@@ -50,6 +52,7 @@ class NumberObjectImp;
 class NumberPrototype;
 class ObjectObjectImp;
 class ObjectPrototype;
+class ProgramCodeBlock;
 class PrototypeReflexiveFunction;
 class RangeError;
 class RangeErrorPrototype;
@@ -77,14 +80,24 @@ class JSGlobalObject : public JSVariableObject {
   using JSVariableObject::JSVariableObjectData;
 
   struct JSGlobalObjectData : public JSVariableObjectData {
-    JSGlobalObjectData() : JSVariableObjectData(&inlineSymbolTable) {}
+    JSGlobalObjectData(JSGlobalObject* globalObject, JSObject* thisValue)
+        : JSVariableObjectData(&symbolTable,
+                               registerFileStack.globalBasePointer(),
+                               0),
+          globalScopeChain(globalObject),
+          globalExec(
+              new ExecState(globalObject, thisValue, globalScopeChain.node())) {
+    }
 
     JSGlobalObject* next;
     JSGlobalObject* prev;
 
     Debugger* debugger;
 
-    OwnPtr<GlobalExecState> globalExec;
+    RegisterFileStack registerFileStack;
+    ScopeChain globalScopeChain;
+    OwnPtr<ExecState> globalExec;
+
     int recursion;
 
     unsigned timeoutTime;
@@ -128,28 +141,26 @@ class JSGlobalObject : public JSVariableObject {
     NativeErrorPrototype* typeErrorPrototype;
     NativeErrorPrototype* URIErrorPrototype;
 
-    SymbolTable inlineSymbolTable;
-
-    ExecStateStack activeExecStates;
-
-    ActivationStackNode* activations;
-    size_t activationCount;
-
+    SymbolTable symbolTable;
     unsigned pageGroupIdentifier;
+
+    PerThreadData perThreadData;
+
+    HashSet<ProgramCodeBlock*> codeBlocks;
 
     OwnPtr<HashSet<JSObject*>> arrayVisitedElements;  // Global data shared by
                                                       // array prototype
                                                       // functions.
-
-    PerThreadData perThreadData;
   };
 
  public:
-  JSGlobalObject() : JSVariableObject(new JSGlobalObjectData) { init(this); }
+  JSGlobalObject() : JSVariableObject(new JSGlobalObjectData(this, this)) {
+    init(this);
+  }
 
  protected:
   JSGlobalObject(JSValue* proto, JSObject* globalThisValue)
-      : JSVariableObject(proto, new JSGlobalObjectData) {
+      : JSVariableObject(proto, new JSGlobalObjectData(this, globalThisValue)) {
     init(globalThisValue);
   }
 
@@ -157,6 +168,10 @@ class JSGlobalObject : public JSVariableObject {
   virtual ~JSGlobalObject();
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier&,
+                                  PropertySlot&,
+                                  bool& slotIsWriteable);
   virtual void put(ExecState*, const Identifier&, JSValue*);
   virtual void putWithAttributes(ExecState*,
                                  const Identifier& propertyName,
@@ -257,6 +272,8 @@ class JSGlobalObject : public JSVariableObject {
   void incRecursion() { ++d()->recursion; }
   void decRecursion() { --d()->recursion; }
 
+  ScopeChain& globalScopeChain() { return d()->globalScopeChain; }
+
   virtual void mark();
 
   virtual bool isGlobalObject() const { return true; }
@@ -268,19 +285,17 @@ class JSGlobalObject : public JSVariableObject {
 
   virtual bool allowsAccessFrom(const JSGlobalObject*) const { return true; }
 
-  ActivationImp* pushActivation(ExecState*);
-  void popActivation();
-  void tearOffActivation(ExecState*, bool markAsRelic = false);
-
   virtual bool isDynamicScope() const;
-
-  ExecStateStack& activeExecStates() const { return d()->activeExecStates; }
 
   HashSet<JSObject*>& arrayVisitedElements() {
     if (!d()->arrayVisitedElements)
       d()->arrayVisitedElements.set(new HashSet<JSObject*>);
     return *d()->arrayVisitedElements;
   }
+
+  HashSet<ProgramCodeBlock*>& codeBlocks() { return d()->codeBlocks; }
+
+  RegisterFileStack& registerFileStack() { return d()->registerFileStack; }
 
   // Per-thread hash tables, cached on the global object for faster access.
   const PerThreadData* perThreadData() const { return &d()->perThreadData; }
@@ -296,14 +311,55 @@ class JSGlobalObject : public JSVariableObject {
     return static_cast<JSGlobalObjectData*>(JSVariableObject::d);
   }
 
+  struct GlobalPropertyInfo {
+    GlobalPropertyInfo(const Identifier& i, JSValue* v, unsigned a)
+        : identifier(i), value(v), attributes(a) {}
+
+    const Identifier& identifier;
+    JSValue* value;
+    unsigned attributes;
+  };
+  void addStaticGlobals(GlobalPropertyInfo*, int count);
+
   bool checkTimeout();
   void resetTimeoutCheck();
 
-  void deleteActivationStack();
-  void checkActivationCount();
-
   static JSGlobalObject* s_head;
 };
+
+inline void JSGlobalObject::addStaticGlobals(GlobalPropertyInfo* globals,
+                                             int count) {
+  RegisterFile* registerFile = registerFileStack().current();
+  ASSERT(registerFile->safeForReentry() && registerFile->isGlobal() &&
+         !registerFile->size());
+  int index = -registerFile->numGlobalSlots() - 1;
+  registerFile->addGlobalSlots(count);
+  for (int i = 0; i < count; ++i) {
+    ASSERT(globals[i].attributes & DontDelete);
+    SymbolTableEntry newEntry(index, globals[i].attributes);
+    symbolTable().add(globals[i].identifier.ustring().rep(), newEntry);
+    valueAt(index) = globals[i].value;
+    --index;
+  }
+}
+
+inline bool JSGlobalObject::getOwnPropertySlot(ExecState* exec,
+                                               const Identifier& propertyName,
+                                               PropertySlot& slot) {
+  if (JSVariableObject::getOwnPropertySlot(exec, propertyName, slot))
+    return true;
+  return symbolTableGet(propertyName, slot);
+}
+
+inline bool JSGlobalObject::getOwnPropertySlot(ExecState* exec,
+                                               const Identifier& propertyName,
+                                               PropertySlot& slot,
+                                               bool& slotIsWriteable) {
+  if (JSVariableObject::getOwnPropertySlotForWrite(exec, propertyName, slot,
+                                                   slotIsWriteable))
+    return true;
+  return symbolTableGet(propertyName, slot, slotIsWriteable);
+}
 
 inline bool JSGlobalObject::timedOut() {
   d()->tickCount++;
@@ -314,33 +370,10 @@ inline bool JSGlobalObject::timedOut() {
   return checkTimeout();
 }
 
-inline ActivationImp* JSGlobalObject::pushActivation(ExecState* exec) {
-  if (d()->activationCount == activationStackNodeSize) {
-    ActivationStackNode* newNode = new ActivationStackNode;
-    newNode->prev = d()->activations;
-    d()->activations = newNode;
-    d()->activationCount = 0;
-  }
-
-  StackActivation* stackEntry = &d()->activations->data[d()->activationCount++];
-  stackEntry->activationStorage.init(exec);
-  return &stackEntry->activationStorage;
-}
-
-inline void JSGlobalObject::checkActivationCount() {
-  if (!d()->activationCount) {
-    ActivationStackNode* prev = d()->activations->prev;
-    ASSERT(prev);
-    delete d()->activations;
-    d()->activations = prev;
-    d()->activationCount = activationStackNodeSize;
-  }
-}
-
-inline void JSGlobalObject::popActivation() {
-  checkActivationCount();
-  d()->activations->data[--d()->activationCount]
-      .activationDataStorage.localStorage.shrink(0);
+inline JSGlobalObject* ScopeChainNode::globalObject() const {
+  JSGlobalObject* globalObject = static_cast<JSGlobalObject*>(bottom());
+  ASSERT(globalObject->isGlobalObject());
+  return globalObject;
 }
 
 }  // namespace KJS

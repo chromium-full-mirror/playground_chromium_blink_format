@@ -50,8 +50,9 @@ class RegExpImp : public JSObject {
   JSValue* test(ExecState*, const List& args);
   JSValue* exec(ExecState*, const List& args);
 
-  virtual bool implementsCall() const;
+  virtual CallType getCallData(CallData&);
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
+
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   void put(ExecState*, const Identifier&, JSValue*);
@@ -91,15 +92,18 @@ class RegExpObjectImp : public InternalFunctionImp {
 
   RegExpObjectImp(ExecState*, FunctionPrototype*, RegExpPrototype*);
 
-  virtual bool implementsConstruct() const;
+  virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);
-  JSObject* createRegExpImp(ExecState*, PassRefPtr<RegExp>);
+
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
+
   virtual void put(ExecState*, const Identifier&, JSValue*);
   void putValueProperty(ExecState*, int token, JSValue*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
+
   virtual const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
 
   void performMatch(RegExp*,
                     const UString&,
@@ -117,8 +121,6 @@ class RegExpObjectImp : public InternalFunctionImp {
   JSValue* getRightContext() const;
 
   OwnPtr<RegExpObjectImpPrivate> d;
-
-  static const ClassInfo info;
 };
 
 }  // namespace

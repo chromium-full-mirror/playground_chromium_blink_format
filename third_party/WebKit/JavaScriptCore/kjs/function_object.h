@@ -51,13 +51,14 @@ class FunctionObjectImp : public InternalFunctionImp {
  public:
   FunctionObjectImp(ExecState*, FunctionPrototype*);
 
-  virtual bool implementsConstruct() const;
+  virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);
   virtual JSObject* construct(ExecState*,
                               const List&,
                               const Identifier& functionName,
                               const UString& sourceURL,
                               int lineNumber);
+
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
 };
 

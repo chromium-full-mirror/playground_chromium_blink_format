@@ -156,42 +156,6 @@ UString JSObject::className() const {
   return "Object";
 }
 
-JSValue* JSObject::get(ExecState* exec, const Identifier& propertyName) const {
-  PropertySlot slot;
-
-  if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
-    return slot.getValue(exec, const_cast<JSObject*>(this), propertyName);
-
-  return jsUndefined();
-}
-
-JSValue* JSObject::get(ExecState* exec, unsigned propertyName) const {
-  PropertySlot slot;
-  if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
-    return slot.getValue(exec, const_cast<JSObject*>(this), propertyName);
-
-  return jsUndefined();
-}
-
-bool JSObject::getPropertySlot(ExecState* exec,
-                               unsigned propertyName,
-                               PropertySlot& slot) {
-  JSObject* imp = this;
-
-  while (true) {
-    if (imp->getOwnPropertySlot(exec, propertyName, slot))
-      return true;
-
-    JSValue* proto = imp->_proto;
-    if (!proto->isObject())
-      break;
-
-    imp = static_cast<JSObject*>(proto);
-  }
-
-  return false;
-}
-
 bool JSObject::getOwnPropertySlot(ExecState* exec,
                                   unsigned propertyName,
                                   PropertySlot& slot) {
@@ -299,7 +263,6 @@ void JSObject::putWithAttributes(ExecState* exec,
   putWithAttributes(exec, Identifier::from(propertyName), value, attributes);
 }
 
-// ECMA 8.6.2.4
 bool JSObject::hasProperty(ExecState* exec,
                            const Identifier& propertyName) const {
   PropertySlot slot;
@@ -350,7 +313,10 @@ static ALWAYS_INLINE JSValue* tryGetAndCallProperty(
   JSValue* v = object->get(exec, propertyName);
   if (v->isObject()) {
     JSObject* o = static_cast<JSObject*>(v);
-    if (o->implementsCall()) {  // spec says "not primitive type" but ...
+    CallData data;
+    CallType callType = o->getCallData(data);
+    // spec says "not primitive type" but ...
+    if (callType != CallTypeNone) {
       JSObject* thisObj = const_cast<JSObject*>(object);
       JSValue* def =
           o->call(exec, thisObj->toThisObject(exec), exec->emptyList());
@@ -373,6 +339,11 @@ bool JSObject::getPrimitiveNumber(ExecState* exec,
 
 // ECMA 8.6.2.6
 JSValue* JSObject::defaultValue(ExecState* exec, JSType hint) const {
+  // We need this check to guard against the case where this object is rhs of
+  // a binary expression where lhs threw an exception in its conversion to
+  // primitive
+  if (exec->hadException())
+    return exec->exception();
   /* Prefer String for Date objects */
   if ((hint == StringType) ||
       (hint != NumberType &&
@@ -482,10 +453,6 @@ JSValue* JSObject::lookupSetter(ExecState*, const Identifier& propertyName) {
   }
 }
 
-bool JSObject::implementsConstruct() const {
-  return false;
-}
-
 JSObject* JSObject::construct(ExecState*, const List& /*args*/) {
   ASSERT(false);
   return NULL;
@@ -499,8 +466,9 @@ JSObject* JSObject::construct(ExecState* exec,
   return construct(exec, args);
 }
 
-bool JSObject::implementsCall() const {
-  return false;
+bool JSObject::implementsCall() {
+  CallData callData;
+  return getCallData(callData) != CallTypeNone;
 }
 
 JSValue* JSObject::callAsFunction(ExecState* /*exec*/,
@@ -612,16 +580,6 @@ JSObject* JSObject::toThisObject(ExecState*) const {
 
 JSGlobalObject* JSObject::toGlobalObject(ExecState*) const {
   return 0;
-}
-
-void JSObject::putDirect(const Identifier& propertyName,
-                         JSValue* value,
-                         int attr) {
-  _prop.put(propertyName, value, attr);
-}
-
-void JSObject::putDirect(const Identifier& propertyName, int value, int attr) {
-  _prop.put(propertyName, jsNumber(value), attr);
 }
 
 void JSObject::removeDirect(const Identifier& propertyName) {

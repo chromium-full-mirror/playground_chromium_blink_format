@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "JSHTMLEmbedElement.h"
+#include "JSHTMLEmbedElementCustom.h"
 
 #include "HTMLEmbedElement.h"
 #include "kjs_html.h"
@@ -48,8 +48,10 @@ bool JSHTMLEmbedElement::customPut(ExecState* exec,
                                 static_cast<HTMLElement*>(impl()));
 }
 
-bool JSHTMLEmbedElement::implementsCall() const {
-  return runtimeObjectImplementsCall(static_cast<HTMLElement*>(impl()));
+CallType JSHTMLEmbedElement::getCallData(CallData&) {
+  return runtimeObjectImplementsCall(static_cast<HTMLElement*>(impl()))
+             ? CallTypeNative
+             : CallTypeNone;
 }
 
 JSValue* JSHTMLEmbedElement::callAsFunction(ExecState* exec,

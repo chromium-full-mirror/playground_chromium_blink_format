@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "JSHTMLAppletElement.h"
+#include "JSHTMLAppletElementCustom.h"
 
 #include "HTMLAppletElement.h"
 #include "kjs_html.h"
@@ -48,8 +48,10 @@ bool JSHTMLAppletElement::customPut(ExecState* exec,
                                 static_cast<HTMLElement*>(impl()));
 }
 
-bool JSHTMLAppletElement::implementsCall() const {
-  return runtimeObjectImplementsCall(static_cast<HTMLElement*>(impl()));
+CallType JSHTMLAppletElement::getCallData(CallData&) {
+  return runtimeObjectImplementsCall(static_cast<HTMLElement*>(impl()))
+             ? CallTypeNative
+             : CallTypeNone;
 }
 
 JSValue* JSHTMLAppletElement::callAsFunction(ExecState* exec,

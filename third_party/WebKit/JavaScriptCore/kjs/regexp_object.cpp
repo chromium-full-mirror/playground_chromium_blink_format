@@ -249,8 +249,8 @@ JSValue* RegExpImp::exec(ExecState* exec, const List& args) {
              : jsNull();
 }
 
-bool RegExpImp::implementsCall() const {
-  return true;
+CallType RegExpImp::getCallData(CallData&) {
+  return CallTypeNative;
 }
 
 JSValue* RegExpImp::callAsFunction(ExecState* exec,
@@ -458,8 +458,8 @@ void RegExpObjectImp::putValueProperty(ExecState* exec,
   }
 }
 
-bool RegExpObjectImp::implementsConstruct() const {
-  return true;
+ConstructType RegExpObjectImp::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 // ECMA 15.10.4
@@ -478,16 +478,10 @@ JSObject* RegExpObjectImp::construct(ExecState* exec, const List& args) {
   UString pattern = arg0->isUndefined() ? UString("") : arg0->toString(exec);
   UString flags = arg1->isUndefined() ? UString("") : arg1->toString(exec);
 
-  return createRegExpImp(exec, RegExp::create(pattern, flags));
-}
-
-JSObject* RegExpObjectImp::createRegExpImp(ExecState* exec,
-                                           PassRefPtr<RegExp> regExp) {
+  RefPtr<RegExp> regExp = RegExp::create(pattern, flags);
   return regExp->isValid()
-             ? new RegExpImp(
-                   static_cast<RegExpPrototype*>(
-                       exec->lexicalGlobalObject()->regExpPrototype()),
-                   regExp)
+             ? new RegExpImp(exec->lexicalGlobalObject()->regExpPrototype(),
+                             regExp.release())
              : throwError(exec, SyntaxError,
                           UString("Invalid regular expression: ")
                               .append(regExp->errorMessage()));

@@ -110,7 +110,7 @@ class ObjcFallbackObjectImp : public JSObject {
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
-  virtual bool implementsCall() const;
+  virtual CallType getCallData(CallData&);
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);

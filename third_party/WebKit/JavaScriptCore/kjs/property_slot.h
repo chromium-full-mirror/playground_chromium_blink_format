@@ -67,6 +67,11 @@ class PropertySlot {
                       *this);
   }
 
+  void putValue(JSValue* value) {
+    ASSERT(m_getValue == KJS_VALUE_SLOT_MARKER);
+    *m_data.valueSlot = value;
+  }
+
   void setValueSlot(JSObject* slotBase, JSValue** valueSlot) {
     m_getValue = KJS_VALUE_SLOT_MARKER;
     m_slotBase = slotBase;

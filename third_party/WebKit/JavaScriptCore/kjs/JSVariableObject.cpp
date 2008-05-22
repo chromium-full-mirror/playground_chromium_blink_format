@@ -47,8 +47,8 @@ void JSVariableObject::getPropertyNames(ExecState* exec,
   SymbolTable::const_iterator end = symbolTable().end();
   for (SymbolTable::const_iterator it = symbolTable().begin(); it != end;
        ++it) {
-    if ((localStorage()[it->second].attributes & DontEnum) == 0)
-      propertyNames.add(it->first.get());
+    if (!(it->second.getAttributes() & DontEnum))
+      propertyNames.add(Identifier(it->first.get()));
   }
 
   JSObject::getPropertyNames(exec, propertyNames);
@@ -57,23 +57,12 @@ void JSVariableObject::getPropertyNames(ExecState* exec,
 bool JSVariableObject::getPropertyAttributes(ExecState* exec,
                                              const Identifier& propertyName,
                                              unsigned& attributes) const {
-  size_t index = symbolTable().get(propertyName.ustring().rep());
-  if (index != missingSymbolMarker()) {
-    attributes = localStorage()[index].attributes;
+  SymbolTableEntry entry = symbolTable().get(propertyName.ustring().rep());
+  if (!entry.isEmpty()) {
+    attributes = entry.getAttributes() | DontDelete;
     return true;
   }
   return JSObject::getPropertyAttributes(exec, propertyName, attributes);
-}
-
-void JSVariableObject::mark() {
-  JSObject::mark();
-
-  size_t size = d->localStorage.size();
-  for (size_t i = 0; i < size; ++i) {
-    JSValue* value = d->localStorage[i].value;
-    if (!value->marked())
-      value->mark();
-  }
 }
 
 bool JSVariableObject::isVariableObject() const {

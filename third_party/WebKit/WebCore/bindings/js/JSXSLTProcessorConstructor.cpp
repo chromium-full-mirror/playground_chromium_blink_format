@@ -46,8 +46,8 @@ JSXSLTProcessorConstructor::JSXSLTProcessorConstructor(ExecState* exec)
             JSXSLTProcessorPrototype::self(exec), None);
 }
 
-bool JSXSLTProcessorConstructor::implementsConstruct() const {
-  return true;
+ConstructType JSXSLTProcessorConstructor::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 JSObject* JSXSLTProcessorConstructor::construct(ExecState* exec,

@@ -41,7 +41,7 @@ class JSCallbackConstructor : public JSObject {
 
   virtual bool implementsHasInstance() const;
 
-  virtual bool implementsConstruct() const;
+  virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List& args);
 
   virtual const ClassInfo* classInfo() const { return &info; }

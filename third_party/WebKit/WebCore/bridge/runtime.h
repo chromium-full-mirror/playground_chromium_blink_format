@@ -106,9 +106,6 @@ class Instance : public RefCounted<Instance> {
   static void setDidExecuteFunction(KJSDidExecuteFunctionPtr func);
   static KJSDidExecuteFunctionPtr didExecuteFunction();
 
-  static void setCurrentGlobalObject(JSGlobalObject*);
-  static JSGlobalObject* currentGlobalObject();
-
   static JSObject* createRuntimeObject(PassRefPtr<Instance>);
   static Instance* getInstance(JSObject*, BindingLanguage);
 
@@ -132,7 +129,7 @@ class Instance : public RefCounted<Instance> {
                                         const Identifier&,
                                         JSValue*) {}
 
-  virtual bool implementsCall() const { return false; }
+  virtual CallType getCallData(CallData&) { return CallTypeNone; }
 
   virtual JSValue* invokeMethod(ExecState*,
                                 const MethodList&,

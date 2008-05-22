@@ -46,8 +46,8 @@ JSAudioConstructor::JSAudioConstructor(ExecState* exec, Document* document)
             ReadOnly | DontDelete | DontEnum);
 }
 
-bool JSAudioConstructor::implementsConstruct() const {
-  return true;
+ConstructType JSAudioConstructor::getConstructData(ConstructData&) {
+  return ConstructTypeNative;
 }
 
 JSObject* JSAudioConstructor::construct(ExecState* exec, const List& args) {

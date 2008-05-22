@@ -22,7 +22,10 @@
 
 #include "config.h"
 #include "property_slot.h"
+
+#include "JSGlobalObject.h"
 #include "object.h"
+#include "RegisterFileStack.h"
 
 namespace KJS {
 
@@ -45,6 +48,17 @@ JSValue* PropertySlot::functionGetter(ExecState* exec,
                                       JSObject* originalObject,
                                       const Identifier&,
                                       const PropertySlot& slot) {
-  return slot.m_data.getterFunc->call(exec, originalObject, exec->emptyList());
+  CallData data;
+  CallType callType = slot.m_data.getterFunc->getCallData(data);
+  if (callType == CallTypeNative)
+    return slot.m_data.getterFunc->call(exec, originalObject,
+                                        exec->emptyList());
+  ASSERT(callType == CallTypeJS);
+  RegisterFileStack* stack = &exec->dynamicGlobalObject()->registerFileStack();
+  stack->pushFunctionRegisterFile();
+  JSValue* result =
+      slot.m_data.getterFunc->call(exec, originalObject, exec->emptyList());
+  stack->popFunctionRegisterFile();
+  return result;
 }
 }
