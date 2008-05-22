@@ -84,6 +84,9 @@ using namespace std;
 
 namespace WebCore {
 
+static const char* const UserInitiatedProfileName =
+    "org.webkit.profiles.user-initiated";
+
 static JSRetainPtr<JSStringRef> jsStringRef(const char* str) {
   return JSRetainPtr<JSStringRef>(Adopt, JSStringCreateWithUTF8CString(str));
 }
@@ -1194,7 +1197,9 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_scriptContext(0),
       m_windowVisible(false),
       m_debuggerAttached(false),
-      m_showAfterVisible(FocusedNodeDocumentPanel),
+      m_attachDebuggerWhenShown(false),
+      m_recordingUserInitiatedProfile(false),
+      m_showAfterVisible(ElementsPanel),
       m_nextIdentifier(-2) {
   ASSERT_ARG(page, page);
   ASSERT_ARG(client, client);
@@ -1272,7 +1277,7 @@ void InspectorController::inspect(Node* node) {
   m_nodeToFocus = node;
 
   if (!m_scriptObject) {
-    m_showAfterVisible = FocusedNodeDocumentPanel;
+    m_showAfterVisible = ElementsPanel;
     return;
   }
 
@@ -1340,14 +1345,12 @@ void InspectorController::setWindowVisible(bool visible) {
     populateScriptObjects();
     if (m_nodeToFocus)
       focusNode();
-    if (m_showAfterVisible == ConsolePanel)
-      showConsole();
-    else if (m_showAfterVisible == TimelinePanel)
-      showTimeline();
+    if (m_attachDebuggerWhenShown)
+      startDebuggingAndReloadInspectedPage();
+    if (m_showAfterVisible != CurrentPanel)
+      showPanel(m_showAfterVisible);
   } else
     resetScriptObjects();
-
-  m_showAfterVisible = FocusedNodeDocumentPanel;
 }
 
 void InspectorController::addMessageToConsole(MessageSource source,
@@ -1539,32 +1542,47 @@ void InspectorController::show() {
   showWindow();
 }
 
-void InspectorController::showConsole() {
+void InspectorController::showPanel(SpecialPanels panel) {
   if (!enabled())
     return;
 
   show();
 
   if (!m_scriptObject) {
-    m_showAfterVisible = ConsolePanel;
+    m_showAfterVisible = panel;
     return;
   }
 
-  callSimpleFunction(m_scriptContext, m_scriptObject, "showConsole");
-}
-
-void InspectorController::showTimeline() {
-  if (!enabled())
+  if (panel == CurrentPanel)
     return;
 
-  show();
-
-  if (!m_scriptObject) {
-    m_showAfterVisible = TimelinePanel;
-    return;
+  const char* showFunctionName;
+  switch (panel) {
+    case ConsolePanel:
+      showFunctionName = "showConsole";
+      break;
+    case DatabasesPanel:
+      showFunctionName = "showDatabasesPanel";
+      break;
+    case ElementsPanel:
+      showFunctionName = "showElementsPanel";
+      break;
+    case ProfilesPanel:
+      showFunctionName = "showProfilesPanel";
+      break;
+    case ResourcesPanel:
+      showFunctionName = "showResourcesPanel";
+      break;
+    case ScriptsPanel:
+      showFunctionName = "showScriptsPanel";
+      break;
+    default:
+      ASSERT_NOT_REACHED();
+      showFunctionName = 0;
   }
 
-  callSimpleFunction(m_scriptContext, m_scriptObject, "showTimeline");
+  if (showFunctionName)
+    callSimpleFunction(m_scriptContext, m_scriptObject, showFunctionName);
 }
 
 void InspectorController::close() {
@@ -1589,6 +1607,26 @@ void InspectorController::showWindow() {
 void InspectorController::closeWindow() {
   stopDebugging();
   m_client->closeWindow();
+}
+
+void InspectorController::startUserInitiatedProfiling() {
+  if (!enabled())
+    return;
+
+  m_recordingUserInitiatedProfile = true;
+
+  ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
+  Profiler::profiler()->startProfiling(exec, UserInitiatedProfileName);
+}
+
+void InspectorController::stopUserInitiatedProfiling() {
+  if (!enabled())
+    return;
+
+  m_recordingUserInitiatedProfile = false;
+
+  ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
+  Profiler::profiler()->stopProfiling(exec, UserInitiatedProfileName);
 }
 
 static void addHeaders(JSContextRef context,
@@ -2465,19 +2503,38 @@ void InspectorController::moveWindowBy(float x, float y) const {
 }
 
 void InspectorController::startDebuggingAndReloadInspectedPage() {
+  if (!enabled())
+    return;
+
+  if (!m_scriptContext || !m_scriptObject) {
+    m_attachDebuggerWhenShown = true;
+    return;
+  }
+
   ASSERT(m_inspectedPage);
 
   JavaScriptDebugServer::shared().addListener(this, m_inspectedPage);
-  m_debuggerAttached = true;
   JavaScriptDebugServer::shared().clearBreakpoints();
+
+  m_debuggerAttached = true;
+  m_attachDebuggerWhenShown = false;
+
+  callSimpleFunction(m_scriptContext, m_scriptObject, "debuggerAttached");
+
   m_inspectedPage->mainFrame()->loader()->reload();
 }
 
 void InspectorController::stopDebugging() {
+  if (!enabled())
+    return;
+
   ASSERT(m_inspectedPage);
 
   JavaScriptDebugServer::shared().removeListener(this, m_inspectedPage);
   m_debuggerAttached = false;
+
+  if (m_scriptContext && m_scriptObject)
+    callSimpleFunction(m_scriptContext, m_scriptObject, "debuggerDetached");
 }
 
 JavaScriptCallFrame* InspectorController::currentCallFrame() const {

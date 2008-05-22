@@ -67,9 +67,13 @@ class InspectorController : JavaScriptDebugListener {
   typedef HashSet<RefPtr<InspectorDatabaseResource>> DatabaseResourcesSet;
 
   typedef enum {
-    FocusedNodeDocumentPanel,
+    CurrentPanel,
     ConsolePanel,
-    TimelinePanel
+    DatabasesPanel,
+    ElementsPanel,
+    ProfilesPanel,
+    ResourcesPanel,
+    ScriptsPanel
   } SpecialPanels;
 
   InspectorController(Page*, InspectorClient*);
@@ -89,9 +93,14 @@ class InspectorController : JavaScriptDebugListener {
   void hideHighlight();
 
   void show();
-  void showConsole();
-  void showTimeline();
+  void showPanel(SpecialPanels);
   void close();
+
+  bool isRecordingUserInitiatedProfile() const {
+    return m_recordingUserInitiatedProfile;
+  }
+  void startUserInitiatedProfiling();
+  void stopUserInitiatedProfiling();
 
   bool windowVisible();
   void setWindowVisible(bool visible = true);
@@ -264,6 +273,8 @@ class InspectorController : JavaScriptDebugListener {
   JSContextRef m_scriptContext;
   bool m_windowVisible;
   bool m_debuggerAttached;
+  bool m_attachDebuggerWhenShown;
+  bool m_recordingUserInitiatedProfile;
   SpecialPanels m_showAfterVisible;
   long long m_nextIdentifier;
   RefPtr<Node> m_highlightedNode;
