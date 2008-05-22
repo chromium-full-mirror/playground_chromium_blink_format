@@ -361,8 +361,6 @@ typedef enum {
   NPNVsupportsOpenGLBool = 2002 /* TRUE if the browser supports the OpenGL
                                    drawing model (CGL on Mac) */
 
-  ,
-  NPNVpluginEventModel = 1001 /* The NPEventModel specified by the plugin */
 #ifndef NP_NO_CARBON
   ,
   NPNVsupportsCarbonBool =
