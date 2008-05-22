@@ -157,8 +157,7 @@ JSValueRef InspectorController::callFunction(JSContextRef context,
   return result;
 }
 
-#pragma mark -
-#pragma mark ConsoleMessage Struct
+// ConsoleMessage Struct
 
 struct ConsoleMessage {
   ConsoleMessage(MessageSource s,
@@ -188,8 +187,7 @@ struct ConsoleMessage {
   String url;
 };
 
-#pragma mark -
-#pragma mark XMLHttpRequestResource Class
+// XMLHttpRequestResource Class
 
 struct XMLHttpRequestResource {
   XMLHttpRequestResource(KJS::UString& sourceString) {
@@ -205,8 +203,7 @@ struct XMLHttpRequestResource {
   RefPtr<KJS::UString::Rep> sourceString;
 };
 
-#pragma mark -
-#pragma mark InspectorResource Struct
+// InspectorResource Struct
 
 struct InspectorResource : public RefCounted<InspectorResource> {
   // Keep these in sync with WebInspector.Resource.Type
@@ -339,8 +336,7 @@ struct InspectorResource : public RefCounted<InspectorResource> {
         endTime(-1.0) {}
 };
 
-#pragma mark -
-#pragma mark InspectorDatabaseResource Struct
+// InspectorDatabaseResource Struct
 
 #if ENABLE(DATABASE)
 struct InspectorDatabaseResource
@@ -386,8 +382,7 @@ struct InspectorDatabaseResource
 };
 #endif
 
-#pragma mark -
-#pragma mark JavaScript Callbacks
+// JavaScript Callbacks
 
 static bool addSourceToFrame(const String& mimeType,
                              const String& source,
@@ -1136,8 +1131,7 @@ static JSValueRef removeBreakpoint(JSContextRef ctx,
   return JSValueMakeUndefined(ctx);
 }
 
-#pragma mark -
-#pragma mark Profiles
+// Profiles
 
 static JSValueRef profiles(JSContextRef ctx,
                            JSObjectRef /*function*/,
@@ -1189,8 +1183,7 @@ static JSValueRef profiles(JSContextRef ctx,
   return result;
 }
 
-#pragma mark -
-#pragma mark InspectorController Class
+// InspectorController Class
 
 InspectorController::InspectorController(Page* page, InspectorClient* client)
     : m_inspectedPage(page),
@@ -2696,8 +2689,7 @@ bool InspectorController::handleException(JSContextRef context,
   return true;
 }
 
-#pragma mark -
-#pragma mark JavaScriptDebugListener functions
+// JavaScriptDebugListener functions
 
 void InspectorController::didParseSource(ExecState*,
                                          const SourceProvider& source,
