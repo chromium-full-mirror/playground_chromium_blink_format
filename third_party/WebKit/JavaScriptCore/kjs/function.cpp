@@ -606,10 +606,6 @@ JSValue* globalFuncEval(ExecState* exec,
   int errLine;
   UString errMsg;
 
-#if JAVASCRIPT_PROFILING
-  Profiler::profiler()->willExecute(exec, UString(), 0);
-#endif
-
   RefPtr<EvalNode> evalNode = parser().parse<EvalNode>(
       exec, UString(), 0, UStringSourceProvider::create(s), &sourceId, &errLine,
       &errMsg);
@@ -622,10 +618,6 @@ JSValue* globalFuncEval(ExecState* exec,
       machine().execute(evalNode.get(), exec, thisObj,
                         &exec->dynamicGlobalObject()->registerFileStack(),
                         globalObject->globalScopeChain().node(), &exception);
-
-#if JAVASCRIPT_PROFILING
-  Profiler::profiler()->didExecute(exec, UString(), 0);
-#endif
 
   if (exception) {
     exec->setException(exception);

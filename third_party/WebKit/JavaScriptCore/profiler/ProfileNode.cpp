@@ -44,6 +44,7 @@ ProfileNode::ProfileNode(const CallIdentifier& callIdentifier,
     : m_callIdentifier(callIdentifier),
       m_headNode(headNode),
       m_parentNode(parentNode),
+      m_startTime(0.0),
       m_actualTotalTime(0.0),
       m_visibleTotalTime(0.0),
       m_actualSelfTime(0.0),
@@ -53,25 +54,14 @@ ProfileNode::ProfileNode(const CallIdentifier& callIdentifier,
   if (!m_headNode)
     m_headNode = this;
 
-  m_startTime = getCurrentUTCTimeWithMicroseconds();
+  startTimer();
 }
 
-void ProfileNode::willExecute() {
-  if (!m_startTime)
-    m_startTime = getCurrentUTCTimeWithMicroseconds();
-}
-
-ProfileNode* ProfileNode::didExecute() {
-  endAndRecordCall();
-  return m_parentNode;
-}
-
-ProfileNode* ProfileNode::addOrStartChild(
-    const CallIdentifier& callIdentifier) {
+ProfileNode* ProfileNode::willExecute(const CallIdentifier& callIdentifier) {
   for (StackIterator currentChild = m_children.begin();
        currentChild != m_children.end(); ++currentChild) {
     if ((*currentChild)->callIdentifier() == callIdentifier) {
-      (*currentChild)->willExecute();
+      (*currentChild)->startTimer();
       return (*currentChild).get();
     }
   }
@@ -80,13 +70,41 @@ ProfileNode* ProfileNode::addOrStartChild(
   return m_children.last().get();
 }
 
+ProfileNode* ProfileNode::didExecute() {
+  endAndRecordCall();
+  return m_parentNode;
+}
+
+void ProfileNode::addChild(PassRefPtr<ProfileNode> prpChild) {
+  RefPtr<ProfileNode> child = prpChild;
+  child->setParent(this);
+  m_children.append(child.release());
+}
+
+void ProfileNode::insertNode(PassRefPtr<ProfileNode> prpNode) {
+  RefPtr<ProfileNode> node = prpNode;
+
+  double sumOfChildrensTime = 0.0;
+  for (unsigned i = 0; i < m_children.size(); ++i) {
+    sumOfChildrensTime += m_children[i]->totalTime();
+    node->addChild(m_children[i].release());
+  }
+
+  m_children.clear();
+
+  node->didExecute();
+  node->setTotalTime(sumOfChildrensTime);
+  node->setSelfTime(0.0);
+  m_children.append(node.release());
+}
+
 void ProfileNode::stopProfiling() {
   if (m_startTime)
     endAndRecordCall();
 
   m_visibleTotalTime = m_actualTotalTime;
 
-  ASSERT(m_actualSelfTime == 0.0);
+  ASSERT(m_actualSelfTime == 0.0 && m_startTime == 0.0);
 
   // Calculate Self time and the percentages once we stop profiling.
   StackIterator endOfChildren = m_children.end();
@@ -100,8 +118,7 @@ void ProfileNode::stopProfiling() {
   m_actualSelfTime = m_actualTotalTime - m_actualSelfTime;
 
   if (m_headNode == this && m_actualSelfTime) {
-    ProfileNode* idleNode =
-        addOrStartChild(CallIdentifier(NonJSExecution, 0, 0));
+    ProfileNode* idleNode = willExecute(CallIdentifier(NonJSExecution, 0, 0));
 
     idleNode->setTotalTime(m_actualSelfTime);
     idleNode->setSelfTime(m_actualSelfTime);
@@ -263,6 +280,11 @@ void ProfileNode::endAndRecordCall() {
   m_startTime = 0.0;
 
   ++m_numberOfCalls;
+}
+
+void ProfileNode::startTimer() {
+  if (!m_startTime)
+    m_startTime = getCurrentUTCTimeWithMicroseconds();
 }
 
 #ifndef NDEBUG

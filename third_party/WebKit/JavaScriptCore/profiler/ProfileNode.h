@@ -55,6 +55,9 @@ struct CallIdentifier {
   inline bool operator==(const CallIdentifier& ci) const {
     return ci.lineNumber == lineNumber && ci.name == name && ci.url == url;
   }
+#ifndef NDEBUG
+  const char* toString() const { return name.UTF8String().c_str(); }
+#endif
 };
 
 class ProfileNode : public RefCounted<ProfileNode> {
@@ -65,15 +68,14 @@ class ProfileNode : public RefCounted<ProfileNode> {
     return adoptRef(new ProfileNode(callIdentifier, headNode, parentNode));
   }
 
-  void willExecute();
+  ProfileNode* willExecute(const CallIdentifier&);
   ProfileNode* didExecute();
-
-  ProfileNode* addOrStartChild(const CallIdentifier&);
 
   void stopProfiling();
 
   const CallIdentifier& callIdentifier() const { return m_callIdentifier; }
   ProfileNode* parent() const { return m_parentNode; }
+  void setParent(ProfileNode* parent) { m_parentNode = parent; }
   UString functionName() const { return m_callIdentifier.name; }
   UString url() const { return m_callIdentifier.url; }
   unsigned lineNumber() const { return m_callIdentifier.lineNumber; }
@@ -86,7 +88,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
   double selfTime() const { return m_visibleSelfTime; }
   void setSelfTime(double time) {
     m_actualSelfTime = time;
-    m_visibleTotalTime = time;
+    m_visibleSelfTime = time;
   }
   double totalPercent() const {
     return (m_visibleTotalTime / m_headNode->totalTime()) * 100.0;
@@ -96,7 +98,9 @@ class ProfileNode : public RefCounted<ProfileNode> {
   }
   unsigned numberOfCalls() const { return m_numberOfCalls; }
   void setNumberOfCalls(unsigned number) { m_numberOfCalls = number; }
-  const Vector<RefPtr<ProfileNode>>& children() { return m_children; }
+  const Vector<RefPtr<ProfileNode>>& children() const { return m_children; }
+  void addChild(PassRefPtr<ProfileNode> prpChild);
+  void insertNode(PassRefPtr<ProfileNode> prpNode);
   bool visible() const { return m_visible; }
   void setVisible(bool visible) { m_visible = visible; }
 
@@ -116,6 +120,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
   void endAndRecordCall();
 
 #ifndef NDEBUG
+  const char* toString() const { return m_callIdentifier.toString(); }
   void debugPrintData(int indentLevel) const;
   double debugPrintDataSampleStyle(int indentLevel,
                                    FunctionCallHashCount&) const;
@@ -124,6 +129,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
   ProfileNode(const CallIdentifier& callIdentifier,
               ProfileNode* headNode,
               ProfileNode* parentNode);
+  void startTimer();
 
   CallIdentifier m_callIdentifier;
   ProfileNode* m_headNode;
