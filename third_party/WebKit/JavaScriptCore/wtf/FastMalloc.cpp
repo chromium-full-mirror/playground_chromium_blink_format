@@ -183,6 +183,10 @@ void* fastRealloc(void* p, size_t n) {
 
 }  // namespace WTF
 
+extern "C" {
+void releaseFastMallocFreeMemory() {}
+}
+
 #if PLATFORM(DARWIN)
 // This symbol is present in the JavaScriptCore exports file even when
 // FastMalloc is disabled.
@@ -3720,6 +3724,13 @@ void FastMallocZone::init() {
   static FastMallocZone zone(
       pageheap, &thread_heaps,
       static_cast<TCMalloc_Central_FreeListPadded*>(central_cache));
+}
+
+extern "C" {
+void releaseFastMallocFreeMemory() {
+  SpinLockHolder h(&pageheap_lock);
+  pageheap->ReleaseFreePages();
+}
 }
 
 #endif
