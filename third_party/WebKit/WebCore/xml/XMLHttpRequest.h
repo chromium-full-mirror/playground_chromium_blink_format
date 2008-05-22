@@ -21,9 +21,11 @@
 #ifndef XMLHttpRequest_h
 #define XMLHttpRequest_h
 
+#include "AccessControlList.h"
 #include "EventTarget.h"
 #include "ResourceResponse.h"
 #include "SubresourceLoaderClient.h"
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
@@ -132,7 +134,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
                                     const AuthenticationChallenge&);
 
   void processSyncLoadResults(const Vector<char>& data,
-                              const ResourceResponse&);
+                              const ResourceResponse&,
+                              ExceptionCode&);
   void updateAndDispatchOnProgress(unsigned int len);
 
   String responseMIMEType() const;
@@ -148,6 +151,9 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void clearResponseEntityBody();
 
   void sameOriginRequest(const String& body, ResourceRequest&);
+  void crossSiteAccessRequest(const String& body,
+                              ResourceRequest&,
+                              ExceptionCode&);
 
   void loadRequestSynchronously(ResourceRequest&, ExceptionCode&);
   void loadRequestAsynchronously(ResourceRequest&);
@@ -194,6 +200,13 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   mutable RefPtr<Document> m_responseXML;
 
   bool m_error;
+
+  bool m_sameOriginRequest;
+  bool m_allowAccess;
+
+  // FIXME: Add support for AccessControlList in a PI in an XML document in
+  // addition to the http header.
+  OwnPtr<AccessControlList> m_httpAccessControlList;
 
   // Used for onprogress tracking
   long long m_receivedLength;

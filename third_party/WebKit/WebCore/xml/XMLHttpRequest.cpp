@@ -143,6 +143,8 @@ XMLHttpRequest::XMLHttpRequest(Document* doc)
       m_responseText(""),
       m_createdDocument(false),
       m_error(false),
+      m_sameOriginRequest(true),
+      m_allowAccess(false),
       m_receivedLength(0) {
   ASSERT(m_doc);
   addToRequestsByDocument(m_doc, this);
@@ -334,11 +336,6 @@ void XMLHttpRequest::open(const String& method,
 
   ASSERT(m_state == UNSENT);
 
-  if (!urlMatchesDocumentDomain(url)) {
-    ec = SECURITY_ERR;
-    return;
-  }
-
   if (!isValidToken(method)) {
     ec = SYNTAX_ERR;
     return;
@@ -414,8 +411,16 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
 
   m_error = false;
 
+  m_sameOriginRequest = urlMatchesDocumentDomain(m_url);
+
   ResourceRequest request;
-  sameOriginRequest(body, request);
+  if (m_sameOriginRequest)
+    sameOriginRequest(body, request);
+  else {
+    crossSiteAccessRequest(body, request, ec);
+    if (ec)
+      return;
+  }
 
   if (m_async) {
     loadRequestAsynchronously(request);
@@ -458,6 +463,26 @@ void XMLHttpRequest::sameOriginRequest(const String& body,
     request.addHTTPHeaderFields(m_requestHeaders);
 }
 
+void XMLHttpRequest::crossSiteAccessRequest(const String& body,
+                                            ResourceRequest& request,
+                                            ExceptionCode& ec) {
+  // FIXME: add support for non-GET cross-domain requests.
+  if (m_method != "GET") {
+    networkError();
+    ec = XMLHttpRequestException::NETWORK_ERR;
+    return;
+  }
+
+  KURL url = m_url;
+  url.setUser(String());
+  url.setPass(String());
+
+  request.setURL(url);
+  request.setHTTPMethod(m_method);
+  request.setHTTPHeaderField("Access-Control-Origin",
+                             m_doc->securityOrigin()->toString());
+}
+
 void XMLHttpRequest::loadRequestSynchronously(ResourceRequest& request,
                                               ExceptionCode& ec) {
   ASSERT(!m_async);
@@ -479,7 +504,7 @@ void XMLHttpRequest::loadRequestSynchronously(ResourceRequest& request,
   // Also, if we have an HTTP response, then it wasn't a network error in fact.
   if (error.isNull() || request.url().isLocalFile() ||
       response.httpStatusCode() > 0) {
-    processSyncLoadResults(data, response);
+    processSyncLoadResults(data, response, ec);
     return;
   }
 
@@ -741,25 +766,18 @@ String XMLHttpRequest::statusText(ExceptionCode& ec) const {
 }
 
 void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
-                                            const ResourceResponse& response) {
-  if (!urlMatchesDocumentDomain(response.url())) {
-    internalAbort();
-    return;
-  }
-
+                                            const ResourceResponse& response,
+                                            ExceptionCode& ec) {
   didReceiveResponse(0, response);
   changeState(HEADERS_RECEIVED);
-  if (m_error)
-    return;
 
   const char* bytes = static_cast<const char*>(data.data());
   int len = static_cast<int>(data.size());
-
   didReceiveData(0, bytes, len);
-  if (m_error)
-    return;
 
   didFinishLoading(0);
+  if (m_error)
+    ec = XMLHttpRequestException::NETWORK_ERR;
 }
 
 void XMLHttpRequest::didFail(SubresourceLoader* loader,
@@ -776,6 +794,22 @@ void XMLHttpRequest::didFail(SubresourceLoader* loader,
 void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
   if (m_error)
     return;
+
+  if (!m_sameOriginRequest) {
+    if (m_method == "GET") {
+      // FIXME: Do list check for PIAccessControlList for responses with XML
+      // MIME type.
+      if (!m_allowAccess) {
+        networkError();
+        return;
+      }
+    } else {
+      ASSERT_NOT_REACHED();
+      // FIXME: Support non-GET cross-domain requests.
+      networkError();
+      return;
+    }
+  }
 
   ASSERT(loader == m_loader);
 
@@ -807,12 +841,21 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
 void XMLHttpRequest::willSendRequest(SubresourceLoader*,
                                      ResourceRequest& request,
                                      const ResourceResponse& redirectResponse) {
+  // FIXME: This needs to be fixed to follow the redirect correctly even for
+  // cross-domain requests.
   if (!urlMatchesDocumentDomain(request.url()))
     internalAbort();
 }
 
 void XMLHttpRequest::didReceiveResponse(SubresourceLoader*,
                                         const ResourceResponse& response) {
+  if (!m_sameOriginRequest && m_method == "GET") {
+    m_httpAccessControlList.set(
+        new AccessControlList(response.httpHeaderField("Access-Control")));
+    if (m_httpAccessControlList->checkOrigin(m_doc->securityOrigin()))
+      m_allowAccess = true;
+  }
+
   m_response = response;
   m_responseEncoding = extractCharsetFromMediaType(m_mimeTypeOverride);
   if (m_responseEncoding.isEmpty())
@@ -921,4 +964,4 @@ void XMLHttpRequest::detachRequests(Document* m_doc) {
   delete requests;
 }
 
-}  // end namespace
+}  // namespace WebCore

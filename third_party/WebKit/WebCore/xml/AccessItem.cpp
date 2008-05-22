@@ -26,19 +26,19 @@
 #include "config.h"
 #include "AccessItem.h"
 
+#include "KURL.h"
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
-#include <stdio.h>
 
 #ifndef NDEBUG
 #include "CString.h"
+#include <stdio.h>
 #endif
 
 namespace WebCore {
 
 AccessItem::AccessItem(const String& accessItemString)
-    : m_valid(false),
-      m_wildcard(false),
+    : m_wildcard(false),
       m_domainWildcard(false),
       m_portWildcard(false),
       m_port(0)
@@ -47,7 +47,15 @@ AccessItem::AccessItem(const String& accessItemString)
       m_string(accessItemString)
 #endif
 {
-  parseAccessItem(accessItemString);
+  // FIXME: Remove this when parseAccessItem is implemented and instead parse
+  // the
+  // accessItemString.
+  KURL accessItemURL(accessItemString);
+  m_valid = accessItemURL.isValid();
+  if (m_valid) {
+    m_origin = SecurityOrigin::create(accessItemURL);
+    parseAccessItem(accessItemString);
+  }
 }
 
 void AccessItem::parseAccessItem(const String& accessItemString) {
@@ -62,8 +70,11 @@ void AccessItem::parseAccessItem(const String& accessItemString) {
   // FIXME: Parse the AccessItem.
 }
 
-bool AccessItem::matches(const SecurityOrigin* accessControlOrigin) {
-  return false;
+bool AccessItem::matches(const SecurityOrigin* accessControlOrigin) const {
+  // FIXME: Remove this when parseAccessItem is implemented and instead
+  // implement the
+  // specified matching alogorithm.
+  return m_origin->isSameSchemeHostPort(accessControlOrigin);
 }
 
 #ifndef NDEBUG
