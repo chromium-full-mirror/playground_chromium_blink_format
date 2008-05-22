@@ -32,11 +32,12 @@ class ScopeChainIterator;
 
 class ScopeChainNode {
  public:
-  ScopeChainNode(ScopeChainNode* n, JSObject* o)
-      : next(n), object(o), refCount(1) {}
+  ScopeChainNode(ScopeChainNode* n, JSObject* o, JSObject* gt)
+      : next(n), object(o), globalThis(gt), refCount(1) {}
 
   ScopeChainNode* next;
   JSObject* object;
+  JSObject* globalThis;
   int refCount;
 
   void deref() {
@@ -65,6 +66,7 @@ class ScopeChainNode {
   ScopeChainIterator end() const;
 
   JSGlobalObject* globalObject() const;  // defined in JSGlobalObject.h
+  JSObject* globalThisObject() const { return globalThis; }
 
 #ifndef NDEBUG
   void print() const;
@@ -73,7 +75,7 @@ class ScopeChainNode {
 
 inline ScopeChainNode* ScopeChainNode::push(JSObject* o) {
   ASSERT(o);
-  return new ScopeChainNode(this, o);
+  return new ScopeChainNode(this, o, globalThis);
 }
 
 inline ScopeChainNode* ScopeChainNode::pop() {
@@ -142,7 +144,8 @@ inline ScopeChainIterator ScopeChainNode::end() const {
 
 class ScopeChain {
  public:
-  ScopeChain(JSObject* o) : _node(new ScopeChainNode(0, o)) {}
+  ScopeChain(JSObject* o, JSObject* globalThis)
+      : _node(new ScopeChainNode(0, o, globalThis)) {}
 
   ScopeChain(const ScopeChain& c) : _node(c._node->copy()) {}
 

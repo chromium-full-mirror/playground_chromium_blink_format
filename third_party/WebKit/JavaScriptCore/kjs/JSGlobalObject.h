@@ -84,7 +84,7 @@ class JSGlobalObject : public JSVariableObject {
         : JSVariableObjectData(&symbolTable,
                                registerFileStack.globalBasePointer(),
                                0),
-          globalScopeChain(globalObject),
+          globalScopeChain(globalObject, thisValue),
           globalExec(
               new ExecState(globalObject, thisValue, globalScopeChain.node())) {
     }
