@@ -164,9 +164,7 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate3 {
       /* [in] */ IWebView* sender,
       /* [in] */ BSTR message,
       /* [in] */ IWebFrame* initiatedByFrame,
-      /* [retval][out] */ BOOL* result) {
-    return E_NOTIMPL;
-  }
+      /* [retval][out] */ BOOL* result);
 
   virtual HRESULT STDMETHODCALLTYPE runOpenPanelForFileButtonWithResultListener(
       /* [in] */ IWebView* sender,
