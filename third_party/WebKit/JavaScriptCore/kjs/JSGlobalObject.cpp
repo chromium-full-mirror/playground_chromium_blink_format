@@ -233,6 +233,22 @@ void JSGlobalObject::putWithAttributes(ExecState* exec,
   }
 }
 
+void JSGlobalObject::defineGetter(ExecState* exec,
+                                  const Identifier& propertyName,
+                                  JSObject* getterFunc) {
+  PropertySlot slot;
+  if (!symbolTableGet(propertyName, slot))
+    JSVariableObject::defineGetter(exec, propertyName, getterFunc);
+}
+
+void JSGlobalObject::defineSetter(ExecState* exec,
+                                  const Identifier& propertyName,
+                                  JSObject* setterFunc) {
+  PropertySlot slot;
+  if (!symbolTableGet(propertyName, slot))
+    JSVariableObject::defineSetter(exec, propertyName, setterFunc);
+}
+
 static inline JSObject* lastInPrototypeChain(JSObject* object) {
   JSObject* o = object;
   while (o->prototype()->isObject())
