@@ -986,29 +986,29 @@ RegisterID* CodeGenerator::emitNewFunctionExpression(RegisterID* r0,
   return r0;
 }
 
-RegisterID* CodeGenerator::emitCall(RegisterID* r0,
-                                    RegisterID* r1,
-                                    RegisterID* r2,
+RegisterID* CodeGenerator::emitCall(RegisterID* dst,
+                                    RegisterID* func,
+                                    RegisterID* base,
                                     ArgumentsNode* argumentsNode) {
-  return emitCall(op_call, r0, r1, r2, argumentsNode);
+  return emitCall(op_call, dst, func, base, argumentsNode);
 }
 
-RegisterID* CodeGenerator::emitCallEval(RegisterID* r0,
-                                        RegisterID* r1,
-                                        RegisterID* r2,
+RegisterID* CodeGenerator::emitCallEval(RegisterID* dst,
+                                        RegisterID* func,
+                                        RegisterID* base,
                                         ArgumentsNode* argumentsNode) {
-  return emitCall(op_call_eval, r0, r1, r2, argumentsNode);
+  return emitCall(op_call_eval, dst, func, base, argumentsNode);
 }
 
 RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
-                                    RegisterID* r0,
-                                    RegisterID* r1,
-                                    RegisterID* r2,
+                                    RegisterID* dst,
+                                    RegisterID* func,
+                                    RegisterID* base,
                                     ArgumentsNode* argumentsNode) {
   ASSERT(opcodeID == op_call || opcodeID == op_call_eval);
 
-  RefPtr<RegisterID> ref1 = r1;
-  RefPtr<RegisterID> ref2 = r2;
+  RefPtr<RegisterID> refFunc = func;
+  RefPtr<RegisterID> refBase = base;
 
   // Reserve space for call frame.
   Vector<RefPtr<RegisterID>, Machine::CallFrameHeaderSize> callFrame;
@@ -1025,20 +1025,18 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
   }
 
   instructions().append(machine().getOpcode(opcodeID));
-  instructions().append(r0->index());
-  instructions().append(r1->index());
+  instructions().append(dst->index());
+  instructions().append(func->index());
   instructions().append(
-      r2 ? r2->index() : missingThisObjectMarker());  // We encode the "this"
-                                                      // value in the
-                                                      // instruction stream, to
-                                                      // avoid an explicit
-                                                      // instruction for copying
-                                                      // or loading it.
+      base ? base->index()
+           : missingThisObjectMarker());  // We encode the "this" value in the
+                                          // instruction stream, to avoid an
+                                          // explicit instruction for copying or
+                                          // loading it.
   instructions().append(argv.size() ? argv[0]->index()
                                     : m_temporaries.size());  // argv
   instructions().append(argv.size());                         // argc
-
-  return r0;
+  return dst;
 }
 
 RegisterID* CodeGenerator::emitReturn(RegisterID* r0) {
@@ -1047,14 +1045,14 @@ RegisterID* CodeGenerator::emitReturn(RegisterID* r0) {
   return r0;
 }
 
-RegisterID* CodeGenerator::emitEnd(RegisterID* r0) {
+RegisterID* CodeGenerator::emitEnd(RegisterID* dst) {
   instructions().append(machine().getOpcode(op_end));
-  instructions().append(r0->index());
-  return r0;
+  instructions().append(dst->index());
+  return dst;
 }
 
-RegisterID* CodeGenerator::emitConstruct(RegisterID* r0,
-                                         RegisterID* r1,
+RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
+                                         RegisterID* func,
                                          ArgumentsNode* argumentsNode) {
   // Reserve space for call frame.
   Vector<RefPtr<RegisterID>, Machine::CallFrameHeaderSize> callFrame;
@@ -1072,12 +1070,12 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* r0,
   }
 
   instructions().append(machine().getOpcode(op_construct));
-  instructions().append(r0->index());
-  instructions().append(r1->index());
+  instructions().append(dst->index());
+  instructions().append(func->index());
   instructions().append(argv.size() ? argv[0]->index()
                                     : m_temporaries.size());  // argv
   instructions().append(argv.size());                         // argc
-  return r0;
+  return dst;
 }
 
 RegisterID* CodeGenerator::emitPushScope(RegisterID* scope) {
