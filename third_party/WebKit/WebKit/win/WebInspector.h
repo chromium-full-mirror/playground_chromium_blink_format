@@ -46,6 +46,7 @@ class WebInspector : public IWebInspector, Noncopyable {
 
   virtual HRESULT STDMETHODCALLTYPE show();
   virtual HRESULT STDMETHODCALLTYPE showConsole();
+  virtual HRESULT STDMETHODCALLTYPE unused1();
   virtual HRESULT STDMETHODCALLTYPE close();
   virtual HRESULT STDMETHODCALLTYPE attach();
   virtual HRESULT STDMETHODCALLTYPE detach();

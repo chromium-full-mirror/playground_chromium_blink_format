@@ -102,6 +102,10 @@ HRESULT STDMETHODCALLTYPE WebInspector::showConsole() {
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE WebInspector::unused1() {
+  return S_OK;
+}
+
 HRESULT STDMETHODCALLTYPE WebInspector::close() {
   if (m_webView)
     if (Page* page = m_webView->page())
