@@ -1793,6 +1793,18 @@ RegisterID* PostIncResolveNode::emitCode(CodeGenerator& generator,
     return generator.emitPostInc(generator.finalDestination(dst), local);
   }
 
+  int index = 0;
+  size_t depth = 0;
+  if (generator.findScopedProperty(m_ident, index, depth) &&
+      index != missingSymbolMarker()) {
+    RefPtr<RegisterID> value =
+        generator.emitGetScopedVar(generator.newTemporary(), depth, index);
+    RegisterID* oldValue =
+        generator.emitPostInc(generator.finalDestination(dst), value.get());
+    generator.emitPutScopedVar(depth, index, value.get());
+    return oldValue;
+  }
+
   RefPtr<RegisterID> value = generator.newTemporary();
   RefPtr<RegisterID> base = generator.emitResolveWithBase(
       generator.newTemporary(), value.get(), m_ident);
@@ -1876,6 +1888,18 @@ RegisterID* PostDecResolveNode::emitCode(CodeGenerator& generator,
       return generator.emitToJSNumber(generator.finalDestination(dst), local);
 
     return generator.emitPostDec(generator.finalDestination(dst), local);
+  }
+
+  int index = 0;
+  size_t depth = 0;
+  if (generator.findScopedProperty(m_ident, index, depth) &&
+      index != missingSymbolMarker()) {
+    RefPtr<RegisterID> value =
+        generator.emitGetScopedVar(generator.newTemporary(), depth, index);
+    RegisterID* oldValue =
+        generator.emitPostDec(generator.finalDestination(dst), value.get());
+    generator.emitPutScopedVar(depth, index, value.get());
+    return oldValue;
   }
 
   RefPtr<RegisterID> value = generator.newTemporary();
@@ -2441,6 +2465,18 @@ RegisterID* PreIncResolveNode::emitCode(CodeGenerator& generator,
     return generator.moveToDestinationIfNeeded(dst, local);
   }
 
+  int index = 0;
+  size_t depth = 0;
+  if (generator.findScopedProperty(m_ident, index, depth) &&
+      index != missingSymbolMarker()) {
+    RefPtr<RegisterID> propDst = generator.emitGetScopedVar(
+        generator.tempDestination(dst), depth, index);
+    generator.emitPreInc(propDst.get());
+    generator.emitPutScopedVar(depth, index, propDst.get());
+    return generator.moveToDestinationIfNeeded(dst, propDst.get());
+    ;
+  }
+
   RefPtr<RegisterID> propDst = generator.tempDestination(dst);
   RefPtr<RegisterID> base = generator.emitResolveWithBase(
       generator.newTemporary(), propDst.get(), m_ident);
@@ -2512,6 +2548,18 @@ RegisterID* PreDecResolveNode::emitCode(CodeGenerator& generator,
 
     generator.emitPreDec(local);
     return generator.moveToDestinationIfNeeded(dst, local);
+  }
+
+  int index = 0;
+  size_t depth = 0;
+  if (generator.findScopedProperty(m_ident, index, depth) &&
+      index != missingSymbolMarker()) {
+    RefPtr<RegisterID> propDst = generator.emitGetScopedVar(
+        generator.tempDestination(dst), depth, index);
+    generator.emitPreDec(propDst.get());
+    generator.emitPutScopedVar(depth, index, propDst.get());
+    return generator.moveToDestinationIfNeeded(dst, propDst.get());
+    ;
   }
 
   RefPtr<RegisterID> propDst = generator.tempDestination(dst);
@@ -4282,6 +4330,20 @@ RegisterID* ReadModifyResolveNode::emitCode(CodeGenerator& generator,
     RegisterID* result =
         emitReadModifyAssignment(generator, local, local, src2, m_operator);
     return generator.moveToDestinationIfNeeded(dst, result);
+  }
+
+  int index = 0;
+  size_t depth = 0;
+  if (generator.findScopedProperty(m_ident, index, depth) &&
+      index != missingSymbolMarker()) {
+    RefPtr<RegisterID> src1 = generator.emitGetScopedVar(
+        generator.tempDestination(dst), depth, index);
+    RegisterID* src2 = generator.emitNode(m_right.get());
+    RegisterID* result = emitReadModifyAssignment(
+        generator, generator.finalDestination(dst, src1.get()), src1.get(),
+        src2, m_operator);
+    generator.emitPutScopedVar(depth, index, result);
+    return result;
   }
 
   RefPtr<RegisterID> src1 = generator.tempDestination(dst);
