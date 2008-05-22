@@ -43,8 +43,8 @@ class Profile : public RefCounted<Profile> {
         new Profile(title, originatingGlobalExec, pageGroupIdentifier));
   }
 
-  void willExecute(const Vector<CallIdentifier>& CallIdentifier);
-  void didExecute(const Vector<CallIdentifier>& CallIdentifier);
+  void willExecute(const CallIdentifier&);
+  void didExecute(const CallIdentifier&);
   void stopProfiling();
 
   const UString& title() const { return m_title; };
@@ -78,7 +78,7 @@ class Profile : public RefCounted<Profile> {
 #endif
 
   typedef void (Profile::*ProfileFunction)(
-      const Vector<CallIdentifier>& callIdentifiers);
+      const CallIdentifier& callIdentifiers);
 
  private:
   Profile(const UString& title,
@@ -89,6 +89,7 @@ class Profile : public RefCounted<Profile> {
   ExecState* m_originatingGlobalExec;
   unsigned m_pageGroupIdentifier;
   RefPtr<ProfileNode> m_callTree;
+  RefPtr<ProfileNode> m_currentNode;
 };
 
 }  // namespace KJS
