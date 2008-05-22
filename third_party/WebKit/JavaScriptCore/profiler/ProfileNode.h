@@ -59,8 +59,9 @@ struct CallIdentifier {
 
 class ProfileNode : public RefCounted<ProfileNode> {
  public:
-  static PassRefPtr<ProfileNode> create(const CallIdentifier& callIdentifier) {
-    return adoptRef(new ProfileNode(callIdentifier));
+  static PassRefPtr<ProfileNode> create(const CallIdentifier& callIdentifier,
+                                        ProfileNode* headNode) {
+    return adoptRef(new ProfileNode(callIdentifier, headNode));
   }
 
   void willExecute();
@@ -70,25 +71,34 @@ class ProfileNode : public RefCounted<ProfileNode> {
   void addChild(PassRefPtr<ProfileNode> prpChild);
   ProfileNode* findChild(const CallIdentifier& functionName);
 
-  void stopProfiling(double totalProfileTime, bool headProfileNode = false);
+  void stopProfiling();
 
   const CallIdentifier& callIdentifier() const { return m_callIdentifier; }
   UString functionName() const { return m_callIdentifier.name; }
   UString url() const { return m_callIdentifier.url; }
   unsigned lineNumber() const { return m_callIdentifier.lineNumber; }
 
-  double totalTime() const { return m_totalTime; }
-  void setTotalTime(double time) { m_totalTime = time; }
-  double selfTime() const { return m_selfTime; }
-  void setSelfTime(double time) { m_selfTime = time; }
-  double totalPercent() const { return m_totalPercent; }
-  double selfPercent() const { return m_selfPercent; }
+  double totalTime() const { return m_visibleTotalTime; }
+  void setTotalTime(double time) {
+    m_actualTotalTime = time;
+    m_visibleTotalTime = time;
+  }
+  double selfTime() const { return m_visibleSelfTime; }
+  void setSelfTime(double time) {
+    m_actualSelfTime = time;
+    m_visibleTotalTime = time;
+  }
+  double totalPercent() const {
+    return (m_visibleTotalTime / m_headNode->totalTime()) * 100.0;
+  }
+  double selfPercent() const {
+    return (m_visibleSelfTime / m_headNode->totalTime()) * 100.0;
+  }
   unsigned numberOfCalls() const { return m_numberOfCalls; }
   void setNumberOfCalls(unsigned number) { m_numberOfCalls = number; }
   const Vector<RefPtr<ProfileNode>>& children() { return m_children; }
   bool visible() const { return m_visible; }
   void setVisible(bool visible) { m_visible = visible; }
-  void setTreeVisible(bool visible);
 
   // Sorting functions
   void sortTotalTimeDescending();
@@ -100,11 +110,10 @@ class ProfileNode : public RefCounted<ProfileNode> {
   void sortFunctionNameDescending();
   void sortFunctionNameAscending();
 
-  bool focus(const CallIdentifier& callIdentifier);
+  void focus(const CallIdentifier& callIdentifier, bool forceVisible = false);
   void restoreAll();
 
   void endAndRecordCall();
-  void calculatePercentages(double totalProfileTime);
 
 #ifndef NDEBUG
   void debugPrintData(int indentLevel) const;
@@ -112,15 +121,16 @@ class ProfileNode : public RefCounted<ProfileNode> {
                                    FunctionCallHashCount&) const;
 #endif
  private:
-  ProfileNode(const CallIdentifier& callIdentifier);
+  ProfileNode(const CallIdentifier& callIdentifier, ProfileNode* headNode);
 
   CallIdentifier m_callIdentifier;
+  ProfileNode* m_headNode;
 
   double m_startTime;
-  double m_totalTime;
-  double m_selfTime;
-  double m_totalPercent;
-  double m_selfPercent;
+  double m_actualTotalTime;
+  double m_visibleTotalTime;
+  double m_actualSelfTime;
+  double m_visibleSelfTime;
   unsigned m_numberOfCalls;
 
   bool m_visible;

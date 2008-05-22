@@ -38,14 +38,19 @@ namespace KJS {
 
 static const char* NonJSExecution = "(non-JavaScript)";
 
-ProfileNode::ProfileNode(const CallIdentifier& callIdentifier)
+ProfileNode::ProfileNode(const CallIdentifier& callIdentifier,
+                         ProfileNode* headNode)
     : m_callIdentifier(callIdentifier),
-      m_totalTime(0.0),
-      m_selfTime(0.0),
-      m_totalPercent(0.0),
-      m_selfPercent(0.0),
+      m_headNode(headNode),
+      m_actualTotalTime(0.0),
+      m_visibleTotalTime(0.0),
+      m_actualSelfTime(0.0),
+      m_visibleSelfTime(0.0),
       m_numberOfCalls(0),
       m_visible(true) {
+  if (!m_headNode)
+    m_headNode = this;
+
   m_startTime = getCurrentUTCTimeWithMicroseconds();
 }
 
@@ -95,48 +100,37 @@ ProfileNode* ProfileNode::findChild(const CallIdentifier& functionName) {
   return 0;
 }
 
-void ProfileNode::stopProfiling(double totalProfileTime, bool headProfileNode) {
+void ProfileNode::stopProfiling() {
   if (m_startTime)
     endAndRecordCall();
+  m_visibleTotalTime = m_actualTotalTime;
 
-  ASSERT(m_selfTime == 0.0);
-
-  if (headProfileNode)
-    totalProfileTime = m_totalTime;
+  ASSERT(m_actualSelfTime == 0.0);
 
   // Calculate Self time and the percentages once we stop profiling.
   StackIterator endOfChildren = m_children.end();
   for (StackIterator currentChild = m_children.begin();
        currentChild != endOfChildren; ++currentChild) {
-    (*currentChild)->stopProfiling(totalProfileTime);
-    m_selfTime += (*currentChild)->totalTime();
+    (*currentChild)->stopProfiling();
+    m_actualSelfTime += (*currentChild)->totalTime();
   }
 
-  ASSERT(m_selfTime <= m_totalTime);
-  m_selfTime = m_totalTime - m_selfTime;
+  ASSERT(m_actualSelfTime <= m_actualTotalTime);
+  m_actualSelfTime = m_actualTotalTime - m_actualSelfTime;
 
-  if (headProfileNode && m_selfTime) {
+  if (m_headNode == this && m_actualSelfTime) {
     RefPtr<ProfileNode> idleNode =
-        ProfileNode::create(CallIdentifier(NonJSExecution, 0, 0));
+        ProfileNode::create(CallIdentifier(NonJSExecution, 0, 0), this);
 
-    idleNode->setTotalTime(m_selfTime);
-    idleNode->setSelfTime(m_selfTime);
+    idleNode->setTotalTime(m_actualSelfTime);
+    idleNode->setSelfTime(m_actualSelfTime);
     idleNode->setNumberOfCalls(0);
-    idleNode->calculatePercentages(totalProfileTime);
 
     addChild(idleNode.release());
-    m_selfTime = 0.0;
+    m_actualSelfTime = 0.0;
   }
 
-  calculatePercentages(totalProfileTime);
-}
-
-void ProfileNode::setTreeVisible(bool visible) {
-  m_visible = visible;
-
-  for (StackIterator currentChild = m_children.begin();
-       currentChild != m_children.end(); ++currentChild)
-    (*currentChild)->setTreeVisible(visible);
+  m_visibleSelfTime = m_actualSelfTime;
 }
 
 // Sorting methods
@@ -250,24 +244,33 @@ void ProfileNode::sortFunctionNameAscending() {
     (*currentChild)->sortFunctionNameAscending();
 }
 
-bool ProfileNode::focus(const CallIdentifier& callIdentifier) {
+void ProfileNode::focus(const CallIdentifier& callIdentifier,
+                        bool forceVisible) {
   if (m_callIdentifier == callIdentifier) {
     m_visible = true;
 
     for (StackIterator currentChild = m_children.begin();
          currentChild != m_children.end(); ++currentChild)
-      (*currentChild)->setTreeVisible(true);
+      (*currentChild)->focus(callIdentifier, true);
   } else {
-    m_visible = false;
-    for (StackIterator currentChild = m_children.begin();
-         currentChild != m_children.end(); ++currentChild)
-      m_visible = (*currentChild)->focus(callIdentifier) || m_visible;
-  }
+    m_visible = forceVisible;
+    double totalChildrenTime = 0.0;
 
-  return m_visible;
+    for (StackIterator currentChild = m_children.begin();
+         currentChild != m_children.end(); ++currentChild) {
+      (*currentChild)->focus(callIdentifier, forceVisible);
+      m_visible |= (*currentChild)->visible();
+      totalChildrenTime += (*currentChild)->totalTime();
+    }
+
+    if (m_visible)
+      m_visibleTotalTime = m_visibleSelfTime + totalChildrenTime;
+  }
 }
 
 void ProfileNode::restoreAll() {
+  m_visibleTotalTime = m_actualTotalTime;
+  m_visibleSelfTime = m_actualSelfTime;
   m_visible = true;
 
   for (StackIterator currentChild = m_children.begin();
@@ -276,15 +279,10 @@ void ProfileNode::restoreAll() {
 }
 
 void ProfileNode::endAndRecordCall() {
-  m_totalTime += getCurrentUTCTimeWithMicroseconds() - m_startTime;
+  m_actualTotalTime += getCurrentUTCTimeWithMicroseconds() - m_startTime;
   m_startTime = 0.0;
 
   ++m_numberOfCalls;
-}
-
-void ProfileNode::calculatePercentages(double totalProfileTime) {
-  m_totalPercent = (m_totalTime / totalProfileTime) * 100.0;
-  m_selfPercent = (m_selfTime / totalProfileTime) * 100.0;
 }
 
 #ifndef NDEBUG
@@ -294,9 +292,10 @@ void ProfileNode::debugPrintData(int indentLevel) const {
     printf("  ");
 
   printf(
-      "%d SelfTime %.3fms/%.3f%% TotalTime %.3fms/%.3f%% Full Name %s Visible "
-      "%s\n",
-      m_numberOfCalls, m_selfTime, selfPercent(), m_totalTime, totalPercent(),
+      "%d SelfTime %.3fms/%.3f%% TotalTime %.3fms/%.3f%% VSelf %.3fms VTotal "
+      "%.3fms Function Name %s Visible %s\n",
+      m_numberOfCalls, m_actualSelfTime, selfPercent(), m_actualTotalTime,
+      totalPercent(), m_visibleSelfTime, m_visibleTotalTime,
       functionName().UTF8String().c_str(), (m_visible ? "True" : "False"));
 
   ++indentLevel;
@@ -315,7 +314,7 @@ double ProfileNode::debugPrintDataSampleStyle(
 
   // Print function names
   const char* name = functionName().UTF8String().c_str();
-  double sampleCount = m_totalTime * 1000;
+  double sampleCount = m_actualTotalTime * 1000;
   if (indentLevel) {
     for (int i = 0; i < indentLevel; ++i)
       printf("  ");
@@ -347,7 +346,7 @@ double ProfileNode::debugPrintDataSampleStyle(
            functionName().UTF8String().c_str());
   }
 
-  return m_totalTime;
+  return m_actualTotalTime;
 }
 #endif
 
