@@ -51,4 +51,4 @@ class StringSourceProvider : public KJS::SourceProvider {
 };
 }
 
-#endif StringSourceProvider_h
+#endif
