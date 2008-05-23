@@ -45,9 +45,7 @@ static void substitute(UString& string, const UString& substring) {
 }
 
 JSValue* createError(ExecState* exec, ErrorType e, const char* msg) {
-  return Error::create(
-      exec, e, msg, -1, -1,
-      0);  // lineNo(), currentSourceId(exec), currentSourceURL(exec)
+  return Error::create(exec, e, msg, -1, -1, 0);
 }
 
 JSValue* createError(ExecState* exec,
@@ -56,9 +54,7 @@ JSValue* createError(ExecState* exec,
                      const Identifier& label) {
   UString message = msg;
   substitute(message, label.ustring());
-  return Error::create(
-      exec, e, message, -1, -1,
-      0);  // lineNo(), currentSourceId(exec), currentSourceURL(exec)
+  return Error::create(exec, e, message, -1, -1, 0);
 }
 
 JSValue* createError(ExecState* exec,
@@ -70,11 +66,16 @@ JSValue* createError(ExecState* exec,
   substitute(message, v->toString(exec));
   if (expr)
     substitute(message, expr->toString());
-  else
-    substitute(message, "<<no string for expression>>");
-  return Error::create(
-      exec, e, message, -1, -1,
-      0);  //, lineNo(), currentSourceId(exec), currentSourceURL(exec));
+  return Error::create(exec, e, message, -1, -1, 0);
+}
+
+JSValue* createError(ExecState* exec,
+                     ErrorType e,
+                     const char* msg,
+                     JSValue* v) {
+  UString message = msg;
+  substitute(message, v->toString(exec));
+  return Error::create(exec, e, message, -1, -1, 0);
 }
 
 JSValue* createStackOverflowError(ExecState* exec) {
@@ -86,29 +87,33 @@ JSValue* createUndefinedVariableError(ExecState* exec,
   return createError(exec, ReferenceError, "Can't find variable: %s", ident);
 }
 
-JSValue* createNotAnObjectError(ExecState* exec, JSValue* value, Node* expr) {
-  return createError(exec, TypeError,
-                     "Value %s (result of expression %s) is not an object.",
-                     value, expr);
+JSValue* createInvalidParamError(ExecState* exec, const char* op, JSValue* v) {
+  UString message = "'%s' is not a valid argument for '%s'";
+  substitute(message, v->toString(exec));
+  substitute(message, op);
+  return Error::create(exec, TypeError, message, -1, -1, 0);
 }
 
 JSValue* createNotAConstructorError(ExecState* exec,
                                     JSValue* value,
                                     Node* expr) {
-  if (!value->isObject())
-    return createNotAnObjectError(exec, value, expr);
+  if (expr)
+    return createError(exec, TypeError,
+                       "Value %s (result of expression %s) is not a "
+                       "constructor. Cannot be used with new.",
+                       value, expr);
   return createError(exec, TypeError,
-                     "Value %s (result of expression %s) is not a constructor. "
-                     "Cannot be used with new.",
-                     value, expr);
+                     "Value %s is not a constructor. Cannot be used with new.",
+                     value);
 }
 
 JSValue* createNotAFunctionError(ExecState* exec, JSValue* value, Node* expr) {
-  if (!value->isObject())
-    return createNotAnObjectError(exec, value, expr);
-  return createError(
-      exec, TypeError,
-      "Value %s (result of expression %s) does not allow function calls.",
-      value, expr);
+  if (expr)
+    return createError(
+        exec, TypeError,
+        "Value %s (result of expression %s) does not allow function calls.",
+        value, expr);
+  return createError(exec, TypeError, "Value %s does not allow function calls.",
+                     value);
 }
 }

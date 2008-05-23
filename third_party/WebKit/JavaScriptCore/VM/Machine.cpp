@@ -481,13 +481,14 @@ ALWAYS_INLINE ScopeChainNode* scopeChainForCall(
 }
 
 static NEVER_INLINE bool isNotObject(ExecState* exec,
-                                     const Instruction*,
+                                     bool forInstanceOf,
                                      CodeBlock*,
                                      JSValue* value,
                                      JSValue*& exceptionData) {
   if (value->isObject())
     return false;
-  exceptionData = createNotAnObjectError(exec, value, 0);
+  exceptionData =
+      createInvalidParamError(exec, forInstanceOf ? "instanceof" : "in", value);
   return true;
 }
 
