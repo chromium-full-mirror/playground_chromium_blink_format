@@ -2014,6 +2014,8 @@ void InspectorController::populateScriptObjects() {
        it != databasesEnd; ++it)
     addDatabaseScriptResource((*it).get());
 #endif
+
+  callSimpleFunction(m_scriptContext, m_scriptObject, "populateInterface");
 }
 
 #if ENABLE(DATABASE)
