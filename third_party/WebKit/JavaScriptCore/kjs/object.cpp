@@ -88,13 +88,22 @@ JSValue* JSObject::call(ExecState* exec, JSObject* thisObj, const List& args) {
     return throwError(exec, RangeError, "Maximum call stack size exceeded.");
   }
 #endif
+  CallData data;
+  JSValue* ret;
+  if (this->getCallData(data) == CallTypeJS) {
+    // A native function will enter the VM, which will allow the profiler
+    // to detect entry
+    ret = callAsFunction(exec, thisObj, args);
+  } else {
+    Profiler** profiler = Profiler::enabledProfilerReference();
+    if (*profiler)
+      (*profiler)->willExecute(exec, this);
 
-  Profiler::profiler()->willExecute(exec, this);
+    ret = callAsFunction(exec, thisObj, args);
 
-  JSValue* ret = callAsFunction(exec, thisObj, args);
-
-  Profiler::profiler()->didExecute(exec, this);
-
+    if (*profiler)
+      (*profiler)->didExecute(exec, this);
+  }
 #if KJS_MAX_STACK > 0
   --depth;
 #endif
