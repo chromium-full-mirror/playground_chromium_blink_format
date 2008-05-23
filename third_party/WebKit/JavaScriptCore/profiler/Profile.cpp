@@ -35,12 +35,15 @@
 
 namespace KJS {
 
+const unsigned DEPTH_LIMIT = 1000;
+
 Profile::Profile(const UString& title,
                  ExecState* originatingGlobalExec,
                  unsigned pageGroupIdentifier)
     : m_title(title),
       m_originatingGlobalExec(originatingGlobalExec),
-      m_pageGroupIdentifier(pageGroupIdentifier) {
+      m_pageGroupIdentifier(pageGroupIdentifier),
+      m_depth(0) {
   // FIXME: When multi-threading is supported this will be a vector and calls
   // into the profiler will need to know which thread it is executing on.
   m_headNode = ProfileNode::create(CallIdentifier("Thread_1", 0, 0), 0, 0);
@@ -51,9 +54,13 @@ void Profile::stopProfiling() {
   m_currentNode = 0;
   m_originatingGlobalExec = 0;
   m_headNode->stopProfiling();
+  m_depth = 0;
 }
 
 void Profile::willExecute(const CallIdentifier& callIdentifier) {
+  if (++m_depth >= DEPTH_LIMIT)
+    return;
+
   ASSERT(m_currentNode);
   m_currentNode = m_currentNode->willExecute(callIdentifier);
 }
@@ -76,6 +83,7 @@ void Profile::didExecute(const CallIdentifier& callIdentifier) {
   }
 
   m_currentNode = m_currentNode->didExecute();
+  --m_depth;
 }
 
 #ifndef NDEBUG
