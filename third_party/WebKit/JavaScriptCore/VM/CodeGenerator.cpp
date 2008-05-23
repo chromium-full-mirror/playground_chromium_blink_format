@@ -226,6 +226,10 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
   if (canCreateVariables) {
     for (size_t i = 0; i < functionStack.size(); ++i) {
       FuncDeclNode* funcDecl = functionStack[i];
+      globalObject->removeDirect(funcDecl->m_ident);  // Make sure our new
+                                                      // function is not
+                                                      // shadowed by an old
+                                                      // property.
       emitNewFunction(addVar(funcDecl->m_ident, false), funcDecl);
     }
 
