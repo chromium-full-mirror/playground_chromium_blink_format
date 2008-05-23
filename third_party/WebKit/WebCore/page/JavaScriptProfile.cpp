@@ -49,13 +49,13 @@ static ProfileMap& profileCache() {
 
 // Static Values
 
-static JSClassRef profileClass();
+static JSClassRef ProfileClass();
 
 static JSValueRef getTitleCallback(JSContextRef ctx,
                                    JSObjectRef thisObject,
                                    JSStringRef propertyName,
                                    JSValueRef* exception) {
-  if (!JSValueIsObjectOfClass(ctx, thisObject, profileClass()))
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
   Profile* profile = static_cast<Profile*>(JSObjectGetPrivate(thisObject));
@@ -66,7 +66,7 @@ static JSValueRef getHeadCallback(JSContextRef ctx,
                                   JSObjectRef thisObject,
                                   JSStringRef propertyName,
                                   JSValueRef* exception) {
-  if (!JSValueIsObjectOfClass(ctx, thisObject, profileClass()))
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
   Profile* profile = static_cast<Profile*>(JSObjectGetPrivate(thisObject));
@@ -79,21 +79,40 @@ static JSValueRef focus(JSContextRef ctx,
                         size_t argumentCount,
                         const JSValueRef arguments[],
                         JSValueRef* /*exception*/) {
-  if (!JSValueIsObjectOfClass(ctx, thisObject, profileClass()))
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
     return JSValueMakeUndefined(ctx);
 
   if (argumentCount < 1)
     return JSValueMakeUndefined(ctx);
 
-  if (!JSValueIsObjectOfClass(ctx, arguments[0], profileClass()))
+  if (!JSValueIsObjectOfClass(ctx, arguments[0], ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);
 
   Profile* profile = static_cast<Profile*>(JSObjectGetPrivate(thisObject));
-  JSValueRef exception;
-  JSObjectRef object = JSValueToObject(ctx, arguments[0], &exception);
-  ASSERT(!exception);
+  profile->focus(static_cast<ProfileNode*>(
+      JSObjectGetPrivate(const_cast<JSObjectRef>(arguments[0]))));
 
-  profile->focus(static_cast<ProfileNode*>(JSObjectGetPrivate(object)));
+  return JSValueMakeUndefined(ctx);
+}
+
+static JSValueRef exclude(JSContextRef ctx,
+                          JSObjectRef /*function*/,
+                          JSObjectRef thisObject,
+                          size_t argumentCount,
+                          const JSValueRef arguments[],
+                          JSValueRef* /*exception*/) {
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
+    return JSValueMakeUndefined(ctx);
+
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(ctx);
+
+  if (!JSValueIsObjectOfClass(ctx, arguments[0], ProfileNodeClass()))
+    return JSValueMakeUndefined(ctx);
+
+  Profile* profile = static_cast<Profile*>(JSObjectGetPrivate(thisObject));
+  profile->exclude(static_cast<ProfileNode*>(
+      JSObjectGetPrivate(const_cast<JSObjectRef>(arguments[0]))));
 
   return JSValueMakeUndefined(ctx);
 }
@@ -104,14 +123,16 @@ static void finalize(JSObjectRef object) {
   profile->deref();
 }
 
-JSClassRef profileClass() {
+JSClassRef ProfileClass() {
   static JSStaticValue staticValues[] = {
       {"title", getTitleCallback, 0, kJSPropertyAttributeNone},
       {"head", getHeadCallback, 0, kJSPropertyAttributeNone},
       {0, 0, 0, 0}};
 
   static JSStaticFunction staticFunctions[] = {
-      {"focus", focus, kJSPropertyAttributeNone}, {0, 0, 0}};
+      {"focus", focus, kJSPropertyAttributeNone},
+      {"exclude", exclude, kJSPropertyAttributeNone},
+      {0, 0, 0}};
 
   static JSClassDefinition classDefinition = {0,
                                               kJSClassAttributeNone,
@@ -145,7 +166,7 @@ JSValue* toJS(ExecState* exec, Profile* profile) {
 
   profile->ref();
   profileWrapper = toJS(
-      JSObjectMake(toRef(exec), profileClass(), static_cast<void*>(profile)));
+      JSObjectMake(toRef(exec), ProfileClass(), static_cast<void*>(profile)));
   profileCache().set(profile, profileWrapper);
   return profileWrapper;
 }
