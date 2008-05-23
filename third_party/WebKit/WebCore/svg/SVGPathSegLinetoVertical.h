@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2008 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -29,48 +29,49 @@
 
 namespace WebCore {
 
-class SVGPathSegLinetoVerticalAbs : public SVGPathSeg {
+class SVGPathSegLinetoVertical : public SVGPathSeg {
+ public:
+  SVGPathSegLinetoVertical(float y) : SVGPathSeg(), m_y(y) {}
+
+  virtual String toString() const {
+    return pathSegTypeAsLetter() + String::format(" %.6lg", m_y);
+  }
+
+  void setY(float y) { m_y = y; }
+  float y() const { return m_y; }
+
+ private:
+  float m_y;
+};
+
+class SVGPathSegLinetoVerticalAbs : public SVGPathSegLinetoVertical {
  public:
   static PassRefPtr<SVGPathSegLinetoVerticalAbs> create(float y) {
     return adoptRef(new SVGPathSegLinetoVerticalAbs(y));
   }
-  virtual ~SVGPathSegLinetoVerticalAbs();
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_VERTICAL_ABS;
   }
   virtual String pathSegTypeAsLetter() const { return "V"; }
-  virtual String toString() const { return String::format("V %.6lg", m_y); }
-
-  void setY(float);
-  float y() const;
 
  private:
   SVGPathSegLinetoVerticalAbs(float y);
-
-  float m_y;
 };
 
-class SVGPathSegLinetoVerticalRel : public SVGPathSeg {
+class SVGPathSegLinetoVerticalRel : public SVGPathSegLinetoVertical {
  public:
   static PassRefPtr<SVGPathSegLinetoVerticalRel> create(float y) {
     return adoptRef(new SVGPathSegLinetoVerticalRel(y));
   }
-  virtual ~SVGPathSegLinetoVerticalRel();
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_VERTICAL_REL;
   }
   virtual String pathSegTypeAsLetter() const { return "v"; }
-  virtual String toString() const { return String::format("v %.6lg", m_y); }
-
-  void setY(float);
-  float y() const;
 
  private:
   SVGPathSegLinetoVerticalRel(float y);
-
-  float m_y;
 };
 
 }  // namespace WebCore

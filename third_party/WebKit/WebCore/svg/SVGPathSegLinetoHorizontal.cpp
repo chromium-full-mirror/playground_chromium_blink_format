@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2008 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -25,35 +25,13 @@
 #if ENABLE(SVG)
 #include "SVGPathSegLinetoHorizontal.h"
 
-#include "SVGStyledElement.h"
-
 namespace WebCore {
 
 SVGPathSegLinetoHorizontalAbs::SVGPathSegLinetoHorizontalAbs(float x)
-    : SVGPathSeg(), m_x(x) {}
-
-SVGPathSegLinetoHorizontalAbs::~SVGPathSegLinetoHorizontalAbs() {}
-
-void SVGPathSegLinetoHorizontalAbs::setX(float x) {
-  m_x = x;
-}
-
-float SVGPathSegLinetoHorizontalAbs::x() const {
-  return m_x;
-}
+    : SVGPathSegLinetoHorizontal(x) {}
 
 SVGPathSegLinetoHorizontalRel::SVGPathSegLinetoHorizontalRel(float x)
-    : SVGPathSeg(), m_x(x) {}
-
-SVGPathSegLinetoHorizontalRel::~SVGPathSegLinetoHorizontalRel() {}
-
-void SVGPathSegLinetoHorizontalRel::setX(float x) {
-  m_x = x;
-}
-
-float SVGPathSegLinetoHorizontalRel::x() const {
-  return m_x;
-}
+    : SVGPathSegLinetoHorizontal(x) {}
 }
 
 #endif  // ENABLE(SVG)

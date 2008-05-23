@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2008 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -29,47 +29,49 @@
 
 namespace WebCore {
 
-class SVGPathSegLinetoHorizontalAbs : public SVGPathSeg {
+class SVGPathSegLinetoHorizontal : public SVGPathSeg {
+ public:
+  SVGPathSegLinetoHorizontal(float x) : SVGPathSeg(), m_x(x) {}
+
+  virtual String toString() const {
+    return pathSegTypeAsLetter() + String::format(" %.6lg", m_x);
+  }
+
+  void setX(float x) { m_x = x; }
+  float x() const { return m_x; }
+
+ private:
+  float m_x;
+};
+
+class SVGPathSegLinetoHorizontalAbs : public SVGPathSegLinetoHorizontal {
  public:
   static PassRefPtr<SVGPathSegLinetoHorizontalAbs> create(float x) {
     return adoptRef(new SVGPathSegLinetoHorizontalAbs(x));
   }
-  virtual ~SVGPathSegLinetoHorizontalAbs();
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_ABS;
   }
   virtual String pathSegTypeAsLetter() const { return "H"; }
-  virtual String toString() const { return String::format("H %.6lg", m_x); }
-
-  void setX(float);
-  float x() const;
 
  private:
   SVGPathSegLinetoHorizontalAbs(float x);
-  float m_x;
 };
 
-class SVGPathSegLinetoHorizontalRel : public SVGPathSeg {
+class SVGPathSegLinetoHorizontalRel : public SVGPathSegLinetoHorizontal {
  public:
   static PassRefPtr<SVGPathSegLinetoHorizontalRel> create(float x) {
     return adoptRef(new SVGPathSegLinetoHorizontalRel(x));
   }
-  virtual ~SVGPathSegLinetoHorizontalRel();
 
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_REL;
   }
   virtual String pathSegTypeAsLetter() const { return "h"; }
-  virtual String toString() const { return String::format("h %.6lg", m_x); }
-
-  void setX(float);
-  float x() const;
 
  private:
   SVGPathSegLinetoHorizontalRel(float x);
-
-  float m_x;
 };
 
 }  // namespace WebCore

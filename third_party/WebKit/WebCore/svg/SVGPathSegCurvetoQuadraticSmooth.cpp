@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2008 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -25,55 +25,17 @@
 #if ENABLE(SVG)
 #include "SVGPathSegCurvetoQuadraticSmooth.h"
 
-#include "SVGStyledElement.h"
-
 namespace WebCore {
 
 SVGPathSegCurvetoQuadraticSmoothAbs::SVGPathSegCurvetoQuadraticSmoothAbs(
     float x,
     float y)
-    : SVGPathSeg(), m_x(x), m_y(y) {}
-
-SVGPathSegCurvetoQuadraticSmoothAbs::~SVGPathSegCurvetoQuadraticSmoothAbs() {}
-
-void SVGPathSegCurvetoQuadraticSmoothAbs::setX(float x) {
-  m_x = x;
-}
-
-float SVGPathSegCurvetoQuadraticSmoothAbs::x() const {
-  return m_x;
-}
-
-void SVGPathSegCurvetoQuadraticSmoothAbs::setY(float y) {
-  m_y = y;
-}
-
-float SVGPathSegCurvetoQuadraticSmoothAbs::y() const {
-  return m_y;
-}
+    : SVGPathSegSingleCoord(x, y) {}
 
 SVGPathSegCurvetoQuadraticSmoothRel::SVGPathSegCurvetoQuadraticSmoothRel(
     float x,
     float y)
-    : SVGPathSeg(), m_x(x), m_y(y) {}
-
-SVGPathSegCurvetoQuadraticSmoothRel::~SVGPathSegCurvetoQuadraticSmoothRel() {}
-
-void SVGPathSegCurvetoQuadraticSmoothRel::setX(float x) {
-  m_x = x;
-}
-
-float SVGPathSegCurvetoQuadraticSmoothRel::x() const {
-  return m_x;
-}
-
-void SVGPathSegCurvetoQuadraticSmoothRel::setY(float y) {
-  m_y = y;
-}
-
-float SVGPathSegCurvetoQuadraticSmoothRel::y() const {
-  return m_y;
-}
+    : SVGPathSegSingleCoord(x, y) {}
 }
 
 #endif  // ENABLE(SVG)
