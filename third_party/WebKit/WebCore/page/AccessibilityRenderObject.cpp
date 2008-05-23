@@ -2034,9 +2034,6 @@ void AccessibilityRenderObject::addChildren() {
   if (!m_renderer)
     return;
 
-  if (isMenuButton())
-    return ariaMenuButtonChildren();
-
   m_haveChildren = true;
 
   // add all unignored acc children
@@ -2074,12 +2071,6 @@ void AccessibilityRenderObject::addChildren() {
       }
     }
   }
-}
-
-void AccessibilityRenderObject::ariaMenuButtonChildren() {
-  // AccessibilityObject* child = menuForMenuButton();
-  // m_children.append(child);
-  // m_children.append(menuForMenuButton());
 }
 
 void AccessibilityRenderObject::ariaListboxSelectedChildren(
