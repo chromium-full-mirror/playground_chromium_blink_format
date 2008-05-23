@@ -39,6 +39,10 @@ class JSObject;
 
 class Profiler {
  public:
+  static Profiler** enabledProfilerReference() {
+    return &s_sharedEnabledProfilerReference;
+  }
+
   static Profiler* profiler();
 
   void startProfiling(ExecState*, const UString& title);
@@ -61,6 +65,8 @@ class Profiler {
 
  private:
   Vector<RefPtr<Profile>> m_currentProfiles;
+  static Profiler* s_sharedProfiler;
+  static Profiler* s_sharedEnabledProfilerReference;
 };
 
 }  // namespace KJS
