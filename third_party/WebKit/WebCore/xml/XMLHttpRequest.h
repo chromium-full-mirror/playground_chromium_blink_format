@@ -133,6 +133,11 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   virtual void receivedCancellation(SubresourceLoader*,
                                     const AuthenticationChallenge&);
 
+  // Special versions for the method check preflight
+  void didReceiveResponseMethodCheck(SubresourceLoader*,
+                                     const ResourceResponse&);
+  void didFinishLoadingMethodCheck(SubresourceLoader*);
+
   void processSyncLoadResults(const Vector<char>& data,
                               const ResourceResponse&,
                               ExceptionCode&);
@@ -157,6 +162,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   void loadRequestSynchronously(ResourceRequest&, ExceptionCode&);
   void loadRequestAsynchronously(ResourceRequest&);
+
+  void handleAsynchronousMethodCheckResult();
 
   void genericError();
   void networkError();
@@ -203,6 +210,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   bool m_sameOriginRequest;
   bool m_allowAccess;
+  bool m_inMethodCheck;
 
   // FIXME: Add support for AccessControlList in a PI in an XML document in
   // addition to the http header.
