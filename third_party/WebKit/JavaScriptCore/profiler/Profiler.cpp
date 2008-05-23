@@ -182,8 +182,10 @@ CallIdentifier createCallIdentifier(JSObject* calledFunction) {
                               .ustring(),
                           "", 0);
 
-  ASSERT_NOT_REACHED();
-  return CallIdentifier("", 0, 0);
+  UString name = "(";
+  name += calledFunction->classInfo()->className;
+  name += " object)";
+  return CallIdentifier(name, 0, 0);
 }
 
 CallIdentifier createCallIdentifier(const UString& sourceURL,
