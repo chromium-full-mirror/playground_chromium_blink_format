@@ -121,6 +121,9 @@ class ExecState : Noncopyable {
   }
 
  private:
+  // Default constructor required for OldInterpreterExecState with gcc 3.
+  ExecState(){};
+
   ExecState(ExecState*,
             Machine*,
             RegisterFile*,
