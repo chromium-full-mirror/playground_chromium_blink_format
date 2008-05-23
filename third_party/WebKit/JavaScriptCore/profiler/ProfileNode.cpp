@@ -101,17 +101,10 @@ void ProfileNode::addChild(PassRefPtr<ProfileNode> prpChild) {
 void ProfileNode::insertNode(PassRefPtr<ProfileNode> prpNode) {
   RefPtr<ProfileNode> node = prpNode;
 
-  double sumOfChildrensTime = 0.0;
-  for (unsigned i = 0; i < m_children.size(); ++i) {
-    sumOfChildrensTime += m_children[i]->totalTime();
+  for (unsigned i = 0; i < m_children.size(); ++i)
     node->addChild(m_children[i].release());
-  }
 
   m_children.clear();
-
-  node->didExecute();
-  node->setTotalTime(sumOfChildrensTime);
-  node->setSelfTime(0.0);
   m_children.append(node.release());
 }
 
