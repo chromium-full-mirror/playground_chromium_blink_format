@@ -1626,7 +1626,10 @@ void InspectorController::stopUserInitiatedProfiling() {
   m_recordingUserInitiatedProfile = false;
 
   ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
-  Profiler::profiler()->stopProfiling(exec, UserInitiatedProfileName);
+  RefPtr<Profile> profile =
+      Profiler::profiler()->stopProfiling(exec, UserInitiatedProfileName);
+  if (profile)
+    addProfile(profile);
 }
 
 static void addHeaders(JSContextRef context,
