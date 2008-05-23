@@ -207,7 +207,13 @@ class NumberImp : public JSCell {
   virtual UString toString(ExecState* exec) const;
   virtual JSObject* toObject(ExecState* exec) const;
 
-  void* operator new(size_t size) { return Collector::allocateNumber(size); }
+  void* operator new(size_t size) {
+#ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
+    return Collector::inlineAllocateNumber(size);
+#else
+    return Collector::allocateNumber(size);
+#endif
+  }
 
  private:
   NumberImp(double v) : val(v) {}
