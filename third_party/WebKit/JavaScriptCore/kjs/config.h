@@ -87,5 +87,3 @@
 #if !PLATFORM(QT) && !PLATFORM(WX)
 #include <wtf/DisallowCType.h>
 #endif
-
-#define JAVASCRIPT_PROFILING 1
