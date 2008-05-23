@@ -1006,6 +1006,9 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
     return false;
   }
 
+  if (isAttachment())
+    return false;
+
   return !m_renderer->isListMarker() && !isWebArea();
 }
 
