@@ -32,6 +32,8 @@
 #include "JavaScriptDebugListener.h"
 
 #include "Console.h"
+#include "PlatformString.h"
+#include "StringHash.h"
 #include <JavaScriptCore/JSContextRef.h>
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
@@ -262,6 +264,7 @@ class InspectorController : JavaScriptDebugListener {
   RefPtr<Node> m_nodeToFocus;
   RefPtr<InspectorResource> m_mainResource;
   ResourcesMap m_resources;
+  HashSet<String> m_knownResources;
   FrameResourcesMap m_frameResources;
   Vector<ConsoleMessage*> m_consoleMessages;
   Vector<RefPtr<KJS::Profile>> m_profiles;
