@@ -117,6 +117,21 @@ static JSValueRef exclude(JSContextRef ctx,
   return JSValueMakeUndefined(ctx);
 }
 
+static JSValueRef restoreAll(JSContextRef ctx,
+                             JSObjectRef /*function*/,
+                             JSObjectRef thisObject,
+                             size_t argumentCount,
+                             const JSValueRef arguments[],
+                             JSValueRef* /*exception*/) {
+  if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileClass()))
+    return JSValueMakeUndefined(ctx);
+
+  Profile* profile = static_cast<Profile*>(JSObjectGetPrivate(thisObject));
+  profile->restoreAll();
+
+  return JSValueMakeUndefined(ctx);
+}
+
 static void finalize(JSObjectRef object) {
   Profile* profile = static_cast<Profile*>(JSObjectGetPrivate(object));
   profileCache().remove(profile);
@@ -132,6 +147,7 @@ JSClassRef ProfileClass() {
   static JSStaticFunction staticFunctions[] = {
       {"focus", focus, kJSPropertyAttributeNone},
       {"exclude", exclude, kJSPropertyAttributeNone},
+      {"restoreAll", restoreAll, kJSPropertyAttributeNone},
       {0, 0, 0}};
 
   static JSClassDefinition classDefinition = {0,
