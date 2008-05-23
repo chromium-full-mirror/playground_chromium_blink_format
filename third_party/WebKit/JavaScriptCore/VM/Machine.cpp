@@ -2135,7 +2135,8 @@ profilerFetchHack:
                 : (r[base].u.jsValue)->toObject(exec);  // "this" value
         JSObject* thisObj = static_cast<JSObject*>(r[argv].u.jsValue);
 
-        List args(&r[argv + 1].u.jsValue, argc - 1);
+        List args(reinterpret_cast<JSValue***>(registerBase),
+                  registerOffset + argv + 1, argc - 1);
 
         registerFile->setSafeForReentry(true);
         JSValue* returnValue =
@@ -2265,7 +2266,9 @@ profilerFetchHack:
 
         int registerOffset = r - (*registerBase);
 
-        List args(&r[argv + 1].u.jsValue, argc - 1);
+        List args(reinterpret_cast<JSValue***>(registerBase),
+                  registerOffset + argv + 1, argc - 1);
+
         registerFile->setSafeForReentry(true);
         JSValue* returnValue = constructor->construct(exec, args);
         registerFile->setSafeForReentry(false);
