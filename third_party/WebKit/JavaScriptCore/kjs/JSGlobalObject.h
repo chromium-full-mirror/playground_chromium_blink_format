@@ -322,7 +322,7 @@ class JSGlobalObject : public JSVariableObject {
     GlobalPropertyInfo(const Identifier& i, JSValue* v, unsigned a)
         : identifier(i), value(v), attributes(a) {}
 
-    const Identifier& identifier;
+    const Identifier identifier;
     JSValue* value;
     unsigned attributes;
   };
