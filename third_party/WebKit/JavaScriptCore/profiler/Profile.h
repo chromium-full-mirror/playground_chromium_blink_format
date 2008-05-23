@@ -48,28 +48,33 @@ class Profile : public RefCounted<Profile> {
   void stopProfiling();
 
   const UString& title() const { return m_title; };
-  ProfileNode* callTree() const { return m_callTree.get(); };
+  ProfileNode* callTree() const { return m_headNode.get(); };
 
-  double totalTime() const { return m_callTree->totalTime(); }
+  double totalTime() const { return m_headNode->totalTime(); }
 
   ExecState* originatingGlobalExec() const { return m_originatingGlobalExec; }
   unsigned pageGroupIdentifier() const { return m_pageGroupIdentifier; }
 
-  void sortTotalTimeDescending() { m_callTree->sortTotalTimeDescending(); }
-  void sortTotalTimeAscending() { m_callTree->sortTotalTimeAscending(); }
-  void sortSelfTimeDescending() { m_callTree->sortSelfTimeDescending(); }
-  void sortSelfTimeAscending() { m_callTree->sortSelfTimeAscending(); }
-  void sortCallsDescending() { m_callTree->sortCallsDescending(); }
-  void sortCallsAscending() { m_callTree->sortCallsAscending(); }
+  void sortTotalTimeDescending() { m_headNode->sortTotalTimeDescending(); }
+  void sortTotalTimeAscending() { m_headNode->sortTotalTimeAscending(); }
+  void sortSelfTimeDescending() { m_headNode->sortSelfTimeDescending(); }
+  void sortSelfTimeAscending() { m_headNode->sortSelfTimeAscending(); }
+  void sortCallsDescending() { m_headNode->sortCallsDescending(); }
+  void sortCallsAscending() { m_headNode->sortCallsAscending(); }
   void sortFunctionNameDescending() {
-    m_callTree->sortFunctionNameDescending();
+    m_headNode->sortFunctionNameDescending();
   }
-  void sortFunctionNameAscending() { m_callTree->sortFunctionNameAscending(); }
+  void sortFunctionNameAscending() { m_headNode->sortFunctionNameAscending(); }
 
   void focus(const ProfileNode* profileNode) {
     if (!profileNode)
       return;
-    m_callTree->focus(profileNode->callIdentifier());
+    m_headNode->focus(profileNode->callIdentifier());
+  }
+  void exclude(const ProfileNode* profileNode) {
+    if (!profileNode)
+      return;
+    m_headNode->exclude(profileNode->callIdentifier());
   }
 
 #ifndef NDEBUG
@@ -78,7 +83,7 @@ class Profile : public RefCounted<Profile> {
 #endif
 
   typedef void (Profile::*ProfileFunction)(
-      const CallIdentifier& callIdentifiers);
+      const CallIdentifier& callIdentifier);
 
  private:
   Profile(const UString& title,
@@ -88,7 +93,7 @@ class Profile : public RefCounted<Profile> {
   UString m_title;
   ExecState* m_originatingGlobalExec;
   unsigned m_pageGroupIdentifier;
-  RefPtr<ProfileNode> m_callTree;
+  RefPtr<ProfileNode> m_headNode;
   RefPtr<ProfileNode> m_currentNode;
 };
 

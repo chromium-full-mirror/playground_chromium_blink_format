@@ -43,14 +43,14 @@ Profile::Profile(const UString& title,
       m_pageGroupIdentifier(pageGroupIdentifier) {
   // FIXME: When multi-threading is supported this will be a vector and calls
   // into the profiler will need to know which thread it is executing on.
-  m_callTree = ProfileNode::create(CallIdentifier("Thread_1", 0, 0), 0, 0);
-  m_currentNode = m_callTree;
+  m_headNode = ProfileNode::create(CallIdentifier("Thread_1", 0, 0), 0, 0);
+  m_currentNode = m_headNode;
 }
 
 void Profile::stopProfiling() {
   m_currentNode = 0;
   m_originatingGlobalExec = 0;
-  m_callTree->stopProfiling();
+  m_headNode->stopProfiling();
 }
 
 void Profile::willExecute(const CallIdentifier& callIdentifier) {
@@ -60,11 +60,11 @@ void Profile::willExecute(const CallIdentifier& callIdentifier) {
 }
 
 void Profile::didExecute(const CallIdentifier& callIdentifier) {
-  if (m_currentNode == m_callTree) {
+  if (m_currentNode == m_headNode) {
     m_currentNode =
-        ProfileNode::create(callIdentifier, m_callTree.get(), m_callTree.get());
-    m_callTree->insertNode(m_currentNode.release());
-    m_currentNode = m_callTree;
+        ProfileNode::create(callIdentifier, m_headNode.get(), m_headNode.get());
+    m_headNode->insertNode(m_currentNode.release());
+    m_currentNode = m_headNode;
     return;
   }
 
@@ -74,7 +74,7 @@ void Profile::didExecute(const CallIdentifier& callIdentifier) {
 #ifndef NDEBUG
 void Profile::debugPrintData() const {
   printf("Call graph:\n");
-  m_callTree->debugPrintData(0);
+  m_headNode->debugPrintData(0);
 }
 
 typedef pair<UString::Rep*, unsigned> NameCountPair;
@@ -89,7 +89,7 @@ void Profile::debugPrintDataSampleStyle() const {
 
   FunctionCallHashCount countedFunctions;
   printf("Call graph:\n");
-  m_callTree->debugPrintDataSampleStyle(0, countedFunctions);
+  m_headNode->debugPrintDataSampleStyle(0, countedFunctions);
 
   printf("\nTotal number in stack:\n");
   NameCountPairVector sortedFunctions(countedFunctions.size());
