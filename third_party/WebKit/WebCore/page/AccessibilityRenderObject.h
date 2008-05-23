@@ -76,6 +76,11 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool isCheckboxOrRadio() const;
   virtual bool isFileUploadButton() const;
   virtual bool isProgressIndicator() const;
+  virtual bool isMenuRelated() const;
+  virtual bool isMenu() const;
+  virtual bool isMenuBar() const;
+  virtual bool isMenuButton() const;
+  virtual bool isMenuItem() const;
 
   virtual bool isEnabled() const;
   virtual bool isSelected() const;
@@ -117,6 +122,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual AccessibilityObject* observableObject() const;
   virtual AccessibilityObject* linkedUIElement() const;
   virtual AccessibilityRole ariaRoleAttribute() const;
+  void setAriaRole();
   virtual AccessibilityRole roleValue() const;
   virtual AXObjectCache* axObjectCache() const;
 
@@ -125,6 +131,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
   FrameView* frameViewIfRenderView() const;
   virtual HTMLAnchorElement* anchorElement() const;
   HTMLAreaElement* areaElement() const { return m_areaElement.get(); }
+  AccessibilityObject* menuForMenuButton() const;
+  AccessibilityObject* menuButtonForMenu() const;
 
   virtual IntRect boundingBoxRect() const;
   virtual IntRect elementRect() const;
@@ -198,6 +206,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
  protected:
   RenderObject* m_renderer;
   RefPtr<HTMLAreaElement> m_areaElement;
+  AccessibilityRole m_ariaRole;
 
   void setRenderObject(RenderObject* renderer) { m_renderer = renderer; }
   virtual void removeAXObjectID();
@@ -207,6 +216,11 @@ class AccessibilityRenderObject : public AccessibilityObject {
  private:
   void ariaListboxSelectedChildren(Vector<RefPtr<AccessibilityObject>>&);
   void ariaListboxVisibleChildren(Vector<RefPtr<AccessibilityObject>>&);
+  void ariaMenuButtonChildren();
+
+  Element* menuElementForMenuButton() const;
+  Element* menuItemElementForMenu() const;
+  AccessibilityRole determineAriaRoleAttribute() const;
 };
 
 }  // namespace WebCore

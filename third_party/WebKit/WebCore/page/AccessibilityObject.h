@@ -195,6 +195,11 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isWebArea() const { return false; };
   virtual bool isCheckboxOrRadio() const { return false; };
   virtual bool isListBox() const { return roleValue() == ListBoxRole; };
+  virtual bool isMenuRelated() const { return false; }
+  virtual bool isMenu() const { return false; }
+  virtual bool isMenuBar() const { return false; }
+  virtual bool isMenuButton() const { return false; }
+  virtual bool isMenuItem() const { return false; }
   virtual bool isFileUploadButton() const { return false; };
   virtual bool isProgressIndicator() const { return false; };
 
