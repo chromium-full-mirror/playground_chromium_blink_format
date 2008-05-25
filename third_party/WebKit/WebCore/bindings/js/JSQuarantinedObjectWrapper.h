@@ -37,6 +37,9 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
   virtual ~JSQuarantinedObjectWrapper();
 
   KJS::JSObject* unwrappedObject() const { return m_unwrappedObject; }
+  KJS::JSGlobalObject* unwrappedGlobalObject() const {
+    return m_unwrappedGlobalObject;
+  };
   KJS::ExecState* unwrappedExecState() const;
 
   bool allowsUnwrappedAccessFrom(const KJS::ExecState*) const;

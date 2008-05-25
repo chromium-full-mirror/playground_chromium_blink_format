@@ -33,9 +33,10 @@ using namespace KJS;
 namespace WebCore {
 
 typedef HashMap<JSObject*, JSInspectedObjectWrapper*> WrapperMap;
+typedef HashMap<JSGlobalObject*, WrapperMap*> GlobalObjectWrapperMap;
 
-static WrapperMap& wrappers() {
-  static WrapperMap map;
+static GlobalObjectWrapperMap& wrappers() {
+  static GlobalObjectWrapperMap map;
   return map;
 }
 
@@ -52,8 +53,10 @@ JSValue* JSInspectedObjectWrapper::wrap(ExecState* unwrappedExec,
   if (unwrappedObject->inherits(&JSInspectedObjectWrapper::s_info))
     return unwrappedObject;
 
-  if (JSInspectedObjectWrapper* wrapper = wrappers().get(unwrappedObject))
-    return wrapper;
+  if (WrapperMap* wrapperMap =
+          wrappers().get(unwrappedExec->dynamicGlobalObject()))
+    if (JSInspectedObjectWrapper* wrapper = wrapperMap->get(unwrappedObject))
+      return wrapper;
 
   JSValue* prototype = unwrappedObject->prototype();
   JSValue* wrappedPrototype = prototype ? wrap(unwrappedExec, prototype) : 0;
@@ -68,12 +71,27 @@ JSInspectedObjectWrapper::JSInspectedObjectWrapper(ExecState* unwrappedExec,
     : JSQuarantinedObjectWrapper(unwrappedExec,
                                  unwrappedObject,
                                  wrappedPrototype) {
-  ASSERT(!wrappers().contains(unwrappedObject));
-  wrappers().set(unwrappedObject, this);
+  WrapperMap* wrapperMap = wrappers().get(unwrappedGlobalObject());
+  if (!wrapperMap) {
+    wrapperMap = new WrapperMap;
+    wrappers().set(unwrappedGlobalObject(), wrapperMap);
+  }
+
+  ASSERT(!wrapperMap->contains(unwrappedObject));
+  wrapperMap->set(unwrappedObject, this);
 }
 
 JSInspectedObjectWrapper::~JSInspectedObjectWrapper() {
-  wrappers().remove(unwrappedObject());
+  ASSERT(wrappers().contains(unwrappedGlobalObject()));
+  WrapperMap* wrapperMap = wrappers().get(unwrappedGlobalObject());
+
+  ASSERT(wrapperMap->contains(unwrappedObject()));
+  wrapperMap->remove(unwrappedObject());
+
+  if (wrapperMap->isEmpty()) {
+    wrappers().remove(unwrappedGlobalObject());
+    delete wrapperMap;
+  }
 }
 
 JSValue* JSInspectedObjectWrapper::prepareIncomingValue(ExecState*,
