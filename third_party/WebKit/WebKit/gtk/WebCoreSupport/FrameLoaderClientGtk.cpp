@@ -58,7 +58,10 @@ using namespace WebCore;
 namespace WebKit {
 
 FrameLoaderClient::FrameLoaderClient(WebKitWebFrame* frame)
-    : m_frame(frame), m_pluginView(0), m_userAgent("") {
+    : m_frame(frame),
+      m_pluginView(0),
+      m_hasSentResponseToPlugin(false),
+      m_userAgent("") {
   ASSERT(m_frame);
 }
 
@@ -349,7 +352,9 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
 }
 
 void FrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {
+  ASSERT(!m_pluginView);
   m_pluginView = static_cast<PluginView*>(pluginWidget);
+  m_hasSentResponseToPlugin = false;
 }
 
 Widget* FrameLoaderClient::createJavaAppletWidget(
