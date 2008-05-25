@@ -58,6 +58,10 @@ class ArrayInstance : public JSObject {
   void sort(ExecState*);
   void sort(ExecState*, JSObject* compareFunction);
 
+ protected:
+  void* lazyCreationData();
+  void setLazyCreationData(void*);
+
  private:
   static JSValue* lengthGetter(ExecState*,
                                JSObject*,
