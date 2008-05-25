@@ -144,7 +144,7 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild,
   // that a positioned child got yanked).  We also repaint, so that the area
   // exposed when the child
   // disappears gets repainted properly.
-  if (!documentBeingDestroyed() && fullRemove) {
+  if (!documentBeingDestroyed() && fullRemove && oldChild->m_everHadLayout) {
     oldChild->setNeedsLayoutAndPrefWidthsRecalc();
     oldChild->repaint();
   }
