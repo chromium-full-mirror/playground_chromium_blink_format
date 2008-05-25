@@ -920,12 +920,6 @@ AccessibilityObject* AccessibilityRenderObject::linkedUIElement() const {
   return linkedAXElement;
 }
 
-bool AccessibilityRenderObject::accessibilityShouldUseUniqueId() const {
-  return isWebArea() || isTextControl() ||
-         (renderer()->element() && renderer()->element()->isFocusable()) ||
-         isMenuRelated();
-}
-
 bool AccessibilityRenderObject::accessibilityIsIgnored() const {
   // ignore invisible element
   if (!m_renderer || m_renderer->style()->visibility() != VISIBLE)

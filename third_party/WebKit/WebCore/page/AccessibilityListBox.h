@@ -42,7 +42,6 @@ class AccessibilityListBox : public AccessibilityRenderObject {
   static PassRefPtr<AccessibilityListBox> create(RenderObject*);
   virtual ~AccessibilityListBox();
 
-  virtual bool accessibilityShouldUseUniqueId() const { return true; }
   virtual AccessibilityObject* doAccessibilityHitTest(const IntPoint&);
   virtual bool isListBox() const { return true; };
 

@@ -102,7 +102,6 @@ class AccessibilityRenderObject : public AccessibilityObject {
 
   virtual bool hasIntValue() const;
 
-  virtual bool accessibilityShouldUseUniqueId() const;
   virtual bool accessibilityIsIgnored() const;
 
   static int headingLevel(Node*);
