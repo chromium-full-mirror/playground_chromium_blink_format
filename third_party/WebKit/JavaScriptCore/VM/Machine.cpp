@@ -500,32 +500,31 @@ static NEVER_INLINE JSValue* callEval(ExecState* exec,
                                       int argv,
                                       int argc,
                                       JSValue*& exceptionValue) {
+  if (argc < 2)
+    return jsUndefined();
+
+  JSValue* program = r[argv + 1].u.jsValue;
+
+  if (!program->isString())
+    return program;
+
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
     (*profiler)->willExecute(exec, scopeChain->globalObject()->evalFunction());
-
-  JSValue* x = argc >= 2 ? r[argv + 1].u.jsValue : jsUndefined();
-
-  if (!x->isString())
-    return x;
-
-  UString s = x->toString(exec);
-  if (exec->hadException()) {
-    exceptionValue = exec->exception();
-    exec->clearException();
-    return 0;
-  }
 
   int sourceId;
   int errLine;
   UString errMsg;
   RefPtr<EvalNode> evalNode = parser().parse<EvalNode>(
-      exec, UString(), 0, UStringSourceProvider::create(s), &sourceId, &errLine,
-      &errMsg);
+      exec, UString(), 0,
+      UStringSourceProvider::create(static_cast<StringImp*>(program)->value()),
+      &sourceId, &errLine, &errMsg);
 
   if (!evalNode) {
     exceptionValue =
         Error::create(exec, SyntaxError, errMsg, errLine, sourceId, NULL);
+    if (*profiler)
+      (*profiler)->didExecute(exec, scopeChain->globalObject()->evalFunction());
     return 0;
   }
 
@@ -534,7 +533,7 @@ static NEVER_INLINE JSValue* callEval(ExecState* exec,
                         r - (*registerFile->basePointer()) + argv + argc,
                         scopeChain, &exceptionValue);
 
-  if ((*profiler))
+  if (*profiler)
     (*profiler)->didExecute(exec, scopeChain->globalObject()->evalFunction());
 
   return result;
@@ -915,11 +914,11 @@ JSValue* Machine::execute(EvalNode* evalNode,
   if (codeBlock->needsFullScopeChain)
     scopeChain = scopeChain->copy();
 
+  ExecState newExec(exec, this, registerFile, scopeChain, -1);
+
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
     (*profiler)->willExecute(exec, evalNode->sourceURL(), evalNode->lineNo());
-
-  ExecState newExec(exec, this, registerFile, scopeChain, -1);
 
   m_reentryDepth++;
   JSValue* result = privateExecute(Normal, &newExec, registerFile, r,
