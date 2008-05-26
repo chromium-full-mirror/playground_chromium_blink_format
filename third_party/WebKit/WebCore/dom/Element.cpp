@@ -466,12 +466,6 @@ void Element::setAttribute(const AtomicString& name,
   // allocate attributemap if necessary
   Attribute* old = attributes(false)->getAttributeItem(localName);
 
-  // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
-  if (namedAttrMap->isReadOnlyNode()) {
-    ec = NO_MODIFICATION_ALLOWED_ERR;
-    return;
-  }
-
   document()->incDOMTreeVersion();
 
   if (localName == idAttr.localName())
@@ -490,17 +484,11 @@ void Element::setAttribute(const AtomicString& name,
 
 void Element::setAttribute(const QualifiedName& name,
                            const AtomicString& value,
-                           ExceptionCode& ec) {
+                           ExceptionCode&) {
   document()->incDOMTreeVersion();
 
   // allocate attributemap if necessary
   Attribute* old = attributes(false)->getAttributeItem(name);
-
-  // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
-  if (namedAttrMap->isReadOnlyNode()) {
-    ec = NO_MODIFICATION_ALLOWED_ERR;
-    return;
-  }
 
   if (name == idAttr)
     updateId(old ? old->value() : nullAtom, value);

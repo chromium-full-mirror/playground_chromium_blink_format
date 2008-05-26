@@ -332,7 +332,7 @@ class Node : public TreeShared<Node> {
     return m_inDocument;
   }
 
-  virtual bool isReadOnlyNode();
+  bool isReadOnlyNode() const { return nodeType() == ENTITY_REFERENCE_NODE; }
   virtual bool childTypeAllowed(NodeType) { return false; }
   virtual unsigned childNodeCount() const;
   virtual Node* childNode(unsigned index) const;

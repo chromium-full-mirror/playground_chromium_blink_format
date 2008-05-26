@@ -79,7 +79,6 @@ class NamedAttrMap : public NamedNodeMap {
   }
   Attribute* getAttributeItem(const QualifiedName& name) const;
   Attribute* getAttributeItem(const String& name) const;
-  bool isReadOnlyNode() const;
 
   void shrinkToLength() { m_attributes.shrinkCapacity(length()); }
   void reserveCapacity(unsigned capacity) {

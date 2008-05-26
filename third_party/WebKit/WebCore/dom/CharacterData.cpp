@@ -44,13 +44,7 @@ CharacterData::CharacterData(Document* document, const String& text)
 
 CharacterData::~CharacterData() {}
 
-void CharacterData::setData(const String& data, ExceptionCode& ec) {
-  // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
-  if (isReadOnlyNode()) {
-    ec = NO_MODIFICATION_ALLOWED_ERR;
-    return;
-  }
-
+void CharacterData::setData(const String& data, ExceptionCode&) {
   StringImpl* dataImpl = data.impl() ? data.impl() : StringImpl::empty();
   if (equal(m_data.get(), dataImpl))
     return;
@@ -73,7 +67,6 @@ void CharacterData::setData(const String& data, ExceptionCode& ec) {
 String CharacterData::substringData(unsigned offset,
                                     unsigned count,
                                     ExceptionCode& ec) {
-  ec = 0;
   checkCharDataOperation(offset, ec);
   if (ec)
     return String();
@@ -81,15 +74,7 @@ String CharacterData::substringData(unsigned offset,
   return m_data->substring(offset, count);
 }
 
-void CharacterData::appendData(const String& arg, ExceptionCode& ec) {
-  ec = 0;
-
-  // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly
-  if (isReadOnlyNode()) {
-    ec = NO_MODIFICATION_ALLOWED_ERR;
-    return;
-  }
-
+void CharacterData::appendData(const String& arg, ExceptionCode&) {
   String newStr = m_data;
   newStr.append(arg);
 
@@ -109,7 +94,6 @@ void CharacterData::appendData(const String& arg, ExceptionCode& ec) {
 void CharacterData::insertData(unsigned offset,
                                const String& arg,
                                ExceptionCode& ec) {
-  ec = 0;
   checkCharDataOperation(offset, ec);
   if (ec)
     return;
@@ -134,7 +118,6 @@ void CharacterData::insertData(unsigned offset,
 void CharacterData::deleteData(unsigned offset,
                                unsigned count,
                                ExceptionCode& ec) {
-  ec = 0;
   checkCharDataOperation(offset, ec);
   if (ec)
     return;
@@ -167,7 +150,6 @@ void CharacterData::replaceData(unsigned offset,
                                 unsigned count,
                                 const String& arg,
                                 ExceptionCode& ec) {
-  ec = 0;
   checkCharDataOperation(offset, ec);
   if (ec)
     return;
@@ -208,7 +190,6 @@ bool CharacterData::containsOnlyWhitespace() const {
 }
 
 void CharacterData::setNodeValue(const String& nodeValue, ExceptionCode& ec) {
-  // NO_MODIFICATION_ALLOWED_ERR: taken care of by setData()
   setData(nodeValue, ec);
 }
 
@@ -233,12 +214,6 @@ void CharacterData::checkCharDataOperation(unsigned offset, ExceptionCode& ec) {
   // units in data.
   if (offset > length()) {
     ec = INDEX_SIZE_ERR;
-    return;
-  }
-
-  // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly
-  if (isReadOnlyNode()) {
-    ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
 }
