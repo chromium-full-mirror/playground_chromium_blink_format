@@ -63,11 +63,6 @@ class InspectorClientView : public QWebView {
   }
 
  protected:
-  void hideEvent(QHideEvent* ev) {
-    QWidget::hideEvent(ev);
-    m_controller->setWindowVisible(false);
-  }
-
   void closeEvent(QCloseEvent* ev) {
     QWidget::closeEvent(ev);
     m_controller->setWindowVisible(false);
