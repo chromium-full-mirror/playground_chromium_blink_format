@@ -167,6 +167,7 @@ void KJSProxy::initScript() {
   JSLock lock;
 
   m_windowShell = new JSDOMWindowShell(m_frame->domWindow());
+  m_windowShell->updateDocument();
 
   if (Page* page = m_frame->page()) {
     attachDebugger(page->debugger());
@@ -174,14 +175,6 @@ void KJSProxy::initScript() {
   }
 
   m_frame->loader()->dispatchWindowObjectAvailable();
-}
-
-void KJSProxy::clearDocumentWrapper() {
-  if (!m_windowShell)
-    return;
-
-  JSLock lock;
-  m_windowShell->window()->removeDirect("document");
 }
 
 bool KJSProxy::processingUserGesture() const {

@@ -73,8 +73,6 @@ class KJSProxy {
   void finishedWithEvent(Event*);
   void setEventHandlerLineno(int lineno) { m_handlerLineno = lineno; }
 
-  void clearDocumentWrapper();
-
   void setProcessingTimerCallback(bool b) { m_processingTimerCallback = b; }
   bool processingUserGesture() const;
 

@@ -57,6 +57,8 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
  public:
   virtual ~JSDOMWindowBase();
 
+  void updateDocument();
+
   DOMWindow* impl() const { return m_impl.get(); }
 
   void disconnectFrame();

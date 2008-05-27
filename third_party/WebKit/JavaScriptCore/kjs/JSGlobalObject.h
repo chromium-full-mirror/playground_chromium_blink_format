@@ -311,13 +311,13 @@ class JSGlobalObject : public JSVariableObject {
   // faster access instead.
   static ThreadClassInfoHashTables* threadClassInfoHashTables();
 
- private:
   void init(JSObject* thisValue);
 
   JSGlobalObjectData* d() const {
     return static_cast<JSGlobalObjectData*>(JSVariableObject::d);
   }
 
+ protected:
   struct GlobalPropertyInfo {
     GlobalPropertyInfo(const Identifier& i, JSValue* v, unsigned a)
         : identifier(i), value(v), attributes(a) {}
@@ -328,6 +328,7 @@ class JSGlobalObject : public JSVariableObject {
   };
   void addStaticGlobals(GlobalPropertyInfo*, int count);
 
+ private:
   bool checkTimeout();
   void resetTimeoutCheck();
 
