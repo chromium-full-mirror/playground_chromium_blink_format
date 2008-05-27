@@ -211,6 +211,7 @@ class InspectorController : JavaScriptDebugListener {
   JSObjectRef addAndUpdateScriptResource(InspectorResource*);
   void updateScriptResourceRequest(InspectorResource*);
   void updateScriptResourceResponse(InspectorResource*);
+  void updateScriptResourceType(InspectorResource*);
   void updateScriptResource(InspectorResource*, int length);
   void updateScriptResource(InspectorResource*,
                             bool finished,
