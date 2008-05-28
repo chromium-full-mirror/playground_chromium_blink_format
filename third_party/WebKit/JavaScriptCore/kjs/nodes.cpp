@@ -6045,9 +6045,13 @@ EvalNode::EvalNode(SourceElements* children,
 EvalNode::~EvalNode() {}
 
 RegisterID* EvalNode::emitCode(CodeGenerator& generator, RegisterID*) {
+  generator.emitDebugHook(WillExecuteProgram, firstLine(), lastLine());
+
   RefPtr<RegisterID> dstRegister = generator.newTemporary();
   generator.emitLoad(dstRegister.get(), jsUndefined());
   statementListEmitCode(m_children, generator, dstRegister.get());
+
+  generator.emitDebugHook(DidExecuteProgram, firstLine(), lastLine());
   generator.emitEnd(dstRegister.get());
   return 0;
 }
@@ -6130,9 +6134,13 @@ RegisterID* FunctionBodyNode::emitCode(CodeGenerator& generator, RegisterID*) {
 }
 
 RegisterID* ProgramNode::emitCode(CodeGenerator& generator, RegisterID*) {
+  generator.emitDebugHook(WillExecuteProgram, firstLine(), lastLine());
+
   RefPtr<RegisterID> dstRegister = generator.newTemporary();
   generator.emitLoad(dstRegister.get(), jsUndefined());
   statementListEmitCode(m_children, generator, dstRegister.get());
+
+  generator.emitDebugHook(DidExecuteProgram, firstLine(), lastLine());
   generator.emitEnd(dstRegister.get());
   return 0;
 }

@@ -116,6 +116,12 @@ class JavaScriptDebugServer : KJS::Debugger {
   virtual void exception(const KJS::DebuggerCallFrame&,
                          int sourceID,
                          int lineNumber);
+  virtual void willExecuteProgram(const KJS::DebuggerCallFrame&,
+                                  int sourceId,
+                                  int lineno);
+  virtual void didExecuteProgram(const KJS::DebuggerCallFrame&,
+                                 int sourceId,
+                                 int lineno);
 
   typedef HashMap<Page*, ListenerSet*> PageListenersMap;
   PageListenersMap m_pageListenersMap;

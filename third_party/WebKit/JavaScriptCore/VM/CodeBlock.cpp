@@ -90,15 +90,22 @@ static CString regexpName(int re, RegExp* regexp) {
       .UTF8String();
 }
 
-static const char* debugHookName(int debugHookID) {
-  if (debugHookID == DidEnterCallFrame)
-    return "didEnterCallFrame";
-  else if (debugHookID == WillLeaveCallFrame)
-    return "willLeaveCallFrame";
-  else {
-    ASSERT(debugHookID == WillExecuteStatement);
-    return "willExecuteStatement";
+NEVER_INLINE static const char* debugHookName(int debugHookID) {
+  switch ((DebugHookID)debugHookID) {
+    case DidEnterCallFrame:
+      return "didEnterCallFrame";
+    case WillLeaveCallFrame:
+      return "willLeaveCallFrame";
+    case WillExecuteStatement:
+      return "willExecuteStatement";
+    case WillExecuteProgram:
+      return "willExecuteProgram";
+    case DidExecuteProgram:
+      return "didExecuteProgram";
   }
+
+  ASSERT_NOT_REACHED();
+  return "";
 }
 
 static int jumpTarget(const Vector<Instruction>::const_iterator& begin,

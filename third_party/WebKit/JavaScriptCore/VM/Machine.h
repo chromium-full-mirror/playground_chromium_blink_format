@@ -47,9 +47,11 @@ class RegisterFileStack;
 class ScopeChainNode;
 
 enum DebugHookID {
-  WillExecuteStatement,
+  WillExecuteProgram,
+  DidExecuteProgram,
   DidEnterCallFrame,
-  WillLeaveCallFrame
+  WillLeaveCallFrame,
+  WillExecuteStatement
 };
 
 class Machine {
