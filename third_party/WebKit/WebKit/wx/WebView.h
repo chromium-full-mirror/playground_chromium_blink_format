@@ -55,6 +55,8 @@ class FrameLoaderClientWx;
 #define WXDLLIMPEXP_WEBKIT
 #endif  // SWIG
 
+extern WXDLLIMPEXP_WEBKIT const wxChar* wxWebViewNameStr;
+
 class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   // ChromeClientWx needs to get the Page* stored by the wxWebView
   // for the createWindow function.
@@ -64,20 +66,38 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
  public:
 // ctor(s)
 #if SWIG
-  % pythonAppend wxWebView "self._setOORInfo(self)"
+  % pythonAppend wxWebView "self._setOORInfo(self)" %
+      pythonAppend wxWebView() ""
 #endif
+
       wxWebView(wxWindow* parent,
                 int id = wxID_ANY,
                 const wxPoint& point = wxDefaultPosition,
                 const wxSize& size = wxDefaultSize,
+                long style = 0,
+                const wxString& name = wxWebViewNameStr,
                 WebViewFrameData* data =
                     NULL);  // For wxWebView internal data passing
+#if SWIG
+  % rename(PreWebView) wxWebView();
+#else
+  wxWebView();
+#endif
+
+  bool Create(
+      wxWindow* parent,
+      int id = wxID_ANY,
+      const wxPoint& point = wxDefaultPosition,
+      const wxSize& size = wxDefaultSize,
+      long style = 0,
+      const wxString& name = wxWebViewNameStr,
+      WebViewFrameData* data = NULL);  // For wxWebView internal data passing
 
 #ifndef SWIG
   ~wxWebView();
 #endif
 
-  void LoadURL(wxString url);
+  void LoadURL(const wxString& url);
   bool GoBack();
   bool GoForward();
   void Stop();
@@ -129,6 +149,7 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
 // any class wishing to process wxWindows events must use this macro
 #ifndef SWIG
   DECLARE_EVENT_TABLE()
+  DECLARE_DYNAMIC_CLASS(wxWebView)
 #endif
   float m_textMagnifier;
   bool m_isEditable;
@@ -243,12 +264,15 @@ class WXDLLIMPEXP_WEBKIT wxWebViewNewWindowEvent : public wxCommandEvent {
  public:
   wxString GetURL() const { return m_url; }
   void SetURL(const wxString& url) { m_url = url; }
+  wxString GetTargetName() const { return m_targetName; }
+  void SetTargetName(const wxString& name) { m_targetName = name; }
 
   wxWebViewNewWindowEvent(wxWindow* win = static_cast<wxWindow*>(NULL));
   wxEvent* Clone(void) const { return new wxWebViewNewWindowEvent(*this); }
 
  private:
   wxString m_url;
+  wxString m_targetName;
 };
 
 class WXDLLIMPEXP_WEBKIT wxWebViewRightClickEvent : public wxCommandEvent {
