@@ -59,7 +59,8 @@ LocalStorageArea::LocalStorageArea(SecurityOrigin* origin,
       m_importComplete(false) {
   ASSERT(m_localStorage);
 
-  m_localStorage->scheduleImport(this);
+  if (!m_localStorage->scheduleImport(this))
+    m_importComplete = true;
 }
 
 LocalStorageArea::~LocalStorageArea() {
