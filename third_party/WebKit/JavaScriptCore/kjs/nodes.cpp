@@ -4848,8 +4848,12 @@ inline void ConstDeclNode::evaluateSingle(OldInterpreterExecState* exec) {
 }
 
 RegisterID* ConstDeclNode::emitCodeSingle(CodeGenerator& generator) {
-  if (RegisterID* local = generator.registerForLocalConstInit(m_ident))
+  if (RegisterID* local = generator.registerForLocalConstInit(m_ident)) {
+    if (!m_init)
+      return local;
+
     return generator.emitNode(local, m_init.get());
+  }
 
   // FIXME: While this code should only be hit in eval code, it will potentially
   // assign to the wrong base if m_ident exists in an intervening dynamic scope.
