@@ -127,7 +127,7 @@ class JSImmediate {
   }
 
   static ALWAYS_INLINE bool canDoFastAdditiveOperations(const JSValue* v) {
-    // Number is positive and an operation involving two of these can't
+    // Number is non-negative and an operation involving two of these can't
     // overflow.
     // Checking for allowed negative numbers takes more time than it's worth on
     // SunSpider.
@@ -151,6 +151,18 @@ class JSImmediate {
     return reinterpret_cast<JSValue*>(
         reinterpret_cast<uintptr_t>(v1) -
         (reinterpret_cast<uintptr_t>(v2) & ~NumberType));
+  }
+
+  static ALWAYS_INLINE JSValue* incImmediateNumber(const JSValue* v) {
+    ASSERT(canDoFastAdditiveOperations(v));
+    return reinterpret_cast<JSValue*>(reinterpret_cast<uintptr_t>(v) + TagMask +
+                                      1);
+  }
+
+  static ALWAYS_INLINE JSValue* decImmediateNumber(const JSValue* v) {
+    ASSERT(canDoFastAdditiveOperations(v));
+    return reinterpret_cast<JSValue*>(reinterpret_cast<uintptr_t>(v) -
+                                      (TagMask + 1));
   }
 
   static double toDouble(const JSValue*);
