@@ -817,7 +817,11 @@ void JSDOMWindowBase::printErrorMessage(const String& message) const {
   if (!frame)
     return;
 
-  if (frame->settings()->privateBrowsingEnabled())
+  Settings* settings = frame->settings();
+  if (!settings)
+    return;
+
+  if (settings->privateBrowsingEnabled())
     return;
 
   impl()->console()->addMessage(
