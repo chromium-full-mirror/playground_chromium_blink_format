@@ -78,6 +78,7 @@ class XSLTProcessor : public RefCounted<XSLTProcessor> {
   }
 
   static void parseErrorFunc(void* userData, xmlError*);
+  static void genericErrorFunc(void* userData, const char* msg, ...);
 
  public:
   // Only for libXSLT callbacks

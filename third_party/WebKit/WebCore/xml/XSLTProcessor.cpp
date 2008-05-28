@@ -108,6 +108,10 @@ SOFT_LINK(libxslt,
 
 namespace WebCore {
 
+void XSLTProcessor::genericErrorFunc(void* userData, const char* msg, ...) {
+  // It would be nice to do something with this error message.
+}
+
 void XSLTProcessor::parseErrorFunc(void* userData, xmlError* error) {
   Console* console = static_cast<Console*>(userData);
   if (!console)
@@ -165,6 +169,7 @@ static xmlDocPtr docLoaderFunc(const xmlChar* uri,
               globalProcessor->xslStylesheet()->ownerDocument()->frame())
         console = frame->domWindow()->console();
       xmlSetStructuredErrorFunc(console, XSLTProcessor::parseErrorFunc);
+      xmlSetGenericErrorFunc(console, XSLTProcessor::genericErrorFunc);
 
       // We don't specify an encoding here. Neither Gecko nor WinIE respects
       // the encoding specified in the HTTP headers.
@@ -172,6 +177,7 @@ static xmlDocPtr docLoaderFunc(const xmlChar* uri,
           xmlReadMemory(data.data(), data.size(), (const char*)uri, 0, options);
 
       xmlSetStructuredErrorFunc(0, 0);
+      xmlSetGenericErrorFunc(0, 0);
 
       return doc;
     }
