@@ -39,7 +39,7 @@ class InsertParagraphSeparatorCommand : public CompositeEditCommand {
 
  private:
   void calculateStyleBeforeInsertion(const Position&);
-  void applyStyleAfterInsertion();
+  void applyStyleAfterInsertion(Node* originalEnclosingBlock);
 
   bool shouldUseDefaultParagraphElement(Node*) const;
 
