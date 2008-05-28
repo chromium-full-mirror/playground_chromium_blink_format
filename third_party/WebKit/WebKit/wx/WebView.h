@@ -319,6 +319,22 @@ class WXDLLIMPEXP_WEBKIT wxWebViewConsoleMessageEvent : public wxCommandEvent {
   wxString m_sourceID;
 };
 
+class WXDLLIMPEXP_WEBKIT wxWebViewReceivedTitleEvent : public wxCommandEvent {
+#ifndef SWIG
+  DECLARE_DYNAMIC_CLASS(wxWebViewReceivedTitleEvent)
+#endif
+
+ public:
+  wxString GetTitle() const { return m_title; }
+  void SetTitle(const wxString& title) { m_title = title; }
+
+  wxWebViewReceivedTitleEvent(wxWindow* win = static_cast<wxWindow*>(NULL));
+  wxEvent* Clone(void) const { return new wxWebViewReceivedTitleEvent(*this); }
+
+ private:
+  wxString m_title;
+};
+
 typedef void (wxEvtHandler::*wxWebViewLoadEventFunction)(wxWebViewLoadEvent&);
 typedef void (wxEvtHandler::*wxWebViewBeforeLoadEventFunction)(
     wxWebViewBeforeLoadEvent&);
@@ -328,6 +344,8 @@ typedef void (wxEvtHandler::*wxWebViewRightClickEventFunction)(
     wxWebViewRightClickEvent&);
 typedef void (wxEvtHandler::*wxWebViewConsoleMessageEventFunction)(
     wxWebViewConsoleMessageEvent&);
+typedef void (wxEvtHandler::*wxWebViewReceivedTitleEventFunction)(
+    wxWebViewReceivedTitleEvent&);
 
 #ifndef SWIG
 BEGIN_DECLARE_EVENT_TYPES()
@@ -343,6 +361,9 @@ DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBKIT,
                             wxID_ANY)
 DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBKIT,
                             wxEVT_WEBVIEW_CONSOLE_MESSAGE,
+                            wxID_ANY)
+DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBKIT,
+                            wxEVT_WEBVIEW_RECEIVED_TITLE,
                             wxID_ANY)
 END_DECLARE_EVENT_TYPES()
 #endif
@@ -380,6 +401,13 @@ END_DECLARE_EVENT_TYPES()
       wxEVT_WEBVIEW_CONSOLE_MESSAGE, winid, wxID_ANY,                     \
       (wxObjectEventFunction)(wxWebViewConsoleMessageEventFunction)&func, \
       static_cast<wxObject*>(NULL))                                       \
+  ,
+
+#define EVT_WEBVIEW_RECEIVED_TITLE(winid, func)                          \
+  DECLARE_EVENT_TABLE_ENTRY(                                             \
+      wxEVT_WEBVIEW_RECEIVED_TITLE, winid, wxID_ANY,                     \
+      (wxObjectEventFunction)(wxWebViewReceivedTitleEventFunction)&func, \
+      static_cast<wxObject*>(NULL))                                      \
   ,
 
 #endif  // ifndef WXWEBVIEW_H
