@@ -640,7 +640,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
   // non-standard Netscape extension
   if (propertyName == exec->propertyNames().underscoreProto) {
     slot.setValueSlot(this, &_proto);
-    slotIsWriteable = true;
+    slotIsWriteable = false;
     return true;
   }
 
