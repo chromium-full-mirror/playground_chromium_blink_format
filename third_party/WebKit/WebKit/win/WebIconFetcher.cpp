@@ -40,8 +40,9 @@ class WebIconFetcherClient : public IconFetcherClient {
       : m_fetcher(0), m_delegate(delegate) {}
 
   virtual void finishedFetchingIcon(PassRefPtr<SharedBuffer> iconData) {
-    COMPtr<MemoryStream> memoryStream(AdoptCOM,
-                                      MemoryStream::createInstance(iconData));
+    COMPtr<MemoryStream> memoryStream;
+    if (iconData)
+      memoryStream.adoptRef(MemoryStream::createInstance(iconData));
 
     m_delegate->finishedLoadingIcon(m_fetcher, memoryStream.get());
 
