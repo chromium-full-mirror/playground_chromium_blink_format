@@ -564,7 +564,8 @@ Node* enclosingNodeWithTag(const Position& p, const QualifiedName& tagName) {
 }
 
 Node* enclosingNodeOfType(const Position& p,
-                          bool (*nodeIsOfType)(const Node*)) {
+                          bool (*nodeIsOfType)(const Node*),
+                          bool onlyReturnEditableNodes) {
   if (p.isNull())
     return 0;
 
@@ -574,7 +575,7 @@ Node* enclosingNodeOfType(const Position& p,
     // since
     // the callers from editing will no doubt want to perform editing inside the
     // returned node.
-    if (root && !isContentEditable(n))
+    if (root && !isContentEditable(n) && onlyReturnEditableNodes)
       continue;
     if ((*nodeIsOfType)(n))
       return n;

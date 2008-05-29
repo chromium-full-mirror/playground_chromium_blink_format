@@ -909,6 +909,10 @@ bool CompositeEditCommand::breakOutOfEmptyListItem() {
       styleAtPosition(endingSelection().start());
 
   Node* listNode = emptyListItem->parentNode();
+
+  if (!listNode->isContentEditable())
+    return false;
+
   RefPtr<Node> newBlock = isListElement(listNode->parentNode())
                               ? createListItemElement(document())
                               : createDefaultParagraphElement(document());
