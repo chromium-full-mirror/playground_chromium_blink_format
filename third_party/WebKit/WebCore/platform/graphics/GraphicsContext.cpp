@@ -316,8 +316,6 @@ const Vector<IntRect>& GraphicsContext::focusRingRects() const {
   return m_common->m_focusRingRects;
 }
 
-static const int cInterpolationCutoff = 800 * 800;
-
 void GraphicsContext::drawImage(Image* image,
                                 const FloatRect& dest,
                                 const FloatRect& src,
@@ -341,16 +339,13 @@ void GraphicsContext::drawImage(Image* image,
   if (th == -1)
     th = image->height();
 
-  bool shouldUseLowQualityInterpolation = useLowQualityScale &&
-                                          (tsw != tw || tsh != th) &&
-                                          tsw * tsh > cInterpolationCutoff;
-  if (shouldUseLowQualityInterpolation) {
+  if (useLowQualityScale) {
     save();
     setUseLowQualityImageInterpolation(true);
   }
   image->draw(this, FloatRect(dest.location(), FloatSize(tw, th)),
               FloatRect(src.location(), FloatSize(tsw, tsh)), op);
-  if (shouldUseLowQualityInterpolation)
+  if (useLowQualityScale)
     restore();
 }
 

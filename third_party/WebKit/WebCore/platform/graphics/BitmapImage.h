@@ -96,6 +96,8 @@ class BitmapImage : public Image {
   BitmapImage(ImageObserver* = 0);
   ~BitmapImage();
 
+  virtual bool isBitmapImage() const { return true; }
+
   virtual IntSize size() const;
 
   virtual bool dataChanged(bool allDataReceived);
