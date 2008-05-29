@@ -28,7 +28,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/AVLTree.h>
 
-using std::min;
+using namespace std;
 
 namespace KJS {
 
