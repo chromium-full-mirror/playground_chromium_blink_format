@@ -54,35 +54,6 @@ DocumentType::DocumentType(Document* document, const DocumentType& t)
       m_systemId(t.m_systemId),
       m_subset(t.m_subset) {}
 
-String DocumentType::toString() const {
-  if (m_name.isEmpty())
-    return "";
-
-  String result = "<!DOCTYPE ";
-  result += m_name;
-  if (!m_publicId.isEmpty()) {
-    result += " PUBLIC \"";
-    result += m_publicId;
-    result += "\"";
-    if (!m_systemId.isEmpty()) {
-      result += " \"";
-      result += m_systemId;
-      result += "\"";
-    }
-  } else if (!m_systemId.isEmpty()) {
-    result += " SYSTEM \"";
-    result += m_systemId;
-    result += "\"";
-  }
-  if (!m_subset.isEmpty()) {
-    result += " [";
-    result += m_subset;
-    result += "]";
-  }
-  result += ">";
-  return result;
-}
-
 KURL DocumentType::baseURI() const {
   return KURL();
 }

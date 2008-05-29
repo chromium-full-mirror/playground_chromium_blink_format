@@ -52,9 +52,4 @@ PassRefPtr<Text> CDATASection::createNew(PassRefPtr<StringImpl> string) {
   return new CDATASection(document(), string);
 }
 
-String CDATASection::toString() const {
-  // FIXME: We need to substitute entity references.
-  return "<![CDATA[" + data() + "]]>";
-}
-
 }  // namespace WebCore

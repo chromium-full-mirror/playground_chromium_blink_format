@@ -66,7 +66,6 @@ class ProcessingInstruction : public ContainerNode,
   void setCSSStyleSheet(CSSStyleSheet*);
   bool isLoading() const;
   virtual bool sheetLoaded();
-  virtual String toString() const;
 
 #if ENABLE(XSLT)
   bool isXSL() const { return m_isXSL; }
