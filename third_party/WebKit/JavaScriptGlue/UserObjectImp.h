@@ -41,7 +41,7 @@ class UserObjectImp : public JSObject {
   virtual const ClassInfo* classInfo() const;
   static const ClassInfo info;
 
-  virtual bool implementsCall() const;
+  virtual CallType getCallData(CallData&);
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 

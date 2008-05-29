@@ -44,8 +44,8 @@ const ClassInfo* UserObjectImp::classInfo() const {
   return &info;
 }
 
-bool UserObjectImp::implementsCall() const {
-  return fJSUserObject ? fJSUserObject->ImplementsCall() : false;
+CallType UserObjectImp::getCallData(CallData& callData) {
+  return fJSUserObject ? fJSUserObject->getCallData(callData) : CallTypeNone;
 }
 
 JSValue* UserObjectImp::callAsFunction(ExecState* exec,
@@ -70,7 +70,7 @@ JSValue* UserObjectImp::callAsFunction(ExecState* exec,
     {  // scope
       JSLock::DropAllLocks dropLocks;
 
-      // implementsCall should have guarded against a NULL fJSUserObject.
+      // getCallData should have guarded against a NULL fJSUserObject.
       assert(fJSUserObject);
       jsResult = fJSUserObject->CallFunction(jsThisObj, jsArgs);
     }
