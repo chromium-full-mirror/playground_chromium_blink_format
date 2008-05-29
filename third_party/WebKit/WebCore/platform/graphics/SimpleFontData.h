@@ -166,7 +166,7 @@ class SimpleFontData : public FontData {
 
   mutable SimpleFontData* m_smallCapsFontData;
 
-#if PLATFORM(CG)
+#if PLATFORM(CG) || PLATFORM(WIN)
   float m_syntheticBoldOffset;
 #endif
 
