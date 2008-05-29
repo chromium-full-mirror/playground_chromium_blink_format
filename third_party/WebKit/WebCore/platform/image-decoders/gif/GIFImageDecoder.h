@@ -85,6 +85,7 @@ class GIFImageDecoder : public ImageDecoder {
 
   bool m_frameCountValid;
   bool m_currentBufferSawAlpha;
+  mutable int m_repetitionCount;
   mutable GIFImageDecoderPrivate* m_reader;
 };
 }
