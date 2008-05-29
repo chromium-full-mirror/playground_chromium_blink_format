@@ -124,7 +124,8 @@ Node* ContainerNode::virtualLastChild() const {
 
 bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
                                  Node* refChild,
-                                 ExceptionCode& ec) {
+                                 ExceptionCode& ec,
+                                 bool shouldLazyAttach) {
   // Check that this node is not "floating".
   // If it is, it can be deleted as a side effect of sending mutation events.
   ASSERT(refCount() || parent());
@@ -133,7 +134,7 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
 
   // insertBefore(node, 0) is equivalent to appendChild(node)
   if (!refChild)
-    return appendChild(newChild, ec);
+    return appendChild(newChild, ec, shouldLazyAttach);
 
   // Make sure adding the new child is OK.
   checkAddChild(newChild.get(), ec);
@@ -214,8 +215,12 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     dispatchChildInsertionEvents(child.get(), ec);
 
     // Add child to the rendering tree.
-    if (attached() && !child->attached() && child->parent() == this)
-      child->attach();
+    if (attached() && !child->attached() && child->parent() == this) {
+      if (shouldLazyAttach)
+        child->lazyAttach();
+      else
+        child->attach();
+    }
 
     child = nextChild.release();
   }
@@ -229,7 +234,8 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
 
 bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
                                  Node* oldChild,
-                                 ExceptionCode& ec) {
+                                 ExceptionCode& ec,
+                                 bool shouldLazyAttach) {
   // Check that this node is not "floating".
   // If it is, it can be deleted as a side effect of sending mutation events.
   ASSERT(refCount() || parent());
@@ -325,8 +331,12 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
     dispatchChildInsertionEvents(child.get(), ec);
 
     // Add child to the rendering tree
-    if (attached() && !child->attached() && child->parent() == this)
-      child->attach();
+    if (attached() && !child->attached() && child->parent() == this) {
+      if (shouldLazyAttach)
+        child->lazyAttach();
+      else
+        child->attach();
+    }
 
     prev = child;
     child = nextChild.release();
@@ -502,7 +512,9 @@ bool ContainerNode::removeChildren() {
   return true;
 }
 
-bool ContainerNode::appendChild(PassRefPtr<Node> newChild, ExceptionCode& ec) {
+bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
+                                ExceptionCode& ec,
+                                bool shouldLazyAttach) {
   // Check that this node is not "floating".
   // If it is, it can be deleted as a side effect of sending mutation events.
   ASSERT(refCount() || parent());
@@ -563,8 +575,12 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild, ExceptionCode& ec) {
     dispatchChildInsertionEvents(child.get(), ec);
 
     // Add child to the rendering tree
-    if (attached() && !child->attached() && child->parent() == this)
-      child->attach();
+    if (attached() && !child->attached() && child->parent() == this) {
+      if (shouldLazyAttach)
+        child->lazyAttach();
+      else
+        child->attach();
+    }
 
     child = nextChild.release();
   }
@@ -651,6 +667,7 @@ void ContainerNode::attach() {
 void ContainerNode::detach() {
   for (Node* child = m_firstChild; child; child = child->nextSibling())
     child->detach();
+  setHasChangedChild(false);
   EventTargetNode::detach();
 }
 

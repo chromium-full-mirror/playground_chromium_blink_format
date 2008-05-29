@@ -40,12 +40,16 @@ class ContainerNode : public EventTargetNode {
 
   virtual bool insertBefore(PassRefPtr<Node> newChild,
                             Node* refChild,
-                            ExceptionCode&);
+                            ExceptionCode&,
+                            bool shouldLazyAttach = false);
   virtual bool replaceChild(PassRefPtr<Node> newChild,
                             Node* oldChild,
-                            ExceptionCode&);
+                            ExceptionCode&,
+                            bool shouldLazyAttach = false);
   virtual bool removeChild(Node* child, ExceptionCode&);
-  virtual bool appendChild(PassRefPtr<Node> newChild, ExceptionCode&);
+  virtual bool appendChild(PassRefPtr<Node> newChild,
+                           ExceptionCode&,
+                           bool shouldLazyAttach = false);
 
   virtual ContainerNode* addChild(PassRefPtr<Node>);
   bool hasChildNodes() const { return m_firstChild; }

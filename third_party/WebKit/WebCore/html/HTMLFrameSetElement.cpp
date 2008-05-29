@@ -181,11 +181,11 @@ void HTMLFrameSetElement::defaultEventHandler(Event* evt) {
 }
 
 void HTMLFrameSetElement::recalcStyle(StyleChange ch) {
+  HTMLElement::recalcStyle(ch);
   if (changed() && renderer()) {
     renderer()->setNeedsLayout(true);
     setChanged(NoStyleChange);
   }
-  HTMLElement::recalcStyle(ch);
 }
 
 String HTMLFrameSetElement::cols() const {

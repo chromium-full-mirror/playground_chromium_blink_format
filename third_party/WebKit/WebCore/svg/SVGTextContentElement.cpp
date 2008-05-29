@@ -406,11 +406,15 @@ static inline SVGInlineTextBoxQueryWalker executeTextQuery(
 }
 
 long SVGTextContentElement::getNumberOfChars() const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   return executeTextQuery(this, SVGInlineTextBoxQueryWalker::NumberOfCharacters)
       .longResult();
 }
 
 float SVGTextContentElement::getComputedTextLength() const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   return executeTextQuery(this, SVGInlineTextBoxQueryWalker::TextLength)
       .floatResult();
 }
@@ -418,6 +422,8 @@ float SVGTextContentElement::getComputedTextLength() const {
 float SVGTextContentElement::getSubStringLength(long charnum,
                                                 long nchars,
                                                 ExceptionCode& ec) const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   // Differences to SVG 1.1 spec, as the spec is clearly wrong. TODO: Raise SVG
   // WG issue!
   // #1: We accept a 'long nchars' parameter instead of 'unsigned long nchars'
@@ -451,6 +457,8 @@ float SVGTextContentElement::getSubStringLength(long charnum,
 FloatPoint SVGTextContentElement::getStartPositionOfChar(
     long charnum,
     ExceptionCode& ec) const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   if (charnum < 0 || charnum > getNumberOfChars()) {
     ec = INDEX_SIZE_ERR;
     return FloatPoint();
@@ -464,6 +472,8 @@ FloatPoint SVGTextContentElement::getStartPositionOfChar(
 FloatPoint SVGTextContentElement::getEndPositionOfChar(
     long charnum,
     ExceptionCode& ec) const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   if (charnum < 0 || charnum > getNumberOfChars()) {
     ec = INDEX_SIZE_ERR;
     return FloatPoint();
@@ -476,6 +486,8 @@ FloatPoint SVGTextContentElement::getEndPositionOfChar(
 
 FloatRect SVGTextContentElement::getExtentOfChar(long charnum,
                                                  ExceptionCode& ec) const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   if (charnum < 0 || charnum > getNumberOfChars()) {
     ec = INDEX_SIZE_ERR;
     return FloatRect();
@@ -487,6 +499,8 @@ FloatRect SVGTextContentElement::getExtentOfChar(long charnum,
 
 float SVGTextContentElement::getRotationOfChar(long charnum,
                                                ExceptionCode& ec) const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   if (charnum < 0 || charnum > getNumberOfChars()) {
     ec = INDEX_SIZE_ERR;
     return 0.0f;
@@ -498,6 +512,8 @@ float SVGTextContentElement::getRotationOfChar(long charnum,
 
 long SVGTextContentElement::getCharNumAtPosition(
     const FloatPoint& point) const {
+  document()->updateLayoutIgnorePendingStylesheets();
+
   return executeTextQuery(
              this, SVGInlineTextBoxQueryWalker::CharacterNumberAtPosition, 0.0f,
              0.0f, point)

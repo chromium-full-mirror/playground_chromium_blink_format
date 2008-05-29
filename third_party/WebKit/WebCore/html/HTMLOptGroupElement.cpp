@@ -49,8 +49,10 @@ const AtomicString& HTMLOptGroupElement::type() const {
 
 bool HTMLOptGroupElement::insertBefore(PassRefPtr<Node> newChild,
                                        Node* refChild,
-                                       ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::insertBefore(newChild, refChild, ec);
+                                       ExceptionCode& ec,
+                                       bool shouldLazyAttach) {
+  bool result = HTMLGenericFormElement::insertBefore(newChild, refChild, ec,
+                                                     shouldLazyAttach);
   if (result)
     recalcSelectOptions();
   return result;
@@ -58,8 +60,10 @@ bool HTMLOptGroupElement::insertBefore(PassRefPtr<Node> newChild,
 
 bool HTMLOptGroupElement::replaceChild(PassRefPtr<Node> newChild,
                                        Node* oldChild,
-                                       ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::replaceChild(newChild, oldChild, ec);
+                                       ExceptionCode& ec,
+                                       bool shouldLazyAttach) {
+  bool result = HTMLGenericFormElement::replaceChild(newChild, oldChild, ec,
+                                                     shouldLazyAttach);
   if (result)
     recalcSelectOptions();
   return result;
@@ -73,8 +77,10 @@ bool HTMLOptGroupElement::removeChild(Node* oldChild, ExceptionCode& ec) {
 }
 
 bool HTMLOptGroupElement::appendChild(PassRefPtr<Node> newChild,
-                                      ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::appendChild(newChild, ec);
+                                      ExceptionCode& ec,
+                                      bool shouldLazyAttach) {
+  bool result =
+      HTMLGenericFormElement::appendChild(newChild, ec, shouldLazyAttach);
   if (result)
     recalcSelectOptions();
   return result;

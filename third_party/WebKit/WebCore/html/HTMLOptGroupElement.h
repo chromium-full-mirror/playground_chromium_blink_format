@@ -46,12 +46,16 @@ class HTMLOptGroupElement : public HTMLGenericFormElement {
 
   virtual bool insertBefore(PassRefPtr<Node> newChild,
                             Node* refChild,
-                            ExceptionCode&);
+                            ExceptionCode&,
+                            bool shouldLazyAttach = false);
   virtual bool replaceChild(PassRefPtr<Node> newChild,
                             Node* oldChild,
-                            ExceptionCode&);
+                            ExceptionCode&,
+                            bool shouldLazyAttach = false);
   virtual bool removeChild(Node* child, ExceptionCode&);
-  virtual bool appendChild(PassRefPtr<Node> newChild, ExceptionCode&);
+  virtual bool appendChild(PassRefPtr<Node> newChild,
+                           ExceptionCode&,
+                           bool shouldLazyAttach = false);
   virtual bool removeChildren();
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
