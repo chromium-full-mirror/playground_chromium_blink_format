@@ -186,6 +186,10 @@ AccessibilityObject* AccessibilityObject::linkedUIElement() const {
   return 0;
 }
 
+AccessibilityObject* AccessibilityObject::titleUIElement() const {
+  return 0;
+}
+
 int AccessibilityObject::textLength() const {
   return 0;
 }

@@ -41,6 +41,7 @@ class HitTestResult;
 class HTMLAnchorElement;
 class HTMLAreaElement;
 class HTMLElement;
+class HTMLLabelElement;
 class HTMLSelectElement;
 class IntPoint;
 class IntSize;
@@ -81,6 +82,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool isMenuBar() const;
   virtual bool isMenuButton() const;
   virtual bool isMenuItem() const;
+  virtual bool isControl() const;
 
   virtual bool isEnabled() const;
   virtual bool isSelected() const;
@@ -120,6 +122,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual AccessibilityObject* parentObject() const;
   virtual AccessibilityObject* observableObject() const;
   virtual AccessibilityObject* linkedUIElement() const;
+  virtual AccessibilityObject* titleUIElement() const;
   virtual AccessibilityRole ariaRoleAttribute() const;
   void setAriaRole();
   virtual AccessibilityRole roleValue() const;
@@ -143,6 +146,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   RenderTextControl* textControl() const;
   Document* document() const;
   FrameView* topDocumentFrameView() const;
+  HTMLLabelElement* labelElementContainer() const;
 
   virtual KURL url() const;
   virtual PlainTextRange selectedTextRange() const;
@@ -219,6 +223,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
   Element* menuElementForMenuButton() const;
   Element* menuItemElementForMenu() const;
   AccessibilityRole determineAriaRoleAttribute() const;
+
+  IntRect checkboxOrRadioRect() const;
 };
 
 }  // namespace WebCore
