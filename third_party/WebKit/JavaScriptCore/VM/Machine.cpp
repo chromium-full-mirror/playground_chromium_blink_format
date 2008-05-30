@@ -1143,13 +1143,18 @@ profilerFetchHack:
          as with the ECMAScript '==' operator, and puts the result
          as a boolean in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* result =
-          jsBoolean(equal(exec, r[src1].u.jsValue, r[src2].u.jsValue));
-      VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result;
+      if (JSImmediate::areBothImmediateNumbers(src1, src2))
+        result = jsBoolean(reinterpret_cast<intptr_t>(src1) ==
+                           reinterpret_cast<intptr_t>(src2));
+      else {
+        result = jsBoolean(equal(exec, src1, src2));
+        VM_CHECK_EXCEPTION();
+      }
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1161,13 +1166,18 @@ profilerFetchHack:
          equal, as with the ECMAScript '!=' operator, and puts the
          result as a boolean in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* result =
-          jsBoolean(!equal(exec, r[src1].u.jsValue, r[src2].u.jsValue));
-      VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result;
+      if (JSImmediate::areBothImmediateNumbers(src1, src2))
+        result = jsBoolean(reinterpret_cast<intptr_t>(src1) !=
+                           reinterpret_cast<intptr_t>(src2));
+      else {
+        result = jsBoolean(!equal(exec, src1, src2));
+        VM_CHECK_EXCEPTION();
+      }
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1179,11 +1189,14 @@ profilerFetchHack:
          equal, as with the ECMAScript '===' operator, and puts the
          result as a boolean in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      r[dst].u.jsValue =
-          jsBoolean(strictEqual(r[src1].u.jsValue, r[src2].u.jsValue));
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
+      if (JSImmediate::areBothImmediateNumbers(src1, src2))
+        dst = jsBoolean(reinterpret_cast<intptr_t>(src1) ==
+                        reinterpret_cast<intptr_t>(src2));
+      else
+        dst = jsBoolean(strictEqual(src1, src2));
 
       ++vPC;
       NEXT_OPCODE;
@@ -1195,11 +1208,14 @@ profilerFetchHack:
          strictly equal, as with the ECMAScript '!==' operator, and
          puts the result as a boolean in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      r[dst].u.jsValue =
-          jsBoolean(!strictEqual(r[src1].u.jsValue, r[src2].u.jsValue));
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
+      if (JSImmediate::areBothImmediateNumbers(src1, src2))
+        dst = jsBoolean(reinterpret_cast<intptr_t>(src1) !=
+                        reinterpret_cast<intptr_t>(src2));
+      else
+        dst = jsBoolean(!strictEqual(src1, src2));
 
       ++vPC;
       NEXT_OPCODE;
@@ -1211,13 +1227,12 @@ profilerFetchHack:
          with the ECMAScript '<' operator, and puts the result as
          a boolean in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* result =
-          jsBoolean(jsLess(exec, r[src1].u.jsValue, r[src2].u.jsValue));
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result = jsBoolean(jsLess(exec, src1, src2));
       VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1229,13 +1244,12 @@ profilerFetchHack:
          register src2, as with the ECMAScript '<=' operator, and
          puts the result as a boolean in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* result =
-          jsBoolean(jsLessEq(exec, r[src1].u.jsValue, r[src2].u.jsValue));
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result = jsBoolean(jsLessEq(exec, src1, src2));
       VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1370,19 +1384,18 @@ profilerFetchHack:
          in register dst. (JS add may be string concatenation or
          numeric add, depending on the types of the operands.)
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* v1 = r[src1].u.jsValue;
-      JSValue* v2 = r[src2].u.jsValue;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
       JSValue* result;
-      if (JSImmediate::canDoFastAdditiveOperations(v1) &&
-          JSImmediate::canDoFastAdditiveOperations(v2))
-        result = JSImmediate::addImmediateNumbers(v1, v2);
-      else
-        result = jsAdd(exec, v1, v2);
-      VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      if (JSImmediate::canDoFastAdditiveOperations(src1) &&
+          JSImmediate::canDoFastAdditiveOperations(src2))
+        result = JSImmediate::addImmediateNumbers(src1, src2);
+      else {
+        result = jsAdd(exec, src1, src2);
+        VM_CHECK_EXCEPTION();
+      }
+      dst = result;
       ++vPC;
       NEXT_OPCODE;
     }
@@ -1392,13 +1405,12 @@ profilerFetchHack:
          Multiplies register src1 and register src2 (converted to
          numbers), and puts the product in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* result = jsNumber(r[src1].u.jsValue->toNumber(exec) *
-                                 r[src2].u.jsValue->toNumber(exec));
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result = jsNumber(src1->toNumber(exec) * src2->toNumber(exec));
       VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1444,19 +1456,18 @@ profilerFetchHack:
          src1 (converted to number), and puts the difference in
          register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* v1 = r[src1].u.jsValue;
-      JSValue* v2 = r[src2].u.jsValue;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
       JSValue* result;
-      if (JSImmediate::canDoFastAdditiveOperations(v1) &&
-          JSImmediate::canDoFastAdditiveOperations(v2))
-        result = JSImmediate::subImmediateNumbers(v1, v2);
-      else
-        result = jsNumber(v1->toNumber(exec) - v2->toNumber(exec));
-      VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      if (JSImmediate::canDoFastAdditiveOperations(src1) &&
+          JSImmediate::canDoFastAdditiveOperations(src2))
+        result = JSImmediate::subImmediateNumbers(src1, src2);
+      else {
+        result = jsNumber(src1->toNumber(exec) - src2->toNumber(exec));
+        VM_CHECK_EXCEPTION();
+      }
+      dst = result;
       ++vPC;
       NEXT_OPCODE;
     }
@@ -1467,13 +1478,13 @@ profilerFetchHack:
          register shift (converted to uint32), and puts the result
          in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int val = (++vPC)->u.operand;
-      int shift = (++vPC)->u.operand;
-      JSValue* result = jsNumber((r[val].u.jsValue->toInt32(exec))
-                                 << (r[shift].u.jsValue->toUInt32(exec)));
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* val = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* shift = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result =
+          jsNumber((val->toInt32(exec)) << (shift->toUInt32(exec)));
       VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1485,13 +1496,18 @@ profilerFetchHack:
          to int32) by register shift (converted to
          uint32), and puts the result in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int val = (++vPC)->u.operand;
-      int shift = (++vPC)->u.operand;
-      JSValue* result = jsNumber((r[val].u.jsValue->toInt32(exec)) >>
-                                 (r[shift].u.jsValue->toUInt32(exec)));
-      VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* val = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* shift = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result;
+      if (JSImmediate::areBothImmediateNumbers(val, shift))
+        result = JSImmediate::rightShiftImmediateNumbers(val, shift);
+      else {
+        result =
+            jsNumber((val->toInt32(exec)) >> (shift->toUInt32(exec) & 0x1f));
+        VM_CHECK_EXCEPTION();
+      }
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1503,13 +1519,14 @@ profilerFetchHack:
          to uint32) by register shift (converted to
          uint32), and puts the result in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int val = (++vPC)->u.operand;
-      int shift = (++vPC)->u.operand;
-      JSValue* result = jsNumber((r[val].u.jsValue->toUInt32(exec)) >>
-                                 (r[shift].u.jsValue->toUInt32(exec)));
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* val = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* shift = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* result;
+      result =
+          jsNumber((val->toUInt32(exec)) >> (shift->toUInt32(exec) & 0x1f));
       VM_CHECK_EXCEPTION();
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1521,19 +1538,17 @@ profilerFetchHack:
          and register src2 (converted to int32), and puts the result
          in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* v1 = r[src1].u.jsValue;
-      JSValue* v2 = r[src2].u.jsValue;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
       JSValue* result;
-      if (JSImmediate::areBothImmediateNumbers(v1, v2))
-        result = JSImmediate::andImmediateNumbers(v1, v2);
+      if (JSImmediate::areBothImmediateNumbers(src1, src2))
+        result = JSImmediate::andImmediateNumbers(src1, src2);
       else {
-        result = jsNumber(v1->toInt32(exec) & v2->toInt32(exec));
+        result = jsNumber(src1->toInt32(exec) & src2->toInt32(exec));
         VM_CHECK_EXCEPTION();
       }
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1545,19 +1560,17 @@ profilerFetchHack:
          and register src2 (converted to int32), and puts the result
          in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* v1 = r[src1].u.jsValue;
-      JSValue* v2 = r[src2].u.jsValue;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
       JSValue* result;
-      if (JSImmediate::areBothImmediateNumbers(v1, v2))
-        result = JSImmediate::xorImmediateNumbers(v1, v2);
+      if (JSImmediate::areBothImmediateNumbers(src1, src2))
+        result = JSImmediate::xorImmediateNumbers(src1, src2);
       else {
-        result = jsNumber(v1->toInt32(exec) ^ v2->toInt32(exec));
+        result = jsNumber(src1->toInt32(exec) ^ src2->toInt32(exec));
         VM_CHECK_EXCEPTION();
       }
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
@@ -1569,19 +1582,17 @@ profilerFetchHack:
          and register src2 (converted to int32), and puts the
          result in register dst.
       */
-      int dst = (++vPC)->u.operand;
-      int src1 = (++vPC)->u.operand;
-      int src2 = (++vPC)->u.operand;
-      JSValue* v1 = r[src1].u.jsValue;
-      JSValue* v2 = r[src2].u.jsValue;
+      JSValue*& dst = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src1 = r[(++vPC)->u.operand].u.jsValue;
+      JSValue* src2 = r[(++vPC)->u.operand].u.jsValue;
       JSValue* result;
-      if (JSImmediate::areBothImmediateNumbers(v1, v2))
-        result = JSImmediate::orImmediateNumbers(v1, v2);
+      if (JSImmediate::areBothImmediateNumbers(src1, src2))
+        result = JSImmediate::orImmediateNumbers(src1, src2);
       else {
-        result = jsNumber(v1->toInt32(exec) | v2->toInt32(exec));
+        result = jsNumber(src1->toInt32(exec) | src2->toInt32(exec));
         VM_CHECK_EXCEPTION();
       }
-      r[dst].u.jsValue = result;
+      dst = result;
 
       ++vPC;
       NEXT_OPCODE;
