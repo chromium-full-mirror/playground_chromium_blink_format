@@ -32,6 +32,7 @@
 #include "SystemTime.h"
 
 #include <QTimer>
+#include <QCoreApplication>
 
 namespace WebCore {
 
@@ -46,9 +47,19 @@ class SharedTimerQt : public QTimer {
   ~SharedTimerQt() {}
 
  public:
+  static void cleanup() {
+    if (s_self->isActive())
+      s_self->fire();
+
+    delete s_self;
+    s_self = 0;
+  }
+
   static SharedTimerQt* inst() {
-    if (!s_self)
+    if (!s_self) {
       s_self = new SharedTimerQt();
+      qAddPostRoutine(SharedTimerQt::cleanup);
+    }
 
     return s_self;
   }
