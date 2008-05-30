@@ -47,6 +47,7 @@ class JSDOMWindowShell : public DOMObject {
   JSDOMWindow* window() const { return m_window; }
   void setWindow(JSDOMWindow* window) {
     ASSERT_ARG(window, window);
+    m_liveFormerWindows->add(m_window);
     m_window = window;
     setPrototype(window->prototype());
   }
@@ -91,9 +92,15 @@ class JSDOMWindowShell : public DOMObject {
   DOMWindow* impl() const;
   void disconnectFrame();
   void clear();
+  void updateDocument();
+
+  void clearFormerWindow(JSDOMWindow* window) {
+    m_liveFormerWindows->remove(window);
+  }
 
  private:
   JSDOMWindow* m_window;
+  HashSet<JSDOMWindow*>* m_liveFormerWindows;
 };
 
 KJS::JSValue* toJS(KJS::ExecState*, Frame*);
