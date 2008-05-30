@@ -538,7 +538,6 @@ static String stringForReplacedNode(Node* replacedNode) {
   // replaced nodes are either attachments (widgets) or images
   if (!replacedNode || !replacedNode->renderer() ||
       !replacedNode->renderer()->isReplaced() || replacedNode->isTextNode()) {
-    ASSERT_NOT_REACHED();
     return String();
   }
 
