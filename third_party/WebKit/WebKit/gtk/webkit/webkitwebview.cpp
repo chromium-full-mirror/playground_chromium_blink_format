@@ -102,7 +102,7 @@ enum {
   PROP_SETTINGS,
   PROP_TRANSPARENT,
   PROP_ZOOM_LEVEL,
-  PROP_ZOOM_TEXT_ONLY
+  PROP_FULL_CONTENT_ZOOM
 };
 
 static guint webkit_web_view_signals[LAST_SIGNAL] = {
@@ -261,7 +261,7 @@ static void webkit_web_view_get_property(GObject* object,
     case PROP_ZOOM_LEVEL:
       g_value_set_float(value, webkit_web_view_get_zoom_level(webView));
       break;
-    case PROP_ZOOM_TEXT_ONLY:
+    case PROP_FULL_CONTENT_ZOOM:
       g_value_set_boolean(value,
                           webkit_web_view_get_full_content_zoom(webView));
       break;
@@ -290,7 +290,7 @@ static void webkit_web_view_set_property(GObject* object,
     case PROP_ZOOM_LEVEL:
       webkit_web_view_set_zoom_level(webView, g_value_get_float(value));
       break;
-    case PROP_ZOOM_TEXT_ONLY:
+    case PROP_FULL_CONTENT_ZOOM:
       webkit_web_view_set_full_content_zoom(webView,
                                             g_value_get_boolean(value));
       break;
@@ -1212,9 +1212,9 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
                          G_MAXFLOAT, 1, WEBKIT_PARAM_READWRITE));
 
   g_object_class_install_property(
-      objectClass, PROP_ZOOM_TEXT_ONLY,
-      g_param_spec_boolean("full-content-zoom", "Text-only zoom",
-                           "Whether only the text size is changed when zooming",
+      objectClass, PROP_FULL_CONTENT_ZOOM,
+      g_param_spec_boolean("full-content-zoom", "Full content zoom",
+                           "Whether the full content is scaled when zooming",
                            FALSE, WEBKIT_PARAM_READWRITE));
 
   g_type_class_add_private(webViewClass, sizeof(WebKitWebViewPrivate));
