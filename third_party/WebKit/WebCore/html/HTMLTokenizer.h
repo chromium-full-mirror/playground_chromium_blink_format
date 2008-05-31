@@ -191,7 +191,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   State scriptExecution(const String& script,
                         State,
                         const String& scriptURL,
-                        int baseLine = 0);
+                        int baseLine = 1);
   void setSrc(const SegmentedString&);
 
   // check if we have enough space in the buffer.

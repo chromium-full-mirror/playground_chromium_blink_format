@@ -607,7 +607,7 @@ JSValue* globalFuncEval(ExecState* exec,
   UString errMsg;
 
   RefPtr<EvalNode> evalNode = parser().parse<EvalNode>(
-      exec, UString(), 0, UStringSourceProvider::create(s), &sourceId, &errLine,
+      exec, UString(), 1, UStringSourceProvider::create(s), &sourceId, &errLine,
       &errMsg);
 
   if (!evalNode)

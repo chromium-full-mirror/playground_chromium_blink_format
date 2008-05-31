@@ -98,7 +98,7 @@ Lexer::~Lexer() {
 }
 
 void Lexer::setCode(int startingLineNumber, PassRefPtr<SourceProvider> source) {
-  yylineno = 1 + startingLineNumber;
+  yylineno = startingLineNumber;
   restrKeyword = false;
   delimited = false;
   eatNextIdentifier = false;

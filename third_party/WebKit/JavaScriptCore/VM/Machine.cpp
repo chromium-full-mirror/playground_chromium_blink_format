@@ -515,7 +515,7 @@ static NEVER_INLINE JSValue* callEval(ExecState* exec,
   int errLine;
   UString errMsg;
   RefPtr<EvalNode> evalNode = parser().parse<EvalNode>(
-      exec, UString(), 0,
+      exec, UString(), 1,
       UStringSourceProvider::create(static_cast<StringImp*>(program)->value()),
       &sourceId, &errLine, &errMsg);
 
@@ -996,12 +996,12 @@ NEVER_INLINE void Machine::debug(ExecState* exec,
     }
     case WillExecuteProgram: {
       debugger->willExecuteProgram(debuggerCallFrame,
-                                   codeBlock->ownerNode->sourceId(), lastLine);
+                                   codeBlock->ownerNode->sourceId(), firstLine);
       return;
     }
     case DidExecuteProgram: {
       debugger->didExecuteProgram(debuggerCallFrame,
-                                  codeBlock->ownerNode->sourceId(), firstLine);
+                                  codeBlock->ownerNode->sourceId(), lastLine);
       return;
     }
   }

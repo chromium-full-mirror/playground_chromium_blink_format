@@ -83,7 +83,7 @@ class JSLazyEventListener : public JSEventListener {
                       const String& code,
                       JSDOMWindow*,
                       Node*,
-                      int lineNumber = 0);
+                      int lineNumber);
   virtual KJS::JSObject* listenerObj() const;
 
  private:

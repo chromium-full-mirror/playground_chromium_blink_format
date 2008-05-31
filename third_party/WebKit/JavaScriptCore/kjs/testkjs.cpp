@@ -199,7 +199,7 @@ JSValue* functionRun(ExecState* exec, JSObject*, const List& args) {
 
   stopWatch.start();
   Interpreter::evaluate(globalObject->globalExec(),
-                        globalObject->globalScopeChain(), fileName, 0,
+                        globalObject->globalScopeChain(), fileName, 1,
                         script.data());
   stopWatch.stop();
 
@@ -214,7 +214,7 @@ JSValue* functionLoad(ExecState* exec, JSObject*, const List& args) {
 
   JSGlobalObject* globalObject = exec->dynamicGlobalObject();
   Interpreter::evaluate(globalObject->globalExec(),
-                        globalObject->globalScopeChain(), fileName, 0,
+                        globalObject->globalScopeChain(), fileName, 1,
                         script.data());
 
   return jsUndefined();
@@ -284,7 +284,7 @@ static bool prettyPrintScript(ExecState* exec,
   UString errMsg;
   UString scriptUString(script.data());
   RefPtr<ProgramNode> programNode = parser().parse<ProgramNode>(
-      exec, fileName, 0, UStringSourceProvider::create(scriptUString), 0,
+      exec, fileName, 1, UStringSourceProvider::create(scriptUString), 0,
       &errLine, &errMsg);
   if (!programNode) {
     fprintf(stderr, "%s:%d: %s.\n", fileName.UTF8String().c_str(), errLine,
@@ -319,7 +319,7 @@ static bool runWithScripts(const Vector<UString>& fileNames,
     else {
       Completion completion = Interpreter::evaluate(
           globalObject->globalExec(), globalObject->globalScopeChain(),
-          fileName, 0, script.data());
+          fileName, 1, script.data());
       success = success && completion.complType() != Throw;
       if (dump) {
         if (success)

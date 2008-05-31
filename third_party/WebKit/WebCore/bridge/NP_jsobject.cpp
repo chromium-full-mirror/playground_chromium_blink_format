@@ -210,7 +210,7 @@ bool _NPN_Evaluate(NPP, NPObject* o, NPString* s, NPVariant* variant) {
     Completion completion =
         Interpreter::evaluate(rootObject->globalObject()->globalExec(),
                               rootObject->globalObject()->globalScopeChain(),
-                              UString(), 0, scriptString);
+                              UString(), 1, scriptString);
     rootObject->globalObject()->stopTimeoutCheck();
     ComplType type = completion.complType();
 
