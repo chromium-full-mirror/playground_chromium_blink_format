@@ -185,6 +185,11 @@ Frame::~Frame() {
   if (d->m_domWindow)
     d->m_domWindow->disconnectFrame();
 
+  HashSet<DOMWindow*>::iterator end = d->m_liveFormerWindows.end();
+  for (HashSet<DOMWindow*>::iterator it = d->m_liveFormerWindows.begin();
+       it != end; ++it)
+    (*it)->disconnectFrame();
+
   if (d->m_view) {
     d->m_view->hide();
     d->m_view->clearFrame();
@@ -256,10 +261,7 @@ void Frame::setDocument(PassRefPtr<Document> newDoc) {
     d->m_doc->attach();
 
   // Update the cached 'document' property, which is now stale.
-  if (d->m_doc && d->m_jscript.haveWindowShell()) {
-    JSLock lock;
-    d->m_jscript.windowShell()->updateDocument();
-  }
+  d->m_jscript.updateDocument();
 }
 
 Settings* Frame::settings() const {
@@ -1117,8 +1119,10 @@ void Frame::clearScriptProxy() {
 }
 
 void Frame::clearDOMWindow() {
-  if (d->m_domWindow)
+  if (d->m_domWindow) {
+    d->m_liveFormerWindows.add(d->m_domWindow.get());
     d->m_domWindow->clear();
+  }
   d->m_domWindow = 0;
 }
 
@@ -1717,6 +1721,10 @@ DOMWindow* Frame::domWindow() const {
     d->m_domWindow = DOMWindow::create(const_cast<Frame*>(this));
 
   return d->m_domWindow.get();
+}
+
+void Frame::clearFormerDOMWindow(DOMWindow* window) {
+  d->m_liveFormerWindows.remove(window);
 }
 
 Page* Frame::page() const {

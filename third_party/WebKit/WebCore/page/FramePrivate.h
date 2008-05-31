@@ -78,6 +78,7 @@ class FramePrivate {
   FrameTree m_treeNode;
   FrameLoader m_loader;
   RefPtr<DOMWindow> m_domWindow;
+  HashSet<DOMWindow*> m_liveFormerWindows;
 
   HTMLFrameOwnerElement* m_ownerElement;
   RefPtr<FrameView> m_view;

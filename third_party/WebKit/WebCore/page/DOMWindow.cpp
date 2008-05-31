@@ -141,7 +141,10 @@ void DOMWindow::adjustWindowRect(const FloatRect& screen,
 
 DOMWindow::DOMWindow(Frame* frame) : m_frame(frame) {}
 
-DOMWindow::~DOMWindow() {}
+DOMWindow::~DOMWindow() {
+  if (m_frame)
+    m_frame->clearFormerDOMWindow(this);
+}
 
 void DOMWindow::disconnectFrame() {
   m_frame = 0;
