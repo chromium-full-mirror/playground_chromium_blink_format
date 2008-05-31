@@ -979,6 +979,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
     bool endLineMatched = false;
     bool checkForEndLineMatch = endLine;
+    bool checkForFloatsFromLastLine = false;
     int lastHeight = m_height;
 
     while (!end.atEnd()) {
@@ -1001,6 +1002,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       end = findNextLineBreak(start, &clear);
       if (start.position().atEnd()) {
         start.deleteRuns();
+        checkForFloatsFromLastLine = true;
         break;
       }
       ASSERT(end != start.position());
@@ -1192,27 +1194,26 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
         }
       }
     }
-    if (m_floatingObjects) {
+    if (m_floatingObjects &&
+        (checkForFloatsFromLastLine || positionNewFloats()) && lastRootBox()) {
       // In case we have a float on the last line, it might not be positioned up
       // to now.
       // This has to be done before adding in the bottom border/padding, or the
       // float will
       // include the padding incorrectly. -dwh
-      if (positionNewFloats() && lastRootBox()) {
-        if (lastFloat) {
-          for (FloatingObject* f = m_floatingObjects->last(); f != lastFloat;
-               f = m_floatingObjects->prev()) {
-          }
-          m_floatingObjects->next();
-        } else
-          m_floatingObjects->first();
-        for (FloatingObject* f = m_floatingObjects->current(); f;
-             f = m_floatingObjects->next()) {
-          if (f->m_bottom > lastHeight)
-            lastRootBox()->floats().append(f->m_renderer);
+      if (lastFloat) {
+        for (FloatingObject* f = m_floatingObjects->last(); f != lastFloat;
+             f = m_floatingObjects->prev()) {
         }
-        lastFloat = m_floatingObjects->last();
+        m_floatingObjects->next();
+      } else
+        m_floatingObjects->first();
+      for (FloatingObject* f = m_floatingObjects->current(); f;
+           f = m_floatingObjects->next()) {
+        if (f->m_bottom > lastHeight)
+          lastRootBox()->floats().append(f->m_renderer);
       }
+      lastFloat = m_floatingObjects->last();
     }
   }
 
