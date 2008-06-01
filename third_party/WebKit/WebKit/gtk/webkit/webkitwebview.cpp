@@ -1209,7 +1209,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
       objectClass, PROP_ZOOM_LEVEL,
       g_param_spec_float("zoom-level", "Zoom level",
                          "The level of zoom of the content", G_MINFLOAT,
-                         G_MAXFLOAT, 1, WEBKIT_PARAM_READWRITE));
+                         G_MAXFLOAT, 1.0f, WEBKIT_PARAM_READWRITE));
 
   g_object_class_install_property(
       objectClass, PROP_FULL_CONTENT_ZOOM,
