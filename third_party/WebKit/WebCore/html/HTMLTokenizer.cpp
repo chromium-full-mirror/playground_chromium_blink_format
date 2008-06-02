@@ -1814,6 +1814,7 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
       tagStartLineno = m_lineNumber;
       src.advancePastNonNewline();
       state.setStartTag(true);
+      state.setDiscardLF(false);
     } else if (cc == '\n' || cc == '\r') {
       if (state.discardLF())
         // Ignore this LF

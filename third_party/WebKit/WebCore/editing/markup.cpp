@@ -405,9 +405,8 @@ static void appendStartMarkup(
   switch (node->nodeType()) {
     case Node::TEXT_NODE: {
       if (Node* parent = node->parentNode()) {
-        if (parent->hasTagName(listingTag) || parent->hasTagName(scriptTag) ||
-            parent->hasTagName(styleTag) || parent->hasTagName(textareaTag) ||
-            parent->hasTagName(xmpTag)) {
+        if (parent->hasTagName(scriptTag) || parent->hasTagName(styleTag) ||
+            parent->hasTagName(textareaTag) || parent->hasTagName(xmpTag)) {
           appendUCharRange(result, ucharRange(node, range));
           break;
         }
