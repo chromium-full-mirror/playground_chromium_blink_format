@@ -54,6 +54,8 @@ enum DebugHookID {
   WillExecuteStatement
 };
 
+enum { MaxReentryDepth = 128 };
+
 class Machine {
  public:
   enum {
@@ -131,7 +133,6 @@ class Machine {
                                int& argc);
 
  private:
-  enum { MaxReentryDepth = 128 };
   typedef enum { Normal, InitializeAndReturn } ExecutionFlag;
 
   ALWAYS_INLINE void setScopeChain(ExecState* exec,

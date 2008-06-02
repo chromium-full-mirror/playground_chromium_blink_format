@@ -92,8 +92,12 @@ JSValue* arrayProtoFuncToString(ExecState* exec,
   if (!thisObj->inherits(&ArrayInstance::info))
     return throwError(exec, TypeError);
 
-  bool alreadyVisited =
-      !exec->dynamicGlobalObject()->arrayVisitedElements().add(thisObj).second;
+  HashSet<JSObject*>& arrayVisitedElements =
+      exec->dynamicGlobalObject()->arrayVisitedElements();
+  if (arrayVisitedElements.size() > MaxReentryDepth)
+    return throwError(exec, RangeError, "Maximum call stack size exceeded.");
+
+  bool alreadyVisited = !arrayVisitedElements.add(thisObj).second;
   Vector<UChar, 256> strBuffer;
   if (alreadyVisited)
     return jsString(
@@ -136,8 +140,12 @@ JSValue* arrayProtoFuncToLocaleString(ExecState* exec,
   if (!thisObj->inherits(&ArrayInstance::info))
     return throwError(exec, TypeError);
 
-  bool alreadyVisited =
-      !exec->dynamicGlobalObject()->arrayVisitedElements().add(thisObj).second;
+  HashSet<JSObject*>& arrayVisitedElements =
+      exec->dynamicGlobalObject()->arrayVisitedElements();
+  if (arrayVisitedElements.size() > MaxReentryDepth)
+    return throwError(exec, RangeError, "Maximum call stack size exceeded.");
+
+  bool alreadyVisited = !arrayVisitedElements.add(thisObj).second;
   Vector<UChar, 256> strBuffer;
   if (alreadyVisited)
     return jsString(
@@ -187,8 +195,12 @@ JSValue* arrayProtoFuncToLocaleString(ExecState* exec,
 JSValue* arrayProtoFuncJoin(ExecState* exec,
                             JSObject* thisObj,
                             const List& args) {
-  bool alreadyVisited =
-      !exec->dynamicGlobalObject()->arrayVisitedElements().add(thisObj).second;
+  HashSet<JSObject*>& arrayVisitedElements =
+      exec->dynamicGlobalObject()->arrayVisitedElements();
+  if (arrayVisitedElements.size() > MaxReentryDepth)
+    return throwError(exec, RangeError, "Maximum call stack size exceeded.");
+
+  bool alreadyVisited = !arrayVisitedElements.add(thisObj).second;
   Vector<UChar, 256> strBuffer;
   if (alreadyVisited)
     return jsString(
