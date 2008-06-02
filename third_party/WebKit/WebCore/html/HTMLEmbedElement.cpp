@@ -159,6 +159,7 @@ void HTMLEmbedElement::detach() {
 }
 
 void HTMLEmbedElement::updateWidget() {
+  document()->updateRendering();
   if (m_needWidgetUpdate && renderer())
     static_cast<RenderPartObject*>(renderer())->updateWidget(true);
 }
