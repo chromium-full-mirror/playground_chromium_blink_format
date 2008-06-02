@@ -938,6 +938,14 @@ AccessibilityRole AccessibilityObject::ariaRoleAttribute() const {
   return UnknownRole;
 }
 
+bool AccessibilityObject::isPresentationalChildOfAriaRole() const {
+  return false;
+}
+
+bool AccessibilityObject::ariaRoleHasPresentationalChildren() const {
+  return false;
+}
+
 void AccessibilityObject::clearChildren() {
   m_haveChildren = false;
   m_children.clear();
