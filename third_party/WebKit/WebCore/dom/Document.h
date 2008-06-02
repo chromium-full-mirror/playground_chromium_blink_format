@@ -227,11 +227,12 @@ class Document : public ContainerNode {
       const String& data,
       ExceptionCode&);
   PassRefPtr<Attr> createAttribute(const String& name, ExceptionCode& ec) {
-    return createAttributeNS(String(), name, ec);
+    return createAttributeNS(String(), name, ec, true);
   }
   PassRefPtr<Attr> createAttributeNS(const String& namespaceURI,
                                      const String& qualifiedName,
-                                     ExceptionCode&);
+                                     ExceptionCode&,
+                                     bool shouldIgnoreNamespaceChecks = false);
   PassRefPtr<EntityReference> createEntityReference(const String& name,
                                                     ExceptionCode&);
   PassRefPtr<Node> importNode(Node* importedNode, bool deep, ExceptionCode&);
