@@ -135,9 +135,7 @@ void CodeGenerator::setDumpsGeneratedCode(bool dumpsGeneratedCode) {
 
 void CodeGenerator::generate() {
   m_codeBlock->numLocals = m_codeBlock->numVars + m_codeBlock->numParameters;
-  m_codeBlock->thisRegister = m_codeType == FunctionCode
-                                  ? -m_codeBlock->numLocals
-                                  : Machine::ProgramCodeThisRegister;
+  m_codeBlock->thisRegister = m_thisRegister.index();
   if (m_shouldEmitDebugHooks)
     m_codeBlock->needsFullScopeChain = true;
 
@@ -150,9 +148,13 @@ void CodeGenerator::generate() {
   }
 #endif
 
-  // Remove "this" from symbol table so it does not appear as a global object
-  // property at runtime.
-  symbolTable().remove(m_propertyNames->thisIdentifier.ustring().rep());
+  m_scopeNode->children().shrinkCapacity(0);
+  if (m_codeType != EvalCode) {  // eval code needs to hang on to its
+                                 // declaration stacks to keep declaration info
+                                 // alive until Machine::execute time.
+    m_scopeNode->varStack().shrinkCapacity(0);
+    m_scopeNode->functionStack().shrinkCapacity(0);
+  }
 }
 
 bool CodeGenerator::addVar(const Identifier& ident,
@@ -176,11 +178,6 @@ bool CodeGenerator::addVar(const Identifier& ident,
   return result.second;
 }
 
-RegisterID* CodeGenerator::programCodeThis() {
-  static RegisterID programThis(Machine::ProgramCodeThisRegister);
-  return &programThis;
-}
-
 CodeGenerator::CodeGenerator(ProgramNode* programNode,
                              const Debugger* debugger,
                              const ScopeChain& scopeChain,
@@ -194,17 +191,15 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
       m_symbolTable(symbolTable),
       m_scopeNode(programNode),
       m_codeBlock(codeBlock),
+      m_thisRegister(Machine::ProgramCodeThisRegister),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
       m_codeType(GlobalCode),
       m_continueDepth(0),
       m_nextVar(-1),
-      m_propertyNames(CommonIdentifiers::shared())
-
-{
+      m_propertyNames(CommonIdentifiers::shared()) {
   // Global code can inherit previously defined symbols.
   int size = symbolTable->size() + 1;  // + 1 slot for  "this"
-  m_thisRegister = programCodeThis();
 
   // Add previously defined symbols to bookkeeping.
   m_locals.resize(size);
@@ -220,9 +215,11 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
 
   ExecState* exec = globalObject->globalExec();
 
+  // FIXME: Move the execution-related parts of this code to Machine::execute.
+
   if (canCreateVariables) {
     for (size_t i = 0; i < functionStack.size(); ++i) {
-      FuncDeclNode* funcDecl = functionStack[i];
+      FuncDeclNode* funcDecl = functionStack[i].get();
       globalObject->removeDirect(funcDecl->m_ident);  // Make sure our new
                                                       // function is not
                                                       // shadowed by an old
@@ -238,7 +235,7 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
     }
   } else {
     for (size_t i = 0; i < functionStack.size(); ++i) {
-      FuncDeclNode* funcDecl = functionStack[i];
+      FuncDeclNode* funcDecl = functionStack[i].get();
       globalObject->putWithAttributes(
           exec, funcDecl->m_ident,
           funcDecl->makeFunction(exec, scopeChain.node()), DontDelete);
@@ -259,30 +256,28 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
                              const Debugger* debugger,
                              const ScopeChain& scopeChain,
                              SymbolTable* symbolTable,
-                             CodeBlock* codeBlock,
-                             VarStack& varStack,
-                             FunctionStack& functionStack,
-                             Vector<Identifier>& parameters)
+                             CodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(functionBody),
       m_codeBlock(codeBlock),
-      m_thisRegister(0),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
       m_codeType(FunctionCode),
       m_continueDepth(0),
       m_nextVar(-1),
       m_propertyNames(CommonIdentifiers::shared()) {
+  const Node::FunctionStack& functionStack = functionBody->functionStack();
   for (size_t i = 0; i < functionStack.size(); ++i) {
-    FuncDeclNode* funcDecl = functionStack[i];
+    FuncDeclNode* funcDecl = functionStack[i].get();
     const Identifier& ident = funcDecl->m_ident;
 
     m_functions.add(ident.ustring().rep());
     emitNewFunction(addVar(ident, false), funcDecl);
   }
 
+  const Node::VarStack& varStack = functionBody->varStack();
   for (size_t i = 0; i < varStack.size(); ++i) {
     const Identifier& ident = varStack[i].first;
     if (ident == m_propertyNames->arguments)
@@ -293,44 +288,39 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
       emitLoad(r0, jsUndefined());
   }
 
-  m_nextParameter = m_nextVar - parameters.size();
-  m_locals.resize(localsIndex(m_nextParameter) + 1);
+  Vector<Identifier>& parameters = functionBody->parameters();
+  m_nextParameter =
+      m_nextVar - parameters.size();  // parameters are allocated prior to vars
+  m_locals.resize(localsIndex(m_nextParameter) +
+                  1);  // localsIndex of 0 => m_locals size of 1
 
-  m_thisRegister = addParameter(m_propertyNames->thisIdentifier);
-  for (size_t i = 0; i < parameters.size(); ++i) {
+  // Add "this" as a parameter
+  m_thisRegister.setIndex(m_nextParameter);
+  ++m_nextParameter;
+  ++m_codeBlock->numParameters;
+
+  for (size_t i = 0; i < parameters.size(); ++i)
     addParameter(parameters[i]);
-  }
 }
 
 CodeGenerator::CodeGenerator(EvalNode* evalNode,
                              const Debugger* debugger,
                              const ScopeChain& scopeChain,
                              SymbolTable* symbolTable,
-                             EvalCodeBlock* codeBlock,
-                             VarStack& varStack,
-                             FunctionStack& functionStack)
+                             EvalCodeBlock* codeBlock)
     : m_shouldEmitDebugHooks(!!debugger),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(evalNode),
       m_codeBlock(codeBlock),
-      m_thisRegister(0),
+      m_thisRegister(Machine::ProgramCodeThisRegister),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
       m_codeType(EvalCode),
       m_continueDepth(0),
       m_nextVar(-1),
       m_propertyNames(CommonIdentifiers::shared()) {
-  addVar(m_propertyNames->thisIdentifier, m_thisRegister, false);
-
-  for (size_t i = 0; i < varStack.size(); ++i)
-    codeBlock->declaredVariableNames.append(varStack[i].first);
-
-  for (size_t i = 0; i < functionStack.size(); ++i) {
-    FuncDeclNode* funcDecl = functionStack[i];
-    codeBlock->declaredFunctionNames.append(funcDecl->m_ident);
-    addConstant(funcDecl);
-  }
+  m_codeBlock->numVars = 1;  // Allocate space for "this"
 }
 
 CodeGenerator::~CodeGenerator() {}
@@ -358,7 +348,10 @@ RegisterID* CodeGenerator::registerForLocal(const Identifier& ident) {
   if (m_codeType == FunctionCode && ident == m_propertyNames->arguments)
     m_codeBlock->needsFullScopeChain = true;
 
-  if (!shouldOptimizeLocals() && ident != m_propertyNames->thisIdentifier)
+  if (ident == m_propertyNames->thisIdentifier)
+    return &m_thisRegister;
+
+  if (!shouldOptimizeLocals())
     return 0;
 
   SymbolTableEntry entry = symbolTable().get(ident.ustring().rep());

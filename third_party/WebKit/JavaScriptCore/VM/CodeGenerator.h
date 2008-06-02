@@ -89,17 +89,12 @@ class CodeGenerator {
                 const Debugger*,
                 const ScopeChain&,
                 SymbolTable*,
-                CodeBlock*,
-                VarStack&,
-                FunctionStack&,
-                Vector<Identifier>& parameters);
+                CodeBlock*);
   CodeGenerator(EvalNode*,
                 const Debugger*,
                 const ScopeChain&,
                 SymbolTable*,
-                EvalCodeBlock*,
-                VarStack&,
-                FunctionStack& functionStack);
+                EvalCodeBlock*);
 
   ~CodeGenerator();
 
@@ -127,7 +122,7 @@ class CodeGenerator {
   bool findScopedProperty(const Identifier&, int& index, size_t& depth);
 
   // Returns the register storing "this"
-  RegisterID* thisRegister() { return m_thisRegister; }
+  RegisterID* thisRegister() { return &m_thisRegister; }
 
   bool isLocalConstant(const Identifier&);
 
@@ -453,8 +448,7 @@ class CodeGenerator {
   CodeBlock* m_codeBlock;
 
   HashSet<RefPtr<UString::Rep>, IdentifierRepHash> m_functions;
-  static RegisterID* programCodeThis();
-  RegisterID* m_thisRegister;
+  RegisterID m_thisRegister;
   SegmentedVector<RegisterID, 512> m_locals;
   SegmentedVector<RegisterID, 512> m_temporaries;
   SegmentedVector<LabelID, 512> m_labels;

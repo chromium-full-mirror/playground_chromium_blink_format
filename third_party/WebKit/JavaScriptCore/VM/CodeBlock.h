@@ -123,9 +123,6 @@ struct ProgramCodeBlock : public CodeBlock {
 struct EvalCodeBlock : public ProgramCodeBlock {
   EvalCodeBlock(ScopeNode* ownerNode, JSGlobalObject* globalObject_)
       : ProgramCodeBlock(ownerNode, globalObject_) {}
-
-  Vector<Identifier> declaredVariableNames;
-  Vector<Identifier> declaredFunctionNames;
 };
 
 }  // namespace KJS
