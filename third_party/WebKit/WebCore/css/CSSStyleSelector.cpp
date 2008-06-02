@@ -434,6 +434,7 @@ static void loadDefaultStyle() {
 
   // Strict-mode rules.
   CSSStyleSheet* defaultSheet = parseUASheet(html4UserAgentStyleSheet);
+  RenderTheme::adjustDefaultStyleSheet(defaultSheet);
   defaultStyle->addRulesFromSheet(defaultSheet, screenEval());
   defaultPrintStyle->addRulesFromSheet(defaultSheet, printEval());
 
