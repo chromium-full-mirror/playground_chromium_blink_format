@@ -3540,8 +3540,8 @@ struct BorderImageParseContext {
     }
     if (!m_left)
       m_left = new CSSPrimitiveValue(
-          m_top->getDoubleValue(),
-          (CSSPrimitiveValue::UnitTypes)m_top->primitiveType());
+          m_right->getDoubleValue(),
+          (CSSPrimitiveValue::UnitTypes)m_right->primitiveType());
 
     // Now build a rect value to hold all four of our primitive values.
     RefPtr<Rect> rect = new Rect;
