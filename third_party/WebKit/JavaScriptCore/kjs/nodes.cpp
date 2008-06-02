@@ -6063,12 +6063,12 @@ RegisterID* EvalNode::emitCode(CodeGenerator& generator, RegisterID*) {
 
 void EvalNode::generateCode(ScopeChainNode* sc) {
   ScopeChain scopeChain(sc);
-  JSGlobalObject* globalObject =
-      static_cast<JSGlobalObject*>(scopeChain.bottom());
-  ASSERT(globalObject->isGlobalObject());
+  JSGlobalObject* globalObject = scopeChain.globalObject();
+
+  SymbolTable symbolTable;
 
   m_code.set(new EvalCodeBlock(this, globalObject));
-  SymbolTable symbolTable;
+
   CodeGenerator generator(this, globalObject->debugger(), scopeChain,
                           &symbolTable, m_code.get(), m_varStack,
                           m_functionStack);
@@ -6111,12 +6111,10 @@ FunctionBodyNode* FunctionBodyNode::create(SourceElements* children,
 }
 
 void FunctionBodyNode::generateCode(ScopeChainNode* sc) {
-  m_code.set(new CodeBlock(this));
-
   ScopeChain scopeChain(sc);
-  JSGlobalObject* globalObject =
-      static_cast<JSGlobalObject*>(scopeChain.bottom());
-  ASSERT(globalObject->isGlobalObject());
+  JSGlobalObject* globalObject = scopeChain.globalObject();
+
+  m_code.set(new CodeBlock(this));
 
   CodeGenerator generator(this, globalObject->debugger(), scopeChain,
                           &m_symbolTable, m_code.get(), m_varStack,
@@ -6152,9 +6150,7 @@ RegisterID* ProgramNode::emitCode(CodeGenerator& generator, RegisterID*) {
 
 void ProgramNode::generateCode(ScopeChainNode* sc, bool canCreateGlobals) {
   ScopeChain scopeChain(sc);
-  JSGlobalObject* globalObject =
-      static_cast<JSGlobalObject*>(scopeChain.bottom());
-  ASSERT(globalObject->isGlobalObject());
+  JSGlobalObject* globalObject = scopeChain.globalObject();
 
   m_code.set(new ProgramCodeBlock(this, globalObject));
 
