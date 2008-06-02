@@ -789,6 +789,26 @@ void CanvasRenderingContext2D::strokeRect(float x,
   c->strokeRect(rect, lineWidth);
 }
 
+#if PLATFORM(CG)
+static inline CGSize adjustedShadowSize(CGFloat width, CGFloat height) {
+  // Work around <rdar://problem/5539388> by ensuring that shadow offsets will
+  // get truncated
+  // to the desired integer.
+  static const CGFloat extraShadowOffset = narrowPrecisionToCGFloat(1.0 / 128);
+  if (width > 0)
+    width += extraShadowOffset;
+  else if (width < 0)
+    width -= extraShadowOffset;
+
+  if (height > 0)
+    height += extraShadowOffset;
+  else if (height < 0)
+    height -= extraShadowOffset;
+
+  return CGSizeMake(width, height);
+}
+#endif
+
 void CanvasRenderingContext2D::setShadow(float width,
                                          float height,
                                          float blur) {
@@ -825,8 +845,8 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
   CGColorRef color = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(), CGSizeMake(width, height),
-                              blur, color);
+  CGContextSetShadowWithColor(c->platformContext(),
+                              adjustedShadowSize(width, -height), blur, color);
   CGColorRelease(color);
 #endif
 }
@@ -853,8 +873,9 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGColorRef shadowColor = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(), CGSizeMake(width, height),
-                              blur, shadowColor);
+  CGContextSetShadowWithColor(c->platformContext(),
+                              adjustedShadowSize(width, -height), blur,
+                              shadowColor);
   CGColorRelease(shadowColor);
 #endif
 }
@@ -877,8 +898,8 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
   CGColorRef color = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(), CGSizeMake(width, height),
-                              blur, color);
+  CGContextSetShadowWithColor(c->platformContext(),
+                              adjustedShadowSize(width, -height), blur, color);
   CGColorRelease(color);
 #endif
 }
@@ -903,8 +924,9 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGColorRef shadowColor = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(c->platformContext(), CGSizeMake(width, height),
-                              blur, shadowColor);
+  CGContextSetShadowWithColor(c->platformContext(),
+                              adjustedShadowSize(width, -height), blur,
+                              shadowColor);
   CGColorRelease(shadowColor);
 #endif
 }
@@ -930,8 +952,9 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceCMYK();
   CGColorRef shadowColor = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
-  CGContextSetShadowWithColor(dc->platformContext(), CGSizeMake(width, height),
-                              blur, shadowColor);
+  CGContextSetShadowWithColor(dc->platformContext(),
+                              adjustedShadowSize(width, -height), blur,
+                              shadowColor);
   CGColorRelease(shadowColor);
 #endif
 }
@@ -959,25 +982,11 @@ void CanvasRenderingContext2D::applyShadow() {
   CGColorRef color = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
 
-  CGFloat width = state().m_shadowOffset.width();
-  CGFloat height = state().m_shadowOffset.height();
-
-  // Work around <rdar://problem/5539388> by ensuring that the offsets will get
-  // truncated
-  // to the desired integer.
-  static const CGFloat extraShadowOffset = narrowPrecisionToCGFloat(1.0 / 128);
-  if (width > 0)
-    width += extraShadowOffset;
-  else if (width < 0)
-    width -= extraShadowOffset;
-
-  if (height > 0)
-    height += extraShadowOffset;
-  else if (height < 0)
-    height -= extraShadowOffset;
-
-  CGContextSetShadowWithColor(c->platformContext(), CGSizeMake(width, -height),
-                              state().m_shadowBlur, color);
+  CGContextSetShadowWithColor(
+      c->platformContext(),
+      adjustedShadowSize(state().m_shadowOffset.width(),
+                         -state().m_shadowOffset.height()),
+      state().m_shadowBlur, color);
   CGColorRelease(color);
 #endif
 }
