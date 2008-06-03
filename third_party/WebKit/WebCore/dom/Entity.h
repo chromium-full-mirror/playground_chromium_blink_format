@@ -43,6 +43,9 @@ class Entity : public ContainerNode {
     ASSERT_NOT_REACHED();
     return String();
   }
+
+ private:
+  Entity() : ContainerNode(0) {}
 };
 
 }  // namespace
