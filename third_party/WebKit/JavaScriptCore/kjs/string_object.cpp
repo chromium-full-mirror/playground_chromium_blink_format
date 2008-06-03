@@ -389,7 +389,8 @@ static JSValue* replace(ExecState* exec,
         args.append(sourceVal);
 
         substitutedReplacement =
-            replacementFunction->call(exec, exec->globalThisValue(), args)
+            replacementFunction
+                ->callAsFunction(exec, exec->globalThisValue(), args)
                 ->toString(exec);
       } else
         substitutedReplacement =
@@ -444,7 +445,7 @@ static JSValue* replace(ExecState* exec,
     args.append(sourceVal);
 
     replacementString =
-        replacementFunction->call(exec, exec->globalThisValue(), args)
+        replacementFunction->callAsFunction(exec, exec->globalThisValue(), args)
             ->toString(exec);
   }
 

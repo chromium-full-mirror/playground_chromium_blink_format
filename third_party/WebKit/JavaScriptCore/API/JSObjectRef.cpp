@@ -313,7 +313,7 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
   for (size_t i = 0; i < argumentCount; i++)
     argList.append(toJS(arguments[i]));
 
-  JSValueRef result = toRef(jsObject->call(
+  JSValueRef result = toRef(jsObject->callAsFunction(
       exec, jsThisObject,
       argList));  // returns NULL if object->implementsCall() is false
   if (exec->hadException()) {

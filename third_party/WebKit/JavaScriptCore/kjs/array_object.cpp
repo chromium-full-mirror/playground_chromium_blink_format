@@ -174,7 +174,7 @@ JSValue* arrayProtoFuncToLocaleString(ExecState* exec,
     if (conversionFunction->isObject() &&
         static_cast<JSObject*>(conversionFunction)->implementsCall())
       str = static_cast<JSObject*>(conversionFunction)
-                ->call(exec, o, exec->emptyList())
+                ->callAsFunction(exec, o, exec->emptyList())
                 ->toString(exec);
     else
       str = element->toString(exec);
@@ -445,8 +445,9 @@ JSValue* arrayProtoFuncSort(ExecState* exec,
         List l;
         l.append(jObj);
         l.append(minObj);
-        compareResult = sortFunction->call(exec, exec->globalThisValue(), l)
-                            ->toNumber(exec);
+        compareResult =
+            sortFunction->callAsFunction(exec, exec->globalThisValue(), l)
+                ->toNumber(exec);
       } else
         compareResult =
             (jObj->toString(exec) < minObj->toString(exec)) ? -1 : 1;
@@ -577,7 +578,8 @@ JSValue* arrayProtoFuncFilter(ExecState* exec,
     eachArguments.append(jsNumber(k));
     eachArguments.append(thisObj);
 
-    JSValue* result = eachFunction->call(exec, applyThis, eachArguments);
+    JSValue* result =
+        eachFunction->callAsFunction(exec, applyThis, eachArguments);
 
     if (result->toBoolean(exec))
       resultArray->put(exec, filterIndex++, v);
@@ -617,7 +619,8 @@ JSValue* arrayProtoFuncMap(ExecState* exec,
     eachArguments.append(jsNumber(k));
     eachArguments.append(thisObj);
 
-    JSValue* result = eachFunction->call(exec, applyThis, eachArguments);
+    JSValue* result =
+        eachFunction->callAsFunction(exec, applyThis, eachArguments);
     resultArray->put(exec, k, result);
   }
 
@@ -657,7 +660,8 @@ JSValue* arrayProtoFuncEvery(ExecState* exec,
     eachArguments.append(thisObj);
 
     bool predicateResult =
-        eachFunction->call(exec, applyThis, eachArguments)->toBoolean(exec);
+        eachFunction->callAsFunction(exec, applyThis, eachArguments)
+            ->toBoolean(exec);
 
     if (!predicateResult) {
       result = jsBoolean(false);
@@ -691,7 +695,7 @@ JSValue* arrayProtoFuncForEach(ExecState* exec,
     eachArguments.append(jsNumber(k));
     eachArguments.append(thisObj);
 
-    eachFunction->call(exec, applyThis, eachArguments);
+    eachFunction->callAsFunction(exec, applyThis, eachArguments);
   }
   return jsUndefined();
 }
@@ -722,7 +726,8 @@ JSValue* arrayProtoFuncSome(ExecState* exec,
     eachArguments.append(thisObj);
 
     bool predicateResult =
-        eachFunction->call(exec, applyThis, eachArguments)->toBoolean(exec);
+        eachFunction->callAsFunction(exec, applyThis, eachArguments)
+            ->toBoolean(exec);
 
     if (predicateResult) {
       result = jsBoolean(true);

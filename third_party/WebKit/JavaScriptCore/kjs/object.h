@@ -379,8 +379,6 @@ class JSObject : public JSCell {
    * @return The return value from the function
    */
   bool implementsCall();
-  JSValue* call(ExecState* exec, JSObject* thisObj, const List& args);
-
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);

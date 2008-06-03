@@ -122,7 +122,7 @@ JSValue* functionProtoFuncApply(ExecState* exec,
       return throwError(exec, TypeError);
   }
 
-  return thisObj->call(exec, applyThis, applyArgs);
+  return thisObj->callAsFunction(exec, applyThis, applyArgs);
 }
 
 JSValue* functionProtoFuncCall(ExecState* exec,
@@ -141,7 +141,7 @@ JSValue* functionProtoFuncCall(ExecState* exec,
 
   List argsTail;
   args.getSlice(1, argsTail);
-  return thisObj->call(exec, callThis, argsTail);
+  return thisObj->callAsFunction(exec, callThis, argsTail);
 }
 
 // ------------------------------ FunctionObjectImp ----------------------------

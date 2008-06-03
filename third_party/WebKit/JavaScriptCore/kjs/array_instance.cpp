@@ -573,7 +573,7 @@ struct AVLTreeAbstractorForArrayCompare {
     arguments.append(va);
     arguments.append(vb);
     double compareResult =
-        m_compareFunction->call(m_exec, m_globalThisValue, arguments)
+        m_compareFunction->callAsFunction(m_exec, m_globalThisValue, arguments)
             ->toNumber(m_exec);
     return (compareResult < 0) ? -1 : 1;  // Not passing equality through,
                                           // because we need to store all

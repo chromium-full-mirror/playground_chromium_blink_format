@@ -38,13 +38,6 @@
 
 namespace KJS {
 
-// ------------------------------ Object ---------------------------------------
-
-JSValue* JSObject::call(ExecState* exec, JSObject* thisObj, const List& args) {
-  ASSERT(implementsCall());
-  return callAsFunction(exec, thisObj, args);
-}
-
 // ------------------------------ JSObject ------------------------------------
 
 void JSObject::mark() {
@@ -155,7 +148,7 @@ void JSObject::put(ExecState* exec,
           List args;
           args.append(value);
 
-          setterFunc->call(exec, this->toThisObject(exec), args);
+          setterFunc->callAsFunction(exec, this->toThisObject(exec), args);
           return;
         } else {
           // If there's an existing property on the object or one of its
@@ -247,8 +240,8 @@ static ALWAYS_INLINE JSValue* tryGetAndCallProperty(
     // spec says "not primitive type" but ...
     if (callType != CallTypeNone) {
       JSObject* thisObj = const_cast<JSObject*>(object);
-      JSValue* def =
-          o->call(exec, thisObj->toThisObject(exec), exec->emptyList());
+      JSValue* def = o->callAsFunction(exec, thisObj->toThisObject(exec),
+                                       exec->emptyList());
       JSType defType = def->type();
       ASSERT(defType != GetterSetterType);
       if (defType != ObjectType)

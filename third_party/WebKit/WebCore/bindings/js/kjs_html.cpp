@@ -128,7 +128,7 @@ JSValue* runtimeObjectCallAsFunction(ExecState* exec,
   JSObject* runtimeObject = getRuntimeObject(exec, thisImp);
   if (!runtimeObject)
     return jsUndefined();
-  return runtimeObject->call(exec, thisObj, args);
+  return runtimeObject->callAsFunction(exec, thisObj, args);
 }
 
 }  // namespace WebCore
