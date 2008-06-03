@@ -1005,6 +1005,11 @@ NEVER_INLINE void Machine::debug(ExecState* exec,
                                   codeBlock->ownerNode->sourceId(), lastLine);
       return;
     }
+    case DidReachBreakpoint: {
+      debugger->didReachBreakpoint(debuggerCallFrame,
+                                   codeBlock->ownerNode->sourceId(), lastLine);
+      return;
+    }
   }
 }
 

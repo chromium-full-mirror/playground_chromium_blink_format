@@ -2696,6 +2696,16 @@ class EmptyStatementNode : public StatementNode {
   virtual bool isEmptyStatement() const KJS_FAST_CALL { return true; }
 };
 
+class DebuggerStatementNode : public StatementNode {
+ public:
+  DebuggerStatementNode() KJS_FAST_CALL {}
+
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+
+  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
+};
+
 class ExprStatementNode : public StatementNode {
  public:
   ExprStatementNode(ExpressionNode* expr) KJS_FAST_CALL : m_expr(expr) {}

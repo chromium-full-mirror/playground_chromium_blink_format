@@ -183,6 +183,9 @@ class Debugger {
   virtual void didExecuteProgram(const DebuggerCallFrame&,
                                  int sourceId,
                                  int lineno) = 0;
+  virtual void didReachBreakpoint(const DebuggerCallFrame&,
+                                  int sourceId,
+                                  int lineno) = 0;
 
  private:
   HashSet<JSGlobalObject*> m_globalObjects;

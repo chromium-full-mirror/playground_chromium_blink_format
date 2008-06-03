@@ -50,6 +50,7 @@ enum DebugHookID {
   WillExecuteProgram,
   DidExecuteProgram,
   DidEnterCallFrame,
+  DidReachBreakpoint,
   WillLeaveCallFrame,
   WillExecuteStatement
 };

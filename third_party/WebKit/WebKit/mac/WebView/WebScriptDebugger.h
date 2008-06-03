@@ -76,6 +76,9 @@ class WebScriptDebugger : public KJS::Debugger {
   virtual void didExecuteProgram(const KJS::DebuggerCallFrame&,
                                  int sourceId,
                                  int lineno);
+  virtual void didReachBreakpoint(const KJS::DebuggerCallFrame&,
+                                  int sourceId,
+                                  int lineno);
 
  private:
   bool m_callingDelegate;
