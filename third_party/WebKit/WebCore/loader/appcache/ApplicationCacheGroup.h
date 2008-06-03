@@ -71,6 +71,9 @@ class ApplicationCacheGroup : Noncopyable, ResourceHandleClient {
   void cacheDestroyed(ApplicationCache*);
 
   ApplicationCache* newestCache() const { return m_newestCache.get(); }
+  ApplicationCache* savedNewestCachePointer() const {
+    return m_savedNewestCachePointer;
+  }
 
   void finishedLoadingMainResource(DocumentLoader*);
   void failedLoadingMainResource(DocumentLoader*);
