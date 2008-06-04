@@ -41,6 +41,11 @@ class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
   unsigned getPathSegAtLength(double);
   Path toPathData();
 
+  static PassRefPtr<SVGPathSegList> createAnimated(
+      const SVGPathSegList* fromList,
+      const SVGPathSegList* toList,
+      float progress);
+
  private:
   SVGPathSegList(const QualifiedName&);
 };
