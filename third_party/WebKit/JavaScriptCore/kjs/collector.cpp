@@ -1,4 +1,3 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
 /*
  *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *  Copyright (C) 2007 Eric Seidel <eric@webkit.org>
@@ -425,6 +424,7 @@ class Collector::Thread {
  public:
   Thread(pthread_t pthread, const PlatformThread& platThread, void* base)
       : posixThread(pthread), platformThread(platThread), stackBase(base) {}
+
   Thread* next;
   pthread_t posixThread;
   PlatformThread platformThread;
