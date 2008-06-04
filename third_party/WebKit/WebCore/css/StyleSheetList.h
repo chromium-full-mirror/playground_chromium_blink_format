@@ -22,6 +22,7 @@
 #define StyleSheetList_h
 
 #include <wtf/RefCounted.h>
+#include <wtf/PassRefPtr.h>
 #include "DeprecatedPtrList.h"
 
 namespace WebCore {
@@ -33,7 +34,9 @@ class String;
 
 class StyleSheetList : public RefCounted<StyleSheetList> {
  public:
-  StyleSheetList(Document*);
+  static PassRefPtr<StyleSheetList> create(Document* doc) {
+    return adoptRef(new StyleSheetList(doc));
+  }
   ~StyleSheetList();
 
   void documentDestroyed();
@@ -49,6 +52,8 @@ class StyleSheetList : public RefCounted<StyleSheetList> {
   DeprecatedPtrList<StyleSheet> styleSheets;
 
  private:
+  StyleSheetList(Document*);
+
   Document* m_doc;
 };
 

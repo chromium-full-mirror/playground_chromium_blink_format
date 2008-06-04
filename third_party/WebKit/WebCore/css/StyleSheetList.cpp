@@ -33,8 +33,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-StyleSheetList::StyleSheetList(Document* doc)
-    : RefCounted<StyleSheetList>(0), m_doc(doc) {}
+StyleSheetList::StyleSheetList(Document* doc) : m_doc(doc) {}
 
 StyleSheetList::~StyleSheetList() {
   for (DeprecatedPtrListIterator<StyleSheet> it(styleSheets); it.current();

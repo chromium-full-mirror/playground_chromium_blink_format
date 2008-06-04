@@ -39,8 +39,11 @@ const size_t maxOffsets = 3 * maxSubstrings;
 
 class RegularExpression::Private : public RefCounted<Private> {
  public:
-  Private();
-  Private(const String& pattern, bool caseSensitive);
+  static PassRefPtr<Private> create() { return adoptRef(new Private); }
+  static PassRefPtr<Private> create(const String& pattern, bool caseSensitive) {
+    return adoptRef(new Private(pattern, caseSensitive));
+  }
+
   ~Private();
 
   void compile(bool caseSensitive);
@@ -53,17 +56,18 @@ class RegularExpression::Private : public RefCounted<Private> {
   int lastMatchCount;
   int lastMatchPos;
   int lastMatchLength;
+
+ private:
+  Private();
+  Private(const String& pattern, bool caseSensitive);
 };
 
-RegularExpression::Private::Private() : RefCounted<Private>(0), pattern("") {
+RegularExpression::Private::Private() : pattern("") {
   compile(true);
 }
 
 RegularExpression::Private::Private(const String& p, bool caseSensitive)
-    : RefCounted<Private>(0),
-      pattern(p),
-      lastMatchPos(-1),
-      lastMatchLength(-1) {
+    : pattern(p), lastMatchPos(-1), lastMatchLength(-1) {
   compile(caseSensitive);
 }
 
@@ -81,13 +85,13 @@ RegularExpression::Private::~Private() {
   jsRegExpFree(regex);
 }
 
-RegularExpression::RegularExpression() : d(new Private) {}
+RegularExpression::RegularExpression() : d(Private::create()) {}
 
 RegularExpression::RegularExpression(const String& pattern, bool caseSensitive)
-    : d(new Private(pattern, caseSensitive)) {}
+    : d(Private::create(pattern, caseSensitive)) {}
 
 RegularExpression::RegularExpression(const char* pattern)
-    : d(new Private(pattern, true)) {}
+    : d(Private::create(pattern, true)) {}
 
 RegularExpression::RegularExpression(const RegularExpression& re) : d(re.d) {}
 

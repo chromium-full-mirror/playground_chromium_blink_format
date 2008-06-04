@@ -276,7 +276,7 @@ Document::Document(DOMImplementation* impl, Frame* frame, bool isXHTML)
     : ContainerNode(0),
       m_implementation(impl),
       m_domtree_version(0),
-      m_styleSheets(new StyleSheetList(this)),
+      m_styleSheets(StyleSheetList::create(this)),
       m_title(""),
       m_titleSetExplicitly(false),
       m_imageLoadEventTimer(this, &Document::imageLoadEventTimerFired),
@@ -1075,7 +1075,7 @@ PassRefPtr<NodeIterator> Document::createNodeIterator(
     ec = NOT_SUPPORTED_ERR;
     return 0;
   }
-  return new NodeIterator(root, whatToShow, filter, expandEntityReferences);
+  return NodeIterator::create(root, whatToShow, filter, expandEntityReferences);
 }
 
 PassRefPtr<TreeWalker> Document::createTreeWalker(Node* root,
@@ -1087,7 +1087,7 @@ PassRefPtr<TreeWalker> Document::createTreeWalker(Node* root,
     ec = NOT_SUPPORTED_ERR;
     return 0;
   }
-  return new TreeWalker(root, whatToShow, filter, expandEntityReferences);
+  return TreeWalker::create(root, whatToShow, filter, expandEntityReferences);
 }
 
 void Document::setDocumentChanged(bool b) {

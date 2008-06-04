@@ -94,7 +94,7 @@ void JSCustomVoidCallback::handleEvent() {
   Document::updateDocumentsRendering();
 }
 
-VoidCallback* toVoidCallback(ExecState* exec, JSValue* value) {
+PassRefPtr<VoidCallback> toVoidCallback(ExecState* exec, JSValue* value) {
   JSObject* object = value->getObject();
   if (!object)
     return 0;
@@ -103,6 +103,6 @@ VoidCallback* toVoidCallback(ExecState* exec, JSValue* value) {
   if (!frame)
     return 0;
 
-  return new JSCustomVoidCallback(object, frame);
+  return JSCustomVoidCallback::create(object, frame);
 }
 }

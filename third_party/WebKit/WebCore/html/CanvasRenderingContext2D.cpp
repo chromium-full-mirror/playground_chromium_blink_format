@@ -69,9 +69,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 CanvasRenderingContext2D::CanvasRenderingContext2D(HTMLCanvasElement* canvas)
-    : RefCounted<CanvasRenderingContext2D>(0),
-      m_canvas(canvas),
-      m_stateStack(1) {}
+    : m_canvas(canvas), m_stateStack(1) {}
 
 void CanvasRenderingContext2D::reset() {
   m_stateStack.resize(1);
@@ -1171,7 +1169,7 @@ PassRefPtr<CanvasGradient> CanvasRenderingContext2D::createLinearGradient(
     float y0,
     float x1,
     float y1) {
-  return new CanvasGradient(FloatPoint(x0, y0), FloatPoint(x1, y1));
+  return CanvasGradient::create(FloatPoint(x0, y0), FloatPoint(x1, y1));
 }
 
 PassRefPtr<CanvasGradient> CanvasRenderingContext2D::createRadialGradient(
@@ -1181,7 +1179,7 @@ PassRefPtr<CanvasGradient> CanvasRenderingContext2D::createRadialGradient(
     float x1,
     float y1,
     float r1) {
-  return new CanvasGradient(FloatPoint(x0, y0), r0, FloatPoint(x1, y1), r1);
+  return CanvasGradient::create(FloatPoint(x0, y0), r0, FloatPoint(x1, y1), r1);
 }
 
 PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(

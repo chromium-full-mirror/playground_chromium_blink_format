@@ -34,10 +34,13 @@ typedef int ExceptionCode;
 
 class NodeIterator : public Traversal {
  public:
-  NodeIterator(PassRefPtr<Node>,
-               unsigned whatToShow,
-               PassRefPtr<NodeFilter>,
-               bool expandEntityReferences);
+  static PassRefPtr<NodeIterator> create(PassRefPtr<Node> rootNode,
+                                         unsigned whatToShow,
+                                         PassRefPtr<NodeFilter> filter,
+                                         bool expandEntityReferences) {
+    return adoptRef(
+        new NodeIterator(rootNode, whatToShow, filter, expandEntityReferences));
+  }
   virtual ~NodeIterator();
 
   PassRefPtr<Node> nextNode(ExceptionCode&, KJS::JSValue*& exception);
@@ -63,6 +66,11 @@ class NodeIterator : public Traversal {
   }
 
  private:
+  NodeIterator(PassRefPtr<Node>,
+               unsigned whatToShow,
+               PassRefPtr<NodeFilter>,
+               bool expandEntityReferences);
+
   struct NodePointer {
     RefPtr<Node> node;
     bool isPointerBeforeNode;

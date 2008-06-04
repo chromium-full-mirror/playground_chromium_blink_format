@@ -53,7 +53,10 @@ typedef int ExceptionCode;
 
 class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
  public:
-  CanvasRenderingContext2D(HTMLCanvasElement*);
+  static PassRefPtr<CanvasRenderingContext2D> create(
+      HTMLCanvasElement* canvas) {
+    return adoptRef(new CanvasRenderingContext2D(canvas));
+  }
 
   HTMLCanvasElement* canvas() const { return m_canvas; }
 
@@ -264,6 +267,8 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
   void detachCanvas() { m_canvas = 0; }
 
  private:
+  CanvasRenderingContext2D(HTMLCanvasElement*);
+
   struct State {
     State();
 

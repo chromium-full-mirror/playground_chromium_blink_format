@@ -70,12 +70,11 @@ static CachedPageCounter cachedPageCounter;
 #endif
 
 PassRefPtr<CachedPage> CachedPage::create(Page* page) {
-  return new CachedPage(page);
+  return adoptRef(new CachedPage(page));
 }
 
 CachedPage::CachedPage(Page* page)
-    : RefCounted<CachedPage>(0),
-      m_timeStamp(0),
+    : m_timeStamp(0),
       m_document(page->mainFrame()->document()),
       m_view(page->mainFrame()->view()),
       m_mousePressNode(page->mainFrame()->eventHandler()->mousePressNode()),

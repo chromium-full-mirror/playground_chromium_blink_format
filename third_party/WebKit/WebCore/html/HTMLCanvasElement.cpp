@@ -148,7 +148,7 @@ String HTMLCanvasElement::toDataURL(const String& mimeType, ExceptionCode& ec) {
 CanvasRenderingContext* HTMLCanvasElement::getContext(const String& type) {
   if (type == "2d") {
     if (!m_2DContext)
-      m_2DContext = new CanvasRenderingContext2D(this);
+      m_2DContext = CanvasRenderingContext2D::create(this);
     return m_2DContext.get();
   }
   return 0;
