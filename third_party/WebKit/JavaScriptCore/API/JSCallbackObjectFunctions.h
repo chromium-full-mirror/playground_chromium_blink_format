@@ -371,7 +371,7 @@ void JSCallbackObject<Base>::getPropertyNames(
         StaticValueEntry* entry = it->second;
         if (entry->getProperty &&
             !(entry->attributes & kJSPropertyAttributeDontEnum))
-          propertyNames.add(name);
+          propertyNames.add(Identifier(name));
       }
     }
 
@@ -383,7 +383,7 @@ void JSCallbackObject<Base>::getPropertyNames(
         UString::Rep* name = it->first.get();
         StaticFunctionEntry* entry = it->second;
         if (!(entry->attributes & kJSPropertyAttributeDontEnum))
-          propertyNames.add(name);
+          propertyNames.add(Identifier(name));
       }
     }
   }

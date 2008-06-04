@@ -32,6 +32,7 @@
 #include "JSObjectRef.h"
 #include <kjs/JSGlobalObject.h>
 #include <kjs/identifier.h>
+#include <kjs/InitializeThreading.h>
 #include <kjs/object_object.h>
 
 using namespace KJS;
@@ -58,16 +59,15 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
       hasInstance(definition->hasInstance),
       convertToType(definition->convertToType),
       cachedPrototype(0) {
+  initializeThreading();
+
   if (const JSStaticValue* staticValue = definition->staticValues) {
     staticValues = new StaticValuesTable();
     while (staticValue->name) {
-      staticValues->add(
-          Identifier(UString::Rep::createFromUTF8(staticValue->name).get())
-              .ustring()
-              .rep(),
-          new StaticValueEntry(staticValue->getProperty,
-                               staticValue->setProperty,
-                               staticValue->attributes));
+      staticValues->add(UString::Rep::createFromUTF8(staticValue->name),
+                        new StaticValueEntry(staticValue->getProperty,
+                                             staticValue->setProperty,
+                                             staticValue->attributes));
       ++staticValue;
     }
   }
@@ -76,9 +76,7 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
     staticFunctions = new StaticFunctionsTable();
     while (staticFunction->name) {
       staticFunctions->add(
-          Identifier(UString::Rep::createFromUTF8(staticFunction->name).get())
-              .ustring()
-              .rep(),
+          UString::Rep::createFromUTF8(staticFunction->name),
           new StaticFunctionEntry(staticFunction->callAsFunction,
                                   staticFunction->attributes));
       ++staticFunction;
