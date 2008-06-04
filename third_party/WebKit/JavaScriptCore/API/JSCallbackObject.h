@@ -80,19 +80,15 @@ class JSCallbackObject : public Base {
   void init(ExecState*);
 
   static JSValue* cachedValueGetter(ExecState*,
-                                    JSObject*,
                                     const Identifier&,
                                     const PropertySlot&);
   static JSValue* staticValueGetter(ExecState*,
-                                    JSObject*,
                                     const Identifier&,
-                                    const PropertySlot& slot);
+                                    const PropertySlot&);
   static JSValue* staticFunctionGetter(ExecState*,
-                                       JSObject*,
                                        const Identifier&,
-                                       const PropertySlot& slot);
+                                       const PropertySlot&);
   static JSValue* callbackGetter(ExecState*,
-                                 JSObject*,
                                  const Identifier&,
                                  const PropertySlot&);
 

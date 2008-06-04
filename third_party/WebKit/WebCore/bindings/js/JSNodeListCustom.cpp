@@ -60,7 +60,6 @@ bool JSNodeList::canGetItemsForName(KJS::ExecState*,
 }
 
 KJS::JSValue* JSNodeList::nameGetter(KJS::ExecState* exec,
-                                     KJS::JSObject* originalObject,
                                      const KJS::Identifier& propertyName,
                                      const KJS::PropertySlot& slot) {
   JSNodeList* thisObj = static_cast<JSNodeList*>(slot.slotBase());

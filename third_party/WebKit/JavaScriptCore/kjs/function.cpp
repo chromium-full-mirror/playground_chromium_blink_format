@@ -105,7 +105,6 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
 }
 
 JSValue* FunctionImp::argumentsGetter(ExecState* exec,
-                                      JSObject*,
                                       const Identifier&,
                                       const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
@@ -114,7 +113,6 @@ JSValue* FunctionImp::argumentsGetter(ExecState* exec,
 }
 
 JSValue* FunctionImp::callerGetter(ExecState* exec,
-                                   JSObject*,
                                    const Identifier&,
                                    const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
@@ -123,7 +121,6 @@ JSValue* FunctionImp::callerGetter(ExecState* exec,
 }
 
 JSValue* FunctionImp::lengthGetter(ExecState*,
-                                   JSObject*,
                                    const Identifier&,
                                    const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
@@ -317,7 +314,6 @@ void Arguments::mark() {
 }
 
 JSValue* Arguments::mappedIndexGetter(ExecState* exec,
-                                      JSObject*,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   Arguments* thisObj = static_cast<Arguments*>(slot.slotBase());

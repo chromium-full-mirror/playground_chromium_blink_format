@@ -62,6 +62,7 @@ class StringImp : public JSCell {
   virtual double toNumber(ExecState* exec) const;
   virtual JSObject* toObject(ExecState* exec) const;
   virtual UString toString(ExecState*) const;
+  virtual JSObject* toThisObject(ExecState*) const;
 
   UString val;
 };

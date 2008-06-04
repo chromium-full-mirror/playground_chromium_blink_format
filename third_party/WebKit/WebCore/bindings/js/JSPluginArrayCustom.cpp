@@ -34,7 +34,6 @@ bool JSPluginArray::canGetItemsForName(ExecState*,
 }
 
 JSValue* JSPluginArray::nameGetter(ExecState* exec,
-                                   JSObject* originalObject,
                                    const Identifier& propertyName,
                                    const PropertySlot& slot) {
   JSPluginArray* thisObj = static_cast<JSPluginArray*>(slot.slotBase());

@@ -57,11 +57,9 @@ class RuntimeArray : public JSObject {
 
  private:
   static JSValue* lengthGetter(ExecState*,
-                               JSObject*,
                                const Identifier&,
                                const PropertySlot&);
   static JSValue* indexGetter(ExecState*,
-                              JSObject*,
                               const Identifier&,
                               const PropertySlot&);
 

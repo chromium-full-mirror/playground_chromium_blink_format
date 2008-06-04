@@ -312,7 +312,6 @@ void printErrorMessageForFrame(Frame* frame, const String& message) {
 }
 
 JSValue* nonCachingStaticFunctionGetter(ExecState* exec,
-                                        JSObject*,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   const HashEntry* entry = slot.staticEntry();
@@ -321,7 +320,6 @@ JSValue* nonCachingStaticFunctionGetter(ExecState* exec,
 }
 
 JSValue* objectToStringFunctionGetter(ExecState* exec,
-                                      JSObject*,
                                       const Identifier& propertyName,
                                       const PropertySlot&) {
   return new PrototypeFunction(exec, 0, propertyName, objectProtoFuncToString);

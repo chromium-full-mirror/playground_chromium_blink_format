@@ -80,6 +80,11 @@ JSObject* StringImp::toObject(ExecState* exec) const {
                             const_cast<StringImp*>(this));
 }
 
+JSObject* StringImp::toThisObject(ExecState* exec) const {
+  return new StringInstance(exec->lexicalGlobalObject()->stringPrototype(),
+                            const_cast<StringImp*>(this));
+}
+
 // ------------------------------ NumberImp ------------------------------------
 
 JSType NumberImp::type() const {
@@ -113,6 +118,13 @@ UString NumberImp::toString(ExecState*) const {
 }
 
 JSObject* NumberImp::toObject(ExecState* exec) const {
+  List args;
+  args.append(const_cast<NumberImp*>(this));
+  return static_cast<JSObject*>(
+      exec->lexicalGlobalObject()->numberConstructor()->construct(exec, args));
+}
+
+JSObject* NumberImp::toThisObject(ExecState* exec) const {
   List args;
   args.append(const_cast<NumberImp*>(this));
   return static_cast<JSObject*>(
@@ -180,6 +192,31 @@ UString GetterSetterImp::toString(ExecState*) const {
 JSObject* GetterSetterImp::toObject(ExecState* exec) const {
   ASSERT(false);
   return jsNull()->toObject(exec);
+}
+
+bool GetterSetterImp::getOwnPropertySlot(ExecState*,
+                                         const Identifier&,
+                                         PropertySlot&) {
+  ASSERT_NOT_REACHED();
+  return false;
+}
+
+bool GetterSetterImp::getOwnPropertySlot(ExecState*, unsigned, PropertySlot&) {
+  ASSERT_NOT_REACHED();
+  return false;
+}
+
+void GetterSetterImp::put(ExecState*, const Identifier&, JSValue*) {
+  ASSERT_NOT_REACHED();
+}
+
+void GetterSetterImp::put(ExecState*, unsigned, JSValue*) {
+  ASSERT_NOT_REACHED();
+}
+
+JSObject* GetterSetterImp::toThisObject(ExecState*) const {
+  ASSERT_NOT_REACHED();
+  return 0;
 }
 
 // ------------------------------ LabelStack -----------------------------------

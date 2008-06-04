@@ -110,7 +110,7 @@ inline bool JSVariableObject::symbolTableGet(const Identifier& propertyName,
   SymbolTableEntry entry =
       symbolTable().inlineGet(propertyName.ustring().rep());
   if (!entry.isEmpty()) {
-    slot.setValueSlot(this, &valueAt(entry.getIndex()));
+    slot.setValueSlot(&valueAt(entry.getIndex()));
     return true;
   }
   return false;
@@ -122,7 +122,7 @@ inline bool JSVariableObject::symbolTableGet(const Identifier& propertyName,
   SymbolTableEntry entry =
       symbolTable().inlineGet(propertyName.ustring().rep());
   if (!entry.isEmpty()) {
-    slot.setValueSlot(this, &valueAt(entry.getIndex()));
+    slot.setValueSlot(&valueAt(entry.getIndex()));
     slotIsWriteable = !entry.isReadOnly();
     return true;
   }

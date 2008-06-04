@@ -47,7 +47,6 @@ JSNamedNodesCollection::JSNamedNodesCollection(
     : DOMObject(prototype), m_nodes(nodes) {}
 
 JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
-                                              JSObject* originalObject,
                                               const Identifier& propertyName,
                                               const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
@@ -56,7 +55,6 @@ JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
 }
 
 JSValue* JSNamedNodesCollection::indexGetter(ExecState* exec,
-                                             JSObject* originalObject,
                                              const Identifier& propertyName,
                                              const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =

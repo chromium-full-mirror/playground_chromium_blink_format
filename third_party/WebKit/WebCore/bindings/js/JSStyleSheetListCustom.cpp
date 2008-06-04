@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2007 Apple Inc. All rights reserved.
  *
@@ -32,18 +31,19 @@
 #include "StyleSheet.h"
 #include "StyleSheetList.h"
 
+using namespace KJS;
+
 namespace WebCore {
 
-bool JSStyleSheetList::canGetItemsForName(KJS::ExecState*,
+bool JSStyleSheetList::canGetItemsForName(ExecState*,
                                           StyleSheetList* styleSheetList,
-                                          const KJS::Identifier& propertyName) {
+                                          const Identifier& propertyName) {
   return styleSheetList->getNamedItem(propertyName);
 }
 
-KJS::JSValue* JSStyleSheetList::nameGetter(KJS::ExecState* exec,
-                                           KJS::JSObject*,
-                                           const KJS::Identifier& propertyName,
-                                           const KJS::PropertySlot& slot) {
+JSValue* JSStyleSheetList::nameGetter(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      const PropertySlot& slot) {
   JSStyleSheetList* thisObj = static_cast<JSStyleSheetList*>(slot.slotBase());
   HTMLStyleElement* element = thisObj->impl()->getNamedItem(propertyName);
   ASSERT(element);

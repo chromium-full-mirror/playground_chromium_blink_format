@@ -37,7 +37,6 @@ RuntimeArray::RuntimeArray(ExecState* exec, Bindings::Array* a)
     : JSObject(exec->lexicalGlobalObject()->arrayPrototype()), _array(a) {}
 
 JSValue* RuntimeArray::lengthGetter(ExecState*,
-                                    JSObject*,
                                     const Identifier&,
                                     const PropertySlot& slot) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(slot.slotBase());
@@ -45,7 +44,6 @@ JSValue* RuntimeArray::lengthGetter(ExecState*,
 }
 
 JSValue* RuntimeArray::indexGetter(ExecState* exec,
-                                   JSObject*,
                                    const Identifier&,
                                    const PropertySlot& slot) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(slot.slotBase());

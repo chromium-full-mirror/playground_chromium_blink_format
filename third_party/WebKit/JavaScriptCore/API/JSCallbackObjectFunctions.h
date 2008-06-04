@@ -453,7 +453,6 @@ bool JSCallbackObject<Base>::inherits(JSClassRef c) const {
 
 template <class Base>
 JSValue* JSCallbackObject<Base>::cachedValueGetter(ExecState*,
-                                                   JSObject*,
                                                    const Identifier&,
                                                    const PropertySlot& slot) {
   JSValue* v = slot.slotBase();
@@ -464,7 +463,6 @@ JSValue* JSCallbackObject<Base>::cachedValueGetter(ExecState*,
 template <class Base>
 JSValue* JSCallbackObject<Base>::staticValueGetter(
     ExecState* exec,
-    JSObject*,
     const Identifier& propertyName,
     const PropertySlot& slot) {
   ASSERT(slot.slotBase()->inherits(&JSCallbackObject::info));
@@ -494,16 +492,15 @@ JSValue* JSCallbackObject<Base>::staticValueGetter(
 template <class Base>
 JSValue* JSCallbackObject<Base>::staticFunctionGetter(
     ExecState* exec,
-    JSObject*,
     const Identifier& propertyName,
     const PropertySlot& slot) {
   ASSERT(slot.slotBase()->inherits(&JSCallbackObject::info));
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   // Check for cached or override property.
-  PropertySlot slot2;
+  PropertySlot slot2(thisObj);
   if (thisObj->Base::getOwnPropertySlot(exec, propertyName, slot2))
-    return slot2.getValue(exec, thisObj, propertyName);
+    return slot2.getValue(exec, propertyName);
 
   for (JSClassRef jsClass = thisObj->m_class; jsClass;
        jsClass = jsClass->parentClass) {
@@ -529,7 +526,6 @@ JSValue* JSCallbackObject<Base>::staticFunctionGetter(
 
 template <class Base>
 JSValue* JSCallbackObject<Base>::callbackGetter(ExecState* exec,
-                                                JSObject*,
                                                 const Identifier& propertyName,
                                                 const PropertySlot& slot) {
   ASSERT(slot.slotBase()->inherits(&JSCallbackObject::info));

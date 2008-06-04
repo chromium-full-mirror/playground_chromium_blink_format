@@ -49,12 +49,6 @@
 #include "operations.h"
 #include "regexp_object.h"
 
-#if COMPILER(GCC)
-#define UNLIKELY(x) __builtin_expect((x), 0)
-#else
-#define UNLIKELY(x) x
-#endif
-
 namespace KJS {
 
 #if HAVE(COMPUTED_GOTO)
@@ -213,12 +207,12 @@ static bool NEVER_INLINE resolve(ExecState* exec,
   ScopeChainIterator end = scopeChain->end();
   ASSERT(iter != end);
 
-  PropertySlot slot;
   Identifier& ident = codeBlock->identifiers[property];
   do {
     JSObject* o = *iter;
+    PropertySlot slot(o);
     if (o->getPropertySlot(exec, ident, slot)) {
-      JSValue* result = slot.getValue(exec, o, ident);
+      JSValue* result = slot.getValue(exec, ident);
       exceptionValue = exec->exception();
       if (exceptionValue)
         return false;
@@ -247,12 +241,12 @@ static bool NEVER_INLINE resolve_skip(ExecState* exec,
     ++iter;
     ASSERT(iter != end);
   }
-  PropertySlot slot;
   Identifier& ident = codeBlock->identifiers[property];
   do {
     JSObject* o = *iter;
+    PropertySlot slot(o);
     if (o->getPropertySlot(exec, ident, slot)) {
-      JSValue* result = slot.getValue(exec, o, ident);
+      JSValue* result = slot.getValue(exec, ident);
       exceptionValue = exec->exception();
       if (exceptionValue)
         return false;
@@ -309,13 +303,13 @@ static bool NEVER_INLINE resolveBaseAndProperty(ExecState* exec,
 
   ASSERT(iter != end);
 
-  PropertySlot slot;
   Identifier& ident = codeBlock->identifiers[property];
   JSObject* base;
   do {
     base = *iter;
+    PropertySlot slot(base);
     if (base->getPropertySlot(exec, ident, slot)) {
-      JSValue* result = slot.getValue(exec, base, ident);
+      JSValue* result = slot.getValue(exec, ident);
       exceptionValue = exec->exception();
       if (exceptionValue)
         return false;
@@ -347,11 +341,11 @@ static bool NEVER_INLINE resolveBaseAndFunc(ExecState* exec,
 
   ASSERT(iter != end);
 
-  PropertySlot slot;
   Identifier& ident = codeBlock->identifiers[property];
   JSObject* base;
   do {
     base = *iter;
+    PropertySlot slot(base);
     if (base->getPropertySlot(exec, ident, slot)) {
       // ECMA 11.2.3 says that if we hit an activation the this value should be
       // null.
@@ -364,7 +358,7 @@ static bool NEVER_INLINE resolveBaseAndFunc(ExecState* exec,
       // We also handle wrapper substitution for the global object at the same
       // time.
       JSObject* thisObj = base->toThisObject(exec);
-      JSValue* result = slot.getValue(exec, base, ident);
+      JSValue* result = slot.getValue(exec, ident);
       exceptionValue = exec->exception();
       if (exceptionValue)
         return false;
@@ -1859,10 +1853,9 @@ profilerFetchHack:
 #ifndef NDEBUG
       int registerOffset = r - (*registerBase);
 #endif
-      JSObject* baseObj = r[base].u.jsValue->toObject(exec);
 
       Identifier& ident = codeBlock->identifiers[property];
-      JSValue* result = baseObj->get(exec, ident);
+      JSValue* result = r[base].u.jsValue->get(exec, ident);
       ASSERT(registerOffset == (r - (*registerBase)));
       VM_CHECK_EXCEPTION();
       r[dst].u.jsValue = result;
@@ -1885,10 +1878,8 @@ profilerFetchHack:
       int registerOffset = r - (*registerBase);
 #endif
 
-      JSObject* baseObj = r[base].u.jsValue->toObject(exec);
-
       Identifier& ident = codeBlock->identifiers[property];
-      baseObj->put(exec, ident, r[value].u.jsValue);
+      r[base].u.jsValue->put(exec, ident, r[value].u.jsValue);
       ASSERT(registerOffset == (r - (*registerBase)));
 
       VM_CHECK_EXCEPTION();
@@ -1928,14 +1919,16 @@ profilerFetchHack:
       int base = (++vPC)->u.operand;
       int property = (++vPC)->u.operand;
 
-      JSObject* baseObj = r[base].u.jsValue->toObject(exec);  // may throw
+      JSValue* baseValue = r[base].u.jsValue;
 
       JSValue* subscript = r[property].u.jsValue;
       JSValue* result;
       uint32_t i;
       if (subscript->getUInt32(i))
-        result = baseObj->get(exec, i);
+        result = baseValue->get(exec, i);
       else {
+        JSObject* baseObj = baseValue->toObject(exec);  // may throw
+
         Identifier property;
         if (subscript->isObject()) {
           VM_CHECK_EXCEPTION();  // If toObject threw, we must not call
@@ -1970,14 +1963,16 @@ profilerFetchHack:
       int property = (++vPC)->u.operand;
       int value = (++vPC)->u.operand;
 
-      JSObject* baseObj = r[base].u.jsValue->toObject(exec);
+      JSValue* baseValue = r[base].u.jsValue;
 
       JSValue* subscript = r[property].u.jsValue;
 
       uint32_t i;
       if (subscript->getUInt32(i))
-        baseObj->put(exec, i, r[value].u.jsValue);
+        baseValue->put(exec, i, r[value].u.jsValue);
       else {
+        JSObject* baseObj = baseValue->toObject(exec);
+
         Identifier property;
         if (subscript->isObject()) {
           VM_CHECK_EXCEPTION();  // If toObject threw, we must not call
@@ -2175,7 +2170,7 @@ profilerFetchHack:
       // this instruction as a normal function call, supplying the proper 'this'
       // value.
       vPC -= 5;
-      r[thisVal].u.jsValue = baseVal->toObject(exec)->toThisObject(exec);
+      r[thisVal].u.jsValue = baseVal->toThisObject(exec);
 
 #if HAVE(COMPUTED_GOTO)
       // Hack around gcc performance quirk by performing an indirect goto

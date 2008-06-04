@@ -48,7 +48,6 @@ bool JSHTMLFrameSetElement::canGetItemsForName(ExecState*,
 }
 
 JSValue* JSHTMLFrameSetElement::nameGetter(ExecState* exec,
-                                           JSObject* originalObject,
                                            const Identifier& propertyName,
                                            const PropertySlot& slot) {
   JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());

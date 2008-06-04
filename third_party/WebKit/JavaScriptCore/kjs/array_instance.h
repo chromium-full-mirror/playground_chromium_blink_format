@@ -64,7 +64,6 @@ class ArrayInstance : public JSObject {
 
  private:
   static JSValue* lengthGetter(ExecState*,
-                               JSObject*,
                                const Identifier&,
                                const PropertySlot&);
   bool inlineGetOwnPropertySlot(ExecState*,

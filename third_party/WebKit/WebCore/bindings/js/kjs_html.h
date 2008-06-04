@@ -34,11 +34,9 @@ class Node;
 // FIXME: Move these to a more appropriate place.
 
 KJS::JSValue* runtimeObjectGetter(KJS::ExecState*,
-                                  KJS::JSObject*,
                                   const KJS::Identifier&,
                                   const KJS::PropertySlot&);
 KJS::JSValue* runtimeObjectPropertyGetter(KJS::ExecState*,
-                                          KJS::JSObject*,
                                           const KJS::Identifier&,
                                           const KJS::PropertySlot&);
 bool runtimeObjectCustomGetOwnPropertySlot(KJS::ExecState*,

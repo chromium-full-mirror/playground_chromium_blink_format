@@ -74,7 +74,7 @@ bool JSActivation::getOwnPropertySlot(ExecState* exec,
     return true;
 
   if (JSValue** location = getDirectLocation(propertyName)) {
-    slot.setValueSlot(this, location);
+    slot.setValueSlot(location);
     return true;
   }
 
@@ -160,7 +160,6 @@ bool JSActivation::isDynamicScope() const {
 }
 
 JSValue* JSActivation::argumentsGetter(ExecState* exec,
-                                       JSObject*,
                                        const Identifier&,
                                        const PropertySlot& slot) {
   JSActivation* thisObj = static_cast<JSActivation*>(slot.slotBase());

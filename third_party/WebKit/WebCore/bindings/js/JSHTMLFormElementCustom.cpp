@@ -43,7 +43,6 @@ bool JSHTMLFormElement::canGetItemsForName(ExecState* exec,
 }
 
 JSValue* JSHTMLFormElement::nameGetter(ExecState* exec,
-                                       JSObject*,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
   HTMLFormElement* form = static_cast<HTMLFormElement*>(

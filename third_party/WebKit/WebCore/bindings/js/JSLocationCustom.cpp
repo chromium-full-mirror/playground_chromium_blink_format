@@ -42,7 +42,7 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
                                           PropertySlot& slot) {
   Frame* frame = impl()->frame();
   if (!frame) {
-    slot.setUndefined(this);
+    slot.setUndefined();
     return true;
   }
 
@@ -75,7 +75,7 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
   // such cases when normally the string form of Location would be the URL.
 
   printErrorMessageForFrame(frame, message);
-  slot.setUndefined(this);
+  slot.setUndefined();
   return true;
 }
 

@@ -45,7 +45,6 @@ class RuntimeMethod : public InternalFunctionImp {
 
  private:
   static JSValue* lengthGetter(ExecState*,
-                               JSObject*,
                                const Identifier&,
                                const PropertySlot&);
 

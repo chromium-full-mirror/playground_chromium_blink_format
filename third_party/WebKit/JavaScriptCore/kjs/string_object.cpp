@@ -56,7 +56,6 @@ StringInstance::StringInstance(JSObject* proto, const UString& string)
 }
 
 JSValue* StringInstance::lengthGetter(ExecState*,
-                                      JSObject*,
                                       const Identifier&,
                                       const PropertySlot& slot) {
   return jsNumber(static_cast<StringInstance*>(slot.slotBase())
@@ -66,7 +65,6 @@ JSValue* StringInstance::lengthGetter(ExecState*,
 }
 
 JSValue* StringInstance::indexGetter(ExecState*,
-                                     JSObject*,
                                      const Identifier&,
                                      const PropertySlot& slot) {
   return jsString(static_cast<StringInstance*>(slot.slotBase())
@@ -76,7 +74,6 @@ JSValue* StringInstance::indexGetter(ExecState*,
 }
 
 static JSValue* stringInstanceNumericPropertyGetter(ExecState*,
-                                                    JSObject*,
                                                     unsigned index,
                                                     const PropertySlot& slot) {
   return jsString(static_cast<StringInstance*>(slot.slotBase())

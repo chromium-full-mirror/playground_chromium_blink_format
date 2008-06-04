@@ -68,10 +68,9 @@ bool JSHTMLEmbedElement::canGetItemsForName(ExecState*,
 }
 
 JSValue* JSHTMLEmbedElement::nameGetter(ExecState* exec,
-                                        JSObject* originalObject,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
-  return runtimeObjectGetter(exec, originalObject, propertyName, slot);
+  return runtimeObjectGetter(exec, propertyName, slot);
 }
 
 }  // namespace WebCore

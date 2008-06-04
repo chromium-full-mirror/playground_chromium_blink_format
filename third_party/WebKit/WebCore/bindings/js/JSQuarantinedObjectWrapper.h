@@ -100,7 +100,6 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
 
  private:
   static KJS::JSValue* cachedValueGetter(KJS::ExecState*,
-                                         KJS::JSObject*,
                                          const KJS::Identifier&,
                                          const KJS::PropertySlot&);
 

@@ -106,7 +106,6 @@ void UserObjectImp::getPropertyNames(ExecState* exec,
 }
 
 JSValue* UserObjectImp::userObjectGetter(ExecState*,
-                                         JSObject*,
                                          const Identifier& propertyName,
                                          const PropertySlot& slot) {
   UserObjectImp* thisObj = static_cast<UserObjectImp*>(slot.slotBase());

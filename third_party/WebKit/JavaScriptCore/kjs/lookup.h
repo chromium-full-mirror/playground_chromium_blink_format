@@ -84,7 +84,6 @@ struct HashTable {
  * Helper for getStaticFunctionSlot and getStaticPropertySlot
  */
 inline JSValue* staticFunctionGetter(ExecState* exec,
-                                     JSObject*,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   // Look for cached value in dynamic map of properties (in JSObject)
@@ -106,7 +105,6 @@ inline JSValue* staticFunctionGetter(ExecState* exec,
  */
 template <class ThisImp>
 inline JSValue* staticValueGetter(ExecState* exec,
-                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot& slot) {
   ThisImp* thisObj = static_cast<ThisImp*>(slot.slotBase());

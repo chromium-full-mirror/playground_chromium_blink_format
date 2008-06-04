@@ -84,7 +84,6 @@ class JSActivation : public JSVariableObject {
   };
 
   static JSValue* argumentsGetter(ExecState*,
-                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot&);
   NEVER_INLINE PropertySlot::GetValueFunc getArgumentsGetter();

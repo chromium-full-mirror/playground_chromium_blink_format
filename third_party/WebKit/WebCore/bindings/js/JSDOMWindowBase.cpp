@@ -560,7 +560,6 @@ JSValue* JSDOMWindowBase::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* JSDOMWindowBase::childFrameGetter(ExecState* exec,
-                                           JSObject*,
                                            const Identifier& propertyName,
                                            const PropertySlot& slot) {
   return toJS(exec, static_cast<JSDOMWindowBase*>(slot.slotBase())
@@ -572,7 +571,6 @@ JSValue* JSDOMWindowBase::childFrameGetter(ExecState* exec,
 }
 
 JSValue* JSDOMWindowBase::indexGetter(ExecState* exec,
-                                      JSObject*,
                                       const Identifier&,
                                       const PropertySlot& slot) {
   return toJS(exec, static_cast<JSDOMWindowBase*>(slot.slotBase())
@@ -584,7 +582,6 @@ JSValue* JSDOMWindowBase::indexGetter(ExecState* exec,
 }
 
 JSValue* JSDOMWindowBase::namedItemGetter(ExecState* exec,
-                                          JSObject* originalObject,
                                           const Identifier& propertyName,
                                           const PropertySlot& slot) {
   JSDOMWindowBase* thisObj = static_cast<JSDOMWindowBase*>(slot.slotBase());
@@ -622,7 +619,7 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
       if (allowsAccessFrom(exec))
         slot.setStaticEntry(this, entry, staticFunctionGetter);
       else
-        slot.setUndefined(this);
+        slot.setUndefined();
     } else
       slot.setStaticEntry(this, entry, staticValueGetter<JSDOMWindowBase>);
     return true;
@@ -636,7 +633,7 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
     if (static_cast<JSObject*>(proto)->getPropertySlot(exec, propertyName,
                                                        slot)) {
       if (!allowsAccessFrom(exec))
-        slot.setUndefined(this);
+        slot.setUndefined();
       return true;
     }
   }
@@ -653,7 +650,7 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
   }
 
   if (!allowsAccessFrom(exec)) {
-    slot.setUndefined(this);
+    slot.setUndefined();
     return true;
   }
 

@@ -43,7 +43,6 @@ bool JSNamedNodeMap::canGetItemsForName(ExecState*,
 }
 
 JSValue* JSNamedNodeMap::nameGetter(ExecState* exec,
-                                    JSObject* originalObject,
                                     const Identifier& propertyName,
                                     const PropertySlot& slot) {
   JSNamedNodeMap* thisObj = static_cast<JSNamedNodeMap*>(slot.slotBase());

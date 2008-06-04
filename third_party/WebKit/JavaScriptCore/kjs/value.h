@@ -33,8 +33,10 @@
 namespace KJS {
 
 class ExecState;
+class Identifier;
 class JSObject;
 class JSCell;
+class PropertySlot;
 
 struct ClassInfo;
 struct Instruction;
@@ -124,17 +126,24 @@ class JSValue : Noncopyable {
   static int32_t toInt32SlowCase(double, bool& ok);
   static uint32_t toUInt32SlowCase(double, bool& ok);
 
+  // Object operations, with the toObject operation included.
+  JSValue* get(ExecState*, const Identifier& propertyName) const;
+  JSValue* get(ExecState*, unsigned propertyName) const;
+  void put(ExecState*, const Identifier& propertyName, JSValue*);
+  void put(ExecState*, unsigned propertyName, JSValue*);
+  JSObject* toThisObject(ExecState*) const;
+
  private:
+  bool getPropertySlot(ExecState*,
+                       const Identifier& propertyName,
+                       PropertySlot&);
+  bool getPropertySlot(ExecState*, unsigned propertyName, PropertySlot&);
   int32_t toInt32SlowCase(ExecState*, bool& ok) const;
   uint32_t toUInt32SlowCase(ExecState*, bool& ok) const;
 
   // Implementation details.
   JSCell* asCell();
   const JSCell* asCell() const;
-
-  // Give a compile time error if we try to copy one of these.
-  JSValue(const JSValue&);
-  JSValue& operator=(const JSValue&);
 };
 
 class JSCell : public JSValue {
@@ -189,6 +198,19 @@ class JSCell : public JSValue {
   void* operator new(size_t);
   virtual void mark();
   bool marked() const;
+
+  // Object operations, with the toObject operation included.
+  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual void put(ExecState*, unsigned propertyName, JSValue*);
+  virtual JSObject* toThisObject(ExecState*) const;
+
+  // Base implementation, but for non-object classes implements getPropertySlot.
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier& propertyName,
+                                  PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  unsigned propertyName,
+                                  PropertySlot&);
 };
 
 class NumberImp : public JSCell {
@@ -206,6 +228,7 @@ class NumberImp : public JSCell {
   virtual double toNumber(ExecState* exec) const;
   virtual UString toString(ExecState* exec) const;
   virtual JSObject* toObject(ExecState* exec) const;
+  virtual JSObject* toThisObject(ExecState*) const;
 
   void* operator new(size_t size) {
 #ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
@@ -551,6 +574,12 @@ inline uint32_t JSValue::toUInt32(ExecState* exec, bool& ok) const {
     return i;
   }
   return toUInt32SlowCase(exec, ok);
+}
+
+inline JSObject* JSValue::toThisObject(ExecState* exec) const {
+  if (UNLIKELY(JSImmediate::isImmediate(this)))
+    return JSImmediate::toObject(this, exec);
+  return asCell()->toThisObject(exec);
 }
 
 }  // namespace

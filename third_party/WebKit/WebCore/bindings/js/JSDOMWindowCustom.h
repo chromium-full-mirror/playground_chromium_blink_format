@@ -86,7 +86,7 @@ ALWAYS_INLINE bool JSDOMWindow::customGetOwnPropertySlot(
     // FIXME: We should have a message here that explains why the property
     // access/function call was
     // not allowed.
-    slot.setUndefined(this);
+    slot.setUndefined();
     return true;
   }
 

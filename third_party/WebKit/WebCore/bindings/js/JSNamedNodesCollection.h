@@ -48,11 +48,9 @@ class JSNamedNodesCollection : public DOMObject {
 
  private:
   static KJS::JSValue* lengthGetter(KJS::ExecState*,
-                                    KJS::JSObject*,
                                     const KJS::Identifier&,
                                     const KJS::PropertySlot&);
   static KJS::JSValue* indexGetter(KJS::ExecState*,
-                                   KJS::JSObject*,
                                    const KJS::Identifier&,
                                    const KJS::PropertySlot&);
 

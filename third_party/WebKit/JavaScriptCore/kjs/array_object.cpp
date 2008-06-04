@@ -81,10 +81,10 @@ bool ArrayPrototype::getOwnPropertySlot(ExecState* exec,
 
 // Helper function
 static JSValue* getProperty(ExecState* exec, JSObject* obj, unsigned index) {
-  PropertySlot slot;
+  PropertySlot slot(obj);
   if (!obj->getPropertySlot(exec, index, slot))
     return 0;
-  return slot.getValue(exec, obj, index);
+  return slot.getValue(exec, index);
 }
 
 JSValue* arrayProtoFuncToString(ExecState* exec,
@@ -565,12 +565,12 @@ JSValue* arrayProtoFuncFilter(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
-    PropertySlot slot;
+    PropertySlot slot(thisObj);
 
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
 
-    JSValue* v = slot.getValue(exec, thisObj, k);
+    JSValue* v = slot.getValue(exec, k);
 
     List eachArguments;
 
@@ -607,11 +607,11 @@ JSValue* arrayProtoFuncMap(ExecState* exec,
                                                                  mapArgs));
 
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
-    PropertySlot slot;
+    PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
 
-    JSValue* v = slot.getValue(exec, thisObj, k);
+    JSValue* v = slot.getValue(exec, k);
 
     List eachArguments;
 
@@ -648,14 +648,14 @@ JSValue* arrayProtoFuncEvery(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
-    PropertySlot slot;
+    PropertySlot slot(thisObj);
 
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
 
     List eachArguments;
 
-    eachArguments.append(slot.getValue(exec, thisObj, k));
+    eachArguments.append(slot.getValue(exec, k));
     eachArguments.append(jsNumber(k));
     eachArguments.append(thisObj);
 
@@ -686,12 +686,12 @@ JSValue* arrayProtoFuncForEach(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
-    PropertySlot slot;
+    PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
 
     List eachArguments;
-    eachArguments.append(slot.getValue(exec, thisObj, k));
+    eachArguments.append(slot.getValue(exec, k));
     eachArguments.append(jsNumber(k));
     eachArguments.append(thisObj);
 
@@ -716,12 +716,12 @@ JSValue* arrayProtoFuncSome(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
-    PropertySlot slot;
+    PropertySlot slot(thisObj);
     if (!thisObj->getPropertySlot(exec, k, slot))
       continue;
 
     List eachArguments;
-    eachArguments.append(slot.getValue(exec, thisObj, k));
+    eachArguments.append(slot.getValue(exec, k));
     eachArguments.append(jsNumber(k));
     eachArguments.append(thisObj);
 

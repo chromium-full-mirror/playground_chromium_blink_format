@@ -63,7 +63,6 @@ static JSObject* getRuntimeObject(ExecState* exec, Node* node) {
 }
 
 JSValue* runtimeObjectGetter(ExecState* exec,
-                             JSObject* originalObject,
                              const Identifier& propertyName,
                              const PropertySlot& slot) {
   JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());
@@ -72,7 +71,6 @@ JSValue* runtimeObjectGetter(ExecState* exec,
 }
 
 JSValue* runtimeObjectPropertyGetter(ExecState* exec,
-                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());

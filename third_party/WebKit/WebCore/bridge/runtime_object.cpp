@@ -51,7 +51,6 @@ void RuntimeObjectImp::invalidate() {
 }
 
 JSValue* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
-                                                JSObject*,
                                                 const Identifier& propertyName,
                                                 const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
@@ -71,7 +70,6 @@ JSValue* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
 }
 
 JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
-                                       JSObject*,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
@@ -92,7 +90,6 @@ JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
 }
 
 JSValue* RuntimeObjectImp::methodGetter(ExecState* exec,
-                                        JSObject*,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());

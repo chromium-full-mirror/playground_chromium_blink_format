@@ -54,7 +54,6 @@ bool JSHTMLDocument::canGetItemsForName(ExecState*,
 }
 
 JSValue* JSHTMLDocument::nameGetter(ExecState* exec,
-                                    JSObject* originalObject,
                                     const Identifier& propertyName,
                                     const PropertySlot& slot) {
   JSHTMLDocument* thisObj = static_cast<JSHTMLDocument*>(slot.slotBase());

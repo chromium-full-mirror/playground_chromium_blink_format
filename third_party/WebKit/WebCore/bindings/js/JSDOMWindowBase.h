@@ -186,15 +186,12 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
                    KJS::JSValue* function);
 
   static KJS::JSValue* childFrameGetter(KJS::ExecState*,
-                                        KJS::JSObject*,
                                         const KJS::Identifier&,
                                         const KJS::PropertySlot&);
   static KJS::JSValue* indexGetter(KJS::ExecState*,
-                                   KJS::JSObject*,
                                    const KJS::Identifier&,
                                    const KJS::PropertySlot&);
   static KJS::JSValue* namedItemGetter(KJS::ExecState*,
-                                       KJS::JSObject*,
                                        const KJS::Identifier&,
                                        const KJS::PropertySlot&);
 
