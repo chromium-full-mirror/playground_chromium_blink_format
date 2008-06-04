@@ -1760,7 +1760,6 @@ class DebuggerStatementNode : public StatementNode {
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual JSValue* execute(OldInterpreterExecState*) KJS_FAST_CALL;
 };
 
 class ExprStatementNode : public StatementNode {
