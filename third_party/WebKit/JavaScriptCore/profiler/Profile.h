@@ -33,6 +33,7 @@
 namespace KJS {
 
 class ExecState;
+typedef void (*SortFunction)(ProfileNode*);
 
 class Profile : public RefCounted<Profile> {
  public:
@@ -55,16 +56,19 @@ class Profile : public RefCounted<Profile> {
   ExecState* originatingGlobalExec() const { return m_originatingGlobalExec; }
   unsigned pageGroupIdentifier() const { return m_pageGroupIdentifier; }
 
-  void sortTotalTimeDescending() { m_headNode->sortTotalTimeDescending(); }
-  void sortTotalTimeAscending() { m_headNode->sortTotalTimeAscending(); }
-  void sortSelfTimeDescending() { m_headNode->sortSelfTimeDescending(); }
-  void sortSelfTimeAscending() { m_headNode->sortSelfTimeAscending(); }
-  void sortCallsDescending() { m_headNode->sortCallsDescending(); }
-  void sortCallsAscending() { m_headNode->sortCallsAscending(); }
+  void sort(SortFunction);
+  void sortTotalTimeDescending() { sort(ProfileNode::sortTotalTimeDescending); }
+  void sortTotalTimeAscending() { sort(ProfileNode::sortTotalTimeAscending); }
+  void sortSelfTimeDescending() { sort(ProfileNode::sortSelfTimeDescending); }
+  void sortSelfTimeAscending() { sort(ProfileNode::sortSelfTimeAscending); }
+  void sortCallsDescending() { sort(ProfileNode::sortCallsDescending); }
+  void sortCallsAscending() { sort(ProfileNode::sortCallsAscending); }
   void sortFunctionNameDescending() {
-    m_headNode->sortFunctionNameDescending();
+    sort(ProfileNode::sortFunctionNameDescending);
   }
-  void sortFunctionNameAscending() { m_headNode->sortFunctionNameAscending(); }
+  void sortFunctionNameAscending() {
+    sort(ProfileNode::sortFunctionNameAscending);
+  }
 
   void focus(const ProfileNode* profileNode) {
     if (!profileNode)

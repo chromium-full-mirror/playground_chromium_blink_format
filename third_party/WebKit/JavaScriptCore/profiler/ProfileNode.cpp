@@ -69,9 +69,6 @@ ProfileNode::ProfileNode(const CallIdentifier& callIdentifier,
       m_visibleSelfTime(0.0),
       m_numberOfCalls(0),
       m_visible(true) {
-  if (!m_head)
-    m_head = this;
-
   startTimer();
 }
 
@@ -84,8 +81,9 @@ ProfileNode* ProfileNode::willExecute(const CallIdentifier& callIdentifier) {
     }
   }
 
-  RefPtr<ProfileNode> newChild =
-      ProfileNode::create(callIdentifier, m_head, this);
+  RefPtr<ProfileNode> newChild = ProfileNode::create(
+      callIdentifier, m_head ? m_head : this,
+      this);  // If this ProfileNode has no head it is the head.
   if (m_children.size())
     m_children.last()->setNextSibling(newChild.get());
   m_children.append(newChild.release());
@@ -134,7 +132,7 @@ void ProfileNode::stopProfiling() {
   ASSERT(m_actualSelfTime <= m_actualTotalTime);
   m_actualSelfTime = m_actualTotalTime - m_actualSelfTime;
 
-  if (m_head == this && m_actualSelfTime) {
+  if (!m_head && m_actualSelfTime) {
     ProfileNode* idleNode = willExecute(CallIdentifier(NonJSExecution, 0, 0));
 
     idleNode->setTotalTime(m_actualSelfTime);
@@ -147,130 +145,18 @@ void ProfileNode::stopProfiling() {
   m_visibleSelfTime = m_actualSelfTime;
 }
 
-// Sorting methods
-
-static inline bool totalTimeDescendingComparator(const RefPtr<ProfileNode>& a,
-                                                 const RefPtr<ProfileNode>& b) {
-  return a->totalTime() > b->totalTime();
+ProfileNode* ProfileNode::traverseNextNode() const {
+  ProfileNode* next = m_nextSibling;
+  if (!next)
+    return m_parent;
+  while (ProfileNode* firstChild = next->firstChild())
+    next = firstChild;
+  return next;
 }
 
-void ProfileNode::sortTotalTimeDescending() {
-  std::sort(m_children.begin(), m_children.end(),
-            totalTimeDescendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortTotalTimeDescending();
-
-  resetChildrensSiblings();
-}
-
-static inline bool totalTimeAscendingComparator(const RefPtr<ProfileNode>& a,
-                                                const RefPtr<ProfileNode>& b) {
-  return a->totalTime() < b->totalTime();
-}
-
-void ProfileNode::sortTotalTimeAscending() {
-  std::sort(m_children.begin(), m_children.end(), totalTimeAscendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortTotalTimeAscending();
-
-  resetChildrensSiblings();
-}
-
-static inline bool selfTimeDescendingComparator(const RefPtr<ProfileNode>& a,
-                                                const RefPtr<ProfileNode>& b) {
-  return a->selfTime() > b->selfTime();
-}
-
-void ProfileNode::sortSelfTimeDescending() {
-  std::sort(m_children.begin(), m_children.end(), selfTimeDescendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortSelfTimeDescending();
-
-  resetChildrensSiblings();
-}
-
-static inline bool selfTimeAscendingComparator(const RefPtr<ProfileNode>& a,
-                                               const RefPtr<ProfileNode>& b) {
-  return a->selfTime() < b->selfTime();
-}
-
-void ProfileNode::sortSelfTimeAscending() {
-  std::sort(m_children.begin(), m_children.end(), selfTimeAscendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortSelfTimeAscending();
-
-  resetChildrensSiblings();
-}
-
-static inline bool callsDescendingComparator(const RefPtr<ProfileNode>& a,
-                                             const RefPtr<ProfileNode>& b) {
-  return a->numberOfCalls() > b->numberOfCalls();
-}
-
-void ProfileNode::sortCallsDescending() {
-  std::sort(m_children.begin(), m_children.end(), callsDescendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortCallsDescending();
-
-  resetChildrensSiblings();
-}
-
-static inline bool callsAscendingComparator(const RefPtr<ProfileNode>& a,
-                                            const RefPtr<ProfileNode>& b) {
-  return a->numberOfCalls() < b->numberOfCalls();
-}
-
-void ProfileNode::sortCallsAscending() {
-  std::sort(m_children.begin(), m_children.end(), callsAscendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortCallsAscending();
-
-  resetChildrensSiblings();
-}
-
-static inline bool functionNameDescendingComparator(
-    const RefPtr<ProfileNode>& a,
-    const RefPtr<ProfileNode>& b) {
-  return a->functionName() > b->functionName();
-}
-
-void ProfileNode::sortFunctionNameDescending() {
-  std::sort(m_children.begin(), m_children.end(),
-            functionNameDescendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortFunctionNameDescending();
-
-  resetChildrensSiblings();
-}
-
-static inline bool functionNameAscendingComparator(
-    const RefPtr<ProfileNode>& a,
-    const RefPtr<ProfileNode>& b) {
-  return a->functionName() < b->functionName();
-}
-
-void ProfileNode::sortFunctionNameAscending() {
-  std::sort(m_children.begin(), m_children.end(),
-            functionNameAscendingComparator);
-
-  unsigned size = m_children.size();
-  for (unsigned i = 0; i < size; ++i)
-    m_children[i]->sortFunctionNameAscending();
-
+void ProfileNode::sort(bool comparator(const RefPtr<ProfileNode>&,
+                                       const RefPtr<ProfileNode>&)) {
+  std::sort(childrenBegin(), childrenEnd(), comparator);
   resetChildrensSiblings();
 }
 
