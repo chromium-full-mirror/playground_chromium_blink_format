@@ -169,15 +169,12 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
 
  private:
   static JSValue* lengthGetter(ExecState*,
-                               JSObject*,
                                const Identifier&,
                                const PropertySlot&);
   static JSValue* connectGetter(ExecState*,
-                                JSObject*,
                                 const Identifier&,
                                 const PropertySlot&);
   static JSValue* disconnectGetter(ExecState*,
-                                   JSObject*,
                                    const Identifier&,
                                    const PropertySlot&);
 };
@@ -204,7 +201,6 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
 
  private:
   static JSValue* lengthGetter(ExecState*,
-                               JSObject*,
                                const Identifier&,
                                const PropertySlot&);
   static QMultiMap<QObject*, QtConnectionObject*> connections;

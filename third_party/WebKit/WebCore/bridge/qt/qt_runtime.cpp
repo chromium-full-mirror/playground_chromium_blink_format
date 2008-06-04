@@ -1363,7 +1363,6 @@ bool QtRuntimeMetaMethod::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* QtRuntimeMetaMethod::lengthGetter(ExecState*,
-                                           JSObject*,
                                            const Identifier&,
                                            const PropertySlot&) {
   // QtScript always returns 0
@@ -1371,7 +1370,6 @@ JSValue* QtRuntimeMetaMethod::lengthGetter(ExecState*,
 }
 
 JSValue* QtRuntimeMetaMethod::connectGetter(ExecState* exec,
-                                            JSObject*,
                                             const Identifier& ident,
                                             const PropertySlot& slot) {
   QtRuntimeMetaMethod* thisObj =
@@ -1385,7 +1383,6 @@ JSValue* QtRuntimeMetaMethod::connectGetter(ExecState* exec,
 }
 
 JSValue* QtRuntimeMetaMethod::disconnectGetter(ExecState* exec,
-                                               JSObject*,
                                                const Identifier& ident,
                                                const PropertySlot& slot) {
   QtRuntimeMetaMethod* thisObj =
@@ -1581,7 +1578,6 @@ bool QtRuntimeConnectionMethod::getOwnPropertySlot(
 }
 
 JSValue* QtRuntimeConnectionMethod::lengthGetter(ExecState*,
-                                                 JSObject*,
                                                  const Identifier&,
                                                  const PropertySlot&) {
   // we have one formal argument, and one optional
@@ -1706,10 +1702,10 @@ void QtConnectionObject::execute(void** argv) {
             ScopeChain sc = oldsc;
             sc.push(wrapper);
             fimp->setScope(sc);
-            fimp->call(exec, m_thisObject, l);
+            fimp->callAsFunction(exec, m_thisObject, l);
             fimp->setScope(oldsc);
           } else
-            m_funcObject->call(exec, m_thisObject, l);
+            m_funcObject->callAsFunction(exec, m_thisObject, l);
         }
       }
     }
