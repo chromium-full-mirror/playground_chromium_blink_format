@@ -495,9 +495,11 @@ class ObjectLiteralNode : public ExpressionNode {
 class BracketAccessorNode : public ExpressionNode {
  public:
   BracketAccessorNode(ExpressionNode* base,
-                      ExpressionNode* subscript) KJS_FAST_CALL
+                      ExpressionNode* subscript,
+                      bool subscriptHasAssignments) KJS_FAST_CALL
       : m_base(base),
-        m_subscript(subscript) {}
+        m_subscript(subscript),
+        m_subscriptHasAssignments(subscriptHasAssignments) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
@@ -512,6 +514,7 @@ class BracketAccessorNode : public ExpressionNode {
  private:
   RefPtr<ExpressionNode> m_base;
   RefPtr<ExpressionNode> m_subscript;
+  bool m_subscriptHasAssignments;
 };
 
 class DotAccessorNode : public ExpressionNode {
