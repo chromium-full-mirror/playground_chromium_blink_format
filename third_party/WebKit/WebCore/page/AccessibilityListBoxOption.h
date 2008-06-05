@@ -54,7 +54,7 @@ class AccessibilityListBoxOption : public AccessibilityObject {
   virtual bool accessibilityIsIgnored() const { return false; }
   virtual bool isSelected() const;
   virtual bool isEnabled() const;
-  virtual String title() const;
+  virtual String stringValue() const;
   virtual Element* actionElement() const;
 
   virtual void setSelected(bool);
