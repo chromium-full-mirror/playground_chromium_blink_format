@@ -118,7 +118,7 @@ inline void ThreadSpecific<T>::destroy(void* ptr)
 #else  // Temporary stub implementation.
 
 template <typename T>
-inline ThreadSpecific<T>::ThreadSpecific() {}
+inline ThreadSpecific<T>::ThreadSpecific() : m_data() {}
 
 template <typename T>
 inline ThreadSpecific<T>::~ThreadSpecific() {}
@@ -137,7 +137,7 @@ template <typename T>
 inline ThreadSpecific<T>::operator T*() {
   T* ptr = static_cast<T*>(get());
   if (!ptr) {
-    ptr = new T;
+    ptr = new T();
     set(ptr);
   }
   return ptr;
