@@ -35,34 +35,18 @@ using namespace HTMLNames;
 
 StyleSheetList::StyleSheetList(Document* doc) : m_doc(doc) {}
 
-StyleSheetList::~StyleSheetList() {
-  for (DeprecatedPtrListIterator<StyleSheet> it(styleSheets); it.current();
-       ++it)
-    it.current()->deref();
-}
+StyleSheetList::~StyleSheetList() {}
 
 void StyleSheetList::documentDestroyed() {
   m_doc = 0;
 }
 
-void StyleSheetList::add(StyleSheet* s) {
-  if (!styleSheets.containsRef(s)) {
-    s->ref();
-    styleSheets.append(s);
-  }
-}
-
-void StyleSheetList::remove(StyleSheet* s) {
-  if (styleSheets.removeRef(s))
-    s->deref();
-}
-
 unsigned StyleSheetList::length() const {
-  return styleSheets.count();
+  return m_sheets.size();
 }
 
 StyleSheet* StyleSheetList::item(unsigned index) {
-  return index < length() ? styleSheets.at(index) : 0;
+  return index < length() ? m_sheets[index].get() : 0;
 }
 
 HTMLStyleElement* StyleSheetList::getNamedItem(const String& name) const {
