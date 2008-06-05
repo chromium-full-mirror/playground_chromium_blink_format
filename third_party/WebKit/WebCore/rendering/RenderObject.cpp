@@ -1807,7 +1807,10 @@ void RenderObject::paintBoxShadow(GraphicsContext* context,
       shadowRect.move(shadowOffset);
       context->clip(shadowRect);
 
-      IntSize extraOffset(w + max(0, shadowOffset.width()) + shadowBlur, 0);
+      // Move the fill just outside the clip, adding 1 pixel separation so that
+      // the fill does not
+      // bleed in (due to antialiasing) if the context is transformed.
+      IntSize extraOffset(w + max(0, shadowOffset.width()) + shadowBlur + 1, 0);
       shadowOffset -= extraOffset;
       fillRect.move(extraOffset);
     }
