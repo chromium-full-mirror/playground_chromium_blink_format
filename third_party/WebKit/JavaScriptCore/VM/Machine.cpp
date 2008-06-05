@@ -1059,11 +1059,23 @@ profilerFetchHack:
 
 #if HAVE(COMPUTED_GOTO)
 #define NEXT_OPCODE goto * vPC->u.opcode
+#if DUMP_OPCODE_STATS
+#define BEGIN_OPCODE(opcode) \
+  opcode:                    \
+  OpcodeStats::recordInstruction(opcode);
+#else
 #define BEGIN_OPCODE(opcode) opcode:
+#endif
   NEXT_OPCODE;
 #else
 #define NEXT_OPCODE continue
+#if DUMP_OPCODE_STATS
+#define BEGIN_OPCODE(opcode) \
+  case opcode:               \
+    OpcodeStats::recordInstruction(opcode);
+#else
 #define BEGIN_OPCODE(opcode) case opcode:
+#endif
   while (1)  // iterator loop begins
     switch (vPC->u.opcode)
 #endif

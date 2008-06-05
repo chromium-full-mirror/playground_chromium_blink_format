@@ -34,6 +34,8 @@
 
 namespace KJS {
 
+#define DUMP_OPCODE_STATS 0
+
 #define FOR_EACH_OPCODE_ID(macro)                                                               \
   macro(op_load) macro(op_new_object) macro(op_new_array) macro(                                \
       op_new_regexp) macro(op_mov)                                                              \
@@ -101,6 +103,17 @@ FOR_EACH_OPCODE_ID(VERIFY_OPCODE_ID);
 typedef void* Opcode;
 #else
 typedef OpcodeID Opcode;
+#endif
+
+#if DUMP_OPCODE_STATS
+
+struct OpcodeStats {
+  OpcodeStats();
+  ~OpcodeStats();
+  static unsigned opcodeCounts[numOpcodeIDs];
+  static void recordInstruction(int opcode);
+};
+
 #endif
 
 }  // namespace KJS
