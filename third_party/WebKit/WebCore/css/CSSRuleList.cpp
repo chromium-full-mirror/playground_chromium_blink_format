@@ -29,10 +29,9 @@
 
 namespace WebCore {
 
-CSSRuleList::CSSRuleList() : RefCounted<CSSRuleList>(0) {}
+CSSRuleList::CSSRuleList() {}
 
-CSSRuleList::CSSRuleList(StyleList* list, bool omitCharsetRules)
-    : RefCounted<CSSRuleList>(0) {
+CSSRuleList::CSSRuleList(StyleList* list, bool omitCharsetRules) {
   m_list = list;
   if (list && omitCharsetRules) {
     m_list = 0;

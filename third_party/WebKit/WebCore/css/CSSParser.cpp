@@ -1242,7 +1242,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         parsedValue2 = parsedValue1;
 
       RefPtr<Pair> pair =
-          new Pair(parsedValue1.release(), parsedValue2.release());
+          Pair::create(parsedValue1.release(), parsedValue2.release());
       RefPtr<CSSPrimitiveValue> val = new CSSPrimitiveValue(pair.release());
       if (propId == CSSPropertyWebkitBorderRadius) {
         const int properties[4] = {CSSPropertyWebkitBorderTopRightRadius,
@@ -2224,8 +2224,8 @@ PassRefPtr<CSSValue> CSSParser::parseFillSize() {
     }
   }
 
-  Pair* pair = new Pair(parsedValue1, parsedValue2);
-  return new CSSPrimitiveValue(pair);
+  RefPtr<Pair> pair = Pair::create(parsedValue1, parsedValue2);
+  return new CSSPrimitiveValue(pair.release());
 }
 
 bool CSSParser::parseFillProperty(int propId,
@@ -3689,9 +3689,9 @@ bool CSSParser::parseCounter(int propId, int defaultValue, bool important) {
           valueList->next();
         }
 
-        list->append(new CSSPrimitiveValue(
-            new Pair(counterName.release(),
-                     new CSSPrimitiveValue(i, CSSPrimitiveValue::CSS_NUMBER))));
+        list->append(new CSSPrimitiveValue(Pair::create(
+            counterName.release(),
+            new CSSPrimitiveValue(i, CSSPrimitiveValue::CSS_NUMBER))));
         state = ID;
         continue;
       }
@@ -4455,9 +4455,11 @@ CSSRule* CSSParser::createMediaRule(MediaList* media, CSSRuleList* rules) {
 }
 
 CSSRuleList* CSSParser::createRuleList() {
-  CSSRuleList* list = new CSSRuleList;
-  m_parsedRuleLists.append(list);
-  return list;
+  RefPtr<CSSRuleList> list = CSSRuleList::create();
+  CSSRuleList* listPtr = list.get();
+
+  m_parsedRuleLists.append(list.release());
+  return listPtr;
 }
 
 CSSRule* CSSParser::createStyleRule(CSSSelector* selector) {

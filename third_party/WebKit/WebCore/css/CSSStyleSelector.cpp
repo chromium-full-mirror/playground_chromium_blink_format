@@ -487,7 +487,7 @@ void CSSStyleSelector::matchRules(CSSRuleSet* rules,
   } else {
     for (unsigned i = 0; i < m_matchedRules.size(); i++) {
       if (!m_ruleList)
-        m_ruleList = new CSSRuleList();
+        m_ruleList = CSSRuleList::create();
       m_ruleList->append(m_matchedRules[i]->rule());
     }
   }
@@ -1423,7 +1423,7 @@ RefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(Element* e,
 
   m_checker.m_collectRulesOnly = false;
 
-  return m_ruleList;
+  return m_ruleList.release();
 }
 
 RefPtr<CSSRuleList> CSSStyleSelector::pseudoStyleRulesForElement(

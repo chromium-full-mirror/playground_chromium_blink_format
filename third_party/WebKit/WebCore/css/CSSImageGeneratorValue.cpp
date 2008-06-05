@@ -82,7 +82,7 @@ void CSSImageGeneratorValue::putImage(const IntSize& size, Image* image) {
 StyleGeneratedImage* CSSImageGeneratorValue::generatedImage() {
   if (!m_accessedImage) {
     m_accessedImage = true;
-    m_image = new StyleGeneratedImage(this, isFixedSize());
+    m_image = StyleGeneratedImage::create(this, isFixedSize());
   }
   return m_image.get();
 }
