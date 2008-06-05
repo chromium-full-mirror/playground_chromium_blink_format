@@ -1341,7 +1341,7 @@ AXObjectCache* AccessibilityRenderObject::axObjectCache() const {
 }
 
 void AccessibilityRenderObject::getDocumentLinks(
-    Vector<RefPtr<AccessibilityObject>>& result) const {
+    AccessibilityChildrenVector& result) const {
   Document* document = m_renderer->document();
   RefPtr<HTMLCollection> coll = document->links();
   Node* curr = coll->firstItem();
@@ -2137,7 +2137,7 @@ void AccessibilityRenderObject::childrenChanged() {
   }
 }
 
-const Vector<RefPtr<AccessibilityObject>>&
+const AccessibilityObject::AccessibilityChildrenVector&
 AccessibilityRenderObject::children() {
   if (!m_haveChildren)
     addChildren();
@@ -2162,7 +2162,7 @@ void AccessibilityRenderObject::addChildren() {
     if (obj->accessibilityIsIgnored()) {
       if (!obj->hasChildren())
         obj->addChildren();
-      Vector<RefPtr<AccessibilityObject>> children = obj->children();
+      AccessibilityChildrenVector children = obj->children();
       unsigned length = children.size();
       for (unsigned i = 0; i < length; ++i)
         m_children.append(children[i]);
@@ -2194,7 +2194,7 @@ void AccessibilityRenderObject::addChildren() {
 }
 
 void AccessibilityRenderObject::ariaListboxSelectedChildren(
-    Vector<RefPtr<AccessibilityObject>>& result) {
+    AccessibilityChildrenVector& result) {
   AccessibilityObject* child = firstChild();
   bool isMultiselectable = false;
 
@@ -2234,7 +2234,7 @@ void AccessibilityRenderObject::ariaListboxSelectedChildren(
 }
 
 void AccessibilityRenderObject::selectedChildren(
-    Vector<RefPtr<AccessibilityObject>>& result) {
+    AccessibilityChildrenVector& result) {
   ASSERT(result.isEmpty());
 
   // only listboxes should be asked for their selected children.
@@ -2248,7 +2248,7 @@ void AccessibilityRenderObject::selectedChildren(
 }
 
 void AccessibilityRenderObject::ariaListboxVisibleChildren(
-    Vector<RefPtr<AccessibilityObject>>& result) {
+    AccessibilityChildrenVector& result) {
   if (!hasChildren())
     addChildren();
 
@@ -2260,7 +2260,7 @@ void AccessibilityRenderObject::ariaListboxVisibleChildren(
 }
 
 void AccessibilityRenderObject::visibleChildren(
-    Vector<RefPtr<AccessibilityObject>>& result) {
+    AccessibilityChildrenVector& result) {
   ASSERT(result.isEmpty());
 
   // only listboxes are asked for their visible children.

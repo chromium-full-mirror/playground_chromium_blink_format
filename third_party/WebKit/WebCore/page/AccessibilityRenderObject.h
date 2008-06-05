@@ -172,7 +172,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual void getDocumentLinks(Vector<RefPtr<AccessibilityObject>>&) const;
   virtual FrameView* documentFrameView() const;
 
-  virtual const Vector<RefPtr<AccessibilityObject>>& children();
+  virtual const AccessibilityChildrenVector& children();
 
   virtual void setFocused(bool);
   virtual void setSelectedTextRange(const PlainTextRange&);
@@ -181,8 +181,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual void detach();
   virtual void childrenChanged();
   virtual void addChildren();
-  virtual void selectedChildren(Vector<RefPtr<AccessibilityObject>>&);
-  virtual void visibleChildren(Vector<RefPtr<AccessibilityObject>>&);
+  virtual void selectedChildren(AccessibilityChildrenVector&);
+  virtual void visibleChildren(AccessibilityChildrenVector&);
   virtual bool shouldFocusActiveDescendant() const;
   virtual AccessibilityObject* activeDescendant() const;
   virtual void handleActiveDescendantChanged();
@@ -219,8 +219,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool isDetached() const { return !m_renderer; }
 
  private:
-  void ariaListboxSelectedChildren(Vector<RefPtr<AccessibilityObject>>&);
-  void ariaListboxVisibleChildren(Vector<RefPtr<AccessibilityObject>>&);
+  void ariaListboxSelectedChildren(AccessibilityChildrenVector&);
+  void ariaListboxVisibleChildren(AccessibilityChildrenVector&);
 
   Element* menuElementForMenuButton() const;
   Element* menuItemElementForMenu() const;

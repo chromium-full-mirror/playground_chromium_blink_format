@@ -242,6 +242,8 @@ void AccessibilityObject::setFocused(bool on) {}
 
 void AccessibilityObject::setValue(const String& string) {}
 
+void AccessibilityObject::setSelected(bool) {}
+
 bool AccessibilityObject::press() const {
   Element* actionElem = actionElement();
   if (!actionElem)
@@ -257,7 +259,7 @@ AXObjectCache* AccessibilityObject::axObjectCache() const {
 }
 
 void AccessibilityObject::getDocumentLinks(
-    Vector<RefPtr<AccessibilityObject>>& result) const {}
+    AccessibilityChildrenVector& result) const {}
 
 Widget* AccessibilityObject::widget() const {
   return 0;
