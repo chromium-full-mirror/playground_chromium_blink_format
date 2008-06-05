@@ -114,8 +114,9 @@ Node* IndentOutdentCommand::prepareBlockquoteLevelForInsertion(
 }
 
 void IndentOutdentCommand::indentRegion() {
-  VisiblePosition startOfSelection = endingSelection().visibleStart();
-  VisiblePosition endOfSelection = endingSelection().visibleEnd();
+  Selection selection = selectionForParagraphIteration(endingSelection());
+  VisiblePosition startOfSelection = selection.visibleStart();
+  VisiblePosition endOfSelection = selection.visibleEnd();
   int startIndex = indexForVisiblePosition(startOfSelection);
   int endIndex = indexForVisiblePosition(endOfSelection);
 
@@ -183,13 +184,22 @@ void IndentOutdentCommand::indentRegion() {
       RefPtr<Node> blockquote = createIndentBlockquoteElement(document());
       Position start = startOfParagraph(endOfCurrentParagraph).deepEquivalent();
 
-      // FIXME: This will break table structure.
-      Node* startOfNewBlock =
-          splitTreeToNode(start.node(), editableRootForPosition(start));
+      Node* enclosingCell = enclosingNodeOfType(start, &isTableCell);
+      Node* nodeToSplitTo =
+          enclosingCell ? enclosingCell : editableRootForPosition(start);
+      Node* startOfNewBlock = splitTreeToNode(start.node(), nodeToSplitTo);
       insertNodeBefore(blockquote.get(), startOfNewBlock);
       newBlockquote = blockquote.get();
       insertionPoint = prepareBlockquoteLevelForInsertion(endOfCurrentParagraph,
                                                           &newBlockquote);
+      // Don't put the next paragraph in the blockquote we just created for this
+      // paragraph unless
+      // the next paragraph is in the same cell.
+      if (enclosingCell &&
+          enclosingCell !=
+              enclosingNodeOfType(endOfNextParagraph.deepEquivalent(),
+                                  &isTableCell))
+        newBlockquote = 0;
     }
     moveParagraph(startOfParagraph(endOfCurrentParagraph),
                   endOfCurrentParagraph,
