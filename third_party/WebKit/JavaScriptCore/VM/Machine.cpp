@@ -717,10 +717,11 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
   int scopeDepth;
   Instruction* handlerVPC;
 
-  while (!codeBlock->getHandlerForVPC(vPC, handlerVPC, scopeDepth))
+  while (!codeBlock->getHandlerForVPC(vPC, handlerVPC, scopeDepth)) {
     if (!unwindCallFrame(exec, exceptionValue, registerBase, vPC, codeBlock, k,
                          scopeChain, r))
       return 0;
+  }
 
   // Now unwind the scope chain within the exception handler's call frame.
 

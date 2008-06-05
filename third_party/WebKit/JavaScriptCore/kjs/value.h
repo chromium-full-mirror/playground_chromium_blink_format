@@ -52,7 +52,6 @@ struct Instruction;
 class JSValue : Noncopyable {
   friend class JSCell;     // so it can derive from this class
   friend class Collector;  // so it can call asCell()
-
  private:
   JSValue();
   virtual ~JSValue();
@@ -89,19 +88,19 @@ class JSValue : Noncopyable {
   bool getTruncatedUInt32(uint32_t&) const;
 
   // Basic conversions.
-  JSValue* toPrimitive(ExecState* exec,
+  JSValue* toPrimitive(ExecState*,
                        JSType preferredType = UnspecifiedType) const;
-  bool getPrimitiveNumber(ExecState* exec, double& number, JSValue*& value);
+  bool getPrimitiveNumber(ExecState*, double& number, JSValue*&);
 
-  bool toBoolean(ExecState* exec) const;
+  bool toBoolean(ExecState*) const;
 
   // toNumber conversion is expected to be side effect free if an exception has
   // been set in the ExecState already.
-  double toNumber(ExecState* exec) const;
+  double toNumber(ExecState*) const;
   JSValue* toJSNumber(ExecState*) const;  // Fast path for when you expect that
                                           // the value is an immediate number.
-  UString toString(ExecState* exec) const;
-  JSObject* toObject(ExecState* exec) const;
+  UString toString(ExecState*) const;
+  JSObject* toObject(ExecState*) const;
 
   // Integer conversions.
   double toInteger(ExecState*) const;
@@ -184,15 +183,13 @@ class JSCell : public JSValue {
 
   // Basic conversions.
   virtual JSValue* toPrimitive(
-      ExecState* exec,
+      ExecState*,
       JSType preferredType = UnspecifiedType) const = 0;
-  virtual bool getPrimitiveNumber(ExecState* exec,
-                                  double& number,
-                                  JSValue*& value) = 0;
-  virtual bool toBoolean(ExecState* exec) const = 0;
-  virtual double toNumber(ExecState* exec) const = 0;
-  virtual UString toString(ExecState* exec) const = 0;
-  virtual JSObject* toObject(ExecState* exec) const = 0;
+  virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*&) = 0;
+  virtual bool toBoolean(ExecState*) const = 0;
+  virtual double toNumber(ExecState*) const = 0;
+  virtual UString toString(ExecState*) const = 0;
+  virtual JSObject* toObject(ExecState*) const = 0;
 
   // Garbage collection.
   void* operator new(size_t);
@@ -224,10 +221,10 @@ class NumberImp : public JSCell {
   virtual JSValue* toPrimitive(ExecState*,
                                JSType preferred = UnspecifiedType) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
-  virtual bool toBoolean(ExecState* exec) const;
-  virtual double toNumber(ExecState* exec) const;
-  virtual UString toString(ExecState* exec) const;
-  virtual JSObject* toObject(ExecState* exec) const;
+  virtual bool toBoolean(ExecState*) const;
+  virtual double toNumber(ExecState*) const;
+  virtual UString toString(ExecState*) const;
+  virtual JSObject* toObject(ExecState*) const;
   virtual JSObject* toThisObject(ExecState*) const;
 
   void* operator new(size_t size) {
@@ -582,6 +579,6 @@ inline JSObject* JSValue::toThisObject(ExecState* exec) const {
   return asCell()->toThisObject(exec);
 }
 
-}  // namespace
+}  // namespace KJS
 
 #endif  // KJS_VALUE_H

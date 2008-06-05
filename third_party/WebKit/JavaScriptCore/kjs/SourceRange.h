@@ -38,6 +38,7 @@ class SourceRange {
  public:
   SourceRange(PassRefPtr<SourceProvider> provider, int start, int end)
       : m_sourceProvider(provider), m_startChar(start), m_endChar(end) {}
+
   SourceRange() {}
 
   UString toString() const {
@@ -51,6 +52,7 @@ class SourceRange {
   int m_startChar;
   int m_endChar;
 };
-}
+
+}  // namespace KJS
 
 #endif  // SourceRange_h

@@ -22,13 +22,14 @@
  *
  */
 
-#ifndef KJS_LOCAL_STORAGE_H
-#define KJS_LOCAL_STORAGE_H
+#ifndef LocalStorageEntry_h
+#define LocalStorageEntry_h
 
 #include <wtf/Forward.h>
 #include <wtf/VectorTraits.h>
 
 namespace KJS {
+
 class JSValue;
 
 struct LocalStorageEntry {
@@ -41,12 +42,15 @@ struct LocalStorageEntry {
 };
 
 typedef Vector<LocalStorageEntry, 32> LocalStorage;
-}
+
+}  // namespace KJS
 
 namespace WTF {
+
 template <>
 struct VectorTraits<KJS::LocalStorageEntry>
     : VectorTraitsBase<true, KJS::LocalStorageEntry> {};
-}
 
-#endif  // KJS_LOCAL_STORAGE_H
+}  // namespace WTF
+
+#endif  // LocalStorageEntry_h

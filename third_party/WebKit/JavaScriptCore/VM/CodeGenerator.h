@@ -37,8 +37,8 @@
 #include "LabelID.h"
 #include "Machine.h"
 #include "RegisterID.h"
-#include "SymbolTable.h"
 #include "SegmentedVector.h"
+#include "SymbolTable.h"
 #include "debugger.h"
 #include "nodes.h"
 #include <wtf/PassRefPtr.h>

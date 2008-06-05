@@ -91,6 +91,7 @@ class RegisterFileStack;
 class RegisterFile : Noncopyable {
  public:
   enum { DefaultRegisterFileSize = 2 * 1024 * 1024 };
+
   RegisterFile(size_t maxSize, RegisterFileStack* m_baseObserver)
       : m_safeForReentry(true),
         m_size(0),
@@ -158,6 +159,7 @@ class RegisterFile : Noncopyable {
   }
 
   void setBase(Register*);
+
   bool m_safeForReentry;
   size_t m_size;
   size_t m_capacity;

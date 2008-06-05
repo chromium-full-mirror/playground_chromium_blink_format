@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef KJS_PROPERTY_NAME_ARRAY_H
-#define KJS_PROPERTY_NAME_ARRAY_H
+#ifndef PropertyNameArray_h
+#define PropertyNameArray_h
 
 #include "identifier.h"
 #include <wtf/HashSet.h>
@@ -36,8 +36,10 @@ class PropertyNameArray {
   void add(const Identifier& identifier) { add(identifier.ustring().rep()); }
   void add(UString::Rep*);
   void addKnownUnique(UString::Rep* identifier) { m_vector.append(identifier); }
+
   const_iterator begin() const { return m_vector.begin(); }
   const_iterator end() const { return m_vector.end(); }
+
   size_t size() const { return m_vector.size(); }
 
   Identifier& operator[](unsigned i) { return m_vector[i]; }
@@ -56,4 +58,4 @@ class PropertyNameArray {
 
 }  // namespace KJS
 
-#endif  // KJS_PROPERTY_NAME_ARRAY_H
+#endif  // PropertyNameArray_h

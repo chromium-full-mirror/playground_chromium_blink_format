@@ -91,7 +91,7 @@ static CString regexpName(int re, RegExp* regexp) {
 }
 
 NEVER_INLINE static const char* debugHookName(int debugHookID) {
-  switch ((DebugHookID)debugHookID) {
+  switch (static_cast<DebugHookID>(debugHookID)) {
     case DidEnterCallFrame:
       return "didEnterCallFrame";
     case WillLeaveCallFrame:

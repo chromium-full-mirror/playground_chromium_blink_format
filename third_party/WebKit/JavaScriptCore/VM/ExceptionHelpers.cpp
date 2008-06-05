@@ -116,4 +116,5 @@ JSValue* createNotAFunctionError(ExecState* exec, JSValue* value, Node* expr) {
   return createError(exec, TypeError, "Value %s does not allow function calls.",
                      value);
 }
-}
+
+}  // namespace KJS

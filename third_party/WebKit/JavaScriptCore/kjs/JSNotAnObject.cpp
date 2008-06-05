@@ -32,6 +32,7 @@
 #include <wtf/UnusedParam.h>
 
 namespace KJS {
+
 // JSValue methods
 JSValue* JSNotAnObject::toPrimitive(ExecState* exec, JSType) const {
   UNUSED_PARAM(exec);
@@ -69,13 +70,14 @@ JSObject* JSNotAnObject::toObject(ExecState* exec) const {
   return m_exception;
 }
 
-// marking
+// Marking
 void JSNotAnObject::mark() {
   JSCell::mark();
   if (!m_exception->marked())
     m_exception->mark();
 }
 
+// JSObject methods
 bool JSNotAnObject::getOwnPropertySlot(ExecState* exec,
                                        const Identifier&,
                                        PropertySlot&) {
@@ -148,4 +150,5 @@ void JSNotAnObject::getPropertyNames(ExecState* exec, PropertyNameArray&) {
   UNUSED_PARAM(exec);
   ASSERT(exec->hadException() && exec->exception() == m_exception);
 }
-}
+
+}  // namespace KJS

@@ -118,7 +118,6 @@ namespace KJS {
     extra arguments, because the "arguments" object may access them later.)
     This copying strategy ensures that all named values will be at the indices
     expected by the callee.
-
 */
 
 #ifndef NDEBUG

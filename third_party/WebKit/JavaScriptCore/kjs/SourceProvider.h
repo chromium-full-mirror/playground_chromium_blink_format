@@ -56,8 +56,10 @@ class UStringSourceProvider : public SourceProvider {
 
  private:
   UStringSourceProvider(const UString& source) : m_source(source) {}
+
   UString m_source;
 };
-}
+
+}  // namespace KJS
 
 #endif  // SourceProvider_h

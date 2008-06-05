@@ -28,13 +28,13 @@
 
 #include "config.h"
 #include "RegisterFile.h"
-#include "RegisterFileStack.h"
 
+#include "RegisterFileStack.h"
 #include "Register.h"
 
-namespace KJS {
-
 using namespace std;
+
+namespace KJS {
 
 size_t RegisterFile::newBuffer(size_t size,
                                size_t capacity,

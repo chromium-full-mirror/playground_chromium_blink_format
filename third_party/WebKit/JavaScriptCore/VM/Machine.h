@@ -31,8 +31,8 @@
 
 #include "Opcode.h"
 #include "RegisterFileStack.h"
-#include <wtf/HashMap.h>
 #include <kjs/list.h>
+#include <wtf/HashMap.h>
 
 namespace KJS {
 
@@ -134,7 +134,7 @@ class Machine {
                                int& argc);
 
  private:
-  typedef enum { Normal, InitializeAndReturn } ExecutionFlag;
+  enum ExecutionFlag { Normal, InitializeAndReturn };
 
   ALWAYS_INLINE void setScopeChain(ExecState* exec,
                                    ScopeChainNode*&,

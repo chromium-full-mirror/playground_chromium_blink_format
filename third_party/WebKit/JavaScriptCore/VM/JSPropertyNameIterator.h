@@ -32,11 +32,16 @@
 #include "value.h"
 
 namespace KJS {
-class JSObject;
+
 class Identifier;
+class JSObject;
 
 class JSPropertyNameIterator : public JSCell {
  public:
+  static JSPropertyNameIterator* create(ExecState*, JSValue*);
+
+  virtual ~JSPropertyNameIterator();
+
   virtual JSType type() const;
   virtual JSValue* toPrimitive(ExecState*, JSType) const;
   virtual bool getPrimitiveNumber(ExecState*, double&, JSValue*&);
@@ -47,22 +52,20 @@ class JSPropertyNameIterator : public JSCell {
 
   virtual void mark();
 
-  JSValue* next(ExecState* exec);
+  JSValue* next(ExecState*);
   void invalidate();
 
-  virtual ~JSPropertyNameIterator();
-
-  static JSPropertyNameIterator* create(ExecState*, JSValue*);
-
  private:
-  JSPropertyNameIterator(JSObject* object,
+  JSPropertyNameIterator(JSObject*,
                          Identifier* propertyNames,
                          size_t numProperties);
+
   JSObject* m_object;
   Identifier* m_propertyNames;
   Identifier* m_position;
   Identifier* m_end;
 };
-}
 
-#endif
+}  // namespace KJS
+
+#endif  // JSPropertyNameIterator_h

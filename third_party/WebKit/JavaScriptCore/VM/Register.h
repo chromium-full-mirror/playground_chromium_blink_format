@@ -35,11 +35,11 @@ namespace KJS {
 
 class CodeBlock;
 class FunctionImp;
-struct Instruction;
 class JSObject;
 class JSPropertyNameIterator;
 class JSValue;
 class ScopeChainNode;
+struct Instruction;
 
 struct Register {
   union {

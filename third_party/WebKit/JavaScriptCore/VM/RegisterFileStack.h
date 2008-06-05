@@ -51,9 +51,8 @@ class RegisterFileStack {
 
   void mark() {
     Stack::iterator end = m_stack.end();
-    for (Stack::iterator it = m_stack.begin(); it != end; ++it) {
+    for (Stack::iterator it = m_stack.begin(); it != end; ++it)
       (*it)->mark();
-    }
   }
 
   // Pointer to a value that holds the base of the top-most global register
