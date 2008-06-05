@@ -196,7 +196,7 @@ struct HeapConstants<Collector::NumberHeap> {
 };
 
 template <Collector::HeapType heapType>
-void* Collector::heapAllocate(size_t s) {
+ALWAYS_INLINE void* Collector::heapAllocate(size_t s) {
   typedef typename HeapConstants<heapType>::Block Block;
   typedef typename HeapConstants<heapType>::Cell Cell;
 
