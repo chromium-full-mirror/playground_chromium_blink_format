@@ -1712,15 +1712,18 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
         break;
       }
       case CSSSelector::Contain:
-        if (!value.contains(sel->m_value, caseSensitive))
+        if (!value.contains(sel->m_value, caseSensitive) ||
+            sel->m_value.isEmpty())
           return false;
         break;
       case CSSSelector::Begin:
-        if (!value.startsWith(sel->m_value, caseSensitive))
+        if (!value.startsWith(sel->m_value, caseSensitive) ||
+            sel->m_value.isEmpty())
           return false;
         break;
       case CSSSelector::End:
-        if (!value.endsWith(sel->m_value, caseSensitive))
+        if (!value.endsWith(sel->m_value, caseSensitive) ||
+            sel->m_value.isEmpty())
           return false;
         break;
       case CSSSelector::Hyphen:
