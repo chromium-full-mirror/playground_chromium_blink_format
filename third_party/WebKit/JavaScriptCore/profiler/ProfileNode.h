@@ -143,7 +143,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
 
   void focus(const CallIdentifier&, bool forceVisible = false);
   double exclude(const CallIdentifier&);
-  void restoreAll();
+  void restore();
 
   void endAndRecordCall();
 

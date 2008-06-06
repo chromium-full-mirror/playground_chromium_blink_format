@@ -86,7 +86,7 @@ class Profile : public RefCounted<Profile> {
       return;
     m_head->exclude(profileNode->callIdentifier());
   }
-  void restoreAll() { m_head->restoreAll(); }
+  void restoreAll();
 
 #ifndef NDEBUG
   void debugPrintData() const;
