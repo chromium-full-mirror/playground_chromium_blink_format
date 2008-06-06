@@ -239,7 +239,7 @@ class CSSParser {
   bool strict;
   bool important;
   int id;
-  StyleList* styleElement;
+  StyleList* m_styleElement;
   RefPtr<CSSRule> rule;
   MediaQuery* mediaQuery;
   ValueList* valueList;
