@@ -46,14 +46,14 @@ Profile::Profile(const UString& title,
       m_depth(0) {
   // FIXME: When multi-threading is supported this will be a vector and calls
   // into the profiler will need to know which thread it is executing on.
-  m_headNode = ProfileNode::create(CallIdentifier("Thread_1", 0, 0), 0, 0);
-  m_currentNode = m_headNode;
+  m_head = ProfileNode::create(CallIdentifier("Thread_1", 0, 0), 0, 0);
+  m_currentNode = m_head;
 }
 
 void Profile::stopProfiling() {
   m_currentNode = 0;
   m_originatingGlobalExec = 0;
-  m_headNode->stopProfiling();
+  m_head->stopProfiling();
   m_depth = 0;
 }
 
@@ -72,13 +72,13 @@ void Profile::didExecute(const CallIdentifier& callIdentifier) {
   // frame,
   // when returning up the stack it needs to insert the calls it missed on the
   // way down.
-  if (m_currentNode == m_headNode) {
+  if (m_currentNode == m_head) {
     m_currentNode =
-        ProfileNode::create(callIdentifier, m_headNode.get(), m_headNode.get());
-    m_currentNode->setStartTime(m_headNode->startTime());
+        ProfileNode::create(callIdentifier, m_head.get(), m_head.get());
+    m_currentNode->setStartTime(m_head->startTime());
     m_currentNode->didExecute();
-    m_headNode->insertNode(m_currentNode.release());
-    m_currentNode = m_headNode;
+    m_head->insertNode(m_currentNode.release());
+    m_currentNode = m_head;
     return;
   }
 
@@ -86,13 +86,13 @@ void Profile::didExecute(const CallIdentifier& callIdentifier) {
   --m_depth;
 }
 
-void Profile::sort(SortFunction function) {
-  ProfileNode* currentNode = m_headNode->firstChild();
+void Profile::forEach(UnaryFunction function) {
+  ProfileNode* currentNode = m_head->firstChild();
   for (ProfileNode* nextNode = currentNode; nextNode;
        nextNode = nextNode->firstChild())
     currentNode = nextNode;
 
-  ProfileNode* endNode = m_headNode->traverseNextNode();
+  ProfileNode* endNode = m_head->traverseNextNode();
   while (currentNode && currentNode != endNode) {
     function(currentNode);
     currentNode = currentNode->traverseNextNode();
@@ -102,7 +102,7 @@ void Profile::sort(SortFunction function) {
 #ifndef NDEBUG
 void Profile::debugPrintData() const {
   printf("Call graph:\n");
-  m_headNode->debugPrintData(0);
+  m_head->debugPrintData(0);
 }
 
 typedef pair<UString::Rep*, unsigned> NameCountPair;
@@ -117,7 +117,7 @@ void Profile::debugPrintDataSampleStyle() const {
 
   FunctionCallHashCount countedFunctions;
   printf("Call graph:\n");
-  m_headNode->debugPrintDataSampleStyle(0, countedFunctions);
+  m_head->debugPrintDataSampleStyle(0, countedFunctions);
 
   printf("\nTotal number in stack:\n");
   NameCountPairVector sortedFunctions(countedFunctions.size());
