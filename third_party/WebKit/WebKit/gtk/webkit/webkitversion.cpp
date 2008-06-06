@@ -27,6 +27,8 @@ extern "C" {
  * The major version number of the WebKit that is linked against.
  *
  * Return value: The major version
+ *
+ * Since: 1.0.1
  */
 guint webkit_major_version() {
   return WEBKIT_MAJOR_VERSION;
@@ -38,6 +40,8 @@ guint webkit_major_version() {
  * The minor version number of the WebKit that is linked against.
  *
  * Return value: The minor version
+ *
+ * Since: 1.0.1
  */
 guint webkit_minor_version() {
   return WEBKIT_MINOR_VERSION;
@@ -49,6 +53,8 @@ guint webkit_minor_version() {
  * The micro version number of the WebKit that is linked against.
  *
  * Return value: The micro version
+ *
+ * Since: 1.0.1
  */
 guint webkit_micro_version() {
   return WEBKIT_MICRO_VERSION;
