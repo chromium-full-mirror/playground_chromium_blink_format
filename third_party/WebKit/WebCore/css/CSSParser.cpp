@@ -132,9 +132,9 @@ CSSParser::CSSParser(bool strictParsing)
   m_numParsedProperties = 0;
   m_maxParsedProperties = 32;
 
-  data = 0;
+  m_data = 0;
   m_valueList = 0;
-  id = 0;
+  m_id = 0;
   m_important = false;
   m_inParseShorthand = 0;
   m_currentShorthand = 0;
@@ -155,7 +155,7 @@ CSSParser::~CSSParser() {
 
   delete m_valueList;
 
-  fastFree(data);
+  fastFree(m_data);
 
   if (m_floatingMediaQueryExpList) {
     deleteAllValues(*m_floatingMediaQueryExpList);
@@ -192,27 +192,27 @@ void CSSParser::setupParser(const char* prefix,
                             const char* suffix) {
   int length = string.length() + strlen(prefix) + strlen(suffix) + 2;
 
-  if (data)
-    fastFree(data);
+  if (m_data)
+    fastFree(m_data);
 
-  data = static_cast<UChar*>(fastMalloc(length * sizeof(UChar)));
+  m_data = static_cast<UChar*>(fastMalloc(length * sizeof(UChar)));
   for (unsigned i = 0; i < strlen(prefix); i++)
-    data[i] = prefix[i];
+    m_data[i] = prefix[i];
 
-  memcpy(data + strlen(prefix), string.characters(),
+  memcpy(m_data + strlen(prefix), string.characters(),
          string.length() * sizeof(UChar));
 
   unsigned start = strlen(prefix) + string.length();
   unsigned end = start + strlen(suffix);
   for (unsigned i = start; i < end; i++)
-    data[i] = suffix[i - start];
+    m_data[i] = suffix[i - start];
 
-  data[length - 1] = 0;
-  data[length - 2] = 0;
+  m_data[length - 1] = 0;
+  m_data[length - 2] = 0;
 
   yy_hold_char = 0;
   yyleng = 0;
-  yytext = yy_c_buf_p = data;
+  yytext = yy_c_buf_p = m_data;
   yy_hold_char = *yy_c_buf_p;
 }
 
@@ -234,15 +234,15 @@ PassRefPtr<CSSRule> CSSParser::parseRule(CSSStyleSheet* sheet,
 }
 
 bool CSSParser::parseValue(CSSMutableStyleDeclaration* declaration,
-                           int _id,
+                           int id,
                            const String& string,
-                           bool _important) {
+                           bool important) {
   m_styleElement = declaration->stylesheet();
 
   setupParser("@-webkit-value{", string, "} ");
 
-  id = _id;
-  m_important = _important;
+  m_id = id;
+  m_important = important;
 
   cssyyparse(this);
 
