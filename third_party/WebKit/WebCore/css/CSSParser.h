@@ -234,7 +234,7 @@ class CSSParser {
   MediaQuery* sinkFloatingMediaQuery(MediaQuery*);
 
  public:
-  bool strict;
+  bool m_strict;
   bool m_important;
   int id;
   StyleList* m_styleElement;
