@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,13 +35,19 @@ namespace WebCore {
 
 class EventException : public ExceptionBase {
  public:
-  EventException(const ExceptionCodeDescription& description)
-      : ExceptionBase(description) {}
+  static PassRefPtr<EventException> create(
+      const ExceptionCodeDescription& description) {
+    return adoptRef(new EventException(description));
+  }
 
   static const int EventExceptionOffset = 100;
   static const int EventExceptionMax = 199;
 
   enum EventExceptionCode { UNSPECIFIED_EVENT_TYPE_ERR = EventExceptionOffset };
+
+ private:
+  EventException(const ExceptionCodeDescription& description)
+      : ExceptionBase(description) {}
 };
 
 }  // namespace WebCore

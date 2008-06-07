@@ -111,9 +111,9 @@ JSValue* jsEventTargetAddEventListener(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  if (JSEventListener* listener =
+  if (RefPtr<JSEventListener> listener =
           toJSDOMWindow(frame)->findOrCreateJSEventListener(args[1]))
-    eventTarget->addEventListener(args[0]->toString(exec), listener,
+    eventTarget->addEventListener(args[0]->toString(exec), listener.release(),
                                   args[2]->toBoolean(exec));
 
   return jsUndefined();

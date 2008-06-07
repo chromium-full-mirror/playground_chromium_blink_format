@@ -45,6 +45,11 @@ inline HTMLCollection::CollectionInfo* HTMLFormCollection::formCollectionInfo(
 HTMLFormCollection::HTMLFormCollection(PassRefPtr<HTMLFormElement> form)
     : HTMLCollection(form.get(), Other, formCollectionInfo(form.get())) {}
 
+PassRefPtr<HTMLFormCollection> HTMLFormCollection::create(
+    PassRefPtr<HTMLFormElement> form) {
+  return adoptRef(new HTMLFormCollection(form));
+}
+
 HTMLFormCollection::~HTMLFormCollection() {}
 
 unsigned HTMLFormCollection::calcLength() const {

@@ -42,18 +42,21 @@ using namespace XPath;
 
 class InvalidatingEventListener : public EventListener {
  public:
-  InvalidatingEventListener(XPathResult* result) : m_result(result) {}
+  static PassRefPtr<InvalidatingEventListener> create(XPathResult* result) {
+    return adoptRef(new InvalidatingEventListener(result));
+  }
   virtual void handleEvent(Event*, bool) {
     m_result->invalidateIteratorState();
   }
 
  private:
+  InvalidatingEventListener(XPathResult* result) : m_result(result) {}
   XPathResult* m_result;
 };
 
 XPathResult::XPathResult(EventTargetNode* eventTarget, const Value& value)
     : m_value(value), m_eventTarget(eventTarget) {
-  m_eventListener = new InvalidatingEventListener(this);
+  m_eventListener = InvalidatingEventListener::create(this);
   m_eventTarget->addEventListener(EventNames::DOMSubtreeModifiedEvent,
                                   m_eventListener, false);
   switch (m_value.type()) {

@@ -64,7 +64,7 @@ WebHistoryItem::~WebHistoryItem() {
 }
 
 WebHistoryItem* WebHistoryItem::createInstance() {
-  WebHistoryItem* instance = new WebHistoryItem(new HistoryItem);
+  WebHistoryItem* instance = new WebHistoryItem(HistoryItem::create());
   instance->AddRef();
   return instance;
 }
@@ -126,7 +126,7 @@ WebHistoryItem::initFromDictionaryRepresentation(void* dictionary) {
   }
 
   historyItemWrappers().remove(m_historyItem.get());
-  m_historyItem = new HistoryItem(urlStringRef, titleRef, lastVisitedTime);
+  m_historyItem = HistoryItem::create(urlStringRef, titleRef, lastVisitedTime);
   historyItemWrappers().set(m_historyItem.get(), this);
 
   if (!CFNumberGetValue(visitCountRef, kCFNumberIntType, &visitedCount)) {
@@ -350,10 +350,10 @@ HRESULT STDMETHODCALLTYPE WebHistoryItem::initWithURLString(
     /* [in] */ BSTR title,
     /* [in] */ DATE lastVisited) {
   historyItemWrappers().remove(m_historyItem.get());
-  m_historyItem =
-      new HistoryItem(String(urlString, SysStringLen(urlString)),
-                      String(title, SysStringLen(title)),
-                      MarshallingHelpers::DATEToCFAbsoluteTime(lastVisited));
+  m_historyItem = HistoryItem::create(
+      String(urlString, SysStringLen(urlString)),
+      String(title, SysStringLen(title)),
+      MarshallingHelpers::DATEToCFAbsoluteTime(lastVisited));
   historyItemWrappers().set(m_historyItem.get(), this);
 
   return S_OK;

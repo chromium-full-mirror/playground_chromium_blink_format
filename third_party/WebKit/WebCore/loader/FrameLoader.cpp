@@ -1044,7 +1044,7 @@ void FrameLoader::write(const char* str, int len, bool flush) {
 
   if (!m_decoder) {
     Settings* settings = m_frame->settings();
-    m_decoder = new TextResourceDecoder(
+    m_decoder = TextResourceDecoder::create(
         m_responseMIMEType,
         settings ? settings->defaultTextEncodingName() : String());
     if (m_encoding.isEmpty()) {
@@ -4201,7 +4201,7 @@ PassRefPtr<HistoryItem> FrameLoader::createHistoryItem(bool useOriginal) {
   if (originalURL.isEmpty())
     originalURL = blankURL();
 
-  RefPtr<HistoryItem> item = new HistoryItem(
+  RefPtr<HistoryItem> item = HistoryItem::create(
       url, m_frame->tree()->name(),
       m_frame->tree()->parent() ? m_frame->tree()->parent()->tree()->name()
                                 : "",

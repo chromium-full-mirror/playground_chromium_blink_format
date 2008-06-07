@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,8 +35,10 @@ namespace WebCore {
 
 class XMLHttpRequestException : public ExceptionBase {
  public:
-  XMLHttpRequestException(const ExceptionCodeDescription& description)
-      : ExceptionBase(description) {}
+  static PassRefPtr<XMLHttpRequestException> create(
+      const ExceptionCodeDescription& description) {
+    return adoptRef(new XMLHttpRequestException(description));
+  }
 
   static const int XMLHttpRequestExceptionOffset = 500;
   static const int XMLHttpRequestExceptionMax = 699;
@@ -45,6 +47,10 @@ class XMLHttpRequestException : public ExceptionBase {
     NETWORK_ERR = XMLHttpRequestExceptionOffset + 101,
     ABORT_ERR
   };
+
+ private:
+  XMLHttpRequestException(const ExceptionCodeDescription& description)
+      : ExceptionBase(description) {}
 };
 
 }  // namespace WebCore

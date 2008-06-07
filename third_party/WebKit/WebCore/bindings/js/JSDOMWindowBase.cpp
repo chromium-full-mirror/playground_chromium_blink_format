@@ -886,8 +886,9 @@ JSEventListener* JSDOMWindowBase::findJSEventListener(JSValue* val, bool html) {
   return listeners.get(object);
 }
 
-JSEventListener* JSDOMWindowBase::findOrCreateJSEventListener(JSValue* val,
-                                                              bool html) {
+PassRefPtr<JSEventListener> JSDOMWindowBase::findOrCreateJSEventListener(
+    JSValue* val,
+    bool html) {
   JSEventListener* listener = findJSEventListener(val, html);
   if (listener)
     return listener;
@@ -898,7 +899,8 @@ JSEventListener* JSDOMWindowBase::findOrCreateJSEventListener(JSValue* val,
 
   // Note that the JSEventListener constructor adds it to our jsEventListeners
   // list
-  return new JSEventListener(object, static_cast<JSDOMWindow*>(this), html);
+  return JSEventListener::create(object, static_cast<JSDOMWindow*>(this), html)
+      .get();
 }
 
 JSUnprotectedEventListener* JSDOMWindowBase::findJSUnprotectedEventListener(
@@ -912,7 +914,7 @@ JSUnprotectedEventListener* JSDOMWindowBase::findJSUnprotectedEventListener(
   return listeners.get(object);
 }
 
-JSUnprotectedEventListener*
+PassRefPtr<JSUnprotectedEventListener>
 JSDOMWindowBase::findOrCreateJSUnprotectedEventListener(JSValue* val,
                                                         bool html) {
   JSUnprotectedEventListener* listener =
@@ -925,8 +927,9 @@ JSDOMWindowBase::findOrCreateJSUnprotectedEventListener(JSValue* val,
 
   // The JSUnprotectedEventListener constructor adds it to our
   // jsUnprotectedEventListeners map.
-  return new JSUnprotectedEventListener(object, static_cast<JSDOMWindow*>(this),
-                                        html);
+  return JSUnprotectedEventListener::create(
+             object, static_cast<JSDOMWindow*>(this), html)
+      .get();
 }
 
 void JSDOMWindowBase::clearHelperObjectProperties() {
@@ -1190,11 +1193,11 @@ JSValue* windowProtoFuncAddEventListener(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  if (JSEventListener* listener =
+  if (RefPtr<JSEventListener> listener =
           window->findOrCreateJSEventListener(args[1])) {
     if (Document* doc = frame->document())
       doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
-                                  listener, args[2]->toBoolean(exec));
+                                  listener.release(), args[2]->toBoolean(exec));
   }
 
   return jsUndefined();

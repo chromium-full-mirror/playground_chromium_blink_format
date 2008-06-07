@@ -2534,14 +2534,14 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
     return valid;
   }
 
-  RefPtr<DashboardRegion> firstRegion = new DashboardRegion;
+  RefPtr<DashboardRegion> firstRegion = DashboardRegion::create();
   DashboardRegion* region = 0;
 
   while (value) {
     if (region == 0) {
       region = firstRegion.get();
     } else {
-      RefPtr<DashboardRegion> nextRegion = new DashboardRegion();
+      RefPtr<DashboardRegion> nextRegion = DashboardRegion::create();
       region->m_next = nextRegion;
       region = nextRegion.get();
     }
@@ -2709,7 +2709,7 @@ PassRefPtr<CSSValue> CSSParser::parseCounterContent(ValueList* args,
         new CSSPrimitiveValue(ls, (CSSPrimitiveValue::UnitTypes)i->unit);
   }
 
-  return new CSSPrimitiveValue(new Counter(
+  return new CSSPrimitiveValue(Counter::create(
       identifier.release(), listStyle.release(), separator.release()));
 }
 
@@ -2722,7 +2722,7 @@ bool CSSParser::parseShape(int propId, bool important) {
   // rect(t, r, b, l) || rect(t r b l)
   if (args->size() != 4 && args->size() != 7)
     return false;
-  Rect* rect = new Rect();
+  RefPtr<Rect> rect = Rect::create();
   bool valid = true;
   int i = 0;
   Value* a = args->current();
@@ -2755,11 +2755,10 @@ bool CSSParser::parseShape(int propId, bool important) {
     i++;
   }
   if (valid) {
-    addProperty(propId, new CSSPrimitiveValue(rect), important);
+    addProperty(propId, new CSSPrimitiveValue(rect.release()), important);
     m_valueList->next();
     return true;
   }
-  delete rect;
   return false;
 }
 
@@ -3516,7 +3515,7 @@ struct BorderImageParseContext {
           (CSSPrimitiveValue::UnitTypes)m_right->primitiveType());
 
     // Now build a rect value to hold all four of our primitive values.
-    RefPtr<Rect> rect = new Rect;
+    RefPtr<Rect> rect = Rect::create();
     rect->setTop(m_top);
     rect->setRight(m_right);
     rect->setBottom(m_bottom);

@@ -425,7 +425,7 @@ void EventTargetNode::setHTMLEventListener(const AtomicString& eventType,
   // removeHTMLEventListener to destroy it.
   removeHTMLEventListener(eventType);
   if (listener)
-    addEventListener(eventType, listener.get(), false);
+    addEventListener(eventType, listener, false);
 }
 
 EventListener* EventTargetNode::getHTMLEventListener(

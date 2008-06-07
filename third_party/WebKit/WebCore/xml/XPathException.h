@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,16 +29,18 @@
 #ifndef XPathException_h
 #define XPathException_h
 
-#if ENABLE(XPATH)
-
 #include "ExceptionBase.h"
+
+#if ENABLE(XPATH)
 
 namespace WebCore {
 
 class XPathException : public ExceptionBase {
  public:
-  XPathException(const ExceptionCodeDescription& description)
-      : ExceptionBase(description) {}
+  static PassRefPtr<XPathException> create(
+      const ExceptionCodeDescription& description) {
+    return adoptRef(new XPathException(description));
+  }
 
   static const int XPathExceptionOffset = 400;
   static const int XPathExceptionMax = 499;
@@ -47,6 +49,10 @@ class XPathException : public ExceptionBase {
     INVALID_EXPRESSION_ERR = XPathExceptionOffset + 51,
     TYPE_ERR
   };
+
+ private:
+  XPathException(const ExceptionCodeDescription& description)
+      : ExceptionBase(description) {}
 };
 
 }  // namespace WebCore

@@ -162,7 +162,7 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 
   // Each item in the src property's list is a single CSSFontFaceSource. Put
   // them all into a CSSFontFace.
-  CSSFontFace* fontFace = 0;
+  RefPtr<CSSFontFace> fontFace;
 
   int i;
   int srcLength = srcList->length();
@@ -214,7 +214,7 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
     }
 
     if (!fontFace)
-      fontFace = new CSSFontFace();
+      fontFace = CSSFontFace::create();
 
     if (source) {
 #if ENABLE(SVG_FONTS)
@@ -230,10 +230,8 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 
   ASSERT(fontFace);
 
-  if (fontFace && !fontFace->isValid()) {
-    delete fontFace;
+  if (fontFace && !fontFace->isValid())
     return;
-  }
 
   // Hash under every single family name.
   int familyLength = familyList->length();
@@ -285,8 +283,9 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
                               fontDescription.italic());
     CSSSegmentedFontFace* segmentedFontFace = m_fonts.get(hash).get();
     if (!segmentedFontFace) {
-      segmentedFontFace = new CSSSegmentedFontFace(this);
-      m_fonts.set(hash, segmentedFontFace);
+      RefPtr<CSSSegmentedFontFace> newFace = CSSSegmentedFontFace::create(this);
+      segmentedFontFace = newFace.get();
+      m_fonts.set(hash, newFace.release());
     }
     if (rangeList) {
       // A local font matching the font description should come first, so that
@@ -294,10 +293,11 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
       // any character not overlaid by explicit @font-face rules for the family.
       if (!segmentedFontFace->numRanges() &&
           FontCache::fontExists(fontDescription, familyName)) {
-        CSSFontFace* implicitFontFace = new CSSFontFace();
+        RefPtr<CSSFontFace> implicitFontFace = CSSFontFace::create();
         implicitFontFace->addSource(new CSSFontFaceSource(familyName));
         ASSERT(implicitFontFace->isValid());
-        segmentedFontFace->overlayRange(0, 0x7FFFFFFF, implicitFontFace);
+        segmentedFontFace->overlayRange(0, 0x7FFFFFFF,
+                                        implicitFontFace.release());
       }
 
       unsigned numRanges = rangeList->length();
@@ -307,7 +307,7 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
         segmentedFontFace->overlayRange(range->from(), range->to(), fontFace);
       }
     } else
-      segmentedFontFace->overlayRange(0, 0x7FFFFFFF, fontFace);
+      segmentedFontFace->overlayRange(0, 0x7FFFFFFF, fontFace.release());
   }
 }
 

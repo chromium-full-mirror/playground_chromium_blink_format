@@ -33,8 +33,10 @@ namespace WebCore {
 
 class RangeException : public ExceptionBase {
  public:
-  RangeException(const ExceptionCodeDescription& description)
-      : ExceptionBase(description) {}
+  static PassRefPtr<RangeException> create(
+      const ExceptionCodeDescription& description) {
+    return adoptRef(new RangeException(description));
+  }
 
   static const int RangeExceptionOffset = 200;
   static const int RangeExceptionMax = 299;
@@ -43,6 +45,10 @@ class RangeException : public ExceptionBase {
     BAD_BOUNDARYPOINTS_ERR = RangeExceptionOffset + 1,
     INVALID_NODE_TYPE_ERR
   };
+
+ private:
+  RangeException(const ExceptionCodeDescription& description)
+      : ExceptionBase(description) {}
 };
 
 }  // namespace WebCore

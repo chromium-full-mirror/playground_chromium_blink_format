@@ -1,8 +1,6 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -25,20 +23,16 @@
 
 #include "CSSPrimitiveValue.h"
 #include "PlatformString.h"
-#include <wtf/RefCounted.h>
-#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
 class Counter : public RefCounted<Counter> {
  public:
-  Counter(PassRefPtr<CSSPrimitiveValue> identifier,
-          PassRefPtr<CSSPrimitiveValue> listStyle,
-          PassRefPtr<CSSPrimitiveValue> separator)
-      : RefCounted<Counter>(0),
-        m_identifier(identifier),
-        m_listStyle(listStyle),
-        m_separator(separator) {}
+  static PassRefPtr<Counter> create(PassRefPtr<CSSPrimitiveValue> identifier,
+                                    PassRefPtr<CSSPrimitiveValue> listStyle,
+                                    PassRefPtr<CSSPrimitiveValue> separator) {
+    return adoptRef(new Counter(identifier, listStyle, separator));
+  }
 
   String identifier() const {
     return m_identifier ? m_identifier->getStringValue() : String();
@@ -64,10 +58,17 @@ class Counter : public RefCounted<Counter> {
     m_separator = separator;
   }
 
- protected:
-  RefPtr<CSSPrimitiveValue> m_identifier;  // String
+ private:
+  Counter(PassRefPtr<CSSPrimitiveValue> identifier,
+          PassRefPtr<CSSPrimitiveValue> listStyle,
+          PassRefPtr<CSSPrimitiveValue> separator)
+      : m_identifier(identifier),
+        m_listStyle(listStyle),
+        m_separator(separator) {}
+
+  RefPtr<CSSPrimitiveValue> m_identifier;  // string
   RefPtr<CSSPrimitiveValue> m_listStyle;   // int
-  RefPtr<CSSPrimitiveValue> m_separator;   // String
+  RefPtr<CSSPrimitiveValue> m_separator;   // string
 };
 
 }  // namespace WebCore

@@ -33,6 +33,11 @@ HTMLOptionsCollection::HTMLOptionsCollection(
     PassRefPtr<HTMLSelectElement> select)
     : HTMLCollection(select.get(), SelectOptions, select->collectionInfo()) {}
 
+PassRefPtr<HTMLOptionsCollection> HTMLOptionsCollection::create(
+    PassRefPtr<HTMLSelectElement> select) {
+  return adoptRef(new HTMLOptionsCollection(select));
+}
+
 void HTMLOptionsCollection::add(PassRefPtr<HTMLOptionElement> element,
                                 ExceptionCode& ec) {
   add(element, length(), ec);

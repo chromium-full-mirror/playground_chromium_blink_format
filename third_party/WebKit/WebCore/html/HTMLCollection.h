@@ -80,7 +80,7 @@ class HTMLCollection : public RefCounted<HTMLCollection> {
   static const unsigned NumNamedDocumentCachedTypes =
       DocumentNamedItems - WindowNamedItems + 1;
 
-  HTMLCollection(PassRefPtr<Node> base, Type);
+  static PassRefPtr<HTMLCollection> create(PassRefPtr<Node> base, Type);
   virtual ~HTMLCollection();
 
   unsigned length() const;
@@ -145,6 +145,8 @@ class HTMLCollection : public RefCounted<HTMLCollection> {
   mutable bool m_idsDone;  // for nextNamedItem()
 
  private:
+  HTMLCollection(PassRefPtr<Node> base, Type);
+
   virtual Element* itemAfter(Element*) const;
   virtual unsigned calcLength() const;
   virtual void updateNameCache() const;

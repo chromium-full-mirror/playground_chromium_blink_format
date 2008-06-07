@@ -35,7 +35,7 @@
 namespace WebCore {
 
 CSSSegmentedFontFace::CSSSegmentedFontFace(CSSFontSelector* fontSelector)
-    : RefCounted<CSSSegmentedFontFace>(0), m_fontSelector(fontSelector) {}
+    : m_fontSelector(fontSelector) {}
 
 CSSSegmentedFontFace::~CSSSegmentedFontFace() {
   pruneTable();

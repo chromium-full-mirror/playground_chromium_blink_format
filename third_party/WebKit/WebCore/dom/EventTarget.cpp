@@ -124,7 +124,7 @@ void EventTarget::addEventListener(EventTargetNode* referenceNode,
         referenceNode);
 
   referenceNode->m_regdListeners->append(
-      new RegisteredEventListener(eventType, listener.get(), useCapture));
+      RegisteredEventListener::create(eventType, listener, useCapture));
 }
 
 void EventTarget::removeEventListener(EventTargetNode* referenceNode,
@@ -135,14 +135,14 @@ void EventTarget::removeEventListener(EventTargetNode* referenceNode,
   if (!referenceNode->m_regdListeners)
     return;
 
-  RegisteredEventListener rl(eventType, listener, useCapture);
-
   RegisteredEventListenerList::Iterator end =
       referenceNode->m_regdListeners->end();
   for (RegisteredEventListenerList::Iterator it =
            referenceNode->m_regdListeners->begin();
        it != end; ++it) {
-    if (*(*it).get() == rl) {
+    RegisteredEventListener& r = **it;
+    if (r.eventType() == eventType && r.listener() == listener &&
+        r.useCapture() == useCapture) {
       (*it)->setRemoved(true);
       it = referenceNode->m_regdListeners->remove(it);
 

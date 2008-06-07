@@ -56,7 +56,9 @@ struct FontFaceRange {
 
 class CSSSegmentedFontFace : public RefCounted<CSSSegmentedFontFace> {
  public:
-  CSSSegmentedFontFace(CSSFontSelector*);
+  static PassRefPtr<CSSSegmentedFontFace> create(CSSFontSelector* selector) {
+    return adoptRef(new CSSSegmentedFontFace(selector));
+  }
   ~CSSSegmentedFontFace();
 
   bool isLoaded() const;
@@ -73,6 +75,8 @@ class CSSSegmentedFontFace : public RefCounted<CSSSegmentedFontFace> {
                         bool syntheticItalic);
 
  private:
+  CSSSegmentedFontFace(CSSFontSelector*);
+
   void pruneTable();
 
   CSSFontSelector* m_fontSelector;

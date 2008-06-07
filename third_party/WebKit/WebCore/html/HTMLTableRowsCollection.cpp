@@ -161,7 +161,12 @@ HTMLTableRowElement* HTMLTableRowsCollection::lastRow(HTMLTableElement* table) {
 
 HTMLTableRowsCollection::HTMLTableRowsCollection(
     PassRefPtr<HTMLTableElement> table)
-    : HTMLCollection(table, Other) {}
+    : HTMLCollection(table, Other, 0) {}
+
+PassRefPtr<HTMLTableRowsCollection> HTMLTableRowsCollection::create(
+    PassRefPtr<HTMLTableElement> table) {
+  return adoptRef(new HTMLTableRowsCollection(table));
+}
 
 Element* HTMLTableRowsCollection::itemAfter(Element* previous) const {
   ASSERT(!previous || previous->hasLocalName(trTag));

@@ -85,11 +85,11 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   const KJS::UString& responseText() const;
   Document* responseXML() const;
 
-  void setOnReadyStateChangeListener(EventListener*);
+  void setOnReadyStateChangeListener(PassRefPtr<EventListener>);
   EventListener* onReadyStateChangeListener() const;
-  void setOnLoadListener(EventListener*);
+  void setOnLoadListener(PassRefPtr<EventListener>);
   EventListener* onLoadListener() const;
-  void setOnProgressListener(EventListener*);
+  void setOnProgressListener(PassRefPtr<EventListener>);
   EventListener* onProgressListener() const;
 
   typedef Vector<RefPtr<EventListener>> ListenerVector;

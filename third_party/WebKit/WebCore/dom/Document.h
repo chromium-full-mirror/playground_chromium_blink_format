@@ -1021,7 +1021,7 @@ class Document : public ContainerNode {
   void setShouldCreateRenderers(bool);
   bool shouldCreateRenderers();
 
-  void setDecoder(TextResourceDecoder*);
+  void setDecoder(PassRefPtr<TextResourceDecoder>);
   TextResourceDecoder* decoder() const { return m_decoder.get(); }
 
   UChar backslashAsCurrencySymbol() const;

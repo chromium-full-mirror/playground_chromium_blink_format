@@ -42,11 +42,7 @@ namespace WebCore {
 
 using namespace EventNames;
 
-JSAbstractEventListener::JSAbstractEventListener(bool html) : m_html(html) {}
-
-void JSAbstractEventListener::handleEvent(Event* ele, bool isWindowEvent) {
-  Event* event = ele;
-
+void JSAbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
   JSObject* listener = listenerObj();
   if (!listener)
     return;
@@ -113,7 +109,7 @@ void JSAbstractEventListener::handleEvent(Event* ele, bool isWindowEvent) {
     } else {
       if (!retval->isUndefinedOrNull() && event->storesResultAsString())
         event->storeResult(retval->toString(exec));
-      if (m_html) {
+      if (m_isHTML) {
         bool retvalbool;
         if (retval->getBoolean(retvalbool) && !retvalbool)
           event->preventDefault();
@@ -126,19 +122,19 @@ void JSAbstractEventListener::handleEvent(Event* ele, bool isWindowEvent) {
 }
 
 bool JSAbstractEventListener::isHTMLEventListener() const {
-  return m_html;
+  return m_isHTML;
 }
 
 // -------------------------------------------------------------------------
 
 JSUnprotectedEventListener::JSUnprotectedEventListener(JSObject* listener,
                                                        JSDOMWindow* window,
-                                                       bool html)
-    : JSAbstractEventListener(html), m_listener(listener), m_window(window) {
+                                                       bool isHTML)
+    : JSAbstractEventListener(isHTML), m_listener(listener), m_window(window) {
   if (m_listener) {
     JSDOMWindow::UnprotectedListenersMap& listeners =
-        html ? window->jsUnprotectedHTMLEventListeners()
-             : window->jsUnprotectedEventListeners();
+        isHTML ? window->jsUnprotectedHTMLEventListeners()
+               : window->jsUnprotectedEventListeners();
     listeners.set(m_listener, this);
   }
 }
@@ -190,11 +186,12 @@ static EventListenerCounter eventListenerCounter;
 
 JSEventListener::JSEventListener(JSObject* listener,
                                  JSDOMWindow* window,
-                                 bool html)
-    : JSAbstractEventListener(html), m_listener(listener), m_window(window) {
+                                 bool isHTML)
+    : JSAbstractEventListener(isHTML), m_listener(listener), m_window(window) {
   if (m_listener) {
     JSDOMWindow::ListenersMap& listeners =
-        html ? m_window->jsHTMLEventListeners() : m_window->jsEventListeners();
+        isHTML ? m_window->jsHTMLEventListeners()
+               : m_window->jsEventListeners();
     listeners.set(m_listener, this);
   }
 #ifndef NDEBUG

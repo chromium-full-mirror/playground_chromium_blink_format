@@ -221,12 +221,12 @@ JSValue* JSXMLHttpRequest::addEventListener(ExecState* exec, const List& args) {
   Frame* frame = document->frame();
   if (!frame)
     return jsUndefined();
-  JSUnprotectedEventListener* listener =
+  RefPtr<JSUnprotectedEventListener> listener =
       toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(args[1],
                                                                    true);
   if (!listener)
     return jsUndefined();
-  impl()->addEventListener(args[0]->toString(exec), listener,
+  impl()->addEventListener(args[0]->toString(exec), listener.release(),
                            args[2]->toBoolean(exec));
   return jsUndefined();
 }
@@ -240,8 +240,7 @@ JSValue* JSXMLHttpRequest::removeEventListener(ExecState* exec,
   if (!frame)
     return jsUndefined();
   JSUnprotectedEventListener* listener =
-      toJSDOMWindow(frame)->findOrCreateJSUnprotectedEventListener(args[1],
-                                                                   true);
+      toJSDOMWindow(frame)->findJSUnprotectedEventListener(args[1], true);
   if (!listener)
     return jsUndefined();
   impl()->removeEventListener(args[0]->toString(exec), listener,
