@@ -1050,6 +1050,10 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
     }                                     \
   } while (0)
 
+#if DUMP_OPCODE_STATS
+  OpcodeStats::resetLastInstruction();
+#endif
+
 #if HAVE(COMPUTED_GOTO)
 #define NEXT_OPCODE goto * vPC->u.opcode
 #if DUMP_OPCODE_STATS
@@ -2051,11 +2055,14 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_jmp) {
-      /* jmp target(offset)
+/* jmp target(offset)
 
-         Jumps unconditionally to offset target from the current
-         instruction.
-      */
+   Jumps unconditionally to offset target from the current
+   instruction.
+*/
+#if DUMP_OPCODE_STATS
+      OpcodeStats::resetLastInstruction();
+#endif
       int target = (++vPC)->u.operand;
 
       vPC += target;
@@ -2264,6 +2271,10 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
                                         callDataScopeChain, registerBase, r));
         k = codeBlock->jsValues.data();
         vPC = codeBlock->instructions.begin();
+
+#if DUMP_OPCODE_STATS
+        OpcodeStats::resetLastInstruction();
+#endif
 
         NEXT_OPCODE;
       }
