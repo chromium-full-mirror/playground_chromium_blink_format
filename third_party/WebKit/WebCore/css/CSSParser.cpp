@@ -3,6 +3,7 @@
  * Copyright (C) 2005 Allan Sandfeld Jensen (kde@carewolf.com)
  * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Nicholas Shanks <webkit@nickshanks.com>
+ * Copyright (C) 2008 Eric Seidel <eric@webkit.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -123,27 +124,25 @@ ValueList::~ValueList() {
 }
 
 CSSParser::CSSParser(bool strictParsing)
-    : m_floatingMediaQuery(0),
+    : m_strict(strictParsing),
+      m_important(false),
+      m_id(0),
+      m_styleSheet(0),
+      m_mediaQuery(0),
+      m_valueList(0),
+      m_parsedProperties(
+          static_cast<CSSProperty**>(fastMalloc(32 * sizeof(CSSProperty*)))),
+      m_numParsedProperties(0),
+      m_maxParsedProperties(32),
+      m_inParseShorthand(0),
+      m_currentShorthand(0),
+      m_implicitShorthand(false),
+      m_defaultNamespace(starAtom),
+      m_data(0),
+      yy_start(1),
+      m_floatingMediaQuery(0),
       m_floatingMediaQueryExp(0),
       m_floatingMediaQueryExpList(0) {
-  m_strict = strictParsing;
-
-  m_parsedProperties = (CSSProperty**)fastMalloc(32 * sizeof(CSSProperty*));
-  m_numParsedProperties = 0;
-  m_maxParsedProperties = 32;
-
-  m_data = 0;
-  m_valueList = 0;
-  m_id = 0;
-  m_important = false;
-  m_inParseShorthand = 0;
-  m_currentShorthand = 0;
-  m_implicitShorthand = false;
-
-  m_defaultNamespace = starAtom;
-
-  yy_start = 1;
-
 #if YYDEBUG > 0
   cssyydebug = 1;
 #endif
@@ -192,9 +191,7 @@ void CSSParser::setupParser(const char* prefix,
                             const char* suffix) {
   int length = string.length() + strlen(prefix) + strlen(suffix) + 2;
 
-  if (m_data)
-    fastFree(m_data);
-
+  fastFree(m_data);
   m_data = static_cast<UChar*>(fastMalloc(length * sizeof(UChar)));
   for (unsigned i = 0; i < strlen(prefix); i++)
     m_data[i] = prefix[i];
@@ -217,7 +214,7 @@ void CSSParser::setupParser(const char* prefix,
 }
 
 void CSSParser::parseSheet(CSSStyleSheet* sheet, const String& string) {
-  m_styleElement = sheet;
+  m_styleSheet = sheet;
   m_defaultNamespace = starAtom;  // Reset the default namespace.
 
   setupParser("", string, "");
@@ -227,7 +224,7 @@ void CSSParser::parseSheet(CSSStyleSheet* sheet, const String& string) {
 
 PassRefPtr<CSSRule> CSSParser::parseRule(CSSStyleSheet* sheet,
                                          const String& string) {
-  m_styleElement = sheet;
+  m_styleSheet = sheet;
   setupParser("@-webkit-rule{", string, "} ");
   cssyyparse(this);
   return m_rule.release();
@@ -237,7 +234,9 @@ bool CSSParser::parseValue(CSSMutableStyleDeclaration* declaration,
                            int id,
                            const String& string,
                            bool important) {
-  m_styleElement = declaration->stylesheet();
+  ASSERT(!declaration->stylesheet() ||
+         declaration->stylesheet()->isCSSStyleSheet());
+  m_styleSheet = static_cast<CSSStyleSheet*>(declaration->stylesheet());
 
   setupParser("@-webkit-value{", string, "} ");
 
@@ -286,7 +285,9 @@ bool CSSParser::parseColor(RGBA32& color, const String& string, bool strict) {
 
 bool CSSParser::parseColor(CSSMutableStyleDeclaration* declaration,
                            const String& string) {
-  m_styleElement = declaration->stylesheet();
+  ASSERT(!declaration->stylesheet() ||
+         declaration->stylesheet()->isCSSStyleSheet());
+  m_styleSheet = static_cast<CSSStyleSheet*>(declaration->stylesheet());
 
   setupParser("@-webkit-decls{color:", string, "} ");
   cssyyparse(this);
@@ -298,7 +299,9 @@ bool CSSParser::parseColor(CSSMutableStyleDeclaration* declaration,
 
 bool CSSParser::parseDeclaration(CSSMutableStyleDeclaration* declaration,
                                  const String& string) {
-  m_styleElement = declaration->stylesheet();
+  ASSERT(!declaration->stylesheet() ||
+         declaration->stylesheet()->isCSSStyleSheet());
+  m_styleSheet = static_cast<CSSStyleSheet*>(declaration->stylesheet());
 
   setupParser("@-webkit-decls{", string, "} ");
   cssyyparse(this);
@@ -363,7 +366,7 @@ void CSSParser::clearProperties() {
 }
 
 Document* CSSParser::document() const {
-  StyleBase* root = m_styleElement;
+  StyleBase* root = m_styleSheet;
   Document* doc = 0;
   while (root->parent())
     root = root->parent();
@@ -831,7 +834,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         if (m_strict || coords.size() == 0) {
           if (!uri.isEmpty())
             list->append(CSSCursorImageValue::create(
-                KURL(m_styleElement->baseURL(), uri).string(), hotspot));
+                KURL(m_styleSheet->baseURL(), uri).string(), hotspot));
         }
         if ((m_strict && !value) ||
             (value &&
@@ -906,7 +909,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         String uri = parseURL(value->string);
         if (!uri.isEmpty()) {
           parsedValue = CSSImageValue::create(
-              KURL(m_styleElement->baseURL(), uri).string());
+              KURL(m_styleSheet->baseURL(), uri).string());
           m_valueList->next();
         }
       } else if (value->unit == Value::Function &&
@@ -1146,7 +1149,7 @@ bool CSSParser::parseValue(int propId, bool important) {
           if (val->unit == CSSPrimitiveValue::CSS_URI) {
             String value = parseURL(val->string);
             parsedValue = new CSSPrimitiveValue(
-                KURL(m_styleElement->baseURL(), value).string(),
+                KURL(m_styleSheet->baseURL(), value).string(),
                 CSSPrimitiveValue::CSS_URI);
           }
           if (!parsedValue)
@@ -1992,8 +1995,8 @@ bool CSSParser::parseContent(int propId, bool important) {
     if (val->unit == CSSPrimitiveValue::CSS_URI) {
       // url
       String value = parseURL(val->string);
-      parsedValue = CSSImageValue::create(
-          KURL(m_styleElement->baseURL(), value).string());
+      parsedValue =
+          CSSImageValue::create(KURL(m_styleSheet->baseURL(), value).string());
     } else if (val->unit == Value::Function) {
       // attr(X) | counter(X [,Y]) | counters(X, Y, [,Z]) |
       // -webkit-gradient(...)
@@ -2070,7 +2073,7 @@ bool CSSParser::parseFillImage(RefPtr<CSSValue>& value) {
     String uri = parseURL(m_valueList->current()->string);
     if (!uri.isEmpty())
       value =
-          CSSImageValue::create(KURL(m_styleElement->baseURL(), uri).string());
+          CSSImageValue::create(KURL(m_styleSheet->baseURL(), uri).string());
     return true;
   }
   if (m_valueList->current()->unit == Value::Function) {
@@ -2942,7 +2945,7 @@ bool CSSParser::parseFontFaceSrc() {
     if (val->unit == CSSPrimitiveValue::CSS_URI && !expectComma) {
       String value = parseURL(val->string);
       parsedValue = new CSSFontFaceSrcValue(
-          KURL(m_styleElement->baseURL(), value).string(), false);
+          KURL(m_styleSheet->baseURL(), value).string(), false);
       uriValue = parsedValue;
       allowFormat = true;
       expectComma = true;
@@ -3583,7 +3586,7 @@ bool CSSParser::parseBorderImage(int propId,
     if (uri.isEmpty())
       return false;
     context.commitImage(
-        CSSImageValue::create(KURL(m_styleElement->baseURL(), uri).string()));
+        CSSImageValue::create(KURL(m_styleSheet->baseURL(), uri).string()));
   } else if (val->unit == Value::Function) {
     RefPtr<CSSValue> value;
     if ((equalIgnoringCase(val->function->name, "-webkit-gradient(") &&
@@ -4390,37 +4393,25 @@ MediaList* CSSParser::createMediaList() {
 }
 
 CSSRule* CSSParser::createCharsetRule(const ParseString& charset) {
-  if (!m_styleElement)
+  if (!m_styleSheet)
     return 0;
-  if (!m_styleElement->isCSSStyleSheet())
-    return 0;
-  CSSCharsetRule* rule = new CSSCharsetRule(m_styleElement, charset);
+  CSSCharsetRule* rule = new CSSCharsetRule(m_styleSheet, charset);
   m_parsedStyleObjects.append(rule);
   return rule;
 }
 
 CSSRule* CSSParser::createImportRule(const ParseString& url, MediaList* media) {
-  if (!media)
+  if (!media || !m_styleSheet)
     return 0;
-  if (!m_styleElement)
-    return 0;
-  if (!m_styleElement->isCSSStyleSheet())
-    return 0;
-  CSSImportRule* rule = new CSSImportRule(m_styleElement, url, media);
+  CSSImportRule* rule = new CSSImportRule(m_styleSheet, url, media);
   m_parsedStyleObjects.append(rule);
   return rule;
 }
 
 CSSRule* CSSParser::createMediaRule(MediaList* media, CSSRuleList* rules) {
-  if (!media)
+  if (!media || !rules || !m_styleSheet)
     return 0;
-  if (!rules)
-    return 0;
-  if (!m_styleElement)
-    return 0;
-  if (!m_styleElement->isCSSStyleSheet())
-    return 0;
-  CSSMediaRule* rule = new CSSMediaRule(m_styleElement, media, rules);
+  CSSMediaRule* rule = new CSSMediaRule(m_styleSheet, media, rules);
   m_parsedStyleObjects.append(rule);
   return rule;
 }
@@ -4436,7 +4427,7 @@ CSSRuleList* CSSParser::createRuleList() {
 CSSRule* CSSParser::createStyleRule(CSSSelector* selector) {
   CSSStyleRule* rule = 0;
   if (selector) {
-    rule = new CSSStyleRule(m_styleElement);
+    rule = new CSSStyleRule(m_styleSheet);
     m_parsedStyleObjects.append(rule);
     rule->setSelector(sinkFloatingSelector(selector));
     rule->setDeclaration(new CSSMutableStyleDeclaration(
@@ -4447,7 +4438,7 @@ CSSRule* CSSParser::createStyleRule(CSSSelector* selector) {
 }
 
 CSSRule* CSSParser::createFontFaceRule() {
-  CSSFontFaceRule* rule = new CSSFontFaceRule(m_styleElement);
+  CSSFontFaceRule* rule = new CSSFontFaceRule(m_styleSheet);
   m_parsedStyleObjects.append(rule);
   rule->setDeclaration(new CSSMutableStyleDeclaration(rule, m_parsedProperties,
                                                       m_numParsedProperties));
