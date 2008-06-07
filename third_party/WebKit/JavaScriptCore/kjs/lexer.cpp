@@ -33,10 +33,6 @@
 #include <wtf/Assertions.h>
 #include <wtf/unicode/Unicode.h>
 
-#if USE(MULTIPLE_THREADS)
-#include <wtf/ThreadSpecific.h>
-#endif
-
 using namespace WTF;
 using namespace Unicode;
 
@@ -51,8 +47,8 @@ using namespace KJS;
 #include "lexer.lut.h"
 
 // a bridge for yacc from the C world to C++
-int kjsyylex(void* lvalp, void* llocp, void* lexer) {
-  return static_cast<Lexer*>(lexer)->lex(lvalp, llocp);
+int kjsyylex(void* lvalp, void* llocp, void* globalData) {
+  return static_cast<JSGlobalData*>(globalData)->lexer->lex(lvalp, llocp);
 }
 
 namespace KJS {
@@ -61,16 +57,6 @@ static bool isDecimalDigit(int);
 
 static const size_t initialReadBufferCapacity = 32;
 static const size_t initialStringTableCapacity = 64;
-
-Lexer& lexer() {
-#if USE(MULTIPLE_THREADS)
-  static ThreadSpecific<Lexer> staticLexer;
-  return *staticLexer;
-#else
-  static Lexer staticLexer;
-  return staticLexer;
-#endif
-}
 
 Lexer::Lexer()
     : yylineno(1),

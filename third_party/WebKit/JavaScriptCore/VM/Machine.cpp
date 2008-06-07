@@ -508,7 +508,7 @@ static NEVER_INLINE JSValue* callEval(ExecState* exec,
   int sourceId;
   int errLine;
   UString errMsg;
-  RefPtr<EvalNode> evalNode = parser().parse<EvalNode>(
+  RefPtr<EvalNode> evalNode = exec->parser()->parse<EvalNode>(
       exec, UString(), 1,
       UStringSourceProvider::create(static_cast<StringImp*>(program)->value()),
       &sourceId, &errLine, &errMsg);

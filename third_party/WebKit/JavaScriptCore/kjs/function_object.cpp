@@ -187,8 +187,9 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
   int errLine;
   UString errMsg;
   RefPtr<SourceProvider> source = UStringSourceProvider::create(body);
-  RefPtr<FunctionBodyNode> functionBody = parser().parse<FunctionBodyNode>(
-      exec, sourceURL, lineNumber, source, &sourceId, &errLine, &errMsg);
+  RefPtr<FunctionBodyNode> functionBody =
+      exec->parser()->parse<FunctionBodyNode>(
+          exec, sourceURL, lineNumber, source, &sourceId, &errLine, &errMsg);
 
   // No program node == syntax error - throw a syntax error
   if (!functionBody)

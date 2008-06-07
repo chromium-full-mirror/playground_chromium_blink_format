@@ -196,7 +196,8 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
       m_codeType(GlobalCode),
       m_continueDepth(0),
       m_nextVar(-1),
-      m_propertyNames(CommonIdentifiers::shared()) {
+      m_propertyNames(
+          &scopeChain.globalObject()->globalExec()->propertyNames()) {
   // Global code can inherit previously defined symbols.
   int size = symbolTable->size() + 1;  // + 1 slot for  "this"
 
@@ -266,7 +267,8 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
       m_codeType(FunctionCode),
       m_continueDepth(0),
       m_nextVar(-1),
-      m_propertyNames(CommonIdentifiers::shared()) {
+      m_propertyNames(
+          &scopeChain.globalObject()->globalExec()->propertyNames()) {
   const Node::FunctionStack& functionStack = functionBody->functionStack();
   for (size_t i = 0; i < functionStack.size(); ++i) {
     FuncDeclNode* funcDecl = functionStack[i].get();
@@ -318,7 +320,8 @@ CodeGenerator::CodeGenerator(EvalNode* evalNode,
       m_codeType(EvalCode),
       m_continueDepth(0),
       m_nextVar(-1),
-      m_propertyNames(CommonIdentifiers::shared()) {
+      m_propertyNames(
+          &scopeChain.globalObject()->globalExec()->propertyNames()) {
   m_codeBlock->numVars = 1;  // Allocate space for "this"
 }
 

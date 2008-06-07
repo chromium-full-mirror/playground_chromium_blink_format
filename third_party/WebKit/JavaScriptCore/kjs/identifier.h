@@ -21,6 +21,7 @@
 #ifndef KJS_IDENTIFIER_H
 #define KJS_IDENTIFIER_H
 
+#include "JSGlobalData.h"
 #include "ustring.h"
 
 namespace KJS {
@@ -35,6 +36,10 @@ class Identifier {
   Identifier(const UChar* s, int length) : _ustring(add(s, length)) {}
   explicit Identifier(UString::Rep* rep) : _ustring(add(rep)) {}
   explicit Identifier(const UString& s) : _ustring(add(s.rep())) {}
+
+  Identifier(JSGlobalData* globalData, const char* s)
+      : _ustring(add(globalData, s)) {
+  }  // Only to be used with string literals.
 
   // Special constructor for cases where we overwrite an object in place.
   Identifier(PlacementNewAdoptType) : _ustring(PlacementNewAdopt) {}
@@ -89,6 +94,7 @@ class Identifier {
     return equal(a._ustring.rep(), b);
   }
 
+  static PassRefPtr<UString::Rep> add(JSGlobalData*, const char*);
   static PassRefPtr<UString::Rep> add(const UChar*, int length);
   static PassRefPtr<UString::Rep> add(UString::Rep* r) {
     if (r->identifierTable)
@@ -109,6 +115,9 @@ inline bool operator!=(const Identifier& a, const Identifier& b) {
 inline bool operator==(const Identifier& a, const char* b) {
   return Identifier::equal(a, b);
 }
+
+IdentifierTable* createIdentifierTable();
+void deleteIdentifierTable(IdentifierTable*);
 
 }  // namespace KJS
 

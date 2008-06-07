@@ -283,7 +283,7 @@ static bool prettyPrintScript(ExecState* exec,
   int errLine = 0;
   UString errMsg;
   UString scriptUString(script.data());
-  RefPtr<ProgramNode> programNode = parser().parse<ProgramNode>(
+  RefPtr<ProgramNode> programNode = exec->parser()->parse<ProgramNode>(
       exec, fileName, 1, UStringSourceProvider::create(scriptUString), 0,
       &errLine, &errMsg);
   if (!programNode) {

@@ -54,7 +54,7 @@ Completion Interpreter::checkSyntax(ExecState* exec,
   int errLine;
   UString errMsg;
 
-  RefPtr<ProgramNode> progNode = parser().parse<ProgramNode>(
+  RefPtr<ProgramNode> progNode = exec->parser()->parse<ProgramNode>(
       exec, sourceURL, startingLineNumber, source, 0, &errLine, &errMsg);
   if (!progNode)
     return Completion(
@@ -86,8 +86,8 @@ Completion Interpreter::evaluate(ExecState* exec,
   UString errMsg;
 
   RefPtr<ProgramNode> programNode =
-      parser().parse<ProgramNode>(exec, sourceURL, startingLineNumber, source,
-                                  &sourceId, &errLine, &errMsg);
+      exec->parser()->parse<ProgramNode>(exec, sourceURL, startingLineNumber,
+                                         source, &sourceId, &errLine, &errMsg);
 
   // no program node means a syntax error occurred
   if (!programNode)

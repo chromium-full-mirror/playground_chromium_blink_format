@@ -24,11 +24,6 @@
 #include "identifier.h"
 #include <wtf/Noncopyable.h>
 
-namespace WTF {
-template <typename T>
-class ThreadSpecific;
-}
-
 // List of property names, passed to a macro so we can do set them up various
 // ways without repeating the list.
 #define KJS_COMMON_IDENTIFIERS_EACH_PROPERTY_NAME(macro)                       \
@@ -49,12 +44,10 @@ namespace KJS {
 
 class CommonIdentifiers : Noncopyable {
  private:
-  CommonIdentifiers();
-  friend class WTF::ThreadSpecific<CommonIdentifiers>;
+  CommonIdentifiers(JSGlobalData*);
+  friend struct JSGlobalData;
 
  public:
-  static CommonIdentifiers* shared();
-
   const Identifier nullIdentifier;
   const Identifier underscoreProto;
   const Identifier thisIdentifier;
