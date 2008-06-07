@@ -467,7 +467,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
     updateGraphicsContext(context, textFillColor, textStrokeColor,
                           textStrokeWidth);
-    if (!paintSelectedTextSeparately) {
+    if (!paintSelectedTextSeparately || ePos <= sPos) {
       // FIXME: Truncate right-to-left text correctly.
       paintTextWithShadows(context, textRun, 0,
                            m_truncation == cNoTruncation ? m_len : m_truncation,
