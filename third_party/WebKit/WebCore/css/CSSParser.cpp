@@ -140,7 +140,7 @@ CSSParser::CSSParser(bool strictParsing)
   m_currentShorthand = 0;
   m_implicitShorthand = false;
 
-  defaultNamespace = starAtom;
+  m_defaultNamespace = starAtom;
 
   yy_start = 1;
 
@@ -218,7 +218,7 @@ void CSSParser::setupParser(const char* prefix,
 
 void CSSParser::parseSheet(CSSStyleSheet* sheet, const String& string) {
   m_styleElement = sheet;
-  defaultNamespace = starAtom;  // Reset the default namespace.
+  m_defaultNamespace = starAtom;  // Reset the default namespace.
 
   setupParser("", string, "");
   cssyyparse(this);
