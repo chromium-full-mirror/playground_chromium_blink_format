@@ -135,7 +135,7 @@ CSSParser::CSSParser(bool strictParsing)
   data = 0;
   m_valueList = 0;
   id = 0;
-  important = false;
+  m_important = false;
   m_inParseShorthand = 0;
   m_currentShorthand = 0;
   m_implicitShorthand = false;
@@ -242,7 +242,7 @@ bool CSSParser::parseValue(CSSMutableStyleDeclaration* declaration,
   setupParser("@-webkit-value{", string, "} ");
 
   id = _id;
-  important = _important;
+  m_important = _important;
 
   cssyyparse(this);
 
@@ -2981,7 +2981,7 @@ bool CSSParser::parseFontFaceSrc() {
   }
 
   if (values->length() && !failed) {
-    addProperty(CSSPropertySrc, values.release(), important);
+    addProperty(CSSPropertySrc, values.release(), m_important);
     m_valueList->next();
     return true;
   }
@@ -3073,7 +3073,7 @@ bool CSSParser::parseFontFaceUnicodeRange() {
     delete values;
     return false;
   }
-  addProperty(CSSPropertyUnicodeRange, values, important);
+  addProperty(CSSPropertyUnicodeRange, values, m_important);
   return true;
 }
 

@@ -235,7 +235,7 @@ class CSSParser {
 
  public:
   bool strict;
-  bool important;
+  bool m_important;
   int id;
   StyleList* m_styleElement;
   RefPtr<CSSRule> m_rule;
