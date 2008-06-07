@@ -122,8 +122,6 @@ ValueList::~ValueList() {
       delete m_values[i].function;
 }
 
-CSSParser* CSSParser::currentParser = 0;
-
 CSSParser::CSSParser(bool strictParsing)
     : m_floatingMediaQuery(0),
       m_floatingMediaQueryExp(0),
@@ -223,26 +221,15 @@ void CSSParser::parseSheet(CSSStyleSheet* sheet, const String& string) {
   defaultNamespace = starAtom;  // Reset the default namespace.
 
   setupParser("", string, "");
-
-  CSSParser* old = currentParser;
-  currentParser = this;
   cssyyparse(this);
-  currentParser = old;
-
   rule = 0;
 }
 
 PassRefPtr<CSSRule> CSSParser::parseRule(CSSStyleSheet* sheet,
                                          const String& string) {
   m_styleElement = sheet;
-
   setupParser("@-webkit-rule{", string, "} ");
-
-  CSSParser* old = currentParser;
-  currentParser = this;
   cssyyparse(this);
-  currentParser = old;
-
   return rule.release();
 }
 
@@ -257,10 +244,7 @@ bool CSSParser::parseValue(CSSMutableStyleDeclaration* declaration,
   id = _id;
   important = _important;
 
-  CSSParser* old = currentParser;
-  currentParser = this;
   cssyyparse(this);
-  currentParser = old;
 
   rule = 0;
 
@@ -305,12 +289,7 @@ bool CSSParser::parseColor(CSSMutableStyleDeclaration* declaration,
   m_styleElement = declaration->stylesheet();
 
   setupParser("@-webkit-decls{color:", string, "} ");
-
-  CSSParser* old = currentParser;
-  currentParser = this;
   cssyyparse(this);
-  currentParser = old;
-
   rule = 0;
 
   bool ok = false;
@@ -325,12 +304,7 @@ bool CSSParser::parseDeclaration(CSSMutableStyleDeclaration* declaration,
   m_styleElement = declaration->stylesheet();
 
   setupParser("@-webkit-decls{", string, "} ");
-
-  CSSParser* old = currentParser;
-  currentParser = this;
   cssyyparse(this);
-  currentParser = old;
-
   rule = 0;
 
   bool ok = false;
@@ -344,26 +318,21 @@ bool CSSParser::parseDeclaration(CSSMutableStyleDeclaration* declaration,
 }
 
 bool CSSParser::parseMediaQuery(MediaList* queries, const String& string) {
-  if (string.isEmpty() || string.isNull()) {
+  if (string.isEmpty() || string.isNull())
     return true;
-  }
 
-  mediaQuery = 0;
+  m_mediaQuery = 0;
   // can't use { because tokenizer state switches from mediaquery to initial
   // state when it sees { token.
   // instead insert one " " (which is WHITESPACE in CSSGrammar.y)
   setupParser("@-webkit-mediaquery ", string, "} ");
-
-  CSSParser* old = currentParser;
-  currentParser = this;
   cssyyparse(this);
-  currentParser = old;
 
   bool ok = false;
-  if (mediaQuery) {
+  if (m_mediaQuery) {
     ok = true;
-    queries->appendMediaQuery(mediaQuery);
-    mediaQuery = 0;
+    queries->appendMediaQuery(m_mediaQuery);
+    m_mediaQuery = 0;
   }
 
   return ok;

@@ -115,8 +115,6 @@ class CSSParser {
   bool parseDeclaration(CSSMutableStyleDeclaration*, const String&);
   bool parseMediaQuery(MediaList*, const String&);
 
-  static CSSParser* current() { return currentParser; }
-
   Document* document() const;
 
   void addProperty(int propId, PassRefPtr<CSSValue>, bool important);
@@ -241,7 +239,7 @@ class CSSParser {
   int id;
   StyleList* m_styleElement;
   RefPtr<CSSRule> rule;
-  MediaQuery* mediaQuery;
+  MediaQuery* m_mediaQuery;
   ValueList* valueList;
   CSSProperty** m_parsedProperties;
   int m_numParsedProperties;
@@ -252,8 +250,6 @@ class CSSParser {
   bool m_implicitShorthand;
 
   AtomicString defaultNamespace;
-
-  static CSSParser* currentParser;
 
   // tokenizer methods and data
  public:
