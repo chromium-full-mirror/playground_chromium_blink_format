@@ -95,13 +95,15 @@ CanvasPattern::CanvasPattern(CachedImage* cachedImage,
                              bool repeatX,
                              bool repeatY,
                              bool originClean)
-    : m_cachedImage(cachedImage),
+    : m_cachedImage(cachedImage)
+#if PLATFORM(CAIRO)
+      ,
+      m_platformImage(0)
+#endif
+      ,
       m_repeatX(repeatX),
       m_repeatY(repeatY),
       m_originClean(originClean) {
-#if PLATFORM(CAIRO)
-  m_platformImage = 0;
-#endif
   if (cachedImage)
     cachedImage->addClient(this);
 }
