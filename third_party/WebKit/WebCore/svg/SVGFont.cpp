@@ -127,10 +127,10 @@ static Vector<SVGGlyphIdentifier::ArabicForm> charactersWithArabicForm(
     const String& input,
     bool rtl) {
   Vector<SVGGlyphIdentifier::ArabicForm> forms;
-  unsigned int length = input.length();
+  unsigned length = input.length();
 
   bool containsArabic = false;
-  for (unsigned int i = 0; i < length; ++i) {
+  for (unsigned i = 0; i < length; ++i) {
     if (isArabicChar(input[i])) {
       containsArabic = true;
       break;
@@ -143,14 +143,15 @@ static Vector<SVGGlyphIdentifier::ArabicForm> charactersWithArabicForm(
   bool lastCharShapesRight = false;
 
   // Start identifying arabic forms
-  if (rtl)
+  if (rtl) {
     for (int i = length - 1; i >= 0; --i)
       forms.prepend(processArabicFormDetection(
           input[i], lastCharShapesRight, forms.isEmpty() ? 0 : &forms.first()));
-  else
-    for (unsigned int i = 0; i < length; ++i)
+  } else {
+    for (unsigned i = 0; i < length; ++i)
       forms.append(processArabicFormDetection(
           input[i], lastCharShapesRight, forms.isEmpty() ? 0 : &forms.last()));
+  }
 
   return forms;
 }
@@ -158,8 +159,8 @@ static Vector<SVGGlyphIdentifier::ArabicForm> charactersWithArabicForm(
 static inline bool isCompatibleArabicForm(
     const SVGGlyphIdentifier& identifier,
     const Vector<SVGGlyphIdentifier::ArabicForm>& chars,
-    unsigned int startPosition,
-    unsigned int endPosition) {
+    unsigned startPosition,
+    unsigned endPosition) {
   if (chars.isEmpty())
     return true;
 
@@ -170,7 +171,9 @@ static inline bool isCompatibleArabicForm(
 
   ASSERT(end <= chars.end());
   for (; it != end; ++it) {
-    if ((*it) != identifier.arabicForm && (*it) != SVGGlyphIdentifier::None)
+    if (*it != static_cast<SVGGlyphIdentifier::ArabicForm>(
+                   identifier.arabicForm) &&
+        *it != SVGGlyphIdentifier::None)
       return false;
   }
 
@@ -182,8 +185,8 @@ static inline bool isCompatibleGlyph(
     bool isVerticalText,
     const String& language,
     const Vector<SVGGlyphIdentifier::ArabicForm>& chars,
-    unsigned int startPosition,
-    unsigned int endPosition) {
+    unsigned startPosition,
+    unsigned endPosition) {
   bool valid = true;
 
   // Check wheter orientation if glyph fits within the request
@@ -220,8 +223,7 @@ static inline bool isCompatibleGlyph(
 
     bool found = false;
     for (; it != end; ++it) {
-      String cur = (*it);
-
+      const String& cur = *it;
       if (cur == language || cur == languagePrefix) {
         found = true;
         break;

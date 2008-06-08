@@ -69,8 +69,8 @@ struct SVGGlyphIdentifier {
 
   bool isValid : 1;
 
-  Orientation orientation : 2;
-  ArabicForm arabicForm : 3;
+  unsigned orientation : 2;  // Orientation
+  unsigned arabicForm : 3;   // ArabicForm
   int priority;
   size_t nameLength;
   String glyphName;
