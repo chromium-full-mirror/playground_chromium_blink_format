@@ -832,7 +832,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         } else if (m_strict && nrcoords == 2)
           hotspot = IntPoint(coords[0], coords[1]);
         if (m_strict || coords.size() == 0) {
-          if (!uri.isEmpty())
+          if (!uri.isNull())
             list->append(CSSCursorImageValue::create(
                 KURL(m_styleSheet->baseURL(), uri).string(), hotspot));
         }
@@ -907,7 +907,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       } else if (value->unit == CSSPrimitiveValue::CSS_URI) {
         // ### allow string in non strict mode?
         String uri = parseURL(value->string);
-        if (!uri.isEmpty()) {
+        if (!uri.isNull()) {
           parsedValue = CSSImageValue::create(
               KURL(m_styleSheet->baseURL(), uri).string());
           m_valueList->next();
@@ -2071,7 +2071,7 @@ bool CSSParser::parseFillImage(RefPtr<CSSValue>& value) {
   }
   if (m_valueList->current()->unit == CSSPrimitiveValue::CSS_URI) {
     String uri = parseURL(m_valueList->current()->string);
-    if (!uri.isEmpty())
+    if (!uri.isNull())
       value =
           CSSImageValue::create(KURL(m_styleSheet->baseURL(), uri).string());
     return true;
@@ -3582,7 +3582,7 @@ bool CSSParser::parseBorderImage(int propId,
   Value* val = m_valueList->current();
   if (val->unit == CSSPrimitiveValue::CSS_URI) {
     String uri = parseURL(val->string);
-    if (uri.isEmpty())
+    if (uri.isNull())
       return false;
     context.commitImage(
         CSSImageValue::create(KURL(m_styleSheet->baseURL(), uri).string()));
