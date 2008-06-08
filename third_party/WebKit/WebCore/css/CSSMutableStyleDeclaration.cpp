@@ -483,7 +483,7 @@ static void initShorthandMap(HashMap<int, PropertyLonghand>& shorthandMap) {
       CSSPropertyWebkitMaskPositionX,  CSSPropertyWebkitMaskPositionY,
       CSSPropertyWebkitMaskRepeat,
   };
-  SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyBackground, maskProperties);
+  SET_SHORTHAND_MAP_ENTRY(shorthandMap, CSSPropertyWebkitMask, maskProperties);
 
 #undef SET_SHORTHAND_MAP_ENTRY
 }
