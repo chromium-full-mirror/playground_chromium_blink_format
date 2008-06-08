@@ -144,7 +144,8 @@ WebKitWebHistoryItem* webkit_web_history_item_new(void) {
       WEBKIT_WEB_HISTORY_ITEM(g_object_new(WEBKIT_TYPE_WEB_HISTORY_ITEM, NULL));
   WebKitWebHistoryItemPrivate* priv = webHistoryItem->priv;
 
-  priv->historyItem = new WebCore::HistoryItem();
+  RefPtr<WebCore::HistoryItem> historyItem = WebCore::HistoryItem::create();
+  priv->historyItem = historyItem.get();
   webkit_history_item_add(webHistoryItem, priv->historyItem);
 
   return webHistoryItem;
@@ -165,10 +166,13 @@ WebKitWebHistoryItem* webkit_web_history_item_new_with_data(
   WebCore::KURL historyUri(uri);
   WebCore::String historyTitle(title);
 
-  WebKitWebHistoryItem* webHistoryItem = webkit_web_history_item_new();
+  WebKitWebHistoryItem* webHistoryItem =
+      WEBKIT_WEB_HISTORY_ITEM(g_object_new(WEBKIT_TYPE_WEB_HISTORY_ITEM, NULL));
   WebKitWebHistoryItemPrivate* priv = webHistoryItem->priv;
 
-  priv->historyItem = new WebCore::HistoryItem(historyUri, historyTitle);
+  RefPtr<WebCore::HistoryItem> historyItem =
+      WebCore::HistoryItem::create(historyUri, historyTitle);
+  priv->historyItem = historyItem.get();
   webkit_history_item_add(webHistoryItem, priv->historyItem);
 
   return webHistoryItem;
