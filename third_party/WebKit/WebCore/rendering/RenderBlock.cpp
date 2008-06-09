@@ -3866,7 +3866,8 @@ int RenderBlock::layoutColumns(int endOfContent) {
     columnRects->append(colRect);
 
     // Start adding in more columns as long as there's still content left.
-    if (currY < endOfContent && i == colCount - 1)
+    if (currY < endOfContent && i == colCount - 1 &&
+        (computeIntrinsicHeight || contentHeight()))
       colCount++;
   }
 
