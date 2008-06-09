@@ -44,6 +44,10 @@
 #include <unistd.h>
 #endif
 
+#if HAVE(READLINE)
+#include <readline/readline.h>
+#endif
+
 #if HAVE(SYS_TIME_H)
 #include <sys/time.h>
 #endif
@@ -75,6 +79,19 @@ static JSValue* functionRun(ExecState*, JSObject*, const List&);
 static JSValue* functionLoad(ExecState*, JSObject*, const List&);
 static JSValue* functionReadline(ExecState*, JSObject*, const List&);
 static JSValue* functionQuit(ExecState*, JSObject*, const List&);
+
+struct Options {
+  Options() : interactive(false), prettyPrint(false), dump(false) {}
+
+  bool interactive;
+  bool prettyPrint;
+  bool dump;
+  Vector<UString> fileNames;
+  Vector<UString> arguments;
+};
+
+static const char interactivePrompt[] = "> ";
+static const UString interpreterName("Interpreter");
 
 class StopWatch {
  public:
@@ -303,18 +320,16 @@ static bool prettyPrintScript(ExecState* exec,
   return true;
 }
 
-static bool runWithScripts(const Vector<UString>& fileNames,
-                           Vector<UString>& arguments,
+static bool runWithScripts(GlobalObject* globalObject,
+                           const Vector<UString>& fileNames,
                            bool prettyPrint,
                            bool dump) {
-  GlobalObject* globalObject = new GlobalObject(arguments);
   Vector<char> script;
 
   if (dump)
     CodeGenerator::setDumpsGeneratedCode(true);
 
   bool success = true;
-
   for (size_t i = 0; i < fileNames.size(); i++) {
     UString fileName = fileNames[i];
 
@@ -343,41 +358,80 @@ static bool runWithScripts(const Vector<UString>& fileNames,
   return success;
 }
 
+static void runInteractive(GlobalObject* globalObject) {
+  bool done = false;
+  while (!done) {
+#if HAVE_READLINE
+    char* line = readline(interactivePrompt);
+    if (!line)
+      break;
+    if (line[0])
+      add_history(line);
+    Completion completion = Interpreter::evaluate(
+        globalObject->globalExec(), globalObject->globalScopeChain(),
+        interpreterName, 1, line);
+    free(line);
+#else
+    printf(interactivePrompt);
+    Vector<char, 256> line;
+    int c;
+    while ((c = getchar()) != EOF) {
+      // FIXME: Should we also break on \r?
+      if (c == '\n')
+        break;
+      line.append(c);
+    }
+    line.append('\0');
+    Completion completion = Interpreter::evaluate(
+        globalObject->globalExec(), globalObject->globalScopeChain(),
+        interpreterName, 1, line.data());
+#endif
+    if (completion.isValueCompletion())
+      printf("%s\n", completion.value()
+                         ->toString(globalObject->globalExec())
+                         .UTF8String()
+                         .c_str());
+  }
+}
+
 static void printUsageStatement() {
   fprintf(stderr, "Usage: testkjs [options] [files] [-- arguments]\n");
-  fprintf(stderr, "  -f  Specifies a source file (deprecated)\n");
-  fprintf(stderr, "  -p  Prints formatted source code\n");
-  fprintf(stderr, "  -d  Dumps bytecode (debug builds only)\n");
+  fprintf(stderr, "  -d         Dumps bytecode (debug builds only)\n");
+  fprintf(stderr, "  -f         Specifies a source file (deprecated)\n");
+  fprintf(stderr, "  -h|--help  Prints this help message\n");
   fprintf(stderr,
-          "  -s  Installs signal handlers that exit on a crash (Unix platforms "
-          "only)\n");
+          "  -i         Enables interactive mode (default if no files are "
+          "specified)\n");
+  fprintf(stderr, "  -p         Prints formatted source code\n");
+  fprintf(stderr,
+          "  -s         Installs signal handlers that exit on a crash (Unix "
+          "platforms only)\n");
   exit(-1);
 }
 
-static void parseArguments(int argc,
-                           char** argv,
-                           Vector<UString>& fileNames,
-                           Vector<UString>& arguments,
-                           bool& prettyPrint,
-                           bool& dump) {
-  if (argc < 2)
-    printUsageStatement();
-
+static void parseArguments(int argc, char** argv, Options& options) {
   int i = 1;
   for (; i < argc; ++i) {
     const char* arg = argv[i];
     if (strcmp(arg, "-f") == 0) {
       if (++i == argc)
         printUsageStatement();
-      fileNames.append(argv[i]);
+      options.fileNames.append(argv[i]);
+      continue;
+    }
+    if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
+      printUsageStatement();
+    }
+    if (strcmp(arg, "-i") == 0) {
+      options.interactive = true;
       continue;
     }
     if (strcmp(arg, "-p") == 0) {
-      prettyPrint = true;
+      options.prettyPrint = true;
       continue;
     }
     if (strcmp(arg, "-d") == 0) {
-      dump = true;
+      options.dump = true;
       continue;
     }
     if (strcmp(arg, "-s") == 0) {
@@ -393,14 +447,14 @@ static void parseArguments(int argc,
       ++i;
       break;
     }
-    fileNames.append(argv[i]);
+    options.fileNames.append(argv[i]);
   }
 
-  if (fileNames.isEmpty())
-    printUsageStatement();
+  if (options.fileNames.isEmpty())
+    options.interactive = true;
 
   for (; i < argc; ++i)
-    arguments.append(argv[i]);
+    options.arguments.append(argv[i]);
 }
 
 int kjsmain(int argc, char** argv) {
@@ -408,13 +462,14 @@ int kjsmain(int argc, char** argv) {
 
   JSLock lock;
 
-  bool prettyPrint = false;
-  bool dump = false;
-  Vector<UString> fileNames;
-  Vector<UString> arguments;
-  parseArguments(argc, argv, fileNames, arguments, prettyPrint, dump);
+  Options options;
+  parseArguments(argc, argv, options);
 
-  bool success = runWithScripts(fileNames, arguments, prettyPrint, dump);
+  GlobalObject* globalObject = new GlobalObject(options.arguments);
+  bool success = runWithScripts(globalObject, options.fileNames,
+                                options.prettyPrint, options.dump);
+  if (options.interactive && success)
+    runInteractive(globalObject);
 
 #ifndef NDEBUG
   Collector::collect();
