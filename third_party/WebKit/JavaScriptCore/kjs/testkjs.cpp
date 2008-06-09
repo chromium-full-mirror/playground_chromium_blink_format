@@ -45,6 +45,7 @@
 #endif
 
 #if HAVE(READLINE)
+#include <readline/history.h>
 #include <readline/readline.h>
 #endif
 
@@ -361,7 +362,7 @@ static bool runWithScripts(GlobalObject* globalObject,
 static void runInteractive(GlobalObject* globalObject) {
   bool done = false;
   while (!done) {
-#if HAVE_READLINE
+#if HAVE(READLINE)
     char* line = readline(interactivePrompt);
     if (!line)
       break;
