@@ -23,7 +23,6 @@
 #include "RenderTheme.h"
 
 #include "CSSValueKeywords.h"
-#include "CSSStyleSheet.h"
 #include "Document.h"
 #include "FocusController.h"
 #include "Frame.h"
@@ -113,7 +112,7 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
 }
 
 #if !PLATFORM(QT)
-void RenderTheme::adjustDefaultStyleSheet(CSSStyleSheet* style) {}
+void RenderTheme::adjustDefaultStyleSheet(CSSStyleSheet*) {}
 #endif
 
 bool RenderTheme::paint(RenderObject* o,
