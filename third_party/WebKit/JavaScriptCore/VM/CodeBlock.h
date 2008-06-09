@@ -58,7 +58,7 @@ struct LineInfo {
 };
 
 struct CodeBlock {
-  CodeBlock(ScopeNode* ownerNode_)
+  CodeBlock(ScopeNode* ownerNode_, CodeType codeType_)
       : ownerNode(ownerNode_),
         numTemporaries(0),
         numVars(0),
@@ -66,7 +66,8 @@ struct CodeBlock {
         numLocals(0),
         needsFullScopeChain(ownerNode_->usesEval() ||
                             ownerNode_->needsClosure()),
-        usesEval(ownerNode_->usesEval()) {}
+        usesEval(ownerNode_->usesEval()),
+        codeType(codeType_) {}
 
   void dump(ExecState*) const;
   int lineNumberForVPC(const Instruction*);
@@ -84,6 +85,7 @@ struct CodeBlock {
   int thisRegister;
   bool needsFullScopeChain;
   bool usesEval;
+  CodeType codeType;
 
   Vector<Instruction> instructions;
 
@@ -106,8 +108,10 @@ struct CodeBlock {
 // responsible for marking it.
 
 struct ProgramCodeBlock : public CodeBlock {
-  ProgramCodeBlock(ScopeNode* ownerNode, JSGlobalObject* globalObject_)
-      : CodeBlock(ownerNode), globalObject(globalObject_) {
+  ProgramCodeBlock(ScopeNode* ownerNode_,
+                   CodeType codeType_,
+                   JSGlobalObject* globalObject_)
+      : CodeBlock(ownerNode_, codeType_), globalObject(globalObject_) {
     globalObject->codeBlocks().add(this);
   }
 
@@ -121,8 +125,8 @@ struct ProgramCodeBlock : public CodeBlock {
 };
 
 struct EvalCodeBlock : public ProgramCodeBlock {
-  EvalCodeBlock(ScopeNode* ownerNode, JSGlobalObject* globalObject_)
-      : ProgramCodeBlock(ownerNode, globalObject_) {}
+  EvalCodeBlock(ScopeNode* ownerNode_, JSGlobalObject* globalObject_)
+      : ProgramCodeBlock(ownerNode_, EvalCode, globalObject_) {}
 };
 
 }  // namespace KJS
