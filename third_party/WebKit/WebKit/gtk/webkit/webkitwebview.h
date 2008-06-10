@@ -82,7 +82,6 @@ struct _WebKitWebViewClass {
       WebKitWebView* web_view,
       WebKitWebFrame* frame,
       WebKitNetworkRequest* request);
-
   void (*window_object_cleared)(WebKitWebView* web_view,
                                 WebKitWebFrame* frame,
                                 JSGlobalContextRef context,
@@ -104,7 +103,7 @@ struct _WebKitWebViewClass {
                             gchar** value);
   gboolean (*console_message)(WebKitWebView* web_view,
                               const gchar* message,
-                              unsigned int line_number,
+                              guint line_number,
                               const gchar* source_id);
   void (*select_all)(WebKitWebView* web_view);
   void (*cut_clipboard)(WebKitWebView* web_view);
@@ -114,9 +113,9 @@ struct _WebKitWebViewClass {
   /*
    * internal
    */
-  void (*set_scroll_adjustments)(WebKitWebView*,
-                                 GtkAdjustment*,
-                                 GtkAdjustment*);
+  void (*set_scroll_adjustments)(WebKitWebView* web_view,
+                                 GtkAdjustment* hadjustment,
+                                 GtkAdjustment* vadjustment);
 };
 
 WEBKIT_API GType webkit_web_view_get_type(void);
