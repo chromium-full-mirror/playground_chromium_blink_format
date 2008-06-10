@@ -153,6 +153,7 @@ class QWebPagePrivate {
   QMenu* currentContextMenu;
   QWebSettings* settings;
   QPalette palette;
+  bool editable;
 
   QAction* actions[QWebPage::WebActionCount];
 
