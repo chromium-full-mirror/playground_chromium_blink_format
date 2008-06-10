@@ -62,6 +62,7 @@ class SetCursorEvent : public QEvent {
 QT_BEGIN_NAMESPACE
 class QUndoStack;
 class QMenu;
+class QBitArray;
 QT_END_NAMESPACE
 
 class QWebPagePrivate {
@@ -70,7 +71,8 @@ class QWebPagePrivate {
   ~QWebPagePrivate();
   void createMainFrame();
   QMenu* createContextMenu(const WebCore::ContextMenu* webcoreMenu,
-                           const QList<WebCore::ContextMenuItem>* items);
+                           const QList<WebCore::ContextMenuItem>* items,
+                           QBitArray* visitedWebActions);
 
   QWebFrame* frameAt(const QPoint& pos) const;
 
@@ -79,8 +81,6 @@ class QWebPagePrivate {
   void updateAction(QWebPage::WebAction action);
   void updateNavigationActions();
   void updateEditorActions();
-  void updateContextMenuActions(const WebCore::ContextMenu* webcoreMenu,
-                                const QList<WebCore::ContextMenuItem>* items);
 
   void timerEvent(QTimerEvent*);
 

@@ -65,6 +65,7 @@
 
 #include <QApplication>
 #include <QBasicTimer>
+#include <QBitArray>
 #include <QDebug>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
@@ -250,7 +251,8 @@ static QWebPage::WebAction webActionForContextMenuAction(
 
 QMenu* QWebPagePrivate::createContextMenu(
     const WebCore::ContextMenu* webcoreMenu,
-    const QList<WebCore::ContextMenuItem>* items) {
+    const QList<WebCore::ContextMenuItem>* items,
+    QBitArray* visitedWebActions) {
   QMenu* menu = new QMenu(view);
   for (int i = 0; i < items->count(); ++i) {
     const ContextMenuItem& item = items->at(i);
@@ -269,6 +271,7 @@ QMenu* QWebPagePrivate::createContextMenu(
           a->setCheckable(item.type() == WebCore::CheckableActionType);
 
           menu->addAction(a);
+          visitedWebActions->setBit(action);
         }
         break;
       }
@@ -276,7 +279,8 @@ QMenu* QWebPagePrivate::createContextMenu(
         menu->addSeparator();
         break;
       case WebCore::SubmenuType: {
-        QMenu* subMenu = createContextMenu(webcoreMenu, item.platformSubMenu());
+        QMenu* subMenu = createContextMenu(webcoreMenu, item.platformSubMenu(),
+                                           visitedWebActions);
 
         bool anyEnabledAction = false;
 
@@ -1862,16 +1866,17 @@ bool QWebPage::swallowContextMenuEvent(QContextMenuEvent* event) {
     element the CopyImageToClipboard action is enabled.
 */
 void QWebPage::updatePositionDependentActions(const QPoint& pos) {
-  // disable position dependent actions first and enable them if WebCore adds
-  // them enabled to the context menu.
-
+  // First we disable all actions, but keep track of which ones were originally
+  // enabled.
+  QBitArray originallyEnabledWebActions(QWebPage::WebActionCount);
   for (int i = ContextMenuItemTagNoAction;
        i < ContextMenuItemBaseApplicationTag; ++i) {
     QWebPage::WebAction action =
         webActionForContextMenuAction(WebCore::ContextMenuAction(i));
-    QAction* a = this->action(action);
-    if (a)
+    if (QAction* a = this->action(action)) {
+      originallyEnabledWebActions.setBit(action, a->isEnabled());
       a->setEnabled(false);
+    }
   }
 
   WebCore::Frame* focusedFrame =
@@ -1887,9 +1892,31 @@ void QWebPage::updatePositionDependentActions(const QPoint& pos) {
     menu.addInspectElementItem();
 
   delete d->currentContextMenu;
-  // createContextMenu also enables actions if necessary
-  d->currentContextMenu =
-      d->createContextMenu(&menu, menu.platformDescription());
+
+  // Then we let createContextMenu() enable the actions that are put into the
+  // menu
+  QBitArray visitedWebActions(QWebPage::WebActionCount);
+  d->currentContextMenu = d->createContextMenu(
+      &menu, menu.platformDescription(), &visitedWebActions);
+
+  // Finally, we restore the original enablement for the actions that were not
+  // put into the menu.
+  originallyEnabledWebActions &= ~visitedWebActions;  // Mask out visited
+                                                      // actions (they're part
+                                                      // of the menu)
+  for (int i = 0; i < QWebPage::WebActionCount; ++i) {
+    if (originallyEnabledWebActions.at(i)) {
+      if (QAction* a = this->action(QWebPage::WebAction(i))) {
+        a->setEnabled(true);
+      }
+    }
+  }
+
+  // This whole process ensures that any actions put into to the context menu
+  // has the right
+  // enablement, while also keeping the correct enablement for actions that were
+  // left out of
+  // the menu.
 }
 
 /*!
