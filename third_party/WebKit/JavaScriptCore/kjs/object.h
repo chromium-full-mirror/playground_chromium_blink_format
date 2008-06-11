@@ -1,9 +1,9 @@
 // -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -517,11 +517,6 @@ class Error {
                           int sourceId,
                           const UString& sourceURL);
   static JSObject* create(ExecState*, ErrorType, const char* message);
-
-  /**
-   * Array of error names corresponding to ErrorType
-   */
-  static const char* const* const errorNames;
 };
 
 JSObject* throwError(ExecState*,
