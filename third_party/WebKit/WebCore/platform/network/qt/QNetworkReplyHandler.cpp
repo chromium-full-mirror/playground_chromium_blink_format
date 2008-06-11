@@ -152,10 +152,9 @@ QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle)
 void QNetworkReplyHandler::abort() {
   m_resourceHandle = 0;
   if (m_reply) {
-    disconnect(m_reply, 0, this, 0);
-    m_reply->abort();
+    QNetworkReply* reply = release();
+    reply->abort();
     deleteLater();
-    m_reply = 0;
   }
 }
 
@@ -163,6 +162,10 @@ QNetworkReply* QNetworkReplyHandler::release() {
   QNetworkReply* reply = m_reply;
   if (m_reply) {
     disconnect(m_reply, 0, this, 0);
+    // We have queued connections to the QNetworkReply. Make sure any
+    // posted meta call events that were the result of a signal emission
+    // don't reach the slots in our instance.
+    QCoreApplication::removePostedEvents(this, QEvent::MetaCall);
     m_reply = 0;
   }
   return reply;
