@@ -362,6 +362,10 @@ class CodeGenerator {
   CodeType codeType() const { return m_codeType; }
 
  private:
+  void emitOpcode(OpcodeID);
+  void retrieveLastBinaryOp(int& dstIndex, int& src1Index, int& src2Index);
+  void rewindBinaryOp();
+
   PassRefPtr<LabelID> emitComplexJumpScopes(LabelID* target,
                                             ControlFlowContext* topScope,
                                             ControlFlowContext* bottomScope);
@@ -468,6 +472,8 @@ class CodeGenerator {
   JSValueMap m_jsValueMap;
 
   const CommonIdentifiers* m_propertyNames;
+
+  OpcodeID m_lastOpcodeID;
 
 #ifndef NDEBUG
   static bool s_dumpsGeneratedCode;

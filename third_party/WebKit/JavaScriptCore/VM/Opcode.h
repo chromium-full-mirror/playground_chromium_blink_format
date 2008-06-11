@@ -63,7 +63,7 @@ namespace KJS {
                                           op_put_getter) macro(op_put_setter)                   \
                                                                                                 \
                                           macro(op_jmp) macro(op_jtrue) macro(                  \
-                                              op_jfalse) macro(op_jmp_scopes)                   \
+                                              op_jfalse) macro(op_jless) macro(op_jmp_scopes)   \
                                                                                                 \
                                               macro(op_new_func) macro(op_new_func_exp) macro(  \
                                                   op_call) macro(op_call_eval) macro(op_ret)    \
