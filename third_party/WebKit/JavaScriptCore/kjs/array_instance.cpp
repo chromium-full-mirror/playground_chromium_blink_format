@@ -28,6 +28,8 @@
 #include <wtf/Assertions.h>
 #include <wtf/AVLTree.h>
 
+#define CHECK_ARRAY_CONSISTENCY 0
+
 using namespace std;
 
 namespace KJS {
@@ -43,7 +45,7 @@ struct ArrayStorage {
 };
 
 // 0xFFFFFFFF is a bit weird -- is not an array index even though it's an
-// integer
+// integer.
 static const unsigned maxArrayIndex = 0xFFFFFFFEU;
 
 // Our policy for when to use a vector and when to use a sparse map.
@@ -71,6 +73,12 @@ static inline bool isDenseEnoughForVector(unsigned length, unsigned numValues) {
   return length / minDensityMultiplier <= numValues;
 }
 
+#if !CHECK_ARRAY_CONSISTENCY
+
+inline void ArrayInstance::checkConsistency(ConsistencyCheckType) {}
+
+#endif
+
 ArrayInstance::ArrayInstance(JSObject* prototype, unsigned initialLength)
     : JSObject(prototype) {
   unsigned initialCapacity = min(initialLength, sparseArrayCutoff);
@@ -81,6 +89,8 @@ ArrayInstance::ArrayInstance(JSObject* prototype, unsigned initialLength)
       fastZeroedMalloc(storageSize(initialCapacity)));
 
   Collector::reportExtraMemoryCost(initialCapacity * sizeof(JSValue*));
+
+  checkConsistency();
 }
 
 ArrayInstance::ArrayInstance(JSObject* prototype, const List& list)
@@ -106,9 +116,13 @@ ArrayInstance::ArrayInstance(JSObject* prototype, const List& list)
   // When the array is created non-empty, its cells are filled, so it's really
   // no worse than
   // a property map. Therefore don't report extra memory cost.
+
+  checkConsistency();
 }
 
 ArrayInstance::~ArrayInstance() {
+  checkConsistency(DestructorConsistencyCheck);
+
   delete m_storage->m_sparseValueMap;
   fastFree(m_storage);
 }
@@ -214,6 +228,8 @@ void ArrayInstance::put(ExecState* exec,
 }
 
 void ArrayInstance::put(ExecState* exec, unsigned i, JSValue* value) {
+  checkConsistency();
+
   unsigned length = m_length;
   if (i >= length) {
     if (i > maxArrayIndex) {
@@ -230,6 +246,7 @@ void ArrayInstance::put(ExecState* exec, unsigned i, JSValue* value) {
     JSValue*& valueSlot = storage->m_vector[i];
     storage->m_numValuesInVector += !valueSlot;
     valueSlot = value;
+    checkConsistency();
     return;
   }
 
@@ -258,6 +275,7 @@ void ArrayInstance::put(ExecState* exec, unsigned i, JSValue* value) {
     storage = m_storage;
     ++storage->m_numValuesInVector;
     storage->m_vector[i] = value;
+    checkConsistency();
     return;
   }
 
@@ -309,6 +327,8 @@ void ArrayInstance::put(ExecState* exec, unsigned i, JSValue* value) {
   storage->m_numValuesInVector = newNumValuesInVector;
 
   m_storage = storage;
+
+  checkConsistency();
 }
 
 bool ArrayInstance::deleteProperty(ExecState* exec,
@@ -325,6 +345,8 @@ bool ArrayInstance::deleteProperty(ExecState* exec,
 }
 
 bool ArrayInstance::deleteProperty(ExecState* exec, unsigned i) {
+  checkConsistency();
+
   ArrayStorage* storage = m_storage;
 
   if (i < m_vectorLength) {
@@ -332,6 +354,7 @@ bool ArrayInstance::deleteProperty(ExecState* exec, unsigned i) {
     bool hadValue = valueSlot;
     valueSlot = 0;
     storage->m_numValuesInVector -= hadValue;
+    checkConsistency();
     return hadValue;
   }
 
@@ -340,10 +363,13 @@ bool ArrayInstance::deleteProperty(ExecState* exec, unsigned i) {
       SparseArrayValueMap::iterator it = map->find(i);
       if (it != map->end()) {
         map->remove(it);
+        checkConsistency();
         return true;
       }
     }
   }
+
+  checkConsistency();
 
   if (i > maxArrayIndex)
     return deleteProperty(exec, Identifier::from(i));
@@ -354,7 +380,8 @@ bool ArrayInstance::deleteProperty(ExecState* exec, unsigned i) {
 void ArrayInstance::getPropertyNames(ExecState* exec,
                                      PropertyNameArray& propertyNames) {
   // FIXME: Filling PropertyNameArray with an identifier for every integer
-  // is incredibly inefficient for large arrays. We need a different approach.
+  // is incredibly inefficient for large arrays. We need a different approach,
+  // which almost certainly means a different structure for PropertyNameArray.
 
   ArrayStorage* storage = m_storage;
 
@@ -400,6 +427,8 @@ bool ArrayInstance::increaseVectorLength(unsigned newLength) {
 }
 
 void ArrayInstance::setLength(unsigned newLength) {
+  checkConsistency();
+
   ArrayStorage* storage = m_storage;
 
   unsigned length = m_length;
@@ -428,6 +457,8 @@ void ArrayInstance::setLength(unsigned newLength) {
   }
 
   m_length = newLength;
+
+  checkConsistency();
 }
 
 void ArrayInstance::mark() {
@@ -452,11 +483,11 @@ void ArrayInstance::mark() {
   }
 }
 
+typedef std::pair<JSValue*, UString> ArrayQSortPair;
+
 static int compareByStringPairForQSort(const void* a, const void* b) {
-  const std::pair<JSValue*, UString>* va =
-      static_cast<const std::pair<JSValue*, UString>*>(a);
-  const std::pair<JSValue*, UString>* vb =
-      static_cast<const std::pair<JSValue*, UString>*>(b);
+  const ArrayQSortPair* va = static_cast<const ArrayQSortPair*>(a);
+  const ArrayQSortPair* vb = static_cast<const ArrayQSortPair*>(b);
   return compare(va->second, vb->second);
 }
 
@@ -479,7 +510,7 @@ void ArrayInstance::sort(ExecState* exec) {
   // random or otherwise changing results, effectively making compare function
   // inconsistent.
 
-  Vector<std::pair<JSValue*, UString>> values(lengthNotIncludingUndefined);
+  Vector<ArrayQSortPair> values(lengthNotIncludingUndefined);
   if (!values.begin()) {
     exec->setException(Error::create(exec, GeneralError, "Out of memory"));
     return;
@@ -489,8 +520,18 @@ void ArrayInstance::sort(ExecState* exec) {
     JSValue* value = m_storage->m_vector[i];
     ASSERT(!value->isUndefined());
     values[i].first = value;
-    values[i].second = value->toString(exec);
   }
+
+  // FIXME: While calling these toString functions, the array could be mutated.
+  // In that case, objects pointed to by values in this vector might get
+  // garbage-collected!
+
+  // FIXME: The following loop continues to call toString on subsequent values
+  // even after
+  // a toString call raises an exception.
+
+  for (size_t i = 0; i < lengthNotIncludingUndefined; i++)
+    values[i].second = values[i].first->toString(exec);
 
   if (exec->hadException())
     return;
@@ -500,17 +541,24 @@ void ArrayInstance::sort(ExecState* exec) {
 // than O(N log N).
 
 #if HAVE(MERGESORT)
-  mergesort(values.begin(), values.size(), sizeof(std::pair<JSValue*, UString>),
+  mergesort(values.begin(), values.size(), sizeof(ArrayQSortPair),
             compareByStringPairForQSort);
 #else
-  // FIXME: QSort may not be stable in some implementations. ECMAScript-262 does
-  // not require this, but in practice, browsers perform stable sort.
-  qsort(values.begin(), values.size(), sizeof(std::pair<JSValue*, UString>),
+  // FIXME: The qsort library function is likely to not be a stable sort.
+  // ECMAScript-262 does not specify a stable sort, but in practice, browsers
+  // perform a stable sort.
+  qsort(values.begin(), values.size(), sizeof(ArrayQSortPair),
         compareByStringPairForQSort);
 #endif
 
+  // FIXME: If the toString function changed the length of the array, this might
+  // be
+  // modifying the vector incorrectly.
+
   for (size_t i = 0; i < lengthNotIncludingUndefined; i++)
     m_storage->m_vector[i] = values[i].first;
+
+  checkConsistency(SortConsistencyCheck);
 }
 
 struct AVLTreeNodeForArrayCompare {
@@ -590,6 +638,11 @@ struct AVLTreeAbstractorForArrayCompare {
 };
 
 void ArrayInstance::sort(ExecState* exec, JSObject* compareFunction) {
+  checkConsistency();
+
+  // FIXME: This ignores exceptions raised in the compare function or in
+  // toNumber.
+
   // The maximum tree depth is compiled in - but the caller is clearly up to no
   // good
   // if a larger array is passed.
@@ -615,6 +668,10 @@ void ArrayInstance::sort(ExecState* exec, JSObject* compareFunction) {
     exec->setException(Error::create(exec, GeneralError, "Out of memory"));
     return;
   }
+
+  // FIXME: If the compare function modifies the array, the vector, map, etc.
+  // could be modified
+  // right out from under us while we're building the tree here.
 
   unsigned numDefined = 0;
   unsigned numUndefined = 0;
@@ -664,6 +721,10 @@ void ArrayInstance::sort(ExecState* exec, JSObject* compareFunction) {
 
   ASSERT(tree.abstractor().m_nodes.size() >= numDefined);
 
+  // FIXME: If the compare function changed the length of the array, the
+  // following might be
+  // modifying the vector incorrectly.
+
   // Copy the values back into m_storage.
   AVLTree<AVLTreeAbstractorForArrayCompare, 44>::Iterator iter;
   iter.start_iter_least(tree);
@@ -679,9 +740,15 @@ void ArrayInstance::sort(ExecState* exec, JSObject* compareFunction) {
   // Ensure that unused values in the vector are zeroed out.
   for (unsigned i = newUsedVectorLength; i < usedVectorLength; ++i)
     m_storage->m_vector[i] = 0;
+
+  m_storage->m_numValuesInVector = newUsedVectorLength;
+
+  checkConsistency(SortConsistencyCheck);
 }
 
 unsigned ArrayInstance::compactForSorting() {
+  checkConsistency();
+
   ArrayStorage* storage = m_storage;
 
   unsigned usedVectorLength = min(m_length, m_vectorLength);
@@ -726,6 +793,10 @@ unsigned ArrayInstance::compactForSorting() {
   for (unsigned i = newUsedVectorLength; i < usedVectorLength; ++i)
     storage->m_vector[i] = 0;
 
+  storage->m_numValuesInVector = newUsedVectorLength;
+
+  checkConsistency(SortConsistencyCheck);
+
   return numDefined;
 }
 
@@ -736,4 +807,43 @@ void* ArrayInstance::lazyCreationData() {
 void ArrayInstance::setLazyCreationData(void* d) {
   m_storage->lazyCreationData = d;
 }
+
+#if CHECK_ARRAY_CONSISTENCY
+
+void ArrayInstance::checkConsistency(ConsistencyCheckType type) {
+  ASSERT(m_storage);
+  if (type == SortConsistencyCheck)
+    ASSERT(!m_storage->m_sparseValueMap);
+
+  unsigned numValuesInVector = 0;
+  for (unsigned i = 0; i < m_vectorLength; ++i) {
+    if (JSValue* value = m_storage->m_vector[i]) {
+      ASSERT(i < m_length);
+      if (type != DestructorConsistencyCheck)
+        value->type();  // Likely to crash if the object was deallocated.
+      ++numValuesInVector;
+    } else {
+      if (type == SortConsistencyCheck)
+        ASSERT(i >= m_storage->m_numValuesInVector);
+    }
+  }
+  ASSERT(numValuesInVector == m_storage->m_numValuesInVector);
+
+  if (m_storage->m_sparseValueMap) {
+    SparseArrayValueMap::iterator end = m_storage->m_sparseValueMap->end();
+    for (SparseArrayValueMap::iterator it =
+             m_storage->m_sparseValueMap->begin();
+         it != end; ++it) {
+      unsigned index = it->first;
+      ASSERT(index < m_length);
+      ASSERT(index >= m_vectorLength);
+      ASSERT(index <= maxArrayIndex);
+      ASSERT(it->second);
+      if (type != DestructorConsistencyCheck)
+        it->second->type();  // Likely to crash if the object was deallocated.
+    }
+  }
+}
+
+#endif
 }
