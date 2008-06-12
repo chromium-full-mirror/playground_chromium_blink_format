@@ -192,7 +192,8 @@ class CodeGenerator {
   RegisterID* emitNode(Node* n) { return emitNode(0, n); }
 
   ALWAYS_INLINE bool leftHandSideNeedsCopy(bool rightHasAssignments) {
-    return m_codeBlock->needsFullScopeChain || rightHasAssignments;
+    return m_codeType != FunctionCode || m_codeBlock->needsFullScopeChain ||
+           rightHasAssignments;
   }
 
   ALWAYS_INLINE PassRefPtr<RegisterID> emitNodeForLeftHandSide(
