@@ -25,12 +25,14 @@
 
 #include <string.h>
 #include <wtf/HashCountedSet.h>
+#include <wtf/HashSet.h>
 
 namespace KJS {
 
+class CollectorBlock;
 class JSCell;
 class JSValue;
-class CollectorBlock;
+class List;
 
 class Collector {
  public:
@@ -79,6 +81,12 @@ class Collector {
 
   static void markStackObjectsConservatively(void* start, void* end);
 
+  static HashSet<List*>& markListSet() {
+    if (!m_markListSet)
+      m_markListSet = new HashSet<List*>;
+    return *m_markListSet;
+  }
+
  private:
   template <Collector::HeapType heapType>
   static void* heapAllocate(size_t s);
@@ -100,6 +108,8 @@ class Collector {
 
   static size_t mainThreadOnlyObjectCount;
   static bool memoryFull;
+
+  static HashSet<List*>* m_markListSet;
 };
 
 // tunable parameters

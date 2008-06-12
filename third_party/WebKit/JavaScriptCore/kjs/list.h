@@ -34,7 +34,8 @@ class List;
 
 class List : Noncopyable {
  private:
-  typedef Vector<JSValue*, 8> VectorType;
+  static const unsigned inlineCapacity = 8;
+  typedef Vector<JSValue*, inlineCapacity> VectorType;
   typedef HashSet<List*> ListSet;
 
  public:
@@ -44,7 +45,7 @@ class List : Noncopyable {
   // Constructor for a read-write list, to which you may append values.
   // FIXME: Remove all clients of this API, then remove this API.
   List()
-      : m_isInMarkSet(false)
+      : m_markSet(0)
 #ifndef NDEBUG
         ,
         m_isReadOnly(false)
@@ -52,7 +53,7 @@ class List : Noncopyable {
   {
     m_bufferSlot = m_vector.dataSlot();
     m_offset = 0;
-    m_size = m_vector.size();
+    m_size = 0;
   }
 
   // Constructor for a read-only list whose data has already been allocated
@@ -61,7 +62,7 @@ class List : Noncopyable {
       : m_bufferSlot(bufferSlot),
         m_offset(offset),
         m_size(size),
-        m_isInMarkSet(false)
+        m_markSet(0)
 #ifndef NDEBUG
         ,
         m_isReadOnly(true)
@@ -70,8 +71,8 @@ class List : Noncopyable {
   }
 
   ~List() {
-    if (m_isInMarkSet)
-      markSet().remove(this);
+    if (m_markSet)
+      m_markSet->remove(this);
   }
 
   size_t size() const { return m_size; }
@@ -93,15 +94,13 @@ class List : Noncopyable {
   void append(JSValue* v) {
     ASSERT(!m_isReadOnly);
 
-    if (m_vector.size() < m_vector.capacity()) {
+    if (m_size < inlineCapacity) {
       m_vector.uncheckedAppend(v);
       ++m_size;
     } else {
-      // Putting the slow "expand and append" case all in one
-      // function measurably improves the performance of the fast
-      // "just append" case.
-      expandAndAppend(v);
-      m_bufferSlot = m_vector.dataSlot();
+      // Putting this case all in one function measurably improves
+      // the performance of the fast "just append to inline buffer" case.
+      slowAppend(v);
       ++m_size;
     }
   }
@@ -114,17 +113,10 @@ class List : Noncopyable {
   const_iterator begin() const { return buffer(); }
   const_iterator end() const { return buffer() + m_size; }
 
-  static void markProtectedLists() {
-    if (!markSet().size())
-      return;
-    markProtectedListsSlowCase();
-  }
+  static void markLists(ListSet&);
 
  private:
-  static ListSet& markSet();
-  static void markProtectedListsSlowCase();
-
-  void expandAndAppend(JSValue*);
+  void slowAppend(JSValue*);
 
   JSValue** buffer() const { return *m_bufferSlot + m_offset; }
 
@@ -133,7 +125,7 @@ class List : Noncopyable {
   size_t m_size;
 
   VectorType m_vector;
-  bool m_isInMarkSet;
+  ListSet* m_markSet;
 #ifndef NDEBUG
   bool m_isReadOnly;
 #endif
