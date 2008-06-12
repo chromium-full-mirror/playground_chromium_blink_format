@@ -165,6 +165,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   void handleAsynchronousMethodCheckResult();
 
+  String accessControlOrigin() const;
+
   void genericError();
   void networkError();
   void abortError();

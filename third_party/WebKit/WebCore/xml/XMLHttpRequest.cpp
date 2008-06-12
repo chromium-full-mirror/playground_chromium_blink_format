@@ -468,6 +468,13 @@ void XMLHttpRequest::sameOriginRequest(const String& body,
     request.addHTTPHeaderFields(m_requestHeaders);
 }
 
+String XMLHttpRequest::accessControlOrigin() const {
+  String accessControlOrigin = m_doc->securityOrigin()->toString();
+  if (accessControlOrigin.isEmpty())
+    return "null";
+  return accessControlOrigin;
+}
+
 void XMLHttpRequest::crossSiteAccessRequest(const String& body,
                                             ResourceRequest& request,
                                             ExceptionCode& ec) {
@@ -475,11 +482,11 @@ void XMLHttpRequest::crossSiteAccessRequest(const String& body,
   url.setUser(String());
   url.setPass(String());
 
-  String accessControlOrigin = m_doc->securityOrigin()->toString();
+  String origin = accessControlOrigin();
 
   request.setURL(url);
   request.setHTTPMethod(m_method);
-  request.setHTTPHeaderField("Access-Control-Origin", accessControlOrigin);
+  request.setHTTPHeaderField("Access-Control-Origin", origin);
 
   if (m_method == "GET")
     return;
@@ -488,8 +495,7 @@ void XMLHttpRequest::crossSiteAccessRequest(const String& body,
   ResourceRequest preflightRequest;
   preflightRequest.setURL(url);
   preflightRequest.setHTTPMethod("OPTIONS");
-  preflightRequest.setHTTPHeaderField("Access-Control-Origin",
-                                      accessControlOrigin);
+  preflightRequest.setHTTPHeaderField("Access-Control-Origin", origin);
 
   if (m_async) {
     loadRequestAsynchronously(preflightRequest);
@@ -510,12 +516,12 @@ void XMLHttpRequest::handleAsynchronousMethodCheckResult() {
   url.setUser(String());
   url.setPass(String());
 
-  String accessControlOrigin = m_doc->securityOrigin()->toString();
+  String origin = accessControlOrigin();
 
   ResourceRequest request;
   request.setURL(url);
   request.setHTTPMethod(m_method);
-  request.setHTTPHeaderField("Access-Control-Origin", accessControlOrigin);
+  request.setHTTPHeaderField("Access-Control-Origin", origin);
 
   loadRequestAsynchronously(request);
 }
