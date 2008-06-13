@@ -1041,6 +1041,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyWebkitMarginStart:
     case CSSPropertyWebkitMarquee:
     case CSSPropertyWebkitMarqueeSpeed:
+    case CSSPropertyWebkitMask:
     case CSSPropertyWebkitPaddingStart:
     case CSSPropertyWebkitTextStroke:
     case CSSPropertyWebkitTransform:
@@ -1055,6 +1056,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       // FIXME: The above are unimplemented.
       break;
 #if ENABLE(SVG)
+    // FIXME: This default case ruins the point of using an enum for
+    // properties -- it prevents us from getting a warning when we
+    // forget to list a property above.
     default:
       return getSVGPropertyCSSValue(propertyID, DoNotUpdateLayout);
 #endif
