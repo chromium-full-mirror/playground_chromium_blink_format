@@ -142,12 +142,34 @@ void ProfileNode::stopProfiling() {
   m_visibleSelfTime = m_actualSelfTime;
 }
 
-ProfileNode* ProfileNode::traverseNextNode() const {
+ProfileNode* ProfileNode::traverseNextNodePostOrder() const {
   ProfileNode* next = m_nextSibling;
   if (!next)
     return m_parent;
   while (ProfileNode* firstChild = next->firstChild())
     next = firstChild;
+  return next;
+}
+
+ProfileNode* ProfileNode::traverseNextNodePreOrder() const {
+  if (m_children.size())
+    return m_children[0].get();
+
+  if (m_nextSibling)
+    return m_nextSibling;
+
+  ProfileNode* nextParent = m_parent;
+  if (!nextParent)
+    return 0;
+
+  ProfileNode* next;
+  for (next = m_parent->nextSibling(); !next;
+       next = nextParent->nextSibling()) {
+    nextParent = nextParent->parent();
+    if (!nextParent)
+      return 0;
+  }
+
   return next;
 }
 
@@ -157,12 +179,18 @@ void ProfileNode::sort(bool comparator(const RefPtr<ProfileNode>&,
   resetChildrensSiblings();
 }
 
-void ProfileNode::setTreeVisible(bool visible) {
-  m_visible = visible;
+void ProfileNode::setTreeVisible(ProfileNode* node, bool visible) {
+  ProfileNode* nodeParent = node->parent();
+  ProfileNode* nodeSibling = node->nextSibling();
+  node->setParent(0);
+  node->setNextSibling(0);
 
-  for (StackIterator currentChild = m_children.begin();
-       currentChild != m_children.end(); ++currentChild)
-    (*currentChild)->setTreeVisible(visible);
+  for (ProfileNode* currentNode = node; currentNode;
+       currentNode = currentNode->traverseNextNodePreOrder())
+    currentNode->setVisible(visible);
+
+  node->setParent(nodeParent);
+  node->setNextSibling(nodeSibling);
 }
 
 void ProfileNode::focus(const CallIdentifier& callIdentifier,
@@ -189,22 +217,12 @@ void ProfileNode::focus(const CallIdentifier& callIdentifier,
   }
 }
 
-double ProfileNode::exclude(const CallIdentifier& callIdentifier) {
-  if (m_callIdentifier == callIdentifier) {
-    m_visible = false;
+void ProfileNode::exclude(const CallIdentifier& callIdentifier) {
+  if (m_visible && m_callIdentifier == callIdentifier) {
+    setTreeVisible(this, false);
 
-    for (StackIterator currentChild = m_children.begin();
-         currentChild != m_children.end(); ++currentChild)
-      (*currentChild)->setTreeVisible(false);
-
-    return m_visibleTotalTime;
+    m_parent->setVisibleSelfTime(m_parent->selfTime() + m_visibleTotalTime);
   }
-
-  for (StackIterator currentChild = m_children.begin();
-       currentChild != m_children.end(); ++currentChild)
-    m_visibleSelfTime += (*currentChild)->exclude(callIdentifier);
-
-  return 0;
 }
 
 void ProfileNode::restore() {

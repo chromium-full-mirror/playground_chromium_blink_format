@@ -93,6 +93,8 @@ class ProfileNode : public RefCounted<ProfileNode> {
     m_actualSelfTime = time;
     m_visibleSelfTime = time;
   }
+  void setActualSelfTime(double time) { m_actualSelfTime = time; }
+  void setVisibleSelfTime(double time) { m_visibleSelfTime = time; }
   double totalPercent() const {
     return (m_visibleTotalTime / (m_head ? m_head->totalTime() : totalTime())) *
            100.0;
@@ -112,9 +114,10 @@ class ProfileNode : public RefCounted<ProfileNode> {
   bool visible() const { return m_visible; }
   void setVisible(bool visible) { m_visible = visible; }
 
-  void setTreeVisible(bool visible);
+  static void setTreeVisible(ProfileNode*, bool visible);
 
-  ProfileNode* traverseNextNode() const;
+  ProfileNode* traverseNextNodePostOrder() const;
+  ProfileNode* traverseNextNodePreOrder() const;
   void sort(bool (*)(const RefPtr<ProfileNode>&, const RefPtr<ProfileNode>&));
   static void sortTotalTimeDescending(ProfileNode* n) {
     n->sort(totalTimeDescendingComparator);
@@ -142,7 +145,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
   }
 
   void focus(const CallIdentifier&, bool forceVisible = false);
-  double exclude(const CallIdentifier&);
+  void exclude(const CallIdentifier&);
   void restore();
 
   void endAndRecordCall();
