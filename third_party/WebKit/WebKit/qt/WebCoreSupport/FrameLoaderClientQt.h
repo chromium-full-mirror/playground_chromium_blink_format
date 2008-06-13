@@ -151,11 +151,13 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
       FramePolicyFunction function,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&,
+      PassRefPtr<FormState>,
       const WebCore::String&);
   virtual void dispatchDecidePolicyForNavigationAction(
       FramePolicyFunction function,
       const WebCore::NavigationAction&,
-      const WebCore::ResourceRequest&);
+      const WebCore::ResourceRequest&,
+      PassRefPtr<FormState>);
   virtual void cancelPolicyCheck();
 
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);

@@ -219,11 +219,13 @@ class FrameLoaderClientWx : public FrameLoaderClient,
       FramePolicyFunction function,
       const NavigationAction&,
       const ResourceRequest&,
+      PassRefPtr<FormState>,
       const String&);
   virtual void dispatchDecidePolicyForNavigationAction(
       FramePolicyFunction function,
       const NavigationAction&,
-      const ResourceRequest&);
+      const ResourceRequest&,
+      PassRefPtr<FormState>);
   virtual void dispatchUnableToImplementPolicy(const ResourceError&);
 
   virtual void startDownload(const ResourceRequest&);

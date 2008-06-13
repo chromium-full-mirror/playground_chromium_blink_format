@@ -125,11 +125,13 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&,
+      WTF::PassRefPtr<WebCore::FormState>,
       const WebCore::String& frameName);
   virtual void dispatchDecidePolicyForNavigationAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
-      const WebCore::ResourceRequest&);
+      const WebCore::ResourceRequest&,
+      WTF::PassRefPtr<WebCore::FormState>);
   virtual void cancelPolicyCheck();
 
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
