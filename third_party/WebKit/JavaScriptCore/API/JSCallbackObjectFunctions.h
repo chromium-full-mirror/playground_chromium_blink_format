@@ -465,7 +465,7 @@ JSValue* JSCallbackObject<Base>::staticValueGetter(
     ExecState* exec,
     const Identifier& propertyName,
     const PropertySlot& slot) {
-  ASSERT(slot.slotBase()->inherits(&JSCallbackObject::info));
+  ASSERT(slot.slotBase()->isObject(&JSCallbackObject::info));
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   JSObjectRef thisRef = toRef(thisObj);
@@ -494,7 +494,7 @@ JSValue* JSCallbackObject<Base>::staticFunctionGetter(
     ExecState* exec,
     const Identifier& propertyName,
     const PropertySlot& slot) {
-  ASSERT(slot.slotBase()->inherits(&JSCallbackObject::info));
+  ASSERT(slot.slotBase()->isObject(&JSCallbackObject::info));
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   // Check for cached or override property.
@@ -528,7 +528,7 @@ template <class Base>
 JSValue* JSCallbackObject<Base>::callbackGetter(ExecState* exec,
                                                 const Identifier& propertyName,
                                                 const PropertySlot& slot) {
-  ASSERT(slot.slotBase()->inherits(&JSCallbackObject::info));
+  ASSERT(slot.slotBase()->isObject(&JSCallbackObject::info));
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   JSObjectRef thisRef = toRef(thisObj);

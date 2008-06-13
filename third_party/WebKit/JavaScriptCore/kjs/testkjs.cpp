@@ -373,7 +373,7 @@ static void runInteractive(GlobalObject* globalObject) {
         interpreterName, 1, line);
     free(line);
 #else
-    printf(interactivePrompt);
+    puts(interactivePrompt);
     Vector<char, 256> line;
     int c;
     while ((c = getchar()) != EOF) {

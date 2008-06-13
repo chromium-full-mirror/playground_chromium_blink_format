@@ -40,7 +40,7 @@ class PropertySlot {
  public:
   PropertySlot() { clearBase(); }
 
-  explicit PropertySlot(JSCell* base) : m_slotBase(base) {}
+  explicit PropertySlot(JSValue* base) : m_slotBase(base) {}
 
   typedef JSValue* (*GetValueFunc)(ExecState*,
                                    const Identifier&,
@@ -76,7 +76,7 @@ class PropertySlot {
     m_data.valueSlot = valueSlot;
   }
 
-  void setStaticEntry(JSCell* slotBase,
+  void setStaticEntry(JSValue* slotBase,
                       const HashEntry* staticEntry,
                       GetValueFunc getValue) {
     ASSERT(slotBase);
@@ -87,14 +87,16 @@ class PropertySlot {
     m_data.staticEntry = staticEntry;
   }
 
-  void setCustom(JSCell* slotBase, GetValueFunc getValue) {
+  void setCustom(JSValue* slotBase, GetValueFunc getValue) {
     ASSERT(slotBase);
     ASSERT(getValue);
     m_getValue = getValue;
     m_slotBase = slotBase;
   }
 
-  void setCustomIndex(JSCell* slotBase, unsigned index, GetValueFunc getValue) {
+  void setCustomIndex(JSValue* slotBase,
+                      unsigned index,
+                      GetValueFunc getValue) {
     ASSERT(slotBase);
     ASSERT(getValue);
     m_getValue = getValue;
@@ -102,7 +104,7 @@ class PropertySlot {
     m_data.index = index;
   }
 
-  void setCustomNumeric(JSCell* slotBase, GetValueNumericFunc getValue) {
+  void setCustomNumeric(JSValue* slotBase, GetValueNumericFunc getValue) {
     ASSERT(slotBase);
     ASSERT(getValue);
     m_slotBase = slotBase;
@@ -121,9 +123,12 @@ class PropertySlot {
     m_getValue = undefinedGetter;
   }
 
-  JSObject* slotBase() const;
+  JSValue* slotBase() const {
+    ASSERT(m_slotBase);
+    return m_slotBase;
+  }
 
-  void setBase(JSCell* base) {
+  void setBase(JSValue* base) {
     ASSERT(m_slotBase);
     ASSERT(base);
     m_slotBase = base;
@@ -148,7 +153,7 @@ class PropertySlot {
 
   GetValueFunc m_getValue;
 
-  JSCell* m_slotBase;
+  JSValue* m_slotBase;
   union {
     JSObject* getterFunc;
     JSValue** valueSlot;

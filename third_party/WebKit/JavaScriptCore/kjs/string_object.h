@@ -1,7 +1,7 @@
 // -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
+ *  Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,9 +32,10 @@ namespace KJS {
 
 class StringInstance : public JSWrapperObject {
  public:
-  StringInstance(JSObject* proto);
-  StringInstance(JSObject* proto, StringImp*);
-  StringInstance(JSObject* proto, const UString&);
+  StringInstance(JSObject* prototype);
+  StringInstance(JSObject* prototype, const UString&);
+
+  static StringInstance* create(ExecState*, StringImp*);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*,
@@ -42,7 +43,7 @@ class StringInstance : public JSWrapperObject {
                                   PropertySlot&);
 
   virtual void put(ExecState* exec, const Identifier& propertyName, JSValue*);
-  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -52,15 +53,8 @@ class StringInstance : public JSWrapperObject {
     return static_cast<StringImp*>(JSWrapperObject::internalValue());
   }
 
- private:
-  bool inlineGetOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
-
-  static JSValue* lengthGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
-  static JSValue* indexGetter(ExecState*,
-                              const Identifier&,
-                              const PropertySlot&);
+ protected:
+  StringInstance(JSObject* prototype, StringImp*);
 };
 
 // WebCore uses this to make style.filter undetectable
@@ -154,7 +148,7 @@ class StringObjectImp : public InternalFunctionImp {
 class StringObjectFuncImp : public InternalFunctionImp {
  public:
   StringObjectFuncImp(ExecState*, FunctionPrototype*, const Identifier&);
-  virtual JSValue* callAsFunction(ExecState* exec,
+  virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
 };
