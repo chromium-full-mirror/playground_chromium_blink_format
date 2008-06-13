@@ -269,6 +269,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
     FramePolicyFunction policyFunction,
     const NavigationAction&,
     const ResourceRequest&,
+    PassRefPtr<FormState>,
     const String&) {
   ASSERT(policyFunction);
   if (!policyFunction)
@@ -281,7 +282,8 @@ void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
 void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
     FramePolicyFunction policyFunction,
     const NavigationAction& action,
-    const ResourceRequest& resourceRequest) {
+    const ResourceRequest& resourceRequest,
+    PassRefPtr<FormState>) {
   ASSERT(policyFunction);
   if (!policyFunction)
     return;

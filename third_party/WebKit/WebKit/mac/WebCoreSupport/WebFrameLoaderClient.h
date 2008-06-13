@@ -141,11 +141,13 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&,
+      PassRefPtr<WebCore::FormState>,
       const WebCore::String& frameName);
   virtual void dispatchDecidePolicyForNavigationAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
-      const WebCore::ResourceRequest&);
+      const WebCore::ResourceRequest&,
+      PassRefPtr<WebCore::FormState>);
   virtual void cancelPolicyCheck();
 
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
@@ -265,7 +267,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   RetainPtr<WebFramePolicyListener> setUpPolicyListener(
       WebCore::FramePolicyFunction);
 
-  NSDictionary* actionDictionary(const WebCore::NavigationAction&) const;
+  NSDictionary* actionDictionary(const WebCore::NavigationAction&,
+                                 PassRefPtr<WebCore::FormState>) const;
 
   virtual bool canCachePage() const;
 

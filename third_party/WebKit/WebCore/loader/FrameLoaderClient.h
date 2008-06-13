@@ -149,11 +149,13 @@ class FrameLoaderClient {
       FramePolicyFunction,
       const NavigationAction&,
       const ResourceRequest&,
+      PassRefPtr<FormState>,
       const String& frameName) = 0;
   virtual void dispatchDecidePolicyForNavigationAction(
       FramePolicyFunction,
       const NavigationAction&,
-      const ResourceRequest&) = 0;
+      const ResourceRequest&,
+      PassRefPtr<FormState>) = 0;
   virtual void cancelPolicyCheck() = 0;
 
   virtual void dispatchUnableToImplementPolicy(const ResourceError&) = 0;

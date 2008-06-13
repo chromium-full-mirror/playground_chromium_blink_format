@@ -233,12 +233,13 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void dispatchDecidePolicyForNewWindowAction(FramePolicyFunction,
                                                       const NavigationAction&,
                                                       const ResourceRequest&,
+                                                      PassRefPtr<FormState>,
                                                       const String& frameName) {
   }
   virtual void dispatchDecidePolicyForNavigationAction(FramePolicyFunction,
                                                        const NavigationAction&,
-                                                       const ResourceRequest&) {
-  }
+                                                       const ResourceRequest&,
+                                                       PassRefPtr<FormState>) {}
   virtual void cancelPolicyCheck() {}
 
   virtual void dispatchUnableToImplementPolicy(const ResourceError&) {}

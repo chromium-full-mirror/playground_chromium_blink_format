@@ -832,6 +832,7 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
     FramePolicyFunction function,
     const WebCore::NavigationAction& action,
     const WebCore::ResourceRequest& request,
+    PassRefPtr<WebCore::FormState>,
     const WebCore::String&) {
   Q_ASSERT(!m_policyFunction);
   Q_ASSERT(m_webFrame);
@@ -857,7 +858,8 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
 void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
     FramePolicyFunction function,
     const WebCore::NavigationAction& action,
-    const WebCore::ResourceRequest& request) {
+    const WebCore::ResourceRequest& request,
+    PassRefPtr<WebCore::FormState>) {
   Q_ASSERT(!m_policyFunction);
   Q_ASSERT(m_webFrame);
   m_policyFunction = function;

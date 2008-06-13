@@ -609,6 +609,7 @@ void FrameLoaderClientWx::dispatchDecidePolicyForNewWindowAction(
     FramePolicyFunction function,
     const NavigationAction&,
     const ResourceRequest&,
+    PassRefPtr<FormState>,
     const String&) {
   if (!m_frame)
     return;
@@ -620,7 +621,8 @@ void FrameLoaderClientWx::dispatchDecidePolicyForNewWindowAction(
 void FrameLoaderClientWx::dispatchDecidePolicyForNavigationAction(
     FramePolicyFunction function,
     const NavigationAction& action,
-    const ResourceRequest& request) {
+    const ResourceRequest& request,
+    PassRefPtr<FormState>) {
   if (!m_frame)
     return;
 

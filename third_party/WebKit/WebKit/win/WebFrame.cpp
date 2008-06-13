@@ -1310,7 +1310,8 @@ void WebFrame::dispatchDecidePolicyForNewWindowAction(
     FramePolicyFunction function,
     const NavigationAction& action,
     const ResourceRequest& request,
-    const String& frameName) {
+    const String& frameName,
+    PassRefPtr<FormState> formState) {
   Frame* coreFrame = core(this);
   ASSERT(coreFrame);
 
@@ -1321,7 +1322,8 @@ void WebFrame::dispatchDecidePolicyForNewWindowAction(
   COMPtr<IWebURLRequest> urlRequest(
       AdoptCOM, WebMutableURLRequest::createInstance(request));
   COMPtr<WebActionPropertyBag> actionInformation(
-      AdoptCOM, WebActionPropertyBag::createInstance(action, coreFrame));
+      AdoptCOM,
+      WebActionPropertyBag::createInstance(action, coreFrame, formState));
 
   if (SUCCEEDED(policyDelegate->decidePolicyForNewWindowAction(
           d->webView, actionInformation.get(), urlRequest.get(),
@@ -1334,7 +1336,8 @@ void WebFrame::dispatchDecidePolicyForNewWindowAction(
 void WebFrame::dispatchDecidePolicyForNavigationAction(
     FramePolicyFunction function,
     const NavigationAction& action,
-    const ResourceRequest& request) {
+    const ResourceRequest& request,
+    PassRefPtr<FormState> formState) {
   Frame* coreFrame = core(this);
   ASSERT(coreFrame);
 
@@ -1345,7 +1348,8 @@ void WebFrame::dispatchDecidePolicyForNavigationAction(
   COMPtr<IWebURLRequest> urlRequest(
       AdoptCOM, WebMutableURLRequest::createInstance(request));
   COMPtr<WebActionPropertyBag> actionInformation(
-      AdoptCOM, WebActionPropertyBag::createInstance(action, coreFrame));
+      AdoptCOM,
+      WebActionPropertyBag::createInstance(action, coreFrame, formState));
 
   if (SUCCEEDED(policyDelegate->decidePolicyForNavigationAction(
           d->webView, actionInformation.get(), urlRequest.get(), this,
