@@ -84,6 +84,13 @@ class PluginStream : public RefCounted<PluginStream>,
 
   static NPP ownerForStream(NPStream*);
 
+  // NetscapePlugInStreamLoaderClient
+  virtual void didReceiveResponse(NetscapePlugInStreamLoader*,
+                                  const ResourceResponse&);
+  virtual void didReceiveData(NetscapePlugInStreamLoader*, const char*, int);
+  virtual void didFail(NetscapePlugInStreamLoader*, const ResourceError&);
+  virtual void didFinishLoading(NetscapePlugInStreamLoader*);
+
  private:
   PluginStream(PluginStreamClient*,
                Frame*,
@@ -93,13 +100,6 @@ class PluginStream : public RefCounted<PluginStream>,
                const NPPluginFuncs*,
                NPP instance,
                const PluginQuirkSet&);
-
-  // NetscapePlugInStreamLoaderClient
-  virtual void didReceiveResponse(NetscapePlugInStreamLoader*,
-                                  const ResourceResponse&);
-  virtual void didReceiveData(NetscapePlugInStreamLoader*, const char*, int);
-  virtual void didFail(NetscapePlugInStreamLoader*, const ResourceError&);
-  virtual void didFinishLoading(NetscapePlugInStreamLoader*);
 
   void deliverData();
   void destroyStream(NPReason);
