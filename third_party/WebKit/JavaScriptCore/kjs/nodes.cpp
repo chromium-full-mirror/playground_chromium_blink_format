@@ -400,7 +400,7 @@ RegisterID* PropertyListNode::emitCode(CodeGenerator& generator,
 RegisterID* BracketAccessorNode::emitCode(CodeGenerator& generator,
                                           RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
-      m_base.get(), m_subscriptHasAssignments);
+      m_base.get(), m_subscriptHasAssignments, m_subscript.get()->isConstant());
   RegisterID* property = generator.emitNode(m_subscript.get());
 
   return generator.emitGetByVal(generator.finalDestination(dst), base.get(),
@@ -1126,8 +1126,8 @@ RegisterID* ReadModifyResolveNode::emitCode(CodeGenerator& generator,
           generator, generator.finalDestination(dst), local, src2, m_operator);
     }
 
-    if (generator.leftHandSideNeedsCopy(m_rightHasAssignments) &&
-        !m_right.get()->isNumber()) {
+    if (generator.leftHandSideNeedsCopy(m_rightHasAssignments,
+                                        m_right.get()->isConstant())) {
       RefPtr<RegisterID> result = generator.newTemporary();
       generator.emitMove(result.get(), local);
       RegisterID* src2 = generator.emitNode(m_right.get());
@@ -1199,8 +1199,8 @@ RegisterID* AssignResolveNode::emitCode(CodeGenerator& generator,
 // -----------------------------------
 
 RegisterID* AssignDotNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
-  RefPtr<RegisterID> base =
-      generator.emitNodeForLeftHandSide(m_base.get(), m_rightHasAssignments);
+  RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
+      m_base.get(), m_rightHasAssignments, m_right.get()->isConstant());
   RefPtr<RegisterID> value = generator.destinationForAssignResult(dst);
   RegisterID* result = generator.emitNode(value.get(), m_right.get());
   generator.emitPutById(base.get(), m_ident, result);
@@ -1212,8 +1212,8 @@ RegisterID* AssignDotNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
 RegisterID* ReadModifyDotNode::emitCode(CodeGenerator& generator,
                                         RegisterID* dst) {
-  RefPtr<RegisterID> base =
-      generator.emitNodeForLeftHandSide(m_base.get(), m_rightHasAssignments);
+  RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
+      m_base.get(), m_rightHasAssignments, m_right.get()->isConstant());
   RefPtr<RegisterID> value = generator.emitGetById(
       generator.tempDestination(dst), base.get(), m_ident);
   RegisterID* change = generator.emitNode(m_right.get());
@@ -1237,9 +1237,10 @@ RegisterID* AssignErrorNode::emitCode(CodeGenerator& generator, RegisterID*) {
 RegisterID* AssignBracketNode::emitCode(CodeGenerator& generator,
                                         RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
-      m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments);
+      m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments,
+      m_subscript.get()->isConstant() && m_right.get()->isConstant());
   RefPtr<RegisterID> property = generator.emitNodeForLeftHandSide(
-      m_subscript.get(), m_rightHasAssignments);
+      m_subscript.get(), m_rightHasAssignments, m_right.get()->isConstant());
   RefPtr<RegisterID> value = generator.destinationForAssignResult(dst);
   RegisterID* result = generator.emitNode(value.get(), m_right.get());
   generator.emitPutByVal(base.get(), property.get(), result);
@@ -1249,9 +1250,10 @@ RegisterID* AssignBracketNode::emitCode(CodeGenerator& generator,
 RegisterID* ReadModifyBracketNode::emitCode(CodeGenerator& generator,
                                             RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
-      m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments);
+      m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments,
+      m_subscript.get()->isConstant() && m_right.get()->isConstant());
   RefPtr<RegisterID> property = generator.emitNodeForLeftHandSide(
-      m_subscript.get(), m_rightHasAssignments);
+      m_subscript.get(), m_rightHasAssignments, m_right.get()->isConstant());
 
   RefPtr<RegisterID> value = generator.emitGetByVal(
       generator.tempDestination(dst), base.get(), property.get());

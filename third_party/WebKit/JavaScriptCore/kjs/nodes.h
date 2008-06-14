@@ -199,6 +199,7 @@ class ExpressionNode : public Node {
       : Node(PlacementNewAdopt) {}
 
   virtual bool isNumber() const KJS_FAST_CALL { return false; }
+  virtual bool isConstant() const KJS_FAST_CALL { return false; }
   virtual bool isLocation() const KJS_FAST_CALL { return false; }
   virtual bool isResolveNode() const KJS_FAST_CALL { return false; }
   virtual bool isBracketAccessorNode() const KJS_FAST_CALL { return false; }
@@ -251,6 +252,7 @@ class FalseNode : public ExpressionNode {
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
+  virtual bool isConstant() const KJS_FAST_CALL { return true; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 };
@@ -261,6 +263,7 @@ class TrueNode : public ExpressionNode {
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
+  virtual bool isConstant() const KJS_FAST_CALL { return true; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 };
@@ -286,6 +289,7 @@ class NumberNode : public ExpressionNode {
   }
 
   virtual bool isNumber() const KJS_FAST_CALL { return true; }
+  virtual bool isConstant() const KJS_FAST_CALL { return true; }
   double value() const KJS_FAST_CALL { return m_double; }
   virtual void setValue(double d) KJS_FAST_CALL { m_double = d; }
 
@@ -318,6 +322,7 @@ class StringNode : public ExpressionNode {
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
+  virtual bool isConstant() const KJS_FAST_CALL { return true; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
 
