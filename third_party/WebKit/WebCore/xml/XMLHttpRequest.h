@@ -121,8 +121,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
 
-  bool urlMatchesDocumentDomain(const KURL&) const;
-
   virtual void willSendRequest(SubresourceLoader*,
                                ResourceRequest& request,
                                const ResourceResponse& redirectResponse);
