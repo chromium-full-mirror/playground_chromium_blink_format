@@ -287,8 +287,7 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
       continue;
 
     RegisterID* r0;
-    if (addVar(ident, r0, varStack[i].second & DeclarationStacks::IsConstant))
-      emitLoad(r0, jsUndefined());
+    addVar(ident, r0, varStack[i].second & DeclarationStacks::IsConstant);
   }
 
   Vector<Identifier>& parameters = functionBody->parameters();
