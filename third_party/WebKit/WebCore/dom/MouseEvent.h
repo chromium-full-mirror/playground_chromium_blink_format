@@ -1,10 +1,8 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 2001 Peter Kelly (pmk@post.com)
  * Copyright (C) 2001 Tobias Anton (anton@stud.fbi.fh-darmstadt.de)
  * Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
- * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -35,30 +33,36 @@ namespace WebCore {
 // Introduced in DOM Level 2
 class MouseEvent : public MouseRelatedEvent {
  public:
-  MouseEvent();
-  MouseEvent(const AtomicString& type,
-             bool canBubble,
-             bool cancelable,
-             AbstractView* view,
-             int detail,
-             int screenX,
-             int screenY,
-             int pageX,
-             int pageY,
-             bool ctrlKey,
-             bool altKey,
-             bool shiftKey,
-             bool metaKey,
-             unsigned short button,
-             EventTargetNode* relatedTarget,
-             Clipboard* clipboard = 0,
-             bool isSimulated = false);
+  static PassRefPtr<MouseEvent> create() { return adoptRef(new MouseEvent); }
+  static PassRefPtr<MouseEvent> create(
+      const AtomicString& type,
+      bool canBubble,
+      bool cancelable,
+      PassRefPtr<AbstractView> view,
+      int detail,
+      int screenX,
+      int screenY,
+      int pageX,
+      int pageY,
+      bool ctrlKey,
+      bool altKey,
+      bool shiftKey,
+      bool metaKey,
+      unsigned short button,
+      PassRefPtr<EventTargetNode> relatedTarget,
+      PassRefPtr<Clipboard> clipboard = 0,
+      bool isSimulated = false) {
+    return adoptRef(new MouseEvent(type, canBubble, cancelable, view, detail,
+                                   screenX, screenY, pageX, pageY, ctrlKey,
+                                   altKey, shiftKey, metaKey, button,
+                                   relatedTarget, clipboard, isSimulated));
+  }
   virtual ~MouseEvent();
 
   void initMouseEvent(const AtomicString& type,
                       bool canBubble,
                       bool cancelable,
-                      AbstractView* view,
+                      PassRefPtr<AbstractView>,
                       int detail,
                       int screenX,
                       int screenY,
@@ -69,7 +73,7 @@ class MouseEvent : public MouseRelatedEvent {
                       bool shiftKey,
                       bool metaKey,
                       unsigned short button,
-                      EventTargetNode* relatedTarget);
+                      PassRefPtr<EventTargetNode> relatedTarget);
 
   // WinIE uses 1,4,2 for left/middle/right but not for click (just for
   // mousedown/up, maybe others),
@@ -92,6 +96,25 @@ class MouseEvent : public MouseRelatedEvent {
   virtual int which() const;
 
  private:
+  MouseEvent();
+  MouseEvent(const AtomicString& type,
+             bool canBubble,
+             bool cancelable,
+             PassRefPtr<AbstractView>,
+             int detail,
+             int screenX,
+             int screenY,
+             int pageX,
+             int pageY,
+             bool ctrlKey,
+             bool altKey,
+             bool shiftKey,
+             bool metaKey,
+             unsigned short button,
+             PassRefPtr<EventTargetNode> relatedTarget,
+             PassRefPtr<Clipboard> clipboard,
+             bool isSimulated);
+
   unsigned short m_button;
   bool m_buttonDown;
   RefPtr<EventTargetNode> m_relatedTarget;

@@ -458,9 +458,9 @@ void HTMLTableElement::additionalAttributeStyleDecls(
   if ((!m_borderAttr && !m_borderColorAttr) || m_frameAttr)
     return;
 
-  MappedAttribute attr(tableborderAttr, m_borderColorAttr ? "solid" : "outset");
+  AtomicString borderValue = m_borderColorAttr ? "solid" : "outset";
   CSSMappedAttributeDeclaration* decl =
-      getMappedAttributeDecl(ePersistent, &attr);
+      getMappedAttributeDecl(ePersistent, tableborderAttr, borderValue);
   if (!decl) {
     decl = new CSSMappedAttributeDeclaration(0);
     decl->setParent(document()->elementSheet());
@@ -476,10 +476,10 @@ void HTMLTableElement::additionalAttributeStyleDecls(
     decl->setProperty(CSSPropertyBorderLeftStyle, v, false);
     decl->setProperty(CSSPropertyBorderRightStyle, v, false);
 
-    setMappedAttributeDecl(ePersistent, &attr, decl);
+    setMappedAttributeDecl(ePersistent, tableborderAttr, borderValue, decl);
     decl->setParent(0);
     decl->setNode(0);
-    decl->setMappedState(ePersistent, attr.name(), attr.value());
+    decl->setMappedState(ePersistent, tableborderAttr, borderValue);
   }
 
   results.append(decl);
@@ -517,12 +517,11 @@ void HTMLTableElement::addSharedCellBordersDecl(
     Vector<CSSMutableStyleDeclaration*>& results) {
   CellBorders borders = cellBorders();
 
-  static AtomicString cellBorderNames[] = {"none", "solid", "inset",
-                                           "solid-cols", "solid-rows"};
-  MappedAttribute attr(cellborderAttr, cellBorderNames[borders]);
-
+  static const AtomicString cellBorderNames[] = {"none", "solid", "inset",
+                                                 "solid-cols", "solid-rows"};
+  const AtomicString& cellborderValue = cellBorderNames[borders];
   CSSMappedAttributeDeclaration* decl =
-      getMappedAttributeDecl(ePersistent, &attr);
+      getMappedAttributeDecl(ePersistent, cellborderAttr, cellborderValue);
   if (!decl) {
     decl = new CSSMappedAttributeDeclaration(0);
     decl->setParent(document()->elementSheet());
@@ -568,10 +567,11 @@ void HTMLTableElement::addSharedCellBordersDecl(
         break;
     }
 
-    setMappedAttributeDecl(ePersistent, &attr, decl);
+    setMappedAttributeDecl(ePersistent, cellborderAttr,
+                           cellBorderNames[borders], decl);
     decl->setParent(0);
     decl->setNode(0);
-    decl->setMappedState(ePersistent, attr.name(), attr.value());
+    decl->setMappedState(ePersistent, cellborderAttr, cellborderValue);
   }
 
   results.append(decl);
@@ -583,9 +583,9 @@ void HTMLTableElement::addSharedCellPaddingDecl(
     return;
 
   if (!m_paddingDecl) {
-    String numericStr = String::number(m_padding);
-    MappedAttribute attr(cellpaddingAttr, numericStr);
-    m_paddingDecl = getMappedAttributeDecl(eUniversal, &attr);
+    String paddingValue = String::number(m_padding);
+    m_paddingDecl =
+        getMappedAttributeDecl(eUniversal, cellpaddingAttr, paddingValue);
     if (!m_paddingDecl) {
       m_paddingDecl = new CSSMappedAttributeDeclaration(0);
       m_paddingDecl->setParent(document()->elementSheet());
@@ -593,15 +593,16 @@ void HTMLTableElement::addSharedCellPaddingDecl(
       m_paddingDecl->setStrictParsing(
           false);  // Mapped attributes are just always quirky.
 
-      m_paddingDecl->setProperty(CSSPropertyPaddingTop, numericStr, false);
-      m_paddingDecl->setProperty(CSSPropertyPaddingRight, numericStr, false);
-      m_paddingDecl->setProperty(CSSPropertyPaddingBottom, numericStr, false);
-      m_paddingDecl->setProperty(CSSPropertyPaddingLeft, numericStr, false);
+      m_paddingDecl->setProperty(CSSPropertyPaddingTop, paddingValue, false);
+      m_paddingDecl->setProperty(CSSPropertyPaddingRight, paddingValue, false);
+      m_paddingDecl->setProperty(CSSPropertyPaddingBottom, paddingValue, false);
+      m_paddingDecl->setProperty(CSSPropertyPaddingLeft, paddingValue, false);
     }
-    setMappedAttributeDecl(eUniversal, &attr, m_paddingDecl.get());
+    setMappedAttributeDecl(eUniversal, cellpaddingAttr, paddingValue,
+                           m_paddingDecl.get());
     m_paddingDecl->setParent(0);
     m_paddingDecl->setNode(0);
-    m_paddingDecl->setMappedState(eUniversal, attr.name(), attr.value());
+    m_paddingDecl->setMappedState(eUniversal, cellpaddingAttr, paddingValue);
   }
 
   results.append(m_paddingDecl.get());
@@ -609,15 +610,13 @@ void HTMLTableElement::addSharedCellPaddingDecl(
 
 void HTMLTableElement::addSharedGroupDecls(
     bool rows,
-    Vector<CSSMutableStyleDeclaration*>& results)
-
-{
+    Vector<CSSMutableStyleDeclaration*>& results) {
   if (m_rulesAttr != GroupsRules)
     return;
 
-  MappedAttribute attr(rulesAttr, rows ? "rowgroups" : "colgroups");
+  AtomicString rulesValue = rows ? "rowgroups" : "colgroups";
   CSSMappedAttributeDeclaration* decl =
-      getMappedAttributeDecl(ePersistent, &attr);
+      getMappedAttributeDecl(ePersistent, rulesAttr, rulesValue);
   if (!decl) {
     decl = new CSSMappedAttributeDeclaration(0);
     decl->setParent(document()->elementSheet());
@@ -639,10 +638,10 @@ void HTMLTableElement::addSharedGroupDecls(
       decl->setProperty(CSSPropertyBorderRightStyle, CSSValueSolid, false);
     }
 
-    setMappedAttributeDecl(ePersistent, &attr, decl);
+    setMappedAttributeDecl(ePersistent, rulesAttr, rulesValue, decl);
     decl->setParent(0);
     decl->setNode(0);
-    decl->setMappedState(ePersistent, attr.name(), attr.value());
+    decl->setMappedState(ePersistent, rulesAttr, rulesValue);
   }
 
   results.append(decl);

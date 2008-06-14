@@ -2610,32 +2610,32 @@ DOMWindow* Document::domWindow() const {
 PassRefPtr<Event> Document::createEvent(const String& eventType,
                                         ExceptionCode& ec) {
   if (eventType == "UIEvents" || eventType == "UIEvent")
-    return new UIEvent;
+    return UIEvent::create();
   if (eventType == "MouseEvents" || eventType == "MouseEvent")
-    return new MouseEvent;
+    return MouseEvent::create();
   if (eventType == "MutationEvents" || eventType == "MutationEvent")
-    return new MutationEvent;
+    return MutationEvent::create();
   if (eventType == "KeyboardEvents" || eventType == "KeyboardEvent")
-    return new KeyboardEvent;
+    return KeyboardEvent::create();
   if (eventType == "HTMLEvents" || eventType == "Event" ||
       eventType == "Events")
-    return new Event;
+    return Event::create();
   if (eventType == "ProgressEvent")
-    return new ProgressEvent;
+    return ProgressEvent::create();
   if (eventType == "TextEvent")
-    return new TextEvent;
+    return TextEvent::create();
   if (eventType == "OverflowEvent")
-    return new OverflowEvent;
+    return OverflowEvent::create();
   if (eventType == "WheelEvent")
-    return new WheelEvent;
+    return WheelEvent::create();
 #if ENABLE(SVG)
   if (eventType == "SVGEvents")
-    return new Event;
+    return Event::create();
   if (eventType == "SVGZoomEvents")
-    return new SVGZoomEvent;
+    return SVGZoomEvent::create();
 #endif
   if (eventType == "MessageEvent")
-    return new MessageEvent;
+    return MessageEvent::create();
   ec = NOT_SUPPORTED_ERR;
   return 0;
 }
@@ -3680,7 +3680,7 @@ PassRefPtr<Attr> Document::createAttributeNS(const String& namespaceURI,
   // FIXME: Assume this is a mapped attribute, since createAttribute isn't
   // namespace-aware.  There's no harm to XML
   // documents if we're wrong.
-  return new Attr(0, this, new MappedAttribute(qName, StringImpl::empty()));
+  return new Attr(0, this, MappedAttribute::create(qName, StringImpl::empty()));
 }
 
 #if ENABLE(SVG)
@@ -3764,7 +3764,7 @@ void Document::finishedParsing() {
   setParsing(false);
 
   ExceptionCode ec = 0;
-  dispatchEvent(new Event(DOMContentLoadedEvent, true, false), ec);
+  dispatchEvent(Event::create(DOMContentLoadedEvent, true, false), ec);
 
   if (Frame* f = frame())
     f->loader()->finishedParsing();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,7 +27,6 @@
 #define StorageEvent_h
 
 #include "Event.h"
-#include <wtf/RefPtr.h>
 
 namespace WebCore {
 
@@ -35,13 +34,18 @@ class DOMWindow;
 
 class StorageEvent : public Event {
  public:
-  StorageEvent();
-  StorageEvent(const AtomicString& type,
-               const String& key,
-               const String& oldValue,
-               const String& newValue,
-               const String& uri,
-               DOMWindow* source);
+  static PassRefPtr<StorageEvent> create() {
+    return adoptRef(new StorageEvent);
+  }
+  static PassRefPtr<StorageEvent> create(const AtomicString& type,
+                                         const String& key,
+                                         const String& oldValue,
+                                         const String& newValue,
+                                         const String& uri,
+                                         PassRefPtr<DOMWindow> source) {
+    return adoptRef(
+        new StorageEvent(type, key, oldValue, newValue, uri, source));
+  }
 
   const String& key() const { return m_key; }
   const String& oldValue() const { return m_oldValue; }
@@ -56,7 +60,7 @@ class StorageEvent : public Event {
                         const String& oldValue,
                         const String& newValue,
                         const String& uri,
-                        DOMWindow* source);
+                        PassRefPtr<DOMWindow> source);
 
   // Needed once we support init<blank>EventNS
   // void initStorageEventNS(in DOMString namespaceURI, in DOMString typeArg, in
@@ -67,6 +71,14 @@ class StorageEvent : public Event {
   virtual bool isStorageEvent() const { return true; }
 
  private:
+  StorageEvent() {}
+  StorageEvent(const AtomicString& type,
+               const String& key,
+               const String& oldValue,
+               const String& newValue,
+               const String& uri,
+               PassRefPtr<DOMWindow> source);
+
   String m_key;
   String m_oldValue;
   String m_newValue;

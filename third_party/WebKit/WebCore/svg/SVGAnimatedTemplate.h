@@ -3,8 +3,6 @@
    <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -98,10 +96,6 @@ struct SVGAnimatedTypeWrapperKeyHashTraits
 template <typename BareType>
 class SVGAnimatedTemplate : public RefCounted<SVGAnimatedTemplate<BareType>> {
  public:
-  SVGAnimatedTemplate(const QualifiedName& attributeName)
-      : RefCounted<SVGAnimatedTemplate<BareType>>(0),
-        m_associatedAttributeName(attributeName) {}
-
   virtual ~SVGAnimatedTemplate() { forgetWrapper(this); }
 
   virtual BareType baseVal() const = 0;
@@ -139,24 +133,28 @@ class SVGAnimatedTemplate : public RefCounted<SVGAnimatedTemplate<BareType>> {
     return m_associatedAttributeName;
   }
 
+ protected:
+  SVGAnimatedTemplate(const QualifiedName& attributeName)
+      : m_associatedAttributeName(attributeName) {}
+
  private:
   const QualifiedName& m_associatedAttributeName;
 };
 
 template <class Type, class SVGElementSubClass>
-Type* lookupOrCreateWrapper(const SVGElementSubClass* element,
-                            const QualifiedName& domAttrName,
-                            const AtomicString& attrIdentifier) {
+PassRefPtr<Type> lookupOrCreateWrapper(const SVGElementSubClass* element,
+                                       const QualifiedName& domAttrName,
+                                       const AtomicString& attrIdentifier) {
   SVGAnimatedTypeWrapperKey key(element, attrIdentifier);
-  Type* wrapper = static_cast<Type*>(Type::wrapperCache()->get(key));
+  RefPtr<Type> wrapper = static_cast<Type*>(Type::wrapperCache()->get(key));
   if (!wrapper) {
-    wrapper = new Type(element, domAttrName);
-    Type::wrapperCache()->set(key, wrapper);
+    wrapper = Type::create(element, domAttrName);
+    Type::wrapperCache()->set(key, wrapper.get());
   }
-  return wrapper;
+  return wrapper.release();
 }
 
-// Common type definitions, to ease IDL generation...
+// Common type definitions, to ease IDL generation.
 typedef SVGAnimatedTemplate<SVGAngle*> SVGAnimatedAngle;
 typedef SVGAnimatedTemplate<bool> SVGAnimatedBoolean;
 typedef SVGAnimatedTemplate<int> SVGAnimatedEnumeration;

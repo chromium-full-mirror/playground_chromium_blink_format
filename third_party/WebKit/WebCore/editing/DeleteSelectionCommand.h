@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,21 +32,42 @@ namespace WebCore {
 
 class DeleteSelectionCommand : public CompositeEditCommand {
  public:
+  static PassRefPtr<DeleteSelectionCommand> create(
+      Document* document,
+      bool smartDelete = false,
+      bool mergeBlocksAfterDelete = true,
+      bool replace = false,
+      bool expandForSpecialElements = false) {
+    return adoptRef(new DeleteSelectionCommand(document, smartDelete,
+                                               mergeBlocksAfterDelete, replace,
+                                               expandForSpecialElements));
+  }
+  static PassRefPtr<DeleteSelectionCommand> create(
+      const Selection& selection,
+      bool smartDelete = false,
+      bool mergeBlocksAfterDelete = true,
+      bool replace = false,
+      bool expandForSpecialElements = false) {
+    return adoptRef(new DeleteSelectionCommand(selection, smartDelete,
+                                               mergeBlocksAfterDelete, replace,
+                                               expandForSpecialElements));
+  }
+
+ private:
   DeleteSelectionCommand(Document*,
-                         bool smartDelete = false,
-                         bool mergeBlocksAfterDelete = true,
-                         bool replace = false,
-                         bool expandForSpecialElements = false);
+                         bool smartDelete,
+                         bool mergeBlocksAfterDelete,
+                         bool replace,
+                         bool expandForSpecialElements);
   DeleteSelectionCommand(const Selection&,
-                         bool smartDelete = false,
-                         bool mergeBlocksAfterDelete = true,
-                         bool replace = false,
-                         bool expandForSpecialElements = false);
+                         bool smartDelete,
+                         bool mergeBlocksAfterDelete,
+                         bool replace,
+                         bool expandForSpecialElements);
 
   virtual void doApply();
   virtual EditAction editingAction() const;
 
- private:
   virtual bool preservesTypingStyle() const;
 
   void initializeStartEnd(Position&, Position&);

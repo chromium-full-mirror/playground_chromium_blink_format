@@ -31,8 +31,9 @@
 
 namespace WebCore {
 
-WrapContentsInDummySpanCommand::WrapContentsInDummySpanCommand(Element* element)
-    : EditCommand(element->document()), m_element(element) {
+WrapContentsInDummySpanCommand::WrapContentsInDummySpanCommand(
+    PassRefPtr<Element> element)
+    : SimpleEditCommand(element->document()), m_element(element) {
   ASSERT(m_element);
 }
 

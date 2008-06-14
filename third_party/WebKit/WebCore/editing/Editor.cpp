@@ -284,7 +284,8 @@ void Editor::deleteSelectionWithSmartDelete(bool smartDelete) {
   if (m_frame->selectionController()->isNone())
     return;
 
-  applyCommand(new DeleteSelectionCommand(m_frame->document(), smartDelete));
+  applyCommand(
+      DeleteSelectionCommand::create(m_frame->document(), smartDelete));
 }
 
 void Editor::pasteAsPlainTextWithPasteboard(Pasteboard* pasteboard) {
@@ -336,9 +337,9 @@ void Editor::replaceSelectionWithFragment(PassRefPtr<DocumentFragment> fragment,
   if (m_frame->selectionController()->isNone() || !fragment)
     return;
 
-  applyCommand(new ReplaceSelectionCommand(m_frame->document(), fragment,
-                                           selectReplacement, smartReplace,
-                                           matchStyle));
+  applyCommand(ReplaceSelectionCommand::create(m_frame->document(), fragment,
+                                               selectReplacement, smartReplace,
+                                               matchStyle));
   revealSelectionAfterEditingOperation();
 }
 
@@ -588,11 +589,11 @@ void Editor::decreaseSelectionListLevel() {
 }
 
 void Editor::removeFormattingAndStyle() {
-  applyCommand(new RemoveFormatCommand(m_frame->document()));
+  applyCommand(RemoveFormatCommand::create(m_frame->document()));
 }
 
-void Editor::setLastEditCommand(PassRefPtr<EditCommand> lastEditCommand) {
-  m_lastEditCommand = lastEditCommand;
+void Editor::clearLastEditCommand() {
+  m_lastEditCommand.clear();
 }
 
 // Returns whether caller should continue with "the default processing", which
@@ -610,8 +611,7 @@ bool Editor::dispatchCPPEvent(const AtomicString& eventType,
   RefPtr<Clipboard> clipboard = newGeneralClipboard(policy);
 
   ExceptionCode ec = 0;
-  RefPtr<Event> evt =
-      new ClipboardEvent(eventType, true, true, clipboard.get());
+  RefPtr<Event> evt = ClipboardEvent::create(eventType, true, true, clipboard);
   EventTargetNodeCast(target)->dispatchEvent(evt, ec, true);
   bool noDefaultProcessing = evt->defaultPrevented();
 
@@ -631,8 +631,8 @@ void Editor::applyStyle(CSSStyleDeclaration* style, EditAction editingAction) {
       break;
     case Selection::RANGE:
       if (m_frame->document() && style)
-        applyCommand(
-            new ApplyStyleCommand(m_frame->document(), style, editingAction));
+        applyCommand(ApplyStyleCommand::create(m_frame->document(), style,
+                                               editingAction));
       break;
   }
 }
@@ -651,8 +651,8 @@ void Editor::applyParagraphStyle(CSSStyleDeclaration* style,
     case Selection::RANGE:
       if (m_frame->document() && style)
         applyCommand(
-            new ApplyStyleCommand(m_frame->document(), style, editingAction,
-                                  ApplyStyleCommand::ForceBlockProperties));
+            ApplyStyleCommand::create(m_frame->document(), style, editingAction,
+                                      ApplyStyleCommand::ForceBlockProperties));
       break;
   }
 }
@@ -773,13 +773,13 @@ TriState Editor::selectionHasStyle(CSSStyleDeclaration* style) const {
   return state;
 }
 void Editor::indent() {
-  applyCommand(new IndentOutdentCommand(m_frame->document(),
-                                        IndentOutdentCommand::Indent));
+  applyCommand(IndentOutdentCommand::create(m_frame->document(),
+                                            IndentOutdentCommand::Indent));
 }
 
 void Editor::outdent() {
-  applyCommand(new IndentOutdentCommand(m_frame->document(),
-                                        IndentOutdentCommand::Outdent));
+  applyCommand(IndentOutdentCommand::create(m_frame->document(),
+                                            IndentOutdentCommand::Outdent));
 }
 
 static void dispatchEditableContentChangedEvents(const EditCommand& command) {
@@ -788,10 +788,12 @@ static void dispatchEditableContentChangedEvents(const EditCommand& command) {
   ExceptionCode ec;
   if (startRoot)
     startRoot->dispatchEvent(
-        new Event(webkitEditableContentChangedEvent, false, false), ec, true);
+        Event::create(webkitEditableContentChangedEvent, false, false), ec,
+        true);
   if (endRoot && endRoot != startRoot)
     endRoot->dispatchEvent(
-        new Event(webkitEditableContentChangedEvent, false, false), ec, true);
+        Event::create(webkitEditableContentChangedEvent, false, false), ec,
+        true);
 }
 
 void Editor::appliedEditing(PassRefPtr<EditCommand> cmd) {

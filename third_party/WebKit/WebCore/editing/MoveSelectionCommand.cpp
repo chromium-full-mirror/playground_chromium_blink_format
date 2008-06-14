@@ -42,8 +42,6 @@ MoveSelectionCommand::MoveSelectionCommand(
   ASSERT(m_fragment);
 }
 
-MoveSelectionCommand::~MoveSelectionCommand() {}
-
 void MoveSelectionCommand::doApply() {
   Selection selection = endingSelection();
   ASSERT(selection.isRange());
@@ -80,8 +78,8 @@ void MoveSelectionCommand::doApply() {
     pos = endingSelection().start();
 
   setEndingSelection(Selection(pos, endingSelection().affinity()));
-  applyCommandToComposite(new ReplaceSelectionCommand(
-      positionNode->document(), m_fragment.get(), true, m_smartMove));
+  applyCommandToComposite(ReplaceSelectionCommand::create(
+      positionNode->document(), m_fragment, true, m_smartMove));
 }
 
 EditAction MoveSelectionCommand::editingAction() const {

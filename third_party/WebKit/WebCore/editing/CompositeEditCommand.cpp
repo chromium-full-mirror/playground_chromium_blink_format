@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -98,7 +98,7 @@ void CompositeEditCommand::applyCommandToComposite(
 void CompositeEditCommand::applyStyle(CSSStyleDeclaration* style,
                                       EditAction editingAction) {
   applyCommandToComposite(
-      new ApplyStyleCommand(document(), style, editingAction));
+      ApplyStyleCommand::create(document(), style, editingAction));
 }
 
 void CompositeEditCommand::applyStyle(CSSStyleDeclaration* style,
@@ -106,30 +106,31 @@ void CompositeEditCommand::applyStyle(CSSStyleDeclaration* style,
                                       const Position& end,
                                       EditAction editingAction) {
   applyCommandToComposite(
-      new ApplyStyleCommand(document(), style, start, end, editingAction));
+      ApplyStyleCommand::create(document(), style, start, end, editingAction));
 }
 
 void CompositeEditCommand::applyStyledElement(Element* element) {
-  applyCommandToComposite(new ApplyStyleCommand(element, false));
+  applyCommandToComposite(ApplyStyleCommand::create(element, false));
 }
 
 void CompositeEditCommand::removeStyledElement(Element* element) {
-  applyCommandToComposite(new ApplyStyleCommand(element, true));
+  applyCommandToComposite(ApplyStyleCommand::create(element, true));
 }
 
 void CompositeEditCommand::insertParagraphSeparator(
     bool useDefaultParagraphElement) {
-  applyCommandToComposite(new InsertParagraphSeparatorCommand(
+  applyCommandToComposite(InsertParagraphSeparatorCommand::create(
       document(), useDefaultParagraphElement));
 }
 
 void CompositeEditCommand::insertLineBreak() {
-  applyCommandToComposite(new InsertLineBreakCommand(document()));
+  applyCommandToComposite(InsertLineBreakCommand::create(document()));
 }
 
 void CompositeEditCommand::insertNodeBefore(Node* insertChild, Node* refChild) {
   ASSERT(!refChild->hasTagName(bodyTag));
-  applyCommandToComposite(new InsertNodeBeforeCommand(insertChild, refChild));
+  applyCommandToComposite(
+      InsertNodeBeforeCommand::create(insertChild, refChild));
 }
 
 void CompositeEditCommand::insertNodeAfter(Node* insertChild, Node* refChild) {
@@ -171,7 +172,7 @@ void CompositeEditCommand::insertNodeAt(Node* insertChild,
 
 void CompositeEditCommand::appendNode(Node* newChild, Node* parent) {
   ASSERT(canHaveChildrenForEditing(parent));
-  applyCommandToComposite(new AppendNodeCommand(parent, newChild));
+  applyCommandToComposite(AppendNodeCommand::create(parent, newChild));
 }
 
 void CompositeEditCommand::removeChildrenInRange(Node* node, int from, int to) {
@@ -185,11 +186,12 @@ void CompositeEditCommand::removeChildrenInRange(Node* node, int from, int to) {
 }
 
 void CompositeEditCommand::removeNode(Node* removeChild) {
-  applyCommandToComposite(new RemoveNodeCommand(removeChild));
+  applyCommandToComposite(RemoveNodeCommand::create(removeChild));
 }
 
 void CompositeEditCommand::removeNodePreservingChildren(Node* removeChild) {
-  applyCommandToComposite(new RemoveNodePreservingChildrenCommand(removeChild));
+  applyCommandToComposite(
+      RemoveNodePreservingChildrenCommand::create(removeChild));
 }
 
 void CompositeEditCommand::removeNodeAndPruneAncestors(Node* node) {
@@ -224,11 +226,11 @@ void CompositeEditCommand::prune(PassRefPtr<Node> node) {
 }
 
 void CompositeEditCommand::splitTextNode(Text* text, int offset) {
-  applyCommandToComposite(new SplitTextNodeCommand(text, offset));
+  applyCommandToComposite(SplitTextNodeCommand::create(text, offset));
 }
 
 void CompositeEditCommand::splitElement(Element* element, Node* atChild) {
-  applyCommandToComposite(new SplitElementCommand(element, atChild));
+  applyCommandToComposite(SplitElementCommand::create(element, atChild));
 }
 
 void CompositeEditCommand::mergeIdenticalElements(Element* first,
@@ -238,21 +240,21 @@ void CompositeEditCommand::mergeIdenticalElements(Element* first,
     removeNode(second);
     insertNodeAfter(second, first);
   }
-  applyCommandToComposite(new MergeIdenticalElementsCommand(first, second));
+  applyCommandToComposite(MergeIdenticalElementsCommand::create(first, second));
 }
 
 void CompositeEditCommand::wrapContentsInDummySpan(Element* element) {
-  applyCommandToComposite(new WrapContentsInDummySpanCommand(element));
+  applyCommandToComposite(WrapContentsInDummySpanCommand::create(element));
 }
 
 void CompositeEditCommand::splitTextNodeContainingElement(Text* text,
                                                           int offset) {
   applyCommandToComposite(
-      new SplitTextNodeContainingElementCommand(text, offset));
+      SplitTextNodeContainingElementCommand::create(text, offset));
 }
 
 void CompositeEditCommand::joinTextNodes(Text* text1, Text* text2) {
-  applyCommandToComposite(new JoinTextNodesCommand(text1, text2));
+  applyCommandToComposite(JoinTextNodesCommand::create(text1, text2));
 }
 
 void CompositeEditCommand::inputText(const String& text,
@@ -267,7 +269,7 @@ void CompositeEditCommand::inputText(const String& text,
   do {
     newline = text.find('\n', offset);
     if (newline != offset) {
-      RefPtr<InsertTextCommand> command = new InsertTextCommand(document());
+      RefPtr<InsertTextCommand> command = InsertTextCommand::create(document());
       applyCommandToComposite(command);
       int substringLength = newline == -1 ? length - offset : newline - offset;
       command->input(text.substring(offset, substringLength), false);
@@ -288,22 +290,25 @@ void CompositeEditCommand::inputText(const String& text,
 void CompositeEditCommand::insertTextIntoNode(Text* node,
                                               int offset,
                                               const String& text) {
-  applyCommandToComposite(new InsertIntoTextNodeCommand(node, offset, text));
+  applyCommandToComposite(
+      InsertIntoTextNodeCommand::create(node, offset, text));
 }
 
 void CompositeEditCommand::deleteTextFromNode(Text* node,
                                               int offset,
                                               int count) {
-  applyCommandToComposite(new DeleteFromTextNodeCommand(node, offset, count));
+  applyCommandToComposite(
+      DeleteFromTextNodeCommand::create(node, offset, count));
 }
 
 void CompositeEditCommand::replaceTextInNode(Text* node,
                                              int offset,
                                              int count,
                                              const String& replacementText) {
-  applyCommandToComposite(new DeleteFromTextNodeCommand(node, offset, count));
   applyCommandToComposite(
-      new InsertIntoTextNodeCommand(node, offset, replacementText));
+      DeleteFromTextNodeCommand::create(node, offset, count));
+  applyCommandToComposite(
+      InsertIntoTextNodeCommand::create(node, offset, replacementText));
 }
 
 Position CompositeEditCommand::positionOutsideTabSpan(const Position& pos) {
@@ -334,7 +339,7 @@ void CompositeEditCommand::deleteSelection(bool smartDelete,
                                            bool replace,
                                            bool expandForSpecialElements) {
   if (endingSelection().isRange())
-    applyCommandToComposite(new DeleteSelectionCommand(
+    applyCommandToComposite(DeleteSelectionCommand::create(
         document(), smartDelete, mergeBlocksAfterDelete, replace,
         expandForSpecialElements));
 }
@@ -345,7 +350,7 @@ void CompositeEditCommand::deleteSelection(const Selection& selection,
                                            bool replace,
                                            bool expandForSpecialElements) {
   if (selection.isRange())
-    applyCommandToComposite(new DeleteSelectionCommand(
+    applyCommandToComposite(DeleteSelectionCommand::create(
         selection, smartDelete, mergeBlocksAfterDelete, replace,
         expandForSpecialElements));
 }
@@ -353,21 +358,22 @@ void CompositeEditCommand::deleteSelection(const Selection& selection,
 void CompositeEditCommand::removeCSSProperty(CSSStyleDeclaration* decl,
                                              int property) {
   applyCommandToComposite(
-      new RemoveCSSPropertyCommand(document(), decl, property));
+      RemoveCSSPropertyCommand::create(document(), decl, property));
 }
 
 void CompositeEditCommand::removeNodeAttribute(Element* element,
                                                const QualifiedName& attribute) {
   if (element->getAttribute(attribute).isNull())
     return;
-  applyCommandToComposite(new RemoveNodeAttributeCommand(element, attribute));
+  applyCommandToComposite(
+      RemoveNodeAttributeCommand::create(element, attribute));
 }
 
 void CompositeEditCommand::setNodeAttribute(Element* element,
                                             const QualifiedName& attribute,
                                             const String& value) {
   applyCommandToComposite(
-      new SetNodeAttributeCommand(element, attribute, value));
+      SetNodeAttributeCommand::create(element, attribute, value));
 }
 
 static inline bool isWhitespace(UChar c) {
@@ -568,7 +574,7 @@ void CompositeEditCommand::deleteInsignificantTextDownstream(
   deleteInsignificantText(pos, end);
 }
 
-Node* CompositeEditCommand::appendBlockPlaceholder(Node* node) {
+PassRefPtr<Node> CompositeEditCommand::appendBlockPlaceholder(Node* node) {
   if (!node)
     return 0;
 
@@ -578,10 +584,11 @@ Node* CompositeEditCommand::appendBlockPlaceholder(Node* node) {
 
   RefPtr<Node> placeholder = createBlockPlaceholderElement(document());
   appendNode(placeholder.get(), node);
-  return placeholder.get();
+  return placeholder.release();
 }
 
-Node* CompositeEditCommand::insertBlockPlaceholder(const Position& pos) {
+PassRefPtr<Node> CompositeEditCommand::insertBlockPlaceholder(
+    const Position& pos) {
   if (pos.isNull())
     return 0;
 
@@ -591,10 +598,10 @@ Node* CompositeEditCommand::insertBlockPlaceholder(const Position& pos) {
 
   RefPtr<Node> placeholder = createBlockPlaceholderElement(document());
   insertNodeAt(placeholder.get(), pos);
-  return placeholder.get();
+  return placeholder.release();
 }
 
-Node* CompositeEditCommand::addBlockPlaceholderIfNeeded(Node* node) {
+PassRefPtr<Node> CompositeEditCommand::addBlockPlaceholderIfNeeded(Node* node) {
   if (!node)
     return 0;
 
@@ -636,7 +643,8 @@ void CompositeEditCommand::removePlaceholderAt(
   }
 }
 
-Node* CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
+PassRefPtr<Node>
+CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
     const Position& pos) {
   if (pos.isNull())
     return 0;
@@ -885,7 +893,7 @@ void CompositeEditCommand::moveParagraphs(
       TextIterator::rangeLength(startToDestinationRange.get(), true);
 
   setEndingSelection(destination);
-  applyCommandToComposite(new ReplaceSelectionCommand(
+  applyCommandToComposite(ReplaceSelectionCommand::create(
       document(), fragment.get(), true, false, !preserveStyle, false, true));
 
   if (preserveSelection && startIndex != -1) {
@@ -1016,20 +1024,20 @@ Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
 // Splits the tree parent by parent until we reach the specified ancestor. We
 // use VisiblePositions
 // to determine if the split is necessary. Returns the last split node.
-Node* CompositeEditCommand::splitTreeToNode(Node* start,
-                                            Node* end,
-                                            bool splitAncestor) {
-  Node* node;
+PassRefPtr<Node> CompositeEditCommand::splitTreeToNode(Node* start,
+                                                       Node* end,
+                                                       bool splitAncestor) {
+  RefPtr<Node> node;
   for (node = start; node && node->parent() != end; node = node->parent()) {
     VisiblePosition positionInParent(Position(node->parent(), 0), DOWNSTREAM);
     VisiblePosition positionInNode(Position(node, 0), DOWNSTREAM);
     if (positionInParent != positionInNode)
-      applyCommandToComposite(
-          new SplitElementCommand(static_cast<Element*>(node->parent()), node));
+      applyCommandToComposite(SplitElementCommand::create(
+          static_cast<Element*>(node->parent()), node));
   }
   if (splitAncestor)
     return splitTreeToNode(end, end->parent());
-  return node;
+  return node.release();
 }
 
 PassRefPtr<Element> createBlockPlaceholderElement(Document* document) {

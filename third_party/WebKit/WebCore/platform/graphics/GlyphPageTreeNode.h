@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,9 +29,10 @@
 #ifndef GlyphPageTreeNode_h
 #define GlyphPageTreeNode_h
 
+#include <wtf/HashMap.h>
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/unicode/Unicode.h>
-#include <wtf/HashMap.h>
 
 namespace WebCore {
 
@@ -58,10 +59,9 @@ struct GlyphData {
 // although multiple nodes may reference it as their "page" if they are supposed
 // to be overriding the parent's node, but provide no additional information.
 struct GlyphPage : public RefCounted<GlyphPage> {
-  GlyphPage() : RefCounted<GlyphPage>(0), m_owner(0) {}
-
-  GlyphPage(GlyphPageTreeNode* owner)
-      : RefCounted<GlyphPage>(0), m_owner(owner) {}
+  static PassRefPtr<GlyphPage> create(GlyphPageTreeNode* owner) {
+    return adoptRef(new GlyphPage(owner));
+  }
 
   static const size_t size = 256;  // Covers Latin-1 in a single page.
   GlyphData m_glyphs[size];
@@ -79,12 +79,16 @@ struct GlyphPage : public RefCounted<GlyphPage> {
     m_glyphs[index].fontData = f;
   }
   GlyphPageTreeNode* owner() const { return m_owner; }
+
   // Implemented by the platform.
   bool fill(unsigned offset,
             unsigned length,
             UChar* characterBuffer,
             unsigned bufferLength,
-            const SimpleFontData* fontData);
+            const SimpleFontData*);
+
+ private:
+  GlyphPage(GlyphPageTreeNode* owner) : m_owner(owner) {}
 };
 
 // The glyph page tree is a data structure that maps (FontData, glyph page

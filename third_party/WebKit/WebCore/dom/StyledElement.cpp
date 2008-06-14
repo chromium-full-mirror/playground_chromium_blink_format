@@ -87,6 +87,16 @@ CSSMappedAttributeDeclaration* StyledElement::getMappedAttributeDecl(
       entryType, attr->name().localName().impl(), attr->value().impl()));
 }
 
+CSSMappedAttributeDeclaration* StyledElement::getMappedAttributeDecl(
+    MappedAttributeEntry type,
+    const QualifiedName& name,
+    const AtomicString& value) {
+  if (!mappedAttributeDecls)
+    return 0;
+  return mappedAttributeDecls->get(
+      MappedAttributeKey(type, name.localName().impl(), value.impl()));
+}
+
 void StyledElement::setMappedAttributeDecl(
     MappedAttributeEntry entryType,
     Attribute* attr,
@@ -96,6 +106,18 @@ void StyledElement::setMappedAttributeDecl(
   mappedAttributeDecls->set(
       MappedAttributeKey(entryType, attr->name().localName().impl(),
                          attr->value().impl()),
+      decl);
+}
+
+void StyledElement::setMappedAttributeDecl(
+    MappedAttributeEntry entryType,
+    const QualifiedName& name,
+    const AtomicString& value,
+    CSSMappedAttributeDeclaration* decl) {
+  if (!mappedAttributeDecls)
+    mappedAttributeDecls = new MappedAttributeDecls;
+  mappedAttributeDecls->set(
+      MappedAttributeKey(entryType, name.localName().impl(), value.impl()),
       decl);
 }
 
@@ -129,9 +151,10 @@ StyledElement::~StyledElement() {
   destroyInlineStyleDecl();
 }
 
-Attribute* StyledElement::createAttribute(const QualifiedName& name,
-                                          const AtomicString& value) {
-  return new MappedAttribute(name, value);
+PassRefPtr<Attribute> StyledElement::createAttribute(
+    const QualifiedName& name,
+    const AtomicString& value) {
+  return MappedAttribute::create(name, value);
 }
 
 void StyledElement::createInlineStyleDecl() {

@@ -25,8 +25,8 @@
  */
 
 #include "config.h"
-
 #include "CSSFontSelector.h"
+
 #include "AtomicString.h"
 #include "CachedFont.h"
 #include "CSSFontFace.h"
@@ -58,6 +58,12 @@
 namespace WebCore {
 
 CSSFontSelector::CSSFontSelector(Document* document) : m_document(document) {
+  // FIXME: An old comment used to say there was no need to hold a reference to
+  // m_document
+  // because "we are guaranteed to be destroyed before the document". But there
+  // does not
+  // seem to be any such guarantee.
+
   ASSERT(m_document);
 }
 

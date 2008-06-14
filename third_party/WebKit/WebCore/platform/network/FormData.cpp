@@ -30,7 +30,7 @@ namespace WebCore {
 inline FormData::FormData() : m_hasGeneratedFiles(false) {}
 
 inline FormData::FormData(const FormData& data)
-    : RefCounted<FormData>(1),
+    : RefCounted<FormData>(),
       m_elements(data.m_elements),
       m_hasGeneratedFiles(false) {
   // We shouldn't be copying FormData that hasn't already removed its generated

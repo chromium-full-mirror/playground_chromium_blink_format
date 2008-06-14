@@ -135,9 +135,7 @@ class Editor {
 
   void removeFormattingAndStyle();
 
-  // FIXME: Once the Editor implements all editing commands, it should track
-  // the lastEditCommand on its own, and we should remove this function.
-  void setLastEditCommand(PassRefPtr<EditCommand> lastEditCommand);
+  void clearLastEditCommand();
 
   bool deleteWithDirection(SelectionController::EDirection,
                            TextGranularity,

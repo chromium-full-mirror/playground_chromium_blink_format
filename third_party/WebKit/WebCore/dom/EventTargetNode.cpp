@@ -2,7 +2,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
  *           (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 #include "EventTargetNode.h"
 
 #include "Document.h"
-#include "Event.h"
 #include "EventException.h"
 #include "EventHandler.h"
 #include "EventListener.h"
@@ -138,9 +137,10 @@ bool EventTargetNode::dispatchSubtreeModifiedEvent() {
   if (!document()->hasListenerType(Document::DOMSUBTREEMODIFIED_LISTENER))
     return false;
   ExceptionCode ec = 0;
-  return dispatchEvent(new MutationEvent(DOMSubtreeModifiedEvent, true, false,
-                                         0, String(), String(), String(), 0),
-                       ec, true);
+  return dispatchEvent(
+      MutationEvent::create(DOMSubtreeModifiedEvent, true, false, 0, String(),
+                            String(), String(), 0),
+      ec, true);
 }
 
 void EventTargetNode::dispatchWindowEvent(PassRefPtr<Event> e) {
@@ -157,7 +157,7 @@ void EventTargetNode::dispatchWindowEvent(const AtomicString& eventType,
                                           bool cancelableArg) {
   ASSERT(!eventDispatchForbidden());
   RefPtr<Document> doc = document();
-  dispatchWindowEvent(new Event(eventType, canBubbleArg, cancelableArg));
+  dispatchWindowEvent(Event::create(eventType, canBubbleArg, cancelableArg));
 
   if (eventType == loadEvent) {
     // For onload events, send a separate load event to the enclosing frame
@@ -166,7 +166,7 @@ void EventTargetNode::dispatchWindowEvent(const AtomicString& eventType,
     // the DOM.
     Element* ownerElement = doc->ownerElement();
     if (ownerElement) {
-      RefPtr<Event> ownerEvent = new Event(eventType, false, cancelableArg);
+      RefPtr<Event> ownerEvent = Event::create(eventType, false, cancelableArg);
       ownerEvent->setTarget(ownerElement);
       ExceptionCode ec = 0;
       ownerElement->dispatchGenericEvent(ownerElement, ownerEvent.release(), ec,
@@ -185,8 +185,8 @@ bool EventTargetNode::dispatchUIEvent(const AtomicString& eventType,
   bool cancelable = eventType == DOMActivateEvent;
 
   ExceptionCode ec = 0;
-  RefPtr<UIEvent> evt = new UIEvent(eventType, true, cancelable,
-                                    document()->defaultView(), detail);
+  RefPtr<UIEvent> evt = UIEvent::create(eventType, true, cancelable,
+                                        document()->defaultView(), detail);
   evt->setUnderlyingEvent(underlyingEvent);
   return dispatchEvent(evt.release(), ec, true);
 }
@@ -195,7 +195,7 @@ bool EventTargetNode::dispatchKeyEvent(const PlatformKeyboardEvent& key) {
   ASSERT(!eventDispatchForbidden());
   ExceptionCode ec = 0;
   RefPtr<KeyboardEvent> keyboardEvent =
-      new KeyboardEvent(key, document()->defaultView());
+      KeyboardEvent::create(key, document()->defaultView());
   bool r = dispatchEvent(keyboardEvent, ec, true);
 
   // we want to return false if default is prevented (already taken care of)
@@ -314,10 +314,10 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
           ? static_cast<EventTargetNode*>(relatedTargetArg)
           : 0;
 
-  RefPtr<Event> mouseEvent = new MouseEvent(
+  RefPtr<Event> mouseEvent = MouseEvent::create(
       eventType, true, cancelable, document()->defaultView(), detail, screenX,
       screenY, pageX, pageY, ctrlKey, altKey, shiftKey, metaKey, button,
-      relatedTarget.get(), 0, isSimulated);
+      relatedTarget, 0, isSimulated);
   mouseEvent->setUnderlyingEvent(underlyingEvent.get());
 
   dispatchEvent(mouseEvent, ec, true);
@@ -333,10 +333,10 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
   // as a separate event in other DOM-compliant browsers like Firefox, and so we
   // do the same.
   if (eventType == clickEvent && detail == 2) {
-    RefPtr<Event> doubleClickEvent = new MouseEvent(
+    RefPtr<Event> doubleClickEvent = MouseEvent::create(
         dblclickEvent, true, cancelable, document()->defaultView(), detail,
         screenX, screenY, pageX, pageY, ctrlKey, altKey, shiftKey, metaKey,
-        button, relatedTarget.get(), 0, isSimulated);
+        button, relatedTarget, 0, isSimulated);
     doubleClickEvent->setUnderlyingEvent(underlyingEvent.get());
     if (defaultHandled)
       doubleClickEvent->setDefaultHandled();
@@ -361,11 +361,11 @@ void EventTargetNode::dispatchWheelEvent(PlatformWheelEvent& e) {
   IntPoint pos = view->windowToContents(e.pos());
 
   RefPtr<WheelEvent> we =
-      new WheelEvent(e.deltaX(), e.deltaY(), document()->defaultView(),
-                     e.globalX(), e.globalY(), pos.x(), pos.y(), e.ctrlKey(),
-                     e.altKey(), e.shiftKey(), e.metaKey());
+      WheelEvent::create(e.deltaX(), e.deltaY(), document()->defaultView(),
+                         e.globalX(), e.globalY(), pos.x(), pos.y(),
+                         e.ctrlKey(), e.altKey(), e.shiftKey(), e.metaKey());
   ExceptionCode ec = 0;
-  if (!dispatchEvent(we, ec, true))
+  if (!dispatchEvent(we.release(), ec, true))
     e.accept();
 }
 
@@ -382,8 +382,8 @@ bool EventTargetNode::dispatchHTMLEvent(const AtomicString& eventType,
                                         bool cancelableArg) {
   ASSERT(!eventDispatchForbidden());
   ExceptionCode ec = 0;
-  return dispatchEvent(new Event(eventType, canBubbleArg, cancelableArg), ec,
-                       true);
+  return dispatchEvent(Event::create(eventType, canBubbleArg, cancelableArg),
+                       ec, true);
 }
 
 bool EventTargetNode::dispatchProgressEvent(const AtomicString& eventType,
@@ -392,9 +392,9 @@ bool EventTargetNode::dispatchProgressEvent(const AtomicString& eventType,
                                             unsigned totalArg) {
   ASSERT(!eventDispatchForbidden());
   ExceptionCode ec = 0;
-  return dispatchEvent(
-      new ProgressEvent(eventType, lengthComputableArg, loadedArg, totalArg),
-      ec, true);
+  return dispatchEvent(ProgressEvent::create(eventType, lengthComputableArg,
+                                             loadedArg, totalArg),
+                       ec, true);
 }
 
 void EventTargetNode::dispatchStorageEvent(const AtomicString& eventType,
@@ -405,10 +405,10 @@ void EventTargetNode::dispatchStorageEvent(const AtomicString& eventType,
 #if ENABLE(DOM_STORAGE)
   ASSERT(!eventDispatchForbidden());
   ExceptionCode ec = 0;
-  dispatchEvent(
-      new StorageEvent(eventType, key, oldValue, newValue,
-                       source->document()->documentURI(), source->domWindow()),
-      ec, true);
+  dispatchEvent(StorageEvent::create(eventType, key, oldValue, newValue,
+                                     source->document()->documentURI(),
+                                     source->domWindow()),
+                ec, true);
 #endif
 }
 

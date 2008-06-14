@@ -143,7 +143,7 @@ inline void Token::addAttribute(Document* doc,
                                 bool viewSourceMode) {
   if (!attrName.isEmpty()) {
     ASSERT(!attrName.contains('/'));
-    RefPtr<MappedAttribute> a = new MappedAttribute(attrName, v);
+    RefPtr<MappedAttribute> a = MappedAttribute::create(attrName, v);
     if (!attrs) {
       attrs = NamedMappedAttrMap::create();
       attrs->reserveCapacity(10);

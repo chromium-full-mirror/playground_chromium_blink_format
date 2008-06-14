@@ -30,14 +30,14 @@
 
 namespace WebCore {
 
-InsertIntoTextNodeCommand::InsertIntoTextNodeCommand(Text* node,
+InsertIntoTextNodeCommand::InsertIntoTextNodeCommand(PassRefPtr<Text> node,
                                                      int offset,
                                                      const String& text)
-    : EditCommand(node->document()),
+    : SimpleEditCommand(node->document()),
       m_node(node),
       m_offset(offset),
       m_text(text) {
-  ASSERT(node);
+  ASSERT(m_node);
   ASSERT(offset >= 0);
   ASSERT(!text.isEmpty());
 }

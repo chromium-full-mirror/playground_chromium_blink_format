@@ -1,10 +1,8 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 2001 Peter Kelly (pmk@post.com)
  * Copyright (C) 2001 Tobias Anton (anton@stud.fbi.fh-darmstadt.de)
  * Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
- * Copyright (C) 2003, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2003, 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -36,7 +34,7 @@ MouseEvent::MouseEvent() : m_button(0), m_buttonDown(false) {}
 MouseEvent::MouseEvent(const AtomicString& eventType,
                        bool canBubble,
                        bool cancelable,
-                       AbstractView* view,
+                       PassRefPtr<AbstractView> view,
                        int detail,
                        int screenX,
                        int screenY,
@@ -47,8 +45,8 @@ MouseEvent::MouseEvent(const AtomicString& eventType,
                        bool shiftKey,
                        bool metaKey,
                        unsigned short button,
-                       EventTargetNode* relatedTarget,
-                       Clipboard* clipboard,
+                       PassRefPtr<EventTargetNode> relatedTarget,
+                       PassRefPtr<Clipboard> clipboard,
                        bool isSimulated)
     : MouseRelatedEvent(eventType,
                         canBubble,
@@ -74,7 +72,7 @@ MouseEvent::~MouseEvent() {}
 void MouseEvent::initMouseEvent(const AtomicString& type,
                                 bool canBubble,
                                 bool cancelable,
-                                AbstractView* view,
+                                PassRefPtr<AbstractView> view,
                                 int detail,
                                 int screenX,
                                 int screenY,
@@ -85,7 +83,7 @@ void MouseEvent::initMouseEvent(const AtomicString& type,
                                 bool shiftKey,
                                 bool metaKey,
                                 unsigned short button,
-                                EventTargetNode* relatedTarget) {
+                                PassRefPtr<EventTargetNode> relatedTarget) {
   if (dispatched())
     return;
 

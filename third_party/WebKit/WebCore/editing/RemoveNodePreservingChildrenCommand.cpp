@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,16 +32,16 @@
 namespace WebCore {
 
 RemoveNodePreservingChildrenCommand::RemoveNodePreservingChildrenCommand(
-    Node* node)
+    PassRefPtr<Node> node)
     : CompositeEditCommand(node->document()), m_node(node) {
   ASSERT(m_node);
 }
 
 void RemoveNodePreservingChildrenCommand::doApply() {
-  while (Node* curr = node()->firstChild()) {
+  while (Node* curr = m_node->firstChild()) {
     removeNode(curr);
-    insertNodeBefore(curr, node());
+    insertNodeBefore(curr, m_node.get());
   }
-  removeNode(node());
+  removeNode(m_node.get());
 }
 }

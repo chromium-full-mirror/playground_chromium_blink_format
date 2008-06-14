@@ -191,9 +191,10 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
               item->title(), frame->selectionController()->toRange().get(),
               EditorInsertActionPasted)) {
         Document* document = frame->document();
-        RefPtr<ReplaceSelectionCommand> command = new ReplaceSelectionCommand(
-            document, createFragmentFromMarkup(document, item->title(), ""),
-            true, false, true);
+        RefPtr<ReplaceSelectionCommand> command =
+            ReplaceSelectionCommand::create(
+                document, createFragmentFromMarkup(document, item->title(), ""),
+                true, false, true);
         applyCommand(command);
         frame->revealSelection(RenderLayer::gAlignToEdgeIfNeeded);
       }

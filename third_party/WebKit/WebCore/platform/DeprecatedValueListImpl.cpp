@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,6 +26,7 @@
 #include "config.h"
 #include "DeprecatedValueListImpl.h"
 
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <stdlib.h>
 
@@ -57,15 +58,14 @@ class DeprecatedValueListImpl::Private
 inline DeprecatedValueListImpl::Private::Private(
     void (*deleteFunc)(DeprecatedValueListImplNode*),
     DeprecatedValueListImplNode* (*copyFunc)(DeprecatedValueListImplNode*))
-    : RefCounted<Private>(0),
-      head(NULL),
+    : head(NULL),
       tail(NULL),
       deleteNode(deleteFunc),
       copyNode(copyFunc),
       count(0) {}
 
 inline DeprecatedValueListImpl::Private::Private(const Private& other)
-    : RefCounted<Private>(0),
+    : RefCounted<Private>(),
       deleteNode(other.deleteNode),
       copyNode(other.copyNode),
       count(other.count) {
@@ -117,7 +117,7 @@ void DeprecatedValueListImpl::Private::deleteList(
 DeprecatedValueListImpl::DeprecatedValueListImpl(
     void (*deleteFunc)(DeprecatedValueListImplNode*),
     DeprecatedValueListImplNode* (*copyFunc)(DeprecatedValueListImplNode*))
-    : d(new Private(deleteFunc, copyFunc)) {}
+    : d(adoptRef(new Private(deleteFunc, copyFunc))) {}
 
 DeprecatedValueListImpl::DeprecatedValueListImpl(
     const DeprecatedValueListImpl& other)
@@ -382,7 +382,7 @@ DeprecatedValueListImpl& DeprecatedValueListImpl::operator=(
 
 void DeprecatedValueListImpl::copyOnWrite() {
   if (!d->hasOneRef())
-    d = new Private(*d);
+    d = adoptRef(new Private(*d));
 }
 
 bool DeprecatedValueListImpl::isEqual(

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,11 +34,17 @@ class OverflowEvent : public Event {
  public:
   enum orientType { VERTICAL = 0, HORIZONTAL = 1, BOTH = 2 };
 
-  OverflowEvent();
-  OverflowEvent(bool horizontalOverflowChanged,
-                bool horizontalOverflow,
-                bool verticalOverflowChanged,
-                bool verticalOverflow);
+  static PassRefPtr<OverflowEvent> create() {
+    return adoptRef(new OverflowEvent);
+  }
+  static PassRefPtr<OverflowEvent> create(bool horizontalOverflowChanged,
+                                          bool horizontalOverflow,
+                                          bool verticalOverflowChanged,
+                                          bool verticalOverflow) {
+    return adoptRef(
+        new OverflowEvent(horizontalOverflowChanged, horizontalOverflow,
+                          verticalOverflowChanged, verticalOverflow));
+  }
 
   void initOverflowEvent(unsigned short orient,
                          bool horizontalOverflow,
@@ -51,6 +57,12 @@ class OverflowEvent : public Event {
   virtual bool isOverflowEvent() const;
 
  private:
+  OverflowEvent();
+  OverflowEvent(bool horizontalOverflowChanged,
+                bool horizontalOverflow,
+                bool verticalOverflowChanged,
+                bool verticalOverflow);
+
   unsigned short m_orient;
   bool m_horizontalOverflow;
   bool m_verticalOverflow;

@@ -175,8 +175,8 @@ class Element : public ContainerNode {
 
   virtual bool childTypeAllowed(NodeType);
 
-  virtual Attribute* createAttribute(const QualifiedName& name,
-                                     const AtomicString& value);
+  virtual PassRefPtr<Attribute> createAttribute(const QualifiedName&,
+                                                const AtomicString& value);
 
   void dispatchAttrRemovalEvent(Attribute*);
   void dispatchAttrAdditionEvent(Attribute*);
