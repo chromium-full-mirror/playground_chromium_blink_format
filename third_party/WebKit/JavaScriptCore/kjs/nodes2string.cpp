@@ -293,15 +293,9 @@ void NullNode::streamTo(SourceStream& s) const {
   s << "null";
 }
 
-void FalseNode::streamTo(SourceStream& s) const {
-  s << "false";
+void BooleanNode::streamTo(SourceStream& s) const {
+  s << (m_value ? "true" : "false");
 }
-
-void TrueNode::streamTo(SourceStream& s) const {
-  s << "true";
-}
-
-void PlaceholderTrueNode::streamTo(SourceStream&) const {}
 
 void NumberNode::streamTo(SourceStream& s) const {
   s << value();

@@ -246,34 +246,19 @@ class NullNode : public ExpressionNode {
   virtual Precedence precedence() const { return PrecPrimary; }
 };
 
-class FalseNode : public ExpressionNode {
+class BooleanNode : public ExpressionNode {
  public:
-  FalseNode() KJS_FAST_CALL : ExpressionNode(BooleanType) {}
+  BooleanNode(bool value) KJS_FAST_CALL : ExpressionNode(BooleanType),
+                                          m_value(value) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual bool isConstant() const KJS_FAST_CALL { return true; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPrimary; }
-};
 
-class TrueNode : public ExpressionNode {
- public:
-  TrueNode() KJS_FAST_CALL : ExpressionNode(BooleanType) {}
-
-  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
-
-  virtual bool isConstant() const KJS_FAST_CALL { return true; }
-  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual Precedence precedence() const { return PrecPrimary; }
-};
-
-class PlaceholderTrueNode : public TrueNode {
- public:
-  // Like TrueNode, but does not serialize as "true".
-  PlaceholderTrueNode() KJS_FAST_CALL : TrueNode() {}
-
-  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
+ protected:
+  bool m_value;
 };
 
 class NumberNode : public ExpressionNode {

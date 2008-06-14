@@ -278,16 +278,10 @@ RegisterID* NullNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   return generator.emitLoad(generator.finalDestination(dst), jsNull());
 }
 
-// ------------------------------ FalseNode ----------------------------------
+// ------------------------------ BooleanNode ----------------------------------
 
-RegisterID* FalseNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
-  return generator.emitLoad(generator.finalDestination(dst), false);
-}
-
-// ------------------------------ TrueNode ----------------------------------
-
-RegisterID* TrueNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
-  return generator.emitLoad(generator.finalDestination(dst), true);
+RegisterID* BooleanNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
+  return generator.emitLoad(generator.finalDestination(dst), m_value);
 }
 
 // ------------------------------ NumberNode -----------------------------------
