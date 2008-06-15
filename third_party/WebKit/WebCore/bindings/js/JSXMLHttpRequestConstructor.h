@@ -21,7 +21,7 @@
 #ifndef JSXMLHttpRequestConstructor_h
 #define JSXMLHttpRequestConstructor_h
 
-#include "kjs_binding.h"
+#include "JSDOMBinding.h"
 
 namespace WebCore {
 

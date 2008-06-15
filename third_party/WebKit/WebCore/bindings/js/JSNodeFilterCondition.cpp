@@ -26,7 +26,7 @@
 #include "JSNode.h"
 #include "JSNodeFilter.h"
 #include "NodeFilter.h"
-#include "kjs_proxy.h"
+#include "ScriptController.h"
 
 namespace WebCore {
 

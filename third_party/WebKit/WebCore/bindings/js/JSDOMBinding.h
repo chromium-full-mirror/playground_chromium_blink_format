@@ -19,8 +19,8 @@
  * USA
  */
 
-#ifndef kjs_binding_h
-#define kjs_binding_h
+#ifndef JSDOMBinding_h
+#define JSDOMBinding_h
 
 #include <kjs/function.h>
 #include <kjs/interpreter.h>
@@ -173,4 +173,4 @@ KJS::JSValue* objectToStringFunctionGetter(KJS::ExecState*,
 
 }  // namespace WebCore
 
-#endif  // kjs_binding_h
+#endif  // JSDOMBinding_h

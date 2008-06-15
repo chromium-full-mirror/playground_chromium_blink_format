@@ -19,8 +19,8 @@
  * USA
  */
 
-#ifndef kjs_proxy_h
-#define kjs_proxy_h
+#ifndef ScriptController_h
+#define ScriptController_h
 
 #include "JSDOMWindowShell.h"
 #include <kjs/protect.h>
@@ -42,10 +42,10 @@ class String;
 // FIXME: Rename this class to JSController and the Frame function to
 // javaScript().
 
-class KJSProxy {
+class ScriptController {
  public:
-  KJSProxy(Frame*);
-  ~KJSProxy();
+  ScriptController(Frame*);
+  ~ScriptController();
 
   bool haveWindowShell() const { return m_windowShell; }
   JSDOMWindowShell* windowShell() {
@@ -107,4 +107,4 @@ class KJSProxy {
 
 }  // namespace WebCore
 
-#endif  // kjs_proxy_h
+#endif  // ScriptController_h

@@ -68,7 +68,7 @@ class FramePrivate;
 class FrameTree;
 class HTMLFrameOwnerElement;
 class HTMLTableCellElement;
-class KJSProxy;
+class ScriptController;
 class RegularExpression;
 class RenderPart;
 class Selection;
@@ -107,7 +107,7 @@ class Frame : public RefCounted<Frame> {
   SelectionController* selectionController() const;
   FrameTree* tree() const;
   AnimationController* animationController() const;
-  KJSProxy* scriptProxy();
+  ScriptController* scriptProxy();
 
   RenderView* contentRenderer()
       const;  // root renderer for the document contained in this frame

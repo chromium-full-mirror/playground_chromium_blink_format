@@ -44,7 +44,7 @@
 #include "PreloadScanner.h"
 #include "Settings.h"
 #include "SystemTime.h"
-#include "kjs_proxy.h"
+#include "ScriptController.h"
 #include <wtf/ASCIICType.h>
 
 #include "HTMLEntityNames.c"
@@ -1952,7 +1952,7 @@ void HTMLTokenizer::finish() {
 }
 
 PassRefPtr<Node> HTMLTokenizer::processToken() {
-  KJSProxy* jsProxy =
+  ScriptController* jsProxy =
       (!m_fragment && m_doc->frame()) ? m_doc->frame()->scriptProxy() : 0;
   if (jsProxy && m_doc->frame()->scriptProxy()->isEnabled())
     jsProxy->setEventHandlerLineno(tagStartLineno +
