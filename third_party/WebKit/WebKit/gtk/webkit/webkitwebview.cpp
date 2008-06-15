@@ -1452,6 +1452,7 @@ void webkit_web_view_set_settings(WebKitWebView* webView,
   webkit_web_view_update_settings(webView);
   g_signal_connect(webSettings, "notify",
                    G_CALLBACK(webkit_web_view_settings_notify), webView);
+  g_object_notify(G_OBJECT(webView), "settings");
 }
 
 WebKitWebSettings* webkit_web_view_get_settings(WebKitWebView* webView) {
@@ -1982,6 +1983,7 @@ void webkit_web_view_set_editable(WebKitWebView* webView, gboolean flag) {
     //    mainFrame->setSelectionFromNone();
   } else
     frame->removeEditingStyleFromBodyElement();
+  g_object_notify(G_OBJECT(webView), "editable");
 }
 
 /**
@@ -2059,6 +2061,7 @@ void webkit_web_view_set_transparent(WebKitWebView* webView, gboolean flag) {
   Frame* frame = core(webView)->mainFrame();
   g_return_if_fail(frame);
   frame->view()->setTransparent(flag);
+  g_object_notify(G_OBJECT(webView), "transparent");
 }
 
 /**
