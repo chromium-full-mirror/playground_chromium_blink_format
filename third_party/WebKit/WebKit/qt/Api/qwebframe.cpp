@@ -94,8 +94,8 @@ void QWebFramePrivate::init(QWebFrame* qframe,
 
   frameLoaderClient = new FrameLoaderClientQt();
   RefPtr<Frame> newFrame =
-      Frame::create(webcorePage, frameData->ownerElement, frameLoaderClient)
-          frame = newFrame.get();
+      Frame::create(webcorePage, frameData->ownerElement, frameLoaderClient);
+  frame = newFrame.get();
   if (frameData->ownerElement)
     frame->ref();  // balanced by adoptRef in FrameLoaderClientQt::createFrame
   frameLoaderClient->setFrame(qframe, frame);
