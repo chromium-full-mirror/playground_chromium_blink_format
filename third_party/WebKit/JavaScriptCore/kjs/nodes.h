@@ -82,7 +82,7 @@ enum Precedence {
   PrecLeftHandSide,
   PrecPostfix,
   PrecUnary,
-  PrecMultiplicitave,
+  PrecMultiplicative,
   PrecAdditive,
   PrecShift,
   PrecRelational,
@@ -1146,7 +1146,7 @@ class MultNode : public BinaryOpNode {
 
   virtual OpcodeID opcode() const KJS_FAST_CALL { return op_mul; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual Precedence precedence() const { return PrecMultiplicitave; }
+  virtual Precedence precedence() const { return PrecMultiplicative; }
 };
 
 class DivNode : public BinaryOpNode {
@@ -1158,7 +1158,7 @@ class DivNode : public BinaryOpNode {
 
   virtual OpcodeID opcode() const KJS_FAST_CALL { return op_div; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual Precedence precedence() const { return PrecMultiplicitave; }
+  virtual Precedence precedence() const { return PrecMultiplicative; }
 };
 
 class ModNode : public BinaryOpNode {
@@ -1170,7 +1170,7 @@ class ModNode : public BinaryOpNode {
 
   virtual OpcodeID opcode() const KJS_FAST_CALL { return op_mod; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual Precedence precedence() const { return PrecMultiplicitave; }
+  virtual Precedence precedence() const { return PrecMultiplicative; }
 };
 
 class AddNode : public BinaryOpNode {
