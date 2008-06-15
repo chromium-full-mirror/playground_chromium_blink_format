@@ -133,7 +133,7 @@ struct MatchData {
 };
 
 /* The maximum remaining length of subject we are prepared to search for a
-req_byte match. */
+reqByte match. */
 
 #define REQ_BYTE_MAX 1000
 
@@ -265,7 +265,7 @@ a bit more code and notice if we use conflicting numbers.*/
     RECURSIVE_MATCH_COMMON(num)                        \
   } while (0)
 
-#define RECURSIVE_MATCH_STARTNG_NEW_GROUP(num, ra, rb) \
+#define RECURSIVE_MATCH_NEW_GROUP(num, ra, rb)         \
   do {                                                 \
     stack.pushNewFrame((ra), (rb), RMATCH_WHERE(num)); \
     startNewGroup(stack.currentFrame);                 \
@@ -305,24 +305,26 @@ Returns:       1 if matched          )  these values are >= 0
                  (e.g. stopped by repeated call or recursion limit)
 */
 
-static const unsigned FRAMES_ON_STACK = 16;
+static const unsigned numFramesOnStack = 16;
 
 struct MatchStack {
   MatchStack()
-      : framesEnd(frames + FRAMES_ON_STACK),
+      : framesEnd(frames + numFramesOnStack),
         currentFrame(frames),
         size(1)  // match() creates accesses the first frame w/o calling
                  // pushNewFrame
   {
-    ASSERT((sizeof(frames) / sizeof(frames[0])) == FRAMES_ON_STACK);
+    ASSERT((sizeof(frames) / sizeof(frames[0])) == numFramesOnStack);
   }
 
-  MatchFrame frames[FRAMES_ON_STACK];
+  MatchFrame frames[numFramesOnStack];
   MatchFrame* framesEnd;
   MatchFrame* currentFrame;
   unsigned size;
 
-  inline bool canUseStackBufferForNextFrame() { return size < FRAMES_ON_STACK; }
+  inline bool canUseStackBufferForNextFrame() {
+    return size < numFramesOnStack;
+  }
 
   inline MatchFrame* allocateNextFrame() {
     if (canUseStackBufferForNextFrame())
@@ -349,7 +351,7 @@ struct MatchStack {
   inline void popCurrentFrame() {
     MatchFrame* oldFrame = currentFrame;
     currentFrame = currentFrame->previousFrame;
-    if (size > FRAMES_ON_STACK)
+    if (size > numFramesOnStack)
       delete oldFrame;
     size--;
   }
@@ -495,7 +497,7 @@ RECURSE:
       BEGIN_OPCODE(BRA)
           : NON_CAPTURING_BRACKET : DPRINTF(("start bracket 0\n"));
       do {
-        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+        RECURSIVE_MATCH_NEW_GROUP(
             2, stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE,
             stack.currentFrame->args.bracketChain);
         if (isMatch)
@@ -529,7 +531,7 @@ RECURSE:
        this level is identical to the lookahead case. */
 
       BEGIN_OPCODE(ASSERT) : do {
-        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+        RECURSIVE_MATCH_NEW_GROUP(
             6, stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE, NULL);
         if (isMatch)
           break;
@@ -552,7 +554,7 @@ RECURSE:
       /* Negative assertion: all branches must fail to match */
 
       BEGIN_OPCODE(ASSERT_NOT) : do {
-        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+        RECURSIVE_MATCH_NEW_GROUP(
             7, stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE, NULL);
         if (isMatch)
           RRETURN_NO_MATCH;
@@ -582,7 +584,7 @@ RECURSE:
       BEGIN_OPCODE(BRAZERO) : {
         stack.currentFrame->locals.startOfRepeatingBracket =
             stack.currentFrame->args.instructionPtr + 1;
-        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+        RECURSIVE_MATCH_NEW_GROUP(
             14, stack.currentFrame->locals.startOfRepeatingBracket,
             stack.currentFrame->args.bracketChain);
         if (isMatch)
@@ -599,7 +601,7 @@ RECURSE:
             stack.currentFrame->args.instructionPtr + 1;
         advanceToEndOfBracket(
             stack.currentFrame->locals.startOfRepeatingBracket);
-        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+        RECURSIVE_MATCH_NEW_GROUP(
             15,
             stack.currentFrame->locals.startOfRepeatingBracket + 1 + LINK_SIZE,
             stack.currentFrame->args.bracketChain);
@@ -701,13 +703,13 @@ RECURSE:
                         stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
-        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+        RECURSIVE_MATCH_NEW_GROUP(
             17, stack.currentFrame->locals.instructionPtrAtStartOfOnce,
             stack.currentFrame->args.bracketChain);
         if (isMatch)
           RRETURN;
       } else { /* OP_KETRMAX */
-        RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+        RECURSIVE_MATCH_NEW_GROUP(
             18, stack.currentFrame->locals.instructionPtrAtStartOfOnce,
             stack.currentFrame->args.bracketChain);
         if (isMatch)
@@ -1957,7 +1959,7 @@ RECURSE:
             stack.currentFrame->args.subjectPtr - md.startSubject;
 
         do {
-          RECURSIVE_MATCH_STARTNG_NEW_GROUP(
+          RECURSIVE_MATCH_NEW_GROUP(
               1, stack.currentFrame->args.instructionPtr + 1 + LINK_SIZE,
               stack.currentFrame->args.bracketChain);
           if (isMatch)
@@ -2076,7 +2078,7 @@ Arguments:
   start_offset    where to start in the subject string
   options         option bits
   offsets         points to a vector of ints to be filled in with offsets
-  offsetcount     the number of elements in the vector
+  offsetCount     the number of elements in the vector
 
 Returns:          > 0 => success; value is the number of elements filled in
                   = 0 => success, but offsets is not big enough
@@ -2086,25 +2088,25 @@ Returns:          > 0 => success; value is the number of elements filled in
 
 static void tryFirstByteOptimization(const UChar*& subjectPtr,
                                      const UChar* endSubject,
-                                     int first_byte,
-                                     bool first_byte_caseless,
+                                     int firstByte,
+                                     bool firstByteIsCaseless,
                                      bool useMultiLineFirstCharOptimization,
                                      const UChar* originalSubjectStart) {
-  // If first_byte is set, try scanning to the first instance of that byte
+  // If firstByte is set, try scanning to the first instance of that byte
   // no need to try and match against any earlier part of the subject string.
-  if (first_byte >= 0) {
-    UChar first_char = first_byte;
-    if (first_byte_caseless)
+  if (firstByte >= 0) {
+    UChar firstChar = firstByte;
+    if (firstByteIsCaseless)
       while (subjectPtr < endSubject) {
         int c = *subjectPtr;
         if (c > 127)
           break;
-        if (toLowerCase(c) == first_char)
+        if (toLowerCase(c) == firstChar)
           break;
         subjectPtr++;
       }
     else {
-      while (subjectPtr < endSubject && *subjectPtr != first_char)
+      while (subjectPtr < endSubject && *subjectPtr != firstChar)
         subjectPtr++;
     }
   } else if (useMultiLineFirstCharOptimization) {
@@ -2120,13 +2122,13 @@ static void tryFirstByteOptimization(const UChar*& subjectPtr,
 
 static bool tryRequiredByteOptimization(const UChar*& subjectPtr,
                                         const UChar* endSubject,
-                                        int req_byte,
-                                        int req_byte2,
-                                        bool req_byte_caseless,
+                                        int reqByte,
+                                        int reqByte2,
+                                        bool reqByteIsCaseless,
                                         bool hasFirstByte,
                                         const UChar*& reqBytePtr) {
-  /* If req_byte is set, we know that that character must appear in the subject
-   for the match to succeed. If the first character is set, req_byte must be
+  /* If reqByte is set, we know that that character must appear in the subject
+   for the match to succeed. If the first character is set, reqByte must be
    later in the subject; otherwise the test starts at the match point. This
    optimization can save a huge amount of backtracking in patterns with nested
    unlimited repeats that aren't going to match. Writing separate code for
@@ -2139,24 +2141,24 @@ static bool tryRequiredByteOptimization(const UChar*& subjectPtr,
    don't do this when the string is sufficiently long.
   */
 
-  if (req_byte >= 0 && endSubject - subjectPtr < REQ_BYTE_MAX) {
+  if (reqByte >= 0 && endSubject - subjectPtr < REQ_BYTE_MAX) {
     const UChar* p = subjectPtr + (hasFirstByte ? 1 : 0);
 
     /* We don't need to repeat the search if we haven't yet reached the
      place we found it at last time. */
 
     if (p > reqBytePtr) {
-      if (req_byte_caseless) {
+      if (reqByteIsCaseless) {
         while (p < endSubject) {
           int pp = *p++;
-          if (pp == req_byte || pp == req_byte2) {
+          if (pp == reqByte || pp == reqByte2) {
             p--;
             break;
           }
         }
       } else {
         while (p < endSubject) {
-          if (*p++ == req_byte) {
+          if (*p++ == reqByte) {
             p--;
             break;
           }
@@ -2183,11 +2185,11 @@ int jsRegExpExecute(const JSRegExp* re,
                     int length,
                     int start_offset,
                     int* offsets,
-                    int offsetcount) {
+                    int offsetCount) {
   ASSERT(re);
   ASSERT(subject);
-  ASSERT(offsetcount >= 0);
-  ASSERT(offsets || offsetcount == 0);
+  ASSERT(offsetCount >= 0);
+  ASSERT(offsets || offsetCount == 0);
 
   MatchData matchBlock;
   matchBlock.startSubject = subject;
@@ -2204,19 +2206,19 @@ int jsRegExpExecute(const JSRegExp* re,
    multiple
    of 3. */
 
-  int ocount = offsetcount - (offsetcount % 3);
+  int ocount = offsetCount - (offsetCount % 3);
 
   // FIXME: This is lame that we have to second-guess our caller here.
   // The API should change to either fail-hard when we don't have enough offset
   // space
   // or that we shouldn't ask our callers to pre-allocate in the first place.
-  bool using_temporary_offsets = false;
-  if (re->top_backref > 0 && re->top_backref >= ocount / 3) {
-    ocount = re->top_backref * 3 + 3;
+  bool usingTemporaryOffsets = false;
+  if (re->topBackref > 0 && re->topBackref >= ocount / 3) {
+    ocount = re->topBackref * 3 + 3;
     matchBlock.offsetVector = new int[ocount];
     if (!matchBlock.offsetVector)
       return JSRegExpErrorNoMemory;
-    using_temporary_offsets = true;
+    usingTemporaryOffsets = true;
   } else
     matchBlock.offsetVector = offsets;
 
@@ -2230,9 +2232,9 @@ int jsRegExpExecute(const JSRegExp* re,
    brackets
    in the pattern. */
 
-  int resetcount = 2 + re->top_bracket * 2;
-  if (resetcount > offsetcount)
-    resetcount = ocount;
+  int resetCount = 2 + re->topBracket * 2;
+  if (resetCount > offsetCount)
+    resetCount = ocount;
 
   /* Reset the working variable associated with each extraction. These should
    never be used unless previously set, but they get saved and restored, and so
@@ -2241,12 +2243,12 @@ int jsRegExpExecute(const JSRegExp* re,
 
   if (matchBlock.offsetVector) {
     int* iptr = matchBlock.offsetVector + ocount;
-    int* iend = iptr - resetcount / 2 + 1;
+    int* iend = iptr - resetCount / 2 + 1;
     while (--iptr >= iend)
       *iptr = -1;
   }
 
-  /* Set up the first character to match, if available. The first_byte value is
+  /* Set up the first character to match, if available. The firstByte value is
    never set for an anchored regular expression, but the anchoring may be forced
    at run time, so we have to test for anchoring. The first char may be unset
    for
@@ -2254,25 +2256,25 @@ int jsRegExpExecute(const JSRegExp* re,
    was
    studied, there may be a bitmap of possible first characters. */
 
-  bool first_byte_caseless = false;
-  int first_byte = -1;
+  bool firstByteIsCaseless = false;
+  int firstByte = -1;
   if (re->options & UseFirstByteOptimizationOption) {
-    first_byte = re->first_byte & 255;
-    if ((first_byte_caseless = (re->first_byte & REQ_IGNORE_CASE)))
-      first_byte = toLowerCase(first_byte);
+    firstByte = re->firstByte & 255;
+    if ((firstByteIsCaseless = (re->firstByte & REQ_IGNORE_CASE)))
+      firstByte = toLowerCase(firstByte);
   }
 
   /* For anchored or unanchored matches, there may be a "last known required
    character" set. */
 
-  bool req_byte_caseless = false;
-  int req_byte = -1;
-  int req_byte2 = -1;
+  bool reqByteIsCaseless = false;
+  int reqByte = -1;
+  int reqByte2 = -1;
   if (re->options & UseRequiredByteOptimizationOption) {
-    req_byte = re->req_byte & 255;  // FIXME: This optimization could be made to
-                                    // work for UTF16 chars as well...
-    req_byte_caseless = (re->req_byte & REQ_IGNORE_CASE);
-    req_byte2 = flipCase(req_byte);
+    reqByte = re->reqByte & 255;  // FIXME: This optimization could be made to
+                                  // work for UTF16 chars as well...
+    reqByteIsCaseless = (re->reqByte & REQ_IGNORE_CASE);
+    reqByte2 = flipCase(reqByte);
   }
 
   /* Loop for handling unanchored repeated matching attempts; for anchored
@@ -2288,17 +2290,17 @@ int jsRegExpExecute(const JSRegExp* re,
     /* Reset the maximum number of extractions we might see. */
     if (matchBlock.offsetVector) {
       int* iptr = matchBlock.offsetVector;
-      int* iend = iptr + resetcount;
+      int* iend = iptr + resetCount;
       while (iptr < iend)
         *iptr++ = -1;
     }
 
-    tryFirstByteOptimization(startMatch, endSubject, first_byte,
-                             first_byte_caseless,
+    tryFirstByteOptimization(startMatch, endSubject, firstByte,
+                             firstByteIsCaseless,
                              useMultiLineFirstCharOptimization,
                              matchBlock.startSubject + start_offset);
-    if (tryRequiredByteOptimization(startMatch, endSubject, req_byte, req_byte2,
-                                    req_byte_caseless, first_byte >= 0,
+    if (tryRequiredByteOptimization(startMatch, endSubject, reqByte, reqByte2,
+                                    reqByteIsCaseless, firstByte >= 0,
                                     reqBytePtr))
       break;
 
@@ -2332,13 +2334,13 @@ int jsRegExpExecute(const JSRegExp* re,
     /* We have a match! Copy the offset information from temporary store if
      necessary */
 
-    if (using_temporary_offsets) {
-      if (offsetcount >= 4) {
+    if (usingTemporaryOffsets) {
+      if (offsetCount >= 4) {
         memcpy(offsets + 2, matchBlock.offsetVector + 2,
-               (offsetcount - 2) * sizeof(int));
+               (offsetCount - 2) * sizeof(int));
         DPRINTF(("Copied offsets from temporary memory\n"));
       }
-      if (matchBlock.endOffsetTop > offsetcount)
+      if (matchBlock.endOffsetTop > offsetCount)
         matchBlock.offsetOverflow = true;
 
       DPRINTF(("Freeing temporary memory\n"));
@@ -2347,7 +2349,7 @@ int jsRegExpExecute(const JSRegExp* re,
 
     returnCode = matchBlock.offsetOverflow ? 0 : matchBlock.endOffsetTop / 2;
 
-    if (offsetcount < 2)
+    if (offsetCount < 2)
       returnCode = 0;
     else {
       offsets[0] = startMatch - matchBlock.startSubject;
@@ -2358,7 +2360,7 @@ int jsRegExpExecute(const JSRegExp* re,
     return returnCode;
   } while (!(re->options & IsAnchoredOption) && startMatch <= endSubject);
 
-  if (using_temporary_offsets) {
+  if (usingTemporaryOffsets) {
     DPRINTF(("Freeing temporary memory\n"));
     delete[] matchBlock.offsetVector;
   }
