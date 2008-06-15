@@ -275,11 +275,13 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&,
-      const WebCore::String& frameName);
+      const WebCore::String& frameName,
+      PassRefPtr<WebCore::FormState>);
   virtual void dispatchDecidePolicyForNavigationAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
-      const WebCore::ResourceRequest&);
+      const WebCore::ResourceRequest&,
+      PassRefPtr<WebCore::FormState>);
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,
