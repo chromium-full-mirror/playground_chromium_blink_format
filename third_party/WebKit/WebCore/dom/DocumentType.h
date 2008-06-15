@@ -1,10 +1,8 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,6 +20,7 @@
  * Boston, MA 02110-1301, USA.
  *
  */
+
 #ifndef DocumentType_h
 #define DocumentType_h
 
@@ -30,35 +29,31 @@
 namespace WebCore {
 
 class NamedNodeMap;
-class DOMImplementation;
 
 class DocumentType : public Node {
  public:
-  DocumentType(DOMImplementation*,
-               Document*,
-               const String& name,
-               const String& publicId,
-               const String& systemId);
+  static PassRefPtr<DocumentType> create(Document* document,
+                                         const String& name,
+                                         const String& publicId,
+                                         const String& systemId) {
+    return new DocumentType(document, name, publicId, systemId);
+  }
+
+  NamedNodeMap* entities() const { return m_entities.get(); }
+  NamedNodeMap* notations() const { return m_notations.get(); }
+
+  const String& name() const { return m_name; }
+  const String& publicId() const { return m_publicId; }
+  const String& systemId() const { return m_systemId; }
+  const String& internalSubset() const { return m_subset; }
+
+ private:
   DocumentType(Document*,
                const String& name,
                const String& publicId,
                const String& systemId);
-  DocumentType(Document*, const DocumentType&);
-
-  // DOM methods & attributes for DocumentType
-  NamedNodeMap* entities() const { return m_entities.get(); }
-  NamedNodeMap* notations() const { return m_notations.get(); }
-
-  String name() const { return m_name; }
-  String publicId() const { return m_publicId; }
-  String systemId() const { return m_systemId; }
-  String internalSubset() const { return m_subset; }
 
   virtual KURL baseURI() const;
-
-  // Other methods (not part of DOM)
-  DOMImplementation* implementation() const { return m_implementation.get(); }
-
   virtual String nodeName() const;
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
@@ -66,8 +61,6 @@ class DocumentType : public Node {
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
- private:
-  RefPtr<DOMImplementation> m_implementation;
   RefPtr<NamedNodeMap> m_entities;
   RefPtr<NamedNodeMap> m_notations;
 
@@ -77,6 +70,6 @@ class DocumentType : public Node {
   String m_subset;
 };
 
-}  // namespace
+}  // namespace WebCore
 
 #endif

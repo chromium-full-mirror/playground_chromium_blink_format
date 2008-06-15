@@ -139,8 +139,7 @@ bool PluginTokenizer::isWaitingForScripts() const {
   return false;
 }
 
-PluginDocument::PluginDocument(DOMImplementation* implementation, Frame* frame)
-    : HTMLDocument(implementation, frame) {
+PluginDocument::PluginDocument(Frame* frame) : HTMLDocument(frame) {
   setParseMode(Compat);
 }
 

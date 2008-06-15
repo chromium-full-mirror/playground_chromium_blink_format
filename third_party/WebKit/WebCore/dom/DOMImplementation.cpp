@@ -160,10 +160,8 @@ static bool isSVG11Feature(const String& feature) {
 }
 #endif
 
-DOMImplementation::~DOMImplementation() {}
-
 bool DOMImplementation::hasFeature(const String& feature,
-                                   const String& version) const {
+                                   const String& version) {
   String lower = feature.lower();
   if (lower == "core" || lower == "html" || lower == "xml" || lower == "xhtml")
     return version.isEmpty() || version == "1.0" || version == "2.0";
@@ -201,12 +199,10 @@ PassRefPtr<DocumentType> DOMImplementation::createDocumentType(
   if (!Document::parseQualifiedName(qualifiedName, prefix, localName, ec))
     return 0;
 
-  return new DocumentType(this, 0, qualifiedName, publicId, systemId);
+  return DocumentType::create(0, qualifiedName, publicId, systemId);
 }
 
-DOMImplementation* DOMImplementation::getInterface(
-    const String& /*feature*/) const {
-  // ###
+DOMImplementation* DOMImplementation::getInterface(const String& /*feature*/) {
   return 0;
 }
 
@@ -219,19 +215,19 @@ PassRefPtr<Document> DOMImplementation::createDocument(
   // different document or was
   // created from a different implementation.
   bool shouldThrowWrongDocErr = false;
-  if (doctype && (doctype->document() || doctype->implementation() != this))
+  if (doctype && doctype->document())
     shouldThrowWrongDocErr = true;
 
   RefPtr<Document> doc;
 #if ENABLE(SVG)
   if (namespaceURI == SVGNames::svgNamespaceURI)
-    doc = new SVGDocument(this, 0);
+    doc = SVGDocument::create(0);
   else
 #endif
       if (namespaceURI == HTMLNames::xhtmlNamespaceURI)
-    doc = new Document(this, 0, true);
+    doc = Document::createXHTML(0);
   else
-    doc = new Document(this, 0);
+    doc = Document::create(0);
 
   // now get the interesting parts of the doctype
   if (doctype)
@@ -267,16 +263,11 @@ PassRefPtr<CSSStyleSheet> DOMImplementation::createCSSStyleSheet(
 }
 
 PassRefPtr<Document> DOMImplementation::createDocument(Frame* frame) {
-  return new Document(this, frame);
+  return Document::create(frame);
 }
 
 PassRefPtr<HTMLDocument> DOMImplementation::createHTMLDocument(Frame* frame) {
-  return new HTMLDocument(this, frame);
-}
-
-DOMImplementation* DOMImplementation::instance() {
-  static DOMImplementation* staticInstance = new DOMImplementation;
-  return staticInstance;
+  return HTMLDocument::create(frame);
 }
 
 bool DOMImplementation::isXMLMIMEType(const String& mimeType) {
@@ -301,7 +292,7 @@ bool DOMImplementation::isTextMIMEType(const String& mimeType) {
 
 PassRefPtr<HTMLDocument> DOMImplementation::createHTMLDocument(
     const String& title) {
-  RefPtr<HTMLDocument> d = new HTMLDocument(this, 0);
+  RefPtr<HTMLDocument> d = HTMLDocument::create(0);
   d->open();
   d->write("<!doctype html><html><head><title>" + title +
            "</title></head><body></body></html>");
@@ -314,20 +305,20 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   if (inViewSourceMode) {
     if (type == "text/html" || type == "application/xhtml+xml" ||
         type == "image/svg+xml" || isTextMIMEType(type) || isXMLMIMEType(type))
-      return new HTMLViewSourceDocument(this, frame, type);
+      return HTMLViewSourceDocument::create(frame, type);
   }
 
   // Plugins cannot take HTML and XHTML from us, and we don't even need to
   // initialize the plugin database for those.
   if (type == "text/html")
-    return new HTMLDocument(this, frame);
+    return HTMLDocument::create(frame);
   if (type == "application/xhtml+xml")
-    return new Document(this, frame, true);
+    return Document::createXHTML(frame);
 
 #if ENABLE(FTPDIR)
   // Plugins cannot take FTP from us either
   if (type == "application/x-ftp-directory")
-    return new FTPDirectoryDocument(this, frame);
+    return FTPDirectoryDocument::create(frame);
 #endif
 
   PluginData* pluginData = 0;
@@ -338,9 +329,9 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   // We do not want QuickTime to take over all image types, obviously.
   if ((type == "application/pdf" || type == "text/pdf") && pluginData &&
       pluginData->supportsMimeType(type))
-    return new PluginDocument(this, frame);
+    return PluginDocument::create(frame);
   if (Image::supportsType(type))
-    return new ImageDocument(this, frame);
+    return ImageDocument::create(frame);
   // Everything else except text/plain can be overridden by plugins. In
   // particular, Adobe SVG Viewer should be used for SVG, if installed.
   // Disallowing plug-ins to use text/plain prevents plug-ins from hijacking a
@@ -348,9 +339,9 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
   // and also serves as an optimization to prevent loading the plug-in database
   // in the common case.
   if (type != "text/plain" && pluginData && pluginData->supportsMimeType(type))
-    return new PluginDocument(this, frame);
+    return PluginDocument::create(frame);
   if (isTextMIMEType(type))
-    return new TextDocument(this, frame);
+    return TextDocument::create(frame);
 
 #if ENABLE(SVG)
   if (type == "image/svg+xml") {
@@ -358,12 +349,12 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
     Settings* settings = frame ? frame->settings() : 0;
     if (!settings || !settings->usesDashboardBackwardCompatibilityMode())
 #endif
-      return new SVGDocument(this, frame);
+      return SVGDocument::create(frame);
   }
 #endif
   if (isXMLMIMEType(type))
-    return new Document(this, frame);
+    return Document::create(frame);
 
-  return new HTMLDocument(this, frame);
+  return HTMLDocument::create(frame);
 }
 }

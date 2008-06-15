@@ -979,7 +979,7 @@ void FrameLoader::begin(const KURL& url,
   if (!m_URL.isEmpty())
     baseURL = m_URL;
 
-  RefPtr<Document> document = DOMImplementation::instance()->createDocument(
+  RefPtr<Document> document = DOMImplementation::createDocument(
       m_responseMIMEType, m_frame, m_frame->inViewSourceMode());
   m_frame->setDocument(document);
 

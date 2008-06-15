@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.
+ * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ class DOMImplementationFront {
                                       const String& qualifiedName,
                                       DocumentType*,
                                       ExceptionCode&);
-  DOMImplementationFront* getInterface(const String& feature) const;
+  DOMImplementationFront* getInterface(const String& feature);
   PassRefPtr<CSSStyleSheet> createCSSStyleSheet(const String& title,
                                                 const String& media,
                                                 ExceptionCode&);

@@ -1102,8 +1102,8 @@ void XMLTokenizer::internalSubset(const xmlChar* name,
   }
 
   if (m_doc)
-    m_doc->addChild(new DocumentType(m_doc, toString(name),
-                                     toString(externalID), toString(systemID)));
+    m_doc->addChild(DocumentType::create(
+        m_doc, toString(name), toString(externalID), toString(systemID)));
 }
 
 static inline XMLTokenizer* getTokenizer(void* closure) {

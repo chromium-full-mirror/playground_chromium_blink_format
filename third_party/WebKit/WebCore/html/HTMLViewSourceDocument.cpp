@@ -43,19 +43,13 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLViewSourceDocument::HTMLViewSourceDocument(
-    DOMImplementation* implementation,
-    Frame* frame,
-    const String& mimeType)
-    : HTMLDocument(implementation, frame),
-      m_type(mimeType),
-      m_current(0),
-      m_tbody(0),
-      m_td(0) {}
+HTMLViewSourceDocument::HTMLViewSourceDocument(Frame* frame,
+                                               const String& mimeType)
+    : HTMLDocument(frame), m_type(mimeType) {}
 
 Tokenizer* HTMLViewSourceDocument::createTokenizer() {
   if (implementation()->isTextMIMEType(m_type))
-    return new TextTokenizer(this);
+    return createTextTokenizer(this);
   return new HTMLTokenizer(this);
 }
 
