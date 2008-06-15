@@ -244,12 +244,7 @@ String FileChooser::basenameForWidth(const Font&, int width) const {
   return String();
 }
 
-Icon::Icon() {
-  notImplemented();
-}
-Icon::~Icon() {
-  notImplemented();
-}
+Icon::~Icon() {}
 PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
   notImplemented();
   return 0;
