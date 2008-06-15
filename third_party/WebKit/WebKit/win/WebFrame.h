@@ -275,8 +275,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&,
-      const WebCore::String& frameName,
-      PassRefPtr<WebCore::FormState>);
+      PassRefPtr<WebCore::FormState>,
+      const WebCore::String& frameName);
   virtual void dispatchDecidePolicyForNavigationAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
