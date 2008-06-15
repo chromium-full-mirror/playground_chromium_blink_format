@@ -317,6 +317,10 @@ RegisterID* ThisNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
 // ------------------------------ ResolveNode ----------------------------------
 
+bool ResolveNode::isPure(CodeGenerator& generator) const {
+  return generator.isLocal(m_ident);
+}
+
 RegisterID* ResolveNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   if (RegisterID* local = generator.registerForLocal(m_ident))
     return generator.moveToDestinationIfNeeded(dst, local);
@@ -393,8 +397,9 @@ RegisterID* PropertyListNode::emitCode(CodeGenerator& generator,
 
 RegisterID* BracketAccessorNode::emitCode(CodeGenerator& generator,
                                           RegisterID* dst) {
-  RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
-      m_base.get(), m_subscriptHasAssignments, m_subscript.get()->isConstant());
+  RefPtr<RegisterID> base =
+      generator.emitNodeForLeftHandSide(m_base.get(), m_subscriptHasAssignments,
+                                        m_subscript.get()->isPure(generator));
   RegisterID* property = generator.emitNode(m_subscript.get());
 
   return generator.emitGetByVal(generator.finalDestination(dst), base.get(),
@@ -880,7 +885,7 @@ RegisterID* ModNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
 RegisterID* AddNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
-      m_term1.get(), m_rightHasAssignments, m_term2.get()->isConstant());
+      m_term1.get(), m_rightHasAssignments, m_term2.get()->isPure(generator));
   RegisterID* src2 = generator.emitNode(m_term2.get());
   return generator.emitAdd(generator.finalDestination(dst, src1.get()),
                            src1.get(), src2);
@@ -888,7 +893,7 @@ RegisterID* AddNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
 RegisterID* SubNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
-      m_term1.get(), m_rightHasAssignments, m_term2.get()->isConstant());
+      m_term1.get(), m_rightHasAssignments, m_term2.get()->isPure(generator));
   RegisterID* src2 = generator.emitNode(m_term2.get());
   return generator.emitSub(generator.finalDestination(dst, src1.get()),
                            src1.get(), src2);
@@ -1123,7 +1128,7 @@ RegisterID* ReadModifyResolveNode::emitCode(CodeGenerator& generator,
     }
 
     if (generator.leftHandSideNeedsCopy(m_rightHasAssignments,
-                                        m_right.get()->isConstant())) {
+                                        m_right.get()->isPure(generator))) {
       RefPtr<RegisterID> result = generator.newTemporary();
       generator.emitMove(result.get(), local);
       RegisterID* src2 = generator.emitNode(m_right.get());
@@ -1196,7 +1201,7 @@ RegisterID* AssignResolveNode::emitCode(CodeGenerator& generator,
 
 RegisterID* AssignDotNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
-      m_base.get(), m_rightHasAssignments, m_right.get()->isConstant());
+      m_base.get(), m_rightHasAssignments, m_right.get()->isPure(generator));
   RefPtr<RegisterID> value = generator.destinationForAssignResult(dst);
   RegisterID* result = generator.emitNode(value.get(), m_right.get());
   generator.emitPutById(base.get(), m_ident, result);
@@ -1209,7 +1214,7 @@ RegisterID* AssignDotNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 RegisterID* ReadModifyDotNode::emitCode(CodeGenerator& generator,
                                         RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
-      m_base.get(), m_rightHasAssignments, m_right.get()->isConstant());
+      m_base.get(), m_rightHasAssignments, m_right.get()->isPure(generator));
   RefPtr<RegisterID> value = generator.emitGetById(
       generator.tempDestination(dst), base.get(), m_ident);
   RegisterID* change = generator.emitNode(m_right.get());
@@ -1234,9 +1239,10 @@ RegisterID* AssignBracketNode::emitCode(CodeGenerator& generator,
                                         RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
       m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments,
-      m_subscript.get()->isConstant() && m_right.get()->isConstant());
+      m_subscript.get()->isPure(generator) && m_right.get()->isPure(generator));
   RefPtr<RegisterID> property = generator.emitNodeForLeftHandSide(
-      m_subscript.get(), m_rightHasAssignments, m_right.get()->isConstant());
+      m_subscript.get(), m_rightHasAssignments,
+      m_right.get()->isPure(generator));
   RefPtr<RegisterID> value = generator.destinationForAssignResult(dst);
   RegisterID* result = generator.emitNode(value.get(), m_right.get());
   generator.emitPutByVal(base.get(), property.get(), result);
@@ -1247,9 +1253,10 @@ RegisterID* ReadModifyBracketNode::emitCode(CodeGenerator& generator,
                                             RegisterID* dst) {
   RefPtr<RegisterID> base = generator.emitNodeForLeftHandSide(
       m_base.get(), m_subscriptHasAssignments || m_rightHasAssignments,
-      m_subscript.get()->isConstant() && m_right.get()->isConstant());
+      m_subscript.get()->isPure(generator) && m_right.get()->isPure(generator));
   RefPtr<RegisterID> property = generator.emitNodeForLeftHandSide(
-      m_subscript.get(), m_rightHasAssignments, m_right.get()->isConstant());
+      m_subscript.get(), m_rightHasAssignments,
+      m_right.get()->isPure(generator));
 
   RefPtr<RegisterID> value = generator.emitGetByVal(
       generator.tempDestination(dst), base.get(), property.get());

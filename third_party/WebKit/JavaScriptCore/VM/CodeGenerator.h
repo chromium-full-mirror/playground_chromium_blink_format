@@ -124,6 +124,7 @@ class CodeGenerator {
   // Returns the register storing "this"
   RegisterID* thisRegister() { return &m_thisRegister; }
 
+  bool isLocal(const Identifier&);
   bool isLocalConstant(const Identifier&);
 
   // Returns the next available temporary register. Registers returned by
@@ -192,17 +193,17 @@ class CodeGenerator {
   RegisterID* emitNode(Node* n) { return emitNode(0, n); }
 
   ALWAYS_INLINE bool leftHandSideNeedsCopy(bool rightHasAssignments,
-                                           bool rightIsConstant) {
+                                           bool rightIsPure) {
     return (m_codeType != FunctionCode || m_codeBlock->needsFullScopeChain ||
             rightHasAssignments) &&
-           !rightIsConstant;
+           !rightIsPure;
   }
 
   ALWAYS_INLINE PassRefPtr<RegisterID> emitNodeForLeftHandSide(
       ExpressionNode* n,
       bool rightHasAssignments,
-      bool rightIsConstant) {
-    if (leftHandSideNeedsCopy(rightHasAssignments, rightIsConstant)) {
+      bool rightIsPure) {
+    if (leftHandSideNeedsCopy(rightHasAssignments, rightIsPure)) {
       PassRefPtr<RegisterID> dst = newTemporary();
       emitNode(dst.get(), n);
       return dst;
