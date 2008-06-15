@@ -1,7 +1,7 @@
 /*
  * This file is part of the XSL implementation.
  *
- * Copyright (C) 2004, 2007 Apple, Inc.
+ * Copyright (C) 2004, 2007, 2008 Apple, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -44,24 +44,26 @@ class XSLTProcessor : public RefCounted<XSLTProcessor> {
     return adoptRef(new XSLTProcessor);
   }
 
-  void setXSLStylesheet(XSLStyleSheet* styleSheet) {
+  void setXSLStyleSheet(PassRefPtr<XSLStyleSheet> styleSheet) {
     m_stylesheet = styleSheet;
   }
   bool transformToString(Node* source,
                          String& resultMIMEType,
                          String& resultString,
                          String& resultEncoding);
-  RefPtr<Document> createDocumentFromSource(const String& source,
-                                            const String& sourceEncoding,
-                                            const String& sourceMIMEType,
-                                            Node* sourceNode,
-                                            Frame* frame);
+  PassRefPtr<Document> createDocumentFromSource(const String& source,
+                                                const String& sourceEncoding,
+                                                const String& sourceMIMEType,
+                                                Node* sourceNode,
+                                                Frame* frame);
 
   // DOM methods
-  void importStylesheet(Node* style) { m_stylesheetRootNode = style; }
-  RefPtr<DocumentFragment> transformToFragment(Node* source,
-                                               Document* ouputDoc);
-  RefPtr<Document> transformToDocument(Node* source);
+  void importStylesheet(PassRefPtr<Node> style) {
+    m_stylesheetRootNode = style;
+  }
+  PassRefPtr<DocumentFragment> transformToFragment(Node* source,
+                                                   Document* ouputDoc);
+  PassRefPtr<Document> transformToDocument(Node* source);
 
   void setParameter(const String& namespaceURI,
                     const String& localName,
@@ -72,8 +74,8 @@ class XSLTProcessor : public RefCounted<XSLTProcessor> {
   void clearParameters() { m_parameters.clear(); }
 
   void reset() {
-    m_stylesheet = NULL;
-    m_stylesheetRootNode = NULL;
+    m_stylesheet.clear();
+    m_stylesheetRootNode.clear();
     m_parameters.clear();
   }
 
@@ -89,15 +91,8 @@ class XSLTProcessor : public RefCounted<XSLTProcessor> {
  private:
   XSLTProcessor() {}
 
-  // Convert a libxml doc ptr to a KHTML DOM Document
-  RefPtr<Document> documentFromXMLDocPtr(xmlDocPtr resultDoc,
-                                         xsltStylesheetPtr sheet,
-                                         Document* ownerDocument,
-                                         bool sourceIsDocument);
-
   RefPtr<XSLStyleSheet> m_stylesheet;
   RefPtr<Node> m_stylesheetRootNode;
-
   ParameterMap m_parameters;
 };
 }
