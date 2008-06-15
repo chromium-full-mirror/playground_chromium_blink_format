@@ -40,9 +40,7 @@
 
 namespace WebCore {
 
-Icon::Icon() : RefCounted<Icon>(0), m_icon(0) {
-  notImplemented();
-}
+Icon::Icon() : m_icon(0) {}
 
 Icon::~Icon() {
   if (m_icon)
@@ -93,11 +91,13 @@ PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
   String MIMEType = MIMETypeRegistry::getMIMETypeForPath(filename);
   String iconName = lookupIconName(MIMEType);
 
-  Icon* icon = new Icon;
+  RefPtr<Icon> icon = adoptRef(new Icon);
   icon->m_icon = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
                                           iconName.utf8().data(), 16,
                                           GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
-  return icon->m_icon ? icon : 0;
+  if (!icon->m_icon)
+    return 0;
+  return icon.release();
 }
 
 void Icon::paint(GraphicsContext* context, const IntRect& rect) {

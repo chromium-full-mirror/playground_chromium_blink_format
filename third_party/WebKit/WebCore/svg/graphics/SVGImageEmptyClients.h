@@ -311,7 +311,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual PassRefPtr<DocumentLoader> createDocumentLoader(
       const ResourceRequest& request,
       const SubstituteData& substituteData) {
-    return new DocumentLoader(request, substituteData);
+    return DocumentLoader::create(request, substituteData);
   }
   virtual void setTitle(const String& title, const KURL&) {}
 

@@ -68,7 +68,10 @@ typedef Vector<ResourceResponse> ResponseVector;
 
 class DocumentLoader : public RefCounted<DocumentLoader> {
  public:
-  DocumentLoader(const ResourceRequest&, const SubstituteData&);
+  static PassRefPtr<DocumentLoader> create(const ResourceRequest& request,
+                                           const SubstituteData& data) {
+    return adoptRef(new DocumentLoader(request, data));
+  }
   virtual ~DocumentLoader();
 
   void setFrame(Frame*);
@@ -226,7 +229,10 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
   ApplicationCache* mainResourceApplicationCache() const;
 #endif
+
  protected:
+  DocumentLoader(const ResourceRequest&, const SubstituteData&);
+
   bool m_deferMainResourceDataLoad;
 
  private:

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.
+ * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -64,8 +64,7 @@ static inline bool isASCIIPrintable(unsigned c) {
 }
 
 PopupMenu::PopupMenu(PopupMenuClient* client)
-    : RefCounted<PopupMenu>(0),
-      m_popupClient(client),
+    : m_popupClient(client),
       m_scrollBar(0),
       m_popup(0),
       m_DC(0),
@@ -117,7 +116,7 @@ void PopupMenu::show(const IntRect& r, FrameView* v, int index) {
     if (visibleItems() < client()->listSize()) {
       // We need a scroll bar
       m_scrollBar =
-          new PlatformScrollbar(this, VerticalScrollbar, SmallScrollbar);
+          PlatformScrollbar::create(this, VerticalScrollbar, SmallScrollbar);
       m_scrollBar->setContainingWindow(m_popup);
     }
 

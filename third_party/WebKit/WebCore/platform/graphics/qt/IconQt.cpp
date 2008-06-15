@@ -33,14 +33,14 @@
 
 namespace WebCore {
 
-Icon::Icon() : RefCounted<Icon>(0) {}
+Icon::Icon() {}
 
 Icon::~Icon() {}
 
 PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
-  Icon* i = new Icon;
+  RefPtr<Icon> i = adoptRef(new Icon);
   i->m_icon = QIcon(filename);
-  return PassRefPtr<Icon>(i);
+  return i.release();
 }
 
 void Icon::paint(GraphicsContext* ctx, const IntRect& rect) {

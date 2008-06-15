@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Zack Rusin <zack@kde.org>
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Trolltech ASA
  *
  * Redistribution and use in source and binary forms, with or without
@@ -109,8 +109,8 @@ bool EventHandler::passWheelEventToWidget(PlatformWheelEvent& event,
       ->handleWheelEvent(event);
 }
 
-Clipboard* EventHandler::createDraggingClipboard() const {
-  return new ClipboardQt(ClipboardWritable, true);
+PassRefPtr<Clipboard> EventHandler::createDraggingClipboard() const {
+  return ClipboardQt::create(ClipboardWritable, true);
 }
 
 bool EventHandler::passMousePressEventToSubframe(

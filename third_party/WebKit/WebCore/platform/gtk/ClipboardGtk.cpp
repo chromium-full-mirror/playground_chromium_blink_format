@@ -24,9 +24,10 @@
 #include "Editor.h"
 
 namespace WebCore {
+
 PassRefPtr<Clipboard> Editor::newGeneralClipboard(
     ClipboardAccessPolicy policy) {
-  return new ClipboardGtk(policy, false);
+  return ClipboardGtk::create(policy, false);
 }
 
 ClipboardGtk::ClipboardGtk(ClipboardAccessPolicy policy, bool forDragging)

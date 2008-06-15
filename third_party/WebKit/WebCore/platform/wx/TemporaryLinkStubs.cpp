@@ -244,7 +244,7 @@ String FileChooser::basenameForWidth(const Font&, int width) const {
   return String();
 }
 
-Icon::Icon() : RefCounted<Icon>(0) {
+Icon::Icon() {
   notImplemented();
 }
 Icon::~Icon() {
@@ -252,7 +252,7 @@ Icon::~Icon() {
 }
 PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
   notImplemented();
-  return PassRefPtr<Icon>(new Icon());
+  return 0;
 }
 void Icon::paint(GraphicsContext*, const IntRect&) {
   notImplemented();

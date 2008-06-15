@@ -41,7 +41,7 @@
 namespace WebCore {
 
 IconRecord::IconRecord(const String& url)
-    : RefCounted<IconRecord>(0), m_iconURL(url), m_stamp(0), m_dataSet(false) {}
+    : m_iconURL(url), m_stamp(0), m_dataSet(false) {}
 
 IconRecord::~IconRecord() {
   LOG(IconDatabase, "Destroying IconRecord for icon url %s",

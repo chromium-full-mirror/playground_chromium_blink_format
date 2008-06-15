@@ -24,14 +24,14 @@
  */
 
 #include "config.h"
-
 #include "Editor.h"
+
 #include "ClipboardWx.h"
 
 namespace WebCore {
 
 PassRefPtr<Clipboard> Editor::newGeneralClipboard(
     ClipboardAccessPolicy policy) {
-  return new ClipboardWx(policy, true);
+  return ClipboardWx::create(policy, true);
 }
 }

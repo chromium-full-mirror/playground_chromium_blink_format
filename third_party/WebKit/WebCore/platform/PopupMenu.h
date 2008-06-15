@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.
+ * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,11 +21,10 @@
 #ifndef PopupMenu_h
 #define PopupMenu_h
 
-#include <wtf/RefCounted.h>
-
 #include "IntRect.h"
 #include "PopupMenuClient.h"
 #include <wtf/PassRefPtr.h>
+#include <wtf/RefCounted.h>
 
 #if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
@@ -76,7 +75,7 @@ class PopupMenu : public RefCounted<PopupMenu>
 {
  public:
   static PassRefPtr<PopupMenu> create(PopupMenuClient* client) {
-    return new PopupMenu(client);
+    return adoptRef(new PopupMenu(client));
   }
   ~PopupMenu();
 
@@ -110,7 +109,7 @@ class PopupMenu : public RefCounted<PopupMenu>
   void focusFirst();
   void focusLast();
 
-  void paint(const IntRect& damageRect, HDC hdc = 0);
+  void paint(const IntRect& damageRect, HDC = 0);
 
   HWND popupHandle() const { return m_popup; }
 
@@ -131,14 +130,7 @@ class PopupMenu : public RefCounted<PopupMenu>
 #endif
 
  protected:
-  PopupMenu(PopupMenuClient* client);
-
-#if PLATFORM(WIN)
-  // ScrollBarClient
-  virtual void valueChanged(Scrollbar*);
-  virtual IntRect windowClipRect() const;
-  virtual bool isActive() const { return true; }
-#endif
+  PopupMenu(PopupMenuClient*);
 
  private:
   PopupMenuClient* m_popupClient;
@@ -153,6 +145,11 @@ class PopupMenu : public RefCounted<PopupMenu>
   void populate(const IntRect&);
   QWebPopup* m_popup;
 #elif PLATFORM(WIN)
+  // ScrollBarClient
+  virtual void valueChanged(Scrollbar*);
+  virtual IntRect windowClipRect() const;
+  virtual bool isActive() const { return true; }
+
   void calculatePositionAndSize(const IntRect&, FrameView*);
   void invalidateItem(int index);
 

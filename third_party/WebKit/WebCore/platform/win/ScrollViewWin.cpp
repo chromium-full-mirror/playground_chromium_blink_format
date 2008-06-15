@@ -101,8 +101,8 @@ class ScrollView::ScrollViewPrivate : public ScrollbarClient {
 void ScrollView::ScrollViewPrivate::setHasHorizontalScrollbar(bool hasBar) {
   if (Scrollbar::hasPlatformScrollbars()) {
     if (hasBar && !m_hBar) {
-      m_hBar =
-          new PlatformScrollbar(this, HorizontalScrollbar, RegularScrollbar);
+      m_hBar = PlatformScrollbar::create(this, HorizontalScrollbar,
+                                         RegularScrollbar);
       m_view->addChild(m_hBar.get());
     } else if (!hasBar && m_hBar) {
       m_view->removeChild(m_hBar.get());
@@ -114,7 +114,8 @@ void ScrollView::ScrollViewPrivate::setHasHorizontalScrollbar(bool hasBar) {
 void ScrollView::ScrollViewPrivate::setHasVerticalScrollbar(bool hasBar) {
   if (Scrollbar::hasPlatformScrollbars()) {
     if (hasBar && !m_vBar) {
-      m_vBar = new PlatformScrollbar(this, VerticalScrollbar, RegularScrollbar);
+      m_vBar =
+          PlatformScrollbar::create(this, VerticalScrollbar, RegularScrollbar);
       m_view->addChild(m_vBar.get());
     } else if (!hasBar && m_vBar) {
       m_view->removeChild(m_vBar.get());

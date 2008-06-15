@@ -122,8 +122,7 @@ static inline Frame* parentFromOwnerElement(
 Frame::Frame(Page* page,
              HTMLFrameOwnerElement* ownerElement,
              FrameLoaderClient* frameLoaderClient)
-    : RefCounted<Frame>(0),
-      d(new FramePrivate(page,
+    : d(new FramePrivate(page,
                          parentFromOwnerElement(ownerElement),
                          this,
                          ownerElement,
@@ -152,9 +151,6 @@ Frame::Frame(Page* page,
   if (!ownerElement)
     page->setMainFrame(this);
   else {
-    // FIXME: It's bad to have a ref() here but not in the !ownerElement case.
-    // We need to straighten this out.
-    ref();
     page->incrementFrameCount();
     ownerElement->m_contentFrame = this;
   }

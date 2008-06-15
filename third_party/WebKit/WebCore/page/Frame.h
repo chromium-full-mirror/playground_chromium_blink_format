@@ -80,9 +80,13 @@ class Timer;
 
 class Frame : public RefCounted<Frame> {
  public:
-  Frame(Page*, HTMLFrameOwnerElement*, FrameLoaderClient*);
-  virtual void setView(FrameView*);
-  virtual ~Frame();
+  static PassRefPtr<Frame> create(Page* page,
+                                  HTMLFrameOwnerElement* ownerElement,
+                                  FrameLoaderClient* client) {
+    return adoptRef(new Frame(page, ownerElement, client));
+  }
+  void setView(FrameView*);
+  ~Frame();
 
   void init();
 
@@ -113,6 +117,8 @@ class Frame : public RefCounted<Frame> {
   friend class FramePrivate;
 
  private:
+  Frame(Page*, HTMLFrameOwnerElement*, FrameLoaderClient*);
+
   FramePrivate* d;
 
   // === undecided, would like to consider moving to another class

@@ -209,7 +209,7 @@ bool SVGImage::dataChanged(bool allDataReceived) {
                         dummyInspectorClient));
     m_page->settings()->setJavaScriptEnabled(false);
 
-    m_frame = new Frame(m_page.get(), 0, dummyFrameLoaderClient);
+    m_frame = Frame::create(m_page.get(), 0, dummyFrameLoaderClient);
     m_frameView = new FrameView(m_frame.get());
     m_frameView->deref();  // FIXME: FrameView starts with a refcount of 1
     m_frame->setView(m_frameView.get());

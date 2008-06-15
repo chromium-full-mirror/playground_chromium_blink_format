@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,16 +23,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// An implementation of the clipboard class from IE that talks to the Cocoa
-// Pasteboard
-
 #ifndef ClipboardMac_h
 #define ClipboardMac_h
 
-#include "IntPoint.h"
-#include "Clipboard.h"
-#include "ClipboardAccessPolicy.h"
 #include "CachedResourceClient.h"
+#include "Clipboard.h"
 #include <wtf/RetainPtr.h>
 
 #ifdef __OBJC__
@@ -41,7 +36,6 @@
 #else
 class NSImage;
 class NSPasteboard;
-typedef unsigned NSDragOperation;
 #endif
 
 namespace WebCore {
@@ -50,10 +44,13 @@ class Frame;
 
 class ClipboardMac : public Clipboard, public CachedResourceClient {
  public:
-  ClipboardMac(bool forDragging,
-               NSPasteboard*,
-               ClipboardAccessPolicy,
-               Frame* = 0);
+  static PassRefPtr<ClipboardMac> create(bool forDragging,
+                                         NSPasteboard* pasteboard,
+                                         ClipboardAccessPolicy policy,
+                                         Frame* frame) {
+    return adoptRef(new ClipboardMac(forDragging, pasteboard, policy, frame));
+  }
+
   virtual ~ClipboardMac();
 
   void clearData(const String& type);
@@ -83,6 +80,8 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   NSPasteboard* pasteboard() { return m_pasteboard.get(); }
 
  private:
+  ClipboardMac(bool forDragging, NSPasteboard*, ClipboardAccessPolicy, Frame*);
+
   void setDragImage(CachedImage*, Node*, const IntPoint&);
 
   RetainPtr<NSPasteboard> m_pasteboard;

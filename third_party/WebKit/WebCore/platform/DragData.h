@@ -92,7 +92,7 @@ class DragData {
   DragOperation draggingSourceOperationMask() const {
     return m_draggingSourceOperationMask;
   }
-  Clipboard* createClipboard(ClipboardAccessPolicy) const;
+  PassRefPtr<Clipboard> createClipboard(ClipboardAccessPolicy) const;
   bool containsURL() const;
   bool containsPlainText() const;
   bool containsCompatibleContent() const;

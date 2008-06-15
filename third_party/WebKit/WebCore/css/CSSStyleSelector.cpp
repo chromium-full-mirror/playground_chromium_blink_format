@@ -3927,10 +3927,10 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
             firstFamily.setFamily(face);
             currFamily = &firstFamily;
           } else {
-            FontFamily* newFamily = new FontFamily;
+            RefPtr<SharedFontFamily> newFamily = SharedFontFamily::create();
             newFamily->setFamily(face);
             currFamily->appendFamily(newFamily);
-            currFamily = newFamily;
+            currFamily = newFamily.get();
           }
 
           if (fontDescription.keywordSize() &&

@@ -1,6 +1,6 @@
 // -*- mode: c++; c-basic-offset: 4 -*-
 /*
- *  Copyright (C) 2005, 2006 Apple Computer, Inc.
+ *  Copyright (C) 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -41,7 +41,7 @@ class ListRefPtr : public RefPtr<T> {
 
   ~ListRefPtr() {
     RefPtr<T> reaper = this->release();
-    while (reaper && reaper->refcount() == 1)
+    while (reaper && reaper->hasOneRef())
       reaper = reaper->releaseNext();  // implicitly protects reaper->next, then
                                        // derefs reaper
   }
