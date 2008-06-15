@@ -36,7 +36,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLOptGroupElement::HTMLOptGroupElement(Document* doc, HTMLFormElement* f)
-    : HTMLGenericFormElement(optgroupTag, doc, f), m_style(0) {}
+    : HTMLFormControlElement(optgroupTag, doc, f), m_style(0) {}
 
 bool HTMLOptGroupElement::isFocusable() const {
   return HTMLElement::isFocusable();
@@ -51,7 +51,7 @@ bool HTMLOptGroupElement::insertBefore(PassRefPtr<Node> newChild,
                                        Node* refChild,
                                        ExceptionCode& ec,
                                        bool shouldLazyAttach) {
-  bool result = HTMLGenericFormElement::insertBefore(newChild, refChild, ec,
+  bool result = HTMLFormControlElement::insertBefore(newChild, refChild, ec,
                                                      shouldLazyAttach);
   if (result)
     recalcSelectOptions();
@@ -62,7 +62,7 @@ bool HTMLOptGroupElement::replaceChild(PassRefPtr<Node> newChild,
                                        Node* oldChild,
                                        ExceptionCode& ec,
                                        bool shouldLazyAttach) {
-  bool result = HTMLGenericFormElement::replaceChild(newChild, oldChild, ec,
+  bool result = HTMLFormControlElement::replaceChild(newChild, oldChild, ec,
                                                      shouldLazyAttach);
   if (result)
     recalcSelectOptions();
@@ -70,7 +70,7 @@ bool HTMLOptGroupElement::replaceChild(PassRefPtr<Node> newChild,
 }
 
 bool HTMLOptGroupElement::removeChild(Node* oldChild, ExceptionCode& ec) {
-  bool result = HTMLGenericFormElement::removeChild(oldChild, ec);
+  bool result = HTMLFormControlElement::removeChild(oldChild, ec);
   if (result)
     recalcSelectOptions();
   return result;
@@ -80,14 +80,14 @@ bool HTMLOptGroupElement::appendChild(PassRefPtr<Node> newChild,
                                       ExceptionCode& ec,
                                       bool shouldLazyAttach) {
   bool result =
-      HTMLGenericFormElement::appendChild(newChild, ec, shouldLazyAttach);
+      HTMLFormControlElement::appendChild(newChild, ec, shouldLazyAttach);
   if (result)
     recalcSelectOptions();
   return result;
 }
 
 bool HTMLOptGroupElement::removeChildren() {
-  bool result = HTMLGenericFormElement::removeChildren();
+  bool result = HTMLFormControlElement::removeChildren();
   if (result)
     recalcSelectOptions();
   return result;
@@ -98,12 +98,12 @@ void HTMLOptGroupElement::childrenChanged(bool changedByParser,
                                           Node* afterChange,
                                           int childCountDelta) {
   recalcSelectOptions();
-  HTMLGenericFormElement::childrenChanged(changedByParser, beforeChange,
+  HTMLFormControlElement::childrenChanged(changedByParser, beforeChange,
                                           afterChange, childCountDelta);
 }
 
 void HTMLOptGroupElement::parseMappedAttribute(MappedAttribute* attr) {
-  HTMLGenericFormElement::parseMappedAttribute(attr);
+  HTMLFormControlElement::parseMappedAttribute(attr);
   recalcSelectOptions();
 }
 
@@ -137,7 +137,7 @@ void HTMLOptGroupElement::attach() {
     setRenderStyle(style);
     style->deref(document()->renderArena());
   }
-  HTMLGenericFormElement::attach();
+  HTMLFormControlElement::attach();
 }
 
 void HTMLOptGroupElement::detach() {
@@ -145,7 +145,7 @@ void HTMLOptGroupElement::detach() {
     m_style->deref(document()->renderArena());
     m_style = 0;
   }
-  HTMLGenericFormElement::detach();
+  HTMLFormControlElement::detach();
 }
 
 void HTMLOptGroupElement::setRenderStyle(RenderStyle* newStyle) {

@@ -23,7 +23,7 @@
  */
 
 #include "config.h"
-#include "HTMLGenericFormElement.h"
+#include "HTMLFormControlElement.h"
 
 #include "Document.h"
 #include "EventHandler.h"
@@ -42,7 +42,7 @@ namespace WebCore {
 using namespace EventNames;
 using namespace HTMLNames;
 
-HTMLGenericFormElement::HTMLGenericFormElement(const QualifiedName& tagName,
+HTMLFormControlElement::HTMLFormControlElement(const QualifiedName& tagName,
                                                Document* doc,
                                                HTMLFormElement* f)
     : HTMLElement(tagName, doc),
@@ -56,12 +56,12 @@ HTMLGenericFormElement::HTMLGenericFormElement(const QualifiedName& tagName,
     m_form->registerFormElement(this);
 }
 
-HTMLGenericFormElement::~HTMLGenericFormElement() {
+HTMLFormControlElement::~HTMLFormControlElement() {
   if (m_form)
     m_form->removeFormElement(this);
 }
 
-void HTMLGenericFormElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLFormControlElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == nameAttr) {
     // Do nothing.
   } else if (attr->name() == disabledAttr) {
@@ -84,7 +84,7 @@ void HTMLGenericFormElement::parseMappedAttribute(MappedAttribute* attr) {
     HTMLElement::parseMappedAttribute(attr);
 }
 
-void HTMLGenericFormElement::attach() {
+void HTMLFormControlElement::attach() {
   ASSERT(!attached());
 
   HTMLElement::attach();
@@ -96,7 +96,7 @@ void HTMLGenericFormElement::attach() {
     renderer()->updateFromElement();
 }
 
-void HTMLGenericFormElement::insertedIntoTree(bool deep) {
+void HTMLFormControlElement::insertedIntoTree(bool deep) {
   if (!m_form) {
     // This handles the case of a new form element being created by
     // JavaScript and inserted inside a form.  In the case of the parser
@@ -119,7 +119,7 @@ static inline Node* findRoot(Node* n) {
   return root;
 }
 
-void HTMLGenericFormElement::removedFromTree(bool deep) {
+void HTMLFormControlElement::removedFromTree(bool deep) {
   // If the form and element are both in the same tree, preserve the connection
   // to the form.
   // Otherwise, null out our form and remove ourselves from the form's list of
@@ -138,39 +138,39 @@ void HTMLGenericFormElement::removedFromTree(bool deep) {
   HTMLElement::removedFromTree(deep);
 }
 
-const AtomicString& HTMLGenericFormElement::name() const {
+const AtomicString& HTMLFormControlElement::name() const {
   const AtomicString& n = getAttribute(nameAttr);
   return n.isNull() ? emptyAtom : n;
 }
 
-void HTMLGenericFormElement::setName(const AtomicString& value) {
+void HTMLFormControlElement::setName(const AtomicString& value) {
   setAttribute(nameAttr, value);
 }
 
-void HTMLGenericFormElement::onChange() {
+void HTMLFormControlElement::onChange() {
   dispatchHTMLEvent(changeEvent, true, false);
 }
 
-bool HTMLGenericFormElement::disabled() const {
+bool HTMLFormControlElement::disabled() const {
   return m_disabled;
 }
 
-void HTMLGenericFormElement::setDisabled(bool b) {
+void HTMLFormControlElement::setDisabled(bool b) {
   setAttribute(disabledAttr, b ? "" : 0);
 }
 
-void HTMLGenericFormElement::setReadOnly(bool b) {
+void HTMLFormControlElement::setReadOnly(bool b) {
   setAttribute(readonlyAttr, b ? "" : 0);
 }
 
-void HTMLGenericFormElement::recalcStyle(StyleChange change) {
+void HTMLFormControlElement::recalcStyle(StyleChange change) {
   HTMLElement::recalcStyle(change);
 
   if (renderer())
     renderer()->updateFromElement();
 }
 
-bool HTMLGenericFormElement::isFocusable() const {
+bool HTMLFormControlElement::isFocusable() const {
   if (disabled() || !renderer() ||
       (renderer()->style() && renderer()->style()->visibility() != VISIBLE) ||
       renderer()->width() == 0 || renderer()->height() == 0)
@@ -178,34 +178,34 @@ bool HTMLGenericFormElement::isFocusable() const {
   return true;
 }
 
-bool HTMLGenericFormElement::isKeyboardFocusable(KeyboardEvent* event) const {
+bool HTMLFormControlElement::isKeyboardFocusable(KeyboardEvent* event) const {
   if (isFocusable())
     if (document()->frame())
       return document()->frame()->eventHandler()->tabsToAllControls(event);
   return false;
 }
 
-bool HTMLGenericFormElement::isMouseFocusable() const {
+bool HTMLFormControlElement::isMouseFocusable() const {
   return false;
 }
 
-void HTMLGenericFormElement::setTabIndex(int value) {
+void HTMLFormControlElement::setTabIndex(int value) {
   setAttribute(tabindexAttr, String::number(value));
 }
 
-short HTMLGenericFormElement::tabIndex() const {
+short HTMLFormControlElement::tabIndex() const {
   return Element::tabIndex();
 }
 
-bool HTMLGenericFormElement::supportsFocus() const {
+bool HTMLFormControlElement::supportsFocus() const {
   return isFocusable() || (!disabled() && !document()->haveStylesheetsLoaded());
 }
 
-HTMLFormElement* HTMLGenericFormElement::virtualForm() const {
+HTMLFormElement* HTMLFormControlElement::virtualForm() const {
   return m_form;
 }
 
-void HTMLGenericFormElement::removeFromForm() {
+void HTMLFormControlElement::removeFromForm() {
   if (!m_form)
     return;
   m_form->removeFormElement(this);
@@ -216,7 +216,7 @@ HTMLFormControlElementWithState::HTMLFormControlElementWithState(
     const QualifiedName& tagName,
     Document* doc,
     HTMLFormElement* f)
-    : HTMLGenericFormElement(tagName, doc, f) {
+    : HTMLFormControlElement(tagName, doc, f) {
   doc->registerFormElementWithState(this);
 }
 
@@ -226,16 +226,16 @@ HTMLFormControlElementWithState::~HTMLFormControlElementWithState() {
 
 void HTMLFormControlElementWithState::willMoveToNewOwnerDocument() {
   document()->unregisterFormElementWithState(this);
-  HTMLGenericFormElement::willMoveToNewOwnerDocument();
+  HTMLFormControlElement::willMoveToNewOwnerDocument();
 }
 
 void HTMLFormControlElementWithState::didMoveToNewOwnerDocument() {
   document()->registerFormElementWithState(this);
-  HTMLGenericFormElement::didMoveToNewOwnerDocument();
+  HTMLFormControlElement::didMoveToNewOwnerDocument();
 }
 
 void HTMLFormControlElementWithState::finishParsingChildren() {
-  HTMLGenericFormElement::finishParsingChildren();
+  HTMLFormControlElement::finishParsingChildren();
   Document* doc = document();
   if (doc->hasStateForNewFormElements()) {
     String state;

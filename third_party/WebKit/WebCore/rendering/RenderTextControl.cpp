@@ -177,8 +177,8 @@ RenderStyle* RenderTextControl::createInnerBlockStyle(RenderStyle* startStyle) {
 
 RenderStyle* RenderTextControl::createInnerTextStyle(RenderStyle* startStyle) {
   RenderStyle* textBlockStyle = new (renderArena()) RenderStyle();
-  HTMLGenericFormElement* element =
-      static_cast<HTMLGenericFormElement*>(node());
+  HTMLFormControlElement* element =
+      static_cast<HTMLFormControlElement*>(node());
 
   textBlockStyle->inheritFrom(startStyle);
   // The inner block, if present, always has its direction set to LTR,
@@ -416,8 +416,8 @@ void RenderTextControl::createSubtreeIfNeeded() {
 }
 
 void RenderTextControl::updateFromElement() {
-  HTMLGenericFormElement* element =
-      static_cast<HTMLGenericFormElement*>(node());
+  HTMLFormControlElement* element =
+      static_cast<HTMLFormControlElement*>(node());
 
   createSubtreeIfNeeded();
 
@@ -569,8 +569,8 @@ void RenderTextControl::subtreeHasChanged() {
   bool wasDirty = m_dirty;
   m_dirty = true;
   m_userEdited = true;
-  HTMLGenericFormElement* element =
-      static_cast<HTMLGenericFormElement*>(node());
+  HTMLFormControlElement* element =
+      static_cast<HTMLFormControlElement*>(node());
   if (m_multiLine) {
     element->setValueMatchesRenderer(false);
     if (element->focused())
@@ -1035,8 +1035,8 @@ void RenderTextControl::forwardEvent(Event* evt) {
 }
 
 void RenderTextControl::selectionChanged(bool userTriggered) {
-  HTMLGenericFormElement* element =
-      static_cast<HTMLGenericFormElement*>(node());
+  HTMLFormControlElement* element =
+      static_cast<HTMLFormControlElement*>(node());
   if (m_multiLine)
     static_cast<HTMLTextAreaElement*>(element)->cacheSelection(selectionStart(),
                                                                selectionEnd());

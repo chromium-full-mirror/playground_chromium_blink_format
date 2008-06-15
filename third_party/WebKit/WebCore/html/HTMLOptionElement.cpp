@@ -43,7 +43,7 @@ using namespace HTMLNames;
 using namespace EventNames;
 
 HTMLOptionElement::HTMLOptionElement(Document* doc, HTMLFormElement* f)
-    : HTMLGenericFormElement(optionTag, doc, f),
+    : HTMLFormControlElement(optionTag, doc, f),
       m_selected(false),
       m_style(0) {}
 
@@ -57,7 +57,7 @@ void HTMLOptionElement::attach() {
     setRenderStyle(style);
     style->deref(document()->renderArena());
   }
-  HTMLGenericFormElement::attach();
+  HTMLFormControlElement::attach();
 }
 
 void HTMLOptionElement::detach() {
@@ -65,7 +65,7 @@ void HTMLOptionElement::detach() {
     m_style->deref(document()->renderArena());
     m_style = 0;
   }
-  HTMLGenericFormElement::detach();
+  HTMLFormControlElement::detach();
 }
 
 bool HTMLOptionElement::isFocusable() const {
@@ -151,7 +151,7 @@ void HTMLOptionElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attr->name() == valueAttr)
     m_value = attr->value();
   else
-    HTMLGenericFormElement::parseMappedAttribute(attr);
+    HTMLFormControlElement::parseMappedAttribute(attr);
 }
 
 String HTMLOptionElement::value() const {
@@ -187,7 +187,7 @@ void HTMLOptionElement::childrenChanged(bool changedByParser,
   HTMLSelectElement* select = ownerSelectElement();
   if (select)
     select->childrenChanged(changedByParser);
-  HTMLGenericFormElement::childrenChanged(changedByParser, beforeChange,
+  HTMLFormControlElement::childrenChanged(changedByParser, beforeChange,
                                           afterChange, childCountDelta);
 }
 
@@ -235,9 +235,9 @@ String HTMLOptionElement::optionText() {
 }
 
 bool HTMLOptionElement::disabled() const {
-  return HTMLGenericFormElement::disabled() ||
+  return HTMLFormControlElement::disabled() ||
          (parentNode() &&
-          static_cast<HTMLGenericFormElement*>(parentNode())->disabled());
+          static_cast<HTMLFormControlElement*>(parentNode())->disabled());
 }
 
 void HTMLOptionElement::insertedIntoDocument() {
@@ -245,7 +245,7 @@ void HTMLOptionElement::insertedIntoDocument() {
   if (selected() && (select = ownerSelectElement()))
     select->scrollToSelection();
 
-  HTMLGenericFormElement::insertedIntoDocument();
+  HTMLFormControlElement::insertedIntoDocument();
 }
 
 }  // namespace
