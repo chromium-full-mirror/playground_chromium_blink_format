@@ -308,7 +308,8 @@ struct RegExpConstructorPrivate {
 RegExpConstructor::RegExpConstructor(ExecState* exec,
                                      FunctionPrototype* funcProto,
                                      RegExpPrototype* regProto)
-    : InternalFunction(funcProto, "RegExp"), d(new RegExpConstructorPrivate) {
+    : InternalFunction(funcProto, Identifier(exec, "RegExp")),
+      d(new RegExpConstructorPrivate) {
   // ECMA 15.10.5.1 RegExp.prototype
   putDirect(exec->propertyNames().prototype, regProto,
             DontEnum | DontDelete | ReadOnly);

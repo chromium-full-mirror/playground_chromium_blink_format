@@ -72,7 +72,8 @@ JSValue* JSSQLResultSetRowList::item(ExecState* exec, const ArgList& args) {
         ASSERT_NOT_REACHED();
     }
 
-    object->putDirect(m_impl->columnNames()[i], jsValue, DontDelete | ReadOnly);
+    object->putDirect(Identifier(exec, m_impl->columnNames()[i]), jsValue,
+                      DontDelete | ReadOnly);
   }
 
   return object;

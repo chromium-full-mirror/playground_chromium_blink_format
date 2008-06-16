@@ -400,7 +400,7 @@ bool _NPN_Enumerate(NPP,
 
     ExecState* exec = rootObject->globalObject()->globalExec();
     JSLock lock;
-    PropertyNameArray propertyNames;
+    PropertyNameArray propertyNames(exec);
 
     obj->imp->getPropertyNames(exec, propertyNames);
     unsigned size = static_cast<unsigned>(propertyNames.size());

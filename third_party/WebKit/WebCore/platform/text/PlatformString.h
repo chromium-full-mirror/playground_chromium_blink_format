@@ -76,7 +76,6 @@ class String {
     return StringImpl::adopt(vector);
   }
 
-  operator KJS::Identifier() const;
   operator KJS::UString() const;
 
   unsigned length() const;

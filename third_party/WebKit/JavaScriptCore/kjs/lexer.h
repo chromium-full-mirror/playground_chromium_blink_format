@@ -95,7 +95,7 @@ class Lexer : Noncopyable {
 
  private:
   friend struct JSGlobalData;
-  Lexer();
+  Lexer(JSGlobalData*);
   ~Lexer();
 
   int yylineno;
@@ -147,6 +147,8 @@ class Lexer : Noncopyable {
 
   Vector<UString*> m_strings;
   Vector<KJS::Identifier*> m_identifiers;
+
+  JSGlobalData* m_globalData;
 
   UString m_pattern;
   UString m_flags;

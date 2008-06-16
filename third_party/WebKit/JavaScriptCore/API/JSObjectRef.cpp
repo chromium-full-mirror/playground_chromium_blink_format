@@ -89,7 +89,8 @@ JSObjectRef JSObjectMakeFunctionWithCallback(
     JSObjectCallAsFunctionCallback callAsFunction) {
   JSLock lock;
   ExecState* exec = toJS(ctx);
-  Identifier nameID = name ? Identifier(toJS(name)) : Identifier("anonymous");
+  Identifier nameID =
+      name ? Identifier(exec, toJS(name)) : Identifier(exec, "anonymous");
 
   return toRef(new JSCallbackFunction(exec, callAsFunction, nameID));
 }
@@ -127,7 +128,8 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
   UString::Rep* sourceURLRep =
       sourceURL ? toJS(sourceURL) : &UString::Rep::null;
 
-  Identifier nameID = name ? Identifier(toJS(name)) : Identifier("anonymous");
+  Identifier nameID =
+      name ? Identifier(exec, toJS(name)) : Identifier(exec, "anonymous");
 
   ArgList args;
   for (unsigned i = 0; i < parameterCount; i++)
@@ -166,7 +168,7 @@ bool JSObjectHasProperty(JSContextRef ctx,
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
 
-  return jsObject->hasProperty(exec, Identifier(nameRep));
+  return jsObject->hasProperty(exec, Identifier(exec, nameRep));
 }
 
 JSValueRef JSObjectGetProperty(JSContextRef ctx,
@@ -178,7 +180,7 @@ JSValueRef JSObjectGetProperty(JSContextRef ctx,
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
 
-  JSValue* jsValue = jsObject->get(exec, Identifier(nameRep));
+  JSValue* jsValue = jsObject->get(exec, Identifier(exec, nameRep));
   if (exec->hadException()) {
     if (exception)
       *exception = toRef(exec->exception());
@@ -196,7 +198,7 @@ void JSObjectSetProperty(JSContextRef ctx,
   JSLock lock;
   ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
-  Identifier name(toJS(propertyName));
+  Identifier name(exec, toJS(propertyName));
   JSValue* jsValue = toJS(value);
 
   if (attributes && !jsObject->hasProperty(exec, name))
@@ -255,7 +257,7 @@ bool JSObjectDeleteProperty(JSContextRef ctx,
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
 
-  bool result = jsObject->deleteProperty(exec, Identifier(nameRep));
+  bool result = jsObject->deleteProperty(exec, Identifier(exec, nameRep));
   if (exec->hadException()) {
     if (exception)
       *exception = toRef(exec->exception());
@@ -356,7 +358,8 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,
 }
 
 struct OpaqueJSPropertyNameArray {
-  OpaqueJSPropertyNameArray() : refCount(0) {}
+  OpaqueJSPropertyNameArray(JSGlobalData* globalData)
+      : refCount(0), array(globalData) {}
 
   unsigned refCount;
   PropertyNameArray array;
@@ -368,7 +371,8 @@ JSPropertyNameArrayRef JSObjectCopyPropertyNames(JSContextRef ctx,
   JSObject* jsObject = toJS(object);
   ExecState* exec = toJS(ctx);
 
-  JSPropertyNameArrayRef propertyNames = new OpaqueJSPropertyNameArray();
+  JSPropertyNameArrayRef propertyNames =
+      new OpaqueJSPropertyNameArray(&exec->globalData());
   jsObject->getPropertyNames(exec, propertyNames->array);
 
   return JSPropertyNameArrayRetain(propertyNames);

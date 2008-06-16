@@ -509,7 +509,8 @@ bool DatePrototype::getOwnPropertySlot(ExecState* exec,
 DateConstructor::DateConstructor(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  DatePrototype* dateProto)
-    : InternalFunction(funcProto, dateProto->classInfo()->className) {
+    : InternalFunction(funcProto,
+                       Identifier(exec, dateProto->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, dateProto,
             DontEnum | DontDelete | ReadOnly);
   putDirectFunction(new DateFunction(exec, funcProto, DateFunction::Parse, 1,

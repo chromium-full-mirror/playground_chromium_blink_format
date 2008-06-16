@@ -68,8 +68,8 @@ bool StringObject::getOwnPropertySlot(ExecState* exec,
                                       PropertySlot& slot) {
   if (internalValue()->getStringPropertySlot(propertyName, slot))
     return true;
-  return JSObject::getOwnPropertySlot(exec, Identifier::from(propertyName),
-                                      slot);
+  return JSObject::getOwnPropertySlot(
+      exec, Identifier::from(exec, propertyName), slot);
 }
 
 void StringObject::put(ExecState* exec,
@@ -91,7 +91,7 @@ void StringObject::getPropertyNames(ExecState* exec,
                                     PropertyNameArray& propertyNames) {
   int size = internalValue()->getString().size();
   for (int i = 0; i < size; i++)
-    propertyNames.add(Identifier(UString::from(i)));
+    propertyNames.add(Identifier(exec, UString::from(i)));
   return JSObject::getPropertyNames(exec, propertyNames);
 }
 
@@ -1119,7 +1119,8 @@ JSValue* stringProtoFuncLink(ExecState* exec,
 StringConstructor::StringConstructor(ExecState* exec,
                                      FunctionPrototype* funcProto,
                                      StringPrototype* stringProto)
-    : InternalFunction(funcProto, stringProto->classInfo()->className) {
+    : InternalFunction(funcProto,
+                       Identifier(exec, stringProto->classInfo()->className)) {
   // ECMA 15.5.3.1 String.prototype
   putDirect(exec->propertyNames().prototype, stringProto,
             DontEnum | DontDelete | ReadOnly);

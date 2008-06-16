@@ -196,8 +196,7 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
       m_codeType(GlobalCode),
       m_continueDepth(0),
       m_nextVar(-1),
-      m_propertyNames(
-          &scopeChain.globalObject()->globalExec()->propertyNames()),
+      m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
   // Global code can inherit previously defined symbols.
   int size = symbolTable->size() + 1;  // + 1 slot for  "this"
@@ -268,8 +267,7 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
       m_codeType(FunctionCode),
       m_continueDepth(0),
       m_nextVar(-1),
-      m_propertyNames(
-          &scopeChain.globalObject()->globalExec()->propertyNames()),
+      m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
   const Node::FunctionStack& functionStack = functionBody->functionStack();
   for (size_t i = 0; i < functionStack.size(); ++i) {
@@ -283,7 +281,7 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
   const Node::VarStack& varStack = functionBody->varStack();
   for (size_t i = 0; i < varStack.size(); ++i) {
     const Identifier& ident = varStack[i].first;
-    if (ident == m_propertyNames->arguments)
+    if (ident == propertyNames().arguments)
       continue;
 
     RegisterID* r0;
@@ -321,8 +319,7 @@ CodeGenerator::CodeGenerator(EvalNode* evalNode,
       m_codeType(EvalCode),
       m_continueDepth(0),
       m_nextVar(-1),
-      m_propertyNames(
-          &scopeChain.globalObject()->globalExec()->propertyNames()),
+      m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
   m_codeBlock->numVars = 1;  // Allocate space for "this"
 }
@@ -349,10 +346,10 @@ RegisterID* CodeGenerator::addParameter(const Identifier& ident) {
 }
 
 RegisterID* CodeGenerator::registerForLocal(const Identifier& ident) {
-  if (m_codeType == FunctionCode && ident == m_propertyNames->arguments)
+  if (m_codeType == FunctionCode && ident == propertyNames().arguments)
     m_codeBlock->needsFullScopeChain = true;
 
-  if (ident == m_propertyNames->thisIdentifier)
+  if (ident == propertyNames().thisIdentifier)
     return &m_thisRegister;
 
   if (!shouldOptimizeLocals())
@@ -376,7 +373,7 @@ RegisterID* CodeGenerator::registerForLocalConstInit(const Identifier& ident) {
 }
 
 bool CodeGenerator::isLocal(const Identifier& ident) {
-  if (ident == m_propertyNames->thisIdentifier)
+  if (ident == propertyNames().thisIdentifier)
     return true;
 
   return shouldOptimizeLocals() &&
@@ -505,7 +502,7 @@ unsigned CodeGenerator::addConstant(const Identifier& ident) {
   pair<IdentifierMap::iterator, bool> result =
       m_identifierMap.add(rep, m_codeBlock->identifiers.size());
   if (result.second)  // new entry
-    m_codeBlock->identifiers.append(rep);
+    m_codeBlock->identifiers.append(Identifier(m_globalData, rep));
 
   return result.first->second;
 }
@@ -609,7 +606,7 @@ bool CodeGenerator::findScopedProperty(const Identifier& property,
                                        int& index,
                                        size_t& stackDepth) {
   // Cases where we cannot optimise the lookup
-  if (property == m_propertyNames->arguments || !canOptimizeNonLocals()) {
+  if (property == propertyNames().arguments || !canOptimizeNonLocals()) {
     stackDepth = 0;
     index = missingSymbolMarker();
     return false;

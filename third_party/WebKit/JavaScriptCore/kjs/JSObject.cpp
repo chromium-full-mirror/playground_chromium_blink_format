@@ -81,7 +81,7 @@ UString JSObject::className() const {
 bool JSObject::getOwnPropertySlot(ExecState* exec,
                                   unsigned propertyName,
                                   PropertySlot& slot) {
-  return getOwnPropertySlot(exec, Identifier::from(propertyName), slot);
+  return getOwnPropertySlot(exec, Identifier::from(exec, propertyName), slot);
 }
 
 static void throwSetterError(ExecState* exec) {
@@ -168,7 +168,7 @@ void JSObject::put(ExecState* exec,
 }
 
 void JSObject::put(ExecState* exec, unsigned propertyName, JSValue* value) {
-  put(exec, Identifier::from(propertyName), value);
+  put(exec, Identifier::from(exec, propertyName), value);
 }
 
 void JSObject::putWithAttributes(ExecState*,
@@ -182,7 +182,8 @@ void JSObject::putWithAttributes(ExecState* exec,
                                  unsigned propertyName,
                                  JSValue* value,
                                  unsigned attributes) {
-  putWithAttributes(exec, Identifier::from(propertyName), value, attributes);
+  putWithAttributes(exec, Identifier::from(exec, propertyName), value,
+                    attributes);
 }
 
 bool JSObject::hasProperty(ExecState* exec,
@@ -225,7 +226,7 @@ bool JSObject::hasOwnProperty(ExecState* exec,
 }
 
 bool JSObject::deleteProperty(ExecState* exec, unsigned propertyName) {
-  return deleteProperty(exec, Identifier::from(propertyName));
+  return deleteProperty(exec, Identifier::from(exec, propertyName));
 }
 
 static ALWAYS_INLINE JSValue* tryGetAndCallProperty(
@@ -296,7 +297,7 @@ const HashEntry* JSObject::findPropertyHashEntry(
     const Identifier& propertyName) const {
   for (const ClassInfo* info = classInfo(); info; info = info->parentClass) {
     if (const HashTable* propHashTable = info->propHashTable(exec)) {
-      if (const HashEntry* e = propHashTable->entry(propertyName))
+      if (const HashEntry* e = propHashTable->entry(exec, propertyName))
         return e;
     }
   }
@@ -459,8 +460,7 @@ void JSObject::getPropertyNames(ExecState* exec,
     const HashTable* table = info->propHashTable(exec);
     if (!table)
       continue;
-    if (!table->table)
-      table->createTable();
+    table->initializeIfNeeded(exec);
     ASSERT(table->table);
     int hashSizeMask = table->hashSizeMask;
     const HashEntry* e = table->table;
@@ -570,12 +570,12 @@ JSObject* Error::create(ExecState* exec,
   JSObject* err = static_cast<JSObject*>(cons->construct(exec, args));
 
   if (lineno != -1)
-    err->put(exec, "line", jsNumber(lineno));
+    err->put(exec, Identifier(exec, "line"), jsNumber(lineno));
   if (sourceId != -1)
-    err->put(exec, "sourceId", jsNumber(sourceId));
+    err->put(exec, Identifier(exec, "sourceId"), jsNumber(sourceId));
 
   if (!sourceURL.isNull())
-    err->put(exec, "sourceURL", jsString(sourceURL));
+    err->put(exec, Identifier(exec, "sourceURL"), jsString(sourceURL));
 
   return err;
 }

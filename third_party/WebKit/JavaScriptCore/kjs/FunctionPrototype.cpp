@@ -153,8 +153,9 @@ JSValue* functionProtoFuncCall(ExecState* exec,
 
 FunctionConstructor::FunctionConstructor(ExecState* exec,
                                          FunctionPrototype* functionPrototype)
-    : InternalFunction(functionPrototype,
-                       functionPrototype->classInfo()->className) {
+    : InternalFunction(
+          functionPrototype,
+          Identifier(exec, functionPrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, functionPrototype,
             DontEnum | DontDelete | ReadOnly);
 
@@ -226,11 +227,11 @@ JSObject* FunctionConstructor::construct(ExecState* exec,
       while (i < len && *c == ' ')
         c++, i++;
       if (i == len) {
-        functionBody->parameters().append(Identifier(param));
+        functionBody->parameters().append(Identifier(exec, param));
         params++;
         break;
       } else if (*c == ',') {
-        functionBody->parameters().append(Identifier(param));
+        functionBody->parameters().append(Identifier(exec, param));
         params++;
         c++, i++;
         continue;
@@ -248,7 +249,7 @@ JSObject* FunctionConstructor::construct(ExecState* exec,
 
 // ECMA 15.3.2 The Function Constructor
 JSObject* FunctionConstructor::construct(ExecState* exec, const ArgList& args) {
-  return construct(exec, args, "anonymous", UString(), 1);
+  return construct(exec, args, Identifier(exec, "anonymous"), UString(), 1);
 }
 
 // ECMA 15.3.1 The Function Constructor Called as a Function

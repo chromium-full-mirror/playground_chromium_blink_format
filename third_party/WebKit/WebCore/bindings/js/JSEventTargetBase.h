@@ -180,7 +180,7 @@ class JSEventTargetPrototype : public KJS::JSObject {
 
   static KJS::JSObject* self(KJS::ExecState* exec) {
     static KJS::Identifier* prototypeName = new KJS::Identifier(
-        JSEventTargetPrototypeInformation::prototypeClassName());
+        exec, JSEventTargetPrototypeInformation::prototypeClassName());
 
     KJS::JSGlobalObject* globalObject = exec->lexicalGlobalObject();
     if (KJS::JSValue* objectValue = globalObject->getDirect(*prototypeName)) {

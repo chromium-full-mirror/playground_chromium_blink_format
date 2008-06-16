@@ -58,7 +58,7 @@ static bool isDecimalDigit(int);
 static const size_t initialReadBufferCapacity = 32;
 static const size_t initialStringTableCapacity = 64;
 
-Lexer::Lexer()
+Lexer::Lexer(JSGlobalData* globalData)
     : yylineno(1),
       restrKeyword(false),
       eatNextIdentifier(false),
@@ -72,6 +72,7 @@ Lexer::Lexer()
       next1(0),
       next2(0),
       next3(0),
+      m_globalData(globalData),
       mainTable(KJS::mainTable) {
   m_buffer8.reserveCapacity(initialReadBufferCapacity);
   m_buffer16.reserveCapacity(initialReadBufferCapacity);
@@ -550,13 +551,15 @@ int Lexer::lex(void* p1, void* p2) {
       lvalp->ident = makeIdentifier(m_buffer16);
       token = IDENT;
       break;
-    case IdentifierOrKeyword:
+    case IdentifierOrKeyword: {
       lvalp->ident = makeIdentifier(m_buffer16);
-      if ((token = mainTable.value(*lvalp->ident)) < 0) {
+      const HashEntry* entry = mainTable.entry(m_globalData, *lvalp->ident);
+      if (!entry) {
         // Lookup for keyword failed, means this is an identifier.
         token = IDENT;
         break;
       }
+      token = entry->integerValue;
       // Hack for "f = function somename() { ... }"; too hard to get into the
       // grammar.
       eatNextIdentifier = token == FUNCTION && lastToken == '=';
@@ -564,6 +567,7 @@ int Lexer::lex(void* p1, void* p2) {
           token == THROW)
         restrKeyword = true;
       break;
+    }
     case String:
       lvalp->string = makeUString(m_buffer16);
       token = STRING;
@@ -872,7 +876,7 @@ void Lexer::clear() {
 
 Identifier* Lexer::makeIdentifier(const Vector<UChar>& buffer) {
   KJS::Identifier* identifier =
-      new KJS::Identifier(buffer.data(), buffer.size());
+      new KJS::Identifier(m_globalData, buffer.data(), buffer.size());
   m_identifiers.append(identifier);
   return identifier;
 }

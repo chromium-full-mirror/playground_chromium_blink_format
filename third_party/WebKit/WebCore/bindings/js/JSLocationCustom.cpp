@@ -59,7 +59,8 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
 
   // Check for the few functions that we allow, even when called cross-domain.
   const HashEntry* entry =
-      JSLocationPrototype::s_info.propHashTable(exec)->entry(propertyName);
+      JSLocationPrototype::s_info.propHashTable(exec)->entry(exec,
+                                                             propertyName);
   if (entry && (entry->attributes & Function) &&
       (entry->functionValue == jsLocationPrototypeFunctionReplace ||
        entry->functionValue == jsLocationPrototypeFunctionReload ||
@@ -89,7 +90,7 @@ bool JSLocation::customPut(ExecState* exec,
   bool sameDomainAccess = allowsAccessFromFrame(exec, frame);
 
   const HashEntry* entry =
-      JSLocation::s_info.propHashTable(exec)->entry(propertyName);
+      JSLocation::s_info.propHashTable(exec)->entry(exec, propertyName);
   if (!entry) {
     if (sameDomainAccess)
       JSObject::put(exec, propertyName, value);

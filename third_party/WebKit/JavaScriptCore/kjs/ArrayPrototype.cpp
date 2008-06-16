@@ -809,7 +809,8 @@ JSValue* arrayProtoFuncLastIndexOf(ExecState* exec,
 ArrayConstructor::ArrayConstructor(ExecState* exec,
                                    FunctionPrototype* funcProto,
                                    ArrayPrototype* arrayProto)
-    : InternalFunction(funcProto, arrayProto->classInfo()->className) {
+    : InternalFunction(funcProto,
+                       Identifier(exec, arrayProto->classInfo()->className)) {
   // ECMA 15.4.3.1 Array.prototype
   putDirect(exec->propertyNames().prototype, arrayProto,
             DontEnum | DontDelete | ReadOnly);

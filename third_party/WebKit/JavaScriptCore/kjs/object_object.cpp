@@ -123,7 +123,7 @@ JSValue* objectProtoFuncHasOwnProperty(ExecState* exec,
                                        JSObject* thisObj,
                                        const ArgList& args) {
   return jsBoolean(
-      thisObj->hasOwnProperty(exec, Identifier(args[0]->toString(exec))));
+      thisObj->hasOwnProperty(exec, Identifier(exec, args[0]->toString(exec))));
 }
 
 JSValue* objectProtoFuncIsPrototypeOf(ExecState*,
@@ -150,7 +150,7 @@ JSValue* objectProtoFuncDefineGetter(ExecState* exec,
       !static_cast<JSObject*>(args[1])->implementsCall())
     return throwError(exec, SyntaxError, "invalid getter usage");
 
-  thisObj->defineGetter(exec, Identifier(args[0]->toString(exec)),
+  thisObj->defineGetter(exec, Identifier(exec, args[0]->toString(exec)),
                         static_cast<JSObject*>(args[1]));
   return jsUndefined();
 }
@@ -162,7 +162,7 @@ JSValue* objectProtoFuncDefineSetter(ExecState* exec,
       !static_cast<JSObject*>(args[1])->implementsCall())
     return throwError(exec, SyntaxError, "invalid setter usage");
 
-  thisObj->defineSetter(exec, Identifier(args[0]->toString(exec)),
+  thisObj->defineSetter(exec, Identifier(exec, args[0]->toString(exec)),
                         static_cast<JSObject*>(args[1]));
   return jsUndefined();
 }
@@ -170,20 +170,20 @@ JSValue* objectProtoFuncDefineSetter(ExecState* exec,
 JSValue* objectProtoFuncLookupGetter(ExecState* exec,
                                      JSObject* thisObj,
                                      const ArgList& args) {
-  return thisObj->lookupGetter(exec, Identifier(args[0]->toString(exec)));
+  return thisObj->lookupGetter(exec, Identifier(exec, args[0]->toString(exec)));
 }
 
 JSValue* objectProtoFuncLookupSetter(ExecState* exec,
                                      JSObject* thisObj,
                                      const ArgList& args) {
-  return thisObj->lookupSetter(exec, Identifier(args[0]->toString(exec)));
+  return thisObj->lookupSetter(exec, Identifier(exec, args[0]->toString(exec)));
 }
 
 JSValue* objectProtoFuncPropertyIsEnumerable(ExecState* exec,
                                              JSObject* thisObj,
                                              const ArgList& args) {
-  return jsBoolean(
-      thisObj->propertyIsEnumerable(exec, Identifier(args[0]->toString(exec))));
+  return jsBoolean(thisObj->propertyIsEnumerable(
+      exec, Identifier(exec, args[0]->toString(exec))));
 }
 
 JSValue* objectProtoFuncToLocaleString(ExecState* exec,
@@ -204,7 +204,7 @@ JSValue* objectProtoFuncToString(ExecState*,
 ObjectConstructor::ObjectConstructor(ExecState* exec,
                                      ObjectPrototype* objProto,
                                      FunctionPrototype* funcProto)
-    : InternalFunction(funcProto, "Object") {
+    : InternalFunction(funcProto, Identifier(exec, "Object")) {
   // ECMA 15.2.3.1
   putDirect(exec->propertyNames().prototype, objProto,
             DontEnum | DontDelete | ReadOnly);

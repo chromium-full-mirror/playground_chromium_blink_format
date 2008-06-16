@@ -502,7 +502,8 @@ DontEnum|DontDelete|ReadOnly
 NumberConstructor::NumberConstructor(ExecState* exec,
                                      FunctionPrototype* funcProto,
                                      NumberPrototype* numberProto)
-    : InternalFunction(funcProto, numberProto->classInfo()->className) {
+    : InternalFunction(funcProto,
+                       Identifier(exec, numberProto->classInfo()->className)) {
   // Number.Prototype
   putDirect(exec->propertyNames().prototype, numberProto,
             DontEnum | DontDelete | ReadOnly);

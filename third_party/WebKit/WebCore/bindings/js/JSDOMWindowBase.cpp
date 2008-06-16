@@ -201,8 +201,10 @@ JSDOMWindowBase::JSDOMWindowBase(JSObject* prototype,
   setTimeoutTime(10000);
 
   GlobalPropertyInfo staticGlobals[] = {
-      GlobalPropertyInfo("document", jsNull(), DontDelete | ReadOnly),
-      GlobalPropertyInfo("window", d->m_shell, DontDelete | ReadOnly)};
+      GlobalPropertyInfo(Identifier(globalExec(), "document"), jsNull(),
+                         DontDelete | ReadOnly),
+      GlobalPropertyInfo(Identifier(globalExec(), "window"), d->m_shell,
+                         DontDelete | ReadOnly)};
 
   addStaticGlobals(staticGlobals,
                    sizeof(staticGlobals) / sizeof(GlobalPropertyInfo));
@@ -211,7 +213,8 @@ JSDOMWindowBase::JSDOMWindowBase(JSObject* prototype,
 void JSDOMWindowBase::updateDocument() {
   ASSERT(m_impl->document());
   ExecState* exec = globalExec();
-  symbolTablePutWithAttributes("document", toJS(exec, m_impl->document()),
+  symbolTablePutWithAttributes(Identifier(exec, "document"),
+                               toJS(exec, m_impl->document()),
                                DontDelete | ReadOnly);
 }
 
@@ -327,7 +330,7 @@ static Frame* createWindow(ExecState* exec,
   JSDOMWindow* newWindow = toJSDOMWindow(newFrame);
 
   if (dialogArgs)
-    newWindow->putDirect("dialogArguments", dialogArgs);
+    newWindow->putDirect(Identifier(exec, "dialogArguments"), dialogArgs);
 
   if (!protocolIs(url, "javascript") || newWindow->allowsAccessFrom(exec)) {
     KURL completedURL =
@@ -445,7 +448,7 @@ static JSValue* showModalDialog(ExecState* exec,
   // value,
   // and in that case, there's no harm in trying again (no benefit either).
   if (!returnValue)
-    returnValue = dialogWindow->getDirect("returnValue");
+    returnValue = dialogWindow->getDirect(Identifier(exec, "returnValue"));
 
   return returnValue ? returnValue : jsUndefined();
 }
@@ -607,7 +610,7 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  const HashEntry* entry = JSDOMWindowBaseTable.entry(propertyName);
+  const HashEntry* entry = JSDOMWindowBaseTable.entry(exec, propertyName);
   if (entry) {
     if (entry->attributes & Function) {
       if (entry->functionValue == windowProtoFuncShowModalDialog) {
@@ -671,7 +674,7 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
 void JSDOMWindowBase::put(ExecState* exec,
                           const Identifier& propertyName,
                           JSValue* value) {
-  const HashEntry* entry = JSDOMWindowBaseTable.entry(propertyName);
+  const HashEntry* entry = JSDOMWindowBaseTable.entry(exec, propertyName);
   if (entry) {
     if (entry->attributes & Function) {
       if (allowsAccessFrom(exec))
@@ -938,7 +941,7 @@ void JSDOMWindowBase::clear() {
   JSLock lock;
 
   if (d->m_returnValueSlot && !*d->m_returnValueSlot)
-    *d->m_returnValueSlot = getDirect("returnValue");
+    *d->m_returnValueSlot = getDirect(Identifier(globalExec(), "returnValue"));
 
   clearAllTimeouts();
   clearHelperObjectProperties();
