@@ -25,7 +25,7 @@
  */
 
 #include "config.h"
-#include "function.h"
+#include "JSFunction.h"
 
 #include "ExecState.h"
 #include "JSActivation.h"
@@ -36,7 +36,7 @@
 #include "debugger.h"
 #include "dtoa.h"
 #include "function_object.h"
-#include "internal.h"
+#include "JSString.h"
 #include "lexer.h"
 #include "nodes.h"
 #include "operations.h"
