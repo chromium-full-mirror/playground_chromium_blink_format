@@ -1,4 +1,3 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
@@ -132,7 +131,7 @@ JS_EXPORT bool JSValueIsObjectOfClass(JSContextRef ctx,
                                       JSValueRef value,
                                       JSClassRef jsClass);
 
-// Comparing values
+/* Comparing values */
 
 /*!
 @function
@@ -181,7 +180,7 @@ JS_EXPORT bool JSValueIsInstanceOfConstructor(JSContextRef ctx,
                                               JSObjectRef constructor,
                                               JSValueRef* exception);
 
-// Creating values
+/* Creating values */
 
 /*!
 @function
@@ -228,7 +227,7 @@ JS_EXPORT JSValueRef JSValueMakeNumber(JSContextRef ctx, double number);
 */
 JS_EXPORT JSValueRef JSValueMakeString(JSContextRef ctx, JSStringRef string);
 
-// Converting to primitive values
+/* Converting to primitive values */
 
 /*!
 @function
@@ -285,7 +284,7 @@ JS_EXPORT JSObjectRef JSValueToObject(JSContextRef ctx,
                                       JSValueRef value,
                                       JSValueRef* exception);
 
-// Garbage collection
+/* Garbage collection */
 /*!
 @function
 @abstract Protects a JavaScript value from garbage collection.
@@ -315,4 +314,4 @@ JS_EXPORT void JSValueUnprotect(JSContextRef ctx, JSValueRef value);
 }
 #endif
 
-#endif  // JSValueRef_h
+#endif /* JSValueRef_h */

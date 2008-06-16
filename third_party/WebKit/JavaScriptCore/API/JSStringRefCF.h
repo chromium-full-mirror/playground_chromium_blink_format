@@ -1,4 +1,3 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
 /*
  * Copyright (C) 2006, 2007 Apple Computer, Inc.  All rights reserved.
  *
@@ -34,7 +33,7 @@
 extern "C" {
 #endif
 
-// CFString convenience methods
+/* CFString convenience methods */
 
 /*!
 @function
@@ -61,4 +60,4 @@ JS_EXPORT CFStringRef JSStringCopyCFString(CFAllocatorRef alloc,
 }
 #endif
 
-#endif  // JSStringRefCF_h
+#endif /* JSStringRefCF_h */

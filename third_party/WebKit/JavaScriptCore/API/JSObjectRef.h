@@ -1,4 +1,3 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
 /*
  * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
@@ -31,7 +30,7 @@
 #include <JavaScriptCore/JSValueRef.h>
 
 #include <stdbool.h>
-#include <stddef.h>  // for size_t
+#include <stddef.h> /* for size_t */
 
 #ifdef __cplusplus
 extern "C" {
@@ -478,7 +477,7 @@ except in the case of hasProperty, where it specifies that getProperty should
 substitute.
 */
 typedef struct {
-  int version;  // current (and only) version is 0
+  int version; /* current (and only) version is 0 */
   JSClassAttributes attributes;
 
   const char* className;
@@ -890,4 +889,4 @@ JS_EXPORT void JSPropertyNameAccumulatorAddName(
 }
 #endif
 
-#endif  // JSObjectRef_h
+#endif /* JSObjectRef_h */
