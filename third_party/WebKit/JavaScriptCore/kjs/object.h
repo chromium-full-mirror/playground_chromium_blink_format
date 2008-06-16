@@ -35,7 +35,7 @@
 
 namespace KJS {
 
-class InternalFunctionImp;
+class InternalFunction;
 class PropertyNameArray;
 
 struct HashEntry;
@@ -451,7 +451,7 @@ class JSObject : public JSCell {
 
   // convenience to add a function property under the function's own built-in
   // name
-  void putDirectFunction(InternalFunctionImp*, int attr = 0);
+  void putDirectFunction(InternalFunction*, int attr = 0);
 
   void fillGetterPropertySlot(PropertySlot& slot, JSValue** location);
 

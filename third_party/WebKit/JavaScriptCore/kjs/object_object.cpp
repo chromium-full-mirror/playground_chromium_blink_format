@@ -188,13 +188,13 @@ JSValue* objectProtoFuncToString(ExecState*, JSObject* thisObj, const List&) {
   return jsString("[object " + thisObj->className() + "]");
 }
 
-// ------------------------------ ObjectObjectImp
+// ------------------------------ ObjectConstructor
 // --------------------------------
 
-ObjectObjectImp::ObjectObjectImp(ExecState* exec,
-                                 ObjectPrototype* objProto,
-                                 FunctionPrototype* funcProto)
-    : InternalFunctionImp(funcProto, "Object") {
+ObjectConstructor::ObjectConstructor(ExecState* exec,
+                                     ObjectPrototype* objProto,
+                                     FunctionPrototype* funcProto)
+    : InternalFunction(funcProto, "Object") {
   // ECMA 15.2.3.1
   putDirect(exec->propertyNames().prototype, objProto,
             DontEnum | DontDelete | ReadOnly);
@@ -204,12 +204,12 @@ ObjectObjectImp::ObjectObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-ConstructType ObjectObjectImp::getConstructData(ConstructData&) {
+ConstructType ObjectConstructor::getConstructData(ConstructData&) {
   return ConstructTypeNative;
 }
 
 // ECMA 15.2.2
-JSObject* ObjectObjectImp::construct(ExecState* exec, const List& args) {
+JSObject* ObjectConstructor::construct(ExecState* exec, const List& args) {
   JSValue* arg = args[0];
   switch (arg->type()) {
     case StringType:
@@ -226,9 +226,9 @@ JSObject* ObjectObjectImp::construct(ExecState* exec, const List& args) {
   }
 }
 
-JSValue* ObjectObjectImp::callAsFunction(ExecState* exec,
-                                         JSObject* /*thisObj*/,
-                                         const List& args) {
+JSValue* ObjectConstructor::callAsFunction(ExecState* exec,
+                                           JSObject* /*thisObj*/,
+                                           const List& args) {
   return construct(exec, args);
 }
 

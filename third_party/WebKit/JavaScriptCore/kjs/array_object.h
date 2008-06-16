@@ -37,9 +37,9 @@ class ArrayPrototype : public JSArray {
   static const ClassInfo info;
 };
 
-class ArrayObjectImp : public InternalFunctionImp {
+class ArrayConstructor : public InternalFunction {
  public:
-  ArrayObjectImp(ExecState*, FunctionPrototype*, ArrayPrototype*);
+  ArrayConstructor(ExecState*, FunctionPrototype*, ArrayPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);

@@ -156,8 +156,8 @@ CallIdentifier createCallIdentifier(JSObject* calledFunction) {
   if (calledFunction->inherits(&JSFunction::info))
     return createCallIdentifierFromFunctionImp(
         static_cast<JSFunction*>(calledFunction));
-  if (calledFunction->inherits(&InternalFunctionImp::info))
-    return CallIdentifier(static_cast<InternalFunctionImp*>(calledFunction)
+  if (calledFunction->inherits(&InternalFunction::info))
+    return CallIdentifier(static_cast<InternalFunction*>(calledFunction)
                               ->functionName()
                               .ustring(),
                           "", 0);

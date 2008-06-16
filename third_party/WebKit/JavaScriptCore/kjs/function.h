@@ -37,10 +37,10 @@ class FunctionPrototype;
 class JSActivation;
 class JSGlobalObject;
 
-class InternalFunctionImp : public JSObject {
+class InternalFunction : public JSObject {
  public:
-  InternalFunctionImp();
-  InternalFunctionImp(FunctionPrototype*, const Identifier&);
+  InternalFunction();
+  InternalFunction(FunctionPrototype*, const Identifier&);
 
   virtual CallType getCallData(CallData&);
 
@@ -57,7 +57,7 @@ class InternalFunctionImp : public JSObject {
   Identifier m_name;
 };
 
-class JSFunction : public InternalFunctionImp {
+class JSFunction : public InternalFunction {
  public:
   JSFunction(ExecState*, const Identifier&, FunctionBodyNode*, ScopeChainNode*);
 
@@ -134,7 +134,7 @@ class Arguments : public JSObject {
   mutable IndexToNameMap indexToNameMap;
 };
 
-class PrototypeFunction : public InternalFunctionImp {
+class PrototypeFunction : public InternalFunction {
  public:
   typedef JSValue* (*JSMemberFunction)(ExecState*,
                                        JSObject* thisObj,
@@ -157,7 +157,7 @@ class PrototypeFunction : public InternalFunctionImp {
 
 // Just like PrototypeFunction, but callbacks also get passed the JS function
 // object.
-class PrototypeReflexiveFunction : public InternalFunctionImp {
+class PrototypeReflexiveFunction : public InternalFunction {
  public:
   typedef JSValue* (*JSMemberFunction)(ExecState*,
                                        PrototypeReflexiveFunction*,

@@ -119,7 +119,7 @@ static JSRealType valueRealType(ExecState* exec, JSValue* val) {
       return Array;
     else if (object->inherits(&DateInstance::info))
       return Date;
-    else if (object->inherits(&RegExpImp::info))
+    else if (object->inherits(&RegExpObject::info))
       return RegExp;
     else if (object->inherits(&RuntimeObjectImp::s_info))
       return QObj;
@@ -502,7 +502,7 @@ QVariant convertValueToQVariant(ExecState* exec,
     case QMetaType::QRegExp:
       if (type == RegExp) {
         /*
-                        RegExpImp *re = static_cast<RegExpImp*>(object);
+                        RegExpObject *re = static_cast<RegExpObject*>(object);
         */
         // Attempt to convert.. a bit risky
         UString ustring = value->toString(exec);
@@ -764,7 +764,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
     QRegExp re = variant.value<QRegExp>();
 
     if (re.isValid()) {
-      RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
+      RegExpConstructor* regExpObj = static_cast<RegExpConstructor*>(
           exec->lexicalGlobalObject()->regExpConstructor());
       List args;
       UString uflags;
@@ -780,7 +780,7 @@ JSValue* convertQVariantToValue(ExecState* exec,
 
   if (type == QMetaType::QDateTime || type == QMetaType::QDate ||
       type == QMetaType::QTime) {
-    DateObjectImp* dateObj = static_cast<DateObjectImp*>(
+    DateConstructor* dateObj = static_cast<DateConstructor*>(
         exec->lexicalGlobalObject()->dateConstructor());
     List args;
 
@@ -880,9 +880,9 @@ QtRuntimeMethod::QtRuntimeMethod(QtRuntimeMethodData* dd,
                                  ExecState* exec,
                                  const Identifier& ident,
                                  PassRefPtr<QtInstance> inst)
-    : InternalFunctionImp(static_cast<FunctionPrototype*>(
-                              exec->lexicalGlobalObject()->functionPrototype()),
-                          ident),
+    : InternalFunction(static_cast<FunctionPrototype*>(
+                           exec->lexicalGlobalObject()->functionPrototype()),
+                       ident),
       d_ptr(dd) {
   QW_D(QtRuntimeMethod);
   d->m_instance = inst;

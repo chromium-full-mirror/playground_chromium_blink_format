@@ -72,7 +72,7 @@ JSValue* FunctionPrototype::callAsFunction(ExecState*, JSObject*, const List&) {
 JSValue* functionProtoFuncToString(ExecState* exec,
                                    JSObject* thisObj,
                                    const List&) {
-  if (!thisObj || !thisObj->inherits(&InternalFunctionImp::info)) {
+  if (!thisObj || !thisObj->inherits(&InternalFunction::info)) {
 #ifndef NDEBUG
     fprintf(stderr,
             "attempted toString() call on null or non-function object\n");
@@ -89,7 +89,7 @@ JSValue* functionProtoFuncToString(ExecState* exec,
 
   return jsString(
       "function " +
-      static_cast<InternalFunctionImp*>(thisObj)->functionName().ustring() +
+      static_cast<InternalFunction*>(thisObj)->functionName().ustring() +
       "() {\n    [native code]\n}");
 }
 
@@ -144,12 +144,13 @@ JSValue* functionProtoFuncCall(ExecState* exec,
   return thisObj->callAsFunction(exec, callThis, argsTail);
 }
 
-// ------------------------------ FunctionObjectImp ----------------------------
+// ------------------------------ FunctionConstructor
+// ----------------------------
 
-FunctionObjectImp::FunctionObjectImp(ExecState* exec,
-                                     FunctionPrototype* functionPrototype)
-    : InternalFunctionImp(functionPrototype,
-                          functionPrototype->classInfo()->className) {
+FunctionConstructor::FunctionConstructor(ExecState* exec,
+                                         FunctionPrototype* functionPrototype)
+    : InternalFunction(functionPrototype,
+                       functionPrototype->classInfo()->className) {
   putDirect(exec->propertyNames().prototype, functionPrototype,
             DontEnum | DontDelete | ReadOnly);
 
@@ -158,16 +159,16 @@ FunctionObjectImp::FunctionObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-ConstructType FunctionObjectImp::getConstructData(ConstructData&) {
+ConstructType FunctionConstructor::getConstructData(ConstructData&) {
   return ConstructTypeNative;
 }
 
 // ECMA 15.3.2 The Function Constructor
-JSObject* FunctionObjectImp::construct(ExecState* exec,
-                                       const List& args,
-                                       const Identifier& functionName,
-                                       const UString& sourceURL,
-                                       int lineNumber) {
+JSObject* FunctionConstructor::construct(ExecState* exec,
+                                         const List& args,
+                                         const Identifier& functionName,
+                                         const UString& sourceURL,
+                                         int lineNumber) {
   UString p("");
   UString body;
   int argsSize = args.size();
@@ -242,14 +243,14 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
 }
 
 // ECMA 15.3.2 The Function Constructor
-JSObject* FunctionObjectImp::construct(ExecState* exec, const List& args) {
+JSObject* FunctionConstructor::construct(ExecState* exec, const List& args) {
   return construct(exec, args, "anonymous", UString(), 1);
 }
 
 // ECMA 15.3.1 The Function Constructor Called as a Function
-JSValue* FunctionObjectImp::callAsFunction(ExecState* exec,
-                                           JSObject*,
-                                           const List& args) {
+JSValue* FunctionConstructor::callAsFunction(ExecState* exec,
+                                             JSObject*,
+                                             const List& args) {
   return construct(exec, args);
 }
 

@@ -41,9 +41,9 @@ class ErrorPrototype : public ErrorInstance {
 
 JSValue* errorProtoFuncToString(ExecState*, JSObject*, const List&);
 
-class ErrorObjectImp : public InternalFunctionImp {
+class ErrorConstructor : public InternalFunction {
  public:
-  ErrorObjectImp(ExecState*, FunctionPrototype*, ErrorPrototype*);
+  ErrorConstructor(ExecState*, FunctionPrototype*, ErrorPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);
@@ -59,9 +59,9 @@ class NativeErrorPrototype : public JSObject {
                        const UString& message);
 };
 
-class NativeErrorImp : public InternalFunctionImp {
+class NativeErrorConstructor : public InternalFunction {
  public:
-  NativeErrorImp(ExecState*, FunctionPrototype*, NativeErrorPrototype*);
+  NativeErrorConstructor(ExecState*, FunctionPrototype*, NativeErrorPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);

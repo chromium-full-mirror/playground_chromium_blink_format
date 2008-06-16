@@ -801,12 +801,13 @@ JSValue* arrayProtoFuncLastIndexOf(ExecState* exec,
   return jsNumber(-1);
 }
 
-// ------------------------------ ArrayObjectImp -------------------------------
+// ------------------------------ ArrayConstructor
+// -------------------------------
 
-ArrayObjectImp::ArrayObjectImp(ExecState* exec,
-                               FunctionPrototype* funcProto,
-                               ArrayPrototype* arrayProto)
-    : InternalFunctionImp(funcProto, arrayProto->classInfo()->className) {
+ArrayConstructor::ArrayConstructor(ExecState* exec,
+                                   FunctionPrototype* funcProto,
+                                   ArrayPrototype* arrayProto)
+    : InternalFunction(funcProto, arrayProto->classInfo()->className) {
   // ECMA 15.4.3.1 Array.prototype
   putDirect(exec->propertyNames().prototype, arrayProto,
             DontEnum | DontDelete | ReadOnly);
@@ -816,12 +817,12 @@ ArrayObjectImp::ArrayObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-ConstructType ArrayObjectImp::getConstructData(ConstructData&) {
+ConstructType ArrayConstructor::getConstructData(ConstructData&) {
   return ConstructTypeNative;
 }
 
 // ECMA 15.4.2
-JSObject* ArrayObjectImp::construct(ExecState* exec, const List& args) {
+JSObject* ArrayConstructor::construct(ExecState* exec, const List& args) {
   // a single numeric argument denotes the array size (!)
   if (args.size() == 1 && args[0]->isNumber()) {
     uint32_t n = args[0]->toUInt32(exec);
@@ -836,9 +837,9 @@ JSObject* ArrayObjectImp::construct(ExecState* exec, const List& args) {
 }
 
 // ECMA 15.6.1
-JSValue* ArrayObjectImp::callAsFunction(ExecState* exec,
-                                        JSObject*,
-                                        const List& args) {
+JSValue* ArrayConstructor::callAsFunction(ExecState* exec,
+                                          JSObject*,
+                                          const List& args) {
   // equivalent to 'new Array(....)'
   return construct(exec, args);
 }

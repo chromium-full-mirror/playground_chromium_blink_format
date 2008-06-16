@@ -44,9 +44,9 @@ JSValue* objectProtoFuncToString(ExecState*, JSObject*, const List&);
  *
  * The initial value of the the global variable's "Object" property
  */
-class ObjectObjectImp : public InternalFunctionImp {
+class ObjectConstructor : public InternalFunction {
  public:
-  ObjectObjectImp(ExecState*, ObjectPrototype*, FunctionPrototype*);
+  ObjectConstructor(ExecState*, ObjectPrototype*, FunctionPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);

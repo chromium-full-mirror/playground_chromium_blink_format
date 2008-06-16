@@ -32,11 +32,11 @@
 
 namespace KJS {
 
-// ------------------------------ NumberInstance ----------------------------
+// ------------------------------ NumberObject ----------------------------
 
-const ClassInfo NumberInstance::info = {"Number", 0, 0, 0};
+const ClassInfo NumberObject::info = {"Number", 0, 0, 0};
 
-NumberInstance::NumberInstance(JSObject* proto) : JSWrapperObject(proto) {}
+NumberObject::NumberObject(JSObject* proto) : JSWrapperObject(proto) {}
 
 // ------------------------------ NumberPrototype ---------------------------
 
@@ -56,10 +56,10 @@ static JSValue* numberProtoFuncToPrecision(ExecState*, JSObject*, const List&);
 NumberPrototype::NumberPrototype(ExecState* exec,
                                  ObjectPrototype* objectPrototype,
                                  FunctionPrototype* functionPrototype)
-    : NumberInstance(objectPrototype) {
+    : NumberObject(objectPrototype) {
   setInternalValue(jsNumber(0));
 
-  // The constructor will be added later, after NumberObjectImp has been
+  // The constructor will be added later, after NumberConstructor has been
   // constructed
 
   putDirectFunction(new PrototypeFunction(exec, functionPrototype, 1,
@@ -162,10 +162,10 @@ static double intPow10(int e) {
 JSValue* numberProtoFuncToString(ExecState* exec,
                                  JSObject* thisObj,
                                  const List& args) {
-  if (!thisObj->inherits(&NumberInstance::info))
+  if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
-  JSValue* v = static_cast<NumberInstance*>(thisObj)->internalValue();
+  JSValue* v = static_cast<NumberObject*>(thisObj)->internalValue();
 
   double radixAsDouble = args[0]->toInteger(exec);  // nan -> 0
   if (radixAsDouble == 10 || args[0]->isUndefined())
@@ -229,31 +229,30 @@ JSValue* numberProtoFuncToString(ExecState* exec,
 JSValue* numberProtoFuncToLocaleString(ExecState* exec,
                                        JSObject* thisObj,
                                        const List&) {
-  if (!thisObj->inherits(&NumberInstance::info))
+  if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
   // TODO
   return jsString(
-      static_cast<NumberInstance*>(thisObj)->internalValue()->toString(exec));
+      static_cast<NumberObject*>(thisObj)->internalValue()->toString(exec));
 }
 
 JSValue* numberProtoFuncValueOf(ExecState* exec,
                                 JSObject* thisObj,
                                 const List&) {
-  if (!thisObj->inherits(&NumberInstance::info))
+  if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
-  return static_cast<NumberInstance*>(thisObj)->internalValue()->toJSNumber(
-      exec);
+  return static_cast<NumberObject*>(thisObj)->internalValue()->toJSNumber(exec);
 }
 
 JSValue* numberProtoFuncToFixed(ExecState* exec,
                                 JSObject* thisObj,
                                 const List& args) {
-  if (!thisObj->inherits(&NumberInstance::info))
+  if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
-  JSValue* v = static_cast<NumberInstance*>(thisObj)->internalValue();
+  JSValue* v = static_cast<NumberObject*>(thisObj)->internalValue();
 
   JSValue* fractionDigits = args[0];
   double df = fractionDigits->toInteger(exec);
@@ -340,10 +339,10 @@ static void exponentialPartToString(char* buf, int& i, int decimalPoint) {
 JSValue* numberProtoFuncToExponential(ExecState* exec,
                                       JSObject* thisObj,
                                       const List& args) {
-  if (!thisObj->inherits(&NumberInstance::info))
+  if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
-  JSValue* v = static_cast<NumberInstance*>(thisObj)->internalValue();
+  JSValue* v = static_cast<NumberObject*>(thisObj)->internalValue();
 
   double x = v->toNumber(exec);
 
@@ -415,10 +414,10 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
 JSValue* numberProtoFuncToPrecision(ExecState* exec,
                                     JSObject* thisObj,
                                     const List& args) {
-  if (!thisObj->inherits(&NumberInstance::info))
+  if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
-  JSValue* v = static_cast<NumberInstance*>(thisObj)->internalValue();
+  JSValue* v = static_cast<NumberObject*>(thisObj)->internalValue();
 
   double doublePrecision = args[0]->toIntegerPreserveNaN(exec);
   double x = v->toNumber(exec);
@@ -481,26 +480,27 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
   return jsString(s + "0." + char_sequence('0', -(e + 1)) + m);
 }
 
-// ------------------------------ NumberObjectImp ------------------------------
+// ------------------------------ NumberConstructor
+// ------------------------------
 
-const ClassInfo NumberObjectImp::info = {"Function", &InternalFunctionImp::info,
-                                         0, ExecState::numberTable};
+const ClassInfo NumberConstructor::info = {"Function", &InternalFunction::info,
+                                           0, ExecState::numberTable};
 
 /* Source for number_object.lut.h
 @begin numberTable 5
-  NaN                   NumberObjectImp::NaNValue DontEnum|DontDelete|ReadOnly
-  NEGATIVE_INFINITY     NumberObjectImp::NegInfinity
+  NaN                   NumberConstructor::NaNValue DontEnum|DontDelete|ReadOnly
+  NEGATIVE_INFINITY     NumberConstructor::NegInfinity
 DontEnum|DontDelete|ReadOnly
-  POSITIVE_INFINITY     NumberObjectImp::PosInfinity
+  POSITIVE_INFINITY     NumberConstructor::PosInfinity
 DontEnum|DontDelete|ReadOnly
-  MAX_VALUE             NumberObjectImp::MaxValue DontEnum|DontDelete|ReadOnly
-  MIN_VALUE             NumberObjectImp::MinValue DontEnum|DontDelete|ReadOnly
+  MAX_VALUE             NumberConstructor::MaxValue DontEnum|DontDelete|ReadOnly
+  MIN_VALUE             NumberConstructor::MinValue DontEnum|DontDelete|ReadOnly
 @end
 */
-NumberObjectImp::NumberObjectImp(ExecState* exec,
-                                 FunctionPrototype* funcProto,
-                                 NumberPrototype* numberProto)
-    : InternalFunctionImp(funcProto, numberProto->classInfo()->className) {
+NumberConstructor::NumberConstructor(ExecState* exec,
+                                     FunctionPrototype* funcProto,
+                                     NumberPrototype* numberProto)
+    : InternalFunction(funcProto, numberProto->classInfo()->className) {
   // Number.Prototype
   putDirect(exec->propertyNames().prototype, numberProto,
             DontEnum | DontDelete | ReadOnly);
@@ -510,14 +510,14 @@ NumberObjectImp::NumberObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-bool NumberObjectImp::getOwnPropertySlot(ExecState* exec,
-                                         const Identifier& propertyName,
-                                         PropertySlot& slot) {
-  return getStaticValueSlot<NumberObjectImp, InternalFunctionImp>(
+bool NumberConstructor::getOwnPropertySlot(ExecState* exec,
+                                           const Identifier& propertyName,
+                                           PropertySlot& slot) {
+  return getStaticValueSlot<NumberConstructor, InternalFunction>(
       exec, ExecState::numberTable(exec), this, propertyName, slot);
 }
 
-JSValue* NumberObjectImp::getValueProperty(ExecState*, int token) const {
+JSValue* NumberConstructor::getValueProperty(ExecState*, int token) const {
   // ECMA 15.7.3
   switch (token) {
     case NaNValue:
@@ -535,14 +535,14 @@ JSValue* NumberObjectImp::getValueProperty(ExecState*, int token) const {
   return jsNull();
 }
 
-ConstructType NumberObjectImp::getConstructData(ConstructData&) {
+ConstructType NumberConstructor::getConstructData(ConstructData&) {
   return ConstructTypeNative;
 }
 
 // ECMA 15.7.1
-JSObject* NumberObjectImp::construct(ExecState* exec, const List& args) {
+JSObject* NumberConstructor::construct(ExecState* exec, const List& args) {
   JSObject* proto = exec->lexicalGlobalObject()->numberPrototype();
-  NumberInstance* obj = new NumberInstance(proto);
+  NumberObject* obj = new NumberObject(proto);
 
   // FIXME: Check args[0]->isUndefined() instead of args.isEmpty()?
   double n = args.isEmpty() ? 0 : args[0]->toNumber(exec);
@@ -551,9 +551,9 @@ JSObject* NumberObjectImp::construct(ExecState* exec, const List& args) {
 }
 
 // ECMA 15.7.2
-JSValue* NumberObjectImp::callAsFunction(ExecState* exec,
-                                         JSObject*,
-                                         const List& args) {
+JSValue* NumberConstructor::callAsFunction(ExecState* exec,
+                                           JSObject*,
+                                           const List& args) {
   // FIXME: Check args[0]->isUndefined() instead of args.isEmpty()?
   return jsNumber(args.isEmpty() ? 0 : args[0]->toNumber(exec));
 }

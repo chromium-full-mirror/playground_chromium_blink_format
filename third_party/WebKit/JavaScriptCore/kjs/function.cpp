@@ -58,20 +58,18 @@ namespace KJS {
 
 // ----------------------------- JSFunction ----------------------------------
 
-const ClassInfo JSFunction::info = {"Function", &InternalFunctionImp::info, 0,
-                                    0};
+const ClassInfo JSFunction::info = {"Function", &InternalFunction::info, 0, 0};
 
 JSFunction::JSFunction(ExecState* exec,
                        const Identifier& name,
                        FunctionBodyNode* b,
                        ScopeChainNode* scopeChain)
-    : InternalFunctionImp(exec->lexicalGlobalObject()->functionPrototype(),
-                          name),
+    : InternalFunction(exec->lexicalGlobalObject()->functionPrototype(), name),
       body(b),
       _scope(scopeChain) {}
 
 void JSFunction::mark() {
-  InternalFunctionImp::mark();
+  InternalFunction::mark();
   body->mark();
   _scope.mark();
 }
@@ -145,7 +143,7 @@ bool JSFunction::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  return InternalFunctionImp::getOwnPropertySlot(exec, propertyName, slot);
+  return InternalFunction::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 void JSFunction::put(ExecState* exec,
@@ -154,7 +152,7 @@ void JSFunction::put(ExecState* exec,
   if (propertyName == exec->propertyNames().arguments ||
       propertyName == exec->propertyNames().length)
     return;
-  InternalFunctionImp::put(exec, propertyName, value);
+  InternalFunction::put(exec, propertyName, value);
 }
 
 bool JSFunction::deleteProperty(ExecState* exec,
@@ -162,7 +160,7 @@ bool JSFunction::deleteProperty(ExecState* exec,
   if (propertyName == exec->propertyNames().arguments ||
       propertyName == exec->propertyNames().length)
     return false;
-  return InternalFunctionImp::deleteProperty(exec, propertyName);
+  return InternalFunction::deleteProperty(exec, propertyName);
 }
 
 /* Returns the parameter name corresponding to the given index. eg:
@@ -745,8 +743,7 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      int len,
                                      const Identifier& name,
                                      JSMemberFunction function)
-    : InternalFunctionImp(exec->lexicalGlobalObject()->functionPrototype(),
-                          name),
+    : InternalFunction(exec->lexicalGlobalObject()->functionPrototype(), name),
       m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(len),
@@ -758,7 +755,7 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      int len,
                                      const Identifier& name,
                                      JSMemberFunction function)
-    : InternalFunctionImp(functionPrototype, name), m_function(function) {
+    : InternalFunction(functionPrototype, name), m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(len),
             DontDelete | ReadOnly | DontEnum);
@@ -780,7 +777,7 @@ PrototypeReflexiveFunction::PrototypeReflexiveFunction(
     const Identifier& name,
     JSMemberFunction function,
     JSGlobalObject* cachedGlobalObject)
-    : InternalFunctionImp(functionPrototype, name),
+    : InternalFunction(functionPrototype, name),
       m_function(function),
       m_cachedGlobalObject(cachedGlobalObject) {
   ASSERT_ARG(function, function);
@@ -796,7 +793,7 @@ JSValue* PrototypeReflexiveFunction::callAsFunction(ExecState* exec,
 }
 
 void PrototypeReflexiveFunction::mark() {
-  InternalFunctionImp::mark();
+  InternalFunction::mark();
   if (!m_cachedGlobalObject->marked())
     m_cachedGlobalObject->mark();
 }

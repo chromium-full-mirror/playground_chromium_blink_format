@@ -27,7 +27,7 @@
 
 namespace KJS {
 
-struct RegExpObjectImpPrivate;
+struct RegExpConstructorPrivate;
 
 class RegExpPrototype : public JSObject {
  public:
@@ -37,12 +37,12 @@ class RegExpPrototype : public JSObject {
   static const ClassInfo info;
 };
 
-class RegExpImp : public JSObject {
+class RegExpObject : public JSObject {
  public:
   enum { Global, IgnoreCase, Multiline, Source, LastIndex };
 
-  RegExpImp(RegExpPrototype*, PassRefPtr<RegExp>);
-  virtual ~RegExpImp();
+  RegExpObject(RegExpPrototype*, PassRefPtr<RegExp>);
+  virtual ~RegExpObject();
 
   void setRegExp(PassRefPtr<RegExp> r) { m_regExp = r; }
   RegExp* regExp() const { return m_regExp.get(); }
@@ -70,7 +70,7 @@ class RegExpImp : public JSObject {
   double m_lastIndex;
 };
 
-class RegExpObjectImp : public InternalFunctionImp {
+class RegExpConstructor : public InternalFunction {
  public:
   enum {
     Dollar1,
@@ -90,7 +90,7 @@ class RegExpObjectImp : public InternalFunctionImp {
     RightContext
   };
 
-  RegExpObjectImp(ExecState*, FunctionPrototype*, RegExpPrototype*);
+  RegExpConstructor(ExecState*, FunctionPrototype*, RegExpPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);
@@ -120,7 +120,7 @@ class RegExpObjectImp : public InternalFunctionImp {
   JSValue* getLeftContext() const;
   JSValue* getRightContext() const;
 
-  OwnPtr<RegExpObjectImpPrivate> d;
+  OwnPtr<RegExpConstructorPrivate> d;
 };
 
 }  // namespace

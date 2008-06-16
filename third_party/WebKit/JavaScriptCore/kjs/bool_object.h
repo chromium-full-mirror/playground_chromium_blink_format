@@ -27,9 +27,9 @@
 
 namespace KJS {
 
-class BooleanInstance : public JSWrapperObject {
+class BooleanObject : public JSWrapperObject {
  public:
-  BooleanInstance(JSObject* proto);
+  BooleanObject(JSObject* proto);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -41,7 +41,7 @@ class BooleanInstance : public JSWrapperObject {
  * The initial value of Boolean.prototype (and thus all objects created
  * with the Boolean constructor
  */
-class BooleanPrototype : public BooleanInstance {
+class BooleanPrototype : public BooleanObject {
  public:
   BooleanPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
 };
@@ -51,9 +51,9 @@ class BooleanPrototype : public BooleanInstance {
  *
  * The initial value of the the global variable's "Boolean" property
  */
-class BooleanObjectImp : public InternalFunctionImp {
+class BooleanConstructor : public InternalFunction {
  public:
-  BooleanObjectImp(ExecState*, FunctionPrototype*, BooleanPrototype*);
+  BooleanConstructor(ExecState*, FunctionPrototype*, BooleanPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual JSObject* construct(ExecState*, const List&);
