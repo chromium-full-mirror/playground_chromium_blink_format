@@ -1058,7 +1058,6 @@ void InlineFlowBox::paintTextDecorations(RenderObject::PaintInfo& paintInfo,
     int extraOffset = 0;
     ShadowData* shadow = styleToUse->textShadow();
     if (!linesAreOpaque && shadow && shadow->next) {
-      context->save();
       IntRect clipRect(tx, ty, w, m_baseline + 2);
       for (ShadowData* s = shadow; s; s = s->next) {
         IntRect shadowRect(tx, ty, w, m_baseline + 2);
