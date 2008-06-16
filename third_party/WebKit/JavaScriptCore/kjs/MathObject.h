@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef MATH_OBJECT_H_
-#define MATH_OBJECT_H_
+#ifndef MathObject_h
+#define MathObject_h
 
-#include "function_object.h"
+#include "FunctionPrototype.h"
 #include "lookup.h"
 
 namespace KJS {
@@ -63,4 +63,4 @@ JSValue* mathProtoFuncTan(ExecState*, JSObject*, const List&);
 
 }  // namespace KJS
 
-#endif  // MATH_OBJECT_H_
+#endif  // MathObject_h

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef KJS_PROPERTY_SLOT_H
-#define KJS_PROPERTY_SLOT_H
+#ifndef PropertySlot_h
+#define PropertySlot_h
 
 #include "identifier.h"
 #include "JSValue.h"
@@ -164,4 +164,4 @@ class PropertySlot {
 };
 }
 
-#endif  // KJS_PROPERTY_SLOT_H
+#endif  // PropertySlot_h

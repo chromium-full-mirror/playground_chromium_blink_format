@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INTERNAL_H
-#define INTERNAL_H
+#ifndef JSString_h
+#define JSString_h
 
 #include "JSObject.h"
 #include "ustring.h"
@@ -109,4 +109,4 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(unsigned propertyName,
 
 }  // namespace
 
-#endif  //  INTERNAL_H
+#endif  //  JSString_h

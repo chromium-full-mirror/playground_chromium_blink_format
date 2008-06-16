@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef ARRAY_INSTANCE_H
-#define ARRAY_INSTANCE_H
+#ifndef JSArray_h
+#define JSArray_h
 
 #include "JSObject.h"
 

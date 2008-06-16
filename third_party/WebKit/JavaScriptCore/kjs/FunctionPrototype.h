@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef FUNCTION_OBJECT_H_
-#define FUNCTION_OBJECT_H_
+#ifndef FunctionPrototype_h
+#define FunctionPrototype_h
 
 #include "object_object.h"
 #include "JSFunction.h"

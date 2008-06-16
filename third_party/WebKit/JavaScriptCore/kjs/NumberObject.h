@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef NUMBER_OBJECT_H_
-#define NUMBER_OBJECT_H_
+#ifndef NumberObject_h
+#define NumberObject_h
 
-#include "function_object.h"
+#include "FunctionPrototype.h"
 #include "JSWrapperObject.h"
 
 namespace KJS {
@@ -74,4 +74,4 @@ class NumberConstructor : public InternalFunction {
 
 }  // namespace KJS
 
-#endif  // NUMBER_OBJECT_H_
+#endif  // NumberObject_h
