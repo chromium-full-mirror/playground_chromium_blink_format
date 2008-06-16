@@ -211,7 +211,7 @@ CallType RuntimeObjectImp::getCallData(CallData&) {
 
 JSValue* RuntimeObjectImp::callAsFunction(ExecState* exec,
                                           JSObject*,
-                                          const List& args) {
+                                          const ArgList& args) {
   if (!instance)
     return throwInvalidAccessError(exec);
 

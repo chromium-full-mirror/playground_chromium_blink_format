@@ -80,7 +80,7 @@ void JSCanvasRenderingContext2D::setFillStyle(ExecState* exec, JSValue* value) {
 }
 
 JSValue* JSCanvasRenderingContext2D::setFillColor(ExecState* exec,
-                                                  const List& args) {
+                                                  const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
   // string arg = named color
@@ -118,7 +118,7 @@ JSValue* JSCanvasRenderingContext2D::setFillColor(ExecState* exec,
 }
 
 JSValue* JSCanvasRenderingContext2D::setStrokeColor(ExecState* exec,
-                                                    const List& args) {
+                                                    const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
   // string arg = named color
@@ -158,7 +158,7 @@ JSValue* JSCanvasRenderingContext2D::setStrokeColor(ExecState* exec,
 }
 
 JSValue* JSCanvasRenderingContext2D::strokeRect(ExecState* exec,
-                                                const List& args) {
+                                                const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
   if (args.size() <= 4)
@@ -173,7 +173,7 @@ JSValue* JSCanvasRenderingContext2D::strokeRect(ExecState* exec,
 }
 
 JSValue* JSCanvasRenderingContext2D::drawImage(ExecState* exec,
-                                               const List& args) {
+                                               const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
   // DrawImage has three variants:
@@ -249,7 +249,7 @@ JSValue* JSCanvasRenderingContext2D::drawImage(ExecState* exec,
 }
 
 JSValue* JSCanvasRenderingContext2D::drawImageFromRect(ExecState* exec,
-                                                       const List& args) {
+                                                       const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
   JSValue* value = args[0];
@@ -269,7 +269,7 @@ JSValue* JSCanvasRenderingContext2D::drawImageFromRect(ExecState* exec,
 }
 
 JSValue* JSCanvasRenderingContext2D::setShadow(ExecState* exec,
-                                               const List& args) {
+                                               const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
   switch (args.size()) {
@@ -315,7 +315,7 @@ JSValue* JSCanvasRenderingContext2D::setShadow(ExecState* exec,
 }
 
 JSValue* JSCanvasRenderingContext2D::createPattern(ExecState* exec,
-                                                   const List& args) {
+                                                   const ArgList& args) {
   CanvasRenderingContext2D* context = impl();
 
   JSValue* value = args[0];
@@ -352,7 +352,7 @@ JSValue* JSCanvasRenderingContext2D::createPattern(ExecState* exec,
 }
 
 JSValue* JSCanvasRenderingContext2D::putImageData(ExecState* exec,
-                                                  const List& args) {
+                                                  const ArgList& args) {
   // putImageData has two variants
   // putImageData(ImageData, x, y)
   // putImageData(ImageData, x, y, dirtyX, dirtyY, dirtyWidth, dirtyHeight)

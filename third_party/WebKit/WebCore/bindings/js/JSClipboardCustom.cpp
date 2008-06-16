@@ -54,14 +54,14 @@ JSValue* JSClipboard::types(ExecState* exec) const {
   if (types.isEmpty())
     return jsNull();
 
-  List list;
+  ArgList list;
   HashSet<String>::const_iterator end = types.end();
   for (HashSet<String>::const_iterator it = types.begin(); it != end; ++it)
     list.append(jsString(UString(*it)));
   return exec->lexicalGlobalObject()->arrayConstructor()->construct(exec, list);
 }
 
-JSValue* JSClipboard::clearData(ExecState* exec, const List& args) {
+JSValue* JSClipboard::clearData(ExecState* exec, const ArgList& args) {
   Clipboard* clipboard = impl();
 
   if (args.size() == 0) {
@@ -80,7 +80,7 @@ JSValue* JSClipboard::clearData(ExecState* exec, const List& args) {
                     "clearData: Invalid number of arguments");
 }
 
-JSValue* JSClipboard::getData(ExecState* exec, const List& args) {
+JSValue* JSClipboard::getData(ExecState* exec, const ArgList& args) {
   // FIXME: It does not match the rest of the JS bindings to throw on invalid
   // number of arguments.
   if (args.size() != 1)
@@ -97,7 +97,7 @@ JSValue* JSClipboard::getData(ExecState* exec, const List& args) {
   return jsString(result);
 }
 
-JSValue* JSClipboard::setData(ExecState* exec, const List& args) {
+JSValue* JSClipboard::setData(ExecState* exec, const ArgList& args) {
   Clipboard* clipboard = impl();
 
   // FIXME: It does not match the rest of the JS bindings to throw on invalid
@@ -110,7 +110,7 @@ JSValue* JSClipboard::setData(ExecState* exec, const List& args) {
       clipboard->setData(args[0]->toString(exec), args[1]->toString(exec)));
 }
 
-JSValue* JSClipboard::setDragImage(ExecState* exec, const List& args) {
+JSValue* JSClipboard::setDragImage(ExecState* exec, const ArgList& args) {
   Clipboard* clipboard = impl();
 
   if (!clipboard->isForDragging())

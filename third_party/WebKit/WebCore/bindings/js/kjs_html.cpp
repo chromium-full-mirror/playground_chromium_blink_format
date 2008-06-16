@@ -121,7 +121,7 @@ bool runtimeObjectImplementsCall(HTMLElement* thisImp) {
 
 JSValue* runtimeObjectCallAsFunction(ExecState* exec,
                                      JSObject* thisObj,
-                                     const List& args,
+                                     const ArgList& args,
                                      HTMLElement* thisImp) {
   JSObject* runtimeObject = getRuntimeObject(exec, thisImp);
   if (!runtimeObject)

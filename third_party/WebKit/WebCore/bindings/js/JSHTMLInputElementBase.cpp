@@ -46,7 +46,7 @@ KJS_IMPLEMENT_PROTOTYPE("HTMLInputElementBase", JSHTMLInputElementBasePrototype)
 
 JSValue* jsHTMLInputElementBaseFunctionSetSelectionRange(ExecState* exec,
                                                          JSObject* thisObj,
-                                                         const List& args) {
+                                                         const ArgList& args) {
   HTMLInputElement& input = *static_cast<HTMLInputElement*>(
       static_cast<JSHTMLInputElementBase*>(thisObj)->impl());
   input.setSelectionRange(args[0]->toInt32(exec), args[1]->toInt32(exec));

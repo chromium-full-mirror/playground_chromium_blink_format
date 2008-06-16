@@ -36,7 +36,7 @@ namespace KJS {
 
 class Identifier;
 class JSGlobalObject;
-class List;
+class ArgList;
 class PropertyNameArray;
 
 namespace Bindings {
@@ -133,8 +133,8 @@ class Instance : public RefCounted<Instance> {
 
   virtual JSValue* invokeMethod(ExecState*,
                                 const MethodList&,
-                                const List& args) = 0;
-  virtual JSValue* invokeDefaultMethod(ExecState*, const List&) {
+                                const ArgList& args) = 0;
+  virtual JSValue* invokeDefaultMethod(ExecState*, const ArgList&) {
     return jsUndefined();
   }
 
@@ -170,7 +170,7 @@ class Array : Noncopyable {
   RefPtr<RootObject> _rootObject;
 };
 
-const char* signatureForParameters(const List&);
+const char* signatureForParameters(const ArgList&);
 
 typedef HashMap<RefPtr<UString::Rep>, MethodList*> MethodListMap;
 typedef HashMap<RefPtr<UString::Rep>, Method*> MethodMap;

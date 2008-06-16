@@ -104,13 +104,13 @@ bool retrieveEventTargetAndCorrespondingNode(KJS::ExecState*,
 // Functions
 KJS::JSValue* jsEventTargetAddEventListener(KJS::ExecState*,
                                             KJS::JSObject*,
-                                            const KJS::List&);
+                                            const KJS::ArgList&);
 KJS::JSValue* jsEventTargetRemoveEventListener(KJS::ExecState*,
                                                KJS::JSObject*,
-                                               const KJS::List&);
+                                               const KJS::ArgList&);
 KJS::JSValue* jsEventTargetDispatchEvent(KJS::ExecState*,
                                          KJS::JSObject*,
-                                         const KJS::List&);
+                                         const KJS::ArgList&);
 
 // Helper function for getValueProperty/putValueProperty
 const AtomicString& eventNameForPropertyToken(int token);

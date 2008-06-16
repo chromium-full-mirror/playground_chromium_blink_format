@@ -129,7 +129,7 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
 
   Identifier nameID = name ? Identifier(toJS(name)) : Identifier("anonymous");
 
-  List args;
+  ArgList args;
   for (unsigned i = 0; i < parameterCount; i++)
     args.append(jsString(UString(toJS(parameterNames[i]))));
   args.append(jsString(UString(bodyRep)));
@@ -309,7 +309,7 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
   if (!jsThisObject)
     jsThisObject = exec->globalThisValue();
 
-  List argList;
+  ArgList argList;
   for (size_t i = 0; i < argumentCount; i++)
     argList.append(toJS(arguments[i]));
 
@@ -340,7 +340,7 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,
   ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
 
-  List argList;
+  ArgList argList;
   for (size_t i = 0; i < argumentCount; i++)
     argList.append(toJS(arguments[i]));
 

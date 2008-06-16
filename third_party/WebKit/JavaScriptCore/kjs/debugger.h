@@ -34,7 +34,7 @@ class ExecState;
 class JSGlobalObject;
 class JSObject;
 class JSValue;
-class List;
+class ArgList;
 class SourceProvider;
 class UString;
 

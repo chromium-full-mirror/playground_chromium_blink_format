@@ -65,7 +65,7 @@ bool RuntimeMethod::getOwnPropertySlot(ExecState* exec,
 
 JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
                                        JSObject* thisObj,
-                                       const List& args) {
+                                       const ArgList& args) {
   if (_methodList->isEmpty())
     return jsUndefined();
 

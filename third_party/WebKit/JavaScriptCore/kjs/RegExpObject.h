@@ -47,11 +47,11 @@ class RegExpObject : public JSObject {
   void setRegExp(PassRefPtr<RegExp> r) { m_regExp = r; }
   RegExp* regExp() const { return m_regExp.get(); }
 
-  JSValue* test(ExecState*, const List& args);
-  JSValue* exec(ExecState*, const List& args);
+  JSValue* test(ExecState*, const ArgList& args);
+  JSValue* exec(ExecState*, const ArgList& args);
 
   virtual CallType getCallData(CallData&);
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
+  virtual JSValue* callAsFunction(ExecState*, JSObject*, const ArgList&);
 
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
@@ -64,7 +64,7 @@ class RegExpObject : public JSObject {
   void setLastIndex(double lastIndex) { m_lastIndex = lastIndex; }
 
  private:
-  bool match(ExecState*, const List& args);
+  bool match(ExecState*, const ArgList& args);
 
   RefPtr<RegExp> m_regExp;
   double m_lastIndex;
@@ -93,9 +93,9 @@ class RegExpConstructor : public InternalFunction {
   RegExpConstructor(ExecState*, FunctionPrototype*, RegExpPrototype*);
 
   virtual ConstructType getConstructData(ConstructData&);
-  virtual JSObject* construct(ExecState*, const List&);
+  virtual JSObject* construct(ExecState*, const ArgList&);
 
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List&);
+  virtual JSValue* callAsFunction(ExecState*, JSObject*, const ArgList&);
 
   virtual void put(ExecState*, const Identifier&, JSValue*);
   void putValueProperty(ExecState*, int token, JSValue*);

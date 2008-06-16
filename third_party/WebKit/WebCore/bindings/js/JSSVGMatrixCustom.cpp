@@ -30,7 +30,7 @@ using namespace KJS;
 
 namespace WebCore {
 
-JSValue* JSSVGMatrix::multiply(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::multiply(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   AffineTransform secondMatrix = toSVGMatrix(args[0]);
@@ -40,7 +40,7 @@ JSValue* JSSVGMatrix::multiply(ExecState* exec, const List& args) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::inverse(ExecState* exec, const List&) {
+JSValue* JSSVGMatrix::inverse(ExecState* exec, const ArgList&) {
   AffineTransform imp(*impl());
   KJS::JSValue* result = toJS(
       exec,
@@ -54,7 +54,7 @@ JSValue* JSSVGMatrix::inverse(ExecState* exec, const List&) {
   return result;
 }
 
-JSValue* JSSVGMatrix::translate(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::translate(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float x = args[0]->toFloat(exec);
@@ -66,7 +66,7 @@ JSValue* JSSVGMatrix::translate(ExecState* exec, const List& args) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::scale(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::scale(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float scaleFactor = args[0]->toFloat(exec);
@@ -76,7 +76,7 @@ JSValue* JSSVGMatrix::scale(ExecState* exec, const List& args) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::scaleNonUniform(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::scaleNonUniform(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float scaleFactorX = args[0]->toFloat(exec);
@@ -88,7 +88,7 @@ JSValue* JSSVGMatrix::scaleNonUniform(ExecState* exec, const List& args) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::rotate(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::rotate(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float angle = args[0]->toFloat(exec);
@@ -98,7 +98,7 @@ JSValue* JSSVGMatrix::rotate(ExecState* exec, const List& args) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::rotateFromVector(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::rotateFromVector(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float x = args[0]->toFloat(exec);
@@ -116,7 +116,7 @@ JSValue* JSSVGMatrix::rotateFromVector(ExecState* exec, const List& args) {
   return result;
 }
 
-JSValue* JSSVGMatrix::flipX(ExecState* exec, const List&) {
+JSValue* JSSVGMatrix::flipX(ExecState* exec, const ArgList&) {
   AffineTransform imp(*impl());
   return toJS(exec, JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>::create(
                         imp.flipX())
@@ -124,7 +124,7 @@ JSValue* JSSVGMatrix::flipX(ExecState* exec, const List&) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::flipY(ExecState* exec, const List&) {
+JSValue* JSSVGMatrix::flipY(ExecState* exec, const ArgList&) {
   AffineTransform imp(*impl());
   return toJS(exec, JSSVGPODTypeWrapperCreatorReadOnly<AffineTransform>::create(
                         imp.flipY())
@@ -132,7 +132,7 @@ JSValue* JSSVGMatrix::flipY(ExecState* exec, const List&) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::skewX(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::skewX(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float angle = args[0]->toFloat(exec);
@@ -142,7 +142,7 @@ JSValue* JSSVGMatrix::skewX(ExecState* exec, const List& args) {
               m_context.get());
 }
 
-JSValue* JSSVGMatrix::skewY(ExecState* exec, const List& args) {
+JSValue* JSSVGMatrix::skewY(ExecState* exec, const ArgList& args) {
   AffineTransform imp(*impl());
 
   float angle = args[0]->toFloat(exec);

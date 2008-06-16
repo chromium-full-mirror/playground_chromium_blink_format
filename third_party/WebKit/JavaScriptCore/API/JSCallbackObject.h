@@ -53,7 +53,7 @@ class JSCallbackObject : public Base {
   virtual bool deleteProperty(ExecState*, unsigned);
 
   virtual ConstructType getConstructData(ConstructData&);
-  virtual JSObject* construct(ExecState*, const List& args);
+  virtual JSObject* construct(ExecState*, const ArgList& args);
 
   virtual bool implementsHasInstance() const;
   virtual bool hasInstance(ExecState* exec, JSValue* value);
@@ -61,7 +61,7 @@ class JSCallbackObject : public Base {
   virtual CallType getCallData(CallData&);
   virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 

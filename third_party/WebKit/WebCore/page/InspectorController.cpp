@@ -173,7 +173,7 @@ struct ConsoleMessage {
   ConsoleMessage(MessageSource s,
                  MessageLevel l,
                  ExecState* exec,
-                 const List& args,
+                 const ArgList& args,
                  unsigned li,
                  const String& u)
       : source(s), level(l), wrappedArguments(args.size()), line(li), url(u) {
@@ -1359,7 +1359,7 @@ void InspectorController::setWindowVisible(bool visible) {
 void InspectorController::addMessageToConsole(MessageSource source,
                                               MessageLevel level,
                                               ExecState* exec,
-                                              const List& arguments,
+                                              const ArgList& arguments,
                                               unsigned lineNumber,
                                               const String& sourceURL) {
   if (!enabled())

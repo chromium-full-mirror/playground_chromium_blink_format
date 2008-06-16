@@ -45,7 +45,8 @@ KJS::ConstructType JSXMLHttpRequestConstructor::getConstructData(
   return ConstructTypeNative;
 }
 
-JSObject* JSXMLHttpRequestConstructor::construct(ExecState* exec, const List&) {
+JSObject* JSXMLHttpRequestConstructor::construct(ExecState* exec,
+                                                 const ArgList&) {
   RefPtr<XMLHttpRequest> xmlHttpRequest =
       XMLHttpRequest::create(m_document.get());
   JSXMLHttpRequest* ret = new JSXMLHttpRequest(

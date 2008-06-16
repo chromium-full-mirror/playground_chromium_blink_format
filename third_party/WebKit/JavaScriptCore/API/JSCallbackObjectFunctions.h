@@ -265,7 +265,8 @@ ConstructType JSCallbackObject<Base>::getConstructData(ConstructData&) {
 }
 
 template <class Base>
-JSObject* JSCallbackObject<Base>::construct(ExecState* exec, const List& args) {
+JSObject* JSCallbackObject<Base>::construct(ExecState* exec,
+                                            const ArgList& args) {
   JSContextRef execRef = toRef(exec);
   JSObjectRef thisRef = toRef(this);
 
@@ -325,7 +326,7 @@ CallType JSCallbackObject<Base>::getCallData(CallData&) {
 template <class Base>
 JSValue* JSCallbackObject<Base>::callAsFunction(ExecState* exec,
                                                 JSObject* thisObj,
-                                                const List& args) {
+                                                const ArgList& args) {
   JSContextRef execRef = toRef(exec);
   JSObjectRef thisRef = toRef(this);
   JSObjectRef thisObjRef = toRef(thisObj);

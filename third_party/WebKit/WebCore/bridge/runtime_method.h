@@ -41,7 +41,7 @@ class RuntimeMethod : public InternalFunction {
 
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
 
  private:
   static JSValue* lengthGetter(ExecState*,

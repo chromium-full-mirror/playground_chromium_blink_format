@@ -35,7 +35,7 @@ using namespace KJS;
 
 namespace WebCore {
 
-JSValue* JSSVGPathSegList::clear(ExecState* exec, const List& args) {
+JSValue* JSSVGPathSegList::clear(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
@@ -47,7 +47,7 @@ JSValue* JSSVGPathSegList::clear(ExecState* exec, const List& args) {
   return jsUndefined();
 }
 
-JSValue* JSSVGPathSegList::initialize(ExecState* exec, const List& args) {
+JSValue* JSSVGPathSegList::initialize(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args[0]);
 
@@ -62,7 +62,7 @@ JSValue* JSSVGPathSegList::initialize(ExecState* exec, const List& args) {
   return result;
 }
 
-JSValue* JSSVGPathSegList::getItem(ExecState* exec, const List& args) {
+JSValue* JSSVGPathSegList::getItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   bool indexOk;
@@ -80,7 +80,8 @@ JSValue* JSSVGPathSegList::getItem(ExecState* exec, const List& args) {
   return result;
 }
 
-JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec, const List& args) {
+JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec,
+                                            const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args[0]);
 
@@ -102,7 +103,7 @@ JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec, const List& args) {
   return result;
 }
 
-JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const List& args) {
+JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args[0]);
 
@@ -123,7 +124,7 @@ JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const List& args) {
   return result;
 }
 
-JSValue* JSSVGPathSegList::removeItem(ExecState* exec, const List& args) {
+JSValue* JSSVGPathSegList::removeItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
 
   bool indexOk;
@@ -144,7 +145,7 @@ JSValue* JSSVGPathSegList::removeItem(ExecState* exec, const List& args) {
   return result;
 }
 
-JSValue* JSSVGPathSegList::appendItem(ExecState* exec, const List& args) {
+JSValue* JSSVGPathSegList::appendItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGPathSeg* newItem = toSVGPathSeg(args[0]);
 

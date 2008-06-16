@@ -51,7 +51,7 @@ bool runtimeObjectCustomPut(KJS::ExecState*,
 bool runtimeObjectImplementsCall(HTMLElement*);
 KJS::JSValue* runtimeObjectCallAsFunction(KJS::ExecState*,
                                           KJS::JSObject*,
-                                          const KJS::List&,
+                                          const KJS::ArgList&,
                                           HTMLElement*);
 
 }  // namespace WebCore

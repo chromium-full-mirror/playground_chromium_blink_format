@@ -81,7 +81,7 @@ static JSValue* finishSetterReadOnlyResult(
       context);
 }
 
-JSValue* JSSVGTransformList::clear(ExecState* exec, const List&) {
+JSValue* JSSVGTransformList::clear(ExecState* exec, const ArgList&) {
   ExceptionCode ec = 0;
   impl()->clear(ec);
   setDOMException(exec, ec);
@@ -89,7 +89,7 @@ JSValue* JSSVGTransformList::clear(ExecState* exec, const List&) {
   return jsUndefined();
 }
 
-JSValue* JSSVGTransformList::initialize(ExecState* exec, const List& args) {
+JSValue* JSSVGTransformList::initialize(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGTransformListBase* listImp = impl();
   return finishSetter(
@@ -98,7 +98,7 @@ JSValue* JSSVGTransformList::initialize(ExecState* exec, const List& args) {
           SVGPODListItem<SVGTransform>::copy(toSVGTransform(args[0])), ec));
 }
 
-JSValue* JSSVGTransformList::getItem(ExecState* exec, const List& args) {
+JSValue* JSSVGTransformList::getItem(ExecState* exec, const ArgList& args) {
   bool indexOk;
   unsigned index = args[0]->toInt32(exec, indexOk);
   if (!indexOk) {
@@ -112,7 +112,7 @@ JSValue* JSSVGTransformList::getItem(ExecState* exec, const List& args) {
 }
 
 JSValue* JSSVGTransformList::insertItemBefore(ExecState* exec,
-                                              const List& args) {
+                                              const ArgList& args) {
   bool indexOk;
   unsigned index = args[1]->toInt32(exec, indexOk);
   if (!indexOk) {
@@ -129,7 +129,7 @@ JSValue* JSSVGTransformList::insertItemBefore(ExecState* exec,
           ec));
 }
 
-JSValue* JSSVGTransformList::replaceItem(ExecState* exec, const List& args) {
+JSValue* JSSVGTransformList::replaceItem(ExecState* exec, const ArgList& args) {
   bool indexOk;
   unsigned index = args[1]->toInt32(exec, indexOk);
   if (!indexOk) {
@@ -145,7 +145,7 @@ JSValue* JSSVGTransformList::replaceItem(ExecState* exec, const List& args) {
                                            index, ec));
 }
 
-JSValue* JSSVGTransformList::removeItem(ExecState* exec, const List& args) {
+JSValue* JSSVGTransformList::removeItem(ExecState* exec, const ArgList& args) {
   bool indexOk;
   unsigned index = args[0]->toInt32(exec, indexOk);
   if (!indexOk) {
@@ -159,7 +159,7 @@ JSValue* JSSVGTransformList::removeItem(ExecState* exec, const List& args) {
                                     listImp->removeItem(index, ec));
 }
 
-JSValue* JSSVGTransformList::appendItem(ExecState* exec, const List& args) {
+JSValue* JSSVGTransformList::appendItem(ExecState* exec, const ArgList& args) {
   ExceptionCode ec = 0;
   SVGTransformListBase* listImp = impl();
   return finishSetter(

@@ -158,7 +158,7 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
 
   virtual void mark();
 
@@ -192,7 +192,7 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
 
  protected:
   QtRuntimeConnectionMethodData* d_func() const {

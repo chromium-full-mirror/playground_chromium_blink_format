@@ -49,7 +49,7 @@ class RuntimeObjectImp : public JSObject {
   virtual KJS::CallType getCallData(KJS::CallData&);
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual void invalidate();

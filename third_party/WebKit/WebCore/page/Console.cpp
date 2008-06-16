@@ -125,7 +125,7 @@ static void printToStandardOut(MessageSource source,
 
 static void printToStandardOut(MessageLevel level,
                                ExecState* exec,
-                               const List& arguments,
+                               const ArgList& arguments,
                                const KURL& url) {
   if (!Interpreter::shouldPrintExceptions())
     return;
@@ -163,13 +163,13 @@ void Console::addMessage(MessageSource source,
   printToStandardOut(source, level, message, sourceURL, lineNumber);
 }
 
-void Console::debug(ExecState* exec, const List& arguments) {
+void Console::debug(ExecState* exec, const ArgList& arguments) {
   // In Firebug, console.debug has the same behavior as console.log. So we'll do
   // the same.
   log(exec, arguments);
 }
 
-void Console::error(ExecState* exec, const List& arguments) {
+void Console::error(ExecState* exec, const ArgList& arguments) {
   if (arguments.isEmpty())
     return;
 
@@ -191,7 +191,7 @@ void Console::error(ExecState* exec, const List& arguments) {
   printToStandardOut(ErrorMessageLevel, exec, arguments, url);
 }
 
-void Console::info(ExecState* exec, const List& arguments) {
+void Console::info(ExecState* exec, const ArgList& arguments) {
   if (arguments.isEmpty())
     return;
 
@@ -213,7 +213,7 @@ void Console::info(ExecState* exec, const List& arguments) {
   printToStandardOut(LogMessageLevel, exec, arguments, url);
 }
 
-void Console::log(ExecState* exec, const List& arguments) {
+void Console::log(ExecState* exec, const ArgList& arguments) {
   if (arguments.isEmpty())
     return;
 
@@ -237,7 +237,7 @@ void Console::log(ExecState* exec, const List& arguments) {
 
 void Console::assertCondition(bool condition,
                               ExecState* exec,
-                              const List& arguments) {
+                              const ArgList& arguments) {
   if (condition)
     return;
 
@@ -261,7 +261,7 @@ void Console::assertCondition(bool condition,
   printToStandardOut(ErrorMessageLevel, exec, arguments, url);
 }
 
-void Console::profile(ExecState* exec, const List& arguments) const {
+void Console::profile(ExecState* exec, const ArgList& arguments) const {
   Page* page = m_frame->page();
   if (!page)
     return;
@@ -270,7 +270,7 @@ void Console::profile(ExecState* exec, const List& arguments) const {
   Profiler::profiler()->startProfiling(exec, title);
 }
 
-void Console::profileEnd(ExecState* exec, const List& arguments) const {
+void Console::profileEnd(ExecState* exec, const ArgList& arguments) const {
   Page* page = m_frame->page();
   if (!page)
     return;
@@ -284,7 +284,7 @@ void Console::profileEnd(ExecState* exec, const List& arguments) const {
     page->inspectorController()->addProfile(profile);
 }
 
-void Console::warn(ExecState* exec, const List& arguments) {
+void Console::warn(ExecState* exec, const ArgList& arguments) {
   if (arguments.isEmpty())
     return;
 

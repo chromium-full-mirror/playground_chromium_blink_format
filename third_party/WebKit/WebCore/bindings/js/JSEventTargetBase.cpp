@@ -98,7 +98,7 @@ DontDelete|Function 1
 
 JSValue* jsEventTargetAddEventListener(ExecState* exec,
                                        JSObject* thisObj,
-                                       const List& args) {
+                                       const ArgList& args) {
   DOMExceptionTranslator exception(exec);
 
   Node* eventNode = 0;
@@ -121,7 +121,7 @@ JSValue* jsEventTargetAddEventListener(ExecState* exec,
 
 JSValue* jsEventTargetRemoveEventListener(ExecState* exec,
                                           JSObject* thisObj,
-                                          const List& args) {
+                                          const ArgList& args) {
   DOMExceptionTranslator exception(exec);
 
   Node* eventNode = 0;
@@ -144,7 +144,7 @@ JSValue* jsEventTargetRemoveEventListener(ExecState* exec,
 
 JSValue* jsEventTargetDispatchEvent(ExecState* exec,
                                     JSObject* thisObj,
-                                    const List& args) {
+                                    const ArgList& args) {
   Node* eventNode = 0;
   EventTarget* eventTarget = 0;
   if (!retrieveEventTargetAndCorrespondingNode(exec, thisObj, eventNode,

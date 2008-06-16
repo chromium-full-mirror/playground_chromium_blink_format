@@ -962,7 +962,7 @@ JSDOMWindowShell* JSDOMWindowBase::shell() const {
 
 JSValue* windowProtoFuncAToB(ExecState* exec,
                              JSObject* thisObj,
-                             const List& args) {
+                             const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -996,7 +996,7 @@ JSValue* windowProtoFuncAToB(ExecState* exec,
 
 JSValue* windowProtoFuncBToA(ExecState* exec,
                              JSObject* thisObj,
-                             const List& args) {
+                             const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1029,7 +1029,7 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
 
 JSValue* windowProtoFuncOpen(ExecState* exec,
                              JSObject* thisObj,
-                             const List& args) {
+                             const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1115,7 +1115,7 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
 
 JSValue* windowProtoFuncSetTimeout(ExecState* exec,
                                    JSObject* thisObj,
-                                   const List& args) {
+                                   const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1128,7 +1128,7 @@ JSValue* windowProtoFuncSetTimeout(ExecState* exec,
     return jsNumber(window->installTimeout(
         v->toString(exec), args[1]->toInt32(exec), true /*single shot*/));
   if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
-    List argsTail;
+    ArgList argsTail;
     args.getSlice(2, argsTail);
     return jsNumber(window->installTimeout(v, argsTail, args[1]->toInt32(exec),
                                            true /*single shot*/));
@@ -1139,7 +1139,7 @@ JSValue* windowProtoFuncSetTimeout(ExecState* exec,
 
 JSValue* windowProtoFuncClearTimeout(ExecState* exec,
                                      JSObject* thisObj,
-                                     const List& args) {
+                                     const ArgList& args) {
   // Also the implementation for window.clearInterval()
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
@@ -1154,7 +1154,7 @@ JSValue* windowProtoFuncClearTimeout(ExecState* exec,
 
 JSValue* windowProtoFuncSetInterval(ExecState* exec,
                                     JSObject* thisObj,
-                                    const List& args) {
+                                    const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1168,7 +1168,7 @@ JSValue* windowProtoFuncSetInterval(ExecState* exec,
     if (v->isString())
       return jsNumber(window->installTimeout(v->toString(exec), delay, false));
     if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
-      List argsTail;
+      ArgList argsTail;
       args.getSlice(2, argsTail);
       return jsNumber(window->installTimeout(v, argsTail, delay, false));
     }
@@ -1179,7 +1179,7 @@ JSValue* windowProtoFuncSetInterval(ExecState* exec,
 
 JSValue* windowProtoFuncAddEventListener(ExecState* exec,
                                          JSObject* thisObj,
-                                         const List& args) {
+                                         const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1203,7 +1203,7 @@ JSValue* windowProtoFuncAddEventListener(ExecState* exec,
 
 JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
                                             JSObject* thisObj,
-                                            const List& args) {
+                                            const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1226,7 +1226,7 @@ JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
 
 JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
                                         JSObject* thisObj,
-                                        const List& args) {
+                                        const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1245,7 +1245,7 @@ JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
 
 JSValue* windowProtoFuncNotImplemented(ExecState* exec,
                                        JSObject* thisObj,
-                                       const List& args) {
+                                       const ArgList& args) {
   ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
   if (!thisObj->inherits(&JSDOMWindowShell::s_info))
     return throwError(exec, TypeError);
@@ -1297,7 +1297,7 @@ int JSDOMWindowBase::installTimeout(const UString& handler,
 }
 
 int JSDOMWindowBase::installTimeout(JSValue* func,
-                                    const List& args,
+                                    const ArgList& args,
                                     int t,
                                     bool singleShot) {
   return installTimeout(new ScheduledAction(func, args), t, singleShot);

@@ -42,7 +42,7 @@ using namespace KJS;
 
 namespace WebCore {
 
-JSValue* JSDOMApplicationCache::add(ExecState* exec, const List& args) {
+JSValue* JSDOMApplicationCache::add(ExecState* exec, const ArgList& args) {
   Frame* frame = asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -54,7 +54,7 @@ JSValue* JSDOMApplicationCache::add(ExecState* exec, const List& args) {
   return jsUndefined();
 }
 
-JSValue* JSDOMApplicationCache::remove(ExecState* exec, const List& args) {
+JSValue* JSDOMApplicationCache::remove(ExecState* exec, const ArgList& args) {
   Frame* frame = asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -67,7 +67,7 @@ JSValue* JSDOMApplicationCache::remove(ExecState* exec, const List& args) {
 }
 
 JSValue* JSDOMApplicationCache::addEventListener(ExecState* exec,
-                                                 const List& args) {
+                                                 const ArgList& args) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -82,7 +82,7 @@ JSValue* JSDOMApplicationCache::addEventListener(ExecState* exec,
 }
 
 JSValue* JSDOMApplicationCache::removeEventListener(ExecState* exec,
-                                                    const List& args) {
+                                                    const ArgList& args) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
@@ -96,7 +96,7 @@ JSValue* JSDOMApplicationCache::removeEventListener(ExecState* exec,
 }
 
 JSValue* JSDOMApplicationCache::dispatchEvent(KJS::ExecState* exec,
-                                              const List& args) {
+                                              const ArgList& args) {
   ExceptionCode ec = 0;
 
   bool result = impl()->dispatchEvent(toEvent(args[0]), ec);

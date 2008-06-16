@@ -106,7 +106,7 @@ class Machine {
                    ExecState*,
                    JSFunction*,
                    JSObject* thisObj,
-                   const List& args,
+                   const ArgList& args,
                    RegisterFileStack*,
                    ScopeChainNode*,
                    JSValue** exception);

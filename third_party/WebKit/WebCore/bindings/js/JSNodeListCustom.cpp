@@ -38,7 +38,7 @@ namespace WebCore {
 // Need to support both get and call, so that list[0] and list(0) work.
 KJS::JSValue* JSNodeList::callAsFunction(KJS::ExecState* exec,
                                          KJS::JSObject* thisObj,
-                                         const KJS::List& args) {
+                                         const KJS::ArgList& args) {
   // Do not use thisObj here. See JSHTMLCollection.
   KJS::UString s = args[0]->toString(exec);
   bool ok;

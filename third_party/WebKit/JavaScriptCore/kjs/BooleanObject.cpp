@@ -38,8 +38,8 @@ BooleanObject::BooleanObject(JSObject* proto) : JSWrapperObject(proto) {}
 // ------------------------------ BooleanPrototype --------------------------
 
 // Functions
-static JSValue* booleanProtoFuncToString(ExecState*, JSObject*, const List&);
-static JSValue* booleanProtoFuncValueOf(ExecState*, JSObject*, const List&);
+static JSValue* booleanProtoFuncToString(ExecState*, JSObject*, const ArgList&);
+static JSValue* booleanProtoFuncValueOf(ExecState*, JSObject*, const ArgList&);
 
 // ECMA 15.6.4
 
@@ -65,7 +65,7 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
 
 JSValue* booleanProtoFuncToString(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List&) {
+                                  const ArgList&) {
   if (!thisObj->inherits(&BooleanObject::info))
     return throwError(exec, TypeError);
 
@@ -76,7 +76,7 @@ JSValue* booleanProtoFuncToString(ExecState* exec,
 }
 JSValue* booleanProtoFuncValueOf(ExecState* exec,
                                  JSObject* thisObj,
-                                 const List&) {
+                                 const ArgList&) {
   if (!thisObj->inherits(&BooleanObject::info))
     return throwError(exec, TypeError);
 
@@ -108,7 +108,7 @@ ConstructType BooleanConstructor::getConstructData(ConstructData&) {
 }
 
 // ECMA 15.6.2
-JSObject* BooleanConstructor::construct(ExecState* exec, const List& args) {
+JSObject* BooleanConstructor::construct(ExecState* exec, const ArgList& args) {
   BooleanObject* obj(
       new BooleanObject(exec->lexicalGlobalObject()->booleanPrototype()));
   obj->setInternalValue(jsBoolean(args[0]->toBoolean(exec)));
@@ -118,7 +118,7 @@ JSObject* BooleanConstructor::construct(ExecState* exec, const List& args) {
 // ECMA 15.6.1
 JSValue* BooleanConstructor::callAsFunction(ExecState* exec,
                                             JSObject*,
-                                            const List& args) {
+                                            const ArgList& args) {
   // TODO: optimize for bool case
   return jsBoolean(args[0]->toBoolean(exec));
 }

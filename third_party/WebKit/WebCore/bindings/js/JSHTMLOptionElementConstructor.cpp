@@ -46,7 +46,7 @@ ConstructType JSHTMLOptionElementConstructor::getConstructData(ConstructData&) {
 }
 
 JSObject* JSHTMLOptionElementConstructor::construct(ExecState* exec,
-                                                    const List& args) {
+                                                    const ArgList& args) {
   ExceptionCode ec = 0;
 
   RefPtr<HTMLOptionElement> element = static_pointer_cast<HTMLOptionElement>(

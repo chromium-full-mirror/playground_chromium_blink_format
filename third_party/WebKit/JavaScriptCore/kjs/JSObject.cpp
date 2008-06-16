@@ -145,7 +145,7 @@ void JSObject::put(ExecState* exec,
             return;
           }
 
-          List args;
+          ArgList args;
           args.append(value);
 
           setterFunc->callAsFunction(exec, this->toThisObject(exec), args);
@@ -375,13 +375,13 @@ JSValue* JSObject::lookupSetter(ExecState*, const Identifier& propertyName) {
   }
 }
 
-JSObject* JSObject::construct(ExecState*, const List& /*args*/) {
+JSObject* JSObject::construct(ExecState*, const ArgList& /*args*/) {
   ASSERT(false);
   return NULL;
 }
 
 JSObject* JSObject::construct(ExecState* exec,
-                              const List& args,
+                              const ArgList& args,
                               const Identifier& /*functionName*/,
                               const UString& /*sourceURL*/,
                               int /*lineNumber*/) {
@@ -395,7 +395,7 @@ bool JSObject::implementsCall() {
 
 JSValue* JSObject::callAsFunction(ExecState* /*exec*/,
                                   JSObject* /*thisObj*/,
-                                  const List& /*args*/) {
+                                  const ArgList& /*args*/) {
   ASSERT(false);
   return NULL;
 }
@@ -562,7 +562,7 @@ JSObject* Error::create(ExecState* exec,
       break;
   }
 
-  List args;
+  ArgList args;
   if (message.isEmpty())
     args.append(jsString(name));
   else

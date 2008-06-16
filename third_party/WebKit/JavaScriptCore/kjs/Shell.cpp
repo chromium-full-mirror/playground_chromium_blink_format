@@ -72,14 +72,14 @@ using namespace WTF;
 static bool fillBufferWithContentsOfFile(const UString& fileName,
                                          Vector<char>& buffer);
 
-static JSValue* functionPrint(ExecState*, JSObject*, const List&);
-static JSValue* functionDebug(ExecState*, JSObject*, const List&);
-static JSValue* functionGC(ExecState*, JSObject*, const List&);
-static JSValue* functionVersion(ExecState*, JSObject*, const List&);
-static JSValue* functionRun(ExecState*, JSObject*, const List&);
-static JSValue* functionLoad(ExecState*, JSObject*, const List&);
-static JSValue* functionReadline(ExecState*, JSObject*, const List&);
-static JSValue* functionQuit(ExecState*, JSObject*, const List&);
+static JSValue* functionPrint(ExecState*, JSObject*, const ArgList&);
+static JSValue* functionDebug(ExecState*, JSObject*, const ArgList&);
+static JSValue* functionGC(ExecState*, JSObject*, const ArgList&);
+static JSValue* functionVersion(ExecState*, JSObject*, const ArgList&);
+static JSValue* functionRun(ExecState*, JSObject*, const ArgList&);
+static JSValue* functionLoad(ExecState*, JSObject*, const ArgList&);
+static JSValue* functionReadline(ExecState*, JSObject*, const ArgList&);
+static JSValue* functionQuit(ExecState*, JSObject*, const ArgList&);
 
 struct Options {
   Options() : interactive(false), prettyPrint(false), dump(false) {}
@@ -182,7 +182,7 @@ GlobalObject::GlobalObject(Vector<UString>& arguments) {
   Interpreter::setShouldPrintExceptions(true);
 }
 
-JSValue* functionPrint(ExecState* exec, JSObject*, const List& args) {
+JSValue* functionPrint(ExecState* exec, JSObject*, const ArgList& args) {
   for (unsigned i = 0; i < args.size(); ++i) {
     if (i != 0)
       putchar(' ');
@@ -195,25 +195,25 @@ JSValue* functionPrint(ExecState* exec, JSObject*, const List& args) {
   return jsUndefined();
 }
 
-JSValue* functionDebug(ExecState* exec, JSObject*, const List& args) {
+JSValue* functionDebug(ExecState* exec, JSObject*, const ArgList& args) {
   fprintf(stderr, "--> %s\n", args[0]->toString(exec).UTF8String().c_str());
   return jsUndefined();
 }
 
-JSValue* functionGC(ExecState*, JSObject*, const List&) {
+JSValue* functionGC(ExecState*, JSObject*, const ArgList&) {
   JSLock lock;
   Collector::collect();
   return jsUndefined();
 }
 
-JSValue* functionVersion(ExecState*, JSObject*, const List&) {
+JSValue* functionVersion(ExecState*, JSObject*, const ArgList&) {
   // We need this function for compatibility with the Mozilla JS tests but for
   // now
   // we don't actually do any version-specific handling
   return jsUndefined();
 }
 
-JSValue* functionRun(ExecState* exec, JSObject*, const List& args) {
+JSValue* functionRun(ExecState* exec, JSObject*, const ArgList& args) {
   StopWatch stopWatch;
   UString fileName = args[0]->toString(exec);
   Vector<char> script;
@@ -231,7 +231,7 @@ JSValue* functionRun(ExecState* exec, JSObject*, const List& args) {
   return jsNumber(stopWatch.getElapsedMS());
 }
 
-JSValue* functionLoad(ExecState* exec, JSObject*, const List& args) {
+JSValue* functionLoad(ExecState* exec, JSObject*, const ArgList& args) {
   UString fileName = args[0]->toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
@@ -245,7 +245,7 @@ JSValue* functionLoad(ExecState* exec, JSObject*, const List& args) {
   return jsUndefined();
 }
 
-JSValue* functionReadline(ExecState*, JSObject*, const List&) {
+JSValue* functionReadline(ExecState*, JSObject*, const ArgList&) {
   Vector<char, 256> line;
   int c;
   while ((c = getchar()) != EOF) {
@@ -258,7 +258,7 @@ JSValue* functionReadline(ExecState*, JSObject*, const List&) {
   return jsString(line.data());
 }
 
-JSValue* functionQuit(ExecState*, JSObject*, const List&) {
+JSValue* functionQuit(ExecState*, JSObject*, const ArgList&) {
   exit(0);
 #if !COMPILER(MSVC)
   // MSVC knows that exit(0) never returns, so it flags this return statement as

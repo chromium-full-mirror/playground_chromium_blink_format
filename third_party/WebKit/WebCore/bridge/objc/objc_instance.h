@@ -59,8 +59,8 @@ class ObjcInstance : public Instance {
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
-                                const List& args);
-  virtual JSValue* invokeDefaultMethod(ExecState* exec, const List& args);
+                                const ArgList& args);
+  virtual JSValue* invokeDefaultMethod(ExecState* exec, const ArgList& args);
 
   virtual bool supportsSetValueOfUndefinedField();
   virtual void setValueOfUndefinedField(ExecState* exec,

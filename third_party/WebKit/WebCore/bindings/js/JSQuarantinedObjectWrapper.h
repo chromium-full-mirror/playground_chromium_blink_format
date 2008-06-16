@@ -58,7 +58,7 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
   virtual bool deleteProperty(KJS::ExecState*, unsigned);
 
   virtual KJS::ConstructType getConstructData(KJS::ConstructData&);
-  virtual KJS::JSObject* construct(KJS::ExecState*, const KJS::List& args);
+  virtual KJS::JSObject* construct(KJS::ExecState*, const KJS::ArgList& args);
 
   virtual bool implementsHasInstance() const;
   virtual bool hasInstance(KJS::ExecState*, KJS::JSValue*);
@@ -66,7 +66,7 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
   virtual KJS::CallType getCallData(KJS::CallData&);
   virtual KJS::JSValue* callAsFunction(KJS::ExecState*,
                                        KJS::JSObject* thisObj,
-                                       const KJS::List& args);
+                                       const KJS::ArgList& args);
 
   virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
 

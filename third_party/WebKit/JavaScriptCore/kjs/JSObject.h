@@ -361,9 +361,9 @@ class JSObject : public JSCell {
   /**
    * Implementation of the [[Construct]] internal property
    */
-  virtual JSObject* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState* exec, const ArgList& args);
   virtual JSObject* construct(ExecState* exec,
-                              const List& args,
+                              const ArgList& args,
                               const Identifier& functionName,
                               const UString& sourceURL,
                               int lineNumber);
@@ -382,13 +382,13 @@ class JSObject : public JSCell {
    * object. For example, if the ECMAScript code "window.location->toString()"
    * is executed, call() will be invoked on the C++ object which implements
    * the toString method, with the thisObj being window.location
-   * @param args List of arguments to be passed to the function
+   * @param args ArgList of arguments to be passed to the function
    * @return The return value from the function
    */
   bool implementsCall();
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
 
   /**
    * Whether or not the object implements the hasInstance() method. If this

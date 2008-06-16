@@ -57,8 +57,8 @@ class CInstance : public Instance {
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
-                                const List& args);
-  virtual JSValue* invokeDefaultMethod(ExecState* exec, const List& args);
+                                const ArgList& args);
+  virtual JSValue* invokeDefaultMethod(ExecState* exec, const ArgList& args);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   JSValue* stringValue() const;

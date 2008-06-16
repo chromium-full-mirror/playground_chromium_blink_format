@@ -79,7 +79,7 @@ class JavaInstance : public Instance {
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
-                                const List& args);
+                                const ArgList& args);
 
   jobject javaInstance() const { return _instance->_instance; }
 

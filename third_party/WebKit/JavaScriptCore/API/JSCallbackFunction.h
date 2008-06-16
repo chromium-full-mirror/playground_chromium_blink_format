@@ -42,7 +42,7 @@ class JSCallbackFunction : public InternalFunction {
   virtual bool implementsHasInstance() const;
   virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

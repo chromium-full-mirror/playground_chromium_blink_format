@@ -52,9 +52,10 @@ class JSHTMLInputElementBase : public JSHTMLElement {
 // SetSelectionRange is implemented on the class instead of on the prototype
 // to make it easier to enable/disable lookup of the function based on input
 // type.
-KJS::JSValue* jsHTMLInputElementBaseFunctionSetSelectionRange(KJS::ExecState*,
-                                                              KJS::JSObject*,
-                                                              const KJS::List&);
+KJS::JSValue* jsHTMLInputElementBaseFunctionSetSelectionRange(
+    KJS::ExecState*,
+    KJS::JSObject*,
+    const KJS::ArgList&);
 
 }  // namespace WebCore
 

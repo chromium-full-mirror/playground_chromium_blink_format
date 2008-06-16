@@ -99,7 +99,7 @@ JSValue* JavaInstance::booleanValue() const {
 
 JSValue* JavaInstance::invokeMethod(ExecState* exec,
                                     const MethodList& methodList,
-                                    const List& args) {
+                                    const ArgList& args) {
   int i, count = args.size();
   jvalue* jArgs;
   JSValue* resultValue;

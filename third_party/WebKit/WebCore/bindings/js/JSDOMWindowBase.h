@@ -73,7 +73,7 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
 
   int installTimeout(const KJS::UString& handler, int t, bool singleShot);
   int installTimeout(KJS::JSValue* function,
-                     const KJS::List& args,
+                     const KJS::ArgList& args,
                      int t,
                      bool singleShot);
   void clearTimeout(int timerId, bool delAction = true);
@@ -209,34 +209,34 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
 // Functions
 KJS::JSValue* windowProtoFuncAToB(KJS::ExecState*,
                                   KJS::JSObject*,
-                                  const KJS::List&);
+                                  const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncBToA(KJS::ExecState*,
                                   KJS::JSObject*,
-                                  const KJS::List&);
+                                  const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncOpen(KJS::ExecState*,
                                   KJS::JSObject*,
-                                  const KJS::List&);
+                                  const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncSetTimeout(KJS::ExecState*,
                                         KJS::JSObject*,
-                                        const KJS::List&);
+                                        const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncClearTimeout(KJS::ExecState*,
                                           KJS::JSObject*,
-                                          const KJS::List&);
+                                          const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncSetInterval(KJS::ExecState*,
                                          KJS::JSObject*,
-                                         const KJS::List&);
+                                         const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncAddEventListener(KJS::ExecState*,
                                               KJS::JSObject*,
-                                              const KJS::List&);
+                                              const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncRemoveEventListener(KJS::ExecState*,
                                                  KJS::JSObject*,
-                                                 const KJS::List&);
+                                                 const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncShowModalDialog(KJS::ExecState*,
                                              KJS::JSObject*,
-                                             const KJS::List&);
+                                             const KJS::ArgList&);
 KJS::JSValue* windowProtoFuncNotImplemented(KJS::ExecState*,
                                             KJS::JSObject*,
-                                            const KJS::List&);
+                                            const KJS::ArgList&);
 
 // Returns a JSDOMWindow or jsNull()
 KJS::JSValue* toJS(KJS::ExecState*, DOMWindow*);

@@ -40,7 +40,7 @@
 
 namespace KJS {
 
-class List;
+class ArgList;
 class JSObject;
 class JSValue;
 
@@ -91,7 +91,7 @@ class JavaJSObject {
 
   jobject convertValueToJObject(JSValue*) const;
   JSValue* convertJObjectToValue(jobject) const;
-  void getListFromJArray(jobjectArray, List&) const;
+  void getListFromJArray(jobjectArray, ArgList&) const;
 
   RootObject* rootObject() const;
 

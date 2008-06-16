@@ -186,8 +186,8 @@ JSObject* JSActivation::createArgumentsObject(ExecState* exec) {
   int argc;
   exec->machine()->getFunctionAndArguments(registerBase(), callFrame, function,
                                            argv, argc);
-  List args(reinterpret_cast<JSValue***>(registerBase()),
-            argv - *registerBase(), argc);
+  ArgList args(reinterpret_cast<JSValue***>(registerBase()),
+               argv - *registerBase(), argc);
   return new Arguments(exec, function, args, this);
 }
 

@@ -28,7 +28,7 @@
 
 namespace KJS {
 class JSValue;
-class List;
+class ArgList;
 }
 
 namespace WebCore {
@@ -42,7 +42,7 @@ class JSDOMWindowShell;
  */
 class ScheduledAction {
  public:
-  ScheduledAction(KJS::JSValue* func, const KJS::List& args);
+  ScheduledAction(KJS::JSValue* func, const KJS::ArgList& args);
   ScheduledAction(const String& code) : m_code(code) {}
 
   void execute(JSDOMWindowShell*);

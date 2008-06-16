@@ -256,7 +256,7 @@ JSValue* WebScriptCallFrame::valueByEvaluatingJavaScriptFromString(
     // evaluate
     JSValue* scriptExecutionResult;
     if (eval) {
-        List args;
+        ArgList args;
         args.append(jsString(code));
         scriptExecutionResult = eval->call(state, 0, args);
     } else

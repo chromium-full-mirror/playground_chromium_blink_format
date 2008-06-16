@@ -215,11 +215,11 @@ KJS::ConstructType JSQuarantinedObjectWrapper::getConstructData(
 }
 
 JSObject* JSQuarantinedObjectWrapper::construct(ExecState* exec,
-                                                const List& args) {
+                                                const ArgList& args) {
   if (!allowsConstruct())
     return 0;
 
-  List argsCopy;
+  ArgList argsCopy;
   for (size_t i = 0; i < args.size(); ++i) {
     JSValue* preparedValue = prepareIncomingValue(exec, args[i]);
     if (!preparedValue)
@@ -266,7 +266,7 @@ CallType JSQuarantinedObjectWrapper::getCallData(CallData&) {
 
 JSValue* JSQuarantinedObjectWrapper::callAsFunction(ExecState* exec,
                                                     JSObject* thisObj,
-                                                    const List& args) {
+                                                    const ArgList& args) {
   if (!allowsCallAsFunction())
     return jsUndefined();
 
@@ -275,7 +275,7 @@ JSValue* JSQuarantinedObjectWrapper::callAsFunction(ExecState* exec,
   if (!preparedThisObj)
     return jsUndefined();
 
-  List preparedArgs;
+  ArgList preparedArgs;
   for (size_t i = 0; i < args.size(); ++i) {
     JSValue* preparedValue = prepareIncomingValue(exec, args[i]);
     if (!preparedValue)

@@ -60,7 +60,7 @@ short JSNodeFilterCondition::acceptNode(Node* filterNode,
     return NodeFilter::FILTER_REJECT;
 
   ExecState* exec = frame->scriptProxy()->globalObject()->globalExec();
-  List args;
+  ArgList args;
   args.append(toJS(exec, filterNode));
   if (exec->hadException()) {
     exception = takeException(exec);

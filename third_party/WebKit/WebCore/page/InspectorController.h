@@ -110,7 +110,7 @@ class InspectorController : JavaScriptDebugListener {
   void addMessageToConsole(MessageSource,
                            MessageLevel,
                            KJS::ExecState*,
-                           const KJS::List& arguments,
+                           const KJS::ArgList& arguments,
                            unsigned lineNumber,
                            const String& sourceID);
   void addMessageToConsole(MessageSource,

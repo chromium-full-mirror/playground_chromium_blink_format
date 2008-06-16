@@ -46,7 +46,7 @@ class InternalFunction : public JSObject {
 
   virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObjec,
-                                  const List& args) = 0;
+                                  const ArgList& args) = 0;
   virtual bool implementsHasInstance() const;
 
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -66,12 +66,12 @@ class JSFunction : public InternalFunction {
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
   virtual ConstructType getConstructData(ConstructData&);
-  virtual JSObject* construct(ExecState*, const List& args);
+  virtual JSObject* construct(ExecState*, const ArgList& args);
 
   virtual CallType getCallData(CallData&);
   virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
-                                  const List& args);
+                                  const ArgList& args);
 
   // Note: unlike body->paramName, this returns Identifier::null for parameters
   // that will never get set, due to later param having the same name
@@ -103,7 +103,7 @@ class JSFunction : public InternalFunction {
 
 class IndexToNameMap {
  public:
-  IndexToNameMap(JSFunction*, const List& args);
+  IndexToNameMap(JSFunction*, const ArgList& args);
   ~IndexToNameMap();
 
   Identifier& operator[](const Identifier& index);
@@ -117,7 +117,10 @@ class IndexToNameMap {
 
 class Arguments : public JSObject {
  public:
-  Arguments(ExecState*, JSFunction* func, const List& args, JSActivation* act);
+  Arguments(ExecState*,
+            JSFunction* func,
+            const ArgList& args,
+            JSActivation* act);
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
@@ -138,7 +141,7 @@ class PrototypeFunction : public InternalFunction {
  public:
   typedef JSValue* (*JSMemberFunction)(ExecState*,
                                        JSObject* thisObj,
-                                       const List&);
+                                       const ArgList&);
 
   PrototypeFunction(ExecState*, int len, const Identifier&, JSMemberFunction);
   PrototypeFunction(ExecState*,
@@ -149,7 +152,7 @@ class PrototypeFunction : public InternalFunction {
 
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List&);
+                                  const ArgList&);
 
  private:
   const JSMemberFunction m_function;
@@ -162,7 +165,7 @@ class PrototypeReflexiveFunction : public InternalFunction {
   typedef JSValue* (*JSMemberFunction)(ExecState*,
                                        PrototypeReflexiveFunction*,
                                        JSObject* thisObj,
-                                       const List&);
+                                       const ArgList&);
 
   PrototypeReflexiveFunction(ExecState*,
                              FunctionPrototype*,
@@ -174,7 +177,7 @@ class PrototypeReflexiveFunction : public InternalFunction {
   virtual void mark();
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
-                                  const List&);
+                                  const ArgList&);
 
   JSGlobalObject* cachedGlobalObject() const { return m_cachedGlobalObject; }
 
@@ -187,19 +190,19 @@ class PrototypeReflexiveFunction : public InternalFunction {
 JSValue* globalFuncEval(ExecState*,
                         PrototypeReflexiveFunction*,
                         JSObject*,
-                        const List&);
-JSValue* globalFuncParseInt(ExecState*, JSObject*, const List&);
-JSValue* globalFuncParseFloat(ExecState*, JSObject*, const List&);
-JSValue* globalFuncIsNaN(ExecState*, JSObject*, const List&);
-JSValue* globalFuncIsFinite(ExecState*, JSObject*, const List&);
-JSValue* globalFuncDecodeURI(ExecState*, JSObject*, const List&);
-JSValue* globalFuncDecodeURIComponent(ExecState*, JSObject*, const List&);
-JSValue* globalFuncEncodeURI(ExecState*, JSObject*, const List&);
-JSValue* globalFuncEncodeURIComponent(ExecState*, JSObject*, const List&);
-JSValue* globalFuncEscape(ExecState*, JSObject*, const List&);
-JSValue* globalFuncUnescape(ExecState*, JSObject*, const List&);
+                        const ArgList&);
+JSValue* globalFuncParseInt(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncParseFloat(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncIsNaN(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncIsFinite(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncDecodeURI(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncDecodeURIComponent(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncEncodeURI(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncEncodeURIComponent(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncEscape(ExecState*, JSObject*, const ArgList&);
+JSValue* globalFuncUnescape(ExecState*, JSObject*, const ArgList&);
 #ifndef NDEBUG
-JSValue* globalFuncKJSPrint(ExecState*, JSObject*, const List&);
+JSValue* globalFuncKJSPrint(ExecState*, JSObject*, const ArgList&);
 #endif
 
 static const double mantissaOverflowLowerBound = 9007199254740992.0;

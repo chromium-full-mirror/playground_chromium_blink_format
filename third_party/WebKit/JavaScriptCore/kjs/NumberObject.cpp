@@ -40,16 +40,18 @@ NumberObject::NumberObject(JSObject* proto) : JSWrapperObject(proto) {}
 
 // ------------------------------ NumberPrototype ---------------------------
 
-static JSValue* numberProtoFuncToString(ExecState*, JSObject*, const List&);
+static JSValue* numberProtoFuncToString(ExecState*, JSObject*, const ArgList&);
 static JSValue* numberProtoFuncToLocaleString(ExecState*,
                                               JSObject*,
-                                              const List&);
-static JSValue* numberProtoFuncValueOf(ExecState*, JSObject*, const List&);
-static JSValue* numberProtoFuncToFixed(ExecState*, JSObject*, const List&);
+                                              const ArgList&);
+static JSValue* numberProtoFuncValueOf(ExecState*, JSObject*, const ArgList&);
+static JSValue* numberProtoFuncToFixed(ExecState*, JSObject*, const ArgList&);
 static JSValue* numberProtoFuncToExponential(ExecState*,
                                              JSObject*,
-                                             const List&);
-static JSValue* numberProtoFuncToPrecision(ExecState*, JSObject*, const List&);
+                                             const ArgList&);
+static JSValue* numberProtoFuncToPrecision(ExecState*,
+                                           JSObject*,
+                                           const ArgList&);
 
 // ECMA 15.7.4
 
@@ -161,7 +163,7 @@ static double intPow10(int e) {
 
 JSValue* numberProtoFuncToString(ExecState* exec,
                                  JSObject* thisObj,
-                                 const List& args) {
+                                 const ArgList& args) {
   if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
@@ -228,7 +230,7 @@ JSValue* numberProtoFuncToString(ExecState* exec,
 
 JSValue* numberProtoFuncToLocaleString(ExecState* exec,
                                        JSObject* thisObj,
-                                       const List&) {
+                                       const ArgList&) {
   if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
@@ -239,7 +241,7 @@ JSValue* numberProtoFuncToLocaleString(ExecState* exec,
 
 JSValue* numberProtoFuncValueOf(ExecState* exec,
                                 JSObject* thisObj,
-                                const List&) {
+                                const ArgList&) {
   if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
@@ -248,7 +250,7 @@ JSValue* numberProtoFuncValueOf(ExecState* exec,
 
 JSValue* numberProtoFuncToFixed(ExecState* exec,
                                 JSObject* thisObj,
-                                const List& args) {
+                                const ArgList& args) {
   if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
@@ -338,7 +340,7 @@ static void exponentialPartToString(char* buf, int& i, int decimalPoint) {
 
 JSValue* numberProtoFuncToExponential(ExecState* exec,
                                       JSObject* thisObj,
-                                      const List& args) {
+                                      const ArgList& args) {
   if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
@@ -413,7 +415,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
 
 JSValue* numberProtoFuncToPrecision(ExecState* exec,
                                     JSObject* thisObj,
-                                    const List& args) {
+                                    const ArgList& args) {
   if (!thisObj->inherits(&NumberObject::info))
     return throwError(exec, TypeError);
 
@@ -540,7 +542,7 @@ ConstructType NumberConstructor::getConstructData(ConstructData&) {
 }
 
 // ECMA 15.7.1
-JSObject* NumberConstructor::construct(ExecState* exec, const List& args) {
+JSObject* NumberConstructor::construct(ExecState* exec, const ArgList& args) {
   JSObject* proto = exec->lexicalGlobalObject()->numberPrototype();
   NumberObject* obj = new NumberObject(proto);
 
@@ -553,7 +555,7 @@ JSObject* NumberConstructor::construct(ExecState* exec, const List& args) {
 // ECMA 15.7.2
 JSValue* NumberConstructor::callAsFunction(ExecState* exec,
                                            JSObject*,
-                                           const List& args) {
+                                           const ArgList& args) {
   // FIXME: Check args[0]->isUndefined() instead of args.isEmpty()?
   return jsNumber(args.isEmpty() ? 0 : args[0]->toNumber(exec));
 }

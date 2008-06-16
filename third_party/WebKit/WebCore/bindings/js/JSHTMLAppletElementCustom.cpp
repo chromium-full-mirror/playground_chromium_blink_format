@@ -56,7 +56,7 @@ CallType JSHTMLAppletElement::getCallData(CallData&) {
 
 JSValue* JSHTMLAppletElement::callAsFunction(ExecState* exec,
                                              JSObject* thisObj,
-                                             const List& args) {
+                                             const ArgList& args) {
   return runtimeObjectCallAsFunction(exec, thisObj, args,
                                      static_cast<HTMLElement*>(impl()));
 }
