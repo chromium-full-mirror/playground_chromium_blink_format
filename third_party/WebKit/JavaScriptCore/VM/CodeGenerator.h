@@ -237,18 +237,8 @@ class CodeGenerator {
 
   RegisterID* emitMove(RegisterID* dst, RegisterID* src);
 
-  RegisterID* emitNot(RegisterID* dst, RegisterID* src) {
-    return emitUnaryOp(op_not, dst, src);
-  }
-  RegisterID* emitBitNot(RegisterID* dst, RegisterID* src) {
-    return emitUnaryOp(op_bitnot, dst, src);
-  }
-
   RegisterID* emitToJSNumber(RegisterID* dst, RegisterID* src) {
     return emitUnaryOp(op_to_jsnumber, dst, src);
-  }
-  RegisterID* emitNegate(RegisterID* dst, RegisterID* src) {
-    return emitUnaryOp(op_negate, dst, src);
   }
   RegisterID* emitPreInc(RegisterID* srcDst);
   RegisterID* emitPreDec(RegisterID* srcDst);
