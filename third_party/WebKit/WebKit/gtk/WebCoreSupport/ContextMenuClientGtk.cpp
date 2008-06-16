@@ -23,7 +23,7 @@
 #include "KURL.h"
 #include "NotImplemented.h"
 
-#include <glib-JSObject.h>
+#include <glib-object.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include "webkitprivate.h"
