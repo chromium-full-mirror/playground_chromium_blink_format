@@ -48,12 +48,17 @@ struct CallIdentifier {
 
   CallIdentifier(UString name, UString url, int lineNumber)
       : name(name), url(url), lineNumber(lineNumber) {}
+
   CallIdentifier(const CallIdentifier& ci)
       : name(ci.name), url(ci.url), lineNumber(ci.lineNumber) {}
 
   inline bool operator==(const CallIdentifier& ci) const {
     return ci.lineNumber == lineNumber && ci.name == name && ci.url == url;
   }
+  inline bool operator!=(const CallIdentifier& ci) const {
+    return !(*this == ci);
+  }
+
 #ifndef NDEBUG
   const char* toString() const { return name.UTF8String().c_str(); }
 #endif
@@ -88,6 +93,8 @@ class ProfileNode : public RefCounted<ProfileNode> {
     m_actualTotalTime = time;
     m_visibleTotalTime = time;
   }
+  void setActualTotalTime(double time) { m_actualTotalTime = time; }
+  void setVisibleTotalTime(double time) { m_visibleTotalTime = time; }
   double selfTime() const { return m_visibleSelfTime; }
   void setSelfTime(double time) {
     m_actualSelfTime = time;
@@ -117,7 +124,8 @@ class ProfileNode : public RefCounted<ProfileNode> {
   static void setTreeVisible(ProfileNode*, bool visible);
 
   ProfileNode* traverseNextNodePostOrder() const;
-  ProfileNode* traverseNextNodePreOrder() const;
+  ProfileNode* traverseNextNodePreOrder(bool processChildren = true) const;
+
   void sort(bool (*)(const RefPtr<ProfileNode>&, const RefPtr<ProfileNode>&));
   static void sortTotalTimeDescending(ProfileNode* n) {
     n->sort(totalTimeDescendingComparator);
@@ -144,7 +152,8 @@ class ProfileNode : public RefCounted<ProfileNode> {
     n->sort(functionNameAscendingComparator);
   }
 
-  void focus(const CallIdentifier&, bool forceVisible = false);
+  void calculateVisibleTotalTime();
+  bool focus(const CallIdentifier&);
   void exclude(const CallIdentifier&);
   void restore();
 

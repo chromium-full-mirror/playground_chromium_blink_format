@@ -76,11 +76,7 @@ class Profile : public RefCounted<Profile> {
     forEach(ProfileNode::sortFunctionNameAscending);
   }
 
-  void focus(const ProfileNode* profileNode) {
-    if (!profileNode || !m_head)
-      return;
-    m_head->focus(profileNode->callIdentifier());
-  }
+  void focus(const ProfileNode* profileNode);
   void exclude(const ProfileNode* profileNode);
   void restoreAll();
 
