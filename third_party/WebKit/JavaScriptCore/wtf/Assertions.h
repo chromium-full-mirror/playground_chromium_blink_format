@@ -1,4 +1,4 @@
-/* -*- mode: c++; c-basic-offset: 4 -*- */
+/* -*- mode: c; c-basic-offset: 4 -*- */
 /*
  * Copyright (C) 2003, 2006, 2007 Apple Inc.  All rights reserved.
  *
@@ -83,12 +83,12 @@
 #define WTF_PRETTY_FUNCTION __FUNCTION__
 #endif
 
-// WTF logging functions can process %@ in the format string to log a NSObject*
-// but the printf format attribute
-// emits a warning when %@ is used in the format string.  Until
-// <rdar://problem/5195437> is resolved we can't include
-// the attribute when being used from Objective-C code in case it decides to use
-// %@.
+/* WTF logging functions can process %@ in the format string to log a NSObject*
+   but the printf format attribute
+   emits a warning when %@ is used in the format string.  Until
+   <rdar://problem/5195437> is resolved we can't include
+   the attribute when being used from Objective-C code in case it decides to use
+   %@. */
 #if COMPILER(GCC) && !defined(__OBJC__)
 #define WTF_ATTRIBUTE_PRINTF(formatStringArgument, extraArguments) \
   __attribute__((__format__(printf, formatStringArgument, extraArguments)))
@@ -191,7 +191,7 @@ void WTFLogVerbose(const char* file,
       CRASH();                                                               \
     }                                                                        \
   while (0)
-#endif  // COMPILER(MSVC7)
+#endif /* COMPILER(MSVC7) */
 #define ASSERT_NOT_REACHED()                                               \
   do {                                                                     \
     WTFReportAssertionFailure(__FILE__, __LINE__, WTF_PRETTY_FUNCTION, 0); \
@@ -277,4 +277,4 @@ void WTFLogVerbose(const char* file,
                 __VA_ARGS__)
 #endif
 
-#endif  // WTF_Assertions_h
+#endif /* WTF_Assertions_h */
