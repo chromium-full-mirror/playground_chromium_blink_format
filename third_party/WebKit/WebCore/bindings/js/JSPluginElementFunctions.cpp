@@ -19,7 +19,7 @@
  */
 
 #include "config.h"
-#include "kjs_html.h"
+#include "JSPluginElementFunctions.h"
 
 #include "Frame.h"
 #include "FrameLoader.h"

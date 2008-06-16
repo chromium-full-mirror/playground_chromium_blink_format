@@ -20,7 +20,7 @@
  */
 
 #include "config.h"
-#include "kjs_events.h"
+#include "JSEventListener.h"
 
 #include "CString.h"
 #include "Console.h"

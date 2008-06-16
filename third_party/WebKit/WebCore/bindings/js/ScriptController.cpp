@@ -36,7 +36,7 @@
 #include "PageGroup.h"
 #include "Settings.h"
 #include "StringSourceProvider.h"
-#include "kjs_events.h"
+#include "JSEventListener.h"
 #include <kjs/debugger.h>
 
 #if ENABLE(SVG)

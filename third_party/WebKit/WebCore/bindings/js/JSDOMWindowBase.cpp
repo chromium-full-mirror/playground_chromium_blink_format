@@ -42,6 +42,7 @@
 #include "JSAudioConstructor.h"
 #include "JSDOMWindowCustom.h"
 #include "JSEvent.h"
+#include "JSEventListener.h"
 #include "JSHTMLCollection.h"
 #include "JSHTMLOptionElementConstructor.h"
 #include "JSImageConstructor.h"
@@ -59,7 +60,6 @@
 #include "Settings.h"
 #include "WindowFeatures.h"
 #include "htmlediting.h"
-#include "kjs_events.h"
 #include "ScriptController.h"
 #include <wtf/AlwaysInline.h>
 #include <wtf/MathExtras.h>

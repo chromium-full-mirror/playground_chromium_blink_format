@@ -18,8 +18,8 @@
  * USA
  */
 
-#ifndef kjs_events_h
-#define kjs_events_h
+#ifndef JSEventListener_h
+#define JSEventListener_h
 
 #include "EventListener.h"
 #include "PlatformString.h"
@@ -124,4 +124,4 @@ KJS::JSValue* getNodeEventListener(Node*, const AtomicString& eventType);
 
 }  // namespace WebCore
 
-#endif  // kjs_events_h
+#endif  // JSEventListener_h

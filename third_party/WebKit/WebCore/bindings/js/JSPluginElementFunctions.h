@@ -18,8 +18,8 @@
  * USA
  */
 
-#ifndef kjs_html_h
-#define kjs_html_h
+#ifndef JSPluginElementFunctions_h
+#define JSPluginElementFunctions_h
 
 #include "JSDOMBinding.h"
 
@@ -56,4 +56,4 @@ KJS::JSValue* runtimeObjectCallAsFunction(KJS::ExecState*,
 
 }  // namespace WebCore
 
-#endif  // kjs_html_h
+#endif  // JSPluginElementFunctions_h
