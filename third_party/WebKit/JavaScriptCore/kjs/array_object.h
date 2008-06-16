@@ -28,7 +28,7 @@
 
 namespace KJS {
 
-class ArrayPrototype : public ArrayInstance {
+class ArrayPrototype : public JSArray {
  public:
   ArrayPrototype(ExecState*, ObjectPrototype*);
 

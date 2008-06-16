@@ -45,7 +45,7 @@ StringInstance::StringInstance(JSObject* proto) : JSWrapperObject(proto) {
   setInternalValue(jsString(""));
 }
 
-StringInstance::StringInstance(JSObject* proto, StringImp* string)
+StringInstance::StringInstance(JSObject* proto, JSString* string)
     : JSWrapperObject(proto) {
   setInternalValue(string);
 }
@@ -282,7 +282,7 @@ static inline int localeCompare(const UString& a, const UString& b) {
 }
 
 static JSValue* replace(ExecState* exec,
-                        StringImp* sourceVal,
+                        JSString* sourceVal,
                         JSValue* pattern,
                         JSValue* replacement) {
   UString source = sourceVal->value();
@@ -629,9 +629,9 @@ JSValue* stringProtoFuncReplace(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
 
-  StringImp* sVal = thisObj->inherits(&StringInstance::info)
-                        ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(s));
+  JSString* sVal = thisObj->inherits(&StringInstance::info)
+                       ? static_cast<StringInstance*>(thisObj)->internalValue()
+                       : static_cast<JSString*>(jsString(s));
 
   JSValue* a0 = args[0];
   JSValue* a1 = args[1];
@@ -821,9 +821,9 @@ JSValue* stringProtoFuncToLowerCase(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
 
-  StringImp* sVal = thisObj->inherits(&StringInstance::info)
-                        ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(s));
+  JSString* sVal = thisObj->inherits(&StringInstance::info)
+                       ? static_cast<StringInstance*>(thisObj)->internalValue()
+                       : static_cast<JSString*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -855,9 +855,9 @@ JSValue* stringProtoFuncToUpperCase(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
 
-  StringImp* sVal = thisObj->inherits(&StringInstance::info)
-                        ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(s));
+  JSString* sVal = thisObj->inherits(&StringInstance::info)
+                       ? static_cast<StringInstance*>(thisObj)->internalValue()
+                       : static_cast<JSString*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -891,9 +891,9 @@ JSValue* stringProtoFuncToLocaleLowerCase(ExecState* exec,
 
   // FIXME: See http://www.unicode.org/Public/UNIDATA/SpecialCasing.txt for
   // locale-sensitive mappings that aren't implemented.
-  StringImp* sVal = thisObj->inherits(&StringInstance::info)
-                        ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(s));
+  JSString* sVal = thisObj->inherits(&StringInstance::info)
+                       ? static_cast<StringInstance*>(thisObj)->internalValue()
+                       : static_cast<JSString*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -925,9 +925,9 @@ JSValue* stringProtoFuncToLocaleUpperCase(ExecState* exec,
           ? static_cast<StringInstance*>(thisObj)->internalValue()->value()
           : thisObj->toString(exec);
 
-  StringImp* sVal = thisObj->inherits(&StringInstance::info)
-                        ? static_cast<StringInstance*>(thisObj)->internalValue()
-                        : static_cast<StringImp*>(jsString(s));
+  JSString* sVal = thisObj->inherits(&StringInstance::info)
+                       ? static_cast<StringInstance*>(thisObj)->internalValue()
+                       : static_cast<JSString*>(jsString(s));
   int ssize = s.size();
   if (!ssize)
     return sVal;

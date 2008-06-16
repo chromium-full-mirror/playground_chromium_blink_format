@@ -30,13 +30,13 @@
 
 namespace KJS {
 
-class StringImp : public JSCell {
+class JSString : public JSCell {
  public:
-  StringImp(const UString& value) : m_value(value) {
+  JSString(const UString& value) : m_value(value) {
     Collector::reportExtraMemoryCost(value.cost());
   }
   enum HasOtherOwnerType { HasOtherOwner };
-  StringImp(const UString& value, HasOtherOwnerType) : m_value(value) {}
+  JSString(const UString& value, HasOtherOwnerType) : m_value(value) {}
 
   const UString& value() const { return m_value; }
 
@@ -78,7 +78,7 @@ class StringImp : public JSCell {
   UString m_value;
 };
 
-ALWAYS_INLINE bool StringImp::getStringPropertySlot(
+ALWAYS_INLINE bool JSString::getStringPropertySlot(
     ExecState* exec,
     const Identifier& propertyName,
     PropertySlot& slot) {
@@ -97,8 +97,8 @@ ALWAYS_INLINE bool StringImp::getStringPropertySlot(
   return false;
 }
 
-ALWAYS_INLINE bool StringImp::getStringPropertySlot(unsigned propertyName,
-                                                    PropertySlot& slot) {
+ALWAYS_INLINE bool JSString::getStringPropertySlot(unsigned propertyName,
+                                                   PropertySlot& slot) {
   if (propertyName < static_cast<unsigned>(m_value.size())) {
     slot.setCustomNumeric(this, indexNumericPropertyGetter);
     return true;

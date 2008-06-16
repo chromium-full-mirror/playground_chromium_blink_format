@@ -351,7 +351,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
   // the requested Java Array type requested, unless the array type is some
   // object array
   // other than a string.
-  ArrayInstance* jsArray = static_cast<ArrayInstance*>(value);
+  JSArray* jsArray = static_cast<JSArray*>(value);
   unsigned length = jsArray->getLength();
   jobjectArray jarray = 0;
 
@@ -499,7 +499,7 @@ jvalue convertValueToJValue(ExecState* exec,
           RuntimeArray* imp = static_cast<RuntimeArray*>(value);
           JavaArray* array = static_cast<JavaArray*>(imp->getConcreteArray());
           result.l = array->javaArray();
-        } else if (objectImp->classInfo() == &ArrayInstance::info) {
+        } else if (objectImp->classInfo() == &JSArray::info) {
           // Input is a Javascript Array. We need to create it to a Java Array.
           result.l =
               convertArrayInstanceToJavaArray(exec, value, javaClassName);

@@ -57,12 +57,9 @@ class InternalFunctionImp : public JSObject {
   Identifier m_name;
 };
 
-class FunctionImp : public InternalFunctionImp {
+class JSFunction : public InternalFunctionImp {
  public:
-  FunctionImp(ExecState*,
-              const Identifier&,
-              FunctionBodyNode*,
-              ScopeChainNode*);
+  JSFunction(ExecState*, const Identifier&, FunctionBodyNode*, ScopeChainNode*);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
@@ -106,7 +103,7 @@ class FunctionImp : public InternalFunctionImp {
 
 class IndexToNameMap {
  public:
-  IndexToNameMap(FunctionImp*, const List& args);
+  IndexToNameMap(JSFunction*, const List& args);
   ~IndexToNameMap();
 
   Identifier& operator[](const Identifier& index);
@@ -120,7 +117,7 @@ class IndexToNameMap {
 
 class Arguments : public JSObject {
  public:
-  Arguments(ExecState*, FunctionImp* func, const List& args, JSActivation* act);
+  Arguments(ExecState*, JSFunction* func, const List& args, JSActivation* act);
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*, const Identifier& propertyName, JSValue*);

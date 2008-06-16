@@ -104,7 +104,7 @@ class Machine {
                    JSValue** exception);
   JSValue* execute(FunctionBodyNode*,
                    ExecState*,
-                   FunctionImp*,
+                   JSFunction*,
                    JSObject* thisObj,
                    const List& args,
                    RegisterFileStack*,
@@ -124,12 +124,12 @@ class Machine {
                    ScopeChainNode*,
                    JSValue** exception);
 
-  JSValue* retrieveArguments(ExecState*, FunctionImp*) const;
-  JSValue* retrieveCaller(ExecState*, FunctionImp*) const;
+  JSValue* retrieveArguments(ExecState*, JSFunction*) const;
+  JSValue* retrieveCaller(ExecState*, JSFunction*) const;
 
   void getFunctionAndArguments(Register** registerBase,
                                Register* callFrame,
-                               FunctionImp*&,
+                               JSFunction*&,
                                Register*& argv,
                                int& argc);
 
@@ -164,7 +164,7 @@ class Machine {
                                            Register*&);
 
   bool getCallFrame(ExecState*,
-                    FunctionImp*,
+                    JSFunction*,
                     Register**& registerBase,
                     int& callFrameOffset) const;
 

@@ -2136,7 +2136,7 @@ class FuncExprNode : public ExpressionNode {
   }
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
-  FunctionImp* makeFunction(ExecState*, ScopeChainNode*) KJS_FAST_CALL;
+  JSFunction* makeFunction(ExecState*, ScopeChainNode*) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecMember; }
   virtual bool needsParensIfLeftmost() const { return true; }
@@ -2169,7 +2169,7 @@ class FuncDeclNode : public StatementNode {
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  FunctionImp* makeFunction(ExecState*, ScopeChainNode*) KJS_FAST_CALL;
+  JSFunction* makeFunction(ExecState*, ScopeChainNode*) KJS_FAST_CALL;
 
   Identifier m_ident;
 

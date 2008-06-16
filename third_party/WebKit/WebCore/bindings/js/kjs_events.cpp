@@ -284,8 +284,7 @@ void JSLazyEventListener::parseCode() const {
     m_listener = constr->construct(exec, args, m_functionName, sourceURL,
                                    m_lineNumber);  // FIXME: is globalExec ok ?
 
-    FunctionImp* listenerAsFunction =
-        static_cast<FunctionImp*>(m_listener.get());
+    JSFunction* listenerAsFunction = static_cast<JSFunction*>(m_listener.get());
 
     if (exec->hadException()) {
       exec->clearException();

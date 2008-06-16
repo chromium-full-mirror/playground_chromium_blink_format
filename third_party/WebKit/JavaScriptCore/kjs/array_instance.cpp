@@ -39,7 +39,7 @@ typedef HashMap<unsigned, JSValue*> SparseArrayValueMap;
 struct ArrayStorage {
   unsigned m_numValuesInVector;
   SparseArrayValueMap* m_sparseValueMap;
-  void* lazyCreationData;  // An ArrayInstance subclass can use this to fill the
+  void* lazyCreationData;  // An JSArray subclass can use this to fill the
                            // vector lazily.
   JSValue* m_vector[1];
 };
@@ -58,7 +58,7 @@ static const unsigned maxArrayIndex = 0xFFFFFFFEU;
 #define sparseArrayCutoff 10000U
 static const unsigned minDensityMultiplier = 8;
 
-const ClassInfo ArrayInstance::info = {"Array", 0, 0, 0};
+const ClassInfo JSArray::info = {"Array", 0, 0, 0};
 
 static inline size_t storageSize(unsigned vectorLength) {
   return sizeof(ArrayStorage) - sizeof(JSValue*) +
@@ -75,11 +75,11 @@ static inline bool isDenseEnoughForVector(unsigned length, unsigned numValues) {
 
 #if !CHECK_ARRAY_CONSISTENCY
 
-inline void ArrayInstance::checkConsistency(ConsistencyCheckType) {}
+inline void JSArray::checkConsistency(ConsistencyCheckType) {}
 
 #endif
 
-ArrayInstance::ArrayInstance(JSObject* prototype, unsigned initialLength)
+JSArray::JSArray(JSObject* prototype, unsigned initialLength)
     : JSObject(prototype) {
   unsigned initialCapacity = min(initialLength, sparseArrayCutoff);
 
@@ -93,8 +93,7 @@ ArrayInstance::ArrayInstance(JSObject* prototype, unsigned initialLength)
   checkConsistency();
 }
 
-ArrayInstance::ArrayInstance(JSObject* prototype, const List& list)
-    : JSObject(prototype) {
+JSArray::JSArray(JSObject* prototype, const List& list) : JSObject(prototype) {
   unsigned length = list.size();
 
   m_length = length;
@@ -120,14 +119,14 @@ ArrayInstance::ArrayInstance(JSObject* prototype, const List& list)
   checkConsistency();
 }
 
-ArrayInstance::~ArrayInstance() {
+JSArray::~JSArray() {
   checkConsistency(DestructorConsistencyCheck);
 
   delete m_storage->m_sparseValueMap;
   fastFree(m_storage);
 }
 
-JSValue* ArrayInstance::getItem(unsigned i) const {
+JSValue* JSArray::getItem(unsigned i) const {
   ASSERT(i <= maxArrayIndex);
 
   ArrayStorage* storage = m_storage;
@@ -145,15 +144,15 @@ JSValue* ArrayInstance::getItem(unsigned i) const {
   return value ? value : jsUndefined();
 }
 
-JSValue* ArrayInstance::lengthGetter(ExecState*,
-                                     const Identifier&,
-                                     const PropertySlot& slot) {
-  return jsNumber(static_cast<ArrayInstance*>(slot.slotBase())->m_length);
+JSValue* JSArray::lengthGetter(ExecState*,
+                               const Identifier&,
+                               const PropertySlot& slot) {
+  return jsNumber(static_cast<JSArray*>(slot.slotBase())->m_length);
 }
 
-ALWAYS_INLINE bool ArrayInstance::inlineGetOwnPropertySlot(ExecState* exec,
-                                                           unsigned i,
-                                                           PropertySlot& slot) {
+ALWAYS_INLINE bool JSArray::inlineGetOwnPropertySlot(ExecState* exec,
+                                                     unsigned i,
+                                                     PropertySlot& slot) {
   ArrayStorage* storage = m_storage;
 
   if (UNLIKELY(i >= m_length)) {
@@ -181,9 +180,9 @@ ALWAYS_INLINE bool ArrayInstance::inlineGetOwnPropertySlot(ExecState* exec,
   return false;
 }
 
-bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
-                                       const Identifier& propertyName,
-                                       PropertySlot& slot) {
+bool JSArray::getOwnPropertySlot(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 PropertySlot& slot) {
   if (propertyName == exec->propertyNames().length) {
     slot.setCustom(this, lengthGetter);
     return true;
@@ -197,16 +196,16 @@ bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
   return JSObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
-                                       unsigned i,
-                                       PropertySlot& slot) {
+bool JSArray::getOwnPropertySlot(ExecState* exec,
+                                 unsigned i,
+                                 PropertySlot& slot) {
   return inlineGetOwnPropertySlot(exec, i, slot);
 }
 
 // ECMA 15.4.5.1
-void ArrayInstance::put(ExecState* exec,
-                        const Identifier& propertyName,
-                        JSValue* value) {
+void JSArray::put(ExecState* exec,
+                  const Identifier& propertyName,
+                  JSValue* value) {
   bool isArrayIndex;
   unsigned i = propertyName.toArrayIndex(&isArrayIndex);
   if (isArrayIndex) {
@@ -227,7 +226,7 @@ void ArrayInstance::put(ExecState* exec,
   JSObject::put(exec, propertyName, value);
 }
 
-void ArrayInstance::put(ExecState* exec, unsigned i, JSValue* value) {
+void JSArray::put(ExecState* exec, unsigned i, JSValue* value) {
   checkConsistency();
 
   unsigned length = m_length;
@@ -331,8 +330,7 @@ void ArrayInstance::put(ExecState* exec, unsigned i, JSValue* value) {
   checkConsistency();
 }
 
-bool ArrayInstance::deleteProperty(ExecState* exec,
-                                   const Identifier& propertyName) {
+bool JSArray::deleteProperty(ExecState* exec, const Identifier& propertyName) {
   bool isArrayIndex;
   unsigned i = propertyName.toArrayIndex(&isArrayIndex);
   if (isArrayIndex)
@@ -344,7 +342,7 @@ bool ArrayInstance::deleteProperty(ExecState* exec,
   return JSObject::deleteProperty(exec, propertyName);
 }
 
-bool ArrayInstance::deleteProperty(ExecState* exec, unsigned i) {
+bool JSArray::deleteProperty(ExecState* exec, unsigned i) {
   checkConsistency();
 
   ArrayStorage* storage = m_storage;
@@ -377,8 +375,8 @@ bool ArrayInstance::deleteProperty(ExecState* exec, unsigned i) {
   return false;
 }
 
-void ArrayInstance::getPropertyNames(ExecState* exec,
-                                     PropertyNameArray& propertyNames) {
+void JSArray::getPropertyNames(ExecState* exec,
+                               PropertyNameArray& propertyNames) {
   // FIXME: Filling PropertyNameArray with an identifier for every integer
   // is incredibly inefficient for large arrays. We need a different approach,
   // which almost certainly means a different structure for PropertyNameArray.
@@ -400,7 +398,7 @@ void ArrayInstance::getPropertyNames(ExecState* exec,
   JSObject::getPropertyNames(exec, propertyNames);
 }
 
-bool ArrayInstance::increaseVectorLength(unsigned newLength) {
+bool JSArray::increaseVectorLength(unsigned newLength) {
   // This function leaves the array in an internally inconsistent state, because
   // it does not move any values from sparse value map
   // to the vector. Callers have to account for that, because they can do it
@@ -426,7 +424,7 @@ bool ArrayInstance::increaseVectorLength(unsigned newLength) {
   return true;
 }
 
-void ArrayInstance::setLength(unsigned newLength) {
+void JSArray::setLength(unsigned newLength) {
   checkConsistency();
 
   ArrayStorage* storage = m_storage;
@@ -461,7 +459,7 @@ void ArrayInstance::setLength(unsigned newLength) {
   checkConsistency();
 }
 
-void ArrayInstance::mark() {
+void JSArray::mark() {
   JSObject::mark();
 
   ArrayStorage* storage = m_storage;
@@ -491,7 +489,7 @@ static int compareByStringPairForQSort(const void* a, const void* b) {
   return compare(va->second, vb->second);
 }
 
-void ArrayInstance::sort(ExecState* exec) {
+void JSArray::sort(ExecState* exec) {
   unsigned lengthNotIncludingUndefined = compactForSorting();
   if (m_storage->m_sparseValueMap) {
     exec->setException(Error::create(exec, GeneralError, "Out of memory"));
@@ -637,7 +635,7 @@ struct AVLTreeAbstractorForArrayCompare {
   static handle null() { return 0x7FFFFFFF; }
 };
 
-void ArrayInstance::sort(ExecState* exec, JSObject* compareFunction) {
+void JSArray::sort(ExecState* exec, JSObject* compareFunction) {
   checkConsistency();
 
   // FIXME: This ignores exceptions raised in the compare function or in
@@ -746,7 +744,7 @@ void ArrayInstance::sort(ExecState* exec, JSObject* compareFunction) {
   checkConsistency(SortConsistencyCheck);
 }
 
-unsigned ArrayInstance::compactForSorting() {
+unsigned JSArray::compactForSorting() {
   checkConsistency();
 
   ArrayStorage* storage = m_storage;
@@ -800,17 +798,17 @@ unsigned ArrayInstance::compactForSorting() {
   return numDefined;
 }
 
-void* ArrayInstance::lazyCreationData() {
+void* JSArray::lazyCreationData() {
   return m_storage->lazyCreationData;
 }
 
-void ArrayInstance::setLazyCreationData(void* d) {
+void JSArray::setLazyCreationData(void* d) {
   m_storage->lazyCreationData = d;
 }
 
 #if CHECK_ARRAY_CONSISTENCY
 
-void ArrayInstance::checkConsistency(ConsistencyCheckType type) {
+void JSArray::checkConsistency(ConsistencyCheckType type) {
   ASSERT(m_storage);
   if (type == SortConsistencyCheck)
     ASSERT(!m_storage->m_sparseValueMap);

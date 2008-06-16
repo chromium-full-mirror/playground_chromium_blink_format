@@ -147,12 +147,12 @@ class JSValue : Noncopyable {
 
 class JSCell : public JSValue {
   friend class Collector;
-  friend class GetterSetterImp;
+  friend class GetterSetter;
   friend class JSObject;
   friend class JSPropertyNameIterator;
   friend class JSValue;
-  friend class NumberImp;
-  friend class StringImp;
+  friend class JSNumberCell;
+  friend class JSString;
 
  private:
   JSCell();
@@ -212,7 +212,7 @@ class JSCell : public JSValue {
                                   PropertySlot&);
 };
 
-class NumberImp : public JSCell {
+class JSNumberCell : public JSCell {
   friend JSValue* jsNumberCell(double);
 
  public:
@@ -238,7 +238,7 @@ class NumberImp : public JSCell {
   }
 
  private:
-  NumberImp(double v) : val(v) {}
+  JSNumberCell(double v) : val(v) {}
 
   virtual bool getUInt32(uint32_t&) const;
   virtual bool getTruncatedInt32(int32_t&) const;
@@ -261,7 +261,7 @@ extern const double Inf;
 // Beware marking this function ALWAYS_INLINE: It takes a PIC branch, so
 // inlining it may not always be a win.
 inline JSValue* jsNumberCell(double d) {
-  return new NumberImp(d);
+  return new JSNumberCell(d);
 }
 
 ALWAYS_INLINE JSValue* jsUndefined() {
@@ -420,7 +420,7 @@ inline double JSValue::uncheckedGetNumber() const {
   ASSERT(JSImmediate::isImmediate(this) || asCell()->isNumber());
   return JSImmediate::isImmediate(this)
              ? JSImmediate::toDouble(this)
-             : static_cast<const NumberImp*>(this)->value();
+             : static_cast<const JSNumberCell*>(this)->value();
 }
 
 inline bool JSValue::getString(UString& s) const {
