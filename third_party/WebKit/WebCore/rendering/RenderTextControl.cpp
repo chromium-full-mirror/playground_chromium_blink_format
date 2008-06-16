@@ -465,14 +465,14 @@ int RenderTextControl::selectionStart() {
   Frame* frame = document()->frame();
   if (!frame)
     return 0;
-  return indexForVisiblePosition(frame->selectionController()->start());
+  return indexForVisiblePosition(frame->selection()->start());
 }
 
 int RenderTextControl::selectionEnd() {
   Frame* frame = document()->frame();
   if (!frame)
     return 0;
-  return indexForVisiblePosition(frame->selectionController()->end());
+  return indexForVisiblePosition(frame->selection()->end());
 }
 
 void RenderTextControl::setSelectionStart(int start) {
@@ -516,7 +516,7 @@ void RenderTextControl::setSelectionRange(int start, int end) {
   Selection newSelection = Selection(startPosition, endPosition);
 
   if (Frame* frame = document()->frame())
-    frame->selectionController()->setSelection(newSelection);
+    frame->selection()->setSelection(newSelection);
 
   // FIXME: Granularity is stored separately on the frame, but also in the
   // selection controller.
@@ -1044,7 +1044,7 @@ void RenderTextControl::selectionChanged(bool userTriggered) {
     static_cast<HTMLInputElement*>(element)->cacheSelection(selectionStart(),
                                                             selectionEnd());
   if (Frame* frame = document()->frame())
-    if (frame->selectionController()->isRange() && userTriggered)
+    if (frame->selection()->isRange() && userTriggered)
       element->dispatchHTMLEvent(selectEvent, true, false);
 }
 
@@ -1323,8 +1323,7 @@ void RenderTextControl::capsLockStateMayHaveChanged() {
             !m_multiLine &&
             static_cast<HTMLInputElement*>(n)->inputType() ==
                 HTMLInputElement::PASSWORD &&
-            f->selectionController()->isFocusedAndActive() &&
-            d->focusedNode() == n &&
+            f->selection()->isFocusedAndActive() && d->focusedNode() == n &&
             PlatformKeyboardEvent::currentCapsLockState();
 
   if (shouldDrawCapsLockIndicator != m_shouldDrawCapsLockIndicator) {

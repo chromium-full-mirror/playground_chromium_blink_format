@@ -417,7 +417,7 @@ bool RenderTheme::isFocused(const RenderObject* o) const {
   Document* document = node->document();
   Frame* frame = document->frame();
   return node == document->focusedNode() && frame &&
-         frame->selectionController()->isFocusedAndActive();
+         frame->selection()->isFocusedAndActive();
 }
 
 bool RenderTheme::isPressed(const RenderObject* o) const {

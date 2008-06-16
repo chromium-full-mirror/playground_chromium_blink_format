@@ -353,8 +353,7 @@ wxString wxWebView::RunScript(const wxString& javascript) {
     if (result)
       returnValue = wxString(
           result
-              ->toString(
-                  m_impl->frame->scriptProxy()->globalObject()->globalExec())
+              ->toString(m_impl->frame->script()->globalObject()->globalExec())
               .UTF8String()
               .c_str(),
           wxConvUTF8);
@@ -595,14 +594,14 @@ void wxWebView::OnKeyEvents(wxKeyEvent& event) {
 
 void wxWebView::OnSetFocus(wxFocusEvent& event) {
   if (m_impl->frame)
-    m_impl->frame->selectionController()->setFocused(true);
+    m_impl->frame->selection()->setFocused(true);
 
   event.Skip();
 }
 
 void wxWebView::OnKillFocus(wxFocusEvent& event) {
   if (m_impl->frame)
-    m_impl->frame->selectionController()->setFocused(false);
+    m_impl->frame->selection()->setFocused(false);
 
   event.Skip();
 }

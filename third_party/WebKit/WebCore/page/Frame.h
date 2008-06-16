@@ -104,10 +104,10 @@ class Frame : public RefCounted<Frame> {
   Editor* editor() const;
   EventHandler* eventHandler() const;
   FrameLoader* loader() const;
-  SelectionController* selectionController() const;
+  SelectionController* selection() const;
   FrameTree* tree() const;
-  AnimationController* animationController() const;
-  ScriptController* scriptProxy();
+  AnimationController* animation() const;
+  ScriptController* script();
 
   RenderView* contentRenderer()
       const;  // root renderer for the document contained in this frame
@@ -161,7 +161,7 @@ class Frame : public RefCounted<Frame> {
 
   String documentTypeString() const;
 
-  void clearScriptProxy();
+  void clearScriptController();
   void clearDOMWindow();
 
   void clearScriptObjects();

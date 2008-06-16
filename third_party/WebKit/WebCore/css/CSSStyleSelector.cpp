@@ -2119,7 +2119,7 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
       }
       case CSSSelector::PseudoFocus:
         if (e && e->focused() &&
-            e->document()->frame()->selectionController()->isFocusedAndActive())
+            e->document()->frame()->selection()->isFocusedAndActive())
           return true;
         break;
       case CSSSelector::PseudoHover: {

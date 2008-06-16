@@ -1185,7 +1185,7 @@ const AtomicString& AccessibilityRenderObject::accessKey() const {
 }
 
 Selection AccessibilityRenderObject::selection() const {
-  return m_renderer->document()->frame()->selectionController()->selection();
+  return m_renderer->document()->frame()->selection()->selection();
 }
 
 PlainTextRange AccessibilityRenderObject::selectedTextRange() const {
@@ -1227,7 +1227,7 @@ void AccessibilityRenderObject::setSelectedTextRange(
   if (!frame)
     return;
   Node* node = m_renderer->element();
-  frame->selectionController()->setSelection(
+  frame->selection()->setSelection(
       Selection(Position(node, range.start),
                 Position(node, range.start + range.length), DOWNSTREAM));
 }
@@ -1280,7 +1280,7 @@ bool AccessibilityRenderObject::isFocused() const {
   // Check instead if the frame's selection controller is focused
   if (focusedNode == m_renderer->element() ||
       (roleValue() == WebAreaRole &&
-       document->frame()->selectionController()->isFocusedAndActive()))
+       document->frame()->selection()->isFocusedAndActive()))
     return true;
 
   return false;
@@ -1428,13 +1428,13 @@ VisiblePositionRange AccessibilityRenderObject::doAXTextMarkerRangeForLine(
   // NOTE: ignores results of sel.modify because it returns false when
   // starting at an empty line.  The resulting selection in that case
   // will be a caret at visiblePos.
-  SelectionController selectionController;
-  selectionController.setSelection(Selection(visiblePos));
-  selectionController.modify(SelectionController::EXTEND,
-                             SelectionController::RIGHT, LineBoundary);
+  SelectionController selection;
+  selection.setSelection(Selection(visiblePos));
+  selection.modify(SelectionController::EXTEND, SelectionController::RIGHT,
+                   LineBoundary);
 
-  return VisiblePositionRange(selectionController.selection().visibleStart(),
-                              selectionController.selection().visibleEnd());
+  return VisiblePositionRange(selection.selection().visibleStart(),
+                              selection.selection().visibleEnd());
 }
 
 VisiblePosition AccessibilityRenderObject::visiblePositionForIndex(
@@ -1539,13 +1539,12 @@ void AccessibilityRenderObject::doSetAXSelectedTextMarkerRange(
   // make selection and tell the document to use it. if it's zero length, then
   // move to that position
   if (textMarkerRange.start == textMarkerRange.end) {
-    m_renderer->document()->frame()->selectionController()->moveTo(
-        textMarkerRange.start, true);
+    m_renderer->document()->frame()->selection()->moveTo(textMarkerRange.start,
+                                                         true);
   } else {
     Selection newSelection =
         Selection(textMarkerRange.start, textMarkerRange.end);
-    m_renderer->document()->frame()->selectionController()->setSelection(
-        newSelection);
+    m_renderer->document()->frame()->selection()->setSelection(newSelection);
   }
 }
 
@@ -1653,21 +1652,19 @@ PlainTextRange AccessibilityRenderObject::doAXRangeForLine(
   }
 
   // make a caret selection for the marker position, then extend it to the line
-  // NOTE: ignores results of selectionController.modify because it returns
-  // false when
+  // NOTE: ignores results of selection.modify because it returns false when
   // starting at an empty line.  The resulting selection in that case
   // will be a caret at visiblePos.
-  SelectionController selectionController;
-  selectionController.setSelection(Selection(visiblePos));
-  selectionController.modify(SelectionController::EXTEND,
-                             SelectionController::LEFT, LineBoundary);
-  selectionController.modify(SelectionController::EXTEND,
-                             SelectionController::RIGHT, LineBoundary);
+  SelectionController selection;
+  selection.setSelection(Selection(visiblePos));
+  selection.modify(SelectionController::EXTEND, SelectionController::LEFT,
+                   LineBoundary);
+  selection.modify(SelectionController::EXTEND, SelectionController::RIGHT,
+                   LineBoundary);
 
   // calculate the indices for the selection start and end
-  VisiblePosition startPosition =
-      selectionController.selection().visibleStart();
-  VisiblePosition endPosition = selectionController.selection().visibleEnd();
+  VisiblePosition startPosition = selection.selection().visibleStart();
+  VisiblePosition endPosition = selection.selection().visibleEnd();
   int index1 = indexForVisiblePosition(startPosition);
   int index2 = indexForVisiblePosition(endPosition);
 
@@ -1851,7 +1848,7 @@ void AccessibilityRenderObject::handleActiveDescendantChanged() {
   if (!element)
     return;
   Document* doc = renderer()->document();
-  if (!doc->frame()->selectionController()->isFocusedAndActive() ||
+  if (!doc->frame()->selection()->isFocusedAndActive() ||
       doc->focusedNode() != element)
     return;
   AccessibilityRenderObject* activedescendant =

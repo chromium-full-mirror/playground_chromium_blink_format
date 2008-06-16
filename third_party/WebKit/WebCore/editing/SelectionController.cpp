@@ -124,7 +124,7 @@ void SelectionController::setSelection(const Selection& s,
   }
 
   if (s.base().node() && s.base().node()->document() != m_frame->document()) {
-    s.base().node()->document()->frame()->selectionController()->setSelection(
+    s.base().node()->document()->frame()->selection()->setSelection(
         s, closeTyping, clearTypingStyle, userTriggered);
     return;
   }
@@ -1053,7 +1053,7 @@ void SelectionController::selectFrameElementInParentIfFullySelected() {
   Selection newSelection(beforeOwnerElement, afterOwnerElement);
   if (parent->shouldChangeSelection(newSelection)) {
     page->focusController()->setFocusedFrame(parent);
-    parent->selectionController()->setSelection(newSelection);
+    parent->selection()->setSelection(newSelection);
   }
 }
 

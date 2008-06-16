@@ -223,11 +223,11 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
     // for the LiveWhenNotFocused editable link behavior
     if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
         static_cast<MouseEvent*>(evt)->button() != RightButton &&
-        document()->frame() && document()->frame()->selectionController()) {
+        document()->frame() && document()->frame()->selection()) {
       MouseEvent* e = static_cast<MouseEvent*>(evt);
 
       m_rootEditableElementForSelectionOnMouseDown =
-          document()->frame()->selectionController()->rootEditableElement();
+          document()->frame()->selection()->rootEditableElement();
       m_wasShiftKeyDownOnMouseDown = e && e->shiftKey();
     } else if (evt->type() == mouseoverEvent) {
       // These are cleared on mouseover and not mouseout because their values
@@ -260,9 +260,8 @@ void HTMLAnchorElement::setActive(bool down, bool pause) {
       // editable block as
       // this link
       case EditableLinkLiveWhenNotFocused:
-        if (down && document()->frame() &&
-            document()->frame()->selectionController() &&
-            document()->frame()->selectionController()->rootEditableElement() ==
+        if (down && document()->frame() && document()->frame()->selection() &&
+            document()->frame()->selection()->rootEditableElement() ==
                 rootEditableElement())
           return;
         break;

@@ -168,7 +168,7 @@ void EventHandler::selectClosestWordFromMouseEvent(
     }
 
     if (m_frame->shouldChangeSelection(newSelection))
-      m_frame->selectionController()->setSelection(newSelection);
+      m_frame->selection()->setSelection(newSelection);
   }
 }
 
@@ -194,7 +194,7 @@ void EventHandler::selectClosestWordOrLinkFromMouseEvent(
     }
 
     if (m_frame->shouldChangeSelection(newSelection))
-      m_frame->selectionController()->setSelection(newSelection);
+      m_frame->selection()->setSelection(newSelection);
   }
 }
 
@@ -203,7 +203,7 @@ bool EventHandler::handleMousePressEventDoubleClick(
   if (event.event().button() != LeftButton)
     return false;
 
-  if (m_frame->selectionController()->isRange())
+  if (m_frame->selection()->isRange())
     // A double-click when range is already selected
     // should not change the selection.  So, do not call
     // selectClosestWordFromMouseEvent, but do set
@@ -238,7 +238,7 @@ bool EventHandler::handleMousePressEventTripleClick(
   }
 
   if (m_frame->shouldChangeSelection(newSelection))
-    m_frame->selectionController()->setSelection(newSelection);
+    m_frame->selection()->setSelection(newSelection);
 
   return true;
 }
@@ -259,7 +259,7 @@ bool EventHandler::handleMousePressEventSingleClick(
   // Don't restart the selection when the mouse is pressed on an
   // existing selection so we can allow for text dragging.
   IntPoint vPoint = m_frame->view()->windowToContents(event.event().pos());
-  if (!extendSelection && m_frame->selectionController()->contains(vPoint)) {
+  if (!extendSelection && m_frame->selection()->contains(vPoint)) {
     m_mouseDownWasSingleClickInSelection = true;
     return false;
   }
@@ -270,9 +270,9 @@ bool EventHandler::handleMousePressEventSingleClick(
     visiblePos = VisiblePosition(innerNode, 0, DOWNSTREAM);
   Position pos = visiblePos.deepEquivalent();
 
-  Selection newSelection = m_frame->selectionController()->selection();
+  Selection newSelection = m_frame->selection()->selection();
   if (extendSelection && newSelection.isCaretOrRange()) {
-    m_frame->selectionController()->setLastChangeWasHorizontalExtension(false);
+    m_frame->selection()->setLastChangeWasHorizontalExtension(false);
 
     // See <rdar://problem/3668157> REGRESSION (Mail): shift-click deselects
     // when selection
@@ -295,7 +295,7 @@ bool EventHandler::handleMousePressEventSingleClick(
   }
 
   if (m_frame->shouldChangeSelection(newSelection))
-    m_frame->selectionController()->setSelection(newSelection);
+    m_frame->selection()->setSelection(newSelection);
 
   return true;
 }
@@ -344,7 +344,7 @@ bool EventHandler::handleMousePressEvent(
   bool swallowEvent = false;
   if (event.event().button() == LeftButton ||
       event.event().button() == MiddleButton) {
-    m_frame->selectionController()->setCaretBlinkingSuspended(true);
+    m_frame->selection()->setCaretBlinkingSuspended(true);
     m_mousePressed = true;
     m_beganSelectingText = false;
 
@@ -465,7 +465,7 @@ void EventHandler::updateSelectionForMouseDrag(Node* targetNode,
   // Restart the selection if this is the first mouse move. This work is usually
   // done in handleMousePressEvent, but not if the mouse press was on an
   // existing selection.
-  Selection newSelection = m_frame->selectionController()->selection();
+  Selection newSelection = m_frame->selection()->selection();
 
 #if ENABLE(SVG)
   // Special case to limit selection to the containing block for SVG text.
@@ -488,8 +488,8 @@ void EventHandler::updateSelectionForMouseDrag(Node* targetNode,
     newSelection.expandUsingGranularity(m_frame->selectionGranularity());
 
   if (m_frame->shouldChangeSelection(newSelection)) {
-    m_frame->selectionController()->setLastChangeWasHorizontalExtension(false);
-    m_frame->selectionController()->setSelection(newSelection);
+    m_frame->selection()->setLastChangeWasHorizontalExtension(false);
+    m_frame->selection()->setSelection(newSelection);
   }
 }
 
@@ -518,7 +518,7 @@ bool EventHandler::handleMouseReleaseEvent(
 
   // Used to prevent mouseMoveEvent from initiating a drag before
   // the mouse is pressed again.
-  m_frame->selectionController()->setCaretBlinkingSuspended(false);
+  m_frame->selection()->setCaretBlinkingSuspended(false);
   m_mousePressed = false;
   m_mouseDownMayStartDrag = false;
   m_mouseDownMayStartSelect = false;
@@ -532,7 +532,7 @@ bool EventHandler::handleMouseReleaseEvent(
   // However, if we are editing, place the caret.
   if (m_mouseDownWasSingleClickInSelection && !m_beganSelectingText &&
       m_dragStartPos == event.event().pos() &&
-      m_frame->selectionController()->isRange()) {
+      m_frame->selection()->isRange()) {
     Selection newSelection;
     Node* node = event.targetNode();
     if (node && node->isContentEditable() && node->renderer()) {
@@ -541,14 +541,14 @@ bool EventHandler::handleMouseReleaseEvent(
       newSelection = Selection(pos);
     }
     if (m_frame->shouldChangeSelection(newSelection))
-      m_frame->selectionController()->setSelection(newSelection);
+      m_frame->selection()->setSelection(newSelection);
 
     handled = true;
   }
 
   m_frame->notifyRendererOfSelectionChange(true);
 
-  m_frame->selectionController()->selectFrameElementInParentIfFullySelected();
+  m_frame->selection()->selectFrameElementInParentIfFullySelected();
 
   return handled;
 }
@@ -696,7 +696,7 @@ static bool isSubmitImage(Node* node) {
 
 // Returns true if the node's editable block is not current focused for editing
 static bool nodeIsNotBeingEdited(Node* node, Frame* frame) {
-  return frame->selectionController()->rootEditableElement() !=
+  return frame->selection()->rootEditableElement() !=
          node->rootEditableElement();
 }
 
@@ -706,8 +706,7 @@ Cursor EventHandler::selectCursor(const MouseEventWithHitTestResults& event,
   // If you're capturing mouse events for a particular node, don't treat this as
   // a selection.
   if (m_mousePressed && m_mouseDownMayStartSelect &&
-      m_frame->selectionController()->isCaretOrRange() &&
-      !m_capturingMouseEventsNode)
+      m_frame->selection()->isCaretOrRange() && !m_capturingMouseEventsNode)
     return iBeamCursor();
 
   Node* node = event.targetNode();
@@ -1400,8 +1399,8 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
         // setFocuseNodeIfNeeded.
         ExceptionCode ec = 0;
         Node* n = node->isShadowNode() ? node->shadowParentNode() : node;
-        if (m_frame->selectionController()->isRange() &&
-            m_frame->selectionController()->toRange()->compareNode(n, ec) ==
+        if (m_frame->selection()->isRange() &&
+            m_frame->selection()->toRange()->compareNode(n, ec) ==
                 Range::NODE_INSIDE &&
             n->isDescendantOf(m_frame->document()->focusedNode()))
           return false;
@@ -1498,13 +1497,13 @@ bool EventHandler::sendContextMenuEvent(const PlatformMouseEvent& event) {
   MouseEventWithHitTestResults mev =
       doc->prepareMouseEvent(HitTestRequest(false, true), viewportPos, event);
 
-  if (!m_frame->selectionController()->contains(viewportPos) &&
+  if (!m_frame->selection()->contains(viewportPos) &&
       // FIXME: In the editable case, word selection sometimes selects content
       // that isn't underneath the mouse.
       // If the selection is non-editable, we do word selection to make it
       // easier to use the contextual menu items
       // available for text selections.  But only if we're above text.
-      (m_frame->selectionController()->isContentEditable() ||
+      (m_frame->selection()->isContentEditable() ||
        mev.targetNode() && mev.targetNode()->isTextNode())) {
     m_mouseDownMayStartSelect =
         true;  // context menu events are always allowed to perform a selection
@@ -1719,23 +1718,23 @@ void EventHandler::handleKeyboardSelectionMovement(KeyboardEvent* event) {
   bool isOptioned = event->getModifierState("Alt");
 
   if (key == "Up") {
-    m_frame->selectionController()->modify(
+    m_frame->selection()->modify(
         (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
         SelectionController::BACKWARD, LineGranularity, true);
     event->setDefaultHandled();
   } else if (key == "Down") {
-    m_frame->selectionController()->modify(
+    m_frame->selection()->modify(
         (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
         SelectionController::FORWARD, LineGranularity, true);
     event->setDefaultHandled();
   } else if (key == "Left") {
-    m_frame->selectionController()->modify(
+    m_frame->selection()->modify(
         (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
         SelectionController::LEFT,
         (isOptioned) ? WordGranularity : CharacterGranularity, true);
     event->setDefaultHandled();
   } else if (key == "Right") {
-    m_frame->selectionController()->modify(
+    m_frame->selection()->modify(
         (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
         SelectionController::RIGHT,
         (isOptioned) ? WordGranularity : CharacterGranularity, true);
@@ -1876,7 +1875,7 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
           node && node->renderer() && node->renderer()->isImage();
 
       dragState().m_dragSrcInSelection =
-          m_frame->selectionController()->contains(m_mouseDownPos);
+          m_frame->selection()->contains(m_mouseDownPos);
     }
   }
 
@@ -1928,7 +1927,7 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
 
     m_mouseDownMayStartDrag =
         dispatchDragSrcEvent(dragstartEvent, m_mouseDown) &&
-        !m_frame->selectionController()->isInPasswordField();
+        !m_frame->selection()->isInPasswordField();
 
     // Invalidate clipboard here against anymore pasteboard writing for
     // security.  The drag

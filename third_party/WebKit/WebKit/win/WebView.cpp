@@ -1043,10 +1043,8 @@ bool WebView::handleContextMenuEvent(WPARAM wParam, LPARAM lParam) {
 
     // The context menu event was generated from the keyboard, so show the
     // context menu by the current selection.
-    Position start =
-        m_page->mainFrame()->selectionController()->selection().start();
-    Position end =
-        m_page->mainFrame()->selectionController()->selection().end();
+    Position start = m_page->mainFrame()->selection()->selection().start();
+    Position end = m_page->mainFrame()->selection()->selection().end();
 
     if (!start.node() || !end.node())
       location =
@@ -1810,7 +1808,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
         // Send focus events unless the previously focused window is a
         // child of ours (for example a plugin).
         if (!IsChild(hWnd, reinterpret_cast<HWND>(wParam)))
-          frame->selectionController()->setFocused(true);
+          frame->selection()->setFocused(true);
       } else
         focusController->setFocusedFrame(webView->page()->mainFrame());
       break;
@@ -1831,7 +1829,7 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       webView->resetIME(frame);
       // Send blur events unless we're losing focus to a child of ours.
       if (!IsChild(hWnd, newFocusWnd))
-        frame->selectionController()->setFocused(false);
+        frame->selection()->setFocused(false);
       break;
     }
     case WM_WINDOWPOSCHANGED:
@@ -2878,8 +2876,7 @@ HRESULT STDMETHODCALLTYPE WebView::updateFocusedAndActiveState() {
   bool active = m_page->focusController()->isActive();
   Frame* mainFrame = m_page->mainFrame();
   Frame* focusedFrame = m_page->focusController()->focusedOrMainFrame();
-  mainFrame->selectionController()->setFocused(active &&
-                                               mainFrame == focusedFrame);
+  mainFrame->selection()->setFocused(active && mainFrame == focusedFrame);
 
   return S_OK;
 }
@@ -3583,7 +3580,7 @@ HRESULT STDMETHODCALLTYPE WebView::styleDeclarationWithText(
 
 HRESULT STDMETHODCALLTYPE WebView::hasSelectedRange(
     /* [retval][out] */ BOOL* hasSelectedRange) {
-  *hasSelectedRange = m_page->mainFrame()->selectionController()->isRange();
+  *hasSelectedRange = m_page->mainFrame()->selection()->isRange();
   return S_OK;
 }
 
@@ -3667,11 +3664,10 @@ HRESULT STDMETHODCALLTYPE WebView::replaceSelectionWithNode(
 HRESULT STDMETHODCALLTYPE WebView::replaceSelectionWithText(
     /* [in] */ BSTR text) {
   String textString(text, ::SysStringLen(text));
-  Position start =
-      m_page->mainFrame()->selectionController()->selection().start();
+  Position start = m_page->mainFrame()->selection()->selection().start();
   m_page->focusController()->focusedOrMainFrame()->editor()->insertText(
       textString, 0);
-  m_page->mainFrame()->selectionController()->setBase(start);
+  m_page->mainFrame()->selection()->setBase(start);
   return S_OK;
 }
 
@@ -3694,10 +3690,7 @@ HRESULT STDMETHODCALLTYPE WebView::deleteSelection(void) {
 }
 
 HRESULT STDMETHODCALLTYPE WebView::clearSelection(void) {
-  m_page->focusController()
-      ->focusedOrMainFrame()
-      ->selectionController()
-      ->clear();
+  m_page->focusController()->focusedOrMainFrame()->selection()->clear();
   return S_OK;
 }
 
@@ -4538,8 +4531,7 @@ void WebView::releaseIMMContext(HIMC hIMC) {
 
 void WebView::prepareCandidateWindow(Frame* targetFrame, HIMC hInputContext) {
   IntRect caret;
-  if (RefPtr<Range> range =
-          targetFrame->selectionController()->selection().toRange()) {
+  if (RefPtr<Range> range = targetFrame->selection()->selection().toRange()) {
     ExceptionCode ec = 0;
     RefPtr<Range> tempRange = range->cloneRange(ec);
     caret = targetFrame->firstRectForRange(tempRange.get());
@@ -4711,7 +4703,7 @@ bool WebView::onIMERequestCharPosition(Frame* targetFrame,
   if (RefPtr<Range> range =
           targetFrame->editor()->hasComposition()
               ? targetFrame->editor()->compositionRange()
-              : targetFrame->selectionController()->selection().toRange()) {
+              : targetFrame->selection()->selection().toRange()) {
     ExceptionCode ec = 0;
     RefPtr<Range> tempRange = range->cloneRange(ec);
     tempRange->setStart(tempRange->startContainer(ec),
@@ -4731,7 +4723,7 @@ bool WebView::onIMERequestCharPosition(Frame* targetFrame,
 bool WebView::onIMERequestReconvertString(Frame* targetFrame,
                                           RECONVERTSTRING* reconvertString,
                                           LRESULT* result) {
-  RefPtr<Range> selectedRange = targetFrame->selectionController()->toRange();
+  RefPtr<Range> selectedRange = targetFrame->selection()->toRange();
   String text = selectedRange->text();
   if (!reconvertString) {
     *result = sizeof(RECONVERTSTRING) + text.length() * sizeof(UChar);

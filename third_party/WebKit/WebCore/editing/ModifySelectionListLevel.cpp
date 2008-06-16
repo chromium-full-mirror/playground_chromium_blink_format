@@ -214,9 +214,8 @@ bool IncreaseSelectionListLevelCommand::canIncreaseSelectionListLevel(
     Document* document) {
   Node* startListChild;
   Node* endListChild;
-  return canIncreaseListLevel(
-      document->frame()->selectionController()->selection(), startListChild,
-      endListChild);
+  return canIncreaseListLevel(document->frame()->selection()->selection(),
+                              startListChild, endListChild);
 }
 
 PassRefPtr<Node>
@@ -301,9 +300,8 @@ bool DecreaseSelectionListLevelCommand::canDecreaseSelectionListLevel(
     Document* document) {
   Node* startListChild;
   Node* endListChild;
-  return canDecreaseListLevel(
-      document->frame()->selectionController()->selection(), startListChild,
-      endListChild);
+  return canDecreaseListLevel(document->frame()->selection()->selection(),
+                              startListChild, endListChild);
 }
 
 void DecreaseSelectionListLevelCommand::decreaseSelectionListLevel(

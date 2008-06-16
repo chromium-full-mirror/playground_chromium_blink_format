@@ -142,7 +142,7 @@ void computePageRectsForFrame(Frame* frame,
 }
 
 DragImageRef Frame::dragImageForSelection() {
-  if (selectionController()->isRange())
+  if (selection()->isRange())
     return imageFromSelection(this, false);
 
   return 0;

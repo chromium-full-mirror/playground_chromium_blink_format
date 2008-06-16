@@ -251,7 +251,7 @@ void EditorClient::handleKeyboardEvent(KeyboardEvent* event) {
   if (!kevent || kevent->type() == PlatformKeyboardEvent::KeyUp)
     return;
 
-  Node* start = frame->selectionController()->start().node();
+  Node* start = frame->selection()->start().node();
   if (!start)
     return;
 
@@ -273,28 +273,28 @@ void EditorClient::handleKeyboardEvent(KeyboardEvent* event) {
             true);
         break;
       case VK_LEFT:
-        frame->selectionController()->modify(
+        frame->selection()->modify(
             kevent->shiftKey() ? SelectionController::EXTEND
                                : SelectionController::MOVE,
             SelectionController::LEFT,
             kevent->ctrlKey() ? WordGranularity : CharacterGranularity, true);
         break;
       case VK_RIGHT:
-        frame->selectionController()->modify(
+        frame->selection()->modify(
             kevent->shiftKey() ? SelectionController::EXTEND
                                : SelectionController::MOVE,
             SelectionController::RIGHT,
             kevent->ctrlKey() ? WordGranularity : CharacterGranularity, true);
         break;
       case VK_UP:
-        frame->selectionController()->modify(
+        frame->selection()->modify(
             kevent->shiftKey() ? SelectionController::EXTEND
                                : SelectionController::MOVE,
             SelectionController::BACKWARD,
             kevent->ctrlKey() ? ParagraphGranularity : LineGranularity, true);
         break;
       case VK_DOWN:
-        frame->selectionController()->modify(
+        frame->selection()->modify(
             kevent->shiftKey() ? SelectionController::EXTEND
                                : SelectionController::MOVE,
             SelectionController::FORWARD,

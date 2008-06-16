@@ -657,7 +657,7 @@ PassRefPtr<LegacyWebArchive> LegacyWebArchive::createFromSelection(
   if (!frame)
     return 0;
 
-  RefPtr<Range> selectionRange = frame->selectionController()->toRange();
+  RefPtr<Range> selectionRange = frame->selection()->toRange();
   Vector<Node*> nodeList;
   String markupString =
       frame->documentTypeString() +

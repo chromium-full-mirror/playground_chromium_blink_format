@@ -371,7 +371,7 @@ JSGlobalContextRef STDMETHODCALLTYPE WebFrame::globalContext() {
   if (!coreFrame)
     return 0;
 
-  return toGlobalRef(coreFrame->scriptProxy()->globalObject()->globalExec());
+  return toGlobalRef(coreFrame->script()->globalObject()->globalExec());
 }
 
 HRESULT STDMETHODCALLTYPE WebFrame::loadRequest(
@@ -1497,8 +1497,8 @@ void WebFrame::windowObjectCleared() {
     COMPtr<IWebFrameLoadDelegate2> frameLoadDelegate2(Query, frameLoadDelegate);
 
     JSContextRef context =
-        toRef(coreFrame->scriptProxy()->globalObject()->globalExec());
-    JSObjectRef windowObject = toRef(coreFrame->scriptProxy()->globalObject());
+        toRef(coreFrame->script()->globalObject()->globalExec());
+    JSObjectRef windowObject = toRef(coreFrame->script()->globalObject());
     ASSERT(windowObject);
 
     if (!frameLoadDelegate2 || FAILED(frameLoadDelegate2->didClearWindowObject(

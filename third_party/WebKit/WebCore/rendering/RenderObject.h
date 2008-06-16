@@ -1127,7 +1127,7 @@ class RenderObject : public CachedResourceClient {
 
   virtual void capsLockStateMayHaveChanged() {}
 
-  AnimationController* animationController() const;
+  AnimationController* animation() const;
 
  protected:
   virtual void printBoxDecorations(GraphicsContext*,

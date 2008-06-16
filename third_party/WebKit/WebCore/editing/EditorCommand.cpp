@@ -207,7 +207,7 @@ static bool executeInsertNode(Frame* frame, PassRefPtr<Node> content) {
 
 static bool expandSelectionToGranularity(Frame* frame,
                                          TextGranularity granularity) {
-  Selection selection = frame->selectionController()->selection();
+  Selection selection = frame->selection()->selection();
   selection.expandUsingGranularity(granularity);
   RefPtr<Range> newRange = selection.toRange();
   if (!newRange)
@@ -215,13 +215,12 @@ static bool expandSelectionToGranularity(Frame* frame,
   ExceptionCode ec = 0;
   if (newRange->collapsed(ec))
     return false;
-  RefPtr<Range> oldRange = frame->selectionController()->selection().toRange();
-  EAffinity affinity = frame->selectionController()->affinity();
+  RefPtr<Range> oldRange = frame->selection()->selection().toRange();
+  EAffinity affinity = frame->selection()->affinity();
   if (!frame->editor()->client()->shouldChangeSelectedRange(
           oldRange.get(), newRange.get(), affinity, false))
     return false;
-  frame->selectionController()->setSelectedRange(newRange.get(), affinity,
-                                                 true);
+  frame->selection()->setSelectedRange(newRange.get(), affinity, true);
   return true;
 }
 
@@ -406,8 +405,8 @@ static bool executeDeleteToMark(Frame* frame,
                                 const String&) {
   RefPtr<Range> mark = frame->mark().toRange();
   if (mark) {
-    SelectionController* selectionController = frame->selectionController();
-    bool selected = selectionController->setSelectedRange(
+    SelectionController* selection = frame->selection();
+    bool selected = selection->setSelectedRange(
         unionDOMRanges(mark.get(), frame->editor()->selectedRange().get())
             .get(),
         DOWNSTREAM, true);
@@ -416,7 +415,7 @@ static bool executeDeleteToMark(Frame* frame,
       return false;
   }
   frame->editor()->performDelete();
-  frame->setMark(frame->selectionController()->selection());
+  frame->setMark(frame->selection()->selection());
   return true;
 }
 
@@ -682,9 +681,9 @@ static bool executeMoveBackward(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::BACKWARD,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::BACKWARD,
+                             CharacterGranularity, true);
   return true;
 }
 
@@ -692,9 +691,9 @@ static bool executeMoveBackwardAndModifySelection(Frame* frame,
                                                   Event*,
                                                   EditorCommandSource,
                                                   const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD,
+                             CharacterGranularity, true);
   return true;
 }
 
@@ -702,9 +701,9 @@ static bool executeMoveDown(Frame* frame,
                             Event*,
                             EditorCommandSource,
                             const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::FORWARD,
-                                       LineGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::FORWARD, LineGranularity,
+                             true);
   return true;
 }
 
@@ -712,9 +711,9 @@ static bool executeMoveDownAndModifySelection(Frame* frame,
                                               Event*,
                                               EditorCommandSource,
                                               const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       LineGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, LineGranularity,
+                             true);
   return true;
 }
 
@@ -722,9 +721,9 @@ static bool executeMoveForward(Frame* frame,
                                Event*,
                                EditorCommandSource,
                                const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::FORWARD,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::FORWARD, CharacterGranularity,
+                             true);
   return true;
 }
 
@@ -732,9 +731,9 @@ static bool executeMoveForwardAndModifySelection(Frame* frame,
                                                  Event*,
                                                  EditorCommandSource,
                                                  const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, CharacterGranularity,
+                             true);
   return true;
 }
 
@@ -742,9 +741,9 @@ static bool executeMoveLeft(Frame* frame,
                             Event*,
                             EditorCommandSource,
                             const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::LEFT,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::LEFT, CharacterGranularity,
+                             true);
   return true;
 }
 
@@ -752,9 +751,9 @@ static bool executeMoveLeftAndModifySelection(Frame* frame,
                                               Event*,
                                               EditorCommandSource,
                                               const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::LEFT,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::LEFT, CharacterGranularity,
+                             true);
   return true;
 }
 
@@ -765,8 +764,7 @@ static bool executeMovePageDown(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selectionController()->modify(SelectionController::MOVE,
-                                              distance, true);
+  return frame->selection()->modify(SelectionController::MOVE, distance, true);
 }
 
 static bool executeMovePageDownAndModifySelection(Frame* frame,
@@ -776,8 +774,8 @@ static bool executeMovePageDownAndModifySelection(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selectionController()->modify(SelectionController::EXTEND,
-                                              distance, true);
+  return frame->selection()->modify(SelectionController::EXTEND, distance,
+                                    true);
 }
 
 static bool executeMovePageUp(Frame* frame,
@@ -787,8 +785,7 @@ static bool executeMovePageUp(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selectionController()->modify(SelectionController::MOVE,
-                                              -distance, true);
+  return frame->selection()->modify(SelectionController::MOVE, -distance, true);
 }
 
 static bool executeMovePageUpAndModifySelection(Frame* frame,
@@ -798,17 +795,17 @@ static bool executeMovePageUpAndModifySelection(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selectionController()->modify(SelectionController::EXTEND,
-                                              -distance, true);
+  return frame->selection()->modify(SelectionController::EXTEND, -distance,
+                                    true);
 }
 
 static bool executeMoveRight(Frame* frame,
                              Event*,
                              EditorCommandSource,
                              const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::RIGHT,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::RIGHT, CharacterGranularity,
+                             true);
   return true;
 }
 
@@ -816,9 +813,9 @@ static bool executeMoveRightAndModifySelection(Frame* frame,
                                                Event*,
                                                EditorCommandSource,
                                                const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::RIGHT,
-                                       CharacterGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::RIGHT, CharacterGranularity,
+                             true);
   return true;
 }
 
@@ -826,9 +823,9 @@ static bool executeMoveToBeginningOfDocument(Frame* frame,
                                              Event*,
                                              EditorCommandSource,
                                              const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::BACKWARD,
-                                       DocumentBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::BACKWARD, DocumentBoundary,
+                             true);
   return true;
 }
 
@@ -837,9 +834,9 @@ static bool executeMoveToBeginningOfDocumentAndModifySelection(
     Event*,
     EditorCommandSource,
     const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       DocumentBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD, DocumentBoundary,
+                             true);
   return true;
 }
 
@@ -847,9 +844,8 @@ static bool executeMoveToBeginningOfLine(Frame* frame,
                                          Event*,
                                          EditorCommandSource,
                                          const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::BACKWARD,
-                                       LineBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::BACKWARD, LineBoundary, true);
   return true;
 }
 
@@ -857,9 +853,8 @@ static bool executeMoveToBeginningOfLineAndModifySelection(Frame* frame,
                                                            Event*,
                                                            EditorCommandSource,
                                                            const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       LineBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD, LineBoundary, true);
   return true;
 }
 
@@ -867,9 +862,9 @@ static bool executeMoveToBeginningOfParagraph(Frame* frame,
                                               Event*,
                                               EditorCommandSource,
                                               const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::BACKWARD,
-                                       ParagraphBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::BACKWARD, ParagraphBoundary,
+                             true);
   return true;
 }
 
@@ -878,9 +873,9 @@ static bool executeMoveToBeginningOfParagraphAndModifySelection(
     Event*,
     EditorCommandSource,
     const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       ParagraphBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD, ParagraphBoundary,
+                             true);
   return true;
 }
 
@@ -888,9 +883,9 @@ static bool executeMoveToBeginningOfSentence(Frame* frame,
                                              Event*,
                                              EditorCommandSource,
                                              const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::BACKWARD,
-                                       SentenceBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::BACKWARD, SentenceBoundary,
+                             true);
   return true;
 }
 
@@ -899,9 +894,9 @@ static bool executeMoveToBeginningOfSentenceAndModifySelection(
     Event*,
     EditorCommandSource,
     const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       SentenceBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD, SentenceBoundary,
+                             true);
   return true;
 }
 
@@ -909,9 +904,9 @@ static bool executeMoveToEndOfDocument(Frame* frame,
                                        Event*,
                                        EditorCommandSource,
                                        const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::FORWARD,
-                                       DocumentBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::FORWARD, DocumentBoundary,
+                             true);
   return true;
 }
 
@@ -919,9 +914,9 @@ static bool executeMoveToEndOfDocumentAndModifySelection(Frame* frame,
                                                          Event*,
                                                          EditorCommandSource,
                                                          const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       DocumentBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, DocumentBoundary,
+                             true);
   return true;
 }
 
@@ -929,9 +924,9 @@ static bool executeMoveToEndOfSentence(Frame* frame,
                                        Event*,
                                        EditorCommandSource,
                                        const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::FORWARD,
-                                       SentenceBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::FORWARD, SentenceBoundary,
+                             true);
   return true;
 }
 
@@ -939,9 +934,9 @@ static bool executeMoveToEndOfSentenceAndModifySelection(Frame* frame,
                                                          Event*,
                                                          EditorCommandSource,
                                                          const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       SentenceBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, SentenceBoundary,
+                             true);
   return true;
 }
 
@@ -949,9 +944,8 @@ static bool executeMoveToEndOfLine(Frame* frame,
                                    Event*,
                                    EditorCommandSource,
                                    const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::FORWARD,
-                                       LineBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::FORWARD, LineBoundary, true);
   return true;
 }
 
@@ -959,9 +953,8 @@ static bool executeMoveToEndOfLineAndModifySelection(Frame* frame,
                                                      Event*,
                                                      EditorCommandSource,
                                                      const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       LineBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, LineBoundary, true);
   return true;
 }
 
@@ -969,9 +962,9 @@ static bool executeMoveToEndOfParagraph(Frame* frame,
                                         Event*,
                                         EditorCommandSource,
                                         const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::FORWARD,
-                                       ParagraphBoundary, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::FORWARD, ParagraphBoundary,
+                             true);
   return true;
 }
 
@@ -979,9 +972,9 @@ static bool executeMoveToEndOfParagraphAndModifySelection(Frame* frame,
                                                           Event*,
                                                           EditorCommandSource,
                                                           const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       ParagraphBoundary, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, ParagraphBoundary,
+                             true);
   return true;
 }
 
@@ -989,9 +982,9 @@ static bool executeMoveParagraphBackwardAndModifySelection(Frame* frame,
                                                            Event*,
                                                            EditorCommandSource,
                                                            const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       ParagraphGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD,
+                             ParagraphGranularity, true);
   return true;
 }
 
@@ -999,9 +992,9 @@ static bool executeMoveParagraphForwardAndModifySelection(Frame* frame,
                                                           Event*,
                                                           EditorCommandSource,
                                                           const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       ParagraphGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, ParagraphGranularity,
+                             true);
   return true;
 }
 
@@ -1009,9 +1002,9 @@ static bool executeMoveUp(Frame* frame,
                           Event*,
                           EditorCommandSource,
                           const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::BACKWARD,
-                                       LineGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::BACKWARD, LineGranularity,
+                             true);
   return true;
 }
 
@@ -1019,9 +1012,9 @@ static bool executeMoveUpAndModifySelection(Frame* frame,
                                             Event*,
                                             EditorCommandSource,
                                             const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       LineGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD, LineGranularity,
+                             true);
   return true;
 }
 
@@ -1029,9 +1022,9 @@ static bool executeMoveWordBackward(Frame* frame,
                                     Event*,
                                     EditorCommandSource,
                                     const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::BACKWARD,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::BACKWARD, WordGranularity,
+                             true);
   return true;
 }
 
@@ -1039,9 +1032,9 @@ static bool executeMoveWordBackwardAndModifySelection(Frame* frame,
                                                       Event*,
                                                       EditorCommandSource,
                                                       const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::BACKWARD,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::BACKWARD, WordGranularity,
+                             true);
   return true;
 }
 
@@ -1049,9 +1042,9 @@ static bool executeMoveWordForward(Frame* frame,
                                    Event*,
                                    EditorCommandSource,
                                    const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::FORWARD,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::FORWARD, WordGranularity,
+                             true);
   return true;
 }
 
@@ -1059,9 +1052,9 @@ static bool executeMoveWordForwardAndModifySelection(Frame* frame,
                                                      Event*,
                                                      EditorCommandSource,
                                                      const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::FORWARD,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::FORWARD, WordGranularity,
+                             true);
   return true;
 }
 
@@ -1069,9 +1062,8 @@ static bool executeMoveWordLeft(Frame* frame,
                                 Event*,
                                 EditorCommandSource,
                                 const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::LEFT,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::LEFT, WordGranularity, true);
   return true;
 }
 
@@ -1079,9 +1071,8 @@ static bool executeMoveWordLeftAndModifySelection(Frame* frame,
                                                   Event*,
                                                   EditorCommandSource,
                                                   const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::LEFT,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::LEFT, WordGranularity, true);
   return true;
 }
 
@@ -1089,9 +1080,8 @@ static bool executeMoveWordRight(Frame* frame,
                                  Event*,
                                  EditorCommandSource,
                                  const String&) {
-  frame->selectionController()->modify(SelectionController::MOVE,
-                                       SelectionController::RIGHT,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::MOVE,
+                             SelectionController::RIGHT, WordGranularity, true);
   return true;
 }
 
@@ -1099,9 +1089,8 @@ static bool executeMoveWordRightAndModifySelection(Frame* frame,
                                                    Event*,
                                                    EditorCommandSource,
                                                    const String&) {
-  frame->selectionController()->modify(SelectionController::EXTEND,
-                                       SelectionController::RIGHT,
-                                       WordGranularity, true);
+  frame->selection()->modify(SelectionController::EXTEND,
+                             SelectionController::RIGHT, WordGranularity, true);
   return true;
 }
 
@@ -1161,7 +1150,7 @@ static bool executeSelectAll(Frame* frame,
                              Event*,
                              EditorCommandSource,
                              const String&) {
-  frame->selectionController()->selectAll();
+  frame->selection()->selectAll();
   return true;
 }
 
@@ -1196,7 +1185,7 @@ static bool executeSelectToMark(Frame* frame,
     systemBeep();
     return false;
   }
-  frame->selectionController()->setSelectedRange(
+  frame->selection()->setSelectedRange(
       unionDOMRanges(mark.get(), selection.get()).get(), DOWNSTREAM, true);
   return true;
 }
@@ -1212,7 +1201,7 @@ static bool executeSetMark(Frame* frame,
                            Event*,
                            EditorCommandSource,
                            const String&) {
-  frame->setMark(frame->selectionController()->selection());
+  frame->setMark(frame->selection()->selection());
   return true;
 }
 
@@ -1246,12 +1235,12 @@ static bool executeSwapWithMark(Frame* frame,
                                 EditorCommandSource,
                                 const String&) {
   const Selection& mark = frame->mark();
-  const Selection& selection = frame->selectionController()->selection();
+  const Selection& selection = frame->selection()->selection();
   if (mark.isNone() || selection.isNone()) {
     systemBeep();
     return false;
   }
-  frame->selectionController()->setSelection(mark);
+  frame->selection()->setSelection(mark);
   frame->setMark(selection);
   return true;
 }
@@ -1319,7 +1308,7 @@ static bool executeUnselect(Frame* frame,
                             Event*,
                             EditorCommandSource,
                             const String&) {
-  frame->selectionController()->clear();
+  frame->selection()->clear();
   return true;
 }
 
@@ -1374,14 +1363,13 @@ static bool enabled(Frame*, Event*, EditorCommandSource) {
 }
 
 static bool enabledAnySelection(Frame* frame, Event*, EditorCommandSource) {
-  return frame->selectionController()->isCaretOrRange();
+  return frame->selection()->isCaretOrRange();
 }
 
 static bool enabledAnySelectionAndMark(Frame* frame,
                                        Event*,
                                        EditorCommandSource) {
-  return frame->selectionController()->isCaretOrRange() &&
-         frame->mark().isCaretOrRange();
+  return frame->selection()->isCaretOrRange() && frame->mark().isCaretOrRange();
 }
 
 static bool enableCaretInEditableText(Frame* frame,
@@ -1427,8 +1415,8 @@ static bool enabledInEditableText(Frame* frame,
 static bool enabledInRichlyEditableText(Frame* frame,
                                         Event*,
                                         EditorCommandSource) {
-  return frame->selectionController()->isCaretOrRange() &&
-         frame->selectionController()->isContentRichlyEditable();
+  return frame->selection()->isCaretOrRange() &&
+         frame->selection()->isContentRichlyEditable();
 }
 
 static bool enabledPaste(Frame* frame, Event*, EditorCommandSource) {
@@ -1438,15 +1426,15 @@ static bool enabledPaste(Frame* frame, Event*, EditorCommandSource) {
 static bool enabledRangeInEditableText(Frame* frame,
                                        Event*,
                                        EditorCommandSource) {
-  return frame->selectionController()->isRange() &&
-         frame->selectionController()->isContentEditable();
+  return frame->selection()->isRange() &&
+         frame->selection()->isContentEditable();
 }
 
 static bool enabledRangeInRichlyEditableText(Frame* frame,
                                              Event*,
                                              EditorCommandSource) {
-  return frame->selectionController()->isRange() &&
-         frame->selectionController()->isContentRichlyEditable();
+  return frame->selection()->isRange() &&
+         frame->selection()->isContentRichlyEditable();
 }
 
 static bool enabledRedo(Frame* frame, Event*, EditorCommandSource) {

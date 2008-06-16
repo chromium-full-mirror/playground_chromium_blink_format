@@ -2217,7 +2217,7 @@ Color RenderObject::selectionBackgroundColor() const {
     if (pseudoStyle && pseudoStyle->backgroundColor().isValid())
       color = pseudoStyle->backgroundColor().blendWithWhite();
     else
-      color = document()->frame()->selectionController()->isFocusedAndActive()
+      color = document()->frame()->selection()->isFocusedAndActive()
                   ? theme()->activeSelectionBackgroundColor()
                   : theme()->inactiveSelectionBackgroundColor();
   }
@@ -2235,7 +2235,7 @@ Color RenderObject::selectionForegroundColor() const {
     if (!color.isValid())
       color = pseudoStyle->color();
   } else
-    color = document()->frame()->selectionController()->isFocusedAndActive()
+    color = document()->frame()->selection()->isFocusedAndActive()
                 ? theme()->platformActiveSelectionForegroundColor()
                 : theme()->platformInactiveSelectionForegroundColor();
 
@@ -2338,7 +2338,7 @@ void RenderObject::handleDynamicFloatPositionChange() {
 
 void RenderObject::setAnimatableStyle(RenderStyle* style) {
   if (!isText() && m_style && style)
-    style = animationController()->updateImplicitAnimations(this, style);
+    style = animation()->updateImplicitAnimations(this, style);
 
   setStyle(style);
 }
@@ -2751,7 +2751,7 @@ void RenderObject::destroy() {
   if (AXObjectCache::accessibilityEnabled())
     document()->axObjectCache()->remove(this);
 
-  animationController()->cancelImplicitAnimations(this);
+  animation()->cancelImplicitAnimations(this);
 
   // By default no ref-counting. RenderWidget::destroy() doesn't call
   // this function because it needs to do ref-counting. If anything
@@ -3313,8 +3313,8 @@ bool RenderObject::isScrollable() const {
   return l && (l->verticalScrollbar() || l->horizontalScrollbar());
 }
 
-AnimationController* RenderObject::animationController() const {
-  return document()->frame()->animationController();
+AnimationController* RenderObject::animation() const {
+  return document()->frame()->animation();
 }
 
 void RenderObject::imageChanged(CachedImage* image) {

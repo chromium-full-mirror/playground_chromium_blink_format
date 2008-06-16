@@ -535,7 +535,7 @@ void SVGTextContentElement::selectSubString(long charnum,
   ASSERT(document());
   ASSERT(document()->frame());
 
-  SelectionController* controller = document()->frame()->selectionController();
+  SelectionController* controller = document()->frame()->selection();
   if (!controller)
     return;
 
