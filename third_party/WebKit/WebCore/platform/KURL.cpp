@@ -1023,8 +1023,19 @@ void KURL::parse(const char* url, const String* originalString) {
 
   bool hierarchical = url[schemeEnd + 1] == '/';
 
+  bool isFile = schemeEnd == 4 && matchLetter(url[0], 'f') &&
+                matchLetter(url[1], 'i') && matchLetter(url[2], 'l') &&
+                matchLetter(url[3], 'e');
+
+  bool isHTTPorHTTPS =
+      matchLetter(url[0], 'h') && matchLetter(url[1], 't') &&
+      matchLetter(url[2], 't') && matchLetter(url[3], 'p') &&
+      (url[4] == ':' || (matchLetter(url[4], 's') && url[5] == ':'));
+
   if (hierarchical && url[schemeEnd + 2] == '/') {
-    // part after the scheme must be a net_path, parse the authority section
+    // The part after the scheme is either a net_path or an abs_path whose first
+    // path segment is empty.
+    // Attempt to find an authority.
 
     // FIXME: Authority characters may be scanned twice, and it would be nice to
     // be faster.
@@ -1044,9 +1055,9 @@ void KURL::parse(const char* url, const String* originalString) {
         passwordEnd = userEnd;
         userEnd = colonPos;
         passwordStart = colonPos + 1;
-      } else {
+      } else
         passwordStart = passwordEnd = userEnd;
-      }
+
       hostStart = passwordEnd + 1;
     } else if (url[userEnd] == '[' || isPathSegmentEndChar(url[userEnd])) {
       // hit the end of the authority, must have been no user
@@ -1089,15 +1100,29 @@ void KURL::parse(const char* url, const String* originalString) {
       portEnd = portStart;
       while (isASCIIDigit(url[portEnd]))
         portEnd++;
-    } else {
+    } else
       portStart = portEnd = hostEnd;
-    }
 
     if (!isPathSegmentEndChar(url[portEnd])) {
       // invalid character
       m_string = originalString ? *originalString : url;
       invalidate();
       return;
+    }
+
+    if (userStart == portEnd && !isHTTPorHTTPS && !isFile) {
+      // No authority found, which means that this is not a net_path, but rather
+      // an abs_path whose first two
+      // path segments are empty. For file, http and https only, an empty
+      // authority is allowed.
+      userStart -= 2;
+      userEnd = userStart;
+      passwordStart = userEnd;
+      passwordEnd = passwordStart;
+      hostStart = passwordEnd;
+      hostEnd = hostStart;
+      portStart = hostEnd;
+      portEnd = hostEnd;
     }
   } else {
     // the part after the scheme must be an opaque_part or an abs_path
@@ -1141,11 +1166,6 @@ void KURL::parse(const char* url, const String* originalString) {
     *p++ = *strPtr++;
   m_schemeEnd = p - buffer.data();
 
-  bool isHTTPorHTTPS =
-      matchLetter(url[0], 'h') && matchLetter(url[1], 't') &&
-      matchLetter(url[2], 't') && matchLetter(url[3], 'p') &&
-      (url[4] == ':' || (matchLetter(url[4], 's') && url[5] == ':'));
-
   bool hostIsLocalHost = portEnd - userStart == 9 &&
                          matchLetter(url[userStart], 'l') &&
                          matchLetter(url[userStart + 1], 'o') &&
@@ -1156,10 +1176,6 @@ void KURL::parse(const char* url, const String* originalString) {
                          matchLetter(url[userStart + 6], 'o') &&
                          matchLetter(url[userStart + 7], 's') &&
                          matchLetter(url[userStart + 8], 't');
-
-  bool isFile = matchLetter(url[0], 'f') && matchLetter(url[1], 'i') &&
-                matchLetter(url[2], 'l') && matchLetter(url[3], 'e') &&
-                url[4] == ':';
 
   // File URLs need a host part unless it is just file:// or file://localhost
   bool degenFilePath =
@@ -1221,10 +1237,9 @@ void KURL::parse(const char* url, const String* originalString) {
         *p++ = *strPtr++;
     }
     m_portEnd = p - buffer.data();
-  } else {
+  } else
     m_userStart = m_userEnd = m_passwordEnd = m_hostEnd = m_portEnd =
         p - buffer.data();
-  }
 
   // For canonicalization, ensure we have a '/' for no path.
   // Only do this for http and https.
