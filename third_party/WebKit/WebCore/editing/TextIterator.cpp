@@ -1349,7 +1349,8 @@ UChar* plainTextToMallocAllocatedBuffer(const Range* r,
              textBuffer.size() * sizeof(UChar));
       if (!textSegments)
         textSegments = new Vector<TextSegment>;
-      textSegments->append(make_pair(newSegmentBuffer, textBuffer.size()));
+      textSegments->append(
+          make_pair(newSegmentBuffer, (unsigned)textBuffer.size()));
       textBuffer.clear();
     }
     textBuffer.append(it.characters(), it.length());
