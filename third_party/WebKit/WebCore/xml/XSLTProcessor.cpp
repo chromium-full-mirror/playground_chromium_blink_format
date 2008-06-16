@@ -313,10 +313,8 @@ PassRefPtr<Document> XSLTProcessor::createDocumentFromSource(
     frame->setDocument(result);
   }
 
-  if (sourceIsDocument) {
+  if (sourceIsDocument)
     result->setURL(ownerDocument->url());
-    result->setBaseURL(ownerDocument->baseURL());
-  }
   result->open();
 
   RefPtr<TextResourceDecoder> decoder =

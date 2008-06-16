@@ -449,16 +449,18 @@ class Document : public ContainerNode {
 
   bool wellFormed() const { return m_wellFormed; }
 
-  const KURL& url() const { return m_url.isEmpty() ? blankURL() : m_url; }
+  const KURL& url() const { return m_url; }
   void setURL(const KURL&);
 
-  const KURL& baseURL() const {
-    return m_baseURL.isEmpty() ? url() : m_baseURL;
-  }
-  void setBaseURL(const KURL&);
+  const KURL& baseURL() const { return m_baseURL; }
+  // Setting the BaseElementURL will change the baseURL.
+  void setBaseElementURL(const KURL&);
 
   const String& baseTarget() const { return m_baseTarget; }
-  void setBaseTarget(const String& baseTarget) { m_baseTarget = baseTarget; }
+  // Setting the BaseElementTarget will change the baseTarget.
+  void setBaseElementTarget(const String& baseTarget) {
+    m_baseTarget = baseTarget;
+  }
 
   KURL completeURL(const String&) const;
 
@@ -883,8 +885,14 @@ class Document : public ContainerNode {
   DocLoader* m_docLoader;
   Tokenizer* m_tokenizer;
   bool m_wellFormed;
-  KURL m_url;
-  KURL m_baseURL;
+
+  // Document URLs.
+  KURL m_url;  // Document.URL: The URL from which this document was retrieved.
+  KURL m_baseURL;  // Node.baseURI: The URL to use when resolving relative URLs.
+  KURL m_baseElementURL;  // The URL set by the <base> element.
+  KURL m_cookieURL;       // The URL to use for cookie access.
+  KURL m_policyBaseURL;   // The policy URL for third-party cookie blocking.
+
   String m_baseTarget;
 
   RefPtr<DocumentType> m_docType;
@@ -1003,9 +1011,6 @@ class Document : public ContainerNode {
   typedef HashMap<AtomicStringImpl*, HTMLMapElement*> ImageMapsByName;
   ImageMapsByName m_imageMapsByName;
 
-  KURL m_cookieURL;      // The URL to use for cookie access.
-  KURL m_policyBaseURL;  // The policy URL for third-party cookie blocking.
-
   HashSet<Node*> m_disconnectedNodesWithEventListeners;
 
   int m_docID;  // A unique document identifier used for things like
@@ -1088,6 +1093,7 @@ class Document : public ContainerNode {
   void removeAllDisconnectedNodeEventListeners();
   void imageLoadEventTimerFired(Timer<Document>*);
   void updateFocusAppearanceTimerFired(Timer<Document>*);
+  void updateBaseURL();
 
   RefPtr<SecurityOrigin> m_securityOrigin;
 
