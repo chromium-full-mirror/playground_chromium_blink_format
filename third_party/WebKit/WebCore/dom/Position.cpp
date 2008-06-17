@@ -848,7 +848,8 @@ void Position::getInlineBoxAndOffset(EAffinity affinity,
       int caretMinOffset = box->caretMinOffset();
       int caretMaxOffset = box->caretMaxOffset();
 
-      if (caretOffset < caretMinOffset || caretOffset > caretMaxOffset)
+      if (caretOffset < caretMinOffset || caretOffset > caretMaxOffset ||
+          caretOffset == caretMaxOffset && box->isLineBreak())
         continue;
 
       if (caretOffset > caretMinOffset && caretOffset < caretMaxOffset) {
