@@ -326,6 +326,8 @@ Document::Document(Frame* frame, bool isXHTML)
 
   m_printing = false;
 
+  m_ignoreAutofocus = false;
+
   m_frame = frame;
   m_renderArena = 0;
 

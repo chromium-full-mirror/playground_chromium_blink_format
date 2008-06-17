@@ -461,6 +461,11 @@ void RenderTextControl::updateFromElement() {
     m_searchPopup->updateFromElement();
 }
 
+void RenderTextControl::setUserEdited(bool isUserEdited) {
+  m_userEdited = isUserEdited;
+  document()->setIgnoreAutofocus(isUserEdited);
+}
+
 int RenderTextControl::selectionStart() {
   Frame* frame = document()->frame();
   if (!frame)
