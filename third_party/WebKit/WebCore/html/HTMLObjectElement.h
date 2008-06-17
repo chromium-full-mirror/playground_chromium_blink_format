@@ -98,8 +98,6 @@ class HTMLObjectElement : public HTMLPlugInElement {
   String standby() const;
   void setStandby(const String&);
 
-  void setTabIndex(int);
-
   String type() const;
   void setType(const String&);
 

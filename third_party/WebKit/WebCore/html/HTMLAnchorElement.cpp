@@ -379,10 +379,6 @@ short HTMLAnchorElement::tabIndex() const {
   return Element::tabIndex();
 }
 
-void HTMLAnchorElement::setTabIndex(int tabIndex) {
-  setAttribute(tabindexAttr, String::number(tabIndex));
-}
-
 String HTMLAnchorElement::target() const {
   return getAttribute(targetAttr);
 }
