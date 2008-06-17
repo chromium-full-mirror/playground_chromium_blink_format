@@ -28,6 +28,10 @@
 
 #import <WebKit/WebHTMLView.h>
 
+#if !defined(ENABLE_NETSCAPE_PLUGIN_API)
+#define ENABLE_NETSCAPE_PLUGIN_API 1
+#endif
+
 @class DOMDocumentFragment;
 @class DOMNode;
 @class DOMRange;
@@ -40,8 +44,6 @@
                   behindText:(BOOL)text
                   entireLine:(BOOL)line
              representedNode:(DOMNode*)node;
-- (void)_resumeNullEventsForAllNetscapePlugins;
-- (void)_pauseNullEventsForAllNetscapePlugins;
 
 // the following methods are deprecated and will be removed once Mail switches
 // to the new methods <rdar://problem/5050528>
@@ -124,6 +126,11 @@
                                                 forType:(NSString*)pboardType
                                               inContext:(DOMRange*)context
                                            subresources:(NSArray**)subresources;
+
+#if ENABLE_NETSCAPE_PLUGIN_API
+- (void)_resumeNullEventsForAllNetscapePlugins;
+- (void)_pauseNullEventsForAllNetscapePlugins;
+#endif
 
 // SPI for DumpRenderTree
 - (void)_updateFocusedAndActiveState;
