@@ -46,6 +46,7 @@ void HTMLStyleElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void HTMLStyleElement::finishParsingChildren() {
+  StyleElement::process(this);
   StyleElement::sheet(this);
   m_createdByParser = false;
   HTMLElement::finishParsingChildren();
@@ -67,7 +68,8 @@ void HTMLStyleElement::childrenChanged(bool changedByParser,
                                        Node* beforeChange,
                                        Node* afterChange,
                                        int childCountDelta) {
-  StyleElement::process(this);
+  if (!changedByParser)
+    StyleElement::process(this);
   HTMLElement::childrenChanged(changedByParser, beforeChange, afterChange,
                                childCountDelta);
 }
