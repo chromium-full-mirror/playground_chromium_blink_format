@@ -60,7 +60,7 @@ struct CallIdentifier {
   }
 
 #ifndef NDEBUG
-  const char* toString() const { return name.UTF8String().c_str(); }
+  operator const char*() const { return name.UTF8String().c_str(); }
 #endif
 };
 
@@ -102,6 +102,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
   }
   void setActualSelfTime(double time) { m_actualSelfTime = time; }
   void setVisibleSelfTime(double time) { m_visibleSelfTime = time; }
+
   double totalPercent() const {
     return (m_visibleTotalTime / (m_head ? m_head->totalTime() : totalTime())) *
            100.0;
@@ -110,14 +111,21 @@ class ProfileNode : public RefCounted<ProfileNode> {
     return (m_visibleSelfTime / (m_head ? m_head->totalTime() : totalTime())) *
            100.0;
   }
+
   unsigned numberOfCalls() const { return m_numberOfCalls; }
   void setNumberOfCalls(unsigned number) { m_numberOfCalls = number; }
+
   const Vector<RefPtr<ProfileNode>>& children() const { return m_children; }
   ProfileNode* firstChild() const {
-    return m_children.size() ? m_children[0].get() : 0;
+    return m_children.size() ? m_children.first().get() : 0;
   }
+  ProfileNode* lastChild() const {
+    return m_children.size() ? m_children.last().get() : 0;
+  }
+  void removeChild(unsigned index) { m_children.remove(index); }
   void addChild(PassRefPtr<ProfileNode> prpChild);
   void insertNode(PassRefPtr<ProfileNode> prpNode);
+
   bool visible() const { return m_visible; }
   void setVisible(bool visible) { m_visible = visible; }
 
@@ -160,7 +168,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
   void endAndRecordCall();
 
 #ifndef NDEBUG
-  const char* toString() const { return m_callIdentifier.toString(); }
+  const char* toString() const { return m_callIdentifier; }
   void debugPrintData(int indentLevel) const;
   double debugPrintDataSampleStyle(int indentLevel,
                                    FunctionCallHashCount&) const;

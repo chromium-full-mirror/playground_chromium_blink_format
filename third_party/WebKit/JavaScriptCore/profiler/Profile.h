@@ -92,6 +92,8 @@ class Profile : public RefCounted<Profile> {
   Profile(const UString& title,
           ExecState* originatingGlobalExec,
           unsigned pageGroupIdentifier);
+  void removeProfileStart();
+  void removeProfileEnd();
 
   UString m_title;
   ExecState* m_originatingGlobalExec;
