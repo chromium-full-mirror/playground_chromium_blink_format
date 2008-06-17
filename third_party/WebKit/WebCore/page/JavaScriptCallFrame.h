@@ -62,6 +62,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
   }
 
   String functionName() const;
+  KJS::DebuggerCallFrame::Type type() const;
   const KJS::ScopeChainNode* scopeChain() const;
 
   KJS::JSObject* thisObject() const;

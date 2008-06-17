@@ -42,6 +42,8 @@ class ScopeChainNode;
 
 class DebuggerCallFrame {
  public:
+  typedef enum { ProgramType, FunctionType } Type;
+
   DebuggerCallFrame(Machine* machine,
                     JSGlobalObject* dynamicGlobalObject,
                     const CodeBlock* codeBlock,
@@ -60,6 +62,7 @@ class DebuggerCallFrame {
   JSGlobalObject* dynamicGlobalObject() const { return m_dynamicGlobalObject; }
   const ScopeChainNode* scopeChain() const { return m_scopeChain; }
   const UString* functionName() const;
+  DebuggerCallFrame::Type type() const;
   JSObject* thisObject() const;
   JSValue* evaluate(const UString&, JSValue*& exception) const;
   JSValue* exception() const { return m_exception; }
