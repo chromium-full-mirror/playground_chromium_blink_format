@@ -356,7 +356,7 @@ RegisterID* CodeGenerator::registerForLocal(const Identifier& ident) {
     return 0;
 
   SymbolTableEntry entry = symbolTable().get(ident.ustring().rep());
-  if (entry.isEmpty())
+  if (entry.isNull())
     return 0;
 
   return &m_locals[localsIndex(entry.getIndex())];
@@ -367,7 +367,7 @@ RegisterID* CodeGenerator::registerForLocalConstInit(const Identifier& ident) {
     return 0;
 
   SymbolTableEntry entry = symbolTable().get(ident.ustring().rep());
-  ASSERT(!entry.isEmpty());
+  ASSERT(!entry.isNull());
 
   return &m_locals[localsIndex(entry.getIndex())];
 }
@@ -626,7 +626,7 @@ bool CodeGenerator::findScopedProperty(const Identifier& property,
         currentVariableObject->symbolTable().get(property.ustring().rep());
 
     // Found the property
-    if (!entry.isEmpty()) {
+    if (!entry.isNull()) {
       stackDepth = depth;
       index = entry.getIndex();
       return true;
