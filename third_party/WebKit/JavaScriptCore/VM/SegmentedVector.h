@@ -132,7 +132,7 @@ class SegmentedVector {
     m_segments.resize(numSegments);
 
     ASSERT(oldSize < m_segments.size());
-    for (size_t i = oldSize - 1; i < (numSegments - 1); i++) {
+    for (size_t i = oldSize; i < (numSegments - 1); i++) {
       Segment* segment = new Segment;
       segment->resize(SegmentSize);
       m_segments[i] = segment;
