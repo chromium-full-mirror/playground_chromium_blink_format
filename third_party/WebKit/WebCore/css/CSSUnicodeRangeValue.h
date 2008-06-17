@@ -27,13 +27,16 @@
 #define CSSUnicodeRangeValue_h
 
 #include "CSSValue.h"
+#include <wtf/PassRefPtr.h>
 #include <wtf/unicode/Unicode.h>
 
 namespace WebCore {
 
 class CSSUnicodeRangeValue : public CSSValue {
  public:
-  CSSUnicodeRangeValue(UChar32 from, UChar32 to) : m_from(from), m_to(to) {}
+  static PassRefPtr<CSSUnicodeRangeValue> create(UChar32 from, UChar32 to) {
+    return adoptRef(new CSSUnicodeRangeValue(from, to));
+  }
 
   virtual ~CSSUnicodeRangeValue();
 
@@ -43,6 +46,8 @@ class CSSUnicodeRangeValue : public CSSValue {
   virtual String cssText() const;
 
  private:
+  CSSUnicodeRangeValue(UChar32 from, UChar32 to) : m_from(from), m_to(to) {}
+
   UChar32 m_from;
   UChar32 m_to;
 };

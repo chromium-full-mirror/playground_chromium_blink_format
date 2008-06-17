@@ -768,7 +768,7 @@ String HTMLMediaElement::pickMedia() {
           MediaQueryEvaluator screenEval("screen", document()->frame(),
                                          renderer() ? renderer()->style() : 0);
           RefPtr<MediaList> media =
-              new MediaList((CSSStyleSheet*)0, source->media(), true);
+              MediaList::createAllowingDescriptionSyntax(source->media());
           if (!screenEval.eval(media.get()))
             continue;
         }

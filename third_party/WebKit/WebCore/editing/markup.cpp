@@ -266,7 +266,8 @@ static String renderedText(const Node* node, const Range* range) {
 static PassRefPtr<CSSMutableStyleDeclaration> styleFromMatchedRulesForElement(
     Element* element,
     bool authorOnly = true) {
-  RefPtr<CSSMutableStyleDeclaration> style = new CSSMutableStyleDeclaration();
+  RefPtr<CSSMutableStyleDeclaration> style =
+      CSSMutableStyleDeclaration::create();
   RefPtr<CSSRuleList> matchedRules =
       element->document()->styleSelector()->styleRulesForElement(element,
                                                                  authorOnly);
@@ -508,7 +509,7 @@ static void appendStartMarkup(
           RefPtr<CSSComputedStyleDeclaration> computedStyleForElement =
               computedStyle(element);
           RefPtr<CSSMutableStyleDeclaration> fromComputedStyle =
-              new CSSMutableStyleDeclaration();
+              CSSMutableStyleDeclaration::create();
 
           DeprecatedValueListConstIterator<CSSProperty> end;
           for (DeprecatedValueListConstIterator<CSSProperty> it =

@@ -109,8 +109,8 @@ void XSLStyleSheet::checkLoaded() {
     return;
   if (parent())
     parent()->checkLoaded();
-  if (m_parentNode)
-    m_parentNode->sheetLoaded();
+  if (ownerNode())
+    ownerNode()->sheetLoaded();
 }
 
 xmlDocPtr XSLStyleSheet::document() {
@@ -230,7 +230,7 @@ void XSLStyleSheet::loadChildSheets() {
 }
 
 void XSLStyleSheet::loadChildSheet(const String& href) {
-  RefPtr<XSLImportRule> childRule = new XSLImportRule(this, href);
+  RefPtr<XSLImportRule> childRule = XSLImportRule::create(this, href);
   append(childRule);
   childRule->loadSheet();
 }

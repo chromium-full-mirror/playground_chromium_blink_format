@@ -53,10 +53,8 @@ void RemoveFormatCommand::doApply() {
   // give the
   // content that we're operating on.
   Node* root = frame->selection()->rootEditableElement();
-  RefPtr<CSSComputedStyleDeclaration> computedStyle =
-      new CSSComputedStyleDeclaration(root);
   RefPtr<CSSMutableStyleDeclaration> defaultStyle =
-      computedStyle->copyInheritableProperties();
+      computedStyle(root)->copyInheritableProperties();
 
   // Delete the selected content.
   // FIXME: We should be able to leave this to insertText, but its delete

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc.  All rights reserved.
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,9 +27,7 @@
 #define CSSGradientValue_h
 
 #include "CSSImageGeneratorValue.h"
-
 #include "CSSPrimitiveValue.h"
-
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
@@ -49,7 +47,9 @@ struct CSSGradientColorStop {
 
 class CSSGradientValue : public CSSImageGeneratorValue {
  public:
-  CSSGradientValue() : m_type(CSSLinearGradient), m_stopsSorted(false) {}
+  static PassRefPtr<CSSGradientValue> create() {
+    return adoptRef(new CSSGradientValue);
+  }
 
   virtual String cssText() const;
 
@@ -74,7 +74,9 @@ class CSSGradientValue : public CSSImageGeneratorValue {
 
   void sortStopsIfNeeded();
 
- protected:
+ private:
+  CSSGradientValue() : m_type(CSSLinearGradient), m_stopsSorted(false) {}
+
   // Create the gradient for a given size.
   Gradient* createGradient(RenderObject*, const IntSize&);
 

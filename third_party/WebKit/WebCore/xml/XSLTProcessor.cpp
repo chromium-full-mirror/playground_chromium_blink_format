@@ -358,7 +358,7 @@ static xsltStylesheetPtr xsltStylesheetPointer(
     RefPtr<XSLStyleSheet>& cachedStylesheet,
     Node* stylesheetRootNode) {
   if (!cachedStylesheet && stylesheetRootNode) {
-    cachedStylesheet = new XSLStyleSheet(
+    cachedStylesheet = XSLStyleSheet::create(
         stylesheetRootNode->parent() ? stylesheetRootNode->parent()
                                      : stylesheetRootNode,
         stylesheetRootNode->document()->url().string());

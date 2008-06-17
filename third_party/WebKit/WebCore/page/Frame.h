@@ -293,7 +293,7 @@ class Frame : public RefCounted<Frame> {
   bool markedTextMatchesAreHighlighted() const;
   void setMarkedTextMatchesAreHighlighted(bool flag);
 
-  CSSComputedStyleDeclaration* selectionComputedStyle(
+  PassRefPtr<CSSComputedStyleDeclaration> selectionComputedStyle(
       Node*& nodeToRemove) const;
 
   void textFieldDidBeginEditing(Element*);

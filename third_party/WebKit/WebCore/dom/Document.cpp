@@ -597,7 +597,7 @@ PassRefPtr<EditingText> Document::createEditingTextNode(const String& text) {
 }
 
 PassRefPtr<CSSStyleDeclaration> Document::createCSSStyleDeclaration() {
-  return new CSSMutableStyleDeclaration;
+  return CSSMutableStyleDeclaration::create();
 }
 
 PassRefPtr<Node> Document::importNode(Node* importedNode,
@@ -1777,7 +1777,7 @@ void Document::updateBaseURL() {
 void Document::setCSSStyleSheet(const String& url,
                                 const String& charset,
                                 const CachedCSSStyleSheet* sheet) {
-  m_sheet = new CSSStyleSheet(this, url, charset);
+  m_sheet = CSSStyleSheet::create(this, url, charset);
   m_sheet->parseString(sheet->sheetText());
 
   updateStyleSelector();
@@ -1805,13 +1805,13 @@ String Document::userStyleSheet() const {
 
 CSSStyleSheet* Document::elementSheet() {
   if (!m_elemSheet)
-    m_elemSheet = new CSSStyleSheet(this, m_baseURL.string());
+    m_elemSheet = CSSStyleSheet::create(this, m_baseURL.string());
   return m_elemSheet.get();
 }
 
 CSSStyleSheet* Document::mappedElementSheet() {
   if (!m_mappedElementSheet)
-    m_mappedElementSheet = new CSSStyleSheet(this, m_baseURL.string());
+    m_mappedElementSheet = CSSStyleSheet::create(this, m_baseURL.string());
   return m_mappedElementSheet.get();
 }
 
@@ -2249,10 +2249,10 @@ void Document::recalcStyleSelector() {
               sheetText += c->nodeValue();
           }
 
-          CSSStyleSheet* cssSheet = new CSSStyleSheet(this);
+          RefPtr<CSSStyleSheet> cssSheet = CSSStyleSheet::create(this);
           cssSheet->parseString(sheetText);
           pi->setCSSStyleSheet(cssSheet);
-          sheet = cssSheet;
+          sheet = cssSheet.get();
         }
       }
     } else if (n->isHTMLElement() &&

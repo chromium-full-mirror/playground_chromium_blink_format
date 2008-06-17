@@ -1,9 +1,7 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
  * (C) 2002-2003 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2002, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2002, 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -25,16 +23,15 @@
 #include "CSSImportRule.h"
 
 #include "CachedCSSStyleSheet.h"
-#include "CSSStyleSheet.h"
 #include "DocLoader.h"
 #include "Document.h"
 #include "MediaList.h"
 
 namespace WebCore {
 
-CSSImportRule::CSSImportRule(StyleBase* parent,
+CSSImportRule::CSSImportRule(CSSStyleSheet* parent,
                              const String& href,
-                             MediaList* media)
+                             PassRefPtr<MediaList> media)
     : CSSRule(parent),
       m_strHref(href),
       m_lstMedia(media),
@@ -43,7 +40,7 @@ CSSImportRule::CSSImportRule(StyleBase* parent,
   if (m_lstMedia)
     m_lstMedia->setParent(this);
   else
-    m_lstMedia = new MediaList(this, String());
+    m_lstMedia = MediaList::create(this, String());
 }
 
 CSSImportRule::~CSSImportRule() {
@@ -60,7 +57,7 @@ void CSSImportRule::setCSSStyleSheet(const String& url,
                                      const CachedCSSStyleSheet* sheet) {
   if (m_styleSheet)
     m_styleSheet->setParent(0);
-  m_styleSheet = new CSSStyleSheet(this, url, charset);
+  m_styleSheet = CSSStyleSheet::create(this, url, charset);
 
   CSSStyleSheet* parent = parentStyleSheet();
   bool strict = !parent || parent->useStrictParsing();

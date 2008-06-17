@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,7 +25,10 @@
 
 #include "config.h"
 #include "CSSTransformValue.h"
+
+#include "CSSValueList.h"
 #include "PlatformString.h"
+#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
@@ -33,9 +36,9 @@ CSSTransformValue::CSSTransformValue(TransformOperationType op) : m_type(op) {}
 
 CSSTransformValue::~CSSTransformValue() {}
 
-void CSSTransformValue::addValue(CSSValue* val) {
+void CSSTransformValue::addValue(PassRefPtr<CSSValue> val) {
   if (!m_values)
-    m_values = new CSSValueList;
+    m_values = CSSValueList::createCommaSeparated();
   m_values->append(val);
 }
 

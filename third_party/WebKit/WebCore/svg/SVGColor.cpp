@@ -29,18 +29,17 @@
 
 namespace WebCore {
 
-SVGColor::SVGColor() : CSSValue(), m_colorType(SVG_COLORTYPE_UNKNOWN) {}
+SVGColor::SVGColor() : m_colorType(SVG_COLORTYPE_UNKNOWN) {}
 
 SVGColor::SVGColor(const String& rgbColor)
-    : CSSValue(), m_colorType(SVG_COLORTYPE_RGBCOLOR) {
+    : m_colorType(SVG_COLORTYPE_RGBCOLOR) {
   setRGBColor(rgbColor);
 }
 
-SVGColor::SVGColor(unsigned short colorType)
-    : CSSValue(), m_colorType(colorType) {}
+SVGColor::SVGColor(SVGColorType colorType) : m_colorType(colorType) {}
 
 SVGColor::SVGColor(const Color& c)
-    : CSSValue(), m_color(c), m_colorType(SVG_COLORTYPE_RGBCOLOR) {}
+    : m_color(c), m_colorType(SVG_COLORTYPE_RGBCOLOR) {}
 
 SVGColor::~SVGColor() {}
 

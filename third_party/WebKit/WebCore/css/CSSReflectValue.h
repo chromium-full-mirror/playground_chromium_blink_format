@@ -41,7 +41,7 @@ class CSSReflectValue : public CSSValue {
       CSSReflectionDirection direction,
       PassRefPtr<CSSPrimitiveValue> offset,
       PassRefPtr<CSSValue> mask) {
-    return new CSSReflectValue(direction, offset, mask);
+    return adoptRef(new CSSReflectValue(direction, offset, mask));
   }
 
   CSSReflectionDirection direction() const { return m_direction; }

@@ -749,7 +749,7 @@ void DeleteSelectionCommand::calculateTypingStyleAfterDelete(
   m_deleteIntoBlockquoteStyle = 0;
 
   RefPtr<CSSComputedStyleDeclaration> endingStyle =
-      new CSSComputedStyleDeclaration(m_endingPosition.node());
+      computedStyle(m_endingPosition.node());
   endingStyle->diff(m_typingStyle.get());
   if (!m_typingStyle->length())
     m_typingStyle = 0;

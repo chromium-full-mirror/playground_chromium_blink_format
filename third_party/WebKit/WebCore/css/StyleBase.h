@@ -31,13 +31,13 @@ class String;
 class StyleSheet;
 class KURL;
 
-// a style class which has a parent (almost all have)
+// Base class for most CSS DOM objects.
+
+// FIXME: We don't need these to all share one base class.
+// Refactor so they don't any more.
+
 class StyleBase : public RefCounted<StyleBase> {
  public:
-  StyleBase(StyleBase* parent)
-      : RefCounted<StyleBase>(0),
-        m_parent(parent),
-        m_strictParsing(!parent || parent->useStrictParsing()) {}
   virtual ~StyleBase() {}
 
   StyleBase* parent() const { return m_parent; }
@@ -46,33 +46,16 @@ class StyleBase : public RefCounted<StyleBase> {
   // returns the url of the style sheet this object belongs to
   KURL baseURL() const;
 
-  virtual bool isStyleSheet() const { return false; }
   virtual bool isCSSStyleSheet() const { return false; }
-  virtual bool isXSLStyleSheet() const { return false; }
-  virtual bool isStyleSheetList() const { return false; }
-  virtual bool isMediaList() { return false; }
-  virtual bool isRuleList() { return false; }
-  virtual bool isRule() { return false; }
-  virtual bool isStyleRule() { return false; }
   virtual bool isCharsetRule() { return false; }
+  virtual bool isFontFaceRule() { return false; }
   virtual bool isImportRule() { return false; }
   virtual bool isMediaRule() { return false; }
-  virtual bool isFontFaceRule() { return false; }
-  virtual bool isPageRule() { return false; }
-  virtual bool isUnknownRule() { return false; }
-  virtual bool isStyleDeclaration() { return false; }
-  virtual bool isValue() { return false; }
-  virtual bool isPrimitiveValue() const { return false; }
-  virtual bool isValueList() { return false; }
-  virtual bool isValueCustom() { return false; }
-#if ENABLE(SVG)
-  virtual bool isSVGColor() const { return false; }
-  virtual bool isSVGPaint() const { return false; }
-#endif
+  virtual bool isRule() { return false; }
+  virtual bool isStyleRule() { return false; }
+  virtual bool isStyleSheet() const { return false; }
+  virtual bool isXSLStyleSheet() const { return false; }
 
-  virtual bool parseString(const String&, bool /*strict*/ = false) {
-    return false;
-  }
   virtual void checkLoaded();
 
   void setStrictParsing(bool b) { m_strictParsing = b; }
@@ -81,6 +64,11 @@ class StyleBase : public RefCounted<StyleBase> {
   virtual void insertedIntoParent() {}
 
   StyleSheet* stylesheet();
+
+ protected:
+  StyleBase(StyleBase* parent)
+      : m_parent(parent),
+        m_strictParsing(!parent || parent->useStrictParsing()) {}
 
  private:
   StyleBase* m_parent;

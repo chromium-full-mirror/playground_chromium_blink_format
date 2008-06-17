@@ -84,8 +84,7 @@ void InsertParagraphSeparatorCommand::applyStyleAfterInsertion(
   if (!m_style)
     return;
 
-  CSSComputedStyleDeclaration endingStyle(endingSelection().start().node());
-  endingStyle.diff(m_style.get());
+  computedStyle(endingSelection().start().node())->diff(m_style.get());
   if (m_style->length() > 0)
     applyStyle(m_style.get());
 }

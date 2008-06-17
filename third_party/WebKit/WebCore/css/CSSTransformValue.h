@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,10 +24,12 @@
  */
 
 #include "CSSValue.h"
-#include "CSSValueList.h"
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
+
+class CSSValueList;
 
 class CSSTransformValue : public CSSValue {
  public:
@@ -46,17 +48,22 @@ class CSSTransformValue : public CSSValue {
     MatrixTransformOperation
   };
 
-  CSSTransformValue(TransformOperationType);
+  static PassRefPtr<CSSTransformValue> create(TransformOperationType type) {
+    return adoptRef(new CSSTransformValue(type));
+  }
+
   virtual ~CSSTransformValue();
 
-  void addValue(CSSValue*);
+  void addValue(PassRefPtr<CSSValue>);
 
   virtual String cssText() const;
 
   TransformOperationType type() const { return m_type; }
   CSSValueList* values() const { return m_values.get(); }
 
- protected:
+ private:
+  CSSTransformValue(TransformOperationType);
+
   TransformOperationType m_type;
   RefPtr<CSSValueList> m_values;
 };

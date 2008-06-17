@@ -37,7 +37,7 @@ SVGFontFaceUriElement::SVGFontFaceUriElement(const QualifiedName& tagName,
 
 PassRefPtr<CSSFontFaceSrcValue> SVGFontFaceUriElement::srcValue() const {
   RefPtr<CSSFontFaceSrcValue> src =
-      new CSSFontFaceSrcValue(getAttribute(XLinkNames::hrefAttr), false);
+      CSSFontFaceSrcValue::create(getAttribute(XLinkNames::hrefAttr));
   AtomicString value(getAttribute(formatAttr));
   src->setFormat(value.isEmpty() ? "svg" : value);  // Default format
   return src.release();

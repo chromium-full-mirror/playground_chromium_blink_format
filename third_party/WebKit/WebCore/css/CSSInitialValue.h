@@ -1,8 +1,6 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -24,19 +22,27 @@
 #define CSSInitialValue_h
 
 #include "CSSValue.h"
+#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
 class CSSInitialValue : public CSSValue {
  public:
+  static PassRefPtr<CSSInitialValue> createExplicit() {
+    return adoptRef(new CSSInitialValue(false));
+  }
+  static PassRefPtr<CSSInitialValue> createImplicit() {
+    return adoptRef(new CSSInitialValue(true));
+  }
+
+  virtual String cssText() const;
+
+ private:
   CSSInitialValue(bool implicit) : m_implicit(implicit) {}
 
   virtual unsigned short cssValueType() const;
-  virtual String cssText() const;
-
   virtual bool isImplicitInitialValue() const { return m_implicit; }
 
- private:
   bool m_implicit;
 };
 

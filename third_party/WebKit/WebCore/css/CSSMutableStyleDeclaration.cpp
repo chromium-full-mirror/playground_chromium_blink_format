@@ -627,8 +627,8 @@ bool CSSMutableStyleDeclaration::setProperty(int propertyID,
                                              bool important,
                                              bool notifyChanged) {
   removeProperty(propertyID);
-  m_values.append(
-      CSSProperty(propertyID, new CSSPrimitiveValue(value), important));
+  m_values.append(CSSProperty(
+      propertyID, CSSPrimitiveValue::createIdentifier(value), important));
   if (notifyChanged)
     setChanged();
   return true;
@@ -640,8 +640,8 @@ void CSSMutableStyleDeclaration::setStringProperty(
     CSSPrimitiveValue::UnitTypes type,
     bool important) {
   removeProperty(propertyId);
-  m_values.append(
-      CSSProperty(propertyId, new CSSPrimitiveValue(value, type), important));
+  m_values.append(CSSProperty(
+      propertyId, CSSPrimitiveValue::create(value, type), important));
   setChanged();
 }
 

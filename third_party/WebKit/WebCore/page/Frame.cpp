@@ -863,8 +863,7 @@ void Frame::computeAndSetTypingStyle(CSSStyleDeclaration* style,
   }
 
   Node* node = selection()->selection().visibleStart().deepEquivalent().node();
-  CSSComputedStyleDeclaration computedStyle(node);
-  computedStyle.diff(mutableStyle.get());
+  computedStyle(node)->diff(mutableStyle.get());
 
   // Handle block styles, substracting these from the typing style.
   RefPtr<CSSMutableStyleDeclaration> blockStyle =
@@ -896,7 +895,7 @@ String Frame::selectionStartStylePropertyValue(int stylePropertyID) const {
   return value;
 }
 
-CSSComputedStyleDeclaration* Frame::selectionComputedStyle(
+PassRefPtr<CSSComputedStyleDeclaration> Frame::selectionComputedStyle(
     Node*& nodeToRemove) const {
   nodeToRemove = 0;
 
@@ -944,7 +943,7 @@ CSSComputedStyleDeclaration* Frame::selectionComputedStyle(
     nodeToRemove = styleElement.get();
   }
 
-  return new CSSComputedStyleDeclaration(styleElement);
+  return computedStyle(styleElement.release());
 }
 
 void Frame::textFieldDidBeginEditing(Element* e) {
