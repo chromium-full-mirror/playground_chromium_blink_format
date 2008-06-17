@@ -30,7 +30,6 @@
 #include "JSObject.h"
 #include "operations.h"
 #include "regexp.h"
-#include "types.h"
 #include "JSValue.h"
 #include "UnusedParam.h"
 
