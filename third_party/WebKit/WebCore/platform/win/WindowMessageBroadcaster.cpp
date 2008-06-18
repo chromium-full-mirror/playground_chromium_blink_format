@@ -68,12 +68,12 @@ WindowMessageBroadcaster::WindowMessageBroadcaster(HWND hwnd)
 WindowMessageBroadcaster::~WindowMessageBroadcaster() {}
 
 void WindowMessageBroadcaster::addListener(WindowMessageListener* listener) {
-  if (!m_originalWndProc) {
+  if (m_listeners.isEmpty()) {
+    ASSERT(!m_originalWndProc);
 #pragma warning(disable : 4244 4312)
     m_originalWndProc = reinterpret_cast<WNDPROC>(
         SetWindowLongPtr(m_subclassedWindow, GWLP_WNDPROC,
                          reinterpret_cast<LONG_PTR>(SubclassedWndProc)));
-    ASSERT(m_originalWndProc);
   }
 
   m_listeners.add(listener);
@@ -98,8 +98,6 @@ void WindowMessageBroadcaster::destroy() {
 }
 
 void WindowMessageBroadcaster::unsubclassWindow() {
-  ASSERT(m_originalWndProc);
-
   SetWindowLongPtr(m_subclassedWindow, GWLP_WNDPROC,
                    reinterpret_cast<LONG_PTR>(m_originalWndProc));
   m_originalWndProc = 0;
