@@ -1022,8 +1022,6 @@ Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
     object = m_webFrame->page()->createPlugin(classid, qurl, params, values);
     QWidget* widget = qobject_cast<QWidget*>(object);
     if (widget && mimeType == "application/x-qt-styled-widget") {
-      CSSComputedStyleDeclaration cssDecl(element);
-
       QString styleSheet = element->getAttribute("style");
       if (!styleSheet.isEmpty())
         styleSheet += QLatin1Char(';');
@@ -1033,7 +1031,7 @@ Widget* FrameLoaderClientQt::createPlugin(const IntSize& pluginSize,
 
         styleSheet += QString::fromLatin1(::getPropertyName(property));
         styleSheet += QLatin1Char(':');
-        styleSheet += cssDecl.getPropertyValue(property);
+        styleSheet += computedStyle(element)->getPropertyValue(property);
         styleSheet += QLatin1Char(';');
       }
 
