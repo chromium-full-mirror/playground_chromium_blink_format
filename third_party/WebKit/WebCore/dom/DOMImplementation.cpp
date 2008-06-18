@@ -323,10 +323,12 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
     return FTPDirectoryDocument::create(frame);
 #endif
 
+#if ENABLE(VIDEO)
   // Check to see if the type can be played by our MediaPlayer, if so create a
   // MediaDocument
   if (MediaPlayer::supportsType(type))
     return MediaDocument::create(frame);
+#endif
 
   PluginData* pluginData = 0;
   if (frame && frame->page())
