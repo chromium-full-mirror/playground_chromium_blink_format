@@ -1405,7 +1405,7 @@ VisiblePositionRange AccessibilityRenderObject::visiblePositionRange() const {
   return VisiblePositionRange(startPos, endPos);
 }
 
-VisiblePositionRange AccessibilityRenderObject::doAXTextMarkerRangeForLine(
+VisiblePositionRange AccessibilityRenderObject::visiblePositionRangeForLine(
     unsigned lineCount) const {
   if (lineCount == 0 || !m_renderer)
     return VisiblePositionRange();
@@ -1487,7 +1487,7 @@ int AccessibilityRenderObject::indexForVisiblePosition(
   return TextIterator::rangeLength(range.get());
 }
 
-IntRect AccessibilityRenderObject::doAXBoundsForTextMarkerRange(
+IntRect AccessibilityRenderObject::boundsForVisiblePositionRange(
     const VisiblePositionRange& visiblePositionRange) const {
   if (visiblePositionRange.isNull())
     return IntRect();
@@ -1531,24 +1531,22 @@ IntRect AccessibilityRenderObject::doAXBoundsForTextMarkerRange(
 #endif
 }
 
-void AccessibilityRenderObject::doSetAXSelectedTextMarkerRange(
-    const VisiblePositionRange& textMarkerRange) const {
-  if (textMarkerRange.start.isNull() || textMarkerRange.end.isNull())
+void AccessibilityRenderObject::setSelectedVisiblePositionRange(
+    const VisiblePositionRange& range) const {
+  if (range.start.isNull() || range.end.isNull())
     return;
 
   // make selection and tell the document to use it. if it's zero length, then
   // move to that position
-  if (textMarkerRange.start == textMarkerRange.end) {
-    m_renderer->document()->frame()->selection()->moveTo(textMarkerRange.start,
-                                                         true);
+  if (range.start == range.end) {
+    m_renderer->document()->frame()->selection()->moveTo(range.start, true);
   } else {
-    Selection newSelection =
-        Selection(textMarkerRange.start, textMarkerRange.end);
+    Selection newSelection = Selection(range.start, range.end);
     m_renderer->document()->frame()->selection()->setSelection(newSelection);
   }
 }
 
-VisiblePosition AccessibilityRenderObject::doAXTextMarkerForPosition(
+VisiblePosition AccessibilityRenderObject::visiblePositionForPoint(
     const IntPoint& point) const {
   // convert absolute point to view coordinates
   FrameView* frameView =
@@ -1597,7 +1595,7 @@ VisiblePosition AccessibilityRenderObject::doAXTextMarkerForPosition(
 }
 
 // NOTE: Consider providing this utility method as AX API
-VisiblePosition AccessibilityRenderObject::textMarkerForIndex(
+VisiblePosition AccessibilityRenderObject::visiblePositionForIndex(
     unsigned indexValue,
     bool lastIndexOK) const {
   if (!isTextControl())
@@ -1615,8 +1613,7 @@ VisiblePosition AccessibilityRenderObject::textMarkerForIndex(
 }
 
 // NOTE: Consider providing this utility method as AX API
-int AccessibilityRenderObject::indexForTextMarker(
-    const VisiblePosition& position) const {
+int AccessibilityRenderObject::index(const VisiblePosition& position) const {
   if (!isTextControl())
     return -1;
 
@@ -1726,7 +1723,7 @@ String AccessibilityRenderObject::doAXStringForRange(
 IntRect AccessibilityRenderObject::doAXBoundsForRange(
     const PlainTextRange& range) const {
   if (isTextControl())
-    return doAXBoundsForTextMarkerRange(textMarkerRangeForRange(range));
+    return boundsForVisiblePositionRange(visiblePositionRangeForRange(range));
   return IntRect();
 }
 
