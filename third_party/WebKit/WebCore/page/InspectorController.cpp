@@ -210,7 +210,7 @@ struct XMLHttpRequestResource {
 
 struct InspectorResource : public RefCounted<InspectorResource> {
   // Keep these in sync with WebInspector.Resource.Type
-  enum Type { Doc, Stylesheet, Image, Font, Script, XHR, Other };
+  enum Type { Doc, Stylesheet, Image, Font, Script, XHR, Media, Other };
 
   static PassRefPtr<InspectorResource> create(long long identifier,
                                               DocumentLoader* documentLoader,
@@ -529,7 +529,8 @@ static JSValueRef getResourceDocumentNode(JSContextRef ctx,
   if (!document)
     return undefined;
 
-  if (document->isPluginDocument() || document->isImageDocument())
+  if (document->isPluginDocument() || document->isImageDocument() ||
+      document->isMediaDocument())
     return undefined;
 
   ExecState* exec =
