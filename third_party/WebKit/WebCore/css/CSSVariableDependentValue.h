@@ -38,7 +38,7 @@ class CSSVariableDependentValue : public CSSValue {
       const PassRefPtr<CSSValueList>& valueList) {
     return adoptRef(new CSSVariableDependentValue(valueList));
   }
-  ~CSSVariableDependentValue();
+  virtual ~CSSVariableDependentValue();
 
   virtual String cssText() const;
 

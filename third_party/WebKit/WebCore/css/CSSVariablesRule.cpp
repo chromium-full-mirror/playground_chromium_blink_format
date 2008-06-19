@@ -34,9 +34,7 @@
 namespace WebCore {
 
 CSSVariablesRule::CSSVariablesRule(CSSStyleSheet* parent, MediaList* mediaList)
-    : CSSRule(parent) {
-  m_lstMedia = mediaList;
-}
+    : CSSRule(parent), m_lstMedia(mediaList) {}
 
 CSSVariablesRule::~CSSVariablesRule() {}
 
