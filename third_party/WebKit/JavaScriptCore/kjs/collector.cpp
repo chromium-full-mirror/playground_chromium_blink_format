@@ -89,14 +89,7 @@ const size_t ALLOCATIONS_PER_COLLECTION = 4000;
 // a PIC branch in Mach-O binaries, see <rdar://problem/5971391>.
 #define MIN_ARRAY_SIZE (static_cast<size_t>(14))
 
-Heap::Heap()
-    : mainThreadOnlyObjectCount(0),
-      m_markListSet(0)
-#if PLATFORM(UNIX)
-      ,
-      m_pagesize(getpagesize())
-#endif
-{
+Heap::Heap() : mainThreadOnlyObjectCount(0), m_markListSet(0) {
   memset(&primaryHeap, 0, sizeof(CollectorHeap));
   memset(&numberHeap, 0, sizeof(CollectorHeap));
 }
@@ -117,9 +110,14 @@ static NEVER_INLINE CollectorBlock* allocateBlock() {
   memset(address, 0, BLOCK_SIZE);
 #else
 
+#if USE(MULTIPLE_THREADS)
+#error Need to initialize pagesize safely.
+#endif
+  static size_t pagesize = getpagesize();
+
   size_t extra = 0;
-  if (BLOCK_SIZE > m_pagesize)
-    extra = BLOCK_SIZE - m_pagesize;
+  if (BLOCK_SIZE > pagesize)
+    extra = BLOCK_SIZE - pagesize;
 
   void* mmapResult = mmap(NULL, BLOCK_SIZE + extra, PROT_READ | PROT_WRITE,
                           MAP_PRIVATE | MAP_ANON, -1, 0);

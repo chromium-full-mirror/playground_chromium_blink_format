@@ -134,10 +134,6 @@ class Heap : Noncopyable {
   CollectorHeap numberHeap;
   ProtectCountSet protectedValues;
   HashSet<ArgList*>* m_markListSet;
-
-#if PLATFORM(UNIX)
-  const size_t m_pagesize;
-#endif
 };
 
 // tunable parameters
