@@ -88,6 +88,7 @@ class FrameViewPrivate {
     m_nestedLayoutCount = 0;
     m_postLayoutTasksTimer.stop();
     m_firstLayout = true;
+    m_firstLayoutCallbackPending = false;
     m_wasScrolledByUser = false;
     m_lastLayoutSize = IntSize();
     m_lastZoomFactor = 1.0f;
@@ -115,6 +116,7 @@ class FrameViewPrivate {
   int m_layoutCount;
   unsigned m_nestedLayoutCount;
   Timer<FrameView> m_postLayoutTasksTimer;
+  bool m_firstLayoutCallbackPending;
 
   bool m_firstLayout;
   bool m_needToInitScrollbars;
@@ -426,7 +428,6 @@ void FrameView::layout(bool allowSubtree) {
   d->m_doFullRepaint = !subtree && (d->m_firstLayout ||
                                     static_cast<RenderView*>(root)->printing());
 
-  bool didFirstLayout = false;
   if (!subtree) {
     // Now set our scrollbar state for the layout.
     ScrollbarMode currentHMode = hScrollbarMode();
@@ -436,7 +437,7 @@ void FrameView::layout(bool allowSubtree) {
       suppressScrollbars(true);
       if (d->m_firstLayout) {
         d->m_firstLayout = false;
-        didFirstLayout = true;
+        d->m_firstLayoutCallbackPending = true;
         d->m_lastLayoutSize = IntSize(width(), height());
         d->m_lastZoomFactor = root->style()->zoom();
 
@@ -511,9 +512,6 @@ void FrameView::layout(bool allowSubtree) {
 #if ENABLE(DASHBOARD_SUPPORT)
   updateDashboardRegions();
 #endif
-
-  if (didFirstLayout)
-    m_frame->loader()->didFirstLayout();
 
   ASSERT(!root->needsLayout());
 
@@ -923,6 +921,11 @@ void FrameView::resumeScheduledEvents() {
 }
 
 void FrameView::performPostLayoutTasks() {
+  if (d->m_firstLayoutCallbackPending) {
+    m_frame->loader()->didFirstLayout();
+    d->m_firstLayoutCallbackPending = false;
+  }
+
   RenderView* root = m_frame->contentRenderer();
 
   root->updateWidgetPositions();
