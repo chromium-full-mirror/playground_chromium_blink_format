@@ -2429,11 +2429,12 @@ void RenderObject::setStyle(RenderStyle* style) {
     if (d == RenderStyle::Layout && m_parent &&
         m_style->position() != style->position()) {
       markContainingBlocksForLayout();
-      if (m_style->position() == StaticPosition) {
+      if (m_style->position() == StaticPosition)
         repaint();
-        if (isFloating())
-          removeFromObjectLists();
-      }
+      if (isFloating() && !isPositioned() &&
+          (style->position() == AbsolutePosition ||
+           style->position() == FixedPosition))
+        removeFromObjectLists();
       if (isRenderBlock()) {
         if (style->position() == StaticPosition)
           // Clear our positioned objects list. Our absolutely positioned
