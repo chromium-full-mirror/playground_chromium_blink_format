@@ -125,7 +125,9 @@ void JSGlobalObject::init(JSObject* thisValue) {
   d()->recursion = 0;
   d()->debugger = 0;
 
-  d()->globalData = &JSGlobalData::threadInstance();
+  d()->globalData = (Heap::heap(this) == JSGlobalData::sharedInstance().heap)
+                        ? &JSGlobalData::sharedInstance()
+                        : &JSGlobalData::threadInstance();
 
   d()->globalExec.set(
       new ExecState(this, thisValue, d()->globalScopeChain.node()));
