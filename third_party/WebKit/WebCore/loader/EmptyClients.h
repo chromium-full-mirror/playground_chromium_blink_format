@@ -23,31 +23,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGImageEmptyClients_h
-#define SVGImageEmptyClients_h
-
-#if ENABLE(SVG)
+#ifndef EmptyClients_h
+#define EmptyClients_h
 
 #include "ChromeClient.h"
 #include "ContextMenuClient.h"
 #include "DragClient.h"
+#include "DocumentLoader.h"
 #include "EditCommand.h"
 #include "EditorClient.h"
 #include "FocusDirection.h"
+#include "FloatRect.h"
 #include "FrameLoaderClient.h"
 #include "InspectorClient.h"
+#include "ResourceError.h"
 #include "SharedBuffer.h"
 
 /*
- This file holds empty Client stubs for use by SVGImage.
- SVGImage needs to create a dummy Page->Frame->FrameView tree for use in parsing
- an SVGDocument.
+ This file holds empty Client stubs for use by WebCore.
+ Viewless element needs to create a dummy Page->Frame->FrameView tree for use in
+ parsing or executing JavaScript.
  This tree depends heavily on Clients (usually provided by WebKit classes).
 
- SVGImage has no way to access the current Page (nor should it, since Images are
- not tied to a page).
- See http://bugs.webkit.org/show_bug.cgi?id=5971 for more discussion on this
- issue.
+ This file was first created for SVGImage as it had no way to access the current
+ Page (nor should it,
+ since Images are not tied to a page).
+ See http://bugs.webkit.org/show_bug.cgi?id=5971 for the original discussion
+ about this file.
 
  Ideally, whenever you change a Client class, you should add a stub here.
  Brittle, yes.  Unfortunate, yes.  Hopefully temporary.
@@ -55,9 +57,9 @@
 
 namespace WebCore {
 
-class SVGEmptyChromeClient : public ChromeClient {
+class EmptyChromeClient : public ChromeClient {
  public:
-  virtual ~SVGEmptyChromeClient() {}
+  virtual ~EmptyChromeClient() {}
   virtual void chromeDestroyed() {}
 
   virtual void setWindowRect(const FloatRect&) {}
@@ -141,9 +143,9 @@ class SVGEmptyChromeClient : public ChromeClient {
   virtual void exceededDatabaseQuota(Frame*, const String&) {}
 };
 
-class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
+class EmptyFrameLoaderClient : public FrameLoaderClient {
  public:
-  virtual ~SVGEmptyFrameLoaderClient() {}
+  virtual ~EmptyFrameLoaderClient() {}
   virtual void frameLoaderDestroyed() {}
 
   virtual bool hasWebView() const { return true; }    // mainly for assertions
@@ -375,9 +377,9 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 #endif
 };
 
-class SVGEmptyEditorClient : public EditorClient {
+class EmptyEditorClient : public EditorClient {
  public:
-  virtual ~SVGEmptyEditorClient() {}
+  virtual ~EmptyEditorClient() {}
   virtual void pageDestroyed() {}
 
   virtual bool shouldDeleteRange(Range*) { return false; }
@@ -477,9 +479,9 @@ class SVGEmptyEditorClient : public EditorClient {
   virtual void setInputMethodState(bool enabled) {}
 };
 
-class SVGEmptyContextMenuClient : public ContextMenuClient {
+class EmptyContextMenuClient : public ContextMenuClient {
  public:
-  virtual ~SVGEmptyContextMenuClient() {}
+  virtual ~EmptyContextMenuClient() {}
   virtual void contextMenuDestroyed() {}
 
   virtual PlatformMenuDescription getCustomMenuFromDefaultItems(ContextMenu*) {
@@ -499,9 +501,9 @@ class SVGEmptyContextMenuClient : public ContextMenuClient {
 #endif
 };
 
-class SVGEmptyDragClient : public DragClient {
+class EmptyDragClient : public DragClient {
  public:
-  virtual ~SVGEmptyDragClient() {}
+  virtual ~EmptyDragClient() {}
   virtual void willPerformDragDestinationAction(DragDestinationAction,
                                                 DragData*) {}
   virtual void willPerformDragSourceAction(DragSourceAction,
@@ -527,9 +529,9 @@ class SVGEmptyDragClient : public DragClient {
   virtual void dragControllerDestroyed() {}
 };
 
-class SVGEmptyInspectorClient : public InspectorClient {
+class EmptyInspectorClient : public InspectorClient {
  public:
-  virtual ~SVGEmptyInspectorClient() {}
+  virtual ~EmptyInspectorClient() {}
 
   virtual void inspectorDestroyed(){};
 
@@ -549,6 +551,4 @@ class SVGEmptyInspectorClient : public InspectorClient {
 };
 }
 
-#endif  // ENABLE(SVG)
-
-#endif  // SVGImageEmptyClients_h
+#endif  // EmptyClients_h
