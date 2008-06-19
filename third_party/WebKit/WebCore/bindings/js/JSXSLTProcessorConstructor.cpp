@@ -53,8 +53,8 @@ ConstructType JSXSLTProcessorConstructor::getConstructData(ConstructData&) {
 JSObject* JSXSLTProcessorConstructor::construct(ExecState* exec,
                                                 const ArgList& args) {
   RefPtr<XSLTProcessor> xsltProcessor = XSLTProcessor::create();
-  return new JSXSLTProcessor(JSXSLTProcessorPrototype::self(exec),
-                             xsltProcessor.get());
+  return new (exec) JSXSLTProcessor(JSXSLTProcessorPrototype::self(exec),
+                                    xsltProcessor.get());
 }
 
 }  // namespace WebCore

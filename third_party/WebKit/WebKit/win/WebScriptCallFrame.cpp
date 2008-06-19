@@ -258,7 +258,7 @@ JSValue* WebScriptCallFrame::valueByEvaluatingJavaScriptFromString(
     JSValue* scriptExecutionResult;
     if (eval) {
         ArgList args;
-        args.append(jsString(code));
+        args.append(jsString(state, code));
         scriptExecutionResult = eval->call(state, 0, args);
     } else
         // no "eval", or no context (i.e. global scope) - use global fallback

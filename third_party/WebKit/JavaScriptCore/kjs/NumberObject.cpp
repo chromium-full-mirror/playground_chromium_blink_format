@@ -59,32 +59,35 @@ NumberPrototype::NumberPrototype(ExecState* exec,
                                  ObjectPrototype* objectPrototype,
                                  FunctionPrototype* functionPrototype)
     : NumberObject(objectPrototype) {
-  setInternalValue(jsNumber(0));
+  setInternalValue(jsNumber(exec, 0));
 
   // The constructor will be added later, after NumberConstructor has been
   // constructed
 
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 1,
-                                          exec->propertyNames().toString,
-                                          numberProtoFuncToString),
+  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 1,
+                                                 exec->propertyNames().toString,
+                                                 numberProtoFuncToString),
                     DontEnum);
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 0,
+  putDirectFunction(new (exec)
+                        PrototypeFunction(exec, functionPrototype, 0,
                                           exec->propertyNames().toLocaleString,
                                           numberProtoFuncToLocaleString),
                     DontEnum);
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 0,
-                                          exec->propertyNames().valueOf,
-                                          numberProtoFuncValueOf),
+  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+                                                 exec->propertyNames().valueOf,
+                                                 numberProtoFuncValueOf),
                     DontEnum);
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 1,
-                                          exec->propertyNames().toFixed,
-                                          numberProtoFuncToFixed),
+  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 1,
+                                                 exec->propertyNames().toFixed,
+                                                 numberProtoFuncToFixed),
                     DontEnum);
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 1,
+  putDirectFunction(new (exec)
+                        PrototypeFunction(exec, functionPrototype, 1,
                                           exec->propertyNames().toExponential,
                                           numberProtoFuncToExponential),
                     DontEnum);
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 1,
+  putDirectFunction(new (exec)
+                        PrototypeFunction(exec, functionPrototype, 1,
                                           exec->propertyNames().toPrecision,
                                           numberProtoFuncToPrecision),
                     DontEnum);
@@ -171,7 +174,7 @@ JSValue* numberProtoFuncToString(ExecState* exec,
 
   double radixAsDouble = args[0]->toInteger(exec);  // nan -> 0
   if (radixAsDouble == 10 || args[0]->isUndefined())
-    return jsString(v->toString(exec));
+    return jsString(exec, v->toString(exec));
 
   if (radixAsDouble < 2 || radixAsDouble > 36)
     return throwError(exec, RangeError,
@@ -186,7 +189,7 @@ JSValue* numberProtoFuncToString(ExecState* exec,
   const char* lastCharInString = s + sizeof(s) - 1;
   double x = v->toNumber(exec);
   if (isnan(x) || isinf(x))
-    return jsString(UString::from(x));
+    return jsString(exec, UString::from(x));
 
   bool isNegative = x < 0.0;
   if (isNegative)
@@ -225,7 +228,7 @@ JSValue* numberProtoFuncToString(ExecState* exec,
   *p = '\0';
   ASSERT(p < s + sizeof(s));
 
-  return jsString(startOfResultString);
+  return jsString(exec, startOfResultString);
 }
 
 JSValue* numberProtoFuncToLocaleString(ExecState* exec,
@@ -236,6 +239,7 @@ JSValue* numberProtoFuncToLocaleString(ExecState* exec,
 
   // TODO
   return jsString(
+      exec,
       static_cast<NumberObject*>(thisObj)->internalValue()->toString(exec));
 }
 
@@ -265,7 +269,7 @@ JSValue* numberProtoFuncToFixed(ExecState* exec,
 
   double x = v->toNumber(exec);
   if (isnan(x))
-    return jsString("NaN");
+    return jsString(exec, "NaN");
 
   UString s;
   if (x < 0) {
@@ -275,7 +279,7 @@ JSValue* numberProtoFuncToFixed(ExecState* exec,
     x = 0;
 
   if (x >= pow(10.0, 21.0))
-    return jsString(s + UString::from(x));
+    return jsString(exec, s + UString::from(x));
 
   const double tenToTheF = pow(10.0, f);
   double n = floor(x * tenToTheF);
@@ -295,8 +299,8 @@ JSValue* numberProtoFuncToFixed(ExecState* exec,
   }
   int kMinusf = k - f;
   if (kMinusf < m.size())
-    return jsString(s + m.substr(0, kMinusf) + "." + m.substr(kMinusf));
-  return jsString(s + m.substr(0, kMinusf));
+    return jsString(exec, s + m.substr(0, kMinusf) + "." + m.substr(kMinusf));
+  return jsString(exec, s + m.substr(0, kMinusf));
 }
 
 static void fractionalPartToString(char* buf,
@@ -349,7 +353,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
   double x = v->toNumber(exec);
 
   if (isnan(x) || isinf(x))
-    return jsString(UString::from(x));
+    return jsString(exec, UString::from(x));
 
   JSValue* fractionalDigitsValue = args[0];
   double df = fractionalDigitsValue->toInteger(exec);
@@ -376,7 +380,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
   }
 
   if (isnan(x))
-    return jsString("NaN");
+    return jsString(exec, "NaN");
 
   if (x == -0.0)  // (-0.0).toExponential() should print as 0 instead of -0
     x = 0;
@@ -410,7 +414,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
 
   freedtoa(result);
 
-  return jsString(buf);
+  return jsString(exec, buf);
 }
 
 JSValue* numberProtoFuncToPrecision(ExecState* exec,
@@ -424,7 +428,7 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
   double doublePrecision = args[0]->toIntegerPreserveNaN(exec);
   double x = v->toNumber(exec);
   if (args[0]->isUndefined() || isnan(x) || isinf(x))
-    return jsString(v->toString(exec));
+    return jsString(exec, v->toString(exec));
 
   UString s;
   if (x < 0) {
@@ -464,8 +468,8 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
       if (m.size() > 1)
         m = m.substr(0, 1) + "." + m.substr(1);
       if (e >= 0)
-        return jsString(s + m + "e+" + UString::from(e));
-      return jsString(s + m + "e-" + UString::from(-e));
+        return jsString(exec, s + m + "e+" + UString::from(e));
+      return jsString(exec, s + m + "e-" + UString::from(-e));
     }
   } else {
     m = char_sequence('0', precision);
@@ -473,13 +477,13 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
   }
 
   if (e == precision - 1)
-    return jsString(s + m);
+    return jsString(exec, s + m);
   if (e >= 0) {
     if (e + 1 < m.size())
-      return jsString(s + m.substr(0, e + 1) + "." + m.substr(e + 1));
-    return jsString(s + m);
+      return jsString(exec, s + m.substr(0, e + 1) + "." + m.substr(e + 1));
+    return jsString(exec, s + m);
   }
-  return jsString(s + "0." + char_sequence('0', -(e + 1)) + m);
+  return jsString(exec, s + "0." + char_sequence('0', -(e + 1)) + m);
 }
 
 // ------------------------------ NumberConstructor
@@ -509,7 +513,7 @@ NumberConstructor::NumberConstructor(ExecState* exec,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(exec->propertyNames().length, jsNumber(1),
+  putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             ReadOnly | DontDelete | DontEnum);
 }
 
@@ -520,19 +524,19 @@ bool NumberConstructor::getOwnPropertySlot(ExecState* exec,
       exec, ExecState::numberTable(exec), this, propertyName, slot);
 }
 
-JSValue* NumberConstructor::getValueProperty(ExecState*, int token) const {
+JSValue* NumberConstructor::getValueProperty(ExecState* exec, int token) const {
   // ECMA 15.7.3
   switch (token) {
     case NaNValue:
-      return jsNaN();
+      return jsNaN(exec);
     case NegInfinity:
-      return jsNumberCell(-Inf);
+      return jsNumberCell(exec, -Inf);
     case PosInfinity:
-      return jsNumberCell(Inf);
+      return jsNumberCell(exec, Inf);
     case MaxValue:
-      return jsNumberCell(1.7976931348623157E+308);
+      return jsNumberCell(exec, 1.7976931348623157E+308);
     case MinValue:
-      return jsNumberCell(5E-324);
+      return jsNumberCell(exec, 5E-324);
   }
   ASSERT_NOT_REACHED();
   return jsNull();
@@ -545,11 +549,11 @@ ConstructType NumberConstructor::getConstructData(ConstructData&) {
 // ECMA 15.7.1
 JSObject* NumberConstructor::construct(ExecState* exec, const ArgList& args) {
   JSObject* proto = exec->lexicalGlobalObject()->numberPrototype();
-  NumberObject* obj = new NumberObject(proto);
+  NumberObject* obj = new (exec) NumberObject(proto);
 
   // FIXME: Check args[0]->isUndefined() instead of args.isEmpty()?
   double n = args.isEmpty() ? 0 : args[0]->toNumber(exec);
-  obj->setInternalValue(jsNumber(n));
+  obj->setInternalValue(jsNumber(exec, n));
   return obj;
 }
 
@@ -558,7 +562,7 @@ JSValue* NumberConstructor::callAsFunction(ExecState* exec,
                                            JSObject*,
                                            const ArgList& args) {
   // FIXME: Check args[0]->isUndefined() instead of args.isEmpty()?
-  return jsNumber(args.isEmpty() ? 0 : args[0]->toNumber(exec));
+  return jsNumber(exec, args.isEmpty() ? 0 : args[0]->toNumber(exec));
 }
 
 }  // namespace KJS

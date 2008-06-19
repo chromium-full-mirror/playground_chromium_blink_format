@@ -73,7 +73,7 @@ Class* JavaInstance::getClass() const {
   return _class;
 }
 
-JSValue* JavaInstance::stringValue() const {
+JSValue* JavaInstance::stringValue(ExecState* exec) const {
   JSLock lock;
 
   jstring stringValue = (jstring)callJNIMethod<jobject>(
@@ -82,13 +82,13 @@ JSValue* JavaInstance::stringValue() const {
   const jchar* c = getUCharactersFromJStringInEnv(env, stringValue);
   UString u((const UChar*)c, (int)env->GetStringLength(stringValue));
   releaseUCharactersForJStringInEnv(env, stringValue, c);
-  return jsString(u);
+  return jsString(exec, u);
 }
 
-JSValue* JavaInstance::numberValue() const {
+JSValue* JavaInstance::numberValue(ExecState* exec) const {
   jdouble doubleValue =
       callJNIMethod<jdouble>(_instance->_instance, "doubleValue", "()D");
-  return jsNumber(doubleValue);
+  return jsNumber(exec, doubleValue);
 }
 
 JSValue* JavaInstance::booleanValue() const {
@@ -154,10 +154,10 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
     jobject obj = _instance->_instance;
     JSValue* exceptionDescription = NULL;
     const char* callingURL = 0;  // FIXME, need to propagate calling URL to Java
-    handled =
-        dispatchJNICall(rootObject->nativeHandle(), obj, jMethod->isStatic(),
-                        jMethod->JNIReturnType(), jMethod->methodID(obj), jArgs,
-                        result, callingURL, exceptionDescription);
+    handled = dispatchJNICall(exec, rootObject->nativeHandle(), obj,
+                              jMethod->isStatic(), jMethod->JNIReturnType(),
+                              jMethod->methodID(obj), jArgs, result, callingURL,
+                              exceptionDescription);
     if (exceptionDescription) {
       throwError(exec, GeneralError, exceptionDescription->toString(exec));
       free(jArgs);
@@ -224,7 +224,7 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
                                                          arrayType, rootObject);
         } else {
           resultValue = Instance::createRuntimeObject(
-              JavaInstance::create(result.l, rootObject));
+              exec, JavaInstance::create(result.l, rootObject));
         }
       } else {
         resultValue = jsUndefined();
@@ -236,31 +236,31 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
     } break;
 
     case byte_type: {
-      resultValue = jsNumber(result.b);
+      resultValue = jsNumber(exec, result.b);
     } break;
 
     case char_type: {
-      resultValue = jsNumber(result.c);
+      resultValue = jsNumber(exec, result.c);
     } break;
 
     case short_type: {
-      resultValue = jsNumber(result.s);
+      resultValue = jsNumber(exec, result.s);
     } break;
 
     case int_type: {
-      resultValue = jsNumber(result.i);
+      resultValue = jsNumber(exec, result.i);
     } break;
 
     case long_type: {
-      resultValue = jsNumber(result.j);
+      resultValue = jsNumber(exec, result.j);
     } break;
 
     case float_type: {
-      resultValue = jsNumber(result.f);
+      resultValue = jsNumber(exec, result.f);
     } break;
 
     case double_type: {
-      resultValue = jsNumber(result.d);
+      resultValue = jsNumber(exec, result.d);
     } break;
 
     case invalid_type:
@@ -272,29 +272,28 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
   return resultValue;
 }
 
-JSValue* JavaInstance::defaultValue(JSType hint) const {
-  if (hint == StringType) {
-    return stringValue();
-  } else if (hint == NumberType) {
-    return numberValue();
-  } else if (hint == BooleanType) {
+JSValue* JavaInstance::defaultValue(ExecState* exec, JSType hint) const {
+  if (hint == StringType)
+    return stringValue(exec);
+  if (hint == NumberType)
+    return numberValue(exec);
+  if (hint == BooleanType)
     return booleanValue();
-  } else if (hint == UnspecifiedType) {
+  if (hint == UnspecifiedType) {
     JavaClass* aClass = static_cast<JavaClass*>(getClass());
-    if (aClass->isStringClass()) {
-      return stringValue();
-    } else if (aClass->isNumberClass()) {
-      return numberValue();
-    } else if (aClass->isBooleanClass()) {
+    if (aClass->isStringClass())
+      return stringValue(exec);
+    if (aClass->isNumberClass())
+      return numberValue(exec);
+    if (aClass->isBooleanClass())
       return booleanValue();
-    }
   }
 
-  return valueOf();
+  return valueOf(exec);
 }
 
-JSValue* JavaInstance::valueOf() const {
-  return stringValue();
+JSValue* JavaInstance::valueOf(ExecState* exec) const {
+  return stringValue(exec);
 }
 
 JObjectWrapper::JObjectWrapper(jobject instance) : _refCount(0) {

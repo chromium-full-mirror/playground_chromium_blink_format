@@ -30,7 +30,6 @@
 #define JSGlobalData_h
 
 #include "list.h"
-#include "ustring.h"
 #include <wtf/HashCountedSet.h>
 #include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
@@ -43,7 +42,7 @@ class ThreadSpecific;
 namespace KJS {
 
 class CommonIdentifiers;
-//    class Heap;
+class Heap;
 class IdentifierTable;
 class JSGlobalObject;
 class Lexer;
@@ -59,8 +58,9 @@ struct HashTable;
 // cannot run concurrently.
 struct JSGlobalData : Noncopyable {
   static JSGlobalData& threadInstance();
+  static JSGlobalData& sharedInstance();
 
-  //        Heap* heap;
+  Heap* heap;
 
   const HashTable* arrayTable;
   const HashTable* dateTable;

@@ -312,6 +312,10 @@ class JSGlobalObject : public JSVariableObject {
   // Per-thread hash tables, cached on the global object for faster access.
   JSGlobalData* globalData() { return d()->globalData; }
 
+  enum SharedTag { Shared };
+  void* operator new(size_t);
+  void* operator new(size_t, SharedTag);
+
   void init(JSObject* thisValue);
 
   JSGlobalObjectData* d() const {
@@ -332,8 +336,6 @@ class JSGlobalObject : public JSVariableObject {
  private:
   bool checkTimeout();
   void resetTimeoutCheck();
-
-  static JSGlobalObject* s_head;
 };
 
 inline void JSGlobalObject::addStaticGlobals(GlobalPropertyInfo* globals,

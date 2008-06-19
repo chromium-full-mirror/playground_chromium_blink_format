@@ -38,6 +38,7 @@
 #include "Parser.h"
 
 #if USE(MULTIPLE_THREADS)
+#include <wtf/Threading.h>
 #include <wtf/ThreadSpecific.h>
 #endif
 
@@ -54,9 +55,10 @@ extern const HashTable regExpConstructorTable;
 extern const HashTable stringTable;
 
 JSGlobalData::JSGlobalData()
-//    : heap(new Heap)
+    : heap(new Heap)
 #if USE(MULTIPLE_THREADS)
-    : arrayTable(new HashTable(KJS::arrayTable)),
+      ,
+      arrayTable(new HashTable(KJS::arrayTable)),
       dateTable(new HashTable(KJS::dateTable)),
       mathTable(new HashTable(KJS::mathTable)),
       numberTable(new HashTable(KJS::numberTable)),
@@ -64,7 +66,8 @@ JSGlobalData::JSGlobalData()
       regExpConstructorTable(new HashTable(KJS::regExpConstructorTable)),
       stringTable(new HashTable(KJS::stringTable))
 #else
-    : arrayTable(&KJS::arrayTable),
+      ,
+      arrayTable(&KJS::arrayTable),
       dateTable(&KJS::dateTable),
       mathTable(&KJS::mathTable),
       numberTable(&KJS::numberTable),
@@ -113,5 +116,17 @@ JSGlobalData& JSGlobalData::threadInstance() {
   static JSGlobalData sharedInstance;
   return sharedInstance;
 #endif
+}
+
+JSGlobalData& JSGlobalData::sharedInstance() {
+  return threadInstance();
+  /*
+  #if USE(MULTIPLE_THREADS)
+      AtomicallyInitializedStatic(JSGlobalData, sharedInstance);
+  #else
+      static JSGlobalData sharedInstance;
+  #endif
+      return sharedInstance;
+  */
 }
 }

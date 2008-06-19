@@ -41,6 +41,7 @@
 namespace KJS {
 
 class ArgList;
+class ExecState;
 class JSObject;
 class JSValue;
 
@@ -90,8 +91,8 @@ class JavaJSObject {
   static jvalue invoke(JSObjectCallContext*);
 
   jobject convertValueToJObject(JSValue*) const;
-  JSValue* convertJObjectToValue(jobject) const;
-  void getListFromJArray(jobjectArray, ArgList&) const;
+  JSValue* convertJObjectToValue(ExecState*, jobject) const;
+  void getListFromJArray(ExecState*, jobjectArray, ArgList&) const;
 
   RootObject* rootObject() const;
 

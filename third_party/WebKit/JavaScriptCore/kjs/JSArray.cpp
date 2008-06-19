@@ -88,7 +88,7 @@ JSArray::JSArray(JSObject* prototype, unsigned initialLength)
   m_storage = static_cast<ArrayStorage*>(
       fastZeroedMalloc(storageSize(initialCapacity)));
 
-  Collector::reportExtraMemoryCost(initialCapacity * sizeof(JSValue*));
+  Heap::heap(this)->reportExtraMemoryCost(initialCapacity * sizeof(JSValue*));
 
   checkConsistency();
 }
@@ -145,10 +145,10 @@ JSValue* JSArray::getItem(unsigned i) const {
   return value ? value : jsUndefined();
 }
 
-JSValue* JSArray::lengthGetter(ExecState*,
+JSValue* JSArray::lengthGetter(ExecState* exec,
                                const Identifier&,
                                const PropertySlot& slot) {
-  return jsNumber(static_cast<JSArray*>(slot.slotBase())->m_length);
+  return jsNumber(exec, static_cast<JSArray*>(slot.slotBase())->m_length);
 }
 
 ALWAYS_INLINE bool JSArray::inlineGetOwnPropertySlot(ExecState* exec,

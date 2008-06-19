@@ -49,13 +49,13 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
     : BooleanObject(objectPrototype) {
   setInternalValue(jsBoolean(false));
 
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 0,
-                                          exec->propertyNames().toString,
-                                          booleanProtoFuncToString),
+  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+                                                 exec->propertyNames().toString,
+                                                 booleanProtoFuncToString),
                     DontEnum);
-  putDirectFunction(new PrototypeFunction(exec, functionPrototype, 0,
-                                          exec->propertyNames().valueOf,
-                                          booleanProtoFuncValueOf),
+  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+                                                 exec->propertyNames().valueOf,
+                                                 booleanProtoFuncValueOf),
                     DontEnum);
 }
 
@@ -72,7 +72,7 @@ JSValue* booleanProtoFuncToString(ExecState* exec,
   JSValue* v = static_cast<BooleanObject*>(thisObj)->internalValue();
   ASSERT(v);
 
-  return jsString(v->toString(exec));
+  return jsString(exec, v->toString(exec));
 }
 JSValue* booleanProtoFuncValueOf(ExecState* exec,
                                  JSObject* thisObj,
@@ -100,7 +100,7 @@ BooleanConstructor::BooleanConstructor(ExecState* exec,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(exec->propertyNames().length, jsNumber(1),
+  putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             ReadOnly | DontDelete | DontEnum);
 }
 
@@ -110,8 +110,8 @@ ConstructType BooleanConstructor::getConstructData(ConstructData&) {
 
 // ECMA 15.6.2
 JSObject* BooleanConstructor::construct(ExecState* exec, const ArgList& args) {
-  BooleanObject* obj(
-      new BooleanObject(exec->lexicalGlobalObject()->booleanPrototype()));
+  BooleanObject* obj(new (exec) BooleanObject(
+      exec->lexicalGlobalObject()->booleanPrototype()));
   obj->setInternalValue(jsBoolean(args[0]->toBoolean(exec)));
   return obj;
 }

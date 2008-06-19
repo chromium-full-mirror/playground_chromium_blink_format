@@ -25,9 +25,6 @@
 #define ExecState_h
 
 #include "JSGlobalData.h"
-#include "LabelStack.h"
-#include "completion.h"
-#include "list.h"
 #include "ScopeChain.h"
 
 namespace KJS {
@@ -107,6 +104,8 @@ class ExecState : Noncopyable {
   static const HashTable* stringTable(ExecState* exec) {
     return exec->m_globalData->stringTable;
   }
+
+  Heap* heap() const { return m_globalData->heap; }
 
  private:
   // Default constructor required for gcc 3.

@@ -42,14 +42,14 @@ COMPILE_ASSERT(sizeof(JSPropertyNameIterator) <=
 JSPropertyNameIterator* JSPropertyNameIterator::create(ExecState* exec,
                                                        JSValue* v) {
   if (v->isUndefinedOrNull())
-    return new JSPropertyNameIterator(0, 0, 0);
+    return new (exec) JSPropertyNameIterator(0, 0, 0);
 
   JSObject* o = v->toObject(exec);
   PropertyNameArray propertyNames(exec);
   o->getPropertyNames(exec, propertyNames);
   size_t numProperties = propertyNames.size();
-  return new JSPropertyNameIterator(o, propertyNames.releaseIdentifiers(),
-                                    numProperties);
+  return new (exec) JSPropertyNameIterator(
+      o, propertyNames.releaseIdentifiers(), numProperties);
 }
 
 JSPropertyNameIterator::JSPropertyNameIterator(JSObject* object,
@@ -109,7 +109,7 @@ void JSPropertyNameIterator::mark() {
 JSValue* JSPropertyNameIterator::next(ExecState* exec) {
   while (m_position != m_end) {
     if (m_object->hasProperty(exec, *m_position))
-      return jsOwnedString((*m_position++).ustring());
+      return jsOwnedString(exec, (*m_position++).ustring());
     ;
     m_position++;
   }

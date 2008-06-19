@@ -92,6 +92,8 @@ class JSDOMWindowShell : public DOMObject {
   void disconnectFrame();
   void clear();
 
+  void* operator new(size_t);
+
  private:
   JSDOMWindow* m_window;
 };

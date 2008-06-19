@@ -77,7 +77,7 @@ bool JSLock::currentThreadIsHoldingLock() {
 }
 
 void JSLock::registerThread() {
-  Collector::registerThread();
+  Heap::registerThread();
 }
 
 JSLock::DropAllLocks::DropAllLocks() : m_lockCount(0) {

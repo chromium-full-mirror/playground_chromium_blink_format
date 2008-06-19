@@ -133,8 +133,8 @@ class RegisterFile : Noncopyable {
 
   void copyGlobals(RegisterFile* src);
 
-  void mark() {
-    Collector::markStackObjectsConservatively(m_buffer, m_base + m_size);
+  void mark(Heap* heap) {
+    heap->markStackObjectsConservatively(m_buffer, m_base + m_size);
   }
 
   bool isGlobal() { return !!m_baseObserver; }

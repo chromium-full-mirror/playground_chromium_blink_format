@@ -259,7 +259,8 @@ JSObject* JSLazyEventListener::listenerObj() const {
 }
 
 JSValue* JSLazyEventListener::eventParameterName() const {
-  static ProtectedPtr<JSValue> eventString = jsString("event");
+  static ProtectedPtr<JSValue> eventString =
+      jsString(window()->globalExec(), "event");
   return eventString.get();
 }
 
@@ -278,7 +279,7 @@ void JSLazyEventListener::parseCode() const {
 
     UString sourceURL(frame->loader()->url().string());
     args.append(eventParameterName());
-    args.append(jsString(m_code));
+    args.append(jsString(exec, m_code));
 
     // FIXME: Passing the document's URL to construct is not always correct,
     // since this event listener might

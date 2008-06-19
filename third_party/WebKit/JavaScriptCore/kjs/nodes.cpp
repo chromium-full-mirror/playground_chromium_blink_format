@@ -187,8 +187,8 @@ static inline const UString currentSourceURL(ExecState*) {
 RegisterID* Node::emitThrowError(CodeGenerator& generator,
                                  ErrorType e,
                                  const char* msg) {
-  RegisterID* exception =
-      generator.emitNewError(generator.newTemporary(), e, jsString(msg));
+  RegisterID* exception = generator.emitNewError(
+      generator.newTemporary(), e, jsString(generator.globalExec(), msg));
   generator.emitThrow(exception);
   return exception;
 }
@@ -199,8 +199,8 @@ RegisterID* Node::emitThrowError(CodeGenerator& generator,
                                  const Identifier& label) {
   UString message = msg;
   substitute(message, label.ustring());
-  RegisterID* exception =
-      generator.emitNewError(generator.newTemporary(), e, jsString(message));
+  RegisterID* exception = generator.emitNewError(
+      generator.newTemporary(), e, jsString(generator.globalExec(), message));
   generator.emitThrow(exception);
   return exception;
 }
@@ -262,7 +262,7 @@ RegisterID* NumberNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 RegisterID* StringNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   // FIXME: should we try to atomize constant strings?
   return generator.emitLoad(generator.finalDestination(dst),
-                            jsOwnedString(m_value));
+                            jsOwnedString(generator.globalExec(), m_value));
 }
 
 // ------------------------------ RegExpNode -----------------------------------
@@ -311,8 +311,9 @@ RegisterID* ArrayNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
     generator.emitPutByIndex(newArray.get(), length++, value);
   }
 
-  value = generator.emitLoad(generator.newTemporary(),
-                             jsNumber(m_elision + length));
+  value =
+      generator.emitLoad(generator.newTemporary(),
+                         jsNumber(generator.globalExec(), m_elision + length));
   generator.emitPutById(newArray.get(), generator.propertyNames().length,
                         value);
 
@@ -1817,14 +1818,15 @@ void FuncDeclNode::addParams() {
 
 JSFunction* FuncDeclNode::makeFunction(ExecState* exec,
                                        ScopeChainNode* scopeChain) {
-  JSFunction* func = new JSFunction(exec, m_ident, m_body.get(), scopeChain);
+  JSFunction* func =
+      new (exec) JSFunction(exec, m_ident, m_body.get(), scopeChain);
 
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
   proto->putDirect(exec->propertyNames().constructor, func, DontEnum);
   func->putDirect(exec->propertyNames().prototype, proto, DontDelete);
   func->putDirect(exec->propertyNames().length,
-                  jsNumber(m_body->parameters().size()),
+                  jsNumber(exec, m_body->parameters().size()),
                   ReadOnly | DontDelete | DontEnum);
   return func;
 }
@@ -1842,7 +1844,8 @@ RegisterID* FuncExprNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
 JSFunction* FuncExprNode::makeFunction(ExecState* exec,
                                        ScopeChainNode* scopeChain) {
-  JSFunction* func = new JSFunction(exec, m_ident, m_body.get(), scopeChain);
+  JSFunction* func =
+      new (exec) JSFunction(exec, m_ident, m_body.get(), scopeChain);
   JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
       exec, exec->emptyList());
   proto->putDirect(exec->propertyNames().constructor, func, DontEnum);
@@ -1857,7 +1860,7 @@ JSFunction* FuncExprNode::makeFunction(ExecState* exec,
    */
 
   if (!m_ident.isNull()) {
-    JSObject* functionScopeObject = new JSObject;
+    JSObject* functionScopeObject = new (exec) JSObject;
     functionScopeObject->putDirect(m_ident, func, ReadOnly | DontDelete);
     func->scope().push(functionScopeObject);
   }
