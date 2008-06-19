@@ -54,7 +54,7 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                                  Values,
                                  values)
 
-  mutable SVGFEColorMatrix* m_filterEffect;
+  mutable RefPtr<SVGFEColorMatrix> m_filterEffect;
 };
 
 }  // namespace WebCore

@@ -38,7 +38,7 @@ enum SVGBlendModeType {
 
 class SVGFEBlend : public SVGFilterEffect {
  public:
-  SVGFEBlend(SVGResourceFilter*);
+  static PassRefPtr<SVGFEBlend> create(SVGResourceFilter*);
 
   String in2() const;
   void setIn2(const String&);
@@ -53,6 +53,8 @@ class SVGFEBlend : public SVGFilterEffect {
 #endif
 
  private:
+  SVGFEBlend(SVGResourceFilter*);
+
   SVGBlendModeType m_mode;
   String m_in2;
 };

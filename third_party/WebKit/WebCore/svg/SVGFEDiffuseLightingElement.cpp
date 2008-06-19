@@ -44,9 +44,7 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
       m_kernelUnitLengthY(0.0f),
       m_filterEffect(0) {}
 
-SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {
-  delete m_filterEffect;
-}
+SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
                               String,
@@ -114,7 +112,7 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect(
     SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEDiffuseLighting(filter);
+    m_filterEffect = SVGFEDiffuseLighting::create(filter);
 
   m_filterEffect->setIn(in1());
   m_filterEffect->setDiffuseConstant(diffuseConstant());
@@ -130,13 +128,13 @@ SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect(
   RenderStyle* filterStyle = nonConstThis->resolveStyle(parentStyle);
 
   m_filterEffect->setLightingColor(filterStyle->svgStyle()->lightingColor());
-  setStandardAttributes(m_filterEffect);
+  setStandardAttributes(m_filterEffect.get());
 
   parentStyle->deref(document()->renderArena());
   filterStyle->deref(document()->renderArena());
 
   updateLights();
-  return m_filterEffect;
+  return m_filterEffect.get();
 }
 
 void SVGFEDiffuseLightingElement::updateLights() const {

@@ -67,7 +67,7 @@ class SVGFEDisplacementMapElement
                                  Scale,
                                  scale)
 
-  mutable SVGFEDisplacementMap* m_filterEffect;
+  mutable RefPtr<SVGFEDisplacementMap> m_filterEffect;
 };
 
 }  // namespace WebCore

@@ -41,9 +41,7 @@ SVGFEComponentTransferElement::SVGFEComponentTransferElement(
     Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc), m_filterEffect(0) {}
 
-SVGFEComponentTransferElement::~SVGFEComponentTransferElement() {
-  delete m_filterEffect;
-}
+SVGFEComponentTransferElement::~SVGFEComponentTransferElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEComponentTransferElement,
                               String,
@@ -66,10 +64,10 @@ void SVGFEComponentTransferElement::parseMappedAttribute(
 SVGFEComponentTransfer* SVGFEComponentTransferElement::filterEffect(
     SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEComponentTransfer(filter);
+    m_filterEffect = SVGFEComponentTransfer::create(filter);
 
   m_filterEffect->setIn(in1());
-  setStandardAttributes(m_filterEffect);
+  setStandardAttributes(m_filterEffect.get());
 
   for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feFuncRTag))
@@ -86,7 +84,7 @@ SVGFEComponentTransfer* SVGFEComponentTransferElement::filterEffect(
           static_cast<SVGFEFuncAElement*>(n)->transferFunction());
   }
 
-  return m_filterEffect;
+  return m_filterEffect.get();
 }
 }
 

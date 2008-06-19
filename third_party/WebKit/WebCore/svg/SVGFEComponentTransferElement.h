@@ -48,7 +48,7 @@ class SVGFEComponentTransferElement
                                  In1,
                                  in1)
 
-  mutable SVGFEComponentTransfer* m_filterEffect;
+  mutable RefPtr<SVGFEComponentTransfer> m_filterEffect;
 };
 
 }  // namespace WebCore

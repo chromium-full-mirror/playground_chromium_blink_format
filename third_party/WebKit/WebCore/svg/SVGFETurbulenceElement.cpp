@@ -41,9 +41,7 @@ SVGFETurbulenceElement::SVGFETurbulenceElement(const QualifiedName& tagName,
       m_type(SVG_TURBULENCE_TYPE_TURBULENCE),
       m_filterEffect(0) {}
 
-SVGFETurbulenceElement::~SVGFETurbulenceElement() {
-  delete m_filterEffect;
-}
+SVGFETurbulenceElement::~SVGFETurbulenceElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFETurbulenceElement,
@@ -127,7 +125,7 @@ void SVGFETurbulenceElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFETurbulence* SVGFETurbulenceElement::filterEffect(
     SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFETurbulence(filter);
+    m_filterEffect = SVGFETurbulence::create(filter);
 
   m_filterEffect->setType((SVGTurbulanceType)type());
   m_filterEffect->setBaseFrequencyX(baseFrequencyX());
@@ -136,8 +134,8 @@ SVGFETurbulence* SVGFETurbulenceElement::filterEffect(
   m_filterEffect->setSeed(seed());
   m_filterEffect->setStitchTiles(stitchTiles() == SVG_STITCHTYPE_STITCH);
 
-  setStandardAttributes(m_filterEffect);
-  return m_filterEffect;
+  setStandardAttributes(m_filterEffect.get());
+  return m_filterEffect.get();
 }
 }
 

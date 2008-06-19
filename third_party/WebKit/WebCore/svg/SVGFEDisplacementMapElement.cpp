@@ -35,9 +35,7 @@ SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
       m_scale(0.0f),
       m_filterEffect(0) {}
 
-SVGFEDisplacementMapElement::~SVGFEDisplacementMapElement() {
-  delete m_filterEffect;
-}
+SVGFEDisplacementMapElement::~SVGFEDisplacementMapElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDisplacementMapElement,
                               String,
@@ -113,7 +111,7 @@ void SVGFEDisplacementMapElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect(
     SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEDisplacementMap(filter);
+    m_filterEffect = SVGFEDisplacementMap::create(filter);
 
   m_filterEffect->setXChannelSelector(
       (SVGChannelSelectorType)xChannelSelector());
@@ -123,8 +121,8 @@ SVGFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect(
   m_filterEffect->setIn2(in2());
   m_filterEffect->setScale(scale());
 
-  setStandardAttributes(m_filterEffect);
-  return m_filterEffect;
+  setStandardAttributes(m_filterEffect.get());
+  return m_filterEffect.get();
 }
 }
 

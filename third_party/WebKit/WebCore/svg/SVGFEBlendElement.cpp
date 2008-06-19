@@ -35,9 +35,7 @@ SVGFEBlendElement::SVGFEBlendElement(const QualifiedName& tagName,
       m_mode(SVG_FEBLEND_MODE_NORMAL),
       m_filterEffect(0) {}
 
-SVGFEBlendElement::~SVGFEBlendElement() {
-  delete m_filterEffect;
-}
+SVGFEBlendElement::~SVGFEBlendElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               String,
@@ -87,13 +85,13 @@ void SVGFEBlendElement::parseMappedAttribute(MappedAttribute* attr) {
 
 SVGFEBlend* SVGFEBlendElement::filterEffect(SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEBlend(filter);
+    m_filterEffect = SVGFEBlend::create(filter);
 
   m_filterEffect->setBlendMode((SVGBlendModeType)mode());
   m_filterEffect->setIn(in1());
   m_filterEffect->setIn2(in2());
-  setStandardAttributes(m_filterEffect);
-  return m_filterEffect;
+  setStandardAttributes(m_filterEffect.get());
+  return m_filterEffect.get();
 }
 }
 

@@ -73,7 +73,7 @@ class SVGFESpecularLightingElement
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
 
-  mutable SVGFESpecularLighting* m_filterEffect;
+  mutable RefPtr<SVGFESpecularLighting> m_filterEffect;
 
   void updateLights() const;
 };

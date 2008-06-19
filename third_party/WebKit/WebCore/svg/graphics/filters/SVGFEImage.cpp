@@ -32,6 +32,10 @@ namespace WebCore {
 SVGFEImage::SVGFEImage(SVGResourceFilter* filter)
     : SVGFilterEffect(filter), m_cachedImage(0) {}
 
+PassRefPtr<SVGFEImage> SVGFEImage::create(SVGResourceFilter* filter) {
+  return adoptRef(new SVGFEImage(filter));
+}
+
 SVGFEImage::~SVGFEImage() {
   if (m_cachedImage)
     m_cachedImage->removeClient(this);

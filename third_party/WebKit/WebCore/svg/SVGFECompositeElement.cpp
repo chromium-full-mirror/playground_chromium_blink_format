@@ -40,9 +40,7 @@ SVGFECompositeElement::SVGFECompositeElement(const QualifiedName& tagName,
       m_k4(0.0f),
       m_filterEffect(0) {}
 
-SVGFECompositeElement::~SVGFECompositeElement() {
-  delete m_filterEffect;
-}
+SVGFECompositeElement::~SVGFECompositeElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               String,
@@ -135,7 +133,7 @@ void SVGFECompositeElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFEComposite* SVGFECompositeElement::filterEffect(
     SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEComposite(filter);
+    m_filterEffect = SVGFEComposite::create(filter);
 
   m_filterEffect->setOperation((SVGCompositeOperationType)_operator());
   m_filterEffect->setIn(in1());
@@ -145,8 +143,8 @@ SVGFEComposite* SVGFECompositeElement::filterEffect(
   m_filterEffect->setK3(k3());
   m_filterEffect->setK4(k4());
 
-  setStandardAttributes(m_filterEffect);
-  return m_filterEffect;
+  setStandardAttributes(m_filterEffect.get());
+  return m_filterEffect.get();
 }
 }
 

@@ -34,9 +34,7 @@ namespace WebCore {
 SVGFETileElement::SVGFETileElement(const QualifiedName& tagName, Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc), m_filterEffect(0) {}
 
-SVGFETileElement::~SVGFETileElement() {
-  delete m_filterEffect;
-}
+SVGFETileElement::~SVGFETileElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETileElement,
                               String,
@@ -57,12 +55,12 @@ void SVGFETileElement::parseMappedAttribute(MappedAttribute* attr) {
 
 SVGFETile* SVGFETileElement::filterEffect(SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFETile(filter);
+    m_filterEffect = SVGFETile::create(filter);
 
   m_filterEffect->setIn(in1());
 
-  setStandardAttributes(m_filterEffect);
-  return m_filterEffect;
+  setStandardAttributes(m_filterEffect.get());
+  return m_filterEffect.get();
 }
 }
 

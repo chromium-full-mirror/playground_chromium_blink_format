@@ -37,9 +37,7 @@ SVGFEFloodElement::SVGFEFloodElement(const QualifiedName& tagName,
                                      Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc), m_filterEffect(0) {}
 
-SVGFEFloodElement::~SVGFEFloodElement() {
-  delete m_filterEffect;
-}
+SVGFEFloodElement::~SVGFEFloodElement() {}
 
 void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
   SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
@@ -47,9 +45,9 @@ void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
 
 SVGFEFlood* SVGFEFloodElement::filterEffect(SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEFlood(filter);
+    m_filterEffect = SVGFEFlood::create(filter);
 
-  setStandardAttributes(m_filterEffect);
+  setStandardAttributes(m_filterEffect.get());
 
   SVGFEFloodElement* nonConstThis = const_cast<SVGFEFloodElement*>(this);
 
@@ -63,7 +61,7 @@ SVGFEFlood* SVGFEFloodElement::filterEffect(SVGResourceFilter* filter) const {
   parentStyle->deref(document()->renderArena());
   filterStyle->deref(document()->renderArena());
 
-  return m_filterEffect;
+  return m_filterEffect.get();
 }
 }
 

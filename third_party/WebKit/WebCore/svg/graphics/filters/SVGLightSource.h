@@ -23,6 +23,7 @@
 #define SVGLightSource_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#include <wtf/RefCounted.h>
 
 namespace WebCore {
 
@@ -30,7 +31,7 @@ enum SVGLightType { LS_DISTANT, LS_POINT, LS_SPOT };
 
 class TextStream;
 
-class SVGLightSource {
+class SVGLightSource : public RefCounted<SVGLightSource> {
  public:
   SVGLightSource(SVGLightType type) : m_type(type) {}
 

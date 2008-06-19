@@ -33,6 +33,11 @@ SVGFEDisplacementMap::SVGFEDisplacementMap(SVGResourceFilter* filter)
       m_yChannelSelector(SVG_CHANNEL_UNKNOWN),
       m_scale(0) {}
 
+PassRefPtr<SVGFEDisplacementMap> SVGFEDisplacementMap::create(
+    SVGResourceFilter* filter) {
+  return adoptRef(new SVGFEDisplacementMap(filter));
+}
+
 String SVGFEDisplacementMap::in2() const {
   return m_in2;
 }

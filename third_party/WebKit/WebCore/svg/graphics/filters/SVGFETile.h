@@ -29,11 +29,13 @@ namespace WebCore {
 
 class SVGFETile : public SVGFilterEffect {
  public:
-  SVGFETile(SVGResourceFilter* filter) : SVGFilterEffect(filter) {}
+  static PassRefPtr<SVGFETile> create(SVGResourceFilter*);
 
 #if PLATFORM(CI)
   virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
 #endif
+ private:
+  SVGFETile(SVGResourceFilter*);
 };
 
 }  // namespace WebCore

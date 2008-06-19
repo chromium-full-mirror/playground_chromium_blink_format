@@ -30,6 +30,10 @@ namespace WebCore {
 SVGFEFlood::SVGFEFlood(SVGResourceFilter* filter)
     : SVGFilterEffect(filter), m_floodColor(), m_floodOpacity(0.0f) {}
 
+PassRefPtr<SVGFEFlood> SVGFEFlood::create(SVGResourceFilter* filter) {
+  return adoptRef(new SVGFEFlood(filter));
+}
+
 Color SVGFEFlood::floodColor() const {
   return m_floodColor;
 }

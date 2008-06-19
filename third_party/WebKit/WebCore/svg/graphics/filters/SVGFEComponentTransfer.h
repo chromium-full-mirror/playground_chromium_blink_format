@@ -71,7 +71,7 @@ struct SVGComponentTransferFunction {
 
 class SVGFEComponentTransfer : public SVGFilterEffect {
  public:
-  SVGFEComponentTransfer(SVGResourceFilter*);
+  static PassRefPtr<SVGFEComponentTransfer> create(SVGResourceFilter*);
 
   SVGComponentTransferFunction redFunction() const;
   void setRedFunction(const SVGComponentTransferFunction&);
@@ -96,6 +96,8 @@ class SVGFEComponentTransfer : public SVGFilterEffect {
 #endif
 
  private:
+  SVGFEComponentTransfer(SVGResourceFilter*);
+
   SVGComponentTransferFunction m_redFunc;
   SVGComponentTransferFunction m_greenFunc;
   SVGComponentTransferFunction m_blueFunc;

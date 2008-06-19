@@ -47,7 +47,6 @@ SVGFEImageElement::SVGFEImageElement(const QualifiedName& tagName,
       m_filterEffect(0) {}
 
 SVGFEImageElement::~SVGFEImageElement() {
-  delete m_filterEffect;
   if (m_cachedImage)
     m_cachedImage->removeClient(this);
 }
@@ -96,14 +95,14 @@ void SVGFEImageElement::notifyFinished(CachedResource* finishedObj) {
 
 SVGFEImage* SVGFEImageElement::filterEffect(SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEImage(filter);
+    m_filterEffect = SVGFEImage::create(filter);
 
   // The resource may already be loaded!
   if (m_cachedImage)
     m_filterEffect->setCachedImage(m_cachedImage);
 
-  setStandardAttributes(m_filterEffect);
-  return m_filterEffect;
+  setStandardAttributes(m_filterEffect.get());
+  return m_filterEffect.get();
 }
 
 void SVGFEImageElement::getSubresourceAttributeStrings(

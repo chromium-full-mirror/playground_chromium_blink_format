@@ -36,6 +36,10 @@ SVGFETurbulence::SVGFETurbulence(SVGResourceFilter* filter)
       m_stitchTiles(false),
       m_type(SVG_TURBULENCE_TYPE_UNKNOWN) {}
 
+PassRefPtr<SVGFETurbulence> SVGFETurbulence::create(SVGResourceFilter* filter) {
+  return adoptRef(new SVGFETurbulence(filter));
+}
+
 SVGTurbulanceType SVGFETurbulence::type() const {
   return m_type;
 }

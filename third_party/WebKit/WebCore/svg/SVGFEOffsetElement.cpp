@@ -37,9 +37,7 @@ SVGFEOffsetElement::SVGFEOffsetElement(const QualifiedName& tagName,
       m_dy(0.0f),
       m_filterEffect(0) {}
 
-SVGFEOffsetElement::~SVGFEOffsetElement() {
-  delete m_filterEffect;
-}
+SVGFEOffsetElement::~SVGFEOffsetElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               String,
@@ -80,14 +78,14 @@ void SVGFEOffsetElement::parseMappedAttribute(MappedAttribute* attr) {
 
 SVGFEOffset* SVGFEOffsetElement::filterEffect(SVGResourceFilter* filter) const {
   if (!m_filterEffect)
-    m_filterEffect = new SVGFEOffset(filter);
+    m_filterEffect = SVGFEOffset::create(filter);
 
   m_filterEffect->setIn(in1());
   m_filterEffect->setDx(dx());
   m_filterEffect->setDy(dy());
 
-  setStandardAttributes(m_filterEffect);
-  return m_filterEffect;
+  setStandardAttributes(m_filterEffect.get());
+  return m_filterEffect.get();
 }
 }
 

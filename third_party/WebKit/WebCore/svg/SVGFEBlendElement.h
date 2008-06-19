@@ -44,7 +44,7 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement, String, String, In2, in2)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement, int, int, Mode, mode)
 
-  mutable SVGFEBlend* m_filterEffect;
+  mutable RefPtr<SVGFEBlend> m_filterEffect;
 };
 
 }  // namespace WebCore

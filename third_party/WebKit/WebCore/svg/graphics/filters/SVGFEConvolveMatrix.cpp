@@ -37,6 +37,11 @@ SVGFEConvolveMatrix::SVGFEConvolveMatrix(SVGResourceFilter* filter)
       m_kernelUnitLength(),
       m_preserveAlpha(false) {}
 
+PassRefPtr<SVGFEConvolveMatrix> SVGFEConvolveMatrix::create(
+    SVGResourceFilter* filter) {
+  return adoptRef(new SVGFEConvolveMatrix(filter));
+}
+
 FloatSize SVGFEConvolveMatrix::kernelSize() const {
   return m_kernelSize;
 }

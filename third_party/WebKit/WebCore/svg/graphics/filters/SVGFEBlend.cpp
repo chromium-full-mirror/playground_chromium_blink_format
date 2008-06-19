@@ -30,6 +30,10 @@ namespace WebCore {
 SVGFEBlend::SVGFEBlend(SVGResourceFilter* filter)
     : SVGFilterEffect(filter), m_mode(SVG_FEBLEND_MODE_UNKNOWN) {}
 
+PassRefPtr<SVGFEBlend> SVGFEBlend::create(SVGResourceFilter* filter) {
+  return adoptRef(new SVGFEBlend(filter));
+}
+
 String SVGFEBlend::in2() const {
   return m_in2;
 }

@@ -73,7 +73,7 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
                                  stitchTiles)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement, int, int, Type, type)
 
-  mutable SVGFETurbulence* m_filterEffect;
+  mutable RefPtr<SVGFETurbulence> m_filterEffect;
 };
 
 }  // namespace WebCore

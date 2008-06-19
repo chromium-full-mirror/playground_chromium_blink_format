@@ -68,7 +68,7 @@ class SVGFEDiffuseLightingElement
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
 
-  mutable SVGFEDiffuseLighting* m_filterEffect;
+  mutable RefPtr<SVGFEDiffuseLighting> m_filterEffect;
 
   void updateLights() const;
 };

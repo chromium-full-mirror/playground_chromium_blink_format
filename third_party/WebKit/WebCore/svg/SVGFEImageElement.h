@@ -67,7 +67,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                  preserveAspectRatio)
 
   CachedImage* m_cachedImage;
-  mutable SVGFEImage* m_filterEffect;
+  mutable RefPtr<SVGFEImage> m_filterEffect;
 };
 
 }  // namespace WebCore

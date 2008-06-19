@@ -29,6 +29,11 @@ namespace WebCore {
 SVGFEColorMatrix::SVGFEColorMatrix(SVGResourceFilter* filter)
     : SVGFilterEffect(filter), m_type(SVG_FECOLORMATRIX_TYPE_UNKNOWN) {}
 
+PassRefPtr<SVGFEColorMatrix> SVGFEColorMatrix::create(
+    SVGResourceFilter* filter) {
+  return adoptRef(new SVGFEColorMatrix(filter));
+}
+
 SVGColorMatrixType SVGFEColorMatrix::type() const {
   return m_type;
 }

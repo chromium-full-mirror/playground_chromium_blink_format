@@ -30,6 +30,10 @@ namespace WebCore {
 SVGFEOffset::SVGFEOffset(SVGResourceFilter* filter)
     : SVGFilterEffect(filter), m_dx(0.0f), m_dy(0.0f) {}
 
+PassRefPtr<SVGFEOffset> SVGFEOffset::create(SVGResourceFilter* filter) {
+  return adoptRef(new SVGFEOffset(filter));
+}
+
 float SVGFEOffset::dx() const {
   return m_dx;
 }

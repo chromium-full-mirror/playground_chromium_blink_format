@@ -61,7 +61,7 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, float, float, K3, k3)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement, float, float, K4, k4)
 
-  mutable SVGFEComposite* m_filterEffect;
+  mutable RefPtr<SVGFEComposite> m_filterEffect;
 };
 
 }  // namespace WebCore

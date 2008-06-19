@@ -59,7 +59,7 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
                                  StdDeviationY,
                                  stdDeviationY)
 
-  mutable SVGFEGaussianBlur* m_filterEffect;
+  mutable RefPtr<SVGFEGaussianBlur> m_filterEffect;
 };
 
 }  // namespace WebCore
