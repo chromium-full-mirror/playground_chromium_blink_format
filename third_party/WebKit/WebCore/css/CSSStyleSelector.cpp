@@ -32,6 +32,7 @@
 #include "CSSFontFaceSource.h"
 #include "CSSImportRule.h"
 #include "CSSMediaRule.h"
+#include "CSSParser.h"
 #include "CSSPrimitiveValueMappings.h"
 #include "CSSProperty.h"
 #include "CSSPropertyNames.h"
@@ -43,6 +44,9 @@
 #include "CSSTimingFunctionValue.h"
 #include "CSSTransformValue.h"
 #include "CSSValueList.h"
+#include "CSSVariableDependentValue.h"
+#include "CSSVariablesDeclaration.h"
+#include "CSSVariablesRule.h"
 #include "CachedImage.h"
 #include "Counter.h"
 #include "FontFamilyValue.h"
@@ -446,6 +450,84 @@ static void loadDefaultStyle() {
       parseUASheet(sourceUserAgentStyleSheet,
                    sizeof(sourceUserAgentStyleSheet)),
       screenEval());
+}
+
+void CSSStyleSelector::addMatchedDeclaration(CSSMutableStyleDeclaration* decl) {
+  if (!decl->hasVariableDependentValue()) {
+    m_matchedDecls.append(decl);
+    return;
+  }
+
+  // See if we have already resolved the variables in this declaration.
+  RefPtr<CSSMutableStyleDeclaration> resolvedDecl =
+      m_resolvedVariablesDeclarations.get(decl);
+  if (resolvedDecl) {
+    m_matchedDecls.append(resolvedDecl.get());
+    return;
+  }
+
+  // If this declaration has any variables in it, then we need to make a cloned
+  // declaration with as many variables resolved as possible for this style
+  // selector's media.
+  RefPtr<CSSMutableStyleDeclaration> newDecl =
+      CSSMutableStyleDeclaration::create(decl->parentRule());
+  *newDecl = *decl;
+  m_matchedDecls.append(newDecl.get());
+  m_resolvedVariablesDeclarations.set(decl, newDecl);
+
+  // Now iterate over the properties in the original declaration.  As we resolve
+  // variables we'll end up
+  // mutating the new declaration (possibly expanding shorthands).  The new
+  // declaration has no m_node
+  // though, so it can't mistakenly call setChanged on anything.
+  DeprecatedValueListConstIterator<CSSProperty> end;
+  for (DeprecatedValueListConstIterator<CSSProperty> it =
+           decl->valuesIterator();
+       it != end; ++it) {
+    const CSSProperty& current = *it;
+    if (!current.value()->isVariableDependentValue())
+      continue;
+    CSSValueList* valueList =
+        static_cast<CSSVariableDependentValue*>(current.value())->valueList();
+    if (!valueList)
+      continue;
+    CSSParserValueList resolvedValueList;
+    unsigned s = valueList->length();
+    bool fullyResolved = true;
+    for (unsigned i = 0; i < s; ++i) {
+      CSSValue* val = valueList->item(i);
+      CSSPrimitiveValue* primitiveValue =
+          val->isPrimitiveValue() ? static_cast<CSSPrimitiveValue*>(val) : 0;
+      if (primitiveValue &&
+          primitiveValue->primitiveType() ==
+              CSSPrimitiveValue::CSS_PARSER_VARIABLE) {
+        CSSVariablesRule* rule =
+            m_variablesMap.get(primitiveValue->getStringValue());
+        if (!rule || !rule->variables()) {
+          fullyResolved = false;
+          break;
+        }
+        CSSValue* resolvedVariable = rule->variables()->getParsedVariable(
+            primitiveValue->getStringValue());
+        if (!resolvedVariable) {
+          fullyResolved = false;
+          break;
+        }
+        resolvedValueList.addValue(resolvedVariable->parserValue());
+      } else
+        resolvedValueList.addValue(val->parserValue());
+    }
+
+    if (!fullyResolved)
+      continue;
+
+    // We now have a fully resolved new value list.  We want the parser to use
+    // this value list
+    // and parse our new declaration.
+    CSSParser(m_checker.m_strictParsing)
+        .parsePropertyWithResolvedVariables(current.id(), current.isImportant(),
+                                            newDecl.get(), &resolvedValueList);
+  }
 }
 
 void CSSStyleSelector::matchRules(CSSRuleSet* rules,
@@ -2312,6 +2394,22 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
   return true;
 }
 
+void CSSStyleSelector::addVariables(CSSVariablesRule* variables) {
+  CSSVariablesDeclaration* decl = variables->variables();
+  if (!decl)
+    return;
+  unsigned size = decl->length();
+  for (unsigned i = 0; i < size; ++i) {
+    String name = decl->item(i);
+    m_variablesMap.set(name, variables);
+  }
+}
+
+CSSValue* CSSStyleSelector::resolveVariableDependentValue(
+    CSSVariableDependentValue* val) {
+  return 0;
+}
+
 // -----------------------------------------------------------------
 
 CSSRuleSet::CSSRuleSet() {
@@ -2412,6 +2510,11 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
       // Add this font face to our set.
       const CSSFontFaceRule* fontFaceRule = static_cast<CSSFontFaceRule*>(item);
       styleSelector->fontSelector()->addFontFaceRule(fontFaceRule);
+    } else if (item->isVariablesRule()) {
+      // Evaluate the media query and make sure it matches.
+      CSSVariablesRule* variables = static_cast<CSSVariablesRule*>(item);
+      if (!variables->media() || medium.eval(variables->media(), styleSelector))
+        styleSelector->addVariables(variables);
     }
   }
 }
@@ -2448,6 +2551,7 @@ void CSSStyleSelector::applyDeclarations(bool applyFirst,
                                          int endIndex) {
   if (startIndex == -1)
     return;
+
   for (int i = startIndex; i <= endIndex; i++) {
     CSSMutableStyleDeclaration* decl = m_matchedDecls[i];
     DeprecatedValueListConstIterator<CSSProperty> end;

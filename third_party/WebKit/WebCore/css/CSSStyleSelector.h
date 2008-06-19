@@ -47,6 +47,8 @@ class CSSSelector;
 class CSSStyleRule;
 class CSSStyleSheet;
 class CSSValue;
+class CSSVariableDependentValue;
+class CSSVariablesRule;
 class Document;
 class Element;
 class Frame;
@@ -151,6 +153,9 @@ class CSSStyleSelector : Noncopyable {
     m_checker.visitedStateChanged(visitedHash);
   }
 
+  void addVariables(CSSVariablesRule* variables);
+  CSSValue* resolveVariableDependentValue(CSSVariableDependentValue*);
+
  private:
   enum SelectorMatch {
     SelectorMatches,
@@ -167,9 +172,7 @@ class CSSStyleSelector : Noncopyable {
   void adjustRenderStyle(RenderStyle*, Element*);
 
   void addMatchedRule(CSSRuleData* rule) { m_matchedRules.append(rule); }
-  void addMatchedDeclaration(CSSMutableStyleDeclaration* decl) {
-    m_matchedDecls.append(decl);
-  }
+  void addMatchedDeclaration(CSSMutableStyleDeclaration* decl);
 
   void matchRules(CSSRuleSet*, int& firstRuleIndex, int& lastRuleIndex);
   void matchRulesForList(CSSRuleDataList*,
@@ -299,6 +302,10 @@ class CSSStyleSelector : Noncopyable {
   HashSet<AtomicStringImpl*> m_selectorAttrs;
   Vector<CSSMutableStyleDeclaration*> m_additionalAttributeStyleDecls;
   Vector<MediaQueryResult*> m_viewportDependentMediaQueryResults;
+
+  HashMap<String, CSSVariablesRule*> m_variablesMap;
+  HashMap<CSSMutableStyleDeclaration*, RefPtr<CSSMutableStyleDeclaration>>
+      m_resolvedVariablesDeclarations;
 };
 
 class CSSRuleData {

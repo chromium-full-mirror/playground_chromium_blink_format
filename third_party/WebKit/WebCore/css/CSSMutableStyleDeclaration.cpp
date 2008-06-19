@@ -35,15 +35,22 @@ using namespace std;
 
 namespace WebCore {
 
-CSSMutableStyleDeclaration::CSSMutableStyleDeclaration() : m_node(0) {}
+CSSMutableStyleDeclaration::CSSMutableStyleDeclaration()
+    : m_node(0), m_variableDependentValueCount(0) {}
 
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(CSSRule* parent)
-    : CSSStyleDeclaration(parent), m_node(0) {}
+    : CSSStyleDeclaration(parent),
+      m_node(0),
+      m_variableDependentValueCount(0) {}
 
 CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     CSSRule* parent,
-    const DeprecatedValueList<CSSProperty>& values)
-    : CSSStyleDeclaration(parent), m_values(values), m_node(0) {
+    const DeprecatedValueList<CSSProperty>& values,
+    unsigned variableDependentValueCount)
+    : CSSStyleDeclaration(parent),
+      m_values(values),
+      m_node(0),
+      m_variableDependentValueCount(variableDependentValueCount) {
   // FIXME: This allows duplicate properties.
 }
 
@@ -51,10 +58,12 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
     CSSRule* parent,
     const CSSProperty* const* properties,
     int numProperties)
-    : CSSStyleDeclaration(parent), m_node(0) {
+    : CSSStyleDeclaration(parent), m_node(0), m_variableDependentValueCount(0) {
   for (int i = 0; i < numProperties; ++i) {
     ASSERT(properties[i]);
     m_values.append(*properties[i]);
+    if (properties[i]->value()->isVariableDependentValue())
+      m_variableDependentValueCount++;
   }
   // FIXME: This allows duplicate properties.
 }
@@ -841,7 +850,8 @@ CSSMutableStyleDeclaration::makeMutable() {
 
 PassRefPtr<CSSMutableStyleDeclaration> CSSMutableStyleDeclaration::copy()
     const {
-  return adoptRef(new CSSMutableStyleDeclaration(0, m_values));
+  return adoptRef(new CSSMutableStyleDeclaration(
+      0, m_values, m_variableDependentValueCount));
 }
 
 }  // namespace WebCore

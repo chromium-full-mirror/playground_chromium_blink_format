@@ -22,12 +22,24 @@
 #include "config.h"
 #include "CSSValueList.h"
 
+#include "CSSParserValues.h"
 #include "PlatformString.h"
 
 namespace WebCore {
 
 CSSValueList::CSSValueList(bool isSpaceSeparated)
     : m_isSpaceSeparated(isSpaceSeparated) {}
+
+CSSValueList::CSSValueList(CSSParserValueList* list)
+    : m_isSpaceSeparated(true) {
+  if (list) {
+    unsigned s = list->size();
+    for (unsigned i = 0; i < s; ++i) {
+      CSSParserValue* v = list->valueAt(i);
+      append(v->createCSSValue());
+    }
+  }
+}
 
 CSSValueList::~CSSValueList() {}
 
@@ -63,6 +75,16 @@ String CSSValueList::cssText() const {
     result += m_values[i]->cssText();
   }
 
+  return result;
+}
+
+CSSParserValueList* CSSValueList::createParserValueList() const {
+  unsigned s = m_values.size();
+  if (!s)
+    return 0;
+  CSSParserValueList* result = new CSSParserValueList;
+  for (unsigned i = 0; i < s; ++i)
+    result->addValue(m_values[i]->parserValue());
   return result;
 }
 

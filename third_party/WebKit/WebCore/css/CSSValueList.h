@@ -27,6 +27,8 @@
 
 namespace WebCore {
 
+class CSSParserValueList;
+
 class CSSValueList : public CSSValue {
  public:
   static PassRefPtr<CSSValueList> createCommaSeparated() {
@@ -34,6 +36,10 @@ class CSSValueList : public CSSValue {
   }
   static PassRefPtr<CSSValueList> createSpaceSeparated() {
     return adoptRef(new CSSValueList(true));
+  }
+  static PassRefPtr<CSSValueList> createFromParserValueList(
+      CSSParserValueList* list) {
+    return adoptRef(new CSSValueList(list));
   }
 
   virtual ~CSSValueList();
@@ -49,8 +55,11 @@ class CSSValueList : public CSSValue {
 
   virtual String cssText() const;
 
+  CSSParserValueList* createParserValueList() const;
+
  private:
   CSSValueList(bool isSpaceSeparated);
+  CSSValueList(CSSParserValueList*);
 
   virtual bool isValueList() { return true; }
 

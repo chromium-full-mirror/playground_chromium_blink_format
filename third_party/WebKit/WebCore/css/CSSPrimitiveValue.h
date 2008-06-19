@@ -70,7 +70,13 @@ class CSSPrimitiveValue : public CSSValue {
                      // background-position, etc.)
     CSS_DASHBOARD_REGION =
         101,  // FIXME: Dashboard region should not be a primitive value.
-    CSS_UNICODE_RANGE = 102
+    CSS_UNICODE_RANGE = 102,
+
+    // These next types are just used internally to allow us to translate back
+    // and forth from CSSPrimitiveValues to CSSParserValues.
+    CSS_PARSER_OPERATOR = 103,
+    CSS_PARSER_INTEGER = 104,
+    CSS_PARSER_VARIABLE = 105
   };
 
   static PassRefPtr<CSSPrimitiveValue> createIdentifier(int ident) {
@@ -122,6 +128,9 @@ class CSSPrimitiveValue : public CSSValue {
   double computeLengthDouble(RenderStyle*,
                              double multiplier = 1.0,
                              bool computingFontSize = false);
+
+  // use with care!!!
+  void setPrimitiveType(unsigned short type) { m_type = type; }
 
   double getDoubleValue(unsigned short unitType, ExceptionCode&);
   double getDoubleValue(unsigned short unitType);
@@ -180,6 +189,8 @@ class CSSPrimitiveValue : public CSSValue {
   virtual String cssText() const;
 
   virtual bool isQuirkValue() { return false; }
+
+  virtual CSSParserValue parserValue() const;
 
  protected:
   // FIXME: int vs. unsigned overloading is too subtle to distinguish the color
