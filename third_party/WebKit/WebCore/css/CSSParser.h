@@ -194,7 +194,7 @@ class CSSParser {
   MediaQuery* createFloatingMediaQuery(Vector<MediaQueryExp*>*);
   MediaQuery* sinkFloatingMediaQuery(MediaQuery*);
 
-  bool addVariable(const CSSParserString&, CSSParserValue&);
+  bool addVariable(const CSSParserString&, CSSParserValueList*);
   bool checkForVariables(CSSParserValueList*);
   void addUnresolvedProperty(int propId, bool important);
 
@@ -215,7 +215,7 @@ class CSSParser {
   bool m_implicitShorthand;
 
   Vector<String> m_variableNames;
-  Vector<RefPtr<CSSValue>> m_variableValues;
+  Vector<RefPtr<CSSValueList>> m_variableValues;
 
   AtomicString m_defaultNamespace;
 

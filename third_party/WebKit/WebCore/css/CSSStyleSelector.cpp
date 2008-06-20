@@ -507,13 +507,15 @@ void CSSStyleSelector::addMatchedDeclaration(CSSMutableStyleDeclaration* decl) {
           fullyResolved = false;
           break;
         }
-        CSSValue* resolvedVariable = rule->variables()->getParsedVariable(
+        CSSValueList* resolvedVariable = rule->variables()->getParsedVariable(
             primitiveValue->getStringValue());
         if (!resolvedVariable) {
           fullyResolved = false;
           break;
         }
-        resolvedValueList.addValue(resolvedVariable->parserValue());
+        unsigned valueSize = resolvedVariable->length();
+        for (unsigned j = 0; j < valueSize; ++j)
+          resolvedValueList.addValue(resolvedVariable->item(j)->parserValue());
       } else
         resolvedValueList.addValue(val->parserValue());
     }

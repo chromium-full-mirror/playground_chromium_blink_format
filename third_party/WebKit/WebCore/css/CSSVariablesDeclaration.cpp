@@ -28,7 +28,7 @@
 
 #include "CSSParser.h"
 #include "CSSRule.h"
-#include "CSSValue.h"
+#include "CSSValueList.h"
 #include "ExceptionCode.h"
 
 namespace WebCore {
@@ -36,7 +36,7 @@ namespace WebCore {
 CSSVariablesDeclaration::CSSVariablesDeclaration(
     StyleBase* parent,
     const Vector<String>& names,
-    const Vector<RefPtr<CSSValue>>& values)
+    const Vector<RefPtr<CSSValueList>>& values)
     : StyleBase(parent) {
   m_variableNames = names;
   ASSERT(names.size() == values.size());
@@ -48,7 +48,7 @@ CSSVariablesDeclaration::CSSVariablesDeclaration(
 CSSVariablesDeclaration::~CSSVariablesDeclaration() {}
 
 String CSSVariablesDeclaration::getVariableValue(const String& variableName) {
-  CSSValue* val = getParsedVariable(variableName);
+  CSSValueList* val = getParsedVariable(variableName);
   if (val)
     return val->cssText();
   return "";
@@ -92,12 +92,12 @@ void CSSVariablesDeclaration::setVariable(const String& variableName,
 
 void CSSVariablesDeclaration::addParsedVariable(
     const String& variableName,
-    PassRefPtr<CSSValue> variableValue,
+    PassRefPtr<CSSValueList> variableValue,
     bool updateNamesList) {
   // Don't leak duplicates.  For multiple variables with the same name, the last
   // one
   // declared will win.
-  CSSValue* current = m_variablesMap.take(variableName).get();
+  CSSValueList* current = m_variablesMap.take(variableName).get();
   if (!current && updateNamesList)
     m_variableNames.append(variableName);
   m_variablesMap.set(variableName, variableValue);
@@ -105,7 +105,7 @@ void CSSVariablesDeclaration::addParsedVariable(
   // FIXME: Communicate this change so the document will update.
 }
 
-CSSValue* CSSVariablesDeclaration::getParsedVariable(
+CSSValueList* CSSVariablesDeclaration::getParsedVariable(
     const String& variableName) {
   return m_variablesMap.get(variableName).get();
 }

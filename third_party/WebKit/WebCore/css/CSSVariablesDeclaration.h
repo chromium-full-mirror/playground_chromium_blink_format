@@ -38,14 +38,14 @@ namespace WebCore {
 typedef int ExceptionCode;
 
 class CSSRule;
-class CSSValue;
+class CSSValueList;
 
 class CSSVariablesDeclaration : public StyleBase {
  public:
   static PassRefPtr<CSSVariablesDeclaration> create(
       StyleBase* owningRule,
       const Vector<String>& names,
-      const Vector<RefPtr<CSSValue>>& values) {
+      const Vector<RefPtr<CSSValueList>>& values) {
     return adoptRef(new CSSVariablesDeclaration(owningRule, names, values));
   }
   virtual ~CSSVariablesDeclaration();
@@ -63,18 +63,18 @@ class CSSVariablesDeclaration : public StyleBase {
                            // whether or not cssText is settable.
 
   void addParsedVariable(const String& variableName,
-                         PassRefPtr<CSSValue> variableValue,
+                         PassRefPtr<CSSValueList> variableValue,
                          bool updateNamesList = true);
-  CSSValue* getParsedVariable(const String& variableName);
+  CSSValueList* getParsedVariable(const String& variableName);
 
  private:
   CSSVariablesDeclaration(StyleBase* owningRule,
                           const Vector<String>& names,
-                          const Vector<RefPtr<CSSValue>>& values);
+                          const Vector<RefPtr<CSSValueList>>& values);
 
  protected:
   Vector<String> m_variableNames;
-  HashMap<String, RefPtr<CSSValue>> m_variablesMap;
+  HashMap<String, RefPtr<CSSValueList>> m_variablesMap;
 };
 
 }  // namespace WebCore
