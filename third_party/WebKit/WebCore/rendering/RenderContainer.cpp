@@ -108,10 +108,10 @@ void RenderContainer::addChild(RenderObject* newChild,
 
   if (needsTable) {
     RenderTable* table;
-    if (!beforeChild)
-      beforeChild = m_lastChild;
-    if (beforeChild && beforeChild->isAnonymous() && beforeChild->isTable())
-      table = static_cast<RenderTable*>(beforeChild);
+    RenderObject* afterChild =
+        beforeChild ? beforeChild->previousSibling() : m_lastChild;
+    if (afterChild && afterChild->isAnonymous() && afterChild->isTable())
+      table = static_cast<RenderTable*>(afterChild);
     else {
       table = new (renderArena()) RenderTable(document() /* is anonymous */);
       RenderStyle* newStyle = new (renderArena()) RenderStyle;
