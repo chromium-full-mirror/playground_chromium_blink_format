@@ -211,8 +211,8 @@ bool RenderTableCell::absolutePosition(int& xPos, int& yPos, bool fixed) const {
   return result;
 }
 
-short RenderTableCell::baselinePosition(bool /*firstLine*/,
-                                        bool /*isRootLineBox*/) const {
+int RenderTableCell::baselinePosition(bool /*firstLine*/,
+                                      bool /*isRootLineBox*/) const {
   RenderObject* o = firstChild();
   int offset = paddingTop() + borderTop();
 

@@ -34,9 +34,9 @@ class RenderReplaced : public RenderBox {
 
   virtual const char* renderName() const { return "RenderReplaced"; }
 
-  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
-  virtual short baselinePosition(bool firstLine,
-                                 bool isRootLineBox = false) const;
+  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
+  virtual int baselinePosition(bool firstLine,
+                               bool isRootLineBox = false) const;
 
   virtual void calcPrefWidths();
 

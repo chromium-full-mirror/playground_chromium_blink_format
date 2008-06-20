@@ -50,7 +50,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   virtual void setStyle(RenderStyle*);
   virtual void updateFromElement();
   virtual bool canHaveChildren() const { return false; }
-  virtual short baselinePosition(bool firstLine, bool isRootLineBox) const;
+  virtual int baselinePosition(bool firstLine, bool isRootLineBox) const;
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

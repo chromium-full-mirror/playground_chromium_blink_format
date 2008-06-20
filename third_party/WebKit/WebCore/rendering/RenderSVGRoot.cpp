@@ -47,11 +47,11 @@ RenderSVGRoot::RenderSVGRoot(SVGStyledElement* node) : RenderContainer(node) {
 
 RenderSVGRoot::~RenderSVGRoot() {}
 
-short RenderSVGRoot::lineHeight(bool b, bool isRootLineBox) const {
+int RenderSVGRoot::lineHeight(bool b, bool isRootLineBox) const {
   return height() + marginTop() + marginBottom();
 }
 
-short RenderSVGRoot::baselinePosition(bool b, bool isRootLineBox) const {
+int RenderSVGRoot::baselinePosition(bool b, bool isRootLineBox) const {
   return height() + marginTop() + marginBottom();
 }
 

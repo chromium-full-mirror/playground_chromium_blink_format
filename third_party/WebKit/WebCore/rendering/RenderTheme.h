@@ -91,7 +91,7 @@ class RenderTheme {
   // position cannot be determined by examining child content. Checkboxes and
   // radio buttons are examples of
   // controls that need to do this.
-  virtual short baselinePosition(const RenderObject*) const;
+  virtual int baselinePosition(const RenderObject*) const;
 
   // A method for asking if a control is a container or not.  Leaf controls have
   // to have some special behavior (like

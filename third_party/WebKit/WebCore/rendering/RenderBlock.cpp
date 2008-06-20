@@ -4538,7 +4538,7 @@ bool RenderBlock::hasLineIfEmpty() const {
                            element()->shadowParentNode()->hasTagName(inputTag));
 }
 
-short RenderBlock::lineHeight(bool b, bool isRootLineBox) const {
+int RenderBlock::lineHeight(bool b, bool isRootLineBox) const {
   // Inline blocks are replaced elements. Otherwise, just pass off to
   // the base class.  If we're being queried as though we're the root line
   // box, then the fact that we're an inline-block is irrelevant, and we behave
@@ -4548,7 +4548,7 @@ short RenderBlock::lineHeight(bool b, bool isRootLineBox) const {
   return RenderFlow::lineHeight(b, isRootLineBox);
 }
 
-short RenderBlock::baselinePosition(bool b, bool isRootLineBox) const {
+int RenderBlock::baselinePosition(bool b, bool isRootLineBox) const {
   // Inline blocks are replaced elements. Otherwise, just pass off to
   // the base class.  If we're being queried as though we're the root line
   // box, then the fact that we're an inline-block is irrelevant, and we behave

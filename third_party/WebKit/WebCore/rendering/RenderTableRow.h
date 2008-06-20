@@ -52,7 +52,7 @@ class RenderTableRow : public RenderContainer {
 
   virtual void setStyle(RenderStyle*);
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
-  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const {
+  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const {
     return 0;
   }
   virtual void position(InlineBox*) {}

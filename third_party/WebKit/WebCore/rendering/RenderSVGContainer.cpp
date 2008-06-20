@@ -209,11 +209,11 @@ bool RenderSVGContainer::requiresLayer() {
   return false;
 }
 
-short RenderSVGContainer::lineHeight(bool b, bool isRootLineBox) const {
+int RenderSVGContainer::lineHeight(bool b, bool isRootLineBox) const {
   return height() + marginTop() + marginBottom();
 }
 
-short RenderSVGContainer::baselinePosition(bool b, bool isRootLineBox) const {
+int RenderSVGContainer::baselinePosition(bool b, bool isRootLineBox) const {
   return height() + marginTop() + marginBottom();
 }
 

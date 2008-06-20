@@ -56,7 +56,7 @@ class RenderThemeSafari : public RenderTheme {
   // position cannot be determined by examining child content. Checkboxes and
   // radio buttons are examples of
   // controls that need to do this.
-  virtual short baselinePosition(const RenderObject*) const;
+  virtual int baselinePosition(const RenderObject*) const;
 
   // A method asking if the control changes its tint when the window has focus
   // or not.

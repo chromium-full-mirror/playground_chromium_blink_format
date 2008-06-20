@@ -190,11 +190,11 @@ void RenderReplaced::calcPrefWidths() {
   setPrefWidthsDirty(false);
 }
 
-short RenderReplaced::lineHeight(bool, bool) const {
+int RenderReplaced::lineHeight(bool, bool) const {
   return height() + marginTop() + marginBottom();
 }
 
-short RenderReplaced::baselinePosition(bool, bool) const {
+int RenderReplaced::baselinePosition(bool, bool) const {
   return height() + marginTop() + marginBottom();
 }
 

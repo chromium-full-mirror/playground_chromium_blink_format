@@ -56,9 +56,9 @@ class RenderBR : public RenderText {
     return 0;
   }
 
-  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
-  virtual short baselinePosition(bool firstLine,
-                                 bool isRootLineBox = false) const;
+  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
+  virtual int baselinePosition(bool firstLine,
+                               bool isRootLineBox = false) const;
   virtual void setStyle(RenderStyle*);
 
   // overrides
@@ -73,7 +73,7 @@ class RenderBR : public RenderText {
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
  private:
-  mutable short m_lineHeight;
+  mutable int m_lineHeight;
 };
 
 }  // namespace WebCore

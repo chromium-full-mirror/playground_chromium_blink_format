@@ -795,7 +795,7 @@ void RenderTextControl::calcHeight() {
   RenderBlock::calcHeight();
 }
 
-short RenderTextControl::baselinePosition(bool b, bool isRootLineBox) const {
+int RenderTextControl::baselinePosition(bool b, bool isRootLineBox) const {
   if (m_multiLine)
     return height() + marginTop() + marginBottom();
   return RenderBlock::baselinePosition(b, isRootLineBox);

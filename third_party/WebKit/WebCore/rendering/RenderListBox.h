@@ -68,7 +68,7 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   virtual bool isScrollable() const;
 
   virtual void calcPrefWidths();
-  virtual short baselinePosition(bool firstLine, bool isRootLineBox) const;
+  virtual int baselinePosition(bool firstLine, bool isRootLineBox) const;
   virtual void calcHeight();
 
   virtual void layout();

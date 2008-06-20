@@ -53,9 +53,9 @@ class RenderListMarker : public RenderBox {
 
   virtual InlineBox* createInlineBox(bool, bool, bool);
 
-  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
-  virtual short baselinePosition(bool firstLine,
-                                 bool isRootLineBox = false) const;
+  virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
+  virtual int baselinePosition(bool firstLine,
+                               bool isRootLineBox = false) const;
 
   bool isImage() const;
   bool isText() const { return !isImage(); }
