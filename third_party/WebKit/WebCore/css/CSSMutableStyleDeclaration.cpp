@@ -523,6 +523,8 @@ String CSSMutableStyleDeclaration::removeProperty(int propertyID,
     if (propertyID == (*it).m_id) {
       if (returnText)
         value = (*it).value()->cssText();
+      if ((*it).value()->isVariableDependentValue())
+        m_variableDependentValueCount--;
       m_values.remove(it);
       if (notifyChanged)
         setChanged();
@@ -681,6 +683,8 @@ void CSSMutableStyleDeclaration::addParsedProperties(
       removeProperty(properties[i]->id(), false);
       ASSERT(properties[i]);
       m_values.append(*properties[i]);
+      if (properties[i]->value()->isVariableDependentValue())
+        m_variableDependentValueCount++;
     }
   }
   // FIXME: This probably should have a call to setChanged() if something
