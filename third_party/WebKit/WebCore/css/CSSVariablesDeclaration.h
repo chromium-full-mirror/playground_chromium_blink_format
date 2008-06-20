@@ -55,7 +55,7 @@ class CSSVariablesDeclaration : public StyleBase {
   void setVariable(const String&, const String&, ExceptionCode&);
 
   unsigned length() const;
-  const String& item(unsigned index);
+  String item(unsigned index);
 
   CSSRule* parentRule();
 

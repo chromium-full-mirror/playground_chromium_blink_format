@@ -114,7 +114,9 @@ unsigned CSSVariablesDeclaration::length() const {
   return m_variableNames.size();
 }
 
-const String& CSSVariablesDeclaration::item(unsigned index) {
+String CSSVariablesDeclaration::item(unsigned index) {
+  if (index >= m_variableNames.size())
+    return "";
   return m_variableNames[index];
 }
 
