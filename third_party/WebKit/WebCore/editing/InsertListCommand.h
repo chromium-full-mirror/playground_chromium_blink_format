@@ -42,6 +42,8 @@ class InsertListCommand : public CompositeEditCommand {
 
   static PassRefPtr<Node> insertList(Document*, Type);
 
+  virtual bool preservesTypingStyle() const { return true; }
+
  private:
   InsertListCommand(Document*, Type, const String&);
 

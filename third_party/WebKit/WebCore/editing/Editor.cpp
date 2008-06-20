@@ -792,13 +792,6 @@ static void dispatchEditableContentChangedEvents(const EditCommand& command) {
 void Editor::appliedEditing(PassRefPtr<EditCommand> cmd) {
   dispatchEditableContentChangedEvents(*cmd);
 
-  // FIXME: We shouldn't tell setSelection to clear the typing style or removed
-  // anchor here.
-  // If we didn't, we wouldn't have to save/restore the removedAnchor, and we
-  // wouldn't have to have
-  // the typing style stored in two places (the Frame and commands).
-  RefPtr<Node> anchor = removedAnchor();
-
   Selection newSelection(cmd->endingSelection());
   // If there is no selection change, don't bother sending
   // shouldChangeSelection, but still call setSelection,
@@ -807,23 +800,14 @@ void Editor::appliedEditing(PassRefPtr<EditCommand> cmd) {
   // produce some strange calls.
   // See <rdar://problem/5729315> Some shouldChangeSelectedDOMRange contain
   // Ranges for selections that are no longer valid
+  // Don't clear the typing style or removedAnchor with this selection change.
+  // We do those things elsewhere if necessary.
   if (newSelection == m_frame->selection()->selection() ||
       m_frame->shouldChangeSelection(newSelection))
-    m_frame->selection()->setSelection(newSelection, false);
+    m_frame->selection()->setSelection(newSelection, false, false);
 
-  setRemovedAnchor(anchor);
-
-  // Now set the typing style from the command. Clear it when done.
-  // This helps make the case work where you completely delete a piece
-  // of styled text and then type a character immediately after.
-  // That new character needs to take on the style of the just-deleted text.
-  // FIXME: Improve typing style.
-  // See this bug: <rdar://problem/3769899> Implementation of typing style needs
-  // improvement
-  if (cmd->typingStyle()) {
-    m_frame->setTypingStyle(cmd->typingStyle());
-    cmd->setTypingStyle(0);
-  }
+  if (!cmd->preservesTypingStyle())
+    m_frame->setTypingStyle(0);
 
   // Command will be equal to last edit command only in the case of typing
   if (m_lastEditCommand.get() == cmd)

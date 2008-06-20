@@ -826,6 +826,17 @@ void CompositeEditCommand::moveParagraphs(
                 "")
           : 0;
 
+  // A non-empty paragraph's style is moved when we copy and move it.  We don't
+  // move
+  // anything if we're given an empty paragraph, but an empty paragraph can have
+  // style
+  // too, <div><b><br></b></div> for example.  Save it so that we can preserve
+  // it later.
+  RefPtr<CSSMutableStyleDeclaration> styleInEmptyParagraph;
+  if (startOfParagraphToMove == endOfParagraphToMove && preserveStyle)
+    styleInEmptyParagraph =
+        styleAtPosition(startOfParagraphToMove.deepEquivalent());
+
   // FIXME (5098931): We should add a new insert action
   // "WebViewInsertActionMoved" and call shouldInsertFragment here.
 
@@ -895,6 +906,9 @@ void CompositeEditCommand::moveParagraphs(
   setEndingSelection(destination);
   applyCommandToComposite(ReplaceSelectionCommand::create(
       document(), fragment.get(), true, false, !preserveStyle, false, true));
+  // Restore styles from an empty paragraph to the new empty paragraph.
+  if (styleInEmptyParagraph)
+    applyStyle(styleInEmptyParagraph.get());
 
   if (preserveSelection && startIndex != -1) {
     // Fragment creation (using createMarkup) incorrectly uses regular

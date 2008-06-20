@@ -65,7 +65,7 @@ class SelectionController : Noncopyable {
   const Selection& selection() const { return m_sel; }
   void setSelection(const Selection&,
                     bool closeTyping = true,
-                    bool clearTypingStyle = true,
+                    bool clearTypingStyleAndRemovedAnchor = true,
                     bool userTriggered = false);
   bool setSelectedRange(Range*, EAffinity, bool closeTyping);
   void selectAll();
