@@ -45,8 +45,9 @@ class Profiler {
 
   static Profiler* profiler();
 
-  void startProfiling(ExecState*, const UString& title);
-  PassRefPtr<Profile> stopProfiling(ExecState*, const UString& title);
+  void startProfiling(ExecState*, const UString& title, ProfilerClient*);
+  void stopProfiling(ExecState*, const UString& title);
+  void didFinishAllExecution(ExecState*);
 
   Profile* findProfile(ExecState*, const UString& title) const;
 
@@ -67,6 +68,14 @@ class Profiler {
   Vector<RefPtr<Profile>> m_currentProfiles;
   static Profiler* s_sharedProfiler;
   static Profiler* s_sharedEnabledProfilerReference;
+};
+
+class ProfilerClient {
+ public:
+  virtual void finishedProfiling(PassRefPtr<Profile>) = 0;
+
+ protected:
+  virtual ~ProfilerClient() {}
 };
 
 }  // namespace KJS

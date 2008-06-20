@@ -65,7 +65,9 @@ Profile* Profiler::findProfile(ExecState* exec, const UString& title) const {
   return 0;
 }
 
-void Profiler::startProfiling(ExecState* exec, const UString& title) {
+void Profiler::startProfiling(ExecState* exec,
+                              const UString& title,
+                              ProfilerClient* client) {
   ASSERT_ARG(exec, exec);
 
   // Check if we currently have a Profile for this global ExecState and title.
@@ -77,27 +79,35 @@ void Profiler::startProfiling(ExecState* exec, const UString& title) {
       return;
   s_sharedEnabledProfilerReference = this;
   RefPtr<Profile> profile = Profile::create(
-      title, globalExec, exec->lexicalGlobalObject()->pageGroupIdentifier());
+      title, globalExec, exec->lexicalGlobalObject()->pageGroupIdentifier(),
+      client);
   m_currentProfiles.append(profile);
 }
 
-PassRefPtr<Profile> Profiler::stopProfiling(ExecState* exec,
-                                            const UString& title) {
+void Profiler::stopProfiling(ExecState* exec, const UString& title) {
   ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
   for (ptrdiff_t i = m_currentProfiles.size() - 1; i >= 0; --i) {
     if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
-        (title.isNull() || m_currentProfiles[i]->title() == title)) {
+        (title.isNull() || m_currentProfiles[i]->title() == title))
       m_currentProfiles[i]->stopProfiling();
+  }
+}
 
+void Profiler::didFinishAllExecution(ExecState* exec) {
+  ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
+  for (ptrdiff_t i = m_currentProfiles.size() - 1; i >= 0; --i) {
+    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
+        m_currentProfiles[i]->didFinishAllExecution()) {
       PassRefPtr<Profile> prpProfile = m_currentProfiles[i].release();
       m_currentProfiles.remove(i);
+
       if (!m_currentProfiles.size())
         s_sharedEnabledProfilerReference = 0;
-      return prpProfile;
+
+      if (ProfilerClient* client = prpProfile->client())
+        client->finishedProfiling(prpProfile);
     }
   }
-
-  return 0;
 }
 
 static inline void dispatchFunctionToProfiles(

@@ -41,7 +41,6 @@
 #include <kjs/JSValue.h>
 #include <kjs/interpreter.h>
 #include <kjs/list.h>
-#include <profiler/Profiler.h>
 #include <stdio.h>
 
 using namespace KJS;
@@ -262,27 +261,22 @@ void Console::assertCondition(bool condition,
   printToStandardOut(ErrorMessageLevel, exec, arguments, url);
 }
 
-void Console::profile(ExecState* exec, const ArgList& arguments) const {
-  Page* page = m_frame->page();
-  if (!page)
-    return;
-
+void Console::profile(ExecState* exec, const ArgList& arguments) {
   UString title = arguments[0]->toString(exec);
-  Profiler::profiler()->startProfiling(exec, title);
+  Profiler::profiler()->startProfiling(exec, title, this);
 }
 
-void Console::profileEnd(ExecState* exec, const ArgList& arguments) const {
-  Page* page = m_frame->page();
-  if (!page)
-    return;
-
+void Console::profileEnd(ExecState* exec, const ArgList& arguments) {
   UString title;
   if (arguments.size() >= 1)
     title = arguments[0]->toString(exec);
 
-  RefPtr<Profile> profile = Profiler::profiler()->stopProfiling(exec, title);
-  if (profile)
-    page->inspectorController()->addProfile(profile);
+  Profiler::profiler()->stopProfiling(exec, title);
+}
+
+void Console::finishedProfiling(PassRefPtr<Profile> prpProfile) {
+  if (Page* page = m_frame->page())
+    page->inspectorController()->addProfile(prpProfile);
 }
 
 void Console::warn(ExecState* exec, const ArgList& arguments) {
