@@ -59,8 +59,10 @@ class CSSVariablesDeclaration : public StyleBase {
 
   CSSRule* parentRule();
 
-  String cssText() const;  // FIXME: The spec contradicts itself regarding
-                           // whether or not cssText is settable.
+  String cssText() const;
+  void setCssText(const String&);  // FIXME: The spec contradicts itself
+                                   // regarding whether or not cssText is
+                                   // settable.
 
   void addParsedVariable(const String& variableName,
                          PassRefPtr<CSSValueList> variableValue,
@@ -71,6 +73,8 @@ class CSSVariablesDeclaration : public StyleBase {
   CSSVariablesDeclaration(StyleBase* owningRule,
                           const Vector<String>& names,
                           const Vector<RefPtr<CSSValueList>>& values);
+
+  void setChanged();
 
  protected:
   Vector<String> m_variableNames;

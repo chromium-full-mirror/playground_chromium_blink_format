@@ -32,12 +32,14 @@
 #include "CSSMediaRule.h"
 #include "CSSPageRule.h"
 #include "CSSStyleRule.h"
+#include "CSSVariablesRule.h"
 #include "JSCSSCharsetRule.h"
 #include "JSCSSFontFaceRule.h"
 #include "JSCSSImportRule.h"
 #include "JSCSSMediaRule.h"
 #include "JSCSSPageRule.h"
 #include "JSCSSStyleRule.h"
+#include "JSCSSVariablesRule.h"
 
 using namespace KJS;
 
@@ -76,6 +78,11 @@ JSValue* toJS(ExecState* exec, CSSRule* rule) {
     case CSSRule::CHARSET_RULE:
       ret = new (exec) JSCSSCharsetRule(JSCSSCharsetRulePrototype::self(exec),
                                         static_cast<CSSCharsetRule*>(rule));
+      break;
+    case CSSRule::VARIABLES_RULE:
+      ret =
+          new (exec) JSCSSVariablesRule(JSCSSVariablesRulePrototype::self(exec),
+                                        static_cast<CSSVariablesRule*>(rule));
       break;
     default:
       ret = new (exec) JSCSSRule(JSCSSRulePrototype::self(exec), rule);
