@@ -97,10 +97,10 @@ JSValue* DebuggerCallFrame::evaluate(const UString& script,
   if (!evalNode)
     return Error::create(&newExec, SyntaxError, errMsg, errLine, sourceId, 0);
 
-  JSValue* result =
-      machine().execute(evalNode.get(), &newExec, thisObject,
-                        &newExec.dynamicGlobalObject()->registerFileStack(),
-                        m_scopeChain, &exception);
+  JSValue* result = newExec.machine()->execute(
+      evalNode.get(), &newExec, thisObject,
+      &newExec.dynamicGlobalObject()->registerFileStack(), m_scopeChain,
+      &exception);
   return result;
 }
 

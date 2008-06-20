@@ -100,7 +100,7 @@ Completion Interpreter::evaluate(ExecState* exec,
                           : thisValue->toObject(exec);
 
   JSValue* exception = 0;
-  JSValue* result = machine().execute(
+  JSValue* result = exec->machine()->execute(
       programNode.get(), exec, scopeChain.node(), thisObj,
       &exec->dynamicGlobalObject()->registerFileStack(), &exception);
 

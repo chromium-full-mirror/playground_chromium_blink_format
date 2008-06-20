@@ -44,15 +44,13 @@ class DebuggerCallFrame {
  public:
   typedef enum { ProgramType, FunctionType } Type;
 
-  DebuggerCallFrame(Machine* machine,
-                    JSGlobalObject* dynamicGlobalObject,
+  DebuggerCallFrame(JSGlobalObject* dynamicGlobalObject,
                     const CodeBlock* codeBlock,
                     ScopeChainNode* scopeChain,
                     JSValue* exception,
                     Register** registerBase,
                     int registerOffset)
-      : m_machine(machine),
-        m_dynamicGlobalObject(dynamicGlobalObject),
+      : m_dynamicGlobalObject(dynamicGlobalObject),
         m_codeBlock(codeBlock),
         m_scopeChain(scopeChain),
         m_exception(exception),
@@ -68,7 +66,6 @@ class DebuggerCallFrame {
   JSValue* exception() const { return m_exception; }
 
  private:
-  Machine* m_machine;
   JSGlobalObject* m_dynamicGlobalObject;
   const CodeBlock* m_codeBlock;
   ScopeChainNode* m_scopeChain;

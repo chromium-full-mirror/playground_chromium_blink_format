@@ -65,8 +65,6 @@ class ExecState : Noncopyable {
 
   JSObject* globalThisValue() const { return m_scopeChain->globalThisObject(); }
 
-  Machine* machine() const { return m_machine; }
-
   // Exception propogation.
   void setException(JSValue* exception) { m_exception = exception; }
   void clearException() { m_exception = 0; }
@@ -83,6 +81,7 @@ class ExecState : Noncopyable {
   const ArgList& emptyList() const { return m_globalData->emptyList; }
   Lexer* lexer() { return m_globalData->lexer; }
   Parser* parser() { return m_globalData->parser; }
+  Machine* machine() const { return m_globalData->machine; }
   static const HashTable* arrayTable(ExecState* exec) {
     return exec->m_globalData->arrayTable;
   }
@@ -111,11 +110,7 @@ class ExecState : Noncopyable {
   // Default constructor required for gcc 3.
   ExecState() {}
 
-  ExecState(ExecState*,
-            Machine*,
-            RegisterFile*,
-            ScopeChainNode*,
-            int callFrameOffset);
+  ExecState(ExecState*, RegisterFile*, ScopeChainNode*, int callFrameOffset);
 
   bool isGlobalObject(JSObject*) const;
 
@@ -128,7 +123,6 @@ class ExecState : Noncopyable {
 
   // These values are controlled by the machine.
   ExecState* m_prev;
-  Machine* m_machine;
   RegisterFile* m_registerFile;
   ScopeChainNode* m_scopeChain;
   int m_callFrameOffset;  // A negative offset indicates a non-function scope.

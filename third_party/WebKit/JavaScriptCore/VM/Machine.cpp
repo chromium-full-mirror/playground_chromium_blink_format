@@ -525,20 +525,14 @@ static NEVER_INLINE JSValue* callEval(ExecState* exec,
   }
 
   JSValue* result =
-      machine().execute(evalNode.get(), exec, thisObj, registerFile,
-                        r - (*registerFile->basePointer()) + argv + argc,
-                        scopeChain, &exceptionValue);
+      exec->machine()->execute(evalNode.get(), exec, thisObj, registerFile,
+                               r - (*registerFile->basePointer()) + argv + argc,
+                               scopeChain, &exceptionValue);
 
   if (*profiler)
     (*profiler)->didExecute(exec, scopeChain->globalObject()->evalFunction());
 
   return result;
-}
-
-Machine& machine() {
-  ASSERT(JSLock::currentThreadIsHoldingLock());
-  static Machine machine;
-  return machine;
 }
 
 Machine::Machine() : m_reentryDepth(0) {
@@ -637,8 +631,8 @@ NEVER_INLINE bool Machine::unwindCallFrame(ExecState* exec,
   Register* callFrame = r - oldCodeBlock->numLocals - CallFrameHeaderSize;
 
   if (Debugger* debugger = exec->dynamicGlobalObject()->debugger()) {
-    DebuggerCallFrame debuggerCallFrame(this, exec->dynamicGlobalObject(),
-                                        codeBlock, scopeChain, exceptionValue,
+    DebuggerCallFrame debuggerCallFrame(exec->dynamicGlobalObject(), codeBlock,
+                                        scopeChain, exceptionValue,
                                         registerBase, r - *registerBase);
     if (!isGlobalCallFrame(registerBase, r) &&
         callFrame[Callee].u.jsObject)  // Check for global and eval code
@@ -709,8 +703,8 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
   }
 
   if (Debugger* debugger = exec->dynamicGlobalObject()->debugger()) {
-    DebuggerCallFrame debuggerCallFrame(this, exec->dynamicGlobalObject(),
-                                        codeBlock, scopeChain, exceptionValue,
+    DebuggerCallFrame debuggerCallFrame(exec->dynamicGlobalObject(), codeBlock,
+                                        scopeChain, exceptionValue,
                                         registerBase, r - *registerBase);
     debugger->exception(debuggerCallFrame, codeBlock->ownerNode->sourceId(),
                         codeBlock->lineNumberForVPC(vPC));
@@ -768,7 +762,7 @@ JSValue* Machine::execute(ProgramNode* programNode,
   if (codeBlock->needsFullScopeChain)
     scopeChain = scopeChain->copy();
 
-  ExecState newExec(exec, this, registerFile, scopeChain, -1);
+  ExecState newExec(exec, registerFile, scopeChain, -1);
 
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
@@ -842,7 +836,7 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
   scopeChain = scopeChainForCall(exec, functionBodyNode, newCodeBlock,
                                  scopeChain, registerBase, r);
 
-  ExecState newExec(exec, this, registerFile, scopeChain, callFrameOffset);
+  ExecState newExec(exec, registerFile, scopeChain, callFrameOffset);
 
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
@@ -916,7 +910,7 @@ JSValue* Machine::execute(EvalNode* evalNode,
   if (codeBlock->needsFullScopeChain)
     scopeChain = scopeChain->copy();
 
-  ExecState newExec(exec, this, registerFile, scopeChain, -1);
+  ExecState newExec(exec, registerFile, scopeChain, -1);
 
   Profiler** profiler = Profiler::enabledProfilerReference();
   if (*profiler)
@@ -974,8 +968,8 @@ NEVER_INLINE void Machine::debug(ExecState* exec,
   if (!debugger)
     return;
 
-  DebuggerCallFrame debuggerCallFrame(this, exec->dynamicGlobalObject(),
-                                      codeBlock, scopeChain, 0, registerBase,
+  DebuggerCallFrame debuggerCallFrame(exec->dynamicGlobalObject(), codeBlock,
+                                      scopeChain, 0, registerBase,
                                       r - *registerBase);
 
   switch ((DebugHookID)debugHookID) {

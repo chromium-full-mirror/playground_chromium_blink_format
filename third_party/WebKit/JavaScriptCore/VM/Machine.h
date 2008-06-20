@@ -194,8 +194,6 @@ class Machine {
 #endif
 };
 
-Machine& machine();
-
 }  // namespace KJS
 
 #endif  // Machine_h
