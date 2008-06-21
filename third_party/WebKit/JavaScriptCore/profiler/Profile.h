@@ -95,7 +95,6 @@ class Profile : public RefCounted<Profile> {
           ProfilerClient*);
   void removeProfileStart();
   void removeProfileEnd();
-  void setupCurrentNodeAsStopped();
 
   UString m_title;
   ExecState* m_originatingGlobalExec;

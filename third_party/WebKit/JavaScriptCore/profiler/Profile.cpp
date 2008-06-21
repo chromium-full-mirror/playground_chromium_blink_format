@@ -75,6 +75,11 @@ void Profile::stopProfiling() {
   removeProfileStart();
   removeProfileEnd();
 
+  // Already at the head, set m_currentNode to prevent
+  // didExecute from recording more nodes.
+  if (m_currentNode == m_head)
+    m_currentNode = 0;
+
   m_stoppedProfiling = true;
 }
 
@@ -154,7 +159,10 @@ void Profile::didExecute(const CallIdentifier& callIdentifier) {
     m_head->insertNode(m_currentNode.get());
 
     if (m_stoppedProfiling) {
-      setupCurrentNodeAsStopped();
+      m_currentNode->setTotalTime(m_currentNode->totalTime() +
+                                  m_head->selfTime());
+      m_head->setSelfTime(0.0);
+      m_currentNode->stopProfiling();
       m_currentNode = 0;
     } else
       m_currentNode = m_head;
@@ -168,12 +176,6 @@ void Profile::didExecute(const CallIdentifier& callIdentifier) {
   }
 
   m_currentNode = m_currentNode->didExecute();
-}
-
-void Profile::setupCurrentNodeAsStopped() {
-  m_currentNode->setTotalTime(m_head->selfTime());
-  m_head->setSelfTime(0.0);
-  m_currentNode->stopProfiling();
 }
 
 void Profile::forEach(UnaryFunction function) {
