@@ -315,6 +315,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
   if (state.inComment())
     state = parseComment(src, state);
 
+  int lastDecodedEntityPosition = -1;
   while (!src.isEmpty()) {
     checkScriptBuffer();
     UChar ch = *src;
@@ -372,7 +373,8 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
         (ch == '>' || ch == '/' || isASCIISpace(ch)) &&
         scriptCodeSize >= searchStopperLen &&
         tagMatch(searchStopper, scriptCode + scriptCodeSize - searchStopperLen,
-                 searchStopperLen)) {
+                 searchStopperLen) &&
+        (lastDecodedEntityPosition < scriptCodeSize - searchStopperLen)) {
       scriptCodeResync = scriptCodeSize - searchStopperLen + 1;
       tquote = NoQuote;
       continue;
@@ -398,6 +400,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
       state =
           parseEntity(src, scriptCodeDest, state, m_cBufferPos, true, false);
       scriptCodeSize = scriptCodeDest - scriptCode;
+      lastDecodedEntityPosition = scriptCodeSize;
     } else {
       scriptCode[scriptCodeSize++] = ch;
       src.advance(m_lineNumber);
