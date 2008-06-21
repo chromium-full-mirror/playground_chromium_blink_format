@@ -34,7 +34,6 @@ namespace KJS {
 
 class ExecState;
 class ProfilerClient;
-typedef void (*UnaryFunction)(ProfileNode*);
 
 class Profile : public RefCounted<Profile> {
  public:
@@ -57,24 +56,24 @@ class Profile : public RefCounted<Profile> {
   unsigned pageGroupIdentifier() const { return m_pageGroupIdentifier; }
   ProfilerClient* client() { return m_client; }
 
-  void forEach(UnaryFunction);
+  void forEach(void (ProfileNode::*)());
   void sortTotalTimeDescending() {
-    forEach(ProfileNode::sortTotalTimeDescending);
+    forEach(&ProfileNode::sortTotalTimeDescending);
   }
   void sortTotalTimeAscending() {
-    forEach(ProfileNode::sortTotalTimeAscending);
+    forEach(&ProfileNode::sortTotalTimeAscending);
   }
   void sortSelfTimeDescending() {
-    forEach(ProfileNode::sortSelfTimeDescending);
+    forEach(&ProfileNode::sortSelfTimeDescending);
   }
-  void sortSelfTimeAscending() { forEach(ProfileNode::sortSelfTimeAscending); }
-  void sortCallsDescending() { forEach(ProfileNode::sortCallsDescending); }
-  void sortCallsAscending() { forEach(ProfileNode::sortCallsAscending); }
+  void sortSelfTimeAscending() { forEach(&ProfileNode::sortSelfTimeAscending); }
+  void sortCallsDescending() { forEach(&ProfileNode::sortCallsDescending); }
+  void sortCallsAscending() { forEach(&ProfileNode::sortCallsAscending); }
   void sortFunctionNameDescending() {
-    forEach(ProfileNode::sortFunctionNameDescending);
+    forEach(&ProfileNode::sortFunctionNameDescending);
   }
   void sortFunctionNameAscending() {
-    forEach(ProfileNode::sortFunctionNameAscending);
+    forEach(&ProfileNode::sortFunctionNameAscending);
   }
 
   void focus(const ProfileNode* profileNode);
