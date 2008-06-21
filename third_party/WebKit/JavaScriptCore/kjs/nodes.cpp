@@ -1671,8 +1671,6 @@ ProgramNode::ProgramNode(SourceElements* children,
                          bool needsClosure)
     : ScopeNode(children, varStack, funcStack, usesEval, needsClosure) {}
 
-ProgramNode::~ProgramNode() {}
-
 ProgramNode* ProgramNode::create(SourceElements* children,
                                  VarStack* varStack,
                                  FunctionStack* funcStack,
@@ -1689,8 +1687,6 @@ EvalNode::EvalNode(SourceElements* children,
                    bool usesEval,
                    bool needsClosure)
     : ScopeNode(children, varStack, funcStack, usesEval, needsClosure) {}
-
-EvalNode::~EvalNode() {}
 
 RegisterID* EvalNode::emitCode(CodeGenerator& generator, RegisterID*) {
   generator.emitDebugHook(WillExecuteProgram, firstLine(), lastLine());
@@ -1733,8 +1729,6 @@ FunctionBodyNode::FunctionBodyNode(SourceElements* children,
                                    bool usesEval,
                                    bool needsClosure)
     : ScopeNode(children, varStack, funcStack, usesEval, needsClosure) {}
-
-FunctionBodyNode::~FunctionBodyNode() {}
 
 void FunctionBodyNode::mark() {
   if (m_code)
