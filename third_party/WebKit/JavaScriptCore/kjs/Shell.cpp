@@ -369,8 +369,7 @@ static bool runWithScripts(GlobalObject* globalObject,
 }
 
 static void runInteractive(GlobalObject* globalObject) {
-  bool done = false;
-  while (!done) {
+  while (true) {
 #if HAVE(READLINE)
     char* line = readline(interactivePrompt);
     if (!line)
@@ -402,6 +401,7 @@ static void runInteractive(GlobalObject* globalObject) {
                          .UTF8String()
                          .c_str());
   }
+  printf("\n");
 }
 
 static void printUsageStatement() {
