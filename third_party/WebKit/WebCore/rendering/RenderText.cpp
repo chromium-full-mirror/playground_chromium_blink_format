@@ -323,8 +323,9 @@ VisiblePosition RenderText::positionForCoordinates(int x, int y) {
           // and the x coordinate is to the right of the last text box right
           // edge
           // generate VisiblePosition, use UPSTREAM affinity if possible
-          return VisiblePosition(element(), offset + box->m_start,
-                                 VP_UPSTREAM_IF_POSSIBLE);
+          return VisiblePosition(
+              element(), offset + box->m_start,
+              offset > 0 ? VP_UPSTREAM_IF_POSSIBLE : DOWNSTREAM);
       }
       lastBoxAbove = box;
     }
