@@ -412,7 +412,7 @@ PassRefPtr<DocumentFragment> fragmentFromCF_HTML(Document* doc,
   String markup = cf_html.substring(fragmentStart, fragmentEnd - fragmentStart)
                       .stripWhiteSpace();
 
-  return createFragmentFromMarkup(doc, markup, srcURL).releaseRef();
+  return createFragmentFromMarkup(doc, markup, srcURL);
 }
 
 PassRefPtr<DocumentFragment> fragmentFromHTML(Document* doc,
