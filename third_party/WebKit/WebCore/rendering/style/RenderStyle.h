@@ -2124,8 +2124,7 @@ class RenderStyle {
     return max(0, outlineWidth() + outlineOffset());
   }
   unsigned short outlineWidth() const {
-    if (background->m_outline.style() == BNONE ||
-        background->m_outline.style() == BHIDDEN)
+    if (background->m_outline.style() == BNONE)
       return 0;
     return background->m_outline.width;
   }
@@ -2364,8 +2363,7 @@ class RenderStyle {
   BindingURI* bindingURIs() const { return rareNonInheritedData->bindingURI; }
 #endif
   int outlineOffset() const {
-    if (background->m_outline.style() == BNONE ||
-        background->m_outline.style() == BHIDDEN)
+    if (background->m_outline.style() == BNONE)
       return 0;
     return background->m_outline._offset;
   }
