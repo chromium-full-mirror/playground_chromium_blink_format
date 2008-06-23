@@ -175,8 +175,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   void createRequest(ExceptionCode&);
 
-  void sameOriginRequest(ResourceRequest&);
-  void crossSiteAccessRequest(ResourceRequest&, ExceptionCode&);
+  void makeSameOriginRequest(ResourceRequest&);
+  void makeCrossSiteAccessRequest(ResourceRequest&, ExceptionCode&);
 
   void loadRequestSynchronously(ResourceRequest&, ExceptionCode&);
   void loadRequestAsynchronously(ResourceRequest&);
