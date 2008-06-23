@@ -222,8 +222,10 @@ void DeleteButtonController::createDeletionUI() {
   style->setProperty(CSSPropertyHeight, String::number(buttonHeight) + "px");
 
   Image* buttonImage = Image::loadPlatformResource("deleteButton");
-  if (buttonImage->isNull())
+  if (buttonImage->isNull()) {
+    delete buttonImage;
     return;
+  }
 
   button->setCachedImage(new CachedImage(buttonImage));
 
