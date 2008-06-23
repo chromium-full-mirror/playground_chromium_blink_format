@@ -5236,7 +5236,7 @@ bool FrameLoader::addLowBandwidthDisplayRequest(CachedResource* cache) {
     case CachedResource::Script:
       m_needToSwitchOutLowBandwidthDisplay = true;
       m_externalRequestsInLowBandwidthDisplay.add(cache);
-      cache->ref(this);
+      cache->addClient(this);
       return true;
     case CachedResource::ImageResource:
     case CachedResource::FontResource:
@@ -5259,7 +5259,7 @@ void FrameLoader::removeAllLowBandwidthDisplayRequests() {
   for (HashSet<CachedResource*>::iterator it =
            m_externalRequestsInLowBandwidthDisplay.begin();
        it != end; ++it)
-    (*it)->deref(this);
+    (*it)->removeClient(this);
   m_externalRequestsInLowBandwidthDisplay.clear();
 }
 
@@ -5267,7 +5267,7 @@ void FrameLoader::notifyFinished(CachedResource* script) {
   HashSet<CachedResource*>::iterator it =
       m_externalRequestsInLowBandwidthDisplay.find(script);
   if (it != m_externalRequestsInLowBandwidthDisplay.end()) {
-    (*it)->deref(this);
+    (*it)->removeClient(this);
     m_externalRequestsInLowBandwidthDisplay.remove(it);
     switchOutLowBandwidthDisplayIfReady();
   }
