@@ -443,6 +443,7 @@ void CodeGenerator::rewindBinaryOp() {
 }
 
 PassRefPtr<LabelID> CodeGenerator::emitJump(LabelID* target) {
+  ASSERT(target->isForwardLabel());
   emitOpcode(op_jmp);
   instructions().append(target->offsetFrom(instructions().size()));
   return target;
@@ -459,7 +460,7 @@ PassRefPtr<LabelID> CodeGenerator::emitJumpIfTrueMayCombine(RegisterID* cond,
 
     if (cond->index() == dstIndex) {
       rewindBinaryOp();
-      emitOpcode(op_jless);
+      emitOpcode(target->isForwardLabel() ? op_jless : op_loop_if_less);
       instructions().append(src1Index);
       instructions().append(src2Index);
       instructions().append(target->offsetFrom(instructions().size()));
@@ -472,7 +473,7 @@ PassRefPtr<LabelID> CodeGenerator::emitJumpIfTrueMayCombine(RegisterID* cond,
 
 PassRefPtr<LabelID> CodeGenerator::emitJumpIfTrue(RegisterID* cond,
                                                   LabelID* target) {
-  emitOpcode(op_jtrue);
+  emitOpcode(target->isForwardLabel() ? op_jtrue : op_loop_if_true);
   instructions().append(cond->index());
   instructions().append(target->offsetFrom(instructions().size()));
   return target;
@@ -480,6 +481,7 @@ PassRefPtr<LabelID> CodeGenerator::emitJumpIfTrue(RegisterID* cond,
 
 PassRefPtr<LabelID> CodeGenerator::emitJumpIfFalse(RegisterID* cond,
                                                    LabelID* target) {
+  ASSERT(target->isForwardLabel());
   emitOpcode(op_jfalse);
   instructions().append(cond->index());
   instructions().append(target->offsetFrom(instructions().size()));
@@ -1077,6 +1079,7 @@ PassRefPtr<LabelID> CodeGenerator::emitComplexJumpScopes(
 PassRefPtr<LabelID> CodeGenerator::emitJumpScopes(LabelID* target,
                                                   int targetScopeDepth) {
   ASSERT(scopeDepth() - targetScopeDepth >= 0);
+  ASSERT(target->isForwardLabel());
 
   size_t scopeDelta = scopeDepth() - targetScopeDepth;
   ASSERT(scopeDelta <= m_scopeContextStack.size());

@@ -187,6 +187,7 @@ class Machine {
   }
 
   int m_reentryDepth;
+
 #if HAVE(COMPUTED_GOTO)
   Opcode m_opcodeTable[numOpcodeIDs];  // Maps OpcodeID => Opcode for compiling
   HashMap<Opcode, OpcodeID>

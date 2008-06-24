@@ -84,6 +84,8 @@ class LabelID {
 
   int refCount() const { return m_refCount; }
 
+  bool isForwardLabel() { return m_location == invalidLocation; }
+
  private:
   typedef Vector<int, 8> JumpVector;
 
