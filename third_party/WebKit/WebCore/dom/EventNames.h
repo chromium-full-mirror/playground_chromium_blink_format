@@ -35,10 +35,10 @@ namespace EventNames {
           dblclick) macro(downloading) macro(drag) macro(dragend) macro(dragenter)                \
           macro(dragleave) macro(dragover) macro(dragstart) macro(drop) macro(                    \
               error) macro(focus) macro(input) macro(keydown) macro(keypress)                     \
-              macro(keyup) macro(load) macro(message) macro(mousedown) macro(                     \
-                  mousemove) macro(mouseout) macro(mouseover) macro(mouseup)                      \
-                  macro(mousewheel) macro(noupdate) macro(offline) macro(                         \
-                      online) macro(overflowchanged) macro(paste)                                 \
+              macro(keyup) macro(load) macro(loadstart) macro(message) macro(                     \
+                  mousedown) macro(mousemove) macro(mouseout) macro(mouseover)                    \
+                  macro(mouseup) macro(mousewheel) macro(noupdate) macro(                         \
+                      offline) macro(online) macro(overflowchanged) macro(paste)                  \
                       macro(readystatechange) macro(reset) macro(resize) macro(                   \
                           scroll) macro(search) macro(select) macro(selectstart)                  \
                           macro(storage) macro(submit) macro(textInput) macro(                    \

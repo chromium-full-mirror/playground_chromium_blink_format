@@ -97,10 +97,27 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
     return m_onReadyStateChangeListener.get();
   }
 
+  void setOnAbortListener(PassRefPtr<EventListener> eventListener) {
+    m_onAbortListener = eventListener;
+  }
+  EventListener* onAbortListener() const { return m_onAbortListener.get(); }
+
+  void setOnErrorListener(PassRefPtr<EventListener> eventListener) {
+    m_onErrorListener = eventListener;
+  }
+  EventListener* onErrorListener() const { return m_onErrorListener.get(); }
+
   void setOnLoadListener(PassRefPtr<EventListener> eventListener) {
     m_onLoadListener = eventListener;
   }
   EventListener* onLoadListener() const { return m_onLoadListener.get(); }
+
+  void setOnLoadStartListener(PassRefPtr<EventListener> eventListener) {
+    m_onLoadStartListener = eventListener;
+  }
+  EventListener* onLoadStartListener() const {
+    return m_onLoadStartListener.get();
+  }
 
   void setOnProgressListener(PassRefPtr<EventListener> eventListener) {
     m_onProgressListener = eventListener;
@@ -124,8 +141,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
                              ExceptionCode&,
                              bool tempEvent = false);
   EventListenersMap& eventListeners() { return m_eventListeners; }
-
-  void dispatchProgressEvent(long long expectedLength);
 
   Document* document() const { return m_doc; }
 
@@ -189,10 +204,25 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void networkError();
   void abortError();
 
+  void dispatchReadyStateChangeEvent();
+  void dispatchXMLHttpRequestProgressEvent(EventListener* listener,
+                                           const AtomicString& type,
+                                           bool lengthComputable,
+                                           unsigned loaded,
+                                           unsigned total);
+  void dispatchAbortEvent();
+  void dispatchErrorEvent();
+  void dispatchLoadEvent();
+  void dispatchLoadStartEvent();
+  void dispatchProgressEvent(long long expectedLength);
+
   Document* m_doc;
 
   RefPtr<EventListener> m_onReadyStateChangeListener;
+  RefPtr<EventListener> m_onAbortListener;
+  RefPtr<EventListener> m_onErrorListener;
   RefPtr<EventListener> m_onLoadListener;
+  RefPtr<EventListener> m_onLoadStartListener;
   RefPtr<EventListener> m_onProgressListener;
   EventListenersMap m_eventListeners;
 
