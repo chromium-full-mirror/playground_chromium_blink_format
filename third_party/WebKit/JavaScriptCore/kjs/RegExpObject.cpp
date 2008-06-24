@@ -39,10 +39,22 @@ namespace KJS {
 
 // ------------------------------ RegExpPrototype ---------------------------
 
-static JSValue* regExpProtoFuncTest(ExecState*, JSObject*, const ArgList&);
-static JSValue* regExpProtoFuncExec(ExecState*, JSObject*, const ArgList&);
-static JSValue* regExpProtoFuncCompile(ExecState*, JSObject*, const ArgList&);
-static JSValue* regExpProtoFuncToString(ExecState*, JSObject*, const ArgList&);
+static JSValue* regExpProtoFuncTest(ExecState*,
+                                    JSObject*,
+                                    JSValue*,
+                                    const ArgList&);
+static JSValue* regExpProtoFuncExec(ExecState*,
+                                    JSObject*,
+                                    JSValue*,
+                                    const ArgList&);
+static JSValue* regExpProtoFuncCompile(ExecState*,
+                                       JSObject*,
+                                       JSValue*,
+                                       const ArgList&);
+static JSValue* regExpProtoFuncToString(ExecState*,
+                                        JSObject*,
+                                        JSValue*,
+                                        const ArgList&);
 
 // ECMA 15.10.5
 
@@ -73,27 +85,28 @@ RegExpPrototype::RegExpPrototype(ExecState* exec,
 // ------------------------------ Functions ---------------------------
 
 JSValue* regExpProtoFuncTest(ExecState* exec,
-                             JSObject* thisObj,
+                             JSObject*,
+                             JSValue* thisValue,
                              const ArgList& args) {
-  if (!thisObj->inherits(&RegExpObject::info))
+  if (!thisValue->isObject(&RegExpObject::info))
     return throwError(exec, TypeError);
-
-  return static_cast<RegExpObject*>(thisObj)->test(exec, args);
+  return static_cast<RegExpObject*>(thisValue)->test(exec, args);
 }
 
 JSValue* regExpProtoFuncExec(ExecState* exec,
-                             JSObject* thisObj,
+                             JSObject*,
+                             JSValue* thisValue,
                              const ArgList& args) {
-  if (!thisObj->inherits(&RegExpObject::info))
+  if (!thisValue->isObject(&RegExpObject::info))
     return throwError(exec, TypeError);
-
-  return static_cast<RegExpObject*>(thisObj)->exec(exec, args);
+  return static_cast<RegExpObject*>(thisValue)->exec(exec, args);
 }
 
 JSValue* regExpProtoFuncCompile(ExecState* exec,
-                                JSObject* thisObj,
+                                JSObject*,
+                                JSValue* thisValue,
                                 const ArgList& args) {
-  if (!thisObj->inherits(&RegExpObject::info))
+  if (!thisValue->isObject(&RegExpObject::info))
     return throwError(exec, TypeError);
 
   RefPtr<RegExp> regExp;
@@ -117,28 +130,37 @@ JSValue* regExpProtoFuncCompile(ExecState* exec,
         exec, SyntaxError,
         UString("Invalid regular expression: ").append(regExp->errorMessage()));
 
-  static_cast<RegExpObject*>(thisObj)->setRegExp(regExp.release());
-  static_cast<RegExpObject*>(thisObj)->setLastIndex(0);
+  static_cast<RegExpObject*>(thisValue)->setRegExp(regExp.release());
+  static_cast<RegExpObject*>(thisValue)->setLastIndex(0);
   return jsUndefined();
 }
 
 JSValue* regExpProtoFuncToString(ExecState* exec,
-                                 JSObject* thisObj,
+                                 JSObject*,
+                                 JSValue* thisValue,
                                  const ArgList&) {
-  if (!thisObj->inherits(&RegExpObject::info)) {
-    if (thisObj->inherits(&RegExpPrototype::info))
+  if (!thisValue->isObject(&RegExpObject::info)) {
+    if (thisValue->isObject(&RegExpPrototype::info))
       return jsString(exec, "//");
     return throwError(exec, TypeError);
   }
 
-  UString result =
-      "/" + thisObj->get(exec, exec->propertyNames().source)->toString(exec) +
-      "/";
-  if (thisObj->get(exec, exec->propertyNames().global)->toBoolean(exec))
+  UString result = "/" +
+                   static_cast<RegExpObject*>(thisValue)
+                       ->get(exec, exec->propertyNames().source)
+                       ->toString(exec) +
+                   "/";
+  if (static_cast<RegExpObject*>(thisValue)
+          ->get(exec, exec->propertyNames().global)
+          ->toBoolean(exec))
     result += "g";
-  if (thisObj->get(exec, exec->propertyNames().ignoreCase)->toBoolean(exec))
+  if (static_cast<RegExpObject*>(thisValue)
+          ->get(exec, exec->propertyNames().ignoreCase)
+          ->toBoolean(exec))
     result += "i";
-  if (thisObj->get(exec, exec->propertyNames().multiline)->toBoolean(exec))
+  if (static_cast<RegExpObject*>(thisValue)
+          ->get(exec, exec->propertyNames().multiline)
+          ->toBoolean(exec))
     result += "m";
   return jsString(exec, result);
 }
@@ -149,7 +171,7 @@ JSValue* regExpProtoFuncToString(ExecState* exec,
 const ClassInfo RegExpObject::info = {"RegExp", 0, 0, ExecState::regExpTable};
 
 /* Source for RegExpObject.lut.h
-@begin regExpTable 5
+@begin regExpTable
     global        RegExpObject::Global       DontDelete|ReadOnly|DontEnum
     ignoreCase    RegExpObject::IgnoreCase   DontDelete|ReadOnly|DontEnum
     multiline     RegExpObject::Multiline    DontDelete|ReadOnly|DontEnum
@@ -253,14 +275,16 @@ JSValue* RegExpObject::exec(ExecState* exec, const ArgList& args) {
              : jsNull();
 }
 
-CallType RegExpObject::getCallData(CallData&) {
-  return CallTypeNative;
+static JSValue* callRegExpObject(ExecState* exec,
+                                 JSObject* function,
+                                 JSValue*,
+                                 const ArgList& args) {
+  return static_cast<RegExpObject*>(function)->exec(exec, args);
 }
 
-JSValue* RegExpObject::callAsFunction(ExecState* exec,
-                                      JSObject*,
-                                      const ArgList& args) {
-  return RegExpObject::exec(exec, args);
+CallType RegExpObject::getCallData(CallData& callData) {
+  callData.native.function = callRegExpObject;
+  return CallTypeNative;
 }
 
 // ------------------------------ RegExpConstructor
@@ -270,7 +294,7 @@ const ClassInfo RegExpConstructor::info = {
     "Function", &InternalFunction::info, 0, ExecState::regExpConstructorTable};
 
 /* Source for RegExpObject.lut.h
-@begin regExpConstructorTable 21
+@begin regExpConstructorTable
   input           RegExpConstructor::Input          None
   $_              RegExpConstructor::Input          DontEnum
   multiline       RegExpConstructor::Multiline      None
@@ -351,9 +375,9 @@ void RegExpConstructor::performMatch(RegExp* r,
 class RegExpMatchesArray : public JSArray {
  public:
   RegExpMatchesArray(ExecState*, RegExpConstructorPrivate*);
-
   virtual ~RegExpMatchesArray();
 
+ private:
   virtual bool getOwnPropertySlot(ExecState* exec,
                                   const Identifier& propertyName,
                                   PropertySlot& slot) {
@@ -396,7 +420,6 @@ class RegExpMatchesArray : public JSArray {
     JSArray::getPropertyNames(exec, arr);
   }
 
- private:
   void fillArrayInstance(ExecState*);
 };
 
@@ -550,12 +573,8 @@ void RegExpConstructor::putValueProperty(ExecState* exec,
   }
 }
 
-ConstructType RegExpConstructor::getConstructData(ConstructData&) {
-  return ConstructTypeNative;
-}
-
 // ECMA 15.10.4
-JSObject* RegExpConstructor::construct(ExecState* exec, const ArgList& args) {
+static JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
   JSValue* arg0 = args[0];
   JSValue* arg1 = args[1];
 
@@ -580,11 +599,29 @@ JSObject* RegExpConstructor::construct(ExecState* exec, const ArgList& args) {
                               .append(regExp->errorMessage()));
 }
 
+static JSObject* constructWithRegExpConstructor(ExecState* exec,
+                                                JSObject*,
+                                                const ArgList& args) {
+  return constructRegExp(exec, args);
+}
+
+ConstructType RegExpConstructor::getConstructData(
+    ConstructData& constructData) {
+  constructData.native.function = constructWithRegExpConstructor;
+  return ConstructTypeNative;
+}
+
 // ECMA 15.10.3
-JSValue* RegExpConstructor::callAsFunction(ExecState* exec,
-                                           JSObject* /*thisObj*/,
-                                           const ArgList& args) {
-  return construct(exec, args);
+static JSValue* callRegExpConstructor(ExecState* exec,
+                                      JSObject*,
+                                      JSValue*,
+                                      const ArgList& args) {
+  return constructRegExp(exec, args);
+}
+
+CallType RegExpConstructor::getCallData(CallData& callData) {
+  callData.native.function = callRegExpConstructor;
+  return CallTypeNative;
 }
 
 const UString& RegExpConstructor::input() const {

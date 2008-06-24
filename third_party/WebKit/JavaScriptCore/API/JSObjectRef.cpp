@@ -136,9 +136,8 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
     args.append(jsString(exec, UString(toJS(parameterNames[i]))));
   args.append(jsString(exec, UString(bodyRep)));
 
-  JSObject* result =
-      exec->dynamicGlobalObject()->functionConstructor()->construct(
-          exec, args, nameID, UString(sourceURLRep), startingLineNumber);
+  JSObject* result = constructFunction(
+      exec, args, nameID, UString(sourceURLRep), startingLineNumber);
   if (exec->hadException()) {
     if (exception)
       *exception = toRef(exec->exception());
@@ -293,8 +292,8 @@ bool JSObjectSetPrivate(JSObjectRef object, void* data) {
 }
 
 bool JSObjectIsFunction(JSContextRef, JSObjectRef object) {
-  JSObject* jsObject = toJS(object);
-  return jsObject->implementsCall();
+  CallData callData;
+  return toJS(object)->getCallData(callData) != CallTypeNone;
 }
 
 JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
@@ -315,9 +314,13 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
   for (size_t i = 0; i < argumentCount; i++)
     argList.append(toJS(arguments[i]));
 
-  JSValueRef result = toRef(jsObject->callAsFunction(
-      exec, jsThisObject,
-      argList));  // returns NULL if object->implementsCall() is false
+  CallData callData;
+  CallType callType = jsObject->getCallData(callData);
+  if (callType == CallTypeNone)
+    return 0;
+
+  JSValueRef result =
+      toRef(call(exec, jsObject, callType, callData, jsThisObject, argList));
   if (exec->hadException()) {
     if (exception)
       *exception = toRef(exec->exception());
@@ -342,12 +345,16 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,
   ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
 
+  ConstructData constructData;
+  ConstructType constructType = jsObject->getConstructData(constructData);
+  if (constructType == ConstructTypeNone)
+    return 0;
+
   ArgList argList;
   for (size_t i = 0; i < argumentCount; i++)
     argList.append(toJS(arguments[i]));
-
-  JSObjectRef result = toRef(jsObject->construct(
-      exec, argList));  // returns NULL if object->implementsCall() is false
+  JSObjectRef result =
+      toRef(construct(exec, jsObject, constructType, constructData, argList));
   if (exec->hadException()) {
     if (exception)
       *exception = toRef(exec->exception());

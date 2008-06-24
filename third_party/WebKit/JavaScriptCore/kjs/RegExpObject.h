@@ -47,11 +47,8 @@ class RegExpObject : public JSObject {
   void setRegExp(PassRefPtr<RegExp> r) { m_regExp = r; }
   RegExp* regExp() const { return m_regExp.get(); }
 
-  JSValue* test(ExecState*, const ArgList& args);
-  JSValue* exec(ExecState*, const ArgList& args);
-
-  virtual CallType getCallData(CallData&);
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const ArgList&);
+  JSValue* test(ExecState*, const ArgList&);
+  JSValue* exec(ExecState*, const ArgList&);
 
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
@@ -64,7 +61,9 @@ class RegExpObject : public JSObject {
   void setLastIndex(double lastIndex) { m_lastIndex = lastIndex; }
 
  private:
-  bool match(ExecState*, const ArgList& args);
+  bool match(ExecState*, const ArgList&);
+
+  virtual CallType getCallData(CallData&);
 
   RefPtr<RegExp> m_regExp;
   double m_lastIndex;
@@ -92,17 +91,11 @@ class RegExpConstructor : public InternalFunction {
 
   RegExpConstructor(ExecState*, FunctionPrototype*, RegExpPrototype*);
 
-  virtual ConstructType getConstructData(ConstructData&);
-  virtual JSObject* construct(ExecState*, const ArgList&);
-
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const ArgList&);
-
   virtual void put(ExecState*, const Identifier&, JSValue*);
   void putValueProperty(ExecState*, int token, JSValue*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
 
-  virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
   void performMatch(RegExp*,
@@ -115,6 +108,10 @@ class RegExpConstructor : public InternalFunction {
   const UString& input() const;
 
  private:
+  virtual ConstructType getConstructData(ConstructData&);
+  virtual CallType getCallData(CallData&);
+  virtual const ClassInfo* classInfo() const { return &info; }
+
   JSValue* getBackref(ExecState*, unsigned) const;
   JSValue* getLastParen(ExecState*) const;
   JSValue* getLeftContext(ExecState*) const;

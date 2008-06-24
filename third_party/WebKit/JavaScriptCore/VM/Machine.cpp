@@ -184,7 +184,8 @@ static JSValue* jsTypeStringForValue(ExecState* exec, JSValue* v) {
         // as null when doing comparisons.
         if (static_cast<JSObject*>(v)->masqueradeAsUndefined())
           return jsString(exec, "undefined");
-        else if (static_cast<JSObject*>(v)->implementsCall())
+        CallData callData;
+        if (static_cast<JSObject*>(v)->getCallData(callData) != CallTypeNone)
           return jsString(exec, "function");
       }
 
@@ -1103,9 +1104,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
          constructor, and puts the result in register dst.
       */
       int dst = (++vPC)->u.operand;
-      r[dst].u.jsValue =
-          scopeChain->globalObject()->objectConstructor()->construct(
-              exec, exec->emptyList());
+      r[dst].u.jsValue = constructEmptyObject(exec);
 
       ++vPC;
       NEXT_OPCODE;
@@ -1117,9 +1116,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
          constructor, and puts the result in register dst.
       */
       int dst = (++vPC)->u.operand;
-      r[dst].u.jsValue =
-          scopeChain->globalObject()->arrayConstructor()->construct(
-              exec, exec->emptyList());
+      r[dst].u.jsValue = constructEmptyArray(exec);
 
       ++vPC;
       NEXT_OPCODE;
@@ -2322,14 +2319,14 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         r[firstArg].u.jsValue = thisVal == missingThisObjectMarker()
                                     ? exec->globalThisValue()
                                     : (r[thisVal].u.jsValue)->toObject(exec);
-        JSObject* thisObj = static_cast<JSObject*>(r[firstArg].u.jsValue);
+        JSValue* thisValue = r[firstArg].u.jsValue;
 
         ArgList args(reinterpret_cast<JSValue***>(registerBase),
                      registerOffset + firstArg + 1, argCount - 1);
 
         registerFile->setSafeForReentry(true);
-        JSValue* returnValue =
-            static_cast<JSObject*>(v)->callAsFunction(exec, thisObj, args);
+        JSValue* returnValue = callData.native.function(
+            exec, static_cast<JSObject*>(v), thisValue, args);
         registerFile->setSafeForReentry(false);
 
         r = (*registerBase) + registerOffset;
@@ -2479,7 +2476,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
                      registerOffset + firstArg + 1, argCount - 1);
 
         registerFile->setSafeForReentry(true);
-        JSValue* returnValue = constructor->construct(exec, args);
+        JSValue* returnValue =
+            constructData.native.function(exec, constructor, args);
         registerFile->setSafeForReentry(false);
 
         r = (*registerBase) + registerOffset;

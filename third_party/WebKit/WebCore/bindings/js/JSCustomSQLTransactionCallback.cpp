@@ -115,18 +115,20 @@ void JSCustomSQLTransactionCallback::handleEvent(SQLTransaction* transaction,
 
   KJS::JSLock lock;
 
-  JSValue* handleEventFuncValue =
+  JSValue* handleEventFunction =
       m_data->callback()->get(exec, Identifier(exec, "handleEvent"));
-  JSObject* handleEventFunc = 0;
-  if (handleEventFuncValue->isObject()) {
-    handleEventFunc = static_cast<JSObject*>(handleEventFuncValue);
-    if (!handleEventFunc->implementsCall())
-      handleEventFunc = 0;
-  }
+  CallData handleEventCallData;
+  CallType handleEventCallType =
+      handleEventFunction->getCallData(handleEventCallData);
+  CallData callbackCallData;
+  CallType callbackCallType;
 
-  if (!handleEventFunc && !m_data->callback()->implementsCall()) {
-    // FIXME: Should an exception be thrown here?
-    return;
+  if (handleEventCallType == CallTypeNone) {
+    callbackCallType = m_data->callback()->getCallData(callbackCallData);
+    if (callbackCallType == CallTypeNone) {
+      // FIXME: Should an exception be thrown here?
+      return;
+    }
   }
 
   RefPtr<JSCustomSQLTransactionCallback> protect(this);
@@ -135,10 +137,12 @@ void JSCustomSQLTransactionCallback::handleEvent(SQLTransaction* transaction,
   args.append(toJS(exec, transaction));
 
   globalObject->startTimeoutCheck();
-  if (handleEventFunc)
-    handleEventFunc->callAsFunction(exec, m_data->callback(), args);
+  if (handleEventCallType != CallTypeNone)
+    call(exec, handleEventFunction, handleEventCallType, handleEventCallData,
+         m_data->callback(), args);
   else
-    m_data->callback()->callAsFunction(exec, m_data->callback(), args);
+    call(exec, m_data->callback(), callbackCallType, callbackCallData,
+         m_data->callback(), args);
   globalObject->stopTimeoutCheck();
 
   if (exec->hadException()) {

@@ -27,12 +27,13 @@
 
 #include "Traversal.h"
 #include <wtf/PassRefPtr.h>
+#include <wtf/RefCounted.h>
 
 namespace WebCore {
 
 typedef int ExceptionCode;
 
-class NodeIterator : public Traversal {
+class NodeIterator : public RefCounted<NodeIterator>, public Traversal {
  public:
   static PassRefPtr<NodeIterator> create(PassRefPtr<Node> rootNode,
                                          unsigned whatToShow,
@@ -41,7 +42,7 @@ class NodeIterator : public Traversal {
     return adoptRef(
         new NodeIterator(rootNode, whatToShow, filter, expandEntityReferences));
   }
-  virtual ~NodeIterator();
+  ~NodeIterator();
 
   PassRefPtr<Node> nextNode(ExceptionCode&, KJS::JSValue*& exception);
   PassRefPtr<Node> previousNode(ExceptionCode&, KJS::JSValue*& exception);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,6 +44,16 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
 
   bool allowsUnwrappedAccessFrom(const KJS::ExecState*) const;
 
+  static const KJS::ClassInfo s_info;
+
+ protected:
+  JSQuarantinedObjectWrapper(KJS::ExecState* unwrappedExec,
+                             KJS::JSObject* unwrappedObject,
+                             KJS::JSValue* wrappedPrototype);
+
+  virtual void mark();
+
+ private:
   virtual bool getOwnPropertySlot(KJS::ExecState*,
                                   const KJS::Identifier&,
                                   KJS::PropertySlot&);
@@ -57,31 +67,17 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
   virtual bool deleteProperty(KJS::ExecState*, const KJS::Identifier&);
   virtual bool deleteProperty(KJS::ExecState*, unsigned);
 
+  virtual KJS::CallType getCallData(KJS::CallData&);
   virtual KJS::ConstructType getConstructData(KJS::ConstructData&);
-  virtual KJS::JSObject* construct(KJS::ExecState*, const KJS::ArgList& args);
 
   virtual bool implementsHasInstance() const;
   virtual bool hasInstance(KJS::ExecState*, KJS::JSValue*);
 
-  virtual KJS::CallType getCallData(KJS::CallData&);
-  virtual KJS::JSValue* callAsFunction(KJS::ExecState*,
-                                       KJS::JSObject* thisObj,
-                                       const KJS::ArgList& args);
-
   virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
-
-  virtual void mark();
 
   virtual KJS::UString className() const {
     return m_unwrappedObject->className();
   }
-  virtual const KJS::ClassInfo* classInfo() const { return &s_info; }
-  static const KJS::ClassInfo s_info;
-
- protected:
-  JSQuarantinedObjectWrapper(KJS::ExecState* unwrappedExec,
-                             KJS::JSObject* unwrappedObject,
-                             KJS::JSValue* wrappedPrototype);
 
   virtual bool allowsGetProperty() const { return false; }
   virtual bool allowsSetProperty() const { return false; }
@@ -98,12 +94,19 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
       KJS::ExecState* unwrappedExec,
       KJS::JSValue* unwrappedValue) const = 0;
 
- private:
   static KJS::JSValue* cachedValueGetter(KJS::ExecState*,
                                          const KJS::Identifier&,
                                          const KJS::PropertySlot&);
 
   void transferExceptionToExecState(KJS::ExecState*) const;
+
+  static KJS::JSValue* call(KJS::ExecState*,
+                            KJS::JSObject* function,
+                            KJS::JSValue* thisValue,
+                            const KJS::ArgList&);
+  static KJS::JSObject* construct(KJS::ExecState*,
+                                  KJS::JSObject*,
+                                  const KJS::ArgList&);
 
   KJS::JSGlobalObject* m_unwrappedGlobalObject;
   KJS::JSObject* m_unwrappedObject;

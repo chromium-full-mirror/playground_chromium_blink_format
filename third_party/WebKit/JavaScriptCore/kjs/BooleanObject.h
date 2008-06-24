@@ -55,11 +55,13 @@ class BooleanConstructor : public InternalFunction {
  public:
   BooleanConstructor(ExecState*, FunctionPrototype*, BooleanPrototype*);
 
+ private:
   virtual ConstructType getConstructData(ConstructData&);
-  virtual JSObject* construct(ExecState*, const ArgList&);
-
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const ArgList&);
+  virtual CallType getCallData(CallData&);
 };
+
+JSObject* constructBooleanFromImmediateBoolean(ExecState*, JSValue*);
+JSObject* constructBoolean(ExecState*, const ArgList&);
 
 }  // namespace KJS
 

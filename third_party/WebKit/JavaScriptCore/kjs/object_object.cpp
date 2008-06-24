@@ -32,30 +32,41 @@ namespace KJS {
 // ------------------------------ ObjectPrototype
 // --------------------------------
 
-static JSValue* objectProtoFuncValueOf(ExecState*, JSObject*, const ArgList&);
+static JSValue* objectProtoFuncValueOf(ExecState*,
+                                       JSObject*,
+                                       JSValue*,
+                                       const ArgList&);
 static JSValue* objectProtoFuncHasOwnProperty(ExecState*,
                                               JSObject*,
+                                              JSValue*,
                                               const ArgList&);
 static JSValue* objectProtoFuncIsPrototypeOf(ExecState*,
                                              JSObject*,
+                                             JSValue*,
                                              const ArgList&);
 static JSValue* objectProtoFuncDefineGetter(ExecState*,
                                             JSObject*,
+                                            JSValue*,
                                             const ArgList&);
 static JSValue* objectProtoFuncDefineSetter(ExecState*,
                                             JSObject*,
+                                            JSValue*,
                                             const ArgList&);
 static JSValue* objectProtoFuncLookupGetter(ExecState*,
                                             JSObject*,
+                                            JSValue*,
                                             const ArgList&);
 static JSValue* objectProtoFuncLookupSetter(ExecState*,
                                             JSObject*,
+                                            JSValue*,
                                             const ArgList&);
 static JSValue* objectProtoFuncPropertyIsEnumerable(ExecState*,
                                                     JSObject*,
+                                                    JSValue*,
                                                     const ArgList&);
 static JSValue* objectProtoFuncToLocaleString(ExecState*,
                                               JSObject*,
+                                              JSValue*,
                                               const ArgList&);
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
@@ -118,20 +129,27 @@ ObjectPrototype::ObjectPrototype(ExecState* exec,
 
 // ECMA 15.2.4.2, 15.2.4.4, 15.2.4.5, 15.2.4.7
 
-JSValue* objectProtoFuncValueOf(ExecState*, JSObject* thisObj, const ArgList&) {
-  return thisObj;
+JSValue* objectProtoFuncValueOf(ExecState* exec,
+                                JSObject*,
+                                JSValue* thisValue,
+                                const ArgList&) {
+  return thisValue->toThisObject(exec);
 }
 
 JSValue* objectProtoFuncHasOwnProperty(ExecState* exec,
-                                       JSObject* thisObj,
+                                       JSObject*,
+                                       JSValue* thisValue,
                                        const ArgList& args) {
-  return jsBoolean(
-      thisObj->hasOwnProperty(exec, Identifier(exec, args[0]->toString(exec))));
+  return jsBoolean(thisValue->toThisObject(exec)->hasOwnProperty(
+      exec, Identifier(exec, args[0]->toString(exec))));
 }
 
-JSValue* objectProtoFuncIsPrototypeOf(ExecState*,
-                                      JSObject* thisObj,
+JSValue* objectProtoFuncIsPrototypeOf(ExecState* exec,
+                                      JSObject*,
+                                      JSValue* thisValue,
                                       const ArgList& args) {
+  JSObject* thisObj = thisValue->toThisObject(exec);
+
   if (!args[0]->isObject())
     return jsBoolean(false);
 
@@ -140,65 +158,75 @@ JSValue* objectProtoFuncIsPrototypeOf(ExecState*,
   while (true) {
     if (!v->isObject())
       return jsBoolean(false);
-    if (thisObj == static_cast<JSObject*>(v))
+    if (thisObj == v)
       return jsBoolean(true);
     v = static_cast<JSObject*>(v)->prototype();
   }
 }
 
 JSValue* objectProtoFuncDefineGetter(ExecState* exec,
-                                     JSObject* thisObj,
+                                     JSObject*,
+                                     JSValue* thisValue,
                                      const ArgList& args) {
-  if (!args[1]->isObject() ||
-      !static_cast<JSObject*>(args[1])->implementsCall())
+  CallData callData;
+  if (args[1]->getCallData(callData) == CallTypeNone)
     return throwError(exec, SyntaxError, "invalid getter usage");
-
-  thisObj->defineGetter(exec, Identifier(exec, args[0]->toString(exec)),
-                        static_cast<JSObject*>(args[1]));
+  thisValue->toThisObject(exec)->defineGetter(
+      exec, Identifier(exec, args[0]->toString(exec)),
+      static_cast<JSObject*>(args[1]));
   return jsUndefined();
 }
 
 JSValue* objectProtoFuncDefineSetter(ExecState* exec,
-                                     JSObject* thisObj,
+                                     JSObject*,
+                                     JSValue* thisValue,
                                      const ArgList& args) {
-  if (!args[1]->isObject() ||
-      !static_cast<JSObject*>(args[1])->implementsCall())
+  CallData callData;
+  if (args[1]->getCallData(callData) == CallTypeNone)
     return throwError(exec, SyntaxError, "invalid setter usage");
-
-  thisObj->defineSetter(exec, Identifier(exec, args[0]->toString(exec)),
-                        static_cast<JSObject*>(args[1]));
+  thisValue->toThisObject(exec)->defineSetter(
+      exec, Identifier(exec, args[0]->toString(exec)),
+      static_cast<JSObject*>(args[1]));
   return jsUndefined();
 }
 
 JSValue* objectProtoFuncLookupGetter(ExecState* exec,
-                                     JSObject* thisObj,
+                                     JSObject*,
+                                     JSValue* thisValue,
                                      const ArgList& args) {
-  return thisObj->lookupGetter(exec, Identifier(exec, args[0]->toString(exec)));
+  return thisValue->toThisObject(exec)->lookupGetter(
+      exec, Identifier(exec, args[0]->toString(exec)));
 }
 
 JSValue* objectProtoFuncLookupSetter(ExecState* exec,
-                                     JSObject* thisObj,
+                                     JSObject*,
+                                     JSValue* thisValue,
                                      const ArgList& args) {
-  return thisObj->lookupSetter(exec, Identifier(exec, args[0]->toString(exec)));
+  return thisValue->toThisObject(exec)->lookupSetter(
+      exec, Identifier(exec, args[0]->toString(exec)));
 }
 
 JSValue* objectProtoFuncPropertyIsEnumerable(ExecState* exec,
-                                             JSObject* thisObj,
+                                             JSObject*,
+                                             JSValue* thisValue,
                                              const ArgList& args) {
-  return jsBoolean(thisObj->propertyIsEnumerable(
+  return jsBoolean(thisValue->toThisObject(exec)->propertyIsEnumerable(
       exec, Identifier(exec, args[0]->toString(exec))));
 }
 
 JSValue* objectProtoFuncToLocaleString(ExecState* exec,
-                                       JSObject* thisObj,
+                                       JSObject*,
+                                       JSValue* thisValue,
                                        const ArgList&) {
-  return jsString(exec, thisObj->toString(exec));
+  return jsString(exec, thisValue->toThisObject(exec)->toString(exec));
 }
 
 JSValue* objectProtoFuncToString(ExecState* exec,
-                                 JSObject* thisObj,
+                                 JSObject*,
+                                 JSValue* thisValue,
                                  const ArgList&) {
-  return jsString(exec, "[object " + thisObj->className() + "]");
+  return jsString(
+      exec, "[object " + thisValue->toThisObject(exec)->className() + "]");
 }
 
 // ------------------------------ ObjectConstructor
@@ -214,36 +242,40 @@ ObjectConstructor::ObjectConstructor(ExecState* exec,
 
   // no. of arguments for constructor
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
-            ReadOnly | DontDelete | DontEnum);
-}
-
-ConstructType ObjectConstructor::getConstructData(ConstructData&) {
-  return ConstructTypeNative;
+            ReadOnly | DontEnum | DontDelete);
 }
 
 // ECMA 15.2.2
-JSObject* ObjectConstructor::construct(ExecState* exec, const ArgList& args) {
+static ALWAYS_INLINE JSObject* constructObject(ExecState* exec,
+                                               const ArgList& args) {
   JSValue* arg = args[0];
-  switch (arg->type()) {
-    case StringType:
-    case BooleanType:
-    case NumberType:
-    case ObjectType:
-      return arg->toObject(exec);
-    case NullType:
-    case UndefinedType:
-      return new (exec)
-          JSObject(exec->lexicalGlobalObject()->objectPrototype());
-    default:
-      ASSERT_NOT_REACHED();
-      return 0;
-  }
+  if (arg->isUndefinedOrNull())
+    return new (exec) JSObject(exec->lexicalGlobalObject()->objectPrototype());
+  return arg->toObject(exec);
 }
 
-JSValue* ObjectConstructor::callAsFunction(ExecState* exec,
-                                           JSObject* /*thisObj*/,
-                                           const ArgList& args) {
-  return construct(exec, args);
+static JSObject* constructWithObjectConstructor(ExecState* exec,
+                                                JSObject*,
+                                                const ArgList& args) {
+  return constructObject(exec, args);
+}
+
+ConstructType ObjectConstructor::getConstructData(
+    ConstructData& constructData) {
+  constructData.native.function = constructWithObjectConstructor;
+  return ConstructTypeNative;
+}
+
+static JSValue* callObjectConstructor(ExecState* exec,
+                                      JSObject*,
+                                      JSValue*,
+                                      const ArgList& args) {
+  return constructObject(exec, args);
+}
+
+CallType ObjectConstructor::getCallData(CallData& callData) {
+  callData.native.function = callObjectConstructor;
+  return CallTypeNative;
 }
 
 }  // namespace KJS

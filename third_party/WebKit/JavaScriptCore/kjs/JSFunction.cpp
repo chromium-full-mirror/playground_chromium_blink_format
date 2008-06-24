@@ -80,24 +80,24 @@ CallType JSFunction::getCallData(CallData& callData) {
   return CallTypeJS;
 }
 
-JSValue* JSFunction::callAsFunction(ExecState* exec,
-                                    JSObject* thisObj,
-                                    const ArgList& args) {
+JSValue* JSFunction::call(ExecState* exec,
+                          JSValue* thisValue,
+                          const ArgList& args) {
   JSValue* exception = 0;
   RegisterFileStack* stack = &exec->dynamicGlobalObject()->registerFileStack();
   RegisterFile* current = stack->current();
   if (!current->safeForReentry()) {
     stack->pushFunctionRegisterFile();
-    JSValue* result =
-        exec->machine()->execute(body.get(), exec, this, thisObj, args, stack,
-                                 _scope.node(), &exception);
+    JSValue* result = exec->machine()->execute(
+        body.get(), exec, this, thisValue->toThisObject(exec), args, stack,
+        _scope.node(), &exception);
     stack->popFunctionRegisterFile();
     exec->setException(exception);
     return result;
   } else {
-    JSValue* result =
-        exec->machine()->execute(body.get(), exec, this, thisObj, args, stack,
-                                 _scope.node(), &exception);
+    JSValue* result = exec->machine()->execute(
+        body.get(), exec, this, thisValue->toThisObject(exec), args, stack,
+        _scope.node(), &exception);
     current->setSafeForReentry(true);
     exec->setException(exception);
     return result;
@@ -170,13 +170,13 @@ bool JSFunction::deleteProperty(ExecState* exec,
  * it appears associates with it. eg:
  * function f2(x, x): getParameterName(0) --> null
  */
-Identifier JSFunction::getParameterName(int index) {
+const Identifier& JSFunction::getParameterName(int index) {
   Vector<Identifier>& parameters = body->parameters();
 
   if (static_cast<size_t>(index) >= body->parameters().size())
     return JSGlobalData::threadInstance().propertyNames->nullIdentifier;
 
-  Identifier name = parameters[index];
+  const Identifier& name = parameters[index];
 
   // Are there any subsequent parameters with the same name?
   size_t size = parameters.size();
@@ -581,11 +581,11 @@ static double parseFloat(const UString& s) {
 }
 
 JSValue* globalFuncEval(ExecState* exec,
-                        PrototypeReflexiveFunction* function,
-                        JSObject* thisObj,
+                        JSObject* function,
+                        JSValue* thisValue,
                         const ArgList& args) {
-  JSGlobalObject* globalObject = thisObj->toGlobalObject(exec);
-
+  JSObject* thisObject = thisValue->toThisObject(exec);
+  JSGlobalObject* globalObject = thisObject->toGlobalObject(exec);
   if (!globalObject || globalObject->evalFunction() != function)
     return throwError(exec, EvalError,
                       "The \"this\" value passed to eval must be the global "
@@ -610,7 +610,7 @@ JSValue* globalFuncEval(ExecState* exec,
 
   JSValue* exception = 0;
   JSValue* value = exec->machine()->execute(
-      evalNode.get(), exec, thisObj,
+      evalNode.get(), exec, thisObject,
       &exec->dynamicGlobalObject()->registerFileStack(),
       globalObject->globalScopeChain().node(), &exception);
 
@@ -622,25 +622,40 @@ JSValue* globalFuncEval(ExecState* exec,
   return value ? value : jsUndefined();
 }
 
-JSValue* globalFuncParseInt(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncParseInt(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
   return jsNumber(exec,
                   parseInt(args[0]->toString(exec), args[1]->toInt32(exec)));
 }
 
-JSValue* globalFuncParseFloat(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncParseFloat(ExecState* exec,
+                              JSObject*,
+                              JSValue*,
+                              const ArgList& args) {
   return jsNumber(exec, parseFloat(args[0]->toString(exec)));
 }
 
-JSValue* globalFuncIsNaN(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncIsNaN(ExecState* exec,
+                         JSObject*,
+                         JSValue*,
+                         const ArgList& args) {
   return jsBoolean(isnan(args[0]->toNumber(exec)));
 }
 
-JSValue* globalFuncIsFinite(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncIsFinite(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
   double n = args[0]->toNumber(exec);
   return jsBoolean(!isnan(n) && !isinf(n));
 }
 
-JSValue* globalFuncDecodeURI(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncDecodeURI(ExecState* exec,
+                             JSObject*,
+                             JSValue*,
+                             const ArgList& args) {
   static const char do_not_unescape_when_decoding_URI[] = "#$&+,/:;=?@";
 
   return decode(exec, args, do_not_unescape_when_decoding_URI, true);
@@ -648,11 +663,15 @@ JSValue* globalFuncDecodeURI(ExecState* exec, JSObject*, const ArgList& args) {
 
 JSValue* globalFuncDecodeURIComponent(ExecState* exec,
                                       JSObject*,
+                                      JSValue*,
                                       const ArgList& args) {
   return decode(exec, args, "", true);
 }
 
-JSValue* globalFuncEncodeURI(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncEncodeURI(ExecState* exec,
+                             JSObject*,
+                             JSValue*,
+                             const ArgList& args) {
   static const char do_not_escape_when_encoding_URI[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
@@ -664,6 +683,7 @@ JSValue* globalFuncEncodeURI(ExecState* exec, JSObject*, const ArgList& args) {
 
 JSValue* globalFuncEncodeURIComponent(ExecState* exec,
                                       JSObject*,
+                                      JSValue*,
                                       const ArgList& args) {
   static const char do_not_escape_when_encoding_URI_component[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -674,7 +694,10 @@ JSValue* globalFuncEncodeURIComponent(ExecState* exec,
   return encode(exec, args, do_not_escape_when_encoding_URI_component);
 }
 
-JSValue* globalFuncEscape(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncEscape(ExecState* exec,
+                          JSObject*,
+                          JSValue*,
+                          const ArgList& args) {
   static const char do_not_escape[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
@@ -702,7 +725,10 @@ JSValue* globalFuncEscape(ExecState* exec, JSObject*, const ArgList& args) {
   return jsString(exec, r);
 }
 
-JSValue* globalFuncUnescape(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncUnescape(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
   UString s = "", str = args[0]->toString(exec);
   int k = 0, len = str.size();
   while (k < len) {
@@ -729,7 +755,10 @@ JSValue* globalFuncUnescape(ExecState* exec, JSObject*, const ArgList& args) {
 }
 
 #ifndef NDEBUG
-JSValue* globalFuncKJSPrint(ExecState* exec, JSObject*, const ArgList& args) {
+JSValue* globalFuncKJSPrint(ExecState* exec,
+                            JSObject*,
+                            JSValue*,
+                            const ArgList& args) {
   CStringBuffer string;
   args[0]->toString(exec).getCString(string);
   puts(string.data());
@@ -743,7 +772,7 @@ JSValue* globalFuncKJSPrint(ExecState* exec, JSObject*, const ArgList& args) {
 PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      int len,
                                      const Identifier& name,
-                                     JSMemberFunction function)
+                                     NativeFunction function)
     : InternalFunction(exec->lexicalGlobalObject()->functionPrototype(), name),
       m_function(function) {
   ASSERT_ARG(function, function);
@@ -755,46 +784,34 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      FunctionPrototype* functionPrototype,
                                      int len,
                                      const Identifier& name,
-                                     JSMemberFunction function)
+                                     NativeFunction function)
     : InternalFunction(functionPrototype, name), m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(exec, len),
             DontDelete | ReadOnly | DontEnum);
 }
 
-JSValue* PrototypeFunction::callAsFunction(ExecState* exec,
-                                           JSObject* thisObj,
-                                           const ArgList& args) {
-  return m_function(exec, thisObj, args);
+CallType PrototypeFunction::getCallData(CallData& callData) {
+  callData.native.function = m_function;
+  return CallTypeNative;
 }
 
 // ------------------------------ PrototypeReflexiveFunction
 // -------------------------------
 
-PrototypeReflexiveFunction::PrototypeReflexiveFunction(
-    ExecState* exec,
-    FunctionPrototype* functionPrototype,
-    int len,
-    const Identifier& name,
-    JSMemberFunction function,
-    JSGlobalObject* cachedGlobalObject)
-    : InternalFunction(functionPrototype, name),
-      m_function(function),
+GlobalEvalFunction::GlobalEvalFunction(ExecState* exec,
+                                       FunctionPrototype* functionPrototype,
+                                       int len,
+                                       const Identifier& name,
+                                       NativeFunction function,
+                                       JSGlobalObject* cachedGlobalObject)
+    : PrototypeFunction(exec, functionPrototype, len, name, function),
       m_cachedGlobalObject(cachedGlobalObject) {
-  ASSERT_ARG(function, function);
   ASSERT_ARG(cachedGlobalObject, cachedGlobalObject);
-  putDirect(exec->propertyNames().length, jsNumber(exec, len),
-            DontDelete | ReadOnly | DontEnum);
 }
 
-JSValue* PrototypeReflexiveFunction::callAsFunction(ExecState* exec,
-                                                    JSObject* thisObj,
-                                                    const ArgList& args) {
-  return m_function(exec, this, thisObj, args);
-}
-
-void PrototypeReflexiveFunction::mark() {
-  InternalFunction::mark();
+void GlobalEvalFunction::mark() {
+  PrototypeFunction::mark();
   if (!m_cachedGlobalObject->marked())
     m_cachedGlobalObject->mark();
 }

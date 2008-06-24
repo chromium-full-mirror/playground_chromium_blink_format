@@ -31,17 +31,32 @@
 
 namespace KJS {
 
+class ArgList;
+class ExecState;
 class FunctionBodyNode;
-class ScopeChain;
+class JSObject;
+class JSValue;
+class ScopeChainNode;
 
 enum ConstructType { ConstructTypeNone, ConstructTypeNative, ConstructTypeJS };
 
+typedef JSObject* (*NativeConstructor)(ExecState*, JSObject*, const ArgList&);
+
 union ConstructData {
+  struct {
+    NativeConstructor function;
+  } native;
   struct {
     FunctionBodyNode* functionBody;
     ScopeChainNode* scopeChain;
   } js;
 };
+
+JSObject* construct(ExecState*,
+                    JSValue* constructor,
+                    ConstructType,
+                    const ConstructData&,
+                    const ArgList&);
 
 }  // namespace KJS
 

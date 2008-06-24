@@ -1815,8 +1815,7 @@ JSFunction* FuncDeclNode::makeFunction(ExecState* exec,
   JSFunction* func =
       new (exec) JSFunction(exec, m_ident, m_body.get(), scopeChain);
 
-  JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
-      exec, exec->emptyList());
+  JSObject* proto = constructEmptyObject(exec);
   proto->putDirect(exec->propertyNames().constructor, func, DontEnum);
   func->putDirect(exec->propertyNames().prototype, proto, DontDelete);
   func->putDirect(exec->propertyNames().length,
@@ -1840,8 +1839,7 @@ JSFunction* FuncExprNode::makeFunction(ExecState* exec,
                                        ScopeChainNode* scopeChain) {
   JSFunction* func =
       new (exec) JSFunction(exec, m_ident, m_body.get(), scopeChain);
-  JSObject* proto = exec->lexicalGlobalObject()->objectConstructor()->construct(
-      exec, exec->emptyList());
+  JSObject* proto = constructEmptyObject(exec);
   proto->putDirect(exec->propertyNames().constructor, func, DontEnum);
   func->putDirect(exec->propertyNames().prototype, proto, DontDelete);
 

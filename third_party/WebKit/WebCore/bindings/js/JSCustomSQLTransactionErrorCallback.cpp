@@ -57,18 +57,16 @@ bool JSCustomSQLTransactionErrorCallback::handleEvent(SQLError* error) {
 
   KJS::JSLock lock;
 
-  JSValue* handleEventFuncValue =
-      m_callback->get(exec, Identifier(exec, "handleEvent"));
-  JSObject* handleEventFunc = 0;
-  if (handleEventFuncValue->isObject()) {
-    handleEventFunc = static_cast<JSObject*>(handleEventFuncValue);
-    if (!handleEventFunc->implementsCall())
-      handleEventFunc = 0;
-  }
-
-  if (!handleEventFunc && !m_callback->implementsCall()) {
-    // FIXME: Should an exception be thrown here?
-    return true;
+  JSValue* function = m_callback->get(exec, Identifier(exec, "handleEvent"));
+  CallData callData;
+  CallType callType = function->getCallData(callData);
+  if (callType == CallTypeNone) {
+    callType = m_callback->getCallData(callData);
+    if (callType == CallTypeNone) {
+      // FIXME: Should an exception be thrown here?
+      return true;
+    }
+    function = m_callback;
   }
 
   RefPtr<JSCustomSQLTransactionErrorCallback> protect(this);
@@ -78,10 +76,7 @@ bool JSCustomSQLTransactionErrorCallback::handleEvent(SQLError* error) {
 
   JSValue* result;
   globalObject->startTimeoutCheck();
-  if (handleEventFunc)
-    result = handleEventFunc->callAsFunction(exec, m_callback, args);
-  else
-    result = m_callback->callAsFunction(exec, m_callback, args);
+  result = call(exec, function, callType, callData, m_callback, args);
   globalObject->stopTimeoutCheck();
 
   if (exec->hadException()) {

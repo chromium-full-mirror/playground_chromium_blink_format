@@ -46,7 +46,7 @@ struct HashEntry {
   UString::Rep* key;
   union {
     intptr_t integerValue;
-    PrototypeFunction::JSMemberFunction functionValue;
+    NativeFunction functionValue;
   };
   unsigned char attributes;  // JSObject attributes
   unsigned char length;      // number of arguments for function

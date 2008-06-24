@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,28 +37,17 @@ bool JSHTMLObjectElement::customGetOwnPropertySlot(
     ExecState* exec,
     const Identifier& propertyName,
     PropertySlot& slot) {
-  return runtimeObjectCustomGetOwnPropertySlot(
-      exec, propertyName, slot, this, static_cast<HTMLElement*>(impl()));
+  return runtimeObjectCustomGetOwnPropertySlot(exec, propertyName, slot, this);
 }
 
 bool JSHTMLObjectElement::customPut(ExecState* exec,
                                     const Identifier& propertyName,
                                     JSValue* value) {
-  return runtimeObjectCustomPut(exec, propertyName, value,
-                                static_cast<HTMLElement*>(impl()));
+  return runtimeObjectCustomPut(exec, propertyName, value, impl());
 }
 
-CallType JSHTMLObjectElement::getCallData(CallData&) {
-  return runtimeObjectImplementsCall(static_cast<HTMLElement*>(impl()))
-             ? CallTypeNative
-             : CallTypeNone;
-}
-
-JSValue* JSHTMLObjectElement::callAsFunction(ExecState* exec,
-                                             JSObject* thisObj,
-                                             const ArgList& args) {
-  return runtimeObjectCallAsFunction(exec, thisObj, args,
-                                     static_cast<HTMLElement*>(impl()));
+CallType JSHTMLObjectElement::getCallData(CallData& callData) {
+  return runtimeObjectGetCallData(impl(), callData);
 }
 
 bool JSHTMLObjectElement::canGetItemsForName(ExecState*,

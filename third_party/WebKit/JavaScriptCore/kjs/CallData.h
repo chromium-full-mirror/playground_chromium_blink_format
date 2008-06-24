@@ -31,17 +31,36 @@
 
 namespace KJS {
 
+class ArgList;
+class ExecState;
 class FunctionBodyNode;
+class JSObject;
+class JSValue;
 class ScopeChainNode;
 
 enum CallType { CallTypeNone, CallTypeNative, CallTypeJS };
 
+typedef JSValue* (*NativeFunction)(ExecState*,
+                                   JSObject*,
+                                   JSValue* thisValue,
+                                   const ArgList&);
+
 union CallData {
+  struct {
+    NativeFunction function;
+  } native;
   struct {
     FunctionBodyNode* functionBody;
     ScopeChainNode* scopeChain;
   } js;
 };
+
+JSValue* call(ExecState*,
+              JSValue* functionObject,
+              CallType,
+              const CallData&,
+              JSValue* thisValue,
+              const ArgList&);
 
 }  // namespace KJS
 

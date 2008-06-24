@@ -41,8 +41,6 @@ Traversal::Traversal(PassRefPtr<Node> rootNode,
       m_filter(nodeFilter),
       m_expandEntityReferences(expandEntityReferences) {}
 
-Traversal::~Traversal() {}
-
 short Traversal::acceptNode(Node* node, JSValue*& exception) const {
   // FIXME: To handle XML properly we would have to check
   // m_expandEntityReferences.

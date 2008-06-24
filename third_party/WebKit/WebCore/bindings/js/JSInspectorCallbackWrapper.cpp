@@ -89,7 +89,7 @@ JSValue* JSInspectorCallbackWrapper::prepareIncomingValue(
         wrapper == this,
         "A different wrapper was passed into a JSInspectorCallbackWrapper");
     if (wrapper != this)
-      return 0;
+      return jsUndefined();
 
     return wrapper->unwrappedObject();
   }

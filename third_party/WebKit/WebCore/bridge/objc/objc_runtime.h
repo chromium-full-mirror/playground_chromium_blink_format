@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,24 +26,23 @@
 #ifndef KJS_BINDINGS_OBJC_RUNTIME_H
 #define KJS_BINDINGS_OBJC_RUNTIME_H
 
-#include <CoreFoundation/CoreFoundation.h>
-#include <kjs/JSObject.h>
 #include "objc_header.h"
 #include "runtime.h"
-
+#include <CoreFoundation/CoreFoundation.h>
+#include <kjs/JSObject.h>
 #include <wtf/RetainPtr.h>
 
 namespace KJS {
 namespace Bindings {
 
-extern ClassStructPtr webScriptObjectClass();
-extern ClassStructPtr webUndefinedClass();
+ClassStructPtr webScriptObjectClass();
+ClassStructPtr webUndefinedClass();
 
 class ObjcInstance;
 
 class ObjcField : public Field {
  public:
-  ObjcField(IvarStructPtr ivar);
+  ObjcField(IvarStructPtr);
   ObjcField(CFStringRef name);
 
   virtual JSValue* valueFromInstance(ExecState* exec,
@@ -104,26 +103,23 @@ class ObjcArray : public Array {
 
 class ObjcFallbackObjectImp : public JSObject {
  public:
-  ObjcFallbackObjectImp(ObjcInstance* i, const Identifier propertyName);
+  ObjcFallbackObjectImp(ObjcInstance*, const Identifier& propertyName);
 
-  const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
 
+  const Identifier& propertyName() const { return _item; }
+
+ private:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
   virtual CallType getCallData(CallData&);
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const ArgList& args);
-  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
-  virtual JSValue* defaultValue(ExecState* exec, JSType hint) const;
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
+  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
 
   virtual JSType type() const;
-  virtual bool toBoolean(ExecState* exec) const;
+  virtual bool toBoolean(ExecState*) const;
 
- private:
-  ObjcFallbackObjectImp();  // prevent default construction
-
-  static const ClassInfo info;
+  virtual const ClassInfo* classInfo() const { return &info; }
 
   RefPtr<ObjcInstance> _instance;
   Identifier _item;

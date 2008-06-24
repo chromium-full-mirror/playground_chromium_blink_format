@@ -40,6 +40,7 @@ class JSNotAnObject : public JSObject {
  public:
   JSNotAnObject(JSObject* exception) : m_exception(exception) {}
 
+ private:
   // JSValue methods
   virtual JSValue* toPrimitive(ExecState*,
                                JSType preferredType = UnspecifiedType) const;
@@ -66,22 +67,8 @@ class JSNotAnObject : public JSObject {
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
 
-  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
-
-  virtual JSObject* construct(ExecState*, const ArgList&);
-  virtual JSObject* construct(ExecState*,
-                              const ArgList&,
-                              const Identifier& functionName,
-                              const UString& sourceURL,
-                              int lineNumber);
-
-  virtual JSValue* callAsFunction(ExecState*,
-                                  JSObject* thisObj,
-                                  const ArgList&);
-
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
- private:
   JSObject* m_exception;
 };
 

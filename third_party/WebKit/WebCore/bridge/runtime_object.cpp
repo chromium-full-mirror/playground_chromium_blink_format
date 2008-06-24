@@ -189,40 +189,30 @@ JSValue* RuntimeObjectImp::defaultValue(ExecState* exec, JSType hint) const {
   if (!instance)
     return throwInvalidAccessError(exec);
 
-  JSValue* result;
-
   RefPtr<Bindings::Instance> protector(instance);
   instance->begin();
-
-  result = instance->defaultValue(exec, hint);
-
+  JSValue* result = instance->defaultValue(exec, hint);
   instance->end();
-
   return result;
 }
 
-CallType RuntimeObjectImp::getCallData(CallData&) {
-  if (!instance)
-    return CallTypeNone;
-  CallData data;
-  return instance->getCallData(data) != CallTypeNone ? CallTypeNative
-                                                     : CallTypeNone;
+static JSValue* callRuntimeObject(ExecState* exec,
+                                  JSObject* function,
+                                  JSValue*,
+                                  const ArgList& args) {
+  RefPtr<Bindings::Instance> instance(
+      static_cast<RuntimeObjectImp*>(function)->getInternalInstance());
+  instance->begin();
+  JSValue* result = instance->invokeDefaultMethod(exec, args);
+  instance->end();
+  return result;
 }
 
-JSValue* RuntimeObjectImp::callAsFunction(ExecState* exec,
-                                          JSObject*,
-                                          const ArgList& args) {
-  if (!instance)
-    return throwInvalidAccessError(exec);
-
-  RefPtr<Bindings::Instance> protector(instance);
-  instance->begin();
-
-  JSValue* aValue = instance->invokeDefaultMethod(exec, args);
-
-  instance->end();
-
-  return aValue;
+CallType RuntimeObjectImp::getCallData(CallData& callData) {
+  if (!instance || !instance->supportsInvokeDefaultMethod())
+    return CallTypeNone;
+  callData.native.function = callRuntimeObject;
+  return CallTypeNative;
 }
 
 void RuntimeObjectImp::getPropertyNames(ExecState* exec,

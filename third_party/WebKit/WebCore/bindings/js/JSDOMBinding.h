@@ -47,9 +47,9 @@ class SVGElement;
 // Base class for all objects in this binding except Window.
 class DOMObject : public KJS::JSObject {
  protected:
-  explicit DOMObject(KJS::JSValue* prototype)  // FIXME: this should take a
-                                               // JSObject once JSLocation has a
-                                               // real prototype
+  explicit DOMObject(KJS::JSValue* prototype)  // FIXME: This could take a
+                                               // JSObject if JSDOMWindowShell
+                                               // had a prototype.
       : JSObject(prototype) {
     // DOMObject destruction is not thread-safe because DOMObjects wrap
     // unsafe WebCore DOM data structures.
@@ -59,9 +59,6 @@ class DOMObject : public KJS::JSObject {
 #ifndef NDEBUG
   virtual ~DOMObject();
 #endif
-
- private:
-  DOMObject();
 };
 
 class ScriptInterpreter : public KJS::Interpreter {

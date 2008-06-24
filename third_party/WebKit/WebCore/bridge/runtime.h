@@ -34,10 +34,11 @@
 
 namespace KJS {
 
+class ArgList;
 class Identifier;
 class JSGlobalObject;
-class ArgList;
 class PropertyNameArray;
+class RuntimeObjectImp;
 
 namespace Bindings {
 
@@ -50,7 +51,6 @@ typedef Vector<Method*> MethodList;
 class Field {
  public:
   virtual const char* name() const = 0;
-
   virtual JSValue* valueFromInstance(ExecState*, const Instance*) const = 0;
   virtual void setValueToInstance(ExecState*,
                                   const Instance*,
@@ -62,7 +62,6 @@ class Field {
 class Method : Noncopyable {
  public:
   virtual const char* name() const = 0;
-
   virtual int numParameters() const = 0;
 
   virtual ~Method() {}
@@ -71,11 +70,8 @@ class Method : Noncopyable {
 class Class : Noncopyable {
  public:
   virtual const char* name() const = 0;
-
   virtual MethodList methodsNamed(const Identifier&, Instance*) const = 0;
-
   virtual Field* fieldNamed(const Identifier&, Instance*) const = 0;
-
   virtual JSValue* fallbackObject(ExecState*, Instance*, const Identifier&) {
     return jsUndefined();
   }
@@ -106,7 +102,8 @@ class Instance : public RefCounted<Instance> {
   static void setDidExecuteFunction(KJSDidExecuteFunctionPtr func);
   static KJSDidExecuteFunctionPtr didExecuteFunction();
 
-  static JSObject* createRuntimeObject(ExecState*, PassRefPtr<Instance>);
+  static RuntimeObjectImp* createRuntimeObject(ExecState*,
+                                               PassRefPtr<Instance>);
   static Instance* getInstance(JSObject*, BindingLanguage);
 
   // These functions are called before and after the main entry points into
@@ -129,11 +126,11 @@ class Instance : public RefCounted<Instance> {
                                         const Identifier&,
                                         JSValue*) {}
 
-  virtual CallType getCallData(CallData&) { return CallTypeNone; }
-
   virtual JSValue* invokeMethod(ExecState*,
                                 const MethodList&,
                                 const ArgList& args) = 0;
+
+  virtual bool supportsInvokeDefaultMethod() const { return false; }
   virtual JSValue* invokeDefaultMethod(ExecState*, const ArgList&) {
     return jsUndefined();
   }

@@ -25,15 +25,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <wtf/Platform.h>
 #include "APICast.h"
 #include "JSCallbackFunction.h"
 #include "JSClassRef.h"
-#include "JSObjectRef.h"
 #include "JSGlobalObject.h"
+#include "JSObjectRef.h"
+#include "JSString.h"
 #include "JSStringRef.h"
 #include "PropertyNameArray.h"
-#include "JSString.h"
 #include <wtf/Vector.h>
 
 namespace KJS {
@@ -47,8 +46,9 @@ JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
   init(exec);
 }
 
-// Global object constructor. FIXME: Move this into a JSGlobalCallbackObject
-// subclass.
+// Global object constructor.
+// FIXME: Move this into a separate JSGlobalCallbackObject class derived from
+// this one.
 template <class Base>
 JSCallbackObject<Base>::JSCallbackObject(JSClassRef jsClass)
     : m_privateData(0), m_class(JSClassRetain(jsClass)) {
@@ -256,21 +256,27 @@ bool JSCallbackObject<Base>::deleteProperty(ExecState* exec,
 }
 
 template <class Base>
-ConstructType JSCallbackObject<Base>::getConstructData(ConstructData&) {
-  for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass)
-    if (jsClass->callAsConstructor)
+ConstructType JSCallbackObject<Base>::getConstructData(
+    ConstructData& constructData) {
+  for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
+    if (jsClass->callAsConstructor) {
+      constructData.native.function = construct;
       return ConstructTypeNative;
-
+    }
+  }
   return ConstructTypeNone;
 }
 
 template <class Base>
 JSObject* JSCallbackObject<Base>::construct(ExecState* exec,
+                                            JSObject* constructor,
                                             const ArgList& args) {
   JSContextRef execRef = toRef(exec);
-  JSObjectRef thisRef = toRef(this);
+  JSObjectRef constructorRef = toRef(constructor);
 
-  for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
+  for (JSClassRef jsClass =
+           static_cast<JSCallbackObject<Base>*>(constructor)->classRef();
+       jsClass; jsClass = jsClass->parentClass) {
     if (JSObjectCallAsConstructorCallback callAsConstructor =
             jsClass->callAsConstructor) {
       int argumentCount = static_cast<int>(args.size());
@@ -278,13 +284,14 @@ JSObject* JSCallbackObject<Base>::construct(ExecState* exec,
       for (int i = 0; i < argumentCount; i++)
         arguments[i] = toRef(args[i]);
       JSLock::DropAllLocks dropAllLocks;
-      return toJS(callAsConstructor(execRef, thisRef, argumentCount,
+      return toJS(callAsConstructor(execRef, constructorRef, argumentCount,
                                     arguments.data(),
                                     toRef(exec->exceptionSlot())));
     }
   }
 
-  ASSERT(0);  // getConstructData should prevent us from reaching here
+  ASSERT_NOT_REACHED();  // getConstructData should prevent us from reaching
+                         // here
   return 0;
 }
 
@@ -315,23 +322,28 @@ bool JSCallbackObject<Base>::hasInstance(ExecState* exec, JSValue* value) {
 }
 
 template <class Base>
-CallType JSCallbackObject<Base>::getCallData(CallData&) {
-  for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass)
-    if (jsClass->callAsFunction)
+CallType JSCallbackObject<Base>::getCallData(CallData& callData) {
+  for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
+    if (jsClass->callAsFunction) {
+      callData.native.function = call;
       return CallTypeNative;
-
+    }
+  }
   return CallTypeNone;
 }
 
 template <class Base>
-JSValue* JSCallbackObject<Base>::callAsFunction(ExecState* exec,
-                                                JSObject* thisObj,
-                                                const ArgList& args) {
+JSValue* JSCallbackObject<Base>::call(ExecState* exec,
+                                      JSObject* functionObject,
+                                      JSValue* thisValue,
+                                      const ArgList& args) {
   JSContextRef execRef = toRef(exec);
-  JSObjectRef thisRef = toRef(this);
-  JSObjectRef thisObjRef = toRef(thisObj);
+  JSObjectRef functionRef = toRef(functionObject);
+  JSObjectRef thisObjRef = toRef(thisValue->toThisObject(exec));
 
-  for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
+  for (JSClassRef jsClass =
+           static_cast<JSCallbackObject<Base>*>(functionObject)->m_class;
+       jsClass; jsClass = jsClass->parentClass) {
     if (JSObjectCallAsFunctionCallback callAsFunction =
             jsClass->callAsFunction) {
       int argumentCount = static_cast<int>(args.size());
@@ -339,8 +351,8 @@ JSValue* JSCallbackObject<Base>::callAsFunction(ExecState* exec,
       for (int i = 0; i < argumentCount; i++)
         arguments[i] = toRef(args[i]);
       JSLock::DropAllLocks dropAllLocks;
-      return toJS(callAsFunction(execRef, thisRef, thisObjRef, argumentCount,
-                                 arguments.data(),
+      return toJS(callAsFunction(execRef, functionRef, thisObjRef,
+                                 argumentCount, arguments.data(),
                                  toRef(exec->exceptionSlot())));
     }
   }

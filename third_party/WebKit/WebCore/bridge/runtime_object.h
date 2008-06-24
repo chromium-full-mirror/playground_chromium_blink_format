@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,11 +26,8 @@
 #ifndef KJS_RUNTIME_OBJECT_H
 #define KJS_RUNTIME_OBJECT_H
 
-#include <kjs/JSObject.h>
-
 #include "runtime.h"
-
-#include <wtf/Noncopyable.h>
+#include <kjs/JSObject.h>
 
 namespace KJS {
 
@@ -38,18 +35,13 @@ class RuntimeObjectImp : public JSObject {
  public:
   virtual ~RuntimeObjectImp();
 
-  const ClassInfo* classInfo() const { return &s_info; }
-
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState* exec,
-                   const Identifier& propertyName,
-                   JSValue* value);
-  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
-  virtual JSValue* defaultValue(ExecState* exec, JSType hint) const;
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier& propertyName,
+                                  PropertySlot&);
+  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
+  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
   virtual KJS::CallType getCallData(KJS::CallData&);
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const ArgList& args);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual void invalidate();
@@ -66,7 +58,7 @@ class RuntimeObjectImp : public JSObject {
                                                      // create us
 
  private:
-  RuntimeObjectImp();  // prevent default construction
+  virtual const ClassInfo* classInfo() const { return &s_info; }
 
   static JSValue* fallbackObjectGetter(ExecState*,
                                        const Identifier&,

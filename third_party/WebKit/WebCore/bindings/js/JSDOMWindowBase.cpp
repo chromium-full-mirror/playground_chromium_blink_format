@@ -68,9 +68,53 @@
 #include "JSXSLTProcessorConstructor.h"
 #endif
 
-#include "JSDOMWindowBase.lut.h"
-
 using namespace KJS;
+
+namespace WebCore {
+
+static JSValue* windowProtoFuncAToB(ExecState*,
+                                    JSObject*,
+                                    JSValue*,
+                                    const ArgList&);
+static JSValue* windowProtoFuncBToA(ExecState*,
+                                    JSObject*,
+                                    JSValue*,
+                                    const ArgList&);
+static JSValue* windowProtoFuncOpen(ExecState*,
+                                    JSObject*,
+                                    JSValue*,
+                                    const ArgList&);
+static JSValue* windowProtoFuncSetTimeout(ExecState*,
+                                          JSObject*,
+                                          JSValue*,
+                                          const ArgList&);
+static JSValue* windowProtoFuncClearTimeoutOrInterval(ExecState*,
+                                                      JSObject*,
+                                                      JSValue*,
+                                                      const ArgList&);
+static JSValue* windowProtoFuncSetInterval(ExecState*,
+                                           JSObject*,
+                                           JSValue*,
+                                           const ArgList&);
+static JSValue* windowProtoFuncAddEventListener(ExecState*,
+                                                JSObject*,
+                                                JSValue*,
+                                                const ArgList&);
+static JSValue* windowProtoFuncRemoveEventListener(ExecState*,
+                                                   JSObject*,
+                                                   JSValue*,
+                                                   const ArgList&);
+static JSValue* windowProtoFuncShowModalDialog(ExecState*,
+                                               JSObject*,
+                                               JSValue*,
+                                               const ArgList&);
+static JSValue* windowProtoFuncNotImplemented(ExecState*,
+                                              JSObject*,
+                                              JSValue*,
+                                              const ArgList&);
+}
+
+#include "JSDOMWindowBase.lut.h"
 
 namespace WebCore {
 
@@ -125,17 +169,17 @@ const ClassInfo JSDOMWindowBase::s_info = {"Window", 0, &JSDOMWindowBaseTable,
                                            0};
 
 /*
-@begin JSDOMWindowBaseTable 118
+@begin JSDOMWindowBaseTable
 # -- Functions --
   atob                  WebCore::windowProtoFuncAToB DontDelete|Function 1
   btoa                  WebCore::windowProtoFuncBToA DontDelete|Function 1
   open                  WebCore::windowProtoFuncOpen DontDelete|Function 3
   setTimeout            WebCore::windowProtoFuncSetTimeout DontDelete|Function 2
-  clearTimeout          WebCore::windowProtoFuncClearTimeout
+  clearTimeout          WebCore::windowProtoFuncClearTimeoutOrInterval
 DontDelete|Function 1
   setInterval           WebCore::windowProtoFuncSetInterval
 DontDelete|Function 2
-  clearInterval         WebCore::windowProtoFuncClearTimeout
+  clearInterval         WebCore::windowProtoFuncClearTimeoutOrInterval
 DontDelete|Function 1
   addEventListener      WebCore::windowProtoFuncAddEventListener
 DontDelete|Function 3
@@ -968,12 +1012,12 @@ JSDOMWindowShell* JSDOMWindowBase::shell() const {
 }
 
 JSValue* windowProtoFuncAToB(ExecState* exec,
-                             JSObject* thisObj,
+                             JSObject*,
+                             JSValue* thisValue,
                              const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1002,12 +1046,12 @@ JSValue* windowProtoFuncAToB(ExecState* exec,
 }
 
 JSValue* windowProtoFuncBToA(ExecState* exec,
-                             JSObject* thisObj,
+                             JSObject*,
+                             JSValue* thisValue,
                              const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1035,12 +1079,12 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
 }
 
 JSValue* windowProtoFuncOpen(ExecState* exec,
-                             JSObject* thisObj,
+                             JSObject*,
+                             JSValue* thisValue,
                              const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1120,40 +1164,37 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
   return toJS(exec, frame->domWindow());  // global object
 }
 
-JSValue* windowProtoFuncSetTimeout(ExecState* exec,
-                                   JSObject* thisObj,
-                                   const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+static JSValue* setTimeoutOrInterval(ExecState* exec,
+                                     JSValue* thisValue,
+                                     const ArgList& args,
+                                     bool timeout) {
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
   JSValue* v = args[0];
+  int delay = args[1]->toInt32(exec);
   if (v->isString())
     return jsNumber(
-        exec, window->installTimeout(v->toString(exec), args[1]->toInt32(exec),
-                                     true /*single shot*/));
-  if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
-    ArgList argsTail;
-    args.getSlice(2, argsTail);
-    return jsNumber(exec,
-                    window->installTimeout(v, argsTail, args[1]->toInt32(exec),
-                                           true /*single shot*/));
-  }
-
-  return jsUndefined();
+        exec, window->installTimeout(static_cast<JSString*>(v)->value(), delay,
+                                     timeout));
+  CallData callData;
+  if (v->getCallData(callData) == CallTypeNone)
+    return jsUndefined();
+  ArgList argsTail;
+  args.getSlice(2, argsTail);
+  return jsNumber(exec, window->installTimeout(v, argsTail, delay, timeout));
 }
 
-JSValue* windowProtoFuncClearTimeout(ExecState* exec,
-                                     JSObject* thisObj,
-                                     const ArgList& args) {
-  // Also the implementation for window.clearInterval()
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+JSValue* windowProtoFuncClearTimeoutOrInterval(ExecState* exec,
+                                               JSObject*,
+                                               JSValue* thisValue,
+                                               const ArgList& args) {
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1161,39 +1202,27 @@ JSValue* windowProtoFuncClearTimeout(ExecState* exec,
   return jsUndefined();
 }
 
+JSValue* windowProtoFuncSetTimeout(ExecState* exec,
+                                   JSObject*,
+                                   JSValue* thisValue,
+                                   const ArgList& args) {
+  return setTimeoutOrInterval(exec, thisValue, args, true);
+}
+
 JSValue* windowProtoFuncSetInterval(ExecState* exec,
-                                    JSObject* thisObj,
+                                    JSObject*,
+                                    JSValue* thisValue,
                                     const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
-    return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
-  if (!window->allowsAccessFrom(exec))
-    return jsUndefined();
-
-  if (args.size() >= 2) {
-    JSValue* v = args[0];
-    int delay = args[1]->toInt32(exec);
-    if (v->isString())
-      return jsNumber(exec,
-                      window->installTimeout(v->toString(exec), delay, false));
-    if (v->isObject() && static_cast<JSObject*>(v)->implementsCall()) {
-      ArgList argsTail;
-      args.getSlice(2, argsTail);
-      return jsNumber(exec, window->installTimeout(v, argsTail, delay, false));
-    }
-  }
-
-  return jsUndefined();
+  return setTimeoutOrInterval(exec, thisValue, args, false);
 }
 
 JSValue* windowProtoFuncAddEventListener(ExecState* exec,
-                                         JSObject* thisObj,
+                                         JSObject*,
+                                         JSValue* thisValue,
                                          const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1212,12 +1241,12 @@ JSValue* windowProtoFuncAddEventListener(ExecState* exec,
 }
 
 JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
-                                            JSObject* thisObj,
+                                            JSObject*,
+                                            JSValue* thisValue,
                                             const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1235,12 +1264,12 @@ JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
 }
 
 JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
-                                        JSObject* thisObj,
+                                        JSObject*,
+                                        JSValue* thisValue,
                                         const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+  JSDOMWindow* window = toJSDOMWindow(thisValue);
+  if (!window)
     return throwError(exec, TypeError);
-  JSDOMWindow* window = static_cast<JSDOMWindowShell*>(thisObj)->window();
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
@@ -1254,10 +1283,10 @@ JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
 }
 
 JSValue* windowProtoFuncNotImplemented(ExecState* exec,
-                                       JSObject* thisObj,
-                                       const ArgList& args) {
-  ASSERT(!thisObj->inherits(&JSDOMWindow::s_info));
-  if (!thisObj->inherits(&JSDOMWindowShell::s_info))
+                                       JSObject*,
+                                       JSValue* thisValue,
+                                       const ArgList&) {
+  if (!toJSDOMWindow(thisValue))
     return throwError(exec, TypeError);
   return jsUndefined();
 }
@@ -1438,6 +1467,17 @@ JSDOMWindow* toJSDOMWindow(Frame* frame) {
   if (!frame)
     return 0;
   return frame->script()->windowShell()->window();
+}
+
+JSDOMWindow* toJSDOMWindow(JSValue* value) {
+  if (!value->isObject())
+    return 0;
+  const ClassInfo* classInfo = static_cast<JSObject*>(value)->classInfo();
+  if (classInfo == &JSDOMWindow::s_info)
+    return static_cast<JSDOMWindow*>(value);
+  if (classInfo == &JSDOMWindowShell::s_info)
+    return static_cast<JSDOMWindowShell*>(value)->window();
+  return 0;
 }
 
 }  // namespace WebCore

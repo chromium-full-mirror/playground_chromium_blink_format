@@ -32,29 +32,22 @@
 
 namespace KJS {
 
-class ArrayConstructor;
 class ArrayPrototype;
-class BooleanConstructor;
 class BooleanPrototype;
-class DateConstructor;
 class DatePrototype;
 class Debugger;
 class ErrorConstructor;
 class ErrorPrototype;
 class EvalError;
 class EvalErrorPrototype;
-class FunctionConstructor;
 class FunctionPrototype;
-struct HashTable;
+class GlobalEvalFunction;
 class JSGlobalObject;
 class NativeErrorConstructor;
 class NativeErrorPrototype;
-class NumberConstructor;
 class NumberPrototype;
-class ObjectConstructor;
 class ObjectPrototype;
 class ProgramCodeBlock;
-class PrototypeReflexiveFunction;
 class RangeError;
 class RangeErrorPrototype;
 class ReferenceError;
@@ -64,14 +57,15 @@ class RegExpConstructor;
 class RegExpPrototype;
 class RuntimeMethod;
 class ScopeChain;
-class StringConstructor;
 class StringPrototype;
 class SyntaxErrorPrototype;
 class TypeError;
 class TypeErrorPrototype;
 class UriError;
 class UriErrorPrototype;
+
 struct ActivationStackNode;
+struct HashTable;
 
 typedef Vector<ExecState*, 16> ExecStateStack;
 
@@ -104,13 +98,6 @@ class JSGlobalObject : public JSVariableObject {
     unsigned tickCount;
     unsigned ticksUntilNextTimeoutCheck;
 
-    ObjectConstructor* objectConstructor;
-    FunctionConstructor* functionConstructor;
-    ArrayConstructor* arrayConstructor;
-    BooleanConstructor* booleanConstructor;
-    StringConstructor* stringConstructor;
-    NumberConstructor* numberConstructor;
-    DateConstructor* dateConstructor;
     RegExpConstructor* regExpConstructor;
     ErrorConstructor* errorConstructor;
     NativeErrorConstructor* evalErrorConstructor;
@@ -120,7 +107,7 @@ class JSGlobalObject : public JSVariableObject {
     NativeErrorConstructor* typeErrorConstructor;
     NativeErrorConstructor* URIErrorConstructor;
 
-    PrototypeReflexiveFunction* evalFunction;
+    GlobalEvalFunction* evalFunction;
 
     ObjectPrototype* objectPrototype;
     FunctionPrototype* functionPrototype;
@@ -156,8 +143,9 @@ class JSGlobalObject : public JSVariableObject {
   }
 
  protected:
-  JSGlobalObject(JSValue* proto, JSObject* globalThisValue)
-      : JSVariableObject(proto, new JSGlobalObjectData(this, globalThisValue)) {
+  JSGlobalObject(JSValue* prototype, JSObject* globalThisValue)
+      : JSVariableObject(prototype,
+                         new JSGlobalObjectData(this, globalThisValue)) {
     init(globalThisValue);
   }
 
@@ -195,26 +183,10 @@ class JSGlobalObject : public JSVariableObject {
   // The following accessors return pristine values, even if a script
   // replaces the global object's associated property.
 
-  ObjectConstructor* objectConstructor() const {
-    return d()->objectConstructor;
-  }
-  FunctionConstructor* functionConstructor() const {
-    return d()->functionConstructor;
-  }
-  ArrayConstructor* arrayConstructor() const { return d()->arrayConstructor; }
-  BooleanConstructor* booleanConstructor() const {
-    return d()->booleanConstructor;
-  }
-  StringConstructor* stringConstructor() const {
-    return d()->stringConstructor;
-  }
-  NumberConstructor* numberConstructor() const {
-    return d()->numberConstructor;
-  }
-  DateConstructor* dateConstructor() const { return d()->dateConstructor; }
   RegExpConstructor* regExpConstructor() const {
     return d()->regExpConstructor;
   }
+
   ErrorConstructor* errorConstructor() const { return d()->errorConstructor; }
   NativeErrorConstructor* evalErrorConstructor() const {
     return d()->evalErrorConstructor;
@@ -235,7 +207,7 @@ class JSGlobalObject : public JSVariableObject {
     return d()->URIErrorConstructor;
   }
 
-  PrototypeReflexiveFunction* evalFunction() const { return d()->evalFunction; }
+  GlobalEvalFunction* evalFunction() const { return d()->evalFunction; }
 
   ObjectPrototype* objectPrototype() const { return d()->objectPrototype; }
   FunctionPrototype* functionPrototype() const {

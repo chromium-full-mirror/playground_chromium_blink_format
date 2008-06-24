@@ -77,8 +77,8 @@ void Instance::setValueOfField(ExecState* exec,
   aField->setValueToInstance(exec, this, aValue);
 }
 
-JSObject* Instance::createRuntimeObject(ExecState* exec,
-                                        PassRefPtr<Instance> instance) {
+RuntimeObjectImp* Instance::createRuntimeObject(ExecState* exec,
+                                                PassRefPtr<Instance> instance) {
 #if PLATFORM(QT)
   if (instance->getBindingLanguage() == QtLanguage)
     return QtInstance::getRuntimeObject(
@@ -95,7 +95,7 @@ Instance* Instance::getInstance(JSObject* object, BindingLanguage language) {
   if (!object->inherits(&RuntimeObjectImp::s_info))
     return 0;
   Instance* instance =
-      (static_cast<RuntimeObjectImp*>(object))->getInternalInstance();
+      static_cast<RuntimeObjectImp*>(object)->getInternalInstance();
   if (!instance)
     return 0;
   if (instance->getBindingLanguage() != language)

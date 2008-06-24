@@ -35,14 +35,30 @@
 #include "JSSVGElementInstance.h"
 #endif
 
-#include "JSEventTargetBase.lut.h"
-
 using namespace KJS;
 
 namespace WebCore {
 
+static JSValue* jsEventTargetAddEventListener(ExecState*,
+                                              JSObject*,
+                                              JSValue*,
+                                              const ArgList&);
+static JSValue* jsEventTargetRemoveEventListener(ExecState*,
+                                                 JSObject*,
+                                                 JSValue*,
+                                                 const ArgList&);
+static JSValue* jsEventTargetDispatchEvent(ExecState*,
+                                           JSObject*,
+                                           JSValue*,
+                                           const ArgList&);
+}
+
+#include "JSEventTargetBase.lut.h"
+
+namespace WebCore {
+
 /* Source for JSEventTargetPropertiesTable
-@begin JSEventTargetPropertiesTable 50
+@begin JSEventTargetPropertiesTable
 onabort       WebCore::JSEventTargetProperties::OnAbort DontDelete
 onblur        WebCore::JSEventTargetProperties::OnBlur DontDelete
 onchange      WebCore::JSEventTargetProperties::OnChange DontDelete
@@ -87,7 +103,7 @@ onunload      WebCore::JSEventTargetProperties::OnUnload DontDelete
 */
 
 /*
-@begin JSEventTargetPrototypeTable 5
+@begin JSEventTargetPrototypeTable
 addEventListener        WebCore::jsEventTargetAddEventListener
 DontDelete|Function 3
 removeEventListener     WebCore::jsEventTargetRemoveEventListener
@@ -97,14 +113,31 @@ DontDelete|Function 1
 @end
 */
 
-JSValue* jsEventTargetAddEventListener(ExecState* exec,
-                                       JSObject* thisObj,
-                                       const ArgList& args) {
-  DOMExceptionTranslator exception(exec);
+static bool retrieveEventTargetAndCorrespondingNode(ExecState*,
+                                                    JSValue* thisValue,
+                                                    Node*& eventNode,
+                                                    EventTarget*& eventTarget) {
+  if (!thisValue->isObject(&JSNode::s_info))
+    return false;
 
+  JSEventTargetNode* jsNode = static_cast<JSEventTargetNode*>(thisValue);
+  ASSERT(jsNode);
+
+  EventTargetNode* node = static_cast<EventTargetNode*>(jsNode->impl());
+  ASSERT(node);
+
+  eventNode = node;
+  eventTarget = node;
+  return true;
+}
+
+JSValue* jsEventTargetAddEventListener(ExecState* exec,
+                                       JSObject*,
+                                       JSValue* thisValue,
+                                       const ArgList& args) {
   Node* eventNode = 0;
   EventTarget* eventTarget = 0;
-  if (!retrieveEventTargetAndCorrespondingNode(exec, thisObj, eventNode,
+  if (!retrieveEventTargetAndCorrespondingNode(exec, thisValue, eventNode,
                                                eventTarget))
     return throwError(exec, TypeError);
 
@@ -121,13 +154,12 @@ JSValue* jsEventTargetAddEventListener(ExecState* exec,
 }
 
 JSValue* jsEventTargetRemoveEventListener(ExecState* exec,
-                                          JSObject* thisObj,
+                                          JSObject*,
+                                          JSValue* thisValue,
                                           const ArgList& args) {
-  DOMExceptionTranslator exception(exec);
-
   Node* eventNode = 0;
   EventTarget* eventTarget = 0;
-  if (!retrieveEventTargetAndCorrespondingNode(exec, thisObj, eventNode,
+  if (!retrieveEventTargetAndCorrespondingNode(exec, thisValue, eventNode,
                                                eventTarget))
     return throwError(exec, TypeError);
 
@@ -144,34 +176,17 @@ JSValue* jsEventTargetRemoveEventListener(ExecState* exec,
 }
 
 JSValue* jsEventTargetDispatchEvent(ExecState* exec,
-                                    JSObject* thisObj,
+                                    JSObject*,
+                                    JSValue* thisValue,
                                     const ArgList& args) {
   Node* eventNode = 0;
   EventTarget* eventTarget = 0;
-  if (!retrieveEventTargetAndCorrespondingNode(exec, thisObj, eventNode,
+  if (!retrieveEventTargetAndCorrespondingNode(exec, thisValue, eventNode,
                                                eventTarget))
     return throwError(exec, TypeError);
 
   DOMExceptionTranslator exception(exec);
   return jsBoolean(eventTarget->dispatchEvent(toEvent(args[0]), exception));
-}
-
-bool retrieveEventTargetAndCorrespondingNode(KJS::ExecState*,
-                                             KJS::JSObject* thisObj,
-                                             Node*& eventNode,
-                                             EventTarget*& eventTarget) {
-  if (!thisObj->inherits(&JSNode::s_info))
-    return false;
-
-  JSEventTargetNode* jsNode = static_cast<JSEventTargetNode*>(thisObj);
-  ASSERT(jsNode);
-
-  EventTargetNode* node = static_cast<EventTargetNode*>(jsNode->impl());
-  ASSERT(node);
-
-  eventNode = node;
-  eventTarget = node;
-  return true;
 }
 
 const AtomicString& eventNameForPropertyToken(int token) {

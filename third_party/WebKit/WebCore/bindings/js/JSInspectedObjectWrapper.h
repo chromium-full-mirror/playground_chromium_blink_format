@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,13 +34,11 @@ class JSInspectedObjectWrapper : public JSQuarantinedObjectWrapper {
  public:
   static KJS::JSValue* wrap(KJS::ExecState* unwrappedExec,
                             KJS::JSValue* unwrappedValue);
-
   virtual ~JSInspectedObjectWrapper();
 
-  virtual const KJS::ClassInfo* classInfo() const { return &s_info; }
   static const KJS::ClassInfo s_info;
 
- protected:
+ private:
   JSInspectedObjectWrapper(KJS::ExecState* unwrappedExec,
                            KJS::JSObject* unwrappedObject,
                            KJS::JSValue* wrappedPrototype);
@@ -60,6 +58,8 @@ class JSInspectedObjectWrapper : public JSQuarantinedObjectWrapper {
                                           KJS::JSValue* unwrappedValue) const {
     return wrap(unwrappedExec, unwrappedValue);
   }
+
+  virtual const KJS::ClassInfo* classInfo() const { return &s_info; }
 };
 
 }  // namespace WebCore

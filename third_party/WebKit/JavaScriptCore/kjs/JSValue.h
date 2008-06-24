@@ -67,7 +67,7 @@ class JSValue : Noncopyable {
   bool isNumber() const;
   bool isString() const;
   bool isObject() const;
-  bool isObject(const ClassInfo*) const;
+  bool isObject(const ClassInfo*) const;  // FIXME: Merge with inherits.
 
   // Extracting the value.
   bool getBoolean(bool&) const;
@@ -131,6 +131,8 @@ class JSValue : Noncopyable {
   JSValue* get(ExecState*, unsigned propertyName) const;
   void put(ExecState*, const Identifier& propertyName, JSValue*);
   void put(ExecState*, unsigned propertyName, JSValue*);
+  bool deleteProperty(ExecState*, const Identifier& propertyName);
+  bool deleteProperty(ExecState*, unsigned propertyName);
   JSObject* toThisObject(ExecState*) const;
 
  private:
@@ -165,7 +167,7 @@ class JSCell : public JSValue {
   bool isNumber() const;
   bool isString() const;
   bool isObject() const;
-  bool isObject(const ClassInfo*) const;
+  bool isObject(const ClassInfo*) const;  // FIXME: Merge with inherits.
 
   // Extracting the value.
   bool getNumber(double&) const;
@@ -199,8 +201,11 @@ class JSCell : public JSValue {
   bool marked() const;
 
   // Object operations, with the toObject operation included.
+  virtual const ClassInfo* classInfo() const;
   virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
   virtual void put(ExecState*, unsigned propertyName, JSValue*);
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
+  virtual bool deleteProperty(ExecState*, unsigned propertyName);
   virtual JSObject* toThisObject(ExecState*) const;
 
  private:

@@ -37,7 +37,10 @@ class ObjectPrototype : public JSObject {
   ObjectPrototype(ExecState*, FunctionPrototype*);
 };
 
-JSValue* objectProtoFuncToString(ExecState*, JSObject*, const ArgList&);
+JSValue* objectProtoFuncToString(ExecState*,
+                                 JSObject*,
+                                 JSValue*,
+                                 const ArgList&);
 
 /**
  * @internal
@@ -48,10 +51,9 @@ class ObjectConstructor : public InternalFunction {
  public:
   ObjectConstructor(ExecState*, ObjectPrototype*, FunctionPrototype*);
 
+ private:
   virtual ConstructType getConstructData(ConstructData&);
-  virtual JSObject* construct(ExecState*, const ArgList&);
-
-  virtual JSValue* callAsFunction(ExecState*, JSObject*, const ArgList&);
+  virtual CallType getCallData(CallData&);
 };
 
 }  // namespace KJS
