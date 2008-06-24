@@ -766,24 +766,24 @@ JSValue* convertQVariantToValue(ExecState* exec,
     if (re.isValid()) {
       RegExpConstructor* regExpObj = static_cast<RegExpConstructor*>(
           exec->lexicalGlobalObject()->regExpConstructor());
-      ArgList args;
-      UString uflags;
 
+      UString uflags;
       if (re.caseSensitivity() == Qt::CaseInsensitive)
         uflags = "i";  // ### Can't do g or m
-      UString ustring((UChar*)re.pattern().utf16(), re.pattern().length());
-      args.append(jsString(exec, ustring));
-      args.append(jsString(exec, uflags));
-      return regExpObj->construct(exec, args);
+
+      UString pattern((UChar*)re.pattern().utf16(), re.pattern().length());
+
+      RefPtr<KJS::RegExp> regExp = KJS::RegExp::create(pattern, uflags);
+      if (regExp->isValid())
+        return new (exec) RegExpObject(
+            exec->lexicalGlobalObject()->regExpPrototype(), regExp.release());
+      else
+        return jsNull();
     }
   }
 
   if (type == QMetaType::QDateTime || type == QMetaType::QDate ||
       type == QMetaType::QTime) {
-    DateConstructor* dateObj = static_cast<DateConstructor*>(
-        exec->lexicalGlobalObject()->dateConstructor());
-    ArgList args;
-
     QDate date = QDate::currentDate();
     QTime time(0, 0, 0);  // midnight
 
@@ -798,14 +798,21 @@ JSValue* convertQVariantToValue(ExecState* exec,
     }
 
     // Dates specified this way are in local time (we convert DateTimes above)
-    args.append(jsNumber(exec, date.year()));
-    args.append(jsNumber(exec, date.month() - 1));
-    args.append(jsNumber(exec, date.day()));
-    args.append(jsNumber(exec, time.hour()));
-    args.append(jsNumber(exec, time.minute()));
-    args.append(jsNumber(exec, time.second()));
-    args.append(jsNumber(exec, time.msec()));
-    return dateObj->construct(exec, args);
+    GregorianDateTime dt;
+    dt.year = date.year() - 1900;
+    dt.month = date.month() - 1;
+    dt.monthDay = date.day();
+    dt.hour = time.hour();
+    dt.minute = time.minute();
+    dt.second = time.second();
+    dt.isDST = -1;
+    double ms =
+        KJS::gregorianDateTimeToMS(dt, time.msec(), /*inputIsUTC*/ false);
+
+    DateInstance* instance =
+        new (exec) DateInstance(exec->lexicalGlobalObject()->datePrototype());
+    instance->setInternalValue(jsNumber(exec, trunc(ms)));
+    return instance;
   }
 
   if (type == QMetaType::QByteArray) {
@@ -1311,10 +1318,12 @@ void QtRuntimeMetaMethod::mark() {
     d->m_disconnect->mark();
 }
 
-JSValue* QtRuntimeMetaMethod::callAsFunction(ExecState* exec,
-                                             JSObject*,
-                                             const ArgList& args) {
-  QW_D(QtRuntimeMetaMethod);
+JSValue* QtRuntimeMetaMethod::call(ExecState* exec,
+                                   JSObject* functionObject,
+                                   JSValue* thisValue,
+                                   const ArgList& args) {
+  QtRuntimeMetaMethodData* d =
+      static_cast<QtRuntimeMetaMethod*>(functionObject)->d_func();
 
   // We're limited to 10 args
   if (args.size() > 10)
@@ -1351,6 +1360,11 @@ JSValue* QtRuntimeMetaMethod::callAsFunction(ExecState* exec,
 
   // void functions return undefined
   return jsUndefined();
+}
+
+CallType QtRuntimeMetaMethod::getCallData(CallData& callData) {
+  callData.native.function = call;
+  return CallTypeNative;
 }
 
 bool QtRuntimeMetaMethod::getOwnPropertySlot(ExecState* exec,
@@ -1422,10 +1436,12 @@ QtRuntimeConnectionMethod::QtRuntimeConnectionMethod(
   d->m_isConnect = isConnect;
 }
 
-JSValue* QtRuntimeConnectionMethod::callAsFunction(ExecState* exec,
-                                                   JSObject*,
-                                                   const ArgList& args) {
-  QW_D(QtRuntimeConnectionMethod);
+JSValue* QtRuntimeConnectionMethod::call(ExecState* exec,
+                                         JSObject* functionObject,
+                                         JSValue* thisValue,
+                                         const ArgList& args) {
+  QtRuntimeConnectionMethodData* d =
+      static_cast<QtRuntimeConnectionMethod*>(functionObject)->d_func();
 
   JSLock lock;
 
@@ -1447,7 +1463,8 @@ JSValue* QtRuntimeConnectionMethod::callAsFunction(ExecState* exec,
     if (signalIndex != -1) {
       if (args.size() == 1) {
         funcObject = args[0]->toObject(exec);
-        if (!funcObject->implementsCall()) {
+        CallData callData;
+        if (funcObject->getCallData(callData) == CallTypeNone) {
           if (d->m_isConnect)
             return throwError(exec, TypeError,
                               "QtMetaMethod.connect: target is not a function");
@@ -1462,7 +1479,8 @@ JSValue* QtRuntimeConnectionMethod::callAsFunction(ExecState* exec,
 
           // Get the actual function to call
           JSObject* asObj = args[1]->toObject(exec);
-          if (asObj->implementsCall()) {
+          CallData callData;
+          if (asObj->getCallData(callData) != CallTypeNone) {
             // Function version
             funcObject = asObj;
           } else {
@@ -1475,7 +1493,7 @@ JSValue* QtRuntimeConnectionMethod::callAsFunction(ExecState* exec,
             JSValue* val = thisObject->get(exec, funcIdent);
             JSObject* asFuncObj = val->toObject(exec);
 
-            if (asFuncObj->implementsCall()) {
+            if (asFuncObj->getCallData(callData) != CallTypeNone) {
               funcObject = asFuncObj;
             } else {
               if (d->m_isConnect)
@@ -1571,6 +1589,11 @@ JSValue* QtRuntimeConnectionMethod::callAsFunction(ExecState* exec,
   }
 
   return jsUndefined();
+}
+
+CallType QtRuntimeConnectionMethod::getCallData(CallData& callData) {
+  callData.native.function = call;
+  return CallTypeNative;
 }
 
 bool QtRuntimeConnectionMethod::getOwnPropertySlot(
@@ -1698,6 +1721,8 @@ void QtConnectionObject::execute(void** argv) {
               l.append(jsUndefined());
             }
           }
+          CallData callData;
+          CallType callType = m_funcObject->getCallData(callData);
           // Stuff in the __qt_sender property, if we can
           if (m_funcObject->inherits(&JSFunction::info)) {
             JSFunction* fimp = static_cast<JSFunction*>(m_funcObject.get());
@@ -1710,10 +1735,12 @@ void QtConnectionObject::execute(void** argv) {
             ScopeChain sc = oldsc;
             sc.push(wrapper);
             fimp->setScope(sc);
-            fimp->callAsFunction(exec, m_thisObject, l);
+
+            call(exec, fimp, callType, callData, m_thisObject, l);
             fimp->setScope(oldsc);
-          } else
-            m_funcObject->callAsFunction(exec, m_thisObject, l);
+          } else {
+            call(exec, m_funcObject, callType, callData, m_thisObject, l);
+          }
         }
       }
     }

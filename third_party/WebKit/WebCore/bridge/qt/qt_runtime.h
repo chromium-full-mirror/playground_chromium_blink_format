@@ -157,9 +157,6 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
                       bool allowPrivate);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const ArgList& args);
 
   virtual void mark();
 
@@ -169,6 +166,11 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
   }
 
  private:
+  virtual CallType getCallData(CallData&);
+  static JSValue* call(ExecState* exec,
+                       JSObject* functionObject,
+                       JSValue* thisValue,
+                       const ArgList& args);
   static JSValue* lengthGetter(ExecState*,
                                const Identifier&,
                                const PropertySlot&);
@@ -191,9 +193,6 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
                             const QByteArray& signature);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const ArgList& args);
 
  protected:
   QtRuntimeConnectionMethodData* d_func() const {
@@ -201,6 +200,11 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
   }
 
  private:
+  virtual CallType getCallData(CallData&);
+  static JSValue* call(ExecState* exec,
+                       JSObject* functionObject,
+                       JSValue* thisValue,
+                       const ArgList& args);
   static JSValue* lengthGetter(ExecState*,
                                const Identifier&,
                                const PropertySlot&);
