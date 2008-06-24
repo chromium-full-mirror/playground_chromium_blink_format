@@ -167,8 +167,10 @@ VisiblePosition RenderSVGInlineText::positionForCoordinates(int x, int y) {
 }
 
 void RenderSVGInlineText::destroy() {
-  setNeedsLayoutAndPrefWidthsRecalc();
-  repaint();
+  if (!documentBeingDestroyed()) {
+    setNeedsLayoutAndPrefWidthsRecalc();
+    repaint();
+  }
   RenderText::destroy();
 }
 }
