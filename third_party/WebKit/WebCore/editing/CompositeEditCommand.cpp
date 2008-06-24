@@ -833,9 +833,12 @@ void CompositeEditCommand::moveParagraphs(
   // too, <div><b><br></b></div> for example.  Save it so that we can preserve
   // it later.
   RefPtr<CSSMutableStyleDeclaration> styleInEmptyParagraph;
-  if (startOfParagraphToMove == endOfParagraphToMove && preserveStyle)
+  if (startOfParagraphToMove == endOfParagraphToMove && preserveStyle) {
     styleInEmptyParagraph =
         styleAtPosition(startOfParagraphToMove.deepEquivalent());
+    // The moved paragraph should assume the block style of the destination.
+    styleInEmptyParagraph->removeBlockProperties();
+  }
 
   // FIXME (5098931): We should add a new insert action
   // "WebViewInsertActionMoved" and call shouldInsertFragment here.

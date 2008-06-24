@@ -212,6 +212,9 @@ PassRefPtr<CSSMutableStyleDeclaration> EditCommand::styleAtPosition(
   RefPtr<CSSMutableStyleDeclaration> style =
       positionBeforeTabSpan(pos).computedStyle()->copyInheritableProperties();
 
+  // FIXME: It seems misleading to also include the typing style when returning
+  // the style at some arbitrary
+  // position in the document.
   CSSMutableStyleDeclaration* typingStyle = document()->frame()->typingStyle();
   if (typingStyle)
     style->merge(typingStyle);
