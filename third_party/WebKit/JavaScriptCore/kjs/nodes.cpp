@@ -45,6 +45,8 @@
 #include <wtf/MathExtras.h>
 #include <wtf/Threading.h>
 
+using namespace WTF;
+
 namespace KJS {
 
 static inline UString::Rep* rep(const Identifier& ident) {
@@ -75,6 +77,7 @@ struct ParserRefCountedCounter {
 volatile int ParserRefCountedCounter::count = 0;
 
 #if USE(MULTIPLE_THREADS)
+
 void ParserRefCountedCounter::increment() {
   atomicIncrement(&count);
 }
