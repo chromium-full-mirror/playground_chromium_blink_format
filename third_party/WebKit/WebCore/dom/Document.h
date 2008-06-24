@@ -848,10 +848,6 @@ class Document : public ContainerNode {
   const String& iconURL() const { return m_iconURL; }
   void setIconURL(const String& iconURL, const String& type);
 
-  bool isAllowedToLoadLocalResources() const {
-    return m_isAllowedToLoadLocalResources;
-  }
-
   void setUseSecureKeyboardEntryWhenActive(bool);
   bool useSecureKeyboardEntryWhenActive() const;
 
@@ -1105,8 +1101,6 @@ class Document : public ContainerNode {
   void clearXMLVersion() { m_xmlVersion = String(); }
 
  private:
-  bool shouldBeAllowedToLoadLocalResources() const;
-
   void updateTitle();
   void removeAllDisconnectedNodeEventListeners();
   void imageLoadEventTimerFired(Timer<Document>*);
@@ -1166,8 +1160,6 @@ class Document : public ContainerNode {
   String m_iconURL;
 
   HashSet<Element*> m_pageCacheCallbackElements;
-
-  bool m_isAllowedToLoadLocalResources;
 
   bool m_useSecureKeyboardEntryWhenActive;
 

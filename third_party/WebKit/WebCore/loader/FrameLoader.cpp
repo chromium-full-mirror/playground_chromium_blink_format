@@ -2379,14 +2379,14 @@ bool FrameLoader::canLoad(const KURL& url, const Document* doc) {
   if (!shouldTreatURLAsLocal(url.string()))
     return true;
 
-  return doc && doc->isAllowedToLoadLocalResources();
+  return doc && doc->securityOrigin()->canLoadLocalResources();
 }
 
 bool FrameLoader::canLoad(const CachedResource& resource, const Document* doc) {
   if (!resource.treatAsLocal())
     return true;
 
-  return doc && doc->isAllowedToLoadLocalResources();
+  return doc && doc->securityOrigin()->canLoadLocalResources();
 }
 
 void FrameLoader::reportLocalLoadFailed(Frame* frame, const String& url) {
