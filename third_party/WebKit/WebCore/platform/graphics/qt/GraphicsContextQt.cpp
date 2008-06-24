@@ -175,18 +175,6 @@ struct TransparencyLayer {
   TransparencyLayer& operator=(const TransparencyLayer&) { return *this; }
 };
 
-struct TextShadow {
-  TextShadow() : x(0), y(0), blur(0) {}
-
-  bool isNull() { return !x && !y && !blur; }
-
-  int x;
-  int y;
-  int blur;
-
-  Color color;
-};
-
 class GraphicsContextPlatformPrivate {
  public:
   GraphicsContextPlatformPrivate(QPainter* painter);
@@ -206,8 +194,6 @@ class GraphicsContextPlatformPrivate {
 
   QStack<TransparencyLayer*> layers;
   QPainter* redirect;
-
-  TextShadow shadow;
 
   // Only used by SVG for now.
   QPainterPath currentPath;
@@ -645,20 +631,13 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& frect) {
 void GraphicsContext::setPlatformShadow(const IntSize& pos,
                                         int blur,
                                         const Color& color) {
-  if (paintingDisabled())
-    return;
-
-  m_data->shadow.x = pos.width();
-  m_data->shadow.y = pos.height();
-  m_data->shadow.blur = blur;
-  m_data->shadow.color = color;
+  // Qt doesn't support shadows natively, they are drawn manually in the draw*
+  // functions
 }
 
 void GraphicsContext::clearPlatformShadow() {
-  if (paintingDisabled())
-    return;
-
-  m_data->shadow = TextShadow();
+  // Qt doesn't support shadows natively, they are drawn manually in the draw*
+  // functions
 }
 
 void GraphicsContext::beginTransparencyLayer(float opacity) {
