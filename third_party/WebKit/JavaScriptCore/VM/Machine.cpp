@@ -659,16 +659,16 @@ NEVER_INLINE bool Machine::unwindCallFrame(ExecState* exec,
   if (isGlobalCallFrame(registerBase, r))
     return false;
 
-  codeBlock = callFrame[CallerCodeBlock].u.codeBlock;
-  if (!codeBlock)
-    return false;
-
   // If this call frame created an activation, tear it off.
   if (JSActivation* activation = static_cast<JSActivation*>(
           callFrame[OptionalCalleeActivation].u.jsValue)) {
     ASSERT(activation->isActivationObject());
     activation->copyRegisters();
   }
+
+  codeBlock = callFrame[CallerCodeBlock].u.codeBlock;
+  if (!codeBlock)
+    return false;
 
   k = codeBlock->jsValues.data();
   scopeChain = callFrame[CallerScopeChain].u.scopeChain;
