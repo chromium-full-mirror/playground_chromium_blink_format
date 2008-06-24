@@ -43,6 +43,7 @@
 #include <wtf/HashCountedSet.h>
 #include <wtf/HashSet.h>
 #include <wtf/MathExtras.h>
+#include <wtf/Threading.h>
 
 namespace KJS {
 
@@ -59,14 +60,42 @@ static inline UString::Rep* rep(const Identifier& ident) {
 static WTFLogChannel LogKJSNodeLeaks = {0x00000000, "", WTFLogChannelOn};
 
 struct ParserRefCountedCounter {
-  static unsigned count;
-  ParserRefCountedCounter() {
+  ~ParserRefCountedCounter() {
     if (count)
       LOG(KJSNodeLeaks, "LEAK: %u KJS::Node\n", count);
   }
+
+  static void increment();
+  static void decrement();
+
+ private:
+  static volatile int count;
 };
-unsigned ParserRefCountedCounter::count = 0;
+
+volatile int ParserRefCountedCounter::count = 0;
+
+#if USE(MULTIPLE_THREADS)
+void ParserRefCountedCounter::increment() {
+  atomicIncrement(&count);
+}
+
+void ParserRefCountedCounter::decrement() {
+  atomicDecrement(&count);
+}
+
+#else
+
+void ParserRefCountedCounter::increment() {
+  ++count;
+}
+
+void ParserRefCountedCounter::decrement() {
+  --count;
+}
+#endif
+
 static ParserRefCountedCounter parserRefCountedCounter;
+
 #endif
 
 static HashSet<ParserRefCounted*>* newTrackedObjects;
@@ -74,7 +103,7 @@ static HashCountedSet<ParserRefCounted*>* trackedObjectExtraRefCounts;
 
 ParserRefCounted::ParserRefCounted() {
 #ifndef NDEBUG
-  ++ParserRefCountedCounter::count;
+  ParserRefCountedCounter::increment();
 #endif
   if (!newTrackedObjects)
     newTrackedObjects = new HashSet<ParserRefCounted*>;
@@ -84,7 +113,7 @@ ParserRefCounted::ParserRefCounted() {
 
 ParserRefCounted::~ParserRefCounted() {
 #ifndef NDEBUG
-  --ParserRefCountedCounter::count;
+  ParserRefCountedCounter::decrement();
 #endif
 }
 
