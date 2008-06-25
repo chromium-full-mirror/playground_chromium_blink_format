@@ -404,7 +404,8 @@ bool HTMLParser::handleError(Node* n,
       }
     } else if (h->hasLocalName(htmlTag)) {
       if (!current->isDocumentNode()) {
-        if (document->documentElement()->hasTagName(htmlTag)) {
+        if (document->documentElement() &&
+            document->documentElement()->hasTagName(htmlTag)) {
           reportError(RedundantHTMLBodyError, &localName);
           // we have another <HTML> element.... apply attributes to existing one
           // make sure we don't overwrite already existing attributes
