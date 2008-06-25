@@ -27,16 +27,8 @@
 
 namespace WebCore {
 
-bool FontCache::fontExists(const FontDescription& desc,
-                           const AtomicString& family) {
-  // try to construct a QFont inside WebCore::Font to see if we know about this
-  // font
-  FontDescription fnt(desc);
-  FontFamily fam;
-  fam.setFamily(family);
-  fnt.setFamily(fam);
-  return Font(fnt, /*letterSpacing*/ 0, /*wordSpacing*/ 0).font().exactMatch();
-}
+void FontCache::getTraitsInFamily(const AtomicString& familyName,
+                                  Vector<unsigned>& traitsMasks) {}
 
 FontPlatformData* FontCache::getCachedFontPlatformData(
     const FontDescription&,

@@ -60,8 +60,9 @@ CSSFontFaceSource::~CSSFontFaceSource() {
 void CSSFontFaceSource::pruneTable() {
   if (m_fontDataTable.isEmpty())
     return;
-  HashMap<int, SimpleFontData*>::iterator end = m_fontDataTable.end();
-  for (HashMap<int, SimpleFontData*>::iterator it = m_fontDataTable.begin();
+  HashMap<unsigned, SimpleFontData*>::iterator end = m_fontDataTable.end();
+  for (HashMap<unsigned, SimpleFontData*>::iterator it =
+           m_fontDataTable.begin();
        it != end; ++it)
     GlyphPageTreeNode::pruneTreeCustomFontData(it->second);
   deleteAllValues(m_fontDataTable);
@@ -109,8 +110,9 @@ SimpleFontData* CSSFontFaceSource::getFontData(
   }
 
   // See if we have a mapping in our FontData cache.
-  if (SimpleFontData* cachedData =
-          m_fontDataTable.get(fontDescription.computedPixelSize()))
+  unsigned hashKey = fontDescription.computedPixelSize() << 2 |
+                     (syntheticBold ? 2 : 0) | (syntheticItalic ? 1 : 0);
+  if (SimpleFontData* cachedData = m_fontDataTable.get(hashKey))
     return cachedData;
 
   OwnPtr<SimpleFontData> fontData;
@@ -197,7 +199,7 @@ SimpleFontData* CSSFontFaceSource::getFontData(
     fontData.set(new SimpleFontData(*tempData, true, true));
   }
 
-  m_fontDataTable.set(fontDescription.computedPixelSize(), fontData.get());
+  m_fontDataTable.set(hashKey, fontData.get());
   return fontData.release();
 }
 }
