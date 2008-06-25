@@ -73,7 +73,7 @@ void Parser::parse(ExecState* exec,
   bool lexError = lexer.sawError();
   lexer.clear();
 
-  ParserRefCounted::deleteNewObjects();
+  ParserRefCounted::deleteNewObjects(&exec->globalData());
 
   if (parseError || lexError) {
     *errLine = lexer.lineNo();
