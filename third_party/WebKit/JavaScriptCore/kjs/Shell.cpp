@@ -328,8 +328,9 @@ int main(int argc, char** argv) {
   int res = 0;
   TRY res = jscmain(argc, argv);
 #ifndef NDEBUG
-  JSLock lock;
+  JSLock::lock();
   JSGlobalData::threadInstance().heap->collect();
+  JSLock::unlock();
 #endif
   EXCEPT(res = 3)
   return res;
