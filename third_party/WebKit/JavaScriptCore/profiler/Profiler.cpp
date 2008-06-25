@@ -56,15 +56,6 @@ Profiler* Profiler::profiler() {
   return s_sharedProfiler;
 }
 
-Profile* Profiler::findProfile(ExecState* exec, const UString& title) const {
-  ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
-  for (size_t i = 0; i < m_currentProfiles.size(); ++i)
-    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
-        (title.isNull() || m_currentProfiles[i]->title() == title))
-      return m_currentProfiles[i].get();
-  return 0;
-}
-
 void Profiler::startProfiling(ExecState* exec,
                               const UString& title,
                               ProfilerClient* client) {
@@ -73,10 +64,14 @@ void Profiler::startProfiling(ExecState* exec,
   // Check if we currently have a Profile for this global ExecState and title.
   // If so return early and don't create a new Profile.
   ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
-  for (size_t i = 0; i < m_currentProfiles.size(); ++i)
-    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
-        m_currentProfiles[i]->title() == title)
+  for (size_t i = 0; i < m_currentProfiles.size(); ++i) {
+    Profile* profile = m_currentProfiles[i].get();
+    if (!profile->stoppedProfiling() &&
+        profile->originatingGlobalExec() == globalExec &&
+        profile->title() == title)
       return;
+  }
+
   s_sharedEnabledProfilerReference = this;
   RefPtr<Profile> profile = Profile::create(
       title, globalExec, exec->lexicalGlobalObject()->pageGroupIdentifier(),
@@ -87,8 +82,10 @@ void Profiler::startProfiling(ExecState* exec,
 void Profiler::stopProfiling(ExecState* exec, const UString& title) {
   ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
   for (ptrdiff_t i = m_currentProfiles.size() - 1; i >= 0; --i) {
-    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
-        (title.isNull() || m_currentProfiles[i]->title() == title))
+    Profile* profile = m_currentProfiles[i].get();
+    if (!profile->stoppedProfiling() &&
+        profile->originatingGlobalExec() == globalExec &&
+        (title.isNull() || profile->title() == title))
       m_currentProfiles[i]->stopProfiling();
   }
 }
@@ -96,8 +93,9 @@ void Profiler::stopProfiling(ExecState* exec, const UString& title) {
 void Profiler::didFinishAllExecution(ExecState* exec) {
   ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
   for (ptrdiff_t i = m_currentProfiles.size() - 1; i >= 0; --i) {
-    if (m_currentProfiles[i]->originatingGlobalExec() == globalExec &&
-        m_currentProfiles[i]->didFinishAllExecution()) {
+    Profile* profile = m_currentProfiles[i].get();
+    if (profile->originatingGlobalExec() == globalExec &&
+        profile->didFinishAllExecution()) {
       PassRefPtr<Profile> prpProfile = m_currentProfiles[i].release();
       m_currentProfiles.remove(i);
 

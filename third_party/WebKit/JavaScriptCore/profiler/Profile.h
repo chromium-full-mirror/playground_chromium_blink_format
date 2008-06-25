@@ -80,6 +80,8 @@ class Profile : public RefCounted<Profile> {
   void exclude(const ProfileNode* profileNode);
   void restoreAll();
 
+  bool stoppedProfiling() { return m_stoppedProfiling; }
+
 #ifndef NDEBUG
   void debugPrintData() const;
   void debugPrintDataSampleStyle() const;
@@ -92,12 +94,14 @@ class Profile : public RefCounted<Profile> {
           ExecState* originatingGlobalExec,
           unsigned pageGroupIdentifier,
           ProfilerClient*);
+
   void removeProfileStart();
   void removeProfileEnd();
 
   UString m_title;
   ExecState* m_originatingGlobalExec;
   unsigned m_pageGroupIdentifier;
+  unsigned m_stoppedCallDepth;
   RefPtr<ProfileNode> m_head;
   RefPtr<ProfileNode> m_currentNode;
   ProfilerClient* m_client;
