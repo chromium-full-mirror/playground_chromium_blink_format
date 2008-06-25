@@ -79,8 +79,8 @@ struct JSGlobalData : Noncopyable {
                             // mark.
 
   // Tracked object sets are transient, only needed when parsing.
-  HashSet<ParserRefCounted*>* newTrackedObjects;
-  HashCountedSet<ParserRefCounted*>* trackedObjectExtraRefCounts;
+  HashSet<ParserRefCounted*>* newParserObjects;
+  HashCountedSet<ParserRefCounted*>* parserObjectExtraRefCounts;
 
   Lexer* lexer;
   Parser* parser;
