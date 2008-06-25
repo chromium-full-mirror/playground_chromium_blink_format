@@ -320,8 +320,8 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
     checkScriptBuffer();
     UChar ch = *src;
 
-    if (!scriptCodeResync && !brokenComments && !state.inTextArea() &&
-        !state.inXmp() && ch == '-' && scriptCodeSize >= 3 && !src.escaped() &&
+    if (!scriptCodeResync && !brokenComments && !state.inXmp() && ch == '-' &&
+        scriptCodeSize >= 3 && !src.escaped() &&
         scriptCode[scriptCodeSize - 3] == '<' &&
         scriptCode[scriptCodeSize - 2] == '!' &&
         scriptCode[scriptCodeSize - 1] == '-') {
