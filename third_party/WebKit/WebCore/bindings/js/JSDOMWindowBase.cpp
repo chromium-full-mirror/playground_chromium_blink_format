@@ -237,10 +237,6 @@ JSDOMWindowBase::JSDOMWindowBase(JSObject* prototype,
     : JSGlobalObject(prototype, shell),
       m_impl(window),
       d(new JSDOMWindowBasePrivate(shell)) {
-  // JSDOMWindowBase destruction is not thread-safe because of
-  // the non-thread-safe WebCore structures it references.
-  Heap::heap(this)->collectOnMainThreadOnly(this);
-
   // Time in milliseconds before the script timeout handler kicks in.
   setTimeoutTime(10000);
 

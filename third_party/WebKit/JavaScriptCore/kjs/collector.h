@@ -79,8 +79,6 @@ class Heap : Noncopyable {
   void protect(JSValue*);
   void unprotect(JSValue*);
 
-  void collectOnMainThreadOnly(JSValue*);
-
   static Heap* heap(const JSValue*);  // 0 for immediate values
 
   size_t globalObjectCount();
@@ -88,7 +86,6 @@ class Heap : Noncopyable {
   size_t protectedGlobalObjectCount();
   HashCountedSet<const char*>* protectedObjectTypeCounts();
 
-  static void registerAsMainThread();
   static void registerThread();  // Should only be called by clients that can
                                  // use the same heap from multiple threads.
 
@@ -111,17 +108,17 @@ class Heap : Noncopyable {
   template <Heap::HeapType heapType>
   void* heapAllocate(size_t);
   template <Heap::HeapType heapType>
-  size_t sweep(bool);
+  size_t sweep();
   static const CollectorBlock* cellBlock(const JSCell*);
   static CollectorBlock* cellBlock(JSCell*);
   static size_t cellOffset(const JSCell*);
 
   Heap();
+  ~Heap();
   friend class JSGlobalData;
 
   void recordExtraCost(size_t);
   void markProtectedObjects();
-  void markMainThreadOnlyObjects();
   void markCurrentThreadConservatively();
   void markCurrentThreadConservativelyInternal();
   void markOtherThreadConservatively(Thread*);
@@ -129,7 +126,6 @@ class Heap : Noncopyable {
 
   typedef HashCountedSet<JSCell*> ProtectCountSet;
 
-  size_t mainThreadOnlyObjectCount;
   CollectorHeap primaryHeap;
   CollectorHeap numberHeap;
   ProtectCountSet protectedValues;
@@ -205,7 +201,6 @@ class CollectorBlock {
   uint32_t usedCells;
   CollectorCell* freeList;
   CollectorBitmap marked;
-  CollectorBitmap collectOnMainThreadOnly;
   Heap* heap;
 };
 
@@ -215,7 +210,6 @@ class SmallCellCollectorBlock {
   uint32_t usedCells;
   SmallCollectorCell* freeList;
   CollectorBitmap marked;
-  CollectorBitmap collectOnMainThreadOnly;
   Heap* heap;
 };
 

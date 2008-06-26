@@ -88,6 +88,8 @@ static inline unsigned getCurrentTime() {
 }
 
 JSGlobalObject::~JSGlobalObject() {
+  ASSERT(JSLock::currentThreadIsHoldingLock());
+
   if (d()->debugger)
     d()->debugger->detach(this);
 
@@ -110,6 +112,10 @@ JSGlobalObject::~JSGlobalObject() {
 void JSGlobalObject::init(JSObject* thisValue) {
   ASSERT(JSLock::currentThreadIsHoldingLock());
 
+  d()->globalData = (Heap::heap(this) == JSGlobalData::sharedInstance().heap)
+                        ? &JSGlobalData::sharedInstance()
+                        : &JSGlobalData::threadInstance();
+
   if (JSGlobalObject*& headObject = head()) {
     d()->prev = headObject;
     d()->next = headObject->d()->next;
@@ -124,10 +130,6 @@ void JSGlobalObject::init(JSObject* thisValue) {
 
   d()->recursion = 0;
   d()->debugger = 0;
-
-  d()->globalData = (Heap::heap(this) == JSGlobalData::sharedInstance().heap)
-                        ? &JSGlobalData::sharedInstance()
-                        : &JSGlobalData::threadInstance();
 
   d()->globalExec.set(
       new ExecState(this, thisValue, d()->globalScopeChain.node()));

@@ -50,11 +50,7 @@ class DOMObject : public KJS::JSObject {
   explicit DOMObject(KJS::JSValue* prototype)  // FIXME: This could take a
                                                // JSObject if JSDOMWindowShell
                                                // had a prototype.
-      : JSObject(prototype) {
-    // DOMObject destruction is not thread-safe because DOMObjects wrap
-    // unsafe WebCore DOM data structures.
-    KJS::Heap::heap(this)->collectOnMainThreadOnly(this);
-  }
+      : JSObject(prototype) {}
 
 #ifndef NDEBUG
   virtual ~DOMObject();

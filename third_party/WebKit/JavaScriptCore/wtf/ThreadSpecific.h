@@ -54,83 +54,51 @@ class ThreadSpecific : Noncopyable {
   void set(T*);
   void static destroy(void* ptr);
 
-#if 0  // FIXME: Temporary disabled until the rest of multithreading support is
-       // in.
 #if USE(PTHREADS) || PLATFORM(WIN)
-    struct Data : Noncopyable {
-        Data(T* value, ThreadSpecific<T>* owner) : value(value), owner(owner) {}
+  struct Data : Noncopyable {
+    Data(T* value, ThreadSpecific<T>* owner) : value(value), owner(owner) {}
 
-        T* value;
-        ThreadSpecific<T>* owner;
-    };
+    T* value;
+    ThreadSpecific<T>* owner;
+  };
 
-    pthread_key_t m_key;
-#endif
-
-#else  // Temporary stub implementation.
-  T m_data;
+  pthread_key_t m_key;
 #endif
 };
 
-#if 0  // FIXME: Temporary disabled until the rest of multithreading support is
-       // in.
-
 #if USE(PTHREADS) || PLATFORM(WIN)
-template<typename T>
-inline ThreadSpecific<T>::ThreadSpecific()
-{
-    pthread_key_create(&m_key, destroy);
+template <typename T>
+inline ThreadSpecific<T>::ThreadSpecific() {
+  pthread_key_create(&m_key, destroy);
 }
 
-template<typename T>
-inline ThreadSpecific<T>::~ThreadSpecific()
-{
-    pthread_key_delete(m_key); // Does not invoke destructor functions.
+template <typename T>
+inline ThreadSpecific<T>::~ThreadSpecific() {
+  pthread_key_delete(m_key);  // Does not invoke destructor functions.
 }
 
-template<typename T>
-inline T* ThreadSpecific<T>::get()
-{
-    Data* data = static_cast<Data*>(pthread_getspecific(m_key));
-    return data ? data->value : 0;
+template <typename T>
+inline T* ThreadSpecific<T>::get() {
+  Data* data = static_cast<Data*>(pthread_getspecific(m_key));
+  return data ? data->value : 0;
 }
 
-template<typename T>
-inline void ThreadSpecific<T>::set(T* ptr)
-{
-    ASSERT(!get());
-    pthread_setspecific(m_key, new Data(ptr, this));
+template <typename T>
+inline void ThreadSpecific<T>::set(T* ptr) {
+  ASSERT(!get());
+  pthread_setspecific(m_key, new Data(ptr, this));
 }
 
-template<typename T>
-inline void ThreadSpecific<T>::destroy(void* ptr)
-{
-    Data* data = static_cast<Data*>(ptr);
-    pthread_setspecific(data->owner->m_key, 0);
-    delete data->value;
-    delete data;
+template <typename T>
+inline void ThreadSpecific<T>::destroy(void* ptr) {
+  Data* data = static_cast<Data*>(ptr);
+  pthread_setspecific(data->owner->m_key, 0);
+  delete data->value;
+  delete data;
 }
 
 #else
 #error ThreadSpecific is not implemented for this platform.
-#endif
-
-#else  // Temporary stub implementation.
-
-template <typename T>
-inline ThreadSpecific<T>::ThreadSpecific() : m_data() {}
-
-template <typename T>
-inline ThreadSpecific<T>::~ThreadSpecific() {}
-
-template <typename T>
-inline T* ThreadSpecific<T>::get() {
-  return &m_data;
-}
-
-template <typename T>
-inline void ThreadSpecific<T>::set(T*) {}
-
 #endif
 
 template <typename T>

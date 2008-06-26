@@ -89,9 +89,25 @@ const size_t ALLOCATIONS_PER_COLLECTION = 4000;
 // a PIC branch in Mach-O binaries, see <rdar://problem/5971391>.
 #define MIN_ARRAY_SIZE (static_cast<size_t>(14))
 
-Heap::Heap() : mainThreadOnlyObjectCount(0), m_markListSet(0) {
+static void freeHeap(CollectorHeap*);
+
+Heap::Heap() : m_markListSet(0) {
   memset(&primaryHeap, 0, sizeof(CollectorHeap));
   memset(&numberHeap, 0, sizeof(CollectorHeap));
+}
+
+Heap::~Heap() {
+  JSLock lock;
+
+  delete m_markListSet;
+  sweep<PrimaryHeap>();
+  // No need to sweep number heap, because the JSNumber destructor doesn't do
+  // anything.
+
+  ASSERT(!primaryHeap.numLiveObjects);
+
+  freeHeap(&primaryHeap);
+  freeHeap(&numberHeap);
 }
 
 static NEVER_INLINE CollectorBlock* allocateBlock() {
@@ -152,6 +168,14 @@ static void freeBlock(CollectorBlock* block) {
 #else
   munmap(reinterpret_cast<char*>(block), BLOCK_SIZE);
 #endif
+}
+
+static void freeHeap(CollectorHeap* heap) {
+  for (size_t i = 0; i < heap->usedBlocks; ++i)
+    if (heap->blocks[i])
+      freeBlock(heap->blocks[i]);
+  fastFree(heap->blocks);
+  memset(heap, 0, sizeof(CollectorHeap));
 }
 
 void Heap::recordExtraCost(size_t cost) {
@@ -378,28 +402,6 @@ static inline void* currentThreadStackBase() {
   return static_cast<char*>(stackBase) + stackSize;
 #else
 #error Need a way to get the stack base on this platform
-#endif
-}
-
-#if USE(MULTIPLE_THREADS)
-static pthread_t mainThread;
-#endif
-
-void Heap::registerAsMainThread() {
-#if USE(MULTIPLE_THREADS)
-  mainThread = pthread_self();
-#endif
-}
-
-static inline bool onMainThread() {
-#if USE(MULTIPLE_THREADS)
-#if PLATFORM(DARWIN)
-  return pthread_main_np();
-#else
-  return !!pthread_equal(pthread_self(), mainThread);
-#endif
-#else
-  return true;
 #endif
 }
 
@@ -773,19 +775,6 @@ void Heap::unprotect(JSValue* k) {
   protectedValues.remove(k->asCell());
 }
 
-void Heap::collectOnMainThreadOnly(JSValue* value) {
-  ASSERT(value);
-  ASSERT(JSLock::lockCount() > 0);
-  ASSERT(JSLock::currentThreadIsHoldingLock());
-
-  if (JSImmediate::isImmediate(value))
-    return;
-
-  JSCell* cell = value->asCell();
-  cellBlock(cell)->collectOnMainThreadOnly.set(cellOffset(cell));
-  ++mainThreadOnlyObjectCount;
-}
-
 Heap* Heap::heap(const JSValue* v) {
   if (JSImmediate::isImmediate(v))
     return 0;
@@ -802,56 +791,11 @@ void Heap::markProtectedObjects() {
   }
 }
 
-void Heap::markMainThreadOnlyObjects() {
-#if USE(MULTIPLE_THREADS)
-  ASSERT(!onMainThread());
-#endif
-
-  // Optimization for clients that never register "main thread only" objects.
-  if (!mainThreadOnlyObjectCount)
-    return;
-
-  // FIXME: We can optimize this marking algorithm by keeping an exact set of
-  // "main thread only" objects when the "main thread only" object count is
-  // small. We don't want to keep an exact set all the time, because WebCore
-  // tends to create lots of "main thread only" objects, and all that set
-  // thrashing can be expensive.
-
-  size_t count = 0;
-
-  // We don't look at the numberHeap as primitive values can never be marked as
-  // main thread only
-  for (size_t block = 0; block < primaryHeap.usedBlocks; block++) {
-    ASSERT(count < mainThreadOnlyObjectCount);
-
-    CollectorBlock* curBlock = primaryHeap.blocks[block];
-    size_t minimumCellsToProcess = curBlock->usedCells;
-    for (size_t i = 0; (i < minimumCellsToProcess) & (i < CELLS_PER_BLOCK);
-         i++) {
-      CollectorCell* cell = curBlock->cells + i;
-      if (cell->u.freeCell.zeroIfFree == 0)
-        ++minimumCellsToProcess;
-      else {
-        if (curBlock->collectOnMainThreadOnly.get(i)) {
-          if (!curBlock->marked.get(i)) {
-            JSCell* imp = reinterpret_cast<JSCell*>(cell);
-            imp->mark();
-          }
-          if (++count == mainThreadOnlyObjectCount)
-            return;
-        }
-      }
-    }
-  }
-}
-
 template <Heap::HeapType heapType>
-size_t Heap::sweep(bool currentThreadIsMainThread) {
+size_t Heap::sweep() {
   typedef typename HeapConstants<heapType>::Block Block;
   typedef typename HeapConstants<heapType>::Cell Cell;
 
-  UNUSED_PARAM(currentThreadIsMainThread);  // currentThreadIsMainThread is only
-                                            // used in ASSERTs
   // SWEEP: delete everything with a zero refcount (garbage) and unmark
   // everything else
   CollectorHeap& heap =
@@ -882,12 +826,6 @@ size_t Heap::sweep(bool currentThreadIsMainThread) {
             if (cell->u.freeCell.zeroIfFree == 0)
               continue;
 
-            ASSERT(currentThreadIsMainThread ||
-                   !curBlock->collectOnMainThreadOnly.get(i));
-            if (curBlock->collectOnMainThreadOnly.get(i)) {
-              curBlock->collectOnMainThreadOnly.clear(i);
-              --mainThreadOnlyObjectCount;
-            }
             imp->~JSCell();
           }
 
@@ -913,12 +851,6 @@ size_t Heap::sweep(bool currentThreadIsMainThread) {
                                     HeapConstants<heapType>::bitmapShift)) {
             if (heapType != Heap::NumberHeap) {
               JSCell* imp = reinterpret_cast<JSCell*>(cell);
-              ASSERT(currentThreadIsMainThread ||
-                     !curBlock->collectOnMainThreadOnly.get(i));
-              if (curBlock->collectOnMainThreadOnly.get(i)) {
-                curBlock->collectOnMainThreadOnly.clear(i);
-                --mainThreadOnlyObjectCount;
-              }
               imp->~JSCell();
             }
             --usedCells;
@@ -984,8 +916,6 @@ bool Heap::collect() {
   primaryHeap.operationInProgress = Collection;
   numberHeap.operationInProgress = Collection;
 
-  bool currentThreadIsMainThread = onMainThread();
-
   // MARK: first mark all referenced objects recursively starting out from the
   // set of root objects
 
@@ -993,15 +923,11 @@ bool Heap::collect() {
   markProtectedObjects();
   if (m_markListSet && m_markListSet->size())
     ArgList::markLists(*m_markListSet);
-#if USE(MULTIPLE_THREADS)
-  if (!currentThreadIsMainThread)
-    markMainThreadOnlyObjects();
-#endif
 
   size_t originalLiveObjects =
       primaryHeap.numLiveObjects + numberHeap.numLiveObjects;
-  size_t numLiveObjects = sweep<PrimaryHeap>(currentThreadIsMainThread);
-  numLiveObjects += sweep<NumberHeap>(currentThreadIsMainThread);
+  size_t numLiveObjects = sweep<PrimaryHeap>();
+  numLiveObjects += sweep<NumberHeap>();
 
   primaryHeap.operationInProgress = NoOperation;
   numberHeap.operationInProgress = NoOperation;
@@ -1015,25 +941,25 @@ size_t Heap::size() {
 
 size_t Heap::globalObjectCount() {
   size_t count = 0;
-  if (JSGlobalObject::head()) {
-    JSGlobalObject* o = JSGlobalObject::head();
+  if (JSGlobalObject* head = JSGlobalData::threadInstance().head) {
+    JSGlobalObject* o = head;
     do {
       ++count;
       o = o->next();
-    } while (o != JSGlobalObject::head());
+    } while (o != head);
   }
   return count;
 }
 
 size_t Heap::protectedGlobalObjectCount() {
   size_t count = 0;
-  if (JSGlobalObject::head()) {
-    JSGlobalObject* o = JSGlobalObject::head();
+  if (JSGlobalObject* head = JSGlobalData::threadInstance().head) {
+    JSGlobalObject* o = head;
     do {
       if (protectedValues.contains(o))
         ++count;
       o = o->next();
-    } while (o != JSGlobalObject::head());
+    } while (o != head);
   }
   return count;
 }
