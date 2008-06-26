@@ -23,6 +23,8 @@
 #include "config.h"
 #include "SimpleFontData.h"
 
+#include "SVGFontData.h"
+
 namespace WebCore {
 
 SimpleFontData::SimpleFontData(const FontPlatformData& font,
