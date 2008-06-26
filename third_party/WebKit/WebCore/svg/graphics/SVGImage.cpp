@@ -208,6 +208,7 @@ bool SVGImage::dataChanged(bool allDataReceived) {
                         dummyEditorClient, dummyDragClient,
                         dummyInspectorClient));
     m_page->settings()->setJavaScriptEnabled(false);
+    m_page->settings()->setPluginsEnabled(false);
 
     m_frame = Frame::create(m_page.get(), 0, dummyFrameLoaderClient);
     m_frameView = new FrameView(m_frame.get());
