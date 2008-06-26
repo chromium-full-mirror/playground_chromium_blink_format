@@ -38,7 +38,10 @@ class AccessibilityController {
                         JSValueRef* exception);
 
   // Controller Methods - platfrom independant implementations
-  JSStringRef dumpCurrentAttributes();
+  JSStringRef allAttributesOfFocusedElement();
+  JSStringRef roleOfFocusedElement();
+  JSStringRef titleOfFocusedElement();
+  JSStringRef descriptionOfFocusedElement();
 
  private:
   static JSClassRef getJSClass();

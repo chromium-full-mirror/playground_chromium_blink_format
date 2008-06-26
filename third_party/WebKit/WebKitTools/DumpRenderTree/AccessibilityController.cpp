@@ -31,7 +31,35 @@ AccessibilityController::AccessibilityController() {}
 
 AccessibilityController::~AccessibilityController() {}
 
-static JSValueRef dumpCurrentAttributesCallback(JSContextRef context,
+static JSValueRef allAttributesOfFocusedElementCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  AccessibilityController* controller =
+      reinterpret_cast<AccessibilityController*>(
+          JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> attributes(
+      Adopt, controller->allAttributesOfFocusedElement());
+  return JSValueMakeString(context, attributes.get());
+}
+
+static JSValueRef roleOfFocusedElementCallback(JSContextRef context,
+                                               JSObjectRef function,
+                                               JSObjectRef thisObject,
+                                               size_t argumentCount,
+                                               const JSValueRef arguments[],
+                                               JSValueRef* exception) {
+  AccessibilityController* controller =
+      reinterpret_cast<AccessibilityController*>(
+          JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> role(Adopt, controller->roleOfFocusedElement());
+  return JSValueMakeString(context, role.get());
+}
+
+static JSValueRef titleOfFocusedElementCallback(JSContextRef context,
                                                 JSObjectRef function,
                                                 JSObjectRef thisObject,
                                                 size_t argumentCount,
@@ -40,9 +68,23 @@ static JSValueRef dumpCurrentAttributesCallback(JSContextRef context,
   AccessibilityController* controller =
       reinterpret_cast<AccessibilityController*>(
           JSObjectGetPrivate(thisObject));
-  JSRetainPtr<JSStringRef> attributes(Adopt,
-                                      controller->dumpCurrentAttributes());
-  return JSValueMakeString(context, attributes.get());
+  JSRetainPtr<JSStringRef> title(Adopt, controller->titleOfFocusedElement());
+  return JSValueMakeString(context, title.get());
+}
+
+static JSValueRef descriptionOfFocusedElementCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  AccessibilityController* controller =
+      reinterpret_cast<AccessibilityController*>(
+          JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> description(
+      Adopt, controller->descriptionOfFocusedElement());
+  return JSValueMakeString(context, description.get());
 }
 
 // Object Creation
@@ -92,7 +134,13 @@ JSClassRef AccessibilityController::getJSClass() {
 
 JSStaticFunction* AccessibilityController::staticFunctions() {
   static JSStaticFunction staticFunctions[] = {
-      {"dumpCurrentAttributes", dumpCurrentAttributesCallback,
+      {"allAttributesOfFocusedElement", allAttributesOfFocusedElementCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"roleOfFocusedElement", roleOfFocusedElementCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"titleOfFocusedElement", titleOfFocusedElementCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"descriptionOfFocusedElement", descriptionOfFocusedElementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 
