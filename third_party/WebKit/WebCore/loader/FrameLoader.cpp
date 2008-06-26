@@ -1990,7 +1990,7 @@ bool FrameLoader::canCachePage() {
          // the right NPObjects. See <rdar://problem/5197041> for more
          // information.
          && !m_containsPlugIns && !m_URL.protocolIs("https") &&
-         m_frame->document() && !m_frame->document()->applets()->length() &&
+         m_frame->document() &&
          !m_frame->document()->hasWindowEventListener(unloadEvent)
 #if ENABLE(DATABASE)
          && !m_frame->document()->hasOpenDatabases()
@@ -5074,8 +5074,12 @@ Widget* FrameLoader::createJavaAppletWidget(
     baseURLString = m_frame->document()->baseURL().string();
   KURL baseURL = completeURL(baseURLString);
 
-  return m_client->createJavaAppletWidget(size, element, baseURL, paramNames,
-                                          paramValues);
+  Widget* widget = m_client->createJavaAppletWidget(size, element, baseURL,
+                                                    paramNames, paramValues);
+  if (widget)
+    m_containsPlugIns = true;
+
+  return widget;
 }
 
 void FrameLoader::didChangeTitle(DocumentLoader* loader) {
