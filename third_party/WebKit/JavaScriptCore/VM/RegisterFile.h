@@ -128,7 +128,7 @@ class RegisterFile : Noncopyable {
                                     MAP_PRIVATE | MAP_ANON, -1, 0));
 #elif HAVE(VIRTUALALLOC)
     // FIXME: Use VirtualAlloc, and commit pages as we go.
-    m_buffer = fastMalloc(bufferLength);
+    m_buffer = static_cast<Register*>(fastMalloc(bufferLength));
 #else
 #error "Don't know how to reserve virtual memory on this platform."
 #endif

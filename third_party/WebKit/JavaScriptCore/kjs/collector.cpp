@@ -26,8 +26,9 @@
 #include "ExecState.h"
 #include "JSGlobalObject.h"
 #include "JSString.h"
-#include "list.h"
 #include "JSValue.h"
+#include "list.h"
+#include "Machine.h"
 #include <algorithm>
 #include <setjmp.h>
 #include <stdlib.h>
