@@ -55,7 +55,10 @@ class JSString : public JSCell {
   virtual double toNumber(ExecState*) const;
   virtual JSObject* toObject(ExecState*) const;
   virtual UString toString(ExecState*) const;
+
   virtual JSObject* toThisObject(ExecState*) const;
+  virtual UString toThisString(ExecState*) const;
+  virtual JSString* toThisJSString(ExecState*);
 
   // Actually getPropertySlot, not getOwnPropertySlot (see JSCell).
   virtual bool getOwnPropertySlot(ExecState*,

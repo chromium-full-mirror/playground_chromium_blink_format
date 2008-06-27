@@ -40,10 +40,6 @@ static JSValue* stringProtoFuncToString(ExecState*,
                                         JSObject*,
                                         JSValue*,
                                         const ArgList&);
-static JSValue* stringProtoFuncValueOf(ExecState*,
-                                       JSObject*,
-                                       JSValue*,
-                                       const ArgList&);
 static JSValue* stringProtoFuncCharAt(ExecState*,
                                       JSObject*,
                                       JSValue*,
@@ -226,10 +222,22 @@ bool StringObject::deleteProperty(ExecState* exec,
 
 void StringObject::getPropertyNames(ExecState* exec,
                                     PropertyNameArray& propertyNames) {
-  int size = internalValue()->getString().size();
+  int size = internalValue()->value().size();
   for (int i = 0; i < size; i++)
     propertyNames.add(Identifier(exec, UString::from(i)));
   return JSObject::getPropertyNames(exec, propertyNames);
+}
+
+UString StringObject::toString(ExecState*) const {
+  return internalValue()->value();
+}
+
+UString StringObject::toThisString(ExecState*) const {
+  return internalValue()->value();
+}
+
+JSString* StringObject::toThisJSString(ExecState*) {
+  return internalValue();
 }
 
 // ------------------------------ StringPrototype ---------------------------
@@ -238,7 +246,7 @@ const ClassInfo StringPrototype::info = {"String", &StringObject::info, 0,
 /* Source for string_object.lut.h
 @begin stringTable 26
   toString              stringProtoFuncToString          DontEnum|Function 0
-  valueOf               stringProtoFuncValueOf           DontEnum|Function 0
+  valueOf               stringProtoFuncToString          DontEnum|Function 0
   charAt                stringProtoFuncCharAt            DontEnum|Function 1
   charCodeAt            stringProtoFuncCharCodeAt        DontEnum|Function 1
   concat                stringProtoFuncConcat            DontEnum|Function 1
@@ -289,91 +297,31 @@ bool StringPrototype::getOwnPropertySlot(ExecState* exec,
 
 // ------------------------------ Functions --------------------------
 
-static inline void expandSourceRanges(UString::Range*& array,
-                                      int& count,
-                                      int& capacity) {
-  int newCapacity;
-  if (capacity == 0) {
-    newCapacity = 16;
-  } else {
-    newCapacity = capacity * 2;
-  }
-
-  UString::Range* newArray = new UString::Range[newCapacity];
-  for (int i = 0; i < count; i++) {
-    newArray[i] = array[i];
-  }
-
-  delete[] array;
-
-  capacity = newCapacity;
-  array = newArray;
-}
-
-static void pushSourceRange(UString::Range*& array,
-                            int& count,
-                            int& capacity,
-                            UString::Range range) {
-  if (count + 1 > capacity)
-    expandSourceRanges(array, count, capacity);
-
-  array[count] = range;
-  count++;
-}
-
-static inline void expandReplacements(UString*& array,
-                                      int& count,
-                                      int& capacity) {
-  int newCapacity;
-  if (capacity == 0) {
-    newCapacity = 16;
-  } else {
-    newCapacity = capacity * 2;
-  }
-
-  UString* newArray = new UString[newCapacity];
-  for (int i = 0; i < count; i++) {
-    newArray[i] = array[i];
-  }
-
-  delete[] array;
-
-  capacity = newCapacity;
-  array = newArray;
-}
-
-static void pushReplacement(UString*& array,
-                            int& count,
-                            int& capacity,
-                            UString replacement) {
-  if (count + 1 > capacity)
-    expandReplacements(array, count, capacity);
-
-  array[count] = replacement;
-  count++;
-}
-
 static inline UString substituteBackreferences(const UString& replacement,
                                                const UString& source,
-                                               int* ovector,
+                                               const int* ovector,
                                                RegExp* reg) {
-  UString substitutedReplacement = replacement;
-
+  UString substitutedReplacement;
+  int offset = 0;
   int i = -1;
-  while ((i = substitutedReplacement.find(UString("$"), i + 1)) != -1) {
-    if (i + 1 == substitutedReplacement.size())
+  while ((i = replacement.find('$', i + 1)) != -1) {
+    if (i + 1 == replacement.size())
       break;
 
-    unsigned short ref = substitutedReplacement[i + 1];
-    int backrefStart = 0;
-    int backrefLength = 0;
-    int advance = 0;
-
-    if (ref == '$') {  // "$$" -> "$"
-      substitutedReplacement = substitutedReplacement.substr(0, i + 1) +
-                               substitutedReplacement.substr(i + 2);
+    unsigned short ref = replacement[i + 1];
+    if (ref == '$') {
+      // "$$" -> "$"
+      ++i;
+      substitutedReplacement.append(replacement.data() + offset, i - offset);
+      offset = i + 1;
+      substitutedReplacement.append('$');
       continue;
-    } else if (ref == '&') {
+    }
+
+    int backrefStart;
+    int backrefLength;
+    int advance = 0;
+    if (ref == '&') {
       backrefStart = ovector[0];
       backrefLength = ovector[1] - backrefStart;
     } else if (ref == '`') {
@@ -387,8 +335,8 @@ static inline UString substituteBackreferences(const UString& replacement,
       unsigned backrefIndex = ref - '0';
       if (backrefIndex > reg->numSubpatterns())
         continue;
-      if (substitutedReplacement.size() > i + 2) {
-        ref = substitutedReplacement[i + 2];
+      if (replacement.size() > i + 2) {
+        ref = replacement[i + 2];
         if (ref >= '0' && ref <= '9') {
           backrefIndex = 10 * backrefIndex + ref - '0';
           if (backrefIndex > reg->numSubpatterns())
@@ -403,11 +351,19 @@ static inline UString substituteBackreferences(const UString& replacement,
     } else
       continue;
 
-    substitutedReplacement = substitutedReplacement.substr(0, i) +
-                             source.substr(backrefStart, backrefLength) +
-                             substitutedReplacement.substr(i + 2 + advance);
-    i += backrefLength - 1;  // - 1 offsets 'i + 1'
+    if (i - offset)
+      substitutedReplacement.append(replacement.data() + offset, i - offset);
+    i += 1 + advance;
+    offset = i + 1;
+    substitutedReplacement.append(source.data() + backrefStart, backrefLength);
   }
+
+  if (!offset)
+    return replacement;
+
+  if (replacement.size() - offset)
+    substitutedReplacement.append(replacement.data() + offset,
+                                  replacement.size() - offset);
 
   return substitutedReplacement;
 }
@@ -418,35 +374,34 @@ static inline int localeCompare(const UString& a, const UString& b) {
       reinterpret_cast<const ::UChar*>(b.data()), b.size());
 }
 
-static JSValue* replace(ExecState* exec,
-                        JSString* sourceVal,
-                        JSValue* pattern,
-                        JSValue* replacement) {
-  UString source = sourceVal->value();
-  CallData callData;
-  UString replacementString;
+JSValue* stringProtoFuncReplace(ExecState* exec,
+                                JSObject*,
+                                JSValue* thisValue,
+                                const ArgList& args) {
+  JSString* sourceVal = thisValue->toThisJSString(exec);
+  const UString& source = sourceVal->value();
 
+  JSValue* pattern = args[0];
+
+  JSValue* replacement = args[1];
+  UString replacementString;
+  CallData callData;
   CallType callType = replacement->getCallData(callData);
   if (callType == CallTypeNone)
     replacementString = replacement->toString(exec);
 
-  if (pattern->isObject() &&
-      static_cast<JSObject*>(pattern)->inherits(&RegExpObject::info)) {
+  if (pattern->isObject(&RegExpObject::info)) {
     RegExp* reg = static_cast<RegExpObject*>(pattern)->regExp();
     bool global = reg->global();
 
-    RegExpConstructor* regExpObj = static_cast<RegExpConstructor*>(
-        exec->lexicalGlobalObject()->regExpConstructor());
+    RegExpConstructor* regExpObj =
+        exec->lexicalGlobalObject()->regExpConstructor();
 
     int lastIndex = 0;
     int startPosition = 0;
 
-    UString::Range* sourceRanges = 0;
-    int sourceRangeCount = 0;
-    int sourceRangeCapacity = 0;
-    UString* replacements = 0;
-    int replacementCount = 0;
-    int replacementCapacity = 0;
+    Vector<UString::Range, 16> sourceRanges;
+    Vector<UString, 16> replacements;
 
     // This is either a loop (if global is set) or a one-way (if not).
     do {
@@ -458,10 +413,8 @@ static JSValue* replace(ExecState* exec,
       if (matchIndex < 0)
         break;
 
-      pushSourceRange(sourceRanges, sourceRangeCount, sourceRangeCapacity,
-                      UString::Range(lastIndex, matchIndex - lastIndex));
+      sourceRanges.append(UString::Range(lastIndex, matchIndex - lastIndex));
 
-      UString substitutedReplacement;
       if (callType != CallTypeNone) {
         int completeMatchStart = ovector[0];
         ArgList args;
@@ -479,15 +432,12 @@ static JSValue* replace(ExecState* exec,
         args.append(jsNumber(exec, completeMatchStart));
         args.append(sourceVal);
 
-        substitutedReplacement = call(exec, replacement, callType, callData,
-                                      exec->globalThisValue(), args)
-                                     ->toString(exec);
+        replacements.append(call(exec, replacement, callType, callData,
+                                 exec->globalThisValue(), args)
+                                ->toString(exec));
       } else
-        substitutedReplacement =
-            substituteBackreferences(replacementString, source, ovector, reg);
-
-      pushReplacement(replacements, replacementCount, replacementCapacity,
-                      substitutedReplacement);
+        replacements.append(
+            substituteBackreferences(replacementString, source, ovector, reg));
 
       lastIndex = matchIndex + matchLen;
       startPosition = lastIndex;
@@ -501,17 +451,11 @@ static JSValue* replace(ExecState* exec,
     } while (global);
 
     if (lastIndex < source.size())
-      pushSourceRange(sourceRanges, sourceRangeCount, sourceRangeCapacity,
-                      UString::Range(lastIndex, source.size() - lastIndex));
+      sourceRanges.append(UString::Range(lastIndex, source.size() - lastIndex));
 
-    UString result;
-
-    if (sourceRanges)
-      result = source.spliceSubstringsWithSeparators(
-          sourceRanges, sourceRangeCount, replacements, replacementCount);
-
-    delete[] sourceRanges;
-    delete[] replacements;
+    UString result = source.spliceSubstringsWithSeparators(
+        sourceRanges.data(), sourceRanges.size(), replacements.data(),
+        replacements.size());
 
     if (result == source)
       return sourceVal;
@@ -547,31 +491,22 @@ JSValue* stringProtoFuncToString(ExecState* exec,
                                  JSObject*,
                                  JSValue* thisValue,
                                  const ArgList&) {
-  if (!thisValue->isObject(&StringObject::info))
-    return throwError(exec, TypeError);
+  // Also used for valueOf.
 
-  return static_cast<StringObject*>(thisValue)->internalValue();
-}
+  if (thisValue->isString())
+    return thisValue;
 
-JSValue* stringProtoFuncValueOf(ExecState* exec,
-                                JSObject*,
-                                JSValue* thisValue,
-                                const ArgList&) {
-  if (!thisValue->isObject(&StringObject::info))
-    return throwError(exec, TypeError);
+  if (thisValue->isObject(&StringObject::info))
+    return static_cast<StringObject*>(thisValue)->internalValue();
 
-  return static_cast<StringObject*>(thisValue)->internalValue();
+  return throwError(exec, TypeError);
 }
 
 JSValue* stringProtoFuncCharAt(ExecState* exec,
                                JSObject*,
                                JSValue* thisValue,
                                const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   int len = s.size();
 
   UString u;
@@ -588,11 +523,7 @@ JSValue* stringProtoFuncCharCodeAt(ExecState* exec,
                                    JSObject*,
                                    JSValue* thisValue,
                                    const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   int len = s.size();
 
   JSValue* result = 0;
@@ -610,11 +541,7 @@ JSValue* stringProtoFuncConcat(ExecState* exec,
                                JSObject*,
                                JSValue* thisValue,
                                const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
 
   ArgList::const_iterator end = args.end();
   for (ArgList::const_iterator it = args.begin(); it != end; ++it) {
@@ -627,11 +554,7 @@ JSValue* stringProtoFuncIndexOf(ExecState* exec,
                                 JSObject*,
                                 JSValue* thisValue,
                                 const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   int len = s.size();
 
   JSValue* a0 = args[0];
@@ -649,11 +572,7 @@ JSValue* stringProtoFuncLastIndexOf(ExecState* exec,
                                     JSObject*,
                                     JSValue* thisValue,
                                     const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   int len = s.size();
 
   JSValue* a0 = args[0];
@@ -672,11 +591,7 @@ JSValue* stringProtoFuncMatch(ExecState* exec,
                               JSObject*,
                               JSValue* thisValue,
                               const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
 
   JSValue* a0 = args[0];
 
@@ -694,8 +609,8 @@ JSValue* stringProtoFuncMatch(ExecState* exec,
      */
     reg = RegExp::create(a0->toString(exec));
   }
-  RegExpConstructor* regExpObj = static_cast<RegExpConstructor*>(
-      exec->lexicalGlobalObject()->regExpConstructor());
+  RegExpConstructor* regExpObj =
+      exec->lexicalGlobalObject()->regExpConstructor();
   int pos;
   int matchLength;
   regExpObj->performMatch(reg.get(), u, 0, pos, matchLength);
@@ -734,11 +649,7 @@ JSValue* stringProtoFuncSearch(ExecState* exec,
                                JSObject*,
                                JSValue* thisValue,
                                const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
 
   JSValue* a0 = args[0];
 
@@ -755,43 +666,19 @@ JSValue* stringProtoFuncSearch(ExecState* exec,
      */
     reg = RegExp::create(a0->toString(exec));
   }
-  RegExpConstructor* regExpObj = static_cast<RegExpConstructor*>(
-      exec->lexicalGlobalObject()->regExpConstructor());
+  RegExpConstructor* regExpObj =
+      exec->lexicalGlobalObject()->regExpConstructor();
   int pos;
   int matchLength;
   regExpObj->performMatch(reg.get(), u, 0, pos, matchLength);
   return jsNumber(exec, pos);
 }
 
-JSValue* stringProtoFuncReplace(ExecState* exec,
-                                JSObject*,
-                                JSValue* thisValue,
-                                const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
-
-  JSString* sVal = thisValue->isObject(&StringObject::info)
-                       ? static_cast<StringObject*>(thisValue)->internalValue()
-                       : static_cast<JSString*>(jsString(exec, s));
-
-  JSValue* a0 = args[0];
-  JSValue* a1 = args[1];
-
-  return replace(exec, sVal, a0, a1);
-}
-
 JSValue* stringProtoFuncSlice(ExecState* exec,
                               JSObject*,
                               JSValue* thisValue,
                               const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   int len = s.size();
 
   JSValue* a0 = args[0];
@@ -818,11 +705,7 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
                               JSObject*,
                               JSValue* thisValue,
                               const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
 
   JSValue* a0 = args[0];
   JSValue* a1 = args[1];
@@ -894,11 +777,7 @@ JSValue* stringProtoFuncSubstr(ExecState* exec,
                                JSObject*,
                                JSValue* thisValue,
                                const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   int len = s.size();
 
   JSValue* a0 = args[0];
@@ -925,11 +804,7 @@ JSValue* stringProtoFuncSubstring(ExecState* exec,
                                   JSObject*,
                                   JSValue* thisValue,
                                   const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   int len = s.size();
 
   JSValue* a0 = args[0];
@@ -963,15 +838,9 @@ JSValue* stringProtoFuncToLowerCase(ExecState* exec,
                                     JSObject*,
                                     JSValue* thisValue,
                                     const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  JSString* sVal = thisValue->toThisJSString(exec);
+  const UString& s = sVal->value();
 
-  JSString* sVal = thisValue->isObject(&StringObject::info)
-                       ? static_cast<StringObject*>(thisValue)->internalValue()
-                       : static_cast<JSString*>(jsString(exec, s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -998,15 +867,9 @@ JSValue* stringProtoFuncToUpperCase(ExecState* exec,
                                     JSObject*,
                                     JSValue* thisValue,
                                     const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  JSString* sVal = thisValue->toThisJSString(exec);
+  const UString& s = sVal->value();
 
-  JSString* sVal = thisValue->isObject(&StringObject::info)
-                       ? static_cast<StringObject*>(thisValue)->internalValue()
-                       : static_cast<JSString*>(jsString(exec, s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -1033,17 +896,12 @@ JSValue* stringProtoFuncToLocaleLowerCase(ExecState* exec,
                                           JSObject*,
                                           JSValue* thisValue,
                                           const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
-
   // FIXME: See http://www.unicode.org/Public/UNIDATA/SpecialCasing.txt for
   // locale-sensitive mappings that aren't implemented.
-  JSString* sVal = thisValue->isObject(&StringObject::info)
-                       ? static_cast<StringObject*>(thisValue)->internalValue()
-                       : static_cast<JSString*>(jsString(exec, s));
+
+  JSString* sVal = thisValue->toThisJSString(exec);
+  const UString& s = sVal->value();
+
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -1070,15 +928,9 @@ JSValue* stringProtoFuncToLocaleUpperCase(ExecState* exec,
                                           JSObject*,
                                           JSValue* thisValue,
                                           const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  JSString* sVal = thisValue->toThisJSString(exec);
+  const UString& s = sVal->value();
 
-  JSString* sVal = thisValue->isObject(&StringObject::info)
-                       ? static_cast<StringObject*>(thisValue)->internalValue()
-                       : static_cast<JSString*>(jsString(exec, s));
   int ssize = s.size();
   if (!ssize)
     return sVal;
@@ -1108,11 +960,7 @@ JSValue* stringProtoFuncLocaleCompare(ExecState* exec,
   if (args.size() < 1)
     return jsNumber(exec, 0);
 
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   JSValue* a0 = args[0];
   return jsNumber(exec, localeCompare(s, a0->toString(exec)));
 }
@@ -1121,11 +969,7 @@ JSValue* stringProtoFuncBig(ExecState* exec,
                             JSObject*,
                             JSValue* thisValue,
                             const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<big>" + s + "</big>");
 }
 
@@ -1133,11 +977,7 @@ JSValue* stringProtoFuncSmall(ExecState* exec,
                               JSObject*,
                               JSValue* thisValue,
                               const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<small>" + s + "</small>");
 }
 
@@ -1145,11 +985,7 @@ JSValue* stringProtoFuncBlink(ExecState* exec,
                               JSObject*,
                               JSValue* thisValue,
                               const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<blink>" + s + "</blink>");
 }
 
@@ -1157,11 +993,7 @@ JSValue* stringProtoFuncBold(ExecState* exec,
                              JSObject*,
                              JSValue* thisValue,
                              const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<b>" + s + "</b>");
 }
 
@@ -1169,11 +1001,7 @@ JSValue* stringProtoFuncFixed(ExecState* exec,
                               JSObject*,
                               JSValue* thisValue,
                               const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<tt>" + s + "</tt>");
 }
 
@@ -1181,11 +1009,7 @@ JSValue* stringProtoFuncItalics(ExecState* exec,
                                 JSObject*,
                                 JSValue* thisValue,
                                 const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<i>" + s + "</i>");
 }
 
@@ -1193,11 +1017,7 @@ JSValue* stringProtoFuncStrike(ExecState* exec,
                                JSObject*,
                                JSValue* thisValue,
                                const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<strike>" + s + "</strike>");
 }
 
@@ -1205,11 +1025,7 @@ JSValue* stringProtoFuncSub(ExecState* exec,
                             JSObject*,
                             JSValue* thisValue,
                             const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<sub>" + s + "</sub>");
 }
 
@@ -1217,11 +1033,7 @@ JSValue* stringProtoFuncSup(ExecState* exec,
                             JSObject*,
                             JSValue* thisValue,
                             const ArgList&) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   return jsString(exec, "<sup>" + s + "</sup>");
 }
 
@@ -1229,11 +1041,7 @@ JSValue* stringProtoFuncFontcolor(ExecState* exec,
                                   JSObject*,
                                   JSValue* thisValue,
                                   const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   JSValue* a0 = args[0];
   return jsString(
       exec, "<font color=\"" + a0->toString(exec) + "\">" + s + "</font>");
@@ -1243,11 +1051,7 @@ JSValue* stringProtoFuncFontsize(ExecState* exec,
                                  JSObject*,
                                  JSValue* thisValue,
                                  const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   JSValue* a0 = args[0];
   return jsString(exec,
                   "<font size=\"" + a0->toString(exec) + "\">" + s + "</font>");
@@ -1257,11 +1061,7 @@ JSValue* stringProtoFuncAnchor(ExecState* exec,
                                JSObject*,
                                JSValue* thisValue,
                                const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   JSValue* a0 = args[0];
   return jsString(exec, "<a name=\"" + a0->toString(exec) + "\">" + s + "</a>");
 }
@@ -1270,11 +1070,7 @@ JSValue* stringProtoFuncLink(ExecState* exec,
                              JSObject*,
                              JSValue* thisValue,
                              const ArgList& args) {
-  // This optimizes the common case that thisObj is a StringObject
-  UString s =
-      thisValue->isObject(&StringObject::info)
-          ? static_cast<StringObject*>(thisValue)->internalValue()->value()
-          : thisValue->toThisObject(exec)->toString(exec);
+  UString s = thisValue->toThisString(exec);
   JSValue* a0 = args[0];
   return jsString(exec, "<a href=\"" + a0->toString(exec) + "\">" + s + "</a>");
 }

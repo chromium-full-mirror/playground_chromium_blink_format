@@ -35,8 +35,9 @@ namespace KJS {
 
 class ExecState;
 class Identifier;
-class JSObject;
 class JSCell;
+class JSObject;
+class JSString;
 class PropertySlot;
 
 struct ClassInfo;
@@ -133,7 +134,12 @@ class JSValue : Noncopyable {
   void put(ExecState*, unsigned propertyName, JSValue*);
   bool deleteProperty(ExecState*, const Identifier& propertyName);
   bool deleteProperty(ExecState*, unsigned propertyName);
+
   JSObject* toThisObject(ExecState*) const;
+  UString toThisString(ExecState*) const;
+  JSString* toThisJSString(ExecState*);
+
+  JSValue* getJSNumber();  // 0 if this is not a JSNumber or number object
 
  private:
   bool getPropertySlot(ExecState*,
@@ -206,7 +212,11 @@ class JSCell : public JSValue {
   virtual void put(ExecState*, unsigned propertyName, JSValue*);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
+
   virtual JSObject* toThisObject(ExecState*) const;
+  virtual UString toThisString(ExecState*) const;
+  virtual JSString* toThisJSString(ExecState*);
+  virtual JSValue* getJSNumber();
 
  private:
   // Base implementation, but for non-object classes implements getPropertySlot.
@@ -233,7 +243,10 @@ class JSNumberCell : public JSCell {
   virtual double toNumber(ExecState*) const;
   virtual UString toString(ExecState*) const;
   virtual JSObject* toObject(ExecState*) const;
+
+  virtual UString toThisString(ExecState*) const;
   virtual JSObject* toThisObject(ExecState*) const;
+  virtual JSValue* getJSNumber();
 
   void* operator new(size_t size, ExecState* exec) {
 #ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
@@ -253,15 +266,16 @@ class JSNumberCell : public JSCell {
   double val;
 };
 
-JSCell* jsString(ExecState*,
-                 const UString&);  // returns empty string if passed null string
-JSCell* jsString(ExecState*,
-                 const char* = "");  // returns empty string if passed 0
+JSString* jsString(
+    ExecState*,
+    const UString&);  // returns empty string if passed null string
+JSString* jsString(ExecState*,
+                   const char* = "");  // returns empty string if passed 0
 
 // should be used for strings that are owned by an object that will
 // likely outlive the JSValue this makes, such as the parse tree or a
 // DOM object that contains a UString
-JSCell* jsOwnedString(ExecState*, const UString&);
+JSString* jsOwnedString(ExecState*, const UString&);
 
 extern const double NaN;
 extern const double Inf;
@@ -567,6 +581,23 @@ inline JSObject* JSValue::toThisObject(ExecState* exec) const {
   if (UNLIKELY(JSImmediate::isImmediate(this)))
     return JSImmediate::toObject(this, exec);
   return asCell()->toThisObject(exec);
+}
+
+inline UString JSValue::toThisString(ExecState* exec) const {
+  return JSImmediate::isImmediate(this) ? JSImmediate::toString(this)
+                                        : asCell()->toThisString(exec);
+}
+
+inline JSString* JSValue::toThisJSString(ExecState* exec) {
+  return JSImmediate::isImmediate(this)
+             ? jsString(exec, JSImmediate::toString(this))
+             : asCell()->toThisJSString(exec);
+}
+
+inline JSValue* JSValue::getJSNumber() {
+  return JSImmediate::isNumber(this)
+             ? this
+             : (JSImmediate::isImmediate(this) ? 0 : asCell()->getJSNumber());
 }
 
 }  // namespace KJS

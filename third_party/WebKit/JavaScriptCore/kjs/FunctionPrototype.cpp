@@ -257,7 +257,7 @@ JSObject* constructFunction(ExecState* exec,
       param = UString(c, 1);
       c++, i++;
       while (i < len && (Lexer::isIdentPart(c[0]))) {
-        param += UString(c, 1);
+        param.append(*c);
         c++, i++;
       }
       while (i < len && *c == ' ')

@@ -200,6 +200,8 @@ class JSImmediate {
 
   static JSValue* impossibleValue();
 
+  static JSObject* prototype(const JSValue*, ExecState*);
+
  private:
   static const uintptr_t TagMask = 3;  // type tags are 2 bits long
 

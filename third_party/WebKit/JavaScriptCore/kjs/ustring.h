@@ -248,6 +248,7 @@ class UString {
   UString& append(char c) {
     return append(static_cast<UChar>(static_cast<unsigned char>(c)));
   }
+  UString& append(const UChar*, int size);
 
   /**
    * @return The string converted to the 8-bit string type CString().

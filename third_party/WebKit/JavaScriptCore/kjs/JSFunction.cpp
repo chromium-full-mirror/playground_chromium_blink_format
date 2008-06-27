@@ -747,7 +747,7 @@ JSValue* globalFuncUnescape(ExecState* exec,
       k += 2;
     }
     k++;
-    s += UString(c, 1);
+    s.append(*c);
   }
 
   return jsString(exec, s);
