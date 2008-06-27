@@ -3025,6 +3025,9 @@ void FrameLoader::open(CachedPage& cachedPage) {
   m_frame->setView(view);
 
   m_frame->setDocument(document);
+  m_frame->domWindow()->setURL(document->url());
+  m_frame->domWindow()->setSecurityOrigin(document->securityOrigin());
+
   m_decoder = document->decoder();
 
   updatePolicyBaseURL();
