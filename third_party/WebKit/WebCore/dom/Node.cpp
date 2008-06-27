@@ -1192,6 +1192,13 @@ PassRefPtr<Element> Node::querySelector(const String& selectors,
   CSSSelector* querySelector =
       static_cast<CSSStyleRule*>(rule.get())->selector();
 
+  if (!querySelector->next() && querySelector->m_match == CSSSelector::Id) {
+    Element* element = document()->getElementById(querySelector->m_value);
+    if (element && (isDocumentNode() || element->isDescendantOf(this)))
+      return element;
+    return 0;
+  }
+
   // FIXME: We can speed this up by implementing caching similar to the one use
   // by getElementById
   for (Node* n = firstChild(); n; n = n->traverseNextNode(this)) {

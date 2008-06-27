@@ -248,6 +248,9 @@ class Document : public ContainerNode {
                                     ExceptionCode& ec);
   Element* getElementById(const AtomicString&) const;
   bool hasElementWithId(AtomicStringImpl* id) const;
+  bool containsMultipleElementsWithId(const AtomicString& elementId) {
+    return m_duplicateIds.contains(elementId.impl());
+  }
 
   Element* elementFromPoint(int x, int y) const;
   String readyState() const;
