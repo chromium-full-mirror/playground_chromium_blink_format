@@ -324,7 +324,8 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
         scriptCodeSize >= 3 && !src.escaped() &&
         scriptCode[scriptCodeSize - 3] == '<' &&
         scriptCode[scriptCodeSize - 2] == '!' &&
-        scriptCode[scriptCodeSize - 1] == '-') {
+        scriptCode[scriptCodeSize - 1] == '-' &&
+        (lastDecodedEntityPosition < scriptCodeSize - 3)) {
       state.setInComment(true);
       state = parseComment(src, state);
       continue;
