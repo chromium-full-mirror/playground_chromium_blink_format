@@ -63,7 +63,8 @@ class TextIterator {
  public:
   TextIterator();
   explicit TextIterator(const Range*,
-                        bool emitCharactersBetweenAllVisiblePositions = false);
+                        bool emitCharactersBetweenAllVisiblePositions = false,
+                        bool enterTextControls = false);
 
   bool atEnd() const { return !m_positionNode; }
   void advance();
@@ -105,6 +106,7 @@ class TextIterator {
   int m_offset;
   bool m_handledNode;
   bool m_handledChildren;
+  bool m_inShadowContent;
 
   // The range.
   Node* m_startContainer;
@@ -152,6 +154,7 @@ class TextIterator {
   // phased out when we rewrite
   // moveParagraphs to not clone/destroy moved content.
   bool m_emitCharactersBetweenAllVisiblePositions;
+  bool m_enterTextControls;
 };
 
 // Iterates through the DOM range, returning all the text, and 0-length
@@ -220,7 +223,8 @@ class CharacterIterator {
   CharacterIterator();
   explicit CharacterIterator(
       const Range* r,
-      bool emitCharactersBetweenAllVisiblePositions = false);
+      bool emitCharactersBetweenAllVisiblePositions = false,
+      bool enterTextControls = false);
 
   void advance(int numCharacters);
 

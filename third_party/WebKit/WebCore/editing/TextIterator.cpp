@@ -37,6 +37,7 @@
 #include "Range.h"
 #include "RenderTableCell.h"
 #include "RenderTableRow.h"
+#include "RenderTextControl.h"
 #include "visible_units.h"
 
 using namespace std;
@@ -82,17 +83,22 @@ TextIterator::TextIterator()
       m_endContainer(0),
       m_endOffset(0),
       m_positionNode(0),
-      m_lastCharacter(0) {}
+      m_lastCharacter(0),
+      m_emitCharactersBetweenAllVisiblePositions(false),
+      m_enterTextControls(false) {}
 
 TextIterator::TextIterator(const Range* r,
-                           bool emitCharactersBetweenAllVisiblePositions)
-    : m_startContainer(0),
+                           bool emitCharactersBetweenAllVisiblePositions,
+                           bool enterTextControls)
+    : m_inShadowContent(false),
+      m_startContainer(0),
       m_startOffset(0),
       m_endContainer(0),
       m_endOffset(0),
       m_positionNode(0),
       m_emitCharactersBetweenAllVisiblePositions(
-          emitCharactersBetweenAllVisiblePositions) {
+          emitCharactersBetweenAllVisiblePositions),
+      m_enterTextControls(enterTextControls) {
   if (!r)
     return;
 
@@ -116,6 +122,13 @@ TextIterator::TextIterator(const Range* r,
   m_startOffset = startOffset;
   m_endContainer = endContainer;
   m_endOffset = endOffset;
+
+  for (Node* n = startContainer; n; n = n->parentNode()) {
+    if (n->isShadowNode()) {
+      m_inShadowContent = true;
+      break;
+    }
+  }
 
   // set up the current node for processing
   m_node = r->firstNode();
@@ -215,12 +228,22 @@ void TextIterator::advance() {
       next = m_node->nextSibling();
       if (!next) {
         bool pastEnd = m_node->traverseNextNode() == m_pastEndNode;
-        while (!next && m_node->parentNode()) {
-          if (pastEnd && m_node->parentNode() == m_endContainer ||
-              m_endContainer->isDescendantOf(m_node->parentNode()))
+        Node* parentNode = m_node->parentNode();
+        if (!parentNode && m_inShadowContent) {
+          m_inShadowContent = false;
+          parentNode = m_node->shadowParentNode();
+        }
+        while (!next && parentNode) {
+          if (pastEnd && parentNode == m_endContainer ||
+              m_endContainer->isDescendantOf(parentNode))
             return;
           bool haveRenderer = m_node->renderer();
-          m_node = m_node->parentNode();
+          m_node = parentNode;
+          parentNode = m_node->parentNode();
+          if (!parentNode && m_inShadowContent) {
+            m_inShadowContent = false;
+            parentNode = m_node->shadowParentNode();
+          }
           if (haveRenderer)
             exitNode();
           if (m_positionNode) {
@@ -372,11 +395,20 @@ void TextIterator::handleTextBox() {
 }
 
 bool TextIterator::handleReplacedElement() {
-  if (m_node->renderer()->style()->visibility() != VISIBLE)
+  RenderObject* renderer = m_node->renderer();
+  if (renderer->style()->visibility() != VISIBLE)
     return false;
 
   if (m_lastTextNodeEndedWithCollapsedSpace) {
     emitCharacter(' ', m_lastTextNode->parentNode(), m_lastTextNode, 1, 1);
+    return false;
+  }
+
+  if (m_enterTextControls &&
+      (renderer->isTextArea() || renderer->isTextField())) {
+    m_node = static_cast<RenderTextControl*>(renderer)->innerTextElement();
+    m_offset = 0;
+    m_inShadowContent = true;
     return false;
   }
 
@@ -936,11 +968,14 @@ CharacterIterator::CharacterIterator()
 
 CharacterIterator::CharacterIterator(
     const Range* r,
-    bool emitCharactersBetweenAllVisiblePositions)
+    bool emitCharactersBetweenAllVisiblePositions,
+    bool enterTextControls)
     : m_offset(0),
       m_runOffset(0),
       m_atBreak(true),
-      m_textIterator(r, emitCharactersBetweenAllVisiblePositions) {
+      m_textIterator(r,
+                     emitCharactersBetweenAllVisiblePositions,
+                     enterTextControls) {
   while (!atEnd() && m_textIterator.length() == 0)
     m_textIterator.advance();
 }
@@ -1419,7 +1454,7 @@ PassRefPtr<Range> findPlainText(const Range* range,
   unsigned matchLength = 0;
   {
     CircularSearchBuffer searchBuffer(target, caseSensitive);
-    CharacterIterator it(range);
+    CharacterIterator it(range, false, true);
     for (;;) {
       if (searchBuffer.isMatch()) {
         // Note that we found a match, and where we found it.
@@ -1444,7 +1479,7 @@ PassRefPtr<Range> findPlainText(const Range* range,
   }
 
   if (matchLength) {
-    CharacterIterator it(range);
+    CharacterIterator it(range, false, true);
     it.advance(matchStart);
     result->setStart(it.range()->startContainer(ec),
                      it.range()->startOffset(ec), ec);

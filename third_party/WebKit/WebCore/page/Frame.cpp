@@ -1584,21 +1584,30 @@ bool Frame::findString(const String& target,
   Selection selection = this->selection()->selection();
   Node* selectionBaseNode = selection.base().node();
 
-  // FIXME 3099526: We don't search in the shadow trees (e.g. text fields and
-  // textareas), though we'd like to
-  // someday. If we don't explicitly skip them here, we'll miss hits in the
-  // regular content.
+  if (forward)
+    setStart(searchRange.get(), startInSelection ? selection.visibleStart()
+                                                 : selection.visibleEnd());
+  else
+    setEnd(searchRange.get(), startInSelection ? selection.visibleEnd()
+                                               : selection.visibleStart());
+
   bool selectionIsInMainContent =
       selectionBaseNode && !isInShadowTree(selectionBaseNode);
-
-  if (selectionIsInMainContent) {
-    if (forward)
-      setStart(searchRange.get(), startInSelection ? selection.visibleStart()
-                                                   : selection.visibleEnd());
-    else
-      setEnd(searchRange.get(), startInSelection ? selection.visibleEnd()
-                                                 : selection.visibleStart());
+  Node* shadowTreeRoot = 0;
+  if (!selectionIsInMainContent) {
+    shadowTreeRoot = selectionBaseNode;
+    while (shadowTreeRoot && !shadowTreeRoot->isShadowNode())
+      shadowTreeRoot = shadowTreeRoot->parentNode();
   }
+
+  if (shadowTreeRoot) {
+    ExceptionCode ec = 0;
+    if (forward)
+      searchRange->setEnd(shadowTreeRoot, shadowTreeRoot->childNodeCount(), ec);
+    else
+      searchRange->setStart(shadowTreeRoot, 0, ec);
+  }
+
   RefPtr<Range> resultRange(
       findPlainText(searchRange.get(), target, forward, caseFlag));
   // If we started in the selection and the found range exactly matches the
@@ -1606,17 +1615,39 @@ bool Frame::findString(const String& target,
   // Build a selection with the found range to remove collapsed whitespace.
   // Compare ranges instead of selection objects to ignore the way that the
   // current selection was made.
-  if (startInSelection && selectionIsInMainContent &&
+  if (startInSelection &&
       *Selection(resultRange.get()).toRange() == *selection.toRange()) {
     searchRange = rangeOfContents(document());
     if (forward)
       setStart(searchRange.get(), selection.visibleEnd());
     else
       setEnd(searchRange.get(), selection.visibleStart());
+
+    if (shadowTreeRoot) {
+      ExceptionCode ec = 0;
+      if (forward)
+        searchRange->setEnd(shadowTreeRoot, shadowTreeRoot->childNodeCount(),
+                            ec);
+      else
+        searchRange->setStart(shadowTreeRoot, 0, ec);
+    }
+
     resultRange = findPlainText(searchRange.get(), target, forward, caseFlag);
   }
 
-  int exception = 0;
+  ExceptionCode exception = 0;
+
+  // If nothing was found in the shadow tree, search in main content following
+  // the shadow tree.
+  if (resultRange->collapsed(exception) && shadowTreeRoot) {
+    searchRange = rangeOfContents(document());
+    if (forward)
+      searchRange->setStartAfter(shadowTreeRoot->shadowParentNode(), exception);
+    else
+      searchRange->setEndBefore(shadowTreeRoot->shadowParentNode(), exception);
+
+    resultRange = findPlainText(searchRange.get(), target, forward, caseFlag);
+  }
 
   // If we didn't find anything and we're wrapping, search again in the entire
   // document (this will
@@ -1648,13 +1679,20 @@ unsigned Frame::markAllMatchesForText(const String& target,
 
   RefPtr<Range> searchRange(rangeOfContents(document()));
 
-  int exception = 0;
+  ExceptionCode exception = 0;
   unsigned matchCount = 0;
   do {
     RefPtr<Range> resultRange(
         findPlainText(searchRange.get(), target, true, caseFlag));
-    if (resultRange->collapsed(exception))
-      break;
+    if (resultRange->collapsed(exception)) {
+      if (!isInShadowTree(resultRange->startContainer()))
+        break;
+
+      searchRange = rangeOfContents(document());
+      searchRange->setStartAfter(
+          resultRange->startContainer()->shadowAncestorNode(), exception);
+      continue;
+    }
 
     // A non-collapsed result range can in some funky whitespace cases still not
     // advance the range's start position (4509328). Break to avoid infinite
@@ -1673,6 +1711,15 @@ unsigned Frame::markAllMatchesForText(const String& target,
       break;
 
     setStart(searchRange.get(), newStart);
+    if (searchRange->collapsed(exception) &&
+        isInShadowTree(searchRange->startContainer())) {
+      Node* shadowTreeRoot = searchRange->startContainer();
+      while (shadowTreeRoot && !shadowTreeRoot->isShadowNode())
+        shadowTreeRoot = shadowTreeRoot->parentNode();
+      if (shadowTreeRoot)
+        searchRange->setEnd(shadowTreeRoot, shadowTreeRoot->childNodeCount(),
+                            exception);
+    }
   } while (true);
 
   // Do a "fake" paint in order to execute the code that computes the rendered
