@@ -36,33 +36,27 @@
 
 namespace KJS {
 
+Register* DebuggerCallFrame::r() const {
+  return *m_registerBase + m_registerOffset;
+}
+
+Register* DebuggerCallFrame::callFrame() const {
+  return r() - m_codeBlock->numLocals - RegisterFile::CallFrameHeaderSize;
+}
+
 const UString* DebuggerCallFrame::functionName() const {
   if (!m_codeBlock)
     return 0;
 
-  int callFrameOffset =
-      m_registerOffset - m_codeBlock->numLocals - Machine::CallFrameHeaderSize;
-  if (callFrameOffset < 0)
-    return 0;
-
-  Register* callFrame = *m_registerBase + callFrameOffset;
   JSFunction* function =
-      static_cast<JSFunction*>(callFrame[Machine::Callee].u.jsValue);
+      static_cast<JSFunction*>(callFrame()[RegisterFile::Callee].u.jsValue);
   if (!function)
     return 0;
   return &function->functionName().ustring();
 }
 
 DebuggerCallFrame::Type DebuggerCallFrame::type() const {
-  if (m_registerOffset == 0)
-    return ProgramType;
-
-  int callFrameOffset =
-      m_registerOffset - m_codeBlock->numLocals - Machine::CallFrameHeaderSize;
-  ASSERT(callFrameOffset >= 0);
-
-  Register* callFrame = *m_registerBase + callFrameOffset;
-  if (callFrame[Machine::Callee].u.jsObject)
+  if (callFrame()[RegisterFile::Callee].u.jsObject)
     return FunctionType;
 
   return ProgramType;
@@ -72,9 +66,7 @@ JSObject* DebuggerCallFrame::thisObject() const {
   if (!m_codeBlock)
     return 0;
 
-  return static_cast<JSObject*>(
-      (*m_registerBase + m_registerOffset)[m_codeBlock->thisRegister]
-          .u.jsValue);
+  return static_cast<JSObject*>(r()[m_codeBlock->thisRegister].u.jsValue);
 }
 
 JSValue* DebuggerCallFrame::evaluate(const UString& script,
@@ -97,11 +89,8 @@ JSValue* DebuggerCallFrame::evaluate(const UString& script,
   if (!evalNode)
     return Error::create(&newExec, SyntaxError, errMsg, errLine, sourceId, 0);
 
-  JSValue* result = newExec.machine()->execute(
-      evalNode.get(), &newExec, thisObject,
-      &newExec.dynamicGlobalObject()->registerFileStack(), m_scopeChain,
-      &exception);
-  return result;
+  return newExec.machine()->execute(evalNode.get(), &newExec, thisObject,
+                                    m_scopeChain, &exception);
 }
 
 }  // namespace KJS

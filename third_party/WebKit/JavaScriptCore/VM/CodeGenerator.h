@@ -83,8 +83,7 @@ class CodeGenerator {
                 SymbolTable*,
                 CodeBlock*,
                 VarStack&,
-                FunctionStack&,
-                bool canCreateGlobals);
+                FunctionStack&);
   CodeGenerator(FunctionBodyNode*,
                 const Debugger*,
                 const ScopeChain&,
@@ -411,13 +410,22 @@ class CodeGenerator {
   // Returns the RegisterID corresponding to ident.
   RegisterID* addVar(const Identifier& ident, bool isConstant) {
     RegisterID* local;
-    addVar(ident, local, isConstant);
+    addVar(ident, isConstant, local);
     return local;
   }
-
   // Returns true if a new RegisterID was added, false if a pre-existing
   // RegisterID was re-used.
-  bool addVar(const Identifier&, RegisterID*&, bool isConstant);
+  bool addVar(const Identifier&, bool isConstant, RegisterID*&);
+
+  // Returns the RegisterID corresponding to ident.
+  RegisterID* addGlobalVar(const Identifier& ident, bool isConstant) {
+    RegisterID* local;
+    addGlobalVar(ident, isConstant, local);
+    return local;
+  }
+  // Returns true if a new RegisterID was added, false if a pre-existing
+  // RegisterID was re-used.
+  bool addGlobalVar(const Identifier&, bool isConstant, RegisterID*&);
 
   RegisterID* addParameter(const Identifier&);
 
@@ -464,6 +472,8 @@ class CodeGenerator {
 
   int m_nextVar;
   int m_nextParameter;
+
+  int m_globalVarStorageOffset;
 
   // Constant pool
   IdentifierMap m_identifierMap;

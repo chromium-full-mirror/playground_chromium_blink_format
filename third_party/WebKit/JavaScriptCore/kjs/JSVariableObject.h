@@ -50,6 +50,7 @@ class JSVariableObject : public JSObject {
 
   virtual bool deleteProperty(ExecState*, const Identifier&);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void mark();
 
   virtual bool isVariableObject() const;
   virtual bool isDynamicScope() const = 0;
@@ -70,10 +71,12 @@ class JSVariableObject : public JSObject {
                          int registerOffset_)
         : symbolTable(symbolTable_),
           registerBase(registerBase_),
-          registerOffset(registerOffset_) {
+          registerOffset(registerOffset_),
+          registerArray(0) {
       ASSERT(symbolTable_);
-      ASSERT(registerBase_);
     }
+
+    ~JSVariableObjectData() { delete registerArray; }
 
     SymbolTable* symbolTable;  // Maps name -> offset from "r" in register file.
 
@@ -81,6 +84,9 @@ class JSVariableObject : public JSObject {
                               // register file is stored.
     int registerOffset;  // Offset of "r", the register past the end of local
                          // storage.
+
+    Register* registerArray;  // Independent copy of registers that were once
+                              // stored in the register file.
   };
 
   JSVariableObject(JSVariableObjectData* data)
@@ -94,6 +100,9 @@ class JSVariableObject : public JSObject {
 
   Register** registerBase() const { return d->registerBase; }
   Register* registers() const { return *registerBase() + d->registerOffset; }
+
+  void copyRegisterArray(Register* src, size_t count);
+  void setRegisterArray(Register* registerArray, size_t count);
 
   bool symbolTableGet(const Identifier&, PropertySlot&);
   bool symbolTableGet(const Identifier&, PropertySlot&, bool& slotIsWriteable);

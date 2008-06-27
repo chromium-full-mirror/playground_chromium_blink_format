@@ -56,7 +56,8 @@ extern const HashTable regExpConstructorTable;
 extern const HashTable stringTable;
 
 JSGlobalData::JSGlobalData()
-    : heap(new Heap)
+    : machine(new Machine),
+      heap(new Heap(machine))
 #if USE(MULTIPLE_THREADS)
       ,
       arrayTable(new HashTable(KJS::arrayTable)),
@@ -83,14 +84,12 @@ JSGlobalData::JSGlobalData()
       parserObjectExtraRefCounts(0),
       lexer(new Lexer(this)),
       parser(new Parser),
-      head(0),
-      machine(new Machine) {
+      head(0) {
 }
 
 JSGlobalData::~JSGlobalData() {
 #if USE(MULTIPLE_THREADS)
   delete heap;
-
   delete machine;
 
   delete[] arrayTable->table;

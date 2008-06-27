@@ -2299,10 +2299,9 @@ class ProgramNode : public ScopeNode {
                              bool usesEval,
                              bool needsClosure) KJS_FAST_CALL;
 
-  ProgramCodeBlock& code(ScopeChainNode* scopeChain,
-                         bool canCreateGlobals) KJS_FAST_CALL {
+  ProgramCodeBlock& code(ScopeChainNode* scopeChain) KJS_FAST_CALL {
     if (!m_code)
-      generateCode(scopeChain, canCreateGlobals);
+      generateCode(scopeChain);
     return *m_code;
   }
 
@@ -2314,7 +2313,7 @@ class ProgramNode : public ScopeNode {
               bool usesEval,
               bool needsClosure) KJS_FAST_CALL;
 
-  void generateCode(ScopeChainNode*, bool) KJS_FAST_CALL;
+  void generateCode(ScopeChainNode*) KJS_FAST_CALL;
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   Vector<size_t> m_varIndexes;  // Storage indexes belonging to the nodes in

@@ -31,10 +31,11 @@
 
 namespace KJS {
 
+class ArgList;
 class CollectorBlock;
 class JSCell;
 class JSValue;
-class ArgList;
+class Machine;
 
 enum OperationInProgress { NoOperation, Allocation, Collection };
 
@@ -96,7 +97,7 @@ class Heap : Noncopyable {
   static bool isCellMarked(const JSCell*);
   static void markCell(JSCell*);
 
-  void markStackObjectsConservatively(void* start, void* end);
+  void markConservatively(void* start, void* end);
 
   HashSet<ArgList*>& markListSet() {
     if (!m_markListSet)
@@ -113,9 +114,10 @@ class Heap : Noncopyable {
   static CollectorBlock* cellBlock(JSCell*);
   static size_t cellOffset(const JSCell*);
 
-  Heap();
-  ~Heap();
+  friend class Machine;
   friend class JSGlobalData;
+  Heap(Machine*);
+  ~Heap();
 
   void recordExtraCost(size_t);
   void markProtectedObjects();
@@ -130,6 +132,7 @@ class Heap : Noncopyable {
   CollectorHeap numberHeap;
   ProtectCountSet protectedValues;
   HashSet<ArgList*>* m_markListSet;
+  Machine* m_machine;
 };
 
 // tunable parameters

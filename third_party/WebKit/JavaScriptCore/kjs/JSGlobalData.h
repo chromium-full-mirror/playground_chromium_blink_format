@@ -61,6 +61,7 @@ struct JSGlobalData : Noncopyable {
   static JSGlobalData& threadInstance();
   static JSGlobalData& sharedInstance();
 
+  Machine* machine;
   Heap* heap;
 
   const HashTable* arrayTable;
@@ -85,8 +86,6 @@ struct JSGlobalData : Noncopyable {
   Parser* parser;
 
   JSGlobalObject* head;
-
-  Machine* machine;
 
  private:
   friend class WTF::ThreadSpecific<JSGlobalData>;

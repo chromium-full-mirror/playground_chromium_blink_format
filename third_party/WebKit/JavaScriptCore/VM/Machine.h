@@ -30,7 +30,7 @@
 #define Machine_h
 
 #include "Opcode.h"
-#include "RegisterFileStack.h"
+#include "RegisterFile.h"
 #include <kjs/list.h>
 #include <wtf/HashMap.h>
 
@@ -40,10 +40,11 @@ class CodeBlock;
 class EvalNode;
 class ExecState;
 class FunctionBodyNode;
+class Instruction;
+class JSFunction;
 class ProgramNode;
 class Register;
 class RegisterFile;
-class RegisterFileStack;
 class ScopeChainNode;
 
 enum DebugHookID {
@@ -59,23 +60,9 @@ enum { MaxReentryDepth = 128 };
 
 class Machine {
  public:
-  enum {
-    CallerCodeBlock = 0,
-    ReturnVPC,
-    CallerScopeChain,
-    CallerRegisterOffset,
-    ReturnValueRegister,
-    ArgumentStartRegister,
-    ArgumentCount,
-    CalledAsConstructor,
-    Callee,
-    OptionalCalleeActivation,
-    CallFrameHeaderSize
-  };
-
-  enum { ProgramCodeThisRegister = -1 };
-
   Machine();
+
+  RegisterFile& registerFile() { return m_registerFile; }
 
   Opcode getOpcode(OpcodeID id) {
 #if HAVE(COMPUTED_GOTO)
@@ -100,29 +87,22 @@ class Machine {
                    ExecState*,
                    ScopeChainNode*,
                    JSObject* thisObj,
-                   RegisterFileStack*,
                    JSValue** exception);
   JSValue* execute(FunctionBodyNode*,
                    ExecState*,
                    JSFunction*,
                    JSObject* thisObj,
                    const ArgList& args,
-                   RegisterFileStack*,
                    ScopeChainNode*,
                    JSValue** exception);
-  JSValue* execute(EvalNode*,
-                   ExecState*,
+  JSValue* execute(EvalNode* evalNode,
+                   ExecState* exec,
                    JSObject* thisObj,
-                   RegisterFile*,
-                   int registerOffset,
-                   ScopeChainNode*,
-                   JSValue** exception);
-  JSValue* execute(EvalNode*,
-                   ExecState*,
-                   JSObject* thisObj,
-                   RegisterFileStack*,
-                   ScopeChainNode*,
-                   JSValue** exception);
+                   ScopeChainNode* scopeChain,
+                   JSValue** exception) {
+    return execute(evalNode, exec, thisObj, m_registerFile.size(), scopeChain,
+                   exception);
+  }
 
   JSValue* retrieveArguments(ExecState*, JSFunction*) const;
   JSValue* retrieveCaller(ExecState*, JSFunction*) const;
@@ -133,8 +113,25 @@ class Machine {
                                Register*& argv,
                                int& argc);
 
+  void mark(Heap* heap) { m_registerFile.mark(heap); }
+
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
+
+  friend NEVER_INLINE JSValue* callEval(ExecState* exec,
+                                        JSObject* thisObj,
+                                        ScopeChainNode* scopeChain,
+                                        RegisterFile*,
+                                        Register* r,
+                                        int argv,
+                                        int argc,
+                                        JSValue*& exceptionValue);
+  JSValue* execute(EvalNode*,
+                   ExecState*,
+                   JSObject* thisObj,
+                   int registerOffset,
+                   ScopeChainNode*,
+                   JSValue** exception);
 
   ALWAYS_INLINE void setScopeChain(ExecState* exec,
                                    ScopeChainNode*&,
@@ -182,11 +179,9 @@ class Machine {
                      const Register*);
   void dumpRegisters(const CodeBlock*, RegisterFile*, const Register*);
 
-  bool isGlobalCallFrame(Register** registerBase, const Register* r) const {
-    return (*registerBase) == r;
-  }
-
   int m_reentryDepth;
+  RegisterFile m_registerFile;
+
 #if HAVE(COMPUTED_GOTO)
   Opcode m_opcodeTable[numOpcodeIDs];  // Maps OpcodeID => Opcode for compiling
   HashMap<Opcode, OpcodeID>

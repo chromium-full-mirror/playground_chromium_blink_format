@@ -25,7 +25,6 @@
 #include "JSFunction.h"
 #include "JSGlobalObject.h"
 #include "JSObject.h"
-#include "RegisterFileStack.h"
 
 namespace KJS {
 
@@ -44,12 +43,9 @@ JSValue* PropertySlot::functionGetter(ExecState* exec,
     return callData.native.function(exec, slot.m_data.getterFunc,
                                     slot.slotBase(), exec->emptyList());
   ASSERT(callType == CallTypeJS);
-  RegisterFileStack* stack = &exec->dynamicGlobalObject()->registerFileStack();
-  stack->pushFunctionRegisterFile();
   // FIXME: Can this be done more efficiently using the callData?
-  JSValue* result = static_cast<JSFunction*>(slot.m_data.getterFunc)
-                        ->call(exec, slot.slotBase(), exec->emptyList());
-  stack->popFunctionRegisterFile();
-  return result;
+  return static_cast<JSFunction*>(slot.m_data.getterFunc)
+      ->call(exec, slot.slotBase(), exec->emptyList());
 }
-}
+
+}  // namespace KJS

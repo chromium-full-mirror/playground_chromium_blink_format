@@ -157,8 +157,8 @@ void CodeGenerator::generate() {
 }
 
 bool CodeGenerator::addVar(const Identifier& ident,
-                           RegisterID*& r0,
-                           bool isConstant) {
+                           bool isConstant,
+                           RegisterID*& r0) {
   int index = m_nextVar;
   SymbolTableEntry newEntry(index, isConstant ? ReadOnly : 0);
   pair<SymbolTable::iterator, bool> result =
@@ -177,20 +177,38 @@ bool CodeGenerator::addVar(const Identifier& ident,
   return result.second;
 }
 
+bool CodeGenerator::addGlobalVar(const Identifier& ident,
+                                 bool isConstant,
+                                 RegisterID*& r0) {
+  int index = m_nextVar;
+  SymbolTableEntry newEntry(index, isConstant ? ReadOnly : 0);
+  pair<SymbolTable::iterator, bool> result =
+      symbolTable().add(ident.ustring().rep(), newEntry);
+
+  if (!result.second)
+    index = result.first->second.getIndex();
+  else {
+    --m_nextVar;
+    m_locals.append(index + m_globalVarStorageOffset);
+  }
+
+  r0 = &m_locals[localsIndex(index)];
+  return result.second;
+}
+
 CodeGenerator::CodeGenerator(ProgramNode* programNode,
                              const Debugger* debugger,
                              const ScopeChain& scopeChain,
                              SymbolTable* symbolTable,
                              CodeBlock* codeBlock,
                              VarStack& varStack,
-                             FunctionStack& functionStack,
-                             bool canCreateVariables)
+                             FunctionStack& functionStack)
     : m_shouldEmitDebugHooks(!!debugger),
       m_scopeChain(&scopeChain),
       m_symbolTable(symbolTable),
       m_scopeNode(programNode),
       m_codeBlock(codeBlock),
-      m_thisRegister(Machine::ProgramCodeThisRegister),
+      m_thisRegister(RegisterFile::ProgramCodeThisRegister),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
       m_codeType(GlobalCode),
@@ -198,40 +216,48 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
       m_nextVar(-1),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
-  // Global code can inherit previously defined symbols.
-  int size = symbolTable->size() + 1;  // + 1 slot for  "this"
+  // FIXME: Move code that modifies the global object to Machine::execute.
+
+  m_codeBlock->numVars = 1;  // Allocate space for "this"
+
+  JSGlobalObject* globalObject = scopeChain.globalObject();
+  ExecState* exec = globalObject->globalExec();
+  RegisterFile* registerFile = &exec->globalData().machine->registerFile();
+
+  // Shift register indexes in generated code to elide registers allocated by
+  // intermediate stack frames.
+  m_globalVarStorageOffset =
+      -1 - RegisterFile::CallFrameHeaderSize - registerFile->size();
 
   // Add previously defined symbols to bookkeeping.
-  m_locals.resize(size);
+  m_locals.resize(symbolTable->size());
   SymbolTable::iterator end = symbolTable->end();
   for (SymbolTable::iterator it = symbolTable->begin(); it != end; ++it)
     m_locals[localsIndex(it->second.getIndex())].setIndex(
-        it->second.getIndex());
+        it->second.getIndex() + m_globalVarStorageOffset);
 
-  // Shift new symbols so they get stored prior to previously defined symbols.
-  m_nextVar -= size;
+  bool canOptimizeNewGlobals =
+      symbolTable->size() + functionStack.size() + varStack.size() <
+      registerFile->maxGlobals();
+  if (canOptimizeNewGlobals) {
+    // Shift new symbols so they get stored prior to existing symbols.
+    m_nextVar -= symbolTable->size();
 
-  JSGlobalObject* globalObject = scopeChain.globalObject();
-
-  ExecState* exec = globalObject->globalExec();
-
-  // FIXME: Move the execution-related parts of this code to Machine::execute.
-
-  if (canCreateVariables) {
     for (size_t i = 0; i < functionStack.size(); ++i) {
       FuncDeclNode* funcDecl = functionStack[i].get();
       globalObject->removeDirect(funcDecl->m_ident);  // Make sure our new
                                                       // function is not
                                                       // shadowed by an old
                                                       // property.
-      emitNewFunction(addVar(funcDecl->m_ident, false), funcDecl);
+      emitNewFunction(addGlobalVar(funcDecl->m_ident, false), funcDecl);
     }
 
     for (size_t i = 0; i < varStack.size(); ++i) {
       if (!globalObject->hasProperty(exec, varStack[i].first))
-        emitLoad(addVar(varStack[i].first,
-                        varStack[i].second & DeclarationStacks::IsConstant),
-                 jsUndefined());
+        emitLoad(
+            addGlobalVar(varStack[i].first,
+                         varStack[i].second & DeclarationStacks::IsConstant),
+            jsUndefined());
     }
   } else {
     for (size_t i = 0; i < functionStack.size(); ++i) {
@@ -283,9 +309,7 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
     const Identifier& ident = varStack[i].first;
     if (ident == propertyNames().arguments)
       continue;
-
-    RegisterID* r0;
-    addVar(ident, r0, varStack[i].second & DeclarationStacks::IsConstant);
+    addVar(ident, varStack[i].second & DeclarationStacks::IsConstant);
   }
 
   Vector<Identifier>& parameters = functionBody->parameters();
@@ -313,12 +337,11 @@ CodeGenerator::CodeGenerator(EvalNode* evalNode,
       m_symbolTable(symbolTable),
       m_scopeNode(evalNode),
       m_codeBlock(codeBlock),
-      m_thisRegister(Machine::ProgramCodeThisRegister),
+      m_thisRegister(RegisterFile::ProgramCodeThisRegister),
       m_finallyDepth(0),
       m_dynamicScopeDepth(0),
       m_codeType(EvalCode),
       m_continueDepth(0),
-      m_nextVar(-1),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
   m_codeBlock->numVars = 1;  // Allocate space for "this"
@@ -851,8 +874,8 @@ RegisterID* CodeGenerator::emitCall(OpcodeID opcodeID,
   RefPtr<RegisterID> refBase = base;
 
   // Reserve space for call frame.
-  Vector<RefPtr<RegisterID>, Machine::CallFrameHeaderSize> callFrame;
-  for (int i = 0; i < Machine::CallFrameHeaderSize; ++i)
+  Vector<RefPtr<RegisterID>, RegisterFile::CallFrameHeaderSize> callFrame;
+  for (int i = 0; i < RegisterFile::CallFrameHeaderSize; ++i)
     callFrame.append(newTemporary());
 
   // Generate code for arguments.
@@ -889,8 +912,8 @@ RegisterID* CodeGenerator::emitConstruct(RegisterID* dst,
                                          RegisterID* func,
                                          ArgumentsNode* argumentsNode) {
   // Reserve space for call frame.
-  Vector<RefPtr<RegisterID>, Machine::CallFrameHeaderSize> callFrame;
-  for (int i = 0; i < Machine::CallFrameHeaderSize; ++i)
+  Vector<RefPtr<RegisterID>, RegisterFile::CallFrameHeaderSize> callFrame;
+  for (int i = 0; i < RegisterFile::CallFrameHeaderSize; ++i)
     callFrame.append(newTemporary());
 
   // Generate code for arguments.

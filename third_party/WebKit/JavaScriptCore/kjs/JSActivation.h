@@ -73,11 +73,9 @@ class JSActivation : public JSVariableObject {
         : JSVariableObjectData(&functionBody_->symbolTable(),
                                registerBase,
                                registerOffset),
-          registerArray(0),
           functionBody(functionBody_),
           argumentsObject(0) {}
 
-    Register* registerArray;
     RefPtr<FunctionBodyNode>
         functionBody;  // Owns the symbol table and code block
     JSObject* argumentsObject;
