@@ -30,14 +30,14 @@
 #include "JSString.h"
 #include "LabelStack.h"
 #include "Opcode.h"
-#include "regexp.h"
 #include "RegisterID.h"
 #include "SourceRange.h"
 #include "SymbolTable.h"
-#include <wtf/UnusedParam.h>
+#include "regexp.h"
 #include <wtf/ListRefPtr.h>
 #include <wtf/MathExtras.h>
 #include <wtf/OwnPtr.h>
+#include <wtf/UnusedParam.h>
 #include <wtf/Vector.h>
 
 #if PLATFORM(X86) && COMPILER(GCC)
@@ -48,10 +48,8 @@
 
 namespace KJS {
 
-class ArgumentsNode;
 class CodeBlock;
 class CodeGenerator;
-class ConstDeclNode;
 class FuncDeclNode;
 class Node;
 class EvalCodeBlock;
@@ -392,12 +390,15 @@ class ElementNode : public Node {
   }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
 
+  int elision() const { return m_elision; }
+  ExpressionNode* value() { return m_node.get(); }
+
+  ElementNode* next() { return m_next.get(); }
   PassRefPtr<ElementNode> releaseNext() KJS_FAST_CALL {
     return m_next.release();
   }
 
  private:
-  friend class ArrayNode;
   ListRefPtr<ElementNode> m_next;
   int m_elision;
   RefPtr<ExpressionNode> m_node;
