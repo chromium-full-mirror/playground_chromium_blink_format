@@ -27,7 +27,6 @@
 #include "config.h"
 #include "nodes.h"
 
-#include "ArrayPrototype.h"
 #include "CodeGenerator.h"
 #include "ExecState.h"
 #include "FunctionPrototype.h"

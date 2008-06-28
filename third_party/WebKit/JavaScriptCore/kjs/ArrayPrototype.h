@@ -23,7 +23,6 @@
 #define ArrayPrototype_h
 
 #include "JSArray.h"
-#include "FunctionPrototype.h"
 #include "lookup.h"
 
 namespace KJS {
@@ -35,13 +34,6 @@ class ArrayPrototype : public JSArray {
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-};
-
-class ArrayConstructor : public InternalFunction {
- public:
-  ArrayConstructor(ExecState*, FunctionPrototype*, ArrayPrototype*);
-  virtual ConstructType getConstructData(ConstructData&);
-  virtual CallType getCallData(CallData&);
 };
 
 }  // namespace KJS
