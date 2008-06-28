@@ -88,6 +88,10 @@ class RegisterID : Noncopyable {
 #endif
 };
 
+inline RegisterID* ignoredResult() {
+  return reinterpret_cast<RegisterID*>(1);
+}
+
 }  // namespace KJS
 
 namespace WTF {
