@@ -1,6 +1,7 @@
+// -*- c-basic-offset: 2 -*-
 /*
+ *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -19,43 +20,38 @@
  *
  */
 
-#ifndef _OBJECT_OBJECT_H_
-#define _OBJECT_OBJECT_H_
+#ifndef NumberConstructor_h
+#define NumberConstructor_h
 
 #include "JSFunction.h"
 
 namespace KJS {
 
-/**
- * @internal
- *
- * The initial value of Object.prototype (and thus all objects created
- * with the Object constructor
- */
-class ObjectPrototype : public JSObject {
- public:
-  ObjectPrototype(ExecState*, FunctionPrototype*);
-};
-
-JSValue* objectProtoFuncToString(ExecState*,
-                                 JSObject*,
-                                 JSValue*,
-                                 const ArgList&);
+class FunctionPrototype;
+class NumberPrototype;
 
 /**
  * @internal
  *
- * The initial value of the the global variable's "Object" property
+ * The initial value of the the global variable's "Number" property
  */
-class ObjectConstructor : public InternalFunction {
+class NumberConstructor : public InternalFunction {
  public:
-  ObjectConstructor(ExecState*, ObjectPrototype*, FunctionPrototype*);
+  NumberConstructor(ExecState*, FunctionPrototype*, NumberPrototype*);
+
+  bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  JSValue* getValueProperty(ExecState*, int token) const;
+
+  static const ClassInfo info;
+
+  enum { NaNValue, NegInfinity, PosInfinity, MaxValue, MinValue };
 
  private:
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
+  virtual const ClassInfo* classInfo() const { return &info; }
 };
 
 }  // namespace KJS
 
-#endif  // _OBJECT_OBJECT_H_
+#endif  // NumberConstructor_h

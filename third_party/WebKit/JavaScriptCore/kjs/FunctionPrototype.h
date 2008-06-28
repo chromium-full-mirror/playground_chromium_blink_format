@@ -24,7 +24,6 @@
 #ifndef FunctionPrototype_h
 #define FunctionPrototype_h
 
-#include "object_object.h"
 #include "JSFunction.h"
 
 namespace KJS {
@@ -43,27 +42,6 @@ class FunctionPrototype : public InternalFunction {
   virtual CallType getCallData(CallData&);
 };
 
-/**
- * @internal
- *
- * The initial value of the the global variable's "Function" property
- */
-class FunctionConstructor : public InternalFunction {
- public:
-  FunctionConstructor(ExecState*, FunctionPrototype*);
-
- private:
-  virtual ConstructType getConstructData(ConstructData&);
-  virtual CallType getCallData(CallData&);
-};
-
-JSObject* constructFunction(ExecState*,
-                            const ArgList&,
-                            const Identifier& functionName,
-                            const UString& sourceURL,
-                            int lineNumber);
-JSObject* constructFunction(ExecState*, const ArgList&);
-
 }  // namespace KJS
 
-#endif  // _FUNCTION_OBJECT_H_
+#endif  // FunctionPrototype_h
