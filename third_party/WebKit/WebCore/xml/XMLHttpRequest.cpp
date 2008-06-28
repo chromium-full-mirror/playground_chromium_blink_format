@@ -110,6 +110,57 @@ static bool isSafeRequestHeader(const String& name) {
          !name.startsWith(secString, false);
 }
 
+static bool isOnAccessControllRequestHeaderBlackList(const String& name) {
+  static HashSet<String, CaseFoldingHash> forbiddenHeaders;
+  static String proxyString("proxy-");
+  static String secString("sec-");
+
+  if (forbiddenHeaders.isEmpty()) {
+    forbiddenHeaders.add("accept-charset");
+    forbiddenHeaders.add("accept-encoding");
+    forbiddenHeaders.add("origin");
+    forbiddenHeaders.add("authorization");
+    forbiddenHeaders.add("connection");
+    forbiddenHeaders.add("content-length");
+    forbiddenHeaders.add("content-transfer-encoding");
+    forbiddenHeaders.add("cookie");
+    forbiddenHeaders.add("cookie2");
+    forbiddenHeaders.add("date");
+    forbiddenHeaders.add("expect");
+    forbiddenHeaders.add("host");
+    forbiddenHeaders.add("keep-alive");
+    forbiddenHeaders.add("referer");
+    forbiddenHeaders.add("te");
+    forbiddenHeaders.add("trailer");
+    forbiddenHeaders.add("transfer-encoding");
+    forbiddenHeaders.add("upgrade");
+    forbiddenHeaders.add("via");
+  }
+
+  return forbiddenHeaders.contains(name) ||
+         name.startsWith(proxyString, false) ||
+         name.startsWith(secString, false);
+}
+
+static bool isOnAccessControlSimpleRequestHeaderWhitelist(const String& name) {
+  return equalIgnoringCase(name, "accept") ||
+         equalIgnoringCase(name, "accept-language");
+}
+
+static bool isOnAccessControlResponseHeaderWhitelist(const String& name) {
+  static HashSet<String, CaseFoldingHash> allowedHeaders;
+  if (allowedHeaders.isEmpty()) {
+    allowedHeaders.add("cache-control");
+    allowedHeaders.add("content-language");
+    allowedHeaders.add("content-type");
+    allowedHeaders.add("expires");
+    allowedHeaders.add("last-modified");
+    allowedHeaders.add("pragma");
+  }
+
+  return allowedHeaders.contains(name);
+}
+
 // Determines if a string is a valid token, as defined by
 // "token" in section 2.2 of RFC 2616.
 static bool isValidToken(const String& name) {
@@ -146,7 +197,7 @@ XMLHttpRequest::XMLHttpRequest(Document* doc)
       m_error(false),
       m_sameOriginRequest(true),
       m_allowAccess(false),
-      m_inMethodCheck(false),
+      m_inPreflight(false),
       m_receivedLength(0) {
   ASSERT(m_doc);
   addToRequestsByDocument(m_doc, this);
@@ -428,34 +479,74 @@ void XMLHttpRequest::createRequest(ExceptionCode& ec) {
 
   m_sameOriginRequest = m_doc->securityOrigin()->canRequest(m_url);
 
-  ResourceRequest request;
-  if (m_sameOriginRequest)
-    makeSameOriginRequest(request);
-  else {
-    makeCrossSiteAccessRequest(request, ec);
-    if (ec)
-      return;
-    if (m_inMethodCheck)
-      return;
-  }
-
-  if (m_async) {
-    loadRequestAsynchronously(request);
+  if (!m_sameOriginRequest) {
+    makeCrossSiteAccessRequest(ec);
     return;
   }
 
-  loadRequestSynchronously(request, ec);
+  makeSameOriginRequest(ec);
 }
 
-void XMLHttpRequest::makeSameOriginRequest(ResourceRequest& request) {
-  request.setURL(m_url);
+void XMLHttpRequest::makeSameOriginRequest(ExceptionCode& ec) {
+  ASSERT(m_sameOriginRequest);
+
+  ResourceRequest request(m_url);
   request.setHTTPMethod(m_method);
 
-  if (m_requestEntityBody)
+  if (m_requestEntityBody) {
+    ASSERT(m_method != "GET");
     request.setHTTPBody(m_requestEntityBody.release());
+  }
 
   if (m_requestHeaders.size() > 0)
     request.addHTTPHeaderFields(m_requestHeaders);
+
+  if (m_async)
+    loadRequestAsynchronously(request);
+  else
+    loadRequestSynchronously(request, ec);
+}
+
+bool XMLHttpRequest::isSimpleCrossSiteAccessRequest() const {
+  if (m_method != "GET")
+    return false;
+
+  HTTPHeaderMap::const_iterator end = m_crossSiteRequestHeaders.end();
+  for (HTTPHeaderMap::const_iterator it = m_crossSiteRequestHeaders.begin();
+       it != end; ++it) {
+    if (!isOnAccessControlSimpleRequestHeaderWhitelist(it->first))
+      return false;
+  }
+
+  return true;
+}
+
+void XMLHttpRequest::makeCrossSiteAccessRequest(ExceptionCode& ec) {
+  ASSERT(!m_sameOriginRequest);
+
+  bool privilegedScript = m_doc->securityOrigin()->canLoadLocalResources();
+
+  HTTPHeaderMap::const_iterator end = m_requestHeaders.end();
+  for (HTTPHeaderMap::const_iterator it = m_requestHeaders.begin(); it != end;
+       ++it) {
+    // A privileged script (e.g. a Dashboard widget) can send any headers.
+    if (!privilegedScript &&
+        isOnAccessControllRequestHeaderBlackList(it->first)) {
+      if (m_doc && m_doc->frame())
+        m_doc->frame()->domWindow()->console()->addMessage(
+            JSMessageSource, ErrorMessageLevel,
+            "Refused to send header \"" + it->first + "\" cross-domain.", 1,
+            String());
+      continue;
+    }
+
+    m_crossSiteRequestHeaders.add(it->first, it->second);
+  }
+
+  if (isSimpleCrossSiteAccessRequest())
+    makeSimpleCrossSiteAccessRequest(ec);
+  else
+    makeCrossSiteAccessRequestWithPreflight(ec);
 }
 
 String XMLHttpRequest::accessControlOrigin() const {
@@ -465,24 +556,35 @@ String XMLHttpRequest::accessControlOrigin() const {
   return accessControlOrigin;
 }
 
-void XMLHttpRequest::makeCrossSiteAccessRequest(ResourceRequest& request,
-                                                ExceptionCode& ec) {
+void XMLHttpRequest::makeSimpleCrossSiteAccessRequest(ExceptionCode& ec) {
+  ASSERT(isSimpleCrossSiteAccessRequest());
+
   KURL url = m_url;
   url.setUser(String());
   url.setPass(String());
 
-  String origin = accessControlOrigin();
-
-  request.setURL(url);
+  ResourceRequest request(url);
   request.setHTTPMethod(m_method);
-  request.setHTTPHeaderField("Access-Control-Origin", origin);
+  request.setHTTPHeaderField("Access-Control-Origin", accessControlOrigin());
 
-  if (m_method == "GET")
-    return;
+  if (m_crossSiteRequestHeaders.size() > 0)
+    request.addHTTPHeaderFields(m_crossSiteRequestHeaders);
 
-  m_inMethodCheck = true;
-  ResourceRequest preflightRequest;
-  preflightRequest.setURL(url);
+  if (m_async)
+    loadRequestAsynchronously(request);
+  else
+    loadRequestSynchronously(request, ec);
+}
+
+void XMLHttpRequest::makeCrossSiteAccessRequestWithPreflight(
+    ExceptionCode& ec) {
+  String origin = accessControlOrigin();
+  KURL url = m_url;
+  url.setUser(String());
+  url.setPass(String());
+
+  m_inPreflight = true;
+  ResourceRequest preflightRequest(url);
   preflightRequest.setHTTPMethod("OPTIONS");
   preflightRequest.setHTTPHeaderField("Access-Control-Origin", origin);
 
@@ -492,25 +594,45 @@ void XMLHttpRequest::makeCrossSiteAccessRequest(ResourceRequest& request,
   }
 
   loadRequestSynchronously(preflightRequest, ec);
-  m_inMethodCheck = false;
+  m_inPreflight = false;
+
+  // Send the actual request.
+  ResourceRequest request(url);
+  request.setHTTPMethod(m_method);
+  request.setHTTPHeaderField("Access-Control-Origin", origin);
+
+  if (m_crossSiteRequestHeaders.size() > 0)
+    request.addHTTPHeaderFields(m_crossSiteRequestHeaders);
+
+  if (m_requestEntityBody) {
+    ASSERT(m_method != "GET");
+    request.setHTTPBody(m_requestEntityBody.release());
+  }
+
+  loadRequestSynchronously(request, ec);
 }
 
-void XMLHttpRequest::handleAsynchronousMethodCheckResult() {
-  ASSERT(m_inMethodCheck);
+void XMLHttpRequest::handleAsynchronousPreflightResult() {
+  ASSERT(m_inPreflight);
   ASSERT(m_async);
 
-  m_inMethodCheck = false;
+  m_inPreflight = false;
 
   KURL url = m_url;
   url.setUser(String());
   url.setPass(String());
 
-  String origin = accessControlOrigin();
-
-  ResourceRequest request;
-  request.setURL(url);
+  ResourceRequest request(url);
   request.setHTTPMethod(m_method);
-  request.setHTTPHeaderField("Access-Control-Origin", origin);
+  request.setHTTPHeaderField("Access-Control-Origin", accessControlOrigin());
+
+  if (m_crossSiteRequestHeaders.size() > 0)
+    request.addHTTPHeaderFields(m_crossSiteRequestHeaders);
+
+  if (m_requestEntityBody) {
+    ASSERT(m_method != "GET");
+    request.setHTTPBody(m_requestEntityBody.release());
+  }
 
   loadRequestAsynchronously(request);
 }
@@ -561,7 +683,7 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
   // We need to keep content sniffing enabled for local files due to CFNetwork
   // not providing a MIME type
   // for local files otherwise, <rdar://problem/5671813>.
-  bool sendResourceLoadCallbacks = !m_inMethodCheck;
+  bool sendResourceLoadCallbacks = !m_inPreflight;
   m_loader = SubresourceLoader::create(m_doc->frame(), this, request, false,
                                        sendResourceLoadCallbacks,
                                        request.url().isLocalFile());
@@ -584,6 +706,7 @@ void XMLHttpRequest::abort() {
 
   // Clear headers as required by the spec
   m_requestHeaders.clear();
+  m_crossSiteRequestHeaders.clear();
 
   if ((m_state <= OPENED && !sendFlag) || m_state == DONE)
     m_state = UNSENT;
@@ -628,6 +751,7 @@ void XMLHttpRequest::clearResponse() {
 
 void XMLHttpRequest::clearRequest() {
   m_requestHeaders.clear();
+  m_crossSiteRequestHeaders.clear();
   m_requestEntityBody = 0;
 }
 
@@ -701,7 +825,7 @@ void XMLHttpRequest::setRequestHeader(const String& name,
     if (m_doc && m_doc->frame())
       m_doc->frame()->domWindow()->console()->addMessage(
           JSMessageSource, ErrorMessageLevel,
-          "Refused to set unsafe header " + name, 1, String());
+          "Refused to set unsafe header \"" + name + "\"", 1, String());
     return;
   }
 
@@ -710,13 +834,10 @@ void XMLHttpRequest::setRequestHeader(const String& name,
 
 void XMLHttpRequest::setRequestHeaderInternal(const String& name,
                                               const String& value) {
-  if (!m_requestHeaders.contains(name)) {
-    m_requestHeaders.set(name, value);
-    return;
-  }
-
-  String oldValue = m_requestHeaders.get(name);
-  m_requestHeaders.set(name, oldValue + ", " + value);
+  pair<HTTPHeaderMap::iterator, bool> result =
+      m_requestHeaders.add(name, value);
+  if (!result.second)
+    result.first->second += ", " + value;
 }
 
 String XMLHttpRequest::getRequestHeader(const String& name) const {
@@ -735,6 +856,10 @@ String XMLHttpRequest::getAllResponseHeaders(ExceptionCode& ec) const {
   HTTPHeaderMap::const_iterator end = m_response.httpHeaderFields().end();
   for (HTTPHeaderMap::const_iterator it = m_response.httpHeaderFields().begin();
        it != end; ++it) {
+    if (!m_sameOriginRequest &&
+        !isOnAccessControlResponseHeaderWhitelist(it->first))
+      continue;
+
     stringBuilder.append(it->first.characters(), it->first.length());
     stringBuilder.append(separator.characters(), separator.length());
     stringBuilder.append(it->second.characters(), it->second.length());
@@ -753,6 +878,9 @@ String XMLHttpRequest::getResponseHeader(const String& name,
   }
 
   if (!isValidToken(name))
+    return "";
+
+  if (!m_sameOriginRequest && !isOnAccessControlResponseHeaderWhitelist(name))
     return "";
 
   return m_response.httpHeaderField(name);
@@ -838,8 +966,8 @@ void XMLHttpRequest::didFail(SubresourceLoader* loader,
 }
 
 void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
-  if (m_inMethodCheck) {
-    didFinishLoadingMethodCheck(loader);
+  if (m_inPreflight) {
+    didFinishLoadingPreflight(loader);
     return;
   }
 
@@ -889,8 +1017,8 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
     dropProtection();
 }
 
-void XMLHttpRequest::didFinishLoadingMethodCheck(SubresourceLoader* loader) {
-  ASSERT(m_inMethodCheck);
+void XMLHttpRequest::didFinishLoadingPreflight(SubresourceLoader* loader) {
+  ASSERT(m_inPreflight);
   ASSERT(!m_sameOriginRequest);
 
   if (!m_allowAccess) {
@@ -898,7 +1026,7 @@ void XMLHttpRequest::didFinishLoadingMethodCheck(SubresourceLoader* loader) {
     return;
   }
   if (m_async)
-    handleAsynchronousMethodCheckResult();
+    handleAsynchronousPreflightResult();
 }
 
 void XMLHttpRequest::willSendRequest(SubresourceLoader*,
@@ -912,8 +1040,8 @@ void XMLHttpRequest::willSendRequest(SubresourceLoader*,
 
 void XMLHttpRequest::didReceiveResponse(SubresourceLoader* loader,
                                         const ResourceResponse& response) {
-  if (m_inMethodCheck) {
-    didReceiveResponseMethodCheck(loader, response);
+  if (m_inPreflight) {
+    didReceiveResponsePreflight(loader, response);
     return;
   }
 
@@ -930,10 +1058,10 @@ void XMLHttpRequest::didReceiveResponse(SubresourceLoader* loader,
     m_responseEncoding = response.textEncodingName();
 }
 
-void XMLHttpRequest::didReceiveResponseMethodCheck(
+void XMLHttpRequest::didReceiveResponsePreflight(
     SubresourceLoader*,
     const ResourceResponse& response) {
-  ASSERT(m_inMethodCheck);
+  ASSERT(m_inPreflight);
   ASSERT(!m_sameOriginRequest);
 
   m_httpAccessControlList.set(
@@ -951,7 +1079,7 @@ void XMLHttpRequest::receivedCancellation(
 void XMLHttpRequest::didReceiveData(SubresourceLoader*,
                                     const char* data,
                                     int len) {
-  if (m_inMethodCheck)
+  if (m_inPreflight)
     return;
 
   if (m_state < HEADERS_RECEIVED)
