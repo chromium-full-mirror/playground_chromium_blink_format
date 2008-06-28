@@ -2737,6 +2737,11 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
     return returnError(ERR16, errorPtr);
 
   size_t size = length + sizeof(JSRegExp);
+#if REGEXP_HISTOGRAM
+  size_t stringOffset =
+      (size + sizeof(UChar) - 1) / sizeof(UChar) * sizeof(UChar);
+  size = stringOffset + patternLength * sizeof(UChar);
+#endif
   JSRegExp* re = reinterpret_cast<JSRegExp*>(new char[size]);
 
   if (!re)
@@ -2853,6 +2858,13 @@ JSRegExp* jsRegExpCompile(const UChar* pattern,
       re->options |= UseRequiredByteOptimizationOption;
     }
   }
+
+#if REGEXP_HISTOGRAM
+  re->stringOffset = stringOffset;
+  re->stringLength = patternLength;
+  memcpy(reinterpret_cast<char*>(re) + stringOffset, pattern,
+         patternLength * 2);
+#endif
 
   if (numSubpatterns)
     *numSubpatterns = re->topBracket;
