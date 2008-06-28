@@ -23,6 +23,7 @@
 #include "config.h"
 #include "FunctionPrototype.h"
 
+#include "JSArray.h"
 #include "JSString.h"
 
 namespace KJS {

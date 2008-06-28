@@ -27,6 +27,7 @@
 namespace KJS {
 
 class FunctionPrototype;
+class ObjectPrototype;
 
 class ErrorInstance : public JSObject {
  public:

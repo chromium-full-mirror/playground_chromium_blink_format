@@ -25,6 +25,7 @@
 
 #include "JSArray.h"
 #include "JSWrapperObject.h"
+#include "ObjectPrototype.h"
 #include "PropertyNameArray.h"
 #include "RegExpObject.h"
 #include "error_object.h"
