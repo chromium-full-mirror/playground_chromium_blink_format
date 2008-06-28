@@ -87,13 +87,6 @@ class JSGlobalObject : public JSVariableObject {
 
     int recursion;
 
-    unsigned timeoutTime;
-    unsigned timeAtLastCheckTimeout;
-    unsigned timeExecuting;
-    unsigned timeoutCheckCount;
-    unsigned tickCount;
-    unsigned ticksUntilNextTimeoutCheck;
-
     RegExpConstructor* regExpConstructor;
     ErrorConstructor* errorConstructor;
     NativeErrorConstructor* evalErrorConstructor;
@@ -240,10 +233,9 @@ class JSGlobalObject : public JSVariableObject {
   }
   unsigned pageGroupIdentifier() const { return d()->pageGroupIdentifier; }
 
-  void setTimeoutTime(unsigned timeoutTime) { d()->timeoutTime = timeoutTime; }
+  void setTimeoutTime(unsigned timeoutTime);
   void startTimeoutCheck();
   void stopTimeoutCheck();
-  bool timedOut();
 
   Debugger* debugger() const { return d()->debugger; }
   void setDebugger(Debugger* debugger) { d()->debugger = debugger; }
@@ -301,10 +293,6 @@ class JSGlobalObject : public JSVariableObject {
     unsigned attributes;
   };
   void addStaticGlobals(GlobalPropertyInfo*, int count);
-
- private:
-  bool checkTimeout();
-  void resetTimeoutCheck();
 };
 
 inline void JSGlobalObject::addStaticGlobals(GlobalPropertyInfo* globals,
@@ -342,15 +330,6 @@ inline bool JSGlobalObject::getOwnPropertySlot(ExecState* exec,
                                                    slotIsWriteable))
     return true;
   return symbolTableGet(propertyName, slot, slotIsWriteable);
-}
-
-inline bool JSGlobalObject::timedOut() {
-  d()->tickCount++;
-
-  if (d()->tickCount != d()->ticksUntilNextTimeoutCheck)
-    return false;
-
-  return checkTimeout();
 }
 
 inline JSGlobalObject* ScopeChainNode::globalObject() const {
