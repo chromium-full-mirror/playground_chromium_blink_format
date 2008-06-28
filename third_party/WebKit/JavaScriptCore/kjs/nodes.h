@@ -116,7 +116,6 @@ struct DeclarationStacks {
 class ParserRefCounted : Noncopyable {
  protected:
   ParserRefCounted(JSGlobalData*) KJS_FAST_CALL;
-  ParserRefCounted(PlacementNewAdoptType) KJS_FAST_CALL {}
 
   JSGlobalData* m_globalData;
 
@@ -137,8 +136,6 @@ class Node : public ParserRefCounted {
   typedef DeclarationStacks::FunctionStack FunctionStack;
 
   Node(JSGlobalData*) KJS_FAST_CALL;
-  Node(PlacementNewAdoptType placementAdopt) KJS_FAST_CALL
-      : ParserRefCounted(placementAdopt) {}
 
   /*
       Return value: The register holding the production's value.
@@ -198,10 +195,6 @@ class ExpressionNode : public Node {
   ExpressionNode(JSGlobalData* globalData) KJS_FAST_CALL : Node(globalData) {}
   ExpressionNode(JSGlobalData* globalData, JSType expectedReturn) KJS_FAST_CALL
       : Node(globalData, expectedReturn) {}
-
-  // Special constructor for cases where we overwrite an object in place.
-  ExpressionNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : Node(PlacementNewAdopt) {}
 
   virtual bool isNumber() const KJS_FAST_CALL { return false; }
   virtual bool isPure(CodeGenerator&) const KJS_FAST_CALL { return false; }
@@ -359,11 +352,6 @@ class ResolveNode : public ExpressionNode {
   ResolveNode(JSGlobalData* globalData, const Identifier& ident) KJS_FAST_CALL
       : ExpressionNode(globalData),
         m_ident(ident) {}
-
-  // Special constructor for cases where we overwrite an object in place.
-  ResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
@@ -682,11 +670,6 @@ class FunctionCallResolveNode : public ExpressionNode {
         m_ident(ident),
         m_args(args) {}
 
-  FunctionCallResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt),
-        m_args(PlacementNewAdopt) {}
-
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -749,10 +732,6 @@ class PrePostResolveNode : public ExpressionNode {
       : ExpressionNode(globalData, NumberType),
         m_ident(ident) {}
 
-  PrePostResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {}
-
  protected:
   Identifier m_ident;
   size_t m_index;  // Used by LocalVarPostfixNode.
@@ -764,9 +743,6 @@ class PostIncResolveNode : public PrePostResolveNode {
                      const Identifier& ident) KJS_FAST_CALL
       : PrePostResolveNode(globalData, ident) {}
 
-  PostIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : PrePostResolveNode(PlacementNewAdopt) {}
-
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
@@ -777,9 +753,6 @@ class PostDecResolveNode : public PrePostResolveNode {
   PostDecResolveNode(JSGlobalData* globalData,
                      const Identifier& ident) KJS_FAST_CALL
       : PrePostResolveNode(globalData, ident) {}
-
-  PostDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : PrePostResolveNode(PlacementNewAdopt) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
@@ -891,10 +864,6 @@ class DeleteResolveNode : public ExpressionNode {
       : ExpressionNode(globalData),
         m_ident(ident) {}
 
-  DeleteResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {}
-
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -979,12 +948,6 @@ class TypeOfResolveNode : public ExpressionNode {
       : ExpressionNode(globalData, StringType),
         m_ident(ident) {}
 
-  TypeOfResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt) {
-    m_expectedReturnType = StringType;
-  }
-
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -1018,9 +981,6 @@ class PreIncResolveNode : public PrePostResolveNode {
                     const Identifier& ident) KJS_FAST_CALL
       : PrePostResolveNode(globalData, ident) {}
 
-  PreIncResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : PrePostResolveNode(PlacementNewAdopt) {}
-
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -1032,9 +992,6 @@ class PreDecResolveNode : public PrePostResolveNode {
   PreDecResolveNode(JSGlobalData* globalData,
                     const Identifier& ident) KJS_FAST_CALL
       : PrePostResolveNode(globalData, ident) {}
-
-  PreDecResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : PrePostResolveNode(PlacementNewAdopt) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
@@ -1675,12 +1632,6 @@ class ReadModifyResolveNode : public ExpressionNode {
         m_operator(oper),
         m_rightHasAssignments(rightHasAssignments) {}
 
-  ReadModifyResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt),
-        m_right(PlacementNewAdopt),
-        m_rightHasAssignments(true) {}
-
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -1704,11 +1655,6 @@ class AssignResolveNode : public ExpressionNode {
         m_ident(ident),
         m_right(right),
         m_rightHasAssignments(rightHasAssignments) {}
-
-  AssignResolveNode(PlacementNewAdoptType) KJS_FAST_CALL
-      : ExpressionNode(PlacementNewAdopt),
-        m_ident(PlacementNewAdopt),
-        m_right(PlacementNewAdopt) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
