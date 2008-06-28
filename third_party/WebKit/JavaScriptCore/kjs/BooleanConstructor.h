@@ -22,9 +22,12 @@
 #ifndef BooleanConstructor_h
 #define BooleanConstructor_h
 
-#include "FunctionPrototype.h"
+#include "JSFunction.h"
 
 namespace KJS {
+
+class BooleanPrototype;
+class FunctionPrototype;
 
 /**
  * @internal
