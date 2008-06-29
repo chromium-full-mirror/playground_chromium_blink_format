@@ -2472,13 +2472,13 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
         JSValue* returnValue = callData.native.function(
             exec, static_cast<JSObject*>(v), thisValue, args);
+        VM_CHECK_EXCEPTION();
 
         r[dst].u.jsValue = returnValue;
 
         if (*enabledProfilerReference)
           (*enabledProfilerReference)
               ->didExecute(exec, static_cast<JSObject*>(v));
-        VM_CHECK_EXCEPTION();
 
         ++vPC;
         NEXT_OPCODE;
