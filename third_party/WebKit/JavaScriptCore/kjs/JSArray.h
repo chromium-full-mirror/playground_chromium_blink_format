@@ -50,7 +50,6 @@ class JSArray : public JSObject {
   unsigned getLength() const { return m_length; }
   void setLength(unsigned);  // OK to use on new arrays, but not if it might be
                              // a RegExpMatchArray.
-  JSValue* getItem(unsigned) const;
 
   void sort(ExecState*);
   void sort(ExecState*, JSValue* compareFunction, CallType, const CallData&);
@@ -66,8 +65,6 @@ class JSArray : public JSObject {
   void setLazyCreationData(void*);
 
  private:
-  using JSObject::get;
-
   virtual const ClassInfo* classInfo() const { return &info; }
 
   static JSValue* lengthGetter(ExecState*,
