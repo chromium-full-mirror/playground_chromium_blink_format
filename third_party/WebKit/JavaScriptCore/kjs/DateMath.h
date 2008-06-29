@@ -47,6 +47,7 @@
 
 namespace KJS {
 
+class UString;
 struct GregorianDateTime;
 
 void initDateMath();
@@ -57,6 +58,14 @@ int equivalentYearForDST(int year);
 double getCurrentUTCTime();
 double getCurrentUTCTimeWithMicroseconds();
 void getLocalTime(const time_t*, tm*);
+
+// Not really math related, but this is currently the only shared place to put
+// these.
+double parseDate(const UString&);
+double timeClip(double);
+UString formatDate(const GregorianDateTime&);
+UString formatDateUTCVariant(const GregorianDateTime&);
+UString formatTime(const GregorianDateTime&, bool inputIsUTC);
 
 const char* const weekdayName[7] = {"Mon", "Tue", "Wed", "Thu",
                                     "Fri", "Sat", "Sun"};
@@ -166,6 +175,10 @@ struct GregorianDateTime : Noncopyable {
   int utcOffset;
   char* timeZone;
 };
+
+static inline int gmtoffset(const GregorianDateTime& t) {
+  return t.utcOffset;
+}
 
 }  // namespace KJS
 
