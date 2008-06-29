@@ -73,9 +73,11 @@ class JSArray : public JSObject {
   static JSValue* lengthGetter(ExecState*,
                                const Identifier&,
                                const PropertySlot&);
-  bool inlineGetOwnPropertySlot(ExecState*,
-                                unsigned propertyName,
-                                PropertySlot&);
+
+  bool getOwnPropertySlotSlowCase(ExecState*,
+                                  unsigned propertyName,
+                                  PropertySlot&);
+  void putSlowCase(ExecState*, unsigned propertyName, JSValue*);
 
   bool increaseVectorLength(unsigned newLength);
 
@@ -89,7 +91,7 @@ class JSArray : public JSObject {
   void checkConsistency(ConsistencyCheckType = NormalConsistencyCheck);
 
   unsigned m_length;
-  unsigned m_vectorLength;
+  unsigned m_fastAccessCutoff;
   ArrayStorage* m_storage;
 };
 
