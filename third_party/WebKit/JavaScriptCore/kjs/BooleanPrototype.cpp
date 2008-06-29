@@ -24,7 +24,6 @@
 
 #include "FunctionPrototype.h"
 #include "ObjectPrototype.h"
-#include "error_object.h"
 
 namespace KJS {
 

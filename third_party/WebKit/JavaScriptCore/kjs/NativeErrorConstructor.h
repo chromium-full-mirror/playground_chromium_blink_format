@@ -19,45 +19,16 @@
  *
  */
 
-#ifndef ERROR_OBJECT_H_
-#define ERROR_OBJECT_H_
+#ifndef NativeErrorConstructor_h
+#define NativeErrorConstructor_h
 
 #include "JSFunction.h"
 
 namespace KJS {
 
+class ErrorInstance;
 class FunctionPrototype;
-class ObjectPrototype;
-
-class ErrorInstance : public JSObject {
- public:
-  ErrorInstance(JSObject* prototype);
-
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-};
-
-class ErrorPrototype : public ErrorInstance {
- public:
-  ErrorPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
-};
-
-class ErrorConstructor : public InternalFunction {
- public:
-  ErrorConstructor(ExecState*, FunctionPrototype*, ErrorPrototype*);
-
- private:
-  virtual ConstructType getConstructData(ConstructData&);
-  virtual CallType getCallData(CallData&);
-};
-
-class NativeErrorPrototype : public JSObject {
- public:
-  NativeErrorPrototype(ExecState*,
-                       ErrorPrototype*,
-                       const UString& name,
-                       const UString& message);
-};
+class NativeErrorPrototype;
 
 class NativeErrorConstructor : public InternalFunction {
  public:
@@ -76,4 +47,4 @@ class NativeErrorConstructor : public InternalFunction {
 
 }  // namespace KJS
 
-#endif  // ERROR_OBJECT_H_
+#endif  // NativeErrorConstructor_h

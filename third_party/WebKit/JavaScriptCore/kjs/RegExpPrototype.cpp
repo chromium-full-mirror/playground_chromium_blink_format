@@ -30,9 +30,6 @@
 #include "JSValue.h"
 #include "ObjectPrototype.h"
 #include "RegExpObject.h"
-#include "UnusedParam.h"
-#include "error_object.h"
-#include "operations.h"
 #include "regexp.h"
 
 namespace KJS {

@@ -29,7 +29,6 @@
 #include "ObjectPrototype.h"
 #include "RegExpObject.h"
 #include "RegExpPrototype.h"
-#include "error_object.h"
 #include "regexp.h"
 
 namespace KJS {
