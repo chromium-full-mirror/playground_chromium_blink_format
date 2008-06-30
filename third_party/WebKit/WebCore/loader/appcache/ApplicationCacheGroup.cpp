@@ -241,6 +241,8 @@ void ApplicationCacheGroup::finishedLoadingMainResource(
 void ApplicationCacheGroup::failedLoadingMainResource(DocumentLoader* loader) {
   ASSERT(m_cacheCandidates.contains(loader) ||
          m_associatedDocumentLoaders.contains(loader));
+
+  // Note that cacheUpdateFailed() can cause the cache group to be deleted.
   cacheUpdateFailed();
 }
 
@@ -366,8 +368,8 @@ void ApplicationCacheGroup::didReceiveResponse(
 
   int statusCode = response.httpStatusCode() / 100;
   if (statusCode == 4 || statusCode == 5) {
+    // Note that cacheUpdateFailed() can cause the cache group to be deleted.
     cacheUpdateFailed();
-    m_currentHandle = 0;
     return;
   }
 
@@ -433,8 +435,8 @@ void ApplicationCacheGroup::didFail(ResourceHandle* handle,
     return;
   }
 
+  // Note that cacheUpdateFailed() can cause the cache group to be deleted.
   cacheUpdateFailed();
-  m_currentHandle = 0;
 }
 
 void ApplicationCacheGroup::didReceiveManifestResponse(
@@ -568,8 +570,8 @@ void ApplicationCacheGroup::cacheUpdateFailed() {
 }
 
 void ApplicationCacheGroup::didFailToLoadManifest() {
+  // Note that cacheUpdateFailed() can cause the cache group to be deleted.
   cacheUpdateFailed();
-  m_manifestHandle = 0;
 }
 
 void ApplicationCacheGroup::checkIfLoadIsComplete() {
