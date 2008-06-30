@@ -218,7 +218,6 @@ class Page : Noncopyable {
 
   RefPtr<BackForwardList> m_backForwardList;
   RefPtr<Frame> m_mainFrame;
-  RefPtr<Node> m_focusedNode;
 
   mutable RefPtr<PluginData> m_pluginData;
 
