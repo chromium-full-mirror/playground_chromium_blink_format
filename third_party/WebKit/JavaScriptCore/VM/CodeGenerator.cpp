@@ -460,7 +460,7 @@ void CodeGenerator::retrieveLastBinaryOp(int& dstIndex,
   src2Index = instructions().at(size - 1).u.operand;
 }
 
-void CodeGenerator::rewindBinaryOp() {
+void ALWAYS_INLINE CodeGenerator::rewindBinaryOp() {
   ASSERT(instructions().size() >= 4);
   instructions().shrink(instructions().size() - 4);
 }
@@ -499,6 +499,24 @@ PassRefPtr<LabelID> CodeGenerator::emitJumpIfTrue(RegisterID* cond,
 PassRefPtr<LabelID> CodeGenerator::emitJumpIfFalse(RegisterID* cond,
                                                    LabelID* target) {
   ASSERT(target->isForwardLabel());
+
+  if (m_lastOpcodeID == op_less) {
+    int dstIndex;
+    int src1Index;
+    int src2Index;
+
+    retrieveLastBinaryOp(dstIndex, src1Index, src2Index);
+
+    if (cond->index() == dstIndex && !cond->refCount()) {
+      rewindBinaryOp();
+      emitOpcode(op_jnless);
+      instructions().append(src1Index);
+      instructions().append(src2Index);
+      instructions().append(target->offsetFrom(instructions().size()));
+      return target;
+    }
+  }
+
   emitOpcode(op_jfalse);
   instructions().append(cond->index());
   instructions().append(target->offsetFrom(instructions().size()));

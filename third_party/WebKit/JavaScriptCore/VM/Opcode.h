@@ -61,7 +61,7 @@ namespace KJS {
                                       op_put_by_index) macro(op_put_getter) macro(op_put_setter)    \
                                                                                                     \
                                       macro(op_jmp) macro(op_jtrue) macro(                          \
-                                          op_jfalse) macro(op_jless)                                \
+                                          op_jfalse) macro(op_jless) macro(op_jnless)               \
                                           macro(op_jmp_scopes) macro(op_loop) macro(                \
                                               op_loop_if_true) macro(op_loop_if_less)               \
                                                                                                     \
