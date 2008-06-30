@@ -139,7 +139,7 @@ template <typename T>
 struct GenericHashTraitsBase<true, T> {
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
-  static void constructDeletedValue(T* slot) { *slot = static_cast<T>(-1); }
+  static void constructDeletedValue(T& slot) { slot = static_cast<T>(-1); }
   static bool isDeletedValue(T value) { return value == static_cast<T>(-1); }
 };
 
@@ -156,8 +156,8 @@ template <typename T>
 struct FloatHashTraits : GenericHashTraits<T> {
   static const bool needsDestruction = false;
   static T emptyValue() { return std::numeric_limits<T>::infinity(); }
-  static void constructDeletedValue(T* slot) {
-    *slot = -std::numeric_limits<T>::infinity();
+  static void constructDeletedValue(T& slot) {
+    slot = -std::numeric_limits<T>::infinity();
   }
   static bool isDeletedValue(T value) {
     return value == -std::numeric_limits<T>::infinity();
@@ -173,8 +173,8 @@ template <typename P>
 struct HashTraits<P*> : GenericHashTraits<P*> {
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
-  static void constructDeletedValue(P** slot) {
-    *slot = reinterpret_cast<P*>(-1);
+  static void constructDeletedValue(P*& slot) {
+    slot = reinterpret_cast<P*>(-1);
   }
   static bool isDeletedValue(P* value) {
     return value == reinterpret_cast<P*>(-1);
@@ -184,8 +184,8 @@ struct HashTraits<P*> : GenericHashTraits<P*> {
 template <typename P>
 struct HashTraits<RefPtr<P>> : GenericHashTraits<RefPtr<P>> {
   static const bool emptyValueIsZero = true;
-  static void constructDeletedValue(RefPtr<P>* slot) {
-    new (slot) RefPtr<P>(HashTableDeletedValue);
+  static void constructDeletedValue(RefPtr<P>& slot) {
+    new (&slot) RefPtr<P>(HashTableDeletedValue);
   }
   static bool isDeletedValue(const RefPtr<P>& value) {
     return value.isHashTableDeletedValue();
@@ -213,8 +213,8 @@ struct PairHashTraits
   static const bool needsDestruction =
       FirstTraits::needsDestruction || SecondTraits::needsDestruction;
 
-  static void constructDeletedValue(TraitType* slot) {
-    FirstTraits::constructDeletedValue(&slot->first);
+  static void constructDeletedValue(TraitType& slot) {
+    FirstTraits::constructDeletedValue(slot.first);
   }
   static bool isDeletedValue(const TraitType& value) {
     return FirstTraits::isDeletedValue(value.first);

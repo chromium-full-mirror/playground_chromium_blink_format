@@ -543,7 +543,7 @@ class HashTable {
   }
   static void deleteBucket(ValueType& bucket) {
     bucket.~ValueType();
-    Traits::constructDeletedValue(&bucket);
+    Traits::constructDeletedValue(bucket);
   }
 
   FullLookupType makeLookupResult(ValueType* position,
@@ -651,7 +651,7 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
   ASSERT(!HashTranslator::equal(KeyTraits::emptyValue(), key));
   ValueType deletedValue = Traits::emptyValue();
   deletedValue.~ValueType();
-  Traits::constructDeletedValue(&deletedValue);
+  Traits::constructDeletedValue(deletedValue);
   ASSERT(!HashTranslator::equal(Extractor::extract(deletedValue), key));
   new (&deletedValue) ValueType(Traits::emptyValue());
 }

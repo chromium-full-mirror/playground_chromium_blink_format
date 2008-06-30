@@ -111,8 +111,8 @@ struct FontPlatformDataCacheKeyTraits
     static FontPlatformDataCacheKey key(nullAtom);
     return key;
   }
-  static void constructDeletedValue(FontPlatformDataCacheKey* slot) {
-    new (slot) FontPlatformDataCacheKey(HashTableDeletedValue);
+  static void constructDeletedValue(FontPlatformDataCacheKey& slot) {
+    new (&slot) FontPlatformDataCacheKey(HashTableDeletedValue);
   }
   static bool isDeletedValue(const FontPlatformDataCacheKey& value) {
     return value.isHashTableDeletedValue();
@@ -213,8 +213,8 @@ struct FontDataCacheKeyTraits : WTF::GenericHashTraits<FontPlatformData> {
     static FontPlatformData key;
     return key;
   }
-  static void constructDeletedValue(FontPlatformData* slot) {
-    new (slot) FontPlatformData(HashTableDeletedValue);
+  static void constructDeletedValue(FontPlatformData& slot) {
+    new (&slot) FontPlatformData(HashTableDeletedValue);
   }
   static bool isDeletedValue(const FontPlatformData& value) {
     return value.isHashTableDeletedValue();

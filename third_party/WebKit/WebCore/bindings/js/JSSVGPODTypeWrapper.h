@@ -225,8 +225,8 @@ struct PODTypeReadWriteHashInfoTraits
   }
 
   static void constructDeletedValue(
-      PODTypeReadWriteHashInfo<PODType, PODTypeCreator>* slot) {
-    new (slot) PODTypeReadWriteHashInfo<PODType, PODTypeCreator>(
+      PODTypeReadWriteHashInfo<PODType, PODTypeCreator>& slot) {
+    new (&slot) PODTypeReadWriteHashInfo<PODType, PODTypeCreator>(
         WTF::HashTableDeletedValue);
   }
   static bool isDeletedValue(
