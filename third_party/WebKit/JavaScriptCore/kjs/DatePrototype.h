@@ -22,7 +22,7 @@
 #ifndef DatePrototype_h
 #define DatePrototype_h
 
-#include "date_object.h"
+#include "DateInstance.h"
 
 namespace KJS {
 
