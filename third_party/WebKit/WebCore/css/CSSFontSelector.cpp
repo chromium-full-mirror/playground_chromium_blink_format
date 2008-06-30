@@ -108,7 +108,11 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 
   if (RefPtr<CSSValue> fontStyle =
           style->getPropertyCSSValue(CSSPropertyFontStyle)) {
-    if (!fontStyle->isValueList())
+    if (fontStyle->isPrimitiveValue()) {
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      list->append(fontStyle);
+      fontStyle = list;
+    } else if (!fontStyle->isValueList())
       return;
 
     CSSValueList* styleList = static_cast<CSSValueList*>(fontStyle.get());
@@ -139,7 +143,11 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 
   if (RefPtr<CSSValue> fontWeight =
           style->getPropertyCSSValue(CSSPropertyFontWeight)) {
-    if (!fontWeight->isValueList())
+    if (fontWeight->isPrimitiveValue()) {
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      list->append(fontWeight);
+      fontWeight = list;
+    } else if (!fontWeight->isValueList())
       return;
 
     CSSValueList* weightList = static_cast<CSSValueList*>(fontWeight.get());
@@ -194,7 +202,11 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 
   if (RefPtr<CSSValue> fontVariant =
           style->getPropertyCSSValue(CSSPropertyFontVariant)) {
-    if (!fontVariant->isValueList())
+    if (fontVariant->isPrimitiveValue()) {
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      list->append(fontVariant);
+      fontVariant = list;
+    } else if (!fontVariant->isValueList())
       return;
 
     CSSValueList* variantList = static_cast<CSSValueList*>(fontVariant.get());
