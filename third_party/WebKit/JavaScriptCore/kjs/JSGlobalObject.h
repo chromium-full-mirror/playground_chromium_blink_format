@@ -25,7 +25,6 @@
 
 #include "JSGlobalData.h"
 #include "JSVariableObject.h"
-#include "RegisterFile.h"
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 
@@ -54,6 +53,7 @@ class ReferenceError;
 class ReferenceErrorPrototype;
 class RegExpConstructor;
 class RegExpPrototype;
+class RegisterFile;
 class RuntimeMethod;
 class ScopeChain;
 class StringPrototype;
