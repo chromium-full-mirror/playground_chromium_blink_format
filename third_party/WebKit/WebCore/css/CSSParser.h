@@ -125,6 +125,9 @@ class CSSParser {
 
   static bool parseColor(const String&, RGBA32& rgb, bool strict);
 
+  bool parseFontStyle();
+  bool parseFontVariant();
+  bool parseFontWeight();
   bool parseFontFaceSrc();
   bool parseFontFaceUnicodeRange();
 
@@ -214,6 +217,8 @@ class CSSParser {
   int m_currentShorthand;
   bool m_implicitShorthand;
 
+  bool m_hasFontFaceOnlyValues;
+
   Vector<String> m_variableNames;
   Vector<RefPtr<CSSValueList>> m_variableValues;
 
@@ -236,6 +241,8 @@ class CSSParser {
   void checkForOrphanedUnits();
 
   void clearVariables();
+
+  void deleteFontFaceOnlyValues();
 
   UChar* m_data;
   UChar* yytext;
