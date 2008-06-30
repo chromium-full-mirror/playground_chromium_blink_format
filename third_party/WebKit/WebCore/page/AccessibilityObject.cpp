@@ -181,9 +181,8 @@ IntPoint AccessibilityObject::clickPoint() const {
   return IntPoint(rect.x() + rect.width() / 2, rect.y() + rect.height() / 2);
 }
 
-// the closest object for an internal anchor
-AccessibilityObject* AccessibilityObject::linkedUIElement() const {
-  return 0;
+void AccessibilityObject::linkedUIElements(AccessibilityChildrenVector&) const {
+  return;
 }
 
 AccessibilityObject* AccessibilityObject::titleUIElement() const {

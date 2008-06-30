@@ -87,6 +87,21 @@ static JSValueRef descriptionOfFocusedElementCallback(
   return JSValueMakeString(context, description.get());
 }
 
+static JSValueRef attributesOfLinkedUIElementsForFocusedElementCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  AccessibilityController* controller =
+      reinterpret_cast<AccessibilityController*>(
+          JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> linkedUIDescription(
+      Adopt, controller->attributesOfLinkedUIElementsForFocusedElement());
+  return JSValueMakeString(context, linkedUIDescription.get());
+}
+
 // Object Creation
 
 void AccessibilityController::makeWindowObject(JSContextRef context,
@@ -141,6 +156,9 @@ JSStaticFunction* AccessibilityController::staticFunctions() {
       {"titleOfFocusedElement", titleOfFocusedElementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"descriptionOfFocusedElement", descriptionOfFocusedElementCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"attributesOfLinkedUIElementsForFocusedElement",
+       attributesOfLinkedUIElementsForFocusedElementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 

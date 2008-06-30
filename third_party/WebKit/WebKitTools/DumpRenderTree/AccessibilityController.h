@@ -42,6 +42,7 @@ class AccessibilityController {
   JSStringRef roleOfFocusedElement();
   JSStringRef titleOfFocusedElement();
   JSStringRef descriptionOfFocusedElement();
+  JSStringRef attributesOfLinkedUIElementsForFocusedElement();
 
  private:
   static JSClassRef getJSClass();
