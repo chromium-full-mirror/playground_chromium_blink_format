@@ -146,8 +146,8 @@ LinearGradientAttributes SVGLinearGradientElement::collectGradientProperties()
     if (!attributes.hasBoundingBoxMode() &&
         current->hasAttribute(SVGNames::gradientUnitsAttr))
       attributes.setBoundingBoxMode(
-          current->getAttribute(SVGNames::gradientUnitsAttr) ==
-          "objectBoundingBox");
+          current->gradientUnits() ==
+          SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
 
     if (!attributes.hasGradientTransform() &&
         current->hasAttribute(SVGNames::gradientTransformAttr))

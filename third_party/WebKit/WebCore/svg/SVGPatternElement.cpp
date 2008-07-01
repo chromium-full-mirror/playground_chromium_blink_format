@@ -366,14 +366,14 @@ PatternAttributes SVGPatternElement::collectPatternProperties() const {
     if (!attributes.hasBoundingBoxMode() &&
         current->hasAttribute(SVGNames::patternUnitsAttr))
       attributes.setBoundingBoxMode(
-          current->getAttribute(SVGNames::patternUnitsAttr) ==
-          "objectBoundingBox");
+          current->patternUnits() ==
+          SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
 
     if (!attributes.hasBoundingBoxModeContent() &&
         current->hasAttribute(SVGNames::patternContentUnitsAttr))
       attributes.setBoundingBoxModeContent(
-          current->getAttribute(SVGNames::patternContentUnitsAttr) ==
-          "objectBoundingBox");
+          current->patternContentUnits() ==
+          SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
 
     if (!attributes.hasPatternTransform() &&
         current->hasAttribute(SVGNames::patternTransformAttr))
