@@ -46,11 +46,17 @@ class SVGScriptElement : public SVGElement,
   virtual void getSubresourceAttributeStrings(Vector<String>&) const;
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_START_DECLARATIONS(SVGScriptElement)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGScriptElement,
+                                         SVGURIReference,
+                                         String,
+                                         Href,
+                                         href)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGScriptElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)

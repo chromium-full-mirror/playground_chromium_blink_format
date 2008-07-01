@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2007, 2008 Nikolas Zimmermann
+   <zimmermann@kde.org>
                   2004, 2005, 2006, 2008 Rob Buis <buis@kde.org>
     Copyright (C) 2008 Apple Inc. All rights reserved.
 
@@ -264,6 +265,26 @@ void SVGElement::attributeChanged(Attribute* attr, bool preserveDecls) {
 
   StyledElement::attributeChanged(attr, preserveDecls);
   svgAttributeChanged(attr->name());
+}
+
+void SVGElement::updateAnimatedSVGAttribute(StringImpl* name) const {
+  if (m_synchronizingSVGAttributes)
+    return;
+
+  m_synchronizingSVGAttributes = true;
+
+  if (name)
+    invokeSVGPropertySynchronizer(name);
+  else {
+    invokeAllSVGPropertySynchronizers();
+    setSynchronizedSVGAttributes(true);
+  }
+
+  m_synchronizingSVGAttributes = false;
+}
+
+void SVGElement::setSynchronizedSVGAttributes(bool value) const {
+  m_areSVGAttributesValid = value;
 }
 }
 

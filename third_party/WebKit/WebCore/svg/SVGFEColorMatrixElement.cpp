@@ -56,14 +56,14 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               type,
                               SVGNames::typeAttr,
                               m_type)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
-                              SVGNumberList*,
-                              NumberList,
-                              numberList,
-                              Values,
-                              values,
-                              SVGNames::valuesAttr,
-                              m_values.get())
+ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED(SVGFEColorMatrixElement,
+                                         SVGNumberList,
+                                         NumberList,
+                                         numberList,
+                                         Values,
+                                         values,
+                                         SVGNames::valuesAttr,
+                                         m_values)
 
 void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

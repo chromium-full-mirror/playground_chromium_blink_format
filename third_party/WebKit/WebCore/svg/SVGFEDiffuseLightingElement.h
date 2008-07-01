@@ -39,7 +39,7 @@ class SVGFEDiffuseLightingElement
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,

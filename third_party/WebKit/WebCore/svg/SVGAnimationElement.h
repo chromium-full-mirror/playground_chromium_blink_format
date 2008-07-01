@@ -107,7 +107,8 @@ class SVGAnimationElement : public SVGSMILElement,
                                SVGSMILElement* resultElement);
   virtual void endedActiveInterval();
 
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGAnimationElement,
+                                         SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)

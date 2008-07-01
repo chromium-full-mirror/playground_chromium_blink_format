@@ -37,7 +37,7 @@ class SVGFEFloodElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFEFlood* filterEffect(SVGResourceFilter*) const;
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
+  virtual SVGElement* contextElement() { return this; }
 
  private:
   mutable RefPtr<SVGFEFlood> m_filterEffect;
