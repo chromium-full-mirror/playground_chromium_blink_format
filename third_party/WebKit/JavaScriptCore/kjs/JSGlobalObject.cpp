@@ -433,6 +433,10 @@ void JSGlobalObject::mark() {
        it != end; ++it)
     (*it)->mark();
 
+  RegisterFile& registerFile = globalData()->machine->registerFile();
+  if (registerFile.globalObject() == this)
+    registerFile.mark(globalData()->heap);
+
   markIfNeeded(d()->globalExec->exception());
 
   markIfNeeded(d()->regExpConstructor);

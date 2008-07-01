@@ -116,7 +116,7 @@ class Heap : Noncopyable {
 
   friend class Machine;
   friend class JSGlobalData;
-  Heap(Machine*);
+  Heap();
   ~Heap();
 
   void recordExtraCost(size_t);
@@ -132,7 +132,6 @@ class Heap : Noncopyable {
   CollectorHeap numberHeap;
   ProtectCountSet protectedValues;
   HashSet<ArgList*>* m_markListSet;
-  Machine* m_machine;
 };
 
 // tunable parameters
