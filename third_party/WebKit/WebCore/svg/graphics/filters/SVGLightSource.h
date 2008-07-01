@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2008 Alex Mathews <possessedpenguinbob@gmail.com>
+                  2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                   2005 Eric Seidel <eric@webkit.org>
 
@@ -27,21 +28,21 @@
 
 namespace WebCore {
 
-enum SVGLightType { LS_DISTANT, LS_POINT, LS_SPOT };
+enum LightType { LS_DISTANT, LS_POINT, LS_SPOT };
 
 class TextStream;
 
-class SVGLightSource : public RefCounted<SVGLightSource> {
+class LightSource : public RefCounted<LightSource> {
  public:
-  SVGLightSource(SVGLightType type) : m_type(type) {}
+  LightSource(LightType type) : m_type(type) {}
 
-  virtual ~SVGLightSource() {}
+  virtual ~LightSource() {}
 
-  SVGLightType type() const { return m_type; }
+  LightType type() const { return m_type; }
   virtual TextStream& externalRepresentation(TextStream&) const = 0;
 
  private:
-  SVGLightType m_type;
+  LightType m_type;
 };
 
 }  // namespace WebCore

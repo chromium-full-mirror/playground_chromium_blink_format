@@ -84,11 +84,11 @@ void SVGFEDiffuseLighting::setKernelUnitLengthY(float kernelUnitLengthY) {
   m_kernelUnitLengthY = kernelUnitLengthY;
 }
 
-const SVGLightSource* SVGFEDiffuseLighting::lightSource() const {
+const LightSource* SVGFEDiffuseLighting::lightSource() const {
   return m_lightSource.get();
 }
 
-void SVGFEDiffuseLighting::setLightSource(SVGLightSource* lightSource) {
+void SVGFEDiffuseLighting::setLightSource(LightSource* lightSource) {
   m_lightSource = lightSource;
 }
 

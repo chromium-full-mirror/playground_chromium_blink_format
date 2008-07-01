@@ -29,7 +29,7 @@
 #include <wtf/MathExtras.h>
 
 class Color;
-class SVGLightSource;
+class LightSource;
 
 namespace WebCore {
 
@@ -41,7 +41,7 @@ CIFilter* getPointLightVectors(CIFilter* normals,
                                CIVector* lightPosition,
                                float surfaceScale);
 CIFilter* getLightVectors(CIFilter* normals,
-                          const SVGLightSource* light,
+                          const LightSource* light,
                           float surfaceScale);
 CIFilter* getNormalMap(CIImage* bumpMap, float scale);
 };
