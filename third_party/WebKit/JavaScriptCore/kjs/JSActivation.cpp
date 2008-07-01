@@ -39,9 +39,8 @@ namespace KJS {
 const ClassInfo JSActivation::info = {"JSActivation", 0, 0, 0};
 
 JSActivation::JSActivation(PassRefPtr<FunctionBodyNode> functionBody,
-                           Register** registerBase,
-                           int registerOffset)
-    : Base(new JSActivationData(functionBody, registerBase, registerOffset)) {}
+                           Register* registers)
+    : Base(new JSActivationData(functionBody, registers)) {}
 
 JSActivation::~JSActivation() {
   delete d();
@@ -52,7 +51,7 @@ void JSActivation::copyRegisters() {
   if (!numLocals)
     return;
 
-  copyRegisterArray(registers() - numLocals, numLocals);
+  copyRegisterArray(d()->registers - numLocals, numLocals);
 }
 
 bool JSActivation::getOwnPropertySlot(ExecState* exec,
@@ -152,17 +151,16 @@ PropertySlot::GetValueFunc JSActivation::getArgumentsGetter() {
 }
 
 JSObject* JSActivation::createArgumentsObject(ExecState* exec) {
-  Register* callFrame = registers() -
+  Register* callFrame = d()->registers -
                         d()->functionBody->generatedCode().numLocals -
                         RegisterFile::CallFrameHeaderSize;
 
   JSFunction* function;
   Register* argv;
   int argc;
-  exec->machine()->getFunctionAndArguments(registerBase(), callFrame, function,
-                                           argv, argc);
-  ArgList args(reinterpret_cast<JSValue***>(registerBase()),
-               argv - *registerBase(), argc);
+  exec->machine()->getArgumentsData(callFrame, function, argv, argc);
+
+  ArgList args(reinterpret_cast<JSValue**>(argv), argc);
   return new (exec) Arguments(exec, function, args, this);
 }
 

@@ -107,11 +107,10 @@ class Machine {
   JSValue* retrieveArguments(ExecState*, JSFunction*) const;
   JSValue* retrieveCaller(ExecState*, JSFunction*) const;
 
-  void getFunctionAndArguments(Register** registerBase,
-                               Register* callFrame,
-                               JSFunction*&,
-                               Register*& argv,
-                               int& argc);
+  void getArgumentsData(Register* callFrame,
+                        JSFunction*&,
+                        Register*& argv,
+                        int& argc);
   void setTimeoutTime(unsigned timeoutTime) { m_timeoutTime = timeoutTime; }
 
   void startTimeoutCheck() {
@@ -155,12 +154,10 @@ class Machine {
                           const Instruction*,
                           const CodeBlock*,
                           ScopeChainNode*,
-                          Register**,
                           Register*);
 
   NEVER_INLINE bool unwindCallFrame(ExecState*,
                                     JSValue*,
-                                    Register**,
                                     const Instruction*&,
                                     CodeBlock*&,
                                     JSValue**&,
@@ -168,17 +165,13 @@ class Machine {
                                     Register*&);
   NEVER_INLINE Instruction* throwException(ExecState*,
                                            JSValue*,
-                                           Register**,
                                            const Instruction*,
                                            CodeBlock*&,
                                            JSValue**&,
                                            ScopeChainNode*&,
                                            Register*&);
 
-  bool getCallFrame(ExecState*,
-                    JSFunction*,
-                    Register**& registerBase,
-                    int& callFrameOffset) const;
+  Register* callFrame(ExecState*, JSFunction*) const;
 
   JSValue* privateExecute(ExecutionFlag,
                           ExecState* = 0,

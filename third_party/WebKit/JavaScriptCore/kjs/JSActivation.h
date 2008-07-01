@@ -41,7 +41,7 @@ class JSActivation : public JSVariableObject {
   typedef JSVariableObject Base;
 
  public:
-  JSActivation(PassRefPtr<FunctionBodyNode>, Register**, int registerOffset);
+  JSActivation(PassRefPtr<FunctionBodyNode>, Register*);
   virtual ~JSActivation();
 
   virtual bool isActivationObject() const;
@@ -68,11 +68,8 @@ class JSActivation : public JSVariableObject {
  private:
   struct JSActivationData : public JSVariableObjectData {
     JSActivationData(PassRefPtr<FunctionBodyNode> functionBody_,
-                     Register** registerBase,
-                     int registerOffset)
-        : JSVariableObjectData(&functionBody_->symbolTable(),
-                               registerBase,
-                               registerOffset),
+                     Register* registers)
+        : JSVariableObjectData(&functionBody_->symbolTable(), registers),
           functionBody(functionBody_),
           argumentsObject(0) {}
 
