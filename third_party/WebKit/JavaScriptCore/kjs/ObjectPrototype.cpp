@@ -24,6 +24,7 @@
 
 #include "operations.h"
 #include "FunctionPrototype.h"
+#include "JSFunction.h"
 
 namespace KJS {
 

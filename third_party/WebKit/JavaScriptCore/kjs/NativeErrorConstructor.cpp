@@ -24,6 +24,7 @@
 
 #include "ErrorInstance.h"
 #include "FunctionPrototype.h"
+#include "JSFunction.h"
 #include "NativeErrorPrototype.h"
 
 namespace KJS {

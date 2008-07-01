@@ -24,6 +24,7 @@
 #include "FunctionPrototype.h"
 
 #include "JSArray.h"
+#include "JSFunction.h"
 #include "JSString.h"
 
 namespace KJS {
