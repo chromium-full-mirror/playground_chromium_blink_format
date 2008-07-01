@@ -116,6 +116,8 @@ class Range : public RefCounted<Range> {
 
   Position editingStartPosition() const;
 
+  Node* shadowTreeRootNode() const;
+
   IntRect boundingBox();
   void addLineBoxRects(Vector<IntRect>&, bool useSelectionHeight = false);
 

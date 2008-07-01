@@ -50,6 +50,7 @@ class SelectionController : Noncopyable {
   bool isContentRichlyEditable() const {
     return m_sel.isContentRichlyEditable();
   }
+  Node* shadowTreeRootNode() const { return m_sel.shadowTreeRootNode(); }
 
   void moveTo(const Range*, EAffinity, bool userTriggered = false);
   void moveTo(const VisiblePosition&, bool userTriggered = false);

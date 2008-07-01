@@ -556,6 +556,10 @@ Element* Selection::rootEditableElement() const {
   return editableRootForPosition(start());
 }
 
+Node* Selection::shadowTreeRootNode() const {
+  return start().node() ? start().node()->shadowTreeRootNode() : 0;
+}
+
 void Selection::debugPosition() const {
   if (!m_start.node())
     return;
