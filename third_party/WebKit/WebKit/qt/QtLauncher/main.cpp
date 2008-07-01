@@ -196,10 +196,6 @@ class MainWindow : public QMainWindow {
   void loadFinished() { urlEdit->setText(view->url().toString()); }
   void showLinkHover(const QString& link, const QString& toolTip) {
     statusBar()->showMessage(link);
-#ifndef QT_NO_TOOLTIP
-    if (!toolTip.isEmpty())
-      QToolTip::showText(QCursor::pos(), toolTip);
-#endif
   }
   void print() {
 #if QT_VERSION >= 0x040400
