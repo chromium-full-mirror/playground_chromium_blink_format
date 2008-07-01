@@ -78,12 +78,6 @@ class Widget;
 template <typename T>
 class Timer;
 
-enum WritingDirection {
-  NaturalWritingDirection,
-  LeftToRightWritingDirection,
-  RightToLeftWritingDirection
-};
-
 class Frame : public RefCounted<Frame> {
  public:
   static PassRefPtr<Frame> create(Page* page,
@@ -351,8 +345,6 @@ class Frame : public RefCounted<Frame> {
   void setSelectionFromNone();
 
   void setUseSecureKeyboardEntry(bool);
-
-  void setSelectionBaseWritingDirection(WritingDirection);
 
  private:
   void caretBlinkTimerFired(Timer<Frame>*);

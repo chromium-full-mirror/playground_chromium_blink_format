@@ -63,6 +63,11 @@ enum EditorCommandSource {
   CommandFromDOM,
   CommandFromDOMWithUserInterface
 };
+enum WritingDirection {
+  NaturalWritingDirection,
+  LeftToRightWritingDirection,
+  RightToLeftWritingDirection
+};
 
 class Editor {
  public:
@@ -232,7 +237,7 @@ class Editor {
   void showColorPanel();
   void toggleBold();
   void toggleUnderline();
-  void setBaseWritingDirection(const String&);
+  void setBaseWritingDirection(WritingDirection);
 
   bool smartInsertDeleteEnabled();
 
