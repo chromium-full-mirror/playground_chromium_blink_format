@@ -36,7 +36,7 @@ class SVGFEMergeElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFEMerge* filterEffect(SVGResourceFilter*) const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
   mutable RefPtr<SVGFEMerge> m_filterEffect;

@@ -39,7 +39,7 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFEColorMatrix* filterEffect(SVGResourceFilter*) const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,

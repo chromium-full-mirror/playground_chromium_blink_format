@@ -59,10 +59,10 @@ SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       SVGFitToViewBox(),
-      m_x(SVGLength(this, LengthModeWidth)),
-      m_y(SVGLength(this, LengthModeHeight)),
-      m_width(SVGLength(this, LengthModeWidth)),
-      m_height(SVGLength(this, LengthModeHeight)),
+      m_x(this, LengthModeWidth),
+      m_y(this, LengthModeHeight),
+      m_width(this, LengthModeWidth),
+      m_height(this, LengthModeHeight),
       m_patternUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
       m_patternContentUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE),
       m_patternTransform(
@@ -118,14 +118,14 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGPatternElement,
                               height,
                               SVGNames::heightAttr,
                               m_height)
-ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED(SVGPatternElement,
-                                         SVGTransformList,
-                                         TransformList,
-                                         transformList,
-                                         PatternTransform,
-                                         patternTransform,
-                                         SVGNames::patternTransformAttr,
-                                         m_patternTransform)
+ANIMATED_PROPERTY_DEFINITIONS(SVGPatternElement,
+                              SVGTransformList*,
+                              TransformList,
+                              transformList,
+                              PatternTransform,
+                              patternTransform,
+                              SVGNames::patternTransformAttr,
+                              m_patternTransform.get())
 
 void SVGPatternElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::patternUnitsAttr) {

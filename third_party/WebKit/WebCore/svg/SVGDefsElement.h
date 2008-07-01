@@ -44,11 +44,10 @@ class SVGDefsElement : public SVGStyledTransformableElement,
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGDefsElement,
-                                         SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)

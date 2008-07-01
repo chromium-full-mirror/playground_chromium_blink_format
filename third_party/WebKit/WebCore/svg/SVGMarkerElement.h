@@ -33,6 +33,9 @@
 
 namespace WebCore {
 
+class Document;
+class SVGAngle;
+
 class SVGMarkerElement : public SVGStyledElement,
                          public SVGLangSpace,
                          public SVGExternalResourcesRequired,
@@ -67,21 +70,18 @@ class SVGMarkerElement : public SVGStyledElement,
   virtual SVGResource* canvasResource();
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGMarkerElement,
-                                         SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGMarkerElement,
-                                         SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
                                          FloatRect,
                                          ViewBox,
                                          viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGMarkerElement,
-                                         SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
                                          SVGPreserveAspectRatio*,
                                          PreserveAspectRatio,
                                          preserveAspectRatio)

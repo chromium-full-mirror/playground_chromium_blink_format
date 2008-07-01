@@ -47,7 +47,7 @@ class SVGAltGlyphElement : public SVGTextPositioningElement,
   SVGGlyphElement* glyphElement() const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 };
 
 }  // namespace WebCore

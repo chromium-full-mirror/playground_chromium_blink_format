@@ -55,7 +55,7 @@ class SVGExternalResourcesRequired {
   bool isKnownAttribute(const QualifiedName&);
 
  protected:
-  virtual SVGElement* contextElement() = 0;
+  virtual const SVGElement* contextElement() const = 0;
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS_WITH_CONTEXT(SVGExternalResourcesRequired,

@@ -40,8 +40,6 @@ class SVGLengthList : public SVGPODList<SVGLength> {
              const SVGStyledElement* context,
              SVGLengthMode mode);
 
-  String valueAsString() const;
-
  private:
   SVGLengthList(const QualifiedName&);
 };

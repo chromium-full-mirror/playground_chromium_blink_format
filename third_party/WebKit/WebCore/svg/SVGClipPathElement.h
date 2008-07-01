@@ -53,14 +53,14 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
   virtual SVGResource* canvasResource();
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGClipPathElement,
-                                         SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
+
   ANIMATED_PROPERTY_DECLARATIONS(SVGClipPathElement,
                                  int,
                                  int,

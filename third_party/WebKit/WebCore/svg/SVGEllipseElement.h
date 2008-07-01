@@ -47,12 +47,11 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
   virtual Path toPathData() const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
   virtual bool hasRelativeValues() const;
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGEllipseElement,
-                                         SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)

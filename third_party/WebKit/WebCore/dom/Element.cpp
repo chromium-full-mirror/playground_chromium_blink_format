@@ -92,15 +92,8 @@ Element::Element(const QualifiedName& qName, Document* doc)
     : ContainerNode(doc),
       m_tagName(qName),
       m_isStyleAttributeValid(true),
-      m_synchronizingStyleAttribute(false)
-#if ENABLE(SVG)
-      ,
-      m_areSVGAttributesValid(true),
-      m_synchronizingSVGAttributes(false)
-#endif
-      ,
-      m_parsingChildrenFinished(true) {
-}
+      m_synchronizingStyleAttribute(false),
+      m_parsingChildrenFinished(true) {}
 
 Element::~Element() {
   if (namedAttrMap)
@@ -184,12 +177,6 @@ NamedAttrMap* Element::attributes() const {
 NamedAttrMap* Element::attributes(bool readonly) const {
   if (!m_isStyleAttributeValid)
     updateStyleAttribute();
-
-#if ENABLE(SVG)
-  if (!m_areSVGAttributesValid)
-    updateAnimatedSVGAttribute(0);
-#endif
-
   if (!readonly && !namedAttrMap)
     createAttributeMap();
   return namedAttrMap.get();
@@ -210,11 +197,6 @@ bool Element::hasAttribute(const QualifiedName& name) const {
 const AtomicString& Element::getAttribute(const QualifiedName& name) const {
   if (name == styleAttr && !m_isStyleAttributeValid)
     updateStyleAttribute();
-
-#if ENABLE(SVG)
-  if (!m_areSVGAttributesValid)
-    updateAnimatedSVGAttribute(name.localName().impl());
-#endif
 
   if (namedAttrMap)
     if (Attribute* a = namedAttrMap->getAttributeItem(name))
@@ -456,11 +438,6 @@ const AtomicString& Element::getAttribute(const String& name) const {
   if (localName == styleAttr.localName() && !m_isStyleAttributeValid)
     updateStyleAttribute();
 
-#if ENABLE(SVG)
-  if (!m_areSVGAttributesValid)
-    updateAnimatedSVGAttribute(name.impl());
-#endif
-
   if (namedAttrMap)
     if (Attribute* a = namedAttrMap->getAttributeItem(localName))
       return a->value();
@@ -578,12 +555,6 @@ void Element::setAttributeMap(PassRefPtr<NamedAttrMap> list) {
 bool Element::hasAttributes() const {
   if (!m_isStyleAttributeValid)
     updateStyleAttribute();
-
-#if ENABLE(SVG)
-  if (!m_areSVGAttributesValid)
-    updateAnimatedSVGAttribute(0);
-#endif
-
   return namedAttrMap && namedAttrMap->length() > 0;
 }
 

@@ -38,7 +38,7 @@ class SVGFontElement : public SVGStyledElement,
   virtual ~SVGFontElement();
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
   void invalidateGlyphCache();
 

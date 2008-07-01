@@ -44,20 +44,17 @@ class SVGSymbolElement : public SVGStyledElement,
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGSymbolElement,
-                                         SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGSymbolElement,
-                                         SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
                                          FloatRect,
                                          ViewBox,
                                          viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGSymbolElement,
-                                         SVGFitToViewBox,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
                                          SVGPreserveAspectRatio*,
                                          PreserveAspectRatio,
                                          preserveAspectRatio)

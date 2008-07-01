@@ -38,7 +38,7 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFEComposite* filterEffect(SVGResourceFilter*) const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFECompositeElement,

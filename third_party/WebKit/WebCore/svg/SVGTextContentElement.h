@@ -64,8 +64,7 @@ class SVGTextContentElement : public SVGStyledElement,
   bool isKnownAttribute(const QualifiedName&);
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGTextContentElement,
-                                         SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)

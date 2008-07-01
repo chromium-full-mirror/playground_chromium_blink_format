@@ -46,7 +46,7 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
   void setStandardAttributes(SVGFilterEffect*) const;
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterPrimitiveStandardAttributes,

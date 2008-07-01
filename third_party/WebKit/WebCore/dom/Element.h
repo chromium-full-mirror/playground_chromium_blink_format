@@ -233,10 +233,6 @@ class Element : public ContainerNode {
 
   virtual void updateStyleAttribute() const {}
 
-#if ENABLE(SVG)
-  virtual void updateAnimatedSVGAttribute(StringImpl* name) const {}
-#endif
-
   void updateFocusAppearanceSoonAfterAttach();
   void cancelFocusAppearanceUpdate();
 
@@ -253,13 +249,6 @@ class Element : public ContainerNode {
   // Element bits.
   mutable bool m_isStyleAttributeValid : 1;
   mutable bool m_synchronizingStyleAttribute : 1;
-
-#if ENABLE(SVG)
-  // These bit is are used by SVGElement subclasses, and it lives here for the
-  // same reason as above.
-  mutable bool m_areSVGAttributesValid : 1;
-  mutable bool m_synchronizingSVGAttributes : 1;
-#endif
 
  private:
   bool m_parsingChildrenFinished : 1;

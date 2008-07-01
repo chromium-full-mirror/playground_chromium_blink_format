@@ -50,16 +50,11 @@ class SVGFilterElement : public SVGStyledElement,
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
  protected:
-  virtual SVGElement* contextElement() { return this; }
+  virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFilterElement,
-                                         SVGURIReference,
-                                         String,
-                                         Href,
-                                         href)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFilterElement,
-                                         SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
@@ -104,3 +99,5 @@ class SVGFilterElement : public SVGStyledElement,
 
 #endif  // ENABLE(SVG)
 #endif
+
+// vim:ts=4:noet
