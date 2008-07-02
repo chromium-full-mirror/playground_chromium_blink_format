@@ -37,6 +37,11 @@ JSValue* PropertySlot::undefinedGetter(ExecState*,
 JSValue* PropertySlot::functionGetter(ExecState* exec,
                                       const Identifier&,
                                       const PropertySlot& slot) {
+  // Prevent getter functions from observing execution if an exception is
+  // pending.
+  if (exec->hadException())
+    return exec->exception();
+
   CallData callData;
   CallType callType = slot.m_data.getterFunc->getCallData(callData);
   if (callType == CallTypeNative)
