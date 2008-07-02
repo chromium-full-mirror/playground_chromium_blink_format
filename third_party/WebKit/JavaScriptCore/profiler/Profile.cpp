@@ -26,10 +26,11 @@
 #include "config.h"
 #include "Profile.h"
 
-#include "ProfileNode.h"
-#include "JSGlobalObject.h"
 #include "ExecState.h"
 #include "JSFunction.h"
+#include "JSGlobalObject.h"
+#include "ProfileNode.h"
+#include "TreeProfile.h"
 
 #include <stdio.h>
 
@@ -41,8 +42,8 @@ PassRefPtr<Profile> Profile::create(const UString& title,
                                     ExecState* originatingGlobalExec,
                                     unsigned pageGroupIdentifier,
                                     ProfilerClient* client) {
-  return adoptRef(
-      new Profile(title, originatingGlobalExec, pageGroupIdentifier, client));
+  return TreeProfile::create(title, originatingGlobalExec, pageGroupIdentifier,
+                             client);
 }
 
 Profile::Profile(const UString& title,
@@ -60,6 +61,8 @@ Profile::Profile(const UString& title,
   m_head = ProfileNode::create(CallIdentifier("Thread_1", 0, 0), 0, 0);
   m_currentNode = m_head;
 }
+
+Profile::~Profile() {}
 
 void Profile::stopProfiling() {
   forEach(&ProfileNode::stopProfiling);

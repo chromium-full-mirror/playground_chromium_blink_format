@@ -41,6 +41,7 @@ class Profile : public RefCounted<Profile> {
                                     ExecState* originatingGlobalExec,
                                     unsigned pageGroupIdentifier,
                                     ProfilerClient*);
+  virtual ~Profile();
 
   void willExecute(const CallIdentifier&);
   void didExecute(const CallIdentifier&);
@@ -82,6 +83,9 @@ class Profile : public RefCounted<Profile> {
 
   bool stoppedProfiling() { return m_stoppedProfiling; }
 
+  virtual Profile* heavyProfile() = 0;
+  virtual Profile* treeProfile() = 0;
+
 #ifndef NDEBUG
   void debugPrintData() const;
   void debugPrintDataSampleStyle() const;
@@ -89,12 +93,13 @@ class Profile : public RefCounted<Profile> {
   typedef void (Profile::*ProfileFunction)(
       const CallIdentifier& callIdentifier);
 
- private:
+ protected:
   Profile(const UString& title,
           ExecState* originatingGlobalExec,
           unsigned pageGroupIdentifier,
           ProfilerClient*);
 
+ private:
   void removeProfileStart();
   void removeProfileEnd();
 
