@@ -28,6 +28,8 @@
 #include <wtf/HashCountedSet.h>
 #include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/OwnPtr.h>
+#include <wtf/Threading.h>
 
 namespace KJS {
 
@@ -77,6 +79,7 @@ class Heap : Noncopyable {
 
   size_t size();
 
+  void setGCProtectNeedsLocking();
   void protect(JSValue*);
   void unprotect(JSValue*);
 
@@ -105,6 +108,8 @@ class Heap : Noncopyable {
     return *m_markListSet;
   }
 
+  bool isShared() const { return m_isShared; }
+
  private:
   template <Heap::HeapType heapType>
   void* heapAllocate(size_t);
@@ -114,9 +119,8 @@ class Heap : Noncopyable {
   static CollectorBlock* cellBlock(JSCell*);
   static size_t cellOffset(const JSCell*);
 
-  friend class Machine;
   friend class JSGlobalData;
-  Heap();
+  Heap(bool isShared);
   ~Heap();
 
   void recordExtraCost(size_t);
@@ -130,8 +134,15 @@ class Heap : Noncopyable {
 
   CollectorHeap primaryHeap;
   CollectorHeap numberHeap;
-  ProtectCountSet protectedValues;
+
+  OwnPtr<Mutex> m_protectedValuesMutex;  // Only non-null if the client
+                                         // explicitly requested it via
+                                         // setGCPrtotectNeedsLocking().
+  ProtectCountSet m_protectedValues;
+
   HashSet<ArgList*>* m_markListSet;
+
+  bool m_isShared;
 };
 
 // tunable parameters

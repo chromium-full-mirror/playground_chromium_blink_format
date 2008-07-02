@@ -75,6 +75,7 @@
 #include "npruntime_impl.h"
 #include "runtime_root.h"
 #include "visible_units.h"
+#include <JavaScriptCore/JSLock.h>
 
 #if FRAME_LOADS_USER_STYLESHEET
 #include "UserStyleSheetLoader.h"
@@ -1060,7 +1061,7 @@ KJS::Bindings::RootObject* Frame::bindingRootObject() {
     return 0;
 
   if (!d->m_bindingRootObject) {
-    JSLock lock;
+    JSLock lock(false);
     d->m_bindingRootObject =
         KJS::Bindings::RootObject::create(0, script()->globalObject());
   }
@@ -1088,7 +1089,7 @@ NPObject* Frame::windowScriptNPObject() {
       // JavaScript is enabled, so there is a JavaScript window object.  Return
       // an NPObject bound to the window
       // object.
-      KJS::JSLock lock;
+      KJS::JSLock lock(false);
       KJS::JSObject* win = toJSDOMWindow(this);
       ASSERT(win);
       KJS::Bindings::RootObject* root = bindingRootObject();
@@ -1129,7 +1130,7 @@ void Frame::cleanupScriptObjectsForPlugin(void* nativeHandle) {
 }
 
 void Frame::clearScriptObjects() {
-  JSLock lock;
+  JSLock lock(false);
 
   RootObjectMap::const_iterator end = d->m_rootObjects.end();
   for (RootObjectMap::const_iterator it = d->m_rootObjects.begin(); it != end;

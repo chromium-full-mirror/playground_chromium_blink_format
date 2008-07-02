@@ -44,8 +44,8 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
                             JSStringRef sourceURL,
                             int startingLineNumber,
                             JSValueRef* exception) {
-  JSLock lock;
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
   JSObject* jsThisObject = toJS(thisObject);
   UString::Rep* scriptRep = toJS(script);
   UString::Rep* sourceURLRep =
@@ -76,9 +76,8 @@ bool JSCheckScriptSyntax(JSContextRef ctx,
                          JSStringRef sourceURL,
                          int startingLineNumber,
                          JSValueRef* exception) {
-  JSLock lock;
-
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
   UString::Rep* scriptRep = toJS(script);
   UString::Rep* sourceURLRep =
       sourceURL ? toJS(sourceURL) : &UString::Rep::null;
@@ -105,13 +104,13 @@ void JSGarbageCollect(JSContextRef ctx) {
   // and it may actually be garbage for some clients (most likely, because of
   // JSGarbageCollect being called after releasing the context).
 
-  JSLock lock;
-
   // FIXME: It would be good to avoid creating a JSGlobalData instance if it
   // didn't exist for this thread yet.
   Heap* heap = JSGlobalData::threadInstance().heap;
   if (!heap->isBusy())
     heap->collect();
+
+  JSLock lock(true);
 
   // FIXME: Similarly, we shouldn't create a shared instance here.
   heap = JSGlobalData::sharedInstance().heap;

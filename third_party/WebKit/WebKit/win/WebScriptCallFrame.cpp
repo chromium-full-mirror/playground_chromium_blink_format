@@ -180,7 +180,7 @@ WebScriptCallFrame::stringByEvaluatingJavaScriptFromString(
 
   *result = 0;
 
-  JSLock lock;
+  JSLock lock(false);
 
   JSValue* scriptExecutionResult =
       valueByEvaluatingJavaScriptFromString(script);

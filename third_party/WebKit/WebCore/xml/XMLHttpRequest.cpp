@@ -42,6 +42,7 @@
 #include "XMLHttpRequestException.h"
 #include "XMLHttpRequestProgressEvent.h"
 #include "markup.h"
+#include <JavaScriptCore/JSLock.h>
 
 namespace WebCore {
 
@@ -644,13 +645,9 @@ void XMLHttpRequest::loadRequestSynchronously(ResourceRequest& request,
   ResourceError error;
   ResourceResponse response;
 
-  {
-    // avoid deadlock in case the loader wants to use JS on a background thread
-    KJS::JSLock::DropAllLocks dropLocks;
-    if (m_doc->frame())
-      m_identifier = m_doc->frame()->loader()->loadResourceSynchronously(
-          request, error, response, data);
-  }
+  if (m_doc->frame())
+    m_identifier = m_doc->frame()->loader()->loadResourceSynchronously(
+        request, error, response, data);
 
   m_loader = 0;
 
@@ -694,7 +691,6 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
     // and they are referenced by the JavaScript wrapper.
     ref();
 
-    KJS::JSLock lock;
     gcProtectNullTolerant(ScriptInterpreter::getDOMObject(this));
   }
 }
@@ -742,7 +738,7 @@ void XMLHttpRequest::internalAbort() {
 void XMLHttpRequest::clearResponse() {
   m_response = ResourceResponse();
   {
-    KJS::JSLock lock;
+    KJS::JSLock lock(false);
     m_responseText = "";
   }
   m_createdDocument = false;
@@ -777,7 +773,6 @@ void XMLHttpRequest::abortError() {
 
 void XMLHttpRequest::dropProtection() {
   {
-    KJS::JSLock lock;
     KJS::JSValue* wrapper = ScriptInterpreter::getDOMObject(this);
     KJS::gcUnprotectNullTolerant(wrapper);
 
@@ -789,8 +784,8 @@ void XMLHttpRequest::dropProtection() {
     // report the extra cost at that point.
 
     if (wrapper)
-      KJS::JSGlobalData::threadInstance().heap->reportExtraMemoryCost(
-          m_responseText.size() * 2);
+      KJS::Heap::heap(wrapper)->reportExtraMemoryCost(m_responseText.size() *
+                                                      2);
   }
 
   deref();
@@ -996,7 +991,7 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
     changeState(HEADERS_RECEIVED);
 
   {
-    KJS::JSLock lock;
+    KJS::JSLock lock(false);
     if (m_decoder)
       m_responseText += m_decoder->flush();
   }
@@ -1106,7 +1101,7 @@ void XMLHttpRequest::didReceiveData(SubresourceLoader*,
   String decoded = m_decoder->decode(data, len);
 
   {
-    KJS::JSLock lock;
+    KJS::JSLock lock(false);
     m_responseText += decoded;
   }
 

@@ -116,8 +116,9 @@ bool JSValueIsEqual(JSContextRef ctx,
                     JSValueRef a,
                     JSValueRef b,
                     JSValueRef* exception) {
-  JSLock lock;
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
   JSValue* jsA = toJS(a);
   JSValue* jsB = toJS(b);
 
@@ -130,10 +131,7 @@ bool JSValueIsEqual(JSContextRef ctx,
   return result;
 }
 
-bool JSValueIsStrictEqual(JSContextRef ctx, JSValueRef a, JSValueRef b) {
-  UNUSED_PARAM(ctx);
-
-  JSLock lock;
+bool JSValueIsStrictEqual(JSContextRef, JSValueRef a, JSValueRef b) {
   JSValue* jsA = toJS(a);
   JSValue* jsB = toJS(b);
 
@@ -145,8 +143,9 @@ bool JSValueIsInstanceOfConstructor(JSContextRef ctx,
                                     JSValueRef value,
                                     JSObjectRef constructor,
                                     JSValueRef* exception) {
-  JSLock lock;
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
   JSValue* jsValue = toJS(value);
   JSObject* jsConstructor = toJS(constructor);
   if (!jsConstructor->implementsHasInstance())
@@ -174,14 +173,18 @@ JSValueRef JSValueMakeBoolean(JSContextRef, bool value) {
 }
 
 JSValueRef JSValueMakeNumber(JSContextRef ctx, double value) {
-  JSLock lock;
-  return toRef(jsNumber(toJS(ctx), value));
+  ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
+  return toRef(jsNumber(exec, value));
 }
 
 JSValueRef JSValueMakeString(JSContextRef ctx, JSStringRef string) {
-  JSLock lock;
+  ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
   UString::Rep* rep = toJS(string);
-  return toRef(jsString(toJS(ctx), UString(rep)));
+  return toRef(jsString(exec, UString(rep)));
 }
 
 bool JSValueToBoolean(JSContextRef ctx, JSValueRef value) {
@@ -193,9 +196,10 @@ bool JSValueToBoolean(JSContextRef ctx, JSValueRef value) {
 double JSValueToNumber(JSContextRef ctx,
                        JSValueRef value,
                        JSValueRef* exception) {
-  JSLock lock;
-  JSValue* jsValue = toJS(value);
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
+  JSValue* jsValue = toJS(value);
 
   double number = jsValue->toNumber(exec);
   if (exec->hadException()) {
@@ -210,9 +214,10 @@ double JSValueToNumber(JSContextRef ctx,
 JSStringRef JSValueToStringCopy(JSContextRef ctx,
                                 JSValueRef value,
                                 JSValueRef* exception) {
-  JSLock lock;
-  JSValue* jsValue = toJS(value);
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
+  JSValue* jsValue = toJS(value);
 
   JSStringRef stringRef = toRef(jsValue->toString(exec).rep()->ref());
   if (exec->hadException()) {
@@ -227,8 +232,9 @@ JSStringRef JSValueToStringCopy(JSContextRef ctx,
 JSObjectRef JSValueToObject(JSContextRef ctx,
                             JSValueRef value,
                             JSValueRef* exception) {
-  JSLock lock;
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
   JSValue* jsValue = toJS(value);
 
   JSObjectRef objectRef = toRef(jsValue->toObject(exec));
@@ -241,14 +247,18 @@ JSObjectRef JSValueToObject(JSContextRef ctx,
   return objectRef;
 }
 
-void JSValueProtect(JSContextRef, JSValueRef value) {
-  JSLock lock;
+void JSValueProtect(JSContextRef ctx, JSValueRef value) {
+  ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
   JSValue* jsValue = toJS(value);
   gcProtect(jsValue);
 }
 
-void JSValueUnprotect(JSContextRef, JSValueRef value) {
-  JSLock lock;
+void JSValueUnprotect(JSContextRef ctx, JSValueRef value) {
+  ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
   JSValue* jsValue = toJS(value);
   gcUnprotect(jsValue);
 }

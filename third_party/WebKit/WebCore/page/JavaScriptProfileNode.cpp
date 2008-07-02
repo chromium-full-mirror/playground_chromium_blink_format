@@ -31,9 +31,10 @@
 #include <JavaScriptCore/APICast.h>
 #include <JavaScriptCore/JSObjectRef.h>
 #include <JavaScriptCore/JSContextRef.h>
+#include <JavaScriptCore/JSLock.h>
 #include <JavaScriptCore/JSRetainPtr.h>
 #include <JavaScriptCore/JSStringRef.h>
-#include <kjs/JSValue.h>
+#include <JavaScriptCore/JSValue.h>
 
 using namespace KJS;
 
@@ -94,7 +95,7 @@ static JSValueRef getTotalTime(JSContextRef ctx,
                                JSObjectRef thisObject,
                                JSStringRef propertyName,
                                JSValueRef* exception) {
-  KJS::JSLock lock;
+  KJS::JSLock lock(false);
 
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);
@@ -108,7 +109,7 @@ static JSValueRef getSelfTime(JSContextRef ctx,
                               JSObjectRef thisObject,
                               JSStringRef propertyName,
                               JSValueRef* exception) {
-  KJS::JSLock lock;
+  KJS::JSLock lock(false);
 
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);
@@ -122,7 +123,7 @@ static JSValueRef getTotalPercent(JSContextRef ctx,
                                   JSObjectRef thisObject,
                                   JSStringRef propertyName,
                                   JSValueRef* exception) {
-  KJS::JSLock lock;
+  KJS::JSLock lock(false);
 
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);
@@ -136,7 +137,7 @@ static JSValueRef getSelfPercent(JSContextRef ctx,
                                  JSObjectRef thisObject,
                                  JSStringRef propertyName,
                                  JSValueRef* exception) {
-  KJS::JSLock lock;
+  KJS::JSLock lock(false);
 
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);
@@ -150,7 +151,7 @@ static JSValueRef getNumberOfCalls(JSContextRef ctx,
                                    JSObjectRef thisObject,
                                    JSStringRef propertyName,
                                    JSValueRef* exception) {
-  KJS::JSLock lock;
+  KJS::JSLock lock(false);
 
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);
@@ -164,7 +165,7 @@ static JSValueRef getChildren(JSContextRef ctx,
                               JSObjectRef thisObject,
                               JSStringRef propertyName,
                               JSValueRef* exception) {
-  KJS::JSLock lock;
+  KJS::JSLock lock(false);
 
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);
@@ -219,7 +220,7 @@ static JSValueRef getVisible(JSContextRef ctx,
                              JSObjectRef thisObject,
                              JSStringRef propertyName,
                              JSValueRef* exception) {
-  KJS::JSLock lock;
+  KJS::JSLock lock(false);
 
   if (!JSValueIsObjectOfClass(ctx, thisObject, ProfileNodeClass()))
     return JSValueMakeUndefined(ctx);

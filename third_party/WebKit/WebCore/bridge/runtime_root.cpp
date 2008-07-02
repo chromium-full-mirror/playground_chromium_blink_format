@@ -110,10 +110,8 @@ void RootObject::invalidate() {
 
   ProtectCountSet::iterator end = m_protectCountSet.end();
   for (ProtectCountSet::iterator it = m_protectCountSet.begin(); it != end;
-       ++it) {
-    JSLock lock;
+       ++it)
     KJS::gcUnprotect(it->first);
-  }
   m_protectCountSet.clear();
 
   rootObjectSet()->remove(this);
@@ -122,10 +120,8 @@ void RootObject::invalidate() {
 void RootObject::gcProtect(JSObject* jsObject) {
   ASSERT(m_isValid);
 
-  if (!m_protectCountSet.contains(jsObject)) {
-    JSLock lock;
+  if (!m_protectCountSet.contains(jsObject))
     KJS::gcProtect(jsObject);
-  }
   m_protectCountSet.add(jsObject);
 }
 
@@ -135,10 +131,8 @@ void RootObject::gcUnprotect(JSObject* jsObject) {
   if (!jsObject)
     return;
 
-  if (m_protectCountSet.count(jsObject) == 1) {
-    JSLock lock;
+  if (m_protectCountSet.count(jsObject) == 1)
     KJS::gcUnprotect(jsObject);
-  }
   m_protectCountSet.remove(jsObject);
 }
 

@@ -53,6 +53,7 @@
 #include "XMLNames.h"
 #include "htmlediting.h"
 #include "JSDOMBinding.h"
+#include <JavaScriptCore/JSLock.h>
 
 namespace WebCore {
 
@@ -150,7 +151,7 @@ void Node::setDocument(Document* doc) {
   willMoveToNewOwnerDocument();
 
   {
-    KJS::JSLock lock;
+    KJS::JSLock lock(false);
     ScriptInterpreter::updateDOMNodeDocument(this, m_document.get(), doc);
   }
   m_document = doc;

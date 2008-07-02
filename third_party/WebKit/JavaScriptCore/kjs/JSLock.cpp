@@ -24,6 +24,8 @@
 #include "JSLock.h"
 
 #include "collector.h"
+#include "ExecState.h"
+
 #if USE(MULTIPLE_THREADS)
 #include <pthread.h>
 #endif
@@ -35,63 +37,112 @@ namespace KJS {
 // Acquire this mutex before accessing lock-related data.
 static pthread_mutex_t JSMutex = PTHREAD_MUTEX_INITIALIZER;
 
-// Thread-specific key that tells whether a thread holds the JSMutex.
-pthread_key_t didLockJSMutex;
+// Thread-specific key that tells whether a thread holds the JSMutex, and how
+// many times it was taken recursively.
+pthread_key_t JSLockCount;
+
+static void createJSLockCount() {
+  pthread_key_create(&JSLockCount, 0);
+}
+
+pthread_once_t createJSLockCountOnce = PTHREAD_ONCE_INIT;
 
 // Lock nesting count.
-static int JSLockCount;
+int JSLock::lockCount() {
+  pthread_once(&createJSLockCountOnce, createJSLockCount);
 
-static void createDidLockJSMutex() {
-  pthread_key_create(&didLockJSMutex, 0);
+  return reinterpret_cast<int>(pthread_getspecific(JSLockCount));
 }
-pthread_once_t createDidLockJSMutexOnce = PTHREAD_ONCE_INIT;
 
-void JSLock::lock() {
-  pthread_once(&createDidLockJSMutexOnce, createDidLockJSMutex);
+static void setLockCount(int count) {
+  pthread_setspecific(JSLockCount, reinterpret_cast<void*>(count));
+}
 
-  if (!pthread_getspecific(didLockJSMutex)) {
+JSLock::JSLock(ExecState* exec)
+    : m_lockingForReal(exec->globalData().isSharedInstance) {
+  lock(m_lockingForReal);
+  if (m_lockingForReal)
+    registerThread();
+}
+
+void JSLock::lock(bool lockForReal) {
+#ifdef NDEBUG
+  // For per-thread contexts, locking is a debug-only feature.
+  if (!lockForReal)
+    return;
+#endif
+
+  pthread_once(&createJSLockCountOnce, createJSLockCount);
+
+  int currentLockCount = lockCount();
+  if (!currentLockCount && lockForReal) {
     int result;
     result = pthread_mutex_lock(&JSMutex);
     ASSERT(!result);
-    pthread_setspecific(didLockJSMutex, &didLockJSMutex);
   }
-  ++JSLockCount;
+  setLockCount(currentLockCount + 1);
 }
 
-void JSLock::unlock() {
-  ASSERT(JSLockCount);
-  ASSERT(!!pthread_getspecific(didLockJSMutex));
+void JSLock::unlock(bool lockForReal) {
+  ASSERT(lockCount());
 
-  --JSLockCount;
-  if (!JSLockCount) {
-    pthread_setspecific(didLockJSMutex, 0);
+#ifdef NDEBUG
+  // For per-thread contexts, locking is a debug-only feature.
+  if (!lockForReal)
+    return;
+#endif
+
+  int newLockCount = lockCount() - 1;
+  setLockCount(newLockCount);
+  if (!newLockCount && lockForReal) {
     int result;
     result = pthread_mutex_unlock(&JSMutex);
     ASSERT(!result);
   }
 }
 
+void JSLock::lock(ExecState* exec) {
+  lock(exec->globalData().isSharedInstance);
+}
+
+void JSLock::unlock(ExecState* exec) {
+  unlock(exec->globalData().isSharedInstance);
+}
+
 bool JSLock::currentThreadIsHoldingLock() {
-  pthread_once(&createDidLockJSMutexOnce, createDidLockJSMutex);
-  return !!pthread_getspecific(didLockJSMutex);
+  pthread_once(&createJSLockCountOnce, createJSLockCount);
+  return !!pthread_getspecific(JSLockCount);
 }
 
 void JSLock::registerThread() {
   Heap::registerThread();
 }
 
-JSLock::DropAllLocks::DropAllLocks() : m_lockCount(0) {
-  pthread_once(&createDidLockJSMutexOnce, createDidLockJSMutex);
+JSLock::DropAllLocks::DropAllLocks(ExecState* exec)
+    : m_lockingForReal(exec->globalData().isSharedInstance) {
+  pthread_once(&createJSLockCountOnce, createJSLockCount);
 
-  m_lockCount = !!pthread_getspecific(didLockJSMutex) ? JSLock::lockCount() : 0;
+  m_lockCount = JSLock::lockCount();
   for (int i = 0; i < m_lockCount; i++)
-    JSLock::unlock();
+    JSLock::unlock(m_lockingForReal);
+}
+
+JSLock::DropAllLocks::DropAllLocks(bool lockingForReal)
+    : m_lockingForReal(lockingForReal) {
+  pthread_once(&createJSLockCountOnce, createJSLockCount);
+
+  // It is necessary to drop even "unreal" locks, because having a non-zero lock
+  // count
+  // will prevent a real lock from being taken.
+
+  m_lockCount = JSLock::lockCount();
+  for (int i = 0; i < m_lockCount; i++)
+    JSLock::unlock(m_lockingForReal);
 }
 
 JSLock::DropAllLocks::~DropAllLocks() {
   for (int i = 0; i < m_lockCount; i++)
-    JSLock::lock();
-  m_lockCount = 0;
+    JSLock::lock(m_lockingForReal);
 }
 
 #else
@@ -99,7 +150,9 @@ JSLock::DropAllLocks::~DropAllLocks() {
 // If threading support is off, set the lock count to a constant value of 1 so
 // assertions
 // that the lock is held don't fail
-const int JSLockCount = 1;
+int JSLock::lockCount() {
+  return 1;
+}
 
 bool JSLock::currentThreadIsHoldingLock() {
   return true;
@@ -116,8 +169,4 @@ JSLock::DropAllLocks::DropAllLocks() {}
 JSLock::DropAllLocks::~DropAllLocks() {}
 
 #endif  // USE(MULTIPLE_THREADS)
-
-int JSLock::lockCount() {
-  return JSLockCount;
-}
 }

@@ -35,6 +35,7 @@
 #include "npruntime_impl.h"
 #include "runtime_root.h"
 #include <kjs/ExecState.h>
+#include <kjs/JSLock.h>
 #include <kjs/JSNumberCell.h>
 #include <kjs/PropertyNameArray.h>
 #include <wtf/Assertions.h>
@@ -89,7 +90,7 @@ JSValue* CInstance::invokeMethod(ExecState* exec,
   VOID_TO_NPVARIANT(resultVariant);
 
   {
-    JSLock::DropAllLocks dropAllLocks;
+    JSLock::DropAllLocks dropAllLocks(false);
     _object->_class->invoke(_object, ident, cArgs.data(), count,
                             &resultVariant);
   }
@@ -118,7 +119,7 @@ JSValue* CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
   {
-    JSLock::DropAllLocks dropAllLocks;
+    JSLock::DropAllLocks dropAllLocks(false);
     _object->_class->invokeDefault(_object, cArgs.data(), count,
                                    &resultVariant);
   }
@@ -173,7 +174,7 @@ void CInstance::getPropertyNames(ExecState* exec,
   NPIdentifier* identifiers;
 
   {
-    JSLock::DropAllLocks dropAllLocks;
+    JSLock::DropAllLocks dropAllLocks(false);
     if (!_object->_class->enumerate(_object, &identifiers, &count))
       return;
   }

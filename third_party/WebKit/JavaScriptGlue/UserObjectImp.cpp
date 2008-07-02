@@ -70,7 +70,7 @@ JSValue* UserObjectImp::callAsFunction(ExecState* exec,
 
     JSUserObject* jsResult;
     {  // scope
-      JSLock::DropAllLocks dropLocks;
+      JSLock::DropAllLocks dropLocks(exec);
 
       // getCallData should have guarded against a NULL fJSUserObject.
       assert(fJSUserObject);

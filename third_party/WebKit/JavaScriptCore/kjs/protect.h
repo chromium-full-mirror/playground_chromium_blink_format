@@ -25,7 +25,6 @@
 
 #include "JSValue.h"
 #include "collector.h"
-#include "JSLock.h"
 
 namespace KJS {
 
@@ -80,40 +79,31 @@ class ProtectedPtr {
 
 template <class T>
 ProtectedPtr<T>::ProtectedPtr(T* ptr) : m_ptr(ptr) {
-  if (ptr) {
-    JSLock lock;
+  if (ptr)
     gcProtect(ptr);
-  }
 }
 
 template <class T>
 ProtectedPtr<T>::ProtectedPtr(const ProtectedPtr& o) : m_ptr(o.get()) {
-  if (T* ptr = m_ptr) {
-    JSLock lock;
+  if (T* ptr = m_ptr)
     gcProtect(ptr);
-  }
 }
 
 template <class T>
 ProtectedPtr<T>::~ProtectedPtr() {
-  if (T* ptr = m_ptr) {
-    JSLock lock;
+  if (T* ptr = m_ptr)
     gcUnprotect(ptr);
-  }
 }
 
 template <class T>
 template <class U>
 ProtectedPtr<T>::ProtectedPtr(const ProtectedPtr<U>& o) : m_ptr(o.get()) {
-  if (T* ptr = m_ptr) {
-    JSLock lock;
+  if (T* ptr = m_ptr)
     gcProtect(ptr);
-  }
 }
 
 template <class T>
 ProtectedPtr<T>& ProtectedPtr<T>::operator=(const ProtectedPtr<T>& o) {
-  JSLock lock;
   T* optr = o.m_ptr;
   gcProtectNullTolerant(optr);
   gcUnprotectNullTolerant(m_ptr);
@@ -123,7 +113,6 @@ ProtectedPtr<T>& ProtectedPtr<T>::operator=(const ProtectedPtr<T>& o) {
 
 template <class T>
 inline ProtectedPtr<T>& ProtectedPtr<T>::operator=(T* optr) {
-  JSLock lock;
   gcProtectNullTolerant(optr);
   gcUnprotectNullTolerant(m_ptr);
   m_ptr = optr;

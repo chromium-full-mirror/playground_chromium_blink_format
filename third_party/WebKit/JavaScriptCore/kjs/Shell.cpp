@@ -224,7 +224,7 @@ JSValue* functionDebug(ExecState* exec,
 }
 
 JSValue* functionGC(ExecState* exec, JSObject*, JSValue*, const ArgList&) {
-  JSLock lock;
+  JSLock lock(false);
   exec->heap()->collect();
   return jsUndefined();
 }
@@ -331,9 +331,9 @@ int main(int argc, char** argv) {
   int res = 0;
   TRY res = jscmain(argc, argv);
 #ifndef NDEBUG
-  JSLock::lock();
+  JSLock::lock(false);
   JSGlobalData::threadInstance().heap->collect();
-  JSLock::unlock();
+  JSLock::unlock(false);
 #endif
   EXCEPT(res = 3)
   return res;
@@ -496,9 +496,9 @@ static void parseArguments(int argc, char** argv, Options& options) {
 }
 
 int jscmain(int argc, char** argv) {
-  initializeThreading();
+  KJS::initializeThreading();
 
-  JSLock lock;
+  JSLock lock(false);
 
   Options options;
   parseArguments(argc, argv, options);
