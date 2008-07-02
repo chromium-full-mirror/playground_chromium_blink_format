@@ -150,7 +150,7 @@ bool PluginView::start() {
   NPError npErr;
   {
     PluginView::setCurrentPluginView(this);
-    KJS::JSLock::DropAllLocks dropAllLocks;
+    KJS::JSLock::DropAllLocks dropAllLocks(false);
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->newp((NPMIMEType)m_mimeType.data(),
                                           m_instance, m_mode, m_paramCount,
@@ -197,7 +197,7 @@ static bool getString(ScriptController* proxy,
                       String& string) {
   if (!proxy || !result || result->isUndefined())
     return false;
-  JSLock lock;
+  JSLock lock(false);
 
   ExecState* exec = proxy->globalObject()->globalExec();
   UString ustring = result->toString(exec);
@@ -239,7 +239,7 @@ void PluginView::performRequest(PluginRequest* request) {
       // has finished loading
       if (request->sendNotification()) {
         PluginView::setCurrentPluginView(this);
-        KJS::JSLock::DropAllLocks dropAllLocks;
+        KJS::JSLock::DropAllLocks dropAllLocks(false);
         setCallingPlugin(true);
         m_plugin->pluginFuncs()->urlnotify(m_instance,
                                            requestURL.string().utf8().data(),
@@ -476,7 +476,7 @@ PassRefPtr<KJS::Bindings::Instance> PluginView::bindingInstance() {
   NPError npErr;
   {
     PluginView::setCurrentPluginView(this);
-    KJS::JSLock::DropAllLocks dropAllLocks;
+    KJS::JSLock::DropAllLocks dropAllLocks(false);
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->getvalue(
         m_instance, NPPVpluginScriptableNPObject, &object);
