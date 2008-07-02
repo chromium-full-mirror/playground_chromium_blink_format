@@ -298,8 +298,7 @@ class JSGlobalObject : public JSVariableObject {
 inline void JSGlobalObject::addStaticGlobals(GlobalPropertyInfo* globals,
                                              int count) {
   size_t registerArraySize = d()->registerArraySize;
-  Register* registerArray = static_cast<Register*>(
-      fastMalloc((registerArraySize + count) * sizeof(Register)));
+  Register* registerArray = new Register[registerArraySize + count];
   if (d()->registerArray)
     memcpy(registerArray + count, d()->registerArray.get(),
            registerArraySize * sizeof(Register));
