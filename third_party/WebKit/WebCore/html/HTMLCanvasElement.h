@@ -131,7 +131,7 @@ class HTMLCanvasElement : public HTMLElement {
 
   bool m_rendererIsCanvas;
 
-  RefPtr<CanvasRenderingContext2D> m_2DContext;
+  OwnPtr<CanvasRenderingContext2D> m_2DContext;
   IntSize m_size;
   CanvasObserver* m_observer;
 

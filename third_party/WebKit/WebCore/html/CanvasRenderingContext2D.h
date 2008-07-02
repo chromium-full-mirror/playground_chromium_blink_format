@@ -51,12 +51,12 @@ class KURL;
 
 typedef int ExceptionCode;
 
-class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
+class CanvasRenderingContext2D : Noncopyable {
  public:
-  static PassRefPtr<CanvasRenderingContext2D> create(
-      HTMLCanvasElement* canvas) {
-    return adoptRef(new CanvasRenderingContext2D(canvas));
-  }
+  CanvasRenderingContext2D(HTMLCanvasElement*);
+
+  void ref();
+  void deref();
 
   HTMLCanvasElement* canvas() const { return m_canvas; }
 
@@ -264,11 +264,8 @@ class CanvasRenderingContext2D : public RefCounted<CanvasRenderingContext2D> {
                     ExceptionCode&);
 
   void reset();
-  void detachCanvas() { m_canvas = 0; }
 
  private:
-  CanvasRenderingContext2D(HTMLCanvasElement*);
-
   struct State {
     State();
 

@@ -77,10 +77,7 @@ HTMLCanvasElement::HTMLCanvasElement(Document* doc)
       m_ignoreReset(false),
       m_createdImageBuffer(false) {}
 
-HTMLCanvasElement::~HTMLCanvasElement() {
-  if (m_2DContext)
-    m_2DContext->detachCanvas();
-}
+HTMLCanvasElement::~HTMLCanvasElement() {}
 
 #if ENABLE(DASHBOARD_SUPPORT)
 
@@ -148,7 +145,7 @@ String HTMLCanvasElement::toDataURL(const String& mimeType, ExceptionCode& ec) {
 CanvasRenderingContext* HTMLCanvasElement::getContext(const String& type) {
   if (type == "2d") {
     if (!m_2DContext)
-      m_2DContext = CanvasRenderingContext2D::create(this);
+      m_2DContext.set(new CanvasRenderingContext2D(this));
     return m_2DContext.get();
   }
   return 0;

@@ -71,6 +71,14 @@ using namespace HTMLNames;
 CanvasRenderingContext2D::CanvasRenderingContext2D(HTMLCanvasElement* canvas)
     : m_canvas(canvas), m_stateStack(1) {}
 
+void CanvasRenderingContext2D::ref() {
+  m_canvas->ref();
+}
+
+void CanvasRenderingContext2D::deref() {
+  m_canvas->deref();
+}
+
 void CanvasRenderingContext2D::reset() {
   m_stateStack.resize(1);
   m_stateStack.first() = State();
@@ -514,10 +522,9 @@ void CanvasRenderingContext2D::rect(float x,
 #if ENABLE(DASHBOARD_SUPPORT)
 void CanvasRenderingContext2D::
     clearPathForDashboardBackwardCompatibilityMode() {
-  if (m_canvas)
-    if (Settings* settings = m_canvas->document()->settings())
-      if (settings->usesDashboardBackwardCompatibilityMode())
-        m_path.clear();
+  if (Settings* settings = m_canvas->document()->settings())
+    if (settings->usesDashboardBackwardCompatibilityMode())
+      m_path.clear();
 }
 #endif
 
@@ -1234,8 +1241,6 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
 }
 
 void CanvasRenderingContext2D::willDraw(const FloatRect& r) {
-  if (!m_canvas)
-    return;
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
@@ -1244,8 +1249,6 @@ void CanvasRenderingContext2D::willDraw(const FloatRect& r) {
 }
 
 GraphicsContext* CanvasRenderingContext2D::drawingContext() const {
-  if (!m_canvas)
-    return 0;
   return m_canvas->drawingContext();
 }
 
@@ -1361,11 +1364,7 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::createImageData(
     float sw,
     float sh) const {
   FloatSize unscaledSize(sw, sh);
-  IntSize scaledSize;
-  if (m_canvas)
-    scaledSize = m_canvas->convertLogicalToDevice(unscaledSize);
-  else
-    scaledSize = IntSize(ceilf(sw), ceilf(sh));
+  IntSize scaledSize = m_canvas->convertLogicalToDevice(unscaledSize);
   if (scaledSize.width() < 1)
     scaledSize.setWidth(1);
   if (scaledSize.height() < 1)
@@ -1386,8 +1385,7 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::getImageData(
   }
 
   FloatRect unscaledRect(sx, sy, sw, sh);
-  IntRect scaledRect = m_canvas ? m_canvas->convertLogicalToDevice(unscaledRect)
-                                : enclosingIntRect(unscaledRect);
+  IntRect scaledRect = m_canvas->convertLogicalToDevice(unscaledRect);
   if (scaledRect.width() < 1)
     scaledRect.setWidth(1);
   if (scaledRect.height() < 1)
@@ -1427,7 +1425,7 @@ void CanvasRenderingContext2D::putImageData(ImageData* data,
     return;
   }
 
-  ImageBuffer* buffer = m_canvas ? m_canvas->buffer() : 0;
+  ImageBuffer* buffer = m_canvas->buffer();
   if (!buffer)
     return;
 
