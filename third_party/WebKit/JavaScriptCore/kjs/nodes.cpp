@@ -1633,18 +1633,22 @@ RegisterID* CaseBlockNode::emitCodeForBlock(CodeGenerator& generator,
 
   // Setup jumps
   for (ClauseListNode* list = m_list1.get(); list; list = list->getNext()) {
-    RegisterID* clauseVal = generator.emitNode(list->getClause()->expr());
-    generator.emitBinaryOp(op_stricteq, clauseVal, clauseVal, switchExpression);
+    RefPtr<RegisterID> clauseVal = generator.newTemporary();
+    generator.emitNode(clauseVal.get(), list->getClause()->expr());
+    generator.emitBinaryOp(op_stricteq, clauseVal.get(), clauseVal.get(),
+                           switchExpression);
     labelVector.append(generator.newLabel());
-    generator.emitJumpIfTrue(clauseVal,
+    generator.emitJumpIfTrue(clauseVal.get(),
                              labelVector[labelVector.size() - 1].get());
   }
 
   for (ClauseListNode* list = m_list2.get(); list; list = list->getNext()) {
-    RegisterID* clauseVal = generator.emitNode(list->getClause()->expr());
-    generator.emitBinaryOp(op_stricteq, clauseVal, clauseVal, switchExpression);
+    RefPtr<RegisterID> clauseVal = generator.newTemporary();
+    generator.emitNode(clauseVal.get(), list->getClause()->expr());
+    generator.emitBinaryOp(op_stricteq, clauseVal.get(), clauseVal.get(),
+                           switchExpression);
     labelVector.append(generator.newLabel());
-    generator.emitJumpIfTrue(clauseVal,
+    generator.emitJumpIfTrue(clauseVal.get(),
                              labelVector[labelVector.size() - 1].get());
   }
 
