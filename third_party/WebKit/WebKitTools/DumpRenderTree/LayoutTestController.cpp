@@ -54,6 +54,7 @@ LayoutTestController::LayoutTestController(
       m_callCloseOnWebViews(true),
       m_canOpenWindows(false),
       m_closeRemainingWindowsWhenComplete(true),
+      m_stopProvisionalFrameLoads(false),
       m_testRepaint(testRepaintDefault),
       m_testRepaintSweepHorizontally(testRepaintSweepHorizontallyDefault),
       m_waitToDump(false),
@@ -873,6 +874,19 @@ static JSValueRef setPopupBlockingEnabledCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setStopProvisionalFrameLoadsCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setStopProvisionalFrameLoads(true);
+  return JSValueMakeUndefined(context);
+}
+
 // Static Values
 
 static JSValueRef getGlobalFlagCallback(JSContextRef context,
@@ -1033,6 +1047,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setPrivateBrowsingEnabled", setPrivateBrowsingEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setPopupBlockingEnabled", setPopupBlockingEnabledCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setStopProvisionalFrameLoads", setStopProvisionalFrameLoadsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setTabKeyCyclesThroughElements", setTabKeyCyclesThroughElementsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
