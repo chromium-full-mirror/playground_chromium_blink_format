@@ -57,7 +57,7 @@ extern const HashTable stringTable;
 
 JSGlobalData::JSGlobalData(bool isShared)
     : machine(new Machine),
-      heap(new Heap(isShared))
+      heap(new Heap(machine, isShared))
 #if USE(MULTIPLE_THREADS)
       ,
       arrayTable(new HashTable(KJS::arrayTable)),
