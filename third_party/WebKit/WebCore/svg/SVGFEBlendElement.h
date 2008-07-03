@@ -24,6 +24,7 @@
 #define SVGFEBlendElement_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#include "FilterBuilder.h"
 #include "SVGFEBlend.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
@@ -34,7 +35,8 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEBlendElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFEBlend* filterEffect(SVGResourceFilter*) const;
+  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
+  bool build(FilterBuilder*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -44,7 +46,7 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement, String, String, In2, in2)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEBlendElement, int, int, Mode, mode)
 
-  mutable RefPtr<SVGFEBlend> m_filterEffect;
+  mutable RefPtr<FEBlend> m_filterEffect;
 };
 
 }  // namespace WebCore

@@ -35,16 +35,16 @@ namespace WebCore {
 class FilterBuilder : public RefCounted<FilterBuilder> {
  public:
   void add(const String& id, PassRefPtr<FilterEffect> effect) {
-    m_namedEffects.set(id, effect);
+    m_namedEffects.set(id.impl(), effect);
   }
   FilterEffect* getEffectById(const String& id) const {
-    return m_namedEffects.get(id).get();
+    return m_namedEffects.get(id.impl()).get();
   }
 
   PassRefPtr<Filter> filter() const { return m_filter; }
 
  private:
-  HashMap<String, RefPtr<FilterEffect>> m_namedEffects;
+  HashMap<StringImpl*, RefPtr<FilterEffect>> m_namedEffects;
 
   RefPtr<Filter> m_filter;
 };
