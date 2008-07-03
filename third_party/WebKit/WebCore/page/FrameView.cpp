@@ -1093,7 +1093,8 @@ void FrameView::updateControlTints() {
     return;
 
   if (theme()->supportsControlTints() && m_frame->contentRenderer()) {
-    layoutIfNeededRecursive();
+    if (needsLayout())
+      layout();
     PlatformGraphicsContext* const noContext = 0;
     GraphicsContext context(noContext);
     context.setUpdatingControlTints(true);
