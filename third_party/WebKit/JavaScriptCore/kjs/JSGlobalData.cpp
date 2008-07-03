@@ -147,8 +147,8 @@ JSGlobalData*& JSGlobalData::threadInstanceInternal() {
   static ThreadSpecific<DataInstance> threadInstance;
   return *threadInstance;
 #else
-  static JSGlobalData threadInstance;
-  return &threadInstance;
+  static JSGlobalData* threadInstance;
+  return threadInstance;
 #endif
 }
 
