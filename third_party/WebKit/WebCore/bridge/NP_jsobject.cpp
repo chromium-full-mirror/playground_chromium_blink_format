@@ -374,17 +374,10 @@ bool _NPN_HasMethod(NPP, NPObject* o, NPIdentifier methodName) {
   return false;
 }
 
-void _NPN_SetException(NPObject* o, const NPUTF8* message) {
-  if (o->_class == NPScriptObjectClass) {
-    JavaScriptObject* obj = (JavaScriptObject*)o;
-    RootObject* rootObject = obj->rootObject;
-    if (!rootObject || !rootObject->isValid())
-      return;
-
-    ExecState* exec = rootObject->globalObject()->globalExec();
-    JSLock lock(false);
-    throwError(exec, GeneralError, message);
-  }
+void _NPN_SetException(NPObject*, const NPUTF8*) {
+  // FIXME:
+  // Bug 19888: Implement _NPN_SetException() correctly
+  // <https://bugs.webkit.org/show_bug.cgi?id=19888>
 }
 
 bool _NPN_Enumerate(NPP,
