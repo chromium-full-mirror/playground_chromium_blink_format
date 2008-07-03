@@ -36,6 +36,7 @@ class JSCell : public JSValue {
   friend class JSValue;
   friend class JSNumberCell;
   friend class JSString;
+  friend class Machine;
 
  private:
   JSCell();
@@ -77,6 +78,9 @@ class JSCell : public JSValue {
 
   // Garbage collection.
   void* operator new(size_t, ExecState*);
+  void* operator new(size_t, void* placementNewDestination) {
+    return placementNewDestination;
+  }
   virtual void mark();
   bool marked() const;
 
@@ -91,6 +95,7 @@ class JSCell : public JSValue {
   virtual UString toThisString(ExecState*) const;
   virtual JSString* toThisJSString(ExecState*);
   virtual JSValue* getJSNumber();
+  void* vptr() { return *reinterpret_cast<void**>(this); }
 
  private:
   // Base implementation, but for non-object classes implements getPropertySlot.

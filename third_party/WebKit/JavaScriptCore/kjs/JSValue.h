@@ -50,8 +50,9 @@ struct Instruction;
  * JSObject.
  */
 class JSValue : Noncopyable {
-  friend class JSCell;  // so it can derive from this class
-  friend class Heap;    // so it can call asCell()
+  friend class JSCell;   // so it can derive from this class
+  friend class Heap;     // so it can call asCell()
+  friend class Machine;  // so it can call asCell()
  private:
   JSValue();
   virtual ~JSValue();

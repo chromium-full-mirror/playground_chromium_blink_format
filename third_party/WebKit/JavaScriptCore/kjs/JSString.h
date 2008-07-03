@@ -48,6 +48,14 @@ class JSString : public JSCell {
                              PropertySlot&);
   bool getStringPropertySlot(unsigned propertyName, PropertySlot&);
 
+  bool canGetIndex(unsigned i) {
+    return i < static_cast<unsigned>(m_value.size());
+  }
+  JSValue* getIndex(ExecState* exec, unsigned i) {
+    ASSERT(canGetIndex(i));
+    return new (exec) JSString(m_value.substr(i, 1));
+  }
+
  private:
   virtual JSType type() const { return StringType; }
 

@@ -29,6 +29,8 @@
 #ifndef Machine_h
 #define Machine_h
 
+#include "JSCell.h"
+#include "JSValue.h"
 #include "Opcode.h"
 #include "RegisterFile.h"
 #include <kjs/list.h>
@@ -189,6 +191,14 @@ class Machine {
   JSValue* checkTimeout(JSGlobalObject*);
   void resetTimeoutCheck();
 
+  bool isJSArray(JSValue* v) {
+    return !JSImmediate::isImmediate(v) && v->asCell()->vptr() == m_jsArrayVptr;
+  }
+  bool isJSString(JSValue* v) {
+    return !JSImmediate::isImmediate(v) &&
+           v->asCell()->vptr() == m_jsStringVptr;
+  }
+
   int m_reentryDepth;
   unsigned m_timeoutTime;
   unsigned m_timeAtLastCheckTimeout;
@@ -197,6 +207,9 @@ class Machine {
   unsigned m_ticksUntilNextTimeoutCheck;
 
   RegisterFile m_registerFile;
+
+  void* m_jsArrayVptr;
+  void* m_jsStringVptr;
 
 #if HAVE(COMPUTED_GOTO)
   Opcode m_opcodeTable[numOpcodeIDs];  // Maps OpcodeID => Opcode for compiling
