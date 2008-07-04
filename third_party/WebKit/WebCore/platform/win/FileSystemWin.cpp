@@ -293,4 +293,10 @@ bool safeCreateFile(const String& path, CFDataRef data) {
   return true;
 }
 
+Vector<String> listDirectory(const String& path, const String& filter) {
+  Vector<String> entries;
+  notImplemented();
+  return entries;
+}
+
 }  // namespace WebCore
