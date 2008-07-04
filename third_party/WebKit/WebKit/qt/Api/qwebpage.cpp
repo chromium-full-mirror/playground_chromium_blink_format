@@ -102,7 +102,7 @@ QCursor SetCursorEvent::cursor() const {
 
 // If you change this make sure to also adjust the docs for
 // QWebPage::userAgentForUrl
-#define WEBKIT_VERSION "523.15"
+#define WEBKIT_VERSION "527+"
 
 static inline DragOperation dropActionToDragOp(Qt::DropActions actions) {
   unsigned result = 0;
@@ -2177,7 +2177,7 @@ QWebPluginFactory* QWebPage::pluginFactory() const {
     \o %Security% expands to U if SSL is enabled, otherwise N. SSL is enabled if
    QSslSocket::supportsSsl() returns true.
     \o %Locale% is replaced with QLocale::name().
-    \o %WebKitVersion% currently expands to 523.15
+    \o %WebKitVersion% currently expands to 527+
     \o %AppVersion% expands to
    QCoreApplication::applicationName()/QCoreApplication::applicationVersion() if
    they're set; otherwise defaulting to Qt and the current Qt version.
