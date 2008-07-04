@@ -24,6 +24,7 @@
 #define SVGFEColorMatrixElement_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#include "FilterBuilder.h"
 #include "SVGFEColorMatrix.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
@@ -36,7 +37,8 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEColorMatrixElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFEColorMatrix* filterEffect(SVGResourceFilter*) const;
+  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
+  bool build(FilterBuilder*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -54,7 +56,7 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                                  Values,
                                  values)
 
-  mutable RefPtr<SVGFEColorMatrix> m_filterEffect;
+  mutable RefPtr<FEColorMatrix> m_filterEffect;
 };
 
 }  // namespace WebCore

@@ -34,7 +34,7 @@ namespace WebCore {
 SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
                                                  Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_type(SVG_FECOLORMATRIX_TYPE_UNKNOWN),
+      m_type(FECOLORMATRIX_TYPE_UNKNOWN),
       m_values(SVGNumberList::create(SVGNames::valuesAttr)),
       m_filterEffect(0) {}
 
@@ -69,13 +69,13 @@ void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::typeAttr) {
     if (value == "matrix")
-      setTypeBaseValue(SVG_FECOLORMATRIX_TYPE_MATRIX);
+      setTypeBaseValue(FECOLORMATRIX_TYPE_MATRIX);
     else if (value == "saturate")
-      setTypeBaseValue(SVG_FECOLORMATRIX_TYPE_SATURATE);
+      setTypeBaseValue(FECOLORMATRIX_TYPE_SATURATE);
     else if (value == "hueRotate")
-      setTypeBaseValue(SVG_FECOLORMATRIX_TYPE_HUEROTATE);
+      setTypeBaseValue(FECOLORMATRIX_TYPE_HUEROTATE);
     else if (value == "luminanceToAlpha")
-      setTypeBaseValue(SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA);
+      setTypeBaseValue(FECOLORMATRIX_TYPE_LUMINANCETOALPHA);
   } else if (attr->name() == SVGNames::inAttr)
     setIn1BaseValue(value);
   else if (attr->name() == SVGNames::valuesAttr)
@@ -84,13 +84,17 @@ void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFEColorMatrix* SVGFEColorMatrixElement::filterEffect(
+SVGFilterEffect* SVGFEColorMatrixElement::filterEffect(
     SVGResourceFilter* filter) const {
-  if (!m_filterEffect)
-    m_filterEffect = SVGFEColorMatrix::create(filter);
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
-  m_filterEffect->setIn(in1());
-  setStandardAttributes(m_filterEffect.get());
+bool SVGFEColorMatrixElement::build(FilterBuilder* builder) {
+  FilterEffect* input1 = builder->getEffectById(in1());
+
+  if (!input1)
+    return false;
 
   Vector<float> _values;
   SVGNumberList* numbers = values();
@@ -100,12 +104,14 @@ SVGFEColorMatrix* SVGFEColorMatrixElement::filterEffect(
   for (unsigned int i = 0; i < nr; i++)
     _values.append(numbers->getItem(i, ec));
 
-  m_filterEffect->setValues(_values);
-  m_filterEffect->setType((SVGColorMatrixType)type());
+  RefPtr<FilterEffect> addedEffect = FEColorMatrix::create(
+      input1, static_cast<ColorMatrixType>(type()), _values);
+  builder->add(result(), addedEffect.release());
 
-  return m_filterEffect.get();
+  return true;
 }
-}
+
+}  // namespace WebCore
 
 #endif  // ENABLE(SVG)
 

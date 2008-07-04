@@ -23,29 +23,33 @@
 #define SVGFEComposite_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
-#include "SVGFilterEffect.h"
+#include "FilterEffect.h"
+#include "PlatformString.h"
 
 namespace WebCore {
 
-enum SVGCompositeOperationType {
-  SVG_FECOMPOSITE_OPERATOR_UNKNOWN = 0,
-  SVG_FECOMPOSITE_OPERATOR_OVER = 1,
-  SVG_FECOMPOSITE_OPERATOR_IN = 2,
-  SVG_FECOMPOSITE_OPERATOR_OUT = 3,
-  SVG_FECOMPOSITE_OPERATOR_ATOP = 4,
-  SVG_FECOMPOSITE_OPERATOR_XOR = 5,
-  SVG_FECOMPOSITE_OPERATOR_ARITHMETIC = 6
+enum CompositeOperationType {
+  FECOMPOSITE_OPERATOR_UNKNOWN = 0,
+  FECOMPOSITE_OPERATOR_OVER = 1,
+  FECOMPOSITE_OPERATOR_IN = 2,
+  FECOMPOSITE_OPERATOR_OUT = 3,
+  FECOMPOSITE_OPERATOR_ATOP = 4,
+  FECOMPOSITE_OPERATOR_XOR = 5,
+  FECOMPOSITE_OPERATOR_ARITHMETIC = 6
 };
 
-class SVGFEComposite : public SVGFilterEffect {
+class FEComposite : public FilterEffect {
  public:
-  static PassRefPtr<SVGFEComposite> create(SVGResourceFilter*);
+  static PassRefPtr<FEComposite> create(FilterEffect*,
+                                        FilterEffect*,
+                                        const CompositeOperationType&,
+                                        const float&,
+                                        const float&,
+                                        const float&,
+                                        const float&);
 
-  String in2() const;
-  void setIn2(const String&);
-
-  SVGCompositeOperationType operation() const;
-  void setOperation(SVGCompositeOperationType);
+  CompositeOperationType operation() const;
+  void setOperation(CompositeOperationType);
 
   float k1() const;
   void setK1(float);
@@ -59,21 +63,25 @@ class SVGFEComposite : public SVGFilterEffect {
   float k4() const;
   void setK4(float);
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
-
-#if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
-#endif
+  virtual void apply();
+  virtual void dump();
 
  private:
-  SVGFEComposite(SVGResourceFilter*);
+  FEComposite(FilterEffect*,
+              FilterEffect*,
+              const CompositeOperationType&,
+              const float&,
+              const float&,
+              const float&,
+              const float&);
 
-  SVGCompositeOperationType m_operation;
+  RefPtr<FilterEffect> m_in;
+  RefPtr<FilterEffect> m_in2;
+  CompositeOperationType m_type;
   float m_k1;
   float m_k2;
   float m_k3;
   float m_k4;
-  String m_in2;
 };
 
 }  // namespace WebCore

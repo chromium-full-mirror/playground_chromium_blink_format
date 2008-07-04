@@ -24,6 +24,7 @@
 #define SVGFEComponentTransferElement_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#include "FilterBuilder.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 #include "SVGFEComponentTransfer.h"
 
@@ -36,7 +37,8 @@ class SVGFEComponentTransferElement
   virtual ~SVGFEComponentTransferElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFEComponentTransfer* filterEffect(SVGResourceFilter*) const;
+  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
+  bool build(FilterBuilder*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -48,7 +50,7 @@ class SVGFEComponentTransferElement
                                  In1,
                                  in1)
 
-  mutable RefPtr<SVGFEComponentTransfer> m_filterEffect;
+  mutable RefPtr<FEComponentTransfer> m_filterEffect;
 };
 
 }  // namespace WebCore

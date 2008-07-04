@@ -39,7 +39,7 @@ class SVGComponentTransferFunctionElement : public SVGElement {
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  SVGComponentTransferFunction transferFunction() const;
+  ComponentTransferFunction transferFunction() const;
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGComponentTransferFunctionElement,

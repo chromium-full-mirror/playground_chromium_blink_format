@@ -23,39 +23,39 @@
 #define SVGFEColorMatrix_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
-#include "SVGFilterEffect.h"
-#include "SVGRenderTreeAsText.h"
+#include "FilterEffect.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
-enum SVGColorMatrixType {
-  SVG_FECOLORMATRIX_TYPE_UNKNOWN = 0,
-  SVG_FECOLORMATRIX_TYPE_MATRIX = 1,
-  SVG_FECOLORMATRIX_TYPE_SATURATE = 2,
-  SVG_FECOLORMATRIX_TYPE_HUEROTATE = 3,
-  SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA = 4
+enum ColorMatrixType {
+  FECOLORMATRIX_TYPE_UNKNOWN = 0,
+  FECOLORMATRIX_TYPE_MATRIX = 1,
+  FECOLORMATRIX_TYPE_SATURATE = 2,
+  FECOLORMATRIX_TYPE_HUEROTATE = 3,
+  FECOLORMATRIX_TYPE_LUMINANCETOALPHA = 4
 };
 
-class SVGFEColorMatrix : public SVGFilterEffect {
+class FEColorMatrix : public FilterEffect {
  public:
-  static PassRefPtr<SVGFEColorMatrix> create(SVGResourceFilter*);
+  static PassRefPtr<FEColorMatrix> create(FilterEffect*,
+                                          ColorMatrixType,
+                                          const Vector<float>&);
 
-  SVGColorMatrixType type() const;
-  void setType(SVGColorMatrixType);
+  ColorMatrixType type() const;
+  void setType(ColorMatrixType);
 
   const Vector<float>& values() const;
   void setValues(const Vector<float>&);
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
-
-#if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
-#endif
+  virtual void apply();
+  virtual void dump();
 
  private:
-  SVGFEColorMatrix(SVGResourceFilter*);
+  FEColorMatrix(FilterEffect*, ColorMatrixType, const Vector<float>&);
 
-  SVGColorMatrixType m_type;
+  RefPtr<FilterEffect> m_in;
+  ColorMatrixType m_type;
   Vector<float> m_values;
 };
 
