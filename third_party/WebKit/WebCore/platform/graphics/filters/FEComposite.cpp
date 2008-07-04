@@ -22,7 +22,7 @@
 #include "config.h"
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
-#include "SVGFEComposite.h"
+#include "FEComposite.h"
 
 namespace WebCore {
 

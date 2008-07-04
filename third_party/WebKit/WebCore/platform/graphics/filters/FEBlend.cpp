@@ -22,40 +22,38 @@
 #include "config.h"
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
-#include "SVGFEColorMatrix.h"
+#include "FEBlend.h"
 
 namespace WebCore {
 
-FEColorMatrix::FEColorMatrix(FilterEffect* in,
-                             ColorMatrixType type,
-                             const Vector<float>& values)
-    : FilterEffect(), m_in(in), m_type(type), m_values(values) {}
+FEBlend::FEBlend(FilterEffect* in, FilterEffect* in2, BlendModeType mode)
+    : FilterEffect(), m_in(in), m_in2(in2), m_mode(mode) {}
 
-PassRefPtr<FEColorMatrix> FEColorMatrix::create(FilterEffect* in,
-                                                ColorMatrixType type,
-                                                const Vector<float>& values) {
-  return adoptRef(new FEColorMatrix(in, type, values));
+PassRefPtr<FEBlend> FEBlend::create(FilterEffect* in,
+                                    FilterEffect* in2,
+                                    BlendModeType mode) {
+  return adoptRef(new FEBlend(in, in2, mode));
 }
 
-ColorMatrixType FEColorMatrix::type() const {
-  return m_type;
+FilterEffect* FEBlend::in2() const {
+  return m_in2.get();
 }
 
-void FEColorMatrix::setType(ColorMatrixType type) {
-  m_type = type;
+void FEBlend::setIn2(FilterEffect* in2) {
+  m_in2 = in2;
 }
 
-const Vector<float>& FEColorMatrix::values() const {
-  return m_values;
+BlendModeType FEBlend::blendMode() const {
+  return m_mode;
 }
 
-void FEColorMatrix::setValues(const Vector<float>& values) {
-  m_values = values;
+void FEBlend::setBlendMode(BlendModeType mode) {
+  m_mode = mode;
 }
 
-void FEColorMatrix::apply() {}
+void FEBlend::apply() {}
 
-void FEColorMatrix::dump() {}
+void FEBlend::dump() {}
 
 }  // namespace WebCore
 
