@@ -81,7 +81,7 @@ class JSLock : Noncopyable {
   static void lock(ExecState*);
   static void unlock(ExecState*);
 
-  static ssize_t lockCount();
+  static intptr_t lockCount();
   static bool currentThreadIsHoldingLock();
 
   static void registerThread();
@@ -95,7 +95,7 @@ class JSLock : Noncopyable {
     ~DropAllLocks();
 
    private:
-    ssize_t m_lockCount;
+    intptr_t m_lockCount;
     bool m_lockingForReal;
   };
 };
