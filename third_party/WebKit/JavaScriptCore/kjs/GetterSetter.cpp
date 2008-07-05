@@ -21,7 +21,7 @@
  */
 
 #include "config.h"
-#include "JSObject.h"
+#include "GetterSetter.h"
 
 #include <wtf/Assertions.h>
 
@@ -69,4 +69,5 @@ JSObject* GetterSetter::toObject(ExecState* exec) const {
   ASSERT_NOT_REACHED();
   return jsNull()->toObject(exec);
 }
-}
+
+}  // namespace KJS
