@@ -22,9 +22,8 @@
 #include "config.h"
 #include "ObjectPrototype.h"
 
-#include "operations.h"
 #include "FunctionPrototype.h"
-#include "JSFunction.h"
+#include "PrototypeFunction.h"
 
 namespace KJS {
 

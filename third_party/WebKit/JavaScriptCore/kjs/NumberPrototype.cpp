@@ -23,8 +23,8 @@
 #include "NumberPrototype.h"
 
 #include "FunctionPrototype.h"
-#include "JSFunction.h"
 #include "ObjectPrototype.h"
+#include "PrototypeFunction.h"
 #include "dtoa.h"
 #include "operations.h"
 #include <wtf/Assertions.h>
