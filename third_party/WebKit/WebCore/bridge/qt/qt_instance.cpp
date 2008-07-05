@@ -29,6 +29,7 @@
 #include "PropertyNameArray.h"
 #include "runtime_object.h"
 #include "ObjectPrototype.h"
+#include "Error.h"
 
 #include <qmetaobject.h>
 #include <qdebug.h>
