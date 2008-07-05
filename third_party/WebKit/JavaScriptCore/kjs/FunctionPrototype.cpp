@@ -23,6 +23,7 @@
 #include "config.h"
 #include "FunctionPrototype.h"
 
+#include "Arguments.h"
 #include "JSArray.h"
 #include "JSFunction.h"
 #include "JSString.h"
