@@ -42,19 +42,17 @@ namespace KJS {
 // We use Identifier::null to indicate that a given argument's value
 // isn't stored in the activation object.
 
-IndexToNameMap::IndexToNameMap(JSFunction* func, const ArgList& args) {
-  _map = new Identifier[args.size()];
-  this->size = args.size();
-
+IndexToNameMap::IndexToNameMap(JSFunction* func, const ArgList& args)
+    : m_size(args.size()), m_map(new Identifier[args.size()]) {
   unsigned i = 0;
   ArgList::const_iterator end = args.end();
   for (ArgList::const_iterator it = args.begin(); it != end; ++i, ++it)
-    _map[i] = func->getParameterName(
+    m_map[i] = func->getParameterName(
         i);  // null if there is no corresponding parameter
 }
 
 IndexToNameMap::~IndexToNameMap() {
-  delete[] _map;
+  delete[] m_map;
 }
 
 bool IndexToNameMap::isMapped(const Identifier& index) const {
@@ -64,10 +62,10 @@ bool IndexToNameMap::isMapped(const Identifier& index) const {
   if (!indexIsNumber)
     return false;
 
-  if (indexAsNumber >= size)
+  if (indexAsNumber >= m_size)
     return false;
 
-  if (_map[indexAsNumber].isNull())
+  if (m_map[indexAsNumber].isNull())
     return false;
 
   return true;
@@ -77,18 +75,18 @@ void IndexToNameMap::unMap(ExecState* exec, const Identifier& index) {
   bool indexIsNumber;
   unsigned indexAsNumber = index.toStrictUInt32(&indexIsNumber);
 
-  ASSERT(indexIsNumber && indexAsNumber < size);
+  ASSERT(indexIsNumber && indexAsNumber < m_size);
 
-  _map[indexAsNumber] = exec->propertyNames().nullIdentifier;
+  m_map[indexAsNumber] = exec->propertyNames().nullIdentifier;
 }
 
 Identifier& IndexToNameMap::operator[](const Identifier& index) {
   bool indexIsNumber;
   unsigned indexAsNumber = index.toStrictUInt32(&indexIsNumber);
 
-  ASSERT(indexIsNumber && indexAsNumber < size);
+  ASSERT(indexIsNumber && indexAsNumber < m_size);
 
-  return _map[indexAsNumber];
+  return m_map[indexAsNumber];
 }
 
 }  // namespace KJS

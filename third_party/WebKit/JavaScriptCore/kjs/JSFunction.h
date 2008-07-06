@@ -52,21 +52,21 @@ class JSFunction : public InternalFunction {
   // due to a later parameter with the same name.
   const Identifier& getParameterName(int index);
 
-  static const ClassInfo info;
-
-  RefPtr<FunctionBodyNode> body;
-
-  void setScope(const ScopeChain& s) { _scope = s; }
-  ScopeChain& scope() { return _scope; }
+  void setScope(const ScopeChain& scopeChain) { m_scopeChain = scopeChain; }
+  ScopeChain& scope() { return m_scopeChain; }
 
   virtual void mark();
 
+  static const ClassInfo info;
+
+  // FIXME: This should be private
+  RefPtr<FunctionBodyNode> m_body;
+
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
+
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
-
-  ScopeChain _scope;
 
   static JSValue* argumentsGetter(ExecState*,
                                   const Identifier&,
@@ -77,6 +77,8 @@ class JSFunction : public InternalFunction {
   static JSValue* lengthGetter(ExecState*,
                                const Identifier&,
                                const PropertySlot&);
+
+  ScopeChain m_scopeChain;
 };
 
 }  // namespace kJS

@@ -120,4 +120,4 @@ JSArray* constructArray(ExecState*, const ArgList& values);
 
 }  // namespace KJS
 
-#endif
+#endif  // JSArray_h

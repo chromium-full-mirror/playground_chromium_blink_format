@@ -274,11 +274,10 @@ static UString formatLocaleDate(ExecState* exec,
   } else if (includeDate && includeTime && !args[1]->isUndefined()) {
     dateStyle = styleFromArgString(arg0String, dateStyle);
     timeStyle = styleFromArgString(args[1]->toString(exec), timeStyle);
-  } else if (includeDate && !args[0]->isUndefined()) {
+  } else if (includeDate && !args[0]->isUndefined())
     dateStyle = styleFromArgString(arg0String, dateStyle);
-  } else if (includeTime && !args[0]->isUndefined()) {
+  else if (includeTime && !args[0]->isUndefined())
     timeStyle = styleFromArgString(arg0String, timeStyle);
-  }
 
   CFLocaleRef locale = CFLocaleCopyCurrent();
   CFDateFormatterRef formatter =
@@ -328,9 +327,8 @@ static JSCell* formatLocaleDate(ExecState* exec,
   struct tm localTM = gdt;
   int year = gdt.year + 1900;
   bool yearNeedsOffset = year < 1900 || year > 2038;
-  if (yearNeedsOffset) {
+  if (yearNeedsOffset)
     localTM.tm_year = equivalentYearForDST(year) - 1900;
-  }
 
   // Do the formatting
   const int bufsize = 128;
@@ -500,8 +498,8 @@ const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, 0,
 */
 // ECMA 15.9.4
 
-DatePrototype::DatePrototype(ExecState* exec, ObjectPrototype* objectProto)
-    : DateInstance(objectProto) {
+DatePrototype::DatePrototype(ExecState* exec, ObjectPrototype* objectPrototype)
+    : DateInstance(objectPrototype) {
   setInternalValue(jsNaN(exec));
   // The constructor will be added later, after DateConstructor has been built.
 }

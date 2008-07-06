@@ -89,8 +89,8 @@ JSValue* functionProtoFuncToString(ExecState* exec,
   if (function->inherits(&JSFunction::info)) {
     JSFunction* fi = static_cast<JSFunction*>(thisValue);
     return jsString(exec, "function " + fi->functionName().ustring() + "(" +
-                              fi->body->paramString() + ") " +
-                              fi->body->toSourceString());
+                              fi->m_body->paramString() + ") " +
+                              fi->m_body->toSourceString());
   }
 
   return jsString(exec, "function " + function->functionName().ustring() +

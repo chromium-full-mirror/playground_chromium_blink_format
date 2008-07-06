@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef KJS_COMMON_IDENTIFIERS_H
-#define KJS_COMMON_IDENTIFIERS_H
+#ifndef CommonIdentifiers_h
+#define CommonIdentifiers_h
 
 #include "identifier.h"
 #include <wtf/Noncopyable.h>
@@ -57,6 +57,7 @@ class CommonIdentifiers : Noncopyable {
       KJS_IDENTIFIER_DECLARE_PROPERTY_NAME_GLOBAL)
 #undef KJS_IDENTIFIER_DECLARE_PROPERTY_NAME_GLOBAL
 };
+
 }  // namespace KJS
 
-#endif  // KJS_COMMON_IDENTIFIERS_H
+#endif  // CommonIdentifiers_h

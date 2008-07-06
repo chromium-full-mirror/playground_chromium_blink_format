@@ -34,40 +34,40 @@
 namespace KJS {
 
 JSObject* Error::create(ExecState* exec,
-                        ErrorType errtype,
+                        ErrorType type,
                         const UString& message,
-                        int lineno,
+                        int lineNumber,
                         int sourceId,
                         const UString& sourceURL) {
-  JSObject* cons;
+  JSObject* constructor;
   const char* name;
-  switch (errtype) {
+  switch (type) {
     case EvalError:
-      cons = exec->lexicalGlobalObject()->evalErrorConstructor();
+      constructor = exec->lexicalGlobalObject()->evalErrorConstructor();
       name = "Evaluation error";
       break;
     case RangeError:
-      cons = exec->lexicalGlobalObject()->rangeErrorConstructor();
+      constructor = exec->lexicalGlobalObject()->rangeErrorConstructor();
       name = "Range error";
       break;
     case ReferenceError:
-      cons = exec->lexicalGlobalObject()->referenceErrorConstructor();
+      constructor = exec->lexicalGlobalObject()->referenceErrorConstructor();
       name = "Reference error";
       break;
     case SyntaxError:
-      cons = exec->lexicalGlobalObject()->syntaxErrorConstructor();
+      constructor = exec->lexicalGlobalObject()->syntaxErrorConstructor();
       name = "Syntax error";
       break;
     case TypeError:
-      cons = exec->lexicalGlobalObject()->typeErrorConstructor();
+      constructor = exec->lexicalGlobalObject()->typeErrorConstructor();
       name = "Type error";
       break;
     case URIError:
-      cons = exec->lexicalGlobalObject()->URIErrorConstructor();
+      constructor = exec->lexicalGlobalObject()->URIErrorConstructor();
       name = "URI error";
       break;
     default:
-      cons = exec->lexicalGlobalObject()->errorConstructor();
+      constructor = exec->lexicalGlobalObject()->errorConstructor();
       name = "Error";
       break;
   }
@@ -78,18 +78,18 @@ JSObject* Error::create(ExecState* exec,
   else
     args.append(jsString(exec, message));
   ConstructData constructData;
-  ConstructType constructType = cons->getConstructData(constructData);
-  JSObject* err = construct(exec, cons, constructType, constructData, args);
+  ConstructType constructType = constructor->getConstructData(constructData);
+  JSObject* error =
+      construct(exec, constructor, constructType, constructData, args);
 
-  if (lineno != -1)
-    err->put(exec, Identifier(exec, "line"), jsNumber(exec, lineno));
+  if (lineNumber != -1)
+    error->put(exec, Identifier(exec, "line"), jsNumber(exec, lineNumber));
   if (sourceId != -1)
-    err->put(exec, Identifier(exec, "sourceId"), jsNumber(exec, sourceId));
-
+    error->put(exec, Identifier(exec, "sourceId"), jsNumber(exec, sourceId));
   if (!sourceURL.isNull())
-    err->put(exec, Identifier(exec, "sourceURL"), jsString(exec, sourceURL));
+    error->put(exec, Identifier(exec, "sourceURL"), jsString(exec, sourceURL));
 
-  return err;
+  return error;
 }
 
 JSObject* Error::create(ExecState* exec, ErrorType type, const char* message) {

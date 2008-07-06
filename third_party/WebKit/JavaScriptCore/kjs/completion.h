@@ -30,15 +30,9 @@ class JSValue;
 
 enum ComplType { Normal, Break, Continue, ReturnValue, Throw, Interrupted };
 
-/**
+/*
  * Completion objects are used to convey the return status and value
  * from functions.
- *
- * See JSFunction::execute()
- *
- * @see JSFunction
- *
- * @short Handle for a Completion type.
  */
 class Completion {
  public:
@@ -54,6 +48,7 @@ class Completion {
   ComplType m_type;
   JSValue* m_value;
 };
-}
 
-#endif
+}  // namespace KJS
+
+#endif  // KJS_COMPLETION_H

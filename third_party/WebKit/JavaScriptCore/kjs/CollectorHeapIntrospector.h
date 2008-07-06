@@ -29,8 +29,8 @@
 #ifndef CollectorHeapIntrospector_h
 #define CollectorHeapIntrospector_h
 
-#include <malloc/malloc.h>
 #include "Assertions.h"
+#include <malloc/malloc.h>
 
 namespace KJS {
 
@@ -55,6 +55,7 @@ class CollectorHeapIntrospector {
 
  private:
   CollectorHeapIntrospector(CollectorHeap*, CollectorHeap*);
+
   static size_t size(malloc_zone_t*, const void*) { return 0; }
   static void* zoneMalloc(malloc_zone_t*, size_t) {
     LOG_ERROR("malloc is not supported");
@@ -89,6 +90,7 @@ class CollectorHeapIntrospector {
   CollectorHeap* m_primaryHeap;
   CollectorHeap* m_numberHeap;
 };
-}
+
+}  // namespace KJS
 
 #endif  // CollectorHeapIntrospector_h

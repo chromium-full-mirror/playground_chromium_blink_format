@@ -29,11 +29,6 @@ namespace KJS {
 class DatePrototype;
 class FunctionPrototype;
 
-/**
- * @internal
- *
- * The initial value of the the global variable's "Date" property
- */
 class DateConstructor : public InternalFunction {
  public:
   DateConstructor(ExecState*, FunctionPrototype*, DatePrototype*);

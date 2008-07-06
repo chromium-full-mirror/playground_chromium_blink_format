@@ -44,21 +44,8 @@ enum ErrorType {
   URIError = 6
 };
 
-/**
- * @short Factory methods for error objects.
- */
 class Error {
  public:
-  /**
-   * Factory method for error objects.
-   *
-   * @param exec The current execution state
-   * @param errtype Type of error.
-   * @param message Optional error message.
-   * @param lineNumber Optional line number.
-   * @param sourceId Optional source id.
-   * @param sourceURL Optional source URL.
-   */
   static JSObject* create(ExecState*,
                           ErrorType,
                           const UString& message,

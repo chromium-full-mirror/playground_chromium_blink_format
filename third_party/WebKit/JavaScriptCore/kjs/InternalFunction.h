@@ -24,8 +24,8 @@
 #ifndef InternalFunction_h
 #define InternalFunction_h
 
-#include "identifier.h"
 #include "JSObject.h"
+#include "identifier.h"
 
 namespace KJS {
 
@@ -33,8 +33,9 @@ class FunctionPrototype;
 
 class InternalFunction : public JSObject {
  public:
-  static const ClassInfo info;
   virtual const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
+
   const Identifier& functionName() const { return m_name; }
 
  protected:

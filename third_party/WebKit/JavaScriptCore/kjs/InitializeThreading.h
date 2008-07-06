@@ -38,4 +38,4 @@ namespace KJS {
 void initializeThreading();
 }
 
-#endif
+#endif  // KJS_InitializeThreading_h

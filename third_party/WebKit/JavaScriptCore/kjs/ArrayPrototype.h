@@ -32,6 +32,7 @@ class ArrayPrototype : public JSArray {
   ArrayPrototype(ExecState*, ObjectPrototype*);
 
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 };

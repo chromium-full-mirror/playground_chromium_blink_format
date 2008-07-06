@@ -28,12 +28,6 @@
 
 namespace KJS {
 
-/**
- * @internal
- *
- * The initial value of Function.prototype (and thus all objects created
- * with the Function constructor)
- */
 class FunctionPrototype : public InternalFunction {
  public:
   FunctionPrototype(ExecState*);

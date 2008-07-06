@@ -26,6 +26,7 @@ namespace KJS {
 
 const ClassInfo BooleanObject::info = {"Boolean", 0, 0, 0};
 
-BooleanObject::BooleanObject(JSObject* proto) : JSWrapperObject(proto) {}
+BooleanObject::BooleanObject(JSObject* prototype)
+    : JSWrapperObject(prototype) {}
 
 }  // namespace KJS

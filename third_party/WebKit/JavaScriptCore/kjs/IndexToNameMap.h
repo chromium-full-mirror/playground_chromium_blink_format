@@ -41,8 +41,8 @@ class IndexToNameMap {
   void unMap(ExecState* exec, const Identifier& index);
 
  private:
-  unsigned size;
-  Identifier* _map;
+  unsigned m_size;
+  Identifier* m_map;  // FIMXE: this should be an OwnArrayPtr
 };
 
 }  // namespace KJS

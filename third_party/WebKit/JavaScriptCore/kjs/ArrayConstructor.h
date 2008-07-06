@@ -32,6 +32,7 @@ class FunctionPrototype;
 class ArrayConstructor : public InternalFunction {
  public:
   ArrayConstructor(ExecState*, FunctionPrototype*, ArrayPrototype*);
+
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
 };

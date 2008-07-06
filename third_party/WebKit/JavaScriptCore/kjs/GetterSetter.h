@@ -34,9 +34,9 @@ class JSObject;
 // for a property.
 class GetterSetter : public JSCell {
  public:
-  JSType type() const { return GetterSetterType; }
-
   GetterSetter() : m_getter(0), m_setter(0) {}
+
+  JSType type() const { return GetterSetterType; }
 
   virtual void mark();
 

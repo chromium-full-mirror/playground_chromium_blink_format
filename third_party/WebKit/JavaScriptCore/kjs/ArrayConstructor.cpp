@@ -32,12 +32,13 @@
 namespace KJS {
 
 ArrayConstructor::ArrayConstructor(ExecState* exec,
-                                   FunctionPrototype* funcProto,
-                                   ArrayPrototype* arrayProto)
-    : InternalFunction(funcProto,
-                       Identifier(exec, arrayProto->classInfo()->className)) {
+                                   FunctionPrototype* functionPrototype,
+                                   ArrayPrototype* arrayPrototype)
+    : InternalFunction(
+          functionPrototype,
+          Identifier(exec, arrayPrototype->classInfo()->className)) {
   // ECMA 15.4.3.1 Array.prototype
-  putDirect(exec->propertyNames().prototype, arrayProto,
+  putDirect(exec->propertyNames().prototype, arrayPrototype,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
@@ -86,4 +87,5 @@ CallType ArrayConstructor::getCallData(CallData& callData) {
   callData.native.function = callArrayConstructor;
   return CallTypeNative;
 }
-}
+
+}  // namespace KJS

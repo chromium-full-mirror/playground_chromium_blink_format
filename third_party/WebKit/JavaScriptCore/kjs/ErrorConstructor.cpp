@@ -31,12 +31,13 @@
 namespace KJS {
 
 ErrorConstructor::ErrorConstructor(ExecState* exec,
-                                   FunctionPrototype* funcProto,
-                                   ErrorPrototype* errorProto)
-    : InternalFunction(funcProto,
-                       Identifier(exec, errorProto->classInfo()->className)) {
+                                   FunctionPrototype* functionPrototype,
+                                   ErrorPrototype* errorPrototype)
+    : InternalFunction(
+          functionPrototype,
+          Identifier(exec, errorPrototype->classInfo()->className)) {
   // ECMA 15.11.3.1 Error.prototype
-  putDirect(exec->propertyNames().prototype, errorProto,
+  putDirect(exec->propertyNames().prototype, errorPrototype,
             DontEnum | DontDelete | ReadOnly);
   putDirect(exec->propertyNames().length, jsNumber(exec, 1),
             DontDelete | ReadOnly | DontEnum);

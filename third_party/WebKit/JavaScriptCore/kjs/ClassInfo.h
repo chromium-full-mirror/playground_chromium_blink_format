@@ -31,14 +31,12 @@ namespace KJS {
 struct HashEntry;
 struct HashTable;
 
-/**
- * Class Information
- */
 struct ClassInfo {
   /**
    * A string denoting the class name. Example: "Window".
    */
   const char* className;
+
   /**
    * Pointer to the class information of the base class.
    * 0L if there is none.
