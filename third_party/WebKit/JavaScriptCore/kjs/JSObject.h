@@ -24,6 +24,7 @@
 #ifndef JSObject_h
 #define JSObject_h
 
+#include "ArgList.h"
 #include "ClassInfo.h"
 #include "CommonIdentifiers.h"
 #include "ExecState.h"
@@ -32,7 +33,6 @@
 #include "PropertyMap.h"
 #include "PropertySlot.h"
 #include "ScopeChain.h"
-#include "list.h"
 
 namespace KJS {
 

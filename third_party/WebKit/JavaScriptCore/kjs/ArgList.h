@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef KJS_LIST_H
-#define KJS_LIST_H
+#ifndef ArgList_h
+#define ArgList_h
 
 #include "JSImmediate.h"
 #include <wtf/HashSet.h>
@@ -30,7 +30,6 @@
 namespace KJS {
 
 class JSValue;
-class ArgList;
 
 class ArgList : Noncopyable {
  private:
@@ -140,4 +139,4 @@ class ArgList : Noncopyable {
 
 }  // namespace KJS
 
-#endif  // KJS_LIST_H
+#endif  // ArgList_h
