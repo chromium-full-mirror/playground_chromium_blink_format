@@ -54,12 +54,9 @@ SVGPathElement::~SVGPathElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGPathElement,
                               float,
-                              Number,
-                              number,
                               PathLength,
                               pathLength,
-                              SVGNames::pathLengthAttr,
-                              m_pathLength)
+                              SVGNames::pathLengthAttr)
 
 float SVGPathElement::getTotalLength() {
   // FIXME: this may wish to use the pathSegList instead of the pathdata if

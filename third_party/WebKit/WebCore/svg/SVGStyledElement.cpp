@@ -55,12 +55,9 @@ SVGStyledElement::~SVGStyledElement() {
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGStyledElement,
                               String,
-                              String,
-                              string,
                               ClassName,
                               className,
-                              HTMLNames::classAttr,
-                              m_className)
+                              HTMLNames::classAttr)
 
 bool SVGStyledElement::rendererIsNeeded(RenderStyle* style) {
   // http://www.w3.org/TR/SVG/extend.html#PrivateData

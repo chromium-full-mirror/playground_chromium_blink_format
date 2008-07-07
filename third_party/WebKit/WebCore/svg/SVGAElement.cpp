@@ -62,12 +62,9 @@ String SVGAElement::title() const {
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGAElement,
                               String,
-                              String,
-                              string,
                               Target,
                               target,
-                              SVGNames::targetAttr,
-                              m_target)
+                              SVGNames::targetAttr)
 
 void SVGAElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::targetAttr)

@@ -60,7 +60,6 @@ class SVGExternalResourcesRequired {
  private:
   ANIMATED_PROPERTY_DECLARATIONS_WITH_CONTEXT(SVGExternalResourcesRequired,
                                               bool,
-                                              bool,
                                               ExternalResourcesRequired,
                                               externalResourcesRequired)
 };

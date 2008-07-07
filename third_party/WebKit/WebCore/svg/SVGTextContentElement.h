@@ -71,11 +71,9 @@ class SVGTextContentElement : public SVGStyledElement,
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
                                  SVGLength,
-                                 SVGLength,
                                  TextLength,
                                  textLength)
   ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
-                                 int,
                                  int,
                                  LengthAdjust,
                                  lengthAdjust)

@@ -40,7 +40,7 @@ class SVGStopElement : public SVGStyledElement {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGStopElement, float, float, Offset, offset)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGStopElement, float, Offset, offset)
 };
 
 }  // namespace WebCore

@@ -35,12 +35,9 @@ SVGURIReference::~SVGURIReference() {}
 
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(SVGURIReference,
                                            String,
-                                           String,
-                                           string,
                                            Href,
                                            href,
-                                           XLinkNames::hrefAttr,
-                                           m_href)
+                                           XLinkNames::hrefAttr)
 
 bool SVGURIReference::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name().matches(XLinkNames::hrefAttr)) {

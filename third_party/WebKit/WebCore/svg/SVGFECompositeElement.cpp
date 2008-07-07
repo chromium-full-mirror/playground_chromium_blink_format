@@ -44,60 +44,39 @@ SVGFECompositeElement::~SVGFECompositeElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               String,
-                              String,
-                              string,
                               In1,
                               in1,
-                              SVGNames::inAttr,
-                              m_in1)
+                              SVGNames::inAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               String,
-                              String,
-                              string,
                               In2,
                               in2,
-                              SVGNames::in2Attr,
-                              m_in2)
+                              SVGNames::in2Attr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               _operator,
                               _operator,
-                              SVGNames::operatorAttr,
-                              m__operator)
+                              SVGNames::operatorAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               float,
-                              Number,
-                              number,
                               K1,
                               k1,
-                              SVGNames::k1Attr,
-                              m_k1)
+                              SVGNames::k1Attr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               float,
-                              Number,
-                              number,
                               K2,
                               k2,
-                              SVGNames::k2Attr,
-                              m_k2)
+                              SVGNames::k2Attr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               float,
-                              Number,
-                              number,
                               K3,
                               k3,
-                              SVGNames::k3Attr,
-                              m_k3)
+                              SVGNames::k3Attr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               float,
-                              Number,
-                              number,
                               K4,
                               k4,
-                              SVGNames::k4Attr,
-                              m_k4)
+                              SVGNames::k4Attr)
 
 void SVGFECompositeElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

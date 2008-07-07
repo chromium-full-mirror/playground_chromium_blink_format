@@ -58,44 +58,29 @@ SVGRadialGradientElement::~SVGRadialGradientElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGRadialGradientElement,
                               SVGLength,
-                              Length,
-                              length,
                               Cx,
                               cx,
-                              SVGNames::cxAttr,
-                              m_cx)
+                              SVGNames::cxAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRadialGradientElement,
                               SVGLength,
-                              Length,
-                              length,
                               Cy,
                               cy,
-                              SVGNames::cyAttr,
-                              m_cy)
+                              SVGNames::cyAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRadialGradientElement,
                               SVGLength,
-                              Length,
-                              length,
                               Fx,
                               fx,
-                              SVGNames::fxAttr,
-                              m_fx)
+                              SVGNames::fxAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRadialGradientElement,
                               SVGLength,
-                              Length,
-                              length,
                               Fy,
                               fy,
-                              SVGNames::fyAttr,
-                              m_fy)
+                              SVGNames::fyAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRadialGradientElement,
                               SVGLength,
-                              Length,
-                              length,
                               R,
                               r,
-                              SVGNames::rAttr,
-                              m_r)
+                              SVGNames::rAttr)
 
 void SVGRadialGradientElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::cxAttr)

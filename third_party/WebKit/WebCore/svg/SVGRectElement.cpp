@@ -45,54 +45,28 @@ SVGRectElement::SVGRectElement(const QualifiedName& tagName, Document* doc)
 
 SVGRectElement::~SVGRectElement() {}
 
+ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement, SVGLength, X, x, SVGNames::xAttr)
+ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement, SVGLength, Y, y, SVGNames::yAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
-                              Length,
-                              length,
-                              X,
-                              x,
-                              SVGNames::xAttr,
-                              m_x)
-ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
-                              SVGLength,
-                              Length,
-                              length,
-                              Y,
-                              y,
-                              SVGNames::yAttr,
-                              m_y)
-ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
-                              SVGLength,
-                              Length,
-                              length,
                               Width,
                               width,
-                              SVGNames::widthAttr,
-                              m_width)
+                              SVGNames::widthAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
-                              Length,
-                              length,
                               Height,
                               height,
-                              SVGNames::heightAttr,
-                              m_height)
+                              SVGNames::heightAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
-                              Length,
-                              length,
                               Rx,
                               rx,
-                              SVGNames::rxAttr,
-                              m_rx)
+                              SVGNames::rxAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGRectElement,
                               SVGLength,
-                              Length,
-                              length,
                               Ry,
                               ry,
-                              SVGNames::ryAttr,
-                              m_ry)
+                              SVGNames::ryAttr)
 
 void SVGRectElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::xAttr)

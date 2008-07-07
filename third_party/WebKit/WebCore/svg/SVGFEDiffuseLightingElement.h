@@ -42,28 +42,20 @@ class SVGFEDiffuseLightingElement
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement, String, In1, in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
-                                 String,
-                                 String,
-                                 In1,
-                                 in1)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
-                                 float,
                                  float,
                                  DiffuseConstant,
                                  diffuseConstant)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
                                  float,
-                                 float,
                                  SurfaceScale,
                                  surfaceScale)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
                                  float,
-                                 float,
                                  KernelUnitLengthX,
                                  kernelUnitLengthX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
-                                 float,
                                  float,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)

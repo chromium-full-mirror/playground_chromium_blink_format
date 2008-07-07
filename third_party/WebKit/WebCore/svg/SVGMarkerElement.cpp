@@ -57,62 +57,42 @@ SVGMarkerElement::~SVGMarkerElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
                               SVGLength,
-                              Length,
-                              length,
                               RefX,
                               refX,
-                              SVGNames::refXAttr,
-                              m_refX)
+                              SVGNames::refXAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
                               SVGLength,
-                              Length,
-                              length,
                               RefY,
                               refY,
-                              SVGNames::refYAttr,
-                              m_refY)
+                              SVGNames::refYAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               MarkerUnits,
                               markerUnits,
-                              SVGNames::markerUnitsAttr,
-                              m_markerUnits)
+                              SVGNames::markerUnitsAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
                               SVGLength,
-                              Length,
-                              length,
                               MarkerWidth,
                               markerWidth,
-                              SVGNames::markerWidthAttr,
-                              m_markerWidth)
+                              SVGNames::markerWidthAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
                               SVGLength,
-                              Length,
-                              length,
                               MarkerHeight,
                               markerHeight,
-                              SVGNames::markerHeightAttr,
-                              m_markerHeight)
+                              SVGNames::markerHeightAttr)
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(SVGMarkerElement,
                                                      int,
-                                                     Enumeration,
-                                                     enumeration,
                                                      OrientType,
                                                      orientType,
                                                      SVGNames::orientAttr,
-                                                     "orientType",
-                                                     m_orientType)
-ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(SVGMarkerElement,
-                                                     SVGAngle*,
-                                                     Angle,
-                                                     angle,
-                                                     OrientAngle,
-                                                     orientAngle,
-                                                     SVGNames::orientAttr,
-                                                     "orientAngle",
-                                                     m_orientAngle.get())
+                                                     "orientType")
+ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED_WITH_CUSTOM_IDENTIFIER(
+    SVGMarkerElement,
+    SVGAngle,
+    OrientAngle,
+    orientAngle,
+    SVGNames::orientAttr,
+    "orientAngle")
 
 void SVGMarkerElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::markerUnitsAttr) {

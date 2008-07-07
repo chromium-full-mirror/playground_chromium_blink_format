@@ -47,60 +47,39 @@ SVGComponentTransferFunctionElement::~SVGComponentTransferFunctionElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGComponentTransferFunctionElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               Type,
                               type,
-                              SVGNames::typeAttr,
-                              m_type)
-ANIMATED_PROPERTY_DEFINITIONS(SVGComponentTransferFunctionElement,
-                              SVGNumberList*,
-                              NumberList,
-                              numberList,
-                              TableValues,
-                              tableValues,
-                              SVGNames::tableValuesAttr,
-                              m_tableValues.get())
+                              SVGNames::typeAttr)
+ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED(SVGComponentTransferFunctionElement,
+                                         SVGNumberList,
+                                         TableValues,
+                                         tableValues,
+                                         SVGNames::tableValuesAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGComponentTransferFunctionElement,
                               float,
-                              Number,
-                              number,
                               Slope,
                               slope,
-                              SVGNames::slopeAttr,
-                              m_slope)
+                              SVGNames::slopeAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGComponentTransferFunctionElement,
                               float,
-                              Number,
-                              number,
                               Intercept,
                               intercept,
-                              SVGNames::interceptAttr,
-                              m_intercept)
+                              SVGNames::interceptAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGComponentTransferFunctionElement,
                               float,
-                              Number,
-                              number,
                               Amplitude,
                               amplitude,
-                              SVGNames::amplitudeAttr,
-                              m_amplitude)
+                              SVGNames::amplitudeAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGComponentTransferFunctionElement,
                               float,
-                              Number,
-                              number,
                               Exponent,
                               exponent,
-                              SVGNames::exponentAttr,
-                              m_exponent)
+                              SVGNames::exponentAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGComponentTransferFunctionElement,
                               float,
-                              Number,
-                              number,
                               Offset,
                               offset,
-                              SVGNames::offsetAttr,
-                              m_offset)
+                              SVGNames::offsetAttr)
 
 void SVGComponentTransferFunctionElement::parseMappedAttribute(
     MappedAttribute* attr) {

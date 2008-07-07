@@ -79,19 +79,16 @@ class SVGGradientElement : public SVGStyledElement,
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGGradientElement,
                                  int,
-                                 int,
                                  SpreadMethod,
                                  spreadMethod)
   ANIMATED_PROPERTY_DECLARATIONS(SVGGradientElement,
                                  int,
-                                 int,
                                  GradientUnits,
                                  gradientUnits)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGGradientElement,
-                                 SVGTransformList*,
-                                 RefPtr<SVGTransformList>,
-                                 GradientTransform,
-                                 gradientTransform)
+  ANIMATED_PROPERTY_DECLARATIONS_REFCOUNTED(SVGGradientElement,
+                                            SVGTransformList,
+                                            GradientTransform,
+                                            gradientTransform)
 };
 
 }  // namespace WebCore

@@ -35,12 +35,9 @@ SVGFEMergeNodeElement::~SVGFEMergeNodeElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEMergeNodeElement,
                               String,
-                              String,
-                              string,
                               In1,
                               in1,
-                              SVGNames::inAttr,
-                              m_in1)
+                              SVGNames::inAttr)
 
 void SVGFEMergeNodeElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

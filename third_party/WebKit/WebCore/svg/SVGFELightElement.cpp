@@ -46,85 +46,43 @@ SVGFELightElement::~SVGFELightElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,
-                              Number,
-                              number,
                               Azimuth,
                               azimuth,
-                              SVGNames::azimuthAttr,
-                              m_azimuth)
+                              SVGNames::azimuthAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,
-                              Number,
-                              number,
                               Elevation,
                               elevation,
-                              SVGNames::elevationAttr,
-                              m_elevation)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
-                              float,
-                              Number,
-                              number,
-                              X,
-                              x,
-                              SVGNames::xAttr,
-                              m_x)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
-                              float,
-                              Number,
-                              number,
-                              Y,
-                              y,
-                              SVGNames::yAttr,
-                              m_y)
+                              SVGNames::elevationAttr)
+ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement, float, X, x, SVGNames::xAttr)
+ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement, float, Y, y, SVGNames::yAttr)
 
+ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement, float, Z, z, SVGNames::zAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,
-                              Number,
-                              number,
-                              Z,
-                              z,
-                              SVGNames::zAttr,
-                              m_z)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
-                              float,
-                              Number,
-                              number,
                               PointsAtX,
                               pointsAtX,
-                              SVGNames::pointsAtXAttr,
-                              m_pointsAtX)
+                              SVGNames::pointsAtXAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,
-                              Number,
-                              number,
                               PointsAtY,
                               pointsAtY,
-                              SVGNames::pointsAtYAttr,
-                              m_pointsAtY)
+                              SVGNames::pointsAtYAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,
-                              Number,
-                              number,
                               PointsAtZ,
                               pointsAtZ,
-                              SVGNames::pointsAtZAttr,
-                              m_pointsAtZ)
+                              SVGNames::pointsAtZAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,
-                              Number,
-                              number,
                               SpecularExponent,
                               specularExponent,
-                              SVGNames::specularExponentAttr,
-                              m_specularExponent)
+                              SVGNames::specularExponentAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,
-                              Number,
-                              number,
                               LimitingConeAngle,
                               limitingConeAngle,
-                              SVGNames::limitingConeAngleAttr,
-                              m_limitingConeAngle)
+                              SVGNames::limitingConeAngleAttr)
 
 void SVGFELightElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

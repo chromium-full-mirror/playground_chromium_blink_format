@@ -54,10 +54,10 @@ class SVGSymbolElement : public SVGStyledElement,
                                          FloatRect,
                                          ViewBox,
                                          viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
-                                         SVGPreserveAspectRatio*,
-                                         PreserveAspectRatio,
-                                         preserveAspectRatio)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS_REFCOUNTED(SVGFitToViewBox,
+                                                    SVGPreserveAspectRatio,
+                                                    PreserveAspectRatio,
+                                                    preserveAspectRatio)
 };
 
 }  // namespace WebCore

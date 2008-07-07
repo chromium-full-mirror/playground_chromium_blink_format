@@ -82,38 +82,18 @@ SVGSVGElement::~SVGSVGElement() {
   document()->accessSVGExtensions()->removeTimeContainer(this);
 }
 
+ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement, SVGLength, X, x, SVGNames::xAttr)
+ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement, SVGLength, Y, y, SVGNames::yAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               SVGLength,
-                              Length,
-                              length,
-                              X,
-                              x,
-                              SVGNames::xAttr,
-                              m_x)
-ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
-                              SVGLength,
-                              Length,
-                              length,
-                              Y,
-                              y,
-                              SVGNames::yAttr,
-                              m_y)
-ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
-                              SVGLength,
-                              Length,
-                              length,
                               Width,
                               width,
-                              SVGNames::widthAttr,
-                              m_width)
+                              SVGNames::widthAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               SVGLength,
-                              Length,
-                              length,
                               Height,
                               height,
-                              SVGNames::heightAttr,
-                              m_height)
+                              SVGNames::heightAttr)
 
 const AtomicString& SVGSVGElement::contentScriptType() const {
   static const AtomicString defaultValue("text/ecmascript");

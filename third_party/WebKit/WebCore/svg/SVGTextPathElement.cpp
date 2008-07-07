@@ -47,28 +47,19 @@ SVGTextPathElement::~SVGTextPathElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               SVGLength,
-                              Length,
-                              length,
                               StartOffset,
                               startOffset,
-                              SVGNames::startOffsetAttr,
-                              m_startOffset)
+                              SVGNames::startOffsetAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               Method,
                               method,
-                              SVGNames::methodAttr,
-                              m_method)
+                              SVGNames::methodAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextPathElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               Spacing,
                               spacing,
-                              SVGNames::spacingAttr,
-                              m_spacing)
+                              SVGNames::spacingAttr)
 
 void SVGTextPathElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

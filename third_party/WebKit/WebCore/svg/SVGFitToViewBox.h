@@ -56,14 +56,12 @@ class SVGFitToViewBox {
  private:
   ANIMATED_PROPERTY_DECLARATIONS_WITH_CONTEXT(SVGFitToViewBox,
                                               FloatRect,
-                                              FloatRect,
                                               ViewBox,
                                               viewBox)
-  ANIMATED_PROPERTY_DECLARATIONS_WITH_CONTEXT(SVGFitToViewBox,
-                                              SVGPreserveAspectRatio*,
-                                              RefPtr<SVGPreserveAspectRatio>,
-                                              PreserveAspectRatio,
-                                              preserveAspectRatio)
+  ANIMATED_PROPERTY_DECLARATIONS_REFCOUNTED_WITH_CONTEXT(SVGFitToViewBox,
+                                                         SVGPreserveAspectRatio,
+                                                         PreserveAspectRatio,
+                                                         preserveAspectRatio)
 };
 
 }  // namespace WebCore

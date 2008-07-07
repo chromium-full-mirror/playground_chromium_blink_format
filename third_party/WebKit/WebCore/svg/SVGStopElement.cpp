@@ -39,12 +39,9 @@ SVGStopElement::~SVGStopElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGStopElement,
                               float,
-                              Number,
-                              number,
                               Offset,
                               offset,
-                              SVGNames::offsetAttr,
-                              m_offset)
+                              SVGNames::offsetAttr)
 
 void SVGStopElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::offsetAttr) {

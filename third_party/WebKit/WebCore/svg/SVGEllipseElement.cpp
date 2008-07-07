@@ -47,36 +47,24 @@ SVGEllipseElement::~SVGEllipseElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGEllipseElement,
                               SVGLength,
-                              Length,
-                              length,
                               Cx,
                               cx,
-                              SVGNames::cxAttr,
-                              m_cx)
+                              SVGNames::cxAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGEllipseElement,
                               SVGLength,
-                              Length,
-                              length,
                               Cy,
                               cy,
-                              SVGNames::cyAttr,
-                              m_cy)
+                              SVGNames::cyAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGEllipseElement,
                               SVGLength,
-                              Length,
-                              length,
                               Rx,
                               rx,
-                              SVGNames::rxAttr,
-                              m_rx)
+                              SVGNames::rxAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGEllipseElement,
                               SVGLength,
-                              Length,
-                              length,
                               Ry,
                               ry,
-                              SVGNames::ryAttr,
-                              m_ry)
+                              SVGNames::ryAttr)
 
 void SVGEllipseElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::cxAttr)

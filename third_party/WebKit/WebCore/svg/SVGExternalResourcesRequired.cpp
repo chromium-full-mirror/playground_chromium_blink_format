@@ -39,12 +39,9 @@ SVGExternalResourcesRequired::~SVGExternalResourcesRequired() {}
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(
     SVGExternalResourcesRequired,
     bool,
-    Boolean,
-    boolean,
     ExternalResourcesRequired,
     externalResourcesRequired,
-    SVGNames::externalResourcesRequiredAttr,
-    m_externalResourcesRequired)
+    SVGNames::externalResourcesRequiredAttr)
 
 bool SVGExternalResourcesRequired::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::externalResourcesRequiredAttr) {

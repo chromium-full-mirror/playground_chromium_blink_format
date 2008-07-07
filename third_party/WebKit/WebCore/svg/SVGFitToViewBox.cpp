@@ -42,20 +42,15 @@ SVGFitToViewBox::~SVGFitToViewBox() {}
 
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(SVGFitToViewBox,
                                            FloatRect,
-                                           Rect,
-                                           rect,
                                            ViewBox,
                                            viewBox,
-                                           SVGNames::viewBoxAttr,
-                                           m_viewBox)
-ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(SVGFitToViewBox,
-                                           SVGPreserveAspectRatio*,
-                                           PreserveAspectRatio,
-                                           preserveAspectRatio,
-                                           PreserveAspectRatio,
-                                           preserveAspectRatio,
-                                           SVGNames::preserveAspectRatioAttr,
-                                           m_preserveAspectRatio.get())
+                                           SVGNames::viewBoxAttr)
+ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED_WITH_CONTEXT(
+    SVGFitToViewBox,
+    SVGPreserveAspectRatio,
+    PreserveAspectRatio,
+    preserveAspectRatio,
+    SVGNames::preserveAspectRatioAttr)
 
 bool SVGFitToViewBox::parseViewBox(const UChar*& c,
                                    const UChar* end,

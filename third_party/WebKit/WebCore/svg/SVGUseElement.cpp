@@ -66,38 +66,18 @@ SVGUseElement::SVGUseElement(const QualifiedName& tagName, Document* doc)
 
 SVGUseElement::~SVGUseElement() {}
 
+ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement, SVGLength, X, x, SVGNames::xAttr)
+ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement, SVGLength, Y, y, SVGNames::yAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               SVGLength,
-                              Length,
-                              length,
-                              X,
-                              x,
-                              SVGNames::xAttr,
-                              m_x)
-ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
-                              SVGLength,
-                              Length,
-                              length,
-                              Y,
-                              y,
-                              SVGNames::yAttr,
-                              m_y)
-ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
-                              SVGLength,
-                              Length,
-                              length,
                               Width,
                               width,
-                              SVGNames::widthAttr,
-                              m_width)
+                              SVGNames::widthAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGUseElement,
                               SVGLength,
-                              Length,
-                              length,
                               Height,
                               height,
-                              SVGNames::heightAttr,
-                              m_height)
+                              SVGNames::heightAttr)
 
 SVGElementInstance* SVGUseElement::instanceRoot() const {
   return m_targetElementInstance.get();

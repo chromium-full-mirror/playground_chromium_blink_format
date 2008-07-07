@@ -52,46 +52,23 @@ SVGImageElement::SVGImageElement(const QualifiedName& tagName, Document* doc)
 
 SVGImageElement::~SVGImageElement() {}
 
+ANIMATED_PROPERTY_DEFINITIONS(SVGImageElement, SVGLength, X, x, SVGNames::xAttr)
+ANIMATED_PROPERTY_DEFINITIONS(SVGImageElement, SVGLength, Y, y, SVGNames::yAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGImageElement,
                               SVGLength,
-                              Length,
-                              length,
-                              X,
-                              x,
-                              SVGNames::xAttr,
-                              m_x)
-ANIMATED_PROPERTY_DEFINITIONS(SVGImageElement,
-                              SVGLength,
-                              Length,
-                              length,
-                              Y,
-                              y,
-                              SVGNames::yAttr,
-                              m_y)
-ANIMATED_PROPERTY_DEFINITIONS(SVGImageElement,
-                              SVGLength,
-                              Length,
-                              length,
                               Width,
                               width,
-                              SVGNames::widthAttr,
-                              m_width)
+                              SVGNames::widthAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGImageElement,
                               SVGLength,
-                              Length,
-                              length,
                               Height,
                               height,
-                              SVGNames::heightAttr,
-                              m_height)
-ANIMATED_PROPERTY_DEFINITIONS(SVGImageElement,
-                              SVGPreserveAspectRatio*,
-                              PreserveAspectRatio,
-                              preserveAspectRatio,
-                              PreserveAspectRatio,
-                              preserveAspectRatio,
-                              SVGNames::preserveAspectRatioAttr,
-                              m_preserveAspectRatio.get())
+                              SVGNames::heightAttr)
+ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED(SVGImageElement,
+                                         SVGPreserveAspectRatio,
+                                         PreserveAspectRatio,
+                                         preserveAspectRatio,
+                                         SVGNames::preserveAspectRatioAttr)
 
 void SVGImageElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::xAttr)

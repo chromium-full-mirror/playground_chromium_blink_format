@@ -47,49 +47,34 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
 SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
-                              String,
-                              String,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr,
-                              m_in1)
+                              SVGNames::inAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
                               float,
-                              Number,
-                              number,
                               DiffuseConstant,
                               diffuseConstant,
-                              SVGNames::diffuseConstantAttr,
-                              m_diffuseConstant)
+                              SVGNames::diffuseConstantAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
                               float,
-                              Number,
-                              number,
                               SurfaceScale,
                               surfaceScale,
-                              SVGNames::surfaceScaleAttr,
-                              m_surfaceScale)
+                              SVGNames::surfaceScaleAttr)
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFEDiffuseLightingElement,
     float,
-    Number,
-    number,
     KernelUnitLengthX,
     kernelUnitLengthX,
     SVGNames::kernelUnitLengthAttr,
-    "kernelUnitLengthX",
-    m_kernelUnitLengthX)
+    "kernelUnitLengthX")
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFEDiffuseLightingElement,
     float,
-    Number,
-    number,
     KernelUnitLengthY,
     kernelUnitLengthY,
     SVGNames::kernelUnitLengthAttr,
-    "kernelUnitLengthY",
-    m_kernelUnitLengthY)
+    "kernelUnitLengthY")
 
 void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

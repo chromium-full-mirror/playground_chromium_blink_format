@@ -63,7 +63,6 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGClipPathElement,
                                  int,
-                                 int,
                                  ClipPathUnits,
                                  clipPathUnits)
 

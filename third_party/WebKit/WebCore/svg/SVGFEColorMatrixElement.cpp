@@ -41,29 +41,20 @@ SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
-                              String,
-                              String,
                               string,
                               In1,
                               in1,
-                              SVGNames::inAttr,
-                              m_in1)
+                              SVGNames::inAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               Type,
                               type,
-                              SVGNames::typeAttr,
-                              m_type)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
-                              SVGNumberList*,
-                              NumberList,
-                              numberList,
-                              Values,
-                              values,
-                              SVGNames::valuesAttr,
-                              m_values.get())
+                              SVGNames::typeAttr)
+ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED(SVGFEColorMatrixElement,
+                                         SVGNumberList,
+                                         Values,
+                                         values,
+                                         SVGNames::valuesAttr)
 
 void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

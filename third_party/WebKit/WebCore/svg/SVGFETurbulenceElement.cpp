@@ -46,55 +46,37 @@ SVGFETurbulenceElement::~SVGFETurbulenceElement() {}
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFETurbulenceElement,
     float,
-    Number,
-    number,
     BaseFrequencyX,
     baseFrequencyX,
     SVGNames::baseFrequencyAttr,
-    "baseFrequencyX",
-    m_baseFrequencyX)
+    "baseFrequencyX")
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFETurbulenceElement,
     float,
-    Number,
-    number,
     BaseFrequencyY,
     baseFrequencyY,
     SVGNames::baseFrequencyAttr,
-    "baseFrequencyY",
-    m_baseFrequencyY)
+    "baseFrequencyY")
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               float,
-                              Number,
-                              number,
                               Seed,
                               seed,
-                              SVGNames::seedAttr,
-                              m_seed)
+                              SVGNames::seedAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               long,
-                              Integer,
-                              integer,
                               NumOctaves,
                               numOctaves,
-                              SVGNames::numOctavesAttr,
-                              m_numOctaves)
+                              SVGNames::numOctavesAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               StitchTiles,
                               stitchTiles,
-                              SVGNames::stitchTilesAttr,
-                              m_stitchTiles)
+                              SVGNames::stitchTilesAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               Type,
                               type,
-                              SVGNames::typeAttr,
-                              m_type)
+                              SVGNames::typeAttr)
 
 void SVGFETurbulenceElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();

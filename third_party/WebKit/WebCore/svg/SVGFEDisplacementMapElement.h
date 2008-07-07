@@ -41,28 +41,17 @@ class SVGFEDisplacementMapElement
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement, String, In1, in1)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement, String, In2, in2)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
-                                 String,
-                                 String,
-                                 In1,
-                                 in1)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
-                                 String,
-                                 String,
-                                 In2,
-                                 in2)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
-                                 int,
                                  int,
                                  XChannelSelector,
                                  xChannelSelector)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
                                  int,
-                                 int,
                                  YChannelSelector,
                                  yChannelSelector)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
-                                 float,
                                  float,
                                  Scale,
                                  scale)

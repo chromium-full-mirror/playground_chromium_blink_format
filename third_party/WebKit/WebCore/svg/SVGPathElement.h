@@ -148,11 +148,7 @@ class SVGPathElement : public SVGStyledTransformableElement,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGPathElement,
-                                 float,
-                                 float,
-                                 PathLength,
-                                 pathLength)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPathElement, float, PathLength, pathLength)
 };
 
 }  // namespace WebCore

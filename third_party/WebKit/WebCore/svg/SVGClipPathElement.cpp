@@ -45,12 +45,9 @@ SVGClipPathElement::~SVGClipPathElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGClipPathElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               ClipPathUnits,
                               clipPathUnits,
-                              SVGNames::clipPathUnitsAttr,
-                              m_clipPathUnits)
+                              SVGNames::clipPathUnitsAttr)
 
 void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::clipPathUnitsAttr) {

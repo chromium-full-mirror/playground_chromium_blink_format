@@ -160,23 +160,15 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                          FloatRect,
                                          ViewBox,
                                          viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
-                                         SVGPreserveAspectRatio*,
-                                         PreserveAspectRatio,
-                                         preserveAspectRatio)
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS_REFCOUNTED(SVGFitToViewBox,
+                                                    SVGPreserveAspectRatio,
+                                                    PreserveAspectRatio,
+                                                    preserveAspectRatio)
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, SVGLength, X, x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, SVGLength, Y, y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
-                                 SVGLength,
-                                 SVGLength,
-                                 Width,
-                                 width)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
-                                 SVGLength,
-                                 SVGLength,
-                                 Height,
-                                 height)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, Y, y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, Width, width)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, Height, height)
 
   virtual void willSaveToCache();
   virtual void willRestoreFromCache();

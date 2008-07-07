@@ -36,27 +36,21 @@ SVGCursorElement::SVGCursorElement(const QualifiedName& tagName, Document* doc)
       SVGTests(),
       SVGExternalResourcesRequired(),
       SVGURIReference(),
-      m_x(0, LengthModeWidth),
-      m_y(0, LengthModeHeight) {}
+      m_x(static_cast<SVGStyledElement*>(0), LengthModeWidth),
+      m_y(static_cast<SVGStyledElement*>(0), LengthModeHeight) {}
 
 SVGCursorElement::~SVGCursorElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGCursorElement,
                               SVGLength,
-                              Length,
-                              length,
                               X,
                               x,
-                              SVGNames::xAttr,
-                              m_x)
+                              SVGNames::xAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGCursorElement,
                               SVGLength,
-                              Length,
-                              length,
                               Y,
                               y,
-                              SVGNames::yAttr,
-                              m_y)
+                              SVGNames::yAttr)
 
 void SVGCursorElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::xAttr)

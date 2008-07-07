@@ -42,33 +42,24 @@ class SVGFESpecularLightingElement
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement, String, In1, in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 String,
-                                 String,
-                                 In1,
-                                 in1)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 float,
                                  float,
                                  SpecularConstant,
                                  specularConstant)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
                                  float,
-                                 float,
                                  SpecularExponent,
                                  specularExponent)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 float,
                                  float,
                                  SurfaceScale,
                                  surfaceScale)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
                                  float,
-                                 float,
                                  KernelUnitLengthX,
                                  kernelUnitLengthX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
-                                 float,
                                  float,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)

@@ -70,7 +70,7 @@ class SVGAElement : public SVGStyledTransformableElement,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGAElement, String, String, Target, target)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGAElement, String, Target, target)
 };
 
 }  // namespace WebCore

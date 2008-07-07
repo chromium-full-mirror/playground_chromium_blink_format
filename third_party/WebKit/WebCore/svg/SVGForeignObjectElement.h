@@ -58,23 +58,13 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
                                          externalResourcesRequired)
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
 
+  ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement, SVGLength, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement, SVGLength, Y, y)
   ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength,
-                                 SVGLength,
-                                 X,
-                                 x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength,
-                                 SVGLength,
-                                 Y,
-                                 y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength,
                                  SVGLength,
                                  Width,
                                  width)
   ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength,
                                  SVGLength,
                                  Height,
                                  height)

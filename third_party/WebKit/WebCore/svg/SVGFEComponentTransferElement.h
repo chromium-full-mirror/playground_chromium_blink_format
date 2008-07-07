@@ -46,7 +46,6 @@ class SVGFEComponentTransferElement
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEComponentTransferElement,
                                  String,
-                                 String,
                                  In1,
                                  in1)
 

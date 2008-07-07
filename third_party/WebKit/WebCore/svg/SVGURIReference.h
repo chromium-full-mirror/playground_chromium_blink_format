@@ -46,7 +46,6 @@ class SVGURIReference {
  private:
   ANIMATED_PROPERTY_DECLARATIONS_WITH_CONTEXT(SVGURIReference,
                                               String,
-                                              String,
                                               Href,
                                               href)
 };

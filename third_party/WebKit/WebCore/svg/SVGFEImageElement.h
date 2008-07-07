@@ -60,11 +60,10 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEImageElement,
-                                 SVGPreserveAspectRatio*,
-                                 RefPtr<SVGPreserveAspectRatio>,
-                                 PreserveAspectRatio,
-                                 preserveAspectRatio)
+  ANIMATED_PROPERTY_DECLARATIONS_REFCOUNTED(SVGFEImageElement,
+                                            SVGPreserveAspectRatio,
+                                            PreserveAspectRatio,
+                                            preserveAspectRatio)
 
   CachedImage* m_cachedImage;
   mutable RefPtr<SVGFEImage> m_filterEffect;

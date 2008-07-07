@@ -39,28 +39,19 @@ SVGFEBlendElement::~SVGFEBlendElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               String,
-                              String,
-                              string,
                               In1,
                               in1,
-                              SVGNames::inAttr,
-                              m_in1)
+                              SVGNames::inAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               String,
-                              String,
-                              string,
                               In2,
                               in2,
-                              SVGNames::in2Attr,
-                              m_in2)
+                              SVGNames::in2Attr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               int,
-                              Enumeration,
-                              enumeration,
                               Mode,
                               mode,
-                              SVGNames::modeAttr,
-                              m_mode)
+                              SVGNames::modeAttr)
 
 void SVGFEBlendElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
