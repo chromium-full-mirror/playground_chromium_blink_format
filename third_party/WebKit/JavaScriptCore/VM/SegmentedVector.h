@@ -149,6 +149,7 @@ class SegmentedVector {
   Segment m_inlineSegment;
   Vector<Segment*, 32> m_segments;
 };
-}
+
+}  // namespace KJS
 
 #endif  // SegmentedVector_h

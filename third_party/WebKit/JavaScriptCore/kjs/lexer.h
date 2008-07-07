@@ -41,7 +41,7 @@ class Lexer : Noncopyable {
 
   int lineNo() const { return yylineno; }
 
-  bool prevTerminator() const { return terminator; }
+  bool prevTerminator() const { return m_terminator; }
 
   enum State {
     Start,
@@ -86,7 +86,7 @@ class Lexer : Noncopyable {
   static bool isIdentPart(int);
   static bool isHexDigit(int);
 
-  bool sawError() const { return error; }
+  bool sawError() const { return m_error; }
 
   void clear();
   SourceRange sourceRange(int openBrace, int closeBrace) {
@@ -98,23 +98,7 @@ class Lexer : Noncopyable {
   Lexer(JSGlobalData*);
   ~Lexer();
 
-  int yylineno;
-  bool done;
-  Vector<char> m_buffer8;
-  Vector<UChar> m_buffer16;
-  bool terminator;
-  bool restrKeyword;
-  // encountered delimiter like "'" and "}" on last run
-  bool delimited;
-  bool skipLF;
-  bool skipCR;
-  bool eatNextIdentifier;
-  int stackToken;
-  int lastToken;
-
-  State state;
   void setDone(State);
-  unsigned int pos;
   void shift(unsigned int p);
   void nextLine();
   int lookupKeyword(const char*);
@@ -134,16 +118,36 @@ class Lexer : Noncopyable {
   KJS::Identifier* makeIdentifier(const Vector<UChar>& buffer);
   UString* makeUString(const Vector<UChar>& buffer);
 
-  RefPtr<SourceProvider> m_source;
-  const UChar* code;
-  unsigned int length;
+  int yylineno;
   int yycolumn;
-  int atLineStart;
-  bool error;
+
+  bool m_done;
+  Vector<char> m_buffer8;
+  Vector<UChar> m_buffer16;
+  bool m_terminator;
+  bool m_restrKeyword;
+  bool m_delimited;  // encountered delimiter like "'" and "}" on last run
+  bool m_skipLF;
+  bool m_skipCR;
+  bool m_eatNextIdentifier;
+  int m_stackToken;
+  int m_lastToken;
+
+  State m_state;
+  unsigned int m_position;
+
+  RefPtr<SourceProvider> m_source;
+  const UChar* m_code;
+  unsigned int m_length;
+  int m_atLineStart;
+  bool m_error;
 
   // current and following unicode characters (int to allow for -1 for
   // end-of-file marker)
-  int current, next1, next2, next3;
+  int m_current;
+  int m_next1;
+  int m_next2;
+  int m_next3;
 
   Vector<UString*> m_strings;
   Vector<KJS::Identifier*> m_identifiers;
@@ -153,7 +157,7 @@ class Lexer : Noncopyable {
   UString m_pattern;
   UString m_flags;
 
-  const HashTable mainTable;
+  const HashTable m_mainTable;
 };
 
 }  // namespace KJS

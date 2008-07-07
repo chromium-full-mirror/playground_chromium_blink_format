@@ -30,7 +30,6 @@
 #define ProfileNode_h
 
 #include "CallIdentifier.h"
-
 #include <wtf/Vector.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -154,8 +153,10 @@ class ProfileNode : public RefCounted<ProfileNode> {
   ProfileNode(const CallIdentifier&,
               ProfileNode* headNode,
               ProfileNode* parentNode);
+
   void startTimer();
   void resetChildrensSiblings();
+
   RefPtr<ProfileNode>* childrenBegin() { return m_children.begin(); }
   RefPtr<ProfileNode>* childrenEnd() { return m_children.end(); }
 

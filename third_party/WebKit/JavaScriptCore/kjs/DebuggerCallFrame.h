@@ -42,7 +42,7 @@ class ScopeChainNode;
 
 class DebuggerCallFrame {
  public:
-  typedef enum { ProgramType, FunctionType } Type;
+  enum Type { ProgramType, FunctionType };
 
   DebuggerCallFrame(JSGlobalObject* dynamicGlobalObject,
                     const CodeBlock* codeBlock,

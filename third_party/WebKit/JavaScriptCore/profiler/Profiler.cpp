@@ -112,9 +112,10 @@ static inline void dispatchFunctionToProfiles(
     Profile::ProfileFunction function,
     const CallIdentifier& callIdentifier,
     unsigned currentPageGroupIdentifier) {
-  for (size_t i = 0; i < profiles.size(); ++i)
+  for (size_t i = 0; i < profiles.size(); ++i) {
     if (profiles[i]->pageGroupIdentifier() == currentPageGroupIdentifier)
       (profiles[i].get()->*function)(callIdentifier);
+  }
 }
 
 void Profiler::willExecute(ExecState* exec, JSObject* calledFunction) {

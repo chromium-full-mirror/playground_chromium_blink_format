@@ -31,7 +31,6 @@
 #include "JSGlobalObject.h"
 #include "ProfileNode.h"
 #include "TreeProfile.h"
-
 #include <stdio.h>
 
 namespace KJS {

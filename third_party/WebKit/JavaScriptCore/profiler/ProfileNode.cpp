@@ -29,9 +29,8 @@
 #include "config.h"
 #include "ProfileNode.h"
 
-#include "Profiler.h"
 #include "DateMath.h"
-
+#include "Profiler.h"
 #include <stdio.h>
 
 #if PLATFORM(WIN_OS)
