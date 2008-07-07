@@ -41,7 +41,7 @@ SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
-                              string,
+                              String,
                               In1,
                               in1,
                               SVGNames::inAttr)

@@ -69,11 +69,15 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFESpecularLightingElement,
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFESpecularLightingElement,
     float,
+    KernelUnitLengthX,
+    kernelUnitLengthX,
     SVGNames::kernelUnitLengthAttr,
     "kernelUnitLengthX")
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFESpecularLightingElement,
     float,
+    KernelUnitLengthY,
+    kernelUnitLengthY,
     SVGNames::kernelUnitLengthAttr,
     "kernelUnitLengthY")
 

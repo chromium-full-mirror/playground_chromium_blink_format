@@ -56,7 +56,6 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               SVGNames::elevationAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement, float, X, x, SVGNames::xAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement, float, Y, y, SVGNames::yAttr)
-
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement, float, Z, z, SVGNames::zAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFELightElement,
                               float,

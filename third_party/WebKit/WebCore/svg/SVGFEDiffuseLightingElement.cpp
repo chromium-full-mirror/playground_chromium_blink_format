@@ -47,7 +47,7 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
 SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
-                              string,
+                              String,
                               In1,
                               in1,
                               SVGNames::inAttr)
