@@ -36,19 +36,13 @@ class UString;
 
 class TreeProfile : public Profile {
  public:
-  static PassRefPtr<TreeProfile> create(const UString& title,
-                                        ExecState* originatingGlobalExec,
-                                        unsigned pageGroupIdentifier,
-                                        ProfilerClient*);
+  static PassRefPtr<TreeProfile> create(const UString& title);
 
   virtual Profile* heavyProfile();
   virtual Profile* treeProfile() { return this; }
 
  private:
-  TreeProfile(const UString& title,
-              ExecState* originatingGlobalExec,
-              unsigned pageGroupIdentifier,
-              ProfilerClient*);
+  TreeProfile(const UString& title);
 };
 
 }  // namespace KJS
