@@ -56,6 +56,7 @@
 #include "HTMLDocument.h"
 #include "HTMLElement.h"
 #include "HTMLInputElement.h"
+#include "HTMLTextAreaElement.h"
 #include "HTMLNames.h"
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
@@ -2253,6 +2254,26 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           // pseudo-class to elements
           // that are non-"hidden" controls.
           return !e->isEnabled();
+        break;
+      case CSSSelector::PseudoReadOnly:
+        if (e && e->isControl()) {
+          if (e->hasTagName(inputTag)) {
+            HTMLInputElement* input = static_cast<HTMLInputElement*>(e);
+            return (input->isTextField() && input->isReadOnlyControl());
+          } else if (e->hasTagName(textareaTag))
+            return (
+                (static_cast<HTMLTextAreaElement*>(e))->isReadOnlyControl());
+        }
+        break;
+      case CSSSelector::PseudoReadWrite:
+        if (e && e->isControl()) {
+          if (e->hasTagName(inputTag)) {
+            HTMLInputElement* input = static_cast<HTMLInputElement*>(e);
+            return (input->isTextField() && !input->isReadOnlyControl());
+          } else if (e->hasTagName(textareaTag))
+            return (
+                !(static_cast<HTMLTextAreaElement*>(e))->isReadOnlyControl());
+        }
         break;
       case CSSSelector::PseudoChecked:
         // Even though WinIE allows checked and indeterminate to co-exist, the

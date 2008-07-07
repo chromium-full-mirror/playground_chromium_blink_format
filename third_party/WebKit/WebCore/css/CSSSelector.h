@@ -136,6 +136,8 @@ class CSSSelector {
     PseudoChecked,
     PseudoEnabled,
     PseudoDisabled,
+    PseudoReadOnly,
+    PseudoReadWrite,
     PseudoIndeterminate,
     PseudoTarget,
     PseudoBefore,
