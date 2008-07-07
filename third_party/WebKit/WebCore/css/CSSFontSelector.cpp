@@ -65,9 +65,11 @@ CSSFontSelector::CSSFontSelector(Document* document) : m_document(document) {
   // seem to be any such guarantee.
 
   ASSERT(m_document);
+  FontCache::addClient(this);
 }
 
 CSSFontSelector::~CSSFontSelector() {
+  FontCache::removeClient(this);
   deleteAllValues(m_fontFaces);
   deleteAllValues(m_locallyInstalledFontFaces);
   deleteAllValues(m_fonts);
@@ -380,6 +382,13 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 }
 
 void CSSFontSelector::fontLoaded(CSSSegmentedFontFace*) {
+  if (m_document->inPageCache() || !m_document->renderer())
+    return;
+  m_document->recalcStyle(Document::Force);
+  m_document->renderer()->setNeedsLayoutAndPrefWidthsRecalc();
+}
+
+void CSSFontSelector::fontCacheInvalidated() {
   if (m_document->inPageCache() || !m_document->renderer())
     return;
   m_document->recalcStyle(Document::Force);
