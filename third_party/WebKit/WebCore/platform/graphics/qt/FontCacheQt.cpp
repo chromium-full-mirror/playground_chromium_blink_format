@@ -48,3 +48,5 @@ FontPlatformData* FontCache::getLastResortFallbackFont(const FontDescription&) {
 void FontCache::addClient(FontSelector*) {}
 
 void FontCache::removeClient(FontSelector*) {}
+
+}  // namespace WebCore
