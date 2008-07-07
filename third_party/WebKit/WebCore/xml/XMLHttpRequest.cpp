@@ -567,7 +567,7 @@ void XMLHttpRequest::makeSimpleCrossSiteAccessRequest(ExceptionCode& ec) {
 
   ResourceRequest request(url);
   request.setHTTPMethod(m_method);
-  request.setHTTPHeaderField("Access-Control-Origin", accessControlOrigin());
+  request.setHTTPHeaderField("Origin", accessControlOrigin());
 
   if (m_crossSiteRequestHeaders.size() > 0)
     request.addHTTPHeaderFields(m_crossSiteRequestHeaders);
@@ -588,7 +588,7 @@ void XMLHttpRequest::makeCrossSiteAccessRequestWithPreflight(
   m_inPreflight = true;
   ResourceRequest preflightRequest(url);
   preflightRequest.setHTTPMethod("OPTIONS");
-  preflightRequest.setHTTPHeaderField("Access-Control-Origin", origin);
+  preflightRequest.setHTTPHeaderField("Origin", origin);
 
   if (m_async) {
     loadRequestAsynchronously(preflightRequest);
@@ -601,7 +601,7 @@ void XMLHttpRequest::makeCrossSiteAccessRequestWithPreflight(
   // Send the actual request.
   ResourceRequest request(url);
   request.setHTTPMethod(m_method);
-  request.setHTTPHeaderField("Access-Control-Origin", origin);
+  request.setHTTPHeaderField("Origin", origin);
 
   if (m_crossSiteRequestHeaders.size() > 0)
     request.addHTTPHeaderFields(m_crossSiteRequestHeaders);
@@ -626,7 +626,7 @@ void XMLHttpRequest::handleAsynchronousPreflightResult() {
 
   ResourceRequest request(url);
   request.setHTTPMethod(m_method);
-  request.setHTTPHeaderField("Access-Control-Origin", accessControlOrigin());
+  request.setHTTPHeaderField("Origin", accessControlOrigin());
 
   if (m_crossSiteRequestHeaders.size() > 0)
     request.addHTTPHeaderFields(m_crossSiteRequestHeaders);
