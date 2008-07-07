@@ -39,33 +39,34 @@ const ClassInfo RegExpConstructor::info = {
 
 /* Source for RegExpConstructor.lut.h
 @begin regExpConstructorTable
-  input           RegExpConstructor::Input          None
-  $_              RegExpConstructor::Input          DontEnum
-  multiline       RegExpConstructor::Multiline      None
-  $*              RegExpConstructor::Multiline      DontEnum
-  lastMatch       RegExpConstructor::LastMatch      DontDelete|ReadOnly
-  $&              RegExpConstructor::LastMatch      DontDelete|ReadOnly|DontEnum
-  lastParen       RegExpConstructor::LastParen      DontDelete|ReadOnly
-  $+              RegExpConstructor::LastParen      DontDelete|ReadOnly|DontEnum
-  leftContext     RegExpConstructor::LeftContext    DontDelete|ReadOnly
-  $`              RegExpConstructor::LeftContext    DontDelete|ReadOnly|DontEnum
-  rightContext    RegExpConstructor::RightContext   DontDelete|ReadOnly
-  $'              RegExpConstructor::RightContext   DontDelete|ReadOnly|DontEnum
-  $1              RegExpConstructor::Dollar1        DontDelete|ReadOnly
-  $2              RegExpConstructor::Dollar2        DontDelete|ReadOnly
-  $3              RegExpConstructor::Dollar3        DontDelete|ReadOnly
-  $4              RegExpConstructor::Dollar4        DontDelete|ReadOnly
-  $5              RegExpConstructor::Dollar5        DontDelete|ReadOnly
-  $6              RegExpConstructor::Dollar6        DontDelete|ReadOnly
-  $7              RegExpConstructor::Dollar7        DontDelete|ReadOnly
-  $8              RegExpConstructor::Dollar8        DontDelete|ReadOnly
-  $9              RegExpConstructor::Dollar9        DontDelete|ReadOnly
+    input           RegExpConstructor::Input          None
+    $_              RegExpConstructor::Input          DontEnum
+    multiline       RegExpConstructor::Multiline      None
+    $*              RegExpConstructor::Multiline      DontEnum
+    lastMatch       RegExpConstructor::LastMatch      DontDelete|ReadOnly
+    $&              RegExpConstructor::LastMatch DontDelete|ReadOnly|DontEnum
+    lastParen       RegExpConstructor::LastParen      DontDelete|ReadOnly
+    $+              RegExpConstructor::LastParen DontDelete|ReadOnly|DontEnum
+    leftContext     RegExpConstructor::LeftContext    DontDelete|ReadOnly
+    $`              RegExpConstructor::LeftContext DontDelete|ReadOnly|DontEnum
+    rightContext    RegExpConstructor::RightContext   DontDelete|ReadOnly
+    $'              RegExpConstructor::RightContext DontDelete|ReadOnly|DontEnum
+    $1              RegExpConstructor::Dollar1        DontDelete|ReadOnly
+    $2              RegExpConstructor::Dollar2        DontDelete|ReadOnly
+    $3              RegExpConstructor::Dollar3        DontDelete|ReadOnly
+    $4              RegExpConstructor::Dollar4        DontDelete|ReadOnly
+    $5              RegExpConstructor::Dollar5        DontDelete|ReadOnly
+    $6              RegExpConstructor::Dollar6        DontDelete|ReadOnly
+    $7              RegExpConstructor::Dollar7        DontDelete|ReadOnly
+    $8              RegExpConstructor::Dollar8        DontDelete|ReadOnly
+    $9              RegExpConstructor::Dollar9        DontDelete|ReadOnly
 @end
 */
 
 struct RegExpConstructorPrivate {
   // Global search cache / settings
   RegExpConstructorPrivate() : lastNumSubPatterns(0), multiline(false) {}
+
   UString lastInput;
   OwnArrayPtr<int> lastOvector;
   unsigned lastNumSubPatterns : 31;
@@ -73,12 +74,12 @@ struct RegExpConstructorPrivate {
 };
 
 RegExpConstructor::RegExpConstructor(ExecState* exec,
-                                     FunctionPrototype* funcProto,
-                                     RegExpPrototype* regProto)
-    : InternalFunction(funcProto, Identifier(exec, "RegExp")),
+                                     FunctionPrototype* functionPrototype,
+                                     RegExpPrototype* regExpPrototype)
+    : InternalFunction(functionPrototype, Identifier(exec, "RegExp")),
       d(new RegExpConstructorPrivate) {
   // ECMA 15.10.5.1 RegExp.prototype
-  putDirect(exec->propertyNames().prototype, regProto,
+  putDirect(exec->propertyNames().prototype, regExpPrototype,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
@@ -313,7 +314,7 @@ void RegExpConstructor::putValueProperty(ExecState* exec,
       d->multiline = value->toBoolean(exec);
       break;
     default:
-      ASSERT(0);
+      ASSERT_NOT_REACHED();
   }
 }
 
@@ -334,13 +335,12 @@ static JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
   UString flags = arg1->isUndefined() ? UString("") : arg1->toString(exec);
 
   RefPtr<RegExp> regExp = RegExp::create(pattern, flags);
-  return regExp->isValid()
-             ? new (exec)
-                   RegExpObject(exec->lexicalGlobalObject()->regExpPrototype(),
-                                regExp.release())
-             : throwError(exec, SyntaxError,
-                          UString("Invalid regular expression: ")
-                              .append(regExp->errorMessage()));
+  if (!regExp->isValid())
+    return throwError(
+        exec, SyntaxError,
+        UString("Invalid regular expression: ").append(regExp->errorMessage()));
+  return new (exec) RegExpObject(exec->lexicalGlobalObject()->regExpPrototype(),
+                                 regExp.release());
 }
 
 static JSObject* constructWithRegExpConstructor(ExecState* exec,

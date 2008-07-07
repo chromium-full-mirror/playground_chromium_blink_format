@@ -104,7 +104,7 @@ NumberPrototype::NumberPrototype(ExecState* exec,
 
 // ECMA 15.7.4.2 - 15.7.4.7
 
-static UString integer_part_noexp(double d) {
+static UString integerPartNoExp(double d) {
   int decimalPoint;
   int sign;
   char* result = dtoa(d, 0, &decimalPoint, &sign, NULL);
@@ -134,7 +134,7 @@ static UString integer_part_noexp(double d) {
   return str;
 }
 
-static UString char_sequence(char c, int count) {
+static UString charSequence(char c, int count) {
   Vector<char, 2048> buf(count + 1, c);
   buf[count] = '\0';
 
@@ -275,7 +275,7 @@ JSValue* numberProtoFuncToFixed(ExecState* exec,
   if (!(df >= 0 && df <= 20))
     return throwError(exec, RangeError,
                       "toFixed() digits argument must be between 0 and 20");
-  int f = (int)df;
+  int f = static_cast<int>(df);
 
   double x = v->uncheckedGetNumber();
   if (isnan(x))
@@ -296,7 +296,7 @@ JSValue* numberProtoFuncToFixed(ExecState* exec,
   if (fabs(n / tenToTheF - x) >= fabs((n + 1) / tenToTheF - x))
     n++;
 
-  UString m = integer_part_noexp(n);
+  UString m = integerPartNoExp(n);
 
   int k = m.size();
   if (k <= f) {
@@ -370,7 +370,7 @@ JSValue* numberProtoFuncToExponential(ExecState* exec,
   if (!(df >= 0 && df <= 20))
     return throwError(exec, RangeError,
                       "toExponential() argument must between 0 and 20");
-  int fractionalDigits = (int)df;
+  int fractionalDigits = static_cast<int>(df);
   bool includeAllDigits = fractionalDigitsValue->isUndefined();
 
   int decimalAdjust = 0;
@@ -449,7 +449,7 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
   if (!(doublePrecision >= 1 && doublePrecision <= 21))  // true for NaN
     return throwError(exec, RangeError,
                       "toPrecision() argument must be between 1 and 21");
-  int precision = (int)doublePrecision;
+  int precision = static_cast<int>(doublePrecision);
 
   int e = 0;
   UString m;
@@ -473,7 +473,7 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
     ASSERT(intPow10(precision - 1) <= n);
     ASSERT(n < intPow10(precision));
 
-    m = integer_part_noexp(n);
+    m = integerPartNoExp(n);
     if (e < -6 || e >= precision) {
       if (m.size() > 1)
         m = m.substr(0, 1) + "." + m.substr(1);
@@ -482,7 +482,7 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
       return jsString(exec, s + m + "e-" + UString::from(-e));
     }
   } else {
-    m = char_sequence('0', precision);
+    m = charSequence('0', precision);
     e = 0;
   }
 
@@ -493,7 +493,7 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
       return jsString(exec, s + m.substr(0, e + 1) + "." + m.substr(e + 1));
     return jsString(exec, s + m);
   }
-  return jsString(exec, s + "0." + char_sequence('0', -(e + 1)) + m);
+  return jsString(exec, s + "0." + charSequence('0', -(e + 1)) + m);
 }
 
 }  // namespace KJS

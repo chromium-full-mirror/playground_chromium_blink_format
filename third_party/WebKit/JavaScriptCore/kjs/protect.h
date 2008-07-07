@@ -1,7 +1,5 @@
-// -*- c-basic-offset: 2 -*-
 /*
- *  This file is part of the KDE libraries
- *  Copyright (C) 2004 Apple Computer, Inc.
+ *  Copyright (C) 2004, 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -20,8 +18,8 @@
  *
  */
 
-#ifndef _KJS_PROTECT_H_
-#define _KJS_PROTECT_H_
+#ifndef protect_h
+#define protect_h
 
 #include "JSValue.h"
 #include "collector.h"
@@ -56,7 +54,7 @@ inline void gcUnprotectNullTolerant(JSValue* val) {
 template <class T>
 class ProtectedPtr {
  public:
-  ProtectedPtr() : m_ptr(NULL) {}
+  ProtectedPtr() : m_ptr(0) {}
   ProtectedPtr(T* ptr);
   ProtectedPtr(const ProtectedPtr&);
   ~ProtectedPtr();
@@ -145,6 +143,6 @@ inline bool operator!=(const T* a, const ProtectedPtr<T>& b) {
   return a != b.get();
 }
 
-}  // namespace
+}  // namespace KJS
 
-#endif
+#endif  // protect_h

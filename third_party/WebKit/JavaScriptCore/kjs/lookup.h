@@ -25,9 +25,9 @@
 
 #include "ExecState.h"
 #include "JSFunction.h"
-#include "identifier.h"
 #include "JSGlobalObject.h"
 #include "JSObject.h"
+#include "identifier.h"
 #include <stdio.h>
 #include <wtf/Assertions.h>
 
@@ -270,7 +270,7 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
   return newObject;
 }
 
-}  // namespace
+}  // namespace KJS
 
 /**
  * Helpers to define prototype objects (each of which simply implements

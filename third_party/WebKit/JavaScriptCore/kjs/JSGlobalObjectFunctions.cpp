@@ -51,32 +51,36 @@ namespace KJS {
 
 static JSValue* encode(ExecState* exec,
                        const ArgList& args,
-                       const char* do_not_escape) {
-  UString r = "", s, str = args[0]->toString(exec);
+                       const char* doNotEscape) {
+  UString str = args[0]->toString(exec);
   CString cstr = str.UTF8String(true);
   if (!cstr.c_str())
     return throwError(exec, URIError,
                       "String contained an illegal UTF-16 sequence.");
+
+  UString result = "";
   const char* p = cstr.c_str();
   for (size_t k = 0; k < cstr.size(); k++, p++) {
     char c = *p;
-    if (c && strchr(do_not_escape, c)) {
-      r.append(c);
-    } else {
+    if (c && strchr(doNotEscape, c))
+      result.append(c);
+    else {
       char tmp[4];
-      sprintf(tmp, "%%%02X", (unsigned char)c);
-      r += tmp;
+      sprintf(tmp, "%%%02X", static_cast<unsigned char>(c));
+      result += tmp;
     }
   }
-  return jsString(exec, r);
+  return jsString(exec, result);
 }
 
 static JSValue* decode(ExecState* exec,
                        const ArgList& args,
-                       const char* do_not_unescape,
+                       const char* doNotUnescape,
                        bool strict) {
-  UString s = "", str = args[0]->toString(exec);
-  int k = 0, len = str.size();
+  UString result = "";
+  UString str = args[0]->toString(exec);
+  int k = 0;
+  int len = str.size();
   const UChar* d = str.data();
   UChar u = 0;
   while (k < len) {
@@ -103,16 +107,15 @@ static JSValue* decode(ExecState* exec,
           if (charLen != 0) {
             sequence[sequenceLen] = 0;
             const int character = decodeUTF8Sequence(sequence);
-            if (character < 0 || character >= 0x110000) {
+            if (character < 0 || character >= 0x110000)
               charLen = 0;
-            } else if (character >= 0x10000) {
+            else if (character >= 0x10000) {
               // Convert to surrogate pair.
-              s.append(
+              result.append(
                   static_cast<UChar>(0xD800 | ((character - 0x10000) >> 10)));
               u = static_cast<UChar>(0xDC00 | ((character - 0x10000) & 0x3FF));
-            } else {
+            } else
               u = static_cast<UChar>(character);
-            }
           }
         }
       }
@@ -130,15 +133,15 @@ static JSValue* decode(ExecState* exec,
           u = Lexer::convertUnicode(p[2], p[3], p[4], p[5]);
         }
       }
-      if (charLen && (u == 0 || u >= 128 || !strchr(do_not_unescape, u))) {
+      if (charLen && (u == 0 || u >= 128 || !strchr(doNotUnescape, u))) {
         c = u;
         k += charLen - 1;
       }
     }
     k++;
-    s.append(c);
+    result.append(c);
   }
-  return jsString(exec, s);
+  return jsString(exec, result);
 }
 
 static bool isStrWhiteSpace(unsigned short c) {
@@ -161,13 +164,12 @@ static bool isStrWhiteSpace(unsigned short c) {
 static int parseDigit(unsigned short c, int radix) {
   int digit = -1;
 
-  if (c >= '0' && c <= '9') {
+  if (c >= '0' && c <= '9')
     digit = c - '0';
-  } else if (c >= 'A' && c <= 'Z') {
+  else if (c >= 'A' && c <= 'Z')
     digit = c - 'A' + 10;
-  } else if (c >= 'a' && c <= 'z') {
+  else if (c >= 'a' && c <= 'z')
     digit = c - 'a' + 10;
-  }
 
   if (digit >= radix)
     return -1;
@@ -199,15 +201,14 @@ static double parseInt(const UString& s, int radix) {
   int length = s.size();
   int p = 0;
 
-  while (p < length && isStrWhiteSpace(s[p])) {
+  while (p < length && isStrWhiteSpace(s[p]))
     ++p;
-  }
 
   double sign = 1;
   if (p < length) {
-    if (s[p] == '+') {
+    if (s[p] == '+')
       ++p;
-    } else if (s[p] == '-') {
+    else if (s[p] == '-') {
       sign = -1;
       ++p;
     }
@@ -263,15 +264,14 @@ static double parseFloat(const UString& s) {
   // Need to skip any whitespace and then one + or - sign.
   int length = s.size();
   int p = 0;
-  while (p < length && isStrWhiteSpace(s[p])) {
+  while (p < length && isStrWhiteSpace(s[p]))
     ++p;
-  }
-  if (p < length && (s[p] == '+' || s[p] == '-')) {
+
+  if (p < length && (s[p] == '+' || s[p] == '-'))
     ++p;
-  }
-  if (length - p >= 2 && s[p] == '0' && (s[p + 1] == 'x' || s[p + 1] == 'X')) {
+
+  if (length - p >= 2 && s[p] == '0' && (s[p + 1] == 'x' || s[p + 1] == 'X'))
     return 0;
-  }
 
   return s.toDouble(true /*tolerant*/, false /* NaN for empty string */);
 }
@@ -391,7 +391,9 @@ JSValue* globalFuncEscape(ExecState* exec,
       "0123456789"
       "*+-./@_";
 
-  UString r = "", s, str = args[0]->toString(exec);
+  UString result = "";
+  UString s;
+  UString str = args[0]->toString(exec);
   const UChar* c = str.data();
   for (int k = 0; k < str.size(); k++, c++) {
     int u = c[0];
@@ -399,25 +401,27 @@ JSValue* globalFuncEscape(ExecState* exec,
       char tmp[7];
       sprintf(tmp, "%%u%04X", u);
       s = UString(tmp);
-    } else if (u != 0 && strchr(do_not_escape, (char)u))
+    } else if (u != 0 && strchr(do_not_escape, static_cast<char>(u)))
       s = UString(c, 1);
     else {
       char tmp[4];
       sprintf(tmp, "%%%02X", u);
       s = UString(tmp);
     }
-    r += s;
+    result += s;
   }
 
-  return jsString(exec, r);
+  return jsString(exec, result);
 }
 
 JSValue* globalFuncUnescape(ExecState* exec,
                             JSObject*,
                             JSValue*,
                             const ArgList& args) {
-  UString s = "", str = args[0]->toString(exec);
-  int k = 0, len = str.size();
+  UString result = "";
+  UString str = args[0]->toString(exec);
+  int k = 0;
+  int len = str.size();
   while (k < len) {
     const UChar* c = str.data() + k;
     UChar u;
@@ -435,10 +439,10 @@ JSValue* globalFuncUnescape(ExecState* exec,
       k += 2;
     }
     k++;
-    s.append(*c);
+    result.append(*c);
   }
 
-  return jsString(exec, s);
+  return jsString(exec, result);
 }
 
 #ifndef NDEBUG

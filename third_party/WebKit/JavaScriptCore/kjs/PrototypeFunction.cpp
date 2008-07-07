@@ -33,24 +33,24 @@
 namespace KJS {
 
 PrototypeFunction::PrototypeFunction(ExecState* exec,
-                                     int len,
+                                     int length,
                                      const Identifier& name,
                                      NativeFunction function)
     : InternalFunction(exec->lexicalGlobalObject()->functionPrototype(), name),
       m_function(function) {
   ASSERT_ARG(function, function);
-  putDirect(exec->propertyNames().length, jsNumber(exec, len),
+  putDirect(exec->propertyNames().length, jsNumber(exec, length),
             DontDelete | ReadOnly | DontEnum);
 }
 
 PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      FunctionPrototype* functionPrototype,
-                                     int len,
+                                     int length,
                                      const Identifier& name,
                                      NativeFunction function)
     : InternalFunction(functionPrototype, name), m_function(function) {
   ASSERT_ARG(function, function);
-  putDirect(exec->propertyNames().length, jsNumber(exec, len),
+  putDirect(exec->propertyNames().length, jsNumber(exec, length),
             DontDelete | ReadOnly | DontEnum);
 }
 

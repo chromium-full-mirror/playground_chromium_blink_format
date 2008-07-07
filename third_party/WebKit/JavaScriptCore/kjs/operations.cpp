@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
+ * Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  * Copyright (C) 2008 Apple Inc. All Rights Reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -120,4 +120,5 @@ JSValue* throwOutOfMemoryError(ExecState* exec) {
   exec->setException(error);
   return error;
 }
-}
+
+}  // namespace KJS

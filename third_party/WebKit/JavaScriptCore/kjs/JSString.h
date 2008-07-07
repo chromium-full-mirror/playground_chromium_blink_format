@@ -38,6 +38,7 @@ class JSString : public JSCell {
   JSString(const UString& value) : m_value(value) {
     Heap::heap(this)->reportExtraMemoryCost(value.cost());
   }
+
   enum HasOtherOwnerType { HasOtherOwner };
   JSString(const UString& value, HasOtherOwnerType) : m_value(value) {}
 

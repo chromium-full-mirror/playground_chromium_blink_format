@@ -29,14 +29,10 @@ namespace KJS {
 class FunctionPrototype;
 class StringPrototype;
 
-/**
- * @internal
- *
- * The initial value of the the global variable's "String" property
- */
 class StringConstructor : public InternalFunction {
  public:
   StringConstructor(ExecState*, FunctionPrototype*, StringPrototype*);
+
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
 };

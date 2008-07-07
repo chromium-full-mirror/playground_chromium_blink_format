@@ -29,10 +29,10 @@ bool LabelStack::push(const Identifier& id) {
   if (contains(id))
     return false;
 
-  StackElem* newtos = new StackElem;
-  newtos->id = id;
-  newtos->prev = tos;
-  tos = newtos;
+  StackElem* newTopOfStack = new StackElem;
+  newTopOfStack->id = id;
+  newTopOfStack->prev = m_topOfStack;
+  m_topOfStack = newTopOfStack;
   return true;
 }
 
@@ -40,9 +40,10 @@ bool LabelStack::contains(const Identifier& id) const {
   if (id.isEmpty())
     return true;
 
-  for (StackElem* curr = tos; curr; curr = curr->prev)
+  for (StackElem* curr = m_topOfStack; curr; curr = curr->prev) {
     if (curr->id == id)
       return true;
+  }
 
   return false;
 }

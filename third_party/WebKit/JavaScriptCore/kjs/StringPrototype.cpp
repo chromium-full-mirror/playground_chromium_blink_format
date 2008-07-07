@@ -171,45 +171,46 @@ const ClassInfo StringPrototype::info = {"String", &StringObject::info, 0,
 
 /* Source for StringPrototype.lut.h
 @begin stringTable 26
-  toString              stringProtoFuncToString          DontEnum|Function 0
-  valueOf               stringProtoFuncToString          DontEnum|Function 0
-  charAt                stringProtoFuncCharAt            DontEnum|Function 1
-  charCodeAt            stringProtoFuncCharCodeAt        DontEnum|Function 1
-  concat                stringProtoFuncConcat            DontEnum|Function 1
-  indexOf               stringProtoFuncIndexOf           DontEnum|Function 1
-  lastIndexOf           stringProtoFuncLastIndexOf       DontEnum|Function 1
-  match                 stringProtoFuncMatch             DontEnum|Function 1
-  replace               stringProtoFuncReplace           DontEnum|Function 2
-  search                stringProtoFuncSearch            DontEnum|Function 1
-  slice                 stringProtoFuncSlice             DontEnum|Function 2
-  split                 stringProtoFuncSplit             DontEnum|Function 2
-  substr                stringProtoFuncSubstr            DontEnum|Function 2
-  substring             stringProtoFuncSubstring         DontEnum|Function 2
-  toLowerCase           stringProtoFuncToLowerCase       DontEnum|Function 0
-  toUpperCase           stringProtoFuncToUpperCase       DontEnum|Function 0
-  toLocaleLowerCase     stringProtoFuncToLocaleLowerCase DontEnum|Function 0
-  toLocaleUpperCase     stringProtoFuncToLocaleUpperCase DontEnum|Function 0
-  localeCompare         stringProtoFuncLocaleCompare     DontEnum|Function 1
+    toString              stringProtoFuncToString          DontEnum|Function 0
+    valueOf               stringProtoFuncToString          DontEnum|Function 0
+    charAt                stringProtoFuncCharAt            DontEnum|Function 1
+    charCodeAt            stringProtoFuncCharCodeAt        DontEnum|Function 1
+    concat                stringProtoFuncConcat            DontEnum|Function 1
+    indexOf               stringProtoFuncIndexOf           DontEnum|Function 1
+    lastIndexOf           stringProtoFuncLastIndexOf       DontEnum|Function 1
+    match                 stringProtoFuncMatch             DontEnum|Function 1
+    replace               stringProtoFuncReplace           DontEnum|Function 2
+    search                stringProtoFuncSearch            DontEnum|Function 1
+    slice                 stringProtoFuncSlice             DontEnum|Function 2
+    split                 stringProtoFuncSplit             DontEnum|Function 2
+    substr                stringProtoFuncSubstr            DontEnum|Function 2
+    substring             stringProtoFuncSubstring         DontEnum|Function 2
+    toLowerCase           stringProtoFuncToLowerCase       DontEnum|Function 0
+    toUpperCase           stringProtoFuncToUpperCase       DontEnum|Function 0
+    toLocaleLowerCase     stringProtoFuncToLocaleLowerCase DontEnum|Function 0
+    toLocaleUpperCase     stringProtoFuncToLocaleUpperCase DontEnum|Function 0
+    localeCompare         stringProtoFuncLocaleCompare     DontEnum|Function 1
 
-  big                   stringProtoFuncBig               DontEnum|Function 0
-  small                 stringProtoFuncSmall             DontEnum|Function 0
-  blink                 stringProtoFuncBlink             DontEnum|Function 0
-  bold                  stringProtoFuncBold              DontEnum|Function 0
-  fixed                 stringProtoFuncFixed             DontEnum|Function 0
-  italics               stringProtoFuncItalics           DontEnum|Function 0
-  strike                stringProtoFuncStrike            DontEnum|Function 0
-  sub                   stringProtoFuncSub               DontEnum|Function 0
-  sup                   stringProtoFuncSup               DontEnum|Function 0
-  fontcolor             stringProtoFuncFontcolor         DontEnum|Function 1
-  fontsize              stringProtoFuncFontsize          DontEnum|Function 1
-  anchor                stringProtoFuncAnchor            DontEnum|Function 1
-  link                  stringProtoFuncLink              DontEnum|Function 1
+    big                   stringProtoFuncBig               DontEnum|Function 0
+    small                 stringProtoFuncSmall             DontEnum|Function 0
+    blink                 stringProtoFuncBlink             DontEnum|Function 0
+    bold                  stringProtoFuncBold              DontEnum|Function 0
+    fixed                 stringProtoFuncFixed             DontEnum|Function 0
+    italics               stringProtoFuncItalics           DontEnum|Function 0
+    strike                stringProtoFuncStrike            DontEnum|Function 0
+    sub                   stringProtoFuncSub               DontEnum|Function 0
+    sup                   stringProtoFuncSup               DontEnum|Function 0
+    fontcolor             stringProtoFuncFontcolor         DontEnum|Function 1
+    fontsize              stringProtoFuncFontsize          DontEnum|Function 1
+    anchor                stringProtoFuncAnchor            DontEnum|Function 1
+    link                  stringProtoFuncLink              DontEnum|Function 1
 @end
 */
 
 // ECMA 15.5.4
-StringPrototype::StringPrototype(ExecState* exec, ObjectPrototype* objProto)
-    : StringObject(exec, objProto) {
+StringPrototype::StringPrototype(ExecState* exec,
+                                 ObjectPrototype* objectPrototype)
+    : StringObject(exec, objectPrototype) {
   // The constructor will be added later, after StringConstructor has been built
   putDirect(exec->propertyNames().length, jsNumber(exec, 0),
             DontDelete | ReadOnly | DontEnum);
@@ -346,7 +347,7 @@ JSValue* stringProtoFuncReplace(ExecState* exec,
         int completeMatchStart = ovector[0];
         ArgList args;
 
-        for (unsigned i = 0; i < reg->numSubpatterns() + 1; i++) {
+        for (unsigned i = 0; i < reg->numSubpatterns() + 1; ++i) {
           int matchStart = ovector[i * 2];
           int matchLen = ovector[i * 2 + 1] - matchStart;
 
@@ -400,7 +401,6 @@ JSValue* stringProtoFuncReplace(ExecState* exec,
 
   if (callType != CallTypeNone) {
     ArgList args;
-
     args.append(jsString(exec, source.substr(matchPos, matchLen)));
     args.append(jsNumber(exec, matchPos));
     args.append(sourceVal);
@@ -471,9 +471,8 @@ JSValue* stringProtoFuncConcat(ExecState* exec,
   UString s = thisValue->toThisString(exec);
 
   ArgList::const_iterator end = args.end();
-  for (ArgList::const_iterator it = args.begin(); it != end; ++it) {
+  for (ArgList::const_iterator it = args.begin(); it != end; ++it)
     s += (*it)->toString(exec);
-  }
   return jsString(exec, s);
 }
 
@@ -526,9 +525,9 @@ JSValue* stringProtoFuncMatch(ExecState* exec,
   RefPtr<RegExp> reg;
   RegExpObject* imp = 0;
   if (a0->isObject() &&
-      static_cast<JSObject*>(a0)->inherits(&RegExpObject::info)) {
+      static_cast<JSObject*>(a0)->inherits(&RegExpObject::info))
     reg = static_cast<RegExpObject*>(a0)->regExp();
-  } else {
+  else {
     /*
      *  ECMA 15.5.4.12 String.prototype.search (regexp)
      *  If regexp is not an object whose [[Class]] property is "RegExp", it is
@@ -541,35 +540,32 @@ JSValue* stringProtoFuncMatch(ExecState* exec,
   int pos;
   int matchLength;
   regExpObj->performMatch(reg.get(), u, 0, pos, matchLength);
-  JSValue* result;
   if (!(reg->global())) {
     // case without 'g' flag is handled like RegExp.prototype.exec
     if (pos < 0)
-      result = jsNull();
-    else
-      result = regExpObj->arrayOfMatches(exec);
-  } else {
-    // return array of matches
-    ArgList list;
-    int lastIndex = 0;
-    while (pos >= 0) {
-      list.append(jsString(exec, u.substr(pos, matchLength)));
-      lastIndex = pos;
-      pos += matchLength == 0 ? 1 : matchLength;
-      regExpObj->performMatch(reg.get(), u, pos, pos, matchLength);
-    }
-    if (imp)
-      imp->setLastIndex(lastIndex);
-    if (list.isEmpty()) {
-      // if there are no matches at all, it's important to return
-      // Null instead of an empty array, because this matches
-      // other browsers and because Null is a false value.
-      result = jsNull();
-    } else {
-      result = constructArray(exec, list);
-    }
+      return jsNull();
+    return regExpObj->arrayOfMatches(exec);
   }
-  return result;
+
+  // return array of matches
+  ArgList list;
+  int lastIndex = 0;
+  while (pos >= 0) {
+    list.append(jsString(exec, u.substr(pos, matchLength)));
+    lastIndex = pos;
+    pos += matchLength == 0 ? 1 : matchLength;
+    regExpObj->performMatch(reg.get(), u, pos, pos, matchLength);
+  }
+  if (imp)
+    imp->setLastIndex(lastIndex);
+  if (list.isEmpty()) {
+    // if there are no matches at all, it's important to return
+    // Null instead of an empty array, because this matches
+    // other browsers and because Null is a false value.
+    return jsNull();
+  }
+
+  return constructArray(exec, list);
 }
 
 JSValue* stringProtoFuncSearch(ExecState* exec,
@@ -583,9 +579,9 @@ JSValue* stringProtoFuncSearch(ExecState* exec,
   UString u = s;
   RefPtr<RegExp> reg;
   if (a0->isObject() &&
-      static_cast<JSObject*>(a0)->inherits(&RegExpObject::info)) {
+      static_cast<JSObject*>(a0)->inherits(&RegExpObject::info))
     reg = static_cast<RegExpObject*>(a0)->regExp();
-  } else {
+  else {
     /*
      *  ECMA 15.5.4.12 String.prototype.search (regexp)
      *  If regexp is not an object whose [[Class]] property is "RegExp", it is
@@ -693,6 +689,7 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
       }
     }
   }
+
   // add remaining string, if any
   if (static_cast<uint32_t>(i) != limit)
     res->put(exec, i++, jsString(exec, u.substr(p0)));
@@ -758,7 +755,9 @@ JSValue* stringProtoFuncSubstring(ExecState* exec,
     end = start;
     start = temp;
   }
-  return jsString(exec, s.substr((int)start, (int)end - (int)start));
+  return jsString(exec,
+                  s.substr(static_cast<int>(start),
+                           (static_cast<int>(end) - static_cast<int>(start))));
 }
 
 JSValue* stringProtoFuncToLowerCase(ExecState* exec,

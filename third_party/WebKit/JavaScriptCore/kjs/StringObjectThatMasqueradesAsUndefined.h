@@ -31,9 +31,10 @@ namespace KJS {
 class StringObjectThatMasqueradesAsUndefined : public StringObject {
  public:
   StringObjectThatMasqueradesAsUndefined(ExecState* exec,
-                                         JSObject* proto,
+                                         JSObject* prototype,
                                          const UString& string)
-      : StringObject(exec, proto, string) {}
+      : StringObject(exec, prototype, string) {}
+
   virtual bool masqueradeAsUndefined() const { return true; }
   virtual bool toBoolean(ExecState*) const { return false; }
 };

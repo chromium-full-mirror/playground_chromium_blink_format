@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2001, 2004 Harri Porten (porten@kde.org)
  *  Copyright (c) 2007, 2008 Apple Inc. All rights reserved.

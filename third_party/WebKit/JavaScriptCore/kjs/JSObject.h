@@ -49,17 +49,17 @@ enum Attribute {
   DontEnum = 1 << 2,    // property doesn't appear in (for .. in ..)
   DontDelete = 1 << 3,  // property can't be deleted
   Function = 1 << 4,  // property is a function - only used by static hashtables
-  IsGetterSetter = 1 << 5
-};  // property is a getter or setter
+  IsGetterSetter = 1 << 5  // property is a getter or setter
+};
 
 class JSObject : public JSCell {
  public:
   /**
    * Creates a new JSObject with the specified prototype
    *
-   * @param proto The prototype
+   * @param prototype The prototype
    */
-  JSObject(JSValue* proto);
+  JSObject(JSValue* prototype);
 
   /**
    * Creates a new JSObject with a prototype of jsNull()
@@ -149,7 +149,7 @@ class JSObject : public JSCell {
    * @return The object's prototype
    */
   JSValue* prototype() const;
-  void setPrototype(JSValue* proto);
+  void setPrototype(JSValue* prototype);
 
   /**
    * Returns the class name of the object
@@ -181,14 +181,20 @@ class JSObject : public JSCell {
    *
    * @return The specified property, or Undefined
    */
-  JSValue* get(ExecState* exec, const Identifier& propertyName) const;
-  JSValue* get(ExecState* exec, unsigned propertyName) const;
+  JSValue* get(ExecState*, const Identifier& propertyName) const;
+  JSValue* get(ExecState*, unsigned propertyName) const;
 
-  bool getPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  bool getPropertySlot(ExecState*, unsigned, PropertySlot&);
+  bool getPropertySlot(ExecState*,
+                       const Identifier& propertyName,
+                       PropertySlot&);
+  bool getPropertySlot(ExecState*, unsigned propertyName, PropertySlot&);
 
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual bool getOwnPropertySlot(ExecState*, unsigned index, PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier& propertyName,
+                                  PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  unsigned propertyName,
+                                  PropertySlot&);
 
   /**
    * Sets the specified property.
@@ -220,8 +226,7 @@ class JSObject : public JSCell {
    * @param propertyName The name of the property
    * @return true if the property is enumerable, otherwise false
    */
-  bool propertyIsEnumerable(ExecState* exec,
-                            const Identifier& propertyName) const;
+  bool propertyIsEnumerable(ExecState*, const Identifier& propertyName) const;
 
   /**
    * Checks to see whether the object (or any object in its prototype chain)
@@ -233,9 +238,9 @@ class JSObject : public JSCell {
    * @param propertyName The name of the property to check for
    * @return true if the object has the property, otherwise false
    */
-  bool hasProperty(ExecState*, const Identifier&) const;
-  bool hasProperty(ExecState*, unsigned) const;
-  bool hasOwnProperty(ExecState*, const Identifier&) const;
+  bool hasProperty(ExecState*, const Identifier& propertyName) const;
+  bool hasProperty(ExecState*, unsigned propertyName) const;
+  bool hasOwnProperty(ExecState*, const Identifier& propertyName) const;
 
   /**
    * Removes the specified property from the object.
@@ -248,8 +253,8 @@ class JSObject : public JSCell {
    * exist on the object. false if deleting the specified property is not
    * allowed.
    */
-  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
-  virtual bool deleteProperty(ExecState* exec, unsigned propertyName);
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
+  virtual bool deleteProperty(ExecState*, unsigned propertyName);
 
   /**
    * Converts the object into a primitive value. The value return may differ
@@ -288,17 +293,17 @@ class JSObject : public JSCell {
    * @return true if value delegates behavior to this object, otherwise
    * false
    */
-  virtual bool hasInstance(ExecState* exec, JSValue* value);
+  virtual bool hasInstance(ExecState*, JSValue*);
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual JSValue* toPrimitive(ExecState*,
                                JSType preferredType = UnspecifiedType) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
-  virtual bool toBoolean(ExecState* exec) const;
-  virtual double toNumber(ExecState* exec) const;
-  virtual UString toString(ExecState* exec) const;
-  virtual JSObject* toObject(ExecState* exec) const;
+  virtual bool toBoolean(ExecState*) const;
+  virtual double toNumber(ExecState*) const;
+  virtual UString toString(ExecState*) const;
+  virtual JSObject* toObject(ExecState*) const;
 
   virtual JSObject* toThisObject(ExecState*) const;
   virtual JSGlobalObject* toGlobalObject(ExecState*) const;
@@ -315,27 +320,29 @@ class JSObject : public JSCell {
   // want
   // to look up in the prototype, it might already exist there)
   JSValue* getDirect(const Identifier& propertyName) const {
-    return _prop.get(propertyName);
+    return m_propertyMap.get(propertyName);
   }
   JSValue** getDirectLocation(const Identifier& propertyName) {
-    return _prop.getLocation(propertyName);
+    return m_propertyMap.getLocation(propertyName);
   }
   JSValue** getDirectLocation(const Identifier& propertyName,
                               bool& isWriteable) {
-    return _prop.getLocation(propertyName, isWriteable);
+    return m_propertyMap.getLocation(propertyName, isWriteable);
   }
-  void putDirect(const Identifier& propertyName, JSValue* value, int attr = 0);
+  void putDirect(const Identifier& propertyName,
+                 JSValue* value,
+                 unsigned attr = 0);
   void putDirect(ExecState*,
                  const Identifier& propertyName,
                  int value,
-                 int attr = 0);
+                 unsigned attr = 0);
   void removeDirect(const Identifier& propertyName);
 
   // convenience to add a function property under the function's own built-in
   // name
-  void putDirectFunction(InternalFunction*, int attr = 0);
+  void putDirectFunction(InternalFunction*, unsigned attr = 0);
 
-  void fillGetterPropertySlot(PropertySlot& slot, JSValue** location);
+  void fillGetterPropertySlot(PropertySlot&, JSValue** location);
 
   virtual void defineGetter(ExecState*,
                             const Identifier& propertyName,
@@ -353,7 +360,7 @@ class JSObject : public JSCell {
   virtual bool isWatchdogException() const { return false; }
 
  protected:
-  PropertyMap _prop;
+  PropertyMap m_propertyMap;
   bool getOwnPropertySlotForWrite(ExecState*,
                                   const Identifier&,
                                   PropertySlot&,
@@ -362,25 +369,25 @@ class JSObject : public JSCell {
  private:
   const HashEntry* findPropertyHashEntry(ExecState*,
                                          const Identifier& propertyName) const;
-  JSValue* _proto;
+  JSValue* m_prototype;
 };
 
 JSObject* constructEmptyObject(ExecState*);
 
-inline JSObject::JSObject(JSValue* proto) : _proto(proto) {
-  ASSERT(proto);
-  ASSERT(proto == jsNull() || Heap::heap(this) == Heap::heap(proto));
+inline JSObject::JSObject(JSValue* prototype) : m_prototype(prototype) {
+  ASSERT(prototype);
+  ASSERT(prototype == jsNull() || Heap::heap(this) == Heap::heap(prototype));
 }
 
-inline JSObject::JSObject() : _proto(jsNull()) {}
+inline JSObject::JSObject() : m_prototype(jsNull()) {}
 
 inline JSValue* JSObject::prototype() const {
-  return _proto;
+  return m_prototype;
 }
 
-inline void JSObject::setPrototype(JSValue* proto) {
-  ASSERT(proto);
-  _proto = proto;
+inline void JSObject::setPrototype(JSValue* prototype) {
+  ASSERT(prototype);
+  m_prototype = prototype;
 }
 
 inline bool JSCell::isObject(const ClassInfo* info) const {
@@ -399,7 +406,6 @@ inline bool JSValue::isObject(const ClassInfo* classInfo) const {
 inline JSValue* JSObject::get(ExecState* exec,
                               const Identifier& propertyName) const {
   PropertySlot slot(const_cast<JSObject*>(this));
-
   if (const_cast<JSObject*>(this)->getPropertySlot(exec, propertyName, slot))
     return slot.getValue(exec, propertyName);
 
@@ -425,28 +431,28 @@ inline bool JSObject::getPropertySlot(ExecState* exec,
     if (object->getOwnPropertySlot(exec, propertyName, slot))
       return true;
 
-    JSValue* proto = object->_proto;
-    if (!proto->isObject())
+    JSValue* prototype = object->m_prototype;
+    if (!prototype->isObject())
       return false;
 
-    object = static_cast<JSObject*>(proto);
+    object = static_cast<JSObject*>(prototype);
   }
 }
 
 inline bool JSObject::getPropertySlot(ExecState* exec,
                                       unsigned propertyName,
                                       PropertySlot& slot) {
-  JSObject* imp = this;
+  JSObject* object = this;
 
   while (true) {
-    if (imp->getOwnPropertySlot(exec, propertyName, slot))
+    if (object->getOwnPropertySlot(exec, propertyName, slot))
       return true;
 
-    JSValue* proto = imp->_proto;
-    if (!proto->isObject())
+    JSValue* prototype = object->m_prototype;
+    if (!prototype->isObject())
       break;
 
-    imp = static_cast<JSObject*>(proto);
+    object = static_cast<JSObject*>(prototype);
   }
 
   return false;
@@ -463,7 +469,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
     PropertySlot& slot,
     bool& slotIsWriteable) {
   if (JSValue** location = getDirectLocation(propertyName, slotIsWriteable)) {
-    if (_prop.hasGetterSetterProperties() &&
+    if (m_propertyMap.hasGetterSetterProperties() &&
         location[0]->type() == GetterSetterType) {
       slotIsWriteable = false;
       fillGetterPropertySlot(slot, location);
@@ -474,7 +480,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
 
   // non-standard Netscape extension
   if (propertyName == exec->propertyNames().underscoreProto) {
-    slot.setValueSlot(&_proto);
+    slot.setValueSlot(&m_prototype);
     slotIsWriteable = false;
     return true;
   }
@@ -491,7 +497,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
                                                 const Identifier& propertyName,
                                                 PropertySlot& slot) {
   if (JSValue** location = getDirectLocation(propertyName)) {
-    if (_prop.hasGetterSetterProperties() &&
+    if (m_propertyMap.hasGetterSetterProperties() &&
         location[0]->type() == GetterSetterType)
       fillGetterPropertySlot(slot, location);
     else
@@ -501,7 +507,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
 
   // non-standard Netscape extension
   if (propertyName == exec->propertyNames().underscoreProto) {
-    slot.setValueSlot(&_proto);
+    slot.setValueSlot(&m_prototype);
     return true;
   }
 
@@ -510,15 +516,15 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
 
 inline void JSObject::putDirect(const Identifier& propertyName,
                                 JSValue* value,
-                                int attr) {
-  _prop.put(propertyName, value, attr);
+                                unsigned attr) {
+  m_propertyMap.put(propertyName, value, attr);
 }
 
 inline void JSObject::putDirect(ExecState* exec,
                                 const Identifier& propertyName,
                                 int value,
-                                int attr) {
-  _prop.put(propertyName, jsNumber(exec, value), attr);
+                                unsigned attr) {
+  m_propertyMap.put(propertyName, jsNumber(exec, value), attr);
 }
 
 inline JSValue* JSObject::toPrimitive(ExecState* exec,
@@ -541,10 +547,10 @@ inline JSValue* JSValue::get(ExecState* exec,
     if (cell->getOwnPropertySlot(exec, propertyName, slot))
       return slot.getValue(exec, propertyName);
     ASSERT(cell->isObject());
-    JSValue* proto = static_cast<JSObject*>(cell)->prototype();
-    if (!proto->isObject())
+    JSValue* prototype = static_cast<JSObject*>(cell)->prototype();
+    if (!prototype->isObject())
       return jsUndefined();
-    cell = static_cast<JSCell*>(proto);
+    cell = static_cast<JSCell*>(prototype);
   }
 }
 
@@ -562,10 +568,10 @@ inline JSValue* JSValue::get(ExecState* exec, unsigned propertyName) const {
     if (cell->getOwnPropertySlot(exec, propertyName, slot))
       return slot.getValue(exec, propertyName);
     ASSERT(cell->isObject());
-    JSValue* proto = static_cast<JSObject*>(cell)->prototype();
-    if (!proto->isObject())
+    JSValue* prototype = static_cast<JSObject*>(cell)->prototype();
+    if (!prototype->isObject())
       return jsUndefined();
-    cell = static_cast<JSCell*>(proto);
+    cell = static_cast<JSCell*>(prototype);
   }
 }
 

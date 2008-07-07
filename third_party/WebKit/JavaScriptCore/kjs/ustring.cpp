@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
@@ -80,62 +79,59 @@ static inline UChar* reallocChars(UChar* buffer, size_t length) {
 
 COMPILE_ASSERT(sizeof(UChar) == 2, uchar_is_2_bytes)
 
-CString::CString(const char* c) {
-  length = strlen(c);
-  data = new char[length + 1];
-  memcpy(data, c, length + 1);
+CString::CString(const char* c)
+    : m_length(strlen(c)), m_data(new char[m_length + 1]) {
+  memcpy(m_data, c, m_length + 1);
 }
 
-CString::CString(const char* c, size_t len) {
-  length = len;
-  data = new char[len + 1];
-  memcpy(data, c, len);
-  data[len] = 0;
+CString::CString(const char* c, size_t length)
+    : m_length(length), m_data(new char[length + 1]) {
+  memcpy(m_data, c, m_length);
+  m_data[m_length] = 0;
 }
 
 CString::CString(const CString& b) {
-  length = b.length;
-  if (b.data) {
-    data = new char[length + 1];
-    memcpy(data, b.data, length + 1);
+  m_length = b.m_length;
+  if (b.m_data) {
+    m_data = new char[m_length + 1];
+    memcpy(m_data, b.m_data, m_length + 1);
   } else
-    data = 0;
+    m_data = 0;
 }
 
 CString::~CString() {
-  delete[] data;
+  delete[] m_data;
 }
 
-CString CString::adopt(char* c, size_t len) {
+CString CString::adopt(char* c, size_t length) {
   CString s;
-  s.data = c;
-  s.length = len;
-
+  s.m_data = c;
+  s.m_length = length;
   return s;
 }
 
 CString& CString::append(const CString& t) {
   char* n;
-  n = new char[length + t.length + 1];
-  if (length)
-    memcpy(n, data, length);
-  if (t.length)
-    memcpy(n + length, t.data, t.length);
-  length += t.length;
-  n[length] = 0;
+  n = new char[m_length + t.m_length + 1];
+  if (m_length)
+    memcpy(n, m_data, m_length);
+  if (t.m_length)
+    memcpy(n + m_length, t.m_data, t.m_length);
+  m_length += t.m_length;
+  n[m_length] = 0;
 
-  delete[] data;
-  data = n;
+  delete[] m_data;
+  m_data = n;
 
   return *this;
 }
 
 CString& CString::operator=(const char* c) {
-  if (data)
-    delete[] data;
-  length = strlen(c);
-  data = new char[length + 1];
-  memcpy(data, c, length + 1);
+  if (m_data)
+    delete[] m_data;
+  m_length = strlen(c);
+  m_data = new char[m_length + 1];
+  memcpy(m_data, c, m_length + 1);
 
   return *this;
 }
@@ -144,14 +140,14 @@ CString& CString::operator=(const CString& str) {
   if (this == &str)
     return *this;
 
-  if (data)
-    delete[] data;
-  length = str.length;
-  if (str.data) {
-    data = new char[length + 1];
-    memcpy(data, str.data, length + 1);
+  if (m_data)
+    delete[] m_data;
+  m_length = str.m_length;
+  if (str.m_data) {
+    m_data = new char[m_length + 1];
+    memcpy(m_data, str.m_data, m_length + 1);
   } else
-    data = 0;
+    m_data = 0;
 
   return *this;
 }
@@ -163,8 +159,9 @@ bool operator==(const CString& c1, const CString& c2) {
 }
 
 // These static strings are immutable, except for rc, whose initial value is
-// chosen to reduce the possibility of it becoming zero due to ref/deref not
-// being thread-safe.
+// chosen to
+// reduce the possibility of it becoming zero due to ref/deref not being
+// thread-safe.
 static UChar sharedEmptyChar;
 UString::Rep UString::Rep::null = {
     0, 0, INT_MAX / 2, 0, 0, &UString::Rep::null, true, 0, 0, 0, 0, 0, 0};
@@ -326,8 +323,8 @@ unsigned UString::Rep::computeHash(const char* s) {
 
   // Main loop
   for (; l > 0; l--) {
-    hash += (unsigned char)s[0];
-    tmp = ((unsigned char)s[1] << 11) ^ hash;
+    hash += static_cast<unsigned char>(s[0]);
+    tmp = (static_cast<unsigned char>(s[1]) << 11) ^ hash;
     hash = (hash << 16) ^ tmp;
     s += 2;
     hash += hash >> 11;
@@ -335,7 +332,7 @@ unsigned UString::Rep::computeHash(const char* s) {
 
   // Handle end case
   if (rem) {
-    hash += (unsigned char)s[0];
+    hash += static_cast<unsigned char>(s[0]);
     hash ^= hash << 11;
     hash += hash >> 17;
   }
@@ -393,9 +390,8 @@ void UString::expandCapacity(int requiredLength) {
     }
     r->capacity = newCapacity - r->preCapacity;
   }
-  if (requiredLength > r->usedCapacity) {
+  if (requiredLength > r->usedCapacity)
     r->usedCapacity = requiredLength;
-  }
 }
 
 void UString::expandPreCapacity(int requiredPreCap) {
@@ -417,9 +413,8 @@ void UString::expandPreCapacity(int requiredPreCap) {
 
     r->preCapacity = newCapacity - r->capacity;
   }
-  if (requiredPreCap > r->usedPreCapacity) {
+  if (requiredPreCap > r->usedPreCapacity)
     r->usedPreCapacity = requiredPreCap;
-  }
 }
 
 UString::UString(const char* c) {
@@ -542,9 +537,9 @@ UString UString::from(int i) {
   UChar* end = buf + sizeof(buf) / sizeof(UChar);
   UChar* p = end;
 
-  if (i == 0) {
+  if (i == 0)
     *--p = '0';
-  } else if (i == INT_MIN) {
+  else if (i == INT_MIN) {
     char minBuf[1 + sizeof(i) * 3];
     sprintf(minBuf, "%d", INT_MIN);
     return UString(minBuf);
@@ -555,12 +550,11 @@ UString UString::from(int i) {
       i = -i;
     }
     while (i) {
-      *--p = (unsigned short)((i % 10) + '0');
+      *--p = static_cast<unsigned short>((i % 10) + '0');
       i /= 10;
     }
-    if (negative) {
+    if (negative)
       *--p = '-';
-    }
   }
 
   return UString(p, static_cast<int>(end - p));
@@ -571,11 +565,11 @@ UString UString::from(unsigned int u) {
   UChar* end = buf + sizeof(buf) / sizeof(UChar);
   UChar* p = end;
 
-  if (u == 0) {
+  if (u == 0)
     *--p = '0';
-  } else {
+  else {
     while (u) {
-      *--p = (unsigned short)((u % 10) + '0');
+      *--p = static_cast<unsigned short>((u % 10) + '0');
       u /= 10;
     }
   }
@@ -588,9 +582,9 @@ UString UString::from(long l) {
   UChar* end = buf + sizeof(buf) / sizeof(UChar);
   UChar* p = end;
 
-  if (l == 0) {
+  if (l == 0)
     *--p = '0';
-  } else if (l == LONG_MIN) {
+  else if (l == LONG_MIN) {
     char minBuf[1 + sizeof(l) * 3];
     sprintf(minBuf, "%ld", LONG_MIN);
     return UString(minBuf);
@@ -601,12 +595,11 @@ UString UString::from(long l) {
       l = -l;
     }
     while (l) {
-      *--p = (unsigned short)((l % 10) + '0');
+      *--p = static_cast<unsigned short>((l % 10) + '0');
       l /= 10;
     }
-    if (negative) {
+    if (negative)
       *--p = '-';
-    }
   }
 
   return UString(p, static_cast<int>(end - p));
@@ -625,24 +618,21 @@ UString UString::from(double d) {
   int length = static_cast<int>(strlen(result));
 
   int i = 0;
-  if (sign) {
+  if (sign)
     buf[i++] = '-';
-  }
 
   if (decimalPoint <= 0 && decimalPoint > -6) {
     buf[i++] = '0';
     buf[i++] = '.';
-    for (int j = decimalPoint; j < 0; j++) {
+    for (int j = decimalPoint; j < 0; j++)
       buf[i++] = '0';
-    }
     strcpy(buf + i, result);
   } else if (decimalPoint <= 21 && decimalPoint > 0) {
     if (length <= decimalPoint) {
       strcpy(buf + i, result);
       i += length;
-      for (int j = 0; j < decimalPoint - length; j++) {
+      for (int j = 0; j < decimalPoint - length; j++)
         buf[i++] = '0';
-      }
       buf[i] = '\0';
     } else {
       strncpy(buf + i, result, decimalPoint);
@@ -650,9 +640,9 @@ UString UString::from(double d) {
       buf[i++] = '.';
       strcpy(buf + i, result + decimalPoint);
     }
-  } else if (result[0] < '0' || result[0] > '9') {
+  } else if (result[0] < '0' || result[0] > '9')
     strcpy(buf + i, result);
-  } else {
+  else {
     buf[i++] = result[0];
     if (length > 1) {
       buf[i++] = '.';
@@ -1198,9 +1188,10 @@ int UString::find(const UString& f, int pos) const {
   const UChar* fdata = f.data();
   unsigned short fchar = fdata[0];
   ++fdata;
-  for (const UChar* c = data() + pos; c <= end; c++)
+  for (const UChar* c = data() + pos; c <= end; c++) {
     if (c[0] == fchar && !memcmp(c + 1, fdata, fsizeminusone))
       return static_cast<int>(c - data());
+  }
 
   return -1;
 }
@@ -1209,9 +1200,10 @@ int UString::find(UChar ch, int pos) const {
   if (pos < 0)
     pos = 0;
   const UChar* end = data() + size();
-  for (const UChar* c = data() + pos; c < end; c++)
+  for (const UChar* c = data() + pos; c < end; c++) {
     if (*c == ch)
       return static_cast<int>(c - data());
+  }
 
   return -1;
 }
@@ -1277,9 +1269,8 @@ bool operator==(const UString& s1, const UString& s2) {
 }
 
 bool operator==(const UString& s1, const char* s2) {
-  if (s2 == 0) {
+  if (s2 == 0)
     return s1.isEmpty();
-  }
 
   const UChar* u = s1.data();
   const UChar* uend = u + s1.size();
@@ -1357,9 +1348,10 @@ bool equal(const UString::Rep* r, const UString::Rep* b) {
     return false;
   const UChar* d = r->data();
   const UChar* s = b->data();
-  for (int i = 0; i != length; ++i)
+  for (int i = 0; i != length; ++i) {
     if (d[i] != s[i])
       return false;
+  }
   return true;
 }
 

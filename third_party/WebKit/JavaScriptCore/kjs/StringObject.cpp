@@ -28,20 +28,20 @@ namespace KJS {
 
 const ClassInfo StringObject::info = {"String", 0, 0, 0};
 
-StringObject::StringObject(ExecState* exec, JSObject* proto)
-    : JSWrapperObject(proto) {
+StringObject::StringObject(ExecState* exec, JSObject* prototype)
+    : JSWrapperObject(prototype) {
   setInternalValue(jsString(exec, ""));
 }
 
-StringObject::StringObject(JSObject* proto, JSString* string)
-    : JSWrapperObject(proto) {
+StringObject::StringObject(JSObject* prototype, JSString* string)
+    : JSWrapperObject(prototype) {
   setInternalValue(string);
 }
 
 StringObject::StringObject(ExecState* exec,
-                           JSObject* proto,
+                           JSObject* prototype,
                            const UString& string)
-    : JSWrapperObject(proto) {
+    : JSWrapperObject(prototype) {
   setInternalValue(jsString(exec, string));
 }
 
@@ -80,7 +80,7 @@ bool StringObject::deleteProperty(ExecState* exec,
 void StringObject::getPropertyNames(ExecState* exec,
                                     PropertyNameArray& propertyNames) {
   int size = internalValue()->value().size();
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < size; ++i)
     propertyNames.add(Identifier(exec, UString::from(i)));
   return JSObject::getPropertyNames(exec, propertyNames);
 }

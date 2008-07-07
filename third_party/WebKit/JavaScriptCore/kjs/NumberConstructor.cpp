@@ -43,12 +43,12 @@ DontEnum|DontDelete|ReadOnly
 @end
 */
 NumberConstructor::NumberConstructor(ExecState* exec,
-                                     FunctionPrototype* funcProto,
-                                     NumberPrototype* numberProto)
-    : InternalFunction(funcProto,
-                       Identifier(exec, numberProto->info.className)) {
+                                     FunctionPrototype* functionPrototype,
+                                     NumberPrototype* numberPrototype)
+    : InternalFunction(functionPrototype,
+                       Identifier(exec, numberPrototype->info.className)) {
   // Number.Prototype
-  putDirect(exec->propertyNames().prototype, numberProto,
+  putDirect(exec->propertyNames().prototype, numberPrototype,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor

@@ -71,4 +71,5 @@ void setUpStaticFunctionSlot(ExecState* exec,
   thisObj->putDirect(propertyName, function, entry->attributes);
   slot.setValueSlot(thisObj->getDirectLocation(propertyName));
 }
-}
+
+}  // namespace KJS

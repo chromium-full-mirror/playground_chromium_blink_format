@@ -26,7 +26,7 @@
 namespace KJS {
 
 inline void ScopeChain::mark() const {
-  for (ScopeChainNode* n = _node; n; n = n->next) {
+  for (ScopeChainNode* n = m_node; n; n = n->next) {
     JSObject* o = n->object;
     if (!o->marked())
       o->mark();
@@ -35,4 +35,4 @@ inline void ScopeChain::mark() const {
 
 }  // namespace KJS
 
-#endif
+#endif  // ScopeChainMark_h

@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 4 -*-
 /*
  *  Copyright (C) 2005, 2008 Apple Inc. All rights reserved.
  *

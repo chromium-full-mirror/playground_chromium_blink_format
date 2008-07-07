@@ -43,6 +43,7 @@
 #include "XMLHttpRequestProgressEvent.h"
 #include "markup.h"
 #include <kjs/JSLock.h>
+#include <kjs/protect.h>
 
 namespace WebCore {
 
@@ -691,7 +692,7 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
     // and they are referenced by the JavaScript wrapper.
     ref();
 
-    gcProtectNullTolerant(ScriptInterpreter::getDOMObject(this));
+    KJS::gcProtectNullTolerant(ScriptInterpreter::getDOMObject(this));
   }
 }
 

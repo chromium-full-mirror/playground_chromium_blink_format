@@ -43,9 +43,9 @@ const ClassInfo RegExpObject::info = {"RegExp", 0, 0, ExecState::regExpTable};
 @end
 */
 
-RegExpObject::RegExpObject(RegExpPrototype* regexpProto,
+RegExpObject::RegExpObject(RegExpPrototype* regExpPrototype,
                            PassRefPtr<RegExp> regExp)
-    : JSObject(regexpProto), m_regExp(regExp), m_lastIndex(0) {}
+    : JSObject(regExpPrototype), m_regExp(regExp), m_lastIndex(0) {}
 
 RegExpObject::~RegExpObject() {}
 
@@ -132,10 +132,10 @@ JSValue* RegExpObject::test(ExecState* exec, const ArgList& args) {
 }
 
 JSValue* RegExpObject::exec(ExecState* exec, const ArgList& args) {
-  return match(exec, args)
-             ? exec->lexicalGlobalObject()->regExpConstructor()->arrayOfMatches(
-                   exec)
-             : jsNull();
+  if (match(exec, args))
+    return exec->lexicalGlobalObject()->regExpConstructor()->arrayOfMatches(
+        exec);
+  return jsNull();
 }
 
 static JSValue* callRegExpObject(ExecState* exec,

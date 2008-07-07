@@ -28,8 +28,8 @@
 namespace KJS {
 
 class FunctionPrototype;
-class RegExpPrototype;
 class RegExp;
+class RegExpPrototype;
 struct RegExpConstructorPrivate;
 
 class RegExpConstructor : public InternalFunction {
@@ -54,9 +54,11 @@ class RegExpConstructor : public InternalFunction {
 
   RegExpConstructor(ExecState*, FunctionPrototype*, RegExpPrototype*);
 
-  virtual void put(ExecState*, const Identifier&, JSValue*);
+  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
   void putValueProperty(ExecState*, int token, JSValue*);
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier& propertyName,
+                                  PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
 
   static const ClassInfo info;
@@ -73,6 +75,7 @@ class RegExpConstructor : public InternalFunction {
  private:
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
+
   virtual const ClassInfo* classInfo() const { return &info; }
 
   JSValue* getBackref(ExecState*, unsigned) const;
@@ -83,6 +86,6 @@ class RegExpConstructor : public InternalFunction {
   OwnPtr<RegExpConstructorPrivate> d;
 };
 
-}  // namespace
+}  // namespace KJS
 
-#endif
+#endif  // RegExpConstructor_h

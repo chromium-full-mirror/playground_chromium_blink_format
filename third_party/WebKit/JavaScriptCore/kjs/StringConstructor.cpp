@@ -48,18 +48,19 @@ static JSValue* stringFromCharCode(ExecState* exec,
 }
 
 StringConstructor::StringConstructor(ExecState* exec,
-                                     FunctionPrototype* funcProto,
-                                     StringPrototype* stringProto)
-    : InternalFunction(funcProto,
-                       Identifier(exec, stringProto->classInfo()->className)) {
+                                     FunctionPrototype* functionPrototype,
+                                     StringPrototype* stringPrototype)
+    : InternalFunction(
+          functionPrototype,
+          Identifier(exec, stringPrototype->classInfo()->className)) {
   // ECMA 15.5.3.1 String.prototype
-  putDirect(exec->propertyNames().prototype, stringProto,
+  putDirect(exec->propertyNames().prototype, stringPrototype,
             ReadOnly | DontEnum | DontDelete);
 
   // ECMA 15.5.3.2 fromCharCode()
   putDirectFunction(new (exec) PrototypeFunction(
-                        exec, funcProto, 1, exec->propertyNames().fromCharCode,
-                        stringFromCharCode),
+                        exec, functionPrototype, 1,
+                        exec->propertyNames().fromCharCode, stringFromCharCode),
                     DontEnum);
 
   // no. of arguments for constructor

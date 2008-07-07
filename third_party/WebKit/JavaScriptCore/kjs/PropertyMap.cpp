@@ -170,10 +170,11 @@ void PropertyMap::clear() {
   m_u.table->deletedSentinelCount = 0;
 }
 
-JSValue* PropertyMap::get(const Identifier& name, unsigned& attributes) const {
-  ASSERT(!name.isNull());
+JSValue* PropertyMap::get(const Identifier& propertyName,
+                          unsigned& attributes) const {
+  ASSERT(!propertyName.isNull());
 
-  UString::Rep* rep = name._ustring.rep();
+  UString::Rep* rep = propertyName._ustring.rep();
 
   if (!m_usingTable) {
 #if USE_SINGLE_ENTRY
@@ -224,10 +225,10 @@ JSValue* PropertyMap::get(const Identifier& name, unsigned& attributes) const {
   }
 }
 
-JSValue* PropertyMap::get(const Identifier& name) const {
-  ASSERT(!name.isNull());
+JSValue* PropertyMap::get(const Identifier& propertyName) const {
+  ASSERT(!propertyName.isNull());
 
-  UString::Rep* rep = name._ustring.rep();
+  UString::Rep* rep = propertyName._ustring.rep();
 
   if (!m_usingTable) {
 #if USE_SINGLE_ENTRY
@@ -272,10 +273,10 @@ JSValue* PropertyMap::get(const Identifier& name) const {
   }
 }
 
-JSValue** PropertyMap::getLocation(const Identifier& name) {
-  ASSERT(!name.isNull());
+JSValue** PropertyMap::getLocation(const Identifier& propertyName) {
+  ASSERT(!propertyName.isNull());
 
-  UString::Rep* rep = name._ustring.rep();
+  UString::Rep* rep = propertyName._ustring.rep();
 
   if (!m_usingTable) {
 #if USE_SINGLE_ENTRY
@@ -320,10 +321,11 @@ JSValue** PropertyMap::getLocation(const Identifier& name) {
   }
 }
 
-JSValue** PropertyMap::getLocation(const Identifier& name, bool& isWriteable) {
-  ASSERT(!name.isNull());
+JSValue** PropertyMap::getLocation(const Identifier& propertyName,
+                                   bool& isWriteable) {
+  ASSERT(!propertyName.isNull());
 
-  UString::Rep* rep = name._ustring.rep();
+  UString::Rep* rep = propertyName._ustring.rep();
 
   if (!m_usingTable) {
 #if USE_SINGLE_ENTRY
@@ -375,16 +377,16 @@ JSValue** PropertyMap::getLocation(const Identifier& name, bool& isWriteable) {
   }
 }
 
-void PropertyMap::put(const Identifier& name,
+void PropertyMap::put(const Identifier& propertyName,
                       JSValue* value,
                       unsigned attributes,
                       bool checkReadOnly) {
-  ASSERT(!name.isNull());
+  ASSERT(!propertyName.isNull());
   ASSERT(value);
 
   checkConsistency();
 
-  UString::Rep* rep = name._ustring.rep();
+  UString::Rep* rep = propertyName._ustring.rep();
 
 #if USE_SINGLE_ENTRY
   if (!m_usingTable) {
@@ -467,8 +469,8 @@ void PropertyMap::put(const Identifier& name,
     // slot that we can use. We know it will be there because we did at least
     // one
     // deletion in the past that left an entry empty.
-    while (m_u.table->entries()[--entryIndex - 1].key)
-      ;
+    while (m_u.table->entries()[--entryIndex - 1].key) {
+    }
   }
 
   // Create a new hash table entry.
@@ -591,12 +593,12 @@ void PropertyMap::rehash(unsigned newTableSize) {
   checkConsistency();
 }
 
-void PropertyMap::remove(const Identifier& name) {
-  ASSERT(!name.isNull());
+void PropertyMap::remove(const Identifier& propertyName) {
+  ASSERT(!propertyName.isNull());
 
   checkConsistency();
 
-  UString::Rep* rep = name._ustring.rep();
+  UString::Rep* rep = propertyName._ustring.rep();
 
   if (!m_usingTable) {
 #if USE_SINGLE_ENTRY

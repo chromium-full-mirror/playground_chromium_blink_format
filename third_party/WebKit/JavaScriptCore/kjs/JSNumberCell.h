@@ -48,7 +48,7 @@ class JSNumberCell : public JSCell {
   friend JSValue* jsNumberCell(ExecState*, double);
 
  public:
-  double value() const { return val; }
+  double value() const { return m_value; }
 
   virtual JSType type() const;
 
@@ -73,13 +73,13 @@ class JSNumberCell : public JSCell {
   }
 
  private:
-  JSNumberCell(double v) : val(v) {}
+  JSNumberCell(double value) : m_value(value) {}
 
   virtual bool getUInt32(uint32_t&) const;
   virtual bool getTruncatedInt32(int32_t&) const;
   virtual bool getTruncatedUInt32(uint32_t&) const;
 
-  double val;
+  double m_value;
 };
 
 extern const double NaN;
@@ -143,8 +143,6 @@ ALWAYS_INLINE JSValue* JSValue::toJSNumber(ExecState* exec) const {
   return JSImmediate::isNumber(this) ? const_cast<JSValue*>(this)
                                      : jsNumber(exec, this->toNumber(exec));
 }
-
-// -------
 
 }  // namespace KJS
 

@@ -34,7 +34,9 @@ class StringObject : public JSWrapperObject {
 
   static StringObject* create(ExecState*, JSString*);
 
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier& propertyName,
+                                  PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);

@@ -31,10 +31,10 @@ namespace KJS {
 
 class PrototypeFunction : public InternalFunction {
  public:
-  PrototypeFunction(ExecState*, int len, const Identifier&, NativeFunction);
+  PrototypeFunction(ExecState*, int length, const Identifier&, NativeFunction);
   PrototypeFunction(ExecState*,
                     FunctionPrototype*,
-                    int len,
+                    int length,
                     const Identifier&,
                     NativeFunction);
 

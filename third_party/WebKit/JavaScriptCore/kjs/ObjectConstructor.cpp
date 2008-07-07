@@ -29,11 +29,11 @@
 namespace KJS {
 
 ObjectConstructor::ObjectConstructor(ExecState* exec,
-                                     ObjectPrototype* objProto,
-                                     FunctionPrototype* funcProto)
-    : InternalFunction(funcProto, Identifier(exec, "Object")) {
+                                     ObjectPrototype* objectPrototype,
+                                     FunctionPrototype* functionPrototype)
+    : InternalFunction(functionPrototype, Identifier(exec, "Object")) {
   // ECMA 15.2.3.1
-  putDirect(exec->propertyNames().prototype, objProto,
+  putDirect(exec->propertyNames().prototype, objectPrototype,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor

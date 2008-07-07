@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
@@ -32,66 +31,48 @@
 #include <wtf/unicode/Unicode.h>
 #include <wtf/Vector.h>
 
-/**
- * @internal
- */
-namespace DOM {
-class DOMString;
-class AtomicString;
-}
-class KJScript;
-
 namespace KJS {
 
 using WTF::PlacementNewAdoptType;
 using WTF::PlacementNewAdopt;
 
 class IdentifierTable;
-class UString;
 
-/**
- * @short 8 bit char based string class
- */
 class CString {
  public:
-  CString() : data(0), length(0) {}
-  CString(const char* c);
-  CString(const char* c, size_t len);
+  CString() : m_length(0), m_data(0) {}
+
+  CString(const char*);
+  CString(const char*, size_t);
   CString(const CString&);
 
   ~CString();
 
-  static CString adopt(char* c,
-                       size_t len);  // c should be allocated with new[].
+  static CString adopt(char*,
+                       size_t);  // buffer should be allocated with new[].
 
   CString& append(const CString&);
   CString& operator=(const char* c);
   CString& operator=(const CString&);
   CString& operator+=(const CString& c) { return append(c); }
 
-  size_t size() const { return length; }
-  const char* c_str() const { return data; }
+  size_t size() const { return m_length; }
+  const char* c_str() const { return m_data; }
 
  private:
-  char* data;
-  size_t length;
+  size_t m_length;
+  char* m_data;
 };
 
 typedef Vector<char, 32> CStringBuffer;
 
-/**
- * @short Unicode string class
- */
 class UString {
   friend bool operator==(const UString&, const UString&);
 
  public:
-  /**
-   * @internal
-   */
   struct Rep {
-    static PassRefPtr<Rep> create(UChar* d, int l);
-    static PassRefPtr<Rep> createCopying(const UChar* d, int l);
+    static PassRefPtr<Rep> create(UChar*, int);
+    static PassRefPtr<Rep> createCopying(const UChar*, int);
     static PassRefPtr<Rep> create(PassRefPtr<Rep> base, int offset, int length);
 
     // Constructs a string from a UTF-8 string, using strict conversion (see
@@ -156,79 +137,34 @@ class UString {
   };
 
  public:
-  /**
-   * Constructs a null string.
-   */
   UString();
-  /**
-   * Constructs a string from a classical zero-terminated char string.
-   */
-  UString(const char* c);
-  /**
-   * Constructs a string from an array of Unicode characters of the specified
-   * length.
-   */
-  UString(const UChar* c, int length);
-  /**
-   * If copy is false the string data will be adopted.
-   * That means that the data will NOT be copied and the pointer will
-   * be deleted when the UString object is modified or destroyed.
-   * Behaviour defaults to a deep copy if copy is true.
-   */
-  UString(UChar* c, int length, bool copy);
-  /**
-   * Copy constructor. Makes a shallow copy only.
-   */
+  UString(const char*);
+  UString(const UChar*, int length);
+  UString(UChar*, int length, bool copy);
+
   UString(const UString& s) : m_rep(s.m_rep) {}
 
   UString(const Vector<UChar>& buffer);
 
-  /**
-   * Convenience declaration only ! You'll be on your own to write the
-   * implementation for a construction from DOM::DOMString.
-   *
-   * Note: feel free to contact me if you want to see a dummy header for
-   * your favorite FooString class here !
-   */
-  UString(const DOM::DOMString&);
-  /**
-   * Convenience declaration only ! See UString(const DOM::DOMString&).
-   */
-  UString(const DOM::AtomicString&);
-
-  /**
-   * Concatenation constructor. Makes operator+ more efficient.
-   */
+  // Concatenation constructor. Makes operator+ more efficient.
   UString(const UString&, const UString&);
-  /**
-   * Destructor.
-   */
+
   ~UString() {}
 
   // Special constructor for cases where we overwrite an object in place.
   UString(PlacementNewAdoptType) : m_rep(PlacementNewAdopt) {}
 
-  /**
-   * Constructs a string from an int.
-   */
-  static UString from(int i);
-  /**
-   * Constructs a string from an unsigned int.
-   */
-  static UString from(unsigned int u);
-  /**
-   * Constructs a string from a long int.
-   */
-  static UString from(long u);
-  /**
-   * Constructs a string from a double.
-   */
-  static UString from(double d);
+  static UString from(int);
+  static UString from(unsigned int);
+  static UString from(long);
+  static UString from(double);
 
   struct Range {
    public:
     Range(int pos, int len) : position(pos), length(len) {}
+
     Range() {}
+
     int position;
     int length;
   };
@@ -238,9 +174,6 @@ class UString {
                                          const UString* separators,
                                          int separatorCount) const;
 
-  /**
-   * Append another string.
-   */
   UString& append(const UString&);
   UString& append(const char*);
   UString& append(UChar);
@@ -249,19 +182,10 @@ class UString {
   }
   UString& append(const UChar*, int size);
 
-  /**
-   * @return The string converted to the 8-bit string type CString().
-   * Returns false if any character is non-ASCII.
-   */
   bool getCString(CStringBuffer&) const;
 
-  /**
-   * Convert the Unicode string to plain ASCII chars chopping off any higher
-   * bytes. This method should only be used for *debugging* purposes as it
-   * is neither Unicode safe nor free from side effects nor thread-safe.
-   * In order not to waste any memory the char buffer is static and *shared*
-   * by all UString instances.
-   */
+  // NOTE: This method should only be used for *debugging* purposes as it
+  // is neither Unicode safe nor free from side effects nor thread-safe.
   char* ascii() const;
 
   /**
@@ -274,105 +198,43 @@ class UString {
    */
   CString UTF8String(bool strict = false) const;
 
-  /**
-   * @see UString(const DOM::DOMString&).
-   */
-  DOM::DOMString domString() const;
-
-  /**
-   * Assignment operator.
-   */
   UString& operator=(const char* c);
-  /**
-   * Appends the specified string.
-   */
+
   UString& operator+=(const UString& s) { return append(s); }
   UString& operator+=(const char* s) { return append(s); }
 
-  /**
-   * @return A pointer to the internal Unicode data.
-   */
   const UChar* data() const { return m_rep->data(); }
-  /**
-   * @return True if null.
-   */
+
   bool isNull() const { return (m_rep == &Rep::null); }
-  /**
-   * @return True if null or zero length.
-   */
   bool isEmpty() const { return (!m_rep->len); }
-  /**
-   * Use this if you want to make sure that this string is a plain ASCII
-   * string. For example, if you don't want to lose any information when
-   * using cstring() or ascii().
-   *
-   * @return True if the string doesn't contain any non-ASCII characters.
-   */
+
   bool is8Bit() const;
-  /**
-   * @return The length of the string.
-   */
+
   int size() const { return m_rep->size(); }
-  /**
-   * Const character at specified position.
-   */
+
   UChar operator[](int pos) const;
 
-  /**
-   * Attempts an conversion to a number. Apart from floating point numbers,
-   * the algorithm will recognize hexadecimal representations (as
-   * indicated by a 0x or 0X prefix) and +/- Infinity.
-   * Returns NaN if the conversion failed.
-   * @param tolerateTrailingJunk if true, toDouble can tolerate garbage after
-   * the number.
-   * @param tolerateEmptyString if false, toDouble will turn an empty string
-   * into NaN rather than 0.
-   */
   double toDouble(bool tolerateTrailingJunk, bool tolerateEmptyString) const;
   double toDouble(bool tolerateTrailingJunk) const;
   double toDouble() const;
 
-  /**
-   * Attempts an conversion to a 32-bit integer. ok will be set
-   * according to the success.
-   * @param tolerateEmptyString if false, toUInt32 will return false for *ok for
-   * an empty string.
-   */
   uint32_t toUInt32(bool* ok = 0) const;
   uint32_t toUInt32(bool* ok, bool tolerateEmptyString) const;
   uint32_t toStrictUInt32(bool* ok = 0) const;
 
-  /**
-   * Attempts an conversion to an array index. The "ok" boolean will be set
-   * to true if it is a valid array index according to the rule from
-   * ECMA 15.2 about what an array index is. It must exactly match the string
-   * form of an unsigned integer, and be less than 2^32 - 1.
-   */
   unsigned toArrayIndex(bool* ok = 0) const;
 
-  /**
-   * @return Position of first occurrence of f starting at position pos.
-   * -1 if the search was not successful.
-   */
   int find(const UString& f, int pos = 0) const;
   int find(UChar, int pos = 0) const;
-  /**
-   * @return Position of first occurrence of f searching backwards from
-   * position pos.
-   * -1 if the search was not successful.
-   */
   int rfind(const UString& f, int pos) const;
   int rfind(UChar, int pos) const;
-  /**
-   * @return The sub string starting at position pos and length len.
-   */
+
   UString substr(int pos = 0, int len = -1) const;
-  /**
-   * Static instance of a null string.
-   */
+
   static const UString& null();
 
   Rep* rep() const { return m_rep.get(); }
+
   UString(PassRefPtr<Rep> r) : m_rep(r) { ASSERT(m_rep); }
 
   size_t cost() const;
@@ -388,22 +250,30 @@ class UString {
 };
 
 bool operator==(const UString& s1, const UString& s2);
+
 inline bool operator!=(const UString& s1, const UString& s2) {
   return !KJS::operator==(s1, s2);
 }
+
 bool operator<(const UString& s1, const UString& s2);
 bool operator>(const UString& s1, const UString& s2);
+
 bool operator==(const UString& s1, const char* s2);
+
 inline bool operator!=(const UString& s1, const char* s2) {
   return !KJS::operator==(s1, s2);
 }
+
 inline bool operator==(const char* s1, const UString& s2) {
   return operator==(s2, s1);
 }
+
 inline bool operator!=(const char* s1, const UString& s2) {
   return !KJS::operator==(s1, s2);
 }
+
 bool operator==(const CString& s1, const CString& s2);
+
 inline UString operator+(const UString& s1, const UString& s2) {
   return UString(s1, s2);
 }

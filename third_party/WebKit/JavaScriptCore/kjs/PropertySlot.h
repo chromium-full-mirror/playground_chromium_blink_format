@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 4 -*-
 /*
  *  Copyright (C) 2005, 2007, 2008 Apple Inc. All rights reserved.
  *
@@ -22,15 +21,14 @@
 #ifndef PropertySlot_h
 #define PropertySlot_h
 
-#include "identifier.h"
 #include "JSValue.h"
+#include "identifier.h"
 #include <wtf/Assertions.h>
 
 namespace KJS {
 
 class ExecState;
 class JSObject;
-
 struct HashEntry;
 
 #define KJS_VALUE_SLOT_MARKER 0
@@ -162,6 +160,7 @@ class PropertySlot {
     GetValueNumericFunc numericFunc;
   } m_data;
 };
-}
+
+}  // namespace KJS
 
 #endif  // PropertySlot_h
