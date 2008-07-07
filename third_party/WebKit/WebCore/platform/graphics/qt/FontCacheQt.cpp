@@ -44,4 +44,7 @@ SimpleFontData* FontCache::getCachedFontData(const FontPlatformData*) {
 FontPlatformData* FontCache::getLastResortFallbackFont(const FontDescription&) {
   return 0;
 }
-}
+
+void FontCache::addClient(FontSelector*) {}
+
+void FontCache::removeClient(FontSelector*) {}
