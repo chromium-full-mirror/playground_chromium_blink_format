@@ -198,6 +198,9 @@ class Settings {
     return m_offlineWebApplicationCacheEnabled;
   }
 
+  void setUpdatesWhenOffscreen(bool);
+  bool updatesWhenOffscreen() const { return m_updatesWhenOffscreen; }
+
  private:
   Page* m_page;
 
@@ -242,6 +245,7 @@ class Settings {
   bool m_inApplicationChromeMode : 1;
   bool m_offlineWebApplicationCacheEnabled : 1;
   bool m_rangeMutationDisabledForOldAppleMail : 1;
+  bool m_updatesWhenOffscreen : 1;
 };
 
 }  // namespace WebCore

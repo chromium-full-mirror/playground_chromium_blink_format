@@ -63,6 +63,7 @@ void WKSetNSURLRequestShouldContentSniff(NSMutableURLRequest* request,
 unsigned WKGetNSAutoreleasePoolCount(void);
 
 NSString* WKMouseMovedNotification(void);
+NSString* WKWindowWillOrderOnScreenNotification(void);
 void WKSetNSWindowShouldPostEventNotifications(NSWindow* window, BOOL post);
 
 CFTypeID WKGetAXTextMarkerTypeID(void);

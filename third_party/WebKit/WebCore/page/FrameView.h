@@ -79,6 +79,8 @@ class FrameView : public ScrollView {
   virtual void setHScrollbarMode(ScrollbarMode);
   virtual void setScrollbarsMode(ScrollbarMode);
 
+  virtual bool shouldUpdateWhenOffscreen() const;
+
   void layout(bool allowSubtree = true);
   bool didFirstLayout() const;
   void layoutTimerFired(Timer<FrameView>*);

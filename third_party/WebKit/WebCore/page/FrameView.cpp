@@ -44,6 +44,7 @@
 #include "RenderPartObject.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
+#include "Settings.h"
 
 namespace WebCore {
 
@@ -683,6 +684,12 @@ void FrameView::setHScrollbarMode(ScrollbarMode mode) {
 
 void FrameView::restoreScrollbar() {
   suppressScrollbars(false);
+}
+
+bool FrameView::shouldUpdateWhenOffscreen() const {
+  if (Settings* settings = frame()->settings())
+    return settings->updatesWhenOffscreen();
+  return true;
 }
 
 void FrameView::scrollRectIntoViewRecursively(const IntRect& r) {
