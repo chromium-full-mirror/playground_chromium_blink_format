@@ -25,6 +25,7 @@
 #ifndef TreeWalker_h
 #define TreeWalker_h
 
+#include "NodeFilter.h"
 #include "Traversal.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -46,42 +47,35 @@ class TreeWalker : public RefCounted<TreeWalker>, public Traversal {
   Node* currentNode() const { return m_current.get(); }
   void setCurrentNode(PassRefPtr<Node>, ExceptionCode&);
 
-  Node* parentNode(KJS::JSValue*& exception);
-  Node* firstChild(KJS::JSValue*& exception);
-  Node* lastChild(KJS::JSValue*& exception);
-  Node* previousSibling(KJS::JSValue*& exception);
-  Node* nextSibling(KJS::JSValue*& exception);
-  Node* previousNode(KJS::JSValue*& exception);
-  Node* nextNode(KJS::JSValue*& exception);
+  Node* parentNode(KJS::ExecState*);
+  Node* firstChild(KJS::ExecState*);
+  Node* lastChild(KJS::ExecState*);
+  Node* previousSibling(KJS::ExecState*);
+  Node* nextSibling(KJS::ExecState*);
+  Node* previousNode(KJS::ExecState*);
+  Node* nextNode(KJS::ExecState*);
 
   // For non-JS bindings. Silently ignores the JavaScript exception if any.
   Node* parentNode() {
-    KJS::JSValue* exception;
-    return parentNode(exception);
+    return parentNode(NodeFilter::execStateFromNode(m_current.get()));
   }
   Node* firstChild() {
-    KJS::JSValue* exception;
-    return firstChild(exception);
+    return firstChild(NodeFilter::execStateFromNode(m_current.get()));
   }
   Node* lastChild() {
-    KJS::JSValue* exception;
-    return lastChild(exception);
+    return lastChild(NodeFilter::execStateFromNode(m_current.get()));
   }
   Node* previousSibling() {
-    KJS::JSValue* exception;
-    return previousSibling(exception);
+    return previousSibling(NodeFilter::execStateFromNode(m_current.get()));
   }
   Node* nextSibling() {
-    KJS::JSValue* exception;
-    return nextSibling(exception);
+    return nextSibling(NodeFilter::execStateFromNode(m_current.get()));
   }
   Node* previousNode() {
-    KJS::JSValue* exception;
-    return previousNode(exception);
+    return previousNode(NodeFilter::execStateFromNode(m_current.get()));
   }
   Node* nextNode() {
-    KJS::JSValue* exception;
-    return nextNode(exception);
+    return nextNode(NodeFilter::execStateFromNode(m_current.get()));
   }
 
  private:

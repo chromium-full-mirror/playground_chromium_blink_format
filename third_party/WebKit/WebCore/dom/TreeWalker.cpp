@@ -25,6 +25,7 @@
 #include "config.h"
 #include "TreeWalker.h"
 
+#include <kjs/ExecState.h>
 #include "ExceptionCode.h"
 #include "Node.h"
 #include "NodeFilter.h"
@@ -54,15 +55,14 @@ inline Node* TreeWalker::setCurrent(PassRefPtr<Node> node) {
   return m_current.get();
 }
 
-Node* TreeWalker::parentNode(JSValue*& exception) {
-  exception = 0;
+Node* TreeWalker::parentNode(ExecState* exec) {
   RefPtr<Node> node = m_current;
   while (node != root()) {
     node = node->parentNode();
     if (!node)
       return 0;
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     if (acceptNodeResult == NodeFilter::FILTER_ACCEPT)
       return setCurrent(node.release());
@@ -70,11 +70,10 @@ Node* TreeWalker::parentNode(JSValue*& exception) {
   return 0;
 }
 
-Node* TreeWalker::firstChild(JSValue*& exception) {
-  exception = 0;
+Node* TreeWalker::firstChild(ExecState* exec) {
   for (RefPtr<Node> node = m_current->firstChild(); node;) {
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     switch (acceptNodeResult) {
       case NodeFilter::FILTER_ACCEPT:
@@ -103,11 +102,10 @@ Node* TreeWalker::firstChild(JSValue*& exception) {
   return 0;
 }
 
-Node* TreeWalker::lastChild(JSValue*& exception) {
-  exception = 0;
+Node* TreeWalker::lastChild(ExecState* exec) {
   for (RefPtr<Node> node = m_current->lastChild(); node;) {
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     switch (acceptNodeResult) {
       case NodeFilter::FILTER_ACCEPT:
@@ -136,15 +134,14 @@ Node* TreeWalker::lastChild(JSValue*& exception) {
   return 0;
 }
 
-Node* TreeWalker::previousSibling(JSValue*& exception) {
-  exception = 0;
+Node* TreeWalker::previousSibling(ExecState* exec) {
   RefPtr<Node> node = m_current;
   if (node == root())
     return 0;
   while (1) {
     for (RefPtr<Node> sibling = node->previousSibling(); sibling;) {
-      short acceptNodeResult = acceptNode(sibling.get(), exception);
-      if (exception)
+      short acceptNodeResult = acceptNode(exec, sibling.get());
+      if (exec && exec->hadException())
         return 0;
       switch (acceptNodeResult) {
         case NodeFilter::FILTER_ACCEPT:
@@ -164,23 +161,22 @@ Node* TreeWalker::previousSibling(JSValue*& exception) {
     node = node->parentNode();
     if (!node || node == root())
       return 0;
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     if (acceptNodeResult == NodeFilter::FILTER_ACCEPT)
       return 0;
   }
 }
 
-Node* TreeWalker::nextSibling(JSValue*& exception) {
-  exception = 0;
+Node* TreeWalker::nextSibling(ExecState* exec) {
   RefPtr<Node> node = m_current;
   if (node == root())
     return 0;
   while (1) {
     for (RefPtr<Node> sibling = node->nextSibling(); sibling;) {
-      short acceptNodeResult = acceptNode(sibling.get(), exception);
-      if (exception)
+      short acceptNodeResult = acceptNode(exec, sibling.get());
+      if (exec && exec->hadException())
         return 0;
       switch (acceptNodeResult) {
         case NodeFilter::FILTER_ACCEPT:
@@ -200,29 +196,28 @@ Node* TreeWalker::nextSibling(JSValue*& exception) {
     node = node->parentNode();
     if (!node || node == root())
       return 0;
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     if (acceptNodeResult == NodeFilter::FILTER_ACCEPT)
       return 0;
   }
 }
 
-Node* TreeWalker::previousNode(JSValue*& exception) {
-  exception = 0;
+Node* TreeWalker::previousNode(ExecState* exec) {
   RefPtr<Node> node = m_current;
   while (node != root()) {
     while (Node* previousSibling = node->previousSibling()) {
       node = previousSibling;
-      short acceptNodeResult = acceptNode(node.get(), exception);
-      if (exception)
+      short acceptNodeResult = acceptNode(exec, node.get());
+      if (exec && exec->hadException())
         return 0;
       if (acceptNodeResult == NodeFilter::FILTER_REJECT)
         continue;
       while (Node* lastChild = node->lastChild()) {
         node = lastChild;
-        acceptNodeResult = acceptNode(node.get(), exception);
-        if (exception)
+        acceptNodeResult = acceptNode(exec, node.get());
+        if (exec && exec->hadException())
           return 0;
         if (acceptNodeResult == NodeFilter::FILTER_ACCEPT)
           continue;
@@ -238,8 +233,8 @@ Node* TreeWalker::previousNode(JSValue*& exception) {
     if (!parent)
       return 0;
     node = parent;
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     if (acceptNodeResult == NodeFilter::FILTER_ACCEPT)
       return setCurrent(node.release());
@@ -247,14 +242,13 @@ Node* TreeWalker::previousNode(JSValue*& exception) {
   return 0;
 }
 
-Node* TreeWalker::nextNode(JSValue*& exception) {
-  exception = 0;
+Node* TreeWalker::nextNode(ExecState* exec) {
   RefPtr<Node> node = m_current;
 Children:
   while (Node* firstChild = node->firstChild()) {
     node = firstChild;
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     if (acceptNodeResult == NodeFilter::FILTER_ACCEPT)
       return setCurrent(node.release());
@@ -263,8 +257,8 @@ Children:
   }
   while (Node* nextSibling = node->traverseNextSibling(root())) {
     node = nextSibling;
-    short acceptNodeResult = acceptNode(node.get(), exception);
-    if (exception)
+    short acceptNodeResult = acceptNode(exec, node.get());
+    if (exec && exec->hadException())
       return 0;
     if (acceptNodeResult == NodeFilter::FILTER_ACCEPT)
       return setCurrent(node.release());

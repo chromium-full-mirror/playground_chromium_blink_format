@@ -25,6 +25,7 @@
 #ifndef NodeIterator_h
 #define NodeIterator_h
 
+#include "NodeFilter.h"
 #include "Traversal.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -44,8 +45,8 @@ class NodeIterator : public RefCounted<NodeIterator>, public Traversal {
   }
   ~NodeIterator();
 
-  PassRefPtr<Node> nextNode(ExceptionCode&, KJS::JSValue*& exception);
-  PassRefPtr<Node> previousNode(ExceptionCode&, KJS::JSValue*& exception);
+  PassRefPtr<Node> nextNode(KJS::ExecState*, ExceptionCode&);
+  PassRefPtr<Node> previousNode(KJS::ExecState*, ExceptionCode&);
   void detach();
 
   Node* referenceNode() const { return m_referenceNode.node.get(); }
@@ -58,12 +59,10 @@ class NodeIterator : public RefCounted<NodeIterator>, public Traversal {
 
   // For non-JS bindings. Silently ignores the JavaScript exception if any.
   PassRefPtr<Node> nextNode(ExceptionCode& ec) {
-    KJS::JSValue* exception;
-    return nextNode(ec, exception);
+    return nextNode(NodeFilter::execStateFromNode(referenceNode()), ec);
   }
   PassRefPtr<Node> previousNode(ExceptionCode& ec) {
-    KJS::JSValue* exception;
-    return previousNode(ec, exception);
+    return previousNode(NodeFilter::execStateFromNode(referenceNode()), ec);
   }
 
  private:

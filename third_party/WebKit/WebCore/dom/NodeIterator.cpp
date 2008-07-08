@@ -25,6 +25,7 @@
 #include "config.h"
 #include "NodeIterator.h"
 
+#include <kjs/ExecState.h>
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "NodeFilter.h"
@@ -78,8 +79,7 @@ NodeIterator::~NodeIterator() {
   root()->document()->detachNodeIterator(this);
 }
 
-PassRefPtr<Node> NodeIterator::nextNode(ExceptionCode& ec,
-                                        JSValue*& exception) {
+PassRefPtr<Node> NodeIterator::nextNode(ExecState* exec, ExceptionCode& ec) {
   if (m_detached) {
     ec = INVALID_STATE_ERR;
     return 0;
@@ -92,11 +92,10 @@ PassRefPtr<Node> NodeIterator::nextNode(ExceptionCode& ec,
     // NodeIterators treat the DOM tree as a flat list of nodes.
     // In other words, FILTER_REJECT does not pass over descendants
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
-    exception = 0;
     RefPtr<Node> provisionalResult = m_candidateNode.node;
-    bool nodeWasAccepted = acceptNode(provisionalResult.get(), exception) ==
-                           NodeFilter::FILTER_ACCEPT;
-    if (exception)
+    bool nodeWasAccepted =
+        acceptNode(exec, provisionalResult.get()) == NodeFilter::FILTER_ACCEPT;
+    if (exec && exec->hadException())
       break;
     if (nodeWasAccepted) {
       m_referenceNode = m_candidateNode;
@@ -109,8 +108,8 @@ PassRefPtr<Node> NodeIterator::nextNode(ExceptionCode& ec,
   return result.release();
 }
 
-PassRefPtr<Node> NodeIterator::previousNode(ExceptionCode& ec,
-                                            JSValue*& exception) {
+PassRefPtr<Node> NodeIterator::previousNode(ExecState* exec,
+                                            ExceptionCode& ec) {
   if (m_detached) {
     ec = INVALID_STATE_ERR;
     return 0;
@@ -123,11 +122,10 @@ PassRefPtr<Node> NodeIterator::previousNode(ExceptionCode& ec,
     // NodeIterators treat the DOM tree as a flat list of nodes.
     // In other words, FILTER_REJECT does not pass over descendants
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
-    exception = 0;
     RefPtr<Node> provisionalResult = m_candidateNode.node;
-    bool nodeWasAccepted = acceptNode(provisionalResult.get(), exception) ==
-                           NodeFilter::FILTER_ACCEPT;
-    if (exception)
+    bool nodeWasAccepted =
+        acceptNode(exec, provisionalResult.get()) == NodeFilter::FILTER_ACCEPT;
+    if (exec && exec->hadException())
       break;
     if (nodeWasAccepted) {
       m_referenceNode = m_candidateNode;

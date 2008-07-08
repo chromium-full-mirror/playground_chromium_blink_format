@@ -41,18 +41,18 @@ Traversal::Traversal(PassRefPtr<Node> rootNode,
       m_filter(nodeFilter),
       m_expandEntityReferences(expandEntityReferences) {}
 
-short Traversal::acceptNode(Node* node, JSValue*& exception) const {
+short Traversal::acceptNode(ExecState* exec, Node* node) const {
   // FIXME: To handle XML properly we would have to check
   // m_expandEntityReferences.
 
-  // The bid twiddling here is done to map DOM node types, which are given as
+  // The bit twiddling here is done to map DOM node types, which are given as
   // integers from
   // 1 through 12, to whatToShow bit masks.
   if (!(((1 << (node->nodeType() - 1)) & m_whatToShow)))
     return NodeFilter::FILTER_SKIP;
   if (!m_filter)
     return NodeFilter::FILTER_ACCEPT;
-  return m_filter->acceptNode(node, exception);
+  return m_filter->acceptNode(exec, node);
 }
 
 }  // namespace WebCore
