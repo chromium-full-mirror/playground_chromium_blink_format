@@ -57,11 +57,11 @@ PlatformMouseEvent::PlatformMouseEvent(const wxMouseEvent& event,
   else if (type == wxEVT_MOTION)
     m_eventType = MouseEventMoved;
 
-  if (event.Button(wxMOUSE_BTN_LEFT))
+  if (event.LeftIsDown() || event.Button(wxMOUSE_BTN_LEFT))
     m_button = LeftButton;
-  else if (event.Button(wxMOUSE_BTN_RIGHT))
+  else if (event.RightIsDown() || event.Button(wxMOUSE_BTN_RIGHT))
     m_button = RightButton;
-  else if (event.Button(wxMOUSE_BTN_MIDDLE))
+  else if (event.MiddleIsDown() || event.Button(wxMOUSE_BTN_MIDDLE))
     m_button = MiddleButton;
   else if (!m_eventType == MouseEventMoved)
     ASSERT_NOT_REACHED();
