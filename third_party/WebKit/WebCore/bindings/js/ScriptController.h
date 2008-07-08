@@ -55,7 +55,7 @@ class ScriptController {
     return m_windowShell->window();
   }
 
-  KJS::JSValue* evaluate(const String& filename,
+  KJS::JSValue* evaluate(const String& sourceURL,
                          int baseLine,
                          const String& code);
   void clear();
@@ -85,6 +85,10 @@ class ScriptController {
   }
   void updateDocument();
 
+  const String* sourceURL() const {
+    return m_sourceURL;
+  }  // 0 if we are not evaluating any script
+
  private:
   void initScriptIfNeeded() {
     if (!m_windowShell)
@@ -96,9 +100,9 @@ class ScriptController {
   HashSet<JSDOMWindow*> m_liveFormerWindows;
   Frame* m_frame;
   int m_handlerLineno;
+  const String* m_sourceURL;
 
   bool m_processingTimerCallback;
-  bool m_processingInlineCode;
   bool m_paused;
 };
 
