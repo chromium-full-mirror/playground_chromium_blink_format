@@ -54,6 +54,7 @@
   WebBaseNetscapePluginView* pluginView;
   NPReason reason;
   BOOL isTerminated;
+  BOOL newStreamSuccessful;
 
   NPP_NewStreamProcPtr NPP_NewStream;
   NPP_DestroyStreamProcPtr NPP_DestroyStream;
