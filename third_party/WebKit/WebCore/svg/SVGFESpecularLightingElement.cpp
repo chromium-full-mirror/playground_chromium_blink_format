@@ -50,22 +50,22 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFESpecularLightingElement,
                               String,
                               In1,
                               in1,
-                              SVGNames::in)
+                              SVGNames::inAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFESpecularLightingElement,
                               float,
                               SpecularConstant,
                               specularConstant,
-                              SVGNames::specularConstant)
+                              SVGNames::specularConstantAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFESpecularLightingElement,
                               float,
                               SpecularExponent,
                               specularExponent,
-                              SVGNames::specularExponent)
+                              SVGNames::specularExponentAttr)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFESpecularLightingElement,
                               float,
                               SurfaceScale,
                               surfaceScale,
-                              SVGNames::surfaceScale)
+                              SVGNames::surfaceScaleAttr)
 ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(
     SVGFESpecularLightingElement,
     float,
