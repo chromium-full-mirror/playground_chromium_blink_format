@@ -83,6 +83,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
 
   bool readOnly() const { return isReadOnlyControl(); }
 
+  virtual bool isTextControl() const { return isTextField(); }
+
   bool isTextButton() const {
     return m_type == SUBMIT || m_type == RESET || m_type == BUTTON;
   }

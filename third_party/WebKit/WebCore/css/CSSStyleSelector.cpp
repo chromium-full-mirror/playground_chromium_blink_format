@@ -2257,25 +2257,9 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           return !e->isEnabled();
         break;
       case CSSSelector::PseudoReadOnly:
-        if (e && e->isControl()) {
-          if (e->hasTagName(inputTag)) {
-            HTMLInputElement* input = static_cast<HTMLInputElement*>(e);
-            return (input->isTextField() && input->isReadOnlyControl());
-          } else if (e->hasTagName(textareaTag))
-            return (
-                (static_cast<HTMLTextAreaElement*>(e))->isReadOnlyControl());
-        }
-        break;
+        return e & e->isTextControl() && e->isReadOnlyControl();
       case CSSSelector::PseudoReadWrite:
-        if (e && e->isControl()) {
-          if (e->hasTagName(inputTag)) {
-            HTMLInputElement* input = static_cast<HTMLInputElement*>(e);
-            return (input->isTextField() && !input->isReadOnlyControl());
-          } else if (e->hasTagName(textareaTag))
-            return (
-                !(static_cast<HTMLTextAreaElement*>(e))->isReadOnlyControl());
-        }
-        break;
+        return e & e->isTextControl() && !e->isReadOnlyControl();
       case CSSSelector::PseudoChecked:
         // Even though WinIE allows checked and indeterminate to co-exist, the
         // CSS selector spec says that

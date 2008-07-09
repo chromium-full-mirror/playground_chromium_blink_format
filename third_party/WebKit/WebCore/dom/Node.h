@@ -305,6 +305,7 @@ class Node : public TreeShared<Node> {
   virtual bool isChecked() const { return false; }
   virtual bool isIndeterminate() const { return false; }
   virtual bool isReadOnlyControl() const { return false; }
+  virtual bool isTextControl() const { return false; }
 
   virtual bool isContentEditable() const;
   virtual bool isContentRichlyEditable() const;
