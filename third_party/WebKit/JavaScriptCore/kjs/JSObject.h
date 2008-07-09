@@ -337,6 +337,7 @@ class JSObject : public JSCell {
                  int value,
                  unsigned attr = 0);
   void removeDirect(const Identifier& propertyName);
+  bool hasCustomProperties() { return !m_propertyMap.isEmpty(); }
 
   // convenience to add a function property under the function's own built-in
   // name

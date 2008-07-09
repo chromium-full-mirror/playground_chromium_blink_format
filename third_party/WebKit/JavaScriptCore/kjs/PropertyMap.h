@@ -37,6 +37,7 @@ class PropertyMap : Noncopyable {
   ~PropertyMap();
 
   void clear();
+  bool isEmpty() { return !m_usingTable & !m_singleEntryKey; }
 
   void put(const Identifier& propertyName,
            JSValue*,
