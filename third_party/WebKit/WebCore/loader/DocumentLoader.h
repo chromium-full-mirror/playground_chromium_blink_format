@@ -272,8 +272,6 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   // headers, cookie information, canonicalization and redirects.
   ResourceRequest m_request;
 
-  mutable ResourceRequest m_externalRequest;
-
   ResourceResponse m_response;
 
   ResourceError m_mainDocumentError;
