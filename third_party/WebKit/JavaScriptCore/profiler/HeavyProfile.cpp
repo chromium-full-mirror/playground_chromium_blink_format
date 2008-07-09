@@ -76,7 +76,7 @@ void HeavyProfile::mergeProfiles(ProfileNode* heavyProfileHead,
 
   ProfileNode* currentHeavyNode = heavyProfileHead;
   ProfileNode* currentTreeNode = treeProfileHead;
-  ProfileNode* previousHeavyNode;
+  ProfileNode* previousHeavyNode = 0;
 
   while (currentHeavyNode) {
     previousHeavyNode = currentHeavyNode;
