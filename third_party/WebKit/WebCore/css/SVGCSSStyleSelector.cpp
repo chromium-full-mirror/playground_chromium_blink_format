@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2005 Apple Computer, Inc.
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2008 Rob Buis <buis@kde.org>
     Copyright (C) 2007 Alexey Proskuryakov <ap@webkit.org>
 
     Based on khtml css code by:
@@ -42,6 +42,7 @@
 #include "SVGRenderStyle.h"
 #include "SVGRenderStyleDefs.h"
 #include "SVGStyledElement.h"
+#include "SVGURIReference.h"
 #include <stdlib.h>
 #include <wtf/MathExtras.h>
 
@@ -347,7 +348,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       else
         return;
 
-      svgstyle->setStartMarker(s);
+      svgstyle->setStartMarker(SVGURIReference::getTarget(s));
       break;
     }
     case CSSPropertyMarkerMid: {
@@ -362,7 +363,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       else
         return;
 
-      svgstyle->setMidMarker(s);
+      svgstyle->setMidMarker(SVGURIReference::getTarget(s));
       break;
     }
     case CSSPropertyMarkerEnd: {
@@ -377,7 +378,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       else
         return;
 
-      svgstyle->setEndMarker(s);
+      svgstyle->setEndMarker(SVGURIReference::getTarget(s));
       break;
     }
     case CSSPropertyStrokeLinecap: {
@@ -412,7 +413,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
         s = primitiveValue->getStringValue();
       else
         return;
-      svgstyle->setFilter(s);
+      svgstyle->setFilter(SVGURIReference::getTarget(s));
       break;
     }
     case CSSPropertyMask: {
@@ -427,7 +428,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       else
         return;
 
-      svgstyle->setMaskElement(s);
+      svgstyle->setMaskElement(SVGURIReference::getTarget(s));
       break;
     }
     case CSSPropertyClipPath: {
@@ -442,7 +443,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       else
         return;
 
-      svgstyle->setClipPath(s);
+      svgstyle->setClipPath(SVGURIReference::getTarget(s));
       break;
     }
     case CSSPropertyTextAnchor: {
