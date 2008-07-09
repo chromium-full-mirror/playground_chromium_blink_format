@@ -38,6 +38,7 @@ LayoutTestController::LayoutTestController(
     bool testRepaintDefault,
     bool testRepaintSweepHorizontallyDefault)
     : m_dumpAsText(false),
+      m_dumpAsPDF(false),
       m_dumpBackForwardList(false),
       m_dumpChildFrameScrollPositions(false),
       m_dumpChildFramesAsText(false),
@@ -72,6 +73,18 @@ static JSValueRef dumpAsTextCallback(JSContextRef context,
   LayoutTestController* controller =
       reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpAsText(true);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef dumpAsPDFCallback(JSContextRef context,
+                                    JSObjectRef function,
+                                    JSObjectRef thisObject,
+                                    size_t argumentCount,
+                                    const JSValueRef arguments[],
+                                    JSValueRef* exception) {
+  LayoutTestController* controller =
+      reinterpret_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpAsPDF(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -979,6 +992,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"display", displayCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpAsText", dumpAsTextCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"printToPDF", dumpAsPDFCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpBackForwardList", dumpBackForwardListCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

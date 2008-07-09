@@ -75,6 +75,9 @@ class LayoutTestController {
   bool dumpAsText() const { return m_dumpAsText; }
   void setDumpAsText(bool dumpAsText) { m_dumpAsText = dumpAsText; }
 
+  bool dumpAsPDF() const { return m_dumpAsPDF; }
+  void setDumpAsPDF(bool dumpAsPDF) { m_dumpAsPDF = dumpAsPDF; }
+
   bool dumpBackForwardList() const { return m_dumpBackForwardList; }
   void setDumpBackForwardList(bool dumpBackForwardList) {
     m_dumpBackForwardList = dumpBackForwardList;
@@ -186,6 +189,7 @@ class LayoutTestController {
 
  private:
   bool m_dumpAsText;
+  bool m_dumpAsPDF;
   bool m_dumpBackForwardList;
   bool m_dumpChildFrameScrollPositions;
   bool m_dumpChildFramesAsText;
