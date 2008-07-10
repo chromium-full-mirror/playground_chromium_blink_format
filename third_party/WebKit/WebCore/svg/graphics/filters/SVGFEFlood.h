@@ -24,13 +24,13 @@
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "Color.h"
-#include "SVGFilterEffect.h"
+#include "FilterEffect.h"
 
 namespace WebCore {
 
-class SVGFEFlood : public SVGFilterEffect {
+class FEFlood : public FilterEffect {
  public:
-  static PassRefPtr<SVGFEFlood> create(SVGResourceFilter*);
+  static PassRefPtr<FEFlood> create(const Color&, const float&);
 
   Color floodColor() const;
   void setFloodColor(const Color&);
@@ -38,14 +38,12 @@ class SVGFEFlood : public SVGFilterEffect {
   float floodOpacity() const;
   void setFloodOpacity(float);
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
-
-#if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
-#endif
+  virtual void apply();
+  virtual void dump();
+  TextStream& externalRepresentation(TextStream& ts) const;
 
  private:
-  SVGFEFlood(SVGResourceFilter*);
+  FEFlood(const Color&, const float&);
 
   Color m_floodColor;
   float m_floodOpacity;

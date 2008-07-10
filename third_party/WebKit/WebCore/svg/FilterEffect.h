@@ -21,6 +21,8 @@
 #define FilterEffect_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#include "TextStream.h"
+
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -33,6 +35,8 @@ class FilterEffect : public RefCounted<FilterEffect> {
 
   virtual void apply() = 0;
   virtual void dump() = 0;
+
+  virtual TextStream& externalRepresentation(TextStream&) const;
 
  protected:
   FilterEffect();

@@ -23,13 +23,15 @@
 #define SVGFEGaussianBlur_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
-#include "SVGFilterEffect.h"
+#include "FilterEffect.h"
 
 namespace WebCore {
 
-class SVGFEGaussianBlur : public SVGFilterEffect {
+class FEGaussianBlur : public FilterEffect {
  public:
-  static PassRefPtr<SVGFEGaussianBlur> create(SVGResourceFilter*);
+  static PassRefPtr<FEGaussianBlur> create(FilterEffect*,
+                                           const float&,
+                                           const float&);
 
   float stdDeviationX() const;
   void setStdDeviationX(float);
@@ -37,15 +39,14 @@ class SVGFEGaussianBlur : public SVGFilterEffect {
   float stdDeviationY() const;
   void setStdDeviationY(float);
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
-
-#if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
-#endif
+  virtual void apply();
+  virtual void dump();
+  TextStream& externalRepresentation(TextStream& ts) const;
 
  private:
-  SVGFEGaussianBlur(SVGResourceFilter*);
+  FEGaussianBlur(FilterEffect*, const float&, const float&);
 
+  RefPtr<FilterEffect> m_in;
   float m_x;
   float m_y;
 };

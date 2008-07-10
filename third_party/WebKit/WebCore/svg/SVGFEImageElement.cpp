@@ -90,16 +90,19 @@ void SVGFEImageElement::notifyFinished(CachedResource* finishedObj) {
     m_filterEffect->setCachedImage(m_cachedImage);
 }
 
-SVGFEImage* SVGFEImageElement::filterEffect(SVGResourceFilter* filter) const {
-  if (!m_filterEffect)
-    m_filterEffect = SVGFEImage::create(filter);
+SVGFilterEffect* SVGFEImageElement::filterEffect(
+    SVGResourceFilter* filter) const {
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
-  // The resource may already be loaded!
-  if (m_cachedImage)
-    m_filterEffect->setCachedImage(m_cachedImage);
+bool SVGFEImageElement::build(FilterBuilder* builder) {
+  if (!m_cachedImage)
+    return false;
 
-  setStandardAttributes(m_filterEffect.get());
-  return m_filterEffect.get();
+  builder->add(result(), FEImage::create(m_cachedImage));
+
+  return true;
 }
 
 void SVGFEImageElement::getSubresourceAttributeStrings(

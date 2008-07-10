@@ -43,25 +43,25 @@ void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
   SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFEFlood* SVGFEFloodElement::filterEffect(SVGResourceFilter* filter) const {
-  if (!m_filterEffect)
-    m_filterEffect = SVGFEFlood::create(filter);
+SVGFilterEffect* SVGFEFloodElement::filterEffect(
+    SVGResourceFilter* filter) const {
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
-  setStandardAttributes(m_filterEffect.get());
+bool SVGFEFloodElement::build(FilterBuilder* builder) {
+  RenderStyle* parentStyle = this->styleForRenderer(parent()->renderer());
+  RenderStyle* filterStyle = this->resolveStyle(parentStyle);
 
-  SVGFEFloodElement* nonConstThis = const_cast<SVGFEFloodElement*>(this);
-
-  RenderStyle* parentStyle =
-      nonConstThis->styleForRenderer(parent()->renderer());
-  RenderStyle* filterStyle = nonConstThis->resolveStyle(parentStyle);
-
-  m_filterEffect->setFloodColor(filterStyle->svgStyle()->floodColor());
-  m_filterEffect->setFloodOpacity(filterStyle->svgStyle()->floodOpacity());
+  Color color = filterStyle->svgStyle()->floodColor();
+  float opacity = filterStyle->svgStyle()->floodOpacity();
 
   parentStyle->deref(document()->renderArena());
   filterStyle->deref(document()->renderArena());
 
-  return m_filterEffect.get();
+  builder->add(result(), FEFlood::create(color, opacity));
+
+  return true;
 }
 }
 

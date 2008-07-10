@@ -25,14 +25,21 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "Color.h"
 #include "SVGLightSource.h"
-#include "SVGFilterEffect.h"
+#include "FilterEffect.h"
 
 namespace WebCore {
 
-class SVGFESpecularLighting : public SVGFilterEffect {
+class FESpecularLighting : public FilterEffect {
  public:
-  static PassRefPtr<SVGFESpecularLighting> create(SVGResourceFilter*);
-  virtual ~SVGFESpecularLighting();
+  static PassRefPtr<FESpecularLighting> create(FilterEffect*,
+                                               const Color&,
+                                               const float&,
+                                               const float&,
+                                               const float&,
+                                               const float&,
+                                               const float&,
+                                               LightSource*);
+  virtual ~FESpecularLighting();
 
   Color lightingColor() const;
   void setLightingColor(const Color&);
@@ -55,15 +62,21 @@ class SVGFESpecularLighting : public SVGFilterEffect {
   const LightSource* lightSource() const;
   void setLightSource(LightSource*);
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
-
-#if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
-#endif
+  virtual void apply();
+  virtual void dump();
+  TextStream& externalRepresentation(TextStream& ts) const;
 
  private:
-  SVGFESpecularLighting(SVGResourceFilter*);
+  FESpecularLighting(FilterEffect*,
+                     const Color&,
+                     const float&,
+                     const float&,
+                     const float&,
+                     const float&,
+                     const float&,
+                     LightSource*);
 
+  RefPtr<FilterEffect> m_in;
   Color m_lightingColor;
   float m_surfaceScale;
   float m_specularConstant;

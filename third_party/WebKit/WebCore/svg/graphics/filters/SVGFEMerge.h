@@ -23,27 +23,27 @@
 #define SVGFEMerge_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
-#include "SVGFilterEffect.h"
+#include "FilterEffect.h"
+
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
-class SVGFEMerge : public SVGFilterEffect {
+class FEMerge : public FilterEffect {
  public:
-  static PassRefPtr<SVGFEMerge> create(SVGResourceFilter*);
+  static PassRefPtr<FEMerge> create(const Vector<FilterEffect*>&);
 
-  const Vector<String>& mergeInputs() const;
-  void setMergeInputs(const Vector<String>& mergeInputs);
+  const Vector<FilterEffect*>& mergeInputs() const;
+  void setMergeInputs(const Vector<FilterEffect*>& mergeInputs);
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
-
-#if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
-#endif
+  virtual void apply();
+  virtual void dump();
+  TextStream& externalRepresentation(TextStream& ts) const;
 
  private:
-  SVGFEMerge(SVGResourceFilter*);
+  FEMerge(const Vector<FilterEffect*>&);
 
-  Vector<String> m_mergeInputs;
+  Vector<FilterEffect*> m_mergeInputs;
 };
 
 }  // namespace WebCore

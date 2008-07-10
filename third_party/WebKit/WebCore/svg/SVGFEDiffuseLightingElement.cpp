@@ -96,36 +96,32 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
 
 SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect(
     SVGResourceFilter* filter) const {
-  if (!m_filterEffect)
-    m_filterEffect = SVGFEDiffuseLighting::create(filter);
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
-  m_filterEffect->setIn(in1());
-  m_filterEffect->setDiffuseConstant(diffuseConstant());
-  m_filterEffect->setSurfaceScale(surfaceScale());
-  m_filterEffect->setKernelUnitLengthX(kernelUnitLengthX());
-  m_filterEffect->setKernelUnitLengthY(kernelUnitLengthY());
+bool SVGFEDiffuseLightingElement::build(FilterBuilder* builder) {
+  FilterEffect* input1 = builder->getEffectById(in1());
 
-  SVGFEDiffuseLightingElement* nonConstThis =
-      const_cast<SVGFEDiffuseLightingElement*>(this);
+  if (!input1)
+    return false;
 
-  RenderStyle* parentStyle =
-      nonConstThis->styleForRenderer(parent()->renderer());
-  RenderStyle* filterStyle = nonConstThis->resolveStyle(parentStyle);
-
-  m_filterEffect->setLightingColor(filterStyle->svgStyle()->lightingColor());
-  setStandardAttributes(m_filterEffect.get());
+  RenderStyle* parentStyle = this->styleForRenderer(parent()->renderer());
+  RenderStyle* filterStyle = this->resolveStyle(parentStyle);
+  Color color = filterStyle->svgStyle()->lightingColor();
 
   parentStyle->deref(document()->renderArena());
   filterStyle->deref(document()->renderArena());
 
-  updateLights();
-  return m_filterEffect.get();
+  RefPtr<FilterEffect> addedEffect = FEDiffuseLighting::create(
+      input1, color, surfaceScale(), diffuseConstant(), kernelUnitLengthX(),
+      kernelUnitLengthY(), findLights());
+  builder->add(result(), addedEffect.release());
+
+  return true;
 }
 
-void SVGFEDiffuseLightingElement::updateLights() const {
-  if (!m_filterEffect)
-    return;
-
+LightSource* SVGFEDiffuseLightingElement::findLights() const {
   LightSource* light = 0;
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feDistantLightTag) ||
@@ -137,7 +133,7 @@ void SVGFEDiffuseLightingElement::updateLights() const {
     }
   }
 
-  m_filterEffect->setLightSource(light);
+  return light;
 }
 }
 

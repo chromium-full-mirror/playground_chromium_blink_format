@@ -50,14 +50,21 @@ void SVGFETileElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFETile* SVGFETileElement::filterEffect(SVGResourceFilter* filter) const {
-  if (!m_filterEffect)
-    m_filterEffect = SVGFETile::create(filter);
+SVGFilterEffect* SVGFETileElement::filterEffect(
+    SVGResourceFilter* filter) const {
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
-  m_filterEffect->setIn(in1());
+bool SVGFETileElement::build(FilterBuilder* builder) {
+  FilterEffect* input1 = builder->getEffectById(in1());
 
-  setStandardAttributes(m_filterEffect.get());
-  return m_filterEffect.get();
+  if (!input1)
+    return false;
+
+  builder->add(result(), FETile::create(input1));
+
+  return true;
 }
 }
 

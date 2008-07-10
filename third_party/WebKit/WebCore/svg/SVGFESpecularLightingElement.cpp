@@ -101,40 +101,13 @@ void SVGFESpecularLightingElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFESpecularLighting* SVGFESpecularLightingElement::filterEffect(
+SVGFilterEffect* SVGFESpecularLightingElement::filterEffect(
     SVGResourceFilter* filter) const {
-  if (!m_filterEffect)
-    m_filterEffect = SVGFESpecularLighting::create(filter);
-
-  m_filterEffect->setIn(in1());
-  m_filterEffect->setSpecularConstant((specularConstant()));
-  m_filterEffect->setSpecularExponent((specularExponent()));
-  m_filterEffect->setSurfaceScale((surfaceScale()));
-  m_filterEffect->setKernelUnitLengthX((kernelUnitLengthX()));
-  m_filterEffect->setKernelUnitLengthY((kernelUnitLengthY()));
-
-  SVGFESpecularLightingElement* nonConstThis =
-      const_cast<SVGFESpecularLightingElement*>(this);
-
-  RenderStyle* parentStyle =
-      nonConstThis->styleForRenderer(parent()->renderer());
-  RenderStyle* filterStyle = nonConstThis->resolveStyle(parentStyle);
-
-  m_filterEffect->setLightingColor(filterStyle->svgStyle()->lightingColor());
-
-  parentStyle->deref(document()->renderArena());
-  filterStyle->deref(document()->renderArena());
-
-  setStandardAttributes(m_filterEffect.get());
-
-  updateLights();
-  return m_filterEffect.get();
+  ASSERT_NOT_REACHED();
+  return 0;
 }
 
-void SVGFESpecularLightingElement::updateLights() const {
-  if (!m_filterEffect)
-    return;
-
+LightSource* SVGFESpecularLightingElement::findLights() const {
   LightSource* light = 0;
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feDistantLightTag) ||
@@ -146,7 +119,29 @@ void SVGFESpecularLightingElement::updateLights() const {
     }
   }
 
-  m_filterEffect->setLightSource(light);
+  return light;
+}
+
+bool SVGFESpecularLightingElement::build(FilterBuilder* builder) {
+  FilterEffect* input1 = builder->getEffectById(in1());
+
+  if (!input1)
+    return false;
+
+  RenderStyle* parentStyle = this->styleForRenderer(parent()->renderer());
+  RenderStyle* filterStyle = this->resolveStyle(parentStyle);
+
+  Color color = filterStyle->svgStyle()->lightingColor();
+
+  parentStyle->deref(document()->renderArena());
+  filterStyle->deref(document()->renderArena());
+
+  RefPtr<FilterEffect> addedEffect = FESpecularLighting::create(
+      input1, color, surfaceScale(), specularConstant(), specularExponent(),
+      kernelUnitLengthX(), kernelUnitLengthY(), findLights());
+  builder->add(result(), addedEffect.release());
+
+  return true;
 }
 }
 

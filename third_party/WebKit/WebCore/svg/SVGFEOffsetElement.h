@@ -35,7 +35,8 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEOffsetElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFEOffset* filterEffect(SVGResourceFilter*) const;
+  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
+  bool build(FilterBuilder*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -45,7 +46,7 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, float, Dx, dx)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, float, Dy, dy)
 
-  mutable RefPtr<SVGFEOffset> m_filterEffect;
+  mutable RefPtr<FEOffset> m_filterEffect;
 };
 
 }  // namespace WebCore

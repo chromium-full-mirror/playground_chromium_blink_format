@@ -36,7 +36,8 @@ class SVGFESpecularLightingElement
   virtual ~SVGFESpecularLightingElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual SVGFESpecularLighting* filterEffect(SVGResourceFilter*) const;
+  virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
+  bool build(FilterBuilder*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -64,9 +65,9 @@ class SVGFESpecularLightingElement
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
 
-  mutable RefPtr<SVGFESpecularLighting> m_filterEffect;
+  mutable RefPtr<FESpecularLighting> m_filterEffect;
 
-  void updateLights() const;
+  LightSource* findLights() const;
 };
 
 }  // namespace WebCore

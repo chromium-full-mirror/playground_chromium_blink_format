@@ -87,9 +87,8 @@ bool SVGFEBlendElement::build(FilterBuilder* builder) {
   if (!input1 || !input2)
     return false;
 
-  RefPtr<FilterEffect> addedEffect =
-      FEBlend::create(input1, input2, static_cast<BlendModeType>(mode()));
-  builder->add(result(), addedEffect.release());
+  builder->add(result(), FEBlend::create(input1, input2,
+                                         static_cast<BlendModeType>(mode())));
 
   return true;
 }

@@ -24,16 +24,22 @@
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "Color.h"
-#include "SVGFilterEffect.h"
+#include "FilterEffect.h"
 
 namespace WebCore {
 
 class LightSource;
 
-class SVGFEDiffuseLighting : public SVGFilterEffect {
+class FEDiffuseLighting : public FilterEffect {
  public:
-  static PassRefPtr<SVGFEDiffuseLighting> create(SVGResourceFilter*);
-  virtual ~SVGFEDiffuseLighting();
+  static PassRefPtr<FEDiffuseLighting> create(FilterEffect*,
+                                              const Color&,
+                                              const float&,
+                                              const float&,
+                                              const float&,
+                                              const float&,
+                                              LightSource*);
+  virtual ~FEDiffuseLighting();
 
   Color lightingColor() const;
   void setLightingColor(const Color&);
@@ -53,15 +59,20 @@ class SVGFEDiffuseLighting : public SVGFilterEffect {
   const LightSource* lightSource() const;
   void setLightSource(LightSource*);
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
-
-#if PLATFORM(CI)
-  virtual CIFilter* getCIFilter(const FloatRect& bbox) const;
-#endif
+  virtual void apply();
+  virtual void dump();
+  TextStream& externalRepresentation(TextStream& ts) const;
 
  private:
-  SVGFEDiffuseLighting(SVGResourceFilter*);
+  FEDiffuseLighting(FilterEffect*,
+                    const Color&,
+                    const float&,
+                    const float&,
+                    const float&,
+                    const float&,
+                    LightSource*);
 
+  RefPtr<FilterEffect> m_in;
   Color m_lightingColor;
   float m_surfaceScale;
   float m_diffuseConstant;

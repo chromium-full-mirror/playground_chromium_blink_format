@@ -67,16 +67,21 @@ void SVGFEOffsetElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-SVGFEOffset* SVGFEOffsetElement::filterEffect(SVGResourceFilter* filter) const {
-  if (!m_filterEffect)
-    m_filterEffect = SVGFEOffset::create(filter);
+SVGFilterEffect* SVGFEOffsetElement::filterEffect(
+    SVGResourceFilter* filter) const {
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
-  m_filterEffect->setIn(in1());
-  m_filterEffect->setDx(dx());
-  m_filterEffect->setDy(dy());
+bool SVGFEOffsetElement::build(FilterBuilder* builder) {
+  FilterEffect* input1 = builder->getEffectById(in1());
 
-  setStandardAttributes(m_filterEffect.get());
-  return m_filterEffect.get();
+  if (!input1)
+    return false;
+
+  builder->add(result(), FEOffset::create(input1, dx(), dy()));
+
+  return true;
 }
 }
 

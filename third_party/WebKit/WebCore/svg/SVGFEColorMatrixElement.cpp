@@ -95,9 +95,9 @@ bool SVGFEColorMatrixElement::build(FilterBuilder* builder) {
   for (unsigned int i = 0; i < nr; i++)
     _values.append(numbers->getItem(i, ec));
 
-  RefPtr<FilterEffect> addedEffect = FEColorMatrix::create(
-      input1, static_cast<ColorMatrixType>(type()), _values);
-  builder->add(result(), addedEffect.release());
+  builder->add(result(),
+               FEColorMatrix::create(
+                   input1, static_cast<ColorMatrixType>(type()), _values));
 
   return true;
 }
