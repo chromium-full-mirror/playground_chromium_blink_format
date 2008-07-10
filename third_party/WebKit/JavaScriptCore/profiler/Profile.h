@@ -41,7 +41,7 @@ class Profile : public RefCounted<Profile> {
   virtual ~Profile();
 
   const UString& title() const { return m_title; }
-  ProfileNode* callTree() const { return m_head.get(); }
+  ProfileNode* head() const { return m_head.get(); }
   void setHead(PassRefPtr<ProfileNode> head) { m_head = head; }
   double totalTime() const { return m_head->totalTime(); }
 
@@ -80,13 +80,12 @@ class Profile : public RefCounted<Profile> {
  protected:
   Profile(const UString& title);
 
-  RefPtr<ProfileNode> m_head;
-
  private:
   void removeProfileStart();
   void removeProfileEnd();
 
   UString m_title;
+  RefPtr<ProfileNode> m_head;
 };
 
 }  // namespace KJS
