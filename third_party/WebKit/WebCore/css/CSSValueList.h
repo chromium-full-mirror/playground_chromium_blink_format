@@ -57,10 +57,11 @@ class CSSValueList : public CSSValue {
 
   CSSParserValueList* createParserValueList() const;
 
- private:
+ protected:
   CSSValueList(bool isSpaceSeparated);
   CSSValueList(CSSParserValueList*);
 
+ private:
   virtual bool isValueList() { return true; }
 
   virtual unsigned short cssValueType() const;

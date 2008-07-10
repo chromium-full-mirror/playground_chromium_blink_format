@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "CSSTransformValue.h"
+#include "WebKitCSSTransformValue.h"
 
 #include "CSSValueList.h"
 #include "PlatformString.h"
@@ -32,17 +32,12 @@
 
 namespace WebCore {
 
-CSSTransformValue::CSSTransformValue(TransformOperationType op) : m_type(op) {}
+WebKitCSSTransformValue::WebKitCSSTransformValue(TransformOperationType op)
+    : CSSValueList(false), m_type(op) {}
 
-CSSTransformValue::~CSSTransformValue() {}
+WebKitCSSTransformValue::~WebKitCSSTransformValue() {}
 
-void CSSTransformValue::addValue(PassRefPtr<CSSValue> val) {
-  if (!m_values)
-    m_values = CSSValueList::createCommaSeparated();
-  m_values->append(val);
-}
-
-String CSSTransformValue::cssText() const {
+String WebKitCSSTransformValue::cssText() const {
   String result;
   switch (m_type) {
     case ScaleTransformOperation:
@@ -82,8 +77,7 @@ String CSSTransformValue::cssText() const {
       break;
   }
 
-  if (m_values)
-    result += m_values->cssText();
+  result += CSSValueList::cssText();
 
   result += ")";
   return result;
