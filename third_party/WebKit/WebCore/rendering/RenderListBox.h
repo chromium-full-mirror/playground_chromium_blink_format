@@ -87,6 +87,12 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   virtual void autoscroll();
   virtual void stopAutoscroll();
 
+  virtual bool shouldPanScroll() const { return true; }
+  virtual void panScroll(const IntPoint&);
+
+  int scrollToward(
+      const IntPoint&);  // Returns the new index or -1 if no scroll occured
+
   virtual int verticalScrollbarWidth() const;
   virtual int scrollLeft() const;
   virtual int scrollTop() const;

@@ -365,6 +365,10 @@ WebCore::ScrollbarMode ScrollView::vScrollbarMode() const {
   return m_data->m_vScrollbarMode;
 }
 
+bool ScrollView::isScrollable() {
+  return true;  // FIXME : return whether or not the view is scrollable
+}
+
 void ScrollView::suppressScrollbars(bool suppressed, bool repaintOnSuppress) {
   m_data->m_scrollbarsSuppressed = suppressed;
   if (repaintOnSuppress && !suppressed)
