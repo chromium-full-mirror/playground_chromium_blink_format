@@ -2549,7 +2549,7 @@ void RenderLayer::repaintIncludingDescendants() {
 bool RenderLayer::shouldBeOverflowOnly() const {
   return (renderer()->hasOverflowClip() || renderer()->hasReflection()) &&
          !renderer()->isPositioned() && !renderer()->isRelPositioned() &&
-         !isTransparent();
+         !renderer()->hasTransform() && !isTransparent();
 }
 
 void RenderLayer::styleChanged(RenderStyle* oldStyle) {
