@@ -41,8 +41,6 @@ struct CallIdentifier {
   CallIdentifier(const CallIdentifier& ci)
       : m_name(ci.m_name), m_url(ci.m_url), m_lineNumber(ci.m_lineNumber) {}
 
-  CallIdentifier() : m_name(""), m_url(""), m_lineNumber(0) {}
-
   inline bool operator==(const CallIdentifier& ci) const {
     return ci.m_lineNumber == m_lineNumber && ci.m_name == m_name &&
            ci.m_url == m_url;
