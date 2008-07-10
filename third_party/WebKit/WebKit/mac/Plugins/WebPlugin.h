@@ -27,6 +27,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import <JavaScriptCore/WebKitAvailability.h>
 
 /*!
     WebPlugIn is an informal protocol that enables interaction between an
@@ -111,7 +112,8 @@
     @discussion This method is only sent to the plug-in if the
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
-- (void)webPlugInMainResourceDidReceiveResponse:(NSURLResponse*)response;
+- (void)webPlugInMainResourceDidReceiveResponse:(NSURLResponse*)response
+    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
 
 /*!
     @method webPlugInMainResourceDidReceiveData:
@@ -121,7 +123,8 @@
     @discussion This method is only sent to the plug-in if the
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
-- (void)webPlugInMainResourceDidReceiveData:(NSData*)data;
+- (void)webPlugInMainResourceDidReceiveData:(NSData*)data
+    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
 
 /*!
     @method webPlugInMainResourceDidFailWithError:
@@ -131,7 +134,8 @@
     @discussion This method is only sent to the plug-in if the
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
-- (void)webPlugInMainResourceDidFailWithError:(NSError*)error;
+- (void)webPlugInMainResourceDidFailWithError:(NSError*)error
+    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
 
 /*!
     @method webPlugInMainResourceDidFinishLoading
@@ -141,6 +145,7 @@
     @discussion This method is only sent to the plug-in if the
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
-- (void)webPlugInMainResourceDidFinishLoading;
+- (void)webPlugInMainResourceDidFinishLoading
+    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
 
 @end

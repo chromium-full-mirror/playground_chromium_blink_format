@@ -27,6 +27,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import <JavaScriptCore/WebKitAvailability.h>
 
 /*!
     @constant WebPlugInBaseURLKey REQUIRED. The base URL of the document
@@ -77,7 +78,8 @@ extern NSString* WebPlugInContainingElementKey;
  WebPlugInShouldLoadMainResourceKey is NO if it is absent from the arguments
  dictionary.
  */
-extern NSString* WebPlugInShouldLoadMainResourceKey;
+extern NSString* WebPlugInShouldLoadMainResourceKey
+    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
 
 /*!
     @protocol WebPlugInViewFactory
