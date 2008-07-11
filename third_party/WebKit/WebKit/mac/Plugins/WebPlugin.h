@@ -113,7 +113,7 @@
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
 - (void)webPlugInMainResourceDidReceiveResponse:(NSURLResponse*)response
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    WEBKIT_CATEGORY_METHOD_ANNOTATION(AVAILABLE_AFTER_WEBKIT_VERSION_3_1);
 
 /*!
     @method webPlugInMainResourceDidReceiveData:
@@ -124,7 +124,7 @@
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
 - (void)webPlugInMainResourceDidReceiveData:(NSData*)data
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    WEBKIT_CATEGORY_METHOD_ANNOTATION(AVAILABLE_AFTER_WEBKIT_VERSION_3_1);
 
 /*!
     @method webPlugInMainResourceDidFailWithError:
@@ -135,7 +135,7 @@
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
 - (void)webPlugInMainResourceDidFailWithError:(NSError*)error
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    WEBKIT_CATEGORY_METHOD_ANNOTATION(AVAILABLE_AFTER_WEBKIT_VERSION_3_1);
 
 /*!
     @method webPlugInMainResourceDidFinishLoading
@@ -146,6 +146,6 @@
     WebPlugInShouldLoadMainResourceKey argument passed to the plug-in was NO.
 */
 - (void)webPlugInMainResourceDidFinishLoading
-    AVAILABLE_AFTER_WEBKIT_VERSION_3_1;
+    WEBKIT_CATEGORY_METHOD_ANNOTATION(AVAILABLE_AFTER_WEBKIT_VERSION_3_1);
 
 @end
