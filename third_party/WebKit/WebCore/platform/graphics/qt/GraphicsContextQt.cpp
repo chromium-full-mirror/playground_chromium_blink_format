@@ -36,7 +36,7 @@
 #include "config.h"
 
 #ifdef Q_WS_WIN
-#define < windows.>
+#include <windows.h>
 #endif
 
 #include "AffineTransform.h"
