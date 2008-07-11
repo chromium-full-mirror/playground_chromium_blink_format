@@ -25,6 +25,7 @@
 #ifndef NodeFilter_h
 #define NodeFilter_h
 
+#include "JSDOMBinding.h"
 #include "NodeFilterCondition.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
@@ -73,9 +74,6 @@ class NodeFilter : public RefCounted<NodeFilter> {
   short acceptNode(Node* node) const {
     return acceptNode(execStateFromNode(node), node);
   }
-
- public:
-  static KJS::ExecState* execStateFromNode(Node*);
 
  private:
   NodeFilter(PassRefPtr<NodeFilterCondition> condition)

@@ -25,6 +25,7 @@
 #ifndef NodeIterator_h
 #define NodeIterator_h
 
+#include "JSDOMBinding.h"
 #include "NodeFilter.h"
 #include "Traversal.h"
 #include <wtf/PassRefPtr.h>
@@ -59,10 +60,10 @@ class NodeIterator : public RefCounted<NodeIterator>, public Traversal {
 
   // For non-JS bindings. Silently ignores the JavaScript exception if any.
   PassRefPtr<Node> nextNode(ExceptionCode& ec) {
-    return nextNode(NodeFilter::execStateFromNode(referenceNode()), ec);
+    return nextNode(execStateFromNode(referenceNode()), ec);
   }
   PassRefPtr<Node> previousNode(ExceptionCode& ec) {
-    return previousNode(NodeFilter::execStateFromNode(referenceNode()), ec);
+    return previousNode(execStateFromNode(referenceNode()), ec);
   }
 
  private:

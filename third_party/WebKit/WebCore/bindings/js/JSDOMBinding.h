@@ -171,6 +171,8 @@ KJS::JSValue* objectToStringFunctionGetter(KJS::ExecState*,
                                            const KJS::Identifier& propertyName,
                                            const KJS::PropertySlot&);
 
+KJS::ExecState* execStateFromNode(Node*);
+
 }  // namespace WebCore
 
 #endif  // JSDOMBinding_h
