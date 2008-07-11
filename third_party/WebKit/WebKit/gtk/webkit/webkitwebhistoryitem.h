@@ -63,20 +63,20 @@ WEBKIT_API WebKitWebHistoryItem* webkit_web_history_item_new_with_data(
     const gchar* uri,
     const gchar* title);
 
-WEBKIT_API const gchar* webkit_web_history_item_get_title(
+WEBKIT_API G_CONST_RETURN gchar* webkit_web_history_item_get_title(
     WebKitWebHistoryItem* web_history_item);
 
-WEBKIT_API const gchar* webkit_web_history_item_get_alternate_title(
+WEBKIT_API G_CONST_RETURN gchar* webkit_web_history_item_get_alternate_title(
     WebKitWebHistoryItem* web_history_item);
 
 WEBKIT_API void webkit_web_history_item_set_alternate_title(
     WebKitWebHistoryItem* web_history_item,
     const gchar* title);
 
-WEBKIT_API const gchar* webkit_web_history_item_get_uri(
+WEBKIT_API G_CONST_RETURN gchar* webkit_web_history_item_get_uri(
     WebKitWebHistoryItem* web_history_item);
 
-WEBKIT_API const gchar* webkit_web_history_item_get_original_uri(
+WEBKIT_API G_CONST_RETURN gchar* webkit_web_history_item_get_original_uri(
     WebKitWebHistoryItem* web_history_item);
 
 WEBKIT_API gdouble webkit_web_history_item_get_last_visited_time(
