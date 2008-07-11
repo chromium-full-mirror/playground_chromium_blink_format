@@ -144,6 +144,7 @@ class KURL {
   void setQuery(const String&);
 
   void setRef(const String&);
+  void removeRef();
 
   friend bool equalIgnoringRef(const KURL&, const KURL&);
 
