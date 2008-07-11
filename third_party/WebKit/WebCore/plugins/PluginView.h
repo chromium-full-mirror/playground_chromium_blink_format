@@ -56,7 +56,7 @@ class Frame;
 class KeyboardEvent;
 class MouseEvent;
 class KURL;
-#if PLATFORM(WIN)
+#if PLATFORM(WIN_OS)
 class PluginMessageThrottlerWin;
 #endif
 class PluginPackage;
@@ -98,10 +98,6 @@ class PluginRequest {
 };
 
 class PluginView : public Widget, private PluginStreamClient {
-#if PLATFORM(WIN)
-  friend static LRESULT CALLBACK PluginViewWndProc(HWND, UINT, WPARAM, LPARAM);
-#endif
-
  public:
   static PluginView* create(Frame* parentFrame,
                             const IntSize&,
@@ -181,7 +177,8 @@ class PluginView : public Widget, private PluginStreamClient {
 
   virtual bool isPluginView() const { return true; }
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN_OS)
+  static LRESULT CALLBACK PluginViewWndProc(HWND, UINT, WPARAM, LPARAM);
   LRESULT wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   WNDPROC pluginWndProc() const { return m_pluginWndProc; }
 #endif
@@ -281,7 +278,7 @@ class PluginView : public Widget, private PluginStreamClient {
   bool m_needsXEmbed;
 #endif
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN_OS)
   OwnPtr<PluginMessageThrottlerWin> m_messageThrottler;
   WNDPROC m_pluginWndProc;
   unsigned m_lastMessage;
