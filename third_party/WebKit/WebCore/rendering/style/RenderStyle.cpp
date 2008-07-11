@@ -774,7 +774,8 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       m_boxShadow(o.m_boxShadow ? new ShadowData(*o.m_boxShadow) : 0),
       m_boxReflect(o.m_boxReflect),
       m_transition(o.m_transition ? new Transition(*o.m_transition) : 0),
-      m_mask(o.m_mask)
+      m_mask(o.m_mask),
+      m_maskBoxImage(o.m_maskBoxImage)
 #if ENABLE(XBL)
       ,
       bindingURI(o.bindingURI ? o.bindingURI->copy() : 0)
@@ -821,7 +822,8 @@ bool StyleRareNonInheritedData::operator==(
          matchNearestMailBlockquoteColor == o.matchNearestMailBlockquoteColor &&
          m_appearance == o.m_appearance && m_borderFit == o.m_borderFit &&
          shadowDataEquivalent(o) && reflectionDataEquivalent(o) &&
-         transitionDataEquivalent(o) && m_mask == o.m_mask
+         transitionDataEquivalent(o) && m_mask == o.m_mask &&
+         m_maskBoxImage == o.m_maskBoxImage
 #if ENABLE(XBL)
          && bindingsEquivalent(o)
 #endif
