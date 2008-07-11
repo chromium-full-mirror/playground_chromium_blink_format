@@ -131,16 +131,12 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
 
     resource->load(docLoader);
 
-    if (!disabled()) {
+    if (!disabled())
       m_resources.set(url.string(), resource);  // The size will be added in
                                                 // later once the resource is
                                                 // loaded and calls back to us
                                                 // with the new size.
-
-      // This will move the resource to the front of its LRU list and increase
-      // its access count.
-      resourceAccessed(resource);
-    } else {
+    else {
       // Kick the resource out of the cache, because the cache is disabled.
       resource->setInCache(false);
       resource->setDocLoader(docLoader);
@@ -168,33 +164,44 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
     return 0;
 #endif
 
+  if (!disabled()) {
+    // This will move the resource to the front of its LRU list and increase its
+    // access count.
+    resourceAccessed(resource);
+  }
+
   return resource;
 }
 
 CachedCSSStyleSheet* Cache::requestUserCSSStyleSheet(DocLoader* docLoader,
                                                      const String& url,
                                                      const String& charset) {
-  if (CachedResource* existing = m_resources.get(url))
-    return existing->type() == CachedResource::CSSStyleSheet
-               ? static_cast<CachedCSSStyleSheet*>(existing)
-               : 0;
+  CachedCSSStyleSheet* userSheet;
+  if (CachedResource* existing = m_resources.get(url)) {
+    if (existing->type() != CachedResource::CSSStyleSheet)
+      return 0;
+    userSheet = static_cast<CachedCSSStyleSheet*>(existing);
+  } else {
+    userSheet = new CachedCSSStyleSheet(url, charset);
 
-  CachedCSSStyleSheet* userSheet = new CachedCSSStyleSheet(url, charset);
+    // Pretend the resource is in the cache, to prevent it from being deleted
+    // during the load() call.
+    // FIXME: CachedResource should just use normal refcounting instead.
+    userSheet->setInCache(true);
+    // Don't load incrementally, skip load checks, don't send resource load
+    // callbacks.
+    userSheet->load(docLoader, false, true, false);
+    if (!disabled())
+      m_resources.set(url, userSheet);
+    else
+      userSheet->setInCache(false);
+  }
 
-  // Pretend the resource is in the cache, to prevent it from being deleted
-  // during the load() call.
-  // FIXME: CachedResource should just use normal refcounting instead.
-  userSheet->setInCache(true);
-  // Don't load incrementally, skip load checks, don't send resource load
-  // callbacks.
-  userSheet->load(docLoader, false, true, false);
   if (!disabled()) {
-    m_resources.set(url, userSheet);
     // This will move the resource to the front of its LRU list and increase its
     // access count.
     resourceAccessed(userSheet);
-  } else
-    userSheet->setInCache(false);
+  }
 
   return userSheet;
 }
