@@ -269,7 +269,7 @@ void PluginDatabase::remove(PluginPackage* package) {
   m_pluginsByPath.remove(package->path());
 }
 
-#if !PLATFORM(WIN)
+#if !PLATFORM(WIN_OS)
 // For Safari/Win the following three methods are implemented
 // in PluginDatabaseWin.cpp, but if we can use WebCore constructs
 // for the logic we should perhaps move it here under XP_WIN?
@@ -374,5 +374,5 @@ void PluginDatabase::getPluginPathsInDirectories(HashSet<String>& paths) const {
   }
 }
 
-#endif
+#endif  // !PLATFORM(WIN_OS)
 }

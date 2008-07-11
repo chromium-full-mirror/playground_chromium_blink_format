@@ -72,7 +72,25 @@
 
 using namespace WebCore;
 
-#if !defined(Q_WS_X11)
+#if !defined(Q_WS_X11) && !defined(Q_WS_WIN)
+
+bool PluginPackage::fetchInfo() {
+  notImplemented();
+  return false;
+}
+unsigned PluginPackage::hash() const {
+  notImplemented();
+  return 0;
+}
+bool PluginPackage::equal(const PluginPackage&, const PluginPackage&) {
+  notImplemented();
+  return false;
+}
+int PluginPackage::compareFileVersion(const PlatformModuleVersion&) const {
+  notImplemented();
+  return -1;
+}
+
 void PluginView::setNPWindowRect(const IntRect&) {
   notImplemented();
 }
@@ -128,22 +146,6 @@ NPError PluginView::getValue(NPNVariable, void*) {
   return NPERR_GENERIC_ERROR;
 }
 PluginView::~PluginView() {}
-bool PluginPackage::fetchInfo() {
-  notImplemented();
-  return false;
-}
-unsigned PluginPackage::hash() const {
-  notImplemented();
-  return 0;
-}
-bool PluginPackage::equal(const PluginPackage&, const PluginPackage&) {
-  notImplemented();
-  return false;
-}
-int PluginPackage::compareFileVersion(const PlatformModuleVersion&) const {
-  notImplemented();
-  return -1;
-}
 #endif
 
 namespace WebCore {

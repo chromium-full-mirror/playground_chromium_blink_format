@@ -47,7 +47,7 @@
 #include "Page.h"
 #include "FocusController.h"
 #include "PlatformMouseEvent.h"
-#if PLATFORM(WIN)
+#if PLATFORM(WIN_OS)
 #include "PluginMessageThrottlerWin.h"
 #endif
 #include "PluginPackage.h"
@@ -119,7 +119,7 @@ void PluginView::setFrameGeometry(const IntRect& rect) {
 
   updateWindow();
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN_OS)
   setNPWindowRect(rect);
 #endif
 }
@@ -561,7 +561,7 @@ PluginView::PluginView(Frame* parentFrame,
       ,
       m_needsXEmbed(false)
 #endif
-#if PLATFORM(WIN)
+#if PLATFORM(WIN_OS)
       ,
       m_pluginWndProc(0),
       m_lastMessage(0),
