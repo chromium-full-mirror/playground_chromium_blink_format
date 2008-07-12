@@ -655,6 +655,9 @@ class FrameLoader : Noncopyable
       bool shouldContinue);
   void continueFragmentScrollAfterNavigationPolicy(const ResourceRequest&,
                                                    bool shouldContinue);
+  bool shouldScrollToAnchor(bool isFormSubmission,
+                            FrameLoadType loadType,
+                            const KURL& url);
   void addHistoryItemForFragmentScroll();
 
   void stopPolicyCheck();
