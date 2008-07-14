@@ -65,12 +65,8 @@ class AccessibilityListBoxOption : public AccessibilityObject {
   virtual AccessibilityObject* parentObject() const;
   bool isListBoxOption() const { return true; };
 
-  virtual void selectedChildren(AccessibilityChildrenVector&) {}
-  virtual void visibleChildren(AccessibilityChildrenVector&) {}
-
  private:
   HTMLElement* m_optionElement;
-  AccessibilityListBox* m_listBoxParent;
 
   HTMLSelectElement* listBoxOptionParentNode() const;
   int listBoxOptionIndex() const;

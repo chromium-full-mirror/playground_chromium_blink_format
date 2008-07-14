@@ -963,6 +963,10 @@ void AccessibilityObject::childrenChanged() {
 
 void AccessibilityObject::addChildren() {}
 
+void AccessibilityObject::selectedChildren(AccessibilityChildrenVector&) {}
+
+void AccessibilityObject::visibleChildren(AccessibilityChildrenVector&) {}
+
 unsigned AccessibilityObject::axObjectID() const {
   return m_id;
 }

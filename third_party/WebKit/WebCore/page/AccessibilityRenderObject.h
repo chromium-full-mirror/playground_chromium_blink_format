@@ -42,6 +42,7 @@ class HTMLAnchorElement;
 class HTMLAreaElement;
 class HTMLElement;
 class HTMLLabelElement;
+class HTMLMapElement;
 class HTMLSelectElement;
 class IntPoint;
 class IntSize;
@@ -135,7 +136,6 @@ class AccessibilityRenderObject : public AccessibilityObject {
   Element* mouseButtonListener() const;
   FrameView* frameViewIfRenderView() const;
   virtual HTMLAnchorElement* anchorElement() const;
-  HTMLAreaElement* areaElement() const { return m_areaElement.get(); }
   AccessibilityObject* menuForMenuButton() const;
   AccessibilityObject* menuButtonForMenu() const;
 
@@ -211,7 +211,6 @@ class AccessibilityRenderObject : public AccessibilityObject {
 
  protected:
   RenderObject* m_renderer;
-  RefPtr<HTMLAreaElement> m_areaElement;
   AccessibilityRole m_ariaRole;
 
   void setRenderObject(RenderObject* renderer) { m_renderer = renderer; }
