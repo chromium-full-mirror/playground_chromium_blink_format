@@ -55,12 +55,15 @@ void HTMLStyleElement::finishParsingChildren() {
 void HTMLStyleElement::insertedIntoDocument() {
   HTMLElement::insertedIntoDocument();
 
+  document()->addStyleSheetCandidateNode(this, m_createdByParser);
   if (!m_createdByParser)
     StyleElement::insertedIntoDocument(document(), this);
 }
 
 void HTMLStyleElement::removedFromDocument() {
   HTMLElement::removedFromDocument();
+  if (document()->renderer())
+    document()->removeStyleSheetCandidateNode(this);
   StyleElement::removedFromDocument(document());
 }
 

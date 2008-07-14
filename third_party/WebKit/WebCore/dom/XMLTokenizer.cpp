@@ -36,6 +36,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameView.h"
+#include "HTMLLinkElement.h"
 #include "HTMLNames.h"
 #include "HTMLScriptElement.h"
 #include "HTMLStyleElement.h"
@@ -878,6 +879,8 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   else if (newElement->hasTagName(SVGNames::styleTag))
     static_cast<SVGStyleElement*>(newElement.get())->setCreatedByParser(true);
 #endif
+  else if (newElement->hasTagName(HTMLNames::linkTag))
+    static_cast<HTMLLinkElement*>(newElement.get())->setCreatedByParser(true);
 
   if (newElement->hasTagName(HTMLNames::scriptTag)
 #if ENABLE(SVG)
@@ -1021,23 +1024,20 @@ void XMLTokenizer::processingInstruction(const xmlChar* target,
   if (exception)
     return;
 
+  pi->setCreatedByParser(true);
+
   if (!m_currentNode->addChild(pi.get()))
     return;
   if (m_view && !pi->attached())
     pi->attach();
 
-  // don't load stylesheets for standalone documents
-  if (m_doc->frame()) {
-    m_sawXSLTransform = !m_sawFirstElement && !pi->checkStyleSheet();
+  pi->finishParsingChildren();
+
 #if ENABLE(XSLT)
-    // Pretend we didn't see this PI if we're the result of a transform.
-    if (m_sawXSLTransform && !m_doc->transformSourceDocument())
-#else
-    if (m_sawXSLTransform)
+  m_sawXSLTransform = !m_sawFirstElement && pi->isXSL();
+  if (m_sawXSLTransform && !m_doc->transformSourceDocument())
+    stopParsing();
 #endif
-      // Stop the SAX parser.
-      stopParsing();
-  }
 }
 
 void XMLTokenizer::cdataBlock(const xmlChar* s, int len) {
@@ -2057,17 +2057,20 @@ void XMLTokenizer::parseProcessingInstruction() {
   if (exception)
     return;
 
+  pi->setCreatedByParser(true);
+
   if (!m_currentNode->addChild(pi.get()))
     return;
   if (m_view && !pi->attached())
     pi->attach();
 
-  // don't load stylesheets for standalone documents
-  if (m_doc->frame()) {
-    m_sawXSLTransform = !m_sawFirstElement && !pi->checkStyleSheet();
-    if (m_sawXSLTransform)
-      stopParsing();
-  }
+  pi->finishParsingChildren();
+
+#if ENABLE(XSLT)
+  m_sawXSLTransform = !m_sawFirstElement && pi->isXSL();
+  if (m_sawXSLTransform && !m_doc->transformSourceDocument()))
+        stopParsing();
+#endif
 }
 
 void XMLTokenizer::parseCdata() {

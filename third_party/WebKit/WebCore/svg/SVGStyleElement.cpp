@@ -89,13 +89,15 @@ void SVGStyleElement::finishParsingChildren() {
 
 void SVGStyleElement::insertedIntoDocument() {
   SVGElement::insertedIntoDocument();
-
+  document()->addStyleSheetCandidateNode(this, m_createdByParser);
   if (!m_createdByParser)
     StyleElement::insertedIntoDocument(document(), this);
 }
 
 void SVGStyleElement::removedFromDocument() {
   SVGElement::removedFromDocument();
+  if (document()->renderer())
+    document()->removeStyleSheetCandidateNode(this);
   StyleElement::removedFromDocument(document());
 }
 

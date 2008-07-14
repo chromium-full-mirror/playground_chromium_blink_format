@@ -101,6 +101,11 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
 
   virtual void getSubresourceAttributeStrings(Vector<String>&) const;
 
+  void setCreatedByParser(bool createdByParser) {
+    m_createdByParser = createdByParser;
+  }
+  virtual void finishParsingChildren();
+
  protected:
   CachedCSSStyleSheet* m_cachedSheet;
   RefPtr<CSSStyleSheet> m_sheet;
@@ -112,6 +117,7 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   bool m_alternate;
   bool m_isStyleSheet;
   bool m_isIcon;
+  bool m_createdByParser;
 };
 
 }  // namespace
