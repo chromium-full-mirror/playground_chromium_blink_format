@@ -330,7 +330,7 @@ int main(int argc, char** argv) {
 #endif
 
   int res = 0;
-  TRY JSGlobalData* globalData = new JSGlobalData;
+  TRY JSGlobalData* globalData = JSGlobalData::create().releaseRef();
   res = jscmain(argc, argv, globalData);
   delete globalData;
   EXCEPT(res = 3)

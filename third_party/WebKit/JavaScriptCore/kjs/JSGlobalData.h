@@ -30,10 +30,10 @@
 #define JSGlobalData_h
 
 #include "ArgList.h"
+#include <wtf/Forward.h>
 #include <wtf/HashCountedSet.h>
 #include <wtf/HashSet.h>
-#include <wtf/Noncopyable.h>
-#include <wtf/OwnPtr.h>
+#include <wtf/RefCounted.h>
 
 namespace KJS {
 
@@ -48,11 +48,11 @@ class ParserRefCounted;
 class UString;
 struct HashTable;
 
-struct JSGlobalData : Noncopyable {
+struct JSGlobalData : public RefCounted<JSGlobalData> {
   static bool sharedInstanceExists();
   static JSGlobalData& sharedInstance();
 
-  JSGlobalData(bool isShared = false);
+  static PassRefPtr<JSGlobalData> create();
   ~JSGlobalData();
 
   Machine* machine;
@@ -84,6 +84,8 @@ struct JSGlobalData : Noncopyable {
   bool isSharedInstance;
 
  private:
+  JSGlobalData(bool isShared = false);
+
   static JSGlobalData*& sharedInstanceInternal();
 
   struct DataInstance {

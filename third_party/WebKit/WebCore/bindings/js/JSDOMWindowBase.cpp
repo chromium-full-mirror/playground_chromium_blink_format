@@ -1010,7 +1010,7 @@ JSDOMWindowShell* JSDOMWindowBase::shell() const {
 }
 
 JSGlobalData* JSDOMWindowBase::commonJSGlobalData() {
-  static JSGlobalData* globalData = new JSGlobalData;
+  static JSGlobalData* globalData = JSGlobalData::create().releaseRef();
   return globalData;
 }
 

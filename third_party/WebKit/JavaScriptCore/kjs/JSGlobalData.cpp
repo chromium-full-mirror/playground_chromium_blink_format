@@ -122,6 +122,10 @@ JSGlobalData::~JSGlobalData() {
   delete parserObjectExtraRefCounts;
 }
 
+PassRefPtr<JSGlobalData> JSGlobalData::create() {
+  return adoptRef(new JSGlobalData);
+}
+
 bool JSGlobalData::sharedInstanceExists() {
   return sharedInstanceInternal();
 }
