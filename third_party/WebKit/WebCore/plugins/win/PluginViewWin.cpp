@@ -408,7 +408,7 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
     npEvent.lParam = 0x8000;
   }
 
-  KJS::JSLock::DropAllLocks;
+  KJS::JSLock::DropAllLocks dropAllLocks(false);
   if (!dispatchNPEvent(npEvent))
     event->setDefaultHandled();
 }
@@ -478,7 +478,7 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
 
   HCURSOR currentCursor = ::GetCursor();
 
-  KJS::JSLock::DropAllLocks;
+  KJS::JSLock::DropAllLocks dropAllLocks(false);
   if (!dispatchNPEvent(npEvent))
     event->setDefaultHandled();
 
