@@ -1727,8 +1727,7 @@ bool Node::offsetInCharacters() const {
   return false;
 }
 
-unsigned short Node::compareDocumentPosition(Node* otherNode,
-                                             ExceptionCode& ec) {
+unsigned short Node::compareDocumentPosition(Node* otherNode) {
   // It is not clear what should be done if |otherNode| is 0.
   if (!otherNode)
     return DOCUMENT_POSITION_DISCONNECTED;
