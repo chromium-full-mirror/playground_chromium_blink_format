@@ -496,7 +496,7 @@ template <typename T, typename U>
 pair<typename ListHashSet<T, U>::iterator, bool>
 ListHashSet<T, U>::insertBefore(const ValueType& beforeValue,
                                 const ValueType& newValue) {
-  insertBefore(find(beforeValue), newValue);
+  return insertBefore(find(beforeValue), newValue);
 }
 
 template <typename T, typename U>
