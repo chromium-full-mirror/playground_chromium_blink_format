@@ -161,8 +161,6 @@ void JSLock::lock(ExecState*) {}
 
 void JSLock::unlock(ExecState*) {}
 
-void JSLock::registerThread() {}
-
 JSLock::DropAllLocks::DropAllLocks(ExecState*) {}
 
 JSLock::DropAllLocks::DropAllLocks(bool) {}
