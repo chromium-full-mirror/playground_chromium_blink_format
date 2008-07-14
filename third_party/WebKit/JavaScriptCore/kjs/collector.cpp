@@ -92,8 +92,14 @@ const size_t ALLOCATIONS_PER_COLLECTION = 4000;
 
 static void freeHeap(CollectorHeap*);
 
-Heap::Heap(Machine* machine, bool isShared)
-    : m_markListSet(0), m_isShared(isShared), m_machine(machine) {
+Heap::Heap(JSGlobalData* globalData)
+    : m_markListSet(0)
+#if USE(MULTIPLE_THREADS)
+      ,
+      m_registeredThreads(0)
+#endif
+      ,
+      m_globalData(globalData) {
   memset(&primaryHeap, 0, sizeof(CollectorHeap));
   memset(&numberHeap, 0, sizeof(CollectorHeap));
 }
@@ -441,60 +447,41 @@ class Heap::Thread {
   void* stackBase;
 };
 
-pthread_key_t registeredThreadKey;
-pthread_once_t registeredThreadKeyOnce = PTHREAD_ONCE_INIT;
-Heap::Thread* registeredThreads;
+void Heap::registerThread() {
+  if (m_currentThreadRegistrar)
+    return;
 
-static void destroyRegisteredThread(void* data) {
-  Heap::Thread* thread = (Heap::Thread*)data;
+  m_currentThreadRegistrar->set(new ThreadRegistrar(this));
+  Heap::Thread* thread = new Heap::Thread(
+      pthread_self(), getCurrentPlatformThread(), currentThreadStackBase());
 
-  // Can't use JSLock convenience object here because we don't want to
-  // re-register
-  // an exiting thread.
-  // JSLock is only used for code simplicity here, as we only need to protect
-  // registeredThreads
-  // list manipulation, not JS data structures.
-  JSLock::lock(true);
+  MutexLocker lock(m_registeredThreadsMutex);
 
-  if (registeredThreads == thread) {
-    registeredThreads = registeredThreads->next;
+  thread->next = m_registeredThreads;
+  m_registeredThreads = thread;
+}
+
+void Heap::unregisterThread() {
+  pthread_t currentPosixThread = pthread_self();
+
+  MutexLocker lock(m_registeredThreadsMutex);
+
+  if (pthread_equal(currentPosixThread, m_registeredThreads->posixThread)) {
+    Thread* t = m_registeredThreads;
+    m_registeredThreads = m_registeredThreads->next;
+    delete t;
   } else {
-    Heap::Thread* last = registeredThreads;
+    Heap::Thread* last = m_registeredThreads;
     Heap::Thread* t;
-    for (t = registeredThreads->next; t != NULL; t = t->next) {
-      if (t == thread) {
+    for (t = m_registeredThreads->next; t; t = t->next) {
+      if (pthread_equal(t->posixThread, currentPosixThread)) {
         last->next = t->next;
         break;
       }
       last = t;
     }
     ASSERT(t);  // If t is NULL, we never found ourselves in the list.
-  }
-
-  JSLock::unlock(true);
-
-  delete thread;
-}
-
-static void initializeRegisteredThreadKey() {
-  pthread_key_create(&registeredThreadKey, destroyRegisteredThread);
-}
-
-void Heap::registerThread() {
-  // Since registerThread() is only called when using a shared heap, these locks
-  // will be real.
-  ASSERT(JSLock::lockCount() > 0);
-  ASSERT(JSLock::currentThreadIsHoldingLock());
-
-  pthread_once(&registeredThreadKeyOnce, initializeRegisteredThreadKey);
-
-  if (!pthread_getspecific(registeredThreadKey)) {
-    Heap::Thread* thread = new Heap::Thread(
-        pthread_self(), getCurrentPlatformThread(), currentThreadStackBase());
-
-    thread->next = registeredThreads;
-    registeredThreads = thread;
-    pthread_setspecific(registeredThreadKey, thread);
+    delete t;
   }
 }
 
@@ -737,7 +724,9 @@ void Heap::markStackObjectsConservatively() {
 
 #if USE(MULTIPLE_THREADS)
 
-  if (m_isShared) {
+  if (m_currentThreadRegistrar) {
+    MutexLocker lock(m_registeredThreadsMutex);
+
 #ifndef NDEBUG
     // Forbid malloc during the mark phase. Marking a thread suspends it, so
     // a malloc inside mark() would risk a deadlock with a thread that had been
@@ -747,8 +736,7 @@ void Heap::markStackObjectsConservatively() {
     // It is safe to access the registeredThreads list, because we earlier
     // asserted that locks are being held,
     // and since this is a shared heap, they are real locks.
-    for (Thread* thread = registeredThreads; thread != NULL;
-         thread = thread->next) {
+    for (Thread* thread = m_registeredThreads; thread; thread = thread->next) {
       if (!pthread_equal(thread->posixThread, pthread_self()))
         markOtherThreadConservatively(thread);
     }
@@ -762,10 +750,9 @@ void Heap::markStackObjectsConservatively() {
 void Heap::setGCProtectNeedsLocking() {
   // Most clients do not need to call this, with the notable exception of
   // WebCore.
-  // Clients that use shared heap have JSLock protection, while others are not
+  // Clients that use shared heap have JSLock protection, while others are
   // supposed
-  // to migrate JS objects between threads. WebCore violates this contract in
-  // Database code,
+  // to do explicit locking. WebCore violates this contract in Database code,
   // which calls gcUnprotect from a secondary thread.
   if (!m_protectedValuesMutex)
     m_protectedValuesMutex.set(new Mutex);
@@ -773,7 +760,8 @@ void Heap::setGCProtectNeedsLocking() {
 
 void Heap::protect(JSValue* k) {
   ASSERT(k);
-  ASSERT(JSLock::currentThreadIsHoldingLock() || !m_isShared);
+  ASSERT(JSLock::currentThreadIsHoldingLock() ||
+         !m_globalData->isSharedInstance);
 
   if (JSImmediate::isImmediate(k))
     return;
@@ -789,7 +777,8 @@ void Heap::protect(JSValue* k) {
 
 void Heap::unprotect(JSValue* k) {
   ASSERT(k);
-  ASSERT(JSLock::currentThreadIsHoldingLock() || !m_isShared);
+  ASSERT(JSLock::currentThreadIsHoldingLock() ||
+         !m_globalData->isSharedInstance);
 
   if (JSImmediate::isImmediate(k))
     return;
@@ -935,8 +924,7 @@ size_t Heap::sweep() {
 
 bool Heap::collect() {
 #ifndef NDEBUG
-  if (JSGlobalData::sharedInstanceExists() &&
-      JSGlobalData::sharedInstance().heap == this) {
+  if (m_globalData->isSharedInstance) {
     ASSERT(JSLock::lockCount() > 0);
     ASSERT(JSLock::currentThreadIsHoldingLock());
   }
@@ -959,7 +947,7 @@ bool Heap::collect() {
   markProtectedObjects();
   if (m_markListSet && m_markListSet->size())
     ArgList::markLists(*m_markListSet);
-  m_machine->registerFile().markCallFrames(this);
+  m_globalData->machine->registerFile().markCallFrames(this);
 
   JAVASCRIPTCORE_GC_MARKED();
 
@@ -981,7 +969,7 @@ size_t Heap::size() {
 
 size_t Heap::globalObjectCount() {
   size_t count = 0;
-  if (JSGlobalObject* head = JSGlobalData::threadInstance().head) {
+  if (JSGlobalObject* head = m_globalData->head) {
     JSGlobalObject* o = head;
     do {
       ++count;
@@ -996,7 +984,7 @@ size_t Heap::protectedGlobalObjectCount() {
     m_protectedValuesMutex->lock();
 
   size_t count = 0;
-  if (JSGlobalObject* head = JSGlobalData::threadInstance().head) {
+  if (JSGlobalObject* head = m_globalData->head) {
     JSGlobalObject* o = head;
     do {
       if (m_protectedValues.contains(o))

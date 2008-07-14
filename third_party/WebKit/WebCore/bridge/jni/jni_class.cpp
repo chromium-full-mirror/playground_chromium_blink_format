@@ -28,6 +28,7 @@
 
 #if ENABLE(MAC_JAVA_BRIDGE)
 
+#include "JSDOMWindow.h"
 #include <kjs/identifier.h>
 #include <kjs/JSLock.h>
 #include "jni_utility.h"
@@ -54,7 +55,7 @@ JavaClass::JavaClass(jobject anInstance) {
   int i;
   JNIEnv* env = getJNIEnv();
 
-  JSGlobalData* globalData = &JSGlobalData::threadInstance();
+  JSGlobalData* globalData = WebCore::JSDOMWindow::commonJSGlobalData();
 
   // Get the fields
   jarray fields = (jarray)callJNIMethod<jobject>(

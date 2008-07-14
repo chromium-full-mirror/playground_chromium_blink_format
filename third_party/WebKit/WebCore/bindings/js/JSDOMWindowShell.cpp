@@ -43,7 +43,8 @@ const ClassInfo JSDOMWindowShell::s_info = {"JSDOMWindowShell", 0, 0, 0};
 
 JSDOMWindowShell::JSDOMWindowShell(DOMWindow* domWindow)
     : Base(jsNull()), m_window(0) {
-  m_window = new JSDOMWindow(domWindow, this);
+  m_window =
+      new (JSDOMWindow::commonJSGlobalData()) JSDOMWindow(domWindow, this);
   setPrototype(m_window->prototype());
 }
 
@@ -141,7 +142,7 @@ void JSDOMWindowShell::clear() {
 }
 
 void* JSDOMWindowShell::operator new(size_t size) {
-  return JSGlobalData::threadInstance().heap->allocate(size);
+  return JSDOMWindow::commonJSGlobalData()->heap->allocate(size);
 }
 
 // ----

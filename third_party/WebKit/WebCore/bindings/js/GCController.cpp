@@ -26,6 +26,7 @@
 #include "config.h"
 #include "GCController.h"
 
+#include "JSDOMWindow.h"
 #include <kjs/JSGlobalData.h>
 #include <kjs/JSLock.h>
 #include <kjs/collector.h>
@@ -42,7 +43,7 @@ namespace WebCore {
 
 static void* collect(void*) {
   JSLock lock(false);
-  JSGlobalData::threadInstance().heap->collect();
+  JSDOMWindow::commonJSGlobalData()->heap->collect();
   return 0;
 }
 
@@ -62,12 +63,12 @@ void GCController::garbageCollectSoon() {
 
 void GCController::gcTimerFired(Timer<GCController>*) {
   JSLock lock(false);
-  JSGlobalData::threadInstance().heap->collect();
+  JSDOMWindow::commonJSGlobalData()->heap->collect();
 }
 
 void GCController::garbageCollectNow() {
   JSLock lock(false);
-  JSGlobalData::threadInstance().heap->collect();
+  JSDOMWindow::commonJSGlobalData()->heap->collect();
 }
 
 void GCController::garbageCollectOnAlternateThreadForDebugging(

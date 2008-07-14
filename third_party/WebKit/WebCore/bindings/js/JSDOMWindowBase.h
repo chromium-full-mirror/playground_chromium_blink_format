@@ -145,6 +145,8 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
   virtual KJS::JSObject* toThisObject(KJS::ExecState*) const;
   JSDOMWindowShell* shell() const;
 
+  static KJS::JSGlobalData* commonJSGlobalData();
+
   enum {
     // Attributes
     Crypto,
