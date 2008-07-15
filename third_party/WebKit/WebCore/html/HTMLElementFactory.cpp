@@ -159,8 +159,10 @@ static PassRefPtr<HTMLElement> titleConstructor(const AtomicString&,
 static PassRefPtr<HTMLElement> frameConstructor(const AtomicString&,
                                                 Document* doc,
                                                 HTMLFormElement*,
-                                                bool) {
-  return new HTMLFrameElement(doc);
+                                                bool createdByParser) {
+  RefPtr<HTMLFrameElement> frame = new HTMLFrameElement(doc);
+  frame->setCreatedByParser(createdByParser);
+  return frame.release();
 }
 
 static PassRefPtr<HTMLElement> framesetConstructor(const AtomicString&,
@@ -173,8 +175,10 @@ static PassRefPtr<HTMLElement> framesetConstructor(const AtomicString&,
 static PassRefPtr<HTMLElement> iframeConstructor(const AtomicString&,
                                                  Document* doc,
                                                  HTMLFormElement*,
-                                                 bool) {
-  return new HTMLIFrameElement(doc);
+                                                 bool createdByParser) {
+  RefPtr<HTMLIFrameElement> iFrame = new HTMLIFrameElement(doc);
+  iFrame->setCreatedByParser(createdByParser);
+  return iFrame.release();
 }
 
 static PassRefPtr<HTMLElement> formConstructor(const AtomicString&,
