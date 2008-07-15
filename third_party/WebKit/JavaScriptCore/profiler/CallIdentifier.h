@@ -63,8 +63,8 @@ struct IntHash<KJS::CallIdentifier> {
   static unsigned hash(const KJS::CallIdentifier& key) {
     unsigned hashCodes[3] = {key.m_name.rep()->hash(), key.m_url.rep()->hash(),
                              key.m_lineNumber};
-    return KJS::UString::Rep::computeHash(reinterpret_cast<UChar*>(hashCodes),
-                                          sizeof(hashCodes) / sizeof(UChar));
+    return KJS::UString::Rep::computeHash(reinterpret_cast<char*>(hashCodes),
+                                          sizeof(hashCodes));
   }
 
   static bool equal(const KJS::CallIdentifier& a,
