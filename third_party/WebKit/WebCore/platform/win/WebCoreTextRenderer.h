@@ -46,4 +46,7 @@ void WebCoreDrawDoubledTextAtPoint(GraphicsContext&,
                                    int underlinedIndex = -1);
 float WebCoreTextFloatWidth(const String&, const Font&);
 
+void WebCoreSetShouldUseFontSmoothing(bool);
+bool WebCoreShouldUseFontSmoothing();
+
 }  // namespace WebCore

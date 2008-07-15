@@ -83,6 +83,9 @@ unsigned RightTruncateStringToWidth(LPCTSTR text,
                                     const WebFontDescription&,
                                     float width,
                                     WCHAR* buffer);
+
+void WebKitSetShouldUseFontSmoothing(bool);
+bool WebKitShouldUseFontSmoothing();
 }
 
 #endif  // !defined(WebKitGraphics_h)

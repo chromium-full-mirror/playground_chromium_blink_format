@@ -175,3 +175,11 @@ unsigned RightTruncateStringToWidth(LPCTSTR text,
   buffer[result.length()] = '\0';
   return result.length();
 }
+
+void WebKitSetShouldUseFontSmoothing(bool smooth) {
+  WebCoreSetShouldUseFontSmoothing(smooth);
+}
+
+bool WebKitShouldUseFontSmoothing() {
+  return WebCoreShouldUseFontSmoothing();
+}

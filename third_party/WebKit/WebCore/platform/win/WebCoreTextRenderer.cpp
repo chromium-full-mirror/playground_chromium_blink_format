@@ -33,6 +33,8 @@
 
 namespace WebCore {
 
+static bool shouldUseFontSmoothing = true;
+
 static bool isOneLeftToRightRun(const TextRun& run) {
   for (int i = 0; i < run.length(); i++) {
     WTF::Unicode::Direction direction = WTF::Unicode::direction(run[i]);
@@ -113,6 +115,14 @@ void WebCoreDrawDoubledTextAtPoint(GraphicsContext& context,
 
 float WebCoreTextFloatWidth(const String& text, const Font& font) {
   return StringTruncator::width(text, font, false);
+}
+
+void WebCoreSetShouldUseFontSmoothing(bool smooth) {
+  shouldUseFontSmoothing = smooth;
+}
+
+bool WebCoreShouldUseFontSmoothing() {
+  return shouldUseFontSmoothing;
 }
 
 }  // namespace WebCore
