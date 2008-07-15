@@ -116,7 +116,7 @@ void CachedPage::restore(Page* page) {
           new (JSDOMWindow::commonJSGlobalData())
               JSDOMWindow(mainFrame->domWindow(), windowShell));
       proxy->attachDebugger(page->debugger());
-      windowShell->window()->setPageGroupIdentifier(page->group().identifier());
+      windowShell->window()->setProfileGroup(page->group().identifier());
     }
   }
 

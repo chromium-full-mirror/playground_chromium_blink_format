@@ -43,14 +43,14 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
  public:
   static PassRefPtr<ProfileGenerator> create(const UString& title,
                                              ExecState* originatingGlobalExec,
-                                             unsigned pageGroupIdentifier,
+                                             unsigned profileGroup,
                                              ProfilerClient*);
 
   // Members
   const UString& title() const;
   PassRefPtr<Profile> profile() const { return m_profile; }
   ExecState* originatingGlobalExec() const { return m_originatingGlobalExec; }
-  unsigned pageGroupIdentifier() const { return m_pageGroupIdentifier; }
+  unsigned profileGroup() const { return m_profileGroup; }
   ProfilerClient* client() { return m_client; }
   bool stoppedProfiling() { return m_stoppedProfiling; }
 
@@ -68,7 +68,7 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
  private:
   ProfileGenerator(const UString& title,
                    ExecState* originatingGlobalExec,
-                   unsigned pageGroupIdentifier,
+                   unsigned profileGroup,
                    ProfilerClient*);
 
   void removeProfileStart();
@@ -76,7 +76,7 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
 
   RefPtr<Profile> m_profile;
   ExecState* m_originatingGlobalExec;
-  unsigned m_pageGroupIdentifier;
+  unsigned m_profileGroup;
   ProfilerClient* m_client;
   RefPtr<ProfileNode> m_head;
   RefPtr<ProfileNode> m_currentNode;
