@@ -40,7 +40,7 @@ static JSValue* stringFromCharCode(ExecState* exec,
     ArgList::const_iterator end = args.end();
     for (ArgList::const_iterator it = args.begin(); it != end; ++it)
       *p++ = static_cast<UChar>((*it)->toUInt32(exec));
-    s = UString(buf, args.size(), false);
+    s = UString::adopt(buf, args.size());
   } else
     s = "";
 
