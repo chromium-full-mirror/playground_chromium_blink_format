@@ -23,6 +23,8 @@
 #define ArgList_h
 
 #include "JSImmediate.h"
+#include "Register.h"
+
 #include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
 #include <wtf/Vector.h>
@@ -34,7 +36,7 @@ class JSValue;
 class ArgList : Noncopyable {
  private:
   static const unsigned inlineCapacity = 8;
-  typedef Vector<JSValue*, inlineCapacity> VectorType;
+  typedef Vector<Register, inlineCapacity> VectorType;
   typedef HashSet<ArgList*> ListSet;
 
  public:
@@ -56,7 +58,7 @@ class ArgList : Noncopyable {
 
   // Constructor for a read-only list whose data has already been allocated
   // elsewhere.
-  ArgList(JSValue** buffer, size_t size)
+  ArgList(Register* buffer, size_t size)
       : m_buffer(buffer),
         m_size(size),
         m_markSet(0)
@@ -77,7 +79,7 @@ class ArgList : Noncopyable {
 
   JSValue* at(size_t i) const {
     if (i < m_size)
-      return m_buffer[i];
+      return m_buffer[i].jsValue();
     return jsUndefined();
   }
 
@@ -116,7 +118,7 @@ class ArgList : Noncopyable {
  private:
   void slowAppend(JSValue*);
 
-  JSValue** m_buffer;
+  Register* m_buffer;
   size_t m_size;
 
   VectorType m_vector;

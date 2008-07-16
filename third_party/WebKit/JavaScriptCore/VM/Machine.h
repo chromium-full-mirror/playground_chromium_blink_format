@@ -133,20 +133,31 @@ class Machine {
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
-  friend NEVER_INLINE JSValue* callEval(ExecState* exec,
-                                        JSObject* thisObj,
-                                        ScopeChainNode* scopeChain,
-                                        RegisterFile*,
-                                        Register* r,
-                                        int argv,
-                                        int argc,
-                                        JSValue*& exceptionValue);
+  NEVER_INLINE JSValue* callEval(ExecState* exec,
+                                 JSObject* thisObj,
+                                 ScopeChainNode* scopeChain,
+                                 RegisterFile*,
+                                 Register* r,
+                                 int argv,
+                                 int argc,
+                                 JSValue*& exceptionValue);
   JSValue* execute(EvalNode*,
                    ExecState*,
                    JSObject* thisObj,
                    int registerOffset,
                    ScopeChainNode*,
                    JSValue** exception);
+
+  ALWAYS_INLINE void initializeCallFrame(Register* callFrame,
+                                         CodeBlock*,
+                                         Instruction*,
+                                         ScopeChainNode*,
+                                         Register* r,
+                                         int returnValueRegister,
+                                         int argv,
+                                         int argc,
+                                         int calledAsConstructor,
+                                         JSValue* function);
 
   ALWAYS_INLINE void setScopeChain(ExecState* exec,
                                    ScopeChainNode*&,

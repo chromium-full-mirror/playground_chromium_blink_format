@@ -60,7 +60,7 @@ class JSVariableObject : public JSObject {
                                      const Identifier& propertyName,
                                      unsigned& attributes) const;
 
-  JSValue*& valueAt(int index) const { return d->registers[index].u.jsValue; }
+  Register& registerAt(int index) const { return d->registers[index]; }
 
  protected:
   // Subclasses of JSVariableObject can subclass this struct to add data
@@ -114,7 +114,7 @@ inline bool JSVariableObject::symbolTableGet(const Identifier& propertyName,
   SymbolTableEntry entry =
       symbolTable().inlineGet(propertyName.ustring().rep());
   if (!entry.isNull()) {
-    slot.setValueSlot(&valueAt(entry.getIndex()));
+    slot.setRegisterSlot(&registerAt(entry.getIndex()));
     return true;
   }
   return false;
@@ -126,7 +126,7 @@ inline bool JSVariableObject::symbolTableGet(const Identifier& propertyName,
   SymbolTableEntry entry =
       symbolTable().inlineGet(propertyName.ustring().rep());
   if (!entry.isNull()) {
-    slot.setValueSlot(&valueAt(entry.getIndex()));
+    slot.setRegisterSlot(&registerAt(entry.getIndex()));
     slotIsWriteable = !entry.isReadOnly();
     return true;
   }
@@ -141,7 +141,7 @@ inline bool JSVariableObject::symbolTablePut(const Identifier& propertyName,
     return false;
   if (entry.isReadOnly())
     return true;
-  valueAt(entry.getIndex()) = value;
+  registerAt(entry.getIndex()) = value;
   return true;
 }
 
@@ -155,7 +155,7 @@ inline bool JSVariableObject::symbolTablePutWithAttributes(
   SymbolTableEntry& entry = iter->second;
   ASSERT(!entry.isNull());
   entry.setAttributes(attributes);
-  valueAt(entry.getIndex()) = value;
+  registerAt(entry.getIndex()) = value;
   return true;
 }
 

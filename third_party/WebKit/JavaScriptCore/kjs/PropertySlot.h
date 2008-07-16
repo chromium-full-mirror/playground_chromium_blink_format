@@ -21,6 +21,7 @@
 #ifndef PropertySlot_h
 #define PropertySlot_h
 
+#include "Register.h"
 #include "JSValue.h"
 #include "identifier.h"
 #include <wtf/Assertions.h>
@@ -32,7 +33,8 @@ class JSObject;
 struct HashEntry;
 
 #define KJS_VALUE_SLOT_MARKER 0
-#define KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER reinterpret_cast<GetValueFunc>(1)
+#define KJS_REGISTER_SLOT_MARKER reinterpret_cast<GetValueFunc>(1)
+#define KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER reinterpret_cast<GetValueFunc>(2)
 
 class PropertySlot {
  public:
@@ -50,6 +52,8 @@ class PropertySlot {
   JSValue* getValue(ExecState* exec, const Identifier& propertyName) const {
     if (m_getValue == KJS_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
+    if (m_getValue == KJS_REGISTER_SLOT_MARKER)
+      return (*m_data.registerSlot).jsValue();
     ASSERT(m_getValue != KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER);
     return m_getValue(exec, propertyName, *this);
   }
@@ -59,12 +63,18 @@ class PropertySlot {
       return *m_data.valueSlot;
     if (m_getValue == KJS_NUMERIC_PROPERTY_NAME_SLOT_MARKER)
       return m_data.numericFunc(exec, propertyName, *this);
+    if (m_getValue == KJS_REGISTER_SLOT_MARKER)
+      return (*m_data.registerSlot).jsValue();
     return m_getValue(exec, Identifier::from(exec, propertyName), *this);
   }
 
   void putValue(JSValue* value) {
-    ASSERT(m_getValue == KJS_VALUE_SLOT_MARKER);
-    *m_data.valueSlot = value;
+    if (m_getValue == KJS_VALUE_SLOT_MARKER) {
+      *m_data.valueSlot = value;
+      return;
+    }
+    ASSERT(m_getValue == KJS_REGISTER_SLOT_MARKER);
+    *m_data.registerSlot = value;
   }
 
   void setValueSlot(JSValue** valueSlot) {
@@ -72,6 +82,13 @@ class PropertySlot {
     m_getValue = KJS_VALUE_SLOT_MARKER;
     clearBase();
     m_data.valueSlot = valueSlot;
+  }
+
+  void setRegisterSlot(Register* registerSlot) {
+    ASSERT(registerSlot);
+    m_getValue = KJS_REGISTER_SLOT_MARKER;
+    clearBase();
+    m_data.registerSlot = registerSlot;
   }
 
   void setStaticEntry(JSValue* slotBase,
@@ -155,6 +172,7 @@ class PropertySlot {
   union {
     JSObject* getterFunc;
     JSValue** valueSlot;
+    Register* registerSlot;
     const HashEntry* staticEntry;
     unsigned index;
     GetValueNumericFunc numericFunc;
