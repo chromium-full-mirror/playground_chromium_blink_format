@@ -36,9 +36,7 @@ class SVGLengthList : public SVGPODList<SVGLength> {
   }
   virtual ~SVGLengthList();
 
-  void parse(const String& value,
-             const SVGStyledElement* context,
-             SVGLengthMode mode);
+  void parse(const String& value, SVGLengthMode mode);
 
   String valueAsString() const;
 

@@ -49,9 +49,7 @@ class SynchronizableTypeWrapper
   SynchronizableTypeWrapper();
 
   // "Forwarding constructors" for primitive type assignment with more than one
-  // argument, for exampe SVGLength:
-  // Use m_syncWrapper(context, LengthMode, ..) instead of
-  // m_syncWrapper(SVGLength(context, LengthMode, ..)))
+  // argument, for exampe SVGLength
   template <typename T1>
   SynchronizableTypeWrapper(const T1&);
   template <typename T1, typename T2>

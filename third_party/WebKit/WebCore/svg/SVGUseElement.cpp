@@ -42,7 +42,6 @@
 #include "SVGElementInstanceList.h"
 #include "SVGGElement.h"
 #include "SVGLength.h"
-#include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
 #include "SVGSMILElement.h"
 #include "SVGSVGElement.h"
@@ -59,10 +58,10 @@ SVGUseElement::SVGUseElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       SVGURIReference(),
-      m_x(this, LengthModeWidth),
-      m_y(this, LengthModeHeight),
-      m_width(this, LengthModeWidth),
-      m_height(this, LengthModeHeight) {}
+      m_x(LengthModeWidth),
+      m_y(LengthModeHeight),
+      m_width(LengthModeWidth),
+      m_height(LengthModeHeight) {}
 
 SVGUseElement::~SVGUseElement() {}
 
@@ -90,17 +89,17 @@ SVGElementInstance* SVGUseElement::animatedInstanceRoot() const {
 
 void SVGUseElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::xAttr)
-    setXBaseValue(SVGLength(this, LengthModeWidth, attr->value()));
+    setXBaseValue(SVGLength(LengthModeWidth, attr->value()));
   else if (attr->name() == SVGNames::yAttr)
-    setYBaseValue(SVGLength(this, LengthModeHeight, attr->value()));
+    setYBaseValue(SVGLength(LengthModeHeight, attr->value()));
   else if (attr->name() == SVGNames::widthAttr) {
-    setWidthBaseValue(SVGLength(this, LengthModeWidth, attr->value()));
-    if (width().value() < 0.0)
+    setWidthBaseValue(SVGLength(LengthModeWidth, attr->value()));
+    if (widthBaseValue().value(this) < 0.0)
       document()->accessSVGExtensions()->reportError(
           "A negative value for use attribute <width> is not allowed");
   } else if (attr->name() == SVGNames::heightAttr) {
-    setHeightBaseValue(SVGLength(this, LengthModeHeight, attr->value()));
-    if (height().value() < 0.0)
+    setHeightBaseValue(SVGLength(LengthModeHeight, attr->value()));
+    if (heightBaseValue().value(this) < 0.0)
       document()->accessSVGExtensions()->reportError(
           "A negative value for use attribute <height> is not allowed");
   } else {
@@ -341,9 +340,9 @@ void SVGUseElement::buildPendingResource() {
   // Spec: An additional transformation translate(x,y) is appended to the end
   // (i.e., right-side) of the transform attribute on the generated 'g', where x
   // and y represent the values of the x and y attributes on the 'use' element.
-  if (x().value() != 0.0 || y().value() != 0.0) {
+  if (x().value(this) != 0.0 || y().value(this) != 0.0) {
     String transformString =
-        String::format("translate(%f, %f)", x().value(), y().value());
+        String::format("translate(%f, %f)", x().value(this), y().value(this));
     m_shadowTreeRootElement->setAttribute(SVGNames::transformAttr,
                                           transformString);
   }
@@ -483,7 +482,8 @@ void SVGUseElement::buildInstanceTree(SVGElement* target,
     // object, the instance tree will contain recursive expansion of the
     // indirect references to form a complete tree.
     if (element->hasTagName(SVGNames::useTag))
-      handleDeepUseReferencing(element, instancePtr, foundProblem);
+      handleDeepUseReferencing(static_cast<SVGUseElement*>(element),
+                               instancePtr, foundProblem);
   }
 
   // Spec: If the referenced object is itself a 'use', or if there are 'use'
@@ -491,10 +491,11 @@ void SVGUseElement::buildInstanceTree(SVGElement* target,
   // object, the instance tree will contain recursive expansion of the indirect
   // references to form a complete tree.
   if (target->hasTagName(SVGNames::useTag))
-    handleDeepUseReferencing(target, targetInstance, foundProblem);
+    handleDeepUseReferencing(static_cast<SVGUseElement*>(target),
+                             targetInstance, foundProblem);
 }
 
-void SVGUseElement::handleDeepUseReferencing(SVGElement* use,
+void SVGUseElement::handleDeepUseReferencing(SVGUseElement* use,
                                              SVGElementInstance* targetInstance,
                                              bool& foundProblem) {
   String id = SVGURIReference::getTarget(use->href());
@@ -535,8 +536,8 @@ void SVGUseElement::handleDeepUseReferencing(SVGElement* use,
 }
 
 void SVGUseElement::alterShadowTreeForSVGTag(SVGElement* target) {
-  String widthString = String::number(width().value());
-  String heightString = String::number(height().value());
+  String widthString = String::number(width().value(this));
+  String heightString = String::number(height().value(this));
 
   if (hasAttribute(SVGNames::widthAttr))
     target->setAttribute(SVGNames::widthAttr, widthString);
@@ -632,14 +633,14 @@ void SVGUseElement::expandUseElementsInShadowTree(Node* element) {
       // where x
       // and y represent the values of the x and y attributes on the 'use'
       // element.
-      if (use->x().value() != 0.0 || use->y().value() != 0.0) {
+      if (use->x().value(this) != 0.0 || use->y().value(this) != 0.0) {
         if (!cloneParent->hasAttribute(SVGNames::transformAttr)) {
           String transformString = String::format(
-              "translate(%f, %f)", use->x().value(), use->y().value());
+              "translate(%f, %f)", use->x().value(this), use->y().value(this));
           cloneParent->setAttribute(SVGNames::transformAttr, transformString);
         } else {
           String transformString = String::format(
-              " translate(%f, %f)", use->x().value(), use->y().value());
+              " translate(%f, %f)", use->x().value(this), use->y().value(this));
           const AtomicString& transformAttribute =
               cloneParent->getAttribute(SVGNames::transformAttr);
           cloneParent->setAttribute(SVGNames::transformAttr,
@@ -722,8 +723,8 @@ void SVGUseElement::expandSymbolElementsInShadowTree(Node* element) {
     svgElement->attributes()->setAttributes(*element->attributes());
 
     // Explicitly re-set width/height values
-    String widthString = String::number(width().value());
-    String heightString = String::number(height().value());
+    String widthString = String::number(width().value(this));
+    String heightString = String::number(height().value(this));
 
     svgElement->setAttribute(
         SVGNames::widthAttr,

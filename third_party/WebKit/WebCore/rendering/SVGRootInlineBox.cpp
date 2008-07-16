@@ -1528,7 +1528,7 @@ void SVGRootInlineBox::buildTextChunks(Vector<SVGChar>& svgChars,
               isVerticalWritingMode(text->style()->svgStyle());
           info.chunk.isTextPath = info.handlingTextPath;
           info.chunk.anchor = text->style()->svgStyle()->textAnchor();
-          info.chunk.textLength = textContent->textLength().value();
+          info.chunk.textLength = textContent->textLength().value(textContent);
           info.chunk.lengthAdjust = (ELengthAdjust)textContent->lengthAdjust();
 
 #if DEBUG_CHUNK_BUILDING > 1
@@ -1569,7 +1569,8 @@ void SVGRootInlineBox::buildTextChunks(Vector<SVGChar>& svgChars,
                 isVerticalWritingMode(text->style()->svgStyle());
             info.chunk.isTextPath = info.handlingTextPath;
             info.chunk.anchor = text->style()->svgStyle()->textAnchor();
-            info.chunk.textLength = textContent->textLength().value();
+            info.chunk.textLength =
+                textContent->textLength().value(textContent);
             info.chunk.lengthAdjust =
                 (ELengthAdjust)textContent->lengthAdjust();
 

@@ -141,7 +141,7 @@ struct SVGCharacterLayoutInfo {
   void addStackContent(StackType, SVGNumberList*);
 
   // Used for x/y/dx/dy.
-  void addStackContent(StackType, SVGLengthList*);
+  void addStackContent(StackType, SVGLengthList*, const SVGElement*);
 
   void addStackContent(StackType, const PositionedFloatVector&);
 

@@ -47,7 +47,7 @@ SVGTextContentElement::SVGTextContentElement(const QualifiedName& tagName,
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_textLength(this, LengthModeOther),
+      m_textLength(LengthModeOther),
       m_lengthAdjust(LENGTHADJUST_SPACING) {}
 
 SVGTextContentElement::~SVGTextContentElement() {}
@@ -535,8 +535,8 @@ void SVGTextContentElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (attr->value() == "spacingAndGlyphs")
       setLengthAdjustBaseValue(LENGTHADJUST_SPACINGANDGLYPHS);
   } else if (attr->name() == SVGNames::textLengthAttr) {
-    setTextLengthBaseValue(SVGLength(this, LengthModeOther, attr->value()));
-    if (textLength().value() < 0.0)
+    setTextLengthBaseValue(SVGLength(LengthModeOther, attr->value()));
+    if (textLengthBaseValue().value(this) < 0.0)
       document()->accessSVGExtensions()->reportError(
           "A negative value for text attribute <textLength> is not allowed");
   } else {

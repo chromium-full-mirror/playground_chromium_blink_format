@@ -65,6 +65,8 @@ class SVGAnimationElement : public SVGSMILElement,
   static bool attributeIsCSS(const String& attributeName);
 
  protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
   enum CalcMode {
     CalcModeDiscrete,
     CalcModeLinear,

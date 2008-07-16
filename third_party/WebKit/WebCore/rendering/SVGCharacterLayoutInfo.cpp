@@ -306,10 +306,10 @@ void SVGCharacterLayoutInfo::addLayoutInformation(
 
   float baselineShift = calculateBaselineShift(element->renderer());
 
-  addStackContent(XStack, element->x());
-  addStackContent(YStack, element->y());
-  addStackContent(DxStack, element->dx());
-  addStackContent(DyStack, element->dy());
+  addStackContent(XStack, element->x(), element);
+  addStackContent(YStack, element->y(), element);
+  addStackContent(DxStack, element->dx(), element);
+  addStackContent(DyStack, element->dy(), element);
   addStackContent(AngleStack, element->rotate());
   addStackContent(BaselineShiftStack, baselineShift);
 
@@ -344,7 +344,8 @@ void SVGCharacterLayoutInfo::addStackContent(StackType type,
 }
 
 void SVGCharacterLayoutInfo::addStackContent(StackType type,
-                                             SVGLengthList* list) {
+                                             SVGLengthList* list,
+                                             const SVGElement* context) {
   unsigned length = list->numberOfItems();
   if (!length)
     return;
@@ -353,7 +354,7 @@ void SVGCharacterLayoutInfo::addStackContent(StackType type,
 
   ExceptionCode ec = 0;
   for (unsigned i = 0; i < length; ++i) {
-    float value = list->getItem(i, ec).value();
+    float value = list->getItem(i, ec).value(context);
     ASSERT(ec == 0);
 
     newLayoutInfo.append(value);

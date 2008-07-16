@@ -95,7 +95,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void buildInstanceTree(SVGElement* target,
                          SVGElementInstance* targetInstance,
                          bool& foundCycle);
-  void handleDeepUseReferencing(SVGElement* use,
+  void handleDeepUseReferencing(SVGUseElement* use,
                                 SVGElementInstance* targetInstance,
                                 bool& foundCycle);
 

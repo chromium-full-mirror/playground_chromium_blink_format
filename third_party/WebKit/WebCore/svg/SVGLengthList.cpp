@@ -34,9 +34,7 @@ SVGLengthList::SVGLengthList(const QualifiedName& attributeName)
 
 SVGLengthList::~SVGLengthList() {}
 
-void SVGLengthList::parse(const String& value,
-                          const SVGStyledElement* context,
-                          SVGLengthMode mode) {
+void SVGLengthList::parse(const String& value, SVGLengthMode mode) {
   ExceptionCode ec = 0;
   clear(ec);
 
@@ -48,7 +46,7 @@ void SVGLengthList::parse(const String& value,
       ptr++;
     if (ptr == start)
       break;
-    SVGLength length(context, mode);
+    SVGLength length(mode);
     if (!length.setValueAsString(String(start, ptr - start)))
       return;
     appendItem(length, ec);

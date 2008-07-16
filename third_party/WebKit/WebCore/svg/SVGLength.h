@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -24,12 +24,9 @@
 #define SVGLength_h
 
 #if ENABLE(SVG)
-
 #include "PlatformString.h"
 
 namespace WebCore {
-
-class SVGStyledElement;
 
 enum SVGLengthType {
   LengthTypeUnknown = 0,
@@ -46,6 +43,8 @@ enum SVGLengthType {
 };
 
 enum SVGLengthMode { LengthModeWidth = 0, LengthModeHeight, LengthModeOther };
+
+class SVGElement;
 
 class SVGLength {
  public:
@@ -64,14 +63,12 @@ class SVGLength {
     SVG_LENGTHTYPE_PC = LengthTypePC
   };
 
-  SVGLength(const SVGStyledElement* context = 0,
-            SVGLengthMode mode = LengthModeOther,
+  SVGLength(SVGLengthMode mode = LengthModeOther,
             const String& valueAsString = String());
 
-  // 'SVGLength' functions
   SVGLengthType unitType() const;
 
-  float value() const;
+  float value(const SVGElement* context) const;
   void setValue(float);
 
   float valueInSpecifiedUnits() const;
@@ -83,11 +80,11 @@ class SVGLength {
   bool setValueAsString(const String&);
 
   void newValueSpecifiedUnits(unsigned short, float valueInSpecifiedUnits);
-  void convertToSpecifiedUnits(unsigned short);
+  void convertToSpecifiedUnits(unsigned short, const SVGElement* context);
 
   // Helper functions
   static float PercentageOfViewport(float value,
-                                    const SVGStyledElement*,
+                                    const SVGElement* context,
                                     SVGLengthMode);
 
   inline bool isRelative() const {
@@ -99,13 +96,9 @@ class SVGLength {
  private:
   float m_valueInSpecifiedUnits;
   unsigned int m_unit;
-
-  const SVGStyledElement* m_context;
 };
 
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
 #endif  // SVGLength_h
-
-// vim:ts=4:noet
