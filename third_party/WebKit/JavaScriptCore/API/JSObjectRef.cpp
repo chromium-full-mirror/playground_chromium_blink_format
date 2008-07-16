@@ -433,5 +433,5 @@ void JSPropertyNameAccumulatorAddName(JSPropertyNameAccumulatorRef array,
   propertyNames->globalData()->heap->registerThread();
   JSLock lock(propertyNames->globalData()->isSharedInstance);
 
-  propertyNames->add(rep);
+  propertyNames->add(Identifier(propertyNames->globalData(), rep));
 }
