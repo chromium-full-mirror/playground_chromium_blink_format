@@ -21,7 +21,7 @@
  */
 
 #include "config.h"
-#include "JSFunction.h"
+#include "InternalFunction.h"
 
 #include "FunctionPrototype.h"
 
@@ -37,6 +37,39 @@ InternalFunction::InternalFunction(FunctionPrototype* prototype,
 
 bool InternalFunction::implementsHasInstance() const {
   return true;
+}
+
+bool InternalFunction::getOwnPropertySlot(ExecState* exec,
+                                          const Identifier& propertyName,
+                                          PropertySlot& slot) {
+  if (propertyName == exec->propertyNames().name) {
+    slot.setCustom(this, nameGetter);
+    return true;
+  }
+
+  return JSObject::getOwnPropertySlot(exec, propertyName, slot);
+}
+
+void InternalFunction::put(ExecState* exec,
+                           const Identifier& propertyName,
+                           JSValue* value) {
+  if (propertyName == exec->propertyNames().name)
+    return;
+  JSObject::put(exec, propertyName, value);
+}
+
+bool InternalFunction::deleteProperty(ExecState* exec,
+                                      const Identifier& propertyName) {
+  if (propertyName == exec->propertyNames().name)
+    return false;
+  return JSObject::deleteProperty(exec, propertyName);
+}
+
+JSValue* InternalFunction::nameGetter(ExecState* exec,
+                                      const Identifier&,
+                                      const PropertySlot& slot) {
+  InternalFunction* thisObj = static_cast<InternalFunction*>(slot.slotBase());
+  return jsString(exec, thisObj->functionName().ustring());
 }
 
 }  // namespace KJS
