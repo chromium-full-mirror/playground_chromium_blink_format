@@ -786,7 +786,7 @@ JSValue* stringProtoFuncToLowerCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString::adopt(buffer));
+  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncToUpperCase(ExecState* exec,
@@ -815,7 +815,7 @@ JSValue* stringProtoFuncToUpperCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString::adopt(buffer));
+  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncToLocaleLowerCase(ExecState* exec,
@@ -847,7 +847,7 @@ JSValue* stringProtoFuncToLocaleLowerCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString::adopt(buffer));
+  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncToLocaleUpperCase(ExecState* exec,
@@ -876,7 +876,7 @@ JSValue* stringProtoFuncToLocaleUpperCase(ExecState* exec,
   if (length == ssize &&
       memcmp(buffer.data(), s.data(), length * sizeof(UChar)) == 0)
     return sVal;
-  return jsString(exec, UString::adopt(buffer));
+  return jsString(exec, UString(buffer.releaseBuffer(), length, false));
 }
 
 JSValue* stringProtoFuncLocaleCompare(ExecState* exec,
