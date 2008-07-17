@@ -613,12 +613,10 @@ void BitOrNode::streamTo(SourceStream& s) const {
   streamLeftAssociativeBinaryOperator(s, precedence(), "|", m_term1, m_term2);
 }
 
-void LogicalAndNode::streamTo(SourceStream& s) const {
-  streamLeftAssociativeBinaryOperator(s, precedence(), "&&", m_expr1, m_expr2);
-}
-
-void LogicalOrNode::streamTo(SourceStream& s) const {
-  streamLeftAssociativeBinaryOperator(s, precedence(), "||", m_expr1, m_expr2);
+void LogicalOpNode::streamTo(SourceStream& s) const {
+  streamLeftAssociativeBinaryOperator(
+      s, precedence(), (m_operator == OpLogicalAnd) ? "&&" : "||", m_expr1,
+      m_expr2);
 }
 
 void ConditionalNode::streamTo(SourceStream& s) const {
