@@ -741,27 +741,20 @@ class PrePostResolveNode : public ExpressionNode {
   size_t m_index;  // Used by LocalVarPostfixNode.
 };
 
-class PostIncResolveNode : public PrePostResolveNode {
+class PostfixResolveNode : public PrePostResolveNode {
  public:
-  PostIncResolveNode(JSGlobalData* globalData,
-                     const Identifier& ident) KJS_FAST_CALL
-      : PrePostResolveNode(globalData, ident) {}
+  PostfixResolveNode(JSGlobalData* globalData,
+                     const Identifier& ident,
+                     Operator oper) KJS_FAST_CALL
+      : PrePostResolveNode(globalData, ident),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecPostfix; }
-};
 
-class PostDecResolveNode : public PrePostResolveNode {
- public:
-  PostDecResolveNode(JSGlobalData* globalData,
-                     const Identifier& ident) KJS_FAST_CALL
-      : PrePostResolveNode(globalData, ident) {}
-
-  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
-
-  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual Precedence precedence() const { return PrecPostfix; }
+ protected:
+  Operator m_operator;
 };
 
 class PostfixBracketNode : public ExpressionNode {
@@ -959,28 +952,21 @@ class TypeOfValueNode : public ExpressionNode {
   RefPtr<ExpressionNode> m_expr;
 };
 
-class PreIncResolveNode : public PrePostResolveNode {
+class PrefixResolveNode : public PrePostResolveNode {
  public:
-  PreIncResolveNode(JSGlobalData* globalData,
-                    const Identifier& ident) KJS_FAST_CALL
-      : PrePostResolveNode(globalData, ident) {}
+  PrefixResolveNode(JSGlobalData* globalData,
+                    const Identifier& ident,
+                    Operator oper) KJS_FAST_CALL
+      : PrePostResolveNode(globalData, ident),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecUnary; }
-};
 
-class PreDecResolveNode : public PrePostResolveNode {
- public:
-  PreDecResolveNode(JSGlobalData* globalData,
-                    const Identifier& ident) KJS_FAST_CALL
-      : PrePostResolveNode(globalData, ident) {}
-
-  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
-
-  virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
-  virtual Precedence precedence() const { return PrecUnary; }
+ protected:
+  Operator m_operator;
 };
 
 class PrefixBracketNode : public ExpressionNode {
