@@ -111,6 +111,10 @@ static guint webkit_web_view_signals[LAST_SIGNAL] = {
 
 G_DEFINE_TYPE(WebKitWebView, webkit_web_view, GTK_TYPE_CONTAINER)
 
+static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
+                                            GParamSpec* pspec,
+                                            WebKitWebView* webView);
+
 static void webkit_web_view_context_menu_position_func(
     GtkMenu*,
     gint* x,
@@ -773,6 +777,8 @@ static void webkit_web_view_finalize(GObject* object) {
   if (priv->verticalAdjustment)
     g_object_unref(priv->verticalAdjustment);
   g_object_unref(priv->backForwardList);
+  g_signal_handlers_disconnect_by_func(
+      priv->webSettings, (gpointer)webkit_web_view_settings_notify, webView);
   g_object_unref(priv->webSettings);
   g_object_unref(priv->mainFrame);
   g_object_unref(priv->imContext);
