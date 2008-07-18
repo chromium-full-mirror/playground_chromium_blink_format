@@ -306,9 +306,10 @@ static IntRect sizingBox(RenderObject* renderer) {
                                                        : renderer->borderBox();
 }
 
-static PassRefPtr<CSSValueList> computedTransform(RenderObject* renderer) {
-  if (!renderer)
-    return 0;
+static PassRefPtr<CSSValue> computedTransform(RenderObject* renderer) {
+  if (!renderer || renderer->style()->transform().isEmpty()) {
+    return CSSPrimitiveValue::createIdentifier(CSSValueNone);
+  }
 
   IntRect box = sizingBox(renderer);
 
