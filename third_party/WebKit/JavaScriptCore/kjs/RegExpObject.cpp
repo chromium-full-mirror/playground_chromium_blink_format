@@ -147,7 +147,7 @@ static JSValue* callRegExpObject(ExecState* exec,
 
 CallType RegExpObject::getCallData(CallData& callData) {
   callData.native.function = callRegExpObject;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 }  // namespace KJS

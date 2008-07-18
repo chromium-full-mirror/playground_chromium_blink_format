@@ -73,7 +73,7 @@ JSValue* JSCallbackFunction::call(ExecState* exec,
 
 CallType JSCallbackFunction::getCallData(CallData& callData) {
   callData.native.function = call;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 }  // namespace KJS

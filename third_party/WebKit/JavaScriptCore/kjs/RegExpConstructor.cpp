@@ -365,7 +365,7 @@ static JSValue* callRegExpConstructor(ExecState* exec,
 
 CallType RegExpConstructor::getCallData(CallData& callData) {
   callData.native.function = callRegExpConstructor;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 const UString& RegExpConstructor::input() const {

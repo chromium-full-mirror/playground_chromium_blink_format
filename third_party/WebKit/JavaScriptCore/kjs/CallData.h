@@ -38,7 +38,7 @@ class JSObject;
 class JSValue;
 class ScopeChainNode;
 
-enum CallType { CallTypeNone, CallTypeNative, CallTypeJS };
+enum CallType { CallTypeNone, CallTypeHost, CallTypeJS };
 
 typedef JSValue* (*NativeFunction)(ExecState*,
                                    JSObject*,

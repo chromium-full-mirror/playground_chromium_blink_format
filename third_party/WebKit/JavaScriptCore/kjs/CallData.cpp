@@ -36,7 +36,7 @@ JSValue* call(ExecState* exec,
               const CallData& callData,
               JSValue* thisValue,
               const ArgList& args) {
-  if (callType == CallTypeNative)
+  if (callType == CallTypeHost)
     return callData.native.function(
         exec, static_cast<JSObject*>(functionObject), thisValue, args);
   ASSERT(callType == CallTypeJS);

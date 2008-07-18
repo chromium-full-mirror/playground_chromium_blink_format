@@ -108,7 +108,7 @@ static JSValue* callNumberConstructor(ExecState* exec,
 
 CallType NumberConstructor::getCallData(CallData& callData) {
   callData.native.function = callNumberConstructor;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 }  // namespace KJS

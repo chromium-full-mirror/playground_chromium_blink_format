@@ -303,7 +303,7 @@ CallType JSQuarantinedObjectWrapper::getCallData(CallData& callData) {
   if (m_unwrappedObject->getCallData(unwrappedCallData) == CallTypeNone)
     return CallTypeNone;
   callData.native.function = call;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 void JSQuarantinedObjectWrapper::getPropertyNames(ExecState* exec,

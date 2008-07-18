@@ -75,7 +75,7 @@ static JSValue* callErrorConstructor(ExecState* exec,
 
 CallType ErrorConstructor::getCallData(CallData& callData) {
   callData.native.function = callErrorConstructor;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 }  // namespace KJS

@@ -82,7 +82,7 @@ CallType JSUserObject::getCallData(CallData& callData) {
     return CallTypeNone;
 
   callData.native.function = nativeCallFunction;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 JSUserObject* JSUserObject::CallFunction(JSUserObject* thisObj,

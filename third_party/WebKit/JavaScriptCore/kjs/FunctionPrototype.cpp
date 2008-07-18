@@ -72,7 +72,7 @@ static JSValue* callFunctionPrototype(ExecState*,
 // ECMA 15.3.4
 CallType FunctionPrototype::getCallData(CallData& callData) {
   callData.native.function = callFunctionPrototype;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 
 // Functions

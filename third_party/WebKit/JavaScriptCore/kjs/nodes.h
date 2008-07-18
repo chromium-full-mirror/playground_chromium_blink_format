@@ -2142,7 +2142,7 @@ class ProgramNode : public ScopeNode {
                              bool usesEval,
                              bool needsClosure) KJS_FAST_CALL;
 
-  ProgramCodeBlock& code(ScopeChainNode* scopeChain) KJS_FAST_CALL {
+  ProgramCodeBlock& byteCode(ScopeChainNode* scopeChain) KJS_FAST_CALL {
     if (!m_code)
       generateCode(scopeChain);
     return *m_code;
@@ -2178,7 +2178,7 @@ class EvalNode : public ScopeNode {
                           bool usesEval,
                           bool needsClosure) KJS_FAST_CALL;
 
-  EvalCodeBlock& code(ScopeChainNode* scopeChain) KJS_FAST_CALL {
+  EvalCodeBlock& byteCode(ScopeChainNode* scopeChain) KJS_FAST_CALL {
     if (!m_code)
       generateCode(scopeChain);
     return *m_code;
@@ -2214,14 +2214,14 @@ class FunctionBodyNode : public ScopeNode {
 
   SymbolTable& symbolTable() { return m_symbolTable; }  // FIXME: Remove this
 
-  CodeBlock& code(ScopeChainNode* scopeChain) KJS_FAST_CALL {
+  CodeBlock& byteCode(ScopeChainNode* scopeChain) KJS_FAST_CALL {
     ASSERT(scopeChain);
     if (!m_code)
       generateCode(scopeChain);
     return *m_code;
   }
 
-  CodeBlock& generatedCode() KJS_FAST_CALL {
+  CodeBlock& generatedByteCode() KJS_FAST_CALL {
     ASSERT(m_code);
     return *m_code;
   }

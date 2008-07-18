@@ -785,7 +785,7 @@ JSValue* Machine::execute(ProgramNode* programNode,
     return 0;
   }
 
-  CodeBlock* codeBlock = &programNode->code(scopeChain);
+  CodeBlock* codeBlock = &programNode->byteCode(scopeChain);
 
   size_t oldSize = m_registerFile.size();
   size_t newSize = oldSize + RegisterFile::CallFrameHeaderSize +
@@ -873,7 +873,7 @@ JSValue* Machine::execute(FunctionBodyNode* functionBodyNode,
   initializeCallFrame(callFrame, 0, 0, 0, callFrame, 0, argv, argc, 0,
                       function);
 
-  CodeBlock* newCodeBlock = &functionBodyNode->code(scopeChain);
+  CodeBlock* newCodeBlock = &functionBodyNode->byteCode(scopeChain);
   Register* r = slideRegisterWindowForCall(exec, newCodeBlock, &m_registerFile,
                                            m_registerFile.base(), callFrame,
                                            argv, argc, *exception);
@@ -914,7 +914,7 @@ JSValue* Machine::execute(EvalNode* evalNode,
     return 0;
   }
 
-  EvalCodeBlock* codeBlock = &evalNode->code(scopeChain);
+  EvalCodeBlock* codeBlock = &evalNode->byteCode(scopeChain);
 
   JSVariableObject* variableObject;
   for (ScopeChainNode* node = scopeChain;; node = node->next) {
@@ -2433,7 +2433,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
         FunctionBodyNode* functionBodyNode = callData.js.functionBody;
-        CodeBlock* newCodeBlock = &functionBodyNode->code(callDataScopeChain);
+        CodeBlock* newCodeBlock =
+            &functionBodyNode->byteCode(callDataScopeChain);
 
         r[firstArg] = thisVal == missingThisObjectMarker()
                           ? exec->globalThisValue()
@@ -2464,7 +2465,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         NEXT_OPCODE;
       }
 
-      if (callType == CallTypeNative) {
+      if (callType == CallTypeHost) {
         if (*enabledProfilerReference)
           (*enabledProfilerReference)
               ->willExecute(exec, static_cast<JSObject*>(v));
@@ -2586,7 +2587,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
         ScopeChainNode* callDataScopeChain = constructData.js.scopeChain;
         FunctionBodyNode* functionBodyNode = constructData.js.functionBody;
-        CodeBlock* newCodeBlock = &functionBodyNode->code(callDataScopeChain);
+        CodeBlock* newCodeBlock =
+            &functionBodyNode->byteCode(callDataScopeChain);
 
         r[firstArg] = newObject;  // "this" value
 
@@ -2918,7 +2920,7 @@ JSValue* Machine::retrieveArguments(ExecState* exec,
   JSActivation* activation = static_cast<JSActivation*>(
       callFrame[RegisterFile::OptionalCalleeActivation].jsValue());
   if (!activation) {
-    CodeBlock* codeBlock = &function->m_body->generatedCode();
+    CodeBlock* codeBlock = &function->m_body->generatedByteCode();
     activation = new (exec) JSActivation(
         function->m_body,
         callFrame + RegisterFile::CallFrameHeaderSize + codeBlock->numLocals);

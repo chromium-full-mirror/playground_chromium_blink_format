@@ -101,6 +101,6 @@ static JSValue* callRuntimeMethod(ExecState* exec,
 
 CallType RuntimeMethod::getCallData(CallData& callData) {
   callData.native.function = callRuntimeMethod;
-  return CallTypeNative;
+  return CallTypeHost;
 }
 }
