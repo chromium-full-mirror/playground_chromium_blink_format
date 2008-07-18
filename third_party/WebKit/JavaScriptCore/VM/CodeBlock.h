@@ -93,7 +93,7 @@ struct CodeBlock {
   Vector<Identifier> identifiers;
   Vector<RefPtr<FuncDeclNode>> functions;
   Vector<RefPtr<FuncExprNode>> functionExpressions;
-  Vector<JSValue*> jsValues;
+  Vector<Register> registers;
   Vector<RefPtr<RegExp>> regexps;
   Vector<HandlerInfo> exceptionHandlers;
   Vector<LineInfo> lineInfo;

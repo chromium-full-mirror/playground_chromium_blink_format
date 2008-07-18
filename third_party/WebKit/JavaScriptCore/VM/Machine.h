@@ -172,14 +172,14 @@ class Machine {
                                     JSValue*,
                                     const Instruction*&,
                                     CodeBlock*&,
-                                    JSValue**&,
+                                    Register*&,
                                     ScopeChainNode*&,
                                     Register*&);
   NEVER_INLINE Instruction* throwException(ExecState*,
                                            JSValue*,
                                            const Instruction*,
                                            CodeBlock*&,
-                                           JSValue**&,
+                                           Register*&,
                                            ScopeChainNode*&,
                                            Register*&);
 
