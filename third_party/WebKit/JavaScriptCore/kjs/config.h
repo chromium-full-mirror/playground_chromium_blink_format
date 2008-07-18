@@ -38,7 +38,7 @@
 
 #endif
 
-#if PLATFORM(FREEBSD)
+#if PLATFORM(FREEBSD) || PLATFORM(OPENBSD)
 #define HAVE_PTHREAD_NP_H 1
 #endif
 
