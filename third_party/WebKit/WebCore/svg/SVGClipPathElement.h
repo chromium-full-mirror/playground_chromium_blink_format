@@ -24,9 +24,9 @@
 #define SVGClipPathElement_h
 
 #if ENABLE(SVG)
-#include "SVGResourceClipper.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
+#include "SVGResourceClipper.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGTests.h"
 
@@ -56,12 +56,9 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
-                                         bool,
-                                         ExternalResourcesRequired,
-                                         externalResourcesRequired)
-
   ANIMATED_PROPERTY_DECLARATIONS(SVGClipPathElement,
+                                 SVGNames::clipPathTagString,
+                                 SVGNames::clipPathUnitsAttrString,
                                  int,
                                  ClipPathUnits,
                                  clipPathUnits)

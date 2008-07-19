@@ -26,9 +26,9 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "FEColorMatrix.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
+#include "SVGNumberList.h"
 
 namespace WebCore {
-class SVGNumberList;
 
 class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
  public:
@@ -39,16 +39,25 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   bool build(FilterBuilder*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement, String, In1, in1)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement, int, Type, type)
-  ANIMATED_PROPERTY_DECLARATIONS_REFCOUNTED(SVGFEColorMatrixElement,
-                                            SVGNumberList,
-                                            Values,
-                                            values)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
+                                 SVGNames::feColorMatrixTagString,
+                                 SVGNames::inAttrString,
+                                 String,
+                                 In1,
+                                 in1)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
+                                 SVGNames::feColorMatrixTagString,
+                                 SVGNames::typeAttrString,
+                                 int,
+                                 Type,
+                                 type)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
+                                 SVGNames::feColorMatrixTagString,
+                                 SVGNames::valuesAttrString,
+                                 SVGNumberList,
+                                 Values,
+                                 values)
 
   mutable RefPtr<FEColorMatrix> m_filterEffect;
 };
@@ -57,5 +66,3 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

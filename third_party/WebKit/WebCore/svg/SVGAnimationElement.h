@@ -109,10 +109,6 @@ class SVGAnimationElement : public SVGSMILElement,
                                SVGSMILElement* resultElement);
   virtual void endedActiveInterval();
 
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
-                                         bool,
-                                         ExternalResourcesRequired,
-                                         externalResourcesRequired)
  private:
   virtual bool calculateFromAndToValues(const String& fromString,
                                         const String& toString) = 0;

@@ -28,6 +28,7 @@
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
+
 class SVGFEMergeElement : public SVGFilterPrimitiveStandardAttributes {
  public:
   SVGFEMergeElement(const QualifiedName&, Document*);
@@ -35,9 +36,6 @@ class SVGFEMergeElement : public SVGFilterPrimitiveStandardAttributes {
 
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   bool build(FilterBuilder*);
-
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
 
  private:
   mutable RefPtr<FEMerge> m_filterEffect;

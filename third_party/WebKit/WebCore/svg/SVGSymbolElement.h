@@ -30,6 +30,7 @@
 #include "SVGStyledElement.h"
 
 namespace WebCore {
+
 class SVGSymbolElement : public SVGStyledElement,
                          public SVGLangSpace,
                          public SVGExternalResourcesRequired,
@@ -45,24 +46,9 @@ class SVGSymbolElement : public SVGStyledElement,
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
-
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
-                                         bool,
-                                         ExternalResourcesRequired,
-                                         externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
-                                         FloatRect,
-                                         ViewBox,
-                                         viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS_REFCOUNTED(SVGFitToViewBox,
-                                                    SVGPreserveAspectRatio,
-                                                    PreserveAspectRatio,
-                                                    preserveAspectRatio)
 };
 
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

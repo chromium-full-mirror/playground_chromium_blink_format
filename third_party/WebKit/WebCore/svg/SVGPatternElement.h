@@ -24,12 +24,13 @@
 #define SVGPatternElement_h
 
 #if ENABLE(SVG)
-#include "SVGPaintServerPattern.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
+#include "SVGPaintServerPattern.h"
 #include "SVGStyledElement.h"
 #include "SVGTests.h"
+#include "SVGTransformList.h"
 #include "SVGURIReference.h"
 
 namespace WebCore {
@@ -37,7 +38,6 @@ namespace WebCore {
 struct PatternAttributes;
 
 class SVGLength;
-class SVGTransformList;
 
 class SVGPatternElement : public SVGStyledElement,
                           public SVGURIReference,
@@ -62,40 +62,53 @@ class SVGPatternElement : public SVGStyledElement,
   virtual SVGResource* canvasResource();
 
  protected:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
-                                         bool,
-                                         ExternalResourcesRequired,
-                                         externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
-                                         FloatRect,
-                                         ViewBox,
-                                         viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS_REFCOUNTED(SVGFitToViewBox,
-                                                    SVGPreserveAspectRatio,
-                                                    PreserveAspectRatio,
-                                                    preserveAspectRatio)
+  virtual const SVGElement* contextElement() const { return this; }
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement, SVGLength, X, x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement, SVGLength, Y, y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement, SVGLength, Width, width)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement, SVGLength, Height, height)
+ private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGNames::patternTagString,
+                                 SVGNames::xAttrString,
+                                 SVGLength,
+                                 X,
+                                 x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGNames::patternTagString,
+                                 SVGNames::yAttrString,
+                                 SVGLength,
+                                 Y,
+                                 y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGNames::patternTagString,
+                                 SVGNames::widthAttrString,
+                                 SVGLength,
+                                 Width,
+                                 width)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGNames::patternTagString,
+                                 SVGNames::heightAttrString,
+                                 SVGLength,
+                                 Height,
+                                 height)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGNames::patternTagString,
+                                 SVGNames::patternUnitsAttrString,
                                  int,
                                  PatternUnits,
                                  patternUnits)
   ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGNames::patternTagString,
+                                 SVGNames::patternContentUnitsAttrString,
                                  int,
                                  PatternContentUnits,
                                  patternContentUnits)
-  ANIMATED_PROPERTY_DECLARATIONS_REFCOUNTED(SVGPatternElement,
-                                            SVGTransformList,
-                                            PatternTransform,
-                                            patternTransform)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGNames::patternTagString,
+                                 SVGNames::patternTransformAttrString,
+                                 SVGTransformList,
+                                 PatternTransform,
+                                 patternTransform)
 
   mutable RefPtr<SVGPaintServerPattern> m_resource;
-
-  virtual const SVGElement* contextElement() const { return this; }
 
  private:
   friend class SVGPaintServerPattern;

@@ -34,27 +34,14 @@ namespace WebCore {
 SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
                                                  Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_type(FECOLORMATRIX_TYPE_UNKNOWN),
-      m_values(SVGNumberList::create(SVGNames::valuesAttr)),
+      m_in1(this, SVGNames::inAttr),
+      m_type(this, SVGNames::typeAttr, FECOLORMATRIX_TYPE_UNKNOWN),
+      m_values(this,
+               SVGNames::valuesAttr,
+               SVGNumberList::create(SVGNames::valuesAttr)),
       m_filterEffect(0) {}
 
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {}
-
-ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
-                              String,
-                              In1,
-                              in1,
-                              SVGNames::inAttr)
-ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
-                              int,
-                              Type,
-                              type,
-                              SVGNames::typeAttr)
-ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED(SVGFEColorMatrixElement,
-                                         SVGNumberList,
-                                         Values,
-                                         values,
-                                         SVGNames::valuesAttr)
 
 void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
@@ -105,5 +92,3 @@ bool SVGFEColorMatrixElement::build(FilterBuilder* builder) {
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

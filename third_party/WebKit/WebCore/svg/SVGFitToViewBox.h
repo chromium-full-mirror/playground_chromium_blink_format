@@ -25,18 +25,19 @@
 
 #if ENABLE(SVG)
 #include "SVGElement.h"
+#include "SVGPreserveAspectRatio.h"
 
 namespace WebCore {
 
+extern char SVGFitToViewBoxIdentifier[];
+
 class AffineTransform;
-class SVGPreserveAspectRatio;
 
 class SVGFitToViewBox {
  public:
   SVGFitToViewBox();
   virtual ~SVGFitToViewBox();
 
-  // 'SVGFitToViewBox' functions
   bool parseViewBox(const UChar*& start,
                     const UChar* end,
                     float& x,
@@ -50,18 +51,21 @@ class SVGFitToViewBox {
   bool parseMappedAttribute(MappedAttribute*);
   bool isKnownAttribute(const QualifiedName&);
 
- protected:
   virtual const SVGElement* contextElement() const = 0;
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS_WITH_CONTEXT(SVGFitToViewBox,
-                                              FloatRect,
-                                              ViewBox,
-                                              viewBox)
-  ANIMATED_PROPERTY_DECLARATIONS_REFCOUNTED_WITH_CONTEXT(SVGFitToViewBox,
-                                                         SVGPreserveAspectRatio,
-                                                         PreserveAspectRatio,
-                                                         preserveAspectRatio)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+                                 SVGFitToViewBoxIdentifier,
+                                 SVGNames::viewBoxAttrString,
+                                 FloatRect,
+                                 ViewBox,
+                                 viewBox)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+                                 SVGFitToViewBoxIdentifier,
+                                 SVGNames::preserveAspectRatioAttrString,
+                                 SVGPreserveAspectRatio,
+                                 PreserveAspectRatio,
+                                 preserveAspectRatio)
 };
 
 }  // namespace WebCore

@@ -28,6 +28,7 @@
 #include "SVGFETile.h"
 
 namespace WebCore {
+
 class SVGFETileElement : public SVGFilterPrimitiveStandardAttributes {
  public:
   SVGFETileElement(const QualifiedName&, Document*);
@@ -37,11 +38,13 @@ class SVGFETileElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   bool build(FilterBuilder*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFETileElement, String, In1, in1)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFETileElement,
+                                 SVGNames::feTileTagString,
+                                 SVGNames::inAttrString,
+                                 String,
+                                 In1,
+                                 in1)
 
   mutable RefPtr<FETile> m_filterEffect;
 };

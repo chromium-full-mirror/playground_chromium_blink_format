@@ -39,15 +39,11 @@ SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_clipPathUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {}
+      m_clipPathUnits(this,
+                      SVGNames::clipPathUnitsAttr,
+                      SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {}
 
 SVGClipPathElement::~SVGClipPathElement() {}
-
-ANIMATED_PROPERTY_DEFINITIONS(SVGClipPathElement,
-                              int,
-                              ClipPathUnits,
-                              clipPathUnits,
-                              SVGNames::clipPathUnitsAttr)
 
 void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::clipPathUnitsAttr) {

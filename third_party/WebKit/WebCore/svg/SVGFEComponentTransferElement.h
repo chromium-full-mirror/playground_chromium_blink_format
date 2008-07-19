@@ -39,11 +39,10 @@ class SVGFEComponentTransferElement
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   bool build(FilterBuilder*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEComponentTransferElement,
+                                 SVGNames::feComponentTransferTagString,
+                                 SVGNames::inAttrString,
                                  String,
                                  In1,
                                  in1)

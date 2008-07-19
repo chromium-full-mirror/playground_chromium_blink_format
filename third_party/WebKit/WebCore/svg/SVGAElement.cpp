@@ -52,19 +52,14 @@ SVGAElement::SVGAElement(const QualifiedName& tagName, Document* doc)
       SVGURIReference(),
       SVGTests(),
       SVGLangSpace(),
-      SVGExternalResourcesRequired() {}
+      SVGExternalResourcesRequired(),
+      m_target(this, SVGNames::targetAttr) {}
 
 SVGAElement::~SVGAElement() {}
 
 String SVGAElement::title() const {
   return getAttribute(XLinkNames::titleAttr);
 }
-
-ANIMATED_PROPERTY_DEFINITIONS(SVGAElement,
-                              String,
-                              Target,
-                              target,
-                              SVGNames::targetAttr)
 
 void SVGAElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::targetAttr)

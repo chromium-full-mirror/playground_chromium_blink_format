@@ -48,15 +48,9 @@ SVGPathElement::SVGPathElement(const QualifiedName& tagName, Document* doc)
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_pathLength(0.0f) {}
+      m_pathLength(this, SVGNames::pathLengthAttr, 0.0f) {}
 
 SVGPathElement::~SVGPathElement() {}
-
-ANIMATED_PROPERTY_DEFINITIONS(SVGPathElement,
-                              float,
-                              PathLength,
-                              pathLength,
-                              SVGNames::pathLengthAttr)
 
 float SVGPathElement::getTotalLength() {
   // FIXME: this may wish to use the pathSegList instead of the pathdata if
@@ -215,8 +209,8 @@ void SVGPathElement::parseMappedAttribute(MappedAttribute* attr) {
       document()->accessSVGExtensions()->reportError("Problem parsing d=\"" +
                                                      attr->value() + "\"");
   } else if (attr->name() == SVGNames::pathLengthAttr) {
-    m_pathLength = attr->value().toFloat();
-    if (m_pathLength < 0.0f)
+    setPathLengthBaseValue(attr->value().toFloat());
+    if (pathLengthBaseValue() < 0.0f)
       document()->accessSVGExtensions()->reportError(
           "A negative value for path attribute <pathLength> is not allowed");
   } else {

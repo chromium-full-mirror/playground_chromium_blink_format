@@ -51,14 +51,24 @@ class SVGCircleElement : public SVGStyledTransformableElement,
   virtual bool hasRelativeValues() const;
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
-                                         bool,
-                                         ExternalResourcesRequired,
-                                         externalResourcesRequired)
-
-  ANIMATED_PROPERTY_DECLARATIONS(SVGCircleElement, SVGLength, Cx, cx)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGCircleElement, SVGLength, Cy, cy)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGCircleElement, SVGLength, R, r)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGCircleElement,
+                                 SVGNames::circleTagString,
+                                 SVGNames::cxAttrString,
+                                 SVGLength,
+                                 Cx,
+                                 cx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGCircleElement,
+                                 SVGNames::circleTagString,
+                                 SVGNames::cyAttrString,
+                                 SVGLength,
+                                 Cy,
+                                 cy)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGCircleElement,
+                                 SVGNames::circleTagString,
+                                 SVGNames::rAttrString,
+                                 SVGLength,
+                                 R,
+                                 r)
 };
 
 }  // namespace WebCore

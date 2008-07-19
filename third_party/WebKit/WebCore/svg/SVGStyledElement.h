@@ -25,14 +25,14 @@
 #define SVGStyledElement_h
 
 #if ENABLE(SVG)
-#include "AffineTransform.h"
-#include "Path.h"
+#include "HTMLNames.h"
 #include "SVGElement.h"
-#include "SVGLength.h"
-#include "SVGResource.h"
 #include "SVGStylable.h"
 
 namespace WebCore {
+
+extern char SVGStyledElementIdentifier[];
+class SVGResource;
 
 class SVGStyledElement : public SVGElement, public SVGStylable {
  public:
@@ -75,8 +75,12 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
 
  private:
-  ANIMATED_PROPERTY_START_DECLARATIONS
-  ANIMATED_PROPERTY_DECLARATIONS(SVGStyledElement, String, ClassName, className)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGStyledElement,
+                                 SVGStyledElementIdentifier,
+                                 HTMLNames::classAttrString,
+                                 String,
+                                 ClassName,
+                                 className)
 
   void updateElementInstance(SVGDocumentExtensions*) const;
 };

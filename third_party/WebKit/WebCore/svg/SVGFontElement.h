@@ -38,7 +38,6 @@ class SVGFontElement : public SVGStyledElement,
   virtual ~SVGFontElement();
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
-  virtual const SVGElement* contextElement() const { return this; }
 
   void invalidateGlyphCache();
 
@@ -54,6 +53,9 @@ class SVGFontElement : public SVGStyledElement,
 
   SVGMissingGlyphElement* firstMissingGlyphElement() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
   void ensureGlyphCache() const;
 
@@ -68,5 +70,3 @@ class SVGFontElement : public SVGStyledElement,
 
 #endif  // ENABLE(SVG_FONTS)
 #endif
-
-// vim:ts=4:noet

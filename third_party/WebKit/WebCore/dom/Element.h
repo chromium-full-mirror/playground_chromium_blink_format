@@ -234,7 +234,7 @@ class Element : public ContainerNode {
   virtual void updateStyleAttribute() const {}
 
 #if ENABLE(SVG)
-  virtual void updateAnimatedSVGAttribute(StringImpl* name) const {}
+  virtual void updateAnimatedSVGAttribute(const String&) const {}
 #endif
 
   void updateFocusAppearanceSoonAfterAttach();

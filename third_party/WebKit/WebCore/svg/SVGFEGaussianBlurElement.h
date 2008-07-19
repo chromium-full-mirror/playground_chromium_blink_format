@@ -29,6 +29,9 @@
 
 namespace WebCore {
 
+extern char SVGStdDeviationXAttrIdentifier[];
+extern char SVGStdDeviationYAttrIdentifier[];
+
 class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
  public:
   SVGFEGaussianBlurElement(const QualifiedName&, Document*);
@@ -40,16 +43,22 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   bool build(FilterBuilder*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEGaussianBlurElement, String, In1, in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEGaussianBlurElement,
+                                 SVGNames::feGaussianBlurTagString,
+                                 SVGNames::inAttrString,
+                                 String,
+                                 In1,
+                                 in1)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEGaussianBlurElement,
+                                 SVGNames::feGaussianBlurTagString,
+                                 SVGStdDeviationXAttrIdentifier,
                                  float,
                                  StdDeviationX,
                                  stdDeviationX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEGaussianBlurElement,
+                                 SVGNames::feGaussianBlurTagString,
+                                 SVGStdDeviationYAttrIdentifier,
                                  float,
                                  StdDeviationY,
                                  stdDeviationY)
@@ -61,5 +70,3 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

@@ -36,6 +36,9 @@ namespace WebCore {
 class Document;
 class SVGAngle;
 
+extern char SVGOrientTypeAttrIdentifier[];
+extern char SVGOrientAngleAttrIdentifier[];
+
 class SVGMarkerElement : public SVGStyledElement,
                          public SVGLangSpace,
                          public SVGExternalResourcesRequired,
@@ -73,38 +76,48 @@ class SVGMarkerElement : public SVGStyledElement,
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
-                                         bool,
-                                         ExternalResourcesRequired,
-                                         externalResourcesRequired)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGFitToViewBox,
-                                         FloatRect,
-                                         ViewBox,
-                                         viewBox)
-  ANIMATED_PROPERTY_FORWARD_DECLARATIONS_REFCOUNTED(SVGFitToViewBox,
-                                                    SVGPreserveAspectRatio,
-                                                    PreserveAspectRatio,
-                                                    preserveAspectRatio)
-
-  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement, SVGLength, RefX, refX)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement, SVGLength, RefY, refY)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
+                                 SVGNames::markerTagString,
+                                 SVGNames::refXAttrString,
+                                 SVGLength,
+                                 RefX,
+                                 refX)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
+                                 SVGNames::markerTagString,
+                                 SVGNames::refYAttrString,
+                                 SVGLength,
+                                 RefY,
+                                 refY)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
+                                 SVGNames::markerTagString,
+                                 SVGNames::markerWidthAttrString,
                                  SVGLength,
                                  MarkerWidth,
                                  markerWidth)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
+                                 SVGNames::markerTagString,
+                                 SVGNames::markerHeightAttrString,
                                  SVGLength,
                                  MarkerHeight,
                                  markerHeight)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
+                                 SVGNames::markerTagString,
+                                 SVGNames::markerUnitsAttrString,
                                  int,
                                  MarkerUnits,
                                  markerUnits)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement, int, OrientType, orientType)
-  ANIMATED_PROPERTY_DECLARATIONS_REFCOUNTED(SVGMarkerElement,
-                                            SVGAngle,
-                                            OrientAngle,
-                                            orientAngle)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
+                                 SVGNames::markerTagString,
+                                 SVGOrientTypeAttrIdentifier,
+                                 int,
+                                 OrientType,
+                                 orientType)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
+                                 SVGNames::markerTagString,
+                                 SVGOrientAngleAttrIdentifier,
+                                 SVGAngle,
+                                 OrientAngle,
+                                 orientAngle)
 
   RefPtr<SVGResourceMarker> m_marker;
 };
@@ -112,5 +125,4 @@ class SVGMarkerElement : public SVGStyledElement,
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)
-
 #endif

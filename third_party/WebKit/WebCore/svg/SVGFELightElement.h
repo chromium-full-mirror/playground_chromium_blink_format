@@ -27,7 +27,8 @@
 #include "SVGLightSource.h"
 
 namespace WebCore {
-class SVGNumberList;
+
+extern char SVGFELightElementIdentifier[];
 
 class SVGFELightElement : public SVGElement {
  public:
@@ -37,21 +38,67 @@ class SVGFELightElement : public SVGElement {
   virtual LightSource* lightSource() const = 0;
   virtual void parseMappedAttribute(MappedAttribute*);
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  ANIMATED_PROPERTY_START_DECLARATIONS
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, Azimuth, azimuth)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, Elevation, elevation)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, X, x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, Y, y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, Z, z)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, PointsAtX, pointsAtX)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, PointsAtY, pointsAtY)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement, float, PointsAtZ, pointsAtZ)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::azimuthAttrString,
+                                 float,
+                                 Azimuth,
+                                 azimuth)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::elevationAttrString,
+                                 float,
+                                 Elevation,
+                                 elevation)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::xAttrString,
+                                 float,
+                                 X,
+                                 x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::yAttrString,
+                                 float,
+                                 Y,
+                                 y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::zAttrString,
+                                 float,
+                                 Z,
+                                 z)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::pointsAtXAttrString,
+                                 float,
+                                 PointsAtX,
+                                 pointsAtX)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::pointsAtYAttrString,
+                                 float,
+                                 PointsAtY,
+                                 pointsAtY)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::pointsAtZAttrString,
+                                 float,
+                                 PointsAtZ,
+                                 pointsAtZ)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::specularExponentAttrString,
                                  float,
                                  SpecularExponent,
                                  specularExponent)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFELightElement,
+                                 SVGFELightElementIdentifier,
+                                 SVGNames::limitingConeAngleAttrString,
                                  float,
                                  LimitingConeAngle,
                                  limitingConeAngle)

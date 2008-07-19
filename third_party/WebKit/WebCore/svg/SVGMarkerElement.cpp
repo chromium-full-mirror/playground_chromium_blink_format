@@ -35,62 +35,28 @@
 
 namespace WebCore {
 
+char SVGOrientTypeAttrIdentifier[] = "SVGOrientTypeAttr";
+char SVGOrientAngleAttrIdentifier[] = "SVGOrientAngleAttr";
+
 SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       SVGFitToViewBox(),
-      m_refX(LengthModeWidth),
-      m_refY(LengthModeHeight),
-      m_markerWidth(LengthModeWidth, "3"),
-      m_markerHeight(LengthModeHeight, "3"),
-      m_markerUnits(SVG_MARKERUNITS_STROKEWIDTH),
-      m_orientType(0),
-      m_orientAngle(SVGAngle::create()) {
+      m_refX(this, SVGNames::refXAttr, LengthModeWidth),
+      m_refY(this, SVGNames::refYAttr, LengthModeHeight),
+      m_markerWidth(this, SVGNames::markerWidthAttr, LengthModeWidth, "3"),
+      m_markerHeight(this, SVGNames::markerHeightAttr, LengthModeHeight, "3"),
+      m_markerUnits(this,
+                    SVGNames::markerUnitsAttr,
+                    SVG_MARKERUNITS_STROKEWIDTH),
+      m_orientType(this, SVGNames::orientAttr),
+      m_orientAngle(this, SVGNames::orientAttr, SVGAngle::create()) {
   // Spec: If the markerWidth/markerHeight attribute is not specified, the
   // effect is as if a value of "3" were specified.
 }
 
 SVGMarkerElement::~SVGMarkerElement() {}
-
-ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
-                              SVGLength,
-                              RefX,
-                              refX,
-                              SVGNames::refXAttr)
-ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
-                              SVGLength,
-                              RefY,
-                              refY,
-                              SVGNames::refYAttr)
-ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
-                              int,
-                              MarkerUnits,
-                              markerUnits,
-                              SVGNames::markerUnitsAttr)
-ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
-                              SVGLength,
-                              MarkerWidth,
-                              markerWidth,
-                              SVGNames::markerWidthAttr)
-ANIMATED_PROPERTY_DEFINITIONS(SVGMarkerElement,
-                              SVGLength,
-                              MarkerHeight,
-                              markerHeight,
-                              SVGNames::markerHeightAttr)
-ANIMATED_PROPERTY_DEFINITIONS_WITH_CUSTOM_IDENTIFIER(SVGMarkerElement,
-                                                     int,
-                                                     OrientType,
-                                                     orientType,
-                                                     SVGNames::orientAttr,
-                                                     "orientType")
-ANIMATED_PROPERTY_DEFINITIONS_REFCOUNTED_WITH_CUSTOM_IDENTIFIER(
-    SVGMarkerElement,
-    SVGAngle,
-    OrientAngle,
-    orientAngle,
-    SVGNames::orientAttr,
-    "orientAngle")
 
 void SVGMarkerElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::markerUnitsAttr) {
@@ -176,7 +142,7 @@ SVGResource* SVGMarkerElement::canvasResource() {
 
   // Spec: If the attribute is not specified, the effect is as if a
   // value of "0" were specified.
-  if (!m_orientType)
+  if (!orientType())
     setOrientToAngle(SVGSVGElement::createSVGAngle());
 
   if (orientType() == SVG_MARKER_ORIENT_ANGLE)

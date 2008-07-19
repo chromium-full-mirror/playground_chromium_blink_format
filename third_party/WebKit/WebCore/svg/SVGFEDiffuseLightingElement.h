@@ -27,6 +27,10 @@
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
+
+extern char SVGKernelUnitLengthXIdentifier[];
+extern char SVGKernelUnitLengthYIdentifier[];
+
 class FEDiffuseLighting;
 class SVGColor;
 
@@ -40,24 +44,34 @@ class SVGFEDiffuseLightingElement
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   bool build(FilterBuilder*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement, String, In1, in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
+                                 SVGNames::feDiffuseLightingTagString,
+                                 SVGNames::inAttrString,
+                                 String,
+                                 In1,
+                                 in1)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
+                                 SVGNames::feDiffuseLightingTagString,
+                                 SVGNames::diffuseConstantAttrString,
                                  float,
                                  DiffuseConstant,
                                  diffuseConstant)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
+                                 SVGNames::feDiffuseLightingTagString,
+                                 SVGNames::surfaceScaleAttrString,
                                  float,
                                  SurfaceScale,
                                  surfaceScale)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
+                                 SVGNames::feDiffuseLightingTagString,
+                                 SVGKernelUnitLengthXIdentifier,
                                  float,
                                  KernelUnitLengthX,
                                  kernelUnitLengthX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
+                                 SVGNames::feDiffuseLightingTagString,
+                                 SVGKernelUnitLengthYIdentifier,
                                  float,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)

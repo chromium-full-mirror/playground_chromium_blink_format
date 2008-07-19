@@ -38,13 +38,25 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
   virtual SVGFilterEffect* filterEffect(SVGResourceFilter*) const;
   bool build(FilterBuilder*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, String, In1, in1)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, float, Dx, dx)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, float, Dy, dy)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement,
+                                 SVGNames::feOffsetTagString,
+                                 SVGNames::inAttrString,
+                                 String,
+                                 In1,
+                                 in1)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement,
+                                 SVGNames::feOffsetTagString,
+                                 SVGNames::dxAttrString,
+                                 float,
+                                 Dx,
+                                 dx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement,
+                                 SVGNames::feOffsetTagString,
+                                 SVGNames::dyAttrString,
+                                 float,
+                                 Dy,
+                                 dy)
 
   mutable RefPtr<FEOffset> m_filterEffect;
 };
@@ -53,5 +65,3 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet
