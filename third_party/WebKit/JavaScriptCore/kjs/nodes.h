@@ -316,7 +316,10 @@ class StringNode : public ExpressionNode {
 
 class ThrowableExpressionData {
  public:
-  ThrowableExpressionData() : m_divot(-1), m_startOffset(-1), m_endOffset(-1) {}
+  ThrowableExpressionData()
+      : m_divot(static_cast<uint32_t>(-1)),
+        m_startOffset(static_cast<uint16_t>(-1)),
+        m_endOffset(static_cast<uint16_t>(-1)) {}
 
   ThrowableExpressionData(unsigned divot,
                           unsigned startOffset,
