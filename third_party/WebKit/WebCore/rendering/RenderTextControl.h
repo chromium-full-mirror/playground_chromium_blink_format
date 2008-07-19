@@ -84,7 +84,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   void forwardEvent(Event*);
   void selectionChanged(bool userTriggered);
 
-  virtual bool shouldAutoscroll() const { return true; }
+  virtual bool canBeProgramaticallyScrolled() const { return true; }
   virtual void autoscroll();
 
   // Subclassed to forward to our inner div.
