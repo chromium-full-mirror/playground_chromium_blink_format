@@ -33,12 +33,22 @@
 
 namespace KJS {
 
+class JSNotAnObjectErrorStub : public JSObject {
+ public:
+  JSNotAnObjectErrorStub(bool isNull) : m_isNull(isNull) {}
+  bool isNull() const { return m_isNull; }
+  bool isNotAnObjectErrorStub() const { return true; }
+
+ private:
+  bool m_isNull;
+};
+
 // This unholy class is used to allow us to avoid multiple exception checks
 // in certain SquirrelFish opcodes -- effectively it just silently consumes
 // any operations performed on the result of a failed toObject call.
 class JSNotAnObject : public JSObject {
  public:
-  JSNotAnObject(JSObject* exception) : m_exception(exception) {}
+  JSNotAnObject(JSNotAnObjectErrorStub* exception) : m_exception(exception) {}
 
  private:
   // JSValue methods
@@ -69,7 +79,7 @@ class JSNotAnObject : public JSObject {
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
-  JSObject* m_exception;
+  JSNotAnObjectErrorStub* m_exception;
 };
 
 }  // namespace KJS

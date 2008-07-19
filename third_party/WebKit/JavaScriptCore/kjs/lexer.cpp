@@ -73,6 +73,10 @@ Lexer::Lexer(JSGlobalData* globalData)
       m_next1(0),
       m_next2(0),
       m_next3(0),
+      m_currentOffset(0),
+      m_nextOffset1(0),
+      m_nextOffset2(0),
+      m_nextOffset3(0),
       m_globalData(globalData),
       m_mainTable(KJS::mainTable) {
   m_buffer8.reserveCapacity(initialReadBufferCapacity);
@@ -115,12 +119,17 @@ void Lexer::shift(unsigned p) {
     m_current = m_next1;
     m_next1 = m_next2;
     m_next2 = m_next3;
+    m_currentOffset = m_nextOffset1;
+    m_nextOffset1 = m_nextOffset2;
+    m_nextOffset2 = m_nextOffset3;
     do {
       if (m_position >= m_length) {
+        m_nextOffset3 = m_position;
         m_position++;
         m_next3 = -1;
         break;
       }
+      m_nextOffset3 = m_position;
       m_next3 = m_code[m_position++];
     } while (m_next3 == 0xFEFF);
   }
@@ -157,7 +166,7 @@ int Lexer::lex(void* p1, void* p2) {
     token = m_stackToken;
     m_stackToken = 0;
   }
-
+  int startOffset = m_currentOffset;
   while (!m_done) {
     if (m_skipLF && m_current != '\n')  // found \r but not \n afterwards
       m_skipLF = false;
@@ -170,6 +179,7 @@ int Lexer::lex(void* p1, void* p2) {
     }
     switch (m_state) {
       case Start:
+        startOffset = m_currentOffset;
         if (isWhiteSpace()) {
           // do nothing
         } else if (m_current == '/' && m_next1 == '/') {
@@ -524,7 +534,8 @@ int Lexer::lex(void* p1, void* p2) {
   m_delimited = false;
   llocp->first_line = yylineno;
   llocp->last_line = yylineno;
-
+  llocp->first_column = startOffset;
+  llocp->last_column = m_currentOffset;
   switch (m_state) {
     case Eof:
       token = 0;

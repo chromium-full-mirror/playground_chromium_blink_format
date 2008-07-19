@@ -360,6 +360,8 @@ class JSObject : public JSCell {
 
   virtual bool isWatchdogException() const { return false; }
 
+  virtual bool isNotAnObjectErrorStub() const { return false; }
+
  protected:
   PropertyMap m_propertyMap;
   bool getOwnPropertySlotForWrite(ExecState*,

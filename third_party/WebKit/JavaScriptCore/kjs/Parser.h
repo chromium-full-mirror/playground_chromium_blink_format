@@ -97,7 +97,9 @@ PassRefPtr<ParsedNode> Parser::parse(ExecState* exec,
                                      int* errLine,
                                      UString* errMsg) {
   m_sourceURL = sourceURL;
-  parse(exec, sourceURL, startingLineNumber, source, sourceId, errLine, errMsg);
+  RefPtr<SourceProvider> sourceProvider = source;
+  parse(exec, sourceURL, startingLineNumber, sourceProvider.get(), sourceId,
+        errLine, errMsg);
   if (!m_sourceElements) {
     m_sourceURL = UString();
     return 0;
@@ -106,7 +108,7 @@ PassRefPtr<ParsedNode> Parser::parse(ExecState* exec,
       ParsedNode::create(&exec->globalData(), m_sourceElements.release().get(),
                          m_varDeclarations ? &m_varDeclarations->data : 0,
                          m_funcDeclarations ? &m_funcDeclarations->data : 0,
-                         m_usesEval, m_needsClosure);
+                         sourceProvider.get(), m_usesEval, m_needsClosure);
   m_varDeclarations = 0;
   m_funcDeclarations = 0;
   m_sourceURL = UString();

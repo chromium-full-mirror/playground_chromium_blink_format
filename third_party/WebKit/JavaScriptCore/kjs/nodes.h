@@ -169,7 +169,7 @@ class Node : public ParserRefCounted {
   }  // FIXME: Make this pure virtual.
 
   UString toString() const KJS_FAST_CALL;
-  int lineNo() const KJS_FAST_CALL { return m_line; }
+  int lineNo() const { return m_line; }
 
   virtual bool isReturnNode() const KJS_FAST_CALL { return false; }
 
@@ -180,12 +180,6 @@ class Node : public ParserRefCounted {
 
  protected:
   Node(JSGlobalData*, JSType) KJS_FAST_CALL;  // used by ExpressionNode
-
-  RegisterID* emitThrowError(CodeGenerator&, ErrorType, const char* msg);
-  RegisterID* emitThrowError(CodeGenerator&,
-                             ErrorType,
-                             const char* msg,
-                             const Identifier&);
 
   int m_line : 28;
   unsigned m_expectedReturnType : 3;  // JSType
@@ -320,7 +314,99 @@ class StringNode : public ExpressionNode {
   UString m_value;
 };
 
-class RegExpNode : public ExpressionNode {
+class ThrowableExpressionData {
+ public:
+  ThrowableExpressionData() : m_divot(-1), m_startOffset(-1), m_endOffset(-1) {}
+
+  ThrowableExpressionData(unsigned divot,
+                          unsigned startOffset,
+                          unsigned endOffset)
+      : m_divot(divot), m_startOffset(startOffset), m_endOffset(endOffset) {}
+
+  void setExceptionSourceRange(unsigned divot,
+                               unsigned startOffset,
+                               unsigned endOffset) {
+    m_divot = divot;
+    m_startOffset = startOffset;
+    m_endOffset = endOffset;
+  }
+
+  uint32_t divot() const { return m_divot; }
+  uint16_t startOffset() const { return m_startOffset; }
+  uint16_t endOffset() const { return m_endOffset; }
+
+ protected:
+  RegisterID* emitThrowError(CodeGenerator&, ErrorType, const char* msg);
+  RegisterID* emitThrowError(CodeGenerator&,
+                             ErrorType,
+                             const char* msg,
+                             const Identifier&);
+  uint32_t m_divot;
+  uint16_t m_startOffset;
+  uint16_t m_endOffset;
+};
+
+class ThrowableSubExpressionData : public ThrowableExpressionData {
+ public:
+  ThrowableSubExpressionData()
+      : ThrowableExpressionData(),
+        m_subexpressionDivotOffset(0),
+        m_subexpressionEndOffset(0) {}
+
+  ThrowableSubExpressionData(unsigned divot,
+                             unsigned startOffset,
+                             unsigned endOffset)
+      : ThrowableExpressionData(divot, startOffset, endOffset),
+        m_subexpressionDivotOffset(0),
+        m_subexpressionEndOffset(0) {}
+
+  void setSubexpressionInfo(uint32_t subexpressionDivot,
+                            uint16_t subexpressionOffset) {
+    ASSERT(subexpressionDivot <= m_divot);
+    if ((m_divot - subexpressionDivot) & ~0xFFFF)  // Overflow means we can't do
+                                                   // this safely, so just point
+                                                   // at the primary divot
+      return;
+    m_subexpressionDivotOffset = m_divot - subexpressionDivot;
+    m_subexpressionEndOffset = subexpressionOffset;
+  }
+
+ protected:
+  uint16_t m_subexpressionDivotOffset;
+  uint16_t m_subexpressionEndOffset;
+};
+
+class ThrowablePrefixedSubExpressionData : public ThrowableExpressionData {
+ public:
+  ThrowablePrefixedSubExpressionData()
+      : ThrowableExpressionData(),
+        m_subexpressionDivotOffset(0),
+        m_subexpressionStartOffset(0) {}
+
+  ThrowablePrefixedSubExpressionData(unsigned divot,
+                                     unsigned startOffset,
+                                     unsigned endOffset)
+      : ThrowableExpressionData(divot, startOffset, endOffset),
+        m_subexpressionDivotOffset(0),
+        m_subexpressionStartOffset(0) {}
+
+  void setSubexpressionInfo(uint32_t subexpressionDivot,
+                            uint16_t subexpressionOffset) {
+    ASSERT(subexpressionDivot >= m_divot);
+    if ((subexpressionDivot - m_divot) & ~0xFFFF)  // Overflow means we can't do
+                                                   // this safely, so just point
+                                                   // at the primary divot
+      return;
+    m_subexpressionDivotOffset = subexpressionDivot - m_divot;
+    m_subexpressionStartOffset = subexpressionOffset;
+  }
+
+ protected:
+  uint16_t m_subexpressionDivotOffset;
+  uint16_t m_subexpressionStartOffset;
+};
+
+class RegExpNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   RegExpNode(JSGlobalData* globalData,
              const UString& pattern,
@@ -350,9 +436,11 @@ class ThisNode : public ExpressionNode {
 
 class ResolveNode : public ExpressionNode {
  public:
-  ResolveNode(JSGlobalData* globalData, const Identifier& ident) KJS_FAST_CALL
-      : ExpressionNode(globalData),
-        m_ident(ident) {}
+  ResolveNode(JSGlobalData* globalData,
+              const Identifier& ident,
+              int startOffset) KJS_FAST_CALL : ExpressionNode(globalData),
+                                               m_ident(ident),
+                                               m_startOffset(startOffset) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
@@ -366,8 +454,7 @@ class ResolveNode : public ExpressionNode {
 
  protected:
   Identifier m_ident;
-  int m_index;          // Used by LocalVarAccessNode and ScopedVarAccessNode.
-  size_t m_scopeDepth;  // Used by ScopedVarAccessNode
+  int32_t m_startOffset;
 };
 
 class ElementNode : public Node {
@@ -514,7 +601,8 @@ class ObjectLiteralNode : public ExpressionNode {
   RefPtr<PropertyListNode> m_list;
 };
 
-class BracketAccessorNode : public ExpressionNode {
+class BracketAccessorNode : public ExpressionNode,
+                            public ThrowableExpressionData {
  public:
   BracketAccessorNode(JSGlobalData* globalData,
                       ExpressionNode* base,
@@ -541,7 +629,7 @@ class BracketAccessorNode : public ExpressionNode {
   bool m_subscriptHasAssignments;
 };
 
-class DotAccessorNode : public ExpressionNode {
+class DotAccessorNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   DotAccessorNode(JSGlobalData* globalData,
                   ExpressionNode* base,
@@ -610,7 +698,7 @@ class ArgumentsNode : public Node {
   RefPtr<ArgumentListNode> m_listNode;
 };
 
-class NewExprNode : public ExpressionNode {
+class NewExprNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   NewExprNode(JSGlobalData* globalData, ExpressionNode* expr) KJS_FAST_CALL
       : ExpressionNode(globalData),
@@ -632,11 +720,16 @@ class NewExprNode : public ExpressionNode {
   RefPtr<ArgumentsNode> m_args;
 };
 
-class EvalFunctionCallNode : public ExpressionNode {
+class EvalFunctionCallNode : public ExpressionNode,
+                             public ThrowableExpressionData {
  public:
   EvalFunctionCallNode(JSGlobalData* globalData,
-                       ArgumentsNode* args) KJS_FAST_CALL
+                       ArgumentsNode* args,
+                       unsigned divot,
+                       unsigned startOffset,
+                       unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_args(args) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
@@ -647,12 +740,17 @@ class EvalFunctionCallNode : public ExpressionNode {
   RefPtr<ArgumentsNode> m_args;
 };
 
-class FunctionCallValueNode : public ExpressionNode {
+class FunctionCallValueNode : public ExpressionNode,
+                              public ThrowableExpressionData {
  public:
   FunctionCallValueNode(JSGlobalData* globalData,
                         ExpressionNode* expr,
-                        ArgumentsNode* args) KJS_FAST_CALL
+                        ArgumentsNode* args,
+                        unsigned divot,
+                        unsigned startOffset,
+                        unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_expr(expr),
         m_args(args) {}
 
@@ -665,12 +763,17 @@ class FunctionCallValueNode : public ExpressionNode {
   RefPtr<ArgumentsNode> m_args;
 };
 
-class FunctionCallResolveNode : public ExpressionNode {
+class FunctionCallResolveNode : public ExpressionNode,
+                                public ThrowableExpressionData {
  public:
   FunctionCallResolveNode(JSGlobalData* globalData,
                           const Identifier& ident,
-                          ArgumentsNode* args) KJS_FAST_CALL
+                          ArgumentsNode* args,
+                          unsigned divot,
+                          unsigned startOffset,
+                          unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_ident(ident),
         m_args(args) {}
 
@@ -687,13 +790,18 @@ class FunctionCallResolveNode : public ExpressionNode {
                         // NonLocalVarFunctionCallNode
 };
 
-class FunctionCallBracketNode : public ExpressionNode {
+class FunctionCallBracketNode : public ExpressionNode,
+                                public ThrowableSubExpressionData {
  public:
   FunctionCallBracketNode(JSGlobalData* globalData,
                           ExpressionNode* base,
                           ExpressionNode* subscript,
-                          ArgumentsNode* args) KJS_FAST_CALL
+                          ArgumentsNode* args,
+                          unsigned divot,
+                          unsigned startOffset,
+                          unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableSubExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_subscript(subscript),
         m_args(args) {}
@@ -708,13 +816,18 @@ class FunctionCallBracketNode : public ExpressionNode {
   RefPtr<ArgumentsNode> m_args;
 };
 
-class FunctionCallDotNode : public ExpressionNode {
+class FunctionCallDotNode : public ExpressionNode,
+                            public ThrowableSubExpressionData {
  public:
   FunctionCallDotNode(JSGlobalData* globalData,
                       ExpressionNode* base,
                       const Identifier& ident,
-                      ArgumentsNode* args) KJS_FAST_CALL
+                      ArgumentsNode* args,
+                      unsigned divot,
+                      unsigned startOffset,
+                      unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableSubExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_ident(ident),
         m_args(args) {}
@@ -729,24 +842,31 @@ class FunctionCallDotNode : public ExpressionNode {
   RefPtr<ArgumentsNode> m_args;
 };
 
-class PrePostResolveNode : public ExpressionNode {
+class PrePostResolveNode : public ExpressionNode,
+                           public ThrowableExpressionData {
  public:
   PrePostResolveNode(JSGlobalData* globalData,
-                     const Identifier& ident) KJS_FAST_CALL
+                     const Identifier& ident,
+                     unsigned divot,
+                     unsigned startOffset,
+                     unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData, NumberType),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_ident(ident) {}
 
  protected:
   Identifier m_ident;
-  size_t m_index;  // Used by LocalVarPostfixNode.
 };
 
 class PostfixResolveNode : public PrePostResolveNode {
  public:
   PostfixResolveNode(JSGlobalData* globalData,
                      const Identifier& ident,
-                     Operator oper) KJS_FAST_CALL
-      : PrePostResolveNode(globalData, ident),
+                     Operator oper,
+                     unsigned divot,
+                     unsigned startOffset,
+                     unsigned endOffset) KJS_FAST_CALL
+      : PrePostResolveNode(globalData, ident, divot, startOffset, endOffset),
         m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
@@ -757,15 +877,21 @@ class PostfixResolveNode : public PrePostResolveNode {
   Operator m_operator;
 };
 
-class PostfixBracketNode : public ExpressionNode {
+class PostfixBracketNode : public ExpressionNode,
+                           public ThrowableSubExpressionData {
  public:
   PostfixBracketNode(JSGlobalData* globalData,
                      ExpressionNode* base,
                      ExpressionNode* subscript,
-                     Operator oper) KJS_FAST_CALL : ExpressionNode(globalData),
-                                                    m_base(base),
-                                                    m_subscript(subscript),
-                                                    m_operator(oper) {}
+                     Operator oper,
+                     unsigned divot,
+                     unsigned startOffset,
+                     unsigned endOffset) KJS_FAST_CALL
+      : ExpressionNode(globalData),
+        ThrowableSubExpressionData(divot, startOffset, endOffset),
+        m_base(base),
+        m_subscript(subscript),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -777,15 +903,21 @@ class PostfixBracketNode : public ExpressionNode {
   Operator m_operator;
 };
 
-class PostfixDotNode : public ExpressionNode {
+class PostfixDotNode : public ExpressionNode,
+                       public ThrowableSubExpressionData {
  public:
   PostfixDotNode(JSGlobalData* globalData,
                  ExpressionNode* base,
                  const Identifier& ident,
-                 Operator oper) KJS_FAST_CALL : ExpressionNode(globalData),
-                                                m_base(base),
-                                                m_ident(ident),
-                                                m_operator(oper) {}
+                 Operator oper,
+                 unsigned divot,
+                 unsigned startOffset,
+                 unsigned endOffset) KJS_FAST_CALL
+      : ExpressionNode(globalData),
+        ThrowableSubExpressionData(divot, startOffset, endOffset),
+        m_base(base),
+        m_ident(ident),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -797,13 +929,19 @@ class PostfixDotNode : public ExpressionNode {
   Operator m_operator;
 };
 
-class PostfixErrorNode : public ExpressionNode {
+class PostfixErrorNode : public ExpressionNode,
+                         public ThrowableSubExpressionData {
  public:
   PostfixErrorNode(JSGlobalData* globalData,
                    ExpressionNode* expr,
-                   Operator oper) KJS_FAST_CALL : ExpressionNode(globalData),
-                                                  m_expr(expr),
-                                                  m_operator(oper) {}
+                   Operator oper,
+                   unsigned divot,
+                   unsigned startOffset,
+                   unsigned endOffset) KJS_FAST_CALL
+      : ExpressionNode(globalData),
+        ThrowableSubExpressionData(divot, startOffset, endOffset),
+        m_expr(expr),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -814,11 +952,16 @@ class PostfixErrorNode : public ExpressionNode {
   Operator m_operator;
 };
 
-class DeleteResolveNode : public ExpressionNode {
+class DeleteResolveNode : public ExpressionNode,
+                          public ThrowableExpressionData {
  public:
   DeleteResolveNode(JSGlobalData* globalData,
-                    const Identifier& ident) KJS_FAST_CALL
+                    const Identifier& ident,
+                    unsigned divot,
+                    unsigned startOffset,
+                    unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_ident(ident) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
@@ -830,12 +973,17 @@ class DeleteResolveNode : public ExpressionNode {
   Identifier m_ident;
 };
 
-class DeleteBracketNode : public ExpressionNode {
+class DeleteBracketNode : public ExpressionNode,
+                          public ThrowableExpressionData {
  public:
   DeleteBracketNode(JSGlobalData* globalData,
                     ExpressionNode* base,
-                    ExpressionNode* subscript) KJS_FAST_CALL
+                    ExpressionNode* subscript,
+                    unsigned divot,
+                    unsigned startOffset,
+                    unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_subscript(subscript) {}
 
@@ -849,12 +997,16 @@ class DeleteBracketNode : public ExpressionNode {
   RefPtr<ExpressionNode> m_subscript;
 };
 
-class DeleteDotNode : public ExpressionNode {
+class DeleteDotNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   DeleteDotNode(JSGlobalData* globalData,
                 ExpressionNode* base,
-                const Identifier& ident) KJS_FAST_CALL
+                const Identifier& ident,
+                unsigned divot,
+                unsigned startOffset,
+                unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_ident(ident) {}
 
@@ -936,8 +1088,11 @@ class PrefixResolveNode : public PrePostResolveNode {
  public:
   PrefixResolveNode(JSGlobalData* globalData,
                     const Identifier& ident,
-                    Operator oper) KJS_FAST_CALL
-      : PrePostResolveNode(globalData, ident),
+                    Operator oper,
+                    unsigned divot,
+                    unsigned startOffset,
+                    unsigned endOffset) KJS_FAST_CALL
+      : PrePostResolveNode(globalData, ident, divot, startOffset, endOffset),
         m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
@@ -949,15 +1104,21 @@ class PrefixResolveNode : public PrePostResolveNode {
   Operator m_operator;
 };
 
-class PrefixBracketNode : public ExpressionNode {
+class PrefixBracketNode : public ExpressionNode,
+                          public ThrowablePrefixedSubExpressionData {
  public:
   PrefixBracketNode(JSGlobalData* globalData,
                     ExpressionNode* base,
                     ExpressionNode* subscript,
-                    Operator oper) KJS_FAST_CALL : ExpressionNode(globalData),
-                                                   m_base(base),
-                                                   m_subscript(subscript),
-                                                   m_operator(oper) {}
+                    Operator oper,
+                    unsigned divot,
+                    unsigned startOffset,
+                    unsigned endOffset) KJS_FAST_CALL
+      : ExpressionNode(globalData),
+        ThrowablePrefixedSubExpressionData(divot, startOffset, endOffset),
+        m_base(base),
+        m_subscript(subscript),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -969,15 +1130,21 @@ class PrefixBracketNode : public ExpressionNode {
   Operator m_operator;
 };
 
-class PrefixDotNode : public ExpressionNode {
+class PrefixDotNode : public ExpressionNode,
+                      public ThrowablePrefixedSubExpressionData {
  public:
   PrefixDotNode(JSGlobalData* globalData,
                 ExpressionNode* base,
                 const Identifier& ident,
-                Operator oper) KJS_FAST_CALL : ExpressionNode(globalData),
-                                               m_base(base),
-                                               m_ident(ident),
-                                               m_operator(oper) {}
+                Operator oper,
+                unsigned divot,
+                unsigned startOffset,
+                unsigned endOffset) KJS_FAST_CALL
+      : ExpressionNode(globalData),
+        ThrowablePrefixedSubExpressionData(divot, startOffset, endOffset),
+        m_base(base),
+        m_ident(ident),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -989,13 +1156,18 @@ class PrefixDotNode : public ExpressionNode {
   Operator m_operator;
 };
 
-class PrefixErrorNode : public ExpressionNode {
+class PrefixErrorNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   PrefixErrorNode(JSGlobalData* globalData,
                   ExpressionNode* expr,
-                  Operator oper) KJS_FAST_CALL : ExpressionNode(globalData),
-                                                 m_expr(expr),
-                                                 m_operator(oper) {}
+                  Operator oper,
+                  unsigned divot,
+                  unsigned startOffset,
+                  unsigned endOffset) KJS_FAST_CALL
+      : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
+        m_expr(expr),
+        m_operator(oper) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -1317,30 +1489,47 @@ class GreaterEqNode : public ReverseBinaryOpNode {
   virtual Precedence precedence() const { return PrecRelational; }
 };
 
-class InstanceOfNode : public BinaryOpNode {
+class ThrowableBinaryOpNode : public BinaryOpNode,
+                              public ThrowableExpressionData {
+ public:
+  ThrowableBinaryOpNode(JSGlobalData* globalData,
+                        JSType type,
+                        ExpressionNode* term1,
+                        ExpressionNode* term2,
+                        bool rightHasAssignments) KJS_FAST_CALL
+      : BinaryOpNode(globalData, type, term1, term2, rightHasAssignments) {}
+  ThrowableBinaryOpNode(JSGlobalData* globalData,
+                        ExpressionNode* term1,
+                        ExpressionNode* term2,
+                        bool rightHasAssignments) KJS_FAST_CALL
+      : BinaryOpNode(globalData, term1, term2, rightHasAssignments) {}
+  virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
+};
+
+class InstanceOfNode : public ThrowableBinaryOpNode {
  public:
   InstanceOfNode(JSGlobalData* globalData,
                  ExpressionNode* term1,
                  ExpressionNode* term2,
                  bool rightHasAssignments) KJS_FAST_CALL
-      : BinaryOpNode(globalData,
-                     BooleanType,
-                     term1,
-                     term2,
-                     rightHasAssignments) {}
+      : ThrowableBinaryOpNode(globalData,
+                              BooleanType,
+                              term1,
+                              term2,
+                              rightHasAssignments) {}
 
   virtual OpcodeID opcode() const KJS_FAST_CALL { return op_instanceof; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
   virtual Precedence precedence() const { return PrecRelational; }
 };
 
-class InNode : public BinaryOpNode {
+class InNode : public ThrowableBinaryOpNode {
  public:
   InNode(JSGlobalData* globalData,
          ExpressionNode* term1,
          ExpressionNode* term2,
          bool rightHasAssignments) KJS_FAST_CALL
-      : BinaryOpNode(globalData, term1, term2, rightHasAssignments) {}
+      : ThrowableBinaryOpNode(globalData, term1, term2, rightHasAssignments) {}
 
   virtual OpcodeID opcode() const KJS_FAST_CALL { return op_in; }
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -1516,14 +1705,19 @@ class ConditionalNode : public ExpressionNode {
   RefPtr<ExpressionNode> m_expr2;
 };
 
-class ReadModifyResolveNode : public ExpressionNode {
+class ReadModifyResolveNode : public ExpressionNode,
+                              public ThrowableExpressionData {
  public:
   ReadModifyResolveNode(JSGlobalData* globalData,
                         const Identifier& ident,
                         Operator oper,
                         ExpressionNode* right,
-                        bool rightHasAssignments) KJS_FAST_CALL
+                        bool rightHasAssignments,
+                        unsigned divot,
+                        unsigned startOffset,
+                        unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_ident(ident),
         m_right(right),
         m_operator(oper),
@@ -1542,7 +1736,8 @@ class ReadModifyResolveNode : public ExpressionNode {
   bool m_rightHasAssignments : 1;
 };
 
-class AssignResolveNode : public ExpressionNode {
+class AssignResolveNode : public ExpressionNode,
+                          public ThrowableExpressionData {
  public:
   AssignResolveNode(JSGlobalData* globalData,
                     const Identifier& ident,
@@ -1565,7 +1760,8 @@ class AssignResolveNode : public ExpressionNode {
   bool m_rightHasAssignments;
 };
 
-class ReadModifyBracketNode : public ExpressionNode {
+class ReadModifyBracketNode : public ExpressionNode,
+                              public ThrowableSubExpressionData {
  public:
   ReadModifyBracketNode(JSGlobalData* globalData,
                         ExpressionNode* base,
@@ -1573,8 +1769,12 @@ class ReadModifyBracketNode : public ExpressionNode {
                         Operator oper,
                         ExpressionNode* right,
                         bool subscriptHasAssignments,
-                        bool rightHasAssignments) KJS_FAST_CALL
+                        bool rightHasAssignments,
+                        unsigned divot,
+                        unsigned startOffset,
+                        unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableSubExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_subscript(subscript),
         m_right(right),
@@ -1596,15 +1796,20 @@ class ReadModifyBracketNode : public ExpressionNode {
   bool m_rightHasAssignments : 1;
 };
 
-class AssignBracketNode : public ExpressionNode {
+class AssignBracketNode : public ExpressionNode,
+                          public ThrowableExpressionData {
  public:
   AssignBracketNode(JSGlobalData* globalData,
                     ExpressionNode* base,
                     ExpressionNode* subscript,
                     ExpressionNode* right,
                     bool subscriptHasAssignments,
-                    bool rightHasAssignments) KJS_FAST_CALL
+                    bool rightHasAssignments,
+                    unsigned divot,
+                    unsigned startOffset,
+                    unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_subscript(subscript),
         m_right(right),
@@ -1624,14 +1829,18 @@ class AssignBracketNode : public ExpressionNode {
   bool m_rightHasAssignments : 1;
 };
 
-class AssignDotNode : public ExpressionNode {
+class AssignDotNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   AssignDotNode(JSGlobalData* globalData,
                 ExpressionNode* base,
                 const Identifier& ident,
                 ExpressionNode* right,
-                bool rightHasAssignments) KJS_FAST_CALL
+                bool rightHasAssignments,
+                unsigned divot,
+                unsigned startOffset,
+                unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_ident(ident),
         m_right(right),
@@ -1648,15 +1857,20 @@ class AssignDotNode : public ExpressionNode {
   bool m_rightHasAssignments;
 };
 
-class ReadModifyDotNode : public ExpressionNode {
+class ReadModifyDotNode : public ExpressionNode,
+                          public ThrowableSubExpressionData {
  public:
   ReadModifyDotNode(JSGlobalData* globalData,
                     ExpressionNode* base,
                     const Identifier& ident,
                     Operator oper,
                     ExpressionNode* right,
-                    bool rightHasAssignments) KJS_FAST_CALL
+                    bool rightHasAssignments,
+                    unsigned divot,
+                    unsigned startOffset,
+                    unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableSubExpressionData(divot, startOffset, endOffset),
         m_base(base),
         m_ident(ident),
         m_right(right),
@@ -1676,13 +1890,17 @@ class ReadModifyDotNode : public ExpressionNode {
   bool m_rightHasAssignments : 1;
 };
 
-class AssignErrorNode : public ExpressionNode {
+class AssignErrorNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   AssignErrorNode(JSGlobalData* globalData,
                   ExpressionNode* left,
                   Operator oper,
-                  ExpressionNode* right) KJS_FAST_CALL
+                  ExpressionNode* right,
+                  unsigned divot,
+                  unsigned startOffset,
+                  unsigned endOffset) KJS_FAST_CALL
       : ExpressionNode(globalData),
+        ThrowableExpressionData(divot, startOffset, endOffset),
         m_left(left),
         m_operator(oper),
         m_right(right) {}
@@ -1931,7 +2149,7 @@ class ForNode : public StatementNode {
   bool m_expr1WasVarDecl;
 };
 
-class ForInNode : public StatementNode {
+class ForInNode : public StatementNode, public ThrowableExpressionData {
  public:
   ForInNode(JSGlobalData*, ExpressionNode*, ExpressionNode*, StatementNode*)
       KJS_FAST_CALL;
@@ -1939,7 +2157,10 @@ class ForInNode : public StatementNode {
             const Identifier&,
             ExpressionNode*,
             ExpressionNode*,
-            StatementNode*) KJS_FAST_CALL;
+            StatementNode*,
+            int divot,
+            int startOffset,
+            int endOffset) KJS_FAST_CALL;
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -1953,7 +2174,7 @@ class ForInNode : public StatementNode {
   bool m_identIsVarDecl;
 };
 
-class ContinueNode : public StatementNode {
+class ContinueNode : public StatementNode, public ThrowableExpressionData {
  public:
   ContinueNode(JSGlobalData* globalData) KJS_FAST_CALL
       : StatementNode(globalData) {}
@@ -1969,7 +2190,7 @@ class ContinueNode : public StatementNode {
   Identifier m_ident;
 };
 
-class BreakNode : public StatementNode {
+class BreakNode : public StatementNode, public ThrowableExpressionData {
  public:
   BreakNode(JSGlobalData* globalData) KJS_FAST_CALL
       : StatementNode(globalData) {}
@@ -1985,7 +2206,7 @@ class BreakNode : public StatementNode {
   Identifier m_ident;
 };
 
-class ReturnNode : public StatementNode {
+class ReturnNode : public StatementNode, public ThrowableExpressionData {
  public:
   ReturnNode(JSGlobalData* globalData, ExpressionNode* value) KJS_FAST_CALL
       : StatementNode(globalData),
@@ -2003,9 +2224,14 @@ class WithNode : public StatementNode {
  public:
   WithNode(JSGlobalData* globalData,
            ExpressionNode* expr,
-           StatementNode* statement) KJS_FAST_CALL : StatementNode(globalData),
-                                                     m_expr(expr),
-                                                     m_statement(statement) {}
+           StatementNode* statement,
+           uint32_t divot,
+           uint32_t expressionLength) KJS_FAST_CALL
+      : StatementNode(globalData),
+        m_expr(expr),
+        m_statement(statement),
+        m_divot(divot),
+        m_expressionLength(expressionLength) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
   virtual void streamTo(SourceStream&) const KJS_FAST_CALL;
@@ -2013,9 +2239,11 @@ class WithNode : public StatementNode {
  private:
   RefPtr<ExpressionNode> m_expr;
   RefPtr<StatementNode> m_statement;
+  uint32_t m_divot;
+  uint32_t m_expressionLength;
 };
 
-class LabelNode : public StatementNode {
+class LabelNode : public StatementNode, public ThrowableExpressionData {
  public:
   LabelNode(JSGlobalData* globalData,
             const Identifier& label,
@@ -2034,7 +2262,7 @@ class LabelNode : public StatementNode {
   RefPtr<StatementNode> m_statement;
 };
 
-class ThrowNode : public StatementNode {
+class ThrowNode : public StatementNode, public ThrowableExpressionData {
  public:
   ThrowNode(JSGlobalData* globalData, ExpressionNode* expr) KJS_FAST_CALL
       : StatementNode(globalData),
@@ -2139,6 +2367,7 @@ class ProgramNode : public ScopeNode {
                              SourceElements*,
                              VarStack*,
                              FunctionStack*,
+                             SourceProvider*,
                              bool usesEval,
                              bool needsClosure) KJS_FAST_CALL;
 
@@ -2153,6 +2382,7 @@ class ProgramNode : public ScopeNode {
               SourceElements*,
               VarStack*,
               FunctionStack*,
+              SourceProvider*,
               bool usesEval,
               bool needsClosure) KJS_FAST_CALL;
 
@@ -2166,6 +2396,8 @@ class ProgramNode : public ScopeNode {
                                      // in m_functionStack. (Recorded to avoid
                                      // double lookup.)
 
+  RefPtr<SourceProvider> m_sourceProvider;
+
   OwnPtr<ProgramCodeBlock> m_code;
 };
 
@@ -2175,6 +2407,7 @@ class EvalNode : public ScopeNode {
                           SourceElements*,
                           VarStack*,
                           FunctionStack*,
+                          SourceProvider*,
                           bool usesEval,
                           bool needsClosure) KJS_FAST_CALL;
 
@@ -2189,17 +2422,27 @@ class EvalNode : public ScopeNode {
            SourceElements*,
            VarStack*,
            FunctionStack*,
+           SourceProvider*,
            bool usesEval,
            bool needsClosure) KJS_FAST_CALL;
 
   void generateCode(ScopeChainNode*) KJS_FAST_CALL;
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
+  RefPtr<SourceProvider> m_sourceProvider;
+
   OwnPtr<EvalCodeBlock> m_code;
 };
 
 class FunctionBodyNode : public ScopeNode {
  public:
+  static FunctionBodyNode* create(JSGlobalData*,
+                                  SourceElements*,
+                                  VarStack*,
+                                  FunctionStack*,
+                                  SourceProvider*,
+                                  bool usesEval,
+                                  bool needsClosure) KJS_FAST_CALL;
   static FunctionBodyNode* create(JSGlobalData*,
                                   SourceElements*,
                                   VarStack*,

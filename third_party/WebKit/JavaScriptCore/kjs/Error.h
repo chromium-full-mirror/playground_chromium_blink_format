@@ -44,6 +44,10 @@ enum ErrorType {
   URIError = 6
 };
 
+extern const char* expressionBeginOffsetPropertyName;
+extern const char* expressionCaretOffsetPropertyName;
+extern const char* expressionEndOffsetPropertyName;
+
 class Error {
  public:
   static JSObject* create(ExecState*,

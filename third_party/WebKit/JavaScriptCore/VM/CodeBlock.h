@@ -33,6 +33,7 @@
 #include "Instruction.h"
 #include "JSGlobalObject.h"
 #include "nodes.h"
+#include "SourceRange.h"
 #include "ustring.h"
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
@@ -46,19 +47,30 @@ static ALWAYS_INLINE int missingThisObjectMarker() {
 }
 
 struct HandlerInfo {
-  unsigned start;
-  unsigned end;
-  unsigned target;
-  unsigned scopeDepth;
+  uint32_t start;
+  uint32_t end;
+  uint32_t target;
+  uint32_t scopeDepth;
+};
+
+struct ExpressionRangeInfo {
+  enum { MaxOffset = (1 << 7) - 1, MaxDivot = (1 << 25) - 1 };
+  uint32_t instructionOffset : 25;
+  uint32_t divotPoint : 25;
+  uint32_t startOffset : 7;
+  uint32_t endOffset : 7;
 };
 
 struct LineInfo {
-  unsigned instructionOffset;
-  int lineNumber;
+  uint32_t instructionOffset;
+  int32_t lineNumber;
 };
 
 struct CodeBlock {
-  CodeBlock(ScopeNode* ownerNode_, CodeType codeType_)
+  CodeBlock(ScopeNode* ownerNode_,
+            CodeType codeType_,
+            PassRefPtr<SourceProvider> source_,
+            unsigned sourceOffset_)
       : ownerNode(ownerNode_),
         numTemporaries(0),
         numVars(0),
@@ -67,10 +79,16 @@ struct CodeBlock {
         needsFullScopeChain(ownerNode_->usesEval() ||
                             ownerNode_->needsClosure()),
         usesEval(ownerNode_->usesEval()),
-        codeType(codeType_) {}
+        codeType(codeType_),
+        source(source_),
+        sourceOffset(sourceOffset_) {}
 
   void dump(ExecState*) const;
-  int lineNumberForVPC(const Instruction*);
+  int expressionRangeForVPC(const Instruction*,
+                            int& divot,
+                            int& startOffset,
+                            int& endOffset);
+  int lineNumberForVPC(const Instruction* vPC);
   bool getHandlerForVPC(const Instruction* vPC,
                         Instruction*& target,
                         int& scopeDepth);
@@ -86,6 +104,8 @@ struct CodeBlock {
   bool needsFullScopeChain;
   bool usesEval;
   CodeType codeType;
+  RefPtr<SourceProvider> source;
+  unsigned sourceOffset;
 
   Vector<Instruction> instructions;
 
@@ -96,6 +116,7 @@ struct CodeBlock {
   Vector<Register> registers;
   Vector<RefPtr<RegExp>> regexps;
   Vector<HandlerInfo> exceptionHandlers;
+  Vector<ExpressionRangeInfo> expressionInfo;
   Vector<LineInfo> lineInfo;
 
  private:
@@ -110,8 +131,10 @@ struct CodeBlock {
 struct ProgramCodeBlock : public CodeBlock {
   ProgramCodeBlock(ScopeNode* ownerNode_,
                    CodeType codeType_,
-                   JSGlobalObject* globalObject_)
-      : CodeBlock(ownerNode_, codeType_), globalObject(globalObject_) {
+                   JSGlobalObject* globalObject_,
+                   PassRefPtr<SourceProvider> source_)
+      : CodeBlock(ownerNode_, codeType_, source_, 0),
+        globalObject(globalObject_) {
     globalObject->codeBlocks().add(this);
   }
 
@@ -125,8 +148,10 @@ struct ProgramCodeBlock : public CodeBlock {
 };
 
 struct EvalCodeBlock : public ProgramCodeBlock {
-  EvalCodeBlock(ScopeNode* ownerNode_, JSGlobalObject* globalObject_)
-      : ProgramCodeBlock(ownerNode_, EvalCode, globalObject_) {}
+  EvalCodeBlock(ScopeNode* ownerNode_,
+                JSGlobalObject* globalObject_,
+                PassRefPtr<SourceProvider> source_)
+      : ProgramCodeBlock(ownerNode_, EvalCode, globalObject_, source_) {}
 };
 
 }  // namespace KJS

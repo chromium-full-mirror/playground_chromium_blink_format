@@ -135,7 +135,6 @@ class Lexer : Noncopyable {
 
   State m_state;
   unsigned int m_position;
-
   RefPtr<SourceProvider> m_source;
   const UChar* m_code;
   unsigned int m_length;
@@ -148,6 +147,11 @@ class Lexer : Noncopyable {
   int m_next1;
   int m_next2;
   int m_next3;
+
+  int m_currentOffset;
+  int m_nextOffset1;
+  int m_nextOffset2;
+  int m_nextOffset3;
 
   Vector<UString*> m_strings;
   Vector<KJS::Identifier*> m_identifiers;

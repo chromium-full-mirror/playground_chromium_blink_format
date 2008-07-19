@@ -176,12 +176,13 @@ class Machine {
                                     ScopeChainNode*&,
                                     Register*&);
   NEVER_INLINE Instruction* throwException(ExecState*,
-                                           JSValue*,
+                                           JSValue*&,
                                            const Instruction*,
                                            CodeBlock*&,
                                            Register*&,
                                            ScopeChainNode*&,
-                                           Register*&);
+                                           Register*&,
+                                           bool);
 
   Register* callFrame(ExecState*, JSFunction*) const;
 
