@@ -54,6 +54,8 @@ class SVGPolyElement : public SVGStyledTransformableElement,
   }
   virtual bool supportsMarkers() const { return true; }
 
+  virtual void updateAnimatedSVGAttribute(const String&) const;
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
