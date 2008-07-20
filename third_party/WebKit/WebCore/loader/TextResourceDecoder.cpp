@@ -513,6 +513,10 @@ static inline void skipComment(const char*& ptr, const char* pEnd) {
   ptr = p;
 }
 
+const int bytesToCheckUnconditionally = 1024;  // That many input bytes will be
+                                               // checked for meta charset even
+                                               // if <head> section is over.
+
 bool TextResourceDecoder::checkForHeadCharset(const char* data,
                                               size_t len,
                                               bool& movedDataToBuffer) {
@@ -591,9 +595,16 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
 
   // Since many sites have charset declarations after <body> or other tags that
   // are disallowed in <head>,
-  // we don't bail out until we've checked at least 512 bytes of input.
+  // we don't bail out until we've checked at least bytesToCheckUnconditionally
+  // bytes of input.
 
   AtomicStringImpl* enclosingTagName = 0;
+  bool inHeadSection = true;  // Becomes false when </head> or any tag not
+                              // allowed in head is encountered.
+
+  // the HTTP-EQUIV meta has no effect on XHTML
+  if (m_contentType == XML)
+    return true;
 
   while (ptr + 3 < pEnd) {  // +3 guarantees that "<!--" fits in the buffer -
                             // and certainly we aren't going to lose any
@@ -606,12 +617,18 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
       if (ptr[0] == '!' && ptr[1] == '-' && ptr[2] == '-') {
         ptr += 3;
         skipComment(ptr, pEnd);
+        if (ptr - m_buffer.data() >= bytesToCheckUnconditionally &&
+            !inHeadSection) {
+          // Some pages that test bandwidth from within the browser do it by
+          // having
+          // huge comments and measuring the time they take to load. Repeatedly
+          // scanning
+          // these comments can take a lot of CPU time.
+          m_checkedForHeadCharset = true;
+          return true;
+        }
         continue;
       }
-
-      // the HTTP-EQUIV meta has no effect on XHTML
-      if (m_contentType == XML)
-        return true;
 
       if (*ptr == '/') {
         ++ptr;
@@ -712,17 +729,23 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
 
           pos = end + 1;
         }
-      } else if (ptr - m_buffer.data() >= 512 && tag != scriptTag &&
-                 tag != noscriptTag && tag != styleTag && tag != linkTag &&
-                 tag != metaTag && tag != objectTag && tag != titleTag &&
-                 tag != baseTag && (end || tag != htmlTag) &&
-                 !enclosingTagName && (tag != headTag) &&
-                 isASCIIAlpha(tagBuffer[0])) {
-        m_checkedForHeadCharset = true;
-        return true;
+      } else {
+        if (!enclosingTagName && tag != scriptTag && tag != noscriptTag &&
+            tag != styleTag && tag != linkTag && tag != metaTag &&
+            tag != objectTag && tag != titleTag && tag != baseTag &&
+            (end || tag != htmlTag) && (end || tag != headTag) &&
+            isASCIIAlpha(tagBuffer[0])) {
+          inHeadSection = false;
+        }
+
+        if (ptr - m_buffer.data() >= bytesToCheckUnconditionally &&
+            !inHeadSection) {
+          m_checkedForHeadCharset = true;
+          return true;
+        }
       }
     } else
-      ptr++;
+      ++ptr;
   }
   return false;
 }
