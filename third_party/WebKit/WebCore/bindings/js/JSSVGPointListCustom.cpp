@@ -19,9 +19,9 @@
  */
 
 #include "config.h"
-#include "JSSVGPointList.h"
 
 #if ENABLE(SVG)
+#include "JSSVGPointList.h"
 
 #include "JSSVGPoint.h"
 #include "SVGPointList.h"
@@ -30,13 +30,14 @@ using namespace KJS;
 
 namespace WebCore {
 
-typedef SVGList<RefPtr<SVGPODListItem<FloatPoint>>> SVGPointListBase;
+typedef SVGPODListItem<FloatPoint> PODListItem;
+typedef SVGList<RefPtr<PODListItem>> SVGPointListBase;
 
 static JSValue* finishGetter(ExecState* exec,
                              ExceptionCode& ec,
                              SVGElement* context,
                              SVGPointList* list,
-                             PassRefPtr<SVGPODListItem<FloatPoint>> item) {
+                             PassRefPtr<PODListItem> item) {
   if (ec) {
     setDOMException(exec, ec);
     return jsUndefined();
@@ -51,7 +52,7 @@ static JSValue* finishSetter(ExecState* exec,
                              ExceptionCode& ec,
                              SVGElement* context,
                              SVGPointList* list,
-                             PassRefPtr<SVGPODListItem<FloatPoint>> item) {
+                             PassRefPtr<PODListItem> item) {
   if (ec) {
     setDOMException(exec, ec);
     return jsUndefined();
@@ -64,20 +65,18 @@ static JSValue* finishSetter(ExecState* exec,
               context);
 }
 
-static JSValue* finishSetterReadOnlyResult(
-    ExecState* exec,
-    ExceptionCode& ec,
-    SVGElement* context,
-    SVGPointList* list,
-    PassRefPtr<SVGPODListItem<FloatPoint>> item) {
+static JSValue* finishSetterReadOnlyResult(ExecState* exec,
+                                           ExceptionCode& ec,
+                                           SVGElement* context,
+                                           SVGPointList* list,
+                                           PassRefPtr<PODListItem> item) {
   if (ec) {
     setDOMException(exec, ec);
     return jsUndefined();
   }
   context->svgAttributeChanged(list->associatedAttributeName());
-  return toJS(
-      exec, JSSVGPODTypeWrapperCreatorReadOnly<FloatPoint>::create(*item).get(),
-      context);
+  return toJS(exec, JSSVGStaticPODTypeWrapper<FloatPoint>::create(*item).get(),
+              context);
 }
 
 JSValue* JSSVGPointList::clear(ExecState* exec, const ArgList&) {
@@ -93,8 +92,7 @@ JSValue* JSSVGPointList::initialize(ExecState* exec, const ArgList& args) {
   SVGPointListBase* listImp = impl();
   return finishSetter(
       exec, ec, context(), impl(),
-      listImp->initialize(SVGPODListItem<FloatPoint>::copy(toSVGPoint(args[0])),
-                          ec));
+      listImp->initialize(PODListItem::copy(toSVGPoint(args[0])), ec));
 }
 
 JSValue* JSSVGPointList::getItem(ExecState* exec, const ArgList& args) {
@@ -121,10 +119,9 @@ JSValue* JSSVGPointList::insertItemBefore(ExecState* exec,
 
   ExceptionCode ec = 0;
   SVGPointListBase* listImp = impl();
-  return finishSetter(
-      exec, ec, context(), impl(),
-      listImp->insertItemBefore(
-          SVGPODListItem<FloatPoint>::copy(toSVGPoint(args[0])), index, ec));
+  return finishSetter(exec, ec, context(), impl(),
+                      listImp->insertItemBefore(
+                          PODListItem::copy(toSVGPoint(args[0])), index, ec));
 }
 
 JSValue* JSSVGPointList::replaceItem(ExecState* exec, const ArgList& args) {
@@ -139,8 +136,7 @@ JSValue* JSSVGPointList::replaceItem(ExecState* exec, const ArgList& args) {
   SVGPointListBase* listImp = impl();
   return finishSetter(
       exec, ec, context(), impl(),
-      listImp->replaceItem(
-          SVGPODListItem<FloatPoint>::copy(toSVGPoint(args[0])), index, ec));
+      listImp->replaceItem(PODListItem::copy(toSVGPoint(args[0])), index, ec));
 }
 
 JSValue* JSSVGPointList::removeItem(ExecState* exec, const ArgList& args) {
@@ -162,8 +158,7 @@ JSValue* JSSVGPointList::appendItem(ExecState* exec, const ArgList& args) {
   SVGPointListBase* listImp = impl();
   return finishSetter(
       exec, ec, context(), impl(),
-      listImp->appendItem(SVGPODListItem<FloatPoint>::copy(toSVGPoint(args[0])),
-                          ec));
+      listImp->appendItem(PODListItem::copy(toSVGPoint(args[0])), ec));
 }
 }
 
