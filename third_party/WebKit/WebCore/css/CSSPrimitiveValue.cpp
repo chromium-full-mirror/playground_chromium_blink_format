@@ -768,6 +768,7 @@ CSSParserValue CSSPrimitiveValue::parserValue() const {
       value.fValue = m_value.num;
       value.unit = m_type;
       break;
+    case CSS_RGBCOLOR:
     case CSS_STRING:
     case CSS_URI:
     case CSS_PARSER_VARIABLE:
@@ -796,7 +797,6 @@ CSSParserValue CSSPrimitiveValue::parserValue() const {
     case CSS_ATTR:
     case CSS_COUNTER:
     case CSS_RECT:
-    case CSS_RGBCOLOR:
     case CSS_PAIR:
 #if ENABLE(DASHBOARD_SUPPORT)
     case CSS_DASHBOARD_REGION:
