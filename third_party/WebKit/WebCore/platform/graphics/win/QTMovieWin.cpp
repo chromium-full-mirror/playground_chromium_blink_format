@@ -60,6 +60,7 @@ union UppParam {
 static MovieDrawingCompleteUPP gMovieDrawingCompleteUPP = 0;
 static HashSet<QTMovieWinPrivate*>* gTaskList;
 static Vector<CFStringRef>* gSupportedTypes = 0;
+static SInt32 quickTimeVersion = 0;
 
 static void updateTaskTimer(int maxInterval = 1000) {
   if (!gTaskList->size()) {
@@ -621,6 +622,13 @@ static void initializeSupportedTypes() {
     return;
 
   gSupportedTypes = new Vector<CFStringRef>;
+  if (quickTimeVersion < minimumQuickTimeVersion) {
+    LOG_ERROR(
+        "QuickTime version %x detected, at least %x required. Returning empty "
+        "list of supported media MIME types.",
+        quickTimeVersion, minimumQuickTimeVersion);
+    return;
+  }
 
   // QuickTime doesn't have an importer for video/quicktime. Add it manually.
   gSupportedTypes->append(CFSTR("video/quicktime"));
@@ -742,19 +750,18 @@ bool QTMovieWin::initializeQuickTime() {
     initialized = true;
     // Initialize and check QuickTime version
     OSErr result = InitializeQTML(0);
-    SInt32 version = 0;
     if (result == noErr)
-      result = Gestalt(gestaltQuickTime, &version);
+      result = Gestalt(gestaltQuickTime, &quickTimeVersion);
     if (result != noErr) {
       LOG_ERROR(
           "No QuickTime available. Disabling <video> and <audio> support.");
       return false;
     }
-    if (version < minimumQuickTimeVersion) {
+    if (quickTimeVersion < minimumQuickTimeVersion) {
       LOG_ERROR(
           "QuickTime version %x detected, at least %x required. Disabling "
           "<video> and <audio> support.",
-          version, minimumQuickTimeVersion);
+          quickTimeVersion, minimumQuickTimeVersion);
       return false;
     }
     EnterMovies();
