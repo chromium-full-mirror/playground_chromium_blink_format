@@ -949,6 +949,7 @@ void HTMLMediaElement::willSaveToCache() {
     initAndDispatchProgressEvent(abortEvent);
     if (m_networkState >= LOADING) {
       m_networkState = EMPTY;
+      m_readyState = DATA_UNAVAILABLE;
       dispatchHTMLEvent(emptiedEvent, false, true);
     }
   }
