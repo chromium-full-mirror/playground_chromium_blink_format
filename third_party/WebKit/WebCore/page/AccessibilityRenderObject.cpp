@@ -940,6 +940,10 @@ AccessibilityObject* AccessibilityRenderObject::internalLinkElement() const {
       m_renderer->document()->axObjectCache()->get(linkedNode->renderer());
   while (linkedAXElement && linkedAXElement->accessibilityIsIgnored()) {
     linkedNode = linkedNode->traverseNextNode();
+
+    while (linkedNode && !linkedNode->renderer())
+      linkedNode = linkedNode->traverseNextSibling();
+
     if (!linkedNode)
       return 0;
     linkedAXElement =
