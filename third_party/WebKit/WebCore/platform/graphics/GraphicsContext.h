@@ -103,6 +103,13 @@ const int cTextClip = 4;
 
 enum StrokeStyle { NoStroke, SolidStroke, DottedStroke, DashedStroke };
 
+enum InterpolationQuality {
+  InterpolationDefault,
+  InterpolationNone,
+  InterpolationLow,
+  InterpolationHigh
+};
+
 class GraphicsContext : Noncopyable {
  public:
   GraphicsContext(PlatformGraphicsContext*);
@@ -184,11 +191,13 @@ class GraphicsContext : Noncopyable {
                       CompositeOperator = CompositeSourceOver);
 
 #if PLATFORM(CG)
-  void setUseLowQualityImageInterpolation(bool = true);
-  bool useLowQualityImageInterpolation() const;
+  void setImageInterpolationQuality(InterpolationQuality);
+  InterpolationQuality imageInterpolationQuality() const;
 #else
-  void setUseLowQualityImageInterpolation(bool = true) {}
-  bool useLowQualityImageInterpolation() const { return false; }
+  void setImageInterpolationQuality(InterpolationQuality) {}
+  InterpolationQuality imageInterpolationQuality() const {
+    return InterpolationDefault;
+  }
 #endif
 
   void clip(const FloatRect&);

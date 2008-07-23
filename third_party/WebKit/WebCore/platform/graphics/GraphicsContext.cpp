@@ -344,7 +344,7 @@ void GraphicsContext::drawImage(Image* image,
 
   if (useLowQualityScale) {
     save();
-    setUseLowQualityImageInterpolation(true);
+    setImageInterpolationQuality(InterpolationNone);
   }
   image->draw(this, FloatRect(dest.location(), FloatSize(tw, th)),
               FloatRect(src.location(), FloatSize(tsw, tsh)), op);
