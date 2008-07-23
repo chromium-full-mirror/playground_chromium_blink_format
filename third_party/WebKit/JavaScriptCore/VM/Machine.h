@@ -130,6 +130,8 @@ class Machine {
     m_timeoutCheckCount = 0;
   }
 
+  SamplingTool* m_sampler;
+
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
 

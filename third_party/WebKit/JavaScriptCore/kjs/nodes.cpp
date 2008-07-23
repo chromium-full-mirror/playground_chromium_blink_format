@@ -1717,7 +1717,7 @@ RegisterID* TryNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   return dst;
 }
 
-// ------------------------------ FunctionBodyNode -----------------------------
+// ------------------------------ ScopeNode -----------------------------
 
 ScopeNode::ScopeNode(JSGlobalData* globalData,
                      SourceElements* children,
@@ -1734,6 +1734,8 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
     m_varStack = *varStack;
   if (funcStack)
     m_functionStack = *funcStack;
+
+  SCOPENODE_SAMPLING_notifyOfScope(globalData->machine->m_sampler);
 }
 
 // ------------------------------ ProgramNode -----------------------------
