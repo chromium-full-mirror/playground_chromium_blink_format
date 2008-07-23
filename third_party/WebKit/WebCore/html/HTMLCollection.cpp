@@ -339,11 +339,10 @@ bool HTMLCollection::checkForNameMatch(Element* element,
             e->hasLocalName(selectTag)))
         return false;
 
-      return e->getAttribute(nameAttr).string().lower() == name.lower() &&
-             e->getAttribute(idAttr).string().lower() != name.lower();
-    } else {
-      return e->getAttribute(idAttr).string().lower() == name.lower();
-    }
+      return equalIgnoringCase(e->getAttribute(nameAttr), name) &&
+             !equalIgnoringCase(e->getAttribute(idAttr), name);
+    } else
+      return equalIgnoringCase(e->getAttribute(idAttr), name);
   }
 }
 

@@ -112,7 +112,7 @@ Element* HTMLFormCollection::getNamedFormItem(const QualifiedName& attrName,
       if (caseSensitive)
         found = e->getAttribute(attrName) == name;
       else
-        found = e->getAttribute(attrName).string().lower() == name.lower();
+        found = equalIgnoringCase(e->getAttribute(attrName), name);
       if (found) {
         foundInputElements = true;
         if (!duplicateNumber)
@@ -129,7 +129,7 @@ Element* HTMLFormCollection::getNamedFormItem(const QualifiedName& attrName,
       if (caseSensitive)
         found = e->getAttribute(attrName) == name;
       else
-        found = e->getAttribute(attrName).string().lower() == name.lower();
+        found = equalIgnoringCase(e->getAttribute(attrName), name);
       if (found) {
         if (!duplicateNumber)
           return e;

@@ -5099,7 +5099,7 @@ Widget* FrameLoader::createJavaAppletWidget(
   HashMap<String, String>::const_iterator end = args.end();
   for (HashMap<String, String>::const_iterator it = args.begin(); it != end;
        ++it) {
-    if (it->first.lower() == "baseurl")
+    if (equalIgnoringCase(it->first, "baseurl"))
       baseURLString = it->second;
     paramNames.append(it->first);
     paramValues.append(it->second);
