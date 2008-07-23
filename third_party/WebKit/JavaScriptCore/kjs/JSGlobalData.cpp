@@ -31,6 +31,7 @@
 
 #include "ArgList.h"
 #include "CommonIdentifiers.h"
+#include "JSClassRef.h"
 #include "JSLock.h"
 #include "Machine.h"
 #include "Parser.h"
@@ -81,6 +82,7 @@ JSGlobalData::JSGlobalData(bool isShared)
       identifierTable(createIdentifierTable()),
       propertyNames(new CommonIdentifiers(this)),
       emptyList(new ArgList),
+      opaqueJSClassData(new HashMap<OpaqueJSClass*, OpaqueJSClassContextData*>),
       newParserObjects(0),
       parserObjectExtraRefCounts(0),
       lexer(new Lexer(this)),
@@ -115,6 +117,9 @@ JSGlobalData::~JSGlobalData() {
 
   delete parser;
   delete lexer;
+
+  deleteAllValues(*opaqueJSClassData);
+  delete opaqueJSClassData;
 
   delete propertyNames;
   deleteIdentifierTable(identifierTable);
