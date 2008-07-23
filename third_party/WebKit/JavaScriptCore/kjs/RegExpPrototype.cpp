@@ -106,8 +106,8 @@ JSValue* regExpProtoFuncCompile(ExecState* exec,
     return throwError(exec, TypeError);
 
   RefPtr<RegExp> regExp;
-  JSValue* arg0 = args[0];
-  JSValue* arg1 = args[1];
+  JSValue* arg0 = args.at(exec, 0);
+  JSValue* arg1 = args.at(exec, 1);
 
   if (arg0->isObject(&RegExpObject::info)) {
     if (!arg1->isUndefined())

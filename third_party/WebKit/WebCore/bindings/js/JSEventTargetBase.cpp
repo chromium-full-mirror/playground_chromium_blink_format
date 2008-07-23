@@ -147,9 +147,11 @@ JSValue* jsEventTargetAddEventListener(ExecState* exec,
     return jsUndefined();
 
   if (RefPtr<JSEventListener> listener =
-          toJSDOMWindow(frame)->findOrCreateJSEventListener(exec, args[1]))
-    eventTarget->addEventListener(args[0]->toString(exec), listener.release(),
-                                  args[2]->toBoolean(exec));
+          toJSDOMWindow(frame)->findOrCreateJSEventListener(exec,
+                                                            args.at(exec, 1)))
+    eventTarget->addEventListener(args.at(exec, 0)->toString(exec),
+                                  listener.release(),
+                                  args.at(exec, 2)->toBoolean(exec));
 
   return jsUndefined();
 }
@@ -169,9 +171,9 @@ JSValue* jsEventTargetRemoveEventListener(ExecState* exec,
     return jsUndefined();
 
   if (JSEventListener* listener =
-          toJSDOMWindow(frame)->findJSEventListener(args[1]))
-    eventTarget->removeEventListener(args[0]->toString(exec), listener,
-                                     args[2]->toBoolean(exec));
+          toJSDOMWindow(frame)->findJSEventListener(args.at(exec, 1)))
+    eventTarget->removeEventListener(args.at(exec, 0)->toString(exec), listener,
+                                     args.at(exec, 2)->toBoolean(exec));
 
   return jsUndefined();
 }
@@ -187,7 +189,8 @@ JSValue* jsEventTargetDispatchEvent(ExecState* exec,
     return throwError(exec, TypeError);
 
   DOMExceptionTranslator exception(exec);
-  return jsBoolean(eventTarget->dispatchEvent(toEvent(args[0]), exception));
+  return jsBoolean(
+      eventTarget->dispatchEvent(toEvent(args.at(exec, 0)), exception));
 }
 
 const AtomicString& eventNameForPropertyToken(int token) {

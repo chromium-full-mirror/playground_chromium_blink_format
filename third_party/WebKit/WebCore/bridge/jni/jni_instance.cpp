@@ -33,6 +33,7 @@
 #include "jni_utility.h"
 #include "runtime_object.h"
 #include "runtime_root.h"
+#include <kjs/ArgList.h>
 #include <kjs/Error.h>
 #include <kjs/JSLock.h>
 
@@ -137,9 +138,9 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
 
   for (i = 0; i < count; i++) {
     JavaParameter* aParameter = jMethod->parameterAt(i);
-    jArgs[i] = convertValueToJValue(exec, args.at(i), aParameter->getJNIType(),
-                                    aParameter->type());
-    JS_LOG("arg[%d] = %s\n", i, args.at(i)->toString(exec).ascii());
+    jArgs[i] = convertValueToJValue(
+        exec, args.at(exec, i), aParameter->getJNIType(), aParameter->type());
+    JS_LOG("arg[%d] = %s\n", i, args.at(exec, i)->toString(exec).ascii());
   }
 
   jvalue result;

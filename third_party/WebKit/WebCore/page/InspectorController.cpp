@@ -179,7 +179,8 @@ struct ConsoleMessage {
       : source(s), level(l), wrappedArguments(args.size()), line(li), url(u) {
     JSLock lock(false);
     for (unsigned i = 0; i < args.size(); ++i)
-      wrappedArguments[i] = JSInspectedObjectWrapper::wrap(exec, args[i]);
+      wrappedArguments[i] =
+          JSInspectedObjectWrapper::wrap(exec, args.at(exec, i));
   }
 
   MessageSource source;

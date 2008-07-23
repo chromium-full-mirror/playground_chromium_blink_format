@@ -36,7 +36,9 @@ class JSDOMWindowShell;
  */
 class ScheduledAction {
  public:
-  ScheduledAction(KJS::JSValue* function, const KJS::ArgList&);
+  ScheduledAction(KJS::ExecState* exec,
+                  KJS::JSValue* function,
+                  const KJS::ArgList&);
   ScheduledAction(const String& code) : m_code(code) {}
 
   void execute(JSDOMWindowShell*);

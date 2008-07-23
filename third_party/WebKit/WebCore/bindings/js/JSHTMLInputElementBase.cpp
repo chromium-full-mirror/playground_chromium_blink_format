@@ -61,7 +61,8 @@ JSValue* jsHTMLInputElementBaseFunctionSetSelectionRange(ExecState* exec,
                                                          const ArgList& args) {
   HTMLInputElement& input = *static_cast<HTMLInputElement*>(
       static_cast<JSHTMLInputElementBase*>(thisValue)->impl());
-  input.setSelectionRange(args[0]->toInt32(exec), args[1]->toInt32(exec));
+  input.setSelectionRange(args.at(exec, 0)->toInt32(exec),
+                          args.at(exec, 1)->toInt32(exec));
   return jsUndefined();
 }
 

@@ -46,14 +46,14 @@ const UString* DebuggerCallFrame::functionName() const {
     return 0;
 
   JSFunction* function =
-      static_cast<JSFunction*>(callFrame()[RegisterFile::Callee].jsValue());
+      static_cast<JSFunction*>(callFrame()[RegisterFile::Callee].getJSValue());
   if (!function)
     return 0;
   return &function->functionName().ustring();
 }
 
 DebuggerCallFrame::Type DebuggerCallFrame::type() const {
-  if (callFrame()[RegisterFile::Callee].jsValue())
+  if (callFrame()[RegisterFile::Callee].getJSValue())
     return FunctionType;
 
   return ProgramType;
@@ -64,7 +64,7 @@ JSObject* DebuggerCallFrame::thisObject() const {
     return 0;
 
   return static_cast<JSObject*>(
-      m_registers[m_codeBlock->thisRegister].jsValue());
+      m_registers[m_codeBlock->thisRegister].getJSValue());
 }
 
 JSValue* DebuggerCallFrame::evaluate(const UString& script,

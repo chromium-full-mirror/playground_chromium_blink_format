@@ -87,7 +87,7 @@ static JSObject* constructWithNumberConstructor(ExecState* exec,
                                                 const ArgList& args) {
   NumberObject* obj =
       new (exec) NumberObject(exec->lexicalGlobalObject()->numberPrototype());
-  double n = args.isEmpty() ? 0 : args[0]->toNumber(exec);
+  double n = args.isEmpty() ? 0 : args.at(exec, 0)->toNumber(exec);
   obj->setInternalValue(jsNumber(exec, n));
   return obj;
 }
@@ -103,7 +103,7 @@ static JSValue* callNumberConstructor(ExecState* exec,
                                       JSObject*,
                                       JSValue*,
                                       const ArgList& args) {
-  return jsNumber(exec, args.isEmpty() ? 0 : args[0]->toNumber(exec));
+  return jsNumber(exec, args.isEmpty() ? 0 : args.at(exec, 0)->toNumber(exec));
 }
 
 CallType NumberConstructor::getCallData(CallData& callData) {

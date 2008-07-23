@@ -35,7 +35,8 @@ namespace WebCore {
 
 JSValue* JSJavaScriptCallFrame::evaluate(ExecState* exec, const ArgList& args) {
   JSValue* exception = 0;
-  JSValue* result = impl()->evaluate(args[0]->toString(exec), exception);
+  JSValue* result =
+      impl()->evaluate(args.at(exec, 0)->toString(exec), exception);
 
   if (exception)
     exec->setException(exception);

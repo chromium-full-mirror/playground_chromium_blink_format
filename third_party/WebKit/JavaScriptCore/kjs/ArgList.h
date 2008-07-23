@@ -77,13 +77,11 @@ class ArgList : Noncopyable {
   size_t size() const { return m_size; }
   bool isEmpty() const { return !m_size; }
 
-  JSValue* at(size_t i) const {
+  JSValue* at(ExecState* exec, size_t i) const {
     if (i < m_size)
-      return m_buffer[i].jsValue();
+      return m_buffer[i].jsValue(exec);
     return jsUndefined();
   }
-
-  JSValue* operator[](int i) const { return at(i); }
 
   void clear() {
     m_vector.clear();
@@ -129,7 +127,9 @@ class ArgList : Noncopyable {
 
  private:
   // Prohibits new / delete, which would break GC.
-  void* operator new(size_t);
+  friend class JSGlobalData;
+
+  void* ArgList::operator new(size_t size) { return fastMalloc(size); }
   void operator delete(void*);
 
   void* operator new[](size_t);

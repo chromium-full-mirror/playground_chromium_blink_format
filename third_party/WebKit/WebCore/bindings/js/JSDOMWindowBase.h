@@ -76,7 +76,8 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
                    KJS::JSValue*);
 
   int installTimeout(const KJS::UString& handler, int t, bool singleShot);
-  int installTimeout(KJS::JSValue* function,
+  int installTimeout(KJS::ExecState*,
+                     KJS::JSValue* function,
                      const KJS::ArgList& args,
                      int t,
                      bool singleShot);

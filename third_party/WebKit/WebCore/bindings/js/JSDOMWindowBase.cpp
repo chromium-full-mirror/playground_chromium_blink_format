@@ -1027,7 +1027,7 @@ JSValue* windowProtoFuncAToB(ExecState* exec,
   if (args.size() < 1)
     return throwError(exec, SyntaxError, "Not enough arguments");
 
-  JSValue* v = args[0];
+  JSValue* v = args.at(exec, 0);
   if (v->isNull())
     return jsString(exec);
 
@@ -1061,7 +1061,7 @@ JSValue* windowProtoFuncBToA(ExecState* exec,
   if (args.size() < 1)
     return throwError(exec, SyntaxError, "Not enough arguments");
 
-  JSValue* v = args[0];
+  JSValue* v = args.at(exec, 0);
   if (v->isNull())
     return jsString(exec);
 
@@ -1101,10 +1101,11 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
 
   Page* page = frame->page();
 
-  String urlString = valueToStringWithUndefinedOrNullCheck(exec, args[0]);
-  AtomicString frameName = args[1]->isUndefinedOrNull()
+  String urlString =
+      valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 0));
+  AtomicString frameName = args.at(exec, 1)->isUndefinedOrNull()
                                ? "_blank"
-                               : AtomicString(args[1]->toString(exec));
+                               : AtomicString(args.at(exec, 1)->toString(exec));
 
   // Because FrameTree::find() returns true for empty strings, we must check for
   // empty framenames.
@@ -1148,7 +1149,7 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
   // In the case of a named frame or a new window, we'll use the createWindow()
   // helper
   WindowFeatures windowFeatures(
-      valueToStringWithUndefinedOrNullCheck(exec, args[2]));
+      valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 2)));
   FloatRect windowRect(windowFeatures.x, windowFeatures.y, windowFeatures.width,
                        windowFeatures.height);
   DOMWindow::adjustWindowRect(screenAvailableRect(page->mainFrame()->view()),
@@ -1177,8 +1178,8 @@ static JSValue* setTimeoutOrInterval(ExecState* exec,
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
-  JSValue* v = args[0];
-  int delay = args[1]->toInt32(exec);
+  JSValue* v = args.at(exec, 0);
+  int delay = args.at(exec, 1)->toInt32(exec);
   if (v->isString())
     return jsNumber(
         exec, window->installTimeout(static_cast<JSString*>(v)->value(), delay,
@@ -1188,7 +1189,8 @@ static JSValue* setTimeoutOrInterval(ExecState* exec,
     return jsUndefined();
   ArgList argsTail;
   args.getSlice(2, argsTail);
-  return jsNumber(exec, window->installTimeout(v, argsTail, delay, timeout));
+  return jsNumber(exec,
+                  window->installTimeout(exec, v, argsTail, delay, timeout));
 }
 
 JSValue* windowProtoFuncClearTimeoutOrInterval(ExecState* exec,
@@ -1201,7 +1203,7 @@ JSValue* windowProtoFuncClearTimeoutOrInterval(ExecState* exec,
   if (!window->allowsAccessFrom(exec))
     return jsUndefined();
 
-  window->clearTimeout(args[0]->toInt32(exec));
+  window->clearTimeout(args.at(exec, 0)->toInt32(exec));
   return jsUndefined();
 }
 
@@ -1234,10 +1236,11 @@ JSValue* windowProtoFuncAddEventListener(ExecState* exec,
     return jsUndefined();
 
   if (RefPtr<JSEventListener> listener =
-          window->findOrCreateJSEventListener(exec, args[1])) {
+          window->findOrCreateJSEventListener(exec, args.at(exec, 1))) {
     if (Document* doc = frame->document())
-      doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
-                                  listener.release(), args[2]->toBoolean(exec));
+      doc->addWindowEventListener(
+          AtomicString(args.at(exec, 0)->toString(exec)), listener.release(),
+          args.at(exec, 2)->toBoolean(exec));
   }
 
   return jsUndefined();
@@ -1257,10 +1260,12 @@ JSValue* windowProtoFuncRemoveEventListener(ExecState* exec,
   if (!frame)
     return jsUndefined();
 
-  if (JSEventListener* listener = window->findJSEventListener(args[1])) {
+  if (JSEventListener* listener =
+          window->findJSEventListener(args.at(exec, 1))) {
     if (Document* doc = frame->document())
-      doc->removeWindowEventListener(AtomicString(args[0]->toString(exec)),
-                                     listener, args[2]->toBoolean(exec));
+      doc->removeWindowEventListener(
+          AtomicString(args.at(exec, 0)->toString(exec)), listener,
+          args.at(exec, 2)->toBoolean(exec));
   }
 
   return jsUndefined();
@@ -1281,8 +1286,10 @@ JSValue* windowProtoFuncShowModalDialog(ExecState* exec,
     return jsUndefined();
 
   return showModalDialog(
-      exec, frame, valueToStringWithUndefinedOrNullCheck(exec, args[0]),
-      args[1], valueToStringWithUndefinedOrNullCheck(exec, args[2]));
+      exec, frame,
+      valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 0)),
+      args.at(exec, 1),
+      valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 2)));
 }
 
 JSValue* windowProtoFuncNotImplemented(ExecState* exec,
@@ -1338,11 +1345,12 @@ int JSDOMWindowBase::installTimeout(const UString& handler,
   return installTimeout(new ScheduledAction(handler), t, singleShot);
 }
 
-int JSDOMWindowBase::installTimeout(JSValue* func,
+int JSDOMWindowBase::installTimeout(ExecState* exec,
+                                    JSValue* func,
                                     const ArgList& args,
                                     int t,
                                     bool singleShot) {
-  return installTimeout(new ScheduledAction(func, args), t, singleShot);
+  return installTimeout(new ScheduledAction(exec, func, args), t, singleShot);
 }
 
 PausedTimeouts* JSDOMWindowBase::pauseTimeouts() {

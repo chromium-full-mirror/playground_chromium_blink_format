@@ -52,7 +52,7 @@ namespace KJS {
 static JSValue* encode(ExecState* exec,
                        const ArgList& args,
                        const char* doNotEscape) {
-  UString str = args[0]->toString(exec);
+  UString str = args.at(exec, 0)->toString(exec);
   CString cstr = str.UTF8String(true);
   if (!cstr.c_str())
     return throwError(exec, URIError,
@@ -78,7 +78,7 @@ static JSValue* decode(ExecState* exec,
                        const char* doNotUnescape,
                        bool strict) {
   UString result = "";
-  UString str = args[0]->toString(exec);
+  UString str = args.at(exec, 0)->toString(exec);
   int k = 0;
   int len = str.size();
   const UChar* d = str.data();
@@ -287,7 +287,7 @@ JSValue* globalFuncEval(ExecState* exec,
                       "The \"this\" value passed to eval must be the global "
                       "object from which eval originated");
 
-  JSValue* x = args[0];
+  JSValue* x = args.at(exec, 0);
   if (!x->isString())
     return x;
 
@@ -313,29 +313,29 @@ JSValue* globalFuncParseInt(ExecState* exec,
                             JSObject*,
                             JSValue*,
                             const ArgList& args) {
-  return jsNumber(exec,
-                  parseInt(args[0]->toString(exec), args[1]->toInt32(exec)));
+  return jsNumber(exec, parseInt(args.at(exec, 0)->toString(exec),
+                                 args.at(exec, 1)->toInt32(exec)));
 }
 
 JSValue* globalFuncParseFloat(ExecState* exec,
                               JSObject*,
                               JSValue*,
                               const ArgList& args) {
-  return jsNumber(exec, parseFloat(args[0]->toString(exec)));
+  return jsNumber(exec, parseFloat(args.at(exec, 0)->toString(exec)));
 }
 
 JSValue* globalFuncIsNaN(ExecState* exec,
                          JSObject*,
                          JSValue*,
                          const ArgList& args) {
-  return jsBoolean(isnan(args[0]->toNumber(exec)));
+  return jsBoolean(isnan(args.at(exec, 0)->toNumber(exec)));
 }
 
 JSValue* globalFuncIsFinite(ExecState* exec,
                             JSObject*,
                             JSValue*,
                             const ArgList& args) {
-  double n = args[0]->toNumber(exec);
+  double n = args.at(exec, 0)->toNumber(exec);
   return jsBoolean(!isnan(n) && !isinf(n));
 }
 
@@ -393,7 +393,7 @@ JSValue* globalFuncEscape(ExecState* exec,
 
   UString result = "";
   UString s;
-  UString str = args[0]->toString(exec);
+  UString str = args.at(exec, 0)->toString(exec);
   const UChar* c = str.data();
   for (int k = 0; k < str.size(); k++, c++) {
     int u = c[0];
@@ -419,7 +419,7 @@ JSValue* globalFuncUnescape(ExecState* exec,
                             JSValue*,
                             const ArgList& args) {
   UString result = "";
-  UString str = args[0]->toString(exec);
+  UString str = args.at(exec, 0)->toString(exec);
   int k = 0;
   int len = str.size();
   while (k < len) {
@@ -451,7 +451,7 @@ JSValue* globalFuncKJSPrint(ExecState* exec,
                             JSValue*,
                             const ArgList& args) {
   CStringBuffer string;
-  args[0]->toString(exec).getCString(string);
+  args.at(exec, 0)->toString(exec).getCString(string);
   puts(string.data());
   return jsUndefined();
 }

@@ -80,6 +80,7 @@ JSGlobalData::JSGlobalData(bool isShared)
       ,
       identifierTable(createIdentifierTable()),
       propertyNames(new CommonIdentifiers(this)),
+      emptyList(new ArgList),
       newParserObjects(0),
       parserObjectExtraRefCounts(0),
       lexer(new Lexer(this)),

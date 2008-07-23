@@ -41,7 +41,7 @@ struct ArrayStorage {
 class JSArray : public JSObject {
  public:
   JSArray(JSValue* prototype, unsigned initialLength);
-  JSArray(JSObject* prototype, const ArgList& initialValues);
+  JSArray(ExecState* exec, JSObject* prototype, const ArgList& initialValues);
   virtual ~JSArray();
 
   virtual bool getOwnPropertySlot(ExecState*,
