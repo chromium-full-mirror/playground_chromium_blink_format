@@ -225,6 +225,11 @@ class Element : public ContainerNode {
   unsigned childElementCount() const;
 
  private:
+  bool hasRareData() const { return attrWasSpecifiedOrElementHasRareData(); }
+  void setHasRareData(bool b = true) {
+    setAttrWasSpecifiedOrElementHasRareData(b);
+  }
+
   ElementRareData* rareData();
   const ElementRareData* rareData() const;
   ElementRareData* createRareData();

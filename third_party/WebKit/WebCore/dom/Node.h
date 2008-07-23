@@ -289,6 +289,10 @@ class Node : public TreeShared<Node> {
   void setInDocument(bool b = true) { m_inDocument = b; }
   void setInActiveChain(bool b = true) { m_inActiveChain = b; }
   void setChanged(StyleChangeType changeType = FullStyleChange);
+  void setIsLink(bool b = true) { m_isLink = b; }
+
+  bool inSubtreeMark() const { return m_inSubtreeMark; }
+  void setInSubtreeMark(bool b = true) { m_inSubtreeMark = b; }
 
   void lazyAttach();
   virtual bool canLazyAttach();
@@ -556,13 +560,6 @@ class Node : public TreeShared<Node> {
 
   unsigned short compareDocumentPosition(Node*);
 
- private:  // members
-  DocPtr<Document> m_document;
-  Node* m_previous;
-  Node* m_next;
-  RenderObject* m_renderer;
-  short m_tabIndex;
-
  protected:
   virtual void willMoveToNewOwnerDocument() {}
   virtual void didMoveToNewOwnerDocument() {}
@@ -573,7 +570,22 @@ class Node : public TreeShared<Node> {
     m_tabIndexSetExplicitly = true;
   }
 
+  bool attrWasSpecifiedOrElementHasRareData() const {
+    return m_attrWasSpecifiedOrElementHasRareData;
+  }
+  void setAttrWasSpecifiedOrElementHasRareData(bool b = true) {
+    m_attrWasSpecifiedOrElementHasRareData = b;
+  }
+
+ private:
+  DocPtr<Document> m_document;
+  Node* m_previous;
+  Node* m_next;
+  RenderObject* m_renderer;
+
   OwnPtr<NodeListsNodeData> m_nodeLists;
+
+  short m_tabIndex;
 
   // make sure we don't use more than 16 bits here -- adding more would increase
   // the size of all Nodes
@@ -596,10 +608,8 @@ class Node : public TreeShared<Node> {
 
   bool m_inDetach : 1;
 
- public:
   bool m_inSubtreeMark : 1;
 
- private:
   bool m_tabIndexSetExplicitly : 1;
   // no bits left
 

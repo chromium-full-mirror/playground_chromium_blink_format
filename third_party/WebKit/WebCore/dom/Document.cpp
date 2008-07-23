@@ -724,7 +724,7 @@ PassRefPtr<Node> Document::adoptNode(PassRefPtr<Node> source,
       Attr* attr = static_cast<Attr*>(source.get());
       if (attr->ownerElement())
         attr->ownerElement()->removeAttributeNode(attr, ec);
-      attr->m_attrWasSpecifiedOrElementHasRareData = true;
+      attr->setSpecified(true);
       break;
     }
     default:

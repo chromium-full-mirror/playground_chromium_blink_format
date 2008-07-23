@@ -3,7 +3,8 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -30,12 +31,6 @@
 
 namespace WebCore {
 
-// this has no counterpart in DOM, purely internal
-// representation of the nodevalue of an Attr.
-// the actual Attr (Attr) with its value as textchild
-// is only allocated on demand by the DOM bindings.
-// Any use of Attr inside khtml should be avoided.
-
 // Attr can have Text and EntityReference children
 // therefore it has to be a fullblown Node. The plan
 // is to dynamically allocate a textchild and store the
@@ -55,7 +50,7 @@ class Attr : public ContainerNode {
 
   // DOM methods & attributes for Attr
   String name() const { return qualifiedName().toString(); }
-  bool specified() const { return m_attrWasSpecifiedOrElementHasRareData; }
+  bool specified() const { return attrWasSpecifiedOrElementHasRareData(); }
   Element* ownerElement() const { return m_element; }
 
   String value() const { return m_attribute->value(); }
@@ -89,7 +84,7 @@ class Attr : public ContainerNode {
   CSSStyleDeclaration* style() { return m_attribute->style(); }
 
   void setSpecified(bool specified) {
-    m_attrWasSpecifiedOrElementHasRareData = specified;
+    setAttrWasSpecifiedOrElementHasRareData(specified);
   }
 
  private:
@@ -98,6 +93,6 @@ class Attr : public ContainerNode {
   int m_ignoreChildrenChanged;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // Attr_h
