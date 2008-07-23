@@ -83,6 +83,7 @@ class QTMovieWinPrivate : Noncopyable {
   void startTask();
   void endTask();
 
+  void createMovieController();
   void registerDrawingCallback();
   void drawingComplete();
   void updateGWorld();
@@ -93,6 +94,7 @@ class QTMovieWinPrivate : Noncopyable {
 
   QTMovieWin* m_movieWin;
   Movie m_movie;
+  MovieController m_movieController;
   bool m_tasking;
   QTMovieWinClient* m_client;
   long m_loadState;
@@ -113,6 +115,7 @@ class QTMovieWinPrivate : Noncopyable {
 QTMovieWinPrivate::QTMovieWinPrivate()
     : m_movieWin(0),
       m_movie(0),
+      m_movieController(0),
       m_tasking(false),
       m_client(0),
       m_loadState(0),
@@ -133,6 +136,8 @@ QTMovieWinPrivate::~QTMovieWinPrivate() {
   endTask();
   if (m_gWorld)
     deleteGWorld();
+  if (m_movieController)
+    DisposeMovieController(m_movieController);
   if (m_movie)
     DisposeMovie(m_movie);
 }
@@ -169,8 +174,12 @@ void QTMovieWinPrivate::endTask() {
 void QTMovieWinPrivate::task() {
   ASSERT(m_tasking);
 
-  if (!m_loadError)
-    MoviesTask(m_movie, 0);
+  if (!m_loadError) {
+    if (m_movieController)
+      MCIdle(m_movieController);
+    else
+      MoviesTask(m_movie, 0);
+  }
 
   // GetMovieLoadState documentation says that you should not call it more often
   // than every quarter of a second.
@@ -181,6 +190,8 @@ void QTMovieWinPrivate::task() {
         m_loadError ? kMovieLoadStateError : GetMovieLoadState(m_movie);
     if (loadState != m_loadState) {
       m_loadState = loadState;
+      if (!m_movieController && m_loadState >= kMovieLoadStateLoaded)
+        createMovieController();
       m_client->movieLoadStateChanged(m_movieWin);
     }
     m_lastLoadStateCheckTime = systemTime();
@@ -204,6 +215,26 @@ void QTMovieWinPrivate::task() {
 
   if (m_loadError)
     endTask();
+}
+
+void QTMovieWinPrivate::createMovieController() {
+  Rect bounds;
+  long flags;
+
+  if (!m_movie)
+    return;
+
+  if (m_movieController)
+    DisposeMovieController(m_movieController);
+
+  GetMovieBox(m_movie, &bounds);
+  flags = mcTopLeftMovie | mcNotVisible;
+  m_movieController = NewMovieController(m_movie, &bounds, flags);
+  if (!m_movieController)
+    return;
+
+  MCSetControllerPort(m_movieController, m_gWorld);
+  MCSetControllerAttached(m_movieController, false);
 }
 
 void QTMovieWinPrivate::registerDrawingCallback() {
@@ -252,9 +283,13 @@ void QTMovieWinPrivate::createGWorld() {
   if (err)
     return;
   GetMovieGWorld(m_movie, &m_savedGWorld, 0);
+  if (m_movieController)
+    MCSetControllerPort(m_movieController, m_gWorld);
   SetMovieGWorld(m_movie, m_gWorld, 0);
   bounds.right = m_width;
   bounds.bottom = m_height;
+  if (m_movieController)
+    MCSetControllerBoundsRect(m_movieController, &bounds);
   SetMovieBox(m_movie, &bounds);
 }
 
@@ -270,12 +305,16 @@ void QTMovieWinPrivate::setSize(int width, int height) {
   bounds.left = 0;
   bounds.right = width;
   bounds.bottom = height;
+  if (m_movieController)
+    MCSetControllerBoundsRect(m_movieController, &bounds);
   SetMovieBox(m_movie, &bounds);
   updateGWorld();
 }
 
 void QTMovieWinPrivate::deleteGWorld() {
   ASSERT(m_gWorld);
+  if (m_movieController)
+    MCSetControllerPort(m_movieController, m_savedGWorld);
   if (m_movie)
     SetMovieGWorld(m_movie, m_savedGWorld, 0);
   m_savedGWorld = 0;
@@ -297,12 +336,19 @@ QTMovieWin::~QTMovieWin() {
 }
 
 void QTMovieWin::play() {
-  StartMovie(m_private->m_movie);
+  if (m_private->m_movieController)
+    MCDoAction(m_private->m_movieController, mcActionPrerollAndPlay,
+               (void*)GetMoviePreferredRate(m_private->m_movie));
+  else
+    StartMovie(m_private->m_movie);
   m_private->startTask();
 }
 
 void QTMovieWin::pause() {
-  StopMovie(m_private->m_movie);
+  if (m_private->m_movieController)
+    MCDoAction(m_private->m_movieController, mcActionPlay, 0);
+  else
+    StopMovie(m_private->m_movie);
   updateTaskTimer();
 }
 
@@ -315,7 +361,11 @@ float QTMovieWin::rate() const {
 void QTMovieWin::setRate(float rate) {
   if (!m_private->m_movie)
     return;
-  SetMovieRate(m_private->m_movie, FloatToFixed(rate));
+  if (m_private->m_movieController)
+    MCDoAction(m_private->m_movieController, mcActionPrerollAndPlay,
+               (void*)FloatToFixed(rate));
+  else
+    SetMovieRate(m_private->m_movie, FloatToFixed(rate));
   updateTaskTimer();
 }
 
@@ -340,7 +390,12 @@ void QTMovieWin::setCurrentTime(float time) const {
     return;
   m_private->m_seeking = true;
   TimeScale scale = GetMovieTimeScale(m_private->m_movie);
-  SetMovieTimeValue(m_private->m_movie, TimeValue(time * scale));
+  if (m_private->m_movieController) {
+    QTRestartAtTimeRecord restart = {time * scale, 0};
+    MCDoAction(m_private->m_movieController, mcActionRestartAtTime,
+               (void*)&restart);
+  } else
+    SetMovieTimeValue(m_private->m_movie, TimeValue(time * scale));
   updateTaskTimer();
 }
 
@@ -414,6 +469,9 @@ void QTMovieWin::load(const UChar* url, int len) {
     m_private->endTask();
     if (m_private->m_gWorld)
       m_private->deleteGWorld();
+    if (m_private->m_movieController)
+      DisposeMovieController(m_private->m_movieController);
+    m_private->m_movieController = 0;
     DisposeMovie(m_private->m_movie);
     m_private->m_movie = 0;
   }
