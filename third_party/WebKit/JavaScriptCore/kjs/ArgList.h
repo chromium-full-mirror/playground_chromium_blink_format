@@ -129,7 +129,7 @@ class ArgList : Noncopyable {
   // Prohibits new / delete, which would break GC.
   friend class JSGlobalData;
 
-  void* ArgList::operator new(size_t size) { return fastMalloc(size); }
+  void* operator new(size_t size) { return fastMalloc(size); }
   void operator delete(void*);
 
   void* operator new[](size_t);
