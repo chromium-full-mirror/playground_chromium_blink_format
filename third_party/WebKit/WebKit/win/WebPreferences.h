@@ -276,6 +276,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setCacheModel(
       /* [in] */ WebCacheModel cacheModel);
 
+  virtual HRESULT STDMETHODCALLTYPE setShouldPaintCustomScrollbars(
+      /* [in] */ BOOL shouldPaint);
+
+  virtual HRESULT STDMETHODCALLTYPE shouldPaintCustomScrollbars(
+      /* [retval][out] */ BOOL* shouldPaint);
+
   // IWebPreferencesPrivate
   virtual HRESULT STDMETHODCALLTYPE setDeveloperExtrasEnabled(
       /* [in] */ BOOL);
