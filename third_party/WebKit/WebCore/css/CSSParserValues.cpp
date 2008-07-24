@@ -62,7 +62,7 @@ PassRefPtr<CSSValue> CSSParserValue::createCSSValue() {
     parsedValue = CSSFunctionValue::create(function);
   else if (unit == CSSPrimitiveValue::CSS_STRING ||
            unit == CSSPrimitiveValue::CSS_URI ||
-           unit == CSSPrimitiveValue::CSS_RGBCOLOR ||
+           unit == CSSPrimitiveValue::CSS_PARSER_HEXCOLOR ||
            unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE)
     parsedValue =
         CSSPrimitiveValue::create(string, (CSSPrimitiveValue::UnitTypes)unit);

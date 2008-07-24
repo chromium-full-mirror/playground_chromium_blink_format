@@ -76,7 +76,8 @@ class CSSPrimitiveValue : public CSSValue {
     // and forth from CSSPrimitiveValues to CSSParserValues.
     CSS_PARSER_OPERATOR = 103,
     CSS_PARSER_INTEGER = 104,
-    CSS_PARSER_VARIABLE = 105
+    CSS_PARSER_VARIABLE = 105,
+    CSS_PARSER_HEXCOLOR = 106
   };
 
   static PassRefPtr<CSSPrimitiveValue> createIdentifier(int ident) {
