@@ -112,6 +112,8 @@ class ScopeNode;
 class CodeBlock;
 struct Instruction;
 
+#if SAMPLING_TOOL_ENABLED
+
 struct ScopeSampleRecord {
   RefPtr<ScopeNode> m_scope;
   CodeBlock* m_codeBlock;
@@ -190,6 +192,8 @@ class SamplingTool {
   long long m_totalSamples;
   ScopeSampleRecordMap* m_scopeSampleMap;
 };
+
+#endif
 
 // SCOPENODE_ / MACHINE_ macros for use from within member methods on ScopeNode
 // / Machine respectively.

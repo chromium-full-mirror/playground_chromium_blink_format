@@ -90,6 +90,8 @@ static const char* opcodeNames[] = {
 
 #endif
 
+#if SAMPLING_TOOL_ENABLED
+
 void ScopeSampleRecord::sample(CodeBlock* codeBlock, Instruction* vPC) {
   m_totalCount++;
 
@@ -152,8 +154,6 @@ void SamplingTool::stop() {
   m_running = false;
   pthread_join(m_samplingThread, 0);
 }
-
-#if SAMPLING_TOOL_ENABLED
 
 struct OpcodeSampleInfo {
   OpcodeID opcode;
@@ -322,10 +322,6 @@ void SamplingTool::dump(ExecState* exec) {
   }
   fprintf(stdout, "\n");
 }
-
-#else
-
-void SamplingTool::dump(ExecState*) {}
 
 #endif
 
