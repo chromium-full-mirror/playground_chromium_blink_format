@@ -47,7 +47,7 @@
 #include "Page.h"
 #include "FocusController.h"
 #include "PlatformMouseEvent.h"
-#if PLATFORM(WIN_OS)
+#if PLATFORM(WIN_OS) && !PLATFORM(WX)
 #include "PluginMessageThrottlerWin.h"
 #endif
 #include "PluginPackage.h"
@@ -566,7 +566,7 @@ PluginView::PluginView(Frame* parentFrame,
       ,
       m_needsXEmbed(false)
 #endif
-#if PLATFORM(WIN_OS)
+#if PLATFORM(WIN_OS) && !PLATFORM(WX)
       ,
       m_pluginWndProc(0),
       m_lastMessage(0),
