@@ -100,7 +100,7 @@ class Node : public TreeShared<Node> {
   enum StyleChange { NoChange, NoInherit, Inherit, Detach, Force };
   static StyleChange diff(RenderStyle*, RenderStyle*);
 
-  Node(Document*);
+  Node(Document*, bool isElement = false);
   virtual ~Node();
 
   // DOM methods & attributes for Node
@@ -169,7 +169,7 @@ class Node : public TreeShared<Node> {
 
   // Other methods (not part of DOM)
 
-  virtual bool isElementNode() const { return false; }
+  bool isElementNode() const { return m_isElement; }
   virtual bool isHTMLElement() const { return false; }
 
 #if ENABLE(SVG)
@@ -571,13 +571,6 @@ class Node : public TreeShared<Node> {
     m_tabIndexSetExplicitly = true;
   }
 
-  bool attrWasSpecifiedOrElementHasRareData() const {
-    return m_attrWasSpecifiedOrElementHasRareData;
-  }
-  void setAttrWasSpecifiedOrElementHasRareData(bool b = true) {
-    m_attrWasSpecifiedOrElementHasRareData = b;
-  }
-
  private:
   DocPtr<Document> m_document;
   Node* m_previous;
@@ -591,27 +584,21 @@ class Node : public TreeShared<Node> {
   // make sure we don't use more than 16 bits here -- adding more would increase
   // the size of all Nodes
 
+  unsigned m_styleChange : 2;
   bool m_hasId : 1;
   bool m_hasClass : 1;
   bool m_attached : 1;
-  unsigned m_styleChange : 2;
   bool m_hasChangedChild : 1;
   bool m_inDocument : 1;
-
   bool m_isLink : 1;
-  bool m_attrWasSpecifiedOrElementHasRareData : 1;  // used in Attr for one
-                                                    // thing and Element for
-                                                    // another
   bool m_focused : 1;
   bool m_active : 1;
   bool m_hovered : 1;
   bool m_inActiveChain : 1;
-
   bool m_inDetach : 1;
-
   bool m_inSubtreeMark : 1;
-
   bool m_tabIndexSetExplicitly : 1;
+  const bool m_isElement : 1;
   // no bits left
 
   Element* ancestorElement() const;

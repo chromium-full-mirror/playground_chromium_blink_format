@@ -34,10 +34,10 @@ Attr::Attr(Element* element, Document* docPtr, PassRefPtr<Attribute> a)
     : ContainerNode(docPtr),
       m_element(element),
       m_attribute(a),
-      m_ignoreChildrenChanged(0) {
+      m_ignoreChildrenChanged(0),
+      m_specified(true) {
   ASSERT(!m_attribute->attr());
   m_attribute->m_impl = this;
-  setSpecified(true);
 }
 
 Attr::~Attr() {

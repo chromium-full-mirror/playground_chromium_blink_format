@@ -135,7 +135,6 @@ class Element : public ContainerNode {
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
   virtual String nodeName() const;
-  virtual bool isElementNode() const { return true; }
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void childrenChanged(bool changedByParser = false,
@@ -225,10 +224,8 @@ class Element : public ContainerNode {
   unsigned childElementCount() const;
 
  private:
-  bool hasRareData() const { return attrWasSpecifiedOrElementHasRareData(); }
-  void setHasRareData(bool b = true) {
-    setAttrWasSpecifiedOrElementHasRareData(b);
-  }
+  bool hasRareData() const { return m_hasRareData; }
+  void setHasRareData(bool b = true) { m_hasRareData = b; }
 
   ElementRareData* rareData();
   const ElementRareData* rareData() const;
@@ -268,6 +265,7 @@ class Element : public ContainerNode {
 
  private:
   bool m_parsingChildrenFinished : 1;
+  bool m_hasRareData : 1;
 };
 
 }  // namespace
