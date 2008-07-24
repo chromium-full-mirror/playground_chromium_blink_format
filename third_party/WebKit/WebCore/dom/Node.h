@@ -97,6 +97,9 @@ class Node : public TreeShared<Node> {
   static void startIgnoringLeaks();
   static void stopIgnoringLeaks();
 
+  enum StyleChange { NoChange, NoInherit, Inherit, Detach, Force };
+  static StyleChange diff(RenderStyle*, RenderStyle*);
+
   Node(Document*);
   virtual ~Node();
 
@@ -325,9 +328,7 @@ class Node : public TreeShared<Node> {
   virtual bool shouldUseInputMethod() const;
   virtual IntRect getRect() const;
 
-  enum StyleChange { NoChange, NoInherit, Inherit, Detach, Force };
   virtual void recalcStyle(StyleChange = NoChange) {}
-  StyleChange diff(RenderStyle*, RenderStyle*) const;
 
   unsigned nodeIndex() const;
 

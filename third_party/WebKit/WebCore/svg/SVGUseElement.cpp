@@ -168,8 +168,8 @@ void SVGUseElement::recalcStyle(StyleChange change) {
   if (change >= Inherit || m_shadowTreeRootElement->changed()) {
     RenderStyle* newStyle = document()->styleSelector()->styleForElement(
         m_shadowTreeRootElement.get());
-    StyleChange ch = m_shadowTreeRootElement->diff(
-        m_shadowTreeRootElement->renderStyle(), newStyle);
+    StyleChange ch =
+        Node::diff(m_shadowTreeRootElement->renderStyle(), newStyle);
     if (ch == Detach) {
       ASSERT(m_shadowTreeRootElement->attached());
       m_shadowTreeRootElement->detach();

@@ -256,6 +256,18 @@ void RenderContainer::updateBeforeAfterContent(RenderStyle::PseudoId type) {
   updateBeforeAfterContentForContainer(type, this);
 }
 
+static RenderObject* findBeforeAfterParent(RenderObject* object) {
+  // Only table parts need to search for the :before or :after parent
+  if (!(object->isTable() || object->isTableSection() || object->isTableRow()))
+    return object;
+
+  RenderObject* beforeAfterParent = object;
+  while (beforeAfterParent &&
+         !(beforeAfterParent->isText() || beforeAfterParent->isImage()))
+    beforeAfterParent = beforeAfterParent->firstChild();
+  return beforeAfterParent;
+}
+
 void RenderContainer::updateBeforeAfterContentForContainer(
     RenderStyle::PseudoId type,
     RenderContainer* styledObject) {
@@ -294,7 +306,7 @@ void RenderContainer::updateBeforeAfterContentForContainer(
   // of the old generated content.
   if (!newContentWanted ||
       (oldContentPresent &&
-       !child->style()->contentDataEquivalent(pseudoElementStyle))) {
+       Node::diff(child->style(), pseudoElementStyle) == Node::Detach)) {
     // Nuke the child.
     if (child && child->style()->styleType() == type) {
       oldContentPresent = false;
@@ -329,10 +341,14 @@ void RenderContainer::updateBeforeAfterContentForContainer(
       // style information with the new pseudo-element style.
       child->setStyle(pseudoElementStyle);
 
+      RenderObject* beforeAfterParent = findBeforeAfterParent(child);
+      if (!beforeAfterParent)
+        return;
+
       // Note that if we ever support additional types of generated content
       // (which should be way off
       // in the future), this code will need to be patched.
-      for (RenderObject* genChild = child->firstChild(); genChild;
+      for (RenderObject* genChild = beforeAfterParent->firstChild(); genChild;
            genChild = genChild->nextSibling()) {
         if (genChild->isText())
           // Generated text content is a child whose style also needs to be set
@@ -398,16 +414,11 @@ void RenderContainer::updateBeforeAfterContentForContainer(
         generatedContentContainer =
             RenderObject::createObject(document(), pseudoElementStyle);
         generatedContentContainer->setStyle(pseudoElementStyle);
+        addChild(generatedContentContainer, insertBefore);
       }
       generatedContentContainer->addChild(renderer);
     }
   }
-
-  // Add the pseudo after we've installed all our content so that addChild will
-  // be able to find the text
-  // inside the inline for e.g., first-letter styling.
-  if (generatedContentContainer)
-    addChild(generatedContentContainer, insertBefore);
 }
 
 bool RenderContainer::isAfterContent(RenderObject* child) const {
