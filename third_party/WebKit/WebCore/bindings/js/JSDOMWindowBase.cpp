@@ -1152,8 +1152,9 @@ JSValue* windowProtoFuncOpen(ExecState* exec,
       valueToStringWithUndefinedOrNullCheck(exec, args.at(exec, 2)));
   FloatRect windowRect(windowFeatures.x, windowFeatures.y, windowFeatures.width,
                        windowFeatures.height);
-  DOMWindow::adjustWindowRect(screenAvailableRect(page->mainFrame()->view()),
-                              windowRect, windowRect);
+  DOMWindow::adjustWindowRect(
+      screenAvailableRect(page ? page->mainFrame()->view() : 0), windowRect,
+      windowRect);
 
   windowFeatures.x = windowRect.x();
   windowFeatures.y = windowRect.y();
