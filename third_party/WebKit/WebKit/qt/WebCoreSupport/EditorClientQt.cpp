@@ -367,7 +367,8 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
       case VK_TAB:
         return;
       default:
-        if (!kevent->ctrlKey() && !kevent->altKey() &&
+        if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
+            !kevent->ctrlKey() && !kevent->altKey() &&
             !kevent->text().isEmpty()) {
           frame->editor()->insertText(kevent->text(), event);
         } else if (kevent->ctrlKey()) {
@@ -398,7 +399,8 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
               break;
             default:
               // catch combination AltGr+key or Ctrl+Alt+key
-              if (!kevent->text().isEmpty()) {
+              if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
+                  !kevent->text().isEmpty()) {
                 frame->editor()->insertText(kevent->text(), event);
                 break;
               }
