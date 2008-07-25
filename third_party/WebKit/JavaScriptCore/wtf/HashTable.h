@@ -926,7 +926,9 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
     // follow a pivot entry and return the new position.
     KeyType enteredKey = Extractor::extract(*entry);
     expand();
-    return std::make_pair(find(enteredKey), true);
+    pair<iterator, bool> p = std::make_pair(find(enteredKey), true);
+    ASSERT(p.first != end());
+    return p;
   }
 
   checkTableConsistency();
@@ -981,7 +983,9 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     // follow a pivot entry and return the new position.
     KeyType enteredKey = Extractor::extract(*entry);
     expand();
-    return std::make_pair(find(enteredKey), true);
+    pair<iterator, bool> p = std::make_pair(find(enteredKey), true);
+    ASSERT(p.first != end());
+    return p;
   }
 
   checkTableConsistency();
