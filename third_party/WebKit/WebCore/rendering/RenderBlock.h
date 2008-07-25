@@ -181,8 +181,8 @@ class RenderBlock : public RenderFlow {
                       int& repaintBottom,
                       int& repaintTop);
   bool generatesLineBoxesForInlineChild(RenderObject*);
-  int skipWhitespace(InlineIterator&);
-  int skipWhitespace(InlineBidiResolver&);
+  void skipTrailingWhitespace(InlineIterator&);
+  int skipLeadingWhitespace(InlineBidiResolver&);
   void fitBelowFloats(int widthToFit, int& availableWidth);
   InlineIterator findNextLineBreak(InlineBidiResolver&, EClear* clear = 0);
   RootInlineBox* constructLine(unsigned runCount,
