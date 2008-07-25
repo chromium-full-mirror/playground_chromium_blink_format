@@ -147,6 +147,7 @@ class PlatformKeyboardEvent {
 
 #if PLATFORM(QT)
   PlatformKeyboardEvent(QKeyEvent*);
+  QKeyEvent* qtEvent() const { return m_qtEvent; }
 #endif
 
 #if PLATFORM(WX)
@@ -174,6 +175,9 @@ class PlatformKeyboardEvent {
 #endif
 #if PLATFORM(GTK)
   GdkEventKey* m_gdkEventKey;
+#endif
+#if PLATFORM(QT)
+  QKeyEvent* m_qtEvent;
 #endif
 };
 
