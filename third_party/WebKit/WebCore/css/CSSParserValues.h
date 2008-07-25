@@ -51,6 +51,8 @@ struct CSSParserValue {
   enum { Operator = 0x100000, Function = 0x100001, Q_EMS = 0x100002 };
   int unit;
 
+  bool isVariable() const;
+
   PassRefPtr<CSSValue> createCSSValue();
 };
 

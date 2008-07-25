@@ -26,6 +26,12 @@
 
 namespace WebCore {
 
+bool CSSParserValue::isVariable() const {
+  return unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE_FUNCTION_SYNTAX ||
+         unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE_EQUALS_SYNTAX ||
+         unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE_EQUALS_SYNTAX;
+}
+
 CSSParserValueList::~CSSParserValueList() {
   size_t numValues = m_values.size();
   for (size_t i = 0; i < numValues; i++) {
@@ -35,13 +41,13 @@ CSSParserValueList::~CSSParserValueList() {
 }
 
 void CSSParserValueList::addValue(const CSSParserValue& v) {
-  if (v.unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE)
+  if (v.isVariable())
     m_variablesCount++;
   m_values.append(v);
 }
 
 void CSSParserValueList::deleteValueAt(unsigned i) {
-  if (m_values[i].unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE)
+  if (m_values[i].isVariable())
     m_variablesCount--;
   m_values.remove(i);
 }
@@ -62,8 +68,7 @@ PassRefPtr<CSSValue> CSSParserValue::createCSSValue() {
     parsedValue = CSSFunctionValue::create(function);
   else if (unit == CSSPrimitiveValue::CSS_STRING ||
            unit == CSSPrimitiveValue::CSS_URI ||
-           unit == CSSPrimitiveValue::CSS_PARSER_HEXCOLOR ||
-           unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE)
+           unit == CSSPrimitiveValue::CSS_PARSER_HEXCOLOR || isVariable())
     parsedValue =
         CSSPrimitiveValue::create(string, (CSSPrimitiveValue::UnitTypes)unit);
   else if (unit >= CSSPrimitiveValue::CSS_NUMBER &&

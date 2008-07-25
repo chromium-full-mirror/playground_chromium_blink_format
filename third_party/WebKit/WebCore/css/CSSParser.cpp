@@ -4673,9 +4673,10 @@ CSSRule* CSSParser::createFontFaceRule() {
   return result;
 }
 
-CSSRule* CSSParser::createVariablesRule(MediaList* mediaList) {
+CSSRule* CSSParser::createVariablesRule(MediaList* mediaList,
+                                        bool variablesKeyword) {
   RefPtr<CSSVariablesRule> rule =
-      CSSVariablesRule::create(m_styleSheet, mediaList);
+      CSSVariablesRule::create(m_styleSheet, mediaList, variablesKeyword);
   rule->setDeclaration(CSSVariablesDeclaration::create(
       rule.get(), m_variableNames, m_variableValues));
   clearVariables();
@@ -4744,7 +4745,7 @@ bool CSSParser::checkForVariables(CSSParserValueList* valueList) {
 
   bool hasVariables = false;
   for (unsigned i = 0; i < valueList->size(); ++i) {
-    if (valueList->valueAt(i)->unit == CSSPrimitiveValue::CSS_PARSER_VARIABLE) {
+    if (valueList->valueAt(i)->isVariable()) {
       hasVariables = true;
       break;
     }

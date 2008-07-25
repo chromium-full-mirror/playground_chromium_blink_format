@@ -500,9 +500,7 @@ void CSSStyleSelector::addMatchedDeclaration(CSSMutableStyleDeclaration* decl) {
       CSSValue* val = valueList->item(i);
       CSSPrimitiveValue* primitiveValue =
           val->isPrimitiveValue() ? static_cast<CSSPrimitiveValue*>(val) : 0;
-      if (primitiveValue &&
-          primitiveValue->primitiveType() ==
-              CSSPrimitiveValue::CSS_PARSER_VARIABLE) {
+      if (primitiveValue && primitiveValue->isVariable()) {
         CSSVariablesRule* rule =
             m_variablesMap.get(primitiveValue->getStringValue());
         if (!rule || !rule->variables()) {

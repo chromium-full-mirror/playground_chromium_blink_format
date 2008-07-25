@@ -38,8 +38,9 @@ class MediaList;
 class CSSVariablesRule : public CSSRule {
  public:
   static PassRefPtr<CSSVariablesRule> create(CSSStyleSheet* parent,
-                                             MediaList* mediaList) {
-    return adoptRef(new CSSVariablesRule(parent, mediaList));
+                                             MediaList* mediaList,
+                                             bool variablesKeyword) {
+    return adoptRef(new CSSVariablesRule(parent, mediaList, variablesKeyword));
   }
 
   virtual ~CSSVariablesRule();
@@ -61,10 +62,11 @@ class CSSVariablesRule : public CSSRule {
   }
 
  private:
-  CSSVariablesRule(CSSStyleSheet* parent, MediaList*);
+  CSSVariablesRule(CSSStyleSheet* parent, MediaList*, bool variablesKeyword);
 
   RefPtr<MediaList> m_lstMedia;
   RefPtr<CSSVariablesDeclaration> m_variables;
+  bool m_variablesKeyword;
 };
 
 }  // namespace WebCore
