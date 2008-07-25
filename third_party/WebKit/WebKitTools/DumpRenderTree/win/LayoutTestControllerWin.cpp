@@ -522,6 +522,13 @@ int LayoutTestController::windowCount() {
   return openWindows().size();
 }
 
+bool LayoutTestController::elementDoesAutoCompleteForElementWithId(
+    JSStringRef id) {
+  // FIXME: Implement this almost exactly like the Mac version
+
+  return false;
+}
+
 void LayoutTestController::execCommand(JSStringRef name, JSStringRef value) {
   wstring wName = jsStringRefToWString(name);
   wstring wValue = jsStringRefToWString(value);

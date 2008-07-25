@@ -52,6 +52,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
     RANGE
   };
 
+  enum AutoCompleteSetting { Uninitialized, On, Off };
+
   HTMLInputElement(Document*, HTMLFormElement* = 0);
   HTMLInputElement(const QualifiedName& tagName,
                    Document*,
@@ -72,7 +74,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
 
   virtual const AtomicString& name() const;
 
-  bool autoComplete() const { return m_autocomplete; }
+  bool autoComplete() const;
 
   // isChecked is used by the rendering tree/CSS while checked() is used by JS
   // to determine checked state
@@ -244,7 +246,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState {
   bool m_indeterminate : 1;
   bool m_haveType : 1;
   bool m_activeSubmit : 1;
-  bool m_autocomplete : 1;
+  AutoCompleteSetting m_autocomplete : 2;
   bool m_autofilled : 1;
   bool m_inited : 1;
 
