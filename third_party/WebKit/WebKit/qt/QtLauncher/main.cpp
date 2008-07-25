@@ -35,7 +35,7 @@
 
 #include <QtGui>
 #include <QDebug>
-#if QT_VERSION >= 0x040400
+#if QT_VERSION >= 0x040400 && !defined(QT_NO_PRINTER)
 #include <QPrintPreviewDialog>
 #endif
 
@@ -172,7 +172,7 @@ class MainWindow : public QMainWindow {
     bar->addAction(view->pageAction(QWebPage::Undo));
     bar->addAction(view->pageAction(QWebPage::Redo));
 
-#if QT_VERSION >= 0x040400
+#if QT_VERSION >= 0x040400 && !defined(QT_NO_PRINTER)
     bar->addSeparator();
     bar->addAction(tr("Print"), this, SLOT(print()));
 #endif
@@ -198,7 +198,7 @@ class MainWindow : public QMainWindow {
     statusBar()->showMessage(link);
   }
   void print() {
-#if QT_VERSION >= 0x040400
+#if QT_VERSION >= 0x040400 && !defined(QT_NO_PRINTER)
     QPrintPreviewDialog dlg(this);
     connect(&dlg, SIGNAL(paintRequested(QPrinter*)), view,
             SLOT(print(QPrinter*)));
