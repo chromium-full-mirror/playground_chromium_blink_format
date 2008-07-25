@@ -130,7 +130,7 @@ class ArgList : Noncopyable {
   friend class JSGlobalData;
 
   void* operator new(size_t size) { return fastMalloc(size); }
-  void operator delete(void*);
+  void operator delete(void* p) { fastFree(p); }
 
   void* operator new[](size_t);
   void operator delete[](void*);
