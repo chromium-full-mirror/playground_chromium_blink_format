@@ -354,7 +354,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 
   AccessibilityObject* accessibilityObjectForPosition(
       const VisiblePosition&) const;
-  unsigned lineForPosition(const VisiblePosition&) const;
+  int lineForPosition(const VisiblePosition&) const;
   PlainTextRange plainTextRangeForVisiblePositionRange(
       const VisiblePositionRange&) const;
   virtual int index(const VisiblePosition&) const;

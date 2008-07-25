@@ -800,7 +800,7 @@ AccessibilityObject* AccessibilityObject::accessibilityObjectForPosition(
   return obj->document()->axObjectCache()->get(obj);
 }
 
-unsigned AccessibilityObject::lineForPosition(
+int AccessibilityObject::lineForPosition(
     const VisiblePosition& visiblePos) const {
   if (visiblePos.isNull())
     return 0;
@@ -815,9 +815,9 @@ unsigned AccessibilityObject::lineForPosition(
   // top document.
   while (currentVisiblePos.isNotNull() &&
          !(inSameLine(currentVisiblePos, savedVisiblePos))) {
-    lineCount += 1;
+    ++lineCount;
     savedVisiblePos = currentVisiblePos;
-    VisiblePosition prevVisiblePos = previousLinePosition(visiblePos, 0);
+    VisiblePosition prevVisiblePos = previousLinePosition(currentVisiblePos, 0);
     currentVisiblePos = prevVisiblePos;
   }
 
