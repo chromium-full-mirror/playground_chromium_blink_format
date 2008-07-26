@@ -65,4 +65,4 @@ class JSStaticScopeObject : public JSVariableObject {
 };
 }
 
-#endif  // !JSStaticScopeObject_h
+#endif  // JSStaticScopeObject_h
