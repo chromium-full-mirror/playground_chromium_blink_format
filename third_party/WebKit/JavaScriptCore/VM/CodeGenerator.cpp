@@ -646,7 +646,8 @@ RegisterID* CodeGenerator::emitNullaryOp(OpcodeID opcode, RegisterID* dst) {
 
 bool CodeGenerator::findScopedProperty(const Identifier& property,
                                        int& index,
-                                       size_t& stackDepth) {
+                                       size_t& stackDepth,
+                                       bool forWriting) {
   // Cases where we cannot optimise the lookup
   if (property == propertyNames().arguments || !canOptimizeNonLocals()) {
     stackDepth = 0;
@@ -669,6 +670,11 @@ bool CodeGenerator::findScopedProperty(const Identifier& property,
 
     // Found the property
     if (!entry.isNull()) {
+      if (entry.isReadOnly() && forWriting) {
+        stackDepth = 0;
+        index = missingSymbolMarker();
+        return false;
+      }
       stackDepth = depth;
       index = entry.getIndex();
       return true;
@@ -687,7 +693,7 @@ RegisterID* CodeGenerator::emitResolve(RegisterID* dst,
                                        const Identifier& property) {
   size_t depth = 0;
   int index = 0;
-  if (!findScopedProperty(property, index, depth)) {
+  if (!findScopedProperty(property, index, depth, false)) {
     // We can't optimise at all :-(
     emitOpcode(op_resolve);
     instructions().append(dst->index());
