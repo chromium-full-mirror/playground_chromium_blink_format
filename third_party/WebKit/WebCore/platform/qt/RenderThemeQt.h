@@ -224,6 +224,7 @@ class StylePainter {
 
  private:
   QBrush oldBrush;
+  bool oldAntialiasing;
 
   Q_DISABLE_COPY(StylePainter)
 };
