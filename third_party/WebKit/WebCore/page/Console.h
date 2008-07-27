@@ -85,6 +85,8 @@ class Console : public RefCounted<Console>, public KJS::ProfilerClient {
                        const KJS::ArgList& arguments);
   void profile(KJS::ExecState*, const KJS::ArgList& arguments);
   void profileEnd(KJS::ExecState*, const KJS::ArgList& arguments);
+  void time(const KJS::UString& title);
+  void timeEnd(const KJS::UString& title);
 
   void finishedProfiling(PassRefPtr<KJS::Profile>);
 

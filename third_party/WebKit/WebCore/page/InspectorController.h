@@ -200,6 +200,9 @@ class InspectorController : JavaScriptDebugListener,
 
   void drawNodeHighlight(GraphicsContext&) const;
 
+  void startTiming(const KJS::UString& title);
+  bool stopTiming(const KJS::UString& title, double& elapsed);
+
  private:
   void focusNode();
 
@@ -273,6 +276,7 @@ class InspectorController : JavaScriptDebugListener,
   FrameResourcesMap m_frameResources;
   Vector<ConsoleMessage*> m_consoleMessages;
   Vector<RefPtr<KJS::Profile>> m_profiles;
+  HashMap<String, double> m_times;
 #if ENABLE(DATABASE)
   DatabaseResourcesSet m_databaseResources;
 #endif
