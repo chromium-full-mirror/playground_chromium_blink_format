@@ -33,30 +33,32 @@
 #include "CSSStyleSelector.h"
 #include "Document.h"
 #include "Element.h"
+#include "HTMLNames.h"
 
 namespace WebCore {
 
-PassRefPtr<StaticNodeList> createSelectorNodeList(PassRefPtr<Node> rootNode,
+using namespace HTMLNames;
+
+PassRefPtr<StaticNodeList> createSelectorNodeList(Node* rootNode,
                                                   CSSSelector* querySelector) {
   Vector<RefPtr<Node>> nodes;
   Document* document = rootNode->document();
   AtomicString selectorValue = querySelector->m_value;
+  bool strictParsing = !document->inCompatMode();
 
-  if (rootNode->inDocument() && !querySelector->next() &&
+  if (strictParsing && rootNode->inDocument() && !querySelector->next() &&
       querySelector->m_match == CSSSelector::Id && !querySelector->hasTag() &&
-      !querySelector->hasAttribute() && !querySelector->m_tagHistory &&
-      !querySelector->m_simpleSelector &&
+      !querySelector->m_tagHistory && !querySelector->m_simpleSelector &&
       !document->containsMultipleElementsWithId(selectorValue)) {
+    ASSERT(querySelector->m_attr == idAttr);
     Element* element = document->getElementById(selectorValue);
     if (element &&
-        (rootNode->isDocumentNode() || element->isDescendantOf(rootNode.get())))
+        (rootNode->isDocumentNode() || element->isDescendantOf(rootNode)))
       nodes.append(element);
   } else {
-    CSSStyleSelector::SelectorChecker selectorChecker(
-        document, !document->inCompatMode());
-
+    CSSStyleSelector::SelectorChecker selectorChecker(document, strictParsing);
     for (Node* n = rootNode->firstChild(); n;
-         n = n->traverseNextNode(rootNode.get())) {
+         n = n->traverseNextNode(rootNode)) {
       if (n->isElementNode()) {
         Element* element = static_cast<Element*>(n);
         for (CSSSelector* selector = querySelector; selector;

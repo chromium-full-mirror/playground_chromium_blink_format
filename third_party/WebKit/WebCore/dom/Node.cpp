@@ -1292,11 +1292,12 @@ PassRefPtr<Element> Node::querySelector(const String& selectors,
     ec = SYNTAX_ERR;
     return 0;
   }
-  CSSParser p(!document()->inCompatMode());
+  bool strictParsing = !document()->inCompatMode();
+  CSSParser p(strictParsing);
   if (resolver) {
     String defaultNamespace = resolver->lookupNamespaceURI(exec, String());
     if (exec && exec->hadException())
-      return false;
+      return 0;
     if (!defaultNamespace.isEmpty())
       p.m_defaultNamespace = defaultNamespace;
   }
@@ -1320,18 +1321,18 @@ PassRefPtr<Element> Node::querySelector(const String& selectors,
     }
   }
 
-  if (inDocument() && !querySelector->next() &&
+  // FIXME: we could also optimize for the the [id="foo"] case
+  if (strictParsing && inDocument() && !querySelector->next() &&
       querySelector->m_match == CSSSelector::Id && !querySelector->hasTag() &&
-      !querySelector->hasAttribute() && !querySelector->m_tagHistory &&
-      !querySelector->m_simpleSelector) {
+      !querySelector->m_tagHistory && !querySelector->m_simpleSelector) {
+    ASSERT(querySelector->m_attr == idAttr);
     Element* element = document()->getElementById(querySelector->m_value);
     if (element && (isDocumentNode() || element->isDescendantOf(this)))
       return element;
     return 0;
   }
 
-  CSSStyleSelector::SelectorChecker selectorChecker(
-      document(), !document()->inCompatMode());
+  CSSStyleSelector::SelectorChecker selectorChecker(document(), strictParsing);
 
   // FIXME: We can speed this up by implementing caching similar to the one use
   // by getElementById
@@ -1357,7 +1358,8 @@ PassRefPtr<NodeList> Node::querySelectorAll(const String& selectors,
     ec = SYNTAX_ERR;
     return 0;
   }
-  CSSParser p(!document()->inCompatMode());
+  bool strictParsing = !document()->inCompatMode();
+  CSSParser p(strictParsing);
   if (resolver) {
     String defaultNamespace = resolver->lookupNamespaceURI(exec, String());
     if (exec && exec->hadException())
