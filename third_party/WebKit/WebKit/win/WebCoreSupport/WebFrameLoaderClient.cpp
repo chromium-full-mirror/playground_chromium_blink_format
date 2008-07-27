@@ -655,10 +655,10 @@ void WebFrameLoaderClient::loadURLIntoChild(const KURL& originalURL,
   }
 
   // FIXME: Handle loading WebArchives here
-
+  String frameName = core(childFrame)->tree()->name();
   core(childFrame)
       ->loader()
-      ->load(url, referrer, childLoadType, String(), 0, 0);
+      ->loadURL(url, referrer, frameName, childLoadType, 0, 0);
 }
 
 Widget* WebFrameLoaderClient::createPlugin(const IntSize& pluginSize,

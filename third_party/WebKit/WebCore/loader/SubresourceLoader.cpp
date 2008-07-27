@@ -88,7 +88,7 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
   ResourceRequest newRequest = request;
 
   if (!skipCanLoadCheck && FrameLoader::restrictAccessToLocal() &&
-      !FrameLoader::canLoad(request.url(), frame->document())) {
+      !FrameLoader::canLoad(request.url(), String(), frame->document())) {
     FrameLoader::reportLocalLoadFailed(frame, request.url().string());
     return 0;
   }
