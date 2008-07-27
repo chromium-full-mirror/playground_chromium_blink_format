@@ -2353,7 +2353,7 @@ void FrameLoader::load(DocumentLoader* newDocumentLoader) {
     type = FrameLoadTypeReload;
   }
 
-  loadWithDocumentLoader(newDocumentLoader, type, nil);
+  loadWithDocumentLoader(newDocumentLoader, type, 0);
 }
 
 void FrameLoader::loadWithDocumentLoader(DocumentLoader* loader,
