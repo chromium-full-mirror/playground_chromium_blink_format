@@ -215,7 +215,7 @@ class FrameLoader : Noncopyable
   // local load is allowed.
   static bool canLoad(const KURL&,
                       const String& referrer,
-                      const Document* theDocument = nil);
+                      const Document* theDocument = 0);
   static void reportLocalLoadFailed(Frame*, const String& url);
 
   static bool shouldHideReferrer(const KURL& url, const String& referrer);
