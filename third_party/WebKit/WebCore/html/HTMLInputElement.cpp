@@ -1576,4 +1576,9 @@ void HTMLInputElement::getSubresourceAttributeStrings(
   urls.append(src().string());
 }
 
+bool HTMLInputElement::willValidate() const {
+  // FIXME: This shall check for new WF2 input types too
+  return HTMLFormControlElementWithState::willValidate() &&
+         inputType() != HIDDEN && inputType() != BUTTON && inputType() != RESET;
+}
 }  // namespace

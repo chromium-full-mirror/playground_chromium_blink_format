@@ -57,6 +57,8 @@ class HTMLButtonElement : public HTMLFormControlElement {
   String value() const;
   void setValue(const String&);
 
+  virtual bool willValidate() const { return false; }
+
  private:
   enum Type { SUBMIT, RESET, BUTTON };
 

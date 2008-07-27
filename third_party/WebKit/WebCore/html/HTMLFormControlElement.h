@@ -98,6 +98,8 @@ class HTMLFormControlElement : public HTMLElement {
 
   short tabIndex() const;
 
+  virtual bool willValidate() const;
+
   void formDestroyed() { m_form = 0; }
 
  protected:
