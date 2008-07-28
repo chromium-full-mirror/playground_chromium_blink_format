@@ -58,6 +58,11 @@ class StyleBase : public RefCounted<StyleBase> {
   virtual bool isStyleSheet() const { return false; }
   virtual bool isXSLStyleSheet() const { return false; }
 
+  virtual bool isValueList() const { return false; }
+  virtual bool isMutableStyleDeclaration() const { return false; }
+
+  virtual String cssText() const;
+
   virtual void checkLoaded();
 
   void setStrictParsing(bool b) { m_strictParsing = b; }

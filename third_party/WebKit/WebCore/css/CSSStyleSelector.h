@@ -155,6 +155,9 @@ class CSSStyleSelector : Noncopyable {
 
   void addVariables(CSSVariablesRule* variables);
   CSSValue* resolveVariableDependentValue(CSSVariableDependentValue*);
+  void resolveVariablesForDeclaration(CSSMutableStyleDeclaration* decl,
+                                      CSSMutableStyleDeclaration* newDecl,
+                                      HashSet<String>& usedBlockVariables);
 
  private:
   enum SelectorMatch {

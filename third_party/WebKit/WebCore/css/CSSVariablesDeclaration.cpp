@@ -37,7 +37,7 @@ namespace WebCore {
 CSSVariablesDeclaration::CSSVariablesDeclaration(
     StyleBase* parent,
     const Vector<String>& names,
-    const Vector<RefPtr<CSSValueList>>& values)
+    const Vector<RefPtr<StyleBase>>& values)
     : StyleBase(parent) {
   m_variableNames = names;
   ASSERT(names.size() == values.size());
@@ -49,7 +49,7 @@ CSSVariablesDeclaration::CSSVariablesDeclaration(
 CSSVariablesDeclaration::~CSSVariablesDeclaration() {}
 
 String CSSVariablesDeclaration::getVariableValue(const String& variableName) {
-  CSSValueList* val = getParsedVariable(variableName);
+  StyleBase* val = m_variablesMap.get(variableName).get();
   if (val)
     return val->cssText();
   return "";
@@ -60,7 +60,7 @@ String CSSVariablesDeclaration::removeVariable(const String& variableName,
   // FIXME: The spec has this method taking an exception code but no exceptions
   // are
   // specified as being thrown.
-  RefPtr<CSSValue> val = m_variablesMap.take(variableName);
+  RefPtr<StyleBase> val = m_variablesMap.take(variableName);
   String result = val ? val->cssText() : "";
   if (val) {
     int s = m_variableNames.size();
@@ -97,12 +97,16 @@ void CSSVariablesDeclaration::setVariable(const String& variableName,
 
 void CSSVariablesDeclaration::addParsedVariable(
     const String& variableName,
-    PassRefPtr<CSSValueList> variableValue,
+    PassRefPtr<StyleBase> variableValue,
     bool updateNamesList) {
+  variableValue->setParent(this);  // Needed to connect variables that are
+                                   // CSSMutableStyleDeclarations, since the
+                                   // parent couldn't be set until now.
+
   // Don't leak duplicates.  For multiple variables with the same name, the last
   // one
   // declared will win.
-  CSSValueList* current = m_variablesMap.take(variableName).get();
+  StyleBase* current = m_variablesMap.take(variableName).get();
   if (!current && updateNamesList)
     m_variableNames.append(variableName);
   m_variablesMap.set(variableName, variableValue);
@@ -112,7 +116,19 @@ void CSSVariablesDeclaration::addParsedVariable(
 
 CSSValueList* CSSVariablesDeclaration::getParsedVariable(
     const String& variableName) {
-  return m_variablesMap.get(variableName).get();
+  StyleBase* result = m_variablesMap.get(variableName).get();
+  if (result->isValueList())
+    return static_cast<CSSValueList*>(result);
+  return 0;
+}
+
+CSSMutableStyleDeclaration*
+CSSVariablesDeclaration::getParsedVariableDeclarationBlock(
+    const String& variableName) {
+  StyleBase* result = m_variablesMap.get(variableName).get();
+  if (result->isMutableStyleDeclaration())
+    return static_cast<CSSMutableStyleDeclaration*>(result);
+  return 0;
 }
 
 unsigned CSSVariablesDeclaration::length() const {
