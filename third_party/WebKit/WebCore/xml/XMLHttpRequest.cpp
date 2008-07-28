@@ -949,6 +949,12 @@ String XMLHttpRequest::statusText(ExceptionCode& ec) const {
 void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
                                             const ResourceResponse& response,
                                             ExceptionCode& ec) {
+  if (m_sameOriginRequest &&
+      !m_doc->securityOrigin()->canRequest(response.url())) {
+    abort();
+    return;
+  }
+
   didReceiveResponse(0, response);
   changeState(HEADERS_RECEIVED);
 
@@ -1046,8 +1052,10 @@ void XMLHttpRequest::willSendRequest(SubresourceLoader*,
                                      const ResourceResponse& redirectResponse) {
   // FIXME: This needs to be fixed to follow the redirect correctly even for
   // cross-domain requests.
-  if (!m_doc->securityOrigin()->canRequest(request.url()))
+  if (!m_doc->securityOrigin()->canRequest(request.url())) {
     internalAbort();
+    networkError();
+  }
 }
 
 void XMLHttpRequest::didReceiveResponse(SubresourceLoader* loader,
