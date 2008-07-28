@@ -82,7 +82,7 @@ static JSObject* constructWithStringConstructor(ExecState* exec,
 ConstructType StringConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = constructWithStringConstructor;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 // ECMA 15.5.1

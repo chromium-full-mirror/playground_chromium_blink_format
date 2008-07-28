@@ -58,7 +58,7 @@ static JSObject* constructWithBooleanConstructor(ExecState* exec,
 ConstructType BooleanConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = constructWithBooleanConstructor;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 // ECMA 15.6.1

@@ -244,7 +244,7 @@ ConstructType JSQuarantinedObjectWrapper::getConstructData(
       ConstructTypeNone)
     return ConstructTypeNone;
   constructData.native.function = construct;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 bool JSQuarantinedObjectWrapper::implementsHasInstance() const {

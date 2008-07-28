@@ -96,7 +96,7 @@ ConstructType QtRuntimeObjectImp::getConstructData(
     case CallTypeNone:
       break;
     case CallTypeHost:
-      type = ConstructTypeNative;
+      type = ConstructTypeHost;
       break;
     case CallTypeJS:
       type = ConstructTypeJS;

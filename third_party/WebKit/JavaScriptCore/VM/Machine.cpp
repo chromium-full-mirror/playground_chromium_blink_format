@@ -2753,7 +2753,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         NEXT_OPCODE;
       }
 
-      if (constructType == ConstructTypeNative) {
+      if (constructType == ConstructTypeHost) {
         if (*enabledProfilerReference)
           (*enabledProfilerReference)->willExecute(exec, constructor);
 

@@ -61,7 +61,7 @@ static JSObject* constructWithErrorConstructor(ExecState* exec,
 
 ConstructType ErrorConstructor::getConstructData(ConstructData& constructData) {
   constructData.native.function = constructWithErrorConstructor;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 // ECMA 15.9.2

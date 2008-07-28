@@ -71,7 +71,7 @@ static JSObject* constructWithArrayConstructor(ExecState* exec,
 // ECMA 15.4.2
 ConstructType ArrayConstructor::getConstructData(ConstructData& constructData) {
   constructData.native.function = constructWithArrayConstructor;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 static JSValue* callArrayConstructor(ExecState* exec,

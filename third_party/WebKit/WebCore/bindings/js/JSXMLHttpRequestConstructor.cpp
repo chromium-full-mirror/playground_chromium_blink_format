@@ -54,7 +54,7 @@ static JSObject* constructXMLHttpRequest(ExecState* exec,
 ConstructType JSXMLHttpRequestConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = constructXMLHttpRequest;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 }  // namespace WebCore

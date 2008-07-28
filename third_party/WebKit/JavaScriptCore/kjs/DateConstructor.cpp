@@ -127,7 +127,7 @@ static JSObject* constructDate(ExecState* exec,
 
 ConstructType DateConstructor::getConstructData(ConstructData& constructData) {
   constructData.native.function = constructDate;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 // ECMA 15.9.2

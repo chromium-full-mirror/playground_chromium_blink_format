@@ -67,7 +67,7 @@ static JSObject* constructWithNativeErrorConstructor(ExecState* exec,
 ConstructType NativeErrorConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = constructWithNativeErrorConstructor;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 static JSValue* callNativeErrorConstructor(ExecState* exec,

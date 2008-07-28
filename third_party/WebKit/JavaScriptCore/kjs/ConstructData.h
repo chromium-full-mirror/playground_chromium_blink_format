@@ -38,7 +38,7 @@ class JSObject;
 class JSValue;
 class ScopeChainNode;
 
-enum ConstructType { ConstructTypeNone, ConstructTypeNative, ConstructTypeJS };
+enum ConstructType { ConstructTypeNone, ConstructTypeHost, ConstructTypeJS };
 
 typedef JSObject* (*NativeConstructor)(ExecState*, JSObject*, const ArgList&);
 

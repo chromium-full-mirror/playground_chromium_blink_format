@@ -71,7 +71,7 @@ static JSObject* constructImage(ExecState* exec,
 ConstructType JSImageConstructor::getConstructData(
     ConstructData& constructData) {
   constructData.native.function = constructImage;
-  return ConstructTypeNative;
+  return ConstructTypeHost;
 }
 
 }  // namespace WebCore
