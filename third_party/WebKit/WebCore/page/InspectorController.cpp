@@ -167,16 +167,23 @@ struct ConsoleMessage {
                  MessageLevel l,
                  const String& m,
                  unsigned li,
-                 const String& u)
-      : source(s), level(l), message(m), line(li), url(u) {}
+                 const String& u,
+                 unsigned g)
+      : source(s), level(l), message(m), line(li), url(u), groupLevel(g) {}
 
   ConsoleMessage(MessageSource s,
                  MessageLevel l,
                  ExecState* exec,
                  const ArgList& args,
                  unsigned li,
-                 const String& u)
-      : source(s), level(l), wrappedArguments(args.size()), line(li), url(u) {
+                 const String& u,
+                 unsigned g)
+      : source(s),
+        level(l),
+        wrappedArguments(args.size()),
+        line(li),
+        url(u),
+        groupLevel(g) {
     JSLock lock(false);
     for (unsigned i = 0; i < args.size(); ++i)
       wrappedArguments[i] =
@@ -189,6 +196,7 @@ struct ConsoleMessage {
   Vector<ProtectedPtr<JSValue>> wrappedArguments;
   unsigned line;
   String url;
+  unsigned groupLevel;
 };
 
 // XMLHttpRequestResource Class
@@ -1215,7 +1223,8 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_attachDebuggerWhenShown(false),
       m_recordingUserInitiatedProfile(false),
       m_showAfterVisible(ElementsPanel),
-      m_nextIdentifier(-2) {
+      m_nextIdentifier(-2),
+      m_groupLevel(0) {
   ASSERT_ARG(page, page);
   ASSERT_ARG(client, client);
 }
@@ -1381,7 +1390,7 @@ void InspectorController::addMessageToConsole(MessageSource source,
     return;
 
   addConsoleMessage(new ConsoleMessage(source, level, exec, arguments,
-                                       lineNumber, sourceURL));
+                                       lineNumber, sourceURL, m_groupLevel));
 }
 
 void InspectorController::addMessageToConsole(MessageSource source,
@@ -1392,8 +1401,8 @@ void InspectorController::addMessageToConsole(MessageSource source,
   if (!enabled())
     return;
 
-  addConsoleMessage(
-      new ConsoleMessage(source, level, message, lineNumber, sourceID));
+  addConsoleMessage(new ConsoleMessage(source, level, message, lineNumber,
+                                       sourceID, m_groupLevel));
 }
 
 void InspectorController::addConsoleMessage(ConsoleMessage* consoleMessage) {
@@ -1404,6 +1413,29 @@ void InspectorController::addConsoleMessage(ConsoleMessage* consoleMessage) {
 
   if (windowVisible())
     addScriptConsoleMessage(consoleMessage);
+}
+
+void InspectorController::startGroup() {
+  JSValueRef exception = 0;
+
+  ++m_groupLevel;
+
+  if (windowVisible())
+    callFunction(m_scriptContext, m_scriptObject, "startGroupInConsole", 0,
+                 NULL, exception);
+}
+
+void InspectorController::endGroup() {
+  JSValueRef exception = 0;
+
+  if (m_groupLevel == 0)
+    return;
+
+  --m_groupLevel;
+
+  if (windowVisible())
+    callFunction(m_scriptContext, m_scriptObject, "endGroupInConsole", 0, NULL,
+                 exception);
 }
 
 void InspectorController::addProfile(PassRefPtr<Profile> prpProfile) {
@@ -2178,6 +2210,8 @@ void InspectorController::addScriptConsoleMessage(
   JSValueRef lineValue = JSValueMakeNumber(m_scriptContext, message->line);
   JSValueRef urlValue =
       JSValueMakeString(m_scriptContext, jsStringRef(message->url).get());
+  JSValueRef groupLevelValue =
+      JSValueMakeNumber(m_scriptContext, message->groupLevel);
 
   static const unsigned maximumMessageArguments = 256;
   JSValueRef arguments[maximumMessageArguments];
@@ -2186,6 +2220,7 @@ void InspectorController::addScriptConsoleMessage(
   arguments[argumentCount++] = levelValue;
   arguments[argumentCount++] = lineValue;
   arguments[argumentCount++] = urlValue;
+  arguments[argumentCount++] = groupLevelValue;
 
   if (!message->wrappedArguments.isEmpty()) {
     unsigned remainingSpaceInArguments =
@@ -2272,6 +2307,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
 
     deleteAllValues(m_consoleMessages);
     m_consoleMessages.clear();
+    m_groupLevel = 0;
 
     m_profiles.clear();
 

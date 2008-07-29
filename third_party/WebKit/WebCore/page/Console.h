@@ -58,7 +58,8 @@ enum MessageLevel {
   TipMessageLevel,
   LogMessageLevel,
   WarningMessageLevel,
-  ErrorMessageLevel
+  ErrorMessageLevel,
+  GroupTitleMessageLevel
 };
 
 class Console : public RefCounted<Console>, public KJS::ProfilerClient {
@@ -87,6 +88,8 @@ class Console : public RefCounted<Console>, public KJS::ProfilerClient {
   void profileEnd(KJS::ExecState*, const KJS::ArgList& arguments);
   void time(const KJS::UString& title);
   void timeEnd(const KJS::UString& title);
+  void group(KJS::ExecState*, const KJS::ArgList& arguments);
+  void groupEnd();
 
   void finishedProfiling(PassRefPtr<KJS::Profile>);
 
