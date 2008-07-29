@@ -113,7 +113,7 @@ MediaControlMuteButtonElement::MediaControlMuteButtonElement(
 void MediaControlMuteButtonElement::defaultEventHandler(Event* event) {
   if (event->type() == clickEvent) {
     m_mediaElement->setMuted(!m_mediaElement->muted());
-    event->defaultHandled();
+    event->setDefaultHandled();
   }
   HTMLInputElement::defaultEventHandler(event);
 }
@@ -135,7 +135,7 @@ void MediaControlPlayButtonElement::defaultEventHandler(Event* event) {
       m_mediaElement->play(ec);
     else
       m_mediaElement->pause(ec);
-    event->defaultHandled();
+    event->setDefaultHandled();
   }
   HTMLInputElement::defaultEventHandler(event);
 }
@@ -166,7 +166,7 @@ void MediaControlSeekButtonElement::defaultEventHandler(Event* event) {
     ExceptionCode ec;
     m_mediaElement->pause(ec);
     m_seekTimer.startRepeating(cSeekRepeatDelay);
-    event->defaultHandled();
+    event->setDefaultHandled();
   } else if (event->type() == mouseupEvent) {
     if (m_capturing)
       if (Frame* frame = document()->frame()) {
@@ -182,7 +182,7 @@ void MediaControlSeekButtonElement::defaultEventHandler(Event* event) {
       }
       m_seekTimer.stop();
       m_seeking = false;
-      event->defaultHandled();
+      event->setDefaultHandled();
     }
   }
   HTMLInputElement::defaultEventHandler(event);
@@ -257,7 +257,7 @@ MediaControlFullscreenButtonElement::MediaControlFullscreenButtonElement(
 
 void MediaControlFullscreenButtonElement::defaultEventHandler(Event* event) {
   if (event->type() == clickEvent) {
-    event->defaultHandled();
+    event->setDefaultHandled();
   }
   HTMLInputElement::defaultEventHandler(event);
 }

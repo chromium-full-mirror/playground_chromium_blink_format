@@ -29,12 +29,13 @@
 #include "MediaDocument.h"
 
 #include "Element.h"
+#include "Event.h"
+#include "EventNames.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
 #include "HTMLEmbedElement.h"
 #include "HTMLNames.h"
-#include "HTMLMediaElement.h"
 #include "HTMLVideoElement.h"
 #include "Page.h"
 #include "SegmentedString.h"
@@ -44,6 +45,7 @@
 
 namespace WebCore {
 
+using namespace EventNames;
 using namespace HTMLNames;
 
 class MediaTokenizer : public Tokenizer {
@@ -123,6 +125,27 @@ MediaDocument::MediaDocument(Frame* frame) : HTMLDocument(frame) {
 
 Tokenizer* MediaDocument::createTokenizer() {
   return new MediaTokenizer(this);
+}
+
+void MediaDocument::defaultEventHandler(Event* event) {
+  // Match the default Quicktime plugin behavior to allow
+  // clicking and double-clicking to pause and play the media.
+  EventTargetNode* targetNode = event->target()->toNode();
+  if (targetNode && targetNode->hasTagName(videoTag)) {
+    HTMLVideoElement* video = static_cast<HTMLVideoElement*>(targetNode);
+    ExceptionCode ec;
+    if (event->type() == clickEvent) {
+      if (!video->canPlay()) {
+        video->pause(ec);
+        event->setDefaultHandled();
+      }
+    } else if (event->type() == dblclickEvent) {
+      if (video->canPlay()) {
+        video->play(ec);
+        event->setDefaultHandled();
+      }
+    }
+  }
 }
 }
 #endif

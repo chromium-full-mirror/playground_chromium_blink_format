@@ -38,6 +38,8 @@ class MediaDocument : public HTMLDocument {
     return new MediaDocument(frame);
   }
 
+  virtual void defaultEventHandler(Event*);
+
  private:
   MediaDocument(Frame*);
 
