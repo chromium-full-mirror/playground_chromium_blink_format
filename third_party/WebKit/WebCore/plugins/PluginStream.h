@@ -90,6 +90,7 @@ class PluginStream : public RefCounted<PluginStream>,
   virtual void didReceiveData(NetscapePlugInStreamLoader*, const char*, int);
   virtual void didFail(NetscapePlugInStreamLoader*, const ResourceError&);
   virtual void didFinishLoading(NetscapePlugInStreamLoader*);
+  virtual bool wantsAllStreams() const;
 
  private:
   PluginStream(PluginStreamClient*,
