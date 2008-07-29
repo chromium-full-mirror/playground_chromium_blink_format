@@ -41,7 +41,8 @@
 #include "ResourceError.h"
 #include "ResourceResponse.h"
 
-#include <WTF/HashMap.h>
+#include <wtf/HashMap.h>
+#include <wtf/Threading.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -226,7 +227,7 @@ CFArrayRef arrayFromFormData(const FormData& d) {
 void emptyPerform(void* unused) {}
 
 static CFRunLoopRef loaderRL = 0;
-void runLoaderThread(void* unused) {
+void* runLoaderThread(void* unused) {
   loaderRL = CFRunLoopGetCurrent();
 
   // Must add a source to the run loop to prevent CFRunLoopRun() from exiting
@@ -236,11 +237,13 @@ void runLoaderThread(void* unused) {
   CFRunLoopAddSource(loaderRL, bogusSource, kCFRunLoopDefaultMode);
 
   CFRunLoopRun();
+
+  return 0;
 }
 
 CFRunLoopRef ResourceHandle::loaderRunLoop() {
   if (!loaderRL) {
-    _beginthread(runLoaderThread, 0, 0);
+    createThread(runLoaderThread, 0, "CFNetwork::Loader");
     while (loaderRL == 0) {
       // FIXME: sleep 10? that can't be right...
       Sleep(10);

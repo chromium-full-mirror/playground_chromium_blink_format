@@ -34,7 +34,7 @@ namespace WTF {
 Mutex* atomicallyInitializedStaticMutex;
 
 void initializeThreading() {}
-ThreadIdentifier createThread(ThreadFunction, void*) {
+ThreadIdentifier createThread(ThreadFunction, void*, const char*) {
   return 0;
 }
 int waitForThreadCompletion(ThreadIdentifier, void**) {

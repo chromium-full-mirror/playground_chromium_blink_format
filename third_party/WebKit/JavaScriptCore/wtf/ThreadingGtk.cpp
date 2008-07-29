@@ -99,7 +99,9 @@ static void clearThreadForIdentifier(ThreadIdentifier id) {
   threadMap().remove(id);
 }
 
-ThreadIdentifier createThread(ThreadFunction entryPoint, void* data) {
+ThreadIdentifier createThread(ThreadFunction entryPoint,
+                              void* data,
+                              const char*) {
   GThread* thread;
   if (!(thread = g_thread_create(entryPoint, data, TRUE, 0))) {
     LOG_ERROR("Failed to create thread at entry point %p with data %p",
