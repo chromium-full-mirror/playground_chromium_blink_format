@@ -36,6 +36,8 @@ namespace WTF {
 using std::min;
 using std::max;
 
+const size_t notFound = static_cast<size_t>(-1);
+
 template <bool needsDestruction, typename T>
 class VectorDestructor;
 
@@ -401,13 +403,7 @@ class Vector {
   const T& last() const { return at(size() - 1); }
 
   template <typename U>
-  iterator find(const U& value) {
-    return std::find(begin(), end(), value);
-  }
-  template <typename U>
-  const_iterator find(const U& value) const {
-    return std::find(begin(), end(), value);
-  }
+  size_t find(const U&) const;
 
   void shrink(size_t size);
   void grow(size_t size);
@@ -537,6 +533,16 @@ Vector<T, inlineCapacity>& Vector<T, inlineCapacity>::operator=(
   m_size = other.size();
 
   return *this;
+}
+
+template <typename T, size_t inlineCapacity>
+template <typename U>
+size_t Vector<T, inlineCapacity>::find(const U& value) const {
+  for (size_t i = 0; i < size(); ++i) {
+    if (at(i) == value)
+      return i;
+  }
+  return notFound;
 }
 
 template <typename T, size_t inlineCapacity>
