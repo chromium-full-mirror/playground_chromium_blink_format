@@ -2951,7 +2951,7 @@ int RenderBox::lowestPosition(bool includeOverflowInterior,
   if (!includeSelf || !m_width)
     return 0;
   int bottom = m_height;
-  if (includeSelf && isRelPositioned())
+  if (isRelPositioned())
     bottom += relativePositionOffsetY();
   return bottom;
 }
@@ -2961,7 +2961,7 @@ int RenderBox::rightmostPosition(bool includeOverflowInterior,
   if (!includeSelf || !m_height)
     return 0;
   int right = m_width;
-  if (includeSelf && isRelPositioned())
+  if (isRelPositioned())
     right += relativePositionOffsetX();
   return right;
 }
@@ -2971,7 +2971,7 @@ int RenderBox::leftmostPosition(bool includeOverflowInterior,
   if (!includeSelf || !m_height)
     return m_width;
   int left = 0;
-  if (includeSelf && isRelPositioned())
+  if (isRelPositioned())
     left += relativePositionOffsetX();
   return left;
 }
