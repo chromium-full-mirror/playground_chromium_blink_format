@@ -2271,6 +2271,9 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           // that are non-"hidden" controls.
           return e->isEnabled();
         break;
+      case CSSSelector::PseudoFullPageMedia:
+        return e && e->document() && e->document()->isMediaDocument();
+        break;
       case CSSSelector::PseudoDisabled:
         if (e && e->isControl() && !e->isInputTypeHidden())
           // The UI spec states that you can't match :enabled unless you are an

@@ -130,6 +130,7 @@ class CSSSelector {
     PseudoActive,
     PseudoChecked,
     PseudoEnabled,
+    PseudoFullPageMedia,
     PseudoDisabled,
     PseudoReadOnly,
     PseudoReadWrite,

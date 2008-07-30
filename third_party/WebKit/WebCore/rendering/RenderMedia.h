@@ -69,6 +69,13 @@ class RenderMedia : public RenderReplaced {
 
   void forwardEvent(Event*);
 
+  virtual int lowestPosition(bool includeOverflowInterior = true,
+                             bool includeSelf = true) const;
+  virtual int rightmostPosition(bool includeOverflowInterior = true,
+                                bool includeSelf = true) const;
+  virtual int leftmostPosition(bool includeOverflowInterior = true,
+                               bool includeSelf = true) const;
+
  private:
   void createControlsShadowRoot();
   void createPanel();
