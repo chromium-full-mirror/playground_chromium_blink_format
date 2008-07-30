@@ -352,6 +352,7 @@ CFTypeRef GetCFNull(void) {
 
 static pthread_key_t globalObjectKey;
 static pthread_once_t globalObjectKeyOnce = PTHREAD_ONCE_INIT;
+JSGlobalData* sharedGlobalData;
 
 static void unprotectGlobalObject(void* data) {
   JSLock lock(true);
@@ -359,6 +360,7 @@ static void unprotectGlobalObject(void* data) {
 }
 
 static void initializeGlobalObjectKey() {
+  sharedGlobalData = JSGlobalData::create().releaseRef();
   pthread_key_create(&globalObjectKey, unprotectGlobalObject);
 }
 
@@ -367,7 +369,7 @@ ExecState* getThreadGlobalExecState() {
   JSGlobalObject* globalObject =
       static_cast<JSGlobalObject*>(pthread_getspecific(globalObjectKey));
   if (!globalObject) {
-    globalObject = new (&JSGlobalData::sharedInstance()) JSGlueGlobalObject;
+    globalObject = new (JSGlobalData::create().get()) JSGlueGlobalObject;
     gcProtect(globalObject);
     pthread_setspecific(globalObjectKey, globalObject);
   }

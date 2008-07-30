@@ -76,6 +76,8 @@ class Heap : Noncopyable {
   bool collect();
   bool isBusy();  // true if an allocation or collection is in progress
 
+  ~Heap();
+
   static const size_t minExtraCostSize = 256;
 
   void reportExtraMemoryCost(size_t cost);
@@ -120,7 +122,6 @@ class Heap : Noncopyable {
 
   friend class JSGlobalData;
   Heap(JSGlobalData*);
-  ~Heap();
 
   void recordExtraCost(size_t);
   void markProtectedObjects();

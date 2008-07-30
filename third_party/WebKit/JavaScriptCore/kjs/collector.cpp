@@ -735,8 +735,6 @@ static inline void* otherThreadStackPointer(
 }
 
 void Heap::markOtherThreadConservatively(Thread* thread) {
-  ASSERT(this == JSGlobalData::sharedInstance().heap);
-
   suspendThread(thread->platformThread);
 
   PlatformThreadRegisters regs;
