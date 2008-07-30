@@ -36,10 +36,12 @@
 
 GEN_DOMObject::GEN_DOMObject() : m_refCount(0) {
   gClassCount++;
+  gClassNameCount.add("GEN_DOMObject");
 }
 
 GEN_DOMObject::~GEN_DOMObject() {
   gClassCount--;
+  gClassNameCount.remove("GEN_DOMObject");
 }
 
 // IUnknown -------------------------------------------------------------------

@@ -41,10 +41,12 @@ using namespace WebCore;
 
 WebScrollBar::WebScrollBar() : m_refCount(0) {
   gClassCount++;
+  gClassNameCount.add("WebScrollBar");
 }
 
 WebScrollBar::~WebScrollBar() {
   gClassCount--;
+  gClassNameCount.remove("WebScrollBar");
 }
 
 WebScrollBar* WebScrollBar::createInstance() {

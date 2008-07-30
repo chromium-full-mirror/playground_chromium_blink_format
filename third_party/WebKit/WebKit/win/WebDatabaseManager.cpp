@@ -158,10 +158,12 @@ WebDatabaseManager* WebDatabaseManager::createInstance() {
 
 WebDatabaseManager::WebDatabaseManager() : m_refCount(0) {
   gClassCount++;
+  gClassNameCount.add("WebDatabaseManager");
 }
 
 WebDatabaseManager::~WebDatabaseManager() {
   gClassCount--;
+  gClassNameCount.remove("WebDatabaseManager");
 }
 
 // IUnknown

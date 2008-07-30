@@ -40,10 +40,12 @@ using namespace WebCore;
 WebURLCredential::WebURLCredential(const Credential& credential)
     : m_refCount(0), m_credential(credential) {
   gClassCount++;
+  gClassNameCount.add("WebURLCredential");
 }
 
 WebURLCredential::~WebURLCredential() {
   gClassCount--;
+  gClassNameCount.remove("WebURLCredential");
 }
 
 WebURLCredential* WebURLCredential::createInstance() {

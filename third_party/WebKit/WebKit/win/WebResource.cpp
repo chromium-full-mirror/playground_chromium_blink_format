@@ -50,10 +50,12 @@ WebResource::WebResource(IStream* data,
       m_textEncodingName(textEncodingName),
       m_frameName(frameName) {
   gClassCount++;
+  gClassNameCount.add("WebResource");
 }
 
 WebResource::~WebResource() {
   gClassCount--;
+  gClassNameCount.remove("WebResource");
 }
 
 WebResource* WebResource::createInstance(

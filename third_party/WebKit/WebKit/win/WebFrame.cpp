@@ -226,12 +226,14 @@ WebFrame::WebFrame()
       m_pageHeight(0) {
   WebFrameCount++;
   gClassCount++;
+  gClassNameCount.add("WebFrame");
 }
 
 WebFrame::~WebFrame() {
   delete d;
   WebFrameCount--;
   gClassCount--;
+  gClassNameCount.remove("WebFrame");
 }
 
 WebFrame* WebFrame::createInstance() {

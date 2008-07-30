@@ -44,10 +44,12 @@ using namespace WebCore;
 WebError::WebError(const ResourceError& error, IPropertyBag* userInfo)
     : m_refCount(0), m_error(error), m_userInfo(userInfo) {
   gClassCount++;
+  gClassNameCount.add("WebError");
 }
 
 WebError::~WebError() {
   gClassCount--;
+  gClassNameCount.remove("WebError");
 }
 
 WebError* WebError::createInstance(const ResourceError& error,

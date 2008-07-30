@@ -50,10 +50,12 @@ HRESULT WebDropSource::createInstance(WebView* webView, IDropSource** result) {
 WebDropSource::WebDropSource(WebView* webView)
     : m_ref(1), m_dropped(false), m_webView(webView) {
   gClassCount++;
+  gClassNameCount.add("WebDropSource");
 }
 
 WebDropSource::~WebDropSource() {
   gClassCount--;
+  gClassNameCount.remove("WebDropSource");
 }
 
 STDMETHODIMP WebDropSource::QueryInterface(REFIID riid, void** ppvObject) {

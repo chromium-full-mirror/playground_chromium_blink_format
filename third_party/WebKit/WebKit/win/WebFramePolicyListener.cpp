@@ -43,10 +43,12 @@ using namespace WebCore;
 WebFramePolicyListener::WebFramePolicyListener(PassRefPtr<Frame> frame)
     : m_refCount(0), m_frame(frame) {
   gClassCount++;
+  gClassNameCount.add("WebFramePolicyListener");
 }
 
 WebFramePolicyListener::~WebFramePolicyListener() {
   gClassCount--;
+  gClassNameCount.remove("WebFramePolicyListener");
 }
 
 WebFramePolicyListener* WebFramePolicyListener::createInstance(

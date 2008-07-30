@@ -131,10 +131,12 @@ WebPreferences::WebPreferences()
       m_automaticallyDetectsCacheModel(true),
       m_numWebViews(0) {
   gClassCount++;
+  gClassNameCount.add("WebPreferences");
 }
 
 WebPreferences::~WebPreferences() {
   gClassCount--;
+  gClassNameCount.remove("WebPreferences");
 }
 
 WebPreferences* WebPreferences::createInstance() {

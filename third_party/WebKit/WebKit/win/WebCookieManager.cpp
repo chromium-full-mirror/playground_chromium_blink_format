@@ -42,10 +42,12 @@ WebCookieManager* WebCookieManager::createInstance() {
 
 WebCookieManager::WebCookieManager() : m_refCount(0) {
   gClassCount++;
+  gClassNameCount.add("WebCookieManager");
 }
 
 WebCookieManager::~WebCookieManager() {
   gClassCount--;
+  gClassNameCount.remove("WebCookieManager");
 }
 
 // IUnknown ---------------------------------------------------------------

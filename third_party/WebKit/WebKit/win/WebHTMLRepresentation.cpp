@@ -43,6 +43,7 @@ using namespace WebCore;
 WebHTMLRepresentation::WebHTMLRepresentation() : m_refCount(0), m_frame(0) {
   WebHTMLRepresentationCount++;
   gClassCount++;
+  gClassNameCount.add("WebHTMLRepresentation");
 }
 
 WebHTMLRepresentation::~WebHTMLRepresentation() {
@@ -53,6 +54,7 @@ WebHTMLRepresentation::~WebHTMLRepresentation() {
 
   WebHTMLRepresentationCount--;
   gClassCount--;
+  gClassNameCount.remove("WebHTMLRepresentation");
 }
 
 WebHTMLRepresentation* WebHTMLRepresentation::createInstance(WebFrame* frame) {

@@ -52,10 +52,12 @@ WebArchive* WebArchive::createInstance(
 WebArchive::WebArchive(PassRefPtr<LegacyWebArchive> coreArchive)
     : m_refCount(0), m_archive(coreArchive) {
   gClassCount++;
+  gClassNameCount.add("WebArchive");
 }
 
 WebArchive::~WebArchive() {
   gClassCount--;
+  gClassNameCount.remove("WebArchive");
 }
 
 HRESULT STDMETHODCALLTYPE WebArchive::QueryInterface(REFIID riid,

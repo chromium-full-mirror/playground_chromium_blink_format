@@ -106,6 +106,7 @@ static HRESULT appendResumeDataToBundle(CFDataRef resumeData,
 
 WebDownload::WebDownload() : m_refCount(0) {
   gClassCount++;
+  gClassNameCount.add("WebDownload");
 }
 
 void WebDownload::init(ResourceHandle* handle,
@@ -207,6 +208,7 @@ WebDownload::~WebDownload() {
   LOG(Download, "WebDownload - Destroying download (%p)", this);
   cancel();
   gClassCount--;
+  gClassNameCount.remove("WebDownload");
 }
 
 WebDownload* WebDownload::createInstance() {

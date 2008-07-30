@@ -94,6 +94,7 @@ static void releaseUserInfo(CFDictionaryPropertyBag* userInfo) {
 
 WebHistory::WebHistory() : m_refCount(0), m_preferences(0) {
   gClassCount++;
+  gClassNameCount.add("WebHistory");
 
   m_entriesByURL.adoptCF(CFDictionaryCreateMutable(
       0, 0, &kCFTypeDictionaryKeyCallBacks,
@@ -107,6 +108,7 @@ WebHistory::WebHistory() : m_refCount(0), m_preferences(0) {
 
 WebHistory::~WebHistory() {
   gClassCount--;
+  gClassNameCount.remove("WebHistory");
 }
 
 WebHistory* WebHistory::createInstance() {

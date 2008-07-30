@@ -43,10 +43,12 @@ WebTextRenderer* WebTextRenderer::createInstance() {
 
 WebTextRenderer::WebTextRenderer() : m_refCount(0) {
   gClassCount++;
+  gClassNameCount.add("WebTextRenderer");
 }
 
 WebTextRenderer::~WebTextRenderer() {
   gClassCount--;
+  gClassNameCount.remove("WebTextRenderer");
 }
 
 HRESULT STDMETHODCALLTYPE WebTextRenderer::QueryInterface(const IID& riid,

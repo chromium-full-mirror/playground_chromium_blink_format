@@ -47,10 +47,12 @@ WebSecurityOrigin* WebSecurityOrigin::createInstance(
 WebSecurityOrigin::WebSecurityOrigin(SecurityOrigin* securityOrigin)
     : m_refCount(0), m_securityOrigin(securityOrigin) {
   gClassCount++;
+  gClassNameCount.add("WebSecurityOrigin");
 }
 
 WebSecurityOrigin::~WebSecurityOrigin() {
   gClassCount--;
+  gClassNameCount.remove("WebSecurityOrigin");
 }
 
 // IUnknown

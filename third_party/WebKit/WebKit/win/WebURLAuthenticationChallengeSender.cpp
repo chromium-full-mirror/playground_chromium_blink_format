@@ -47,10 +47,12 @@ WebURLAuthenticationChallengeSender::WebURLAuthenticationChallengeSender(
     : m_refCount(0), m_handle(handle) {
   ASSERT(m_handle);
   gClassCount++;
+  gClassNameCount.add("WebURLAuthenticationChallengeSender");
 }
 
 WebURLAuthenticationChallengeSender::~WebURLAuthenticationChallengeSender() {
   gClassCount--;
+  gClassNameCount.remove("WebURLAuthenticationChallengeSender");
 }
 
 WebURLAuthenticationChallengeSender*

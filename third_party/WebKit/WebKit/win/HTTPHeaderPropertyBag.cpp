@@ -36,10 +36,12 @@
 HTTPHeaderPropertyBag::HTTPHeaderPropertyBag(WebURLResponse* response)
     : m_refCount(1), m_response(response) {
   gClassCount++;
+  gClassNameCount.add("HTTPHeaderPropertyBag");
 }
 
 HTTPHeaderPropertyBag::~HTTPHeaderPropertyBag() {
   gClassCount--;
+  gClassNameCount.remove("HTTPHeaderPropertyBag");
 }
 
 HTTPHeaderPropertyBag* HTTPHeaderPropertyBag::createInstance(

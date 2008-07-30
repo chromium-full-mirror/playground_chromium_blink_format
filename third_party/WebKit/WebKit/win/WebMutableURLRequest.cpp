@@ -45,6 +45,7 @@ using namespace WebCore;
 WebMutableURLRequest::WebMutableURLRequest(bool isMutable)
     : m_refCount(0), m_isMutable(isMutable) {
   gClassCount++;
+  gClassNameCount.add("WebMutableURLRequest");
 }
 
 WebMutableURLRequest* WebMutableURLRequest::createInstance() {
@@ -85,6 +86,7 @@ WebMutableURLRequest* WebMutableURLRequest::createImmutableInstance(
 
 WebMutableURLRequest::~WebMutableURLRequest() {
   gClassCount--;
+  gClassNameCount.remove("WebMutableURLRequest");
 }
 
 // IUnknown -------------------------------------------------------------------

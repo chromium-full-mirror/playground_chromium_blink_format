@@ -307,6 +307,7 @@ WebView::WebView()
 
   WebViewCount++;
   gClassCount++;
+  gClassNameCount.add("WebView");
 }
 
 WebView::~WebView() {
@@ -330,6 +331,7 @@ WebView::~WebView() {
 
   WebViewCount--;
   gClassCount--;
+  gClassNameCount.remove("WebView");
 }
 
 WebView* WebView::createInstance() {

@@ -63,6 +63,7 @@ WebDataSource::WebDataSource(WebDocumentLoader* loader)
     : m_refCount(0), m_loader(loader) {
   WebDataSourceCount++;
   gClassCount++;
+  gClassNameCount.add("WebDataSource");
 }
 
 WebDataSource::~WebDataSource() {
@@ -70,6 +71,7 @@ WebDataSource::~WebDataSource() {
     m_loader->detachDataSource();
   WebDataSourceCount--;
   gClassCount--;
+  gClassNameCount.remove("WebDataSource");
 }
 
 WebDataSource* WebDataSource::createInstance(WebDocumentLoader* loader) {

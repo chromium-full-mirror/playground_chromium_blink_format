@@ -59,10 +59,12 @@ IWebNotificationCenter* WebNotificationCenter::m_defaultCenter = 0;
 WebNotificationCenter::WebNotificationCenter()
     : m_refCount(0), d(new WebNotificationCenterPrivate) {
   gClassCount++;
+  gClassNameCount.add("WebNotificationCenter");
 }
 
 WebNotificationCenter::~WebNotificationCenter() {
   gClassCount--;
+  gClassNameCount.remove("WebNotificationCenter");
 }
 
 WebNotificationCenter* WebNotificationCenter::createInstance() {

@@ -41,10 +41,12 @@ WebURLProtectionSpace::WebURLProtectionSpace(
     const ProtectionSpace& protectionSpace)
     : m_refCount(0), m_protectionSpace(protectionSpace) {
   gClassCount++;
+  gClassNameCount.add("WebURLProtectionSpace");
 }
 
 WebURLProtectionSpace::~WebURLProtectionSpace() {
   gClassCount--;
+  gClassNameCount.remove("WebURLProtectionSpace");
 }
 
 WebURLProtectionSpace* WebURLProtectionSpace::createInstance() {
