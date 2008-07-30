@@ -129,6 +129,8 @@ class UString {
         destroy();
     }
 
+    void checkConsistency() const;
+
     // unshared data
     int offset;
     int len;
@@ -142,7 +144,7 @@ class UString {
     UString::Rep* baseString;
     size_t reportedCost;
 
-    // potentially shared data
+    // potentially shared data. 0 if backed up by a base string.
     UChar* buf;
     int usedCapacity;
     int capacity;
@@ -298,6 +300,10 @@ inline UString operator+(const UString& s1, const UString& s2) {
 int compare(const UString&, const UString&);
 
 bool equal(const UString::Rep*, const UString::Rep*);
+
+#ifdef NDEBUG
+inline void UString::Rep::checkConsistency() const {}
+#endif
 
 inline UString::UString() : m_rep(&Rep::null) {}
 
