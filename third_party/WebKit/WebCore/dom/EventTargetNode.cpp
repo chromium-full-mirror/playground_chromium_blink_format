@@ -314,6 +314,15 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
           ? static_cast<EventTargetNode*>(relatedTargetArg)
           : 0;
 
+  if (Frame* frame = document()->frame()) {
+    float pageZoom = frame->pageZoomFactor();
+    if (pageZoom != 1.0f) {
+      // Adjust our pageX and pageY to account for the page zoom.
+      pageX /= pageZoom;
+      pageY /= pageZoom;
+    }
+  }
+
   RefPtr<Event> mouseEvent = MouseEvent::create(
       eventType, true, cancelable, document()->defaultView(), detail, screenX,
       screenY, pageX, pageY, ctrlKey, altKey, shiftKey, metaKey, button,
