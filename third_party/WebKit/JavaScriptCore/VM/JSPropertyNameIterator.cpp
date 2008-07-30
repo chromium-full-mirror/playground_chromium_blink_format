@@ -62,7 +62,7 @@ JSPropertyNameIterator::JSPropertyNameIterator(JSObject* object,
       m_end(propertyNames + numProperties) {}
 
 JSPropertyNameIterator::~JSPropertyNameIterator() {
-  delete m_propertyNames;
+  invalidate();
 }
 
 JSType JSPropertyNameIterator::type() const {
@@ -119,7 +119,11 @@ JSValue* JSPropertyNameIterator::next(ExecState* exec) {
 }
 
 void JSPropertyNameIterator::invalidate() {
-  delete m_propertyNames;
+  if (m_propertyNames) {
+    for (Identifier* p = m_propertyNames; p != m_end; ++p)
+      p->~Identifier();
+    fastFree(m_propertyNames);
+  }
   m_object = 0;
   m_propertyNames = 0;
 }
