@@ -462,7 +462,7 @@ PassRefPtr<DocumentLoader> WebFrameLoaderClient::createDocumentLoader(
     const ResourceRequest& request,
     const SubstituteData& substituteData) {
   RefPtr<WebDocumentLoader> loader =
-      new WebDocumentLoader(request, substituteData);
+      WebDocumentLoader::create(request, substituteData);
 
   COMPtr<WebDataSource> dataSource(AdoptCOM,
                                    WebDataSource::createInstance(loader.get()));
