@@ -34,6 +34,7 @@
 #include "JSObject.h"
 #include "Parser.h"
 #include "PrototypeFunction.h"
+#include "SamplingTool.h"
 #include "collector.h"
 #include "completion.h"
 #include "interpreter.h"
@@ -376,7 +377,7 @@ static bool runWithScripts(GlobalObject* globalObject,
     if (prettyPrint)
       prettyPrintScript(globalObject->globalExec(), fileName, script);
     else {
-#if SAMPLING_TOOL_ENABLED
+#if ENABLE(SAMPLING_TOOL)
       Machine* machine = globalObject->globalData()->machine;
       machine->m_sampler = new SamplingTool();
       machine->m_sampler->start();
@@ -397,7 +398,7 @@ static bool runWithScripts(GlobalObject* globalObject,
               completion.value()->toString(globalObject->globalExec()).ascii());
       }
 
-#if SAMPLING_TOOL_ENABLED
+#if ENABLE(SAMPLING_TOOL)
       machine->m_sampler->stop();
       machine->m_sampler->dump(globalObject->globalExec());
       delete machine->m_sampler;

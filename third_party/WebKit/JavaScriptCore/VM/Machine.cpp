@@ -50,6 +50,7 @@
 #include "collector.h"
 #include "debugger.h"
 #include "operations.h"
+#include "SamplingTool.h"
 #include <stdio.h>
 
 #if HAVE(SYS_TIME_H)
@@ -541,13 +542,8 @@ NEVER_INLINE JSValue* Machine::callEval(ExecState* exec,
 }
 
 Machine::Machine()
-    :
-#if SAMPLING_TOOL_ENABLED
-      m_sampler(0),
-#else
-      m_reentryDepth(0)
-#endif
-      ,
+    : m_sampler(0),
+      m_reentryDepth(0),
       m_timeoutTime(0),
       m_timeAtLastCheckTimeout(0),
       m_timeExecuting(0),
@@ -2613,7 +2609,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
                                  : r[thisVal].jsValue(exec);
         ArgList args(r + firstArg + 1, argCount - 1);
 
-        MACHINE_SAMPLING_callingNativeFunction();
+        MACHINE_SAMPLING_callingHostFunction();
 
         JSValue* returnValue = callData.native.function(
             exec, static_cast<JSObject*>(v), thisValue, args);
@@ -2760,6 +2756,9 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
           (*enabledProfilerReference)->willExecute(exec, constructor);
 
         ArgList args(r + firstArg + 1, argCount - 1);
+
+        MACHINE_SAMPLING_callingHostFunction();
+
         JSValue* returnValue =
             constructData.native.function(exec, constructor, args);
 
