@@ -66,7 +66,7 @@ class Parser : Noncopyable {
                         int lastLine);
 
  private:
-  friend struct JSGlobalData;
+  friend class JSGlobalData;
   Parser();
 
   void parse(ExecState*,

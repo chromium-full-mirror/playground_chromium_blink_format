@@ -94,7 +94,7 @@ class Lexer : Noncopyable {
   }
 
  private:
-  friend struct JSGlobalData;
+  friend class JSGlobalData;
   Lexer(JSGlobalData*);
   ~Lexer();
 
