@@ -45,6 +45,9 @@ class SubresourceLoaderClient {
   virtual void willSendRequest(SubresourceLoader*,
                                ResourceRequest&,
                                const ResourceResponse& redirectResponse) {}
+  virtual void didSendData(SubresourceLoader*,
+                           unsigned long long bytesSent,
+                           unsigned long long totalBytesToBeSent) {}
 
   virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&) {
   }
@@ -58,6 +61,7 @@ class SubresourceLoaderClient {
   virtual void receivedCancellation(SubresourceLoader*,
                                     const AuthenticationChallenge&) {}
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // SubresourceLoaderClient_h

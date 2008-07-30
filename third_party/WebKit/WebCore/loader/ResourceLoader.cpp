@@ -214,6 +214,9 @@ void ResourceLoader::willSendRequest(ResourceRequest& request,
   m_request = request;
 }
 
+void ResourceLoader::didSendData(unsigned long long bytesSent,
+                                 unsigned long long totalBytesToBeSent) {}
+
 void ResourceLoader::didReceiveResponse(const ResourceResponse& r) {
   ASSERT(!m_reachedTerminalState);
 
@@ -368,6 +371,12 @@ void ResourceLoader::willSendRequest(ResourceHandle*,
                                      ResourceRequest& request,
                                      const ResourceResponse& redirectResponse) {
   willSendRequest(request, redirectResponse);
+}
+
+void ResourceLoader::didSendData(ResourceHandle*,
+                                 unsigned long long bytesSent,
+                                 unsigned long long totalBytesToBeSent) {
+  didSendData(bytesSent, totalBytesToBeSent);
 }
 
 void ResourceLoader::didReceiveResponse(ResourceHandle*,

@@ -63,6 +63,10 @@ XMLHttpRequest* EventTarget::toXMLHttpRequest() {
   return 0;
 }
 
+XMLHttpRequestUpload* EventTarget::toXMLHttpRequestUpload() {
+  return 0;
+}
+
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
 DOMApplicationCache* EventTarget::toDOMApplicationCache() {
   return 0;

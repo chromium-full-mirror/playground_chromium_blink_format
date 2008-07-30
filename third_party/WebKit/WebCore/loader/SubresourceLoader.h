@@ -57,6 +57,8 @@ class SubresourceLoader : public ResourceLoader {
 
   virtual void willSendRequest(ResourceRequest&,
                                const ResourceResponse& redirectResponse);
+  virtual void didSendData(unsigned long long bytesSent,
+                           unsigned long long totalBytesToBeSent);
   virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char*,
                               int,

@@ -77,6 +77,8 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
 
   virtual void willSendRequest(ResourceRequest&,
                                const ResourceResponse& redirectResponse);
+  virtual void didSendData(unsigned long long bytesSent,
+                           unsigned long long totalBytesToBeSent);
   virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char*,
                               int,
@@ -95,6 +97,9 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
   virtual void willSendRequest(ResourceHandle*,
                                ResourceRequest&,
                                const ResourceResponse& redirectResponse);
+  virtual void didSendData(ResourceHandle*,
+                           unsigned long long bytesSent,
+                           unsigned long long totalBytesToBeSent);
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
   virtual void didReceiveData(ResourceHandle*,
                               const char*,
