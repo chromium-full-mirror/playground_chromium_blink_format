@@ -114,6 +114,9 @@ class Frame : public RefCounted<Frame> {
   RenderPart* ownerRenderer()
       const;  // renderer for the element that contains this frame
 
+  bool isDisconnected() const;
+  void setIsDisconnected(bool);
+
   friend class FramePrivate;
 
  private:

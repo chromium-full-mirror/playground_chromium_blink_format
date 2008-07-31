@@ -48,6 +48,12 @@ void FrameTree::setName(const AtomicString& name) {
   m_name = parent()->tree()->uniqueChildName(name);
 }
 
+Frame* FrameTree::parent(bool checkForDisconnectedFrame) const {
+  if (checkForDisconnectedFrame && m_thisFrame->isDisconnected())
+    return 0;
+  return m_parent;
+}
+
 void FrameTree::appendChild(PassRefPtr<Frame> child) {
   ASSERT(child->page() == m_thisFrame->page());
   child->tree()->m_parent = m_thisFrame;
@@ -304,13 +310,13 @@ Frame* FrameTree::deepLastChild() const {
   return result;
 }
 
-Frame* FrameTree::top() const {
-  if (Page* page = m_thisFrame->page())
-    return page->mainFrame();
-
+Frame* FrameTree::top(bool checkForDisconnectedFrame) const {
   Frame* frame = m_thisFrame;
-  while (Frame* parent = frame->tree()->parent())
+  for (Frame* parent = m_thisFrame; parent; parent = parent->tree()->parent()) {
     frame = parent;
+    if (checkForDisconnectedFrame && frame->isDisconnected())
+      return frame;
+  }
   return frame;
 }
 
