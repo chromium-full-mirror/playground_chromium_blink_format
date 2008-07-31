@@ -206,6 +206,9 @@ class Settings {
   void setUpdatesWhenOffscreen(bool);
   bool updatesWhenOffscreen() const { return m_updatesWhenOffscreen; }
 
+  void setZoomsTextOnly(bool);
+  bool zoomsTextOnly() const { return m_zoomsTextOnly; }
+
   void setEnforceCSSMIMETypeInStrictMode(bool);
   bool enforceCSSMIMETypeInStrictMode() {
     return m_enforceCSSMIMETypeInStrictMode;
@@ -257,6 +260,7 @@ class Settings {
   bool m_rangeMutationDisabledForOldAppleMail : 1;
   bool m_shouldPaintCustomScrollbars : 1;
   bool m_updatesWhenOffscreen : 1;
+  bool m_zoomsTextOnly : 1;
   bool m_enforceCSSMIMETypeInStrictMode : 1;
 };
 
