@@ -27,6 +27,7 @@
 #include "WebKitDLL.h"
 #include "WebKit.h"
 
+#include "COMPropertyBag.h"
 #include "HTTPHeaderPropertyBag.h"
 #include "MarshallingHelpers.h"
 #include "WebLocalizableStrings.h"
@@ -371,7 +372,9 @@ HRESULT STDMETHODCALLTYPE WebURLResponse::URL(
 HRESULT STDMETHODCALLTYPE WebURLResponse::allHeaderFields(
     /* [retval][out] */ IPropertyBag** headerFields) {
   ASSERT(m_response.isHTTP());
-  *headerFields = HTTPHeaderPropertyBag::createInstance(this);
+
+  *headerFields = COMPropertyBag<String, CaseFoldingHash>::createInstance(
+      m_response.httpHeaderFields());
   return S_OK;
 }
 
