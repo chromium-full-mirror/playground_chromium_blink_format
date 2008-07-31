@@ -31,6 +31,11 @@
 #include <wtf/OwnPtr.h>
 #include <wtf/Threading.h>
 
+// This is supremely lame that we require pthreads to build on windows.
+#if USE(JSC_MULTIPLE_THREADS)
+#include <pthread.h>
+#endif
+
 namespace KJS {
 
 class ArgList;
@@ -139,7 +144,7 @@ class Heap : Noncopyable {
 
   HashSet<ArgList*>* m_markListSet;
 
-#if USE(MULTIPLE_THREADS)
+#if ENABLE(JSC_MULTIPLE_THREADS)
   static void unregisterThread(void*);
   void unregisterThread();
 
