@@ -35,6 +35,7 @@
 #include "NotImplemented.h"
 #include "PluginView.h"
 #include "SharedBuffer.h"
+#include <float.h>
 
 using namespace WebCore;
 
@@ -75,8 +76,9 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
 }
 float userIdleTime() {
   notImplemented();
-  return 0.0;
-}
+  return FLT_MAX;
+}  // return an arbitrarily high userIdleTime so that releasing pages from the
+   // page cache isn't postponed
 
 String KURL::fileSystemPath() const {
   notImplemented();

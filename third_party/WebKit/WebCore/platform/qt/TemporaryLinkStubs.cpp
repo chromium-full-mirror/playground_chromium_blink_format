@@ -69,6 +69,7 @@
 #include "Widget.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 using namespace WebCore;
 
@@ -164,8 +165,9 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
 // defined in win/SystemTimeWin.cpp, which is compiled for the Qt/Windows port
 float userIdleTime() {
   notImplemented();
-  return 0.0;
-}
+  return FLT_MAX;
+}  // return an arbitrarily high userIdleTime so that releasing pages from the
+   // page cache isn't postponed
 #endif
 
 PassRefPtr<SharedBuffer> SharedBuffer::createWithContentsOfFile(const String&) {

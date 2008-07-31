@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 #include "AffineTransform.h"
 #include "AXObjectCache.h"
@@ -366,8 +367,9 @@ bool SearchPopupMenu::enabled() {
 namespace WebCore {
 float userIdleTime() {
   notImplemented();
-  return 0;
-}
+  return FLT_MAX;
+}  // return an arbitrarily high userIdleTime so that releasing pages from the
+   // page cache isn't postponed
 Vector<String> supportedKeySizes() {
   notImplemented();
   return Vector<String>();
