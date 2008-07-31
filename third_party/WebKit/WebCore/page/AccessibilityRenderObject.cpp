@@ -1483,11 +1483,14 @@ VisiblePositionRange AccessibilityRenderObject::visiblePositionRangeForLine(
 
 VisiblePosition AccessibilityRenderObject::visiblePositionForIndex(
     int index) const {
+  if (!m_renderer)
+    return VisiblePosition();
+
   if (isNativeTextControl())
     return static_cast<RenderTextControl*>(m_renderer)
         ->visiblePositionForIndex(index);
 
-  if (!isTextControl())
+  if (!isTextControl() && !m_renderer->isText())
     return VisiblePosition();
 
   Node* node = m_renderer->node();

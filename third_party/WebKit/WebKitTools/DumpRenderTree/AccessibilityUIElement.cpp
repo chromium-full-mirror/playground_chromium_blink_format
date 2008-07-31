@@ -68,6 +68,20 @@ static JSValueRef attributesOfChildrenCallback(JSContextRef context,
   return JSValueMakeString(context, childrenDescription.get());
 }
 
+static JSValueRef parameterizedAttributeNamesCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  AccessibilityUIElement* element =
+      reinterpret_cast<AccessibilityUIElement*>(JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> parameterizedAttributeNames(
+      Adopt, element->parameterizedAttributeNames());
+  return JSValueMakeString(context, parameterizedAttributeNames.get());
+}
+
 static JSValueRef lineForIndexCallback(JSContextRef context,
                                        JSObjectRef function,
                                        JSObjectRef thisObject,
@@ -81,6 +95,41 @@ static JSValueRef lineForIndexCallback(JSContextRef context,
   AccessibilityUIElement* element =
       reinterpret_cast<AccessibilityUIElement*>(JSObjectGetPrivate(thisObject));
   return JSValueMakeNumber(context, element->lineForIndex(indexNumber));
+}
+
+static JSValueRef boundsForRangeCallback(JSContextRef context,
+                                         JSObjectRef function,
+                                         JSObjectRef thisObject,
+                                         size_t argumentCount,
+                                         const JSValueRef arguments[],
+                                         JSValueRef* exception) {
+  unsigned location = UINT_MAX, length = 0;
+  if (argumentCount == 2) {
+    location = JSValueToNumber(context, arguments[0], exception);
+    length = JSValueToNumber(context, arguments[1], exception);
+  }
+
+  AccessibilityUIElement* element =
+      reinterpret_cast<AccessibilityUIElement*>(JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> boundsDescription(
+      Adopt, element->boundsForRange(location, length));
+  return JSValueMakeString(context, boundsDescription.get());
+}
+
+static JSValueRef childAtIndexCallback(JSContextRef context,
+                                       JSObjectRef function,
+                                       JSObjectRef thisObject,
+                                       size_t argumentCount,
+                                       const JSValueRef arguments[],
+                                       JSValueRef* exception) {
+  int indexNumber = -1;
+  if (argumentCount == 1)
+    indexNumber = JSValueToNumber(context, arguments[0], exception);
+
+  AccessibilityUIElement* element =
+      reinterpret_cast<AccessibilityUIElement*>(JSObjectGetPrivate(thisObject));
+  return AccessibilityUIElement::makeJSAccessibilityUIElement(
+      context, element->getChildAtIndex(0));
 }
 
 // Static Value Getters
@@ -214,7 +263,13 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"attributesOfChildren", attributesOfChildrenCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"parameterizedAttributeNames", parameterizedAttributeNamesCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"lineForIndex", lineForIndexCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"boundsForRange", boundsForRangeCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"childAtIndex", childAtIndexCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 
