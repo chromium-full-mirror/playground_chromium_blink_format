@@ -167,7 +167,9 @@ static void createAndAppendSpeechSubMenu(const HitTestResult& result,
 
   speechMenuItem.setSubMenu(&speechMenu);
 }
+#endif
 
+#if !PLATFORM(GTK)
 static void createAndAppendWritingDirectionSubMenu(
     const HitTestResult& result,
     ContextMenuItem& writingDirectionMenuItem) {
@@ -450,6 +452,8 @@ void ContextMenu::populate() {
                                      contextMenuItemTagSpeechMenu());
       createAndAppendSpeechSubMenu(m_hitTestResult, SpeechMenuItem);
       appendItem(SpeechMenuItem);
+#endif
+#if !PLATFORM(GTK)
       ContextMenuItem WritingDirectionMenuItem(
           SubmenuType, ContextMenuItemTagWritingDirectionMenu,
           contextMenuItemTagWritingDirectionMenu());
