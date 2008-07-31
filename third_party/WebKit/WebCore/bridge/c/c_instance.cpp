@@ -36,7 +36,6 @@
 #include "runtime_root.h"
 #include <kjs/ArgList.h>
 #include <kjs/ExecState.h>
-#include <kjs/JSLock.h>
 #include <kjs/JSNumberCell.h>
 #include <kjs/PropertyNameArray.h>
 #include <wtf/Assertions.h>
@@ -90,11 +89,7 @@ JSValue* CInstance::invokeMethod(ExecState* exec,
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
 
-  {
-    JSLock::DropAllLocks dropAllLocks(false);
-    _object->_class->invoke(_object, ident, cArgs.data(), count,
-                            &resultVariant);
-  }
+  _object->_class->invoke(_object, ident, cArgs.data(), count, &resultVariant);
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
@@ -119,11 +114,7 @@ JSValue* CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
   // Invoke the 'C' method.
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
-  {
-    JSLock::DropAllLocks dropAllLocks(false);
-    _object->_class->invokeDefault(_object, cArgs.data(), count,
-                                   &resultVariant);
-  }
+  _object->_class->invokeDefault(_object, cArgs.data(), count, &resultVariant);
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
@@ -174,11 +165,8 @@ void CInstance::getPropertyNames(ExecState* exec,
   unsigned count;
   NPIdentifier* identifiers;
 
-  {
-    JSLock::DropAllLocks dropAllLocks(false);
-    if (!_object->_class->enumerate(_object, &identifiers, &count))
-      return;
-  }
+  if (!_object->_class->enumerate(_object, &identifiers, &count))
+    return;
 
   for (unsigned i = 0; i < count; i++) {
     PrivateIdentifier* identifier =

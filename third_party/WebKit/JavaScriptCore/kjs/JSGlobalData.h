@@ -85,8 +85,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   JSGlobalObject* head;
 
-  bool isSharedInstance;
-
  private:
   JSGlobalData();
 

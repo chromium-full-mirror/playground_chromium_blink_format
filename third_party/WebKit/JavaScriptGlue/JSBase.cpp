@@ -39,10 +39,8 @@ JSBase* JSBase::Retain() {
 }
 
 void JSBase::Release() {
-  if (--fRetainCount == 0) {
-    JSLock lock(true);
+  if (--fRetainCount == 0)
     delete this;
-  }
 }
 
 CFIndex JSBase::RetainCount() const {

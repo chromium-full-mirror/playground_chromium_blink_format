@@ -66,7 +66,6 @@ void JSClassRelease(JSClassRef jsClass) {
 JSObjectRef JSObjectMake(JSContextRef ctx, JSClassRef jsClass, void* data) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   if (!jsClass)
     return toRef(new (exec) JSObject(
@@ -87,7 +86,6 @@ JSObjectRef JSObjectMakeFunctionWithCallback(
     JSObjectCallAsFunctionCallback callAsFunction) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   Identifier nameID =
       name ? Identifier(exec, toJS(name)) : Identifier(exec, "anonymous");
@@ -101,7 +99,6 @@ JSObjectRef JSObjectMakeConstructor(
     JSObjectCallAsConstructorCallback callAsConstructor) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSValue* jsPrototype = jsClass
                              ? jsClass->prototype(exec)
@@ -124,7 +121,6 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
                                  JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   UString::Rep* bodyRep = toJS(body);
   UString::Rep* sourceURLRep =
@@ -166,7 +162,6 @@ bool JSObjectHasProperty(JSContextRef ctx,
                          JSStringRef propertyName) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
@@ -180,7 +175,6 @@ JSValueRef JSObjectGetProperty(JSContextRef ctx,
                                JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
@@ -202,7 +196,6 @@ void JSObjectSetProperty(JSContextRef ctx,
                          JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
   Identifier name(exec, toJS(propertyName));
@@ -226,7 +219,6 @@ JSValueRef JSObjectGetPropertyAtIndex(JSContextRef ctx,
                                       JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
 
@@ -246,7 +238,6 @@ void JSObjectSetPropertyAtIndex(JSContextRef ctx,
                                 JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
   JSValue* jsValue = toJS(value);
@@ -265,7 +256,6 @@ bool JSObjectDeleteProperty(JSContextRef ctx,
                             JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
@@ -318,7 +308,6 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
                                   JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
   JSObject* jsThisObject = toJS(thisObject);
@@ -359,7 +348,6 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,
                                       JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSObject* jsObject = toJS(object);
 
@@ -395,7 +383,6 @@ JSPropertyNameArrayRef JSObjectCopyPropertyNames(JSContextRef ctx,
   JSObject* jsObject = toJS(object);
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
-  JSLock lock(exec);
 
   JSPropertyNameArrayRef propertyNames =
       new OpaqueJSPropertyNameArray(&exec->globalData());
@@ -410,10 +397,8 @@ JSPropertyNameArrayRef JSPropertyNameArrayRetain(JSPropertyNameArrayRef array) {
 }
 
 void JSPropertyNameArrayRelease(JSPropertyNameArrayRef array) {
-  if (--array->refCount == 0) {
-    JSLock lock(array->array.globalData()->isSharedInstance);
+  if (--array->refCount == 0)
     delete array;
-  }
 }
 
 size_t JSPropertyNameArrayGetCount(JSPropertyNameArrayRef array) {
@@ -431,7 +416,6 @@ void JSPropertyNameAccumulatorAddName(JSPropertyNameAccumulatorRef array,
   UString::Rep* rep = toJS(propertyName);
 
   propertyNames->globalData()->heap->registerThread();
-  JSLock lock(propertyNames->globalData()->isSharedInstance);
 
   propertyNames->add(Identifier(propertyNames->globalData(), rep));
 }

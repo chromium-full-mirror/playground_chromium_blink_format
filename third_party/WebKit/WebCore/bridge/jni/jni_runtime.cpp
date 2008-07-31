@@ -34,7 +34,6 @@
 #include "runtime_object.h"
 #include "runtime_root.h"
 #include <kjs/Error.h>
-#include <kjs/JSLock.h>
 
 #ifdef NDEBUG
 #define JS_LOG(formatAndArgs...) ((void)0)
@@ -317,8 +316,6 @@ JavaMethod::~JavaMethod() {
 // JNI method signatures use '/' between components of a class name, but
 // we get '.' between components from the reflection API.
 static void appendClassName(UString& aString, const char* className) {
-  ASSERT(JSLock::lockCount() > 0);
-
   char *result, *cp = strdup(className);
 
   result = cp;
@@ -335,8 +332,6 @@ static void appendClassName(UString& aString, const char* className) {
 
 const char* JavaMethod::signature() const {
   if (!_signature) {
-    JSLock lock(false);
-
     UString signatureBuilder("(");
     for (int i = 0; i < _numParameters; i++) {
       JavaParameter* aParameter = parameterAt(i);

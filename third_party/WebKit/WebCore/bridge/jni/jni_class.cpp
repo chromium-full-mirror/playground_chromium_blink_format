@@ -30,7 +30,6 @@
 
 #include "JSDOMWindow.h"
 #include <kjs/identifier.h>
-#include <kjs/JSLock.h>
 #include "jni_utility.h"
 #include "jni_runtime.h"
 
@@ -65,12 +64,8 @@ JavaClass::JavaClass(jobject anInstance) {
     jobject aJField = env->GetObjectArrayElement((jobjectArray)fields, i);
     Field* aField =
         new JavaField(env, aJField);  // deleted in the JavaClass destructor
-    {
-      JSLock lock(false);
-      _fields.set(
-          Identifier(globalData, UString(aField->name())).ustring().rep(),
-          aField);
-    }
+    _fields.set(Identifier(globalData, UString(aField->name())).ustring().rep(),
+                aField);
     env->DeleteLocalRef(aJField);
   }
 
@@ -82,18 +77,13 @@ JavaClass::JavaClass(jobject anInstance) {
     jobject aJMethod = env->GetObjectArrayElement((jobjectArray)methods, i);
     Method* aMethod =
         new JavaMethod(env, aJMethod);  // deleted in the JavaClass destructor
-    MethodList* methodList;
-    {
-      JSLock lock(false);
-
-      methodList = _methods.get(
-          Identifier(globalData, UString(aMethod->name())).ustring().rep());
-      if (!methodList) {
-        methodList = new MethodList();
-        _methods.set(
-            Identifier(globalData, UString(aMethod->name())).ustring().rep(),
-            methodList);
-      }
+    MethodList* methodList = _methods.get(
+        Identifier(globalData, UString(aMethod->name())).ustring().rep());
+    if (!methodList) {
+      methodList = new MethodList();
+      _methods.set(
+          Identifier(globalData, UString(aMethod->name())).ustring().rep(),
+          methodList);
     }
     methodList->append(aMethod);
     env->DeleteLocalRef(aJMethod);
@@ -102,8 +92,6 @@ JavaClass::JavaClass(jobject anInstance) {
 
 JavaClass::~JavaClass() {
   free((void*)_name);
-
-  JSLock lock(false);
 
   deleteAllValues(_fields);
   _fields.clear();

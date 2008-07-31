@@ -97,7 +97,6 @@
 #include <WebCore/WindowMessageBroadcaster.h>
 #pragma warning(pop)
 #include <JavaScriptCore/InitializeThreading.h>
-#include <JavaScriptCore/JSLock.h>
 #include <JavaScriptCore/JSValue.h>
 #include <CFNetwork/CFURLCachePriv.h>
 #include <CFNetwork/CFURLProtocolPriv.h>
@@ -112,7 +111,6 @@
 
 using namespace WebCore;
 using namespace WebCore::EventNames;
-using KJS::JSLock;
 using std::min;
 using std::max;
 
@@ -2702,10 +2700,8 @@ HRESULT STDMETHODCALLTYPE WebView::stringByEvaluatingJavaScriptFromString(
       coreFrame->loader()->executeScript(WebCore::String(script), true);
   if (!scriptExecutionResult)
     return E_FAIL;
-  else if (scriptExecutionResult->isString()) {
-    JSLock lock(false);
+  else if (scriptExecutionResult->isString())
     *result = BString(String(scriptExecutionResult->getString()));
-  }
 
   return S_OK;
 }

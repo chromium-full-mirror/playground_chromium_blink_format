@@ -35,7 +35,6 @@
 #include <JavaScriptCore/Interpreter.h>
 #include <JavaScriptCore/JSFunction.h>
 #include <JavaScriptCore/JSGlobalObject.h>
-#include <JavaScriptCore/JSLock.h>
 #include <JavaScriptCore/JSStringRefBSTR.h>
 #include <JavaScriptCore/JSValueRef.h>
 #include <JavaScriptCore/PropertyNameArray.h>
@@ -182,8 +181,6 @@ WebScriptCallFrame::stringByEvaluatingJavaScriptFromString(
     return E_POINTER;
 
   *result = 0;
-
-  JSLock lock(false);
 
   JSValue* scriptExecutionResult =
       valueByEvaluatingJavaScriptFromString(script);

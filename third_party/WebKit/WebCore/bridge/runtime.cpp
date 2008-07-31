@@ -28,7 +28,6 @@
 
 #include "runtime_object.h"
 #include "runtime_root.h"
-#include <kjs/JSLock.h>
 
 #if PLATFORM(QT)
 #include "qt_instance.h"
@@ -85,7 +84,6 @@ RuntimeObjectImp* Instance::createRuntimeObject(ExecState* exec,
     return QtInstance::getRuntimeObject(
         exec, static_cast<QtInstance*>(instance.get()));
 #endif
-  JSLock lock(false);
 
   return new (exec) RuntimeObjectImp(instance);
 }

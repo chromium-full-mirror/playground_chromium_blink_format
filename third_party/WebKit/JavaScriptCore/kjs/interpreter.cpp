@@ -25,7 +25,6 @@
 
 #include "ExecState.h"
 #include "JSGlobalObject.h"
-#include "JSLock.h"
 #include "Machine.h"
 #include "Parser.h"
 #include "completion.h"
@@ -51,8 +50,6 @@ Completion Interpreter::checkSyntax(ExecState* exec,
                                     const UString& sourceURL,
                                     int startingLineNumber,
                                     PassRefPtr<SourceProvider> source) {
-  JSLock lock(exec);
-
   int errLine;
   UString errMsg;
 
@@ -80,8 +77,6 @@ Completion Interpreter::evaluate(ExecState* exec,
                                  int startingLineNumber,
                                  PassRefPtr<SourceProvider> source,
                                  JSValue* thisValue) {
-  JSLock lock(exec);
-
   // parse the source code
   int sourceId;
   int errLine;

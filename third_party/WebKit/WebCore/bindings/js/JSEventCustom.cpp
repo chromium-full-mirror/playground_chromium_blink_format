@@ -52,7 +52,6 @@
 #include "UIEvent.h"
 #include "WheelEvent.h"
 #include "XMLHttpRequestProgressEvent.h"
-#include <kjs/JSLock.h>
 
 #if ENABLE(DOM_STORAGE)
 #include "JSStorageEvent.h"
@@ -74,8 +73,6 @@ JSValue* JSEvent::clipboardData(ExecState* exec) const {
 }
 
 JSValue* toJS(ExecState* exec, Event* event) {
-  JSLock lock(false);
-
   if (!event)
     return jsNull();
 
