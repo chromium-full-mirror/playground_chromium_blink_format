@@ -206,6 +206,11 @@ class Settings {
   void setUpdatesWhenOffscreen(bool);
   bool updatesWhenOffscreen() const { return m_updatesWhenOffscreen; }
 
+  void setEnforceCSSMIMETypeInStrictMode(bool);
+  bool enforceCSSMIMETypeInStrictMode() {
+    return m_enforceCSSMIMETypeInStrictMode;
+  }
+
  private:
   Page* m_page;
 
@@ -252,6 +257,7 @@ class Settings {
   bool m_rangeMutationDisabledForOldAppleMail : 1;
   bool m_shouldPaintCustomScrollbars : 1;
   bool m_updatesWhenOffscreen : 1;
+  bool m_enforceCSSMIMETypeInStrictMode : 1;
 };
 
 }  // namespace WebCore

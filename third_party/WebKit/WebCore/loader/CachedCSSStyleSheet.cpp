@@ -102,11 +102,11 @@ void CachedCSSStyleSheet::error() {
   checkNotify();
 }
 
-bool CachedCSSStyleSheet::canUseSheet(bool strict) const {
+bool CachedCSSStyleSheet::canUseSheet(bool enforceMIMEType) const {
   if (errorOccurred())
     return false;
 
-  if (!strict)
+  if (!enforceMIMEType)
     return true;
 
   // This check exactly matches Firefox.
