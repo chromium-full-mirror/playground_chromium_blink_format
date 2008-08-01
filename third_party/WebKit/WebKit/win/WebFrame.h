@@ -214,6 +214,9 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual HRESULT STDMETHODCALLTYPE allowsScrolling(
       /* [retval][out] */ BOOL* flag);
 
+  virtual HRESULT STDMETHODCALLTYPE setIsDisconnected(
+      /* [in] */ BOOL flag);
+
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
       /* [retval][out] */ BOOL* result);

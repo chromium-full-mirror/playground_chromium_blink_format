@@ -261,6 +261,16 @@ HRESULT STDMETHODCALLTYPE WebFrame::allowsScrolling(
   return S_OK;
 }
 
+HRESULT STDMETHODCALLTYPE WebFrame::setIsDisconnected(
+    /* [in] */ BOOL flag) {
+  if (Frame* frame = core(this)) {
+    frame->setIsDisconnected(flag);
+    return S_OK;
+  }
+
+  return E_FAIL;
+}
+
 // IUnknown -------------------------------------------------------------------
 
 HRESULT STDMETHODCALLTYPE WebFrame::QueryInterface(REFIID riid,
