@@ -40,7 +40,7 @@ ApplicationCache::ApplicationCache()
     : m_group(0), m_manifest(0), m_storageID(0) {}
 
 ApplicationCache::~ApplicationCache() {
-  if (m_group)
+  if (m_group && !m_group->isCopy())
     m_group->cacheDestroyed(this);
 }
 

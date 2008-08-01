@@ -59,4 +59,7 @@
 - (NSString*)_webkit_stringByCollapsingWhitespaceCharacters;
 - (NSString*)_webkit_fixedCarbonPOSIXPath;
 
++ (NSString*)_webkit_applicationCacheDirectoryWithBundleIdentifier:
+    (NSString*)bundleIdentifier;
+
 @end
