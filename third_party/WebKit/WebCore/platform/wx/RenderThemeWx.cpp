@@ -125,6 +125,19 @@ class RenderThemeWx : public RenderTheme {
   bool supportsFocus(EAppearance) const;
 };
 
+// Constants
+
+#define MINIMUM_MENU_LIST_SIZE 21
+#define POPUP_INTERNAL_PADDING_LEFT 6
+#define POPUP_INTERNAL_PADDING_TOP 2
+#define POPUP_INTERNAL_PADDING_BOTTOM 2
+
+#ifdef __WXMAC__
+#define POPUP_INTERNAL_PADDING_RIGHT 22
+#else
+#define POPUP_INTERNAL_PADDING_RIGHT 20
+#endif
+
 RenderTheme* theme() {
   static RenderThemeWx rt;
   return &rt;
@@ -284,7 +297,7 @@ bool RenderThemeWx::paintTextField(RenderObject* o,
 }
 
 int RenderThemeWx::minimumMenuListSize(RenderStyle*) const {
-  return 21;
+  return MINIMUM_MENU_LIST_SIZE;
 }
 
 void RenderThemeWx::adjustMenuListStyle(CSSStyleSelector*,
@@ -365,22 +378,18 @@ Color RenderThemeWx::platformInactiveSelectionForegroundColor() const {
 }
 
 int RenderThemeWx::popupInternalPaddingLeft(RenderStyle*) const {
-  return 6;
+  return POPUP_INTERNAL_PADDING_LEFT;
 }
 
 int RenderThemeWx::popupInternalPaddingRight(RenderStyle*) const {
-#ifdef __WXMAC__
-  return 22;
-#else
-  return 20;
-#endif
+  return POPUP_INTERNAL_PADDING_RIGHT;
 }
 
 int RenderThemeWx::popupInternalPaddingTop(RenderStyle*) const {
-  return 2;
+  return POPUP_INTERNAL_PADDING_TOP;
 }
 
 int RenderThemeWx::popupInternalPaddingBottom(RenderStyle*) const {
-  return 2;
+  return POPUP_INTERNAL_PADDING_BOTTOM;
 }
 }
