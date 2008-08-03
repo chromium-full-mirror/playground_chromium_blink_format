@@ -77,7 +77,7 @@ namespace KJS {
                                                           op_next_pname)                                         \
                                                                                                                  \
                                                           macro(op_push_scope) macro(                            \
-                                                              op_pop_scope)                                      \
+                                                              op_pop_scope) macro(op_push_new_scope)             \
                                                                                                                  \
                                                               macro(op_catch) macro(                             \
                                                                   op_throw) macro(op_new_error)                  \
