@@ -137,13 +137,13 @@ struct Length {
   float calcFloatValue(int maxValue) const {
     switch (type()) {
       case Fixed:
-        return value();
+        return static_cast<float>(value());
       case Percent:
         return static_cast<float>(maxValue * percent() / 100.0);
       case Auto:
-        return maxValue;
+        return static_cast<float>(maxValue);
       default:
-        return undefinedLength;
+        return static_cast<float>(undefinedLength);
     }
   }
 
