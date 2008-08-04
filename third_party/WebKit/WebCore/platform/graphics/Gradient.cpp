@@ -32,7 +32,13 @@
 namespace WebCore {
 
 Gradient::Gradient(const FloatPoint& p0, const FloatPoint& p1)
-    : m_radial(false), m_p0(p0), m_p1(p1), m_stopsSorted(false), m_lastStop(0) {
+    : m_radial(false),
+      m_p0(p0),
+      m_p1(p1),
+      m_r0(0),
+      m_r1(0),
+      m_stopsSorted(false),
+      m_lastStop(0) {
   platformInit();
 }
 
