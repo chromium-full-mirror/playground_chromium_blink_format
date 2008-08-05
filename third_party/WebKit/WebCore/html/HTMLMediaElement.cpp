@@ -956,8 +956,7 @@ void HTMLMediaElement::willSaveToCache() {
   m_inPageCache = true;
   // Stop the playback without generating events
   setPausedInternal(true);
-  if (m_player)
-    m_player->setVisible(false);
+
   if (renderer())
     renderer()->updateFromElement();
 }
