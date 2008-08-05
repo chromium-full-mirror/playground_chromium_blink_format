@@ -155,6 +155,8 @@ class WebMutableURLRequest : public IWebMutableURLRequest,
   virtual HRESULT STDMETHODCALLTYPE setClientCertificate(
       /* [in] */ OLE_HANDLE cert);
 
+  virtual /* [local] */ CFURLRequestRef STDMETHODCALLTYPE cfRequest();
+
   // WebMutableURLRequest
   void setFormData(const PassRefPtr<WebCore::FormData> data);
   const PassRefPtr<WebCore::FormData> formData() const;
