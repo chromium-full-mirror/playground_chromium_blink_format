@@ -153,6 +153,9 @@ static const char* editorCommandWebActions[] = {
 
     0,  // InspectElement,
 
+    "InsertNewline",    // InsertParagraphSeparator
+    "InsertLineBreak",  // InsertLineSeparator
+
     0  // WebActionCount
 };
 
@@ -602,39 +605,45 @@ static QWebPage::WebAction editorActionForKeyEvent(QKeyEvent* event) {
   static struct {
     QKeySequence::StandardKey standardKey;
     QWebPage::WebAction action;
-  } editorActions[32] = {
-      {QKeySequence::Cut, QWebPage::Cut},
-      {QKeySequence::Copy, QWebPage::Copy},
-      {QKeySequence::Paste, QWebPage::Paste},
-      {QKeySequence::Undo, QWebPage::Undo},
-      {QKeySequence::Redo, QWebPage::Redo},
-      {QKeySequence::MoveToNextChar, QWebPage::MoveToNextChar},
-      {QKeySequence::MoveToPreviousChar, QWebPage::MoveToPreviousChar},
-      {QKeySequence::MoveToNextWord, QWebPage::MoveToNextWord},
-      {QKeySequence::MoveToPreviousWord, QWebPage::MoveToPreviousWord},
-      {QKeySequence::MoveToNextLine, QWebPage::MoveToNextLine},
-      {QKeySequence::MoveToPreviousLine, QWebPage::MoveToPreviousLine},
-      {QKeySequence::MoveToStartOfLine, QWebPage::MoveToStartOfLine},
-      {QKeySequence::MoveToEndOfLine, QWebPage::MoveToEndOfLine},
-      {QKeySequence::MoveToStartOfBlock, QWebPage::MoveToStartOfBlock},
-      {QKeySequence::MoveToEndOfBlock, QWebPage::MoveToEndOfBlock},
-      {QKeySequence::MoveToStartOfDocument, QWebPage::MoveToStartOfDocument},
-      {QKeySequence::MoveToEndOfDocument, QWebPage::MoveToEndOfDocument},
-      {QKeySequence::SelectNextChar, QWebPage::SelectNextChar},
-      {QKeySequence::SelectPreviousChar, QWebPage::SelectPreviousChar},
-      {QKeySequence::SelectNextWord, QWebPage::SelectNextWord},
-      {QKeySequence::SelectPreviousWord, QWebPage::SelectPreviousWord},
-      {QKeySequence::SelectNextLine, QWebPage::SelectNextLine},
-      {QKeySequence::SelectPreviousLine, QWebPage::SelectPreviousLine},
-      {QKeySequence::SelectStartOfLine, QWebPage::SelectStartOfLine},
-      {QKeySequence::SelectEndOfLine, QWebPage::SelectEndOfLine},
-      {QKeySequence::SelectStartOfBlock, QWebPage::SelectStartOfBlock},
-      {QKeySequence::SelectEndOfBlock, QWebPage::SelectEndOfBlock},
-      {QKeySequence::SelectStartOfDocument, QWebPage::SelectStartOfDocument},
-      {QKeySequence::SelectEndOfDocument, QWebPage::SelectEndOfDocument},
-      {QKeySequence::DeleteStartOfWord, QWebPage::DeleteStartOfWord},
-      {QKeySequence::DeleteEndOfWord, QWebPage::DeleteEndOfWord},
-      {QKeySequence::UnknownKey, QWebPage::NoWebAction}};
+  } editorActions[] = {
+    {QKeySequence::Cut, QWebPage::Cut},
+    {QKeySequence::Copy, QWebPage::Copy},
+    {QKeySequence::Paste, QWebPage::Paste},
+    {QKeySequence::Undo, QWebPage::Undo},
+    {QKeySequence::Redo, QWebPage::Redo},
+    {QKeySequence::MoveToNextChar, QWebPage::MoveToNextChar},
+    {QKeySequence::MoveToPreviousChar, QWebPage::MoveToPreviousChar},
+    {QKeySequence::MoveToNextWord, QWebPage::MoveToNextWord},
+    {QKeySequence::MoveToPreviousWord, QWebPage::MoveToPreviousWord},
+    {QKeySequence::MoveToNextLine, QWebPage::MoveToNextLine},
+    {QKeySequence::MoveToPreviousLine, QWebPage::MoveToPreviousLine},
+    {QKeySequence::MoveToStartOfLine, QWebPage::MoveToStartOfLine},
+    {QKeySequence::MoveToEndOfLine, QWebPage::MoveToEndOfLine},
+    {QKeySequence::MoveToStartOfBlock, QWebPage::MoveToStartOfBlock},
+    {QKeySequence::MoveToEndOfBlock, QWebPage::MoveToEndOfBlock},
+    {QKeySequence::MoveToStartOfDocument, QWebPage::MoveToStartOfDocument},
+    {QKeySequence::MoveToEndOfDocument, QWebPage::MoveToEndOfDocument},
+    {QKeySequence::SelectNextChar, QWebPage::SelectNextChar},
+    {QKeySequence::SelectPreviousChar, QWebPage::SelectPreviousChar},
+    {QKeySequence::SelectNextWord, QWebPage::SelectNextWord},
+    {QKeySequence::SelectPreviousWord, QWebPage::SelectPreviousWord},
+    {QKeySequence::SelectNextLine, QWebPage::SelectNextLine},
+    {QKeySequence::SelectPreviousLine, QWebPage::SelectPreviousLine},
+    {QKeySequence::SelectStartOfLine, QWebPage::SelectStartOfLine},
+    {QKeySequence::SelectEndOfLine, QWebPage::SelectEndOfLine},
+    {QKeySequence::SelectStartOfBlock, QWebPage::SelectStartOfBlock},
+    {QKeySequence::SelectEndOfBlock, QWebPage::SelectEndOfBlock},
+    {QKeySequence::SelectStartOfDocument, QWebPage::SelectStartOfDocument},
+    {QKeySequence::SelectEndOfDocument, QWebPage::SelectEndOfDocument},
+    {QKeySequence::DeleteStartOfWord, QWebPage::DeleteStartOfWord},
+    {QKeySequence::DeleteEndOfWord, QWebPage::DeleteEndOfWord},
+#if QT_VERSION >= 0x040500
+    {QKeySequence::InsertParagraphSeparator,
+     QWebPage::InsertParagraphSeparator},
+    {QKeySequence::InsertLineSeparator, QWebPage::InsertLineSeparator},
+#endif
+    {QKeySequence::UnknownKey, QWebPage::NoWebAction}
+  };
 
   for (int i = 0; editorActions[i].standardKey != QKeySequence::UnknownKey; ++i)
     if (event == editorActions[i].standardKey)
@@ -1063,6 +1072,8 @@ QVariant QWebPage::inputMethodQuery(Qt::InputMethodQuery property) const {
     \value ToggleUnderline Toggle underlining.
     \value InspectElement Show the Web Inspector with the currently highlighted
    HTML element.
+    \value InsertParagraphSeparator Insert a new paragraph.
+    \value InsertLineSeparator Insert a new line.
     \omitvalue WebActionCount
 
 */

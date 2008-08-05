@@ -143,6 +143,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
     InspectElement,
 
+    InsertParagraphSeparator,
+    InsertLineSeparator,
+
     WebActionCount
   };
 
