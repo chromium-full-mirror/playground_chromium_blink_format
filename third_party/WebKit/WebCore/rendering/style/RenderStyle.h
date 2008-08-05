@@ -3349,8 +3349,6 @@ class RenderStyle {
 #endif
 };
 
-#pragma mark -
-
 class KeyframeValue {
  public:
   KeyframeValue() : key(-1) {}
