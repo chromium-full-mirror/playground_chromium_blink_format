@@ -29,6 +29,7 @@
 #include "CSSPrimitiveValueMappings.h"
 #include "CSSPropertyNames.h"
 #include "CSSReflectValue.h"
+#include "CSSTimingFunctionValue.h"
 #include "CSSValueList.h"
 #include "CachedImage.h"
 #include "Document.h"
@@ -108,7 +109,9 @@ static const int computedProperties[] = {
     CSSPropertyWebkitTextFillColor, CSSPropertyWebkitTextSecurity,
     CSSPropertyWebkitTextStrokeColor, CSSPropertyWebkitTextStrokeWidth,
     CSSPropertyWebkitTransform, CSSPropertyWebkitTransformOriginX,
-    CSSPropertyWebkitTransformOriginY, CSSPropertyWebkitUserDrag,
+    CSSPropertyWebkitTransformOriginY, CSSPropertyWebkitTransitionDelay,
+    CSSPropertyWebkitTransitionDuration, CSSPropertyWebkitTransitionProperty,
+    CSSPropertyWebkitTransitionTimingFunction, CSSPropertyWebkitUserDrag,
     CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
@@ -1045,6 +1048,67 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
             CSSPrimitiveValue::CSS_PX);
       } else
         return CSSPrimitiveValue::create(style->transformOriginY());
+    case CSSPropertyWebkitTransitionDelay: {
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      const AnimationList* t = style->transitions();
+      if (t) {
+        for (size_t i = 0; i < t->size(); ++i)
+          list->append(CSSPrimitiveValue::create((*t)[i]->delay(),
+                                                 CSSPrimitiveValue::CSS_S));
+      } else
+        list->append(CSSPrimitiveValue::create(RenderStyle::initialDelay(),
+                                               CSSPrimitiveValue::CSS_S));
+      return list.release();
+    }
+    case CSSPropertyWebkitTransitionDuration: {
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      const AnimationList* t = style->transitions();
+      if (t) {
+        for (size_t i = 0; i < t->size(); ++i)
+          list->append(CSSPrimitiveValue::create((*t)[i]->duration(),
+                                                 CSSPrimitiveValue::CSS_S));
+      } else
+        list->append(CSSPrimitiveValue::create(RenderStyle::initialDuration(),
+                                               CSSPrimitiveValue::CSS_S));
+      return list.release();
+    }
+    case CSSPropertyWebkitTransitionTimingFunction: {
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      const AnimationList* t = style->transitions();
+      if (t) {
+        for (size_t i = 0; i < t->size(); ++i) {
+          const TimingFunction& tf = (*t)[i]->timingFunction();
+          list->append(CSSTimingFunctionValue::create(tf.x1(), tf.y1(), tf.x2(),
+                                                      tf.y2()));
+        }
+      } else {
+        const TimingFunction& tf = RenderStyle::initialTimingFunction();
+        list->append(
+            CSSTimingFunctionValue::create(tf.x1(), tf.y1(), tf.x2(), tf.y2()));
+      }
+      return list.release();
+    }
+    case CSSPropertyWebkitTransitionProperty: {
+      RefPtr<CSSValueList> list = CSSValueList::createCommaSeparated();
+      const AnimationList* t = style->transitions();
+      if (t) {
+        for (size_t i = 0; i < t->size(); ++i) {
+          int prop = (*t)[i]->property();
+          const char* name;
+          if (prop == cAnimateNone)
+            name = "none";
+          else if (prop == cAnimateAll)
+            name = "all";
+          else
+            name = getPropertyName(static_cast<CSSPropertyID>(prop));
+          list->append(
+              CSSPrimitiveValue::create(name, CSSPrimitiveValue::CSS_STRING));
+        }
+      } else
+        list->append(
+            CSSPrimitiveValue::create("all", CSSPrimitiveValue::CSS_STRING));
+      return list.release();
+    }
     case CSSPropertyBackground:
     case CSSPropertyBorder:
     case CSSPropertyBorderBottom:
@@ -1102,11 +1166,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyWebkitMask:
     case CSSPropertyWebkitPaddingStart:
     case CSSPropertyWebkitTextStroke:
-    case CSSPropertyWebkitTransition:
-    case CSSPropertyWebkitTransitionDuration:
-    case CSSPropertyWebkitTransitionProperty:
-    case CSSPropertyWebkitTransitionRepeatCount:
-    case CSSPropertyWebkitTransitionTimingFunction:
       // FIXME: The above are unimplemented.
       break;
 #if ENABLE(SVG)

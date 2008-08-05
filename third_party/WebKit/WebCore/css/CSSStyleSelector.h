@@ -255,10 +255,10 @@ class CSSStyleSelector : Noncopyable {
   void mapFillXPosition(FillLayer*, CSSValue*);
   void mapFillYPosition(FillLayer*, CSSValue*);
 
-  void mapTransitionDuration(Transition*, CSSValue*);
-  void mapTransitionRepeatCount(Transition*, CSSValue*);
-  void mapTransitionTimingFunction(Transition*, CSSValue*);
-  void mapTransitionProperty(Transition*, CSSValue*);
+  void mapDelay(Animation*, CSSValue*);
+  void mapDuration(Animation*, CSSValue*);
+  void mapTimingFunction(Animation*, CSSValue*);
+  void mapProperty(Animation*, CSSValue*);
 
   void mapNinePieceImage(CSSValue*, NinePieceImage&);
 
