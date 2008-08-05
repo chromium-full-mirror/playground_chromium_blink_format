@@ -1953,18 +1953,10 @@ bool AnimationController::isAnimatingPropertyOnRenderer(RenderObject* obj,
 }
 
 void AnimationController::suspendAnimations(Document* document) {
-#ifdef DEBUG_STATE_MACHINE
-  fprintf(stderr, "AnimationController %p suspendAnimations for document %p\n",
-          this, document);
-#endif
   m_data->suspendAnimations(document);
 }
 
 void AnimationController::resumeAnimations(Document* document) {
-#ifdef DEBUG_STATE_MACHINE
-  fprintf(stderr, "AnimationController %p resumeAnimations for document %p\n",
-          this, document);
-#endif
   m_data->resumeAnimations(document);
 }
 

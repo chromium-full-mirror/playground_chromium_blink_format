@@ -204,7 +204,7 @@ using namespace HTMLNames;
   }                                                                            \
   if (isInitial) {                                                             \
     AnimationList* list = m_style->accessTransitions();                        \
-    (*list)[0]->set##Prop(RenderStyle::initial##Prop());                       \
+    (*list)[0]->set##Prop(RenderStyle::initialAnimation##Prop());              \
     for (size_t i = 1; i < list->size(); ++i)                                  \
       (*list)[0]->clear##Prop();                                               \
   }
@@ -5427,7 +5427,7 @@ void CSSStyleSelector::mapFillYPosition(FillLayer* layer, CSSValue* value) {
 
 void CSSStyleSelector::mapDuration(Animation* transition, CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    transition->setDuration(RenderStyle::initialDuration());
+    transition->setDuration(RenderStyle::initialAnimationDuration());
     return;
   }
 
@@ -5443,7 +5443,7 @@ void CSSStyleSelector::mapDuration(Animation* transition, CSSValue* value) {
 
 void CSSStyleSelector::mapDelay(Animation* transition, CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    transition->setDelay(RenderStyle::initialDelay());
+    transition->setDelay(RenderStyle::initialAnimationDelay());
     return;
   }
 
@@ -5461,7 +5461,8 @@ void CSSStyleSelector::mapDelay(Animation* transition, CSSValue* value) {
 void CSSStyleSelector::mapTimingFunction(Animation* transition,
                                          CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    transition->setTimingFunction(RenderStyle::initialTimingFunction());
+    transition->setTimingFunction(
+        RenderStyle::initialAnimationTimingFunction());
     return;
   }
 
@@ -5501,7 +5502,7 @@ void CSSStyleSelector::mapTimingFunction(Animation* transition,
 
 void CSSStyleSelector::mapProperty(Animation* transition, CSSValue* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
-    transition->setProperty(RenderStyle::initialProperty());
+    transition->setProperty(RenderStyle::initialAnimationProperty());
     return;
   }
 

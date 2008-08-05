@@ -1056,8 +1056,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           list->append(CSSPrimitiveValue::create((*t)[i]->delay(),
                                                  CSSPrimitiveValue::CSS_S));
       } else
-        list->append(CSSPrimitiveValue::create(RenderStyle::initialDelay(),
-                                               CSSPrimitiveValue::CSS_S));
+        list->append(CSSPrimitiveValue::create(
+            RenderStyle::initialAnimationDelay(), CSSPrimitiveValue::CSS_S));
       return list.release();
     }
     case CSSPropertyWebkitTransitionDuration: {
@@ -1068,8 +1068,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           list->append(CSSPrimitiveValue::create((*t)[i]->duration(),
                                                  CSSPrimitiveValue::CSS_S));
       } else
-        list->append(CSSPrimitiveValue::create(RenderStyle::initialDuration(),
-                                               CSSPrimitiveValue::CSS_S));
+        list->append(CSSPrimitiveValue::create(
+            RenderStyle::initialAnimationDuration(), CSSPrimitiveValue::CSS_S));
       return list.release();
     }
     case CSSPropertyWebkitTransitionTimingFunction: {
@@ -1082,7 +1082,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
                                                       tf.y2()));
         }
       } else {
-        const TimingFunction& tf = RenderStyle::initialTimingFunction();
+        const TimingFunction& tf =
+            RenderStyle::initialAnimationTimingFunction();
         list->append(
             CSSTimingFunctionValue::create(tf.x1(), tf.y1(), tf.x2(), tf.y2()));
       }
