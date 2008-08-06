@@ -204,15 +204,15 @@ void ThreadCondition::wait(Mutex& mutex) {
     ASSERT(false);
 }
 
-bool ThreadCondition::timedWait(Mutex& mutex, double interval) {
-  if (interval < 0.0) {
+bool ThreadCondition::timedWait(Mutex& mutex, double secondsToWait) {
+  if (secondsToWait < 0.0) {
     wait(mutex);
     return true;
   }
 
-  int intervalSeconds = static_cast<int>(interval);
+  int intervalSeconds = static_cast<int>(secondsToWait);
   int intervalMicroseconds =
-      static_cast<int>((interval - intervalSeconds) * 1000000.0);
+      static_cast<int>((secondsToWait - intervalSeconds) * 1000000.0);
 
   // Current time comes in sec/microsec
   timeval currentTime;

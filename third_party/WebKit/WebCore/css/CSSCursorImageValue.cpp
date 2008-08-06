@@ -85,11 +85,11 @@ bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element) {
 
   if (SVGCursorElement* cursorElement =
           resourceReferencedByCursorElement(url, element->document())) {
-    int x = roundf(cursorElement->x().value(0));
-    m_hotspot.setX(x);
+    float x = roundf(cursorElement->x().value(0));
+    m_hotspot.setX(static_cast<int>(x));
 
-    int y = roundf(cursorElement->y().value(0));
-    m_hotspot.setY(y);
+    float y = roundf(cursorElement->y().value(0));
+    m_hotspot.setY(static_cast<int>(y));
 
     if (cachedImageURL() !=
         element->document()->completeURL(cursorElement->href()))
