@@ -1868,10 +1868,12 @@ void FrameLoader::clearRecordedFormValues() {
   m_formValuesAboutToBeSubmitted.clear();
 }
 
-void FrameLoader::recordFormValue(const String& name,
-                                  const String& value,
-                                  PassRefPtr<HTMLFormElement> element) {
+void FrameLoader::setFormAboutToBeSubmitted(
+    PassRefPtr<HTMLFormElement> element) {
   m_formAboutToBeSubmitted = element;
+}
+
+void FrameLoader::recordFormValue(const String& name, const String& value) {
   m_formValuesAboutToBeSubmitted.set(name, value);
 }
 
@@ -2206,7 +2208,7 @@ void FrameLoader::loadFrameRequestWithFormAndValues(
     HTMLFormElement* submitForm,
     const HashMap<String, String>& formValues) {
   RefPtr<FormState> formState;
-  if (submitForm && !formValues.isEmpty())
+  if (submitForm)
     formState = FormState::create(submitForm, formValues, m_frame);
 
   loadFrameRequestWithFormState(request, lockHistory, event,
