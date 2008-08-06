@@ -42,9 +42,9 @@ class StorageArea;
 
 class LocalStorage : public ThreadSafeShared<LocalStorage> {
  public:
-  static PassRefPtr<LocalStorage> create(PageGroup* group, const String& path) {
-    return adoptRef(new LocalStorage(group, path));
-  }
+  ~LocalStorage();
+
+  static PassRefPtr<LocalStorage> localStorage(const String& path);
 
   PassRefPtr<StorageArea> storageArea(Frame* sourceFrame, SecurityOrigin*);
 
@@ -54,7 +54,7 @@ class LocalStorage : public ThreadSafeShared<LocalStorage> {
   void close();
 
  private:
-  LocalStorage(PageGroup*, const String& path);
+  LocalStorage(const String& path);
 
   typedef HashMap<RefPtr<SecurityOrigin>,
                   RefPtr<LocalStorageArea>,
@@ -62,7 +62,6 @@ class LocalStorage : public ThreadSafeShared<LocalStorage> {
       LocalStorageAreaMap;
   LocalStorageAreaMap m_storageAreaMap;
 
-  PageGroup* m_group;
   RefPtr<LocalStorageThread> m_thread;
 
   // The following members are subject to thread synchronization issues
