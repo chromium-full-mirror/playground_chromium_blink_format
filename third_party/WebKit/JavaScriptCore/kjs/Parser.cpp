@@ -90,13 +90,15 @@ void Parser::didFinishParsing(
     ParserRefCountedData<DeclarationStacks::FunctionStack>* funcStack,
     bool usesEval,
     bool needsClosure,
-    int lastLine) {
+    int lastLine,
+    int numConstants) {
   m_sourceElements = sourceElements;
   m_varDeclarations = varStack;
   m_funcDeclarations = funcStack;
   m_usesEval = usesEval;
   m_needsClosure = needsClosure;
   m_lastLine = lastLine;
+  m_numConstants = numConstants;
 }
 
 }  // namespace KJS

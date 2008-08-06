@@ -63,7 +63,8 @@ class Parser : Noncopyable {
                         ParserRefCountedData<DeclarationStacks::FunctionStack>*,
                         bool usesEval,
                         bool needsClosure,
-                        int lastLine);
+                        int lastLine,
+                        int numConstants);
 
  private:
   friend class JSGlobalData;
@@ -86,6 +87,7 @@ class Parser : Noncopyable {
   bool m_usesEval;
   bool m_needsClosure;
   int m_lastLine;
+  int m_numConstants;
 };
 
 template <class ParsedNode>
@@ -104,11 +106,11 @@ PassRefPtr<ParsedNode> Parser::parse(ExecState* exec,
     m_sourceURL = UString();
     return 0;
   }
-  RefPtr<ParsedNode> node =
-      ParsedNode::create(&exec->globalData(), m_sourceElements.release().get(),
-                         m_varDeclarations ? &m_varDeclarations->data : 0,
-                         m_funcDeclarations ? &m_funcDeclarations->data : 0,
-                         sourceProvider.get(), m_usesEval, m_needsClosure);
+  RefPtr<ParsedNode> node = ParsedNode::create(
+      &exec->globalData(), m_sourceElements.release().get(),
+      m_varDeclarations ? &m_varDeclarations->data : 0,
+      m_funcDeclarations ? &m_funcDeclarations->data : 0, sourceProvider.get(),
+      m_usesEval, m_needsClosure, m_numConstants);
   m_varDeclarations = 0;
   m_funcDeclarations = 0;
   m_sourceURL = UString();

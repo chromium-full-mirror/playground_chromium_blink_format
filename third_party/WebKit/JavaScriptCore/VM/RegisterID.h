@@ -38,7 +38,8 @@ namespace KJS {
 class RegisterID : Noncopyable {
  public:
   RegisterID()
-      : m_refCount(0)
+      : m_refCount(0),
+        m_isConstant(false)
 #ifndef NDEBUG
         ,
         m_didSetIndex(false)
@@ -48,7 +49,8 @@ class RegisterID : Noncopyable {
 
   explicit RegisterID(int index)
       : m_refCount(0),
-        m_index(index)
+        m_index(index),
+        m_isConstant(false)
 #ifndef NDEBUG
         ,
         m_didSetIndex(true)
@@ -64,12 +66,14 @@ class RegisterID : Noncopyable {
     m_index = index;
   }
 
+  void makeConstant() { m_isConstant = true; }
+
   int index() const {
     ASSERT(m_didSetIndex);
     return m_index;
   }
 
-  bool isTemporary() { return m_index >= 0; }
+  bool isTemporary() { return m_index >= 0 && !m_isConstant; }
 
   void ref() { ++m_refCount; }
 
@@ -83,6 +87,7 @@ class RegisterID : Noncopyable {
  private:
   int m_refCount;
   int m_index;
+  bool m_isConstant;
 #ifndef NDEBUG
   bool m_didSetIndex;
 #endif

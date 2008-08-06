@@ -107,6 +107,7 @@ struct CodeBlock {
 
   ScopeNode* ownerNode;
 
+  int numConstants;
   int numTemporaries;
   int numVars;
   int numParameters;
@@ -124,7 +125,8 @@ struct CodeBlock {
   Vector<Identifier> identifiers;
   Vector<RefPtr<FuncDeclNode>> functions;
   Vector<RefPtr<FuncExprNode>> functionExpressions;
-  Vector<Register> registers;
+  Vector<Register> constantRegisters;
+  Vector<JSValue*> unexpectedConstants;
   Vector<RefPtr<RegExp>> regexps;
   Vector<HandlerInfo> exceptionHandlers;
   Vector<ExpressionRangeInfo> expressionInfo;

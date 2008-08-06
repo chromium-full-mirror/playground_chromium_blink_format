@@ -37,6 +37,7 @@ template <typename T>
 struct NodeFeatureInfo {
   T m_node;
   FeatureInfo m_featureInfo;
+  int m_numConstants;
 };
 
 typedef NodeFeatureInfo<FuncExprNode*> FuncExprNodeInfo;
@@ -54,6 +55,7 @@ struct NodeDeclarationInfo {
   ParserRefCountedData<DeclarationStacks::VarStack>* m_varDeclarations;
   ParserRefCountedData<DeclarationStacks::FunctionStack>* m_funcDeclarations;
   FeatureInfo m_featureInfo;
+  int m_numConstants;
 };
 
 typedef NodeDeclarationInfo<StatementNode*> StatementNodeInfo;

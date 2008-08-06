@@ -219,6 +219,7 @@ CodeGenerator::CodeGenerator(ProgramNode* programNode,
       m_lastOpcodeID(op_end) {
   // FIXME: Move code that modifies the global object to Machine::execute.
 
+  m_codeBlock->numConstants = programNode->neededConstants();
   m_codeBlock->numVars = 1;  // Allocate space for "this"
 
   JSGlobalObject* globalObject = scopeChain.globalObject();
@@ -296,6 +297,8 @@ CodeGenerator::CodeGenerator(FunctionBodyNode* functionBody,
       m_nextVar(-1),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
+  m_codeBlock->numConstants = functionBody->neededConstants();
+
   const Node::FunctionStack& functionStack = functionBody->functionStack();
   for (size_t i = 0; i < functionStack.size(); ++i) {
     FuncDeclNode* funcDecl = functionStack[i].get();
@@ -345,6 +348,7 @@ CodeGenerator::CodeGenerator(EvalNode* evalNode,
       m_continueDepth(0),
       m_globalData(&scopeChain.globalObject()->globalExec()->globalData()),
       m_lastOpcodeID(op_end) {
+  m_codeBlock->numConstants = evalNode->neededConstants();
   m_codeBlock->numVars = 1;  // Allocate space for "this"
 }
 
@@ -414,7 +418,7 @@ RegisterID* CodeGenerator::newTemporary() {
     m_temporaries.removeLast();
 
   // Allocate new register ID.
-  m_temporaries.append(m_temporaries.size());
+  m_temporaries.append(m_temporaries.size() + m_codeBlock->numConstants);
   m_codeBlock->numTemporaries =
       max<int>(m_codeBlock->numTemporaries, m_temporaries.size());
   return &m_temporaries.last();
@@ -549,13 +553,25 @@ unsigned CodeGenerator::addConstant(const Identifier& ident) {
   return result.first->second;
 }
 
-unsigned CodeGenerator::addConstant(JSValue* v) {
+RegisterID* CodeGenerator::addConstant(JSValue* v) {
   pair<JSValueMap::iterator, bool> result =
-      m_jsValueMap.add(v, m_codeBlock->registers.size());
-  if (result.second)  // new entry
-    m_codeBlock->registers.append(v);
+      m_jsValueMap.add(v, m_codeBlock->constantRegisters.size());
+  if (result.second) {
+    m_constants.append(m_codeBlock->constantRegisters.size());
+    m_constants.last().makeConstant();
+    m_codeBlock->constantRegisters.append(v);
+    ASSERT(m_codeBlock->constantRegisters.size() <=
+           (unsigned)m_codeBlock->numConstants);
+    return &m_constants.last();
+  }
 
-  return result.first->second;
+  return &m_constants[result.first->second];
+}
+
+unsigned CodeGenerator::addUnexpectedConstant(JSValue* v) {
+  int index = m_codeBlock->regexps.size();
+  m_codeBlock->unexpectedConstants.append(v);
+  return index;
 }
 
 unsigned CodeGenerator::addRegExp(RegExp* r) {
@@ -618,23 +634,24 @@ RegisterID* CodeGenerator::emitBinaryOp(OpcodeID opcode,
 }
 
 RegisterID* CodeGenerator::emitLoad(RegisterID* dst, bool b) {
-  emitOpcode(op_load);
-  instructions().append(dst->index());
-  instructions().append(addConstant(jsBoolean(b)));
-  return dst;
+  return emitLoad(dst, jsBoolean(b));
 }
 
 RegisterID* CodeGenerator::emitLoad(RegisterID* dst, double d) {
-  emitOpcode(op_load);
-  instructions().append(dst->index());
-  instructions().append(addConstant(jsNumber(globalExec(), d)));
-  return dst;
+  return emitLoad(dst, jsNumber(globalExec(), d));
 }
 
 RegisterID* CodeGenerator::emitLoad(RegisterID* dst, JSValue* v) {
-  emitOpcode(op_load);
+  RegisterID* constantID = addConstant(v);
+  if (dst)
+    return emitMove(dst, constantID);
+  return constantID;
+}
+
+RegisterID* CodeGenerator::emitUnexpectedLoad(RegisterID* dst, bool b) {
+  emitOpcode(op_unexpected_load);
   instructions().append(dst->index());
-  instructions().append(addConstant(v));
+  instructions().append(addUnexpectedConstant(jsBoolean(b)));
   return dst;
 }
 
@@ -1202,7 +1219,7 @@ RegisterID* CodeGenerator::emitNewError(RegisterID* dst,
   emitOpcode(op_new_error);
   instructions().append(dst->index());
   instructions().append(static_cast<int>(type));
-  instructions().append(addConstant(message));
+  instructions().append(addUnexpectedConstant(message));
   return dst;
 }
 

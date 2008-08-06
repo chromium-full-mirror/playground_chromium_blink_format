@@ -2355,7 +2355,8 @@ class ScopeNode : public BlockNode {
             VarStack*,
             FunctionStack*,
             bool usesEval,
-            bool needsClosure) KJS_FAST_CALL;
+            bool needsClosure,
+            int numConstants) KJS_FAST_CALL;
 
   int sourceId() const KJS_FAST_CALL { return m_sourceId; }
   const UString& sourceURL() const KJS_FAST_CALL { return m_sourceURL; }
@@ -2367,6 +2368,14 @@ class ScopeNode : public BlockNode {
   VarStack& varStack() { return m_varStack; }
   FunctionStack& functionStack() { return m_functionStack; }
 
+  int neededConstants() {
+    // We may need 3 more constants than the count given by the parser,
+    // because of the various uses of jsUndefined() and the 1.0 / -1.0
+    // that are emitted for a preincrement or predecrement on a constant
+    // local variable.
+    return m_numConstants + 3;
+  }
+
  protected:
   VarStack m_varStack;
   FunctionStack m_functionStack;
@@ -2376,6 +2385,7 @@ class ScopeNode : public BlockNode {
   int m_sourceId;
   bool m_usesEval;
   bool m_needsClosure;
+  int m_numConstants;
 };
 
 class ProgramNode : public ScopeNode {
@@ -2386,7 +2396,8 @@ class ProgramNode : public ScopeNode {
                              FunctionStack*,
                              SourceProvider*,
                              bool usesEval,
-                             bool needsClosure) KJS_FAST_CALL;
+                             bool needsClosure,
+                             int numConstants) KJS_FAST_CALL;
 
   ProgramCodeBlock& byteCode(ScopeChainNode* scopeChain) KJS_FAST_CALL {
     if (!m_code)
@@ -2401,7 +2412,8 @@ class ProgramNode : public ScopeNode {
               FunctionStack*,
               SourceProvider*,
               bool usesEval,
-              bool needsClosure) KJS_FAST_CALL;
+              bool needsClosure,
+              int numConstants) KJS_FAST_CALL;
 
   void generateCode(ScopeChainNode*) KJS_FAST_CALL;
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
@@ -2426,7 +2438,8 @@ class EvalNode : public ScopeNode {
                           FunctionStack*,
                           SourceProvider*,
                           bool usesEval,
-                          bool needsClosure) KJS_FAST_CALL;
+                          bool needsClosure,
+                          int numConstants) KJS_FAST_CALL;
 
   EvalCodeBlock& byteCode(ScopeChainNode* scopeChain) KJS_FAST_CALL {
     if (!m_code)
@@ -2441,7 +2454,8 @@ class EvalNode : public ScopeNode {
            FunctionStack*,
            SourceProvider*,
            bool usesEval,
-           bool needsClosure) KJS_FAST_CALL;
+           bool needsClosure,
+           int numConstants) KJS_FAST_CALL;
 
   void generateCode(ScopeChainNode*) KJS_FAST_CALL;
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
@@ -2459,13 +2473,15 @@ class FunctionBodyNode : public ScopeNode {
                                   FunctionStack*,
                                   SourceProvider*,
                                   bool usesEval,
-                                  bool needsClosure) KJS_FAST_CALL;
+                                  bool needsClosure,
+                                  int numConstants) KJS_FAST_CALL;
   static FunctionBodyNode* create(JSGlobalData*,
                                   SourceElements*,
                                   VarStack*,
                                   FunctionStack*,
                                   bool usesEval,
-                                  bool needsClosure) KJS_FAST_CALL;
+                                  bool needsClosure,
+                                  int numConstants) KJS_FAST_CALL;
 
   Vector<Identifier>& parameters() KJS_FAST_CALL { return m_parameters; }
   UString paramString() const KJS_FAST_CALL;
@@ -2499,7 +2515,8 @@ class FunctionBodyNode : public ScopeNode {
                    VarStack*,
                    FunctionStack*,
                    bool usesEval,
-                   bool needsClosure) KJS_FAST_CALL;
+                   bool needsClosure,
+                   int numConstants) KJS_FAST_CALL;
 
  private:
   void generateCode(ScopeChainNode*) KJS_FAST_CALL;

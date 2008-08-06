@@ -417,8 +417,8 @@ ALWAYS_INLINE Register* slideRegisterWindowForCall(ExecState* exec,
                                                    int argc,
                                                    JSValue*& exceptionValue) {
   size_t registerOffset = argv + newCodeBlock->numLocals;
-  size_t size =
-      r - registerBase + registerOffset + newCodeBlock->numTemporaries;
+  size_t size = r - registerBase + registerOffset + newCodeBlock->numConstants +
+                newCodeBlock->numTemporaries;
 
   if (argc == newCodeBlock->numParameters) {  // correct number of arguments
     if (!registerFile->grow(size)) {
@@ -462,6 +462,9 @@ ALWAYS_INLINE Register* slideRegisterWindowForCall(ExecState* exec,
   // initialize local variable slots
   for (Register* it = r - newCodeBlock->numVars; it != r; ++it)
     (*it) = jsUndefined();
+
+  for (size_t i = 0; i < newCodeBlock->constantRegisters.size(); ++i)
+    r[i] = newCodeBlock->constantRegisters[i];
 
   return r;
 }
@@ -666,7 +669,6 @@ NEVER_INLINE bool Machine::unwindCallFrame(ExecState* exec,
                                            JSValue* exceptionValue,
                                            const Instruction*& vPC,
                                            CodeBlock*& codeBlock,
-                                           Register*& k,
                                            ScopeChainNode*& scopeChain,
                                            Register*& r) {
   CodeBlock* oldCodeBlock = codeBlock;
@@ -709,7 +711,6 @@ NEVER_INLINE bool Machine::unwindCallFrame(ExecState* exec,
   if (!codeBlock)
     return false;
 
-  k = codeBlock->registers.data();
   scopeChain = callFrame[RegisterFile::CallerScopeChain].scopeChain();
   r = callFrame[RegisterFile::CallerRegisters].r();
   exec->m_callFrame =
@@ -723,7 +724,6 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
                                                   JSValue*& exceptionValue,
                                                   const Instruction* vPC,
                                                   CodeBlock*& codeBlock,
-                                                  Register*& k,
                                                   ScopeChainNode*& scopeChain,
                                                   Register*& r,
                                                   bool explicitThrow) {
@@ -781,8 +781,8 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
       }
 
       if (exception->isWatchdogException()) {
-        while (unwindCallFrame(exec, exceptionValue, vPC, codeBlock, k,
-                               scopeChain, r)) {
+        while (unwindCallFrame(exec, exceptionValue, vPC, codeBlock, scopeChain,
+                               r)) {
           // Don't need handler checks or anything, we just want to unroll all
           // the JS callframes possible.
         }
@@ -804,8 +804,7 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
   Instruction* handlerVPC;
 
   while (!codeBlock->getHandlerForVPC(vPC, handlerVPC, scopeDepth)) {
-    if (!unwindCallFrame(exec, exceptionValue, vPC, codeBlock, k, scopeChain,
-                         r))
+    if (!unwindCallFrame(exec, exceptionValue, vPC, codeBlock, scopeChain, r))
       return 0;
   }
 
@@ -835,7 +834,8 @@ JSValue* Machine::execute(ProgramNode* programNode,
 
   size_t oldSize = m_registerFile.size();
   size_t newSize = oldSize + RegisterFile::CallFrameHeaderSize +
-                   codeBlock->numVars + codeBlock->numTemporaries;
+                   codeBlock->numVars + codeBlock->numConstants +
+                   codeBlock->numTemporaries;
   if (!m_registerFile.grow(newSize)) {
     *exception = createStackOverflowError(exec);
     return 0;
@@ -853,6 +853,9 @@ JSValue* Machine::execute(ProgramNode* programNode,
   Register* r =
       callFrame + RegisterFile::CallFrameHeaderSize + codeBlock->numVars;
   r[codeBlock->thisRegister] = thisObj;
+
+  for (size_t i = 0; i < codeBlock->constantRegisters.size(); ++i)
+    r[i] = codeBlock->constantRegisters[i];
 
   if (codeBlock->needsFullScopeChain)
     scopeChain = scopeChain->copy();
@@ -994,7 +997,7 @@ JSValue* Machine::execute(EvalNode* evalNode,
 
   size_t oldSize = m_registerFile.size();
   size_t newSize = registerOffset + codeBlock->numVars +
-                   codeBlock->numTemporaries +
+                   codeBlock->numConstants + codeBlock->numTemporaries +
                    RegisterFile::CallFrameHeaderSize;
   if (!m_registerFile.grow(newSize)) {
     *exception = createStackOverflowError(exec);
@@ -1009,6 +1012,9 @@ JSValue* Machine::execute(EvalNode* evalNode,
   Register* r =
       callFrame + RegisterFile::CallFrameHeaderSize + codeBlock->numVars;
   r[codeBlock->thisRegister] = thisObj;
+
+  for (size_t i = 0; i < codeBlock->constantRegisters.size(); ++i)
+    r[i] = codeBlock->constantRegisters[i];
 
   if (codeBlock->needsFullScopeChain)
     scopeChain = scopeChain->copy();
@@ -1215,7 +1221,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
   Register* registerBase = registerFile->base();
   Instruction* vPC = codeBlock->instructions.begin();
-  Register* k = codeBlock->registers.data();
   Profiler** enabledProfilerReference = Profiler::enabledProfilerReference();
   unsigned tickCount = m_ticksUntilNextTimeoutCheck + 1;
 
@@ -1265,18 +1270,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
     switch (vPC->u.opcode)
 #endif
   {
-    BEGIN_OPCODE(op_load) {
-      /* load dst(r) src(k)
-
-         Copies constant src to register dst.
-      */
-      int dst = (++vPC)->u.operand;
-      int src = (++vPC)->u.operand;
-      r[dst] = k[src];
-
-      ++vPC;
-      NEXT_OPCODE;
-    }
     BEGIN_OPCODE(op_new_object) {
       /* new_object dst(r)
 
@@ -2616,7 +2609,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         setScopeChain(exec, scopeChain,
                       scopeChainForCall(exec, functionBodyNode, codeBlock,
                                         callDataScopeChain, r));
-        k = codeBlock->registers.data();
         vPC = codeBlock->instructions.begin();
 
 #if DUMP_OPCODE_STATS
@@ -2701,7 +2693,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       if (!codeBlock)
         return returnValue;
 
-      k = codeBlock->registers.data();
       vPC = callFrame[RegisterFile::ReturnVPC].vPC();
       setScopeChain(exec, scopeChain,
                     callFrame[RegisterFile::CallerScopeChain].scopeChain());
@@ -2772,7 +2763,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         setScopeChain(exec, scopeChain,
                       scopeChainForCall(exec, functionBodyNode, codeBlock,
                                         callDataScopeChain, r));
-        k = codeBlock->registers.data();
         vPC = codeBlock->instructions.begin();
 
         NEXT_OPCODE;
@@ -2940,7 +2930,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       int ex = (++vPC)->u.operand;
       exceptionValue = r[ex].jsValue(exec);
 
-      handlerVPC = throwException(exec, exceptionValue, vPC, codeBlock, k,
+      handlerVPC = throwException(exec, exceptionValue, vPC, codeBlock,
                                   scopeChain, r, true);
       if (!handlerVPC) {
         *exception = exceptionValue;
@@ -2959,6 +2949,18 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
     vPC = handlerVPC;
     NEXT_OPCODE;
   }
+    BEGIN_OPCODE(op_unexpected_load) {
+      /* unexpected_load load dst(r) src(k)
+
+         Copies constant src to register dst.
+      */
+      int dst = (++vPC)->u.operand;
+      int src = (++vPC)->u.operand;
+      r[dst] = codeBlock->unexpectedConstants[src];
+
+      ++vPC;
+      NEXT_OPCODE;
+    }
     BEGIN_OPCODE(op_new_error) {
       /* new_error dst(r) type(n) message(k)
 
@@ -2972,7 +2974,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       int message = (++vPC)->u.operand;
 
       r[dst] = Error::create(
-          exec, (ErrorType)type, k[message].jsValue(exec)->toString(exec),
+          exec, (ErrorType)type,
+          codeBlock->unexpectedConstants[message]->toString(exec),
           codeBlock->lineNumberForVPC(vPC), codeBlock->ownerNode->sourceId(),
           codeBlock->ownerNode->sourceURL());
 
@@ -3087,7 +3090,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       // branching)
       exceptionValue = createInterruptedExecutionException(exec);
     }
-    handlerVPC = throwException(exec, exceptionValue, vPC, codeBlock, k,
+    handlerVPC = throwException(exec, exceptionValue, vPC, codeBlock,
                                 scopeChain, r, false);
     if (!handlerVPC) {
       *exception = exceptionValue;
