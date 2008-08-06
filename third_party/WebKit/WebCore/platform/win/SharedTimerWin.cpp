@@ -152,6 +152,7 @@ void setSharedTimerFiredFunction(void (*f)()) {
 }
 
 static void NTAPI queueTimerProc(PVOID, BOOLEAN) {
+  DeleteTimerQueueTimer(timerQueue, timer, 0);
   timer = 0;
   PostMessage(timerWindowHandle, timerFiredMessage, 0, 0);
 }
@@ -207,9 +208,9 @@ void setSharedTimerFireTime(double fireTime) {
       if (timer)
         timerSet = ChangeTimerQueueTimer(timerQueue, timer, intervalInMS, 0);
       else
-        timerSet =
-            CreateTimerQueueTimer(&timer, timerQueue, queueTimerProc, 0,
-                                  intervalInMS, 0, WT_EXECUTEINTIMERTHREAD);
+        timerSet = CreateTimerQueueTimer(
+            &timer, timerQueue, queueTimerProc, 0, intervalInMS, 0,
+            WT_EXECUTEINTIMERTHREAD | WT_EXECUTEONLYONCE);
     }
   }
 
