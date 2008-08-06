@@ -845,6 +845,9 @@ void DOMWindow::resizeBy(float x, float y) const {
   if (!m_frame)
     return;
 
+  if (m_frame->isDisconnected())
+    return;
+
   Page* page = m_frame->page();
   if (!page)
     return;
@@ -858,6 +861,9 @@ void DOMWindow::resizeBy(float x, float y) const {
 
 void DOMWindow::resizeTo(float width, float height) const {
   if (!m_frame)
+    return;
+
+  if (m_frame->isDisconnected())
     return;
 
   Page* page = m_frame->page();
