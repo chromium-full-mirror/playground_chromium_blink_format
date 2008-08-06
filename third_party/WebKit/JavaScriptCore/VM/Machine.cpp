@@ -1208,7 +1208,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
 
 #define ADD_OPCODE_ID(id) m_opcodeIDTable.add(&&id, id);
     FOR_EACH_OPCODE_ID(ADD_OPCODE_ID);
-#undef ADD_OPCODE
+#undef ADD_OPCODE_ID
     ASSERT(m_opcodeIDTable.size() == numOpcodeIDs);
     op_throw_end_indirect = &&op_throw_end;
     op_call_indirect = &&op_call;
@@ -1817,9 +1817,9 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       NEXT_OPCODE;
     }
     BEGIN_OPCODE(op_not) {
-      /* not dst(r) src1(r) src2(r)
+      /* not dst(r) src(r)
 
-         Computes logical NOT of register src1 (converted to
+         Computes logical NOT of register src (converted to
          boolean), and puts the result in register dst.
       */
       int dst = (++vPC)->u.operand;
