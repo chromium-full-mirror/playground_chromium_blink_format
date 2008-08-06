@@ -846,14 +846,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
 {
 }
 
-StyleRareNonInheritedData::~StyleRareNonInheritedData() {
-  delete m_content;
-  delete m_counterDirectives;
-  delete m_boxShadow;
-#if ENABLE(XBL)
-  delete bindingURI;
-#endif
-}
+StyleRareNonInheritedData::~StyleRareNonInheritedData() {}
 
 #if ENABLE(XBL)
 bool StyleRareNonInheritedData::bindingsEquivalent(
@@ -1468,9 +1461,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 
   // If the counter directives change, trigger a relayout to re-calculate
   // counter values and rebuild the counter node tree.
-  const CounterDirectiveMap* mapA = rareNonInheritedData->m_counterDirectives;
+  const CounterDirectiveMap* mapA =
+      rareNonInheritedData->m_counterDirectives.get();
   const CounterDirectiveMap* mapB =
-      other->rareNonInheritedData->m_counterDirectives;
+      other->rareNonInheritedData->m_counterDirectives.get();
   if (!(mapA == mapB || (mapA && mapB && *mapA == *mapB)))
     return Layout;
   if (visual->counterIncrement != other->visual->counterIncrement ||
@@ -1573,8 +1567,8 @@ void RenderStyle::clearCursorList() {
 }
 
 bool RenderStyle::contentDataEquivalent(const RenderStyle* otherStyle) const {
-  ContentData* c1 = rareNonInheritedData->m_content;
-  ContentData* c2 = otherStyle->rareNonInheritedData->m_content;
+  ContentData* c1 = rareNonInheritedData->m_content.get();
+  ContentData* c2 = otherStyle->rareNonInheritedData->m_content.get();
 
   while (c1 && c2) {
     if (c1->m_type != c2->m_type)
@@ -1613,23 +1607,23 @@ void RenderStyle::setContent(StyleImage* image, bool add) {
   if (!image)
     return;  // The object is null. Nothing to do. Just bail.
 
-  ContentData*& content = rareNonInheritedData.access()->m_content;
-  ContentData* lastContent = content;
+  OwnPtr<ContentData>& content = rareNonInheritedData.access()->m_content;
+  ContentData* lastContent = content.get();
   while (lastContent && lastContent->m_next)
     lastContent = lastContent->m_next;
 
   bool reuseContent = !add;
-  ContentData* newContentData = 0;
+  ContentData* newContentData;
   if (reuseContent && content) {
     content->clear();
-    newContentData = content;
+    newContentData = content.release();
   } else
     newContentData = new ContentData;
 
   if (lastContent && !reuseContent)
     lastContent->m_next = newContentData;
   else
-    content = newContentData;
+    content.set(newContentData);
 
   newContentData->m_content.m_image = image;
   newContentData->m_type = CONTENT_OBJECT;
@@ -1640,8 +1634,8 @@ void RenderStyle::setContent(StringImpl* s, bool add) {
   if (!s)
     return;  // The string is null. Nothing to do. Just bail.
 
-  ContentData*& content = rareNonInheritedData.access()->m_content;
-  ContentData* lastContent = content;
+  OwnPtr<ContentData>& content = rareNonInheritedData.access()->m_content;
+  ContentData* lastContent = content.get();
   while (lastContent && lastContent->m_next)
     lastContent = lastContent->m_next;
 
@@ -1662,14 +1656,14 @@ void RenderStyle::setContent(StringImpl* s, bool add) {
   ContentData* newContentData = 0;
   if (reuseContent && content) {
     content->clear();
-    newContentData = content;
+    newContentData = content.release();
   } else
     newContentData = new ContentData;
 
   if (lastContent && !reuseContent)
     lastContent->m_next = newContentData;
   else
-    content = newContentData;
+    content.set(newContentData);
 
   newContentData->m_content.m_text = s;
   newContentData->m_content.m_text->ref();
@@ -1680,8 +1674,8 @@ void RenderStyle::setContent(CounterContent* c, bool add) {
   if (!c)
     return;
 
-  ContentData*& content = rareNonInheritedData.access()->m_content;
-  ContentData* lastContent = content;
+  OwnPtr<ContentData>& content = rareNonInheritedData.access()->m_content;
+  ContentData* lastContent = content.get();
   while (lastContent && lastContent->m_next)
     lastContent = lastContent->m_next;
 
@@ -1689,14 +1683,14 @@ void RenderStyle::setContent(CounterContent* c, bool add) {
   ContentData* newContentData = 0;
   if (reuseContent && content) {
     content->clear();
-    newContentData = content;
+    newContentData = content.release();
   } else
     newContentData = new ContentData;
 
   if (lastContent && !reuseContent)
     lastContent->m_next = newContentData;
   else
-    content = newContentData;
+    content.set(newContentData);
 
   newContentData->m_content.m_counter = c;
   newContentData->m_type = CONTENT_COUNTER;
@@ -1828,16 +1822,15 @@ void RenderStyle::setTextShadow(ShadowData* val, bool add) {
   rareData->textShadow = val;
 }
 
-void RenderStyle::setBoxShadow(ShadowData* val, bool add) {
+void RenderStyle::setBoxShadow(ShadowData* shadowData, bool add) {
   StyleRareNonInheritedData* rareData = rareNonInheritedData.access();
   if (!add) {
-    delete rareData->m_boxShadow;
-    rareData->m_boxShadow = val;
+    rareData->m_boxShadow.set(shadowData);
     return;
   }
 
-  val->next = rareData->m_boxShadow;
-  rareData->m_boxShadow = val;
+  shadowData->next = rareData->m_boxShadow.release();
+  rareData->m_boxShadow.set(shadowData);
 }
 
 ShadowData::ShadowData(const ShadowData& o)
@@ -1864,15 +1857,15 @@ bool operator==(const CounterDirectives& a, const CounterDirectives& b) {
 }
 
 const CounterDirectiveMap* RenderStyle::counterDirectives() const {
-  return rareNonInheritedData->m_counterDirectives;
+  return rareNonInheritedData->m_counterDirectives.get();
 }
 
 CounterDirectiveMap& RenderStyle::accessCounterDirectives() {
-  CounterDirectiveMap*& map =
+  OwnPtr<CounterDirectiveMap>& map =
       rareNonInheritedData.access()->m_counterDirectives;
   if (!map)
-    map = new CounterDirectiveMap;
-  return *map;
+    map.set(new CounterDirectiveMap);
+  return *map.get();
 }
 
 #if ENABLE(DASHBOARD_SUPPORT)
@@ -1901,14 +1894,9 @@ const Vector<StyleDashboardRegion>& RenderStyle::noneDashboardRegions() {
 #endif
 
 void RenderStyle::adjustAnimations() {
-  AnimationList* animationList = rareNonInheritedData->m_animations;
+  AnimationList* animationList = rareNonInheritedData->m_animations.get();
   if (!animationList)
     return;
-
-  if (animationList->size() == 0) {
-    clearAnimations();
-    return;
-  }
 
   // get rid of empty transitions and anything beyond them
   for (size_t i = 0; i < animationList->size(); ++i) {
@@ -1918,7 +1906,7 @@ void RenderStyle::adjustAnimations() {
     }
   }
 
-  if (animationList->size() == 0) {
+  if (animationList->isEmpty()) {
     clearAnimations();
     return;
   }
@@ -1928,14 +1916,9 @@ void RenderStyle::adjustAnimations() {
 }
 
 void RenderStyle::adjustTransitions() {
-  AnimationList* transitionList = rareNonInheritedData->m_transitions;
+  AnimationList* transitionList = rareNonInheritedData->m_transitions.get();
   if (!transitionList)
     return;
-
-  if (transitionList->size() == 0) {
-    clearTransitions();
-    return;
-  }
 
   // get rid of empty transitions and anything beyond them
   for (size_t i = 0; i < transitionList->size(); ++i) {
@@ -1945,7 +1928,7 @@ void RenderStyle::adjustTransitions() {
     }
   }
 
-  if (transitionList->size() == 0) {
+  if (transitionList->isEmpty()) {
     clearTransitions();
     return;
   }
@@ -1968,17 +1951,15 @@ void RenderStyle::adjustTransitions() {
 }
 
 AnimationList* RenderStyle::accessAnimations() {
-  AnimationList* list = rareNonInheritedData.access()->m_animations;
-  if (!list)
-    rareNonInheritedData.access()->m_animations = new AnimationList();
-  return rareNonInheritedData->m_animations;
+  if (!rareNonInheritedData.access()->m_animations)
+    rareNonInheritedData.access()->m_animations.set(new AnimationList());
+  return rareNonInheritedData->m_animations.get();
 }
 
 AnimationList* RenderStyle::accessTransitions() {
-  AnimationList* list = rareNonInheritedData.access()->m_transitions;
-  if (!list)
-    rareNonInheritedData.access()->m_transitions = new AnimationList();
-  return rareNonInheritedData->m_transitions;
+  if (!rareNonInheritedData.access()->m_transitions)
+    rareNonInheritedData.access()->m_transitions.set(new AnimationList());
+  return rareNonInheritedData->m_transitions.get();
 }
 
 const Animation* RenderStyle::transitionForProperty(int property) {
