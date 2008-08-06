@@ -23,11 +23,11 @@
 #ifndef HTMLEmbedElement_h
 #define HTMLEmbedElement_h
 
-#include "HTMLPlugInElement.h"
+#include "HTMLPlugInImageElement.h"
 
 namespace WebCore {
 
-class HTMLEmbedElement : public HTMLPlugInElement {
+class HTMLEmbedElement : public HTMLPlugInImageElement {
  public:
   HTMLEmbedElement(Document*);
   ~HTMLEmbedElement();
@@ -48,6 +48,7 @@ class HTMLEmbedElement : public HTMLPlugInElement {
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
   virtual bool isURLAttribute(Attribute*) const;
+  virtual const QualifiedName& imageSourceAttributeName() const;
 
   virtual void updateWidget();
   void setNeedWidgetUpdate(bool needWidgetUpdate) {
@@ -64,15 +65,10 @@ class HTMLEmbedElement : public HTMLPlugInElement {
   String type() const;
   void setType(const String&);
 
-  const String& url() const { return m_url; }
-  const String& serviceType() const { return m_serviceType; }
-
   virtual void getSubresourceAttributeStrings(Vector<String>&) const;
 
  private:
-  String m_url;
   String m_pluginPage;
-  String m_serviceType;
   bool m_needWidgetUpdate;
 };
 }

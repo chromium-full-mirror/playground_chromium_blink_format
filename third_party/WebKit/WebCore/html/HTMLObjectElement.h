@@ -23,15 +23,13 @@
 #ifndef HTMLObjectElement_h
 #define HTMLObjectElement_h
 
-#include "HTMLPlugInElement.h"
-#include <wtf/OwnPtr.h>
+#include "HTMLPlugInImageElement.h"
 
 namespace WebCore {
 
-class HTMLImageLoader;
 class KURL;
 
-class HTMLObjectElement : public HTMLPlugInElement {
+class HTMLObjectElement : public HTMLPlugInImageElement {
  public:
   HTMLObjectElement(Document*, bool createdByParser);
   ~HTMLObjectElement();
@@ -62,8 +60,6 @@ class HTMLObjectElement : public HTMLPlugInElement {
   void setNeedWidgetUpdate(bool needWidgetUpdate) {
     m_needWidgetUpdate = needWidgetUpdate;
   }
-
-  bool isImageType();
 
   void renderFallbackContent();
 
@@ -110,8 +106,6 @@ class HTMLObjectElement : public HTMLPlugInElement {
   bool isDocNamedItem() const { return m_docNamedItem; }
 
   const String& classId() const { return m_classId; }
-  const String& url() const { return m_url; }
-  const String& serviceType() const { return m_serviceType; }
 
   bool containsJavaApplet() const;
 
@@ -121,13 +115,10 @@ class HTMLObjectElement : public HTMLPlugInElement {
   void updateDocNamedItem();
 
   AtomicString m_id;
-  String m_serviceType;
-  String m_url;
   String m_classId;
   bool m_docNamedItem : 1;
   bool m_needWidgetUpdate : 1;
   bool m_useFallbackContent : 1;
-  OwnPtr<HTMLImageLoader> m_imageLoader;
 };
 }
 
