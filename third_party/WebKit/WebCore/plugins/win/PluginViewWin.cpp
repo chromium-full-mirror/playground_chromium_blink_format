@@ -682,7 +682,8 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
       if (m_isJavaScriptPaused)
         return NPERR_GENERIC_ERROR;
 
-      NPObject* windowScriptObject = m_parentFrame->windowScriptNPObject();
+      NPObject* windowScriptObject =
+          m_parentFrame->script()->windowScriptNPObject();
 
       // Return value is expected to be retained, as described here:
       // <http://www.mozilla.org/projects/plugin/npruntime.html>
@@ -795,7 +796,7 @@ PluginView::~PluginView() {
   if (m_window)
     DestroyWindow(m_window);
 
-  m_parentFrame->cleanupScriptObjectsForPlugin(this);
+  m_parentFrame->script()->cleanupScriptObjectsForPlugin(this);
 
   if (m_plugin && !m_plugin->quirks().contains(PluginQuirkDontUnloadPlugin))
     m_plugin->unload();
