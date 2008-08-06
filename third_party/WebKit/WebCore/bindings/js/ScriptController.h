@@ -2,6 +2,7 @@
  *  Copyright (C) 1999 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
  *  Copyright (C) 2008 Apple Inc. All rights reserved.
+ *  Copyright (C) 2008 Eric Seidel <eric@webkit.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,19 +26,39 @@
 #include "JSDOMWindowShell.h"
 #include <kjs/protect.h>
 #include <wtf/RefPtr.h>
+#include <wtf/RetainPtr.h>
+
+#if PLATFORM(MAC)
+#ifdef __OBJC__
+@class WebScriptObject;
+#else
+class WebScriptObject;
+#endif
+#endif
+
+struct NPObject;
 
 namespace KJS {
 class JSGlobalObject;
 class JSValue;
+
+namespace Bindings {
+class Instance;
+class RootObject;
+}
 }
 
 namespace WebCore {
 
 class Event;
 class EventListener;
+class HTMLPlugInElement;
 class Frame;
 class Node;
 class String;
+class Widget;
+
+typedef HashMap<void*, RefPtr<KJS::Bindings::RootObject>> RootObjectMap;
 
 class ScriptController {
  public:
@@ -58,7 +79,7 @@ class ScriptController {
   KJS::JSValue* evaluate(const String& sourceURL,
                          int baseLine,
                          const String& code);
-  void clear();
+
   PassRefPtr<EventListener> createHTMLEventHandler(const String& functionName,
                                                    const String& code,
                                                    Node*);
@@ -80,14 +101,35 @@ class ScriptController {
   void setPaused(bool b) { m_paused = b; }
   bool isPaused() const { return m_paused; }
 
+  const String* sourceURL() const {
+    return m_sourceURL;
+  }  // 0 if we are not evaluating any script
+
+  void clearWindowShell();
   void clearFormerWindow(JSDOMWindow* window) {
     m_liveFormerWindows.remove(window);
   }
   void updateDocument();
 
-  const String* sourceURL() const {
-    return m_sourceURL;
-  }  // 0 if we are not evaluating any script
+  void clearScriptObjects();
+  void cleanupScriptObjectsForPlugin(void*);
+
+  PassRefPtr<KJS::Bindings::Instance> createScriptInstanceForWidget(Widget*);
+  KJS::Bindings::RootObject* bindingRootObject();
+
+  PassRefPtr<KJS::Bindings::RootObject> createRootObject(void* nativeHandle);
+
+#if PLATFORM(MAC)
+#if ENABLE(MAC_JAVA_BRIDGE)
+  static void initJavaJSBindings();
+#endif
+  WebScriptObject* windowScriptObject();
+#endif
+
+#if ENABLE(NETSCAPE_PLUGIN_API)
+  NPObject* createScriptObjectForPluginElement(HTMLPlugInElement*);
+  NPObject* windowScriptNPObject();
+#endif
 
  private:
   void initScriptIfNeeded() {
@@ -95,6 +137,9 @@ class ScriptController {
       initScript();
   }
   void initScript();
+
+  void clearPlatformScriptObjects();
+  void disconnectPlatformScriptObjects();
 
   KJS::ProtectedPtr<JSDOMWindowShell> m_windowShell;
   HashSet<JSDOMWindow*> m_liveFormerWindows;
@@ -104,6 +149,16 @@ class ScriptController {
 
   bool m_processingTimerCallback;
   bool m_paused;
+
+  // The root object used for objects bound outside the context of a plugin.
+  RefPtr<KJS::Bindings::RootObject> m_bindingRootObject;
+  RootObjectMap m_rootObjects;
+#if ENABLE(NETSCAPE_PLUGIN_API)
+  NPObject* m_windowScriptNPObject;
+#endif
+#if PLATFORM(MAC)
+  RetainPtr<WebScriptObject> m_windowScriptObject;
+#endif
 };
 
 }  // namespace WebCore

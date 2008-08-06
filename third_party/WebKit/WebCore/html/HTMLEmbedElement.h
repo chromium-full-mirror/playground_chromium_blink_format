@@ -25,14 +25,6 @@
 
 #include "HTMLPlugInElement.h"
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
-namespace KJS {
-namespace Bindings {
-class Instance;
-}
-}
-#endif
-
 namespace WebCore {
 
 class HTMLEmbedElement : public HTMLPlugInElement {
@@ -49,7 +41,6 @@ class HTMLEmbedElement : public HTMLPlugInElement {
 
   virtual void attach();
   virtual bool canLazyAttach() { return false; }
-  virtual void detach();
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void insertedIntoDocument();
@@ -64,7 +55,7 @@ class HTMLEmbedElement : public HTMLPlugInElement {
   }
 
 #if USE(JAVASCRIPTCORE_BINDINGS)
-  virtual KJS::Bindings::Instance* getInstance() const;
+  virtual RenderWidget* renderWidgetForJSBindings() const;
 #endif
 
   String src() const;

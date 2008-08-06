@@ -30,7 +30,6 @@
 #include "FrameLoader.h"
 #include "FrameTree.h"
 #include "HTMLNames.h"
-#include "JSNode.h"
 #include "Page.h"
 #include "RenderWidget.h"
 #include "Settings.h"
@@ -42,14 +41,11 @@
 #endif
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
+#include "JSNode.h"
 #include "NP_jsobject.h"
 #include "npruntime_impl.h"
 #include "runtime_root.h"
 #endif
-
-using KJS::ExecState;
-using KJS::JSValue;
-using KJS::Bindings::RootObject;
 
 namespace WebCore {
 
@@ -66,6 +62,10 @@ HTMLPlugInElement::HTMLPlugInElement(const QualifiedName& tagName,
 }
 
 HTMLPlugInElement::~HTMLPlugInElement() {
+#if USE(JAVASCRIPTCORE_BINDINGS)
+  ASSERT(!m_instance);  // cleared in detach()
+#endif
+
 #if ENABLE(NETSCAPE_PLUGIN_API)
   if (m_NPObject) {
     _NPN_ReleaseObject(m_NPObject);
@@ -73,6 +73,32 @@ HTMLPlugInElement::~HTMLPlugInElement() {
   }
 #endif
 }
+
+#if USE(JAVASCRIPTCORE_BINDINGS)
+void HTMLPlugInElement::detach() {
+  m_instance.clear();
+  HTMLFrameOwnerElement::detach();
+}
+
+KJS::Bindings::Instance* HTMLPlugInElement::getInstance() const {
+  Frame* frame = document()->frame();
+  if (!frame)
+    return 0;
+
+  // If the host dynamically turns off JavaScript (or Java) we will still return
+  // the cached allocated Bindings::Instance.  Not supporting this edge-case is
+  // OK.
+  if (m_instance)
+    return m_instance.get();
+
+  RenderWidget* renderWidget = renderWidgetForJSBindings();
+  if (renderWidget && renderWidget->widget())
+    m_instance =
+        frame->script()->createScriptInstanceForWidget(renderWidget->widget());
+
+  return m_instance.get();
+}
+#endif
 
 String HTMLPlugInElement::align() const {
   return getAttribute(alignAttr);
@@ -156,39 +182,11 @@ void HTMLPlugInElement::defaultEventHandler(Event* event) {
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
 
-NPObject* HTMLPlugInElement::createNPObject() {
-  Frame* frame = document()->frame();
-  if (!frame) {
-    // This shouldn't ever happen, but might as well check anyway.
-    ASSERT_NOT_REACHED();
-    return _NPN_CreateNoScriptObject();
-  }
-
-  Settings* settings = frame->settings();
-  if (!settings) {
-    // This shouldn't ever happen, but might as well check anyway.
-    ASSERT_NOT_REACHED();
-    return _NPN_CreateNoScriptObject();
-  }
-
-  // Can't create NPObjects when JavaScript is disabled
-  if (!frame->script()->isEnabled())
-    return _NPN_CreateNoScriptObject();
-
-  // Create a JSObject bound to this element
-  ExecState* exec = frame->script()->globalObject()->globalExec();
-  JSValue* jsElementValue = toJS(exec, this);
-  if (!jsElementValue || !jsElementValue->isObject())
-    return _NPN_CreateNoScriptObject();
-
-  // Wrap the JSObject in an NPObject
-  RootObject* rootObject = frame->bindingRootObject();
-  return _NPN_CreateScriptObject(0, jsElementValue->getObject(), rootObject);
-}
-
 NPObject* HTMLPlugInElement::getNPObject() {
+  ASSERT(document()->frame());
   if (!m_NPObject)
-    m_NPObject = createNPObject();
+    m_NPObject =
+        document()->frame()->script()->createScriptObjectForPluginElement(this);
   return m_NPObject;
 }
 

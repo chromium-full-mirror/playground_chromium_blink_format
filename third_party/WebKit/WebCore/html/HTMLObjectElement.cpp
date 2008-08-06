@@ -40,11 +40,8 @@
 #include "RenderImage.h"
 #include "RenderPartObject.h"
 #include "RenderWidget.h"
+#include "ScriptController.h"
 #include "Text.h"
-
-#if USE(JAVASCRIPTCORE_BINDINGS)
-#include "runtime.h"
-#endif
 
 namespace WebCore {
 
@@ -57,22 +54,10 @@ HTMLObjectElement::HTMLObjectElement(Document* doc, bool createdByParser)
       m_needWidgetUpdate(!createdByParser),
       m_useFallbackContent(false) {}
 
-HTMLObjectElement::~HTMLObjectElement() {
-#if USE(JAVASCRIPTCORE_BINDINGS)
-  // m_instance should have been cleaned up in detach().
-  ASSERT(!m_instance);
-#endif
-}
+HTMLObjectElement::~HTMLObjectElement() {}
 
 #if USE(JAVASCRIPTCORE_BINDINGS)
-KJS::Bindings::Instance* HTMLObjectElement::getInstance() const {
-  Frame* frame = document()->frame();
-  if (!frame)
-    return 0;
-
-  if (m_instance)
-    return m_instance.get();
-
+RenderWidget* HTMLObjectElement::renderWidgetForJSBindings() const {
   RenderWidget* renderWidget = (renderer() && renderer()->isWidget())
                                    ? static_cast<RenderWidget*>(renderer())
                                    : 0;
@@ -82,10 +67,7 @@ KJS::Bindings::Instance* HTMLObjectElement::getInstance() const {
                        ? static_cast<RenderWidget*>(renderer())
                        : 0;
   }
-  if (renderWidget && renderWidget->widget())
-    m_instance = frame->createScriptInstanceForWidget(renderWidget->widget());
-
-  return m_instance.get();
+  return renderWidget;
 }
 #endif
 
@@ -199,15 +181,10 @@ void HTMLObjectElement::finishParsingChildren() {
 }
 
 void HTMLObjectElement::detach() {
-  if (attached() && renderer() && !m_useFallbackContent) {
+  if (attached() && renderer() && !m_useFallbackContent)
     // Update the widget the next time we attach (detaching destroys the
     // plugin).
     m_needWidgetUpdate = true;
-  }
-
-#if USE(JAVASCRIPTCORE_BINDINGS)
-  m_instance = 0;
-#endif
   HTMLPlugInElement::detach();
 }
 

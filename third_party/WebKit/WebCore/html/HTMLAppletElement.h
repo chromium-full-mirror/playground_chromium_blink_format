@@ -25,14 +25,6 @@
 
 #include "HTMLPlugInElement.h"
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
-namespace KJS {
-namespace Bindings {
-class Instance;
-}
-}
-#endif
-
 namespace WebCore {
 
 class HTMLFormElement;
@@ -50,10 +42,9 @@ class HTMLAppletElement : public HTMLPlugInElement {
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void finishParsingChildren();
-  virtual void detach();
 
 #if USE(JAVASCRIPTCORE_BINDINGS)
-  virtual KJS::Bindings::Instance* getInstance() const;
+  virtual RenderWidget* renderWidgetForJSBindings() const;
 #endif
 
   String alt() const;

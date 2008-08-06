@@ -32,10 +32,7 @@
 #include "HTMLObjectElement.h"
 #include "HTMLNames.h"
 #include "RenderPartObject.h"
-
-#if USE(JAVASCRIPTCORE_BINDINGS)
-#include "runtime.h"
-#endif
+#include "ScriptController.h"
 
 namespace WebCore {
 
@@ -44,12 +41,7 @@ using namespace HTMLNames;
 HTMLEmbedElement::HTMLEmbedElement(Document* doc)
     : HTMLPlugInElement(embedTag, doc), m_needWidgetUpdate(false) {}
 
-HTMLEmbedElement::~HTMLEmbedElement() {
-#if USE(JAVASCRIPTCORE_BINDINGS)
-  // m_instance should have been cleaned up in detach().
-  ASSERT(!m_instance);
-#endif
-}
+HTMLEmbedElement::~HTMLEmbedElement() {}
 
 #if USE(JAVASCRIPTCORE_BINDINGS)
 static inline RenderWidget* findWidgetRenderer(const Node* n) {
@@ -58,29 +50,19 @@ static inline RenderWidget* findWidgetRenderer(const Node* n) {
       n = n->parentNode();
     while (n && !n->hasTagName(objectTag));
 
-  return (n && n->renderer() && n->renderer()->isWidget())
-             ? static_cast<RenderWidget*>(n->renderer())
-             : 0;
+  if (n && n->renderer() && n->renderer()->isWidget())
+    return static_cast<RenderWidget*>(n->renderer());
+
+  return 0;
 }
 
-KJS::Bindings::Instance* HTMLEmbedElement::getInstance() const {
-  Frame* frame = document()->frame();
-  if (!frame)
-    return 0;
-
-  if (m_instance)
-    return m_instance.get();
-
+RenderWidget* HTMLEmbedElement::renderWidgetForJSBindings() const {
   RenderWidget* renderWidget = findWidgetRenderer(this);
   if (renderWidget && !renderWidget->widget()) {
     document()->updateLayoutIgnorePendingStylesheets();
     renderWidget = findWidgetRenderer(this);
   }
-
-  if (renderWidget && renderWidget->widget())
-    m_instance = frame->createScriptInstanceForWidget(renderWidget->widget());
-
-  return m_instance.get();
+  return renderWidget;
 }
 #endif
 
@@ -149,13 +131,6 @@ void HTMLEmbedElement::attach() {
   m_needWidgetUpdate = true;
   queuePostAttachCallback(&HTMLPlugInElement::updateWidgetCallback, this);
   HTMLPlugInElement::attach();
-}
-
-void HTMLEmbedElement::detach() {
-#if USE(JAVASCRIPTCORE_BINDINGS)
-  m_instance = 0;
-#endif
-  HTMLPlugInElement::detach();
 }
 
 void HTMLEmbedElement::updateWidget() {
