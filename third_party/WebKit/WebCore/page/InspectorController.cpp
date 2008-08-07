@@ -1195,6 +1195,20 @@ static JSValueRef profiles(JSContextRef ctx,
   return result;
 }
 
+static JSValueRef clearMessages(JSContextRef ctx,
+                                JSObjectRef /*function*/,
+                                JSObjectRef thisObject,
+                                size_t /*argumentCount*/,
+                                const JSValueRef[] /*arguments*/,
+                                JSValueRef* /*exception*/) {
+  InspectorController* controller =
+      reinterpret_cast<InspectorController*>(JSObjectGetPrivate(thisObject));
+  if (controller)
+    controller->clearConsoleMessages();
+
+  return JSValueMakeUndefined(ctx);
+}
+
 // InspectorController Class
 
 InspectorController::InspectorController(Page* page, InspectorClient* client)
@@ -1396,6 +1410,11 @@ void InspectorController::addConsoleMessage(ConsoleMessage* consoleMessage) {
     addScriptConsoleMessage(consoleMessage);
 }
 
+void InspectorController::clearConsoleMessages() {
+  deleteAllValues(m_consoleMessages);
+  m_consoleMessages.clear();
+}
+
 void InspectorController::startGroup() {
   JSValueRef exception = 0;
 
@@ -1507,6 +1526,7 @@ void InspectorController::windowScriptObjectAvailable() {
     {"addBreakpoint", WebCore::addBreakpoint, kJSPropertyAttributeNone},
     {"removeBreakpoint", WebCore::removeBreakpoint, kJSPropertyAttributeNone},
     {"isWindowVisible", WebCore::isWindowVisible, kJSPropertyAttributeNone},
+    {"clearMessages", clearMessages, kJSPropertyAttributeNone},
     {0, 0, 0}
   };
 
