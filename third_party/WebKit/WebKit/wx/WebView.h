@@ -35,6 +35,7 @@
 
 class WebViewPrivate;
 class WebViewFrameData;
+class wxWebFrame;
 
 namespace WebCore {
 class ChromeClientWx;
@@ -75,23 +76,21 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
                 const wxPoint& point = wxDefaultPosition,
                 const wxSize& size = wxDefaultSize,
                 long style = 0,
-                const wxString& name = wxWebViewNameStr,
-                WebViewFrameData* data =
-                    NULL);  // For wxWebView internal data passing
+                const wxString& name =
+                    wxWebViewNameStr);  // For wxWebView internal data passing
 #if SWIG
   % rename(PreWebView) wxWebView();
 #else
   wxWebView();
 #endif
 
-  bool Create(
-      wxWindow* parent,
-      int id = wxID_ANY,
-      const wxPoint& point = wxDefaultPosition,
-      const wxSize& size = wxDefaultSize,
-      long style = 0,
-      const wxString& name = wxWebViewNameStr,
-      WebViewFrameData* data = NULL);  // For wxWebView internal data passing
+  bool Create(wxWindow* parent,
+              int id = wxID_ANY,
+              const wxPoint& point = wxDefaultPosition,
+              const wxSize& size = wxDefaultSize,
+              long style = 0,
+              const wxString& name =
+                  wxWebViewNameStr);  // For wxWebView internal data passing
 
 #ifndef SWIG
   ~wxWebView();
@@ -135,6 +134,8 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   wxString GetPageTitle() const { return m_title; }
   void SetPageTitle(const wxString& title) { m_title = title; }
 
+  wxWebFrame* GetMainFrame() { return m_mainFrame; }
+
  protected:
   // event handlers (these functions should _not_ be virtual)
   void OnPaint(wxPaintEvent& event);
@@ -156,6 +157,7 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   bool m_isInitialized;
   bool m_beingDestroyed;
   WebViewPrivate* m_impl;
+  wxWebFrame* m_mainFrame;
   wxString m_title;
 };
 
