@@ -33,6 +33,7 @@
 #include "HitTestResult.h"
 #include "InlineTextBox.h"
 #include "RenderImage.h"
+#include "RenderMarquee.h"
 #include "RenderReplica.h"
 #include "RenderTableCell.h"
 #include "RenderTextFragment.h"
