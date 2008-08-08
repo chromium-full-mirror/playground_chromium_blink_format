@@ -146,21 +146,13 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
                       const FloatPoint& point) const {
   if (font->m_font.useGDI()) {
     Color fillColor = graphicsContext->fillColor();
-    if (!fillColor.alpha())
-      return;
-
-    // We have to convert CG's two-dimensional floating point advances to just
-    // horizontal integer advances.
-    Vector<int, 2048> gdiAdvances;
-    int totalWidth = 0;
-    for (int i = 0; i < numGlyphs; i++) {
-      gdiAdvances.append(lroundf(glyphBuffer.advanceAt(from + i)));
-      totalWidth += gdiAdvances[i];
-    }
 
     bool drawIntoBitmap = false;
     int drawingMode = graphicsContext->textDrawingMode();
     if (drawingMode == cTextFill) {
+      if (!fillColor.alpha())
+        return;
+
       drawIntoBitmap =
           fillColor.alpha() != 255 || graphicsContext->inTransparencyLayer();
       if (!drawIntoBitmap) {
@@ -170,6 +162,15 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
         graphicsContext->getShadow(size, blur, color);
         drawIntoBitmap = !size.isEmpty() || blur;
       }
+    }
+
+    // We have to convert CG's two-dimensional floating point advances to just
+    // horizontal integer advances.
+    Vector<int, 2048> gdiAdvances;
+    int totalWidth = 0;
+    for (int i = 0; i < numGlyphs; i++) {
+      gdiAdvances.append(lroundf(glyphBuffer.advanceAt(from + i)));
+      totalWidth += gdiAdvances[i];
     }
 
     HDC hdc = 0;
