@@ -200,7 +200,7 @@ using namespace HTMLNames;
       (*list)[i]->set##Prop((*parentList)[i]->prop());                         \
     }                                                                          \
                                                                                \
-    /* Reset any remaining layers to not have the property set. */             \
+    /* Reset any remaining animations to not have the property set. */         \
     for (; i < list->size(); ++i)                                              \
       (*list)[i]->clear##Prop();                                               \
   }                                                                            \
@@ -211,34 +211,34 @@ using namespace HTMLNames;
       (*list)[0]->clear##Prop();                                               \
   }
 
-#define HANDLE_ANIMATION_VALUE(prop, Prop, value)                        \
-  {                                                                      \
-    HANDLE_ANIMATION_INHERIT_AND_INITIAL(prop, Prop)                     \
-    if (isInherit || isInitial)                                          \
-      return;                                                            \
-    AnimationList* list = m_style->accessAnimations();                   \
-    size_t childIndex = 0;                                               \
-    if (value->isValueList()) {                                          \
-      /* Walk each value and put it into a layer, creating new layers as \
-       * needed. */                                                      \
-      CSSValueList* valueList = static_cast<CSSValueList*>(value);       \
-      for (unsigned int i = 0; i < valueList->length(); i++) {           \
-        if (childIndex <= list->size())                                  \
-          list->append(Animation::create());                             \
-        mapAnimation##Prop((*list)[childIndex].get(),                    \
-                           valueList->itemWithoutBoundsCheck(i));        \
-        ++childIndex;                                                    \
-      }                                                                  \
-    } else {                                                             \
-      if (list->isEmpty())                                               \
-        list->append(Animation::create());                               \
-      mapAnimation##Prop((*list)[childIndex].get(), value);              \
-      childIndex = 1;                                                    \
-    }                                                                    \
-    for (; childIndex < list->size(); ++childIndex) {                    \
-      /* Reset all remaining layers to not have the property set. */     \
-      (*list)[childIndex]->clear##Prop();                                \
-    }                                                                    \
+#define HANDLE_ANIMATION_VALUE(prop, Prop, value)                              \
+  {                                                                            \
+    HANDLE_ANIMATION_INHERIT_AND_INITIAL(prop, Prop)                           \
+    if (isInherit || isInitial)                                                \
+      return;                                                                  \
+    AnimationList* list = m_style->accessAnimations();                         \
+    size_t childIndex = 0;                                                     \
+    if (value->isValueList()) {                                                \
+      /* Walk each value and put it into an animation, creating new animations \
+       * as needed. */                                                         \
+      CSSValueList* valueList = static_cast<CSSValueList*>(value);             \
+      for (unsigned int i = 0; i < valueList->length(); i++) {                 \
+        if (childIndex <= list->size())                                        \
+          list->append(Animation::create());                                   \
+        mapAnimation##Prop((*list)[childIndex].get(),                          \
+                           valueList->itemWithoutBoundsCheck(i));              \
+        ++childIndex;                                                          \
+      }                                                                        \
+    } else {                                                                   \
+      if (list->isEmpty())                                                     \
+        list->append(Animation::create());                                     \
+      mapAnimation##Prop((*list)[childIndex].get(), value);                    \
+      childIndex = 1;                                                          \
+    }                                                                          \
+    for (; childIndex < list->size(); ++childIndex) {                          \
+      /* Reset all remaining animations to not have the property set. */       \
+      (*list)[childIndex]->clear##Prop();                                      \
+    }                                                                          \
   }
 
 #define HANDLE_TRANSITION_INHERIT_AND_INITIAL(prop, Prop)                      \
@@ -252,7 +252,7 @@ using namespace HTMLNames;
       (*list)[i]->set##Prop((*parentList)[i]->prop());                         \
     }                                                                          \
                                                                                \
-    /* Reset any remaining layers to not have the property set. */             \
+    /* Reset any remaining transitions to not have the property set. */        \
     for (; i < list->size(); ++i)                                              \
       (*list)[i]->clear##Prop();                                               \
   }                                                                            \
@@ -263,34 +263,34 @@ using namespace HTMLNames;
       (*list)[0]->clear##Prop();                                               \
   }
 
-#define HANDLE_TRANSITION_VALUE(prop, Prop, value)                       \
-  {                                                                      \
-    HANDLE_TRANSITION_INHERIT_AND_INITIAL(prop, Prop)                    \
-    if (isInherit || isInitial)                                          \
-      return;                                                            \
-    AnimationList* list = m_style->accessTransitions();                  \
-    size_t childIndex = 0;                                               \
-    if (value->isValueList()) {                                          \
-      /* Walk each value and put it into a layer, creating new layers as \
-       * needed. */                                                      \
-      CSSValueList* valueList = static_cast<CSSValueList*>(value);       \
-      for (unsigned int i = 0; i < valueList->length(); i++) {           \
-        if (childIndex <= list->size())                                  \
-          list->append(Animation::create());                             \
-        mapAnimation##Prop((*list)[childIndex].get(),                    \
-                           valueList->itemWithoutBoundsCheck(i));        \
-        ++childIndex;                                                    \
-      }                                                                  \
-    } else {                                                             \
-      if (list->isEmpty())                                               \
-        list->append(Animation::create());                               \
-      mapAnimation##Prop((*list)[childIndex].get(), value);              \
-      childIndex = 1;                                                    \
-    }                                                                    \
-    for (; childIndex < list->size(); ++childIndex) {                    \
-      /* Reset all remaining layers to not have the property set. */     \
-      (*list)[childIndex]->clear##Prop();                                \
-    }                                                                    \
+#define HANDLE_TRANSITION_VALUE(prop, Prop, value)                             \
+  {                                                                            \
+    HANDLE_TRANSITION_INHERIT_AND_INITIAL(prop, Prop)                          \
+    if (isInherit || isInitial)                                                \
+      return;                                                                  \
+    AnimationList* list = m_style->accessTransitions();                        \
+    size_t childIndex = 0;                                                     \
+    if (value->isValueList()) {                                                \
+      /* Walk each value and put it into a transition, creating new animations \
+       * as needed. */                                                         \
+      CSSValueList* valueList = static_cast<CSSValueList*>(value);             \
+      for (unsigned int i = 0; i < valueList->length(); i++) {                 \
+        if (childIndex <= list->size())                                        \
+          list->append(Animation::create());                                   \
+        mapAnimation##Prop((*list)[childIndex].get(),                          \
+                           valueList->itemWithoutBoundsCheck(i));              \
+        ++childIndex;                                                          \
+      }                                                                        \
+    } else {                                                                   \
+      if (list->isEmpty())                                                     \
+        list->append(Animation::create());                                     \
+      mapAnimation##Prop((*list)[childIndex].get(), value);                    \
+      childIndex = 1;                                                          \
+    }                                                                          \
+    for (; childIndex < list->size(); ++childIndex) {                          \
+      /* Reset all remaining transitions to not have the property set. */      \
+      (*list)[childIndex]->clear##Prop();                                      \
+    }                                                                          \
   }
 
 #define HANDLE_INHERIT_COND(propID, prop, Prop) \

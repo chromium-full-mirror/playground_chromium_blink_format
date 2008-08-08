@@ -47,7 +47,12 @@ class AnimationController {
   void cancelAnimations(RenderObject*);
   RenderStyle* updateAnimations(RenderObject*, RenderStyle* newStyle);
 
-  bool isAnimatingPropertyOnRenderer(RenderObject* obj, int property) const;
+  void setAnimationStartTime(RenderObject* obj, double t);
+  void setTransitionStartTime(RenderObject* obj, int property, double t);
+
+  bool isAnimatingPropertyOnRenderer(RenderObject* obj,
+                                     int property,
+                                     bool isRunningNow) const;
 
   void suspendAnimations(Document* document);
   void resumeAnimations(Document* document);
