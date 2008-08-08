@@ -106,7 +106,7 @@ static inline void scrollAndAcceptEvent(float delta,
   if (!delta)
     return;
 
-  int pixelsToScroll = abs(static_cast<int>(delta));
+  float pixelsToScroll = delta > 0 ? delta : -delta;
   if (!e.isContinuous() && !pageScrollEnabled) {
     if (node->renderer()->scroll(
             delta < 0 ? negativeDirection : positiveDirection, ScrollByLine,
@@ -114,7 +114,7 @@ static inline void scrollAndAcceptEvent(float delta,
       e.accept();
   } else {
     if (pageScrollEnabled)
-      pixelsToScroll = static_cast<int>(windowHeightOrWidth);
+      pixelsToScroll = windowHeightOrWidth;
     if (node->renderer()->scroll(
             delta < 0 ? negativeDirection : positiveDirection, ScrollByPixel,
             pixelsToScroll))
