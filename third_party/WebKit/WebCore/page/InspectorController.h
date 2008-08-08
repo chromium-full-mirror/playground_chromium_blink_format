@@ -122,6 +122,7 @@ class InspectorController : JavaScriptDebugListener,
                            unsigned lineNumber,
                            const String& sourceID);
   void clearConsoleMessages();
+  void toggleRecordButton(bool);
 
   void addProfile(PassRefPtr<KJS::Profile>);
   void addScriptProfile(KJS::Profile* profile);

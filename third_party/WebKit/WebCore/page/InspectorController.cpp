@@ -1443,6 +1443,16 @@ void InspectorController::clearConsoleMessages() {
   m_consoleMessages.clear();
 }
 
+void InspectorController::toggleRecordButton(bool isProfiling) {
+  if (!m_scriptContext)
+    return;
+
+  JSValueRef exception = 0;
+  JSValueRef isProvingValue = JSValueMakeBoolean(m_scriptContext, isProfiling);
+  callFunction(m_scriptContext, m_scriptObject, "setRecordingProfile", 1,
+               &isProvingValue, exception);
+}
+
 void InspectorController::startGroup() {
   JSValueRef exception = 0;
 
@@ -1713,6 +1723,7 @@ void InspectorController::startUserInitiatedProfiling() {
 
   ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
   Profiler::profiler()->startProfiling(exec, UserInitiatedProfileName, this);
+  toggleRecordButton(true);
 }
 
 void InspectorController::stopUserInitiatedProfiling() {
@@ -1724,6 +1735,7 @@ void InspectorController::stopUserInitiatedProfiling() {
   ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
   Profiler::profiler()->stopProfiling(exec, UserInitiatedProfileName);
   Profiler::profiler()->didFinishAllExecution(exec);
+  toggleRecordButton(false);
 }
 
 void InspectorController::finishedProfiling(PassRefPtr<Profile> prpProfile) {
