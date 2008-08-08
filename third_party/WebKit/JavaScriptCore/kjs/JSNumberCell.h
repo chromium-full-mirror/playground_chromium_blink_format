@@ -60,6 +60,8 @@ class JSNumberCell : public JSCell {
   virtual UString toThisString(ExecState*) const;
   virtual JSObject* toThisObject(ExecState*) const;
   virtual JSValue* getJSNumber();
+  int32_t fastToInt32() const;
+  uint32_t fastToUInt32() const;
 
   void* operator new(size_t size, ExecState* exec) {
 #ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
@@ -134,6 +136,20 @@ inline double JSValue::uncheckedGetNumber() const {
   return JSImmediate::isImmediate(this)
              ? JSImmediate::toDouble(this)
              : static_cast<const JSNumberCell*>(this)->value();
+}
+
+inline int32_t JSNumberCell::fastToInt32() const {
+  if (m_value >= -2147483648.0 && m_value < 2147483648.0)
+    return static_cast<int32_t>(m_value);
+  bool scratch;
+  return JSValue::toInt32SlowCase(m_value, scratch);
+}
+
+inline uint32_t JSNumberCell::fastToUInt32() const {
+  if (m_value >= 0.0 && m_value < 4294967296.0)
+    return static_cast<uint32_t>(m_value);
+  bool scratch;
+  return JSValue::toUInt32SlowCase(m_value, scratch);
 }
 
 ALWAYS_INLINE JSValue* JSValue::toJSNumber(ExecState* exec) const {

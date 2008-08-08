@@ -158,6 +158,7 @@ Heap::~Heap() {
 #endif
 }
 
+template <Heap::HeapType heapType>
 static NEVER_INLINE CollectorBlock* allocateBlock() {
 #if PLATFORM(DARWIN)
   vm_address_t address = 0;
@@ -203,7 +204,7 @@ static NEVER_INLINE CollectorBlock* allocateBlock() {
   address += adjust;
   memset(reinterpret_cast<void*>(address), 0, BLOCK_SIZE);
 #endif
-
+  reinterpret_cast<CollectorBlock*>(address)->type = heapType;
   return reinterpret_cast<CollectorBlock*>(address);
 }
 
@@ -364,7 +365,7 @@ scan:
           fastRealloc(heap.blocks, numBlocks * sizeof(CollectorBlock*)));
     }
 
-    targetBlock = (Block*)allocateBlock();
+    targetBlock = (Block*)allocateBlock<heapType>();
     targetBlock->freeList = targetBlock->cells;
     targetBlock->heap = this;
     targetBlockUsedCells = 0;
