@@ -839,6 +839,7 @@ void RenderLayer::scrollToOffset(int x,
 }
 
 void RenderLayer::scrollRectToVisible(const IntRect& rect,
+                                      bool scrollToAnchor,
                                       const ScrollAlignment& alignX,
                                       const ScrollAlignment& alignY) {
   RenderLayer* parentLayer = 0;
@@ -892,7 +893,8 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
       newRect.setX(rect.x() - diffX);
       newRect.setY(rect.y() - diffY);
     }
-  } else if (!parentLayer && renderer()->canBeProgramaticallyScrolled()) {
+  } else if (!parentLayer &&
+             renderer()->canBeProgramaticallyScrolled(scrollToAnchor)) {
     if (frameView) {
       if (m_object->document() && m_object->document()->ownerElement() &&
           m_object->document()->ownerElement()->renderer()) {
@@ -924,7 +926,7 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
   }
 
   if (parentLayer)
-    parentLayer->scrollRectToVisible(newRect, alignX, alignY);
+    parentLayer->scrollRectToVisible(newRect, scrollToAnchor, alignX, alignY);
 
   if (frameView)
     frameView->resumeScheduledEvents();
@@ -1032,7 +1034,7 @@ void RenderLayer::autoscroll() {
 
   IntPoint currentDocumentPosition = frameView->windowToContents(
       frame->eventHandler()->currentMousePosition());
-  scrollRectToVisible(IntRect(currentDocumentPosition, IntSize(1, 1)),
+  scrollRectToVisible(IntRect(currentDocumentPosition, IntSize(1, 1)), false,
                       gAlignToEdgeIfNeeded, gAlignToEdgeIfNeeded);
 }
 

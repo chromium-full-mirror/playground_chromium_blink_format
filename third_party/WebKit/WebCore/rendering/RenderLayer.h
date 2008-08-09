@@ -225,6 +225,7 @@ class RenderLayer : public ScrollbarClient {
   }
   void scrollRectToVisible(
       const IntRect&,
+      bool scrollToAnchor = false,
       const ScrollAlignment& alignX = gAlignCenterIfNeeded,
       const ScrollAlignment& alignY = gAlignCenterIfNeeded);
 

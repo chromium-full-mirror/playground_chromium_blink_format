@@ -811,7 +811,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,
                       float multiplier = 1.0f);
-  virtual bool canBeProgramaticallyScrolled() const;
+  virtual bool canBeProgramaticallyScrolled(bool) const;
   bool hasScrollableView() const;
   virtual void autoscroll();
   virtual void stopAutoscroll() {}

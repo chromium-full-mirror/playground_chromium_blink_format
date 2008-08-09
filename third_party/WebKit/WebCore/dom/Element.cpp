@@ -231,11 +231,11 @@ void Element::scrollIntoView(bool alignToTop) {
     // Align to the top / bottom and to the closest edge.
     if (alignToTop)
       renderer()->enclosingLayer()->scrollRectToVisible(
-          bounds, RenderLayer::gAlignToEdgeIfNeeded,
+          bounds, false, RenderLayer::gAlignToEdgeIfNeeded,
           RenderLayer::gAlignTopAlways);
     else
       renderer()->enclosingLayer()->scrollRectToVisible(
-          bounds, RenderLayer::gAlignToEdgeIfNeeded,
+          bounds, false, RenderLayer::gAlignToEdgeIfNeeded,
           RenderLayer::gAlignBottomAlways);
   }
 }
@@ -246,11 +246,11 @@ void Element::scrollIntoViewIfNeeded(bool centerIfNeeded) {
   if (renderer()) {
     if (centerIfNeeded)
       renderer()->enclosingLayer()->scrollRectToVisible(
-          bounds, RenderLayer::gAlignCenterIfNeeded,
+          bounds, false, RenderLayer::gAlignCenterIfNeeded,
           RenderLayer::gAlignCenterIfNeeded);
     else
       renderer()->enclosingLayer()->scrollRectToVisible(
-          bounds, RenderLayer::gAlignToEdgeIfNeeded,
+          bounds, false, RenderLayer::gAlignToEdgeIfNeeded,
           RenderLayer::gAlignToEdgeIfNeeded);
   }
 }

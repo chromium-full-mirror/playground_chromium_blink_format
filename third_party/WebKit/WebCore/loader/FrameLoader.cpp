@@ -1760,7 +1760,8 @@ bool FrameLoader::gotoAnchor(const String& name) {
   }
   if (renderer)
     renderer->enclosingLayer()->scrollRectToVisible(
-        rect, RenderLayer::gAlignToEdgeIfNeeded, RenderLayer::gAlignTopAlways);
+        rect, true, RenderLayer::gAlignToEdgeIfNeeded,
+        RenderLayer::gAlignTopAlways);
 
   return true;
 }
