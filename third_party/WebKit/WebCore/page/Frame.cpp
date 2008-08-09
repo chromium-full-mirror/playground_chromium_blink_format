@@ -1535,10 +1535,20 @@ bool Frame::findString(const String& target,
     resultRange = findPlainText(searchRange.get(), target, forward, caseFlag);
   }
 
+  Editor::Visibility rangeLocation =
+      editor()->rangeVisibility(resultRange.get());
+  if (rangeLocation == Editor::BeforeVisibleArea && forward)
+    resultRange = editor()->firstVisibleRange(resultRange.get(), target,
+                                              forward, caseFlag);
+
   // If we didn't find anything and we're wrapping, search again in the entire
   // document (this will
   // redundantly re-search the area already searched in some cases).
-  if (resultRange->collapsed(exception) && wrapFlag) {
+  bool disconnectedFrameShouldWrap =
+      rangeLocation == Editor::AfterVisibleArea ||
+      (rangeLocation == Editor::BeforeVisibleArea && !forward);
+  if (resultRange->collapsed(exception) && wrapFlag ||
+      disconnectedFrameShouldWrap) {
     searchRange = rangeOfContents(document());
     resultRange = findPlainText(searchRange.get(), target, forward, caseFlag);
     // We used to return false here if we ended up with the same range that we
@@ -1547,6 +1557,14 @@ bool Frame::findString(const String& target,
     // decided that
     // this should be a success case instead, so we'll just fall through in that
     // case.
+
+    rangeLocation = editor()->rangeVisibility(resultRange.get());
+    if (rangeLocation == Editor::BeforeVisibleArea)
+      resultRange = editor()->firstVisibleRange(resultRange.get(), target,
+                                                forward, caseFlag);
+    else if (rangeLocation == Editor::AfterVisibleArea)
+      resultRange = editor()->lastVisibleRange(resultRange.get(), target,
+                                               forward, caseFlag);
   }
 
   if (resultRange->collapsed(exception))
@@ -1586,6 +1604,17 @@ unsigned Frame::markAllMatchesForText(const String& target,
     VisiblePosition newStart =
         endVisiblePosition(resultRange.get(), DOWNSTREAM);
     if (newStart == startVisiblePosition(searchRange.get(), DOWNSTREAM))
+      break;
+
+    Editor::Visibility rangeLocation =
+        editor()->rangeVisibility(resultRange.get());
+    if (rangeLocation == Editor::BeforeVisibleArea) {
+      searchRange = rangeOfContents(document());
+      searchRange->setStartAfter(
+          resultRange->startContainer()->shadowAncestorNode(), exception);
+      continue;
+    }
+    if (rangeLocation == Editor::AfterVisibleArea)
       break;
 
     ++matchCount;

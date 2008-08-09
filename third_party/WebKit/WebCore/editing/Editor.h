@@ -287,6 +287,19 @@ class Editor {
 
   PassRefPtr<Range> selectedRange();
 
+  // We should make these functions private when their callers in Frame are
+  // moved over here to Editor
+  enum Visibility { BeforeVisibleArea, InsideVisibleArea, AfterVisibleArea };
+  Visibility rangeVisibility(Range*) const;
+  PassRefPtr<Range> firstVisibleRange(Range*,
+                                      const String&,
+                                      bool forward,
+                                      bool caseFlag);
+  PassRefPtr<Range> lastVisibleRange(Range*,
+                                     const String&,
+                                     bool forward,
+                                     bool caseFlag);
+
  private:
   Frame* m_frame;
   OwnPtr<DeleteButtonController> m_deleteButtonController;
