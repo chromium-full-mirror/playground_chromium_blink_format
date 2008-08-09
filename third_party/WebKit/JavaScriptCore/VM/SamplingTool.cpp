@@ -193,9 +193,9 @@ void SamplingTool::dump(ExecState* exec) {
   long long totalOpcodeSamples = 0;
   long long opcodeSampleCounts[numOpcodeIDs] = {0};
 
-  fprintf(stdout, "\nBlock sampling results\n\n");
-  fprintf(stdout, "Total blocks sampled (total samples): %lld (%lld)\n\n",
-          totalCodeBlockSamples, m_totalSamples);
+  printf("\nBlock sampling results\n\n");
+  printf("Total blocks sampled (total samples): %lld (%lld)\n\n",
+         totalCodeBlockSamples, m_totalSamples);
 
   for (int i = 0; i < scopeCount; i++) {
     ScopeSampleRecord* record = codeBlockSamples[i];
@@ -207,10 +207,10 @@ void SamplingTool::dump(ExecState* exec) {
 
     if ((blockPercent >= 1) && codeBlock) {
       Instruction* code = codeBlock->instructions.begin();
-      fprintf(stdout, "#%d: %s:%d: sampled %d times - %.3f%% (%.3f%%)\n", i + 1,
-              record->m_scope->sourceURL().UTF8String().c_str(),
-              codeBlock->lineNumberForVPC(code), record->m_totalCount,
-              blockPercent, totalPercent);
+      printf("#%d: %s:%d: sampled %d times - %.3f%% (%.3f%%)\n", i + 1,
+             record->m_scope->sourceURL().UTF8String().c_str(),
+             codeBlock->lineNumberForVPC(code), record->m_totalCount,
+             blockPercent, totalPercent);
       if (i < 10) {
         HashMap<unsigned, unsigned> lineCounts;
         codeBlock->dump(exec);
@@ -279,29 +279,29 @@ void SamplingTool::dump(ExecState* exec) {
 
   // (4) Print Opcode sampling results.
 
-  fprintf(stdout, "\nOpcode sampling results\n\n");
+  printf("\nOpcode sampling results\n\n");
 
-  fprintf(stdout, "Total opcodes sampled (total samples): %lld (%lld)\n\n",
-          totalOpcodeSamples, m_totalSamples);
-  fprintf(stdout, "Opcodes in order:\n\n");
+  printf("Total opcodes sampled (total samples): %lld (%lld)\n\n",
+         totalOpcodeSamples, m_totalSamples);
+  printf("Opcodes in order:\n\n");
   for (int i = 0; i < numOpcodeIDs; ++i) {
     long long count = opcodeSampleCounts[i];
-    fprintf(stdout, "%s:%s%6lld\t%.3f%%\t(%.3f%%)\n", opcodeNames[i],
-            padOpcodeName((OpcodeID)i, 20), count,
-            ((double)count * 100) / totalOpcodeSamples,
-            ((double)count * 100) / m_totalSamples);
+    printf("%s:%s%6lld\t%.3f%%\t(%.3f%%)\n", opcodeNames[i],
+           padOpcodeName(reinterpret_cast<OpcodeID>(i), 20), count,
+           (static_cast<double>(count) * 100) / totalOpcodeSamples,
+           (static_cast<double>(count) * 100) / m_totalSamples);
   }
-  fprintf(stdout, "\n");
-  fprintf(stdout, "Opcodes by sample count:\n\n");
+  printf("\n");
+  printf("Opcodes by sample count:\n\n");
   for (int i = 0; i < numOpcodeIDs; ++i) {
     OpcodeID opcode = opcodeSampleInfo[i].opcode;
     long long count = opcodeSampleInfo[i].count;
-    fprintf(stdout, "%s:%s%6lld\t%.3f%%\t(%.3f%%)\n", opcodeNames[opcode],
-            padOpcodeName(opcode, 20), count,
-            ((double)count * 100) / totalOpcodeSamples,
-            ((double)count * 100) / m_totalSamples);
+    printf("%s:%s%6lld\t%.3f%%\t(%.3f%%)\n", opcodeNames[opcode],
+           padOpcodeName(opcode, 20), count,
+           (static_cast<double>(count) * 100) / totalOpcodeSamples,
+           (static_cast<double>(count) * 100) / m_totalSamples);
   }
-  fprintf(stdout, "\n");
+  printf("\n");
 }
 
 #else
