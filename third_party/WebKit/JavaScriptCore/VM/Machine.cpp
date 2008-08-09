@@ -615,6 +615,8 @@ Machine::Machine()
   fastFree(storage);
 }
 
+#ifndef NDEBUG
+
 void Machine::dumpCallFrame(const CodeBlock* codeBlock,
                             ScopeChainNode* scopeChain,
                             RegisterFile* registerFile,
@@ -700,6 +702,10 @@ void Machine::dumpRegisters(const CodeBlock* codeBlock,
   }
 }
 
+#endif
+
+#if !defined(NDEBUG) || HAVE(SAMPLING_TOOL)
+
 bool Machine::isOpcode(Opcode opcode) {
 #if HAVE(COMPUTED_GOTO)
   return opcode != HashTraits<Opcode>::emptyValue() &&
@@ -709,6 +715,8 @@ bool Machine::isOpcode(Opcode opcode) {
   return opcode >= 0 && opcode <= op_end;
 #endif
 }
+
+#endif
 
 NEVER_INLINE bool Machine::unwindCallFrame(ExecState* exec,
                                            JSValue* exceptionValue,

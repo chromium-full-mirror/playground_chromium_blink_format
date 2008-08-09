@@ -94,7 +94,9 @@ struct CodeBlock {
         source(source_),
         sourceOffset(sourceOffset_) {}
 
+#if !defined(NDEBUG) || ENABLE_SAMPLING_TOOL
   void dump(ExecState*) const;
+#endif
   int expressionRangeForVPC(const Instruction*,
                             int& divot,
                             int& startOffset,
@@ -137,9 +139,11 @@ struct CodeBlock {
   Vector<StringJumpTable> stringSwitchJumpTables;
 
  private:
+#if !defined(NDEBUG) || ENABLE_SAMPLING_TOOL
   void dump(ExecState*,
             const Vector<Instruction>::const_iterator& begin,
             Vector<Instruction>::const_iterator&) const;
+#endif
 };
 
 // Program code is not marked by any function, so we make the global object
