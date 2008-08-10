@@ -400,8 +400,10 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
       src.advancePastNonNewline();
       state =
           parseEntity(src, scriptCodeDest, state, m_cBufferPos, true, false);
-      scriptCodeSize = scriptCodeDest - scriptCode;
-      lastDecodedEntityPosition = scriptCodeSize;
+      if (scriptCodeDest == scriptCode + scriptCodeSize)
+        lastDecodedEntityPosition = scriptCodeSize;
+      else
+        scriptCodeSize = scriptCodeDest - scriptCode;
     } else {
       scriptCode[scriptCodeSize++] = ch;
       src.advance(m_lineNumber);
