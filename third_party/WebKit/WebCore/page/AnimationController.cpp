@@ -155,9 +155,9 @@ class ImplicitAnimation;
 class KeyframeAnimation;
 class AnimationControllerPrivate;
 
-// A CompositeAnimation represents a collection of animations that
-// are running, such as a number of properties transitioning at once.
-
+// A CompositeAnimation represents a collection of animations that are running
+// on a single RenderObject, such as a number of properties transitioning at
+// once.
 class CompositeAnimation : public Noncopyable {
  public:
   CompositeAnimation(AnimationControllerPrivate* animationController)
@@ -171,7 +171,7 @@ class CompositeAnimation : public Noncopyable {
   }
 
   RenderStyle* animate(RenderObject*,
-                       RenderStyle* currentStyle,
+                       const RenderStyle* currentStyle,
                        RenderStyle* targetStyle);
 
   void setAnimating(bool inAnimating);
@@ -204,10 +204,10 @@ class CompositeAnimation : public Noncopyable {
 
  protected:
   void updateTransitions(RenderObject* renderer,
-                         RenderStyle* currentStyle,
+                         const RenderStyle* currentStyle,
                          RenderStyle* targetStyle);
   void updateKeyframeAnimations(RenderObject* renderer,
-                                RenderStyle* currentStyle,
+                                const RenderStyle* currentStyle,
                                 RenderStyle* targetStyle);
 
   KeyframeAnimation* findKeyframeAnimation(const AtomicString& name);
@@ -406,16 +406,23 @@ class AnimationBase : public Noncopyable {
   bool m_waitingForEndEvent;
 };
 
+// An ImplicitAnimation tracks the state of a transition of a specific CSS
+// property
+// for a single RenderObject.
 class ImplicitAnimation : public AnimationBase {
  public:
   ImplicitAnimation(const Animation* transition,
+                    int animatingProperty,
                     RenderObject* renderer,
                     CompositeAnimation* compAnim)
       : AnimationBase(transition, renderer, compAnim),
-        m_property(transition->property()),
+        m_transitionProperty(transition->property()),
+        m_animatingProperty(animatingProperty),
         m_overridden(false),
         m_fromStyle(0),
-        m_toStyle(0) {}
+        m_toStyle(0) {
+    ASSERT(animatingProperty != cAnimateAll);
+  }
 
   virtual ~ImplicitAnimation() {
     ASSERT(!m_fromStyle && !m_toStyle);
@@ -432,7 +439,8 @@ class ImplicitAnimation : public AnimationBase {
       updateStateMachine(STATE_INPUT_END_ANIMATION, -1);
   }
 
-  int property() const { return m_property; }
+  int transitionProperty() const { return m_transitionProperty; }
+  int animatingProperty() const { return m_animatingProperty; }
 
   virtual void onAnimationEnd(double inElapsedTime);
 
@@ -454,7 +462,7 @@ class ImplicitAnimation : public AnimationBase {
 
   bool hasStyle() const { return m_fromStyle && m_toStyle; }
 
-  bool isTargetPropertyEqual(int prop, RenderStyle* targetStyle);
+  bool isTargetPropertyEqual(int prop, const RenderStyle* targetStyle);
 
   void blendPropertyValueInStyle(int prop, RenderStyle* currentStyle);
 
@@ -467,8 +475,11 @@ class ImplicitAnimation : public AnimationBase {
                            double inElapsedTime);
 
  private:
-  int m_property;
-  bool m_overridden;
+  int m_transitionProperty;  // Transition property as specified in the
+                             // RenderStyle. May be cAnimateAll
+  int m_animatingProperty;   // Specific property for this ImplicitAnimation
+  bool m_overridden;  // true when there is a keyframe animation that overrides
+                      // the transitioning property
 
   // The two styles that we are blending.
   RenderStyle* m_fromStyle;
@@ -484,6 +495,8 @@ void AnimationEventDispatcher::timerFired(Timer<AnimationTimerBase>*) {
                                         m_reset, m_eventType, m_elapsedTime);
 }
 
+// An KeyframeAnimation tracks the state of an explicit animation
+// for a single RenderObject.
 class KeyframeAnimation : public AnimationBase {
  public:
   KeyframeAnimation(const Animation* animation,
@@ -1426,6 +1439,7 @@ bool AnimationControllerPrivate::blendProperties(int prop,
                                                  const RenderStyle* b,
                                                  double prog) {
   if (prop == cAnimateAll) {
+    ASSERT(0);
     bool needsTimer = false;
 
     size_t n = gPropertyWrappers->size();
@@ -1590,7 +1604,7 @@ void AnimationControllerPrivate::resumeAnimations(Document* document) {
 }
 
 void CompositeAnimation::updateTransitions(RenderObject* renderer,
-                                           RenderStyle* currentStyle,
+                                           const RenderStyle* currentStyle,
                                            RenderStyle* targetStyle) {
   // If currentStyle is null, we don't do transitions
   if (!currentStyle || !targetStyle->transitions())
@@ -1612,13 +1626,18 @@ void CompositeAnimation::updateTransitions(RenderObject* renderer,
     // Handle both the 'all' and single property cases. For the single prop
     // case, we make only one pass
     // through the loop
-    for (int i = 0;; ++i) {
+    for (int propertyIndex = 0;; ++propertyIndex) {
       if (all) {
-        if (i >= AnimationControllerPrivate::getNumProperties())
+        if (propertyIndex >= AnimationControllerPrivate::getNumProperties())
           break;
         // get the next prop
-        prop = AnimationControllerPrivate::getPropertyAtIndex(i);
+        prop = AnimationControllerPrivate::getPropertyAtIndex(propertyIndex);
       }
+
+      // ImplicitAnimations are always hashed by actual properties, never
+      // cAnimateAll
+      ASSERT(prop > firstCSSProperty &&
+             prop < (firstCSSProperty + numCSSProperties));
 
       // See if there is a current transition for this prop
       ImplicitAnimation* implAnim = m_transitions.get(prop);
@@ -1627,34 +1646,21 @@ void CompositeAnimation::updateTransitions(RenderObject* renderer,
       if (implAnim) {
         // There is one, has our target changed?
         if (!implAnim->isTargetPropertyEqual(prop, targetStyle)) {
-          // It has changed - toss it and start over
-          // Opacity is special since it can pop in and out of RenderLayers. We
-          // need to compute
-          // the blended opacity value between the previous from and to styles
-          // and put that in the currentStyle, which
-          // will become the new fromStyle. This is changing a const
-          // RenderStyle, but we know what we are doing, really :-)
-          if (prop == CSSPropertyOpacity) {
-            // get the blended value of opacity into the currentStyle (which
-            // will be the new fromStyle)
-            implAnim->blendPropertyValueInStyle(CSSPropertyOpacity,
-                                                currentStyle);
-          }
-
           implAnim->reset(renderer);
           delete implAnim;
           m_transitions.remove(prop);
           equal = false;
         }
-      } else
+      } else {
         // See if we need to start a new transition
         equal = AnimationControllerPrivate::propertiesEqual(prop, currentStyle,
                                                             targetStyle);
+      }
 
       if (!equal) {
-        // AAdd the new transition
-        ImplicitAnimation* animation =
-            new ImplicitAnimation(const_cast<Animation*>(anim), renderer, this);
+        // Add the new transition
+        ImplicitAnimation* animation = new ImplicitAnimation(
+            const_cast<Animation*>(anim), prop, renderer, this);
         m_transitions.set(prop, animation);
       }
 
@@ -1665,9 +1671,10 @@ void CompositeAnimation::updateTransitions(RenderObject* renderer,
   }
 }
 
-void CompositeAnimation::updateKeyframeAnimations(RenderObject* renderer,
-                                                  RenderStyle* currentStyle,
-                                                  RenderStyle* targetStyle) {
+void CompositeAnimation::updateKeyframeAnimations(
+    RenderObject* renderer,
+    const RenderStyle* currentStyle,
+    RenderStyle* targetStyle) {
   // Nothing to do if we don't have any animations, and didn't have any before
   if (m_keyframeAnimations.isEmpty() && !targetStyle->hasAnimations())
     return;
@@ -1742,7 +1749,7 @@ KeyframeAnimation* CompositeAnimation::findKeyframeAnimation(
 }
 
 RenderStyle* CompositeAnimation::animate(RenderObject* renderer,
-                                         RenderStyle* currentStyle,
+                                         const RenderStyle* currentStyle,
                                          RenderStyle* targetStyle) {
   RenderStyle* resultStyle = 0;
 
@@ -1838,12 +1845,7 @@ void CompositeAnimation::resetTransitions(RenderObject* renderer) {
 }
 
 void CompositeAnimation::resetAnimations(RenderObject* renderer) {
-  AnimationNameMap::const_iterator kfend = m_keyframeAnimations.end();
-  for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
-       it != kfend; ++it) {
-    KeyframeAnimation* anim = it->second;
-    delete anim;
-  }
+  deleteAllValues(m_keyframeAnimations);
   m_keyframeAnimations.clear();
 }
 
@@ -1861,7 +1863,7 @@ void CompositeAnimation::cleanupFinishedAnimations(RenderObject* renderer) {
     if (!anim)
       continue;
     if (anim->postactive() && !anim->waitingForEndEvent())
-      finishedTransitions.append(anim->property());
+      finishedTransitions.append(anim->animatingProperty());
   }
 
   // Delete them
@@ -1918,7 +1920,7 @@ void CompositeAnimation::setTransitionStartTime(int property, double t) {
        it != end; ++it) {
     ImplicitAnimation* anim = it->second;
     if (anim && anim->waitingForStartTime() &&
-        (anim->property() == property || anim->property() == cAnimateAll))
+        anim->animatingProperty() == property)
       anim->updateStateMachine(AnimationBase::STATE_INPUT_START_TIME_SET, t);
   }
 }
@@ -1974,8 +1976,7 @@ void CompositeAnimation::overrideImplicitAnimations(int property) {
   for (CSSPropertyTransitionsMap::const_iterator it = m_transitions.begin();
        it != end; ++it) {
     ImplicitAnimation* anim = it->second;
-    if (anim &&
-        (anim->property() == property || anim->property() == cAnimateAll))
+    if (anim && anim->animatingProperty() == property)
       anim->setOverridden(true);
   }
 }
@@ -1985,8 +1986,7 @@ void CompositeAnimation::resumeOverriddenImplicitAnimations(int property) {
   for (CSSPropertyTransitionsMap::const_iterator it = m_transitions.begin();
        it != end; ++it) {
     ImplicitAnimation* anim = it->second;
-    if (anim &&
-        (anim->property() == property || anim->property() == cAnimateAll))
+    if (anim && anim->animatingProperty() == property)
       anim->setOverridden(false);
   }
 }
@@ -2063,12 +2063,9 @@ void ImplicitAnimation::animate(CompositeAnimation* animation,
 
   // If we get this far and the animation is done, it means we are cleaning up a
   // just finished animation.
-  // If so, send back the targetStyle (it will get tossed later)
-  if (postactive()) {
-    if (!animatedStyle)
-      animatedStyle = const_cast<RenderStyle*>(targetStyle);
+  // So just return. Everything is already all cleaned up
+  if (postactive())
     return;
-  }
 
   // Reset to start the transition if we are new
   if (isnew())
@@ -2081,18 +2078,16 @@ void ImplicitAnimation::animate(CompositeAnimation* animation,
 
   double prog = progress(1, 0);
   bool needsAnim = AnimationControllerPrivate::blendProperties(
-      m_property, animatedStyle, m_fromStyle, m_toStyle, prog);
+      m_animatingProperty, animatedStyle, m_fromStyle, m_toStyle, prog);
   if (needsAnim)
     setAnimating();
 }
 
 void ImplicitAnimation::onAnimationEnd(double inElapsedTime) {
-  // we're converting the animation into a transition here
   if (!sendTransitionEvent(EventNames::webkitTransitionEndEvent,
                            inElapsedTime)) {
-    // we didn't dispatch an event, which would call endAnimation(), so we'll
-    // just end
-    // it here.
+    // We didn't dispatch an event, which would call endAnimation(), so we'll
+    // just call it here.
     endAnimation(true);
   }
 }
@@ -2106,13 +2101,13 @@ bool ImplicitAnimation::sendTransitionEvent(const AtomicString& inEventType,
       Element* element = elementForEventDispatch();
       if (element) {
         String propertyName;
-        if (m_property == cAnimateAll)
-          propertyName = String("");
-        else
-          propertyName = String(getPropertyName((CSSPropertyID)m_property));
+        if (m_transitionProperty != cAnimateAll)
+          propertyName =
+              String(getPropertyName((CSSPropertyID)m_transitionProperty));
         m_waitingForEndEvent = true;
-        m_animationEventDispatcher.startTimer(element, propertyName, m_property,
-                                              true, inEventType, inElapsedTime);
+        m_animationEventDispatcher.startTimer(element, propertyName,
+                                              m_transitionProperty, true,
+                                              inEventType, inElapsedTime);
         return true;  // Did dispatch an event
       }
     }
@@ -2156,14 +2151,11 @@ void ImplicitAnimation::setOverridden(bool b) {
 }
 
 bool ImplicitAnimation::affectsProperty(int property) const {
-  return m_property == property ||
-         (m_property == cAnimateAll &&
-          !AnimationControllerPrivate::propertiesEqual(property, m_fromStyle,
-                                                       m_toStyle));
+  return (m_animatingProperty == property);
 }
 
 bool ImplicitAnimation::isTargetPropertyEqual(int prop,
-                                              RenderStyle* targetStyle) {
+                                              const RenderStyle* targetStyle) {
   return AnimationControllerPrivate::propertiesEqual(prop, m_toStyle,
                                                      targetStyle);
 }
@@ -2268,10 +2260,9 @@ void KeyframeAnimation::animate(CompositeAnimation* animation,
 }
 
 void KeyframeAnimation::endAnimation(bool reset) {
-  if (m_object) {
-    // restore the original (unanimated) style
+  // Restore the original (unanimated) style
+  if (m_object)
     setChanged(m_object->element());
-  }
 }
 
 void KeyframeAnimation::onAnimationStart(double inElapsedTime) {
@@ -2283,11 +2274,9 @@ void KeyframeAnimation::onAnimationIteration(double inElapsedTime) {
 }
 
 void KeyframeAnimation::onAnimationEnd(double inElapsedTime) {
-  // FIXME: set the unanimated style on the element
   if (!sendAnimationEvent(EventNames::webkitAnimationEndEvent, inElapsedTime)) {
-    // we didn't dispatch an event, which would call endAnimation(), so we'll
-    // just end
-    // it here.
+    // We didn't dispatch an event, which would call endAnimation(), so we'll
+    // just call it here.
     endAnimation(true);
   }
 }
@@ -2316,7 +2305,7 @@ bool KeyframeAnimation::sendAnimationEvent(const AtomicString& inEventType,
 }
 
 void KeyframeAnimation::overrideAnimations() {
-  // this will override implicit animations that match the properties in the
+  // This will override implicit animations that match the properties in the
   // keyframe animation
   HashSet<int>::const_iterator end = m_keyframes->endProperties();
   for (HashSet<int>::const_iterator it = m_keyframes->beginProperties();
@@ -2325,7 +2314,7 @@ void KeyframeAnimation::overrideAnimations() {
 }
 
 void KeyframeAnimation::resumeOverriddenAnimations() {
-  // this will resume overridden implicit animations
+  // This will resume overridden implicit animations
   HashSet<int>::const_iterator end = m_keyframes->endProperties();
   for (HashSet<int>::const_iterator it = m_keyframes->beginProperties();
        it != end; ++it)
