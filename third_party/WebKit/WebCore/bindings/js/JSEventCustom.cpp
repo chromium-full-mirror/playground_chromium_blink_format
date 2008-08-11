@@ -40,6 +40,8 @@
 #include "JSProgressEvent.h"
 #include "JSTextEvent.h"
 #include "JSUIEvent.h"
+#include "JSWebKitAnimationEvent.h"
+#include "JSWebKitTransitionEvent.h"
 #include "JSWheelEvent.h"
 #include "JSXMLHttpRequestProgressEvent.h"
 #include "KeyboardEvent.h"
@@ -50,6 +52,8 @@
 #include "ProgressEvent.h"
 #include "TextEvent.h"
 #include "UIEvent.h"
+#include "WebKitAnimationEvent.h"
+#include "WebKitTransitionEvent.h"
 #include "WheelEvent.h"
 #include "XMLHttpRequestProgressEvent.h"
 
@@ -124,6 +128,14 @@ JSValue* toJS(ExecState* exec, Event* event) {
     ret = new (exec) JSStorageEvent(JSStorageEventPrototype::self(exec),
                                     static_cast<StorageEvent*>(event));
 #endif
+  else if (event->isWebKitAnimationEvent())
+    ret = new (exec)
+        JSWebKitAnimationEvent(JSWebKitAnimationEventPrototype::self(exec),
+                               static_cast<WebKitAnimationEvent*>(event));
+  else if (event->isWebKitTransitionEvent())
+    ret = new (exec)
+        JSWebKitTransitionEvent(JSWebKitTransitionEventPrototype::self(exec),
+                                static_cast<WebKitTransitionEvent*>(event));
   else
     ret = new (exec) JSEvent(JSEventPrototype::self(exec), event);
 

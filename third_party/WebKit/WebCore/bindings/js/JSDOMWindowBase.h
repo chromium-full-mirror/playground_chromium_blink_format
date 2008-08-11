@@ -179,6 +179,10 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
     Onsubmit,
     Onunload,
     Onbeforeunload,
+    OnWebKitAnimationStart,
+    OnWebKitAnimationIteration,
+    OnWebKitAnimationEnd,
+    OnWebKitTransitionEnd,
 
     // Constructors
     Audio,
