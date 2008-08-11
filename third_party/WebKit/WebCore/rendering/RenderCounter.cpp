@@ -223,7 +223,7 @@ const char* RenderCounter::renderName() const {
   return "RenderCounter";
 }
 
-bool RenderCounter::isRenderCounter() const {
+bool RenderCounter::isCounter() const {
   return true;
 }
 
@@ -263,6 +263,11 @@ void RenderCounter::calcPrefWidths(int lead) {
   RenderText::calcPrefWidths(lead);
 }
 
+void RenderCounter::invalidate() {
+  m_counterNode = 0;
+  setNeedsLayoutAndPrefWidthsRecalc();
+}
+
 static void destroyCounterNodeChildren(AtomicStringImpl* identifier,
                                        CounterNode* node) {
   CounterNode* previous;
@@ -272,6 +277,7 @@ static void destroyCounterNodeChildren(AtomicStringImpl* identifier,
     child->parent()->removeChild(child);
     ASSERT(counterMaps().get(child->renderer())->get(identifier) == child);
     counterMaps().get(child->renderer())->remove(identifier);
+    child->renderer()->invalidateCounters();
     delete child;
   }
 }

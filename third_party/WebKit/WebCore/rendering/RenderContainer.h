@@ -64,6 +64,7 @@ class RenderContainer : public RenderBox {
   void updateBeforeAfterContentForContainer(RenderStyle::PseudoId,
                                             RenderContainer*);
   bool isAfterContent(RenderObject* child) const;
+  virtual void invalidateCounters();
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
