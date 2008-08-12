@@ -26,6 +26,7 @@
 #include <qwebhistory.h>
 #include <qnetworkrequest.h>
 #include <QDebug>
+#include <QMenu>
 
 // Will try to wait for the condition while allowing event processing
 #define QTRY_COMPARE(__expr, __expected)                             \
@@ -85,6 +86,7 @@ class tst_QWebPage : public QObject {
   void acceptNavigationRequestWithNewWindow();
   void userStyleSheet();
   void modified();
+  void contextMenuCrash();
 
  private:
  private:
@@ -309,6 +311,20 @@ void tst_QWebPage::modified() {
   QVERIFY(m_page->history()->canGoForward());
 
   QVERIFY(!m_page->isModified());
+}
+
+void tst_QWebPage::contextMenuCrash() {
+  QWebView view;
+  view.setHtml("<p>test");
+  view.page()->updatePositionDependentActions(QPoint(0, 0));
+  QMenu* contextMenu = 0;
+  foreach (QObject* child, view.children()) {
+    contextMenu = qobject_cast<QMenu*>(child);
+    if (contextMenu)
+      break;
+  }
+  QVERIFY(contextMenu);
+  delete contextMenu;
 }
 
 QTEST_MAIN(tst_QWebPage)

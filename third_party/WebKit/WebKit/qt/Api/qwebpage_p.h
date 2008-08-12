@@ -150,7 +150,7 @@ class QWebPagePrivate {
   QSize viewportSize;
   QWebHistory history;
   QWebHitTestResult hitTestResult;
-  QMenu* currentContextMenu;
+  QPointer<QMenu> currentContextMenu;
   QWebSettings* settings;
   QPalette palette;
   bool editable;
