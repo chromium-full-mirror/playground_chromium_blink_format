@@ -127,7 +127,7 @@ _createSubframeWithOwnerElement:(WebCore::HTMLFrameOwnerElement*)ownerElement
 
 - (void)_clearCoreFrame;
 
-- (void)_updateBackground;
+- (void)_updateBackgroundAndUpdatesWhileHidden;
 - (void)_setInternalLoadDelegate:(id)internalLoadDelegate;
 - (id)_internalLoadDelegate;
 #ifndef BUILDING_ON_TIGER

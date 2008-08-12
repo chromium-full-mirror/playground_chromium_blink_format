@@ -75,9 +75,6 @@ extern NSString* WebPreferencesRemovedNotification;
 - (void)setOfflineWebApplicationCacheEnabled:
     (BOOL)offlineWebApplicationCacheEnabled;
 
-- (BOOL)updatesWhenOffscreen;
-- (void)setUpdatesWhenOffscreen:(BOOL)updatesWhenOffscreen;
-
 - (BOOL)zoomsTextOnly;
 - (void)setZoomsTextOnly:(BOOL)zoomsTextOnly;
 
