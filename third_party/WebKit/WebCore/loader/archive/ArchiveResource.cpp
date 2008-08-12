@@ -37,7 +37,7 @@ PassRefPtr<ArchiveResource> ArchiveResource::create(
     PassRefPtr<SharedBuffer> data,
     const KURL& url,
     const ResourceResponse& response) {
-  return adoptRef(new ArchiveResource(data, url, response));
+  return data ? adoptRef(new ArchiveResource(data, url, response)) : 0;
 }
 
 PassRefPtr<ArchiveResource> ArchiveResource::create(
@@ -46,8 +46,9 @@ PassRefPtr<ArchiveResource> ArchiveResource::create(
     const String& mimeType,
     const String& textEncoding,
     const String& frameName) {
-  return adoptRef(
-      new ArchiveResource(data, url, mimeType, textEncoding, frameName));
+  return data ? adoptRef(new ArchiveResource(data, url, mimeType, textEncoding,
+                                             frameName))
+              : 0;
 }
 
 PassRefPtr<ArchiveResource> ArchiveResource::create(
@@ -57,8 +58,9 @@ PassRefPtr<ArchiveResource> ArchiveResource::create(
     const String& textEncoding,
     const String& frameName,
     const ResourceResponse& resourceResponse) {
-  return adoptRef(new ArchiveResource(data, url, mimeType, textEncoding,
-                                      frameName, resourceResponse));
+  return data ? adoptRef(new ArchiveResource(data, url, mimeType, textEncoding,
+                                             frameName, resourceResponse))
+              : 0;
 }
 
 ArchiveResource::ArchiveResource(PassRefPtr<SharedBuffer> data,

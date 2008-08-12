@@ -48,7 +48,9 @@ class SubstituteResource : public RefCounted<SubstituteResource> {
   SubstituteResource(const KURL& url,
                      const ResourceResponse& response,
                      PassRefPtr<SharedBuffer> data)
-      : m_url(url), m_response(response), m_data(data) {}
+      : m_url(url), m_response(response), m_data(data) {
+    ASSERT(m_data);
+  }
 
  private:
   KURL m_url;
