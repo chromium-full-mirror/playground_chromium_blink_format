@@ -133,6 +133,10 @@ Frame::Frame(Page* page,
     page->setMainFrame(this);
   else {
     page->incrementFrameCount();
+    // Make sure we will not end up with two frames referencing the same owner
+    // element.
+    ASSERT((!(ownerElement->m_contentFrame)) ||
+           (ownerElement->m_contentFrame->ownerElement() != ownerElement));
     ownerElement->m_contentFrame = this;
   }
 
