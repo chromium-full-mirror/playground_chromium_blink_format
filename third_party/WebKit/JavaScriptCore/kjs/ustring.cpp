@@ -67,14 +67,14 @@ static inline UChar* allocChars(size_t length) {
   ASSERT(length);
   if (length > maxUChars())
     return 0;
-  return static_cast<UChar*>(fastMalloc(sizeof(UChar) * length));
+  return static_cast<UChar*>(tryFastMalloc(sizeof(UChar) * length));
 }
 
 static inline UChar* reallocChars(UChar* buffer, size_t length) {
   ASSERT(length);
   if (length > maxUChars())
     return 0;
-  return static_cast<UChar*>(fastRealloc(buffer, sizeof(UChar) * length));
+  return static_cast<UChar*>(tryFastRealloc(buffer, sizeof(UChar) * length));
 }
 
 COMPILE_ASSERT(sizeof(UChar) == 2, uchar_is_2_bytes)

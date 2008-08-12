@@ -54,7 +54,7 @@ auto_ptr<ImageBuffer> ImageBuffer::create(const IntSize& size, bool grayScale) {
     bytesPerRow *= 4;
   }
 
-  void* imageBuffer = fastCalloc(size.height(), bytesPerRow);
+  void* imageBuffer = tryFastCalloc(size.height(), bytesPerRow);
   if (!imageBuffer)
     return auto_ptr<ImageBuffer>();
 
