@@ -108,7 +108,7 @@ class InspectorController : JavaScriptDebugListener,
   void finishedProfiling(PassRefPtr<KJS::Profile>);
 
   bool windowVisible();
-  void setWindowVisible(bool visible = true);
+  void setWindowVisible(bool visible = true, bool attached = false);
 
   void addMessageToConsole(MessageSource,
                            MessageLevel,
@@ -131,6 +131,7 @@ class InspectorController : JavaScriptDebugListener,
   void attachWindow();
   void detachWindow();
 
+  void setAttachedWindow(bool);
   void setAttachedWindowHeight(unsigned height);
 
   JSContextRef scriptContext() const { return m_scriptContext; };
