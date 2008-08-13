@@ -182,6 +182,7 @@ class InspectorController : JavaScriptDebugListener,
   const ResourcesMap& resources() const { return m_resources; }
 
   void moveWindowBy(float x, float y) const;
+  void closeWindow();
 
   void startDebuggingAndReloadInspectedPage();
   void stopDebugging();
@@ -258,7 +259,6 @@ class InspectorController : JavaScriptDebugListener,
                        unsigned lineNumber) const;
 
   void showWindow();
-  void closeWindow();
 
   virtual void didParseSource(KJS::ExecState*,
                               const KJS::SourceProvider& source,
