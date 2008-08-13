@@ -688,7 +688,11 @@ WTF::PassRefPtr<WebCore::DocumentLoader>
 FrameLoaderClientQt::createDocumentLoader(
     const WebCore::ResourceRequest& request,
     const SubstituteData& substituteData) {
-  return DocumentLoader::create(request, substituteData);
+  RefPtr<DocumentLoader> loader =
+      DocumentLoader::create(request, substituteData);
+  if (substituteData.isValid())
+    loader->setDeferMainResourceDataLoad(false);
+  return loader.release();
 }
 
 void FrameLoaderClientQt::download(WebCore::ResourceHandle* handle,
