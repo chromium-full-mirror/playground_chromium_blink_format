@@ -411,7 +411,7 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
             default:
               // catch combination AltGr+key or Ctrl+Alt+key
               if (kevent->type() != PlatformKeyboardEvent::KeyDown &&
-                  !kevent->text().isEmpty()) {
+                  kevent->altKey() && !kevent->text().isEmpty()) {
                 frame->editor()->insertText(kevent->text(), event);
                 break;
               }
