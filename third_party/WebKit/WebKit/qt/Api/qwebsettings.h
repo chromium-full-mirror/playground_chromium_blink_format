@@ -56,7 +56,8 @@ class QWEBKIT_EXPORT QWebSettings {
     JavascriptCanOpenWindows,
     JavascriptCanAccessClipboard,
     DeveloperExtrasEnabled,
-    LinksIncludedInFocusChain
+    LinksIncludedInFocusChain,
+    ZoomTextOnly
   };
   enum WebGraphic {
     MissingImageGraphic,
