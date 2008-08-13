@@ -217,6 +217,10 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual HRESULT STDMETHODCALLTYPE setIsDisconnected(
       /* [in] */ BOOL flag);
 
+  virtual HRESULT STDMETHODCALLTYPE paintDocumentRectToContext(
+      /* [in] */ RECT rect,
+      /* [in] */ OLE_HANDLE deviceContext);
+
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
       /* [retval][out] */ BOOL* result);
