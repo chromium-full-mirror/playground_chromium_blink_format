@@ -97,7 +97,6 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   Q_PROPERTY(qreal textSizeMultiplier READ textSizeMultiplier WRITE
                  setTextSizeMultiplier DESIGNABLE false)
   Q_PROPERTY(qreal zoomFactor READ zoomFactor WRITE setZoomFactor)
-  Q_PROPERTY(bool zoomTextOnly READ zoomTextOnly WRITE setZoomTextOnly)
   Q_PROPERTY(QString title READ title)
   Q_PROPERTY(QUrl url READ url WRITE setUrl)
   Q_PROPERTY(QIcon icon READ icon)
@@ -161,9 +160,6 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
   qreal zoomFactor() const;
   void setZoomFactor(qreal factor);
-
-  bool zoomTextOnly() const;
-  void setZoomTextOnly(bool textOnly);
 
   QPoint pos() const;
   QRect geometry() const;
