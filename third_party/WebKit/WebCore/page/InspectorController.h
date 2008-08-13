@@ -131,6 +131,8 @@ class InspectorController : JavaScriptDebugListener,
   void attachWindow();
   void detachWindow();
 
+  void setAttachedWindowHeight(unsigned height);
+
   JSContextRef scriptContext() const { return m_scriptContext; };
   void setScriptContext(JSContextRef context) { m_scriptContext = context; };
 

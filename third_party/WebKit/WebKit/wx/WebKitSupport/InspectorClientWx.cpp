@@ -70,6 +70,10 @@ void InspectorClientWx::detachWindow() {
   notImplemented();
 }
 
+void InspectorClientWx::setAttachedWindowHeight(unsigned height) {
+  notImplemented();
+}
+
 void InspectorClientWx::highlight(Node*) {
   notImplemented();
 }

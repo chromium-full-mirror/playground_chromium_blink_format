@@ -268,6 +268,10 @@ void WebInspectorClient::detachWindow() {
     m_highlight->update();
 }
 
+void WebInspectorClient::setAttachedWindowHeight(unsigned height) {
+  // FIXME: implement this.
+}
+
 void WebInspectorClient::highlight(Node*) {
   bool creatingHighlight = !m_highlight;
 

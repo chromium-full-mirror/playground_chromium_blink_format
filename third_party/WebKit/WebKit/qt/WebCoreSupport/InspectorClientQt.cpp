@@ -138,6 +138,10 @@ void InspectorClientQt::detachWindow() {
   notImplemented();
 }
 
+void InspectorClientQt::setAttachedWindowHeight(unsigned height) {
+  notImplemented();
+}
+
 void InspectorClientQt::highlight(Node* node) {
   notImplemented();
 }

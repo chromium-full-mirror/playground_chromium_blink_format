@@ -880,6 +880,30 @@ static JSValueRef moveByUnrestricted(JSContextRef ctx,
   return JSValueMakeUndefined(ctx);
 }
 
+static JSValueRef setAttachedWindowHeight(JSContextRef ctx,
+                                          JSObjectRef /*function*/,
+                                          JSObjectRef thisObject,
+                                          size_t argumentCount,
+                                          const JSValueRef arguments[],
+                                          JSValueRef* exception) {
+  InspectorController* controller =
+      reinterpret_cast<InspectorController*>(JSObjectGetPrivate(thisObject));
+  if (!controller)
+    return JSValueMakeUndefined(ctx);
+
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(ctx);
+
+  unsigned height =
+      static_cast<unsigned>(JSValueToNumber(ctx, arguments[0], exception));
+  if (exception && *exception)
+    return JSValueMakeUndefined(ctx);
+
+  controller->setAttachedWindowHeight(height);
+
+  return JSValueMakeUndefined(ctx);
+}
+
 static JSValueRef wrapCallback(JSContextRef ctx,
                                JSObjectRef /*function*/,
                                JSObjectRef thisObject,
@@ -1499,6 +1523,12 @@ void InspectorController::detachWindow() {
   m_client->detachWindow();
 }
 
+void InspectorController::setAttachedWindowHeight(unsigned height) {
+  if (!enabled())
+    return;
+  m_client->setAttachedWindowHeight(height);
+}
+
 void InspectorController::inspectedWindowScriptObjectCleared(Frame* frame) {
   if (!enabled() || !m_scriptContext || !m_scriptObject)
     return;
@@ -1543,6 +1573,8 @@ void InspectorController::windowScriptObjectAvailable() {
     {"localizedStringsURL", localizedStrings, kJSPropertyAttributeNone},
     {"platform", platform, kJSPropertyAttributeNone},
     {"moveByUnrestricted", moveByUnrestricted, kJSPropertyAttributeNone},
+    {"setAttachedWindowHeight", WebCore::setAttachedWindowHeight,
+     kJSPropertyAttributeNone},
     {"wrapCallback", wrapCallback, kJSPropertyAttributeNone},
     {"startDebuggingAndReloadInspectedPage",
      WebCore::startDebuggingAndReloadInspectedPage, kJSPropertyAttributeNone},
