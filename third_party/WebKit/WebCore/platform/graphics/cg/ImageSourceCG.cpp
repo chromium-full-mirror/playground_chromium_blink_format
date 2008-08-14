@@ -110,10 +110,10 @@ bool ImageSource::isSizeAvailable() {
   return result;
 }
 
-IntSize ImageSource::size() const {
+IntSize ImageSource::frameSizeAtIndex(size_t index) const {
   IntSize result;
-  CFDictionaryRef properties =
-      CGImageSourceCopyPropertiesAtIndex(m_decoder, 0, imageSourceOptions());
+  CFDictionaryRef properties = CGImageSourceCopyPropertiesAtIndex(
+      m_decoder, index, imageSourceOptions());
   if (properties) {
     int w = 0, h = 0;
     CFNumberRef num = (CFNumberRef)CFDictionaryGetValue(
@@ -128,6 +128,10 @@ IntSize ImageSource::size() const {
     CFRelease(properties);
   }
   return result;
+}
+
+IntSize ImageSource::size() const {
+  return frameSizeAtIndex(0);
 }
 
 int ImageSource::repetitionCount() {

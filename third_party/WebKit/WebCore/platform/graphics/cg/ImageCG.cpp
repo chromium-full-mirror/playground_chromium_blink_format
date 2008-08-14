@@ -153,7 +153,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
   // inflated destination rect that will hold the entire image
   // and then set a clip to the portion that we want to display.
   FloatRect adjustedDestRect = destRect;
-  FloatSize selfSize = size();
+  FloatSize selfSize = currentFrameSize();
   if (srcRect.size() != selfSize) {
     CGInterpolationQuality interpolationQuality =
         CGContextGetInterpolationQuality(context);
@@ -182,7 +182,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
           FloatPoint(destRect.x() - srcRect.x() / xScale,
                      destRect.y() - srcRect.y() / yScale));
       adjustedDestRect.setSize(
-          FloatSize(size().width() / xScale, size().height() / yScale));
+          FloatSize(selfSize.width() / xScale, selfSize.height() / yScale));
 
       CGContextClipToRect(context, destRect);
     }
