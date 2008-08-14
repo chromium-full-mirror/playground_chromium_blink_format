@@ -1194,6 +1194,11 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
   if (ec)
     return 0;
 
+  if (!image->complete()) {
+    ec = INVALID_STATE_ERR;
+    return 0;
+  }
+
   CachedImage* cachedImage = image->cachedImage();
   if (!cachedImage || !image->cachedImage()->image())
     return CanvasPattern::create(Image::nullImage(), repeatX, repeatY, true);
