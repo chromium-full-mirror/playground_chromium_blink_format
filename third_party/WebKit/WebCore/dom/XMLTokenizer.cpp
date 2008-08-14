@@ -42,6 +42,7 @@
 #include "HTMLStyleElement.h"
 #include "HTMLTokenizer.h"
 #include "ScriptController.h"
+#include "ScriptElement.h"
 #include "ProcessingInstruction.h"
 #include "ResourceError.h"
 #include "ResourceHandle.h"
@@ -65,8 +66,8 @@
 
 #if ENABLE(SVG)
 #include "SVGNames.h"
+#include "SVGScriptElement.h"
 #include "SVGStyleElement.h"
-#include "XLinkNames.h"
 #endif
 
 using namespace std;
@@ -74,7 +75,6 @@ using namespace std;
 namespace WebCore {
 
 using namespace EventNames;
-using namespace HTMLNames;
 
 const int maxErrors = 25;
 
@@ -517,6 +517,29 @@ QString EntityResolver::resolveUndeclaredEntity(const QString& name) {
 
 // --------------------------------
 
+inline bool isScriptElement(Element* element) {
+  return element->hasTagName(HTMLNames::scriptTag)
+#if ENABLE(SVG)
+         || element->hasTagName(SVGNames::scriptTag)
+#endif
+      ;
+}
+
+inline ScriptElement* castToScriptElement(Element* element) {
+  ASSERT(isScriptElement(element));
+
+  if (element->hasTagName(HTMLNames::scriptTag))
+    return static_cast<HTMLScriptElement*>(element);
+
+#if ENABLE(SVG)
+  if (element->hasTagName(SVGNames::scriptTag))
+    return static_cast<SVGScriptElement*>(element);
+#endif
+
+  ASSERT_NOT_REACHED();
+  return 0;
+}
+
 XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
     : m_doc(_doc),
       m_view(_view)
@@ -807,6 +830,23 @@ static inline void handleElementAttributes(Element* newElement,
   }
 }
 
+static void eventuallyMarkAsParserCreated(Element* element) {
+  if (element->hasTagName(HTMLNames::scriptTag))
+    static_cast<HTMLScriptElement*>(element)->setCreatedByParser(true);
+#if ENABLE(SVG)
+  else if (element->hasTagName(SVGNames::scriptTag))
+    static_cast<SVGScriptElement*>(element)->setCreatedByParser(true);
+#endif
+  else if (element->hasTagName(HTMLNames::styleTag))
+    static_cast<HTMLStyleElement*>(element)->setCreatedByParser(true);
+#if ENABLE(SVG)
+  else if (element->hasTagName(SVGNames::styleTag))
+    static_cast<SVGStyleElement*>(element)->setCreatedByParser(true);
+#endif
+  else if (element->hasTagName(HTMLNames::linkTag))
+    static_cast<HTMLLinkElement*>(element)->setCreatedByParser(true);
+}
+
 void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
                                   const xmlChar* xmlPrefix,
                                   const xmlChar* xmlURI,
@@ -870,23 +910,9 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
     jsProxy->setEventHandlerLineno(0);
 
   newElement->beginParsingChildren();
+  eventuallyMarkAsParserCreated(newElement.get());
 
-  if (newElement->hasTagName(scriptTag))
-    static_cast<HTMLScriptElement*>(newElement.get())->setCreatedByParser(true);
-  else if (newElement->hasTagName(HTMLNames::styleTag))
-    static_cast<HTMLStyleElement*>(newElement.get())->setCreatedByParser(true);
-#if ENABLE(SVG)
-  else if (newElement->hasTagName(SVGNames::styleTag))
-    static_cast<SVGStyleElement*>(newElement.get())->setCreatedByParser(true);
-#endif
-  else if (newElement->hasTagName(HTMLNames::linkTag))
-    static_cast<HTMLLinkElement*>(newElement.get())->setCreatedByParser(true);
-
-  if (newElement->hasTagName(HTMLNames::scriptTag)
-#if ENABLE(SVG)
-      || newElement->hasTagName(SVGNames::scriptTag)
-#endif
-          )
+  if (isScriptElement(newElement.get()))
     m_scriptStartLine = lineNumber();
 
   if (!m_currentNode->addChild(newElement.get())) {
@@ -916,32 +942,20 @@ void XMLTokenizer::endElementNs() {
 
   // don't load external scripts for standalone documents (for now)
   if (n->isElementNode() && m_view &&
-      (static_cast<Element*>(n)->hasTagName(scriptTag)
-#if ENABLE(SVG)
-       || static_cast<Element*>(n)->hasTagName(SVGNames::scriptTag)
-#endif
-           )) {
-
+      isScriptElement(static_cast<Element*>(n))) {
     ASSERT(!m_pendingScript);
-
     m_requestingScript = true;
 
-    Element* scriptElement = static_cast<Element*>(n);
-    String scriptHref;
+    Element* element = static_cast<Element*>(n);
+    ScriptElement* scriptElement = castToScriptElement(element);
 
-    if (static_cast<Element*>(n)->hasTagName(scriptTag))
-      scriptHref = scriptElement->getAttribute(srcAttr);
-#if ENABLE(SVG)
-    else if (static_cast<Element*>(n)->hasTagName(SVGNames::scriptTag))
-      scriptHref = scriptElement->getAttribute(XLinkNames::hrefAttr);
-#endif
-
+    String scriptHref = scriptElement->sourceAttributeValue();
     if (!scriptHref.isEmpty()) {
       // we have a src attribute
-      const AtomicString& charset = scriptElement->getAttribute(charsetAttr);
+      String scriptCharset = scriptElement->charsetAttributeValue();
       if ((m_pendingScript =
-               m_doc->docLoader()->requestScript(scriptHref, charset))) {
-        m_scriptElement = scriptElement;
+               m_doc->docLoader()->requestScript(scriptHref, scriptCharset))) {
+        m_scriptElement = element;
         m_pendingScript->addClient(this);
 
         // m_pendingScript will be 0 if script was already loaded and ref()
@@ -952,13 +966,7 @@ void XMLTokenizer::endElementNs() {
         m_scriptElement = 0;
 
     } else {
-      String scriptCode = "";
-      for (Node* child = scriptElement->firstChild(); child;
-           child = child->nextSibling()) {
-        if (child->isTextNode() ||
-            child->nodeType() == Node::CDATA_SECTION_NODE)
-          scriptCode += static_cast<CharacterData*>(child)->data();
-      }
+      String scriptCode = scriptElement->scriptContent();
       m_view->frame()->loader()->executeScript(m_doc->url().string(),
                                                m_scriptStartLine, scriptCode);
     }
@@ -1456,23 +1464,26 @@ static inline RefPtr<Element> createXHTMLParserErrorHeader(
     const String& errorMessages) {
   ExceptionCode ec = 0;
   RefPtr<Element> reportElement =
-      doc->createElementNS(xhtmlNamespaceURI, "parsererror", ec);
-  reportElement->setAttribute(styleAttr,
+      doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "parsererror", ec);
+  reportElement->setAttribute(HTMLNames::styleAttr,
                               "display: block; white-space: pre; border: 2px "
                               "solid #c77; padding: 0 1em 0 1em; margin: 1em; "
                               "background-color: #fdd; color: black");
 
-  RefPtr<Element> h3 = doc->createElementNS(xhtmlNamespaceURI, "h3", ec);
+  RefPtr<Element> h3 =
+      doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "h3", ec);
   reportElement->appendChild(h3.get(), ec);
   h3->appendChild(
       doc->createTextNode("This page contains the following errors:"), ec);
 
-  RefPtr<Element> fixed = doc->createElementNS(xhtmlNamespaceURI, "div", ec);
+  RefPtr<Element> fixed =
+      doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "div", ec);
   reportElement->appendChild(fixed.get(), ec);
-  fixed->setAttribute(styleAttr, "font-family:monospace;font-size:12px");
+  fixed->setAttribute(HTMLNames::styleAttr,
+                      "font-family:monospace;font-size:12px");
   fixed->appendChild(doc->createTextNode(errorMessages), ec);
 
-  h3 = doc->createElementNS(xhtmlNamespaceURI, "h3", ec);
+  h3 = doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "h3", ec);
   reportElement->appendChild(h3.get(), ec);
   h3->appendChild(
       doc->createTextNode(
@@ -1499,9 +1510,10 @@ void XMLTokenizer::insertErrorMessageBlock() {
   Node* documentElement = doc->documentElement();
   if (!documentElement) {
     RefPtr<Node> rootElement =
-        doc->createElementNS(xhtmlNamespaceURI, "html", ec);
+        doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "html", ec);
     doc->appendChild(rootElement, ec);
-    RefPtr<Node> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
+    RefPtr<Node> body =
+        doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "body", ec);
     rootElement->appendChild(body, ec);
     documentElement = body.get();
   }
@@ -1511,8 +1523,9 @@ void XMLTokenizer::insertErrorMessageBlock() {
     // wrap the erroneous SVG document in an xhtml document and render
     // the combined document with error messages.
     RefPtr<Node> rootElement =
-        doc->createElementNS(xhtmlNamespaceURI, "html", ec);
-    RefPtr<Node> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
+        doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "html", ec);
+    RefPtr<Node> body =
+        doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "body", ec);
     rootElement->appendChild(body, ec);
     body->appendChild(documentElement, ec);
     doc->appendChild(rootElement.get(), ec);
@@ -1526,9 +1539,10 @@ void XMLTokenizer::insertErrorMessageBlock() {
                                 ec);
 #if ENABLE(XSLT)
   if (doc->transformSourceDocument()) {
-    RefPtr<Element> par = doc->createElementNS(xhtmlNamespaceURI, "p", ec);
+    RefPtr<Element> par =
+        doc->createElementNS(HTMLNames::xhtmlNamespaceURI, "p", ec);
     reportElement->appendChild(par, ec);
-    par->setAttribute(styleAttr, "white-space: normal");
+    par->setAttribute(HTMLNames::styleAttr, "white-space: normal");
     par->appendChild(
         doc->createTextNode("This document was created as the result of an XSL "
                             "transformation. The line and column numbers given "
@@ -1954,14 +1968,9 @@ void XMLTokenizer::parseStartElement() {
     return;
   }
 
-  if (newElement->hasTagName(scriptTag))
-    static_cast<HTMLScriptElement*>(newElement.get())->setCreatedByParser(true);
+  eventuallyMarkAsParserCreated(newElement.get());
 
-  if (newElement->hasTagName(HTMLNames::scriptTag)
-#if ENABLE(SVG)
-      || newElement->hasTagName(SVGNames::scriptTag)
-#endif
-          )
+  if (isScriptElement(newElement.get()))
     m_scriptStartLine = lineNumber();
 
   if (!m_currentNode->addChild(newElement.get())) {
@@ -1978,41 +1987,25 @@ void XMLTokenizer::parseEndElement() {
   exitText();
 
   Node* n = m_currentNode;
-
-  // skip end of dummy element
-  //     if (m_parsingFragment & n->nodeType() == Node::DOCUMENT_FRAGMENT_NODE)
-  //         return;
-
   RefPtr<Node> parent = n->parentNode();
   n->finishParsingChildren();
 
   // don't load external scripts for standalone documents (for now)
   if (n->isElementNode() && m_view &&
-      (static_cast<Element*>(n)->hasTagName(scriptTag)
-#if ENABLE(SVG)
-       || static_cast<Element*>(n)->hasTagName(SVGNames::scriptTag)
-#endif
-           )) {
-
+      isScriptElement(static_cast<Element*>(n))) {
     ASSERT(!m_pendingScript);
-
     m_requestingScript = true;
 
-    Element* scriptElement = static_cast<Element*>(n);
-    String scriptHref;
+    Element* element = static_cast<Element*>(n);
+    ScriptElement* scriptElement = castToScriptElement(element);
 
-    if (static_cast<Element*>(n)->hasTagName(scriptTag))
-      scriptHref = scriptElement->getAttribute(srcAttr);
-#if ENABLE(SVG)
-    else if (static_cast<Element*>(n)->hasTagName(SVGNames::scriptTag))
-      scriptHref = scriptElement->getAttribute(XLinkNames::hrefAttr);
-#endif
+    String scriptHref = scriptElement->sourceAttributeValue();
     if (!scriptHref.isEmpty()) {
       // we have a src attribute
-      const AtomicString& charset = scriptElement->getAttribute(charsetAttr);
+      String scriptCharset = scriptElement->charsetAttributeValue();
       if ((m_pendingScript =
-               m_doc->docLoader()->requestScript(scriptHref, charset))) {
-        m_scriptElement = scriptElement;
+               m_doc->docLoader()->requestScript(scriptHref, scriptCharset))) {
+        m_scriptElement = element;
         m_pendingScript->addClient(this);
 
         // m_pendingScript will be 0 if script was already loaded and ref()
@@ -2023,16 +2016,11 @@ void XMLTokenizer::parseEndElement() {
         m_scriptElement = 0;
 
     } else {
-      String scriptCode = "";
-      for (Node* child = scriptElement->firstChild(); child;
-           child = child->nextSibling()) {
-        if (child->isTextNode() ||
-            child->nodeType() == Node::CDATA_SECTION_NODE)
-          scriptCode += static_cast<CharacterData*>(child)->data();
-      }
+      String scriptCode = scriptElement->scriptContent();
       m_view->frame()->loader()->executeScript(m_doc->url().string(),
                                                m_scriptStartLine, scriptCode);
     }
+
     m_requestingScript = false;
   }
 

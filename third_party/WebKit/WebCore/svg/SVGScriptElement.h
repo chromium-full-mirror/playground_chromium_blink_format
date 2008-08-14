@@ -24,6 +24,7 @@
 #define SVGScriptElement_h
 
 #if ENABLE(SVG)
+#include "ScriptElement.h"
 #include "SVGElement.h"
 #include "SVGURIReference.h"
 #include "SVGExternalResourcesRequired.h"
@@ -32,10 +33,14 @@ namespace WebCore {
 
 class SVGScriptElement : public SVGElement,
                          public SVGURIReference,
-                         public SVGExternalResourcesRequired {
+                         public SVGExternalResourcesRequired,
+                         public ScriptElement {
  public:
   SVGScriptElement(const QualifiedName&, Document*);
   virtual ~SVGScriptElement();
+
+  void setCreatedByParser(bool) {}
+  virtual String scriptContent() const;
 
   String type() const;
   void setType(const String&);
@@ -46,7 +51,16 @@ class SVGScriptElement : public SVGElement,
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
+  virtual String sourceAttributeValue() const;
+  virtual String charsetAttributeValue() const;
+  virtual String typeAttributeValue() const;
+  virtual String languageAttributeValue() const;
+
+  virtual void dispatchLoadEvent();
+  virtual void dispatchErrorEvent();
+
  private:
+  ScriptElementData m_data;
   String m_type;
 };
 

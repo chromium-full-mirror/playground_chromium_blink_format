@@ -31,7 +31,8 @@ namespace WebCore {
 SVGScriptElement::SVGScriptElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc),
       SVGURIReference(),
-      SVGExternalResourcesRequired() {}
+      SVGExternalResourcesRequired(),
+      m_data(this, this) {}
 
 SVGScriptElement::~SVGScriptElement() {}
 
@@ -41,6 +42,10 @@ String SVGScriptElement::type() const {
 
 void SVGScriptElement::setType(const String& type) {
   m_type = type;
+}
+
+String SVGScriptElement::scriptContent() const {
+  return m_data.scriptContent();
 }
 
 void SVGScriptElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -59,6 +64,32 @@ void SVGScriptElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGScriptElement::getSubresourceAttributeStrings(
     Vector<String>& urls) const {
   urls.append(href());
+}
+
+String SVGScriptElement::sourceAttributeValue() const {
+  return href();
+}
+
+String SVGScriptElement::charsetAttributeValue() const {
+  return String();
+}
+
+String SVGScriptElement::typeAttributeValue() const {
+  return type();
+}
+
+String SVGScriptElement::languageAttributeValue() const {
+  return String();
+}
+
+void SVGScriptElement::dispatchLoadEvent() {
+  // TODO!
+  // dispatchSVGEvent(loadEvent, false, false);
+}
+
+void SVGScriptElement::dispatchErrorEvent() {
+  // TODO!
+  // dispatchSVGEvent(errorEvent, true, false);
 }
 }
 
