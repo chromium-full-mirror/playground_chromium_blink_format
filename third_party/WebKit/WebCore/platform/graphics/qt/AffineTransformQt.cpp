@@ -41,7 +41,8 @@ AffineTransform::AffineTransform(double a,
                                  double ty)
     : m_transform(a, b, c, d, tx, ty) {}
 
-AffineTransform::AffineTransform(const QMatrix& matrix) : m_transform(matrix) {}
+AffineTransform::AffineTransform(const PlatformAffineTransform& matrix)
+    : m_transform(matrix) {}
 
 void AffineTransform::setMatrix(double a,
                                 double b,

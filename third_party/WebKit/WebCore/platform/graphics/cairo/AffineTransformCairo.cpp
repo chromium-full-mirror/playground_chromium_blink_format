@@ -47,7 +47,7 @@ AffineTransform::AffineTransform(double a,
   cairo_matrix_init(&m_transform, a, b, c, d, tx, ty);
 }
 
-AffineTransform::AffineTransform(const cairo_matrix_t& matrix) {
+AffineTransform::AffineTransform(const PlatformAffineTransform& matrix) {
   m_transform = matrix;
 }
 
