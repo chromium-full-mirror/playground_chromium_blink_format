@@ -428,6 +428,9 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   int scriptStartLineno;
   int tagStartLineno;
 
+  double m_tokenizerTimeDelay;
+  int m_tokenizerChunkSize;
+
   // The timer for continued processing.
   Timer<HTMLTokenizer> m_timer;
 
