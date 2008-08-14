@@ -44,7 +44,8 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
   static PassRefPtr<ProfileGenerator> create(const UString& title,
                                              ExecState* originatingGlobalExec,
                                              unsigned profileGroup,
-                                             ProfilerClient*);
+                                             ProfilerClient*,
+                                             unsigned uid);
 
   // Members
   const UString& title() const;
@@ -69,7 +70,8 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
   ProfileGenerator(const UString& title,
                    ExecState* originatingGlobalExec,
                    unsigned profileGroup,
-                   ProfilerClient*);
+                   ProfilerClient*,
+                   unsigned uid);
 
   void removeProfileStart();
   void removeProfileEnd();
