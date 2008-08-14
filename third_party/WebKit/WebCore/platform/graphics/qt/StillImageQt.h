@@ -34,7 +34,14 @@ namespace WebCore {
 
 class StillImage : public Image {
  public:
-  StillImage(const QPixmap& pixmap);
+  static create(const QPixmap& pixmap) {
+    return adoptRef(new StillImage(pixmap));
+  }
+
+  // FIXME: StillImages are underreporting decoded sizes and will be unable
+  // to prune because these functions are not implemented yet.
+  virtual void destroyDecodedData(bool incremental = false) {}
+  virtual unsigned decodedSize() const { return 0; }
 
   virtual IntSize size() const;
   virtual QPixmap* getPixmap() const;
@@ -44,6 +51,8 @@ class StillImage : public Image {
                     CompositeOperator);
 
  private:
+  StillImage(const QPixmap& pixmap);
+
   QPixmap m_pixmap;
 };
 }
