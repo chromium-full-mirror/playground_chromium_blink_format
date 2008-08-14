@@ -132,6 +132,10 @@ IntSize ImageSource::size() const {
   return m_decoder->size();
 }
 
+IntSize ImageSource::frameSizeAtIndex(size_t) const {
+  return size();
+}
+
 int ImageSource::repetitionCount() {
   if (!m_decoder)
     return cAnimationNone;
