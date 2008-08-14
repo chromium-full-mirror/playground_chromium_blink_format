@@ -81,8 +81,8 @@ void FrameData::clear() {
 // Image Class
 // ================================================
 
-Image* Image::loadPlatformResource(const char* name) {
-  return new StillImage(loadResourcePixmap(name));
+PassRefPtr<Image> Image::loadPlatformResource(const char* name) {
+  return StillImage::create(loadResourcePixmap(name));
 }
 
 void Image::drawPattern(GraphicsContext* ctxt,
