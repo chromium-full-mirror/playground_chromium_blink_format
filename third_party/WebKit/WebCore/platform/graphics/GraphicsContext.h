@@ -346,7 +346,6 @@ class GraphicsContext : Noncopyable {
   void setGdkExposeEvent(GdkEventExpose*);
   GdkDrawable* gdkDrawable() const;
   GdkEventExpose* gdkExposeEvent() const;
-  IntPoint translatePoint(const IntPoint&) const;
 #endif
 
  private:
