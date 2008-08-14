@@ -59,12 +59,13 @@ void applyStrokeStyleToContext(GraphicsContext* context,
   context->setLineJoin(style->svgStyle()->joinStyle());
   context->setMiterLimit(style->svgStyle()->strokeMiterLimit());
 
+  // FIXME: DashArray support could easily be moved into GraphicsContext, and
+  // this function then made x-platform
   const DashArray& dashes = dashArrayFromRenderingStyle(style);
-  double dashOffset = SVGRenderStyle::cssPrimitiveToLength(
+  float dashOffset = SVGRenderStyle::cssPrimitiveToLength(
       object, style->svgStyle()->strokeDashOffset(), 0.0f);
 
-  CGContextSetLineDash(context->platformContext(),
-                       narrowPrecisionToCGFloat(dashOffset), dashes.data(),
+  CGContextSetLineDash(context->platformContext(), dashOffset, dashes.data(),
                        dashes.size());
 }
 
@@ -92,7 +93,7 @@ FloatRect strokeBoundingBox(const Path& path,
   // to make an alternative call...
 
   // FIXME: since this is mainly used to decide what to repaint,
-  // perhaps it would be sufficien to just outset the fill bbox by
+  // perhaps it would be sufficient to just outset the fill bbox by
   // the stroke width - that should be way cheaper and simpler than
   // what we do here.
 
