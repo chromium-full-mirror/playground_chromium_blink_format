@@ -56,4 +56,9 @@ String ImageBuffer::toDataURL(const String&) const {
   return String();
 }
 
+Image* ImageBuffer::image() const {
+  notImplemented();
+  return 0;
+}
+
 }  // namespace WebCore
