@@ -69,10 +69,8 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
   CanvasGradient* canvasGradient() const { return m_gradient.get(); }
   CanvasPattern* pattern() const { return m_pattern.get(); }
 
-// These do nothing for gradients or patterns.
-#if !PLATFORM(CAIRO)
+  // These do nothing for gradients or patterns.
   void applyFillColor(GraphicsContext*);
-#endif
   void applyStrokeColor(GraphicsContext*);
 
  private:
