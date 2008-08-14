@@ -33,6 +33,7 @@
 #include "ImageBuffer.h"
 #include "KURL.h"
 #include "Path.h"
+#include "Pattern.h"
 #include <CoreGraphics/CGBitmapContext.h>
 #include <CoreGraphics/CGPDFContext.h>
 #include <wtf/MathExtras.h>
@@ -506,7 +507,7 @@ void GraphicsContext::clipToImageBuffer(const FloatRect& rect,
   CGContextTranslateCTM(platformContext(), rect.x(), rect.y() + rect.height());
   CGContextScaleCTM(platformContext(), 1, -1);
   CGContextClipToMask(platformContext(), FloatRect(FloatPoint(), rect.size()),
-                      imageBuffer->cgImage());
+                      imageBuffer->image()->getCGImageRef());
   CGContextScaleCTM(platformContext(), 1, -1);
   CGContextTranslateCTM(platformContext(), -rect.x(),
                         -rect.y() - rect.height());
@@ -909,6 +910,34 @@ void GraphicsContext::setPlatformTextDrawingMode(int mode) {
     default:
       break;
   }
+}
+
+void GraphicsContext::applyStrokePattern(const Pattern& pattern) {
+  CGPatternRef platformPattern = pattern.createPlatformPattern(getCTM());
+  if (!platformPattern)
+    return;
+
+  CGColorSpaceRef patternSpace = CGColorSpaceCreatePattern(0);
+  CGContextSetStrokeColorSpace(platformContext(), patternSpace);
+  CGColorSpaceRelease(patternSpace);
+
+  const CGFloat patternAlpha = 1;
+  CGContextSetStrokePattern(platformContext(), platformPattern, &patternAlpha);
+  CGPatternRelease(platformPattern);
+}
+
+void GraphicsContext::applyFillPattern(const Pattern& pattern) {
+  CGPatternRef platformPattern = pattern.createPlatformPattern(getCTM());
+  if (!platformPattern)
+    return;
+
+  CGColorSpaceRef patternSpace = CGColorSpaceCreatePattern(0);
+  CGContextSetFillColorSpace(platformContext(), patternSpace);
+  CGColorSpaceRelease(patternSpace);
+
+  const CGFloat patternAlpha = 1;
+  CGContextSetFillPattern(platformContext(), platformPattern, &patternAlpha);
+  CGPatternRelease(platformPattern);
 }
 
 void GraphicsContext::setPlatformStrokeColor(const Color& color) {

@@ -93,6 +93,7 @@ class GraphicsContextPlatformPrivate;
 class ImageBuffer;
 class KURL;
 class Path;
+class Pattern;
 class TextRun;
 
 // These bits can be ORed together for a total of 8 possible text drawing modes.
@@ -129,6 +130,9 @@ class GraphicsContext : Noncopyable {
 
   Color fillColor() const;
   void setFillColor(const Color&);
+
+  void applyStrokePattern(const Pattern&);
+  void applyFillPattern(const Pattern&);
 
   void save();
   void restore();
