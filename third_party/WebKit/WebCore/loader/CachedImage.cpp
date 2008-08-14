@@ -47,21 +47,17 @@ using std::max;
 namespace WebCore {
 
 CachedImage::CachedImage(const String& url)
-    : CachedResource(url, ImageResource) {
-  m_image = 0;
+    : CachedResource(url, ImageResource), m_image(0) {
   m_status = Unknown;
 }
 
 CachedImage::CachedImage(Image* image)
-    : CachedResource(String(), ImageResource) {
-  m_image = image;
+    : CachedResource(String(), ImageResource), m_image(image) {
   m_status = Cached;
   m_loading = false;
 }
 
-CachedImage::~CachedImage() {
-  delete m_image;
-}
+CachedImage::~CachedImage() {}
 
 void CachedImage::load(DocLoader* docLoader) {
   if (!docLoader || docLoader->autoLoadImages())
@@ -86,15 +82,15 @@ void CachedImage::allReferencesRemoved() {
 }
 
 static Image* brokenImage() {
-  static Image* brokenImage;
+  static RefPtr<Image> brokenImage;
   if (!brokenImage)
     brokenImage = Image::loadPlatformResource("missingImage");
-  return brokenImage;
+  return brokenImage.get();
 }
 
 static Image* nullImage() {
-  static BitmapImage nullImage;
-  return &nullImage;
+  static RefPtr<BitmapImage> nullImage = BitmapImage::create();
+  return nullImage.get();
 }
 
 Image* CachedImage::image() const {
@@ -102,7 +98,7 @@ Image* CachedImage::image() const {
     return brokenImage();
 
   if (m_image)
-    return m_image;
+    return m_image.get();
 
   return nullImage();
 }
@@ -188,7 +184,6 @@ void CachedImage::notifyObservers() {
 
 void CachedImage::clear() {
   destroyDecodedData();
-  delete m_image;
   m_image = 0;
   setEncodedSize(0);
 }
@@ -199,17 +194,17 @@ inline void CachedImage::createImage() {
     return;
 #if PLATFORM(CG)
   if (m_response.mimeType() == "application/pdf") {
-    m_image = new PDFDocumentImage;
+    m_image = PDFDocumentImage::create();
     return;
   }
 #endif
 #if ENABLE(SVG_AS_IMAGE)
   if (m_response.mimeType() == "image/svg+xml") {
-    m_image = new SVGImage(this);
+    m_image = SVGImage::create(this);
     return;
   }
 #endif
-  m_image = new BitmapImage(this);
+  m_image = BitmapImage::create(this);
 }
 
 void CachedImage::data(PassRefPtr<SharedBuffer> data, bool allDataReceived) {

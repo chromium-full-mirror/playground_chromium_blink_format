@@ -1536,12 +1536,12 @@ void RenderLayer::paintOverflowControls(GraphicsContext* p,
       return;
 
     // Paint the resizer control.
-    static Image* resizeCornerImage;
+    static RefPtr<Image> resizeCornerImage;
     if (!resizeCornerImage)
       resizeCornerImage = Image::loadPlatformResource("textAreaResizeCorner");
     IntPoint imagePoint(scrollCorner.right() - resizeCornerImage->width(),
                         scrollCorner.bottom() - resizeCornerImage->height());
-    p->drawImage(resizeCornerImage, imagePoint);
+    p->drawImage(resizeCornerImage.get(), imagePoint);
 
     // Draw a frame around the resizer (1px grey line) if there are any
     // scrollbars present.

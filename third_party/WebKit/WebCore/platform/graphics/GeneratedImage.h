@@ -49,6 +49,10 @@ class GeneratedImage : public Image {
 
   virtual IntSize size() const { return m_size; }
 
+  // Assume that generated content has no decoded data we need to worry about
+  virtual void destroyDecodedData(bool incremental = false) {}
+  virtual unsigned decodedSize() const { return 0; }
+
  protected:
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,

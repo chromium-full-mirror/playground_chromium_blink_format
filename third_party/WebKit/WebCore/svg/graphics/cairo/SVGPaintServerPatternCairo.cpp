@@ -24,9 +24,11 @@
 #include "SVGPaintServerPattern.h"
 
 #include "GraphicsContext.h"
+#include "Image.h"
 #include "ImageBuffer.h"
 #include "RenderObject.h"
 #include "SVGPatternElement.h"
+
 #include <wtf/OwnArrayPtr.h>
 
 namespace WebCore {
@@ -73,7 +75,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
 
   m_ownerElement->buildPattern(targetRect);
 
-  cairo_surface_t* image = tile()->surface();
+  cairo_surface_t* image = tile()->image()->nativeImageForCurrentFrame();
   if (!image)
     return false;
 

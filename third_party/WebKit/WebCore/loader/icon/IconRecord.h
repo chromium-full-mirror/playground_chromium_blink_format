@@ -93,7 +93,7 @@ class IconRecord : public RefCounted<IconRecord> {
 
   String m_iconURL;
   time_t m_stamp;
-  OwnPtr<Image> m_image;
+  RefPtr<Image> m_image;
 
   HashSet<String> m_retainingPageURLs;
 

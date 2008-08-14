@@ -96,7 +96,7 @@ class CachedImage : public CachedResource, public ImageObserver {
   void createImage();
   void notifyObservers();
 
-  Image* m_image;
+  RefPtr<Image> m_image;
 };
 }
 

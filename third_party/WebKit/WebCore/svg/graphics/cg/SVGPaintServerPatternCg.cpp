@@ -39,7 +39,7 @@ static void patternCallback(void* info, CGContextRef context) {
   CGContextScaleCTM(context, 1.0f, -1.0f);
   CGContextDrawImage(context,
                      CGRect(FloatRect(FloatPoint(), patternImage->size())),
-                     patternImage->cgImage());
+                     patternImage->image()->getCGImageRef());
   CGContextRestoreGState(context);
 }
 
