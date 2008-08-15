@@ -177,7 +177,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   QWidget* view() const;
 
   bool isModified() const;
+#ifndef QT_NO_UNDOSTACK
   QUndoStack* undoStack() const;
+#endif
 
 #if QT_VERSION < 0x040400 && !defined(qdoc)
   void setNetworkInterface(QWebNetworkInterface* interface);

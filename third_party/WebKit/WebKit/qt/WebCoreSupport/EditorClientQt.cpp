@@ -236,6 +236,7 @@ bool EditorClientQt::isEditable() {
 
 void EditorClientQt::registerCommandForUndo(
     WTF::PassRefPtr<WebCore::EditCommand> cmd) {
+#ifndef QT_NO_UNDOSTACK
   Frame* frame = m_page->d->page->focusController()->focusedOrMainFrame();
   if (m_inUndoRedo ||
       (frame &&
@@ -243,33 +244,48 @@ void EditorClientQt::registerCommandForUndo(
     return;
   }
   m_page->undoStack()->push(new EditCommandQt(cmd));
+#endif  // QT_NO_UNDOSTACK
 }
 
 void EditorClientQt::registerCommandForRedo(
     WTF::PassRefPtr<WebCore::EditCommand>) {}
 
 void EditorClientQt::clearUndoRedoOperations() {
+#ifndef QT_NO_UNDOSTACK
   return m_page->undoStack()->clear();
+#endif
 }
 
 bool EditorClientQt::canUndo() const {
+#ifdef QT_NO_UNDOSTACK
+  return false;
+#else
   return m_page->undoStack()->canUndo();
+#endif
 }
 
 bool EditorClientQt::canRedo() const {
+#ifdef QT_NO_UNDOSTACK
+  return false;
+#else
   return m_page->undoStack()->canRedo();
+#endif
 }
 
 void EditorClientQt::undo() {
+#ifndef QT_NO_UNDOSTACK
   m_inUndoRedo = true;
   m_page->undoStack()->undo();
   m_inUndoRedo = false;
+#endif
 }
 
 void EditorClientQt::redo() {
+#ifndef QT_NO_UNDOSTACK
   m_inUndoRedo = true;
   m_page->undoStack()->redo();
   m_inUndoRedo = false;
+#endif
 }
 
 bool EditorClientQt::shouldInsertNode(Node* node,
