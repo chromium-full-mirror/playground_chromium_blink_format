@@ -70,9 +70,11 @@ class QWebPagePrivate {
   QWebPagePrivate(QWebPage*);
   ~QWebPagePrivate();
   void createMainFrame();
+#ifndef QT_NO_CONTEXTMENU
   QMenu* createContextMenu(const WebCore::ContextMenu* webcoreMenu,
                            const QList<WebCore::ContextMenuItem>* items,
                            QBitArray* visitedWebActions);
+#endif
 
   QWebFrame* frameAt(const QPoint& pos) const;
 
@@ -89,7 +91,9 @@ class QWebPagePrivate {
   void mouseDoubleClickEvent(QMouseEvent*);
   void mouseTripleClickEvent(QMouseEvent*);
   void mouseReleaseEvent(QMouseEvent*);
+#ifndef QT_NO_CONTEXTMENU
   void contextMenuEvent(QContextMenuEvent*);
+#endif
 #ifndef QT_NO_WHEELEVENT
   void wheelEvent(QWheelEvent*);
 #endif
@@ -150,7 +154,9 @@ class QWebPagePrivate {
   QSize viewportSize;
   QWebHistory history;
   QWebHitTestResult hitTestResult;
+#ifndef QT_NO_CONTEXTMENU
   QPointer<QMenu> currentContextMenu;
+#endif
   QWebSettings* settings;
   QPalette palette;
   bool editable;

@@ -53,6 +53,7 @@ PlatformMouseEvent::PlatformMouseEvent(QInputEvent* event, int clickCount) {
       m_eventType = MouseEventReleased;
       me = static_cast<QMouseEvent*>(event);
       break;
+#ifndef QT_NO_CONTEXTMENU
     case QEvent::ContextMenu: {
       m_eventType = MouseEventPressed;
       QContextMenuEvent* ce = static_cast<QContextMenuEvent*>(event);
@@ -61,6 +62,7 @@ PlatformMouseEvent::PlatformMouseEvent(QInputEvent* event, int clickCount) {
       m_button = RightButton;
       break;
     }
+#endif  // QT_NO_CONTEXTMENU
     default:
       m_eventType = MouseEventMoved;
   }

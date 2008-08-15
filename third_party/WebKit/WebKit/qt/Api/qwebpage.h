@@ -227,7 +227,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void setEditable(bool editable);
   bool isEditable() const;
 
+#ifndef QT_NO_CONTEXTMENU
   bool swallowContextMenuEvent(QContextMenuEvent* event);
+#endif
   void updatePositionDependentActions(const QPoint& pos);
 
   QMenu* createStandardContextMenu();

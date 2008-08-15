@@ -361,6 +361,7 @@ bool PlatformScrollbar::handleMouseReleaseEvent(const PlatformMouseEvent& evt) {
 
 bool PlatformScrollbar::handleContextMenuEvent(
     const PlatformMouseEvent& event) {
+#ifndef QT_NO_CONTEXTMENU
   bool horizontal = (m_orientation == HorizontalScrollbar);
 
   QMenu menu;
@@ -404,7 +405,7 @@ bool PlatformScrollbar::handleContextMenuEvent(
     scroll(horizontal ? ScrollLeft : ScrollUp, ScrollByLine, 1);
   else if (actionSelected == actScrollDown)
     scroll(horizontal ? ScrollRight : ScrollDown, ScrollByLine, 1);
-
+#endif  // QT_NO_CONTEXTMENU
   return true;
 }
 
