@@ -210,8 +210,8 @@ class JSImmediate {
     // overflow.
     // Checking for allowed negative numbers takes more time than it's worth on
     // SunSpider.
-    return (reinterpret_cast<uintptr_t>(v) & (TagBitTypeInteger + (3 << 30))) ==
-           TagBitTypeInteger;
+    return (reinterpret_cast<uintptr_t>(v) &
+            (TagBitTypeInteger + (3u << 30))) == TagBitTypeInteger;
   }
 
   static ALWAYS_INLINE JSValue* addImmediateNumbers(const JSValue* v1,
