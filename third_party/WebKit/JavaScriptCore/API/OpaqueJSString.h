@@ -56,7 +56,7 @@ struct OpaqueJSString : public ThreadSafeShared<OpaqueJSString> {
   KJS::Identifier identifier(KJS::JSGlobalData*) const;
 
  private:
-  friend class ThreadSafeShared<OpaqueJSString>;
+  friend class WTF::ThreadSafeShared<OpaqueJSString>;
 
   OpaqueJSString() : m_characters(0), m_length(0) {}
 
