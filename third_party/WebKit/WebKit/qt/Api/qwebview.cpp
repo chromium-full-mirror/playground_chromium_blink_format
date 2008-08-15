@@ -707,6 +707,7 @@ void QWebView::contextMenuEvent(QContextMenuEvent* ev) {
     d->page->event(ev);
 }
 
+#ifndef QT_NO_WHEELEVENT
 /*! \reimp
 */
 void QWebView::wheelEvent(QWheelEvent* ev) {
@@ -716,6 +717,7 @@ void QWebView::wheelEvent(QWheelEvent* ev) {
   if (!ev->isAccepted())
     return QWidget::wheelEvent(ev);
 }
+#endif  // QT_NO_WHEELEVENT
 
 /*! \reimp
 */

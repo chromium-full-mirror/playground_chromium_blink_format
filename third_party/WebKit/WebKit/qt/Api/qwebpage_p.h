@@ -90,7 +90,9 @@ class QWebPagePrivate {
   void mouseTripleClickEvent(QMouseEvent*);
   void mouseReleaseEvent(QMouseEvent*);
   void contextMenuEvent(QContextMenuEvent*);
+#ifndef QT_NO_WHEELEVENT
   void wheelEvent(QWheelEvent*);
+#endif
   void keyPressEvent(QKeyEvent*);
   void keyReleaseEvent(QKeyEvent*);
   void focusInEvent(QFocusEvent*);

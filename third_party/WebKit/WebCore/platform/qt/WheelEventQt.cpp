@@ -27,6 +27,11 @@
 namespace WebCore {
 
 PlatformWheelEvent::PlatformWheelEvent(QWheelEvent* e)
+#ifdef QT_NO_WHEELEVENT
+{
+  Q_UNUSED(e);
+}
+#else
     : m_position(e->pos()),
       m_globalPosition(e->globalPos()),
       m_isAccepted(false),
@@ -50,5 +55,6 @@ PlatformWheelEvent::PlatformWheelEvent(QWheelEvent* e)
   m_pageXScrollMode = false;
   m_pageYScrollMode = false;
 }
+#endif  // QT_NO_WHEELEVENT
 
 }  // namespace WebCore
