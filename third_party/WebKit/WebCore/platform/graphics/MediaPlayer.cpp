@@ -122,10 +122,8 @@ float MediaPlayer::volume() const {
 }
 
 void MediaPlayer::setVolume(float volume) {
-  if (volume != m_volume) {
-    m_volume = volume;
-    m_private->setVolume(volume);
-  }
+  m_volume = volume;
+  m_private->setVolume(volume);
 }
 
 float MediaPlayer::rate() const {
@@ -133,8 +131,6 @@ float MediaPlayer::rate() const {
 }
 
 void MediaPlayer::setRate(float rate) {
-  if (rate == m_rate)
-    return;
   m_rate = rate;
   m_private->setRate(rate);
 }
@@ -168,8 +164,6 @@ unsigned MediaPlayer::totalBytes() {
 }
 
 void MediaPlayer::setRect(const IntRect& r) {
-  if (m_rect == r)
-    return;
   m_rect = r;
   m_private->setRect(r);
 }
@@ -179,8 +173,6 @@ bool MediaPlayer::visible() const {
 }
 
 void MediaPlayer::setVisible(bool b) {
-  if (m_visible == b)
-    return;
   m_visible = b;
   m_private->setVisible(b);
 }
