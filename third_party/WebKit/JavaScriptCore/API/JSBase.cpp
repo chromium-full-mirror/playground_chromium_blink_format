@@ -29,6 +29,7 @@
 
 #include "APICast.h"
 #include "completion.h"
+#include "OpaqueJSString.h"
 #include <kjs/ExecState.h>
 #include <kjs/InitializeThreading.h>
 #include <kjs/interpreter.h>
@@ -47,15 +48,12 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
   exec->globalData().heap->registerThread();
 
   JSObject* jsThisObject = toJS(thisObject);
-  UString::Rep* scriptRep = toJS(script);
-  UString::Rep* sourceURLRep =
-      sourceURL ? toJS(sourceURL) : &UString::Rep::null;
 
   // Interpreter::evaluate sets "this" to the global object if it is NULL
   JSGlobalObject* globalObject = exec->dynamicGlobalObject();
   Completion completion = Interpreter::evaluate(
       globalObject->globalExec(), globalObject->globalScopeChain(),
-      UString(sourceURLRep), startingLineNumber, UString(scriptRep),
+      sourceURL->ustring(), startingLineNumber, script->ustring(),
       jsThisObject);
 
   if (completion.complType() == Throw) {
@@ -79,12 +77,9 @@ bool JSCheckScriptSyntax(JSContextRef ctx,
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
 
-  UString::Rep* scriptRep = toJS(script);
-  UString::Rep* sourceURLRep =
-      sourceURL ? toJS(sourceURL) : &UString::Rep::null;
   Completion completion = Interpreter::checkSyntax(
-      exec->dynamicGlobalObject()->globalExec(), UString(sourceURLRep),
-      startingLineNumber, UString(scriptRep));
+      exec->dynamicGlobalObject()->globalExec(), sourceURL->ustring(),
+      startingLineNumber, script->ustring());
   if (completion.complType() == Throw) {
     if (exception)
       *exception = toRef(completion.value());

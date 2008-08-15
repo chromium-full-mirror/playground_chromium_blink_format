@@ -33,6 +33,7 @@
 #include "JSObjectRef.h"
 #include "JSString.h"
 #include "JSStringRef.h"
+#include "OpaqueJSString.h"
 #include "PropertyNameArray.h"
 #include <wtf/Vector.h>
 
@@ -102,18 +103,22 @@ bool JSCallbackObject<Base>::getOwnPropertySlot(ExecState* exec,
                                                 PropertySlot& slot) {
   JSContextRef ctx = toRef(exec);
   JSObjectRef thisRef = toRef(this);
-  JSStringRef propertyNameRef = toRef(propertyName.ustring().rep());
+  RefPtr<OpaqueJSString> propertyNameRef;
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
     // optional optimization to bypass getProperty in cases when we only need to
     // know if the property exists
     if (JSObjectHasPropertyCallback hasProperty = jsClass->hasProperty) {
-      if (hasProperty(ctx, thisRef, propertyNameRef)) {
+      if (!propertyNameRef)
+        propertyNameRef = OpaqueJSString::create(propertyName.ustring());
+      if (hasProperty(ctx, thisRef, propertyNameRef.get())) {
         slot.setCustom(this, callbackGetter);
         return true;
       }
     } else if (JSObjectGetPropertyCallback getProperty = jsClass->getProperty) {
-      if (JSValueRef value = getProperty(ctx, thisRef, propertyNameRef,
+      if (!propertyNameRef)
+        propertyNameRef = OpaqueJSString::create(propertyName.ustring());
+      if (JSValueRef value = getProperty(ctx, thisRef, propertyNameRef.get(),
                                          toRef(exec->exceptionSlot()))) {
         // cache the value so we don't have to compute it again
         // FIXME: This violates the PropertySlot design a little bit.
@@ -157,12 +162,14 @@ void JSCallbackObject<Base>::put(ExecState* exec,
                                  JSValue* value) {
   JSContextRef ctx = toRef(exec);
   JSObjectRef thisRef = toRef(this);
-  JSStringRef propertyNameRef = toRef(propertyName.ustring().rep());
+  RefPtr<OpaqueJSString> propertyNameRef;
   JSValueRef valueRef = toRef(value);
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
     if (JSObjectSetPropertyCallback setProperty = jsClass->setProperty) {
-      if (setProperty(ctx, thisRef, propertyNameRef, valueRef,
+      if (!propertyNameRef)
+        propertyNameRef = OpaqueJSString::create(propertyName.ustring());
+      if (setProperty(ctx, thisRef, propertyNameRef.get(), valueRef,
                       toRef(exec->exceptionSlot())))
         return;
     }
@@ -174,7 +181,9 @@ void JSCallbackObject<Base>::put(ExecState* exec,
         if (entry->attributes & kJSPropertyAttributeReadOnly)
           return;
         if (JSObjectSetPropertyCallback setProperty = entry->setProperty) {
-          if (setProperty(ctx, thisRef, propertyNameRef, valueRef,
+          if (!propertyNameRef)
+            propertyNameRef = OpaqueJSString::create(propertyName.ustring());
+          if (setProperty(ctx, thisRef, propertyNameRef.get(), valueRef,
                           toRef(exec->exceptionSlot())))
             return;
         } else
@@ -211,12 +220,14 @@ bool JSCallbackObject<Base>::deleteProperty(ExecState* exec,
                                             const Identifier& propertyName) {
   JSContextRef ctx = toRef(exec);
   JSObjectRef thisRef = toRef(this);
-  JSStringRef propertyNameRef = toRef(propertyName.ustring().rep());
+  RefPtr<OpaqueJSString> propertyNameRef;
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
     if (JSObjectDeletePropertyCallback deleteProperty =
             jsClass->deleteProperty) {
-      if (deleteProperty(ctx, thisRef, propertyNameRef,
+      if (!propertyNameRef)
+        propertyNameRef = OpaqueJSString::create(propertyName.ustring());
+      if (deleteProperty(ctx, thisRef, propertyNameRef.get(),
                          toRef(exec->exceptionSlot())))
         return true;
     }
@@ -467,7 +478,7 @@ JSValue* JSCallbackObject<Base>::staticValueGetter(
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   JSObjectRef thisRef = toRef(thisObj);
-  JSStringRef propertyNameRef = toRef(propertyName.ustring().rep());
+  RefPtr<OpaqueJSString> propertyNameRef;
 
   for (JSClassRef jsClass = thisObj->m_class; jsClass;
        jsClass = jsClass->parentClass)
@@ -476,8 +487,10 @@ JSValue* JSCallbackObject<Base>::staticValueGetter(
       if (StaticValueEntry* entry =
               staticValues->get(propertyName.ustring().rep()))
         if (JSObjectGetPropertyCallback getProperty = entry->getProperty) {
+          if (!propertyNameRef)
+            propertyNameRef = OpaqueJSString::create(propertyName.ustring());
           if (JSValueRef value =
-                  getProperty(toRef(exec), thisRef, propertyNameRef,
+                  getProperty(toRef(exec), thisRef, propertyNameRef.get(),
                               toRef(exec->exceptionSlot())))
             return toJS(value);
         }
@@ -530,13 +543,16 @@ JSValue* JSCallbackObject<Base>::callbackGetter(ExecState* exec,
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   JSObjectRef thisRef = toRef(thisObj);
-  JSStringRef propertyNameRef = toRef(propertyName.ustring().rep());
+  RefPtr<OpaqueJSString> propertyNameRef;
 
   for (JSClassRef jsClass = thisObj->m_class; jsClass;
        jsClass = jsClass->parentClass)
     if (JSObjectGetPropertyCallback getProperty = jsClass->getProperty) {
-      if (JSValueRef value = getProperty(toRef(exec), thisRef, propertyNameRef,
-                                         toRef(exec->exceptionSlot())))
+      if (!propertyNameRef)
+        propertyNameRef = OpaqueJSString::create(propertyName.ustring());
+      if (JSValueRef value =
+              getProperty(toRef(exec), thisRef, propertyNameRef.get(),
+                          toRef(exec->exceptionSlot())))
         return toJS(value);
     }
 

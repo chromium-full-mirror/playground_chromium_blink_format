@@ -68,6 +68,7 @@
 #include <JavaScriptCore/APICast.h>
 #include <JavaScriptCore/JSRetainPtr.h>
 #include <JavaScriptCore/JSStringRef.h>
+#include <JavaScriptCore/OpaqueJSString.h>
 #include <kjs/ustring.h>
 #include <profiler/Profile.h>
 #include <profiler/Profiler.h>
@@ -101,7 +102,8 @@ static JSRetainPtr<JSStringRef> jsStringRef(const String& str) {
 }
 
 static JSRetainPtr<JSStringRef> jsStringRef(const UString& str) {
-  return JSRetainPtr<JSStringRef>(toRef(str.rep()));
+  return JSRetainPtr<JSStringRef>(Adopt,
+                                  OpaqueJSString::create(str).releaseRef());
 }
 
 static String toString(JSContextRef context,
@@ -2973,7 +2975,7 @@ bool InspectorController::handleException(JSContextRef context,
 
 // JavaScriptDebugListener functions
 
-void InspectorController::didParseSource(ExecState*,
+void InspectorController::didParseSource(ExecState* exec,
                                          const SourceProvider& source,
                                          int startingLineNumber,
                                          const UString& sourceURL,
@@ -2993,7 +2995,7 @@ void InspectorController::didParseSource(ExecState*,
                arguments, exception);
 }
 
-void InspectorController::failedToParseSource(ExecState*,
+void InspectorController::failedToParseSource(ExecState* exec,
                                               const SourceProvider& source,
                                               int startingLineNumber,
                                               const UString& sourceURL,
