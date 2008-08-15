@@ -670,6 +670,12 @@ class WebView : public IWebView,
       /* [in] */ RECT rect,
       /* [in] */ OLE_HANDLE dc);
 
+  virtual HRESULT STDMETHODCALLTYPE setCustomHTMLTokenizerTimeDelay(
+      /* [in] */ double timeDelay);
+
+  virtual HRESULT STDMETHODCALLTYPE setCustomHTMLTokenizerChunkSize(
+      /* [in] */ int chunkSize);
+
   // WebView
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
