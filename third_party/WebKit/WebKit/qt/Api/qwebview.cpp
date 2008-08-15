@@ -347,6 +347,8 @@ QWebSettings* QWebView::settings() const {
     \property QWebView::title
     \brief the title of the web page currently viewed
 
+    By default, this property contains an empty string.
+
     \sa titleChanged()
 */
 QString QWebView::title() const {
@@ -359,7 +361,9 @@ QString QWebView::title() const {
     \property QWebView::url
     \brief the url of the web page currently viewed
 
-    Setting this property clears the view and loads the url.
+    Setting this property clears the view and loads the URL.
+
+    By default, this property contains an empty, invalid URL.
 
     \sa load(), urlChanged()
 */
@@ -378,6 +382,8 @@ QUrl QWebView::url() const {
     \property QWebView::icon
     \brief the icon associated with the web page currently viewed
 
+    By default, this property contains a null icon.
+
     \sa iconChanged(), QWebSettings::iconForUrl()
 */
 QIcon QWebView::icon() const {
@@ -389,6 +395,8 @@ QIcon QWebView::icon() const {
 /*!
     \property QWebView::selectedText
     \brief the text currently selected
+
+    By default, this property contains an empty string.
 
     \sa findText(), selectionChanged()
 */
@@ -428,6 +436,8 @@ void QWebView::triggerPageAction(QWebPage::WebAction action, bool checked) {
 
     Parts of HTML documents can be editable for example through the
     \c{contenteditable} attribute on HTML elements.
+
+    By default, this property is false.
 */
 bool QWebView::isModified() const {
   if (d->page)
@@ -489,6 +499,8 @@ qreal QWebView::zoomFactor() const {
 
   \note Setting this property also enables the
   ZoomTextOnly attribute in QWebSettings.
+
+  By default, this property contains a value of 1.0.
 */
 
 void QWebView::setTextSizeMultiplier(qreal factor) {
