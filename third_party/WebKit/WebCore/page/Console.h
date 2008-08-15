@@ -59,6 +59,7 @@ enum MessageLevel {
   LogMessageLevel,
   WarningMessageLevel,
   ErrorMessageLevel,
+  ObjectMessageLevel,
   GroupTitleMessageLevel
 };
 
@@ -81,6 +82,7 @@ class Console : public RefCounted<Console>, public KJS::ProfilerClient {
   void info(KJS::ExecState*, const KJS::ArgList& arguments);
   void log(KJS::ExecState*, const KJS::ArgList& arguments);
   void warn(KJS::ExecState*, const KJS::ArgList& arguments);
+  void dir(KJS::ExecState*, const KJS::ArgList& arguments);
   void assertCondition(bool condition,
                        KJS::ExecState*,
                        const KJS::ArgList& arguments);
