@@ -52,7 +52,9 @@ class AffineTransform {
  public:
   AffineTransform();
   AffineTransform(double a, double b, double c, double d, double e, double f);
+#if !PLATFORM(WX) || USE(WXGC)
   AffineTransform(const PlatformAffineTransform&);
+#endif
 
   void setMatrix(double a, double b, double c, double d, double e, double f);
   void map(double x, double y, double* x2, double* y2) const;
@@ -101,7 +103,9 @@ class AffineTransform {
   bool isInvertible() const;
   AffineTransform inverse() const;
 
+#if !PLATFORM(WX) || USE(WXGC)
   operator PlatformAffineTransform() const;
+#endif
 
   bool operator==(const AffineTransform&) const;
   bool operator!=(const AffineTransform& other) const {
@@ -111,7 +115,9 @@ class AffineTransform {
   AffineTransform operator*(const AffineTransform&);
 
  private:
+#if !PLATFORM(WX) || USE(WXGC)
   PlatformAffineTransform m_transform;
+#endif
 };
 
 }  // namespace WebCore
