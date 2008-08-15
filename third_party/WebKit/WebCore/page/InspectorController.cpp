@@ -1496,27 +1496,28 @@ void InspectorController::toggleRecordButton(bool isProfiling) {
                &isProvingValue, exception);
 }
 
-void InspectorController::startGroup() {
-  JSValueRef exception = 0;
-
+void InspectorController::startGroup(MessageSource source,
+                                     ExecState* exec,
+                                     const ArgList& arguments,
+                                     unsigned lineNumber,
+                                     const String& sourceURL) {
   ++m_groupLevel;
 
-  if (windowVisible())
-    callFunction(m_scriptContext, m_scriptObject, "startGroupInConsole", 0,
-                 NULL, exception);
+  addConsoleMessage(new ConsoleMessage(source, StartGroupMessageLevel, exec,
+                                       arguments, lineNumber, sourceURL,
+                                       m_groupLevel));
 }
 
-void InspectorController::endGroup() {
-  JSValueRef exception = 0;
-
+void InspectorController::endGroup(MessageSource source,
+                                   unsigned lineNumber,
+                                   const String& sourceURL) {
   if (m_groupLevel == 0)
     return;
 
   --m_groupLevel;
 
-  if (windowVisible())
-    callFunction(m_scriptContext, m_scriptObject, "endGroupInConsole", 0, NULL,
-                 exception);
+  addConsoleMessage(new ConsoleMessage(source, EndGroupMessageLevel, String(),
+                                       lineNumber, sourceURL, m_groupLevel));
 }
 
 void InspectorController::addProfile(PassRefPtr<Profile> prpProfile) {
