@@ -107,9 +107,11 @@ class DocLoader {
   int requestCount();
 
   void clearPreloads();
-  void preload(CachedResource::Type type,
+  void preload(CachedResource::Type,
                const String& url,
-               const String& charset);
+               const String& charset,
+               bool referencedFromBody);
+  void checkForPendingPreloads();
   void printPreloadStats();
 
  private:
@@ -117,6 +119,9 @@ class DocLoader {
                                   const String& url,
                                   const String& charset,
                                   bool isPreload = false);
+  void requestPreload(CachedResource::Type,
+                      const String& url,
+                      const String& charset);
 
   void checkForReload(const KURL&);
   void checkCacheObjectStatus(CachedResource*);
@@ -130,6 +135,12 @@ class DocLoader {
   int m_requestCount;
 
   ListHashSet<CachedResource*> m_preloads;
+  struct PendingPreload {
+    CachedResource::Type m_type;
+    String m_url;
+    String m_charset;
+  };
+  Vector<PendingPreload> m_pendingPreloads;
 
   // 29 bits left
   bool m_autoLoadImages : 1;
