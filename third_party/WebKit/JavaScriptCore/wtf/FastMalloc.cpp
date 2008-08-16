@@ -1821,14 +1821,25 @@ class TCMalloc_Central_FreeList {
 
 #ifdef WTF_CHANGES
   template <class Finder, class Reader>
-  void enumerateFreeObjects(Finder& finder, const Reader& reader) {
+  void enumerateFreeObjects(Finder& finder,
+                            const Reader& reader,
+                            TCMalloc_Central_FreeList* remoteCentralFreeList) {
     for (Span* span = &empty_; span && span != &empty_;
          span = (span->next ? reader(span->next) : 0))
       ASSERT(!span->objects);
 
     ASSERT(!nonempty_.objects);
-    for (Span* span = reader(nonempty_.next); span && span != &nonempty_;
-         span = (span->next ? reader(span->next) : 0)) {
+    static const ptrdiff_t nonemptyOffset =
+        reinterpret_cast<const char*>(&nonempty_) -
+        reinterpret_cast<const char*>(this);
+
+    Span* remoteNonempty = reinterpret_cast<Span*>(
+        reinterpret_cast<char*>(remoteCentralFreeList) + nonemptyOffset);
+    Span* remoteSpan = nonempty_.next;
+
+    for (Span *span = reader(remoteSpan); span && remoteSpan != remoteNonempty;
+         remoteSpan = span->next,
+              span = (span->next ? reader(span->next) : 0)) {
       for (void* nextObject = span->objects; nextObject;
            nextObject = *reader(reinterpret_cast<void**>(nextObject)))
         finder.visit(nextObject);
@@ -3659,9 +3670,11 @@ class FreeObjectFinder {
   }
 
   void findFreeObjects(TCMalloc_Central_FreeListPadded* centralFreeList,
-                       size_t numSizes) {
+                       size_t numSizes,
+                       TCMalloc_Central_FreeListPadded* remoteCentralFreeList) {
     for (unsigned i = 0; i < numSizes; i++)
-      centralFreeList[i].enumerateFreeObjects(*this, m_reader);
+      centralFreeList[i].enumerateFreeObjects(*this, m_reader,
+                                              remoteCentralFreeList + i);
   }
 };
 
@@ -3796,7 +3809,7 @@ kern_return_t FastMallocZone::enumerate(task_t task,
 
   FreeObjectFinder finder(memoryReader);
   finder.findFreeObjects(threadHeaps);
-  finder.findFreeObjects(centralCaches, kNumClasses);
+  finder.findFreeObjects(centralCaches, kNumClasses, mzone->m_centralCaches);
 
   TCMalloc_PageHeap::PageMap* pageMap = &pageHeap->pagemap_;
   PageMapFreeObjectFinder pageMapFinder(memoryReader, finder);
