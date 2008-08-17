@@ -350,7 +350,7 @@ static jobject convertArrayInstanceToJavaArray(ExecState* exec,
   // object array
   // other than a string.
   JSArray* jsArray = static_cast<JSArray*>(value);
-  unsigned length = jsArray->getLength();
+  unsigned length = jsArray->length();
   jobjectArray jarray = 0;
 
   // Build the correct array type

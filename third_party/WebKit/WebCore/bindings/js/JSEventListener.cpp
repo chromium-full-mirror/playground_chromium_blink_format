@@ -43,6 +43,8 @@ namespace WebCore {
 
 using namespace EventNames;
 
+ASSERT_CLASS_FITS_IN_CELL(JSAbstractEventListener)
+
 void JSAbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
   JSObject* listener = listenerObj();
   if (!listener)

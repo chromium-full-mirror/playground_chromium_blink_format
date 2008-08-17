@@ -46,7 +46,7 @@ class JSCallbackObject : public Base {
 
   static const ClassInfo info;
 
-  JSClassRef classRef() const { return m_class; }
+  JSClassRef classRef() const { return m_callbackObjectData->jsClass; }
   bool inherits(JSClassRef) const;
 
  private:
@@ -94,8 +94,19 @@ class JSCallbackObject : public Base {
                                  const Identifier&,
                                  const PropertySlot&);
 
-  void* m_privateData;
-  JSClassRef m_class;
+  struct JSCallbackObjectData {
+    JSCallbackObjectData(void* privateData_, JSClassRef jsClass_)
+        : privateData(privateData_), jsClass(jsClass_) {
+      JSClassRetain(jsClass);
+    }
+
+    ~JSCallbackObjectData() { JSClassRelease(jsClass); }
+
+    void* privateData;
+    JSClassRef jsClass;
+  };
+
+  OwnPtr<JSCallbackObjectData> m_callbackObjectData;
 };
 
 }  // namespace KJS

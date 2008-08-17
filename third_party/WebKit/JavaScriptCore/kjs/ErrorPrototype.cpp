@@ -30,6 +30,8 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(ErrorPrototype);
+
 static JSValue* errorProtoFuncToString(ExecState*,
                                        JSObject*,
                                        JSValue*,
@@ -46,7 +48,8 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
   putDirect(exec->propertyNames().message, jsString(exec, "Unknown error"),
             DontEnum);
 
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
                                                  exec->propertyNames().toString,
                                                  errorProtoFuncToString),
                     DontEnum);

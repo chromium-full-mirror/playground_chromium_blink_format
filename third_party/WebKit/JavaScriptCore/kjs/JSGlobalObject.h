@@ -76,6 +76,8 @@ class JSGlobalObject : public JSVariableObject {
         : JSVariableObjectData(&symbolTable, 0),
           globalScopeChain(globalObject, thisValue) {}
 
+    virtual ~JSGlobalObjectData() {}
+
     JSGlobalObject* next;
     JSGlobalObject* prev;
 
@@ -131,9 +133,10 @@ class JSGlobalObject : public JSVariableObject {
   }
 
  protected:
-  JSGlobalObject(JSValue* prototype, JSObject* globalThisValue)
-      : JSVariableObject(prototype,
-                         new JSGlobalObjectData(this, globalThisValue)) {
+  JSGlobalObject(JSValue* prototype,
+                 JSGlobalObjectData* d,
+                 JSObject* globalThisValue)
+      : JSVariableObject(prototype, d) {
     init(globalThisValue);
   }
 

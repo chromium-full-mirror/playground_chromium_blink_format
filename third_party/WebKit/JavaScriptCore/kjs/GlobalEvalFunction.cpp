@@ -32,6 +32,8 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(GlobalEvalFunction);
+
 GlobalEvalFunction::GlobalEvalFunction(ExecState* exec,
                                        FunctionPrototype* functionPrototype,
                                        int len,

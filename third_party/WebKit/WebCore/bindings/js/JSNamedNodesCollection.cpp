@@ -35,6 +35,8 @@ namespace WebCore {
 
 using namespace KJS;
 
+ASSERT_CLASS_FITS_IN_CELL(JSNamedNodesCollection)
+
 const ClassInfo JSNamedNodesCollection::s_info = {"Collection", 0, 0, 0};
 
 // Such a collection is usually very short-lived, it only exists
@@ -44,14 +46,14 @@ const ClassInfo JSNamedNodesCollection::s_info = {"Collection", 0, 0, 0};
 JSNamedNodesCollection::JSNamedNodesCollection(
     KJS::JSObject* prototype,
     const Vector<RefPtr<Node>>& nodes)
-    : DOMObject(prototype), m_nodes(nodes) {}
+    : DOMObject(prototype), m_nodes(new Vector<RefPtr<Node>>(nodes)) {}
 
 JSValue* JSNamedNodesCollection::lengthGetter(ExecState* exec,
                                               const Identifier& propertyName,
                                               const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
       static_cast<JSNamedNodesCollection*>(slot.slotBase());
-  return jsNumber(exec, thisObj->m_nodes.size());
+  return jsNumber(exec, thisObj->m_nodes->size());
 }
 
 JSValue* JSNamedNodesCollection::indexGetter(ExecState* exec,
@@ -59,7 +61,7 @@ JSValue* JSNamedNodesCollection::indexGetter(ExecState* exec,
                                              const PropertySlot& slot) {
   JSNamedNodesCollection* thisObj =
       static_cast<JSNamedNodesCollection*>(slot.slotBase());
-  return toJS(exec, thisObj->m_nodes[slot.index()].get());
+  return toJS(exec, (*thisObj->m_nodes)[slot.index()].get());
 }
 
 bool JSNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
@@ -72,7 +74,7 @@ bool JSNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
 
   bool ok;
   unsigned index = propertyName.toUInt32(&ok);
-  if (ok && index < m_nodes.size()) {
+  if (ok && index < m_nodes->size()) {
     slot.setCustomIndex(this, index, indexGetter);
     return true;
   }
@@ -81,8 +83,8 @@ bool JSNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
   // document.formName.name result by id as well as be index.
 
   AtomicString atomicPropertyName = propertyName;
-  for (unsigned i = 0; i < m_nodes.size(); i++) {
-    Node* node = m_nodes[i].get();
+  for (unsigned i = 0; i < m_nodes->size(); i++) {
+    Node* node = (*m_nodes)[i].get();
     if (node->hasAttributes() &&
         node->attributes()->id() == atomicPropertyName) {
       slot.setCustomIndex(this, i, indexGetter);

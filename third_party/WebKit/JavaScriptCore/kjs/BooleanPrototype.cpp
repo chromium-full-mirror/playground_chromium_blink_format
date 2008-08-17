@@ -30,6 +30,8 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(BooleanPrototype);
+
 // Functions
 static JSValue* booleanProtoFuncToString(ExecState*,
                                          JSObject*,
@@ -48,11 +50,13 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
     : BooleanObject(objectPrototype) {
   setInternalValue(jsBoolean(false));
 
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
                                                  exec->propertyNames().toString,
                                                  booleanProtoFuncToString),
                     DontEnum);
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
                                                  exec->propertyNames().valueOf,
                                                  booleanProtoFuncValueOf),
                     DontEnum);

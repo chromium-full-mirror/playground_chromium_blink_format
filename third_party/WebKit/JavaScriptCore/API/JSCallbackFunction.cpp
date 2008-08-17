@@ -36,13 +36,17 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(JSCallbackFunction);
+
 const ClassInfo JSCallbackFunction::info = {"CallbackFunction",
                                             &InternalFunction::info, 0, 0};
 
 JSCallbackFunction::JSCallbackFunction(ExecState* exec,
                                        JSObjectCallAsFunctionCallback callback,
                                        const Identifier& name)
-    : InternalFunction(exec->lexicalGlobalObject()->functionPrototype(), name),
+    : InternalFunction(exec,
+                       exec->lexicalGlobalObject()->functionPrototype(),
+                       name),
       m_callback(callback) {}
 
 // InternalFunction mish-mashes constructor and function behavior -- we should

@@ -28,10 +28,12 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(ObjectConstructor);
+
 ObjectConstructor::ObjectConstructor(ExecState* exec,
                                      ObjectPrototype* objectPrototype,
                                      FunctionPrototype* functionPrototype)
-    : InternalFunction(functionPrototype, Identifier(exec, "Object")) {
+    : InternalFunction(exec, functionPrototype, Identifier(exec, "Object")) {
   // ECMA 15.2.3.1
   putDirect(exec->propertyNames().prototype, objectPrototype,
             DontEnum | DontDelete | ReadOnly);

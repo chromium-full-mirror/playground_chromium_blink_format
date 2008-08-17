@@ -32,6 +32,7 @@
 namespace KJS {
 
 class CodeBlock;
+class ExecState;
 class JSGlobalObject;
 class JSObject;
 class JSValue;
@@ -44,12 +45,14 @@ class DebuggerCallFrame {
  public:
   enum Type { ProgramType, FunctionType };
 
-  DebuggerCallFrame(JSGlobalObject* dynamicGlobalObject,
+  DebuggerCallFrame(ExecState* exec,
+                    JSGlobalObject* dynamicGlobalObject,
                     const CodeBlock* codeBlock,
                     ScopeChainNode* scopeChain,
                     Register* r,
                     JSValue* exception)
-      : m_dynamicGlobalObject(dynamicGlobalObject),
+      : m_exec(exec),
+        m_dynamicGlobalObject(dynamicGlobalObject),
         m_codeBlock(codeBlock),
         m_scopeChain(scopeChain),
         m_registers(r),
@@ -66,6 +69,7 @@ class DebuggerCallFrame {
  private:
   Register* callFrame() const;
 
+  ExecState* m_exec;
   JSGlobalObject* m_dynamicGlobalObject;
   const CodeBlock* m_codeBlock;
   ScopeChainNode* m_scopeChain;

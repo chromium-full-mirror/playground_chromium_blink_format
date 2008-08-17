@@ -35,6 +35,8 @@ using namespace WTF;
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(StringPrototype);
+
 static JSValue* stringProtoFuncToString(ExecState*,
                                         JSObject*,
                                         JSValue*,

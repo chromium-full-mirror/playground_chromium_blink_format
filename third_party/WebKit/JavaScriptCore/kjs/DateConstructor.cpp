@@ -45,6 +45,8 @@ namespace KJS {
 
 // TODO: MakeTime (15.9.11.1) etc. ?
 
+ASSERT_CLASS_FITS_IN_CELL(DateConstructor);
+
 static JSValue* dateParse(ExecState*, JSObject*, JSValue*, const ArgList&);
 static JSValue* dateNow(ExecState*, JSObject*, JSValue*, const ArgList&);
 static JSValue* dateUTC(ExecState*, JSObject*, JSValue*, const ArgList&);
@@ -53,23 +55,24 @@ DateConstructor::DateConstructor(ExecState* exec,
                                  FunctionPrototype* functionPrototype,
                                  DatePrototype* datePrototype)
     : InternalFunction(
+          exec,
           functionPrototype,
           Identifier(exec, datePrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, datePrototype,
             DontEnum | DontDelete | ReadOnly);
 
+  putDirectFunction(exec, new (exec) PrototypeFunction(
+                              exec, functionPrototype, 1,
+                              exec->propertyNames().parse, dateParse),
+                    DontEnum);
   putDirectFunction(
-      new (exec) PrototypeFunction(exec, functionPrototype, 1,
-                                   exec->propertyNames().parse, dateParse),
+      exec, new (exec) PrototypeFunction(exec, functionPrototype, 7,
+                                         exec->propertyNames().UTC, dateUTC),
       DontEnum);
-  putDirectFunction(new (exec)
-                        PrototypeFunction(exec, functionPrototype, 7,
-                                          exec->propertyNames().UTC, dateUTC),
-                    DontEnum);
-  putDirectFunction(new (exec)
-                        PrototypeFunction(exec, functionPrototype, 0,
-                                          exec->propertyNames().now, dateNow),
-                    DontEnum);
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, functionPrototype, 0,
+                                         exec->propertyNames().now, dateNow),
+      DontEnum);
 
   putDirect(exec, exec->propertyNames().length, 7,
             ReadOnly | DontEnum | DontDelete);

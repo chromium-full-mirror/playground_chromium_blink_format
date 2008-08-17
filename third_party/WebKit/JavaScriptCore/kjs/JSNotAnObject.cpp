@@ -33,6 +33,8 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(JSNotAnObject);
+
 // JSValue methods
 JSValue* JSNotAnObject::toPrimitive(ExecState* exec, JSType) const {
   UNUSED_PARAM(exec);

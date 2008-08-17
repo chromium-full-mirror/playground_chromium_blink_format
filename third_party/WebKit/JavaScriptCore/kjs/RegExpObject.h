@@ -36,8 +36,8 @@ class RegExpObject : public JSObject {
   RegExpObject(RegExpPrototype*, PassRefPtr<RegExp>);
   virtual ~RegExpObject();
 
-  void setRegExp(PassRefPtr<RegExp> r) { m_regExp = r; }
-  RegExp* regExp() const { return m_regExp.get(); }
+  void setRegExp(PassRefPtr<RegExp> r) { d->regExp = r; }
+  RegExp* regExp() const { return d->regExp.get(); }
 
   JSValue* test(ExecState*, const ArgList&);
   JSValue* exec(ExecState*, const ArgList&);
@@ -52,15 +52,22 @@ class RegExpObject : public JSObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
-  void setLastIndex(double lastIndex) { m_lastIndex = lastIndex; }
+  void setLastIndex(double lastIndex) { d->lastIndex = lastIndex; }
 
  private:
   bool match(ExecState*, const ArgList&);
 
   virtual CallType getCallData(CallData&);
 
-  RefPtr<RegExp> m_regExp;
-  double m_lastIndex;
+  struct RegExpObjectData {
+    RegExpObjectData(PassRefPtr<RegExp> regExp_, double lastIndex_)
+        : regExp(regExp_), lastIndex(lastIndex_) {}
+
+    RefPtr<RegExp> regExp;
+    double lastIndex;
+  };
+
+  OwnPtr<RegExpObjectData> d;
 };
 
 }  // namespace KJS

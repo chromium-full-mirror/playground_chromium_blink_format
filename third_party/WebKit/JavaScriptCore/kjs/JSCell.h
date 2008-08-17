@@ -105,6 +105,8 @@ class JSCell : public JSValue {
   virtual bool getOwnPropertySlot(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
+
+  intptr_t reserved;  // Reserved for work in progress.
 };
 
 inline JSCell::JSCell() {}

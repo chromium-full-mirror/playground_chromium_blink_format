@@ -30,10 +30,13 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(ErrorConstructor);
+
 ErrorConstructor::ErrorConstructor(ExecState* exec,
                                    FunctionPrototype* functionPrototype,
                                    ErrorPrototype* errorPrototype)
     : InternalFunction(
+          exec,
           functionPrototype,
           Identifier(exec, errorPrototype->classInfo()->className)) {
   // ECMA 15.11.3.1 Error.prototype

@@ -29,6 +29,8 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(NativeErrorConstructor);
+
 const ClassInfo NativeErrorConstructor::info = {"Function",
                                                 &InternalFunction::info, 0, 0};
 
@@ -37,6 +39,7 @@ NativeErrorConstructor::NativeErrorConstructor(
     FunctionPrototype* functionPrototype,
     NativeErrorPrototype* nativeErrorPrototype)
     : InternalFunction(
+          exec,
           functionPrototype,
           Identifier(exec,
                      nativeErrorPrototype->getDirect(exec->propertyNames().name)

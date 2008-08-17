@@ -34,9 +34,12 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(FunctionConstructor);
+
 FunctionConstructor::FunctionConstructor(ExecState* exec,
                                          FunctionPrototype* functionPrototype)
     : InternalFunction(
+          exec,
           functionPrototype,
           Identifier(exec, functionPrototype->classInfo()->className)) {
   putDirect(exec->propertyNames().prototype, functionPrototype,

@@ -26,6 +26,7 @@
 #include "config.h"
 #include "JSFunction.h"
 
+#include "CommonIdentifiers.h"
 #include "ExecState.h"
 #include "FunctionPrototype.h"
 #include "JSGlobalObject.h"
@@ -40,18 +41,20 @@ using namespace Unicode;
 
 namespace KJS {
 
-const ClassInfo JSFunction::info = {"Function", &InternalFunction::info, 0, 0};
+ASSERT_CLASS_FITS_IN_CELL(JSFunction);
+
+const ClassInfo JSFunction::info = {"Function", 0, 0, 0};
 
 JSFunction::JSFunction(ExecState* exec,
                        const Identifier& name,
                        FunctionBodyNode* body,
                        ScopeChainNode* scopeChainNode)
-    : InternalFunction(exec->lexicalGlobalObject()->functionPrototype(), name),
+    : Base(exec, exec->lexicalGlobalObject()->functionPrototype(), name),
       m_body(body),
       m_scopeChain(scopeChainNode) {}
 
 void JSFunction::mark() {
-  InternalFunction::mark();
+  Base::mark();
   m_body->mark();
   m_scopeChain.mark();
 }
@@ -109,7 +112,7 @@ bool JSFunction::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  return InternalFunction::getOwnPropertySlot(exec, propertyName, slot);
+  return Base::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 void JSFunction::put(ExecState* exec,
@@ -118,7 +121,7 @@ void JSFunction::put(ExecState* exec,
   if (propertyName == exec->propertyNames().arguments ||
       propertyName == exec->propertyNames().length)
     return;
-  InternalFunction::put(exec, propertyName, value);
+  Base::put(exec, propertyName, value);
 }
 
 bool JSFunction::deleteProperty(ExecState* exec,
@@ -126,7 +129,7 @@ bool JSFunction::deleteProperty(ExecState* exec,
   if (propertyName == exec->propertyNames().arguments ||
       propertyName == exec->propertyNames().length)
     return false;
-  return InternalFunction::deleteProperty(exec, propertyName);
+  return Base::deleteProperty(exec, propertyName);
 }
 
 /* Returns the parameter name corresponding to the given index. eg:

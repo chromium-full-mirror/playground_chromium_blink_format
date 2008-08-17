@@ -36,6 +36,8 @@ using namespace std;
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(JSArray);
+
 // Overview of JSArray
 //
 // Properties of JSArray objects may be stored in one of three locations:
@@ -150,11 +152,11 @@ JSArray::JSArray(JSValue* prototype, unsigned initialLength)
     : JSObject(prototype) {
   unsigned initialCapacity = min(initialLength, MIN_SPARSE_ARRAY_INDEX);
 
-  m_length = initialLength;
-  m_fastAccessCutoff = 0;
   m_storage = static_cast<ArrayStorage*>(
       fastZeroedMalloc(storageSize(initialCapacity)));
+  m_fastAccessCutoff = 0;
   m_storage->m_vectorLength = initialCapacity;
+  m_storage->m_length = initialLength;
 
   Heap::heap(this)->reportExtraMemoryCost(initialCapacity * sizeof(JSValue*));
 
@@ -165,7 +167,6 @@ JSArray::JSArray(ExecState* exec, JSObject* prototype, const ArgList& list)
     : JSObject(prototype) {
   unsigned length = list.size();
 
-  m_length = length;
   m_fastAccessCutoff = length;
 
   ArrayStorage* storage =
@@ -174,6 +175,7 @@ JSArray::JSArray(ExecState* exec, JSObject* prototype, const ArgList& list)
   storage->m_vectorLength = length;
   storage->m_numValuesInVector = length;
   storage->m_sparseValueMap = 0;
+  storage->m_length = length;
 
   size_t i = 0;
   ArgList::const_iterator end = list.end();
@@ -201,7 +203,7 @@ bool JSArray::getOwnPropertySlot(ExecState* exec,
                                  PropertySlot& slot) {
   ArrayStorage* storage = m_storage;
 
-  if (i >= m_length) {
+  if (i >= storage->m_length) {
     if (i > MAX_ARRAY_INDEX)
       return getOwnPropertySlot(exec, Identifier::from(exec, i), slot);
     return false;
@@ -230,7 +232,7 @@ bool JSArray::getOwnPropertySlot(ExecState* exec,
                                  const Identifier& propertyName,
                                  PropertySlot& slot) {
   if (propertyName == exec->propertyNames().length) {
-    slot.setValue(jsNumber(exec, getLength()));
+    slot.setValue(jsNumber(exec, length()));
     return true;
   }
 
@@ -269,10 +271,10 @@ void JSArray::put(ExecState* exec,
 void JSArray::put(ExecState* exec, unsigned i, JSValue* value) {
   checkConsistency();
 
-  unsigned length = m_length;
+  unsigned length = m_storage->m_length;
   if (i >= length && i <= MAX_ARRAY_INDEX) {
     length = i + 1;
-    m_length = length;
+    m_storage->m_length = length;
   }
 
   if (i < m_storage->m_vectorLength) {
@@ -283,8 +285,8 @@ void JSArray::put(ExecState* exec, unsigned i, JSValue* value) {
       return;
     }
     valueSlot = value;
-    if (++m_storage->m_numValuesInVector == m_length)
-      m_fastAccessCutoff = m_length;
+    if (++m_storage->m_numValuesInVector == m_storage->m_length)
+      m_fastAccessCutoff = m_storage->m_length;
     checkConsistency();
     return;
   }
@@ -449,7 +451,7 @@ void JSArray::getPropertyNames(ExecState* exec,
 
   ArrayStorage* storage = m_storage;
 
-  unsigned usedVectorLength = min(m_length, storage->m_vectorLength);
+  unsigned usedVectorLength = min(storage->m_length, storage->m_vectorLength);
   for (unsigned i = 0; i < usedVectorLength; ++i) {
     if (storage->m_vector[i])
       propertyNames.add(Identifier::from(exec, i));
@@ -496,7 +498,7 @@ void JSArray::setLength(unsigned newLength) {
 
   ArrayStorage* storage = m_storage;
 
-  unsigned length = m_length;
+  unsigned length = m_storage->m_length;
 
   if (newLength < length) {
     if (m_fastAccessCutoff > newLength)
@@ -524,7 +526,7 @@ void JSArray::setLength(unsigned newLength) {
     }
   }
 
-  m_length = newLength;
+  m_storage->m_length = newLength;
 
   checkConsistency();
 }
@@ -534,7 +536,7 @@ void JSArray::mark() {
 
   ArrayStorage* storage = m_storage;
 
-  unsigned usedVectorLength = min(m_length, storage->m_vectorLength);
+  unsigned usedVectorLength = min(storage->m_length, storage->m_vectorLength);
   for (unsigned i = 0; i < usedVectorLength; ++i) {
     JSValue* value = storage->m_vector[i];
     if (value && !value->marked())
@@ -722,14 +724,17 @@ void JSArray::sort(ExecState* exec,
   // The maximum tree depth is compiled in - but the caller is clearly up to no
   // good
   // if a larger array is passed.
-  ASSERT(m_length <= static_cast<unsigned>(std::numeric_limits<int>::max()));
-  if (m_length > static_cast<unsigned>(std::numeric_limits<int>::max()))
+  ASSERT(m_storage->m_length <=
+         static_cast<unsigned>(std::numeric_limits<int>::max()));
+  if (m_storage->m_length >
+      static_cast<unsigned>(std::numeric_limits<int>::max()))
     return;
 
-  if (!m_length)
+  if (!m_storage->m_length)
     return;
 
-  unsigned usedVectorLength = min(m_length, m_storage->m_vectorLength);
+  unsigned usedVectorLength =
+      min(m_storage->m_length, m_storage->m_vectorLength);
 
   AVLTree<AVLTreeAbstractorForArrayCompare, 44>
       tree;  // Depth 44 is enough for 2^31 items
@@ -833,7 +838,7 @@ unsigned JSArray::compactForSorting() {
 
   ArrayStorage* storage = m_storage;
 
-  unsigned usedVectorLength = min(m_length, storage->m_vectorLength);
+  unsigned usedVectorLength = min(m_storage->m_length, storage->m_vectorLength);
 
   unsigned numDefined = 0;
   unsigned numUndefined = 0;
@@ -902,13 +907,13 @@ void JSArray::checkConsistency(ConsistencyCheckType type) {
   if (type == SortConsistencyCheck)
     ASSERT(!m_storage->m_sparseValueMap);
 
-  ASSERT(m_fastAccessCutoff <= m_length);
+  ASSERT(m_fastAccessCutoff <= m_storage->m_length);
   ASSERT(m_fastAccessCutoff <= m_storage->m_numValuesInVector);
 
   unsigned numValuesInVector = 0;
   for (unsigned i = 0; i < m_storage->m_vectorLength; ++i) {
     if (JSValue* value = m_storage->m_vector[i]) {
-      ASSERT(i < m_length);
+      ASSERT(i < m_storage->m_length);
       if (type != DestructorConsistencyCheck)
         value->type();  // Likely to crash if the object was deallocated.
       ++numValuesInVector;
@@ -926,7 +931,7 @@ void JSArray::checkConsistency(ConsistencyCheckType type) {
              m_storage->m_sparseValueMap->begin();
          it != end; ++it) {
       unsigned index = it->first;
-      ASSERT(index < m_length);
+      ASSERT(index < m_storage->m_length);
       ASSERT(index >= m_storage->m_vectorLength);
       ASSERT(index <= MAX_ARRAY_INDEX);
       ASSERT(it->second);

@@ -32,11 +32,15 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(PrototypeFunction);
+
 PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      int length,
                                      const Identifier& name,
                                      NativeFunction function)
-    : InternalFunction(exec->lexicalGlobalObject()->functionPrototype(), name),
+    : InternalFunction(exec,
+                       exec->lexicalGlobalObject()->functionPrototype(),
+                       name),
       m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(exec, length),
@@ -48,7 +52,7 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
                                      int length,
                                      const Identifier& name,
                                      NativeFunction function)
-    : InternalFunction(functionPrototype, name), m_function(function) {
+    : InternalFunction(exec, functionPrototype, name), m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(exec, length),
             DontDelete | ReadOnly | DontEnum);

@@ -30,6 +30,7 @@ namespace KJS {
 typedef HashMap<unsigned, JSValue*> SparseArrayValueMap;
 
 struct ArrayStorage {
+  unsigned m_length;
   unsigned m_vectorLength;
   unsigned m_numValuesInVector;
   SparseArrayValueMap* m_sparseValueMap;
@@ -56,7 +57,7 @@ class JSArray : public JSObject {
 
   static const ClassInfo info;
 
-  unsigned getLength() const { return m_length; }
+  unsigned length() const { return m_storage->m_length; }
   void setLength(unsigned);  // OK to use on new arrays, but not if it might be
                              // a RegExpMatchArray.
 
@@ -104,7 +105,6 @@ class JSArray : public JSObject {
   };
   void checkConsistency(ConsistencyCheckType = NormalConsistencyCheck);
 
-  unsigned m_length;
   unsigned m_fastAccessCutoff;
   ArrayStorage* m_storage;
 };

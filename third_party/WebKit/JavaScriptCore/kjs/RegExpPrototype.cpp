@@ -35,6 +35,8 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(RegExpPrototype);
+
 static JSValue* regExpProtoFuncTest(ExecState*,
                                     JSObject*,
                                     JSValue*,
@@ -60,19 +62,21 @@ RegExpPrototype::RegExpPrototype(ExecState* exec,
                                  ObjectPrototype* objectPrototype,
                                  FunctionPrototype* functionPrototype)
     : JSObject(objectPrototype) {
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
                                                  exec->propertyNames().compile,
                                                  regExpProtoFuncCompile),
                     DontEnum);
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
-                                                 exec->propertyNames().exec,
-                                                 regExpProtoFuncExec),
+  putDirectFunction(exec, new (exec) PrototypeFunction(
+                              exec, functionPrototype, 0,
+                              exec->propertyNames().exec, regExpProtoFuncExec),
                     DontEnum);
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
-                                                 exec->propertyNames().test,
-                                                 regExpProtoFuncTest),
+  putDirectFunction(exec, new (exec) PrototypeFunction(
+                              exec, functionPrototype, 0,
+                              exec->propertyNames().test, regExpProtoFuncTest),
                     DontEnum);
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
                                                  exec->propertyNames().toString,
                                                  regExpProtoFuncToString),
                     DontEnum);

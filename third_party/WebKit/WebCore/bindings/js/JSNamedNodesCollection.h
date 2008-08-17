@@ -54,7 +54,7 @@ class JSNamedNodesCollection : public DOMObject {
                                    const KJS::Identifier&,
                                    const KJS::PropertySlot&);
 
-  Vector<RefPtr<Node>> m_nodes;
+  OwnPtr<Vector<RefPtr<Node>>> m_nodes;
 };
 
 }  // namespace WebCore

@@ -35,6 +35,8 @@
 
 namespace KJS {
 
+ASSERT_CLASS_FITS_IN_CELL(NumberPrototype);
+
 static JSValue* numberProtoFuncToString(ExecState*,
                                         JSObject*,
                                         JSValue*,
@@ -71,33 +73,36 @@ NumberPrototype::NumberPrototype(ExecState* exec,
   // The constructor will be added later, after NumberConstructor has been
   // constructed
 
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 1,
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 1,
                                                  exec->propertyNames().toString,
                                                  numberProtoFuncToString),
                     DontEnum);
-  putDirectFunction(new (exec)
-                        PrototypeFunction(exec, functionPrototype, 0,
-                                          exec->propertyNames().toLocaleString,
-                                          numberProtoFuncToLocaleString),
-                    DontEnum);
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 0,
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, functionPrototype, 0,
+                                         exec->propertyNames().toLocaleString,
+                                         numberProtoFuncToLocaleString),
+      DontEnum);
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 0,
                                                  exec->propertyNames().valueOf,
                                                  numberProtoFuncValueOf),
                     DontEnum);
-  putDirectFunction(new (exec) PrototypeFunction(exec, functionPrototype, 1,
+  putDirectFunction(exec,
+                    new (exec) PrototypeFunction(exec, functionPrototype, 1,
                                                  exec->propertyNames().toFixed,
                                                  numberProtoFuncToFixed),
                     DontEnum);
-  putDirectFunction(new (exec)
-                        PrototypeFunction(exec, functionPrototype, 1,
-                                          exec->propertyNames().toExponential,
-                                          numberProtoFuncToExponential),
-                    DontEnum);
-  putDirectFunction(new (exec)
-                        PrototypeFunction(exec, functionPrototype, 1,
-                                          exec->propertyNames().toPrecision,
-                                          numberProtoFuncToPrecision),
-                    DontEnum);
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, functionPrototype, 1,
+                                         exec->propertyNames().toExponential,
+                                         numberProtoFuncToExponential),
+      DontEnum);
+  putDirectFunction(
+      exec, new (exec) PrototypeFunction(exec, functionPrototype, 1,
+                                         exec->propertyNames().toPrecision,
+                                         numberProtoFuncToPrecision),
+      DontEnum);
 }
 
 // ------------------------------ Functions ---------------------------
