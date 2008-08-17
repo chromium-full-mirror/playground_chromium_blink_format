@@ -88,10 +88,6 @@ class JSArray : public JSObject {
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 
-  static JSValue* lengthGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
-
   bool getOwnPropertySlotSlowCase(ExecState*,
                                   unsigned propertyName,
                                   PropertySlot&);
