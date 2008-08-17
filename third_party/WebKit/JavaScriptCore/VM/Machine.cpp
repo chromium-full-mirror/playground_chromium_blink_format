@@ -82,7 +82,9 @@ static void* op_call_indirect;
 #endif
 
 // Returns the depth of the scope chain within a given call frame.
-static int depth(ScopeChain& sc) {
+static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
+  if (!codeBlock->needsFullScopeChain)
+    return 0;
   int scopeDepth = 0;
   ScopeChainIterator iter = sc.begin();
   ScopeChainIterator end = sc.end();
@@ -866,7 +868,7 @@ NEVER_INLINE Instruction* Machine::throwException(ExecState* exec,
   // Now unwind the scope chain within the exception handler's call frame.
 
   ScopeChain sc(scopeChain);
-  int scopeDelta = depth(sc) - scopeDepth;
+  int scopeDelta = depth(codeBlock, sc) - scopeDepth;
   ASSERT(scopeDelta >= 0);
   while (scopeDelta--)
     sc.pop();
