@@ -335,7 +335,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         JSArray* array = static_cast<JSArray*>(object);
 
         QVariantList result;
-        int len = array->getLength();
+        int len = array->length();
         int objdist = 0;
         qConvDebug() << "converting a " << len << " length Array";
         for (int i = 0; i < len; ++i) {
@@ -388,7 +388,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         JSArray* array = static_cast<JSArray*>(object);
 
         QStringList result;
-        int len = array->getLength();
+        int len = array->length();
         for (int i = 0; i < len; ++i) {
           JSValue* val = array->get(exec, i);
           UString ustring = val->toString(exec);
@@ -625,7 +625,7 @@ QVariant convertValueToQVariant(ExecState* exec,
           JSObject* object = value->toObject(exec);
           JSArray* array = static_cast<JSArray*>(object);
           QObjectList result;
-          int len = array->getLength();
+          int len = array->length();
           for (int i = 0; i < len; ++i) {
             JSValue* val = array->get(exec, i);
             int itemdist = -1;
@@ -679,7 +679,7 @@ QVariant convertValueToQVariant(ExecState* exec,
           JSArray* array = static_cast<JSArray*>(object);
 
           QList<int> result;
-          int len = array->getLength();
+          int len = array->length();
           for (int i = 0; i < len; ++i) {
             JSValue* val = array->get(exec, i);
             int itemdist = -1;
@@ -890,7 +890,8 @@ QtRuntimeMethod::QtRuntimeMethod(QtRuntimeMethodData* dd,
                                  ExecState* exec,
                                  const Identifier& ident,
                                  PassRefPtr<QtInstance> inst)
-    : InternalFunction(static_cast<FunctionPrototype*>(
+    : InternalFunction(exec,
+                       static_cast<FunctionPrototype*>(
                            exec->lexicalGlobalObject()->functionPrototype()),
                        ident),
       d_ptr(dd) {
