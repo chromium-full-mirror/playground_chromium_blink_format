@@ -119,6 +119,8 @@ JSGlobalData::~JSGlobalData() {
   deleteAllValues(*opaqueJSClassData);
   delete opaqueJSClassData;
 
+  delete emptyList;
+
   delete propertyNames;
   deleteIdentifierTable(identifierTable);
 
