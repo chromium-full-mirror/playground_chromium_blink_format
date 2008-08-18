@@ -51,6 +51,9 @@ void Profile::forEach(void (ProfileNode::*function)()) {
        nextNode = nextNode->firstChild())
     currentNode = nextNode;
 
+  if (!currentNode)
+    currentNode = m_head.get();
+
   ProfileNode* endNode = m_head->traverseNextNodePostOrder();
   while (currentNode && currentNode != endNode) {
     (currentNode->*function)();
