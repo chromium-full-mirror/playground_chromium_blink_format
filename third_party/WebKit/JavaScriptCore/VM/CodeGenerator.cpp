@@ -680,6 +680,13 @@ RegisterID* CodeGenerator::emitUnexpectedLoad(RegisterID* dst, bool b) {
   return dst;
 }
 
+RegisterID* CodeGenerator::emitUnexpectedLoad(RegisterID* dst, double d) {
+  emitOpcode(op_unexpected_load);
+  instructions().append(dst->index());
+  instructions().append(addUnexpectedConstant(jsNumber(globalExec(), d)));
+  return dst;
+}
+
 RegisterID* CodeGenerator::emitNullaryOp(OpcodeID opcode, RegisterID* dst) {
   emitOpcode(opcode);
   instructions().append(dst->index());
