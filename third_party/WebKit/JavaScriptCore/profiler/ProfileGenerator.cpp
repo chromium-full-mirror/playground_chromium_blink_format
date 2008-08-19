@@ -28,6 +28,7 @@
 
 #include "Profile.h"
 #include "Profiler.h"
+#include "Tracing.h"
 
 namespace KJS {
 
@@ -62,6 +63,14 @@ const UString& ProfileGenerator::title() const {
 }
 
 void ProfileGenerator::willExecute(const CallIdentifier& callIdentifier) {
+  if (JAVASCRIPTCORE_PROFILE_WILL_EXECUTE_ENABLED()) {
+    CString name = callIdentifier.m_name.UTF8String();
+    CString url = callIdentifier.m_url.UTF8String();
+    JAVASCRIPTCORE_PROFILE_WILL_EXECUTE(
+        m_profileGroup, const_cast<char*>(name.c_str()),
+        const_cast<char*>(url.c_str()), callIdentifier.m_lineNumber);
+  }
+
   if (m_stoppedProfiling) {
     ++m_stoppedCallDepth;
     return;
@@ -72,6 +81,14 @@ void ProfileGenerator::willExecute(const CallIdentifier& callIdentifier) {
 }
 
 void ProfileGenerator::didExecute(const CallIdentifier& callIdentifier) {
+  if (JAVASCRIPTCORE_PROFILE_DID_EXECUTE_ENABLED()) {
+    CString name = callIdentifier.m_name.UTF8String();
+    CString url = callIdentifier.m_url.UTF8String();
+    JAVASCRIPTCORE_PROFILE_DID_EXECUTE(
+        m_profileGroup, const_cast<char*>(name.c_str()),
+        const_cast<char*>(url.c_str()), callIdentifier.m_lineNumber);
+  }
+
   if (!m_currentNode)
     return;
 
