@@ -271,6 +271,19 @@ void Console::assertCondition(bool condition,
   printToStandardOut(ErrorMessageLevel, exec, args, url);
 }
 
+void Console::count(const UString& title) {
+  if (!m_frame)
+    return;
+
+  Page* page = m_frame->page();
+  if (!page)
+    return;
+
+  // FIXME: pass the file and line number to the InspectorController
+  // when we have this information.
+  page->inspectorController()->count(title, 0, String());
+}
+
 void Console::profile(ExecState* exec, const ArgList& args) {
   UString title = args.at(exec, 0)->toString(exec);
   Profiler::profiler()->startProfiling(exec, title, this);

@@ -207,6 +207,10 @@ class InspectorController : JavaScriptDebugListener,
 
   void drawNodeHighlight(GraphicsContext&) const;
 
+  void count(const KJS::UString& title,
+             unsigned lineNumber,
+             const String& sourceID);
+
   void startTiming(const KJS::UString& title);
   bool stopTiming(const KJS::UString& title, double& elapsed);
 
@@ -292,6 +296,7 @@ class InspectorController : JavaScriptDebugListener,
   Vector<ConsoleMessage*> m_consoleMessages;
   Vector<RefPtr<KJS::Profile>> m_profiles;
   HashMap<String, double> m_times;
+  HashMap<String, unsigned> m_counts;
 #if ENABLE(DATABASE)
   DatabaseResourcesSet m_databaseResources;
 #endif
