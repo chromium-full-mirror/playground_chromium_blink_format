@@ -58,6 +58,11 @@ class TRect;
 class wxRect;
 #endif
 
+#if PLATFORM(SKIA)
+struct SkRect;
+struct SkIRect;
+#endif
+
 namespace WebCore {
 
 class FloatRect;
@@ -158,6 +163,12 @@ class IntRect {
 
 #if PLATFORM(CG)
   operator CGRect() const;
+#endif
+
+#if PLATFORM(SKIA)
+  IntRect(const SkIRect&);
+  operator SkRect() const;
+  operator SkIRect() const;
 #endif
 
 #if PLATFORM(MAC) && !defined(NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES)

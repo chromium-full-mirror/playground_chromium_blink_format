@@ -65,22 +65,15 @@ class SVGPaintServerPattern : public SVGPaintServer {
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
-#if PLATFORM(CG)
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
                      SVGPaintTargetType,
                      bool isPaintingText) const;
+#if PLATFORM(CG)
   virtual void teardown(GraphicsContext*&,
                         const RenderObject*,
                         SVGPaintTargetType,
                         bool isPaintingText) const;
-#endif
-
-#if PLATFORM(QT) || PLATFORM(CAIRO)
-  virtual bool setup(GraphicsContext*&,
-                     const RenderObject*,
-                     SVGPaintTargetType,
-                     bool isPaintingText) const;
 #endif
 
  private:

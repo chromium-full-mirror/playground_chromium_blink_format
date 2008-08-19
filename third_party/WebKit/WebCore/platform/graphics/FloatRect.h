@@ -51,6 +51,10 @@ QT_END_NAMESPACE
 class wxRect2DDouble;
 #endif
 
+#if PLATFORM(SKIA)
+struct SkRect;
+#endif
+
 namespace WebCore {
 
 class IntRect;
@@ -147,6 +151,11 @@ class FloatRect {
 #if PLATFORM(WX) && USE(WXGC)
   FloatRect(const wxRect2DDouble&);
   operator wxRect2DDouble() const;
+#endif
+
+#if PLATFORM(SKIA)
+  FloatRect(const SkRect&);
+  operator SkRect() const;
 #endif
 
  private:
