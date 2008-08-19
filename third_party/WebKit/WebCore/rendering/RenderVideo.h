@@ -45,7 +45,7 @@ class RenderVideo : public RenderMedia {
 
   virtual void layout();
 
-  virtual int calcReplacedWidth() const;
+  virtual int calcReplacedWidth(bool includeMaxWidth = true) const;
   virtual int calcReplacedHeight() const;
 
   virtual void calcPrefWidths();

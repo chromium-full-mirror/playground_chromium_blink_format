@@ -490,7 +490,7 @@ bool RenderImage::isHeightSpecified() const {
   return false;
 }
 
-int RenderImage::calcReplacedWidth() const {
+int RenderImage::calcReplacedWidth(bool includeMaxWidth) const {
   if (imageHasRelativeWidth())
     if (RenderObject* cb = isPositioned() ? container() : containingBlock())
       setImageContainerSize(
@@ -508,7 +508,7 @@ int RenderImage::calcReplacedWidth() const {
     width = calcAspectRatioWidth();
 
   int minW = calcReplacedWidthUsing(style()->minWidth());
-  int maxW = style()->maxWidth().isUndefined()
+  int maxW = !includeMaxWidth || style()->maxWidth().isUndefined()
                  ? width
                  : calcReplacedWidthUsing(style()->maxWidth());
 
@@ -556,8 +556,16 @@ int RenderImage::calcAspectRatioHeight() const {
 void RenderImage::calcPrefWidths() {
   ASSERT(prefWidthsDirty());
 
-  m_maxPrefWidth = calcReplacedWidth() + paddingLeft() + paddingRight() +
-                   borderLeft() + borderRight();
+  int paddingAndBorders =
+      paddingLeft() + paddingRight() + borderLeft() + borderRight();
+  m_maxPrefWidth = calcReplacedWidth(false) + paddingAndBorders;
+
+  if (style()->maxWidth().isFixed() &&
+      style()->maxWidth().value() != undefinedLength)
+    m_maxPrefWidth =
+        min(m_maxPrefWidth,
+            style()->maxWidth().value() +
+                (style()->boxSizing() == CONTENT_BOX ? paddingAndBorders : 0));
 
   if (style()->width().isPercent() || style()->height().isPercent() ||
       style()->maxWidth().isPercent() || style()->maxHeight().isPercent() ||

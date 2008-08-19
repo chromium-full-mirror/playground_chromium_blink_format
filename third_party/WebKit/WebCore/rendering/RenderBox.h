@@ -147,7 +147,7 @@ class RenderBox : public RenderObject {
   int calcReplacedWidthUsing(Length width) const;
   int calcReplacedHeightUsing(Length height) const;
 
-  virtual int calcReplacedWidth() const;
+  virtual int calcReplacedWidth(bool includeMaxWidth = true) const;
   virtual int calcReplacedHeight() const;
 
   int calcPercentageHeight(const Length& height);
