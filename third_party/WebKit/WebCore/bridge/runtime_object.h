@@ -40,8 +40,8 @@ class RuntimeObjectImp : public JSObject {
                                   PropertySlot&);
   virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
-  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
-  virtual KJS::CallType getCallData(KJS::CallData&);
+  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
+  virtual CallType getCallData(CallData&);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual void invalidate();

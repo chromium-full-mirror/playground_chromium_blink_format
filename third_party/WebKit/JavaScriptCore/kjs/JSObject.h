@@ -29,7 +29,6 @@
 #include "CommonIdentifiers.h"
 #include "ExecState.h"
 #include "JSNumberCell.h"
-#include "JSType.h"
 #include "PropertyMap.h"
 #include "PropertySlot.h"
 #include "ScopeChain.h"
@@ -68,11 +67,10 @@ class JSObject : public JSCell {
   JSObject();
 
   virtual void mark();
-  virtual JSType type() const;
 
   bool inherits(const ClassInfo* classInfo) const {
-    return isObject(classInfo);
-  }  // FIXME: Merge with isObject.
+    return JSCell::isObject(classInfo);
+  }
 
   JSValue* prototype() const;
   void setPrototype(JSValue* prototype);
@@ -115,7 +113,7 @@ class JSObject : public JSCell {
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
 
-  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
+  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
 
   virtual bool implementsHasInstance() const;
   virtual bool hasInstance(ExecState*, JSValue*);
@@ -123,7 +121,7 @@ class JSObject : public JSCell {
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual JSValue* toPrimitive(ExecState*,
-                               JSType preferredType = UnspecifiedType) const;
+                               PreferredPrimitiveType = NoPreference) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
   virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
@@ -192,6 +190,8 @@ class JSObject : public JSCell {
                                   bool& slotIsWriteable);
 
  private:
+  virtual bool isObject() const;
+
   const HashEntry* findPropertyHashEntry(ExecState*,
                                          const Identifier& propertyName) const;
   JSValue* m_prototype;
@@ -295,7 +295,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
     bool& slotIsWriteable) {
   if (JSValue** location = getDirectLocation(propertyName, slotIsWriteable)) {
     if (m_propertyMap.hasGetterSetterProperties() &&
-        location[0]->type() == GetterSetterType) {
+        location[0]->isGetterSetter()) {
       slotIsWriteable = false;
       fillGetterPropertySlot(slot, location);
     } else
@@ -323,7 +323,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
                                                 PropertySlot& slot) {
   if (JSValue** location = getDirectLocation(propertyName)) {
     if (m_propertyMap.hasGetterSetterProperties() &&
-        location[0]->type() == GetterSetterType)
+        location[0]->isGetterSetter())
       fillGetterPropertySlot(slot, location);
     else
       slot.setValueSlot(location);
@@ -354,8 +354,9 @@ inline void JSObject::putDirect(ExecState* exec,
   m_propertyMap.put(propertyName, jsNumber(exec, value), attr);
 }
 
-inline JSValue* JSObject::toPrimitive(ExecState* exec,
-                                      JSType preferredType) const {
+inline JSValue* JSObject::toPrimitive(
+    ExecState* exec,
+    PreferredPrimitiveType preferredType) const {
   return defaultValue(exec, preferredType);
 }
 

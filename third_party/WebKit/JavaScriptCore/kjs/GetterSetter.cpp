@@ -37,7 +37,7 @@ void GetterSetter::mark() {
     m_setter->mark();
 }
 
-JSValue* GetterSetter::toPrimitive(ExecState*, JSType) const {
+JSValue* GetterSetter::toPrimitive(ExecState*, PreferredPrimitiveType) const {
   ASSERT_NOT_REACHED();
   return jsNull();
 }
@@ -69,6 +69,10 @@ UString GetterSetter::toString(ExecState*) const {
 JSObject* GetterSetter::toObject(ExecState* exec) const {
   ASSERT_NOT_REACHED();
   return jsNull()->toObject(exec);
+}
+
+bool GetterSetter::isGetterSetter() const {
+  return true;
 }
 
 }  // namespace KJS

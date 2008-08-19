@@ -115,7 +115,7 @@ class Heap : Noncopyable {
   }
 
   JSGlobalData* globalData() const { return m_globalData; }
-  static bool fastIsNumber(JSCell*);
+  static bool isNumber(JSCell*);
 
  private:
   template <Heap::HeapType heapType>
@@ -243,7 +243,7 @@ class SmallCellCollectorBlock {
   Heap::HeapType type;
 };
 
-inline bool Heap::fastIsNumber(JSCell* cell) {
+inline bool Heap::isNumber(JSCell* cell) {
   CollectorBlock* block = Heap::cellBlock(cell);
   return block && block->type == NumberHeap;
 }

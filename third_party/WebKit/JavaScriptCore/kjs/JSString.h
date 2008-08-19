@@ -60,10 +60,9 @@ class JSString : public JSCell {
   }
 
  private:
-  virtual JSType type() const { return StringType; }
+  virtual bool isString() const;
 
-  virtual JSValue* toPrimitive(ExecState*,
-                               JSType preferred = UnspecifiedType) const;
+  virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
   virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;

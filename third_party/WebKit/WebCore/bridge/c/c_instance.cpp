@@ -125,13 +125,12 @@ JSValue* CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
   return resultValue;
 }
 
-JSValue* CInstance::defaultValue(ExecState* exec, JSType hint) const {
-  if (hint == StringType)
+JSValue* CInstance::defaultValue(ExecState* exec,
+                                 PreferredPrimitiveType hint) const {
+  if (hint == JSValue::PreferString)
     return stringValue(exec);
-  if (hint == NumberType)
+  if (hint == JSValue::PreferNumber)
     return numberValue(exec);
-  if (hint == BooleanType)
-    return booleanValue();
   return valueOf(exec);
 }
 

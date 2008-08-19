@@ -36,8 +36,6 @@ class GetterSetter : public JSCell {
  public:
   GetterSetter() : m_getter(0), m_setter(0) {}
 
-  JSType type() const { return GetterSetterType; }
-
   virtual void mark();
 
   JSObject* getter() const { return m_getter; }
@@ -46,7 +44,9 @@ class GetterSetter : public JSCell {
   void setSetter(JSObject* setter) { m_setter = setter; }
 
  private:
-  virtual JSValue* toPrimitive(ExecState*, JSType preferred) const;
+  virtual bool isGetterSetter() const;
+
+  virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*& value);
   virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;

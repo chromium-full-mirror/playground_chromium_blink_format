@@ -97,21 +97,26 @@ static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
   return scopeDepth;
 }
 
+// FIXME: This operation should be called "getNumber", not "isNumber" (as it is
+// in JSValue.h).
+// FIXME: There's no need to have a "slow" version of this. All versions should
+// be fast.
 static bool fastIsNumber(JSValue* value, double& arg) {
   if (JSImmediate::isNumber(value))
     arg = JSImmediate::getTruncatedInt32(value);
-  else if (Heap::fastIsNumber(static_cast<JSCell*>(value)))
+  else if (Heap::isNumber(static_cast<JSCell*>(value)))
     arg = static_cast<JSNumberCell*>(value)->value();
   else
     return false;
   return true;
 }
 
+// FIXME: Why doesn't JSValue::toInt32 have the Heap::isNumber optimization?
 static bool fastToInt32(JSValue* value, int32_t& arg) {
   if (JSImmediate::isNumber(value))
     arg = JSImmediate::getTruncatedInt32(value);
-  else if (Heap::fastIsNumber(static_cast<JSCell*>(value)))
-    arg = static_cast<JSNumberCell*>(value)->fastToInt32();
+  else if (Heap::isNumber(static_cast<JSCell*>(value)))
+    arg = static_cast<JSNumberCell*>(value)->toInt32();
   else
     return false;
   return true;
@@ -125,8 +130,8 @@ static ALWAYS_INLINE bool fastToUInt32(JSValue* value, uint32_t& arg) {
     arg = JSValue::toUInt32SlowCase(JSImmediate::getTruncatedInt32(value),
                                     scratch);
     return true;
-  } else if (Heap::fastIsNumber(static_cast<JSCell*>(value)))
-    arg = static_cast<JSNumberCell*>(value)->fastToUInt32();
+  } else if (Heap::isNumber(static_cast<JSCell*>(value)))
+    arg = static_cast<JSNumberCell*>(value)->toUInt32();
   else
     return false;
   return true;
@@ -178,8 +183,8 @@ static inline bool jsLessEq(ExecState* exec, JSValue* v1, JSValue* v2) {
 
 static JSValue* jsAddSlowCase(ExecState* exec, JSValue* v1, JSValue* v2) {
   // exception for the Date exception in defaultValue()
-  JSValue* p1 = v1->toPrimitive(exec, UnspecifiedType);
-  JSValue* p2 = v2->toPrimitive(exec, UnspecifiedType);
+  JSValue* p1 = v1->toPrimitive(exec);
+  JSValue* p2 = v2->toPrimitive(exec);
 
   if (p1->isString() || p2->isString()) {
     UString value = p1->toString(exec) + p2->toString(exec);
@@ -203,15 +208,10 @@ static JSValue* jsAddSlowCase(ExecState* exec, JSValue* v1, JSValue* v2) {
 static inline JSValue* jsAdd(ExecState* exec, JSValue* v1, JSValue* v2) {
   double left;
   double right;
-
   if (fastIsNumber(v1, left) && fastIsNumber(v2, right))
     return jsNumber(exec, left + right);
 
-  JSType t1 = v1->type();
-  JSType t2 = v2->type();
-  const unsigned bothTypes = (t1 << 3) | t2;
-  ASSERT(bothTypes != ((NumberType << 3) | NumberType));
-  if (bothTypes == ((StringType << 3) | StringType)) {
+  if (v1->isString() && v2->isString()) {
     UString value = static_cast<JSString*>(v1)->value() +
                     static_cast<JSString*>(v2)->value();
     if (value.isNull())
@@ -224,30 +224,24 @@ static inline JSValue* jsAdd(ExecState* exec, JSValue* v1, JSValue* v2) {
 }
 
 static JSValue* jsTypeStringForValue(ExecState* exec, JSValue* v) {
-  switch (v->type()) {
-    case UndefinedType:
+  if (v->isUndefined())
+    return jsString(exec, "undefined");
+  if (v->isBoolean())
+    return jsString(exec, "boolean");
+  if (v->isNumber())
+    return jsString(exec, "number");
+  if (v->isString())
+    return jsString(exec, "string");
+  if (v->isObject()) {
+    // Return "undefined" for objects that should be treated
+    // as null when doing comparisons.
+    if (static_cast<JSObject*>(v)->masqueradeAsUndefined())
       return jsString(exec, "undefined");
-    case NullType:
-      return jsString(exec, "object");
-    case BooleanType:
-      return jsString(exec, "boolean");
-    case NumberType:
-      return jsString(exec, "number");
-    case StringType:
-      return jsString(exec, "string");
-    default:
-      if (v->isObject()) {
-        // Return "undefined" for objects that should be treated
-        // as null when doing comparisons.
-        if (static_cast<JSObject*>(v)->masqueradeAsUndefined())
-          return jsString(exec, "undefined");
-        CallData callData;
-        if (static_cast<JSObject*>(v)->getCallData(callData) != CallTypeNone)
-          return jsString(exec, "function");
-      }
-
-      return jsString(exec, "object");
+    CallData callData;
+    if (static_cast<JSObject*>(v)->getCallData(callData) != CallTypeNone)
+      return jsString(exec, "function");
   }
+  return jsString(exec, "object");
 }
 
 static bool NEVER_INLINE resolve(ExecState* exec,
@@ -1758,7 +1752,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       if (JSImmediate::areBothImmediateNumbers(val, shift))
         r[dst] = jsNumber(
             exec, JSImmediate::getTruncatedInt32(val)
-                      << (JSImmediate::toTruncatedUInt32(shift) & 0x1f));
+                      << (JSImmediate::getTruncatedUInt32(shift) & 0x1f));
       else if (fastToInt32(val, left) && fastToUInt32(shift, right))
         r[dst] = jsNumber(exec, left << (right & 0x1f));
       else {
@@ -2494,7 +2488,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       int tableIndex = (++vPC)->u.operand;
       int defaultOffset = (++vPC)->u.operand;
       JSValue* scrutinee = r[(++vPC)->u.operand].jsValue(exec);
-      if (scrutinee->type() != StringType)
+      if (!scrutinee->isString())
         vPC += defaultOffset;
       else {
         UString::Rep* value = static_cast<JSString*>(scrutinee)->value().rep();
@@ -2519,7 +2513,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       int tableIndex = (++vPC)->u.operand;
       int defaultOffset = (++vPC)->u.operand;
       JSValue* scrutinee = r[(++vPC)->u.operand].jsValue(exec);
-      if (scrutinee->type() != StringType)
+      if (!scrutinee->isString())
         vPC += defaultOffset;
       else
         vPC +=

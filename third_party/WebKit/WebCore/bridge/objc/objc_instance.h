@@ -53,7 +53,7 @@ class ObjcInstance : public Instance {
   virtual Class* getClass() const;
 
   virtual JSValue* valueOf(ExecState*) const;
-  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
+  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
@@ -66,9 +66,8 @@ class ObjcInstance : public Instance {
                                         const Identifier& property,
                                         JSValue* aValue);
 
-  virtual JSValue* getValueOfUndefinedField(ExecState* exec,
-                                            const Identifier& property,
-                                            JSType hint) const;
+  virtual JSValue* getValueOfUndefinedField(ExecState*,
+                                            const Identifier& property) const;
 
   ObjectStructPtr getObject() const { return _instance.get(); }
 

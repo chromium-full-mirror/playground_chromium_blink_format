@@ -75,7 +75,7 @@ class JavaInstance : public Instance {
   virtual Class* getClass() const;
 
   virtual JSValue* valueOf(ExecState*) const;
-  virtual JSValue* defaultValue(ExecState*, JSType hint) const;
+  virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,

@@ -44,11 +44,11 @@ class JSCell : public JSValue {
 
  public:
   // Querying the type.
-  virtual JSType type() const = 0;
   bool isNumber() const;
-  bool isString() const;
-  bool isObject() const;
-  bool isObject(const ClassInfo*) const;  // FIXME: Merge with inherits.
+  virtual bool isString() const;
+  virtual bool isGetterSetter() const;
+  virtual bool isObject() const;
+  virtual bool isObject(const ClassInfo*) const;
 
   // Extracting the value.
   bool getNumber(double&) const;
@@ -67,9 +67,7 @@ class JSCell : public JSValue {
   virtual bool getTruncatedUInt32(uint32_t&) const;
 
   // Basic conversions.
-  virtual JSValue* toPrimitive(
-      ExecState*,
-      JSType preferredType = UnspecifiedType) const = 0;
+  virtual JSValue* toPrimitive(ExecState*, PreferredPrimitiveType) const = 0;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue*&) = 0;
   virtual bool toBoolean(ExecState*) const = 0;
   virtual double toNumber(ExecState*) const = 0;
@@ -114,15 +112,7 @@ inline JSCell::JSCell() {}
 inline JSCell::~JSCell() {}
 
 inline bool JSCell::isNumber() const {
-  return type() == NumberType;
-}
-
-inline bool JSCell::isString() const {
-  return type() == StringType;
-}
-
-inline bool JSCell::isObject() const {
-  return type() == ObjectType;
+  return Heap::isNumber(const_cast<JSCell*>(this));
 }
 
 inline bool JSCell::marked() const {
@@ -152,6 +142,10 @@ inline bool JSValue::isNumber() const {
 
 inline bool JSValue::isString() const {
   return !JSImmediate::isImmediate(this) && asCell()->isString();
+}
+
+inline bool JSValue::isGetterSetter() const {
+  return !JSImmediate::isImmediate(this) && asCell()->isGetterSetter();
 }
 
 inline bool JSValue::isObject() const {
@@ -225,13 +219,9 @@ inline bool JSValue::marked() const {
   return JSImmediate::isImmediate(this) || asCell()->marked();
 }
 
-inline JSType JSValue::type() const {
-  return JSImmediate::isImmediate(this) ? JSImmediate::type(this)
-                                        : asCell()->type();
-}
-
-inline JSValue* JSValue::toPrimitive(ExecState* exec,
-                                     JSType preferredType) const {
+inline JSValue* JSValue::toPrimitive(
+    ExecState* exec,
+    PreferredPrimitiveType preferredType) const {
   return JSImmediate::isImmediate(this)
              ? const_cast<JSValue*>(this)
              : asCell()->toPrimitive(exec, preferredType);

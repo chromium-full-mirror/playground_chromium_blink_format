@@ -115,8 +115,7 @@ class Instance : public RefCounted<Instance> {
 
   virtual JSValue* getValueOfField(ExecState*, const Field*) const;
   virtual JSValue* getValueOfUndefinedField(ExecState*,
-                                            const Identifier&,
-                                            JSType) const {
+                                            const Identifier&) const {
     return jsUndefined();
   }
   virtual void setValueOfField(ExecState*, const Field*, JSValue*) const;
@@ -136,7 +135,9 @@ class Instance : public RefCounted<Instance> {
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&) {}
 
-  virtual JSValue* defaultValue(ExecState*, JSType hint) const = 0;
+  typedef JSValue::PreferredPrimitiveType PreferredPrimitiveType;
+  virtual JSValue* defaultValue(ExecState*,
+                                JSValue::PreferredPrimitiveType) const = 0;
 
   virtual JSValue* valueOf(ExecState* exec) const {
     return jsString(exec, getClass()->name());

@@ -185,7 +185,8 @@ bool RuntimeObjectImp::deleteProperty(ExecState*, const Identifier&) {
   return false;
 }
 
-JSValue* RuntimeObjectImp::defaultValue(ExecState* exec, JSType hint) const {
+JSValue* RuntimeObjectImp::defaultValue(ExecState* exec,
+                                        PreferredPrimitiveType hint) const {
   if (!instance)
     return throwInvalidAccessError(exec);
 
