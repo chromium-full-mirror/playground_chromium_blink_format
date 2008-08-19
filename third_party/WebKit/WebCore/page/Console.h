@@ -44,6 +44,7 @@ class JSValue;
 namespace WebCore {
 
 class Frame;
+class Page;
 class String;
 
 enum MessageSource {
@@ -100,6 +101,8 @@ class Console : public RefCounted<Console>, public KJS::ProfilerClient {
   void reportCurrentException(KJS::ExecState*);
 
  private:
+  inline Page* page() const;
+
   Console(Frame*);
 
   Frame* m_frame;
