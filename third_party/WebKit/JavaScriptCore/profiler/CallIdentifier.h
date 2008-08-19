@@ -83,7 +83,7 @@ struct HashTraits<KJS::CallIdentifier>
     : GenericHashTraits<KJS::CallIdentifier> {
   static const bool emptyValueIsZero = false;
   static KJS::CallIdentifier emptyValue() {
-    return KJS::CallIdentifier(KJS::UString(), KJS::UString(), 0);
+    return KJS::CallIdentifier("", "", 0);
   }
   static const bool needsDestruction = false;
   static void constructDeletedValue(KJS::CallIdentifier& slot) {
