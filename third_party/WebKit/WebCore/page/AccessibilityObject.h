@@ -133,7 +133,7 @@ enum AccessibilityRole {
   LinkRole,
   DisclosureTriangleRole,
   GridRole,
-
+  CellRole,
   // AppKit includes SortButtonRole but it is misnamed and really a subrole of
   // ButtonRole so we do not include it here.
 
@@ -145,7 +145,8 @@ enum AccessibilityRole {
   WebAreaRole,
   HeadingRole,
   ListBoxRole,
-  ListBoxOptionRole
+  ListBoxOptionRole,
+  TableHeaderContainerRole
 };
 
 struct VisiblePositionRange {
@@ -203,6 +204,10 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isProgressIndicator() const { return false; };
   virtual bool isSlider() const { return false; };
   virtual bool isControl() const { return false; };
+  virtual bool isDataTable() const { return false; };
+  virtual bool isTableRow() const { return false; };
+  virtual bool isTableColumn() const { return false; };
+  virtual bool isTableCell() const { return false; };
 
   virtual bool isChecked() const { return false; };
   virtual bool isEnabled() const { return false; };
