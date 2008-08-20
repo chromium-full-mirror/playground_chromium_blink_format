@@ -34,6 +34,7 @@
 #include "NP_jsobject.h"
 #include "c_instance.h"
 #include <kjs/JSGlobalObject.h>
+#include <kjs/JSLock.h>
 #include "PlatformString.h"
 #include "npruntime_impl.h"
 #include "npruntime_priv.h"
@@ -72,6 +73,8 @@ static String convertUTF8ToUTF16WithLatin1Fallback(const NPUTF8* UTF8Chars,
 void convertValueToNPVariant(ExecState* exec,
                              JSValue* value,
                              NPVariant* result) {
+  JSLock lock(false);
+
   VOID_TO_NPVARIANT(*result);
 
   if (value->isString()) {
@@ -111,6 +114,8 @@ void convertValueToNPVariant(ExecState* exec,
 JSValue* convertNPVariantToValue(ExecState* exec,
                                  const NPVariant* variant,
                                  RootObject* rootObject) {
+  JSLock lock(false);
+
   NPVariantType type = variant->type;
 
   if (type == NPVariantType_Bool)

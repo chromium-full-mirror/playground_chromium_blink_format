@@ -26,6 +26,7 @@
 #include "ArgList.h"
 #include "ExecState.h"
 #include "JSGlobalObject.h"
+#include "JSLock.h"
 #include "JSString.h"
 #include "JSValue.h"
 #include "Machine.h"
@@ -132,6 +133,8 @@ Heap::Heap(JSGlobalData* globalData)
 }
 
 Heap::~Heap() {
+  JSLock lock(false);
+
   // The global object is not GC protected at this point, so sweeping may delete
   // it (and thus the global data)
   // before other objects that may use the global data.
@@ -288,6 +291,8 @@ ALWAYS_INLINE void* Heap::heapAllocate(size_t s) {
   typedef typename HeapConstants<heapType>::Cell Cell;
 
   CollectorHeap& heap = heapType == PrimaryHeap ? primaryHeap : numberHeap;
+  ASSERT(JSLock::lockCount() > 0);
+  ASSERT(JSLock::currentThreadIsHoldingLock());
   ASSERT(s <= HeapConstants<heapType>::cellSize);
   UNUSED_PARAM(s);  // s is now only used for the above assert
 
@@ -787,8 +792,8 @@ void Heap::markStackObjectsConservatively() {
 void Heap::setGCProtectNeedsLocking() {
   // Most clients do not need to call this, with the notable exception of
   // WebCore.
-  // Clients that use context from a single context group from multiple threads
-  // are supposed
+  // Clients that use shared heap have JSLock protection, while others are
+  // supposed
   // to do explicit locking. WebCore violates this contract in Database code,
   // which calls gcUnprotect from a secondary thread.
   if (!m_protectedValuesMutex)
@@ -797,6 +802,8 @@ void Heap::setGCProtectNeedsLocking() {
 
 void Heap::protect(JSValue* k) {
   ASSERT(k);
+  ASSERT(JSLock::currentThreadIsHoldingLock() ||
+         !m_globalData->isSharedInstance);
 
   if (JSImmediate::isImmediate(k))
     return;
@@ -812,6 +819,8 @@ void Heap::protect(JSValue* k) {
 
 void Heap::unprotect(JSValue* k) {
   ASSERT(k);
+  ASSERT(JSLock::currentThreadIsHoldingLock() ||
+         !m_globalData->isSharedInstance);
 
   if (JSImmediate::isImmediate(k))
     return;
@@ -956,6 +965,13 @@ size_t Heap::sweep() {
 }
 
 bool Heap::collect() {
+#ifndef NDEBUG
+  if (m_globalData->isSharedInstance) {
+    ASSERT(JSLock::lockCount() > 0);
+    ASSERT(JSLock::currentThreadIsHoldingLock());
+  }
+#endif
+
   ASSERT((primaryHeap.operationInProgress == NoOperation) |
          (numberHeap.operationInProgress == NoOperation));
   if ((primaryHeap.operationInProgress != NoOperation) |

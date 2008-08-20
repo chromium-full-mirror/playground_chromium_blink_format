@@ -24,6 +24,7 @@
 #include "JSNode.h"
 #include "JSNodeFilter.h"
 #include "NodeFilter.h"
+#include <kjs/JSLock.h>
 
 namespace WebCore {
 
@@ -41,6 +42,8 @@ void JSNodeFilterCondition::mark() {
 
 short JSNodeFilterCondition::acceptNode(KJS::ExecState* exec,
                                         Node* filterNode) const {
+  JSLock lock(false);
+
   CallData callData;
   CallType callType = m_filter->getCallData(callData);
   if (callType == CallTypeNone)

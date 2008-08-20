@@ -51,7 +51,8 @@ void JSContextGroupRelease(JSContextGroupRef group) {
 }
 
 JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass) {
-  return JSGlobalContextCreateInGroup(toRef(JSGlobalData::create().get()),
+  JSLock lock(true);
+  return JSGlobalContextCreateInGroup(toRef(&JSGlobalData::sharedInstance()),
                                       globalObjectClass);
 }
 
@@ -59,15 +60,18 @@ JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef group,
                                                 JSClassRef globalObjectClass) {
   initializeThreading();
 
-  JSGlobalData* globalData = toJS(group);
+  JSLock lock(true);
+
+  RefPtr<JSGlobalData> globalData =
+      group ? PassRefPtr<JSGlobalData>(toJS(group)) : JSGlobalData::create();
 
   if (!globalObjectClass) {
-    JSGlobalObject* globalObject = new (globalData) JSGlobalObject;
+    JSGlobalObject* globalObject = new (globalData.get()) JSGlobalObject;
     return JSGlobalContextRetain(toGlobalRef(globalObject->globalExec()));
   }
 
-  JSGlobalObject* globalObject =
-      new (globalData) JSCallbackObject<JSGlobalObject>(globalObjectClass);
+  JSGlobalObject* globalObject = new (globalData.get())
+      JSCallbackObject<JSGlobalObject>(globalObjectClass);
   ExecState* exec = globalObject->globalExec();
   JSValue* prototype = globalObjectClass->prototype(exec);
   if (!prototype)
@@ -78,6 +82,8 @@ JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef group,
 
 JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef ctx) {
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
+
   JSGlobalData& globalData = exec->globalData();
 
   globalData.heap->registerThread();
@@ -89,6 +95,7 @@ JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef ctx) {
 
 void JSGlobalContextRelease(JSGlobalContextRef ctx) {
   ExecState* exec = toJS(ctx);
+  JSLock lock(exec);
 
   gcUnprotect(exec->dynamicGlobalObject());
 
@@ -112,6 +119,7 @@ void JSGlobalContextRelease(JSGlobalContextRef ctx) {
 JSObjectRef JSContextGetGlobalObject(JSContextRef ctx) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   // It is necessary to call toThisObject to get the wrapper object when used
   // with WebCore.

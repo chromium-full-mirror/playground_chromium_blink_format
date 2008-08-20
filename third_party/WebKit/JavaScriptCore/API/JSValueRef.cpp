@@ -112,6 +112,7 @@ bool JSValueIsEqual(JSContextRef ctx,
                     JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSValue* jsA = toJS(a);
   JSValue* jsB = toJS(b);
@@ -139,6 +140,7 @@ bool JSValueIsInstanceOfConstructor(JSContextRef ctx,
                                     JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSValue* jsValue = toJS(value);
   JSObject* jsConstructor = toJS(constructor);
@@ -169,6 +171,7 @@ JSValueRef JSValueMakeBoolean(JSContextRef, bool value) {
 JSValueRef JSValueMakeNumber(JSContextRef ctx, double value) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   return toRef(jsNumber(exec, value));
 }
@@ -176,6 +179,7 @@ JSValueRef JSValueMakeNumber(JSContextRef ctx, double value) {
 JSValueRef JSValueMakeString(JSContextRef ctx, JSStringRef string) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   return toRef(jsString(exec, string->ustring()));
 }
@@ -191,6 +195,7 @@ double JSValueToNumber(JSContextRef ctx,
                        JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSValue* jsValue = toJS(value);
 
@@ -209,6 +214,7 @@ JSStringRef JSValueToStringCopy(JSContextRef ctx,
                                 JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSValue* jsValue = toJS(value);
 
@@ -228,6 +234,7 @@ JSObjectRef JSValueToObject(JSContextRef ctx,
                             JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSValue* jsValue = toJS(value);
 
@@ -244,6 +251,7 @@ JSObjectRef JSValueToObject(JSContextRef ctx,
 void JSValueProtect(JSContextRef ctx, JSValueRef value) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSValue* jsValue = toJS(value);
   gcProtect(jsValue);
@@ -252,6 +260,7 @@ void JSValueProtect(JSContextRef ctx, JSValueRef value) {
 void JSValueUnprotect(JSContextRef ctx, JSValueRef value) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSValue* jsValue = toJS(value);
   gcUnprotect(jsValue);

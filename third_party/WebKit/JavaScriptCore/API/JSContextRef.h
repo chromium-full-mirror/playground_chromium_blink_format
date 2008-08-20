@@ -76,13 +76,16 @@ JS_EXPORT void JSContextGroupRelease(JSContextGroupRef group)
 @discussion JSGlobalContextCreate allocates a global object and populates it
 with all the
  built-in JavaScript objects, such as Object, Function, String, and Array.
- The global context is created in a unique context group.
+
+ The created context can only be used on the main thread. JavaScript values
+cannot be
+ shared or exchanged between contexts.
 @param globalObjectClass The class to use when creating the global object. Pass
  NULL to use the default object class.
 @result A JSGlobalContext with a global object of class globalObjectClass.
 */
-JS_EXPORT JSGlobalContextRef
-JSGlobalContextCreate(JSClassRef globalObjectClass);
+JS_EXPORT JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass)
+    AVAILABLE_WEBKIT_VERSION_1_0_AND_LATER_BUT_DEPRECATED_AFTER_WEBKIT_VERSION_3_1;
 
 /*!
 @function
@@ -96,6 +99,7 @@ Array.
  NULL to use the default object class.
 @param group The context group to use. The created global context retains the
 group.
+ Pass NULL to create a unique group for the context.
 @result A JSGlobalContext with a global object of class globalObjectClass and a
 context
  group equal to group.

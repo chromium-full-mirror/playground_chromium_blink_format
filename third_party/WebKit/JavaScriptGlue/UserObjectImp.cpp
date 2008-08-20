@@ -68,9 +68,14 @@ JSValue* UserObjectImp::callAsFunction(ExecState* exec,
       }
     }
 
-    // getCallData should have guarded against a NULL fJSUserObject.
-    assert(fJSUserObject);
-    JSUserObject* jsResult = fJSUserObject->CallFunction(jsThisObj, jsArgs);
+    JSUserObject* jsResult;
+    {  // scope
+      JSLock::DropAllLocks dropLocks(exec);
+
+      // getCallData should have guarded against a NULL fJSUserObject.
+      assert(fJSUserObject);
+      jsResult = fJSUserObject->CallFunction(jsThisObj, jsArgs);
+    }
 
     if (jsResult) {
       result = JSObjectKJSValue(jsResult);

@@ -119,6 +119,8 @@ JSUserObject* KJSValueToJSObject(JSValue* inValue, ExecState* exec) {
 // JSObjectKJSValue
 //--------------------------------------------------------------------------
 JSValue* JSObjectKJSValue(JSUserObject* ptr) {
+  JSLock lock(true);
+
   JSValue* result = jsUndefined();
   if (ptr) {
     bool handled = false;
@@ -175,6 +177,8 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
     return 0;
 
   CFTypeRef result = 0;
+
+  JSLock lock(true);
 
   if (inValue->isBoolean()) {
     result = inValue->toBoolean(exec) ? kCFBooleanTrue : kCFBooleanFalse;
@@ -348,6 +352,7 @@ static pthread_once_t globalObjectKeyOnce = PTHREAD_ONCE_INIT;
 JSGlobalData* sharedGlobalData;
 
 static void unprotectGlobalObject(void* data) {
+  JSLock lock(true);
   gcUnprotect(static_cast<JSGlobalObject*>(data));
 }
 

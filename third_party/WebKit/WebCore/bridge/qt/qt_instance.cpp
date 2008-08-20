@@ -23,6 +23,7 @@
 
 #include "ArgList.h"
 #include "JSGlobalObject.h"
+#include "JSLock.h"
 #include "qt_class.h"
 #include "qt_runtime.h"
 #include "PropertyNameArray.h"
@@ -81,6 +82,7 @@ void QtRuntimeObjectImp::invalidate() {
 }
 
 void QtRuntimeObjectImp::removeFromCache() {
+  JSLock lock(false);
   QtInstance* key = cachedObjects.key(this);
   if (key)
     cachedObjects.remove(key);
@@ -127,6 +129,8 @@ QtInstance::QtInstance(QObject* o, PassRefPtr<RootObject> rootObject)
       m_defaultMethodIndex(-2) {}
 
 QtInstance::~QtInstance() {
+  JSLock lock(false);
+
   cachedObjects.remove(this);
   cachedInstances.remove(m_hashkey);
 
@@ -140,6 +144,8 @@ QtInstance::~QtInstance() {
 PassRefPtr<QtInstance> QtInstance::getQtInstance(
     QObject* o,
     PassRefPtr<RootObject> rootObject) {
+  JSLock lock(false);
+
   foreach (QtInstance* instance, cachedInstances.values(o)) {
     if (instance->rootObject() == rootObject)
       return instance;
@@ -154,6 +160,7 @@ PassRefPtr<QtInstance> QtInstance::getQtInstance(
 RuntimeObjectImp* QtInstance::getRuntimeObject(
     ExecState* exec,
     PassRefPtr<QtInstance> instance) {
+  JSLock lock(false);
   RuntimeObjectImp* ret =
       static_cast<RuntimeObjectImp*>(cachedObjects.value(instance.get()));
   if (!ret) {

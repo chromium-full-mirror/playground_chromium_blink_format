@@ -32,6 +32,7 @@
 #include "c_instance.h"
 #include "c_utility.h"
 #include "npruntime_impl.h"
+#include <kjs/JSLock.h>
 
 namespace KJS {
 namespace Bindings {
@@ -59,7 +60,10 @@ JSValue* CField::valueFromInstance(ExecState* exec,
     VOID_TO_NPVARIANT(property);
 
     bool result;
-    result = obj->_class->getProperty(obj, _fieldIdentifier, &property);
+    {
+      JSLock::DropAllLocks dropAllLocks(false);
+      result = obj->_class->getProperty(obj, _fieldIdentifier, &property);
+    }
     if (result) {
       JSValue* result =
           convertNPVariantToValue(exec, &property, instance->rootObject());
@@ -79,7 +83,10 @@ void CField::setValueToInstance(ExecState* exec,
     NPVariant variant;
     convertValueToNPVariant(exec, aValue, &variant);
 
-    obj->_class->setProperty(obj, _fieldIdentifier, &variant);
+    {
+      JSLock::DropAllLocks dropAllLocks(false);
+      obj->_class->setProperty(obj, _fieldIdentifier, &variant);
+    }
 
     _NPN_ReleaseVariantValue(&variant);
   }

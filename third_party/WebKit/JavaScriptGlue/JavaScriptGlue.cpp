@@ -218,8 +218,10 @@ JSRunRef JSRunCreate(CFStringRef jsSource, JSFlags inFlags) {
   initializeThreading();
 
   JSRunRef result = 0;
-  if (jsSource)
+  if (jsSource) {
+    JSLock lock(true);
     result = (JSRunRef) new JSRun(jsSource, inFlags);
+  }
   return result;
 }
 
@@ -256,6 +258,7 @@ JSObjectRef JSRunEvaluate(JSRunRef ref) {
   JSObjectRef result = 0;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
+    JSLock lock(true);
     Completion completion = ptr->Evaluate();
     if (completion.isValueCompletion()) {
       result = (JSObjectRef)KJSValueToJSObject(
@@ -283,8 +286,10 @@ JSObjectRef JSRunEvaluate(JSRunRef ref) {
 bool JSRunCheckSyntax(JSRunRef ref) {
   bool result = false;
   JSRun* ptr = (JSRun*)ref;
-  if (ptr)
+  if (ptr) {
+    JSLock lock(true);
     result = ptr->CheckSyntax();
+  }
   return result;
 }
 
@@ -294,6 +299,7 @@ bool JSRunCheckSyntax(JSRunRef ref) {
 void JSCollect() {
   initializeThreading();
 
+  JSLock lock(true);
   getThreadGlobalExecState()->heap()->collect();
 }
 
@@ -551,6 +557,9 @@ CFMutableArrayRef JSCreateJSArrayFromCFArray(CFArrayRef array) {
 
 void JSLockInterpreter() {
   initializeThreading();
+  JSLock::lock(true);
 }
 
-void JSUnlockInterpreter() {}
+void JSUnlockInterpreter() {
+  JSLock::unlock(true);
+}

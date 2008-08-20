@@ -34,6 +34,7 @@
 #include <kjs/InitializeThreading.h>
 #include <kjs/interpreter.h>
 #include <kjs/JSGlobalObject.h>
+#include <kjs/JSLock.h>
 #include <kjs/JSObject.h>
 
 using namespace KJS;
@@ -46,6 +47,7 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
                             JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   JSObject* jsThisObject = toJS(thisObject);
 
@@ -76,6 +78,7 @@ bool JSCheckScriptSyntax(JSContextRef ctx,
                          JSValueRef* exception) {
   ExecState* exec = toJS(ctx);
   exec->globalData().heap->registerThread();
+  JSLock lock(exec);
 
   Completion completion = Interpreter::checkSyntax(
       exec->dynamicGlobalObject()->globalExec(), sourceURL->ustring(),
@@ -105,6 +108,8 @@ void JSGarbageCollect(JSContextRef ctx) {
   ExecState* exec = toJS(ctx);
   JSGlobalData& globalData = exec->globalData();
   Heap* heap = globalData.heap;
+
+  JSLock lock(globalData.isSharedInstance);
 
   if (!heap->isBusy())
     heap->collect();
