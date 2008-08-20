@@ -345,7 +345,7 @@ AccessibilityTableCell* AccessibilityTable::cellForColumnAndRow(unsigned column,
           if (cell && ((cell->row() + (cell->rowSpan() - 1)) >=
                        (int)sectionSpecificRow))
             break;
-          cell = nil;
+          cell = 0;
         }
 
         if (!cell) {
@@ -355,7 +355,7 @@ AccessibilityTableCell* AccessibilityTable::cellForColumnAndRow(unsigned column,
             // cell overlapped. use this one
             if (cell && ((cell->col() + (cell->colSpan() - 1)) >= (int)column))
               break;
-            cell = nil;
+            cell = 0;
           }
         }
       }
