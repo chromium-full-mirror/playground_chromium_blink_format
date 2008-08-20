@@ -81,6 +81,7 @@ typedef enum {
 - (WebIconFetcher*)fetchApplicationIcon:(id)target selector:(SEL)selector;
 
 - (void)_setIsDisconnected:(bool)isDisconnected;
+- (void)_setExcludeFromTextSearch:(bool)exclude;
 
 #if ENABLE_NETSCAPE_PLUGIN_API
 - (void)_recursive_resumeNullEventsForAllNetscapePlugins;

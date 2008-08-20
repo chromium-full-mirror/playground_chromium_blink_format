@@ -293,7 +293,8 @@ class Editor {
   PassRefPtr<Range> nextVisibleRange(Range*,
                                      const String&,
                                      bool forward,
-                                     bool caseFlag);
+                                     bool caseFlag,
+                                     bool wrapFlag);
 
  private:
   Frame* m_frame;

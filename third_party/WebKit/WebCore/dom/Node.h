@@ -197,6 +197,7 @@ class Node : public TreeShared<Node> {
   virtual Node* shadowParentNode() { return 0; }
   Node* shadowAncestorNode();
   Node* shadowTreeRootNode();
+  bool isInShadowTree();
 
   // The node's parent for the purpose of event capture and bubbling.
   virtual Node* eventParentNode() { return parentNode(); }

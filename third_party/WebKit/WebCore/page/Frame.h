@@ -102,6 +102,8 @@ class Frame : public RefCounted<Frame> {
 
   bool isDisconnected() const;
   void setIsDisconnected(bool);
+  bool excludeFromTextSearch() const;
+  void setExcludeFromTextSearch(bool);
 
   friend class FramePrivate;
 

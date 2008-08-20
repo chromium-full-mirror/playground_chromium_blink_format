@@ -1087,6 +1087,14 @@ void Frame::setIsDisconnected(bool isDisconnected) {
   d->m_isDisconnected = isDisconnected;
 }
 
+bool Frame::excludeFromTextSearch() const {
+  return d->m_excludeFromTextSearch;
+}
+
+void Frame::setExcludeFromTextSearch(bool exclude) {
+  d->m_excludeFromTextSearch = exclude;
+}
+
 // returns FloatRect because going through IntRect would truncate any floats
 FloatRect Frame::selectionRect(bool clipToVisibleContent) const {
   RenderView* root = contentRenderer();
@@ -1459,13 +1467,6 @@ UChar Frame::backslashAsCurrencySymbol() const {
   return decoder->encoding().backslashAsCurrencySymbol();
 }
 
-static bool isInShadowTree(Node* node) {
-  for (Node* n = node; n; n = n->parentNode())
-    if (n->isShadowNode())
-      return true;
-  return false;
-}
-
 // Searches from the beginning of the document if nothing is selected.
 bool Frame::findString(const String& target,
                        bool forward,
@@ -1473,6 +1474,9 @@ bool Frame::findString(const String& target,
                        bool wrapFlag,
                        bool startInSelection) {
   if (target.isEmpty() || !document())
+    return false;
+
+  if (excludeFromTextSearch())
     return false;
 
   // Start from an edge of the selection, if there's a selection that's not in
@@ -1541,7 +1545,7 @@ bool Frame::findString(const String& target,
 
   if (!editor()->insideVisibleArea(resultRange.get())) {
     resultRange = editor()->nextVisibleRange(resultRange.get(), target, forward,
-                                             caseFlag);
+                                             caseFlag, wrapFlag);
     if (!resultRange)
       return false;
   }
@@ -1582,7 +1586,7 @@ unsigned Frame::markAllMatchesForText(const String& target,
     RefPtr<Range> resultRange(
         findPlainText(searchRange.get(), target, true, caseFlag));
     if (resultRange->collapsed(exception)) {
-      if (!isInShadowTree(resultRange->startContainer()))
+      if (!resultRange->startContainer()->isInShadowTree())
         break;
 
       searchRange = rangeOfContents(document());
@@ -1623,9 +1627,11 @@ unsigned Frame::markAllMatchesForText(const String& target,
   if (doc && d->m_view && contentRenderer()) {
     doc->updateLayout();  // Ensure layout is up to date.
     IntRect visibleRect(enclosingIntRect(d->m_view->visibleContentRect()));
-    GraphicsContext context((PlatformGraphicsContext*)0);
-    context.setPaintingDisabled(true);
-    paint(&context, visibleRect);
+    if (!visibleRect.isEmpty()) {
+      GraphicsContext context((PlatformGraphicsContext*)0);
+      context.setPaintingDisabled(true);
+      paint(&context, visibleRect);
+    }
   }
 
   return matchCount;
@@ -1883,7 +1889,8 @@ FramePrivate::FramePrivate(Page* page,
       m_inViewSourceMode(false),
       m_prohibitsScrolling(false),
       m_needsReapplyStyles(false),
-      m_isDisconnected(false)
+      m_isDisconnected(false),
+      m_excludeFromTextSearch(false)
 #if FRAME_LOADS_USER_STYLESHEET
       ,
       m_userStyleSheetLoader(0)
