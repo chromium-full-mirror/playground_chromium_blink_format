@@ -34,15 +34,6 @@
 
 @interface NSFileManager (WebNSFileManagerExtras)
 
-- (BOOL)_webkit_createDirectoryAtPathWithIntermediateDirectories:(NSString*)path
-                                                      attributes:(NSDictionary*)
-                                                                     attributes;
-- (BOOL)_webkit_createFileAtPathWithIntermediateDirectories:(NSString*)path
-                                                   contents:(NSData*)contents
-                                                 attributes:
-                                                     (NSDictionary*)attributes
-                                        directoryAttributes:
-                                            (NSDictionary*)directoryAttributes;
 - (void)_webkit_backgroundRemoveFileAtPath:(NSString*)path;
 - (void)_webkit_backgroundRemoveLeftoverFiles:(NSString*)path;
 - (BOOL)_webkit_removeFileOnlyAtPath:(NSString*)path;
@@ -53,3 +44,15 @@
 - (NSString*)_webkit_pathWithUniqueFilenameForPath:(NSString*)path;
 
 @end
+
+#ifdef BUILDING_ON_TIGER
+@interface NSFileManager (WebNSFileManagerTigerForwardCompatibility)
+- (NSArray*)contentsOfDirectoryAtPath:(NSString*)path error:(NSError**)error;
+- (BOOL)moveItemAtPath:(NSString*)srcPath
+                toPath:(NSString*)dstPath
+                 error:(NSError**)error;
+- (BOOL)removeItemAtPath:(NSString*)path error:(NSError**)error;
+- (NSDictionary*)attributesOfFileSystemForPath:(NSString*)path
+                                         error:(NSError**)error;
+@end
+#endif
