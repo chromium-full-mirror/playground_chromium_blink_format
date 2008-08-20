@@ -1256,7 +1256,18 @@ bool WebView::handleMouseEvent(UINT message, WPARAM wParam, LPARAM lParam) {
                              ::GetSystemMetrics(SM_CYDOUBLECLK);
   LONG messageTime = ::GetMessageTime();
 
+  if (inResizer(position)) {
+    if (m_uiDelegate) {
+      COMPtr<IWebUIDelegatePrivate4> uiPrivate(Query, m_uiDelegate);
+
+      if (uiPrivate)
+        uiPrivate->webViewSendResizeMessage(message, wParam, position);
+    }
+    return true;
+  }
+
   bool handled = false;
+
   if (message == WM_LBUTTONDOWN || message == WM_MBUTTONDOWN ||
       message == WM_RBUTTONDOWN) {
     // FIXME: I'm not sure if this is the "right" way to do this

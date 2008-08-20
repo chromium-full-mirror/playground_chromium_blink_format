@@ -313,6 +313,13 @@ class UIDelegate : public IWebUIDelegate, IWebUIDelegatePrivate3 {
     return E_NOTIMPL;
   }
 
+  virtual HRESULT STDMETHODCALLTYPE webViewSendResizeMessage(
+      /* [in] */ UINT uMsg,
+      /* [in] */ WPARAM wParam,
+      /* [in] */ LPARAM lParam) {
+    return E_NOTIMPL;
+  }
+
   virtual HRESULT STDMETHODCALLTYPE webViewDrawResizer(
       /* [in] */ IWebView* sender,
       /* [in] */ HDC dc,
