@@ -1731,7 +1731,8 @@ void ContentData::clear() {
 }
 
 void RenderStyle::applyTransform(AffineTransform& transform,
-                                 const IntSize& borderBoxSize) const {
+                                 const IntSize& borderBoxSize,
+                                 bool includeTransformOrigin) const {
   // transform-origin brackets the transform with translate operations.
   // Optimize for the case where the only transform is a translation, since the
   // transform-origin is irrelevant
@@ -1739,11 +1740,13 @@ void RenderStyle::applyTransform(AffineTransform& transform,
   bool applyTransformOrigin = false;
   unsigned s = rareNonInheritedData->m_transform->m_operations.size();
   unsigned i;
-  for (i = 0; i < s; i++) {
-    if (!rareNonInheritedData->m_transform->m_operations[i]
-             ->isTranslateOperation()) {
-      applyTransformOrigin = true;
-      break;
+  if (includeTransformOrigin) {
+    for (i = 0; i < s; i++) {
+      if (!rareNonInheritedData->m_transform->m_operations[i]
+               ->isTranslateOperation()) {
+        applyTransformOrigin = true;
+        break;
+      }
     }
   }
 

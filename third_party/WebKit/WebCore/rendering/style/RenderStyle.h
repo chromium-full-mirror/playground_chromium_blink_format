@@ -2588,7 +2588,9 @@ class RenderStyle {
   bool hasTransform() const {
     return !rareNonInheritedData->m_transform->m_operations.isEmpty();
   }
-  void applyTransform(AffineTransform&, const IntSize& borderBoxSize) const;
+  void applyTransform(AffineTransform&,
+                      const IntSize& borderBoxSize,
+                      bool includeTransformOrigin = true) const;
   bool hasMask() const {
     return rareNonInheritedData->m_mask.hasImage() ||
            rareNonInheritedData->m_maskBoxImage.hasImage();
