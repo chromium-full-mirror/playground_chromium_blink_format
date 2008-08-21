@@ -114,6 +114,7 @@ enum InterpolationQuality {
   InterpolationDefault,
   InterpolationNone,
   InterpolationLow,
+  InterpolationMedium,
   InterpolationHigh
 };
 
