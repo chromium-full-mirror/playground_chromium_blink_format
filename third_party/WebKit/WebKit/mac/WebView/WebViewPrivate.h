@@ -202,9 +202,6 @@ incremental searching), NO to begin search after the selected text.
 - (BOOL)canResetPageZoom;
 - (IBAction)resetPageZoom:(id)sender;
 
-- (BOOL)shouldUpdateWhileHidden;
-- (void)setShouldUpdateWhileHidden:(BOOL)flag;
-
 @end
 
 @interface WebView (WebPrivate)

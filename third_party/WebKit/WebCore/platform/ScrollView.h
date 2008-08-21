@@ -109,7 +109,7 @@ class ScrollView : public Widget {
   void setStaticBackground(bool);
 
   bool inWindow() const;
-  virtual bool shouldUpdateWhileHidden() const = 0;
+  virtual bool shouldUpdateWhileOffscreen() const = 0;
 
   // For platforms that need to hit test scrollbars from within the engine's
   // event handlers (like Win32).

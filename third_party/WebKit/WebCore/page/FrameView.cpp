@@ -69,7 +69,7 @@ class FrameViewPrivate {
         m_viewportRenderer(0),
         m_wasScrolledByUser(false),
         m_inProgrammaticScroll(false),
-        m_shouldUpdateWhileHidden(true) {
+        m_shouldUpdateWhileOffscreen(true) {
     m_isTransparent = false;
     m_baseBackgroundColor = Color::white;
     m_vmode = m_hmode = ScrollbarAuto;
@@ -145,7 +145,7 @@ class FrameViewPrivate {
   IntRect m_repaintRect;
   Vector<IntRect> m_repaintRects;
 
-  bool m_shouldUpdateWhileHidden;
+  bool m_shouldUpdateWhileOffscreen;
 };
 
 FrameView::FrameView(Frame* frame)
@@ -896,12 +896,12 @@ void FrameView::setBaseBackgroundColor(Color bc) {
   d->m_baseBackgroundColor = bc;
 }
 
-bool FrameView::shouldUpdateWhileHidden() const {
-  return d->m_shouldUpdateWhileHidden;
+bool FrameView::shouldUpdateWhileOffscreen() const {
+  return d->m_shouldUpdateWhileOffscreen;
 }
 
-void FrameView::setShouldUpdateWhileHidden(bool shouldUpdateWhileHidden) {
-  d->m_shouldUpdateWhileHidden = shouldUpdateWhileHidden;
+void FrameView::setShouldUpdateWhileOffscreen(bool shouldUpdateWhileOffscreen) {
+  d->m_shouldUpdateWhileOffscreen = shouldUpdateWhileOffscreen;
 }
 
 void FrameView::scheduleEvent(PassRefPtr<Event> event,

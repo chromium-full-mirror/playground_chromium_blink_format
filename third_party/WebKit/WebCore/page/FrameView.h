@@ -107,8 +107,8 @@ class FrameView : public ScrollView {
   Color baseBackgroundColor() const;
   void setBaseBackgroundColor(Color);
 
-  virtual bool shouldUpdateWhileHidden() const;
-  void setShouldUpdateWhileHidden(bool);
+  virtual bool shouldUpdateWhileOffscreen() const;
+  void setShouldUpdateWhileOffscreen(bool);
 
   void adjustViewSize();
   void initScrollbars();
