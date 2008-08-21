@@ -170,7 +170,7 @@ void CInstance::getPropertyNames(ExecState* exec,
       !_object->_class->enumerate)
     return;
 
-  unsigned count;
+  uint32_t count;
   NPIdentifier* identifiers;
 
   {
@@ -179,7 +179,7 @@ void CInstance::getPropertyNames(ExecState* exec,
       return;
   }
 
-  for (unsigned i = 0; i < count; i++) {
+  for (uint32_t i = 0; i < count; i++) {
     PrivateIdentifier* identifier =
         static_cast<PrivateIdentifier*>(identifiers[i]);
 
