@@ -419,8 +419,14 @@ bool EventHandler::handleMouseDraggedEvent(
     // should handle the autoscroll
     // Otherwise, let the bridge handle it so the view can scroll itself.
     RenderObject* renderer = targetNode->renderer();
-    while (renderer && !renderer->canBeProgramaticallyScrolled(true))
-      renderer = renderer->parent();
+    while (renderer && !renderer->canBeProgramaticallyScrolled(false)) {
+      if (!renderer->parent() && renderer->node() == renderer->document() &&
+          renderer->document()->ownerElement())
+        renderer = renderer->document()->ownerElement()->renderer();
+      else
+        renderer = renderer->parent();
+    }
+
     if (renderer) {
       m_autoscrollInProgress = true;
       handleAutoscroll(renderer);
@@ -1034,8 +1040,13 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   if (mouseEvent.button() == MiddleButton && !mev.isOverLink()) {
     RenderObject* renderer = mev.targetNode()->renderer();
 
-    while (renderer && !renderer->canBeProgramaticallyScrolled(true))
-      renderer = renderer->parent();
+    while (renderer && !renderer->canBeProgramaticallyScrolled(false)) {
+      if (!renderer->parent() && renderer->node() == renderer->document() &&
+          renderer->document()->ownerElement())
+        renderer = renderer->document()->ownerElement()->renderer();
+      else
+        renderer = renderer->parent();
+    }
 
     if (renderer) {
       m_panScrollInProgress = true;
