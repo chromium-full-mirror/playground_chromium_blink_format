@@ -676,6 +676,9 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE setCustomHTMLTokenizerChunkSize(
       /* [in] */ int chunkSize);
 
+  virtual HRESULT STDMETHODCALLTYPE backingStore(
+      /* [out, retval] */ OLE_HANDLE* hBitmap);
+
   // WebView
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
