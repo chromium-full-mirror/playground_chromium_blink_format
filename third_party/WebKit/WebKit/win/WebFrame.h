@@ -330,6 +330,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   void unmarkAllMisspellings();
   void unmarkAllBadGrammar();
 
+  void updateBackground();
+
   // WebFrame (matching WebCoreFrameBridge)
   void setTextSizeMultiplier(float multiplier);
   HRESULT inViewSourceMode(BOOL* flag);

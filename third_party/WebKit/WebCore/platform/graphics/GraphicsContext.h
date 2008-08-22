@@ -292,7 +292,7 @@ class GraphicsContext : Noncopyable {
   void setUseAntialiasing(bool = true);
 
 #if PLATFORM(WIN)
-  GraphicsContext(HDC);  // FIXME: To be removed.
+  GraphicsContext(HDC, bool hasAlpha = false);  // FIXME: To be removed.
   bool inTransparencyLayer() const;
   HDC getWindowsContext(const IntRect&,
                         bool supportAlphaBlend = true,

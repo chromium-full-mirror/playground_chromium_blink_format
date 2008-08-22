@@ -288,7 +288,8 @@ WebView::WebView()
       m_toolTipHwnd(0),
       m_closeWindowTimer(this, &WebView::closeWindowTimerFired),
       m_topLevelParent(0),
-      m_deleteBackingStoreTimerActive(false) {
+      m_deleteBackingStoreTimerActive(false),
+      m_transparent(false) {
   KJS::initializeThreading();
 
   m_backingStoreSize.cx = m_backingStoreSize.cy = 0;
@@ -945,7 +946,7 @@ void WebView::paintIntoBackingStore(FrameView* frameView,
   FillRect(bitmapDC, &rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
   if (frameView && frameView->frame() &&
       frameView->frame()->contentRenderer()) {
-    GraphicsContext gc(bitmapDC);
+    GraphicsContext gc(bitmapDC, m_transparent);
     gc.save();
     gc.clip(dirtyRect);
     frameView->paint(&gc, dirtyRect);
@@ -4849,6 +4850,23 @@ HRESULT STDMETHODCALLTYPE WebView::backingStore(
   if (!hBitmap)
     return E_POINTER;
   *hBitmap = reinterpret_cast<OLE_HANDLE>(m_backingStoreBitmap.get());
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebView::setTransparent(BOOL transparent) {
+  if (m_transparent == !!transparent)
+    return S_OK;
+
+  m_transparent = transparent;
+  m_mainFrame->updateBackground();
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebView::transparent(BOOL* transparent) {
+  if (!transparent)
+    return E_POINTER;
+
+  *transparent = this->transparent() ? TRUE : FALSE;
   return S_OK;
 }
 
