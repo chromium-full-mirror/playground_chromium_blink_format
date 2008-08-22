@@ -168,8 +168,7 @@ JSUserObject* UserObjectImp::GetJSUserObject() const {
   return fJSUserObject;
 }
 
-JSValue* UserObjectImp::toPrimitive(ExecState* exec,
-                                    PreferredPrimitiveType) const {
+JSValue* UserObjectImp::toPrimitive(ExecState* exec, JSType) const {
   JSValue* result = jsUndefined();
   JSUserObject* jsObjPtr = KJSValueToJSObject(toObject(exec), exec);
   CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : 0;
