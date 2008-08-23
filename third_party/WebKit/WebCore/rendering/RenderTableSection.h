@@ -57,6 +57,8 @@ class RenderTableSection : public RenderContainer {
   }
   virtual void position(InlineBox*) {}
 
+  virtual int getBaselineOfFirstLineBox() const;
+
   void addCell(RenderTableCell*, RenderObject* row);
 
   void setCellWidths();
