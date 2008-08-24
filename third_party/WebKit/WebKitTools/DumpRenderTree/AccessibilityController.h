@@ -39,7 +39,7 @@ class AccessibilityController {
                         JSObjectRef windowObject,
                         JSValueRef* exception);
 
-  // Controller Methods - platfrom independant implementations
+  // Controller Methods - platform-independent implementations
   AccessibilityUIElement rootElement();
   AccessibilityUIElement focusedElement();
 

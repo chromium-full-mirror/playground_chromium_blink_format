@@ -29,6 +29,7 @@
 #include "DumpRenderTree.h"
 #include "FrameLoadDelegate.h"
 
+#include "AccessibilityController.h"
 #include "EventSender.h"
 #include "GCController.h"
 #include "LayoutTestController.h"
@@ -81,7 +82,9 @@ string descriptionSuitableForTestResult(IWebFrame* webFrame) {
 }
 
 FrameLoadDelegate::FrameLoadDelegate()
-    : m_refCount(1), m_gcController(new GCController) {}
+    : m_refCount(1),
+      m_gcController(new GCController),
+      m_accessibilityController(new AccessibilityController) {}
 
 FrameLoadDelegate::~FrameLoadDelegate() {}
 
@@ -244,6 +247,10 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didClearWindowObject(
   ASSERT(!exception);
 
   m_gcController->makeWindowObject(context, windowObject, &exception);
+  ASSERT(!exception);
+
+  m_accessibilityController->makeWindowObject(context, windowObject,
+                                              &exception);
   ASSERT(!exception);
 
   JSStringRef eventSenderStr = JSStringCreateWithUTF8CString("eventSender");
