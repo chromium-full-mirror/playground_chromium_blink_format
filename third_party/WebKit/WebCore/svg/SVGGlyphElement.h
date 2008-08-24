@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
    Copyright (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
+   Copyright (C) 2008 Rob Buis <buis@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -89,6 +90,8 @@ class SVGGlyphElement : public SVGStyledElement {
   SVGGlyphElement(const QualifiedName&, Document*);
   virtual ~SVGGlyphElement();
 
+  virtual void parseMappedAttribute(MappedAttribute*);
+
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
@@ -103,6 +106,9 @@ class SVGGlyphElement : public SVGStyledElement {
 
   // Helper function shared between SVGGlyphElement & SVGMissingGlyphElement
   static SVGGlyphIdentifier buildGenericGlyphIdentifier(const SVGElement*);
+
+ private:
+  void invalidateGlyphCache();
 };
 
 }  // namespace WebCore
