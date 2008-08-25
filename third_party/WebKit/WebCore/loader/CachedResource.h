@@ -92,7 +92,7 @@ class CachedResource {
 
   virtual void addClient(CachedResourceClient*);
   void removeClient(CachedResourceClient*);
-  bool referenced() const { return !m_clients.isEmpty(); }
+  bool hasClients() const { return !m_clients.isEmpty(); }
 
   enum PreloadResult {
     PreloadNotReferenced,
@@ -146,7 +146,7 @@ class CachedResource {
   const ResourceResponse& response() const { return m_response; }
 
   bool canDelete() const {
-    return !referenced() && !m_request && !m_preloadCount;
+    return !hasClients() && !m_request && !m_preloadCount;
   }
 
   bool isExpired() const;
