@@ -189,27 +189,27 @@ using namespace HTMLNames;
 #define HANDLE_MASK_VALUE(prop, Prop, value) \
   HANDLE_FILL_LAYER_VALUE(mask, Mask, prop, Prop, value)
 
-#define HANDLE_ANIMATION_INHERIT_AND_INITIAL(prop, Prop)                       \
-  if (isInherit) {                                                             \
-    AnimationList* list = m_style->accessAnimations();                         \
-    const AnimationList* parentList = m_parentStyle->animations();             \
-    size_t i = 0;                                                              \
-    for (; i < parentList->size() && (*parentList)[i]->is##Prop##Set(); ++i) { \
-      if (list->size() <= i)                                                   \
-        list->append(Animation::create());                                     \
-      (*list)[i]->set##Prop((*parentList)[i]->prop());                         \
-    }                                                                          \
-                                                                               \
-    /* Reset any remaining animations to not have the property set. */         \
-    for (; i < list->size(); ++i)                                              \
-      (*list)[i]->clear##Prop();                                               \
-  } else if (isInitial) {                                                      \
-    AnimationList* list = m_style->accessAnimations();                         \
-    if (list->isEmpty())                                                       \
-      list->append(Animation::create());                                       \
-    (*list)[0]->set##Prop(RenderStyle::initialAnimation##Prop());              \
-    for (size_t i = 1; i < list->size(); ++i)                                  \
-      (*list)[0]->clear##Prop();                                               \
+#define HANDLE_ANIMATION_INHERIT_AND_INITIAL(prop, Prop)               \
+  if (isInherit) {                                                     \
+    AnimationList* list = m_style->accessAnimations();                 \
+    const AnimationList* parentList = m_parentStyle->animations();     \
+    size_t i = 0, parentSize = parentList ? parentList->size() : 0;    \
+    for (; i < parentSize && (*parentList)[i]->is##Prop##Set(); ++i) { \
+      if (list->size() <= i)                                           \
+        list->append(Animation::create());                             \
+      (*list)[i]->set##Prop((*parentList)[i]->prop());                 \
+    }                                                                  \
+                                                                       \
+    /* Reset any remaining animations to not have the property set. */ \
+    for (; i < list->size(); ++i)                                      \
+      (*list)[i]->clear##Prop();                                       \
+  } else if (isInitial) {                                              \
+    AnimationList* list = m_style->accessAnimations();                 \
+    if (list->isEmpty())                                               \
+      list->append(Animation::create());                               \
+    (*list)[0]->set##Prop(RenderStyle::initialAnimation##Prop());      \
+    for (size_t i = 1; i < list->size(); ++i)                          \
+      (*list)[0]->clear##Prop();                                       \
   }
 
 #define HANDLE_ANIMATION_VALUE(prop, Prop, value)                              \
@@ -242,27 +242,27 @@ using namespace HTMLNames;
     }                                                                          \
   }
 
-#define HANDLE_TRANSITION_INHERIT_AND_INITIAL(prop, Prop)                      \
-  if (isInherit) {                                                             \
-    AnimationList* list = m_style->accessTransitions();                        \
-    const AnimationList* parentList = m_parentStyle->transitions();            \
-    size_t i = 0;                                                              \
-    for (; i < parentList->size() && (*parentList)[i]->is##Prop##Set(); ++i) { \
-      if (list->size() <= i)                                                   \
-        list->append(Animation::create());                                     \
-      (*list)[i]->set##Prop((*parentList)[i]->prop());                         \
-    }                                                                          \
-                                                                               \
-    /* Reset any remaining transitions to not have the property set. */        \
-    for (; i < list->size(); ++i)                                              \
-      (*list)[i]->clear##Prop();                                               \
-  } else if (isInitial) {                                                      \
-    AnimationList* list = m_style->accessTransitions();                        \
-    if (list->isEmpty())                                                       \
-      list->append(Animation::create());                                       \
-    (*list)[0]->set##Prop(RenderStyle::initialAnimation##Prop());              \
-    for (size_t i = 1; i < list->size(); ++i)                                  \
-      (*list)[0]->clear##Prop();                                               \
+#define HANDLE_TRANSITION_INHERIT_AND_INITIAL(prop, Prop)               \
+  if (isInherit) {                                                      \
+    AnimationList* list = m_style->accessTransitions();                 \
+    const AnimationList* parentList = m_parentStyle->transitions();     \
+    size_t i = 0, parentSize = parentList ? parentList->size() : 0;     \
+    for (; i < parentSize && (*parentList)[i]->is##Prop##Set(); ++i) {  \
+      if (list->size() <= i)                                            \
+        list->append(Animation::create());                              \
+      (*list)[i]->set##Prop((*parentList)[i]->prop());                  \
+    }                                                                   \
+                                                                        \
+    /* Reset any remaining transitions to not have the property set. */ \
+    for (; i < list->size(); ++i)                                       \
+      (*list)[i]->clear##Prop();                                        \
+  } else if (isInitial) {                                               \
+    AnimationList* list = m_style->accessTransitions();                 \
+    if (list->isEmpty())                                                \
+      list->append(Animation::create());                                \
+    (*list)[0]->set##Prop(RenderStyle::initialAnimation##Prop());       \
+    for (size_t i = 1; i < list->size(); ++i)                           \
+      (*list)[0]->clear##Prop();                                        \
   }
 
 #define HANDLE_TRANSITION_VALUE(prop, Prop, value)                             \
