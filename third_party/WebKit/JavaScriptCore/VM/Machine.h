@@ -109,6 +109,10 @@ class Machine {
 
   JSValue* retrieveArguments(ExecState*, JSFunction*) const;
   JSValue* retrieveCaller(ExecState*, JSFunction*) const;
+  void retrieveLastCaller(ExecState* exec,
+                          int& lineNumber,
+                          int& sourceId,
+                          UString& sourceURL) const;
 
   void getArgumentsData(Register* callFrame,
                         JSFunction*&,

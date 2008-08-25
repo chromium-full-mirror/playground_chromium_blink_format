@@ -2652,11 +2652,16 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       CallData callData;
       CallType callType = v->getCallData(callData);
 
-      if (callType == CallTypeJS) {
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)
-              ->willExecute(exec, static_cast<JSObject*>(v));
+      if (*enabledProfilerReference)
+        (*enabledProfilerReference)
+            ->willExecute(exec, static_cast<JSObject*>(v));
 
+      Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
+      initializeCallFrame(callFrame, codeBlock, vPC, scopeChain, r, dst,
+                          firstArg, argCount, 0, v);
+      exec->m_callFrame = callFrame;
+
+      if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
         FunctionBodyNode* functionBodyNode = callData.js.functionBody;
         CodeBlock* newCodeBlock =
@@ -2665,11 +2670,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
         r[firstArg] = thisVal == missingThisObjectMarker()
                           ? exec->globalThisValue()
                           : r[thisVal].jsValue(exec);
-
-        Register* callFrame = r + firstArg - RegisterFile::CallFrameHeaderSize;
-        initializeCallFrame(callFrame, codeBlock, vPC, scopeChain, r, dst,
-                            firstArg, argCount, 0, v);
-        exec->m_callFrame = callFrame;
 
         r = slideRegisterWindowForCall(exec, newCodeBlock, registerFile,
                                        registerBase, r, firstArg, argCount,
@@ -2691,10 +2691,6 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       }
 
       if (callType == CallTypeHost) {
-        if (*enabledProfilerReference)
-          (*enabledProfilerReference)
-              ->willExecute(exec, static_cast<JSObject*>(v));
-
         JSValue* thisValue = thisVal == missingThisObjectMarker()
                                  ? exec->globalThisValue()
                                  : r[thisVal].jsValue(exec);
@@ -3213,6 +3209,28 @@ JSValue* Machine::retrieveCaller(ExecState* exec, JSFunction* function) const {
     return caller;
 
   return jsNull();
+}
+
+void Machine::retrieveLastCaller(ExecState* exec,
+                                 int& lineNumber,
+                                 int& sourceId,
+                                 UString& sourceURL) const {
+  lineNumber = -1;
+  sourceURL = UString();
+
+  Register* callFrame = exec->m_callFrame;
+  if (!callFrame)
+    return;
+
+  CodeBlock* callerCodeBlock =
+      callFrame[RegisterFile::CallerCodeBlock].codeBlock();
+  if (!callerCodeBlock)
+    return;
+
+  Instruction* vPC = callFrame[RegisterFile::ReturnVPC].vPC();
+  lineNumber = callerCodeBlock->lineNumberForVPC(vPC - 1);
+  sourceId = callerCodeBlock->ownerNode->sourceId();
+  sourceURL = callerCodeBlock->ownerNode->sourceURL();
 }
 
 Register* Machine::callFrame(ExecState* exec, JSFunction* function) const {

@@ -41,6 +41,7 @@
 #include <kjs/ArgList.h>
 #include <kjs/interpreter.h>
 #include <kjs/JSObject.h>
+#include <VM/Machine.h>
 #include <profiler/Profile.h>
 #include <stdio.h>
 
@@ -48,7 +49,8 @@ using namespace KJS;
 
 namespace WebCore {
 
-Console::Console(Frame* frame) : m_frame(frame) {}
+Console::Console(Frame* frame)
+    : m_frame(frame), m_profileLineNumber(0), m_profileSourceURL(UString()) {}
 
 void Console::disconnectFrame() {
   m_frame = 0;
@@ -294,6 +296,11 @@ void Console::profileEnd(ExecState* exec, const ArgList& args) {
   if (args.size() >= 1)
     title = args.at(exec, 0)->toString(exec);
 
+  int sourceId;
+  // FIXME: We won't need to save these to statics once we remove the profiler
+  // "zombie" mode
+  exec->machine()->retrieveLastCaller(exec, m_profileLineNumber, sourceId,
+                                      m_profileSourceURL);
   Profiler::profiler()->stopProfiling(exec, title);
 }
 
@@ -346,7 +353,8 @@ void Console::groupEnd() {
 
 void Console::finishedProfiling(PassRefPtr<Profile> prpProfile) {
   if (Page* page = this->page())
-    page->inspectorController()->addProfile(prpProfile);
+    page->inspectorController()->addProfile(prpProfile, m_profileLineNumber,
+                                            m_profileSourceURL);
 }
 
 void Console::warn(ExecState* exec, const ArgList& args) {
