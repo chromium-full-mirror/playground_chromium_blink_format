@@ -99,6 +99,8 @@ class BitmapImage : public Image {
 
   virtual bool isBitmapImage() const { return true; }
 
+  virtual bool hasSingleSecurityOrigin() const { return true; }
+
   virtual IntSize size() const;
   IntSize currentFrameSize() const;
 
