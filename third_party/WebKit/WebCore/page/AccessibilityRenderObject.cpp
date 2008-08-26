@@ -1125,8 +1125,9 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
   if (ariaRole != UnknownRole)
     return false;
 
+  // make a platform-specific decision
   if (isAttachment())
-    return false;
+    return accessibilityIgnoreAttachment();
 
   return !m_renderer->isListMarker() && !isWebArea();
 }

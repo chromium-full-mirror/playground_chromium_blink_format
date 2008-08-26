@@ -49,4 +49,6 @@ class VisiblePosition;
 - (void)detach;
 - (WebCore::AccessibilityObject*)accessibilityObject;
 
+- (NSView*)attachmentView;
+
 @end

@@ -384,6 +384,9 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 #endif
 #endif
 
+  // a platform-specific method for determining if an attachment is ignored
+  bool accessibilityIgnoreAttachment() const;
+
  protected:
   unsigned m_id;
   AccessibilityChildrenVector m_children;
