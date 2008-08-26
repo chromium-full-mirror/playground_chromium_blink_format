@@ -1061,6 +1061,13 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
   if (m_canvas->originClean())
     checkOrigin(KURL(cachedImage->url()));
 
+  // Since it is unknown whether an SVG image contains resources from another
+  // domain,
+  // treat all SVG images as dirty.
+  if (m_canvas->originClean() && cachedImage->image() &&
+      cachedImage->image()->isSVGImage())
+    m_canvas->setOriginTainted();
+
   FloatRect sourceRect = c->roundToDevicePixels(srcRect);
   FloatRect destRect = c->roundToDevicePixels(dstRect);
   willDraw(destRect);
@@ -1151,6 +1158,13 @@ void CanvasRenderingContext2D::drawImageFromRect(
 
   if (m_canvas->originClean())
     checkOrigin(KURL(cachedImage->url()));
+
+  // Since it is unknown whether an SVG image contains resources from another
+  // domain,
+  // treat all SVG images as dirty.
+  if (m_canvas->originClean() && cachedImage->image() &&
+      cachedImage->image()->isSVGImage())
+    m_canvas->setOriginTainted();
 
   GraphicsContext* c = drawingContext();
   if (!c)

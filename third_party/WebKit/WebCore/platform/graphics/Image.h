@@ -86,6 +86,7 @@ class Image : public RefCounted<Image> {
   static bool supportsType(const String&);
 
   virtual bool isBitmapImage() const { return false; }
+  virtual bool isSVGImage() const { return false; }
 
   static Image* nullImage();
   bool isNull() const;
