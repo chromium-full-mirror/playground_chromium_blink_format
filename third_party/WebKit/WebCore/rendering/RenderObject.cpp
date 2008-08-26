@@ -616,6 +616,9 @@ bool RenderObject::scroll(ScrollDirection direction,
 }
 
 bool RenderObject::canBeProgramaticallyScrolled(bool scrollToAnchor) const {
+  if (!layer())
+    return false;
+
   return (hasOverflowClip() &&
           (scrollsOverflow() || (node() && node()->isContentEditable()))) ||
          ((node() && node()->isDocumentNode()) &&
@@ -627,13 +630,11 @@ bool RenderObject::hasScrollableView() const {
 }
 
 void RenderObject::autoscroll() {
-  if (RenderLayer* l = layer())
-    l->autoscroll();
+  layer()->autoscroll();
 }
 
 void RenderObject::panScroll(const IntPoint& source) {
-  if (RenderLayer* l = layer())
-    l->panScrollFromPoint(source);
+  layer()->panScrollFromPoint(source);
 }
 
 bool RenderObject::hasStaticX() const {

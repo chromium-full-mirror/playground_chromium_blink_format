@@ -211,6 +211,7 @@ class RenderLayer : public ScrollbarClient {
   void panScrollFromPoint(const IntPoint&);
 
   // Scrolling methods for layers that can scroll their overflow.
+  void scrollByRecursively(int xDelta, int yDelta);
   void scrollOffset(int& x, int& y);
   void subtractScrollOffset(int& x, int& y);
   int scrollXOffset() const { return m_scrollX + m_scrollOriginX; }
