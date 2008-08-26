@@ -647,8 +647,10 @@ void XMLHttpRequest::makeCrossSiteAccessRequestWithPreflight(
   if (cacheIt != preflightResultCache().end()) {
     skipPreflight = canSkipPrelight(cacheIt, m_includeCredentials, m_method,
                                     m_requestHeaders);
-    if (!skipPreflight)
+    if (!skipPreflight) {
+      delete cacheIt->second;
       preflightResultCache().remove(cacheIt);
+    }
   }
 
   if (!skipPreflight) {
