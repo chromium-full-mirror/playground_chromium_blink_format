@@ -1059,7 +1059,7 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
     return;
 
   if (m_canvas->originClean())
-    checkOrigin(KURL(cachedImage->url()));
+    checkOrigin(cachedImage->response().url());
 
   if (m_canvas->originClean() &&
       !cachedImage->image()->hasSingleSecurityOrigin())
@@ -1154,7 +1154,7 @@ void CanvasRenderingContext2D::drawImageFromRect(
     return;
 
   if (m_canvas->originClean())
-    checkOrigin(KURL(cachedImage->url()));
+    checkOrigin(cachedImage->response().url());
 
   if (m_canvas->originClean() &&
       !cachedImage->image()->hasSingleSecurityOrigin())
