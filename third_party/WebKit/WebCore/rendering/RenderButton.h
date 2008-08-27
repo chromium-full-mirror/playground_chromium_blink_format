@@ -62,17 +62,13 @@ class RenderButton : public RenderFlexibleBox {
  protected:
   virtual bool hasLineIfEmpty() const { return true; }
 
-#if PLATFORM(WIN)
   void timerFired(Timer<RenderButton>*);
-#endif
 
   RenderTextFragment* m_buttonText;
   RenderBlock* m_inner;
 
-#if PLATFORM(WIN)
   OwnPtr<Timer<RenderButton>> m_timer;
   bool m_default;
-#endif
 };
 
 }  // namespace WebCore

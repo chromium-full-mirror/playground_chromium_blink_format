@@ -79,6 +79,8 @@
   @"WebKitDeveloperExtrasEnabledPreferenceKey"
 #define WebKitAuthorAndUserStylesEnabledPreferenceKey \
   @"WebKitAuthorAndUserStylesEnabledPreferenceKey"
+#define WebKitApplicationChromeModeEnabledPreferenceKey \
+  @"WebKitApplicationChromeModeEnabledPreferenceKey"
 #define WebKitWebArchiveDebugModeEnabledPreferenceKey \
   @"WebKitWebArchiveDebugModeEnabledPreferenceKey"
 #define WebKitLocalStorageDatabasePathPreferenceKey \
