@@ -1362,7 +1362,7 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
 
 static void addIntrinsicMargins(RenderStyle* style) {
   // Intrinsic margin value.
-  const int intrinsicMargin = 2;
+  const int intrinsicMargin = 2 * style->effectiveZoom();
 
   // FIXME: Using width/height alone and not also dealing with
   // min-width/max-width is flawed.
