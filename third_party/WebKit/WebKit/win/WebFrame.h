@@ -277,6 +277,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       const WebCore::ResourceResponse&);
   virtual WebCore::ResourceError fileDoesNotExistError(
       const WebCore::ResourceResponse&);
+  virtual WebCore::ResourceError pluginWillHandleLoadError(
+      const WebCore::ResourceResponse&);
   virtual bool shouldFallBack(const WebCore::ResourceError&);
   virtual void dispatchDecidePolicyForMIMEType(WebCore::FramePolicyFunction,
                                                const WebCore::String& MIMEType,

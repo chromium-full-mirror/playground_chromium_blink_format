@@ -28,6 +28,7 @@
 #if ENABLE(VIDEO)
 #include "MediaDocument.h"
 
+#include "DocumentLoader.h"
 #include "Element.h"
 #include "Event.h"
 #include "EventNames.h"
@@ -37,6 +38,7 @@
 #include "HTMLEmbedElement.h"
 #include "HTMLNames.h"
 #include "HTMLVideoElement.h"
+#include "MainResourceLoader.h"
 #include "Page.h"
 #include "SegmentedString.h"
 #include "Settings.h"
@@ -97,6 +99,18 @@ void MediaTokenizer::createDocumentStructure() {
   m_mediaElement->setSrc(m_doc->url());
 
   body->appendChild(mediaElement, ec);
+
+  Frame* frame = m_doc->frame();
+  if (!frame)
+    return;
+
+  frame->loader()
+      ->activeDocumentLoader()
+      ->mainResourceLoader()
+      ->setShouldBufferData(false);
+  frame->loader()->documentLoader()->cancelMainResourceLoad(
+      frame->loader()->client()->pluginWillHandleLoadError(
+          frame->loader()->documentLoader()->response()));
 }
 
 bool MediaTokenizer::writeRawData(const char* data, int len) {

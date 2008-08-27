@@ -679,6 +679,12 @@ WebCore::ResourceError FrameLoaderClientQt::fileDoesNotExistError(
                                   QCoreApplication::UnicodeUTF8));
 }
 
+WebCore::ResourceError FrameLoaderClientQt::pluginWillHandleLoadError(
+    const WebCore::ResourceResponse& response) {
+  notImplemented();
+  return ResourceError();
+}
+
 bool FrameLoaderClientQt::shouldFallBack(const WebCore::ResourceError&) {
   notImplemented();
   return false;

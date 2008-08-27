@@ -719,6 +719,12 @@ ResourceError FrameLoaderClient::fileDoesNotExistError(
   return ResourceError();
 }
 
+ResourceError FrameLoaderClient::pluginWillHandleLoadError(
+    const ResourceResponse&) {
+  notImplemented();
+  return ResourceError();
+}
+
 bool FrameLoaderClient::shouldFallBack(const ResourceError&) {
   notImplemented();
   return false;

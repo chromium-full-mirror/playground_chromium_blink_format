@@ -289,6 +289,9 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual ResourceError fileDoesNotExistError(const ResourceResponse&) {
     return ResourceError();
   }
+  virtual ResourceError pluginWillHandleLoadError(const ResourceResponse&) {
+    return ResourceError();
+  }
 
   virtual bool shouldFallBack(const ResourceError&) { return false; }
 

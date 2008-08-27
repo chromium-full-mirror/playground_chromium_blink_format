@@ -195,6 +195,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::ResourceResponse&);
   virtual WebCore::ResourceError fileDoesNotExistError(
       const WebCore::ResourceResponse&);
+  virtual WebCore::ResourceError pluginWillHandleLoadError(
+      const WebCore::ResourceResponse&);
 
   virtual bool shouldFallBack(const WebCore::ResourceError&);
 
