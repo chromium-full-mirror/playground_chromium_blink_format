@@ -1311,9 +1311,10 @@ ResourceError WebFrame::fileDoesNotExistError(const ResourceResponse&) {
   return ResourceError();
 }
 
-ResourceError WebFrame::pluginWillHandleLoadError(const ResourceResponse&) {
+ResourceError WebFrame::pluginWillHandleLoadError(
+    const ResourceResponse& response) {
   return ResourceError(String(WebKitErrorDomain),
-                       WebKitErrorPlugInWillHandleLoad, request.url().string(),
+                       WebKitErrorPlugInWillHandleLoad, response.url().string(),
                        String());
 }
 
