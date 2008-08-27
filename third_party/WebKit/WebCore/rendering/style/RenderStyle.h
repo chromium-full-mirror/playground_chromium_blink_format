@@ -861,9 +861,10 @@ class TransformOperation : public RefCounted<TransformOperation> {
 
   virtual void apply(AffineTransform&, const IntSize& borderBoxSize) = 0;
 
-  virtual TransformOperation* blend(const TransformOperation* from,
-                                    double progress,
-                                    bool blendToIdentity = false) = 0;
+  virtual PassRefPtr<TransformOperation> blend(
+      const TransformOperation* from,
+      double progress,
+      bool blendToIdentity = false) = 0;
 
   virtual bool isScaleOperation() const { return false; }
   virtual bool isRotateOperation() const { return false; }
@@ -893,9 +894,9 @@ class ScaleTransformOperation : public TransformOperation {
     transform.scale(m_x, m_y);
   }
 
-  virtual TransformOperation* blend(const TransformOperation* from,
-                                    double progress,
-                                    bool blendToIdentity = false);
+  virtual PassRefPtr<TransformOperation> blend(const TransformOperation* from,
+                                               double progress,
+                                               bool blendToIdentity = false);
 
  private:
   ScaleTransformOperation(double sx, double sy) : m_x(sx), m_y(sy) {}
@@ -925,9 +926,9 @@ class RotateTransformOperation : public TransformOperation {
     transform.rotate(m_angle);
   }
 
-  virtual TransformOperation* blend(const TransformOperation* from,
-                                    double progress,
-                                    bool blendToIdentity = false);
+  virtual PassRefPtr<TransformOperation> blend(const TransformOperation* from,
+                                               double progress,
+                                               bool blendToIdentity = false);
 
  private:
   RotateTransformOperation(double angle) : m_angle(angle) {}
@@ -956,9 +957,9 @@ class SkewTransformOperation : public TransformOperation {
     transform.skew(m_angleX, m_angleY);
   }
 
-  virtual TransformOperation* blend(const TransformOperation* from,
-                                    double progress,
-                                    bool blendToIdentity = false);
+  virtual PassRefPtr<TransformOperation> blend(const TransformOperation* from,
+                                               double progress,
+                                               bool blendToIdentity = false);
 
  private:
   SkewTransformOperation(double angleX, double angleY)
@@ -990,9 +991,9 @@ class TranslateTransformOperation : public TransformOperation {
                         m_y.calcFloatValue(borderBoxSize.height()));
   }
 
-  virtual TransformOperation* blend(const TransformOperation* from,
-                                    double progress,
-                                    bool blendToIdentity = false);
+  virtual PassRefPtr<TransformOperation> blend(const TransformOperation* from,
+                                               double progress,
+                                               bool blendToIdentity = false);
 
  private:
   TranslateTransformOperation(const Length& tx, const Length& ty)
@@ -1030,9 +1031,9 @@ class MatrixTransformOperation : public TransformOperation {
     transform = matrix * transform;
   }
 
-  virtual TransformOperation* blend(const TransformOperation* from,
-                                    double progress,
-                                    bool blendToIdentity = false);
+  virtual PassRefPtr<TransformOperation> blend(const TransformOperation* from,
+                                               double progress,
+                                               bool blendToIdentity = false);
 
  private:
   MatrixTransformOperation(double a,
