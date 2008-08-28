@@ -897,10 +897,6 @@ void GraphicsContext::clipToImageBuffer(const FloatRect&, const ImageBuffer*) {
   notImplemented();
 }
 
-void GraphicsContext::clipToImageBuffer(const FloatRect&, const ImageBuffer*) {
-  notImplemented();
-}
-
 void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
                                               int thickness) {
   if (paintingDisabled())
@@ -1076,12 +1072,6 @@ void GraphicsContext::releaseWindowsContext(HDC hdc,
   }
 }
 #endif
-
-void GraphicsContext::setImageInterpolationQuality(InterpolationQuality) {}
-
-InterpolationQuality GraphicsContext::imageInterpolationQuality() const {
-  return InterpolationDefault;
-}
 
 void GraphicsContext::setImageInterpolationQuality(InterpolationQuality) {}
 
