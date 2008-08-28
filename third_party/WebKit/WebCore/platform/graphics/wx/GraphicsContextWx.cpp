@@ -347,6 +347,10 @@ void GraphicsContext::clip(const Path&) {
   notImplemented();
 }
 
+void GraphicsContext::clipToImageBuffer(const FloatRect&, const ImageBuffer*) {
+  notImplemented();
+}
+
 AffineTransform GraphicsContext::getCTM() const {
   notImplemented();
   return AffineTransform();
@@ -455,15 +459,31 @@ void GraphicsContext::setUseAntialiasing(bool enable) {
   notImplemented();
 }
 
-void GraphicsContext::applyFillPattern(const Pattern&) {
-  if (paintingDisabled())
-    return;
-  notImplemented();
+void GraphicsContext::setImageInterpolationQuality(InterpolationQuality) {}
+
+InterpolationQuality GraphicsContext::imageInterpolationQuality() const {
+  return InterpolationDefault;
 }
 
-void GraphicsContext::applyStrokePattern(const Pattern&) {
+void GraphicsContext::fillPath() {}
+
+void GraphicsContext::strokePath() {}
+
+void GraphicsContext::drawPath() {
+  fillPath();
+  strokePath();
+}
+
+void GraphicsContext::fillRect(const FloatRect& rect) {
   if (paintingDisabled())
     return;
-  notImplemented();
 }
+
+void GraphicsContext::setPlatformFillPattern(Pattern* pattern) {}
+
+void GraphicsContext::setPlatformStrokePattern(Pattern* pattern) {}
+
+void GraphicsContext::setPlatformFillGradient(Gradient* gradient) {}
+
+void GraphicsContext::setPlatformStrokeGradient(Gradient* gradient) {}
 }
