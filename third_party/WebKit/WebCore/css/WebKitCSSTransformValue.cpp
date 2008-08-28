@@ -40,6 +40,18 @@ WebKitCSSTransformValue::~WebKitCSSTransformValue() {}
 String WebKitCSSTransformValue::cssText() const {
   String result;
   switch (m_type) {
+    case TranslateTransformOperation:
+      result += "translate(";
+      break;
+    case TranslateXTransformOperation:
+      result += "translateX(";
+      break;
+    case TranslateYTransformOperation:
+      result += "translateY(";
+      break;
+    case RotateTransformOperation:
+      result += "rotate(";
+      break;
     case ScaleTransformOperation:
       result += "scale(";
       break;
@@ -49,9 +61,6 @@ String WebKitCSSTransformValue::cssText() const {
     case ScaleYTransformOperation:
       result += "scaleY(";
       break;
-    case RotateTransformOperation:
-      result += "rotate(";
-      break;
     case SkewTransformOperation:
       result += "skew(";
       break;
@@ -60,15 +69,6 @@ String WebKitCSSTransformValue::cssText() const {
       break;
     case SkewYTransformOperation:
       result += "skewY(";
-      break;
-    case TranslateTransformOperation:
-      result += "translate(";
-      break;
-    case TranslateXTransformOperation:
-      result += "translateX(";
-      break;
-    case TranslateYTransformOperation:
-      result += "translateY(";
       break;
     case MatrixTransformOperation:
       result += "matrix(";
