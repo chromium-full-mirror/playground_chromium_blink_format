@@ -46,7 +46,7 @@ class FontValue : public CSSValue {
  private:
   FontValue() {}
 
-  virtual bool isFontValue() { return true; }
+  virtual bool isFontValue() const { return true; }
 };
 
 }  // namespace
