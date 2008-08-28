@@ -37,6 +37,6 @@ void SearchPopupMenu::loadRecentSearches(const AtomicString&, Vector<String>&) {
 
 bool SearchPopupMenu::enabled() {
   notImplemented();
-  return true;
+  return false;
 }
 }
