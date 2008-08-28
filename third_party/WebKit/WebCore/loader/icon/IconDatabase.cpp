@@ -67,6 +67,10 @@
 #define IS_ICON_SYNC_THREAD() (m_syncThread == currentThread())
 #define ASSERT_ICON_SYNC_THREAD() ASSERT(IS_ICON_SYNC_THREAD())
 
+#if PLATFORM(QT)
+#define CAN_THEME_URL_ICON
+#endif
+
 namespace WebCore {
 
 static IconDatabase* sharedIconDatabase = 0;
@@ -360,9 +364,12 @@ String IconDatabase::iconURLForPageURL(const String& pageURLOriginal) {
                                   : String();
 }
 
-Image* IconDatabase::defaultIcon(const IntSize& size) {
-  ASSERT_NOT_SYNC_THREAD();
-
+#ifdef CAN_THEME_URL_ICON
+static inline void loadDefaultIconRecord(IconRecord* defaultIconRecord) {
+  defaultIconRecord->loadImageFromResource("urlIcon");
+}
+#else
+static inline void loadDefaultIconRecord(IconRecord* defaultIconRecord) {
   static const unsigned char defaultIconData[] = {
       0x4D, 0x4D, 0x00, 0x2A, 0x00, 0x00, 0x03, 0x32, 0x80, 0x00, 0x20, 0x50,
       0x38, 0x24, 0x16, 0x0D, 0x07, 0x84, 0x42, 0x61, 0x50, 0xB8, 0x64, 0x08,
@@ -452,10 +459,16 @@ Image* IconDatabase::defaultIcon(const IntSize& size) {
 
   static RefPtr<SharedBuffer> defaultIconBuffer(
       SharedBuffer::create(defaultIconData, sizeof(defaultIconData)));
+  defaultIconRecord->setImageData(defaultIconBuffer);
+}
+#endif
+
+Image* IconDatabase::defaultIcon(const IntSize& size) {
+  ASSERT_NOT_SYNC_THREAD();
 
   if (!m_defaultIconRecord) {
     m_defaultIconRecord = IconRecord::create("urlIcon");
-    m_defaultIconRecord->setImageData(defaultIconBuffer);
+    loadDefaultIconRecord(m_defaultIconRecord.get());
   }
 
   return m_defaultIconRecord->image(size);
