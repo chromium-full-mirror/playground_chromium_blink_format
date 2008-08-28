@@ -64,6 +64,7 @@ bool parseLineCap(const String&, LineCap&);
 
 String lineJoinName(LineJoin);
 bool parseLineJoin(const String&, LineJoin&);
-}
+
+}  // namespace WebCore
 
 #endif

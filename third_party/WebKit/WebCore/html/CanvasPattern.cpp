@@ -63,5 +63,6 @@ CanvasPattern::CanvasPattern(Image* image,
                              bool repeatX,
                              bool repeatY,
                              bool originClean)
-    : m_pattern(image, repeatX, repeatY), m_originClean(originClean) {}
+    : m_pattern(Pattern::create(image, repeatX, repeatY)),
+      m_originClean(originClean) {}
 }

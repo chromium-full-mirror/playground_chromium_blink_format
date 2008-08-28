@@ -30,6 +30,7 @@
 #include "Generator.h"
 
 #include "FloatPoint.h"
+#include <wtf/PassRefPtr.h>
 #include <wtf/Vector.h>
 
 #if PLATFORM(CG)
@@ -58,8 +59,16 @@ class String;
 
 class Gradient : public Generator {
  public:
-  Gradient(const FloatPoint& p0, const FloatPoint& p1);
-  Gradient(const FloatPoint& p0, float r0, const FloatPoint& p1, float r1);
+  static PassRefPtr<Gradient> create(const FloatPoint& p0,
+                                     const FloatPoint& p1) {
+    return adoptRef(new Gradient(p0, p1));
+  }
+  static PassRefPtr<Gradient> create(const FloatPoint& p0,
+                                     float r0,
+                                     const FloatPoint& p1,
+                                     float r1) {
+    return adoptRef(new Gradient(p0, r0, p1, r1));
+  }
   virtual ~Gradient();
 
   void addColorStop(float, const String&);
@@ -86,6 +95,9 @@ class Gradient : public Generator {
   virtual void fill(GraphicsContext*, const FloatRect&);
 
  private:
+  Gradient(const FloatPoint& p0, const FloatPoint& p1);
+  Gradient(const FloatPoint& p0, float r0, const FloatPoint& p1, float r1);
+
   void platformInit() { m_gradient = 0; }
   void platformDestroy();
 

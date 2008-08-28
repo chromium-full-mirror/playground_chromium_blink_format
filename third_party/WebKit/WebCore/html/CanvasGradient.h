@@ -48,14 +48,14 @@ class CanvasGradient : public RefCounted<CanvasGradient> {
     return adoptRef(new CanvasGradient(p0, r0, p1, r1));
   }
 
-  Gradient& gradient() { return m_gradient; }
+  Gradient* gradient() const { return m_gradient.get(); }
 
   void addColorStop(float value, const String& color) {
-    m_gradient.addColorStop(value, color);
+    m_gradient->addColorStop(value, color);
   }
 
   void getColor(float value, float* r, float* g, float* b, float* a) const {
-    m_gradient.getColor(value, r, g, b, a);
+    m_gradient->getColor(value, r, g, b, a);
   }
 
  private:
@@ -65,7 +65,7 @@ class CanvasGradient : public RefCounted<CanvasGradient> {
                  const FloatPoint& p1,
                  float r1);
 
-  Gradient m_gradient;
+  RefPtr<Gradient> m_gradient;
 };
 
 }  // namespace

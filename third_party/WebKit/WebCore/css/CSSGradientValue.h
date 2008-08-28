@@ -78,7 +78,7 @@ class CSSGradientValue : public CSSImageGeneratorValue {
   CSSGradientValue() : m_type(CSSLinearGradient), m_stopsSorted(false) {}
 
   // Create the gradient for a given size.
-  Gradient* createGradient(RenderObject*, const IntSize&);
+  PassRefPtr<Gradient> createGradient(RenderObject*, const IntSize&);
 
   // Resolve points/radii to front end values.
   FloatPoint resolvePoint(CSSPrimitiveValue*,

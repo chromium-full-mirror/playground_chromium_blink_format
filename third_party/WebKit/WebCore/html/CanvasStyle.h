@@ -67,9 +67,8 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
 
   String color() const { return m_color; }
   CanvasGradient* canvasGradient() const { return m_gradient.get(); }
-  CanvasPattern* pattern() const { return m_pattern.get(); }
+  CanvasPattern* canvasPattern() const { return m_pattern.get(); }
 
-  // These do nothing for gradients or patterns.
   void applyFillColor(GraphicsContext*);
   void applyStrokeColor(GraphicsContext*);
 

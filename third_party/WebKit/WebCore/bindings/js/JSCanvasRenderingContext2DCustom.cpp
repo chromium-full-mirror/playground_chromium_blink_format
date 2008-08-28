@@ -43,8 +43,8 @@ namespace WebCore {
 static JSValue* toJS(ExecState* exec, CanvasStyle* style) {
   if (style->canvasGradient())
     return toJS(exec, style->canvasGradient());
-  if (style->pattern())
-    return toJS(exec, style->pattern());
+  if (style->canvasPattern())
+    return toJS(exec, style->canvasPattern());
   return jsString(exec, style->color());
 }
 

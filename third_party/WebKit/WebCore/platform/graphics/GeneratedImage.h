@@ -30,15 +30,14 @@
 
 #include "Generator.h"
 #include "IntSize.h"
-#include <wtf/OwnPtr.h>
+#include <wtf/RefPtr.h>
 
 namespace WebCore {
 
 class GeneratedImage : public Image {
  public:
-  GeneratedImage(Generator* generator, const IntSize& size) : m_size(size) {
-    m_generator.set(generator);
-  }
+  GeneratedImage(PassRefPtr<Generator> generator, const IntSize& size)
+      : m_generator(generator), m_size(size) {}
   virtual ~GeneratedImage() {}
 
   virtual bool hasSingleSecurityOrigin() const { return true; }
@@ -68,7 +67,7 @@ class GeneratedImage : public Image {
                            const FloatRect& destRect);
 
  protected:
-  OwnPtr<Generator> m_generator;
+  RefPtr<Generator> m_generator;
   IntSize m_size;
 };
 }

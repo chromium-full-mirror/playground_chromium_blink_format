@@ -95,10 +95,11 @@ class Path {
 
   void moveTo(const FloatPoint&);
   void addLineTo(const FloatPoint&);
-  void addQuadCurveTo(const FloatPoint& controlPoint, const FloatPoint& point);
+  void addQuadCurveTo(const FloatPoint& controlPoint,
+                      const FloatPoint& endPoint);
   void addBezierCurveTo(const FloatPoint& controlPoint1,
                         const FloatPoint& controlPoint2,
-                        const FloatPoint&);
+                        const FloatPoint& endPoint);
   void addArcTo(const FloatPoint&, const FloatPoint&, float radius);
   void closeSubpath();
 
@@ -111,9 +112,6 @@ class Path {
   void addEllipse(const FloatRect&);
 
   void translate(const FloatSize&);
-
-  void setWindingRule(WindRule rule) { m_rule = rule; }
-  WindRule windingRule() const { return m_rule; }
 
   String debugString() const;
 
@@ -136,7 +134,6 @@ class Path {
 
  private:
   PlatformPath* m_path;
-  WindRule m_rule;
 };
 }
 

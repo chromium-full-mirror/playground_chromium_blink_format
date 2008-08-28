@@ -94,6 +94,7 @@ const int cMisspellingLinePatternGapWidth = 1;
 class AffineTransform;
 class Font;
 class Generator;
+class Gradient;
 class GraphicsContextPrivate;
 class GraphicsContextPlatformPrivate;
 class ImageBuffer;
@@ -134,12 +135,15 @@ class GraphicsContext : Noncopyable {
   void setStrokeStyle(const StrokeStyle& style);
   Color strokeColor() const;
   void setStrokeColor(const Color&);
+  void setStrokePattern(PassRefPtr<Pattern>);
+  void setStrokeGradient(PassRefPtr<Gradient>);
 
+  WindRule fillRule() const;
+  void setFillRule(WindRule);
   Color fillColor() const;
   void setFillColor(const Color&);
-
-  void applyStrokePattern(const Pattern&);
-  void applyFillPattern(const Pattern&);
+  void setFillPattern(PassRefPtr<Pattern>);
+  void setFillGradient(PassRefPtr<Gradient>);
 
   void save();
   void restore();
@@ -152,11 +156,15 @@ class GraphicsContext : Noncopyable {
                          const FloatPoint*,
                          bool shouldAntialias = false);
 
+  void drawPath();
+  void fillPath();
+  void strokePath();
+
   // Arc drawing (used by border-radius in CSS) just supports stroking at the
   // moment.
   void strokeArc(const IntRect&, int startAngle, int angleSpan);
 
-  void fillRect(const IntRect&, const Color&);
+  void fillRect(const FloatRect&);
   void fillRect(const FloatRect&, const Color&);
   void fillRect(const FloatRect&, Generator&);
   void fillRoundedRect(const IntRect&,
@@ -165,7 +173,10 @@ class GraphicsContext : Noncopyable {
                        const IntSize& bottomLeft,
                        const IntSize& bottomRight,
                        const Color&);
+
   void clearRect(const FloatRect&);
+
+  void strokeRect(const FloatRect&);
   void strokeRect(const FloatRect&, float lineWidth);
 
   void drawImage(Image*,
@@ -201,15 +212,8 @@ class GraphicsContext : Noncopyable {
                       Image::TileRule vRule = Image::StretchTile,
                       CompositeOperator = CompositeSourceOver);
 
-#if PLATFORM(CG)
   void setImageInterpolationQuality(InterpolationQuality);
   InterpolationQuality imageInterpolationQuality() const;
-#else
-  void setImageInterpolationQuality(InterpolationQuality) {}
-  InterpolationQuality imageInterpolationQuality() const {
-    return InterpolationDefault;
-  }
-#endif
 
   void clip(const FloatRect&);
   void addRoundedRectClip(const IntRect&,
@@ -345,7 +349,6 @@ class GraphicsContext : Noncopyable {
 
 #if PLATFORM(QT)
   bool inTransparencyLayer() const;
-  void setFillRule(WindRule);
   PlatformPath* currentPath();
 #endif
 
@@ -358,12 +361,20 @@ class GraphicsContext : Noncopyable {
  private:
   void savePlatformState();
   void restorePlatformState();
+
   void setPlatformTextDrawingMode(int);
+  void setPlatformFont(const Font& font);
+
   void setPlatformStrokeColor(const Color&);
+  void setPlatformStrokePattern(Pattern*);
+  void setPlatformStrokeGradient(Gradient*);
   void setPlatformStrokeStyle(const StrokeStyle&);
   void setPlatformStrokeThickness(float);
+
   void setPlatformFillColor(const Color&);
-  void setPlatformFont(const Font& font);
+  void setPlatformFillPattern(Pattern*);
+  void setPlatformFillGradient(Gradient*);
+
   void setPlatformShadow(const IntSize&, int blur, const Color&);
   void clearPlatformShadow();
 
