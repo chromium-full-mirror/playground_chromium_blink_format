@@ -82,8 +82,9 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
                      int t,
                      bool singleShot);
   void clearTimeout(int timerId, bool delAction = true);
-  PausedTimeouts* pauseTimeouts();
-  void resumeTimeouts(PausedTimeouts*);
+
+  void pauseTimeouts(OwnPtr<PausedTimeouts>&);
+  void resumeTimeouts(OwnPtr<PausedTimeouts>&);
 
   void timerFired(DOMWindowTimer*);
 
