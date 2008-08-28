@@ -124,7 +124,8 @@ LRESULT CALLBACK TimerWindowWndProc(HWND hWnd,
     sharedTimerFiredFunction();
     processingCustomTimerMessage = false;
   } else if (message == WM_TIMER) {
-    if (wParam == sharedTimerID || wParam == lastChanceSharedTimerID) {
+    if (wParam == sharedTimerID ||
+        wParam == lastChanceSharedTimerID && !isDeferringTimers()) {
       KillTimer(timerWindowHandle, sharedTimerID);
       sharedTimerFiredFunction();
     } else if (wParam == endHighResTimerID) {
