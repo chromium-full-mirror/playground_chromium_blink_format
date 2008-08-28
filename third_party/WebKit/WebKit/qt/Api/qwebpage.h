@@ -272,6 +272,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 #endif
 
   void microFocusChanged();
+  void contentsChanged();
 
  protected:
   virtual QWebPage* createWindow(WebWindowType type);
