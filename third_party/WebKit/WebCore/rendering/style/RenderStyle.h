@@ -2811,6 +2811,9 @@ class RenderStyle {
     return false;
   }
 
+  // Only used for blending font sizes when animating.
+  void setBlendedFontSize(int);
+
   void setColor(const Color& v) { SET_VAR(inherited, color, v) }
   void setTextIndent(Length v) { SET_VAR(inherited, indent, v) }
   void setTextAlign(ETextAlign v) { inherited_flags._text_align = v; }

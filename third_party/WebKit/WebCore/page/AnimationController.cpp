@@ -1288,6 +1288,9 @@ void AnimationControllerPrivate::ensurePropertyMap() {
     gPropertyWrappers->append(new PropertyWrapper<const Color&>(
         CSSPropertyBackgroundColor, &RenderStyle::backgroundColor,
         &RenderStyle::setBackgroundColor));
+    gPropertyWrappers->append(
+        new PropertyWrapper<int>(CSSPropertyFontSize, &RenderStyle::fontSize,
+                                 &RenderStyle::setBlendedFontSize));
     gPropertyWrappers->append(new PropertyWrapper<unsigned short>(
         CSSPropertyWebkitColumnRuleWidth, &RenderStyle::columnRuleWidth,
         &RenderStyle::setColumnRuleWidth));
