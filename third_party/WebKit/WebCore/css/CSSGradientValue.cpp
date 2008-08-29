@@ -122,8 +122,10 @@ Image* CSSGradientValue::image(RenderObject* renderer, const IntSize& size) {
     return 0;
 
   // We need to create an image.
-  result = new GeneratedImage(createGradient(renderer, size), size);
-  putImage(size, result);
+  RefPtr<Image> newImage =
+      GeneratedImage::create(createGradient(renderer, size), size);
+  result = newImage.get();
+  putImage(size, newImage.release());
 
   return result;
 }

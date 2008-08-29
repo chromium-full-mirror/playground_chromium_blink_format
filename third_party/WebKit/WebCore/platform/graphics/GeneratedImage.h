@@ -36,8 +36,10 @@ namespace WebCore {
 
 class GeneratedImage : public Image {
  public:
-  GeneratedImage(PassRefPtr<Generator> generator, const IntSize& size)
-      : m_generator(generator), m_size(size) {}
+  static PassRefPtr<GeneratedImage> create(PassRefPtr<Generator> generator,
+                                           const IntSize& size) {
+    return adoptRef(new GeneratedImage(generator, size));
+  }
   virtual ~GeneratedImage() {}
 
   virtual bool hasSingleSecurityOrigin() const { return true; }
@@ -67,6 +69,9 @@ class GeneratedImage : public Image {
                            const FloatRect& destRect);
 
  protected:
+  GeneratedImage(PassRefPtr<Generator> generator, const IntSize& size)
+      : m_generator(generator), m_size(size) {}
+
   RefPtr<Generator> m_generator;
   IntSize m_size;
 };

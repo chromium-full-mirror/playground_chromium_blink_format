@@ -37,9 +37,7 @@ namespace WebCore {
 
 CSSImageGeneratorValue::CSSImageGeneratorValue() : m_accessedImage(false) {}
 
-CSSImageGeneratorValue::~CSSImageGeneratorValue() {
-  deleteAllValues(m_images);
-}
+CSSImageGeneratorValue::~CSSImageGeneratorValue() {}
 
 void CSSImageGeneratorValue::addClient(RenderObject* renderer,
                                        const IntSize& size) {
@@ -54,7 +52,7 @@ void CSSImageGeneratorValue::removeClient(RenderObject* renderer) {
   if (!size.isEmpty()) {
     m_sizes.remove(size);
     if (!m_sizes.contains(size))
-      delete m_images.take(size);
+      m_images.remove(size);
   }
   m_clients.remove(renderer);
   deref();
@@ -73,10 +71,11 @@ Image* CSSImageGeneratorValue::getImage(RenderObject* renderer,
     return 0;
 
   // Look up the image in our cache.
-  return m_images.get(size);
+  return m_images.get(size).get();
 }
 
-void CSSImageGeneratorValue::putImage(const IntSize& size, Image* image) {
+void CSSImageGeneratorValue::putImage(const IntSize& size,
+                                      PassRefPtr<Image> image) {
   m_images.add(size, image);
 }
 
