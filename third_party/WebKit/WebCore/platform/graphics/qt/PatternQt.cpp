@@ -32,8 +32,8 @@
 
 namespace WebCore {
 
-QBrush* Pattern::createPlatformPattern(const AffineTransform& transform) const {
+QBrush Pattern::createPlatformPattern(const AffineTransform& transform) const {
   notImplemented();
-  return 0;
+  return QBrush();
 }
 }
