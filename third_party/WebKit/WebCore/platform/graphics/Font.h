@@ -220,7 +220,9 @@ class Font {
 
   // Useful for debugging the different font rendering code paths.
  public:
-#if !PLATFORM(QT)
+#if PLATFORM(QT)
+  FontSelector* fontSelector() const { return 0; }
+#else
   enum CodePath { Auto, Simple, Complex };
   static void setCodePath(CodePath);
   static CodePath codePath;
