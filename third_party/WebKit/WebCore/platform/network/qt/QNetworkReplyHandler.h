@@ -40,7 +40,10 @@ class ResourceHandle;
 class QNetworkReplyHandler : public QObject {
   Q_OBJECT
  public:
-  QNetworkReplyHandler(ResourceHandle* handle);
+  enum LoadMode { LoadNormal, LoadDeferred };
+
+  QNetworkReplyHandler(ResourceHandle* handle, LoadMode);
+  void setLoadMode(LoadMode);
 
   QNetworkReply* reply() const { return m_reply; }
 
@@ -55,14 +58,23 @@ class QNetworkReplyHandler : public QObject {
 
  private:
   void start();
+  void resetState();
+  void sendQueuedItems();
 
   QNetworkReply* m_reply;
   ResourceHandle* m_resourceHandle;
   bool m_redirected;
   bool m_responseSent;
+  LoadMode m_loadMode;
   QNetworkAccessManager::Operation m_method;
   QNetworkRequest m_request;
   uint m_startTime;
+
+  // defer state holding
+  bool m_shouldStart;
+  bool m_shouldFinish;
+  bool m_shouldSendResponse;
+  bool m_shouldForwardData;
 };
 
 // Self destructing QIODevice for FormData

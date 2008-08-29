@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2007-2008 Trolltech ASA
     Copyright (C) 2007 Staikos Computing Services Inc.  <info@staikos.net>
+    Copyright (C) 2008 Holger Hans Peter Freyther
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -124,13 +125,19 @@ void FormDataIODevice::slotFinished() {
   deleteLater();
 }
 
-QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle)
+QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle,
+                                           LoadMode loadMode)
     : QObject(0),
       m_resourceHandle(handle),
       m_reply(0),
       m_redirected(false),
       m_responseSent(false),
-      m_startTime(0) {
+      m_loadMode(loadMode),
+      m_startTime(0),
+      m_shouldStart(true),
+      m_shouldFinish(false),
+      m_shouldSendResponse(false),
+      m_shouldForwardData(false) {
   const ResourceRequest& r = m_resourceHandle->request();
 
   if (r.httpMethod() == "GET")
@@ -146,7 +153,14 @@ QNetworkReplyHandler::QNetworkReplyHandler(ResourceHandle* handle)
 
   m_request = r.toNetworkRequest();
 
-  start();
+  if (m_loadMode == LoadNormal)
+    start();
+}
+
+void QNetworkReplyHandler::setLoadMode(LoadMode mode) {
+  m_loadMode = mode;
+  if (m_loadMode == LoadNormal)
+    sendQueuedItems();
 }
 
 void QNetworkReplyHandler::abort() {
@@ -172,6 +186,10 @@ QNetworkReply* QNetworkReplyHandler::release() {
 }
 
 void QNetworkReplyHandler::finish() {
+  m_shouldFinish = true;
+  if (m_loadMode == LoadDeferred)
+    return;
+
   sendResponseIfNeeded();
 
   if (!m_resourceHandle)
@@ -184,8 +202,7 @@ void QNetworkReplyHandler::finish() {
   }
   QNetworkReply* oldReply = m_reply;
   if (m_redirected) {
-    m_redirected = false;
-    m_responseSent = false;
+    resetState();
     start();
   } else if (m_reply->error() != QNetworkReply::NoError
              // a web page that returns 403/404 can still have content
@@ -208,6 +225,10 @@ void QNetworkReplyHandler::finish() {
 }
 
 void QNetworkReplyHandler::sendResponseIfNeeded() {
+  m_shouldSendResponse = true;
+  if (m_loadMode == LoadDeferred)
+    return;
+
   if (m_responseSent || !m_resourceHandle)
     return;
   m_responseSent = true;
@@ -291,6 +312,10 @@ void QNetworkReplyHandler::sendResponseIfNeeded() {
 }
 
 void QNetworkReplyHandler::forwardData() {
+  m_shouldForwardData = true;
+  if (m_loadMode == LoadDeferred)
+    return;
+
   sendResponseIfNeeded();
 
   // don't emit the "Document has moved here" type of HTML
@@ -312,6 +337,8 @@ void QNetworkReplyHandler::forwardData() {
 }
 
 void QNetworkReplyHandler::start() {
+  m_shouldStart = false;
+
   ResourceHandleInternal* d = m_resourceHandle->getInternal();
 
   QNetworkAccessManager* manager = d->m_frame->page()->networkAccessManager();
@@ -377,6 +404,31 @@ void QNetworkReplyHandler::start() {
 
   connect(m_reply, SIGNAL(readyRead()), this, SLOT(forwardData()),
           Qt::QueuedConnection);
+}
+
+void QNetworkReplyHandler::resetState() {
+  m_redirected = false;
+  m_responseSent = false;
+  m_shouldStart = true;
+  m_shouldFinish = false;
+  m_shouldSendResponse = false;
+  m_shouldForwardData = false;
+}
+
+void QNetworkReplyHandler::sendQueuedItems() {
+  Q_ASSERT(m_loadMode == LoadNormal);
+
+  if (m_shouldStart)
+    start();
+
+  if (m_shouldSendResponse)
+    sendResponseIfNeeded();
+
+  if (m_shouldForwardData)
+    forwardData();
+
+  if (m_shouldFinish)
+    finish();
 }
 }
 
