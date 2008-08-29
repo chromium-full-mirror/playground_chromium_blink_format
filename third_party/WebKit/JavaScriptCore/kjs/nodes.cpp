@@ -1413,6 +1413,9 @@ ForInNode::ForInNode(JSGlobalData* globalData,
 }
 
 RegisterID* ForInNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
+  if (!m_lexpr->isLocation())
+    return emitThrowError(generator, ReferenceError,
+                          "Left side of for-in statement is not a reference.");
   RefPtr<LabelID> loopStart = generator.newLabel();
   RefPtr<LabelID> continueTarget = generator.newLabel();
   RefPtr<LabelID> breakTarget = generator.newLabel();
