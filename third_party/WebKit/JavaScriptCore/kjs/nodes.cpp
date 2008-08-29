@@ -837,8 +837,8 @@ RegisterID* UnaryOpNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 
 RegisterID* BinaryOpNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
-      m_term1.get(), m_rightHasAssignments, m_term2->isPure(generator));
-  RegisterID* src2 = generator.emitNode(m_term2.get());
+      m_expr1.get(), m_rightHasAssignments, m_expr2->isPure(generator));
+  RegisterID* src2 = generator.emitNode(m_expr2.get());
   return generator.emitBinaryOp(
       opcode(), generator.finalDestination(dst, src1.get()), src1.get(), src2);
 }
@@ -846,8 +846,8 @@ RegisterID* BinaryOpNode::emitCode(CodeGenerator& generator, RegisterID* dst) {
 RegisterID* ReverseBinaryOpNode::emitCode(CodeGenerator& generator,
                                           RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
-      m_term1.get(), m_rightHasAssignments, m_term2->isPure(generator));
-  RegisterID* src2 = generator.emitNode(m_term2.get());
+      m_expr1.get(), m_rightHasAssignments, m_expr2->isPure(generator));
+  RegisterID* src2 = generator.emitNode(m_expr2.get());
   return generator.emitBinaryOp(
       opcode(), generator.finalDestination(dst, src1.get()), src2, src1.get());
 }
@@ -855,8 +855,8 @@ RegisterID* ReverseBinaryOpNode::emitCode(CodeGenerator& generator,
 RegisterID* ThrowableBinaryOpNode::emitCode(CodeGenerator& generator,
                                             RegisterID* dst) {
   RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(
-      m_term1.get(), m_rightHasAssignments, m_term2->isPure(generator));
-  RegisterID* src2 = generator.emitNode(m_term2.get());
+      m_expr1.get(), m_rightHasAssignments, m_expr2->isPure(generator));
+  RegisterID* src2 = generator.emitNode(m_expr2.get());
   generator.emitExpressionInfo(m_divot, m_startOffset, m_endOffset);
   return generator.emitBinaryOp(
       opcode(), generator.finalDestination(dst, src1.get()), src1.get(), src2);
