@@ -139,10 +139,6 @@ class Image : public RefCounted<Image> {
   virtual CGImageRef getCGImageRef() { return 0; }
 #endif
 
-#if PLATFORM(QT)
-  virtual QPixmap* getPixmap() const { return 0; }
-#endif
-
 #if PLATFORM(WIN)
   virtual bool getHBITMAP(HBITMAP) { return false; }
   virtual bool getHBITMAPOfSize(HBITMAP, LPSIZE) { return false; }

@@ -162,10 +162,6 @@ void BitmapImage::checkForSolidColor() {
   // RGBA32 buffer to see if it is 1x1.
   m_isSolidColor = false;
 }
-
-QPixmap* BitmapImage::getPixmap() const {
-  return const_cast<BitmapImage*>(this)->frameAtIndex(0);
-}
 }
 
 // vim: ts=4 sw=4 et

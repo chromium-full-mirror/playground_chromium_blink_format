@@ -123,7 +123,7 @@ QDateTime QWebHistoryItem::lastVisited() const {
  \sa title(), url(), lastVisited()
 */
 QIcon QWebHistoryItem::icon() const {
-  return *d->item->icon()->getPixmap();
+  return *d->item->icon()->nativeImageForCurrentFrame();
 }
 
 /*!
