@@ -89,6 +89,7 @@ class QTMovieWinPrivate : Noncopyable {
   void updateGWorld();
   void createGWorld();
   void deleteGWorld();
+  void clearGWorld();
 
   void setSize(int, int);
 
@@ -189,6 +190,13 @@ void QTMovieWinPrivate::task() {
     long loadState =
         m_loadError ? kMovieLoadStateError : GetMovieLoadState(m_movie);
     if (loadState != m_loadState) {
+      // we only need to erase the movie gworld when the load state changes to
+      // loaded while it
+      //  is visible as the gworld is destroyed/created when visibility changes
+      if (loadState >= QTMovieLoadStateLoaded &&
+          m_loadState < QTMovieLoadStateLoaded && m_visible)
+        clearGWorld();
+
       m_loadState = loadState;
       if (!m_movieController && m_loadState >= kMovieLoadStateLoaded)
         createMovieController();
@@ -245,7 +253,7 @@ void QTMovieWinPrivate::registerDrawingCallback() {
 }
 
 void QTMovieWinPrivate::drawingComplete() {
-  if (!m_gWorld)
+  if (!m_gWorld || m_loadState < kMovieLoadStateLoaded)
     return;
   m_client->movieNewImageAvailable(m_movieWin);
 }
@@ -291,6 +299,24 @@ void QTMovieWinPrivate::createGWorld() {
   if (m_movieController)
     MCSetControllerBoundsRect(m_movieController, &bounds);
   SetMovieBox(m_movie, &bounds);
+}
+
+void QTMovieWinPrivate::clearGWorld() {
+  if (!m_movie || !m_gWorld)
+    return;
+
+  GrafPtr savePort;
+  GetPort(&savePort);
+  MacSetPort((GrafPtr)m_gWorld);
+
+  Rect bounds;
+  bounds.top = 0;
+  bounds.left = 0;
+  bounds.right = m_gWorldWidth;
+  bounds.bottom = m_gWorldHeight;
+  EraseRect(&bounds);
+
+  MacSetPort(savePort);
 }
 
 void QTMovieWinPrivate::setSize(int width, int height) {
