@@ -54,6 +54,10 @@
 #include "SamplingTool.h"
 #include <stdio.h>
 
+#if PLATFORM(DARWIN)
+#include <mach/mach.h>
+#endif
+
 #if HAVE(SYS_TIME_H)
 #include <sys/time.h>
 #endif
@@ -1156,13 +1160,24 @@ void Machine::resetTimeoutCheck() {
   m_timeExecuting = 0;
 }
 
-// Returns the current time in milliseconds
-// It doesn't matter what "current time" is here, just as long as
-// it's possible to measure the time difference correctly.
-// In an ideal world this would just be getCurrentUTCTimeWithMicroseconds
-// from DateMath.h, but unfortunately there's a slowdown if we use tha.
-static inline unsigned getCurrentTime() {
-#if HAVE(SYS_TIME_H)
+// Returns the time the current thread has spent executing, in milliseconds.
+static inline unsigned getCPUTime() {
+#if PLATFORM(DARWIN)
+  mach_msg_type_number_t infoCount = THREAD_BASIC_INFO_COUNT;
+  thread_basic_info_data_t info;
+
+  // Get thread information
+  thread_info(mach_thread_self(), THREAD_BASIC_INFO,
+              reinterpret_cast<thread_info_t>(&info), &infoCount);
+
+  unsigned time =
+      info.user_time.seconds * 1000 + info.user_time.microseconds / 1000;
+  time +=
+      info.system_time.seconds * 1000 + info.system_time.microseconds / 1000;
+
+  return time;
+#elif HAVE(SYS_TIME_H)
+  // FIXME: This should probably use getrusage with the RUSAGE_THREAD flag.
   struct timeval tv;
   gettimeofday(&tv, 0);
   return tv.tv_sec * 1000 + tv.tv_usec / 1000;
@@ -1170,7 +1185,19 @@ static inline unsigned getCurrentTime() {
   QDateTime t = QDateTime::currentDateTime();
   return t.toTime_t() * 1000 + t.time().msec();
 #elif PLATFORM(WIN_OS)
-  return timeGetTime();
+  union {
+    FILETIME fileTime;
+    unsigned long long fileTimeAsLong;
+  } userTime, kernelTime;
+
+  // GetThreadTimes won't accept NULL arguments so we pass these even though
+  // they're not used.
+  FILETIME creationTime, exitTime;
+
+  GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime,
+                 &kernelTime.fileTime, &userTime.fileTime);
+
+  return userTime / 10000 + kernelTime / 10000;
 #else
 #error Platform does not have getCurrentTime function
 #endif
@@ -1179,7 +1206,7 @@ static inline unsigned getCurrentTime() {
 // We have to return a JSValue here, gcc seems to produce worse code if
 // we attempt to return a bool
 ALWAYS_INLINE JSValue* Machine::checkTimeout(JSGlobalObject* globalObject) {
-  unsigned currentTime = getCurrentTime();
+  unsigned currentTime = getCPUTime();
 
   if (!m_timeAtLastCheckTimeout) {
     // Suspicious amount of looping in a script -- start timing it
