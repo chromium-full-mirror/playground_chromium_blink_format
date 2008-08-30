@@ -289,6 +289,7 @@ class Editor {
 
   // We should make these functions private when their callers in Frame are
   // moved over here to Editor
+  bool insideVisibleArea(const IntPoint&) const;
   bool insideVisibleArea(Range*) const;
   PassRefPtr<Range> nextVisibleRange(Range*,
                                      const String&,
