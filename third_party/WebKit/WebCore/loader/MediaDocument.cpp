@@ -108,14 +108,15 @@ void MediaTokenizer::createDocumentStructure() {
       ->activeDocumentLoader()
       ->mainResourceLoader()
       ->setShouldBufferData(false);
-  frame->loader()->documentLoader()->cancelMainResourceLoad(
-      frame->loader()->client()->pluginWillHandleLoadError(
-          frame->loader()->documentLoader()->response()));
 }
 
 bool MediaTokenizer::writeRawData(const char* data, int len) {
-  if (!m_mediaElement)
-    createDocumentStructure();
+  ASSERT(!m_mediaElement);
+  if (m_mediaElement)
+    return false;
+
+  createDocumentStructure();
+  finish();
   return false;
 }
 
