@@ -685,6 +685,12 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE transparent(
       /* [out, retval] */ BOOL* transparent);
 
+  virtual HRESULT STDMETHODCALLTYPE setDefersCallbacks(
+      /* [in] */ BOOL defersCallbacks);
+
+  virtual HRESULT STDMETHODCALLTYPE defersCallbacks(
+      /* [out, retval] */ BOOL* defersCallbacks);
+
   // WebView
   WebCore::Page* page();
   bool handleMouseEvent(UINT, WPARAM, LPARAM);
