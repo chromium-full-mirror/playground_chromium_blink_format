@@ -356,7 +356,7 @@ JSValue* stringProtoFuncReplace(ExecState* exec,
           if (matchStart < 0)
             args.append(jsUndefined());
           else
-            args.append(jsString(exec, source.substr(matchStart, matchLen)));
+            args.append(jsSubstring(exec, source, matchStart, matchLen));
         }
 
         args.append(jsNumber(exec, completeMatchStart));
@@ -403,7 +403,7 @@ JSValue* stringProtoFuncReplace(ExecState* exec,
 
   if (callType != CallTypeNone) {
     ArgList args;
-    args.append(jsString(exec, source.substr(matchPos, matchLen)));
+    args.append(jsSubstring(exec, source, matchPos, matchLen));
     args.append(jsNumber(exec, matchPos));
     args.append(sourceVal);
 
@@ -436,16 +436,18 @@ JSValue* stringProtoFuncCharAt(ExecState* exec,
                                JSValue* thisValue,
                                const ArgList& args) {
   UString s = thisValue->toThisString(exec);
-  int len = s.size();
-
-  UString u;
+  unsigned len = s.size();
   JSValue* a0 = args.at(exec, 0);
+  if (JSImmediate::isNumber(a0)) {
+    uint32_t i;
+    if (JSImmediate::getUInt32(a0, i) && i < len)
+      return jsSingleCharacterSubstring(exec, s, i);
+    return jsEmptyString(exec);
+  }
   double dpos = a0->toInteger(exec);
   if (dpos >= 0 && dpos < len)
-    u = s.substr(static_cast<int>(dpos), 1);
-  else
-    u = "";
-  return jsString(exec, u);
+    return jsSingleCharacterSubstring(exec, s, static_cast<unsigned>(dpos));
+  return jsEmptyString(exec);
 }
 
 JSValue* stringProtoFuncCharCodeAt(ExecState* exec,
@@ -453,17 +455,18 @@ JSValue* stringProtoFuncCharCodeAt(ExecState* exec,
                                    JSValue* thisValue,
                                    const ArgList& args) {
   UString s = thisValue->toThisString(exec);
-  int len = s.size();
-
-  JSValue* result = 0;
-
+  unsigned len = s.size();
   JSValue* a0 = args.at(exec, 0);
+  if (JSImmediate::isNumber(a0)) {
+    uint32_t i;
+    if (JSImmediate::getUInt32(a0, i) && i < len)
+      return jsNumber(exec, s.data()[i]);
+    return jsNaN(exec);
+  }
   double dpos = a0->toInteger(exec);
   if (dpos >= 0 && dpos < len)
-    result = jsNumber(exec, s[static_cast<int>(dpos)]);
-  else
-    result = jsNaN(exec);
-  return result;
+    return jsNumber(exec, s[static_cast<int>(dpos)]);
+  return jsNaN(exec);
 }
 
 JSValue* stringProtoFuncConcat(ExecState* exec,
@@ -553,7 +556,7 @@ JSValue* stringProtoFuncMatch(ExecState* exec,
   ArgList list;
   int lastIndex = 0;
   while (pos >= 0) {
-    list.append(jsString(exec, u.substr(pos, matchLength)));
+    list.append(jsSubstring(exec, u, pos, matchLength));
     lastIndex = pos;
     pos += matchLength == 0 ? 1 : matchLength;
     regExpObj->performMatch(reg.get(), u, pos, pos, matchLength);
@@ -619,11 +622,11 @@ JSValue* stringProtoFuncSlice(ExecState* exec,
       from = 0;
     if (to > len)
       to = len;
-    return jsString(
-        exec, s.substr(static_cast<int>(from), static_cast<int>(to - from)));
+    return jsSubstring(exec, s, static_cast<unsigned>(from),
+                       static_cast<unsigned>(to) - static_cast<unsigned>(from));
   }
 
-  return jsString(exec, "");
+  return jsEmptyString(exec);
 }
 
 JSValue* stringProtoFuncSplit(ExecState* exec,
@@ -635,67 +638,60 @@ JSValue* stringProtoFuncSplit(ExecState* exec,
   JSValue* a0 = args.at(exec, 0);
   JSValue* a1 = args.at(exec, 1);
 
-  JSObject* res = constructEmptyArray(exec);
-  JSValue* result = res;
-  UString u = s;
-  int pos;
-  int i = 0;
+  JSArray* result = constructEmptyArray(exec);
+  unsigned i = 0;
   int p0 = 0;
-  uint32_t limit = a1->isUndefined() ? 0xFFFFFFFFU : a1->toUInt32(exec);
+  unsigned limit = a1->isUndefined() ? 0xFFFFFFFFU : a1->toUInt32(exec);
   if (a0->isObject() &&
       static_cast<JSObject*>(a0)->inherits(&RegExpObject::info)) {
     RegExp* reg = static_cast<RegExpObject*>(a0)->regExp();
-    if (u.isEmpty() && reg->match(u, 0) >= 0) {
+    if (s.isEmpty() && reg->match(s, 0) >= 0) {
       // empty string matched by regexp -> empty array
-      res->put(exec, exec->propertyNames().length, jsNumber(exec, 0));
       return result;
     }
-    pos = 0;
-    while (static_cast<uint32_t>(i) != limit && pos < u.size()) {
+    int pos = 0;
+    while (i != limit && pos < s.size()) {
       OwnArrayPtr<int> ovector;
-      int mpos = reg->match(u, pos, &ovector);
+      int mpos = reg->match(s, pos, &ovector);
       if (mpos < 0)
         break;
       int mlen = ovector[1] - ovector[0];
       pos = mpos + (mlen == 0 ? 1 : mlen);
       if (mpos != p0 || mlen) {
-        res->put(exec, i, jsString(exec, u.substr(p0, mpos - p0)));
+        result->put(exec, i++, jsSubstring(exec, s, p0, mpos - p0));
         p0 = mpos + mlen;
-        i++;
       }
       for (unsigned si = 1; si <= reg->numSubpatterns(); ++si) {
         int spos = ovector[si * 2];
         if (spos < 0)
-          res->put(exec, i++, jsUndefined());
+          result->put(exec, i++, jsUndefined());
         else
-          res->put(exec, i++,
-                   jsString(exec, u.substr(spos, ovector[si * 2 + 1] - spos)));
+          result->put(exec, i++,
+                      jsSubstring(exec, s, spos, ovector[si * 2 + 1] - spos));
       }
     }
   } else {
     UString u2 = a0->toString(exec);
     if (u2.isEmpty()) {
-      if (u.isEmpty()) {
+      if (s.isEmpty()) {
         // empty separator matches empty string -> empty array
-        res->put(exec, exec->propertyNames().length, jsNumber(exec, 0));
         return result;
-      } else {
-        while (static_cast<uint32_t>(i) != limit && i < u.size() - 1)
-          res->put(exec, i++, jsString(exec, u.substr(p0++, 1)));
       }
+      while (i != limit && p0 < s.size() - 1)
+        result->put(exec, i++, jsSingleCharacterSubstring(exec, s, p0++));
     } else {
-      while (static_cast<uint32_t>(i) != limit && (pos = u.find(u2, p0)) >= 0) {
-        res->put(exec, i, jsString(exec, u.substr(p0, pos - p0)));
+      int pos;
+      while (i != limit && (pos = s.find(u2, p0)) >= 0) {
+        result->put(exec, i++, jsSubstring(exec, s, p0, pos - p0));
         p0 = pos + u2.size();
-        i++;
       }
     }
   }
 
-  // add remaining string, if any
-  if (static_cast<uint32_t>(i) != limit)
-    res->put(exec, i++, jsString(exec, u.substr(p0)));
-  res->put(exec, exec->propertyNames().length, jsNumber(exec, i));
+  // add remaining string
+  if (i != limit)
+    result->put(exec, i++, jsSubstring(exec, s, p0, s.size() - p0));
+
   return result;
 }
 
@@ -712,9 +708,9 @@ JSValue* stringProtoFuncSubstr(ExecState* exec,
   double start = a0->toInteger(exec);
   double length = a1->isUndefined() ? len : a1->toInteger(exec);
   if (start >= len)
-    return jsString(exec, "");
+    return jsEmptyString(exec);
   if (length < 0)
-    return jsString(exec, "");
+    return jsEmptyString(exec);
   if (start < 0) {
     start += len;
     if (start < 0)
@@ -722,8 +718,8 @@ JSValue* stringProtoFuncSubstr(ExecState* exec,
   }
   if (length > len)
     length = len;
-  return jsString(exec,
-                  s.substr(static_cast<int>(start), static_cast<int>(length)));
+  return jsSubstring(exec, s, static_cast<unsigned>(start),
+                     static_cast<unsigned>(length));
 }
 
 JSValue* stringProtoFuncSubstring(ExecState* exec,
@@ -757,9 +753,8 @@ JSValue* stringProtoFuncSubstring(ExecState* exec,
     end = start;
     start = temp;
   }
-  return jsString(exec,
-                  s.substr(static_cast<int>(start),
-                           (static_cast<int>(end) - static_cast<int>(start))));
+  return jsSubstring(exec, s, static_cast<unsigned>(start),
+                     static_cast<unsigned>(end) - static_cast<unsigned>(start));
 }
 
 JSValue* stringProtoFuncToLowerCase(ExecState* exec,

@@ -68,8 +68,6 @@ class CString {
 typedef Vector<char, 32> CStringBuffer;
 
 class UString {
-  friend bool operator==(const UString&, const UString&);
-
  public:
   struct Rep {
     static PassRefPtr<Rep> create(UChar*, int);
@@ -165,9 +163,6 @@ class UString {
 
   UString(const Vector<UChar>& buffer);
 
-  // Concatenation constructor. Makes operator+ more efficient.
-  UString(const UString&, const UString&);
-
   ~UString() {}
 
   // Special constructor for cases where we overwrite an object in place.
@@ -253,22 +248,25 @@ class UString {
   static const UString& null();
 
   Rep* rep() const { return m_rep.get(); }
+  static Rep* nullRep();
 
   UString(PassRefPtr<Rep> r) : m_rep(r) { ASSERT(m_rep); }
 
   size_t cost() const;
 
  private:
-  size_t expandedSize(size_t size, size_t otherSize) const;
+  static size_t expandedSize(size_t size, size_t otherSize);
   int usedCapacity() const;
   int usedPreCapacity() const;
   void expandCapacity(int requiredLength);
   void expandPreCapacity(int requiredPreCap);
+  void makeNull();
 
   RefPtr<Rep> m_rep;
-};
 
-bool operator==(const UString& s1, const UString& s2);
+  friend bool operator==(const UString&, const UString&);
+  friend PassRefPtr<Rep> concatenate(Rep*, Rep*);  // returns 0 if out of memory
+};
 
 inline bool operator!=(const UString& s1, const UString& s2) {
   return !KJS::operator==(s1, s2);
@@ -291,10 +289,11 @@ inline bool operator!=(const char* s1, const UString& s2) {
   return !KJS::operator==(s1, s2);
 }
 
-bool operator==(const CString& s1, const CString& s2);
+bool operator==(const CString&, const CString&);
 
 inline UString operator+(const UString& s1, const UString& s2) {
-  return UString(s1, s2);
+  RefPtr<UString::Rep> result = concatenate(s1.rep(), s2.rep());
+  return UString(result ? result.release() : UString::nullRep());
 }
 
 int compare(const UString&, const UString&);

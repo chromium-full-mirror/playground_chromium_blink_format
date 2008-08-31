@@ -243,7 +243,7 @@ JSObject* JSLazyEventListener::listenerObj() const {
 
 JSValue* JSLazyEventListener::eventParameterName() const {
   static ProtectedPtr<JSValue> eventString =
-      jsString(window()->globalExec(), "event");
+      jsNontrivialString(window()->globalExec(), "event");
   return eventString.get();
 }
 

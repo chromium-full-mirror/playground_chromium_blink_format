@@ -71,21 +71,21 @@ JSValue* booleanProtoFuncToString(ExecState* exec,
                                   JSValue* thisValue,
                                   const ArgList&) {
   if (thisValue == jsBoolean(false))
-    return jsString(exec, "false");
+    return jsNontrivialString(exec, "false");
 
   if (thisValue == jsBoolean(true))
-    return jsString(exec, "true");
+    return jsNontrivialString(exec, "true");
 
   if (!thisValue->isObject(&BooleanObject::info))
     return throwError(exec, TypeError);
 
   if (static_cast<BooleanObject*>(thisValue)->internalValue() ==
       jsBoolean(false))
-    return jsString(exec, "false");
+    return jsNontrivialString(exec, "false");
 
   ASSERT(static_cast<BooleanObject*>(thisValue)->internalValue() ==
          jsBoolean(true));
-  return jsString(exec, "true");
+  return jsNontrivialString(exec, "true");
 }
 
 JSValue* booleanProtoFuncValueOf(ExecState* exec,

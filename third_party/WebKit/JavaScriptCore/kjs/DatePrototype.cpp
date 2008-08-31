@@ -338,7 +338,7 @@ static JSCell* formatLocaleDate(ExecState* exec,
   size_t ret = strftime(timebuffer, bufsize, formatStrings[format], &localTM);
 
   if (ret == 0)
-    return jsString(exec, "");
+    return jsEmptyString(exec);
 
   // Copy original into the buffer
   if (yearNeedsOffset && format != LocaleTime) {
@@ -352,7 +352,7 @@ static JSCell* formatLocaleDate(ExecState* exec,
     strncpy(yearLocation, yearString, yearLen - 1);
   }
 
-  return jsString(exec, timebuffer);
+  return jsNontrivialString(exec, timebuffer);
 }
 
 #endif  // PLATFORM(WIN_OS)
@@ -527,11 +527,11 @@ JSValue* dateProtoFuncToString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
   GregorianDateTime t;
   thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsString(exec, formatDate(t) + " " + formatTime(t, utc));
+  return jsNontrivialString(exec, formatDate(t) + " " + formatTime(t, utc));
 }
 
 JSValue* dateProtoFuncToUTCString(ExecState* exec,
@@ -546,11 +546,12 @@ JSValue* dateProtoFuncToUTCString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
   GregorianDateTime t;
   thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsString(exec, formatDateUTCVariant(t) + " " + formatTime(t, utc));
+  return jsNontrivialString(exec,
+                            formatDateUTCVariant(t) + " " + formatTime(t, utc));
 }
 
 JSValue* dateProtoFuncToDateString(ExecState* exec,
@@ -565,11 +566,11 @@ JSValue* dateProtoFuncToDateString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
   GregorianDateTime t;
   thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsString(exec, formatDate(t));
+  return jsNontrivialString(exec, formatDate(t));
 }
 
 JSValue* dateProtoFuncToTimeString(ExecState* exec,
@@ -584,11 +585,11 @@ JSValue* dateProtoFuncToTimeString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
   GregorianDateTime t;
   thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsString(exec, formatTime(t, utc));
+  return jsNontrivialString(exec, formatTime(t, utc));
 }
 
 JSValue* dateProtoFuncToLocaleString(ExecState* exec,
@@ -601,11 +602,12 @@ JSValue* dateProtoFuncToLocaleString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
 #if PLATFORM(MAC)
   double secs = floor(milli / msPerSecond);
-  return jsString(exec, formatLocaleDate(exec, secs, true, true, args));
+  return jsNontrivialString(exec,
+                            formatLocaleDate(exec, secs, true, true, args));
 #else
   UNUSED_PARAM(args);
 
@@ -627,11 +629,12 @@ JSValue* dateProtoFuncToLocaleDateString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
 #if PLATFORM(MAC)
   double secs = floor(milli / msPerSecond);
-  return jsString(exec, formatLocaleDate(exec, secs, true, false, args));
+  return jsNontrivialString(exec,
+                            formatLocaleDate(exec, secs, true, false, args));
 #else
   UNUSED_PARAM(args);
 
@@ -653,11 +656,12 @@ JSValue* dateProtoFuncToLocaleTimeString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
 #if PLATFORM(MAC)
   double secs = floor(milli / msPerSecond);
-  return jsString(exec, formatLocaleDate(exec, secs, false, true, args));
+  return jsNontrivialString(exec,
+                            formatLocaleDate(exec, secs, false, true, args));
 #else
   UNUSED_PARAM(args);
 
@@ -749,11 +753,12 @@ JSValue* dateProtoFuncToGMTString(ExecState* exec,
   DateInstance* thisDateObj = static_cast<DateInstance*>(thisValue);
   double milli = thisDateObj->internalNumber();
   if (isnan(milli))
-    return jsString(exec, "Invalid Date");
+    return jsNontrivialString(exec, "Invalid Date");
 
   GregorianDateTime t;
   thisDateObj->msToGregorianDateTime(milli, utc, t);
-  return jsString(exec, formatDateUTCVariant(t) + " " + formatTime(t, utc));
+  return jsNontrivialString(exec,
+                            formatDateUTCVariant(t) + " " + formatTime(t, utc));
 }
 
 JSValue* dateProtoFuncGetMonth(ExecState* exec,

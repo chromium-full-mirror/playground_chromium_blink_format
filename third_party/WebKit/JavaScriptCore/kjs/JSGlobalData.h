@@ -34,6 +34,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/RefCounted.h>
+#include "SmallStrings.h"
 
 struct OpaqueJSClass;
 struct OpaqueJSClassContextData;
@@ -77,6 +78,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
                              // to have their elements properly marked, which is
                              // not the case here - but this list has nothing to
                              // mark.
+
+  SmallStrings smallStrings;
 
   HashMap<OpaqueJSClass*, OpaqueJSClassContextData*>* opaqueJSClassData;
 

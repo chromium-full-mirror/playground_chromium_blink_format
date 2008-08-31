@@ -131,7 +131,7 @@ JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
 
   ArgList args;
   for (unsigned i = 0; i < parameterCount; i++)
-    args.append(jsString(exec, UString(parameterNames[i]->ustring())));
+    args.append(jsString(exec, parameterNames[i]->ustring()));
   args.append(jsString(exec, body->ustring()));
 
   JSObject* result = constructFunction(exec, args, nameID, sourceURL->ustring(),

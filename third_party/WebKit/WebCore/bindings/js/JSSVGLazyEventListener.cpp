@@ -39,7 +39,7 @@ JSSVGLazyEventListener::JSSVGLazyEventListener(const String& functionName,
 
 JSValue* JSSVGLazyEventListener::eventParameterName() const {
   static ProtectedPtr<JSValue> eventString =
-      jsString(window()->globalExec(), "evt");
+      jsNontrivialString(window()->globalExec(), "evt");
   return eventString.get();
 }
 

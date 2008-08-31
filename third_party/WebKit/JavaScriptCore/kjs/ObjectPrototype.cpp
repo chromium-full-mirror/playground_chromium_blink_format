@@ -219,14 +219,14 @@ JSValue* objectProtoFuncToLocaleString(ExecState* exec,
                                        JSObject*,
                                        JSValue* thisValue,
                                        const ArgList&) {
-  return jsString(exec, thisValue->toThisObject(exec)->toString(exec));
+  return thisValue->toThisJSString(exec);
 }
 
 JSValue* objectProtoFuncToString(ExecState* exec,
                                  JSObject*,
                                  JSValue* thisValue,
                                  const ArgList&) {
-  return jsString(
+  return jsNontrivialString(
       exec, "[object " + thisValue->toThisObject(exec)->className() + "]");
 }
 

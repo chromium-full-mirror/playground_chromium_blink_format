@@ -184,9 +184,8 @@ JSValue* arrayProtoFuncToString(ExecState* exec,
   bool alreadyVisited = !arrayVisitedElements.add(thisObj).second;
   Vector<UChar, 256> strBuffer;
   if (alreadyVisited)
-    return jsString(
-        exec,
-        UString(0, 0));  // return an empty string, avoding infinite recursion.
+    return jsEmptyString(
+        exec);  // return an empty string, avoiding infinite recursion.
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
@@ -235,9 +234,8 @@ JSValue* arrayProtoFuncToLocaleString(ExecState* exec,
   bool alreadyVisited = !arrayVisitedElements.add(thisObj).second;
   Vector<UChar, 256> strBuffer;
   if (alreadyVisited)
-    return jsString(
-        exec,
-        UString(0, 0));  // return an empty string, avoding infinite recursion.
+    return jsEmptyString(
+        exec);  // return an empty string, avoding infinite recursion.
 
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
@@ -295,9 +293,8 @@ JSValue* arrayProtoFuncJoin(ExecState* exec,
   bool alreadyVisited = !arrayVisitedElements.add(thisObj).second;
   Vector<UChar, 256> strBuffer;
   if (alreadyVisited)
-    return jsString(
-        exec,
-        UString(0, 0));  // return an empty string, avoding infinite recursion.
+    return jsEmptyString(
+        exec);  // return an empty string, avoding infinite recursion.
 
   UChar comma = ',';
   UString separator = args.at(exec, 0)->isUndefined()
