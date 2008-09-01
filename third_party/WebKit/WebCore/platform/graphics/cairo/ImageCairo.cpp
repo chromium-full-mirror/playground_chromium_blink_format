@@ -128,7 +128,8 @@ void BitmapImage::draw(GraphicsContext* context,
   cairo_set_source(cr, pattern);
   cairo_pattern_destroy(pattern);
   cairo_rectangle(cr, 0, 0, dstRect.width(), dstRect.height());
-  cairo_fill(cr);
+  cairo_clip(cr);
+  cairo_paint_with_alpha(cr, context->getAlpha());
 
   cairo_restore(cr);
 

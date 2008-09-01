@@ -44,7 +44,8 @@ namespace WebCore {
 class GraphicsContextPlatformPrivate {
  public:
   GraphicsContextPlatformPrivate()
-      : cr(0)
+      : cr(0),
+        globalAlpha(1.0f)
 #if PLATFORM(GTK)
         ,
         expose(0)
@@ -88,6 +89,7 @@ class GraphicsContextPlatformPrivate {
 #endif
 
   cairo_t* cr;
+  float globalAlpha;
   Vector<float> layers;
 
 #if PLATFORM(GTK)
