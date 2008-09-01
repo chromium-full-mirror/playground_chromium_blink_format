@@ -860,6 +860,7 @@ void JSDOMWindowBase::put(ExecState* exec,
         break;
     }
   }
+
   if (allowsAccessFrom(exec))
     Base::put(exec, propertyName, value, slot);
 }
