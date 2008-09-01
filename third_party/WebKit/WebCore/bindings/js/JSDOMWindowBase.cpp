@@ -856,6 +856,22 @@ void JSDOMWindowBase::put(ExecState* exec,
         if (allowsAccessFrom(exec))
           setListener(exec, unloadEvent, value);
         return;
+      case OnWebKitAnimationStart:
+        if (allowsAccessFrom(exec))
+          setListener(exec, webkitAnimationStartEvent, value);
+        return;
+      case OnWebKitAnimationIteration:
+        if (allowsAccessFrom(exec))
+          setListener(exec, webkitAnimationIterationEvent, value);
+        return;
+      case OnWebKitAnimationEnd:
+        if (allowsAccessFrom(exec))
+          setListener(exec, webkitAnimationEndEvent, value);
+        return;
+      case OnWebKitTransitionEnd:
+        if (allowsAccessFrom(exec))
+          setListener(exec, webkitTransitionEndEvent, value);
+        return;
       default:
         break;
     }
