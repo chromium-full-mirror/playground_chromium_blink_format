@@ -34,8 +34,10 @@
 JSRun::JSRun(CFStringRef source, JSFlags inFlags)
     : JSBase(kJSRunTypeID),
       fSource(CFStringToUString(source)),
-      fGlobalObject(new (&getThreadGlobalExecState()->globalData())
-                        JSGlueGlobalObject(inFlags)),
+      fGlobalObject(
+          new (&getThreadGlobalExecState()->globalData())
+              JSGlueGlobalObject(&getThreadGlobalExecState()->globalData(),
+                                 inFlags)),
       fFlags(inFlags) {}
 
 JSRun::~JSRun() {}

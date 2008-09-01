@@ -160,7 +160,8 @@ JSValue* JSObjectKJSValue(JSUserObject* ptr) {
       }
     }
     if (!handled) {
-      result = new (getThreadGlobalExecState()) UserObjectImp(ptr);
+      ExecState* exec = getThreadGlobalExecState();
+      result = new (exec) UserObjectImp(exec, ptr);
     }
   }
   return result;
@@ -366,7 +367,8 @@ ExecState* getThreadGlobalExecState() {
   JSGlobalObject* globalObject =
       static_cast<JSGlobalObject*>(pthread_getspecific(globalObjectKey));
   if (!globalObject) {
-    globalObject = new (JSGlobalData::create().get()) JSGlueGlobalObject;
+    RefPtr<JSGlobalData> globalData = JSGlobalData::create();
+    globalObject = new (globalData.get()) JSGlueGlobalObject(globalData.get());
     gcProtect(globalObject);
     pthread_setspecific(globalObjectKey, globalObject);
   }
