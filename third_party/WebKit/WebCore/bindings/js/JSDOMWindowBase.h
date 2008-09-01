@@ -73,7 +73,8 @@ class JSDOMWindowBase : public KJS::JSGlobalObject {
   KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
   virtual void put(KJS::ExecState*,
                    const KJS::Identifier& propertyName,
-                   KJS::JSValue*);
+                   KJS::JSValue*,
+                   KJS::PutPropertySlot&);
 
   int installTimeout(const KJS::UString& handler, int t, bool singleShot);
   int installTimeout(KJS::ExecState*,

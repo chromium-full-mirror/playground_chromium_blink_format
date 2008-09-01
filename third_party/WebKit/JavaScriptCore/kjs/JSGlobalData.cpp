@@ -79,6 +79,9 @@ JSGlobalData::JSGlobalData(bool isShared)
       stringTable(&KJS::stringTable)
 #endif
       ,
+      stringStructureID(StructureID::create(jsNull())),
+      numberStructureID(StructureID::create(jsNull())),
+      nullProtoStructureID(StructureID::create(jsNull())),
       identifierTable(createIdentifierTable()),
       propertyNames(new CommonIdentifiers(this)),
       emptyList(new ArgList),

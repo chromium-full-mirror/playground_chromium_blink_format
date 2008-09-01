@@ -117,9 +117,10 @@ JSValue* JSHTMLInputElementBase::getValueProperty(ExecState* exec,
 
 void JSHTMLInputElementBase::put(ExecState* exec,
                                  const Identifier& propertyName,
-                                 JSValue* value) {
+                                 JSValue* value,
+                                 PutPropertySlot& slot) {
   lookupPut<JSHTMLInputElementBase, JSHTMLElement>(
-      exec, propertyName, value, &JSHTMLInputElementBaseTable, this);
+      exec, propertyName, value, &JSHTMLInputElementBaseTable, this, slot);
 }
 
 void JSHTMLInputElementBase::putValueProperty(ExecState* exec,

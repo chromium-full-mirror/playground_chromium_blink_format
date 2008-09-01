@@ -40,7 +40,9 @@ struct ArrayStorage {
 
 class JSArray : public JSObject {
  public:
-  JSArray(JSValue* prototype, unsigned initialLength);
+  enum DummyConstructTag { DummyConstruct };
+  JSArray(DummyConstructTag);
+  JSArray(JSObject* prototype, unsigned initialLength);
   JSArray(ExecState* exec, JSObject* prototype, const ArgList& initialValues);
   virtual ~JSArray();
 
@@ -76,7 +78,10 @@ class JSArray : public JSObject {
   }
 
  protected:
-  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual void put(ExecState*,
+                   const Identifier& propertyName,
+                   JSValue*,
+                   PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);

@@ -77,7 +77,8 @@ bool JSHistory::customGetOwnPropertySlot(ExecState* exec,
 
 bool JSHistory::customPut(ExecState* exec,
                           const Identifier& propertyName,
-                          JSValue* value) {
+                          JSValue* value,
+                          PutPropertySlot&) {
   // Only allow putting by frames in the same origin.
   if (!allowsAccessFromFrame(exec, impl()->frame()))
     return true;

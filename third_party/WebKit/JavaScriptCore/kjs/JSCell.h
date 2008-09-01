@@ -23,6 +23,7 @@
 #ifndef JSCell_h
 #define JSCell_h
 
+#include "StructureID.h"
 #include "JSValue.h"
 #include "collector.h"
 
@@ -40,6 +41,7 @@ class JSCell : public JSValue {
 
  private:
   JSCell();
+  JSCell(StructureID*);
   virtual ~JSCell();
 
  public:
@@ -49,6 +51,8 @@ class JSCell : public JSValue {
   virtual bool isGetterSetter() const;
   virtual bool isObject() const;
   virtual bool isObject(const ClassInfo*) const;
+
+  StructureID* structureID() const;
 
   // Extracting the value.
   bool getNumber(double&) const;
@@ -84,7 +88,10 @@ class JSCell : public JSValue {
 
   // Object operations, with the toObject operation included.
   virtual const ClassInfo* classInfo() const;
-  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual void put(ExecState*,
+                   const Identifier& propertyName,
+                   JSValue*,
+                   PutPropertySlot&);
   virtual void put(ExecState*, unsigned propertyName, JSValue*);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
@@ -104,15 +111,21 @@ class JSCell : public JSValue {
                                   unsigned propertyName,
                                   PropertySlot&);
 
-  intptr_t reserved;  // Reserved for work in progress.
+  StructureID* m_structureID;
 };
 
-inline JSCell::JSCell() {}
+inline JSCell::JSCell() : m_structureID(0) {}
+
+inline JSCell::JSCell(StructureID* structureID) : m_structureID(structureID) {}
 
 inline JSCell::~JSCell() {}
 
 inline bool JSCell::isNumber() const {
   return Heap::isNumber(const_cast<JSCell*>(this));
+}
+
+inline StructureID* JSCell::structureID() const {
+  return m_structureID;
 }
 
 inline bool JSCell::marked() const {

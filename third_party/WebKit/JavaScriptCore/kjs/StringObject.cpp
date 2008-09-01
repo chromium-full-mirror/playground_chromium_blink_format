@@ -66,10 +66,11 @@ bool StringObject::getOwnPropertySlot(ExecState* exec,
 
 void StringObject::put(ExecState* exec,
                        const Identifier& propertyName,
-                       JSValue* value) {
+                       JSValue* value,
+                       PutPropertySlot& slot) {
   if (propertyName == exec->propertyNames().length)
     return;
-  JSObject::put(exec, propertyName, value);
+  JSObject::put(exec, propertyName, value, slot);
 }
 
 bool StringObject::deleteProperty(ExecState* exec,

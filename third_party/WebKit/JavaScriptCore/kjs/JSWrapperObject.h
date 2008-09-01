@@ -34,7 +34,7 @@ namespace KJS {
 */
 class JSWrapperObject : public JSObject {
  public:
-  JSWrapperObject(JSValue* proto);
+  JSWrapperObject(JSObject* prototype);
 
   JSValue* internalValue() const;
   void setInternalValue(JSValue*);
@@ -45,8 +45,8 @@ class JSWrapperObject : public JSObject {
   JSValue* m_internalValue;
 };
 
-inline JSWrapperObject::JSWrapperObject(JSValue* proto)
-    : JSObject(proto), m_internalValue(0) {}
+inline JSWrapperObject::JSWrapperObject(JSObject* prototype)
+    : JSObject(prototype), m_internalValue(0) {}
 
 inline JSValue* JSWrapperObject::internalValue() const {
   return m_internalValue;

@@ -44,7 +44,8 @@ ASSERT_CLASS_FITS_IN_CELL(JSDOMWindowShell)
 const ClassInfo JSDOMWindowShell::s_info = {"JSDOMWindowShell", 0, 0, 0};
 
 JSDOMWindowShell::JSDOMWindowShell(DOMWindow* domWindow)
-    : Base(jsNull()), m_window(0) {
+    : Base(JSDOMWindow::commonJSGlobalData()->nullProtoStructureID),
+      m_window(0) {
   m_window =
       new (JSDOMWindow::commonJSGlobalData()) JSDOMWindow(domWindow, this);
   setPrototype(m_window->prototype());
@@ -74,8 +75,9 @@ bool JSDOMWindowShell::getOwnPropertySlot(ExecState* exec,
 
 void JSDOMWindowShell::put(ExecState* exec,
                            const Identifier& propertyName,
-                           JSValue* value) {
-  m_window->put(exec, propertyName, value);
+                           JSValue* value,
+                           PutPropertySlot& slot) {
+  m_window->put(exec, propertyName, value, slot);
 }
 
 void JSDOMWindowShell::putWithAttributes(ExecState* exec,

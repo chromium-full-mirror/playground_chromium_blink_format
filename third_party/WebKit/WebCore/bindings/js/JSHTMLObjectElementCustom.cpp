@@ -42,8 +42,9 @@ bool JSHTMLObjectElement::customGetOwnPropertySlot(
 
 bool JSHTMLObjectElement::customPut(ExecState* exec,
                                     const Identifier& propertyName,
-                                    JSValue* value) {
-  return runtimeObjectCustomPut(exec, propertyName, value, impl());
+                                    JSValue* value,
+                                    PutPropertySlot& slot) {
+  return runtimeObjectCustomPut(exec, propertyName, value, impl(), slot);
 }
 
 CallType JSHTMLObjectElement::getCallData(CallData& callData) {

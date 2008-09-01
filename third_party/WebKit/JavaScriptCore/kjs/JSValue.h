@@ -37,6 +37,8 @@ class JSCell;
 class JSObject;
 class JSString;
 class PropertySlot;
+class PutPropertySlot;
+class StructureID;
 struct ClassInfo;
 struct Instruction;
 
@@ -127,8 +129,13 @@ class JSValue : Noncopyable {
 
   // Object operations, with the toObject operation included.
   JSValue* get(ExecState*, const Identifier& propertyName) const;
+  JSValue* get(ExecState*, const Identifier& propertyName, PropertySlot&) const;
   JSValue* get(ExecState*, unsigned propertyName) const;
-  void put(ExecState*, const Identifier& propertyName, JSValue*);
+  JSValue* get(ExecState*, unsigned propertyName, PropertySlot&) const;
+  void put(ExecState*,
+           const Identifier& propertyName,
+           JSValue*,
+           PutPropertySlot&);
   void put(ExecState*, unsigned propertyName, JSValue*);
   bool deleteProperty(ExecState*, const Identifier& propertyName);
   bool deleteProperty(ExecState*, unsigned propertyName);

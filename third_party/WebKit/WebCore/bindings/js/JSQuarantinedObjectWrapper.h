@@ -49,7 +49,10 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
  protected:
   JSQuarantinedObjectWrapper(KJS::ExecState* unwrappedExec,
                              KJS::JSObject* unwrappedObject,
-                             KJS::JSValue* wrappedPrototype);
+                             KJS::JSObject* wrappedPrototype);
+  JSQuarantinedObjectWrapper(KJS::ExecState* unwrappedExec,
+                             KJS::JSObject* unwrappedObject,
+                             PassRefPtr<KJS::StructureID>);
 
   virtual void mark();
 
@@ -61,7 +64,10 @@ class JSQuarantinedObjectWrapper : public KJS::JSObject {
                                   unsigned,
                                   KJS::PropertySlot&);
 
-  virtual void put(KJS::ExecState*, const KJS::Identifier&, KJS::JSValue*);
+  virtual void put(KJS::ExecState*,
+                   const KJS::Identifier&,
+                   KJS::JSValue*,
+                   KJS::PutPropertySlot&);
   virtual void put(KJS::ExecState*, unsigned, KJS::JSValue*);
 
   virtual bool deleteProperty(KJS::ExecState*, const KJS::Identifier&);

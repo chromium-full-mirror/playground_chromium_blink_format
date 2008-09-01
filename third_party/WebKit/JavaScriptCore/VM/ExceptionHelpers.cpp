@@ -48,11 +48,14 @@ static void substitute(UString& string, const UString& substring) {
 
 class InterruptedExecutionError : public JSObject {
  public:
+  InterruptedExecutionError(ExecState* exec)
+      : JSObject(exec->globalData().nullProtoStructureID) {}
+
   virtual bool isWatchdogException() const { return true; }
 };
 
 JSValue* createInterruptedExecutionException(ExecState* exec) {
-  return new (exec) InterruptedExecutionError;
+  return new (exec) InterruptedExecutionError(exec);
 }
 
 JSValue* createError(ExecState* exec, ErrorType e, const char* msg) {
@@ -258,7 +261,7 @@ JSValue* createNotAFunctionError(ExecState* exec,
 
 JSNotAnObjectErrorStub* createNotAnObjectErrorStub(ExecState* exec,
                                                    bool isNull) {
-  return new (exec) JSNotAnObjectErrorStub(isNull);
+  return new (exec) JSNotAnObjectErrorStub(exec, isNull);
 }
 
 JSObject* createNotAnObjectError(ExecState* exec,

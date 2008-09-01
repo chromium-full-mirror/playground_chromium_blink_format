@@ -143,10 +143,11 @@ class RegExpMatchesArray : public JSArray {
   }
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   JSValue* v) {
+                   JSValue* v,
+                   PutPropertySlot& slot) {
     if (lazyCreationData())
       fillArrayInstance(exec);
-    JSArray::put(exec, propertyName, v);
+    JSArray::put(exec, propertyName, v, slot);
   }
   virtual void put(ExecState* exec, unsigned propertyName, JSValue* v) {
     if (lazyCreationData())
@@ -207,9 +208,12 @@ void RegExpMatchesArray::fillArrayInstance(ExecState* exec) {
       JSArray::put(exec, i, jsSubstring(exec, d->lastInput, start,
                                         d->lastOvector[2 * i + 1] - start));
   }
+
+  PutPropertySlot slot;
   JSArray::put(exec, exec->propertyNames().index,
-               jsNumber(exec, d->lastOvector[0]));
-  JSArray::put(exec, exec->propertyNames().input, jsString(exec, d->input));
+               jsNumber(exec, d->lastOvector[0]), slot);
+  JSArray::put(exec, exec->propertyNames().input, jsString(exec, d->input),
+               slot);
 
   delete d;
   setLazyCreationData(0);
@@ -302,9 +306,11 @@ JSValue* RegExpConstructor::getValueProperty(ExecState* exec, int token) const {
 
 void RegExpConstructor::put(ExecState* exec,
                             const Identifier& propertyName,
-                            JSValue* value) {
+                            JSValue* value,
+                            PutPropertySlot& slot) {
   lookupPut<RegExpConstructor, InternalFunction>(
-      exec, propertyName, value, ExecState::regExpConstructorTable(exec), this);
+      exec, propertyName, value, ExecState::regExpConstructorTable(exec), this,
+      slot);
 }
 
 void RegExpConstructor::putValueProperty(ExecState* exec,

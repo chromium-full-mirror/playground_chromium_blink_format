@@ -161,14 +161,16 @@ long StopWatch::getElapsedMS() {
 
 class GlobalObject : public JSGlobalObject {
  public:
-  GlobalObject(Vector<UString>& arguments);
+  GlobalObject(JSGlobalData*, const Vector<UString>& arguments);
   virtual UString className() const { return "global"; }
 };
 COMPILE_ASSERT(!IsInteger<GlobalObject>::value,
                WTF_IsInteger_GlobalObject_false);
 ASSERT_CLASS_FITS_IN_CELL(GlobalObject);
 
-GlobalObject::GlobalObject(Vector<UString>& arguments) {
+GlobalObject::GlobalObject(JSGlobalData* globalData,
+                           const Vector<UString>& arguments)
+    : JSGlobalObject(globalData) {
   putDirectFunction(globalExec(),
                     new (globalExec()) PrototypeFunction(
                         globalExec(), functionPrototype(), 1,
@@ -376,6 +378,12 @@ static bool runWithScripts(GlobalObject* globalObject,
   if (dump)
     CodeGenerator::setDumpsGeneratedCode(true);
 
+#if ENABLE(SAMPLING_TOOL)
+  Machine* machine = globalObject->globalData()->machine;
+  machine->m_sampler = new SamplingTool();
+  machine->m_sampler->start();
+#endif
+
   bool success = true;
   for (size_t i = 0; i < fileNames.size(); i++) {
     UString fileName = fileNames[i];
@@ -386,12 +394,6 @@ static bool runWithScripts(GlobalObject* globalObject,
     if (prettyPrint)
       prettyPrintScript(globalObject->globalExec(), fileName, script);
     else {
-#if ENABLE(SAMPLING_TOOL)
-      Machine* machine = globalObject->globalData()->machine;
-      machine->m_sampler = new SamplingTool();
-      machine->m_sampler->start();
-#endif
-
       Completion completion = Interpreter::evaluate(
           globalObject->globalExec(), globalObject->globalScopeChain(),
           fileName, 1, script.data());
@@ -408,14 +410,14 @@ static bool runWithScripts(GlobalObject* globalObject,
       }
 
       globalObject->globalExec()->clearException();
-
-#if ENABLE(SAMPLING_TOOL)
-      machine->m_sampler->stop();
-      machine->m_sampler->dump(globalObject->globalExec());
-      delete machine->m_sampler;
-#endif
     }
   }
+
+#if ENABLE(SAMPLING_TOOL)
+  machine->m_sampler->stop();
+  machine->m_sampler->dump(globalObject->globalExec());
+  delete machine->m_sampler;
+#endif
   return success;
 }
 
@@ -531,7 +533,8 @@ int jscmain(int argc, char** argv, JSGlobalData* globalData) {
   Options options;
   parseArguments(argc, argv, options);
 
-  GlobalObject* globalObject = new (globalData) GlobalObject(options.arguments);
+  GlobalObject* globalObject =
+      new (globalData) GlobalObject(globalData, options.arguments);
   bool success = runWithScripts(globalObject, options.fileNames,
                                 options.prettyPrint, options.dump);
   if (options.interactive && success)

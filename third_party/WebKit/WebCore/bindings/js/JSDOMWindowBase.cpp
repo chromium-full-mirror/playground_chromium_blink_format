@@ -743,12 +743,13 @@ bool JSDOMWindowBase::getOwnPropertySlot(ExecState* exec,
 
 void JSDOMWindowBase::put(ExecState* exec,
                           const Identifier& propertyName,
-                          JSValue* value) {
+                          JSValue* value,
+                          PutPropertySlot& slot) {
   const HashEntry* entry = JSDOMWindowBaseTable.entry(exec, propertyName);
   if (entry) {
     if (entry->attributes & Function) {
       if (allowsAccessFrom(exec))
-        Base::put(exec, propertyName, value);
+        Base::put(exec, propertyName, value, slot);
       return;
     }
     if (entry->attributes & ReadOnly)
@@ -860,7 +861,7 @@ void JSDOMWindowBase::put(ExecState* exec,
     }
   }
   if (allowsAccessFrom(exec))
-    Base::put(exec, propertyName, value);
+    Base::put(exec, propertyName, value, slot);
 }
 
 String JSDOMWindowBase::crossDomainAccessErrorMessage(

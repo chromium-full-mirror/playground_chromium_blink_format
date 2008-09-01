@@ -37,7 +37,8 @@ JSObject* JSStaticScopeObject::toThisObject(ExecState* exec) const {
 
 void JSStaticScopeObject::put(ExecState*,
                               const Identifier& propertyName,
-                              JSValue* value) {
+                              JSValue* value,
+                              PutPropertySlot&) {
   if (symbolTablePut(propertyName, value))
     return;
 

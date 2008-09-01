@@ -284,10 +284,12 @@ bool _NPN_SetProperty(NPP,
     ExecState* exec = rootObject->globalObject()->globalExec();
     JSLock lock(false);
     PrivateIdentifier* i = static_cast<PrivateIdentifier*>(propertyName);
-    if (i->isString)
+
+    if (i->isString) {
+      PutPropertySlot slot;
       obj->imp->put(exec, identifierFromNPIdentifier(i->value.string),
-                    convertNPVariantToValue(exec, variant, rootObject));
-    else
+                    convertNPVariantToValue(exec, variant, rootObject), slot);
+    } else
       obj->imp->put(exec, i->value.number,
                     convertNPVariantToValue(exec, variant, rootObject));
     exec->clearException();

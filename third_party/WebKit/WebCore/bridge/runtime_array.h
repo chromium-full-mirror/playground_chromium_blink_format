@@ -41,7 +41,8 @@ class RuntimeArray : public JSObject {
   virtual bool getOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   JSValue* value);
+                   JSValue* value,
+                   PutPropertySlot&);
   virtual void put(ExecState* exec, unsigned propertyName, JSValue* value);
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);

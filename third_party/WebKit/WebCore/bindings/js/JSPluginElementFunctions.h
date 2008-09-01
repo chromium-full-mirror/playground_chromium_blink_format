@@ -45,7 +45,8 @@ bool runtimeObjectCustomGetOwnPropertySlot(KJS::ExecState*,
 bool runtimeObjectCustomPut(KJS::ExecState*,
                             const KJS::Identifier&,
                             KJS::JSValue*,
-                            HTMLElement*);
+                            HTMLElement*,
+                            KJS::PutPropertySlot&);
 KJS::CallType runtimeObjectGetCallData(HTMLElement*, KJS::CallData&);
 
 }  // namespace WebCore

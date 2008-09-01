@@ -47,10 +47,10 @@ class SVGElement;
 // Base class for all objects in this binding except Window.
 class DOMObject : public KJS::JSObject {
  protected:
-  explicit DOMObject(KJS::JSValue* prototype)  // FIXME: This could take a
-                                               // JSObject if JSDOMWindowShell
-                                               // had a prototype.
-      : JSObject(prototype) {}
+  explicit DOMObject(PassRefPtr<KJS::StructureID> structureID)
+      : JSObject(structureID) {}
+
+  explicit DOMObject(KJS::JSObject* prototype) : JSObject(prototype) {}
 
 #ifndef NDEBUG
   virtual ~DOMObject();

@@ -35,7 +35,8 @@ namespace KJS {
 
 class JSNotAnObjectErrorStub : public JSObject {
  public:
-  JSNotAnObjectErrorStub(bool isNull) : m_isNull(isNull) {}
+  JSNotAnObjectErrorStub(ExecState* exec, bool isNull)
+      : JSObject(exec->globalData().nullProtoStructureID), m_isNull(isNull) {}
   bool isNull() const { return m_isNull; }
   bool isNotAnObjectErrorStub() const { return true; }
 
@@ -48,7 +49,9 @@ class JSNotAnObjectErrorStub : public JSObject {
 // any operations performed on the result of a failed toObject call.
 class JSNotAnObject : public JSObject {
  public:
-  JSNotAnObject(JSNotAnObjectErrorStub* exception) : m_exception(exception) {}
+  JSNotAnObject(ExecState* exec, JSNotAnObjectErrorStub* exception)
+      : JSObject(exec->globalData().nullProtoStructureID),
+        m_exception(exception) {}
 
  private:
   // JSValue methods
@@ -70,7 +73,10 @@ class JSNotAnObject : public JSObject {
                                   unsigned propertyName,
                                   PropertySlot&);
 
-  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual void put(ExecState*,
+                   const Identifier& propertyName,
+                   JSValue*,
+                   PutPropertySlot&);
   virtual void put(ExecState*, unsigned propertyName, JSValue*);
 
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);

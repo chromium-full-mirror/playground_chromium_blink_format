@@ -74,7 +74,7 @@ DateConstructor::DateConstructor(ExecState* exec,
                                          exec->propertyNames().now, dateNow),
       DontEnum);
 
-  putDirect(exec, exec->propertyNames().length, 7,
+  putDirect(exec->propertyNames().length, jsNumber(exec, 7),
             ReadOnly | DontEnum | DontDelete);
 }
 

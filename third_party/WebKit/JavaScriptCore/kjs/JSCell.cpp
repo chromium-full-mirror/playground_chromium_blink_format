@@ -169,8 +169,9 @@ bool JSCell::getOwnPropertySlot(ExecState* exec,
 
 void JSCell::put(ExecState* exec,
                  const Identifier& identifier,
-                 JSValue* value) {
-  toObject(exec)->put(exec, identifier, value);
+                 JSValue* value,
+                 PutPropertySlot& slot) {
+  toObject(exec)->put(exec, identifier, value, slot);
 }
 
 void JSCell::put(ExecState* exec, unsigned identifier, JSValue* value) {

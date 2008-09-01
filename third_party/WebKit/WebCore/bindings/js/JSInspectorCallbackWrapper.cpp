@@ -58,19 +58,33 @@ JSValue* JSInspectorCallbackWrapper::wrap(ExecState* unwrappedExec,
     return wrapper;
 
   JSValue* prototype = unwrappedObject->prototype();
-  JSValue* wrappedPrototype = prototype ? wrap(unwrappedExec, prototype) : 0;
+  ASSERT(prototype->isNull() || prototype->isObject());
 
+  if (prototype->isNull())
+    return new (unwrappedExec) JSInspectorCallbackWrapper(
+        unwrappedExec, unwrappedObject,
+        unwrappedExec->globalData().nullProtoStructureID);
   return new (unwrappedExec) JSInspectorCallbackWrapper(
-      unwrappedExec, unwrappedObject, wrappedPrototype);
+      unwrappedExec, unwrappedObject,
+      static_cast<JSObject*>(wrap(unwrappedExec, prototype)));
 }
 
 JSInspectorCallbackWrapper::JSInspectorCallbackWrapper(
     ExecState* unwrappedExec,
     JSObject* unwrappedObject,
-    JSValue* wrappedPrototype)
+    JSObject* wrappedPrototype)
     : JSQuarantinedObjectWrapper(unwrappedExec,
                                  unwrappedObject,
                                  wrappedPrototype) {
+  ASSERT(!wrappers().contains(unwrappedObject));
+  wrappers().set(unwrappedObject, this);
+}
+
+JSInspectorCallbackWrapper::JSInspectorCallbackWrapper(
+    ExecState* unwrappedExec,
+    JSObject* unwrappedObject,
+    PassRefPtr<StructureID> structureID)
+    : JSQuarantinedObjectWrapper(unwrappedExec, unwrappedObject, structureID) {
   ASSERT(!wrappers().contains(unwrappedObject));
   wrappers().set(unwrappedObject, this);
 }

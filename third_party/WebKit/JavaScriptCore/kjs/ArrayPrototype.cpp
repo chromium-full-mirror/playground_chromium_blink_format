@@ -168,6 +168,14 @@ static JSValue* getProperty(ExecState* exec, JSObject* obj, unsigned index) {
   return slot.getValue(exec, index);
 }
 
+static void putProperty(ExecState* exec,
+                        JSObject* obj,
+                        const Identifier& propertyName,
+                        JSValue* value) {
+  PutPropertySlot slot;
+  obj->put(exec, propertyName, value, slot);
+}
+
 JSValue* arrayProtoFuncToString(ExecState* exec,
                                 JSObject*,
                                 JSValue* thisValue,
@@ -372,13 +380,14 @@ JSValue* arrayProtoFuncPop(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   if (length == 0) {
-    thisObj->put(exec, exec->propertyNames().length, jsNumber(exec, length));
+    putProperty(exec, thisObj, exec->propertyNames().length,
+                jsNumber(exec, length));
     result = jsUndefined();
   } else {
     result = thisObj->get(exec, length - 1);
     thisObj->deleteProperty(exec, length - 1);
-    thisObj->put(exec, exec->propertyNames().length,
-                 jsNumber(exec, length - 1));
+    putProperty(exec, thisObj, exec->propertyNames().length,
+                jsNumber(exec, length - 1));
   }
   return result;
 }
@@ -393,7 +402,8 @@ JSValue* arrayProtoFuncPush(ExecState* exec,
   for (unsigned n = 0; n < args.size(); n++)
     thisObj->put(exec, length + n, args.at(exec, n));
   length += args.size();
-  thisObj->put(exec, exec->propertyNames().length, jsNumber(exec, length));
+  putProperty(exec, thisObj, exec->propertyNames().length,
+              jsNumber(exec, length));
   return jsNumber(exec, length);
 }
 
@@ -434,7 +444,8 @@ JSValue* arrayProtoFuncShift(ExecState* exec,
   unsigned length =
       thisObj->get(exec, exec->propertyNames().length)->toUInt32(exec);
   if (length == 0) {
-    thisObj->put(exec, exec->propertyNames().length, jsNumber(exec, length));
+    putProperty(exec, thisObj, exec->propertyNames().length,
+                jsNumber(exec, length));
     result = jsUndefined();
   } else {
     result = thisObj->get(exec, 0);
@@ -445,8 +456,8 @@ JSValue* arrayProtoFuncShift(ExecState* exec,
         thisObj->deleteProperty(exec, k - 1);
     }
     thisObj->deleteProperty(exec, length - 1);
-    thisObj->put(exec, exec->propertyNames().length,
-                 jsNumber(exec, length - 1));
+    putProperty(exec, thisObj, exec->propertyNames().length,
+                jsNumber(exec, length - 1));
   }
   return result;
 }
@@ -618,8 +629,8 @@ JSValue* arrayProtoFuncSplice(ExecState* exec,
   for (unsigned k = 0; k < additionalArgs; ++k)
     thisObj->put(exec, k + begin, args.at(exec, k + 2));
 
-  thisObj->put(exec, exec->propertyNames().length,
-               jsNumber(exec, length - deleteCount + additionalArgs));
+  putProperty(exec, thisObj, exec->propertyNames().length,
+              jsNumber(exec, length - deleteCount + additionalArgs));
   return result;
 }
 
@@ -644,7 +655,7 @@ JSValue* arrayProtoFuncUnShift(ExecState* exec,
   for (unsigned k = 0; k < nrArgs; ++k)
     thisObj->put(exec, k, args.at(exec, k));
   JSValue* result = jsNumber(exec, length + nrArgs);
-  thisObj->put(exec, exec->propertyNames().length, result);
+  putProperty(exec, thisObj, exec->propertyNames().length, result);
   return result;
 }
 

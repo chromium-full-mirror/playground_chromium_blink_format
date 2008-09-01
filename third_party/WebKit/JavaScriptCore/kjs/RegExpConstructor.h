@@ -54,7 +54,10 @@ class RegExpConstructor : public InternalFunction {
 
   RegExpConstructor(ExecState*, FunctionPrototype*, RegExpPrototype*);
 
-  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual void put(ExecState*,
+                   const Identifier& propertyName,
+                   JSValue*,
+                   PutPropertySlot&);
   void putValueProperty(ExecState*, int token, JSValue*);
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,

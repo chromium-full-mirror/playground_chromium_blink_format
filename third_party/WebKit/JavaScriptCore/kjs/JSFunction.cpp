@@ -117,11 +117,12 @@ bool JSFunction::getOwnPropertySlot(ExecState* exec,
 
 void JSFunction::put(ExecState* exec,
                      const Identifier& propertyName,
-                     JSValue* value) {
+                     JSValue* value,
+                     PutPropertySlot& slot) {
   if (propertyName == exec->propertyNames().arguments ||
       propertyName == exec->propertyNames().length)
     return;
-  Base::put(exec, propertyName, value);
+  Base::put(exec, propertyName, value, slot);
 }
 
 bool JSFunction::deleteProperty(ExecState* exec,

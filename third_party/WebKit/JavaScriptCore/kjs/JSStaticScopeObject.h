@@ -43,10 +43,12 @@ class JSStaticScopeObject : public JSVariableObject {
   };
 
  public:
-  JSStaticScopeObject(const Identifier& ident,
+  JSStaticScopeObject(ExecState* exec,
+                      const Identifier& ident,
                       JSValue* value,
                       unsigned attributes)
-      : JSVariableObject(new JSStaticScopeObjectData()) {
+      : JSVariableObject(exec->globalData().nullProtoStructureID,
+                         new JSStaticScopeObjectData()) {
     JSStaticScopeObjectData* data = static_cast<JSStaticScopeObjectData*>(d);
     data->registerStore = value;
     symbolTable().add(ident.ustring().rep(), SymbolTableEntry(-1, attributes));
@@ -59,7 +61,7 @@ class JSStaticScopeObject : public JSVariableObject {
                                   const Identifier&,
                                   PropertySlot&,
                                   bool& slotIsWriteable);
-  virtual void put(ExecState*, const Identifier&, JSValue*);
+  virtual void put(ExecState*, const Identifier&, JSValue*, PutPropertySlot&);
   void putWithAttributes(ExecState*,
                          const Identifier&,
                          JSValue*,

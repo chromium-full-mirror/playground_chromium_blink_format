@@ -82,7 +82,8 @@ bool JSLocation::customGetOwnPropertySlot(ExecState* exec,
 
 bool JSLocation::customPut(ExecState* exec,
                            const Identifier& propertyName,
-                           JSValue* value) {
+                           JSValue* value,
+                           PutPropertySlot& slot) {
   Frame* frame = impl()->frame();
   if (!frame)
     return true;
@@ -93,7 +94,7 @@ bool JSLocation::customPut(ExecState* exec,
       JSLocation::s_info.propHashTable(exec)->entry(exec, propertyName);
   if (!entry) {
     if (sameDomainAccess)
-      JSObject::put(exec, propertyName, value);
+      JSObject::put(exec, propertyName, value, slot);
     return true;
   }
 

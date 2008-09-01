@@ -42,7 +42,7 @@ namespace KJS {
 template <class Base>
 JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
                                          JSClassRef jsClass,
-                                         JSValue* prototype,
+                                         JSObject* prototype,
                                          void* data)
     : Base(prototype),
       m_callbackObjectData(new JSCallbackObjectData(data, jsClass)) {
@@ -53,8 +53,10 @@ JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
 // FIXME: Move this into a separate JSGlobalCallbackObject class derived from
 // this one.
 template <class Base>
-JSCallbackObject<Base>::JSCallbackObject(JSClassRef jsClass)
-    : m_callbackObjectData(new JSCallbackObjectData(0, jsClass)) {
+JSCallbackObject<Base>::JSCallbackObject(JSGlobalData* globalData,
+                                         JSClassRef jsClass)
+    : Base(globalData),
+      m_callbackObjectData(new JSCallbackObjectData(0, jsClass)) {
   ASSERT(Base::isGlobalObject());
   init(static_cast<JSGlobalObject*>(this)->globalExec());
 }
@@ -161,7 +163,8 @@ bool JSCallbackObject<Base>::getOwnPropertySlot(ExecState* exec,
 template <class Base>
 void JSCallbackObject<Base>::put(ExecState* exec,
                                  const Identifier& propertyName,
-                                 JSValue* value) {
+                                 JSValue* value,
+                                 PutPropertySlot& slot) {
   JSContextRef ctx = toRef(exec);
   JSObjectRef thisRef = toRef(this);
   RefPtr<OpaqueJSString> propertyNameRef;
@@ -210,14 +213,7 @@ void JSCallbackObject<Base>::put(ExecState* exec,
     }
   }
 
-  return Base::put(exec, propertyName, value);
-}
-
-template <class Base>
-void JSCallbackObject<Base>::put(ExecState* exec,
-                                 unsigned propertyName,
-                                 JSValue* value) {
-  return put(exec, Identifier::from(exec, propertyName), value);
+  return Base::put(exec, propertyName, value, slot);
 }
 
 template <class Base>

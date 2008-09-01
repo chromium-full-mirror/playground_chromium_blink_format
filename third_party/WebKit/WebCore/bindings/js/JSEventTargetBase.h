@@ -138,9 +138,11 @@ class JSEventTargetBase {
   void put(JSEventTarget* owner,
            KJS::ExecState* exec,
            const KJS::Identifier& propertyName,
-           KJS::JSValue* value) {
-    KJS::lookupPut<JSEventTarget, JSParent>(
-        exec, propertyName, value, &KJS::JSEventTargetPropertiesTable, owner);
+           KJS::JSValue* value,
+           KJS::PutPropertySlot& slot) {
+    KJS::lookupPut<JSEventTarget, JSParent>(exec, propertyName, value,
+                                            &KJS::JSEventTargetPropertiesTable,
+                                            owner, slot);
   }
 };
 

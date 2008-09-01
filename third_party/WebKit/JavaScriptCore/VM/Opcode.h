@@ -56,38 +56,40 @@ namespace KJS {
                                                                                                                  \
                       macro(op_resolve) macro(op_resolve_skip) macro(op_get_scoped_var) macro(                   \
                           op_put_scoped_var) macro(op_resolve_base) macro(op_resolve_with_base)                  \
-                          macro(op_resolve_func) macro(op_get_by_id) macro(                                      \
-                              op_put_by_id) macro(op_del_by_id) macro(op_get_by_val)                             \
-                              macro(op_put_by_val) macro(op_del_by_val) macro(                                   \
-                                  op_put_by_index) macro(op_put_getter) macro(op_put_setter)                     \
+                          macro(op_resolve_func) macro(op_get_by_id) macro(op_get_by_id_self) macro(             \
+                              op_get_by_id_proto) macro(op_get_by_id_chain) macro(op_get_by_id_generic)          \
+                              macro(op_put_by_id) macro(op_put_by_id_replace) macro(                             \
+                                  op_put_by_id_generic) macro(op_del_by_id) macro(op_get_by_val)                 \
+                                  macro(op_put_by_val) macro(op_del_by_val) macro(                               \
+                                      op_put_by_index) macro(op_put_getter) macro(op_put_setter)                 \
                                                                                                                  \
-                                  macro(op_jmp) macro(op_jtrue) macro(op_jfalse) macro(                          \
-                                      op_jnless) macro(op_jmp_scopes) macro(op_loop)                             \
-                                      macro(op_loop_if_true) macro(op_loop_if_less) macro(                       \
-                                          op_switch_imm) macro(op_switch_char) macro(op_switch_string)           \
+                                      macro(op_jmp) macro(op_jtrue) macro(op_jfalse) macro(                      \
+                                          op_jnless) macro(op_jmp_scopes) macro(op_loop)                         \
+                                          macro(op_loop_if_true) macro(op_loop_if_less) macro(                   \
+                                              op_switch_imm) macro(op_switch_char) macro(op_switch_string)       \
                                                                                                                  \
-                                          macro(op_new_func) macro(op_new_func_exp) macro(                       \
-                                              op_call) macro(op_call_eval) macro(op_ret)                         \
+                                              macro(op_new_func) macro(op_new_func_exp) macro(                   \
+                                                  op_call) macro(op_call_eval) macro(op_ret)                     \
                                                                                                                  \
-                                              macro(op_construct)                                                \
+                                                  macro(op_construct)                                            \
                                                                                                                  \
-                                                  macro(op_get_pnames) macro(                                    \
-                                                      op_next_pname)                                             \
+                                                      macro(op_get_pnames) macro(                                \
+                                                          op_next_pname)                                         \
                                                                                                                  \
-                                                      macro(op_push_scope) macro(                                \
-                                                          op_pop_scope) macro(op_push_new_scope)                 \
+                                                          macro(op_push_scope) macro(                            \
+                                                              op_pop_scope) macro(op_push_new_scope)             \
                                                                                                                  \
-                                                          macro(op_catch) macro(                                 \
-                                                              op_throw) macro(op_new_error)                      \
+                                                              macro(op_catch) macro(                             \
+                                                                  op_throw) macro(op_new_error)                  \
                                                                                                                  \
-                                                              macro(op_jsr) macro(                               \
-                                                                  op_sret)                                       \
-                                                                                                                 \
-                                                                  macro(                                         \
-                                                                      op_debug)                                  \
+                                                                  macro(op_jsr) macro(                           \
+                                                                      op_sret)                                   \
                                                                                                                  \
                                                                       macro(                                     \
-                                                                          op_end)  // end must be the last opcode in the list
+                                                                          op_debug)                              \
+                                                                                                                 \
+                                                                          macro(                                 \
+                                                                              op_end)  // end must be the last opcode in the list
 
 #define OPCODE_ID_ENUM(opcode) opcode,
 typedef enum { FOR_EACH_OPCODE_ID(OPCODE_ID_ENUM) } OpcodeID;

@@ -70,8 +70,7 @@ static JSValue* objectProtoFuncToLocaleString(ExecState*,
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
                                  FunctionPrototype* functionPrototype)
-    : JSObject()  // [[Prototype]] is null
-{
+    : JSObject(exec->globalData().nullProtoStructureID) {
   putDirectFunction(exec,
                     new (exec) PrototypeFunction(exec, functionPrototype, 0,
                                                  exec->propertyNames().toString,

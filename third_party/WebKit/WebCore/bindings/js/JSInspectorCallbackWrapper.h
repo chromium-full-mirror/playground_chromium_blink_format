@@ -43,7 +43,10 @@ class JSInspectorCallbackWrapper : public JSQuarantinedObjectWrapper {
  protected:
   JSInspectorCallbackWrapper(KJS::ExecState* unwrappedExec,
                              KJS::JSObject* unwrappedObject,
-                             KJS::JSValue* wrappedPrototype);
+                             KJS::JSObject* wrappedPrototype);
+  JSInspectorCallbackWrapper(KJS::ExecState* unwrappedExec,
+                             KJS::JSObject* unwrappedObject,
+                             PassRefPtr<KJS::StructureID>);
 
   virtual bool allowsCallAsFunction() const { return true; }
 

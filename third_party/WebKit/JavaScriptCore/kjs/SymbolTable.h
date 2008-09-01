@@ -35,13 +35,6 @@
 
 namespace KJS {
 
-struct IdentifierRepHash : PtrHash<RefPtr<UString::Rep>> {
-  static unsigned hash(const RefPtr<UString::Rep>& key) {
-    return key->computedHash();
-  }
-  static unsigned hash(UString::Rep* key) { return key->computedHash(); }
-};
-
 static ALWAYS_INLINE int missingSymbolMarker() {
   return std::numeric_limits<int>::max();
 }
@@ -115,7 +108,7 @@ struct SymbolTableIndexHashTraits {
 
 typedef HashMap<RefPtr<UString::Rep>,
                 SymbolTableEntry,
-                IdentifierRepHash,
+                WTF::IdentifierRepHash,
                 HashTraits<RefPtr<UString::Rep>>,
                 SymbolTableIndexHashTraits>
     SymbolTable;

@@ -78,9 +78,10 @@ JSValue* RegExpObject::getValueProperty(ExecState* exec, int token) const {
 
 void RegExpObject::put(ExecState* exec,
                        const Identifier& propertyName,
-                       JSValue* value) {
+                       JSValue* value,
+                       PutPropertySlot& slot) {
   lookupPut<RegExpObject, JSObject>(exec, propertyName, value,
-                                    ExecState::regExpTable(exec), this);
+                                    ExecState::regExpTable(exec), this, slot);
 }
 
 void RegExpObject::putValueProperty(ExecState* exec,

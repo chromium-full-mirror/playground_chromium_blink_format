@@ -67,7 +67,8 @@ class JSDOMWindowShell : public DOMObject {
                                   KJS::PropertySlot&);
   virtual void put(KJS::ExecState*,
                    const KJS::Identifier& propertyName,
-                   KJS::JSValue*);
+                   KJS::JSValue*,
+                   KJS::PutPropertySlot&);
   virtual void putWithAttributes(KJS::ExecState*,
                                  const KJS::Identifier& propertyName,
                                  KJS::JSValue*,

@@ -38,7 +38,10 @@ class RuntimeObjectImp : public JSObject {
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
                                   PropertySlot&);
-  virtual void put(ExecState*, const Identifier& propertyName, JSValue*);
+  virtual void put(ExecState*,
+                   const Identifier& propertyName,
+                   JSValue*,
+                   PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual JSValue* defaultValue(ExecState*, PreferredPrimitiveType) const;
   virtual CallType getCallData(CallData&);
@@ -53,7 +56,8 @@ class RuntimeObjectImp : public JSObject {
 
  protected:
   friend class Bindings::Instance;
-  RuntimeObjectImp(PassRefPtr<Bindings::Instance>);  // Only allow Instances and
+  RuntimeObjectImp(ExecState* exec,
+                   PassRefPtr<Bindings::Instance>);  // Only allow Instances and
                                                      // derived classes to
                                                      // create us
 

@@ -80,7 +80,9 @@ void setUpStaticFunctionSlot(ExecState* exec,
   PrototypeFunction* function = new (exec) PrototypeFunction(
       exec, entry->length, propertyName, entry->functionValue);
   thisObj->putDirect(propertyName, function, entry->attributes);
-  slot.setValueSlot(thisObj->getDirectLocation(propertyName));
+
+  JSValue** location = thisObj->getDirectLocation(propertyName);
+  slot.setValueSlot(thisObj, location, thisObj->offsetForLocation(location));
 }
 
 }  // namespace KJS

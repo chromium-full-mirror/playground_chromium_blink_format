@@ -47,7 +47,8 @@ Arguments::Arguments(ExecState* exec,
   ASSERT(activation);
 
   putDirect(exec->propertyNames().callee, function, DontEnum);
-  putDirect(exec, exec->propertyNames().length, args.size(), DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(exec, args.size()),
+            DontEnum);
 
   int i = 0;
   ArgList::const_iterator end = args.end();
@@ -85,11 +86,12 @@ bool Arguments::getOwnPropertySlot(ExecState* exec,
 
 void Arguments::put(ExecState* exec,
                     const Identifier& propertyName,
-                    JSValue* value) {
+                    JSValue* value,
+                    PutPropertySlot& slot) {
   if (d->indexToNameMap.isMapped(propertyName))
-    d->activation->put(exec, d->indexToNameMap[propertyName], value);
+    d->activation->put(exec, d->indexToNameMap[propertyName], value, slot);
   else
-    JSObject::put(exec, propertyName, value);
+    JSObject::put(exec, propertyName, value, slot);
 }
 
 bool Arguments::deleteProperty(ExecState* exec,
