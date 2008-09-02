@@ -46,7 +46,6 @@ class OriginQuotaManager : public Noncopyable {
   void lock();
   void unlock();
 
-  // To setup the origin usage records on the main (DatabaseTracker) thread
   void trackOrigin(PassRefPtr<SecurityOrigin>);
   bool tracksOrigin(SecurityOrigin*) const;
   void addDatabase(SecurityOrigin*,
@@ -55,12 +54,15 @@ class OriginQuotaManager : public Noncopyable {
   void removeDatabase(SecurityOrigin*, const String& databaseIdentifier);
   void removeOrigin(SecurityOrigin*);
 
-  // To mark dirtiness of a specific database on the background thread
-  void markDatabase(Database*);
+  void markDatabase(Database*);  // Mark dirtiness of a specific database.
   unsigned long long diskUsage(SecurityOrigin*) const;
 
  private:
   mutable Mutex m_usageRecordGuard;
+#ifndef NDEBUG
+  bool m_usageRecordGuardLocked;
+#endif
+
   typedef HashMap<RefPtr<SecurityOrigin>,
                   OriginUsageRecord*,
                   SecurityOriginHash>
