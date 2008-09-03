@@ -533,8 +533,7 @@ bool HTMLParser::handleError(Node* n,
         } else
           reportError(MisplacedFramesetContentError, &localName);
       }
-    } else if (h->hasLocalName(addressTag) || h->hasLocalName(dlTag) ||
-               h->hasLocalName(dtTag) || h->hasLocalName(fontTag) ||
+    } else if (h->hasLocalName(addressTag) || h->hasLocalName(fontTag) ||
                h->hasLocalName(styleTag) || h->hasLocalName(titleTag)) {
       reportError(MisplacedContentRetryError, &localName, &currentTagName);
       popBlock(currentTagName);
