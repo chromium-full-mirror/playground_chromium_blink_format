@@ -43,6 +43,7 @@ class EvalNode;
 class ExecState;
 class FunctionBodyNode;
 class Instruction;
+class InternalFunction;
 class JSFunction;
 class JSGlobalObject;
 class ProgramNode;
@@ -108,11 +109,12 @@ class Machine {
   }
 
   JSValue* retrieveArguments(ExecState*, JSFunction*) const;
-  JSValue* retrieveCaller(ExecState*, JSFunction*) const;
+  JSValue* retrieveCaller(ExecState*, InternalFunction*) const;
   void retrieveLastCaller(ExecState* exec,
                           int& lineNumber,
                           int& sourceId,
-                          UString& sourceURL) const;
+                          UString& sourceURL,
+                          JSValue*& function) const;
 
   void getArgumentsData(Register* callFrame,
                         JSFunction*&,
@@ -189,7 +191,7 @@ class Machine {
                                            Register*&,
                                            bool);
 
-  Register* callFrame(ExecState*, JSFunction*) const;
+  Register* callFrame(ExecState*, InternalFunction*) const;
 
   JSValue* privateExecute(ExecutionFlag,
                           ExecState* = 0,

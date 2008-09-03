@@ -1842,7 +1842,6 @@ void InspectorController::stopUserInitiatedProfiling() {
 
   ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
   Profiler::profiler()->stopProfiling(exec, UserInitiatedProfileName);
-  Profiler::profiler()->didFinishAllExecution(exec);
   toggleRecordButton(false);
 }
 

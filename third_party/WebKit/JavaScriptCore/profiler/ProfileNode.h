@@ -117,10 +117,7 @@ class ProfileNode : public RefCounted<ProfileNode> {
     return m_children.size() ? m_children.last().get() : 0;
   }
   ProfileNode* findChild(ProfileNode*) const;
-  void removeChild(unsigned index) {
-    m_children.remove(index);
-    resetChildrensSiblings();
-  }
+  void removeChild(ProfileNode*);
   void addChild(PassRefPtr<ProfileNode> prpChild);
   void insertNode(PassRefPtr<ProfileNode> prpNode);
 

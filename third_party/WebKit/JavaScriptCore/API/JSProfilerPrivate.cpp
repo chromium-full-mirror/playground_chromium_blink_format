@@ -40,5 +40,4 @@ void JSEndProfiling(JSContextRef ctx, JSStringRef title) {
   ExecState* exec = toJS(ctx);
   Profiler* profiler = Profiler::profiler();
   profiler->stopProfiling(exec, title->ustring());
-  profiler->didFinishAllExecution(exec);
 }

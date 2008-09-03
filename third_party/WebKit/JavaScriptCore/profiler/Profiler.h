@@ -35,6 +35,7 @@
 
 namespace KJS {
 
+class CallIdentifier;
 class ExecState;
 class JSObject;
 class Profile;
@@ -56,10 +57,13 @@ class Profiler {
   }
 
   static Profiler* profiler();
+  static CallIdentifier createCallIdentifier(ExecState*,
+                                             JSObject*,
+                                             const UString& sourceURL,
+                                             int lineNumber);
 
   void startProfiling(ExecState*, const UString& title, ProfilerClient*);
   void stopProfiling(ExecState*, const UString& title);
-  void didFinishAllExecution(ExecState*);
 
   void willExecute(ExecState*, JSObject* calledFunction);
   void willExecute(ExecState*,
