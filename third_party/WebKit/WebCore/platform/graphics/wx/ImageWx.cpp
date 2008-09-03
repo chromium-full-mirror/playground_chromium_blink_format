@@ -97,6 +97,8 @@ void BitmapImage::draw(GraphicsContext* ctxt,
   wxWindowDC* context = ctxt->platformContext();
 #endif
 
+  startAnimation();
+
   wxBitmap* bitmap = frameAtIndex(m_currentFrame);
   if (!bitmap)  // If it's too early we won't have an image yet.
     return;
@@ -142,7 +144,6 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     bitmap = NULL;
   }
   ctxt->restore();
-  startAnimation();
 }
 
 void BitmapImage::drawPattern(GraphicsContext* ctxt,
