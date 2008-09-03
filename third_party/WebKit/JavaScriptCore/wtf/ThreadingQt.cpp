@@ -29,8 +29,9 @@
 #include "config.h"
 #include "Threading.h"
 
-#include <wtf/HashMap.h>
-#include <wtf/MathExtras.h>
+#include "HashMap.h"
+#include "MainThread.h"
+#include "MathExtras.h"
 
 #include <QMutex>
 #include <QThread>
@@ -59,7 +60,9 @@ void ThreadPrivate::run() {
 
 Mutex* atomicallyInitializedStaticMutex;
 
+#if !PLATFORM(DARWIN)
 static ThreadIdentifier mainThreadIdentifier;
+#endif
 
 static Mutex& threadMapMutex() {
   static Mutex mutex;
@@ -112,7 +115,10 @@ void initializeThreading() {
     atomicallyInitializedStaticMutex = new Mutex;
     threadMapMutex();
     wtf_random_init();
+#if !PLATFORM(DARWIN)
     mainThreadIdentifier = currentThread();
+#endif
+    initializeMainThread();
   }
 }
 

@@ -29,8 +29,9 @@
 #include "config.h"
 #include "Threading.h"
 
-#include <wtf/HashMap.h>
-#include <wtf/MathExtras.h>
+#include "HashMap.h"
+#include "MainThread.h"
+#include "MathExtras.h"
 
 #include <errno.h>
 #include <sys/time.h>
@@ -39,9 +40,11 @@ namespace WTF {
 
 Mutex* atomicallyInitializedStaticMutex;
 
-static ThreadIdentifier mainThreadIdentifier;  // More precisely, the thread
-                                               // that was the first to call
-                                               // initializeThreading().
+#if !PLATFORM(DARWIN)
+static ThreadIdentifier mainThreadIdentifier;  // The thread that was the first
+                                               // to call initializeThreading(),
+                                               // which must be the main thread.
+#endif
 
 static Mutex& threadMapMutex() {
   static Mutex mutex;
@@ -53,7 +56,10 @@ void initializeThreading() {
     atomicallyInitializedStaticMutex = new Mutex;
     threadMapMutex();
     wtf_random_init();
+#if !PLATFORM(DARWIN)
     mainThreadIdentifier = currentThread();
+#endif
+    initializeMainThread();
   }
 }
 
