@@ -497,6 +497,7 @@ AnimationBase::~AnimationBase() {
 bool AnimationBase::propertiesEqual(int prop,
                                     const RenderStyle* a,
                                     const RenderStyle* b) {
+  ensurePropertyMap();
   if (prop == cAnimateAll) {
     size_t n = gPropertyWrappers->size();
     for (unsigned int i = 0; i < n; ++i) {
@@ -516,6 +517,7 @@ bool AnimationBase::propertiesEqual(int prop,
 
 // static
 int AnimationBase::getPropertyAtIndex(int i) {
+  ensurePropertyMap();
   if (i < 0 || i >= (int)gPropertyWrappers->size())
     return CSSPropertyInvalid;
 
@@ -524,6 +526,7 @@ int AnimationBase::getPropertyAtIndex(int i) {
 
 // static
 int AnimationBase::getNumProperties() {
+  ensurePropertyMap();
   return gPropertyWrappers->size();
 }
 
