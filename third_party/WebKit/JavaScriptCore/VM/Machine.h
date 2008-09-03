@@ -216,9 +216,11 @@ class Machine {
            v->asCell()->vptr() == m_jsStringVptr;
   }
 
-  void tryCacheGetByID(CodeBlock*,
+  void tryCacheGetByID(ExecState*,
+                       CodeBlock*,
                        Instruction* vPC,
                        JSValue* baseValue,
+                       const Identifier& propertyName,
                        const PropertySlot&);
   void uncacheGetByID(CodeBlock*, Instruction* vPC);
   void tryCachePutByID(CodeBlock*,
