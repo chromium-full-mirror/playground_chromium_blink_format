@@ -1541,7 +1541,7 @@ void InspectorController::endGroup(MessageSource source,
 }
 
 void InspectorController::addProfile(PassRefPtr<Profile> prpProfile,
-                                     int lineNumber,
+                                     unsigned lineNumber,
                                      const UString& sourceURL) {
   if (!enabled())
     return;
@@ -1557,7 +1557,7 @@ void InspectorController::addProfile(PassRefPtr<Profile> prpProfile,
 
 void InspectorController::addProfileMessageToConsole(
     PassRefPtr<Profile> prpProfile,
-    int lineNumber,
+    unsigned lineNumber,
     const UString& sourceURL) {
   RefPtr<Profile> profile = prpProfile;
 
@@ -1830,7 +1830,7 @@ void InspectorController::startUserInitiatedProfiling() {
   m_recordingUserInitiatedProfile = true;
 
   ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
-  Profiler::profiler()->startProfiling(exec, UserInitiatedProfileName, this);
+  Profiler::profiler()->startProfiling(exec, UserInitiatedProfileName);
   toggleRecordButton(true);
 }
 
@@ -1841,12 +1841,11 @@ void InspectorController::stopUserInitiatedProfiling() {
   m_recordingUserInitiatedProfile = false;
 
   ExecState* exec = toJSDOMWindow(m_inspectedPage->mainFrame())->globalExec();
-  Profiler::profiler()->stopProfiling(exec, UserInitiatedProfileName);
+  RefPtr<Profile> profile =
+      Profiler::profiler()->stopProfiling(exec, UserInitiatedProfileName);
+  if (profile)
+    addProfile(profile, 0, UString());
   toggleRecordButton(false);
-}
-
-void InspectorController::finishedProfiling(PassRefPtr<Profile> prpProfile) {
-  addProfile(prpProfile, -1, UString());
 }
 
 static void addHeaders(JSContextRef context,

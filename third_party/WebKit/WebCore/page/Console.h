@@ -30,7 +30,6 @@
 #define Console_h
 
 #include "PlatformString.h"
-#include <profiler/Profiler.h>
 #include <wtf/RefCounted.h>
 #include <wtf/PassRefPtr.h>
 
@@ -65,7 +64,7 @@ enum MessageLevel {
   EndGroupMessageLevel
 };
 
-class Console : public RefCounted<Console>, public KJS::ProfilerClient {
+class Console : public RefCounted<Console> {
  public:
   static PassRefPtr<Console> create(Frame* frame) {
     return adoptRef(new Console(frame));
@@ -94,8 +93,6 @@ class Console : public RefCounted<Console>, public KJS::ProfilerClient {
   void group(KJS::ExecState*, const KJS::ArgList&);
   void groupEnd();
 
-  void finishedProfiling(PassRefPtr<KJS::Profile>);
-
   void reportException(KJS::ExecState*, KJS::JSValue*);
   void reportCurrentException(KJS::ExecState*);
 
@@ -105,10 +102,6 @@ class Console : public RefCounted<Console>, public KJS::ProfilerClient {
   Console(Frame*);
 
   Frame* m_frame;
-
-  // FIXME: We won't need these once we remove the profiler "zombie" mode
-  int m_profileLineNumber;
-  KJS::UString m_profileSourceURL;
 };
 
 }  // namespace WebCore

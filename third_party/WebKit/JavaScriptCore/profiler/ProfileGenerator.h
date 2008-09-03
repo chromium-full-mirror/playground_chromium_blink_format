@@ -36,14 +36,12 @@ class CallIdentifier;
 class ExecState;
 class Profile;
 class ProfileNode;
-class ProfilerClient;
 class UString;
 
 class ProfileGenerator : public RefCounted<ProfileGenerator> {
  public:
   static PassRefPtr<ProfileGenerator> create(const UString& title,
                                              ExecState* originatingExec,
-                                             ProfilerClient*,
                                              unsigned uid);
 
   // Members
@@ -51,7 +49,6 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
   PassRefPtr<Profile> profile() const { return m_profile; }
   ExecState* originatingGlobalExec() const { return m_originatingGlobalExec; }
   unsigned profileGroup() const { return m_profileGroup; }
-  ProfilerClient* client() { return m_client; }
 
   // Collecting
   void willExecute(const CallIdentifier&);
@@ -66,7 +63,6 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
  private:
   ProfileGenerator(const UString& title,
                    ExecState* originatingExec,
-                   ProfilerClient*,
                    unsigned uid);
   void addParentForConsoleStart(ExecState*);
 
@@ -76,7 +72,6 @@ class ProfileGenerator : public RefCounted<ProfileGenerator> {
   RefPtr<Profile> m_profile;
   ExecState* m_originatingGlobalExec;
   unsigned m_profileGroup;
-  ProfilerClient* m_client;
   RefPtr<ProfileNode> m_head;
   RefPtr<ProfileNode> m_currentNode;
 };
