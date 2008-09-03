@@ -618,7 +618,8 @@ bool RenderBox::repaintLayerRectsForImage(WrappedImagePtr image,
 
   for (const FillLayer* curLayer = layers; curLayer;
        curLayer = curLayer->next()) {
-    if (curLayer->image() && image == curLayer->image()->data()) {
+    if (curLayer->image() && image == curLayer->image()->data() &&
+        curLayer->image()->canRender(style()->effectiveZoom())) {
       // Now that we know this image is being used, compute the renderer and the
       // rect
       // if we haven't already
