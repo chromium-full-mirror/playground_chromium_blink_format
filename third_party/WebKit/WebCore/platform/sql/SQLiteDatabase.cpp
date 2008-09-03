@@ -27,8 +27,8 @@
 #include "config.h"
 #include "SQLiteDatabase.h"
 
+#include "DatabaseAuthorizer.h"
 #include "Logging.h"
-#include "SQLiteAuthorizer.h"
 #include "SQLiteStatement.h"
 
 #include <sqlite3.h>
@@ -230,7 +230,7 @@ int SQLiteDatabase::authorizerFunction(void* userData,
                                        const char* parameter2,
                                        const char* /*databaseName*/,
                                        const char* /*trigger_or_view*/) {
-  SQLiteAuthorizer* auth = static_cast<SQLiteAuthorizer*>(userData);
+  DatabaseAuthorizer* auth = static_cast<DatabaseAuthorizer*>(userData);
   ASSERT(auth);
 
   switch (actionCode) {
@@ -304,7 +304,7 @@ int SQLiteDatabase::authorizerFunction(void* userData,
   }
 }
 
-void SQLiteDatabase::setAuthorizer(PassRefPtr<SQLiteAuthorizer> auth) {
+void SQLiteDatabase::setAuthorizer(PassRefPtr<DatabaseAuthorizer> auth) {
   if (!m_db) {
     LOG_ERROR("Attempt to set an authorizer on a non-open SQL database");
     ASSERT_NOT_REACHED();
