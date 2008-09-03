@@ -28,6 +28,7 @@
 
 #include "AffineTransform.h"
 #include "FloatSize.h"
+#include "Font.h"
 #include "GraphicsTypes.h"
 #include "Path.h"
 #include "PlatformString.h"
@@ -48,6 +49,7 @@ class HTMLCanvasElement;
 class HTMLImageElement;
 class ImageData;
 class KURL;
+class TextMetrics;
 
 typedef int ExceptionCode;
 
@@ -265,6 +267,21 @@ class CanvasRenderingContext2D : Noncopyable {
 
   void reset();
 
+  String font() const;
+  void setFont(const String&);
+
+  String textAlign() const;
+  void setTextAlign(const String&);
+
+  String textBaseline() const;
+  void setTextBaseline(const String&);
+
+  void fillText(const String& text, float x, float y);
+  void fillText(const String& text, float x, float y, float maxWidth);
+  void strokeText(const String& text, float x, float y);
+  void strokeText(const String& text, float x, float y, float maxWidth);
+  PassRefPtr<TextMetrics> measureText(const String& text);
+
  private:
   struct State {
     State();
@@ -281,6 +298,14 @@ class CanvasRenderingContext2D : Noncopyable {
     float m_globalAlpha;
     CompositeOperator m_globalComposite;
     AffineTransform m_transform;
+
+    // Text state.
+    TextAlign m_textAlign;
+    TextBaseline m_textBaseline;
+
+    String m_unparsedFont;
+    Font m_font;
+    bool m_realizedFont;
   };
   Path m_path;
 
@@ -295,6 +320,15 @@ class CanvasRenderingContext2D : Noncopyable {
 
   void applyStrokePattern();
   void applyFillPattern();
+
+  void drawTextInternal(const String& text,
+                        float x,
+                        float y,
+                        bool fill,
+                        float maxWidth = 0,
+                        bool useMaxWidth = false);
+
+  const Font& accessFont();
 
 #if ENABLE(DASHBOARD_SUPPORT)
   void clearPathForDashboardBackwardCompatibilityMode();

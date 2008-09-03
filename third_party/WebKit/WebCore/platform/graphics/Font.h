@@ -135,6 +135,7 @@ class Font {
   int descent() const;
   int height() const { return ascent() + descent(); }
   int lineSpacing() const;
+  int lineGap() const;
   float xHeight() const;
   unsigned unitsPerEm() const;
   int spaceWidth() const;

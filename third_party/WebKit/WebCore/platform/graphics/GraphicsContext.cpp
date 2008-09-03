@@ -278,7 +278,8 @@ void GraphicsContext::drawText(const TextRun& run,
   font().drawText(this, run, point, from, to);
 }
 
-void GraphicsContext::drawBidiText(const TextRun& run, const IntPoint& point) {
+void GraphicsContext::drawBidiText(const TextRun& run,
+                                   const FloatPoint& point) {
   if (paintingDisabled())
     return;
 
