@@ -290,7 +290,7 @@ class AnimationBase : public Noncopyable {
                               const RenderStyle* b,
                               double prog);
 
-  static void AnimationBase::setChanged(Node* node);
+  static void setChanged(Node* node);
 
  protected:
   AnimState m_animState;
