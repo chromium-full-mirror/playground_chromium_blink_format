@@ -43,8 +43,8 @@ namespace KJS {
   macro(op_unexpected_load) macro(op_new_object) macro(op_new_array) macro(                                      \
       op_new_regexp) macro(op_mov)                                                                               \
                                                                                                                  \
-      macro(op_not) macro(op_eq) macro(op_neq) macro(op_stricteq) macro(                                         \
-          op_nstricteq) macro(op_less) macro(op_lesseq)                                                          \
+      macro(op_not) macro(op_eq) macro(op_eq_null) macro(op_neq) macro(op_neq_null) macro(                       \
+          op_stricteq) macro(op_nstricteq) macro(op_less) macro(op_lesseq)                                       \
                                                                                                                  \
           macro(op_pre_inc) macro(op_pre_dec) macro(op_post_inc) macro(op_post_dec) macro(op_to_jsnumber) macro( \
               op_negate) macro(op_add) macro(op_mul) macro(op_div) macro(op_mod) macro(op_sub)                   \

@@ -205,6 +205,7 @@ class ExpressionNode : public Node {
 
   virtual bool isNumber() const KJS_FAST_CALL { return false; }
   virtual bool isString() const KJS_FAST_CALL { return false; }
+  virtual bool isNull() const KJS_FAST_CALL { return false; }
   virtual bool isPure(CodeGenerator&) const KJS_FAST_CALL { return false; }
   virtual bool isLocation() const KJS_FAST_CALL { return false; }
   virtual bool isResolveNode() const KJS_FAST_CALL { return false; }
@@ -246,6 +247,8 @@ class NullNode : public ExpressionNode {
  public:
   NullNode(JSGlobalData* globalData) KJS_FAST_CALL
       : ExpressionNode(globalData, NullType) {}
+
+  virtual bool isNull() const KJS_FAST_CALL { return true; }
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
