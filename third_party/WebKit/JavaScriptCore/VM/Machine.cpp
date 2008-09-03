@@ -30,6 +30,7 @@
 #include "config.h"
 #include "Machine.h"
 
+#include "BatchedTransitionOptimizer.h"
 #include "CodeBlock.h"
 #include "DebuggerCallFrame.h"
 #include "ExceptionHelpers.h"
@@ -607,7 +608,7 @@ Machine::Machine()
   // stack.
   void* storage = fastMalloc(sizeof(CollectorBlock));
 
-  JSArray* jsArray = new (storage) JSArray(JSArray::DummyConstruct);
+  JSArray* jsArray = new (storage) JSArray(StructureID::create(jsNull()));
   m_jsArrayVptr = jsArray->vptr();
   static_cast<JSCell*>(jsArray)->~JSCell();
 
@@ -1036,25 +1037,30 @@ JSValue* Machine::execute(EvalNode* evalNode,
     }
   }
 
-  const Node::VarStack& varStack = codeBlock->ownerNode->varStack();
-  Node::VarStack::const_iterator varStackEnd = varStack.end();
-  for (Node::VarStack::const_iterator it = varStack.begin(); it != varStackEnd;
-       ++it) {
-    const Identifier& ident = (*it).first;
-    if (!variableObject->hasProperty(exec, ident)) {
-      PutPropertySlot slot;
-      variableObject->put(exec, ident, jsUndefined(), slot);
-    }
-  }
+  {  // Scope for BatchedTransitionOptimizer
 
-  const Node::FunctionStack& functionStack =
-      codeBlock->ownerNode->functionStack();
-  Node::FunctionStack::const_iterator functionStackEnd = functionStack.end();
-  for (Node::FunctionStack::const_iterator it = functionStack.begin();
-       it != functionStackEnd; ++it) {
-    PutPropertySlot slot;
-    variableObject->put(exec, (*it)->m_ident,
-                        (*it)->makeFunction(exec, scopeChain), slot);
+    BatchedTransitionOptimizer optimizer(variableObject);
+
+    const Node::VarStack& varStack = codeBlock->ownerNode->varStack();
+    Node::VarStack::const_iterator varStackEnd = varStack.end();
+    for (Node::VarStack::const_iterator it = varStack.begin();
+         it != varStackEnd; ++it) {
+      const Identifier& ident = (*it).first;
+      if (!variableObject->hasProperty(exec, ident)) {
+        PutPropertySlot slot;
+        variableObject->put(exec, ident, jsUndefined(), slot);
+      }
+    }
+
+    const Node::FunctionStack& functionStack =
+        codeBlock->ownerNode->functionStack();
+    Node::FunctionStack::const_iterator functionStackEnd = functionStack.end();
+    for (Node::FunctionStack::const_iterator it = functionStack.begin();
+         it != functionStackEnd; ++it) {
+      PutPropertySlot slot;
+      variableObject->put(exec, (*it)->m_ident,
+                          (*it)->makeFunction(exec, scopeChain), slot);
+    }
   }
 
   size_t oldSize = m_registerFile.size();
@@ -1279,7 +1285,7 @@ static NEVER_INLINE ScopeChainNode* createExceptionScope(
 
 StructureIDChain* cachePrototypeChain(StructureID* structureID) {
   RefPtr<StructureIDChain> chain = StructureIDChain::create(
-      static_cast<JSCell*>(structureID->prototype())->structureID());
+      static_cast<JSObject*>(structureID->prototype())->structureID());
   structureID->setCachedPrototypeChain(chain.release());
   return structureID->cachedPrototypeChain();
 }
@@ -1337,8 +1343,9 @@ NEVER_INLINE void Machine::tryCachePutByID(CodeBlock* codeBlock,
 
   // Cache hit: Specialize instruction and ref StructureIDs.
 
-  // If baseCell != slotBase, then baseCell must be a proxy for another object.
-  if (baseCell != slot.slotBase()) {
+  // If baseCell != slot.base(), then baseCell must be a proxy for another
+  // object.
+  if (baseCell != slot.base()) {
     vPC[0] = getOpcode(op_put_by_id_generic);
     return;
   }
@@ -1429,7 +1436,7 @@ NEVER_INLINE void Machine::tryCacheGetByID(CodeBlock* codeBlock,
     baseCell = static_cast<JSCell*>(baseCell->structureID()->prototype());
     // If we didn't find slotBase in baseCell's prototype chain, then baseCell
     // must be a proxy for another object.
-    if (baseCell == jsNull()) {
+    if (baseCell->isNull()) {
       vPC[0] = getOpcode(op_get_by_id_generic);
       return;
     }
@@ -2441,7 +2448,7 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
          structureIDChain(sIDc) count(n) offset(n)
 
          Cached property access: Attempts to get a cached property from the
-         value base's prototype chain. If the cache misses, op_get_by_id_proto
+         value base's prototype chain. If the cache misses, op_get_by_id_chain
          reverts to op_get_by_id.
       */
       int base = vPC[2].u.operand;
@@ -2457,14 +2464,13 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
           RefPtr<StructureID>* end = it + count;
 
           while (1) {
-            baseCell =
-                static_cast<JSCell*>(baseCell->structureID()->prototype());
-            if (UNLIKELY(baseCell->structureID() != (*it).get()))
+            ASSERT(baseCell->isObject());
+            JSObject* baseObject =
+                static_cast<JSObject*>(baseCell->structureID()->prototype());
+            if (UNLIKELY(baseObject->structureID() != (*it).get()))
               break;
 
             if (++it == end) {
-              ASSERT(baseCell->isObject());
-              JSObject* baseObject = static_cast<JSObject*>(baseCell);
               int dst = vPC[1].u.operand;
               int offset = vPC[7].u.operand;
 
@@ -2507,8 +2513,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
     BEGIN_OPCODE(op_put_by_id) {
       /* put_by_id base(r) property(id) value(r) nop(n) nop(n)
 
-         Sets register value on register base as the property named
-         by identifier property. Base is converted to object first.
+         Generic property access: Sets the property named by identifier
+         property, belonging to register base, to register value.
 
          Unlike many opcodes, this one does not write any output to
          the register file.
@@ -2534,8 +2540,10 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
       /* op_put_by_id_replace base(r) property(id) value(r) structureID(sID)
          offset(n)
 
-         Sets register value on register base as the property named
-         by identifier property. Base is converted to object first.
+         Cached property access: Attempts to set a pre-existing, cached
+         property named by identifier property, belonging to register base,
+         to register value. If the cache misses, op_put_by_id_replace
+         reverts to op_put_by_id.
 
          Unlike many opcodes, this one does not write any output to
          the register file.
@@ -2568,8 +2576,8 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
     BEGIN_OPCODE(op_put_by_id_generic) {
       /* op_put_by_id_generic base(r) property(id) value(r) nop(n) nop(n)
 
-         Sets register value on register base as the property named
-         by identifier property. Base is converted to object first.
+         Generic property access: Sets the property named by identifier
+         property, belonging to register base, to register value.
 
          Unlike many opcodes, this one does not write any output to
          the register file.

@@ -892,10 +892,9 @@ void CodeBlock::dump(ExecState* exec,
 #endif  // !defined(NDEBUG) || ENABLE(SAMPLING_TOOL)
 
 CodeBlock::~CodeBlock() {
-  Vector<size_t>::const_iterator end = structureIDInstructions.end();
-  for (Vector<size_t>::const_iterator it = structureIDInstructions.begin();
-       it != end; ++it)
-    derefStructureIDs(&instructions[*it]);
+  size_t size = structureIDInstructions.size();
+  for (size_t i = 0; i < size; ++i)
+    derefStructureIDs(&instructions[structureIDInstructions[i]]);
 }
 
 void CodeBlock::derefStructureIDs(Instruction* vPC) const {

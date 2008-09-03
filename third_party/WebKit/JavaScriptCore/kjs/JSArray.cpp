@@ -148,7 +148,7 @@ inline void JSArray::checkConsistency(ConsistencyCheckType) {}
 
 #endif
 
-JSArray::JSArray(DummyConstructTag) : JSObject(StructureID::create(jsNull())) {
+JSArray::JSArray(PassRefPtr<StructureID> structureID) : JSObject(structureID) {
   unsigned initialCapacity = 0;
 
   m_storage = static_cast<ArrayStorage*>(

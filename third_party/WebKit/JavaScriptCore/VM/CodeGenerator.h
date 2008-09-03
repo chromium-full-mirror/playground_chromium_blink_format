@@ -451,7 +451,7 @@ class CodeGenerator {
 
   typedef HashMap<RefPtr<UString::Rep>,
                   int,
-                  WTF::IdentifierRepHash,
+                  IdentifierRepHash,
                   HashTraits<RefPtr<UString::Rep>>,
                   IdentifierMapIndexHashTraits>
       IdentifierMap;
@@ -521,7 +521,7 @@ class CodeGenerator {
   ScopeNode* m_scopeNode;
   CodeBlock* m_codeBlock;
 
-  HashSet<RefPtr<UString::Rep>, WTF::IdentifierRepHash> m_functions;
+  HashSet<RefPtr<UString::Rep>, IdentifierRepHash> m_functions;
   RegisterID m_thisRegister;
   SegmentedVector<RegisterID, 512> m_locals;
   SegmentedVector<RegisterID, 512> m_constants;

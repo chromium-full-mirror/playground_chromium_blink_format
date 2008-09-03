@@ -291,7 +291,7 @@ void SamplingTool::dump(ExecState* exec) {
   for (int i = 0; i < numOpcodeIDs; ++i) {
     long long count = opcodeSampleCounts[i];
     printf("%s:%s%6lld\t%.3f%%\t(%.3f%%)\n", opcodeNames[i],
-           padOpcodeName((OpcodeID)i, 20), count,
+           padOpcodeName(static_cast<OpcodeID>(i), 20), count,
            (static_cast<double>(count) * 100) / totalOpcodeSamples,
            (static_cast<double>(count) * 100) / m_totalSamples);
   }

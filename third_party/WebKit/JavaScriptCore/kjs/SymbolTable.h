@@ -108,7 +108,7 @@ struct SymbolTableIndexHashTraits {
 
 typedef HashMap<RefPtr<UString::Rep>,
                 SymbolTableEntry,
-                WTF::IdentifierRepHash,
+                IdentifierRepHash,
                 HashTraits<RefPtr<UString::Rep>>,
                 SymbolTableIndexHashTraits>
     SymbolTable;

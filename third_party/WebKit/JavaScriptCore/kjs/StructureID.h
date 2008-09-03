@@ -49,7 +49,8 @@ class StructureID : public RefCounted<StructureID> {
   static PassRefPtr<StructureID> addPropertyTransition(StructureID*,
                                                        const Identifier& name);
   static PassRefPtr<StructureID> getterSetterTransition(StructureID*);
-  static PassRefPtr<StructureID> dictionaryTransition(StructureID*);
+  static PassRefPtr<StructureID> toDictionaryTransition(StructureID*);
+  static PassRefPtr<StructureID> fromDictionaryTransition(StructureID*);
 
   ~StructureID();
 
@@ -73,7 +74,7 @@ class StructureID : public RefCounted<StructureID> {
  private:
   typedef HashMap<RefPtr<UString::Rep>,
                   StructureID*,
-                  WTF::IdentifierRepHash,
+                  IdentifierRepHash,
                   HashTraits<RefPtr<UString::Rep>>>
       TransitionTable;
 
@@ -104,7 +105,6 @@ class StructureIDChain : public RefCounted<StructureIDChain> {
  private:
   StructureIDChain(StructureID* structureID);
 
-  size_t m_size;
   OwnArrayPtr<RefPtr<StructureID>> m_vector;
 };
 

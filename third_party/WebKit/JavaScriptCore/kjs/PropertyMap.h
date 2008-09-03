@@ -23,6 +23,7 @@
 
 #include "PropertySlot.h"
 #include "identifier.h"
+#include <wtf/NotFound.h>
 
 namespace KJS {
 
@@ -103,7 +104,7 @@ class PropertyMap : Noncopyable {
   }
 
   size_t offsetForLocation(JSValue** location) {
-    return m_usingTable ? offsetForTableLocation(location) : KJS_INVALID_OFFSET;
+    return m_usingTable ? offsetForTableLocation(location) : WTF::notFound;
   }
 
   void mark() const;

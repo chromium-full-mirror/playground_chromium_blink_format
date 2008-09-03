@@ -342,6 +342,13 @@ inline size_t UString::cost() const {
   return capacityDelta;
 }
 
+struct IdentifierRepHash : PtrHash<RefPtr<KJS::UString::Rep>> {
+  static unsigned hash(const RefPtr<KJS::UString::Rep>& key) {
+    return key->computedHash();
+  }
+  static unsigned hash(KJS::UString::Rep* key) { return key->computedHash(); }
+};
+
 }  // namespace KJS
 
 namespace WTF {
@@ -391,13 +398,6 @@ struct DefaultHash<KJS::UString::Rep*> {
 template <>
 struct DefaultHash<RefPtr<KJS::UString::Rep>> {
   typedef StrHash<RefPtr<KJS::UString::Rep>> Hash;
-};
-
-struct IdentifierRepHash : PtrHash<RefPtr<KJS::UString::Rep>> {
-  static unsigned hash(const RefPtr<KJS::UString::Rep>& key) {
-    return key->computedHash();
-  }
-  static unsigned hash(KJS::UString::Rep* key) { return key->computedHash(); }
 };
 
 }  // namespace WTF
