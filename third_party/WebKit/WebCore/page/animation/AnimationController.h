@@ -29,8 +29,6 @@
 #ifndef AnimationController_h
 #define AnimationController_h
 
-#include "CSSPropertyNames.h"
-
 namespace WebCore {
 
 class AnimationControllerPrivate;
@@ -62,8 +60,16 @@ class AnimationController {
 
   void styleAvailable();
 
+  void setWaitingForStyleAvailable(bool waiting) {
+    if (waiting)
+      m_numStyleAvailableWaiters++;
+    else
+      m_numStyleAvailableWaiters--;
+  }
+
  private:
   AnimationControllerPrivate* m_data;
+  uint32_t m_numStyleAvailableWaiters;
 };
 }
 
