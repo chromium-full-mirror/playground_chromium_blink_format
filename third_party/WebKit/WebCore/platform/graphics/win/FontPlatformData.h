@@ -26,8 +26,9 @@
 #define FontPlatformData_H
 
 #include "StringImpl.h"
+#include <wtf/PassRefPtr.h>
 #include <wtf/RetainPtr.h>
-#include <wtf/Refcounted.h>
+#include <wtf/RefCounted.h>
 
 #if PLATFORM(CAIRO)
 #include <cairo-win32.h>
