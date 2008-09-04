@@ -686,6 +686,10 @@ int Font::lineSpacing() const {
   return QFontMetrics(m_font).lineSpacing();
 }
 
+int Font::lineGap() const {
+  return QFontMetrics(m_font).leading();
+}
+
 float Font::xHeight() const {
   return QFontMetrics(m_font).xHeight();
 }
