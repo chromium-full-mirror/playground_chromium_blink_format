@@ -70,6 +70,7 @@ class JSObject : public JSCell {
   JSValue* prototype() const;
   void setPrototype(JSValue* prototype);
 
+  void setStructureID(PassRefPtr<StructureID>);
   StructureID* inheritorID();
 
   virtual UString className() const;
@@ -203,7 +204,6 @@ class JSObject : public JSCell {
 
   const HashEntry* findPropertyHashEntry(ExecState*,
                                          const Identifier& propertyName) const;
-  void setStructureID(PassRefPtr<StructureID>);
   StructureID* createInheritorID();
 
   PropertyMap m_propertyMap;
