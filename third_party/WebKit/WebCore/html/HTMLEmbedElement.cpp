@@ -36,10 +36,6 @@
 #include "RenderWidget.h"
 #include "ScriptController.h"
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
-#include "runtime.h"
-#endif
-
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -49,7 +45,6 @@ HTMLEmbedElement::HTMLEmbedElement(Document* doc)
 
 HTMLEmbedElement::~HTMLEmbedElement() {}
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
 static inline RenderWidget* findWidgetRenderer(const Node* n) {
   if (!n->renderer())
     do
@@ -70,7 +65,6 @@ RenderWidget* HTMLEmbedElement::renderWidgetForJSBindings() const {
   }
   return renderWidget;
 }
-#endif
 
 bool HTMLEmbedElement::mapToEntry(const QualifiedName& attrName,
                                   MappedAttributeEntry& result) const {

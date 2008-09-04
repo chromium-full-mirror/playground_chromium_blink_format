@@ -27,6 +27,10 @@
 
 #include "StringImpl.h"
 
+#if USE(JSC)
+#include <kjs/identifier.h>
+#endif
+
 #if PLATFORM(CF)
 typedef const struct __CFString* CFStringRef;
 #endif
@@ -52,8 +56,10 @@ class String {
   String() {}  // gives null string, distinguishable from an empty string
   String(const UChar*, unsigned length);
   String(const UChar*);  // Specifically for null terminated UTF-16
+#if USE(JSC)
   String(const KJS::Identifier&);
   String(const KJS::UString&);
+#endif
   String(const char*);
   String(const char*, unsigned length);
   String(StringImpl* i) : m_impl(i) {}
@@ -76,7 +82,9 @@ class String {
     return StringImpl::adopt(vector);
   }
 
+#if USE(JSC)
   operator KJS::UString() const;
+#endif
 
   unsigned length() const;
   const UChar* characters() const;

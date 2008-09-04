@@ -31,8 +31,10 @@
 #include <kjs/identifier.h>
 #include <wtf/HashSet.h>
 
+#if USE(JSC)
 using KJS::Identifier;
 using KJS::UString;
+#endif
 
 namespace WebCore {
 
@@ -213,6 +215,7 @@ void AtomicString::remove(StringImpl* r) {
   stringTable->remove(r);
 }
 
+#if USE(JSC)
 PassRefPtr<StringImpl> AtomicString::add(const KJS::Identifier& identifier) {
   if (identifier.isNull())
     return 0;
@@ -246,6 +249,7 @@ PassRefPtr<StringImpl> AtomicString::add(const KJS::UString& ustring) {
     return *addResult.first;
   return adoptRef(*addResult.first);
 }
+#endif
 
 AtomicStringImpl* AtomicString::find(const KJS::Identifier& identifier) {
   if (identifier.isNull())

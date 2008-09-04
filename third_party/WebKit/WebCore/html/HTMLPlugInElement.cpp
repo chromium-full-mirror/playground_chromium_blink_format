@@ -36,7 +36,7 @@
 #include "Widget.h"
 #include "ScriptController.h"
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
+#if USE(JSC)
 #include "runtime.h"
 #endif
 
@@ -62,7 +62,7 @@ HTMLPlugInElement::HTMLPlugInElement(const QualifiedName& tagName,
 }
 
 HTMLPlugInElement::~HTMLPlugInElement() {
-#if USE(JAVASCRIPTCORE_BINDINGS)
+#if USE(JSC)
   ASSERT(!m_instance);  // cleared in detach()
 #endif
 
@@ -74,7 +74,7 @@ HTMLPlugInElement::~HTMLPlugInElement() {
 #endif
 }
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
+#if USE(JSC)
 void HTMLPlugInElement::detach() {
   m_instance.clear();
   HTMLFrameOwnerElement::detach();

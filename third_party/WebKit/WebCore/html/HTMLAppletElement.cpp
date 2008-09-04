@@ -125,7 +125,6 @@ RenderObject* HTMLAppletElement::createRenderer(RenderArena* arena,
   return RenderObject::createObject(this, style);
 }
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
 RenderWidget* HTMLAppletElement::renderWidgetForJSBindings() const {
   Settings* settings = document()->settings();
   if (!settings || !settings->isJavaEnabled())
@@ -137,7 +136,6 @@ RenderWidget* HTMLAppletElement::renderWidgetForJSBindings() const {
 
   return applet;
 }
-#endif
 
 void HTMLAppletElement::finishParsingChildren() {
   // The parser just reached </applet>, so all the params are available now.

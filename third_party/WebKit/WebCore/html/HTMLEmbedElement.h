@@ -55,9 +55,7 @@ class HTMLEmbedElement : public HTMLPlugInImageElement {
     m_needWidgetUpdate = needWidgetUpdate;
   }
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
   virtual RenderWidget* renderWidgetForJSBindings() const;
-#endif
 
   String src() const;
   void setSrc(const String&);

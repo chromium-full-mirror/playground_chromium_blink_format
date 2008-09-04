@@ -43,9 +43,7 @@ class HTMLAppletElement : public HTMLPlugInElement {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void finishParsingChildren();
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
   virtual RenderWidget* renderWidgetForJSBindings() const;
-#endif
 
   String alt() const;
   void setAlt(const String&);

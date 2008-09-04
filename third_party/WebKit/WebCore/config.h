@@ -88,10 +88,6 @@
 #include <wtf/DisallowCType.h>
 #endif
 
-#if PLATFORM(GTK)
-#define WTF_USE_JAVASCRIPTCORE_BINDINGS 1
-#endif
-
 #if COMPILER(MSVC)
 #define SKIP_STATIC_CONSTRUCTORS_ON_MSVC 1
 #else
@@ -99,7 +95,6 @@
 #endif
 
 #if PLATFORM(WIN)
-#define WTF_USE_JAVASCRIPTCORE_BINDINGS 1
 #define WTF_PLATFORM_CG 1
 #undef WTF_PLATFORM_CAIRO
 #define WTF_USE_CFNETWORK 1
@@ -108,12 +103,7 @@
 #define WTF_USE_PTHREADS 0
 #endif
 
-#if PLATFORM(MAC)
-#define WTF_USE_JAVASCRIPTCORE_BINDINGS 1
-#endif
-
 #if PLATFORM(SYMBIAN)
-#define WTF_USE_JAVASCRIPTCORE_BINDINGS 1
 #undef WIN32
 #undef _WIN32
 #undef SKIP_STATIC_CONSTRUCTORS_ON_GCC
@@ -129,6 +119,18 @@
 #include <limits.h>
 #include <wtf/MathExtras.h>
 #endif
+
+#if !defined(WTF_USE_V8)
+/* Currently Chromium is the only platform which uses V8 by default */
+#if PLATFORM(CHROMIUM)
+#define WTF_USE_V8 1
+#else
+#define WTF_USE_V8 0
+#endif /* PLATFORM(CHROMIUM) */
+#endif /* !defined(WTF_USE_V8) */
+
+/* Using V8 implies not using JSC and vice versa */
+#define WTF_USE_JSC !WTF_USE_V8
 
 #if PLATFORM(CG)
 #ifndef CGFLOAT_DEFINED

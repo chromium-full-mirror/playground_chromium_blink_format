@@ -39,10 +39,6 @@
 #include "ScriptController.h"
 #include "Text.h"
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
-#include "runtime.h"
-#endif
-
 namespace WebCore {
 
 using namespace EventNames;
@@ -56,7 +52,6 @@ HTMLObjectElement::HTMLObjectElement(Document* doc, bool createdByParser)
 
 HTMLObjectElement::~HTMLObjectElement() {}
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
 RenderWidget* HTMLObjectElement::renderWidgetForJSBindings() const {
   RenderWidget* renderWidget = (renderer() && renderer()->isWidget())
                                    ? static_cast<RenderWidget*>(renderer())
@@ -69,7 +64,6 @@ RenderWidget* HTMLObjectElement::renderWidgetForJSBindings() const {
   }
   return renderWidget;
 }
-#endif
 
 void HTMLObjectElement::parseMappedAttribute(MappedAttribute* attr) {
   String val = attr->value();

@@ -25,7 +25,7 @@
 
 #include "HTMLFrameOwnerElement.h"
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
+#if USE(JSC)
 namespace KJS {
 namespace Bindings {
 class Instance;
@@ -69,9 +69,9 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
 
   virtual void defaultEventHandler(Event*);
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
-  virtual void detach();
   virtual RenderWidget* renderWidgetForJSBindings() const = 0;
+#if USE(JSC)
+  virtual void detach();
   KJS::Bindings::Instance* getInstance() const;
 #endif
 
@@ -83,7 +83,7 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
   static void updateWidgetCallback(Node*);
 
   AtomicString m_name;
-#if USE(JAVASCRIPTCORE_BINDINGS)
+#if USE(JSC)
   mutable RefPtr<KJS::Bindings::Instance> m_instance;
 #endif
 #if ENABLE(NETSCAPE_PLUGIN_API)
