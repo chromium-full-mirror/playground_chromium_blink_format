@@ -83,6 +83,11 @@
 #define WTF_PLATFORM_UNIX 1
 #endif
 
+/* PLATFORM(CHROMIUM) */
+#if defined(BUILDING_CHROMIUM__)
+#define WTF_PLATFORM_CHROMIUM 1
+#endif
+
 /* Operating environments */
 
 /* PLATFORM(QT) */
@@ -109,12 +114,19 @@
 
 /* Graphics engines */
 
-/* PLATFORM(CG) */
-/* PLATFORM(CAIRO) */
+/* PLATFORM(CG) and PLATFORM(CI) */
 #if PLATFORM(MAC)
 #define WTF_PLATFORM_CG 1
 #define WTF_PLATFORM_CI 1
-#elif !PLATFORM(QT) && !PLATFORM(WX)
+#endif
+
+/* PLATFORM(SKIA) */
+#if PLATFORM(CHROMIUM)
+#define WTF_PLATFORM_SKIA 1
+#endif
+
+/* Makes PLATFORM(WIN) default to PLATFORM(CAIRO) */
+#if !PLATFORM(MAC) && !PLATFORM(QT) && !PLATFORM(WX)
 #define WTF_PLATFORM_CAIRO 1
 #endif
 
@@ -230,12 +242,6 @@
 #endif
 #endif
 
-#if (PLATFORM(MAC) || PLATFORM(GTK) || PLATFORM(SYMBIAN) || PLATFORM(WIN) || \
-     PLATFORM(WX)) &&                                                        \
-    !defined(ENABLE_NETSCAPE_PLUGIN_API)
-#define ENABLE_NETSCAPE_PLUGIN_API 1
-#endif
-
 #if PLATFORM(WIN)
 #define WTF_USE_WININET 1
 #endif
@@ -243,10 +249,6 @@
 #if PLATFORM(WX)
 #define WTF_USE_CURL 1
 #define WTF_USE_PTHREADS 1
-#endif
-
-#if (PLATFORM(MAC) || PLATFORM(WIN)) && !defined(ENABLE_DASHBOARD_SUPPORT)
-#define ENABLE_DASHBOARD_SUPPORT 1
 #endif
 
 #if PLATFORM(MAC) || PLATFORM(WIN) || PLATFORM(GTK)
@@ -302,12 +304,16 @@
 #define ENABLE_FTPDIR 1
 #endif
 
+#if !defined(ENABLE_DASHBOARD_SUPPORT)
+#define ENABLE_DASHBOARD_SUPPORT 0
+#endif
+
 #if !defined(ENABLE_MAC_JAVA_BRIDGE)
 #define ENABLE_MAC_JAVA_BRIDGE 0
 #endif
 
 #if !defined(ENABLE_NETSCAPE_PLUGIN_API)
-#define ENABLE_NETSCAPE_PLUGIN_API 0
+#define ENABLE_NETSCAPE_PLUGIN_API 1
 #endif
 
 #if !defined(ENABLE_DASHBOARD_SUPPORT)
