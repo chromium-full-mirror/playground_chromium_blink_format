@@ -125,7 +125,7 @@ JSValue* PropertyMap::get(const Identifier& propertyName,
   ++numProbes;
 #endif
 
-  unsigned entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+  unsigned entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
   if (entryIndex == emptyEntryIndex)
     return 0;
 
@@ -147,7 +147,7 @@ JSValue* PropertyMap::get(const Identifier& propertyName,
     ++numRehashes;
 #endif
 
-    entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+    entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
     if (entryIndex == emptyEntryIndex)
       return 0;
 
@@ -177,7 +177,7 @@ JSValue* PropertyMap::get(const Identifier& propertyName) const {
   ++numProbes;
 #endif
 
-  unsigned entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+  unsigned entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
   if (entryIndex == emptyEntryIndex)
     return 0;
 
@@ -197,7 +197,7 @@ JSValue* PropertyMap::get(const Identifier& propertyName) const {
     ++numRehashes;
 #endif
 
-    entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+    entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
     if (entryIndex == emptyEntryIndex)
       return 0;
 
@@ -225,7 +225,7 @@ JSValue** PropertyMap::getLocation(const Identifier& propertyName) {
   ++numProbes;
 #endif
 
-  unsigned entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+  unsigned entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
   if (entryIndex == emptyEntryIndex)
     return 0;
 
@@ -245,7 +245,7 @@ JSValue** PropertyMap::getLocation(const Identifier& propertyName) {
     ++numRehashes;
 #endif
 
-    entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+    entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
     if (entryIndex == emptyEntryIndex)
       return 0;
 
@@ -276,7 +276,7 @@ JSValue** PropertyMap::getLocation(const Identifier& propertyName,
   ++numProbes;
 #endif
 
-  unsigned entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+  unsigned entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
   if (entryIndex == emptyEntryIndex)
     return 0;
 
@@ -298,7 +298,7 @@ JSValue** PropertyMap::getLocation(const Identifier& propertyName,
     ++numRehashes;
 #endif
 
-    entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+    entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
     if (entryIndex == emptyEntryIndex)
       return 0;
 
@@ -357,7 +357,7 @@ void PropertyMap::put(const Identifier& propertyName,
 #endif
 
   while (1) {
-    unsigned entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+    unsigned entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
     if (entryIndex == emptyEntryIndex)
       break;
 
@@ -411,7 +411,7 @@ void PropertyMap::put(const Identifier& propertyName,
   }
 
   // Create a new hash table entry.
-  m_u.table->entryIndicies[i & m_u.table->sizeMask] = entryIndex;
+  m_u.table->entryIndices[i & m_u.table->sizeMask] = entryIndex;
 
   // Create a new hash table entry.
   rep->ref();
@@ -442,7 +442,7 @@ void PropertyMap::insert(const Entry& entry) {
 #endif
 
   while (1) {
-    unsigned entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+    unsigned entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
     if (entryIndex == emptyEntryIndex)
       break;
 
@@ -461,7 +461,7 @@ void PropertyMap::insert(const Entry& entry) {
   }
 
   unsigned entryIndex = m_u.table->keyCount + 2;
-  m_u.table->entryIndicies[i & m_u.table->sizeMask] = entryIndex;
+  m_u.table->entryIndices[i & m_u.table->sizeMask] = entryIndex;
   m_u.table->entries()[entryIndex - 1] = entry;
   ++m_u.table->keyCount;
 }
@@ -566,7 +566,7 @@ void PropertyMap::remove(const Identifier& propertyName) {
   unsigned entryIndex;
   UString::Rep* key = 0;
   while (1) {
-    entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+    entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
     if (entryIndex == emptyEntryIndex)
       return;
 
@@ -590,7 +590,7 @@ void PropertyMap::remove(const Identifier& propertyName) {
 
   // Replace this one element with the deleted sentinel. Also clear out
   // the entry so we can iterate all the entries as needed.
-  m_u.table->entryIndicies[i & m_u.table->sizeMask] = deletedSentinelIndex;
+  m_u.table->entryIndices[i & m_u.table->sizeMask] = deletedSentinelIndex;
   key->deref();
   m_u.table->entries()[entryIndex - 1].key = 0;
   m_u.table->entries()[entryIndex - 1].value = jsUndefined();
@@ -712,7 +712,7 @@ void PropertyMap::checkConsistency() {
   unsigned indexCount = 0;
   unsigned deletedIndexCount = 0;
   for (unsigned a = 0; a != m_u.table->size; ++a) {
-    unsigned entryIndex = m_u.table->entryIndicies[a];
+    unsigned entryIndex = m_u.table->entryIndices[a];
     if (entryIndex == emptyEntryIndex)
       continue;
     if (entryIndex == deletedSentinelIndex) {
@@ -725,7 +725,7 @@ void PropertyMap::checkConsistency() {
     ++indexCount;
 
     for (unsigned b = a + 1; b != m_u.table->size; ++b)
-      ASSERT(m_u.table->entryIndicies[b] != entryIndex);
+      ASSERT(m_u.table->entryIndices[b] != entryIndex);
   }
   ASSERT(indexCount == m_u.table->keyCount);
   ASSERT(deletedIndexCount == m_u.table->deletedSentinelCount);
@@ -745,7 +745,7 @@ void PropertyMap::checkConsistency() {
     unsigned k = 0;
     unsigned entryIndex;
     while (1) {
-      entryIndex = m_u.table->entryIndicies[i & m_u.table->sizeMask];
+      entryIndex = m_u.table->entryIndices[i & m_u.table->sizeMask];
       ASSERT(entryIndex != emptyEntryIndex);
       if (rep == m_u.table->entries()[entryIndex - 1].key)
         break;
