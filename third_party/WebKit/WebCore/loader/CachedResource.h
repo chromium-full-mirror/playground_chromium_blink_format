@@ -105,7 +105,7 @@ class CachedResource {
     m_requestedFromNetworkingLayer = true;
   }
 
-  virtual void allReferencesRemoved(){};
+  virtual void allClientsRemoved(){};
 
   unsigned count() const { return m_clients.size(); }
 

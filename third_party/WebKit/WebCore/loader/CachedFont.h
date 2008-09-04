@@ -54,7 +54,7 @@ class CachedFont : public CachedResource {
   virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);
   virtual void error();
 
-  virtual void allReferencesRemoved();
+  virtual void allClientsRemoved();
 
   virtual bool schedule() const { return true; }
 

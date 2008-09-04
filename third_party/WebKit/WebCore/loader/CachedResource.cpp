@@ -130,7 +130,7 @@ void CachedResource::removeClient(CachedResourceClient* c) {
   else if (!hasClients() && inCache()) {
     cache()->removeFromLiveResourcesSize(this);
     cache()->removeFromLiveDecodedResourcesList(this);
-    allReferencesRemoved();
+    allClientsRemoved();
     cache()->prune();
   }
 }
