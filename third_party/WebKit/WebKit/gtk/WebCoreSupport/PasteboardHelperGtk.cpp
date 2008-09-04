@@ -17,9 +17,10 @@
  * USA
  */
 
-#include "Frame.h"
+#include "config.h"
 #include "PasteboardHelperGtk.h"
 
+#include "Frame.h"
 #include "webkitwebframe.h"
 #include "webkitwebview.h"
 #include "webkitprivate.h"
