@@ -249,6 +249,7 @@ class FrameLoaderClientWx : public FrameLoaderClient,
                                const String&,
                                bool loadManually);
   virtual void redirectDataToPlugin(Widget* pluginWidget);
+  virtual ResourceError pluginWillHandleLoadError(const ResourceResponse&);
 
   virtual Widget* createJavaAppletWidget(const IntSize&,
                                          Element*,
