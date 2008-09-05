@@ -40,7 +40,7 @@ FEImage::~FEImage() {
 }
 
 CachedImage* FEImage::cachedImage() const {
-  return m_cachedImage;
+  return m_cachedImage.get();
 }
 
 void FEImage::setCachedImage(CachedImage* image) {
