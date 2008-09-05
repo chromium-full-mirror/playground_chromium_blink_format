@@ -25,6 +25,7 @@
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
 #include "CachedImage.h"
 #include "CachedResourceClient.h"
+#include "CachedResourceHandle.h"
 #include "FilterEffect.h"
 
 namespace WebCore {
@@ -46,7 +47,7 @@ class FEImage : public FilterEffect, public CachedResourceClient {
  private:
   FEImage(CachedImage*);
 
-  CachedImage* m_cachedImage;
+  CachedResourceHandle<CachedImage> m_cachedImage;
 };
 
 }  // namespace WebCore

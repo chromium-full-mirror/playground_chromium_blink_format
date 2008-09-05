@@ -30,6 +30,7 @@
 #define UserStyleSheetLoader_h
 
 #include "CachedResourceClient.h"
+#include "CachedResourceHandle.h"
 
 #include "Document.h"
 
@@ -50,7 +51,7 @@ class UserStyleSheetLoader : CachedResourceClient {
                                 const CachedCSSStyleSheet* sheet);
 
   RefPtr<Document> m_document;
-  CachedCSSStyleSheet* m_cachedSheet;
+  CachedResourceHandle<CachedCSSStyleSheet> m_cachedSheet;
 };
 
 }  // namespace WebCore

@@ -212,7 +212,8 @@ void HTMLTokenizer::reset() {
   ASSERT(m_executingScript == 0);
 
   while (!pendingScripts.isEmpty()) {
-    CachedScript* cs = pendingScripts.dequeue();
+    CachedScript* cs = pendingScripts.first().get();
+    pendingScripts.removeFirst();
     ASSERT(cache()->disabled() || cs->accessCount() > 0);
     cs->removeClient(this);
   }
@@ -447,7 +448,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
         // If so, we don't want to load scripts.
         if (!m_parserStopped && (cs = m_doc->docLoader()->requestScript(
                                      scriptSrc, scriptSrcCharset)))
-          pendingScripts.enqueue(cs);
+          pendingScripts.append(cs);
         else
           scriptNode = 0;
       } else
@@ -2058,8 +2059,9 @@ void HTMLTokenizer::notifyFinished(CachedResource*) {
     return;
 
   bool finished = false;
-  while (!finished && pendingScripts.head()->isLoaded()) {
-    CachedScript* cs = pendingScripts.dequeue();
+  while (!finished && pendingScripts.first()->isLoaded()) {
+    CachedScript* cs = pendingScripts.first().get();
+    pendingScripts.removeFirst();
     ASSERT(cache()->disabled() || cs->accessCount() > 0);
 
     String scriptSource = cs->script();

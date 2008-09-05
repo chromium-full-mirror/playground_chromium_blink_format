@@ -28,6 +28,7 @@
 
 #include "AtomicString.h"
 #include "CachedResourceClient.h"
+#include "CachedResourceHandle.h"
 #include <wtf/HashMap.h>
 
 #if ENABLE(SVG_FONTS)
@@ -74,8 +75,9 @@ class CSSFontFaceSource : public CachedResourceClient {
 
  private:
   AtomicString m_string;  // URI for remote, built-in font name for local.
-  CachedFont* m_font;     // For remote fonts, a pointer to our cached resource.
-  CSSFontFace* m_face;    // Our owning font face.
+  CachedResourceHandle<CachedFont>
+      m_font;           // For remote fonts, a pointer to our cached resource.
+  CSSFontFace* m_face;  // Our owning font face.
   HashMap<unsigned, SimpleFontData*>
       m_fontDataTable;  // The hash key is composed of size synthetic styles.
 

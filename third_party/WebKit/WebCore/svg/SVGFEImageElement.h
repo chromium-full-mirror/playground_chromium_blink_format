@@ -24,6 +24,7 @@
 #define SVGFEImageElement_h
 
 #if ENABLE(SVG) && ENABLE(SVG_FILTERS)
+#include "CachedResourceHandle.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 #include "SVGURIReference.h"
 #include "SVGLangSpace.h"
@@ -60,7 +61,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                  PreserveAspectRatio,
                                  preserveAspectRatio)
 
-  CachedImage* m_cachedImage;
+  CachedResourceHandle<CachedImage> m_cachedImage;
   mutable RefPtr<FEImage> m_filterEffect;
 };
 

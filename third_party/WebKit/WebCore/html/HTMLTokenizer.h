@@ -24,14 +24,15 @@
 #ifndef HTMLTokenizer_h
 #define HTMLTokenizer_h
 
-#include "DeprecatedPtrQueue.h"
+#include "CachedResourceClient.h"
+#include "CachedResourceHandle.h"
 #include "NamedMappedAttrMap.h"
 #include "SegmentedString.h"
 #include "Timer.h"
 #include "Tokenizer.h"
-#include "CachedResourceClient.h"
-#include <wtf/Vector.h>
+#include <wtf/Deque.h>
 #include <wtf/OwnPtr.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -413,7 +414,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   // the output of the script to be postponed until after the script has
   // finished executing
   int m_executingScript;
-  DeprecatedPtrQueue<CachedScript> pendingScripts;
+  Deque<CachedResourceHandle<CachedScript>> pendingScripts;
   RefPtr<Node> scriptNode;
 
   bool m_requestingScript;
