@@ -78,6 +78,7 @@ class Console : public RefCounted<Console> {
                   unsigned lineNumber,
                   const String& sourceURL);
 
+#if USE(JSC)
   void debug(KJS::ExecState*, const KJS::ArgList&);
   void error(KJS::ExecState*, const KJS::ArgList&);
   void info(KJS::ExecState*, const KJS::ArgList&);
@@ -95,7 +96,7 @@ class Console : public RefCounted<Console> {
 
   void reportException(KJS::ExecState*, KJS::JSValue*);
   void reportCurrentException(KJS::ExecState*);
-
+#endif
  private:
   inline Page* page() const;
 

@@ -589,13 +589,13 @@ String::String(const UString& str) {
     return;
   m_impl = StringImpl::create(str.data(), str.size());
 }
-#endif
 
 String::operator UString() const {
   if (!m_impl)
     return UString();
   return UString(m_impl->characters(), m_impl->length());
 }
+#endif
 
 // String Operations
 
