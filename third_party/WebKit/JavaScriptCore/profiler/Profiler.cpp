@@ -57,11 +57,10 @@ Profiler* Profiler::profiler() {
 }
 
 void Profiler::startProfiling(ExecState* exec, const UString& title) {
-  ASSERT_ARG(exec, exec);
-
   // Check if we currently have a Profile for this global ExecState and title.
   // If so return early and don't create a new Profile.
-  ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
+  ExecState* globalExec = exec ? exec->lexicalGlobalObject()->globalExec() : 0;
+
   for (size_t i = 0; i < m_currentProfiles.size(); ++i) {
     ProfileGenerator* profileGenerator = m_currentProfiles[i].get();
     if (profileGenerator->originatingGlobalExec() == globalExec &&
@@ -77,7 +76,7 @@ void Profiler::startProfiling(ExecState* exec, const UString& title) {
 
 PassRefPtr<Profile> Profiler::stopProfiling(ExecState* exec,
                                             const UString& title) {
-  ExecState* globalExec = exec->lexicalGlobalObject()->globalExec();
+  ExecState* globalExec = exec ? exec->lexicalGlobalObject()->globalExec() : 0;
   for (ptrdiff_t i = m_currentProfiles.size() - 1; i >= 0; --i) {
     ProfileGenerator* profileGenerator = m_currentProfiles[i].get();
     if (profileGenerator->originatingGlobalExec() == globalExec &&
@@ -102,7 +101,8 @@ static inline void dispatchFunctionToProfiles(
     const CallIdentifier& callIdentifier,
     unsigned currentProfileTargetGroup) {
   for (size_t i = 0; i < profiles.size(); ++i) {
-    if (profiles[i]->profileGroup() == currentProfileTargetGroup)
+    if (profiles[i]->profileGroup() == currentProfileTargetGroup ||
+        !profiles[i]->originatingGlobalExec())
       (profiles[i].get()->*function)(callIdentifier);
   }
 }
