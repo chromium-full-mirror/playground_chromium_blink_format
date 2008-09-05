@@ -42,6 +42,8 @@ enum ResourceRequestCachePolicy {
                             // cache
 };
 
+const int unspecifiedTimeoutInterval = INT_MAX;
+
 class ResourceRequest;
 
 // Do not use this type directly.  Use ResourceRequest instead.
@@ -109,7 +111,7 @@ class ResourceRequestBase {
   ResourceRequestBase(const KURL& url, ResourceRequestCachePolicy policy)
       : m_url(url),
         m_cachePolicy(policy),
-        m_timeoutInterval(defaultTimeoutInterval),
+        m_timeoutInterval(unspecifiedTimeoutInterval),
         m_httpMethod("GET"),
         m_allowHTTPCookies(true),
         m_resourceRequestUpdated(true),
@@ -117,8 +119,6 @@ class ResourceRequestBase {
 
   void updatePlatformRequest() const;
   void updateResourceRequest() const;
-
-  static const int defaultTimeoutInterval = 60;
 
   KURL m_url;
 
