@@ -306,6 +306,9 @@ void WebPreferences::initializeDefaultSettings() {
       defaults, CFSTR(WebKitOfflineWebApplicationCacheEnabledPreferenceKey),
       kCFBooleanFalse);
 
+  CFDictionaryAddValue(defaults, CFSTR(WebKitPaintNativeControlsPreferenceKey),
+                       kCFBooleanFalse);
+
   defaultSettings = defaults;
 }
 
@@ -1087,6 +1090,16 @@ HRESULT WebPreferences::setShouldPaintCustomScrollbars(BOOL shouldPaint) {
 HRESULT WebPreferences::shouldPaintCustomScrollbars(BOOL* shouldPaint) {
   *shouldPaint =
       boolValueForKey(CFSTR(WebKitPaintCustomScrollbarsPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::shouldPaintNativeControls(BOOL* shouldPaint) {
+  *shouldPaint = boolValueForKey(CFSTR(WebKitPaintNativeControlsPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::setShouldPaintNativeControls(BOOL shouldPaint) {
+  setBoolValue(CFSTR(WebKitPaintNativeControlsPreferenceKey), shouldPaint);
   return S_OK;
 }
 

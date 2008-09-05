@@ -29,8 +29,6 @@
 #include "PlatformString.h"
 #include "SoftLinking.h"
 
-#include <cairo-win32.h>
-
 /*
  * The following constants are used to determine how a widget is drawn using
  * Windows' Theme API. For more information on theme parts and states see
@@ -133,10 +131,12 @@ SOFT_LINK(uxtheme,
 
 namespace WebCore {
 
+#if !USE(SAFARI_THEME)
 RenderTheme* theme() {
   static RenderThemeWin winTheme;
   return &winTheme;
 }
+#endif
 
 RenderThemeWin::RenderThemeWin()
     : m_buttonTheme(0), m_textFieldTheme(0), m_menuListTheme(0) {}

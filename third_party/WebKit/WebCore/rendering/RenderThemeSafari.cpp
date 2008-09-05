@@ -20,6 +20,8 @@
 
 #include "config.h"
 #include "RenderThemeSafari.h"
+#include "RenderThemeWin.h"
+#include "Settings.h"
 
 #if USE(SAFARI_THEME)
 
@@ -55,6 +57,9 @@ enum { topPadding, rightPadding, bottomPadding, leftPadding };
 
 RenderTheme* theme() {
   static RenderThemeSafari safariTheme;
+  static RenderThemeWin windowsTheme;
+  if (Settings::shouldPaintNativeControls())
+    return &windowsTheme;
   return &safariTheme;
 }
 

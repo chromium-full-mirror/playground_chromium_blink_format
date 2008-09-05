@@ -316,6 +316,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setLocalStorageDatabasePath(
       /* [in] */ BSTR location);
 
+  virtual HRESULT STDMETHODCALLTYPE setShouldPaintNativeControls(
+      /* [in] */ BOOL shouldPaint);
+
+  virtual HRESULT STDMETHODCALLTYPE shouldPaintNativeControls(
+      /* [retval][out] */ BOOL* shouldPaint);
+
   // WebPreferences
 
   // This method accesses a different preference key than
