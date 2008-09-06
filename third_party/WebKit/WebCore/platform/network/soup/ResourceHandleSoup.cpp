@@ -42,11 +42,7 @@ namespace WebCore {
 
 static SoupSession* session = 0;
 
-typedef enum {
-  ERROR_TRANSPORT,
-  ERROR_UNKNOWN_PROTOCOL,
-  ERROR_BAD_NON_HTTP_METHOD
-};
+enum { ERROR_TRANSPORT, ERROR_UNKNOWN_PROTOCOL, ERROR_BAD_NON_HTTP_METHOD };
 
 ResourceHandleInternal::~ResourceHandleInternal() {
   if (m_msg) {
