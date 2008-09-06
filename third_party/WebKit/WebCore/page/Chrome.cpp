@@ -57,7 +57,6 @@ class PageGroupLoadDeferrer : Noncopyable {
 
  private:
   Vector<RefPtr<Frame>, 16> m_deferredFrames;
-  bool m_wasDeferringTimers;
 #if !PLATFORM(MAC)
   Vector<pair<RefPtr<Frame>, PausedTimeouts*>, 16> m_pausedTimeouts;
 #endif
@@ -390,11 +389,7 @@ bool ChromeClient::paintCustomScrollCorner(GraphicsContext*, const FloatRect&) {
 
 // --------
 
-PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf)
-    : m_wasDeferringTimers(isDeferringTimers()) {
-  if (!m_wasDeferringTimers)
-    setDeferringTimers(true);
-
+PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {
   const HashSet<Page*>& pages = page->group().pages();
 
   HashSet<Page*>::const_iterator end = pages.end();
@@ -424,9 +419,6 @@ PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf)
 }
 
 PageGroupLoadDeferrer::~PageGroupLoadDeferrer() {
-  if (!m_wasDeferringTimers)
-    setDeferringTimers(false);
-
   for (size_t i = 0; i < m_deferredFrames.size(); ++i)
     if (Page* page = m_deferredFrames[i]->page())
       page->setDefersLoading(false);
