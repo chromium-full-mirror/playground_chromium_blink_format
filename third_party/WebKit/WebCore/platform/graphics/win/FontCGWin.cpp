@@ -352,14 +352,11 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
         matrix, CGAffineTransformMake(1, 0, skew, 1, 0, 0));
   }
 
+  CGContextSetTextMatrix(cgContext, matrix);
+
   // Uniscribe gives us offsets to help refine the positioning of combining
   // glyphs.
   FloatSize translation = glyphBuffer.offsetAt(from);
-  if (translation.width() || translation.height())
-    CGAffineTransformTranslate(matrix, translation.width(),
-                               translation.height());
-
-  CGContextSetTextMatrix(cgContext, matrix);
 
   CGContextSetFontSize(cgContext, platformData.size());
   wkSetCGContextFontRenderingStyle(cgContext, font->isSystemFont(), false);
@@ -380,8 +377,9 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
                           shadowColor.blue(),
                           shadowColor.alpha() * fillColor.alpha() / 255);
     graphicsContext->setFillColor(shadowFillColor);
-    CGContextSetTextPosition(cgContext, point.x() + shadowSize.width(),
-                             point.y() + shadowSize.height());
+    CGContextSetTextPosition(
+        cgContext, point.x() + translation.width() + shadowSize.width(),
+        point.y() + translation.height() + shadowSize.height());
     CGContextShowGlyphsWithAdvances(cgContext, glyphBuffer.glyphs(from),
                                     glyphBuffer.advances(from), numGlyphs);
     if (font->m_syntheticBoldOffset) {
@@ -394,7 +392,8 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
     graphicsContext->setFillColor(fillColor);
   }
 
-  CGContextSetTextPosition(cgContext, point.x(), point.y());
+  CGContextSetTextPosition(cgContext, point.x() + translation.width(),
+                           point.y() + translation.height());
   CGContextShowGlyphsWithAdvances(cgContext, glyphBuffer.glyphs(from),
                                   glyphBuffer.advances(from), numGlyphs);
   if (font->m_syntheticBoldOffset) {
