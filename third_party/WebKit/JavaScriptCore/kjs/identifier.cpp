@@ -123,11 +123,13 @@ PassRefPtr<UString::Rep> Identifier::add(JSGlobalData* globalData,
     UString::Rep::null.hash();
     return &UString::Rep::null;
   }
-
   if (!c[0]) {
     UString::Rep::empty.hash();
     return &UString::Rep::empty;
   }
+  if (!c[1])
+    return add(globalData, globalData->smallStrings.singleCharacterStringRep(
+                               static_cast<unsigned char>(c[0])));
 
   IdentifierTable& identifierTable = *globalData->identifierTable;
   LiteralIdentifierTable& literalIdentifierTable =
@@ -180,11 +182,16 @@ struct UCharBufferTranslator {
 PassRefPtr<UString::Rep> Identifier::add(JSGlobalData* globalData,
                                          const UChar* s,
                                          int length) {
+  if (length == 1) {
+    UChar c = s[0];
+    if (c <= 0xFF)
+      return add(globalData,
+                 globalData->smallStrings.singleCharacterStringRep(c));
+  }
   if (!length) {
     UString::Rep::empty.hash();
     return &UString::Rep::empty;
   }
-
   UCharBuffer buf = {s, length};
   return *globalData->identifierTable
               ->add<UCharBuffer, UCharBufferTranslator>(buf)
@@ -200,12 +207,19 @@ PassRefPtr<UString::Rep> Identifier::add(ExecState* exec,
 PassRefPtr<UString::Rep> Identifier::addSlowCase(JSGlobalData* globalData,
                                                  UString::Rep* r) {
   ASSERT(!r->identifierTable());
-
-  if (r->len == 0) {
+  if (r->len == 1) {
+    UChar c = r->data()[0];
+    if (c <= 0xFF)
+      r = globalData->smallStrings.singleCharacterStringRep(c);
+    if (r->identifierTable()) {
+      checkSameIdentifierTable(globalData, r);
+      return r;
+    }
+  }
+  if (!r->len) {
     UString::Rep::empty.hash();
     return &UString::Rep::empty;
   }
-
   return *globalData->identifierTable->add(r).first;
 }
 
@@ -219,6 +233,7 @@ void Identifier::remove(UString::Rep* r) {
 }
 
 #ifndef NDEBUG
+
 void Identifier::checkSameIdentifierTable(ExecState* exec, UString::Rep* rep) {
   ASSERT(rep->identifierTable() == exec->identifierTable());
 }
@@ -227,10 +242,7 @@ void Identifier::checkSameIdentifierTable(JSGlobalData* globalData,
                                           UString::Rep* rep) {
   ASSERT(rep->identifierTable() == globalData->identifierTable);
 }
-#else
-void Identifier::checkSameIdentifierTable(ExecState*, UString::Rep*) {}
 
-void Identifier::checkSameIdentifierTable(JSGlobalData*, UString::Rep*) {}
 #endif
 
 }  // namespace KJS
