@@ -69,6 +69,7 @@ class Loader : Noncopyable {
     void servePendingRequests(Priority minimumPriority = Low);
     void cancelRequests(DocLoader*);
     bool hasRequests() const;
+    bool processingResource() const { return m_processingResource; }
 
    private:
     virtual void didReceiveResponse(SubresourceLoader*,
@@ -88,6 +89,7 @@ class Loader : Noncopyable {
     RequestMap m_requestsLoading;
     const AtomicString m_name;
     const int m_maxRequestsInFlight;
+    bool m_processingResource;
   };
   typedef HashMap<AtomicStringImpl*, Host*> HostMap;
   HostMap m_hosts;
