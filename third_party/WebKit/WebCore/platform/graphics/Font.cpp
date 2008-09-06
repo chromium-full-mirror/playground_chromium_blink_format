@@ -144,7 +144,8 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
 
   bool rtl = m_run.rtl();
   bool hasExtraSpacing =
-      m_font->letterSpacing() || m_font->wordSpacing() || m_padding;
+      (m_font->letterSpacing() || m_font->wordSpacing() || m_padding) &&
+      !m_run.spacingDisabled();
 
   float runWidthSoFar = m_runWidthSoFar;
   float lastRoundingWidth = m_finalRoundingWidth;
@@ -205,7 +206,7 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
         width = fontData->m_adjustedSpaceWidth;
     }
 
-    if (hasExtraSpacing && !m_run.spacingDisabled()) {
+    if (hasExtraSpacing) {
       // Account for letter-spacing.
       if (width && m_font->letterSpacing())
         width += m_font->letterSpacing();

@@ -107,6 +107,11 @@
 #define WTF_USE_PTHREADS 0
 #endif
 
+#if PLATFORM(MAC)
+#define WTF_USE_ATSUI 1
+#define WTF_USE_CORE_TEXT 0
+#endif
+
 #if PLATFORM(SYMBIAN)
 #undef WIN32
 #undef _WIN32
