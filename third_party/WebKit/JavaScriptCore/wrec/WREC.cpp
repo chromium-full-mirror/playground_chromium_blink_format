@@ -569,7 +569,7 @@ void WRECGenerator::generateNonGreedyQuantifier(JmpSrcVector& failures,
   // (2.1) recursively call to parseAlternative, if it falls through, success!
   m_jit.emitPushl_r(CURR_POS_REG);
   m_parser.parseAlternative(newFailures);
-  m_jit.emitAddl_i8r(4, IA32MacroAssembler::esp);
+  m_jit.emitAddl_i8r(4, X86Assembler::esp);
   m_jit.emitPopl_r(QUANTIFIER_COUNT_REG);
   // (2.2) link failure cases to jump back up to alternativeFailed.
   for (unsigned i = 0; i < newFailures.size(); ++i)
@@ -657,7 +657,7 @@ void WRECGenerator::generateGreedyQuantifier(JmpSrcVector& failures,
   // (2.2) recursively call to parseAlternative, if it falls through, success!
   m_jit.emitPushl_r(CURR_POS_REG);
   m_parser.parseAlternative(newFailures);
-  m_jit.emitAddl_i8r(4, IA32MacroAssembler::esp);
+  m_jit.emitAddl_i8r(4, X86Assembler::esp);
   m_jit.emitPopl_r(QUANTIFIER_COUNT_REG);
   // (2.3) link failure cases to here.
   for (unsigned i = 0; i < newFailures.size(); ++i)
@@ -887,7 +887,7 @@ WRECGenerator::JmpSrc WRECGenerator::generateParentheses(ParenthesesType type) {
     m_jit.emitMovl_rm(CURR_POS_REG, (2 * subpatternId + 1) * sizeof(int),
                       OUTPUT_REG);
   } else if (type == non_capturing)
-    m_jit.emitAddl_i8r(4, IA32MacroAssembler::esp);
+    m_jit.emitAddl_i8r(4, X86Assembler::esp);
   else
     m_jit.emitPopl_r(CURR_POS_REG);
 
@@ -1104,7 +1104,7 @@ void WRECGenerator::generateBackreference(JmpSrcVector& failures,
   // Success
   m_jit.link(endOfBackRef, m_jit.label());
   m_jit.emitPopl_r(QUANTIFIER_COUNT_REG);
-  m_jit.emitAddl_i8r(4, IA32MacroAssembler::esp);
+  m_jit.emitAddl_i8r(4, X86Assembler::esp);
 }
 
 void WRECGenerator::gernerateDisjunction(JmpSrcVector& successes,
@@ -1117,7 +1117,7 @@ void WRECGenerator::gernerateDisjunction(JmpSrcVector& successes,
     m_jit.link(failures[i], here);
   failures.clear();
 
-  m_jit.emitMovl_mr(IA32MacroAssembler::esp, CURR_POS_REG);
+  m_jit.emitMovl_mr(X86Assembler::esp, CURR_POS_REG);
 }
 
 void WRECGenerator::terminateDisjunction(JmpSrcVector& successes) {

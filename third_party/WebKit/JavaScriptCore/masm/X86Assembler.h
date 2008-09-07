@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef IA32MacroAsm_h
-#define IA32MacroAsm_h
+#ifndef X86Assembler_h
+#define X86Assembler_h
 
 #if ENABLE(MASM) && PLATFORM(X86)
 
@@ -123,7 +123,7 @@ class JITCodeBuffer {
 #define SIB(type, reg, rm) MODRM(type, reg, rm)
 #define CAN_SIGN_EXTEND_8_32(value) (value == ((int)(signed char)value))
 
-class IA32MacroAssembler {
+class X86Assembler {
  public:
   typedef enum {
     eax,
@@ -211,7 +211,7 @@ class IA32MacroAssembler {
 
   static const int MAX_INSTRUCTION_SIZE = 16;
 
-  IA32MacroAssembler(JITCodeBuffer* m_buffer) : m_buffer(m_buffer) {
+  X86Assembler(JITCodeBuffer* m_buffer) : m_buffer(m_buffer) {
     m_buffer->reset();
   }
 
@@ -533,7 +533,7 @@ class IA32MacroAssembler {
   // Opaque label types
 
   class JmpSrc {
-    friend class IA32MacroAssembler;
+    friend class X86Assembler;
 
    public:
     JmpSrc() : m_offset(-1) {}
@@ -545,7 +545,7 @@ class IA32MacroAssembler {
   };
 
   class JmpDst {
-    friend class IA32MacroAssembler;
+    friend class X86Assembler;
 
    public:
     JmpDst() : m_offset(-1) {}
@@ -788,4 +788,4 @@ class IA32MacroAssembler {
 
 #endif  // ENABLE(MASM) && PLATFORM(X86)
 
-#endif  // IA32MacroAsm_h
+#endif  // X86Assembler_h
