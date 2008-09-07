@@ -108,6 +108,8 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
   TTGetNewFontName(&m_fontReference, logFont.lfFaceName, LF_FACESIZE, 0, 0);
 
   logFont.lfHeight = -size;
+  if (renderingMode == NormalRenderingMode)
+    logFont.lfHeight *= 32;
   logFont.lfWidth = 0;
   logFont.lfEscapement = 0;
   logFont.lfOrientation = 0;
