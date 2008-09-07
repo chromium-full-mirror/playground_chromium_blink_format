@@ -333,13 +333,13 @@ scan:
   Block* targetBlock;
   size_t targetBlockUsedCells;
   if (i != usedBlocks) {
-    targetBlock = (Block*)heap.blocks[i];
+    targetBlock = reinterpret_cast<Block*>(heap.blocks[i]);
     targetBlockUsedCells = targetBlock->usedCells;
     ASSERT(targetBlockUsedCells <= HeapConstants<heapType>::cellsPerBlock);
     while (targetBlockUsedCells == HeapConstants<heapType>::cellsPerBlock) {
       if (++i == usedBlocks)
         goto collect;
-      targetBlock = (Block*)heap.blocks[i];
+      targetBlock = reinterpret_cast<Block*>(heap.blocks[i]);
       targetBlockUsedCells = targetBlock->usedCells;
       ASSERT(targetBlockUsedCells <= HeapConstants<heapType>::cellsPerBlock);
     }
@@ -377,11 +377,11 @@ scan:
           fastRealloc(heap.blocks, numBlocks * sizeof(CollectorBlock*)));
     }
 
-    targetBlock = (Block*)allocateBlock<heapType>();
+    targetBlock = reinterpret_cast<Block*>(allocateBlock<heapType>());
     targetBlock->freeList = targetBlock->cells;
     targetBlock->heap = this;
     targetBlockUsedCells = 0;
-    heap.blocks[usedBlocks] = (CollectorBlock*)targetBlock;
+    heap.blocks[usedBlocks] = reinterpret_cast<CollectorBlock*>(targetBlock);
     heap.usedBlocks = usedBlocks + 1;
     heap.firstBlockWithPossibleSpace = usedBlocks;
   }
@@ -424,16 +424,16 @@ static inline void* currentThreadStackBase() {
         MOV EAX, FS:[18h]
         MOV pTib, EAX
   }
-  return (void*)pTib->StackBase;
+  return static_cast<void*>(pTib->StackBase);
 #elif PLATFORM(WIN_OS) && PLATFORM(X86_64) && COMPILER(MSVC)
   PNT_TIB64 pTib = reinterpret_cast<PNT_TIB64>(NtCurrentTeb());
-  return (void*)pTib->StackBase;
+  return static_cast<void*>(pTib->StackBase);
 #elif PLATFORM(WIN_OS) && PLATFORM(X86) && COMPILER(GCC)
   // offset 0x18 from the FS segment register gives a pointer to
   // the thread information block for the current thread
   NT_TIB* pTib;
   asm("movl %%fs:0x18, %0\n" : "=r"(pTib));
-  return (void*)pTib->StackBase;
+  return static_cast<void*>(pTib->StackBase);
 #elif PLATFORM(SOLARIS)
   stack_t s;
   thr_stksegment(&s);
@@ -543,12 +543,12 @@ void Heap::markConservatively(void* start, void* end) {
     end = tmp;
   }
 
-  ASSERT(((char*)end - (char*)start) < 0x1000000);
+  ASSERT((static_cast<char*>(end) - static_cast<char*>(start)) < 0x1000000);
   ASSERT(IS_POINTER_ALIGNED(start));
   ASSERT(IS_POINTER_ALIGNED(end));
 
-  char** p = (char**)start;
-  char** e = (char**)end;
+  char** p = static_cast<char**>(start);
+  char** e = static_cast<char**>(end);
 
   size_t usedPrimaryBlocks = primaryHeap.usedBlocks;
   size_t usedNumberBlocks = numberHeap.usedBlocks;
@@ -577,7 +577,8 @@ void Heap::markConservatively(void* start, void* end) {
       // Mark the primary heap
       for (size_t block = 0; block < usedPrimaryBlocks; block++) {
         if ((primaryBlocks[block] == blockAddr) & (offset <= lastCellOffset)) {
-          if (((CollectorCell*)xAsBits)->u.freeCell.zeroIfFree != 0) {
+          if (reinterpret_cast<CollectorCell*>(xAsBits)
+                  ->u.freeCell.zeroIfFree != 0) {
             JSCell* imp = reinterpret_cast<JSCell*>(xAsBits);
             if (!imp->marked())
               imp->mark();
@@ -711,13 +712,13 @@ static inline void* otherThreadStackPointer(
 #if __DARWIN_UNIX03
 
 #if PLATFORM(X86)
-  return (void*)regs.__esp;
+  return reinterpret_cast<void*>(regs.__esp);
 #elif PLATFORM(X86_64)
-  return (void*)regs.__rsp;
+  return reinterpret_cast<void*>(regs.__rsp);
 #elif PLATFORM(PPC) || PLATFORM(PPC64)
-  return (void*)regs.__r1;
+  return reinterpret_cast<void*>(regs.__r1);
 #elif PLATFORM(ARM)
-  return (void*)regs.__sp;
+  return reinterpret_cast<void*>(regs.__sp);
 #else
 #error Unknown Architecture
 #endif
@@ -725,11 +726,11 @@ static inline void* otherThreadStackPointer(
 #else  // !__DARWIN_UNIX03
 
 #if PLATFORM(X86)
-  return (void*)regs.esp;
+  return reinterpret_cast<void*>(regs.esp);
 #elif PLATFORM(X86_64)
-  return (void*)regs.rsp;
+  return reinterpret_cast<void*>(regs.rsp);
 #elif (PLATFORM(PPC) || PLATFORM(PPC64))
-  return (void*)regs.r1;
+  return reinterpret_cast<void*>(regs.r1);
 #else
 #error Unknown Architecture
 #endif
@@ -738,7 +739,7 @@ static inline void* otherThreadStackPointer(
 
 // end PLATFORM(DARWIN)
 #elif PLATFORM(X86) && PLATFORM(WIN_OS)
-  return (void*)(uintptr_t)regs.Esp;
+  return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(regs.Esp));
 #else
 #error Need a way to get the stack pointer for another thread on this platform
 #endif
@@ -751,7 +752,9 @@ void Heap::markOtherThreadConservatively(Thread* thread) {
   size_t regSize = getPlatformThreadRegisters(thread->platformThread, regs);
 
   // mark the thread's registers
-  markConservatively((void*)&regs, (void*)((char*)&regs + regSize));
+  markConservatively(
+      static_cast<void*>(&regs),
+      static_cast<void*>(reinterpret_cast<char*>(&regs) + regSize));
 
   void* stackPointer = otherThreadStackPointer(regs);
   markConservatively(stackPointer, thread->stackBase);
@@ -870,7 +873,7 @@ size_t Heap::sweep() {
   size_t numLiveObjects = heap.numLiveObjects;
 
   for (size_t block = 0; block < heap.usedBlocks; block++) {
-    Block* curBlock = (Block*)heap.blocks[block];
+    Block* curBlock = reinterpret_cast<Block*>(heap.blocks[block]);
 
     size_t usedCells = curBlock->usedCells;
     Cell* freeList = curBlock->freeList;
@@ -938,7 +941,7 @@ size_t Heap::sweep() {
       emptyBlocks++;
       if (emptyBlocks > SPARE_EMPTY_BLOCKS) {
 #if !DEBUG_COLLECTOR
-        freeBlock((CollectorBlock*)curBlock);
+        freeBlock(reinterpret_cast<CollectorBlock*>(curBlock));
 #endif
         // swap with the last block so we compact as we go
         heap.blocks[block] = heap.blocks[heap.usedBlocks - 1];
@@ -948,8 +951,8 @@ size_t Heap::sweep() {
         if (heap.numBlocks > MIN_ARRAY_SIZE &&
             heap.usedBlocks < heap.numBlocks / LOW_WATER_FACTOR) {
           heap.numBlocks = heap.numBlocks / GROWTH_FACTOR;
-          heap.blocks = (CollectorBlock**)fastRealloc(
-              heap.blocks, heap.numBlocks * sizeof(CollectorBlock*));
+          heap.blocks = static_cast<CollectorBlock**>(fastRealloc(
+              heap.blocks, heap.numBlocks * sizeof(CollectorBlock*)));
         }
       }
     }
