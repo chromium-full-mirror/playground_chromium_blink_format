@@ -62,6 +62,11 @@ JSValue* JSConsole::dir(ExecState* exec, const ArgList& arguments) {
   return jsUndefined();
 }
 
+JSValue* JSConsole::dirxml(ExecState* exec, const ArgList& arguments) {
+  impl()->dirxml(exec, arguments);
+  return jsUndefined();
+}
+
 JSValue* JSConsole::assertCondition(ExecState* exec, const ArgList& arguments) {
   ArgList messageParameters;
   arguments.getSlice(1, messageParameters);
