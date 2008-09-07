@@ -82,6 +82,10 @@ class JSVariableObject : public JSObject {
                                           // registers out of the register file.
     size_t registerArraySize;
 
+    static inline ptrdiff_t offsetOf_registers() {
+      return OBJECT_OFFSET(JSVariableObjectData, registers);
+    }
+
    private:
     JSVariableObjectData(const JSVariableObjectData&);
     JSVariableObjectData& operator=(const JSVariableObjectData&);
@@ -109,6 +113,15 @@ class JSVariableObject : public JSObject {
                                     unsigned attributes);
 
   JSVariableObjectData* d;
+
+ public:
+  static inline ptrdiff_t offsetOf_d() {
+    return OBJECT_OFFSET(JSVariableObject, d);
+  }
+
+  static inline ptrdiff_t offsetOf_Data_registers() {
+    return JSVariableObjectData::offsetOf_registers();
+  }
 };
 
 inline bool JSVariableObject::symbolTableGet(const Identifier& propertyName,

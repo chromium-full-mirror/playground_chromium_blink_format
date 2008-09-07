@@ -68,8 +68,12 @@ class CString {
 typedef Vector<char, 32> CStringBuffer;
 
 class UString {
+  friend class CTI;
+
  public:
   struct Rep {
+    friend class CTI;
+
     static PassRefPtr<Rep> create(UChar*, int);
     static PassRefPtr<Rep> createCopying(const UChar*, int);
     static PassRefPtr<Rep> create(PassRefPtr<Rep> base, int offset, int length);

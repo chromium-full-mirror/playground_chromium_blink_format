@@ -59,6 +59,8 @@ JSString* jsNontrivialString(ExecState*, const char*);
 JSString* jsOwnedString(ExecState*, const UString&);
 
 class JSString : public JSCell {
+  friend class CTI;
+
  public:
   JSString(const UString& value) : m_value(value) {
     Heap::heap(this)->reportExtraMemoryCost(value.cost());

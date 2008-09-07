@@ -93,7 +93,7 @@ class JSGlobalObject;
 
 class RegisterFile : Noncopyable {
  public:
-  enum {
+  enum CallFrameHeaderEntry {
     CallerCodeBlock = 0,
     ReturnVPC,
     CallerScopeChain,
@@ -104,6 +104,7 @@ class RegisterFile : Noncopyable {
     CalledAsConstructor,
     Callee,
     OptionalCalleeActivation,
+    CTIReturnEIP,
     CallFrameHeaderSize
   };
 

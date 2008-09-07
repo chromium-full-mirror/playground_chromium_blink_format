@@ -38,7 +38,11 @@ class JSActivation;
 class JSGlobalObject;
 
 class JSFunction : public InternalFunction {
+  friend class Machine;
+
   typedef InternalFunction Base;
+  JSFunction(PassRefPtr<KJS::StructureID> st)
+      : InternalFunction(st), m_scopeChain(NoScopeChain()) {}
 
  public:
   JSFunction(ExecState*, const Identifier&, FunctionBodyNode*, ScopeChainNode*);

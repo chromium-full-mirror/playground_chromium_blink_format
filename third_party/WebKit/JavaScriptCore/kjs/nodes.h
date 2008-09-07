@@ -432,9 +432,9 @@ class RegExpNode : public ExpressionNode, public ThrowableExpressionData {
  public:
   RegExpNode(JSGlobalData* globalData,
              const UString& pattern,
-             const UString& flags) KJS_FAST_CALL
-      : ExpressionNode(globalData),
-        m_regExp(RegExp::create(pattern, flags)) {}
+             const UString& flags) KJS_FAST_CALL : ExpressionNode(globalData),
+                                                   m_pattern(pattern),
+                                                   m_flags(flags) {}
 
   virtual RegisterID* emitCode(CodeGenerator&, RegisterID* = 0) KJS_FAST_CALL;
 
@@ -442,7 +442,8 @@ class RegExpNode : public ExpressionNode, public ThrowableExpressionData {
   virtual Precedence precedence() const { return PrecPrimary; }
 
  private:
-  RefPtr<RegExp> m_regExp;
+  UString m_pattern;
+  UString m_flags;
 };
 
 class ThisNode : public ExpressionNode {

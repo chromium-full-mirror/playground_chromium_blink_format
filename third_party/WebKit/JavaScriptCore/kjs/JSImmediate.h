@@ -100,6 +100,8 @@ class UString;
 
 class JSImmediate {
  private:
+  friend class CTI;  // Whooo!
+
   static const uintptr_t TagMask = 0x3u;  // primary tag is 2 bits long
   static const uintptr_t TagBitTypeInteger = 0x1u;  // bottom bit set indicates
                                                     // integer, this dominates
@@ -268,6 +270,8 @@ class JSImmediate {
   static JSValue* falseImmediate();
   static JSValue* undefinedImmediate();
   static JSValue* nullImmediate();
+  static JSValue* zeroImmediate();
+  static JSValue* oneImmediate();
 
   static JSValue* impossibleValue();
 
@@ -325,6 +329,12 @@ ALWAYS_INLINE JSValue* JSImmediate::undefinedImmediate() {
 }
 ALWAYS_INLINE JSValue* JSImmediate::nullImmediate() {
   return makeNull();
+}
+ALWAYS_INLINE JSValue* JSImmediate::zeroImmediate() {
+  return makeInt(0);
+}
+ALWAYS_INLINE JSValue* JSImmediate::oneImmediate() {
+  return makeInt(1);
 }
 
 // This value is impossible because 0x4 is not a valid pointer but a tag of 0

@@ -358,12 +358,13 @@ void CodeBlock::dump(ExecState* exec) const {
     unsigned i = 0;
     do {
       printf("  %1d = {\n", i);
-      StringJumpTable::const_iterator end = stringSwitchJumpTables[i].end();
-      for (StringJumpTable::const_iterator iter =
-               stringSwitchJumpTables[i].begin();
+      StringJumpTable::StringOffsetTable::const_iterator end =
+          stringSwitchJumpTables[i].offsetTable.end();
+      for (StringJumpTable::StringOffsetTable::const_iterator iter =
+               stringSwitchJumpTables[i].offsetTable.begin();
            iter != end; ++iter)
         printf("\t\t\"%s\" => %04d\n", UString(iter->first).ascii(),
-               iter->second);
+               iter->second.branchOffset);
       printf("      }\n");
       ++i;
     } while (i < stringSwitchJumpTables.size());
@@ -912,6 +913,15 @@ CodeBlock::~CodeBlock() {
   size_t size = structureIDInstructions.size();
   for (size_t i = 0; i < size; ++i)
     derefStructureIDs(&instructions[structureIDInstructions[i]]);
+
+  size = structureIDAccessStubs.size();
+  for (size_t i = 0; i < size; ++i)
+    fastFree(structureIDAccessStubs[i]);
+
+#if ENABLE(CTI)
+  if (ctiCode)
+    fastFree(ctiCode);
+#endif
 }
 
 void CodeBlock::derefStructureIDs(Instruction* vPC) const {
@@ -1008,6 +1018,20 @@ bool CodeBlock::getHandlerForVPC(const Instruction* vPC,
     }
   }
   return false;
+}
+
+void* CodeBlock::nativeExceptionCodeForHandlerVPC(
+    const Instruction* handlerVPC) {
+  Vector<HandlerInfo>::iterator ptr = exceptionHandlers.begin();
+  Vector<HandlerInfo>::iterator end = exceptionHandlers.end();
+
+  for (; ptr != end; ++ptr) {
+    Instruction* target = instructions.begin() + ptr->target;
+    if (handlerVPC == target)
+      return ptr->nativeCode;
+  }
+
+  return 0;
 }
 
 int CodeBlock::lineNumberForVPC(const Instruction* vPC) {

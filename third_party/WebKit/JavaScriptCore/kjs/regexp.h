@@ -23,8 +23,10 @@
 #define KJS_REGEXP_H
 
 #include "ustring.h"
+#include "ExecState.h"
 #include <wtf/Forward.h>
 #include <wtf/RefCounted.h>
+#include <wrec/WREC.h>
 
 struct JSRegExp;
 
@@ -32,8 +34,9 @@ namespace KJS {
 
 class RegExp : public RefCounted<RegExp> {
  public:
-  static PassRefPtr<RegExp> create(const UString& pattern);
-  static PassRefPtr<RegExp> create(const UString& pattern,
+  static PassRefPtr<RegExp> create(ExecState*, const UString& pattern);
+  static PassRefPtr<RegExp> create(ExecState*,
+                                   const UString& pattern,
                                    const UString& flags);
   ~RegExp();
 
@@ -51,8 +54,8 @@ class RegExp : public RefCounted<RegExp> {
   unsigned numSubpatterns() const { return m_numSubpatterns; }
 
  private:
-  RegExp(const UString& pattern);
-  RegExp(const UString& pattern, const UString& flags);
+  RegExp(ExecState*, const UString& pattern);
+  RegExp(ExecState*, const UString& pattern, const UString& flags);
 
   void compile();
 
@@ -64,6 +67,10 @@ class RegExp : public RefCounted<RegExp> {
   JSRegExp* m_regExp;
   const char* m_constructionError;
   unsigned m_numSubpatterns;
+
+#if ENABLE(WREC)
+  WRECFunction m_wrecFunction;
+#endif
 };
 
 }  // namespace KJS

@@ -43,6 +43,10 @@ class ScopeNode;
 class CodeBlock;
 struct Instruction;
 
+#if ENABLE(SAMPLING_TOOL)
+extern OpcodeID what;
+#endif
+
 struct ScopeSampleRecord {
   RefPtr<ScopeNode> m_scope;
   CodeBlock* m_codeBlock;
@@ -97,6 +101,9 @@ class SamplingTool {
   void callingHostFunction() {
     m_recordedCodeBlock = 0;
     m_recordedVPC = 0;
+#if ENABLE(SAMPLING_TOOL)
+    what = (OpcodeID)-1;
+#endif
   }
 
  private:
@@ -126,11 +133,14 @@ class SamplingTool {
 #define MACHINE_SAMPLING_privateExecuteReturned() \
   m_sampler->privateExecuteReturned()
 #define MACHINE_SAMPLING_callingHostFunction() m_sampler->callingHostFunction()
+#define CTI_MACHINE_SAMPLING_callingHostFunction() \
+  machine->m_sampler->callingHostFunction()
 #else
 #define SCOPENODE_SAMPLING_notifyOfScope(sampler)
 #define MACHINE_SAMPLING_sample(codeBlock, vPC)
 #define MACHINE_SAMPLING_privateExecuteReturned()
 #define MACHINE_SAMPLING_callingHostFunction()
+#define CTI_MACHINE_SAMPLING_callingHostFunction()
 #endif
 
 }  // namespace KJS
