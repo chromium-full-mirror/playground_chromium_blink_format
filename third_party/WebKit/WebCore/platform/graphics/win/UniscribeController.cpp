@@ -412,7 +412,7 @@ bool UniscribeController::shapeAndPlaceItem(const UChar* cp,
     // the appropriate
     // translation.
     if (glyphBuffer) {
-      FloatSize size(offsetX, offsetY);
+      FloatSize size(offsetX, -offsetY);
       glyphBuffer->add(glyph, fontData, advance, &size);
     }
 
