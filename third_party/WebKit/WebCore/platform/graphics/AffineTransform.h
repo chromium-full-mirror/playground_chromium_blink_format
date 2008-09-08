@@ -106,6 +106,8 @@ class AffineTransform {
   bool isInvertible() const;
   AffineTransform inverse() const;
 
+  void blend(const AffineTransform& from, double progress);
+
 #if !PLATFORM(WX) || USE(WXGC)
   operator PlatformAffineTransform() const;
 #endif
