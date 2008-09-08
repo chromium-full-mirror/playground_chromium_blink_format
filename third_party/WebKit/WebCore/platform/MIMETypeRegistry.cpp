@@ -233,7 +233,9 @@ String MIMETypeRegistry::getMIMETypeForPath(const String& path) {
   int pos = path.reverseFind('.');
   if (pos >= 0) {
     String extension = path.substring(pos + 1);
-    return getMIMETypeForExtension(extension);
+    String result = getMIMETypeForExtension(extension);
+    if (result.length())
+      return result;
   }
   return "application/octet-stream";
 }
