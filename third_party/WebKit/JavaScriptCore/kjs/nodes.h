@@ -237,7 +237,7 @@ class StatementNode : public Node {
   }
   virtual bool isEmptyStatement() const JSC_FAST_CALL { return false; }
 
-  virtual bool isBlock() const KJS_FAST_CALL { return false; }
+  virtual bool isBlock() const JSC_FAST_CALL { return false; }
 
  protected:
   LabelStack m_labelStack;
@@ -2029,7 +2029,7 @@ class BlockNode : public StatementNode {
 
   StatementVector& children() { return m_children; }
 
-  virtual bool isBlock() const KJS_FAST_CALL { return true; }
+  virtual bool isBlock() const JSC_FAST_CALL { return true; }
 
  protected:
   StatementVector m_children;
