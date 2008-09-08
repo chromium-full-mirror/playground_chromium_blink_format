@@ -150,6 +150,8 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
 
   static JSC::JSGlobalData* commonJSGlobalData();
 
+  void clearAllTimeouts();
+
   enum {
     // Attributes
     Crypto,
@@ -231,7 +233,6 @@ class JSDOMWindowBase : public JSC::JSGlobalObject {
                                        const JSC::PropertySlot&);
 
   void clearHelperObjectProperties();
-  void clearAllTimeouts();
   int installTimeout(ScheduledAction*, int interval, bool singleShot);
 
   bool allowsAccessFromPrivate(const JSC::JSGlobalObject*) const;
