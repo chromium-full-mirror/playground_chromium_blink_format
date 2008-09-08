@@ -237,6 +237,8 @@ class StatementNode : public Node {
   }
   virtual bool isEmptyStatement() const JSC_FAST_CALL { return false; }
 
+  virtual bool isBlock() const KJS_FAST_CALL { return false; }
+
  protected:
   LabelStack m_labelStack;
 
@@ -2026,6 +2028,8 @@ class BlockNode : public StatementNode {
   virtual void streamTo(SourceStream&) const JSC_FAST_CALL;
 
   StatementVector& children() { return m_children; }
+
+  virtual bool isBlock() const KJS_FAST_CALL { return true; }
 
  protected:
   StatementVector m_children;
