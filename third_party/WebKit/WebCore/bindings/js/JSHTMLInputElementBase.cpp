@@ -52,7 +52,7 @@ DontDelete|Function 2
 @end
 */
 
-KJS_IMPLEMENT_PROTOTYPE("HTMLInputElementBase", JSHTMLInputElementBasePrototype)
+JSC_IMPLEMENT_PROTOTYPE("HTMLInputElementBase", JSHTMLInputElementBasePrototype)
 
 // SetSelectionRange is implemented on the class instead of on the prototype
 // to make it easier to enable/disable lookup of the function based on input

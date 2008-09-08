@@ -27,7 +27,7 @@ namespace WebCore {
 
 class HTMLInputElement;
 
-KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLInputElementBasePrototype,
+JSC_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLInputElementBasePrototype,
                                     JSHTMLElementPrototype)
 
 class JSHTMLInputElementBase : public JSHTMLElement {
