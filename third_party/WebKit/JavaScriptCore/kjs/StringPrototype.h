@@ -24,7 +24,7 @@
 
 #include "StringObject.h"
 
-namespace KJS {
+namespace JSC {
 
 class ObjectPrototype;
 
@@ -40,6 +40,6 @@ class StringPrototype : public StringObject {
   static const ClassInfo info;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // StringPrototype_h

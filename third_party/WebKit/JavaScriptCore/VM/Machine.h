@@ -40,7 +40,7 @@
 #include "CTI.h"
 #endif
 
-namespace KJS {
+namespace JSC {
 
 class CodeBlock;
 class EvalNode;
@@ -378,6 +378,6 @@ class Machine {
 #endif
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // Machine_h

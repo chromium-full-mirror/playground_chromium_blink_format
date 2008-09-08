@@ -24,7 +24,7 @@
 
 #include "JSObject.h"
 
-namespace KJS {
+namespace JSC {
 
 class FunctionPrototype;
 
@@ -44,6 +44,6 @@ JSValue* objectProtoFuncToString(ExecState*,
                                  JSValue*,
                                  const ArgList&);
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ObjectPrototype_h

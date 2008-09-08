@@ -43,7 +43,7 @@
 
 namespace WebCore {
 
-using namespace KJS;
+using namespace JSC;
 
 JSValue* JSDatabase::changeVersion(ExecState* exec, const ArgList& args) {
   String oldVersion = args.at(exec, 0)->toString(exec);

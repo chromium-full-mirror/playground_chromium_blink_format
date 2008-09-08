@@ -30,7 +30,7 @@
 #include "nodes.h"
 #include "JSObject.h"
 
-namespace KJS {
+namespace JSC {
 
 class FunctionBodyNode;
 class FunctionPrototype;
@@ -41,7 +41,7 @@ class JSFunction : public InternalFunction {
   friend class Machine;
 
   typedef InternalFunction Base;
-  JSFunction(PassRefPtr<KJS::StructureID> st)
+  JSFunction(PassRefPtr<JSC::StructureID> st)
       : InternalFunction(st), m_scopeChain(NoScopeChain()) {}
 
  public:

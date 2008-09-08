@@ -25,7 +25,7 @@
 #include "AffineTransform.h"
 #include "SVGException.h"
 
-using namespace KJS;
+using namespace JSC;
 
 namespace WebCore {
 
@@ -41,7 +41,7 @@ JSValue* JSSVGMatrix::multiply(ExecState* exec, const ArgList& args) {
 
 JSValue* JSSVGMatrix::inverse(ExecState* exec, const ArgList&) {
   AffineTransform imp(*impl());
-  KJS::JSValue* result = toJS(
+  JSC::JSValue* result = toJS(
       exec,
       JSSVGStaticPODTypeWrapper<AffineTransform>::create(imp.inverse()).get(),
       m_context.get());
@@ -102,7 +102,7 @@ JSValue* JSSVGMatrix::rotateFromVector(ExecState* exec, const ArgList& args) {
   float x = args.at(exec, 0)->toFloat(exec);
   float y = args.at(exec, 1)->toFloat(exec);
 
-  KJS::JSValue* result =
+  JSC::JSValue* result =
       toJS(exec, JSSVGStaticPODTypeWrapper<AffineTransform>::create(
                      imp.rotateFromVector(x, y))
                      .get(),

@@ -29,7 +29,7 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/Vector.h>
 
-namespace KJS {
+namespace JSC {
 
 class JSValue;
 
@@ -139,6 +139,6 @@ class ArgList : Noncopyable {
   void operator delete(void*, size_t);
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ArgList_h

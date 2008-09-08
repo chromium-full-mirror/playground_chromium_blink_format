@@ -28,7 +28,7 @@
 #include <pthread.h>
 #endif
 
-namespace KJS {
+namespace JSC {
 
 #if ENABLE(JSC_MULTIPLE_THREADS)
 
@@ -169,4 +169,4 @@ JSLock::DropAllLocks::~DropAllLocks() {}
 
 #endif  // USE(MULTIPLE_THREADS)
 
-}  // namespace KJS
+}  // namespace JSC

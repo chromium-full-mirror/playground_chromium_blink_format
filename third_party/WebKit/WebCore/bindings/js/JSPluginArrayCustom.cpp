@@ -25,7 +25,7 @@
 
 namespace WebCore {
 
-using namespace KJS;
+using namespace JSC;
 
 bool JSPluginArray::canGetItemsForName(ExecState*,
                                        PluginArray* pluginArray,

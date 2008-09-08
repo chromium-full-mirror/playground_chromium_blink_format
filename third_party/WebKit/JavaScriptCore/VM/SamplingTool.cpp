@@ -37,7 +37,7 @@
 #include <unistd.h>
 #endif
 
-namespace KJS {
+namespace JSC {
 
 void ScopeSampleRecord::sample(CodeBlock* codeBlock, Instruction* vPC) {
   m_totalCount++;
@@ -339,4 +339,4 @@ void SamplingTool::dump(ExecState*) {}
 
 #endif
 
-}  // namespace KJS
+}  // namespace JSC

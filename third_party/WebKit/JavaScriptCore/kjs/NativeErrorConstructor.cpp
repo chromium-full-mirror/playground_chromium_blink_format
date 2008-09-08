@@ -27,7 +27,7 @@
 #include "JSFunction.h"
 #include "NativeErrorPrototype.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(NativeErrorConstructor);
 
@@ -92,4 +92,4 @@ void NativeErrorConstructor::mark() {
     m_proto->mark();
 }
 
-}  // namespace KJS
+}  // namespace JSC

@@ -29,7 +29,7 @@
 #include "JSObjectRef.h"
 #include <kjs/JSObject.h>
 
-namespace KJS {
+namespace JSC {
 
 class JSCallbackConstructor : public JSObject {
  public:
@@ -50,6 +50,6 @@ class JSCallbackConstructor : public JSObject {
   JSObjectCallAsConstructorCallback m_callback;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSCallbackConstructor_h

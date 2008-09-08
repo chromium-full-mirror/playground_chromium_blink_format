@@ -30,7 +30,7 @@
 
 struct JSRegExp;
 
-namespace KJS {
+namespace JSC {
 
 class RegExp : public RefCounted<RegExp> {
  public:
@@ -73,6 +73,6 @@ class RegExp : public RefCounted<RegExp> {
 #endif
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // KJS_REGEXP_H

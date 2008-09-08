@@ -24,7 +24,7 @@
 
 #include "InternalFunction.h"
 
-namespace KJS {
+namespace JSC {
 
 class DatePrototype;
 class FunctionPrototype;
@@ -38,6 +38,6 @@ class DateConstructor : public InternalFunction {
   virtual CallType getCallData(CallData&);
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // DateConstructor_h

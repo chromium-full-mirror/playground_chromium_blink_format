@@ -32,7 +32,7 @@
 #include <jni_instance.h>
 #include <kjs/JSLock.h>
 
-namespace KJS {
+namespace JSC {
 
 namespace Bindings {
 
@@ -183,7 +183,7 @@ class JavaArray : public Array {
 
 }  // namespace Bindings
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(MAC_JAVA_BRIDGE)
 

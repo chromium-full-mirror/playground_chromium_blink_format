@@ -50,7 +50,7 @@ typedef enum {
   array_type
 } JNIType;
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 class JSObject;
@@ -293,7 +293,7 @@ bool dispatchJNICall(ExecState*,
 
 }  // namespace Bindings
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(MAC_JAVA_BRIDGE)
 

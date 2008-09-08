@@ -34,7 +34,7 @@
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
-namespace KJS {
+namespace JSC {
 
 class CallIdentifier;
 class ExecState;
@@ -74,6 +74,6 @@ class Profiler {
   static Profiler* s_sharedEnabledProfilerReference;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // Profiler_h

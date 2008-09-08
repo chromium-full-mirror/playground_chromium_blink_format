@@ -32,7 +32,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/HashSet.h>
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(ArrayPrototype);
 
@@ -116,7 +116,7 @@ static JSValue* arrayProtoFuncLastIndexOf(ExecState*,
 
 #include "ArrayPrototype.lut.h"
 
-namespace KJS {
+namespace JSC {
 
 // ------------------------------ ArrayPrototype ----------------------------
 
@@ -939,4 +939,4 @@ JSValue* arrayProtoFuncLastIndexOf(ExecState* exec,
   return jsNumber(exec, -1);
 }
 
-}  // namespace KJS
+}  // namespace JSC

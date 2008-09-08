@@ -135,7 +135,7 @@ Database::Database(Document* document,
   if (m_name.isNull())
     m_name = "";
 
-  KJS::initializeThreading();
+  JSC::initializeThreading();
   // Database code violates the normal JSCore contract by calling jsUnprotect
   // from a secondary thread, and thus needs additional locking.
   JSDOMWindow::commonJSGlobalData()->heap->setGCProtectNeedsLocking();

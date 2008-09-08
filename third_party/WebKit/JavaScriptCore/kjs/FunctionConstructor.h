@@ -25,7 +25,7 @@
 
 #include "InternalFunction.h"
 
-namespace KJS {
+namespace JSC {
 
 class FunctionPrototype;
 
@@ -45,6 +45,6 @@ JSObject* constructFunction(ExecState*,
                             int lineNumber);
 JSObject* constructFunction(ExecState*, const ArgList&);
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // FunctionConstructor_h

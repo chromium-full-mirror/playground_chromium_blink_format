@@ -37,7 +37,7 @@
   (reinterpret_cast<ptrdiff_t>(&(reinterpret_cast<class*>(0x4000)->member)) - \
    0x4000)
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 class Identifier;
@@ -250,6 +250,6 @@ inline uint32_t JSValue::toUInt32(ExecState* exec, bool& ok) const {
   return toUInt32SlowCase(exec, ok);
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSValue_h

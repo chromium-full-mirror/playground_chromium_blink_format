@@ -25,7 +25,7 @@
 #include "JSWrapperObject.h"
 #include "JSString.h"
 
-namespace KJS {
+namespace JSC {
 
 class StringObject : public JSWrapperObject {
  public:
@@ -64,6 +64,6 @@ class StringObject : public JSWrapperObject {
   virtual JSString* toThisJSString(ExecState*);
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // StringObject_h

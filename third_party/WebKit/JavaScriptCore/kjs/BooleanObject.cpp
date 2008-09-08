@@ -22,7 +22,7 @@
 #include "config.h"
 #include "BooleanObject.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(BooleanObject);
 
@@ -31,4 +31,4 @@ const ClassInfo BooleanObject::info = {"Boolean", 0, 0, 0};
 BooleanObject::BooleanObject(JSObject* prototype)
     : JSWrapperObject(prototype) {}
 
-}  // namespace KJS
+}  // namespace JSC

@@ -37,7 +37,7 @@
 #include <windows.h>
 #endif
 
-namespace KJS {
+namespace JSC {
 
 static double getCount() {
 #if PLATFORM(WIN_OS)
@@ -343,4 +343,4 @@ double ProfileNode::debugPrintDataSampleStyle(
 }
 #endif
 
-}  // namespace KJS
+}  // namespace JSC

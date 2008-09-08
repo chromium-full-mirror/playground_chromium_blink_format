@@ -31,7 +31,7 @@
 
 #include <wtf/Assertions.h>
 
-using namespace KJS;
+using namespace JSC;
 
 namespace WebCore {
 
@@ -55,7 +55,7 @@ JSValue* JSSVGPathSegList::initialize(ExecState* exec, const ArgList& args) {
 
   SVGPathSeg* obj = WTF::getPtr(imp->initialize(newItem, ec));
 
-  KJS::JSValue* result = toJS(exec, obj, m_context.get());
+  JSC::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
 
   m_context->svgAttributeChanged(imp->associatedAttributeName());
@@ -75,7 +75,7 @@ JSValue* JSSVGPathSegList::getItem(ExecState* exec, const ArgList& args) {
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
   SVGPathSeg* obj = WTF::getPtr(imp->getItem(index, ec));
 
-  KJS::JSValue* result = toJS(exec, obj, m_context.get());
+  JSC::JSValue* result = toJS(exec, obj, m_context.get());
   setDOMException(exec, ec);
   return result;
 }
@@ -94,7 +94,7 @@ JSValue* JSSVGPathSegList::insertItemBefore(ExecState* exec,
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
 
-  KJS::JSValue* result =
+  JSC::JSValue* result =
       toJS(exec, WTF::getPtr(imp->insertItemBefore(newItem, index, ec)),
            m_context.get());
   setDOMException(exec, ec);
@@ -116,7 +116,7 @@ JSValue* JSSVGPathSegList::replaceItem(ExecState* exec, const ArgList& args) {
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
 
-  KJS::JSValue* result = toJS(
+  JSC::JSValue* result = toJS(
       exec, WTF::getPtr(imp->replaceItem(newItem, index, ec)), m_context.get());
   setDOMException(exec, ec);
 
@@ -138,7 +138,7 @@ JSValue* JSSVGPathSegList::removeItem(ExecState* exec, const ArgList& args) {
 
   RefPtr<SVGPathSeg> obj(imp->removeItem(index, ec));
 
-  KJS::JSValue* result = toJS(exec, obj.get(), m_context.get());
+  JSC::JSValue* result = toJS(exec, obj.get(), m_context.get());
   setDOMException(exec, ec);
 
   m_context->svgAttributeChanged(imp->associatedAttributeName());
@@ -151,7 +151,7 @@ JSValue* JSSVGPathSegList::appendItem(ExecState* exec, const ArgList& args) {
 
   SVGPathSegList* imp = static_cast<SVGPathSegList*>(impl());
 
-  KJS::JSValue* result =
+  JSC::JSValue* result =
       toJS(exec, WTF::getPtr(imp->appendItem(newItem, ec)), m_context.get());
   setDOMException(exec, ec);
 

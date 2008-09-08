@@ -42,7 +42,7 @@
 #include <algorithm>  // for std::min
 
 JSType JSValueGetType(JSContextRef, JSValueRef value) {
-  KJS::JSValue* jsValue = toJS(value);
+  JSC::JSValue* jsValue = toJS(value);
   if (jsValue->isUndefined())
     return kJSTypeUndefined;
   if (jsValue->isNull())
@@ -57,7 +57,7 @@ JSType JSValueGetType(JSContextRef, JSValueRef value) {
   return kJSTypeObject;
 }
 
-using namespace KJS;  // placed here to avoid conflict between KJS::JSType and
+using namespace JSC;  // placed here to avoid conflict between JSC::JSType and
                       // JSType, above.
 
 bool JSValueIsUndefined(JSContextRef, JSValueRef value) {

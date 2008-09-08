@@ -25,7 +25,7 @@
 #include "JSGlobalObject.h"
 #include "JSObject.h"
 
-namespace KJS {
+namespace JSC {
 
 JSValue* PropertySlot::functionGetter(ExecState* exec,
                                       const Identifier&,
@@ -46,4 +46,4 @@ JSValue* PropertySlot::functionGetter(ExecState* exec,
       ->call(exec, slot.slotBase(), exec->emptyList());
 }
 
-}  // namespace KJS
+}  // namespace JSC

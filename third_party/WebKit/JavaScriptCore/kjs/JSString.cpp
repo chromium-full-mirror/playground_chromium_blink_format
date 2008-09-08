@@ -28,7 +28,7 @@
 #include "StringObject.h"
 #include "StringPrototype.h"
 
-namespace KJS {
+namespace JSC {
 
 JSValue* JSString::toPrimitive(ExecState*, PreferredPrimitiveType) const {
   return const_cast<JSString*>(this);
@@ -151,4 +151,4 @@ JSString* jsOwnedString(ExecState* exec, const UString& s) {
   return new (exec) JSString(s, JSString::HasOtherOwner);
 }
 
-}  // namespace KJS
+}  // namespace JSC

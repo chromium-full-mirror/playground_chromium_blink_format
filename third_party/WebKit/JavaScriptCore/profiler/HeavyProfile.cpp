@@ -28,7 +28,7 @@
 
 #include "TreeProfile.h"
 
-namespace KJS {
+namespace JSC {
 
 HeavyProfile::HeavyProfile(TreeProfile* treeProfile)
     : Profile(treeProfile->title(), treeProfile->uid()) {
@@ -118,4 +118,4 @@ void HeavyProfile::addAncestorsAsChildren(ProfileNode* getFrom,
   }
 }
 
-}  // namespace KJS
+}  // namespace JSC

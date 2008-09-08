@@ -29,7 +29,7 @@
 
 namespace WebCore {
 
-using namespace KJS;
+using namespace JSC;
 using namespace HTMLNames;
 
 JSValue* JSHTMLSelectElement::remove(ExecState* exec, const ArgList& args) {
@@ -46,9 +46,9 @@ JSValue* JSHTMLSelectElement::remove(ExecState* exec, const ArgList& args) {
 }
 
 void selectIndexSetter(HTMLSelectElement* select,
-                       KJS::ExecState* exec,
+                       JSC::ExecState* exec,
                        unsigned index,
-                       KJS::JSValue* value) {
+                       JSC::JSValue* value) {
   if (value->isUndefinedOrNull())
     select->remove(index);
   else {
@@ -62,9 +62,9 @@ void selectIndexSetter(HTMLSelectElement* select,
   }
 }
 
-void JSHTMLSelectElement::indexSetter(KJS::ExecState* exec,
+void JSHTMLSelectElement::indexSetter(JSC::ExecState* exec,
                                       unsigned index,
-                                      KJS::JSValue* value) {
+                                      JSC::JSValue* value) {
   selectIndexSetter(static_cast<HTMLSelectElement*>(impl()), exec, index,
                     value);
 }

@@ -30,7 +30,7 @@
 #include "PropertySlot.h"
 #include "identifier.h"
 
-namespace KJS {
+namespace JSC {
 
 class JSString;
 
@@ -183,6 +183,6 @@ inline JSString* JSValue::toThisJSString(ExecState* exec) {
              : asCell()->toThisJSString(exec);
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSString_h

@@ -28,7 +28,7 @@
 
 #include <kjs/JSGlobalObject.h>
 
-using namespace KJS;
+using namespace JSC;
 
 namespace WebCore {
 
@@ -235,7 +235,7 @@ JSObject* JSQuarantinedObjectWrapper::construct(ExecState* exec,
       wrapper->m_unwrappedObject->getConstructData(unwrappedConstructData);
   ASSERT(unwrappedConstructType != ConstructTypeNone);
 
-  JSValue* unwrappedResult = KJS::construct(
+  JSValue* unwrappedResult = JSC::construct(
       wrapper->unwrappedExecState(), wrapper->m_unwrappedObject,
       unwrappedConstructType, unwrappedConstructData, preparedArgs);
 
@@ -298,7 +298,7 @@ JSValue* JSQuarantinedObjectWrapper::call(ExecState* exec,
       wrapper->m_unwrappedObject->getCallData(unwrappedCallData);
   ASSERT(unwrappedCallType != CallTypeNone);
 
-  JSValue* unwrappedResult = KJS::call(
+  JSValue* unwrappedResult = JSC::call(
       wrapper->unwrappedExecState(), wrapper->m_unwrappedObject,
       unwrappedCallType, unwrappedCallData, preparedThisValue, preparedArgs);
 

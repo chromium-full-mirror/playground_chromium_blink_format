@@ -26,7 +26,7 @@
 #include "JSGlobalData.h"
 #include "ScopeChain.h"
 
-namespace KJS {
+namespace JSC {
 
 class EvalNode;
 class FunctionBodyNode;
@@ -139,6 +139,6 @@ class ExecState : Noncopyable {
 
 enum CodeType { GlobalCode, EvalCode, FunctionCode };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ExecState_h

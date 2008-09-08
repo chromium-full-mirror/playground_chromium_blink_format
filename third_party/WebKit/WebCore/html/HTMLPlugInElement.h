@@ -26,7 +26,7 @@
 #include "HTMLFrameOwnerElement.h"
 
 #if USE(JSC)
-namespace KJS {
+namespace JSC {
 namespace Bindings {
 class Instance;
 }
@@ -72,7 +72,7 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
   virtual RenderWidget* renderWidgetForJSBindings() const = 0;
 #if USE(JSC)
   virtual void detach();
-  KJS::Bindings::Instance* getInstance() const;
+  JSC::Bindings::Instance* getInstance() const;
 #endif
 
 #if ENABLE(NETSCAPE_PLUGIN_API)
@@ -84,7 +84,7 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
 
   AtomicString m_name;
 #if USE(JSC)
-  mutable RefPtr<KJS::Bindings::Instance> m_instance;
+  mutable RefPtr<JSC::Bindings::Instance> m_instance;
 #endif
 #if ENABLE(NETSCAPE_PLUGIN_API)
   NPObject* m_NPObject;

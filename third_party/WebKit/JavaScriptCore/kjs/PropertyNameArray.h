@@ -26,7 +26,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
-namespace KJS {
+namespace JSC {
 
 class PropertyNameArray {
  public:
@@ -65,6 +65,6 @@ class PropertyNameArray {
   JSGlobalData* m_globalData;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // PropertyNameArray_h

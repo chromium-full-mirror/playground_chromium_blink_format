@@ -32,7 +32,7 @@
 #include <kjs/ObjectPrototype.h>
 #include <wtf/Vector.h>
 
-namespace KJS {
+namespace JSC {
 
 const ClassInfo JSCallbackConstructor::info = {"CallbackConstructor", 0, 0, 0};
 
@@ -85,4 +85,4 @@ ConstructType JSCallbackConstructor::getConstructData(
   return ConstructTypeHost;
 }
 
-}  // namespace KJS
+}  // namespace JSC

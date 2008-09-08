@@ -44,7 +44,7 @@ class JSSVGLazyEventListener : public JSLazyEventListener {
                          Node*,
                          int lineNumber);
 
-  virtual KJS::JSValue* eventParameterName() const;
+  virtual JSC::JSValue* eventParameterName() const;
 };
 
 }  // namespace WebCore

@@ -47,8 +47,8 @@
   }
 #endif
 
-using namespace KJS::Bindings;
-using namespace KJS;
+using namespace JSC::Bindings;
+using namespace JSC;
 
 JavaInstance::JavaInstance(jobject instance, PassRefPtr<RootObject> rootObject)
     : Instance(rootObject) {

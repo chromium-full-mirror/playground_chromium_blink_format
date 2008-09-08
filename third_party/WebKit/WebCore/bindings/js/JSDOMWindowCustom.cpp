@@ -32,7 +32,7 @@
 #include "ScriptController.h"
 #include <kjs/JSObject.h>
 
-using namespace KJS;
+using namespace JSC;
 
 namespace WebCore {
 
@@ -83,7 +83,7 @@ bool JSDOMWindow::customGetPropertyNames(ExecState* exec, PropertyNameArray&) {
   return false;
 }
 
-bool JSDOMWindow::getPropertyAttributes(KJS::ExecState* exec,
+bool JSDOMWindow::getPropertyAttributes(JSC::ExecState* exec,
                                         const Identifier& propertyName,
                                         unsigned& attributes) const {
   // Only allow getting property attributes properties by frames in the same

@@ -46,7 +46,7 @@
 
 namespace WebCore {
 
-PassRefPtr<KJS::Bindings::Instance>
+PassRefPtr<JSC::Bindings::Instance>
 ScriptController::createScriptInstanceForWidget(WebCore::Widget* widget) {
   if (!widget->isPluginView())
     return 0;
@@ -56,7 +56,7 @@ ScriptController::createScriptInstanceForWidget(WebCore::Widget* widget) {
   QWidget* nativeWidget = widget->nativeWidget();
   if (!nativeWidget)
     return 0;
-  return KJS::Bindings::QtInstance::create(nativeWidget, bindingRootObject());
+  return JSC::Bindings::QtInstance::create(nativeWidget, bindingRootObject());
 }
 }
 // vim: ts=4 sw=4 et

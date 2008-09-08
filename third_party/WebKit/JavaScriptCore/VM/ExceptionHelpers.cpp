@@ -35,7 +35,7 @@
 #include "JSObject.h"
 #include "JSNotAnObject.h"
 
-namespace KJS {
+namespace JSC {
 
 static void substitute(UString& string, const UString& substring) {
   int position = string.find("%s");
@@ -291,4 +291,4 @@ JSObject* createNotAnObjectError(ExecState* exec,
   return exception;
 }
 
-}  // namespace KJS
+}  // namespace JSC

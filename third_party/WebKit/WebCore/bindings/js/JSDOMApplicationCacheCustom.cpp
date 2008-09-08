@@ -38,7 +38,7 @@
 #include "JSEvent.h"
 #include "JSEventListener.h"
 
-using namespace KJS;
+using namespace JSC;
 
 namespace WebCore {
 
@@ -98,7 +98,7 @@ JSValue* JSDOMApplicationCache::removeEventListener(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* JSDOMApplicationCache::dispatchEvent(KJS::ExecState* exec,
+JSValue* JSDOMApplicationCache::dispatchEvent(JSC::ExecState* exec,
                                               const ArgList& args) {
   ExceptionCode ec = 0;
 

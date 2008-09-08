@@ -80,7 +80,7 @@ class HistogramTimeLogger {
 
 #else
 
-using namespace KJS;
+using namespace JSC;
 
 class Histogram {
  public:

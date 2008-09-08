@@ -68,12 +68,12 @@
 #include <gdk/gdkwin32.h>
 #endif
 
-using KJS::ExecState;
-using KJS::Interpreter;
-using KJS::JSLock;
-using KJS::JSObject;
-using KJS::JSValue;
-using KJS::UString;
+using JSC::ExecState;
+using JSC::Interpreter;
+using JSC::JSLock;
+using JSC::JSObject;
+using JSC::JSValue;
+using JSC::UString;
 
 using std::min;
 
@@ -157,7 +157,7 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
   ASSERT(parent()->isFrameView());
 
   if (m_plugin->pluginFuncs()->event) {
-    KJS::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(false);
     m_plugin->pluginFuncs()->event(m_instance, &npEvent);
   }
 
@@ -169,7 +169,7 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
 
   /* FIXME: Synthesize an XEvent to pass through */
 
-  KJS::JSLock::DropAllLocks dropAllLocks(false);
+  JSC::JSLock::DropAllLocks dropAllLocks(false);
   if (!m_plugin->pluginFuncs()->event(m_instance, &npEvent))
     event->setDefaultHandled();
 }
@@ -184,7 +184,7 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
   IntPoint p = static_cast<FrameView*>(parent())->contentsToWindow(
       IntPoint(event->pageX(), event->pageY()));
 
-  KJS::JSLock::DropAllLocks dropAllLocks(false);
+  JSC::JSLock::DropAllLocks dropAllLocks(false);
   if (!m_plugin->pluginFuncs()->event(m_instance, &npEvent))
     event->setDefaultHandled();
 }
@@ -223,7 +223,7 @@ void PluginView::setNPWindowRect(const IntRect& rect) {
 
   if (m_plugin->pluginFuncs()->setwindow) {
     PluginView::setCurrentPluginView(this);
-    KJS::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(false);
     setCallingPlugin(true);
     m_plugin->pluginFuncs()->setwindow(m_instance, &m_npWindow);
     setCallingPlugin(false);
@@ -269,7 +269,7 @@ void PluginView::stop() {
   ASSERT(m_streams.isEmpty());
 
   m_isStarted = false;
-  KJS::JSLock::DropAllLocks dropAllLocks(false);
+  JSC::JSLock::DropAllLocks dropAllLocks(false);
 
   // Clear the window
   m_npWindow.window = 0;
@@ -519,7 +519,7 @@ void PluginView::init() {
 
   if (m_plugin->pluginFuncs()->getvalue) {
     PluginView::setCurrentPluginView(this);
-    KJS::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(false);
     setCallingPlugin(true);
     m_plugin->pluginFuncs()->getvalue(m_instance, NPPVpluginNeedsXEmbed,
                                       &m_needsXEmbed);

@@ -32,7 +32,7 @@
 #include "runtime.h"
 #include <wtf/HashMap.h>
 
-namespace KJS {
+namespace JSC {
 namespace Bindings {
 
 class CClass : public Class {
@@ -54,7 +54,7 @@ class CClass : public Class {
 };
 
 }  // namespace Bindings
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(NETSCAPE_PLUGIN_API)
 

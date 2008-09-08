@@ -38,7 +38,7 @@
 #include "ProfileNode.h"
 #include <stdio.h>
 
-namespace KJS {
+namespace JSC {
 
 static const char* GlobalCodeExecution = "(program)";
 static const char* AnonymousFunction = "(anonymous function)";
@@ -175,4 +175,4 @@ CallIdentifier createCallIdentifierFromFunctionImp(ExecState* exec,
                         function->m_body->lineNo());
 }
 
-}  // namespace KJS
+}  // namespace JSC

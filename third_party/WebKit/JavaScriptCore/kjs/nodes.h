@@ -48,7 +48,7 @@
 #define KJS_FAST_CALL
 #endif
 
-namespace KJS {
+namespace JSC {
 
 class CodeBlock;
 class CodeGenerator;
@@ -2742,6 +2742,6 @@ struct ClauseList {
   ClauseListNode* tail;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // NODES_H_

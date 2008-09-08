@@ -33,7 +33,7 @@
 #include "JSValue.h"
 #include "ustring.h"
 
-namespace KJS {
+namespace JSC {
 
 class JSValue;
 class StructureIDChain;
@@ -108,6 +108,6 @@ class StructureIDChain : public RefCounted<StructureIDChain> {
   OwnArrayPtr<RefPtr<StructureID>> m_vector;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // StructureID_h

@@ -36,7 +36,7 @@
 #include <nodes.h>
 #include <Opcode.h>
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 class ScopeNode;
@@ -143,6 +143,6 @@ class SamplingTool {
 #define CTI_MACHINE_SAMPLING_callingHostFunction()
 #endif
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // SamplingTool_h

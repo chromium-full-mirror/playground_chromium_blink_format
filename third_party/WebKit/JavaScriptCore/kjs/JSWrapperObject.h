@@ -24,7 +24,7 @@
 
 #include "JSObject.h"
 
-namespace KJS {
+namespace JSC {
 
 /**
    This class is used as a base for classes such as String,
@@ -57,6 +57,6 @@ inline void JSWrapperObject::setInternalValue(JSValue* value) {
   m_internalValue = value;
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // KJS_JSWrapperObject_h

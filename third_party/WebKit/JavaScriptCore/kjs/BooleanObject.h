@@ -24,7 +24,7 @@
 
 #include "JSWrapperObject.h"
 
-namespace KJS {
+namespace JSC {
 
 class BooleanObject : public JSWrapperObject {
  public:
@@ -34,6 +34,6 @@ class BooleanObject : public JSWrapperObject {
   static const ClassInfo info;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // BooleanObject_h

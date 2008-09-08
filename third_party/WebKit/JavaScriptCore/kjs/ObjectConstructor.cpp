@@ -26,7 +26,7 @@
 #include "JSGlobalObject.h"
 #include "ObjectPrototype.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(ObjectConstructor);
 
@@ -76,4 +76,4 @@ CallType ObjectConstructor::getCallData(CallData& callData) {
   return CallTypeHost;
 }
 
-}  // namespace KJS
+}  // namespace JSC

@@ -27,7 +27,7 @@
 #include <qhash.h>
 #include <qset.h>
 
-namespace KJS {
+namespace JSC {
 
 namespace Bindings {
 
@@ -91,6 +91,6 @@ class QtInstance : public Instance {
 
 }  // namespace Bindings
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif

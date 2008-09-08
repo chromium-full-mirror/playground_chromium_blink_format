@@ -23,7 +23,7 @@
 
 #include <wtf/Assertions.h>
 
-namespace KJS {
+namespace JSC {
 
 class JSGlobalObject;
 class JSObject;
@@ -203,6 +203,6 @@ inline ScopeChain& ScopeChain::operator=(const ScopeChain& c) {
   return *this;
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ScopeChain_h

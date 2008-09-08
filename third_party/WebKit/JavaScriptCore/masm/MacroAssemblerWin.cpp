@@ -28,7 +28,7 @@
 
 #if ENABLE(MASM) && PLATFORM(X86)
 
-namespace KJS {
+namespace JSC {
 
 void MacroAssembler::emitConvertToFastCall() {
   emitMovl_mr(4, esp, eax);

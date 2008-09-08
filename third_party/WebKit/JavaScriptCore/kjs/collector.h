@@ -39,7 +39,7 @@
 #define ASSERT_CLASS_FITS_IN_CELL(class) \
   COMPILE_ASSERT(sizeof(class) <= CELL_SIZE, class_fits_in_cell)
 
-namespace KJS {
+namespace JSC {
 
 class ArgList;
 class CollectorBlock;
@@ -275,6 +275,6 @@ inline void Heap::reportExtraMemoryCost(size_t cost) {
     recordExtraCost(cost / (CELL_SIZE * 2));
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif /* KJSCOLLECTOR_H_ */

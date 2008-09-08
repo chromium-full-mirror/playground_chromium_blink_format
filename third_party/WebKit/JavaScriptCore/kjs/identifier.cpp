@@ -29,7 +29,7 @@
 #include <wtf/FastMalloc.h>
 #include <wtf/HashSet.h>
 
-namespace KJS {
+namespace JSC {
 
 typedef HashMap<const char*, RefPtr<UString::Rep>, PtrHash<const char*>>
     LiteralIdentifierTable;
@@ -245,4 +245,4 @@ void Identifier::checkSameIdentifierTable(JSGlobalData* globalData,
 
 #endif
 
-}  // namespace KJS
+}  // namespace JSC

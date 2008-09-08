@@ -25,7 +25,7 @@
 #include "StringObject.h"
 #include "ustring.h"
 
-namespace KJS {
+namespace JSC {
 
 // WebCore uses this to make style.filter undetectable
 class StringObjectThatMasqueradesAsUndefined : public StringObject {
@@ -39,6 +39,6 @@ class StringObjectThatMasqueradesAsUndefined : public StringObject {
   virtual bool toBoolean(ExecState*) const { return false; }
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // StringObjectThatMasqueradesAsUndefined_h

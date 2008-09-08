@@ -33,7 +33,7 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/VectorTraits.h>
 
-namespace KJS {
+namespace JSC {
 
 class RegisterID : Noncopyable {
  public:
@@ -97,12 +97,12 @@ inline RegisterID* ignoredResult() {
   return reinterpret_cast<RegisterID*>(1);
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 namespace WTF {
 
 template <>
-struct VectorTraits<KJS::RegisterID> : VectorTraitsBase<true, KJS::RegisterID> {
+struct VectorTraits<JSC::RegisterID> : VectorTraitsBase<true, JSC::RegisterID> {
   static const bool needsInitialization = true;
   static const bool canInitializeWithMemset =
       true;  // Default initialization just sets everything to 0 or false, so

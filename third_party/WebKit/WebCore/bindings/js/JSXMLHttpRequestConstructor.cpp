@@ -25,7 +25,7 @@
 #include "JSXMLHttpRequest.h"
 #include "XMLHttpRequest.h"
 
-using namespace KJS;
+using namespace JSC;
 
 namespace WebCore {
 

@@ -41,7 +41,7 @@
 #include <sys/timeb.h>
 #endif
 
-namespace KJS {
+namespace JSC {
 
 // TODO: MakeTime (15.9.11.1) etc. ?
 
@@ -184,4 +184,4 @@ static JSValue* dateUTC(ExecState* exec,
   return jsNumber(exec, gregorianDateTimeToMS(t, ms, true));
 }
 
-}  // namespace KJS
+}  // namespace JSC

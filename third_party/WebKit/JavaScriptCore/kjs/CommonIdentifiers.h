@@ -40,7 +40,7 @@
                                       macro(toString) macro(UTC)               \
                                           macro(valueOf)
 
-namespace KJS {
+namespace JSC {
 
 class CommonIdentifiers : Noncopyable {
  private:
@@ -58,6 +58,6 @@ class CommonIdentifiers : Noncopyable {
 #undef KJS_IDENTIFIER_DECLARE_PROPERTY_NAME_GLOBAL
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // CommonIdentifiers_h

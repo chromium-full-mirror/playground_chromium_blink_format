@@ -36,16 +36,16 @@ class JSDOMWindowShell;
  */
 class ScheduledAction {
  public:
-  ScheduledAction(KJS::ExecState* exec,
-                  KJS::JSValue* function,
-                  const KJS::ArgList&);
+  ScheduledAction(JSC::ExecState* exec,
+                  JSC::JSValue* function,
+                  const JSC::ArgList&);
   ScheduledAction(const String& code) : m_code(code) {}
 
   void execute(JSDOMWindowShell*);
 
  private:
-  KJS::ProtectedPtr<KJS::JSValue> m_function;
-  Vector<KJS::ProtectedPtr<KJS::JSValue>> m_args;
+  JSC::ProtectedPtr<JSC::JSValue> m_function;
+  Vector<JSC::ProtectedPtr<JSC::JSValue>> m_args;
   String m_code;
 };
 

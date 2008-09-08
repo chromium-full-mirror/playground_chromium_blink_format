@@ -33,7 +33,7 @@
 
 #include <JavaVM/jni.h>
 
-namespace KJS {
+namespace JSC {
 
 namespace Bindings {
 
@@ -102,7 +102,7 @@ class JavaInstance : public Instance {
 
 }  // namespace Bindings
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(MAC_JAVA_BRIDGE)
 

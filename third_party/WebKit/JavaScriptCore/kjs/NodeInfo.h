@@ -24,7 +24,7 @@
 #include "nodes.h"
 #include "Parser.h"
 
-namespace KJS {
+namespace JSC {
 
 typedef unsigned int FeatureInfo;
 
@@ -66,6 +66,6 @@ typedef NodeDeclarationInfo<ClauseList> ClauseListInfo;
 typedef NodeDeclarationInfo<ExpressionNode*> VarDeclListInfo;
 typedef NodeDeclarationInfo<ConstDeclList> ConstDeclListInfo;
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // NodeInfo_h

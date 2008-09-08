@@ -31,7 +31,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/OwnArrayPtr.h>
 
-namespace KJS {
+namespace JSC {
 
 inline RegExp::RegExp(ExecState* exec, const UString& pattern)
     : m_pattern(pattern),
@@ -185,4 +185,4 @@ int RegExp::match(const UString& s, int i, OwnArrayPtr<int>* ovector) {
   return -1;
 }
 
-}  // namespace KJS
+}  // namespace JSC

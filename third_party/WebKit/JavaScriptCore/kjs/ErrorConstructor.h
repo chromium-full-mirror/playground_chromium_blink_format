@@ -24,7 +24,7 @@
 
 #include "InternalFunction.h"
 
-namespace KJS {
+namespace JSC {
 
 class ErrorPrototype;
 class FunctionPrototype;
@@ -38,6 +38,6 @@ class ErrorConstructor : public InternalFunction {
   virtual CallType getCallData(CallData&);
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ErrorConstructor_h

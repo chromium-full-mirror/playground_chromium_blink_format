@@ -25,7 +25,7 @@
 #include "identifier.h"
 #include <wtf/NotFound.h>
 
-namespace KJS {
+namespace JSC {
 
 class JSObject;
 class JSValue;
@@ -152,6 +152,6 @@ inline PropertyMap::PropertyMap()
 
 {}
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // PropertyMap_h

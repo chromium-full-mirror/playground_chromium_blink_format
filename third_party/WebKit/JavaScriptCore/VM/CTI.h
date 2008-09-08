@@ -93,7 +93,7 @@
 
 #define CTI_RETURN_ADDRESS ((ARGS)[-1])
 
-namespace KJS {
+namespace JSC {
 
 class CodeBlock;
 class ExecState;

@@ -59,8 +59,8 @@ class String {
   String(const UChar*, unsigned length);
   String(const UChar*);  // Specifically for null terminated UTF-16
 #if USE(JSC)
-  String(const KJS::Identifier&);
-  String(const KJS::UString&);
+  String(const JSC::Identifier&);
+  String(const JSC::UString&);
 #endif
   String(const char*);
   String(const char*, unsigned length);
@@ -85,7 +85,7 @@ class String {
   }
 
 #if USE(JSC)
-  operator KJS::UString() const;
+  operator JSC::UString() const;
 #endif
 
   unsigned length() const;

@@ -32,7 +32,7 @@
 #include "ustring.h"
 #include <wtf/RefCounted.h>
 
-namespace KJS {
+namespace JSC {
 
 class SourceProvider : public RefCounted<SourceProvider> {
  public:
@@ -60,6 +60,6 @@ class UStringSourceProvider : public SourceProvider {
   UString m_source;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // SourceProvider_h

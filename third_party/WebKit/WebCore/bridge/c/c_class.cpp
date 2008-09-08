@@ -35,7 +35,7 @@
 #include <kjs/identifier.h>
 #include <kjs/JSLock.h>
 
-namespace KJS {
+namespace JSC {
 namespace Bindings {
 
 CClass::CClass(NPClass* aClass) {
@@ -116,6 +116,6 @@ Field* CClass::fieldNamed(const Identifier& identifier,
   return aField;
 }
 }
-}  // namespace KJS::Bindings
+}  // namespace JSC::Bindings
 
 #endif  // ENABLE(NETSCAPE_PLUGIN_API)

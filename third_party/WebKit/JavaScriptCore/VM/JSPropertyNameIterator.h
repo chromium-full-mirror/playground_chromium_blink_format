@@ -33,7 +33,7 @@
 #include "JSString.h"
 #include "PropertyNameArray.h"
 
-namespace KJS {
+namespace JSC {
 
 class Identifier;
 class JSObject;
@@ -98,6 +98,6 @@ inline JSValue* JSPropertyNameIterator::next(ExecState* exec) {
   return 0;
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSPropertyNameIterator_h

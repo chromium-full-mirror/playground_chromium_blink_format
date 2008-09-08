@@ -54,7 +54,7 @@
 
 using namespace WTF;
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(DatePrototype);
 
@@ -238,7 +238,7 @@ static JSValue* dateProtoFuncValueOf(ExecState*,
 
 #include "DatePrototype.lut.h"
 
-namespace KJS {
+namespace JSC {
 
 #if PLATFORM(MAC)
 
@@ -1308,4 +1308,4 @@ JSValue* dateProtoFuncGetYear(ExecState* exec,
   return jsNumber(exec, t.year);
 }
 
-}  // namespace KJS
+}  // namespace JSC

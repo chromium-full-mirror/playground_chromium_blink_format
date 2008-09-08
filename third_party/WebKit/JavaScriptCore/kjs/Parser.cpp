@@ -30,7 +30,7 @@
 
 extern int kjsyyparse(void*);
 
-namespace KJS {
+namespace JSC {
 
 Parser::Parser() : m_sourceId(0) {}
 
@@ -101,4 +101,4 @@ void Parser::didFinishParsing(
   m_numConstants = numConstants;
 }
 
-}  // namespace KJS
+}  // namespace JSC

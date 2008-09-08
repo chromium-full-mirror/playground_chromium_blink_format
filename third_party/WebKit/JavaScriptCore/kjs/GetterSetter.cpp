@@ -26,7 +26,7 @@
 #include "JSObject.h"
 #include <wtf/Assertions.h>
 
-namespace KJS {
+namespace JSC {
 
 void GetterSetter::mark() {
   JSCell::mark();
@@ -75,4 +75,4 @@ bool GetterSetter::isGetterSetter() const {
   return true;
 }
 
-}  // namespace KJS
+}  // namespace JSC

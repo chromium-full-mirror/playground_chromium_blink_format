@@ -31,7 +31,7 @@
 
 #include <wtf/Vector.h>
 
-namespace KJS {
+namespace JSC {
 
 template <typename T, size_t SegmentSize>
 class SegmentedVector {
@@ -150,6 +150,6 @@ class SegmentedVector {
   Vector<Segment*, 32> m_segments;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // SegmentedVector_h

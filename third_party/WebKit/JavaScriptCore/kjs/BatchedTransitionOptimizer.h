@@ -30,7 +30,7 @@
 #include <wtf/Noncopyable.h>
 #include "JSObject.h"
 
-namespace KJS {
+namespace JSC {
 
 class BatchedTransitionOptimizer : Noncopyable {
  public:
@@ -49,6 +49,6 @@ class BatchedTransitionOptimizer : Noncopyable {
   JSObject* m_object;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // BatchedTransitionOptimizer_h

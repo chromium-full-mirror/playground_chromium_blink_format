@@ -28,7 +28,7 @@
 
 #include "Profile.h"
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 class HeavyProfile;
@@ -46,6 +46,6 @@ class TreeProfile : public Profile {
   RefPtr<HeavyProfile> m_heavyProfile;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // TreeProfiler_h

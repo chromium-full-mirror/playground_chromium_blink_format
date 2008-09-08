@@ -30,7 +30,7 @@
 #include "JSGlobalObject.h"
 #include <wtf/Assertions.h>
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(GlobalEvalFunction);
 
@@ -51,4 +51,4 @@ void GlobalEvalFunction::mark() {
     m_cachedGlobalObject->mark();
 }
 
-}  // namespace KJS
+}  // namespace JSC

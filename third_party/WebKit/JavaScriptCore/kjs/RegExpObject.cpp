@@ -29,7 +29,7 @@
 #include "RegExpConstructor.h"
 #include "RegExpPrototype.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(RegExpObject);
 
@@ -153,4 +153,4 @@ CallType RegExpObject::getCallData(CallData& callData) {
   return CallTypeHost;
 }
 
-}  // namespace KJS
+}  // namespace JSC

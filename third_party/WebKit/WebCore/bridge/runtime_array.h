@@ -31,7 +31,7 @@
 #include <kjs/JSObject.h>
 #include "runtime.h"
 
-namespace KJS {
+namespace JSC {
 
 class RuntimeArray : public JSObject {
  public:
@@ -67,6 +67,6 @@ class RuntimeArray : public JSObject {
   OwnPtr<Bindings::Array> _array;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // RUNTIME_ARRAY_H_

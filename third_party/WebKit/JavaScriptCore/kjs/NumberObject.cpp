@@ -25,7 +25,7 @@
 #include "JSGlobalObject.h"
 #include "NumberPrototype.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(NumberObject);
 
@@ -52,4 +52,4 @@ NumberObject* constructNumberFromImmediateNumber(ExecState* exec,
   return obj;
 }
 
-}  // namespace KJS
+}  // namespace JSC

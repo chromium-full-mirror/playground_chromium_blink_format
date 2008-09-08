@@ -25,7 +25,7 @@
 #include "InternalFunction.h"
 #include <wtf/OwnPtr.h>
 
-namespace KJS {
+namespace JSC {
 
 class FunctionPrototype;
 class RegExp;
@@ -89,6 +89,6 @@ class RegExpConstructor : public InternalFunction {
   OwnPtr<RegExpConstructorPrivate> d;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // RegExpConstructor_h

@@ -32,7 +32,7 @@
 #include <wtf/Vector.h>
 #include <wtf/unicode/Unicode.h>
 
-namespace KJS {
+namespace JSC {
 
 using WTF::PlacementNewAdoptType;
 using WTF::PlacementNewAdopt;
@@ -275,7 +275,7 @@ PassRefPtr<UString::Rep> concatenate(UString::Rep*, UString::Rep*);
 bool operator==(const UString&, const UString&);
 
 inline bool operator!=(const UString& s1, const UString& s2) {
-  return !KJS::operator==(s1, s2);
+  return !JSC::operator==(s1, s2);
 }
 
 bool operator<(const UString& s1, const UString& s2);
@@ -284,7 +284,7 @@ bool operator>(const UString& s1, const UString& s2);
 bool operator==(const UString& s1, const char* s2);
 
 inline bool operator!=(const UString& s1, const char* s2) {
-  return !KJS::operator==(s1, s2);
+  return !JSC::operator==(s1, s2);
 }
 
 inline bool operator==(const char* s1, const UString& s2) {
@@ -292,7 +292,7 @@ inline bool operator==(const char* s1, const UString& s2) {
 }
 
 inline bool operator!=(const char* s1, const UString& s2) {
-  return !KJS::operator==(s1, s2);
+  return !JSC::operator==(s1, s2);
 }
 
 bool operator==(const CString&, const CString&);
@@ -346,14 +346,14 @@ inline size_t UString::cost() const {
   return capacityDelta;
 }
 
-struct IdentifierRepHash : PtrHash<RefPtr<KJS::UString::Rep>> {
-  static unsigned hash(const RefPtr<KJS::UString::Rep>& key) {
+struct IdentifierRepHash : PtrHash<RefPtr<JSC::UString::Rep>> {
+  static unsigned hash(const RefPtr<JSC::UString::Rep>& key) {
     return key->computedHash();
   }
-  static unsigned hash(KJS::UString::Rep* key) { return key->computedHash(); }
+  static unsigned hash(JSC::UString::Rep* key) { return key->computedHash(); }
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 namespace WTF {
 
@@ -363,45 +363,45 @@ template <typename T>
 struct StrHash;
 
 template <>
-struct StrHash<KJS::UString::Rep*> {
-  static unsigned hash(const KJS::UString::Rep* key) { return key->hash(); }
-  static bool equal(const KJS::UString::Rep* a, const KJS::UString::Rep* b) {
-    return KJS::equal(a, b);
+struct StrHash<JSC::UString::Rep*> {
+  static unsigned hash(const JSC::UString::Rep* key) { return key->hash(); }
+  static bool equal(const JSC::UString::Rep* a, const JSC::UString::Rep* b) {
+    return JSC::equal(a, b);
   }
   static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <>
-struct StrHash<RefPtr<KJS::UString::Rep>> : public StrHash<KJS::UString::Rep*> {
-  using StrHash<KJS::UString::Rep*>::hash;
-  static unsigned hash(const RefPtr<KJS::UString::Rep>& key) {
+struct StrHash<RefPtr<JSC::UString::Rep>> : public StrHash<JSC::UString::Rep*> {
+  using StrHash<JSC::UString::Rep*>::hash;
+  static unsigned hash(const RefPtr<JSC::UString::Rep>& key) {
     return key->hash();
   }
-  using StrHash<KJS::UString::Rep*>::equal;
-  static bool equal(const RefPtr<KJS::UString::Rep>& a,
-                    const RefPtr<KJS::UString::Rep>& b) {
-    return KJS::equal(a.get(), b.get());
+  using StrHash<JSC::UString::Rep*>::equal;
+  static bool equal(const RefPtr<JSC::UString::Rep>& a,
+                    const RefPtr<JSC::UString::Rep>& b) {
+    return JSC::equal(a.get(), b.get());
   }
-  static bool equal(const KJS::UString::Rep* a,
-                    const RefPtr<KJS::UString::Rep>& b) {
-    return KJS::equal(a, b.get());
+  static bool equal(const JSC::UString::Rep* a,
+                    const RefPtr<JSC::UString::Rep>& b) {
+    return JSC::equal(a, b.get());
   }
-  static bool equal(const RefPtr<KJS::UString::Rep>& a,
-                    const KJS::UString::Rep* b) {
-    return KJS::equal(a.get(), b);
+  static bool equal(const RefPtr<JSC::UString::Rep>& a,
+                    const JSC::UString::Rep* b) {
+    return JSC::equal(a.get(), b);
   }
 
   static const bool safeToCompareToEmptyOrDeleted = false;
 };
 
 template <>
-struct DefaultHash<KJS::UString::Rep*> {
-  typedef StrHash<KJS::UString::Rep*> Hash;
+struct DefaultHash<JSC::UString::Rep*> {
+  typedef StrHash<JSC::UString::Rep*> Hash;
 };
 
 template <>
-struct DefaultHash<RefPtr<KJS::UString::Rep>> {
-  typedef StrHash<RefPtr<KJS::UString::Rep>> Hash;
+struct DefaultHash<RefPtr<JSC::UString::Rep>> {
+  typedef StrHash<RefPtr<JSC::UString::Rep>> Hash;
 };
 
 }  // namespace WTF

@@ -28,7 +28,7 @@
 #include <wtf/Vector.h>
 #include "SourceRange.h"
 
-namespace KJS {
+namespace JSC {
 
 class Identifier;
 class RegExp;
@@ -114,7 +114,7 @@ class Lexer : Noncopyable {
   void record16(int);
   void record16(UChar);
 
-  KJS::Identifier* makeIdentifier(const Vector<UChar>& buffer);
+  JSC::Identifier* makeIdentifier(const Vector<UChar>& buffer);
   UString* makeUString(const Vector<UChar>& buffer);
 
   int yylineno;
@@ -153,7 +153,7 @@ class Lexer : Noncopyable {
   int m_nextOffset3;
 
   Vector<UString*> m_strings;
-  Vector<KJS::Identifier*> m_identifiers;
+  Vector<JSC::Identifier*> m_identifiers;
 
   JSGlobalData* m_globalData;
 
@@ -163,6 +163,6 @@ class Lexer : Noncopyable {
   const HashTable m_mainTable;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // Lexer_h

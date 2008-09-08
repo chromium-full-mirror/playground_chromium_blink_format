@@ -24,7 +24,7 @@
 
 #include "JSObject.h"
 
-namespace KJS {
+namespace JSC {
 
 typedef HashMap<unsigned, JSValue*> SparseArrayValueMap;
 
@@ -119,6 +119,6 @@ JSArray* constructEmptyArray(ExecState*, unsigned initialLength);
 JSArray* constructArray(ExecState*, JSValue* singleItemValue);
 JSArray* constructArray(ExecState*, const ArgList& values);
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSArray_h

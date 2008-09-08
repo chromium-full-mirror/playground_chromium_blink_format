@@ -34,9 +34,9 @@
 namespace WebCore {
 
 void selectIndexSetter(HTMLSelectElement*,
-                       KJS::ExecState*,
+                       JSC::ExecState*,
                        unsigned index,
-                       KJS::JSValue*);
+                       JSC::JSValue*);
 }
 
 #endif

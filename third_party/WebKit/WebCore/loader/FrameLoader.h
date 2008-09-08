@@ -47,7 +47,7 @@
 #include "CachedResourceClient.h"
 #endif
 
-namespace KJS {
+namespace JSC {
 class JSValue;
 }
 
@@ -435,10 +435,10 @@ class FrameLoader : Noncopyable
                               bool userGesture = false,
                               bool replaceDocument = true);
 
-  KJS::JSValue* executeScript(const String& url,
+  JSC::JSValue* executeScript(const String& url,
                               int baseLine,
                               const String& script);
-  KJS::JSValue* executeScript(const String& script,
+  JSC::JSValue* executeScript(const String& script,
                               bool forceUserGesture = false);
 
   void gotoAnchor();

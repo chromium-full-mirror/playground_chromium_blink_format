@@ -26,7 +26,7 @@
 #include "JSFunction.h"
 #include <wtf/MathExtras.h>
 
-namespace KJS {
+namespace JSC {
 
 static const double D32 = 4294967296.0;
 
@@ -94,4 +94,4 @@ float JSValue::toFloat(ExecState* exec) const {
   return static_cast<float>(toNumber(exec));
 }
 
-}  // namespace KJS
+}  // namespace JSC

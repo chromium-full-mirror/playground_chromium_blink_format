@@ -26,7 +26,7 @@
 #include "NumberObject.h"
 #include "NumberPrototype.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(NumberConstructor);
 
@@ -114,4 +114,4 @@ CallType NumberConstructor::getCallData(CallData& callData) {
   return CallTypeHost;
 }
 
-}  // namespace KJS
+}  // namespace JSC

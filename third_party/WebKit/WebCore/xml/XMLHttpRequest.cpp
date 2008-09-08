@@ -235,7 +235,7 @@ XMLHttpRequest::State XMLHttpRequest::readyState() const {
   return m_state;
 }
 
-const KJS::UString& XMLHttpRequest::responseText() const {
+const JSC::UString& XMLHttpRequest::responseText() const {
   return m_responseText;
 }
 
@@ -792,7 +792,7 @@ void XMLHttpRequest::loadRequestAsynchronously(ResourceRequest& request) {
     // and they are referenced by the JavaScript wrapper.
     ref();
 
-    KJS::gcProtectNullTolerant(ScriptInterpreter::getDOMObject(this));
+    JSC::gcProtectNullTolerant(ScriptInterpreter::getDOMObject(this));
   }
 }
 
@@ -843,7 +843,7 @@ void XMLHttpRequest::internalAbort() {
 void XMLHttpRequest::clearResponse() {
   m_response = ResourceResponse();
   {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     m_responseText = "";
   }
   m_createdDocument = false;
@@ -893,10 +893,10 @@ void XMLHttpRequest::dropProtection() {
   // can't be recouped until the load is done, so only
   // report the extra cost at that point.
 
-  KJS::JSValue* wrapper = ScriptInterpreter::getDOMObject(this);
+  JSC::JSValue* wrapper = ScriptInterpreter::getDOMObject(this);
   if (wrapper) {
-    KJS::gcUnprotect(wrapper);
-    KJS::Heap::heap(wrapper)->reportExtraMemoryCost(m_responseText.size() * 2);
+    JSC::gcUnprotect(wrapper);
+    JSC::Heap::heap(wrapper)->reportExtraMemoryCost(m_responseText.size() * 2);
   }
 
   deref();
@@ -1092,7 +1092,7 @@ void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
     changeState(HEADERS_RECEIVED);
 
   {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     if (m_decoder)
       m_responseText += m_decoder->flush();
   }
@@ -1312,7 +1312,7 @@ void XMLHttpRequest::didReceiveData(SubresourceLoader*,
   String decoded = m_decoder->decode(data, len);
 
   {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     m_responseText += decoded;
   }
 

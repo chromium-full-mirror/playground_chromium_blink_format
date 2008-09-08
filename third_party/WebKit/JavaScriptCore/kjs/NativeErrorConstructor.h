@@ -24,7 +24,7 @@
 
 #include "InternalFunction.h"
 
-namespace KJS {
+namespace JSC {
 
 class ErrorInstance;
 class FunctionPrototype;
@@ -49,6 +49,6 @@ class NativeErrorConstructor : public InternalFunction {
   NativeErrorPrototype* m_proto;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // NativeErrorConstructor_h

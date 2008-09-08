@@ -24,7 +24,7 @@
 
 #include "NumberObject.h"
 
-namespace KJS {
+namespace JSC {
 
 class FunctionPrototype;
 class ObjectPrototype;
@@ -34,6 +34,6 @@ class NumberPrototype : public NumberObject {
   NumberPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // NumberPrototype_h

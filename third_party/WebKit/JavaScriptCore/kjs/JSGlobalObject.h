@@ -27,7 +27,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 
-namespace KJS {
+namespace JSC {
 
 class ArrayPrototype;
 class BooleanPrototype;
@@ -337,6 +337,6 @@ inline JSGlobalObject* ScopeChainNode::globalObject() const {
   return globalObject;
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSGlobalObject_h

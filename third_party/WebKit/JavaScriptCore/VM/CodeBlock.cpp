@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <wtf/StringExtras.h>
 
-namespace KJS {
+namespace JSC {
 
 #if !defined(NDEBUG) || ENABLE(SAMPLING_TOOL)
 
@@ -1103,4 +1103,4 @@ int32_t SimpleJumpTable::offsetForValue(int32_t value, int32_t defaultOffset) {
   return defaultOffset;
 }
 
-}  // namespace KJS
+}  // namespace JSC

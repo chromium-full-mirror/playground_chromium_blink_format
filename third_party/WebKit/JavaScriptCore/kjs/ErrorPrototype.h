@@ -24,7 +24,7 @@
 
 #include "ErrorInstance.h"
 
-namespace KJS {
+namespace JSC {
 
 class FunctionPrototype;
 class ObjectPrototype;
@@ -34,6 +34,6 @@ class ErrorPrototype : public ErrorInstance {
   ErrorPrototype(ExecState*, ObjectPrototype*, FunctionPrototype*);
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ErrorPrototype_h

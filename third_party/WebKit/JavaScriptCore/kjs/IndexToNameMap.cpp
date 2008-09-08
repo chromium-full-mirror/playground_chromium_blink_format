@@ -30,7 +30,7 @@
 #include "JSFunction.h"
 #include "identifier.h"
 
-namespace KJS {
+namespace JSC {
 
 // We map indexes in the arguments array to their corresponding argument names.
 // Example: function f(x, y, z): arguments[0] = x, so we map 0 to
@@ -88,4 +88,4 @@ Identifier& IndexToNameMap::operator[](const Identifier& index) {
   return m_map[indexAsNumber];
 }
 
-}  // namespace KJS
+}  // namespace JSC

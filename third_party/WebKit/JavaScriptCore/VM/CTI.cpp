@@ -35,7 +35,7 @@
 
 using namespace std;
 
-namespace KJS {
+namespace JSC {
 
 #if COMPILER(GCC) && PLATFORM(X86)
 asm(".globl _ctiTrampoline"
@@ -77,7 +77,7 @@ asm(".globl _ctiVMThrowTrampoline"
     "1:"
     "\n"
 #endif
-    "call __ZN3KJS7Machine12cti_vm_throwEPv"
+    "call __ZN3JSC7Machine12cti_vm_throwEPv"
     "\n"
     "addl $0x24, %esp"
     "\n"
@@ -116,7 +116,7 @@ __declspec(naked) JSValue* ctiTrampoline(void* code,
 __declspec(naked) void ctiVMThrowTrampoline() {
   __asm {
            mov [esp], esp;
-            call KJS::Machine::cti_vm_throw;
+            call JSC::Machine::cti_vm_throw;
             add esp, 0x24;
             pop edi;
             pop esi;
@@ -2167,6 +2167,6 @@ void* CTI::compileRegExp(ExecState* exec,
   return code;
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(CTI)

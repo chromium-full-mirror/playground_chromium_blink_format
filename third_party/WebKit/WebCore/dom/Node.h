@@ -554,11 +554,11 @@ class Node : public TreeShared<Node> {
   PassRefPtr<Element> querySelector(const String& selectors,
                                     NSResolver*,
                                     ExceptionCode&,
-                                    KJS::ExecState*);
+                                    JSC::ExecState*);
   PassRefPtr<NodeList> querySelectorAll(const String& selectors,
                                         NSResolver*,
                                         ExceptionCode&,
-                                        KJS::ExecState*);
+                                        JSC::ExecState*);
 #endif
 
   // For non-JS bindings. Silently ignores the JavaScript exception if any.

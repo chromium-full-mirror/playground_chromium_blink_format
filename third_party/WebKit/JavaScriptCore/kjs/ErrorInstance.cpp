@@ -22,10 +22,10 @@
 #include "config.h"
 #include "ErrorInstance.h"
 
-namespace KJS {
+namespace JSC {
 
 const ClassInfo ErrorInstance::info = {"Error", 0, 0, 0};
 
 ErrorInstance::ErrorInstance(JSObject* prototype) : JSObject(prototype) {}
 
-}  // namespace KJS
+}  // namespace JSC

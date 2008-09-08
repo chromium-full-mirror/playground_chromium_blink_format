@@ -33,7 +33,7 @@
 #include "SymbolTable.h"
 #include "nodes.h"
 
-namespace KJS {
+namespace JSC {
 
 class Register;
 
@@ -89,6 +89,6 @@ class JSActivation : public JSVariableObject {
   }
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSActivation_h

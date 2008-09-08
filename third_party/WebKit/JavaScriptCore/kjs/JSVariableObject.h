@@ -36,7 +36,7 @@
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/UnusedParam.h>
 
-namespace KJS {
+namespace JSC {
 
 class Register;
 
@@ -178,6 +178,6 @@ inline bool JSVariableObject::symbolTablePutWithAttributes(
   return true;
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSVariableObject_h

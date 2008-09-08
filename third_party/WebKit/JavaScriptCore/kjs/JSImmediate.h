@@ -32,7 +32,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 class JSObject;
@@ -470,6 +470,6 @@ inline JSValue* jsBoolean(bool b) {
   return b ? JSImmediate::trueImmediate() : JSImmediate::falseImmediate();
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif

@@ -51,7 +51,7 @@ class JSDOMWindowShell : public DOMObject {
     setPrototype(window->prototype());
   }
 
-  static const KJS::ClassInfo s_info;
+  static const JSC::ClassInfo s_info;
 
   DOMWindow* impl() const;
   void disconnectFrame();
@@ -61,41 +61,41 @@ class JSDOMWindowShell : public DOMObject {
 
  private:
   virtual void mark();
-  virtual KJS::UString className() const;
-  virtual bool getOwnPropertySlot(KJS::ExecState*,
-                                  const KJS::Identifier& propertyName,
-                                  KJS::PropertySlot&);
-  virtual void put(KJS::ExecState*,
-                   const KJS::Identifier& propertyName,
-                   KJS::JSValue*,
-                   KJS::PutPropertySlot&);
-  virtual void putWithAttributes(KJS::ExecState*,
-                                 const KJS::Identifier& propertyName,
-                                 KJS::JSValue*,
+  virtual JSC::UString className() const;
+  virtual bool getOwnPropertySlot(JSC::ExecState*,
+                                  const JSC::Identifier& propertyName,
+                                  JSC::PropertySlot&);
+  virtual void put(JSC::ExecState*,
+                   const JSC::Identifier& propertyName,
+                   JSC::JSValue*,
+                   JSC::PutPropertySlot&);
+  virtual void putWithAttributes(JSC::ExecState*,
+                                 const JSC::Identifier& propertyName,
+                                 JSC::JSValue*,
                                  unsigned attributes);
-  virtual bool deleteProperty(KJS::ExecState*,
-                              const KJS::Identifier& propertyName);
-  virtual void getPropertyNames(KJS::ExecState*, KJS::PropertyNameArray&);
-  virtual bool getPropertyAttributes(KJS::ExecState*,
-                                     const KJS::Identifier& propertyName,
+  virtual bool deleteProperty(JSC::ExecState*,
+                              const JSC::Identifier& propertyName);
+  virtual void getPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
+  virtual bool getPropertyAttributes(JSC::ExecState*,
+                                     const JSC::Identifier& propertyName,
                                      unsigned& attributes) const;
-  virtual void defineGetter(KJS::ExecState*,
-                            const KJS::Identifier& propertyName,
-                            KJS::JSObject* getterFunction);
-  virtual void defineSetter(KJS::ExecState*,
-                            const KJS::Identifier& propertyName,
-                            KJS::JSObject* setterFunction);
-  virtual KJS::JSValue* lookupGetter(KJS::ExecState*,
-                                     const KJS::Identifier& propertyName);
-  virtual KJS::JSValue* lookupSetter(KJS::ExecState*,
-                                     const KJS::Identifier& propertyName);
-  virtual KJS::JSGlobalObject* toGlobalObject(KJS::ExecState*) const;
-  virtual const KJS::ClassInfo* classInfo() const { return &s_info; }
+  virtual void defineGetter(JSC::ExecState*,
+                            const JSC::Identifier& propertyName,
+                            JSC::JSObject* getterFunction);
+  virtual void defineSetter(JSC::ExecState*,
+                            const JSC::Identifier& propertyName,
+                            JSC::JSObject* setterFunction);
+  virtual JSC::JSValue* lookupGetter(JSC::ExecState*,
+                                     const JSC::Identifier& propertyName);
+  virtual JSC::JSValue* lookupSetter(JSC::ExecState*,
+                                     const JSC::Identifier& propertyName);
+  virtual JSC::JSGlobalObject* toGlobalObject(JSC::ExecState*) const;
+  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
 
   JSDOMWindow* m_window;
 };
 
-KJS::JSValue* toJS(KJS::ExecState*, Frame*);
+JSC::JSValue* toJS(JSC::ExecState*, Frame*);
 JSDOMWindowShell* toJSDOMWindowShell(Frame*);
 
 }  // namespace WebCore

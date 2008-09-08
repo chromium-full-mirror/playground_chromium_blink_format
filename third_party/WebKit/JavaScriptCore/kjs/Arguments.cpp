@@ -31,7 +31,7 @@
 #include "JSGlobalObject.h"
 #include "ObjectPrototype.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(Arguments);
 
@@ -104,4 +104,4 @@ bool Arguments::deleteProperty(ExecState* exec,
   return JSObject::deleteProperty(exec, propertyName);
 }
 
-}  // namespace KJS
+}  // namespace JSC

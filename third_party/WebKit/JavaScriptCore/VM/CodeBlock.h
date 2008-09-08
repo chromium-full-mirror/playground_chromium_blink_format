@@ -38,7 +38,7 @@
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 
@@ -254,6 +254,6 @@ struct EvalCodeBlock : public ProgramCodeBlock {
       : ProgramCodeBlock(ownerNode_, EvalCode, globalObject_, source_) {}
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // CodeBlock_h

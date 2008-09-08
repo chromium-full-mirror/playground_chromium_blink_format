@@ -38,7 +38,7 @@ class String;
 class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
  public:
   static PassRefPtr<JavaScriptCallFrame> create(
-      const KJS::DebuggerCallFrame& debuggerCallFrame,
+      const JSC::DebuggerCallFrame& debuggerCallFrame,
       PassRefPtr<JavaScriptCallFrame> caller,
       int sourceID,
       int line) {
@@ -53,7 +53,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
 
   int sourceIdentifier() const { return m_sourceID; }
   int line() const { return m_line; }
-  void update(const KJS::DebuggerCallFrame& debuggerCallFrame,
+  void update(const JSC::DebuggerCallFrame& debuggerCallFrame,
               int sourceID,
               int line) {
     m_debuggerCallFrame = debuggerCallFrame;
@@ -62,20 +62,20 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
   }
 
   String functionName() const;
-  KJS::DebuggerCallFrame::Type type() const;
-  const KJS::ScopeChainNode* scopeChain() const;
+  JSC::DebuggerCallFrame::Type type() const;
+  const JSC::ScopeChainNode* scopeChain() const;
 
-  KJS::JSObject* thisObject() const;
-  KJS::JSValue* evaluate(const KJS::UString& script,
-                         KJS::JSValue*& exception) const;
+  JSC::JSObject* thisObject() const;
+  JSC::JSValue* evaluate(const JSC::UString& script,
+                         JSC::JSValue*& exception) const;
 
  private:
-  JavaScriptCallFrame(const KJS::DebuggerCallFrame&,
+  JavaScriptCallFrame(const JSC::DebuggerCallFrame&,
                       PassRefPtr<JavaScriptCallFrame> caller,
                       int sourceID,
                       int line);
 
-  KJS::DebuggerCallFrame m_debuggerCallFrame;
+  JSC::DebuggerCallFrame m_debuggerCallFrame;
   RefPtr<JavaScriptCallFrame> m_caller;
   int m_sourceID;
   int m_line;

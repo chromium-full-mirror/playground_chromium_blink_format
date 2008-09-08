@@ -33,7 +33,7 @@
 
 namespace WebCore {
 
-using namespace KJS;
+using namespace JSC;
 
 static bool needsYouTubeQuirk(ExecState*, Frame*);
 

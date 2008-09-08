@@ -31,7 +31,7 @@
 #include "npruntime_internal.h"
 #include "runtime.h"
 
-namespace KJS {
+namespace JSC {
 namespace Bindings {
 
 class CField : public Field {
@@ -58,7 +58,7 @@ class CMethod : public Method {
 };
 
 }  // namespace Bindings
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(NETSCAPE_PLUGIN_API)
 

@@ -27,7 +27,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/NotFound.h>
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 class JSObject;
@@ -206,6 +206,6 @@ class PropertySlot {
   size_t m_offset;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // PropertySlot_h

@@ -24,7 +24,7 @@
 
 #include "DateInstance.h"
 
-namespace KJS {
+namespace JSC {
 
 class ObjectPrototype;
 
@@ -38,6 +38,6 @@ class DatePrototype : public DateInstance {
   static const ClassInfo info;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // DatePrototype_h

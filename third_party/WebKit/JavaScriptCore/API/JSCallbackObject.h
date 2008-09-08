@@ -31,7 +31,7 @@
 #include "JSValueRef.h"
 #include "JSObject.h"
 
-namespace KJS {
+namespace JSC {
 
 template <class Base>
 class JSCallbackObject : public Base {
@@ -107,7 +107,7 @@ class JSCallbackObject : public Base {
   OwnPtr<JSCallbackObjectData> m_callbackObjectData;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 // include the actual template class implementation
 #include "JSCallbackObjectFunctions.h"

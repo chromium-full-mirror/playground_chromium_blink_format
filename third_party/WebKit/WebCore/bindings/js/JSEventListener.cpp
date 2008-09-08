@@ -38,7 +38,7 @@
 #include <kjs/JSLock.h>
 #include <wtf/RefCountedLeakCounter.h>
 
-using namespace KJS;
+using namespace JSC;
 
 namespace WebCore {
 

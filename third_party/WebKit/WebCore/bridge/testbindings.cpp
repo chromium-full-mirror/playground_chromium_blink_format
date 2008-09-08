@@ -286,8 +286,8 @@ static NPClass* myFunctionPtrs = &_myFunctionPtrs;
 
 // --------------------------------------------------------
 
-using namespace KJS;
-using namespace KJS::Bindings;
+using namespace JSC;
+using namespace JSC::Bindings;
 
 class GlobalImp : public ObjectImp {
  public:

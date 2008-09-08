@@ -39,7 +39,7 @@ class WebScriptObject;
 
 struct NPObject;
 
-namespace KJS {
+namespace JSC {
 class JSGlobalObject;
 class JSValue;
 
@@ -59,7 +59,7 @@ class Node;
 class String;
 class Widget;
 
-typedef HashMap<void*, RefPtr<KJS::Bindings::RootObject>> RootObjectMap;
+typedef HashMap<void*, RefPtr<JSC::Bindings::RootObject>> RootObjectMap;
 
 class ScriptController {
  public:
@@ -77,7 +77,7 @@ class ScriptController {
     return m_windowShell->window();
   }
 
-  KJS::JSValue* evaluate(const String& sourceURL,
+  JSC::JSValue* evaluate(const String& sourceURL,
                          int baseLine,
                          const String& code);
 
@@ -97,7 +97,7 @@ class ScriptController {
 
   bool isEnabled();
 
-  void attachDebugger(KJS::Debugger*);
+  void attachDebugger(JSC::Debugger*);
 
   void setPaused(bool b) { m_paused = b; }
   bool isPaused() const { return m_paused; }
@@ -118,10 +118,10 @@ class ScriptController {
   void clearScriptObjects();
   void cleanupScriptObjectsForPlugin(void*);
 
-  PassRefPtr<KJS::Bindings::Instance> createScriptInstanceForWidget(Widget*);
-  KJS::Bindings::RootObject* bindingRootObject();
+  PassRefPtr<JSC::Bindings::Instance> createScriptInstanceForWidget(Widget*);
+  JSC::Bindings::RootObject* bindingRootObject();
 
-  PassRefPtr<KJS::Bindings::RootObject> createRootObject(void* nativeHandle);
+  PassRefPtr<JSC::Bindings::RootObject> createRootObject(void* nativeHandle);
 
 #if PLATFORM(MAC)
 #if ENABLE(MAC_JAVA_BRIDGE)
@@ -145,7 +145,7 @@ class ScriptController {
   void clearPlatformScriptObjects();
   void disconnectPlatformScriptObjects();
 
-  KJS::ProtectedPtr<JSDOMWindowShell> m_windowShell;
+  JSC::ProtectedPtr<JSDOMWindowShell> m_windowShell;
   HashSet<JSDOMWindow*> m_liveFormerWindows;
   Frame* m_frame;
   int m_handlerLineno;
@@ -155,7 +155,7 @@ class ScriptController {
   bool m_paused;
 
   // The root object used for objects bound outside the context of a plugin.
-  RefPtr<KJS::Bindings::RootObject> m_bindingRootObject;
+  RefPtr<JSC::Bindings::RootObject> m_bindingRootObject;
   RootObjectMap m_rootObjects;
 #if ENABLE(NETSCAPE_PLUGIN_API)
   NPObject* m_windowScriptNPObject;

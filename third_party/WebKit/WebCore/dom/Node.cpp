@@ -191,7 +191,7 @@ void Node::setDocument(Document* doc) {
   willMoveToNewOwnerDocument();
 
   {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     ScriptInterpreter::updateDOMNodeDocument(this, m_document.get(), doc);
   }
   m_document = doc;
@@ -1226,7 +1226,7 @@ class ResolveNamespaceFunctor {
  public:
   ResolveNamespaceFunctor(NSResolver* resolver,
                           ExceptionCode& ec,
-                          KJS::ExecState* exec)
+                          JSC::ExecState* exec)
       : m_resolver(resolver), m_exceptionCode(ec), m_exec(exec) {}
 
   bool operator()(CSSSelector* selector) {
@@ -1267,7 +1267,7 @@ class ResolveNamespaceFunctor {
  private:
   NSResolver* m_resolver;
   ExceptionCode& m_exceptionCode;
-  KJS::ExecState* m_exec;
+  JSC::ExecState* m_exec;
 };
 
 static bool selectorNeedsNamespaceResolution(CSSSelector* currentSelector) {
@@ -1278,7 +1278,7 @@ static bool selectorNeedsNamespaceResolution(CSSSelector* currentSelector) {
 static bool resolveNamespacesForSelector(CSSSelector* currentSelector,
                                          NSResolver* resolver,
                                          ExceptionCode& ec,
-                                         KJS::ExecState* exec) {
+                                         JSC::ExecState* exec) {
   ResolveNamespaceFunctor functor(resolver, ec, exec);
   return forEachSelector(functor, currentSelector);
 }
@@ -1296,7 +1296,7 @@ PassRefPtr<NodeList> Node::querySelectorAll(const String& selectors,
 PassRefPtr<Element> Node::querySelector(const String& selectors,
                                         NSResolver* resolver,
                                         ExceptionCode& ec,
-                                        KJS::ExecState* exec) {
+                                        JSC::ExecState* exec) {
   if (selectors.isEmpty()) {
     ec = SYNTAX_ERR;
     return 0;
@@ -1362,7 +1362,7 @@ PassRefPtr<Element> Node::querySelector(const String& selectors,
 PassRefPtr<NodeList> Node::querySelectorAll(const String& selectors,
                                             NSResolver* resolver,
                                             ExceptionCode& ec,
-                                            KJS::ExecState* exec) {
+                                            JSC::ExecState* exec) {
   if (selectors.isEmpty()) {
     ec = SYNTAX_ERR;
     return 0;

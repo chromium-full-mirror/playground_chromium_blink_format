@@ -29,7 +29,7 @@
 #include "config.h"
 #include "RegisterFile.h"
 
-namespace KJS {
+namespace JSC {
 
 RegisterFile::~RegisterFile() {
 #if HAVE(MMAP)
@@ -42,4 +42,4 @@ RegisterFile::~RegisterFile() {
 #endif
 }
 
-}  // namespace KJS
+}  // namespace JSC

@@ -24,7 +24,7 @@
 #include "NodeFilterCondition.h"
 #include <wtf/PassRefPtr.h>
 
-namespace KJS {
+namespace JSC {
 class JSValue;
 }
 
@@ -34,17 +34,17 @@ class Node;
 
 class JSNodeFilterCondition : public NodeFilterCondition {
  public:
-  static PassRefPtr<JSNodeFilterCondition> create(KJS::JSValue* filter) {
+  static PassRefPtr<JSNodeFilterCondition> create(JSC::JSValue* filter) {
     return adoptRef(new JSNodeFilterCondition(filter));
   }
 
  private:
-  JSNodeFilterCondition(KJS::JSValue* filter);
+  JSNodeFilterCondition(JSC::JSValue* filter);
 
-  virtual short acceptNode(KJS::ExecState*, Node*) const;
+  virtual short acceptNode(JSC::ExecState*, Node*) const;
   virtual void mark();
 
-  KJS::JSValue* m_filter;
+  JSC::JSValue* m_filter;
 };
 
 }  // namespace WebCore

@@ -26,7 +26,7 @@
 #include "JSString.h"
 #include "ScopeChainMark.h"
 
-namespace KJS {
+namespace JSC {
 
 ExecState::ExecState(JSGlobalObject* globalObject,
                      JSObject* globalThisValue,
@@ -59,4 +59,4 @@ bool ExecState::isGlobalObject(JSObject* o) const {
   return o->isGlobalObject();
 }
 
-}  // namespace KJS
+}  // namespace JSC

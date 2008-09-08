@@ -35,7 +35,7 @@
 #include <wtf/Vector.h>
 #include <limits.h>
 
-namespace KJS {
+namespace JSC {
 
 class LabelID {
  public:
@@ -99,6 +99,6 @@ class LabelID {
   mutable JumpVector m_unresolvedJumps;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // LabelID_h

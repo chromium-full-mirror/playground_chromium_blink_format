@@ -66,11 +66,11 @@
 #include <kjs/JSValue.h>
 #include <wtf/ASCIICType.h>
 
-using KJS::ExecState;
-using KJS::JSLock;
-using KJS::JSObject;
-using KJS::JSValue;
-using KJS::UString;
+using JSC::ExecState;
+using JSC::JSLock;
+using JSC::JSObject;
+using JSC::JSValue;
+using JSC::UString;
 
 using std::min;
 
@@ -155,7 +155,7 @@ bool PluginView::start() {
   NPError npErr;
   {
     PluginView::setCurrentPluginView(this);
-    KJS::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(false);
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->newp((NPMIMEType)m_mimeType.data(),
                                           m_instance, m_mode, m_paramCount,
@@ -244,7 +244,7 @@ void PluginView::performRequest(PluginRequest* request) {
       // has finished loading
       if (request->sendNotification()) {
         PluginView::setCurrentPluginView(this);
-        KJS::JSLock::DropAllLocks dropAllLocks(false);
+        JSC::JSLock::DropAllLocks dropAllLocks(false);
         setCallingPlugin(true);
         m_plugin->pluginFuncs()->urlnotify(m_instance,
                                            requestURL.string().utf8().data(),
@@ -476,7 +476,7 @@ void PluginView::setJavaScriptPaused(bool paused) {
     m_requestTimer.startOneShot(0);
 }
 
-PassRefPtr<KJS::Bindings::Instance> PluginView::bindingInstance() {
+PassRefPtr<JSC::Bindings::Instance> PluginView::bindingInstance() {
 #if ENABLE(NETSCAPE_PLUGIN_API)
   NPObject* object = 0;
 
@@ -486,7 +486,7 @@ PassRefPtr<KJS::Bindings::Instance> PluginView::bindingInstance() {
   NPError npErr;
   {
     PluginView::setCurrentPluginView(this);
-    KJS::JSLock::DropAllLocks dropAllLocks(false);
+    JSC::JSLock::DropAllLocks dropAllLocks(false);
     setCallingPlugin(true);
     npErr = m_plugin->pluginFuncs()->getvalue(
         m_instance, NPPVpluginScriptableNPObject, &object);
@@ -497,10 +497,10 @@ PassRefPtr<KJS::Bindings::Instance> PluginView::bindingInstance() {
   if (npErr != NPERR_NO_ERROR || !object)
     return 0;
 
-  RefPtr<KJS::Bindings::RootObject> root =
+  RefPtr<JSC::Bindings::RootObject> root =
       m_parentFrame->script()->createRootObject(this);
-  RefPtr<KJS::Bindings::Instance> instance =
-      KJS::Bindings::CInstance::create(object, root.release());
+  RefPtr<JSC::Bindings::Instance> instance =
+      JSC::Bindings::CInstance::create(object, root.release());
 
   _NPN_ReleaseObject(object);
 

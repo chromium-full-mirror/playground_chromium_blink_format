@@ -26,7 +26,7 @@
 #include <math.h>
 #include <wtf/MathExtras.h>
 
-namespace KJS {
+namespace JSC {
 
 struct DateInstance::Cache {
   double m_gregorianDateTimeCachedForMS;
@@ -55,14 +55,14 @@ void DateInstance::msToGregorianDateTime(double milli,
 
   if (outputIsUTC) {
     if (m_cache->m_gregorianDateTimeUTCCachedForMS != milli) {
-      KJS::msToGregorianDateTime(milli, true,
+      JSC::msToGregorianDateTime(milli, true,
                                  m_cache->m_cachedGregorianDateTimeUTC);
       m_cache->m_gregorianDateTimeUTCCachedForMS = milli;
     }
     t.copyFrom(m_cache->m_cachedGregorianDateTimeUTC);
   } else {
     if (m_cache->m_gregorianDateTimeCachedForMS != milli) {
-      KJS::msToGregorianDateTime(milli, false,
+      JSC::msToGregorianDateTime(milli, false,
                                  m_cache->m_cachedGregorianDateTime);
       m_cache->m_gregorianDateTimeCachedForMS = milli;
     }
@@ -108,4 +108,4 @@ bool DateInstance::getUTCTime(double& milli) const {
   return true;
 }
 
-}  // namespace KJS
+}  // namespace JSC

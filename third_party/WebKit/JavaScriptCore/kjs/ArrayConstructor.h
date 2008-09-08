@@ -24,7 +24,7 @@
 
 #include "InternalFunction.h"
 
-namespace KJS {
+namespace JSC {
 
 class ArrayPrototype;
 class FunctionPrototype;
@@ -37,6 +37,6 @@ class ArrayConstructor : public InternalFunction {
   virtual CallType getCallData(CallData&);
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ArrayConstructor_h

@@ -37,7 +37,7 @@
 
 using namespace std;
 
-namespace KJS {
+namespace JSC {
 
 /*
     The layout of a register frame looks like this:
@@ -1457,4 +1457,4 @@ void CodeGenerator::endSwitch(uint32_t clauseCount,
   }
 }
 
-}  // namespace KJS
+}  // namespace JSC

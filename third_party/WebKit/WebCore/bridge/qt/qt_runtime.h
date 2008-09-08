@@ -31,7 +31,7 @@
 #include <qpointer.h>
 #include <qvariant.h>
 
-namespace KJS {
+namespace JSC {
 namespace Bindings {
 
 class QtInstance;
@@ -247,6 +247,6 @@ QVariant convertValueToQVariant(ExecState* exec,
                                 int* distance);
 
 }  // namespace Bindings
-}  // namespace KJS
+}  // namespace JSC
 
 #endif

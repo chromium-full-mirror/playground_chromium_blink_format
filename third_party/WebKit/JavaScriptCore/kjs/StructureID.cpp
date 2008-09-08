@@ -31,7 +31,7 @@
 #include "JSObject.h"
 #include <wtf/RefPtr.h>
 
-namespace KJS {
+namespace JSC {
 
 StructureID::StructureID(JSValue* prototype)
     : m_isDictionary(false),
@@ -128,4 +128,4 @@ StructureIDChain::StructureIDChain(StructureID* structureID) {
   m_vector[i] = structureID;
 }
 
-}  // namespace KJS
+}  // namespace JSC

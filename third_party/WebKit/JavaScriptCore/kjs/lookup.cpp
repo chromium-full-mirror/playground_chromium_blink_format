@@ -23,7 +23,7 @@
 
 #include "PrototypeFunction.h"
 
-namespace KJS {
+namespace JSC {
 
 void HashTable::createTable(JSGlobalData* globalData) const {
   ASSERT(!table);
@@ -85,4 +85,4 @@ void setUpStaticFunctionSlot(ExecState* exec,
   slot.setValueSlot(thisObj, location, thisObj->offsetForLocation(location));
 }
 
-}  // namespace KJS
+}  // namespace JSC

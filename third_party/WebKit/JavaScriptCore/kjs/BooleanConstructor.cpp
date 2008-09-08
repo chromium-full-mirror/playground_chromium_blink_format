@@ -25,7 +25,7 @@
 #include "BooleanPrototype.h"
 #include "JSGlobalObject.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(BooleanConstructor);
 
@@ -85,4 +85,4 @@ JSObject* constructBooleanFromImmediateBoolean(ExecState* exec,
   return obj;
 }
 
-}  // namespace KJS
+}  // namespace JSC

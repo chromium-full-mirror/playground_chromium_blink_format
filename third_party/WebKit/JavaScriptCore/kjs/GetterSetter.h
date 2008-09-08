@@ -26,7 +26,7 @@
 
 #include "JSCell.h"
 
-namespace KJS {
+namespace JSC {
 
 class JSObject;
 
@@ -57,6 +57,6 @@ class GetterSetter : public JSCell {
   JSObject* m_setter;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // GetterSetter_h

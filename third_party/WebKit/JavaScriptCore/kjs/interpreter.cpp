@@ -37,7 +37,7 @@
 #include <unistd.h>
 #endif
 
-namespace KJS {
+namespace JSC {
 
 Completion Interpreter::checkSyntax(ExecState* exec,
                                     const UString& sourceURL,
@@ -123,4 +123,4 @@ void Interpreter::setShouldPrintExceptions(bool print) {
   printExceptions = print;
 }
 
-}  // namespace KJS
+}  // namespace JSC

@@ -28,7 +28,7 @@
 #include "ObjectPrototype.h"
 #include "PrototypeFunction.h"
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(BooleanPrototype);
 
@@ -101,4 +101,4 @@ JSValue* booleanProtoFuncValueOf(ExecState* exec,
   return static_cast<BooleanObject*>(thisValue)->internalValue();
 }
 
-}  // namespace KJS
+}  // namespace JSC

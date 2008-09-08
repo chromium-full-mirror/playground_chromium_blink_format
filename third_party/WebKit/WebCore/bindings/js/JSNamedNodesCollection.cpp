@@ -33,7 +33,7 @@
 
 namespace WebCore {
 
-using namespace KJS;
+using namespace JSC;
 
 ASSERT_CLASS_FITS_IN_CELL(JSNamedNodesCollection)
 
@@ -44,7 +44,7 @@ const ClassInfo JSNamedNodesCollection::s_info = {"Collection", 0, 0, 0};
 // so it shouldn't be a problem that it's storing all the nodes (with the same
 // name). (David)
 JSNamedNodesCollection::JSNamedNodesCollection(
-    KJS::JSObject* prototype,
+    JSC::JSObject* prototype,
     const Vector<RefPtr<Node>>& nodes)
     : DOMObject(prototype), m_nodes(new Vector<RefPtr<Node>>(nodes)) {}
 

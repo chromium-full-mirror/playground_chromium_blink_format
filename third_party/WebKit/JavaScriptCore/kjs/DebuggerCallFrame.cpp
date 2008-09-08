@@ -34,7 +34,7 @@
 #include "Machine.h"
 #include "Parser.h"
 
-namespace KJS {
+namespace JSC {
 
 Register* DebuggerCallFrame::callFrame() const {
   return m_registers - m_codeBlock->numLocals -
@@ -89,4 +89,4 @@ JSValue* DebuggerCallFrame::evaluate(const UString& script,
                                     m_scopeChain, &exception);
 }
 
-}  // namespace KJS
+}  // namespace JSC

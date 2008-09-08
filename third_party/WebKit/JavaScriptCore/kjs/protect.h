@@ -24,7 +24,7 @@
 #include "JSValue.h"
 #include "collector.h"
 
-namespace KJS {
+namespace JSC {
 
 inline void gcProtect(JSValue* val) {
   Heap* heap = Heap::heap(val);
@@ -143,6 +143,6 @@ inline bool operator!=(const T* a, const ProtectedPtr<T>& b) {
   return a != b.get();
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // protect_h

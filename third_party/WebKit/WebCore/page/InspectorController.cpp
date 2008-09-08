@@ -80,7 +80,7 @@
 #include "JSDatabase.h"
 #endif
 
-using namespace KJS;
+using namespace JSC;
 using namespace std;
 
 namespace WebCore {
@@ -203,17 +203,17 @@ struct ConsoleMessage {
 // XMLHttpRequestResource Class
 
 struct XMLHttpRequestResource {
-  XMLHttpRequestResource(KJS::UString& sourceString) {
-    KJS::JSLock lock(false);
+  XMLHttpRequestResource(JSC::UString& sourceString) {
+    JSC::JSLock lock(false);
     this->sourceString = sourceString.rep();
   }
 
   ~XMLHttpRequestResource() {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     sourceString.clear();
   }
 
-  RefPtr<KJS::UString::Rep> sourceString;
+  RefPtr<JSC::UString::Rep> sourceString;
 };
 
 // InspectorResource Struct
@@ -274,13 +274,13 @@ struct InspectorResource : public RefCounted<InspectorResource> {
       JSValueProtect(context, newScriptObject);
   }
 
-  void setXMLHttpRequestProperties(KJS::UString& data) {
+  void setXMLHttpRequestProperties(JSC::UString& data) {
     xmlHttpRequestResource.set(new XMLHttpRequestResource(data));
   }
 
   String sourceString() const {
     if (xmlHttpRequestResource)
-      return KJS::UString(xmlHttpRequestResource->sourceString);
+      return JSC::UString(xmlHttpRequestResource->sourceString);
 
     RefPtr<SharedBuffer> buffer;
     String textEncodingName;
@@ -546,7 +546,7 @@ static JSValueRef getResourceDocumentNode(JSContextRef ctx,
   ExecState* exec =
       toJSDOMWindowShell(resource->frame.get())->window()->globalExec();
 
-  KJS::JSLock lock(false);
+  JSC::JSLock lock(false);
   JSValueRef documentValue =
       toRef(JSInspectedObjectWrapper::wrap(exec, toJS(exec, document)));
   return documentValue;
@@ -718,7 +718,7 @@ static JSValueRef search(JSContextRef ctx,
     if (newStart == startVisiblePosition(searchRange.get(), DOWNSTREAM))
       break;
 
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     JSValueRef arg0 = toRef(toJS(toJS(ctx), resultRange.get()));
     JSObjectCallAsFunction(ctx, pushFunction, result, 1, &arg0, exception);
     if (exception && *exception)
@@ -1410,7 +1410,7 @@ void InspectorController::focusNode() {
   JSValueRef arg0;
 
   {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     arg0 = toRef(
         JSInspectedObjectWrapper::wrap(exec, toJS(exec, m_nodeToFocus.get())));
   }
@@ -1609,7 +1609,7 @@ void InspectorController::inspectedWindowScriptObjectCleared(Frame* frame) {
   JSValueRef arg0;
 
   {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     arg0 = toRef(JSInspectedObjectWrapper::wrap(exec, win));
   }
 
@@ -2281,7 +2281,7 @@ JSObjectRef InspectorController::addDatabaseScriptResource(
   JSValueRef database;
 
   {
-    KJS::JSLock lock(false);
+    JSC::JSLock lock(false);
     database = toRef(JSInspectedObjectWrapper::wrap(
         exec, toJS(exec, resource->database.get())));
   }
@@ -2710,7 +2710,7 @@ void InspectorController::didFailLoading(DocumentLoader* loader,
 
 void InspectorController::resourceRetrievedByXMLHttpRequest(
     unsigned long identifier,
-    KJS::UString& sourceString) {
+    JSC::UString& sourceString) {
   if (!enabled())
     return;
 

@@ -24,7 +24,7 @@
 #ifndef Error_h
 #define Error_h
 
-namespace KJS {
+namespace JSC {
 
 class ExecState;
 class JSObject;
@@ -69,6 +69,6 @@ JSObject* throwError(ExecState*, ErrorType, const UString& message);
 JSObject* throwError(ExecState*, ErrorType, const char* message);
 JSObject* throwError(ExecState*, ErrorType);
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // Error_h

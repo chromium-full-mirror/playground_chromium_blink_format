@@ -31,7 +31,7 @@
 #include "JSString.h"
 #include "NativeErrorConstructor.h"
 
-namespace KJS {
+namespace JSC {
 
 const char* expressionBeginOffsetPropertyName = "expressionBeginOffset";
 const char* expressionCaretOffsetPropertyName = "expressionCaretOffset";
@@ -133,4 +133,4 @@ JSObject* throwError(ExecState* exec,
   return error;
 }
 
-}  // namespace KJS
+}  // namespace JSC

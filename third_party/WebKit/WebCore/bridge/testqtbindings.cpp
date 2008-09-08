@@ -71,8 +71,8 @@ class MyObject : public QObject {
 
 // --------------------------------------------------------
 
-using namespace KJS;
-using namespace KJS::Bindings;
+using namespace JSC;
+using namespace JSC::Bindings;
 
 class Global : public JSObject {
  public:

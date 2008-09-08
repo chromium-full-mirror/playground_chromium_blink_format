@@ -35,7 +35,7 @@
 
 #include <wtf/Assertions.h>
 
-namespace KJS {
+namespace JSC {
 
 #define DUMP_OPCODE_STATS 0
 
@@ -145,6 +145,6 @@ struct OpcodeStats {
 
 #endif
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // Opcodes_h

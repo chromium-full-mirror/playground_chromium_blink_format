@@ -36,7 +36,7 @@
 
 #include <string.h>
 
-namespace KJS {
+namespace JSC {
 
 class JITCodeBuffer {
  public:
@@ -784,7 +784,7 @@ class X86Assembler {
   JITCodeBuffer* m_buffer;
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(MASM) && PLATFORM(X86)
 

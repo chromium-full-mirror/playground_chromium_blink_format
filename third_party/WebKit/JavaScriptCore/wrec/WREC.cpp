@@ -34,7 +34,7 @@
 
 using namespace WTF;
 
-namespace KJS {
+namespace JSC {
 
 // ==== CharacterClass ====
 
@@ -1700,6 +1700,6 @@ void WRECParser::parseDisjunction(JmpSrcVector& failures) {
   }
 }
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // ENABLE(WREC)

@@ -36,7 +36,7 @@
 #endif
 #include <wtf/Noncopyable.h>
 
-namespace KJS {
+namespace JSC {
 
 /*
     A register file is a stack of register frames. We represent a register
@@ -189,6 +189,6 @@ class RegisterFile : Noncopyable {
                                    // stored in the register file.
 };
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // RegisterFile_h

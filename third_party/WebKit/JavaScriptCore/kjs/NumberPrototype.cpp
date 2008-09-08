@@ -33,7 +33,7 @@
 #include <wtf/MathExtras.h>
 #include <wtf/Vector.h>
 
-namespace KJS {
+namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(NumberPrototype);
 
@@ -501,4 +501,4 @@ JSValue* numberProtoFuncToPrecision(ExecState* exec,
   return jsNontrivialString(exec, s + "0." + charSequence('0', -(e + 1)) + m);
 }
 
-}  // namespace KJS
+}  // namespace JSC

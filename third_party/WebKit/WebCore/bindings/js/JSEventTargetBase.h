@@ -32,7 +32,7 @@
 #include "EventNames.h"
 #include "JSEvent.h"
 
-namespace KJS {
+namespace JSC {
 
 extern const struct HashTable JSEventTargetPropertiesTable;
 extern const struct HashTable JSEventTargetPrototypeTable;
@@ -102,20 +102,20 @@ class JSEventTargetBase {
  public:
   JSEventTargetBase() {}
 
-  KJS::JSValue* getValueProperty(const JSEventTarget* owner,
-                                 KJS::ExecState* exec,
+  JSC::JSValue* getValueProperty(const JSEventTarget* owner,
+                                 JSC::ExecState* exec,
                                  int token) const {
     const AtomicString& eventName = eventNameForPropertyToken(token);
     if (!eventName.isEmpty())
       return owner->getListener(eventName);
 
-    return KJS::jsUndefined();
+    return JSC::jsUndefined();
   }
 
   void putValueProperty(const JSEventTarget* owner,
-                        KJS::ExecState* exec,
+                        JSC::ExecState* exec,
                         int token,
-                        KJS::JSValue* value) {
+                        JSC::JSValue* value) {
     const AtomicString& eventName = eventNameForPropertyToken(token);
     if (!eventName.isEmpty())
       owner->setListener(exec, eventName, value);
@@ -127,21 +127,21 @@ class JSEventTargetBase {
 
   template <class JSParent>
   bool getOwnPropertySlot(JSEventTarget* owner,
-                          KJS::ExecState* exec,
-                          const KJS::Identifier& propertyName,
-                          KJS::PropertySlot& slot) {
-    return KJS::getStaticValueSlot<JSEventTarget, JSParent>(
-        exec, &KJS::JSEventTargetPropertiesTable, owner, propertyName, slot);
+                          JSC::ExecState* exec,
+                          const JSC::Identifier& propertyName,
+                          JSC::PropertySlot& slot) {
+    return JSC::getStaticValueSlot<JSEventTarget, JSParent>(
+        exec, &JSC::JSEventTargetPropertiesTable, owner, propertyName, slot);
   }
 
   template <class JSParent>
   void put(JSEventTarget* owner,
-           KJS::ExecState* exec,
-           const KJS::Identifier& propertyName,
-           KJS::JSValue* value,
-           KJS::PutPropertySlot& slot) {
-    KJS::lookupPut<JSEventTarget, JSParent>(exec, propertyName, value,
-                                            &KJS::JSEventTargetPropertiesTable,
+           JSC::ExecState* exec,
+           const JSC::Identifier& propertyName,
+           JSC::JSValue* value,
+           JSC::PutPropertySlot& slot) {
+    JSC::lookupPut<JSEventTarget, JSParent>(exec, propertyName, value,
+                                            &JSC::JSEventTargetPropertiesTable,
                                             owner, slot);
   }
 };
@@ -158,44 +158,44 @@ class JSEventTargetBase {
 // classes - avoid that.
 template <class JSEventTargetPrototypeParent,
           class JSEventTargetPrototypeInformation>
-class JSEventTargetPrototype : public KJS::JSObject {
+class JSEventTargetPrototype : public JSC::JSObject {
  public:
-  JSEventTargetPrototype(KJS::ExecState* exec)
-      : KJS::JSObject(JSEventTargetPrototypeParent::self(exec)) {}
+  JSEventTargetPrototype(JSC::ExecState* exec)
+      : JSC::JSObject(JSEventTargetPrototypeParent::self(exec)) {}
 
-  static KJS::JSObject* self(KJS::ExecState* exec) {
-    static KJS::Identifier* prototypeName = new KJS::Identifier(
+  static JSC::JSObject* self(JSC::ExecState* exec) {
+    static JSC::Identifier* prototypeName = new JSC::Identifier(
         exec, JSEventTargetPrototypeInformation::prototypeClassName());
 
-    KJS::JSGlobalObject* globalObject = exec->lexicalGlobalObject();
-    if (KJS::JSValue* objectValue = globalObject->getDirect(*prototypeName)) {
+    JSC::JSGlobalObject* globalObject = exec->lexicalGlobalObject();
+    if (JSC::JSValue* objectValue = globalObject->getDirect(*prototypeName)) {
       ASSERT(objectValue->isObject());
-      return static_cast<KJS::JSObject*>(objectValue);
+      return static_cast<JSC::JSObject*>(objectValue);
     }
 
-    KJS::JSObject* newObject = new (exec)
+    JSC::JSObject* newObject = new (exec)
         JSEventTargetPrototype<JSEventTargetPrototypeParent,
                                JSEventTargetPrototypeInformation>(exec);
-    globalObject->putDirect(*prototypeName, newObject, KJS::DontEnum);
+    globalObject->putDirect(*prototypeName, newObject, JSC::DontEnum);
     return newObject;
   }
 
-  bool getOwnPropertySlot(KJS::ExecState* exec,
-                          const KJS::Identifier& propertyName,
-                          KJS::PropertySlot& slot) {
-    return KJS::getStaticFunctionSlot<KJS::JSObject>(
-        exec, &KJS::JSEventTargetPrototypeTable, this, propertyName, slot);
+  bool getOwnPropertySlot(JSC::ExecState* exec,
+                          const JSC::Identifier& propertyName,
+                          JSC::PropertySlot& slot) {
+    return JSC::getStaticFunctionSlot<JSC::JSObject>(
+        exec, &JSC::JSEventTargetPrototypeTable, this, propertyName, slot);
   }
 
-  virtual const KJS::ClassInfo* classInfo() const {
-    static const KJS::ClassInfo s_classInfo = {
+  virtual const JSC::ClassInfo* classInfo() const {
+    static const JSC::ClassInfo s_classInfo = {
         JSEventTargetPrototypeInformation::prototypeClassName(), 0,
-        &KJS::JSEventTargetPrototypeTable, 0};
+        &JSC::JSEventTargetPrototypeTable, 0};
     return &s_classInfo;
   }
 };
 
-KJS::JSValue* toJS(KJS::ExecState*, EventTarget*);
+JSC::JSValue* toJS(JSC::ExecState*, EventTarget*);
 
 }  // namespace WebCore
 

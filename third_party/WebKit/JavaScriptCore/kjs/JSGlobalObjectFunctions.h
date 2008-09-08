@@ -24,7 +24,7 @@
 #ifndef JSGlobalObjectFunctions_h
 #define JSGlobalObjectFunctions_h
 
-namespace KJS {
+namespace JSC {
 
 class ArgList;
 class ExecState;
@@ -59,6 +59,6 @@ JSValue* globalFuncKJSPrint(ExecState*, JSObject*, JSValue*, const ArgList&);
 static const double mantissaOverflowLowerBound = 9007199254740992.0;
 double parseIntOverflow(const char*, int length, int radix);
 
-}  // namespace KJS
+}  // namespace JSC
 
 #endif  // JSGlobalObjectFunctions_h
