@@ -553,6 +553,7 @@ static NEVER_INLINE bool isNotObject(ExecState* exec,
 }
 
 NEVER_INLINE JSValue* Machine::callEval(ExecState* exec,
+                                        CodeBlock* callingCodeBlock,
                                         JSObject* thisObj,
                                         ScopeChainNode* scopeChain,
                                         RegisterFile* registerFile,
@@ -572,25 +573,16 @@ NEVER_INLINE JSValue* Machine::callEval(ExecState* exec,
   if (*profiler)
     (*profiler)->willExecute(exec, scopeChain->globalObject()->evalFunction());
 
-  int sourceId;
-  int errLine;
-  UString errMsg;
-  RefPtr<EvalNode> evalNode = exec->parser()->parse<EvalNode>(
-      exec, UString(), 1,
-      UStringSourceProvider::create(static_cast<JSString*>(program)->value()),
-      &sourceId, &errLine, &errMsg);
+  UString programSource = static_cast<JSString*>(program)->value();
 
-  if (!evalNode) {
-    exceptionValue =
-        Error::create(exec, SyntaxError, errMsg, errLine, sourceId, NULL);
-    if (*profiler)
-      (*profiler)->didExecute(exec, scopeChain->globalObject()->evalFunction());
-    return 0;
-  }
+  RefPtr<EvalNode> evalNode = callingCodeBlock->evalCodeCache.get(
+      exec, programSource, scopeChain, exceptionValue);
 
-  JSValue* result = exec->globalData().machine->execute(
-      evalNode.get(), exec, thisObj, r - registerFile->base() + argv + argc,
-      scopeChain, &exceptionValue);
+  JSValue* result = 0;
+  if (evalNode)
+    result = exec->globalData().machine->execute(
+        evalNode.get(), exec, thisObj, r - registerFile->base() + argv + argc,
+        scopeChain, &exceptionValue);
 
   if (*profiler)
     (*profiler)->didExecute(exec, scopeChain->globalObject()->evalFunction());
@@ -3154,8 +3146,9 @@ JSValue* Machine::privateExecute(ExecutionFlag flag,
           funcVal == scopeChain->globalObject()->evalFunction()) {
         JSObject* thisObject =
             static_cast<JSObject*>(r[codeBlock->thisRegister].jsValue(exec));
-        JSValue* result = callEval(exec, thisObject, scopeChain, registerFile,
-                                   r, firstArg, argCount, exceptionValue);
+        JSValue* result =
+            callEval(exec, codeBlock, thisObject, scopeChain, registerFile, r,
+                     firstArg, argCount, exceptionValue);
         if (exceptionValue)
           goto vm_throw;
 
@@ -5164,8 +5157,8 @@ JSValue* Machine::cti_op_call_eval(CTI_ARGS) {
     JSObject* thisObject =
         static_cast<JSObject*>(r[codeBlock->thisRegister].jsValue(exec));
     JSValue* result =
-        machine->callEval(exec, thisObject, scopeChain, registerFile, r,
-                          firstArg, argCount, exceptionValue);
+        machine->callEval(exec, codeBlock, thisObject, scopeChain, registerFile,
+                          r, firstArg, argCount, exceptionValue);
     JSVALUE_VM_CHECK_EXCEPTION_ARG(exceptionValue);
     return result;
   }

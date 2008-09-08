@@ -245,6 +245,7 @@ class Machine {
   enum ExecutionFlag { Normal, InitializeAndReturn };
 
   NEVER_INLINE JSValue* callEval(ExecState* exec,
+                                 CodeBlock* callingCodeBlock,
                                  JSObject* thisObj,
                                  ScopeChainNode* scopeChain,
                                  RegisterFile*,
