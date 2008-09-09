@@ -212,7 +212,9 @@ PassRefPtr<UString::Rep> Identifier::addSlowCase(JSGlobalData* globalData,
     if (c <= 0xFF)
       r = globalData->smallStrings.singleCharacterStringRep(c);
     if (r->identifierTable()) {
+#ifndef NDEBUG
       checkSameIdentifierTable(globalData, r);
+#endif
       return r;
     }
   }
@@ -242,6 +244,12 @@ void Identifier::checkSameIdentifierTable(JSGlobalData* globalData,
                                           UString::Rep* rep) {
   ASSERT(rep->identifierTable() == globalData->identifierTable);
 }
+
+#else
+
+void Identifier::checkSameIdentifierTable(ExecState*, UString::Rep*) {}
+
+void Identifier::checkSameIdentifierTable(JSGlobalData*, UString::Rep*) {}
 
 #endif
 

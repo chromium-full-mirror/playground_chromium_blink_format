@@ -116,7 +116,9 @@ class Identifier {
 
   static PassRefPtr<UString::Rep> add(ExecState* exec, UString::Rep* r) {
     if (r->identifierTable()) {
+#ifndef NDEBUG
       checkSameIdentifierTable(exec, r);
+#endif
       return r;
     }
     return addSlowCase(exec, r);
@@ -124,7 +126,9 @@ class Identifier {
   static PassRefPtr<UString::Rep> add(JSGlobalData* globalData,
                                       UString::Rep* r) {
     if (r->identifierTable()) {
+#ifndef NDEBUG
       checkSameIdentifierTable(globalData, r);
+#endif
       return r;
     }
     return addSlowCase(globalData, r);
@@ -151,12 +155,6 @@ inline bool operator==(const Identifier& a, const char* b) {
 
 IdentifierTable* createIdentifierTable();
 void deleteIdentifierTable(IdentifierTable*);
-
-#ifdef NDEBUG
-inline void Identifier::checkSameIdentifierTable(ExecState*, UString::Rep*) {}
-inline void Identifier::checkSameIdentifierTable(JSGlobalData*, UString::Rep*) {
-}
-#endif
 
 }  // namespace JSC
 
