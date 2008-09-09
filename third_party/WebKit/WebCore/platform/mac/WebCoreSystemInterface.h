@@ -166,7 +166,6 @@ extern void (*wkSignalCFReadStreamError)(CFReadStreamRef stream,
 extern void (*wkSignalCFReadStreamHasBytes)(CFReadStreamRef stream);
 
 #ifndef BUILDING_ON_TIGER
-extern void* wkConvertCharToGlyphs;
 extern void (*wkGetGlyphsForCharacters)(CGFontRef,
                                         const UniChar[],
                                         CGGlyph[],
@@ -188,6 +187,7 @@ extern void (*wkGetFontMetrics)(CGFontRef,
                                 int* lineGap,
                                 unsigned* unitsPerEm);
 extern ATSLayoutRecord* (*wkGetGlyphVectorFirstRecord)(void* glyphVector);
+extern void* wkGetGlyphsForCharacters;
 extern int (*wkGetGlyphVectorNumGlyphs)(void* glyphVector);
 extern size_t (*wkGetGlyphVectorRecordSize)(void* glyphVector);
 extern OSStatus (*wkInitializeGlyphVector)(int count, void* glyphs);
