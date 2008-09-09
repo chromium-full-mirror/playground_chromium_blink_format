@@ -46,22 +46,24 @@ struct CharacterClassRange;
 struct CharacterClass;
 
 struct Quantifier {
-  static const unsigned NoMaxSpecified = UINT_MAX;
-
   enum Type {
     None,
     Greedy,
     NonGreedy,
     Error,
-  } m_type;
+  };
 
-  unsigned m_min;
-  unsigned m_max;
+  Quantifier() : type(None) {}
 
-  Quantifier() : m_type(None) {}
+  Quantifier(Type type_, unsigned min_ = 0, unsigned max_ = noMaxSpecified)
+      : type(type_), min(min_), max(max_) {}
 
-  Quantifier(Type type, unsigned min = 0, unsigned max = NoMaxSpecified)
-      : m_type(type), m_min(min), m_max(max) {}
+  Type type;
+
+  unsigned min;
+  unsigned max;
+
+  static const unsigned noMaxSpecified = UINT_MAX;
 };
 
 class WRECParser;
