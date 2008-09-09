@@ -2069,6 +2069,8 @@ void* CTI::privateStringLengthTrampoline() {
   return code;
 }
 
+#if ENABLE(WREC)
+
 void* CTI::compileRegExp(ExecState* exec,
                          const UString& pattern,
                          unsigned* numSubpatterns_ptr,
@@ -2166,6 +2168,8 @@ void* CTI::compileRegExp(ExecState* exec,
   ASSERT(code);
   return code;
 }
+
+#endif  // ENABLE(WREC)
 
 }  // namespace JSC
 
