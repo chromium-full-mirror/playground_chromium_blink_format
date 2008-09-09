@@ -40,6 +40,22 @@ bool GlyphPage::fill(unsigned offset,
                      UChar* buffer,
                      unsigned bufferLength,
                      const SimpleFontData* fontData) {
+  bool haveGlyphs = false;
+
+#ifndef BUILDING_ON_TIGER
+  Vector<CGGlyph, 512> glyphs(bufferLength);
+  wkGetGlyphsForCharacters(fontData->platformData().cgFont(), buffer,
+                           glyphs.data(), bufferLength);
+
+  for (unsigned i = 0; i < length; ++i) {
+    if (!glyphs[i])
+      setGlyphDataForIndex(offset + i, 0, 0);
+    else {
+      setGlyphDataForIndex(offset + i, glyphs[i], fontData);
+      haveGlyphs = true;
+    }
+  }
+#else
   // Use an array of long so we get good enough alignment.
   long glyphVector[(GLYPH_VECTOR_SIZE + sizeof(long) - 1) / sizeof(long)];
 
@@ -61,7 +77,6 @@ bool GlyphPage::fill(unsigned offset,
     return false;
   }
 
-  bool haveGlyphs = false;
   ATSLayoutRecord* glyphRecord =
       (ATSLayoutRecord*)wkGetGlyphVectorFirstRecord(glyphVector);
   for (unsigned i = 0; i < length; i++) {
@@ -76,6 +91,7 @@ bool GlyphPage::fill(unsigned offset,
                                      wkGetGlyphVectorRecordSize(glyphVector));
   }
   wkClearGlyphVector(&glyphVector);
+#endif
 
   return haveGlyphs;
 }
