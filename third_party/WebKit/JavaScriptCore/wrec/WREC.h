@@ -64,7 +64,6 @@ struct Quantifier {
       : m_type(type), m_min(min), m_max(max) {}
 };
 
-class WRECompiler;
 class WRECParser;
 
 typedef Vector<MacroAssembler::JmpSrc> JmpSrcVector;

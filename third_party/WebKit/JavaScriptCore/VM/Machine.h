@@ -68,7 +68,6 @@ enum { MaxReentryDepth = 128 };
 
 class Machine {
   friend class CTI;
-  friend class WRECompiler;
 
  public:
   Machine();
