@@ -1836,12 +1836,10 @@ void* CTI::privateCompileGetByIdSelf(StructureID* structureID,
   MacroAssembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - getDirectOffset
-  m_jit.emitMovl_mr(OBJECT_OFFSET(JSObject, m_propertyMap) +
-                        OBJECT_OFFSET(PropertyMap, m_u.table),
+  m_jit.emitMovl_mr(OBJECT_OFFSET(JSObject, m_propertyStorage),
                     MacroAssembler::eax, MacroAssembler::eax);
-  m_jit.emitMovl_mr(OBJECT_OFFSET(PropertyMapHashTable, entryIndices[0]) +
-                        (cachedOffset * sizeof(JSValue*)),
-                    MacroAssembler::eax, MacroAssembler::eax);
+  m_jit.emitMovl_mr(cachedOffset * sizeof(JSValue*), MacroAssembler::eax,
+                    MacroAssembler::eax);
   m_jit.emitRet();
 
   void* code = m_jit.copy();
@@ -1865,9 +1863,9 @@ void* CTI::privateCompileGetByIdProto(StructureID* structureID,
   // referencing the prototype object - let's speculatively load it's table nice
   // and early!)
   JSObject* protoObject = static_cast<JSObject*>(structureID->prototype());
-  PropertyMapHashTable** protoTableAddress =
-      &(protoObject->m_propertyMap.m_u.table);
-  m_jit.emitMovl_mr(static_cast<void*>(protoTableAddress), MacroAssembler::edx);
+  OwnArrayPtr<JSValue*>* protoPropertyStorage = &protoObject->m_propertyStorage;
+  m_jit.emitMovl_mr(static_cast<void*>(protoPropertyStorage),
+                    MacroAssembler::edx);
 
   // check eax is an object of the right StructureID.
   m_jit.emitTestl_i32r(JSImmediate::TagMask, MacroAssembler::eax);
@@ -1884,10 +1882,8 @@ void* CTI::privateCompileGetByIdProto(StructureID* structureID,
   MacroAssembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - getDirectOffset
-
-  m_jit.emitMovl_mr(OBJECT_OFFSET(PropertyMapHashTable, entryIndices[0]) +
-                        (cachedOffset * sizeof(JSValue*)),
-                    MacroAssembler::edx, MacroAssembler::eax);
+  m_jit.emitMovl_mr(cachedOffset * sizeof(JSValue*), MacroAssembler::edx,
+                    MacroAssembler::eax);
 
   m_jit.emitRet();
 
@@ -1937,12 +1933,12 @@ void* CTI::privateCompileGetByIdChain(StructureID* structureID,
   }
   ASSERT(protoObject);
 
-  PropertyMapHashTable** protoTableAddress =
-      &(reinterpret_cast<JSObject*>(protoObject)->m_propertyMap.m_u.table);
-  m_jit.emitMovl_mr(static_cast<void*>(protoTableAddress), MacroAssembler::edx);
-  m_jit.emitMovl_mr(OBJECT_OFFSET(PropertyMapHashTable, entryIndices[0]) +
-                        (cachedOffset * sizeof(JSValue*)),
-                    MacroAssembler::edx, MacroAssembler::eax);
+  OwnArrayPtr<JSValue*>* protoPropertyStorage =
+      &static_cast<JSObject*>(protoObject)->m_propertyStorage;
+  m_jit.emitMovl_mr(static_cast<void*>(protoPropertyStorage),
+                    MacroAssembler::edx);
+  m_jit.emitMovl_mr(cachedOffset * sizeof(JSValue*), MacroAssembler::edx,
+                    MacroAssembler::eax);
   m_jit.emitRet();
 
   bucketsOfFail.append(m_jit.emitUnlinkedJmp());
@@ -1969,12 +1965,9 @@ void* CTI::privateCompilePutByIdReplace(StructureID* structureID,
   MacroAssembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
 
   // checks out okay! - putDirectOffset
-  m_jit.emitMovl_mr(OBJECT_OFFSET(JSObject, m_propertyMap) +
-                        OBJECT_OFFSET(PropertyMap, m_u.table),
+  m_jit.emitMovl_mr(OBJECT_OFFSET(JSObject, m_propertyStorage),
                     MacroAssembler::eax, MacroAssembler::eax);
-  m_jit.emitMovl_rm(MacroAssembler::edx,
-                    OBJECT_OFFSET(PropertyMapHashTable, entryIndices[0]) +
-                        (cachedOffset * sizeof(JSValue*)),
+  m_jit.emitMovl_rm(MacroAssembler::edx, cachedOffset * sizeof(JSValue*),
                     MacroAssembler::eax);
   m_jit.emitRet();
 

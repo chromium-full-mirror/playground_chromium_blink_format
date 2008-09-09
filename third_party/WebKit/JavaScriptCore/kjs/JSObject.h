@@ -77,6 +77,8 @@ class JSObject : public JSCell {
   void setStructureID(PassRefPtr<StructureID>);
   StructureID* inheritorID();
 
+  PropertyStorage& propertyStorage() { return m_propertyStorage; }
+
   virtual UString className() const;
 
   JSValue* get(ExecState*, const Identifier& propertyName) const;
@@ -142,22 +144,28 @@ class JSObject : public JSCell {
 
   // This get function only looks at the property map.
   JSValue* getDirect(const Identifier& propertyName) const {
-    return m_propertyMap.get(propertyName);
+    return m_structureID->propertyMap().get(propertyName, m_propertyStorage);
   }
+
   JSValue** getDirectLocation(const Identifier& propertyName) {
-    return m_propertyMap.getLocation(propertyName);
+    return m_structureID->propertyMap().getLocation(propertyName,
+                                                    m_propertyStorage);
   }
+
   JSValue** getDirectLocation(const Identifier& propertyName,
                               bool& isWriteable) {
-    return m_propertyMap.getLocation(propertyName, isWriteable);
+    return m_structureID->propertyMap().getLocation(propertyName, isWriteable,
+                                                    m_propertyStorage);
   }
+
   size_t offsetForLocation(JSValue** location) {
-    return m_propertyMap.offsetForLocation(location);
+    return location - m_propertyStorage.get();
   }
+
   void removeDirect(const Identifier& propertyName);
-  bool hasCustomProperties() { return !m_propertyMap.isEmpty(); }
+  bool hasCustomProperties() { return !m_structureID->propertyMap().isEmpty(); }
   bool hasGetterSetterProperties() {
-    return m_propertyMap.hasGetterSetterProperties();
+    return m_structureID->propertyMap().hasGetterSetterProperties();
   }
 
   void putDirect(const Identifier& propertyName,
@@ -173,11 +181,9 @@ class JSObject : public JSCell {
                          unsigned attr = 0);
 
   // Fast access to known property offsets.
-  JSValue* getDirectOffset(size_t offset) {
-    return m_propertyMap.getOffset(offset);
-  }
-  void putDirectOffset(size_t offset, JSValue* v) {
-    m_propertyMap.putOffset(offset, v);
+  JSValue* getDirectOffset(size_t offset) { return m_propertyStorage[offset]; }
+  void putDirectOffset(size_t offset, JSValue* value) {
+    m_propertyStorage[offset] = value;
   }
 
   void fillGetterPropertySlot(PropertySlot&, JSValue** location);
@@ -210,7 +216,7 @@ class JSObject : public JSCell {
                                          const Identifier& propertyName) const;
   StructureID* createInheritorID();
 
-  PropertyMap m_propertyMap;
+  PropertyStorage m_propertyStorage;
   RefPtr<StructureID> m_inheritorID;
 };
 
@@ -337,7 +343,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
     PropertySlot& slot,
     bool& slotIsWriteable) {
   if (JSValue** location = getDirectLocation(propertyName, slotIsWriteable)) {
-    if (m_propertyMap.hasGetterSetterProperties() &&
+    if (m_structureID->propertyMap().hasGetterSetterProperties() &&
         location[0]->isGetterSetter()) {
       slotIsWriteable = false;
       fillGetterPropertySlot(slot, location);
@@ -365,7 +371,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
                                                 const Identifier& propertyName,
                                                 PropertySlot& slot) {
   if (JSValue** location = getDirectLocation(propertyName)) {
-    if (m_propertyMap.hasGetterSetterProperties() &&
+    if (m_structureID->propertyMap().hasGetterSetterProperties() &&
         location[0]->isGetterSetter())
       fillGetterPropertySlot(slot, location);
     else
@@ -391,18 +397,33 @@ inline void JSObject::putDirect(const Identifier& propertyName,
 
 inline void JSObject::putDirect(const Identifier& propertyName,
                                 JSValue* value,
-                                unsigned attr,
+                                unsigned attributes,
                                 bool checkReadOnly,
                                 PutPropertySlot& slot) {
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
-  m_propertyMap.put(propertyName, value, attr, checkReadOnly, this, slot);
-  if (slot.type() == PutPropertySlot::NewProperty) {
-    if (!m_structureID->isDictionary()) {
-      RefPtr<StructureID> structureID =
-          StructureID::addPropertyTransition(m_structureID, propertyName);
-      setStructureID(structureID.release());
-    }
+
+  if (m_structureID->isDictionary()) {
+    m_structureID->propertyMap().put(propertyName, value, attributes,
+                                     checkReadOnly, this, slot,
+                                     m_propertyStorage);
+    return;
   }
+
+  bool isWriteable;
+  size_t offset =
+      m_structureID->propertyMap().getOffset(propertyName, isWriteable);
+  if (offset != WTF::notFound) {
+    if (checkReadOnly && !isWriteable)
+      return;
+    m_propertyStorage[offset] = value;
+    slot.setExistingProperty(this, offset);
+    return;
+  }
+
+  RefPtr<StructureID> structureID = StructureID::addPropertyTransition(
+      m_structureID, propertyName, value, attributes, checkReadOnly, this, slot,
+      m_propertyStorage);
+  setStructureID(structureID.release());
 }
 
 inline JSValue* JSObject::toPrimitive(
