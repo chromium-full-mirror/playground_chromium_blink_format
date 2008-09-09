@@ -380,7 +380,8 @@ static const char* simpleUserAgentStyleSheet =
 
 static bool elementCanUseSimpleDefaultStyle(Element* e) {
   return e->hasTagName(htmlTag) || e->hasTagName(bodyTag) ||
-         e->hasTagName(divTag) || e->hasTagName(spanTag);
+         e->hasTagName(divTag) || e->hasTagName(spanTag) ||
+         e->hasTagName(brTag);
 }
 
 static const MediaQueryEvaluator& screenEval() {
