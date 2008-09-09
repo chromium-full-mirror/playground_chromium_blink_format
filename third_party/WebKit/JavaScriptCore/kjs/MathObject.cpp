@@ -169,7 +169,7 @@ bool MathObject::getOwnPropertySlot(ExecState* exec,
     return JSObject::getOwnPropertySlot(exec, propertyName, slot);
 
   ASSERT(entry->attributes & Function);
-  slot.setStaticEntry(this, entry, staticFunctionGetter);
+  setUpStaticFunctionSlot(exec, entry, this, propertyName, slot);
   return true;
 }
 
