@@ -93,16 +93,8 @@ class PropertyMap {
            PutPropertySlot&,
            PropertyStorage&);
   void remove(const Identifier& propertyName, PropertyStorage&);
-  JSValue* get(const Identifier& propertyName, const PropertyStorage&) const;
-  JSValue* get(const Identifier& propertyName,
-               unsigned& attributes,
-               const PropertyStorage&) const;
-  JSValue** getLocation(const Identifier& propertyName, const PropertyStorage&);
-  JSValue** getLocation(const Identifier& propertyName,
-                        bool& isWriteable,
-                        const PropertyStorage&);
-
   size_t getOffset(const Identifier& propertyName);
+  size_t getOffset(const Identifier& propertyName, unsigned& attributes);
   size_t getOffset(const Identifier& propertyName, bool& isWriteable);
 
   void getEnumerablePropertyNames(PropertyNameArray&) const;
