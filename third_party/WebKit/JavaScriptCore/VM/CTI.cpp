@@ -468,6 +468,21 @@ void CTI::compileOpCall(Instruction* instruction,
   emitPutResult(instruction[i + 1].u.operand);
 }
 
+void CTI::emitSlowScriptCheck(unsigned opcodeIndex) {
+  m_jit.emitSubl_i8r(1, MacroAssembler::esi);
+  MacroAssembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
+  emitCall(opcodeIndex, Machine::cti_timeout_check);
+
+  emitGetCTIParam(CTI_ARGS_exec, MacroAssembler::ecx);
+  m_jit.emitMovl_mr(OBJECT_OFFSET(ExecState, m_globalData), MacroAssembler::ecx,
+                    MacroAssembler::ecx);
+  m_jit.emitMovl_mr(OBJECT_OFFSET(JSGlobalData, machine), MacroAssembler::ecx,
+                    MacroAssembler::ecx);
+  m_jit.emitMovl_mr(OBJECT_OFFSET(Machine, m_ticksUntilNextTimeoutCheck),
+                    MacroAssembler::ecx, MacroAssembler::esi);
+  m_jit.link(skipTimeout, m_jit.label());
+}
+
 void CTI::privateCompileMainPass() {
   Instruction* instruction = m_codeBlock->instructions.begin();
   unsigned instructionCount = m_codeBlock->instructions.size();
@@ -566,17 +581,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop: {
-        m_jit.emitSubl_i8r(1, MacroAssembler::esi);
-        MacroAssembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
-        emitCall(i, Machine::cti_timeout_check);
-
-        emitGetCTIParam(CTI_ARGS_exec, MacroAssembler::ecx);
-        m_jit.emitMovl_mr(OBJECT_OFFSET(ExecState, m_globalData) +
-                              OBJECT_OFFSET(JSGlobalData, machine),
-                          MacroAssembler::ecx, MacroAssembler::ecx);
-        m_jit.emitMovl_mr(OBJECT_OFFSET(Machine, m_ticksUntilNextTimeoutCheck),
-                          MacroAssembler::ecx, MacroAssembler::esi);
-        m_jit.link(skipTimeout, m_jit.label());
+        emitSlowScriptCheck(i);
 
         unsigned target = instruction[i + 1].u.operand;
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 1 + target));
@@ -584,17 +589,7 @@ void CTI::privateCompileMainPass() {
         break;
       }
       case op_loop_if_less: {
-        m_jit.emitSubl_i8r(1, MacroAssembler::esi);
-        MacroAssembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
-        emitCall(i, Machine::cti_timeout_check);
-
-        emitGetCTIParam(CTI_ARGS_exec, MacroAssembler::ecx);
-        m_jit.emitMovl_mr(OBJECT_OFFSET(ExecState, m_globalData) +
-                              OBJECT_OFFSET(JSGlobalData, machine),
-                          MacroAssembler::ecx, MacroAssembler::ecx);
-        m_jit.emitMovl_mr(OBJECT_OFFSET(Machine, m_ticksUntilNextTimeoutCheck),
-                          MacroAssembler::ecx, MacroAssembler::esi);
-        m_jit.link(skipTimeout, m_jit.label());
+        emitSlowScriptCheck(i);
 
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
@@ -832,17 +827,7 @@ void CTI::privateCompileMainPass() {
       }
         CTI_COMPILE_BINARY_OP(op_lesseq)
       case op_loop_if_true: {
-        m_jit.emitSubl_i8r(1, MacroAssembler::esi);
-        MacroAssembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
-        emitCall(i, Machine::cti_timeout_check);
-
-        emitGetCTIParam(CTI_ARGS_exec, MacroAssembler::ecx);
-        m_jit.emitMovl_mr(OBJECT_OFFSET(ExecState, m_globalData) +
-                              OBJECT_OFFSET(JSGlobalData, machine),
-                          MacroAssembler::ecx, MacroAssembler::ecx);
-        m_jit.emitMovl_mr(OBJECT_OFFSET(Machine, m_ticksUntilNextTimeoutCheck),
-                          MacroAssembler::ecx, MacroAssembler::esi);
-        m_jit.link(skipTimeout, m_jit.label());
+        emitSlowScriptCheck(i);
 
         unsigned target = instruction[i + 2].u.operand;
         emitGetArg(instruction[i + 1].u.operand, MacroAssembler::eax);
@@ -1520,6 +1505,8 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_less: {
+        emitSlowScriptCheck(i);
+
         unsigned target = instruction[i + 3].u.operand;
         JSValue* src2imm =
             getConstantImmediateNumericArg(instruction[i + 2].u.operand);
@@ -1571,6 +1558,8 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_loop_if_true: {
+        emitSlowScriptCheck(i);
+
         m_jit.link(iter->from, m_jit.label());
         emitPutArg(MacroAssembler::eax, 0);
         emitCall(i, Machine::cti_op_jtrue);
