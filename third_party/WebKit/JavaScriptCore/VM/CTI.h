@@ -319,8 +319,7 @@ class CTI {
                      MacroAssembler::RegisterID scratch);
   void emitPutArg(MacroAssembler::RegisterID src, unsigned offset);
   void emitPutArgConstant(unsigned value, unsigned offset);
-  void emitPutResult(unsigned dst,
-                     MacroAssembler::RegisterID from = MacroAssembler::eax);
+  void emitPutResult(unsigned dst, MacroAssembler::RegisterID from = X86::eax);
 
   void emitPutCTIParam(MacroAssembler::RegisterID from, unsigned name);
   void emitGetCTIParam(unsigned name, MacroAssembler::RegisterID to);
