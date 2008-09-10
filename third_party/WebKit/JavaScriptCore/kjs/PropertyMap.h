@@ -75,8 +75,6 @@ struct PropertyMapHashTable {
 };
 
 class PropertyMap {
-  friend class CTI;
-
  public:
   PropertyMap();
   ~PropertyMap();
@@ -93,6 +91,7 @@ class PropertyMap {
            PutPropertySlot&,
            PropertyStorage&);
   void remove(const Identifier& propertyName, PropertyStorage&);
+
   size_t getOffset(const Identifier& propertyName);
   size_t getOffset(const Identifier& propertyName, unsigned& attributes);
   size_t getOffset(const Identifier& propertyName, bool& isWriteable);
