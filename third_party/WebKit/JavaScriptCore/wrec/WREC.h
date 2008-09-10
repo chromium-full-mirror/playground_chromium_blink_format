@@ -29,9 +29,15 @@
 #if ENABLE(WREC)
 
 #include "ustring.h"
-#include <masm/MacroAssembler.h>
+#include <masm/X86Assembler.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/Vector.h>
+
+#if COMPILER(GCC)
+#define WREC_CALL __attribute__((regparm(3)))
+#else
+#define WREC_CALL
+#endif
 
 namespace JSC {
 
@@ -68,15 +74,15 @@ struct Quantifier {
 
 class WRECParser;
 
-typedef Vector<MacroAssembler::JmpSrc> JmpSrcVector;
+typedef Vector<X86Assembler::JmpSrc> JmpSrcVector;
 
 class WRECGenerator {
  public:
-  WRECGenerator(WRECParser& parser, MacroAssembler& jit)
+  WRECGenerator(WRECParser& parser, X86Assembler& jit)
       : m_parser(parser), m_jit(jit) {}
 
-  typedef MacroAssembler::JmpSrc JmpSrc;
-  typedef MacroAssembler::JmpDst JmpDst;
+  typedef X86Assembler::JmpSrc JmpSrc;
+  typedef X86Assembler::JmpDst JmpDst;
 
   // these regs setup by the params
   static const X86Assembler::RegisterID inputRegister = X86::eax;
@@ -144,7 +150,7 @@ class WRECGenerator {
 
  private:
   WRECParser& m_parser;
-  MacroAssembler& m_jit;
+  X86Assembler& m_jit;
 };
 
 class WRECParser {
@@ -166,7 +172,7 @@ class WRECParser {
   WRECParser(const UString& pattern,
              bool ignoreCase,
              bool multiline,
-             MacroAssembler& jit)
+             X86Assembler& jit)
       : m_ignoreCase(ignoreCase),
         m_multiline(multiline),
         m_numSubpatterns(0),

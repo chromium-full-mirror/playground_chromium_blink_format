@@ -128,8 +128,7 @@ __declspec(naked) void ctiVMThrowTrampoline() {
 #endif
 
 // get arg puts an arg from the SF register array into a h/w register
-ALWAYS_INLINE void CTI::emitGetArg(unsigned src,
-                                   MacroAssembler::RegisterID dst) {
+ALWAYS_INLINE void CTI::emitGetArg(unsigned src, X86Assembler::RegisterID dst) {
   // TODO: we want to reuse values that are already in registers if we can - add
   // a register allocator!
   if (src < m_codeBlock->constantRegisters.size()) {
@@ -143,7 +142,7 @@ ALWAYS_INLINE void CTI::emitGetArg(unsigned src,
 // context threaded function.
 ALWAYS_INLINE void CTI::emitGetPutArg(unsigned src,
                                       unsigned offset,
-                                      MacroAssembler::RegisterID scratch) {
+                                      X86Assembler::RegisterID scratch) {
   if (src < m_codeBlock->constantRegisters.size()) {
     JSValue* js = m_codeBlock->constantRegisters[src].jsValue(m_exec);
     m_jit.movl_i32m(reinterpret_cast<unsigned>(js), offset + sizeof(void*),
@@ -155,7 +154,7 @@ ALWAYS_INLINE void CTI::emitGetPutArg(unsigned src,
 }
 
 // puts an arg onto the stack, as an arg to a context threaded function.
-ALWAYS_INLINE void CTI::emitPutArg(MacroAssembler::RegisterID src,
+ALWAYS_INLINE void CTI::emitPutArg(X86Assembler::RegisterID src,
                                    unsigned offset) {
   m_jit.movl_rm(src, offset + sizeof(void*), X86::esp);
 }
@@ -172,18 +171,18 @@ ALWAYS_INLINE JSValue* CTI::getConstantImmediateNumericArg(unsigned src) {
   return 0;
 }
 
-ALWAYS_INLINE void CTI::emitPutCTIParam(MacroAssembler::RegisterID from,
+ALWAYS_INLINE void CTI::emitPutCTIParam(X86Assembler::RegisterID from,
                                         unsigned name) {
   m_jit.movl_rm(from, name * sizeof(void*), X86::esp);
 }
 
 ALWAYS_INLINE void CTI::emitGetCTIParam(unsigned name,
-                                        MacroAssembler::RegisterID to) {
+                                        X86Assembler::RegisterID to) {
   m_jit.movl_mr(name * sizeof(void*), X86::esp, to);
 }
 
 ALWAYS_INLINE void CTI::emitPutToCallFrameHeader(
-    MacroAssembler::RegisterID from,
+    X86Assembler::RegisterID from,
     RegisterFile::CallFrameHeaderEntry entry) {
   m_jit.movl_rm(
       from,
@@ -194,7 +193,7 @@ ALWAYS_INLINE void CTI::emitPutToCallFrameHeader(
 
 ALWAYS_INLINE void CTI::emitGetFromCallFrameHeader(
     RegisterFile::CallFrameHeaderEntry entry,
-    MacroAssembler::RegisterID to) {
+    X86Assembler::RegisterID to) {
   m_jit.movl_mr(
       -((m_codeBlock->numLocals + RegisterFile::CallFrameHeaderSize) - entry) *
           sizeof(Register),
@@ -202,7 +201,7 @@ ALWAYS_INLINE void CTI::emitGetFromCallFrameHeader(
 }
 
 ALWAYS_INLINE void CTI::emitPutResult(unsigned dst,
-                                      MacroAssembler::RegisterID from) {
+                                      X86Assembler::RegisterID from) {
   m_jit.movl_rm(from, dst * sizeof(Register), X86::edi);
   // FIXME: #ifndef NDEBUG, Write the correct m_type to the register.
 }
@@ -229,7 +228,7 @@ ALWAYS_INLINE void CTI::emitDebugExceptionCheck() {}
 ALWAYS_INLINE void CTI::emitDebugExceptionCheck() {
   emitGetCTIParam(CTI_ARGS_exec, X86::ecx);
   m_jit.cmpl_i32m(0, OBJECT_OFFSET(ExecState, m_exception), X86::ecx);
-  MacroAssembler::JmpSrc noException = m_jit.emitUnlinkedJe();
+  X86Assembler::JmpSrc noException = m_jit.emitUnlinkedJe();
   m_jit.emitInt3();
   m_jit.link(noException, m_jit.label());
 }
@@ -320,16 +319,15 @@ ALWAYS_INLINE void CTI::emitCall(unsigned opcodeIndex, CTIHelper_s helper) {
 #endif
 }
 
-ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImm(MacroAssembler::RegisterID reg,
+ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImm(X86Assembler::RegisterID reg,
                                                  unsigned opcodeIndex) {
   m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, reg);
   m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJe(), opcodeIndex));
 }
 
-ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImms(
-    MacroAssembler::RegisterID reg1,
-    MacroAssembler::RegisterID reg2,
-    unsigned opcodeIndex) {
+ALWAYS_INLINE void CTI::emitJumpSlowCaseIfNotImms(X86Assembler::RegisterID reg1,
+                                                  X86Assembler::RegisterID reg2,
+                                                  unsigned opcodeIndex) {
   m_jit.movl_rr(reg1, X86::ecx);
   m_jit.andl_rr(reg2, X86::ecx);
   emitJumpSlowCaseIfNotImm(X86::ecx, opcodeIndex);
@@ -341,27 +339,27 @@ ALWAYS_INLINE unsigned CTI::getDeTaggedConstantImmediate(JSValue* imm) {
 }
 
 ALWAYS_INLINE void CTI::emitFastArithDeTagImmediate(
-    MacroAssembler::RegisterID reg) {
+    X86Assembler::RegisterID reg) {
   // op_mod relies on this being a sub - setting zf if result is 0.
   m_jit.subl_i8r(JSImmediate::TagBitTypeInteger, reg);
 }
 
 ALWAYS_INLINE void CTI::emitFastArithReTagImmediate(
-    MacroAssembler::RegisterID reg) {
+    X86Assembler::RegisterID reg) {
   m_jit.addl_i8r(JSImmediate::TagBitTypeInteger, reg);
 }
 
 ALWAYS_INLINE void CTI::emitFastArithPotentiallyReTagImmediate(
-    MacroAssembler::RegisterID reg) {
+    X86Assembler::RegisterID reg) {
   m_jit.orl_rr(JSImmediate::TagBitTypeInteger, reg);
 }
 
-ALWAYS_INLINE void CTI::emitFastArithImmToInt(MacroAssembler::RegisterID reg) {
+ALWAYS_INLINE void CTI::emitFastArithImmToInt(X86Assembler::RegisterID reg) {
   m_jit.sarl_i8r(1, reg);
 }
 
 ALWAYS_INLINE void CTI::emitFastArithIntToImmOrSlowCase(
-    MacroAssembler::RegisterID reg,
+    X86Assembler::RegisterID reg,
     unsigned opcodeIndex) {
   m_jit.addl_rr(reg, reg);
   m_slowCases.append(SlowCaseEntry(m_jit.emitUnlinkedJo(), opcodeIndex));
@@ -369,7 +367,7 @@ ALWAYS_INLINE void CTI::emitFastArithIntToImmOrSlowCase(
 }
 
 ALWAYS_INLINE void CTI::emitFastArithIntToImmNoCheck(
-    MacroAssembler::RegisterID reg) {
+    X86Assembler::RegisterID reg) {
   m_jit.addl_rr(reg, reg);
   emitFastArithReTagImmediate(reg);
 }
@@ -415,7 +413,7 @@ void CTI::compileOpCall(Instruction* instruction,
       emitGetPutArg(thisVal, 4, X86::ecx);
   }
 
-  MacroAssembler::JmpSrc wasEval;
+  X86Assembler::JmpSrc wasEval;
   if (type == OpCallEval) {
     emitGetPutArg(instruction[i + 2].u.operand, 0, X86::ecx);
     emitCall(i, Machine::cti_op_call_eval);
@@ -438,10 +436,10 @@ void CTI::compileOpCall(Instruction* instruction,
 
   // Fast check for JS function.
   m_jit.testl_i32r(JSImmediate::TagMask, X86::ecx);
-  MacroAssembler::JmpSrc isNotObject = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc isNotObject = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<unsigned>(m_machine->m_jsFunctionVptr),
                   X86::ecx);
-  MacroAssembler::JmpSrc isJSFunction = m_jit.emitUnlinkedJe();
+  X86Assembler::JmpSrc isJSFunction = m_jit.emitUnlinkedJe();
   m_jit.link(isNotObject, m_jit.label());
 
   // This handles host functions
@@ -449,7 +447,7 @@ void CTI::compileOpCall(Instruction* instruction,
                                      : Machine::cti_op_call_NotJSFunction));
   emitGetCTIParam(CTI_ARGS_r, X86::edi);  // edi := r
 
-  MacroAssembler::JmpSrc wasNotJSFunction = m_jit.emitUnlinkedJmp();
+  X86Assembler::JmpSrc wasNotJSFunction = m_jit.emitUnlinkedJmp();
   m_jit.link(isJSFunction, m_jit.label());
 
   // This handles JSFunctions
@@ -458,7 +456,7 @@ void CTI::compileOpCall(Instruction* instruction,
   m_jit.call_r(X86::eax);
   emitGetCTIParam(CTI_ARGS_r, X86::edi);  // edi := r
 
-  MacroAssembler::JmpDst end = m_jit.label();
+  X86Assembler::JmpDst end = m_jit.label();
   m_jit.link(wasNotJSFunction, end);
   if (type == OpCallEval)
     m_jit.link(wasEval, end);
@@ -468,7 +466,7 @@ void CTI::compileOpCall(Instruction* instruction,
 
 void CTI::emitSlowScriptCheck(unsigned opcodeIndex) {
   m_jit.subl_i8r(1, X86::esi);
-  MacroAssembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc skipTimeout = m_jit.emitUnlinkedJne();
   emitCall(opcodeIndex, Machine::cti_timeout_check);
 
   emitGetCTIParam(CTI_ARGS_exec, X86::ecx);
@@ -817,7 +815,7 @@ void CTI::privateCompileMainPass() {
 
         m_jit.cmpl_i32r(
             reinterpret_cast<uint32_t>(JSImmediate::zeroImmediate()), X86::eax);
-        MacroAssembler::JmpSrc isZero = m_jit.emitUnlinkedJe();
+        X86Assembler::JmpSrc isZero = m_jit.emitUnlinkedJe();
         m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJne(), i + 2 + target));
 
@@ -913,7 +911,7 @@ void CTI::privateCompileMainPass() {
             reinterpret_cast<uint32_t>(JSImmediate::zeroImmediate()), X86::eax);
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJe(), i + 2 + target));
         m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
-        MacroAssembler::JmpSrc isNonZero = m_jit.emitUnlinkedJne();
+        X86Assembler::JmpSrc isNonZero = m_jit.emitUnlinkedJne();
 
         m_jit.cmpl_i32r(
             reinterpret_cast<uint32_t>(JSImmediate::falseImmediate()),
@@ -953,9 +951,9 @@ void CTI::privateCompileMainPass() {
         int retAddrDst = instruction[i + 1].u.operand;
         int target = instruction[i + 2].u.operand;
         m_jit.movl_i32m(0, sizeof(Register) * retAddrDst, X86::edi);
-        MacroAssembler::JmpDst addrPosition = m_jit.label();
+        X86Assembler::JmpDst addrPosition = m_jit.label();
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 2 + target));
-        MacroAssembler::JmpDst sretTarget = m_jit.label();
+        X86Assembler::JmpDst sretTarget = m_jit.label();
         m_jsrSites.append(JSRInfo(addrPosition, sretTarget));
         i += 3;
         break;
@@ -1070,7 +1068,7 @@ void CTI::privateCompileMainPass() {
 
         m_jit.cmpl_i32r(
             reinterpret_cast<uint32_t>(JSImmediate::zeroImmediate()), X86::eax);
-        MacroAssembler::JmpSrc isZero = m_jit.emitUnlinkedJe();
+        X86Assembler::JmpSrc isZero = m_jit.emitUnlinkedJe();
         m_jit.testl_i32r(JSImmediate::TagBitTypeInteger, X86::eax);
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJne(), i + 2 + target));
 
@@ -1158,7 +1156,7 @@ void CTI::privateCompileMainPass() {
         unsigned target = instruction[i + 3].u.operand;
         emitCall(i, Machine::cti_op_next_pname);
         m_jit.testl_rr(X86::eax, X86::eax);
-        MacroAssembler::JmpSrc endOfIter = m_jit.emitUnlinkedJe();
+        X86Assembler::JmpSrc endOfIter = m_jit.emitUnlinkedJe();
         emitPutResult(instruction[i + 1].u.operand);
         m_jmpTable.append(JmpTable(m_jit.emitUnlinkedJmp(), i + 3 + target));
         m_jit.link(endOfIter, m_jit.label());
@@ -1389,7 +1387,7 @@ void CTI::privateCompileSlowCases() {
         if (src2 < m_codeBlock->constantRegisters.size()) {
           JSValue* value = m_codeBlock->constantRegisters[src2].jsValue(m_exec);
           if (JSImmediate::isNumber(value)) {
-            MacroAssembler::JmpSrc notImm = iter->from;
+            X86Assembler::JmpSrc notImm = iter->from;
             m_jit.link((++iter)->from, m_jit.label());
             m_jit.subl_i32r(getDeTaggedConstantImmediate(value), X86::eax);
             m_jit.link(notImm, m_jit.label());
@@ -1405,7 +1403,7 @@ void CTI::privateCompileSlowCases() {
         ASSERT(!(static_cast<unsigned>(instruction[i + 2].u.operand) <
                  m_codeBlock->constantRegisters.size()));
 
-        MacroAssembler::JmpSrc notImm = iter->from;
+        X86Assembler::JmpSrc notImm = iter->from;
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.subl_rr(X86::edx, X86::eax);
         emitFastArithReTagImmediate(X86::eax);
@@ -1418,7 +1416,7 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_get_by_val: {
-        MacroAssembler::JmpSrc notImm = iter->from;
+        X86Assembler::JmpSrc notImm = iter->from;
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
@@ -1432,7 +1430,7 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_sub: {
-        MacroAssembler::JmpSrc notImm = iter->from;
+        X86Assembler::JmpSrc notImm = iter->from;
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.addl_rr(X86::edx, X86::eax);
         m_jit.link(notImm, m_jit.label());
@@ -1454,8 +1452,8 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_lshift: {
-        MacroAssembler::JmpSrc notImm1 = iter->from;
-        MacroAssembler::JmpSrc notImm2 = (++iter)->from;
+        X86Assembler::JmpSrc notImm1 = iter->from;
+        X86Assembler::JmpSrc notImm2 = (++iter)->from;
         m_jit.link((++iter)->from, m_jit.label());
         emitGetArg(instruction[i + 2].u.operand, X86::eax);
         emitGetArg(instruction[i + 3].u.operand, X86::ecx);
@@ -1495,7 +1493,7 @@ void CTI::privateCompileSlowCases() {
       }
       case op_pre_inc: {
         unsigned srcDst = instruction[i + 1].u.operand;
-        MacroAssembler::JmpSrc notImm = iter->from;
+        X86Assembler::JmpSrc notImm = iter->from;
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.subl_i8r(
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
@@ -1508,7 +1506,7 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_put_by_val: {
-        MacroAssembler::JmpSrc notImm = iter->from;
+        X86Assembler::JmpSrc notImm = iter->from;
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.link((++iter)->from, m_jit.label());
@@ -1535,7 +1533,7 @@ void CTI::privateCompileSlowCases() {
       }
       case op_pre_dec: {
         unsigned srcDst = instruction[i + 1].u.operand;
-        MacroAssembler::JmpSrc notImm = iter->from;
+        X86Assembler::JmpSrc notImm = iter->from;
         m_jit.link((++iter)->from, m_jit.label());
         m_jit.addl_i8r(
             getDeTaggedConstantImmediate(JSImmediate::oneImmediate()),
@@ -1677,8 +1675,8 @@ void CTI::privateCompileSlowCases() {
         break;
       }
       case op_mod: {
-        MacroAssembler::JmpSrc notImm1 = iter->from;
-        MacroAssembler::JmpSrc notImm2 = (++iter)->from;
+        X86Assembler::JmpSrc notImm1 = iter->from;
+        X86Assembler::JmpSrc notImm2 = (++iter)->from;
         m_jit.link((++iter)->from, m_jit.label());
         emitFastArithReTagImmediate(X86::eax);
         emitFastArithReTagImmediate(X86::ecx);
@@ -1776,7 +1774,7 @@ void CTI::privateCompile() {
   // m_codeBlock->ctiReturnAddressVPCMap.grow(m_calls.size());
   for (Vector<CallRecord>::iterator iter = m_calls.begin();
        iter != m_calls.end(); ++iter) {
-    MacroAssembler::link(code, iter->from, iter->to);
+    X86Assembler::link(code, iter->from, iter->to);
     m_codeBlock->ctiReturnAddressVPCMap.add(
         m_jit.getRelocatedAddress(code, iter->from), iter->opcodeIndex);
   }
@@ -1784,7 +1782,7 @@ void CTI::privateCompile() {
   // Link absolute addresses for jsr
   for (Vector<JSRInfo>::iterator iter = m_jsrSites.begin();
        iter != m_jsrSites.end(); ++iter)
-    MacroAssembler::linkAbsoluteAddress(code, iter->addrPosition, iter->target);
+    X86Assembler::linkAbsoluteAddress(code, iter->addrPosition, iter->target);
 
   m_codeBlock->ctiCode = code;
 }
@@ -1793,10 +1791,10 @@ void* CTI::privateCompileGetByIdSelf(StructureID* structureID,
                                      size_t cachedOffset) {
   // Check eax is an object of the right StructureID.
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
-  MacroAssembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<uint32_t>(structureID),
                   OBJECT_OFFSET(JSCell, m_structureID), X86::eax);
-  MacroAssembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - getDirectOffset
   m_jit.movl_mr(OBJECT_OFFSET(JSObject, m_propertyStorage), X86::eax, X86::eax);
@@ -1806,10 +1804,10 @@ void* CTI::privateCompileGetByIdSelf(StructureID* structureID,
   void* code = m_jit.copy();
   ASSERT(code);
 
-  MacroAssembler::link(code, failureCases1,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  MacroAssembler::link(code, failureCases2,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases1,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases2,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
 
   m_codeBlock->structureIDAccessStubs.append(code);
 
@@ -1829,16 +1827,16 @@ void* CTI::privateCompileGetByIdProto(StructureID* structureID,
 
   // check eax is an object of the right StructureID.
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
-  MacroAssembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<uint32_t>(structureID),
                   OBJECT_OFFSET(JSCell, m_structureID), X86::eax);
-  MacroAssembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
 
   // Check the prototype object's StructureID had not changed.
   StructureID** protoStructureIDAddress = &(protoObject->m_structureID);
   m_jit.cmpl_i32m(reinterpret_cast<uint32_t>(prototypeStructureID),
                   static_cast<void*>(protoStructureIDAddress));
-  MacroAssembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - getDirectOffset
   m_jit.movl_mr(cachedOffset * sizeof(JSValue*), X86::edx, X86::eax);
@@ -1848,12 +1846,12 @@ void* CTI::privateCompileGetByIdProto(StructureID* structureID,
   void* code = m_jit.copy();
   ASSERT(code);
 
-  MacroAssembler::link(code, failureCases1,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  MacroAssembler::link(code, failureCases2,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  MacroAssembler::link(code, failureCases3,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases1,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases2,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases3,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
 
   m_codeBlock->structureIDAccessStubs.append(code);
 
@@ -1866,7 +1864,7 @@ void* CTI::privateCompileGetByIdChain(StructureID* structureID,
                                       size_t cachedOffset) {
   ASSERT(count);
 
-  Vector<MacroAssembler::JmpSrc> bucketsOfFail;
+  Vector<X86Assembler::JmpSrc> bucketsOfFail;
 
   // Check eax is an object of the right StructureID.
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
@@ -1902,9 +1900,8 @@ void* CTI::privateCompileGetByIdChain(StructureID* structureID,
   ASSERT(code);
 
   for (unsigned i = 0; i < bucketsOfFail.size(); ++i)
-    MacroAssembler::link(
-        code, bucketsOfFail[i],
-        reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+    X86Assembler::link(code, bucketsOfFail[i],
+                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
   m_codeBlock->structureIDAccessStubs.append(code);
   return code;
 }
@@ -1913,10 +1910,10 @@ void* CTI::privateCompilePutByIdReplace(StructureID* structureID,
                                         size_t cachedOffset) {
   // check eax is an object of the right StructureID.
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
-  MacroAssembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<uint32_t>(structureID),
                   OBJECT_OFFSET(JSCell, m_structureID), X86::eax);
-  MacroAssembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
 
   // checks out okay! - putDirectOffset
   m_jit.movl_mr(OBJECT_OFFSET(JSObject, m_propertyStorage), X86::eax, X86::eax);
@@ -1926,10 +1923,10 @@ void* CTI::privateCompilePutByIdReplace(StructureID* structureID,
   void* code = m_jit.copy();
   ASSERT(code);
 
-  MacroAssembler::link(code, failureCases1,
-                       reinterpret_cast<void*>(Machine::cti_op_put_by_id_fail));
-  MacroAssembler::link(code, failureCases2,
-                       reinterpret_cast<void*>(Machine::cti_op_put_by_id_fail));
+  X86Assembler::link(code, failureCases1,
+                     reinterpret_cast<void*>(Machine::cti_op_put_by_id_fail));
+  X86Assembler::link(code, failureCases2,
+                     reinterpret_cast<void*>(Machine::cti_op_put_by_id_fail));
 
   m_codeBlock->structureIDAccessStubs.append(code);
 
@@ -1939,17 +1936,17 @@ void* CTI::privateCompilePutByIdReplace(StructureID* structureID,
 void* CTI::privateArrayLengthTrampoline() {
   // Check eax is an array
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
-  MacroAssembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<unsigned>(m_machine->m_jsArrayVptr),
                   X86::eax);
-  MacroAssembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - get the length from the storage
   m_jit.movl_mr(OBJECT_OFFSET(JSArray, m_storage), X86::eax, X86::eax);
   m_jit.movl_mr(OBJECT_OFFSET(ArrayStorage, m_length), X86::eax, X86::eax);
 
   m_jit.addl_rr(X86::eax, X86::eax);
-  MacroAssembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJo();
+  X86Assembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJo();
   m_jit.addl_i8r(1, X86::eax);
 
   m_jit.ret();
@@ -1957,12 +1954,12 @@ void* CTI::privateArrayLengthTrampoline() {
   void* code = m_jit.copy();
   ASSERT(code);
 
-  MacroAssembler::link(code, failureCases1,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  MacroAssembler::link(code, failureCases2,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  MacroAssembler::link(code, failureCases3,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases1,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases2,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases3,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
 
   return code;
 }
@@ -1970,10 +1967,10 @@ void* CTI::privateArrayLengthTrampoline() {
 void* CTI::privateStringLengthTrampoline() {
   // Check eax is a string
   m_jit.testl_i32r(JSImmediate::TagMask, X86::eax);
-  MacroAssembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases1 = m_jit.emitUnlinkedJne();
   m_jit.cmpl_i32m(reinterpret_cast<unsigned>(m_machine->m_jsStringVptr),
                   X86::eax);
-  MacroAssembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
+  X86Assembler::JmpSrc failureCases2 = m_jit.emitUnlinkedJne();
 
   // Checks out okay! - get the length from the Ustring.
   m_jit.movl_mr(
@@ -1982,7 +1979,7 @@ void* CTI::privateStringLengthTrampoline() {
   m_jit.movl_mr(OBJECT_OFFSET(UString::Rep, len), X86::eax, X86::eax);
 
   m_jit.addl_rr(X86::eax, X86::eax);
-  MacroAssembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJo();
+  X86Assembler::JmpSrc failureCases3 = m_jit.emitUnlinkedJo();
   m_jit.addl_i8r(1, X86::eax);
 
   m_jit.ret();
@@ -1990,12 +1987,12 @@ void* CTI::privateStringLengthTrampoline() {
   void* code = m_jit.copy();
   ASSERT(code);
 
-  MacroAssembler::link(code, failureCases1,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  MacroAssembler::link(code, failureCases2,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
-  MacroAssembler::link(code, failureCases3,
-                       reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases1,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases2,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
+  X86Assembler::link(code, failureCases3,
+                     reinterpret_cast<void*>(Machine::cti_op_get_by_id_fail));
 
   return code;
 }
@@ -2014,7 +2011,7 @@ void* CTI::compileRegExp(ExecState* exec,
     return 0;
   }
 
-  MacroAssembler jit(exec->machine()->jitCodeBuffer());
+  X86Assembler jit(exec->machine()->jitCodeBuffer());
   WRECParser parser(pattern, ignoreCase, multiline, jit);
 
   jit.emitConvertToFastCall();
