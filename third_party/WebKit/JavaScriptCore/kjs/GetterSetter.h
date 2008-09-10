@@ -34,7 +34,7 @@ class JSObject;
 // for a property.
 class GetterSetter : public JSCell {
  public:
-  GetterSetter() : m_getter(0), m_setter(0) {}
+  GetterSetter() : JSCell(0), m_getter(0), m_setter(0) {}
 
   virtual void mark();
 

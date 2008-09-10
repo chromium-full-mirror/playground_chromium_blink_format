@@ -26,6 +26,7 @@
 #ifndef StructureID_h
 #define StructureID_h
 
+#include "JSType.h"
 #include "JSValue.h"
 #include "PropertyMap.h"
 #include "ustring.h"
@@ -78,8 +79,9 @@ struct TransitionTableHashTraits {
 
 class StructureID : public RefCounted<StructureID> {
  public:
-  static PassRefPtr<StructureID> create(JSValue* prototype) {
-    return adoptRef(new StructureID(prototype));
+  static PassRefPtr<StructureID> create(JSValue* prototype,
+                                        JSType type = ObjectType) {
+    return adoptRef(new StructureID(prototype, type));
   }
 
   static PassRefPtr<StructureID> changePrototypeTransition(StructureID*,
@@ -106,7 +108,8 @@ class StructureID : public RefCounted<StructureID> {
 
   bool isDictionary() const { return m_isDictionary; }
 
-  JSValue* prototype() const { return m_prototype; }
+  JSValue* storedPrototype() const { return m_prototype; }
+  JSValue* prototypeForLookup(ExecState*);
 
   void setCachedPrototypeChain(
       PassRefPtr<StructureIDChain> cachedPrototypeChain) {
@@ -127,11 +130,12 @@ class StructureID : public RefCounted<StructureID> {
                   TransitionTableHashTraits>
       TransitionTable;
 
-  StructureID(JSValue* prototype);
+  StructureID(JSValue* prototype, JSType);
 
   static const size_t s_maxTransitionLength = 64;
 
   bool m_isDictionary;
+  JSType m_type;
 
   JSValue* m_prototype;
   RefPtr<StructureIDChain> m_cachedPrototypeChain;

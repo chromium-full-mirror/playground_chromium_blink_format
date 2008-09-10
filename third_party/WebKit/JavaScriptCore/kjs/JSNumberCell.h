@@ -70,7 +70,8 @@ class JSNumberCell : public JSCell {
   }
 
  private:
-  JSNumberCell(double value) : m_value(value) {}
+  JSNumberCell(ExecState* exec, double value)
+      : JSCell(exec->globalData().numberStructureID.get()), m_value(value) {}
 
   virtual bool getUInt32(uint32_t&) const;
   virtual bool getTruncatedInt32(int32_t&) const;
@@ -85,7 +86,7 @@ extern const double Inf;
 // Beware marking this function ALWAYS_INLINE: It takes a PIC branch, so
 // inlining it may not always be a win.
 inline JSValue* jsNumberCell(ExecState* exec, double d) {
-  return new (exec) JSNumberCell(d);
+  return new (exec) JSNumberCell(exec, d);
 }
 
 inline JSValue* jsNaN(ExecState* exec) {

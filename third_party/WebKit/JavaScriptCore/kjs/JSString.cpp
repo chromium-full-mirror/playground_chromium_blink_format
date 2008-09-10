@@ -119,7 +119,7 @@ JSString* jsString(ExecState* exec, const UString& s) {
     if (c <= 0xFF)
       return exec->globalData().smallStrings.singleCharacterString(exec, c);
   }
-  return new (exec) JSString(s);
+  return new (exec) JSString(exec, s);
 }
 
 JSString* jsSubstring(ExecState* exec,
@@ -136,7 +136,8 @@ JSString* jsSubstring(ExecState* exec,
     if (c <= 0xFF)
       return exec->globalData().smallStrings.singleCharacterString(exec, c);
   }
-  return new (exec) JSString(UString::Rep::create(s.rep(), offset, length));
+  return new (exec)
+      JSString(exec, UString::Rep::create(s.rep(), offset, length));
 }
 
 JSString* jsOwnedString(ExecState* exec, const UString& s) {
@@ -148,7 +149,7 @@ JSString* jsOwnedString(ExecState* exec, const UString& s) {
     if (c <= 0xFF)
       return exec->globalData().smallStrings.singleCharacterString(exec, c);
   }
-  return new (exec) JSString(s, JSString::HasOtherOwner);
+  return new (exec) JSString(exec, s, JSString::HasOtherOwner);
 }
 
 }  // namespace JSC

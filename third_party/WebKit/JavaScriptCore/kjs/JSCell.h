@@ -41,7 +41,6 @@ class JSCell : public JSValue {
   friend class CTI;
 
  private:
-  JSCell();
   JSCell(StructureID*);
   virtual ~JSCell();
 
@@ -117,8 +116,6 @@ class JSCell : public JSValue {
 
   StructureID* m_structureID;
 };
-
-inline JSCell::JSCell() : m_structureID(0) {}
 
 inline JSCell::JSCell(StructureID* structureID) : m_structureID(structureID) {}
 

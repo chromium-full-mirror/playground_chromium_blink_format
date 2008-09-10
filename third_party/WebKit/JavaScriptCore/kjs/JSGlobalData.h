@@ -74,6 +74,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   const HashTable* stringTable;
 
   RefPtr<StructureID> nullProtoStructureID;
+  RefPtr<StructureID> stringStructureID;
+  RefPtr<StructureID> numberStructureID;
 
   IdentifierTable* identifierTable;
   CommonIdentifiers* propertyNames;

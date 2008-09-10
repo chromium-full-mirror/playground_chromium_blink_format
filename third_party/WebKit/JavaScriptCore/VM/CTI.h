@@ -235,8 +235,8 @@ class CTI {
                                    StructureID* prototypeStructureID,
                                    size_t cachedOffset) {
     CTI cti(machine, exec, codeBlock);
-    return cti.privateCompileGetByIdProto(structureID, prototypeStructureID,
-                                          cachedOffset);
+    return cti.privateCompileGetByIdProto(exec, structureID,
+                                          prototypeStructureID, cachedOffset);
   }
 
   static void* compileGetByIdChain(Machine* machine,
@@ -247,7 +247,7 @@ class CTI {
                                    size_t count,
                                    size_t cachedOffset) {
     CTI cti(machine, exec, codeBlock);
-    return cti.privateCompileGetByIdChain(structureID, chain, count,
+    return cti.privateCompileGetByIdChain(exec, structureID, chain, count,
                                           cachedOffset);
   }
 
@@ -297,10 +297,12 @@ class CTI {
   void privateCompileSlowCases();
   void privateCompile();
   void* privateCompileGetByIdSelf(StructureID*, size_t cachedOffset);
-  void* privateCompileGetByIdProto(StructureID*,
+  void* privateCompileGetByIdProto(ExecState*,
+                                   StructureID*,
                                    StructureID* prototypeStructureID,
                                    size_t cachedOffset);
-  void* privateCompileGetByIdChain(StructureID*,
+  void* privateCompileGetByIdChain(ExecState*,
+                                   StructureID*,
                                    StructureIDChain*,
                                    size_t count,
                                    size_t cachedOffset);
