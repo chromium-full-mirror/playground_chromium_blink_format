@@ -154,9 +154,9 @@ class JSObject : public JSCell {
   }
 
   JSValue** getDirectLocation(const Identifier& propertyName,
-                              bool& isWriteable) {
+                              unsigned& attributes) {
     size_t offset =
-        m_structureID->propertyMap().getOffset(propertyName, isWriteable);
+        m_structureID->propertyMap().getOffset(propertyName, attributes);
     return offset != WTF::notFound ? locationForOffset(offset) : 0;
   }
 
@@ -348,13 +348,16 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlotForWrite(
     const Identifier& propertyName,
     PropertySlot& slot,
     bool& slotIsWriteable) {
-  if (JSValue** location = getDirectLocation(propertyName, slotIsWriteable)) {
+  unsigned attributes;
+  if (JSValue** location = getDirectLocation(propertyName, attributes)) {
     if (m_structureID->propertyMap().hasGetterSetterProperties() &&
         location[0]->isGetterSetter()) {
       slotIsWriteable = false;
       fillGetterPropertySlot(slot, location);
-    } else
+    } else {
+      slotIsWriteable = !(attributes & ReadOnly);
       slot.setValueSlot(this, location, offsetForLocation(location));
+    }
     return true;
   }
 
@@ -415,11 +418,11 @@ inline void JSObject::putDirect(const Identifier& propertyName,
     return;
   }
 
-  bool isWriteable;
+  unsigned currentAttributes;
   size_t offset =
-      m_structureID->propertyMap().getOffset(propertyName, isWriteable);
+      m_structureID->propertyMap().getOffset(propertyName, currentAttributes);
   if (offset != WTF::notFound) {
-    if (checkReadOnly && !isWriteable)
+    if (checkReadOnly && currentAttributes & ReadOnly)
       return;
     m_propertyStorage[offset] = value;
     slot.setExistingProperty(this, offset);
