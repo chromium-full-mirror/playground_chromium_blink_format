@@ -151,9 +151,9 @@ void PropertyMap::put(const Identifier& propertyName,
           (m_table->entries()[entryIndex - 1].attributes & ReadOnly))
         return;
       // Put a new value in an existing hash table entry.
-      propertyStorage[entryIndex - 1] = value;
+      propertyStorage[entryIndex - 2] = value;
       // Attributes are intentionally not updated.
-      slot.setExistingProperty(slotBase, entryIndex - 1);
+      slot.setExistingProperty(slotBase, entryIndex - 2);
       return;
     } else if (entryIndex == deletedSentinelIndex) {
       // If we find a deleted-element sentinel, remember it for use later.
@@ -202,13 +202,13 @@ void PropertyMap::put(const Identifier& propertyName,
   m_table->entries()[entryIndex - 1].index = ++m_table->lastIndexUsed;
   ++m_table->keyCount;
 
-  propertyStorage[entryIndex - 1] = value;
+  propertyStorage[entryIndex - 2] = value;
 
   if ((m_table->keyCount + m_table->deletedSentinelCount) * 2 >= m_table->size)
     expand(propertyStorage);
 
   checkConsistency(propertyStorage);
-  slot.setNewProperty(slotBase, entryIndex - 1);
+  slot.setNewProperty(slotBase, entryIndex - 2);
 }
 
 void PropertyMap::remove(const Identifier& propertyName,
@@ -262,7 +262,7 @@ void PropertyMap::remove(const Identifier& propertyName,
   m_table->entries()[entryIndex - 1].key = 0;
   m_table->entries()[entryIndex - 1].attributes = 0;
 
-  propertyStorage[entryIndex - 1] = jsUndefined();
+  propertyStorage[entryIndex - 2] = jsUndefined();
 
   ASSERT(m_table->keyCount >= 1);
   --m_table->keyCount;
@@ -293,7 +293,7 @@ size_t PropertyMap::getOffset(const Identifier& propertyName) {
     return WTF::notFound;
 
   if (rep == m_table->entries()[entryIndex - 1].key)
-    return entryIndex - 1;
+    return entryIndex - 2;
 
 #if DUMP_PROPERTYMAP_STATS
   ++numCollisions;
@@ -313,7 +313,7 @@ size_t PropertyMap::getOffset(const Identifier& propertyName) {
       return WTF::notFound;
 
     if (rep == m_table->entries()[entryIndex - 1].key)
-      return entryIndex - 1;
+      return entryIndex - 2;
   }
 }
 
@@ -338,7 +338,7 @@ size_t PropertyMap::getOffset(const Identifier& propertyName,
 
   if (rep == m_table->entries()[entryIndex - 1].key) {
     attributes = m_table->entries()[entryIndex - 1].attributes;
-    return entryIndex - 1;
+    return entryIndex - 2;
   }
 
 #if DUMP_PROPERTYMAP_STATS
@@ -360,7 +360,7 @@ size_t PropertyMap::getOffset(const Identifier& propertyName,
 
     if (rep == m_table->entries()[entryIndex - 1].key) {
       attributes = m_table->entries()[entryIndex - 1].attributes;
-      return entryIndex - 1;
+      return entryIndex - 2;
     }
   }
 }
@@ -386,7 +386,7 @@ size_t PropertyMap::getOffset(const Identifier& propertyName,
 
   if (rep == m_table->entries()[entryIndex - 1].key) {
     isWriteable = !(m_table->entries()[entryIndex - 1].attributes & ReadOnly);
-    return entryIndex - 1;
+    return entryIndex - 2;
   }
 
 #if DUMP_PROPERTYMAP_STATS
@@ -408,7 +408,7 @@ size_t PropertyMap::getOffset(const Identifier& propertyName,
 
     if (rep == m_table->entries()[entryIndex - 1].key) {
       isWriteable = !(m_table->entries()[entryIndex - 1].attributes & ReadOnly);
-      return entryIndex - 1;
+      return entryIndex - 2;
     }
   }
 }
@@ -448,7 +448,7 @@ void PropertyMap::insert(const Entry& entry,
   m_table->entryIndices[i & m_table->sizeMask] = entryIndex;
   m_table->entries()[entryIndex - 1] = entry;
 
-  propertyStorage[entryIndex - 1] = value;
+  propertyStorage[entryIndex - 2] = value;
 
   ++m_table->keyCount;
 }
@@ -504,7 +504,7 @@ void PropertyMap::rehash(unsigned newTableSize,
   for (unsigned i = 1; i <= entryCount; ++i) {
     if (oldTable->entries()[i].key) {
       lastIndexUsed = max(oldTable->entries()[i].index, lastIndexUsed);
-      insert(oldTable->entries()[i], oldPropertStorage[i], propertyStorage);
+      insert(oldTable->entries()[i], oldPropertStorage[i - 1], propertyStorage);
     }
   }
   m_table->lastIndexUsed = lastIndexUsed;
@@ -524,7 +524,7 @@ void PropertyMap::resizePropertyStorage(PropertyStorage& propertyStorage,
     propertyStorage.set(new JSValue*[m_table->size]);
 
     // FIXME: this can probalby use memcpy
-    for (unsigned i = 1; i <= oldSize; ++i)
+    for (unsigned i = 0; i < oldSize; ++i)
       propertyStorage[i] = oldPropertStorage[i];
 
     delete[] oldPropertStorage;
@@ -639,7 +639,7 @@ void PropertyMap::checkConsistency(PropertyStorage& propertyStorage) {
        ++c) {
     UString::Rep* rep = m_table->entries()[c].key;
     if (!rep) {
-      ASSERT(propertyStorage[c]->isUndefined());
+      ASSERT(propertyStorage[c - 1]->isUndefined());
       continue;
     }
     ++nonEmptyEntryCount;

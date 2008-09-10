@@ -102,7 +102,7 @@ class PropertyMap {
   void setHasGetterSetterProperties(bool f) { m_getterSetterFlag = f; }
 
   unsigned size() const { return m_table ? m_table->size : 0; }
-  unsigned makingCount() const {
+  unsigned markingCount() const {
     return m_table ? m_table->keyCount + m_table->deletedSentinelCount : 0;
   }
 
@@ -112,7 +112,6 @@ class PropertyMap {
   typedef PropertyMapEntry Entry;
   typedef PropertyMapHashTable Table;
 
-  static bool keysMatch(const UString::Rep*, const UString::Rep*);
   void expand(PropertyStorage&);
   void rehash(PropertyStorage&);
   void rehash(unsigned newTableSize, PropertyStorage&);
