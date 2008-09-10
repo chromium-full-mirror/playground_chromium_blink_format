@@ -346,7 +346,8 @@ void CompositeAnimation::setAnimationStartTime(double t) {
        it != kfend; ++it) {
     KeyframeAnimation* anim = it->second;
     if (anim && anim->waitingForStartTime())
-      anim->updateStateMachine(AnimationBase::STATE_INPUT_START_TIME_SET, t);
+      anim->updateStateMachine(AnimationBase::AnimationStateInputStartTimeSet,
+                               t);
   }
 }
 
@@ -358,7 +359,8 @@ void CompositeAnimation::setTransitionStartTime(int property, double t) {
     ImplicitAnimation* anim = it->second;
     if (anim && anim->waitingForStartTime() &&
         anim->animatingProperty() == property)
-      anim->updateStateMachine(AnimationBase::STATE_INPUT_START_TIME_SET, t);
+      anim->updateStateMachine(AnimationBase::AnimationStateInputStartTimeSet,
+                               t);
   }
 }
 
@@ -458,7 +460,8 @@ void CompositeAnimation::styleAvailable() {
   for (i = 0; i < animations.size(); ++i) {
     KeyframeAnimation* anim = animations[i];
     if (anim && anim->waitingForStyleAvailable())
-      anim->updateStateMachine(AnimationBase::STATE_INPUT_STYLE_AVAILABLE, -1);
+      anim->updateStateMachine(AnimationBase::AnimationStateInputStyleAvailable,
+                               -1);
   }
 
   CSSPropertyTransitionsMap::const_iterator end = m_transitions.end();
@@ -466,7 +469,8 @@ void CompositeAnimation::styleAvailable() {
        it != end; ++it) {
     ImplicitAnimation* anim = it->second;
     if (anim && anim->waitingForStyleAvailable())
-      anim->updateStateMachine(AnimationBase::STATE_INPUT_STYLE_AVAILABLE, -1);
+      anim->updateStateMachine(AnimationBase::AnimationStateInputStyleAvailable,
+                               -1);
   }
 }
 

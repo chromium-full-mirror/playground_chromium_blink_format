@@ -28,17 +28,17 @@
 
 #include "config.h"
 #include "AnimationBase.h"
-#include "AnimationController.h"
-#include "KeyframeAnimation.h"
-#include "ImplicitAnimation.h"
-#include "CompositeAnimation.h"
 
+#include "AnimationController.h"
 #include "CSSPropertyNames.h"
 #include "CString.h"
+#include "CompositeAnimation.h"
 #include "Document.h"
 #include "EventNames.h"
 #include "FloatConversion.h"
 #include "Frame.h"
+#include "ImplicitAnimation.h"
+#include "KeyframeAnimation.h"
 #include "RenderObject.h"
 #include "RenderStyle.h"
 #include "SystemTime.h"
@@ -166,12 +166,13 @@ static inline EVisibility blendFunc(EVisibility from,
 class PropertyWrapperBase {
  public:
   PropertyWrapperBase(int prop) : m_prop(prop) {}
+
   virtual ~PropertyWrapperBase() {}
   virtual bool equals(const RenderStyle* a, const RenderStyle* b) const = 0;
   virtual void blend(RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
-                     double prog) const = 0;
+                     double progress) const = 0;
 
   int property() const { return m_prop; }
 
@@ -204,10 +205,10 @@ class PropertyWrapper : public PropertyWrapperGetter<T> {
   virtual void blend(RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
-                     double prog) const {
+                     double progress) const {
     (dst->*m_setter)(blendFunc((a->*PropertyWrapperGetter<T>::m_getter)(),
                                (b->*PropertyWrapperGetter<T>::m_getter)(),
-                               prog));
+                               progress));
   }
 
  protected:
@@ -222,12 +223,12 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
       : PropertyWrapperGetter<ShadowData*>(prop, getter), m_setter(setter) {}
 
   virtual bool equals(const RenderStyle* a, const RenderStyle* b) const {
-    ShadowData* shadowa = (a->*m_getter)();
-    ShadowData* shadowb = (b->*m_getter)();
+    ShadowData* shadowA = (a->*m_getter)();
+    ShadowData* shadowB = (b->*m_getter)();
 
-    if (!shadowa && shadowb || shadowa && !shadowb)
+    if (!shadowA && shadowB || shadowA && !shadowB)
       return false;
-    if (shadowa && shadowb && (*shadowa != *shadowb))
+    if (shadowA && shadowB && (*shadowA != *shadowB))
       return false;
     return true;
   }
@@ -235,17 +236,17 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
   virtual void blend(RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
-                     double prog) const {
-    ShadowData* shadowa = (a->*m_getter)();
-    ShadowData* shadowb = (b->*m_getter)();
+                     double progress) const {
+    ShadowData* shadowA = (a->*m_getter)();
+    ShadowData* shadowB = (b->*m_getter)();
     ShadowData defaultShadowData(0, 0, 0, Color::transparent);
 
-    if (!shadowa)
-      shadowa = &defaultShadowData;
-    if (!shadowb)
-      shadowb = &defaultShadowData;
+    if (!shadowA)
+      shadowA = &defaultShadowData;
+    if (!shadowB)
+      shadowB = &defaultShadowData;
 
-    (dst->*m_setter)(blendFunc(shadowa, shadowb, prog), false);
+    (dst->*m_setter)(blendFunc(shadowA, shadowB, progress), false);
   }
 
  private:
@@ -273,14 +274,14 @@ class PropertyWrapperMaybeInvalidColor : public PropertyWrapperBase {
   virtual void blend(RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
-                     double prog) const {
+                     double progress) const {
     Color fromColor = (a->*m_getter)();
     Color toColor = (b->*m_getter)();
     if (!fromColor.isValid())
       fromColor = a->color();
     if (!toColor.isValid())
       toColor = b->color();
-    (dst->*m_setter)(blendFunc(fromColor, toColor, prog));
+    (dst->*m_setter)(blendFunc(fromColor, toColor, progress));
   }
 
  private:
@@ -474,7 +475,7 @@ static void ensurePropertyMap() {
 AnimationBase::AnimationBase(const Animation* transition,
                              RenderObject* renderer,
                              CompositeAnimation* compAnim)
-    : m_animState(STATE_NEW),
+    : m_animState(AnimationStateNew),
       m_iteration(0),
       m_animating(false),
       m_waitedForResponse(false),
@@ -485,15 +486,13 @@ AnimationBase::AnimationBase(const Animation* transition,
       m_animationEventDispatcher(const_cast<AnimationBase*>(this)),
       m_animation(const_cast<Animation*>(transition)),
       m_compAnim(compAnim),
-      m_waitingForEndEvent(false) {
-  ensurePropertyMap();
-}
+      m_waitingForEndEvent(false) {}
 
 AnimationBase::~AnimationBase() {
-  if (m_animState == STATE_START_WAIT_STYLE_AVAILABLE)
+  if (m_animState == AnimationStateStartWaitStyleAvailable)
     m_compAnim->setWaitingForStyleAvailable(false);
 }
-// static
+
 bool AnimationBase::propertiesEqual(int prop,
                                     const RenderStyle* a,
                                     const RenderStyle* b) {
@@ -509,42 +508,41 @@ bool AnimationBase::propertiesEqual(int prop,
 
     if (propIndex >= 0 && propIndex < numCSSProperties) {
       int i = gPropertyWrapperMap[propIndex];
-      return (i >= 0) ? (*gPropertyWrappers)[i]->equals(a, b) : true;
+      return i >= 0 ? (*gPropertyWrappers)[i]->equals(a, b) : true;
     }
   }
   return true;
 }
 
-// static
 int AnimationBase::getPropertyAtIndex(int i) {
   ensurePropertyMap();
-  if (i < 0 || i >= (int)gPropertyWrappers->size())
+  if (i < 0 || i >= static_cast<int>(gPropertyWrappers->size()))
     return CSSPropertyInvalid;
 
   return (*gPropertyWrappers)[i]->property();
 }
 
-// static
 int AnimationBase::getNumProperties() {
   ensurePropertyMap();
   return gPropertyWrappers->size();
 }
 
-// static - return true if we need to start software animation timers
+// Returns true if we need to start animation timers
 bool AnimationBase::blendProperties(int prop,
                                     RenderStyle* dst,
                                     const RenderStyle* a,
                                     const RenderStyle* b,
-                                    double prog) {
+                                    double progress) {
+  ASSERT(prop != cAnimateAll);
+  // FIXME: Why can this happen?
   if (prop == cAnimateAll) {
-    ASSERT(0);
     bool needsTimer = false;
 
     size_t n = gPropertyWrappers->size();
     for (unsigned int i = 0; i < n; ++i) {
       PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
       if (!wrapper->equals(a, b)) {
-        wrapper->blend(dst, a, b, prog);
+        wrapper->blend(dst, a, b, progress);
         needsTimer = true;
       }
     }
@@ -556,7 +554,7 @@ bool AnimationBase::blendProperties(int prop,
     int i = gPropertyWrapperMap[propIndex];
     if (i >= 0) {
       PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
-      wrapper->blend(dst, a, b, prog);
+      wrapper->blend(dst, a, b, progress);
       return true;
     }
   }
@@ -588,46 +586,56 @@ Element* AnimationBase::elementForEventDispatch() {
 }
 
 void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
-  // If we get a RESTART then we force a new animation, regardless of state
-  if (input == STATE_INPUT_MAKE_NEW) {
-    if (m_animState == STATE_START_WAIT_STYLE_AVAILABLE)
+  // If we get AnimationStateInputRestartAnimation then we force a new
+  // animation, regardless of state.
+  if (input == AnimationStateInputMakeNew) {
+    if (m_animState == AnimationStateStartWaitStyleAvailable)
       m_compAnim->setWaitingForStyleAvailable(false);
-    m_animState = STATE_NEW;
+    m_animState = AnimationStateNew;
     m_startTime = 0;
     m_pauseTime = -1;
     m_waitedForResponse = false;
     endAnimation(false);
     return;
-  } else if (input == STATE_INPUT_RESTART_ANIMATION) {
+  }
+
+  if (input == AnimationStateInputRestartAnimation) {
     cancelTimers();
-    if (m_animState == STATE_START_WAIT_STYLE_AVAILABLE)
+    if (m_animState == AnimationStateStartWaitStyleAvailable)
       m_compAnim->setWaitingForStyleAvailable(false);
-    m_animState = STATE_NEW;
+    m_animState = AnimationStateNew;
     m_startTime = 0;
     m_pauseTime = -1;
     endAnimation(false);
 
     if (!paused())
-      updateStateMachine(STATE_INPUT_START_ANIMATION, -1);
+      updateStateMachine(AnimationStateInputStartAnimation, -1);
     return;
-  } else if (input == STATE_INPUT_END_ANIMATION) {
+  }
+
+  if (input == AnimationStateInputEndAnimation) {
     cancelTimers();
-    if (m_animState == STATE_START_WAIT_STYLE_AVAILABLE)
+    if (m_animState == AnimationStateStartWaitStyleAvailable)
       m_compAnim->setWaitingForStyleAvailable(false);
-    m_animState = STATE_DONE;
+    m_animState = AnimationStateDone;
     endAnimation(true);
     return;
-  } else if (input == STATE_INPUT_PAUSE_OVERRIDE) {
-    if (m_animState == STATE_START_WAIT_RESPONSE) {
-      // If we are in the WAIT_RESPONSE state, the animation will get canceled
-      // before
-      // we get a response, so move to the next state
+  }
+
+  if (input == AnimationStateInputPauseOverride) {
+    if (m_animState == AnimationStateStartWaitResponse) {
+      // If we are in AnimationStateStartWaitResponse, the animation will get
+      // canceled before
+      // we get a response, so move to the next state.
       endAnimation(false);
-      updateStateMachine(STATE_INPUT_START_TIME_SET, currentTime());
+      updateStateMachine(AnimationStateInputStartTimeSet, currentTime());
     }
     return;
-  } else if (input == STATE_INPUT_RESUME_OVERRIDE) {
-    if (m_animState == STATE_LOOPING || m_animState == STATE_ENDING) {
+  }
+
+  if (input == AnimationStateInputResumeOverride) {
+    if (m_animState == AnimationStateLooping ||
+        m_animState == AnimationStateEnding) {
       // Start the animation
       startAnimation(m_startTime);
     }
@@ -636,29 +644,29 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
 
   // Execute state machine
   switch (m_animState) {
-    case STATE_NEW:
-      ASSERT(input == STATE_INPUT_START_ANIMATION ||
-             input == STATE_INPUT_PLAY_STATE_RUNNING ||
-             input == STATE_INPUT_PLAY_STATE_PAUSED);
-      if (input == STATE_INPUT_START_ANIMATION ||
-          input == STATE_INPUT_PLAY_STATE_RUNNING) {
+    case AnimationStateNew:
+      ASSERT(input == AnimationStateInputStartAnimation ||
+             input == AnimationStateInputPlayStateRunnning ||
+             input == AnimationStateInputPlayStatePaused);
+      if (input == AnimationStateInputStartAnimation ||
+          input == AnimationStateInputPlayStateRunnning) {
         // Set the start timer to the initial delay (0 if no delay)
         m_waitedForResponse = false;
-        m_animState = STATE_START_WAIT_TIMER;
+        m_animState = AnimationStateStartWaitTimer;
         m_animationTimerCallback.startTimer(
             m_animation->delay(), EventNames::webkitAnimationStartEvent,
             m_animation->delay());
       }
       break;
-    case STATE_START_WAIT_TIMER:
-      ASSERT(input == STATE_INPUT_START_TIMER_FIRED ||
-             input == STATE_INPUT_PLAY_STATE_PAUSED);
+    case AnimationStateStartWaitTimer:
+      ASSERT(input == AnimationStateInputStartTimerFired ||
+             input == AnimationStateInputPlayStatePaused);
 
-      if (input == STATE_INPUT_START_TIMER_FIRED) {
+      if (input == AnimationStateInputStartTimerFired) {
         ASSERT(param >= 0);
         // Start timer has fired, tell the animation to start and wait for it to
         // respond with start time
-        m_animState = STATE_START_WAIT_STYLE_AVAILABLE;
+        m_animState = AnimationStateStartWaitStyleAvailable;
         m_compAnim->setWaitingForStyleAvailable(true);
 
         // Trigger a render so we can start the animation
@@ -670,31 +678,31 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         // the timer, pause and wait
         m_pauseTime = currentTime();
         cancelTimers();
-        m_animState = STATE_PAUSED_WAIT_TIMER;
+        m_animState = AnimationStatePausedWaitTimer;
       }
       break;
-    case STATE_START_WAIT_STYLE_AVAILABLE:
-      ASSERT(input == STATE_INPUT_STYLE_AVAILABLE ||
-             input == STATE_INPUT_PLAY_STATE_PAUSED);
+    case AnimationStateStartWaitStyleAvailable:
+      ASSERT(input == AnimationStateInputStyleAvailable ||
+             input == AnimationStateInputPlayStatePaused);
 
       m_compAnim->setWaitingForStyleAvailable(false);
 
-      if (input == STATE_INPUT_STYLE_AVAILABLE) {
+      if (input == AnimationStateInputStyleAvailable) {
         // Start timer has fired, tell the animation to start and wait for it to
         // respond with start time
-        m_animState = STATE_START_WAIT_RESPONSE;
+        m_animState = AnimationStateStartWaitResponse;
 
         overrideAnimations();
 
         // Send start event, if needed
-        onAnimationStart(0.0f);  // The elapsedTime is always 0 here
+        onAnimationStart(0);  // The elapsedTime is always 0 here
 
         // Start the animation
         if (overridden() || !startAnimation(0)) {
           // We're not going to get a startTime callback, so fire the start time
           // here
-          m_animState = STATE_START_WAIT_RESPONSE;
-          updateStateMachine(STATE_INPUT_START_TIME_SET, currentTime());
+          m_animState = AnimationStateStartWaitResponse;
+          updateStateMachine(AnimationStateInputStartTimeSet, currentTime());
         } else
           m_waitedForResponse = true;
       } else {
@@ -705,14 +713,14 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         // with this like we would
         // for WAIT_RESPONSE, except that we don't need to do an endAnimation().
         m_pauseTime = 0;
-        m_animState = STATE_START_WAIT_RESPONSE;
+        m_animState = AnimationStateStartWaitResponse;
       }
       break;
-    case STATE_START_WAIT_RESPONSE:
-      ASSERT(input == STATE_INPUT_START_TIME_SET ||
-             input == STATE_INPUT_PLAY_STATE_PAUSED);
+    case AnimationStateStartWaitResponse:
+      ASSERT(input == AnimationStateInputStartTimeSet ||
+             input == AnimationStateInputPlayStatePaused);
 
-      if (input == STATE_INPUT_START_TIME_SET) {
+      if (input == AnimationStateInputStartTimeSet) {
         ASSERT(param >= 0);
         // We have a start time, set it, unless the startTime is already set
         if (m_startTime <= 0)
@@ -730,14 +738,14 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         // we unpause, we will act as though the start timer just fired
         m_pauseTime = 0;
         endAnimation(false);
-        m_animState = STATE_PAUSED_WAIT_RESPONSE;
+        m_animState = AnimationStatePausedWaitResponse;
       }
       break;
-    case STATE_LOOPING:
-      ASSERT(input == STATE_INPUT_LOOP_TIMER_FIRED ||
-             input == STATE_INPUT_PLAY_STATE_PAUSED);
+    case AnimationStateLooping:
+      ASSERT(input == AnimationStateInputLoopTimerFired ||
+             input == AnimationStateInputPlayStatePaused);
 
-      if (input == STATE_INPUT_LOOP_TIMER_FIRED) {
+      if (input == AnimationStateInputLoopTimerFired) {
         ASSERT(param >= 0);
         // Loop timer fired, loop again or end.
         onAnimationIteration(param);
@@ -747,14 +755,14 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         m_pauseTime = currentTime();
         cancelTimers();
         endAnimation(false);
-        m_animState = STATE_PAUSED_RUN;
+        m_animState = AnimationStatePausedRun;
       }
       break;
-    case STATE_ENDING:
-      ASSERT(input == STATE_INPUT_END_TIMER_FIRED ||
-             input == STATE_INPUT_PLAY_STATE_PAUSED);
+    case AnimationStateEnding:
+      ASSERT(input == AnimationStateInputEndTimerFired ||
+             input == AnimationStateInputPlayStatePaused);
 
-      if (input == STATE_INPUT_END_TIMER_FIRED) {
+      if (input == AnimationStateInputEndTimerFired) {
         ASSERT(param >= 0);
         // End timer fired, finish up
         onAnimationEnd(param);
@@ -763,7 +771,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
 
         // Fire off another style change so we can set the final value
         setChanged(m_object->element());
-        m_animState = STATE_DONE;
+        m_animState = AnimationStateDone;
         m_object->animation()->startUpdateRenderingDispatcher();
         // |this| may be deleted here when we've been called from timerFired()
       } else {
@@ -771,34 +779,34 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         m_pauseTime = currentTime();
         cancelTimers();
         endAnimation(false);
-        m_animState = STATE_PAUSED_RUN;
+        m_animState = AnimationStatePausedRun;
       }
       // |this| may be deleted here
       break;
-    case STATE_PAUSED_WAIT_TIMER:
-      ASSERT(input == STATE_INPUT_PLAY_STATE_RUNNING);
+    case AnimationStatePausedWaitTimer:
+      ASSERT(input == AnimationStateInputPlayStateRunnning);
       ASSERT(!running());
       // Update the times
       m_startTime += currentTime() - m_pauseTime;
       m_pauseTime = -1;
 
       // we were waiting for the start timer to fire, go back and wait again
-      m_animState = STATE_NEW;
-      updateStateMachine(STATE_INPUT_START_ANIMATION, 0);
+      m_animState = AnimationStateNew;
+      updateStateMachine(AnimationStateInputStartAnimation, 0);
       break;
-    case STATE_PAUSED_WAIT_RESPONSE:
-    case STATE_PAUSED_RUN:
+    case AnimationStatePausedWaitResponse:
+    case AnimationStatePausedRun:
       // We treat these two cases the same. The only difference is that, when we
-      // are in the WAIT_RESPONSE
-      // state, we don't yet have a valid startTime, so we send 0 to
-      // startAnimation. When the START_TIME
-      // event comes in qnd we were in the RUN state, we will notice that we
-      // have already set the
-      // startTime and will ignore it.
-      ASSERT(input == STATE_INPUT_PLAY_STATE_RUNNING);
+      // are in
+      // AnimationStatePausedWaitResponse, we don't yet have a valid startTime,
+      // so we send 0 to startAnimation.
+      // When the AnimationStateInputStartTimeSet comes in and we were in
+      // AnimationStatePausedRun, we will notice
+      // that we have already set the startTime and will ignore it.
+      ASSERT(input == AnimationStateInputPlayStateRunnning);
       ASSERT(!running());
       // Update the times
-      if (m_animState == STATE_PAUSED_RUN)
+      if (m_animState == AnimationStatePausedRun)
         m_startTime += currentTime() - m_pauseTime;
       else
         m_startTime = 0;
@@ -806,22 +814,22 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
 
       // We were waiting for a begin time response from the animation, go back
       // and wait again
-      m_animState = STATE_START_WAIT_RESPONSE;
+      m_animState = AnimationStateStartWaitResponse;
 
       // Start the animation
       if (overridden() || !startAnimation(m_startTime)) {
         // We're not going to get a startTime callback, so fire the start time
         // here
-        updateStateMachine(STATE_INPUT_START_TIME_SET, currentTime());
+        updateStateMachine(AnimationStateInputStartTimeSet, currentTime());
       } else
         m_waitedForResponse = true;
       break;
-    case STATE_DONE:
+    case AnimationStateDone:
       // We're done. Stay in this state until we are deleted
       break;
   }
-  // |this| may be deleted here if we came out of STATE_ENDING when we've been
-  // called from timerFired()
+  // |this| may be deleted here if we came out of AnimationStateEnding when
+  // we've been called from timerFired()
 }
 
 void AnimationBase::animationTimerCallbackFired(const AtomicString& eventType,
@@ -830,11 +838,11 @@ void AnimationBase::animationTimerCallbackFired(const AtomicString& eventType,
 
   // FIXME: use an enum
   if (eventType == EventNames::webkitAnimationStartEvent)
-    updateStateMachine(STATE_INPUT_START_TIMER_FIRED, elapsedTime);
+    updateStateMachine(AnimationStateInputStartTimerFired, elapsedTime);
   else if (eventType == EventNames::webkitAnimationIterationEvent)
-    updateStateMachine(STATE_INPUT_LOOP_TIMER_FIRED, elapsedTime);
+    updateStateMachine(AnimationStateInputLoopTimerFired, elapsedTime);
   else if (eventType == EventNames::webkitAnimationEndEvent) {
-    updateStateMachine(STATE_INPUT_END_TIMER_FIRED, elapsedTime);
+    updateStateMachine(AnimationStateInputEndTimerFired, elapsedTime);
     // |this| may be deleted here
   }
 }
@@ -868,16 +876,16 @@ void AnimationBase::animationEventDispatcherFired(Element* element,
     element->dispatchWebKitAnimationEvent(eventType, name, elapsedTime);
 
   // Restore the original (unanimated) style
-  if (animEventType == EventNames::webkitAnimationEndEvent)
-    if (element->renderer())
-      setChanged(element->renderer()->element());
+  if (animEventType == EventNames::webkitAnimationEndEvent &&
+      element->renderer())
+    setChanged(element->renderer()->element());
 }
 
 void AnimationBase::updatePlayState(bool run) {
   if (paused() == run || isNew())
-    updateStateMachine(
-        run ? STATE_INPUT_PLAY_STATE_RUNNING : STATE_INPUT_PLAY_STATE_PAUSED,
-        -1);
+    updateStateMachine(run ? AnimationStateInputPlayStateRunnning
+                           : AnimationStateInputPlayStatePaused,
+                       -1);
 }
 
 double AnimationBase::progress(double scale, double offset) const {
@@ -899,15 +907,15 @@ double AnimationBase::progress(double scale, double offset) const {
 
   // Compute the fractional time, taking into account direction.
   // There is no need to worry about iterations, we assume that we would have
-  // short circuited above if we were done
+  // short circuited above if we were done.
   double fractionalTime = elapsedTime / m_animation->duration();
-  int integralTime = (int)fractionalTime;
+  int integralTime = static_cast<int>(fractionalTime);
   fractionalTime -= integralTime;
 
   if (m_animation->direction() && (integralTime & 1))
     fractionalTime = 1 - fractionalTime;
 
-  if (scale != 1 || offset != 0)
+  if (scale != 1 || offset)
     fractionalTime = (fractionalTime - offset) * scale;
 
   if (m_animation->timingFunction().type() == LinearTimingFunction)
@@ -949,15 +957,16 @@ void AnimationBase::primeEventTimers() {
   if (totalDuration < 0 || nextIterationTime < totalDuration) {
     // We are not at the end yet, send a loop event
     ASSERT(nextIterationTime > 0);
-    m_animState = STATE_LOOPING;
+    m_animState = AnimationStateLooping;
     m_animationTimerCallback.startTimer(
         durationLeft, EventNames::webkitAnimationIterationEvent,
         nextIterationTime);
   } else {
     // We are at the end, send an end event
-    m_animState = STATE_ENDING;
+    m_animState = AnimationStateEnding;
     m_animationTimerCallback.startTimer(
         durationLeft, EventNames::webkitAnimationEndEvent, nextIterationTime);
   }
 }
-}
+
+}  // namespace WebCore
