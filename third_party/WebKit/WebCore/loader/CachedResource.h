@@ -48,9 +48,6 @@ class Request;
 // resource from the network.
 class CachedResource {
   friend class Cache;
-#ifndef NDEBUG
-  friend class CacheEventLogger;
-#endif
 
  public:
   enum Type {
@@ -246,7 +243,6 @@ class CachedResource {
 #ifndef NDEBUG
   bool m_deleted;
   unsigned m_lruIndex;
-  unsigned m_identifier;
 #endif
 
  private:

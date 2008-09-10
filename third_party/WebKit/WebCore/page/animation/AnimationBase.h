@@ -29,22 +29,23 @@
 #ifndef AnimationBase_h
 #define AnimationBase_h
 
-#include "AtomicString.h"
 #include "Timer.h"
-#include <wtf/HashMap.h>
+#include "wtf/HashMap.h"
+#include "AtomicString.h"
 
 namespace WebCore {
 
-class Animation;
-class AnimationBase;
 class AnimationController;
-class CompositeAnimation;
-class Element;
+class AnimationBase;
 class ImplicitAnimation;
 class KeyframeAnimation;
-class Node;
+class CompositeAnimation;
 class RenderObject;
 class RenderStyle;
+class AtomicStringImpl;
+class Animation;
+class Element;
+class Node;
 
 class AnimationTimerBase {
  public:
@@ -52,7 +53,6 @@ class AnimationTimerBase {
       : m_timer(this, &AnimationTimerBase::timerFired), m_anim(anim) {
     m_timer.startOneShot(0);
   }
-
   virtual ~AnimationTimerBase() {}
 
   void startTimer(double timeout = 0) { m_timer.startOneShot(timeout); }
@@ -103,7 +103,6 @@ class AnimationTimerCallback : public AnimationTimerBase {
  public:
   AnimationTimerCallback(AnimationBase* anim)
       : AnimationTimerBase(anim), m_elapsedTime(0) {}
-
   virtual ~AnimationTimerCallback() {}
 
   virtual void timerFired(Timer<AnimationTimerBase>*);
@@ -146,45 +145,42 @@ class AnimationBase : public Noncopyable {
   // If so, we stay in this state until that response is received (and it
   // returns the start time).
   // Otherwise, we use the current time as the start time and go immediately to
-  // AnimationStateLooping
-  // or AnimationStateEnding.
+  // the LOOPING or
+  // ENDING state.
   enum AnimState {
-    AnimationStateNew,  // animation just created, animation not running yet
-    AnimationStateStartWaitTimer,  // start timer running, waiting for fire
-    AnimationStateStartWaitStyleAvailable,  // waiting for style setup so we can
-                                            // start animations
-    AnimationStateStartWaitResponse,  // animation started, waiting for response
-    AnimationStateLooping,  // response received, animation running, loop timer
-                            // running, waiting for fire
-    AnimationStateEnding,   // received, animation running, end timer running,
-                            // waiting for fire
-    AnimationStatePausedWaitTimer,     // in pause mode when animation started
-    AnimationStatePausedWaitResponse,  // animation paused when in STARTING
-                                       // state
-    AnimationStatePausedRun,  // animation paused when in LOOPING or ENDING
-                              // state
-    AnimationStateDone        // end timer fired, animation finished and removed
+    STATE_NEW,  // animation just created, animation not running yet
+    STATE_START_WAIT_TIMER,            // start timer running, waiting for fire
+    STATE_START_WAIT_STYLE_AVAILABLE,  // waiting for style setup so we can
+                                       // start animations
+    STATE_START_WAIT_RESPONSE,  // animation started, waiting for response
+    STATE_LOOPING,  // response received, animation running, loop timer running,
+                    // waiting for fire
+    STATE_ENDING,   // response received, animation running, end timer running,
+                    // waiting for fire
+    STATE_PAUSED_WAIT_TIMER,  // animation in pause mode when animation started
+    STATE_PAUSED_WAIT_RESPONSE,  // animation paused when in STARTING state
+    STATE_PAUSED_RUN,  // animation paused when in LOOPING or ENDING state
+    STATE_DONE         // end timer fired, animation finished and removed
   };
 
   enum AnimStateInput {
-    AnimationStateInputMakeNew,            // reset back to new from any state
-    AnimationStateInputStartAnimation,     // animation requests a start
-    AnimationStateInputRestartAnimation,   // force a restart from any state
-    AnimationStateInputStartTimerFired,    // start timer fired
-    AnimationStateInputStyleAvailable,     // style is setup, ready to start
-                                           // animating
-    AnimationStateInputStartTimeSet,       // m_startTime was set
-    AnimationStateInputLoopTimerFired,     // loop timer fired
-    AnimationStateInputEndTimerFired,      // end timer fired
-    AnimationStateInputPauseOverride,      // pause an animation due to override
-    AnimationStateInputResumeOverride,     // resume an overridden animation
-    AnimationStateInputPlayStateRunnning,  // play state paused -> running
-    AnimationStateInputPlayStatePaused,    // play state running -> paused
-    AnimationStateInputEndAnimation        // force an end from any state
+    STATE_INPUT_MAKE_NEW,            // reset back to new from any state
+    STATE_INPUT_START_ANIMATION,     // animation requests a start
+    STATE_INPUT_RESTART_ANIMATION,   // force a restart from any state
+    STATE_INPUT_START_TIMER_FIRED,   // start timer fired
+    STATE_INPUT_STYLE_AVAILABLE,     // style is setup, ready to start animating
+    STATE_INPUT_START_TIME_SET,      // m_startTime was set
+    STATE_INPUT_LOOP_TIMER_FIRED,    // loop timer fired
+    STATE_INPUT_END_TIMER_FIRED,     // end timer fired
+    STATE_INPUT_PAUSE_OVERRIDE,      // pause an animation due to override
+    STATE_INPUT_RESUME_OVERRIDE,     // resume an overridden animation
+    STATE_INPUT_PLAY_STATE_RUNNING,  // play state paused -> running
+    STATE_INPUT_PLAY_STATE_PAUSED,   // play state running -> paused
+    STATE_INPUT_END_ANIMATION        // force an end from any state
   };
 
-  // Called when animation is in AnimationStateNew to start animation
-  void updateStateMachine(AnimStateInput, double param);
+  // Called when animation is in NEW state to start animation
+  void updateStateMachine(AnimStateInput input, double param);
 
   // Animation has actually started, at passed time
   void onAnimationStartResponse(double startTime);
@@ -194,26 +190,23 @@ class AnimationBase : public Noncopyable {
   bool playStatePlaying() const;
 
   bool waitingToStart() const {
-    return m_animState == AnimationStateNew ||
-           m_animState == AnimationStateStartWaitTimer;
+    return m_animState == STATE_NEW || m_animState == STATE_START_WAIT_TIMER;
   }
   bool preActive() const {
-    return m_animState == AnimationStateNew ||
-           m_animState == AnimationStateStartWaitTimer ||
-           m_animState == AnimationStateStartWaitStyleAvailable ||
-           m_animState == AnimationStateStartWaitResponse;
+    return m_animState == STATE_NEW || m_animState == STATE_START_WAIT_TIMER ||
+           m_animState == STATE_START_WAIT_STYLE_AVAILABLE ||
+           m_animState == STATE_START_WAIT_RESPONSE;
   }
-
-  bool postActive() const { return m_animState == AnimationStateDone; }
+  bool postActive() const { return m_animState == STATE_DONE; }
   bool active() const { return !postActive() && !preActive(); }
   bool running() const { return !isNew() && !postActive(); }
   bool paused() const { return m_pauseTime >= 0; }
-  bool isNew() const { return m_animState == AnimationStateNew; }
+  bool isNew() const { return m_animState == STATE_NEW; }
   bool waitingForStartTime() const {
-    return m_animState == AnimationStateStartWaitResponse;
+    return m_animState == STATE_START_WAIT_RESPONSE;
   }
   bool waitingForStyleAvailable() const {
-    return m_animState == AnimationStateStartWaitStyleAvailable;
+    return m_animState == STATE_START_WAIT_STYLE_AVAILABLE;
   }
   bool waitingForEndEvent() const { return m_waitingForEndEvent; }
 
@@ -230,7 +223,7 @@ class AnimationBase : public Noncopyable {
                        const RenderStyle* currentStyle,
                        const RenderStyle* targetStyle,
                        RenderStyle*& animatedStyle) {}
-  virtual void reset(RenderObject*,
+  virtual void reset(RenderObject* renderer,
                      const RenderStyle* from = 0,
                      const RenderStyle* to = 0) {}
 
@@ -238,14 +231,14 @@ class AnimationBase : public Noncopyable {
 
   void animationTimerCallbackFired(const AtomicString& eventType,
                                    double elapsedTime);
-  void animationEventDispatcherFired(Element*,
+  void animationEventDispatcherFired(Element* element,
                                      const AtomicString& name,
                                      int property,
                                      bool reset,
                                      const AtomicString& eventType,
                                      double elapsedTime);
 
-  bool animationsMatch(const Animation*) const;
+  bool animationsMatch(const Animation* anim) const;
 
   void setAnimation(const Animation* anim) {
     m_animation = const_cast<Animation*>(anim);
@@ -254,7 +247,7 @@ class AnimationBase : public Noncopyable {
   // Return true if this animation is overridden. This will only be the case for
   // ImplicitAnimations and is used to determine whether or not we should force
   // set the start time. If an animation is overridden, it will probably not get
-  // back the AnimationStateInputStartTimeSet input.
+  // back the START_TIME event.
   virtual bool overridden() const { return false; }
 
   // Does this animation/transition involve the given property?
@@ -287,7 +280,7 @@ class AnimationBase : public Noncopyable {
   static bool propertiesEqual(int prop,
                               const RenderStyle* a,
                               const RenderStyle* b);
-  static int getPropertyAtIndex(int);
+  static int getPropertyAtIndex(int i);
   static int getNumProperties();
 
   // Return true if we need to start software animation timers
@@ -295,9 +288,9 @@ class AnimationBase : public Noncopyable {
                               RenderStyle* dst,
                               const RenderStyle* a,
                               const RenderStyle* b,
-                              double progress);
+                              double prog);
 
-  static void setChanged(Node*);
+  static void setChanged(Node* node);
 
  protected:
   AnimState m_animState;
@@ -314,8 +307,9 @@ class AnimationBase : public Noncopyable {
   RefPtr<Animation> m_animation;
   CompositeAnimation* m_compAnim;
   bool m_waitingForEndEvent;
+
+ private:
 };
+}
 
-}  // namespace WebCore
-
-#endif  // AnimationBase_h
+#endif
