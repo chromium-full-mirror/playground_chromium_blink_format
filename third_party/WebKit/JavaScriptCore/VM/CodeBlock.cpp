@@ -567,6 +567,24 @@ void CodeBlock::dump(ExecState* exec,
              registerName(r0).c_str());
       break;
     }
+    case op_get_global_var: {
+      int r0 = (++it)->u.operand;
+      JSValue* scope = static_cast<JSValue*>((++it)->u.jsCell);
+      int index = (++it)->u.operand;
+      printf("[%4d] get_global_var\t %s, %s, %d\n", location,
+             registerName(r0).c_str(), valueToSourceString(exec, scope).ascii(),
+             index);
+      break;
+    }
+    case op_put_global_var: {
+      JSValue* scope = static_cast<JSValue*>((++it)->u.jsCell);
+      int index = (++it)->u.operand;
+      int r0 = (++it)->u.operand;
+      printf("[%4d] put_global_var\t %s, %d, %s\n", location,
+             valueToSourceString(exec, scope).ascii(), index,
+             registerName(r0).c_str());
+      break;
+    }
     case op_resolve_base: {
       int r0 = (++it)->u.operand;
       int id0 = (++it)->u.operand;

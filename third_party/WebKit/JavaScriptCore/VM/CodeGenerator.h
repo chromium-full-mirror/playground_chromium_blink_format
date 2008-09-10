@@ -123,7 +123,8 @@ class CodeGenerator {
   bool findScopedProperty(const Identifier&,
                           int& index,
                           size_t& depth,
-                          bool forWriting);
+                          bool forWriting,
+                          JSValue*& globalObject);
 
   // Returns the register storing "this"
   RegisterID* thisRegister() { return &m_thisRegister; }
@@ -300,8 +301,14 @@ class CodeGenerator {
   }
 
   RegisterID* emitResolve(RegisterID* dst, const Identifier& property);
-  RegisterID* emitGetScopedVar(RegisterID* dst, size_t skip, int index);
-  RegisterID* emitPutScopedVar(size_t skip, int index, RegisterID* value);
+  RegisterID* emitGetScopedVar(RegisterID* dst,
+                               size_t skip,
+                               int index,
+                               JSValue* globalObject);
+  RegisterID* emitPutScopedVar(size_t skip,
+                               int index,
+                               RegisterID* value,
+                               JSValue* globalObject);
 
   RegisterID* emitResolveBase(RegisterID* dst, const Identifier& property);
   RegisterID* emitResolveWithBase(RegisterID* baseDst,

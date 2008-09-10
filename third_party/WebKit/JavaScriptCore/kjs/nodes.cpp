@@ -450,10 +450,12 @@ RegisterID* FunctionCallResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  if (generator.findScopedProperty(m_ident, index, depth, false) &&
+  JSValue* globalObject = 0;
+  if (generator.findScopedProperty(m_ident, index, depth, false,
+                                   globalObject) &&
       index != missingSymbolMarker()) {
-    RegisterID* func =
-        generator.emitGetScopedVar(generator.newTemporary(), depth, index);
+    RegisterID* func = generator.emitGetScopedVar(generator.newTemporary(),
+                                                  depth, index, globalObject);
     return generator.emitCall(generator.finalDestination(dst), func, 0,
                               m_args.get(), m_divot, m_startOffset,
                               m_endOffset);
@@ -532,10 +534,11 @@ RegisterID* PostfixResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  if (generator.findScopedProperty(m_ident, index, depth, true) &&
+  JSValue* globalObject = 0;
+  if (generator.findScopedProperty(m_ident, index, depth, true, globalObject) &&
       index != missingSymbolMarker()) {
-    RefPtr<RegisterID> value =
-        generator.emitGetScopedVar(generator.newTemporary(), depth, index);
+    RefPtr<RegisterID> value = generator.emitGetScopedVar(
+        generator.newTemporary(), depth, index, globalObject);
     RegisterID* oldValue;
     if (dst == ignoredResult()) {
       oldValue = 0;
@@ -544,7 +547,7 @@ RegisterID* PostfixResolveNode::emitCode(CodeGenerator& generator,
       oldValue = emitPostIncOrDec(generator, generator.finalDestination(dst),
                                   value.get(), m_operator);
     }
-    generator.emitPutScopedVar(depth, index, value.get());
+    generator.emitPutScopedVar(depth, index, value.get(), globalObject);
     return oldValue;
   }
 
@@ -752,12 +755,14 @@ RegisterID* PrefixResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  if (generator.findScopedProperty(m_ident, index, depth, false) &&
+  JSValue* globalObject = 0;
+  if (generator.findScopedProperty(m_ident, index, depth, false,
+                                   globalObject) &&
       index != missingSymbolMarker()) {
     RefPtr<RegisterID> propDst = generator.emitGetScopedVar(
-        generator.tempDestination(dst), depth, index);
+        generator.tempDestination(dst), depth, index, globalObject);
     emitPreIncOrDec(generator, propDst.get(), m_operator);
-    generator.emitPutScopedVar(depth, index, propDst.get());
+    generator.emitPutScopedVar(depth, index, propDst.get(), globalObject);
     return generator.moveToDestinationIfNeeded(dst, propDst.get());
     ;
   }
@@ -995,15 +1000,16 @@ RegisterID* ReadModifyResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  if (generator.findScopedProperty(m_ident, index, depth, true) &&
+  JSValue* globalObject = 0;
+  if (generator.findScopedProperty(m_ident, index, depth, true, globalObject) &&
       index != missingSymbolMarker()) {
     RefPtr<RegisterID> src1 = generator.emitGetScopedVar(
-        generator.tempDestination(dst), depth, index);
+        generator.tempDestination(dst), depth, index, globalObject);
     RegisterID* src2 = generator.emitNode(m_right.get());
     RegisterID* result = emitReadModifyAssignment(
         generator, generator.finalDestination(dst, src1.get()), src1.get(),
         src2, m_operator);
-    generator.emitPutScopedVar(depth, index, result);
+    generator.emitPutScopedVar(depth, index, result, globalObject);
     return result;
   }
 
@@ -1035,12 +1041,13 @@ RegisterID* AssignResolveNode::emitCode(CodeGenerator& generator,
 
   int index = 0;
   size_t depth = 0;
-  if (generator.findScopedProperty(m_ident, index, depth, true) &&
+  JSValue* globalObject = 0;
+  if (generator.findScopedProperty(m_ident, index, depth, true, globalObject) &&
       index != missingSymbolMarker()) {
     if (dst == ignoredResult())
       dst = 0;
     RegisterID* value = generator.emitNode(dst, m_right.get());
-    generator.emitPutScopedVar(depth, index, value);
+    generator.emitPutScopedVar(depth, index, value, globalObject);
     return value;
   }
 
