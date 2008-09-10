@@ -47,7 +47,8 @@ class FontPlatformData {
  public:
   FontPlatformData(WTF::HashTableDeletedValueType)
 #if defined(USE_FREETYPE)
-      : m_pattern(hashTableDeletedFontValue())
+      : m_pattern(hashTableDeletedFontValue()),
+        m_fallbacks(0)
 #elif defined(USE_PANGO)
       : m_context(0),
         m_font(hashTableDeletedFontValue())
@@ -60,7 +61,8 @@ class FontPlatformData {
 
   FontPlatformData()
 #if defined(USE_FREETYPE)
-      : m_pattern(0)
+      : m_pattern(0),
+        m_fallbacks(0)
 #elif defined(USE_PANGO)
       : m_context(0),
         m_font(0)
@@ -89,6 +91,10 @@ class FontPlatformData {
   void setFont(cairo_t*) const;
 
   unsigned hash() const {
+#if defined(USE_FREETYPE)
+    if (m_pattern)
+      return FcPatternHash(m_pattern);
+#endif
     uintptr_t hashCodes[1] = {reinterpret_cast<uintptr_t>(m_scaledFont)};
     return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
                                    sizeof(hashCodes) / sizeof(UChar));
@@ -105,6 +111,7 @@ class FontPlatformData {
 
 #if defined(USE_FREETYPE)
   FcPattern* m_pattern;
+  FcFontSet* m_fallbacks;
 #elif defined(USE_PANGO)
   static PangoFontMap* m_fontMap;
   static GHashTable* m_hashTable;
