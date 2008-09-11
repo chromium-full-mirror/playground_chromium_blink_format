@@ -154,6 +154,7 @@ _createSubframeWithOwnerElement:(WebCore::HTMLFrameOwnerElement*)ownerElement
 
 - (BOOL)_needsLayout;
 - (void)_drawRect:(NSRect)rect;
+- (BOOL)_getVisibleRect:(NSRect*)rect;
 - (NSArray*)_computePageRectsWithPrintWidthScaleFactor:
                 (float)printWidthScaleFactor
                                            printHeight:(float)printHeight;
