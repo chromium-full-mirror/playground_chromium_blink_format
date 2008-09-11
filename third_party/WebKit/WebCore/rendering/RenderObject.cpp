@@ -621,7 +621,12 @@ bool RenderObject::canBeProgramaticallyScrolled(bool scrollToAnchor) const {
 
   return (hasOverflowClip() &&
           (scrollsOverflow() || (node() && node()->isContentEditable()))) ||
-         (node() && node()->isDocumentNode());
+         ((node() && node()->isDocumentNode()) &&
+          (hasScrollableView() || scrollToAnchor));
+}
+
+bool RenderObject::hasScrollableView() const {
+  return (view() && view()->frameView()->isScrollable());
 }
 
 void RenderObject::autoscroll() {
