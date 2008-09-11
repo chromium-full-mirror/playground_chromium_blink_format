@@ -325,7 +325,7 @@ class X86Assembler {
     emitModRm_rr(src, dst);
   }
 
-  void orl_rr(int imm, RegisterID dst) {
+  void orl_i32r(int imm, RegisterID dst) {
     m_buffer->putByte(OP_GROUP1_EvIb);
     emitModRm_opr(GROUP1_OP_OR, dst);
     m_buffer->putByte(imm);
