@@ -91,7 +91,6 @@ class StructureID : public RefCounted<StructureID> {
       const Identifier& propertyName,
       JSValue*,
       unsigned attributes,
-      bool checkReadOnly,
       JSObject* slotBase,
       PutPropertySlot&,
       PropertyStorage&);

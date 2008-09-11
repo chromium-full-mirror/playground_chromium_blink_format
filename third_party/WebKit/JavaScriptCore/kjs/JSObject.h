@@ -161,7 +161,7 @@ class JSObject : public JSCell {
   }
 
   size_t offsetForLocation(JSValue** location) {
-    return location - m_propertyStorage.get();
+    return location - m_propertyStorage;
   }
 
   JSValue** locationForOffset(size_t offset) {
@@ -209,6 +209,11 @@ class JSObject : public JSCell {
   virtual bool isWatchdogException() const { return false; }
   virtual bool isNotAnObjectErrorStub() const { return false; }
 
+  void allocatePropertyStorage(size_t oldSize, size_t newSize);
+  bool usingInlineStorage() const {
+    return m_propertyStorage == m_inlineStorage;
+  }
+
  protected:
   bool getOwnPropertySlotForWrite(ExecState*,
                                   const Identifier&,
@@ -222,14 +227,18 @@ class JSObject : public JSCell {
                                          const Identifier& propertyName) const;
   StructureID* createInheritorID();
 
-  PropertyStorage m_propertyStorage;
+  static const size_t inlineStorageCapacity = 2;
+
   RefPtr<StructureID> m_inheritorID;
+
+  PropertyStorage m_propertyStorage;
+  JSValue* m_inlineStorage[inlineStorageCapacity];
 };
 
 JSObject* constructEmptyObject(ExecState*);
 
 inline JSObject::JSObject(JSObject* prototype)
-    : JSCell(prototype->inheritorID()) {
+    : JSCell(prototype->inheritorID()), m_propertyStorage(m_inlineStorage) {
   ASSERT(m_structureID);
   ASSERT(this->prototype());
   ASSERT(this->prototype()->isNull() ||
@@ -239,12 +248,15 @@ inline JSObject::JSObject(JSObject* prototype)
 
 inline JSObject::JSObject(PassRefPtr<StructureID> structureID)
     : JSCell(structureID.releaseRef())  // ~JSObject balances this ref()
-{
+      ,
+      m_propertyStorage(m_inlineStorage) {
   ASSERT(m_structureID);
 }
 
 inline JSObject::~JSObject() {
   ASSERT(m_structureID);
+  if (m_propertyStorage != m_inlineStorage)
+    delete[] m_propertyStorage;
   m_structureID->deref();
 }
 
@@ -412,6 +424,20 @@ inline void JSObject::putDirect(const Identifier& propertyName,
   ASSERT(!Heap::heap(value) || Heap::heap(value) == Heap::heap(this));
 
   if (m_structureID->isDictionary()) {
+    unsigned currentAttributes;
+    size_t offset =
+        m_structureID->propertyMap().getOffset(propertyName, currentAttributes);
+    if (offset != WTF::notFound) {
+      if (checkReadOnly && currentAttributes & ReadOnly)
+        return;
+      m_propertyStorage[offset] = value;
+      slot.setExistingProperty(this, offset);
+      return;
+    }
+
+    if (m_structureID->propertyMap().storageSize() == inlineStorageCapacity)
+      allocatePropertyStorage(m_structureID->propertyMap().storageSize(),
+                              m_structureID->propertyMap().size());
     m_structureID->propertyMap().put(propertyName, value, attributes,
                                      checkReadOnly, this, slot,
                                      m_propertyStorage);
@@ -429,8 +455,12 @@ inline void JSObject::putDirect(const Identifier& propertyName,
     return;
   }
 
+  if (m_structureID->propertyMap().storageSize() == inlineStorageCapacity)
+    allocatePropertyStorage(m_structureID->propertyMap().storageSize(),
+                            m_structureID->propertyMap().size());
+
   RefPtr<StructureID> structureID = StructureID::addPropertyTransition(
-      m_structureID, propertyName, value, attributes, checkReadOnly, this, slot,
+      m_structureID, propertyName, value, attributes, this, slot,
       m_propertyStorage);
   setStructureID(structureID.release());
 }

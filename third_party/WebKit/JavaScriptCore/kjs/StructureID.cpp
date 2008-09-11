@@ -51,7 +51,6 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
     const Identifier& propertyName,
     JSValue* value,
     unsigned attributes,
-    bool checkReadOnly,
     JSObject* slotBase,
     PutPropertySlot& slot,
     PropertyStorage& propertyStorage) {
@@ -60,24 +59,25 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
 
   if (StructureID* existingTransition = structureID->m_transitionTable.get(
           make_pair(propertyName.ustring().rep(), attributes))) {
-    if (structureID->m_propertyMap.size() !=
-        existingTransition->m_propertyMap.size())
-      existingTransition->m_propertyMap.resizePropertyStorage(
-          propertyStorage, structureID->m_propertyMap.size());
+    if (!slotBase->usingInlineStorage() &&
+        structureID->m_propertyMap.size() !=
+            existingTransition->m_propertyMap.size())
+      slotBase->allocatePropertyStorage(
+          structureID->m_propertyMap.size(),
+          existingTransition->m_propertyMap.size());
 
     size_t offset = existingTransition->propertyMap().getOffset(propertyName);
     ASSERT(offset != WTF::notFound);
     propertyStorage[offset] = value;
-    slot.setExistingProperty(slotBase, offset);
+    slot.setNewProperty(slotBase, offset);
 
     return existingTransition;
   }
 
   if (structureID->m_transitionCount > s_maxTransitionLength) {
     RefPtr<StructureID> transition = toDictionaryTransition(structureID);
-    transition->m_propertyMap.put(propertyName, value, attributes,
-                                  checkReadOnly, slotBase, slot,
-                                  propertyStorage);
+    transition->m_propertyMap.put(propertyName, value, attributes, false,
+                                  slotBase, slot, propertyStorage);
     return transition.release();
   }
 
@@ -89,7 +89,7 @@ PassRefPtr<StructureID> StructureID::addPropertyTransition(
   transition->m_transitionCount = structureID->m_transitionCount + 1;
   transition->m_propertyMap = structureID->m_propertyMap;
 
-  transition->m_propertyMap.put(propertyName, value, attributes, checkReadOnly,
+  transition->m_propertyMap.put(propertyName, value, attributes, false,
                                 slotBase, slot, propertyStorage);
 
   structureID->m_transitionTable.add(
