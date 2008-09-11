@@ -41,7 +41,6 @@ class HTMLOptGroupElement : public HTMLFormControlElement {
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
   virtual void attach();
   virtual void detach();
-  virtual RenderStyle* renderStyle() const { return m_style; }
   virtual void setRenderStyle(RenderStyle*);
 
   virtual bool insertBefore(PassRefPtr<Node> newChild,
@@ -70,6 +69,8 @@ class HTMLOptGroupElement : public HTMLFormControlElement {
   virtual void accessKeyAction(bool sendToAnyElement);
 
  private:
+  virtual RenderStyle* nonRendererRenderStyle() const;
+
   void recalcSelectOptions();
 
   RenderStyle* m_style;

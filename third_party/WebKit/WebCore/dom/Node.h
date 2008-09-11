@@ -473,7 +473,7 @@ class Node : public TreeShared<Node> {
 
   // Wrapper for nodes that don't have a renderer, but still cache the style
   // (like HTMLOptionElement).
-  virtual RenderStyle* renderStyle() const;
+  RenderStyle* renderStyle() const;
   virtual void setRenderStyle(RenderStyle*);
 
   virtual RenderStyle* computedStyle();
@@ -580,6 +580,8 @@ class Node : public TreeShared<Node> {
   }
 
  private:
+  virtual RenderStyle* nonRendererRenderStyle() const;
+
   DocPtr<Document> m_document;
   Node* m_previous;
   Node* m_next;
