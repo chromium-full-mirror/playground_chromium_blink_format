@@ -28,7 +28,6 @@
 
 #include "config.h"
 #include "AnimationBase.h"
-
 #include "AnimationController.h"
 #include "CSSPropertyNames.h"
 #include "CString.h"
@@ -289,8 +288,8 @@ class PropertyWrapperMaybeInvalidColor : public PropertyWrapperBase {
   void (RenderStyle::*m_setter)(const Color&);
 };
 
-Vector<PropertyWrapperBase*>* gPropertyWrappers = 0;
-int gPropertyWrapperMap[numCSSProperties];
+static Vector<PropertyWrapperBase*>* gPropertyWrappers = 0;
+static int gPropertyWrapperMap[numCSSProperties];
 
 static void ensurePropertyMap() {
   // FIXME: This data is never destroyed. Maybe we should ref count it and toss
