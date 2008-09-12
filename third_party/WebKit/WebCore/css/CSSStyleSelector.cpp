@@ -471,6 +471,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
 // This is a simplified style setting function for keyframe styles
 void CSSStyleSelector::addKeyframeStyle(Document* doc,
                                         const WebKitCSSKeyframesRule* rule) {
+  // Create the keyframe list
   AtomicString s(rule->name());
   RefPtr<KeyframeList> list;
   if (m_keyframeRuleMap.contains(s.impl()))
@@ -481,16 +482,15 @@ void CSSStyleSelector::addKeyframeStyle(Document* doc,
   }
   list->clear();
 
-  // Make sure there is a 0% and a 100% keyframe
-  if (rule->item(0)->key() || rule->item(rule->length() - 1)->key() != 1)
-    return;
-
+  // Add all the keyframes
   for (unsigned i = 0; i < rule->length(); ++i) {
     const WebKitCSSKeyframeRule* kf = rule->item(i);
     m_style = new (doc->renderArena()) RenderStyle();
     m_style->ref();
     CSSMutableStyleDeclaration* decl = kf->style();
     DeprecatedValueListConstIterator<CSSProperty> end;
+
+    // Record all the properties in this keyframe
     for (DeprecatedValueListConstIterator<CSSProperty> it =
              decl->valuesIterator();
          it != end; ++it) {
@@ -498,9 +498,26 @@ void CSSStyleSelector::addKeyframeStyle(Document* doc,
       applyProperty(current.id(), current.value());
       list->addProperty(current.id());
     }
-    list->insert(kf->key(), *m_style);
+
+    // Add this keyframe to all the indicated key times
+    Vector<float> keys;
+    kf->getKeys(keys);
+
+    for (size_t keyIndex = 0; keyIndex < keys.size(); ++keyIndex) {
+      float key = keys[keyIndex];
+      list->insert(key, *m_style);
+    }
+
     m_style->deref(doc->renderArena());
     m_style = 0;
+  }
+
+  // Make sure there is a 0% and a 100% keyframe
+  float first = list->beginKeyframes()->key;
+  float last = (list->endKeyframes() - 1)->key;
+  if (first != 0 || last != 1) {
+    list->clear();
+    return;
   }
 }
 

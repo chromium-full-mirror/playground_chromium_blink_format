@@ -535,6 +535,8 @@ bool AnimationBase::blendProperties(int prop,
                                     double progress) {
   ASSERT(prop != cAnimateAll);
   // FIXME: Why can this happen?
+
+  ensurePropertyMap();
   if (prop == cAnimateAll) {
     bool needsTimer = false;
 
