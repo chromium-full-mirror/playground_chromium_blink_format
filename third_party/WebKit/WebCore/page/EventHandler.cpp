@@ -754,7 +754,7 @@ HitTestResult EventHandler::hitTestResultAtPoint(const IntPoint& point,
                            ? result.innerNonSharedNode()->document()->frame()
                            : 0;
   Frame* mainFrame = m_frame->page()->mainFrame();
-  if (resultFrame && resultFrame != mainFrame &&
+  if (m_frame != mainFrame && resultFrame && resultFrame != mainFrame &&
       !resultFrame->editor()->insideVisibleArea(result.point())) {
     IntPoint windowPoint =
         resultFrame->view()->contentsToWindow(result.point());
