@@ -28,6 +28,7 @@
 
 #include <wtf/RefCounted.h>
 #include "ScrollTypes.h"
+#include "Widget.h"
 #include <wtf/MathExtras.h>
 
 namespace WebCore {
@@ -54,7 +55,7 @@ class ScrollbarClient {
   virtual bool isActive() const = 0;
 };
 
-class Scrollbar : public RefCounted<Scrollbar> {
+class Scrollbar : public Widget, public RefCounted<Scrollbar> {
  protected:
   Scrollbar(ScrollbarClient*, ScrollbarOrientation, ScrollbarControlSize);
 
@@ -62,8 +63,6 @@ class Scrollbar : public RefCounted<Scrollbar> {
   virtual ~Scrollbar() {}
 
   void setClient(ScrollbarClient* client) { m_client = client; }
-
-  virtual bool isWidget() const = 0;
 
   ScrollbarOrientation orientation() const { return m_orientation; }
   int value() const { return lroundf(m_currentPos); }
@@ -82,16 +81,6 @@ class Scrollbar : public RefCounted<Scrollbar> {
   virtual void setRect(const IntRect&) = 0;
   virtual void setEnabled(bool) = 0;
   virtual void paint(GraphicsContext*, const IntRect& damageRect) = 0;
-
-  static bool hasPlatformScrollbars() {
-    // To use the platform's built-in scrollbars by default, return true.  We
-    // may
-    // support styled engine scrollbars someday, and some platforms may wish to
-    // not
-    // implement a platform scrollbar at all by default.  That's what this
-    // method is for.
-    return true;
-  }
 
   // These methods are used for platform scrollbars to give :hover feedback.
   // They will not get called
