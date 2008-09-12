@@ -342,6 +342,7 @@ class Frame : public RefCounted<Frame> {
   NSImage* snapshotDragImage(Node*,
                              NSRect* imageRect,
                              NSRect* elementRect) const;
+  NSImage* nodeImage(Node*) const;
 
  private:
   NSImage* imageFromRect(NSRect) const;
