@@ -48,12 +48,7 @@ class KeyframeAnimation : public AnimationBase {
         m_name(animation->name()),
         m_index(index) {}
 
-  virtual ~KeyframeAnimation() {
-    // Do the cleanup here instead of in the base class so the specialized
-    // methods get called
-    if (!postActive())
-      updateStateMachine(AnimationStateInputEndAnimation, -1);
-  }
+  virtual ~KeyframeAnimation();
 
   virtual void animate(CompositeAnimation*,
                        RenderObject*,
@@ -68,19 +63,18 @@ class KeyframeAnimation : public AnimationBase {
   virtual bool shouldFireEvents() const { return true; }
 
  protected:
-  virtual void onAnimationStart(double inElapsedTime);
-  virtual void onAnimationIteration(double inElapsedTime);
-  virtual void onAnimationEnd(double inElapsedTime);
+  virtual void onAnimationStart(double elapsedTime);
+  virtual void onAnimationIteration(double elapsedTime);
+  virtual void onAnimationEnd(double elapsedTime);
   virtual void endAnimation(bool reset);
 
   virtual void overrideAnimations();
   virtual void resumeOverriddenAnimations();
 
   bool shouldSendEventForListener(Document::ListenerType inListenerType);
-  bool sendAnimationEvent(const AtomicString& inEventType,
-                          double inElapsedTime);
+  bool sendAnimationEvent(const AtomicString&, double elapsedTime);
 
-  virtual bool affectsProperty(int property) const;
+  virtual bool affectsProperty(int) const;
 
  private:
   // The keyframes that we are blending.
@@ -89,6 +83,7 @@ class KeyframeAnimation : public AnimationBase {
   // The order in which this animation appears in the animation-name style.
   int m_index;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // KeyframeAnimation_h

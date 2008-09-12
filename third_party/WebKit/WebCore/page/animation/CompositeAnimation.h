@@ -37,10 +37,10 @@
 namespace WebCore {
 
 class AnimationController;
-class RenderStyle;
-class RenderObject;
-class KeyframeAnimation;
 class ImplicitAnimation;
+class KeyframeAnimation;
+class RenderObject;
+class RenderStyle;
 
 // A CompositeAnimation represents a collection of animations that are running
 // on a single RenderObject, such as a number of properties transitioning at
@@ -58,7 +58,7 @@ class CompositeAnimation : public Noncopyable {
                        const RenderStyle* currentStyle,
                        RenderStyle* targetStyle);
 
-  void setAnimating(bool inAnimating);
+  void setAnimating(bool);
   bool animating();
 
   bool hasAnimationForProperty(int prop) const {
@@ -84,17 +84,17 @@ class CompositeAnimation : public Noncopyable {
 
   bool isAnimatingProperty(int property, bool isRunningNow) const;
 
-  void setWaitingForStyleAvailable(bool waiting);
+  void setWaitingForStyleAvailable(bool);
 
  protected:
-  void updateTransitions(RenderObject* renderer,
+  void updateTransitions(RenderObject*,
                          const RenderStyle* currentStyle,
                          RenderStyle* targetStyle);
-  void updateKeyframeAnimations(RenderObject* renderer,
+  void updateKeyframeAnimations(RenderObject*,
                                 const RenderStyle* currentStyle,
                                 RenderStyle* targetStyle);
 
-  KeyframeAnimation* findKeyframeAnimation(const AtomicString& name);
+  KeyframeAnimation* getKeyframeAnimation(const AtomicString&);
 
  private:
   typedef HashMap<int, ImplicitAnimation*> CSSPropertyTransitionsMap;
@@ -104,8 +104,9 @@ class CompositeAnimation : public Noncopyable {
   AnimationNameMap m_keyframeAnimations;
   bool m_suspended;
   AnimationController* m_animationController;
-  uint32_t m_numStyleAvailableWaiters;
+  unsigned m_numStyleAvailableWaiters;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // CompositeAnimation_h

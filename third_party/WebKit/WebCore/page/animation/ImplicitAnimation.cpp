@@ -47,6 +47,20 @@ ImplicitAnimation::ImplicitAnimation(const Animation* transition,
   ASSERT(animatingProperty != cAnimateAll);
 }
 
+ImplicitAnimation::~ImplicitAnimation() {
+  ASSERT(!m_fromStyle && !m_toStyle);
+
+  // If we were waiting for an end event, we need to finish the animation to
+  // make sure no old
+  // animations stick around in the lower levels
+  ASSERT(!waitingForEndEvent() || !m_object);
+
+  // Do the cleanup here instead of in the base class so the specialized methods
+  // get called
+  if (!postActive())
+    updateStateMachine(AnimationStateInputEndAnimation, -1);
+}
+
 bool ImplicitAnimation::shouldSendEventForListener(
     Document::ListenerType inListenerType) {
   return m_object->document()->hasListenerType(inListenerType);
@@ -62,7 +76,7 @@ void ImplicitAnimation::animate(CompositeAnimation* animation,
 
   // If we get this far and the animation is done, it means we are cleaning up a
   // just finished animation.
-  // So just return. Everything is already all cleaned up
+  // So just return. Everything is already all cleaned up.
   if (postActive())
     return;
 
@@ -75,38 +89,34 @@ void ImplicitAnimation::animate(CompositeAnimation* animation,
   if (!animatedStyle)
     animatedStyle = new (renderer->renderArena()) RenderStyle(*targetStyle);
 
-  double prog = progress(1, 0);
-  bool needsAnim = blendProperties(m_animatingProperty, animatedStyle,
-                                   m_fromStyle, m_toStyle, prog);
-  if (needsAnim)
+  if (blendProperties(m_animatingProperty, animatedStyle, m_fromStyle,
+                      m_toStyle, progress(1, 0)))
     setAnimating();
 }
 
-void ImplicitAnimation::onAnimationEnd(double inElapsedTime) {
-  if (!sendTransitionEvent(EventNames::webkitTransitionEndEvent,
-                           inElapsedTime)) {
+void ImplicitAnimation::onAnimationEnd(double elapsedTime) {
+  if (!sendTransitionEvent(EventNames::webkitTransitionEndEvent, elapsedTime)) {
     // We didn't dispatch an event, which would call endAnimation(), so we'll
     // just call it here.
     endAnimation(true);
   }
 }
 
-bool ImplicitAnimation::sendTransitionEvent(const AtomicString& inEventType,
-                                            double inElapsedTime) {
-  if (inEventType == EventNames::webkitTransitionEndEvent) {
+bool ImplicitAnimation::sendTransitionEvent(const AtomicString& eventType,
+                                            double elapsedTime) {
+  if (eventType == EventNames::webkitTransitionEndEvent) {
     Document::ListenerType listenerType = Document::TRANSITIONEND_LISTENER;
 
     if (shouldSendEventForListener(listenerType)) {
-      Element* element = elementForEventDispatch();
-      if (element) {
+      if (Element* element = elementForEventDispatch()) {
         String propertyName;
         if (m_transitionProperty != cAnimateAll)
           propertyName =
-              String(getPropertyName((CSSPropertyID)m_transitionProperty));
+              getPropertyName(static_cast<CSSPropertyID>(m_transitionProperty));
         m_waitingForEndEvent = true;
         m_animationEventDispatcher.startTimer(element, propertyName,
                                               m_transitionProperty, true,
-                                              inEventType, inElapsedTime);
+                                              eventType, elapsedTime);
         return true;  // Did dispatch an event
       }
     }
@@ -135,18 +145,19 @@ void ImplicitAnimation::reset(RenderObject* renderer,
   if (m_toStyle)
     m_toStyle->ref();
 
-  // restart the transition
+  // Restart the transition
   if (from && to)
     updateStateMachine(AnimationStateInputRestartAnimation, -1);
 }
 
 void ImplicitAnimation::setOverridden(bool b) {
-  if (b != m_overridden) {
-    m_overridden = b;
-    updateStateMachine(m_overridden ? AnimationStateInputPauseOverride
-                                    : AnimationStateInputResumeOverride,
-                       -1);
-  }
+  if (b == m_overridden)
+    return;
+
+  m_overridden = b;
+  updateStateMachine(m_overridden ? AnimationStateInputPauseOverride
+                                  : AnimationStateInputResumeOverride,
+                     -1);
 }
 
 bool ImplicitAnimation::affectsProperty(int property) const {
@@ -160,7 +171,7 @@ bool ImplicitAnimation::isTargetPropertyEqual(int prop,
 
 void ImplicitAnimation::blendPropertyValueInStyle(int prop,
                                                   RenderStyle* currentStyle) {
-  double prog = progress(1, 0);
-  blendProperties(prop, currentStyle, m_fromStyle, m_toStyle, prog);
+  blendProperties(prop, currentStyle, m_fromStyle, m_toStyle, progress(1, 0));
 }
-}
+
+}  // namespace WebCore

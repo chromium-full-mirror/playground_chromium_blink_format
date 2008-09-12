@@ -29,8 +29,6 @@
 #ifndef AnimationController_h
 #define AnimationController_h
 
-#include <stdint.h>
-
 namespace WebCore {
 
 class AnimationControllerPrivate;
@@ -47,15 +45,15 @@ class AnimationController {
   void cancelAnimations(RenderObject*);
   RenderStyle* updateAnimations(RenderObject*, RenderStyle* newStyle);
 
-  void setAnimationStartTime(RenderObject* obj, double t);
-  void setTransitionStartTime(RenderObject* obj, int property, double t);
+  void setAnimationStartTime(RenderObject*, double t);
+  void setTransitionStartTime(RenderObject*, int property, double t);
 
-  bool isAnimatingPropertyOnRenderer(RenderObject* obj,
+  bool isAnimatingPropertyOnRenderer(RenderObject*,
                                      int property,
                                      bool isRunningNow) const;
 
-  void suspendAnimations(Document* document);
-  void resumeAnimations(Document* document);
+  void suspendAnimations(Document*);
+  void resumeAnimations(Document*);
   void updateAnimationTimer();
 
   void startUpdateRenderingDispatcher();
@@ -71,8 +69,9 @@ class AnimationController {
 
  private:
   AnimationControllerPrivate* m_data;
-  uint32_t m_numStyleAvailableWaiters;
+  unsigned m_numStyleAvailableWaiters;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // AnimationController_h

@@ -53,12 +53,12 @@ class AnimationControllerPrivate {
 
   bool hasAnimations() const { return !m_compositeAnimations.isEmpty(); }
 
-  void suspendAnimations(Document* document);
-  void resumeAnimations(Document* document);
+  void suspendAnimations(Document*);
+  void resumeAnimations(Document*);
 
   void styleAvailable();
 
-  bool isAnimatingPropertyOnRenderer(RenderObject* obj,
+  bool isAnimatingPropertyOnRenderer(RenderObject*,
                                      int property,
                                      bool isRunningNow) const;
 
@@ -95,7 +95,7 @@ CompositeAnimation* AnimationControllerPrivate::accessCompositeAnimation(
 bool AnimationControllerPrivate::clear(RenderObject* renderer) {
   // Return false if we didn't do anything OR we are suspended (so we don't try
   // to
-  // do a setChanged() when suspended
+  // do a setChanged() when suspended).
   CompositeAnimation* animation = m_compositeAnimations.take(renderer);
   if (!animation)
     return false;
@@ -110,9 +110,8 @@ void AnimationControllerPrivate::styleAvailable() {
       m_compositeAnimations.end();
   for (RenderObjectAnimationMap::const_iterator it =
            m_compositeAnimations.begin();
-       it != animationsEnd; ++it) {
+       it != animationsEnd; ++it)
     it->second->styleAvailable();
-  }
 }
 
 void AnimationControllerPrivate::updateAnimationTimer() {
@@ -139,15 +138,13 @@ void AnimationControllerPrivate::updateAnimationTimer() {
 
 void AnimationControllerPrivate::updateRenderingDispatcherFired(
     Timer<AnimationControllerPrivate>*) {
-  if (m_frame && m_frame->document()) {
+  if (m_frame && m_frame->document())
     m_frame->document()->updateRendering();
-  }
 }
 
 void AnimationControllerPrivate::startUpdateRenderingDispatcher() {
-  if (!m_updateRenderingDispatcher.isActive()) {
+  if (!m_updateRenderingDispatcher.isActive())
     m_updateRenderingDispatcher.startOneShot(0);
-  }
 }
 
 void AnimationControllerPrivate::animationTimerFired(
@@ -161,13 +158,12 @@ void AnimationControllerPrivate::animationTimerFired(
   for (RenderObjectAnimationMap::const_iterator it =
            m_compositeAnimations.begin();
        it != animationsEnd; ++it) {
-    RenderObject* renderer = it->first;
     CompositeAnimation* compAnim = it->second;
     if (!compAnim->suspended() && compAnim->animating()) {
       animating = true;
       compAnim->setAnimating(false);
 
-      Node* node = renderer->element();
+      Node* node = it->first->element();
       ASSERT(!node || (node->document() && !node->document()->inPageCache()));
       node->setChanged(AnimationStyleChange);
     }
@@ -179,10 +175,10 @@ void AnimationControllerPrivate::animationTimerFired(
 }
 
 bool AnimationControllerPrivate::isAnimatingPropertyOnRenderer(
-    RenderObject* obj,
+    RenderObject* renderer,
     int property,
     bool isRunningNow) const {
-  CompositeAnimation* animation = m_compositeAnimations.get(obj);
+  CompositeAnimation* animation = m_compositeAnimations.get(renderer);
   if (!animation)
     return false;
 
@@ -240,7 +236,7 @@ void AnimationController::cancelAnimations(RenderObject* renderer) {
 
 RenderStyle* AnimationController::updateAnimations(RenderObject* renderer,
                                                    RenderStyle* newStyle) {
-  // don't do anything if we're in the cache
+  // Don't do anything if we're in the cache
   if (!renderer->document() || renderer->document()->inPageCache())
     return newStyle;
 
@@ -280,25 +276,27 @@ RenderStyle* AnimationController::updateAnimations(RenderObject* renderer,
   return blendedStyle;
 }
 
-void AnimationController::setAnimationStartTime(RenderObject* obj, double t) {
+void AnimationController::setAnimationStartTime(RenderObject* renderer,
+                                                double t) {
   CompositeAnimation* rendererAnimations =
-      m_data->accessCompositeAnimation(obj);
+      m_data->accessCompositeAnimation(renderer);
   rendererAnimations->setAnimationStartTime(t);
 }
 
-void AnimationController::setTransitionStartTime(RenderObject* obj,
+void AnimationController::setTransitionStartTime(RenderObject* renderer,
                                                  int property,
                                                  double t) {
   CompositeAnimation* rendererAnimations =
-      m_data->accessCompositeAnimation(obj);
+      m_data->accessCompositeAnimation(renderer);
   rendererAnimations->setTransitionStartTime(property, t);
 }
 
 bool AnimationController::isAnimatingPropertyOnRenderer(
-    RenderObject* obj,
+    RenderObject* renderer,
     int property,
     bool isRunningNow) const {
-  return m_data->isAnimatingPropertyOnRenderer(obj, property, isRunningNow);
+  return m_data->isAnimatingPropertyOnRenderer(renderer, property,
+                                               isRunningNow);
 }
 
 void AnimationController::suspendAnimations(Document* document) {
@@ -314,9 +312,10 @@ void AnimationController::startUpdateRenderingDispatcher() {
 }
 
 void AnimationController::styleAvailable() {
-  if (m_numStyleAvailableWaiters == 0)
+  if (!m_numStyleAvailableWaiters)
     return;
 
   m_data->styleAvailable();
 }
-}
+
+}  // namespace WebCore
