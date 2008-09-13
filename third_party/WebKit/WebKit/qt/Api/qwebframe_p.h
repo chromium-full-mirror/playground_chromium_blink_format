@@ -34,7 +34,7 @@ namespace WebCore {
 class FrameLoaderClientQt;
 class FrameView;
 class HTMLFrameOwnerElement;
-class PlatformScrollbar;
+class Scrollbar;
 }
 class QWebPage;
 
@@ -68,8 +68,8 @@ class QWebFramePrivate {
     return qobject_cast<QWebFrame*>(q->parent());
   }
 
-  WebCore::PlatformScrollbar* horizontalScrollBar() const;
-  WebCore::PlatformScrollbar* verticalScrollBar() const;
+  WebCore::Scrollbar* horizontalScrollBar() const;
+  WebCore::Scrollbar* verticalScrollBar() const;
 
   Qt::ScrollBarPolicy horizontalScrollBarPolicy;
   Qt::ScrollBarPolicy verticalScrollBarPolicy;
