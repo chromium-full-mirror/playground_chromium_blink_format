@@ -6043,6 +6043,8 @@ TransformOperation::OperationType getTransformOperationType(
       return TransformOperation::SKEW_Y;
     case WebKitCSSTransformValue::MatrixTransformOperation:
       return TransformOperation::MATRIX;
+    case WebKitCSSTransformValue::UnknownTransformOperation:
+      return TransformOperation::NONE;
   }
   return TransformOperation::NONE;
 }
