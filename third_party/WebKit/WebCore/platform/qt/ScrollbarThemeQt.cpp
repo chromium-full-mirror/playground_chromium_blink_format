@@ -51,5 +51,3 @@ int ScrollbarThemeQt::scrollbarThickness(ScrollbarControlSize controlSize) {
   return s->pixelMetric(QStyle::PM_ScrollBarExtent, &o, 0);
 }
 }
-
-#endif

@@ -48,5 +48,3 @@ int ScrollbarThemeGtk::scrollbarThickness(ScrollbarControlSize controlSize) {
   return size;
 }
 }
-
-#endif
