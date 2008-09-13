@@ -57,7 +57,9 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
   void setClient(ScrollbarClient* client) { m_client = client; }
 
   ScrollbarOrientation orientation() const { return m_orientation; }
+
   int value() const { return lroundf(m_currentPos); }
+  int maximum() const { return m_totalSize - m_visibleSize; }
 
   ScrollbarControlSize controlSize() const { return m_controlSize; }
 
