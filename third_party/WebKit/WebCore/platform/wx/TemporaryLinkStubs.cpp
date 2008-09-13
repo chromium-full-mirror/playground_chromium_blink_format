@@ -230,7 +230,7 @@ void PlatformScrollbar::setRect(const IntRect&) {
   notImplemented();
 }
 
-void ScrollbarTheme::nativeTheme() {
+ScrollbarTheme* ScrollbarTheme::nativeTheme() {
   notImplemented();
   static ScrollbarTheme theme;
   return &theme;
