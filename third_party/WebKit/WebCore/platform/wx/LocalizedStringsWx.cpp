@@ -248,4 +248,12 @@ String AXLinkActionVerb() {
   return String();
 }
 
+String AXDefinitionListTermText() {
+  return String();
+}
+
+String AXDefinitionListDefinitionText() {
+  return String();
+}
+
 }  // namespace WebCore

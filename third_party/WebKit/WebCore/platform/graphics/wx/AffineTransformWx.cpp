@@ -51,8 +51,8 @@ AffineTransform::AffineTransform(double a,
 #if USE(WXGC)
   wxGraphicsRenderer* renderer = wxGraphicsRenderer::GetDefaultRenderer();
   m_transform = renderer->CreateMatrix();
-  m_transform.Set(a, b, c, d, e, f);
 #endif
+  setMatrix(a, b, c, d, e, f);
 }
 
 AffineTransform::AffineTransform() {
@@ -68,6 +68,17 @@ AffineTransform::AffineTransform() {
 AffineTransform AffineTransform::inverse() const {
   notImplemented();
   return *this;
+}
+
+void AffineTransform::setMatrix(double a,
+                                double b,
+                                double c,
+                                double d,
+                                double e,
+                                double f) {
+#if USE(WXGC)
+  m_transform.Set(a, b, c, d, e, f);
+#endif
 }
 
 void AffineTransform::map(double x, double y, double* x2, double* y2) const {
@@ -152,12 +163,20 @@ double AffineTransform::a() const {
   return a;
 }
 
+void AffineTransform::setA(double a) {
+  setMatrix(a, b(), c(), d(), e(), f());
+}
+
 double AffineTransform::b() const {
   double b = 0;
 #if USE(WXGC)
   m_transform.Get(&b);
 #endif
   return b;
+}
+
+void AffineTransform::setB(double b) {
+  setMatrix(a(), b, c(), d(), e(), f());
 }
 
 double AffineTransform::c() const {
@@ -168,12 +187,20 @@ double AffineTransform::c() const {
   return c;
 }
 
+void AffineTransform::setC(double c) {
+  setMatrix(a(), b(), c, d(), e(), f());
+}
+
 double AffineTransform::d() const {
   double d = 0;
 #if USE(WXGC)
   m_transform.Get(&d);
 #endif
   return d;
+}
+
+void AffineTransform::setD(double d) {
+  setMatrix(a(), b(), c(), d, e(), f());
 }
 
 double AffineTransform::e() const {
@@ -184,11 +211,19 @@ double AffineTransform::e() const {
   return e;
 }
 
+void AffineTransform::setE(double e) {
+  setMatrix(a(), b(), c(), d(), e, f());
+}
+
 double AffineTransform::f() const {
   double f = 0;
 #if USE(WXGC)
   m_transform.Get(&f);
 #endif
   return f;
+}
+
+void AffineTransform::setF(double f) {
+  setMatrix(a(), b(), c(), d(), e(), f);
 }
 }
