@@ -37,8 +37,8 @@
 #include "MouseEventWithHitTestResults.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
-#include "PlatformScrollbar.h"
 #include "PlatformWheelEvent.h"
+#include "Scrollbar.h"
 #include "SelectionController.h"
 #include "WCDataObject.h"
 #include "NotImplemented.h"
@@ -86,7 +86,7 @@ bool EventHandler::passWheelEventToWidget(PlatformWheelEvent& wheelEvent,
 
 bool EventHandler::passMousePressEventToScrollbar(
     MouseEventWithHitTestResults& mev,
-    PlatformScrollbar* scrollbar) {
+    Scrollbar* scrollbar) {
   if (!scrollbar || !scrollbar->isEnabled())
     return false;
   return scrollbar->handleMousePressEvent(mev.event());

@@ -45,9 +45,9 @@
 #include "MouseEventWithHitTestResults.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
-#include "PlatformScrollBar.h"
 #include "PlatformWheelEvent.h"
 #include "RenderWidget.h"
+#include "ScrollBar.h"
 #include "NotImplemented.h"
 
 QT_BEGIN_NAMESPACE
@@ -137,7 +137,7 @@ bool EventHandler::passMouseReleaseEventToSubframe(
 
 bool EventHandler::passMousePressEventToScrollbar(
     MouseEventWithHitTestResults& mev,
-    PlatformScrollbar* scrollbar) {
+    Scrollbar* scrollbar) {
   if (!scrollbar || !scrollbar->isEnabled())
     return false;
   return scrollbar->handleMousePressEvent(mev.event());

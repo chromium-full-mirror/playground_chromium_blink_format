@@ -65,8 +65,6 @@ class PlatformScrollbar : public Scrollbar {
   static int verticalScrollbarWidth(
       ScrollbarControlSize size = RegularScrollbar);
 
-  void autoscrollTimerFired(Timer<PlatformScrollbar>*);
-
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
@@ -107,22 +105,10 @@ class PlatformScrollbar : public Scrollbar {
 
   ScrollbarPart hitTest(const PlatformMouseEvent&);
 
-  void startTimerIfNeeded(double delay);
-  void stopTimerIfNeeded();
-  void autoscrollPressedPart(double delay);
-  ScrollDirection pressedPartScrollDirection();
-  ScrollGranularity pressedPartScrollGranularity();
-
   bool thumbUnderMouse();
 
   void invalidatePart(ScrollbarPart);
   void invalidateTrack();
-
-  ScrollbarPart m_hoveredPart;
-  ScrollbarPart m_pressedPart;
-  int m_pressedPos;
-  Timer<PlatformScrollbar> m_scrollTimer;
-  bool m_overlapsResizer;
 };
 }
 

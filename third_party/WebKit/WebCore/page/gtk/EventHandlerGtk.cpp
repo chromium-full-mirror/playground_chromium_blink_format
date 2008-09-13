@@ -37,9 +37,9 @@
 #include "NotImplemented.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
-#include "PlatformScrollBar.h"
 #include "PlatformWheelEvent.h"
 #include "RenderWidget.h"
+#include "ScrollBar.h"
 
 namespace WebCore {
 
@@ -127,9 +127,8 @@ bool EventHandler::passMouseReleaseEventToSubframe(
   return true;
 }
 
-bool EventHandler::passMousePressEventToScrollbar(
-    MouseEventWithHitTestResults&,
-    PlatformScrollbar* scrollbar) {
+bool EventHandler::passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
+                                                  Scrollbar* scrollbar) {
   notImplemented();
   return false;
 }

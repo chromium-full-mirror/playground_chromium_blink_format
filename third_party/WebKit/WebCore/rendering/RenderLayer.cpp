@@ -1150,18 +1150,6 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
   // keep the point under the cursor in view.
 }
 
-PlatformScrollbar* RenderLayer::horizontalScrollbarWidget() const {
-  if (m_hBar)
-    return static_cast<PlatformScrollbar*>(m_hBar.get());
-  return 0;
-}
-
-PlatformScrollbar* RenderLayer::verticalScrollbarWidget() const {
-  if (m_vBar)
-    return static_cast<PlatformScrollbar*>(m_vBar.get());
-  return 0;
-}
-
 void RenderLayer::valueChanged(Scrollbar*) {
   // Update scroll position from scrollbars.
 
@@ -1605,7 +1593,7 @@ bool RenderLayer::hitTestOverflowControls(HitTestResult& result) {
             (renderer()->borderTop() + renderer()->borderBottom()) -
             (m_hBar ? m_hBar->height() : resizeControlSize));
     if (vBarRect.contains(result.point())) {
-      result.setScrollbar(verticalScrollbarWidget());
+      result.setScrollbar(m_vBar.get());
       return true;
     }
   }
@@ -1620,7 +1608,7 @@ bool RenderLayer::hitTestOverflowControls(HitTestResult& result) {
             (m_vBar ? m_vBar->width() : resizeControlSize),
         m_hBar->height());
     if (hBarRect.contains(result.point())) {
-      result.setScrollbar(horizontalScrollbarWidget());
+      result.setScrollbar(m_hBar.get());
       return true;
     }
   }

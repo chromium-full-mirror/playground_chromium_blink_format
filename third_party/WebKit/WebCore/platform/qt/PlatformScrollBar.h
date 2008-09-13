@@ -96,10 +96,6 @@ class PlatformScrollbar : public Scrollbar {
 
   int pixelPosToRangeValue(int pos) const;
 
-  int m_pressedPos;
-  QStyle::SubControl m_pressedPart;
-  QStyle::SubControl m_hoveredPart;
-  Timer<PlatformScrollbar> m_scrollTimer;
   QStyleOptionSlider m_opt;
 };
 }

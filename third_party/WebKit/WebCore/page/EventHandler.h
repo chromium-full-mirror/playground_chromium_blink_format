@@ -60,11 +60,11 @@ class KeyboardEvent;
 class MouseEventWithHitTestResults;
 class Node;
 class PlatformKeyboardEvent;
-class PlatformScrollbar;
 class PlatformWheelEvent;
 class RenderLayer;
 class RenderObject;
 class RenderWidget;
+class Scrollbar;
 class String;
 class TextEvent;
 class VisiblePosition;
@@ -227,7 +227,7 @@ class EventHandler : Noncopyable {
 
   void handleKeyboardSelectionMovement(KeyboardEvent*);
 
-  Cursor selectCursor(const MouseEventWithHitTestResults&, PlatformScrollbar*);
+  Cursor selectCursor(const MouseEventWithHitTestResults&, Scrollbar*);
   void setPanScrollCursor();
 
   void hoverTimerFired(Timer<EventHandler>*);
@@ -290,7 +290,7 @@ class EventHandler : Noncopyable {
                                    HitTestResult* hoveredNode = 0);
 
   bool passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
-                                      PlatformScrollbar*);
+                                      Scrollbar*);
 
   bool passWidgetMouseDownEventToWidget(const MouseEventWithHitTestResults&);
   bool passWidgetMouseDownEventToWidget(RenderWidget*);
@@ -355,7 +355,7 @@ class EventHandler : Noncopyable {
   RefPtr<Node> m_nodeUnderMouse;
   RefPtr<Node> m_lastNodeUnderMouse;
   RefPtr<Frame> m_lastMouseMoveEventSubframe;
-  RefPtr<PlatformScrollbar> m_lastScrollbarUnderMouse;
+  RefPtr<Scrollbar> m_lastScrollbarUnderMouse;
 
   int m_clickCount;
   RefPtr<Node> m_clickNode;
