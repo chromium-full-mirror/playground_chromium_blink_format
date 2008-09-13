@@ -146,9 +146,7 @@ enum AccessibilityRole {
   HeadingRole,
   ListBoxRole,
   ListBoxOptionRole,
-  TableHeaderContainerRole,
-  DefinitionListTermRole,
-  DefinitionListDefinitionRole
+  TableHeaderContainerRole
 };
 
 struct VisiblePositionRange {
@@ -206,7 +204,6 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isProgressIndicator() const { return false; };
   virtual bool isSlider() const { return false; };
   virtual bool isControl() const { return false; };
-  virtual bool isList() const { return false; };
   virtual bool isDataTable() const { return false; };
   virtual bool isTableRow() const { return false; };
   virtual bool isTableColumn() const { return false; };

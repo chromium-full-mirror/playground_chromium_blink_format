@@ -99,8 +99,6 @@ String AXLinkText();
 String AXListMarkerText();
 String AXImageMapText();
 String AXHeadingText();
-String AXDefinitionListTermText();
-String AXDefinitionListDefinitionText();
 
 String AXButtonActionVerb();
 String AXRadioButtonActionVerb();
