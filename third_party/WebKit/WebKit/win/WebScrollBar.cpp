@@ -32,6 +32,7 @@
 #include <WebCore/GraphicsContext.h>
 #include <WebCore/PlatformMouseEvent.h>
 #include <WebCore/PlatformScrollBar.h>
+#include <WebCore/ScrollbarTheme.h>
 #pragma warning(pop)
 
 using namespace WebCore;
@@ -190,7 +191,7 @@ HRESULT STDMETHODCALLTYPE WebScrollBar::requestedWidth(
     return E_POINTER;
 
   *w = m_scrollBar->orientation() == VerticalScrollbar
-           ? PlatformScrollbar::verticalScrollbarWidth(
+           ? ScrollbarTheme::nativeTheme()->scrollbarThickness(
                  m_scrollBar->controlSize())
            : -1;
   return S_OK;
@@ -202,7 +203,7 @@ HRESULT STDMETHODCALLTYPE WebScrollBar::requestedHeight(
     return E_POINTER;
 
   *h = m_scrollBar->orientation() == HorizontalScrollbar
-           ? PlatformScrollbar::horizontalScrollbarHeight(
+           ? ScrollbarTheme::nativeTheme()->scrollbarThickness(
                  m_scrollBar->controlSize())
            : -1;
   return S_OK;
