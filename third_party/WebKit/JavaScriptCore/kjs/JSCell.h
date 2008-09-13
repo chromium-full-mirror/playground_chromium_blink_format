@@ -47,9 +47,9 @@ class JSCell : public JSValue {
  public:
   // Querying the type.
   bool isNumber() const;
-  virtual bool isString() const;
+  bool isString() const;
+  bool isObject() const;
   virtual bool isGetterSetter() const;
-  virtual bool isObject() const;
   virtual bool isObject(const ClassInfo*) const;
 
   StructureID* structureID() const;
@@ -123,6 +123,14 @@ inline JSCell::~JSCell() {}
 
 inline bool JSCell::isNumber() const {
   return Heap::isNumber(const_cast<JSCell*>(this));
+}
+
+inline bool JSCell::isObject() const {
+  return m_structureID->type() == ObjectType;
+}
+
+inline bool JSCell::isString() const {
+  return m_structureID->type() == StringType;
 }
 
 inline StructureID* JSCell::structureID() const {

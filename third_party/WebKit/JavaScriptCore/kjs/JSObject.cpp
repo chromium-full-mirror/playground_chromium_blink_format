@@ -538,10 +538,6 @@ StructureID* JSObject::createInheritorID() {
   return m_inheritorID.get();
 }
 
-bool JSObject::isObject() const {
-  return true;
-}
-
 void JSObject::allocatePropertyStorage(size_t oldSize, size_t newSize) {
   JSValue** oldPropertStorage = m_propertyStorage;
   m_propertyStorage = new JSValue*[newSize];

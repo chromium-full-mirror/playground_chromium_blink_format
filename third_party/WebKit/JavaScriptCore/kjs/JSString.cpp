@@ -104,12 +104,6 @@ bool JSString::getOwnPropertySlot(ExecState* exec,
       exec, Identifier::from(exec, propertyName), slot);
 }
 
-bool JSString::isString() const {
-  // FIXME: Change JSCell::isString to a non-virtual implementation like the one
-  // in Machine::isJSString.
-  return true;
-}
-
 JSString* jsString(ExecState* exec, const UString& s) {
   int size = s.size();
   if (!size)
