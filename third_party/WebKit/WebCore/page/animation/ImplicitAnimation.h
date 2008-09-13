@@ -76,6 +76,8 @@ class ImplicitAnimation : public AnimationBase {
   bool shouldSendEventForListener(Document::ListenerType);
   bool sendTransitionEvent(const AtomicString&, double elapsedTime);
 
+  void validateTransformFunctionList();
+
  private:
   int m_transitionProperty;  // Transition property as specified in the
                              // RenderStyle. May be cAnimateAll

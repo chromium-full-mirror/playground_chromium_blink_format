@@ -82,72 +82,113 @@ void AnimationEventDispatcher::timerFired(Timer<AnimationTimerBase>*) {
                                         m_reset, m_eventType, m_elapsedTime);
 }
 
-static inline int blendFunc(int from, int to, double progress) {
+static inline int blendFunc(const AnimationBase* anim,
+                            int from,
+                            int to,
+                            double progress) {
   return int(from + (to - from) * progress);
 }
 
-static inline double blendFunc(double from, double to, double progress) {
+static inline double blendFunc(const AnimationBase* anim,
+                               double from,
+                               double to,
+                               double progress) {
   return from + (to - from) * progress;
 }
 
-static inline float blendFunc(float from, float to, double progress) {
+static inline float blendFunc(const AnimationBase* anim,
+                              float from,
+                              float to,
+                              double progress) {
   return narrowPrecisionToFloat(from + (to - from) * progress);
 }
 
-static inline Color blendFunc(const Color& from,
+static inline Color blendFunc(const AnimationBase* anim,
+                              const Color& from,
                               const Color& to,
                               double progress) {
-  return Color(blendFunc(from.red(), to.red(), progress),
-               blendFunc(from.green(), to.green(), progress),
-               blendFunc(from.blue(), to.blue(), progress),
-               blendFunc(from.alpha(), to.alpha(), progress));
+  return Color(blendFunc(anim, from.red(), to.red(), progress),
+               blendFunc(anim, from.green(), to.green(), progress),
+               blendFunc(anim, from.blue(), to.blue(), progress),
+               blendFunc(anim, from.alpha(), to.alpha(), progress));
 }
 
-static inline Length blendFunc(const Length& from,
+static inline Length blendFunc(const AnimationBase* anim,
+                               const Length& from,
                                const Length& to,
                                double progress) {
   return to.blend(from, progress);
 }
 
-static inline IntSize blendFunc(const IntSize& from,
+static inline IntSize blendFunc(const AnimationBase* anim,
+                                const IntSize& from,
                                 const IntSize& to,
                                 double progress) {
-  return IntSize(blendFunc(from.width(), to.width(), progress),
-                 blendFunc(from.height(), to.height(), progress));
+  return IntSize(blendFunc(anim, from.width(), to.width(), progress),
+                 blendFunc(anim, from.height(), to.height(), progress));
 }
 
-static inline ShadowData* blendFunc(const ShadowData* from,
+static inline ShadowData* blendFunc(const AnimationBase* anim,
+                                    const ShadowData* from,
                                     const ShadowData* to,
                                     double progress) {
   ASSERT(from && to);
-  return new ShadowData(blendFunc(from->x, to->x, progress),
-                        blendFunc(from->y, to->y, progress),
-                        blendFunc(from->blur, to->blur, progress),
-                        blendFunc(from->color, to->color, progress));
+  return new ShadowData(blendFunc(anim, from->x, to->x, progress),
+                        blendFunc(anim, from->y, to->y, progress),
+                        blendFunc(anim, from->blur, to->blur, progress),
+                        blendFunc(anim, from->color, to->color, progress));
 }
 
-static inline TransformOperations blendFunc(const TransformOperations& from,
+static inline TransformOperations blendFunc(const AnimationBase* anim,
+                                            const TransformOperations& from,
                                             const TransformOperations& to,
                                             double progress) {
-  // Blend any operations whose types actually match up.  Otherwise don't
-  // bother.
-  unsigned fromSize = from.size();
-  unsigned toSize = to.size();
-  unsigned size = max(fromSize, toSize);
   TransformOperations result;
-  for (unsigned i = 0; i < size; i++) {
-    RefPtr<TransformOperation> fromOp = i < fromSize ? from[i] : 0;
-    RefPtr<TransformOperation> toOp = i < toSize ? to[i] : 0;
-    RefPtr<TransformOperation> blendedOp =
-        toOp ? toOp->blend(fromOp.get(), progress)
-             : fromOp->blend(0, progress, true);
-    if (blendedOp)
-      result.append(blendedOp);
+
+  // If we have a transform function list, use that to do a per-function
+  // animation. Otherwise do a Matrix animation
+  if (anim->isTransformFunctionListValid()) {
+    unsigned fromSize = from.size();
+    unsigned toSize = to.size();
+    unsigned size = max(fromSize, toSize);
+    for (unsigned i = 0; i < size; i++) {
+      RefPtr<TransformOperation> fromOp =
+          (i < fromSize && !from[i]->isIdentity()) ? from[i].get() : 0;
+      RefPtr<TransformOperation> toOp =
+          (i < toSize && !to[i]->isIdentity()) ? to[i].get() : 0;
+      RefPtr<TransformOperation> blendedOp =
+          toOp ? toOp->blend(fromOp.get(), progress)
+               : (fromOp ? fromOp->blend(0, progress, true) : 0);
+      if (blendedOp)
+        result.append(blendedOp);
+      else {
+        RefPtr<TransformOperation> identityOp =
+            IdentityTransformOperation::create();
+        if (progress > 0.5)
+          result.append(toOp ? toOp : identityOp);
+        else
+          result.append(fromOp ? fromOp : identityOp);
+      }
+    }
+  } else {
+    // Convert the TransformOperations into matrices
+    IntSize size = anim->renderer()->borderBox().size();
+    AffineTransform fromT;
+    AffineTransform toT;
+    from.apply(size, fromT);
+    to.apply(size, toT);
+
+    toT.blend(fromT, progress);
+
+    // Append the result
+    result.append(MatrixTransformOperation::create(toT.a(), toT.b(), toT.c(),
+                                                   toT.d(), toT.e(), toT.f()));
   }
   return result;
 }
 
-static inline EVisibility blendFunc(EVisibility from,
+static inline EVisibility blendFunc(const AnimationBase* anim,
+                                    EVisibility from,
                                     EVisibility to,
                                     double progress) {
   // Any non-zero result means we consider the object to be visible.  Only at 0
@@ -158,7 +199,7 @@ static inline EVisibility blendFunc(EVisibility from,
   double toVal = to == VISIBLE ? 1. : 0.;
   if (fromVal == toVal)
     return to;
-  double result = blendFunc(fromVal, toVal, progress);
+  double result = blendFunc(anim, fromVal, toVal, progress);
   return result > 0. ? VISIBLE : (to != VISIBLE ? to : from);
 }
 
@@ -168,7 +209,8 @@ class PropertyWrapperBase {
 
   virtual ~PropertyWrapperBase() {}
   virtual bool equals(const RenderStyle* a, const RenderStyle* b) const = 0;
-  virtual void blend(RenderStyle* dst,
+  virtual void blend(const AnimationBase* anim,
+                     RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
                      double progress) const = 0;
@@ -201,11 +243,12 @@ class PropertyWrapper : public PropertyWrapperGetter<T> {
                   void (RenderStyle::*setter)(T))
       : PropertyWrapperGetter<T>(prop, getter), m_setter(setter) {}
 
-  virtual void blend(RenderStyle* dst,
+  virtual void blend(const AnimationBase* anim,
+                     RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
                      double progress) const {
-    (dst->*m_setter)(blendFunc((a->*PropertyWrapperGetter<T>::m_getter)(),
+    (dst->*m_setter)(blendFunc(anim, (a->*PropertyWrapperGetter<T>::m_getter)(),
                                (b->*PropertyWrapperGetter<T>::m_getter)(),
                                progress));
   }
@@ -232,7 +275,8 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
     return true;
   }
 
-  virtual void blend(RenderStyle* dst,
+  virtual void blend(const AnimationBase* anim,
+                     RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
                      double progress) const {
@@ -245,7 +289,7 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
     if (!shadowB)
       shadowB = &defaultShadowData;
 
-    (dst->*m_setter)(blendFunc(shadowA, shadowB, progress), false);
+    (dst->*m_setter)(blendFunc(anim, shadowA, shadowB, progress), false);
   }
 
  private:
@@ -270,7 +314,8 @@ class PropertyWrapperMaybeInvalidColor : public PropertyWrapperBase {
     return fromColor == toColor;
   }
 
-  virtual void blend(RenderStyle* dst,
+  virtual void blend(const AnimationBase* anim,
+                     RenderStyle* dst,
                      const RenderStyle* a,
                      const RenderStyle* b,
                      double progress) const {
@@ -280,7 +325,7 @@ class PropertyWrapperMaybeInvalidColor : public PropertyWrapperBase {
       fromColor = a->color();
     if (!toColor.isValid())
       toColor = b->color();
-    (dst->*m_setter)(blendFunc(fromColor, toColor, progress));
+    (dst->*m_setter)(blendFunc(anim, fromColor, toColor, progress));
   }
 
  private:
@@ -422,8 +467,6 @@ static void ensurePropertyMap() {
         &RenderStyle::setVisibility));
     gPropertyWrappers->append(new PropertyWrapper<float>(
         CSSPropertyZoom, &RenderStyle::zoom, &RenderStyle::setZoom));
-
-    // FIXME: these might be invalid colors, need to check for that
     gPropertyWrappers->append(new PropertyWrapperMaybeInvalidColor(
         CSSPropertyWebkitColumnRuleColor, &RenderStyle::columnRuleColor,
         &RenderStyle::setColumnRuleColor));
@@ -485,7 +528,8 @@ AnimationBase::AnimationBase(const Animation* transition,
       m_animationEventDispatcher(const_cast<AnimationBase*>(this)),
       m_animation(const_cast<Animation*>(transition)),
       m_compAnim(compAnim),
-      m_waitingForEndEvent(false) {}
+      m_waitingForEndEvent(false),
+      m_transformFunctionListValid(false) {}
 
 AnimationBase::~AnimationBase() {
   if (m_animState == AnimationStateStartWaitStyleAvailable)
@@ -527,7 +571,8 @@ int AnimationBase::getNumProperties() {
 }
 
 // Returns true if we need to start animation timers
-bool AnimationBase::blendProperties(int prop,
+bool AnimationBase::blendProperties(const AnimationBase* anim,
+                                    int prop,
                                     RenderStyle* dst,
                                     const RenderStyle* a,
                                     const RenderStyle* b,
@@ -543,7 +588,7 @@ bool AnimationBase::blendProperties(int prop,
     for (unsigned int i = 0; i < n; ++i) {
       PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
       if (!wrapper->equals(a, b)) {
-        wrapper->blend(dst, a, b, progress);
+        wrapper->blend(anim, dst, a, b, progress);
         needsTimer = true;
       }
     }
@@ -555,7 +600,7 @@ bool AnimationBase::blendProperties(int prop,
     int i = gPropertyWrapperMap[propIndex];
     if (i >= 0) {
       PropertyWrapperBase* wrapper = (*gPropertyWrappers)[i];
-      wrapper->blend(dst, a, b, progress);
+      wrapper->blend(anim, dst, a, b, progress);
       return true;
     }
   }

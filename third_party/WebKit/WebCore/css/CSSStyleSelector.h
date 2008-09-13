@@ -174,6 +174,10 @@ class CSSStyleSelector : Noncopyable {
 
   void addKeyframeStyle(Document* doc, const WebKitCSSKeyframesRule* rule);
 
+  static bool createTransformOperations(CSSValue* inValue,
+                                        RenderStyle* inStyle,
+                                        TransformOperations& outOperations);
+
  private:
   enum SelectorMatch {
     SelectorMatches,

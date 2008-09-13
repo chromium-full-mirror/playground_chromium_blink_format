@@ -266,6 +266,10 @@ class AnimationBase : public Noncopyable {
     return !postActive() && affectsProperty(property);
   }
 
+  bool isTransformFunctionListValid() const {
+    return m_transformFunctionListValid;
+  }
+
  protected:
   Element* elementForEventDispatch();
 
@@ -291,7 +295,8 @@ class AnimationBase : public Noncopyable {
   static int getNumProperties();
 
   // Return true if we need to start software animation timers
-  static bool blendProperties(int prop,
+  static bool blendProperties(const AnimationBase* anim,
+                              int prop,
                               RenderStyle* dst,
                               const RenderStyle* a,
                               const RenderStyle* b,
@@ -314,6 +319,7 @@ class AnimationBase : public Noncopyable {
   RefPtr<Animation> m_animation;
   CompositeAnimation* m_compAnim;
   bool m_waitingForEndEvent;
+  bool m_transformFunctionListValid;
 };
 
 }  // namespace WebCore

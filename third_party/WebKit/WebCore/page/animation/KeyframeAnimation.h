@@ -46,7 +46,10 @@ class KeyframeAnimation : public AnimationBase {
       : AnimationBase(animation, renderer, compAnim),
         m_keyframes(animation->keyframeList()),
         m_name(animation->name()),
-        m_index(index) {}
+        m_index(index) {
+    // Set the transform animation list
+    validateTransformFunctionList();
+  }
 
   virtual ~KeyframeAnimation();
 
@@ -76,6 +79,8 @@ class KeyframeAnimation : public AnimationBase {
   bool sendAnimationEvent(const AtomicString&, double elapsedTime);
 
   virtual bool affectsProperty(int) const;
+
+  void validateTransformFunctionList();
 
  private:
   // The keyframes that we are blending.
