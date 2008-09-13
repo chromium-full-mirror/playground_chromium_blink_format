@@ -40,6 +40,7 @@
 #include "PlatformKeyboardEvent.h"
 #include "PlatformScrollBar.h"
 #include "RenderTheme.h"
+#include "ScrollbarTheme.h"
 #include "SearchPopupMenu.h"
 #include "SelectionController.h"
 #include "Settings.h"
@@ -715,7 +716,7 @@ void RenderTextControl::calcHeight() {
   if (m_innerText->renderer()->style()->overflowX() == OSCROLL ||
       (m_innerText->renderer()->style()->overflowX() == OAUTO &&
        m_innerText->renderer()->style()->wordWrap() == NormalWordWrap))
-    scrollbarSize = PlatformScrollbar::horizontalScrollbarHeight();
+    scrollbarSize = ScrollbarTheme::nativeTheme()->scrollbarThickness();
 
   m_height = line * rows + toAdd + scrollbarSize;
 
@@ -889,7 +890,7 @@ void RenderTextControl::calcPrefWidths() {
       // FIXME: We should get the size of the scrollbar from the RenderTheme
       // instead.
       if (m_innerText->renderer()->style()->overflowY() != OHIDDEN)
-        scrollbarSize = PlatformScrollbar::verticalScrollbarWidth();
+        scrollbarSize = ScrollbarTheme::nativeTheme()->scrollbarThickness();
     } else {
       factor = static_cast<HTMLInputElement*>(node())->size();
       if (factor <= 0)

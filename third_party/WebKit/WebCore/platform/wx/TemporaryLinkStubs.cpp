@@ -72,6 +72,7 @@
 #include "ResourceHandleInternal.h"
 #include "ResourceLoader.h"
 #include "Screen.h"
+#include "ScrollbarTheme.h"
 #include "SearchPopupMenu.h"
 #include "ScrollBar.h"
 #include "SharedBuffer.h"
@@ -227,6 +228,12 @@ void PlatformScrollbar::updateThumbProportion() {
 }
 void PlatformScrollbar::setRect(const IntRect&) {
   notImplemented();
+}
+
+void ScrollbarTheme::nativeTheme() {
+  notImplemented();
+  static ScrollbarTheme theme;
+  return &theme;
 }
 
 void FileChooser::openFileChooser(Document*) {

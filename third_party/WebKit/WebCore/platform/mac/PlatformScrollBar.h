@@ -49,9 +49,6 @@ class PlatformScrollbar : public Scrollbar {
 
   bool scrollbarHit(NSScrollerPart);
 
-  static int horizontalScrollbarHeight() { return 15; }
-  static int verticalScrollbarWidth() { return 15; }
-
  private:
   PlatformScrollbar(ScrollbarClient*,
                     ScrollbarOrientation,

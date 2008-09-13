@@ -59,12 +59,6 @@ class PlatformScrollbar : public Scrollbar {
 
   virtual IntRect windowClipRect() const;
 
-  static void themeChanged();
-  static int horizontalScrollbarHeight(
-      ScrollbarControlSize size = RegularScrollbar);
-  static int verticalScrollbarWidth(
-      ScrollbarControlSize size = RegularScrollbar);
-
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();

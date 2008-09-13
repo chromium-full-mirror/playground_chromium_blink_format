@@ -27,6 +27,7 @@
 #include "ScrollBar.h"
 
 #include "ScrollbarClient.h"
+#include "ScrollbarTheme.h"
 
 #include <algorithm>
 
@@ -41,10 +42,12 @@ namespace WebCore {
 
 Scrollbar::Scrollbar(ScrollbarClient* client,
                      ScrollbarOrientation orientation,
-                     ScrollbarControlSize controlSize)
+                     ScrollbarControlSize controlSize,
+                     ScrollbarTheme* theme)
     : m_client(client),
       m_orientation(orientation),
       m_controlSize(controlSize),
+      m_theme(theme),
       m_visibleSize(0),
       m_totalSize(0),
       m_currentPos(0),
@@ -55,7 +58,10 @@ Scrollbar::Scrollbar(ScrollbarClient* client,
       m_pressedPart(NoPart),
       m_pressedPos(0),
       m_scrollTimer(this, &Scrollbar::autoscrollTimerFired),
-      m_overlapsResizer(false) {}
+      m_overlapsResizer(false) {
+  if (!m_theme)
+    m_theme = ScrollbarTheme::nativeTheme();
+}
 
 bool Scrollbar::setValue(int v) {
   v = max(min(v, m_totalSize - m_visibleSize), 0);
