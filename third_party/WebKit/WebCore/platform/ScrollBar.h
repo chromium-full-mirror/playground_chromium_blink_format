@@ -94,6 +94,16 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
     return false;
   }
 
+#if PLATFORM(QT)
+  // For platforms that wish to handle context menu events.
+  // FIXME: This sems misplaced.  Normal hit testing could be used to populate a
+  // correct
+  // context menu.  There's no reason why the scrollbar should have to do it.
+  virtual bool handleContextMenuEvent(const PlatformMouseEvent& event) {
+    return false;
+  }
+#endif
+
  protected:
   virtual void updateThumbPosition() = 0;
   virtual void updateThumbProportion() = 0;
