@@ -640,7 +640,7 @@ static LRESULT CALLBACK PopupWndProc(HWND hWnd,
     case WM_SIZE:
       if (popup && popup->scrollBar()) {
         IntSize size(LOWORD(lParam), HIWORD(lParam));
-        popup->scrollBar()->setRect(
+        popup->scrollBar()->setFrameGeometry(
             IntRect(size.width() - popup->scrollBar()->width(), 0,
                     popup->scrollBar()->width(), size.height()));
 

@@ -46,7 +46,7 @@ class PlatformScrollbar : public Scrollbar {
 
   virtual void setParent(ScrollView*);
 
-  virtual void setRect(const IntRect&);
+  virtual void setFrameGeometry(const IntRect&);
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
   virtual bool handleMouseMoveEvent(const PlatformMouseEvent&);

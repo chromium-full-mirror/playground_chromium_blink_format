@@ -99,8 +99,8 @@ void PlatformScrollbar::updateThumbProportion() {
   gtk_adjustment_changed(m_adjustment);
 }
 
-void PlatformScrollbar::setRect(const IntRect& rect) {
-  setFrameGeometry(rect);
+void PlatformScrollbar::setFrameGeometry(const IntRect& rect) {
+  Widget::setFrameGeometry(rect);
   geometryChanged();
 }
 

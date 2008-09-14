@@ -555,7 +555,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
         IntRect(0, height() - m_data->m_hBar->height(),
                 width() - (m_data->m_vBar ? m_data->m_vBar->width() : 0),
                 m_data->m_hBar->height());
-    m_data->m_hBar->setRect(hBarRect);
+    m_data->m_hBar->setFrameGeometry(hBarRect);
     if (!m_data->m_scrollbarsSuppressed &&
         oldRect != m_data->m_hBar->frameGeometry())
       m_data->m_hBar->invalidate();
@@ -579,7 +579,7 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
     IntRect vBarRect =
         IntRect(width() - m_data->m_vBar->width(), 0, m_data->m_vBar->width(),
                 height() - (m_data->m_hBar ? m_data->m_hBar->height() : 0));
-    m_data->m_vBar->setRect(vBarRect);
+    m_data->m_vBar->setFrameGeometry(vBarRect);
     if (!m_data->m_scrollbarsSuppressed &&
         oldRect != m_data->m_vBar->frameGeometry())
       m_data->m_vBar->invalidate();

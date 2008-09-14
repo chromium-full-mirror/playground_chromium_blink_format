@@ -215,9 +215,6 @@ void PlatformScrollbar::updateThumbPosition() {
 void PlatformScrollbar::updateThumbProportion() {
   notImplemented();
 }
-void PlatformScrollbar::setRect(const IntRect&) {
-  notImplemented();
-}
 
 ScrollbarTheme* ScrollbarTheme::nativeTheme() {
   notImplemented();
