@@ -24,6 +24,7 @@
 #include "GraphicsContext.h"
 #include "FrameView.h"
 #include "NotImplemented.h"
+#include "ScrollbarTheme.h"
 #include "gtkdrawing.h"
 
 #include <gtk/gtk.h>
@@ -63,8 +64,8 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
    * assign a sane default width and height to the ScrollBar, otherwise
    * we will end up with a 0 width scrollbar.
    */
-  resize(PlatformScrollbar::horizontalScrollbarHeight(),
-         PlatformScrollbar::verticalScrollbarWidth());
+  resize(ScrollbarTheme::nativeTheme()->scrollbarThickness(),
+         ScrollbarTheme::nativeTheme()->scrollbarThickness());
 }
 
 PlatformScrollbar::~PlatformScrollbar() {
