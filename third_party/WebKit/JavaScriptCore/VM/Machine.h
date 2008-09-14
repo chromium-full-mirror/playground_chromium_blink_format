@@ -329,7 +329,8 @@ class Machine {
                        const Identifier& propertyName,
                        const PropertySlot&);
   void uncacheGetByID(CodeBlock*, Instruction* vPC);
-  void tryCachePutByID(CodeBlock*,
+  void tryCachePutByID(ExecState* exec,
+                       CodeBlock*,
                        Instruction* vPC,
                        JSValue* baseValue,
                        const PutPropertySlot&);

@@ -868,6 +868,8 @@ RegisterID* CodeGenerator::emitPutById(RegisterID* base,
   instructions().append(value->index());
   instructions().append(0);
   instructions().append(0);
+  instructions().append(0);
+  instructions().append(0);
   return value;
 }
 

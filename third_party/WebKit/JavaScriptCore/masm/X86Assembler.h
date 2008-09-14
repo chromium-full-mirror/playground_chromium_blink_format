@@ -252,6 +252,12 @@ class X86Assembler {
     m_buffer->putByte(imm);
   }
 
+  void addl_i8m(int imm, void* addr) {
+    m_buffer->putByte(OP_GROUP1_EvIb);
+    emitModRm_opm(GROUP1_OP_ADD, addr);
+    m_buffer->putByte(imm);
+  }
+
   void addl_i32r(int imm, RegisterID dst) {
     m_buffer->putByte(OP_GROUP1_EvIz);
     emitModRm_opr(GROUP1_OP_ADD, dst);
@@ -339,6 +345,12 @@ class X86Assembler {
   void subl_i8r(int imm, RegisterID dst) {
     m_buffer->putByte(OP_GROUP1_EvIb);
     emitModRm_opr(GROUP1_OP_SUB, dst);
+    m_buffer->putByte(imm);
+  }
+
+  void subl_i8m(int imm, void* addr) {
+    m_buffer->putByte(OP_GROUP1_EvIb);
+    emitModRm_opm(GROUP1_OP_SUB, addr);
     m_buffer->putByte(imm);
   }
 

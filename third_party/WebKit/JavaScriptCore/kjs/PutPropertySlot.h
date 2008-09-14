@@ -37,7 +37,7 @@ class PutPropertySlot {
  public:
   enum Type { Invalid, ExistingProperty, NewProperty };
 
-  PutPropertySlot() : m_type(Invalid), m_base(0) {}
+  PutPropertySlot() : m_type(Invalid), m_base(0), m_wasTransition(false) {}
 
   void setExistingProperty(JSObject* base, size_t offset) {
     m_type = ExistingProperty;
@@ -60,9 +60,13 @@ class PutPropertySlot {
     return m_offset;
   }
 
+  bool wasTransition() const { return m_wasTransition; }
+  void setWasTransition(bool wasTransition) { m_wasTransition = wasTransition; }
+
  private:
   Type m_type;
   JSObject* m_base;
+  bool m_wasTransition;
   size_t m_offset;
 };
 

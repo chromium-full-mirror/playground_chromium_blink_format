@@ -56,11 +56,11 @@ namespace JSC {
                                                                                                                  \
                       macro(op_resolve) macro(op_resolve_skip) macro(op_get_scoped_var) macro(                   \
                           op_put_scoped_var) macro(op_get_global_var) macro(op_put_global_var)                   \
-                          macro(op_resolve_base) macro(op_resolve_with_base) macro(                              \
-                              op_resolve_func) macro(op_get_by_id) macro(op_get_by_id_self)                      \
-                              macro(op_get_by_id_proto) macro(op_get_by_id_chain) macro(                         \
-                                  op_get_by_id_generic) macro(op_get_array_length) macro(op_get_string_length)   \
-                                  macro(op_put_by_id) macro(op_put_by_id_replace) macro(                         \
+                          macro(op_resolve_base) macro(op_resolve_with_base) macro(op_resolve_func) macro(       \
+                              op_get_by_id) macro(op_get_by_id_self) macro(op_get_by_id_proto)                   \
+                              macro(op_get_by_id_chain) macro(op_get_by_id_generic) macro(                       \
+                                  op_get_array_length) macro(op_get_string_length) macro(op_put_by_id)           \
+                                  macro(op_put_by_id_transition) macro(op_put_by_id_replace) macro(              \
                                       op_put_by_id_generic) macro(op_del_by_id) macro(op_get_by_val)             \
                                       macro(op_put_by_val) macro(op_del_by_val) macro(                           \
                                           op_put_by_index) macro(op_put_getter) macro(op_put_setter)             \

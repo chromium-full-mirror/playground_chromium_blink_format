@@ -168,6 +168,8 @@ class JSObject : public JSCell {
     return &m_propertyStorage[offset];
   }
 
+  void transitionTo(StructureID*);
+
   void removeDirect(const Identifier& propertyName);
   bool hasCustomProperties() { return !m_structureID->propertyMap().isEmpty(); }
   bool hasGetterSetterProperties() {
@@ -214,6 +216,8 @@ class JSObject : public JSCell {
     return m_propertyStorage == m_inlineStorage;
   }
 
+  static const size_t inlineStorageCapacity = 2;
+
  protected:
   bool getOwnPropertySlotForWrite(ExecState*,
                                   const Identifier&,
@@ -224,8 +228,6 @@ class JSObject : public JSCell {
   const HashEntry* findPropertyHashEntry(ExecState*,
                                          const Identifier& propertyName) const;
   StructureID* createInheritorID();
-
-  static const size_t inlineStorageCapacity = 2;
 
   RefPtr<StructureID> m_inheritorID;
 
@@ -460,7 +462,13 @@ inline void JSObject::putDirect(const Identifier& propertyName,
   RefPtr<StructureID> structureID = StructureID::addPropertyTransition(
       m_structureID, propertyName, value, attributes, this, slot,
       m_propertyStorage);
+  slot.setWasTransition(true);
   setStructureID(structureID.release());
+}
+
+inline void JSObject::transitionTo(StructureID* newStructureID) {
+  StructureID::transitionTo(m_structureID, newStructureID, this);
+  setStructureID(newStructureID);
 }
 
 inline JSValue* JSObject::toPrimitive(

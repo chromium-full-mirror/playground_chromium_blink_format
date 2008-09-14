@@ -260,6 +260,18 @@ class CTI {
     return cti.privateCompilePutByIdReplace(structureID, cachedOffset);
   }
 
+  static void* compilePutByIdTransition(Machine* machine,
+                                        ExecState* exec,
+                                        CodeBlock* codeBlock,
+                                        StructureID* oldStructureID,
+                                        StructureID* newStructureID,
+                                        size_t cachedOffset,
+                                        StructureIDChain* sIDC) {
+    CTI cti(machine, exec, codeBlock);
+    return cti.privateCompilePutByIdTransition(oldStructureID, newStructureID,
+                                               cachedOffset, sIDC);
+  }
+
   static void* compileArrayLengthTrampoline(Machine* machine,
                                             ExecState* exec,
                                             CodeBlock* codeBlock) {
@@ -307,6 +319,10 @@ class CTI {
                                    size_t count,
                                    size_t cachedOffset);
   void* privateCompilePutByIdReplace(StructureID*, size_t cachedOffset);
+  void* privateCompilePutByIdTransition(StructureID*,
+                                        StructureID*,
+                                        size_t cachedOffset,
+                                        StructureIDChain*);
   void* privateArrayLengthTrampoline();
   void* privateStringLengthTrampoline();
 
