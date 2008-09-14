@@ -47,7 +47,6 @@ class PlatformScrollbar : public Scrollbar {
 
   virtual int width() const;
   virtual int height() const;
-  virtual void setRect(const IntRect&);
 
   virtual IntRect frameGeometry() const;
   virtual void setFrameGeometry(const IntRect& r);
@@ -62,13 +61,6 @@ class PlatformScrollbar : public Scrollbar {
   virtual bool handleContextMenuEvent(const PlatformMouseEvent&);
 
   bool isEnabled() const;
-
-  static int horizontalScrollbarHeight(
-      ScrollbarControlSize size = RegularScrollbar);
-  static int verticalScrollbarWidth(
-      ScrollbarControlSize size = RegularScrollbar);
-
-  void autoscrollTimerFired(Timer<PlatformScrollbar>*);
   void invalidate();
 
  protected:
@@ -83,12 +75,6 @@ class PlatformScrollbar : public Scrollbar {
   int thumbPosition() const;
   int thumbLength() const;
   int trackLength() const;
-
-  void startTimerIfNeeded(double delay);
-  void stopTimerIfNeeded();
-  void autoscrollPressedPart(double delay);
-  ScrollDirection pressedPartScrollDirection();
-  ScrollGranularity pressedPartScrollGranularity();
 
   bool thumbUnderMouse();
 
