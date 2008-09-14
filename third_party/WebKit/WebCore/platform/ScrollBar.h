@@ -52,7 +52,7 @@ class Scrollbar : public Widget, public RefCounted<Scrollbar> {
             ScrollbarTheme* = 0);
 
  public:
-  virtual ~Scrollbar() {}
+  virtual ~Scrollbar();
 
   void setClient(ScrollbarClient* client) { m_client = client; }
 

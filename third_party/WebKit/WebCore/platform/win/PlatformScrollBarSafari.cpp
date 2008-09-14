@@ -135,9 +135,7 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
                              cHorizontalHeight[controlSize()]));
 }
 
-PlatformScrollbar::~PlatformScrollbar() {
-  stopTimerIfNeeded();
-}
+PlatformScrollbar::~PlatformScrollbar() {}
 
 void PlatformScrollbar::updateThumbPosition() {
   invalidateTrack();

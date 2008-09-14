@@ -76,9 +76,7 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
   }
 }
 
-PlatformScrollbar::~PlatformScrollbar() {
-  stopTimerIfNeeded();
-}
+PlatformScrollbar::~PlatformScrollbar() {}
 
 void PlatformScrollbar::updateThumbPosition() {
   invalidate();

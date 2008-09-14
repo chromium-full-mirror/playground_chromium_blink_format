@@ -160,9 +160,7 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
     setFrameGeometry(IntRect(0, 0, cHorizontalWidth, cHorizontalHeight));
 }
 
-PlatformScrollbar::~PlatformScrollbar() {
-  stopTimerIfNeeded();
-}
+PlatformScrollbar::~PlatformScrollbar() {}
 
 void PlatformScrollbar::updateThumbPosition() {
   invalidateTrack();
