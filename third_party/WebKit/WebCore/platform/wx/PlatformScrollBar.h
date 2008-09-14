@@ -41,7 +41,6 @@ class PlatformScrollbar : public Scrollbar {
   virtual ~PlatformScrollbar();
 
   virtual void setRect(const IntRect&);
-  virtual void setEnabled(bool);
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
   static int horizontalScrollbarHeight() { return 17; }

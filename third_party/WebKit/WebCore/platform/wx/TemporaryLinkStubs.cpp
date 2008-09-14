@@ -206,9 +206,6 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
 PlatformScrollbar::~PlatformScrollbar() {
   notImplemented();
 }
-void PlatformScrollbar::setEnabled(bool) {
-  notImplemented();
-}
 void PlatformScrollbar::paint(GraphicsContext*, const IntRect& damageRect) {
   notImplemented();
 }
