@@ -31,6 +31,7 @@
 
 #include "config.h"
 #include "ScrollView.h"
+
 #include "FrameView.h"
 #include "FloatRect.h"
 #include "FocusController.h"
@@ -42,6 +43,7 @@
 #include "Page.h"
 #include "GraphicsContext.h"
 #include "PlatformScrollBar.h"
+#include "ScrollbarTheme.h"
 
 #include <QDebug>
 #include <QWidget>
@@ -444,8 +446,10 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
   ScrollbarMode hScroll = m_data->m_hScrollbarMode;
   ScrollbarMode vScroll = m_data->m_vScrollbarMode;
 
-  const int cVerticalWidth = PlatformScrollbar::verticalScrollbarWidth();
-  const int cHorizontalHeight = PlatformScrollbar::horizontalScrollbarHeight();
+  const int cVerticalWidth =
+      ScrollbarTheme::nativeTheme()->scrollbarThickness();
+  const int cHorizontalHeight =
+      ScrollbarTheme::nativeTheme()->scrollbarThickness();
 
   for (int pass = 0; pass < 2; pass++) {
     bool scrollsVertically;
