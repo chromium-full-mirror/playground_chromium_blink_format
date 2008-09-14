@@ -488,7 +488,6 @@ void ScrollView::updateScrollbars(const IntSize& desiredOffset) {
 
   const int scrollbarThickness =
       ScrollbarTheme::nativeTheme()->scrollbarThickness();
-  ;
 
   for (int pass = 0; pass < 2; pass++) {
     bool scrollsVertically;

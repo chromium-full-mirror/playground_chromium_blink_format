@@ -1960,7 +1960,6 @@ void RenderBlock::paintEllipsisBoxes(PaintInfo& paintInfo, int tx, int ty) {
     // We can check the first box and last box and avoid painting if we don't
     // intersect.
     int yPos = ty + firstLineBox()->yPos();
-    ;
     int h = lastLineBox()->yPos() + lastLineBox()->height() -
             firstLineBox()->yPos();
     if (yPos >= paintInfo.rect.bottom() || yPos + h <= paintInfo.rect.y())

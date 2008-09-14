@@ -174,12 +174,10 @@ String HTMLScriptElement::sourceAttributeValue() const {
 
 String HTMLScriptElement::charsetAttributeValue() const {
   return getAttribute(charsetAttr).string();
-  ;
 }
 
 String HTMLScriptElement::typeAttributeValue() const {
   return getAttribute(typeAttr).string();
-  ;
 }
 
 String HTMLScriptElement::languageAttributeValue() const {

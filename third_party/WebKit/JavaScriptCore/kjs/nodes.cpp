@@ -764,7 +764,6 @@ RegisterID* PrefixResolveNode::emitCode(CodeGenerator& generator,
     emitPreIncOrDec(generator, propDst.get(), m_operator);
     generator.emitPutScopedVar(depth, index, propDst.get(), globalObject);
     return generator.moveToDestinationIfNeeded(dst, propDst.get());
-    ;
   }
 
   generator.emitExpressionInfo(m_divot, m_startOffset, m_endOffset);

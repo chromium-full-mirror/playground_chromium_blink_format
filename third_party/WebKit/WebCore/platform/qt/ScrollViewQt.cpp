@@ -110,7 +110,6 @@ void ScrollView::ScrollViewPrivate::setHasHorizontalScrollbar(bool hasBar) {
     m_view->addChild(m_hBar.get());
   } else if (!hasBar && m_hBar) {
     m_view->removeChild(m_hBar.get());
-    ;
     m_hBar = 0;
   }
 }
