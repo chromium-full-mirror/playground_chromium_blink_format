@@ -44,7 +44,8 @@ class CodeBlock;
 struct Instruction;
 
 #if ENABLE(SAMPLING_TOOL)
-extern OpcodeID what;
+extern OpcodeID currentOpcodeID;
+extern unsigned inCalledCode;
 #endif
 
 struct ScopeSampleRecord {
@@ -102,7 +103,7 @@ class SamplingTool {
     m_recordedCodeBlock = 0;
     m_recordedVPC = 0;
 #if ENABLE(SAMPLING_TOOL)
-    what = (OpcodeID)-1;
+    currentOpcodeID = static_cast<OpcodeID>(-1);
 #endif
   }
 
